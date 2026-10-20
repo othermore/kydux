@@ -224,6 +224,9 @@ kydux/
 - **One piece at a time.** The owner asks for a numbered piece of the current
   phase; it is done, its checks pass, it is tried on the network; then the
   next. Pieces of a phase can be reordered when one is blocked.
+- **Sprints.** A run of pieces given to the implementer together is a
+  sprint, with its own document, `sprint-<n>.md`, that spells each piece
+  out to the file and the test, and ends with the owner's acceptance test.
 - **Checks at every piece**: `pytest world content` (the world and every
   level's solutions and wrong answers), `npm test` (Vitest), `tools/i18n_check.py`,
   `tests/project/` (no forbidden name anywhere, no secret-looking string, every

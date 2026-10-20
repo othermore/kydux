@@ -71,12 +71,25 @@ async function showLevel(root: HTMLElement, id: string): Promise<void> {
     content.replaceChildren(screen.node);
     screen.mount();
   } catch (error) {
-    if (!(error instanceof LevelNotFound)) throw error;
+    if (shownLevel !== id) return;
     document.title = t('app.title');
+    if (error instanceof LevelNotFound) {
+      content.replaceChildren(
+        element('div', { className: 'not-found' }, [
+          element('p', {}, [t('level.not_found', { id })]),
+          element('a', { id: 'first-level', href: `#level/${FIRST_LEVEL}` }, [t('level.go_first')]),
+        ]),
+      );
+      return;
+    }
+    // The network, or a part of the game that did not arrive.
+    console.error(error);
+    const reload = element('button', { id: 'reload', type: 'button' }, [t('level.reload')]);
+    reload.addEventListener('click', () => location.reload());
     content.replaceChildren(
       element('div', { className: 'not-found' }, [
-        element('p', {}, [t('level.not_found', { id })]),
-        element('a', { id: 'first-level', href: `#level/${FIRST_LEVEL}` }, [t('level.go_first')]),
+        element('p', {}, [t('level.load_failed')]),
+        reload,
       ]),
     );
   }

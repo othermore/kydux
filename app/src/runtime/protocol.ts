@@ -21,8 +21,34 @@ export interface ErrorInfo {
   line?: number | null;
 }
 
+export type WorldStatus = 'won' | 'incomplete' | 'error' | 'too_many_ticks' | 'interrupted';
+
+/** One tick of a run (kydux_world.world.Event.to_dict). */
+export interface WorldEvent {
+  tick: number;
+  actor: string;
+  kind: string;
+  data: Record<string, unknown>;
+  line: number | null;
+}
+
+/** How a goal came out (kydux_world.goals.GoalResult.to_dict). */
+export interface WorldGoal {
+  kind: string;
+  params: Record<string, unknown>;
+  met: boolean;
+  met_at_tick: number | null;
+}
+
 /** What the world says of a run in a level (kydux_world.run.RunResult.to_dict). */
-export type WorldResult = Record<string, unknown>;
+export interface WorldResult {
+  status: WorldStatus;
+  events: WorldEvent[];
+  goals: WorldGoal[];
+  ticks: number;
+  stdout: string;
+  error: ErrorInfo | null;
+}
 
 export interface RunResult {
   status: 'ok' | 'error' | 'interrupted';

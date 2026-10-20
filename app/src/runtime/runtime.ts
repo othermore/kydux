@@ -2,7 +2,14 @@
 // time, and stops a run that goes on too long, in place through Pyodide's
 // interrupt buffer when the page is isolated, else by starting a new worker.
 
-import type { FromWorker, LevelJson, RunResult, RuntimeInfo, ToWorker } from './protocol';
+import type {
+  FromWorker,
+  LevelJson,
+  RunResult,
+  RuntimeInfo,
+  ToWorker,
+  WorldResult,
+} from './protocol';
 
 export type RuntimeStatus = 'loading' | 'ready' | 'running' | 'restarting' | 'failed';
 
@@ -32,16 +39,30 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 /** Whether a world's result has the shape the page plays back. */
-export function isWorldResult(value: unknown): boolean {
+export function isWorldResult(value: unknown): value is WorldResult {
   if (!isObject(value) || !WORLD_STATUSES.includes(value.status as string)) return false;
-  const { events, goals } = value;
+  const { events, goals, ticks, stdout, error } = value;
   return (
     Array.isArray(events) &&
     events.every(
-      (e) => isObject(e) && typeof e.tick === 'number' && typeof e.kind === 'string' && isObject(e.data),
+      (e) =>
+        isObject(e) &&
+        typeof e.tick === 'number' &&
+        typeof e.actor === 'string' &&
+        typeof e.kind === 'string' &&
+        isObject(e.data) &&
+        (typeof e.line === 'number' || e.line === null),
     ) &&
     Array.isArray(goals) &&
-    goals.every((g) => isObject(g) && typeof g.met === 'boolean')
+    goals.every(
+      (g) =>
+        isObject(g) &&
+        typeof g.met === 'boolean' &&
+        (typeof g.met_at_tick === 'number' || g.met_at_tick === null),
+    ) &&
+    typeof ticks === 'number' &&
+    typeof stdout === 'string' &&
+    (error === null || isObject(error))
   );
 }
 

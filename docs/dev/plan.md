@@ -302,7 +302,7 @@ One hard-coded level played end to end: editor, Python, scene, goals.
 1.4 The editor: CodeMirror with Python, the starting code, the running line
     marked during playback, Cast and Stop buttons.
 1.5 The goals panel: the level's goals ticked as events arrive; a win banner.
-1.6 The first level, "The corridor": reach the door with three moves; its
+1.6 The first level, "The corridor": reach the door in six steps; its
     `solution.py` and `wrong/` checked by pytest.
 1.7 Interrupts: the tick limit shown as a message; a tight loop stopped by the
     interrupt buffer or a worker restart; Vitest for the bridge.

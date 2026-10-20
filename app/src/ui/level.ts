@@ -7,7 +7,7 @@ import type { SceneHandle } from '../engine/scene';
 import type { Speed } from '../engine/playback';
 import { currentLanguage, t } from '../i18n';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
-import type { RunResult } from '../runtime/protocol';
+import type { RunResult, WorldResult } from '../runtime/protocol';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
@@ -16,19 +16,6 @@ import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
 const SPEEDS: Speed[] = [1, 2, 4];
 const SPEED_KEY = 'kydux.speed';
 const DEFAULT_TICK_LIMIT = 1000;
-
-interface WorldGoal {
-  met: boolean;
-  met_at_tick: number | null;
-}
-
-/** The world's result as the level screen reads it (kydux_world.run.RunResult). */
-interface World {
-  status: 'won' | 'incomplete' | 'error' | 'too_many_ticks' | 'interrupted';
-  events: { line: number | null }[];
-  goals: WorldGoal[];
-  error: { type: string; message: string; line?: number | null } | null;
-}
 
 function storage(kind: 'local' | 'session'): Storage | null {
   try {
@@ -133,7 +120,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   });
 
   let scene: SceneHandle | null = null;
-  let world: World | null = null;
+  let world: WorldResult | null = null;
   let stopped: (() => void)[] = [];
   let destroyed = false;
 
@@ -160,7 +147,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   };
   stopped.push(runtime.onStatus(showStatus));
 
-  const outcomeOf = (result: World): Outcome => {
+  const outcomeOf = (result: WorldResult): Outcome => {
     switch (result.status) {
       case 'won':
         return { kind: 'won' };
@@ -214,20 +201,22 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     runtime.run(editor.getDoc(), loaded.level).then(
       (result: RunResult) => {
         if (destroyed) return;
-        const ran = result.world as World | undefined;
+        const ran = result.world;
         if (!ran) {
           // A run stopped by ending the worker comes back without a world.
           world = {
             status: result.status === 'interrupted' ? 'interrupted' : 'error',
             events: [],
             goals: [],
+            ticks: 0,
+            stdout: result.stdout,
             error: result.error ?? null,
           };
           finish();
           return;
         }
         world = ran;
-        handle.load(result.world ?? {});
+        handle.load(ran);
         handle.playback.setSpeed(Number(speed.value) as Speed);
         if (ran.events.length === 0) {
           markGoals(0);
@@ -245,6 +234,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           status: 'error',
           events: [],
           goals: [],
+          ticks: 0,
+          stdout: '',
           error: { type: 'Error', message: error instanceof Error ? error.message : String(error) },
         };
         finish();

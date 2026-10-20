@@ -39,6 +39,7 @@
     "not_found": "No hay ningún nivel llamado «{id}».",
     "failed": "Python no ha podido arrancar. Recarga la página para intentarlo de nuevo.",
     "reload": "Recargar",
-    "go_first": "Ir al primer nivel"
+    "go_first": "Ir al primer nivel",
+    "load_failed": "No se ha podido cargar el nivel. Recarga la página para intentarlo de nuevo."
   }
 }

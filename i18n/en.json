@@ -39,6 +39,7 @@
     "not_found": "There is no level called “{id}”.",
     "failed": "Python could not start. Reload the page to try again.",
     "reload": "Reload",
-    "go_first": "Go to the first level"
+    "go_first": "Go to the first level",
+    "load_failed": "The level could not be loaded. Reload the page to try again."
   }
 }

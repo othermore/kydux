@@ -1,13 +1,10 @@
 // The playback of a run's events, one tick per event, at a speed the child
 // chooses. It knows nothing of Phaser: the scene listens to it and draws.
 
-export interface PlaybackEvent {
-  tick: number;
-  actor: string;
-  kind: string;
-  data: Record<string, unknown>;
-  line: number | null;
-}
+import type { WorldEvent } from '../runtime/protocol';
+
+/** What the playback plays: the world's events, one tick each. */
+export type PlaybackEvent = WorldEvent;
 
 export type PlaybackState = 'idle' | 'playing' | 'paused' | 'done';
 export type Speed = 1 | 2 | 4;

@@ -22,8 +22,8 @@ acceptance test comes later, after further sprints; section 6 is for then.
   are tiles to place; the world will read the `.tmj` then, and the rows of
   characters will go. Two files describing one map would drift.
 - **D17 — CodeMirror 6**, `codemirror@6.0.2` with `@codemirror/lang-python@6.2.1`,
-  as planned (D5); pinned exactly, with whatever `@codemirror/*` packages
-  they pull in left to the lock file.
+  as planned (D5); pinned exactly, and the `@codemirror/*` packages the
+  editor imports directly declared and pinned too, one copy of each.
 - **The scene speaks only through the DOM.** Everything a test or a person
   needs to know (the tick being played, where the wizard is, the outcome) is
   in the page, in text and `data-*` attributes; nothing is read from the
@@ -293,9 +293,9 @@ Small things the skeleton must get right before it grows:
   status line shows `level.restarting`, Cast disabled until ready.
 - **Resize**: the scene follows its parent; the editor too.
 
-Each with a browser test where the browser is needed (the 404, the
-interrupt path over plain HTTP with `KYDUX_HTTP=1` in a second Playwright
-project), a Vitest where not.
+Each with a browser test where the browser is needed (the 404; the
+interrupt path without isolation, which the test brings about in the page
+itself, since HTTP on localhost is isolated too), a Vitest where not.
 
 ### 1.8 Hardening the sandbox (D14)
 
@@ -310,15 +310,15 @@ project), a Vitest where not.
   the headers are the one source, and a meta tag cannot carry
   `frame-ancestors`.
 - **`kydux_world/sandbox.py`**: `install()` puts a finder first on
-  `sys.meta_path` that raises `ImportError("the spell book has no chapter
-  called js")` for `js`, `pyodide`, `pyodide_js`, `_pyodide`, `micropip`,
-  `pyodide.ffi` and anything under them; and removes those already in
-  `sys.modules` from the child's reach by the same finder (an `import`
-  looks in `sys.modules` first, so the names that Pyodide imported are
-  deleted from it after the world is loaded, except `_pyodide`'s internals
-  the runtime itself needs, which are left and only blocked at import).
-  The worker calls it once after loading. The message is mapped to the
-  child's words in 2.4; for now its English goes through `outcome.error`.
+  `sys.meta_path` that refuses `js`, `pyodide`, `pyodide_js`, `_pyodide`,
+  `_pyodide_core`, `micropip` and anything under them, and removes those
+  already in `sys.modules` from the child's reach (an `import` looks in
+  `sys.modules` first), except `_pyodide`'s internals Pyodide itself runs
+  from, which stay and are only refused at import; and the child's code
+  runs with builtins whose `__import__` refuses the same names, loaded or
+  not. The worker calls `install()` once after loading. The refusal is
+  Python's own `ModuleNotFoundError`, which 2.4 says in the child's words
+  (D19).
   Tests under CPython: the finder blocks the names and leaves `json`,
   `math`, `random` alone; a test in the worker's browser suite: `import js`
   in the editor shows the ImportError.

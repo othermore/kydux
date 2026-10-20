@@ -189,7 +189,7 @@ export function startScene(parent: HTMLElement, level: LevelJson): Promise<Scene
       resolve({
         playback,
         load(result: WorldResult) {
-          playback.load((result.events as PlaybackEvent[] | undefined) ?? []);
+          playback.load(result.events);
         },
         reset() {
           playback.reset();

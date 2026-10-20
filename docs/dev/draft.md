@@ -217,10 +217,8 @@ prompts and the scripts that cut them are kept outside the repository, in
 - Terrain tiles: generated as seamless textures, or a free tileset; to be
   settled by a second round of tests.
 
-## 7. What the plan is to cover
+## 7. The plan
 
-A full, detailed plan of every phase is to be written from this draft: the
-basic technology (the runtime, the level model, the renderer, the editor, i18n,
-saving, the launcher), the art, the story and the levels, the packaging for
-Kidux, and the way the project is developed: tests, the checks of every level,
-releases, and the hours of the repository.
+`plan.md` takes this draft further: the stack, how the game works, the
+repository's layout, the development model and every phase with its pieces
+and its acceptance test.

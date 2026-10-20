@@ -178,10 +178,13 @@ serving it on the network instead of on `localhost`:
 
 - **During development**: `npm run dev` runs Vite's server bound to all
   interfaces (`--host`), with hot reload; the MacBook opens
-  `http://hija.local:5173` (mDNS, which macOS resolves) or
-  `http://10.10.11.226:5173`. A change saved on the Linux machine shows in the
-  MacBook's browser within a second. The server sends the COOP/COEP headers
-  so the interrupt buffer works there too.
+  `https://hija.local:5173` (mDNS, which macOS resolves) or
+  `https://10.10.11.226:5173`. A change saved on the Linux machine shows in the
+  MacBook's browser within a second. The server sends the COOP/COEP headers,
+  and serves HTTPS because a browser isolates only a secure context, which
+  plain HTTP from another computer is not: its certificate comes from a
+  local authority of the machine's own (`ci/dev-cert.sh`), which the MacBook
+  trusts once (architecture.md, D13; dev-environment.md, section 4).
 - **A built game**: `npm run build` then `npm run preview -- --host` serves
   `dist/` the way the launcher will; or the launcher itself with
   `kydux --listen 0.0.0.0:8765`, which is what a release will run.
@@ -229,7 +232,7 @@ kydux/
   out to the file and the test, and ends with the owner's acceptance test.
 - **Checks at every piece**: `pytest world content` (the world and every
   level's solutions and wrong answers), `npm test` (Vitest), `tools/i18n_check.py`,
-  `tests/project/` (no forbidden name anywhere, no secret-looking string, every
+  `tests/project/` (no forbidden word anywhere, no secret-looking string, every
   asset in a manifest with a licence, the two READMEs in step). All of them
   together: `ci/check.sh`. The Playwright suite, slower, runs before a release
   and when a piece touches the shell.
@@ -265,8 +268,9 @@ network.
 0.2 `world/` as a Python package with `pyproject.toml`, an empty `Level`,
     `pytest` running; `uv` or a plain venv, documented.
 0.3 `ci/check.sh` running pytest, Vitest, `tools/i18n_check.py` and
-    `tests/project/`: the forbidden-name check (the inspiring game's name,
-    case-insensitive, in any tracked file), the secret check (strings shaped
+    `tests/project/`: the forbidden-word check (a list kept outside the
+    repository, in any case and any spelling, in every tracked file, path
+    and commit message), the secret check (strings shaped
     like API keys, `secrets.env` content), the manifest check, the READMEs in
     step (same headings).
 0.4 GitHub Actions: `check.yml` running `ci/check.sh` on push.
@@ -275,7 +279,7 @@ network.
     another computer, the hours.
 0.6 Pin every version; note each in the architecture document.
 
-UAT: open `http://hija.local:5173` on the MacBook, see the page in Spanish,
+UAT: open `https://hija.local:5173` on the MacBook, see the page in Spanish,
 switch the MacBook's browser language to English, see it in English.
 
 ### Phase 1 — Walking skeleton

@@ -26,13 +26,10 @@ node --version      # v24.x
 Nothing else is installed system-wide: Python packages go in a venv, npm
 packages in `app/node_modules`, Playwright's browser in `~/.cache/ms-playwright`.
 
-The owner also creates, once, outside the repository:
-
-```sh
-printf '%s\n' '<the name of the game Kydux takes after, lowercase>' > ~/.config/kydux/forbidden.txt
-```
-
-which the forbidden-name check (piece 0.3) reads. The name itself is never
+The owner also creates, once, outside the repository,
+`~/.config/kydux/forbidden.txt`: the list of forbidden words, one entry per
+line with `#` for comments, starting with the name of the game Kydux takes
+after, which the forbidden-word check (piece 0.3) reads. No entry is ever
 written in any file of the repository, this one included.
 
 ## 2. Versions
@@ -153,9 +150,18 @@ stubbed `navigator` and `localStorage`; no DOM library is needed): placeholder
 substitution, fallback to the key, the detection order. Parity between the
 languages is the check's job (0.3), not this test's.
 
-**Done when** `npm run dev` prints a network URL; from the MacBook
-`http://hija.local:5173` shows the page in the browser's language;
-`curl -sI http://localhost:5173/ | grep -i cross-origin` shows both headers;
+**HTTPS.** A browser isolates only a secure context, and plain HTTP from
+another computer is not one, so the dev and preview servers serve HTTPS
+when `~/.config/kydux/tls/server.crt` exists, made by `ci/dev-cert.sh`: a
+certificate authority of the machine's own, limited by name constraints to
+the machine's names and private addresses, and a certificate for
+`localhost`, `hija`, `hija.local` and the machine's private addresses.
+`KYDUX_HTTP=1` serves plain HTTP regardless (D13).
+
+**Done when** `npm run dev` prints a network URL; from the MacBook, with
+the authority trusted, `https://hija.local:5173` shows the page in the
+browser's language; `curl -sI --cacert ~/.config/kydux/tls/ca.crt
+https://hija.local:5173/ | grep -i cross-origin` shows both headers;
 the page says it can stop a spell that runs forever; `npm run build` and
 `npm run preview` serve the same from `dist/`.
 
@@ -193,10 +199,13 @@ capital letter; fails on it, since every user-facing string goes through
 `tracked_files()` = `git ls-files -co --exclude-standard -z`, text files only
 by a small extension list plus files without extension that decode as UTF-8):
 
-- `test_forbidden.py`: reads `~/.config/kydux/forbidden.txt` (one word per
-  line); for each tracked file, its path and its content, case-insensitive,
-  must not contain any word; also the output of `git log --format=%B` for the
-  commit messages. When the file does not exist (CI), the test is skipped
+- `test_forbidden.py`, with its logic in `tools/forbidden.py`: reads
+  `~/.config/kydux/forbidden.txt` (one entry per line, `#` for comments); an
+  entry matches in any case, with accents ignored and up to three other
+  characters between its letters, so one entry covers its spaced,
+  hyphenated and underscored spellings; no tracked file's path or content
+  and no commit message may match one. A finding names the place, never the
+  word. The matcher's rules are tested on a made-up word. When the file does not exist (CI), the test is skipped
   with a message saying so; the pre-commit hook makes it run on the machine
   at every commit, which is where it matters.
 - `test_secrets.py`: no tracked file matches `AIza[0-9A-Za-z_-]{35}`,
@@ -219,14 +228,16 @@ test`, `npm run build`. `--e2e` adds `npm run e2e` at the end (needs a built
 `dist/`; the Playwright config starts `vite preview` itself). Prints `==> All
 checks passed` or stops at the first failure.
 
-**`ci/hooks/pre-commit`.** Runs `pytest -q tests/project/test_forbidden.py
-tests/project/test_secrets.py` against the staged tree (`git stash` is not
-used; the tests read the working tree, which is what is committed in
-practice; the comment says so). Takes under two seconds.
+**`ci/hooks/pre-commit`.** Runs `tools/forbidden.py files` and
+`tests/project/test_secrets.py` against the working tree (not the staged
+one: in practice they are what is committed; the comment says so), and
+refuses the commit when the forbidden list is missing. **`ci/hooks/commit-msg`**
+runs `tools/forbidden.py message` on the message. Both take under two
+seconds.
 
 **Done when** `ci/check.sh` passes end to end on the machine, and a file
-containing the forbidden word, or a fake `AIza…` string, makes `git commit`
-refuse.
+containing a forbidden word in any spelling, a fake `AIza…` string, or a
+commit message with a forbidden word, makes `git commit` refuse.
 
 ### 0.4 GitHub Actions
 
@@ -250,7 +261,7 @@ The implementer does not push; the owner runs `ci/push.sh`.
   with D1–D12 dated `date -I`: D1 a static web app in TypeScript built by
   Vite; D2 Pyodide in a worker; D3 the world in Python, tested under CPython;
   D4 Phaser, version deferred to 1.3; D5 CodeMirror 6; D6 the Go launcher;
-  D7 i18n as JSON files with a parity check; D8 the forbidden name kept
+  D7 i18n as JSON files with a parity check; D8 the forbidden words kept
   outside the repository; D9 Node from NodeSource; D10 no UI framework for
   the shell; D11 the COOP/COEP headers everywhere the game is served; D12 the
   GitHub hours (pointing at `ci/hours.py`). Each entry: what, why, what it
@@ -524,20 +535,22 @@ screen of pieces 1.3–1.5 replaces.
 
 ## 6. Acceptance test (the owner, from the MacBook)
 
-1. On the Linux machine: `cd app && npm run dev`. On the MacBook, open
-   `http://hija.local:5173` (or the IP shown by Vite).
-2. The page is in the MacBook's language; the select switches it without a
+1. Once: on the MacBook, trust the development authority
+   (`docs/dev/dev-environment.md`, section 4).
+2. On the Linux machine: `cd app && npm run dev`. On the MacBook, open
+   `https://hija.local:5173` (or the address Vite shows, with `https://`).
+3. The page is in the MacBook's language; the select switches it without a
    reload; the status says the page can stop a spell that runs forever.
-3. "Preparing Python…" turns into "Python 3.14.x ready" within a few seconds
+4. "Preparing Python…" turns into "Python 3.14.x ready" within a few seconds
    (longer the first time).
-4. *Run* with the starting line prints `Hello, Kydux!`.
-5. Replace it with `while True: pass`, *Run*: within about five seconds the
+5. *Run* with the starting line prints `Hello, Kydux!`.
+6. Replace it with `while True: pass`, *Run*: within about five seconds the
    status says it was stopped, and *Run* works again without reloading.
-6. Type `wizard.move_right(6)` and press *Run in the corridor*: the JSON
+7. Type `wizard.move_right(6)` and press *Run in the corridor*: the JSON
    shows `"status": "won"` and six `move` events; try `wizard.move_right(3)`
    and see `"incomplete"`; try `wizrd.move_right(6)` and see a `NameError`
    on line 1.
-7. On the Linux machine, `ci/check.sh --e2e` passes; `git log` shows one
+8. On the Linux machine, `ci/check.sh --e2e` passes; `git log` shows one
    commit per piece, none pushed.
 
 ## 7. How the implementer works

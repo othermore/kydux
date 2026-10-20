@@ -186,9 +186,36 @@ starting code are translated.
   not spoken lines, so that they need no translation.
 - The lessons and the dialogue are **not read aloud**; they are text.
 
+### What the first tests showed
+
+Three styles were tried with `gemini-3-pro-image` (a scene, a 4×4 walking sheet
+of the wizard and a tileset each, on a magenta background to be keyed out):
+
+- **Retro pixel art, seen from above with front-facing walls**: the best fit.
+  The scene came out on a clean grid; the walking sheet came out regular, with
+  the same wizard in all sixteen frames, and it was keyed, cut, reduced to its
+  true pixels (each drawn pixel is 4 of the image's) and animated walking over
+  tiles without retouching. The tileset's objects (wand, book, broom, potion,
+  chest, doors) are usable as they are. Its floor and wall tiles are not: they
+  carry their own borders and are not the same size, so they show seams when
+  repeated. Terrain needs another approach: each terrain asked for alone as a
+  seamless texture, or a free tileset in a matching style with the characters
+  and objects generated.
+- **Detailed pixel art**: drifted into a diagonal, isometric-like view, which is
+  harder to program; set aside.
+- **Cartoon with outlines**: pleasant and consistent, but drew the sheet's cells
+  on white rather than on the key colour, and its smooth lines do not reduce to a
+  small grid as cleanly; a second choice.
+
+The working choice is the retro pixel style on a grid of about 48 screen
+pixels, the wizard about one and a quarter tiles tall. The raw tests, their
+prompts and the scripts that cut them are kept outside the repository, in
+`art/raw/`.
+
 ## 6. Open questions
 
-- The art's style and grid size, to be settled on the Gemini tests.
+- Terrain tiles: generated as seamless textures, or a free tileset; to be
+  settled by a second round of tests.
 
 ## 7. What the plan is to cover
 

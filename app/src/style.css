@@ -186,3 +186,83 @@ footer {
   text-underline-offset: 4px;
   background: #fff0e6;
 }
+
+/* The goals panel and the outcome card. */
+
+.goals {
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
+  font-size: 16px;
+}
+
+.goals h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.goals ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.goal {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.goal-mark {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  border: 2px solid var(--muted);
+  border-radius: 50%;
+  transform: translateY(0.15em);
+}
+
+.goal[data-mark='met'] .goal-mark {
+  border-color: var(--ok);
+  background: var(--ok);
+  box-shadow: inset 0 0 0 2px #fff;
+}
+
+.goal[data-mark='failed'] .goal-mark {
+  border-color: var(--warning);
+  background: var(--warning);
+  box-shadow: inset 0 0 0 2px #fff;
+}
+
+.outcome {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border-left: 6px solid var(--muted);
+  background: var(--panel);
+}
+
+.outcome-text {
+  margin: 0;
+}
+
+.outcome[data-kind='won'] {
+  border-left-color: var(--ok);
+  background: #ebfbee;
+}
+
+.outcome[data-kind='incomplete'] {
+  border-left-color: var(--accent);
+}
+
+.outcome[data-kind='error'],
+.outcome[data-kind='failed'],
+.outcome[data-kind='too_many_ticks'],
+.outcome[data-kind='interrupted'] {
+  border-left-color: var(--warning);
+  background: #fff4e6;
+}

@@ -25,5 +25,22 @@
     "stopped": "Stopped: the code ran for more than {seconds} seconds.",
     "failed": "Python could not start. Reload the page to try again.",
     "error_line": " (line {line})"
+  },
+  "goals": {
+    "title": "Goals",
+    "open": "Not met yet",
+    "met": "Met",
+    "failed": "Failed"
+  },
+  "outcome": {
+    "won": "You did it!",
+    "incomplete": "Not yet: {n} of {total} goals met. Try again.",
+    "too_many_ticks": "The wizard is tired: the spell ran more than {limit} steps. Is there a loop that never ends?",
+    "interrupted": "The spell was stopped: it was running for more than {seconds} seconds.",
+    "error": "Python says: {type}: {message} (line {line})",
+    "error_no_line": "Python says: {type}: {message}"
+  },
+  "level": {
+    "failed": "Python could not start. Reload the page to try again."
   }
 }

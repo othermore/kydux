@@ -25,5 +25,22 @@
     "stopped": "Parado: el código ha estado más de {seconds} segundos sin terminar.",
     "failed": "Python no ha podido arrancar. Recarga la página para intentarlo de nuevo.",
     "error_line": " (línea {line})"
+  },
+  "goals": {
+    "title": "Objetivos",
+    "open": "Aún sin cumplir",
+    "met": "Cumplido",
+    "failed": "Fallido"
+  },
+  "outcome": {
+    "won": "¡Lo has conseguido!",
+    "incomplete": "Todavía no: {n} de {total} objetivos cumplidos. Inténtalo otra vez.",
+    "too_many_ticks": "El mago está agotado: el hechizo ha dado más de {limit} pasos. ¿Hay algún bucle que no termina nunca?",
+    "interrupted": "Se ha detenido el hechizo: llevaba más de {seconds} segundos sin terminar.",
+    "error": "Python dice: {type}: {message} (línea {line})",
+    "error_no_line": "Python dice: {type}: {message}"
+  },
+  "level": {
+    "failed": "Python no ha podido arrancar. Recarga la página para intentarlo de nuevo."
   }
 }

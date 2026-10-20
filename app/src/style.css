@@ -122,3 +122,67 @@ footer {
   overflow: hidden;
   background: #1f2330;
 }
+
+/* The editor. */
+
+.cm-editor {
+  height: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  font-size: 17px;
+}
+
+.cm-editor.cm-focused {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.cm-scroller {
+  font-family: var(--mono);
+  line-height: 1.5;
+}
+
+.cm-gutters {
+  border-right: 1px solid var(--border);
+  background: #f1eee6;
+  color: var(--muted);
+}
+
+.cm-lineNumbers .cm-gutterElement {
+  min-width: 3ch;
+}
+
+.cm-kydux-marks .cm-gutterElement {
+  width: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cm-kydux-mark {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid var(--accent);
+}
+
+.cm-kydux-mark-error {
+  width: 10px;
+  height: 10px;
+  border: none;
+  border-radius: 50%;
+  background: var(--warning);
+}
+
+.cm-kydux-running-line {
+  background: #dbe4ff;
+}
+
+.cm-kydux-error-line {
+  text-decoration: underline wavy var(--warning);
+  text-underline-offset: 4px;
+  background: #fff0e6;
+}

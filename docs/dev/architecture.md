@@ -21,6 +21,7 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/i18n/     every string the player sees, from i18n/<lang>.json
   src/runtime/  the worker that holds Pyodide, and the page's side of it
   src/engine/   the scene in Phaser, and the playback of a run's events
+  src/editor/   the child's editor, CodeMirror
   src/ui/       the screens
   scripts/      copy Pyodide into public/ and pack the world, before dev and build
   e2e/          the browser tests (Playwright), beside the node_modules they need
@@ -46,6 +47,9 @@ Pinned exactly, checked against their registries on 2026-10-20:
 | Playwright | 1.64.1 | |
 | Pyodide | 314.0.7 | Python 3.14 |
 | Phaser | 4.2.1 | the scene; loaded on its own, after the page (D15) |
+| codemirror | 6.0.2 | the editor (D17), with the packages below |
+| @codemirror/lang-python | 6.2.1 | |
+| @codemirror/state, view, commands, language, autocomplete | 6.7.6, 6.43.15, 6.11.1, 6.13.1, 6.20.4 | imported directly, so declared and pinned; one copy of each in the lock |
 | Python on the machine | 3.13 | `kydux_world` keeps to syntax that runs on 3.12 and up |
 | pytest | 9.1.1 | |
 | ruff | 0.17.1 | one configuration for all the Python, `ruff.toml` |
@@ -144,3 +148,11 @@ one overturns stays, marked as superseded.
   the art in phase 4, when there are tiles to place: the world will read the
   `.tmj` then, and the rows of characters will go. Two files describing one
   map would drift.
+- **D17 — CodeMirror 6, its packages declared.** Decided 2026-10-20
+  (sprint-2.md), built 2026-10-21. `codemirror` 6.0.2 with
+  `@codemirror/lang-python` 6.2.1, as D5 planned. The editor imports
+  `@codemirror/state`, `view`, `commands`, `language` and `autocomplete`
+  directly, so they are declared and pinned at the versions `codemirror`
+  resolves, rather than left to the lock file as sprint-2.md said: a package
+  used but not declared can vanish with an update of the one that brought
+  it, and two copies of `@codemirror/state` break the editor.

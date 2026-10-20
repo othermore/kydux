@@ -17,6 +17,8 @@ export interface WorkerLike {
 export interface RuntimeOptions {
   /** How long a run may last before it is stopped, in milliseconds. */
   wallClockMs?: number;
+  /** How long Python may take to load before it is given up on, in milliseconds. */
+  loadTimeoutMs?: number;
   createWorker?: () => WorkerLike;
   /** Whether to share an interrupt buffer; by default, when the page is isolated. */
   isolated?: boolean;
@@ -26,6 +28,9 @@ export interface RuntimeOptions {
 const SIGINT = 2;
 /** How long an interrupt in place may take before the worker is ended instead. */
 const INTERRUPT_GRACE_MS = 2000;
+/** Pyodide does not say when its WebAssembly fails to arrive: it waits forever.
+ * A load that has not finished in this long is taken as failed. */
+const LOAD_TIMEOUT_MS = 120_000;
 
 function defaultWorker(): WorkerLike {
   return new Worker(new URL('./worker.ts', import.meta.url), {
@@ -44,6 +49,7 @@ interface Pending {
 
 export class Runtime {
   readonly wallClockMs: number;
+  private readonly loadTimeoutMs: number;
   private readonly createWorker: () => WorkerLike;
   private readonly interruptBuffer: SharedArrayBuffer | null;
   private worker!: WorkerLike;
@@ -58,6 +64,7 @@ export class Runtime {
 
   constructor(options: RuntimeOptions = {}) {
     this.wallClockMs = options.wallClockMs ?? 5000;
+    this.loadTimeoutMs = options.loadTimeoutMs ?? LOAD_TIMEOUT_MS;
     this.createWorker = options.createWorker ?? defaultWorker;
     const isolated = options.isolated ?? globalThis.crossOriginIsolated === true;
     this.interruptBuffer =
@@ -141,8 +148,15 @@ export class Runtime {
     this.setStatus(status);
     this.worker = this.createWorker();
     this.readyPromise = new Promise<RuntimeInfo>((resolve, reject) => {
+      const worker = this.worker;
+      const giveUp = setTimeout(() => {
+        worker.terminate();
+        this.setStatus('failed');
+        reject(new Error('Python did not finish loading'));
+      }, this.loadTimeoutMs);
       this.worker.onmessage = (event) => {
         const message = event.data;
+        if (message.type === 'ready' || message.type === 'load-error') clearTimeout(giveUp);
         switch (message.type) {
           case 'ready':
             this.lastInfo = {
@@ -170,6 +184,7 @@ export class Runtime {
         }
       };
       this.worker.onerror = (event) => {
+        clearTimeout(giveUp);
         const failure = new Error(event.message || 'the Python worker failed');
         const pending = this.pending;
         this.clearPending();

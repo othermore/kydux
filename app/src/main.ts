@@ -74,7 +74,10 @@ async function showLevel(root: HTMLElement, id: string): Promise<void> {
     if (!(error instanceof LevelNotFound)) throw error;
     document.title = t('app.title');
     content.replaceChildren(
-      element('p', { className: 'not-found' }, [t('level.not_found', { id })]),
+      element('div', { className: 'not-found' }, [
+        element('p', {}, [t('level.not_found', { id })]),
+        element('a', { id: 'first-level', href: `#level/${FIRST_LEVEL}` }, [t('level.go_first')]),
+      ]),
     );
   }
 }

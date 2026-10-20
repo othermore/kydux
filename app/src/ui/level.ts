@@ -152,6 +152,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     }
   };
   const showStatus = (s: RuntimeStatus) => {
+    if (s === 'failed' && card.current?.kind !== 'failed') card.show({ kind: 'failed' });
     status.textContent = statusLine(s);
     status.dataset.status = s;
     cast.disabled = s !== 'ready' || !scene;
@@ -237,6 +238,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       },
       (error: unknown) => {
         if (destroyed) return;
+        if (runtime.status === 'failed') return;
+        // The worker could not run the code at all: its message is shown as an
+        // error, and Cast is ready again.
         world = {
           status: 'error',
           events: [],

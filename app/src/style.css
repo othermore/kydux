@@ -254,6 +254,10 @@ footer {
   margin: 0;
 }
 
+.outcome button {
+  margin-top: 8px;
+}
+
 .outcome[data-kind='won'] {
   border-left-color: var(--ok);
   background: #ebfbee;

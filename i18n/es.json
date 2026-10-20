@@ -37,6 +37,8 @@
     "running": "El hechizo está en marcha…",
     "restarting": "Arrancando Python de nuevo…",
     "not_found": "No hay ningún nivel llamado «{id}».",
-    "failed": "Python no ha podido arrancar. Recarga la página para intentarlo de nuevo."
+    "failed": "Python no ha podido arrancar. Recarga la página para intentarlo de nuevo.",
+    "reload": "Recargar",
+    "go_first": "Ir al primer nivel"
   }
 }

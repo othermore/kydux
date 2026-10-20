@@ -1,0 +1,77 @@
+import { expect, test, type Page } from '@playwright/test';
+
+test.use({ locale: 'en-US' });
+
+async function setCode(page: Page, code: string): Promise<void> {
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText(code);
+}
+
+test('a level that does not exist says so, and leads to the first', async ({ page }) => {
+  await page.goto('/#level/no-such-level');
+  await expect(page.locator('.not-found')).toContainText('There is no level called “no-such-level”.');
+  await page.locator('#first-level').click();
+  await expect(page.locator('.level-title')).toHaveText('The corridor');
+});
+
+test('Python that cannot start says so, with a way to reload', async ({ page }) => {
+  // A wasm that fails to arrive makes Pyodide wait forever, which the runtime's
+  // load timeout catches (a Vitest); a loader that fails to arrive fails at once.
+  await page.route('**/pyodide/pyodide.mjs', (route) => route.abort());
+  await page.goto('/');
+  await expect(page.locator('.outcome-text')).toHaveText(
+    'Python could not start. Reload the page to try again.',
+    { timeout: 60_000 },
+  );
+  await expect(page.locator('#reload')).toBeVisible();
+  await expect(page.locator('#cast')).toBeDisabled();
+});
+
+test('a Cast during the playback starts the new run from the start', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#cast')).toBeEnabled({ timeout: 90_000 });
+  await setCode(page, 'wizard.move_right(6)');
+  await page.locator('#cast').click();
+  await expect(page.locator('#scene')).toHaveAttribute('data-tick', '2', { timeout: 10_000 });
+  await setCode(page, 'wizard.move_right(2)');
+  await page.locator('#cast').click();
+  await expect(page.locator('.outcome-text')).toHaveText('Not yet: 0 of 1 goals met. Try again.', {
+    timeout: 30_000,
+  });
+  await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '3,1');
+});
+
+test('without isolation, a loop that never ends is stopped by starting Python again', async ({
+  page,
+}) => {
+  // As on a page served over plain HTTP from another computer.
+  await page.addInitScript(() =>
+    Object.defineProperty(globalThis, 'crossOriginIsolated', { value: false }),
+  );
+  await page.goto('/');
+  await expect(page.locator('#isolation')).toHaveClass('warning');
+  await expect(page.locator('#cast')).toBeEnabled({ timeout: 90_000 });
+  await setCode(page, 'while True:\n    pass');
+  await page.locator('#cast').click();
+  await expect(page.locator('.outcome-text')).toHaveText(
+    'The spell was stopped: it was running for more than 5 seconds.',
+    { timeout: 15_000 },
+  );
+  await expect(page.locator('#status')).toHaveText('Starting Python again…');
+  await expect(page.locator('#cast')).toBeDisabled();
+  await expect(page.locator('#cast')).toBeEnabled({ timeout: 60_000 });
+  await setCode(page, 'wizard.move_right(6)');
+  await page.locator('#cast').click();
+  await expect(page.locator('.outcome-text')).toHaveText('You did it!', { timeout: 30_000 });
+});
+
+test('the scene follows the size of the window', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/');
+  const canvas = page.locator('#scene canvas');
+  await expect(canvas).toBeVisible({ timeout: 30_000 });
+  const wide = (await canvas.boundingBox())?.width ?? 0;
+  await page.setViewportSize({ width: 900, height: 700 });
+  await expect.poll(async () => (await canvas.boundingBox())?.width ?? 0).toBeLessThan(wide);
+});

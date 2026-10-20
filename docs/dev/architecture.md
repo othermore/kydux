@@ -159,3 +159,10 @@ one overturns stays, marked as superseded.
   resolves, rather than left to the lock file as sprint-2.md said: a package
   used but not declared can vanish with an update of the one that brought
   it, and two copies of `@codemirror/state` break the editor.
+- **D18 — Loading Python has a deadline.** Decided 2026-10-21, found at
+  piece 1.7. When Pyodide's WebAssembly fails to arrive, Pyodide logs a
+  warning and its `loadPyodide()` never settles, so the page would say
+  *Preparing Python…* for ever. The runtime gives up on a load that has not
+  finished in 120 seconds, ends the worker and reports `failed`, which the
+  level screen shows with a *Reload* button. Two minutes leave room for a
+  first load of about 13 MB over a slow connection.

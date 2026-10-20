@@ -154,6 +154,35 @@ describe('Runtime', () => {
     expect(statuses.at(-1)).toBe('ready');
   });
 
+  it('rejects a run the worker could not run, and is ready again', async () => {
+    const { runtime, workers } = setUp(false);
+    const worker = workers[0]!;
+    worker.ready();
+    const result = runtime.run('print(1)');
+    await vi.waitFor(() => expect(runtime.status).toBe('running'));
+    worker.answer({ type: 'crashed', id: worker.lastRun().id, message: 'bad JSON' });
+    await expect(result).rejects.toThrow('bad JSON');
+    expect(runtime.status).toBe('ready');
+  });
+
+  it('gives up on a load that never finishes', async () => {
+    const workers: FakeWorker[] = [];
+    const runtime = new Runtime({
+      isolated: false,
+      loadTimeoutMs: 1000,
+      createWorker: () => {
+        const worker = new FakeWorker();
+        workers.push(worker);
+        return worker;
+      },
+    });
+    const ready = runtime.ready;
+    vi.advanceTimersByTime(1000);
+    await expect(ready).rejects.toThrow('did not finish loading');
+    expect(runtime.status).toBe('failed');
+    expect(workers[0]!.terminated).toBe(true);
+  });
+
   it('reports a failure to load', async () => {
     const { runtime, workers } = setUp(false);
     workers[0]!.answer({ type: 'load-error', message: 'no wasm' });

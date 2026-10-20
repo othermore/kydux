@@ -44,7 +44,10 @@ export interface OutcomeCard {
 
 export function outcomeCard(): OutcomeCard {
   const text = element('p', { className: 'outcome-text' });
-  const node = element('section', { className: 'outcome', hidden: true }, [text]);
+  // Python that could not start needs the page loaded again.
+  const reload = element('button', { id: 'reload', type: 'button', hidden: true });
+  reload.addEventListener('click', () => location.reload());
+  const node = element('section', { className: 'outcome', hidden: true }, [text, reload]);
   node.setAttribute('role', 'status');
   let current: Outcome | null = null;
   return {
@@ -52,6 +55,8 @@ export function outcomeCard(): OutcomeCard {
     show(outcome) {
       current = outcome;
       text.textContent = outcomeText(outcome);
+      reload.textContent = t('level.reload');
+      reload.hidden = outcome.kind !== 'failed';
       node.dataset.kind = outcome.kind;
       node.hidden = false;
     },

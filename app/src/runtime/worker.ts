@@ -3,7 +3,7 @@
 // code when the page asks, one run at a time, and answers with a result.
 
 import type { PyodideAPI } from 'pyodide';
-import type { FromWorker, RunResult, ToWorker } from './protocol';
+import type { FromWorker, LevelJson, RunResult, ToWorker, WorldResult } from './protocol';
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -36,19 +36,43 @@ async function load(interruptBuffer?: SharedArrayBuffer): Promise<void> {
   post({ type: 'ready', pythonVersion, worldVersion });
 }
 
-function run(code: string): RunResult {
+function python(source: string, values: Record<string, unknown>): string {
   if (!pyodide) throw new Error('Python is not loaded');
   if (interrupt) Atomics.store(interrupt, 0, 0);
-  const globals = pyodide.toPy({ code });
+  const globals = pyodide.toPy(values);
   try {
-    const json = pyodide.runPython(
-      'from kydux_world.run import run_script_json; run_script_json(code)',
-      { globals },
-    ) as string;
-    return JSON.parse(json) as RunResult;
+    return pyodide.runPython(source, { globals }) as string;
   } finally {
     globals.destroy();
   }
+}
+
+function run(code: string, level?: LevelJson): RunResult {
+  if (!level) {
+    const json = python('from kydux_world.run import run_script_json; run_script_json(code)', {
+      code,
+    });
+    return JSON.parse(json) as RunResult;
+  }
+  const started = performance.now();
+  const json = python(
+    'from kydux_world.run import run_level_json; run_level_json(level, code)',
+    { code, level: JSON.stringify(level) },
+  );
+  const world = JSON.parse(json) as WorldResult & {
+    status: string;
+    stdout: string;
+    error: RunResult['error'];
+  };
+  return {
+    status:
+      world.status === 'interrupted' ? 'interrupted' : world.status === 'error' ? 'error' : 'ok',
+    stdout: world.stdout,
+    stderr: '',
+    error: world.error,
+    durationMs: Math.round(performance.now() - started),
+    world,
+  };
 }
 
 self.addEventListener('message', (event: MessageEvent<ToWorker>) => {
@@ -59,7 +83,7 @@ self.addEventListener('message', (event: MessageEvent<ToWorker>) => {
     );
   } else if (message.type === 'run') {
     try {
-      post({ type: 'result', id: message.id, result: run(message.code) });
+      post({ type: 'result', id: message.id, result: run(message.code, message.level) });
     } catch (error) {
       post({ type: 'crashed', id: message.id, message: String(error) });
     }

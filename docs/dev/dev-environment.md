@@ -83,8 +83,9 @@ computer keeps trusting the same authority.
 
 The page's status line says whether it is isolated: *This page can stop a
 spell that runs forever.* Without the certificate trusted, the browser
-warns about it; going on anyway works, but the game falls back to
-restarting Python to stop a runaway program.
+warns before it opens the page. When the page is not isolated, whatever the
+reason, the game still works: it stops a runaway program by starting Python
+again, and the status line says so.
 
 From outside the local network, an SSH tunnel makes the game local to the
 other computer, which needs no certificate:
@@ -98,8 +99,9 @@ ci/check.sh          # lint, the world's and the project's tests, i18n, the app'
 ci/check.sh --e2e    # all that, then the browser tests against the built game
 ```
 
-A change to `world/` while the dev server runs needs `npm run predev`
-again, which packs the world for the browser, and a reload.
+A change to `world/` or `content/` while the dev server runs needs
+`npm run predev` again, in `app/`, which packs the world and copies the
+levels for the browser, and a reload.
 
 ## 6. Committing and pushing
 

@@ -2,9 +2,12 @@
 // the browser, until the level screen takes its place.
 
 import { t } from '../i18n';
-import type { RunResult } from '../runtime/protocol';
+import type { LevelJson, RunResult } from '../runtime/protocol';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
 import { element } from './dom';
+
+/** The one level the playground runs code in. */
+const CORRIDOR = '01-the-corridor';
 
 export interface PlaygroundState {
   /** What the child typed; null while it is the starting code, in the page's language. */
@@ -37,6 +40,9 @@ function statusText(runtime: Runtime, status: RuntimeStatus, state: PlaygroundSt
 }
 
 function describe(result: RunResult): { text: string; kind: 'ok' | 'error' } {
+  if (result.world) {
+    return { text: JSON.stringify(result.world, null, 2), kind: 'ok' };
+  }
   const printed = result.stdout + result.stderr;
   if (result.status === 'error' && result.error) {
     const where =
@@ -83,43 +89,56 @@ export function playground(runtime: Runtime, state: PlaygroundState): Rendered {
     state.output,
   ]);
   const run = element('button', { id: 'run', type: 'button' }, [t('playground.run')]);
+  const runLevel = element('button', { id: 'run-level', type: 'button' }, [
+    t('playground.run_level'),
+  ]);
   const stop = element('button', { id: 'stop', type: 'button' }, [t('playground.stop')]);
 
   const show = (s: RuntimeStatus) => {
     status.textContent = statusText(runtime, s, state);
     run.disabled = s !== 'ready';
+    runLevel.disabled = s !== 'ready';
     stop.disabled = s !== 'running';
   };
   const dispose = runtime.onStatus(show);
 
-  run.addEventListener('click', () => {
+  const display = (result: RunResult) => {
+    if (result.status === 'interrupted') {
+      state.stoppedFor = Math.round(runtime.wallClockMs / 1000);
+    }
+    const { text, kind } = describe(result);
+    state.output = text;
+    state.outputKind = kind;
+    output.textContent = text;
+    output.className = `output ${kind}`;
+    show(runtime.status);
+  };
+  const failed = (error: unknown) => {
+    state.output = String(error);
+    state.outputKind = 'error';
+    output.textContent = state.output;
+    output.className = 'output error';
+  };
+  const start = (level?: LevelJson) => {
     state.stoppedFor = null;
-    runtime.run(code.value).then(
-      (result) => {
-        if (result.status === 'interrupted') {
-          state.stoppedFor = Math.round(runtime.wallClockMs / 1000);
-        }
-        const shown = describe(result);
-        state.output = shown.text;
-        state.outputKind = shown.kind;
-        output.textContent = shown.text;
-        output.className = `output ${shown.kind}`;
-        show(runtime.status);
-      },
-      (error: unknown) => {
-        state.output = String(error);
-        state.outputKind = 'error';
-        output.textContent = state.output;
-        output.className = 'output error';
-      },
-    );
+    runtime.run(code.value, level).then(display, failed);
+  };
+
+  run.addEventListener('click', () => start());
+  runLevel.addEventListener('click', () => {
+    fetch(`${import.meta.env.BASE_URL}content/levels/${CORRIDOR}/level.json`)
+      .then((response) => {
+        if (!response.ok) throw new Error(`${CORRIDOR}: HTTP ${response.status}`);
+        return response.json() as Promise<LevelJson>;
+      })
+      .then(start, failed);
   });
   stop.addEventListener('click', () => runtime.interrupt());
 
   const node = element('section', { className: 'playground' }, [
     element('h2', {}, [t('playground.title')]),
     code,
-    element('div', { className: 'buttons' }, [run, stop]),
+    element('div', { className: 'buttons' }, [run, runLevel, stop]),
     status,
     output,
   ]);

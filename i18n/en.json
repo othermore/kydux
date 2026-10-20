@@ -16,6 +16,7 @@
     "code_label": "Python code",
     "starting_code": "print(\"Hello, Kydux!\")",
     "run": "Run",
+    "run_level": "Run in the corridor",
     "stop": "Stop",
     "loading": "Preparing Python…",
     "ready": "Python {version} ready",

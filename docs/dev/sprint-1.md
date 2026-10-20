@@ -516,12 +516,11 @@ but `won`. The corridor's `solution.py` is `wizard.move_right(6)`;
 `wizard.move_up()`.
 
 **In the browser.** The worker's `run` with a `level` calls
-`run_code(Level.from_dict(level), code)` and returns `to_dict()` as
-`result.world`. The playground gains a second button, *Run in the corridor*
+`run_level_json(level, code)` and returns the result as `result.world`. The
+playground gains a second button, *Run in the corridor*
 (`playground.run_level`), which fetches
-`/content/levels/01-the-corridor/level.json` (served by Vite from the
-repository root through `server.fs.allow`, and copied into `dist/content/`
-at build by a small addition to `pack-world.mjs`) and shows the returned
+`content/levels/01-the-corridor/level.json` (copied into `app/public/content/`
+by `pack-world.mjs` before dev and build, so served the same by both) and shows the returned
 `world` JSON pretty-printed, so the owner can type `wizard.move_right(6)`
 and see `"status": "won"` with its six events. A Playwright step covers it.
 

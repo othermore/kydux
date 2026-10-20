@@ -62,3 +62,30 @@ test('the page speaks Spanish, and switches language without a reload', async ({
   await expect(page.locator('#output')).toHaveText('¡Hola, Kydux!');
   await context.close();
 });
+
+test('the wizard walks the corridor in the browser', async ({ page }) => {
+  await page.goto('/');
+  await waitReady(page);
+
+  const world = async () => JSON.parse(await page.locator('#output').innerText()) as {
+    status: string;
+    events: { kind: string; line: number | null }[];
+    error: { type: string; line: number } | null;
+  };
+
+  await setCode(page, 'wizard.move_right(6)');
+  await page.locator('#run-level').click();
+  await expect(page.locator('#output')).toContainText('"status": "won"');
+  const won = await world();
+  expect(won.events.map((e) => e.kind)).toEqual(Array(6).fill('move'));
+  expect(won.events.every((e) => e.line === 1)).toBe(true);
+
+  await setCode(page, 'wizard.move_right(3)');
+  await page.locator('#run-level').click();
+  await expect(page.locator('#output')).toContainText('"status": "incomplete"');
+
+  await setCode(page, 'wizrd.move_right(6)');
+  await page.locator('#run-level').click();
+  await expect(page.locator('#output')).toContainText('"status": "error"');
+  expect((await world()).error).toMatchObject({ type: 'NameError', line: 1 });
+});

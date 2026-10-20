@@ -16,6 +16,7 @@
     "code_label": "Código Python",
     "starting_code": "print(\"¡Hola, Kydux!\")",
     "run": "Ejecutar",
+    "run_level": "Ejecutar en el pasillo",
     "stop": "Parar",
     "loading": "Preparando Python…",
     "ready": "Python {version} listo",

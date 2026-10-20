@@ -10,9 +10,12 @@ import io
 import json
 import time
 import traceback
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
+from typing import Any, Literal
 
-CHILD = "<child>"
+from .goals import GoalResult
+from .level import Level
+from .world import CHILD, Event, TooManyTicks, World
 
 
 @dataclass
@@ -62,3 +65,64 @@ def run_script(code: str) -> dict:
 
 def run_script_json(code: str) -> str:
     return json.dumps(run_script(code))
+
+
+Status = Literal["won", "incomplete", "error", "too_many_ticks", "interrupted"]
+
+
+@dataclass
+class RunResult:
+    """What happened when the child's code ran in a level."""
+
+    status: Status
+    events: list[Event] = field(default_factory=list)
+    goals: list[GoalResult] = field(default_factory=list)
+    ticks: int = 0
+    stdout: str = ""
+    error: ErrorInfo | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "status": self.status,
+            "events": [event.to_dict() for event in self.events],
+            "goals": [goal.to_dict() for goal in self.goals],
+            "ticks": self.ticks,
+            "stdout": self.stdout,
+            "error": asdict(self.error) if self.error else None,
+        }
+
+
+def run_code(level: Level, code: str) -> RunResult:
+    """Run the child's code in `level`, with `wizard` theirs to command.
+
+    The events recorded before an error, or before the tick limit, are kept,
+    so that the scene can show the wizard walking up to the mistake.
+    """
+    world = World(level)
+    stdout = io.StringIO()
+    status: Status
+    error = None
+    try:
+        compiled = compile(code, CHILD, "exec")
+        with contextlib.redirect_stdout(stdout):
+            exec(compiled, {"__name__": "__main__", "wizard": world.wizard})
+    except SyntaxError as caught:
+        status, error = "error", error_info(caught)
+    except TooManyTicks:
+        status = "too_many_ticks"
+    except KeyboardInterrupt:
+        status = "interrupted"
+    except BaseException as caught:  # the child's code may raise anything, exit() too
+        status, error = "error", error_info(caught)
+    else:
+        status = "won" if len(world.met_at) == len(world.goals) else "incomplete"
+    goals = [
+        GoalResult(spec.kind, dict(spec.params), index in world.met_at, world.met_at.get(index))
+        for index, spec in enumerate(level.goals)
+    ]
+    return RunResult(status, list(world.events), goals, world.tick, stdout.getvalue(), error)
+
+
+def run_level_json(level_json: str, code: str) -> str:
+    """The worker's call: a level as JSON and the child's code, the result as JSON."""
+    return json.dumps(run_code(Level.from_json(level_json), code).to_dict())

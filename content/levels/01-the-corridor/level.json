@@ -1,0 +1,10 @@
+{
+  "id": "01-the-corridor",
+  "map": [
+    "#########",
+    "#S.....D#",
+    "#########"
+  ],
+  "goals": [{ "kind": "reach", "marker": "D" }],
+  "tick_limit": 100
+}

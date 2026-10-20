@@ -88,7 +88,7 @@ def test_a_syntax_error_has_no_events():
 def test_the_tick_limit_ends_the_run():
     result = run_code(CORRIDOR, "while True:\n    wizard.say('again')\n")
     assert result.status == "too_many_ticks"
-    assert result.ticks == 21
+    assert result.ticks == 20
     assert len(result.events) == 20
 
 

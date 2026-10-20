@@ -49,6 +49,8 @@ export class Runtime {
   private worker!: WorkerLike;
   private readyPromise!: Promise<RuntimeInfo>;
   private pending: Pending | null = null;
+  /** A run asked for and not yet sent: Python may still be loading. */
+  private reserved = false;
   private nextId = 1;
   private listeners: ((status: RuntimeStatus) => void)[] = [];
   private lastStatus: RuntimeStatus = 'loading';
@@ -91,16 +93,24 @@ export class Runtime {
   }
 
   run(code: string, level?: LevelJson): Promise<RunResult> {
-    if (this.pending) return Promise.reject(new Error('a run is already going on'));
+    if (this.pending || this.reserved) {
+      return Promise.reject(new Error('a run is already going on'));
+    }
+    this.reserved = true;
     return this.ready.then(
       () =>
         new Promise<RunResult>((resolve, reject) => {
+          this.reserved = false;
           const id = this.nextId++;
           const timer = setTimeout(() => this.interrupt(), this.wallClockMs);
           this.pending = { id, resolve, reject, timer, started: Date.now(), interrupted: false };
           this.setStatus('running');
           this.worker.postMessage(level ? { type: 'run', id, code, level } : { type: 'run', id, code });
         }),
+      (error: unknown) => {
+        this.reserved = false;
+        throw error;
+      },
     );
   }
 
@@ -160,8 +170,12 @@ export class Runtime {
         }
       };
       this.worker.onerror = (event) => {
+        const failure = new Error(event.message || 'the Python worker failed');
+        const pending = this.pending;
+        this.clearPending();
         this.setStatus('failed');
-        reject(new Error(event.message || 'the Python worker failed'));
+        reject(failure);
+        pending?.reject(failure);
       };
     });
     // A failure to load is reported through the status; no caller may be waiting.

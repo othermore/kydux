@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
+from .goals import make_goal
 from .level import Level, Position
 
 CHILD = "<child>"
@@ -66,8 +67,6 @@ def child_line() -> int | None:
 
 class World:
     def __init__(self, level: Level) -> None:
-        from .goals import make_goal
-
         self.level = level
         self.tick = 0
         self.events: list[Event] = []
@@ -81,10 +80,11 @@ class World:
         return self.level.inside(position) and position not in self.level.walls
 
     def record(self, actor: str, kind: str, data: dict[str, Any]) -> None:
-        """One tick: the event that happened in it, then the goals checked."""
-        self.tick += 1
-        if self.tick > self.level.tick_limit:
+        """One tick: the event that happened in it, then the goals checked. The
+        level's tick limit is the most ticks a run may take; one more stops it."""
+        if self.tick >= self.level.tick_limit:
             raise TooManyTicks(self.level.tick_limit)
+        self.tick += 1
         self.events.append(Event(self.tick, actor, kind, data, child_line()))
         self._check_goals()
 

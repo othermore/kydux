@@ -1,5 +1,7 @@
 // Pack kydux_world into public/world.zip, which the worker unpacks into Pyodide's
-// file system, and copy the levels into public/content/ for the page to fetch.
+// file system, and copy the levels into public/content/ for the page to fetch:
+// what the game needs of a level, never its solution or its wrong answers,
+// which are the tests' and would otherwise ship with the game.
 //
 // The zip is written here, stored without compression and with a fixed date, so
 // that the same sources always give the same bytes and no zip library is needed.
@@ -102,8 +104,12 @@ writeFileSync(join(publicDir, 'world.zip'), zip(entries));
 
 const content = join(publicDir, 'content');
 rmSync(content, { recursive: true, force: true });
+const shipped = (path) => {
+  const name = relative(join(repo, 'content'), path).split(sep);
+  return !(name.includes('wrong') || name.at(-1) === 'solution.py');
+};
 if (existsSync(join(repo, 'content'))) {
-  cpSync(join(repo, 'content'), content, { recursive: true });
+  cpSync(join(repo, 'content'), content, { recursive: true, filter: shipped });
 }
 
 console.log(`pack-world: ${entries.length} files in public/world.zip, content/ copied`);

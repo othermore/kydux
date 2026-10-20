@@ -89,3 +89,14 @@ test('the wizard walks the corridor in the browser', async ({ page }) => {
   await expect(page.locator('#output')).toContainText('"status": "error"');
   expect((await world()).error).toMatchObject({ type: 'NameError', line: 1 });
 });
+
+test("the built game does not ship a level's solution or wrong answers", async ({ request }) => {
+  // The preview server answers an unknown path with the page itself, so what
+  // matters is that no Python comes back, not the status.
+  const level = await request.get('/content/levels/01-the-corridor/level.json');
+  expect(await level.json()).toMatchObject({ id: '01-the-corridor' });
+  for (const path of ['solution.py', 'wrong/too_short.py']) {
+    const answer = await request.get(`/content/levels/01-the-corridor/${path}`);
+    expect(await answer.text()).not.toContain('wizard');
+  }
+});

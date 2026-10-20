@@ -434,7 +434,7 @@ class World:
     tick: int; events: list[Event]; level: Level; wizard: Wizard
     def is_free(self, position: Position) -> bool     # inside and not a wall
     def record(self, actor: str, kind: str, data: dict) -> None
-        # increments tick first; raises TooManyTicks when tick > level.tick_limit;
+        # raises TooManyTicks when tick == level.tick_limit already, else increments tick;
         # captures the child's line (below); appends the Event
 
 class Wizard:

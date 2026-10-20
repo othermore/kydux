@@ -67,6 +67,36 @@ describe('Runtime', () => {
     expect(statuses).toEqual(['loading', 'ready', 'running', 'ready']);
   });
 
+  it('refuses a second run asked for while Python still loads', async () => {
+    const { runtime, workers } = setUp(false);
+    const first = runtime.run('print(1)');
+    await expect(runtime.run('print(2)')).rejects.toThrow();
+    workers[0]!.ready();
+    const worker = workers[0]!;
+    await vi.waitFor(() => expect(worker.sent.filter((m) => m.type === 'run')).toHaveLength(1));
+    worker.answer({ type: 'result', id: worker.lastRun().id, result: ok });
+    await expect(first).resolves.toEqual(ok);
+  });
+
+  it('lets a run be asked for again after one that could not start', async () => {
+    const { runtime, workers } = setUp(false);
+    const first = runtime.run('print(1)');
+    workers[0]!.answer({ type: 'load-error', message: 'no wasm' });
+    await expect(first).rejects.toThrow('no wasm');
+    await expect(runtime.run('print(2)')).rejects.toThrow('no wasm');
+  });
+
+  it('answers a pending run when the worker itself fails', async () => {
+    const { runtime, workers } = setUp(false);
+    const worker = workers[0]!;
+    worker.ready();
+    const result = runtime.run('print(1)');
+    await vi.waitFor(() => expect(runtime.status).toBe('running'));
+    worker.onerror?.({ message: 'out of memory' } as ErrorEvent);
+    await expect(result).rejects.toThrow('out of memory');
+    expect(runtime.status).toBe('failed');
+  });
+
   it('refuses a second run while one goes on', async () => {
     const { runtime, workers } = setUp(false);
     workers[0]!.ready();

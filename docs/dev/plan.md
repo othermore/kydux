@@ -303,6 +303,13 @@ One hard-coded level played end to end: editor, Python, scene, goals.
 1.7 Interrupts: the tick limit shown as a message; a tight loop stopped by the
     interrupt buffer or a worker restart; Vitest for the bridge.
 
+1.8 Hardening the sandbox (architecture.md, D14): a Content-Security-Policy
+    on every server and in the page, with `connect-src 'self'` so that the
+    child's code can reach no server but the game's own; the modules `js`,
+    `pyodide`, `pyodide_js`, `_pyodide` and `micropip` refused to the child's
+    code by an import hook, as a second line behind the sandbox; and the
+    worker's messages to the page checked for their shape. A test of each.
+
 UAT: from the MacBook, write the three moves, press Cast, watch the wizard
 reach the door; write `while True: pass`, see it stopped with a message;
 misspell a move, see Python's error (plain, not yet translated).
@@ -330,7 +337,11 @@ Everything a level can be made of, with the content format of section 2.5.
     (a short animation, stars by goals met, Next).
 2.8 Completion in the editor from the exposed API, and the grimoire panel
     listing it with translated descriptions and a click to insert an example.
-2.9 A second and third level exercising all of it (a locked door with a key;
+2.9 The world refuses to be tampered with: the wizard's position, facing
+    and items are read-only to the child's code, the world's own objects are
+    out of its reach, and the page replays the events against the level's
+    map, so that a run cannot claim a win it did not make.
+2.10 A second and third level exercising all of it (a locked door with a key;
     sneaking past a teacher), with solutions and wrong answers.
 
 UAT: the three levels from the MacBook; a misspelled spell gets a Spanish

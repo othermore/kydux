@@ -120,3 +120,13 @@ one overturns stays, marked as superseded.
   the machine's names and private address ranges, so that trusting it on the
   other computer trusts nothing else. Without the certificate, as on GitHub,
   the servers serve HTTP on localhost, which browsers count as secure.
+- **D14 — The child's code is contained by the browser's sandbox.**
+  Decided 2026-10-20. The child's Python is real CPython compiled to
+  WebAssembly, running in a Web Worker: it has no access to the computer's
+  files (Pyodide's file system is in memory), processes, sockets or devices,
+  nor to the page, its cookies or other tabs; the servers that serve the game
+  only serve files and execute nothing they are sent. Inside that sandbox the
+  code can still reach Pyodide's bridge to JavaScript (`import js`), and with
+  it make requests as any web page can, post messages to the page, and touch
+  the game's own storage; the worst it can do there is cheat at the game.
+  Piece 1.8 narrows that further (plan.md).

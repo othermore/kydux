@@ -1,36 +1,15 @@
 import { version } from '../package.json';
+import { isLevelId, LevelNotFound, loadLevel } from './content/levels';
 import { currentLanguage, initLanguage, languages, setLanguage, t } from './i18n';
-import type { SceneHandle } from './engine/scene';
-import type { RunResult } from './runtime/protocol';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
-import { newPlaygroundState, playground, type Rendered } from './ui/playground';
+import type { LevelScreen } from './ui/level';
+
+const FIRST_LEVEL = '01-the-corridor';
 
 const runtime = new Runtime();
-const playgroundState = newPlaygroundState();
-let shown: Rendered | null = null;
-
-// The scene is mounted beside the playground until the level screen takes
-// both their places (sprint 2, piece 1.6). Phaser is loaded on its own.
-const sceneParent = element('div', { id: 'scene', className: 'scene' });
-let scene: Promise<SceneHandle> | null = null;
-
-function mountScene(): void {
-  scene = Promise.all([
-    import('./engine/scene'),
-    fetch(`${import.meta.env.BASE_URL}content/levels/01-the-corridor/level.json`).then(
-      (response) => response.json(),
-    ),
-  ]).then(([module, level]) => module.startScene(sceneParent, level));
-}
-
-function playInScene(result: RunResult): void {
-  if (!result.world) return;
-  void scene?.then((handle) => {
-    handle.load(result.world ?? {});
-    handle.playback.play();
-  });
-}
+let screen: LevelScreen | null = null;
+let shownLevel: string | null = null;
 
 function languagePicker(): HTMLElement {
   const select = element('select', { id: 'language' });
@@ -45,30 +24,79 @@ function languagePicker(): HTMLElement {
   return element('label', { className: 'language' }, [t('app.language'), ' ', select]);
 }
 
-function render(root: HTMLElement): void {
-  document.title = t('app.title');
+function chrome(root: HTMLElement, content: HTMLElement): void {
   const isolated = globalThis.crossOriginIsolated === true;
-  shown?.dispose();
-  shown = playground(runtime, playgroundState, playInScene);
   root.replaceChildren(
-    element('header', {}, [
-      element('h1', {}, [t('app.title')]),
+    element('header', { className: 'top' }, [
+      element('div', { className: 'brand' }, [
+        element('h1', {}, [t('app.title')]),
+        element('span', { className: 'tagline' }, [t('app.tagline')]),
+      ]),
       languagePicker(),
     ]),
-    element('p', { className: 'tagline' }, [t('app.tagline')]),
-    element('p', { id: 'isolation', className: isolated ? 'ok' : 'warning' }, [
-      isolated ? t('app.isolated_yes') : t('app.isolated_no'),
+    content,
+    element('footer', {}, [
+      element('span', { id: 'isolation', className: isolated ? 'ok' : 'warning' }, [
+        isolated ? t('app.isolated_yes') : t('app.isolated_no'),
+      ]),
+      element('span', {}, [t('app.version', { version })]),
     ]),
-    shown.node,
-    sceneParent,
-    element('footer', {}, [t('app.version', { version })]),
   );
+}
+
+/** The level the address names, as #level/<id>; null when it names none. */
+function levelFromHash(): string | null {
+  const match = /^#level\/(.+)$/.exec(location.hash);
+  return match ? decodeURIComponent(match[1] ?? '') : null;
+}
+
+async function showLevel(root: HTMLElement, id: string): Promise<void> {
+  screen?.destroy();
+  screen = null;
+  shownLevel = id;
+  const content = element('main', { className: 'content' }, [
+    element('p', { className: 'status' }, [t('level.loading')]),
+  ]);
+  chrome(root, content);
+  try {
+    if (!isLevelId(id)) throw new LevelNotFound(id);
+    const [loaded, { levelScreen }, { createEditor }, { startScene }] = await Promise.all([
+      loadLevel(id, currentLanguage()),
+      import('./ui/level'),
+      import('./editor/editor'),
+      import('./engine/scene'),
+    ]);
+    if (shownLevel !== id) return;
+    screen = levelScreen({ runtime, loaded, createEditor, startScene });
+    content.replaceChildren(screen.node);
+    screen.mount();
+  } catch (error) {
+    if (!(error instanceof LevelNotFound)) throw error;
+    document.title = t('app.title');
+    content.replaceChildren(
+      element('p', { className: 'not-found' }, [t('level.not_found', { id })]),
+    );
+  }
 }
 
 const root = document.querySelector<HTMLElement>('#app');
 if (root) {
   initLanguage();
-  render(root);
-  mountScene();
-  document.addEventListener('kydux:language', () => render(root));
+  const route = () => {
+    const id = levelFromHash();
+    if (id === null) {
+      location.replace(`#level/${FIRST_LEVEL}`);
+      return;
+    }
+    if (id !== shownLevel || !screen) void showLevel(root, id);
+  };
+  window.addEventListener('hashchange', route);
+  document.addEventListener('kydux:language', () => {
+    // The header and footer are drawn again; the level screen keeps its scene
+    // and editor and only says its words again.
+    const content = root.querySelector<HTMLElement>('main.content');
+    if (content) chrome(root, content);
+    void screen?.relabel();
+  });
+  route();
 }

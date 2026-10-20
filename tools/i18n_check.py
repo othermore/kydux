@@ -8,6 +8,9 @@ Fails, printing file:line: message for each, on:
   - a key the app uses, t('a.key'), that a language lacks;
   - a key no source uses, unless it starts with a prefix in tools/i18n_dynamic.txt
     (for keys made at run time, like `language.${lang}`);
+  - a level, content/levels/<id>/, without a text.<lang>.json for every language
+    in i18n/, or with texts whose keys differ, or with a different number of goals
+    than its level.json;
   - a string literal in the app's code that reads like words for a person (words
     separated by spaces, with a capitalised word or a sentence's final stop),
     which must come from t() instead. A line marked `// i18n-ignore` is left alone, and
@@ -23,6 +26,7 @@ REPO = Path(__file__).resolve().parents[1]
 I18N = REPO / "i18n"
 SOURCES = REPO / "app" / "src"
 DYNAMIC = REPO / "tools" / "i18n_dynamic.txt"
+LEVELS = REPO / "content" / "levels"
 
 KEY_USE = re.compile(r"""\bt\(\s*(['"])([\w.-]+)\1""")
 LITERAL = re.compile(r"""'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`([^`$]*)`""")
@@ -64,6 +68,34 @@ def dynamic_prefixes() -> list[str]:
     ]
 
 
+def check_levels(languages: list[str]) -> list[str]:
+    findings = []
+    if not LEVELS.is_dir():
+        return findings
+    for directory in sorted(p for p in LEVELS.iterdir() if (p / "level.json").is_file()):
+        name = directory.relative_to(REPO).as_posix()
+        goals = len(
+            json.loads((directory / "level.json").read_text(encoding="utf-8")).get("goals", [])
+        )
+        texts = {}
+        for lang in languages:
+            path = directory / f"text.{lang}.json"
+            if not path.is_file():
+                findings.append(f"{name}: lacks text.{lang}.json")
+                continue
+            texts[lang] = flatten(json.loads(path.read_text(encoding="utf-8")))
+        every_key = set().union(*(set(t) for t in texts.values())) if texts else set()
+        for lang, text in texts.items():
+            for key in sorted(every_key - set(text)):
+                findings.append(f"{name}/text.{lang}.json: lacks {key}")
+            said = text.get("goals")
+            if not isinstance(said, list) or len(said) != goals:
+                findings.append(
+                    f"{name}/text.{lang}.json: {goals} goals in level.json, not as many here"
+                )
+    return findings
+
+
 def check() -> list[str]:
     findings = []
     languages = catalogs()
@@ -96,6 +128,8 @@ def check() -> list[str]:
         for lang, catalog in languages.items():
             if key not in catalog:
                 findings.append(f"{where}: {key} is not in i18n/{lang}.json")
+
+    findings.extend(check_levels(list(languages)))
 
     prefixes = dynamic_prefixes()
     for key in sorted(every_key - set(used)):

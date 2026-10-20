@@ -22,13 +22,14 @@ body {
   font: 18px/1.5 system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px 16px;
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0 16px;
 }
 
-header {
+header.top {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -39,10 +40,27 @@ header {
 h1 {
   margin: 0;
   color: var(--accent);
+  font-size: 24px;
+}
+
+header.top {
+  padding: 8px 0;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
 }
 
 .tagline {
   color: var(--muted);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  min-height: 0;
 }
 
 .ok {
@@ -60,23 +78,18 @@ textarea {
 }
 
 footer {
-  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 8px 0;
   color: var(--muted);
-  font-size: 14px;
-}
-
-.playground textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel);
-  font: 16px/1.5 var(--mono);
-  tab-size: 4;
+  font-size: 13px;
 }
 
 .buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 8px 0;
 }
@@ -112,15 +125,6 @@ footer {
 
 .output.error {
   color: #ffb4a2;
-}
-
-.scene {
-  width: 100%;
-  aspect-ratio: 3 / 1;
-  margin-top: 16px;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #1f2330;
 }
 
 /* The editor. */
@@ -265,4 +269,80 @@ footer {
 .outcome[data-kind='interrupted'] {
   border-left-color: var(--warning);
   background: #fff4e6;
+}
+
+/* The level screen. */
+
+.level-screen {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
+  gap: 16px;
+  min-height: 560px;
+  height: calc(100vh - 110px);
+}
+
+.stage,
+.workbench {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.level-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.scene-frame {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #1f2330;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+}
+
+.goals-slot {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  max-width: 60%;
+}
+
+.editor {
+  flex: 1;
+  min-height: 0;
+}
+
+.speed {
+  margin-left: auto;
+  align-self: center;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.not-found {
+  margin: 48px auto;
+  font-size: 20px;
+}
+
+@media (max-width: 800px) {
+  .level-screen {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .scene-frame {
+    aspect-ratio: 4 / 3;
+  }
+
+  .editor {
+    height: 260px;
+  }
 }

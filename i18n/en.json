@@ -11,21 +11,6 @@
     "en": "English",
     "es": "Español"
   },
-  "playground": {
-    "title": "Try Python",
-    "code_label": "Python code",
-    "starting_code": "print(\"Hello, Kydux!\")",
-    "run": "Run",
-    "run_level": "Run in the corridor",
-    "stop": "Stop",
-    "loading": "Preparing Python…",
-    "ready": "Python {version} ready",
-    "running": "Running…",
-    "restarting": "Starting Python again…",
-    "stopped": "Stopped: the code ran for more than {seconds} seconds.",
-    "failed": "Python could not start. Reload the page to try again.",
-    "error_line": " (line {line})"
-  },
   "goals": {
     "title": "Goals",
     "open": "Not met yet",
@@ -41,6 +26,17 @@
     "error_no_line": "Python says: {type}: {message}"
   },
   "level": {
+    "cast": "Cast",
+    "stop": "Stop",
+    "restart": "Restart",
+    "speed": "Speed",
+    "code_label": "Your spell, in Python",
+    "page_title": "Kydux — {title}",
+    "loading": "Preparing Python…",
+    "ready": "Python {version} ready",
+    "running": "The spell is running…",
+    "restarting": "Starting Python again…",
+    "not_found": "There is no level called “{id}”.",
     "failed": "Python could not start. Reload the page to try again."
   }
 }

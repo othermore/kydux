@@ -1,0 +1,7 @@
+{
+  "title": "The corridor",
+  "goals": [
+    "Reach the door at the end of the corridor."
+  ],
+  "starting_code": "# Walk to the door.\n# The wizard moves one tile per step.\nwizard.move_right()\n"
+}

@@ -182,6 +182,9 @@ export function startScene(parent: HTMLElement, level: LevelJson): Promise<Scene
 
   return new Promise((resolve) => {
     let game: Phaser.Game | null = null;
+    // The scene fits its parent, and follows it when the parent changes size.
+    const resized = new ResizeObserver(() => game?.scale.refresh());
+    resized.observe(parent);
     const scene = new LevelScene(map, parent, playback, () => {
       resolve({
         playback,
@@ -192,6 +195,7 @@ export function startScene(parent: HTMLElement, level: LevelJson): Promise<Scene
           playback.reset();
         },
         destroy() {
+          resized.disconnect();
           playback.stop();
           game?.destroy(true);
           game = null;

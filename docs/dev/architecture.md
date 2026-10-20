@@ -22,11 +22,14 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/runtime/  the worker that holds Pyodide, and the page's side of it
   src/engine/   the scene in Phaser, and the playback of a run's events
   src/editor/   the child's editor, CodeMirror
-  src/ui/       the screens
+  src/ui/       the screens: the level screen, its goals panel and outcome card
+  src/content/  loading a level's level.json and its text.<lang>.json
   scripts/      copy Pyodide into public/ and pack the world, before dev and build
   e2e/          the browser tests (Playwright), beside the node_modules they need
 world/          kydux_world, the model of the levels, and its tests
-content/        the levels (and later the lessons and chapters)
+content/        the levels, each with level.json, its words in text.<lang>.json,
+                its solution and its wrong answers (the last two never shipped);
+                later the lessons and chapters
 i18n/           en.json, es.json: the app's words, the same keys in each
 tools/          the i18n check, the forbidden-word check, later the art tools
 tests/project/  the repository's own checks

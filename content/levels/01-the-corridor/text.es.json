@@ -1,0 +1,7 @@
+{
+  "title": "El pasillo",
+  "goals": [
+    "Llega a la puerta del final del pasillo."
+  ],
+  "starting_code": "# Camina hasta la puerta.\n# El mago avanza una casilla por paso.\nwizard.move_right()\n"
+}

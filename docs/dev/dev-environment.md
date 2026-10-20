@@ -49,6 +49,13 @@ The server reloads the page when a file changes. `npm run build` makes the
 game in `app/dist/`, and `npm run preview` serves that on port 4173, the way
 a release runs.
 
+The page opens a level by the address's hash, `#level/<id>`, the level's
+directory under `content/levels/`; without one it goes to the first,
+`#level/01-the-corridor`. The browser keeps the speed chosen
+(`localStorage`, `kydux.speed`) and the code typed in each level for the
+visit (`sessionStorage`, `kydux.code.<id>`); clearing the site's data in
+the browser starts afresh.
+
 ## 4. Trying it from another computer
 
 The development server listens on every interface, so another computer on

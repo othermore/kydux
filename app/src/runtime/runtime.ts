@@ -1,0 +1,191 @@
+// The page's side of Python: starts the worker, runs code in it one run at a
+// time, and stops a run that goes on too long, in place through Pyodide's
+// interrupt buffer when the page is isolated, else by starting a new worker.
+
+import type { FromWorker, LevelJson, RunResult, RuntimeInfo, ToWorker } from './protocol';
+
+export type RuntimeStatus = 'loading' | 'ready' | 'running' | 'restarting' | 'failed';
+
+/** What the runtime needs of a worker, so that tests can give a fake one. */
+export interface WorkerLike {
+  postMessage(message: ToWorker): void;
+  terminate(): void;
+  onmessage: ((event: MessageEvent<FromWorker>) => void) | null;
+  onerror: ((event: ErrorEvent) => void) | null;
+}
+
+export interface RuntimeOptions {
+  /** How long a run may last before it is stopped, in milliseconds. */
+  wallClockMs?: number;
+  createWorker?: () => WorkerLike;
+  /** Whether to share an interrupt buffer; by default, when the page is isolated. */
+  isolated?: boolean;
+}
+
+/** SIGINT, which Pyodide turns into KeyboardInterrupt in the running code. */
+const SIGINT = 2;
+/** How long an interrupt in place may take before the worker is ended instead. */
+const INTERRUPT_GRACE_MS = 2000;
+
+function defaultWorker(): WorkerLike {
+  return new Worker(new URL('./worker.ts', import.meta.url), {
+    type: 'module',
+  }) as unknown as WorkerLike;
+}
+
+interface Pending {
+  id: number;
+  resolve: (result: RunResult) => void;
+  reject: (error: Error) => void;
+  timer: ReturnType<typeof setTimeout>;
+  started: number;
+  interrupted: boolean;
+}
+
+export class Runtime {
+  readonly wallClockMs: number;
+  private readonly createWorker: () => WorkerLike;
+  private readonly interruptBuffer: SharedArrayBuffer | null;
+  private worker!: WorkerLike;
+  private readyPromise!: Promise<RuntimeInfo>;
+  private pending: Pending | null = null;
+  private nextId = 1;
+  private listeners: ((status: RuntimeStatus) => void)[] = [];
+  private lastStatus: RuntimeStatus = 'loading';
+  private lastInfo: RuntimeInfo | null = null;
+
+  constructor(options: RuntimeOptions = {}) {
+    this.wallClockMs = options.wallClockMs ?? 5000;
+    this.createWorker = options.createWorker ?? defaultWorker;
+    const isolated = options.isolated ?? globalThis.crossOriginIsolated === true;
+    this.interruptBuffer =
+      isolated && typeof SharedArrayBuffer !== 'undefined' ? new SharedArrayBuffer(4) : null;
+    this.start('loading');
+  }
+
+  /** Resolves when Python is ready; a new promise after a restart. */
+  get ready(): Promise<RuntimeInfo> {
+    return this.readyPromise;
+  }
+
+  get status(): RuntimeStatus {
+    return this.lastStatus;
+  }
+
+  get info(): RuntimeInfo | null {
+    return this.lastInfo;
+  }
+
+  /** Whether a run that goes on too long is stopped in place, without a restart. */
+  get interruptsInPlace(): boolean {
+    return this.interruptBuffer !== null;
+  }
+
+  /** Calls `listener` with the status now and at every change; returns the way to stop. */
+  onStatus(listener: (status: RuntimeStatus) => void): () => void {
+    this.listeners.push(listener);
+    listener(this.lastStatus);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== listener);
+    };
+  }
+
+  run(code: string, level?: LevelJson): Promise<RunResult> {
+    if (this.pending) return Promise.reject(new Error('a run is already going on'));
+    return this.ready.then(
+      () =>
+        new Promise<RunResult>((resolve, reject) => {
+          const id = this.nextId++;
+          const timer = setTimeout(() => this.interrupt(), this.wallClockMs);
+          this.pending = { id, resolve, reject, timer, started: Date.now(), interrupted: false };
+          this.setStatus('running');
+          this.worker.postMessage(level ? { type: 'run', id, code, level } : { type: 'run', id, code });
+        }),
+    );
+  }
+
+  /** Stops the run going on, if any. */
+  interrupt(): void {
+    const pending = this.pending;
+    if (!pending) return;
+    // In place first; if Python has not stopped after a grace, as when it waits
+    // in something that does not check for interrupts, the worker is ended.
+    if (this.interruptBuffer && !pending.interrupted) {
+      pending.interrupted = true;
+      Atomics.store(new Int32Array(this.interruptBuffer), 0, SIGINT);
+      clearTimeout(pending.timer);
+      pending.timer = setTimeout(() => this.interrupt(), INTERRUPT_GRACE_MS);
+      return;
+    }
+    this.finish({
+      status: 'interrupted',
+      stdout: '',
+      stderr: '',
+      durationMs: Date.now() - pending.started,
+    });
+    this.worker.terminate();
+    this.start('restarting');
+  }
+
+  private start(status: 'loading' | 'restarting'): void {
+    this.setStatus(status);
+    this.worker = this.createWorker();
+    this.readyPromise = new Promise<RuntimeInfo>((resolve, reject) => {
+      this.worker.onmessage = (event) => {
+        const message = event.data;
+        switch (message.type) {
+          case 'ready':
+            this.lastInfo = {
+              pythonVersion: message.pythonVersion,
+              worldVersion: message.worldVersion,
+            };
+            this.setStatus('ready');
+            resolve(this.lastInfo);
+            break;
+          case 'load-error':
+            this.setStatus('failed');
+            reject(new Error(message.message));
+            break;
+          case 'result':
+            if (this.pending?.id === message.id) this.finish(message.result);
+            break;
+          case 'crashed':
+            if (this.pending?.id === message.id) {
+              const pending = this.pending;
+              this.clearPending();
+              this.setStatus('ready');
+              pending.reject(new Error(message.message));
+            }
+            break;
+        }
+      };
+      this.worker.onerror = (event) => {
+        this.setStatus('failed');
+        reject(new Error(event.message || 'the Python worker failed'));
+      };
+    });
+    // A failure to load is reported through the status; no caller may be waiting.
+    this.readyPromise.catch(() => {});
+    this.worker.postMessage(
+      this.interruptBuffer ? { type: 'load', interruptBuffer: this.interruptBuffer } : { type: 'load' },
+    );
+  }
+
+  private finish(result: RunResult): void {
+    const pending = this.pending;
+    if (!pending) return;
+    this.clearPending();
+    this.setStatus('ready');
+    pending.resolve(result);
+  }
+
+  private clearPending(): void {
+    if (this.pending) clearTimeout(this.pending.timer);
+    this.pending = null;
+  }
+
+  private setStatus(status: RuntimeStatus): void {
+    this.lastStatus = status;
+    for (const listener of this.listeners) listener(status);
+  }
+}

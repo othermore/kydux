@@ -62,7 +62,7 @@ kydux/
   .github/workflows/check.yml
   app/
     package.json  package-lock.json  tsconfig.json  vite.config.ts  index.html
-    playwright.config.ts
+    playwright.config.ts  e2e/
     scripts/copy-pyodide.mjs   scripts/pack-world.mjs
     public/            (pyodide/ and world.zip are written here at build and ignored)
     src/main.ts  src/style.css
@@ -78,7 +78,7 @@ kydux/
   i18n/en.json  i18n/es.json
   tools/i18n_check.py
   tests/project/conftest.py  test_forbidden.py  test_secrets.py  test_readmes.py  test_manifests.py
-  tests/e2e/playground.spec.ts
+  app/e2e/playground.spec.ts
   ci/check.sh  ci/hooks/pre-commit  (hours.py, push.sh, hooks/pre-push exist)
   docs/dev/README.md  architecture.md  dev-environment.md  (draft.md, plan.md, sprint-1.md exist)
 ```
@@ -136,9 +136,10 @@ from `params`; a missing key returns the key itself and logs a warning once
 "Un juego para aprender Python"), a language `<select>` labelled
 `app.language` with the two languages by their own names (`language.en`
 "English", `language.es` "Español"), and a status line `app.isolated_yes` /
-`app.isolated_no` ("This page can stop a spell that runs forever" / "…
-cannot stop a spell that runs forever: the server is not sending the
-isolation headers") from `window.crossOriginIsolated`. Changing the select
+`app.isolated_no` ("This page can stop a spell that runs forever" / "This
+page stops a spell that runs forever by starting Python again: to stop it
+in place it needs HTTPS (or localhost) and the isolation headers") from
+`window.crossOriginIsolated`. Changing the select
 re-renders without reloading. Plain DOM, no framework: the shell stays small
 and this choice is logged (D10).
 
@@ -356,7 +357,7 @@ words come in phase 2. The textarea starts with `print("Hello, Kydux!")`.
 
 **Tests.** `src/runtime/runtime.test.ts` (Vitest): the message sequence
 against a fake `Worker` (ready, a run, a timeout with and without
-`SharedArrayBuffer`). `tests/e2e/playground.spec.ts` (Playwright, Chromium,
+`SharedArrayBuffer`). `app/e2e/playground.spec.ts` (Playwright, Chromium,
 `app/playwright.config.ts` with `webServer: 'npm run preview'` on a fixed
 port and `baseURL`): waits for the ready status (timeout 90 s the first
 time), runs `print(1 + 1)` and sees `2`; runs `import kydux_world;

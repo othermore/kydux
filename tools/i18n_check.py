@@ -8,8 +8,9 @@ Fails, printing file:line: message for each, on:
   - a key the app uses, t('a.key'), that a language lacks;
   - a key no source uses, unless it starts with a prefix in tools/i18n_dynamic.txt
     (for keys made at run time, like `language.${lang}`);
-  - a string literal in the app's code that reads like words for a person, which
-    must come from t() instead. A line marked `// i18n-ignore` is left alone, and
+  - a string literal in the app's code that reads like words for a person (words
+    separated by spaces, with a capitalised word or a sentence's final stop),
+    which must come from t() instead. A line marked `// i18n-ignore` is left alone, and
     so are console messages, errors thrown for developers and imports.
 """
 
@@ -26,6 +27,8 @@ DYNAMIC = REPO / "tools" / "i18n_dynamic.txt"
 KEY_USE = re.compile(r"""\bt\(\s*(['"])([\w.-]+)\1""")
 LITERAL = re.compile(r"""'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`([^`$]*)`""")
 WORDS = re.compile(r"[A-Za-zÀ-ÿ]{2,}[,.!?:;]?\s+[A-Za-zÀ-ÿ]{2,}")
+#: What makes words read like a sentence rather than code or class names.
+SENTENCE = re.compile(r"(^|\s)[A-ZÀ-Þ][a-zß-ÿ]|[.!?…]$")
 EXEMPT_LINE = re.compile(r"i18n-ignore|console\.|Error\(|^\s*import\s|^\s*//|^\s*\*")
 
 
@@ -84,7 +87,7 @@ def check() -> list[str]:
                 if literal.start() in keys_here:
                     continue
                 text = next(g for g in literal.groups() if g is not None)
-                if WORDS.search(text):
+                if WORDS.search(text) and SENTENCE.search(text.strip()):
                     findings.append(
                         f"{name}:{number}: a string for people, {text[:40]!r}, not through t()"
                     )

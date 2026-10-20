@@ -21,6 +21,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/i18n/     every string the player sees, from i18n/<lang>.json
   src/runtime/  the worker that holds Pyodide, and the page's side of it
   src/ui/       the screens
+  scripts/      copy Pyodide into public/ and pack the world, before dev and build
+  e2e/          the browser tests (Playwright), beside the node_modules they need
 world/          kydux_world, the model of the levels, and its tests
 content/        the levels (and later the lessons and chapters)
 i18n/           en.json, es.json: the app's words, the same keys in each

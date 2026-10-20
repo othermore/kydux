@@ -216,7 +216,7 @@ kydux/
   launcher/           the Go launcher
   packaging/          debian/ for the Kidux package, and the per-platform bundles
   tools/              art/ (generation, cutting), sound/, i18n_check.py, checks
-  tests/              e2e/ (Playwright), project/ (repository checks)
+  tests/              project/ (repository checks); the browser tests are in app/e2e/
   ci/                 hours.py, push.sh, hooks/, build and release scripts
   docs/dev/           this plan, architecture.md with its decision log, how each part works
   docs/en/ docs/es/   the user guide, when there is something to guide

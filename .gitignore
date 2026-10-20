@@ -1,0 +1,21 @@
+# Secrets never enter the repository: the image-generation API key lives
+# outside it (~/.config/kydux/secrets.env) or in the environment.
+.env
+*.env
+secrets.*
+*.key
+
+# Build output and downloaded runtimes, reproducible from the sources.
+build/
+dist/
+node_modules/
+vendor/
+
+# Raw generated art before it is reviewed and cut into sprites.
+art/raw/
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+*.log

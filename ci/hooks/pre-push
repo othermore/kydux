@@ -1,0 +1,19 @@
+#!/bin/sh
+# Refuse to push a commit dated outside the hours Kydux is seen working, or
+# to push at all outside them (ci/hours.py). ci/push.sh dates the commits
+# inside the hours before it pushes; this catches a push made any other way.
+# Enabled by: git config core.hooksPath ci/hooks
+
+set -eu
+
+HOURS="$(git rev-parse --show-toplevel)/ci/hours.py"
+"$HOURS" allowed || exit 1
+
+null=0000000000000000000000000000000000000000
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+    [ "$local_sha" = "$null" ] && continue
+    if ! "$HOURS" check "$remote_sha" "$local_sha"; then
+        echo "pre-push: push with ci/push.sh, which dates the commits inside the hours" >&2
+        exit 1
+    fi
+done

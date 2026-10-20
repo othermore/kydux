@@ -14,7 +14,7 @@ own.
 | Python | **Pyodide 314.x** (CPython 3.14 in WebAssembly), from its npm package, run in a **Web Worker** | Real Python, the one the child will meet outside the game; a worker keeps the page responsive and lets a runaway program be stopped. |
 | The level model | A Python package of our own, `kydux_world`, run inside Pyodide | The child's code calls real Python objects (`wizard.move_right()`), the world is deterministic, and the same package runs under CPython on the development machine, so every level is checked by plain `pytest` in milliseconds, without a browser. |
 | The scene | **Phaser 3** | Tile maps from Tiled, sprite animation, tweens, audio and input in one MIT library made for exactly this kind of 2D game. |
-| Maps | **Tiled** (`.tmj` JSON) | A free map editor whose files Phaser loads as they are; walls, floors and objects are layers a person can edit. |
+| Maps | Rows of characters in `level.json` now; **Tiled** (`.tmj` JSON) from phase 4 | One source for the world and the scene. Tiled is a free map editor whose files Phaser loads as they are; it comes when there are tiles to place. |
 | The editor | **CodeMirror 6** with its Python mode | Light, accessible, themeable, with line markers for the running line and for errors. |
 | Lessons and texts | Markdown and JSON per language, under `content/` and `i18n/` | Writers edit text files; a check keeps the languages in step. |
 | Progress | A `ProgressStore` interface; local storage in the browser now, a server later | Local first, online later, without touching the game. |
@@ -230,6 +230,8 @@ kydux/
 - **Sprints.** A run of pieces given to the implementer together is a
   sprint, with its own document, `sprint-<n>.md`, that spells each piece
   out to the file and the test, and ends with the owner's acceptance test.
+  A sprint is reviewed before the next is planned: the design, its fit
+  with the documents, and what the implementer reported as different.
 - **Checks at every piece**: `pytest world content` (the world and every
   level's solutions and wrong answers), `npm test` (Vitest), `tools/i18n_check.py`,
   `tests/project/` (no forbidden word anywhere, no secret-looking string, every
@@ -292,9 +294,11 @@ One hard-coded level played end to end: editor, Python, scene, goals.
     (several seconds the first time; cached after).
 1.2 `kydux_world`: `World`, `Wizard` with the four moves, ticks, events, the
     `reach` goal, `TooManyTicks`; tests.
-1.3 The level scene in Phaser: a map from a `.tmj` with floor and wall layers,
-    placeholder tiles (plain coloured squares) and a placeholder wizard;
-    playback of move events as tweens tile by tile; speed control; restart.
+1.3 The level scene in Phaser: the map from `level.json`'s rows of
+    characters, the one source the world reads too until Tiled arrives with
+    the art in phase 4, drawn with placeholder tiles made at run time and a
+    placeholder wizard; playback of move events as tweens tile by tile;
+    speed control; restart.
 1.4 The editor: CodeMirror with Python, the starting code, the running line
     marked during playback, Cast and Stop buttons.
 1.5 The goals panel: the level's goals ticked as events arrive; a win banner.

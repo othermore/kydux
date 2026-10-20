@@ -1,0 +1,14 @@
+{
+  "app": {
+    "title": "Kydux",
+    "tagline": "Un juego para aprender Python",
+    "language": "Idioma",
+    "version": "Versión {version}",
+    "isolated_yes": "Esta página puede detener un hechizo que no termina nunca.",
+    "isolated_no": "Esta página no puede detener un hechizo que no termina nunca: el servidor no envía las cabeceras de aislamiento."
+  },
+  "language": {
+    "en": "English",
+    "es": "Español"
+  }
+}

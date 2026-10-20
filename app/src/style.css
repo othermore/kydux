@@ -1,0 +1,66 @@
+:root {
+  --bg: #f7f4ee;
+  --fg: #1f2330;
+  --muted: #5d6372;
+  --accent: #3b5bdb;
+  --ok: #2b8a3e;
+  --warning: #c2410c;
+  --panel: #ffffff;
+  --border: #d9d4c7;
+  --mono: ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 18px/1.5 system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+h1 {
+  margin: 0;
+  color: var(--accent);
+}
+
+.tagline {
+  color: var(--muted);
+}
+
+.ok {
+  color: var(--ok);
+}
+
+.warning {
+  color: var(--warning);
+}
+
+select,
+button,
+textarea {
+  font: inherit;
+}
+
+footer {
+  margin-top: 32px;
+  color: var(--muted);
+  font-size: 14px;
+}

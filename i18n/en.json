@@ -1,0 +1,14 @@
+{
+  "app": {
+    "title": "Kydux",
+    "tagline": "A game for learning Python",
+    "language": "Language",
+    "version": "Version {version}",
+    "isolated_yes": "This page can stop a spell that runs forever.",
+    "isolated_no": "This page cannot stop a spell that runs forever: the server is not sending the isolation headers."
+  },
+  "language": {
+    "en": "English",
+    "es": "Español"
+  }
+}

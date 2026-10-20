@@ -33,7 +33,7 @@ LITERAL = re.compile(r"""'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`([^`$]*)`"
 WORDS = re.compile(r"[A-Za-zÀ-ÿ]{2,}[,.!?:;]?\s+[A-Za-zÀ-ÿ]{2,}")
 #: What makes words read like a sentence rather than code or class names.
 SENTENCE = re.compile(r"(^|\s)[A-ZÀ-Þ][a-zß-ÿ]|[.!?…]$")
-EXEMPT_LINE = re.compile(r"i18n-ignore|console\.|Error\(|^\s*import\s|^\s*//|^\s*\*")
+EXEMPT_LINE = re.compile(r"i18n-ignore|console\.|Error\(|^\s*import\s|^\s*//|^\s*/?\*")
 
 
 def flatten(tree: dict, prefix: str = "") -> dict[str, str]:

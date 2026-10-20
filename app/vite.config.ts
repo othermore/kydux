@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { homedir } from 'node:os';
+import { homedir, hostname } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
@@ -19,16 +19,36 @@ const https =
     : undefined;
 
 // The game is served cross-origin isolated wherever it runs, so that
-// SharedArrayBuffer exists and a runaway program can be interrupted (D11).
+// SharedArrayBuffer exists and a runaway program can be interrupted (D11),
+// and with a Content-Security-Policy that keeps the page, and the child's code
+// with it, to the game's own origin (D14, D19). The launcher sends the same.
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'wasm-unsafe-eval'",
+  "worker-src 'self'",
+  "connect-src 'self'",
+  "img-src 'self' data: blob:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
+  "object-src 'none'",
+  "base-uri 'none'",
+  "frame-ancestors 'none'",
+].join('; ');
+
 const isolation = {
   'Cross-Origin-Opener-Policy': 'same-origin',
   'Cross-Origin-Embedder-Policy': 'require-corp',
+  'Content-Security-Policy': contentSecurityPolicy,
 };
 
 export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    // Vite takes requests by an address or localhost, and by these names too,
+    // so that another computer can open the game, and its hot reload, by this
+    // machine's name: https://hija.local:5173.
+    allowedHosts: [hostname(), `${hostname()}.local`],
     strictPort: true,
     https,
     headers: isolation,

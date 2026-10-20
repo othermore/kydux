@@ -61,7 +61,10 @@ the browser starts afresh.
 The development server listens on every interface, so another computer on
 the same network opens it by this machine's name, `https://hija.local:5173`
 (macOS resolves `.local` names by itself), or by its address, which Vite
-prints when it starts.
+prints when it starts. Vite answers only names it knows, so
+`app/vite.config.ts` names this machine's, `<hostname>` and
+`<hostname>.local`; without them the page opens but its hot reload, a
+websocket, is refused.
 
 It has to be HTTPS: a browser gives a page the isolation that stopping a
 runaway program needs only in a secure context, and HTTP from another

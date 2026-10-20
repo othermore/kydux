@@ -31,6 +31,8 @@ async function load(interruptBuffer?: SharedArrayBuffer): Promise<void> {
   const versions = py.runPython(
     'import sys, kydux_world; f"{sys.version.split()[0]} {kydux_world.__version__}"',
   ) as string;
+  // From here on the child's code cannot reach Pyodide's bridge to JavaScript (D14).
+  py.runPython('from kydux_world import sandbox; sandbox.install()');
   const [pythonVersion = '', worldVersion = ''] = versions.split(' ');
   pyodide = py;
   post({ type: 'ready', pythonVersion, worldVersion });

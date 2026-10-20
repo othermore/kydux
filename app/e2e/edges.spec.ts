@@ -75,3 +75,33 @@ test('the scene follows the size of the window', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
   await expect.poll(async () => (await canvas.boundingBox())?.width ?? 0).toBeLessThan(wide);
 });
+
+test('the page may reach no other server, and the game still runs', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#cast')).toBeEnabled({ timeout: 90_000 });
+  const blocked = await page.evaluate(
+    () =>
+      new Promise<string>((resolve) => {
+        document.addEventListener('securitypolicyviolation', (e) => resolve(e.effectiveDirective), {
+          once: true,
+        });
+        fetch('https://example.com/').catch(() => {});
+      }),
+  );
+  expect(blocked).toBe('connect-src');
+  await setCode(page, 'wizard.move_right(6)');
+  await page.locator('#cast').click();
+  await expect(page.locator('.outcome-text')).toHaveText('You did it!', { timeout: 30_000 });
+});
+
+test("the child's code cannot reach JavaScript", async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#cast')).toBeEnabled({ timeout: 90_000 });
+  for (const code of ['import js', 'from pyodide.ffi import to_js', 'import sys\nprint(sys.modules["js"])']) {
+    await setCode(page, code);
+    await page.locator('#cast').click();
+    await expect(page.locator('.outcome-text')).toHaveText(/^Python says: (ModuleNotFoundError|KeyError)/, {
+      timeout: 30_000,
+    });
+  }
+});

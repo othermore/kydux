@@ -15,6 +15,7 @@ from typing import Any, Literal
 
 from .goals import GoalResult
 from .level import Level
+from .sandbox import child_builtins
 from .world import CHILD, Event, TooManyTicks, World
 
 
@@ -49,7 +50,7 @@ def run_script(code: str) -> dict:
     try:
         compiled = compile(code, CHILD, "exec")
         with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
-            exec(compiled, {"__name__": "__main__"})
+            exec(compiled, {"__name__": "__main__", "__builtins__": child_builtins()})
     except KeyboardInterrupt:
         status = "interrupted"
     except BaseException as caught:  # the child's code may raise anything, exit() too
@@ -105,7 +106,8 @@ def run_code(level: Level, code: str) -> RunResult:
     try:
         compiled = compile(code, CHILD, "exec")
         with contextlib.redirect_stdout(stdout):
-            exec(compiled, {"__name__": "__main__", "wizard": world.wizard})
+            namespace = {"__name__": "__main__", "__builtins__": child_builtins()}
+            exec(compiled, {**namespace, "wizard": world.wizard})
     except SyntaxError as caught:
         status, error = "error", error_info(caught)
     except TooManyTicks:

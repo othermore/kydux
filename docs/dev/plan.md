@@ -323,8 +323,9 @@ misspell a move, see Python's error (plain, not yet translated).
 Everything a level can be made of, with the content format of section 2.5.
 
 2.1 The level definition (`level.json`) and its loader on both sides; the
-    exposed API list; `text.<lang>.json`; `tools/i18n_check.py` extended to
-    level texts.
+    exposed API list. The level texts, `text.<lang>.json` with their check in
+    `tools/i18n_check.py`, exist since sprint 2; they gain the hints and the
+    dialogue here.
 2.2 Objects and actors: doors, keys, items on tiles, `pick_up`, `use`,
     `find_nearest`, `find_all`, attributes; a patrolling actor with `can_see`;
     their events and their playback (open door, item vanishing, a sight

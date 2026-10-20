@@ -26,7 +26,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/content/  loading a level's level.json and its text.<lang>.json
   scripts/      copy Pyodide into public/ and pack the world, before dev and build
   e2e/          the browser tests (Playwright), beside the node_modules they need
-world/          kydux_world, the model of the levels, and its tests
+world/          kydux_world, the model of the levels, and its tests; its sandbox
+                module keeps the child's code from Pyodide's bridge to JavaScript
 content/        the levels, each with level.json, its words in text.<lang>.json,
                 its solution and its wrong answers (the last two never shipped);
                 later the lessons and chapters
@@ -166,3 +167,29 @@ one overturns stays, marked as superseded.
   finished in 120 seconds, ends the worker and reports `failed`, which the
   level screen shows with a *Reload* button. Two minutes leave room for a
   first load of about 13 MB over a slow connection.
+- **D19 — The game keeps to its own origin, and the child's code away from
+  JavaScript.** Decided 2026-10-21, piece 1.8, narrowing D14. Every server
+  of the game sends, with the isolation headers, this
+  Content-Security-Policy, which the launcher sends as it is:
+
+  ```
+  default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self';
+  connect-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline';
+  font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
+  ```
+
+  `connect-src 'self'` is what keeps the child's code, and anything else in
+  the page, from reaching another server; `'wasm-unsafe-eval'` is what
+  Pyodide needs, and `'unsafe-inline'` for styles what CodeMirror and Phaser
+  need. Nothing is evaluated from a string. Behind it,
+  `kydux_world.sandbox` refuses the modules `js`, `pyodide`, `pyodide_js`,
+  `_pyodide`, `_pyodide_core` and `micropip` to the child's code in two ways,
+  since an import looks in `sys.modules` before any finder: the worker
+  installs, once, a finder that refuses them and takes them out of
+  `sys.modules`, except the `_pyodide` parts Pyodide runs from; and the
+  child's code runs with builtins whose `__import__` refuses them, loaded or
+  not. The refusal is Python's own `ModuleNotFoundError`, which piece 2.4
+  says in the child's words; sprint-2.md had a message of the game's own,
+  which would have been English in every language. The runtime also takes a
+  worker's result only when it has the shape of one, its world's too, and
+  treats anything else as a run that could not be run.

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FromWorker, ToWorker } from './protocol';
-import { Runtime, type RuntimeStatus, type WorkerLike } from './runtime';
+import { isRunResult, isWorldResult, Runtime, type RuntimeStatus, type WorkerLike } from './runtime';
 
 class FakeWorker implements WorkerLike {
   sent: ToWorker[] = [];
@@ -188,5 +188,45 @@ describe('Runtime', () => {
     workers[0]!.answer({ type: 'load-error', message: 'no wasm' });
     await expect(runtime.ready).rejects.toThrow('no wasm');
     expect(runtime.status).toBe('failed');
+  });
+});
+
+describe('the worker\'s answers', () => {
+  const world = {
+    status: 'won',
+    events: [{ tick: 1, actor: 'wizard', kind: 'move', data: {}, line: 1 }],
+    goals: [{ kind: 'reach', params: {}, met: true, met_at_tick: 1 }],
+    ticks: 1,
+    stdout: '',
+    error: null,
+  };
+
+  it('take a result and a world of the right shape', () => {
+    expect(isRunResult(ok)).toBe(true);
+    expect(isRunResult({ ...ok, world })).toBe(true);
+    expect(isWorldResult(world)).toBe(true);
+  });
+
+  it.each([
+    ['nothing', null],
+    ['a status unknown', { ...ok, status: 'won' }],
+    ['no stdout', { status: 'ok', stderr: '', durationMs: 1 }],
+    ['a world with an unknown status', { ...ok, world: { ...world, status: 'cheated' } }],
+    ['a world without events', { ...ok, world: { ...world, events: 'all of them' } }],
+    ['an event without a tick', { ...ok, world: { ...world, events: [{ kind: 'move', data: {} }] } }],
+    ['a goal without met', { ...ok, world: { ...world, goals: [{ kind: 'reach' }] } }],
+  ])('refuse %s', (_, value) => {
+    expect(isRunResult(value)).toBe(false);
+  });
+
+  it('turn a result of the wrong shape into a failed run', async () => {
+    const { runtime, workers } = setUp(false);
+    const worker = workers[0]!;
+    worker.ready();
+    const result = runtime.run('print(1)');
+    await vi.waitFor(() => expect(runtime.status).toBe('running'));
+    worker.answer({ type: 'result', id: worker.lastRun().id, result: { won: true } as never });
+    await expect(result).rejects.toThrow('not a result');
+    expect(runtime.status).toBe('ready');
   });
 });

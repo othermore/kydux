@@ -24,6 +24,39 @@ export interface RuntimeOptions {
   isolated?: boolean;
 }
 
+const RUN_STATUSES = ['ok', 'error', 'interrupted'];
+const WORLD_STATUSES = ['won', 'incomplete', 'error', 'too_many_ticks', 'interrupted'];
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/** Whether a world's result has the shape the page plays back. */
+export function isWorldResult(value: unknown): boolean {
+  if (!isObject(value) || !WORLD_STATUSES.includes(value.status as string)) return false;
+  const { events, goals } = value;
+  return (
+    Array.isArray(events) &&
+    events.every(
+      (e) => isObject(e) && typeof e.tick === 'number' && typeof e.kind === 'string' && isObject(e.data),
+    ) &&
+    Array.isArray(goals) &&
+    goals.every((g) => isObject(g) && typeof g.met === 'boolean')
+  );
+}
+
+/** Whether a worker's result has the shape of a RunResult, its world's too. */
+export function isRunResult(value: unknown): value is RunResult {
+  return (
+    isObject(value) &&
+    RUN_STATUSES.includes(value.status as string) &&
+    typeof value.stdout === 'string' &&
+    typeof value.stderr === 'string' &&
+    typeof value.durationMs === 'number' &&
+    (value.world === undefined || isWorldResult(value.world))
+  );
+}
+
 /** SIGINT, which Pyodide turns into KeyboardInterrupt in the running code. */
 const SIGINT = 2;
 /** How long an interrupt in place may take before the worker is ended instead. */
@@ -171,15 +204,15 @@ export class Runtime {
             reject(new Error(message.message));
             break;
           case 'result':
-            if (this.pending?.id === message.id) this.finish(message.result);
+            if (this.pending?.id !== message.id) break;
+            if (isRunResult(message.result)) {
+              this.finish(message.result);
+            } else {
+              this.fail(new Error('the worker answered with something that is not a result'));
+            }
             break;
           case 'crashed':
-            if (this.pending?.id === message.id) {
-              const pending = this.pending;
-              this.clearPending();
-              this.setStatus('ready');
-              pending.reject(new Error(message.message));
-            }
+            if (this.pending?.id === message.id) this.fail(new Error(message.message));
             break;
         }
       };
@@ -206,6 +239,15 @@ export class Runtime {
     this.clearPending();
     this.setStatus('ready');
     pending.resolve(result);
+  }
+
+  /** The run going on could not be run: its promise rejects, and Python is ready again. */
+  private fail(error: Error): void {
+    const pending = this.pending;
+    if (!pending) return;
+    this.clearPending();
+    this.setStatus('ready');
+    pending.reject(error);
   }
 
   private clearPending(): void {

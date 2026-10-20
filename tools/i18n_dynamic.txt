@@ -1,0 +1,5 @@
+# Prefixes of i18n keys made at run time, which tools/i18n_check.py cannot see used.
+# One per line.
+
+# The language picker names each language by `language.${lang}`.
+language.

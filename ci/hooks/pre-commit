@@ -1,0 +1,19 @@
+#!/bin/sh
+# Refuse a commit that would put a forbidden word or a secret in the repository
+# (tools/forbidden.py, tests/project/test_secrets.py). It reads the working
+# tree, not the staged one: in practice they are what is committed, and the
+# full check, ci/check.sh, runs the same tests on the tree as committed.
+# Enabled by: git config core.hooksPath ci/hooks
+
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+PYTHON=python3
+[ -x .venv/bin/python ] && PYTHON=.venv/bin/python
+
+"$PYTHON" tools/forbidden.py files
+"$PYTHON" -m pytest -q -p no:cacheprovider tests/project/test_secrets.py >/dev/null || {
+    "$PYTHON" -m pytest -q -p no:cacheprovider tests/project/test_secrets.py >&2
+    exit 1
+}

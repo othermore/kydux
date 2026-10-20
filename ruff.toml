@@ -1,0 +1,7 @@
+# Lint and format for all of Kydux's Python: the world, the tools and the tests.
+line-length = 99
+target-version = "py312"
+extend-exclude = ["art/raw", "app"]
+
+[lint]
+select = ["E", "F", "I", "UP", "B"]

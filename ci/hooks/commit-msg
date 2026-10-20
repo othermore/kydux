@@ -1,0 +1,10 @@
+#!/bin/sh
+# Refuse a commit message that holds a forbidden word (tools/forbidden.py).
+# Enabled by: git config core.hooksPath ci/hooks
+
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel)"
+PYTHON=python3
+[ -x "$ROOT/.venv/bin/python" ] && PYTHON="$ROOT/.venv/bin/python"
+"$PYTHON" "$ROOT/tools/forbidden.py" message "$1"

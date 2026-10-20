@@ -34,7 +34,7 @@ function render(root: HTMLElement): void {
     ]),
     element('p', { className: 'tagline' }, [t('app.tagline')]),
     element('p', { id: 'isolation', className: isolated ? 'ok' : 'warning' }, [
-      t(isolated ? 'app.isolated_yes' : 'app.isolated_no'),
+      isolated ? t('app.isolated_yes') : t('app.isolated_no'),
     ]),
     element('footer', {}, [t('app.version', { version })]),
   );

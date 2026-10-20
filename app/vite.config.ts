@@ -42,6 +42,12 @@ export default defineConfig({
     headers: isolation,
   },
   worker: { format: 'es' },
-  build: { target: 'es2022', sourcemap: true },
+  build: {
+    target: 'es2022',
+    sourcemap: true,
+    // Phaser is one library of about 1.4 MB that cannot be split; it is loaded
+    // on its own, after the page, so the warning would only ever be about it.
+    chunkSizeWarningLimit: 1600,
+  },
   test: { environment: 'node', include: ['src/**/*.test.ts'] },
 });

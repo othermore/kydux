@@ -113,3 +113,12 @@ footer {
 .output.error {
   color: #ffb4a2;
 }
+
+.scene {
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  margin-top: 16px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #1f2330;
+}

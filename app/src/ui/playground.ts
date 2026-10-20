@@ -70,7 +70,11 @@ export interface Rendered {
   dispose: () => void;
 }
 
-export function playground(runtime: Runtime, state: PlaygroundState): Rendered {
+export function playground(
+  runtime: Runtime,
+  state: PlaygroundState,
+  onWorld?: (result: RunResult) => void,
+): Rendered {
   const code = element('textarea', {
     id: 'code',
     rows: 12,
@@ -103,6 +107,7 @@ export function playground(runtime: Runtime, state: PlaygroundState): Rendered {
   const dispose = runtime.onStatus(show);
 
   const display = (result: RunResult) => {
+    if (result.world) onWorld?.(result);
     if (result.status === 'interrupted') {
       state.stoppedFor = Math.round(runtime.wallClockMs / 1000);
     }

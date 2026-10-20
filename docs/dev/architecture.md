@@ -20,6 +20,7 @@ there by pytest, without a browser.
 app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/i18n/     every string the player sees, from i18n/<lang>.json
   src/runtime/  the worker that holds Pyodide, and the page's side of it
+  src/engine/   the scene in Phaser, and the playback of a run's events
   src/ui/       the screens
   scripts/      copy Pyodide into public/ and pack the world, before dev and build
   e2e/          the browser tests (Playwright), beside the node_modules they need
@@ -44,6 +45,7 @@ Pinned exactly, checked against their registries on 2026-10-20:
 | @types/node | 24.19.2 | |
 | Playwright | 1.64.1 | |
 | Pyodide | 314.0.7 | Python 3.14 |
+| Phaser | 4.2.1 | the scene; loaded on its own, after the page (D15) |
 | Python on the machine | 3.13 | `kydux_world` keeps to syntax that runs on 3.12 and up |
 | pytest | 9.1.1 | |
 | ruff | 0.17.1 | one configuration for all the Python, `ruff.toml` |
@@ -68,7 +70,7 @@ one overturns stays, marked as superseded.
   Rules out a world written in TypeScript and driven from Python.
 - **D4 — The scene is drawn by Phaser; its version is chosen at piece 1.3.**
   Decided 2026-10-20. Phaser 4 is out; 3.90 or 4.x is chosen once 4.x's
-  support for Tiled maps has been tried.
+  support for Tiled maps has been tried. *Its version: D15.*
 - **D5 — The editor is CodeMirror 6.** Decided 2026-10-20. Light,
   accessible, with line markers and completion. Rules out Monaco, ten times
   its size.
@@ -130,3 +132,15 @@ one overturns stays, marked as superseded.
   it make requests as any web page can, post messages to the page, and touch
   the game's own storage; the worst it can do there is cheat at the game.
   Piece 1.8 narrows that further (plan.md).
+- **D15 — Phaser 4.** Decided 2026-10-20 (sprint-2.md), built
+  2026-10-21. Phaser 4.2.1, out since April 2026, keeps 3.x's Tilemap API
+  and Tiled's formats, and 3.90 is the end of its line. Pinned exactly; its
+  types come with it. It is about 1.4 MB, loaded by a dynamic import after
+  the page, in a chunk of its own.
+- **D16 — One source for a level's map.** Decided 2026-10-20 (sprint-2.md).
+  `level.json`'s rows of characters feed both the world and the scene, which
+  draws them with placeholder tiles and a placeholder wizard drawn at run
+  time with Canvas 2D (`app/src/engine/placeholders.ts`). Tiled comes with
+  the art in phase 4, when there are tiles to place: the world will read the
+  `.tmj` then, and the rows of characters will go. Two files describing one
+  map would drift.

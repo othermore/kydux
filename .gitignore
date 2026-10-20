@@ -5,6 +5,11 @@
 secrets.*
 *.key
 
+# The instructions and memory for Claude are the project's own and never
+# leave this machine.
+CLAUDE.md
+.claude/
+
 # Build output and downloaded runtimes, reproducible from the sources.
 build/
 dist/

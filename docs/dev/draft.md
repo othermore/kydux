@@ -31,6 +31,26 @@ before it.
   plain language ("The spell `mvoe_up` does not exist. Did you mean
   `move_up`?"), in the player's language, pointing at the line.
 
+### The flow of a level
+
+- **Before it starts**, a card shows the level's goals with a picture of the
+  scene and a two-line example of the idea it needs, and a *Start* button.
+- **While the child writes**, the goals stay in a corner of the scene, each
+  ticked or crossed as the last run left it. Some levels add a bonus goal, such
+  as solving it in fewer than a number of lines.
+- **When a run plays**, a timeline under the scene can be dragged back and
+  forth; the line being run is marked in the editor, and a bubble over the
+  wizard names the spell being cast. The wizard's energy shows in a bar.
+- **Things grant spells.** What the wizard can do comes from what they carry:
+  the wand gives `cast`, a spellbook gives its spells, the broom gives `fly`,
+  a cloak gives `hide`. Getting a new thing is part of the story, and its
+  spells appear in the grimoire with the thing's icon. The first time a new
+  spell or idea appears, a card explains it with an example.
+- **On winning**, a short scene and a reward (stars, potions or another
+  currency of the game's own) that buys things in a shop between levels.
+- Levels are reached from a **map** of each chapter, with the path between
+  them lit as they are won.
+
 ### How the code runs
 
 The child's code is real Python, run by CPython in the browser. It runs against
@@ -46,6 +66,14 @@ methods and attributes), so what the child learns carries over to Python outside
 the game.
 
 ## 2. The course
+
+The players are children from 8 or 9 years old upwards, which sets short
+texts, one idea at a time, and levels solved in a few minutes.
+
+The first release has between 10 and 20 lessons, each followed by its levels.
+After them come **challenges**: levels with no lesson, each harder than the
+last, that combine everything taught so far, and that can keep growing after
+the course itself is finished.
 
 A first sketch of the order of ideas, each a lesson and one or more levels:
 
@@ -63,7 +91,12 @@ A first sketch of the order of ideas, each a lesson and one or more levels:
 
 ### The story
 
-The wizard (the child picks their look and name) arrives at the school and goes
+The child creates their wizard at the start: a name, and a look put together
+from parts (body, skin, hair, robe, hat and colours), which every scene and
+cutscene then shows. The parts are separate sprite layers drawn to fit each
+other, so that each combination animates without art of its own.
+
+The wizard arrives at the school and goes
 from scene to scene: getting a wand, learning the first spells, finding the way
 through the castle's corridors and secret passages, slipping out of a class
 without the teacher seeing, earning and learning to fly a broom, and further
@@ -84,30 +117,83 @@ characters and places have names and looks invented for it.
   opens the browser, on Linux, Windows and macOS (Python's own `http.server` is
   enough). The same files can be published as a website.
 - **Progress**: kept on the player's machine (the browser's storage, or a file
-  beside the game when it is run locally). No accounts, no server of ours.
+  beside the game when it is run locally). No accounts and no server of ours in
+  the first release.
+- **Online later**: the first release is local only. The design keeps the way
+  open to publishing it on a hosted server: the game is static files, and saving
+  progress goes through one interface that a local store implements today and an
+  online one can implement later. On top of that, later ideas include accounts,
+  online rankings, and playing with others, such as duels between wizards; none
+  of them is part of the first release.
 - **Kidux**: packaged as a Kidux learning module, a `.deb` built from this
   repository, and presented on the Kidux website.
 - **Checks**: every level has its solution in the repository, run headless to
   prove it wins and that the naive wrong answers do not.
 
-## 4. Art and sound
+## 4. Internationalization
 
-- One consistent style for the whole game: pixel art seen from above (a grid of
-  32 or 48 pixels to be chosen), animated characters in four directions.
-- Made for Kydux, with Gemini's image generation as a tool, then cleaned up,
-  cut into sprite sheets and reviewed by hand; or taken from free collections
-  (OpenGameArt, Kenney and the like) under a licence that can ship with a GPL
-  game.
+Everything the player sees comes from translation files, one per language with
+the same keys: the interface, the lessons, the story, the goals, the hints, the
+grimoire, the error messages, the launcher's messages, and the words that appear
+inside the scene (signs, book titles), which the game draws from a string
+instead of painting them into the art. English and Spanish from the start; a new
+language is a new set of files and nothing else. A check fails when a language
+lacks a key or keeps one nothing uses. The player picks the language, which
+defaults to the system's. The Python stays Python in every language: keywords
+and the game's API in English, while the comments and the strings in a level's
+starting code are translated.
+
+## 5. Art and sound
+
+### The style is chosen by what is easiest to program
+
+- The scene is a **flat grid seen from straight above** (or nearly, with walls
+  showing their front face), not an isometric or free-perspective view: tiles
+  line up with the map, a move of one step is one square, collisions and goals
+  are cells, and maps are drawn in a tile editor. This keeps the level model,
+  the checks and the renderer simple.
+- Characters are **sprite sheets** with a few frames per direction (idle, walk,
+  cast), all on the same grid and scale as the tiles.
+- The wizard the child designs is put together in the cheapest way that looks
+  good: a base sprite recoloured in code (skin, hair, robe), plus a small set of
+  hats and hair styles drawn to fit it, instead of every combination drawn.
+- The words in a scene are drawn by the game from translated strings, never
+  painted into the art (section 4).
+
+### Where the art comes from
+
+- **First, tests with Gemini** (`gemini-3-pro-image`, `gemini-3.1-flash-image`):
+  a few candidate styles, each with a wizard sprite sheet, a stretch of castle
+  corridor as tiles, and an object, to choose the style and the grid size, and
+  to see whether the generated pieces can be cut up and fit together: tiles
+  that join without seams, characters at the tiles' scale, the same character
+  the same from one sheet to the next.
+- **If they do not fit**, the art comes from free collections (OpenGameArt,
+  Kenney and the like) under a licence that can ship with a GPL game, or from
+  another image model, or a mix: free tiles with generated characters.
+- Whatever is generated is cleaned up, cut into sheets and reviewed by hand
+  before it enters the repository; raw output stays out of it.
 - Every asset is listed in a manifest beside it: where it came from, who made
-  it, its licence, and for a generated one the prompt that made it.
+  it, its licence, and for a generated one the model and the prompt.
 - The API key is read from `~/.config/kydux/secrets.env` or the environment,
   never from the repository.
 
-## 5. Open questions
+### Sound
 
-- The age range of the players, which sets the length of the texts and of the
-  levels.
-- The wizard's look and name: fixed, or chosen by the child.
-- The size of the first release: how many lessons and levels.
-- Whether the online version is published from the start, and where.
-- The art's grid size and style, to be settled on a few test sprites.
+- **Music** and **sound effects** made with Lyria: a theme for each chapter,
+  short effects for spells, steps, doors, winning and failing.
+- **Voices for the characters**: short sounds or exclamations when they speak,
+  not spoken lines, so that they need no translation.
+- The lessons and the dialogue are **not read aloud**; they are text.
+
+## 6. Open questions
+
+- The art's style and grid size, to be settled on the Gemini tests.
+
+## 7. What the plan is to cover
+
+A full, detailed plan of every phase is to be written from this draft: the
+basic technology (the runtime, the level model, the renderer, the editor, i18n,
+saving, the launcher), the art, the story and the levels, the packaging for
+Kidux, and the way the project is developed: tests, the checks of every level,
+releases, and the hours of the repository.

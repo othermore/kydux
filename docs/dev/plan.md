@@ -321,15 +321,22 @@ misspell a move, see Python's error (plain, not yet translated).
 ### Phase 2 — The level engine
 
 Everything a level can be made of, with the content format of section 2.5.
+Sprint 3 has 2.1, 2.2, 2.3, 2.9, 2.4 and 2.10 (`sprint-3.md`); sprint 4
+has 2.0, 2.5, 2.6, 2.7 and 2.8.
+
+2.0 The level screen's run, as a controller of its own: the states a run
+    goes through (idle, running, playing, done, failed) and what each
+    button does, apart from the DOM and tested by Vitest, before the
+    screen gains hints, the timeline, the cards and the grimoire.
 
 2.1 The level definition (`level.json`) and its loader on both sides; the
     exposed API list. The level texts, `text.<lang>.json` with their check in
     `tools/i18n_check.py`, exist since sprint 2; they gain the hints and the
     dialogue here.
-2.2 Objects and actors: doors, keys, items on tiles, `pick_up`, `use`,
-    `find_nearest`, `find_all`, attributes; a patrolling actor with `can_see`;
-    their events and their playback (open door, item vanishing, a sight
-    cone drawn).
+2.2 Objects and actors: doors, keys, items on tiles, `pick_up`, `wait`,
+    `find_nearest`, `find_all`, `has`, attributes; a patrolling actor that
+    walks its path back and forth, with `can_see`; their events and their
+    playback (open door, item vanishing, a sight cone drawn).
 2.3 Goals: the full set, `goals.py` per level, bonus goals, fatal failures
     (seen by the teacher ends the run).
 2.4 Errors in the child's words: the mapping of section 2.4 with

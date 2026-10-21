@@ -13,6 +13,28 @@ software under the GNU General Public License, version 3 or later.
 
 ## Playing
 
+Kydux runs in a web browser. There is nothing to install yet: for now it
+runs only from this repository, as `docs/dev/dev-environment.md` explains.
+
+The game opens on its start screen. *Continue* takes you to where you left
+off. The first time, that is the first lesson.
+
+A lesson is a few short pages. Each one explains one idea, with an example.
+On the last page, *Try it* opens the level that comes next, with the
+example already in the editor.
+
+In a level, you write Python in the editor, on the right. *Run* makes the
+wizard do what your code says, on the left. The goals, in the corner,
+tick themselves off as you reach them. If a run goes wrong, the game says
+why, and *Hint* gives you a clue.
+
+Win the level, and *Next* takes you on. The map shows the whole course:
+what you have done, what is open, and what is still locked.
+
+The game remembers your progress in the browser. *Export*, on the start
+screen, saves it as a file, and *Import* brings it back on another
+computer.
+
 ## Lessons
 
 ## Licence

@@ -109,8 +109,9 @@ everything the browser needs into `app/public/`, which git ignores:
 - Python's WebAssembly build, copied from its npm package into `pyodide/`.
 - The world, packed into `world.zip`, which the browser unpacks into
   Python.
-- The levels, copied into `content/levels/`. A level's solution and its
-  wrong answers stay out, so that a child cannot find them in the game.
+- The content, copied into `content/`: the chapters, the lessons and the
+  levels. A level's solution and its wrong answers stay out, so that a
+  child cannot find them in the game.
 - The course, in `content/course.json`: its chapters in order, each with
   its lessons and levels. It comes from each chapter's `chapter.json`, in
   `content/chapters/`.
@@ -127,17 +128,33 @@ the new one, then reload the page:
 npm run predev
 ```
 
-The page opens a level by the hash in its address. For example,
-`#level/02-the-locked-door` opens the level in the directory
-`content/levels/02-the-locked-door/`. An address with no hash goes to the
-first level, the corridor.
+The hash in the address says which screen the page shows. You can type
+one to go straight to a screen:
 
-The browser remembers a few things. The playback speed you chose stays
-between visits. Three more things stay only until you close the tab: the
-code you typed in each level, the hints you have opened, and whether a
-level's start card has been shown. If you want to start from a clean page,
-clear the site's data in the browser, or open the game in a private
-window.
+| Address | Screen |
+| --- | --- |
+| `#start` | The start screen. An address with no hash, or one the game does not know, opens it too. |
+| `#map` | The map of the course. |
+| `#lesson/01-first-action` | A lesson, from `content/lessons/01-first-action/`. |
+| `#level/02-the-locked-door` | A level, from `content/levels/02-the-locked-door/`. |
+| `#settings` | The settings: the language, the speed and the editor's text size. |
+
+The map keeps a locked stop closed. A level's or a lesson's address opens
+it anyway. That is on purpose, so that you can test any level without
+playing the ones before it.
+
+The browser remembers the player's progress. It keeps it as one document
+in its `localStorage`, under the key `kydux.progress`. The document holds
+everything: the language, the settings, the code typed in each level, the
+hints opened, the stars won and the lessons read. Closing the tab or the
+browser does not lose it.
+
+The start screen can move that document to another browser. *Export*
+downloads it as `kydux-progress.json`. *Import* reads such a file back. To
+start from a clean page, press *Start from the beginning* on the start
+screen. It clears the progress but keeps the language and the settings.
+To clear everything, clear the site's data in the browser, or open the
+game in a private window.
 
 Two other commands matter. `npm run build` makes the finished game under
 `app/dist/`, the same files a release ships. `npm run preview` serves that

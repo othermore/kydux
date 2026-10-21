@@ -115,9 +115,12 @@ exposes. Every key is in `i18n/<lang>.json` like any other text.
 
 ```
 content/
-  chapters/01-arrival/chapter.json        order of lessons and levels, map picture
+  chapters/01-arrival/
+    chapter.json                          id, and the items in order: lesson:<id>, level:<id>
+    text.en.json  text.es.json            the chapter's title
   lessons/01-first-action/
-    lesson.json                           id, chapter, ideas taught, API unlocked
+    lesson.json                           id, and what it teaches: the names the
+                                          level after it needs (`teaches`)
     en.md  es.md                          the lesson, a few short pages separated by ---
   levels/01-the-corridor/
     level.json                            map file, actors, exposed API, goals, tick
@@ -131,8 +134,12 @@ content/
 
 Goals are declared (`reach`, `collect`, `not_seen_by`, `say`, `lines_under`,
 `open`) and a level may add `goals.py` for one of its own. The lesson's
-markdown may hold a fenced block marked `try` that opens in the next level's
-editor as its starting code.
+Markdown, with no HTML in it, may hold one fenced block marked `python try`:
+*Try it* puts it in the next level's editor when the child has typed nothing
+there (D33). `pack-world.mjs` writes the chapters, in the order of their
+directories, as `content/course.json`, the one order of the course (D32). A
+chapter's picture for the map comes with the art (phase 4); the map draws
+its stops as a path until then.
 
 ### 2.6 Internationalization
 
@@ -148,13 +155,16 @@ editor as its starting code.
 
 ### 2.7 Progress and the wizard
 
-- `ProgressStore` (TypeScript interface): `load()`, `save(progress)`, with
-  `progress` = `{wizard: {name, look}, language, levels: {id: {won, stars,
-  code, lines}}, lessons: {id: read}}`. `LocalProgressStore` keeps it in
-  `localStorage` (IndexedDB when it outgrows it); *Export* and *Import* move
-  it as a JSON file between computers; the launcher can also keep it as a
-  file beside itself when asked. An online store comes later behind the same
-  interface.
+- `ProgressStore` (TypeScript interface, D31): `load()`, `save(progress)`,
+  with `progress` = `{version, language, settings: {speed, fontSize, split},
+  lessons: {id: {read}}, levels: {id: {won, stars, code, hints, tried}},
+  started, current}`: `started` the levels whose start card was seen,
+  `current` the item last opened, where *Continue* goes. The wizard's name
+  and look join it with 3.2. `LocalProgressStore` keeps it in `localStorage`
+  under `kydux.progress` (IndexedDB when it outgrows it); *Export* and
+  *Import*, on the start screen, move it as a JSON file between computers;
+  the launcher can also keep it as a file beside itself when asked. An
+  online store comes later behind the same interface.
 - The wizard's look: a base sprite drawn with placeholder colours for skin,
   hair, robe and hat, recoloured at load time on a canvas to the child's
   choices (pixel art makes exact colour replacement trivial); hats and hair

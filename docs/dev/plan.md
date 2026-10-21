@@ -116,7 +116,7 @@ exposes. Every key is in `i18n/<lang>.json` like any other text.
 ```
 content/
   chapters/01-arrival/chapter.json        order of lessons and levels, map picture
-  lessons/01-first-spell/
+  lessons/01-first-action/
     lesson.json                           id, chapter, ideas taught, API unlocked
     en.md  es.md                          the lesson, a few short pages separated by ---
   levels/01-the-corridor/
@@ -431,7 +431,7 @@ English and Spanish together; the owner reviews each chapter before the next.
     give spells; locked doors and keys.
 5.5 Chapter 3, Corridors and passages (loops, conditions): the moving
     staircases, the patrolling teacher, slipping out of class.
-5.6 Chapter 4, The broom (lists, functions): flying, the race, a spell of the
+5.6 Chapter 4, The broom (lists, functions): flying, the race, an action of the
     child's own.
 5.7 Chapter 5, The familiar (classes and objects): the child defines a
     creature with its attributes and methods and sends it through a passage.

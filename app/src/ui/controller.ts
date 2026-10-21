@@ -1,0 +1,276 @@
+// The run of a level, apart from the DOM (D29): what state a run is in, what
+// each button does, and what the screen should show, as a snapshot the level
+// screen renders. It holds no words: an outcome is data, said by the card in
+// the language of the moment, so that a change of language needs no new run.
+
+import type { LoadedLevel } from '../content/levels';
+import type { Playback, Speed } from '../engine/playback';
+import type { LevelJson, RunResult, WorldResult } from '../runtime/protocol';
+import type { RuntimeStatus } from '../runtime/runtime';
+import type { GoalMark } from './goals';
+import type { Outcome } from './outcome';
+
+export type RunState = 'loading' | 'ready' | 'running' | 'playing' | 'done' | 'failed';
+
+export interface RunSnapshot {
+  state: RunState;
+  /** The runtime's own status, for the status line. */
+  runtime: RuntimeStatus;
+  /** The last run's world, or null before a run and after a restart. */
+  world: WorldResult | null;
+  /** What the card says, or null while it is hidden. */
+  outcome: Outcome | null;
+  /** What the child's code printed in the last run. */
+  printed: string;
+  runningLine: number | null;
+  errorLine: number | null;
+  /** One mark for each goal, at the tick being shown. */
+  goals: GoalMark[];
+  /** The tick being shown, and how many the run has. */
+  tick: number;
+  length: number;
+  speed: Speed;
+  canRun: boolean;
+  canStop: boolean;
+}
+
+/** What the controller needs of the runtime, so that tests can give a fake. */
+export interface RuntimeLike {
+  readonly status: RuntimeStatus;
+  readonly wallClockMs: number;
+  run(code: string, level?: LevelJson): Promise<RunResult>;
+  interrupt(): void;
+  onStatus(listener: (status: RuntimeStatus) => void): () => void;
+}
+
+/** What the controller needs of the scene. */
+export interface SceneLike {
+  readonly playback: Playback;
+  load(world: WorldResult): void;
+  reset(): void;
+}
+
+const DEFAULT_TICK_LIMIT = 1000;
+
+/** A world for a run that came back without one, as when the worker was ended. */
+function emptyWorld(status: WorldResult['status'], result: Partial<RunResult>): WorldResult {
+  return {
+    status,
+    events: [],
+    goals: [],
+    ticks: 0,
+    stdout: result.stdout ?? '',
+    error: result.error ?? null,
+  };
+}
+
+export class RunController {
+  private readonly runtime: RuntimeLike;
+  private readonly level: LoadedLevel;
+  private scene: SceneLike | null = null;
+  private world: WorldResult | null = null;
+  private outcome: Outcome | null = null;
+  private runningLine: number | null = null;
+  private errorLine: number | null = null;
+  private tick = 0;
+  private speed: Speed;
+  /** Bumped at every run and restart, so that a run's late answer is dropped. */
+  private generation = 0;
+  private listeners: ((snapshot: RunSnapshot) => void)[] = [];
+  private unsubscribe: (() => void)[] = [];
+
+  constructor(parts: { runtime: RuntimeLike; level: LoadedLevel; speed: Speed }) {
+    this.runtime = parts.runtime;
+    this.level = parts.level;
+    this.speed = parts.speed;
+    this.unsubscribe.push(
+      this.runtime.onStatus((status) => {
+        if (status === 'failed' && this.outcome?.kind !== 'failed') {
+          this.outcome = { kind: 'failed' };
+        }
+        this.changed();
+      }),
+    );
+  }
+
+  /** The scene, once it is drawn: until then a run cannot start. */
+  attach(scene: SceneLike): void {
+    this.scene = scene;
+    scene.playback.setSpeed(this.speed);
+    this.unsubscribe.push(
+      scene.playback.onTick((tick, events) => {
+        this.tick = tick;
+        this.runningLine = events[0]?.line ?? null;
+        this.changed();
+      }),
+      scene.playback.onState((state) => {
+        if (state === 'done' && this.world) this.finish();
+        this.changed();
+      }),
+    );
+    this.changed();
+  }
+
+  get snapshot(): RunSnapshot {
+    const state = this.state();
+    return {
+      state,
+      runtime: this.runtime.status,
+      world: this.world,
+      outcome: this.outcome,
+      printed: this.outcome ? (this.world?.stdout ?? '') : '',
+      runningLine: this.runningLine,
+      errorLine: this.errorLine,
+      goals: this.marks(),
+      tick: this.tick,
+      length: this.scene?.playback.length ?? 0,
+      speed: this.speed,
+      canRun: this.scene !== null && this.runtime.status === 'ready',
+      canStop: state === 'running' || state === 'playing',
+    };
+  }
+
+  run(code: string): void {
+    const scene = this.scene;
+    if (!scene || this.runtime.status !== 'ready') return;
+    if (scene.playback.state === 'playing') scene.playback.stop();
+    this.clear();
+    scene.reset();
+    const generation = ++this.generation;
+    this.runtime.run(code, this.level.level).then(
+      (result) => {
+        if (generation !== this.generation) return;
+        const world = result.world;
+        if (!world) {
+          this.world = emptyWorld(result.status === 'interrupted' ? 'interrupted' : 'error', result);
+          this.finish();
+          return;
+        }
+        this.world = world;
+        scene.load(world);
+        scene.playback.setSpeed(this.speed);
+        if (world.events.length === 0) this.finish();
+        else scene.playback.play();
+        this.changed();
+      },
+      (error: unknown) => {
+        if (generation !== this.generation || this.runtime.status === 'failed') return;
+        // The worker could not run the code at all: its message is shown as an
+        // error, and Run is ready again.
+        const message = error instanceof Error ? error.message : String(error);
+        this.world = emptyWorld('error', { error: { type: 'Error', message } });
+        this.finish();
+      },
+    );
+    this.changed();
+  }
+
+  stop(): void {
+    if (this.runtime.status === 'running') this.runtime.interrupt();
+    else this.scene?.playback.stop();
+  }
+
+  restart(): void {
+    this.generation += 1;
+    this.scene?.playback.reset();
+    this.clear();
+    this.changed();
+  }
+
+  setSpeed(speed: Speed): void {
+    this.speed = speed;
+    this.scene?.playback.setSpeed(speed);
+    this.changed();
+  }
+
+  onChange(listener: (snapshot: RunSnapshot) => void): () => void {
+    this.listeners.push(listener);
+    listener(this.snapshot);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== listener);
+    };
+  }
+
+  destroy(): void {
+    this.generation += 1;
+    for (const stop of this.unsubscribe) stop();
+    this.unsubscribe = [];
+    this.listeners = [];
+  }
+
+  private state(): RunState {
+    const status = this.runtime.status;
+    if (status === 'failed') return 'failed';
+    if (!this.scene || status === 'loading' || status === 'restarting') return 'loading';
+    if (status === 'running') return 'running';
+    if (this.scene.playback.state === 'playing') return 'playing';
+    return this.outcome ? 'done' : 'ready';
+  }
+
+  private marks(): GoalMark[] {
+    const goals = (this.level.level.goals as unknown[] | undefined) ?? [];
+    if (!this.world || this.world.goals.length === 0) return goals.map(() => 'open');
+    const reached = (at: number | null) => at !== null && this.tick >= at;
+    return this.world.goals.map((goal) =>
+      reached(goal.failed_at_tick) ? 'failed' : reached(goal.met_at_tick) ? 'met' : 'open',
+    );
+  }
+
+  private finish(): void {
+    const world = this.world;
+    if (!world) return;
+    this.runningLine = null;
+    this.outcome = this.outcomeOf(world);
+    this.errorLine = world.status === 'error' ? (world.error?.line ?? null) : null;
+    this.changed();
+  }
+
+  private clear(): void {
+    this.world = null;
+    this.outcome = this.runtime.status === 'failed' ? { kind: 'failed' } : null;
+    this.runningLine = null;
+    this.errorLine = null;
+    this.tick = 0;
+  }
+
+  private outcomeOf(world: WorldResult): Outcome {
+    switch (world.status) {
+      case 'won':
+        return { kind: 'won' };
+      case 'incomplete': {
+        const needed = world.goals.filter((g) => !g.bonus);
+        const first = world.events.find((e) => e.actor === 'wizard' && e.kind === 'blocked');
+        const things = (this.level.level.things as { id: string; kind: string }[] | undefined) ?? [];
+        return {
+          kind: 'incomplete',
+          met: needed.filter((g) => g.met).length,
+          total: needed.length,
+          blocked:
+            first && first.line !== null
+              ? {
+                  line: first.line,
+                  reason: String(first.data.reason),
+                  thing: things.find((thing) => thing.id === first.data.by)?.kind ?? null,
+                }
+              : undefined,
+        };
+      }
+      case 'too_many_ticks':
+        return {
+          kind: 'too_many_ticks',
+          limit: Number(this.level.level.tick_limit ?? DEFAULT_TICK_LIMIT),
+        };
+      case 'interrupted':
+        return { kind: 'interrupted', seconds: Math.round(this.runtime.wallClockMs / 1000) };
+      case 'caught':
+        return { kind: 'caught' };
+      case 'error':
+        return { kind: 'error', error: world.error ?? { type: 'Error', message: '' } };
+    }
+  }
+
+  private changed(): void {
+    const snapshot = this.snapshot;
+    for (const listener of this.listeners) listener(snapshot);
+  }
+}

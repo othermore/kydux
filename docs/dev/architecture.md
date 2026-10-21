@@ -24,7 +24,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (layout.ts), what an actor sees (sight.ts, the same rule as the
                 world's, tested on tests/fixtures/sight.json), and the playback
   src/editor/   the child's editor, CodeMirror
-  src/ui/       the screens: the level screen, its goals panel and outcome card
+  src/ui/       the screens: the level screen, a view of the run controller
+                (controller.ts), and its goals panel and outcome card
   src/content/  loading a level's level.json and its text.<lang>.json
   scripts/      copy Pyodide into public/ and pack the world, before dev and build
   e2e/          the browser tests (Playwright), beside the node_modules they need
@@ -363,3 +364,14 @@ one overturns stays, marked as superseded.
   by the id the child typed as sprint-4.md had it, so that a sentence
   reads well in every language. A bubble or a thought that has no room
   above the wizard goes under it, and neither leaves the scene's sides.
+- **D29 — The level screen is a view of a controller.** Decided 2026-10-21
+  (sprint-4.md), built the same day. `RunController`
+  (`app/src/ui/controller.ts`) holds the state of a run, what each button
+  does, and what the screen shows, as a snapshot: the state, the last
+  world, the outcome, the lines to mark, the goals' marks at the tick
+  shown. It reaches the runtime and the scene through the small interfaces
+  it needs of them, so Vitest drives it with fakes. The level screen makes
+  its DOM once and renders every snapshot. An outcome is data, not words:
+  the reason an action could not be done is kept as its code and its
+  thing's kind, and the card says it in the language of the moment, so a
+  change of language needs no new run.

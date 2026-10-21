@@ -1,13 +1,20 @@
-// What a run came to, said to the child: a card under the editor. Python's
-// own words stay for an error until the children's words of piece 2.4.
+// What a run came to, said to the child: a card under the editor. An outcome
+// is data; the card says it in the language of the moment.
 
+import { blockedText } from '../engine/words';
 import { t } from '../i18n';
 import type { ErrorInfo, Explanation } from '../runtime/protocol';
 import { element } from './dom';
 
 export type Outcome =
   | { kind: 'won' }
-  | { kind: 'incomplete'; met: number; total: number; blocked?: { line: number; reason: string } }
+  | {
+      kind: 'incomplete';
+      met: number;
+      total: number;
+      /** The first action that could not be done: its line, its reason, its thing's kind. */
+      blocked?: { line: number; reason: string; thing: string | null };
+    }
   | { kind: 'too_many_ticks'; limit: number }
   | { kind: 'interrupted'; seconds: number }
   | { kind: 'caught' }
@@ -55,9 +62,9 @@ export function outcomeText(outcome: Outcome): string {
     case 'incomplete': {
       const said = t('outcome.incomplete', { n: outcome.met, total: outcome.total });
       // Why something could not be done, the first time it happened (D28).
-      return outcome.blocked
-        ? `${said}\n${t('outcome.blocked', { line: outcome.blocked.line, reason: outcome.blocked.reason })}`
-        : said;
+      if (!outcome.blocked) return said;
+      const { line, reason, thing } = outcome.blocked;
+      return `${said}\n${t('outcome.blocked', { line, reason: blockedText(reason, thing) })}`;
     }
     case 'too_many_ticks':
       return t('outcome.too_many_ticks', { limit: outcome.limit });

@@ -1,22 +1,21 @@
 // The level screen: the scene with the goals over its corner, the editor
 // beside it, Run, Stop, Restart and the speed, and the card saying how a run
-// went. It is where the child's code becomes the wizard walking.
+// went. It is a view of a RunController (D29): it makes the DOM once, renders
+// every snapshot the controller gives, and each button calls the controller.
 
-import type { Editor, EditorOptions } from '../editor/editor';
-import type { SceneHandle } from '../engine/scene';
-import type { Speed } from '../engine/playback';
-import { currentLanguage, t } from '../i18n';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
-import type { RunResult, WorldResult } from '../runtime/protocol';
+import type { Editor, EditorOptions } from '../editor/editor';
+import type { Speed } from '../engine/playback';
+import type { SceneHandle } from '../engine/scene';
+import { currentLanguage, t } from '../i18n';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
-import { blockedText } from '../engine/words';
+import { RunController, type RunSnapshot } from './controller';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
 import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
 
 const SPEEDS: Speed[] = [1, 2, 4];
 const SPEED_KEY = 'kydux.speed';
-const DEFAULT_TICK_LIMIT = 1000;
 
 function storage(kind: 'local' | 'session'): Storage | null {
   try {
@@ -55,7 +54,7 @@ export interface LevelScreenParts {
 export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const { runtime, loaded } = parts;
   let text = loaded.text;
-  const tickLimit = Number(loaded.level.tick_limit ?? DEFAULT_TICK_LIMIT);
+  const controller = new RunController({ runtime, level: loaded, speed: savedSpeed() });
 
   // The words that change with the language, each with how to say it.
   const labels: [HTMLElement, () => string][] = [];
@@ -117,17 +116,12 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const editor = parts.createEditor(editorParent, {
     doc: typed && saved ? saved : text.starting_code,
     label: t('level.code_label'),
-    onRun: () => runNow(),
+    onRun: () => controller.run(editor.getDoc()),
     onChange: (doc) => {
       typed = doc !== text.starting_code;
       storage('session')?.setItem(codeKey(loaded.id), doc);
     },
   });
-
-  let scene: SceneHandle | null = null;
-  let world: WorldResult | null = null;
-  let stopped: (() => void)[] = [];
-  let destroyed = false;
 
   const statusLine = (s: RuntimeStatus): string => {
     switch (s) {
@@ -143,141 +137,37 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         return t('level.failed');
     }
   };
-  const showStatus = (s: RuntimeStatus) => {
-    if (s === 'failed' && card.current?.kind !== 'failed') card.show({ kind: 'failed' });
-    status.textContent = statusLine(s);
-    status.dataset.status = s;
-    run.disabled = s !== 'ready' || !scene;
-    stop.disabled = s !== 'running' && scene?.playback.state !== 'playing';
-  };
-  stopped.push(runtime.onStatus(showStatus));
 
-  const outcomeOf = (result: WorldResult): Outcome => {
-    switch (result.status) {
-      case 'won':
-        return { kind: 'won' };
-      case 'incomplete': {
-        const needed = result.goals.filter((g) => !g.bonus);
-        const first = result.events.find((e) => e.actor === 'wizard' && e.kind === 'blocked');
-        const kindOf = (id: unknown) =>
-          ((loaded.level.things as { id: string; kind: string }[] | undefined) ?? []).find(
-            (thing) => thing.id === id,
-          )?.kind ?? null;
-        return {
-          kind: 'incomplete',
-          met: needed.filter((g) => g.met).length,
-          total: needed.length,
-          blocked:
-            first && first.line !== null
-              ? { line: first.line, reason: blockedText(String(first.data.reason), kindOf(first.data.by)) }
-              : undefined,
-        };
-      }
-      case 'too_many_ticks':
-        return { kind: 'too_many_ticks', limit: tickLimit };
-      case 'interrupted':
-        return { kind: 'interrupted', seconds: Math.round(runtime.wallClockMs / 1000) };
-      case 'caught':
-        return { kind: 'caught' };
-      case 'error':
-        return {
-          kind: 'error',
-          error: result.error ?? { type: 'Error', message: '' },
-        };
+  // What was last drawn, so that the card and the editor's marks change only
+  // when the controller's do.
+  let shownOutcome: Outcome | null = null;
+  let shownLines: [number | null, number | null] = [null, null];
+
+  const render = (snapshot: RunSnapshot, force = false) => {
+    status.textContent = statusLine(snapshot.runtime);
+    status.dataset.status = snapshot.runtime;
+    run.disabled = !snapshot.canRun;
+    stop.disabled = !snapshot.canStop;
+    snapshot.goals.forEach((mark, index) => goals.set(index, mark));
+    if (force || snapshot.outcome !== shownOutcome) {
+      if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed);
+      else card.hide();
+      shownOutcome = snapshot.outcome;
+    }
+    if (snapshot.runningLine !== shownLines[0] || snapshot.errorLine !== shownLines[1]) {
+      editor.setRunningLine(snapshot.runningLine);
+      editor.setErrorLine(snapshot.errorLine);
+      shownLines = [snapshot.runningLine, snapshot.errorLine];
     }
   };
+  let stopped: (() => void)[] = [controller.onChange((snapshot) => render(snapshot))];
 
-  const markGoals = (tick: number) => {
-    world?.goals.forEach((goal, index) => {
-      const reached = (at: number | null) => at !== null && tick >= at;
-      goals.set(
-        index,
-        reached(goal.failed_at_tick) ? 'failed' : reached(goal.met_at_tick) ? 'met' : 'open',
-      );
-    });
-    if (!world) goals.reset();
-  };
-
-  const finish = () => {
-    editor.setRunningLine(null);
-    if (!world) return;
-    card.show(outcomeOf(world), world.stdout);
-    if (world.status === 'error') editor.setErrorLine(world.error?.line ?? null);
-    showStatus(runtime.status);
-  };
-
-  const clear = () => {
-    world = null;
-    card.hide();
-    goals.reset();
-    editor.setRunningLine(null);
-    editor.setErrorLine(null);
-  };
-
-  const runNow = () => {
-    if (run.disabled || !scene) return;
-    const handle = scene;
-    if (handle.playback.state === 'playing') handle.playback.stop();
-    clear();
-    handle.reset();
-    runtime.run(editor.getDoc(), loaded.level).then(
-      (result: RunResult) => {
-        if (destroyed) return;
-        const ran = result.world;
-        if (!ran) {
-          // A run stopped by ending the worker comes back without a world.
-          world = {
-            status: result.status === 'interrupted' ? 'interrupted' : 'error',
-            events: [],
-            goals: [],
-            ticks: 0,
-            stdout: result.stdout,
-            error: result.error ?? null,
-          };
-          finish();
-          return;
-        }
-        world = ran;
-        handle.load(ran);
-        handle.playback.setSpeed(Number(speed.value) as Speed);
-        if (ran.events.length === 0) {
-          markGoals(0);
-          finish();
-          return;
-        }
-        handle.playback.play();
-      },
-      (error: unknown) => {
-        if (destroyed) return;
-        if (runtime.status === 'failed') return;
-        // The worker could not run the code at all: its message is shown as an
-        // error, and Run is ready again.
-        world = {
-          status: 'error',
-          events: [],
-          goals: [],
-          ticks: 0,
-          stdout: '',
-          error: { type: 'Error', message: error instanceof Error ? error.message : String(error) },
-        };
-        finish();
-      },
-    );
-  };
-
-  run.addEventListener('click', runNow);
-  stop.addEventListener('click', () => {
-    if (runtime.status === 'running') runtime.interrupt();
-    else scene?.playback.stop();
-  });
-  restart.addEventListener('click', () => {
-    scene?.playback.reset();
-    clear();
-    showStatus(runtime.status);
-  });
+  run.addEventListener('click', () => controller.run(editor.getDoc()));
+  stop.addEventListener('click', () => controller.stop());
+  restart.addEventListener('click', () => controller.restart());
   speed.addEventListener('change', () => {
     storage('local')?.setItem(SPEED_KEY, speed.value);
-    scene?.playback.setSpeed(Number(speed.value) as Speed);
+    controller.setSpeed(Number(speed.value) as Speed);
   });
 
   const setPageTitle = () => {
@@ -285,6 +175,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   };
   setPageTitle();
 
+  let scene: SceneHandle | null = null;
+  let destroyed = false;
   let mounted = false;
 
   return {
@@ -298,17 +190,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           return;
         }
         scene = handle;
-        stopped.push(
-          handle.playback.onTick((tick, events) => {
-            markGoals(tick);
-            editor.setRunningLine(events[0]?.line ?? null);
-          }),
-          handle.playback.onState((state) => {
-            if (state === 'done' && world) finish();
-            showStatus(runtime.status);
-          }),
-        );
-        showStatus(runtime.status);
+        controller.attach(handle);
       });
     },
     async relabel() {
@@ -316,23 +198,17 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       text = await loadLevelText(loaded.id, currentLanguage());
       if (!typed && editor.getDoc() === before.starting_code) editor.setDoc(text.starting_code);
       for (const [labelNode, say] of labels) labelNode.textContent = say();
-      const marks = text.goals.map((_, index) =>
-        goals.node.querySelectorAll('.goal')[index]?.getAttribute('data-mark'),
-      );
       goals = goalsPanel(goalTexts());
-      marks.forEach((mark, index) => {
-        if (mark === 'met' || mark === 'failed') goals.set(index, mark);
-      });
       goalsSlot.replaceChildren(goals.node);
       editor.view.contentDOM.setAttribute('aria-label', t('level.code_label'));
-      if (card.current) card.show(card.current);
-      showStatus(runtime.status);
+      render(controller.snapshot, true);
       setPageTitle();
     },
     destroy() {
       destroyed = true;
-      for (const stop of stopped) stop();
+      for (const unsubscribe of stopped) unsubscribe();
       stopped = [];
+      controller.destroy();
       scene?.destroy();
       editor.destroy();
     },

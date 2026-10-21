@@ -13,27 +13,25 @@ async function winTheCorridor(page: Page): Promise<void> {
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
 }
 
-test('a first visit lands on the start screen, and Continue opens the first level', async ({
+test('a first visit lands on the start screen, and Continue opens the first lesson', async ({
   page,
 }) => {
   await page.goto('/');
   const go = page.locator('#continue');
-  await expect(go).toHaveText('Continue: The corridor');
+  await expect(go).toHaveText('Continue: Your first action');
   await go.click();
-  await expect(page.locator('.level-title')).toHaveText('The corridor');
+  await expect(page.locator('.lesson-page h1')).toHaveText('Your first action');
 });
 
 test('after a win, Continue names what comes next, and the title leads home', async ({ page }) => {
-  await page.goto('/');
-  await page.locator('#continue').click();
+  await page.goto('/#level/01-the-corridor');
   await winTheCorridor(page);
   await page.locator('#home').click();
-  await expect(page.locator('#continue')).toHaveText('Continue: The locked door');
+  await expect(page.locator('#continue')).toHaveText('Continue: Steps, keys and doors');
 });
 
 test('progress exported, cleared and imported comes back', async ({ page }) => {
-  await page.goto('/');
-  await page.locator('#continue').click();
+  await page.goto('/#level/01-the-corridor');
   await winTheCorridor(page);
   await page.locator('#home').click();
 
@@ -44,10 +42,10 @@ test('progress exported, cleared and imported comes back', async ({ page }) => {
 
   page.once('dialog', (dialog) => dialog.accept());
   await page.locator('#new').click();
-  await expect(page.locator('#continue')).toHaveText('Continue: The corridor');
+  await expect(page.locator('#continue')).toHaveText('Continue: Your first action');
 
   await page.locator('#import-file').setInputFiles(file as string);
-  await expect(page.locator('#continue')).toHaveText('Continue: The locked door');
+  await expect(page.locator('#continue')).toHaveText('Continue: Steps, keys and doors');
 });
 
 test('a file that is not progress is refused, and nothing changes', async ({ page }) => {
@@ -60,16 +58,16 @@ test('a file that is not progress is refused, and nothing changes', async ({ pag
   await expect(page.locator('#start-message')).toHaveText(
     'That file is not a Kydux progress file. Nothing has changed.',
   );
-  await expect(page.locator('#continue')).toHaveText('Continue: The corridor');
+  await expect(page.locator('#continue')).toHaveText('Continue: Your first action');
 });
 
 test('the start screen in Spanish', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
   const page = await context.newPage();
   await page.goto('/');
-  await expect(page.locator('#continue')).toHaveText('Continuar: El pasillo');
+  await expect(page.locator('#continue')).toHaveText('Continuar: Tu primera acción');
   await expect(page.locator('#new')).toHaveText('Empezar desde el principio');
   await page.locator('#language').selectOption('en');
-  await expect(page.locator('#continue')).toHaveText('Continue: The corridor');
+  await expect(page.locator('#continue')).toHaveText('Continue: Your first action');
   await context.close();
 });

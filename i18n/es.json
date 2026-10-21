@@ -153,5 +153,13 @@
     "locked": "todavía cerrado",
     "open_map": "Mapa",
     "title_page": "Kydux — el mapa"
+  },
+  "lesson": {
+    "previous": "Atrás",
+    "next": "Página siguiente",
+    "page": "Página {n} de {total}",
+    "try": "Probar",
+    "go_on": "Seguir",
+    "not_found": "No hay ninguna lección llamada «{id}»."
   }
 }

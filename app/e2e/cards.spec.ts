@@ -35,7 +35,7 @@ test('the start card opens a level the first time in a visit, and ? brings it ba
   await expect(page.locator('.start-card')).toBeHidden();
 });
 
-test('a won run shows its stars, and Next opens the next level', async ({ page }) => {
+test('a won run shows its stars, and Next opens what comes next in the course', async ({ page }) => {
   await page.goto('/#level/02-the-locked-door');
   await page.locator('#start').click();
   await ready(page);
@@ -49,8 +49,8 @@ test('a won run shows its stars, and Next opens the next level', async ({ page }
   await expect(win.locator('.stars')).toHaveAttribute('data-stars', '2');
   await expect(win.locator('.stars')).toHaveAttribute('aria-label', '2 of 3 stars');
   await page.locator('#next').click();
-  await expect(page).toHaveURL(/#level\/03-past-the-teacher$/);
-  await expect(page.locator('.level-title')).toHaveText('Past the teacher');
+  await expect(page).toHaveURL(/#lesson\/03-watching$/);
+  await expect(page.locator('.lesson-page h1')).toHaveText('Watching and waiting');
 });
 
 test('Play again closes the win card; the last level says there is no next yet', async ({

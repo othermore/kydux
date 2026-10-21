@@ -1,0 +1,7 @@
+{
+  "id": "02-steps",
+  "teaches": [
+    "wizard.pick_up",
+    "door.open"
+  ]
+}

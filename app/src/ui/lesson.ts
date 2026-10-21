@@ -1,0 +1,98 @@
+// A lesson, page by page: its Markdown rendered by marked (D33), Back and Next
+// page, and on the last page Try it, which marks the lesson read, gives its
+// example to the next level when the child has typed nothing there yet, and
+// opens what comes next. Reaching the last page marks the lesson read too.
+
+import { marked } from 'marked';
+import { itemHash } from '../content/course';
+import type { Lesson } from '../content/lessons';
+import { t } from '../i18n';
+import * as progress from '../progress/progress';
+import { element } from './dom';
+import type { Screen } from './screen';
+
+export interface LessonScreenParts {
+  lesson: Lesson;
+  /** The course's item after this lesson, or null after the last. */
+  next: string | null;
+  /** The lesson in the language now set, for a change of language. */
+  reload: () => Promise<Lesson>;
+}
+
+export function lessonScreen(parts: LessonScreenParts): Screen {
+  let lesson = parts.lesson;
+  let page = 0;
+  const node = element('div', { className: 'lesson-screen' });
+
+  const markRead = () => progress.markRead(lesson.id);
+
+  const tryIt = () => {
+    markRead();
+    const next = parts.next;
+    if (next?.startsWith('level:') && lesson.tryCode !== null) {
+      const id = next.slice('level:'.length);
+      // The example goes into the level only when the child has typed nothing there.
+      if (progress.levelProgress(id).code === undefined) progress.setCode(id, lesson.tryCode);
+    }
+    if (next) progress.setCurrent(next);
+    location.hash = next ? itemHash(next) : '#map';
+  };
+
+  const draw = () => {
+    const last = page === lesson.pages.length - 1;
+    if (last) markRead();
+    document.title = t('level.page_title', { title: lesson.title });
+    const article = element('article', { className: 'lesson-page' });
+    // The lessons are the project's own, with no HTML in them (a content check
+    // refuses it), so marked's output is put in as it is.
+    article.innerHTML = marked.parse(lesson.pages[page] ?? '', { async: false });
+    const back = element('button', { id: 'lesson-back', type: 'button', className: 'quiet-button' }, [
+      t('lesson.previous'),
+    ]);
+    back.disabled = page === 0;
+    back.addEventListener('click', () => {
+      page = Math.max(0, page - 1);
+      draw();
+    });
+    const forward = last
+      ? element('button', { id: 'lesson-try', type: 'button', className: 'big-button' }, [
+          lesson.tryCode !== null ? t('lesson.try') : t('lesson.go_on'),
+        ])
+      : element('button', { id: 'lesson-next', type: 'button', className: 'big-button' }, [
+          t('lesson.next'),
+        ]);
+    forward.addEventListener('click', () => {
+      if (last) tryIt();
+      else {
+        page += 1;
+        draw();
+      }
+    });
+    node.replaceChildren(
+      element('a', { id: 'lesson-map', className: 'quiet-button small', href: '#map' }, [t('map.open_map')]),
+      article,
+      element('div', { className: 'lesson-nav' }, [
+        back,
+        element('span', { id: 'lesson-page', className: 'lesson-count' }, [
+          t('lesson.page', { n: page + 1, total: lesson.pages.length }),
+        ]),
+        forward,
+      ]),
+    );
+    forward.focus();
+  };
+
+  return {
+    node,
+    mount: () => {
+      progress.setCurrent(`lesson:${lesson.id}`);
+      draw();
+    },
+    async relabel() {
+      lesson = await parts.reload();
+      page = Math.min(page, lesson.pages.length - 1);
+      draw();
+    },
+    destroy: () => {},
+  };
+}

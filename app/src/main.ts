@@ -1,5 +1,6 @@
 import { version } from '../package.json';
 import { type Course, items, itemHash, loadCourse, next, parseItem } from './content/course';
+import { LessonNotFound, loadLesson } from './content/lessons';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
 import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, t } from './i18n';
 import * as progress from './progress/progress';
@@ -13,12 +14,18 @@ let screen: Screen | null = null;
 /** The address of the screen shown, so that a hash change to it again is ignored. */
 let shownRoute: string | null = null;
 
-type Route = { name: 'start' } | { name: 'map' } | { name: 'level'; id: string };
+type Route =
+  | { name: 'start' }
+  | { name: 'map' }
+  | { name: 'level'; id: string }
+  | { name: 'lesson'; id: string };
 
 /** The screen the address names; the start screen for an address that names none. */
 function parseRoute(hash: string): Route {
   const level = /^#level\/(.+)$/.exec(hash);
   if (level) return { name: 'level', id: decodeURIComponent(level[1] ?? '') };
+  const lesson = /^#lesson\/(.+)$/.exec(hash);
+  if (lesson) return { name: 'lesson', id: decodeURIComponent(lesson[1] ?? '') };
   if (hash === '#map') return { name: 'map' };
   return { name: 'start' };
 }
@@ -39,7 +46,40 @@ async function itemTitle(item: string): Promise<string> {
     const text = await loadLevelText(parsed.id, currentLanguage()).catch(() => null);
     return text?.title ?? parsed.id;
   }
-  return parsed.id;
+  const lesson = await loadLesson(parsed.id, currentLanguage()).catch(() => null);
+  return lesson?.title ?? parsed.id;
+}
+
+async function showLesson(content: HTMLElement, id: string, key: string): Promise<void> {
+  try {
+    const [lesson, course, { lessonScreen }] = await Promise.all([
+      loadLesson(id, currentLanguage()),
+      loadCourse(),
+      import('./ui/lesson'),
+    ]);
+    if (shownRoute !== key) return;
+    show(
+      content,
+      lessonScreen({
+        lesson,
+        next: next(course, `lesson:${id}`),
+        reload: () => loadLesson(id, currentLanguage()),
+      }),
+    );
+  } catch (error) {
+    if (shownRoute !== key) return;
+    if (!(error instanceof LessonNotFound)) {
+      failed(content, error);
+      return;
+    }
+    document.title = t('app.title');
+    content.replaceChildren(
+      element('div', { className: 'not-found' }, [
+        element('p', {}, [t('lesson.not_found', { id })]),
+        element('a', { id: 'first-level', href: '#start' }, [t('level.go_start')]),
+      ]),
+    );
+  }
 }
 
 function languagePicker(): HTMLElement {
@@ -178,7 +218,10 @@ let root: HTMLElement | null = null;
 function route(): void {
   if (!root) return;
   const wanted = parseRoute(location.hash);
-  const key = wanted.name === 'level' ? `level/${wanted.id}` : wanted.name;
+  const key =
+    wanted.name === 'level' || wanted.name === 'lesson'
+      ? `${wanted.name}/${wanted.id}`
+      : wanted.name;
   if (key === shownRoute && screen) return;
   shownRoute = key;
   screen?.destroy();
@@ -190,9 +233,11 @@ function route(): void {
   const shown =
     wanted.name === 'level'
       ? showLevel(content, wanted.id, key)
-      : wanted.name === 'map'
-        ? showMap(content)
-        : showStart(content);
+      : wanted.name === 'lesson'
+        ? showLesson(content, wanted.id, key)
+        : wanted.name === 'map'
+          ? showMap(content)
+          : showStart(content);
   shown.catch((error: unknown) => failed(content, error));
 }
 

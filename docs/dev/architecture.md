@@ -25,11 +25,15 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 world's, tested on tests/fixtures/sight.json), the playback, and
                 the words the scene shows (words.ts, why an action failed)
   src/editor/   the child's editor, CodeMirror
-  src/ui/       the screens: the level screen, a view of the run controller
-                (controller.ts); its goals panel, outcome card, start and win
-                cards (cards.ts), and the wizard's notebook (notebook.ts)
-  src/content/  loading a level's level.json and its text.<lang>.json, and the
-                course (course.ts): its chapters, what comes next, a stop's state
+  src/ui/       the screens: start (start.ts), the map (map.ts), a lesson
+                (lesson.ts), and the level screen, a view of the run controller
+                (controller.ts), with its goals panel, outcome card, start and
+                win cards (cards.ts), and the wizard's notebook (notebook.ts)
+  src/content/  loading a level's level.json and its text.<lang>.json, a lesson
+                and its pages (lessons.ts), and the course (course.ts): its
+                chapters, what comes next, a stop's state
+  src/progress/ the player's progress, one document (store.ts), and the calls
+                the screens make on it (progress.ts)
   scripts/      before dev and build: copy Pyodide into public/, pack the world
                 into world.zip, copy the content into content/ with the course in
                 content/course.json, and write the world's table as api.json
@@ -42,7 +46,8 @@ world/          kydux_world, the model of the levels, and its tests: level.py re
                 sandbox.py keeps it from Pyodide's bridge to JavaScript
 content/        the levels, each with level.json, its words in text.<lang>.json,
                 its solution and its wrong answers (the last two never shipped);
-                later the lessons and chapters
+                the lessons, each with lesson.json and <lang>.md; the chapters,
+                each with chapter.json and text.<lang>.json
 i18n/           en.json, es.json: the app's words, the same keys in each
 tools/          the i18n check, the forbidden-word check, later the art tools
 tests/project/  the repository's own checks
@@ -63,6 +68,7 @@ Pinned exactly, checked against their registries on 2026-10-20:
 | Playwright | 1.64.1 | |
 | Pyodide | 314.0.7 | Python 3.14 |
 | Phaser | 4.2.1 | the scene; loaded on its own, after the page (D15) |
+| marked | 18.0.14 | the lessons' Markdown (D33); 18.1.1 was nine days old, so the release before it |
 | codemirror | 6.0.2 | the editor (D17), with the packages below |
 | @codemirror/lang-python | 6.2.1 | |
 | @codemirror/state, view, commands, language, autocomplete | 6.7.6, 6.43.15, 6.11.1, 6.13.1, 6.20.4 | imported directly, so declared and pinned; one copy of each in the lock |
@@ -418,6 +424,22 @@ one overturns stays, marked as superseded.
   the sorted list of levels the page read before: one order for the
   course, not two that could disagree. A lesson is a directory under
   `content/lessons/` (D33).
+- **D33 — A lesson is Markdown, in pages, with one Try it.** Decided
+  2026-10-21 (sprint-5.md), built the same day. A lesson is a directory
+  under `content/lessons/` with `lesson.json`, the names it explains
+  (`teaches`), and its text in `<lang>.md`, falling back to English. Its
+  pages are separated by a line of `---`; the first page opens with its
+  title as a `#` heading. A fenced block marked `python try` is the Try it:
+  it is shown as code, and Try it puts it in the next level's editor when
+  the child has typed nothing there. marked (`app/src/ui/lesson.ts`) turns
+  the Markdown into HTML, put in as it is: the lessons are the project's
+  own, and `world/tests/test_course_content.py` refuses HTML in them, as
+  well as a lesson missing in a language, pages that differ in number
+  between languages, more than one Try it, a `teaches` the next level does
+  not teach, and a Try it that fails in that level. Code on a page is
+  plain `<pre>`, not highlighted: a highlighter would be one more
+  dependency for a few short lines, and the editor already shows the
+  colours. Reaching the last page marks a lesson read.
 - **D34 — An item is open once the one before it is done.** Decided
   2026-10-21 (sprint-5.md), built the same day. On the map, a stop is done
   (a lesson read, a level won), open (the course's first item, or the one

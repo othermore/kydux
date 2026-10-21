@@ -119,6 +119,8 @@ export function createEditor(parent: HTMLElement, options: EditorOptions): Edito
         bracketMatching(),
         closeBrackets(),
         highlightActiveLine(),
+        // A long line goes on below, with no line number of its own.
+        EditorView.lineWrapping,
         python(),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         indentUnit.of('    '),

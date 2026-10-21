@@ -152,15 +152,20 @@ its stops as a path until then.
   or `textContent`).
 - The language is chosen on the first screen and remembered; the browser's
   language is the default. Python keywords and the API are not translated.
+- A text may speak of the wizard: `{boy's words|girl's words}` and `{wizard}`
+  are resolved from the wizard the child made (D37), in every path a text
+  takes to the screen. Spanish needs it in nearly every sentence about the
+  wizard; English in few.
 
 ### 2.7 Progress and the wizard
 
 - `ProgressStore` (TypeScript interface, D31): `load()`, `save(progress)`,
-  with `progress` = `{version, language, settings: {speed, fontSize, split},
-  lessons: {id: {read}}, levels: {id: {won, stars, code, hints, tried}},
-  started, current}`: `started` the levels whose start card was seen,
-  `current` the item last opened, where *Continue* goes. The wizard's name
-  and look join it with 3.2. `LocalProgressStore` keeps it in `localStorage`
+  with `progress` = `{version, language, wizard: {name, gender, look},
+  settings: {speed, fontSize, split}, lessons: {id: {read}}, levels: {id:
+  {won, stars, code, hints, tried}}, started, current}`: `wizard` what the
+  child made (D36), `started` the levels whose start card was seen,
+  `current` the item last opened, where *Continue* goes. `LocalProgressStore`
+  keeps it in `localStorage`
   under `kydux.progress` (IndexedDB when it outgrows it); *Export* and
   *Import*, on the start screen, move it as a JSON file between computers;
   the launcher can also keep it as a file beside itself when asked. An
@@ -370,12 +375,14 @@ message with a suggestion; the scrubber; a hint; stars.
 ### Phase 3 — The shell
 
 The game around the levels: the course as the child walks it.
-Sprint 5 has 3.5, 3.1, 3.3, 3.4 and 3.6 (`sprint-5.md`); sprint 6 has 3.2, 3.7
-and 3.8.
+Sprint 5 has 3.5, 3.1, 3.3, 3.4 and 3.6 (`sprint-5.md`); sprint 6 has 3.9, 3.2,
+3.7 and 3.8 (`sprint-6.md`).
 
 3.1 The start screen: language, New wizard / Continue, Export / Import.
-3.2 The wizard creator: name, colours (skin, hair, robe, hat) applied by
-    palette swap to the base sprite; shown in every scene and card.
+3.2 The wizard creator: a name, a girl or a boy, and a look chosen among
+    several (D36): now palettes and hair styles on the placeholder figure,
+    later palette swaps and overlays on the base sprite; shown in every
+    scene.
 3.3 The chapter map: levels as places on a picture, the path lit as levels
     are won, lessons as books on the path; the map opens where the child
     left off.
@@ -390,7 +397,11 @@ and 3.8.
     landscape too; the editor font is readable for a child; Tab inserts four
     spaces.
 3.8 The Playwright suite: new wizard → lesson → level → win → map, in both
-    languages, with screenshots.
+    languages, with screenshots (D39).
+3.9 The words follow the wizard (D37): a text for the player may hold
+    `{boy's words|girl's words}` and `{wizard}`, resolved from the wizard
+    chosen, in `t()`, the lessons and the levels' texts; the i18n check
+    holds the Spanish texts to it.
 
 UAT: the whole loop from the MacBook as a child would, in both languages;
 close the browser, come back, continue; export on the MacBook, import on
@@ -400,6 +411,19 @@ another browser.
 
 From placeholder squares to the game's look, with reproducible tools.
 
+4.0 The way the sprites are made, decided by trying two on the same brief
+    (the wizard's walking sheet in the retro pixel style of `draft.md`,
+    section 5, and one object), each with GPT Image and with Gemini's image
+    model where it generates:
+    1. autosprite.io: close to what is wanted, with cleanup and some back
+       and forth still needed.
+    2. GPT-image 2.5, a clear step above Gemini's image model, with the
+       agent-sprite-forge skill (https://github.com/0x0funky/agent-sprite-forge)
+       for consistency from one sheet to the next, iterating until good
+       enough.
+    What each gives, what it cost in time and money, and how the pieces cut
+    and fit, go in the architecture log with the choice. GPT Image needs an
+    OpenAI key in `secrets.env` (`OPENAI_API_KEY`), beside the Gemini one.
 4.1 `tools/art/generate.py`: a prompt file in, an image out, the key from
     `secrets.env`, the prompt and model recorded in the asset's manifest
     entry; `tools/art/cut.py`: key out the background, slice a grid, reduce to

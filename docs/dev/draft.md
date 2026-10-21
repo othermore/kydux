@@ -173,6 +173,13 @@ starting code are translated.
   to see whether the generated pieces can be cut up and fit together: tiles
   that join without seams, characters at the tiles' scale, the same character
   the same from one sheet to the next.
+- **Then two ways of making sprites, tried on the same brief before phase 4
+  settles the pipeline** (plan, 4.0): autosprite.io, which gets close but
+  needs cleanup and iteration; and GPT-image 2.5, a clear step above
+  Gemini's image model, with the agent-sprite-forge skill
+  (https://github.com/0x0funky/agent-sprite-forge) for consistency across
+  sheets. Whatever needs generating is tried with GPT Image and with Gemini
+  both.
 - **If they do not fit**, the art comes from free collections (OpenGameArt,
   Kenney and the like) under a licence that can ship with a GPL game, or from
   another image model, or a mix: free tiles with generated characters.

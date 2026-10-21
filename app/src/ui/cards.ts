@@ -7,8 +7,6 @@ import { MAX_STARS } from '../progress/store';
 import type { WorldResult } from '../runtime/protocol';
 import { element } from './dom';
 
-
-
 /** One star for winning, one more for each bonus goal met, three at most. */
 export function stars(world: WorldResult): number {
   if (world.status !== 'won') return 0;

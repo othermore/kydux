@@ -364,6 +364,12 @@ footer {
   inset: 0;
 }
 
+.timeline {
+  width: 100%;
+  margin: 8px 0 0;
+  accent-color: var(--accent);
+}
+
 .goals-slot {
   position: absolute;
   top: 10px;

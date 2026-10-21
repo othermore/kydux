@@ -50,7 +50,9 @@
     "stars": "{n} of 3 stars",
     "last": "That is all for now. More levels are coming.",
     "hint": "Hint",
-    "hint_n": "Hint {n} of {total}"
+    "hint_n": "Hint {n} of {total}",
+    "timeline": "Timeline",
+    "play": "Play"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",

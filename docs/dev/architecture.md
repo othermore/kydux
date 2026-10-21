@@ -22,12 +22,16 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/runtime/  the worker that holds Pyodide, and the page's side of it
   src/engine/   the scene in Phaser, where everything stands before a run
                 (layout.ts), what an actor sees (sight.ts, the same rule as the
-                world's, tested on tests/fixtures/sight.json), and the playback
+                world's, tested on tests/fixtures/sight.json), the playback, and
+                the words the scene shows (words.ts, why an action failed)
   src/editor/   the child's editor, CodeMirror
   src/ui/       the screens: the level screen, a view of the run controller
-                (controller.ts), and its goals panel and outcome card
+                (controller.ts); its goals panel, outcome card, start and win
+                cards (cards.ts), and the wizard's notebook (notebook.ts)
   src/content/  loading a level's level.json and its text.<lang>.json
-  scripts/      copy Pyodide into public/ and pack the world, before dev and build
+  scripts/      before dev and build: copy Pyodide into public/, pack the world
+                into world.zip, copy the levels into content/ with their order in
+                content/levels.json, and write the world's table as api.json
   e2e/          the browser tests (Playwright), beside the node_modules they need
 world/          kydux_world, the model of the levels, and its tests: level.py reads
                 a level; world.py holds the wizard and the ticks; things.py the

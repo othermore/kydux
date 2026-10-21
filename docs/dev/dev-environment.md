@@ -103,12 +103,24 @@ The server prints the addresses it listens on. One is
 are the machine's network addresses, for a browser on another computer.
 Section 5 explains how to use those.
 
-Before the server starts, two scripts run on their own. One copies Python's
-WebAssembly build into place, and the other packs the world and the levels
-for the browser. You never run them by hand, with one exception: if you
-change something under `world/` or `content/` while the server is already
-running, the browser keeps the old copy. Run this from `app/` to pack the
-new one, then reload the page:
+Before the server starts, two scripts run on their own. They prepare
+everything the browser needs into `app/public/`, which git ignores:
+
+- Python's WebAssembly build, copied from its npm package into `pyodide/`.
+- The world, packed into `world.zip`, which the browser unpacks into
+  Python.
+- The levels, copied into `content/levels/`. A level's solution and its
+  wrong answers stay out, so that a child cannot find them in the game.
+- The order of the levels, in `content/levels.json`. It is the levels'
+  directory names, sorted, so a level's number in its name is its place.
+- The table of everything the child can type, in `api.json`. It comes from
+  the world itself, by running `python -m kydux_world.api`. The notebook
+  and the editor's completion read it.
+
+You never run these scripts by hand, with one exception. If you change
+something under `world/` or `content/` while the server is already
+running, the browser keeps the old copy. Run this from `app/` to prepare
+the new one, then reload the page:
 
 ```sh
 npm run predev
@@ -119,10 +131,12 @@ The page opens a level by the hash in its address. For example,
 `content/levels/02-the-locked-door/`. An address with no hash goes to the
 first level, the corridor.
 
-The browser remembers two things between visits. It keeps the playback
-speed you chose, and it keeps the code you typed in each level until you
-close the tab. If you want to start from a clean page, clear the site's
-data in the browser.
+The browser remembers a few things. The playback speed you chose stays
+between visits. Three more things stay only until you close the tab: the
+code you typed in each level, the hints you have opened, and whether a
+level's start card has been shown. If you want to start from a clean page,
+clear the site's data in the browser, or open the game in a private
+window.
 
 Two other commands matter. `npm run build` makes the finished game under
 `app/dist/`, the same files a release ships. `npm run preview` serves that

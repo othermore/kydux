@@ -17,8 +17,9 @@ export interface PlaybackOptions {
   cancel?: (handle: unknown) => void;
 }
 
-/** Called with tick 0 and no events at a reset, then with each tick and its events. */
-type TickListener = (tick: number, events: PlaybackEvent[]) => void;
+/** Called with tick 0 and no events at a reset, then with each tick and its events;
+ * `instant` when the tick is replayed by a seek, to be drawn at once, without tweens. */
+type TickListener = (tick: number, events: PlaybackEvent[], instant: boolean) => void;
 type StateListener = (state: PlaybackState) => void;
 
 export class Playback {
@@ -98,8 +99,23 @@ export class Playback {
   reset(): void {
     this.clearTimer();
     this.current = 0;
-    for (const listener of this.tickListeners) listener(0, []);
+    for (const listener of this.tickListeners) listener(0, [], false);
     this.setState('idle');
+  }
+
+  /** Shows the run as it was at `tick`: back to the start, every tick up to it
+   * replayed at once, and paused there; play() goes on from it. */
+  seek(tick: number): void {
+    const target = Math.max(0, Math.min(Math.round(tick), this.ticks.length));
+    this.clearTimer();
+    this.current = 0;
+    for (const listener of this.tickListeners) listener(0, [], true);
+    for (let index = 0; index < target; index += 1) {
+      this.current = index + 1;
+      const events = this.ticks[index] ?? [];
+      for (const listener of this.tickListeners) listener(this.current, events, true);
+    }
+    this.setState('paused');
   }
 
   /** From the next tick on. */
@@ -128,7 +144,7 @@ export class Playback {
       return;
     }
     this.current += 1;
-    for (const listener of this.tickListeners) listener(this.current, events);
+    for (const listener of this.tickListeners) listener(this.current, events, false);
     this.timer = this.schedule(() => {
       this.timer = null;
       if (this.currentState === 'playing') this.next();

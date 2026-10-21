@@ -10,7 +10,14 @@ import type { RuntimeStatus } from '../runtime/runtime';
 import type { GoalMark } from './goals';
 import type { Outcome } from './outcome';
 
-export type RunState = 'loading' | 'ready' | 'running' | 'playing' | 'done' | 'failed';
+export type RunState =
+  | 'loading'
+  | 'ready'
+  | 'running'
+  | 'playing'
+  | 'paused'
+  | 'done'
+  | 'failed';
 
 export interface RunSnapshot {
   state: RunState;
@@ -32,6 +39,10 @@ export interface RunSnapshot {
   speed: Speed;
   canRun: boolean;
   canStop: boolean;
+  /** Whether a playback paused by the timeline can go on. */
+  canPlay: boolean;
+  /** Whether the timeline can be dragged: there is a run to show. */
+  canSeek: boolean;
 }
 
 /** What the controller needs of the runtime, so that tests can give a fake. */
@@ -127,6 +138,9 @@ export class RunController {
       speed: this.speed,
       canRun: this.scene !== null && this.runtime.status === 'ready',
       canStop: state === 'running' || state === 'playing',
+      canPlay: state === 'paused',
+      canSeek:
+        this.world !== null && (this.scene?.playback.length ?? 0) > 0 && state !== 'running',
     };
   }
 
@@ -177,6 +191,19 @@ export class RunController {
     this.changed();
   }
 
+  /** Shows the run as it was at a tick, paused there (the timeline). */
+  seek(tick: number): void {
+    if (!this.scene || !this.world) return;
+    this.scene.playback.seek(tick);
+    this.changed();
+  }
+
+  /** Goes on from where a seek left the playback. */
+  play(): void {
+    if (this.scene?.playback.state === 'paused') this.scene.playback.play();
+    this.changed();
+  }
+
   setSpeed(speed: Speed): void {
     this.speed = speed;
     this.scene?.playback.setSpeed(speed);
@@ -204,6 +231,7 @@ export class RunController {
     if (!this.scene || status === 'loading' || status === 'restarting') return 'loading';
     if (status === 'running') return 'running';
     if (this.scene.playback.state === 'playing') return 'playing';
+    if (this.scene.playback.state === 'paused') return 'paused';
     return this.outcome ? 'done' : 'ready';
   }
 

@@ -216,6 +216,34 @@ describe('RunController', () => {
     expect(last().speed).toBe(4);
   });
 
+  it('seeks back after a run, the goals and the line as they were, and plays on', async () => {
+    const { runtime, controller, last } = setUp();
+    controller.run('wizard.move_right(6)');
+    runtime.answer(world('won', moves(6), 6));
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 6);
+    expect(last().state).toBe('done');
+    expect(last().canSeek).toBe(true);
+
+    controller.seek(3);
+    expect(last().state).toBe('paused');
+    expect(last().tick).toBe(3);
+    expect(last().goals).toEqual(['open']);
+    expect(last().canPlay).toBe(true);
+    expect(last().runningLine).toBe(1);
+
+    controller.play();
+    expect(last().state).toBe('playing');
+    vi.advanceTimersByTime(400 * 4);
+    expect(last().state).toBe('done');
+    expect(last().goals).toEqual(['met']);
+  });
+
+  it('cannot seek before there is a run to show', () => {
+    const { last } = setUp();
+    expect(last().canSeek).toBe(false);
+  });
+
   it('says Python could not start, and offers no run', () => {
     const { runtime, last } = setUp();
     runtime.set('failed');

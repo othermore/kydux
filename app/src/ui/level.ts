@@ -86,10 +86,21 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   let goals: GoalsPanel = goalsPanel(goalTexts());
   goalsSlot.append(goals.node);
   const status = element('p', { id: 'status', className: 'status' });
+  const timeline = element('input', {
+    id: 'timeline',
+    type: 'range',
+    min: '0',
+    max: '0',
+    value: '0',
+    step: '1',
+    className: 'timeline',
+    disabled: true,
+  });
+  timeline.setAttribute('aria-label', t('level.timeline'));
 
   const editorParent = element('div', { className: 'editor' });
   const run = labelled(element('button', { id: 'run', type: 'button' }), () => t('level.run'));
-  const stop = labelled(element('button', { id: 'stop', type: 'button' }), () => t('level.stop'));
+  const stop = element('button', { id: 'stop', type: 'button' }, [t('level.stop')]);
   const restart = labelled(element('button', { id: 'restart', type: 'button' }), () =>
     t('level.restart'),
   );
@@ -129,6 +140,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     element('section', { className: 'stage' }, [
       heading,
       sceneFrame,
+      timeline,
       status,
     ]),
     element('section', { className: 'workbench' }, [
@@ -251,7 +263,12 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     status.textContent = statusLine(snapshot.runtime);
     status.dataset.status = snapshot.runtime;
     run.disabled = !snapshot.canRun;
-    stop.disabled = !snapshot.canStop;
+    // Stop, or Play once the timeline has paused the playback.
+    stop.textContent = snapshot.canPlay ? t('level.play') : t('level.stop');
+    stop.disabled = !snapshot.canStop && !snapshot.canPlay;
+    timeline.max = String(snapshot.length);
+    timeline.value = String(snapshot.tick);
+    timeline.disabled = !snapshot.canSeek;
     snapshot.goals.forEach((mark, index) => goals.set(index, mark));
     if (force || snapshot.outcome !== shownOutcome) {
       if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed);
@@ -279,7 +296,15 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   about.title = t('level.about');
   about.addEventListener('click', showStart);
   run.addEventListener('click', () => controller.run(editor.getDoc()));
-  stop.addEventListener('click', () => controller.stop());
+  stop.addEventListener('click', () => {
+    if (controller.snapshot.canPlay) controller.play();
+    else controller.stop();
+  });
+  timeline.addEventListener('input', () => {
+    // The win card would hide the scene being looked back at.
+    if (shownCard?.node.querySelector('.win-card')) shownCard.close();
+    controller.seek(Number(timeline.value));
+  });
   restart.addEventListener('click', () => controller.restart());
   speed.addEventListener('change', () => {
     storage('local')?.setItem(SPEED_KEY, speed.value);
@@ -325,6 +350,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       editor.view.contentDOM.setAttribute('aria-label', t('level.code_label'));
       about.setAttribute('aria-label', t('level.about'));
       about.title = t('level.about');
+      timeline.setAttribute('aria-label', t('level.timeline'));
       if (shownCard?.open && shownCard.node.querySelector('.start-card')) showStart();
       renderHints();
       notebook.relabel();

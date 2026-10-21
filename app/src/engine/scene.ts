@@ -120,7 +120,7 @@ class LevelScene extends Phaser.Scene {
     this.wizard = this.add.sprite(...centre(this.map.start), WIZARD_KEY, 'down');
     this.wizard.setOrigin(0.5, 0.6).setDepth(4);
 
-    this.playback.onTick((tick, events) => this.show(tick, events));
+    this.playback.onTick((tick, events, instant) => this.show(tick, events, instant));
     this.playback.onState((state) => {
       this.parentNode.dataset.state = state;
     });
@@ -183,22 +183,24 @@ class LevelScene extends Phaser.Scene {
     this.wizardTile = tile;
   }
 
-  private show(tick: number, events: WorldEvent[]): void {
+  /** A tick's events drawn; `instant` for a tick replayed by a seek, drawn at once
+   * with no tweens, no bubbles and no shaking: only where everything ends up. */
+  private show(tick: number, events: WorldEvent[], instant: boolean): void {
     if (tick === 0) {
       this.restart();
       return;
     }
     this.parentNode.dataset.tick = String(tick);
-    if (this.bubble && tick >= this.bubbleUntil) this.clearBubble();
-    if (this.thought && tick >= this.thoughtUntil) this.clearThought();
+    if (this.bubble && (instant || tick >= this.bubbleUntil)) this.clearBubble();
+    if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
     for (const event of events) {
-      if (event.actor === 'wizard') this.showWizard(tick, event);
-      else this.showActor(event);
+      if (event.actor === 'wizard') this.showWizard(tick, event, instant);
+      else this.showActor(event, instant);
     }
     this.publish();
   }
 
-  private showWizard(tick: number, event: WorldEvent): void {
+  private showWizard(tick: number, event: WorldEvent, instant: boolean): void {
     const facing = isFacing(event.data.facing) ? event.data.facing : null;
     const duration = this.playback.tickDuration * 0.9;
     switch (event.kind) {
@@ -206,6 +208,10 @@ class LevelScene extends Phaser.Scene {
         const from = tileOf(event.data.from);
         const to = tileOf(event.data.to);
         if (!from || !to) return;
+        if (instant) {
+          this.placeWizard(to, facing ?? 'down');
+          break;
+        }
         this.placeWizard(from, facing ?? 'down');
         this.wizardTile = to;
         const [x, y] = centre(to);
@@ -216,16 +222,19 @@ class LevelScene extends Phaser.Scene {
         const at = tileOf(event.data.at);
         if (!at) return;
         this.placeWizard(at, facing ?? 'down');
-        this.nudge(this.wizard, facing ?? 'down', duration);
+        if (!instant) this.nudge(this.wizard, facing ?? 'down', duration);
         break;
       }
       case 'say':
-        this.say(String(event.data.text ?? ''), tick);
+        if (!instant) this.say(String(event.data.text ?? ''), tick);
         break;
       case 'pick_up': {
         const id = String(event.data.id);
         const image = this.things.get(id);
-        if (image) {
+        if (image && instant) {
+          this.tweens.killTweensOf(image);
+          image.setVisible(false);
+        } else if (image) {
           this.tweens.add({
             targets: image,
             y: image.y - 16,
@@ -247,6 +256,7 @@ class LevelScene extends Phaser.Scene {
         // The wizard thinks why; and when it did try, what would not do shakes:
         // a locked door, or the wizard with nothing to pick up (D28). From too
         // far away there was nothing to try, so nothing shakes.
+        if (instant) break;
         const by = String(event.data.by);
         const thing = this.map.things.find((t) => t.id === by);
         this.think(blockedText(String(event.data.reason), thing?.kind ?? null), tick);
@@ -257,7 +267,7 @@ class LevelScene extends Phaser.Scene {
     }
   }
 
-  private showActor(event: WorldEvent): void {
+  private showActor(event: WorldEvent, instant: boolean): void {
     const actor = this.actors.get(event.actor);
     if (!actor) return;
     const facing = isFacing(event.data.facing) ? event.data.facing : actor.facing;
@@ -267,6 +277,12 @@ class LevelScene extends Phaser.Scene {
         const to = tileOf(event.data.to);
         if (!from || !to) return;
         this.tweens.killTweensOf(actor.sprite);
+        actor.tile = to;
+        actor.facing = facing;
+        if (instant) {
+          actor.sprite.setPosition(...centre(to)).setFrame(facing);
+          break;
+        }
         actor.sprite.setPosition(...centre(from)).setFrame(facing);
         const [x, y] = centre(to);
         this.tweens.add({
@@ -276,8 +292,6 @@ class LevelScene extends Phaser.Scene {
           duration: this.playback.tickDuration * 0.9,
           ease: 'Linear',
         });
-        actor.tile = to;
-        actor.facing = facing;
         break;
       }
       case 'turn':
@@ -286,7 +300,7 @@ class LevelScene extends Phaser.Scene {
         break;
       case 'seen':
         this.seenBy = event.actor;
-        this.cameras.main.shake(this.playback.tickDuration * 0.6, 0.006);
+        if (!instant) this.cameras.main.shake(this.playback.tickDuration * 0.6, 0.006);
         break;
     }
   }

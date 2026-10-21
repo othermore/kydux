@@ -128,6 +128,39 @@ describe('Playback', () => {
     ]);
   });
 
+  it('seeks: replays every tick up to one at once, then waits there', () => {
+    const playback = new Playback({ tickMs: 400 });
+    const seen: [number, boolean][] = [];
+    playback.onTick((tick, _events, instant) => seen.push([tick, instant]));
+    playback.load(events(4));
+    playback.play();
+    vi.advanceTimersByTime(4000);
+    seen.length = 0;
+    playback.seek(2);
+    expect(seen).toEqual([
+      [0, true],
+      [1, true],
+      [2, true],
+    ]);
+    expect(playback.tick).toBe(2);
+    expect(playback.state).toBe('paused');
+    playback.play();
+    expect(playback.tick).toBe(3);
+    vi.advanceTimersByTime(400);
+    expect(playback.tick).toBe(4);
+    vi.advanceTimersByTime(400);
+    expect(playback.state).toBe('done');
+  });
+
+  it('seeks no further than the run goes', () => {
+    const playback = new Playback({ tickMs: 400 });
+    playback.load(events(3));
+    playback.seek(10);
+    expect(playback.tick).toBe(3);
+    playback.seek(-2);
+    expect(playback.tick).toBe(0);
+  });
+
   it('stops telling a listener once it unsubscribes', () => {
     const playback = new Playback({ tickMs: 400 });
     const seen: number[] = [];

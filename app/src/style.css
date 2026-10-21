@@ -139,7 +139,7 @@ footer {
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--panel);
-  font-size: 17px;
+  font-size: var(--editor-font-size, 17px);
 }
 
 .cm-editor.cm-focused {
@@ -337,10 +337,37 @@ footer {
 .level-screen {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
-  gap: 16px;
+  /* The scene's share of the width is a setting (D35), the handle between. */
+  grid-template-columns: minmax(0, calc((100% - 16px) * var(--split, 0.6))) 16px minmax(0, 1fr);
   min-height: 560px;
   height: calc(100vh - 110px);
+}
+
+.split-handle {
+  position: relative;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.split-handle::after {
+  content: '';
+  position: absolute;
+  top: 40%;
+  bottom: 40%;
+  left: 6px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.split-handle:hover::after,
+.split-handle:focus-visible::after,
+.split-handle.dragging::after {
+  background: var(--accent);
+}
+
+.split-handle:focus-visible {
+  outline: none;
 }
 
 .stage,
@@ -480,7 +507,12 @@ footer {
 @media (max-width: 800px) {
   .level-screen {
     grid-template-columns: 1fr;
+    gap: 16px;
     height: auto;
+  }
+
+  .split-handle {
+    display: none;
   }
 
   .scene-frame {
@@ -796,4 +828,61 @@ a.stop-body:focus-visible {
 .quiet-button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* The settings. */
+
+.gear {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.gear:hover,
+.gear:focus-visible {
+  color: var(--accent);
+}
+
+.settings-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+  max-width: 560px;
+  margin: 32px auto;
+  font-size: 18px;
+}
+
+.settings-screen h2 {
+  margin: 0;
+}
+
+.settings-list {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+}
+
+.setting {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setting select {
+  min-width: 140px;
+  font-size: 17px;
+}
+
+.settings-sample {
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: var(--editor-font-size, 17px);
 }

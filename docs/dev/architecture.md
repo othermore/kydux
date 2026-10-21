@@ -447,3 +447,16 @@ one overturns stays, marked as superseded.
   a link. A level's address still opens it directly, for a developer and
   for the tests, and a done item can always be played again. A level only
   tried is not done.
+- **D35 — The split between scene and editor, and the editor's text size,
+  are the child's to set.** Decided 2026-10-21 (sprint-5.md), built the
+  same day. Both are kept in the progress document under `settings` and
+  set as CSS variables on the page's root (`app/src/ui/look.ts`), so that a
+  screen drawn later finds them: `--split`, the scene's share of the level
+  screen's width, from 0.35 to 0.75, and `--editor-font-size`, chosen in
+  the settings (`#settings`) among 14, 17, 20 and 24 pixels. The handle
+  between the panes takes pointer events, so a mouse and a finger both
+  drag it; a double-click gives back 0.6, and the arrow keys move it by
+  0.05, so that it can be reached without a pointer. The share shows while
+  dragging and is saved when the drag ends. The scene follows as it does a
+  window resize. Under 800 pixels the panes stack and the handle is gone.
+  The settings' Back returns to the screen they were opened from.

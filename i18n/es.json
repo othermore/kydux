@@ -52,7 +52,9 @@
     "hint_n": "Pista {n} de {total}",
     "timeline": "Línea de tiempo",
     "play": "Seguir",
-    "go_start": "Ir al inicio"
+    "go_start": "Ir al inicio",
+    "settings": "Ajustes",
+    "split": "Arrastra para repartir el sitio entre la escena y el editor"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",
@@ -161,5 +163,12 @@
     "try": "Probar",
     "go_on": "Seguir",
     "not_found": "No hay ninguna lección llamada «{id}»."
+  },
+  "settings": {
+    "title": "Ajustes",
+    "page_title": "Kydux — ajustes",
+    "font_size": "Tamaño del texto en el editor",
+    "pixels": "{n} píxeles",
+    "back": "Volver"
   }
 }

@@ -7,16 +7,21 @@ import * as progress from './progress/progress';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
 import type { Screen } from './ui/screen';
+import { applyLook } from './ui/look';
+import { settingsScreen } from './ui/settings';
 import { startScreen } from './ui/start';
 
 const runtime = new Runtime();
 let screen: Screen | null = null;
 /** The address of the screen shown, so that a hash change to it again is ignored. */
 let shownRoute: string | null = null;
+/** The last address shown that was not the settings, where their Back goes. */
+let beforeSettings = '#start';
 
 type Route =
   | { name: 'start' }
   | { name: 'map' }
+  | { name: 'settings' }
   | { name: 'level'; id: string }
   | { name: 'lesson'; id: string };
 
@@ -27,6 +32,7 @@ function parseRoute(hash: string): Route {
   const lesson = /^#lesson\/(.+)$/.exec(hash);
   if (lesson) return { name: 'lesson', id: decodeURIComponent(lesson[1] ?? '') };
   if (hash === '#map') return { name: 'map' };
+  if (hash === '#settings') return { name: 'settings' };
   return { name: 'start' };
 }
 
@@ -224,12 +230,17 @@ function route(): void {
       : wanted.name;
   if (key === shownRoute && screen) return;
   shownRoute = key;
+  if (wanted.name !== 'settings') beforeSettings = location.hash || '#start';
   screen?.destroy();
   screen = null;
   const content = element('main', { className: 'content' }, [
     element('p', { className: 'status' }, [t('level.loading')]),
   ]);
   chrome(root, content);
+  if (wanted.name === 'settings') {
+    show(content, settingsScreen({ back: beforeSettings }));
+    return;
+  }
   const shown =
     wanted.name === 'level'
       ? showLevel(content, wanted.id, key)
@@ -256,6 +267,7 @@ if (root) {
   const page = root;
   keepLanguageIn(progress.languageStorage);
   initLanguage();
+  applyLook(progress.settings());
   window.addEventListener('hashchange', route);
   document.addEventListener('kydux:language', () => {
     // The header and footer are drawn again; the screen keeps what it holds and

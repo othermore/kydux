@@ -1,7 +1,8 @@
 // The level screen: the scene with the goals over its corner, the editor
-// beside it, Run, Stop, Restart and the speed, and the card saying how a run
-// went. It is a view of a RunController (D29): it makes the DOM once, renders
-// every snapshot the controller gives, and each button calls the controller.
+// beside it with a handle between the two, Run, Stop, Restart and the speed,
+// and the card saying how a run went. It is a view of a RunController (D29):
+// it makes the DOM once, renders every snapshot the controller gives, and
+// each button calls the controller.
 
 import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
@@ -10,11 +11,13 @@ import type { Speed } from '../engine/playback';
 import type { SceneHandle } from '../engine/scene';
 import { currentLanguage, t } from '../i18n';
 import * as progress from '../progress/progress';
+import { DEFAULT_SETTINGS } from '../progress/store';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
 import { type Card, startCard, stars, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
+import { applyLook, clampSplit, splitAt } from './look';
 import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
 import { type Outcome, type OutcomeCard, outcomeCard, withCode } from './outcome';
 
@@ -65,7 +68,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const toMap = labelled(element('a', { id: 'level-map', className: 'quiet-button small', href: '#map' }), () =>
     t('map.open_map'),
   );
-  const heading = element('div', { className: 'level-heading' }, [title, about, toMap]);
+  const toSettings = element('a', { id: 'level-settings', className: 'gear', href: '#settings' }, ['⚙']);
+  const heading = element('div', { className: 'level-heading' }, [title, about, toMap, toSettings]);
   const sceneParent = element('div', { id: 'scene', className: 'scene' });
   const goalsSlot = element('div', { className: 'goals-slot' });
   const bonus = ((loaded.level.goals as { bonus?: boolean }[] | undefined) ?? []).map(
@@ -125,6 +129,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     goalsSlot,
     notebook.node,
   ]);
+  const handle = element('div', { id: 'split', className: 'split-handle', tabIndex: 0 });
+  handle.setAttribute('role', 'separator');
+  handle.setAttribute('aria-orientation', 'vertical');
+  handle.setAttribute('aria-valuemin', '35');
+  handle.setAttribute('aria-valuemax', '75');
   const node = element('div', { className: 'level-screen' }, [
     element('section', { className: 'stage' }, [
       heading,
@@ -132,6 +141,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       timeline,
       status,
     ]),
+    handle,
     element('section', { className: 'workbench' }, [
       editorParent,
       element('div', { className: 'buttons' }, [
@@ -305,6 +315,55 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     controller.setSpeed(Number(speed.value) as Speed);
   });
 
+  // The handle between the panes: dragged, it gives the scene its share of the
+  // width; double-clicked, the share it had at first; the arrow keys move it too.
+  // The share shows at once and is saved when the drag ends. The scene follows,
+  // as it does a window resize.
+  const showSplit = (share: number) => {
+    applyLook({ ...progress.settings(), split: share });
+    handle.setAttribute('aria-valuenow', String(Math.round(share * 100)));
+  };
+  const keepSplit = (share: number) => {
+    progress.setSetting('split', clampSplit(share));
+    showSplit(clampSplit(share));
+  };
+  showSplit(progress.settings().split);
+  let dragged: number | null = null;
+  handle.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    handle.setPointerCapture(event.pointerId);
+    dragged = progress.settings().split;
+    handle.classList.add('dragging');
+  });
+  handle.addEventListener('pointermove', (event) => {
+    if (dragged === null) return;
+    const box = node.getBoundingClientRect();
+    dragged = splitAt(event.clientX, box.left, box.width);
+    showSplit(dragged);
+  });
+  const endDrag = () => {
+    if (dragged === null) return;
+    keepSplit(dragged);
+    dragged = null;
+    handle.classList.remove('dragging');
+  };
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+  handle.addEventListener('dblclick', () => keepSplit(DEFAULT_SETTINGS.split));
+  handle.addEventListener('keydown', (event) => {
+    const step = event.key === 'ArrowLeft' ? -0.05 : event.key === 'ArrowRight' ? 0.05 : 0;
+    if (step === 0) return;
+    event.preventDefault();
+    keepSplit(progress.settings().split + step);
+  });
+
+  const labelSettings = () => {
+    toSettings.setAttribute('aria-label', t('level.settings'));
+    toSettings.title = t('level.settings');
+    handle.setAttribute('aria-label', t('level.split'));
+  };
+  labelSettings();
+
   const setPageTitle = () => {
     document.title = t('level.page_title', { title: text.title });
   };
@@ -345,6 +404,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       about.setAttribute('aria-label', t('level.about'));
       about.title = t('level.about');
       timeline.setAttribute('aria-label', t('level.timeline'));
+      labelSettings();
       if (shownCard?.open && shownCard.node.querySelector('.start-card')) showStart();
       renderHints();
       notebook.relabel();

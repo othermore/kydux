@@ -39,6 +39,10 @@ export interface Progress {
   current: string | null;
 }
 
+/** The scene's share of the width, at least and at most (D35). */
+export const SPLIT_MIN = 0.35;
+export const SPLIT_MAX = 0.75;
+
 export const DEFAULT_SETTINGS: Settings = { speed: 1, fontSize: 17, split: 0.6 };
 
 export function defaultProgress(): Progress {
@@ -74,7 +78,9 @@ export function readProgress(value: unknown): Progress | null {
     if (typeof fontSize === 'number' && fontSize >= 10 && fontSize <= 40) {
       progress.settings.fontSize = fontSize;
     }
-    if (typeof split === 'number' && split >= 0.35 && split <= 0.75) progress.settings.split = split;
+    if (typeof split === 'number' && split >= SPLIT_MIN && split <= SPLIT_MAX) {
+      progress.settings.split = split;
+    }
   }
   if (isObject(value.lessons)) {
     for (const [id, lesson] of Object.entries(value.lessons)) {

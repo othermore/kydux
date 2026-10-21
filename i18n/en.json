@@ -52,7 +52,9 @@
     "hint_n": "Hint {n} of {total}",
     "timeline": "Timeline",
     "play": "Play",
-    "go_start": "Go to the start"
+    "go_start": "Go to the start",
+    "settings": "Settings",
+    "split": "Drag to share the room between the scene and the editor"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",
@@ -161,5 +163,12 @@
     "try": "Try it",
     "go_on": "Go on",
     "not_found": "There is no lesson called “{id}”."
+  },
+  "settings": {
+    "title": "Settings",
+    "page_title": "Kydux — settings",
+    "font_size": "Text size in the editor",
+    "pixels": "{n} pixels",
+    "back": "Back"
   }
 }

@@ -311,8 +311,8 @@ misspell a move, see Python's error (plain, not yet translated).
 ### Phase 2 — The level engine
 
 Everything a level can be made of, with the content format of section 2.5.
-Sprint 3 has 2.1, 2.2, 2.3, 2.9, 2.4 and 2.10 (`sprint-3.md`); sprint 4
-has 2.0, 2.5, 2.6, 2.7 and 2.8.
+Sprint 3 had 2.1, 2.2, 2.3, 2.9, 2.4 and 2.10 (`sprint-3.md`); sprint 4
+has 2.11, 2.12, 2.0, 2.7, 2.5, 2.8 and 2.6 (`sprint-4.md`).
 
 2.0 The level screen's run, as a controller of its own: the states a run
     goes through (idle, running, playing, done, failed) and what each
@@ -337,7 +337,7 @@ has 2.0, 2.5, 2.6, 2.7 and 2.8.
     that tick; the editor's marker follows.
 2.7 The level-start card (goals, picture, example, Start) and the win scene
     (a short animation, stars by goals met, Next).
-2.8 Completion in the editor from the exposed API, and the grimoire panel
+2.8 Completion in the editor from the exposed API, and the notebook panel
     listing it with translated descriptions and a click to insert an example.
 2.9 The world refuses to be tampered with: the wizard's position, facing
     and items are read-only to the child's code, the world's own modules are
@@ -346,6 +346,13 @@ has 2.0, 2.5, 2.6, 2.7 and 2.8.
     win it did not make.
 2.10 A second and third level exercising all of it (a locked door with a key;
     sneaking past a teacher), with solutions and wrong answers.
+2.11 The game's words (D27): *action* for a method, *Run* for the button,
+    *notebook* for the panel, *spell* only for the story's magic; the
+    isolation diagnostic out of the child's sight; changing an attribute
+    told apart from adding one.
+2.12 Why an action could not be done (D28): a thought over the wizard at the
+    tick it happens, the card repeating the first with its line, and no
+    animation for an attempt that could not even be made.
 
 UAT: the three levels from the MacBook; a misspelled spell gets a Spanish
 message with a suggestion; the scrubber; a hint; stars.

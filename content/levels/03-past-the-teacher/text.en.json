@@ -4,5 +4,10 @@
     "Reach the way out at the top.",
     "Do not let the teacher see you."
   ],
-  "starting_code": "# The teacher walks up and down the corridor, looking ahead.\n# Wait while they look your way, then cross.\nwizard.wait()\n"
+  "starting_code": "# The teacher walks up and down the corridor, looking ahead.\n# Wait while they look your way, then cross.\nwizard.wait()\n",
+  "hints": [
+    "Watch which way the teacher looks as they walk.",
+    "`wizard.wait()` lets one tick go by while you stay hidden.",
+    "A `while` loop can keep waiting while `teacher.facing` is `\"left\"`."
+  ]
 }

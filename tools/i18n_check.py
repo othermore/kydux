@@ -10,7 +10,7 @@ Fails, printing file:line: message for each, on:
     (for keys made at run time, like `language.${lang}`);
   - a level, content/levels/<id>/, without a text.<lang>.json for every language
     in i18n/, or with texts whose keys differ, or with a different number of goals
-    than its level.json;
+    than its level.json, or a different number of hints in each language;
   - a string literal in the app's code that reads like words for a person (words
     separated by spaces, with a capitalised word or a sentence's final stop),
     which must come from t() instead. A line marked `// i18n-ignore` is left alone, and
@@ -93,6 +93,9 @@ def check_levels(languages: list[str]) -> list[str]:
                 findings.append(
                     f"{name}/text.{lang}.json: {goals} goals in level.json, not as many here"
                 )
+        hints = {lang: len(text.get("hints", [])) for lang, text in texts.items()}
+        if len(set(hints.values())) > 1:
+            findings.append(f"{name}: a different number of hints in each language, {hints}")
     return findings
 
 

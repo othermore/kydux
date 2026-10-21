@@ -9,6 +9,8 @@ export interface LevelText {
   /** One for each of level.json's goals, in the same order. */
   goals: string[];
   starting_code: string;
+  /** From the gentlest to the one that nearly says it; never the solution. */
+  hints?: string[];
 }
 
 export interface LoadedLevel {

@@ -48,7 +48,9 @@
     "again": "Play again",
     "next": "Next",
     "stars": "{n} of 3 stars",
-    "last": "That is all for now. More levels are coming."
+    "last": "That is all for now. More levels are coming.",
+    "hint": "Hint",
+    "hint_n": "Hint {n} of {total}"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",

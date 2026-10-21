@@ -6,5 +6,10 @@
     "Reach the room beyond the door.",
     "Do it in fewer than 6 lines."
   ],
-  "starting_code": "# The door is locked, and its key is on the floor.\n# Walk to the key, pick it up, then open the door.\nwizard.move_right(4)\n"
+  "starting_code": "# The door is locked, and its key is on the floor.\n# Walk to the key, pick it up, then open the door.\nwizard.move_right(4)\n",
+  "hints": [
+    "The door needs the key. Where is the key?",
+    "Walk onto the key's tile and pick it up with `wizard.pick_up()`.",
+    "Stand next to the door before you open it, with `door.open()`."
+  ]
 }

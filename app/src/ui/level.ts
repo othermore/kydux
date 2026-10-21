@@ -13,7 +13,7 @@ import { type Card, startCard, stars, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
-import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
+import { type Outcome, type OutcomeCard, outcomeCard, withCode } from './outcome';
 
 const SPEEDS: Speed[] = [1, 2, 4];
 const SPEED_KEY = 'kydux.speed';
@@ -33,6 +33,10 @@ function savedSpeed(): Speed {
 
 function codeKey(id: string): string {
   return `kydux.code.${id}`;
+}
+
+function hintsKey(id: string): string {
+  return `kydux.hints.${id}`;
 }
 
 export interface LevelScreen {
@@ -86,6 +90,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const restart = labelled(element('button', { id: 'restart', type: 'button' }), () =>
     t('level.restart'),
   );
+  const hint = labelled(element('button', { id: 'hint', type: 'button' }), () => t('level.hint'));
+  const hintsBox = element('section', { className: 'hints', hidden: true });
+  hintsBox.setAttribute('aria-live', 'polite');
   const speed = element('select', { id: 'speed' });
   for (const value of SPEEDS) {
     speed.append(element('option', { value: String(value) }, [`${value}×`]));
@@ -109,8 +116,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         run,
         stop,
         restart,
+        hint,
         element('label', { className: 'speed' }, [speedLabel, ' ', speed]),
       ]),
+      hintsBox,
       card.node,
     ]),
   ]);
@@ -165,6 +174,33 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       ),
     );
 
+  // Hints: one more at each press, offered once a run has not won; the hints
+  // shown stay for the visit.
+  const allHints = () => text.hints ?? [];
+  let hintsShown = Number(storage('session')?.getItem(hintsKey(loaded.id)) ?? 0) || 0;
+  let hintsOffered = hintsShown > 0;
+  const renderHints = () => {
+    const hints = allHints();
+    hint.hidden = hints.length === 0;
+    hint.disabled = !hintsOffered || hintsShown >= hints.length;
+    hintsBox.hidden = hintsShown === 0;
+    hintsBox.replaceChildren(
+      ...hints.slice(0, hintsShown).map((said, index) =>
+        element('p', { className: 'hint' }, [
+          element('strong', {}, [t('level.hint_n', { n: index + 1, total: hints.length })]),
+          ' ',
+          ...withCode(said),
+        ]),
+      ),
+    );
+  };
+  hint.addEventListener('click', () => {
+    hintsShown = Math.min(hintsShown + 1, allHints().length);
+    storage('session')?.setItem(hintsKey(loaded.id), String(hintsShown));
+    renderHints();
+  });
+  renderHints();
+
   // What was last drawn, so that the card and the editor's marks change only
   // when the controller's do.
   let shownOutcome: Outcome | null = null;
@@ -179,6 +215,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     if (force || snapshot.outcome !== shownOutcome) {
       if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed);
       else card.hide();
+      if (snapshot.outcome && snapshot.outcome.kind !== 'won' && snapshot.outcome.kind !== 'failed') {
+        hintsOffered = true;
+        renderHints();
+      }
       if (!force && snapshot.outcome?.kind === 'won' && snapshot.world) {
         showWin(stars(snapshot.world));
       } else if (!force && shownCard?.node.querySelector('.win-card')) {
@@ -245,6 +285,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       about.setAttribute('aria-label', t('level.about'));
       about.title = t('level.about');
       if (shownCard?.open && shownCard.node.querySelector('.start-card')) showStart();
+      renderHints();
       render(controller.snapshot, true);
       setPageTitle();
     },

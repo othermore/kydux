@@ -3,5 +3,9 @@
   "goals": [
     "Reach the door at the end of the corridor."
   ],
-  "starting_code": "# Walk to the door.\n# The wizard moves one tile per step.\nwizard.move_right()\n"
+  "starting_code": "# Walk to the door.\n# The wizard moves one tile per step.\nwizard.move_right()\n",
+  "hints": [
+    "How many tiles away is the door? Count them.",
+    "`move_right` can take a number: `wizard.move_right(2)` takes two steps."
+  ]
 }

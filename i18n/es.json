@@ -48,7 +48,9 @@
     "again": "Jugar otra vez",
     "next": "Siguiente",
     "stars": "{n} de 3 estrellas",
-    "last": "Por ahora no hay más. Pronto habrá más niveles."
+    "last": "Por ahora no hay más. Pronto habrá más niveles.",
+    "hint": "Pista",
+    "hint_n": "Pista {n} de {total}"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",

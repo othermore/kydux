@@ -4,5 +4,10 @@
     "Llega a la salida de arriba.",
     "Que no te vea el profesor."
   ],
-  "starting_code": "# El profesor va y viene por el pasillo, mirando hacia delante.\n# Espera mientras mire hacia ti, y luego cruza.\nwizard.wait()\n"
+  "starting_code": "# El profesor va y viene por el pasillo, mirando hacia delante.\n# Espera mientras mire hacia ti, y luego cruza.\nwizard.wait()\n",
+  "hints": [
+    "Fíjate hacia dónde mira el profesor mientras camina.",
+    "`wizard.wait()` deja pasar un tick mientras sigues escondido.",
+    "Un bucle `while` puede seguir esperando mientras `teacher.facing` sea `\"left\"`."
+  ]
 }

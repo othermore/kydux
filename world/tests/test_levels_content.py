@@ -96,6 +96,29 @@ def test_the_starting_code_runs_without_an_error(directory, lang):
     assert result.status != "error", result.error
 
 
+@pytest.mark.parametrize(
+    ("directory", "lang"),
+    [(d, lang) for d in LEVELS for lang in LANGUAGES],
+    ids=lambda v: v.name if isinstance(v, Path) else v,
+)
+def test_a_hint_never_gives_the_solution_away(directory, lang):
+    """A hint may name the action that is needed, `door.open()`; it may not be a
+    line of the solution, nor quote one that holds its shape (a while, an if, a for)."""
+    text = json.loads((directory / f"text.{lang}.json").read_text(encoding="utf-8"))
+    solution = {
+        line.strip()
+        for line in (directory / "solution.py").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+    shape = {line for line in solution if line.split()[0] in ("while", "if", "elif", "for")}
+    for hint in text.get("hints", []):
+        assert hint.replace("`", "").strip() not in solution, (
+            f"a hint is a line of the solution: {hint}"
+        )
+        for code in hint.split("`")[1::2]:
+            assert code.strip() not in shape, f"a hint quotes the solution's shape: {code}"
+
+
 def test_the_api_check_finds_what_a_level_does_not_teach():
     level = Level.from_dict({"id": "few", "map": ["S..."], "api": ["wizard.move_right"]})
     assert outside_api(level, "wizard.move_right()\nwizard.say('hi')\nx = 3\nx.real") == [

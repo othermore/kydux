@@ -393,3 +393,17 @@ one overturns stays, marked as superseded.
   the child could not see it. The editor's completion offers, after a
   name the child's code holds and a dot, the members the level teaches of
   it, and nothing else: Python's keywords would be noise at this age.
+- **D31 — Progress is one document behind one interface.** Decided
+  2026-10-21 (sprint-5.md), built the same day. `ProgressStore`
+  (`app/src/progress/store.ts`) has `load()` and `save(progress)`;
+  `LocalProgressStore` keeps the document in `localStorage` under
+  `kydux.progress`, and a remote store can come later behind the same
+  interface. The document has a `version`; one of another version, or
+  none, is read as the defaults, and each field read back is checked for
+  its shape. The language chosen, the settings, the code typed in each
+  level, the hints shown, whether a level was tried, its stars, the start
+  cards seen and the item last opened all live in it, so that export and
+  import carry everything; `sessionStorage` is no longer used, and i18n
+  keeps the language where the game tells it to (`keepLanguageIn`). A
+  storage that cannot be read or written leaves the document in memory for
+  the visit.

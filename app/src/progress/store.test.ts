@@ -1,0 +1,118 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+import * as progress from './progress';
+import {
+  defaultProgress,
+  exportProgress,
+  importProgress,
+  LocalProgressStore,
+  PROGRESS_VERSION,
+} from './store';
+
+function memoryStorage() {
+  const kept = new Map<string, string>();
+  return {
+    kept,
+    getItem: (key: string) => kept.get(key) ?? null,
+    setItem: (key: string, value: string) => void kept.set(key, value),
+  };
+}
+
+const throwing = {
+  getItem: () => {
+    throw new Error('denied');
+  },
+  setItem: () => {
+    throw new Error('denied');
+  },
+};
+
+describe('LocalProgressStore', () => {
+  it('gives the defaults when there is nothing kept', () => {
+    expect(new LocalProgressStore(memoryStorage()).load()).toEqual(defaultProgress());
+  });
+
+  it('reads back what it saved, under one key', () => {
+    const storage = memoryStorage();
+    const store = new LocalProgressStore(storage);
+    const saved = defaultProgress();
+    saved.levels['01-the-corridor'] = { won: true, stars: 1, code: 'wizard.move_right(6)\n' };
+    saved.settings.fontSize = 24;
+    store.save(saved);
+    expect([...storage.kept.keys()]).toEqual(['kydux.progress']);
+    expect(store.load()).toEqual(saved);
+  });
+
+  it('reads a document of another version, or not JSON, as the defaults', () => {
+    const storage = memoryStorage();
+    storage.setItem('kydux.progress', JSON.stringify({ version: PROGRESS_VERSION + 1, levels: { x: { won: true } } }));
+    expect(new LocalProgressStore(storage).load()).toEqual(defaultProgress());
+    storage.setItem('kydux.progress', '{ not json');
+    expect(new LocalProgressStore(storage).load()).toEqual(defaultProgress());
+  });
+
+  it('keeps only fields of the right shape', () => {
+    const storage = memoryStorage();
+    storage.setItem(
+      'kydux.progress',
+      JSON.stringify({
+        version: PROGRESS_VERSION,
+        settings: { speed: 3, fontSize: 'big', split: 0.5 },
+        levels: { a: { won: 'yes', stars: 2 } },
+        started: ['a', 7],
+      }),
+    );
+    const read = new LocalProgressStore(storage).load();
+    expect(read.settings).toEqual({ speed: 1, fontSize: 17, split: 0.5 });
+    expect(read.levels.a).toEqual({ stars: 2 });
+    expect(read.started).toEqual(['a']);
+  });
+
+  it('keeps the document in memory for the visit when storage throws', () => {
+    const store = new LocalProgressStore(throwing);
+    const saved = defaultProgress();
+    saved.current = 'level:02-the-locked-door';
+    store.save(saved);
+    expect(store.load().current).toBe('level:02-the-locked-door');
+  });
+});
+
+describe('export and import', () => {
+  it('give back the same document', () => {
+    const saved = defaultProgress();
+    saved.lessons['01-first-action'] = { read: true };
+    expect(importProgress(exportProgress(saved))).toEqual(saved);
+  });
+
+  it('refuse a file that is not a progress document', () => {
+    expect(() => importProgress('hello')).toThrow();
+    expect(() => importProgress('{"version": 99}')).toThrow();
+  });
+});
+
+describe('the helpers', () => {
+  beforeEach(() => progress.useStore(new LocalProgressStore(memoryStorage())));
+
+  it('keep the most stars a level has earned, and its winning code', () => {
+    progress.markWon('a', 2, 'two');
+    progress.markWon('a', 1, 'one');
+    expect(progress.levelProgress('a')).toEqual({ won: true, stars: 2, code: 'one' });
+  });
+
+  it('remember the start cards seen, the hints shown and the settings', () => {
+    expect(progress.hasStarted('a')).toBe(false);
+    progress.markStarted('a');
+    progress.markStarted('a');
+    expect(progress.load().started).toEqual(['a']);
+    progress.setHints('a', 2);
+    progress.markTried('a');
+    expect(progress.levelProgress('a')).toEqual({ hints: 2, tried: true });
+    progress.setSetting('speed', 4);
+    expect(progress.settings().speed).toBe(4);
+  });
+
+  it('keep the language for i18n', () => {
+    progress.languageStorage.setItem('kydux.language', 'es');
+    expect(progress.languageStorage.getItem('kydux.language')).toBe('es');
+    expect(progress.load().language).toBe('es');
+  });
+});

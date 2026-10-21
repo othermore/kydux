@@ -8,6 +8,7 @@ import type { Editor, EditorOptions } from '../editor/editor';
 import type { Speed } from '../engine/playback';
 import type { SceneHandle } from '../engine/scene';
 import { currentLanguage, t } from '../i18n';
+import * as progress from '../progress/progress';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
 import { type Card, startCard, stars, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
@@ -17,28 +18,6 @@ import { type ApiTable, describe, notebookEntries, notebookPanel } from './noteb
 import { type Outcome, type OutcomeCard, outcomeCard, withCode } from './outcome';
 
 const SPEEDS: Speed[] = [1, 2, 4];
-const SPEED_KEY = 'kydux.speed';
-
-function storage(kind: 'local' | 'session'): Storage | null {
-  try {
-    return kind === 'local' ? globalThis.localStorage : globalThis.sessionStorage;
-  } catch {
-    return null;
-  }
-}
-
-function savedSpeed(): Speed {
-  const saved = Number(storage('local')?.getItem(SPEED_KEY));
-  return (SPEEDS as number[]).includes(saved) ? (saved as Speed) : 1;
-}
-
-function codeKey(id: string): string {
-  return `kydux.code.${id}`;
-}
-
-function hintsKey(id: string): string {
-  return `kydux.hints.${id}`;
-}
 
 export interface LevelScreen {
   node: HTMLElement;
@@ -64,7 +43,12 @@ export interface LevelScreenParts {
 export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const { runtime, loaded } = parts;
   let text = loaded.text;
-  const controller = new RunController({ runtime, level: loaded, speed: savedSpeed() });
+  const controller = new RunController({
+    runtime,
+    level: loaded,
+    speed: progress.settings().speed,
+  });
+  const kept = progress.levelProgress(loaded.id);
 
   // The words that change with the language, each with how to say it.
   const labels: [HTMLElement, () => string][] = [];
@@ -123,7 +107,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   for (const value of SPEEDS) {
     speed.append(element('option', { value: String(value) }, [`${value}×`]));
   }
-  speed.value = String(savedSpeed());
+  speed.value = String(progress.settings().speed);
   const speedLabel = labelled(element('span', { className: 'speed-label' }), () =>
     t('level.speed'),
   );
@@ -158,10 +142,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     ]),
   ]);
 
-  // The editor keeps what the child typed for this visit; the starting code,
-  // while untouched, follows the language.
-  const saved = storage('session')?.getItem(codeKey(loaded.id));
-  let typed = saved !== null && saved !== undefined && saved !== text.starting_code;
+  // The editor keeps what the child typed in the progress document; the
+  // starting code, while untouched, follows the language.
+  const saved = kept.code;
+  let typed = saved !== undefined && saved !== text.starting_code;
   // After the name of something the child's code holds and a dot, the editor
   // offers what the level teaches of it, with the notebook's words.
   const entries = notebookEntries(loaded.level, parts.table);
@@ -187,7 +171,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     onRun: () => controller.run(editor.getDoc()),
     onChange: (doc) => {
       typed = doc !== text.starting_code;
-      storage('session')?.setItem(codeKey(loaded.id), doc);
+      progress.setCode(loaded.id, doc);
     },
   });
 
@@ -228,10 +212,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     );
 
   // Hints: one more at each press, offered once a run has not won; the hints
-  // shown stay for the visit.
+  // shown are kept in the progress document.
   const allHints = () => text.hints ?? [];
-  let hintsShown = Number(storage('session')?.getItem(hintsKey(loaded.id)) ?? 0) || 0;
-  let hintsOffered = hintsShown > 0;
+  let hintsShown = kept.hints ?? 0;
+  let hintsOffered = kept.tried === true || hintsShown > 0;
   const renderHints = () => {
     const hints = allHints();
     hint.hidden = hints.length === 0;
@@ -249,7 +233,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   };
   hint.addEventListener('click', () => {
     hintsShown = Math.min(hintsShown + 1, allHints().length);
-    storage('session')?.setItem(hintsKey(loaded.id), String(hintsShown));
+    progress.setHints(loaded.id, hintsShown);
     renderHints();
   });
   renderHints();
@@ -274,11 +258,14 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed);
       else card.hide();
       if (snapshot.outcome && snapshot.outcome.kind !== 'won' && snapshot.outcome.kind !== 'failed') {
+        if (!hintsOffered && !force) progress.markTried(loaded.id);
         hintsOffered = true;
         renderHints();
       }
       if (!force && snapshot.outcome?.kind === 'won' && snapshot.world) {
-        showWin(stars(snapshot.world));
+        const earned = stars(snapshot.world);
+        progress.markWon(loaded.id, earned, editor.getDoc());
+        showWin(earned);
       } else if (!force && shownCard?.node.querySelector('.win-card')) {
         shownCard.close();
       }
@@ -307,7 +294,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   });
   restart.addEventListener('click', () => controller.restart());
   speed.addEventListener('change', () => {
-    storage('local')?.setItem(SPEED_KEY, speed.value);
+    progress.setSetting('speed', Number(speed.value) as Speed);
     controller.setSpeed(Number(speed.value) as Speed);
   });
 
@@ -333,10 +320,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         scene = handle;
         controller.attach(handle);
       });
-      // The start card opens a level the first time it is played in a visit.
-      const started = `kydux.started.${loaded.id}`;
-      if (storage('session')?.getItem(started) !== 'yes') {
-        storage('session')?.setItem(started, 'yes');
+      // The start card opens a level the first time it is played.
+      progress.setCurrent(`level:${loaded.id}`);
+      if (!progress.hasStarted(loaded.id)) {
+        progress.markStarted(loaded.id);
         showStart();
       }
     },

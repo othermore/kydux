@@ -7,7 +7,8 @@ import {
   loadLevelOrder,
   nextLevel,
 } from './content/levels';
-import { currentLanguage, initLanguage, languages, setLanguage, t } from './i18n';
+import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, t } from './i18n';
+import { languageStorage } from './progress/progress';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
 import type { LevelScreen } from './ui/level';
@@ -117,6 +118,7 @@ console.info(
 
 const root = document.querySelector<HTMLElement>('#app');
 if (root) {
+  keepLanguageIn(languageStorage);
   initLanguage();
   const route = () => {
     const id = levelFromHash();

@@ -31,12 +31,22 @@ export interface Environment {
   storage: Pick<Storage, 'getItem' | 'setItem'> | null;
 }
 
+/** Where the language chosen is kept; the browser's localStorage unless the game
+ * says otherwise (it keeps it in the progress document, D31). */
+let keptIn: Environment['storage'] | undefined;
+
+export function keepLanguageIn(storage: Environment['storage']): void {
+  keptIn = storage;
+}
+
 function browserEnvironment(): Environment {
-  let storage: Environment['storage'] = null;
-  try {
-    storage = globalThis.localStorage ?? null;
-  } catch {
-    storage = null;
+  let storage: Environment['storage'] = keptIn ?? null;
+  if (keptIn === undefined) {
+    try {
+      storage = globalThis.localStorage ?? null;
+    } catch {
+      storage = null;
+    }
   }
   const nav = globalThis.navigator;
   return { languages: nav?.languages ?? (nav?.language ? [nav.language] : []), storage };

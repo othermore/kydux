@@ -281,7 +281,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       if (!force && snapshot.outcome?.kind === 'won' && snapshot.world) {
         const earned = stars(snapshot.world);
         progress.markWon(loaded.id, earned, editor.getDoc());
-        // Continue, on the start screen, now goes to what comes after.
+        // Continue, on the start screen, goes to what comes after.
         if (parts.next) progress.setCurrent(parts.next);
         showWin(earned);
       } else if (!force && shownCard?.node.querySelector('.win-card')) {
@@ -317,7 +317,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   });
 
   // The handle between the panes: dragged, it gives the scene its share of the
-  // width; double-clicked, the share it had at first; the arrow keys move it too.
+  // width; double-clicked, the default share; the arrow keys move it too.
   // The share shows at once and is saved when the drag ends. The scene follows,
   // as it does a window resize.
   const showSplit = (share: number) => {

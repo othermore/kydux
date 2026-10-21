@@ -336,8 +336,7 @@ has 2.11, 2.12, 2.0, 2.7, 2.5, 2.8 and 2.6 (`sprint-4.md`).
 
 2.1 The level definition (`level.json`) and its loader on both sides; the
     exposed API list. The level texts, `text.<lang>.json` with their check in
-    `tools/i18n_check.py`, exist since sprint 2; they gain the hints and the
-    dialogue here.
+    `tools/i18n_check.py`, hold the hints and the dialogue too.
 2.2 Objects and actors: doors, keys, items on tiles, `pick_up`, `wait`,
     `find_nearest`, `find_all`, `has`, attributes; a patrolling actor that
     walks its path back and forth, with `can_see`; their events and their

@@ -106,9 +106,9 @@ def test_open_is_met_when_the_door_opens():
 
 
 def test_say_is_met_word_for_word():
-    level = rooms({"kind": "say", "text": "Lumos"})
-    assert run_code(level, "wizard.say('Lumos')").status == "won"
-    assert run_code(level, "wizard.say('lumos')").status == "incomplete"
+    level = rooms({"kind": "say", "text": "Open"})
+    assert run_code(level, "wizard.say('Open')").status == "won"
+    assert run_code(level, "wizard.say('open')").status == "incomplete"
 
 
 def test_lines_under_counts_lines_that_do_something():

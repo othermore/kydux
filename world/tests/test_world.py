@@ -55,9 +55,9 @@ def test_the_wizard_turns_even_when_it_cannot_move():
 
 def test_say_records_what_was_said():
     world = World(ROOM)
-    world.wizard.say("Lumos")
+    world.wizard.say("Hello")
     world.wizard.say(42)
-    assert kinds(world) == [("say", {"text": "Lumos"}), ("say", {"text": "42"})]
+    assert kinds(world) == [("say", {"text": "Hello"}), ("say", {"text": "42"})]
 
 
 def test_past_the_tick_limit_the_world_stops_the_run():

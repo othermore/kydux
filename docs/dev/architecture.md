@@ -74,7 +74,7 @@ Pinned exactly, checked against their registries on 2026-10-20:
 | Playwright | 1.64.1 | |
 | Pyodide | 314.0.7 | Python 3.14 |
 | Phaser | 4.2.1 | the scene; loaded on its own, after the page (D15) |
-| marked | 18.0.14 | the lessons' Markdown (D33); 18.1.1 was nine days old, so the release before it |
+| marked | 18.0.14 | the lessons' Markdown (D33); pinned to a release at least two weeks old |
 | codemirror | 6.0.2 | the editor (D17), with the packages below |
 | @codemirror/lang-python | 6.2.1 | |
 | @codemirror/state, view, commands, language, autocomplete | 6.7.6, 6.43.15, 6.11.1, 6.13.1, 6.20.4 | imported directly, so declared and pinned; one copy of each in the lock |
@@ -356,7 +356,7 @@ one overturns stays, marked as superseded.
   wizard's actions, and without the thing they are refused with *You do
   not know this action yet*. A **spell** is a named piece of magic, data
   and not a method: learned by reading a book (`wizard.read(book)`, into
-  `wizard.spells`) and cast with the wand, `wizard.cast("lumos")` or
+  `wizard.spells`) and cast with the wand, `wizard.cast("light")` or
   `wizard.cast("open", door)`; a spell is a string first, and may become
   an object when classes are taught. An **attribute** keeps Python's word:
   what an object knows about itself, `door.locked`, `wizard.position`. A
@@ -416,7 +416,7 @@ one overturns stays, marked as superseded.
   its shape. The language chosen, the settings, the code typed in each
   level, the hints shown, whether a level was tried, its stars, the start
   cards seen and the item last opened all live in it, so that export and
-  import carry everything; `sessionStorage` is no longer used, and i18n
+  import carry everything, and nothing else in the page keeps state: i18n
   keeps the language where the game tells it to (`keepLanguageIn`). A
   storage that cannot be read or written leaves the document in memory for
   the visit.
@@ -426,9 +426,9 @@ one overturns stays, marked as superseded.
   items in order, each `lesson:<id>` or `level:<id>`, and its title in
   `text.<lang>.json`. `pack-world.mjs` writes the chapters, sorted by
   directory, as `content/course.json`, which the page reads for the map,
-  for what comes after an item, and for where Continue goes. It replaces
-  the sorted list of levels the page read before: one order for the
-  course, not two that could disagree. A lesson is a directory under
+  for what comes after an item, and for where Continue goes. It is the
+  course's one order: nothing else lists the levels, so no second list can
+  disagree with it. A lesson is a directory under
   `content/lessons/` (D33).
 - **D33 — A lesson is Markdown, in pages, with one Try it.** Decided
   2026-10-21 (sprint-5.md), built the same day. A lesson is a directory
@@ -481,8 +481,7 @@ one overturns stays, marked as superseded.
   change. The creator is at `#wizard` (`app/src/ui/wizard.ts`); the start
   screen's big button leads there while there is no wizard, and offers
   *Change my wizard* once there is. Done needs a name and a gender: the
-  gender is never preset, as sprint-6.md's *enabled once the name is not
-  empty* would have needed, since a default would choose for the child.
+  gender is never preset, since a default would choose for the child.
   The gender buttons are words, not a figure each, since a figure is a
   look and any look is either's. Escape and Back leave an existing wizard
   as it was. *Start from the beginning* keeps the wizard; an import keeps
@@ -499,8 +498,8 @@ one overturns stays, marked as superseded.
   shows, from the progress document. Every path a text takes goes through
   it: `t()`, a lesson's Markdown before its pages are cut, and every string
   of a level's text, the starting code included. `t()` makes the choices in
-  its template before it puts the parameters in, not after as sprint-6.md
-  first said: a parameter can be the child's own text, a Python name, and
+  its template before it puts the parameters in: a parameter can be the
+  child's own text, a Python name, and
   must never be read for a choice. Braces with no bar, or with more than
   one, are left alone, so `t()`'s `{name}` and a Python set survive. With
   no wizard, which only a developer's direct address brings about, the
@@ -522,10 +521,9 @@ one overturns stays, marked as superseded.
   with no scrolling, the start card and the notebook fit inside the
   scene's frame, and the heading wraps rather than overlap
   (`app/e2e/screens.spec.ts`). Under 800 pixels the panes stack, for a
-  phone, which the game does not promise but does not break on. The layout
-  needed no change of size: what the trial showed was the goals panel
-  covering the scene's first row, the wizard's start, at 1024; its heading
-  now folds it, and it stays folded for the visit. The keys: Tab and
+  phone, which the game does not promise but does not break on. The goals
+  panel's heading folds it, since at 1024 the open panel covers the scene's
+  first row, the wizard's start; it stays folded for the visit. The keys: Tab and
   Shift+Tab indent, Escape then Tab leaves the editor, Ctrl+Enter (Cmd on
   a Mac) runs in the editor, and on the whole level screen Alt+R runs and
   Alt+N opens the notebook. Those two are read by the key's place

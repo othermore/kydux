@@ -1,0 +1,15 @@
+{
+  "title": "The dark room",
+  "goals": [
+    "Open the door.",
+    "Go through it.",
+    "Find the key with find_nearest."
+  ],
+  "starting_code": "# The room is dark. Light it, find the key, and open the door.\n",
+  "hints": [
+    "In the dark, `find_nearest` finds nothing far away: light the room first.",
+    "After `kirra`, print where the key lies, and walk to it.",
+    "The door is locked: carry its key, and stand right beside it."
+  ],
+  "intro": "This storeroom has no lamp, and I am not lending you mine. The key to the far door is in here, somewhere."
+}

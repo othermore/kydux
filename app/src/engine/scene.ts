@@ -436,7 +436,7 @@ class LevelScene extends Phaser.Scene {
     // The dark over every floor tile but the wizard's and its eight neighbours (D52).
     this.darkness.clear();
     if (!this.lit) {
-      this.darkness.fillStyle(0x07080c, 0.88);
+      this.darkness.fillStyle(0x07080c, 0.97);
       this.map.rows.forEach((row, y) => {
         [...row].forEach((char, x) => {
           const near = Math.abs(x - this.wizardTile[0]) <= 1 && Math.abs(y - this.wizardTile[1]) <= 1;

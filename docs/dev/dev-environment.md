@@ -140,6 +140,11 @@ one to go straight to a screen:
 | `#level/the-locked-door` | A level, from `content/levels/the-locked-door/`. |
 | `#settings` | The settings: the language, the speed and the editor's text size. |
 
+Some levels are played in several ways: the same map, with a door locked
+in one way and open in another, or the teacher looking another way. The
+program must win in every way. After a run, a select under the timeline
+plays back any way, and the card says which way it speaks of.
+
 The map keeps a locked stop closed. A level's or a lesson's address opens
 it anyway. That is on purpose, so that you can test any level without
 playing the ones before it.

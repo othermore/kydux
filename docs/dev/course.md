@@ -85,10 +85,10 @@ Night passages, where Dask patrols. The ideas: true and false, `if`,
 | L19 | `level:the-long-stairs` | The same two moves, up and right, eight times: `for`. Bonus: fewer than 4 lines. | |
 | T16 | `lesson:while` | `while` repeats its lines as long as its expression is true: a loop and a condition together; a `while` whose answer never changes is stopped by the tick limit. | |
 | L20 | `level:past-the-teacher` | Wait while Dask looks this way, then cross. | |
-| T17 | `lesson:kirra-and-osto` | Two spells: `kirra` lights a dark room; `osto` holds a moving stair. | (the spells `kirra`, `osto`) |
-| L21 | `level:the-dark-room` | A dark room (D52): the key lies somewhere in it; `kirra` lights it, then `find_nearest` finds the key. | |
-| L22 | `level:the-moving-stairs` | A stair that comes and goes (D53): wait `while not stair.in_place`, then step; or hold it with `osto`. Bonus: the code asks `in_place`. | |
-| L23 | `level:the-night-walk` | The chapter together, past Dask. | |
+| T17 | `lesson:kirra-and-osto` | Two spells: `kirra` lights a dark room; `osto` holds a moving stair. A stair is in place for a while and away for as long, and `stair.in_place` asks whether a step now would land. | `stair.in_place` (and the spells `kirra`, `osto`) |
+| L21 | `level:the-moving-stairs` | A stair that comes and goes (D53): wait `while not stair.in_place`, then step; `osto` holds it too. Bonus: the code asks `in_place`. | |
+| L22 | `level:the-dark-room` | A dark room (D52): the key lies somewhere in it; `kirra` lights it, then `find_nearest` finds the key, and the key opens the door. Bonus: the key found with `find_nearest`. | |
+| L23 | `level:the-night-walk` | The chapter together: a dark room, a key and its door, a stair, and Dask on his round below; Dask lets the wizard go on the win card. | |
 
 The world features chapter 3 needs: a level played in several ways,
 which the same program must win in all of them, so that a condition has

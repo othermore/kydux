@@ -1,0 +1,80 @@
+{
+  "id": "the-night-walk",
+  "map": [
+    "#############",
+    "#S...K.D.T..#",
+    "###########.#",
+    "#...........#",
+    "###########E#",
+    "#############"
+  ],
+  "dark": true,
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "kirra",
+    "osto"
+  ],
+  "things": [
+    {
+      "kind": "key",
+      "id": "key",
+      "marker": "K",
+      "opens": "door"
+    },
+    {
+      "kind": "door",
+      "id": "door",
+      "marker": "D",
+      "locked": true
+    },
+    {
+      "kind": "stair",
+      "id": "stair",
+      "marker": "T",
+      "period": 2
+    }
+  ],
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "dask",
+      "at": [
+        3,
+        3
+      ],
+      "patrol": [
+        [
+          8,
+          3
+        ]
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.pick_up",
+    "wizard.wait",
+    "wizard.cast",
+    "wizard.find_nearest",
+    "door.open",
+    "teacher.facing",
+    "stair.in_place"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "not_seen_by",
+      "id": "dask"
+    }
+  ],
+  "tick_limit": 200,
+  "speaker": "dask"
+}

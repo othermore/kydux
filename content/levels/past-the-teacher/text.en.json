@@ -2,12 +2,13 @@
   "title": "Past the teacher",
   "goals": [
     "Reach the way out at the top.",
-    "Do not let the teacher see you."
+    "Do not let Dask see you."
   ],
-  "starting_code": "# The teacher walks up and down the corridor, looking ahead.\n# Wait while they look your way, then cross.\nwizard.wait()\n",
+  "starting_code": "# Dask walks up and down the corridor, looking ahead.\n# Wait while he looks your way, then cross.\nwizard.wait()\n",
   "hints": [
-    "Watch which way the teacher looks as they walk.",
+    "Watch which way Dask looks as he walks.",
     "`wizard.wait()` lets one tick go by while you stay hidden.",
     "A `while` loop can keep waiting while `dask.facing` is `\"left\"`."
-  ]
+  ],
+  "intro": "Back and forth, all night long. Cross while my back is turned, and not a moment before."
 }

@@ -1,0 +1,15 @@
+{
+  "title": "El paseo nocturno",
+  "goals": [
+    "Llega a la escalera que baja al dormitorio.",
+    "Que no te vea Dask."
+  ],
+  "starting_code": "# Oscuridad, una puerta cerrada con llave, una escalera que va y viene, y Dask de ronda.\n",
+  "hints": [
+    "Un problema cada vez: la oscuridad, la llave y su puerta, la escalera, y luego Dask.",
+    "Espera a la escalera en un `while`, y a Dask en otro.",
+    "Dask recorre el pasillo de abajo. Crúzalo cuando esté de espaldas: mientras mire a la derecha, espera."
+  ],
+  "intro": "Vaya. Has llegado hasta aquí. Un último paseo por mis pasadizos esta noche, a oscuras, y sin que te vea.",
+  "outro": "Vaya, vaya, {wizard}. Hacía años que nadie se me escapaba. Anda, a la cama. Y ni una palabra a los demás."
+}

@@ -42,5 +42,6 @@
       "id": "dask"
     }
   ],
-  "tick_limit": 60
+  "tick_limit": 60,
+  "speaker": "dask"
 }

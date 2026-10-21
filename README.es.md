@@ -50,13 +50,14 @@ Cada lección explica una idea, empezando por qué es y para qué sirve. Los
 niveles que vienen después practican esa idea, y nada que no se haya
 explicado todavía.
 
-Hay dos capítulos listos. El primero, *La llegada*, va desde qué es un
+Hay tres capítulos listos. El primero, *La llegada*, va desde qué es un
 programa hasta las acciones, los números, las palabras, las cosas que se
 llevan y el primer hechizo. El segundo, *La biblioteca*, trae los nombres
 para los valores, lo que saben las cosas, cómo encontrarlas, las llaves y
-un hechizo que alcanza. Los capítulos siguientes traen lo verdadero y lo
-falso, las condiciones, los bucles, las listas, las acciones propias y, al
-final, los objetos propios. Llegan de capítulo en capítulo.
+un hechizo que alcanza. El tercero, *Los pasadizos*, trae lo verdadero y
+lo falso, elegir con `if` y `else`, y repetir con `for` y `while`. Los
+capítulos siguientes traen las listas, las acciones propias y, al final,
+los objetos propios. Llegan de capítulo en capítulo.
 
 ## Licencia
 

@@ -56,11 +56,11 @@ test('a won run shows its stars, and Next opens what comes next in the course', 
 test('Play again closes the win card; the last level says there is no next yet', async ({
   page,
 }) => {
-  await page.goto('/#level/past-the-teacher');
+  await page.goto('/#level/the-night-walk');
   await page.locator('#start').click();
   await ready(page);
   await page.locator('#speed').selectOption('4');
-  await run(page, 'while dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
+  await run(page, 'wizard.cast("kirra")\nkey = wizard.find_nearest("key")\nwizard.move_right(4)\nwizard.pick_up()\nwizard.move_right()\ndoor.open()\nwizard.move_right(2)\nwhile not stair.in_place:\n    wizard.wait()\nwizard.move_right(3)\nwizard.move_down()\nwhile dask.facing == "right":\n    wizard.wait()\nwizard.move_down(2)');
   await expect(page.locator('.win-card .stars')).toHaveAttribute('data-stars', '1');
   await expect(page.locator('#last')).toHaveText('That is all for now. More levels are coming.');
   await expect(page.locator('#to-map')).toHaveAttribute('href', '#map');

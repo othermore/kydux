@@ -49,12 +49,13 @@ Each lesson explains one idea, starting from what it is and why it exists.
 The levels after it practise that idea, and nothing that has not been
 explained yet.
 
-Two chapters are ready. The first, *Arrival*, goes from what a program is
-to actions, numbers, words, things to carry and the first spell. The
+Three chapters are ready. The first, *Arrival*, goes from what a program
+is to actions, numbers, words, things to carry and the first spell. The
 second, *The library*, brings names for values, what things know, finding
-things, keys and a spell that reaches. The next chapters bring true and
-false, conditions, loops, lists, actions of your own and, last, objects of
-your own. They come one chapter at a time.
+things, keys and a spell that reaches. The third, *The passages*, brings
+true and false, choosing with `if` and `else`, and repeating with `for`
+and `while`. The next chapters bring lists, actions of your own and, last,
+objects of your own. They come one chapter at a time.
 
 ## Licence
 

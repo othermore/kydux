@@ -1,0 +1,45 @@
+{
+  "id": "the-moving-stairs",
+  "map": [
+    "########",
+    "#S.T..E#",
+    "########"
+  ],
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "osto"
+  ],
+  "things": [
+    {
+      "kind": "stair",
+      "id": "stair",
+      "marker": "T",
+      "period": 2
+    }
+  ],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.wait",
+    "wizard.cast",
+    "stair.in_place"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "uses",
+      "member": "in_place",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "dask"
+}

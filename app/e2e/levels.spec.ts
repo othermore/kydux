@@ -303,6 +303,14 @@ const CHAPTER_3: [string, string][] = [
       '    wizard.move_right(2)\nwizard.move_down()',
   ],
   ['the-long-stairs', 'for step in range(8):\n    wizard.move_up()\n    wizard.move_right()'],
+  ['past-the-teacher', 'while dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)'],
+  ['the-moving-stairs', 'wizard.move_right()\nwhile not stair.in_place:\n    wizard.wait()\nwizard.move_right(4)'],
+  [
+    'the-dark-room',
+    'wizard.cast("kirra")\nkey = wizard.find_nearest("key")\nwizard.move_right(4)\nwizard.move_down(2)\n' +
+      'wizard.pick_up()\nwizard.move_left()\ndoor.open()\nwizard.move_down(2)',
+  ],
+  ['the-night-walk', 'wizard.cast("kirra")\nkey = wizard.find_nearest("key")\nwizard.move_right(4)\nwizard.pick_up()\nwizard.move_right()\ndoor.open()\nwizard.move_right(2)\nwhile not stair.in_place:\n    wizard.wait()\nwizard.move_right(3)\nwizard.move_down()\nwhile dask.facing == "right":\n    wizard.wait()\nwizard.move_down(2)'],
 ];
 
 test.describe('chapter 3', () => {
@@ -345,5 +353,37 @@ test.describe('a level played two ways (D51)', () => {
     await run(page, 'if dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
     await expect(page.locator('.outcome-text')).toHaveText('You did it, apprentice! In every way!');
     await expect(page.locator('.win-card')).toBeVisible();
+  });
+});
+
+test.describe('the dark and the stairs (D52, D53)', () => {
+  test('a dark room is covered until kirra lights it', async ({ page }) => {
+    await page.goto('/#level/the-dark-room');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(scene(page)).toHaveAttribute('data-dark', 'true');
+    await page.locator('#speed').selectOption('4');
+    await run(page, 'wizard.cast("kirra")');
+    await expect(scene(page)).toHaveAttribute('data-dark', 'false');
+  });
+
+  test('a stair comes and goes, and a step onto it while it is away bumps', async ({ page }) => {
+    await page.goto('/#level/the-moving-stairs');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(scene(page)).toHaveAttribute('data-stairs', 'stair:in');
+    await page.locator('#speed').selectOption('4');
+    await run(page, 'wizard.move_right()\nwizard.wait()\nprint(stair.in_place)\nwizard.move_right()');
+    await expect(page.locator('.printed')).toHaveText('False');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '2,1');
+  });
+
+  test('osto beside the stair holds it', async ({ page }) => {
+    await page.goto('/#level/the-moving-stairs');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('4');
+    await run(page, 'wizard.move_right()\nwizard.cast("osto")\nwizard.wait(3)\nprint(stair.in_place)');
+    await expect(page.locator('.printed')).toHaveText('True');
   });
 });

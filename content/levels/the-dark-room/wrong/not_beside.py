@@ -1,0 +1,6 @@
+wizard.cast("kirra")
+wizard.move_right(4)
+wizard.move_down(2)
+wizard.pick_up()
+door.open()
+wizard.move_down(2)

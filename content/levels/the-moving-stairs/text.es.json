@@ -1,0 +1,14 @@
+{
+  "title": "La escalera que se mueve",
+  "goals": [
+    "Cruza el hueco.",
+    "Pregúntale a la escalera si está en su sitio."
+  ],
+  "starting_code": "# La escalera va y viene. Espérala, y luego cruza.\nwizard.move_right()\n",
+  "hints": [
+    "Un paso hacia la escalera mientras está apartada no llega: {el mago|la maga} choca.",
+    "`stair.in_place` es `True` cuando un paso dado ahora caería sobre ella.",
+    "Espera en un `while` mientras la escalera no esté en su sitio, y luego cruza."
+  ],
+  "intro": "Estas escaleras hacen lo que quieren. Písalas cuando estén, no cuando no estén."
+}

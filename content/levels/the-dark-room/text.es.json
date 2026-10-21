@@ -1,0 +1,15 @@
+{
+  "title": "La sala oscura",
+  "goals": [
+    "Abre la puerta.",
+    "Crúzala.",
+    "Encuentra la llave con find_nearest."
+  ],
+  "starting_code": "# La sala está a oscuras. Ilumínala, encuentra la llave, y abre la puerta.\n",
+  "hints": [
+    "A oscuras, `find_nearest` no encuentra nada lejano: ilumina primero la sala.",
+    "Después de `kirra`, escribe dónde está la llave, y camina hasta ella.",
+    "La puerta está cerrada con llave: lleva su llave, y ponte justo a su lado."
+  ],
+  "intro": "Este almacén no tiene lámpara, y la mía no te la presto. La llave de la puerta del fondo está aquí dentro, en algún sitio."
+}

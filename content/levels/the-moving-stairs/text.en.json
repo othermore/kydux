@@ -1,0 +1,14 @@
+{
+  "title": "The moving stairs",
+  "goals": [
+    "Cross the gap.",
+    "Ask the stair whether it is in place."
+  ],
+  "starting_code": "# The stair comes and goes. Wait for it, then cross.\nwizard.move_right()\n",
+  "hints": [
+    "A step onto the stair while it is away does not land: the wizard bumps.",
+    "`stair.in_place` is `True` when a step taken now would land.",
+    "Wait in a `while` as long as the stair is not in place, then walk across."
+  ],
+  "intro": "These stairs have a mind of their own. Step on them when they are there, not when they are not."
+}

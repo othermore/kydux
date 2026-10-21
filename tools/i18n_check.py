@@ -9,7 +9,8 @@ Fails, printing file:line: message for each, on:
   - a key no source uses, unless it starts with a prefix in tools/i18n_dynamic.txt
     (for keys made at run time, like `language.${lang}`);
   - a member of kydux_world.api's table without its words in the notebook,
-    notebook.<role>.<member>, or words there for a member it does not have;
+    notebook.<role>.<member>, a kind of thing without its name, things.<kind>, or
+    words for a member or a kind the world does not have;
   - a level, content/levels/<id>/, without a text.<lang>.json for every language
     in i18n/, or with texts whose keys differ, or with a different number of goals
     than its level.json, or a different number of hints in each language;
@@ -101,22 +102,29 @@ def check_levels(languages: list[str]) -> list[str]:
     return findings
 
 
-def check_notebook(languages: dict[str, dict[str, str]]) -> list[str]:
-    """Every member the child may use has its words in the notebook, and nothing else
-    does (D30): notebook.<role>.<member> for each member of kydux_world.api's table."""
+def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
+    """The words the page has for what the world defines, held to the world itself:
+    notebook.<role>.<member> for every member of kydux_world.api's table (D30), and
+    things.<kind> for every kind of thing in kydux_world.level, each language having
+    them all and nothing more."""
     sys.path.insert(0, str(REPO / "world"))
-    from kydux_world import api
+    from kydux_world import api, level
 
     wanted = {
         f"notebook.{role}.{member}" for role, members in api.MEMBERS.items() for member in members
     }
+    wanted |= {f"things.{kind}" for kind in level.THING_KINDS}
     findings = []
     for lang, catalog in languages.items():
-        described = {key for key in catalog if key.count(".") == 2 and key.startswith("notebook.")}
-        for key in sorted(wanted - described):
-            findings.append(f"i18n/{lang}.json: lacks {key}, the notebook's words for it")
-        for key in sorted(described - wanted):
-            findings.append(f"i18n/{lang}.json: {key} describes nothing kydux_world.api has")
+        said = {
+            key
+            for key in catalog
+            if (key.startswith("notebook.") and key.count(".") == 2) or key.startswith("things.")
+        }
+        for key in sorted(wanted - said):
+            findings.append(f"i18n/{lang}.json: lacks {key}, the words for it")
+        for key in sorted(said - wanted):
+            findings.append(f"i18n/{lang}.json: {key} names nothing the world has")
     return findings
 
 
@@ -154,7 +162,7 @@ def check() -> list[str]:
                 findings.append(f"{where}: {key} is not in i18n/{lang}.json")
 
     findings.extend(check_levels(list(languages)))
-    findings.extend(check_notebook(languages))
+    findings.extend(check_world_words(languages))
 
     prefixes = dynamic_prefixes()
     for key in sorted(every_key - set(used)):

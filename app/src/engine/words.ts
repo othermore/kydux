@@ -4,22 +4,11 @@
 
 import { t } from '../i18n';
 
-/** A thing's kind said with its article: "the door", "la puerta". */
+/** A thing's kind said with its article: "the door", "la puerta". Every kind the
+ * world has is in i18n/<lang>.json as things.<kind>, which tools/i18n_check.py holds
+ * to kydux_world.level.THING_KINDS. */
 function thingWords(kind: string): string {
-  switch (kind) {
-    case 'door':
-      return t('things.door');
-    case 'key':
-      return t('things.key');
-    case 'book':
-      return t('things.book');
-    case 'wand':
-      return t('things.wand');
-    case 'potion':
-      return t('things.potion');
-    default:
-      return kind;
-  }
+  return t(`things.${kind}`);
 }
 
 /** Why an action could not be done, from a `blocked` event's reason and its thing's kind. */

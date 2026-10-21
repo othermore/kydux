@@ -4,6 +4,8 @@
 # The language picker names each language by `language.${lang}`.
 language.
 
-# The notebook says each member of kydux_world.api's table by `notebook.${role}.${member}`;
-# tools/i18n_check.py holds those keys to the table itself.
+# The notebook says each member of kydux_world.api's table by `notebook.${role}.${member}`,
+# and the scene names a thing by `things.${kind}`; tools/i18n_check.py holds those
+# keys to the world itself.
 notebook.
+things.

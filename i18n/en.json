@@ -81,7 +81,8 @@
     "key": "the key",
     "book": "the book",
     "wand": "the wand",
-    "potion": "the potion"
+    "potion": "the potion",
+    "stair": "the stair"
   },
   "blocked": {
     "far": "I cannot reach {thing} from here.",
@@ -159,6 +160,12 @@
       "name": "The cat's name in this level.",
       "position": "Where the cat sits, in x and y.",
       "facing": "The way the cat looks: up, down, left or right."
+    },
+    "stair": {
+      "kind": "What it is: \"stair\".",
+      "name": "The stair's own name in this level.",
+      "position": "Where the stair is, in x and y.",
+      "in_place": "True when a step onto the stair, taken now, lands on it."
     }
   },
   "start": {

@@ -11,7 +11,7 @@ import io
 import json
 import time
 import traceback
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from typing import Any, Literal
 
 from .explain import NotCalled, check_called, explain
@@ -119,7 +119,10 @@ Status = Literal["won", "incomplete", "error", "too_many_ticks", "interrupted", 
 
 @dataclass
 class RunResult:
-    """What happened when the child's code ran in a level."""
+    """What happened when the child's code ran in a level. For a level played in
+    several ways (D51), `ways` holds each way's own result, by its id, and the rest
+    is the way shown: the first not won, or the first; `status` is won only when
+    every way is."""
 
     status: Status
     events: list[Event] = field(default_factory=list)
@@ -127,9 +130,12 @@ class RunResult:
     ticks: int = 0
     stdout: str = ""
     error: ErrorInfo | None = None
+    #: The id of the way shown, or None for a level played one way.
+    way: str | None = None
+    ways: list[tuple[str, "RunResult"]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        found: dict[str, Any] = {
             "status": self.status,
             "events": [event.to_dict() for event in self.events],
             "goals": [goal.to_dict() for goal in self.goals],
@@ -137,14 +143,30 @@ class RunResult:
             "stdout": self.stdout,
             "error": asdict(self.error) if self.error else None,
         }
+        if self.ways:
+            found["way"] = self.way
+            found["ways"] = [{"id": way_id, **result.to_dict()} for way_id, result in self.ways]
+        return found
 
 
 def run_code(level: Level, code: str) -> RunResult:
-    """Run the child's code in `level`, with the wizard and the level's things theirs.
+    """Run the child's code in `level`, with the wizard and the level's things theirs;
+    in each of its ways, one world each, when it has ways (D51).
 
     The events recorded before an error, or before the run ended early, are
     kept, so that the scene can show the wizard walking up to the mistake.
     """
+    if not level.ways:
+        return _run_one(level, code)
+    results = [(way_id, _run_one(way, code)) for way_id, way in level.ways]
+    shown_id, shown = next(
+        ((way_id, result) for way_id, result in results if result.status != "won"), results[0]
+    )
+    status: Status = "won" if all(r.status == "won" for _, r in results) else shown.status
+    return replace(shown, status=status, way=shown_id, ways=results)
+
+
+def _run_one(level: Level, code: str) -> RunResult:
     world = World(level, code)
     stdout = io.StringIO()
     status: Status

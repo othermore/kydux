@@ -40,13 +40,14 @@ MEMBERS: dict[str, tuple[str, ...]] = {
     "thing": THING_MEMBERS,
     "door": (*THING_MEMBERS, "locked", "sealed", "password", "is_open", "open"),
     "key": THING_MEMBERS,
+    "stair": (*THING_MEMBERS, "in_place"),
     "teacher": ("kind", "name", "position", "facing", "can_see"),
     "ghost": ("kind", "name", "position", "facing"),
     "cat": ("kind", "name", "position", "facing"),
 }
 
 #: The roles that are things, and so have a thing's members.
-THING_ROLES = ("thing", "door", "key")
+THING_ROLES = ("thing", "door", "key", "stair")
 
 
 def role_of(kind: str) -> str:
@@ -87,10 +88,10 @@ def table() -> dict[str, list[dict[str, str]]]:
     build time (architecture.md, D30), so that the page needs no Python to show it."""
     from .actors import ACTORS
     from .explain import example
-    from .things import Door, Key, Thing
+    from .things import THINGS, Thing
     from .world import Wizard
 
-    classes = {"wizard": Wizard, "thing": Thing, "door": Door, "key": Key, **ACTORS}
+    classes = {"wizard": Wizard, "thing": Thing, **THINGS, **ACTORS}
     found: dict[str, list[dict[str, str]]] = {}
     for role, members in MEMBERS.items():
         owner = classes[role]

@@ -81,7 +81,8 @@
     "key": "la llave",
     "book": "el libro",
     "wand": "la varita",
-    "potion": "la poción"
+    "potion": "la poción",
+    "stair": "la escalera"
   },
   "blocked": {
     "far": "No llego a {thing} desde aquí.",
@@ -159,6 +160,12 @@
       "name": "El nombre del gato en este nivel.",
       "position": "Dónde está sentado el gato, en x e y.",
       "facing": "Hacia dónde mira el gato: up, down, left o right."
+    },
+    "stair": {
+      "kind": "Lo que es: \"stair\".",
+      "name": "El nombre propio de la escalera en este nivel.",
+      "position": "Dónde está la escalera, en x e y.",
+      "in_place": "True cuando un paso hacia la escalera, dado ahora, cae sobre ella."
     }
   },
   "start": {

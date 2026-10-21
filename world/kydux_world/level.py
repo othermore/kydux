@@ -11,14 +11,16 @@ Beside the map: `things` (keys, doors, books...) and `actors` (the teacher,
 the ghost, the cat), each placed by a marker or at x and y, with an id the
 child's code knows it by; `carrying`, the kinds of thing the wizard holds
 from the start (D49); `spells`, the spells that can be cast (D42); `api`,
-the names the level teaches (D23); `goals`, some of them bonus goals; and
-`tick_limit`. A level may come with goals of its own, in a goals.py beside
-level.json, whose source the loader passes as `goals_source`.
+the names the level teaches (D23); `goals`, some of them bonus goals;
+`tick_limit`; `dark`, a room unlit until `kirra` (D52); and `ways`, the ways
+the level is played, each one the same program must win (D51). A level may
+come with goals of its own, in a goals.py beside level.json, whose source
+the loader passes as `goals_source`.
 """
 
 import json
 import keyword
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, NamedTuple
 
@@ -37,12 +39,14 @@ class LevelError(ValueError):
 WALL, FLOOR, SHELF, START = "#", ".", "=", "S"
 
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
-THING_KINDS = ("key", "door", "book", "wand", "potion")
+THING_KINDS = ("key", "door", "book", "wand", "potion", "stair")
 CARRIED_KINDS = ("key", "book", "wand", "potion")
 ACTOR_KINDS = ("teacher", "ghost", "cat")
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
-KNOWN_SPELLS = ("zelim", "fendra")
+KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto")
+#: What a way may say differently from the level it is a way of (D51).
+WAY_FIELDS = ("id", "things", "actors", "carrying", "spells", "dark")
 FACINGS = ("up", "down", "left", "right")
 DEFAULT_SIGHT = 4
 
@@ -69,6 +73,8 @@ class ThingSpec:
     password: str | None = None
     #: Carried by the wizard from the start, with no tile of its own (D49).
     carried: bool = False
+    #: For a stair, the ticks it is in place and then away, in turn (D53).
+    period: int | None = None
 
 
 @dataclass(frozen=True)
@@ -99,12 +105,27 @@ class Level:
     goals_source: str | None = None
     #: The spells that exist in the level, which the wand can cast (D42).
     spells: tuple[str, ...] = ()
+    #: Whether the room is dark until `kirra` lights it (D52).
+    dark: bool = False
+    #: The ways the level is played, by id, each a level of its own (D51); empty
+    #: for a level played one way.
+    ways: tuple[tuple[str, "Level"], ...] = ()
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Level":
+        """A level from its level.json; with `ways`, the level as its first way, its
+        `ways` each merged with the rest of level.json (D51)."""
         level_id = data.get("id")
         if not isinstance(level_id, str) or not level_id:
             raise LevelError("a level needs an id")
+        if "ways" in data:
+            ways = tuple((way["id"], cls._one(merged)) for way, merged in _ways(data))
+            return replace(ways[0][1], ways=ways)
+        return cls._one(data)
+
+    @classmethod
+    def _one(cls, data: dict[str, Any]) -> "Level":
+        level_id = data["id"]
         rows = data.get("map")
         if not isinstance(rows, list) or not rows or not all(isinstance(r, str) for r in rows):
             raise LevelError(f"{level_id}: the map must be a list of rows of characters")
@@ -171,6 +192,12 @@ class Level:
         for spell in spells:
             if spell not in KNOWN_SPELLS:
                 raise LevelError(f"{level_id}: {spell} is not a spell the world knows")
+
+        dark = data.get("dark", False)
+        if not isinstance(dark, bool):
+            raise LevelError(f"{level_id}: dark is true or false")
+        if dark and "kirra" not in spells:
+            raise LevelError(f"{level_id}: a dark level needs kirra among its spells")
         for thing in things:
             if thing.sealed is not None and thing.sealed not in spells:
                 raise LevelError(
@@ -202,9 +229,14 @@ class Level:
             api=tuple(api),
             goals_source=source,
             spells=tuple(spells),
+            dark=dark,
         )
         check_api(level)
         return level
+
+    def way(self, way_id: str) -> "Level":
+        """The level as one of its ways is played."""
+        return dict(self.ways)[way_id]
 
     @classmethod
     def from_json(cls, text: str) -> "Level":
@@ -315,7 +347,20 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
             f"{shape.level_id}: the door {thing_id} is locked, sealed or has a password, "
             "one of them at most"
         )
-    return ThingSpec(kind, thing_id, shape.place(spec, thing_id), opens, locked, sealed, password)
+    period = spec.get("period")
+    whole = isinstance(period, int) and not isinstance(period, bool) and period >= 1
+    if (kind == "stair") != (period is not None) or (period is not None and not whole):
+        raise LevelError(f"{shape.level_id}: a stair, and only a stair, has a whole period")
+    return ThingSpec(
+        kind,
+        thing_id,
+        shape.place(spec, thing_id),
+        opens,
+        locked,
+        sealed,
+        password,
+        period=period,
+    )
 
 
 def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
@@ -351,6 +396,50 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
         raise LevelError(f"{shape.level_id}: {actor_id}'s sight must be a whole number, 1 or more")
     patrol = tuple(path) if len(path) > 1 else ()
     return ActorSpec(kind, actor_id, position, facing, patrol, sight)
+
+
+def _ways(data: dict[str, Any]) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """Each way of a level, with level.json as that way plays it: its things and actors
+    merged by id, field by field, and its carrying, spells and dark in place of the
+    level's (D51)."""
+    level_id = data["id"]
+    ways = data["ways"]
+    if not isinstance(ways, list) or len(ways) < 2 or not all(isinstance(w, dict) for w in ways):
+        raise LevelError(f"{level_id}: ways is a list of two ways or more")
+    base = {key: value for key, value in data.items() if key != "ways"}
+    seen: set[str] = set()
+    found = []
+    for way in ways:
+        way_id = way.get("id")
+        if not isinstance(way_id, str) or not way_id.isidentifier() or way_id in seen:
+            raise LevelError(f"{level_id}: every way needs an id of its own, a Python name")
+        seen.add(way_id)
+        for key in way:
+            if key not in WAY_FIELDS:
+                raise LevelError(f"{level_id}: the way {way_id} cannot change {key}")
+        merged = dict(base)
+        for key in ("things", "actors"):
+            if key in way:
+                merged[key] = _merged_by_id(level_id, way_id, key, base.get(key, []), way[key])
+        for key in ("carrying", "spells", "dark"):
+            if key in way:
+                merged[key] = way[key]
+        found.append((way, merged))
+    return found
+
+
+def _merged_by_id(
+    level_id: str, way_id: str, key: str, base: list[Any], changes: Any
+) -> list[dict[str, Any]]:
+    if not isinstance(changes, list) or not all(isinstance(c, dict) for c in changes):
+        raise LevelError(f"{level_id}: the way {way_id}'s {key} must be a list of objects")
+    by_id = {item.get("id"): dict(item) for item in base if isinstance(item, dict)}
+    for change in changes:
+        item_id = change.get("id")
+        if item_id not in by_id:
+            raise LevelError(f"{level_id}: the way {way_id} changes {item_id}, not in {key}")
+        by_id[item_id].update(change)
+    return [by_id[item.get("id")] for item in base]
 
 
 def _carrying(data: dict[str, Any], level_id: str, start: Position) -> tuple[ThingSpec, ...]:

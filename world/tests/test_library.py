@@ -139,7 +139,7 @@ def test_a_ghost_stands_and_catches_no_one():
     [
         ({"carrying": ["door"]}, "carrying lists"),
         ({"carrying": ["wand", "wand"]}, "twice"),
-        ({"spells": ["kirra"]}, "not a spell the world knows"),
+        ({"spells": ["abra"]}, "not a spell the world knows"),
         ({"actors": [{"kind": "ghost", "id": "eldra", "at": [2, 1]}]}, "cannot stand on a shelf"),
     ],
 )

@@ -22,7 +22,7 @@ from typing import Any
 from .actors import Actor, Teacher, make_actor, sight_tiles
 from .goals import make_goal
 from .level import CARRIED_KINDS, Level, Position
-from .things import Child, Door, Thing, make_thing
+from .things import Child, Door, Stair, Thing, make_thing
 
 CHILD = "<child>"
 
@@ -103,6 +103,8 @@ class World:
         self.code = code
         self.tick = 0
         self.events: list[Event] = []
+        #: Whether the room is lit: a dark level is not, until kirra (D52).
+        self.lit = not level.dark
         self.wizard = Wizard(self)
         self.things: dict[str, Thing] = {s.id: make_thing(self, s) for s in level.things}
         self.actors: dict[str, Actor] = {s.id: make_actor(self, s) for s in level.actors}
@@ -123,8 +125,20 @@ class World:
         return {"wizard": self.wizard, **self.things, **self.actors}
 
     def is_free(self, position: Position) -> bool:
-        """Whether the wizard or an actor can walk onto a tile: floor, and no closed door."""
-        return self.level.free(position) and self._not_shut(position)
+        """Whether the wizard or an actor can walk onto a tile in the next tick: floor,
+        no closed door, and no stair that is away (D53)."""
+        if not (self.level.free(position) and self._not_shut(position)):
+            return False
+        return all(
+            stair._k_in_place_at(self.tick + 1)
+            for stair in self.things.values()
+            if isinstance(stair, Stair) and stair._k_position == position
+        )
+
+    def near_wizard(self, position: Position) -> bool:
+        """Whether a tile is the wizard's or one of its eight neighbours."""
+        here = self.wizard._k_position
+        return abs(position.x - here.x) <= 1 and abs(position.y - here.y) <= 1
 
     def is_clear(self, position: Position) -> bool:
         """Whether sight passes a tile: floor or a shelf, and no closed door (D46)."""
@@ -261,11 +275,23 @@ class Wizard(Child):
             here = self._k_position
             ahead = Position(here.x + dx, here.y + dy)
             if not world.is_free(ahead):
-                by = "door" if world.door_at(ahead) is not None else "wall"
+                by = (
+                    "door"
+                    if world.door_at(ahead) is not None
+                    else "stair"
+                    if self._k_stair_at(world, ahead)
+                    else "wall"
+                )
                 world.act("bump", {"at": list(here), "facing": direction.value, "by": by})
                 return
             self._set(position=ahead)
             world.act("move", {"from": list(here), "to": list(ahead), "facing": direction.value})
+
+    @staticmethod
+    def _k_stair_at(world: "World", position: Position) -> bool:
+        return any(
+            isinstance(t, Stair) and t._k_position == position for t in world.things.values()
+        )
 
     def move_right(self, steps: int = 1) -> None:
         """Walk right, one tile per step, stopping at a wall or a closed door:
@@ -431,6 +457,36 @@ def _fendra(world: World, here: Position) -> Effect:
     return Effect(then=pull)
 
 
+def _kirra(world: World, here: Position) -> Effect:
+    """Lights a dark room for the rest of the run (D52); in a lit room it does nothing."""
+    if world.lit:
+        return Effect()
+
+    def light() -> None:
+        world.lit = True
+        world.note("world", "light", {"at": list(here)})
+
+    return Effect(then=light)
+
+
+def _osto(world: World, here: Position) -> Effect:
+    """Holds a stair beside the wizard in place (D53); with none beside, refused."""
+    beside = [
+        thing
+        for thing in sorted(world.things.values(), key=lambda t: t.name)
+        if isinstance(thing, Stair)
+        and abs(thing._k_position.x - here.x) + abs(thing._k_position.y - here.y) == 1
+    ]
+    if not beside:
+        return Effect(refused="nothing_near")
+    return Effect(then=beside[0]._hold)
+
+
 #: Each spell's effect, by its name (D42); kydux_world.level.KNOWN_SPELLS lists the
 #: same names, so that a level can be checked without the world.
-SPELLS: dict[str, Callable[[World, Position], Effect]] = {"zelim": _zelim, "fendra": _fendra}
+SPELLS: dict[str, Callable[[World, Position], Effect]] = {
+    "zelim": _zelim,
+    "fendra": _fendra,
+    "kirra": _kirra,
+    "osto": _osto,
+}

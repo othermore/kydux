@@ -124,6 +124,8 @@ teacher.can_see(target)      # the target straight ahead, within its sight (4 ti
                              # over a shelf (D46)
 
 ghost.kind, ghost.name, ghost.position, ghost.facing    # and cat.*: they stand (D48)
+
+stair.in_place               # whether a step onto it, taken now, lands on it (D53)
 ```
 
 The map's characters: `#` a wall, `.` floor, `=` a shelf (D46), `S` the
@@ -144,13 +146,15 @@ tiles are `[x, y]`.
 | kind | actor | data | the scene |
 |---|---|---|---|
 | `move` | wizard, or an actor | `from`, `to`, `facing` | walks it one tile, facing that way |
-| `bump` | wizard | `at`, `facing`, `by`: `wall` or `door` | nudges the wizard against it |
+| `bump` | wizard | `at`, `facing`, `by`: `wall`, `door` or `stair` | nudges the wizard against it |
 | `say` | wizard | `text` | a bubble over the wizard for three ticks, under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
 | `pick_up` | wizard | `id`, `at` | the thing rises and vanishes; `data-carried` |
 | `open` | wizard, by `door.open()`; or the door, in the wizard's tick, opened by a spell or a word | `id`, `at`, `by`: `hand`, `spell` or `word` | the door's frame turns open; `data-doors` |
 | `cast` | wizard | `spell`, `at` | a ring of light grows from the wizard and fades |
 | `pull` | the thing, in the wizard's tick | `id`, `from`, `to` | the thing slides to the wizard's tile (D47) |
+| `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
+| `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
 | `give` | wizard | `id`, `to`, `at` | the thing floats from the wizard to the actor and fades; the actor faces the wizard (D48) |
 | `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (with `spell`), `not_carried` or `nobody`; `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
@@ -699,3 +703,41 @@ one overturns stays, marked as superseded.
   parse meets neither. They are bonus goals in chapter 2: a run that wins
   without the idea still wins, and the extra star says the idea was
   used.
+- **D51 — A level may be played in several ways, and the program must win
+  them all.** Decided 2026-10-21 (sprint-9.md), built the same day.
+  `level.json`'s `ways` is a list of two or more, each with an `id`, a
+  Python name, and what differs in that way: `things` and `actors` as
+  `{id, ...}` merged into the level's own by id, field by field, and
+  `carrying`, `spells` and `dark` in place of the level's; the map, the
+  goals, the api and the rest are the level's in every way.
+  `Level.from_dict` gives the level as its first way, with `ways` holding
+  each way's own `Level` (`level.way(id)`). `run_code` runs the child's
+  code once per way, each in a world of its own, and returns the first
+  way not won, or the first, with `way` naming it, `ways` holding every
+  way's result, and `status` won only when every way is. Rules out a
+  random way per run: a child must see that one program handles every
+  case, and a test must be able to say so.
+- **D52 — A dark room hides what lies on its floor.** Decided 2026-10-21
+  (sprint-9.md), built the same day. A level with `"dark": true` is unlit
+  until `kirra` (which it must list among its spells): until then, a
+  thing that can be carried and lies farther than one tile from the
+  wizard, in any of the eight directions, has no `position`, and so
+  `find_nearest`, `find_all` and `fendra` pass it by; doors, stairs and
+  actors are the castle's shape, and are seen. `kirra` makes a `light`
+  event, the world's, and lights the room for the rest of the run; in a
+  lit room it does nothing. A teacher's sight is not darkness's
+  business: Dask carries a lantern. Rules out darkness that moves with the
+  wizard, which a child cannot reason about from the code.
+- **D53 — A stair comes and goes, and `osto` holds it.** Decided
+  2026-10-21 (sprint-9.md), built the same day. A thing of kind `stair`,
+  with a whole `period`, lies on a floor tile and is in place for
+  `period` ticks and away for as many, in place from tick 0. A step onto
+  it in a tick it is away bumps (`by: "stair"`); a stair never goes from
+  under the wizard, since only stepping onto it is asked. `stair.in_place`
+  says whether a step onto it, taken now, lands: it looks at the next
+  tick, the one the step would take, so that `while not stair.in_place:
+  wizard.wait()` and then a step always land. `osto`, cast beside a
+  stair, holds it in place for `HOLD_TICKS` (six) from the next tick it is
+  in place, with the stair's `hold` event (`from`, `until`); with no stair
+  beside, it is refused with `nothing_near`. A stair is never locked,
+  sealed or opened.

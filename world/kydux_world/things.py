@@ -12,7 +12,7 @@ line behind the browser's sandbox, not a wall.
 from typing import TYPE_CHECKING, Any
 
 from . import api
-from .level import Position, ThingSpec
+from .level import CARRIED_KINDS, Position, ThingSpec
 
 if TYPE_CHECKING:
     from .world import World
@@ -91,7 +91,19 @@ class Thing(Child):
     @property
     def position(self) -> Position | None:
         """Where the thing lies, as x and y, or None once the wizard carries it: `key.position`"""
-        return None if self._k_carried or self._k_given is not None else self._k_position
+        if self._k_carried or self._k_given is not None or self._k_unseen():
+            return None
+        return self._k_position
+
+    def _k_unseen(self) -> bool:
+        """Whether the thing lies in the dark, out of the wizard's reach (D52): a thing
+        on the floor, not a door or a stair, which are the castle's shape."""
+        world: World = self._k_world
+        return (
+            not world.lit
+            and self.kind in CARRIED_KINDS
+            and not world.near_wizard(self._k_position)
+        )
 
     def _carry(self) -> None:
         self._set(carried=True)
@@ -183,9 +195,47 @@ class Door(Thing):
             world.act("open", {"id": self.name, "at": at, "by": "hand"})
 
 
+#: How many ticks `osto` holds a stair in place (D53).
+HOLD_TICKS = 6
+
+
+class Stair(Thing):
+    """A stair across a gap or a doorway, in place for `period` ticks and away for as
+    many, from tick 0 in place, unless `osto` holds it (D53)."""
+
+    _k_role = "stair"
+
+    def __init__(self, world: "World", spec: ThingSpec) -> None:
+        super().__init__(world, spec)
+        #: The ticks it is held, each a range: from the first, up to the last.
+        self._set(holds=())
+
+    def _k_in_place_at(self, tick: int) -> bool:
+        period = self._k_spec.period or 1
+        if (tick // period) % 2 == 0:
+            return True
+        return any(start <= tick < end for start, end in self._k_holds)
+
+    @property
+    def in_place(self) -> bool:
+        """True when a step onto the stair, taken now, lands on it: `stair.in_place`"""
+        world: World = self._k_world
+        return self._k_in_place_at(world.tick + 1)
+
+    def _hold(self) -> None:
+        """Held in place for HOLD_TICKS, from the next tick it is in place."""
+        world: World = self._k_world
+        start = world.tick + 1
+        while not self._k_in_place_at(start):
+            start += 1
+        end = start + HOLD_TICKS
+        self._set(holds=(*self._k_holds, (start, end)))
+        world.note(self.name, "hold", {"id": self.name, "from": start, "until": end})
+
+
+#: Each kind of thing with a class of its own; any other kind is a Thing.
+THINGS: dict[str, type[Thing]] = {"door": Door, "key": Key, "stair": Stair}
+
+
 def make_thing(world: "World", spec: ThingSpec) -> Thing:
-    if spec.kind == "door":
-        return Door(world, spec)
-    if spec.kind == "key":
-        return Key(world, spec)
-    return Thing(world, spec)
+    return THINGS.get(spec.kind, Thing)(world, spec)

@@ -44,6 +44,10 @@ export interface WorldGoal {
   params: Record<string, unknown>;
   met: boolean;
   met_at_tick: number | null;
+  failed: boolean;
+  failed_at_tick: number | null;
+  /** Not needed to win. */
+  bonus: boolean;
 }
 
 /** What the world says of a run in a level (kydux_world.run.RunResult.to_dict). */

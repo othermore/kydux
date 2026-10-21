@@ -1,5 +1,22 @@
-"""What a level asks of the wizard, each goal checked after every tick."""
+"""What a level asks of the wizard, each goal checked after every tick.
 
+A goal is a class made from its spec and the level, with `check(world)`,
+true once the goal is met, and optionally `failed(world)`, true once it can
+no longer be met. The world remembers the first tick each was met or failed
+at. A bonus goal (`"bonus": true`) is not needed to win.
+
+The kinds: reach (a marker's tile, or one at x and y), collect (a thing by
+id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
+say (a text, word for word), not_seen_by (an actor; failed when it
+catches the wizard), and lines_under (the code has fewer lines than that,
+not counting blank lines and comments; decided before the run). A level
+may add its own in a goals.py beside its
+level.json, which says so with `"own_goals": true`: a module whose `GOALS`
+maps each kind to its class, in the same shape as these.
+"""
+
+import sys
+import types
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Protocol
 
@@ -19,6 +36,9 @@ class GoalResult:
     params: dict[str, Any] = field(default_factory=dict)
     met: bool = False
     met_at_tick: int | None = None
+    failed: bool = False
+    failed_at_tick: int | None = None
+    bonus: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -26,7 +46,18 @@ class GoalResult:
             "params": self.params,
             "met": self.met,
             "met_at_tick": self.met_at_tick,
+            "failed": self.failed,
+            "failed_at_tick": self.failed_at_tick,
+            "bonus": self.bonus,
         }
+
+
+def _thing_id(spec: GoalSpec, level: Level, kinds: tuple[str, ...] | None = None) -> str:
+    thing_id = spec.params.get("id")
+    things = {t.id: t for t in level.things}
+    if thing_id not in things or (kinds is not None and things[thing_id].kind not in kinds):
+        raise LevelError(f"{level.id}: the {spec.kind} goal names {thing_id}, no such thing")
+    return thing_id
 
 
 class ReachGoal:
@@ -47,11 +78,126 @@ class ReachGoal:
         return world.wizard.position == self.target
 
 
-GOALS: dict[str, type] = {"reach": ReachGoal}
+class CollectGoal:
+    """Met once the wizard carries a thing: one by its id, or any `of` a kind."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        if "id" in spec.params:
+            self.id: str | None = _thing_id(spec, level)
+            self.kind: str | None = None
+        elif isinstance(spec.params.get("of"), str):
+            self.id, self.kind = None, spec.params["of"]
+        else:
+            raise LevelError(f"{level.id}: a collect goal needs an id, or `of` a kind")
+
+    def check(self, world: "World") -> bool:
+        carried = world.carried()
+        if self.id is not None:
+            return any(t.name == self.id for t in carried)
+        return any(t.kind == self.kind for t in carried)
+
+
+class OpenGoal:
+    """Met once a door is open."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        self.id = _thing_id(spec, level, ("door",))
+
+    def check(self, world: "World") -> bool:
+        return bool(world.things[self.id].is_open)
+
+
+class SayGoal:
+    """Met once the wizard has said a text, word for word."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        text = spec.params.get("text")
+        if not isinstance(text, str):
+            raise LevelError(f"{level.id}: a say goal needs a text")
+        self.text = text
+
+    def check(self, world: "World") -> bool:
+        return any(
+            e.actor == "wizard" and e.kind == "say" and e.data.get("text") == self.text
+            for e in world.events
+        )
+
+
+class NotSeenByGoal:
+    """Met at the end of a run the actor did not catch the wizard in; failed when it did."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        actor_id = spec.params.get("id")
+        if actor_id not in {a.id for a in level.actors}:
+            raise LevelError(f"{level.id}: the not_seen_by goal names {actor_id}, no actor")
+        self.id = actor_id
+
+    def check(self, world: "World") -> bool:
+        # Met only once the run is over and the actor never caught the wizard:
+        # until then, it might.
+        return world.finished and world.caught_by is None
+
+    def failed(self, world: "World") -> bool:
+        return world.caught_by == self.id
+
+
+def code_lines(code: str) -> int:
+    """How many lines of the child's code do something: not blank, not only a comment."""
+    return sum(
+        1 for line in code.splitlines() if line.strip() and not line.strip().startswith("#")
+    )
+
+
+class LinesUnderGoal:
+    """Met, before the run starts, when the code has fewer lines than a number."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        lines = spec.params.get("lines")
+        if isinstance(lines, bool) or not isinstance(lines, int) or lines < 1:
+            raise LevelError(f"{level.id}: a lines_under goal needs a whole number of lines")
+        self.lines = lines
+
+    def check(self, world: "World") -> bool:
+        return code_lines(world.code) < self.lines
+
+
+GOALS: dict[str, type] = {
+    "reach": ReachGoal,
+    "collect": CollectGoal,
+    "open": OpenGoal,
+    "say": SayGoal,
+    "not_seen_by": NotSeenByGoal,
+    "lines_under": LinesUnderGoal,
+}
+
+_own_goals: dict[tuple[str, str], dict[str, type]] = {}
+
+
+def module_name(level_id: str) -> str:
+    """The name a level's own goals module goes by: kydux_world.levels.level_01_x."""
+    return f"kydux_world.levels.level_{level_id.replace('-', '_')}"
+
+
+def own_goals(level: Level) -> dict[str, type]:
+    """The goals a level's goals.py adds, made once for each level and source."""
+    if level.goals_source is None:
+        return {}
+    key = (level.id, level.goals_source)
+    if key not in _own_goals:
+        module = types.ModuleType(module_name(level.id))
+        module.__file__ = f"content/levels/{level.id}/goals.py"
+        code = compile(level.goals_source, module.__file__, "exec")
+        sys.modules[module.__name__] = module
+        exec(code, module.__dict__)
+        goals = getattr(module, "GOALS", None)
+        if not isinstance(goals, dict):
+            raise LevelError(f"{level.id}: goals.py has no GOALS")
+        _own_goals[key] = dict(goals)
+    return _own_goals[key]
 
 
 def make_goal(spec: GoalSpec, level: Level) -> Goal:
-    kind = GOALS.get(spec.kind)
+    kind = own_goals(level).get(spec.kind) or GOALS.get(spec.kind)
     if kind is None:
         raise LevelError(f"{level.id}: there is no goal of kind {spec.kind}")
     return kind(spec, level)

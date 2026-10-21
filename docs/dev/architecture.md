@@ -234,3 +234,13 @@ one overturns stays, marked as superseded.
   plays all of one tick's together; its listeners get the tick and its
   events. Playing one event per step would make the teacher move after the
   wizard rather than with it.
+- **D26 — A goal's parameters never reuse its own keys; a level's own
+  goals are declared.** Decided 2026-10-21, piece 2.3. A `collect` goal
+  for any thing of a kind names the kind with `of`, `{"kind": "collect",
+  "of": "key"}`, since `kind` is the goal's own (sprint-3.md had `kind`
+  twice). A level with goals of its own says so in level.json,
+  `"own_goals": true`, and its goals.py comes with it: the page fetches it
+  and sends its source to the world with the level, the tests read it from
+  the level's directory, and either without the other is refused. Rules
+  out the world looking for goals.py on its own, which it cannot do in the
+  browser.

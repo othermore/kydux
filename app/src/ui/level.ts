@@ -67,7 +67,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const title = labelled(element('h2', { className: 'level-title' }), () => text.title);
   const sceneParent = element('div', { id: 'scene', className: 'scene' });
   const goalsSlot = element('div', { className: 'goals-slot' });
-  let goals: GoalsPanel = goalsPanel(text.goals.map((g) => ({ text: g })));
+  const bonus = ((loaded.level.goals as { bonus?: boolean }[] | undefined) ?? []).map(
+    (goal) => goal.bonus === true,
+  );
+  const goalTexts = () => text.goals.map((g, index) => ({ text: g, bonus: bonus[index] }));
+  let goals: GoalsPanel = goalsPanel(goalTexts());
   goalsSlot.append(goals.node);
   const status = element('p', { id: 'status', className: 'status' });
 
@@ -151,12 +155,14 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     switch (result.status) {
       case 'won':
         return { kind: 'won' };
-      case 'incomplete':
+      case 'incomplete': {
+        const needed = result.goals.filter((g) => !g.bonus);
         return {
           kind: 'incomplete',
-          met: result.goals.filter((g) => g.met).length,
-          total: result.goals.length,
+          met: needed.filter((g) => g.met).length,
+          total: needed.length,
         };
+      }
       case 'too_many_ticks':
         return { kind: 'too_many_ticks', limit: tickLimit };
       case 'interrupted':
@@ -173,7 +179,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
 
   const markGoals = (tick: number) => {
     world?.goals.forEach((goal, index) => {
-      goals.set(index, goal.met_at_tick !== null && tick >= goal.met_at_tick ? 'met' : 'open');
+      const reached = (at: number | null) => at !== null && tick >= at;
+      goals.set(
+        index,
+        reached(goal.failed_at_tick) ? 'failed' : reached(goal.met_at_tick) ? 'met' : 'open',
+      );
     });
     if (!world) goals.reset();
   };
@@ -299,7 +309,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       const marks = text.goals.map((_, index) =>
         goals.node.querySelectorAll('.goal')[index]?.getAttribute('data-mark'),
       );
-      goals = goalsPanel(text.goals.map((g) => ({ text: g })));
+      goals = goalsPanel(goalTexts());
       marks.forEach((mark, index) => {
         if (mark === 'met' || mark === 'failed') goals.set(index, mark);
       });

@@ -108,6 +108,8 @@ class World:
         #: Who caught the wizard, when someone did.
         self.caught_by: str | None = None
         self.over: RunOver | None = None
+        #: Whether the child's code has come to its end, however it did.
+        self.finished = False
         self.goals = [make_goal(spec, level) for spec in level.goals]
         #: For each goal by its index, the first tick it was met at, or failed at.
         self.met_at: dict[int, int] = {}
@@ -163,6 +165,17 @@ class World:
         if self.caught_by is not None:
             self.over = Caught(self.caught_by)
             raise self.over
+
+    def finish(self) -> None:
+        """The child's code has ended: the goals that are met only then are checked."""
+        self.finished = True
+        self._check_goals()
+
+    def won(self) -> bool:
+        """Every goal that is not a bonus met, and none failed."""
+        return not self.failed_at and all(
+            index in self.met_at for index, spec in enumerate(self.level.goals) if not spec.bonus
+        )
 
     def note(self, actor: str, kind: str, data: dict[str, Any]) -> None:
         """An event in the tick going on, of an actor's or the world's."""

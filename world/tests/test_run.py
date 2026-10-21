@@ -117,5 +117,13 @@ def test_the_worker_s_call_speaks_json():
         "line": 1,
     }
     assert result["goals"] == [
-        {"kind": "reach", "params": {"marker": "D"}, "met": True, "met_at_tick": 2}
+        {
+            "kind": "reach",
+            "params": {"marker": "D"},
+            "met": True,
+            "met_at_tick": 2,
+            "failed": False,
+            "failed_at_tick": None,
+            "bonus": False,
+        }
     ]

@@ -15,7 +15,8 @@
     "title": "Goals",
     "open": "Not met yet",
     "met": "Met",
-    "failed": "Failed"
+    "failed": "Failed",
+    "bonus": "Bonus:"
   },
   "outcome": {
     "won": "You did it!",

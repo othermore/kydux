@@ -236,6 +236,10 @@ footer {
   box-shadow: inset 0 0 0 2px #fff;
 }
 
+.goal-bonus {
+  color: #b08900;
+}
+
 .goal[data-mark='failed'] .goal-mark {
   border-color: var(--warning);
   background: var(--warning);

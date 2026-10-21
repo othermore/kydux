@@ -195,7 +195,17 @@ describe('the worker\'s answers', () => {
   const world = {
     status: 'won',
     events: [{ tick: 1, actor: 'wizard', kind: 'move', data: {}, line: 1 }],
-    goals: [{ kind: 'reach', params: {}, met: true, met_at_tick: 1 }],
+    goals: [
+      {
+        kind: 'reach',
+        params: {},
+        met: true,
+        met_at_tick: 1,
+        failed: false,
+        failed_at_tick: null,
+        bonus: false,
+      },
+    ],
     ticks: 1,
     stdout: '',
     error: null,
@@ -215,6 +225,10 @@ describe('the worker\'s answers', () => {
     ['a world without events', { ...ok, world: { ...world, events: 'all of them' } }],
     ['an event without a tick', { ...ok, world: { ...world, events: [{ kind: 'move', data: {} }] } }],
     ['a goal without met', { ...ok, world: { ...world, goals: [{ kind: 'reach' }] } }],
+    [
+      'a goal without bonus',
+      { ...ok, world: { ...world, goals: [{ ...world.goals[0], bonus: undefined }] } },
+    ],
   ])('refuse %s', (_, value) => {
     expect(isRunResult(value)).toBe(false);
   });

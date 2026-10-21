@@ -58,7 +58,10 @@ export function isWorldResult(value: unknown): value is WorldResult {
       (g) =>
         isObject(g) &&
         typeof g.met === 'boolean' &&
-        (typeof g.met_at_tick === 'number' || g.met_at_tick === null),
+        (typeof g.met_at_tick === 'number' || g.met_at_tick === null) &&
+        typeof g.failed === 'boolean' &&
+        (typeof g.failed_at_tick === 'number' || g.failed_at_tick === null) &&
+        typeof g.bonus === 'boolean',
     ) &&
     typeof ticks === 'number' &&
     typeof stdout === 'string' &&

@@ -23,10 +23,14 @@ function label(mark: GoalMark): string {
   }
 }
 
-export function goalsPanel(goals: { text: string }[]): GoalsPanel {
+export function goalsPanel(goals: { text: string; bonus?: boolean }[]): GoalsPanel {
   const items = goals.map((goal) => {
     const mark = element('span', { className: 'goal-mark' });
-    const item = element('li', { className: 'goal' }, [mark, element('span', {}, [goal.text])]);
+    const words = goal.bonus
+      ? [element('strong', { className: 'goal-bonus' }, [t('goals.bonus')]), ' ', goal.text]
+      : [goal.text];
+    const item = element('li', { className: 'goal' }, [mark, element('span', {}, words)]);
+    if (goal.bonus) item.dataset.bonus = 'true';
     return { item, mark };
   });
   const set = (index: number, state: GoalMark) => {

@@ -146,9 +146,14 @@ class Level:
         if not isinstance(api, list) or not all(isinstance(name, str) for name in api):
             raise LevelError(f"{level_id}: api must be a list of names")
 
+        own = data.get("own_goals", False)
         source = data.get("goals_source")
-        if source is not None and not isinstance(source, str):
-            raise LevelError(f"{level_id}: goals_source must be Python's source")
+        if not isinstance(own, bool) or (source is not None and not isinstance(source, str)):
+            raise LevelError(f"{level_id}: own_goals is true or false, with goals.py's source")
+        if own != (source is not None):
+            raise LevelError(
+                f"{level_id}: own_goals says goals.py, and its source must come with it"
+            )
 
         level = cls(
             id=level_id,
@@ -173,9 +178,12 @@ class Level:
 
     @classmethod
     def from_directory(cls, directory: Path) -> "Level":
-        """A level from its directory: level.json, and goals.py when there is one."""
+        """A level from its directory: level.json, and goals.py when level.json says
+        `"own_goals": true`."""
         data = json.loads((directory / "level.json").read_text(encoding="utf-8"))
         goals = directory / "goals.py"
+        if goals.is_file() != bool(data.get("own_goals", False)):
+            raise LevelError(f"{directory.name}: goals.py and own_goals in level.json go together")
         if goals.is_file():
             data["goals_source"] = goals.read_text(encoding="utf-8")
         return cls.from_dict(data)

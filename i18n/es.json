@@ -15,7 +15,8 @@
     "title": "Objetivos",
     "open": "Aún sin cumplir",
     "met": "Cumplido",
-    "failed": "Fallido"
+    "failed": "Fallido",
+    "bonus": "Extra:"
   },
   "outcome": {
     "won": "¡Lo has conseguido!",

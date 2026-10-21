@@ -40,6 +40,12 @@ async function json<T>(url: string): Promise<T | null> {
   return (await response.json()) as T;
 }
 
+async function source(url: string): Promise<string | null> {
+  const response = await fetch(url);
+  if (!response.ok || response.headers.get('content-type')?.includes('html')) return null;
+  return response.text();
+}
+
 export async function loadLevelText(id: string, lang: Language): Promise<LevelText> {
   const text = await json<LevelText>(levelUrl(id, `text.${lang}.json`));
   if (text) return text;
@@ -53,5 +59,11 @@ export async function loadLevel(id: string, lang: Language): Promise<LoadedLevel
   if (!isLevelId(id)) throw new LevelNotFound(id);
   const level = await json<LevelJson>(levelUrl(id, 'level.json'));
   if (!level) throw new LevelNotFound(id);
+  // A level's own goals, in its goals.py, go to the world with the level.
+  if (level.own_goals === true) {
+    const goals = await source(levelUrl(id, 'goals.py'));
+    if (goals === null) throw new Error(`level ${id}: own_goals, and no goals.py`);
+    level.goals_source = goals;
+  }
   return { id, level, text: await loadLevelText(id, lang) };
 }

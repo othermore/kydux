@@ -94,10 +94,10 @@ class RunResult:
 
 
 def run_code(level: Level, code: str) -> RunResult:
-    """Run the child's code in `level`, with `wizard` theirs to command.
+    """Run the child's code in `level`, with the wizard and the level's things theirs.
 
-    The events recorded before an error, or before the tick limit, are kept,
-    so that the scene can show the wizard walking up to the mistake.
+    The events recorded before an error, or before the run ended early, are
+    kept, so that the scene can show the wizard walking up to the mistake.
     """
     world = World(level, code)
     stdout = io.StringIO()
@@ -119,12 +119,24 @@ def run_code(level: Level, code: str) -> RunResult:
     except BaseException as caught:  # the child's code may raise anything, exit() too
         status, error = "error", error_info(caught)
     else:
-        status = "won" if len(world.met_at) == len(world.goals) else "incomplete"
-    if world.over is not None and status in ("won", "incomplete", "error"):
+        status = "incomplete"
+    if world.over is not None and status in ("incomplete", "error"):
         # The child's code caught the end of the run and went on: the end stands.
         status = "caught" if isinstance(world.over, Caught) else "too_many_ticks"
+        error = None
+    world.finish()
+    if status == "incomplete" and world.won():
+        status = "won"
     goals = [
-        GoalResult(spec.kind, dict(spec.params), index in world.met_at, world.met_at.get(index))
+        GoalResult(
+            spec.kind,
+            dict(spec.params),
+            index in world.met_at,
+            world.met_at.get(index),
+            index in world.failed_at,
+            world.failed_at.get(index),
+            spec.bonus,
+        )
         for index, spec in enumerate(level.goals)
     ]
     return RunResult(status, list(world.events), goals, world.tick, stdout.getvalue(), error)

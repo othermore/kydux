@@ -120,6 +120,9 @@ def test_a_level_loads_from_its_directory_with_its_goals(tmp_path):
     (tmp_path / "level.json").write_text(json.dumps(CORRIDOR))
     assert Level.from_directory(tmp_path).goals_source is None
     (tmp_path / "goals.py").write_text("GOALS = {}\n")
+    with pytest.raises(LevelError, match="go together"):
+        Level.from_directory(tmp_path)
+    (tmp_path / "level.json").write_text(json.dumps({**CORRIDOR, "own_goals": True}))
     assert Level.from_directory(tmp_path).goals_source == "GOALS = {}\n"
 
 

@@ -1,126 +1,310 @@
 # The development environment
 
-How to set up a machine to work on Kydux, run it, try it from another
-computer, and check it.
+This guide explains how to work on Kydux. It covers four things: how to
+prepare a machine, how to run the game while you develop it, how to try the
+game from another computer, and how to check your work before you commit.
 
-## 1. The machine
+Kydux is developed on a Linux server with no screen. In this guide that
+server is called `hija`, which is its hostname. The game is tried from
+another computer, such as a MacBook, through a web browser.
 
-Debian 13 with Python 3.13 and git. Node 24 comes from NodeSource, since
-Debian's Node is too old for the tools (architecture.md, D9):
+## 1. What the machine needs
+
+The development machine runs Debian 13. Debian provides Python 3.13 and
+git, and the project uses both as Debian ships them.
+
+Node is different. Debian 13 ships Node 20, which has reached its end of
+life, and the project's test tool refuses it. So Node 24 is installed from
+NodeSource's package repository instead. This is the one thing installed
+system-wide, and it needs `sudo`:
 
 ```sh
 curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-Nothing else is installed system-wide. From the repository's root:
+To confirm it worked, ask Node for its version:
 
 ```sh
-git config core.hooksPath ci/hooks     # the hours, the forbidden words, the secrets
+node --version
+```
+
+You should see a version that starts with `v24`.
+
+Everything else lives inside your user account and inside the repository.
+Nothing else needs `sudo`.
+
+## 2. Preparing the repository
+
+Clone the repository, then run these commands from its root directory.
+Each one prepares a different part of the project.
+
+The git hooks enforce the project's rules at every commit and push. They
+refuse a commit that contains a forbidden word or a secret, and a push made
+outside the project's hours. This tells git where the hooks are:
+
+```sh
+git config core.hooksPath ci/hooks
+```
+
+The world, the Python model of the levels, runs in a virtual environment.
+Creating it and installing the world into it, together with its test tools
+`pytest` and `ruff`, takes two commands:
+
+```sh
 python3 -m venv .venv
-.venv/bin/pip install -e 'world[dev]'  # kydux_world, pytest, ruff
-(cd app && npm ci)                     # the app's tools
-(cd app && npx playwright install chromium)   # the browser for the browser tests
+.venv/bin/pip install -e 'world[dev]'
 ```
 
-## 2. Files outside the repository
+The app, the web page the child plays in, has its own tools under `app/`.
+This installs them exactly as the lock file pins them:
 
-All in `~/.config/kydux/`, none of them ever committed:
+```sh
+(cd app && npm ci)
+```
 
-| File | What it holds |
+The browser tests drive a real browser. This downloads the one they use:
+
+```sh
+(cd app && npx playwright install chromium)
+```
+
+## 3. Files that stay outside the repository
+
+Some files must exist on the machine but must never be committed. They all
+live in `~/.config/kydux/`. The repository's `.gitignore` and the project's
+checks keep them out, but it is worth knowing what they are.
+
+| File | What it is for |
 |---|---|
-| `secrets.env` | `KEY=value` lines: the image-generation API key and other credentials. Mode 600. Tools read it; nothing prints it. |
-| `forbidden.txt` | The forbidden words, one entry per line, `#` for comments (architecture.md, D8). The hooks refuse a commit without it. |
-| `tls/` | The local certificate authority and this machine's certificate, made by `ci/dev-cert.sh`. |
+| `secrets.env` | The API keys and credentials the tools use, one `KEY=value` per line. Keep its mode at 600. Nothing in the project ever prints its contents. |
+| `forbidden.txt` | The words that must never appear in the repository. The hooks refuse a commit while this file is missing. |
+| `tls/` | The certificate the development server uses for HTTPS. Section 5 explains it. |
 
-`forbidden.txt` starts with the name of the game Kydux takes after; any
-other name the project must not use by accident is added as a line. One
-entry covers its spellings with spaces, hyphens or underscores, in any
-case.
+The forbidden words deserve a word more. The list starts with the name of
+the game that Kydux takes after, which the project never names, not even
+in this guide. Any other name that the story must not use by accident goes
+on its own line. One entry covers all its spellings. If the list held the
+made-up word `zorblax`, it would also catch `Zorb Lax`, `zorb-lax` and
+`ZORB_LAX`. Lines that start with `#` are comments.
 
-## 3. Running the game
+## 4. Running the game while you develop
 
-```sh
-ci/dev-cert.sh           # once: the certificate for HTTPS (section 4)
-cd app && npm run dev    # https://localhost:5173, and on the network
-```
-
-The server reloads the page when a file changes. `npm run build` makes the
-game in `app/dist/`, and `npm run preview` serves that on port 4173, the way
-a release runs.
-
-The page opens a level by the address's hash, `#level/<id>`, the level's
-directory under `content/levels/`; without one it goes to the first,
-`#level/01-the-corridor`. The browser keeps the speed chosen
-(`localStorage`, `kydux.speed`) and the code typed in each level for the
-visit (`sessionStorage`, `kydux.code.<id>`); clearing the site's data in
-the browser starts afresh.
-
-## 4. Trying it from another computer
-
-The development server listens on every interface, so another computer on
-the same network opens it by this machine's name, `https://hija.local:5173`
-(macOS resolves `.local` names by itself), or by its address, which Vite
-prints when it starts. Vite answers only names it knows, so
-`app/vite.config.ts` names this machine's, `<hostname>` and
-`<hostname>.local`; without them the page opens but its hot reload, a
-websocket, is refused.
-
-It has to be HTTPS: a browser gives a page the isolation that stopping a
-runaway program needs only in a secure context, and HTTP from another
-computer is not one (architecture.md, D13). The certificate comes from a
-small certificate authority of this machine's own, made by `ci/dev-cert.sh`.
-The other computer trusts that authority once:
-
-- **macOS**: copy `~/.config/kydux/tls/ca.crt` to the Mac
-  (`scp hija:.config/kydux/tls/ca.crt ~/Downloads/kydux-dev-ca.crt`), open
-  it, which adds it to Keychain Access in the *login* keychain; double-click
-  *Kydux development (hija)*, open *Trust*, set *When using this
-  certificate* to *Always Trust*, close and give the password. Safari and
-  Chrome then trust the game's certificate; Firefox needs
-  `security.enterprise_roots.enabled` set to true in `about:config`, or the
-  file imported under *Settings → Privacy & Security → Certificates*.
-- **Windows**: open `ca.crt`, *Install Certificate*, *Current User*, *Place
-  all certificates in the following store*, *Trusted Root Certification
-  Authorities*.
-- **Linux**: `sudo cp ca.crt /usr/local/share/ca-certificates/kydux-dev.crt &&
-  sudo update-ca-certificates` (and Firefox's import, as on macOS).
-
-The authority can sign only for this machine's names and private
-addresses, so trusting it trusts nothing else. After this machine's address
-changes, `ci/dev-cert.sh --renew` makes the certificate again; the other
-computer keeps trusting the same authority.
-
-The page's status line says whether it is isolated: *This page can stop a
-spell that runs forever.* Without the certificate trusted, the browser
-warns before it opens the page. When the page is not isolated, whatever the
-reason, the game still works: it stops a runaway program by starting Python
-again, and the status line says so.
-
-From outside the local network, an SSH tunnel makes the game local to the
-other computer, which needs no certificate:
-`ssh -L 5173:localhost:5173 hija`, then `https://localhost:5173` (or
-`KYDUX_HTTP=1 npm run dev` on this machine and `http://localhost:5173` there).
-
-## 5. Checking
+The development server builds the page as you edit it and reloads the
+browser when a file changes. Start it from the `app/` directory:
 
 ```sh
-ci/check.sh          # lint, the world's and the project's tests, i18n, the app's types, tests, build
-ci/check.sh --e2e    # all that, then the browser tests against the built game
+cd app
+npm run dev
 ```
 
-A change to `world/` or `content/` while the dev server runs needs
-`npm run predev` again, in `app/`, which packs the world and copies the
-levels for the browser, and a reload.
+The server prints the addresses it listens on. One is
+`https://localhost:5173`, for a browser on the same machine. The others
+are the machine's network addresses, for a browser on another computer.
+Section 5 explains how to use those.
 
-## 6. Committing and pushing
+Before the server starts, two scripts run on their own. One copies Python's
+WebAssembly build into place, and the other packs the world and the levels
+for the browser. You never run them by hand, with one exception: if you
+change something under `world/` or `content/` while the server is already
+running, the browser keeps the old copy. Run this from `app/` to pack the
+new one, then reload the page:
 
-- Commits are local, any time, authored as the repository's `git config`
-  says (`othermore <info@kidux.org>`). The pre-commit hook refuses a
-  forbidden word or a secret in the tree; the commit-msg hook a forbidden
-  word in the message.
-- `ci/push.sh` is the one way to push: inside the hours it dates the
-  commits not yet on GitHub inside them and pushes; outside them,
-  `ci/push.sh --later` sets a timer for when they open (architecture.md,
-  D12). The pre-push hook refuses a push made any other way.
-- `CLAUDE.md` and `.claude/` are never committed.
+```sh
+npm run predev
+```
+
+The page opens a level by the hash in its address. For example,
+`#level/02-the-locked-door` opens the level in the directory
+`content/levels/02-the-locked-door/`. An address with no hash goes to the
+first level, the corridor.
+
+The browser remembers two things between visits. It keeps the playback
+speed you chose, and it keeps the code you typed in each level until you
+close the tab. If you want to start from a clean page, clear the site's
+data in the browser.
+
+Two other commands matter. `npm run build` makes the finished game under
+`app/dist/`, the same files a release ships. `npm run preview` serves that
+finished build on port 4173, which is how the browser tests run it.
+
+## 5. Trying the game from another computer
+
+### Why it needs HTTPS
+
+The development server listens on every network interface, so another
+computer on the same network can open the game. But a plain `http://`
+address is not enough. Here is why.
+
+The game stops a child's program that runs forever. To stop it without
+restarting Python, the page needs a browser feature called cross-origin
+isolation. Browsers grant that feature only to pages in a secure context.
+A page on `localhost` counts as secure. A page on `http://hija.local` from
+another computer does not. So the development server serves HTTPS, and for
+that it needs a certificate the other computer trusts.
+
+Without the trusted certificate the game still works. The browser shows a
+warning first, and once you go past it, the game stops a runaway program by
+restarting Python instead. The status line at the bottom of the page tells
+you which of the two you have. With isolation it says *This page can stop
+a spell that runs forever.*
+
+### Making the certificate on the server
+
+The certificate comes from a small certificate authority that the server
+makes for itself. The authority can sign certificates only for the
+server's own names and for private network addresses. Trusting it on your
+other computer therefore trusts nothing else. The authority and the
+certificate live in `~/.config/kydux/tls/`, and their private keys never
+leave the server.
+
+Run this once on the server:
+
+```sh
+ci/dev-cert.sh
+```
+
+It prints the names and addresses the certificate covers. If the server's
+network address changes later, make a new certificate with the same
+authority:
+
+```sh
+ci/dev-cert.sh --renew
+```
+
+The other computer keeps trusting the authority, so nothing has to be
+redone there.
+
+### Trusting the authority on a Mac
+
+First copy the authority's public certificate to the Mac. Its file is
+`ca.crt`. From a terminal on the Mac:
+
+```sh
+scp hija:.config/kydux/tls/ca.crt ~/Downloads/kydux-dev-ca.crt
+```
+
+Then add it to your login keychain as a trusted root. The Mac asks for
+your password, because trusting a certificate authority is a change to the
+system's trust:
+
+```sh
+security add-trusted-cert -r trustRoot -k ~/Library/Keychains/login.keychain-db ~/Downloads/kydux-dev-ca.crt
+```
+
+Safari and Chrome read the keychain, so they now trust the server's
+certificate. Firefox keeps its own list of authorities. For Firefox, open
+`about:config`, search for `security.enterprise_roots.enabled`, and set it
+to `true`; Firefox then reads the keychain too.
+
+If you prefer the graphical way, double-click `kydux-dev-ca.crt` instead.
+It opens in Keychain Access under the *login* keychain. Double-click the
+entry called *Kydux development (hija)*, open the *Trust* section, set
+*When using this certificate* to *Always Trust*, and close the window.
+
+### Trusting the authority on Windows or Linux
+
+On Windows, open `ca.crt`, choose *Install Certificate*, then *Current
+User*, then *Place all certificates in the following store*, and pick
+*Trusted Root Certification Authorities*.
+
+On Linux, copy it into the system's store and update the store:
+
+```sh
+sudo cp ca.crt /usr/local/share/ca-certificates/kydux-dev.crt
+sudo update-ca-certificates
+```
+
+Firefox on Linux needs the same `about:config` change as on a Mac.
+
+### Opening the game
+
+With the server running (section 4), open this address in a browser on
+the other computer:
+
+```
+https://hija.local:5173
+```
+
+macOS resolves names that end in `.local` on its own, with no setup. If
+that name does not resolve on your computer, use the server's network
+address instead. The development server prints it when it starts, and
+`https://10.10.11.226:5173` is the server's address at the time of
+writing.
+
+The server answers only names it knows. `app/vite.config.ts` lists the
+server's hostname and its `.local` name. Without that, the page would open
+but the automatic reload would not work, because the reload uses a
+websocket that the server would refuse.
+
+### From outside the local network
+
+When you are not on the same network as the server, an SSH tunnel brings
+the game to your computer as if it were local. A local page is a secure
+context, so no certificate is needed. Run this on your computer and keep
+it open:
+
+```sh
+ssh -L 5173:localhost:5173 hija
+```
+
+Then open `https://localhost:5173` in the browser.
+
+## 6. Checking your work
+
+One script runs every check the project has. It stops at the first
+failure and says which check failed. Run it from the repository's root:
+
+```sh
+ci/check.sh
+```
+
+It runs, in this order: the Python linter and formatter, the world's tests
+and the repository's own checks, the check that keeps the languages in
+step, and the app's type check, unit tests and build. When everything
+passes, the last line says `==> All checks passed`.
+
+The browser tests take longer, about a minute and a half. They build the
+game, serve it, and play the levels in a real browser. Add `--e2e` to run
+them after the other checks:
+
+```sh
+ci/check.sh --e2e
+```
+
+The repository's own checks deserve a mention, because they guard the
+project's rules. They refuse a secret in any tracked file. They refuse a
+forbidden word in any file, path or commit message. They keep the two
+READMEs saying the same things. And they require every piece of art and
+sound to be listed in a manifest with its source and licence.
+
+## 7. Committing and pushing
+
+Commits are made locally at any time. They are authored as the
+repository's `git config` says, `othermore <info@kidux.org>`. Two hooks run
+at every commit. The pre-commit hook refuses a forbidden word or a secret
+in the tree. The commit-msg hook refuses a forbidden word in the message.
+
+Pushing is different, because the project is seen on GitHub only inside
+certain hours: Madrid's 19:00 to 03:00 around a night from Tuesday to
+Friday, and the whole of Saturday, Sunday and Monday. There is one way to
+push, and it keeps to those hours:
+
+```sh
+ci/push.sh
+```
+
+Inside the hours, it dates the commits that are not yet on GitHub inside
+the hours and pushes them. Outside the hours, it refuses. To push at the
+next opening without waiting up for it, set a timer instead:
+
+```sh
+ci/push.sh --later
+```
+
+The pre-push hook refuses a push made any other way. A commit that is
+already on GitHub is never rewritten.
+
+Two files are never committed: `CLAUDE.md` and the `.claude/` directory.
+They hold the project's internal instructions, and `.gitignore` keeps them
+out.

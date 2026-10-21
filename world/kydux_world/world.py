@@ -162,7 +162,10 @@ class World:
         for actor in self.actors.values():
             actor._step()
         for actor in self.actors.values():
-            if isinstance(actor, Teacher) and actor.can_see(self.wizard):
+            # Seen straight ahead, or walked into: either way the teacher has found it.
+            if isinstance(actor, Teacher) and (
+                actor.can_see(self.wizard) or actor.position == self.wizard.position
+            ):
                 self.note(actor.name, "seen", {"by": actor.name, "at": list(self.wizard.position)})
                 self.caught_by = actor.name
                 break

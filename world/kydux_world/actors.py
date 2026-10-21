@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from .world import World
 
 DELTAS = {"up": (0, -1), "down": (0, 1), "left": (-1, 0), "right": (1, 0)}
-OPPOSITE = {"up": "down", "down": "up", "left": "right", "right": "left"}
 
 
 def towards(here: Position, there: Position) -> str:

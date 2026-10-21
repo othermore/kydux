@@ -153,3 +153,27 @@ def test_a_spell_after_the_end_changes_nothing():
         with pytest.raises(Caught):
             spell()
     assert (world.wizard.position, world.tick) == (where, ticks)
+
+
+def test_a_teacher_who_walks_into_the_wizard_catches_it():
+    # The teacher walks right along the row the wizard stands in, looking away
+    # from it until it steps onto its tile.
+    level = Level.from_dict(
+        {
+            "id": "walked-into",
+            "map": ["#######", "#.S...#", "#######"],
+            "actors": [
+                {
+                    "kind": "teacher",
+                    "id": "teacher",
+                    "at": [1, 1],
+                    "facing": "left",
+                    "patrol": [[2, 1]],
+                }
+            ],
+        }
+    )
+    world = World(level)
+    with pytest.raises(Caught):
+        world.wizard.wait()
+    assert world.events[-1].kind == "seen"

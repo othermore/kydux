@@ -115,13 +115,18 @@ def explain(error: BaseException, level: Level) -> Explanation:
     return Explanation("other", {"type": type(error).__name__, "message": str(error)})
 
 
-def _arguments(spell: str, level: Level) -> Explanation:
-    from .actors import Teacher
-    from .things import Door
-    from .world import Wizard
+def _child_classes(base: type = Child) -> list[type]:
+    """Every class of object the child may hold, the wizard's and the things' and actors'."""
+    found = []
+    for kind in base.__subclasses__():
+        found.append(kind)
+        found.extend(_child_classes(kind))
+    return found
 
-    for owner in (Wizard, Door, Teacher):
-        if hasattr(owner, spell):
+
+def _arguments(spell: str, level: Level) -> Explanation:
+    for owner in _child_classes():
+        if callable(getattr(owner, spell, None)):
             return Explanation("arguments", {"name": spell, "example": example(owner, spell)})
     return Explanation("arguments", {"name": spell, "example": f"{spell}()"})
 

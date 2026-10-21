@@ -340,9 +340,10 @@ has 2.0, 2.5, 2.6, 2.7 and 2.8.
 2.8 Completion in the editor from the exposed API, and the grimoire panel
     listing it with translated descriptions and a click to insert an example.
 2.9 The world refuses to be tampered with: the wizard's position, facing
-    and items are read-only to the child's code, the world's own objects are
-    out of its reach, and the page replays the events against the level's
-    map, so that a run cannot claim a win it did not make.
+    and items are read-only to the child's code, the world's own modules are
+    out of its reach, and a run's events must add up, each step following
+    the last from the start, before it counts, so that a run cannot claim a
+    win it did not make.
 2.10 A second and third level exercising all of it (a locked door with a key;
     sneaking past a teacher), with solutions and wrong answers.
 

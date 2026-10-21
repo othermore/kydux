@@ -13,6 +13,7 @@ import { type Card, startCard, stars, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
+import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
 import { type Outcome, type OutcomeCard, outcomeCard, withCode } from './outcome';
 
 const SPEEDS: Speed[] = [1, 2, 4];
@@ -53,6 +54,8 @@ export interface LevelScreenParts {
   loaded: LoadedLevel;
   /** The level after this one, or null when it is the last. */
   next: string | null;
+  /** What the child can type, for the notebook and the editor's completion. */
+  table: ApiTable;
   /** Made by the caller, so that Phaser and CodeMirror load on their own. */
   createEditor: (parent: HTMLElement, options: EditorOptions) => Editor;
   startScene: (parent: HTMLElement, level: LoadedLevel['level']) => Promise<SceneHandle>;
@@ -91,6 +94,18 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     t('level.restart'),
   );
   const hint = labelled(element('button', { id: 'hint', type: 'button' }), () => t('level.hint'));
+  const notebookButton = labelled(element('button', { id: 'notebook-open', type: 'button' }), () =>
+    t('notebook.open'),
+  );
+  const notebook = notebookPanel(loaded.level, parts.table, (example) => {
+    editor.insertLine(example);
+  });
+  notebookButton.addEventListener('click', () => {
+    notebook.toggle();
+    notebookButton.setAttribute('aria-expanded', String(notebook.open));
+  });
+  notebookButton.setAttribute('aria-controls', 'notebook');
+  notebookButton.setAttribute('aria-expanded', 'false');
   const hintsBox = element('section', { className: 'hints', hidden: true });
   hintsBox.setAttribute('aria-live', 'polite');
   const speed = element('select', { id: 'speed' });
@@ -103,7 +118,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   );
   const card: OutcomeCard = outcomeCard();
 
-  const sceneFrame = element('div', { className: 'scene-frame' }, [sceneParent, goalsSlot]);
+  // The notebook opens over the scene, beside the editor, so that an example
+  // clicked lands where the child can see it.
+  const sceneFrame = element('div', { className: 'scene-frame' }, [
+    sceneParent,
+    goalsSlot,
+    notebook.node,
+  ]);
   const node = element('div', { className: 'level-screen' }, [
     element('section', { className: 'stage' }, [
       heading,
@@ -117,6 +138,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         stop,
         restart,
         hint,
+        notebookButton,
         element('label', { className: 'speed' }, [speedLabel, ' ', speed]),
       ]),
       hintsBox,
@@ -128,9 +150,28 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   // while untouched, follows the language.
   const saved = storage('session')?.getItem(codeKey(loaded.id));
   let typed = saved !== null && saved !== undefined && saved !== text.starting_code;
+  // After the name of something the child's code holds and a dot, the editor
+  // offers what the level teaches of it, with the notebook's words.
+  const entries = notebookEntries(loaded.level, parts.table);
   const editor = parts.createEditor(editorParent, {
     doc: typed && saved ? saved : text.starting_code,
     label: t('level.code_label'),
+    complete: (context) => {
+      const before = context.matchBefore(/\b(\w+)\.\w*$/);
+      if (!before) return null;
+      const object = before.text.slice(0, before.text.indexOf('.'));
+      const own = entries.filter((entry) => entry.object === object);
+      if (own.length === 0) return null;
+      return {
+        from: before.from + object.length + 1,
+        options: own.map((entry) => ({
+          label: entry.member.name,
+          type: entry.member.kind === 'action' ? 'method' : 'property',
+          detail: describe(entry.role, entry.member.name),
+        })),
+        validFor: /^\w*$/,
+      };
+    },
     onRun: () => controller.run(editor.getDoc()),
     onChange: (doc) => {
       typed = doc !== text.starting_code;
@@ -286,6 +327,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       about.title = t('level.about');
       if (shownCard?.open && shownCard.node.querySelector('.start-card')) showStart();
       renderHints();
+      notebook.relabel();
       render(controller.snapshot, true);
       setPageTitle();
     },

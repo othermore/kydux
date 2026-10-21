@@ -81,5 +81,53 @@
     "open": "I do not need to: {thing} is already open.",
     "nothing": "There is nothing here to pick up.",
     "unknown_action": "I do not know this action yet."
+  },
+  "notebook": {
+    "title": "The wizard's notebook",
+    "open": "Notebook",
+    "close": "Close",
+    "actions": "Actions",
+    "attributes": "Attributes",
+    "nothing": "Nothing to note here yet.",
+    "wizard": {
+      "move_right": "Walks right, one tile per step. Stops at a wall or a closed door.",
+      "move_left": "Walks left, one tile per step. Stops at a wall or a closed door.",
+      "move_up": "Walks up, one tile per step. Stops at a wall or a closed door.",
+      "move_down": "Walks down, one tile per step. Stops at a wall or a closed door.",
+      "say": "Says something out loud.",
+      "wait": "Stands still while the world moves on, one tick at a time.",
+      "pick_up": "Picks up the thing on the wizard's tile and carries it.",
+      "find_nearest": "Finds the nearest thing of a kind, or None when there is none.",
+      "find_all": "Finds every thing of a kind, nearest first.",
+      "has": "Tells whether the wizard carries a thing of a kind.",
+      "position": "Where the wizard stands, as x and y.",
+      "facing": "The way the wizard looks: up, down, left or right.",
+      "items": "The things the wizard carries."
+    },
+    "thing": {
+      "kind": "What the thing is, like \"key\" or \"book\".",
+      "name": "The thing's own name in this level.",
+      "position": "Where the thing lies, or None once the wizard carries it."
+    },
+    "door": {
+      "kind": "What it is: \"door\".",
+      "name": "The door's own name in this level.",
+      "position": "Where the door stands, as x and y.",
+      "locked": "True while the door needs its key to open.",
+      "is_open": "True once the door is open, and the wizard can go through.",
+      "open": "Opens the door. The wizard must stand next to it, and carry its key if it is locked."
+    },
+    "key": {
+      "kind": "What it is: \"key\".",
+      "name": "The key's own name in this level.",
+      "position": "Where the key lies, or None once the wizard carries it."
+    },
+    "teacher": {
+      "kind": "What they are: \"teacher\".",
+      "name": "The teacher's own name in this level.",
+      "position": "Where the teacher stands, as x and y.",
+      "facing": "The way the teacher looks: up, down, left or right.",
+      "can_see": "Tells whether the teacher can see something straight ahead, close enough."
+    }
   }
 }

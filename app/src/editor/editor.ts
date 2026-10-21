@@ -2,7 +2,13 @@
 // line being played lit, and the line of an error marked, each also in the
 // gutter.
 
-import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
+import {
+  autocompletion,
+  type CompletionSource,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+} from '@codemirror/autocomplete';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { python } from '@codemirror/lang-python';
 import {
@@ -32,6 +38,8 @@ export interface Editor {
   setRunningLine(line: number | null): void;
   /** Marks a line, 1-based, as the one an error came from; null for none. */
   setErrorLine(line: number | null): void;
+  /** Puts `text` on a line of its own after the cursor's line, and the cursor after it. */
+  insertLine(text: string): void;
   focus(): void;
   destroy(): void;
   readonly view: EditorView;
@@ -44,6 +52,8 @@ export interface EditorOptions {
   onRun?: () => void;
   /** The editor's name for screen readers. */
   label?: string;
+  /** What to offer after a name and a dot; nothing else is completed. */
+  complete?: CompletionSource;
 }
 
 class Mark extends GutterMarker {
@@ -126,7 +136,16 @@ export function createEditor(parent: HTMLElement, options: EditorOptions): Edito
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         indentUnit.of('    '),
         EditorState.tabSize.of(4),
-        keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, indentWithTab]),
+        ...(options.complete
+          ? [autocompletion({ override: [options.complete], activateOnTyping: true })]
+          : []),
+        keymap.of([
+          ...closeBracketsKeymap,
+          ...completionKeymap,
+          ...defaultKeymap,
+          ...historyKeymap,
+          indentWithTab,
+        ]),
         running.extension,
         error.extension,
         EditorView.contentAttributes.of({
@@ -153,6 +172,16 @@ export function createEditor(parent: HTMLElement, options: EditorOptions): Edito
     },
     setErrorLine(line) {
       view.dispatch({ effects: error.set.of(line) });
+    },
+    insertLine(text) {
+      const line = view.state.doc.lineAt(view.state.selection.main.head);
+      const blank = line.text.trim() === '';
+      const indent = /^\s*/.exec(line.text)?.[0] ?? '';
+      const insert = blank ? `${indent}${text}` : `\n${indent}${text}`;
+      const from = blank ? line.from : line.to;
+      const to = blank ? line.to : line.to;
+      view.dispatch({ changes: { from, to, insert }, selection: { anchor: from + insert.length } });
+      view.focus();
     },
     focus: () => view.focus(),
     destroy: () => view.destroy(),

@@ -375,3 +375,17 @@ one overturns stays, marked as superseded.
   the reason an action could not be done is kept as its code and its
   thing's kind, and the card says it in the language of the moment, so a
   change of language needs no new run.
+- **D30 — The notebook's words come from two places by design.** Decided
+  2026-10-21 (sprint-4.md), built the same day. A member's example is its
+  docstring's, in the code, the same one the error explanations use; its
+  description is in `i18n/<lang>.json` under `notebook.<role>.<member>`,
+  so that the child reads it in their language while the code stays
+  English, and `tools/i18n_check.py` requires one for every member of
+  `kydux_world.api`'s table and refuses one for anything else. At build
+  time `pack-world.mjs` runs `python -m kydux_world.api` and writes the
+  table as `api.json`, so the page needs no Python to show it. The
+  notebook opens over the scene, beside the editor, rather than over the
+  editor as first built: over the editor, an example clicked landed where
+  the child could not see it. The editor's completion offers, after a
+  name the child's code holds and a dot, the members the level teaches of
+  it, and nothing else: Python's keywords would be noise at this age.

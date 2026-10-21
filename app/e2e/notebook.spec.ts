@@ -1,0 +1,65 @@
+import { expect, test, type Page } from '@playwright/test';
+
+test.use({ locale: 'en-US' });
+
+async function open(page: Page, id: string): Promise<void> {
+  await page.goto(`/#level/${id}`);
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+}
+
+test('the notebook lists what the level teaches, and a click puts an example in the editor', async ({
+  page,
+}) => {
+  await open(page, '01-the-corridor');
+  await page.locator('#notebook-open').click();
+  const notebook = page.locator('#notebook');
+  await expect(notebook).toBeVisible();
+  await expect(notebook.locator('h2')).toHaveText("The wizard's notebook");
+  await expect(notebook.locator('[data-example="wizard.move_right(3)"]')).toBeVisible();
+  await expect(notebook.locator('[data-example="wizard.pick_up()"]')).toHaveCount(0);
+  await expect(notebook).toContainText('Walks right, one tile per step.');
+
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+End');
+  await notebook.locator('[data-example="wizard.move_right(3)"]').click();
+  await expect(page.locator('.cm-content')).toContainText('wizard.move_right(3)');
+  await page.locator('#notebook-close').click();
+  await expect(notebook).toBeHidden();
+});
+
+test('the notebook of the locked door has the door and the key', async ({ page }) => {
+  await open(page, '02-the-locked-door');
+  await page.locator('#notebook-open').click();
+  const notebook = page.locator('#notebook');
+  await expect(notebook.locator('[data-example="door.open()"]')).toBeVisible();
+  await expect(notebook.locator('[data-example="key.position"]')).toBeVisible();
+  await expect(notebook.locator('[data-example="wizard.pick_up()"]')).toBeVisible();
+});
+
+test('after a name and a dot, the editor offers what the level teaches of it', async ({ page }) => {
+  await open(page, '02-the-locked-door');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.press('Delete');
+  await page.keyboard.type('door.');
+  const offered = page.locator('.cm-tooltip-autocomplete');
+  await expect(offered).toBeVisible();
+  await expect(offered).toContainText('open');
+  await expect(offered).toContainText('locked');
+  await expect(offered).not.toContainText('move_right');
+  await page.keyboard.type('op');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.cm-content')).toHaveText('door.open');
+});
+
+test('the notebook in Spanish', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'es-ES' });
+  const page = await context.newPage();
+  await open(page, '03-past-the-teacher');
+  await page.locator('#notebook-open').click();
+  await expect(page.locator('#notebook h2')).toHaveText('El cuaderno del mago');
+  await expect(page.locator('#notebook')).toContainText('Se queda quieto mientras el mundo sigue');
+  await expect(page.locator('#notebook [data-example="teacher.can_see(wizard)"]')).toBeVisible();
+  await context.close();
+});

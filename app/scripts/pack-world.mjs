@@ -16,6 +16,7 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -122,6 +123,21 @@ const order = existsSync(levelsDir)
   : [];
 mkdirSync(content, { recursive: true });
 writeFileSync(join(content, 'levels.json'), `${JSON.stringify(order, null, 2)}\n`);
+
+// The table of what the child can type, from the world itself (D30): the
+// notebook and the editor's completion read it, so the page needs no Python
+// to show it. The venv's Python when there is one, the PATH's otherwise, as in CI.
+const venvPython = join(repo, '.venv', 'bin', 'python');
+const python = existsSync(venvPython) ? venvPython : 'python3';
+const table = spawnSync(python, ['-m', 'kydux_world.api'], {
+  cwd: join(repo, 'world'),
+  encoding: 'utf8',
+});
+if (table.status !== 0) {
+  console.error(`pack-world: kydux_world.api failed\n${table.stderr}`);
+  process.exit(1);
+}
+writeFileSync(join(publicDir, 'api.json'), table.stdout);
 
 console.log(
   `pack-world: ${entries.length} files in public/world.zip, content/ copied, ${order.length} levels in order`,

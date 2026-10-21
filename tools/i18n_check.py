@@ -8,6 +8,8 @@ Fails, printing file:line: message for each, on:
   - a key the app uses, t('a.key'), that a language lacks;
   - a key no source uses, unless it starts with a prefix in tools/i18n_dynamic.txt
     (for keys made at run time, like `language.${lang}`);
+  - a member of kydux_world.api's table without its words in the notebook,
+    notebook.<role>.<member>, or words there for a member it does not have;
   - a level, content/levels/<id>/, without a text.<lang>.json for every language
     in i18n/, or with texts whose keys differ, or with a different number of goals
     than its level.json, or a different number of hints in each language;
@@ -99,6 +101,25 @@ def check_levels(languages: list[str]) -> list[str]:
     return findings
 
 
+def check_notebook(languages: dict[str, dict[str, str]]) -> list[str]:
+    """Every member the child may use has its words in the notebook, and nothing else
+    does (D30): notebook.<role>.<member> for each member of kydux_world.api's table."""
+    sys.path.insert(0, str(REPO / "world"))
+    from kydux_world import api
+
+    wanted = {
+        f"notebook.{role}.{member}" for role, members in api.MEMBERS.items() for member in members
+    }
+    findings = []
+    for lang, catalog in languages.items():
+        described = {key for key in catalog if key.count(".") == 2 and key.startswith("notebook.")}
+        for key in sorted(wanted - described):
+            findings.append(f"i18n/{lang}.json: lacks {key}, the notebook's words for it")
+        for key in sorted(described - wanted):
+            findings.append(f"i18n/{lang}.json: {key} describes nothing kydux_world.api has")
+    return findings
+
+
 def check() -> list[str]:
     findings = []
     languages = catalogs()
@@ -133,6 +154,7 @@ def check() -> list[str]:
                 findings.append(f"{where}: {key} is not in i18n/{lang}.json")
 
     findings.extend(check_levels(list(languages)))
+    findings.extend(check_notebook(languages))
 
     prefixes = dynamic_prefixes()
     for key in sorted(every_key - set(used)):

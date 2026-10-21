@@ -30,6 +30,7 @@ app/node_modules/
 app/dist/
 app/public/pyodide/
 app/public/world.zip
+app/public/api.json
 app/public/content/
 app/test-results/
 app/playwright-report/

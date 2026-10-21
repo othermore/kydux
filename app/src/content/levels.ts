@@ -3,6 +3,7 @@
 
 import { fallbackLanguage, type Language } from '../i18n';
 import type { LevelJson } from '../runtime/protocol';
+import type { ApiTable } from '../ui/notebook';
 
 export interface LevelText {
   title: string;
@@ -80,4 +81,10 @@ export async function loadLevelOrder(): Promise<string[]> {
 export function nextLevel(order: readonly string[], id: string): string | null {
   const index = order.indexOf(id);
   return index >= 0 && index + 1 < order.length ? (order[index + 1] ?? null) : null;
+}
+
+/** The table of what the child can type (api.json, written by pack-world from the world). */
+export async function loadApiTable(): Promise<ApiTable> {
+  const table = await json<ApiTable>(`${import.meta.env.BASE_URL}api.json`);
+  return table ?? { roles: {}, thing_roles: [] };
 }

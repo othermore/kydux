@@ -75,3 +75,46 @@ def check_api(level: "Level") -> None:
     for name in level.api:
         if not known(name):
             raise LevelError(f"{level.id}: api names {name}, which no object has")
+
+
+def table() -> dict[str, list[dict[str, str]]]:
+    """Every role's members, for the page's notebook: each one's name, whether it is an
+    action or an attribute, and its example, from its docstring. Written as api.json at
+    build time (architecture.md, D30), so that the page needs no Python to show it."""
+    from .actors import Teacher
+    from .explain import example
+    from .things import Door, Key, Thing
+    from .world import Wizard
+
+    classes = {"wizard": Wizard, "thing": Thing, "door": Door, "key": Key, "teacher": Teacher}
+    found: dict[str, list[dict[str, str]]] = {}
+    for role, members in MEMBERS.items():
+        owner = classes[role]
+        found[role] = []
+        for member in members:
+            attribute = isinstance(getattr(owner, member), property)
+            found[role].append(
+                {
+                    "name": member,
+                    "kind": "attribute" if attribute else "action",
+                    "example": _attribute_example(owner, member)
+                    if attribute
+                    else example(owner, member),
+                }
+            )
+    return found
+
+
+def _attribute_example(owner: type, member: str) -> str:
+    """An attribute's example: the last thing in backticks in its docstring that names it."""
+    import re
+
+    doc = getattr(owner, member).__doc__ or ""
+    named = [text for text in re.findall(r"`([^`]+)`", doc) if f".{member}" in text]
+    return named[-1] if named else member
+
+
+if __name__ == "__main__":
+    import json
+
+    print(json.dumps({"roles": table(), "thing_roles": list(THING_ROLES)}, indent=2))

@@ -1,5 +1,12 @@
 import { version } from '../package.json';
-import { isLevelId, LevelNotFound, loadLevel, loadLevelOrder, nextLevel } from './content/levels';
+import {
+  isLevelId,
+  LevelNotFound,
+  loadApiTable,
+  loadLevel,
+  loadLevelOrder,
+  nextLevel,
+} from './content/levels';
 import { currentLanguage, initLanguage, languages, setLanguage, t } from './i18n';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
@@ -54,15 +61,23 @@ async function showLevel(root: HTMLElement, id: string): Promise<void> {
   chrome(root, content);
   try {
     if (!isLevelId(id)) throw new LevelNotFound(id);
-    const [loaded, order, { levelScreen }, { createEditor }, { startScene }] = await Promise.all([
+    const [loaded, order, table, { levelScreen }, { createEditor }, { startScene }] = await Promise.all([
       loadLevel(id, currentLanguage()),
       loadLevelOrder(),
+      loadApiTable(),
       import('./ui/level'),
       import('./editor/editor'),
       import('./engine/scene'),
     ]);
     if (shownLevel !== id) return;
-    screen = levelScreen({ runtime, loaded, next: nextLevel(order, id), createEditor, startScene });
+    screen = levelScreen({
+      runtime,
+      loaded,
+      next: nextLevel(order, id),
+      table,
+      createEditor,
+      startScene,
+    });
     content.replaceChildren(screen.node);
     screen.mount();
   } catch (error) {

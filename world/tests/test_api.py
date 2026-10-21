@@ -38,3 +38,22 @@ def test_the_members_taught_follow_the_table():
         "move_right",
         "say",
     ]
+
+
+def test_the_table_for_the_page_has_every_member_with_its_kind_and_example():
+    found = api.table()
+    assert set(found) == set(api.MEMBERS)
+    for role, members in found.items():
+        assert [m["name"] for m in members] == list(api.MEMBERS[role])
+        for member in members:
+            assert member["kind"] in ("action", "attribute")
+            assert f".{member['name']}" in member["example"], member
+            if member["kind"] == "action":
+                assert "(" in member["example"], member
+    wizard = {m["name"]: m for m in found["wizard"]}
+    assert wizard["move_right"] == {
+        "name": "move_right",
+        "kind": "action",
+        "example": "wizard.move_right(3)",
+    }
+    assert wizard["position"]["kind"] == "attribute"

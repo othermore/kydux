@@ -335,7 +335,7 @@ languages.
 
 1. `#level/02-the-locked-door`: the key and the door show; the starting
    code walks to the key; `wizard.pick_up()` makes it vanish and
-   `wizard.items` holds it; `door.open()` before the key is picked up
+   `print(wizard.items)` shows it in the card; `door.open()` before the key is picked up
    shakes the door and the run ends with the goals not met; five lines
    (walk, pick up, walk, open, walk down) win with every goal ticked, the
    bonus among them.

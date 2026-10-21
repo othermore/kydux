@@ -28,6 +28,11 @@ test.describe('the locked door', () => {
     await expect(page.locator('.goal[data-bonus="true"]')).toContainText('Bonus:');
   });
 
+  test('what the code prints shows in the card', async ({ page }) => {
+    await cast(page, 'wizard.move_right(4)\nwizard.pick_up()\nprint(wizard.items)');
+    await expect(page.locator('.printed')).toHaveText('[<key key carried>]');
+  });
+
   test('a locked door stays shut without its key', async ({ page }) => {
     const said = await cast(page, 'wizard.move_right(6)\ndoor.open()\nwizard.move_down(2)');
     expect(said).toBe('Not yet: 0 of 3 goals met. Try again.');

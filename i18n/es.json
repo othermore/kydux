@@ -25,7 +25,8 @@
     "interrupted": "Se ha detenido el hechizo: llevaba más de {seconds} segundos sin terminar.",
     "error": "Python dice: {type}: {message} (línea {line})",
     "error_no_line": "Python dice: {type}: {message}",
-    "caught": "¡Te ha visto el profesor! Inténtalo otra vez, y fíjate hacia dónde mira."
+    "caught": "¡Te ha visto el profesor! Inténtalo otra vez, y fíjate hacia dónde mira.",
+    "printed": "Tu código ha escrito:"
   },
   "level": {
     "cast": "Lanzar",

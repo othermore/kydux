@@ -191,7 +191,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const finish = () => {
     editor.setRunningLine(null);
     if (!world) return;
-    card.show(outcomeOf(world));
+    card.show(outcomeOf(world), world.stdout);
     if (world.status === 'error') editor.setErrorLine(world.error?.line ?? null);
     showStatus(runtime.status);
   };

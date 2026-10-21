@@ -83,7 +83,8 @@ export function withCode(said: string): (string | HTMLElement)[] {
 
 export interface OutcomeCard {
   node: HTMLElement;
-  show(outcome: Outcome): void;
+  /** Says what the run came to, and what the child's code printed, if anything. */
+  show(outcome: Outcome, printed?: string): void;
   hide(): void;
   /** What the card says now, or null while it is hidden. */
   readonly current: Outcome | null;
@@ -94,14 +95,26 @@ export function outcomeCard(): OutcomeCard {
   // Python that could not start needs the page loaded again.
   const reload = element('button', { id: 'reload', type: 'button', hidden: true });
   reload.addEventListener('click', () => location.reload());
-  const node = element('section', { className: 'outcome', hidden: true }, [text, reload]);
+  const printedLabel = element('p', { className: 'printed-label' });
+  const printedText = element('pre', { className: 'printed' });
+  const printedBox = element('div', { hidden: true }, [printedLabel, printedText]);
+  const node = element('section', { className: 'outcome', hidden: true }, [
+    text,
+    printedBox,
+    reload,
+  ]);
+  let lastPrinted = '';
   node.setAttribute('role', 'status');
   let current: Outcome | null = null;
   return {
     node,
-    show(outcome) {
+    show(outcome, printed = lastPrinted) {
       current = outcome;
+      lastPrinted = printed;
       text.replaceChildren(...withCode(outcomeText(outcome)));
+      printedLabel.textContent = t('outcome.printed');
+      printedText.textContent = printed.replace(/\n$/, '');
+      printedBox.hidden = printed === '';
       reload.textContent = t('level.reload');
       reload.hidden = outcome.kind !== 'failed';
       node.dataset.kind = outcome.kind;
@@ -109,6 +122,7 @@ export function outcomeCard(): OutcomeCard {
     },
     hide() {
       current = null;
+      lastPrinted = '';
       node.hidden = true;
       delete node.dataset.kind;
     },

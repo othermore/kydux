@@ -25,7 +25,8 @@
     "interrupted": "The spell was stopped: it was running for more than {seconds} seconds.",
     "error": "Python says: {type}: {message} (line {line})",
     "error_no_line": "Python says: {type}: {message}",
-    "caught": "The teacher saw you! Try again, and watch which way they look."
+    "caught": "The teacher saw you! Try again, and watch which way they look.",
+    "printed": "Your code printed:"
   },
   "level": {
     "cast": "Cast",

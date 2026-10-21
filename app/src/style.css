@@ -262,6 +262,24 @@ footer {
   margin-top: 8px;
 }
 
+.printed-label {
+  margin: 8px 0 2px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.printed {
+  margin: 0;
+  padding: 6px 10px;
+  max-height: 8em;
+  overflow: auto;
+  border-radius: 4px;
+  background: #20232c;
+  color: #e9ecf2;
+  font: 14px/1.4 var(--mono);
+  white-space: pre-wrap;
+}
+
 .outcome code {
   padding: 0 4px;
   border-radius: 4px;

@@ -42,6 +42,21 @@ ordenador.
 
 ## Lecciones
 
+El curso se cuenta como una historia. Tu personaje, una maga o un mago,
+llega a Arvelia, un colegio de magia en un castillo antiguo, y aprende su
+magia, que se hace escribiendo Python.
+
+Cada lección explica una idea, empezando por qué es y para qué sirve. Los
+niveles que vienen después practican esa idea, y nada que no se haya
+explicado todavía.
+
+El primer capítulo, *La llegada*, ya está listo. Va desde qué es un
+programa hasta las acciones, los números, las palabras, las cosas que se
+llevan y el primer hechizo. Los capítulos siguientes traen las variables,
+lo verdadero y lo falso, las condiciones, los bucles, las listas, las
+acciones propias y, al final, los objetos propios. Llegan de capítulo en
+capítulo.
+
 ## Licencia
 
 El código, los niveles, los textos y los dibujos de Kydux son software libre:

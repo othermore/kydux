@@ -1,0 +1,6 @@
+{
+  "id": "your-first-spell",
+  "teaches": [
+    "wizard.cast"
+  ]
+}

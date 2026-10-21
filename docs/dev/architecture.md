@@ -96,7 +96,9 @@ notebook shows. A level lists in its `api` which of them it teaches
 ```python
 wizard.move_right(steps=1)   # and move_left, move_up, move_down: a tick per step;
                              # stops at a wall or a closed door
-wizard.say(text)             # a tick
+wizard.say(text)             # a tick; a door beside the wizard whose password it is opens
+wizard.cast(spell)           # a tick: with the wand carried, a spell of the level's,
+                             # where the wizard stands (D42); zelim breaks a seal beside it
 wizard.wait(ticks=1)         # a tick each: stands still while the world moves on
 wizard.pick_up()             # a tick: the thing on the wizard's tile, into wizard.items
 wizard.find_nearest(kind)    # the nearest thing or actor of a kind ("key"...), or None
@@ -109,9 +111,10 @@ wizard.items                 # the things it carries
 thing.kind, thing.name       # a key, a book, a wand, a potion, a door: by its id
 thing.position               # where it lies; None once carried
 
-door.locked, door.is_open
+door.locked, door.sealed, door.password, door.is_open
 door.open()                  # a tick: from a tile beside it (D24), with its key when
-                             # locked; else blocked
+                             # locked; else blocked, and always for a sealed door or
+                             # one with a password (D43)
 
 teacher.kind, teacher.name, teacher.position, teacher.facing
 teacher.can_see(target)      # the target straight ahead, within its sight (4 tiles by
@@ -359,8 +362,8 @@ one overturns stays, marked as superseded.
   wizard's actions, and without the thing they are refused with *You do
   not know this action yet*. A **spell** is a named piece of magic, data
   and not a method: learned by reading a book (`wizard.read(book)`, into
-  `wizard.spells`) and cast with the wand, `wizard.cast("light")` or
-  `wizard.cast("open", door)`; a spell is a string first, and may become
+  `wizard.spells`) and cast with the wand where the wizard stands,
+  `wizard.cast("zelim")` (D42); a spell is a string first, and may become
   an object when classes are taught. An **attribute** keeps Python's word:
   what an object knows about itself, `door.locked`, `wizard.position`. A
   **thing** (or item) is what the wizard can pick up and carry: a key, a

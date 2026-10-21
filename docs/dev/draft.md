@@ -84,7 +84,7 @@ A first sketch of the order of ideas, each a lesson and one or more levels:
 
 1. Calling a method on an object: `wizard.move_right()`.
 2. A sequence of instructions; arguments: `wizard.move_right(3)`.
-3. Strings as arguments: `wizard.say("Hello")`, `wizard.cast("open", door)`.
+3. Strings as arguments: `wizard.say("Hello")`, `wizard.cast("zelim")`.
 4. Variables: naming things the wizard finds, `door = wizard.find_nearest("door")`.
 5. Attributes: `door.locked`, `wizard.energy`, `potion.colour`.
 6. Loops: `while True:` and `for` over a range, then over a list.

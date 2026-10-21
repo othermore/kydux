@@ -1,0 +1,46 @@
+{
+  "id": "the-sealed-door",
+  "map": [
+    "#########",
+    "#SW..A.E#",
+    "#########"
+  ],
+  "spells": [
+    "zelim"
+  ],
+  "things": [
+    {
+      "kind": "wand",
+      "id": "wand",
+      "marker": "W"
+    },
+    {
+      "kind": "door",
+      "id": "door",
+      "marker": "A",
+      "sealed": "zelim"
+    }
+  ],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.say",
+    "wizard.pick_up",
+    "wizard.cast"
+  ],
+  "goals": [
+    {
+      "kind": "open",
+      "id": "door"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    }
+  ],
+  "tick_limit": 50,
+  "speaker": "ilda"
+}

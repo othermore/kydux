@@ -41,6 +41,20 @@ computer.
 
 ## Lessons
 
+The course is told as a story. The wizard arrives at Arvelia, a school of
+magic in an old castle, and learns its magic, which is done by writing
+Python.
+
+Each lesson explains one idea, starting from what it is and why it exists.
+The levels after it practise that idea, and nothing that has not been
+explained yet.
+
+The first chapter, *Arrival*, is ready. It goes from what a program is to
+actions, numbers, words, things to carry and the first spell. The next
+chapters bring variables, true and false, conditions, loops, lists,
+actions of your own and, last, objects of your own. They come one chapter
+at a time.
+
 ## Licence
 
 Kydux's code, levels, texts and art are free software: you can redistribute them

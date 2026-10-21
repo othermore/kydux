@@ -1,0 +1,15 @@
+{
+  "title": "El camino de entrada",
+  "goals": [
+    "Llega al vestíbulo del castillo.",
+    "Hazlo en menos de 11 líneas."
+  ],
+  "starting_code": "# La puerta escucha, la varita espera, y hay dos puertas selladas.\n",
+  "hints": [
+    "Ve puerta a puerta: ¿qué quiere cada una?",
+    "La varita está después de la puerta que escucha. Los sellos vienen luego.",
+    "Cuenta las casillas de cada tramo, para que cada uno sea una sola línea con su número."
+  ],
+  "intro": "Este es el camino de entrada al castillo. Una puerta que escucha, una varita que encontrar, y dos sellos. Todo lo que has aprendido, junto.",
+  "outro": "¡Ya estás dentro, {wizard}! Este es el castillo de Arvelia. Mañana, la biblioteca."
+}

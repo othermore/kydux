@@ -1,0 +1,13 @@
+{
+  "title": "The pedestal",
+  "goals": [
+    "Pick up your wand.",
+    "Walk on to the end of the room."
+  ],
+  "starting_code": "# The wand is on its pedestal. Walk onto it, pick it up, and walk on.\n",
+  "hints": [
+    "The wizard picks up only what lies on its own tile.",
+    "Stop on the wand's tile, then `wizard.pick_up()`, then walk on."
+  ],
+  "intro": "In Arvelia, every apprentice has a wand. Yours is on that pedestal. Pick it up: you will need it soon."
+}

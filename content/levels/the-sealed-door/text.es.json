@@ -1,0 +1,13 @@
+{
+  "title": "La puerta sellada",
+  "goals": [
+    "Rompe el sello de la puerta.",
+    "Cruza la puerta."
+  ],
+  "starting_code": "# Coge la varita, acércate hasta el lado de la puerta, y lanza el hechizo.\n",
+  "hints": [
+    "Un hechizo solo funciona donde está {el mago|la maga}: justo al lado de la puerta.",
+    "Primero la varita: sin ella, {el mago|la maga} no conoce `cast`."
+  ],
+  "intro": "Una puerta sellada. ¿Ves su runa? Solo zelim la rompe, y solo con la varita en la mano."
+}

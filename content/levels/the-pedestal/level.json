@@ -1,0 +1,36 @@
+{
+  "id": "the-pedestal",
+  "map": [
+    "#########",
+    "#S..W..E#",
+    "#########"
+  ],
+  "things": [
+    {
+      "kind": "wand",
+      "id": "wand",
+      "marker": "W"
+    }
+  ],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.say",
+    "wizard.pick_up"
+  ],
+  "goals": [
+    {
+      "kind": "collect",
+      "id": "wand"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    }
+  ],
+  "tick_limit": 50,
+  "speaker": "ilda"
+}

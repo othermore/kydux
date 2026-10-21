@@ -1,0 +1,13 @@
+{
+  "title": "The sealed door",
+  "goals": [
+    "Break the door's seal.",
+    "Walk through the door."
+  ],
+  "starting_code": "# Pick up the wand, walk up beside the door, and cast the spell.\n",
+  "hints": [
+    "A spell works only where the wizard stands: right beside the door.",
+    "The wand first: without it, the wizard does not know `cast`."
+  ],
+  "intro": "A sealed door. Can you see its rune? Only zelim breaks it, and only with the wand in hand."
+}

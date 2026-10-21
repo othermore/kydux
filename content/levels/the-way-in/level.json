@@ -1,0 +1,61 @@
+{
+  "id": "the-way-in",
+  "map": [
+    "###########",
+    "#S.G.W...##",
+    "########A##",
+    "#E.B.....##",
+    "###########"
+  ],
+  "spells": [
+    "zelim"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "gate",
+      "marker": "G",
+      "password": "ambrel"
+    },
+    {
+      "kind": "wand",
+      "id": "wand",
+      "marker": "W"
+    },
+    {
+      "kind": "door",
+      "id": "first_seal",
+      "marker": "A",
+      "sealed": "zelim"
+    },
+    {
+      "kind": "door",
+      "id": "second_seal",
+      "marker": "B",
+      "sealed": "zelim"
+    }
+  ],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.say",
+    "wizard.pick_up",
+    "wizard.cast"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "lines_under",
+      "lines": 11,
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "ilda"
+}

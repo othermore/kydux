@@ -1,0 +1,8 @@
+wizard.move_right()
+wizard.say("ambrel")
+wizard.move_right(3)
+wizard.pick_up()
+wizard.move_right(3)
+wizard.cast("zelim")
+wizard.move_down(2)
+wizard.move_left(7)

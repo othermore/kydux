@@ -132,3 +132,72 @@ test('the locked door in Spanish', async ({ browser }) => {
   );
   await context.close();
 });
+
+/** Chapter 1's levels with a program that wins each, as its solution.py does. */
+const CHAPTER_1: [string, string][] = [
+  ['the-gate', 'wizard.move_right()'],
+  ['the-corridor', 'wizard.move_right()\nwizard.move_right()\nwizard.move_down()\nwizard.move_down()'],
+  ['the-long-corridor', 'wizard.move_right(6)'],
+  ['the-stairs', 'wizard.move_up(2)\nwizard.move_right(3)\nwizard.move_up(2)\nwizard.move_right(2)'],
+  ['the-password', 'wizard.move_right(2)\nwizard.say("ambrel")\nwizard.move_right(2)'],
+  ['the-pedestal', 'wizard.move_right(3)\nwizard.pick_up()\nwizard.move_right(3)'],
+  ['the-sealed-door', 'wizard.move_right()\nwizard.pick_up()\nwizard.move_right(2)\nwizard.cast("zelim")\nwizard.move_right(3)'],
+  [
+    'the-way-in',
+    'wizard.move_right()\nwizard.say("ambrel")\nwizard.move_right(3)\nwizard.pick_up()\nwizard.move_right(3)\n' +
+      'wizard.cast("zelim")\nwizard.move_down(2)\nwizard.move_left(4)\nwizard.cast("zelim")\nwizard.move_left(3)',
+  ],
+];
+
+test.describe('chapter 1', () => {
+  for (const [id, code] of CHAPTER_1) {
+    test(`${id} is won by its solution`, async ({ page }) => {
+      await page.goto(`/#level/${id}`);
+      await page.locator('#start').click();
+      await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+      await page.locator('#speed').selectOption('4');
+      expect(await run(page, code)).toMatch(/^You did it/);
+    });
+  }
+});
+
+test.describe('the sealed door (D42, D43)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/#level/the-sealed-door');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  });
+
+  test('without the wand, the wizard does not know how to cast', async ({ page }) => {
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_right(3)\nwizard.cast("zelim")');
+    await page.locator('#run').click();
+    await expect(scene(page)).toHaveAttribute('data-thought', 'I do not know this action yet.', {
+      timeout: 15_000,
+    });
+    await expect(page.locator('.outcome-text')).toContainText('On line 2: I do not know this action yet.', {
+      timeout: 30_000,
+    });
+  });
+
+  test('the spell cast away from the door opens nothing; beside it, the door opens', async ({ page }) => {
+    await page.locator('#speed').selectOption('4');
+    await run(page, 'wizard.move_right()\nwizard.pick_up()\nwizard.cast("zelim")');
+    await expect(scene(page)).toHaveAttribute('data-doors', '');
+    await run(page, 'wizard.move_right()\nwizard.pick_up()\nwizard.move_right(2)\nwizard.cast("zelim")');
+    await expect(scene(page)).toHaveAttribute('data-doors', 'door');
+  });
+
+  test('a spell the level does not have is named in the wizard\'s thought', async ({ page }) => {
+    await run(page, 'wizard.move_right()\nwizard.pick_up()\nwizard.cast("abra")');
+    await expect(page.locator('.outcome-text')).toContainText('I do not know a spell called “abra”.');
+  });
+
+  test('the door opened by hand wants its spell', async ({ page }) => {
+    await run(page, 'wizard.move_right(3)\ndoor.open()');
+    await expect(page.locator('.outcome-text')).toContainText(
+      'I cannot open the door by hand: it is sealed, and needs a spell.',
+    );
+  });
+});

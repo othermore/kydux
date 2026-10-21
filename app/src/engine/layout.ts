@@ -43,11 +43,16 @@ export interface Layout {
   markers: [string, Tile][];
   things: ThingLayout[];
   actors: ActorLayout[];
+  /** The shelves' tiles, `=`: no one walks on them, sight passes (D46). */
+  shelves: Tile[];
+  /** The ids of the things the wizard carries from the start, each its kind (D49). */
+  carrying: string[];
 }
 
 const DEFAULT_SIGHT = 4;
 
-function towards([x, y]: Tile, [tx, ty]: Tile): Facing {
+/** The way to face to look from one tile towards another. */
+export function towards([x, y]: Tile, [tx, ty]: Tile): Facing {
   if (tx > x) return 'right';
   if (tx < x) return 'left';
   return ty > y ? 'down' : 'up';
@@ -88,10 +93,18 @@ export function layout(level: LevelJson): Layout {
     if (!tile) continue;
     const first = asTile(asList(spec.patrol)[0] ?? null);
     const facing = (spec.facing as Facing | undefined) ?? (first ? towards(tile, first) : 'down');
-    const sight = typeof spec.sight === 'number' ? spec.sight : DEFAULT_SIGHT;
+    // Only a teacher looks out for the wizard; a ghost or a cat sees nothing to catch.
+    const sight = spec.kind !== 'teacher' ? 0 : typeof spec.sight === 'number' ? spec.sight : DEFAULT_SIGHT;
     actors.push({ id: String(spec.id), kind: String(spec.kind), tile, facing, sight });
   }
   const markers = [...letters].filter(([letter]) => !used.has(letter));
+  const shelves: Tile[] = [];
+  rows.forEach((row, y) => {
+    [...row].forEach((char, x) => {
+      if (char === '=') shelves.push([x, y]);
+    });
+  });
+  const carrying = Array.isArray(level.carrying) ? level.carrying.map(String) : [];
   return {
     rows,
     width: Math.max(1, rows[0]?.length ?? 1),
@@ -100,5 +113,7 @@ export function layout(level: LevelJson): Layout {
     markers,
     things,
     actors,
+    shelves,
+    carrying,
   };
 }

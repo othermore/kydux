@@ -10,7 +10,7 @@
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
-import { type Layout, layout } from './layout';
+import { type Layout, layout, towards } from './layout';
 import { DEFAULT_LOOK, type Look } from './looks';
 import {
   actorKey,
@@ -19,6 +19,7 @@ import {
   FACINGS,
   makePlaceholders,
   markerKey,
+  SHELF,
   thingKey,
   TILE,
   TILES_KEY,
@@ -26,7 +27,7 @@ import {
   WIZARD_KEY,
 } from './placeholders';
 import { Playback } from './playback';
-import { sightTiles, type Tile } from './sight';
+import { clearOf, sightTiles, type Tile } from './sight';
 import { blockedText } from './words';
 
 /** How long one tick lasts at speed 1. */
@@ -100,7 +101,9 @@ class LevelScene extends Phaser.Scene {
     );
     // The look the wizard is drawn with, for the tests (D36).
     this.parentNode.dataset.look = this.look.id;
-    const data = this.map.rows.map((row) => [...row].map((c) => (c === '#' ? WALL : FLOOR)));
+    const data = this.map.rows.map((row) =>
+      [...row].map((c) => (c === '#' ? WALL : c === '=' ? SHELF : FLOOR)),
+    );
     const tilemap = this.make.tilemap({ data, tileWidth: TILE, tileHeight: TILE });
     const tileset = tilemap.addTilesetImage(TILES_KEY, TILES_KEY, TILE, TILE, 0, 0);
     if (tileset) tilemap.createLayer(0, tileset, 0, 0);
@@ -161,7 +164,8 @@ class LevelScene extends Phaser.Scene {
     this.clearThought();
     this.seenBy = null;
     this.openDoors.clear();
-    this.carried.clear();
+    // What the wizard holds from the start is carried at tick 0 (D49).
+    this.carried = new Set(this.map.carrying);
     for (const thing of this.map.things) {
       const image = this.things.get(thing.id);
       if (!image) continue;
@@ -201,11 +205,52 @@ class LevelScene extends Phaser.Scene {
     if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
     for (const event of events) {
       if (event.actor === 'wizard') this.showWizard(tick, event, instant);
-      // A door opened by a spell or a word is the door's own event (D43).
+      // A door opened by a spell or a word is the door's own event (D43); so is a
+      // thing a spell pulls (D47).
       else if (event.kind === 'open') this.openDoor(String(event.data.id));
+      else if (event.kind === 'pull') this.pull(event, instant);
       else this.showActor(event, instant);
     }
     this.publish();
+  }
+
+  /** A thing drawn by a spell from where it lay to the wizard's tile (D47). */
+  private pull(event: WorldEvent, instant: boolean): void {
+    const image = this.things.get(String(event.data.id));
+    const to = tileOf(event.data.to);
+    if (!image || !to) return;
+    this.tweens.killTweensOf(image);
+    const [x, y] = centre(to);
+    if (instant) image.setPosition(x, y);
+    else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });
+  }
+
+  /** A thing handed to the actor beside the wizard: it floats over and fades (D48). */
+  private give(event: WorldEvent, instant: boolean): void {
+    const id = String(event.data.id);
+    this.carried.delete(id);
+    const actor = this.actors.get(String(event.data.to));
+    const image = this.things.get(id);
+    if (actor) {
+      actor.facing = towards(actor.tile, this.wizardTile);
+      actor.sprite.setFrame(actor.facing);
+    }
+    if (!image || !actor) return;
+    this.tweens.killTweensOf(image);
+    if (instant) {
+      image.setVisible(false);
+      return;
+    }
+    image.setPosition(this.wizard.x, this.wizard.y - 16).setVisible(true).setAlpha(1);
+    const [x, y] = centre(actor.tile);
+    this.tweens.add({
+      targets: image,
+      x,
+      y: y - 10,
+      alpha: 0,
+      duration: this.playback.tickDuration * 0.9,
+      onComplete: () => image.setVisible(false).setAlpha(1),
+    });
   }
 
   private openDoor(id: string): void {
@@ -277,6 +322,9 @@ class LevelScene extends Phaser.Scene {
       case 'cast':
         if (!instant) this.flash(duration);
         break;
+      case 'give':
+        this.give(event, instant);
+        break;
       case 'blocked': {
         // The wizard thinks why; and when it did try, what would not do shakes:
         // a locked door, or the wizard with nothing to pick up (D28). From too
@@ -331,14 +379,11 @@ class LevelScene extends Phaser.Scene {
     }
   }
 
-  private isClear = ([x, y]: Tile): boolean => {
-    const row = this.map.rows[y];
-    if (!row || x < 0 || x >= row.length || row[x] === '#') return false;
-    for (const [id, tile] of this.doors) {
-      if (tile[0] === x && tile[1] === y && !this.openDoors.has(id)) return false;
-    }
-    return true;
-  };
+  /** Whether sight passes a tile: the shared rule (sight.ts), with the doors shut now. */
+  private isClear = (tile: Tile): boolean =>
+    clearOf(this.map.rows, ([x, y]) =>
+      [...this.doors].some(([id, at]) => at[0] === x && at[1] === y && !this.openDoors.has(id)),
+    )(tile);
 
   /** The attributes the tests read, and the sight cones drawn again. */
   private publish(): void {

@@ -52,6 +52,8 @@ export interface StartCardText {
   goals: { text: string; bonus?: boolean }[];
   /** What a character of the story says before the level, with the character's name. */
   said?: Said;
+  /** What the wizard carries from the start, in words (D49). */
+  carrying?: string;
 }
 
 /** A character's words on a card (D45): the name, and what they say. */
@@ -85,6 +87,7 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
       ...(text.said ? [saidBy(text.said, 'card-intro')] : []),
       element('p', {}, [t('goals.title')]),
       list,
+      ...(text.carrying ? [element('p', { id: 'card-carrying', className: 'card-carrying' }, [text.carrying])] : []),
       start,
     ],
     onClose,

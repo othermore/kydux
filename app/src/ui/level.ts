@@ -217,9 +217,18 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const speaker = typeof loaded.level.speaker === 'string' ? loaded.level.speaker : null;
   const said = (words: string | undefined) =>
     speaker && words ? { speaker: t(`characters.${speaker}`), text: words } : undefined;
+  // What the wizard holds from the start (D49), said with each thing's name.
+  const carried = Array.isArray(loaded.level.carrying) ? loaded.level.carrying.map(String) : [];
+  const carrying = () =>
+    carried.length > 0
+      ? t('level.carrying', { things: carried.map((kind) => t(`things.${kind}`)).join(', ') })
+      : undefined;
   const showStart = () =>
     showCard(
-      startCard({ title: text.title, goals: goalTexts(), said: said(text.intro) }, () => editor.focus()),
+      startCard(
+        { title: text.title, goals: goalTexts(), said: said(text.intro), carrying: carrying() },
+        () => editor.focus(),
+      ),
     );
   const showWin = (earned: number) =>
     showCard(

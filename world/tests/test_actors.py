@@ -12,14 +12,18 @@ FIXTURE = json.loads(
 )
 
 
+#: The fixture's map as a level, the wizard's start on its first floor tile.
+SIGHT_LEVEL = Level.from_dict(
+    {"id": "sight", "map": [FIXTURE["map"][0], "#S" + FIXTURE["map"][1][2:], *FIXTURE["map"][2:]]}
+)
+
+
 @pytest.mark.parametrize("case", FIXTURE["cases"], ids=lambda c: c["name"])
 def test_sight_follows_the_shared_rule(case):
-    rows = FIXTURE["map"]
     closed = {Position(*tile) for tile in case["closed"]}
 
     def clear(here):
-        inside = 0 <= here.y < len(rows) and 0 <= here.x < len(rows[0])
-        return inside and rows[here.y][here.x] != "#" and here not in closed
+        return SIGHT_LEVEL.clear(here) and here not in closed
 
     tiles = sight_tiles(clear, Position(*case["from"]), case["facing"], case["sight"])
     assert [list(t) for t in tiles] == case["tiles"]

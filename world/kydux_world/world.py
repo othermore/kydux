@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
-from .actors import Actor, Teacher, make_actor
+from .actors import Actor, Teacher, make_actor, sight_tiles
 from .goals import make_goal
 from .level import CARRIED_KINDS, Level, Position
 from .things import Child, Door, Thing, make_thing
@@ -123,9 +123,14 @@ class World:
         return {"wizard": self.wizard, **self.things, **self.actors}
 
     def is_free(self, position: Position) -> bool:
-        """Whether the wizard, an actor or a look can pass: floor, and no closed door."""
-        if not self.level.free(position):
-            return False
+        """Whether the wizard or an actor can walk onto a tile: floor, and no closed door."""
+        return self.level.free(position) and self._not_shut(position)
+
+    def is_clear(self, position: Position) -> bool:
+        """Whether sight passes a tile: floor or a shelf, and no closed door (D46)."""
+        return self.level.clear(position) and self._not_shut(position)
+
+    def _not_shut(self, position: Position) -> bool:
         door = self.door_at(position)
         return door is None or door.is_open
 
@@ -150,9 +155,7 @@ class World:
 
     def things_at(self, position: Position) -> list[Thing]:
         return [
-            t
-            for t in self.things.values()
-            if not t._k_carried and t._k_position == position and t.kind in CARRIED_KINDS
+            t for t in self.things.values() if t.position == position and t.kind in CARRIED_KINDS
         ]
 
     def ready(self) -> None:
@@ -310,9 +313,37 @@ class Wizard(Child):
             refused = {"at": here, "by": "wizard", "reason": "unknown_spell", "tried": True}
             world.act("blocked", {**refused, "spell": spell})
             return
-        door = world.door_beside(self._k_position, lambda d: d._k_seal == spell)
-        opens = (lambda: door._opened_by("spell")) if door else None
-        world.act("cast", {"spell": spell, "at": here}, then=opens)
+        effect = SPELLS[spell](world, self._k_position)
+        if effect.refused is not None:
+            refused = {"at": here, "by": "wizard", "reason": effect.refused, "tried": True}
+            world.act("blocked", {**refused, "spell": spell})
+            return
+        world.act("cast", {"spell": spell, "at": here}, then=effect.then)
+
+    def give(self, thing: Thing) -> None:
+        """Give a thing the wizard carries to whoever stands beside it: `wizard.give(book)`"""
+        if not isinstance(thing, Thing):
+            raise ActionArguments("give", "give() takes a thing the wizard carries")
+        world: World = self._k_world
+        world.ready()
+        here = self._k_position
+        if not thing._k_carried:
+            refused = {"at": list(here), "by": thing.name, "reason": "not_carried", "tried": False}
+            world.act("blocked", refused)
+            return
+        beside = [
+            actor
+            for actor in sorted(world.actors.values(), key=lambda a: a.name)
+            if abs(actor.position.x - here.x) + abs(actor.position.y - here.y) == 1
+        ]
+        if not beside:
+            world.act(
+                "blocked", {"at": list(here), "by": "wizard", "reason": "nobody", "tried": False}
+            )
+            return
+        to = beside[0]
+        thing._give(to.name)
+        world.act("give", {"id": thing.name, "to": to.name, "at": list(here)})
 
     def wait(self, ticks: int = 1) -> None:
         """Stand still while the world moves on, one tick at a time: `wizard.wait(2)`"""
@@ -358,3 +389,48 @@ class Wizard(Child):
     def has(self, kind: str) -> bool:
         """True when the wizard carries a thing of that kind: `wizard.has("key")`"""
         return any(item.kind == kind for item in self._k_world.carried())
+
+
+@dataclass(frozen=True)
+class Effect:
+    """What a spell does when cast: `then`, the change to the world in the wizard's
+    tick, or nothing; or `refused`, the reason it could not be cast here."""
+
+    then: Callable[[], None] | None = None
+    refused: str | None = None
+
+
+def _zelim(world: World, here: Position) -> Effect:
+    """Breaks the seal of a door beside the wizard; away from one it does nothing."""
+    door = world.door_beside(here, lambda d: d._k_seal == "zelim")
+    return Effect(then=(lambda: door._opened_by("spell")) if door else None)
+
+
+#: How far `fendra` reaches along each of the four ways (D47).
+FENDRA_REACH = 3
+
+
+def _fendra(world: World, here: Position) -> Effect:
+    """Draws the nearest thing in sight, three tiles at most along each way, through
+    shelves and not through walls or closed doors, onto the wizard's tile (D47)."""
+    found: list[tuple[int, int, int, Thing]] = []
+    for facing in ("up", "down", "left", "right"):
+        for tile in sight_tiles(world.is_clear, here, facing, FENDRA_REACH):
+            for thing in world.things_at(tile):
+                distance = abs(tile.x - here.x) + abs(tile.y - here.y)
+                found.append((distance, tile.y, tile.x, thing))
+    if not found:
+        return Effect(refused="nothing_near")
+    *_, thing = min(found, key=lambda f: f[:3])
+
+    def pull() -> None:
+        before = thing._k_position
+        thing._set(position=here)
+        world.note(thing.name, "pull", {"id": thing.name, "from": list(before), "to": list(here)})
+
+    return Effect(then=pull)
+
+
+#: Each spell's effect, by its name (D42); kydux_world.level.KNOWN_SPELLS lists the
+#: same names, so that a level can be checked without the world.
+SPELLS: dict[str, Callable[[World, Position], Effect]] = {"zelim": _zelim, "fendra": _fendra}

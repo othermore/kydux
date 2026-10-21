@@ -57,7 +57,8 @@
     "settings": "Settings",
     "split": "Drag to resize the scene and the editor",
     "run_key": "Run your code: Alt+R, or Ctrl+Enter in the editor",
-    "notebook_key": "Open or close the notebook: Alt+N"
+    "notebook_key": "Open or close the notebook: Alt+N",
+    "carrying": "You carry {things}."
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",
@@ -91,7 +92,10 @@
     "no_wand": "I do not know this action yet.",
     "unknown_spell": "I do not know a spell called “{spell}”.",
     "sealed": "I cannot open {thing} by hand: it is sealed, and needs a spell.",
-    "password": "I cannot open {thing} by hand: it wants a word."
+    "password": "I cannot open {thing} by hand: it wants a word.",
+    "nothing_near": "There is nothing near enough for the spell to bring.",
+    "not_carried": "I cannot give {thing}: I am not carrying it.",
+    "nobody": "There is no one beside me to give it to."
   },
   "notebook": {
     "title": "The wizard's notebook",
@@ -114,7 +118,8 @@
       "position": "Where the wizard stands, as x and y.",
       "facing": "The way the wizard looks: up, down, left or right.",
       "items": "The things the wizard carries.",
-      "cast": "Casts a spell with the wand, which the wizard must carry. The spell works where the wizard stands."
+      "cast": "Casts a spell with the wand, which the wizard must carry. The spell works where the wizard stands.",
+      "give": "Gives a thing the wizard carries to whoever stands right beside it."
     },
     "thing": {
       "kind": "What the thing is, like \"key\" or \"book\".",
@@ -142,6 +147,18 @@
       "position": "Where the teacher stands, as x and y.",
       "facing": "The way the teacher looks: up, down, left or right.",
       "can_see": "Tells whether the teacher can see something straight ahead, close enough."
+    },
+    "ghost": {
+      "kind": "What it is: \"ghost\".",
+      "name": "The ghost's name in this level.",
+      "position": "Where the ghost floats, in x and y.",
+      "facing": "The way the ghost looks: up, down, left or right."
+    },
+    "cat": {
+      "kind": "What it is: \"cat\".",
+      "name": "The cat's name in this level.",
+      "position": "Where the cat sits, in x and y.",
+      "facing": "The way the cat looks: up, down, left or right."
     }
   },
   "start": {

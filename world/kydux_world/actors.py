@@ -101,7 +101,7 @@ class Teacher(Actor):
 
     def _k_seen(self) -> list[Position]:
         world: World = self._k_world
-        return sight_tiles(world.is_free, self._k_position, self._k_facing, self._k_spec.sight)
+        return sight_tiles(world.is_clear, self._k_position, self._k_facing, self._k_spec.sight)
 
     def _step(self) -> None:
         patrol = self._k_spec.patrol
@@ -121,7 +121,21 @@ class Teacher(Actor):
         world.note(self.name, "move", {"from": list(here), "to": list(there), "facing": facing})
 
 
+class Ghost(Actor):
+    """A ghost, who stands where it is and speaks in the level's story (D48)."""
+
+    _k_role = "ghost"
+
+
+class Cat(Actor):
+    """The school's cat, who stands where it is (D48)."""
+
+    _k_role = "cat"
+
+
+#: Each actor kind's class, by the kind's name in level.json.
+ACTORS: dict[str, type[Actor]] = {"teacher": Teacher, "ghost": Ghost, "cat": Cat}
+
+
 def make_actor(world: "World", spec: ActorSpec) -> Actor:
-    if spec.kind == "teacher":
-        return Teacher(world, spec)
-    return Actor(world, spec)
+    return ACTORS[spec.kind](world, spec)

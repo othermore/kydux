@@ -7,10 +7,10 @@ at. A bonus goal (`"bonus": true`) is not needed to win.
 
 The kinds: reach (a marker's tile, or one at x and y), collect (a thing by
 id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
-say (a text, word for word), not_seen_by (an actor; failed when it
-catches the wizard), and lines_under (the code has fewer lines than that,
-not counting blank lines and comments; decided before the run). A level
-may add its own in a goals.py beside its
+say (a text, word for word), give (a thing by id, to an actor by id),
+not_seen_by (an actor; failed when it catches the wizard), and lines_under
+(the code has fewer lines than that, not counting blank lines and comments;
+decided before the run). A level may add its own in a goals.py beside its
 level.json, which says so with `"own_goals": true`: a module whose `GOALS`
 maps each kind to its class, in the same shape as these.
 """
@@ -161,11 +161,26 @@ class LinesUnderGoal:
         return code_lines(world.code) < self.lines
 
 
+class GiveGoal:
+    """Met once the wizard has given a thing to an actor (D48):
+    `{"kind": "give", "id": "book", "to": "eldra"}`."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        self.id = _thing_id(spec, level)
+        self.to = spec.params.get("to")
+        if self.to not in {a.id for a in level.actors}:
+            raise LevelError(f"{level.id}: the give goal gives to {self.to}, no actor")
+
+    def check(self, world: "World") -> bool:
+        return world.things[self.id]._k_given == self.to
+
+
 GOALS: dict[str, type] = {
     "reach": ReachGoal,
     "collect": CollectGoal,
     "open": OpenGoal,
     "say": SayGoal,
+    "give": GiveGoal,
     "not_seen_by": NotSeenByGoal,
     "lines_under": LinesUnderGoal,
 }

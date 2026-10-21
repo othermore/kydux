@@ -1,17 +1,19 @@
 """A level: its map, what is on it, what it teaches, and what it asks of the wizard.
 
-A level is read from its level.json. The map is rows of characters for now:
-`#` a wall, `.` floor, `S` where the wizard starts, and any other letter a
-floor tile that things, actors and goals may name by that letter (a marker),
-like `D` for a door. Positions are (x, y) from the top-left corner, x to the
-right and y down.
+A level is read from its level.json. The map is rows of characters: `#` a
+wall, `.` floor, `=` a shelf (no one walks on it, a thing may lie on it, and
+sight passes over it, D46), `S` where the wizard starts, and any other
+letter a floor tile that things, actors and goals may name by that letter (a
+marker), like `D` for a door. Positions are (x, y) from the top-left corner,
+x to the right and y down.
 
-Beside the map: `things` (keys, doors, books...) and `actors` (the teacher),
-each placed by a marker or at x and y, with an id the child's code knows it
-by; `api`, the names the level teaches (architecture.md, D23); `goals`, some
-of them bonus goals; and `tick_limit`. A level may come with goals of its
-own, in a goals.py beside level.json, whose source the loader passes as
-`goals_source`.
+Beside the map: `things` (keys, doors, books...) and `actors` (the teacher,
+the ghost, the cat), each placed by a marker or at x and y, with an id the
+child's code knows it by; `carrying`, the kinds of thing the wizard holds
+from the start (D49); `spells`, the spells that can be cast (D42); `api`,
+the names the level teaches (D23); `goals`, some of them bonus goals; and
+`tick_limit`. A level may come with goals of its own, in a goals.py beside
+level.json, whose source the loader passes as `goals_source`.
 """
 
 import json
@@ -32,12 +34,15 @@ class LevelError(ValueError):
     """A level definition that cannot be played."""
 
 
-WALL, FLOOR, START = "#", ".", "S"
+WALL, FLOOR, SHELF, START = "#", ".", "=", "S"
 
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
 THING_KINDS = ("key", "door", "book", "wand", "potion")
 CARRIED_KINDS = ("key", "book", "wand", "potion")
-ACTOR_KINDS = ("teacher",)
+ACTOR_KINDS = ("teacher", "ghost", "cat")
+#: The spells the world knows how to cast; a level names those it has (D42).
+#: Each has its effect in kydux_world.world.SPELLS.
+KNOWN_SPELLS = ("zelim", "fendra")
 FACINGS = ("up", "down", "left", "right")
 DEFAULT_SIGHT = 4
 
@@ -62,6 +67,8 @@ class ThingSpec:
     sealed: str | None = None
     #: For a door, the word that opens it when said beside it, or None (D43).
     password: str | None = None
+    #: Carried by the wizard from the start, with no tile of its own (D49).
+    carried: bool = False
 
 
 @dataclass(frozen=True)
@@ -81,6 +88,7 @@ class Level:
     width: int = 1
     height: int = 1
     walls: frozenset[Position] = frozenset()
+    shelves: frozenset[Position] = frozenset()
     start: Position = Position(0, 0)
     goals: tuple[GoalSpec, ...] = ()
     tick_limit: int = 1000
@@ -104,12 +112,14 @@ class Level:
         if width == 0 or any(len(row) != width for row in rows):
             raise LevelError(f"{level_id}: the map's rows must all be as long as the first")
 
-        walls, starts, markers = set(), [], {}
+        walls, shelves, starts, markers = set(), set(), [], {}
         for y, row in enumerate(rows):
             for x, char in enumerate(row):
                 here = Position(x, y)
                 if char == WALL:
                     walls.add(here)
+                elif char == SHELF:
+                    shelves.add(here)
                 elif char == START:
                     starts.append(here)
                 elif char == FLOOR:
@@ -123,8 +133,9 @@ class Level:
         if len(starts) != 1:
             raise LevelError(f"{level_id}: the map needs exactly one S, and has {len(starts)}")
 
-        shape = _Shape(level_id, width, len(rows), frozenset(walls), markers)
+        shape = _Shape(level_id, width, len(rows), frozenset(walls), frozenset(shelves), markers)
         things = tuple(_thing(shape, spec) for spec in _list(data, "things", level_id))
+        things += _carrying(data, level_id, starts[0])
         actors = tuple(_actor(shape, spec) for spec in _list(data, "actors", level_id))
         _check_ids(level_id, things, actors)
         doors = {t.id for t in things if t.kind == "door"}
@@ -157,6 +168,9 @@ class Level:
             isinstance(spell, str) and spell.isalpha() and spell.islower() for spell in spells
         ):
             raise LevelError(f"{level_id}: spells must be a list of words in small letters")
+        for spell in spells:
+            if spell not in KNOWN_SPELLS:
+                raise LevelError(f"{level_id}: {spell} is not a spell the world knows")
         for thing in things:
             if thing.sealed is not None and thing.sealed not in spells:
                 raise LevelError(
@@ -178,6 +192,7 @@ class Level:
             width=width,
             height=len(rows),
             walls=frozenset(walls),
+            shelves=frozenset(shelves),
             start=starts[0],
             goals=tuple(goals),
             tick_limit=tick_limit,
@@ -211,7 +226,12 @@ class Level:
         return 0 <= position.x < self.width and 0 <= position.y < self.height
 
     def free(self, position: Position) -> bool:
-        """Inside the map and not a wall; doors are the world's to say."""
+        """Inside the map, and neither a wall nor a shelf: a tile to walk on. Doors are
+        the world's to say."""
+        return self.clear(position) and position not in self.shelves
+
+    def clear(self, position: Position) -> bool:
+        """Inside the map and not a wall: a tile sight passes, shelves too (D46)."""
         return self.inside(position) and position not in self.walls
 
     def ids(self) -> list[str]:
@@ -225,9 +245,17 @@ class _Shape:
     width: int
     height: int
     walls: frozenset[Position]
+    shelves: frozenset[Position]
     markers: dict[str, Position]
 
-    def place(self, spec: dict[str, Any], what: str) -> Position:
+    def place(self, spec: dict[str, Any], what: str, walks: bool = False) -> Position:
+        """Where a thing lies, or, with `walks`, where an actor stands: not on a shelf."""
+        here = self._place(spec, what)
+        if walks and here in self.shelves:
+            raise LevelError(f"{self.level_id}: {what} cannot stand on a shelf")
+        return here
+
+    def _place(self, spec: dict[str, Any], what: str) -> Position:
         if "marker" in spec:
             marker = spec["marker"]
             if marker not in self.markers:
@@ -295,7 +323,7 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
     if kind not in ACTOR_KINDS:
         raise LevelError(f"{shape.level_id}: there is no actor of kind {kind}")
     actor_id = _identifier(shape.level_id, spec.get("id"), f"a {kind}")
-    position = shape.place(spec, actor_id)
+    position = shape.place(spec, actor_id, walks=True)
     waypoints = spec.get("patrol", [])
     if not isinstance(waypoints, list):
         raise LevelError(f"{shape.level_id}: {actor_id}'s patrol must be a list of [x, y]")
@@ -308,8 +336,10 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
         dy = (there.y > here.y) - (there.y < here.y)
         while here != there:
             here = Position(here.x + dx, here.y + dy)
-            if here in shape.walls:
-                raise LevelError(f"{shape.level_id}: {actor_id}'s patrol walks through a wall")
+            if here in shape.walls or here in shape.shelves:
+                raise LevelError(
+                    f"{shape.level_id}: {actor_id}'s patrol walks through a wall or a shelf"
+                )
             path.append(here)
     facing = spec.get("facing")
     if facing is None:
@@ -321,6 +351,17 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
         raise LevelError(f"{shape.level_id}: {actor_id}'s sight must be a whole number, 1 or more")
     patrol = tuple(path) if len(path) > 1 else ()
     return ActorSpec(kind, actor_id, position, facing, patrol, sight)
+
+
+def _carrying(data: dict[str, Any], level_id: str, start: Position) -> tuple[ThingSpec, ...]:
+    """The things the wizard holds from the start (D49): one of each kind named, its id
+    the kind's name, with no tile of its own."""
+    kinds = data.get("carrying", [])
+    if not isinstance(kinds, list) or not all(kind in CARRIED_KINDS for kind in kinds):
+        raise LevelError(f"{level_id}: carrying lists kinds of thing the wizard can carry")
+    if len(set(kinds)) != len(kinds):
+        raise LevelError(f"{level_id}: carrying names a kind twice")
+    return tuple(ThingSpec(kind, kind, start, carried=True) for kind in kinds)
 
 
 def _towards(here: Position, there: Position) -> str:

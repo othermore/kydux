@@ -24,6 +24,12 @@ export function blockedText(reason: string, kind: string | null, spell = ''): st
       return t('blocked.sealed', { thing });
     case 'password':
       return t('blocked.password', { thing });
+    case 'nothing_near':
+      return t('blocked.nothing_near');
+    case 'not_carried':
+      return t('blocked.not_carried', { thing });
+    case 'nobody':
+      return t('blocked.nobody');
     case 'far':
       return t('blocked.far', { thing });
     case 'locked':

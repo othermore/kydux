@@ -57,7 +57,8 @@
     "settings": "Ajustes",
     "split": "Arrastra para cambiar el tamaño de la escena y del editor",
     "run_key": "Ejecuta tu código: Alt+R, o Ctrl+Intro en el editor",
-    "notebook_key": "Abre o cierra el cuaderno: Alt+N"
+    "notebook_key": "Abre o cierra el cuaderno: Alt+N",
+    "carrying": "Llevas {things}."
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",
@@ -91,7 +92,10 @@
     "no_wand": "Todavía no conozco esta acción.",
     "unknown_spell": "No conozco ningún hechizo que se llame «{spell}».",
     "sealed": "No puedo abrir {thing} con la mano: está sellada, y necesita un hechizo.",
-    "password": "No puedo abrir {thing} con la mano: quiere una palabra."
+    "password": "No puedo abrir {thing} con la mano: quiere una palabra.",
+    "nothing_near": "No hay nada lo bastante cerca para que el hechizo lo traiga.",
+    "not_carried": "No puedo dar {thing}: no está entre lo que llevo.",
+    "nobody": "No hay nadie a mi lado para dárselo."
   },
   "notebook": {
     "title": "El cuaderno {del mago|de la maga}",
@@ -114,7 +118,8 @@
       "position": "Dónde está {el mago|la maga}, en x e y.",
       "facing": "Hacia dónde mira {el mago|la maga}: up, down, left o right.",
       "items": "Las cosas que lleva {el mago|la maga}.",
-      "cast": "Lanza un hechizo con la varita, que {el mago|la maga} tiene que llevar. El hechizo funciona donde está."
+      "cast": "Lanza un hechizo con la varita, que {el mago|la maga} tiene que llevar. El hechizo funciona donde está.",
+      "give": "Le da una cosa que lleva a quien esté justo a su lado."
     },
     "thing": {
       "kind": "Qué es la cosa, como \"key\" o \"book\".",
@@ -142,6 +147,18 @@
       "position": "Dónde está el profesor, en x e y.",
       "facing": "Hacia dónde mira el profesor: up, down, left o right.",
       "can_see": "Dice si el profesor puede ver algo que tiene delante, lo bastante cerca."
+    },
+    "ghost": {
+      "kind": "Lo que es: \"ghost\".",
+      "name": "El nombre del fantasma en este nivel.",
+      "position": "Dónde flota el fantasma, en x e y.",
+      "facing": "Hacia dónde mira el fantasma: up, down, left o right."
+    },
+    "cat": {
+      "kind": "Lo que es: \"cat\".",
+      "name": "El nombre del gato en este nivel.",
+      "position": "Dónde está sentado el gato, en x e y.",
+      "facing": "Hacia dónde mira el gato: up, down, left o right."
     }
   },
   "start": {

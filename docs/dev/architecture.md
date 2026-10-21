@@ -106,7 +106,9 @@ wizard.find_all(kind)        # all of them, nearest first, then in reading order
 wizard.has(kind)             # whether it carries one of that kind
 wizard.position              # Position(x, y), which compares as a tuple
 wizard.facing                # "up", "down", "left" or "right"
-wizard.items                 # the things it carries
+wizard.items                 # the things it carries, from the start those of the
+                             # level's carrying (D49)
+wizard.give(thing)           # a tick: a thing it carries, to the actor beside it (D48)
 
 thing.kind, thing.name       # a key, a book, a wand, a potion, a door: by its id
 thing.position               # where it lies; None once carried
@@ -118,8 +120,14 @@ door.open()                  # a tick: from a tile beside it (D24), with its key
 
 teacher.kind, teacher.name, teacher.position, teacher.facing
 teacher.can_see(target)      # the target straight ahead, within its sight (4 tiles by
-                             # default), with no wall or closed door in between
+                             # default), with no wall or closed door in between; it sees
+                             # over a shelf (D46)
+
+ghost.kind, ghost.name, ghost.position, ghost.facing    # and cat.*: they stand (D48)
 ```
+
+The map's characters: `#` a wall, `.` floor, `=` a shelf (D46), `S` the
+wizard's start, any other letter a floor tile named by it (a marker).
 
 The child's code holds `wizard` and every thing and actor of the level by
 its id. Everything it holds is read-only to it (D20). Its errors are
@@ -142,7 +150,9 @@ tiles are `[x, y]`.
 | `pick_up` | wizard | `id`, `at` | the thing rises and vanishes; `data-carried` |
 | `open` | wizard, by `door.open()`; or the door, in the wizard's tick, opened by a spell or a word | `id`, `at`, `by`: `hand`, `spell` or `word` | the door's frame turns open; `data-doors` |
 | `cast` | wizard | `spell`, `at` | a ring of light grows from the wizard and fades |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand` or `unknown_spell` (with `spell`); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
+| `pull` | the thing, in the wizard's tick | `id`, `from`, `to` | the thing slides to the wizard's tile (D47) |
+| `give` | wizard | `id`, `to`, `at` | the thing floats from the wizard to the actor and fades; the actor faces the wizard (D48) |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (with `spell`), `not_carried` or `nobody`; `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
 
@@ -631,3 +641,50 @@ one overturns stays, marked as superseded.
   has a speaker (`world/tests/test_levels_content.py`); a speaker is a
   character of the story (`tests/project/test_story.py`) with a name in
   every language (`tools/i18n_check.py`).
+- **D46 — A shelf is a tile that stops feet, not eyes.** Decided
+  2026-10-21 (sprint-8.md), built the same day. The map character `=` is a
+  shelf: a bookcase, a table, a gap. No one walks onto it (`Level.free`),
+  sight passes over it (`Level.clear`, the world's `is_clear`, the page's
+  `clearOf`), and a thing may lie on it, placed with `"at"` since a
+  marker letter makes its tile floor; an actor may not stand on one, nor
+  patrol across it. `pick_up` takes only what lies on the wizard's own
+  tile, so a thing on a shelf comes down only by a spell. Both sides'
+  sight is tested with their own rule on `tests/fixtures/sight.json`,
+  which holds shelves.
+- **D47 — `fendra` pulls the nearest thing the wizard can see.** Decided
+  2026-10-21 (sprint-8.md), built the same day. Cast with the wand,
+  `fendra` looks along the four ways from the wizard's tile, up to three
+  tiles each (`FENDRA_REACH`), through shelves and not through walls or
+  closed doors, and moves the nearest thing that can be carried onto the
+  wizard's tile: nearest by distance, then by reading order, as
+  `find_nearest` chooses. The thing's `pull` event comes in the wizard's
+  tick, the thing's own, as a door's `open` by a spell is (D43). With
+  nothing to pull the cast is refused, `nothing_near`, and the wizard
+  shakes, having tried. The wizard then picks the thing up: a spell moves
+  the world, the hands carry. A spell's effect is looked up by name in
+  `SPELLS` (`world.py`), a function from the world and the wizard's tile
+  to an `Effect`, the change to make in the tick or the reason to refuse;
+  `level.KNOWN_SPELLS` names the same spells, so that a level naming a
+  spell the world cannot cast is refused when it loads.
+- **D48 — Actors who stand and speak, and giving.** Decided 2026-10-21
+  (sprint-8.md), built the same day. The actor kinds are `teacher`,
+  `ghost` and `cat`, each a class in `actors.ACTORS`; a ghost or a cat
+  stands where it is put, faces one way, catches no one, and has no sight
+  cone in the scene. The wizard walks through a ghost's tile and a cat's:
+  no level asks otherwise yet. `wizard.give(thing)` hands a thing the
+  wizard carries to the actor on a tile beside it, the first by id: a
+  `give` event, and the thing is gone from the map and from
+  `wizard.items` (`position` None, `find_nearest` passes it by). It is
+  refused with `not_carried` for a thing not carried, and with `nobody`
+  when no actor is beside; `far` would say *I cannot reach the thing*,
+  which is not what goes wrong. `give` takes the thing
+  as an object, so that a variable holding what `find_nearest` gave back
+  is what is given. The goal `give` (`id`, `to`) is met once that thing
+  has been given to that actor.
+- **D49 — A level may hand the wizard things from the start.** Decided
+  2026-10-21 (sprint-8.md), built the same day. `"carrying": ["wand"]` in
+  `level.json` lists kinds of thing the wizard holds at tick 0, each once,
+  each a thing whose id is its kind, with no tile; the start card says so
+  (`level.carrying`), and the scene counts them carried from tick 0. The
+  world keeps nothing between levels: each level says what is carried, so
+  that any level can be played on its own.

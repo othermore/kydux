@@ -20,4 +20,16 @@ describe('layout', () => {
       ['d', 'word'],
     ]);
   });
+
+  it('lists the shelves, what is carried, and gives only a teacher sight (D46, D48, D49)', () => {
+    const map = layout({
+      id: 'library',
+      map: ['######', '#S=.G#', '######'],
+      carrying: ['wand'],
+      actors: [{ kind: 'ghost', id: 'eldra', marker: 'G' }],
+    });
+    expect(map.shelves).toEqual([[2, 1]]);
+    expect(map.carrying).toEqual(['wand']);
+    expect(map.actors[0]?.sight).toBe(0);
+  });
 });

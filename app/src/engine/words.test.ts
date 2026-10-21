@@ -36,4 +36,12 @@ describe('blockedText', () => {
       'No puedo abrir la puerta con la mano: quiere una palabra.',
     );
   });
+
+  it('says why a pull or a gift would not do (D47, D48)', () => {
+    initLanguage(english);
+    expect(blockedText('nothing_near', null)).toBe('There is nothing near enough for the spell to bring.');
+    expect(blockedText('not_carried', 'book')).toBe('I cannot give the book: I am not carrying it.');
+    initLanguage(spanish);
+    expect(blockedText('nobody', null)).toBe('No hay nadie a mi lado para dárselo.');
+  });
 });

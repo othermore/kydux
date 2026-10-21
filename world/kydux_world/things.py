@@ -62,14 +62,20 @@ class Thing(Child):
     _k_role = "thing"
 
     def __init__(self, world: "World", spec: ThingSpec) -> None:
-        self._set(world=world, spec=spec, position=spec.position, carried=False)
+        # `given`: the id of the actor the wizard gave the thing to, or None (D48).
+        self._set(world=world, spec=spec, position=spec.position, carried=spec.carried, given=None)
 
     @property
     def _k_child_name(self) -> str:
         return self._k_spec.id
 
     def __repr__(self) -> str:
-        where = "carried" if self._k_carried else f"at {self._k_position.x}, {self._k_position.y}"
+        if self._k_given is not None:
+            where = f"given to {self._k_given}"
+        elif self._k_carried:
+            where = "carried"
+        else:
+            where = f"at {self._k_position.x}, {self._k_position.y}"
         return f"<{self._k_spec.kind} {self._k_spec.id} {where}>"
 
     @property
@@ -85,10 +91,13 @@ class Thing(Child):
     @property
     def position(self) -> Position | None:
         """Where the thing lies, as x and y, or None once the wizard carries it: `key.position`"""
-        return None if self._k_carried else self._k_position
+        return None if self._k_carried or self._k_given is not None else self._k_position
 
     def _carry(self) -> None:
         self._set(carried=True)
+
+    def _give(self, to: str) -> None:
+        self._set(carried=False, given=to)
 
 
 class Key(Thing):

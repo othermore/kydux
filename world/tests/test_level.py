@@ -151,7 +151,7 @@ def _with(**change):
             ),
             "two things or actors",
         ),
-        (_with(actors=[{"kind": "ghost", "id": "g", "at": [2, 1]}]), "no actor of kind ghost"),
+        (_with(actors=[{"kind": "dragon", "id": "g", "at": [2, 1]}]), "no actor of kind dragon"),
         (
             _with(actors=[{"kind": "teacher", "id": "t", "marker": "T", "patrol": [[4, 1]]}]),
             "straight lines",

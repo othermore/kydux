@@ -18,6 +18,7 @@ export type Facing = (typeof FACINGS)[number];
 /** The tile indexes in the tiles texture, in the order they are drawn. */
 export const FLOOR = 0;
 export const WALL = 1;
+export const SHELF = 2;
 
 /** One colour per marker letter, in the order the letters first appear. */
 const MARKER_COLOURS = ['#e8a33d', '#4cb5ae', '#c65d9a', '#7aa04a', '#5b7bd6', '#d0623f'];
@@ -57,6 +58,20 @@ function drawFloor(ctx: CanvasRenderingContext2D, x: number): void {
   ctx.strokeStyle = '#6f717b';
   ctx.lineWidth = 1;
   ctx.strokeRect(x + 0.5, 0.5, TILE - 1, TILE - 1);
+}
+
+/** A shelf seen from above: a wooden case with books' backs in a row (D46). */
+function drawShelf(ctx: CanvasRenderingContext2D, x: number): void {
+  drawFloor(ctx, x);
+  ctx.fillStyle = '#6b4226';
+  ctx.fillRect(x + 3, 10, TILE - 6, TILE - 20);
+  ctx.fillStyle = '#8a5a35';
+  ctx.fillRect(x + 5, 12, TILE - 10, TILE - 24);
+  const backs = ['#c0392b', '#2b6cb0', '#2f855a', '#b7791f', '#6b46c1'];
+  backs.forEach((colour, index) => {
+    ctx.fillStyle = colour;
+    ctx.fillRect(x + 7 + index * 7, 14, 5, TILE - 28);
+  });
 }
 
 function drawWall(ctx: CanvasRenderingContext2D, x: number): void {
@@ -108,6 +123,48 @@ const TEACHER: Figure = {
   hairStyle: 'short',
   skin: '#f2c9a0',
 };
+
+const GHOST: Figure = {
+  robe: '#dfe7f2',
+  hat: null,
+  hair: '#c3cfe0',
+  hairStyle: 'short',
+  skin: '#eef3fa',
+};
+
+/** The cat, facing one way: a body, a head with ears, a tail. */
+function drawCat(ctx: CanvasRenderingContext2D, x: number, facing: Facing): void {
+  const cx = x + WIZARD_WIDTH / 2;
+  const side = facing === 'left' ? -1 : 1;
+  ctx.fillStyle = '#3a3a44';
+  ctx.beginPath();
+  ctx.ellipse(cx, 34, 10, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  const head = facing === 'left' || facing === 'right' ? cx + side * 9 : cx;
+  const headY = facing === 'up' ? 27 : 29;
+  ctx.beginPath();
+  ctx.arc(head, headY, 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(head - 5, headY - 3);
+  ctx.lineTo(head - 3, headY - 9);
+  ctx.lineTo(head - 1, headY - 4);
+  ctx.moveTo(head + 5, headY - 3);
+  ctx.lineTo(head + 3, headY - 9);
+  ctx.lineTo(head + 1, headY - 4);
+  ctx.fill();
+  ctx.strokeStyle = '#3a3a44';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(cx - side * 9, 34);
+  ctx.quadraticCurveTo(cx - side * 16, 30, cx - side * 13, 22);
+  ctx.stroke();
+  if (facing !== 'up') {
+    ctx.fillStyle = '#ffd43b';
+    ctx.fillRect(head - 3, headY - 1, 2, 2);
+    ctx.fillRect(head + 1, headY - 1, 2, 2);
+  }
+}
 
 function wizardFigure(look: Look): Figure {
   return {
@@ -319,9 +376,10 @@ export function makePlaceholders(
   markers: string[],
   look: Look = DEFAULT_LOOK,
 ): void {
-  const tiles = canvas(scene, TILES_KEY, TILE * 2, TILE);
+  const tiles = canvas(scene, TILES_KEY, TILE * 3, TILE);
   drawFloor(tiles.ctx, FLOOR * TILE);
   drawWall(tiles.ctx, WALL * TILE);
+  drawShelf(tiles.ctx, SHELF * TILE);
   tiles.texture.refresh();
 
   markers.forEach((letter, index) => {
@@ -343,6 +401,21 @@ export function makePlaceholders(
     teacher.texture.add(facing, 0, index * WIZARD_WIDTH, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
   });
   teacher.texture.refresh();
+
+  // The ghost: a pale figure, half seen through; the cat: small, on all fours.
+  const ghost = canvas(scene, actorKey('ghost'), WIZARD_WIDTH * FACINGS.length, WIZARD_HEIGHT);
+  ghost.ctx.globalAlpha = 0.7;
+  FACINGS.forEach((facing, index) => {
+    drawFigure(ghost.ctx, index * WIZARD_WIDTH, facing, GHOST);
+    ghost.texture.add(facing, 0, index * WIZARD_WIDTH, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
+  });
+  ghost.texture.refresh();
+  const cat = canvas(scene, actorKey('cat'), WIZARD_WIDTH * FACINGS.length, WIZARD_HEIGHT);
+  FACINGS.forEach((facing, index) => {
+    drawCat(cat.ctx, index * WIZARD_WIDTH, facing);
+    cat.texture.add(facing, 0, index * WIZARD_WIDTH, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
+  });
+  cat.texture.refresh();
 
   const door = canvas(scene, thingKey('door'), TILE * (DOOR_LOCKS.length + 1), TILE);
   DOOR_LOCKS.forEach((lock, index) => {

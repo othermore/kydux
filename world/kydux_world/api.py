@@ -3,7 +3,7 @@
 A level lists in `api` the names it uses, as `role.member` (D23):
 `wizard.move_right`, `door.open`, `thing.position`. A role is what an object
 is to the child: `wizard`; a thing's kind when it has members of its own
-(`door`), or `thing`; an actor's kind (`teacher`). A door is a thing too, so
+(`door`), or `thing`; an actor's kind (`teacher`, `ghost`, `cat`). A door is a thing too, so
 `thing.position` covers a door's position; so does a key's.
 
 The table here is the one list of what the child can type. It is plain data,
@@ -31,6 +31,7 @@ MEMBERS: dict[str, tuple[str, ...]] = {
         "find_nearest",
         "find_all",
         "has",
+        "give",
         "cast",
         "position",
         "facing",
@@ -40,6 +41,8 @@ MEMBERS: dict[str, tuple[str, ...]] = {
     "door": (*THING_MEMBERS, "locked", "sealed", "password", "is_open", "open"),
     "key": THING_MEMBERS,
     "teacher": ("kind", "name", "position", "facing", "can_see"),
+    "ghost": ("kind", "name", "position", "facing"),
+    "cat": ("kind", "name", "position", "facing"),
 }
 
 #: The roles that are things, and so have a thing's members.
@@ -82,12 +85,12 @@ def table() -> dict[str, list[dict[str, str]]]:
     """Every role's members, for the page's notebook: each one's name, whether it is an
     action or an attribute, and its example, from its docstring. Written as api.json at
     build time (architecture.md, D30), so that the page needs no Python to show it."""
-    from .actors import Teacher
+    from .actors import ACTORS
     from .explain import example
     from .things import Door, Key, Thing
     from .world import Wizard
 
-    classes = {"wizard": Wizard, "thing": Thing, "door": Door, "key": Key, "teacher": Teacher}
+    classes = {"wizard": Wizard, "thing": Thing, "door": Door, "key": Key, **ACTORS}
     found: dict[str, list[dict[str, str]]] = {}
     for role, members in MEMBERS.items():
         owner = classes[role]

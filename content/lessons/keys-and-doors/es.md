@@ -3,7 +3,7 @@
 La mayoría de las puertas se abren con la mano.
 Algunas están cerradas con llave, y solo se abren con su llave.
 
-Así que {el mago|la maga} necesita primero la llave, encima.
+Así que {el mago|la maga} tiene que llevar primero la llave.
 Luego se pone al lado de la puerta, y la abre.
 
 ---

@@ -2,9 +2,9 @@
 (D48), and what the wizard carries from the start (D49)."""
 
 import pytest
-from kydux_world.level import Level, LevelError, Position
+from kydux_world.level import KNOWN_SPELLS, Level, LevelError, Position
 from kydux_world.run import check_consistency, run_code
-from kydux_world.world import World
+from kydux_world.world import SPELLS, World
 
 #: The wizard below a shelf with a book on it; a wall with a book behind it to
 #: the right; Eldra at the end of the corridor.
@@ -152,3 +152,9 @@ def test_a_give_goal_names_an_actor_of_the_level():
     level = Level.from_dict({**GIVING, "goals": [{"kind": "give", "id": "book", "to": "nobody"}]})
     with pytest.raises(LevelError, match="gives to nobody"):
         World(level)
+
+
+def test_the_spells_a_level_may_name_are_the_spells_the_world_casts():
+    """level.KNOWN_SPELLS and world.SPELLS are two lists of the same names: the loader
+    checks a level without the world, and the world casts; neither may drift."""
+    assert set(KNOWN_SPELLS) == set(SPELLS)

@@ -3,7 +3,7 @@
 // block marked `python try` on the last page is the lesson's Try it, which goes
 // into the next level's editor, and is not shown as a page's code.
 
-import { fallbackLanguage, type Language } from '../i18n';
+import { fallbackLanguage, forWizard, type Language } from '../i18n';
 
 export interface Lesson {
   id: string;
@@ -60,5 +60,6 @@ export async function loadLesson(id: string, lang: Language): Promise<Lesson> {
     (await fetched(lessonUrl(id, `${fallbackLanguage}.md`), 'text'));
   if (markdown === null) throw new LessonNotFound(id);
   const { teaches } = JSON.parse(about) as { teaches?: string[] };
-  return { id, teaches: teaches ?? [], ...readLesson(markdown) };
+  // The wizard's words go in before the pages are cut (D37).
+  return { id, teaches: teaches ?? [], ...readLesson(forWizard(markdown)) };
 }

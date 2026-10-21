@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { detectLanguage, initLanguage, languages, setLanguage, t, type Environment } from '.';
+import { detectLanguage, initLanguage, languages, setLanguage, speakOf, t, type Environment } from '.';
 
 function env(browser: string[], saved: string | null = null): Environment {
   const store = new Map<string, string>(saved ? [['kydux.language', saved]] : []);
@@ -12,7 +12,10 @@ function env(browser: string[], saved: string | null = null): Environment {
   };
 }
 
-afterEach(() => initLanguage(env(['en'])));
+afterEach(() => {
+  initLanguage(env(['en']));
+  speakOf(null);
+});
 
 describe('languages', () => {
   it('are the files in i18n/', () => {
@@ -83,5 +86,26 @@ describe('t', () => {
     setLanguage('es', e);
     expect(e.storage?.getItem('kydux.language')).toBe('es');
     expect(t('language.en')).toBe('English');
+  });
+});
+
+describe('t, for the wizard (D37)', () => {
+  it('speaks of a girl as a girl, and of a boy as a boy', () => {
+    initLanguage(env(['es']));
+    speakOf({ name: 'Marta', gender: 'girl' });
+    expect(t('notebook.title')).toBe('El cuaderno de la maga');
+    expect(t('outcome.too_many_ticks', { limit: 9 })).toContain('la maga está agotada');
+    speakOf({ name: 'Pablo', gender: 'boy' });
+    expect(t('outcome.too_many_ticks', { limit: 9 })).toContain('el mago está agotado');
+  });
+
+  it('takes the first side with no wizard', () => {
+    initLanguage(env(['es']));
+    expect(t('notebook.title')).toBe('El cuaderno del mago');
+  });
+
+  it('never reads a parameter for a choice', () => {
+    speakOf({ name: 'Marta', gender: 'girl' });
+    expect(t('error.unknown_name', { name: '{a|b}' })).toContain('`{a|b}`');
   });
 });

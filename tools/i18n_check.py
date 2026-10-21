@@ -14,6 +14,9 @@ Fails, printing file:line: message for each, on:
   - a level, content/levels/<id>/, without a text.<lang>.json for every language
     in i18n/, or with texts whose keys differ, or with a different number of goals
     than its level.json, or a different number of hints in each language;
+  - a choice for the wizard, {boy's words|girl's words}, with other than one bar,
+    in any text for the player; and in Spanish, `mago` or `maga` outside a choice,
+    so that no text speaks of a girl as a boy by oversight (D37);
   - a string literal in the app's code that reads like words for a person (words
     separated by spaces, with a capitalised word or a sentence's final stop),
     which must come from t() instead. A line marked `// i18n-ignore` is left alone, and
@@ -119,6 +122,53 @@ def check_chapters(languages: list[str]) -> list[str]:
     return findings
 
 
+#: Braces holding a bar: a choice for the wizard, well made or not.
+BRACED_BAR = re.compile(r"\{[^{}\n]*\|[^{}\n]*\}")
+#: The words for the wizard that Spanish genders; they belong inside a choice.
+GENDERED = {"es": re.compile(r"\bmag[oa]\b", re.IGNORECASE)}
+
+
+def strings(value) -> list[str]:
+    """Every string in a JSON value, however deep."""
+    if isinstance(value, str):
+        return [value]
+    items = value.values() if isinstance(value, dict) else value if isinstance(value, list) else []
+    return [text for item in items for text in strings(item)]
+
+
+def player_texts(languages: dict[str, dict[str, str]]) -> list[tuple[str, str, str]]:
+    """Every text for the player, as (language, where, text): the app's words, the
+    levels', the chapters' and the lessons'."""
+    texts = []
+    for lang, catalog in languages.items():
+        texts.extend((lang, f"i18n/{lang}.json: {key}", text) for key, text in catalog.items())
+    content = REPO / "content"
+    for path in sorted(content.glob("*/*/text.*.json")):
+        lang = path.name.split(".")[1]
+        where = path.relative_to(REPO).as_posix()
+        found = strings(json.loads(path.read_text(encoding="utf-8")))
+        texts.extend((lang, where, text) for text in found)
+    for path in sorted(content.glob("lessons/*/*.md")):
+        where = path.relative_to(REPO).as_posix()
+        texts.append((path.stem, where, path.read_text(encoding="utf-8")))
+    return texts
+
+
+def check_choices(languages: dict[str, dict[str, str]]) -> list[str]:
+    """The choices for the wizard are well made, and Spanish genders the wizard only
+    inside one (D37)."""
+    findings = []
+    for lang, where, text in player_texts(languages):
+        for braced in BRACED_BAR.findall(text):
+            if braced.count("|") != 1:
+                findings.append(f"{where}: {braced!r} is a choice with other than two sides")
+        gendered = GENDERED.get(lang)
+        if gendered:
+            for word in gendered.findall(BRACED_BAR.sub("", text)):
+                findings.append(f"{where}: {word!r} outside a choice; write {{el mago|la maga}}")
+    return findings
+
+
 def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
     """The words the page has for what the world defines, held to the world itself:
     notebook.<role>.<member> for every member of kydux_world.api's table (D30), and
@@ -181,6 +231,7 @@ def check() -> list[str]:
     findings.extend(check_levels(list(languages)))
     findings.extend(check_chapters(list(languages)))
     findings.extend(check_world_words(languages))
+    findings.extend(check_choices(languages))
 
     prefixes = dynamic_prefixes()
     for key in sorted(every_key - set(used)):

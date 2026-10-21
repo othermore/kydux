@@ -1,6 +1,6 @@
 # Your first action
 
-Welcome to the school! I am your teacher.
+Welcome to the school, {wizard}! I am your teacher.
 
 Here, you make the wizard move by writing Python.
 Python is a language that computers understand.

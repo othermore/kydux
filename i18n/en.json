@@ -170,5 +170,8 @@
     "font_size": "Text size in the editor",
     "pixels": "{n} pixels",
     "back": "Back"
+  },
+  "wizard": {
+    "no_name": "apprentice"
   }
 }

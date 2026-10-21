@@ -7,7 +7,7 @@
   "starting_code": "# El profesor va y viene por el pasillo, mirando hacia delante.\n# Espera mientras mire hacia ti, y luego cruza.\nwizard.wait()\n",
   "hints": [
     "Fíjate hacia dónde mira el profesor mientras camina.",
-    "`wizard.wait()` deja pasar un tick mientras sigues escondido.",
+    "`wizard.wait()` deja pasar un tick mientras sigues escondid{o|a}.",
     "Un bucle `while` puede seguir esperando mientras `teacher.facing` sea `\"left\"`."
   ]
 }

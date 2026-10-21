@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 from kydux_world.level import Level
 from kydux_world.run import run_code
+from wizard_words import for_wizard
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT = ROOT / "content"
@@ -103,12 +104,13 @@ def test_what_a_lesson_explains_the_level_after_it_teaches(path):
 
 
 @pytest.mark.parametrize(
-    ("path", "lang"),
-    [(p, lang) for p in LESSONS for lang in LANGUAGES],
+    ("path", "lang", "gender"),
+    [(p, lang, gender) for p in LESSONS for lang in LANGUAGES for gender in ("girl", "boy")],
     ids=lambda v: v.name if isinstance(v, Path) else v,
 )
-def test_a_lesson_s_try_it_runs_in_the_level_after_it(path, lang):
-    found = TRY.findall((path / f"{lang}.md").read_text(encoding="utf-8"))
+def test_a_lesson_s_try_it_runs_in_the_level_after_it(path, lang, gender):
+    text = for_wizard((path / f"{lang}.md").read_text(encoding="utf-8"), gender)
+    found = TRY.findall(text)
     if not found:
         return
     level = level_after(f"lesson:{path.name}")

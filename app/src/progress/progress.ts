@@ -8,6 +8,7 @@ import {
   type Progress,
   type ProgressStore,
   type Settings,
+  type Wizard,
 } from './store';
 
 function browserStorage(): Pick<Storage, 'getItem' | 'setItem'> | null {
@@ -122,12 +123,23 @@ export const languageStorage: Pick<Storage, 'getItem' | 'setItem'> = {
   },
 };
 
-/** Start from the beginning: the course's progress cleared, the language and the
- * settings the child chose kept. */
+export function wizard(): Wizard | null {
+  return store.load().wizard;
+}
+
+export function setWizard(made: Wizard): void {
+  change((progress) => {
+    progress.wizard = made;
+  });
+}
+
+/** Start from the beginning: the course's progress cleared; the language, the
+ * settings and the wizard the child chose kept. */
 export function reset(): void {
   const kept = store.load();
   const fresh = defaultProgress();
   fresh.language = kept.language;
   fresh.settings = kept.settings;
+  fresh.wizard = kept.wizard;
   store.save(fresh);
 }

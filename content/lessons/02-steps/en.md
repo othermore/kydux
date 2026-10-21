@@ -17,7 +17,7 @@ The number is called an **argument**: it tells the action how much to do.
 Some levels have **things** in them, like a key or a door.
 Each thing is an object too, with its own name and its own actions.
 
-The wizard can pick up the thing on its tile:
+The wizard can pick up the thing on {his|her} tile:
 
 ```python
 wizard.pick_up()

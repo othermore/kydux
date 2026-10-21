@@ -26,10 +26,20 @@ export interface LevelProgress {
   tried?: boolean;
 }
 
+/** The wizard the child made (D36). `gender` chooses the words, nothing else;
+ * `look` is the id of one of the looks the game offers. */
+export interface Wizard {
+  name: string;
+  gender: 'girl' | 'boy';
+  look: string;
+}
+
 export interface Progress {
   version: number;
   /** The language chosen, or null for the browser's. */
   language: string | null;
+  /** Null until the child has made one. */
+  wizard: Wizard | null;
   settings: Settings;
   lessons: Record<string, { read?: boolean }>;
   levels: Record<string, LevelProgress>;
@@ -56,12 +66,44 @@ export function defaultProgress(): Progress {
   return {
     version: PROGRESS_VERSION,
     language: null,
+    wizard: null,
     settings: { ...DEFAULT_SETTINGS },
     lessons: {},
     levels: {},
     started: [],
     current: null,
   };
+}
+
+/** The longest name a wizard may have, in characters. */
+export const NAME_MAX = 20;
+/** A name's characters: letters of any alphabet with their accents, digits,
+ * spaces, hyphens and apostrophes. */
+const NAME_CHARACTER = /^[\p{L}\p{M}\p{N} '’-]$/u;
+
+/** Whether a character may be in a name. */
+export function isNameCharacter(character: string): boolean {
+  return NAME_CHARACTER.test(character);
+}
+
+/** A name as it is kept: trimmed, and null when it breaks the rule. */
+export function wizardName(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const name = value.trim();
+  const characters = [...name];
+  if (characters.length === 0 || characters.length > NAME_MAX) return null;
+  return characters.every(isNameCharacter) ? name : null;
+}
+
+/** A wizard read back, or null when any of its fields is not of its shape.
+ * `isLook` says which looks the game has. */
+export function readWizard(value: unknown, isLook: (id: string) => boolean = () => true): Wizard | null {
+  if (!isObject(value)) return null;
+  const name = wizardName(value.name);
+  const { gender, look } = value;
+  if (name === null || (gender !== 'girl' && gender !== 'boy')) return null;
+  if (typeof look !== 'string' || !isLook(look)) return null;
+  return { name, gender, look };
 }
 
 export interface ProgressStore {
@@ -75,10 +117,18 @@ function isObject(value: unknown): value is Record<string, unknown> {
 
 /** A document read back: its known fields, each checked, the rest the defaults'.
  * Returns null for something that is not a progress document of this version. */
+let isLook: (id: string) => boolean = () => true;
+
+/** Tells the store which looks the game has, so that a wizard of another is not read. */
+export function knowLooks(check: (id: string) => boolean): void {
+  isLook = check;
+}
+
 export function readProgress(value: unknown): Progress | null {
   if (!isObject(value) || value.version !== PROGRESS_VERSION) return null;
   const progress = defaultProgress();
   if (typeof value.language === 'string') progress.language = value.language;
+  progress.wizard = readWizard(value.wizard, isLook);
   if (isObject(value.settings)) {
     const { speed, fontSize, split } = value.settings;
     if (speed === 1 || speed === 2 || speed === 4) progress.settings.speed = speed;

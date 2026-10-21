@@ -1,7 +1,7 @@
 // Loading a level: what the world and the scene read (level.json), and its
 // words in the player's language (text.<lang>.json), from content/levels/<id>/.
 
-import { fallbackLanguage, type Language } from '../i18n';
+import { fallbackLanguage, forWizard, type Language } from '../i18n';
 import type { LevelJson } from '../runtime/protocol';
 import type { ApiTable } from '../ui/notebook';
 
@@ -49,13 +49,24 @@ async function source(url: string): Promise<string | null> {
   return response.text();
 }
 
+/** Every string of a level's text, the starting code too, made for the wizard (D37). */
+function madeForWizard(text: LevelText): LevelText {
+  return {
+    ...text,
+    title: forWizard(text.title),
+    goals: text.goals.map(forWizard),
+    starting_code: forWizard(text.starting_code),
+    ...(text.hints ? { hints: text.hints.map(forWizard) } : {}),
+  };
+}
+
 export async function loadLevelText(id: string, lang: Language): Promise<LevelText> {
   const text = await json<LevelText>(levelUrl(id, `text.${lang}.json`));
-  if (text) return text;
+  if (text) return madeForWizard(text);
   console.warn(`level ${id}: no text in ${lang}, using ${fallbackLanguage}`);
   const fallback = await json<LevelText>(levelUrl(id, `text.${fallbackLanguage}.json`));
   if (!fallback) throw new LevelNotFound(id);
-  return fallback;
+  return madeForWizard(fallback);
 }
 
 export async function loadLevel(id: string, lang: Language): Promise<LoadedLevel> {

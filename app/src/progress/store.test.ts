@@ -6,6 +6,8 @@ import {
   importProgress,
   LocalProgressStore,
   PROGRESS_VERSION,
+  readWizard,
+  wizardName,
 } from './store';
 
 function memoryStorage() {
@@ -118,5 +120,45 @@ describe('the helpers', () => {
     progress.languageStorage.setItem('kydux.language', 'es');
     expect(progress.languageStorage.getItem('kydux.language')).toBe('es');
     expect(progress.load().language).toBe('es');
+  });
+});
+
+describe('the wizard (D36)', () => {
+  it('keeps a name of letters, digits, spaces, hyphens and apostrophes, trimmed', () => {
+    expect(wizardName('  Marta ')).toBe('Marta');
+    expect(wizardName('José-Luis O’Neill')).toBe('José-Luis O’Neill');
+    expect(wizardName('Ñandú 2')).toBe('Ñandú 2');
+    expect(wizardName('Алёна')).toBe('Алёна');
+    expect(wizardName('')).toBeNull();
+    expect(wizardName('   ')).toBeNull();
+    expect(wizardName('a'.repeat(21))).toBeNull();
+    expect(wizardName('a'.repeat(20))).toBe('a'.repeat(20));
+    expect(wizardName('<b>')).toBeNull();
+    expect(wizardName('{wizard}')).toBeNull();
+  });
+
+  it('reads a wizard only when every field is of its shape', () => {
+    const looks = (id: string) => id === 'amber';
+    expect(readWizard({ name: 'Marta', gender: 'girl', look: 'amber' }, looks)).toEqual({
+      name: 'Marta',
+      gender: 'girl',
+      look: 'amber',
+    });
+    expect(readWizard({ name: 'Marta', gender: 'other', look: 'amber' }, looks)).toBeNull();
+    expect(readWizard({ name: 'Marta', gender: 'girl', look: 'gold' }, looks)).toBeNull();
+    expect(readWizard({ name: 'x'.repeat(30), gender: 'boy', look: 'amber' }, looks)).toBeNull();
+    expect(readWizard('Marta', looks)).toBeNull();
+  });
+
+  it('is read as none in a document without one, and kept by a reset', () => {
+    const storage = memoryStorage();
+    storage.setItem('kydux.progress', JSON.stringify({ version: PROGRESS_VERSION }));
+    expect(new LocalProgressStore(storage).load().wizard).toBeNull();
+    progress.useStore(new LocalProgressStore(storage));
+    progress.setWizard({ name: 'Marta', gender: 'girl', look: 'amber' });
+    progress.markWon('a', 1, 'x');
+    progress.reset();
+    expect(progress.wizard()?.name).toBe('Marta');
+    expect(progress.levelProgress('a')).toEqual({});
   });
 });

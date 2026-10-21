@@ -16,14 +16,14 @@ Esta línea escribe hacia dónde mira el profesor: `"left"` o `"right"`.
 
 ## Esperar el momento justo
 
-El mago puede quedarse quieto mientras el mundo sigue:
+{El mago|La maga} puede quedarse quiet{o|a} mientras el mundo sigue:
 
 ```python
 wizard.wait()
 ```
 
 Un bucle `while` hace algo una y otra vez, mientras algo sea verdad.
-Así el mago puede esperar mientras el profesor mire hacia donde está.
+Así {el mago|la maga} puede esperar mientras el profesor mire hacia donde está.
 
 ---
 

@@ -19,7 +19,7 @@
   "outcome": {
     "won": "¡Lo has conseguido!",
     "incomplete": "Todavía no: {n} de {total} objetivos cumplidos. Inténtalo otra vez.",
-    "too_many_ticks": "Tu programa ha dado más de {limit} pasos y el mago está agotado. ¿Hay algún bucle que no termina nunca?",
+    "too_many_ticks": "Tu programa ha dado más de {limit} pasos y {el mago|la maga} está agotad{o|a}. ¿Hay algún bucle que no termina nunca?",
     "interrupted": "Se ha detenido tu programa: llevaba más de {seconds} segundos sin hacer nada.",
     "error": "Python dice: {type}: {message} (línea {line})",
     "error_no_line": "Python dice: {type}: {message}",
@@ -87,7 +87,7 @@
     "unknown_action": "Todavía no conozco esta acción."
   },
   "notebook": {
-    "title": "El cuaderno del mago",
+    "title": "El cuaderno {del mago|de la maga}",
     "open": "Cuaderno",
     "close": "Cerrar",
     "actions": "Acciones",
@@ -99,32 +99,32 @@
       "move_up": "Camina hacia arriba, una casilla por paso. Se para ante una pared o una puerta cerrada.",
       "move_down": "Camina hacia abajo, una casilla por paso. Se para ante una pared o una puerta cerrada.",
       "say": "Dice algo en voz alta.",
-      "wait": "Se queda quieto mientras el mundo sigue, un tick cada vez.",
-      "pick_up": "Coge lo que hay en la casilla del mago y lo lleva consigo.",
+      "wait": "Se queda quiet{o|a} mientras el mundo sigue, un tick cada vez.",
+      "pick_up": "Coge lo que hay en la casilla {del mago|de la maga} y lo lleva consigo.",
       "find_nearest": "Encuentra la cosa más cercana de un tipo, o None si no hay ninguna.",
       "find_all": "Encuentra todas las cosas de un tipo, de la más cercana a la más lejana.",
-      "has": "Dice si el mago lleva una cosa de un tipo.",
-      "position": "Dónde está el mago, en x e y.",
-      "facing": "Hacia dónde mira el mago: up, down, left o right.",
-      "items": "Las cosas que lleva el mago."
+      "has": "Dice si {el mago|la maga} lleva una cosa de un tipo.",
+      "position": "Dónde está {el mago|la maga}, en x e y.",
+      "facing": "Hacia dónde mira {el mago|la maga}: up, down, left o right.",
+      "items": "Las cosas que lleva {el mago|la maga}."
     },
     "thing": {
       "kind": "Qué es la cosa, como \"key\" o \"book\".",
       "name": "El nombre de la cosa en este nivel.",
-      "position": "Dónde está la cosa, o None cuando el mago la lleva."
+      "position": "Dónde está la cosa, o None cuando {el mago|la maga} la lleva."
     },
     "door": {
       "kind": "Qué es: \"door\".",
       "name": "El nombre de la puerta en este nivel.",
       "position": "Dónde está la puerta, en x e y.",
       "locked": "True mientras la puerta necesite su llave para abrirse.",
-      "is_open": "True cuando la puerta está abierta y el mago puede pasar.",
-      "open": "Abre la puerta. El mago tiene que estar a su lado, y llevar la llave si está cerrada con llave."
+      "is_open": "True cuando la puerta está abierta y {el mago|la maga} puede pasar.",
+      "open": "Abre la puerta. {El mago|La maga} tiene que estar a su lado, y llevar la llave si está cerrada con llave."
     },
     "key": {
       "kind": "Qué es: \"key\".",
       "name": "El nombre de la llave en este nivel.",
-      "position": "Dónde está la llave, o None cuando el mago la lleva."
+      "position": "Dónde está la llave, o None cuando {el mago|la maga} la lleva."
     },
     "teacher": {
       "kind": "Qué es: \"teacher\".",
@@ -170,5 +170,8 @@
     "font_size": "Tamaño del texto en el editor",
     "pixels": "{n} píxeles",
     "back": "Volver"
+  },
+  "wizard": {
+    "no_name": "aprendiz"
   }
 }

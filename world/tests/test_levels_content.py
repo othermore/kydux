@@ -2,7 +2,7 @@
 
 Its solution wins and calls nothing outside the level's api (D23); it has
 three wrong answers or more, none of which wins; a text in every language,
-whose starting code runs without an error.
+whose starting code runs without an error, as a girl's wizard and a boy's see it.
 """
 
 import ast
@@ -13,6 +13,7 @@ import pytest
 from kydux_world import api
 from kydux_world.level import Level
 from kydux_world.run import run_code
+from wizard_words import for_wizard
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT = ROOT / "content" / "levels"
@@ -86,13 +87,13 @@ def test_a_wrong_answer_does_not_win(directory, wrong):
 
 
 @pytest.mark.parametrize(
-    ("directory", "lang"),
-    [(d, lang) for d in LEVELS for lang in LANGUAGES],
+    ("directory", "lang", "gender"),
+    [(d, lang, gender) for d in LEVELS for lang in LANGUAGES for gender in ("girl", "boy")],
     ids=lambda v: v.name if isinstance(v, Path) else v,
 )
-def test_the_starting_code_runs_without_an_error(directory, lang):
+def test_the_starting_code_runs_without_an_error(directory, lang, gender):
     text = json.loads((directory / f"text.{lang}.json").read_text(encoding="utf-8"))
-    result = run_code(load(directory), text["starting_code"])
+    result = run_code(load(directory), for_wizard(text["starting_code"], gender))
     assert result.status != "error", result.error
 
 

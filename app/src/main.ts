@@ -2,7 +2,7 @@ import { version } from '../package.json';
 import { type Course, items, itemHash, loadCourse, next, parseItem } from './content/course';
 import { LessonNotFound, loadLesson } from './content/lessons';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
-import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, t } from './i18n';
+import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
 import * as progress from './progress/progress';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
@@ -230,6 +230,8 @@ function route(): void {
       : wanted.name;
   if (key === shownRoute && screen) return;
   shownRoute = key;
+  // The words speak of the wizard as the progress document has it now (D37).
+  speakOf(progress.wizard());
   if (wanted.name !== 'settings') beforeSettings = location.hash || '#start';
   screen?.destroy();
   screen = null;

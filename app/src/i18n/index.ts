@@ -2,6 +2,10 @@
 // in i18n/ at the repository root: adding one is adding its file, with the
 // same keys as the others (tools/i18n_check.py keeps them in step).
 
+import { personal, type Speaker } from './personal';
+
+export type { Gender, Speaker } from './personal';
+
 type Messages = { [key: string]: string | Messages };
 
 const files = import.meta.glob<Messages>('../../../i18n/*.json', {
@@ -24,6 +28,20 @@ export const languages: readonly Language[] = Object.keys(catalogs).sort();
 const storageKey = 'kydux.language';
 const warned = new Set<string>();
 let current: Language = fallbackLanguage;
+/** The wizard the words speak of (D37); null before the child has made one. */
+let speaker: Speaker | null = null;
+
+/** Tells the words which wizard they speak of. The page calls it on every screen. */
+export function speakOf(wizard: Speaker | null): void {
+  speaker = wizard;
+}
+
+/** A text with its choices made for the wizard and the wizard's name put in. */
+export function forWizard(text: string): string {
+  const unnamed =
+    lookup(catalogs[current], 'wizard.no_name') ?? lookup(catalogs[fallbackLanguage], 'wizard.no_name');
+  return personal(text, speaker, unnamed ?? '');
+}
 
 /** What detection reads, so tests can give their own. */
 export interface Environment {
@@ -96,7 +114,9 @@ function lookup(messages: Messages | undefined, key: string): string | undefined
   return typeof node === 'string' ? node : undefined;
 }
 
-/** The text for `key` in the current language, with `{name}` replaced from `params`. */
+/** The text for `key` in the current language, made for the wizard, with `{name}`
+ * replaced from `params`. The wizard's words go in first, so that a parameter's
+ * value, which may be the child's own text, is never read for a choice. */
 export function t(key: string, params: Record<string, string | number> = {}): string {
   const text = lookup(catalogs[current], key) ?? lookup(catalogs[fallbackLanguage], key);
   if (text === undefined) {
@@ -106,7 +126,7 @@ export function t(key: string, params: Record<string, string | number> = {}): st
     }
     return key;
   }
-  return text.replace(/\{(\w+)\}/g, (whole, name: string) =>
+  return forWizard(text).replace(/\{(\w+)\}/g, (whole, name: string) =>
     name in params ? String(params[name]) : whole,
   );
 }

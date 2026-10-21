@@ -460,3 +460,27 @@ one overturns stays, marked as superseded.
   dragging and is saved when the drag ends. The scene follows as it does a
   window resize. Under 800 pixels the panes stack and the handle is gone.
   The settings' Back returns to the screen they were opened from.
+- **D37 — The words follow the wizard.** Decided 2026-10-21 (sprint-6.md),
+  built the same day. A text for the player may hold a choice,
+  `{boy's words|girl's words}`, either side possibly empty (`cansad{o|a}`),
+  and the wizard's name, `{wizard}`. `personal()` (`app/src/i18n/personal.ts`)
+  resolves both; `forWizard()` in `app/src/i18n/` does it for the wizard the
+  page was told of by `speakOf()`, which `main.ts` calls on every screen it
+  shows, from the progress document. Every path a text takes goes through
+  it: `t()`, a lesson's Markdown before its pages are cut, and every string
+  of a level's text, the starting code included. `t()` makes the choices in
+  its template before it puts the parameters in, not after as sprint-6.md
+  first said: a parameter can be the child's own text, a Python name, and
+  must never be read for a choice. Braces with no bar, or with more than
+  one, are left alone, so `t()`'s `{name}` and a Python set survive. With
+  no wizard, which only a developer's direct address brings about, the
+  first side is taken and `{wizard}` is `wizard.no_name` (*apprentice*,
+  *aprendiz*: a word with no gender in either language).
+  `tools/i18n_check.py` refuses a choice with other than two sides in any
+  text for the player, and, in Spanish, `mago` or `maga` outside a choice;
+  the world's tests run every level's starting code and every lesson's Try
+  it as a girl's wizard and as a boy's (`world/tests/wizard_words.py`).
+  English needs few choices (`{his|her}` in a lesson); the code's `wizard`
+  is Python, never a word to gender. The adjectives that agree with the
+  wizard (`quiet{o|a}`, `agotad{o|a}`) are not checked: the check would need
+  a grammar, and a reviewer reads the Spanish.

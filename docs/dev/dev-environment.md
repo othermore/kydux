@@ -136,8 +136,8 @@ one to go straight to a screen:
 | `#start` | The start screen. An address with no hash, or one the game does not know, opens it too. |
 | `#wizard` | The creator, where the player names their wizard, says whether it is a girl or a boy, and picks its look. |
 | `#map` | The map of the course. |
-| `#lesson/01-first-action` | A lesson, from `content/lessons/01-first-action/`. |
-| `#level/02-the-locked-door` | A level, from `content/levels/02-the-locked-door/`. |
+| `#lesson/what-a-program-is` | A lesson, from `content/lessons/what-a-program-is/`. |
+| `#level/the-locked-door` | A level, from `content/levels/the-locked-door/`. |
 | `#settings` | The settings: the language, the speed and the editor's text size. |
 
 The map keeps a locked stop closed. A level's or a lesson's address opens

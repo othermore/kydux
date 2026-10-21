@@ -1,0 +1,13 @@
+{
+  "title": "La escalera",
+  "goals": [
+    "Sube hasta lo alto de la escalera.",
+    "Hazlo en menos de 5 líneas."
+  ],
+  "starting_code": "# Arriba, derecha, arriba, derecha: una línea para cada tramo del camino.\nwizard.move_up(2)\n",
+  "hints": [
+    "Cuenta las casillas de cada tramo antes de escribir su línea.",
+    "Después de subir, {el mago|la maga} gira a la derecha: `move_right` con el número de casillas de ese tramo."
+  ],
+  "intro": "Esta escalera sube hacia arriba y a la derecha, dos veces. Cada tramo del camino es una línea, con su número."
+}

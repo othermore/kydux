@@ -20,7 +20,7 @@ async function run(page: Page, code: string): Promise<string> {
 const scene = (page: Page) => page.locator('#scene');
 
 test.describe('the locked door', () => {
-  test.beforeEach(({ page }) => open(page, '02-the-locked-door'));
+  test.beforeEach(({ page }) => open(page, 'the-locked-door'));
 
   test('shows its goals, the bonus among them', async ({ page }) => {
     await expect(page.locator('.level-title')).toHaveText('The locked door');
@@ -90,7 +90,7 @@ test.describe('the locked door', () => {
 });
 
 test.describe('past the teacher', () => {
-  test.beforeEach(({ page }) => open(page, '03-past-the-teacher'));
+  test.beforeEach(({ page }) => open(page, 'past-the-teacher'));
 
   test('the teacher walks the corridor', async ({ page }) => {
     await expect(scene(page)).toHaveAttribute('data-actors', 'teacher:7,2,left');
@@ -123,7 +123,7 @@ test.describe('past the teacher', () => {
 test('the locked door in Spanish', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
   const page = await context.newPage();
-  await open(page, '02-the-locked-door');
+  await open(page, 'the-locked-door');
   await expect(page.locator('.level-title')).toHaveText('La puerta cerrada');
   await expect(page.locator('.goal[data-bonus="true"]')).toContainText('Extra:');
   const said = await run(page, 'wizard.mvoe_right(4)');

@@ -1,0 +1,8 @@
+{
+  "id": "your-first-action",
+  "teaches": [
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down"
+  ]
+}

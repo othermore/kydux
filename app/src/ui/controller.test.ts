@@ -86,8 +86,8 @@ function world(status: WorldResult['status'], events: WorldEvent[], metAt: numbe
 }
 
 const LEVEL: LoadedLevel = {
-  id: '01-the-corridor',
-  level: { id: '01-the-corridor', goals: [{ kind: 'reach', marker: 'D' }], tick_limit: 100 },
+  id: 'the-long-corridor',
+  level: { id: 'the-long-corridor', goals: [{ kind: 'reach', marker: 'D' }], tick_limit: 100 },
   text: { title: 'The corridor', goals: ['Reach the door.'], starting_code: '' },
 };
 

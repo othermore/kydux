@@ -13,21 +13,21 @@ const SHOTS = fileURLToPath(new URL('./shots/', import.meta.url));
 const WORDS = {
   en: {
     create: 'Make your wizard',
-    lesson: 'Your first action',
-    greeting: 'Welcome to the school, Ada!',
-    corridor: 'The corridor',
+    lesson: 'What a program is',
+    greeting: 'Welcome to Arvelia, Ada!',
+    gate: 'The gate',
     won: 'You did it, Ada!',
-    second: 'Steps, keys and doors',
+    second: 'Objects and actions',
     hello: 'Hello, Ada',
     settings: 'Settings',
   },
   es: {
     create: 'Crea tu personaje',
-    lesson: 'Tu primera acción',
-    greeting: '¡Te damos la bienvenida al colegio, Ada!',
-    corridor: 'El pasillo',
+    lesson: 'Qué es un programa',
+    greeting: '¡Te damos la bienvenida a Arvelia, Ada!',
+    gate: 'La puerta',
     won: '¡Lo has conseguido, Ada!',
-    second: 'Pasos, llaves y puertas',
+    second: 'Objetos y acciones',
     hello: 'Hola, Ada',
     settings: 'Ajustes',
   },
@@ -78,11 +78,14 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await page.locator('#lesson-next').click();
     await shoot(page, 'lesson-second-page');
     await page.locator('#lesson-next').click();
+    await shoot(page, 'lesson-third-page');
+    await page.locator('#lesson-next').click();
     await shoot(page, 'lesson-last-page');
 
-    // Try it: the corridor, its start card, the example in the editor.
+    // Try it: the gate, its start card with the teacher's words, the example in the editor.
     await page.locator('#lesson-try').click();
-    await expect(page.locator('.start-card h3')).toHaveText(words.corridor);
+    await expect(page.locator('.start-card h3')).toHaveText(words.gate);
+    await expect(page.locator('#card-intro')).toContainText('Ilda');
     await shoot(page, 'start-card');
     await page.locator('#start').click();
     await expect(page.locator('.cm-content')).toContainText('wizard.move_right()');
@@ -104,7 +107,7 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await shoot(page, 'hint');
 
     // The winning run, and the win card that names the wizard.
-    await type(page, 'wizard.move_right(6)');
+    await type(page, 'wizard.move_right()');
     await page.locator('#run').click();
     await expect(page.locator('.win-card h3')).toHaveText(words.won, { timeout: 30_000 });
     await shoot(page, 'win');

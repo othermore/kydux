@@ -12,6 +12,9 @@ export interface LevelText {
   starting_code: string;
   /** From the gentlest to the one that nearly says it; never the solution. */
   hints?: string[];
+  /** What the level's speaker says on the start card, and on the win card (D45). */
+  intro?: string;
+  outro?: string;
 }
 
 export interface LoadedLevel {
@@ -57,6 +60,8 @@ function madeForWizard(text: LevelText): LevelText {
     goals: text.goals.map(forWizard),
     starting_code: forWizard(text.starting_code),
     ...(text.hints ? { hints: text.hints.map(forWizard) } : {}),
+    ...(text.intro !== undefined ? { intro: forWizard(text.intro) } : {}),
+    ...(text.outro !== undefined ? { outro: forWizard(text.outro) } : {}),
   };
 }
 

@@ -1,0 +1,6 @@
+{
+  "id": "what-a-program-is",
+  "teaches": [
+    "wizard.move_right"
+  ]
+}

@@ -1,0 +1,1 @@
+wizard.move_up()

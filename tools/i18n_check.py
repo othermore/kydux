@@ -17,6 +17,7 @@ Fails, printing file:line: message for each, on:
   - a choice for the wizard, {boy's words|girl's words}, with other than one bar,
     in any text for the player; and in Spanish, `mago` or `maga` outside a choice,
     so that no text speaks of a girl as a boy by oversight (D37);
+  - a level's speaker without its name, characters.<speaker>, in a language;
   - a string literal in the app's code that reads like words for a person (words
     separated by spaces, with a capitalised word or a sentence's final stop),
     which must come from t() instead. A line marked `// i18n-ignore` is left alone, and
@@ -102,6 +103,20 @@ def check_levels(languages: list[str]) -> list[str]:
         hints = {lang: len(text.get("hints", [])) for lang, text in texts.items()}
         if len(set(hints.values())) > 1:
             findings.append(f"{name}: a different number of hints in each language, {hints}")
+    return findings
+
+
+def check_speakers(languages: dict[str, dict[str, str]]) -> list[str]:
+    """Every level's speaker has its name, characters.<speaker>, in every language (D45)."""
+    findings = []
+    for path in sorted(LEVELS.glob("*/level.json")):
+        speaker = json.loads(path.read_text(encoding="utf-8")).get("speaker")
+        if speaker is None:
+            continue
+        for lang, catalog in languages.items():
+            if f"characters.{speaker}" not in catalog:
+                where = path.relative_to(REPO).as_posix()
+                findings.append(f"{where}: the speaker {speaker} has no name in i18n/{lang}.json")
     return findings
 
 
@@ -236,6 +251,7 @@ def check() -> list[str]:
 
     findings.extend(check_levels(list(languages)))
     findings.extend(check_chapters(list(languages)))
+    findings.extend(check_speakers(languages))
     findings.extend(check_world_words(languages))
     findings.extend(check_choices(languages))
 

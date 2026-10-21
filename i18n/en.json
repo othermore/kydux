@@ -224,5 +224,15 @@
     "look_n": "Look {n}",
     "done": "Done",
     "back": "Back"
+  },
+  "characters": {
+    "ilda": "Ilda",
+    "orla": "Orla",
+    "dask": "Dask",
+    "wenna": "Wenna",
+    "nuri": "Nuri",
+    "zarek": "Zarek",
+    "bimo": "Bimo",
+    "eldra": "Eldra"
   }
 }

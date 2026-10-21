@@ -50,9 +50,25 @@ function overlay(className: string, children: (Node | string)[], onClose: () => 
 export interface StartCardText {
   title: string;
   goals: { text: string; bonus?: boolean }[];
+  /** What a character of the story says before the level, with the character's name. */
+  said?: Said;
 }
 
-/** The level's title and goals, and Start. */
+/** A character's words on a card (D45): the name, and what they say. */
+export interface Said {
+  speaker: string;
+  text: string;
+}
+
+function saidBy(said: Said, id: string): HTMLElement {
+  return element('p', { id, className: 'card-said' }, [
+    element('strong', {}, [said.speaker]),
+    ' ',
+    said.text,
+  ]);
+}
+
+/** The level's title, what its speaker says, its goals, and Start. */
 export function startCard(text: StartCardText, onClose: () => void = () => {}): Card {
   const start = element('button', { id: 'start', type: 'button' }, [t('level.start')]);
   const list = element(
@@ -64,7 +80,13 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
   );
   const card = overlay(
     'start-card',
-    [element('h3', {}, [text.title]), element('p', {}, [t('goals.title')]), list, start],
+    [
+      element('h3', {}, [text.title]),
+      ...(text.said ? [saidBy(text.said, 'card-intro')] : []),
+      element('p', {}, [t('goals.title')]),
+      list,
+      start,
+    ],
     onClose,
   );
   start.addEventListener('click', () => card.close());
@@ -72,13 +94,15 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
   return card;
 }
 
-/** You did it, the stars, Play again, and Next; after the course's last item, the
- * word that there is no next yet and the way to the map. `next` is an address. */
+/** You did it, the stars, what the speaker says after the level, Play again, and
+ * Next; after the course's last item, the word that there is no next yet and the
+ * way to the map. `next` is an address. */
 export function winCard(
   earned: number,
   next: string | null,
   onAgain: () => void,
   onNext: (hash: string) => void,
+  said?: Said,
 ): Card {
   const shown = element('p', { className: 'stars' }, [
     '★'.repeat(earned) + '☆'.repeat(MAX_STARS - earned),
@@ -94,7 +118,12 @@ export function winCard(
       ]);
   const card = overlay(
     'win-card',
-    [element('h3', {}, [t('outcome.won')]), shown, element('div', { className: 'card-buttons' }, [again, after])],
+    [
+      element('h3', {}, [t('outcome.won')]),
+      shown,
+      ...(said ? [saidBy(said, 'card-outro')] : []),
+      element('div', { className: 'card-buttons' }, [again, after]),
+    ],
     () => {},
   );
   again.addEventListener('click', () => {

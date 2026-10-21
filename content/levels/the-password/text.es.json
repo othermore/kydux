@@ -1,0 +1,13 @@
+{
+  "title": "La contraseña",
+  "goals": [
+    "Abre la puerta.",
+    "Pasa al otro lado."
+  ],
+  "starting_code": "# Camina hasta la puerta, y di su palabra a su lado.\n",
+  "hints": [
+    "La puerta solo oye una palabra dicha justo a su lado.",
+    "Una palabra del programa va entre comillas, en los paréntesis de `wizard.say`. Las mayúsculas importan."
+  ],
+  "intro": "Esta puerta interior se abre con una palabra, y la palabra es ambrel. Ponte a su lado y dila, tal como la he escrito."
+}

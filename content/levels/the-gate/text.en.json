@@ -1,0 +1,12 @@
+{
+  "title": "The gate",
+  "goals": [
+    "Walk to the gate."
+  ],
+  "starting_code": "# The gate is one step to the right.\n",
+  "hints": [
+    "The wizard needs to take one step, to the right.",
+    "The lesson's instruction is the one: `move_right` takes a step to the right."
+  ],
+  "intro": "Hello, {wizard}! This is the gate of Arvelia. It is only one step away."
+}

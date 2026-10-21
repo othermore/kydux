@@ -38,12 +38,12 @@ test('a first visit makes the wizard first, and Done opens the first lesson by n
   await expect(page.locator('#wizard-preview-name')).toHaveText('Ana');
 
   await page.locator('#wizard-done').click();
-  await expect(page).toHaveURL(/#lesson\/01-first-action$/);
-  await expect(page.locator('.lesson-page')).toContainText('Welcome to the school, Ana!');
+  await expect(page).toHaveURL(/#lesson\/what-a-program-is$/);
+  await expect(page.locator('.lesson-page')).toContainText('Welcome to Arvelia, Ana!');
 
   await page.locator('#home').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Ana');
-  await expect(page.locator('#continue')).toHaveText('Continue: Your first action');
+  await expect(page.locator('#continue')).toHaveText('Continue: What a program is');
   await expect(page.locator('#change-wizard')).toBeVisible();
   expect(await robeColour(page, '#start-figure')).toBe('#8e4bb5');
 });
@@ -77,10 +77,10 @@ test('the scene draws the look chosen, and the words follow a girl in Spanish', 
   await page.goto('/#wizard');
   await makeWizard(page, 'Lucía', 'girl', 5);
   await page.locator('#wizard-done').click();
-  await expect(page).toHaveURL(/#lesson\/01-first-action$/);
-  await page.goto('/#level/01-the-corridor');
+  await expect(page).toHaveURL(/#lesson\/what-a-program-is$/);
+  await page.goto('/#level/the-corridor');
+  await expect(page.locator('#card-intro')).toContainText('mueve a la maga');
   await page.locator('#start').click();
-  await expect(page.locator('.cm-content')).toContainText('# La maga avanza una casilla por paso.');
   await expect(page.locator('#scene')).toHaveAttribute('data-look', 'sky');
   await context.close();
 });

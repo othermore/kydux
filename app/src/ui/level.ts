@@ -213,8 +213,14 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     shownCard = card;
     sceneFrame.append(card.node);
   };
+  // The level's story, said by its speaker (D45): a name of the story's, through i18n.
+  const speaker = typeof loaded.level.speaker === 'string' ? loaded.level.speaker : null;
+  const said = (words: string | undefined) =>
+    speaker && words ? { speaker: t(`characters.${speaker}`), text: words } : undefined;
   const showStart = () =>
-    showCard(startCard({ title: text.title, goals: goalTexts() }, () => editor.focus()));
+    showCard(
+      startCard({ title: text.title, goals: goalTexts(), said: said(text.intro) }, () => editor.focus()),
+    );
   const showWin = (earned: number) =>
     showCard(
       winCard(
@@ -224,6 +230,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         (hash) => {
           location.hash = hash;
         },
+        said(text.outro),
       ),
     );
 

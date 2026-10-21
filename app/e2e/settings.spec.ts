@@ -3,7 +3,7 @@ import { expect, type Page, test } from '@playwright/test';
 test.use({ locale: 'en-US' });
 
 async function openTheCorridor(page: Page): Promise<void> {
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   const start = page.locator('#start');
   if (await start.isVisible().catch(() => false)) await start.click();
   await expect(page.locator('.cm-editor')).toBeVisible();
@@ -31,7 +31,7 @@ test('the text size chosen shows in the editor at once, and after a reload', asy
   await page.locator('#settings-font-size').selectOption('24');
   await expect(page.locator('#settings-sample')).toHaveCSS('font-size', '24px');
   await page.locator('#settings-back').click();
-  await expect(page).toHaveURL(/#level\/01-the-corridor$/);
+  await expect(page).toHaveURL(/#level\/the-long-corridor$/);
   await expect.poll(() => editorFontSize(page)).toBe('24px');
   await page.reload();
   await expect(page.locator('.cm-editor')).toBeVisible();

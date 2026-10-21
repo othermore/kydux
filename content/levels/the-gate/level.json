@@ -1,0 +1,21 @@
+{
+  "id": "the-gate",
+  "map": [
+    "####",
+    "#SE#",
+    "####"
+  ],
+  "things": [],
+  "actors": [],
+  "api": [
+    "wizard.move_right"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    }
+  ],
+  "tick_limit": 50,
+  "speaker": "ilda"
+}

@@ -1,6 +1,7 @@
-"""The course in content/ holds together (D32, D33): its chapters name items that
-exist, every lesson is in every language with the same pages and no HTML, what a
-lesson explains is taught by the level after it, and its Try it runs there."""
+"""The course in content/ holds together (D32, D33, D41): its chapters name items
+that exist, every lesson is in every language with the same pages and no HTML, what
+a lesson explains is taught by the level after it, its Try it runs there, and in a
+chapter with lessons, a level teaches nothing a lesson before it has not explained."""
 
 import json
 import re
@@ -116,3 +117,28 @@ def test_a_lesson_s_try_it_runs_in_the_level_after_it(path, lang, gender):
     level = level_after(f"lesson:{path.name}")
     result = run_code(Level.from_directory(level), found[0])
     assert result.status != "error", result.error
+
+
+def level_api(item_id: str) -> list[str]:
+    return list(Level.from_directory(CONTENT / "levels" / item_id).api)
+
+
+@pytest.mark.parametrize("path", CHAPTERS, ids=lambda p: p.name)
+def test_a_level_teaches_only_what_a_lesson_before_it_explained(path):
+    """In a chapter that has lessons (D41), every name a level teaches was explained
+    by a lesson before it in the course, or taught by a level before it. A chapter
+    with no lesson yet holds levels to be given their lessons in its own sprint."""
+    if not any(item.startswith("lesson:") for item in chapter(path)["items"]):
+        return
+    explained: set[str] = set()
+    for item in course():
+        kind, _, item_id = item.partition(":")
+        if kind == "lesson":
+            lesson = json.loads((CONTENT / "lessons" / item_id / "lesson.json").read_text())
+            explained.update(lesson["teaches"])
+            continue
+        api = level_api(item_id)
+        if item in chapter(path)["items"]:
+            unexplained = [name for name in api if name not in explained]
+            assert not unexplained, f"{item_id} teaches {unexplained}, which no lesson explained"
+        explained.update(api)

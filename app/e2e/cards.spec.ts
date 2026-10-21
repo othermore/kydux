@@ -17,7 +17,7 @@ async function run(page: Page, code: string): Promise<void> {
 test('the start card opens a level the first time in a visit, and ? brings it back', async ({
   page,
 }) => {
-  await page.goto('/#level/02-the-locked-door');
+  await page.goto('/#level/the-locked-door');
   const card = page.locator('.start-card');
   await expect(card).toBeVisible();
   await expect(card.locator('h3')).toHaveText('The locked door');
@@ -36,7 +36,7 @@ test('the start card opens a level the first time in a visit, and ? brings it ba
 });
 
 test('a won run shows its stars, and Next opens what comes next in the course', async ({ page }) => {
-  await page.goto('/#level/02-the-locked-door');
+  await page.goto('/#level/the-locked-door');
   await page.locator('#start').click();
   await ready(page);
   await page.locator('#speed').selectOption('4');
@@ -49,14 +49,14 @@ test('a won run shows its stars, and Next opens what comes next in the course', 
   await expect(win.locator('.stars')).toHaveAttribute('data-stars', '2');
   await expect(win.locator('.stars')).toHaveAttribute('aria-label', '2 of 3 stars');
   await page.locator('#next').click();
-  await expect(page).toHaveURL(/#lesson\/03-watching$/);
-  await expect(page.locator('.lesson-page h1')).toHaveText('Watching and waiting');
+  await expect(page).toHaveURL(/#level\/past-the-teacher$/);
+  await expect(page.locator('.level-title')).toHaveText('Past the teacher');
 });
 
 test('Play again closes the win card; the last level says there is no next yet', async ({
   page,
 }) => {
-  await page.goto('/#level/03-past-the-teacher');
+  await page.goto('/#level/past-the-teacher');
   await page.locator('#start').click();
   await ready(page);
   await page.locator('#speed').selectOption('4');

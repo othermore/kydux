@@ -19,7 +19,7 @@ test('Python that cannot start says so, with a way to reload', async ({ page }) 
   // A wasm that fails to arrive makes Pyodide wait forever, which the runtime's
   // load timeout catches (a Vitest); a loader that fails to arrive fails at once.
   await page.route('**/pyodide/pyodide.mjs', (route) => route.abort());
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   await expect(page.locator('.outcome-text')).toHaveText(
     'Python could not start. Reload the page to try again.',
     { timeout: 60_000 },
@@ -29,7 +29,7 @@ test('Python that cannot start says so, with a way to reload', async ({ page }) 
 });
 
 test('a Run during the playback starts the new run from the start', async ({ page }) => {
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await setCode(page, 'wizard.move_right(6)');
   await page.locator('#run').click();
@@ -49,7 +49,7 @@ test('without isolation, a loop that never ends is stopped by starting Python ag
   await page.addInitScript(() =>
     Object.defineProperty(globalThis, 'crossOriginIsolated', { value: false }),
   );
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   await expect(page.locator('html')).toHaveAttribute('data-isolated', 'false');
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await setCode(page, 'while True:\n    pass');
@@ -68,7 +68,7 @@ test('without isolation, a loop that never ends is stopped by starting Python ag
 
 test('the scene follows the size of the window', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   const canvas = page.locator('#scene canvas');
   await expect(canvas).toBeVisible({ timeout: 30_000 });
   const wide = (await canvas.boundingBox())?.width ?? 0;
@@ -77,7 +77,7 @@ test('the scene follows the size of the window', async ({ page }) => {
 });
 
 test('the page may reach no other server, and the game still runs', async ({ page }) => {
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   const blocked = await page.evaluate(
     () =>
@@ -95,7 +95,7 @@ test('the page may reach no other server, and the game still runs', async ({ pag
 });
 
 test("the child's code cannot reach JavaScript", async ({ page }) => {
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   for (const code of ['import js', 'from pyodide.ffi import to_js', 'import sys\nprint(sys.modules["js"])']) {
     await setCode(page, code);

@@ -1,0 +1,13 @@
+{
+  "title": "The password",
+  "goals": [
+    "Open the gate.",
+    "Walk through it."
+  ],
+  "starting_code": "# Walk up to the gate, and say its word beside it.\n",
+  "hints": [
+    "The gate only hears a word said right beside it.",
+    "A word in the program goes between quotes, in the brackets of `wizard.say`. Capitals matter."
+  ],
+  "intro": "This inner gate opens to a word, and the word is ambrel. Stand beside it and say it, just as I wrote it."
+}

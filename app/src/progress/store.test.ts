@@ -37,7 +37,7 @@ describe('LocalProgressStore', () => {
     const storage = memoryStorage();
     const store = new LocalProgressStore(storage);
     const saved = defaultProgress();
-    saved.levels['01-the-corridor'] = { won: true, stars: 1, code: 'wizard.move_right(6)\n' };
+    saved.levels['the-long-corridor'] = { won: true, stars: 1, code: 'wizard.move_right(6)\n' };
     saved.settings.fontSize = 24;
     store.save(saved);
     expect([...storage.kept.keys()]).toEqual(['kydux.progress']);
@@ -76,16 +76,16 @@ describe('LocalProgressStore', () => {
   it('keeps the document in memory for the visit when storage throws', () => {
     const store = new LocalProgressStore(throwing);
     const saved = defaultProgress();
-    saved.current = 'level:02-the-locked-door';
+    saved.current = 'level:the-locked-door';
     store.save(saved);
-    expect(store.load().current).toBe('level:02-the-locked-door');
+    expect(store.load().current).toBe('level:the-locked-door');
   });
 });
 
 describe('export and import', () => {
   it('give back the same document', () => {
     const saved = defaultProgress();
-    saved.lessons['01-first-action'] = { read: true };
+    saved.lessons['what-a-program-is'] = { read: true };
     expect(importProgress(exportProgress(saved))).toEqual(saved);
   });
 

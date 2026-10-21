@@ -125,3 +125,21 @@ def test_the_api_check_finds_what_a_level_does_not_teach():
     assert outside_api(level, "wizard.move_right()\nwizard.say('hi')\nx = 3\nx.real") == [
         "wizard.say (line 2)"
     ]
+
+
+@pytest.mark.parametrize("directory", LEVELS, ids=lambda p: p.name)
+def test_a_level_s_story_is_said_by_someone_in_every_language_or_in_none(directory):
+    """A level's intro and outro (D45): in every language or in none, never empty,
+    and said by the level's speaker."""
+    speaker = json.loads((directory / "level.json").read_text(encoding="utf-8")).get("speaker")
+    texts = {
+        lang: json.loads((directory / f"text.{lang}.json").read_text(encoding="utf-8"))
+        for lang in LANGUAGES
+    }
+    for part in ("intro", "outro"):
+        said = {lang: text.get(part) for lang, text in texts.items()}
+        present = {lang for lang, text in said.items() if text is not None}
+        assert present in (set(), set(LANGUAGES)), f"{part} in {sorted(present)} only"
+        for lang in present:
+            assert isinstance(said[lang], str) and said[lang].strip(), f"{part} in {lang} is empty"
+            assert speaker, f"the level has an {part} and no speaker to say it"

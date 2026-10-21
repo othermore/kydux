@@ -30,7 +30,7 @@ for (const [width, height] of [
 ] as const) {
   test(`at ${width}×${height}, the level screen shows all it needs without scrolling`, async ({ page }) => {
     await page.setViewportSize({ width, height });
-    await page.goto('/#level/02-the-locked-door');
+    await page.goto('/#level/the-locked-door');
     const view: Box = { x: 0, y: 0, width, height };
     // The start card fits inside the scene's frame.
     expect(inside(await box(page, '.start-card'), await box(page, '.scene-frame'))).toBe(true);
@@ -53,7 +53,7 @@ for (const [width, height] of [
 
 test('the heading keeps its parts apart with the longest title, at 1024', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 700 });
-  await page.goto('/#level/03-past-the-teacher');
+  await page.goto('/#level/past-the-teacher');
   await page.locator('#start').click();
   const parts = await Promise.all(['.level-title', '#about', '#level-map', '#level-settings'].map((s) => box(page, s)));
   for (let i = 0; i < parts.length; i += 1) {
@@ -67,7 +67,7 @@ test('the heading keeps its parts apart with the longest title, at 1024', async 
 
 test('on a phone, the panes stack and nothing scrolls sideways', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await expect(page.locator('#split')).toBeHidden();
@@ -76,7 +76,7 @@ test('on a phone, the panes stack and nothing scrolls sideways', async ({ page }
 });
 
 test('the goals fold away from the scene, and open again', async ({ page }) => {
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();
   const toggle = page.locator('#goals-toggle');
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
@@ -88,7 +88,7 @@ test('the goals fold away from the scene, and open again', async ({ page }) => {
 
 test.describe('the keys', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/#level/01-the-corridor');
+    await page.goto('/#level/the-long-corridor');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('.cm-content').click();

@@ -16,3 +16,7 @@ wizard.no_name
 
 # The settings list each key the game answers to by `settings.key.${key}`.
 settings.key.
+
+# A level's speaker is named by `characters.${speaker}` (D45); tools/i18n_check.py
+# holds every speaker of content/levels/ to a key here.
+characters.

@@ -1,0 +1,6 @@
+{
+  "id": "words",
+  "teaches": [
+    "wizard.say"
+  ]
+}

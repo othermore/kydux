@@ -1,0 +1,13 @@
+{
+  "title": "The stairs",
+  "goals": [
+    "Climb to the top of the stairs.",
+    "Do it in fewer than 5 lines."
+  ],
+  "starting_code": "# Up, right, up, right: one line for each stretch of the way.\nwizard.move_up(2)\n",
+  "hints": [
+    "Count the tiles of each stretch before you write its line.",
+    "After going up, the wizard turns right: `move_right` with the number of tiles of that stretch."
+  ],
+  "intro": "These stairs climb up and to the right, twice. Each stretch of the way is one line, with its number."
+}

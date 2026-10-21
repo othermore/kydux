@@ -1,0 +1,26 @@
+{
+  "id": "the-corridor",
+  "map": [
+    "######",
+    "#S..##",
+    "###.##",
+    "###E##",
+    "######"
+  ],
+  "things": [],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    }
+  ],
+  "tick_limit": 50,
+  "speaker": "ilda"
+}

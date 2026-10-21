@@ -593,6 +593,24 @@ footer {
   font-size: 22px;
 }
 
+.card-said {
+  margin: 4px 0 12px;
+  padding: 8px 12px;
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  background: #f1eee6;
+  text-align: left;
+  font-style: italic;
+}
+
+.card-said strong {
+  font-style: normal;
+}
+
+.card-said strong::after {
+  content: ':';
+}
+
 .start-goals {
   margin: 4px 0 16px;
   padding-left: 20px;

@@ -1,11 +1,14 @@
 {
   "id": "01-arrival",
   "items": [
-    "lesson:01-first-action",
-    "level:01-the-corridor",
-    "lesson:02-steps",
-    "level:02-the-locked-door",
-    "lesson:03-watching",
-    "level:03-past-the-teacher"
+    "lesson:what-a-program-is",
+    "level:the-gate",
+    "lesson:your-first-action",
+    "level:the-corridor",
+    "lesson:how-much",
+    "level:the-long-corridor",
+    "level:the-stairs",
+    "lesson:words",
+    "level:the-password"
   ]
 }

@@ -1,0 +1,12 @@
+{
+  "title": "El pasillo",
+  "goals": [
+    "Llega al final del pasillo."
+  ],
+  "starting_code": "# A la derecha hasta la esquina, y luego hacia abajo hasta el final.\n",
+  "hints": [
+    "Camina primero a la derecha hasta la esquina, y luego hacia abajo.",
+    "Cada `move_down()` es un paso hacia abajo. ¿Cuántas casillas hay debajo de la esquina?"
+  ],
+  "intro": "Este pasillo dobla una esquina. Cada línea mueve {al mago|a la maga} una casilla. Cuenta antes de escribir."
+}

@@ -11,7 +11,7 @@ const COURSE: Course = {
 
 describe('the course', () => {
   it('reads an item', () => {
-    expect(parseItem('level:01-the-corridor')).toEqual({ kind: 'level', id: '01-the-corridor' });
+    expect(parseItem('level:the-long-corridor')).toEqual({ kind: 'level', id: 'the-long-corridor' });
     expect(parseItem('nonsense')).toBeNull();
     expect(itemHash('lesson:01-a')).toBe('#lesson/01-a');
   });

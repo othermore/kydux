@@ -1,0 +1,13 @@
+{
+  "title": "El pasillo largo",
+  "goals": [
+    "Llega a la puerta del final del pasillo.",
+    "Hazlo en menos de 2 líneas."
+  ],
+  "starting_code": "# Camina hasta la puerta del final del pasillo.\nwizard.move_right()\n",
+  "hints": [
+    "¿A cuántas casillas está la puerta? Cuéntalas.",
+    "`move_right` puede llevar un número: `wizard.move_right(2)` da dos pasos."
+  ],
+  "intro": "¡Un pasillo largo! Seis líneas lo recorren. Una sola línea con un número, también."
+}

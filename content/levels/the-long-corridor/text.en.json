@@ -1,0 +1,13 @@
+{
+  "title": "The long corridor",
+  "goals": [
+    "Reach the door at the end of the corridor.",
+    "Do it in fewer than 2 lines."
+  ],
+  "starting_code": "# Walk to the door at the end of the corridor.\nwizard.move_right()\n",
+  "hints": [
+    "How many tiles away is the door? Count them.",
+    "`move_right` can take a number: `wizard.move_right(2)` takes two steps."
+  ],
+  "intro": "A long corridor! Six lines would walk it. One line with a number walks it too."
+}

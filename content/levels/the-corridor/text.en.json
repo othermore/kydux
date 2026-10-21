@@ -1,0 +1,12 @@
+{
+  "title": "The corridor",
+  "goals": [
+    "Reach the end of the corridor."
+  ],
+  "starting_code": "# Right to the corner, then down to the end.\n",
+  "hints": [
+    "Walk right to the corner first, then down.",
+    "Each `move_down()` is one step down. How many tiles are there below the corner?"
+  ],
+  "intro": "This corridor turns a corner. Each line moves the wizard one tile. Count before you write."
+}

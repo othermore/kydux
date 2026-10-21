@@ -55,6 +55,8 @@ content/        the levels, each with level.json, its words in text.<lang>.json,
                 the lessons, each with lesson.json and <lang>.md; the chapters,
                 each with chapter.json and text.<lang>.json
 i18n/           en.json, es.json: the app's words, the same keys in each
+docs/dev/       the plan, the sprints, this log, the guide; the story (story.md)
+                and the course (course.md) that the content is written from
 tools/          the i18n check, the forbidden-word check, later the art tools
 tests/project/  the repository's own checks
 ci/             check.sh, push.sh and hours.py, dev-cert.sh, the git hooks
@@ -587,3 +589,35 @@ one overturns stays, marked as superseded.
   variable. The scene draws the four closed doors apart, one frame each,
   named as the layout's `lock`: plain, a lock plate with a keyhole, a
   glowing rune, a mouth.
+- **D41 — A lesson is one idea: its theory first, then how the game says
+  it, then Try it.** Decided 2026-10-21 by the owner (plan, phase 5;
+  sprint-7.md), built the same day. A lesson's first page or two say what
+  the idea is and why it exists, in words a child of eight understands,
+  with no code; the next page shows it in the game's API with its example;
+  the last is Try it, into the first level that practises it. One idea per
+  lesson, so the course has more lessons than the draft's 10 to 20, each
+  short (`course.md`). Conditions come before loops, each alone, and a
+  loop with a condition only once both are known.
+  `world/tests/test_course_content.py` holds a chapter that has lessons to
+  it: every name a level's `api` teaches was explained by a lesson before
+  it, or taught by a level before it. A chapter with no lesson yet holds
+  levels that get their lessons in its own sprint.
+- **D44 — An item's id is its slug; its order is the chapter's.** Decided
+  2026-10-21 (sprint-7.md), built the same day. A lesson's or a level's
+  directory is a slug with no number (`the-corridor`,
+  `what-a-program-is`), and only `chapter.json` says where it comes
+  (D32), so that an item is added or moved without renaming the others.
+  Chapters keep their number: they are few, and their order is the
+  story's. The ids are also the progress document's keys, so a renamed
+  item loses the progress kept under its old id.
+- **D45 — A level may tell its story on its cards.** Decided 2026-10-21
+  (sprint-7.md), built the same day. A level's `text.<lang>.json` may have
+  `intro`, one to three short sentences shown on the start card above the
+  goals, and `outro`, shown on the win card; both are said by the
+  character `level.json` names in `speaker`, an id of `story.md`'s
+  characters, whose name the page shows from `characters.<id>` in
+  `i18n/`, the same in every language. Both follow the wizard (D37). The
+  checks: an intro or outro is in every language or none, never empty, and
+  has a speaker (`world/tests/test_levels_content.py`); a speaker is a
+  character of the story (`tests/project/test_story.py`) with a name in
+  every language (`tools/i18n_check.py`).

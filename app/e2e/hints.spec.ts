@@ -19,7 +19,7 @@ test.describe('in English', () => {
   test.use({ locale: 'en-US' });
 
   test('hints are offered after a run that does not win, one at a time', async ({ page }) => {
-    await open(page, '02-the-locked-door');
+    await open(page, 'the-locked-door');
     const hint = page.locator('#hint');
     await expect(hint).toHaveText('Hint');
     await expect(hint).toBeDisabled();
@@ -38,7 +38,7 @@ test.describe('in English', () => {
   });
 
   test('the hints shown stay for the visit', async ({ page }) => {
-    await open(page, '01-the-corridor');
+    await open(page, 'the-long-corridor');
     await run(page, 'wizard.move_right()');
     await page.locator('#hint').click();
     await page.reload();
@@ -51,7 +51,7 @@ test.describe('in English', () => {
 test('hints in Spanish', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
   const page = await context.newPage();
-  await open(page, '03-past-the-teacher');
+  await open(page, 'past-the-teacher');
   await run(page, 'wizard.move_up(2)');
   await page.locator('#hint').click();
   await expect(page.locator('#hint')).toHaveText('Pista');

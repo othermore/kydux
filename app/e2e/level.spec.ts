@@ -23,19 +23,19 @@ test.describe('in English', () => {
   test.use({ locale: 'en-US' });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/#level/01-the-corridor');
+    await page.goto('/#level/the-long-corridor');
     await waitReady(page);
     await page.locator('#speed').selectOption('4');
   });
 
   test('the page opens on the corridor, isolated, with Python ready', async ({ page }) => {
-    await expect(page).toHaveURL(/#level\/01-the-corridor$/);
-    await expect(page).toHaveTitle('Kydux — The corridor');
+    await expect(page).toHaveURL(/#level\/the-long-corridor$/);
+    await expect(page).toHaveTitle('Kydux — The long corridor');
     expect(await page.evaluate(() => globalThis.crossOriginIsolated)).toBe(true);
     await expect(page.locator('#status')).toHaveText(/^Python 3\.14\.\d+ ready$/);
     await expect(scene(page)).toHaveAttribute('data-wizard', '1,1');
-    await expect(page.locator('.cm-content')).toContainText('# Walk to the door.');
-    await expect(page.locator('.goal')).toHaveText('Reach the door at the end of the corridor.');
+    await expect(page.locator('.cm-content')).toContainText('# Walk to the door at the end of the corridor.');
+    await expect(page.locator('.goal').first()).toHaveText('Reach the door at the end of the corridor.');
   });
 
   test('the starting code takes one step, and the goal is not met', async ({ page }) => {
@@ -43,14 +43,14 @@ test.describe('in English', () => {
     await expect(scene(page)).toHaveAttribute('data-wizard', '2,1');
     await expect(scene(page)).toHaveAttribute('data-tick', '1');
     await expect(outcome(page)).toHaveText('Not yet: 0 of 1 goals met. Try again.');
-    await expect(page.locator('.goal')).toHaveAttribute('data-mark', 'open');
+    await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
   });
 
   test('six steps reach the door, the goal ticked as the wizard arrives', async ({ page }) => {
     await setCode(page, 'wizard.move_right(6)');
     await page.locator('#run').click();
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(1);
-    await expect(page.locator('.goal')).toHaveAttribute('data-mark', 'met', { timeout: 10_000 });
+    await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'met', { timeout: 10_000 });
     await expect(outcome(page)).toHaveText('You did it, apprentice!');
     await expect(scene(page)).toHaveAttribute('data-wizard', '7,1');
     await expect(scene(page)).toHaveAttribute('data-state', 'done');
@@ -99,7 +99,7 @@ test.describe('in English', () => {
     await page.locator('#restart').click();
     await expect(scene(page)).toHaveAttribute('data-wizard', '1,1');
     await expect(page.locator('.outcome')).toBeHidden();
-    await expect(page.locator('.goal')).toHaveAttribute('data-mark', 'open');
+    await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
   });
 
   test('Ctrl-Enter runs the program from the editor', async ({ page }) => {
@@ -112,18 +112,18 @@ test.describe('in English', () => {
 test('in Spanish, and switching to English keeps the code typed', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
   const page = await context.newPage();
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   await waitReady(page);
-  await expect(page.locator('.level-title')).toHaveText('El pasillo');
-  await expect(page.locator('.goal')).toHaveText('Llega a la puerta del final del pasillo.');
-  await expect(page.locator('.cm-content')).toContainText('# Camina hasta la puerta.');
+  await expect(page.locator('.level-title')).toHaveText('El pasillo largo');
+  await expect(page.locator('.goal').first()).toHaveText('Llega a la puerta del final del pasillo.');
+  await expect(page.locator('.cm-content')).toContainText('# Camina hasta la puerta del final del pasillo.');
   await expect(page.locator('#run')).toHaveText('Ejecutar');
 
   await page.locator('#language').selectOption('en');
-  await expect(page.locator('.level-title')).toHaveText('The corridor');
-  await expect(page.locator('.cm-content')).toContainText('# Walk to the door.');
+  await expect(page.locator('.level-title')).toHaveText('The long corridor');
+  await expect(page.locator('.cm-content')).toContainText('# Walk to the door at the end of the corridor.');
   await expect(page.locator('#run')).toHaveText('Run');
-  await expect(page).toHaveTitle('Kydux — The corridor');
+  await expect(page).toHaveTitle('Kydux — The long corridor');
 
   await setCode(page, 'wizard.move_right(2)');
   await page.locator('#run').click();
@@ -141,10 +141,10 @@ test('in Spanish, and switching to English keeps the code typed', async ({ brows
 test("the built game does not ship a level's solution or wrong answers", async ({ request }) => {
   // The preview server answers an unknown path with the page itself, so what
   // matters is that no Python comes back, not the status.
-  const level = await request.get('/content/levels/01-the-corridor/level.json');
-  expect(await level.json()).toMatchObject({ id: '01-the-corridor' });
+  const level = await request.get('/content/levels/the-long-corridor/level.json');
+  expect(await level.json()).toMatchObject({ id: 'the-long-corridor' });
   for (const path of ['solution.py', 'wrong/too_short.py']) {
-    const answer = await request.get(`/content/levels/01-the-corridor/${path}`);
+    const answer = await request.get(`/content/levels/the-long-corridor/${path}`);
     expect(await answer.text()).not.toContain('wizard');
   }
 });

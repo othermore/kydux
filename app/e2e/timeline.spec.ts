@@ -5,7 +5,7 @@ test.use({ locale: 'en-US' });
 test('the timeline goes back to any tick of a run, and Play goes on from there', async ({
   page,
 }) => {
-  await page.goto('/#level/01-the-corridor');
+  await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   const timeline = page.locator('#timeline');
@@ -24,12 +24,12 @@ test('the timeline goes back to any tick of a run, and Play goes on from there',
   await expect(page.locator('.win-card')).toBeHidden();
   await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '4,1');
   await expect(page.locator('#scene')).toHaveAttribute('data-tick', '3');
-  await expect(page.locator('.goal')).toHaveAttribute('data-mark', 'open');
+  await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
   await expect(page.locator('#stop')).toHaveText('Play');
 
   await timeline.fill('6');
   await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '7,1');
-  await expect(page.locator('.goal')).toHaveAttribute('data-mark', 'met');
+  await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'met');
 
   await timeline.fill('1');
   await page.locator('#stop').click();

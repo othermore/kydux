@@ -11,7 +11,7 @@ async function open(page: Page, id: string): Promise<void> {
 test('the notebook lists what the level teaches, and a click puts an example in the editor', async ({
   page,
 }) => {
-  await open(page, '01-the-corridor');
+  await open(page, 'the-long-corridor');
   await page.locator('#notebook-open').click();
   const notebook = page.locator('#notebook');
   await expect(notebook).toBeVisible();
@@ -29,7 +29,7 @@ test('the notebook lists what the level teaches, and a click puts an example in 
 });
 
 test('the notebook of the locked door has the door and the key', async ({ page }) => {
-  await open(page, '02-the-locked-door');
+  await open(page, 'the-locked-door');
   await page.locator('#notebook-open').click();
   const notebook = page.locator('#notebook');
   await expect(notebook.locator('[data-example="door.open()"]')).toBeVisible();
@@ -38,7 +38,7 @@ test('the notebook of the locked door has the door and the key', async ({ page }
 });
 
 test('after a name and a dot, the editor offers what the level teaches of it', async ({ page }) => {
-  await open(page, '02-the-locked-door');
+  await open(page, 'the-locked-door');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.press('Delete');
@@ -56,7 +56,7 @@ test('after a name and a dot, the editor offers what the level teaches of it', a
 test('the notebook in Spanish', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
   const page = await context.newPage();
-  await open(page, '03-past-the-teacher');
+  await open(page, 'past-the-teacher');
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook h2')).toHaveText('El cuaderno del mago');
   await expect(page.locator('#notebook')).toContainText('Se queda quieto mientras el mundo sigue');
@@ -67,7 +67,7 @@ test('the notebook in Spanish', async ({ browser }) => {
 test('a level\'s notebook has what the course has taught so far, for what is in the level (D40)', async ({
   page,
 }) => {
-  await page.goto('/#level/03-past-the-teacher');
+  await page.goto('/#level/past-the-teacher');
   await page.locator('#start').click();
   await page.locator('#notebook-open').click();
   const notebook = page.locator('#notebook');
@@ -82,7 +82,7 @@ test('a level\'s notebook has what the course has taught so far, for what is in 
 });
 
 test('a level\'s notebook has nothing the course has not taught yet', async ({ page }) => {
-  await page.goto('/#level/02-the-locked-door');
+  await page.goto('/#level/the-locked-door');
   await page.locator('#start').click();
   await page.locator('#notebook-open').click();
   const notebook = page.locator('#notebook');

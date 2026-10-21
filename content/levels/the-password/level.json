@@ -1,0 +1,36 @@
+{
+  "id": "the-password",
+  "map": [
+    "#######",
+    "#S..GE#",
+    "#######"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "gate",
+      "marker": "G",
+      "password": "ambrel"
+    }
+  ],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.say"
+  ],
+  "goals": [
+    {
+      "kind": "open",
+      "id": "gate"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    }
+  ],
+  "tick_limit": 50,
+  "speaker": "ilda"
+}

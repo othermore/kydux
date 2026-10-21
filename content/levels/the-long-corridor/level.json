@@ -1,0 +1,29 @@
+{
+  "id": "the-long-corridor",
+  "map": [
+    "#########",
+    "#S.....D#",
+    "#########"
+  ],
+  "things": [],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "D"
+    },
+    {
+      "kind": "lines_under",
+      "lines": 2,
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "ilda"
+}

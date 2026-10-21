@@ -371,6 +371,9 @@ has 2.11, 2.12, 2.0, 2.7, 2.5, 2.8 and 2.6 (`sprint-4.md`).
     animation for an attempt that could not even be made.
 2.13 The wand and spells (D42), and doors that open by key, by word or by
     spell (D43): chapter 1's world, in sprint 7.
+2.14 Shelves that stop feet and not eyes (D46), the spell that pulls
+    (D47), actors who stand and speak, and giving (D48), and what the
+    wizard carries from the start (D49): chapter 2's world, in sprint 8.
 
 UAT: the three levels from the MacBook; a misspelled action gets a Spanish
 message with a suggestion; the scrubber; a hint; stars.
@@ -474,8 +477,9 @@ every chapter follow:
   and so can be a condition, a conditional instruction, a loop, and so on.
   The levels after a theory lesson practise exactly what it explained.
 
-Sprint 7 has 5.1, 5.2, 2.13 and 5.3 (`sprint-7.md`); each later chapter is a
-sprint of its own, after the owner reads the one before.
+Sprint 7 has 5.1, 5.2, 2.13 and 5.3 (`sprint-7.md`); sprint 8 has 2.14 and
+5.4 (`sprint-8.md`); each later chapter is a sprint of its own, and the
+owner's notes on a chapter become fixes at the start of the sprint after.
 
 5.1 The story bible, `docs/dev/story.md`: the school, its name and places,
     the characters (the head, the teachers, a rival, a friend, the cat, a

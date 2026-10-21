@@ -50,22 +50,23 @@ attribute, finding a thing, a key, a spell that brings things.
 | # | Item | The idea, or what it practises | API it unlocks |
 | --- | --- | --- | --- |
 | T7 | `lesson:a-name-for-a-value` | A variable: a name the program gives a value, to use it again. `steps = 4`, then `wizard.move_right(steps)`. | (Python's `=`) |
-| L9 | `level:the-reading-room` | The same number of steps three times, kept in a variable. | |
+| L9 | `level:the-reading-room` | The same number of steps three times, kept in a variable. Bonus, a goal of the level's own: the number written once. | |
 | T8 | `lesson:what-things-know` | An attribute: what an object knows about itself, read without brackets: `wizard.position`, `door.locked`, `wizard.items`, what the wizard carries. `print` shows it. | `wizard.position`, `wizard.items`, `door.locked`, `thing.position` |
 | L10 | `level:which-door` | Print which of two doors is locked, then go through the other. | |
-| T9 | `lesson:finding-things` | An action can give something back: `wizard.find_nearest("book")` gives the nearest book, kept in a variable. | `wizard.find_nearest` |
+| T9 | `lesson:finding-things` | An action can give something back: `wizard.find_nearest("book")` gives the nearest book, kept in a variable; and the wizard can give a thing it carries to whoever stands beside it, `wizard.give(book)`. | `wizard.find_nearest`, `wizard.give` |
 | L11 | `level:the-lost-book` | Find Eldra's book and bring it to her. | |
 | T10 | `lesson:keys-and-doors` | A locked door needs its key, carried, and `door.open()` beside it. | `door.open` |
 | L12 | `level:the-locked-door` | Today's level, kept. | |
 | L13 | `level:the-archive` | A key found with `find_nearest`, two doors, one locked. | |
 | T11 | `lesson:fendra` | A spell can act at a distance: `fendra` draws a thing to the wizard. | (the spell `fendra`) |
-| L14 | `level:the-high-shelf` | A book on a shelf the wizard cannot reach. | |
+| L14 | `level:the-high-shelf` | A book on a shelf the wizard cannot reach; the wand carried from the start. | |
 | L15 | `level:eldras-book` | The chapter together; Eldra's book returned. | |
 
-The world features chapter 2 needs: tiles the wizard cannot walk on but
-can see across (a shelf, a gap); `fendra`, which moves a thing to the
-wizard's tile; Eldra as an actor who stands and speaks; a goal of giving
-a thing to an actor (`give`).
+The world features chapter 2 needs: shelves, tiles the wizard cannot walk
+on but can see across (D46); `fendra`, which pulls the nearest thing in
+sight to the wizard's tile (D47); Eldra as an actor who stands and
+speaks, and `wizard.give` with a `give` goal (D48); the wand carried from
+a level's start (D49). Built in sprint 8 (2.14).
 
 ## Chapter 3 — The passages (`03-passages`)
 

@@ -600,7 +600,12 @@ one overturns stays, marked as superseded.
   the last is Try it, into the first level that practises it. One idea per
   lesson, so the course has more lessons than the draft's 10 to 20, each
   short (`course.md`). Conditions come before loops, each alone, and a
-  loop with a condition only once both are known.
+  loop with a condition only once both are known. An idea goes where it
+  belongs, not where it is first handy: `wizard.items` is read like an
+  attribute, so it is taught with attributes in chapter 2, not with
+  picking things up in chapter 1. A bonus never asks for what the course
+  has not taught: without loops, chapter 1's last level asks for no line
+  to spare.
   `world/tests/test_course_content.py` holds a chapter that has lessons to
   it: every name a level's `api` teaches was explained by a lesson before
   it, or taught by a level before it. A chapter with no lesson yet holds

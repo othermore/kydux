@@ -114,11 +114,11 @@ tiles are `[x, y]`.
 |---|---|---|---|
 | `move` | wizard, or an actor | `from`, `to`, `facing` | walks it one tile, facing that way |
 | `bump` | wizard | `at`, `facing`, `by`: `wall` or `door` | nudges the wizard against it |
-| `say` | wizard | `text` | a bubble over the wizard for three ticks |
+| `say` | wizard | `text` | a bubble over the wizard for three ticks, under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
 | `pick_up` | wizard | `id`, `at` | the thing rises and vanishes; `data-carried` |
 | `open` | wizard | `id`, `at` | the door's frame turns open; `data-doors` |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open` or `nothing` | the door, or the wizard, shakes |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open` or `nothing`; `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
 
@@ -350,3 +350,16 @@ one overturns stays, marked as superseded.
   game's texts, docstrings and plans said *spell* for *method* and *Cast*
   for *Run*; sprint 4 renames them. Rules out a word of the story's for a
   mechanism of the language's.
+- **D28 — An action that cannot be done says why, where it happens.**
+  Decided 2026-10-21 (sprint-4.md), on the owner's acceptance test of
+  sprint 3. A `blocked` event is shown as a thought over the wizard, a grey
+  cloud with two small circles leading to it, in the child's words, for
+  three ticks; the run's card, when the run is not won, repeats the first
+  one with its line. The event carries `tried`: false for an attempt that
+  could not even be made (a door too far away, or already open), which is
+  not animated as a try, and true otherwise, when what would not do
+  shakes. The words name the thing by its kind with its article, *the
+  door*, *la puerta*, from `things.<kind>` in the i18n files, rather than
+  by the id the child typed as sprint-4.md had it, so that a sentence
+  reads well in every language. A bubble or a thought that has no room
+  above the wizard goes under it, and neither leaves the scene's sides.

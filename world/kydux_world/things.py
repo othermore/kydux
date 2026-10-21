@@ -129,14 +129,16 @@ class Door(Thing):
         world.ready()
         at = list(self._k_position)
         wizard = world.wizard.position
+        # `tried` says whether the wizard got to try: from too far, or at a door
+        # already open, there is nothing to try, and the scene shows no attempt.
         if abs(wizard.x - self._k_position.x) + abs(wizard.y - self._k_position.y) != 1:
-            world.act("blocked", {"at": at, "by": self.name, "reason": "far"})
+            world.act("blocked", {"at": at, "by": self.name, "reason": "far", "tried": False})
         elif self._k_open:
-            world.act("blocked", {"at": at, "by": self.name, "reason": "open"})
+            world.act("blocked", {"at": at, "by": self.name, "reason": "open", "tried": False})
         elif self._k_locked and not any(
             isinstance(item, Key) and item._opens(self) for item in world.carried()
         ):
-            world.act("blocked", {"at": at, "by": self.name, "reason": "locked"})
+            world.act("blocked", {"at": at, "by": self.name, "reason": "locked", "tried": True})
         else:
             self._set(open=True, locked=False)
             world.act("open", {"id": self.name, "at": at})

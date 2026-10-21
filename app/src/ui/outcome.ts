@@ -7,7 +7,7 @@ import { element } from './dom';
 
 export type Outcome =
   | { kind: 'won' }
-  | { kind: 'incomplete'; met: number; total: number }
+  | { kind: 'incomplete'; met: number; total: number; blocked?: { line: number; reason: string } }
   | { kind: 'too_many_ticks'; limit: number }
   | { kind: 'interrupted'; seconds: number }
   | { kind: 'caught' }
@@ -52,8 +52,13 @@ export function outcomeText(outcome: Outcome): string {
   switch (outcome.kind) {
     case 'won':
       return t('outcome.won');
-    case 'incomplete':
-      return t('outcome.incomplete', { n: outcome.met, total: outcome.total });
+    case 'incomplete': {
+      const said = t('outcome.incomplete', { n: outcome.met, total: outcome.total });
+      // Why something could not be done, the first time it happened (D28).
+      return outcome.blocked
+        ? `${said}\n${t('outcome.blocked', { line: outcome.blocked.line, reason: outcome.blocked.reason })}`
+        : said;
+    }
     case 'too_many_ticks':
       return t('outcome.too_many_ticks', { limit: outcome.limit });
     case 'interrupted':

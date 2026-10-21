@@ -24,7 +24,8 @@
     "error": "Python dice: {type}: {message} (línea {line})",
     "error_no_line": "Python dice: {type}: {message}",
     "caught": "¡Te ha visto el profesor! Inténtalo otra vez, y fíjate hacia dónde mira.",
-    "printed": "Tu código ha escrito:"
+    "printed": "Tu código ha escrito:",
+    "blocked": "En la línea {line}: {reason}"
   },
   "level": {
     "stop": "Parar",
@@ -58,5 +59,19 @@
     "line": " (línea {line})",
     "unknown_action": "`{object}` no conoce ninguna acción llamada `{name}`.",
     "no_new_attribute": "No puedes darle a `{object}` algo nuevo llamado `{name}`. Lo que `{object}` puede hacer está en su cuaderno."
+  },
+  "things": {
+    "door": "la puerta",
+    "key": "la llave",
+    "book": "el libro",
+    "wand": "la varita",
+    "potion": "la poción"
+  },
+  "blocked": {
+    "far": "No llego a {thing} desde aquí.",
+    "locked": "No puedo abrir {thing}: está cerrada con llave y no tengo la llave.",
+    "open": "No hace falta: {thing} ya está abierta.",
+    "nothing": "Aquí no hay nada que coger.",
+    "unknown_action": "Todavía no conozco esta acción."
   }
 }

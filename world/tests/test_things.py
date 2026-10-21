@@ -50,7 +50,9 @@ def test_pick_up_carries_the_thing_on_the_wizard_s_tile():
 def test_pick_up_with_nothing_there_is_blocked_and_takes_a_tick():
     world = World(ROOMS)
     world.wizard.pick_up()
-    assert kinds(world) == [("blocked", {"at": [1, 1], "by": "wizard", "reason": "nothing"})]
+    assert kinds(world) == [
+        ("blocked", {"at": [1, 1], "by": "wizard", "reason": "nothing", "tried": True})
+    ]
     assert world.tick == 1
 
 
@@ -66,7 +68,10 @@ def test_a_locked_door_needs_its_key():
     world = World(ROOMS)
     world.wizard.move_right(6)
     world.things["door"].open()
-    assert kinds(world)[-1] == ("blocked", {"at": [7, 2], "by": "door", "reason": "locked"})
+    assert kinds(world)[-1] == (
+        "blocked",
+        {"at": [7, 2], "by": "door", "reason": "locked", "tried": True},
+    )
     assert world.things["door"].locked and not world.things["door"].is_open
 
 
@@ -76,7 +81,10 @@ def test_a_door_is_opened_from_next_to_it_with_its_key_and_lets_the_wizard_throu
     world.wizard.pick_up()
     door = world.things["door"]
     door.open()
-    assert kinds(world)[-1] == ("blocked", {"at": [7, 2], "by": "door", "reason": "far"})
+    assert kinds(world)[-1] == (
+        "blocked",
+        {"at": [7, 2], "by": "door", "reason": "far", "tried": False},
+    )
     world.wizard.move_right(2)
     door.open()
     assert kinds(world)[-1] == ("open", {"id": "door", "at": [7, 2]})

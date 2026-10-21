@@ -24,7 +24,8 @@
     "error": "Python says: {type}: {message} (line {line})",
     "error_no_line": "Python says: {type}: {message}",
     "caught": "The teacher saw you! Try again, and watch which way they look.",
-    "printed": "Your code printed:"
+    "printed": "Your code printed:",
+    "blocked": "On line {line}: {reason}"
   },
   "level": {
     "stop": "Stop",
@@ -58,5 +59,19 @@
     "line": " (line {line})",
     "unknown_action": "`{object}` does not know an action called `{name}`.",
     "no_new_attribute": "You cannot give `{object}` a new `{name}`. What `{object}` can do is in its notebook."
+  },
+  "things": {
+    "door": "the door",
+    "key": "the key",
+    "book": "the book",
+    "wand": "the wand",
+    "potion": "the potion"
+  },
+  "blocked": {
+    "far": "I cannot reach {thing} from here.",
+    "locked": "I cannot open {thing}: it is locked, and I have no key for it.",
+    "open": "I do not need to: {thing} is already open.",
+    "nothing": "There is nothing here to pick up.",
+    "unknown_action": "I do not know this action yet."
   }
 }

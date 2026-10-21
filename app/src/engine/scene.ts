@@ -2,8 +2,10 @@
 // wizard, and the playback of a run's events, tick by tick. It speaks to the
 // rest of the page only through its handle and its parent's data-* attributes:
 // data-tick, data-state, data-wizard ("x,y"), data-actors ("id:x,y,facing"
-// joined by ";"), data-doors (the open doors' ids, joined by ","), and
-// data-carried (the ids of what the wizard carries, joined by ",").
+// joined by ";"), data-doors (the open doors' ids, joined by ","),
+// data-carried (the ids of what the wizard carries, joined by ","),
+// data-thought (why an action could not be done, while the wizard thinks it)
+// and data-shaking (present while something shakes at a failed try).
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
@@ -23,6 +25,7 @@ import {
 } from './placeholders';
 import { Playback } from './playback';
 import { sightTiles, type Tile } from './sight';
+import { blockedText } from './words';
 
 /** How long one tick lasts at speed 1. */
 export const TICK_MS = 400;
@@ -69,6 +72,11 @@ class LevelScene extends Phaser.Scene {
   private cone!: Phaser.GameObjects.Graphics;
   private bubble: Phaser.GameObjects.Text | null = null;
   private bubbleUntil = 0;
+  private thought: Phaser.GameObjects.Container | null = null;
+  private thoughtUntil = 0;
+  /** Where a bubble or thought sits: its width, and whether it is below the wizard. */
+  private bubblePlace = { width: 0, below: false };
+  private shaking = 0;
   /** Who saw the wizard, whose cone is drawn red. */
   private seenBy: string | null = null;
 
@@ -123,12 +131,28 @@ class LevelScene extends Phaser.Scene {
 
   /** A word said follows the wizard while it walks. */
   override update(): void {
-    this.bubble?.setPosition(this.wizard.x, this.wizard.y - 34);
+    const [x, y] = this.bubbleAnchor();
+    this.bubble?.setPosition(x, y);
+    this.thought?.setPosition(x, y);
+  }
+
+  /** Over the wizard, or under it when there is no room above; never past the sides. */
+  private bubbleAnchor(): [number, number] {
+    const half = this.bubblePlace.width / 2 + 4;
+    const width = this.map.width * TILE;
+    const x = Math.min(Math.max(this.wizard.x, half), Math.max(half, width - half));
+    return [x, this.wizard.y + (this.bubblePlace.below ? 22 : -34)];
+  }
+
+  /** Whether a bubble this tall fits over the wizard, inside the scene. */
+  private roomAbove(height: number): boolean {
+    return this.wizard.y - 34 - height - 14 >= 2;
   }
 
   /** Everything where it stood before the run. */
   private restart(): void {
     this.clearBubble();
+    this.clearThought();
     this.seenBy = null;
     this.openDoors.clear();
     this.carried.clear();
@@ -166,6 +190,7 @@ class LevelScene extends Phaser.Scene {
     }
     this.parentNode.dataset.tick = String(tick);
     if (this.bubble && tick >= this.bubbleUntil) this.clearBubble();
+    if (this.thought && tick >= this.thoughtUntil) this.clearThought();
     for (const event of events) {
       if (event.actor === 'wizard') this.showWizard(tick, event);
       else this.showActor(event);
@@ -219,9 +244,13 @@ class LevelScene extends Phaser.Scene {
         break;
       }
       case 'blocked': {
-        // A door that will not open shakes; with nothing to pick up, the wizard does.
-        const door = this.things.get(String(event.data.by));
-        this.shake(door ?? this.wizard, duration);
+        // The wizard thinks why; and when it did try, what would not do shakes:
+        // a locked door, or the wizard with nothing to pick up (D28). From too
+        // far away there was nothing to try, so nothing shakes.
+        const by = String(event.data.by);
+        const thing = this.map.things.find((t) => t.id === by);
+        this.think(blockedText(String(event.data.reason), thing?.kind ?? null), tick);
+        if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
         break;
       }
       // 'wait': the wizard stands still while the world moves on.
@@ -302,13 +331,66 @@ class LevelScene extends Phaser.Scene {
   }
 
   private shake(target: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite, ms: number): void {
-    this.tweens.add({ targets: target, x: target.x + 4, duration: ms / 6, yoyo: true, repeat: 2 });
+    this.shaking += 1;
+    this.parentNode.dataset.shaking = 'true';
+    this.tweens.add({
+      targets: target,
+      x: target.x + 4,
+      duration: ms / 6,
+      yoyo: true,
+      repeat: 2,
+      onComplete: () => {
+        this.shaking -= 1;
+        if (this.shaking === 0) delete this.parentNode.dataset.shaking;
+      },
+    });
+  }
+
+  /** A thought over the wizard: grey and rounded, with two small circles under it. */
+  private think(text: string, tick: number): void {
+    this.clearThought();
+    this.clearBubble();
+    const words = this.add
+      .text(0, 0, text.replaceAll('`', ''), {
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '15px',
+        fontStyle: 'italic',
+        color: '#1f2330',
+        wordWrap: { width: TILE * 4 },
+        align: 'center',
+      })
+      .setOrigin(0.5, 1);
+    const pad = 8;
+    const width = words.width + pad * 2;
+    const height = words.height + pad * 2;
+    // Above the wizard, the two small circles lead down to it; below, up to it.
+    const below = !this.roomAbove(height);
+    const sign = below ? 1 : -1;
+    const top = below ? 14 : -height - 14;
+    const cloud = this.add.graphics();
+    cloud.fillStyle(0xe9ecef, 0.97).lineStyle(2, 0x868e96, 1);
+    cloud.fillRoundedRect(-width / 2, top, width, height, 12);
+    cloud.strokeRoundedRect(-width / 2, top, width, height, 12);
+    cloud.fillCircle(-6, sign * 8, 4).strokeCircle(-6, sign * 8, 4);
+    cloud.fillCircle(-12, sign * 1, 2.5).strokeCircle(-12, sign * 1, 2.5);
+    words.setOrigin(0.5, below ? 0 : 1).setY(below ? 14 + pad : -14 - pad);
+    this.bubblePlace = { width, below };
+    this.thought = this.add.container(...this.bubbleAnchor(), [cloud, words]).setDepth(11);
+    this.thoughtUntil = tick + SAY_TICKS;
+    this.parentNode.dataset.thought = text.replaceAll('`', '');
+  }
+
+  private clearThought(): void {
+    this.thought?.destroy();
+    this.thought = null;
+    delete this.parentNode.dataset.thought;
   }
 
   private say(text: string, tick: number): void {
     this.clearBubble();
-    this.bubble = this.add
-      .text(this.wizard.x, this.wizard.y - 34, text, {
+    this.clearThought();
+    const bubble = this.add
+      .text(0, 0, text, {
         fontFamily: 'system-ui, sans-serif',
         fontSize: '15px',
         color: '#1f2330',
@@ -316,8 +398,12 @@ class LevelScene extends Phaser.Scene {
         padding: { x: 6, y: 3 },
         wordWrap: { width: TILE * 4 },
       })
-      .setOrigin(0.5, 1)
       .setDepth(10);
+    const below = !this.roomAbove(bubble.height);
+    bubble.setOrigin(0.5, below ? 0 : 1);
+    this.bubblePlace = { width: bubble.width, below };
+    bubble.setPosition(...this.bubbleAnchor());
+    this.bubble = bubble;
     this.bubbleUntil = tick + SAY_TICKS;
   }
 

@@ -33,9 +33,45 @@ test.describe('the locked door', () => {
     await expect(page.locator('.printed')).toHaveText('[<key key carried>]');
   });
 
+  test('a door too far away is not tried: the wizard thinks why, and nothing shakes', async ({
+    page,
+  }) => {
+    await page.locator('#speed').selectOption('1');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('door.open()');
+    await page.locator('#run').click();
+    await expect(scene(page)).toHaveAttribute('data-thought', 'I cannot reach the door from here.');
+    await expect(scene(page)).not.toHaveAttribute('data-shaking', /.*/);
+    await expect(page.locator('.outcome-text')).toHaveText(
+      'Not yet: 0 of 3 goals met. Try again.\nOn line 1: I cannot reach the door from here.',
+      { timeout: 30_000 },
+    );
+  });
+
+  test('a locked door is tried: it shakes, and the card says why', async ({ page }) => {
+    await page.locator('#speed').selectOption('1');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_right(6)\ndoor.open()');
+    await page.locator('#run').click();
+    await expect(scene(page)).toHaveAttribute(
+      'data-thought',
+      'I cannot open the door: it is locked, and I have no key for it.',
+      { timeout: 15_000 },
+    );
+    await expect(scene(page)).toHaveAttribute('data-shaking', 'true');
+    await expect(page.locator('.outcome-text')).toContainText(
+      'On line 2: I cannot open the door: it is locked',
+      { timeout: 30_000 },
+    );
+  });
+
   test('a locked door stays shut without its key', async ({ page }) => {
     const said = await run(page, 'wizard.move_right(6)\ndoor.open()\nwizard.move_down(2)');
-    expect(said).toBe('Not yet: 0 of 3 goals met. Try again.');
+    expect(said).toBe(
+      'Not yet: 0 of 3 goals met. Try again.\nOn line 2: I cannot open the door: it is locked, and I have no key for it.',
+    );
     await expect(scene(page)).toHaveAttribute('data-doors', '');
     await expect(scene(page)).toHaveAttribute('data-wizard', '7,1');
   });

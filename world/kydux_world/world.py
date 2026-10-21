@@ -287,7 +287,9 @@ class Wizard(Child):
         here = self._k_position
         found = world.things_at(here)
         if not found:
-            world.act("blocked", {"at": list(here), "by": "wizard", "reason": "nothing"})
+            world.act(
+                "blocked", {"at": list(here), "by": "wizard", "reason": "nothing", "tried": True}
+            )
             return
         thing = found[0]
         thing._carry()

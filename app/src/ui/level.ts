@@ -9,6 +9,7 @@ import { currentLanguage, t } from '../i18n';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
 import type { RunResult, WorldResult } from '../runtime/protocol';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
+import { blockedText } from '../engine/words';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
 import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
@@ -157,10 +158,19 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         return { kind: 'won' };
       case 'incomplete': {
         const needed = result.goals.filter((g) => !g.bonus);
+        const first = result.events.find((e) => e.actor === 'wizard' && e.kind === 'blocked');
+        const kindOf = (id: unknown) =>
+          ((loaded.level.things as { id: string; kind: string }[] | undefined) ?? []).find(
+            (thing) => thing.id === id,
+          )?.kind ?? null;
         return {
           kind: 'incomplete',
           met: needed.filter((g) => g.met).length,
           total: needed.length,
+          blocked:
+            first && first.line !== null
+              ? { line: first.line, reason: blockedText(String(first.data.reason), kindOf(first.data.by)) }
+              : undefined,
         };
       }
       case 'too_many_ticks':

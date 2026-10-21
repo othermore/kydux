@@ -1,0 +1,15 @@
+{
+  "title": "El libro perdido",
+  "goals": [
+    "Dale a Eldra su libro.",
+    "Encuentra el libro con find_nearest."
+  ],
+  "starting_code": "# ¿Dónde está el libro? Encuéntralo, tráelo y dáselo a Eldra.\n",
+  "hints": [
+    "Guarda bajo un nombre lo que devuelve `find_nearest`, y escribe dónde está.",
+    "Coge el libro en su casilla, y luego vuelve hasta quedar justo al lado de Eldra.",
+    "Entre los paréntesis de `wizard.give` va el libro mismo: el nombre bajo el que lo guardaste."
+  ],
+  "intro": "¡Oh, alguien nuevo! Perdí mi libro, ay, hace tanto tiempo. ¿Me lo encuentras, y me lo traes?",
+  "outro": "¡Mi libro! Después de tantos años. Gracias, {wizard}."
+}

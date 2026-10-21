@@ -1,0 +1,13 @@
+{
+  "title": "Por dónde",
+  "goals": [
+    "Llega al mostrador.",
+    "Pregúntale a la puerta si está cerrada con llave."
+  ],
+  "starting_code": "# El camino corto pasa por la puerta. ¿Está cerrada con llave?\n",
+  "hints": [
+    "`print(door.locked)` enseña `True` o `False` en la tarjeta.",
+    "Una puerta cerrada con llave, sin llave en la sala, no se abre: el otro camino es más largo, y está abierto."
+  ],
+  "intro": "Esa puerta es el camino corto a mi mostrador. Pero aquí algunas puertas están cerradas con llave, y la llave no está en esta sala."
+}

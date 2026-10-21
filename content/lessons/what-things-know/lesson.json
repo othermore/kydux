@@ -1,0 +1,9 @@
+{
+  "id": "what-things-know",
+  "teaches": [
+    "wizard.position",
+    "wizard.items",
+    "door.locked",
+    "thing.position"
+  ]
+}

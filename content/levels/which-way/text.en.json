@@ -1,0 +1,13 @@
+{
+  "title": "Which way",
+  "goals": [
+    "Reach the reading desk.",
+    "Ask the door whether it is locked."
+  ],
+  "starting_code": "# The short way goes through the door. Is it locked?\n",
+  "hints": [
+    "`print(door.locked)` shows `True` or `False` on the card.",
+    "A locked door with no key in the room will not open: the other way is longer, and open."
+  ],
+  "intro": "That door is the short way to my desk. But some doors here are locked, and the key is not in this room."
+}

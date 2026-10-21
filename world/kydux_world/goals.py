@@ -8,13 +8,17 @@ at. A bonus goal (`"bonus": true`) is not needed to win.
 The kinds: reach (a marker's tile, or one at x and y), collect (a thing by
 id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
 say (a text, word for word), give (a thing by id, to an actor by id),
-not_seen_by (an actor; failed when it catches the wizard), and lines_under
-(the code has fewer lines than that, not counting blank lines and comments;
-decided before the run). A level may add its own in a goals.py beside its
-level.json, which says so with `"own_goals": true`: a module whose `GOALS`
-maps each kind to its class, in the same shape as these.
+not_seen_by (an actor; failed when it catches the wizard), and three read
+from the code before the run: lines_under (fewer lines than that, not
+counting blank lines and comments), numbers_under (fewer numbers written in
+it than that, so that a value is named once, as a variable) and uses (the
+code names an action or an attribute: `{"kind": "uses", "member": "locked"}`).
+A level may add its own in a goals.py beside its level.json, which says so
+with `"own_goals": true`: a module whose `GOALS` maps each kind to its class,
+in the same shape as these.
 """
 
+import ast
 import sys
 import types
 from dataclasses import dataclass, field
@@ -161,6 +165,54 @@ class LinesUnderGoal:
         return code_lines(world.code) < self.lines
 
 
+def _code_tree(code: str) -> ast.AST | None:
+    try:
+        return ast.parse(code)
+    except SyntaxError:
+        return None
+
+
+class NumbersUnderGoal:
+    """Met, before the run starts, when the code writes fewer numbers than a count:
+    `{"kind": "numbers_under", "count": 2}` asks for a value written once."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        count = spec.params.get("count")
+        if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+            raise LevelError(f"{level.id}: a numbers_under goal needs a whole count")
+        self.count = count
+
+    def check(self, world: "World") -> bool:
+        tree = _code_tree(world.code)
+        if tree is None:
+            return False
+        numbers = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Constant)
+            and isinstance(node.value, int | float)
+            and not isinstance(node.value, bool)
+        ]
+        return len(numbers) < self.count
+
+
+class UsesGoal:
+    """Met, before the run starts, when the code names a member of an object, an
+    action or an attribute: `{"kind": "uses", "member": "find_nearest"}`."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        member = spec.params.get("member")
+        if not isinstance(member, str) or not member.isidentifier():
+            raise LevelError(f"{level.id}: a uses goal names a member")
+        self.member = member
+
+    def check(self, world: "World") -> bool:
+        tree = _code_tree(world.code)
+        return tree is not None and any(
+            isinstance(node, ast.Attribute) and node.attr == self.member for node in ast.walk(tree)
+        )
+
+
 class GiveGoal:
     """Met once the wizard has given a thing to an actor (D48):
     `{"kind": "give", "id": "book", "to": "eldra"}`."""
@@ -183,6 +235,8 @@ GOALS: dict[str, type] = {
     "give": GiveGoal,
     "not_seen_by": NotSeenByGoal,
     "lines_under": LinesUnderGoal,
+    "numbers_under": NumbersUnderGoal,
+    "uses": UsesGoal,
 }
 
 _own_goals: dict[tuple[str, str], dict[str, type]] = {}

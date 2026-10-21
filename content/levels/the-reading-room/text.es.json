@@ -1,0 +1,13 @@
+{
+  "title": "La sala de lectura",
+  "goals": [
+    "Cruza la sala de lectura.",
+    "Escribe el número una sola vez."
+  ],
+  "starting_code": "# Derecha, abajo, derecha: el mismo número de casillas cada vez.\n",
+  "hints": [
+    "Cuenta las casillas de un tramo: los otros dos son igual de largos.",
+    "Dale primero un nombre al número, como `steps = ...`, y luego usa el nombre en cada línea."
+  ],
+  "intro": "Te damos la bienvenida a la biblioteca. Camina en silencio, por favor: tres tramos, todos igual de largos."
+}

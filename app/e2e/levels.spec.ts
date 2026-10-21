@@ -201,3 +201,55 @@ test.describe('the sealed door (D42, D43)', () => {
     );
   });
 });
+
+/** Chapter 2's levels with a program that wins each, as its solution.py does. */
+const CHAPTER_2: [string, string][] = [
+  ['the-reading-room', 'steps = 3\nwizard.move_right(steps)\nwizard.move_down(steps)\nwizard.move_right(steps)'],
+  ['which-way', 'print(door.locked)\nwizard.move_right(5)\nwizard.move_down(3)\nwizard.move_left(5)'],
+  [
+    'the-lost-book',
+    'book = wizard.find_nearest("book")\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.pick_up()\n' +
+      'wizard.move_left(2)\nwizard.move_up(2)\nwizard.move_right(4)\nwizard.give(book)',
+  ],
+  [
+    'the-archive',
+    'wizard.move_right()\narchive_door.open()\nwizard.move_right(4)\nwizard.pick_up()\n' +
+      'wizard.move_right()\nvault_door.open()\nwizard.move_right(2)',
+  ],
+];
+
+test.describe('chapter 2', () => {
+  for (const [id, code] of CHAPTER_2) {
+    test(`${id} is won by its solution`, async ({ page }) => {
+      await page.goto(`/#level/${id}`);
+      await page.locator('#start').click();
+      await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+      await page.locator('#speed').selectOption('4');
+      expect(await run(page, code)).toMatch(/^You did it/);
+    });
+  }
+
+  test('a level says what it prints, and Eldra thanks the wizard on the win card', async ({ page }) => {
+    await page.goto('/#level/the-lost-book');
+    await expect(page.locator('#card-intro')).toContainText('Eldra');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('4');
+    await run(
+      page,
+      'book = wizard.find_nearest("book")\nprint(book.position)\nwizard.move_down(2)\nwizard.move_right(2)\n' +
+        'wizard.pick_up()\nwizard.move_left(2)\nwizard.move_up(2)\nwizard.move_right(4)\nwizard.give(book)',
+    );
+    await expect(page.locator('.printed')).toHaveText('Position(x=3, y=3)');
+    await expect(page.locator('#card-outro')).toContainText('My book!');
+  });
+
+  test('giving with no one beside the wizard says so', async ({ page }) => {
+    await page.goto('/#level/the-lost-book');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('4');
+    await run(page, 'wizard.move_down(2)\nwizard.move_right(2)\nwizard.pick_up()\nwizard.give(old_book)');
+    await expect(page.locator('.outcome-text')).toContainText('There is no one beside me to give it to.');
+  });
+});

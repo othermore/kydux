@@ -1,0 +1,13 @@
+{
+  "title": "The reading room",
+  "goals": [
+    "Cross the reading room.",
+    "Write the number only once."
+  ],
+  "starting_code": "# Right, down, right: the same number of tiles each time.\n",
+  "hints": [
+    "Count the tiles of one stretch: the other two are as long.",
+    "Give the number a name first, like `steps = ...`, and then use the name in every line."
+  ],
+  "intro": "Welcome to the library. Walk quietly, please: three stretches, each as long as the others."
+}

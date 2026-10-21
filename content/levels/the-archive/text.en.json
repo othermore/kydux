@@ -1,0 +1,15 @@
+{
+  "title": "The archive",
+  "goals": [
+    "Open the vault door.",
+    "Reach the vault.",
+    "Find the key with find_nearest."
+  ],
+  "starting_code": "# Two doors: one opens by hand, one needs its key.\n",
+  "hints": [
+    "`print(archive_door.locked, vault_door.locked)` says which door needs a key.",
+    "The archive door opens by hand. The key lies between the two doors.",
+    "Ask `find_nearest` for the key, and print its position to know where to stop."
+  ],
+  "intro": "The archive keeps the oldest books. Its first door opens by hand; the vault's needs a key, which lies somewhere inside."
+}

@@ -11,5 +11,6 @@
     "The door needs the key. Where is the key?",
     "Walk onto the key's tile and pick it up with `wizard.pick_up()`.",
     "Stand next to the door before you open it, with `door.open()`."
-  ]
+  ],
+  "intro": "This room's door is locked, and its key lies on the floor. You know what to do."
 }

@@ -1,0 +1,7 @@
+book = wizard.find_nearest("book")
+wizard.move_down(2)
+wizard.move_right(2)
+wizard.move_left(2)
+wizard.move_up(2)
+wizard.move_right(4)
+wizard.give(book)

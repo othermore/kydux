@@ -1,0 +1,7 @@
+wizard.move_right()
+archive_door.open()
+wizard.move_right(3)
+wizard.pick_up()
+wizard.move_right(2)
+vault_door.open()
+wizard.move_right(2)

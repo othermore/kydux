@@ -1,6 +1,14 @@
 {
   "id": "02-the-library",
   "items": [
-    "level:the-locked-door"
+    "lesson:a-name-for-a-value",
+    "level:the-reading-room",
+    "lesson:what-things-know",
+    "level:which-way",
+    "lesson:finding-things",
+    "level:the-lost-book",
+    "lesson:keys-and-doors",
+    "level:the-locked-door",
+    "level:the-archive"
   ]
 }

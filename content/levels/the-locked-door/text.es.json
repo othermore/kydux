@@ -11,5 +11,6 @@
     "La puerta necesita la llave. ¿Dónde está la llave?",
     "Camina hasta la casilla de la llave y cógela con `wizard.pick_up()`.",
     "Ponte junto a la puerta antes de abrirla, con `door.open()`."
-  ]
+  ],
+  "intro": "La puerta de esta sala está cerrada con llave, y su llave está en el suelo. Ya sabes qué hacer."
 }

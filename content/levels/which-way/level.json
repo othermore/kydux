@@ -1,0 +1,43 @@
+{
+  "id": "which-way",
+  "map": [
+    "#########",
+    "#S.....##",
+    "#D####.##",
+    "#.####.##",
+    "#E.....##",
+    "#########"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "door",
+      "marker": "D",
+      "locked": true
+    }
+  ],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.position",
+    "wizard.items",
+    "door.locked",
+    "thing.position"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "uses",
+      "member": "locked",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "wenna"
+}

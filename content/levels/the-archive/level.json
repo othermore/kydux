@@ -1,0 +1,56 @@
+{
+  "id": "the-archive",
+  "map": [
+    "###########",
+    "#S.A..K.BE#",
+    "###########"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "archive_door",
+      "marker": "A"
+    },
+    {
+      "kind": "key",
+      "id": "key",
+      "marker": "K",
+      "opens": "vault_door"
+    },
+    {
+      "kind": "door",
+      "id": "vault_door",
+      "marker": "B",
+      "locked": true
+    }
+  ],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.pick_up",
+    "wizard.find_nearest",
+    "door.open",
+    "door.locked",
+    "thing.position"
+  ],
+  "goals": [
+    {
+      "kind": "open",
+      "id": "vault_door"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "uses",
+      "member": "find_nearest",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "wenna"
+}

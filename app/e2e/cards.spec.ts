@@ -49,8 +49,8 @@ test('a won run shows its stars, and Next opens what comes next in the course', 
   await expect(win.locator('.stars')).toHaveAttribute('data-stars', '2');
   await expect(win.locator('.stars')).toHaveAttribute('aria-label', '2 of 3 stars');
   await page.locator('#next').click();
-  await expect(page).toHaveURL(/#level\/past-the-teacher$/);
-  await expect(page.locator('.level-title')).toHaveText('Past the teacher');
+  await expect(page).toHaveURL(/#level\/the-archive$/);
+  await expect(page.locator('.level-title')).toHaveText('The archive');
 });
 
 test('Play again closes the win card; the last level says there is no next yet', async ({

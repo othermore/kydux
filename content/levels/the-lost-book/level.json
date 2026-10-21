@@ -1,0 +1,49 @@
+{
+  "id": "the-lost-book",
+  "map": [
+    "########",
+    "#S....G#",
+    "#.######",
+    "#..B####",
+    "########"
+  ],
+  "things": [
+    {
+      "kind": "book",
+      "id": "old_book",
+      "marker": "B"
+    }
+  ],
+  "actors": [
+    {
+      "kind": "ghost",
+      "id": "eldra",
+      "marker": "G",
+      "facing": "left"
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.pick_up",
+    "wizard.find_nearest",
+    "wizard.give",
+    "thing.position"
+  ],
+  "goals": [
+    {
+      "kind": "give",
+      "id": "old_book",
+      "to": "eldra"
+    },
+    {
+      "kind": "uses",
+      "member": "find_nearest",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "eldra"
+}

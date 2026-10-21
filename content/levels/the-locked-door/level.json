@@ -54,5 +54,6 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100
+  "tick_limit": 100,
+  "speaker": "wenna"
 }

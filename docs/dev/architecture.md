@@ -688,3 +688,14 @@ one overturns stays, marked as superseded.
   (`level.carrying`), and the scene counts them carried from tick 0. The
   world keeps nothing between levels: each level says what is carried, so
   that any level can be played on its own.
+- **D50 — Goals that read the code: lines, numbers, and what it uses.**
+  Decided 2026-10-21, while building sprint 8. Besides `lines_under`, a
+  level may ask, before the run, for `numbers_under` (fewer numbers
+  written in the code than a count, so that a value is named once, as a
+  variable) and `uses` (the code names a member, an action or an
+  attribute, as `.locked` or `.find_nearest`). They are the world's
+  goals, not a level's `goals.py`: every chapter that teaches an idea
+  needs to ask for it, so one goal serves them all. A code that does not
+  parse meets neither. They are bonus goals in chapter 2: a run that wins
+  without the idea still wins, and the extra star says the idea was
+  used.

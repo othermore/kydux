@@ -1,0 +1,7 @@
+{
+  "id": "finding-things",
+  "teaches": [
+    "wizard.find_nearest",
+    "wizard.give"
+  ]
+}

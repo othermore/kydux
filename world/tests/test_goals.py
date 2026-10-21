@@ -192,3 +192,20 @@ def test_a_level_s_own_goals_come_from_its_goals_py():
 def test_a_goal_that_cannot_be_checked_names_its_fault(goal, says):
     with pytest.raises(LevelError, match=says):
         World(rooms(goal))
+
+
+def test_numbers_under_counts_the_numbers_the_code_writes():
+    level = rooms(
+        {"kind": "reach", "marker": "E"}, {"kind": "numbers_under", "count": 2, "bonus": True}
+    )
+    once = run_code(level, "steps = 3\nwizard.move_right(steps)\nwizard.move_right(steps)\n")
+    twice = run_code(level, "wizard.move_right(3)\nwizard.move_right(3)\n")
+    assert once.goals[1].met and not twice.goals[1].met
+
+
+def test_uses_is_met_when_the_code_names_the_member():
+    level = rooms(
+        {"kind": "reach", "marker": "E"}, {"kind": "uses", "member": "position", "bonus": True}
+    )
+    assert run_code(level, "print(wizard.position)\n").goals[1].met
+    assert not run_code(level, "wizard.move_right()\n").goals[1].met

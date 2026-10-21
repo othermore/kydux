@@ -17,7 +17,7 @@
     "bonus": "Bonus:"
   },
   "outcome": {
-    "won": "You did it!",
+    "won": "You did it, {wizard}!",
     "incomplete": "Not yet: {n} of {total} goals met. Try again.",
     "too_many_ticks": "Your program has taken more than {limit} steps and the wizard is tired. Is there a loop that never ends?",
     "interrupted": "Your program was stopped: it ran for more than {seconds} seconds without doing anything.",
@@ -146,7 +146,10 @@
     "export": "Export",
     "import": "Import",
     "import_failed": "That file is not a Kydux progress file. Nothing has changed.",
-    "map": "The map"
+    "map": "The map",
+    "create": "Make your wizard",
+    "hello": "Hello, {wizard}",
+    "change_wizard": "Change my wizard"
   },
   "map": {
     "back": "Back to the start",
@@ -172,6 +175,17 @@
     "back": "Back"
   },
   "wizard": {
-    "no_name": "apprentice"
+    "no_name": "apprentice",
+    "title": "Your wizard",
+    "page_title": "Kydux — your wizard",
+    "name": "Your wizard's name",
+    "name_rule": "A name has letters, digits, spaces, hyphens and apostrophes, up to 20 of them.",
+    "gender": "Your wizard is",
+    "girl": "A girl",
+    "boy": "A boy",
+    "looks": "Your wizard's look",
+    "look_n": "Look {n}",
+    "done": "Done",
+    "back": "Back"
   }
 }

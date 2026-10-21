@@ -3,6 +3,7 @@
 // the same drawing comes out everywhere.
 
 import type Phaser from 'phaser';
+import { DEFAULT_LOOK, type HairStyle, type Look } from './looks';
 
 export const TILE = 48;
 export const WIZARD_WIDTH = 36;
@@ -91,16 +92,61 @@ function drawMarker(ctx: CanvasRenderingContext2D, colour: string): void {
 
 interface Figure {
   robe: string;
-  hat: string | null;
+  /** The hat and its band, or null for a figure without one. */
+  hat: { colour: string; band: string } | null;
   hair: string;
+  hairStyle: HairStyle;
+  skin: string;
 }
 
-const WIZARD: Figure = { robe: '#3b5bdb', hat: '#2b3fa8', hair: '#6b4a2b' };
-const TEACHER: Figure = { robe: '#6c6f7d', hat: null, hair: '#c9c9c9' };
+const TEACHER: Figure = {
+  robe: '#6c6f7d',
+  hat: null,
+  hair: '#c9c9c9',
+  hairStyle: 'short',
+  skin: '#f2c9a0',
+};
+
+function wizardFigure(look: Look): Figure {
+  return {
+    robe: look.robe,
+    hat: { colour: look.hat, band: look.band },
+    hair: look.hair,
+    hairStyle: look.hairStyle,
+    skin: look.skin,
+  };
+}
 
 /** The wizard facing one way, in a frame of WIZARD_WIDTH by WIZARD_HEIGHT at x. */
-function drawWizard(ctx: CanvasRenderingContext2D, x: number, facing: Facing): void {
-  drawFigure(ctx, x, facing, WIZARD);
+function drawWizard(ctx: CanvasRenderingContext2D, x: number, facing: Facing, look: Look): void {
+  drawFigure(ctx, x, facing, wizardFigure(look));
+}
+
+/** A look's wizard facing the viewer, on a canvas of its own: for a screen
+ * outside the scene, like the creator. The canvas is WIZARD_WIDTH by
+ * WIZARD_HEIGHT; CSS makes it bigger, pixelated. */
+export function drawLookPreview(target: HTMLCanvasElement, look: Look): void {
+  target.width = WIZARD_WIDTH;
+  target.height = WIZARD_HEIGHT;
+  const ctx = target.getContext('2d');
+  if (!ctx) return;
+  ctx.clearRect(0, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
+  drawWizard(ctx, 0, 'down', look);
+}
+
+/** Long hair: past the hat's brim at the sides, and from behind over the robe. */
+function drawLongHair(ctx: CanvasRenderingContext2D, cx: number, facing: Facing, hair: string): void {
+  ctx.fillStyle = hair;
+  if (facing === 'up') {
+    ctx.fillRect(cx - 8, 14, 16, 14);
+  } else if (facing === 'down') {
+    ctx.fillRect(cx - 9, 12, 4, 15);
+    ctx.fillRect(cx + 5, 12, 4, 15);
+  } else {
+    // Seen from a side, the hair falls behind the head.
+    const back = facing === 'left' ? cx + 3 : cx - 8;
+    ctx.fillRect(back, 12, 5, 15);
+  }
 }
 
 /** A person facing one way: the wizard, with a hat, or the teacher, without. */
@@ -115,8 +161,9 @@ function drawFigure(ctx: CanvasRenderingContext2D, x: number, facing: Facing, fi
   ctx.lineTo(cx - 8, 20);
   ctx.closePath();
   ctx.fill();
+  if (figure.hat && figure.hairStyle === 'long') drawLongHair(ctx, cx, facing, figure.hair);
   // The face, or the back of the head.
-  ctx.fillStyle = facing === 'up' ? figure.hair : '#f2c9a0';
+  ctx.fillStyle = facing === 'up' ? figure.hair : figure.skin;
   ctx.beginPath();
   ctx.arc(cx, 18, 7, 0, Math.PI * 2);
   ctx.fill();
@@ -137,9 +184,15 @@ function drawFigure(ctx: CanvasRenderingContext2D, x: number, facing: Facing, fi
     }
     return;
   }
+  // Short hair shows under the brim, at the sides of the face.
+  if (figure.hairStyle === 'short' && facing !== 'up') {
+    ctx.fillStyle = figure.hair;
+    if (facing !== 'right') ctx.fillRect(cx - 8, 13, 3, 4);
+    if (facing !== 'left') ctx.fillRect(cx + 5, 13, 3, 4);
+  }
   // The hat: its brim, then its point, leaning the way the wizard faces.
   const lean = facing === 'left' ? -4 : facing === 'right' ? 4 : 0;
-  ctx.fillStyle = figure.hat;
+  ctx.fillStyle = figure.hat.colour;
   ctx.fillRect(cx - 12, 11, 24, 3);
   ctx.beginPath();
   ctx.moveTo(cx - 8, 11);
@@ -147,7 +200,7 @@ function drawFigure(ctx: CanvasRenderingContext2D, x: number, facing: Facing, fi
   ctx.lineTo(cx + lean, 0);
   ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = '#ffd43b';
+  ctx.fillStyle = figure.hat.band;
   ctx.fillRect(cx - 8, 9, 16, 2);
 }
 
@@ -216,7 +269,11 @@ function drawThing(ctx: CanvasRenderingContext2D, x: number, kind: string, open 
 }
 
 /** Makes every placeholder texture a level with these marker letters needs. */
-export function makePlaceholders(scene: Phaser.Scene, markers: string[]): void {
+export function makePlaceholders(
+  scene: Phaser.Scene,
+  markers: string[],
+  look: Look = DEFAULT_LOOK,
+): void {
   const tiles = canvas(scene, TILES_KEY, TILE * 2, TILE);
   drawFloor(tiles.ctx, FLOOR * TILE);
   drawWall(tiles.ctx, WALL * TILE);
@@ -230,7 +287,7 @@ export function makePlaceholders(scene: Phaser.Scene, markers: string[]): void {
 
   const wizard = canvas(scene, WIZARD_KEY, WIZARD_WIDTH * FACINGS.length, WIZARD_HEIGHT);
   FACINGS.forEach((facing, index) => {
-    drawWizard(wizard.ctx, index * WIZARD_WIDTH, facing);
+    drawWizard(wizard.ctx, index * WIZARD_WIDTH, facing, look);
     wizard.texture.add(facing, 0, index * WIZARD_WIDTH, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
   });
   wizard.texture.refresh();

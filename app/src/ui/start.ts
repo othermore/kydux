@@ -1,16 +1,21 @@
-// The start screen: where the game opens. Continue goes to the item of the
-// course last opened, Start from the beginning clears the progress, and the
+// The start screen: where the game opens. Before the child has made a wizard,
+// its big button leads to the creator; after, Continue goes to the item of the
+// course last opened. Start from the beginning clears the progress, and the
 // progress can be kept as a file and given back.
 
+import { lookOf } from '../engine/looks';
+import { drawLookPreview } from '../engine/placeholders';
 import { t } from '../i18n';
 import * as progress from '../progress/progress';
-import { exportProgress, importProgress } from '../progress/store';
+import { exportProgress, importProgress, type Wizard } from '../progress/store';
 import { element } from './dom';
 import type { Screen } from './screen';
 
 export interface StartScreenParts {
   /** Where Continue goes, and the title of what is there. */
   continueTo: { hash: string; title: string };
+  /** The wizard the child made, or null before there is one (D36). */
+  wizard: Wizard | null;
   /** The progress changed (cleared or imported): the screen is drawn again. */
   onChanged: () => void;
 }
@@ -30,9 +35,12 @@ export function startScreen(parts: StartScreenParts): Screen {
   const message = element('p', { id: 'start-message', className: 'start-message', hidden: true });
 
   const draw = () => {
-    const go = element('a', { id: 'continue', className: 'big-button', href: parts.continueTo.hash }, [
-      t('start.continue', { title: parts.continueTo.title }),
-    ]);
+    const { wizard } = parts;
+    const go = wizard
+      ? element('a', { id: 'continue', className: 'big-button', href: parts.continueTo.hash }, [
+          t('start.continue', { title: parts.continueTo.title }),
+        ])
+      : element('a', { id: 'continue', className: 'big-button', href: '#wizard' }, [t('start.create')]);
     const fresh = element('button', { id: 'new', type: 'button', className: 'quiet-button' }, [
       t('start.new'),
     ]);
@@ -60,7 +68,10 @@ export function startScreen(parts: StartScreenParts): Screen {
       try {
         // The language the child chose stays as it is now: the file brings progress.
         const brought = importProgress(await file.text());
-        brought.language = progress.load().language;
+        const now = progress.load();
+        brought.language = now.language;
+        // A file from before the wizard was made keeps the one made since.
+        brought.wizard ??= now.wizard;
         progress.save(brought);
         parts.onChanged();
       } catch {
@@ -68,10 +79,24 @@ export function startScreen(parts: StartScreenParts): Screen {
         message.hidden = false;
       }
     });
+    const greeting: HTMLElement[] = [element('h2', {}, [wizard ? t('start.hello') : t('start.welcome')])];
+    if (wizard) {
+      const shown = element('canvas', { id: 'start-figure', className: 'figure medium' });
+      drawLookPreview(shown, lookOf(wizard.look));
+      greeting.unshift(shown);
+    }
+    const actions: HTMLElement[] = [go, map, fresh, settings];
+    if (wizard) {
+      actions.push(
+        element('a', { id: 'change-wizard', className: 'quiet-button', href: '#wizard' }, [
+          t('start.change_wizard'),
+        ]),
+      );
+    }
     node.replaceChildren(
-      element('h2', {}, [t('start.welcome')]),
+      element('div', { className: 'start-greeting' }, greeting),
       element('p', { className: 'start-intro' }, [t('start.intro')]),
-      element('div', { className: 'start-actions' }, [go, map, fresh, settings]),
+      element('div', { className: 'start-actions' }, actions),
       element('section', { className: 'start-progress' }, [
         element('h3', {}, [t('start.progress')]),
         element('p', {}, [t('start.progress_about')]),

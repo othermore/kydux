@@ -8,6 +8,7 @@ import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
 import type { Editor, EditorOptions } from '../editor/editor';
 import type { Speed } from '../engine/playback';
+import { type Look, lookOf } from '../engine/looks';
 import type { SceneHandle } from '../engine/scene';
 import { currentLanguage, t } from '../i18n';
 import * as progress from '../progress/progress';
@@ -42,7 +43,7 @@ export interface LevelScreenParts {
   table: ApiTable;
   /** Made by the caller, so that Phaser and CodeMirror load on their own. */
   createEditor: (parent: HTMLElement, options: EditorOptions) => Editor;
-  startScene: (parent: HTMLElement, level: LoadedLevel['level']) => Promise<SceneHandle>;
+  startScene: (parent: HTMLElement, level: LoadedLevel['level'], look: Look) => Promise<SceneHandle>;
 }
 
 export function levelScreen(parts: LevelScreenParts): LevelScreen {
@@ -378,7 +379,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     mount() {
       if (mounted) return;
       mounted = true;
-      void parts.startScene(sceneParent, loaded.level).then((handle) => {
+      // The wizard the child made, or the first look before there is one.
+      const look = lookOf(progress.wizard()?.look);
+      void parts.startScene(sceneParent, loaded.level, look).then((handle) => {
         if (destroyed) {
           handle.destroy();
           return;

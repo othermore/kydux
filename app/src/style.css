@@ -886,3 +886,136 @@ a.stop-body:focus-visible {
   font-family: var(--mono);
   font-size: var(--editor-font-size, 17px);
 }
+
+/* The wizard: its figure drawn small and shown big, in true pixels (D36). */
+
+.figure {
+  image-rendering: pixelated;
+}
+
+.figure.small {
+  width: 108px;
+  height: 132px;
+}
+
+.figure.medium {
+  width: 72px;
+  height: 88px;
+}
+
+.figure.big {
+  width: 144px;
+  height: 176px;
+}
+
+.start-greeting {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.wizard-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 980px;
+  margin: 24px auto;
+  font-size: 18px;
+}
+
+.wizard-screen h2 {
+  margin: 0;
+}
+
+.wizard-layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.wizard-choices {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 320px;
+}
+
+.wizard-field {
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+
+#wizard-name {
+  max-width: 360px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 20px;
+}
+
+.wizard-rule {
+  margin: 0;
+  color: var(--warning);
+  font-size: 15px;
+}
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.radio-group .radio {
+  padding: 10px 18px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--fg);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#wizard-looks .radio {
+  padding: 4px;
+}
+
+.radio-group .radio[aria-checked='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.radio-group .radio:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.wizard-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.wizard-preview-name {
+  min-height: 1.4em;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.wizard-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.big-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

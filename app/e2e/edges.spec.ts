@@ -63,7 +63,7 @@ test('without isolation, a loop that never ends is stopped by starting Python ag
   await expect(page.locator('#run')).toBeEnabled({ timeout: 60_000 });
   await setCode(page, 'wizard.move_right(6)');
   await page.locator('#run').click();
-  await expect(page.locator('.outcome-text')).toHaveText('You did it!', { timeout: 30_000 });
+  await expect(page.locator('.outcome-text')).toHaveText('You did it, apprentice!', { timeout: 30_000 });
 });
 
 test('the scene follows the size of the window', async ({ page }) => {
@@ -91,7 +91,7 @@ test('the page may reach no other server, and the game still runs', async ({ pag
   expect(blocked).toBe('connect-src');
   await setCode(page, 'wizard.move_right(6)');
   await page.locator('#run').click();
-  await expect(page.locator('.outcome-text')).toHaveText('You did it!', { timeout: 30_000 });
+  await expect(page.locator('.outcome-text')).toHaveText('You did it, apprentice!', { timeout: 30_000 });
 });
 
 test("the child's code cannot reach JavaScript", async ({ page }) => {

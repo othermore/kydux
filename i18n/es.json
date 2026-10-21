@@ -17,7 +17,7 @@
     "bonus": "Extra:"
   },
   "outcome": {
-    "won": "¡Lo has conseguido!",
+    "won": "¡Lo has conseguido, {wizard}!",
     "incomplete": "Todavía no: {n} de {total} objetivos cumplidos. Inténtalo otra vez.",
     "too_many_ticks": "Tu programa ha dado más de {limit} pasos y {el mago|la maga} está agotad{o|a}. ¿Hay algún bucle que no termina nunca?",
     "interrupted": "Se ha detenido tu programa: llevaba más de {seconds} segundos sin hacer nada.",
@@ -146,7 +146,10 @@
     "export": "Exportar",
     "import": "Importar",
     "import_failed": "Ese fichero no es un fichero de progreso de Kydux. No ha cambiado nada.",
-    "map": "El mapa"
+    "map": "El mapa",
+    "create": "Crea tu personaje",
+    "hello": "Hola, {wizard}",
+    "change_wizard": "Cambiar mi personaje"
   },
   "map": {
     "back": "Volver al inicio",
@@ -172,6 +175,17 @@
     "back": "Volver"
   },
   "wizard": {
-    "no_name": "aprendiz"
+    "no_name": "aprendiz",
+    "title": "Tu personaje",
+    "page_title": "Kydux — tu personaje",
+    "name": "El nombre de tu personaje",
+    "name_rule": "Un nombre puede tener letras, números, espacios, guiones y apóstrofos, hasta 20.",
+    "gender": "Tu personaje es",
+    "girl": "Una maga",
+    "boy": "Un mago",
+    "looks": "Su aspecto",
+    "look_n": "Aspecto {n}",
+    "done": "Listo",
+    "back": "Volver"
   }
 }

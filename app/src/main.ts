@@ -10,6 +10,7 @@ import type { Screen } from './ui/screen';
 import { applyLook } from './ui/look';
 import { settingsScreen } from './ui/settings';
 import { startScreen } from './ui/start';
+import { wizardScreen } from './ui/wizard';
 
 const runtime = new Runtime();
 let screen: Screen | null = null;
@@ -22,6 +23,7 @@ type Route =
   | { name: 'start' }
   | { name: 'map' }
   | { name: 'settings' }
+  | { name: 'wizard' }
   | { name: 'level'; id: string }
   | { name: 'lesson'; id: string };
 
@@ -33,6 +35,7 @@ function parseRoute(hash: string): Route {
   if (lesson) return { name: 'lesson', id: decodeURIComponent(lesson[1] ?? '') };
   if (hash === '#map') return { name: 'map' };
   if (hash === '#settings') return { name: 'settings' };
+  if (hash === '#wizard') return { name: 'wizard' };
   return { name: 'start' };
 }
 
@@ -169,6 +172,7 @@ async function showStart(content: HTMLElement): Promise<void> {
     content,
     startScreen({
       continueTo,
+      wizard: progress.wizard(),
       onChanged: () => {
         shownRoute = null;
         route();
@@ -241,6 +245,22 @@ function route(): void {
   chrome(root, content);
   if (wanted.name === 'settings') {
     show(content, settingsScreen({ back: beforeSettings }));
+    return;
+  }
+  if (wanted.name === 'wizard') {
+    show(
+      content,
+      wizardScreen({
+        // The wizard made, the course goes on where the child was, or begins.
+        onDone: () => {
+          void loadCourse()
+            .then(continueTarget)
+            .then((target) => {
+              location.hash = target.hash;
+            });
+        },
+      }),
+    );
     return;
   }
   const shown =

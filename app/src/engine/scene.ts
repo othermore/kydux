@@ -4,12 +4,14 @@
 // data-tick, data-state, data-wizard ("x,y"), data-actors ("id:x,y,facing"
 // joined by ";"), data-doors (the open doors' ids, joined by ","),
 // data-carried (the ids of what the wizard carries, joined by ","),
-// data-thought (why an action could not be done, while the wizard thinks it)
-// and data-shaking (present while something shakes at a failed try).
+// data-thought (why an action could not be done, while the wizard thinks it),
+// data-shaking (present while something shakes at a failed try) and data-look
+// (the id of the look the wizard is drawn with, D36).
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
 import { type Layout, layout } from './layout';
+import { DEFAULT_LOOK, type Look } from './looks';
 import {
   actorKey,
   FLOOR,
@@ -85,6 +87,7 @@ class LevelScene extends Phaser.Scene {
     private readonly parentNode: HTMLElement,
     private readonly playback: Playback,
     private readonly ready: () => void,
+    private readonly look: Look,
   ) {
     super({ key: 'level' });
   }
@@ -93,7 +96,10 @@ class LevelScene extends Phaser.Scene {
     makePlaceholders(
       this,
       this.map.markers.map(([letter]) => letter),
+      this.look,
     );
+    // The look the wizard is drawn with, for the tests (D36).
+    this.parentNode.dataset.look = this.look.id;
     const data = this.map.rows.map((row) => [...row].map((c) => (c === '#' ? WALL : FLOOR)));
     const tilemap = this.make.tilemap({ data, tileWidth: TILE, tileHeight: TILE });
     const tileset = tilemap.addTilesetImage(TILES_KEY, TILES_KEY, TILE, TILE, 0, 0);
@@ -427,8 +433,13 @@ class LevelScene extends Phaser.Scene {
   }
 }
 
-/** Starts the level's scene in `parent`; resolves once it is drawn. */
-export function startScene(parent: HTMLElement, level: LevelJson): Promise<SceneHandle> {
+/** Starts the level's scene in `parent`, its wizard drawn with `look`; resolves
+ * once it is drawn. */
+export function startScene(
+  parent: HTMLElement,
+  level: LevelJson,
+  look: Look = DEFAULT_LOOK,
+): Promise<SceneHandle> {
   const map = layout(level);
   const playback = new Playback({ tickMs: TICK_MS });
 
@@ -437,7 +448,7 @@ export function startScene(parent: HTMLElement, level: LevelJson): Promise<Scene
     // The scene fits its parent, and follows it when the parent changes size.
     const resized = new ResizeObserver(() => game?.scale.refresh());
     resized.observe(parent);
-    const scene = new LevelScene(map, parent, playback, () => {
+    const onReady = () => {
       resolve({
         playback,
         load(result: WorldResult) {
@@ -453,7 +464,8 @@ export function startScene(parent: HTMLElement, level: LevelJson): Promise<Scene
           game = null;
         },
       });
-    });
+    };
+    const scene = new LevelScene(map, parent, playback, onReady, look);
     game = new Phaser.Game({
       type: Phaser.AUTO,
       parent,

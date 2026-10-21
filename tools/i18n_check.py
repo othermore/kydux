@@ -126,6 +126,8 @@ def check_chapters(languages: list[str]) -> list[str]:
 BRACED_BAR = re.compile(r"\{[^{}\n]*\|[^{}\n]*\}")
 #: The words for the wizard that Spanish genders; they belong inside a choice.
 GENDERED = {"es": re.compile(r"\bmag[oa]\b", re.IGNORECASE)}
+#: The words that choose the wizard's gender, which name it on purpose.
+CHOOSE_GENDER = {"wizard.girl", "wizard.boy"}
 
 
 def strings(value) -> list[str]:
@@ -141,7 +143,11 @@ def player_texts(languages: dict[str, dict[str, str]]) -> list[tuple[str, str, s
     levels', the chapters' and the lessons'."""
     texts = []
     for lang, catalog in languages.items():
-        texts.extend((lang, f"i18n/{lang}.json: {key}", text) for key, text in catalog.items())
+        texts.extend(
+            (lang, f"i18n/{lang}.json: {key}", text)
+            for key, text in catalog.items()
+            if key not in CHOOSE_GENDER
+        )
     content = REPO / "content"
     for path in sorted(content.glob("*/*/text.*.json")):
         lang = path.name.split(".")[1]

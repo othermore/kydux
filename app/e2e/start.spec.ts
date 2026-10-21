@@ -1,6 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
+import { seedWizard } from './helpers';
 
 test.use({ locale: 'en-US' });
+
+// Continue goes on in the course once there is a wizard; before, it makes one
+// (wizard.spec.ts).
+test.beforeEach(async ({ page }) => seedWizard(page));
 
 async function winTheCorridor(page: Page): Promise<void> {
   await page.locator('#start').click();
@@ -13,7 +18,7 @@ async function winTheCorridor(page: Page): Promise<void> {
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
 }
 
-test('a first visit lands on the start screen, and Continue opens the first lesson', async ({
+test('the start screen opens the game, and Continue opens the first lesson', async ({
   page,
 }) => {
   await page.goto('/');
@@ -63,6 +68,7 @@ test('a file that is not progress is refused, and nothing changes', async ({ pag
 
 test('the start screen in Spanish', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
+  await seedWizard(context);
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('#continue')).toHaveText('Continuar: Tu primera acción');

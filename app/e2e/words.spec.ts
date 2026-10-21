@@ -1,12 +1,10 @@
 import { type Browser, expect, type Page, test } from '@playwright/test';
+import { MARTA, seedWizard } from './helpers';
 
 /** A page whose progress document already holds a wizard (D36). */
 async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'boy'): Promise<Page> {
   const context = await browser.newContext({ locale });
-  const document = { version: 1, wizard: { name: 'Marta', gender, look: 'amber' } };
-  await context.addInitScript((kept) => {
-    if (!localStorage.getItem('kydux.progress')) localStorage.setItem('kydux.progress', kept);
-  }, JSON.stringify(document));
+  await seedWizard(context, { ...MARTA, gender });
   return context.newPage();
 }
 

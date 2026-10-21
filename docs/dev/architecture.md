@@ -460,6 +460,30 @@ one overturns stays, marked as superseded.
   dragging and is saved when the drag ends. The scene follows as it does a
   window resize. Under 800 pixels the panes stack and the handle is gone.
   The settings' Back returns to the screen they were opened from.
+- **D36 — The wizard is the child's: a name, a gender and a look, kept in
+  the progress document.** Decided 2026-10-21 (sprint-6.md), built the
+  same day. `progress.wizard` is `{name, gender, look}`, or null before the
+  child has made one; the document's `version` stays 1, and one without
+  `wizard` reads as null. `readWizard` (`app/src/progress/store.ts`) keeps a
+  wizard only when its name, trimmed, is 1 to 20 letters of any alphabet,
+  digits, spaces, hyphens or apostrophes, its gender `girl` or `boy`, and
+  its look one the game has. `gender` chooses the words (D37), nothing
+  else. The looks are `app/src/engine/looks.ts`: eight ids, each with the
+  placeholder figure's skin, hair, hair style, robe, hat and band, four
+  skin tones each with both hair styles, none like a famous wizard; with
+  phase 4's art the same ids pick sprite sheets, so the document does not
+  change. The creator is at `#wizard` (`app/src/ui/wizard.ts`); the start
+  screen's big button leads there while there is no wizard, and offers
+  *Change my wizard* once there is. Done needs a name and a gender: the
+  gender is never preset, as sprint-6.md's *enabled once the name is not
+  empty* would have needed, since a default would choose for the child.
+  The gender buttons are words, not a figure each, since a figure is a
+  look and any look is either's. Escape and Back leave an existing wizard
+  as it was. *Start from the beginning* keeps the wizard; an import keeps
+  the file's, or the current one when the file has none. The scene draws
+  the wizard from the look and says its id in `data-look`, which the
+  browser tests read: a WebGL canvas's pixels cannot be read reliably, so
+  the colours are checked on the creator's 2D canvas instead.
 - **D37 — The words follow the wizard.** Decided 2026-10-21 (sprint-6.md),
   built the same day. A text for the player may hold a choice,
   `{boy's words|girl's words}`, either side possibly empty (`cansad{o|a}`),

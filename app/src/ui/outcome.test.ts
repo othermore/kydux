@@ -10,7 +10,7 @@ afterEach(() => initLanguage(english));
 describe('outcomeText', () => {
   it('says each outcome in English', () => {
     initLanguage(english);
-    expect(outcomeText({ kind: 'won' })).toBe('You did it!');
+    expect(outcomeText({ kind: 'won' })).toBe('You did it, apprentice!');
     expect(outcomeText({ kind: 'incomplete', met: 0, total: 1 })).toBe(
       'Not yet: 0 of 1 goals met. Try again.',
     );
@@ -35,7 +35,7 @@ describe('outcomeText', () => {
 
   it('says it in Spanish', () => {
     initLanguage(spanish);
-    expect(outcomeText({ kind: 'won' })).toBe('¡Lo has conseguido!');
+    expect(outcomeText({ kind: 'won' })).toBe('¡Lo has conseguido, aprendiz!');
     expect(outcomeText({ kind: 'incomplete', met: 1, total: 2 })).toBe(
       'Todavía no: 1 de 2 objetivos cumplidos. Inténtalo otra vez.',
     );

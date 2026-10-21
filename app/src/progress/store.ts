@@ -2,6 +2,8 @@
 // store keeps it in the browser's localStorage; a remote one can come later
 // behind the same interface. Nothing else in the game keeps progress anywhere.
 
+import { isLook } from '../engine/looks';
+
 /** The document's shape this version of the game writes. A document of another
  * version, or none, is read as the defaults. */
 export const PROGRESS_VERSION = 1;
@@ -117,13 +119,6 @@ function isObject(value: unknown): value is Record<string, unknown> {
 
 /** A document read back: its known fields, each checked, the rest the defaults'.
  * Returns null for something that is not a progress document of this version. */
-let isLook: (id: string) => boolean = () => true;
-
-/** Tells the store which looks the game has, so that a wizard of another is not read. */
-export function knowLooks(check: (id: string) => boolean): void {
-  isLook = check;
-}
-
 export function readProgress(value: unknown): Progress | null {
   if (!isObject(value) || value.version !== PROGRESS_VERSION) return null;
   const progress = defaultProgress();

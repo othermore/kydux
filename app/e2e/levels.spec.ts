@@ -81,7 +81,7 @@ test.describe('the locked door', () => {
       page,
       'wizard.move_right(4)\nwizard.pick_up()\nwizard.move_right(2)\ndoor.open()\nwizard.move_down(2)',
     );
-    expect(said).toBe('You did it!');
+    expect(said).toBe('You did it, apprentice!');
     await expect(scene(page)).toHaveAttribute('data-carried', 'key');
     await expect(scene(page)).toHaveAttribute('data-doors', 'door');
     await expect(scene(page)).toHaveAttribute('data-wizard', '7,3');
@@ -115,7 +115,7 @@ test.describe('past the teacher', () => {
 
   test('waiting while the teacher looks this way, then crossing, wins', async ({ page }) => {
     const said = await run(page, 'while teacher.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
-    expect(said).toBe('You did it!');
+    expect(said).toBe('You did it, apprentice!');
     await expect(scene(page)).toHaveAttribute('data-wizard', '2,1');
   });
 });

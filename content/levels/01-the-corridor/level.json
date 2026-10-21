@@ -5,6 +5,19 @@
     "#S.....D#",
     "#########"
   ],
-  "goals": [{ "kind": "reach", "marker": "D" }],
+  "things": [],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "D"
+    }
+  ],
   "tick_limit": 100
 }

@@ -13,3 +13,6 @@ things.
 # The word for a wizard not yet made, which the words that follow the wizard
 # (app/src/i18n/index.ts, forWizard) read without t(), since t() calls them.
 wizard.no_name
+
+# The settings list each key the game answers to by `settings.key.${key}`.
+settings.key.

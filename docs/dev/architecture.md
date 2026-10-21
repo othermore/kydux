@@ -508,6 +508,24 @@ one overturns stays, marked as superseded.
   is Python, never a word to gender. The adjectives that agree with the
   wizard (`quiet{o|a}`, `agotad{o|a}`) are not checked: the check would need
   a grammar, and a reviewer reads the Spanish.
+- **D38 — The screens the game is made for.** Decided 2026-10-21
+  (sprint-6.md), built the same day. The level screen works from 1024 ×
+  700 pixels, a tablet held sideways with its browser's bars, to any size:
+  at 1024 × 700, 1280 × 720 and 1920 × 1080 the scene, the editor with
+  eight lines or more, Run, the goals, the speed and the gear are in view
+  with no scrolling, the start card and the notebook fit inside the
+  scene's frame, and the heading wraps rather than overlap
+  (`app/e2e/screens.spec.ts`). Under 800 pixels the panes stack, for a
+  phone, which the game does not promise but does not break on. The layout
+  needed no change of size: what the trial showed was the goals panel
+  covering the scene's first row, the wizard's start, at 1024; its heading
+  now folds it, and it stays folded for the visit. The keys: Tab and
+  Shift+Tab indent, Escape then Tab leaves the editor, Ctrl+Enter (Cmd on
+  a Mac) runs in the editor, and on the whole level screen Alt+R runs and
+  Alt+N opens the notebook. Those two are read by the key's place
+  (`event.code`), so that a Mac's Option+R, which types `®`, works and
+  types nothing. The buttons say their key in their title, and the
+  settings list every key.
 - **D40 — An action once learned stays known.** Decided 2026-10-21 by the
   owner, during sprint 6, built the same day. A level's `api` (D23) still
   lists what that level teaches, and the world's tests hold its solution

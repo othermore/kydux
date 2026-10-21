@@ -1,5 +1,6 @@
 // The goals panel: the level's goals, each with a mark that is empty, ticked
-// once met, or crossed once failed.
+// once met, or crossed once failed. Its heading folds it, so that on a small
+// screen it does not hide the scene; it stays folded for the visit (D38).
 
 import { t } from '../i18n';
 import { element } from './dom';
@@ -23,6 +24,9 @@ function label(mark: GoalMark): string {
   }
 }
 
+/** Whether the child has folded the panel, kept while the page is open. */
+let folded = false;
+
 export function goalsPanel(goals: { text: string; bonus?: boolean }[]): GoalsPanel {
   const items = goals.map((goal) => {
     const mark = element('span', { className: 'goal-mark' });
@@ -42,14 +46,27 @@ export function goalsPanel(goals: { text: string; bonus?: boolean }[]): GoalsPan
   };
   const reset = () => items.forEach((_, index) => set(index, 'open'));
   reset();
-  const node = element('section', { className: 'goals' }, [
-    element('h3', {}, [t('goals.title')]),
-    element(
-      'ul',
-      {},
-      items.map((entry) => entry.item),
-    ),
+  const list = element(
+    'ul',
+    { id: 'goals-list' },
+    items.map((entry) => entry.item),
+  );
+  const toggle = element('button', { id: 'goals-toggle', type: 'button', className: 'goals-toggle' }, [
+    t('goals.title'),
   ]);
+  toggle.setAttribute('aria-controls', 'goals-list');
+  toggle.title = t('goals.fold');
+  const node = element('section', { className: 'goals' }, [element('h3', {}, [toggle]), list]);
+  const show = () => {
+    list.hidden = folded;
+    node.dataset.folded = String(folded);
+    toggle.setAttribute('aria-expanded', String(!folded));
+  };
+  toggle.addEventListener('click', () => {
+    folded = !folded;
+    show();
+  });
+  show();
   node.setAttribute('aria-live', 'polite');
   return { node, set, reset };
 }

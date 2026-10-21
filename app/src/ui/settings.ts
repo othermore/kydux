@@ -10,6 +10,8 @@ import { applyLook, FONT_SIZES } from './look';
 import type { Screen } from './screen';
 
 const SPEEDS: Speed[] = [1, 2, 4];
+/** The keys the game answers to, each with its words in settings.key.<name>. */
+const KEYS = ['run', 'notebook', 'indent', 'leave', 'close', 'split'] as const;
 
 export interface SettingsScreenParts {
   /** The address Back goes to. */
@@ -66,6 +68,17 @@ export function settingsScreen(parts: SettingsScreenParts): Screen {
         ),
       ]),
       element('p', { className: 'settings-sample', id: 'settings-sample' }, ['wizard.move_right(3)']),
+      element('section', { className: 'settings-keys', id: 'settings-keys' }, [
+        element('h3', {}, [t('settings.keys')]),
+        element(
+          'dl',
+          {},
+          KEYS.flatMap((key) => [
+            element('dt', {}, [t(`settings.key.${key}.keys`)]),
+            element('dd', {}, [t(`settings.key.${key}.does`)]),
+          ]),
+        ),
+      ]),
       element('a', { id: 'settings-back', className: 'big-button', href: parts.back }, [t('settings.back')]),
     );
   };

@@ -365,6 +365,27 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   };
   labelSettings();
 
+  // Keys for the level, anywhere on its screen: Alt+R runs, Alt+N opens the
+  // notebook. They are read by the key's place, so that a Mac's Option+R, which
+  // types a character, works too (D38).
+  const onKey = (event: KeyboardEvent) => {
+    if (!event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.code === 'KeyR') {
+      event.preventDefault();
+      if (controller.snapshot.canRun) controller.run(editor.getDoc());
+    } else if (event.code === 'KeyN') {
+      event.preventDefault();
+      notebookButton.click();
+    }
+  };
+  document.addEventListener('keydown', onKey, true);
+  stopped.push(() => document.removeEventListener('keydown', onKey, true));
+  const labelKeys = () => {
+    run.title = t('level.run_key');
+    notebookButton.title = t('level.notebook_key');
+  };
+  labelKeys();
+
   const setPageTitle = () => {
     document.title = t('level.page_title', { title: text.title });
   };
@@ -408,6 +429,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       about.title = t('level.about');
       timeline.setAttribute('aria-label', t('level.timeline'));
       labelSettings();
+      labelKeys();
       if (shownCard?.open && shownCard.node.querySelector('.start-card')) showStart();
       renderHints();
       notebook.relabel();

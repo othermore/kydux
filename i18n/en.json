@@ -14,7 +14,8 @@
     "open": "Not met yet",
     "met": "Met",
     "failed": "Failed",
-    "bonus": "Bonus:"
+    "bonus": "Bonus:",
+    "fold": "Show or hide the goals"
   },
   "outcome": {
     "won": "You did it, {wizard}!",
@@ -54,7 +55,9 @@
     "play": "Play",
     "go_start": "Go to the start",
     "settings": "Settings",
-    "split": "Drag to resize the scene and the editor"
+    "split": "Drag to resize the scene and the editor",
+    "run_key": "Run your code: Alt+R, or Ctrl+Enter in the editor",
+    "notebook_key": "Open or close the notebook: Alt+N"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",
@@ -172,7 +175,34 @@
     "page_title": "Kydux — settings",
     "font_size": "Text size in the editor",
     "pixels": "{n} pixels",
-    "back": "Back"
+    "back": "Back",
+    "keys": "Keys",
+    "key": {
+      "run": {
+        "keys": "Ctrl+Enter or Alt+R",
+        "does": "Runs your code. On a Mac, Cmd+Enter or Option+R."
+      },
+      "notebook": {
+        "keys": "Alt+N",
+        "does": "Opens or closes the notebook. On a Mac, Option+N."
+      },
+      "indent": {
+        "keys": "Tab, Shift+Tab",
+        "does": "Moves a line in by four spaces, or out again."
+      },
+      "leave": {
+        "keys": "Escape, then Tab",
+        "does": "Leaves the editor, so that Tab moves to the next button."
+      },
+      "close": {
+        "keys": "Escape",
+        "does": "Closes a card over the scene."
+      },
+      "split": {
+        "keys": "Left and right arrows",
+        "does": "On the handle between the scene and the editor, moves it."
+      }
+    }
   },
   "wizard": {
     "no_name": "apprentice",

@@ -209,9 +209,29 @@ footer {
 .goals h3 {
   margin: 0 0 4px;
   font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+}
+
+.goals[data-folded='true'] h3 {
+  margin: 0;
+}
+
+.goals-toggle {
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--muted);
+  font: inherit;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.goals-toggle::after {
+  content: ' ▾';
+}
+
+.goals[data-folded='true'] .goals-toggle::after {
+  content: ' ▸';
 }
 
 .goals ul {
@@ -528,7 +548,8 @@ footer {
 
 .level-heading {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 4px 10px;
   align-items: center;
 }
 
@@ -1018,4 +1039,31 @@ a.stop-body:focus-visible {
 .big-button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.settings-keys {
+  width: 100%;
+}
+
+.settings-keys h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.settings-keys dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 0;
+  font-size: 16px;
+}
+
+.settings-keys dt {
+  font-family: var(--mono);
+  font-weight: 600;
+}
+
+.settings-keys dd {
+  margin: 0;
+  color: var(--muted);
 }

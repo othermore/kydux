@@ -244,3 +244,16 @@ one overturns stays, marked as superseded.
   the level's directory, and either without the other is refused. Rules
   out the world looking for goals.py on its own, which it cannot do in the
   browser.
+- **D22 — Errors are explained by the world, said by the page.** Decided
+  2026-10-20 (sprint-3.md), built 2026-10-21. `kydux_world.explain` turns
+  a Python exception into an explanation, a kind and its parameters, with
+  suggestions from the names the level teaches for a spell, and from
+  `wizard` and the level's ids for a name; the page says it through
+  `t('error.<kind>')` in the player's language, a code name in backticks
+  shown as code, and Python's own text stays in the error for an adult.
+  The kinds: `unknown_spell`, `unknown_name`, `read_only`, `not_called`,
+  `unclosed`, `missing_colon`, `indentation`, `syntax`, `arguments`,
+  `no_such_module` and `other`. `not_called` was not in sprint-3.md's
+  table: a spell named without its brackets, `wizard.move_right` alone, is
+  no error to Python and does nothing, which a child cannot tell from a
+  spell that failed, so the world refuses it before the run, at its line.

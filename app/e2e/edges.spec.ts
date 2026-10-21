@@ -100,8 +100,9 @@ test("the child's code cannot reach JavaScript", async ({ page }) => {
   for (const code of ['import js', 'from pyodide.ffi import to_js', 'import sys\nprint(sys.modules["js"])']) {
     await setCode(page, code);
     await page.locator('#cast').click();
-    await expect(page.locator('.outcome-text')).toHaveText(/^Python says: (ModuleNotFoundError|KeyError)/, {
-      timeout: 30_000,
-    });
+    await expect(page.locator('.outcome-text')).toHaveText(
+      /^(There is no spell book called (js|pyodide\.ffi) in this school|Python says: KeyError)/,
+      { timeout: 30_000 },
+    );
   }
 });

@@ -43,5 +43,20 @@
     "reload": "Recargar",
     "go_first": "Ir al primer nivel",
     "load_failed": "No se ha podido cargar el nivel. Recarga la página para intentarlo de nuevo."
+  },
+  "error": {
+    "unknown_spell": "`{object}` no conoce el hechizo `{name}`.",
+    "unknown_name": "Aquí no hay nada que se llame `{name}`.",
+    "suggestion": "¿Querías decir `{suggestion}`?",
+    "read_only": "No puedes cambiar `{object}.{name}` tú mismo: lanza un hechizo para que cambie.",
+    "not_called": "`{name}` es un hechizo, y un hechizo se lanza con paréntesis detrás, como `{example}`.",
+    "unclosed": "Esta línea abre un `{what}` que nunca se cierra.",
+    "missing_colon": "Una línea que empieza por `{keyword}` termina con `:`.",
+    "indentation": "Las líneas de dentro de un `while`, un `if` o un `for` necesitan cuatro espacios delante.",
+    "syntax": "Python no puede leer esta línea: {message}.",
+    "arguments": "`{name}` no se lanza así. Prueba de esta forma: `{example}`.",
+    "no_such_module": "En este colegio no hay ningún libro de hechizos llamado `{name}`.",
+    "other": "Python dice: {type}: {message}",
+    "line": " (línea {line})"
   }
 }

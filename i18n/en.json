@@ -43,5 +43,20 @@
     "reload": "Reload",
     "go_first": "Go to the first level",
     "load_failed": "The level could not be loaded. Reload the page to try again."
+  },
+  "error": {
+    "unknown_spell": "`{object}` does not know the spell `{name}`.",
+    "unknown_name": "There is nothing called `{name}` here.",
+    "suggestion": "Did you mean `{suggestion}`?",
+    "read_only": "You cannot change `{object}.{name}` yourself: cast a spell to make it change.",
+    "not_called": "`{name}` is a spell, and a spell is cast with brackets after it, like `{example}`.",
+    "unclosed": "This line opens a `{what}` that never closes.",
+    "missing_colon": "A line that starts with `{keyword}` ends with `:`.",
+    "indentation": "The lines inside a `while`, an `if` or a `for` need four spaces in front.",
+    "syntax": "Python cannot read this line: {message}.",
+    "arguments": "`{name}` is not cast like that. Try it like this: `{example}`.",
+    "no_such_module": "There is no spell book called `{name}` in this school.",
+    "other": "Python says: {type}: {message}",
+    "line": " (line {line})"
   }
 }

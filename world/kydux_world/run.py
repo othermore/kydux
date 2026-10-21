@@ -5,6 +5,7 @@ from the world's in a traceback; what it prints is captured; and whatever
 happens, a result comes back as a plain dict the worker sends as JSON.
 """
 
+import ast
 import contextlib
 import io
 import json
@@ -13,6 +14,7 @@ import traceback
 from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
 
+from .explain import NotCalled, check_called, explain
 from .goals import GoalResult
 from .level import Level
 from .sandbox import child_builtins
@@ -24,10 +26,14 @@ class ErrorInfo:
     type: str
     message: str
     line: int | None
+    #: What it means, in the kind and parameters the page says in the child's words.
+    explanation: dict[str, Any] | None = None
 
 
 def child_line(error: BaseException) -> int | None:
     """The innermost line of the child's code in the error's traceback."""
+    if isinstance(error, NotCalled):
+        return error.line
     if isinstance(error, SyntaxError) and error.filename == CHILD:
         return error.lineno
     line = None
@@ -46,9 +52,10 @@ def python_name(error: BaseException) -> str:
     return type(error).__name__
 
 
-def error_info(error: BaseException) -> ErrorInfo:
+def error_info(error: BaseException, level: Level | None = None) -> ErrorInfo:
     message = error.msg if isinstance(error, SyntaxError) else str(error)
-    return ErrorInfo(python_name(error), message, child_line(error))
+    explanation = explain(error, level).to_dict() if level is not None else None
+    return ErrorInfo(python_name(error), message, child_line(error), explanation)
 
 
 class WorldError(Exception):
@@ -144,11 +151,12 @@ def run_code(level: Level, code: str) -> RunResult:
     error = None
     try:
         compiled = compile(code, CHILD, "exec")
+        check_called(compile(code, CHILD, "exec", flags=ast.PyCF_ONLY_AST), world.namespace())
         with contextlib.redirect_stdout(stdout):
             namespace = {"__name__": "__main__", "__builtins__": child_builtins()}
             exec(compiled, {**namespace, **world.namespace()})
-    except SyntaxError as caught:
-        status, error = "error", error_info(caught)
+    except (SyntaxError, NotCalled) as caught:
+        status, error = "error", error_info(caught, level)
     except TooManyTicks:
         status = "too_many_ticks"
     except Caught:
@@ -156,7 +164,7 @@ def run_code(level: Level, code: str) -> RunResult:
     except KeyboardInterrupt:
         status = "interrupted"
     except BaseException as caught:  # the child's code may raise anything, exit() too
-        status, error = "error", error_info(caught)
+        status, error = "error", error_info(caught, level)
     else:
         status = "incomplete"
     if world.over is not None and status in ("incomplete", "error"):

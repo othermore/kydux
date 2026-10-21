@@ -57,12 +57,13 @@ test.describe('in English', () => {
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(0);
   });
 
-  test("Python's error shows with its line, marked in the editor", async ({ page }) => {
+  test("an error is said in the child's words, its line marked in the editor", async ({ page }) => {
     await setCode(page, 'wizrd.move_right(6)');
     await cast(page);
     await expect(outcome(page)).toHaveText(
-      "Python says: NameError: name 'wizrd' is not defined (line 1)",
+      'There is nothing called wizrd here. Did you mean wizard? (line 1)',
     );
+    await expect(outcome(page).locator('code')).toHaveText(['wizrd', 'wizard']);
     await expect(page.locator('.cm-kydux-error-line')).toHaveCount(1);
     await page.locator('.cm-content').press('End');
     await page.keyboard.type(' ');

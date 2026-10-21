@@ -2,7 +2,7 @@
 // own words stay for an error until the children's words of piece 2.4.
 
 import { t } from '../i18n';
-import type { ErrorInfo } from '../runtime/protocol';
+import type { ErrorInfo, Explanation } from '../runtime/protocol';
 import { element } from './dom';
 
 export type Outcome =
@@ -13,6 +13,38 @@ export type Outcome =
   | { kind: 'caught' }
   | { kind: 'error'; error: ErrorInfo }
   | { kind: 'failed' };
+
+/** An error explained by the world, in the child's words (D22). */
+export function explanationText(explanation: Explanation): string {
+  const p = explanation.params;
+  const said = (() => {
+    switch (explanation.kind) {
+      case 'unknown_spell':
+        return t('error.unknown_spell', p);
+      case 'unknown_name':
+        return t('error.unknown_name', p);
+      case 'read_only':
+        return t('error.read_only', p);
+      case 'not_called':
+        return t('error.not_called', p);
+      case 'unclosed':
+        return t('error.unclosed', p);
+      case 'missing_colon':
+        return t('error.missing_colon', p);
+      case 'indentation':
+        return t('error.indentation', p);
+      case 'syntax':
+        return t('error.syntax', p);
+      case 'arguments':
+        return t('error.arguments', p);
+      case 'no_such_module':
+        return t('error.no_such_module', p);
+      default:
+        return t('error.other', p);
+    }
+  })();
+  return 'suggestion' in p ? `${said} ${t('error.suggestion', p)}` : said;
+}
 
 export function outcomeText(outcome: Outcome): string {
   switch (outcome.kind) {
@@ -27,7 +59,11 @@ export function outcomeText(outcome: Outcome): string {
     case 'caught':
       return t('outcome.caught');
     case 'error': {
-      const { type, message, line } = outcome.error;
+      const { type, message, line, explanation } = outcome.error;
+      if (explanation) {
+        const text = explanationText(explanation);
+        return line != null ? `${text}${t('error.line', { line })}` : text;
+      }
       return line != null
         ? t('outcome.error', { type, message, line })
         : t('outcome.error_no_line', { type, message });
@@ -35,6 +71,14 @@ export function outcomeText(outcome: Outcome): string {
     case 'failed':
       return t('level.failed');
   }
+}
+
+/** The text with what is between backticks as code: `move_right` is a name to type. */
+export function withCode(said: string): (string | HTMLElement)[] {
+  return said
+    .split('`')
+    .map((part, index) => (index % 2 === 1 ? element('code', {}, [part]) : part))
+    .filter((part) => part !== '');
 }
 
 export interface OutcomeCard {
@@ -57,7 +101,7 @@ export function outcomeCard(): OutcomeCard {
     node,
     show(outcome) {
       current = outcome;
-      text.textContent = outcomeText(outcome);
+      text.replaceChildren(...withCode(outcomeText(outcome)));
       reload.textContent = t('level.reload');
       reload.hidden = outcome.kind !== 'failed';
       node.dataset.kind = outcome.kind;

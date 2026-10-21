@@ -15,10 +15,17 @@ export type FromWorker =
   | { type: 'result'; id: number; result: RunResult }
   | { type: 'crashed'; id: number; message: string };
 
+/** What an error means, as the world explains it (kydux_world.explain). */
+export interface Explanation {
+  kind: string;
+  params: Record<string, string | number>;
+}
+
 export interface ErrorInfo {
   type: string;
   message: string;
   line?: number | null;
+  explanation?: Explanation | null;
 }
 
 export type WorldStatus =

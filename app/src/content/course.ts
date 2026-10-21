@@ -11,6 +11,9 @@ export interface Chapter {
 
 export interface Course {
   chapters: Chapter[];
+  /** For each level of the course, every name taught by it and by the levels
+   * before it (D40). */
+  known?: Record<string, string[]>;
 }
 
 export type ItemKind = 'lesson' | 'level';
@@ -46,6 +49,12 @@ export function next(course: Course, item: string): string | null {
   const all = items(course);
   const index = all.indexOf(item);
   return index >= 0 && index + 1 < all.length ? (all[index + 1] ?? null) : null;
+}
+
+/** What the child may use in a level: what the course has taught up to it, or,
+ * for a level outside the course, the level's own `api`. */
+export function knownApi(course: Course, levelId: string, own: readonly string[]): string[] {
+  return course.known?.[levelId] ?? [...own];
 }
 
 export function previous(course: Course, item: string): string | null {

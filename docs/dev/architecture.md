@@ -508,3 +508,18 @@ one overturns stays, marked as superseded.
   is Python, never a word to gender. The adjectives that agree with the
   wizard (`quiet{o|a}`, `agotad{o|a}`) are not checked: the check would need
   a grammar, and a reviewer reads the Spanish.
+- **D40 — An action once learned stays known.** Decided 2026-10-21 by the
+  owner, during sprint 6, built the same day. A level's `api` (D23) still
+  lists what that level teaches, and the world's tests hold its solution
+  to it; what the child may use in a level is wider: every name taught by
+  that level and by every level before it in the course. `pack-world.mjs`
+  writes it into `content/course.json` as `known`, by level, and the page
+  gives it to the world, the notebook and the editor's completion in
+  place of the level's own list (`knownApi` in `app/src/content/course.ts`);
+  a level opened outside the course keeps its own. So the notebook of the
+  level with the teacher lists the moves and `pick_up` learned before,
+  though the level does not need them, and the world lets them be used,
+  rather than the notebook offering what the world then refuses. The
+  notebook still shows only the objects the level holds: no door where
+  there is none, and the teacher only where the teacher is. A name the
+  course has not taught yet is shown nowhere.

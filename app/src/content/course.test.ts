@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { defaultProgress } from '../progress/store';
-import { type Course, itemHash, next, parseItem, previous, stopState } from './course';
+import { type Course, itemHash, knownApi, next, parseItem, previous, stopState } from './course';
 
 const COURSE: Course = {
   chapters: [
@@ -42,5 +42,13 @@ describe('the course', () => {
     progress.lessons['01-a'] = { read: true };
     progress.levels['01-b'] = { tried: true };
     expect(stopState(COURSE, 'lesson:02-c', progress)).toBe('locked');
+  });
+});
+
+describe('what the child knows (D40)', () => {
+  it('is what the course has taught, or the level\'s own api outside the course', () => {
+    const course: Course = { ...COURSE, known: { '02-d': ['wizard.move_right', 'wizard.wait'] } };
+    expect(knownApi(course, '02-d', ['wizard.wait'])).toEqual(['wizard.move_right', 'wizard.wait']);
+    expect(knownApi(course, 'elsewhere', ['wizard.wait'])).toEqual(['wizard.wait']);
   });
 });

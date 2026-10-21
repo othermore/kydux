@@ -455,13 +455,31 @@ colours showing on the map and in the scene; a tile seam hunt.
 The content: 10 to 20 lessons with their levels, then challenges. Written in
 English and Spanish together; the owner reviews each chapter before the next.
 
+What the owner asked of the course (2026-10-21), which the outline (5.2) and
+every chapter follow:
+
+- **One step at a time.** Each lesson adds one idea to what the child knows.
+  The three lessons of sprint 5 go too fast: the third already asks for a
+  loop with a condition. Conditions come before loops, each alone first, and
+  other ideas come before both (sequences, arguments, attributes,
+  variables, literals); a loop with a condition comes only once both are
+  known. Each new idea is used alone in a level before it is combined.
+- **A short lesson of theory before each idea, then one or more levels to
+  practise it.** The theory lessons say, in a page or two each, what a
+  program is, what an instruction is, an object, a method (an action, D27),
+  a variable, a literal, an expression, an expression that is true or false
+  and so can be a condition, a conditional instruction, a loop, and so on.
+  The levels after a theory lesson practise exactly what it explained.
+
 5.1 The story bible, `docs/dev/story.md`: the school, its name and places,
     the characters (the head, the teachers, a rival, a friend, the cat, a
     ghost), the wizard's arc through the chapters, the tone (warm, funny,
     never scary). All names invented for Kydux.
 5.2 The course outline, `docs/dev/course.md`: every lesson with the idea it
-    teaches, the API it unlocks, and its levels with their goals; the
-    challenges after it. The order of the draft, refined.
+    teaches, theory or practice, the API it unlocks, and its levels with
+    their goals; the challenges after it. The order of the draft, refined
+    to one idea at a time, as above; the lessons and levels of sprint 5 are
+    replaced by it.
 5.3 Chapter 1, Arrival (methods, sequences, arguments, strings): about four
     lessons, eight levels: the gate, the corridor, the wand on its pedestal,
     the first spell.

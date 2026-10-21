@@ -1,5 +1,5 @@
 import { version } from '../package.json';
-import { type Course, items, itemHash, loadCourse, next, parseItem } from './content/course';
+import { type Course, items, itemHash, knownApi, loadCourse, next, parseItem } from './content/course';
 import { LessonNotFound, loadLesson } from './content/lessons';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
 import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
@@ -194,6 +194,9 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
         import('./engine/scene'),
       ]);
     if (shownRoute !== key) return;
+    // The world, the notebook and the editor's completion all read the level's
+    // api: what the course has taught up to here, not only this level (D40).
+    loaded.level.api = knownApi(course, id, (loaded.level.api as string[] | undefined) ?? []);
     show(
       content,
       levelScreen({

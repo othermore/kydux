@@ -1,7 +1,7 @@
 // The wizard's notebook: what the child's code holds in this level, and for
-// each, the actions and attributes the level teaches, with an example to
-// click and a sentence in the child's language (D30). Nothing the level does
-// not teach yet is shown.
+// each, the actions and attributes the course has taught up to here (D40),
+// with an example to click and a sentence in the child's language (D30).
+// Nothing not taught yet is shown, and no object that is not in the level.
 
 import type { LevelJson } from '../runtime/protocol';
 import { t } from '../i18n';

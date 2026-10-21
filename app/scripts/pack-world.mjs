@@ -127,7 +127,20 @@ const chapters = existsSync(chaptersDir)
         return { id: chapter.id, items: chapter.items };
       })
   : [];
-writeFileSync(join(content, 'course.json'), `${JSON.stringify({ chapters }, null, 2)}\n`);
+// What the child knows on reaching each level (D40): every name taught by that
+// level and by every level before it in the course. The page gives it to the
+// world and to the notebook in place of the level's own `api`, so that an action
+// once learned stays known; the notebook still shows only the objects present.
+const known = {};
+const taught = new Set();
+for (const item of chapters.flatMap((chapter) => chapter.items)) {
+  const [kind, id] = item.split(':');
+  if (kind !== 'level') continue;
+  const level = JSON.parse(readFileSync(join(repo, 'content', 'levels', id, 'level.json'), 'utf8'));
+  for (const name of level.api ?? []) taught.add(name);
+  known[id] = [...taught];
+}
+writeFileSync(join(content, 'course.json'), `${JSON.stringify({ chapters, known }, null, 2)}\n`);
 
 // The table of what the child can type, from the world itself (D30): the
 // notebook and the editor's completion read it, so the page needs no Python

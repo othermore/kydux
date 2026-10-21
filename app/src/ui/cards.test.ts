@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { nextLevel } from '../content/levels';
 import type { WorldGoal, WorldResult } from '../runtime/protocol';
 import { stars } from './cards';
 
@@ -21,16 +20,5 @@ describe('stars', () => {
 
   it('gives none to a run that did not win', () => {
     expect(stars(world('incomplete', [goal(false), goal(true, true)]))).toBe(0);
-  });
-});
-
-describe('nextLevel', () => {
-  const order = ['01-a', '02-b', '03-c'];
-  it('is the level after this one', () => {
-    expect(nextLevel(order, '01-a')).toBe('02-b');
-  });
-  it('is null after the last, or for a level not in the order', () => {
-    expect(nextLevel(order, '03-c')).toBeNull();
-    expect(nextLevel(order, 'zz')).toBeNull();
   });
 });

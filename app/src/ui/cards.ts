@@ -73,12 +73,13 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
   return card;
 }
 
-/** You did it, the stars, Play again, and Next or the word that there is no next yet. */
+/** You did it, the stars, Play again, and Next; after the course's last item, the
+ * word that there is no next yet and the way to the map. `next` is an address. */
 export function winCard(
   earned: number,
   next: string | null,
   onAgain: () => void,
-  onNext: (id: string) => void,
+  onNext: (hash: string) => void,
 ): Card {
   const shown = element('p', { className: 'stars' }, [
     '★'.repeat(earned) + '☆'.repeat(MAX_STARS - earned),
@@ -88,7 +89,10 @@ export function winCard(
   const again = element('button', { id: 'again', type: 'button' }, [t('level.again')]);
   const after = next
     ? element('button', { id: 'next', type: 'button' }, [t('level.next')])
-    : element('p', { id: 'last', className: 'last' }, [t('level.last')]);
+    : element('div', {}, [
+        element('p', { id: 'last', className: 'last' }, [t('level.last')]),
+        element('a', { id: 'to-map', className: 'quiet-button', href: '#map' }, [t('map.open_map')]),
+      ]);
   const card = overlay(
     'win-card',
     [element('h3', {}, [t('outcome.won')]), shown, element('div', { className: 'card-buttons' }, [again, after])],

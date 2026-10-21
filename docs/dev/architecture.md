@@ -28,10 +28,11 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/ui/       the screens: the level screen, a view of the run controller
                 (controller.ts); its goals panel, outcome card, start and win
                 cards (cards.ts), and the wizard's notebook (notebook.ts)
-  src/content/  loading a level's level.json and its text.<lang>.json
+  src/content/  loading a level's level.json and its text.<lang>.json, and the
+                course (course.ts): its chapters, what comes next, a stop's state
   scripts/      before dev and build: copy Pyodide into public/, pack the world
-                into world.zip, copy the levels into content/ with their order in
-                content/levels.json, and write the world's table as api.json
+                into world.zip, copy the content into content/ with the course in
+                content/course.json, and write the world's table as api.json
   e2e/          the browser tests (Playwright), beside the node_modules they need
 world/          kydux_world, the model of the levels, and its tests: level.py reads
                 a level; world.py holds the wizard and the ticks; things.py the
@@ -407,3 +408,20 @@ one overturns stays, marked as superseded.
   keeps the language where the game tells it to (`keepLanguageIn`). A
   storage that cannot be read or written leaves the document in memory for
   the visit.
+- **D32 — The course is chapters of lessons and levels, in `content/`.**
+  Decided 2026-10-21 (sprint-5.md), built the same day. A chapter is a
+  directory under `content/chapters/` with `chapter.json`, its id and its
+  items in order, each `lesson:<id>` or `level:<id>`, and its title in
+  `text.<lang>.json`. `pack-world.mjs` writes the chapters, sorted by
+  directory, as `content/course.json`, which the page reads for the map,
+  for what comes after an item, and for where Continue goes. It replaces
+  the sorted list of levels the page read before: one order for the
+  course, not two that could disagree. A lesson is a directory under
+  `content/lessons/` (D33).
+- **D34 — An item is open once the one before it is done.** Decided
+  2026-10-21 (sprint-5.md), built the same day. On the map, a stop is done
+  (a lesson read, a level won), open (the course's first item, or the one
+  after a done item, across chapters too), or locked; a locked stop is not
+  a link. A level's address still opens it directly, for a developer and
+  for the tests, and a done item can always be played again. A level only
+  tried is not done.

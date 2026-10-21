@@ -111,8 +111,9 @@ everything the browser needs into `app/public/`, which git ignores:
   Python.
 - The levels, copied into `content/levels/`. A level's solution and its
   wrong answers stay out, so that a child cannot find them in the game.
-- The order of the levels, in `content/levels.json`. It is the levels'
-  directory names, sorted, so a level's number in its name is its place.
+- The course, in `content/course.json`: its chapters in order, each with
+  its lessons and levels. It comes from each chapter's `chapter.json`, in
+  `content/chapters/`.
 - The table of everything the child can type, in `api.json`. It comes from
   the world itself, by running `python -m kydux_world.api`. The notebook
   and the editor's completion read it.

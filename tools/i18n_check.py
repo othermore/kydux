@@ -102,6 +102,23 @@ def check_levels(languages: list[str]) -> list[str]:
     return findings
 
 
+def check_chapters(languages: list[str]) -> list[str]:
+    """Every chapter has its text, with its title, in every language."""
+    chapters = REPO / "content" / "chapters"
+    findings = []
+    if not chapters.is_dir():
+        return findings
+    for directory in sorted(p for p in chapters.iterdir() if (p / "chapter.json").is_file()):
+        name = directory.relative_to(REPO).as_posix()
+        for lang in languages:
+            path = directory / f"text.{lang}.json"
+            if not path.is_file():
+                findings.append(f"{name}: lacks text.{lang}.json")
+            elif not json.loads(path.read_text(encoding="utf-8")).get("title"):
+                findings.append(f"{name}/text.{lang}.json: lacks a title")
+    return findings
+
+
 def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
     """The words the page has for what the world defines, held to the world itself:
     notebook.<role>.<member> for every member of kydux_world.api's table (D30), and
@@ -162,6 +179,7 @@ def check() -> list[str]:
                 findings.append(f"{where}: {key} is not in i18n/{lang}.json")
 
     findings.extend(check_levels(list(languages)))
+    findings.extend(check_chapters(list(languages)))
     findings.extend(check_world_words(languages))
 
     prefixes = dynamic_prefixes()

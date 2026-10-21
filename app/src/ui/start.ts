@@ -44,6 +44,7 @@ export function startScreen(parts: StartScreenParts): Screen {
     const settings = element('a', { id: 'settings-link', className: 'quiet-button', href: '#settings' }, [
       t('start.settings'),
     ]);
+    const map = element('a', { id: 'map-link', className: 'quiet-button', href: '#map' }, [t('start.map')]);
     const exported = element('button', { id: 'export', type: 'button', className: 'quiet-button' }, [
       t('start.export'),
     ]);
@@ -70,7 +71,7 @@ export function startScreen(parts: StartScreenParts): Screen {
     node.replaceChildren(
       element('h2', {}, [t('start.welcome')]),
       element('p', { className: 'start-intro' }, [t('start.intro')]),
-      element('div', { className: 'start-actions' }, [go, fresh, settings]),
+      element('div', { className: 'start-actions' }, [go, map, fresh, settings]),
       element('section', { className: 'start-progress' }, [
         element('h3', {}, [t('start.progress')]),
         element('p', {}, [t('start.progress_about')]),

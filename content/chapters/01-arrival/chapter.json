@@ -1,0 +1,8 @@
+{
+  "id": "01-arrival",
+  "items": [
+    "level:01-the-corridor",
+    "level:02-the-locked-door",
+    "level:03-past-the-teacher"
+  ]
+}

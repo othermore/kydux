@@ -1,13 +1,6 @@
 import { version } from '../package.json';
-import {
-  isLevelId,
-  LevelNotFound,
-  loadApiTable,
-  loadLevel,
-  loadLevelOrder,
-  loadLevelText,
-  nextLevel,
-} from './content/levels';
+import { type Course, items, itemHash, loadCourse, next, parseItem } from './content/course';
+import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
 import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, t } from './i18n';
 import * as progress from './progress/progress';
 import { Runtime } from './runtime/runtime';
@@ -20,13 +13,33 @@ let screen: Screen | null = null;
 /** The address of the screen shown, so that a hash change to it again is ignored. */
 let shownRoute: string | null = null;
 
-type Route = { name: 'start' } | { name: 'level'; id: string };
+type Route = { name: 'start' } | { name: 'map' } | { name: 'level'; id: string };
 
 /** The screen the address names; the start screen for an address that names none. */
 function parseRoute(hash: string): Route {
   const level = /^#level\/(.+)$/.exec(hash);
   if (level) return { name: 'level', id: decodeURIComponent(level[1] ?? '') };
+  if (hash === '#map') return { name: 'map' };
   return { name: 'start' };
+}
+
+async function chapterTitle(id: string): Promise<string> {
+  const response = await fetch(
+    `${import.meta.env.BASE_URL}content/chapters/${id}/text.${currentLanguage()}.json`,
+  );
+  if (!response.ok || !response.headers.get('content-type')?.includes('json')) return id;
+  return ((await response.json()) as { title?: string }).title ?? id;
+}
+
+/** An item's title in the language now set. */
+async function itemTitle(item: string): Promise<string> {
+  const parsed = parseItem(item);
+  if (!parsed) return item;
+  if (parsed.kind === 'level') {
+    const text = await loadLevelText(parsed.id, currentLanguage()).catch(() => null);
+    return text?.title ?? parsed.id;
+  }
+  return parsed.id;
 }
 
 function languagePicker(): HTMLElement {
@@ -75,17 +88,36 @@ function failed(content: HTMLElement, error: unknown): void {
 }
 
 /** Where Continue goes: the item last opened, else the first of the course. */
-async function continueTarget(): Promise<{ hash: string; title: string }> {
-  const order = await loadLevelOrder();
+async function continueTarget(course: Course): Promise<{ hash: string; title: string }> {
   const current = progress.load().current;
-  const id = current?.startsWith('level:') ? current.slice('level:'.length) : (order[0] ?? '');
-  const text = await loadLevelText(id, currentLanguage()).catch(() => null);
-  return { hash: `#level/${id}`, title: text?.title ?? id };
+  const item = current && items(course).includes(current) ? current : (items(course)[0] ?? '');
+  return { hash: itemHash(item), title: await itemTitle(item) };
+}
+
+async function showMap(content: HTMLElement): Promise<void> {
+  document.title = t('map.title_page');
+  const course = await loadCourse();
+  const all = items(course);
+  const [titles, chapterTitles] = await Promise.all([
+    Promise.all(all.map(async (item) => [item, await itemTitle(item)] as const)),
+    Promise.all(course.chapters.map(async (c) => [c.id, await chapterTitle(c.id)] as const)),
+  ]);
+  if (shownRoute !== 'map') return;
+  const { mapScreen } = await import('./ui/map');
+  show(
+    content,
+    mapScreen({
+      course,
+      progress: progress.load(),
+      titles: new Map(titles),
+      chapterTitles: new Map(chapterTitles),
+    }),
+  );
 }
 
 async function showStart(content: HTMLElement): Promise<void> {
   document.title = t('app.title');
-  const continueTo = await continueTarget();
+  const continueTo = await continueTarget(await loadCourse());
   if (shownRoute !== 'start') return;
   show(
     content,
@@ -102,10 +134,10 @@ async function showStart(content: HTMLElement): Promise<void> {
 async function showLevel(content: HTMLElement, id: string, key: string): Promise<void> {
   try {
     if (!isLevelId(id)) throw new LevelNotFound(id);
-    const [loaded, order, table, { levelScreen }, { createEditor }, { startScene }] =
+    const [loaded, course, table, { levelScreen }, { createEditor }, { startScene }] =
       await Promise.all([
         loadLevel(id, currentLanguage()),
-        loadLevelOrder(),
+        loadCourse(),
         loadApiTable(),
         import('./ui/level'),
         import('./editor/editor'),
@@ -114,7 +146,14 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
     if (shownRoute !== key) return;
     show(
       content,
-      levelScreen({ runtime, loaded, next: nextLevel(order, id), table, createEditor, startScene }),
+      levelScreen({
+        runtime,
+        loaded,
+        next: next(course, `level:${id}`),
+        table,
+        createEditor,
+        startScene,
+      }),
     );
   } catch (error) {
     if (shownRoute !== key) return;
@@ -138,8 +177,8 @@ let root: HTMLElement | null = null;
 
 function route(): void {
   if (!root) return;
-  const next = parseRoute(location.hash);
-  const key = next.name === 'level' ? `level/${next.id}` : next.name;
+  const wanted = parseRoute(location.hash);
+  const key = wanted.name === 'level' ? `level/${wanted.id}` : wanted.name;
   if (key === shownRoute && screen) return;
   shownRoute = key;
   screen?.destroy();
@@ -148,7 +187,12 @@ function route(): void {
     element('p', { className: 'status' }, [t('level.loading')]),
   ]);
   chrome(root, content);
-  const shown = next.name === 'level' ? showLevel(content, next.id, key) : showStart(content);
+  const shown =
+    wanted.name === 'level'
+      ? showLevel(content, wanted.id, key)
+      : wanted.name === 'map'
+        ? showMap(content)
+        : showStart(content);
   shown.catch((error: unknown) => failed(content, error));
 }
 
@@ -173,8 +217,8 @@ if (root) {
     // only says its words again.
     const content = page.querySelector<HTMLElement>('main.content');
     if (content) chrome(page, content);
-    if (shownRoute === 'start') {
-      // The start screen names a title it loaded in the language before.
+    if (shownRoute === 'start' || shownRoute === 'map') {
+      // These screens name titles they loaded in the language before.
       shownRoute = null;
       route();
       return;

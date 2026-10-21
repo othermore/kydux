@@ -113,16 +113,21 @@ if (existsSync(join(repo, 'content'))) {
   cpSync(join(repo, 'content'), content, { recursive: true, filter: shipped });
 }
 
-// The levels in the order they are played: their directories' names, sorted,
-// so that a level's number in its name is its place.
-const levelsDir = join(repo, 'content', 'levels');
-const order = existsSync(levelsDir)
-  ? readdirSync(levelsDir)
-      .filter((name) => existsSync(join(levelsDir, name, 'level.json')))
-      .sort()
-  : [];
 mkdirSync(content, { recursive: true });
-writeFileSync(join(content, 'levels.json'), `${JSON.stringify(order, null, 2)}\n`);
+
+// The course: its chapters in order, each with its items, lessons and levels
+// (D32). The page reads it to draw the map and to know what comes next.
+const chaptersDir = join(repo, 'content', 'chapters');
+const chapters = existsSync(chaptersDir)
+  ? readdirSync(chaptersDir)
+      .filter((name) => existsSync(join(chaptersDir, name, 'chapter.json')))
+      .sort()
+      .map((name) => {
+        const chapter = JSON.parse(readFileSync(join(chaptersDir, name, 'chapter.json'), 'utf8'));
+        return { id: chapter.id, items: chapter.items };
+      })
+  : [];
+writeFileSync(join(content, 'course.json'), `${JSON.stringify({ chapters }, null, 2)}\n`);
 
 // The table of what the child can type, from the world itself (D30): the
 // notebook and the editor's completion read it, so the page needs no Python
@@ -140,5 +145,5 @@ if (table.status !== 0) {
 writeFileSync(join(publicDir, 'api.json'), table.stdout);
 
 console.log(
-  `pack-world: ${entries.length} files in public/world.zip, content/ copied, ${order.length} levels in order`,
+  `pack-world: ${entries.length} files in public/world.zip, content/ copied, ${chapters.length} chapters in the course`,
 );

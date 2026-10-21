@@ -143,6 +143,15 @@
     "progress_about": "Tu progreso se guarda en este navegador. Para llevarlo a otro ordenador, expórtalo a un fichero e impórtalo allí.",
     "export": "Exportar",
     "import": "Importar",
-    "import_failed": "Ese fichero no es un fichero de progreso de Kydux. No ha cambiado nada."
+    "import_failed": "Ese fichero no es un fichero de progreso de Kydux. No ha cambiado nada.",
+    "map": "El mapa"
+  },
+  "map": {
+    "back": "Volver al inicio",
+    "done": "hecho",
+    "open": "abierto",
+    "locked": "todavía cerrado",
+    "open_map": "Mapa",
+    "title_page": "Kydux — el mapa"
   }
 }

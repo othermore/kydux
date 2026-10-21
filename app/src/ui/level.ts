@@ -3,6 +3,7 @@
 // went. It is a view of a RunController (D29): it makes the DOM once, renders
 // every snapshot the controller gives, and each button calls the controller.
 
+import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
 import type { Editor, EditorOptions } from '../editor/editor';
 import type { Speed } from '../engine/playback';
@@ -31,7 +32,8 @@ export interface LevelScreen {
 export interface LevelScreenParts {
   runtime: Runtime;
   loaded: LoadedLevel;
-  /** The level after this one, or null when it is the last. */
+  /** The course's item after this level, `lesson:<id>` or `level:<id>`, or null after
+   * the last. */
   next: string | null;
   /** What the child can type, for the notebook and the editor's completion. */
   table: ApiTable;
@@ -60,7 +62,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
 
   const title = labelled(element('h2', { className: 'level-title' }), () => text.title);
   const about = element('button', { id: 'about', type: 'button', className: 'about' }, ['?']);
-  const heading = element('div', { className: 'level-heading' }, [title, about]);
+  const toMap = labelled(element('a', { id: 'level-map', className: 'quiet-button small', href: '#map' }), () =>
+    t('map.open_map'),
+  );
+  const heading = element('div', { className: 'level-heading' }, [title, about, toMap]);
   const sceneParent = element('div', { id: 'scene', className: 'scene' });
   const goalsSlot = element('div', { className: 'goals-slot' });
   const bonus = ((loaded.level.goals as { bonus?: boolean }[] | undefined) ?? []).map(
@@ -203,10 +208,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     showCard(
       winCard(
         earned,
-        parts.next,
+        parts.next ? itemHash(parts.next) : null,
         () => editor.focus(),
-        (id) => {
-          location.hash = `#level/${id}`;
+        (hash) => {
+          location.hash = hash;
         },
       ),
     );
@@ -266,7 +271,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         const earned = stars(snapshot.world);
         progress.markWon(loaded.id, earned, editor.getDoc());
         // Continue, on the start screen, now goes to what comes after.
-        if (parts.next) progress.setCurrent(`level:${parts.next}`);
+        if (parts.next) progress.setCurrent(parts.next);
         showWin(earned);
       } else if (!force && shownCard?.node.querySelector('.win-card')) {
         shownCard.close();

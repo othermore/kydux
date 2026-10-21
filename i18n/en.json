@@ -143,6 +143,15 @@
     "progress_about": "Your progress is kept in this browser. To take it to another computer, export it to a file and import it there.",
     "export": "Export",
     "import": "Import",
-    "import_failed": "That file is not a Kydux progress file. Nothing has changed."
+    "import_failed": "That file is not a Kydux progress file. Nothing has changed.",
+    "map": "The map"
+  },
+  "map": {
+    "back": "Back to the start",
+    "done": "done",
+    "open": "open",
+    "locked": "not open yet",
+    "open_map": "Map",
+    "title_page": "Kydux — the map"
   }
 }

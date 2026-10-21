@@ -748,3 +748,15 @@ one overturns stays, marked as superseded.
   in place, with the stair's `hold` event (`from`, `until`); with no stair
   beside, it is refused with `nothing_near`. A stair is never locked,
   sealed or opened.
+- **D54 — `not`, `==` and `can_see` belong to the lesson on true and
+  false; `wait` to the lesson on `if`.** Decided 2026-10-21 (sprint-9.md),
+  built the same day. An expression that is true or false is the idea of
+  one lesson: `==` asks whether two values are the same (and is not `=`),
+  `not` turns the answer round, and an action can answer
+  (`teacher.can_see(wizard)`); `and` and `or` wait for the challenges.
+  `wizard.wait()` comes with `if`, in a sentence of its example: the level
+  after the lesson on `if` asks the wizard to wait while Dask looks this
+  way, so the action is needed there, and it is too small an idea for a
+  lesson of its own. The teacher of the passages is `dask` in the
+  child's code in every level, the name the story gives him, and his kind
+  is `teacher`, as the notebook says.

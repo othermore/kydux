@@ -1,0 +1,14 @@
+{
+  "title": "La torre de vigilancia",
+  "goals": [
+    "Recorre la galería.",
+    "Que no te vea Dask.",
+    "Pregunta si Dask puede verte."
+  ],
+  "starting_code": "# Pregunta hacia dónde mira Dask, y si puede verte. Luego sigue andando.\n",
+  "hints": [
+    "`print(dask.facing)` enseña en la tarjeta hacia dónde mira.",
+    "`dask.can_see(wizard)` responde `True` o `False`: dáselo a `print`."
+  ],
+  "intro": "Hmm. Alguien en mis pasadizos. Estoy mirando a la pared, no a ti. Pregunta lo que veo, si quieres, y luego sigue en silencio."
+}

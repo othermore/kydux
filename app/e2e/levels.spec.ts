@@ -93,16 +93,16 @@ test.describe('past the teacher', () => {
   test.beforeEach(({ page }) => open(page, 'past-the-teacher'));
 
   test('the teacher walks the corridor', async ({ page }) => {
-    await expect(scene(page)).toHaveAttribute('data-actors', 'teacher:7,2,left');
+    await expect(scene(page)).toHaveAttribute('data-actors', 'dask:7,2,left');
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.wait(3)');
     await page.locator('#run').click();
-    await expect(scene(page)).toHaveAttribute('data-actors', 'teacher:6,2,left', {
+    await expect(scene(page)).toHaveAttribute('data-actors', 'dask:6,2,left', {
       timeout: 10_000,
     });
-    await expect(scene(page)).toHaveAttribute('data-actors', 'teacher:4,2,left', {
+    await expect(scene(page)).toHaveAttribute('data-actors', 'dask:4,2,left', {
       timeout: 10_000,
     });
   });
@@ -114,7 +114,7 @@ test.describe('past the teacher', () => {
   });
 
   test('waiting while the teacher looks this way, then crossing, wins', async ({ page }) => {
-    const said = await run(page, 'while teacher.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
+    const said = await run(page, 'while dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
     expect(said).toBe('You did it, apprentice!');
     await expect(scene(page)).toHaveAttribute('data-wizard', '2,1');
   });
@@ -289,5 +289,61 @@ test.describe('the high shelf (D46, D47, D49)', () => {
       'There is nothing near enough for the spell to bring.',
       { timeout: 15_000 },
     );
+  });
+});
+
+/** Chapter 3's levels with a program that wins each, in every way. */
+const CHAPTER_3: [string, string][] = [
+  ['the-watchtower', 'print(dask.facing)\nprint(dask.can_see(wizard))\nwizard.move_right(6)'],
+  ['the-watch', 'if dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)'],
+  [
+    'left-or-right',
+    'if left_door.locked:\n    wizard.move_right(2)\n    right_door.open()\n    wizard.move_down(2)\n' +
+      '    wizard.move_left(2)\nelse:\n    wizard.move_left(2)\n    left_door.open()\n    wizard.move_down(2)\n' +
+      '    wizard.move_right(2)\nwizard.move_down()',
+  ],
+  ['the-long-stairs', 'for step in range(8):\n    wizard.move_up()\n    wizard.move_right()'],
+];
+
+test.describe('chapter 3', () => {
+  for (const [id, code] of CHAPTER_3) {
+    test(`${id} is won by its solution`, async ({ page }) => {
+      await page.goto(`/#level/${id}`);
+      await page.locator('#start').click();
+      await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+      await page.locator('#speed').selectOption('4');
+      // The editor closes no bracket of its own here: the code is typed as it is.
+      expect(await run(page, code)).toMatch(/^You did it/);
+    });
+  }
+});
+
+test.describe('a level played two ways (D51)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/#level/the-watch');
+    await expect(page.locator('#card-ways li')).toHaveText(['Dask looks away', 'Dask looks this way']);
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('4');
+  });
+
+  test('a program that does not ask wins one way and is caught in the other, which the card names', async ({
+    page,
+  }) => {
+    await expect(page.locator('#way')).toBeHidden();
+    await run(page, 'wizard.move_up(2)');
+    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks this way”: The teacher saw you!');
+    await expect(page.locator('#way')).toBeVisible();
+    await expect(page.locator('#way')).toHaveValue('watching');
+    await page.locator('#way').selectOption('away');
+    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks away”', { timeout: 30_000 });
+    await expect(page.locator('.outcome-text')).toContainText('Not every way yet');
+    await expect(page.locator('.win-card')).toHaveCount(0);
+  });
+
+  test('with if, the same program wins every way', async ({ page }) => {
+    await run(page, 'if dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
+    await expect(page.locator('.outcome-text')).toHaveText('You did it, apprentice! In every way!');
+    await expect(page.locator('.win-card')).toBeVisible();
   });
 });

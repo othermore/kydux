@@ -1,0 +1,17 @@
+{
+  "title": "Izquierda o derecha",
+  "goals": [
+    "Llega a la escalera de bajada."
+  ],
+  "ways": {
+    "left_locked": "la puerta de la izquierda cerrada",
+    "right_locked": "la puerta de la derecha cerrada"
+  },
+  "starting_code": "# Una puerta está cerrada con llave y la otra no, pero ¿cuál?\n",
+  "hints": [
+    "Dos maneras: en cada una, la puerta cerrada es otra. El mismo programa tiene que superar las dos.",
+    "Pregunta `left_door.locked`: debajo del `if`, ve por la puerta de la derecha; debajo del `else`, por la de la izquierda.",
+    "Cada camino es andar hasta la puerta, `open()`, y luego bajar y seguir hasta la escalera."
+  ],
+  "intro": "Dos puertas, y una la tengo cerrada con llave. ¿Cuál? Eso cambia de noche en noche."
+}

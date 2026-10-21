@@ -1,0 +1,14 @@
+{
+  "title": "La escalera larga",
+  "goals": [
+    "Sube hasta lo alto de la escalera.",
+    "Hazlo en menos de 4 líneas."
+  ],
+  "starting_code": "# Arriba y a la derecha, una y otra vez, hasta arriba.\n",
+  "hints": [
+    "Cada peldaño de esta escalera son los mismos dos movimientos: arriba, y luego derecha.",
+    "Cuenta los peldaños desde abajo hasta arriba: ese es el número para `range`.",
+    "Los dos movimientos van debajo del `for`, metidos cuatro espacios."
+  ],
+  "intro": "Esta escalera sube a los pasadizos de la noche. Cuenta los peldaños si quieres; un bucle los cuenta por ti."
+}

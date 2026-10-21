@@ -1,0 +1,37 @@
+{
+  "id": "the-long-stairs",
+  "map": [
+    "###########",
+    "########.E#",
+    "#######..##",
+    "######..###",
+    "#####..####",
+    "####..#####",
+    "###..######",
+    "##..#######",
+    "#..########",
+    "#S#########",
+    "###########"
+  ],
+  "things": [],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "lines_under",
+      "lines": 4,
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "dask"
+}

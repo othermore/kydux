@@ -1,0 +1,44 @@
+{
+  "id": "the-watchtower",
+  "map": [
+    "#########",
+    "####D####",
+    "#S.....E#",
+    "#########"
+  ],
+  "things": [],
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "dask",
+      "marker": "D",
+      "facing": "up"
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "teacher.facing",
+    "teacher.position",
+    "teacher.can_see"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "not_seen_by",
+      "id": "dask"
+    },
+    {
+      "kind": "uses",
+      "member": "can_see",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "dask"
+}

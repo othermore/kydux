@@ -1,0 +1,18 @@
+{
+  "title": "La guardia",
+  "goals": [
+    "Cruza hasta la puerta de arriba.",
+    "Que no te vea Dask."
+  ],
+  "ways": {
+    "away": "Dask mira hacia otro lado",
+    "watching": "Dask mira hacia aquí"
+  },
+  "starting_code": "# Espera solo si Dask mira hacia aquí, y luego cruza.\nwizard.move_up(2)\n",
+  "hints": [
+    "Mira la tarjeta de inicio: el nivel se juega de dos maneras, y un solo programa tiene que superar las dos.",
+    "Pregunta hacia dónde mira Dask antes de moverte: `dask.facing == \"left\"` es `True` cuando mira hacia aquí.",
+    "Debajo del `if`, metido cuatro espacios, espera un tick."
+  ],
+  "intro": "Recorro este pasillo todas las noches. A veces miro hacia ti, a veces no. Cruza cuando no mire, si puedes."
+}

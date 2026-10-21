@@ -60,7 +60,7 @@ test('Play again closes the win card; the last level says there is no next yet',
   await page.locator('#start').click();
   await ready(page);
   await page.locator('#speed').selectOption('4');
-  await run(page, 'while teacher.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
+  await run(page, 'while dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
   await expect(page.locator('.win-card .stars')).toHaveAttribute('data-stars', '1');
   await expect(page.locator('#last')).toHaveText('That is all for now. More levels are coming.');
   await expect(page.locator('#to-map')).toHaveAttribute('href', '#map');

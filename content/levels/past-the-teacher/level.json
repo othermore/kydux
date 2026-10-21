@@ -11,7 +11,7 @@
   "actors": [
     {
       "kind": "teacher",
-      "id": "teacher",
+      "id": "dask",
       "at": [
         7,
         2
@@ -39,7 +39,7 @@
     },
     {
       "kind": "not_seen_by",
-      "id": "teacher"
+      "id": "dask"
     }
   ],
   "tick_limit": 60

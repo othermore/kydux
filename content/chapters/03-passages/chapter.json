@@ -1,6 +1,15 @@
 {
   "id": "03-passages",
   "items": [
+    "lesson:true-or-false",
+    "level:the-watchtower",
+    "lesson:if",
+    "level:the-watch",
+    "lesson:else",
+    "level:left-or-right",
+    "lesson:repeat",
+    "level:the-long-stairs",
+    "lesson:while",
     "level:past-the-teacher"
   ]
 }

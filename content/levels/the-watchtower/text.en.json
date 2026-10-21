@@ -1,0 +1,14 @@
+{
+  "title": "The watchtower",
+  "goals": [
+    "Walk along the gallery.",
+    "Do not let Dask see you.",
+    "Ask whether Dask can see you."
+  ],
+  "starting_code": "# Ask which way Dask looks, and whether he can see you. Then walk on.\n",
+  "hints": [
+    "`print(dask.facing)` shows on the card which way he looks.",
+    "`dask.can_see(wizard)` answers `True` or `False`: give it to `print`."
+  ],
+  "intro": "Hmph. A pupil in my passages. I am looking at the wall, not at you. Ask what I can see, if you like, and then walk on quietly."
+}

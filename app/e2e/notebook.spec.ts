@@ -60,7 +60,7 @@ test('the notebook in Spanish', async ({ browser }) => {
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook h2')).toHaveText('El cuaderno del mago');
   await expect(page.locator('#notebook')).toContainText('Se queda quieto mientras el mundo sigue');
-  await expect(page.locator('#notebook [data-example="teacher.can_see(wizard)"]')).toBeVisible();
+  await expect(page.locator('#notebook [data-example="dask.can_see(wizard)"]')).toBeVisible();
   await context.close();
 });
 
@@ -75,7 +75,7 @@ test('a level\'s notebook has what the course has taught so far, for what is in 
   await expect(notebook.locator('[data-example="wizard.move_right(3)"]')).toHaveCount(1);
   await expect(notebook.locator('[data-example="wizard.pick_up()"]')).toHaveCount(1);
   // Taught here.
-  await expect(notebook.locator('[data-example="teacher.facing"]')).toHaveCount(1);
+  await expect(notebook.locator('[data-example="dask.facing"]')).toHaveCount(1);
   await expect(notebook.locator('[data-example="wizard.wait(2)"]')).toHaveCount(1);
   // The door of the level before is not in this one.
   await expect(notebook.locator('[data-example="door.open()"]')).toHaveCount(0);
@@ -88,5 +88,5 @@ test('a level\'s notebook has nothing the course has not taught yet', async ({ p
   const notebook = page.locator('#notebook');
   await expect(notebook.locator('[data-example="door.open()"]')).toHaveCount(1);
   await expect(notebook.locator('[data-example="wizard.wait(2)"]')).toHaveCount(0);
-  await expect(notebook.locator('[data-example="teacher.facing"]')).toHaveCount(0);
+  await expect(notebook.locator('[data-example="dask.facing"]')).toHaveCount(0);
 });

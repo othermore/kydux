@@ -1,0 +1,18 @@
+{
+  "title": "The watch",
+  "goals": [
+    "Cross to the door above.",
+    "Do not let Dask see you."
+  ],
+  "ways": {
+    "away": "Dask looks away",
+    "watching": "Dask looks this way"
+  },
+  "starting_code": "# Wait only if Dask looks this way, then cross.\nwizard.move_up(2)\n",
+  "hints": [
+    "Look at the start card: the level is played two ways, and one program must get through both.",
+    "Ask which way Dask looks before you move: `dask.facing == \"left\"` is `True` when he looks this way.",
+    "Under the `if`, moved in by four spaces, wait one tick."
+  ],
+  "intro": "I walk this corridor every night. Sometimes I look your way, sometimes I do not. Cross when I am not looking, if you can."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "true-or-false",
+  "teaches": [
+    "teacher.facing",
+    "teacher.position",
+    "teacher.can_see"
+  ]
+}

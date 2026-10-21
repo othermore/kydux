@@ -1,0 +1,14 @@
+{
+  "title": "The long stairs",
+  "goals": [
+    "Climb to the top of the stairs.",
+    "Do it in fewer than 4 lines."
+  ],
+  "starting_code": "# Up and right, again and again, to the top.\n",
+  "hints": [
+    "Each step of these stairs is the same two moves: up, then right.",
+    "Count the steps from the bottom to the top: that is the number for `range`.",
+    "Both moves go under the `for`, moved in by four spaces."
+  ],
+  "intro": "These stairs go up to the night passages. Count the steps if you like; a loop will count them for you."
+}

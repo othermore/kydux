@@ -76,15 +76,15 @@ Night passages, where Dask patrols. The ideas: true and false, `if`,
 | # | Item | The idea, or what it practises | API it unlocks |
 | --- | --- | --- | --- |
 | T12 | `lesson:true-or-false` | An expression is a question the computer answers with `True` or `False`: `3 > 2`, `door.locked`, `teacher.facing == "left"`; `not` turns the answer round; an action can answer, `teacher.can_see(wizard)` (D54). | `teacher.facing`, `teacher.position`, `teacher.can_see` |
-| L16 | `level:the-watchtower` | Print what Dask faces, and whether he can see the wizard. Bonus: the code asks `can_see`. | |
-| T13 | `lesson:if` | A condition: `if` runs its lines only when its expression is true. The lines inside are moved in by four spaces. | (Python's `if`) |
-| L17 | `level:the-watch` | Played two ways (D51): Dask looks away, or this way. `if` he looks this way, wait; then walk. The same program must win both ways. | |
+| L16 | `level:the-watchtower` | Dask stands facing the wall: print what he faces and whether he can see the wizard, then walk past. Bonus: the code asks `can_see`. | |
+| T13 | `lesson:if` | A condition: `if` runs its lines only when its expression is true. The lines inside are moved in by four spaces. Its example waits, `wizard.wait()`, the one tick the wizard stands still; and the level after it is played two ways. | `wizard.wait` (and Python's `if`) |
+| L17 | `level:the-watch` | Played two ways (D51): Dask walks his short round looking away, or looking this way. `if` he looks this way, wait one tick; then cross. Walking at once is caught in one way, waiting always in the other. | |
 | T14 | `lesson:else` | `else`: the lines to run when the condition is false. | (Python's `else`) |
 | L18 | `level:left-or-right` | Played two ways: one of two doors is locked, the other open. `if` one is locked go through the other, `else` through it. | |
 | T15 | `lesson:repeat` | A loop: `for step in range(4):` repeats its lines a number of times. | (Python's `for`) |
 | L19 | `level:the-long-stairs` | The same two moves, up and right, eight times: `for`. Bonus: fewer than 4 lines. | |
-| T16 | `lesson:while` | `while` repeats its lines as long as its expression is true: a loop and a condition together. | `wizard.wait` |
-| L20 | `level:past-the-teacher` | Today's level, kept: wait while Dask looks this way. | |
+| T16 | `lesson:while` | `while` repeats its lines as long as its expression is true: a loop and a condition together; a `while` whose answer never changes is stopped by the tick limit. | |
+| L20 | `level:past-the-teacher` | Wait while Dask looks this way, then cross. | |
 | T17 | `lesson:kirra-and-osto` | Two spells: `kirra` lights a dark room; `osto` holds a moving stair. | (the spells `kirra`, `osto`) |
 | L21 | `level:the-dark-room` | A dark room (D52): the key lies somewhere in it; `kirra` lights it, then `find_nearest` finds the key. | |
 | L22 | `level:the-moving-stairs` | A stair that comes and goes (D53): wait `while not stair.in_place`, then step; or hold it with `osto`. Bonus: the code asks `in_place`. | |

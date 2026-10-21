@@ -1,0 +1,17 @@
+{
+  "title": "Left or right",
+  "goals": [
+    "Reach the stair down."
+  ],
+  "ways": {
+    "left_locked": "the left door locked",
+    "right_locked": "the right door locked"
+  },
+  "starting_code": "# One door is locked and the other is not, but which?\n",
+  "hints": [
+    "Two ways: in each, a different door is locked. The same program must get through both.",
+    "Ask `left_door.locked`: under the `if`, take the right door; under the `else`, the left.",
+    "Each way is a walk to the door, `open()`, then down and along to the stair."
+  ],
+  "intro": "Two doors, and I keep one of them locked. Which one? That changes from night to night."
+}

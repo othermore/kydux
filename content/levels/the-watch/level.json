@@ -1,0 +1,71 @@
+{
+  "id": "the-watch",
+  "map": [
+    "##########",
+    "##E#######",
+    "#........#",
+    "##S#######",
+    "##########"
+  ],
+  "things": [],
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "dask",
+      "at": [
+        5,
+        2
+      ],
+      "patrol": [
+        [
+          6,
+          2
+        ]
+      ],
+      "facing": "right"
+    }
+  ],
+  "api": [
+    "wizard.move_up",
+    "wizard.wait",
+    "teacher.facing",
+    "teacher.position",
+    "teacher.can_see"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "not_seen_by",
+      "id": "dask"
+    }
+  ],
+  "ways": [
+    {
+      "id": "away"
+    },
+    {
+      "id": "watching",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            7,
+            2
+          ],
+          "patrol": [
+            [
+              6,
+              2
+            ]
+          ],
+          "facing": "left"
+        }
+      ]
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "dask"
+}

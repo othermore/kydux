@@ -143,3 +143,17 @@ def test_a_level_s_story_is_said_by_someone_in_every_language_or_in_none(directo
         for lang in present:
             assert isinstance(said[lang], str) and said[lang].strip(), f"{part} in {lang} is empty"
             assert speaker, f"the level has an {part} and no speaker to say it"
+
+
+@pytest.mark.parametrize("directory", [d for d in LEVELS if load(d).ways], ids=lambda p: p.name)
+def test_a_level_played_in_ways_has_a_wrong_answer_that_wins_only_some(directory):
+    """In a level with ways (D51), the ways must matter: some wrong answer, a program
+    that does not ask, wins one way and loses another."""
+    level = load(directory)
+    some = []
+    for wrong in sorted((directory / "wrong").glob("*.py")):
+        result = run_code(level, wrong.read_text(encoding="utf-8"))
+        won = [way_id for way_id, way in result.ways if way.status == "won"]
+        if 0 < len(won) < len(result.ways):
+            some.append(wrong.name)
+    assert some, "no wrong answer wins one way and not another: do the ways matter?"

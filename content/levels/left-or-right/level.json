@@ -1,0 +1,59 @@
+{
+  "id": "left-or-right",
+  "map": [
+    "#######",
+    "#..S..#",
+    "#L###R#",
+    "#.....#",
+    "###E###",
+    "#######"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "left_door",
+      "marker": "L",
+      "locked": true
+    },
+    {
+      "kind": "door",
+      "id": "right_door",
+      "marker": "R"
+    }
+  ],
+  "actors": [],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "door.open",
+    "door.locked"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    }
+  ],
+  "ways": [
+    {
+      "id": "left_locked"
+    },
+    {
+      "id": "right_locked",
+      "things": [
+        {
+          "id": "left_door",
+          "locked": false
+        },
+        {
+          "id": "right_door",
+          "locked": true
+        }
+      ]
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "dask"
+}

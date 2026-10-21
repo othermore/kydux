@@ -8,6 +8,6 @@
   "hints": [
     "Fíjate hacia dónde mira el profesor mientras camina.",
     "`wizard.wait()` deja pasar un tick mientras sigues escondid{o|a}.",
-    "Un bucle `while` puede seguir esperando mientras `teacher.facing` sea `\"left\"`."
+    "Un bucle `while` puede seguir esperando mientras `dask.facing` sea `\"left\"`."
   ]
 }

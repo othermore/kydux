@@ -11,13 +11,13 @@ import type { Speed } from '../engine/playback';
 import type { SceneHandle } from '../engine/scene';
 import { currentLanguage, t } from '../i18n';
 import * as progress from '../progress/progress';
-import { DEFAULT_SETTINGS } from '../progress/store';
+import { DEFAULT_SETTINGS, SPLIT_MAX, SPLIT_MIN } from '../progress/store';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
 import { type Card, startCard, stars, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
-import { applyLook, clampSplit, splitAt } from './look';
+import { clampSplit, setSplit, splitAt } from './look';
 import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
 import { type Outcome, type OutcomeCard, outcomeCard, withCode } from './outcome';
 
@@ -132,8 +132,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const handle = element('div', { id: 'split', className: 'split-handle', tabIndex: 0 });
   handle.setAttribute('role', 'separator');
   handle.setAttribute('aria-orientation', 'vertical');
-  handle.setAttribute('aria-valuemin', '35');
-  handle.setAttribute('aria-valuemax', '75');
+  handle.setAttribute('aria-valuemin', String(Math.round(SPLIT_MIN * 100)));
+  handle.setAttribute('aria-valuemax', String(Math.round(SPLIT_MAX * 100)));
   const node = element('div', { className: 'level-screen' }, [
     element('section', { className: 'stage' }, [
       heading,
@@ -320,7 +320,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   // The share shows at once and is saved when the drag ends. The scene follows,
   // as it does a window resize.
   const showSplit = (share: number) => {
-    applyLook({ ...progress.settings(), split: share });
+    setSplit(share);
     handle.setAttribute('aria-valuenow', String(Math.round(share * 100)));
   };
   const keepSplit = (share: number) => {

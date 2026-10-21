@@ -54,7 +54,7 @@
     "play": "Seguir",
     "go_start": "Ir al inicio",
     "settings": "Ajustes",
-    "split": "Arrastra para repartir el sitio entre la escena y el editor"
+    "split": "Arrastra para cambiar el tamaño de la escena y del editor"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",

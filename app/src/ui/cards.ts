@@ -3,10 +3,11 @@
 // winning run earned and leads to the next level.
 
 import { t } from '../i18n';
+import { MAX_STARS } from '../progress/store';
 import type { WorldResult } from '../runtime/protocol';
 import { element } from './dom';
 
-export const MAX_STARS = 3;
+
 
 /** One star for winning, one more for each bonus goal met, three at most. */
 export function stars(world: WorldResult): number {

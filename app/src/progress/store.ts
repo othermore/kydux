@@ -44,6 +44,13 @@ export const SPLIT_MIN = 0.35;
 export const SPLIT_MAX = 0.75;
 
 export const DEFAULT_SETTINGS: Settings = { speed: 1, fontSize: 17, split: 0.6 };
+/** The most stars a level gives; the map draws that many. */
+export const MAX_STARS = 3;
+const ITEM = /^(lesson|level):[a-z0-9][a-z0-9-]*$/;
+
+function isCount(value: unknown, most = Number.POSITIVE_INFINITY): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= most;
+}
 
 export function defaultProgress(): Progress {
   return {
@@ -92,9 +99,9 @@ export function readProgress(value: unknown): Progress | null {
       if (!isObject(level)) continue;
       const kept: LevelProgress = {};
       if (typeof level.won === 'boolean') kept.won = level.won;
-      if (typeof level.stars === 'number') kept.stars = level.stars;
+      if (isCount(level.stars, MAX_STARS)) kept.stars = level.stars;
       if (typeof level.code === 'string') kept.code = level.code;
-      if (typeof level.hints === 'number') kept.hints = level.hints;
+      if (isCount(level.hints)) kept.hints = level.hints;
       if (typeof level.tried === 'boolean') kept.tried = level.tried;
       progress.levels[id] = kept;
     }
@@ -102,7 +109,7 @@ export function readProgress(value: unknown): Progress | null {
   if (Array.isArray(value.started)) {
     progress.started = value.started.filter((id): id is string => typeof id === 'string');
   }
-  if (typeof value.current === 'string') progress.current = value.current;
+  if (typeof value.current === 'string' && ITEM.test(value.current)) progress.current = value.current;
   return progress;
 }
 

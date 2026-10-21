@@ -57,14 +57,18 @@ describe('LocalProgressStore', () => {
       JSON.stringify({
         version: PROGRESS_VERSION,
         settings: { speed: 3, fontSize: 'big', split: 0.5 },
-        levels: { a: { won: 'yes', stars: 2 } },
+        levels: { a: { won: 'yes', stars: 2 }, b: { stars: 9, hints: -1 }, c: { stars: 1.5 } },
         started: ['a', 7],
+        current: 'nonsense',
       }),
     );
     const read = new LocalProgressStore(storage).load();
     expect(read.settings).toEqual({ speed: 1, fontSize: 17, split: 0.5 });
     expect(read.levels.a).toEqual({ stars: 2 });
+    expect(read.levels.b).toEqual({});
+    expect(read.levels.c).toEqual({});
     expect(read.started).toEqual(['a']);
+    expect(read.current).toBeNull();
   });
 
   it('keeps the document in memory for the visit when storage throws', () => {

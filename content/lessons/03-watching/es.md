@@ -23,7 +23,7 @@ wizard.wait()
 ```
 
 Un bucle `while` hace algo una y otra vez, mientras algo sea verdad.
-Así el mago puede esperar mientras el profesor mire hacia el mago.
+Así el mago puede esperar mientras el profesor mire hacia donde está.
 
 ---
 

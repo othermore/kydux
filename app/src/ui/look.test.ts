@@ -10,15 +10,15 @@ describe('the split', () => {
     expect(clampSplit(SPLIT_MAX)).toBe(SPLIT_MAX);
   });
 
-  it('reads a share that is not a number as the middle', () => {
-    expect(clampSplit(Number.NaN)).toBeCloseTo(0.55);
-    expect(clampSplit(Number.POSITIVE_INFINITY)).toBeCloseTo(0.55);
+  it('reads a share that is not a number as the default', () => {
+    expect(clampSplit(Number.NaN)).toBe(0.6);
+    expect(clampSplit(Number.POSITIVE_INFINITY)).toBe(0.6);
   });
 
   it('turns a pointer into a share of the box', () => {
     expect(splitAt(600, 100, 1000)).toBeCloseTo(0.5);
     expect(splitAt(100, 100, 1000)).toBe(SPLIT_MIN);
     expect(splitAt(1100, 100, 1000)).toBe(SPLIT_MAX);
-    expect(splitAt(500, 100, 0)).toBeCloseTo(0.55);
+    expect(splitAt(500, 100, 0)).toBe(0.6);
   });
 });

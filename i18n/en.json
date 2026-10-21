@@ -54,7 +54,7 @@
     "play": "Play",
     "go_start": "Go to the start",
     "settings": "Settings",
-    "split": "Drag to share the room between the scene and the editor"
+    "split": "Drag to resize the scene and the editor"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",

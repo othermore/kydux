@@ -4,7 +4,7 @@
 
 import { type Course, itemHash, parseItem, stopState } from '../content/course';
 import { t } from '../i18n';
-import type { Progress } from '../progress/store';
+import { MAX_STARS, type Progress } from '../progress/store';
 import { element } from './dom';
 import type { Screen } from './screen';
 
@@ -42,7 +42,7 @@ export function mapScreen(parts: MapScreenParts): Screen {
         const label = element('span', { className: 'stop-title' }, [title]);
         const extra =
           state === 'done' && parsed?.kind === 'level'
-            ? [element('span', { className: 'stop-stars' }, ['★'.repeat(stars) + '☆'.repeat(3 - stars)])]
+            ? [element('span', { className: 'stop-stars' }, ['★'.repeat(stars) + '☆'.repeat(MAX_STARS - stars)])]
             : [];
         const body = [icon, label, ...extra];
         const stop =

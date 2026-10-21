@@ -23,7 +23,7 @@ wizard.wait()
 ```
 
 A `while` loop does something again and again, as long as something is true.
-So the wizard can wait for as long as the teacher looks its way.
+So the wizard can wait for as long as the teacher looks this way.
 
 ---
 

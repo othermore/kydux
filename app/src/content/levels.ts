@@ -67,3 +67,15 @@ export async function loadLevel(id: string, lang: Language): Promise<LoadedLevel
   }
   return { id, level, text: await loadLevelText(id, lang) };
 }
+
+/** The levels in the order they are played (content/levels.json, written by pack-world). */
+export async function loadLevelOrder(): Promise<string[]> {
+  const order = await json<string[]>(`${import.meta.env.BASE_URL}content/levels.json`);
+  return Array.isArray(order) ? order : [];
+}
+
+/** The level after `id` in `order`, or null when it is the last or not there. */
+export function nextLevel(order: readonly string[], id: string): string | null {
+  const index = order.indexOf(id);
+  return index >= 0 && index + 1 < order.length ? (order[index + 1] ?? null) : null;
+}

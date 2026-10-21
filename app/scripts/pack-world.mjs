@@ -112,4 +112,17 @@ if (existsSync(join(repo, 'content'))) {
   cpSync(join(repo, 'content'), content, { recursive: true, filter: shipped });
 }
 
-console.log(`pack-world: ${entries.length} files in public/world.zip, content/ copied`);
+// The levels in the order they are played: their directories' names, sorted,
+// so that a level's number in its name is its place.
+const levelsDir = join(repo, 'content', 'levels');
+const order = existsSync(levelsDir)
+  ? readdirSync(levelsDir)
+      .filter((name) => existsSync(join(levelsDir, name, 'level.json')))
+      .sort()
+  : [];
+mkdirSync(content, { recursive: true });
+writeFileSync(join(content, 'levels.json'), `${JSON.stringify(order, null, 2)}\n`);
+
+console.log(
+  `pack-world: ${entries.length} files in public/world.zip, content/ copied, ${order.length} levels in order`,
+);

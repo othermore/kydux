@@ -42,7 +42,13 @@
     "reload": "Reload",
     "go_first": "Go to the first level",
     "load_failed": "The level could not be loaded. Reload the page to try again.",
-    "run": "Run"
+    "run": "Run",
+    "about": "About this level",
+    "start": "Start",
+    "again": "Play again",
+    "next": "Next",
+    "stars": "{n} of 3 stars",
+    "last": "That is all for now. More levels are coming."
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",

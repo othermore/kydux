@@ -9,6 +9,7 @@ import type { Speed } from '../engine/playback';
 import type { SceneHandle } from '../engine/scene';
 import { currentLanguage, t } from '../i18n';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
+import { type Card, startCard, stars, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
@@ -46,6 +47,8 @@ export interface LevelScreen {
 export interface LevelScreenParts {
   runtime: Runtime;
   loaded: LoadedLevel;
+  /** The level after this one, or null when it is the last. */
+  next: string | null;
   /** Made by the caller, so that Phaser and CodeMirror load on their own. */
   createEditor: (parent: HTMLElement, options: EditorOptions) => Editor;
   startScene: (parent: HTMLElement, level: LoadedLevel['level']) => Promise<SceneHandle>;
@@ -65,6 +68,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   };
 
   const title = labelled(element('h2', { className: 'level-title' }), () => text.title);
+  const about = element('button', { id: 'about', type: 'button', className: 'about' }, ['?']);
+  const heading = element('div', { className: 'level-heading' }, [title, about]);
   const sceneParent = element('div', { id: 'scene', className: 'scene' });
   const goalsSlot = element('div', { className: 'goals-slot' });
   const bonus = ((loaded.level.goals as { bonus?: boolean }[] | undefined) ?? []).map(
@@ -91,10 +96,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   );
   const card: OutcomeCard = outcomeCard();
 
+  const sceneFrame = element('div', { className: 'scene-frame' }, [sceneParent, goalsSlot]);
   const node = element('div', { className: 'level-screen' }, [
     element('section', { className: 'stage' }, [
-      title,
-      element('div', { className: 'scene-frame' }, [sceneParent, goalsSlot]),
+      heading,
+      sceneFrame,
       status,
     ]),
     element('section', { className: 'workbench' }, [
@@ -138,6 +144,27 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     }
   };
 
+  // The cards over the scene: the start card, and the win card after a won run.
+  let shownCard: Card | null = null;
+  const showCard = (card: Card) => {
+    shownCard?.close();
+    shownCard = card;
+    sceneFrame.append(card.node);
+  };
+  const showStart = () =>
+    showCard(startCard({ title: text.title, goals: goalTexts() }, () => editor.focus()));
+  const showWin = (earned: number) =>
+    showCard(
+      winCard(
+        earned,
+        parts.next,
+        () => editor.focus(),
+        (id) => {
+          location.hash = `#level/${id}`;
+        },
+      ),
+    );
+
   // What was last drawn, so that the card and the editor's marks change only
   // when the controller's do.
   let shownOutcome: Outcome | null = null;
@@ -152,6 +179,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     if (force || snapshot.outcome !== shownOutcome) {
       if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed);
       else card.hide();
+      if (!force && snapshot.outcome?.kind === 'won' && snapshot.world) {
+        showWin(stars(snapshot.world));
+      } else if (!force && shownCard?.node.querySelector('.win-card')) {
+        shownCard.close();
+      }
       shownOutcome = snapshot.outcome;
     }
     if (snapshot.runningLine !== shownLines[0] || snapshot.errorLine !== shownLines[1]) {
@@ -162,6 +194,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   };
   let stopped: (() => void)[] = [controller.onChange((snapshot) => render(snapshot))];
 
+  about.setAttribute('aria-label', t('level.about'));
+  about.title = t('level.about');
+  about.addEventListener('click', showStart);
   run.addEventListener('click', () => controller.run(editor.getDoc()));
   stop.addEventListener('click', () => controller.stop());
   restart.addEventListener('click', () => controller.restart());
@@ -192,6 +227,12 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         scene = handle;
         controller.attach(handle);
       });
+      // The start card opens a level the first time it is played in a visit.
+      const started = `kydux.started.${loaded.id}`;
+      if (storage('session')?.getItem(started) !== 'yes') {
+        storage('session')?.setItem(started, 'yes');
+        showStart();
+      }
     },
     async relabel() {
       const before = text;
@@ -201,11 +242,15 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       goals = goalsPanel(goalTexts());
       goalsSlot.replaceChildren(goals.node);
       editor.view.contentDOM.setAttribute('aria-label', t('level.code_label'));
+      about.setAttribute('aria-label', t('level.about'));
+      about.title = t('level.about');
+      if (shownCard?.open && shownCard.node.querySelector('.start-card')) showStart();
       render(controller.snapshot, true);
       setPageTitle();
     },
     destroy() {
       destroyed = true;
+      shownCard?.close();
       for (const unsubscribe of stopped) unsubscribe();
       stopped = [];
       controller.destroy();

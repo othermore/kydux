@@ -16,8 +16,12 @@ software under the GNU General Public License, version 3 or later.
 Kydux runs in a web browser. There is nothing to install yet: for now it
 runs only from this repository, as `docs/dev/dev-environment.md` explains.
 
-The game opens on its start screen. *Continue* takes you to where you left
-off. The first time, that is the first lesson.
+The first time, you make your wizard. You give it a name, say whether it
+is a girl or a boy, and choose how it looks. The game then calls you by
+that name.
+
+After that, the game opens on its start screen. *Continue* takes you to
+where you left off. The first time, that is the first lesson.
 
 A lesson is a few short pages. Each one explains one idea, with an example.
 On the last page, *Try it* opens the level that comes next, with the

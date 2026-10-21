@@ -134,6 +134,7 @@ one to go straight to a screen:
 | Address | Screen |
 | --- | --- |
 | `#start` | The start screen. An address with no hash, or one the game does not know, opens it too. |
+| `#wizard` | The creator, where the player names their wizard, says whether it is a girl or a boy, and picks its look. |
 | `#map` | The map of the course. |
 | `#lesson/01-first-action` | A lesson, from `content/lessons/01-first-action/`. |
 | `#level/02-the-locked-door` | A level, from `content/levels/02-the-locked-door/`. |
@@ -143,16 +144,21 @@ The map keeps a locked stop closed. A level's or a lesson's address opens
 it anyway. That is on purpose, so that you can test any level without
 playing the ones before it.
 
+The first time the game opens, its big button leads to the creator. The
+course begins once the player has a wizard. A level's or a lesson's
+address works without one: the texts then call the player *apprentice*.
+
 The browser remembers the player's progress. It keeps it as one document
 in its `localStorage`, under the key `kydux.progress`. The document holds
-everything: the language, the settings, the code typed in each level, the
-hints opened, the stars won and the lessons read. Closing the tab or the
-browser does not lose it.
+everything: the wizard, the language, the settings, the code typed in each
+level, the hints opened, the stars won and the lessons read. Closing the
+tab or the browser does not lose it.
 
 The start screen can move that document to another browser. *Export*
 downloads it as `kydux-progress.json`. *Import* reads such a file back. To
 start from a clean page, press *Start from the beginning* on the start
-screen. It clears the progress but keeps the language and the settings.
+screen. It clears the progress but keeps the wizard, the language and the
+settings.
 To clear everything, clear the site's data in the browser, or open the
 game in a private window.
 
@@ -300,13 +306,18 @@ and the repository's own checks, the check that keeps the languages in
 step, and the app's type check, unit tests and build. When everything
 passes, the last line says `==> All checks passed`.
 
-The browser tests take longer, about a minute and a half. They build the
-game, serve it, and play the levels in a real browser. Add `--e2e` to run
-them after the other checks:
+The browser tests take longer, about three minutes. They build the game,
+serve it, and play it in a real browser. Add `--e2e` to run them after the
+other checks:
 
 ```sh
 ci/check.sh --e2e
 ```
+
+One of them walks the whole game, once in each language, and takes a
+screenshot at each step. The screenshots let you see the game without
+playing it. They land in `app/e2e/shots/`, one folder per language, and git
+ignores them. `app/e2e/README.md` says what each one shows.
 
 The repository's own checks deserve a mention, because they guard the
 project's rules. They refuse a secret in any tracked file. They refuse a

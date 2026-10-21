@@ -18,26 +18,32 @@ there by pytest, without a browser.
 
 ```
 app/            the web app: Vite, TypeScript, plain DOM for the shell
-  src/i18n/     every string the player sees, from i18n/<lang>.json
+  src/i18n/     every string the player sees, from i18n/<lang>.json, made for
+                the wizard by personal.ts (D37)
   src/runtime/  the worker that holds Pyodide, and the page's side of it
   src/engine/   the scene in Phaser, where everything stands before a run
                 (layout.ts), what an actor sees (sight.ts, the same rule as the
                 world's, tested on tests/fixtures/sight.json), the playback, and
-                the words the scene shows (words.ts, why an action failed)
+                the words the scene shows (words.ts, why an action failed);
+                the looks a wizard may have (looks.ts) and the figures drawn
+                until the art comes (placeholders.ts)
   src/editor/   the child's editor, CodeMirror
-  src/ui/       the screens: start (start.ts), the map (map.ts), a lesson
-                (lesson.ts), and the level screen, a view of the run controller
+  src/ui/       the screens: start (start.ts), the wizard's creator
+                (wizard.ts), the map (map.ts), a lesson (lesson.ts), the
+                settings (settings.ts), and the level screen, a view of the run controller
                 (controller.ts), with its goals panel, outcome card, start and
                 win cards (cards.ts), and the wizard's notebook (notebook.ts)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), and the course (course.ts): its
-                chapters, what comes next, a stop's state
+                chapters, what comes next, a stop's state, what the child
+                knows in a level (D40)
   src/progress/ the player's progress, one document (store.ts), and the calls
                 the screens make on it (progress.ts)
   scripts/      before dev and build: copy Pyodide into public/, pack the world
                 into world.zip, copy the content into content/ with the course in
                 content/course.json, and write the world's table as api.json
-  e2e/          the browser tests (Playwright), beside the node_modules they need
+  e2e/          the browser tests (Playwright), beside the node_modules they need;
+                the loop's screenshots in e2e/shots/ (D39)
 world/          kydux_world, the model of the levels, and its tests: level.py reads
                 a level; world.py holds the wizard and the ticks; things.py the
                 read-only base and the things; actors.py the teacher and the sight
@@ -526,6 +532,18 @@ one overturns stays, marked as superseded.
   (`event.code`), so that a Mac's Option+R, which types `®`, works and
   types nothing. The buttons say their key in their title, and the
   settings list every key.
+- **D39 — The loop suite leaves screenshots for the reviewer.** Decided
+  2026-10-21 (sprint-6.md), built the same day. `app/e2e/loop.spec.ts`
+  walks the whole loop in each language, from a fresh visit through the
+  creator, the first lesson, a failed run, a hint, a win and the next
+  lesson to the map and the settings, asserting each step as the other
+  specs do and saving a full-page screenshot of it under
+  `app/e2e/shots/<lang>/<nn>-<step>.png`. The folder is ignored by git and
+  emptied at each run, so it always shows the code just tested;
+  `ci/check.sh --e2e` says where it is. The owner tries the game every few
+  sprints; between those trials, the shots are what a reviewer reads in
+  place of hands on the game. They are taken at 1280 × 720, the laptop the
+  game is first made for (D38).
 - **D40 — An action once learned stays known.** Decided 2026-10-21 by the
   owner, during sprint 6, built the same day. A level's `api` (D23) still
   lists what that level teaches, and the world's tests hold its solution

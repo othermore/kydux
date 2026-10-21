@@ -34,6 +34,8 @@ app/public/api.json
 app/public/content/
 app/test-results/
 app/playwright-report/
+# The loop suite's screenshots, for the reviewer's eyes (D39).
+app/e2e/shots/
 
 # Python's environment and tool caches.
 .venv/

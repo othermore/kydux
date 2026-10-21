@@ -17,8 +17,12 @@ Kydux funciona en un navegador web. Todavía no hay nada que instalar: por
 ahora solo funciona desde este repositorio, como explica
 `docs/dev/dev-environment.md`.
 
-El juego se abre en su pantalla de inicio. *Continuar* te lleva a donde lo
-dejaste. La primera vez, eso es la primera lección.
+La primera vez, creas tu personaje. Le pones un nombre, eliges si es una
+maga o un mago, y escoges su aspecto. Después, el juego te llama por ese
+nombre.
+
+A partir de ahí, el juego se abre en su pantalla de inicio. *Continuar* te
+lleva a donde lo dejaste. La primera vez, eso es la primera lección.
 
 Una lección son unas pocas páginas cortas. Cada una explica una idea, con
 un ejemplo. En la última página, *Probar* abre el nivel que viene después,

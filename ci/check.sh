@@ -51,6 +51,7 @@ npm run --silent build
 if [ -n "$E2E" ]; then
     step "The browser tests"
     npm run --silent e2e
+    echo "==> The loop's screenshots are in app/e2e/shots/ (app/e2e/README.md)"
 fi
 
 echo "==> All checks passed"

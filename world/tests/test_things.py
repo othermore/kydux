@@ -87,7 +87,7 @@ def test_a_door_is_opened_from_next_to_it_with_its_key_and_lets_the_wizard_throu
     )
     world.wizard.move_right(2)
     door.open()
-    assert kinds(world)[-1] == ("open", {"id": "door", "at": [7, 2]})
+    assert kinds(world)[-1] == ("open", {"id": "door", "at": [7, 2], "by": "hand"})
     assert door.is_open and not door.locked
     world.wizard.move_down(2)
     assert world.wizard.position == (7, 3)

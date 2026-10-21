@@ -14,6 +14,7 @@ bare `except:` cannot carry the run on.
 """
 
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
@@ -134,6 +135,16 @@ class World:
                 return thing
         return None
 
+    def door_beside(self, position: Position, opens: Callable[[Door], bool]) -> Door | None:
+        """The first closed door next to `position`, by id, for which `opens` holds."""
+        for thing in sorted(self.things.values(), key=lambda t: t.name):
+            if not isinstance(thing, Door) or thing.is_open:
+                continue
+            where = thing._k_position
+            if abs(where.x - position.x) + abs(where.y - position.y) == 1 and opens(thing):
+                return thing
+        return None
+
     def carried(self) -> list[Thing]:
         return [t for t in self.things.values() if t._k_carried]
 
@@ -153,12 +164,15 @@ class World:
             self.over = TooManyTicks(self.level.tick_limit)
             raise self.over
 
-    def act(self, kind: str, data: dict[str, Any]) -> None:
-        """One tick of the wizard's: its event, every actor's step, who sees it, the goals."""
+    def act(self, kind: str, data: dict[str, Any], then: Callable[[], None] | None = None) -> None:
+        """One tick of the wizard's: its event, what it does to the world (`then`, as a
+        door opening to a spell), every actor's step, who sees it, the goals."""
         self.ready()
         self.tick += 1
         self._line = child_line()
         self.events.append(Event(self.tick, "wizard", kind, data, self._line))
+        if then is not None:
+            then()
         for actor in self.actors.values():
             actor._step()
         for actor in self.actors.values():
@@ -208,9 +222,8 @@ def _whole(name: str, what: str, value: object) -> int:
 
 class Wizard(Child):
     """The child's wizard. Its methods are its actions, which the child's code makes it do:
-    moving, waiting, saying, picking up, finding and looking at what it carries. Spells,
-    the magic it learns from books and casts with the wand, come with later chapters
-    (architecture.md, D27)."""
+    moving, waiting, saying, picking up, finding, looking at what it carries, and casting
+    a spell with the wand (architecture.md, D27, D42)."""
 
     _k_role = "wizard"
 
@@ -272,8 +285,34 @@ class Wizard(Child):
         self._move(Direction.DOWN, _whole("move_down", "steps", steps))
 
     def say(self, text: object) -> None:
-        """Say something out loud: `wizard.say("Hello!")`"""
-        self._k_world.act("say", {"text": str(text)})
+        """Say something out loud; a door beside the wizard opens to its password:
+        `wizard.say("Hello!")`"""
+        world: World = self._k_world
+        said = str(text)
+        world.ready()
+        door = world.door_beside(self._k_position, lambda d: d.password == said)
+        world.act("say", {"text": said}, then=door and (lambda: door._opened_by("word")))
+
+    def cast(self, spell: str) -> None:
+        """Cast a spell with the wand, which the wizard must carry; it works where the
+        wizard stands: `wizard.cast("zelim")`"""
+        if not isinstance(spell, str):
+            raise ActionArguments("cast", "cast() takes a spell's name, in quotes")
+        world: World = self._k_world
+        world.ready()
+        here = list(self._k_position)
+        if not self.has("wand"):
+            # Without the wand the wizard does not know the action (D27): nothing to try.
+            world.act("blocked", {"at": here, "by": "wizard", "reason": "no_wand", "tried": False})
+            return
+        if spell not in world.level.spells:
+            refused = {"at": here, "by": "wizard", "reason": "unknown_spell", "tried": True}
+            world.act("blocked", {**refused, "spell": spell})
+            return
+        door = world.door_beside(self._k_position, lambda d: d._k_seal == spell)
+        world.act(
+            "cast", {"spell": spell, "at": here}, then=door and (lambda: door._opened_by("spell"))
+        )
 
     def wait(self, ticks: int = 1) -> None:
         """Stand still while the world moves on, one tick at a time: `wizard.wait(2)`"""

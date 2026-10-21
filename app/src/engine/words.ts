@@ -11,10 +11,19 @@ function thingWords(kind: string): string {
   return t(`things.${kind}`);
 }
 
-/** Why an action could not be done, from a `blocked` event's reason and its thing's kind. */
-export function blockedText(reason: string, kind: string | null): string {
+/** Why an action could not be done, from a `blocked` event's reason, its thing's
+ * kind, and for a spell not known, the spell's name. */
+export function blockedText(reason: string, kind: string | null, spell = ''): string {
   const thing = kind ? thingWords(kind) : '';
   switch (reason) {
+    case 'no_wand':
+      return t('blocked.no_wand');
+    case 'unknown_spell':
+      return t('blocked.unknown_spell', { spell });
+    case 'sealed':
+      return t('blocked.sealed', { thing });
+    case 'password':
+      return t('blocked.password', { thing });
     case 'far':
       return t('blocked.far', { thing });
     case 'locked':

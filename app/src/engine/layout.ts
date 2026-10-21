@@ -7,10 +7,23 @@
 import type { LevelJson } from '../runtime/protocol';
 import type { Facing, Tile } from './sight';
 
+/** How a closed door opens (D43): by hand, by its key, by a spell, by a word. */
+export type DoorLock = 'none' | 'key' | 'spell' | 'word';
+
 export interface ThingLayout {
   id: string;
   kind: string;
   tile: Tile;
+  /** For a door, how it opens; `none` for anything else. */
+  lock: DoorLock;
+}
+
+function lockOf(spec: Record<string, unknown>): DoorLock {
+  if (spec.kind !== 'door') return 'none';
+  if (spec.locked === true) return 'key';
+  if (typeof spec.sealed === 'string') return 'spell';
+  if (typeof spec.password === 'string') return 'word';
+  return 'none';
 }
 
 export interface ActorLayout {
@@ -66,7 +79,7 @@ export function layout(level: LevelJson): Layout {
   for (const spec of asList(level.things)) {
     const tile = place(spec);
     if (typeof spec.marker === 'string') used.add(spec.marker);
-    if (tile) things.push({ id: String(spec.id), kind: String(spec.kind), tile });
+    if (tile) things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec) });
   }
   const actors: ActorLayout[] = [];
   for (const spec of asList(level.actors)) {

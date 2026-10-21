@@ -23,4 +23,17 @@ describe('blockedText', () => {
     expect(blockedText('far', 'door')).toBe('No llego a la puerta desde aquí.');
     expect(blockedText('open', 'door')).toBe('No hace falta: la puerta ya está abierta.');
   });
+
+  it('says why a spell or a door would not do (D42, D43)', () => {
+    initLanguage(english);
+    expect(blockedText('no_wand', null)).toBe('I do not know this action yet.');
+    expect(blockedText('unknown_spell', null, 'abra')).toBe('I do not know a spell called “abra”.');
+    expect(blockedText('sealed', 'door')).toBe(
+      'I cannot open the door by hand: it is sealed, and needs a spell.',
+    );
+    initLanguage(spanish);
+    expect(blockedText('password', 'door')).toBe(
+      'No puedo abrir la puerta con la mano: quiere una palabra.',
+    );
+  });
 });

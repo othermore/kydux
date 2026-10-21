@@ -13,7 +13,8 @@ export type Outcome =
       met: number;
       total: number;
       /** The first action that could not be done: its line, its reason, its thing's kind. */
-      blocked?: { line: number; reason: string; thing: string | null };
+      /** The first action that could not be done; `spell` for a spell not known. */
+      blocked?: { line: number; reason: string; thing: string | null; spell?: string };
     }
   | { kind: 'too_many_ticks'; limit: number }
   | { kind: 'interrupted'; seconds: number }
@@ -63,8 +64,9 @@ export function outcomeText(outcome: Outcome): string {
       const said = t('outcome.incomplete', { n: outcome.met, total: outcome.total });
       // Why something could not be done, the first time it happened (D28).
       if (!outcome.blocked) return said;
-      const { line, reason, thing } = outcome.blocked;
-      return `${said}\n${t('outcome.blocked', { line, reason: blockedText(reason, thing) })}`;
+      const { line, reason, thing, spell } = outcome.blocked;
+      const why = blockedText(reason, thing, spell);
+      return `${said}\n${t('outcome.blocked', { line, reason: why })}`;
     }
     case 'too_many_ticks':
       return t('outcome.too_many_ticks', { limit: outcome.limit });

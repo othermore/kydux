@@ -135,8 +135,9 @@ tiles are `[x, y]`.
 | `say` | wizard | `text` | a bubble over the wizard for three ticks, under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
 | `pick_up` | wizard | `id`, `at` | the thing rises and vanishes; `data-carried` |
-| `open` | wizard | `id`, `at` | the door's frame turns open; `data-doors` |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open` or `nothing`; `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
+| `open` | wizard, by `door.open()`; or the door, in the wizard's tick, opened by a spell or a word | `id`, `at`, `by`: `hand`, `spell` or `word` | the door's frame turns open; `data-doors` |
+| `cast` | wizard | `spell`, `at` | a ring of light grows from the wizard and fades |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand` or `unknown_spell` (with `spell`); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
 
@@ -557,3 +558,32 @@ one overturns stays, marked as superseded.
   notebook still shows only the objects the level holds: no door where
   there is none, and the teacher only where the teacher is. A name the
   course has not taught yet is shown nowhere.
+- **D42 — Spells.** Decided 2026-10-21 (sprint-7.md), built the same day.
+  A spell is a word, cast with the wand: `wizard.cast("<spell>")` is the
+  wand's action (D27), and without the wand carried it is refused with a
+  `blocked` event of reason `no_wand`, which the wizard thinks as *I do not
+  know this action yet*; nothing is tried, so nothing shakes. A level says
+  which spells exist in it, `"spells"` in `level.json`, words in small
+  letters; any other is refused with `unknown_spell` and the spell's name,
+  and the wizard shakes, having tried. A spell cast makes a `cast` event
+  and does what it does where the wizard stands: `zelim`, chapter 1's,
+  breaks the seal of a door next to the wizard. The world does not hold
+  the child to the level's `api` while it runs (the api is the notebook's,
+  the suggestions' and the solution's, D23, D40); the wand is the rule
+  for `cast`, as the story has it. The spells' names are `story.md`'s.
+- **D43 — A door opens by hand, by key, by word or by spell.** Decided
+  2026-10-21 (sprint-7.md), built the same day. A door in `level.json`
+  has at most one of `"locked": true` (`door.open()` with its key
+  carried), `"sealed": "<spell>"` (the spell cast beside it; the spell
+  must be one of the level's) or `"password": "<word>"` (the word said
+  beside it, exactly, capitals and all); with none it opens by hand. A
+  door opened by a spell or a word opens in the tick of the wizard's
+  `cast` or `say`, by an `open` event whose actor is the door itself, so
+  that the wizard keeps one event per tick, which the run's consistency
+  check holds to (D20). `door.open()` on a sealed door or a password door
+  is refused (`sealed`, `password`) and the door shakes: the wizard tried.
+  `door.sealed` is true until the seal is broken; `door.password` is the
+  door's word, so that a later chapter can teach reading it into a
+  variable. The scene draws the four closed doors apart, one frame each,
+  named as the layout's `lock`: plain, a lock plate with a keyhole, a
+  glowing rune, a mouth.

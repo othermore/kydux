@@ -58,6 +58,10 @@ class ThingSpec:
     opens: str | None = None
     #: For a door, whether it needs a key.
     locked: bool = False
+    #: For a door, the spell that breaks its seal, or None (D43).
+    sealed: str | None = None
+    #: For a door, the word that opens it when said beside it, or None (D43).
+    password: str | None = None
 
 
 @dataclass(frozen=True)
@@ -85,6 +89,8 @@ class Level:
     actors: tuple[ActorSpec, ...] = ()
     api: tuple[str, ...] = ()
     goals_source: str | None = None
+    #: The spells that exist in the level, which the wand can cast (D42).
+    spells: tuple[str, ...] = ()
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Level":
@@ -146,6 +152,18 @@ class Level:
         if not isinstance(api, list) or not all(isinstance(name, str) for name in api):
             raise LevelError(f"{level_id}: api must be a list of names")
 
+        spells = data.get("spells", [])
+        if not isinstance(spells, list) or not all(
+            isinstance(spell, str) and spell.isalpha() and spell.islower() for spell in spells
+        ):
+            raise LevelError(f"{level_id}: spells must be a list of words in small letters")
+        for thing in things:
+            if thing.sealed is not None and thing.sealed not in spells:
+                raise LevelError(
+                    f"{level_id}: the door {thing.id} is sealed by {thing.sealed}, "
+                    "which is not a spell here"
+                )
+
         own = data.get("own_goals", False)
         source = data.get("goals_source")
         if not isinstance(own, bool) or (source is not None and not isinstance(source, str)):
@@ -168,6 +186,7 @@ class Level:
             actors=actors,
             api=tuple(api),
             goals_source=source,
+            spells=tuple(spells),
         )
         check_api(level)
         return level
@@ -259,7 +278,16 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
     locked = spec.get("locked", False)
     if not isinstance(locked, bool) or (locked and kind != "door"):
         raise LevelError(f"{shape.level_id}: only a door is locked, true or false")
-    return ThingSpec(kind, thing_id, shape.place(spec, thing_id), opens, locked)
+    sealed, password = spec.get("sealed"), spec.get("password")
+    for name, value in (("sealed", sealed), ("password", password)):
+        if value is not None and (kind != "door" or not isinstance(value, str) or not value):
+            raise LevelError(f"{shape.level_id}: only a door is {name}, by a word")
+    if sum((locked, sealed is not None, password is not None)) > 1:
+        raise LevelError(
+            f"{shape.level_id}: the door {thing_id} is locked, sealed or has a password, "
+            "one of them at most"
+        )
+    return ThingSpec(kind, thing_id, shape.place(spec, thing_id), opens, locked, sealed, password)
 
 
 def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:

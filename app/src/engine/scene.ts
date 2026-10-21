@@ -111,7 +111,7 @@ class LevelScene extends Phaser.Scene {
     for (const thing of this.map.things) {
       const image =
         thing.kind === 'door'
-          ? this.add.image(...centre(thing.tile), thingKey('door'), 'closed')
+          ? this.add.image(...centre(thing.tile), thingKey('door'), thing.lock)
           : this.add.image(...centre(thing.tile), thingKey(thing.kind));
       this.things.set(thing.id, image.setDepth(2));
       if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
@@ -167,7 +167,7 @@ class LevelScene extends Phaser.Scene {
       if (!image) continue;
       this.tweens.killTweensOf(image);
       image.setPosition(...centre(thing.tile)).setVisible(true).setAlpha(1);
-      if (thing.kind === 'door') image.setFrame('closed');
+      if (thing.kind === 'door') image.setFrame(thing.lock);
     }
     for (const actor of this.map.actors) {
       const state = this.actors.get(actor.id);
@@ -201,9 +201,28 @@ class LevelScene extends Phaser.Scene {
     if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
     for (const event of events) {
       if (event.actor === 'wizard') this.showWizard(tick, event, instant);
+      // A door opened by a spell or a word is the door's own event (D43).
+      else if (event.kind === 'open') this.openDoor(String(event.data.id));
       else this.showActor(event, instant);
     }
     this.publish();
+  }
+
+  private openDoor(id: string): void {
+    this.things.get(id)?.setFrame('open');
+    this.openDoors.add(id);
+  }
+
+  /** A spell cast: a ring of light that grows from the wizard and fades (D42). */
+  private flash(duration: number): void {
+    const ring = this.add.circle(this.wizard.x, this.wizard.y - 6, 10, 0xfff3bf, 0.8).setDepth(5);
+    this.tweens.add({
+      targets: ring,
+      scale: 3,
+      alpha: 0,
+      duration,
+      onComplete: () => ring.destroy(),
+    });
   }
 
   private showWizard(tick: number, event: WorldEvent, instant: boolean): void {
@@ -252,12 +271,12 @@ class LevelScene extends Phaser.Scene {
         this.carried.add(id);
         break;
       }
-      case 'open': {
-        const id = String(event.data.id);
-        this.things.get(id)?.setFrame('open');
-        this.openDoors.add(id);
+      case 'open':
+        this.openDoor(String(event.data.id));
         break;
-      }
+      case 'cast':
+        if (!instant) this.flash(duration);
+        break;
       case 'blocked': {
         // The wizard thinks why; and when it did try, what would not do shakes:
         // a locked door, or the wizard with nothing to pick up (D28). From too
@@ -265,7 +284,8 @@ class LevelScene extends Phaser.Scene {
         if (instant) break;
         const by = String(event.data.by);
         const thing = this.map.things.find((t) => t.id === by);
-        this.think(blockedText(String(event.data.reason), thing?.kind ?? null), tick);
+        const spell = typeof event.data.spell === 'string' ? event.data.spell : '';
+        this.think(blockedText(String(event.data.reason), thing?.kind ?? null, spell), tick);
         if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
         break;
       }

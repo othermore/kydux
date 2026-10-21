@@ -279,6 +279,7 @@ export class RunController {
                   line: first.line,
                   reason: String(first.data.reason),
                   thing: things.find((thing) => thing.id === first.data.by)?.kind ?? null,
+                  ...(typeof first.data.spell === 'string' ? { spell: first.data.spell } : {}),
                 }
               : undefined,
         };

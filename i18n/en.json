@@ -87,7 +87,11 @@
     "locked": "I cannot open {thing}: it is locked, and I have no key for it.",
     "open": "I do not need to: {thing} is already open.",
     "nothing": "There is nothing here to pick up.",
-    "unknown_action": "I do not know this action yet."
+    "unknown_action": "I do not know this action yet.",
+    "no_wand": "I do not know this action yet.",
+    "unknown_spell": "I do not know a spell called “{spell}”.",
+    "sealed": "I cannot open {thing} by hand: it is sealed, and needs a spell.",
+    "password": "I cannot open {thing} by hand: it wants a word."
   },
   "notebook": {
     "title": "The wizard's notebook",
@@ -109,7 +113,8 @@
       "has": "Tells whether the wizard carries a thing of a kind.",
       "position": "Where the wizard stands, as x and y.",
       "facing": "The way the wizard looks: up, down, left or right.",
-      "items": "The things the wizard carries."
+      "items": "The things the wizard carries.",
+      "cast": "Casts a spell with the wand, which the wizard must carry. The spell works where the wizard stands."
     },
     "thing": {
       "kind": "What the thing is, like \"key\" or \"book\".",
@@ -122,7 +127,9 @@
       "position": "Where the door stands, as x and y.",
       "locked": "True while the door needs its key to open.",
       "is_open": "True once the door is open, and the wizard can go through.",
-      "open": "Opens the door. The wizard must stand next to it, and carry its key if it is locked."
+      "open": "Opens the door. The wizard must stand next to it, and carry its key if it is locked. A sealed door, or one with a password, does not open by hand.",
+      "sealed": "True while the door is sealed, until its spell is cast beside it.",
+      "password": "The word that opens the door when it is said beside it, or None."
     },
     "key": {
       "kind": "What it is: \"key\".",

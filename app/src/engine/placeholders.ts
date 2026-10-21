@@ -3,6 +3,7 @@
 // the same drawing comes out everywhere.
 
 import type Phaser from 'phaser';
+import type { DoorLock } from './layout';
 import { DEFAULT_LOOK, type HairStyle, type Look } from './looks';
 
 export const TILE = 48;
@@ -25,7 +26,8 @@ export function markerKey(letter: string): string {
   return `kydux-marker-${letter}`;
 }
 
-/** A thing's texture: a door has two frames, `closed` and `open`. */
+/** A thing's texture. A door has a frame for each way it is closed, named as its
+ * layout's lock (`none`, `key`, `spell`, `word`), and `open`. */
 export function thingKey(kind: string): string {
   return `kydux-thing-${kind}`;
 }
@@ -204,6 +206,49 @@ function drawFigure(ctx: CanvasRenderingContext2D, x: number, facing: Facing, fi
   ctx.fillRect(cx - 8, 9, 16, 2);
 }
 
+const DOOR_LOCKS: readonly DoorLock[] = ['none', 'key', 'spell', 'word'];
+
+/** What a closed door shows of how it opens: a keyhole, a glowing rune, a mouth. */
+function drawLock(ctx: CanvasRenderingContext2D, x: number, lock: DoorLock): void {
+  const c = x + TILE / 2;
+  switch (lock) {
+    case 'key':
+      ctx.fillStyle = '#c9a227';
+      ctx.fillRect(c - 6, 18, 12, 16);
+      ctx.fillStyle = '#1b1c22';
+      ctx.beginPath();
+      ctx.arc(c, 24, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillRect(c - 1, 25, 2, 6);
+      break;
+    case 'spell':
+      ctx.strokeStyle = '#9be7ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(c, 24, 9, 0, Math.PI * 2);
+      ctx.moveTo(c, 15);
+      ctx.lineTo(c, 33);
+      ctx.moveTo(c - 6, 20);
+      ctx.lineTo(c + 6, 28);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(155, 231, 255, 0.25)';
+      ctx.fill();
+      break;
+    case 'word':
+      ctx.fillStyle = '#c0392b';
+      ctx.beginPath();
+      ctx.ellipse(c, 26, 9, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#1b1c22';
+      ctx.beginPath();
+      ctx.ellipse(c, 26, 6, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    case 'none':
+      break;
+  }
+}
+
 /** A thing, small on its tile, or a door filling it. */
 function drawThing(ctx: CanvasRenderingContext2D, x: number, kind: string, open = false): void {
   const c = x + TILE / 2;
@@ -299,11 +344,14 @@ export function makePlaceholders(
   });
   teacher.texture.refresh();
 
-  const door = canvas(scene, thingKey('door'), TILE * 2, TILE);
-  drawThing(door.ctx, 0, 'door', false);
-  drawThing(door.ctx, TILE, 'door', true);
-  door.texture.add('closed', 0, 0, 0, TILE, TILE);
-  door.texture.add('open', 0, TILE, 0, TILE, TILE);
+  const door = canvas(scene, thingKey('door'), TILE * (DOOR_LOCKS.length + 1), TILE);
+  DOOR_LOCKS.forEach((lock, index) => {
+    drawThing(door.ctx, index * TILE, 'door', false);
+    drawLock(door.ctx, index * TILE, lock);
+    door.texture.add(lock, 0, index * TILE, 0, TILE, TILE);
+  });
+  drawThing(door.ctx, DOOR_LOCKS.length * TILE, 'door', true);
+  door.texture.add('open', 0, DOOR_LOCKS.length * TILE, 0, TILE, TILE);
   door.texture.refresh();
 
   for (const kind of ['key', 'book', 'wand', 'potion']) {

@@ -101,17 +101,43 @@ class Key(Thing):
 
 
 class Door(Thing):
-    """A door in a doorway: closed until opened, and locked until opened with its key."""
+    """A door in a doorway, closed until it opens, in one of four ways (D43): by hand
+    (`door.open()`), locked (`door.open()` with its key carried), sealed (its spell
+    cast beside it) or with a password (its word said beside it)."""
 
     _k_role = "door"
 
     def __init__(self, world: "World", spec: ThingSpec) -> None:
         super().__init__(world, spec)
-        self._set(locked=spec.locked, open=False)
+        self._set(locked=spec.locked, seal=spec.sealed, open=False)
 
     def __repr__(self) -> str:
-        state = "open" if self._k_open else "locked" if self._k_locked else "closed"
+        state = (
+            "open"
+            if self._k_open
+            else "locked"
+            if self._k_locked
+            else "sealed"
+            if self._k_seal
+            else "closed"
+        )
         return f"<door {self._k_spec.id} {state}>"
+
+    @property
+    def sealed(self) -> bool:
+        """True while the door is sealed, until its spell is cast beside it: `door.sealed`"""
+        return self._k_seal is not None
+
+    @property
+    def password(self) -> str | None:
+        """The word that opens the door when it is said beside it, or None: `door.password`"""
+        return self._k_spec.password
+
+    def _opened_by(self, how: str) -> None:
+        """Opens the door by a spell or a word, in the tick of the wizard's that did it."""
+        self._set(open=True, locked=False, seal=None)
+        world: World = self._k_world
+        world.note(self.name, "open", {"id": self.name, "at": list(self._k_position), "by": how})
 
     @property
     def locked(self) -> bool:
@@ -135,13 +161,17 @@ class Door(Thing):
             world.act("blocked", {"at": at, "by": self.name, "reason": "far", "tried": False})
         elif self._k_open:
             world.act("blocked", {"at": at, "by": self.name, "reason": "open", "tried": False})
+        elif self._k_seal is not None:
+            world.act("blocked", {"at": at, "by": self.name, "reason": "sealed", "tried": True})
+        elif self.password is not None:
+            world.act("blocked", {"at": at, "by": self.name, "reason": "password", "tried": True})
         elif self._k_locked and not any(
             isinstance(item, Key) and item._opens(self) for item in world.carried()
         ):
             world.act("blocked", {"at": at, "by": self.name, "reason": "locked", "tried": True})
         else:
             self._set(open=True, locked=False)
-            world.act("open", {"id": self.name, "at": at})
+            world.act("open", {"id": self.name, "at": at, "by": "hand"})
 
 
 def make_thing(world: "World", spec: ThingSpec) -> Thing:

@@ -26,7 +26,10 @@
     "error_no_line": "Python dice: {type}: {message}",
     "caught": "¡Te ha visto el profesor! Inténtalo otra vez, y fíjate hacia dónde mira.",
     "printed": "Tu código ha escrito:",
-    "blocked": "En la línea {line}: {reason}"
+    "blocked": "En la línea {line}: {reason}",
+    "way": "En la manera «{name}»:",
+    "all_ways": "¡De todas las maneras!",
+    "way_won": "{El mago|La maga} pasa de esta manera. Todavía no de todas: elige otra para verla."
   },
   "level": {
     "stop": "Parar",
@@ -58,7 +61,9 @@
     "split": "Arrastra para cambiar el tamaño de la escena y del editor",
     "run_key": "Ejecuta tu código: Alt+R, o Ctrl+Intro en el editor",
     "notebook_key": "Abre o cierra el cuaderno: Alt+N",
-    "carrying": "Llevas {things}."
+    "carrying": "Llevas {things}.",
+    "way_label": "Manera",
+    "ways": "Este nivel se juega de {n} maneras. Un solo programa tiene que superarlas todas:"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",

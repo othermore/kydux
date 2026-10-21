@@ -54,6 +54,8 @@ export interface StartCardText {
   said?: Said;
   /** What the wizard carries from the start, in words (D49). */
   carrying?: string;
+  /** The words for each way the level is played, when it has ways (D51). */
+  ways?: string[];
 }
 
 /** A character's words on a card (D45): the name, and what they say. */
@@ -88,6 +90,18 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
       element('p', {}, [t('goals.title')]),
       list,
       ...(text.carrying ? [element('p', { id: 'card-carrying', className: 'card-carrying' }, [text.carrying])] : []),
+      ...(text.ways && text.ways.length > 0
+        ? [
+            element('div', { id: 'card-ways', className: 'card-ways' }, [
+              element('p', {}, [t('level.ways', { n: text.ways.length })]),
+              element(
+                'ul',
+                {},
+                text.ways.map((words) => element('li', {}, [words])),
+              ),
+            ]),
+          ]
+        : []),
       start,
     ],
     onClose,

@@ -26,7 +26,10 @@
     "error_no_line": "Python says: {type}: {message}",
     "caught": "The teacher saw you! Try again, and watch which way they look.",
     "printed": "Your code printed:",
-    "blocked": "On line {line}: {reason}"
+    "blocked": "On line {line}: {reason}",
+    "way": "In the way “{name}”:",
+    "all_ways": "In every way!",
+    "way_won": "The wizard gets through this way. Not every way yet: choose another one to see it."
   },
   "level": {
     "stop": "Stop",
@@ -58,7 +61,9 @@
     "split": "Drag to resize the scene and the editor",
     "run_key": "Run your code: Alt+R, or Ctrl+Enter in the editor",
     "notebook_key": "Open or close the notebook: Alt+N",
-    "carrying": "You carry {things}."
+    "carrying": "You carry {things}.",
+    "way_label": "Way",
+    "ways": "This level is played {n} ways. One program must get through them all:"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",

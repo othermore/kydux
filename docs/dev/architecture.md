@@ -716,7 +716,14 @@ one overturns stays, marked as superseded.
   way not won, or the first, with `way` naming it, `ways` holding every
   way's result, and `status` won only when every way is. Rules out a
   random way per run: a child must see that one program handles every
-  case, and a test must be able to say so.
+  case, and a test must be able to say so. The page keeps every way's
+  world and shows one: the first not won, with a `#way` select, after a
+  run, to play back any other; the goals, the timeline and the card follow
+  the way shown, and the card names it. The card says *won* only when
+  every way is: a way won while another is not is its own outcome,
+  `way_won`, so that the progress document never counts a level won by
+  looking at its one good way. The start card lists the ways in their
+  words, `ways` in `text.<lang>.json`.
 - **D52 — A dark room hides what lies on its floor.** Decided 2026-10-21
   (sprint-9.md), built the same day. A level with `"dark": true` is unlit
   until `kirra` (which it must list among its spells): until then, a

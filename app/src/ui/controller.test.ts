@@ -232,7 +232,7 @@ describe('RunController', () => {
     expect(last().canPlay).toBe(true);
     expect(last().runningLine).toBe(1);
 
-    controller.play();
+    controller.resume();
     expect(last().state).toBe('playing');
     vi.advanceTimersByTime(400 * 4);
     expect(last().state).toBe('done');
@@ -250,5 +250,51 @@ describe('RunController', () => {
     expect(last().state).toBe('failed');
     expect(last().outcome).toEqual({ kind: 'failed' });
     expect(last().canRun).toBe(false);
+  });
+});
+
+describe('RunController with ways (D51)', () => {
+  /** A result of two ways: `open` won in 6 ticks, `locked` not, stopped after 2. */
+  function twoWays(): WorldResult {
+    const open = { ...world('won', moves(6), 6), id: 'open' };
+    const locked = { ...world('incomplete', moves(2), null), id: 'locked' };
+    return { ...locked, status: 'incomplete', way: 'locked', ways: [open, locked] };
+  }
+
+  it('shows the first way not won, said of its way, and lists the ways', async () => {
+    const { runtime, controller, last } = setUp();
+    controller.run('wizard.move_right(6)');
+    runtime.answer(twoWays());
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    expect(last().ways).toEqual(['open', 'locked']);
+    expect(last().way).toBe('locked');
+    vi.advanceTimersByTime(400 * 2);
+    expect(last().outcome).toMatchObject({ kind: 'incomplete', way: 'locked' });
+    expect(last().goals).toEqual(['open']);
+  });
+
+  it('plays back another way, its goals and its card, and a won way is not a win', async () => {
+    const { runtime, controller, last } = setUp();
+    controller.run('wizard.move_right(6)');
+    runtime.answer(twoWays());
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 2);
+    controller.showWay('open');
+    expect(last().way).toBe('open');
+    expect(last().outcome).toBeNull();
+    vi.advanceTimersByTime(400 * 6);
+    expect(last().goals).toEqual(['met']);
+    expect(last().outcome).toEqual({ kind: 'way_won', way: 'open' });
+  });
+
+  it('wins only when every way is won, and says so', async () => {
+    const { runtime, controller, last } = setUp();
+    controller.run('wizard.move_right(6)');
+    const open = { ...world('won', moves(6), 6), id: 'open' };
+    const also = { ...world('won', moves(6), 6), id: 'also' };
+    runtime.answer({ ...open, status: 'won', way: 'open', ways: [open, also] });
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 6);
+    expect(last().outcome).toEqual({ kind: 'won', way: 'open' });
   });
 });

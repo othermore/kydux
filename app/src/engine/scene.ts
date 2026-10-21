@@ -5,8 +5,10 @@
 // joined by ";"), data-doors (the open doors' ids, joined by ","),
 // data-carried (the ids of what the wizard carries, joined by ","),
 // data-thought (why an action could not be done, while the wizard thinks it),
-// data-shaking (present while something shakes at a failed try) and data-look
-// (the id of the look the wizard is drawn with, D36).
+// data-shaking (present while something shakes at a failed try), data-look
+// (the id of the look the wizard is drawn with, D36), data-dark (whether the
+// room is still dark, D52) and data-stairs ("id:in" or "id:away" joined by ";",
+// each stair as a step taken now would find it, D53).
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
@@ -28,6 +30,7 @@ import {
 } from './placeholders';
 import { Playback } from './playback';
 import { clearOf, sightTiles, type Tile } from './sight';
+import { type Hold, stairInPlace } from './stairs';
 import { blockedText } from './words';
 
 /** How long one tick lasts at speed 1. */
@@ -82,6 +85,12 @@ class LevelScene extends Phaser.Scene {
   private shaking = 0;
   /** Who saw the wizard, whose cone is drawn red. */
   private seenBy: string | null = null;
+  /** Whether the room is lit (D52), and the dark drawn over its floor while not. */
+  private lit = true;
+  private darkness!: Phaser.GameObjects.Graphics;
+  /** The tick shown, and each stair's holds seen so far (D53). */
+  private shownTick = 0;
+  private holds = new Map<string, Hold[]>();
 
   constructor(
     private readonly map: Layout,
@@ -108,15 +117,22 @@ class LevelScene extends Phaser.Scene {
     const tileset = tilemap.addTilesetImage(TILES_KEY, TILES_KEY, TILE, TILE, 0, 0);
     if (tileset) tilemap.createLayer(0, tileset, 0, 0);
     for (const [letter, tile] of this.map.markers) {
-      this.add.image(...centre(tile), markerKey(letter));
+      // A marker, like the way out, shows in the dark: it is the castle's shape.
+      this.add.image(...centre(tile), markerKey(letter)).setDepth(2.8);
     }
     this.cone = this.add.graphics().setDepth(1);
+    this.darkness = this.add.graphics().setDepth(2.5);
     for (const thing of this.map.things) {
       const image =
         thing.kind === 'door'
           ? this.add.image(...centre(thing.tile), thingKey('door'), thing.lock)
-          : this.add.image(...centre(thing.tile), thingKey(thing.kind));
-      this.things.set(thing.id, image.setDepth(2));
+          : thing.kind === 'stair'
+            ? this.add.image(...centre(thing.tile), thingKey('stair'), 'in')
+            : this.add.image(...centre(thing.tile), thingKey(thing.kind));
+      // Doors and stairs are the castle's shape, seen in the dark; what lies on the
+      // floor is under it (D52).
+      const shape = thing.kind === 'door' || thing.kind === 'stair';
+      this.things.set(thing.id, image.setDepth(shape ? 2.8 : 2));
       if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
     }
     for (const actor of this.map.actors) {
@@ -163,6 +179,9 @@ class LevelScene extends Phaser.Scene {
     this.clearBubble();
     this.clearThought();
     this.seenBy = null;
+    this.lit = !this.map.dark;
+    this.shownTick = 0;
+    this.holds.clear();
     this.openDoors.clear();
     // What the wizard holds from the start is carried at tick 0 (D49).
     this.carried = new Set(this.map.carrying);
@@ -201,6 +220,7 @@ class LevelScene extends Phaser.Scene {
       return;
     }
     this.parentNode.dataset.tick = String(tick);
+    this.shownTick = tick;
     if (this.bubble && (instant || tick >= this.bubbleUntil)) this.clearBubble();
     if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
     for (const event of events) {
@@ -209,9 +229,18 @@ class LevelScene extends Phaser.Scene {
       // thing a spell pulls (D47).
       else if (event.kind === 'open') this.openDoor(String(event.data.id));
       else if (event.kind === 'pull') this.pull(event, instant);
+      else if (event.kind === 'light') this.lit = true;
+      else if (event.kind === 'hold') this.hold(event);
       else this.showActor(event, instant);
     }
     this.publish();
+  }
+
+  /** A stair held by osto: its hold kept, for the stair's state at later ticks (D53). */
+  private hold(event: WorldEvent): void {
+    const id = String(event.data.id);
+    const held = { from: Number(event.data.from), until: Number(event.data.until) };
+    this.holds.set(id, [...(this.holds.get(id) ?? []), held]);
   }
 
   /** A thing drawn by a spell from where it lay to the wizard's tile (D47). */
@@ -394,7 +423,30 @@ class LevelScene extends Phaser.Scene {
         this.cone.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
     }
+    // Each stair as a step taken now would find it, and in place under the wizard.
+    const stairs: string[] = [];
+    for (const thing of this.map.things) {
+      if (thing.kind !== 'stair') continue;
+      const under = thing.tile[0] === this.wizardTile[0] && thing.tile[1] === this.wizardTile[1];
+      const inPlace =
+        under || stairInPlace(thing.period ?? 1, this.holds.get(thing.id) ?? [], this.shownTick + 1);
+      this.things.get(thing.id)?.setFrame(inPlace ? 'in' : 'away');
+      stairs.push(`${thing.id}:${inPlace ? 'in' : 'away'}`);
+    }
+    // The dark over every floor tile but the wizard's and its eight neighbours (D52).
+    this.darkness.clear();
+    if (!this.lit) {
+      this.darkness.fillStyle(0x07080c, 0.88);
+      this.map.rows.forEach((row, y) => {
+        [...row].forEach((char, x) => {
+          const near = Math.abs(x - this.wizardTile[0]) <= 1 && Math.abs(y - this.wizardTile[1]) <= 1;
+          if (char !== '#' && !near) this.darkness.fillRect(x * TILE, y * TILE, TILE, TILE);
+        });
+      });
+    }
     const dataset = this.parentNode.dataset;
+    dataset.dark = String(!this.lit);
+    dataset.stairs = stairs.join(';');
     dataset.wizard = this.wizardTile.join(',');
     dataset.actors = [...this.actors]
       .map(([id, a]) => `${id}:${a.tile.join(',')},${a.facing}`)

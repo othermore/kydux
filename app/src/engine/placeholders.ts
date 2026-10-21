@@ -60,6 +60,23 @@ function drawFloor(ctx: CanvasRenderingContext2D, x: number): void {
   ctx.strokeRect(x + 0.5, 0.5, TILE - 1, TILE - 1);
 }
 
+/** A stair seen from above: steps in place, or the gap it leaves when away. */
+function drawStair(ctx: CanvasRenderingContext2D, x: number, inPlace: boolean): void {
+  ctx.fillStyle = '#14151b';
+  ctx.fillRect(x, 0, TILE, TILE);
+  if (!inPlace) {
+    ctx.strokeStyle = '#3d3f4a';
+    ctx.setLineDash([4, 4]);
+    ctx.strokeRect(x + 4.5, 4.5, TILE - 9, TILE - 9);
+    ctx.setLineDash([]);
+    return;
+  }
+  for (let step = 0; step < 4; step += 1) {
+    ctx.fillStyle = step % 2 === 0 ? '#9c6b3f' : '#7a4e2d';
+    ctx.fillRect(x + 4, 4 + step * 10, TILE - 8, 10);
+  }
+}
+
 /** A shelf seen from above: a wooden case with books' backs in a row (D46). */
 function drawShelf(ctx: CanvasRenderingContext2D, x: number): void {
   drawFloor(ctx, x);
@@ -426,6 +443,14 @@ export function makePlaceholders(
   drawThing(door.ctx, DOOR_LOCKS.length * TILE, 'door', true);
   door.texture.add('open', 0, DOOR_LOCKS.length * TILE, 0, TILE, TILE);
   door.texture.refresh();
+
+  // A stair: wooden steps in place, a dark gap while it is away (D53).
+  const stair = canvas(scene, thingKey('stair'), TILE * 2, TILE);
+  drawStair(stair.ctx, 0, true);
+  drawStair(stair.ctx, TILE, false);
+  stair.texture.add('in', 0, 0, 0, TILE, TILE);
+  stair.texture.add('away', 0, TILE, 0, TILE, TILE);
+  stair.texture.refresh();
 
   for (const kind of ['key', 'book', 'wand', 'potion']) {
     const thing = canvas(scene, thingKey(kind), TILE, TILE);

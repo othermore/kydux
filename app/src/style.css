@@ -1090,3 +1090,31 @@ a.stop-body:focus-visible {
   margin: 0;
   color: var(--muted);
 }
+
+/* A level played in several ways (D51): the select that replays a way, and the
+   ways on the start card. */
+
+.way {
+  display: block;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.way select {
+  font-size: 15px;
+}
+
+.card-ways {
+  margin: -4px 0 14px;
+  text-align: left;
+}
+
+.card-ways p {
+  margin: 0 0 4px;
+}
+
+.card-ways ul {
+  margin: 0;
+  padding-left: 20px;
+}

@@ -80,6 +80,26 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   let goals: GoalsPanel = goalsPanel(goalTexts());
   goalsSlot.append(goals.node);
   const status = element('p', { id: 'status', className: 'status' });
+  // A level played in several ways (D51): its ways' ids, their words, and the
+  // select that plays back the way the child picks, after a run.
+  const levelWays = ((loaded.level.ways as { id: string }[] | undefined) ?? []).map((way) => way.id);
+  const wayName = (id: string) => text.ways?.[id] ?? id;
+  const waySelect = element('select', { id: 'way' });
+  const wayLabel = labelled(element('span', { className: 'way-label' }), () => t('level.way_label'));
+  const wayBox = element('label', { className: 'way', hidden: true }, [wayLabel, ' ', waySelect]);
+  waySelect.addEventListener('change', () => controller.showWay(waySelect.value));
+  let shownWays = '';
+  const renderWays = (snapshot: RunSnapshot, force: boolean) => {
+    wayBox.hidden = snapshot.ways.length === 0;
+    const key = snapshot.ways.join(',');
+    if (force || key !== shownWays) {
+      waySelect.replaceChildren(
+        ...snapshot.ways.map((id) => element('option', { value: id }, [wayName(id)])),
+      );
+      shownWays = key;
+    }
+    if (snapshot.way !== null) waySelect.value = snapshot.way;
+  };
   const timeline = element('input', {
     id: 'timeline',
     type: 'range',
@@ -140,6 +160,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       heading,
       sceneFrame,
       timeline,
+      wayBox,
       status,
     ]),
     handle,
@@ -226,7 +247,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const showStart = () =>
     showCard(
       startCard(
-        { title: text.title, goals: goalTexts(), said: said(text.intro), carrying: carrying() },
+        {
+          title: text.title,
+          goals: goalTexts(),
+          said: said(text.intro),
+          carrying: carrying(),
+          ways: levelWays.map(wayName),
+        },
         () => editor.focus(),
       ),
     );
@@ -286,8 +313,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     timeline.value = String(snapshot.tick);
     timeline.disabled = !snapshot.canSeek;
     snapshot.goals.forEach((mark, index) => goals.set(index, mark));
+    renderWays(snapshot, force);
     if (force || snapshot.outcome !== shownOutcome) {
-      if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed);
+      if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed, wayName);
       else card.hide();
       if (snapshot.outcome && snapshot.outcome.kind !== 'won' && snapshot.outcome.kind !== 'failed') {
         if (!hintsOffered && !force) progress.markTried(loaded.id);
@@ -318,7 +346,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   about.addEventListener('click', showStart);
   run.addEventListener('click', () => controller.run(editor.getDoc()));
   stop.addEventListener('click', () => {
-    if (controller.snapshot.canPlay) controller.play();
+    if (controller.snapshot.canPlay) controller.resume();
     else controller.stop();
   });
   timeline.addEventListener('input', () => {

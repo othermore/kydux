@@ -6,21 +6,26 @@ import { t } from '../i18n';
 import type { ErrorInfo, Explanation } from '../runtime/protocol';
 import { element } from './dom';
 
-export type Outcome =
+/** What a run came to. For a level played in several ways (D51), `way` is the id
+ * of the way the card speaks of; `won` is every way won, and `way_won` one way won
+ * while another is not. */
+export type Outcome = (
   | { kind: 'won' }
+  | { kind: 'way_won' }
   | {
       kind: 'incomplete';
       met: number;
       total: number;
-      /** The first action that could not be done: its line, its reason, its thing's kind. */
-      /** The first action that could not be done; `spell` for a spell not known. */
+      /** The first action that could not be done: its line, its reason, its thing's
+       * kind, and for a spell not known, the spell. */
       blocked?: { line: number; reason: string; thing: string | null; spell?: string };
     }
   | { kind: 'too_many_ticks'; limit: number }
   | { kind: 'interrupted'; seconds: number }
   | { kind: 'caught' }
   | { kind: 'error'; error: ErrorInfo }
-  | { kind: 'failed' };
+  | { kind: 'failed' }
+) & { way?: string };
 
 /** An error explained by the world, in the child's words (D22). */
 export function explanationText(explanation: Explanation): string {
@@ -56,10 +61,20 @@ export function explanationText(explanation: Explanation): string {
   return 'suggestion' in p ? `${said} ${t('error.suggestion', p)}` : said;
 }
 
-export function outcomeText(outcome: Outcome): string {
+/** What the card says; `wayName` gives a way's words, from the level's text. */
+export function outcomeText(outcome: Outcome, wayName: (id: string) => string = (id) => id): string {
+  const said = outcomeWords(outcome);
+  if (outcome.way === undefined) return said;
+  if (outcome.kind === 'won') return `${said} ${t('outcome.all_ways')}`;
+  return `${t('outcome.way', { name: wayName(outcome.way) })} ${said}`;
+}
+
+function outcomeWords(outcome: Outcome): string {
   switch (outcome.kind) {
     case 'won':
       return t('outcome.won');
+    case 'way_won':
+      return t('outcome.way_won');
     case 'incomplete': {
       const said = t('outcome.incomplete', { n: outcome.met, total: outcome.total });
       // Why something could not be done, the first time it happened (D28).
@@ -99,8 +114,9 @@ export function withCode(said: string): (string | HTMLElement)[] {
 
 export interface OutcomeCard {
   node: HTMLElement;
-  /** Says what the run came to, and what the child's code printed, if anything. */
-  show(outcome: Outcome, printed?: string): void;
+  /** Says what the run came to, and what the child's code printed, if anything;
+   * `wayName` gives a way's words. */
+  show(outcome: Outcome, printed?: string, wayName?: (id: string) => string): void;
   hide(): void;
   /** What the card says now, or null while it is hidden. */
   readonly current: Outcome | null;
@@ -124,10 +140,10 @@ export function outcomeCard(): OutcomeCard {
   let current: Outcome | null = null;
   return {
     node,
-    show(outcome, printed = lastPrinted) {
+    show(outcome, printed = lastPrinted, wayName = (id) => id) {
       current = outcome;
       lastPrinted = printed;
-      text.replaceChildren(...withCode(outcomeText(outcome)));
+      text.replaceChildren(...withCode(outcomeText(outcome, wayName)));
       printedLabel.textContent = t('outcome.printed');
       printedText.textContent = printed.replace(/\n$/, '');
       printedBox.hidden = printed === '';

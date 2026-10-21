@@ -16,6 +16,8 @@ export interface ThingLayout {
   tile: Tile;
   /** For a door, how it opens; `none` for anything else. */
   lock: DoorLock;
+  /** For a stair, the ticks it is in place and then away (D53). */
+  period?: number;
 }
 
 function lockOf(spec: Record<string, unknown>): DoorLock {
@@ -47,6 +49,8 @@ export interface Layout {
   shelves: Tile[];
   /** The ids of the things the wizard carries from the start, each its kind (D49). */
   carrying: string[];
+  /** Whether the room is dark until lit (D52). */
+  dark: boolean;
 }
 
 const DEFAULT_SIGHT = 4;
@@ -84,7 +88,10 @@ export function layout(level: LevelJson): Layout {
   for (const spec of asList(level.things)) {
     const tile = place(spec);
     if (typeof spec.marker === 'string') used.add(spec.marker);
-    if (tile) things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec) });
+    if (tile) {
+      const period = typeof spec.period === 'number' ? { period: spec.period } : {};
+      things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec), ...period });
+    }
   }
   const actors: ActorLayout[] = [];
   for (const spec of asList(level.actors)) {
@@ -115,5 +122,6 @@ export function layout(level: LevelJson): Layout {
     actors,
     shelves,
     carrying,
+    dark: level.dark === true,
   };
 }

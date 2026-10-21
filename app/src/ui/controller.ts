@@ -5,7 +5,7 @@
 
 import type { LoadedLevel } from '../content/levels';
 import type { Playback, Speed } from '../engine/playback';
-import type { LevelJson, RunResult, WorldResult } from '../runtime/protocol';
+import type { LevelJson, RunResult, WayResult, WorldResult } from '../runtime/protocol';
 import type { RuntimeStatus } from '../runtime/runtime';
 import type { GoalMark } from './goals';
 import type { Outcome } from './outcome';
@@ -23,8 +23,13 @@ export interface RunSnapshot {
   state: RunState;
   /** The runtime's own status, for the status line. */
   runtime: RuntimeStatus;
-  /** The last run's world, or null before a run and after a restart. */
+  /** The last run's world, the way shown of a level with ways, or null before a run
+   * and after a restart. */
   world: WorldResult | null;
+  /** The ids of the last run's ways (D51), empty for a level played one way, and the
+   * way shown. */
+  ways: string[];
+  way: string | null;
   /** What the card says, or null while it is hidden. */
   outcome: Outcome | null;
   /** What the child's code printed in the last run. */
@@ -79,7 +84,11 @@ export class RunController {
   private readonly runtime: RuntimeLike;
   private readonly level: LoadedLevel;
   private scene: SceneLike | null = null;
+  /** The last run's result as the world gave it, every way's within it. */
+  private result: WorldResult | null = null;
+  /** The world shown: the result's own, or one of its ways'. */
   private world: WorldResult | null = null;
+  private shownWay: string | null = null;
   private outcome: Outcome | null = null;
   private runningLine: number | null = null;
   private errorLine: number | null = null;
@@ -128,6 +137,8 @@ export class RunController {
       state,
       runtime: this.runtime.status,
       world: this.world,
+      ways: this.result?.ways?.map((way) => way.id) ?? [],
+      way: this.shownWay,
       outcome: this.outcome,
       printed: this.outcome ? (this.world?.stdout ?? '') : '',
       runningLine: this.runningLine,
@@ -160,12 +171,10 @@ export class RunController {
           this.finish();
           return;
         }
-        this.world = world;
-        scene.load(world);
-        scene.playback.setSpeed(this.speed);
-        if (world.events.length === 0) this.finish();
-        else scene.playback.play();
-        this.changed();
+        this.result = world;
+        const shown = world.ways?.find((way) => way.id === world.way);
+        this.shownWay = shown?.id ?? null;
+        this.play(shown ?? world);
       },
       (error: unknown) => {
         if (generation !== this.generation || this.runtime.status === 'failed') return;
@@ -177,6 +186,19 @@ export class RunController {
       },
     );
     this.changed();
+  }
+
+  /** Plays back one way of the last run (D51), the goals and the card following it. */
+  showWay(id: string): void {
+    const way = this.result?.ways?.find((entry) => entry.id === id);
+    if (!way || !this.scene) return;
+    if (this.scene.playback.state === 'playing') this.scene.playback.stop();
+    this.shownWay = id;
+    this.outcome = null;
+    this.errorLine = null;
+    this.tick = 0;
+    this.scene.reset();
+    this.play(way);
   }
 
   stop(): void {
@@ -198,8 +220,20 @@ export class RunController {
     this.changed();
   }
 
+  /** Loads a world into the scene and plays it from the start. */
+  private play(world: WorldResult | WayResult): void {
+    const scene = this.scene;
+    if (!scene) return;
+    this.world = world as WorldResult;
+    scene.load(this.world);
+    scene.playback.setSpeed(this.speed);
+    if (world.events.length === 0) this.finish();
+    else scene.playback.play();
+    this.changed();
+  }
+
   /** Goes on from where a seek left the playback. */
-  play(): void {
+  resume(): void {
     if (this.scene?.playback.state === 'paused') this.scene.playback.play();
     this.changed();
   }
@@ -254,14 +288,27 @@ export class RunController {
   }
 
   private clear(): void {
+    this.result = null;
     this.world = null;
+    this.shownWay = null;
     this.outcome = this.runtime.status === 'failed' ? { kind: 'failed' } : null;
     this.runningLine = null;
     this.errorLine = null;
     this.tick = 0;
   }
 
+  /** The outcome of the world shown; with ways, said of its way (D51): `won` only when
+   * every way is, `way_won` for a way won while another is not. */
   private outcomeOf(world: WorldResult): Outcome {
+    const said = this.outcomeOfOne(world);
+    if (this.shownWay === null) return said;
+    if (said.kind === 'won' && this.result?.status !== 'won') {
+      return { kind: 'way_won', way: this.shownWay };
+    }
+    return { ...said, way: this.shownWay };
+  }
+
+  private outcomeOfOne(world: WorldResult): Outcome {
     switch (world.status) {
       case 'won':
         return { kind: 'won' };

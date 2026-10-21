@@ -65,7 +65,14 @@ export interface WorldResult {
   ticks: number;
   stdout: string;
   error: ErrorInfo | null;
+  /** For a level played in several ways (D51): the way these fields are of, the
+   * first not won or the first, and every way's own result. */
+  way?: string;
+  ways?: WayResult[];
 }
+
+/** One way's result, by the way's id. */
+export type WayResult = Omit<WorldResult, 'way' | 'ways'> & { id: string };
 
 export interface RunResult {
   status: 'ok' | 'error' | 'interrupted';

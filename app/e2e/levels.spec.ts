@@ -216,6 +216,13 @@ const CHAPTER_2: [string, string][] = [
     'wizard.move_right()\narchive_door.open()\nwizard.move_right(4)\nwizard.pick_up()\n' +
       'wizard.move_right()\nvault_door.open()\nwizard.move_right(2)',
   ],
+  ['the-high-shelf', 'wizard.move_right(4)\nwizard.cast("fendra")\nwizard.pick_up()\nwizard.move_right(2)'],
+  [
+    'eldras-book',
+    'book = wizard.find_nearest("book")\nwizard.move_right(2)\nwizard.pick_up()\nwizard.move_right()\n' +
+      'door.open()\nwizard.move_right(3)\nwizard.cast("fendra")\nwizard.pick_up()\nwizard.move_right(2)\n' +
+      'wizard.give(book)',
+  ],
 ];
 
 test.describe('chapter 2', () => {
@@ -251,5 +258,36 @@ test.describe('chapter 2', () => {
     await page.locator('#speed').selectOption('4');
     await run(page, 'wizard.move_down(2)\nwizard.move_right(2)\nwizard.pick_up()\nwizard.give(old_book)');
     await expect(page.locator('.outcome-text')).toContainText('There is no one beside me to give it to.');
+  });
+});
+
+test.describe('the high shelf (D46, D47, D49)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/#level/the-high-shelf');
+    await expect(page.locator('#card-carrying')).toHaveText('You carry the wand.');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  });
+
+  test('the wizard holds the wand from the start', async ({ page }) => {
+    await expect(scene(page)).toHaveAttribute('data-carried', 'wand');
+  });
+
+  test('fendra from below brings the book down, through the shelves', async ({ page }) => {
+    await page.locator('#speed').selectOption('4');
+    await run(page, 'wizard.move_right(4)\nwizard.cast("fendra")\nwizard.pick_up()');
+    await expect(scene(page)).toHaveAttribute('data-carried', 'rare_book,wand');
+  });
+
+  test('fendra out of line with the book finds nothing near', async ({ page }) => {
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.cast("fendra")');
+    await page.locator('#run').click();
+    await expect(scene(page)).toHaveAttribute(
+      'data-thought',
+      'There is nothing near enough for the spell to bring.',
+      { timeout: 15_000 },
+    );
   });
 });

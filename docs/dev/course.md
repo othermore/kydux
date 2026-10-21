@@ -59,8 +59,8 @@ attribute, finding a thing, a key, a spell that brings things.
 | L12 | `level:the-locked-door` | Today's level, kept. | |
 | L13 | `level:the-archive` | Two doors in a row, one opened by hand, one locked, its key between them. Bonus: the key found with `find_nearest`. | |
 | T11 | `lesson:fendra` | A spell can act at a distance: `fendra` draws a thing to the wizard. | (the spell `fendra`) |
-| L14 | `level:the-high-shelf` | A book on a shelf the wizard cannot reach; the wand carried from the start. | |
-| L15 | `level:eldras-book` | The chapter together; Eldra's book returned. | |
+| L14 | `level:the-high-shelf` | A book on the top of three shelves, three tiles above the aisle; the wand carried from the start. Stand in line with it and cast. | |
+| L15 | `level:eldras-book` | The chapter together: a key and its locked door, the book on a shelf, `fendra`, the book given to Eldra. Bonus: the book kept under a name with `find_nearest` before the spell moves it. | |
 
 The world features chapter 2 needs: shelves, tiles the wizard cannot walk
 on but can see across (D46); `fendra`, which pulls the nearest thing in

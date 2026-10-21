@@ -1,0 +1,14 @@
+{
+  "title": "La estantería alta",
+  "goals": [
+    "Baja el libro raro y llévalo.",
+    "Sigue hasta el final del pasillo."
+  ],
+  "starting_code": "# El libro está en la balda de arriba. Ponte en línea con él, lo bastante cerca, y lanza fendra.\n",
+  "hints": [
+    "fendra alcanza tres casillas, en línea recta arriba, abajo, a la izquierda o a la derecha, por encima de las estanterías.",
+    "Camina por el pasillo hasta que el libro quede justo encima {del mago|de la maga}.",
+    "Después del hechizo, el libro está en la casilla {del mago|de la maga}: cógelo."
+  ],
+  "intro": "Ese libro está en la balda de arriba, y nadie se sube a mis estanterías. Tienes tu varita, y ahora conoces fendra."
+}

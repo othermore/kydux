@@ -1,0 +1,15 @@
+{
+  "title": "Eldra's book",
+  "goals": [
+    "Give Eldra her book.",
+    "Keep the book under a name with find_nearest."
+  ],
+  "starting_code": "# A locked door, a high shelf, and Eldra waiting at the end.\n",
+  "hints": [
+    "One thing at a time: the key, the door, the shelf, then Eldra.",
+    "Keep the book under a name before the spell moves it: `find_nearest` finds it on the shelf.",
+    "fendra brings the book onto the wizard's tile; pick it up before you walk on."
+  ],
+  "intro": "I remember now: I left my book on the shelf behind the locked door, the night I became a ghost. Will you fetch it for me?",
+  "outro": "You found it, {wizard}, just where I left it. Now I can rest. The passages wait for you next: mind Dask."
+}

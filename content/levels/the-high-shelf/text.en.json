@@ -1,0 +1,14 @@
+{
+  "title": "The high shelf",
+  "goals": [
+    "Bring down the rare book and carry it.",
+    "Walk on to the end of the aisle."
+  ],
+  "starting_code": "# The book is on the top shelf. Stand in line with it, near enough, and cast fendra.\n",
+  "hints": [
+    "fendra reaches three tiles, straight up, down, left or right, over the shelves.",
+    "Walk along the aisle until the book is straight above the wizard.",
+    "After the spell, the book lies on the wizard's tile: pick it up."
+  ],
+  "intro": "That book is on the top shelf, and no one climbs my shelves. You have your wand, and now you know fendra."
+}

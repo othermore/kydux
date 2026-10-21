@@ -1,0 +1,72 @@
+{
+  "id": "eldras-book",
+  "map": [
+    "###########",
+    "#S.K.D....#",
+    "######===G#",
+    "###########"
+  ],
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "fendra"
+  ],
+  "things": [
+    {
+      "kind": "key",
+      "id": "key",
+      "marker": "K",
+      "opens": "door"
+    },
+    {
+      "kind": "door",
+      "id": "door",
+      "marker": "D",
+      "locked": true
+    },
+    {
+      "kind": "book",
+      "id": "eldras_book",
+      "at": [
+        7,
+        2
+      ]
+    }
+  ],
+  "actors": [
+    {
+      "kind": "ghost",
+      "id": "eldra",
+      "marker": "G",
+      "facing": "up"
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.pick_up",
+    "wizard.cast",
+    "wizard.find_nearest",
+    "wizard.give",
+    "door.open",
+    "door.locked",
+    "thing.position"
+  ],
+  "goals": [
+    {
+      "kind": "give",
+      "id": "eldras_book",
+      "to": "eldra"
+    },
+    {
+      "kind": "uses",
+      "member": "find_nearest",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "speaker": "eldra"
+}

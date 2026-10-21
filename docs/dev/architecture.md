@@ -361,10 +361,12 @@ one overturns stays, marked as superseded.
   `wizard.cast(...)`, the broom gives `wizard.fly()`; they stay the
   wizard's actions, and without the thing they are refused with *You do
   not know this action yet*. A **spell** is a named piece of magic, data
-  and not a method: learned by reading a book (`wizard.read(book)`, into
-  `wizard.spells`) and cast with the wand where the wizard stands,
-  `wizard.cast("zelim")` (D42); a spell is a string first, and may become
-  an object when classes are taught. An **attribute** keeps Python's word:
+  and not a method, cast with the wand where the wizard stands,
+  `wizard.cast("zelim")`; which spells can be cast is the level's to say
+  (D42, which supersedes this entry's `wizard.read(book)` and
+  `wizard.spells`: no chapter of the course reads a spell from a book). A
+  spell is a string first, and may become an object when classes are
+  taught. An **attribute** keeps Python's word:
   what an object knows about itself, `door.locked`, `wizard.position`. A
   **thing** (or item) is what the wizard can pick up and carry: a key, a
   book, a wand, a broom, a potion. A **module** is a book of the school's

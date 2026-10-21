@@ -4,7 +4,7 @@ So far, the program has told the wizard where to go.
 It can also tell the wizard what to **say**.
 
 Words in a program go between quotes: `"Hello!"`.
-Words in quotes are called a **string**, like letters on a string of beads.
+Words in quotes are called a **string**: a string of letters, one after another.
 
 ---
 

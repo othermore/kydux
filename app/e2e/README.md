@@ -32,7 +32,7 @@ per language, numbered in the order they were taken:
 app/e2e/shots/en/01-start.png
 app/e2e/shots/en/02-creator.png
 ...
-app/e2e/shots/es/14-settings.png
+app/e2e/shots/es/15-settings.png
 ```
 
 Git ignores the folder. Each run of the loop replaces it, so the shots are

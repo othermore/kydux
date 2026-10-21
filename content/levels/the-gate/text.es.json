@@ -1,12 +1,12 @@
 {
-  "title": "La puerta",
+  "title": "El portón",
   "goals": [
-    "Camina hasta la puerta."
+    "Camina hasta el portón."
   ],
-  "starting_code": "# La puerta está a un paso, a la derecha.\n",
+  "starting_code": "# El portón está a un paso, a la derecha.\n",
   "hints": [
     "{El mago|La maga} tiene que dar un paso, a la derecha.",
     "La instrucción de la lección es la que sirve: `move_right` da un paso a la derecha."
   ],
-  "intro": "¡Hola, {wizard}! Esta es la puerta de Arvelia. Está a un solo paso."
+  "intro": "¡Hola, {wizard}! Este es el portón de Arvelia. Está a un solo paso."
 }

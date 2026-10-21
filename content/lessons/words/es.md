@@ -4,7 +4,7 @@ Hasta ahora, el programa le ha dicho {al mago|a la maga} adónde ir.
 También le puede decir qué tiene que **decir**.
 
 Las palabras de un programa van entre comillas: `"¡Hola!"`.
-Unas palabras entre comillas se llaman **cadena**, como las cuentas de un collar.
+Unas palabras entre comillas se llaman **cadena**: una cadena de letras, una detrás de otra.
 
 ---
 

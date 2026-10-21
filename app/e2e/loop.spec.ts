@@ -25,7 +25,7 @@ const WORDS = {
     create: 'Crea tu personaje',
     lesson: 'Qué es un programa',
     greeting: '¡Te damos la bienvenida a Arvelia, Ada!',
-    gate: 'La puerta',
+    gate: 'El portón',
     won: '¡Lo has conseguido, Ada!',
     second: 'Objetos y acciones',
     hello: 'Hola, Ada',

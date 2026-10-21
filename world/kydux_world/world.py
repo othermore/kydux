@@ -291,7 +291,8 @@ class Wizard(Child):
         said = str(text)
         world.ready()
         door = world.door_beside(self._k_position, lambda d: d.password == said)
-        world.act("say", {"text": said}, then=door and (lambda: door._opened_by("word")))
+        opens = (lambda: door._opened_by("word")) if door else None
+        world.act("say", {"text": said}, then=opens)
 
     def cast(self, spell: str) -> None:
         """Cast a spell with the wand, which the wizard must carry; it works where the
@@ -310,9 +311,8 @@ class Wizard(Child):
             world.act("blocked", {**refused, "spell": spell})
             return
         door = world.door_beside(self._k_position, lambda d: d._k_seal == spell)
-        world.act(
-            "cast", {"spell": spell, "at": here}, then=door and (lambda: door._opened_by("spell"))
-        )
+        opens = (lambda: door._opened_by("spell")) if door else None
+        world.act("cast", {"spell": spell, "at": here}, then=opens)
 
     def wait(self, ticks: int = 1) -> None:
         """Stand still while the world moves on, one tick at a time: `wizard.wait(2)`"""

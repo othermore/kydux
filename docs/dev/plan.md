@@ -116,18 +116,20 @@ exposes. Every key is in `i18n/<lang>.json` like any other text.
 ```
 content/
   chapters/01-arrival/
-    chapter.json                          id, and the items in order: lesson:<id>, level:<id>
+    chapter.json                          id, and the items in order: lesson:<id>, level:<id>;
+                                          an item's id is its slug, its order the chapter's (D44)
     text.en.json  text.es.json            the chapter's title
-  lessons/01-first-action/
+  lessons/your-first-action/
     lesson.json                           id, and what it teaches: the names the
                                           level after it needs (`teaches`)
-    en.md  es.md                          the lesson, a few short pages separated by ---
-  levels/01-the-corridor/
+    en.md  es.md                          the lesson, a few short pages separated by ---:
+                                          the idea's theory, then the game's way, then Try it (D41)
+  levels/the-corridor/
     level.json                            map file, actors, exposed API, goals, tick
-                                          limit, hints keys, starting code key
+                                          limit, the spells it has, the speaker of its intro
     map.tmj                               Tiled map: layers floor, walls, objects
     text.en.json  text.es.json            title, goals, hints, starting code's
-                                          comments and strings, dialogue
+                                          comments and strings, intro and outro (D45)
     solution.py                           wins the level
     wrong/*.py                            each must not win (the naive mistakes)
 ```
@@ -367,6 +369,8 @@ has 2.11, 2.12, 2.0, 2.7, 2.5, 2.8 and 2.6 (`sprint-4.md`).
 2.12 Why an action could not be done (D28): a thought over the wizard at the
     tick it happens, the card repeating the first with its line, and no
     animation for an attempt that could not even be made.
+2.13 The wand and spells (D42), and doors that open by key, by word or by
+    spell (D43): chapter 1's world, in sprint 7.
 
 UAT: the three levels from the MacBook; a misspelled action gets a Spanish
 message with a suggestion; the scrubber; a hint; stars.
@@ -469,6 +473,9 @@ every chapter follow:
   a variable, a literal, an expression, an expression that is true or false
   and so can be a condition, a conditional instruction, a loop, and so on.
   The levels after a theory lesson practise exactly what it explained.
+
+Sprint 7 has 5.1, 5.2, 2.13 and 5.3 (`sprint-7.md`); each later chapter is a
+sprint of its own, after the owner reads the one before.
 
 5.1 The story bible, `docs/dev/story.md`: the school, its name and places,
     the characters (the head, the teachers, a rival, a friend, the cat, a

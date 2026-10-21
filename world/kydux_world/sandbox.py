@@ -13,7 +13,8 @@ Two things do it, since an import looks in sys.modules before any finder:
   sys.modules those the child could otherwise import from there. The ones
   Pyodide's own machinery runs from (`_pyodide` and its parts) stay loaded.
 - `child_builtins()` gives the child's code builtins whose `__import__`
-  refuses the same names whether loaded or not, `_pyodide` included.
+  refuses the same names whether loaded or not, `_pyodide` included, and
+  kydux_world itself.
 
 The refusal is the ModuleNotFoundError Python gives for any missing module.
 """
@@ -28,6 +29,9 @@ from typing import Any
 BLOCKED = ("js", "pyodide", "pyodide_js", "_pyodide", "_pyodide_core", "micropip")
 #: What Pyodide's own machinery runs from, so it stays in sys.modules.
 KEPT_LOADED = ("_pyodide", "_pyodide_core")
+#: Refused to the child's code only: the world itself, which the child holds only
+#: through the objects it is given (D20).
+CHILD_ONLY = ("kydux_world",)
 
 
 def blocked(name: str) -> bool:
@@ -64,6 +68,10 @@ def install() -> None:
     _installed = True
 
 
+def refused_to_the_child(name: str) -> bool:
+    return blocked(name) or any(name == root or name.startswith(f"{root}.") for root in CHILD_ONLY)
+
+
 def _guarded_import(
     name: str,
     globals: dict[str, Any] | None = None,
@@ -71,7 +79,7 @@ def _guarded_import(
     fromlist: tuple[str, ...] = (),
     level: int = 0,
 ) -> ModuleType:
-    if level == 0 and blocked(name):
+    if level == 0 and refused_to_the_child(name):
         raise refusal(name)
     return builtins.__import__(name, globals, locals, fromlist, level)
 

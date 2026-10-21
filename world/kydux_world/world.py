@@ -144,13 +144,18 @@ class World:
             if not t._k_carried and t._k_position == position and t.kind in CARRIED_KINDS
         ]
 
-    def act(self, kind: str, data: dict[str, Any]) -> None:
-        """One tick of the wizard's: its event, every actor's step, who sees it, the goals."""
+    def ready(self) -> None:
+        """Raises when the run has ended or has no tick left: every spell asks first,
+        before it changes anything."""
         if self.over is not None:
             raise self.over
         if self.tick >= self.level.tick_limit:
             self.over = TooManyTicks(self.level.tick_limit)
             raise self.over
+
+    def act(self, kind: str, data: dict[str, Any]) -> None:
+        """One tick of the wizard's: its event, every actor's step, who sees it, the goals."""
+        self.ready()
         self.tick += 1
         self._line = child_line()
         self.events.append(Event(self.tick, "wizard", kind, data, self._line))
@@ -228,6 +233,7 @@ class Wizard(Child):
     def _move(self, direction: Direction, steps: int) -> None:
         world: World = self._k_world
         for _ in range(steps):
+            world.ready()
             self._set(facing=direction)
             dx, dy = direction.delta
             here = self._k_position
@@ -271,6 +277,7 @@ class Wizard(Child):
     def pick_up(self) -> None:
         """Pick up the thing on the wizard's tile and carry it: `wizard.pick_up()`"""
         world: World = self._k_world
+        world.ready()
         here = self._k_position
         found = world.things_at(here)
         if not found:

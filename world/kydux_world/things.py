@@ -121,6 +121,7 @@ class Door(Thing):
     def open(self) -> None:
         """Open the door, standing next to it, with its key when it is locked: `door.open()`"""
         world: World = self._k_world
+        world.ready()
         at = list(self._k_position)
         wizard = world.wizard.position
         if abs(wizard.x - self._k_position.x) + abs(wizard.y - self._k_position.y) != 1:

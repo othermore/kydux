@@ -138,3 +138,18 @@ def test_except_exception_does_not_catch_the_end_of_a_run():
     result = run_code(Level.from_dict(data), code)
     assert result.status == "caught"
     assert result.stdout == ""
+
+
+def test_a_spell_after_the_end_changes_nothing():
+    data = {
+        **HALL,
+        "actors": [{"kind": "teacher", "id": "teacher", "at": [7, 1], "facing": "left"}],
+    }
+    world = World(Level.from_dict(data))
+    with pytest.raises(Caught):
+        world.wizard.move_right(5)
+    where, ticks = world.wizard.position, world.tick
+    for spell in (world.wizard.move_left, world.wizard.pick_up, world.wizard.wait):
+        with pytest.raises(Caught):
+            spell()
+    assert (world.wizard.position, world.tick) == (where, ticks)

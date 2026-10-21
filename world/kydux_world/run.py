@@ -37,9 +37,48 @@ def child_line(error: BaseException) -> int | None:
     return line
 
 
+def python_name(error: BaseException) -> str:
+    """The name of the error as Python has it: the world's own errors are told by
+    the built-in error they are (ReadOnly is an AttributeError)."""
+    for kind in type(error).__mro__:
+        if kind.__module__ == "builtins":
+            return kind.__name__
+    return type(error).__name__
+
+
 def error_info(error: BaseException) -> ErrorInfo:
     message = error.msg if isinstance(error, SyntaxError) else str(error)
-    return ErrorInfo(type(error).__name__, message, child_line(error))
+    return ErrorInfo(python_name(error), message, child_line(error))
+
+
+class WorldError(Exception):
+    """A run whose events do not add up: the world was changed by other means than spells."""
+
+
+def check_consistency(world: World) -> None:
+    """The run's events hold together: every tick of the wizard's once, its steps one
+    after the other from the start to where it stands, and every goal's tick a tick of
+    the run. Raises WorldError when they do not (D20)."""
+    own = [e for e in world.events if e.actor == "wizard"]
+    if [e.tick for e in own] != list(range(1, world.tick + 1)):
+        raise WorldError("the wizard's ticks do not follow one another")
+    here = list(world.level.start)
+    for event in own:
+        if event.kind == "move":
+            there = event.data["to"]
+            if (
+                event.data["from"] != here
+                or abs(there[0] - here[0]) + abs(there[1] - here[1]) != 1
+            ):
+                raise WorldError(f"the wizard's step at tick {event.tick} does not follow on")
+            here = there
+        elif event.kind in ("bump", "wait") and event.data["at"] != here:
+            raise WorldError(f"the wizard is not where it was at tick {event.tick}")
+    if list(world.wizard.position) != here:
+        raise WorldError("the wizard is not where its steps took it")
+    for tick in [*world.met_at.values(), *world.failed_at.values()]:
+        if not 0 <= tick <= world.tick:
+            raise WorldError("a goal was met at a tick the run does not have")
 
 
 def run_script(code: str) -> dict:
@@ -127,6 +166,10 @@ def run_code(level: Level, code: str) -> RunResult:
     world.finish()
     if status == "incomplete" and world.won():
         status = "won"
+    try:
+        check_consistency(world)
+    except WorldError as broken:
+        status, error = "error", ErrorInfo("WorldError", str(broken), None)
     goals = [
         GoalResult(
             spec.kind,

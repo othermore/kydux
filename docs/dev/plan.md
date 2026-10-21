@@ -374,6 +374,13 @@ has 2.11, 2.12, 2.0, 2.7, 2.5, 2.8 and 2.6 (`sprint-4.md`).
 2.14 Shelves that stop feet and not eyes (D46), the spell that pulls
     (D47), actors who stand and speak, and giving (D48), and what the
     wizard carries from the start (D49): chapter 2's world, in sprint 8.
+2.15 A level played in several ways, which one program must win in all
+    (D51), dark rooms and the spell that lights them (D52), stairs that
+    come and go and the spell that holds them (D53): chapter 3's world,
+    in sprint 9.
+2.16 The page for the ways, the darkness and the stairs: the way select,
+    the outcome by way, the dark layer, the stair drawn by the tick; in
+    sprint 9.
 
 UAT: the three levels from the MacBook; a misspelled action gets a Spanish
 message with a suggestion; the scrubber; a hint; stars.
@@ -478,8 +485,9 @@ every chapter follow:
   The levels after a theory lesson practise exactly what it explained.
 
 Sprint 7 has 5.1, 5.2, 2.13 and 5.3 (`sprint-7.md`); sprint 8 has 2.14 and
-5.4 (`sprint-8.md`); each later chapter is a sprint of its own, and the
-owner's notes on a chapter become fixes at the start of the sprint after.
+5.4 (`sprint-8.md`); sprint 9 has 2.15, 2.16 and 5.5 (`sprint-9.md`); each
+later chapter is a sprint of its own, and the owner's notes on a chapter
+become fixes at the start of the sprint after.
 
 5.1 The story bible, `docs/dev/story.md`: the school, its name and places,
     the characters (the head, the teachers, a rival, a friend, the cat, a

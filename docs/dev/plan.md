@@ -360,6 +360,8 @@ message with a suggestion; the scrubber; a hint; stars.
 ### Phase 3 — The shell
 
 The game around the levels: the course as the child walks it.
+Sprint 5 has 3.5, 3.1, 3.3, 3.4 and 3.6 (`sprint-5.md`); sprint 6 has 3.2, 3.7
+and 3.8.
 
 3.1 The start screen: language, New wizard / Continue, Export / Import.
 3.2 The wizard creator: name, colours (skin, hair, robe, hat) applied by
@@ -371,7 +373,9 @@ The game around the levels: the course as the child walks it.
     block that goes into the next level's editor; marked read.
 3.5 `ProgressStore` and `LocalProgressStore`; progress saved after every run
     and lesson; Export and Import.
-3.6 Settings: language, speed, sound on/off, the "reset my wizard" door.
+3.6 Settings: language, speed, the editor's text size, the split between the
+    scene and the editor (D35); sound on/off when there is sound; the "reset
+    my wizard" door.
 3.7 Keyboard and screen: the layout works from 1280×720 up, in a tablet's
     landscape too; the editor font is readable for a child; Tab inserts four
     spaces.

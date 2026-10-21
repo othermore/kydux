@@ -1,0 +1,91 @@
+// Where everything stands before a run, read from level.json for the scene to
+// draw: the map's walls and markers, the wizard's start, the things and the
+// actors. It follows kydux_world.level, which validates the same file: a thing
+// or actor is placed by its marker or at [x, y], and an actor without a
+// facing faces its first step, or down. The world's events say the rest.
+
+import type { LevelJson } from '../runtime/protocol';
+import type { Facing, Tile } from './sight';
+
+export interface ThingLayout {
+  id: string;
+  kind: string;
+  tile: Tile;
+}
+
+export interface ActorLayout {
+  id: string;
+  kind: string;
+  tile: Tile;
+  facing: Facing;
+  sight: number;
+}
+
+export interface Layout {
+  rows: string[];
+  width: number;
+  height: number;
+  start: Tile;
+  /** Marker letters on the map that no thing or actor stands on, like a goal's. */
+  markers: [string, Tile][];
+  things: ThingLayout[];
+  actors: ActorLayout[];
+}
+
+const DEFAULT_SIGHT = 4;
+
+function towards([x, y]: Tile, [tx, ty]: Tile): Facing {
+  if (tx > x) return 'right';
+  if (tx < x) return 'left';
+  return ty > y ? 'down' : 'up';
+}
+
+function asTile(value: unknown): Tile | null {
+  return Array.isArray(value) && value.length === 2 ? [Number(value[0]), Number(value[1])] : null;
+}
+
+function asList(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
+}
+
+export function layout(level: LevelJson): Layout {
+  const rows = (level.map as string[] | undefined) ?? [];
+  let start: Tile = [0, 0];
+  const letters = new Map<string, Tile>();
+  rows.forEach((row, y) => {
+    [...row].forEach((char, x) => {
+      if (char === 'S') start = [x, y];
+      else if (/^\p{L}$/u.test(char)) letters.set(char, [x, y]);
+    });
+  });
+  const place = (spec: Record<string, unknown>): Tile | null =>
+    typeof spec.marker === 'string' ? (letters.get(spec.marker) ?? null) : asTile(spec.at);
+
+  const used = new Set<string>();
+  const things: ThingLayout[] = [];
+  for (const spec of asList(level.things)) {
+    const tile = place(spec);
+    if (typeof spec.marker === 'string') used.add(spec.marker);
+    if (tile) things.push({ id: String(spec.id), kind: String(spec.kind), tile });
+  }
+  const actors: ActorLayout[] = [];
+  for (const spec of asList(level.actors)) {
+    const tile = place(spec);
+    if (typeof spec.marker === 'string') used.add(spec.marker);
+    if (!tile) continue;
+    const first = asTile(asList(spec.patrol)[0] ?? null);
+    const facing = (spec.facing as Facing | undefined) ?? (first ? towards(tile, first) : 'down');
+    const sight = typeof spec.sight === 'number' ? spec.sight : DEFAULT_SIGHT;
+    actors.push({ id: String(spec.id), kind: String(spec.kind), tile, facing, sight });
+  }
+  const markers = [...letters].filter(([letter]) => !used.has(letter));
+  return {
+    rows,
+    width: Math.max(1, rows[0]?.length ?? 1),
+    height: Math.max(1, rows.length),
+    start,
+    markers,
+    things,
+    actors,
+  };
+}

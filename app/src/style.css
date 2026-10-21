@@ -267,6 +267,7 @@ footer {
   border-left-color: var(--accent);
 }
 
+.outcome[data-kind='caught'],
 .outcome[data-kind='error'],
 .outcome[data-kind='failed'],
 .outcome[data-kind='too_many_ticks'],

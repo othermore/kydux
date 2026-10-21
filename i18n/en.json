@@ -23,7 +23,8 @@
     "too_many_ticks": "The wizard is tired: the spell ran more than {limit} steps. Is there a loop that never ends?",
     "interrupted": "The spell was stopped: it was running for more than {seconds} seconds.",
     "error": "Python says: {type}: {message} (line {line})",
-    "error_no_line": "Python says: {type}: {message}"
+    "error_no_line": "Python says: {type}: {message}",
+    "caught": "The teacher saw you! Try again, and watch which way they look."
   },
   "level": {
     "cast": "Cast",

@@ -21,7 +21,13 @@ export interface ErrorInfo {
   line?: number | null;
 }
 
-export type WorldStatus = 'won' | 'incomplete' | 'error' | 'too_many_ticks' | 'interrupted';
+export type WorldStatus =
+  | 'won'
+  | 'incomplete'
+  | 'error'
+  | 'too_many_ticks'
+  | 'interrupted'
+  | 'caught';
 
 /** One tick of a run (kydux_world.world.Event.to_dict). */
 export interface WorldEvent {

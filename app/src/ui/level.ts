@@ -161,6 +161,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         return { kind: 'too_many_ticks', limit: tickLimit };
       case 'interrupted':
         return { kind: 'interrupted', seconds: Math.round(runtime.wallClockMs / 1000) };
+      case 'caught':
+        return { kind: 'caught' };
       case 'error':
         return {
           kind: 'error',
@@ -277,9 +279,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         }
         scene = handle;
         stopped.push(
-          handle.playback.onTick((tick, event) => {
+          handle.playback.onTick((tick, events) => {
             markGoals(tick);
-            editor.setRunningLine(event?.line ?? null);
+            editor.setRunningLine(events[0]?.line ?? null);
           }),
           handle.playback.onState((state) => {
             if (state === 'done' && world) finish();

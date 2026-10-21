@@ -1,5 +1,6 @@
-// The playback of a run's events, one tick per event, at a speed the child
-// chooses. It knows nothing of Phaser: the scene listens to it and draws.
+// The playback of a run's events, tick by tick, at a speed the child chooses:
+// each step plays every event of one tick, the wizard's and the actors'. It
+// knows nothing of Phaser: the scene listens to it and draws.
 
 import type { WorldEvent } from '../runtime/protocol';
 
@@ -16,14 +17,16 @@ export interface PlaybackOptions {
   cancel?: (handle: unknown) => void;
 }
 
-type TickListener = (tick: number, event: PlaybackEvent | null) => void;
+/** Called with tick 0 and no events at a reset, then with each tick and its events. */
+type TickListener = (tick: number, events: PlaybackEvent[]) => void;
 type StateListener = (state: PlaybackState) => void;
 
 export class Playback {
   readonly tickMs: number;
   private readonly schedule: (callback: () => void, ms: number) => unknown;
   private readonly cancel: (handle: unknown) => void;
-  private events: PlaybackEvent[] = [];
+  /** The run's events, one list for each tick, in order. */
+  private ticks: PlaybackEvent[][] = [];
   private current = 0;
   private currentState: PlaybackState = 'idle';
   private multiplier: Speed = 1;
@@ -46,8 +49,9 @@ export class Playback {
     return this.currentState;
   }
 
+  /** How many ticks the run has. */
   get length(): number {
-    return this.events.length;
+    return this.ticks.length;
   }
 
   get speed(): Speed {
@@ -61,13 +65,15 @@ export class Playback {
 
   /** New events to play, from tick 0. */
   load(events: PlaybackEvent[]): void {
-    this.events = [...events];
+    const byTick = new Map<number, PlaybackEvent[]>();
+    for (const event of events) byTick.set(event.tick, [...(byTick.get(event.tick) ?? []), event]);
+    this.ticks = [...byTick.keys()].sort((a, b) => a - b).map((tick) => byTick.get(tick) ?? []);
     this.reset();
   }
 
   play(): void {
     if (this.currentState === 'playing' || this.currentState === 'done') return;
-    if (this.current >= this.events.length) {
+    if (this.current >= this.ticks.length) {
       this.setState('done');
       return;
     }
@@ -92,7 +98,7 @@ export class Playback {
   reset(): void {
     this.clearTimer();
     this.current = 0;
-    for (const listener of this.tickListeners) listener(0, null);
+    for (const listener of this.tickListeners) listener(0, []);
     this.setState('idle');
   }
 
@@ -101,7 +107,6 @@ export class Playback {
     this.multiplier = multiplier;
   }
 
-  /** Called with tick 0 and no event at a reset, then with each tick and its event. */
   onTick(listener: TickListener): () => void {
     this.tickListeners.push(listener);
     return () => {
@@ -117,13 +122,13 @@ export class Playback {
   }
 
   private next(): void {
-    const event = this.events[this.current];
-    if (!event) {
+    const events = this.ticks[this.current];
+    if (!events) {
       this.setState('done');
       return;
     }
     this.current += 1;
-    for (const listener of this.tickListeners) listener(this.current, event);
+    for (const listener of this.tickListeners) listener(this.current, events);
     this.timer = this.schedule(() => {
       this.timer = null;
       if (this.currentState === 'playing') this.next();

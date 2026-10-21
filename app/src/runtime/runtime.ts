@@ -32,7 +32,7 @@ export interface RuntimeOptions {
 }
 
 const RUN_STATUSES = ['ok', 'error', 'interrupted'];
-const WORLD_STATUSES = ['won', 'incomplete', 'error', 'too_many_ticks', 'interrupted'];
+const WORLD_STATUSES = ['won', 'incomplete', 'error', 'too_many_ticks', 'interrupted', 'caught'];
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

@@ -20,14 +20,20 @@ there by pytest, without a browser.
 app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/i18n/     every string the player sees, from i18n/<lang>.json
   src/runtime/  the worker that holds Pyodide, and the page's side of it
-  src/engine/   the scene in Phaser, and the playback of a run's events
+  src/engine/   the scene in Phaser, where everything stands before a run
+                (layout.ts), what an actor sees (sight.ts, the same rule as the
+                world's, tested on tests/fixtures/sight.json), and the playback
   src/editor/   the child's editor, CodeMirror
   src/ui/       the screens: the level screen, its goals panel and outcome card
   src/content/  loading a level's level.json and its text.<lang>.json
   scripts/      copy Pyodide into public/ and pack the world, before dev and build
   e2e/          the browser tests (Playwright), beside the node_modules they need
-world/          kydux_world, the model of the levels, and its tests; its sandbox
-                module keeps the child's code from Pyodide's bridge to JavaScript
+world/          kydux_world, the model of the levels, and its tests: level.py reads
+                a level; world.py holds the wizard and the ticks; things.py the
+                read-only base and the things; actors.py the teacher and the sight
+                rule; goals.py the goals; api.py the names a level may teach; run.py
+                runs the child's code; sandbox.py keeps it from Pyodide's bridge to
+                JavaScript
 content/        the levels, each with level.json, its words in text.<lang>.json,
                 its solution and its wrong answers (the last two never shipped);
                 later the lessons and chapters
@@ -193,3 +199,38 @@ one overturns stays, marked as superseded.
   which would have been English in every language. The runtime also takes a
   worker's result only when it has the shape of one, its world's too, and
   treats anything else as a run that could not be run.
+- **D20 — The child's objects are Python objects with read-only state.**
+  Decided 2026-10-20 (sprint-3.md), built 2026-10-21. What the child
+  commands, the wizard, things and actors, are instances of the world's
+  classes (`kydux_world.things.Child` and below), with methods for what
+  they do and properties for what they are. Setting or deleting any
+  attribute raises `ReadOnly`, an `AttributeError` the child's words
+  explain; `dir()` shows only the names `kydux_world.api` gives the
+  object's role; the world keeps its state on the object under `_k_`
+  names. A second line, like D19: the browser's sandbox stays the wall,
+  and a child who digs past it cheats only themselves. Rules out plain
+  dicts or namedtuples for the child, and setting state to move.
+- **D21 — One tick is one thing done.** Decided 2026-10-20 (sprint-3.md),
+  built 2026-10-21. Every spell that does something takes one tick: each
+  step of a move, `say`, `wait`, `pick_up`, `open`, and a spell that could
+  not be done (`blocked`), so that trying costs time as doing does. In each
+  tick, after the wizard's event, every actor takes its step, a teacher
+  who sees the wizard catches it, and the goals are checked; all of a
+  tick's events carry its number and the child's line. Asking takes no
+  tick. The end of a run, past the tick limit or caught, is a
+  `BaseException` the child's `except Exception` lets through, and a world
+  that has ended refuses every further spell, so not even a bare `except:`
+  carries the run on.
+- **D24 — A door is opened from next to it.** Decided 2026-10-21, piece
+  2.2. `door.open()` works only with the wizard on a tile beside the door;
+  from further away it is `blocked` with the reason `far`, and so is
+  opening a door already open (`open`), and a locked door without its key
+  (`locked`). Sprint-3.md set no distance; opening a door from across the
+  map would teach nothing about where the wizard is, and walking to it is
+  half the puzzle.
+- **D25 — The playback plays a tick at a time, with all its events.**
+  Decided 2026-10-21, piece 2.2. A tick holds the wizard's event and its
+  actors' (D21), so `Playback` groups the events by tick and each step
+  plays all of one tick's together; its listeners get the tick and its
+  events. Playing one event per step would make the teacher move after the
+  wizard rather than with it.

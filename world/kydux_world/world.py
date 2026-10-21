@@ -1,9 +1,16 @@
-"""The world a child's code runs in: the wizard on the level's grid, ticks and events.
+"""The world a child's code runs in: the wizard, the level's things and actors, ticks and events.
 
 Everything is deterministic: the same level and the same code give the same
-events. Each thing the wizard does takes whole ticks, and each tick records
-an event, with the line of the child's code that caused it, for the page to
-play back.
+events. One tick is one thing done (architecture.md, D21): every spell that
+does something takes a tick, and in each tick, after the wizard, every
+actor takes its step, a teacher who sees the wizard catches it, and the
+goals are checked. Asking takes no tick. Each tick's events carry the line
+of the child's code that caused them, for the page to play back.
+
+A run ends early when the wizard is caught or past the tick limit. Both are
+raised as BaseExceptions, which the child's `except Exception` does not
+catch; and a world that has ended refuses every further spell, so that a
+bare `except:` cannot carry the run on.
 """
 
 import sys
@@ -11,8 +18,10 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
+from .actors import Actor, Teacher, make_actor
 from .goals import make_goal
-from .level import Level, Position
+from .level import CARRIED_KINDS, Level, Position
+from .things import Child, Door, Thing, make_thing
 
 CHILD = "<child>"
 
@@ -46,12 +55,33 @@ class Event:
         }
 
 
-class TooManyTicks(Exception):
+class RunOver(BaseException):
+    """The run has ended; the child's code is stopped. Not an Exception, so that the
+    child's `except Exception` lets it through."""
+
+
+class TooManyTicks(RunOver):
     """The run went past the level's tick limit."""
 
     def __init__(self, limit: int) -> None:
         super().__init__(f"the run went past {limit} steps")
         self.limit = limit
+
+
+class Caught(RunOver):
+    """An actor saw the wizard."""
+
+    def __init__(self, by: str) -> None:
+        super().__init__(f"{by} saw the wizard")
+        self.by = by
+
+
+class SpellArguments(TypeError):
+    """A spell given what it cannot take."""
+
+    def __init__(self, spell: str, message: str) -> None:
+        super().__init__(message)
+        self.spell = spell
 
 
 def child_line() -> int | None:
@@ -66,87 +96,198 @@ def child_line() -> int | None:
 
 
 class World:
-    def __init__(self, level: Level) -> None:
+    def __init__(self, level: Level, code: str = "") -> None:
         self.level = level
+        #: The child's code, which some goals read (lines_under).
+        self.code = code
         self.tick = 0
         self.events: list[Event] = []
         self.wizard = Wizard(self)
+        self.things: dict[str, Thing] = {s.id: make_thing(self, s) for s in level.things}
+        self.actors: dict[str, Actor] = {s.id: make_actor(self, s) for s in level.actors}
+        #: Who caught the wizard, when someone did.
+        self.caught_by: str | None = None
+        self.over: RunOver | None = None
         self.goals = [make_goal(spec, level) for spec in level.goals]
-        #: For each goal by its index, the first tick it was met at.
+        #: For each goal by its index, the first tick it was met at, or failed at.
         self.met_at: dict[int, int] = {}
+        self.failed_at: dict[int, int] = {}
+        self._line: int | None = None
         self._check_goals()
+
+    def namespace(self) -> dict[str, Child]:
+        """What the child's code holds: the wizard, and the level's things and actors by id."""
+        return {"wizard": self.wizard, **self.things, **self.actors}
 
     def is_free(self, position: Position) -> bool:
-        return self.level.inside(position) and position not in self.level.walls
+        """Whether the wizard, an actor or a look can pass: floor, and no closed door."""
+        if not self.level.free(position):
+            return False
+        door = self.door_at(position)
+        return door is None or door.is_open
 
-    def record(self, actor: str, kind: str, data: dict[str, Any]) -> None:
-        """One tick: the event that happened in it, then the goals checked. The
-        level's tick limit is the most ticks a run may take; one more stops it."""
+    def door_at(self, position: Position) -> Door | None:
+        for thing in self.things.values():
+            if isinstance(thing, Door) and thing._k_position == position:
+                return thing
+        return None
+
+    def carried(self) -> list[Thing]:
+        return [t for t in self.things.values() if t._k_carried]
+
+    def things_at(self, position: Position) -> list[Thing]:
+        return [
+            t
+            for t in self.things.values()
+            if not t._k_carried and t._k_position == position and t.kind in CARRIED_KINDS
+        ]
+
+    def act(self, kind: str, data: dict[str, Any]) -> None:
+        """One tick of the wizard's: its event, every actor's step, who sees it, the goals."""
+        if self.over is not None:
+            raise self.over
         if self.tick >= self.level.tick_limit:
-            raise TooManyTicks(self.level.tick_limit)
+            self.over = TooManyTicks(self.level.tick_limit)
+            raise self.over
         self.tick += 1
-        self.events.append(Event(self.tick, actor, kind, data, child_line()))
+        self._line = child_line()
+        self.events.append(Event(self.tick, "wizard", kind, data, self._line))
+        for actor in self.actors.values():
+            actor._step()
+        for actor in self.actors.values():
+            if isinstance(actor, Teacher) and actor.can_see(self.wizard):
+                self.note(actor.name, "seen", {"by": actor.name, "at": list(self.wizard.position)})
+                self.caught_by = actor.name
+                break
         self._check_goals()
+        if self.caught_by is not None:
+            self.over = Caught(self.caught_by)
+            raise self.over
+
+    def note(self, actor: str, kind: str, data: dict[str, Any]) -> None:
+        """An event in the tick going on, of an actor's or the world's."""
+        self.events.append(Event(self.tick, actor, kind, data, self._line))
 
     def _check_goals(self) -> None:
         for index, goal in enumerate(self.goals):
-            if index not in self.met_at and goal.check(self):
+            if index in self.met_at or index in self.failed_at:
+                continue
+            failed = getattr(goal, "failed", None)
+            if failed is not None and failed(self):
+                self.failed_at[index] = self.tick
+            elif goal.check(self):
                 self.met_at[index] = self.tick
 
 
-def _steps(name: str, steps: object) -> int:
-    if isinstance(steps, bool) or not isinstance(steps, int):
-        raise TypeError(f"{name}() takes a whole number of steps, 1 or more")
-    if steps < 1:
-        raise ValueError(f"{name}() takes a whole number of steps, 1 or more")
-    return steps
+def _whole(name: str, what: str, value: object) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+        raise SpellArguments(name, f"{name}() takes a whole number of {what}, 1 or more")
+    return value
 
 
-class Wizard:
+class Wizard(Child):
     """The child's wizard. Its methods are the spells the child casts."""
 
+    _k_role = "wizard"
+
     def __init__(self, world: World) -> None:
-        self._world = world
-        self.position = world.level.start
-        self.facing = Direction.DOWN
+        self._set(world=world, position=world.level.start, facing=Direction.DOWN)
 
     def __repr__(self) -> str:
-        return f"<wizard at {self.position.x}, {self.position.y}>"
+        here = self._k_position
+        return f"<wizard at {here.x}, {here.y} facing {self._k_facing.value}>"
+
+    @property
+    def position(self) -> Position:
+        """Where the wizard stands, as x and y: `wizard.position.x`"""
+        return self._k_position
+
+    @property
+    def facing(self) -> str:
+        """The way the wizard looks: `"up"`, `"down"`, `"left"` or `"right"`: `wizard.facing`"""
+        return self._k_facing.value
+
+    @property
+    def items(self) -> list[Thing]:
+        """The things the wizard carries, as a list: `wizard.items`"""
+        return self._k_world.carried()
 
     def _move(self, direction: Direction, steps: int) -> None:
+        world: World = self._k_world
         for _ in range(steps):
-            self.facing = direction
+            self._set(facing=direction)
             dx, dy = direction.delta
-            ahead = Position(self.position.x + dx, self.position.y + dy)
-            if not self._world.is_free(ahead):
-                self._world.record(
-                    "wizard", "bump", {"at": list(self.position), "facing": direction.value}
-                )
+            here = self._k_position
+            ahead = Position(here.x + dx, here.y + dy)
+            if not world.is_free(ahead):
+                by = "door" if world.door_at(ahead) is not None else "wall"
+                world.act("bump", {"at": list(here), "facing": direction.value, "by": by})
                 return
-            before = self.position
-            self.position = ahead
-            self._world.record(
-                "wizard",
-                "move",
-                {"from": list(before), "to": list(ahead), "facing": direction.value},
-            )
+            self._set(position=ahead)
+            world.act("move", {"from": list(here), "to": list(ahead), "facing": direction.value})
 
     def move_right(self, steps: int = 1) -> None:
-        """Walk right, one tile per step, stopping at a wall."""
-        self._move(Direction.RIGHT, _steps("move_right", steps))
+        """Walk right, one tile per step, stopping at a wall or a closed door:
+        `wizard.move_right(3)`"""
+        self._move(Direction.RIGHT, _whole("move_right", "steps", steps))
 
     def move_left(self, steps: int = 1) -> None:
-        """Walk left, one tile per step, stopping at a wall."""
-        self._move(Direction.LEFT, _steps("move_left", steps))
+        """Walk left, one tile per step, stopping at a wall or a closed door:
+        `wizard.move_left(3)`"""
+        self._move(Direction.LEFT, _whole("move_left", "steps", steps))
 
     def move_up(self, steps: int = 1) -> None:
-        """Walk up, one tile per step, stopping at a wall."""
-        self._move(Direction.UP, _steps("move_up", steps))
+        """Walk up, one tile per step, stopping at a wall or a closed door:
+        `wizard.move_up(3)`"""
+        self._move(Direction.UP, _whole("move_up", "steps", steps))
 
     def move_down(self, steps: int = 1) -> None:
-        """Walk down, one tile per step, stopping at a wall."""
-        self._move(Direction.DOWN, _steps("move_down", steps))
+        """Walk down, one tile per step, stopping at a wall or a closed door:
+        `wizard.move_down(3)`"""
+        self._move(Direction.DOWN, _whole("move_down", "steps", steps))
 
     def say(self, text: object) -> None:
-        """Say something out loud."""
-        self._world.record("wizard", "say", {"text": str(text)})
+        """Say something out loud: `wizard.say("Hello!")`"""
+        self._k_world.act("say", {"text": str(text)})
+
+    def wait(self, ticks: int = 1) -> None:
+        """Stand still while the world moves on, one tick at a time: `wizard.wait(2)`"""
+        for _ in range(_whole("wait", "ticks", ticks)):
+            self._k_world.act("wait", {"at": list(self._k_position)})
+
+    def pick_up(self) -> None:
+        """Pick up the thing on the wizard's tile and carry it: `wizard.pick_up()`"""
+        world: World = self._k_world
+        here = self._k_position
+        found = world.things_at(here)
+        if not found:
+            world.act("blocked", {"at": list(here), "by": "wizard", "reason": "nothing"})
+            return
+        thing = found[0]
+        thing._carry()
+        world.act("pick_up", {"id": thing.name, "at": list(here)})
+
+    def _nearby(self, kind: object) -> list[Child]:
+        world: World = self._k_world
+        here = self._k_position
+        found: list[tuple[int, int, int, Child]] = []
+        for item in [*world.things.values(), *world.actors.values()]:
+            where = item.position
+            if item.kind == kind and where is not None:
+                distance = abs(where.x - here.x) + abs(where.y - here.y)
+                found.append((distance, where.y, where.x, item))
+        return [item for *_, item in sorted(found, key=lambda f: f[:3])]
+
+    def find_nearest(self, kind: str) -> Child | None:
+        """The nearest thing of a kind, or None when there is none:
+        `wizard.find_nearest("key")`"""
+        nearby = self._nearby(kind)
+        return nearby[0] if nearby else None
+
+    def find_all(self, kind: str) -> list[Child]:
+        """Every thing of a kind, nearest first, as a list: `wizard.find_all("book")`"""
+        return self._nearby(kind)
+
+    def has(self, kind: str) -> bool:
+        """True when the wizard carries a thing of that kind: `wizard.has("key")`"""
+        return any(item.kind == kind for item in self._k_world.carried())

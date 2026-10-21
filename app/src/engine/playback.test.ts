@@ -15,7 +15,7 @@ function setUp(n = 3) {
   const playback = new Playback({ tickMs: 400 });
   const ticks: [number, string | null][] = [];
   const states: PlaybackState[] = [];
-  playback.onTick((tick, event) => ticks.push([tick, event ? event.kind : null]));
+  playback.onTick((tick, events) => ticks.push([tick, events[0]?.kind ?? null]));
   playback.onState((state) => states.push(state));
   playback.load(events(n));
   return { playback, ticks, states };
@@ -107,6 +107,25 @@ describe('Playback', () => {
     expect(playback.state).toBe('idle');
     expect(playback.tick).toBe(0);
     expect(playback.length).toBe(2);
+  });
+
+  it('plays every event of a tick together, as one step', () => {
+    const playback = new Playback({ tickMs: 400 });
+    const seen: [number, string[]][] = [];
+    playback.onTick((tick, events) => seen.push([tick, events.map((e) => e.actor)]));
+    playback.load([
+      { tick: 1, actor: 'wizard', kind: 'move', data: {}, line: 1 },
+      { tick: 1, actor: 'teacher', kind: 'move', data: {}, line: 1 },
+      { tick: 2, actor: 'wizard', kind: 'wait', data: {}, line: 2 },
+    ]);
+    expect(playback.length).toBe(2);
+    playback.play();
+    vi.advanceTimersByTime(400);
+    expect(seen).toEqual([
+      [0, []],
+      [1, ['wizard', 'teacher']],
+      [2, ['wizard']],
+    ]);
   });
 
   it('stops telling a listener once it unsubscribes', () => {

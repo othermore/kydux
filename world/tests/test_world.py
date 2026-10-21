@@ -1,7 +1,7 @@
 import pytest
 from kydux_world.level import Level, Position
 from kydux_world.run import run_code
-from kydux_world.world import Direction, TooManyTicks, World
+from kydux_world.world import TooManyTicks, World
 
 ROOM = Level.from_dict(
     {"id": "room", "map": ["#####", "#S..#", "#...#", "#####"], "tick_limit": 10}
@@ -26,7 +26,7 @@ def test_a_move_of_several_steps_is_a_tick_each():
     world.wizard.move_down()
     assert world.wizard.position == Position(3, 2)
     assert [e.tick for e in world.events] == [1, 2, 3]
-    assert world.wizard.facing is Direction.DOWN
+    assert world.wizard.facing == "down"
 
 
 def test_a_wall_stops_the_wizard_with_a_bump_and_the_rest_of_the_steps():
@@ -34,7 +34,7 @@ def test_a_wall_stops_the_wizard_with_a_bump_and_the_rest_of_the_steps():
     world.wizard.move_right(5)
     assert world.wizard.position == Position(3, 1)
     assert [e.kind for e in world.events] == ["move", "move", "bump"]
-    assert world.events[-1].data == {"at": [3, 1], "facing": "right"}
+    assert world.events[-1].data == {"at": [3, 1], "facing": "right", "by": "wall"}
 
 
 def test_the_edge_of_the_map_stops_the_wizard_too():
@@ -44,13 +44,13 @@ def test_the_edge_of_the_map_stops_the_wizard_too():
     world.wizard.move_left()
     assert world.wizard.position == Position(0, 0)
     assert [e.kind for e in world.events] == ["bump", "bump"]
-    assert world.wizard.facing is Direction.LEFT
+    assert world.wizard.facing == "left"
 
 
 def test_the_wizard_turns_even_when_it_cannot_move():
     world = World(ROOM)
     world.wizard.move_up()
-    assert world.wizard.facing is Direction.UP
+    assert world.wizard.facing == "up"
 
 
 def test_say_records_what_was_said():

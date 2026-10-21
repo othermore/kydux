@@ -16,7 +16,7 @@ from typing import Any, Literal
 from .goals import GoalResult
 from .level import Level
 from .sandbox import child_builtins
-from .world import CHILD, Event, TooManyTicks, World
+from .world import CHILD, Caught, Event, TooManyTicks, World
 
 
 @dataclass
@@ -68,7 +68,7 @@ def run_script_json(code: str) -> str:
     return json.dumps(run_script(code))
 
 
-Status = Literal["won", "incomplete", "error", "too_many_ticks", "interrupted"]
+Status = Literal["won", "incomplete", "error", "too_many_ticks", "interrupted", "caught"]
 
 
 @dataclass
@@ -99,7 +99,7 @@ def run_code(level: Level, code: str) -> RunResult:
     The events recorded before an error, or before the tick limit, are kept,
     so that the scene can show the wizard walking up to the mistake.
     """
-    world = World(level)
+    world = World(level, code)
     stdout = io.StringIO()
     status: Status
     error = None
@@ -107,17 +107,22 @@ def run_code(level: Level, code: str) -> RunResult:
         compiled = compile(code, CHILD, "exec")
         with contextlib.redirect_stdout(stdout):
             namespace = {"__name__": "__main__", "__builtins__": child_builtins()}
-            exec(compiled, {**namespace, "wizard": world.wizard})
+            exec(compiled, {**namespace, **world.namespace()})
     except SyntaxError as caught:
         status, error = "error", error_info(caught)
     except TooManyTicks:
         status = "too_many_ticks"
+    except Caught:
+        status = "caught"
     except KeyboardInterrupt:
         status = "interrupted"
     except BaseException as caught:  # the child's code may raise anything, exit() too
         status, error = "error", error_info(caught)
     else:
         status = "won" if len(world.met_at) == len(world.goals) else "incomplete"
+    if world.over is not None and status in ("won", "incomplete", "error"):
+        # The child's code caught the end of the run and went on: the end stands.
+        status = "caught" if isinstance(world.over, Caught) else "too_many_ticks"
     goals = [
         GoalResult(spec.kind, dict(spec.params), index in world.met_at, world.met_at.get(index))
         for index, spec in enumerate(level.goals)

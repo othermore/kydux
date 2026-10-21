@@ -10,6 +10,7 @@ export type Outcome =
   | { kind: 'incomplete'; met: number; total: number }
   | { kind: 'too_many_ticks'; limit: number }
   | { kind: 'interrupted'; seconds: number }
+  | { kind: 'caught' }
   | { kind: 'error'; error: ErrorInfo }
   | { kind: 'failed' };
 
@@ -23,6 +24,8 @@ export function outcomeText(outcome: Outcome): string {
       return t('outcome.too_many_ticks', { limit: outcome.limit });
     case 'interrupted':
       return t('outcome.interrupted', { seconds: outcome.seconds });
+    case 'caught':
+      return t('outcome.caught');
     case 'error': {
       const { type, message, line } = outcome.error;
       return line != null

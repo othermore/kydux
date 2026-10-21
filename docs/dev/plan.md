@@ -85,20 +85,10 @@ level's solution be checked without a browser.
 
 Python conventions throughout: `snake_case`, objects with methods and
 attributes, docstrings in English in the code (the grimoire shows them
-translated from `i18n`). A first sketch, grown by the lessons:
-
-```python
-wizard.move_right(steps=1)   # also move_left, move_up, move_down
-wizard.say(text)
-wizard.cast(spell, target=None)      # needs the wand; spells come from books
-wizard.find_nearest(kind)            # "door", "key", "book" -> object or None
-wizard.find_all(kind)                # list
-wizard.pick_up()                     # the thing on this tile
-wizard.use(item)
-wizard.energy, wizard.position, wizard.items, wizard.facing
-door.locked, door.position, door.open()
-teacher.position, teacher.facing, teacher.can_see(wizard)
-```
+translated from `i18n`). What exists is in `architecture.md`, section *The
+child's Python*, from the one list in `kydux_world/api.py`; the spells the
+later chapters bring (casting with the wand, using a thing, the wizard's
+energy) are added there as their chapters arrive.
 
 What a level exposes is listed in its definition, so the grimoire and the
 editor's completion show only what has been taught.

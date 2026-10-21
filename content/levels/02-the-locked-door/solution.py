@@ -1,0 +1,6 @@
+key = wizard.find_nearest("key")
+wizard.move_right(key.position.x - wizard.position.x)
+wizard.pick_up()
+wizard.move_right(2)
+door.open()
+wizard.move_down(2)

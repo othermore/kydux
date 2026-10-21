@@ -63,7 +63,8 @@ a level can be checked automatically.
 
 The game's API follows Python's own conventions (`snake_case`, objects with
 methods and attributes), so what the child learns carries over to Python outside
-the game.
+the game. What the child can type today, and what the world records, is in
+`architecture.md`, section *The child's Python*; it grows with the course.
 
 ## 2. The course
 
@@ -80,7 +81,7 @@ A first sketch of the order of ideas, each a lesson and one or more levels:
 1. Calling a method on an object: `wizard.move_right()`.
 2. A sequence of instructions; arguments: `wizard.move_right(3)`.
 3. Strings as arguments: `wizard.say("Lumos")`, `wizard.cast("open", door)`.
-4. Variables: naming things the wizard finds, `door = wizard.find_nearest_door()`.
+4. Variables: naming things the wizard finds, `door = wizard.find_nearest("door")`.
 5. Attributes: `door.locked`, `wizard.energy`, `potion.colour`.
 6. Loops: `while True:` and `for` over a range, then over a list.
 7. Conditions: `if`, `else`, `elif`; comparing; `and`, `or`, `not`.

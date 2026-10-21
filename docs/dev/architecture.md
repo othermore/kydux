@@ -31,9 +31,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
 world/          kydux_world, the model of the levels, and its tests: level.py reads
                 a level; world.py holds the wizard and the ticks; things.py the
                 read-only base and the things; actors.py the teacher and the sight
-                rule; goals.py the goals; api.py the names a level may teach; run.py
-                runs the child's code; sandbox.py keeps it from Pyodide's bridge to
-                JavaScript
+                rule; goals.py the goals; api.py the names a level may teach;
+                explain.py errors in the child's words; run.py runs the child's code;
+                sandbox.py keeps it from Pyodide's bridge to JavaScript
 content/        the levels, each with level.json, its words in text.<lang>.json,
                 its solution and its wrong answers (the last two never shipped);
                 later the lessons and chapters
@@ -64,6 +64,67 @@ Pinned exactly, checked against their registries on 2026-10-20:
 | pytest | 9.1.1 | |
 | ruff | 0.17.1 | one configuration for all the Python, `ruff.toml` |
 | Go | 1.27 | for the launcher, phase 6 |
+
+## The child's Python
+
+What the child can type, and what the world records. The one list of the
+names is `world/kydux_world/api.py`; a test holds every one of them to a
+member of the world's classes with a docstring and an example, which the
+grimoire will show. A level lists in its `api` which of them it teaches
+(D23). Nothing takes a tick unless it says so (D21).
+
+```python
+wizard.move_right(steps=1)   # and move_left, move_up, move_down: a tick per step;
+                             # stops at a wall or a closed door
+wizard.say(text)             # a tick
+wizard.wait(ticks=1)         # a tick each: stands still while the world moves on
+wizard.pick_up()             # a tick: the thing on the wizard's tile, into wizard.items
+wizard.find_nearest(kind)    # the nearest thing or actor of a kind ("key"...), or None
+wizard.find_all(kind)        # all of them, nearest first, then in reading order
+wizard.has(kind)             # whether it carries one of that kind
+wizard.position              # Position(x, y), which compares as a tuple
+wizard.facing                # "up", "down", "left" or "right"
+wizard.items                 # the things it carries
+
+thing.kind, thing.name       # a key, a book, a wand, a potion, a door: by its id
+thing.position               # where it lies; None once carried
+
+door.locked, door.is_open
+door.open()                  # a tick: from a tile beside it (D24), with its key when
+                             # locked; else blocked
+
+teacher.kind, teacher.name, teacher.position, teacher.facing
+teacher.can_see(target)      # the target straight ahead, within its sight (4 tiles by
+                             # default), with no wall or closed door in between
+```
+
+The child's code holds `wizard` and every thing and actor of the level by
+its id. Everything it holds is read-only to it (D20). Its errors are
+explained in its own words (D22); the kinds are in `kydux_world/explain.py`
+and their words in `i18n/<lang>.json` under `error`.
+
+### The world's events
+
+What a run records, tick by tick, and what the scene does with each
+(`app/src/engine/scene.ts`). Every event has `tick`, `actor` (`wizard`, or
+an actor's id), `kind`, `data` and `line`, the line of the child's code;
+tiles are `[x, y]`.
+
+| kind | actor | data | the scene |
+|---|---|---|---|
+| `move` | wizard, or an actor | `from`, `to`, `facing` | walks it one tile, facing that way |
+| `bump` | wizard | `at`, `facing`, `by`: `wall` or `door` | nudges the wizard against it |
+| `say` | wizard | `text` | a bubble over the wizard for three ticks |
+| `wait` | wizard | `at` | nothing: the wizard stands still |
+| `pick_up` | wizard | `id`, `at` | the thing rises and vanishes; `data-carried` |
+| `open` | wizard | `id`, `at` | the door's frame turns open; `data-doors` |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open` or `nothing` | the door, or the wizard, shakes |
+| `turn` | an actor | `facing` | the actor faces the other way |
+| `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
+
+A run's status is `won`, `incomplete`, `error`, `too_many_ticks`,
+`interrupted` or `caught`; its goals say for each whether it was met or
+failed, at which tick, and whether it was a bonus.
 
 ## Decision log
 
@@ -221,6 +282,29 @@ one overturns stays, marked as superseded.
   `BaseException` the child's `except Exception` lets through, and a world
   that has ended refuses every further spell, so not even a bare `except:`
   carries the run on.
+- **D22 — Errors are explained by the world, said by the page.** Decided
+  2026-10-20 (sprint-3.md), built 2026-10-21. `kydux_world.explain` turns
+  a Python exception into an explanation, a kind and its parameters, with
+  suggestions from the names the level teaches for a spell, and from
+  `wizard` and the level's ids for a name; the page says it through
+  `t('error.<kind>')` in the player's language, a code name in backticks
+  shown as code, and Python's own text stays in the error for an adult.
+  The kinds: `unknown_spell`, `unknown_name`, `read_only`, `not_called`,
+  `unclosed`, `missing_colon`, `indentation`, `syntax`, `arguments`,
+  `no_such_module` and `other`. `not_called` was not in sprint-3.md's
+  table: a spell named without its brackets, `wizard.move_right` alone, is
+  no error to Python and does nothing, which a child cannot tell from a
+  spell that failed, so the world refuses it before the run, at its line.
+- **D23 — A level says what it teaches.** Decided 2026-10-20 (sprint-3.md),
+  built 2026-10-21. `level.json` lists in `api` the names the level uses,
+  as `role.member` from `kydux_world.api`'s table (`wizard.move_right`,
+  `door.open`, `thing.position`), and the level is refused when it names
+  one no object has. `world/tests/test_levels_content.py` reads each
+  solution with `ast` and refuses a use of a member the level does not
+  teach, so the course's order cannot be broken by accident; the
+  suggestions of D22 come from the same list, and the grimoire and the
+  editor's completion will show it. A variable named like a thing's id is
+  taken for that thing, which errs on the side of checking.
 - **D24 — A door is opened from next to it.** Decided 2026-10-21, piece
   2.2. `door.open()` works only with the wizard on a tile beside the door;
   from further away it is `blocked` with the reason `far`, and so is
@@ -244,16 +328,3 @@ one overturns stays, marked as superseded.
   the level's directory, and either without the other is refused. Rules
   out the world looking for goals.py on its own, which it cannot do in the
   browser.
-- **D22 — Errors are explained by the world, said by the page.** Decided
-  2026-10-20 (sprint-3.md), built 2026-10-21. `kydux_world.explain` turns
-  a Python exception into an explanation, a kind and its parameters, with
-  suggestions from the names the level teaches for a spell, and from
-  `wizard` and the level's ids for a name; the page says it through
-  `t('error.<kind>')` in the player's language, a code name in backticks
-  shown as code, and Python's own text stays in the error for an adult.
-  The kinds: `unknown_spell`, `unknown_name`, `read_only`, `not_called`,
-  `unclosed`, `missing_colon`, `indentation`, `syntax`, `arguments`,
-  `no_such_module` and `other`. `not_called` was not in sprint-3.md's
-  table: a spell named without its brackets, `wizard.move_right` alone, is
-  no error to Python and does nothing, which a child cannot tell from a
-  spell that failed, so the world refuses it before the run, at its line.

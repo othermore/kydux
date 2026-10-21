@@ -1,0 +1,46 @@
+{
+  "id": "03-past-the-teacher",
+  "map": [
+    "##########",
+    "##E#######",
+    "#........#",
+    "##S#######",
+    "##########"
+  ],
+  "things": [],
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "teacher",
+      "at": [
+        7,
+        2
+      ],
+      "facing": "left",
+      "patrol": [
+        [
+          3,
+          2
+        ]
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_up",
+    "wizard.wait",
+    "teacher.facing",
+    "teacher.position",
+    "teacher.can_see"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "not_seen_by",
+      "id": "teacher"
+    }
+  ],
+  "tick_limit": 60
+}

@@ -1,0 +1,10 @@
+{
+  "title": "La puerta cerrada",
+  "goals": [
+    "Coge la llave.",
+    "Abre la puerta.",
+    "Llega a la sala del otro lado de la puerta.",
+    "Hazlo en menos de 6 líneas."
+  ],
+  "starting_code": "# La puerta está cerrada con llave, y la llave está en el suelo.\n# Camina hasta la llave, cógela y luego abre la puerta.\nwizard.move_right(4)\n"
+}

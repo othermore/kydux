@@ -1,0 +1,8 @@
+{
+  "title": "Sin que te vea el profesor",
+  "goals": [
+    "Llega a la salida de arriba.",
+    "Que no te vea el profesor."
+  ],
+  "starting_code": "# El profesor va y viene por el pasillo, mirando hacia delante.\n# Espera mientras mire hacia ti, y luego cruza.\nwizard.wait()\n"
+}

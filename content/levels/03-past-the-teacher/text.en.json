@@ -1,0 +1,8 @@
+{
+  "title": "Past the teacher",
+  "goals": [
+    "Reach the way out at the top.",
+    "Do not let the teacher see you."
+  ],
+  "starting_code": "# The teacher walks up and down the corridor, looking ahead.\n# Wait while they look your way, then cross.\nwizard.wait()\n"
+}

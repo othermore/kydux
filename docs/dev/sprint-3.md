@@ -74,8 +74,9 @@ thing.position                  # where it lies; None once carried
 # A door: a thing that stands in a doorway.
 door.locked                     # True until opened with its key
 door.is_open                    # True once opened; an open door lets the wizard through
-door.open()                     # one tick: opens it, when it is not locked or the wizard
-                                # carries the key that opens it; else a `blocked` event
+door.open()                     # one tick: opens it, from a tile beside it (D24), when it
+                                # is not locked or the wizard carries the key that opens it;
+                                # else a `blocked` event
 
 # An actor: the teacher, for now.
 teacher.position
@@ -239,8 +240,8 @@ both suites run).
 
 ### 2.3 The goals
 
-`goals.py` grows: `reach` (marker or at), `collect` (`id`, or `kind`:
-the wizard carries it), `open` (`id`), `say` (`text`: said exactly once or
+`goals.py` grows: `reach` (marker or at), `collect` (`id`, or `of` a
+kind: the wizard carries it; D26), `open` (`id`), `say` (`text`: said exactly once or
 more), `not_seen_by` (`id`: fails fatally at `seen`), `lines_under`
 (`lines`: the code has fewer lines than that, blank and comment lines not
 counted; checked once, before the run), and a level's own `goals.py`
@@ -298,8 +299,10 @@ browser test's error step now expects the child's words.
 - **`03-past-the-teacher`**: a corridor the teacher patrols, facing the
   way they walk; the wizard waits in a side nook and crosses when the
   teacher looks away; goals `reach` and `not_seen_by`. Solution with
-  `wait` and `can_see` in a `while` (the ideas of chapter 3; the level is
-  the engine's proof, and the course of phase 5 will place it). Wrong:
+  `wait` in a `while` on `teacher.facing` (the ideas of chapter 3; the
+  level is the engine's proof, and the course of phase 5 will place it).
+  A loop on `teacher.can_see(wizard)` cannot work: being seen is being
+  caught, so it never waits. Wrong:
   walking straight in (caught), waiting for ever (too many ticks), crossing
   too early (caught).
 - `01-the-corridor` gains `api` and a third wrong answer.
@@ -333,12 +336,13 @@ languages.
 1. `#level/02-the-locked-door`: the key and the door show; the starting
    code walks to the key; `wizard.pick_up()` makes it vanish and
    `wizard.items` holds it; `door.open()` before the key is picked up
-   shakes the door and the card says the door is still locked; the
-   solution wins with the goals ticking in order and the bonus star.
+   shakes the door and the run ends with the goals not met; five lines
+   (walk, pick up, walk, open, walk down) win with every goal ticked, the
+   bonus among them.
 2. `#level/03-past-the-teacher`: the teacher walks back and forth with the
-   yellow cone ahead; walking straight in gets the wizard caught, with
-   the card saying so; waiting with `while teacher.can_see(wizard):
-   wizard.wait()` and then crossing wins.
+   yellow cone ahead; walking straight in gets the wizard caught, the cone
+   turning red and the card saying so; waiting with `while teacher.facing
+   == "left": wizard.wait()` and then `wizard.move_up(2)` wins.
 3. Misspell `move_right` and see *The wizard does not know the spell…
    Did you mean `move_right`?* in the page's language; forget a `:` after
    `while` and see the colon message; `wizard.position = (7, 1)` and see

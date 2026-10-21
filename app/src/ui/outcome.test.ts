@@ -14,8 +14,12 @@ describe('outcomeText', () => {
     expect(outcomeText({ kind: 'incomplete', met: 0, total: 1 })).toBe(
       'Not yet: 0 of 1 goals met. Try again.',
     );
-    expect(outcomeText({ kind: 'too_many_ticks', limit: 100 })).toContain('more than 100 steps');
-    expect(outcomeText({ kind: 'interrupted', seconds: 5 })).toContain('more than 5 seconds');
+    expect(outcomeText({ kind: 'too_many_ticks', limit: 100 })).toBe(
+      'Your program has taken more than 100 steps and the wizard is tired. Is there a loop that never ends?',
+    );
+    expect(outcomeText({ kind: 'interrupted', seconds: 5 })).toBe(
+      'Your program was stopped: it ran for more than 5 seconds without doing anything.',
+    );
   });
 
   it('gives Python its words, with the line when there is one', () => {
@@ -44,7 +48,7 @@ describe('an error explained', () => {
     message: "'Wizard' object has no attribute 'mvoe_right'",
     line: 2,
     explanation: {
-      kind: 'unknown_spell',
+      kind: 'unknown_action',
       params: { object: 'wizard', name: 'mvoe_right', suggestion: 'move_right' },
     },
   };
@@ -52,14 +56,14 @@ describe('an error explained', () => {
   it('is said in the child\'s words, with a suggestion and the line', () => {
     initLanguage(english);
     expect(outcomeText({ kind: 'error', error: misspelt })).toBe(
-      '`wizard` does not know the spell `mvoe_right`. Did you mean `move_right`? (line 2)',
+      '`wizard` does not know an action called `mvoe_right`. Did you mean `move_right`? (line 2)',
     );
   });
 
   it('is said in Spanish', () => {
     initLanguage(spanish);
     expect(outcomeText({ kind: 'error', error: misspelt })).toBe(
-      '`wizard` no conoce el hechizo `mvoe_right`. ¿Querías decir `move_right`? (línea 2)',
+      '`wizard` no conoce ninguna acción llamada `mvoe_right`. ¿Querías decir `move_right`? (línea 2)',
     );
   });
 

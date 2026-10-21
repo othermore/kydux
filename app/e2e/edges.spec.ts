@@ -25,17 +25,17 @@ test('Python that cannot start says so, with a way to reload', async ({ page }) 
     { timeout: 60_000 },
   );
   await expect(page.locator('#reload')).toBeVisible();
-  await expect(page.locator('#cast')).toBeDisabled();
+  await expect(page.locator('#run')).toBeDisabled();
 });
 
-test('a Cast during the playback starts the new run from the start', async ({ page }) => {
+test('a Run during the playback starts the new run from the start', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#cast')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await setCode(page, 'wizard.move_right(6)');
-  await page.locator('#cast').click();
+  await page.locator('#run').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-tick', '2', { timeout: 10_000 });
   await setCode(page, 'wizard.move_right(2)');
-  await page.locator('#cast').click();
+  await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText('Not yet: 0 of 1 goals met. Try again.', {
     timeout: 30_000,
   });
@@ -50,19 +50,19 @@ test('without isolation, a loop that never ends is stopped by starting Python ag
     Object.defineProperty(globalThis, 'crossOriginIsolated', { value: false }),
   );
   await page.goto('/');
-  await expect(page.locator('#isolation')).toHaveClass('warning');
-  await expect(page.locator('#cast')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('html')).toHaveAttribute('data-isolated', 'false');
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await setCode(page, 'while True:\n    pass');
-  await page.locator('#cast').click();
+  await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText(
-    'The spell was stopped: it was running for more than 5 seconds.',
+    'Your program was stopped: it ran for more than 5 seconds without doing anything.',
     { timeout: 15_000 },
   );
   await expect(page.locator('#status')).toHaveText('Starting Python again…');
-  await expect(page.locator('#cast')).toBeDisabled();
-  await expect(page.locator('#cast')).toBeEnabled({ timeout: 60_000 });
+  await expect(page.locator('#run')).toBeDisabled();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 60_000 });
   await setCode(page, 'wizard.move_right(6)');
-  await page.locator('#cast').click();
+  await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText('You did it!', { timeout: 30_000 });
 });
 
@@ -78,7 +78,7 @@ test('the scene follows the size of the window', async ({ page }) => {
 
 test('the page may reach no other server, and the game still runs', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#cast')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   const blocked = await page.evaluate(
     () =>
       new Promise<string>((resolve) => {
@@ -90,18 +90,18 @@ test('the page may reach no other server, and the game still runs', async ({ pag
   );
   expect(blocked).toBe('connect-src');
   await setCode(page, 'wizard.move_right(6)');
-  await page.locator('#cast').click();
+  await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText('You did it!', { timeout: 30_000 });
 });
 
 test("the child's code cannot reach JavaScript", async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#cast')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   for (const code of ['import js', 'from pyodide.ffi import to_js', 'import sys\nprint(sys.modules["js"])']) {
     await setCode(page, code);
-    await page.locator('#cast').click();
+    await page.locator('#run').click();
     await expect(page.locator('.outcome-text')).toHaveText(
-      /^(There is no spell book called (js|pyodide\.ffi) in this school|Python says: KeyError)/,
+      /^(There is no book called (js|pyodide\.ffi) in the school's library|Python says: KeyError)/,
       { timeout: 30_000 },
     );
   }

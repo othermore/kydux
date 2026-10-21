@@ -70,7 +70,7 @@ Pinned exactly, checked against their registries on 2026-10-20:
 What the child can type, and what the world records. The one list of the
 names is `world/kydux_world/api.py`; a test holds every one of them to a
 member of the world's classes with a docstring and an example, which the
-grimoire will show. A level lists in its `api` which of them it teaches
+notebook shows. A level lists in its `api` which of them it teaches
 (D23). Nothing takes a tick unless it says so (D21).
 
 ```python

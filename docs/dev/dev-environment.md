@@ -145,9 +145,13 @@ that it needs a certificate the other computer trusts.
 
 Without the trusted certificate the game still works. The browser shows a
 warning first, and once you go past it, the game stops a runaway program by
-restarting Python instead. The status line at the bottom of the page tells
-you which of the two you have. With isolation it says *This page can stop
-a spell that runs forever.*
+restarting Python instead.
+
+The child is not told which of the two the page has, because it means
+nothing to a child. A developer can find out in two ways. The browser's
+console shows one line that starts with `Kydux:` and says it. And the
+page's root element carries it as an attribute: `data-isolated="true"` on
+the `<html>` element means the page is isolated.
 
 ### Making the certificate on the server
 

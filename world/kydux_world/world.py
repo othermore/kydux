@@ -1,7 +1,7 @@
 """The world a child's code runs in: the wizard, the level's things and actors, ticks and events.
 
 Everything is deterministic: the same level and the same code give the same
-events. One tick is one thing done (architecture.md, D21): every spell that
+events. One tick is one thing done (architecture.md, D21): every action that
 does something takes a tick, and in each tick, after the wizard, every
 actor takes its step, a teacher who sees the wizard catches it, and the
 goals are checked. Asking takes no tick. Each tick's events carry the line
@@ -9,7 +9,7 @@ of the child's code that caused them, for the page to play back.
 
 A run ends early when the wizard is caught or past the tick limit. Both are
 raised as BaseExceptions, which the child's `except Exception` does not
-catch; and a world that has ended refuses every further spell, so that a
+catch; and a world that has ended refuses every further action, so that a
 bare `except:` cannot carry the run on.
 """
 
@@ -76,12 +76,12 @@ class Caught(RunOver):
         self.by = by
 
 
-class SpellArguments(TypeError):
-    """A spell given what it cannot take."""
+class ActionArguments(TypeError):
+    """An action given what it cannot take."""
 
-    def __init__(self, spell: str, message: str) -> None:
+    def __init__(self, action: str, message: str) -> None:
         super().__init__(message)
-        self.spell = spell
+        self.action = action
 
 
 def child_line() -> int | None:
@@ -145,7 +145,7 @@ class World:
         ]
 
     def ready(self) -> None:
-        """Raises when the run has ended or has no tick left: every spell asks first,
+        """Raises when the run has ended or has no tick left: every action asks first,
         before it changes anything."""
         if self.over is not None:
             raise self.over
@@ -202,12 +202,15 @@ class World:
 
 def _whole(name: str, what: str, value: object) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < 1:
-        raise SpellArguments(name, f"{name}() takes a whole number of {what}, 1 or more")
+        raise ActionArguments(name, f"{name}() takes a whole number of {what}, 1 or more")
     return value
 
 
 class Wizard(Child):
-    """The child's wizard. Its methods are the spells the child casts."""
+    """The child's wizard. Its methods are its actions, which the child's code makes it do:
+    moving, waiting, saying, picking up, finding and looking at what it carries. Spells,
+    the magic it learns from books and casts with the wand, come with later chapters
+    (architecture.md, D27)."""
 
     _k_role = "wizard"
 

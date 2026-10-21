@@ -3,7 +3,7 @@
 The world explains, and the page says it in the player's language through
 its i18n files (architecture.md, D22): `explain` gives a kind, one key under
 `error.` in i18n/<lang>.json, and the names and examples that go in it.
-Suggestions come from the names the level teaches (its `api`) for a spell,
+Suggestions come from the names the level teaches (its `api`) for an action,
 and from `wizard` and the level's ids for a name. Python's own text stays in
 the error beside the explanation, for an adult.
 """
@@ -17,7 +17,7 @@ from typing import Any
 from . import api
 from .level import Level
 from .things import Child, ReadOnly
-from .world import SpellArguments
+from .world import ActionArguments
 
 
 @dataclass
@@ -30,15 +30,15 @@ class Explanation:
 
 
 class NotCalled(Exception):
-    """A spell named without the brackets that cast it: `wizard.move_right`."""
+    """An action named without the brackets that do it: `wizard.move_right`."""
 
-    def __init__(self, owner: str, spell: str, example: str, line: int) -> None:
-        super().__init__(f"{owner}.{spell} is not called")
-        self.owner, self.spell, self.example, self.line = owner, spell, example, line
+    def __init__(self, owner: str, action: str, example: str, line: int) -> None:
+        super().__init__(f"{owner}.{action} is not called")
+        self.owner, self.action, self.example, self.line = owner, action, example, line
 
 
 def example(owner: Child | type, member: str) -> str:
-    """The first example in backticks in a member's docstring, which shows it cast."""
+    """The first example in backticks in a member's docstring, which shows it used."""
     found = getattr(owner if isinstance(owner, type) else type(owner), member, None)
     for text in re.findall(r"`([^`]+)`", getattr(found, "__doc__", None) or ""):
         if "(" in text:
@@ -51,7 +51,7 @@ def suggest(name: str, candidates: list[str]) -> str | None:
     return close[0] if close else None
 
 
-def spells_of(owner: Child, level: Level) -> list[str]:
+def actions_of(owner: Child, level: Level) -> list[str]:
     """The members of an object the level teaches; every one of its role's when it lists none."""
     role = owner._k_role
     taught = api.members_taught(level.api, role)
@@ -59,8 +59,8 @@ def spells_of(owner: Child, level: Level) -> list[str]:
 
 
 def check_called(tree: ast.AST, namespace: dict[str, Child]) -> None:
-    """Refuses a line that names a spell and does not cast it: `wizard.move_right`
-    alone does nothing, which a child cannot tell from a spell that failed."""
+    """Refuses a line that names an action and does not do it: `wizard.move_right`
+    alone does nothing, which a child cannot tell from an action that failed."""
     for node in ast.walk(tree):
         if not (isinstance(node, ast.Expr) and isinstance(node.value, ast.Attribute)):
             continue
@@ -82,19 +82,20 @@ _UNCLOSED = re.compile(r"'(.)' was never closed")
 def explain(error: BaseException, level: Level) -> Explanation:
     if isinstance(error, NotCalled):
         return Explanation(
-            "not_called", {"object": error.owner, "name": error.spell, "example": error.example}
+            "not_called", {"object": error.owner, "name": error.action, "example": error.example}
         )
     if isinstance(error, ReadOnly):
-        return Explanation("read_only", {"object": error.owner, "name": error.attribute})
-    if isinstance(error, SpellArguments):
-        return _arguments(error.spell, level)
+        kind = "read_only" if error.exists else "no_new_attribute"
+        return Explanation(kind, {"object": error.owner, "name": error.attribute})
+    if isinstance(error, ActionArguments):
+        return _arguments(error.action, level)
     if isinstance(error, AttributeError) and isinstance(getattr(error, "obj", None), Child):
         owner: Child = error.obj  # type: ignore[attr-defined]
         params: dict[str, Any] = {"object": owner._k_child_name, "name": error.name}
-        suggestion = suggest(str(error.name), spells_of(owner, level))
+        suggestion = suggest(str(error.name), actions_of(owner, level))
         if suggestion:
             params["suggestion"] = suggestion
-        return Explanation("unknown_spell", params)
+        return Explanation("unknown_action", params)
     if isinstance(error, NameError):
         name = str(getattr(error, "name", "") or "")
         params = {"name": name}
@@ -124,11 +125,11 @@ def _child_classes(base: type = Child) -> list[type]:
     return found
 
 
-def _arguments(spell: str, level: Level) -> Explanation:
+def _arguments(action: str, level: Level) -> Explanation:
     for owner in _child_classes():
-        if callable(getattr(owner, spell, None)):
-            return Explanation("arguments", {"name": spell, "example": example(owner, spell)})
-    return Explanation("arguments", {"name": spell, "example": f"{spell}()"})
+        if callable(getattr(owner, action, None)):
+            return Explanation("arguments", {"name": action, "example": example(owner, action)})
+    return Explanation("arguments", {"name": action, "example": f"{action}()"})
 
 
 def _syntax(error: SyntaxError) -> Explanation:

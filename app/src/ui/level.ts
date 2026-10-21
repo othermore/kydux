@@ -1,5 +1,5 @@
 // The level screen: the scene with the goals over its corner, the editor
-// beside it, Cast, Stop, Restart and the speed, and the card saying how a run
+// beside it, Run, Stop, Restart and the speed, and the card saying how a run
 // went. It is where the child's code becomes the wizard walking.
 
 import type { Editor, EditorOptions } from '../editor/editor';
@@ -76,7 +76,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const status = element('p', { id: 'status', className: 'status' });
 
   const editorParent = element('div', { className: 'editor' });
-  const cast = labelled(element('button', { id: 'cast', type: 'button' }), () => t('level.cast'));
+  const run = labelled(element('button', { id: 'run', type: 'button' }), () => t('level.run'));
   const stop = labelled(element('button', { id: 'stop', type: 'button' }), () => t('level.stop'));
   const restart = labelled(element('button', { id: 'restart', type: 'button' }), () =>
     t('level.restart'),
@@ -100,7 +100,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     element('section', { className: 'workbench' }, [
       editorParent,
       element('div', { className: 'buttons' }, [
-        cast,
+        run,
         stop,
         restart,
         element('label', { className: 'speed' }, [speedLabel, ' ', speed]),
@@ -116,7 +116,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const editor = parts.createEditor(editorParent, {
     doc: typed && saved ? saved : text.starting_code,
     label: t('level.code_label'),
-    onCast: () => castNow(),
+    onRun: () => runNow(),
     onChange: (doc) => {
       typed = doc !== text.starting_code;
       storage('session')?.setItem(codeKey(loaded.id), doc);
@@ -146,7 +146,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     if (s === 'failed' && card.current?.kind !== 'failed') card.show({ kind: 'failed' });
     status.textContent = statusLine(s);
     status.dataset.status = s;
-    cast.disabled = s !== 'ready' || !scene;
+    run.disabled = s !== 'ready' || !scene;
     stop.disabled = s !== 'running' && scene?.playback.state !== 'playing';
   };
   stopped.push(runtime.onStatus(showStatus));
@@ -204,8 +204,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     editor.setErrorLine(null);
   };
 
-  const castNow = () => {
-    if (cast.disabled || !scene) return;
+  const runNow = () => {
+    if (run.disabled || !scene) return;
     const handle = scene;
     if (handle.playback.state === 'playing') handle.playback.stop();
     clear();
@@ -241,7 +241,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         if (destroyed) return;
         if (runtime.status === 'failed') return;
         // The worker could not run the code at all: its message is shown as an
-        // error, and Cast is ready again.
+        // error, and Run is ready again.
         world = {
           status: 'error',
           events: [],
@@ -255,7 +255,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     );
   };
 
-  cast.addEventListener('click', castNow);
+  run.addEventListener('click', runNow);
   stop.addEventListener('click', () => {
     if (runtime.status === 'running') runtime.interrupt();
     else scene?.playback.stop();

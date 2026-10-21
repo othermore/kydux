@@ -8,8 +8,8 @@ is to the child: `wizard`; a thing's kind when it has members of its own
 
 The table here is the one list of what the child can type. It is plain data,
 so that a level can be checked without the world's classes; a test holds the
-classes to it, each name a member with a docstring, and the grimoire (sprint
-4) reads the docstrings from the classes.
+classes to it, each name a member with a docstring, and the notebook (sprint
+4) shows each member with its docstring's example.
 """
 
 from typing import TYPE_CHECKING

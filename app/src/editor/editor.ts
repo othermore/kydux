@@ -40,7 +40,8 @@ export interface Editor {
 export interface EditorOptions {
   doc: string;
   onChange?: (doc: string) => void;
-  onCast?: () => void;
+  /** Ctrl- or Cmd-Enter: run the program. */
+  onRun?: () => void;
   /** The editor's name for screen readers. */
   label?: string;
 }
@@ -93,12 +94,12 @@ export function createEditor(parent: HTMLElement, options: EditorOptions): Edito
     initialSpacer: () => new Mark('running'),
   });
 
-  const cast = Prec.highest(
+  const run = Prec.highest(
     keymap.of([
       {
         key: 'Mod-Enter',
         run: () => {
-          options.onCast?.();
+          options.onRun?.();
           return true;
         },
       },
@@ -110,7 +111,7 @@ export function createEditor(parent: HTMLElement, options: EditorOptions): Edito
     state: EditorState.create({
       doc: options.doc,
       extensions: [
-        cast,
+        run,
         marks,
         lineNumbers(),
         highlightActiveLineGutter(),

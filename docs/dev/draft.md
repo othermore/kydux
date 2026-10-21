@@ -7,7 +7,7 @@ are written. Every point here is open to change.
 
 A child learns Python by writing it. Each screen is a level: a scene of the
 castle or its grounds seen from above, the young wizard in it, a goal, and a code
-editor beside it. The child writes a few lines, presses *Cast* (run), and watches
+editor beside it. The child writes a few lines, presses *Run*, and watches
 the wizard carry them out. A level is won when its goals are met: reach the door,
 pick up the wand, get past the teacher unseen.
 
@@ -22,13 +22,13 @@ before it.
 - **The editor**, beside it: Python with colours, line numbers, and the line that
   is running lit while the wizard acts it out.
 - **The goals**, a short list ticked off as they are met.
-- **The grimoire**: the spells (methods) and things (attributes) the wizard
+- **The notebook**: the actions (methods) and attributes the wizard
   knows so far, each with an example; it grows as lessons teach more, and a click
   puts an example in the editor.
-- **Cast / Stop / Restart**, and a speed control for the playback.
+- **Run / Stop / Restart**, and a speed control for the playback.
 - **Help**: a hint at a time, after a failed try or on request; never the answer.
 - **Errors in the child's words**: a Python error is shown as what it is in
-  plain language ("The spell `mvoe_up` does not exist. Did you mean
+  plain language ("The wizard does not know an action called `mvoe_up`. Did you mean
   `move_up`?"), in the player's language, pointing at the line.
 
 ### The flow of a level
@@ -40,12 +40,16 @@ before it.
   as solving it in fewer than a number of lines.
 - **When a run plays**, a timeline under the scene can be dragged back and
   forth; the line being run is marked in the editor, and a bubble over the
-  wizard names the spell being cast. The wizard's energy shows in a bar.
-- **Things grant spells.** What the wizard can do comes from what they carry:
-  the wand gives `cast`, a spellbook gives its spells, the broom gives `fly`,
-  a cloak gives `hide`. Getting a new thing is part of the story, and its
-  spells appear in the grimoire with the thing's icon. The first time a new
-  spell or idea appears, a card explains it with an example.
+  wizard shows what it says, or what it could not do. The wizard's energy
+  shows in a bar.
+- **Things grant actions, books teach spells.** The wizard has its general
+  actions from the start: moving, waiting, saying, picking up. Others come
+  with what it carries: the wand gives `cast`, the broom gives `fly`, a cloak
+  gives `hide`. A spell book teaches spells, which the wand then casts.
+  Getting a new thing is part of the story, and its actions and spells
+  appear in the notebook with the thing's icon. The first time a new action
+  or idea appears, a card explains it with an example. The words for all of
+  this are in architecture.md, D27.
 - **On winning**, a short scene and a reward (stars, potions or another
   currency of the game's own) that buys things in a shop between levels.
 - Levels are reached from a **map** of each chapter, with the path between
@@ -86,7 +90,7 @@ A first sketch of the order of ideas, each a lesson and one or more levels:
 6. Loops: `while True:` and `for` over a range, then over a list.
 7. Conditions: `if`, `else`, `elif`; comparing; `and`, `or`, `not`.
 8. Lists: carrying several things, choosing from them.
-9. Defining functions: a spell of one's own.
+9. Defining functions: an action of one's own.
 10. Defining classes: creating a familiar or a new kind of object, with its own
     attributes and methods.
 
@@ -135,7 +139,7 @@ characters and places have names and looks invented for it.
 
 Everything the player sees comes from translation files, one per language with
 the same keys: the interface, the lessons, the story, the goals, the hints, the
-grimoire, the error messages, the launcher's messages, and the words that appear
+notebook, the error messages, the launcher's messages, and the words that appear
 inside the scene (signs, book titles), which the game draws from a string
 instead of painting them into the art. English and Spanish from the start; a new
 language is a new set of files and nothing else. A check fails when a language

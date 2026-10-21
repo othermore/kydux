@@ -19,12 +19,17 @@ if TYPE_CHECKING:
 
 
 class ReadOnly(AttributeError):
-    """An attribute of a child's object set or deleted: the world's to change."""
+    """An attribute of a child's object set or deleted: the world's to change.
 
-    def __init__(self, owner: str, name: str) -> None:
-        super().__init__(f"{owner}.{name} cannot be changed directly", name=name)
+    `exists` tells changing what the object has (`wizard.position = ...`) from
+    giving it something new (`wizard.jump = ...`), which the child is told apart."""
+
+    def __init__(self, owner: str, name: str, exists: bool) -> None:
+        verb = "cannot be changed directly" if exists else "cannot be added"
+        super().__init__(f"{owner}.{name} {verb}", name=name)
         self.owner = owner
         self.attribute = name
+        self.exists = exists
 
 
 class Child:
@@ -42,10 +47,10 @@ class Child:
         return self._k_role
 
     def __setattr__(self, name: str, value: Any) -> None:
-        raise ReadOnly(self._k_child_name, name)
+        raise ReadOnly(self._k_child_name, name, hasattr(type(self), name))
 
     def __delattr__(self, name: str) -> None:
-        raise ReadOnly(self._k_child_name, name)
+        raise ReadOnly(self._k_child_name, name, hasattr(type(self), name))
 
     def __dir__(self) -> list[str]:
         return sorted(api.MEMBERS.get(self._k_role, ()))

@@ -59,7 +59,7 @@ def error_info(error: BaseException, level: Level | None = None) -> ErrorInfo:
 
 
 class WorldError(Exception):
-    """A run whose events do not add up: the world was changed by other means than spells."""
+    """A run whose events do not add up: the world was changed by other means than actions."""
 
 
 def check_consistency(world: World) -> None:

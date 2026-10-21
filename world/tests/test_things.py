@@ -159,6 +159,10 @@ def test_the_child_s_objects_are_read_only():
     with pytest.raises(ReadOnly) as raised:
         world.wizard.position = (7, 3)
     assert (raised.value.owner, raised.value.attribute) == ("wizard", "position")
+    assert raised.value.exists
+    with pytest.raises(ReadOnly) as raised:
+        world.wizard.jump = 3
+    assert not raised.value.exists
     with pytest.raises(AttributeError):
         world.things["door"].locked = False
     with pytest.raises(AttributeError):

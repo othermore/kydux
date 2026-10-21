@@ -29,14 +29,14 @@ def explained(code):
     [
         (
             "wizard.mvoe_right()",
-            "unknown_spell",
+            "unknown_action",
             {"object": "wizard", "name": "mvoe_right", "suggestion": "move_right"},
             1,
         ),
-        ("wizard.fly()", "unknown_spell", {"object": "wizard", "name": "fly"}, 1),
+        ("wizard.fly()", "unknown_action", {"object": "wizard", "name": "fly"}, 1),
         (
             "door.opn()",
-            "unknown_spell",
+            "unknown_action",
             {"object": "door", "name": "opn", "suggestion": "open"},
             1,
         ),
@@ -45,6 +45,7 @@ def explained(code):
         ("dragon.roar()", "unknown_name", {"name": "dragon"}, 1),
         ("wizard.position = (7, 1)", "read_only", {"object": "wizard", "name": "position"}, 1),
         ("door.locked = False", "read_only", {"object": "door", "name": "locked"}, 1),
+        ("wizard.jump = 3", "no_new_attribute", {"object": "wizard", "name": "jump"}, 1),
         ("wizard.move_right(3\n", "unclosed", {"what": "("}, 1),
         ("wizard.say([1, 2)\n", "syntax", None, 1),
         ("wizard.say('hello)\n", "unclosed", {"what": "'"}, 1),
@@ -104,9 +105,25 @@ def test_python_s_own_words_stay_beside_the_explanation():
     assert result.error.message == "name 'wizrd' is not defined"
 
 
-def test_a_spell_suggested_is_one_the_level_teaches():
+def test_an_action_suggested_is_one_the_level_teaches():
     level = Level.from_dict({"id": "few", "map": ["S..."], "api": ["wizard.say"]})
     result = run_code(level, "wizard.sya('hi')")
     assert result.error.explanation["params"]["suggestion"] == "say"
     result = run_code(level, "wizard.move_rihgt()")
     assert "suggestion" not in result.error.explanation["params"]
+
+
+def test_giving_the_wizard_a_method_of_one_s_own_is_told_apart_from_changing_one():
+    # The owner's own try, from the acceptance test of sprint 3.
+    code = (
+        "import types\n"
+        "def caminar_derecha(self):\n"
+        "    self.position.x += 1\n"
+        "wizard.caminar_derecha = types.MethodType(caminar_derecha, wizard)\n"
+    )
+    explanation, line = explained(code)
+    assert explanation == {
+        "kind": "no_new_attribute",
+        "params": {"object": "wizard", "name": "caminar_derecha"},
+    }
+    assert line == 4

@@ -19,12 +19,14 @@ export function explanationText(explanation: Explanation): string {
   const p = explanation.params;
   const said = (() => {
     switch (explanation.kind) {
-      case 'unknown_spell':
-        return t('error.unknown_spell', p);
+      case 'unknown_action':
+        return t('error.unknown_action', p);
       case 'unknown_name':
         return t('error.unknown_name', p);
       case 'read_only':
         return t('error.read_only', p);
+      case 'no_new_attribute':
+        return t('error.no_new_attribute', p);
       case 'not_called':
         return t('error.not_called', p);
       case 'unclosed':

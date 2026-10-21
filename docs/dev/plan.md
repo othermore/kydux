@@ -60,7 +60,7 @@ that runs on 3.12 and up, so that it runs on both).
    mapped to a key and its data (section 2.4).
 5. The scene plays the events back at the chosen speed: the wizard walks tile
    by tile, the editor's gutter marks the line being played, a bubble over the
-   wizard names the spell, the goals tick off as their events arrive. The
+   wizard names what it says, the goals tick off as their events arrive. The
    timeline under the scene can be dragged to any tick, since every tick's
    state can be rebuilt from the events.
 
@@ -70,7 +70,7 @@ level's solution be checked without a browser.
 ### 2.2 Stopping a runaway program
 
 - Every API call counts a tick; past the level's limit (default 1000) the
-  world raises `TooManyTicks`, shown as "The wizard is tired: the spell has
+  world raises `TooManyTicks`, shown as "Your program has taken more than
   run more than 1000 steps. Is there a loop that never ends?".
 - A loop with no API call in it (`while True: pass`) never reaches that
   check. Two defences: when the page has `SharedArrayBuffer` (served with the
@@ -84,13 +84,13 @@ level's solution be checked without a browser.
 ### 2.3 The API the child uses
 
 Python conventions throughout: `snake_case`, objects with methods and
-attributes, docstrings in English in the code (the grimoire shows them
+attributes, docstrings in English in the code (the notebook shows them
 translated from `i18n`). What exists is in `architecture.md`, section *The
-child's Python*, from the one list in `kydux_world/api.py`; the spells the
+child's Python*, from the one list in `kydux_world/api.py`; the actions the
 later chapters bring (casting with the wand, using a thing, the wizard's
 energy) are added there as their chapters arrive.
 
-What a level exposes is listed in its definition, so the grimoire and the
+What a level exposes is listed in its definition, so the notebook and the
 editor's completion show only what has been taught.
 
 ### 2.4 Errors in the child's words
@@ -100,7 +100,7 @@ the translated text pointing at the line:
 
 | Python | Key, data | English text |
 |---|---|---|
-| `AttributeError: 'Wizard' object has no attribute 'mvoe_right'` | `error.unknown_spell`, `{name, suggestion}` | The wizard does not know the spell `mvoe_right`. Did you mean `move_right`? |
+| `AttributeError: 'Wizard' object has no attribute 'mvoe_right'` | `error.unknown_action`, `{name, suggestion}` | The wizard does not know an action called `mvoe_right`. Did you mean `move_right`? |
 | `NameError: name 'wizrd' is not defined` | `error.unknown_name` | There is nothing called `wizrd` here. Did you mean `wizard`? |
 | `SyntaxError` on a line with `(` unclosed | `error.unclosed_paren` | This line opens a `(` that never closes. |
 | `IndentationError` | `error.indentation` | The lines inside a `while` or `if` need four spaces in front. |
@@ -136,8 +136,8 @@ editor as its starting code.
 
 ### 2.6 Internationalization
 
-- `i18n/en.json`, `i18n/es.json`: every string of the shell, the grimoire's
-  spell descriptions and the error texts, nested keys.
+- `i18n/en.json`, `i18n/es.json`: every string of the shell, the notebook's
+  descriptions of every action and attribute, and the error texts, nested keys.
 - Level and lesson texts beside their content (above).
 - `tools/i18n_check.py` fails on a key present in one language and not the
   other, a key no code or content uses, or a string literal in the TypeScript
@@ -193,7 +193,7 @@ kydux/
     src/runtime/      the worker, Pyodide loading, the bridge to the world
     src/editor/       CodeMirror setup, line markers, completion from the level's API
     src/ui/           the shell: start, wizard creator, chapter map, lesson,
-                      level screen, cards, grimoire, settings
+                      level screen, cards, notebook, settings
     src/i18n/         loading and lookup of strings
     src/progress/     ProgressStore and its local implementation
     src/content/      loading of chapters, lessons and levels
@@ -290,7 +290,7 @@ One hard-coded level played end to end: editor, Python, scene, goals.
     placeholder wizard; playback of move events as tweens tile by tile;
     speed control; restart.
 1.4 The editor: CodeMirror with Python, the starting code, the running line
-    marked during playback, Cast and Stop buttons.
+    marked during playback, Run and Stop buttons.
 1.5 The goals panel: the level's goals ticked as events arrive; a win banner.
 1.6 The first level, "The corridor": reach the door in six steps; its
     `solution.py` and `wrong/` checked by pytest.
@@ -304,7 +304,7 @@ One hard-coded level played end to end: editor, Python, scene, goals.
     code by an import hook, as a second line behind the sandbox; and the
     worker's messages to the page checked for their shape. A test of each.
 
-UAT: from the MacBook, write the three moves, press Cast, watch the wizard
+UAT: from the MacBook, write the three moves, press Run, watch the wizard
 reach the door; write `while True: pass`, see it stopped with a message;
 misspell a move, see Python's error (plain, not yet translated).
 
@@ -317,7 +317,7 @@ has 2.11, 2.12, 2.0, 2.7, 2.5, 2.8 and 2.6 (`sprint-4.md`).
 2.0 The level screen's run, as a controller of its own: the states a run
     goes through (idle, running, playing, done, failed) and what each
     button does, apart from the DOM and tested by Vitest, before the
-    screen gains hints, the timeline, the cards and the grimoire.
+    screen gains hints, the timeline, the cards and the notebook.
 
 2.1 The level definition (`level.json`) and its loader on both sides; the
     exposed API list. The level texts, `text.<lang>.json` with their check in
@@ -354,7 +354,7 @@ has 2.11, 2.12, 2.0, 2.7, 2.5, 2.8 and 2.6 (`sprint-4.md`).
     tick it happens, the card repeating the first with its line, and no
     animation for an attempt that could not even be made.
 
-UAT: the three levels from the MacBook; a misspelled spell gets a Spanish
+UAT: the three levels from the MacBook; a misspelled action gets a Spanish
 message with a suggestion; the scrubber; a hint; stars.
 
 ### Phase 3 — The shell
@@ -399,8 +399,8 @@ From placeholder squares to the game's look, with reproducible tools.
     creator; hats and hair overlays if a sheet comes out on the same grid.
 4.4 Objects and actors of chapters 1–2: wand, books, keys, doors, chests,
     potions, broom, teacher, cat, ghost, portraits; each on the grid.
-4.5 The UI skin: cards, panels, buttons, the grimoire's book, the map's
-    frame, icons for goals and spells, a font with its licence (Andika or a
+4.5 The UI skin: cards, panels, buttons, the notebook, the map's
+    frame, icons for goals, actions and spells, a font with its licence (Andika or a
     pixel font readable by children).
 4.6 Sound: `tools/sound/generate.py` with Lyria for a chapter theme and short
     effects (step, cast, door, pick up, win, fail), free CC0 effects where

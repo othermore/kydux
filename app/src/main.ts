@@ -25,7 +25,6 @@ function languagePicker(): HTMLElement {
 }
 
 function chrome(root: HTMLElement, content: HTMLElement): void {
-  const isolated = globalThis.crossOriginIsolated === true;
   root.replaceChildren(
     element('header', { className: 'top' }, [
       element('div', { className: 'brand' }, [
@@ -35,12 +34,7 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
       languagePicker(),
     ]),
     content,
-    element('footer', {}, [
-      element('span', { id: 'isolation', className: isolated ? 'ok' : 'warning' }, [
-        isolated ? t('app.isolated_yes') : t('app.isolated_no'),
-      ]),
-      element('span', {}, [t('app.version', { version })]),
-    ]),
+    element('footer', {}, [element('span', {}, [t('app.version', { version })])]),
   );
 }
 
@@ -94,6 +88,16 @@ async function showLevel(root: HTMLElement, id: string): Promise<void> {
     );
   }
 }
+
+// Whether the page can stop a program in place is for a developer to know,
+// not the child: the page says it on its root element and in the console.
+const isolated = globalThis.crossOriginIsolated === true;
+document.documentElement.dataset.isolated = String(isolated);
+console.info(
+  isolated
+    ? 'Kydux: cross-origin isolated; a runaway program is stopped in place.' // i18n-ignore
+    : 'Kydux: not isolated; a runaway program is stopped by starting Python again.', // i18n-ignore
+);
 
 const root = document.querySelector<HTMLElement>('#app');
 if (root) {

@@ -3,9 +3,7 @@
     "title": "Kydux",
     "tagline": "Un juego para aprender Python",
     "language": "Idioma",
-    "version": "Versión {version}",
-    "isolated_yes": "Esta página puede detener un hechizo que no termina nunca.",
-    "isolated_no": "Esta página detiene un hechizo que no termina nunca arrancando Python de nuevo: para detenerlo sin reiniciar necesita HTTPS (o localhost) y las cabeceras de aislamiento."
+    "version": "Versión {version}"
   },
   "language": {
     "en": "English",
@@ -21,43 +19,44 @@
   "outcome": {
     "won": "¡Lo has conseguido!",
     "incomplete": "Todavía no: {n} de {total} objetivos cumplidos. Inténtalo otra vez.",
-    "too_many_ticks": "El mago está agotado: el hechizo ha dado más de {limit} pasos. ¿Hay algún bucle que no termina nunca?",
-    "interrupted": "Se ha detenido el hechizo: llevaba más de {seconds} segundos sin terminar.",
+    "too_many_ticks": "Tu programa ha dado más de {limit} pasos y el mago está agotado. ¿Hay algún bucle que no termina nunca?",
+    "interrupted": "Se ha detenido tu programa: llevaba más de {seconds} segundos sin hacer nada.",
     "error": "Python dice: {type}: {message} (línea {line})",
     "error_no_line": "Python dice: {type}: {message}",
     "caught": "¡Te ha visto el profesor! Inténtalo otra vez, y fíjate hacia dónde mira.",
     "printed": "Tu código ha escrito:"
   },
   "level": {
-    "cast": "Lanzar",
     "stop": "Parar",
     "restart": "Reiniciar",
     "speed": "Velocidad",
-    "code_label": "Tu hechizo, en Python",
+    "code_label": "Tu programa, en Python",
     "page_title": "Kydux — {title}",
     "loading": "Preparando Python…",
     "ready": "Python {version} listo",
-    "running": "El hechizo está en marcha…",
+    "running": "Tu programa está en marcha…",
     "restarting": "Arrancando Python de nuevo…",
     "not_found": "No hay ningún nivel llamado «{id}».",
     "failed": "Python no ha podido arrancar. Recarga la página para intentarlo de nuevo.",
     "reload": "Recargar",
     "go_first": "Ir al primer nivel",
-    "load_failed": "No se ha podido cargar el nivel. Recarga la página para intentarlo de nuevo."
+    "load_failed": "No se ha podido cargar el nivel. Recarga la página para intentarlo de nuevo.",
+    "run": "Ejecutar"
   },
   "error": {
-    "unknown_spell": "`{object}` no conoce el hechizo `{name}`.",
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",
     "suggestion": "¿Querías decir `{suggestion}`?",
-    "read_only": "No puedes cambiar `{object}.{name}` tú mismo: lanza un hechizo para que cambie.",
-    "not_called": "`{name}` es un hechizo, y un hechizo se lanza con paréntesis detrás, como `{example}`.",
+    "read_only": "No puedes cambiar `{object}.{name}` tú mismo. Lo cambia una acción.",
+    "not_called": "`{name}` es una acción. Una acción se hace con paréntesis detrás, como `{example}`.",
     "unclosed": "Esta línea abre un `{what}` que nunca se cierra.",
     "missing_colon": "Una línea que empieza por `{keyword}` termina con `:`.",
     "indentation": "Las líneas de dentro de un `while`, un `if` o un `for` necesitan cuatro espacios delante.",
     "syntax": "Python no puede leer esta línea: {message}.",
-    "arguments": "`{name}` no se lanza así. Prueba de esta forma: `{example}`.",
-    "no_such_module": "En este colegio no hay ningún libro de hechizos llamado `{name}`.",
+    "arguments": "`{name}` no se usa así. Prueba de esta forma: `{example}`.",
+    "no_such_module": "En la biblioteca del colegio no hay ningún libro llamado `{name}`.",
     "other": "Python dice: {type}: {message}",
-    "line": " (línea {line})"
+    "line": " (línea {line})",
+    "unknown_action": "`{object}` no conoce ninguna acción llamada `{name}`.",
+    "no_new_attribute": "No puedes darle a `{object}` algo nuevo llamado `{name}`. Lo que `{object}` puede hacer está en su cuaderno."
   }
 }

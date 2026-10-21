@@ -328,3 +328,25 @@ one overturns stays, marked as superseded.
   the level's directory, and either without the other is refused. Rules
   out the world looking for goals.py on its own, which it cannot do in the
   browser.
+- **D27 — The game's words for the ideas of programming.** Decided
+  2026-10-21 by the owner. An **action** is a method: what an object knows
+  how to do, `wizard.move_right()`, `door.open()`, `teacher.can_see()`.
+  The wizard has its general actions from the first level: moving,
+  waiting, saying, picking up, finding, looking at what it carries, using
+  a thing. Some actions come with a thing it carries: the wand gives
+  `wizard.cast(...)`, the broom gives `wizard.fly()`; they stay the
+  wizard's actions, and without the thing they are refused with *You do
+  not know this action yet*. A **spell** is a named piece of magic, data
+  and not a method: learned by reading a book (`wizard.read(book)`, into
+  `wizard.spells`) and cast with the wand, `wizard.cast("lumos")` or
+  `wizard.cast("open", door)`; a spell is a string first, and may become
+  an object when classes are taught. An **attribute** keeps Python's word:
+  what an object knows about itself, `door.locked`, `wizard.position`. A
+  **thing** (or item) is what the wizard can pick up and carry: a key, a
+  book, a wand, a broom, a potion. A **module** is a book of the school's
+  library. Running the child's code is **Run** (*Ejecutar*), never *Cast*.
+  The panel that lists what the wizard can do, carries and knows is the
+  **notebook** (*cuaderno*), not a grimoire. Until this decision the
+  game's texts, docstrings and plans said *spell* for *method* and *Cast*
+  for *Run*; sprint 4 renames them. Rules out a word of the story's for a
+  mechanism of the language's.

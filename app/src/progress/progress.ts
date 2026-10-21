@@ -2,6 +2,7 @@
 // document: each loads it, changes it, and saves it (D31).
 
 import {
+  defaultProgress,
   type LevelProgress,
   LocalProgressStore,
   type Progress,
@@ -120,3 +121,13 @@ export const languageStorage: Pick<Storage, 'getItem' | 'setItem'> = {
     });
   },
 };
+
+/** Start from the beginning: the course's progress cleared, the language and the
+ * settings the child chose kept. */
+export function reset(): void {
+  const kept = store.load();
+  const fresh = defaultProgress();
+  fresh.language = kept.language;
+  fresh.settings = kept.settings;
+  store.save(fresh);
+}

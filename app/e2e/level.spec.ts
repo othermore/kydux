@@ -23,7 +23,7 @@ test.describe('in English', () => {
   test.use({ locale: 'en-US' });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#level/01-the-corridor');
     await waitReady(page);
     await page.locator('#speed').selectOption('4');
   });
@@ -112,7 +112,7 @@ test.describe('in English', () => {
 test('in Spanish, and switching to English keeps the code typed', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
   const page = await context.newPage();
-  await page.goto('/');
+  await page.goto('/#level/01-the-corridor');
   await waitReady(page);
   await expect(page.locator('.level-title')).toHaveText('El pasillo');
   await expect(page.locator('.goal')).toHaveText('Llega a la puerta del final del pasillo.');

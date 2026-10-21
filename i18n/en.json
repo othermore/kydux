@@ -40,7 +40,6 @@
     "not_found": "There is no level called “{id}”.",
     "failed": "Python could not start. Reload the page to try again.",
     "reload": "Reload",
-    "go_first": "Go to the first level",
     "load_failed": "The level could not be loaded. Reload the page to try again.",
     "run": "Run",
     "about": "About this level",
@@ -52,7 +51,8 @@
     "hint": "Hint",
     "hint_n": "Hint {n} of {total}",
     "timeline": "Timeline",
-    "play": "Play"
+    "play": "Play",
+    "go_start": "Go to the start"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",
@@ -131,5 +131,18 @@
       "facing": "The way the teacher looks: up, down, left or right.",
       "can_see": "Tells whether the teacher can see something straight ahead, close enough."
     }
+  },
+  "start": {
+    "welcome": "Welcome to the school of magic",
+    "intro": "You have just arrived at the school. Every step you take here, you take by writing Python.",
+    "continue": "Continue: {title}",
+    "new": "Start from the beginning",
+    "new_confirm": "This clears everything you have done so far. Start from the beginning?",
+    "settings": "Settings",
+    "progress": "Your progress",
+    "progress_about": "Your progress is kept in this browser. To take it to another computer, export it to a file and import it there.",
+    "export": "Export",
+    "import": "Import",
+    "import_failed": "That file is not a Kydux progress file. Nothing has changed."
   }
 }

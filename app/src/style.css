@@ -43,6 +43,11 @@ h1 {
   font-size: 24px;
 }
 
+h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+
 header.top {
   padding: 8px 0;
 }
@@ -573,4 +578,65 @@ footer {
 .last {
   margin: 0;
   color: var(--muted);
+}
+
+/* The start screen. */
+
+.start-screen {
+  max-width: 640px;
+  margin: 32px auto;
+  padding: 0 8px;
+}
+
+.start-screen h2 {
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.start-intro {
+  color: var(--muted);
+}
+
+.start-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.big-button,
+.quiet-button {
+  display: inline-block;
+  padding: 8px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.big-button {
+  background: var(--accent);
+  color: #fff;
+  font-size: 20px;
+}
+
+.quiet-button {
+  background: var(--panel);
+  color: var(--accent);
+}
+
+.start-progress {
+  margin-top: 32px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.start-progress h3 {
+  margin: 8px 0 4px;
+}
+
+.start-message {
+  color: var(--warning);
 }

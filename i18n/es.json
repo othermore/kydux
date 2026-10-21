@@ -40,7 +40,6 @@
     "not_found": "No hay ningún nivel llamado «{id}».",
     "failed": "Python no ha podido arrancar. Recarga la página para intentarlo de nuevo.",
     "reload": "Recargar",
-    "go_first": "Ir al primer nivel",
     "load_failed": "No se ha podido cargar el nivel. Recarga la página para intentarlo de nuevo.",
     "run": "Ejecutar",
     "about": "Sobre este nivel",
@@ -52,7 +51,8 @@
     "hint": "Pista",
     "hint_n": "Pista {n} de {total}",
     "timeline": "Línea de tiempo",
-    "play": "Seguir"
+    "play": "Seguir",
+    "go_start": "Ir al inicio"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",
@@ -131,5 +131,18 @@
       "facing": "Hacia dónde mira el profesor: up, down, left o right.",
       "can_see": "Dice si el profesor puede ver algo que tiene delante, lo bastante cerca."
     }
+  },
+  "start": {
+    "welcome": "Te damos la bienvenida al colegio de magia",
+    "intro": "Acabas de llegar al colegio. Cada paso que des aquí lo darás escribiendo Python.",
+    "continue": "Continuar: {title}",
+    "new": "Empezar desde el principio",
+    "new_confirm": "Esto borra todo lo que has hecho hasta ahora. ¿Empezar desde el principio?",
+    "settings": "Ajustes",
+    "progress": "Tu progreso",
+    "progress_about": "Tu progreso se guarda en este navegador. Para llevarlo a otro ordenador, expórtalo a un fichero e impórtalo allí.",
+    "export": "Exportar",
+    "import": "Importar",
+    "import_failed": "Ese fichero no es un fichero de progreso de Kydux. No ha cambiado nada."
   }
 }

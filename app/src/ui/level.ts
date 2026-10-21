@@ -265,6 +265,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       if (!force && snapshot.outcome?.kind === 'won' && snapshot.world) {
         const earned = stars(snapshot.world);
         progress.markWon(loaded.id, earned, editor.getDoc());
+        // Continue, on the start screen, now goes to what comes after.
+        if (parts.next) progress.setCurrent(`level:${parts.next}`);
         showWin(earned);
       } else if (!force && shownCard?.node.querySelector('.win-card')) {
         shownCard.close();

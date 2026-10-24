@@ -48,6 +48,8 @@ export interface Progress {
   lessons: Record<string, { read?: boolean }>;
   /** The story pages read (D56). */
   stories: Record<string, { read?: boolean }>;
+  /** Whether the screen's guide has been shown, done or skipped (D68). */
+  guided: boolean;
   levels: Record<string, LevelProgress>;
   /** The levels whose start card has been seen. */
   started: string[];
@@ -76,6 +78,7 @@ export function defaultProgress(): Progress {
     settings: { ...DEFAULT_SETTINGS },
     lessons: {},
     stories: {},
+    guided: false,
     levels: {},
     started: [],
     current: null,
@@ -163,6 +166,7 @@ export function readProgress(value: unknown): Progress | null {
     progress.started = value.started.filter((id): id is string => typeof id === 'string');
   }
   if (typeof value.current === 'string' && ITEM.test(value.current)) progress.current = value.current;
+  progress.guided = value.guided === true;
   return progress;
 }
 

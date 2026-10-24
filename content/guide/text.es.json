@@ -1,0 +1,32 @@
+{
+  "steps": {
+    "scene": {
+      "title": "La escena",
+      "text": "Aquí es donde sucede tu programa. Puedes arrastrar la escena para mirar y usar los botones para acercarla o alejarla."
+    },
+    "goals": {
+      "title": "Tus objetivos",
+      "text": "Estas son las tareas que debes terminar. Una tarea recibe una marca cuando está hecha."
+    },
+    "editor": {
+      "title": "El editor",
+      "text": "Aquí es donde escribes tu programa. Escribes una instrucción en cada línea."
+    },
+    "run": {
+      "title": "Ejecutar y Reiniciar",
+      "text": "Para probar tu programa, pulsa el botón Ejecutar. El botón Reiniciar pone todo como al principio."
+    },
+    "notebook": {
+      "title": "El cuaderno",
+      "text": "Esta lista muestra lo que tu {mago|maga} puede hacer. Puedes hacer clic en un ejemplo para ponerlo en el editor."
+    },
+    "hint": {
+      "title": "Pistas y ayuda",
+      "text": "El botón Pista te da una ayuda cuando tu código falla. El signo de interrogación abre esta guía otra vez."
+    },
+    "method": {
+      "title": "Cómo aprendemos",
+      "text": "Probamos, miramos qué sucede y probamos otra vez. ¡Ahora vamos a escribir tu primera instrucción!"
+    }
+  }
+}

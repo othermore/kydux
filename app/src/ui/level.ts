@@ -16,6 +16,7 @@ import { DEFAULT_SETTINGS, SPLIT_MAX, SPLIT_MIN } from '../progress/store';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
 import { type Card, startCard, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
+import { type Guide, type GuideText, openGuide } from './guide';
 import { judge, type Verdict } from './stars';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
@@ -47,6 +48,10 @@ export interface LevelScreenParts {
   /** Made by the caller, so that Phaser and CodeMirror load on their own. */
   createEditor: (parent: HTMLElement, options: EditorOptions) => Editor;
   startScene: (parent: HTMLElement, level: LoadedLevel['level'], look: Look) => Promise<SceneHandle>;
+  /** The screen's guide's words (D68), and whether this level opens the guide the
+   * first time it is played: the course's first level. */
+  loadGuide?: () => Promise<GuideText>;
+  guideFirst?: boolean;
 }
 
 export function levelScreen(parts: LevelScreenParts): LevelScreen {
@@ -280,7 +285,37 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   // opens it again with ?, or when it is drawn again in another language.
   let startOpened = false;
   let startAgain = false;
-  const showStart = (redraw = false) => {
+  // The screen's guide (D68), with the notebook opened for its step about it.
+  let guide: Guide | null = null;
+  const showGuide = () => {
+    if (guide || !parts.loadGuide) return;
+    let openedNotebook = false;
+    const setNotebook = (open: boolean) => {
+      if (notebook.open !== open) notebook.toggle();
+      notebookButton.setAttribute('aria-expanded', String(notebook.open));
+    };
+    void parts.loadGuide().then((words) => {
+      if (destroyed || guide) return;
+      guide = openGuide(document.body, words, {
+        onStep: (key) => {
+          if (key === 'notebook' && !notebook.open) {
+            setNotebook(true);
+            openedNotebook = true;
+          } else if (key !== 'notebook' && openedNotebook) {
+            setNotebook(false);
+            openedNotebook = false;
+          }
+        },
+        onClose: () => {
+          if (openedNotebook) setNotebook(false);
+          guide = null;
+          progress.markGuided();
+          editor.focus();
+        },
+      });
+    });
+  };
+  const showStart = (redraw = false, asked = false) => {
     if (!redraw) startAgain = startOpened;
     startOpened = true;
     showCard(
@@ -294,8 +329,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           said: said(text.intro),
           carrying: carrying(),
           ways: levelWays.map(wayName),
+          onGuide: parts.loadGuide && (asked || startAgain) ? showGuide : undefined,
         },
-        () => editor.focus(),
+        () => {
+          // The first level opens the guide once its start card is closed, the first time.
+          if (parts.guideFirst && !progress.guided()) showGuide();
+          else editor.focus();
+        },
       ),
     );
   };
@@ -399,7 +439,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
 
   about.setAttribute('aria-label', t('level.about'));
   about.title = t('level.about');
-  about.addEventListener('click', () => showStart());
+  about.addEventListener('click', () => showStart(false, true));
   run.addEventListener('click', () => runCode());
   stop.addEventListener('click', () => {
     if (controller.snapshot.canPlay) controller.resume();
@@ -542,6 +582,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     destroy() {
       destroyed = true;
       shownCard?.close();
+      guide?.node.remove();
       for (const unsubscribe of stopped) unsubscribe();
       stopped = [];
       controller.destroy();

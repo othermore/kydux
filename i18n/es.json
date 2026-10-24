@@ -59,6 +59,7 @@
     "go_start": "Ir al inicio",
     "settings": "Ajustes",
     "split": "Arrastra para cambiar el tamaño de la escena y del editor",
+    "show_screen": "Enséñame la pantalla",
     "zoom_in": "Acercar (o la rueda del ratón)",
     "zoom_out": "Alejar (o la rueda del ratón)",
     "run_key": "Ejecuta tu código: Alt+R, o Ctrl+Intro en el editor",
@@ -93,6 +94,12 @@
     "wand": "la varita",
     "potion": "la poción",
     "stair": "la escalera"
+  },
+  "guide": {
+    "next": "Siguiente",
+    "skip": "Saltar",
+    "done": "¡Vamos!",
+    "count": "{n} de {total}"
   },
   "blocked": {
     "friend": "{name} está en mi camino: tengo que dar un rodeo.",

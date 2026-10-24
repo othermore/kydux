@@ -18,6 +18,8 @@ Fails, printing file:line: message for each, on:
     in any text for the player; and in Spanish, `mago` or `maga` outside a choice,
     so that no text speaks of a girl as a boy by oversight (D37);
   - a level's speaker without its name, characters.<speaker>, in a language;
+  - the screen's guide, content/guide/, without a text.<lang>.json for every
+    language, or with steps that differ between languages or lack their words;
   - a string literal in the app's code that reads like words for a person (words
     separated by spaces, with a capitalised word or a sentence's final stop),
     which must come from t() instead. A line marked `// i18n-ignore` is left alone, and
@@ -120,6 +122,26 @@ def check_speakers(languages: dict[str, dict[str, str]]) -> list[str]:
     return findings
 
 
+def check_guide(languages: list[str]) -> list[str]:
+    """The screen's guide (D68) has the same steps in every language, each with its
+    title and its words."""
+    guide = REPO / "content" / "guide"
+    findings, steps = [], {}
+    for lang in languages:
+        path = guide / f"text.{lang}.json"
+        if not path.is_file():
+            findings.append(f"content/guide: lacks text.{lang}.json")
+            continue
+        found = json.loads(path.read_text(encoding="utf-8")).get("steps", {})
+        steps[lang] = list(found)
+        for key, step in found.items():
+            if not (isinstance(step, dict) and step.get("title") and step.get("text")):
+                findings.append(f"content/guide/text.{lang}.json: {key} lacks its title or text")
+    if len({tuple(keys) for keys in steps.values()}) > 1:
+        findings.append("content/guide: the languages' steps differ")
+    return findings
+
+
 def check_chapters(languages: list[str]) -> list[str]:
     """Every chapter has its text, with its title, in every language."""
     chapters = REPO / "content" / "chapters"
@@ -164,7 +186,7 @@ def player_texts(languages: dict[str, dict[str, str]]) -> list[tuple[str, str, s
             if key not in CHOOSE_GENDER
         )
     content = REPO / "content"
-    for path in sorted(content.glob("*/*/text.*.json")):
+    for path in sorted([*content.glob("*/*/text.*.json"), *content.glob("guide/text.*.json")]):
         lang = path.name.split(".")[1]
         where = path.relative_to(REPO).as_posix()
         found = strings(json.loads(path.read_text(encoding="utf-8")))
@@ -260,6 +282,7 @@ def check() -> list[str]:
 
     findings.extend(check_levels(list(languages)))
     findings.extend(check_chapters(list(languages)))
+    findings.extend(check_guide(list(languages)))
     findings.extend(check_speakers(languages))
     findings.extend(check_world_words(languages))
     findings.extend(check_choices(languages))

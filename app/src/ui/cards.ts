@@ -55,6 +55,8 @@ export interface StartCardText {
   again?: boolean;
   /** The words for each way the level is played, when it has ways (D51). */
   ways?: string[];
+  /** Plays the screen's guide again (D68): offered on the card opened with ?. */
+  onGuide?: () => void;
 }
 
 /** A character's words on a card (D45): the name, and what they say. */
@@ -69,6 +71,18 @@ function saidBy(said: Said, id: string): HTMLElement {
     ' ',
     said.text,
   ]);
+}
+
+/** The button that plays the screen's guide again, once the card is closed. */
+function showScreen(onGuide: () => void, close: () => void): HTMLElement {
+  const button = element('button', { id: 'show-screen', type: 'button', className: 'quiet-button' }, [
+    t('level.show_screen'),
+  ]);
+  button.addEventListener('click', () => {
+    close();
+    onGuide();
+  });
+  return button;
 }
 
 /** The level's title, what its speaker says, its goals, and Start. */
@@ -105,7 +119,9 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
             ]),
           ]
         : []),
-      start,
+      text.onGuide
+        ? element('div', { className: 'card-buttons' }, [showScreen(text.onGuide, () => card.close()), start])
+        : start,
     ],
     onClose,
   );

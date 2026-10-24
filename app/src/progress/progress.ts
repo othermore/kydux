@@ -105,6 +105,17 @@ export function markStoryRead(storyId: string): void {
   });
 }
 
+/** Whether the screen's guide has been shown (D68). */
+export function guided(): boolean {
+  return store.load().guided;
+}
+
+export function markGuided(): void {
+  change((progress) => {
+    progress.guided = true;
+  });
+}
+
 export function markRead(lessonId: string): void {
   change((progress) => {
     progress.lessons[lessonId] = { ...progress.lessons[lessonId], read: true };

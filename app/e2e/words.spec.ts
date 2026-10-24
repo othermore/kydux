@@ -1,5 +1,5 @@
 import { type Browser, expect, type Page, test } from '@playwright/test';
-import { MARTA, seedWizard } from './helpers';
+import { MARTA, seedWizard, skipGuide } from './helpers';
 
 /** A page whose progress document already holds a wizard (D36). */
 async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'boy'): Promise<Page> {
@@ -11,6 +11,7 @@ async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'bo
 /** The gate won, its win card open with Nuri's words. */
 async function winTheGate(page: Page): Promise<void> {
   await page.locator('#start').click();
+  await skipGuide(page);
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await page.locator('.cm-content').click();
   await page.keyboard.insertText('wizard.move_right()');

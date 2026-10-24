@@ -7,6 +7,7 @@
 import { mkdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
+import { skipGuide } from './helpers';
 
 const SHOTS = fileURLToPath(new URL('./shots/', import.meta.url));
 
@@ -101,6 +102,10 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await expect(page.locator('#card-intro')).toContainText('Nuri');
     await shoot(page, 'start-card');
     await page.locator('#start').click();
+    // The screen's guide, the first time (D68): its first step, then skipped.
+    await expect(page.locator('.guide')).toHaveAttribute('data-step', 'scene');
+    await shoot(page, 'guide');
+    await skipGuide(page);
     await expect(page.locator('.cm-content')).toHaveText('');
     await expect(page.locator('#scene')).toHaveAttribute('data-look', 'teal');
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });

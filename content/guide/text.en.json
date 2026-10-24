@@ -1,0 +1,32 @@
+{
+  "steps": {
+    "scene": {
+      "title": "The scene",
+      "text": "This is where your program happens. You can drag the scene to look around and use the buttons to zoom."
+    },
+    "goals": {
+      "title": "Your goals",
+      "text": "These are the tasks you need to finish. A task gets a tick when it is done."
+    },
+    "editor": {
+      "title": "The editor",
+      "text": "This is where you write your program. You type one instruction on each line."
+    },
+    "run": {
+      "title": "Run and Restart",
+      "text": "To test your program, press the Run button. The Restart button puts everything back to the start."
+    },
+    "notebook": {
+      "title": "The notebook",
+      "text": "This list shows what your wizard can do. You can click an example to put it in the editor."
+    },
+    "hint": {
+      "title": "Hints and help",
+      "text": "The Hint button gives a clue when your code fails. The question mark opens this guide again."
+    },
+    "method": {
+      "title": "How we learn",
+      "text": "We try, we watch what happens and we try again. Now let us write your first instruction!"
+    }
+  }
+}

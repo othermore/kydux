@@ -1,5 +1,6 @@
 import { version } from '../package.json';
 import { type Course, conceptsAt, items, itemHash, knownApi, loadCourse, next, parseItem } from './content/course';
+import { loadGuideText } from './content/guide';
 import { LessonNotFound, loadLesson, loadStory } from './content/lessons';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
 import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
@@ -249,6 +250,8 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
         table,
         createEditor,
         startScene,
+        loadGuide: () => loadGuideText(currentLanguage()),
+        guideFirst: items(course).find((item) => item.startsWith('level:')) === `level:${id}`,
       }),
     );
   } catch (error) {

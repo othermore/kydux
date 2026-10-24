@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
+import { skipGuide } from './helpers';
 
 test.use({ locale: 'en-US' });
 
@@ -149,6 +150,7 @@ test.describe('chapter 1', () => {
     test(`${id} is won by its solution`, async ({ page }) => {
       await page.goto(`/#level/${id}`);
       await page.locator('#start').click();
+      if (id === 'the-gate') await skipGuide(page);
       await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
       await page.locator('#speed').selectOption('4');
       expect(await run(page, code)).toMatch(/^You did it/);

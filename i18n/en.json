@@ -59,6 +59,7 @@
     "go_start": "Go to the start",
     "settings": "Settings",
     "split": "Drag to resize the scene and the editor",
+    "show_screen": "Show me the screen",
     "zoom_in": "Zoom in (or the mouse wheel)",
     "zoom_out": "Zoom out (or the mouse wheel)",
     "run_key": "Run your code: Alt+R, or Ctrl+Enter in the editor",
@@ -93,6 +94,12 @@
     "wand": "the wand",
     "potion": "the potion",
     "stair": "the stair"
+  },
+  "guide": {
+    "next": "Next",
+    "skip": "Skip",
+    "done": "Let's go!",
+    "count": "{n} of {total}"
   },
   "blocked": {
     "friend": "{name} is in my way: I must walk round.",

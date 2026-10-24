@@ -1228,3 +1228,81 @@ a.stop-body:focus-visible {
   margin: 0 0 12px;
   font-weight: 600;
 }
+
+/* The screen's guide (D68): the screen dimmed but the part it shows, and a card
+   beside that part with an arrow to it. */
+.guide {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.guide-spot {
+  position: fixed;
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgb(10 12 20 / 60%);
+  outline: 3px solid #ffd43b;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.guide:has(.guide-spot[hidden]) {
+  background: rgb(10 12 20 / 60%);
+}
+
+.guide-card {
+  position: fixed;
+  width: min(320px, calc(100vw - 16px));
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--fg);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 35%);
+}
+
+.guide-card h3 {
+  margin: 0 0 6px;
+}
+
+.guide-card p {
+  margin: 0 0 12px;
+}
+
+.guide-count {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* The arrow: a square turned half round, on the card's side towards the part. */
+.guide-card::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--panel);
+  transform: rotate(45deg);
+}
+
+.guide-card.right::before {
+  left: -8px;
+  top: calc(var(--arrow, 50%) - 8px);
+}
+
+.guide-card.left::before {
+  right: -8px;
+  top: calc(var(--arrow, 50%) - 8px);
+}
+
+.guide-card.below::before {
+  top: -8px;
+  left: calc(var(--arrow, 50%) - 8px);
+}
+
+.guide-card.above::before {
+  bottom: -8px;
+  left: calc(var(--arrow, 50%) - 8px);
+}
+
+.guide-card.middle::before {
+  display: none;
+}

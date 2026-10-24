@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { skipGuide } from './helpers';
 
 test.use({ locale: 'en-US' });
 
@@ -100,6 +101,7 @@ test('a level and a lesson say their number in the chapter (D56)', async ({ page
 test('before arguments are taught, the notebook shows a move with no number (D60)', async ({ page }) => {
   await page.goto('/#level/the-gate');
   await page.locator('#start').click();
+  await skipGuide(page);
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook [data-example="wizard.move_right()"]')).toHaveCount(1);
   await expect(page.locator('#notebook')).toContainText('Walks one step to the right.');

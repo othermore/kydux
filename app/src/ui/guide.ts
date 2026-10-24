@@ -50,12 +50,20 @@ export interface Guide {
 const GAP = 16;
 const EDGE = 8;
 
-function middle(box: DOMRect): [number, number] {
+/** A box on the screen: its left and top edges and its size, as a DOMRect has them. */
+export interface Box {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+function middle(box: Box): [number, number] {
   return [box.left + box.width / 2, box.top + box.height / 2];
 }
 
 /** Where the line from a box's middle to a point outside it leaves the box. */
-function edgeToward(box: DOMRect, [x, y]: [number, number]): [number, number] {
+export function edgeToward(box: Box, [x, y]: [number, number]): [number, number] {
   const [cx, cy] = middle(box);
   const [dx, dy] = [x - cx, y - cy];
   const scale = Math.min(
@@ -63,6 +71,44 @@ function edgeToward(box: DOMRect, [x, y]: [number, number]): [number, number] {
     dy === 0 ? Infinity : box.height / 2 / Math.abs(dy),
   );
   return scale >= 1 ? [x, y] : [cx + dx * scale, cy + dy * scale];
+}
+
+export type Side = 'right' | 'left' | 'below' | 'above';
+
+/** Where a card of `size` goes beside the part `box` points at, in a window of
+ * `window` size: beside the part where there is room, above or below a part
+ * narrower than the card (a button), else to its right or left, kept within the
+ * window's edges; and how far along its side towards the part its arrow sits,
+ * level with the part's middle. */
+export function placeCard(
+  box: Box,
+  [w, h]: [number, number],
+  [width, height]: [number, number],
+): { side: Side; left: number; top: number; arrow: number } {
+  const right = box.left + box.width;
+  const bottom = box.top + box.height;
+  const centreY = Math.min(Math.max(EDGE, box.top + box.height / 2 - h / 2), height - h - EDGE);
+  const centreX = Math.min(Math.max(EDGE, box.left + box.width / 2 - w / 2), width - w - EDGE);
+  const room: Record<Side, boolean> = {
+    right: right + GAP + w + EDGE <= width,
+    left: box.left - GAP - w >= EDGE,
+    below: bottom + GAP + h + EDGE <= height,
+    above: box.top - GAP - h >= EDGE,
+  };
+  const order: Side[] = box.width < w ? ['above', 'below', 'right', 'left'] : ['right', 'left', 'below', 'above'];
+  const side = order.find((way) => room[way]) ?? 'above';
+  const corners: Record<Side, [number, number]> = {
+    right: [right + GAP, centreY],
+    left: [box.left - GAP - w, centreY],
+    below: [centreX, bottom + GAP],
+    above: [centreX, Math.max(EDGE, box.top - GAP - h)],
+  };
+  const [left, top] = corners[side];
+  const arrow =
+    side === 'right' || side === 'left'
+      ? Math.min(Math.max(16, box.top + box.height / 2 - top), h - 16)
+      : Math.min(Math.max(16, box.left + box.width / 2 - left), w - 16);
+  return { side, left, top, arrow };
 }
 
 /** Opens the guide over `root`, at its first step. */
@@ -137,36 +183,12 @@ export function openGuide(root: HTMLElement, text: GuideText, hooks: GuideHooks)
       card.style.top = `${Math.max(EDGE, (innerHeight - card.offsetHeight) / 2)}px`;
       return;
     }
-    // Beside the part where there is room, its arrow pointing back at it: above or
-    // below a part narrower than the card (a button), else to its right or left.
+    // Beside the part where there is room, its arrow pointing back at it (placeCard).
     const [w, h] = [card.offsetWidth, card.offsetHeight];
-    const centreY = Math.min(Math.max(EDGE, box.top + box.height / 2 - h / 2), innerHeight - h - EDGE);
-    const centreX = Math.min(Math.max(EDGE, box.left + box.width / 2 - w / 2), innerWidth - w - EDGE);
-    type Side = 'right' | 'left' | 'below' | 'above';
-    const room: Record<Side, boolean> = {
-      right: box.right + GAP + w + EDGE <= innerWidth,
-      left: box.left - GAP - w >= EDGE,
-      below: box.bottom + GAP + h + EDGE <= innerHeight,
-      above: box.top - GAP - h >= EDGE,
-    };
-    const order: Side[] =
-      box.width < w ? ['above', 'below', 'right', 'left'] : ['right', 'left', 'below', 'above'];
-    const side = order.find((way) => room[way]) ?? 'above';
-    const corners: Record<Side, [number, number]> = {
-      right: [box.right + GAP, centreY],
-      left: [box.left - GAP - w, centreY],
-      below: [centreX, box.bottom + GAP],
-      above: [centreX, Math.max(EDGE, box.top - GAP - h)],
-    };
-    const [x, y] = corners[side];
+    const { side, left: x, top: y, arrow: along } = placeCard(box, [w, h], [innerWidth, innerHeight]);
     card.classList.add(side);
     card.style.left = `${x}px`;
     card.style.top = `${y}px`;
-    // The arrow sits on the card's side towards the part, level with the part's middle.
-    const along =
-      side === 'right' || side === 'left'
-        ? Math.min(Math.max(16, box.top + box.height / 2 - y), h - 16)
-        : Math.min(Math.max(16, box.left + box.width / 2 - x), w - 16);
     card.style.setProperty('--arrow', `${along}px`);
     // An arrow from the card to each other part, along the line between their
     // middles, from the card's edge to the part's.

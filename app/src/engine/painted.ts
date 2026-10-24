@@ -21,6 +21,10 @@ export interface SceneArt {
   cell: number;
   size: Tile;
   ground: string;
+  /** The ground painted beyond the playable area (D83): the cells on each side
+   * (left, top, right, bottom), and the playable corner in the ground's pixels. */
+  margin?: [number, number, number, number];
+  origin?: Tile;
   rows: { row: number; image: string; top: number }[];
   things: Record<
     string,
@@ -101,10 +105,18 @@ export function preloadArt(scene: Phaser.Scene, { scene: painted, figures }: Art
   }
 }
 
-/** The painting as the ground, and its raised things by row, returned. */
+/** The cells a painted scene's ground reaches beyond the playable area on each
+ * side (D83): left, top, right, bottom; none for a scene without art. */
+export function marginOf(art: Art | null): [number, number, number, number] {
+  return art?.scene.margin ?? [0, 0, 0, 0];
+}
+
+/** The painting as the ground, with its margin round the playable area, and its
+ * raised things by row, returned. */
 export function paintScene(scene: Phaser.Scene, art: Art): Phaser.GameObjects.Image[] {
   const scale = artScale(art);
-  scene.add.image(0, 0, 'art-ground').setOrigin(0, 0).setScale(scale).setDepth(0);
+  const [x, y] = art.scene.origin ?? [0, 0];
+  scene.add.image(-x * scale, -y * scale, 'art-ground').setOrigin(0, 0).setScale(scale).setDepth(0);
   return art.scene.rows.map((row) =>
     scene.add
       .image(0, row.top * scale, `art-row-${row.row}`)

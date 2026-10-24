@@ -1,14 +1,16 @@
 // The camera on a scene bigger than its window (D69): it follows the wizard, the
 // player zooms it with the buttons and the wheel and drags it to look around, and
-// a run brings it back to the wizard.
+// a run brings it back to the wizard. The canvas takes the frame's shape, so how
+// far it zooms out is the scene's size and its painted margin's (D83) against the
+// frame: the field, painted with a margin, is zoomed on.
 
 import { expect, test } from '@playwright/test';
 
 test.use({ locale: 'en-US' });
 
 test('the camera zooms, is dragged, and comes back to the wizard on a run', async ({ page }) => {
-  // The long stairs are taller than the camera's window.
-  await page.goto('/#level/the-long-stairs');
+  // The field and its margin are larger than the camera's window, zoomed out too.
+  await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   const scene = page.locator('#scene');
@@ -41,6 +43,17 @@ test('the camera zooms, is dragged, and comes back to the wizard on a run', asyn
   await page.locator('#speed').selectOption('4');
   await page.locator('#run').click();
   await expect(scene).toHaveAttribute('data-following', 'true');
+});
+
+test('the camera never zooms out past a scene that does not fill the frame', async ({ page }) => {
+  // The long stairs are twelve rows high: in a tall frame, zoomed out a step, the
+  // window would be taller than they are, and the step is refused.
+  await page.setViewportSize({ width: 1000, height: 1000 });
+  await page.goto('/#level/the-long-stairs');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#scene')).toHaveAttribute('data-zoom', '1');
+  await expect(page.locator('#zoom-out')).toBeDisabled();
 });
 
 test('a shaky press does not let go of the wizard; Find my wizard brings the camera back (12.6)', async ({

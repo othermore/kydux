@@ -19,9 +19,12 @@
 // it, silhouette.ts) and data-debug with data-debug-layers (the tester's view and
 // its layers, debug.ts).
 //
-// The camera is a window on the scene (D69): at most VIEW_TILES of it at zoom
-// 1, the tiles at their size; it follows the wizard, the player zooms it and
-// drags it to look around, and a run or a restart brings it back to the wizard.
+// The camera is a window on the scene (D69): the canvas takes the frame's
+// shape, and at zoom 1 the window is VIEW_TILES of the scene fitted to it, more
+// of the scene the other way, never a band of the frame's colour where the scene
+// and its painted margin (D83) reach; it follows the wizard, the player zooms it
+// and drags it to look around, and a run or a restart brings it back to the
+// wizard.
 //
 // A painted scene (D76) is drawn by painted.ts: its ground and rows, its things'
 // states, the figures' sheets, the grid, the goal's mark and the sealed doors'
@@ -70,6 +73,7 @@ import {
   paintScene,
   paintThing,
   playCast,
+  marginOf,
   preloadArt,
   SHEET_ROW,
 } from './painted';
@@ -420,7 +424,9 @@ class LevelScene extends Phaser.Scene {
       this.silhouette = new Silhouette(this, this.wizard, [...this.rows, ...painted], this.still);
       this.parentNode.dataset.silhouette = 'true';
     }
-    if (debugging()) this.debug = new DebugView(this, this.map, this.parentNode, [...this.rows, ...painted]);
+    if (debugging()) {
+      this.debug = new DebugView(this, this.map, this.parentNode, [...this.rows, ...painted], marginOf(this.art));
+    }
 
     this.playback.onTick((tick, events, instant) => this.show(tick, events, instant));
     this.playback.onState((state) => {
@@ -439,15 +445,28 @@ class LevelScene extends Phaser.Scene {
    * moves it, which lets go of the wizard until the next run (D69). */
   private setUpCamera(): void {
     const camera = this.cameras.main;
-    camera.setBounds(0, 0, this.map.width * TILE, this.map.height * TILE);
+    // Over the scene and the margin painted round it (D83).
+    const [left, top, right, bottom] = marginOf(this.art);
+    camera.setBounds(
+      -left * TILE,
+      -top * TILE,
+      (this.map.width + left + right) * TILE,
+      (this.map.height + top + bottom) * TILE,
+    );
     camera.setRoundPixels(true);
+    this.applyZoom();
+    // The canvas is the frame's size: the zoom fits the window to it again, and a
+    // story's window is made again.
+    this.scale.on('resize', (size: Phaser.Structs.Size) => {
+      camera.setSize(size.width, size.height);
+      this.applyZoom();
+      if (this.options.story) this.fitWindow();
+    });
     if (this.options.story) {
       const [x, y] = centre(this.options.story.camera);
       this.spot = { x, y };
       camera.centerOn(x, y);
       this.follow();
-      // The window is made again for the scene's new size.
-      this.scale.on('resize', () => this.fitWindow());
     } else this.follow();
     this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => {
       if (dy !== 0) this.zoomBy(dy < 0 ? 1 : -1);
@@ -476,7 +495,6 @@ class LevelScene extends Phaser.Scene {
       camera.scrollX -= dx / camera.zoom;
       camera.scrollY -= dy / camera.zoom;
     });
-    this.parentNode.dataset.zoom = String(camera.zoom);
   }
 
   /** The camera back on the wizard, following it; in a story, gliding back to
@@ -542,15 +560,14 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** Whether the camera can zoom a step: never out so far that its window would
-   * reach past the scene's edges and show the frame's colour beside it. */
-
+   * reach past the scene's edges, its margin with them (D83), and show the frame's
+   * colour beside it. */
   canZoomBy(step: 1 | -1): boolean {
     const next = this.zoomStep + step;
     const zoom = ZOOMS[next];
     if (zoom === undefined) return false;
     if (step > 0) return true;
-    const camera = this.cameras.main;
-    return camera.width / zoom <= this.map.width * TILE && camera.height / zoom <= this.map.height * TILE;
+    return this.fits(zoom);
   }
 
   /** The level starting again, seen: a fade to the frame's colour, everything put
@@ -574,13 +591,40 @@ class LevelScene extends Phaser.Scene {
     });
   }
 
+  /** How far the camera is zoomed at the zoom step 1 (D69): the window, VIEW_TILES
+   * of the scene or the whole of a small one, fitted to the canvas, which takes the
+   * frame's shape; the other way the canvas shows more of the scene, so that no
+   * band of the frame's colour is left beside it. */
+  private fit(): number {
+    const { width, height } = this.scale.gameSize;
+    const shownX = Math.min(this.map.width, VIEW_TILES[0]) * TILE;
+    const shownY = Math.min(this.map.height, VIEW_TILES[1]) * TILE;
+    return Math.max(0.01, Math.min(width / shownX, height / shownY));
+  }
+
+  /** The camera at the zoom step, fitted to the canvas; data-zoom is the step's.
+   * Zoomed out further than the scene and its margin hold, at a new size of the
+   * frame, the camera steps back in, never past the step it starts at. */
+  private applyZoom(): void {
+    while (this.zoomStep < ZOOM_START && !this.fits(ZOOMS[this.zoomStep] ?? 1)) this.zoomStep += 1;
+    const step = ZOOMS[this.zoomStep] ?? 1;
+    this.cameras.main.setZoom(this.fit() * step);
+    this.parentNode.dataset.zoom = String(step);
+  }
+
+  /** Whether the window, at a zoom step, lies within the scene and its margin. */
+  private fits(step: number): boolean {
+    const camera = this.cameras.main;
+    const bounds = camera.getBounds();
+    const shown = this.fit() * step;
+    return camera.width / shown <= bounds.width + 1 && camera.height / shown <= bounds.height + 1;
+  }
+
   /** One step in or out of ZOOMS, about the camera's middle. */
   zoomBy(step: 1 | -1): boolean {
     if (!this.canZoomBy(step)) return false;
     this.zoomStep += step;
-    const zoom = ZOOMS[this.zoomStep] ?? 1;
-    this.cameras.main.setZoom(zoom);
-    this.parentNode.dataset.zoom = String(zoom);
+    this.applyZoom();
     if (this.options.story) this.fitWindow();
     return true;
   }
@@ -1191,13 +1235,13 @@ export async function startScene(
     game = new Phaser.Game({
       type: Phaser.AUTO,
       parent,
-      // The camera's window: the whole scene when it is small, VIEW_TILES of it when not.
-      width: Math.min(map.width, VIEW_TILES[0]) * TILE,
-      height: Math.min(map.height, VIEW_TILES[1]) * TILE,
+      // The canvas is the frame's size; the camera's zoom fits the window to it (fit).
+      width: parent.clientWidth || Math.min(map.width, VIEW_TILES[0]) * TILE,
+      height: parent.clientHeight || Math.min(map.height, VIEW_TILES[1]) * TILE,
       pixelArt: true,
       backgroundColor: '#1f2330',
       banner: false,
-      scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+      scale: { mode: Phaser.Scale.RESIZE },
       scene,
     });
   });

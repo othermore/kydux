@@ -67,7 +67,14 @@ A chapter's scene is one painting. Its map is read from the painting.
    lists the cells where the wizard is wholly hidden, and fails when a
    cut-out breaks one of the rules below. Run it after every export, and
    look at its sheet before anyone plays the scene.
-7. Place the levels on the new map, each starting where the one before
+7. Paint the margin, the scene going on beyond its playable area (D83):
+   say its cells in the settings (`margin`), make the canvas with
+   `tools/art/margin.py <scene> canvas`, ask Gemini to paint its border
+   (the field's prompt is `tools/art/prompts/image-first-field-margin.md`),
+   and join it with `tools/art/margin.py <scene> join <picture>`. The tool
+   says where the border does not meet the painting's edge; ask again for
+   a border that breaks there, naming what the edge cuts. Then export.
+8. Place the levels on the new map, each starting where the one before
    ended. A level's start, its mark, its things and its friend stand on
    free cells that no cut-out covers. `tests/project/test_art_content.py`
    checks both rules against the painting's cut-outs.

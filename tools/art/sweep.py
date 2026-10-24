@@ -103,6 +103,9 @@ def load(scene: str) -> Scene:
     cell = art["cell"]
     columns, rows = art["size"]
     ground = np.array(Image.open(folder / art["ground"]).convert("RGBA"))
+    # The playable part of a ground painted with a margin (D83).
+    ox, oy = art.get("origin", [0, 0])
+    ground = ground[oy : oy + rows * cell, ox : ox + columns * cell]
     found = Scene(scene, cell, columns, rows, walks(scene), ground)
     if (scene_settings.SCENES / scene / "cut.json").is_file():
         found.thresholds = scene_settings.settings(scene).thresholds

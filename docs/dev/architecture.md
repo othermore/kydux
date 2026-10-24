@@ -985,11 +985,14 @@ one overturns stays, marked as superseded.
   to the same steps in every language.
 - **D69 — The camera: a window on the scene.** Decided 2026-10-22 by the
   owner's UAT (sprint-11.md), built the same day. The scene is drawn whole;
-  the canvas is at most `VIEW_TILES` (15 by 9) at zoom 1, the tiles at
-  their size, and the camera, bounded by the scene, follows the wizard.
-  The player zooms with *+* and *−* over the scene or the mouse wheel,
-  through `ZOOMS` (0.5 to 2), never out so far that the window would reach
-  past the scene's edges, and drags the scene to look around, which
+  the canvas takes the frame's size and shape, and at zoom 1 the camera
+  fits `VIEW_TILES` (15 by 9, or the whole of a smaller scene) to it, so
+  that the frame's other way shows more of the scene, never a band of the
+  frame's colour; the camera, bounded by the scene and its painted margin
+  (D83), follows the wizard. The player zooms with *+* and *−* over the
+  scene or the mouse wheel, through `ZOOMS` (0.5 to 2), never out so far
+  that the window would reach past those bounds, and drags the scene to
+  look around, which
   lets go of the wizard; a run or a restart brings the camera back to it.
   The scene publishes `data-zoom` and `data-following` for the tests; the
   world's coordinates, which the tests read, do not change with the camera.
@@ -1202,3 +1205,27 @@ one overturns stays, marked as superseded.
   `sweep.py <scene>` take the scene's id, and the art tests run over
   every scene that has settings and is exported. Rules out a scene cut by
   editing the tools.
+- **D83 — A scene is painted with a margin.** Decided 2026-10-24 by the
+  owner (sprint 14, 14.2). The painting goes on beyond the playable area,
+  three cells on each side and two above and below on the field, with
+  what no one enters (the castle going up, woods and rocks at the sides,
+  trees and a fence at the bottom), so that the camera zoomed out, or a
+  frame of another shape, shows painting to its edges. The world's map
+  and every level's and story's coordinates are those of the playable
+  area: the margin is the art's alone. `tools/art/margin.py` makes it: a
+  canvas with the painting in the middle and its edge stretched and
+  blurred round it, which Gemini paints the border of; then the model's
+  picture laid on the canvas by the least difference, the seam measured
+  cell by cell along the edge, and the scene's own painting kept inside,
+  pixel for pixel, joined to the border by a short fade. Nothing of the
+  margin rises into the playable area, so the margin is ground, drawn
+  under everything and never cut: `ground.webp` holds it, `art.json` says
+  its cells (`margin`, left, top, right, bottom) and the playable
+  corner's place in the ground (`origin`), and the page draws the ground
+  there and bounds the camera over it. The debug view numbers the
+  margin's cells below zero and crosses them out. A border whose seam the
+  tool says is bad is asked for again with what the edge cuts named in
+  the prompt, or sketched into the canvas for the model to keep. Rules
+  out a map grown to hold the margin, which would move every coordinate,
+  and the model's copy of the inside, which the cut and the edits do not
+  line up with.

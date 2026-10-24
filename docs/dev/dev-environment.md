@@ -570,6 +570,20 @@ problem. Look at the pictures before committing: every figure should be
 hidden by what stands in front of it and drawn over what stands behind
 it. `export_scene.py the-field check` checks again without cutting.
 
+A scene is painted beyond its playable area too, so that zooming out
+never shows the frame's colour. The margin is painted by Gemini on a
+canvas made from the scene's painting, then joined to it:
+
+```sh
+.venv/bin/python tools/art/margin.py the-field canvas
+.venv/bin/python tools/art/generate.py tools/art/prompts/image-first-field-margin.md
+.venv/bin/python tools/art/margin.py the-field join art/raw/game-field-margin/image-first-field-margin.png
+```
+
+The last command says where the painted border does not meet the
+scene's edge. If it names a stretch, ask again with that stretch named in
+the prompt. Then export the scene again.
+
 The figures are no scene's, and are made apart:
 
 ```sh

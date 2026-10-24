@@ -363,7 +363,8 @@
       "steps": "Steps",
       "bank": "Bank",
       "stone": "Stone",
-      "other": "Other"
+      "other": "Other",
+      "margin": "Margin, painted beyond the scene"
     }
   }
 }

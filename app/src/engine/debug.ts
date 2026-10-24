@@ -31,6 +31,7 @@ const KIND_COLOURS: Record<string, number> = {
   steps: 0xf4f4f4,
   bank: 0xa0703c,
   stone: 0x6fa8ff,
+  margin: 0x4a3f5c,
 };
 const OTHER = 0xff66cc;
 
@@ -85,6 +86,9 @@ export class DebugView {
     private readonly map: Layout,
     private readonly parent: HTMLElement,
     painted: Phaser.GameObjects.Image[],
+    /** The cells painted beyond the playable area on each side (D83): left, top,
+     * right, bottom. */
+    private readonly margin: [number, number, number, number] = [0, 0, 0, 0],
   ) {
     this.cells = this.drawCells();
     for (const source of painted) this.masks.push({ source, mask: this.maskOf(source) });
@@ -98,14 +102,29 @@ export class DebugView {
     parent.dataset.debug = 'true';
   }
 
-  /** Each cell tinted by its kind, and crossed out when no one walks on it. */
+  /** The cells drawn on, the margin's with them: the first column and row, and
+   * the last ones past the end. */
+  private get extent(): { x0: number; y0: number; x1: number; y1: number } {
+    const [left, top, right, bottom] = this.margin;
+    return { x0: -left, y0: -top, x1: this.map.width + right, y1: this.map.height + bottom };
+  }
+
+  /** The kind of a cell, `margin` past the playable area. */
+  private kindAt(x: number, y: number): string {
+    if (x < 0 || y < 0 || x >= this.map.width || y >= this.map.height) return 'margin';
+    return this.map.terrain[y]?.[x] ?? '';
+  }
+
+  /** Each cell tinted by its kind, and crossed out when no one walks on it: the
+   * margin's cells, painted beyond the playable area, are never walked on. */
   private drawCells(): Phaser.GameObjects.Graphics {
     const cells = this.scene.add.graphics().setDepth(DEPTH);
-    for (let y = 0; y < this.map.height; y += 1) {
-      for (let x = 0; x < this.map.width; x += 1) {
-        const kind = this.map.terrain[y]?.[x] ?? '';
+    const { x0, y0, x1, y1 } = this.extent;
+    for (let y = y0; y < y1; y += 1) {
+      for (let x = x0; x < x1; x += 1) {
+        const kind = this.kindAt(x, y);
         cells.fillStyle(KIND_COLOURS[kind] ?? OTHER, 0.38).fillRect(x * TILE, y * TILE, TILE, TILE);
-        const char = this.map.rows[y]?.[x] ?? '#';
+        const char = kind === 'margin' ? '#' : (this.map.rows[y]?.[x] ?? '#');
         if (char === '#' || char === '=') {
           cells.lineStyle(2, 0xff2a2a, 0.75);
           cells.lineBetween(x * TILE + 6, y * TILE + 6, (x + 1) * TILE - 6, (y + 1) * TILE - 6);
@@ -114,8 +133,8 @@ export class DebugView {
       }
     }
     cells.lineStyle(1, 0xffffff, 0.45);
-    for (let x = 0; x <= this.map.width; x += 1) cells.lineBetween(x * TILE, 0, x * TILE, this.map.height * TILE);
-    for (let y = 0; y <= this.map.height; y += 1) cells.lineBetween(0, y * TILE, this.map.width * TILE, y * TILE);
+    for (let x = x0; x <= x1; x += 1) cells.lineBetween(x * TILE, y0 * TILE, x * TILE, y1 * TILE);
+    for (let y = y0; y <= y1; y += 1) cells.lineBetween(x0 * TILE, y * TILE, x1 * TILE, y * TILE);
     return cells;
   }
 
@@ -161,6 +180,7 @@ export class DebugView {
     const legend = document.createElement('div');
     legend.className = 'debug-legend';
     const kinds = new Set(this.map.terrain.flat());
+    if (this.margin.some((cells) => cells > 0)) kinds.add('margin');
     const entry = (colour: string, words: string, crossed = false) => {
       const item = document.createElement('span');
       const swatch = document.createElement('span');
@@ -229,8 +249,9 @@ export class DebugView {
     context.lineWidth = Math.max(2, 2.5 * ratio);
     context.strokeStyle = '#000000';
     context.fillStyle = '#fff36b';
-    const first = [Math.max(0, Math.floor(view.x / TILE)), Math.max(0, Math.floor(view.y / TILE))];
-    const last = [Math.min(this.map.width, Math.ceil(view.right / TILE)), Math.min(this.map.height, Math.ceil(view.bottom / TILE))];
+    const { x0, y0, x1, y1 } = this.extent;
+    const first = [Math.max(x0, Math.floor(view.x / TILE)), Math.max(y0, Math.floor(view.y / TILE))];
+    const last = [Math.min(x1, Math.ceil(view.right / TILE)), Math.min(y1, Math.ceil(view.bottom / TILE))];
     for (let y = first[1] ?? 0; y < (last[1] ?? 0); y += 1) {
       for (let x = first[0] ?? 0; x < (last[0] ?? 0); x += 1) {
         const left = (x * TILE - view.x) * scale + 2 * scale;

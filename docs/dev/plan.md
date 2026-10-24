@@ -477,8 +477,10 @@ so that the figures pass behind and in front of them (D76).
     for the trials; `tools/sound/generate.py` with Lyria; the effects made
     in the page (`sfx.ts`) with a mute in the settings.
 4.3 **The chapters' scenes painted and placed:** chapter 1's field in the
-    game (sprint 12, 12.8); chapters 2 and 3's library and passages painted,
-    mapped, their levels placed on them and their texts written again.
+    game (sprint 12, 12.8), with its margin (sprint 14, D83) and its
+    settings (D82); chapters 2 and 3's library and passages painted with
+    their margins, mapped, their levels placed on them and their texts
+    written again.
 4.4 **The masks made right:** every raised thing cut by its outline, no
     shadow below its row, what opens or is picked up cut against an edit
     without it, checked with a figure behind and in front of every row.

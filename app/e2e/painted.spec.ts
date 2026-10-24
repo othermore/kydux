@@ -22,6 +22,12 @@ test('chapter 1 plays on the painted field', async ({ page }) => {
   await page.locator('#speed').selectOption('2');
   await page.waitForTimeout(500);
   await page.screenshot({ path: `${SHOTS}01-password.png` });
+  // Zoomed out, the field's painted margin fills the frame to its edges (D83).
+  await page.locator('#zoom-out').click();
+  await expect(page.locator('#scene')).toHaveAttribute('data-zoom', '0.75');
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: `${SHOTS}12-zoomed-out.png` });
+  await page.locator('#zoom-in').click();
   // Where something painted hides the wizard, its outline shows over it.
   await expect(page.locator('#scene')).toHaveAttribute('data-silhouette', 'true');
   await page.locator('.cm-content').click();

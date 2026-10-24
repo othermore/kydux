@@ -13,5 +13,8 @@ later, like the rest of it.
   `game-field-castle-open.md`, `game-field-nowand.md`), the gate half open
   (`game-field-gate-ajar.md`) and the castle's hall lit behind its open door
   (`game-field-castle-lit.md`).
+- Painted on beyond its playable area by Gemini 3 Pro Image, from
+  `image-first-field-margin.md`, and joined to the painting by
+  `tools/art/margin.py`, the painting kept inside pixel for pixel.
 - Its cells marked by hand, cut by `tools/art/image_first.py` and exported by
   `tools/art/export_scene.py`.

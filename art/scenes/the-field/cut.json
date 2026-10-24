@@ -91,6 +91,18 @@
       1174
     ]
   ],
+  "margin": {
+    "about": "The painting gone on beyond the playable area (D83), three cells on each side and two above and below: painted by Gemini 3 Pro Image round the painting from tools/art/prompts/image-first-field-margin.md, on a canvas made by tools/art/margin.py with the lower right corner's bush sketched in from an earlier try so that the model kept it, and joined by tools/art/margin.py.",
+    "cells": [
+      3,
+      2,
+      3,
+      2
+    ],
+    "canvas": "art/raw/game-field-margin/field-margin-canvas.png",
+    "painting": "art/raw/game-field-margin/field-margin.png",
+    "grid": "art/raw/game-field-margin/field-margin-grid.json"
+  },
   "thresholds": {
     "grass": {
       "hue": [
@@ -124,5 +136,5 @@
       "darker": 0.93
     }
   },
-  "source": "# The field before the school's gate\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`), from\n  `tools/art/prompts/image-first-field.md`, with the style-B sketch as its\n  reference, then edited by it without its grid\n  (`image-first-field-nogrid.md`), with the ground alone\n  (`image-first-field-ground.md`, `image-first-field-ground-2.md`), and with\n  each thing that opens or is picked up changed (`game-field-nogate.md`,\n  `game-field-gate-open.md`, `game-field-noseal.md`,\n  `game-field-castle-open.md`, `game-field-nowand.md`), the gate half open\n  (`game-field-gate-ajar.md`) and the castle's hall lit behind its open door\n  (`game-field-castle-lit.md`).\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n"
+  "source": "# The field before the school's gate\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`), from\n  `tools/art/prompts/image-first-field.md`, with the style-B sketch as its\n  reference, then edited by it without its grid\n  (`image-first-field-nogrid.md`), with the ground alone\n  (`image-first-field-ground.md`, `image-first-field-ground-2.md`), and with\n  each thing that opens or is picked up changed (`game-field-nogate.md`,\n  `game-field-gate-open.md`, `game-field-noseal.md`,\n  `game-field-castle-open.md`, `game-field-nowand.md`), the gate half open\n  (`game-field-gate-ajar.md`) and the castle's hall lit behind its open door\n  (`game-field-castle-lit.md`).\n- Painted on beyond its playable area by Gemini 3 Pro Image, from\n  `image-first-field-margin.md`, and joined to the painting by\n  `tools/art/margin.py`, the painting kept inside pixel for pixel.\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n"
 }

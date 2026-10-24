@@ -5,6 +5,16 @@
     30
   ],
   "ground": "ground.webp",
+  "margin": [
+    3,
+    2,
+    3,
+    2
+  ],
+  "origin": [
+    288,
+    192
+  ],
   "rows": [
     {
       "row": 6,

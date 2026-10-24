@@ -262,6 +262,28 @@ def patched(floor: Image.Image, patches: list[tuple[int, int, int, int]]) -> Ima
     return Image.fromarray(pixels)
 
 
+#: How wide, in the page's pixels, the playable ground fades into the margin's.
+MARGIN_FADE = 20
+
+
+def with_margin(floor: Image.Image, margin: dict) -> Image.Image:
+    """The ground with the margin round it (D83): the margin painting, joined to the
+    scene's painting by tools/art/margin.py, brought onto the page's grid, and the
+    playable ground laid in it at the margin's cells, faded in over its edge."""
+    left, top, right, bottom = margin["cells"]
+    grid = json.loads((REPO / margin["grid"]).read_text())
+    columns, rows = floor.width // CELL, floor.height // CELL
+    painting = Image.open(REPO / margin["painting"])
+    out = image_first.aligned(painting, grid, columns + left + right, rows + top + bottom, CELL)
+    yy, xx = np.arange(floor.height)[:, None], np.arange(floor.width)[None, :]
+    edge = np.minimum(
+        np.minimum(yy, floor.height - 1 - yy), np.minimum(xx, floor.width - 1 - xx)
+    ).astype(np.float32)
+    alpha = Image.fromarray((np.clip(edge / MARGIN_FADE, 0, 1) * 255).astype(np.uint8))
+    out.paste(floor.convert("RGB"), (left * CELL, top * CELL), alpha)
+    return out
+
+
 def scene(settings: Settings) -> Path:
     grid = settings.grid
     marks = settings.marks()
@@ -304,6 +326,9 @@ def scene(settings: Settings) -> Path:
     width = columns * CELL
     floor = image_first.aligned(Image.fromarray(ground), grid, columns, rows, CELL)
     floor = patched(floor, settings.patches)
+    margin = settings.data.get("margin")
+    if margin:
+        floor = with_margin(floor, margin)
     webp(floor, out / "ground.webp")
     rows_out = []
     for layer in field["layers"]:
@@ -361,6 +386,16 @@ def scene(settings: Settings) -> Path:
         "cell": CELL,
         "size": [columns, rows],
         "ground": "ground.webp",
+        # The ground reaches past the playable area by the margin's cells, its
+        # playable corner at `origin` in its own pixels (D83).
+        **(
+            {
+                "margin": margin["cells"],
+                "origin": [margin["cells"][0] * CELL, margin["cells"][1] * CELL],
+            }
+            if margin
+            else {}
+        ),
         "rows": rows_out,
         "things": things,
         "source": "SOURCE.md",
@@ -511,6 +546,10 @@ def draw(
     fig = json.loads((figures_folder / "figures.json").read_text())
     cell = art["cell"]
     picture = Image.open(folder / art["ground"]).convert("RGBA")
+    # The playable part of a ground painted with a margin (D83).
+    ox, oy = art.get("origin", [0, 0])
+    columns, rows = art["size"]
+    picture = picture.crop((ox, oy, ox + columns * cell, oy + rows * cell))
     width, height = fig["frame"]
     sheets = {
         name: Image.open(figures_folder / f"{name}.webp").convert("RGBA")

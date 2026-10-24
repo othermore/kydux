@@ -363,7 +363,8 @@
       "steps": "Escalones",
       "bank": "Ribera",
       "stone": "Piedra",
-      "other": "Otro"
+      "other": "Otro",
+      "margin": "Margen, pintado fuera de la escena"
     }
   }
 }

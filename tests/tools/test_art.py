@@ -458,7 +458,10 @@ def test_an_exported_scene_keeps_its_contract_and_nothing_reaches_below_its_row(
     art = json.loads((folder / "art.json").read_text())
     cell, (columns, rows) = art["cell"], art["size"]
     ground = Image.open(folder / art["ground"])
-    assert ground.size == (columns * cell, rows * cell)
+    # The ground holds the playable area and the margin round it, if any (D83).
+    left, top, right, bottom = art.get("margin", [0, 0, 0, 0])
+    assert ground.size == ((columns + left + right) * cell, (rows + top + bottom) * cell)
+    assert art.get("origin", [0, 0]) == [left * cell, top * cell]
     for layer in art["rows"]:
         image = Image.open(folder / layer["image"])
         # The full width, from its top down to its row's bottom edge and no lower.

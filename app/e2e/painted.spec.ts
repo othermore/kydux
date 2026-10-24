@@ -33,14 +33,14 @@ test('chapter 1 plays on the painted field', async ({ page }) => {
   await page.screenshot({ path: `${SHOTS}03-won.png` });
 });
 
-test('a figure behind a tree is hidden by it; the castle door opens onto the dark', async ({ page }) => {
+test('the castle door opens onto the dark', async ({ page }) => {
   await seedWizard(page);
   await page.goto('/#level/the-way-in');
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await page.locator('#speed').selectOption('2');
   await page.locator('.cm-content').click();
-  await page.keyboard.insertText('wizard.move_up(3)\nwizard.say("ambrel")\nwizard.cast("zelim")\nwizard.move_up()');
+  await page.keyboard.insertText('wizard.move_up(2)\nwizard.say("ambrel")\nwizard.cast("zelim")\nwizard.move_up()');
   await page.locator('#run').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-doors', /castle_door/, { timeout: 30_000 });
   await page.waitForTimeout(600);
@@ -53,7 +53,7 @@ test('the story at the gate is told on the field', async ({ page }) => {
   await page.goto('/#story/at-the-gate');
   await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done');
   await storyNext(page, 3);
-  await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'friend:9,20,up');
+  await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'friend:8,21,up');
   await page.waitForTimeout(400);
   await page.screenshot({ path: `${SHOTS}05-at-the-gate.png` });
 });

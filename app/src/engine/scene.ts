@@ -146,6 +146,16 @@ function centre([x, y]: Tile): [number, number] {
   return [x * TILE + TILE / 2, y * TILE + TILE / 2];
 }
 
+/** A colour part of the way, t from 0 to 1, from one colour to another. */
+function mix(from: number, to: number, t: number): number {
+  const channel = (shift: number) => {
+    const a = (from >> shift) & 0xff;
+    const b = (to >> shift) & 0xff;
+    return Math.round(a + (b - a) * t) << shift;
+  };
+  return channel(16) | channel(8) | channel(0);
+}
+
 function isFacing(value: unknown): value is Facing {
   return typeof value === 'string' && (FACINGS as readonly string[]).includes(value);
 }
@@ -169,6 +179,8 @@ class LevelScene extends Phaser.Scene {
   private things = new Map<string, Phaser.GameObjects.Image>();
   private doors = new Map<string, Tile>();
   private openDoors = new Set<string>();
+  /** The glow over each sealed door while its seal holds (D79). */
+  private glows = new Map<string, Phaser.GameObjects.Ellipse>();
   private carried = new Set<string>();
   private actors = new Map<string, ActorState>();
   private cone!: Phaser.GameObjects.Graphics;
@@ -294,6 +306,60 @@ class LevelScene extends Phaser.Scene {
     else image.setFrame(open ? 'open' : lock);
   }
 
+  /** Whether the player asks for less motion: the pulses then stand still. */
+  private get still(): boolean {
+    return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  }
+
+  /** The goal's mark on a painted scene (D79): a bright ring with a soft disc in it,
+   * pulsing slowly, over the ground and under what stands in front. */
+  private drawMark(tile: Tile): void {
+    const [x, y] = centre(tile);
+    const disc = this.add.circle(0, 0, TILE * 0.32, 0xffe066, 0.35);
+    const ring = this.add.circle(0, 0, TILE * 0.36).setStrokeStyle(3, 0xffc61a, 1);
+    const mark = this.add.container(x, y, [disc, ring]).setDepth(2.9);
+    if (!this.still) {
+      this.tweens.add({ targets: mark, scale: 1.18, alpha: 0.7, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      // Its colour beats too, from gold to a warm white and back, slower than its size.
+      this.tweens.addCounter({
+        from: 0,
+        to: 1,
+        duration: 900,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+        onUpdate: (tween) => {
+          const t = tween.getValue() ?? 0;
+          disc.setFillStyle(mix(0xffe066, 0xfff6d8, t), 0.35 + 0.2 * t);
+          ring.setStrokeStyle(3, mix(0xffc61a, 0xff8a1a, t), 1);
+        },
+      });
+    }
+  }
+
+  /** A glow over a sealed door, pulsing while the seal holds (D79). */
+  private addGlow(id: string, tile: Tile): void {
+    const painted = this.art?.scene.things[id];
+    const image = this.things.get(id);
+    const [x, y] =
+      painted && image
+        ? [image.x + (image.displayWidth || TILE) / 2, image.y + (image.displayHeight || TILE) / 2]
+        : centre(tile);
+    const glow = this.add
+      .ellipse(x, y, TILE * 0.9, TILE * 1.1, 0x6fd6ff, 0.35)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth((image?.depth ?? 3) + 0.0005);
+    if (!this.still) {
+      this.tweens.add({ targets: glow, alpha: 0.75, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    }
+    this.glows.set(id, glow);
+  }
+
+  /** A seal broken: its glow goes. */
+  private unseal(id: string): void {
+    this.glows.get(id)?.setVisible(false);
+  }
+
   /** The pencil grid over a painted scene, for counting steps (D76): thin lines a
    * little crooked, as drawn by hand, the same every time, breathing slowly. */
   private drawGrid(): void {
@@ -361,9 +427,12 @@ class LevelScene extends Phaser.Scene {
       if (tileset) tilemap.createLayer(0, tileset, 0, 0);
     }
     for (const [letter, tile] of this.map.markers) {
-      // A marker, like the way out, shows in the dark: it is the castle's shape.
-      this.add.image(...centre(tile), markerKey(letter)).setDepth(2.8);
+      // A marker, like the way out, shows in the dark: it is the castle's shape. On a
+      // painted scene the goal's mark is a ring that pulses, over the ground (D79).
+      if (this.art) this.drawMark(tile);
+      else this.add.image(...centre(tile), markerKey(letter)).setDepth(2.8);
     }
+    this.parentNode.dataset.marks = this.map.markers.map(([, tile]) => tile.join(',')).join(';');
     for (const prop of this.map.props) {
       // A painted scene has its props in the painting.
       if (!this.art && this.textures.exists(propKey(prop.kind))) {
@@ -397,6 +466,9 @@ class LevelScene extends Phaser.Scene {
       const shape = thing.kind === 'door' || thing.kind === 'stair';
       this.things.set(thing.id, image.setDepth(shape ? 2.8 : 2));
       if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
+    }
+    for (const thing of this.map.things) {
+      if (thing.kind === 'door' && thing.lock === 'spell') this.addGlow(thing.id, thing.tile);
     }
     for (const actor of this.map.actors) {
       const key = actor.kind === 'friend' ? friendKey(actor.id) : actorKey(actor.kind);
@@ -552,6 +624,7 @@ class LevelScene extends Phaser.Scene {
       else image.setPosition(...centre(thing.tile));
       image.setVisible(true).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
+      this.glows.get(thing.id)?.setVisible(!thing.open);
       if (thing.open) this.openDoors.add(thing.id);
     }
     for (const actor of this.map.actors) {
@@ -592,6 +665,7 @@ class LevelScene extends Phaser.Scene {
       // A door opened by a spell or a word is the door's own event (D43); so is a
       // thing a spell pulls (D47).
       else if (event.kind === 'open') this.openDoor(String(event.data.id), instant, event.data.by === 'word');
+      else if (event.kind === 'unsealed') this.unseal(String(event.data.id));
       else if (event.kind === 'pull') this.pull(event, instant);
       else if (event.kind === 'light') this.lit = true;
       else if (event.kind === 'hold') this.hold(event);
@@ -650,6 +724,7 @@ class LevelScene extends Phaser.Scene {
    * the word is said, so that the child sees the word, then the door. */
   private openDoor(id: string, instant = true, byWord = false): void {
     this.openDoors.add(id);
+    this.unseal(id);
     if (!instant) play('door');
     const lock = this.map.things.find((thing) => thing.id === id)?.lock ?? 'none';
     if (instant || !byWord) {
@@ -878,6 +953,7 @@ class LevelScene extends Phaser.Scene {
       .map(([id, a]) => `${id}:${a.tile.join(',')},${a.facing}`)
       .join(';');
     dataset.doors = [...this.openDoors].sort().join(',');
+    dataset.glowing = [...this.glows].filter(([, glow]) => glow.visible).map(([id]) => id).sort().join(',');
     dataset.carried = [...this.carried].sort().join(',');
   }
 

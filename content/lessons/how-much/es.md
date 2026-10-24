@@ -17,5 +17,5 @@ Cada método tiene sus propios argumentos, que significan sus propias cosas, o a
 Vamos a usar un argumento para caminar más lejos con una sola instrucción. ¡Pon un número dentro de los paréntesis para decir cuántos pasos dar!
 
 ```python try
-wizard.move_left(3)
+wizard.move_right(3)
 ```

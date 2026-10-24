@@ -14,12 +14,12 @@ test('a step, a bump and a win each have their sound', async ({ page }) => {
   const scene = page.locator('#scene');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
-  await page.keyboard.insertText('wizard.move_right()');
+  await page.keyboard.insertText('wizard.move_up()');
   await page.locator('#run').click();
   await expect(scene).toHaveAttribute('data-sound', 'fail', { timeout: 30_000 });
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
-  await page.keyboard.insertText('wizard.move_left(6)');
+  await page.keyboard.insertText('wizard.move_right(8)');
   await page.locator('#run').click();
   await expect(scene).toHaveAttribute('data-sound', 'win', { timeout: 30_000 });
 });

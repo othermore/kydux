@@ -3,12 +3,12 @@
   "opening": true,
   "scene": "the-field",
   "wizard": [
-    7,
-    28
+    8,
+    29
   ],
   "camera": [
     8,
-    22
+    24
   ],
   "actors": [],
   "steps": [
@@ -24,7 +24,7 @@
       "who": "voice",
       "do": {
         "walk": [
-          7,
+          8,
           20
         ]
       },
@@ -33,7 +33,10 @@
     {
       "who": "voice",
       "do": {
-        "face": "right"
+        "walk": [
+          7,
+          20
+        ]
       },
       "by": "wizard"
     },

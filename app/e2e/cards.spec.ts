@@ -77,10 +77,10 @@ test('the stars say why: a hint and a bump each cost one (D57)', async ({ page }
   await page.locator('#start').click();
   await ready(page);
   await page.locator('#speed').selectOption('4');
-  await run(page, 'wizard.move_down()');
+  await run(page, 'wizard.move_up()');
   await page.locator('#hint').click();
-  // Into Nuri, who stands below: a bump; then the long walk, in two lines.
-  await run(page, 'wizard.move_down()\nwizard.move_left(6)');
+  // Into the friend, who stands above: a bump; then the long walk, in two lines.
+  await run(page, 'wizard.move_up()\nwizard.move_right(8)');
   const win = page.locator('.win-card');
   await expect(win.locator('.stars')).toHaveAttribute('data-stars', '1');
   await expect(win.locator('#star-reasons li')).toHaveText([

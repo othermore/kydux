@@ -31,15 +31,15 @@ test('Python that cannot start says so, with a way to reload', async ({ page }) 
 test('a Run during the playback starts the new run from the start', async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
-  await setCode(page, 'wizard.move_left(6)');
+  await setCode(page, 'wizard.move_right(8)');
   await page.locator('#run').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-tick', '2', { timeout: 10_000 });
-  await setCode(page, 'wizard.move_left(2)');
+  await setCode(page, 'wizard.move_right(2)');
   await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText('Not yet: 0 of 1 goals met. Try again.', {
     timeout: 30_000,
   });
-  await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '7,24');
+  await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '6,25');
 });
 
 test('without isolation, a loop that never ends is stopped by starting Python again', async ({
@@ -61,7 +61,7 @@ test('without isolation, a loop that never ends is stopped by starting Python ag
   await expect(page.locator('#status')).toHaveText('Starting Python again…');
   await expect(page.locator('#run')).toBeDisabled();
   await expect(page.locator('#run')).toBeEnabled({ timeout: 60_000 });
-  await setCode(page, 'wizard.move_left(6)');
+  await setCode(page, 'wizard.move_right(8)');
   await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText('You did it, apprentice!', { timeout: 30_000 });
 });
@@ -89,7 +89,7 @@ test('the page may reach no other server, and the game still runs', async ({ pag
       }),
   );
   expect(blocked).toBe('connect-src');
-  await setCode(page, 'wizard.move_left(6)');
+  await setCode(page, 'wizard.move_right(8)');
   await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText('You did it, apprentice!', { timeout: 30_000 });
 });

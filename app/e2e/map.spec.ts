@@ -35,7 +35,7 @@ test('a won level is done with its stars, and opens the next stop', async ({ pag
   await page.locator('#speed').selectOption('4');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
-  await page.keyboard.insertText('wizard.move_left(6)');
+  await page.keyboard.insertText('wizard.move_right(8)');
   await page.locator('#run').click();
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
   await page.locator('#level-map').click();
@@ -62,7 +62,7 @@ test('from a level, the map opens over it, says where you are, and closes back t
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
-  await page.keyboard.insertText('wizard.move_left(2)');
+  await page.keyboard.insertText('wizard.move_right(2)');
 
   await page.locator('#level-map').click();
   const overlay = page.locator('#map-overlay');
@@ -73,7 +73,7 @@ test('from a level, the map opens over it, says where you are, and closes back t
   await expect(here).toContainText('You are here');
   await page.locator('#map-close').click();
   await expect(overlay).toHaveCount(0);
-  await expect(page.locator('.cm-content')).toHaveText('wizard.move_left(2)');
+  await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(2)');
 
   // A stop chosen on the map is gone to.
   await page.locator('#level-map').click();

@@ -5,7 +5,7 @@
     "No choques contra nada.",
     "En menos de 3 líneas."
   ],
-  "starting_code": "# El programa llega, pero choca. ¡Mejóralo!\nwizard.move_right(7)\nwizard.move_up(5)\n",
+  "starting_code": "# El programa llega, pero choca. ¡Mejóralo!\nwizard.move_left(4)\nwizard.move_up(6)\n",
   "hints": [
     "Cuenta el número exacto de pasos que necesitas dar a la derecha y hacia arriba.",
     "Los números dentro de los paréntesis son un poco grandes.",

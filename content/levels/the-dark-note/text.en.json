@@ -3,7 +3,7 @@
   "goals": [
     "Reach the spot."
   ],
-  "starting_code": "# Find the wrong move and fix it!\nwizard.move_right()\nwizard.move_down()\nwizard.move_down()\n",
+  "starting_code": "# Find the wrong move and fix it!\nwizard.move_up()\nwizard.move_left()\nwizard.move_down()\nwizard.move_down()\n",
   "hints": [
     "Look at the first line below the comment.",
     "If you move right first, your wizard will walk into the fence. Which way should you go instead?",

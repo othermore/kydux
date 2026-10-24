@@ -3,7 +3,7 @@
   "goals": [
     "Llega a la marca."
   ],
-  "starting_code": "# ¡Encuentra el movimiento equivocado y arréglalo!\nwizard.move_right()\nwizard.move_down()\nwizard.move_down()\n",
+  "starting_code": "# ¡Encuentra el movimiento equivocado y arréglalo!\nwizard.move_up()\nwizard.move_left()\nwizard.move_down()\nwizard.move_down()\n",
   "hints": [
     "Mira la primera línea debajo del comentario.",
     "Si te mueves a la derecha primero, tu {mago|maga} chocará con la valla. ¿Hacia dónde deberías ir en su lugar?",

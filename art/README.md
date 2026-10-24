@@ -22,9 +22,15 @@ tall.
 ## The grid
 
 The world is a grid of square cells, and everything stands on it. A path,
-a wall or a fence follows the cells' edges. The game draws a thin pencil
-grid over the ground, so that a child can count steps. A painting must
-still read well under it.
+a wall or a fence follows the cells' edges, and a path runs along the rows
+and the columns. A thing fits one cell where it can: a rock, a stone, a
+bush. A tree's trunk stands on one cell, and its crown may spread over the
+cells above it. The game draws a thin pencil grid over the ground, so that
+a child can count steps. A painting must still read well under it.
+
+The game draws over the painting what changes with the play: the goal's
+mark, a round ring that beats in size and colour, and the glow of a
+sealed door's rune while the seal holds. Neither is painted.
 
 ## How a scene is made
 
@@ -37,8 +43,9 @@ A chapter's scene is one painting. Its map is read from the painting.
 2. Ask for the painting with a faint grid of square cells over it. Paint
    again rather than force a picture that misses a requirement.
 3. Mark each cell from the painting with `tools/art/map_from_image.py`:
-   walked on or not, seen through or not, and its kind. This gives the
-   scene's `map.txt` and `scene.json`.
+   walked on or not, seen through or not, and its kind. Every cell a
+   tree, a rock, a fence or a stone stands on is marked as not walked on.
+   This gives the scene's `map.txt` and `scene.json`.
 4. Ask Gemini for an edit of the painting without each thing that opens
    or is picked up, one thing an edit. The edits must line up with the
    painting pixel for pixel.
@@ -46,7 +53,9 @@ A chapter's scene is one painting. Its map is read from the painting.
    `content/art/scenes/<scene>/` and the check pictures into
    `art/raw/game-check/`.
 6. Place the levels on the new map, each starting where the one before
-   ended.
+   ended. A level's start, its mark, its things and its friend stand on
+   free cells that no cut-out covers. `tests/project/test_art_content.py`
+   checks both rules against the painting's cut-outs.
 
 ## The rules for the cut-outs
 

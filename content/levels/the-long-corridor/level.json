@@ -3,12 +3,12 @@
   "kind": "practice",
   "scene": "the-field",
   "start": [
-    9,
-    24
+    4,
+    25
   ],
   "end": [
-    3,
-    24
+    12,
+    25
   ],
   "speaker": "friend",
   "things": [],
@@ -17,8 +17,8 @@
       "kind": "friend",
       "id": "friend",
       "at": [
-        9,
-        25
+        4,
+        24
       ]
     }
   ],

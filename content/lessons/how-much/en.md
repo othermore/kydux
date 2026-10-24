@@ -17,5 +17,5 @@ Every method has its own arguments, which mean their own things, or sometimes no
 Let us use an argument to walk further with just one instruction. Put a number inside the brackets to say how many steps to take!
 
 ```python try
-wizard.move_left(3)
+wizard.move_right(3)
 ```

@@ -4,7 +4,7 @@
   "scene": "the-field",
   "start": [
     8,
-    10
+    9
   ],
   "end": [
     8,
@@ -32,8 +32,8 @@
       "kind": "friend",
       "id": "friend",
       "at": [
-        8,
-        11
+        7,
+        8
       ]
     }
   ],

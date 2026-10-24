@@ -3,12 +3,12 @@
   "kind": "fix",
   "scene": "the-field",
   "start": [
-    10,
-    22
+    6,
+    23
   ],
   "end": [
-    9,
-    24
+    4,
+    25
   ],
   "speaker": "friend",
   "things": [],
@@ -17,8 +17,8 @@
       "kind": "friend",
       "id": "friend",
       "at": [
-        10,
-        21
+        7,
+        23
       ]
     }
   ],

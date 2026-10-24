@@ -75,19 +75,19 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await page.locator('#wizard-looks .radio').nth(0).click();
     await shoot(page, 'creator');
 
-    // Chapter 1 opens at the gate, where the wizard meets Nuri and says their name.
+    // Chapter 1 opens at the gate, where the wizard meets the friend and says their name.
     await page.locator('#wizard-done').click();
     await expect(page.locator('#story-title')).toHaveText(words.story);
     await shoot(page, 'at-the-gate');
-    // Nuri comes up the path, and walks to the wizard's side to speak (D74).
+    // The friend comes up the path, and walks to the wizard's side to speak (D74).
     await storyNext(page, 3);
-    await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'friend:9,20,up');
+    await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'friend:8,21,up');
     await expect(page.locator('#scene')).toHaveAttribute('data-speaker', 'friend');
     await shoot(page, 'nuri-speaks');
     // The wizard answers by name.
     await storyNext(page);
     await expect(storySaid(page)).toContainText(words.greeting);
-    // The story's last step: Nuri turns to teaching.
+    // The story's last step: the friend turns to teaching.
     await storyNext(page, 3);
     await shoot(page, 'nuri-teaches');
     await page.locator('#story-go-on').click();
@@ -100,7 +100,7 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await page.locator('#lesson-next').click();
     await shoot(page, 'lesson-last-page');
 
-    // Try it: the gate, its start card with Nuri's words, the editor empty (D63).
+    // Try it: the gate, its start card with the friend's words, the editor empty (D63).
     await page.locator('#lesson-try').click();
     await expect(page.locator('.start-card h3')).toHaveText(words.gate);
     await expect(page.locator('#card-intro')).toContainText('Teku');

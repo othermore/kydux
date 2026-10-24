@@ -20,15 +20,15 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
   await expect(scene).toHaveAttribute('data-following', 'false');
   await expect(page.locator('#story-back')).toBeDisabled();
 
-  // The wizard calls out; Nuri appears at the path's end, then walks up and speaks.
+  // The wizard calls out; the friend appears at the path's end, then walks up and speaks.
   await storyNext(page);
   await expect(scene).toHaveAttribute('data-speaker', 'wizard');
   await expect(scene).toHaveAttribute('data-bubble', /Is anyone there\?/);
   await storyNext(page);
-  await expect(scene).toHaveAttribute('data-actors', 'friend:9,28,left');
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,28,left');
   await expect(scene).not.toHaveAttribute('data-bubble', /./);
   await storyNext(page);
-  await expect(scene).toHaveAttribute('data-actors', 'friend:9,20,up');
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up');
   await expect(scene).toHaveAttribute('data-speaker', 'friend');
   await expect(scene).toHaveAttribute('data-bubble', /Hello! I am Teku\./);
   await expect(page.locator('#story-voice')).toHaveText('');
@@ -37,9 +37,9 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
   await page.waitForTimeout(1500);
   await expect(scene).toHaveAttribute('data-speaker', 'friend');
 
-  // Back shows the step before as it was: Nuri back at the path's end.
+  // Back shows the step before as it was: the friend back at the path's end.
   await page.locator('#story-back').click();
-  await expect(scene).toHaveAttribute('data-actors', 'friend:9,28,left');
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,28,left');
   await expect(page.locator('#story-voice')).toContainText('Someone else is coming up the path');
 });
 

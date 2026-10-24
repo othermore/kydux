@@ -53,7 +53,7 @@ test('the creator, and Done opens the first lesson by name', async ({ page }) =>
   await expect(page.locator('#wizard-preview-name')).toHaveText('Ana');
 
   await page.locator('#wizard-done').click();
-  // Chapter 1 opens at the gate, where the wizard meets Nuri and says their name.
+  // Chapter 1 opens at the gate, where the wizard meets the friend and says their name.
   await expect(page).toHaveURL(/#story\/at-the-gate$/);
   await storyNext(page, 4);
   await expect(storySaid(page)).toContainText('Ana');

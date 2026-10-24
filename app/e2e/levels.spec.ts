@@ -171,11 +171,17 @@ test.describe('the sealed door (D42, D43)', () => {
   });
 
   test('the spell cast away from the door opens nothing; beside it, the door opens', async ({ page }) => {
+    // The mark and the sealed doors' runes are drawn by the page (D79): this gate's,
+    // and the castle door's, which waits for the next level.
+    await expect(scene(page)).toHaveAttribute('data-marks', '8,9');
+    await expect(scene(page)).toHaveAttribute('data-glowing', 'castle_door,seal_gate');
     await page.locator('#speed').selectOption('4');
     await run(page, 'wizard.cast("zelim")');
     await expect(scene(page)).toHaveAttribute('data-doors', 'gate');
+    await expect(scene(page)).toHaveAttribute('data-glowing', 'castle_door,seal_gate');
     await run(page, 'wizard.move_left(2)\nwizard.move_up(3)\nwizard.cast("zelim")');
     await expect(scene(page)).toHaveAttribute('data-doors', 'gate,seal_gate');
+    await expect(scene(page)).toHaveAttribute('data-glowing', 'castle_door');
   });
 
   test('a spell the level does not have is named in the wizard\'s thought', async ({ page }) => {

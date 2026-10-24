@@ -36,33 +36,33 @@ test.describe('in English', () => {
     await expect(page).toHaveTitle(`Kydux — ${LONG.en.title}`);
     expect(await page.evaluate(() => globalThis.crossOriginIsolated)).toBe(true);
     await expect(page.locator('#status')).toHaveText(/^Python 3\.14\.\d+ ready$/);
-    await expect(scene(page)).toHaveAttribute('data-wizard', '9,24');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '4,25');
     await expect(page.locator('.cm-content')).toContainText(LONG.en.starting_code.trim());
     await expect(page.locator('.goal').first()).toHaveText(LONG.en.goals[0] ?? '');
   });
 
-  test('one step left, and the goal is not met', async ({ page }) => {
-    await setCode(page, 'wizard.move_left()');
+  test('one step right, and the goal is not met', async ({ page }) => {
+    await setCode(page, 'wizard.move_right()');
     await run(page);
-    await expect(scene(page)).toHaveAttribute('data-wizard', '8,24');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '5,25');
     await expect(scene(page)).toHaveAttribute('data-tick', '1');
     await expect(outcome(page)).toHaveText('Not yet: 0 of 1 goals met. Try again.');
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
   });
 
-  test('six steps reach the foot of the steps, the goal ticked as the wizard arrives', async ({ page }) => {
-    await setCode(page, 'wizard.move_left(6)');
+  test('eight steps reach the end of the path, the goal ticked as the wizard arrives', async ({ page }) => {
+    await setCode(page, 'wizard.move_right(8)');
     await page.locator('#run').click();
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(1);
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'met', { timeout: 10_000 });
     await expect(outcome(page)).toHaveText('You did it, apprentice!');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '3,24');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '12,25');
     await expect(scene(page)).toHaveAttribute('data-state', 'done');
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(0);
   });
 
   test("an error is said in the child's words, its line marked in the editor", async ({ page }) => {
-    await setCode(page, 'wizrd.move_left(6)');
+    await setCode(page, 'wizrd.move_right(8)');
     await run(page);
     await expect(outcome(page)).toHaveText(
       'There is nothing called wizrd here. Did you mean wizard? (line 1)',
@@ -92,22 +92,22 @@ test.describe('in English', () => {
       'Your program was stopped: it ran for more than 5 seconds without doing anything.',
     );
     await waitReady(page, 30_000);
-    await setCode(page, 'wizard.move_left(6)');
+    await setCode(page, 'wizard.move_right(8)');
     await run(page);
     await expect(outcome(page)).toHaveText('You did it, apprentice!');
   });
 
   test('Restart puts the wizard back at the start', async ({ page }) => {
-    await setCode(page, 'wizard.move_left(6)');
+    await setCode(page, 'wizard.move_right(8)');
     await run(page);
     await page.locator('#restart').click();
-    await expect(scene(page)).toHaveAttribute('data-wizard', '9,24');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '4,25');
     await expect(page.locator('.outcome')).toBeHidden();
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
   });
 
   test('Ctrl-Enter runs the program from the editor', async ({ page }) => {
-    await setCode(page, 'wizard.move_left(6)');
+    await setCode(page, 'wizard.move_right(8)');
     await page.keyboard.press('ControlOrMeta+Enter');
     await expect(outcome(page)).toHaveText('You did it, apprentice!', { timeout: 30_000 });
   });
@@ -129,13 +129,13 @@ test('in Spanish, and switching to English keeps the code typed', async ({ brows
   await expect(page.locator('#run')).toHaveText('Run');
   await expect(page).toHaveTitle(`Kydux — ${LONG.en.title}`);
 
-  await setCode(page, 'wizard.move_left(2)');
+  await setCode(page, 'wizard.move_right(2)');
   await page.locator('#run').click();
   await expect(outcome(page)).toHaveText('Not yet: 0 of 1 goals met. Try again.', {
     timeout: 30_000,
   });
   await page.locator('#language').selectOption('es');
-  await expect(page.locator('.cm-content')).toHaveText('wizard.move_left(2)');
+  await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(2)');
   await expect(outcome(page)).toHaveText(
     'Todavía no: 0 de 1 objetivos cumplidos. Inténtalo otra vez.',
   );

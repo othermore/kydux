@@ -5,7 +5,7 @@
     "Never bump into anything.",
     "In fewer than 3 lines."
   ],
-  "starting_code": "# The program gets there but bumps. Make it better!\nwizard.move_right(7)\nwizard.move_up(5)\n",
+  "starting_code": "# The program gets there but bumps. Make it better!\nwizard.move_left(4)\nwizard.move_up(6)\n",
   "hints": [
     "Count the exact number of steps you need to take right and up.",
     "The numbers in the brackets are a little too big.",

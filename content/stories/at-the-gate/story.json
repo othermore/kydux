@@ -8,7 +8,7 @@
   ],
   "camera": [
     8,
-    22
+    23
   ],
   "actors": [
     {
@@ -32,7 +32,7 @@
       "who": "voice",
       "do": {
         "appear": [
-          9,
+          8,
           28
         ]
       },
@@ -42,15 +42,15 @@
       "who": "friend",
       "do": {
         "walk": [
-          9,
-          20
+          8,
+          21
         ]
       }
     },
     {
       "who": "wizard",
       "do": {
-        "face": "right"
+        "face": "down"
       }
     },
     {

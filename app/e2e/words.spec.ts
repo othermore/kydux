@@ -8,7 +8,7 @@ async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'bo
   return context.newPage();
 }
 
-/** The gate won, its win card open with Nuri's words. */
+/** The gate won, its win card open with the friend's words. */
 async function winTheGate(page: Page): Promise<void> {
   await page.locator('#start').click();
   await skipGuide(page);

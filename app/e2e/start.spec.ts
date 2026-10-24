@@ -15,7 +15,7 @@ async function winTheCorridor(page: Page): Promise<void> {
   await page.locator('#speed').selectOption('4');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
-  await page.keyboard.insertText('wizard.move_left(6)');
+  await page.keyboard.insertText('wizard.move_right(8)');
   await page.locator('#run').click();
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
 }

@@ -15,7 +15,7 @@ describe('outcomeText', () => {
       'Not yet: 0 of 1 goals met. Try again.',
     );
     expect(outcomeText({ kind: 'incomplete', met: 0, total: 1, walkedOver: true })).toBe(
-      'Not yet: 0 of 1 goals met. Try again.\nYou walked over the mark without stopping on it: your program must end there.',
+      'Not yet: 0 of 1 goals met. Try again.\nThe wizard walked right over the mark without stopping! The program needs to end with the wizard standing exactly on it.',
     );
     expect(outcomeText({ kind: 'too_many_ticks', limit: 100 })).toBe(
       'Your program has taken more than 100 steps and the wizard is tired. Is there a loop that never ends?',

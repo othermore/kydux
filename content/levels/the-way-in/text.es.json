@@ -1,16 +1,16 @@
 {
   "title": "La entrada",
   "goals": [
-    "Abre la puerta del castillo.",
-    "Entra.",
+    "Abre la gran puerta del castillo.",
+    "Entra en el vestíbulo.",
     "En menos de 5 líneas."
   ],
-  "starting_code": "# La puerta está sellada, y escucha la palabra de la escuela cuando el sello está roto.\n",
+  "starting_code": "# La gran puerta está sellada y escucha la palabra de la escuela.\n# ¡No puede oír nada mientras el sello aguante!\n",
   "hints": [
-    "Primero muévete hacia arriba para ponerte delante de la puerta.",
-    "La puerta solo escucha cuando su sello está roto: usa el método `cast` antes que el método `say`.",
-    "Después del sello y la palabra, da un paso más para entrar en el vestíbulo."
+    "Primero, da dos pasos hacia arriba para situarte justo delante de la gran puerta.",
+    "La puerta solo escucha cuando se rompe su sello. Eso significa que debes usar el método `cast` para romperlo antes de usar el método `say`.",
+    "Después de lanzar el hechizo y decir la palabra, usa el método `move_up` para dar un último paso y entrar al vestíbulo."
   ],
-  "intro": "¡Aquí está, la gran puerta del castillo! Está sellada por una runa, y también escucha la palabra de la escuela, pero no oye ninguna palabra mientras el sello aguanta. Primero rompe el sello, luego di la palabra, ¡y dentro!",
-  "outro": "¡La puerta está abierta! Entremos al gran vestíbulo."
+  "intro": "¡Aquí estamos, la gran puerta del castillo! Está sellada por una runa, y también escucha la palabra de la escuela. ¡Pero estoy {{seguro|segura}} de que no oirá nada mientras el sello aguante! Rompe el sello primero, luego di la palabra, ¡y entraremos!",
+  "outro": "¡Se está abriendo! Mira qué iluminado está el gran vestíbulo. ¡Entremos juntos!"
 }

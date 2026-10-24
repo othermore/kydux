@@ -20,7 +20,7 @@
   "outcome": {
     "won": "You did it, {wizard}!",
     "incomplete": "Not yet: {n} of {total} goals met. Try again.",
-    "walked_over": "You walked over the mark without stopping on it: your program must end there.",
+    "walked_over": "The wizard walked right over the mark without stopping! The program needs to end with the wizard standing exactly on it.",
     "too_many_ticks": "Your program has taken more than {limit} steps and the wizard is tired. Is there a loop that never ends?",
     "interrupted": "Your program was stopped: it ran for more than {seconds} seconds without doing anything.",
     "error": "Python says: {type}: {message} (line {line})",

@@ -20,7 +20,7 @@
   "outcome": {
     "won": "¡Lo has conseguido, {wizard}!",
     "incomplete": "Todavía no: {n} de {total} objetivos cumplidos. Inténtalo otra vez.",
-    "walked_over": "Has pasado por la marca sin pararte en ella: el programa tiene que terminar allí.",
+    "walked_over": "¡{El mago|La maga} ha pasado por encima de la marca sin detenerse! El programa tiene que terminar con {el mago|la maga} justo encima de ella.",
     "too_many_ticks": "Tu programa ha dado más de {limit} pasos y {el mago|la maga} está agotad{o|a}. ¿Hay algún bucle que no termina nunca?",
     "interrupted": "Se ha detenido tu programa: llevaba más de {seconds} segundos sin hacer nada.",
     "error": "Python dice: {type}: {message} (línea {line})",

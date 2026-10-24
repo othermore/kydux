@@ -1,16 +1,16 @@
 {
   "title": "The way in",
   "goals": [
-    "Open the castle's door.",
-    "Walk in.",
+    "Open the castle's great door.",
+    "Walk into the hall.",
     "In fewer than 5 lines."
   ],
-  "starting_code": "# The door is sealed, and listens for the school's word once the seal is broken.\n",
+  "starting_code": "# The great door is sealed, and listens for the school's word.\n# It cannot hear anything while the seal holds!\n",
   "hints": [
-    "Move up to stand before the door first.",
-    "The door listens only once its seal is broken: use the `cast` method before the `say` method.",
-    "After the seal and the word, take one more step to walk into the hall."
+    "First, take two steps up to stand right before the great door.",
+    "The door only listens once its seal is broken. That means you must use the `cast` method to break the seal before you use the `say` method.",
+    "After you cast the spell and say the word, use the `move_up` method to take one last step into the hall."
   ],
-  "intro": "This is it, the castle's great door! It is sealed by a rune, and it also listens for the school's word, but it cannot hear a word while its seal holds. Break the seal first, then say the word, and we are in!",
-  "outro": "The door is open! Let us walk into the great hall."
+  "intro": "Here we are, the castle's great door! It is sealed by a rune, and it also listens for the school's word. But I am sure it will not hear a thing while that seal holds! Break the seal first, then say the word, and we will be in!",
+  "outro": "It is opening! Look how bright the great hall is. Let us walk in together!"
 }

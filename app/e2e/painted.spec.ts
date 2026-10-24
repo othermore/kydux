@@ -75,3 +75,36 @@ test('the wizard is drawn in the look chosen, and the friend is of the other gen
     await context.close();
   }
 });
+
+test('a spell is cast with the wand, the seal breaks, and a door opens through its half-open state (13.9)', async ({
+  page,
+}) => {
+  await seedWizard(page);
+  await page.goto('/#level/the-sealed-door');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await page.locator('#speed').selectOption('1');
+  const scene = page.locator('#scene');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_left(2)\nwizard.move_up(3)\nwizard.cast("zelim")');
+  await page.locator('#run').click();
+  // The casting frames play; the seal's glow goes.
+  await expect.poll(() => scene.getAttribute('data-casting'), { intervals: [50], timeout: 30_000 }).toBe('true');
+  await page.screenshot({ path: `${SHOTS}09-casting.png` });
+  await expect(scene).toHaveAttribute('data-glowing', 'castle_door', { timeout: 10_000 });
+  await expect(scene).toHaveAttribute('data-doors', 'gate,seal_gate');
+
+  // The castle's door, opened by the word and the spell, is seen half open first.
+  await page.goto('/#level/the-way-in');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await page.locator('#speed').selectOption('1');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_up(2)\nwizard.say("ambrel")\nwizard.cast("zelim")');
+  await page.locator('#run').click();
+  await expect.poll(() => scene.getAttribute('data-opening'), { intervals: [50], timeout: 30_000 }).toBe('castle_door');
+  await page.screenshot({ path: `${SHOTS}10-door-half-open.png` });
+  await expect(scene).toHaveAttribute('data-doors', /castle_door/, { timeout: 10_000 });
+});

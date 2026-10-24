@@ -134,6 +134,7 @@
       "top": 1526,
       "states": {
         "closed": "gate-closed.webp",
+        "ajar": "gate-ajar.webp",
         "open": "gate-open.webp"
       }
     },
@@ -148,10 +149,11 @@
     },
     "castle_door": {
       "row": 6,
-      "left": 715,
+      "left": 643,
       "top": 379,
       "states": {
         "closed": "castle_door-closed.webp",
+        "ajar": "castle_door-ajar.webp",
         "open": "castle_door-open.webp"
       }
     },

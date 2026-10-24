@@ -10,6 +10,8 @@ later, like the rest of it.
   (`image-first-field-ground.md`, `image-first-field-ground-2.md`), and with
   each thing that opens or is picked up changed (`game-field-nogate.md`,
   `game-field-gate-open.md`, `game-field-noseal.md`,
-  `game-field-castle-open.md`, `game-field-nowand.md`).
+  `game-field-castle-open.md`, `game-field-nowand.md`), and the gate and the
+  castle's door half open (`game-field-gate-ajar.md`,
+  `game-field-castle-ajar.md`).
 - Its cells marked by hand, cut by `tools/art/image_first.py` and exported by
   `tools/art/export_scene.py`.

@@ -1,7 +1,8 @@
 // A scene painted in one picture (D76), drawn in Phaser: its art loaded, the
 // ground and the raised things by row, each changing thing in its state, the
 // figures from their sheets, the pencil grid, the goal's beating mark and the
-// sealed doors' glow (D79). scene.ts holds what changes as a run plays and calls
+// sealed doors' glow (D79); and what moves when a spell is cast: the wizard's
+// casting frames, a door passing through its states, a seal breaking. scene.ts holds what changes as a run plays and calls
 // these to draw; a scene without art is drawn by placeholders.ts.
 
 import Phaser from 'phaser';
@@ -58,8 +59,11 @@ export async function loadArt(level: LevelJson): Promise<Art | null> {
   return { scene: { ...scene, base }, figures: figures ? { ...figures, base: `${root}figures/` } : null };
 }
 
-/** The rows of a figure's sheet, by the way it faces. */
+/** The rows of a figure's sheet, by the way it faces: four rows of walking frames,
+ * and on the wizard's, four rows of casting frames after them, in the same order. */
 export const SHEET_ROW: Record<Facing, number> = { down: 0, left: 1, right: 2, up: 3 };
+const CAST_ROW = 4;
+const FACING_OF_ROW: readonly Facing[] = ['down', 'left', 'right', 'up'];
 /** Where a figure's feet stand in its cell on a painted scene, as a part of a cell. */
 export const FOOT_IN_CELL = 0.8;
 
@@ -141,6 +145,84 @@ export function drawFigure(
   sprite.setOrigin(0.5, 1 - figures.foot / figures.frame[1]);
   sprite.setScale(TILE / figures.cell);
   return sprite;
+}
+
+/** The way a figure drawn from its sheet faces, read from the frame it shows. */
+export function facingOf(sprite: Phaser.GameObjects.Sprite): Facing {
+  const frame = Number(sprite.frame.name);
+  return FACING_OF_ROW[Math.floor((Number.isFinite(frame) ? frame : 0) / 3) % 4] ?? 'down';
+}
+
+/** The wizard casting: its three casting frames the way it faces, the wand raised,
+ * pointed and lowered, then standing again; false for a sheet without them. */
+export function playCast(
+  scene: Phaser.Scene,
+  sprite: Phaser.GameObjects.Sprite,
+  standing: number,
+  duration: number,
+): boolean {
+  // A sheet's frames, and Phaser's whole-image frame besides them.
+  if (!sprite.texture.key.startsWith('fig-') || sprite.texture.frameTotal - 1 < (CAST_ROW + 4) * 3) return false;
+  const facing = facingOf(sprite);
+  const frame = (step: number) => (CAST_ROW + SHEET_ROW[facing]) * 3 + step;
+  sprite.setFrame(frame(0));
+  scene.time.delayedCall(duration * 0.25, () => sprite.setFrame(frame(1)));
+  scene.time.delayedCall(duration * 0.7, () => sprite.setFrame(frame(2)));
+  scene.time.delayedCall(duration, () => sprite.setFrame(SHEET_ROW[facing] * 3 + standing));
+  return true;
+}
+
+/** A thing passing from one painted state to the next: the new state shown at once
+ * under a copy of the old one, which fades out. */
+export function crossfade(
+  scene: Phaser.Scene,
+  image: Phaser.GameObjects.Image,
+  key: string,
+  duration: number,
+): void {
+  const old = scene.add
+    .image(image.x, image.y, image.texture.key)
+    .setOrigin(image.originX, image.originY)
+    .setScale(image.scaleX, image.scaleY)
+    .setDepth(image.depth + 0.0001);
+  image.setTexture(key);
+  scene.tweens.add({ targets: old, alpha: 0, duration, onComplete: () => old.destroy() });
+}
+
+/** A seal broken (D79): its glow goes at once, a flare of it grows and fades in its
+ * place, and sparks of its light fly out and fade; the glow itself is left as it
+ * was, hidden, for the level to start again with. */
+export function breakSeal(scene: Phaser.Scene, glow: Phaser.GameObjects.Ellipse, duration: number): void {
+  glow.setVisible(false);
+  const flare = scene.add
+    .ellipse(glow.x, glow.y, glow.width, glow.height, 0x6fd6ff, 0.8)
+    .setBlendMode(Phaser.BlendModes.ADD)
+    .setDepth(glow.depth);
+  scene.tweens.add({
+    targets: flare,
+    scale: 1.8,
+    alpha: 0,
+    duration,
+    ease: 'Quad.easeOut',
+    onComplete: () => flare.destroy(),
+  });
+  for (let i = 0; i < 10; i += 1) {
+    const angle = (i / 10) * Math.PI * 2;
+    const spark = scene.add
+      .circle(glow.x, glow.y, 3, 0xbfefff, 1)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth(glow.depth + 0.0001);
+    scene.tweens.add({
+      targets: spark,
+      x: glow.x + Math.cos(angle) * TILE * 0.9,
+      y: glow.y + Math.sin(angle) * TILE * 0.9,
+      alpha: 0,
+      scale: 0.4,
+      duration,
+      ease: 'Quad.easeOut',
+      onComplete: () => spark.destroy(),
+    });
+  }
 }
 
 /** The pencil grid over a painted scene, for counting steps (D76): thin lines a

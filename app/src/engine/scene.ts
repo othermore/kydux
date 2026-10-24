@@ -8,7 +8,9 @@
 // data-shaking (present while something shakes at a failed try), data-bubble
 // and data-speaker (the words said in a bubble and who says them), data-look
 // (the id of the look the wizard is drawn with, D36), data-wizard-figure and
-// data-friend-figure (the sheets they are drawn from, D77), data-dark (whether the
+// data-friend-figure (the sheets they are drawn from, D77), data-casting (present
+// while the wizard's casting frames play), data-opening (the door shown half open
+// as it opens), data-dark (whether the
 // room is still dark, D52), data-stairs ("id:in" or "id:away" joined by ";",
 // each stair as a step taken now would find it, D53), data-zoom (the
 // camera's zoom, D69) and data-following (whether the camera follows the wizard).
@@ -49,6 +51,8 @@ import {
 import {
   type Art,
   artScale,
+  breakSeal,
+  crossfade,
   drawFigure,
   drawGlow,
   drawGrid,
@@ -58,6 +62,7 @@ import {
   loadArt,
   paintScene,
   paintThing,
+  playCast,
   preloadArt,
   SHEET_ROW,
 } from './painted';
@@ -225,12 +230,33 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** A door's look, shut or open: its painted state, or the placeholder's frame. */
-  private doorLook(id: string, open: boolean, lock: string): void {
+  private doorLook(id: string, open: boolean, lock: string, moving = false): void {
     const image = this.things.get(id);
     if (!image) return;
     const key = `art-${id}-${open ? 'open' : 'closed'}`;
-    if (this.textures.exists(key)) image.setTexture(key);
-    else image.setFrame(open ? 'open' : lock);
+    if (!this.textures.exists(key)) {
+      image.setFrame(open ? 'open' : lock);
+      return;
+    }
+    if (!moving || this.still) {
+      image.setTexture(key);
+      return;
+    }
+    // Seen opening: through its half-open state when it has one, each state fading
+    // into the next.
+    const step = this.playback.tickDuration * 0.3;
+    const ajar = `art-${id}-ajar`;
+    if (!this.textures.exists(ajar)) {
+      crossfade(this, image, key, step * 2);
+      return;
+    }
+    crossfade(this, image, ajar, step);
+    this.parentNode.dataset.opening = id;
+    const run = this.restarts;
+    this.time.delayedCall(step, () => {
+      delete this.parentNode.dataset.opening;
+      if (run === this.restarts && this.openDoors.has(id)) crossfade(this, image, key, step);
+    });
   }
 
   /** Whether the player asks for less motion: the pulses then stand still. */
@@ -249,9 +275,12 @@ class LevelScene extends Phaser.Scene {
     this.glows.set(id, drawGlow(this, at, image?.depth ?? 3, this.still));
   }
 
-  /** A seal broken: its glow goes. */
-  private unseal(id: string): void {
-    this.glows.get(id)?.setVisible(false);
+  /** A seal broken: its glow goes, breaking into sparks when it is seen go. */
+  private unseal(id: string, instant = true): void {
+    const glow = this.glows.get(id);
+    if (!glow?.visible) return;
+    if (instant || this.still) glow.setVisible(false);
+    else breakSeal(this, glow, this.playback.tickDuration * 0.8);
   }
 
   /** How many ticks a word said stays: in a story, until the next step. */
@@ -516,7 +545,7 @@ class LevelScene extends Phaser.Scene {
       // A door opened by a spell or a word is the door's own event (D43); so is a
       // thing a spell pulls (D47).
       else if (event.kind === 'open') this.openDoor(String(event.data.id), instant, event.data.by === 'word');
-      else if (event.kind === 'unsealed') this.unseal(String(event.data.id));
+      else if (event.kind === 'unsealed') this.unseal(String(event.data.id), instant);
       else if (event.kind === 'pull') this.pull(event, instant);
       else if (event.kind === 'light') this.lit = true;
       else if (event.kind === 'hold') this.hold(event);
@@ -575,16 +604,16 @@ class LevelScene extends Phaser.Scene {
    * the word is said, so that the child sees the word, then the door. */
   private openDoor(id: string, instant = true, byWord = false): void {
     this.openDoors.add(id);
-    this.unseal(id);
+    this.unseal(id, instant);
     if (!instant) play('door');
     const lock = this.map.things.find((thing) => thing.id === id)?.lock ?? 'none';
     if (instant || !byWord) {
-      this.doorLook(id, true, lock);
+      this.doorLook(id, true, lock, !instant);
       return;
     }
     const run = this.restarts;
     this.time.delayedCall(this.playback.tickDuration * 0.5, () => {
-      if (run === this.restarts && this.openDoors.has(id)) this.doorLook(id, true, lock);
+      if (run === this.restarts && this.openDoors.has(id)) this.doorLook(id, true, lock, true);
     });
   }
 
@@ -663,6 +692,11 @@ class LevelScene extends Phaser.Scene {
         break;
       case 'cast':
         if (!instant) {
+          // The wand raised, pointed and lowered, on a sheet that has it.
+          if (playCast(this, this.wizard, this.art?.figures?.standing ?? 1, duration)) {
+            this.parentNode.dataset.casting = 'true';
+            this.time.delayedCall(duration, () => delete this.parentNode.dataset.casting);
+          }
           this.flash(duration);
           play('cast');
         }

@@ -549,6 +549,19 @@ those of `app/src/engine/looks.ts`. This writes every sheet into
 With `--check`, it also writes `art/raw/figures-check.png`, every sheet
 side by side. Look at it after changing a look's colours or a base.
 
+A wizard's sheet also has four rows of casting frames, below its walking
+ones. They come from a casting base for each gender, in `art/figures/`.
+A casting base is made from Gemini's edit of the walking base, asked for
+with `tools/art/prompts/figure-cast-boy.md` or `figure-cast-girl.md`.
+This puts the edit back on the base's grid:
+
+```sh
+.venv/bin/python tools/art/figures.py --cast boy art/raw/figures/figure-cast-boy.png
+```
+
+It prints the base it wrote. Run `tools/art/figures.py --check` after it,
+so that every look gets the new frames.
+
 The music is asked for the same way, from `tools/sound/prompts/`:
 
 ```sh

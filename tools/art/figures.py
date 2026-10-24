@@ -4,6 +4,7 @@ creator, and each friend, made from a base sheet by recolouring its parts, so
 that the figures stay the same drawing and only their colours change.
 
     tools/art/figures.py [--check]
+    tools/art/figures.py --cast <boy|girl> <edit.png>
 
 A base sheet is four rows (down, left, right, up) of three frames, as
 content/art/figures/figures.json says. Each opaque pixel is told by its colour
@@ -17,7 +18,11 @@ part's middle lightness. The looks' colours are app/src/engine/looks.ts's.
 Writes content/art/figures/wizard-<look>.webp for every look and the friends'
 sheets named in FRIENDS, from the bases in art/figures/ (BASES), and their list in
 figures.json; --check writes art/raw/figures-check.png, every sheet side by
-side, to look at.
+side, to look at. A wizard's sheet has four more rows after its walking ones,
+the same ways in the same order: casting, the wand raised, pointed with its
+light and lowered, recoloured from the casting base of its gender (CAST_BASES).
+--cast makes that base from Gemini's edit of the walking base
+(tools/art/prompts/figure-cast-<gender>.md), put back on the base's grid.
 """
 
 import argparse
@@ -47,6 +52,8 @@ BASES = {
     "friend-boy": ("friend-base-boy.webp", (80, 170)),
     "friend-girl": ("friend-base-girl.webp", (80, 170)),
 }
+#: The wizard's casting frames, by gender: four rows of three, as the walking base's.
+CAST_BASES = {"boy": "wizard-cast-boy.webp", "girl": "wizard-cast-girl.webp"}
 #: The friends (D77): their base and their colours, as a look's.
 FRIENDS = {
     "teku": (
@@ -203,14 +210,47 @@ def from_edit(edited: Image.Image, base: Image.Image, frame: tuple[int, int]) ->
     return Image.fromarray(out, "RGBA")
 
 
+def whiten_light(sheet: Image.Image) -> Image.Image:
+    """The wand's light white again where the magenta it was drawn on tinted it pink:
+    a light pixel whose green falls short of its red and blue."""
+    pixels = np.array(sheet.convert("RGBA")).astype(int)
+    r, g, b = pixels[..., 0], pixels[..., 1], pixels[..., 2]
+    pink = (r > 170) & (b > 170) & (g < np.minimum(r, b) - 25)
+    pixels[..., 1] = np.where(pink, np.minimum(r, b), g)
+    return Image.fromarray(pixels.astype(np.uint8), "RGBA")
+
+
+def make_cast_base(gender: str, edit: Path) -> Path:
+    """The casting base of a gender, from Gemini's edit of its walking base."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    base = Image.open(BASE_DIR / BASES[gender][0])
+    cast = whiten_light(from_edit(Image.open(edit), base, tuple(about["frame"])))
+    target = BASE_DIR / CAST_BASES[gender]
+    cast.save(target, quality=90, method=6)
+    return target
+
+
+def stacked(top: Image.Image, bottom: Image.Image) -> Image.Image:
+    """One sheet over the other."""
+    sheet = Image.new("RGBA", (top.width, top.height + bottom.height), (0, 0, 0, 0))
+    sheet.paste(top, (0, 0))
+    sheet.paste(bottom, (0, top.height))
+    return sheet
+
+
 def make(check: bool = False) -> list[Path]:
     about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
     frame = tuple(about["frame"])
     bases = {key: (Image.open(BASE_DIR / name), hues) for key, (name, hues) in BASES.items()}
+    casts = {key: Image.open(BASE_DIR / name) for key, name in CAST_BASES.items()}
     written = []
     for look_id, look in looks().items():
         base, hues = bases[look["gender"]]
-        sheet = recolour_sheet(base, frame, {p: look[p] for p in PARTS}, hues)
+        colours = {p: look[p] for p in PARTS}
+        sheet = stacked(
+            recolour_sheet(base, frame, colours, hues),
+            recolour_sheet(casts[look["gender"]], frame, colours, hues),
+        )
         target = FIGURES / f"wizard-{look_id}.webp"
         sheet.save(target, quality=90, method=6)
         written.append(target)
@@ -239,7 +279,13 @@ def make(check: bool = False) -> list[Path]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="The characters' sheets in every look.")
     parser.add_argument("--check", action="store_true", help="also write a sheet to look at")
+    parser.add_argument(
+        "--cast", nargs=2, metavar=("GENDER", "EDIT"), help="make a casting base from an edit"
+    )
     args = parser.parse_args()
+    if args.cast:
+        print(make_cast_base(args.cast[0], Path(args.cast[1])).relative_to(REPO))
+        return 0
     for path in make(args.check):
         print(path.relative_to(REPO))
     return 0

@@ -383,7 +383,9 @@ def test_the_exported_figures_are_sheets_of_four_ways_and_three_frames():
     assert data["ways"] == ["down", "left", "right", "up"] and data["frames"] == 3
     for name in data["figures"]:
         sheet = Image.open(FIGURES / f"{name}.webp")
-        assert sheet.size == (3 * width, 4 * height), name
+        # A wizard's sheet has its four casting rows after its four walking ones.
+        rows = 8 if name.startswith("wizard-") else 4
+        assert sheet.size == (3 * width, rows * height), name
 
 
 def test_a_look_recolours_its_parts_and_keeps_the_rest():

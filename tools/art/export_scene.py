@@ -42,6 +42,7 @@ from PIL import Image, ImageFilter
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import figures as looks  # noqa: E402
 import image_first  # noqa: E402
 import sprites  # noqa: E402
 
@@ -65,7 +66,12 @@ THINGS = {
         "row": 19,
         "solid": False,
         "without": "game-field-nogate.png",
-        "states": {"closed": "painting", "open": "game-field-gate-open.png"},
+        # Half open between the two, as the page shows it opening (13.9).
+        "states": {
+            "closed": "painting",
+            "ajar": "game-field-gate-ajar.png",
+            "open": "game-field-gate-open.png",
+        },
     },
     "seal_gate": {
         "box": (7.45, 10.35, 9.6, 12.0),
@@ -75,11 +81,16 @@ THINGS = {
         "states": {"closed": "painting", "open": None},
     },
     "castle_door": {
-        "box": (7.45, 3.95, 9.6, 6.7),
+        # Wide enough on its left for the door half open, swung out past the arch.
+        "box": (6.7, 3.95, 9.6, 6.7),
         "row": 6,
         "solid": True,
         "without": "game-field-castle-open.png",
-        "states": {"closed": "painting", "open": "without"},
+        "states": {
+            "closed": "painting",
+            "ajar": "game-field-castle-ajar.png",
+            "open": "without",
+        },
     },
     "wand": {
         "box": (11.9, 13.5, 14.1, 15.0),
@@ -96,6 +107,9 @@ THINGS = {
     },
 }
 FIGURES = ("wizard", "nuri", "wenna", "eldra", "dask")
+#: The figures every look and friend is recoloured from (tools/art/figures.py),
+#: kept in art/figures/ as their bases.
+AS_BASES = {"wizard": "wizard-base-boy.webp", "nuri": "friend-base-boy.webp"}
 WAYS = ("down", "left", "right", "up")
 
 
@@ -362,7 +376,9 @@ later, like the rest of it.
   (`image-first-field-ground.md`, `image-first-field-ground-2.md`), and with
   each thing that opens or is picked up changed (`game-field-nogate.md`,
   `game-field-gate-open.md`, `game-field-noseal.md`,
-  `game-field-castle-open.md`, `game-field-nowand.md`).
+  `game-field-castle-open.md`, `game-field-nowand.md`), and the gate and the
+  castle's door half open (`game-field-gate-ajar.md`,
+  `game-field-castle-ajar.md`).
 - Its cells marked by hand, cut by `tools/art/image_first.py` and exported by
   `tools/art/export_scene.py`.
 """
@@ -375,9 +391,18 @@ later, like the rest of it.
 - Drawn by Gemini 3 Pro Image (`gemini-3-pro-image`) as walking sheets, from
   `tools/art/prompts/demo-wizard.md`, `demo-nuri.md`, `demo-wenna.md`,
   `demo-eldra.md` and `demo-dask.md`, each with the style-B wizard as its
-  reference (`chibi-b-gemini.md`).
-- Cut by `tools/art/sprites.py` and put together by
-  `tools/art/export_scene.py`.
+  reference (`chibi-b-gemini.md`); cut by `tools/art/sprites.py` and put
+  together by `tools/art/export_scene.py`.
+- The wizard's girl and Nuri's are Gemini's edits of those sheets
+  (`figure-wizard-girl.md`, `figure-nuri-girl.md`), and the wizard's
+  casting frames are Gemini's edits of the wizard's two sheets
+  (`figure-cast-boy.md`, `figure-cast-girl.md`), each put back on its grid
+  by `tools/art/figures.py`. The base sheets are in `art/figures/`.
+- `wizard-<look>.webp` for each look of the creator, its walking rows and
+  its casting rows, and Teku's and Nuri's, are those bases recoloured by
+  `tools/art/figures.py`: the robe, the hat, its band, the hair and the
+  skin in the look's colours (`app/src/engine/looks.ts`), their shading
+  kept.
 """
 
 
@@ -440,7 +465,7 @@ def figures() -> Path:
                 x = c * width + (width - frame.width) // 2
                 y = r * height + height - FOOT - frame.height
                 sheet.alpha_composite(frame, (x, y))
-        webp(sheet, out / f"{name}.webp")
+        webp(sheet, looks.BASE_DIR / AS_BASES[name] if name in AS_BASES else out / f"{name}.webp")
     wizard = every["wizard"]["down"][1].height
     data = {
         "cell": CELL,
@@ -450,9 +475,11 @@ def figures() -> Path:
         "ways": list(WAYS),
         "frames": 3,
         "standing": 1,
-        "figures": list(FIGURES),
+        "figures": [name for name in FIGURES if name not in AS_BASES],
     }
     (out / "figures.json").write_text(json.dumps(data, indent=2) + "\n")
+    # Every look's sheet and the friends', from the bases, and their names in the list.
+    looks.make()
     (out / "SOURCE.md").write_text(FIGURES_SOURCE)
     return out / "figures.json"
 

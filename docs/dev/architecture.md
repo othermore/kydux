@@ -29,8 +29,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the looks a wizard may have (looks.ts) and the placeholders for a
                 scene without art (placeholders.ts); the camera on the scene, its
                 zoom and its drag (scene.ts, D69), a painted scene drawn from its
-                art with its figures sorted by their feet (scene.ts, D76), the
-                goal's beating mark and the sealed doors' glow (D79), and
+                art with its figures sorted by their feet (scene.ts, painted.ts,
+                D76), the goal's beating mark and the sealed doors' glow (D79),
+                the wizard casting, a seal breaking and a door opening (D81), and
                 the sound effects, made as the game plays (sfx.ts)
   src/editor/   the child's editor, CodeMirror
   src/ui/       the screens: start with the saved games (start.ts), the
@@ -1132,3 +1133,15 @@ one overturns stays, marked as superseded.
   the i18n check to the world's spells and the levels' words), and an
   example to click. Rules out a child having to remember a spell's or a
   word's spelling from a lesson pages back.
+- **D81 — What a spell does is seen.** Decided 2026-10-24 by the owner
+  (sprint 13, 13.9). The wizard's sheet has four casting rows after its
+  four walking ones, the same ways in the same order: the wand raised,
+  pointed with its light, and lowered, played when the wizard casts. A
+  sealed door's glow breaks into sparks and a flare as its seal goes. A
+  door seen opening passes from one painted state to the next, each
+  fading into the next, through a half-open state (`ajar`) where the
+  painting has one: the gate and the castle's door. The casting frames
+  are Gemini's edits of the two wizard bases, recoloured for every look
+  like the walking rows; the half-open states are edits of the painting,
+  cut as the other states are. Rules out a spell seen only as a ring of
+  light, and a door that changes in one frame.

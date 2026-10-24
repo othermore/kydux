@@ -77,9 +77,15 @@ and in front of a row's things.
 ## The figures
 
 Each character is a sheet of four rows, one for each way it faces (down,
-left, right, up), with three walking frames in a row. The frames are drawn
-on the same scale as the scenes. `content/art/figures/figures.json` says
-the frame's size and where the feet are.
+left, right, up), with three walking frames in a row. The wizard's sheet
+has four more rows below, in the same order: casting, with the wand
+raised, pointed with its light, and lowered. The frames are drawn on the
+same scale as the scenes. `content/art/figures/figures.json` says the
+frame's size and where the feet are.
+
+A door that opens may have a half-open state, between its closed and its
+open ones. It is an edit of the painting like the others, and the game
+shows it for a moment as the door opens.
 
 ## Where things are kept
 

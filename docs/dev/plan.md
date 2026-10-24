@@ -484,8 +484,9 @@ so that the figures pass behind and in front of them (D76).
     without it, checked with a figure behind and in front of every row.
 4.5 **The figures:** the wizard drawn in every look the creator offers,
     and the two friends, recoloured from base sheets by
-    `tools/art/figures.py` (sprint 13); cast, pick up and celebrate
-    frames; the teachers, Eldra and Bimo on the same scale.
+    `tools/art/figures.py`, with the wizard's casting frames (sprint 13,
+    D81); pick up and celebrate frames; the teachers, Eldra and Bimo on
+    the same scale.
 4.6 **The UI skin:** cards, panels, buttons, the notebook, the map's frame
     (perhaps the castle drawn isometric, D72), the lesson's speech bubble,
     icons for goals, actions and spells, a font with its licence readable

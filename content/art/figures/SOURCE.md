@@ -9,9 +9,12 @@ later, like the rest of it.
   reference (`chibi-b-gemini.md`); cut by `tools/art/sprites.py` and put
   together by `tools/art/export_scene.py`.
 - The wizard's girl and Nuri's are Gemini's edits of those sheets
-  (`figure-wizard-girl.md`, `figure-nuri-girl.md`), put back on their grid
-  by `tools/art/figures.py`. The four base sheets are in `art/figures/`.
-- `wizard-<look>.webp` for each look of the creator, and Teku's and Nuri's,
-  are those bases recoloured by `tools/art/figures.py`: the robe, the hat,
-  its band, the hair and the skin in the look's colours
-  (`app/src/engine/looks.ts`), their shading kept.
+  (`figure-wizard-girl.md`, `figure-nuri-girl.md`), and the wizard's
+  casting frames are Gemini's edits of the wizard's two sheets
+  (`figure-cast-boy.md`, `figure-cast-girl.md`), each put back on its grid
+  by `tools/art/figures.py`. The base sheets are in `art/figures/`.
+- `wizard-<look>.webp` for each look of the creator, its walking rows and
+  its casting rows, and Teku's and Nuri's, are those bases recoloured by
+  `tools/art/figures.py`: the robe, the hat, its band, the hair and the
+  skin in the look's colours (`app/src/engine/looks.ts`), their shading
+  kept.

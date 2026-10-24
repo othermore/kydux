@@ -140,8 +140,13 @@ export class GamesStore implements ProgressStore {
     this.keep(this.entries().map((entry) => (entry.id === id ? { ...entry, played } : entry)));
   }
 
-  /** A game begun: in the list, and the one being played. */
+  /** A game begun: in the list, and the one being played. A game begun before and
+   * left without a wizard (a creator never finished) is dropped, so that no
+   * game lies forgotten in the storage. */
   private begin(): string {
+    for (const entry of this.entries()) {
+      if (!this.game(entry.id)?.wizard) this.remove(entry.id);
+    }
     const when = this.now();
     const id = `g${when.getTime().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
     const stamp = when.toISOString();

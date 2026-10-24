@@ -135,6 +135,9 @@ def test_a_lesson_s_try_it_runs_in_the_level_after_it(path, lang, gender):
     level = level_after(f"lesson:{path.name}")
     result = run_code(Level.from_directory(level), found[0])
     assert result.status != "error", result.error
+    # The example is the level's own: it bumps into nothing and is refused nothing.
+    stumbles = [e for e in result.events if e.kind in ("bump", "blocked")]
+    assert not stumbles, f"{path.name}'s example stumbles in {level.name}: {stumbles[0].data}"
 
 
 def level_api(item_id: str) -> list[str]:

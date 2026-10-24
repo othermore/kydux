@@ -25,7 +25,6 @@ A sealed door shows a glowing rune.
 ## Try it
 
 ```python try
-wizard.move_right()
-wizard.pick_up()
+wizard.move_right(2)
 wizard.cast("zelim")
 ```

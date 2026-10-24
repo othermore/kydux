@@ -21,5 +21,5 @@ An argument tells the method how much to do. If you give no number, your wizard 
 ## Try it
 
 ```python try
-wizard.move_right(3)
+wizard.move_left(3)
 ```

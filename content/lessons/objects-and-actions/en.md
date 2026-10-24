@@ -18,9 +18,9 @@ The dot means the method belongs to the wizard. The brackets mean do the action 
 
 ## Try it
 
-Walk down the corridor that turns a corner.
+Walk down the path by the hedge, then round its corner.
 
 ```python try
-wizard.move_right()
+wizard.move_down()
 wizard.move_down()
 ```

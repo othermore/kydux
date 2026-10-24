@@ -25,9 +25,10 @@ Si no hay nada lo suficientemente cerca, {tu mago|tu maga} te lo dirá.
 
 ## Pruébalo
 
-Un libro descansa en un estante alto. Atráelo hacia ti, y recógelo.
+Un libro descansa en un estante alto. Camina a la izquierda hasta ponerte debajo. Luego atráelo hacia ti, y recógelo.
 
 ```python try
+wizard.move_left(5)
 wizard.cast("fendra")
 wizard.pick_up()
 ```

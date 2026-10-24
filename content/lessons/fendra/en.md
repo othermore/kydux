@@ -25,9 +25,10 @@ If nothing is near enough, your wizard will tell you.
 
 ## Try it
 
-A book lies on a high shelf. Draw it to you, and pick it up.
+A book lies on a high shelf. Walk left until you stand under it. Then draw it to you, and pick it up.
 
 ```python try
+wizard.move_left(5)
 wizard.cast("fendra")
 wizard.pick_up()
 ```

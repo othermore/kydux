@@ -21,5 +21,5 @@ Un argumento le dice al método cuánto hacer. Si no pones ningún número, tu {
 ## Pruébalo
 
 ```python try
-wizard.move_right(3)
+wizard.move_left(3)
 ```

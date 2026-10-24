@@ -31,14 +31,14 @@ Each with the id a level's `speaker` uses (D45), the name the player reads, who 
 
 | id | Name | Who | How they speak |
 | --- | --- | --- | --- |
-| `ilda` | Ilda | A teacher, a woman; she greets the new pupils inside the castle. The later lessons are in her voice: *your teacher* / *tu profesora*. | Warm, patient, a little funny. Short sentences. She explains why before how, and never makes a pupil feel slow. |
+| `ilda` | Ilda | A teacher, a woman; she greets the new pupils inside the castle and sends the wizard on their errands: *your teacher* / *tu profesora*. | Warm, patient, a little funny. Short sentences. She explains why before how, and never makes a pupil feel slow. |
 | `orla` | Orla | The head of the school, a woman. She welcomes the pupils at the start and gives the familiar at the end. | Calm and kind, a few words at a time. |
-| `dask` | Dask | A strict teacher, a man, who patrols the passages and does not want pupils there after dark: chapter 3's teacher. | Gruff and brief; never cruel. He is fair, and in the end impressed. |
+| `dask` | Dask | A strict teacher, a man, who patrols the passages and does not want pupils there after dark: the one the wizard hides from in chapter 3. | Gruff and brief; never cruel. He is fair, and in the end impressed. |
 | `wenna` | Wenna | The librarian, a woman, keeper of the books and of their rules: chapter 2's teacher. | Precise and quiet; she loves order and a good question. |
-| `nuri` | Nuri | A first-year pupil who arrives at the same moment as the wizard. A girl or a boy to match the wizard's gender. Grew up among wizards and teaches chapter 1. | Eager, curious, says what the child may be thinking: *What does that do?* |
+| `nuri` | Nuri | A first-year pupil who arrives at the same moment as the wizard. A girl or a boy to match the wizard's gender. Grew up among wizards and teaches chapters 1 and 3, whispering in the night passages. | Eager, curious, says what the child may be thinking: *What does that do?* |
 | `zarek` | Zarek | A pupil a year older, the rival: quick, proud, sometimes right. | Boastful but not mean; he races the wizard in chapter 4 and is a good loser. |
 | `bimo` | Bimo | The school's cat, who wanders into levels. | He does not speak: he meows, and the texts say what he seems to mean. |
-| `eldra` | Eldra | A ghost in the library, once a pupil, who lost a book long ago. | Whispers, speaks in old-fashioned ways, is never frightening. |
+| `eldra` | Eldra | A ghost in the library, once a pupil, who lost her books long ago. | Whispers, speaks in old-fashioned ways, is never frightening. |
 
 Nuri, Bimo and Eldra are actors a level may hold; the teachers and pupils speak
 in intros and outros, and Dask patrols as the `teacher` kind.

@@ -25,7 +25,6 @@ Una puerta sellada muestra una runa brillante.
 ## Pruébalo
 
 ```python try
-wizard.move_right()
-wizard.pick_up()
+wizard.move_right(2)
 wizard.cast("zelim")
 ```

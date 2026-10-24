@@ -18,9 +18,9 @@ El punto significa que el método pertenece a tu {mago|maga}. Los paréntesis si
 
 ## Pruébalo
 
-Camina por el pasillo que dobla la esquina.
+Baja por el camino junto al seto, y luego dobla la esquina.
 
 ```python try
-wizard.move_right()
+wizard.move_down()
 wizard.move_down()
 ```

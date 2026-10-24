@@ -56,6 +56,17 @@ describe('GamesStore (D70)', () => {
     expect(progress.levelProgress('the-gate').stars).toBe(3);
   });
 
+  it('drops a game left without a wizard when another begins', () => {
+    progress.setWizard(ANA);
+    progress.newGame();
+    progress.markStoryRead('the-letter');
+    expect(games.entries()).toHaveLength(2);
+    progress.newGame();
+    progress.markStoryRead('the-letter');
+    expect(games.entries()).toHaveLength(2);
+    expect([...storage.kept.keys()].filter((key) => key.startsWith('kydux.game.'))).toHaveLength(2);
+  });
+
   it('a new game keeps the machine\'s language and settings', () => {
     progress.setWizard(ANA);
     progress.setSetting('fontSize', 22);

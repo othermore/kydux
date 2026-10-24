@@ -48,7 +48,7 @@ export interface Progress {
   wizard: Wizard | null;
   settings: Settings;
   lessons: Record<string, { read?: boolean }>;
-  /** The story pages read (D56). */
+  /** The stories read to their end (D56, D74). */
   stories: Record<string, { read?: boolean }>;
   /** Whether the screen's guide has been shown, done or skipped (D68). */
   guided: boolean;

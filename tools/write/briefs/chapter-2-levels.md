@@ -18,8 +18,8 @@ outputs:
   - content/levels/eldras-book/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/in-the-castle/en.md
-  - content/stories/the-wand-bank/en.md
+  - content/stories/in-the-castle/text.en.json
+  - content/stories/the-wand-bank/text.en.json
   - content/lessons/a-name-for-a-value/en.md
   - content/lessons/what-things-know/en.md
   - content/lessons/finding-things/en.md

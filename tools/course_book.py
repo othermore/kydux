@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """The course so far as one document to read and comment on: every chapter's
-story pages, lessons and levels in order, with the texts the child reads, what
+stories, lessons and levels in order, each story as its steps with who says
+each and what they do (D74), with the texts the child reads, what
 each lesson teaches, and each level's goals, starting code, hints and solution.
 
     tools/course_book.py [--lang es] [--gender girl] [out.md]
@@ -57,6 +58,13 @@ WORDS = {
         "outro": "Al ganar",
         "learned": "Lo aprendido",
         "page": "Página",
+        "voice": "Narración",
+        "does": {
+            "walk": "camina",
+            "face": "se vuelve",
+            "appear": "aparece",
+            "vanish": "se va",
+        },
         "carrying": "Lleva desde el principio",
     },
     "en": {
@@ -93,6 +101,13 @@ WORDS = {
         "outro": "On a win",
         "learned": "What was learned",
         "page": "Page",
+        "voice": "Narration",
+        "does": {
+            "walk": "walks",
+            "face": "turns",
+            "appear": "appears",
+            "vanish": "goes",
+        },
         "carrying": "Carried from the start",
     },
 }
@@ -118,17 +133,24 @@ def made(text: str, lang: str, gender: str, name: str) -> str:
 
 
 def story_section(story_id: str, lang: str, gender: str, name: str, w: dict) -> list[str]:
+    """A story (D74) as its steps: who says each, what is done before it, the words."""
     path = CONTENT / "stories" / story_id
     about = load_json(path / "story.json")
-    body = made((path / f"{lang}.md").read_text(encoding="utf-8"), lang, gender, name)
-    parts = pages(body)
-    title = re.sub(r"^#\s+", "", parts[0].splitlines()[0]) if parts else story_id
-    lines = [f"### {w['story']}: {title}", ""]
-    if about.get("speaker"):
-        lines += [f"*{w['speaker']}: {character(about['speaker'], lang)}*", ""]
-    for index, page in enumerate(parts, 1):
-        text = page if index > 1 else "\n".join(page.splitlines()[1:]).strip()
-        lines += [f"**{w['page']} {index}**", "", text, ""]
+    text = load_json(path / f"text.{lang}.json")
+    title = made(text.get("title", story_id), lang, gender, name)
+    lines = [f"### {w['story']}: {title}", "", f"*{w['scene']}: {about.get('scene')}*", ""]
+
+    def who_is(who: str) -> str:
+        if who == "voice":
+            return w["voice"]
+        return name if who == "wizard" else character(who, lang)
+
+    for step, said in zip(about.get("steps", []), text.get("steps", []), strict=False):
+        doing = step.get("do")
+        if doing:
+            kind = next(iter(doing))
+            lines += [f"*({who_is(step.get('by', step['who']))} {w['does'][kind]})*", ""]
+        lines += [f"**{who_is(step['who'])}:** {made(said, lang, gender, name)}", ""]
     return lines
 
 

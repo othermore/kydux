@@ -1,7 +1,8 @@
 import { version } from '../package.json';
 import { type Course, conceptsAt, items, itemHash, knownApi, loadCourse, next, parseItem } from './content/course';
 import { loadGuideText } from './content/guide';
-import { LessonNotFound, loadLesson, loadStory } from './content/lessons';
+import { LessonNotFound, loadLesson } from './content/lessons';
+import { loadStory, StoryNotFound } from './content/stories';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
 import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
 import * as progress from './progress/progress';
@@ -66,8 +67,8 @@ async function itemTitle(item: string): Promise<string> {
     return text?.title ?? parsed.id;
   }
   const load = parsed.kind === 'story' ? loadStory : loadLesson;
-  const pages = await load(parsed.id, currentLanguage()).catch(() => null);
-  return pages?.title ?? parsed.id;
+  const read = await load(parsed.id, currentLanguage()).catch(() => null);
+  return read?.title ?? parsed.id;
 }
 
 /** An item's number in words, *Lesson 3* or *Practice 4* (D56), or undefined. */
@@ -76,18 +77,22 @@ function itemNumber(course: Course, item: string): string | undefined {
   return number ? t(`kinds.${number.kind}`, { n: number.n }) : undefined;
 }
 
-/** A lesson, or a story page (D56): pages read one after another. */
-async function showLesson(
-  content: HTMLElement,
-  kind: 'lesson' | 'story',
-  id: string,
-  key: string,
-  from?: string,
-): Promise<void> {
-  const load = kind === 'story' ? loadStory : loadLesson;
+/** What a lesson or a story says when there is none by that id. */
+function notFound(content: HTMLElement, kind: 'lesson' | 'story', id: string): void {
+  document.title = t('app.title');
+  content.replaceChildren(
+    element('div', { className: 'not-found' }, [
+      element('p', {}, [kind === 'story' ? t('story.not_found', { id }) : t('lesson.not_found', { id })]),
+      element('a', { id: 'first-level', href: '#start' }, [t('level.go_start')]),
+    ]),
+  );
+}
+
+/** A lesson (D56): pages read one after another. */
+async function showLesson(content: HTMLElement, id: string, key: string, from?: string): Promise<void> {
   try {
     const [lesson, course, { lessonScreen }] = await Promise.all([
-      load(id, currentLanguage()),
+      loadLesson(id, currentLanguage()),
       loadCourse(),
       import('./ui/lesson'),
     ]);
@@ -96,32 +101,46 @@ async function showLesson(
       content,
       lessonScreen({
         lesson,
-        kind,
-        label: itemNumber(course, `${kind}:${id}`),
-        next: next(course, `${kind}:${id}`),
-        // The game's opening goes on to the creator, or, with a wizard made, to the
-        // course's first item (D61).
-        ...(lesson.opening
-          ? { onward: progress.wizard() ? itemHash(items(course)[0] ?? '') : '#wizard' }
-          : {}),
+        label: itemNumber(course, `lesson:${id}`),
+        next: next(course, `lesson:${id}`),
         // Read again from a level, the lesson goes back to it (D71).
         ...(from ? { backTo: `#level/${from}` } : {}),
-        reload: () => load(id, currentLanguage()),
+        reload: () => loadLesson(id, currentLanguage()),
       }),
     );
   } catch (error) {
     if (shownRoute !== key) return;
-    if (!(error instanceof LessonNotFound)) {
-      failed(content, error);
-      return;
-    }
-    document.title = t('app.title');
-    content.replaceChildren(
-      element('div', { className: 'not-found' }, [
-        element('p', {}, [t('lesson.not_found', { id })]),
-        element('a', { id: 'first-level', href: '#start' }, [t('level.go_start')]),
-      ]),
+    if (error instanceof LessonNotFound) notFound(content, 'lesson', id);
+    else failed(content, error);
+  }
+}
+
+/** A story told on its scene (D74). */
+async function showStory(content: HTMLElement, id: string, key: string): Promise<void> {
+  try {
+    const [story, course, { storyScreen }, { startScene }] = await Promise.all([
+      loadStory(id, currentLanguage()),
+      loadCourse(),
+      import('./ui/story'),
+      import('./engine/scene'),
+    ]);
+    if (shownRoute !== key) return;
+    show(
+      content,
+      storyScreen({
+        story,
+        next: next(course, `story:${id}`),
+        // The game's opening goes on to the creator, or, with a wizard made, to the
+        // course's first item (D61).
+        ...(story.opening ? { onward: progress.wizard() ? itemHash(items(course)[0] ?? '') : '#wizard' } : {}),
+        startScene,
+        reload: () => loadStory(id, currentLanguage()),
+      }),
     );
+  } catch (error) {
+    if (shownRoute !== key) return;
+    if (error instanceof StoryNotFound) notFound(content, 'story', id);
+    else failed(content, error);
   }
 }
 
@@ -220,7 +239,7 @@ function lessonBefore(course: Course, levelId: string): string | null {
 /** How often play time is counted, in seconds. */
 const PLAY_TICK_S = 10;
 
-/** The story page the game opens with, before the creator (D61). */
+/** The story the game opens with, before the creator (D61). */
 const OPENING = '#story/the-letter';
 
 async function showStart(content: HTMLElement): Promise<void> {
@@ -361,9 +380,11 @@ function route(): void {
   const shown =
     wanted.name === 'level'
       ? showLevel(content, wanted.id, key)
-      : wanted.name === 'lesson' || wanted.name === 'story'
-        ? showLesson(content, wanted.name, wanted.id, key, wanted.name === 'lesson' ? wanted.from : undefined)
-        : wanted.name === 'map'
+      : wanted.name === 'lesson'
+        ? showLesson(content, wanted.id, key, wanted.from)
+        : wanted.name === 'story'
+          ? showStory(content, wanted.id, key)
+          : wanted.name === 'map'
           ? showMap(content)
           : showStart(content);
   shown.catch((error: unknown) => failed(content, error));
@@ -387,7 +408,7 @@ if (root) {
   applyLook(progress.settings());
   setMuted(!progress.settings().sound);
   window.addEventListener('hashchange', route);
-  // Play time (D70): the seconds a level, a lesson or a story page is on screen,
+  // Play time (D70): the seconds a level, a lesson or a story is on screen,
   // with the tab in sight, counted to the game being played.
   setInterval(() => {
     if (document.visibilityState === 'visible' && /^(level|lesson|story)\//.test(shownRoute ?? '')) {

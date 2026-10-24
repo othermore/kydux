@@ -20,9 +20,9 @@ outputs:
   - content/levels/the-way-in/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/the-letter/en.md
-  - content/stories/at-the-gate/en.md
-  - content/stories/at-the-gate/es.md
+  - content/stories/the-letter/text.en.json
+  - content/stories/at-the-gate/text.en.json
+  - content/stories/at-the-gate/text.es.json
   - content/lessons/what-a-program-is/en.md
   - content/lessons/objects-and-actions/en.md
   - content/lessons/notes/en.md
@@ -31,7 +31,7 @@ context:
   - content/lessons/things-to-carry/en.md
   - content/lessons/your-first-spell/en.md
   - content/lessons/your-first-spell/es.md
-  - content/stories/up-to-the-castle/en.md
+  - content/stories/up-to-the-castle/text.en.json
 ---
 Write the texts of chapter 1's eight levels, in English and Spanish. The
 story pages and lessons of the chapter are given: the levels come between

@@ -1,0 +1,12 @@
+{
+  "title": "El banco de varitas",
+  "steps": [
+    "Eldra, la fantasma, sonríe. Sostiene su libro perdido.",
+    "Te doy las gracias, {wizard}. Es maravilloso volver a leer mi historia favorita.",
+    "Se aleja flotando feliz.",
+    "Llegas al mostrador al final de la biblioteca. Este es el banco de varitas.",
+    "Nuri te espera allí. Pides prestada una varita del colegio para el año. Le devuelves la varita de repuesto a tu {amigo|amiga}.",
+    "Has aprendido mucho de Wenna. Has dado un nombre a un valor, una variable. Has descubierto lo que sabe una cosa, un atributo. Lo has mostrado con `print`. Has usado una acción que devuelve algo, como `find_nearest`.",
+    "Has usado una llave en una puerta que se abre con `door.open()`. Has aprendido un hechizo que llega lejos, `fendra`. Ahora cae la noche sobre el castillo. La gente susurra sobre los pasadizos oscuros. Se preguntan quién camina por ellos después del anochecer."
+  ]
+}

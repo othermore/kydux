@@ -4,7 +4,7 @@ outputs:
   - content/guide/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/at-the-gate/en.md
+  - content/stories/at-the-gate/text.en.json
   - content/lessons/what-a-program-is/en.md
   - content/levels/the-gate/text.en.json
 ---

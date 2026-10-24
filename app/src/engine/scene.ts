@@ -5,7 +5,8 @@
 // joined by ";"), data-doors (the open doors' ids, joined by ","),
 // data-carried (the ids of what the wizard carries, joined by ","),
 // data-thought (why an action could not be done, while the wizard thinks it),
-// data-shaking (present while something shakes at a failed try), data-look
+// data-shaking (present while something shakes at a failed try), data-bubble
+// and data-speaker (the words said in a bubble and who says them), data-look
 // (the id of the look the wizard is drawn with, D36), data-dark (whether the
 // room is still dark, D52), data-stairs ("id:in" or "id:away" joined by ";",
 // each stair as a step taken now would find it, D53), data-zoom (the
@@ -14,6 +15,10 @@
 // The camera is a window on the scene (D69): at most VIEW_TILES of it at zoom
 // 1, the tiles at their size; it follows the wizard, the player zooms it and
 // drags it to look around, and a run or a restart brings it back to the wizard.
+//
+// A story is played on the scene the same way (D74): its steps come as events,
+// an actor appears, walks, turns, says its words in a bubble and vanishes; the
+// camera stays on the story's tile, and a bubble stays until the next step.
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
@@ -51,6 +56,12 @@ export const VIEW_TILES: Tile = [15, 9];
 /** The zooms the player steps through, from the whole scene to a close look. */
 export const ZOOMS = [0.5, 0.75, 1, 1.5, 2] as const;
 const ZOOM_START = ZOOMS.indexOf(1);
+
+/** How the scene is played: a level's run, or a story's steps (D74). */
+export interface SceneOptions {
+  /** A story: the camera stays on this tile, and the words stay said. */
+  story?: { camera: Tile };
+}
 
 export interface SceneHandle {
   playback: Playback;
@@ -113,6 +124,8 @@ class LevelScene extends Phaser.Scene {
   private restarts = 0;
   /** The zoom's step in ZOOMS (D69). */
   private zoomStep = ZOOM_START;
+  /** Who a bubble or a thought is over: the wizard, or an actor who speaks. */
+  private speaker: Phaser.GameObjects.Sprite | null = null;
 
   constructor(
     private readonly map: Layout,
@@ -120,8 +133,14 @@ class LevelScene extends Phaser.Scene {
     private readonly playback: Playback,
     private readonly ready: () => void,
     private readonly look: Look,
+    private readonly options: SceneOptions = {},
   ) {
     super({ key: 'level' });
+  }
+
+  /** How many ticks a word said stays: in a story, until the next step. */
+  private get sayTicks(): number {
+    return this.options.story ? Number.POSITIVE_INFINITY : SAY_TICKS;
   }
 
   create(): void {
@@ -183,7 +202,7 @@ class LevelScene extends Phaser.Scene {
       // A run brings the camera back to the wizard.
       if (state === 'playing') this.follow();
       // A word said near the end of the run would stay for ever: it fades.
-      if (state === 'done') this.time.delayedCall(this.playback.tickDuration * SAY_TICKS, () => this.clearBubble());
+      if (state === 'done' && !this.options.story) this.time.delayedCall(this.playback.tickDuration * SAY_TICKS, () => this.clearBubble());
     });
     this.restart();
     this.parentNode.dataset.state = this.playback.state;
@@ -213,9 +232,15 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.zoom = String(camera.zoom);
   }
 
-  /** The camera back on the wizard, following it. */
+  /** The camera back on the wizard, following it; in a story, on the story's tile. */
   follow(): void {
     const camera = this.cameras.main;
+    if (this.options.story) {
+      camera.stopFollow();
+      camera.centerOn(...centre(this.options.story.camera));
+      this.parentNode.dataset.following = 'false';
+      return;
+    }
     camera.startFollow(this.wizard, true, 0.2, 0.2);
     camera.centerOn(this.wizard.x, this.wizard.y);
     this.parentNode.dataset.following = 'true';
@@ -236,24 +261,25 @@ class LevelScene extends Phaser.Scene {
     return true;
   }
 
-  /** A word said follows the wizard while it walks. */
+  /** A word said follows who says it while they walk. */
   override update(): void {
     const [x, y] = this.bubbleAnchor();
     this.bubble?.setPosition(x, y);
     this.thought?.setPosition(x, y);
   }
 
-  /** Over the wizard, or under it when there is no room above; never past the sides. */
+  /** Over who speaks, or under them when there is no room above; never past the sides. */
   private bubbleAnchor(): [number, number] {
+    const over = this.speaker ?? this.wizard;
     const half = this.bubblePlace.width / 2 + 4;
     const width = this.map.width * TILE;
-    const x = Math.min(Math.max(this.wizard.x, half), Math.max(half, width - half));
-    return [x, this.wizard.y + (this.bubblePlace.below ? 22 : -34)];
+    const x = Math.min(Math.max(over.x, half), Math.max(half, width - half));
+    return [x, over.y + (this.bubblePlace.below ? 22 : -34)];
   }
 
-  /** Whether a bubble this tall fits over the wizard, inside the scene. */
+  /** Whether a bubble this tall fits over who speaks, inside the scene. */
   private roomAbove(height: number): boolean {
-    return this.wizard.y - 34 - height - 14 >= 2;
+    return (this.speaker ?? this.wizard).y - 34 - height - 14 >= 2;
   }
 
   /** Everything where it stood before the run. */
@@ -282,7 +308,7 @@ class LevelScene extends Phaser.Scene {
       this.tweens.killTweensOf(state.sprite);
       state.tile = actor.tile;
       state.facing = actor.facing;
-      state.sprite.setPosition(...centre(actor.tile)).setFrame(actor.facing);
+      state.sprite.setPosition(...centre(actor.tile)).setFrame(actor.facing).setAlpha(1).setVisible(!actor.hidden);
     }
     this.placeWizard(this.map.start, 'down');
     this.parentNode.dataset.tick = '0';
@@ -429,6 +455,9 @@ class LevelScene extends Phaser.Scene {
           play('say');
         }
         break;
+      case 'turn':
+        if (facing) this.wizard.setFrame(facing);
+        break;
       case 'pick_up': {
         const id = String(event.data.id);
         const image = this.things.get(id);
@@ -510,6 +539,38 @@ class LevelScene extends Phaser.Scene {
         actor.facing = facing;
         actor.sprite.setFrame(facing);
         break;
+      // A story's actor speaks, comes into sight and goes (D74).
+      case 'say':
+        if (!instant) {
+          this.say(String(event.data.text ?? ''), this.shownTick, actor.sprite, event.actor);
+          play('say');
+        }
+        break;
+      case 'appear': {
+        const at = tileOf(event.data.at);
+        if (!at) return;
+        this.tweens.killTweensOf(actor.sprite);
+        actor.tile = at;
+        actor.sprite.setPosition(...centre(at)).setFrame(actor.facing).setVisible(true);
+        if (instant) actor.sprite.setAlpha(1);
+        else {
+          actor.sprite.setAlpha(0);
+          this.tweens.add({ targets: actor.sprite, alpha: 1, duration: this.playback.tickDuration * 0.9 });
+        }
+        break;
+      }
+      case 'vanish':
+        this.tweens.killTweensOf(actor.sprite);
+        if (instant) actor.sprite.setVisible(false);
+        else {
+          this.tweens.add({
+            targets: actor.sprite,
+            alpha: 0,
+            duration: this.playback.tickDuration * 0.9,
+            onComplete: () => actor.sprite.setVisible(false).setAlpha(1),
+          });
+        }
+        break;
       case 'seen':
         this.seenBy = event.actor;
         if (!instant) this.cameras.main.shake(this.playback.tickDuration * 0.6, 0.006);
@@ -560,7 +621,9 @@ class LevelScene extends Phaser.Scene {
     dataset.dark = String(!this.lit);
     dataset.stairs = stairs.join(';');
     dataset.wizard = this.wizardTile.join(',');
+    // An actor out of sight is left out (D74).
     dataset.actors = [...this.actors]
+      .filter(([, a]) => a.sprite.visible)
       .map(([id, a]) => `${id}:${a.tile.join(',')},${a.facing}`)
       .join(';');
     dataset.doors = [...this.openDoors].sort().join(',');
@@ -599,6 +662,7 @@ class LevelScene extends Phaser.Scene {
   private think(text: string, tick: number): void {
     this.clearThought();
     this.clearBubble();
+    this.speaker = null;
     const words = this.add
       .text(0, 0, text.replaceAll('`', ''), {
         fontFamily: 'system-ui, sans-serif',
@@ -625,7 +689,7 @@ class LevelScene extends Phaser.Scene {
     words.setOrigin(0.5, below ? 0 : 1).setY(below ? 14 + pad : -14 - pad);
     this.bubblePlace = { width, below };
     this.thought = this.add.container(...this.bubbleAnchor(), [cloud, words]).setDepth(11);
-    this.thoughtUntil = tick + SAY_TICKS;
+    this.thoughtUntil = tick + this.sayTicks;
     this.parentNode.dataset.thought = text.replaceAll('`', '');
   }
 
@@ -635,17 +699,21 @@ class LevelScene extends Phaser.Scene {
     delete this.parentNode.dataset.thought;
   }
 
-  private say(text: string, tick: number): void {
+  /** Words said in a bubble over the wizard, or over the actor who says them. */
+  private say(text: string, tick: number, over: Phaser.GameObjects.Sprite = this.wizard, who = 'wizard'): void {
     this.clearBubble();
     this.clearThought();
+    this.speaker = over;
+    // A story's words may mark a word to type or a name in code; a bubble shows them plain.
+    const plain = text.replace(/[`*_]/g, '');
     const bubble = this.add
-      .text(0, 0, text, {
+      .text(0, 0, plain, {
         fontFamily: 'system-ui, sans-serif',
         fontSize: '15px',
         color: '#1f2330',
         backgroundColor: '#ffffff',
         padding: { x: 6, y: 3 },
-        wordWrap: { width: TILE * 4 },
+        wordWrap: { width: TILE * (this.options.story ? 6 : 4) },
       })
       .setDepth(10);
     const below = !this.roomAbove(bubble.height);
@@ -653,21 +721,26 @@ class LevelScene extends Phaser.Scene {
     this.bubblePlace = { width: bubble.width, below };
     bubble.setPosition(...this.bubbleAnchor());
     this.bubble = bubble;
-    this.bubbleUntil = tick + SAY_TICKS;
+    this.bubbleUntil = tick + this.sayTicks;
+    this.parentNode.dataset.bubble = plain;
+    this.parentNode.dataset.speaker = who;
   }
 
   private clearBubble(): void {
     this.bubble?.destroy();
     this.bubble = null;
+    delete this.parentNode.dataset.bubble;
+    delete this.parentNode.dataset.speaker;
   }
 }
 
-/** Starts the level's scene in `parent`, its wizard drawn with `look`; resolves
- * once it is drawn. */
+/** Starts the level's scene in `parent`, its wizard drawn with `look`, or a
+ * story's (D74); resolves once it is drawn. */
 export function startScene(
   parent: HTMLElement,
   level: LevelJson,
   look: Look = DEFAULT_LOOK,
+  options: SceneOptions = {},
 ): Promise<SceneHandle> {
   const map = layout(level);
   const playback = new Playback({ tickMs: TICK_MS });
@@ -700,7 +773,7 @@ export function startScene(
         },
       });
     };
-    const scene = new LevelScene(map, parent, playback, onReady, look);
+    const scene = new LevelScene(map, parent, playback, onReady, look, options);
     game = new Phaser.Game({
       type: Phaser.AUTO,
       parent,

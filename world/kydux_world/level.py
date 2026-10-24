@@ -8,10 +8,11 @@ marker), like `D` for a door. Positions are (x, y) from the top-left corner,
 x to the right and y down.
 
 A level that is a part of a chapter's scene (D65) names it in `scene` instead
-of giving a map: the scene's rows are read from content/scenes/<id>/map.txt
-(`#`, `.` and `=` only), and the level puts the wizard at `start` and the
-`E` the reach goal wants at `end`, each [x, y]; `from_directory` builds the
-level's map from them.
+of giving a map: the scene's rows are read from content/scenes/<id>/map.txt,
+letters whose terrains its scene.json names (D73), and the level puts the
+wizard at `start` and the `E` the reach goal wants at `end`, each [x, y];
+`from_directory` builds the level's map from them. A story told on a scene
+(D74) is staged on it the same way, by `story_on_scene`.
 
 Beside the map: `things` (keys, doors, books...) and `actors` (the teacher,
 the ghost, the cat, a friend), each placed by a marker or at x and y, with an
@@ -680,3 +681,158 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
         built["dark"] = bool(dark)
         built["dark_area"] = [list(scene.rooms[room]) for room in dark]
     return built
+
+
+STORY_DOINGS = ("walk", "face", "appear", "vanish")
+
+
+def _story_tile(value: Any, what: str, story_id: Any) -> Position:
+    if not (
+        isinstance(value, list)
+        and len(value) == 2
+        and all(isinstance(v, int) and not isinstance(v, bool) for v in value)
+    ):
+        raise LevelError(f"{story_id}: {what} must be [x, y]")
+    return Position(*value)
+
+
+def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
+    """A story's staging checked against its scene and made whole (D74): the
+    world the page draws, as a level on the scene is built, under `world`.
+
+    The staging puts the wizard at `wizard`, the camera on `camera`, and each
+    actor at its `at`; an actor with no `at` is out of sight until a step makes
+    it appear. Each step is said by `voice`, `wizard` or an actor, after its
+    action (`do`), done by its speaker or by the figure `by` names: a walk in a
+    straight line to a tile, every tile on the way walked on and free (no one
+    standing there, no door shut); a turn to face a way; appearing on a free
+    tile; vanishing, once its words are said. The voice does nothing itself;
+    no one speaks or moves out of sight."""
+    story_id = data.get("id")
+    if "scene" not in data:
+        raise LevelError(f"{story_id}: a story is told on a scene")
+    wizard = _story_tile(data.get("wizard"), "wizard", story_id)
+    actors = data.get("actors", [])
+    if not isinstance(actors, list) or not all(isinstance(a, dict) for a in actors):
+        raise LevelError(f"{story_id}: actors must be a list of objects")
+    built = on_scene(
+        {
+            "id": story_id,
+            "scene": data["scene"],
+            "start": list(wizard),
+            **({"things": data["things"]} if "things" in data else {}),
+        },
+        scene,
+    )
+    grid = built["map"]
+    height, width = len(grid), len(grid[0])
+    shut = {
+        Position(*thing["at"])
+        for thing in built.get("things", [])
+        if thing.get("kind") == "door" and thing.get("open") is not True and "at" in thing
+    }
+    camera = _story_tile(data.get("camera", list(wizard)), "camera", story_id)
+    if not (0 <= camera.x < width and 0 <= camera.y < height):
+        raise LevelError(f"{story_id}: the camera's tile {camera.x},{camera.y} is off the scene")
+
+    def walked(tile: Position) -> bool:
+        return (
+            0 <= tile.y < height
+            and 0 <= tile.x < width
+            and grid[tile.y][tile.x] != WALL
+            and (grid[tile.y][tile.x] != SHELF)
+        )
+
+    # Where each figure stands, or None while out of sight.
+    where: dict[str, Position | None] = {"wizard": wizard}
+    for actor in actors:
+        actor_id = _identifier(story_id, actor.get("id"), "an actor's id")
+        if actor_id in where:
+            raise LevelError(f"{story_id}: two figures are called {actor_id}")
+        if actor.get("kind") not in ACTOR_KINDS:
+            raise LevelError(f"{story_id}: {actor_id} is of no kind of actor")
+        where[actor_id] = (
+            _story_tile(actor["at"], f"{actor_id}'s at", story_id) if "at" in actor else None
+        )
+        if where[actor_id] is not None and not walked(where[actor_id]):
+            raise LevelError(f"{story_id}: {actor_id} stands on no floor")
+
+    def free(tile: Position, mover: str) -> bool:
+        taken = any(at == tile for who, at in where.items() if who != mover)
+        return walked(tile) and tile not in shut and not taken
+
+    first_seen: dict[str, Position] = {}
+    steps = data.get("steps")
+    if not isinstance(steps, list) or not steps:
+        raise LevelError(f"{story_id}: a story has its steps")
+    for number, step in enumerate(steps, 1):
+        here = f"{story_id}, step {number}"
+        if not isinstance(step, dict):
+            raise LevelError(f"{here}: a step is an object")
+        who, doing = step.get("who"), step.get("do")
+        # Who does the step's action: its speaker, or `by` when the voice tells it.
+        doer = step.get("by", who)
+        if who != "voice" and who not in where:
+            raise LevelError(f"{here}: {who} is no one in the story")
+        if doing is not None and doer not in where:
+            raise LevelError(f"{here}: the action is done by no one in the story; give its by")
+        if "by" in step and doing is None:
+            raise LevelError(f"{here}: by names who does the action, and there is none")
+        if doing is None:
+            pass
+        elif not (isinstance(doing, dict) and len(doing) == 1 and set(doing) <= set(STORY_DOINGS)):
+            raise LevelError(f"{here}: do is one of {', '.join(STORY_DOINGS)}")
+        elif "appear" in doing:
+            tile = _story_tile(doing["appear"], "appear", here)
+            if where[doer] is not None:
+                raise LevelError(f"{here}: {doer} is already in sight")
+            if not free(tile, doer):
+                raise LevelError(f"{here}: {doer} appears on a tile not free")
+            where[doer] = tile
+            first_seen.setdefault(doer, tile)
+        elif where[doer] is None:
+            raise LevelError(f"{here}: {doer} is out of sight")
+        elif "vanish" in doing:
+            if doer == "wizard":
+                raise LevelError(f"{here}: the wizard stays in the story")
+            where[doer] = None
+        elif "face" in doing:
+            if doing["face"] not in FACINGS:
+                raise LevelError(f"{here}: face is one of {', '.join(FACINGS)}")
+        else:
+            to = _story_tile(doing["walk"], "walk", here)
+            at = where[doer]
+            if (to.x != at.x) == (to.y != at.y):
+                raise LevelError(f"{here}: {doer} walks in a straight line, to another tile")
+            dx, dy = (to.x > at.x) - (to.x < at.x), (to.y > at.y) - (to.y < at.y)
+            tile = at
+            while tile != to:
+                tile = Position(tile.x + dx, tile.y + dy)
+                if not free(tile, doer):
+                    raise LevelError(f"{here}: {doer}'s walk is stopped at {tile.x},{tile.y}")
+            where[doer] = to
+        # Who vanishes says the step's words first, then goes.
+        vanishing = isinstance(doing, dict) and "vanish" in doing and doer == who
+        if who != "voice" and where[who] is None and not vanishing:
+            raise LevelError(f"{here}: {who} speaks out of sight")
+
+    world_actors = []
+    for actor in actors:
+        actor_id = actor["id"]
+        placed = dict(actor)
+        if "at" not in actor:
+            if actor_id not in first_seen:
+                raise LevelError(f"{story_id}: {actor_id} never appears")
+            placed["at"] = list(first_seen[actor_id])
+            placed["hidden"] = True
+        # In a story no one watches for the wizard.
+        placed["sight"] = 0
+        world_actors.append(placed)
+    if world_actors:
+        built["actors"] = world_actors
+    del built["id"]
+    staging = ("wizard", "actors", "things")
+    story = {key: value for key, value in data.items() if key not in staging}
+    story["camera"] = list(camera)
+    story["world"] = built
+    return story

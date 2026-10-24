@@ -1,17 +1,17 @@
 ---
 outputs:
-  - content/stories/after-dark/en.md
-  - content/stories/after-dark/es.md
-  - content/stories/the-top-of-the-stairs/en.md
-  - content/stories/the-top-of-the-stairs/es.md
-  - content/stories/caught/en.md
-  - content/stories/caught/es.md
+  - content/stories/after-dark/text.en.json
+  - content/stories/after-dark/text.es.json
+  - content/stories/the-top-of-the-stairs/text.en.json
+  - content/stories/the-top-of-the-stairs/text.es.json
+  - content/stories/caught/text.en.json
+  - content/stories/caught/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/up-to-the-castle/en.md
-  - content/stories/in-the-castle/en.md
-  - content/stories/the-wand-bank/en.md
-  - content/stories/the-wand-bank/es.md
+  - content/stories/up-to-the-castle/text.en.json
+  - content/stories/in-the-castle/text.en.json
+  - content/stories/the-wand-bank/text.en.json
+  - content/stories/the-wand-bank/text.es.json
 ---
 Write the three story pages of chapter 3, *The passages*. Chapter 2
 ended at the wand bank, with a school wand borrowed and night falling

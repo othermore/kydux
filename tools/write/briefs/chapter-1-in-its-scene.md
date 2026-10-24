@@ -1,9 +1,9 @@
 ---
 outputs:
-  - content/stories/at-the-gate/en.md
-  - content/stories/at-the-gate/es.md
-  - content/stories/up-to-the-castle/en.md
-  - content/stories/up-to-the-castle/es.md
+  - content/stories/at-the-gate/text.en.json
+  - content/stories/at-the-gate/text.es.json
+  - content/stories/up-to-the-castle/text.en.json
+  - content/stories/up-to-the-castle/text.es.json
   - content/levels/the-gate/text.en.json
   - content/levels/the-gate/text.es.json
   - content/levels/the-corridor/text.en.json
@@ -24,11 +24,11 @@ outputs:
   - content/levels/the-way-in/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/the-letter/en.md
-  - content/stories/at-the-gate/en.md
-  - content/stories/at-the-gate/es.md
-  - content/stories/up-to-the-castle/en.md
-  - content/stories/up-to-the-castle/es.md
+  - content/stories/the-letter/text.en.json
+  - content/stories/at-the-gate/text.en.json
+  - content/stories/at-the-gate/text.es.json
+  - content/stories/up-to-the-castle/text.en.json
+  - content/stories/up-to-the-castle/text.es.json
   - content/lessons/what-a-program-is/en.md
   - content/lessons/objects-and-actions/en.md
   - content/lessons/notes/en.md

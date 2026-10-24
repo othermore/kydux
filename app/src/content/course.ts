@@ -1,4 +1,4 @@
-// The course: chapters of story pages, lessons and levels, in order (D32, D56),
+// The course: chapters of stories, lessons and levels, in order (D32, D56, D74),
 // read from content/course.json, which pack-world writes from content/chapters/.
 // An item is `story:<id>`, `lesson:<id>` or `level:<id>`.
 
@@ -17,7 +17,7 @@ export interface ItemNumber {
 
 export interface Course {
   chapters: Chapter[];
-  /** The number of each lesson and level; a story page has none. */
+  /** The number of each lesson and level; a story has none. */
   numbers?: Record<string, ItemNumber>;
   /** For each level, the concepts the lessons before it taught (D60). */
   concepts?: Record<string, string[]>;
@@ -73,7 +73,7 @@ export function previous(course: Course, item: string): string | null {
   return index > 0 ? (all[index - 1] ?? null) : null;
 }
 
-/** Whether an item is done: a story page or a lesson read, a level won. */
+/** Whether an item is done: a story or a lesson read, a level won. */
 export function isDone(item: string, progress: Progress): boolean {
   const parsed = parseItem(item);
   if (!parsed) return false;

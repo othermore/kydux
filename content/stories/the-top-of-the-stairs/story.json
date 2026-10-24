@@ -1,4 +1,49 @@
 {
   "id": "the-top-of-the-stairs",
-  "speaker": "nuri"
+  "speaker": "nuri",
+  "scene": "the-passages",
+  "wizard": [
+    19,
+    2
+  ],
+  "camera": [
+    17,
+    3
+  ],
+  "actors": [
+    {
+      "id": "nuri",
+      "kind": "friend",
+      "at": [
+        18,
+        2
+      ],
+      "facing": "right"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "do": {
+        "walk": [
+          19,
+          1
+        ]
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "voice",
+      "do": {
+        "face": "left"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "nuri",
+      "do": {
+        "face": "up"
+      }
+    }
+  ]
 }

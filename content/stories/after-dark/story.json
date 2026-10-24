@@ -1,4 +1,65 @@
 {
   "id": "after-dark",
-  "speaker": "nuri"
+  "speaker": "nuri",
+  "scene": "the-passages",
+  "wizard": [
+    3,
+    2
+  ],
+  "camera": [
+    5,
+    3
+  ],
+  "actors": [
+    {
+      "id": "nuri",
+      "kind": "friend"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "do": {
+        "face": "left"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "nuri",
+      "do": {
+        "appear": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "who": "nuri",
+      "do": {
+        "walk": [
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "who": "voice",
+      "do": {
+        "walk": [
+          6,
+          2
+        ]
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "nuri",
+      "do": {
+        "walk": [
+          5,
+          2
+        ]
+      }
+    }
+  ]
 }

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Each level on a scene (D65), as the page reads it: its level.json with the
-scene's map built in, the wizard's S at its start and the E at its end.
-Printed as a JSON object of level id to level.json; pack-world.mjs writes each
-into public/content/levels/<id>/level.json, so that the page loads a level on a
-scene as any other.
+"""Each level and each story on a scene (D65, D74), as the page reads it: a
+level's level.json with the scene's map built in, the wizard's S at its start
+and the E at its end; a story's story.json with its staging checked against the
+scene and the world it is played in under `world`. Printed as a JSON object,
+{"levels": {id: level.json}, "stories": {id: story.json}}; pack-world.mjs
+writes each into public/content/, so that the page loads a level on a scene as
+any other, and a story with its world ready.
 
     tools/scene_maps.py
 """
@@ -16,22 +18,28 @@ REPO = Path(__file__).resolve().parents[1]
 CONTENT = REPO / "content"
 
 
-def scene_maps() -> dict[str, dict]:
+def scene_maps(content: Path = CONTENT) -> dict[str, dict[str, dict]]:
     sys.path.insert(0, str(REPO / "world"))
-    from kydux_world.level import Level, on_scene, read_scene
+    from kydux_world.level import Level, on_scene, read_scene, story_on_scene
 
-    built = {}
-    for path in sorted((CONTENT / "levels").glob("*/level.json")):
+    levels = {}
+    for path in sorted((content / "levels").glob("*/level.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         if "scene" not in data:
             continue
         # Read as the world reads it, so that a level badly placed fails here too.
         Level.from_directory(path.parent)
-        built[data["id"]] = on_scene(
-            data, read_scene(CONTENT / "scenes", data["scene"], data["id"])
+        levels[data["id"]] = on_scene(
+            data, read_scene(content / "scenes", data["scene"], data["id"])
         )
-    return built
+    stories = {}
+    for path in sorted((content / "stories").glob("*/story.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        stories[data["id"]] = story_on_scene(
+            data, read_scene(content / "scenes", data.get("scene"), data.get("id"))
+        )
+    return {"levels": levels, "stories": stories}
 
 
 if __name__ == "__main__":
-    print(json.dumps(scene_maps(), indent=2))
+    print(json.dumps(scene_maps(), indent=2, ensure_ascii=False))

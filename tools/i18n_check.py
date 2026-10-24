@@ -18,6 +18,10 @@ Fails, printing file:line: message for each, on:
     in any text for the player; and in Spanish, `mago` or `maga` outside a choice,
     so that no text speaks of a girl as a boy by oversight (D37);
   - a level's speaker without its name, characters.<speaker>, in a language;
+  - a story, content/stories/<id>/, without a text.<lang>.json for every
+    language, or with a title missing, or with other than one text for each
+    step of its story.json (D74); or a figure who speaks in it, or its
+    speaker, without its name in a language;
   - the screen's guide, content/guide/, without a text.<lang>.json for every
     language, or with steps that differ between languages or lack their words;
   - a string literal in the app's code that reads like words for a person (words
@@ -122,6 +126,35 @@ def check_speakers(languages: dict[str, dict[str, str]]) -> list[str]:
     return findings
 
 
+def check_stories(languages: dict[str, dict[str, str]]) -> list[str]:
+    """Every story has its title and one text a step in every language, and every
+    figure who speaks in it has its name (D74)."""
+    findings = []
+    for path in sorted((REPO / "content" / "stories").glob("*/story.json")):
+        name = path.parent.relative_to(REPO).as_posix()
+        story = json.loads(path.read_text(encoding="utf-8"))
+        steps = story.get("steps", [])
+        named = {step.get("who") for step in steps} - {"voice", "wizard"}
+        if story.get("speaker"):
+            named.add(story["speaker"])
+        for lang, catalog in languages.items():
+            text_path = path.parent / f"text.{lang}.json"
+            if not text_path.is_file():
+                findings.append(f"{name}: lacks text.{lang}.json")
+                continue
+            text = json.loads(text_path.read_text(encoding="utf-8"))
+            if not text.get("title"):
+                findings.append(f"{name}/text.{lang}.json: lacks a title")
+            if len(text.get("steps", [])) != len(steps):
+                findings.append(
+                    f"{name}/text.{lang}.json: {len(steps)} steps in story.json, not as many here"
+                )
+            for who in sorted(map(str, named)):
+                if f"characters.{who}" not in catalog:
+                    findings.append(f"{name}: {who} has no name in i18n/{lang}.json")
+    return findings
+
+
 def check_guide(languages: list[str]) -> list[str]:
     """The screen's guide (D68) has the same steps in every language, each with its
     title and its words."""
@@ -177,7 +210,7 @@ def strings(value) -> list[str]:
 
 def player_texts(languages: dict[str, dict[str, str]]) -> list[tuple[str, str, str]]:
     """Every text for the player, as (language, where, text): the app's words, the
-    levels', the chapters' and the lessons'."""
+    levels', the chapters', the stories' and the lessons'."""
     texts = []
     for lang, catalog in languages.items():
         texts.extend(
@@ -191,7 +224,7 @@ def player_texts(languages: dict[str, dict[str, str]]) -> list[tuple[str, str, s
         where = path.relative_to(REPO).as_posix()
         found = strings(json.loads(path.read_text(encoding="utf-8")))
         texts.extend((lang, where, text) for text in found)
-    for path in sorted([*content.glob("lessons/*/*.md"), *content.glob("stories/*/*.md")]):
+    for path in sorted(content.glob("lessons/*/*.md")):
         where = path.relative_to(REPO).as_posix()
         texts.append((path.stem, where, path.read_text(encoding="utf-8")))
     return texts
@@ -284,6 +317,7 @@ def check() -> list[str]:
     findings.extend(check_chapters(list(languages)))
     findings.extend(check_guide(list(languages)))
     findings.extend(check_speakers(languages))
+    findings.extend(check_stories(languages))
     findings.extend(check_world_words(languages))
     findings.extend(check_choices(languages))
 

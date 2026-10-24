@@ -26,3 +26,25 @@ export async function seedWizard(target: Page | BrowserContext, wizard: SeededWi
     }
   }, document);
 }
+
+/** What a story says at its step (D74): the voice's band, or what a figure says,
+ * which the screen gives a screen reader beside the bubble. */
+export function storySaid(page: Page) {
+  return page.locator('.story-said');
+}
+
+/** A story's steps gone through: Next pressed `times` times, each step played. */
+export async function storyNext(page: Page, times = 1): Promise<void> {
+  for (let turn = 0; turn < times; turn += 1) {
+    const before = await page.locator('#story-step').textContent();
+    await page.locator('#story-next').click();
+    await expect(page.locator('#story-step')).not.toHaveText(before ?? '');
+  }
+}
+
+/** A story read to its end, and Go on pressed. */
+export async function finishStory(page: Page): Promise<void> {
+  await expect(page.locator('.story-screen')).toBeVisible();
+  while ((await page.locator('#story-next').count()) > 0) await storyNext(page);
+  await page.locator('#story-go-on').click();
+}

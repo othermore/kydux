@@ -14,8 +14,8 @@ outputs:
   - content/lessons/kirra-and-osto/es.md
 context:
   - docs/dev/story.md
-  - content/stories/after-dark/en.md
-  - content/stories/the-top-of-the-stairs/en.md
+  - content/stories/after-dark/text.en.json
+  - content/stories/the-top-of-the-stairs/text.en.json
   - content/lessons/what-a-program-is/en.md
   - content/lessons/a-name-for-a-value/en.md
   - content/lessons/what-things-know/en.md

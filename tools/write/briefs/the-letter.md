@@ -1,7 +1,7 @@
 ---
 outputs:
-  - content/stories/the-letter/en.md
-  - content/stories/the-letter/es.md
+  - content/stories/the-letter/text.en.json
+  - content/stories/the-letter/text.es.json
 context:
   - docs/dev/story.md
   - tools/write/rules.md

@@ -7,7 +7,7 @@
 import { mkdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
-import { skipGuide } from './helpers';
+import { skipGuide, storyNext, storySaid } from './helpers';
 
 const SHOTS = fileURLToPath(new URL('./shots/', import.meta.url));
 
@@ -63,10 +63,11 @@ for (const [lang, words] of Object.entries(WORDS)) {
 
     // A fresh visit: the story's opening, then the creator (D61).
     await page.goto('/');
-    await expect(page.locator('.lesson-page h1')).toHaveText(words.opening);
+    await expect(page.locator('#story-title')).toHaveText(words.opening);
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done');
     await shoot(page, 'opening');
-    for (let turn = 0; turn < 3; turn += 1) await page.locator('#lesson-next').click();
-    await page.locator('#lesson-try').click();
+    await storyNext(page, 3);
+    await page.locator('#story-go-on').click();
 
     // The creator: a name, a girl, a look.
     await page.locator('#wizard-name').fill('Ada');
@@ -76,15 +77,19 @@ for (const [lang, words] of Object.entries(WORDS)) {
 
     // Chapter 1 opens at the gate, where Nuri greets the wizard by name.
     await page.locator('#wizard-done').click();
-    await expect(page.locator('.lesson-page h1')).toHaveText(words.story);
+    await expect(page.locator('#story-title')).toHaveText(words.story);
     await shoot(page, 'at-the-gate');
-    await page.locator('#lesson-next').click();
-    await page.locator('#lesson-next').click();
-    await expect(page.locator('.lesson-page')).toContainText(words.greeting);
-    // The story's last page: Nuri turns to teaching.
-    await page.locator('#lesson-next').click();
+    // Nuri comes up the path, and walks to the wizard's side to speak (D74).
+    await storyNext(page, 2);
+    await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'nuri:10,6,right');
+    await expect(page.locator('#scene')).toHaveAttribute('data-speaker', 'nuri');
+    await shoot(page, 'nuri-speaks');
+    await storyNext(page, 2);
+    await expect(storySaid(page)).toContainText(words.greeting);
+    // The story's last step: Nuri turns to teaching.
+    await storyNext(page);
     await shoot(page, 'nuri-teaches');
-    await page.locator('#lesson-try').click();
+    await page.locator('#story-go-on').click();
 
     // The first lesson, page by page.
     await expect(page.locator('.lesson-page h1')).toHaveText(words.lesson);

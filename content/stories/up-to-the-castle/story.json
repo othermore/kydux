@@ -1,4 +1,83 @@
 {
   "id": "up-to-the-castle",
-  "speaker": "nuri"
+  "speaker": "nuri",
+  "scene": "the-gate",
+  "wizard": [
+    18,
+    2
+  ],
+  "camera": [
+    18,
+    3
+  ],
+  "things": [
+    {
+      "id": "gate",
+      "open": true
+    },
+    {
+      "id": "door",
+      "open": true
+    },
+    {
+      "id": "inner_gate",
+      "open": true
+    },
+    {
+      "id": "first_seal",
+      "open": true
+    },
+    {
+      "id": "second_seal",
+      "open": true
+    }
+  ],
+  "actors": [
+    {
+      "id": "nuri",
+      "kind": "friend",
+      "at": [
+        19,
+        3
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "do": {
+        "walk": [
+          18,
+          1
+        ]
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "nuri",
+      "do": {
+        "walk": [
+          18,
+          3
+        ]
+      }
+    },
+    {
+      "who": "nuri",
+      "do": {
+        "walk": [
+          18,
+          2
+        ]
+      }
+    },
+    {
+      "who": "nuri",
+      "do": null
+    },
+    {
+      "who": "nuri",
+      "do": null
+    }
+  ]
 }

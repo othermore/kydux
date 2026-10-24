@@ -1,9 +1,8 @@
-// A lesson or a story page, page by page: its Markdown rendered by marked
-// (D33), Back and Next page, and on the last page Try it, which marks the
-// lesson read and opens what comes next; a story page, or a lesson with no
-// example, has Go on instead (D56). Reaching the last page marks it read. A
-// lesson is drawn as its teacher speaking, the figure beside the words; a story
-// page as a page of a book (D67).
+// A lesson, page by page: its Markdown rendered by marked (D33), Back and Next
+// page, and on the last page Try it, which marks the lesson read and opens what
+// comes next; a lesson with no example has Go on instead (D56). Reaching the
+// last page marks it read. A lesson is drawn as its teacher speaking, the
+// figure beside the words (D67).
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
@@ -16,15 +15,10 @@ import type { Screen } from './screen';
 
 export interface LessonScreenParts {
   lesson: Lesson;
-  /** A lesson, or a story page, which is read the same way and kept apart. */
-  kind: 'lesson' | 'story';
   /** The lesson's number in its chapter, in words (*Lesson 3*), or none. */
   label?: string;
   /** The course's item after this lesson, or null after the last. */
   next: string | null;
-  /** Where Go on leads when it is not to the course's next item: from the game's
-   * opening, to the creator or to the course's start (D61). */
-  onward?: string;
   /** A lesson read again from a level: where Back to the level goes (D71). */
   backTo?: string;
   /** The lesson in the language now set, for a change of language. */
@@ -34,11 +28,11 @@ export interface LessonScreenParts {
 export function lessonScreen(parts: LessonScreenParts): Screen {
   let lesson = parts.lesson;
   let page = 0;
-  const node = element('div', { className: `lesson-screen ${parts.kind === 'story' ? 'story' : 'taught'}` });
+  const node = element('div', { className: 'lesson-screen taught' });
 
   // The teacher beside a lesson's words: the character's figure, with the name (D67).
   const teacher = () => {
-    const speaker = parts.kind === 'lesson' ? lesson.speaker : undefined;
+    const speaker = lesson.speaker;
     if (!speaker) return null;
     const figure = element('canvas', { className: 'lesson-figure' });
     drawFigurePreview(figure, friendFigure(speaker, progress.wizard()?.gender ?? 'girl'));
@@ -48,8 +42,7 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
     ]);
   };
 
-  const markRead = () =>
-    parts.kind === 'story' ? progress.markStoryRead(lesson.id) : progress.markRead(lesson.id);
+  const markRead = () => progress.markRead(lesson.id);
 
   const tryIt = () => {
     markRead();
@@ -59,7 +52,7 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
     }
     const next = parts.next;
     if (next) progress.setCurrent(next);
-    location.hash = parts.onward ?? (next ? itemHash(next) : '#map');
+    location.hash = next ? itemHash(next) : '#map';
   };
 
   const draw = () => {
@@ -119,9 +112,8 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
   return {
     node,
     mount: () => {
-      // The opening is before the course: Continue does not come back to it.
-      // So is a lesson read again from a level: the child is still at the level.
-      if (!lesson.opening && !parts.backTo) progress.setCurrent(`${parts.kind}:${lesson.id}`);
+      // A lesson read again from a level: the child is still at the level.
+      if (!parts.backTo) progress.setCurrent(`lesson:${lesson.id}`);
       draw();
     },
     async relabel() {

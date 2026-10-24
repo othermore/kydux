@@ -20,9 +20,9 @@ outputs:
   - content/levels/the-night-walk/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/after-dark/en.md
-  - content/stories/the-top-of-the-stairs/en.md
-  - content/stories/caught/en.md
+  - content/stories/after-dark/text.en.json
+  - content/stories/the-top-of-the-stairs/text.en.json
+  - content/stories/caught/text.en.json
   - content/lessons/true-or-false/en.md
   - content/lessons/if/en.md
   - content/lessons/else/en.md

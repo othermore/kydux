@@ -47,7 +47,7 @@ test('a lesson in Spanish', async ({ browser }) => {
   await context.close();
 });
 
-test('a lesson shows who teaches it; a story page looks like a page of a book (D67)', async ({ page }) => {
+test('a lesson shows who teaches it; a story is told on its scene instead (D67, D74)', async ({ page }) => {
   await page.goto('/#lesson/what-a-program-is');
   await expect(page.locator('.lesson-screen')).toHaveClass(/taught/);
   await expect(page.locator('#lesson-teacher figcaption')).toHaveText('Nuri');
@@ -55,6 +55,7 @@ test('a lesson shows who teaches it; a story page looks like a page of a book (D
   await page.goto('/#lesson/a-name-for-a-value');
   await expect(page.locator('#lesson-teacher figcaption')).toHaveText('Wenna');
   await page.goto('/#story/at-the-gate');
-  await expect(page.locator('.lesson-screen')).toHaveClass(/story/);
+  await expect(page.locator('.story-screen #scene canvas')).toBeVisible();
+  await expect(page.locator('.lesson-screen')).toHaveCount(0);
   await expect(page.locator('#lesson-teacher')).toHaveCount(0);
 });

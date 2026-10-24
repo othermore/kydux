@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
-import { seedWizard } from './helpers';
+import { seedWizard, storyNext, storySaid } from './helpers';
 
 test.use({ locale: 'en-US' });
 
@@ -19,14 +19,13 @@ async function makeWizard(page: Page, name: string, gender: 'girl' | 'boy', look
 test('a first visit opens on the story, which leads to the creator (D61)', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveURL(/#story\/the-letter$/);
-  await expect(page.locator('.lesson-page h1')).toHaveText('The letter');
-  // No code in the opening: the story comes first.
-  for (let turn = 0; turn < 3; turn += 1) {
-    await expect(page.locator('.lesson-page pre')).toHaveCount(0);
-    await page.locator('#lesson-next').click();
-  }
-  await expect(page.locator('#lesson-try')).toHaveText('Go on');
-  await page.locator('#lesson-try').click();
+  await expect(page.locator('#story-title')).toHaveText('The letter');
+  // No code in the opening: the story comes first, told on the scene (D74).
+  await expect(page.locator('.cm-content')).toHaveCount(0);
+  await expect(page.locator('#scene canvas')).toBeVisible();
+  await storyNext(page, 3);
+  await expect(page.locator('#story-go-on')).toHaveText('Go on');
+  await page.locator('#story-go-on').click();
   await expect(page).toHaveURL(/#wizard$/);
   // The start screen, reached on purpose, begins the story too.
   await page.goto('/#start');
@@ -58,9 +57,8 @@ test('the creator, and Done opens the first lesson by name', async ({ page }) =>
   await page.locator('#wizard-done').click();
   // Chapter 1 opens at the gate, where Nuri greets the wizard by name.
   await expect(page).toHaveURL(/#story\/at-the-gate$/);
-  await page.locator('#lesson-next').click();
-  await page.locator('#lesson-next').click();
-  await expect(page.locator('.lesson-page')).toContainText('Ana');
+  await storyNext(page, 4);
+  await expect(storySaid(page)).toContainText('Ana');
 
   await page.locator('#home').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Ana');

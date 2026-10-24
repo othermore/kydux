@@ -1,14 +1,14 @@
 ---
 outputs:
-  - content/stories/in-the-castle/en.md
-  - content/stories/in-the-castle/es.md
-  - content/stories/the-wand-bank/en.md
-  - content/stories/the-wand-bank/es.md
+  - content/stories/in-the-castle/text.en.json
+  - content/stories/in-the-castle/text.es.json
+  - content/stories/the-wand-bank/text.en.json
+  - content/stories/the-wand-bank/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/at-the-gate/en.md
-  - content/stories/up-to-the-castle/en.md
-  - content/stories/up-to-the-castle/es.md
+  - content/stories/at-the-gate/text.en.json
+  - content/stories/up-to-the-castle/text.en.json
+  - content/stories/up-to-the-castle/text.es.json
 ---
 Write the two story pages of chapter 2, *The library*, which open and
 close it. Chapter 1 ended on the castle road (the closing page is given).

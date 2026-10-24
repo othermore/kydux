@@ -233,6 +233,11 @@
     "go_on": "Go on",
     "not_found": "There is no lesson called “{id}”."
   },
+  "story": {
+    "next": "Next",
+    "step": "{n} of {total}",
+    "not_found": "There is no story called “{id}”."
+  },
   "settings": {
     "title": "Settings",
     "page_title": "Kydux — settings",

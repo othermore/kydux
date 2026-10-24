@@ -1,4 +1,35 @@
 {
   "id": "the-letter",
-  "opening": true
+  "opening": true,
+  "scene": "the-gate",
+  "wizard": [
+    11,
+    6
+  ],
+  "camera": [
+    11,
+    6
+  ],
+  "actors": [],
+  "steps": [
+    {
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": {
+        "face": "right"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "voice",
+      "do": null
+    }
+  ]
 }

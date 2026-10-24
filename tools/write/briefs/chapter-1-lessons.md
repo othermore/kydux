@@ -1,7 +1,7 @@
 ---
 outputs:
-  - content/stories/at-the-gate/en.md
-  - content/stories/at-the-gate/es.md
+  - content/stories/at-the-gate/text.en.json
+  - content/stories/at-the-gate/text.es.json
   - content/lessons/what-a-program-is/en.md
   - content/lessons/what-a-program-is/es.md
   - content/lessons/objects-and-actions/en.md
@@ -16,12 +16,12 @@ outputs:
   - content/lessons/things-to-carry/es.md
   - content/lessons/your-first-spell/en.md
   - content/lessons/your-first-spell/es.md
-  - content/stories/up-to-the-castle/en.md
-  - content/stories/up-to-the-castle/es.md
+  - content/stories/up-to-the-castle/text.en.json
+  - content/stories/up-to-the-castle/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/the-letter/en.md
-  - content/stories/the-letter/es.md
+  - content/stories/the-letter/text.en.json
+  - content/stories/the-letter/text.es.json
 ---
 Write chapter 1 of Kydux, *Arrival*: its opening story page, its seven
 lessons and its closing story page, in English and Spanish. The level texts

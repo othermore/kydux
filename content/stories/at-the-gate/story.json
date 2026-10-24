@@ -1,4 +1,62 @@
 {
   "id": "at-the-gate",
-  "speaker": "nuri"
+  "speaker": "nuri",
+  "scene": "the-gate",
+  "wizard": [
+    11,
+    6
+  ],
+  "camera": [
+    9,
+    6
+  ],
+  "actors": [
+    {
+      "id": "nuri",
+      "kind": "friend"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "do": {
+        "face": "right"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "voice",
+      "do": {
+        "appear": [
+          5,
+          6
+        ]
+      },
+      "by": "nuri"
+    },
+    {
+      "who": "nuri",
+      "do": {
+        "walk": [
+          10,
+          6
+        ]
+      }
+    },
+    {
+      "who": "voice",
+      "do": {
+        "face": "left"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "nuri",
+      "do": null
+    },
+    {
+      "who": "nuri",
+      "do": null
+    }
+  ]
 }

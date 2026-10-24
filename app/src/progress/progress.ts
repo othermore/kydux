@@ -140,7 +140,7 @@ export function countRun(id: string): void {
   });
 }
 
-/** A story page read to its end (D56). */
+/** A story read to its end (D56, D74). */
 export function markStoryRead(storyId: string): void {
   change((progress) => {
     progress.stories[storyId] = { read: true };

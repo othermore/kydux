@@ -12,7 +12,7 @@ outputs:
   - content/lessons/fendra/es.md
 context:
   - docs/dev/story.md
-  - content/stories/in-the-castle/en.md
+  - content/stories/in-the-castle/text.en.json
   - content/lessons/what-a-program-is/en.md
   - content/lessons/objects-and-actions/en.md
   - content/lessons/how-much/en.md

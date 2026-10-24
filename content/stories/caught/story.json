@@ -1,4 +1,59 @@
 {
   "id": "caught",
-  "speaker": "nuri"
+  "speaker": "nuri",
+  "scene": "the-night-passages",
+  "wizard": [
+    20,
+    7
+  ],
+  "camera": [
+    17,
+    6
+  ],
+  "actors": [
+    {
+      "id": "nuri",
+      "kind": "friend",
+      "at": [
+        18,
+        7
+      ],
+      "facing": "right"
+    },
+    {
+      "id": "dask",
+      "kind": "teacher"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": {
+        "appear": [
+          20,
+          8
+        ]
+      },
+      "by": "dask"
+    },
+    {
+      "who": "voice",
+      "do": {
+        "face": "down"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "dask",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": null
+    }
+  ]
 }

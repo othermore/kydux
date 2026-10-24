@@ -1,5 +1,6 @@
 """The course in content/ holds together (D32, D33, D41): its chapters name items
-that exist, every lesson is in every language with the same pages and no HTML, what
+that exist, every lesson is in every language with the same pages and no HTML,
+every story is staged on its scene and said in every language (D74), what
 a lesson explains is taught by the level after it, its Try it runs there, and in a
 chapter with lessons, a level teaches nothing a lesson before it has not explained."""
 
@@ -71,9 +72,9 @@ def test_every_item_is_in_the_course_once():
     for path in STORIES:
         story = json.loads((path / "story.json").read_text(encoding="utf-8"))
         assert story["id"] == path.name
-        # The game's opening comes before the course (D61); every other story page is in it.
+        # The game's opening comes before the course (D61); every other story is in it.
         if not story.get("opening"):
-            assert f"story:{path.name}" in items, f"the story page {path.name} is in no chapter"
+            assert f"story:{path.name}" in items, f"the story {path.name} is in no chapter"
     for path in sorted((CONTENT / "levels").iterdir()):
         if (path / "level.json").is_file():
             assert f"level:{path.name}" in items, f"the level {path.name} is in no chapter"
@@ -168,21 +169,29 @@ def test_a_level_teaches_only_what_a_lesson_before_it_explained(path):
 
 
 @pytest.mark.parametrize("path", STORIES, ids=lambda p: p.name)
-def test_a_story_page_is_in_every_language_with_the_same_pages_no_html_and_no_try_it(path):
-    """A story page (D56) is read like a lesson, and has no example to try."""
-    counts = {}
+def test_a_story_is_staged_on_its_scene_and_said_in_every_language(path):
+    """A story (D74) is a staging that fits its scene, and in every language its
+    title and one text for each step, with no HTML."""
+    from kydux_world.level import read_scene, story_on_scene
+
+    story = json.loads((path / "story.json").read_text(encoding="utf-8"))
+    story_on_scene(story, read_scene(CONTENT / "scenes", story.get("scene"), story["id"]))
     for lang in LANGUAGES:
-        text = (path / f"{lang}.md").read_text(encoding="utf-8")
-        counts[lang] = len(pages(text))
-        assert re.match(r"#\s+\S", text), f"{path.name}/{lang}.md does not open with its title"
-        assert not TRY.findall(text), f"{path.name}/{lang}.md has a Try it"
-        prose = INLINE.sub("", FENCED.sub("", text))
-        assert not HTML.search(prose), f"{path.name}/{lang}.md has HTML"
-    assert len(set(counts.values())) == 1, f"{path.name}: pages differ, {counts}"
+        text = json.loads((path / f"text.{lang}.json").read_text(encoding="utf-8"))
+        assert text.get("title"), f"{path.name}/text.{lang}.json has no title"
+        steps = text.get("steps", [])
+        assert len(steps) == len(story["steps"]), (
+            f"{path.name}/text.{lang}.json: not a text a step"
+        )
+        for said in steps:
+            assert isinstance(said, str) and said.strip(), (
+                f"{path.name}/text.{lang}.json: a step unsaid"
+            )
+            assert not HTML.search(INLINE.sub("", said)), f"{path.name}/text.{lang}.json has HTML"
 
 
 def rewritten(chapter_path: Path) -> bool:
-    """A chapter in the shape of the owner's UAT (D56, D62): it opens with a story page.
+    """A chapter in the shape of the owner's UAT (D56, D62): it opens with a story.
     The chapters not yet rewritten are held to it in their own sprint."""
     items = chapter(chapter_path)["items"]
     return bool(items) and items[0].startswith("story:")
@@ -244,7 +253,7 @@ def test_a_level_s_code_needs_only_the_concepts_taught_before_it(directory, item
 @pytest.mark.parametrize("path", [p for p in CHAPTERS if rewritten(p)], ids=lambda p: p.name)
 def test_every_level_of_a_rewritten_chapter_closes(path):
     """Every level says an outro and what was learned; the chapter's last level says
-    no learned, since the chapter's closing story page recaps (D62)."""
+    no learned, since the chapter's closing story recaps (D62)."""
     levels = [i.partition(":")[2] for i in chapter(path)["items"] if i.startswith("level:")]
     for level_id in levels:
         for lang in LANGUAGES:
@@ -256,7 +265,7 @@ def test_every_level_of_a_rewritten_chapter_closes(path):
                 assert "learned" not in text, f"{level_id}, the chapter's last, says learned"
             else:
                 assert text.get("learned", "").strip(), f"{level_id} says no learned in {lang}"
-    assert chapter(path)["items"][-1].startswith("story:"), "the chapter closes with a story page"
+    assert chapter(path)["items"][-1].startswith("story:"), "the chapter closes with a story"
 
 
 def level_json(item_id: str) -> dict:

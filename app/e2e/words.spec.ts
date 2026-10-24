@@ -1,5 +1,5 @@
 import { type Browser, expect, type Page, test } from '@playwright/test';
-import { MARTA, seedWizard, skipGuide } from './helpers';
+import { MARTA, seedWizard, skipGuide, storyNext, storySaid } from './helpers';
 
 /** A page whose progress document already holds a wizard (D36). */
 async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'boy'): Promise<Page> {
@@ -38,7 +38,7 @@ test('the words speak of a boy as a boy', async ({ browser }) => {
   await page.context().close();
 });
 
-test('a story page greets the wizard by name, and Nuri is of the wizard\'s gender', async ({ browser }) => {
+test('a story greets the wizard by name, and Nuri is of the wizard\'s gender', async ({ browser }) => {
   for (const [locale, gender, words] of [
     ['es-ES', 'girl', 'No te preocupes, Marta.'],
     ['es-ES', 'girl', 'Soy una alumna de primer año'],
@@ -47,19 +47,19 @@ test('a story page greets the wizard by name, and Nuri is of the wizard\'s gende
   ] as const) {
     const page = await withWizard(browser, locale, gender);
     await page.goto('/#story/at-the-gate');
-    await page.locator('#lesson-next').click();
-    await page.locator('#lesson-next').click();
-    await page.locator('#lesson-back').click();
-    await expect(page.locator('.lesson-page')).toContainText(words.startsWith('Soy') ? words : 'Nuri');
-    await page.locator('#lesson-next').click();
-    if (!words.startsWith('Soy')) await expect(page.locator('.lesson-page')).toContainText(words);
+    // Nuri's greeting, reached again with Back; then Nuri's first words of advice.
+    await storyNext(page, 3);
+    await page.locator('#story-back').click();
+    await expect(page.locator('#story-step')).toHaveText(/^3 /);
+    if (words.startsWith('Soy')) await expect(storySaid(page)).toContainText(words);
+    await storyNext(page, 2);
+    if (!words.startsWith('Soy')) await expect(storySaid(page)).toContainText(words);
     await page.context().close();
   }
 });
 
-test('with no wizard yet, a story page says the word for one', async ({ page }) => {
+test('with no wizard yet, a story says the word for one', async ({ page }) => {
   await page.goto('/#story/at-the-gate');
-  await page.locator('#lesson-next').click();
-  await page.locator('#lesson-next').click();
-  await expect(page.locator('.lesson-page')).toContainText('Do not worry, apprentice.');
+  await storyNext(page, 4);
+  await expect(storySaid(page)).toContainText('Do not worry, apprentice.');
 });

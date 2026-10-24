@@ -1,4 +1,76 @@
 {
   "id": "the-wand-bank",
-  "speaker": "wenna"
+  "speaker": "wenna",
+  "scene": "the-library",
+  "wizard": [
+    10,
+    11
+  ],
+  "camera": [
+    12,
+    10
+  ],
+  "actors": [
+    {
+      "id": "eldra",
+      "kind": "ghost",
+      "at": [
+        9,
+        11
+      ],
+      "facing": "right"
+    },
+    {
+      "id": "nuri",
+      "kind": "friend"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "do": {
+        "face": "left"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "eldra",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": {
+        "vanish": true
+      },
+      "by": "eldra"
+    },
+    {
+      "who": "voice",
+      "do": {
+        "walk": [
+          15,
+          11
+        ]
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "voice",
+      "do": {
+        "appear": [
+          16,
+          11
+        ]
+      },
+      "by": "nuri"
+    },
+    {
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": null
+    }
+  ]
 }

@@ -38,6 +38,8 @@ export interface ActorLayout {
   tile: Tile;
   facing: Facing;
   sight: number;
+  /** Out of sight until a story makes it appear (D74). */
+  hidden: boolean;
 }
 
 export interface Layout {
@@ -130,7 +132,7 @@ export function layout(level: LevelJson): Layout {
       (first ? towards(tile, first) : looking ? towards(tile, start) : 'down');
     // Only a teacher looks out for the wizard; a ghost or a cat sees nothing to catch.
     const sight = spec.kind !== 'teacher' ? 0 : typeof spec.sight === 'number' ? spec.sight : DEFAULT_SIGHT;
-    actors.push({ id: String(spec.id), kind: String(spec.kind), tile, facing, sight });
+    actors.push({ id: String(spec.id), kind: String(spec.kind), tile, facing, sight, hidden: spec.hidden === true });
   }
   const markers = [...letters].filter(([letter]) => !used.has(letter));
   const shelves: Tile[] = [];

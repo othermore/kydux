@@ -191,14 +191,19 @@ if (reserved.status !== 0) {
 writeFileSync(join(publicDir, 'reserved.json'), reserved.stdout);
 
 // A level on a chapter's scene (D65) ships with the scene's map built in, its
-// start and its end on it, so that the page loads it as any other level.
+// start and its end on it, so that the page loads it as any other level; a story
+// (D74) with its staging checked and the world it is played in.
 const scened = spawnSync(python, [join(repo, 'tools', 'scene_maps.py')], { encoding: 'utf8' });
 if (scened.status !== 0) {
   console.error(scened.stderr);
   process.exit(1);
 }
-for (const [id, level] of Object.entries(JSON.parse(scened.stdout))) {
+const built = JSON.parse(scened.stdout);
+for (const [id, level] of Object.entries(built.levels)) {
   writeFileSync(join(content, 'levels', id, 'level.json'), `${JSON.stringify(level, null, 2)}\n`);
+}
+for (const [id, story] of Object.entries(built.stories)) {
+  writeFileSync(join(content, 'stories', id, 'story.json'), `${JSON.stringify(story, null, 2)}\n`);
 }
 
 console.log(

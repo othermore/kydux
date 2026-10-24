@@ -1,9 +1,8 @@
-// Loading a lesson or a story page: lesson.json or story.json and its Markdown
-// in the player's language, from content/lessons/<id>/ or content/stories/<id>/
-// (D33, D56). Pages are separated by a line of `---`; a fenced block marked
-// `python try` on a lesson's last page is its example, shown as code: the
-// level after it starts with its own program, never with the example (D63). A
-// story page has none.
+// Loading a lesson: lesson.json and its Markdown in the player's language, from
+// content/lessons/<id>/ (D33, D56). Pages are separated by a line of `---`; a
+// fenced block marked `python try` on the last page is its example, shown as
+// code: the level after it starts with its own program, never with the example
+// (D63).
 
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
 
@@ -16,9 +15,7 @@ export interface Lesson {
   pages: string[];
   /** The Try it example, or null when the lesson has none. */
   tryCode: string | null;
-  /** For a story page, whether it is the game's opening, before the course (D61). */
-  opening?: boolean;
-  /** Who teaches a lesson, or tells a story page: a character of story.md (D67). */
+  /** Who teaches the lesson: a character of story.md (D67). */
   speaker?: string;
 }
 
@@ -54,36 +51,19 @@ async function fetched(url: string, kind: 'json' | 'text'): Promise<string | nul
 }
 
 export async function loadLesson(id: string, lang: Language): Promise<Lesson> {
-  return loadPages('lessons', id, lang);
-}
-
-/** A story page (D56): pages like a lesson's, with no Try it. */
-export async function loadStory(id: string, lang: Language): Promise<Lesson> {
-  const story = await loadPages('stories', id, lang);
-  return { ...story, tryCode: null };
-}
-
-async function loadPages(folder: 'lessons' | 'stories', id: string, lang: Language): Promise<Lesson> {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) throw new LessonNotFound(id);
-  const lessonUrl = (lessonId: string, file: string) =>
-    `${import.meta.env.BASE_URL}content/${folder}/${lessonId}/${file}`;
-  const about = await fetched(lessonUrl(id, folder === 'lessons' ? 'lesson.json' : 'story.json'), 'json');
+  const lessonUrl = (file: string) => `${import.meta.env.BASE_URL}content/lessons/${id}/${file}`;
+  const about = await fetched(lessonUrl('lesson.json'), 'json');
   if (!about) throw new LessonNotFound(id);
   const markdown =
-    (await fetched(lessonUrl(id, `${lang}.md`), 'text')) ??
-    (await fetched(lessonUrl(id, `${fallbackLanguage}.md`), 'text'));
+    (await fetched(lessonUrl(`${lang}.md`), 'text')) ?? (await fetched(lessonUrl(`${fallbackLanguage}.md`), 'text'));
   if (markdown === null) throw new LessonNotFound(id);
-  const { teaches, opening, speaker } = JSON.parse(about) as {
-    teaches?: string[];
-    opening?: boolean;
-    speaker?: string;
-  };
+  const { teaches, speaker } = JSON.parse(about) as { teaches?: string[]; speaker?: string };
   // The wizard's words go in before the pages are cut (D37).
   return {
     id,
     teaches: teaches ?? [],
     ...readLesson(forWizard(markdown)),
-    ...(opening === true ? { opening: true } : {}),
     ...(typeof speaker === 'string' ? { speaker } : {}),
   };
 }

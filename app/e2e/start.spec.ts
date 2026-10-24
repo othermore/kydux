@@ -25,7 +25,7 @@ test('the start screen opens the game, and Continue opens the first lesson', asy
   const go = page.locator('#continue');
   await expect(go).toHaveText('Continue: At the gate');
   await go.click();
-  await expect(page.locator('.lesson-page h1')).toHaveText('At the gate');
+  await expect(page.locator('#story-title')).toHaveText('At the gate');
 });
 
 test('after a win, Continue names what comes next, and the title leads home', async ({ page }) => {

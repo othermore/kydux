@@ -1,0 +1,191 @@
+// The words said on the scene: a bubble with a tail over whoever says them, and
+// the wizard's thoughts in a grey cloud when an action could not be done (D28).
+// Each stays some ticks, follows who it is over as they walk, sits below them
+// when there is no room above, and is never held past the scene's sides. The
+// scene's parent says what is said: data-bubble and data-speaker, data-thought.
+
+import Phaser from 'phaser';
+import { TILE } from './placeholders';
+
+/** How far a bubble's drawn box and tail reach beyond its words, at most: a
+ * container's bounds are its words' alone. */
+const BUBBLE_ROOM = 18;
+
+export interface SpeechParts {
+  /** The scene's width, in its pixels, which no bubble passes. */
+  width: number;
+  /** How far above a figure's feet a word said over it goes. */
+  headroom: number;
+  /** Who a thought is over, and a bubble when no one else says it. */
+  wizard: () => Phaser.GameObjects.Sprite;
+  /** How wide a bubble's words are, in tiles. */
+  wrap: number;
+}
+
+export class Speech {
+  private bubble: Phaser.GameObjects.Container | null = null;
+  private bubbleUntil = 0;
+  private thought: Phaser.GameObjects.Container | null = null;
+  private thoughtUntil = 0;
+  /** Where a bubble or a thought sits: its width, and whether it is below who it is over. */
+  private place = { width: 0, below: false };
+  /** Who a bubble or a thought is over: the wizard, or an actor who speaks. */
+  private speaker: Phaser.GameObjects.Sprite | null = null;
+
+  constructor(
+    private readonly scene: Phaser.Scene,
+    private readonly parent: HTMLElement,
+    private readonly parts: SpeechParts,
+  ) {}
+
+  /** Whether words are said in a bubble now. */
+  get saying(): boolean {
+    return this.bubble !== null;
+  }
+
+  /** A bubble and a thought gone once their ticks are over, or at once. */
+  expire(tick: number, instant: boolean): void {
+    if (this.bubble && (instant || tick >= this.bubbleUntil)) this.clearBubble();
+    if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
+  }
+
+  /** Every frame: the words over who says them, as they walk. */
+  update(): void {
+    const [x, y] = this.anchor();
+    this.bubble?.setPosition(x, y);
+    this.thought?.setPosition(x, y);
+  }
+
+  /** The bubble's box and tail with the figure, for the camera to keep in view: the
+   * figure's bounds, and the bubble's when the figure says it. */
+  around(figure: Phaser.GameObjects.Sprite): Phaser.Geom.Rectangle {
+    const box = figure.getBounds();
+    if (this.bubble && this.speaker === figure) {
+      const words = this.bubble.getBounds();
+      words.setTo(
+        words.x - BUBBLE_ROOM,
+        words.y - BUBBLE_ROOM,
+        words.width + BUBBLE_ROOM * 2,
+        words.height + BUBBLE_ROOM * 2,
+      );
+      Phaser.Geom.Rectangle.Union(box, words, box);
+    }
+    return box;
+  }
+
+  /** Over who speaks, or under them when there is no room above; never past the sides. */
+  private anchor(): [number, number] {
+    const over = this.speaker ?? this.parts.wizard();
+    const half = this.place.width / 2 + 4;
+    const x = Math.min(Math.max(over.x, half), Math.max(half, this.parts.width - half));
+    return [x, over.y + (this.place.below ? 22 : -this.parts.headroom)];
+  }
+
+  /** Whether a bubble this tall fits over who speaks, inside the scene. */
+  private roomAbove(height: number): boolean {
+    return (this.speaker ?? this.parts.wizard()).y - this.parts.headroom - height - 14 >= 2;
+  }
+
+  /** A thought over the wizard: grey and rounded, with two small circles under it,
+   * for `ticks` ticks from `tick`. */
+  think(text: string, tick: number, ticks: number): void {
+    this.clearThought();
+    this.clearBubble();
+    this.speaker = null;
+    const words = this.scene.add
+      .text(0, 0, text.replaceAll('`', ''), {
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '15px',
+        fontStyle: 'italic',
+        color: '#1f2330',
+        wordWrap: { width: TILE * 4 },
+        align: 'center',
+      })
+      .setOrigin(0.5, 1);
+    const pad = 8;
+    const width = words.width + pad * 2;
+    const height = words.height + pad * 2;
+    // Above the wizard, the two small circles lead down to it; below, up to it.
+    const below = !this.roomAbove(height);
+    const sign = below ? 1 : -1;
+    const top = below ? 14 : -height - 14;
+    const cloud = this.scene.add.graphics();
+    cloud.fillStyle(0xe9ecef, 0.97).lineStyle(2, 0x868e96, 1);
+    cloud.fillRoundedRect(-width / 2, top, width, height, 12);
+    cloud.strokeRoundedRect(-width / 2, top, width, height, 12);
+    cloud.fillCircle(-6, sign * 8, 4).strokeCircle(-6, sign * 8, 4);
+    cloud.fillCircle(-12, sign * 1, 2.5).strokeCircle(-12, sign * 1, 2.5);
+    words.setOrigin(0.5, below ? 0 : 1).setY(below ? 14 + pad : -14 - pad);
+    this.place = { width, below };
+    this.thought = this.scene.add.container(...this.anchor(), [cloud, words]).setDepth(11);
+    this.thoughtUntil = tick + ticks;
+    this.parent.dataset.thought = text.replaceAll('`', '');
+  }
+
+  /** Words said in a bubble over the wizard, or over the actor who says them, for
+   * `ticks` ticks from `tick`. */
+  say(text: string, tick: number, ticks: number, over: Phaser.GameObjects.Sprite, who: string): void {
+    this.clearBubble();
+    this.clearThought();
+    this.speaker = over;
+    // A story's words may mark a word to type or a name in code; a bubble shows them plain.
+    const plain = text.replace(/[`*_]/g, '');
+    const words = this.scene.add
+      .text(0, 0, plain, {
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '15px',
+        color: '#1f2330',
+        wordWrap: { width: TILE * this.parts.wrap },
+      })
+      .setOrigin(0.5, 0);
+    const pad = 7;
+    const tail = 10;
+    const width = words.width + pad * 2;
+    const height = words.height + pad * 2;
+    // The box above who speaks, its tail pointing down at them; below them, when
+    // there is no room above, with the tail pointing up.
+    const below = !this.roomAbove(height + tail);
+    const top = below ? tail : -height - tail;
+    this.place = { width, below };
+    const [x, y] = this.anchor();
+    // The tail's tip is at the anchor, over who speaks, even where the box is held
+    // in from the scene's side.
+    const tip = Math.min(Math.max(over.x - x, -width / 2 + 12), width / 2 - 12);
+    const base = below ? top : top + height;
+    const box = this.scene.add.graphics();
+    box.fillStyle(0xffffff, 1).lineStyle(2, 0x1f2330, 1);
+    box.fillRoundedRect(-width / 2, top, width, height, 8);
+    box.strokeRoundedRect(-width / 2, top, width, height, 8);
+    box.fillTriangle(tip - 7, base, tip + 7, base, tip, 0);
+    box.beginPath();
+    box.moveTo(tip - 7, base);
+    box.lineTo(tip, 0);
+    box.lineTo(tip + 7, base);
+    box.strokePath();
+    box.lineStyle(3, 0xffffff, 1);
+    box.beginPath();
+    box.moveTo(tip - 6, base);
+    box.lineTo(tip + 6, base);
+    box.strokePath();
+    words.setY(top + pad);
+    this.bubble = this.scene.add.container(x, y, [box, words]).setDepth(10);
+    this.bubbleUntil = tick + ticks;
+    this.parent.dataset.bubble = plain;
+    this.parent.dataset.speaker = who;
+  }
+
+  /** The thought gone, if there is one. */
+  clearThought(): void {
+    this.thought?.destroy();
+    this.thought = null;
+    delete this.parent.dataset.thought;
+  }
+
+  /** The bubble gone, if there is one. */
+  clearBubble(): void {
+    this.bubble?.destroy();
+    this.bubble = null;
+    delete this.parent.dataset.bubble;
+    delete this.parent.dataset.speaker;
+  }
+}

@@ -20,12 +20,10 @@
 // it, silhouette.ts) and data-debug with data-debug-layers (the tester's view and
 // its layers, debug.ts).
 //
-// The camera is a window on the scene (D69): the canvas takes the frame's
-// shape, and at zoom 1 the window is VIEW_TILES of the scene fitted to it, more
-// of the scene the other way, never a band of the frame's colour where the scene
-// and its painted margin (D83) reach; it follows the wizard, the player zooms it
-// and drags it to look around, and a run or a restart brings it back to the
-// wizard.
+// The camera is a window on the scene (D69, camera.ts): it follows the wizard,
+// the player zooms it and drags it to look around, and a run or a restart brings
+// it back to the wizard. The words said are in bubbles and the wizard's thoughts
+// in clouds (speech.ts).
 //
 // A painted scene (D76) is drawn by painted.ts: its ground and rows, its things'
 // states, the figures' sheets, the grid, the goal's mark and the sealed doors'
@@ -33,9 +31,8 @@
 //
 // A story is played on the scene the same way (D74): its steps come as events,
 // an actor appears, walks, turns, says its words in a bubble and vanishes; the
-// camera starts on the story's tile and keeps whoever each step is about, with
-// their words, inside its window, gliding only when they push past its edge; a
-// bubble stays until the next step.
+// camera keeps whoever each step is about, with their words, in view; a bubble
+// stays until the next step.
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
@@ -79,7 +76,9 @@ import {
   preloadArt,
   SHEET_ROW,
 } from './painted';
+import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, debugging } from './debug';
+import { Speech } from './speech';
 import { Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
 import { clearOf, sightTiles, type Tile } from './sight';
@@ -91,20 +90,11 @@ import { blockedText, friendText } from './words';
 export const TICK_MS = 400;
 /** How many ticks a word said stays over the wizard. */
 const SAY_TICKS = 3;
-/** The most of a scene the camera shows at zoom 1, in tiles across and down (D69). */
-export const VIEW_TILES: Tile = [15, 9];
+
 /** How long the scene takes to fade out and in when the level starts again, and how
  * long it stays out (D75). */
 const RESTART_FADE_MS = 120;
 const RESTART_HOLD_MS = 160;
-/** How far, in pixels, the pointer moves before a press is a drag of the camera. */
-const DRAG_THRESHOLD = 6;
-/** In a story, the room, in the scene's pixels, the camera's window keeps between
- * its edge and the figure it follows with its words (D74). */
-const STORY_EDGE = TILE;
-/** The zooms the player steps through, from the whole scene to a close look. */
-export const ZOOMS = [0.5, 0.75, 1, 1.5, 2] as const;
-const ZOOM_START = ZOOMS.indexOf(1);
 
 /** How a scene is played: a level's run, or a story's steps (D74). */
 export interface SceneOptions {
@@ -172,12 +162,9 @@ class LevelScene extends Phaser.Scene {
   private carried = new Set<string>();
   private actors = new Map<string, ActorState>();
   private cone!: Phaser.GameObjects.Graphics;
-  private bubble: Phaser.GameObjects.Container | null = null;
-  private bubbleUntil = 0;
-  private thought: Phaser.GameObjects.Container | null = null;
-  private thoughtUntil = 0;
-  /** Where a bubble or thought sits: its width, and whether it is below the wizard. */
-  private bubblePlace = { width: 0, below: false };
+  /** The words said, in bubbles and thoughts (speech.ts), and the camera (camera.ts). */
+  private speech!: Speech;
+  private view!: SceneCamera;
   private shaking = 0;
   /** Who saw the wizard, whose cone is drawn red. */
   private seenBy: string | null = null;
@@ -191,17 +178,6 @@ class LevelScene extends Phaser.Scene {
   private restarts = 0;
   /** The timers of a cast being played (D81), dropped when the level starts again. */
   private casting: Phaser.Time.TimerEvent[] = [];
-  /** The zoom's step in ZOOMS (D69). */
-  private zoomStep = ZOOM_START;
-  /** Who a bubble or a thought is over: the wizard, or an actor who speaks. */
-  private speaker: Phaser.GameObjects.Sprite | null = null;
-  /** In a story, who the camera is with: whoever the last step was about (D74). */
-  private focus: Phaser.GameObjects.Sprite | null = null;
-  /** In a story, the story's tile, which the camera is with before any step. */
-  private spot = { x: 0, y: 0 };
-  /** In a story, what the camera follows: the focus, or the spot; null once a drag
-   * has let go of it. */
-  private followed: { x: number; y: number } | null = null;
 
   constructor(
     private readonly map: Layout,
@@ -421,7 +397,22 @@ class LevelScene extends Phaser.Scene {
       this.actors.set(actor.id, { sprite, tile: actor.tile, facing: actor.facing, sight: actor.sight });
     }
     this.wizard = this.figure('wizard', WIZARD_KEY, this.map.start, 'down').setDepth(4);
-    this.setUpCamera();
+    this.speech = new Speech(this, this.parentNode, {
+      width: this.map.width * TILE,
+      headroom: this.headroom,
+      wizard: () => this.wizard,
+      wrap: this.options.story ? 6 : 4,
+    });
+    const story = this.options.story;
+    this.view = new SceneCamera(this, this.parentNode, {
+      columns: this.map.width,
+      rows: this.map.height,
+      margin: marginOf(this.art),
+      story: story ? { x: centre(story.camera)[0], y: centre(story.camera)[1] } : null,
+      wizard: () => this.wizard,
+      around: (figure) => this.speech.around(figure),
+    });
+    this.view.setUp();
     // The painted rows and things; a placeholder scene has none.
     const painted = this.art ? [...this.things.values()].filter((image) => image.texture.key.startsWith('art-')) : [];
     if (this.art && this.wizard.texture.key.startsWith('fig-')) {
@@ -438,90 +429,17 @@ class LevelScene extends Phaser.Scene {
       // A run brings the camera back to the wizard.
       if (state === 'playing') this.follow();
       // A word said near the end of the run would stay for ever: it fades.
-      if (state === 'done' && !this.options.story) this.time.delayedCall(this.playback.tickDuration * SAY_TICKS, () => this.clearBubble());
+      if (state === 'done' && !this.options.story) this.time.delayedCall(this.playback.tickDuration * SAY_TICKS, () => this.speech.clearBubble());
     });
     this.restart();
     this.parentNode.dataset.state = this.playback.state;
     this.ready();
   }
 
-  /** The camera over the whole scene, on the wizard; the wheel zooms it and a drag
-   * moves it, which lets go of the wizard until the next run (D69). */
-  private setUpCamera(): void {
-    const camera = this.cameras.main;
-    // Over the scene and the margin painted round it (D83).
-    const [left, top, right, bottom] = marginOf(this.art);
-    camera.setBounds(
-      -left * TILE,
-      -top * TILE,
-      (this.map.width + left + right) * TILE,
-      (this.map.height + top + bottom) * TILE,
-    );
-    camera.setRoundPixels(true);
-    this.applyZoom();
-    // The canvas is the frame's size: the zoom fits the window to it again, and a
-    // story's window is made again.
-    this.scale.on('resize', (size: Phaser.Structs.Size) => {
-      camera.setSize(size.width, size.height);
-      this.applyZoom();
-      if (this.options.story) this.fitWindow();
-    });
-    if (this.options.story) {
-      const [x, y] = centre(this.options.story.camera);
-      this.spot = { x, y };
-      camera.centerOn(x, y);
-      this.follow();
-    } else this.follow();
-    this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => {
-      if (dy !== 0) this.zoomBy(dy < 0 ? 1 : -1);
-    });
-    // The wheel over the scene zooms it, and does not scroll the page under it.
-    this.parentNode.addEventListener('wheel', (event) => event.preventDefault(), { passive: false });
-    // A drag lets go of the wizard only once it is a real drag, a few pixels long, so
-    // that a click or a shaky tap does not (12.6).
-    let dragging = false;
-    this.input.on('pointerdown', () => {
-      dragging = false;
-    });
-    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (!pointer.isDown) return;
-      if (!dragging) {
-        const far = Math.hypot(pointer.x - pointer.downX, pointer.y - pointer.downY);
-        if (far < DRAG_THRESHOLD) return;
-        dragging = true;
-      }
-      const dx = pointer.x - pointer.prevPosition.x;
-      const dy = pointer.y - pointer.prevPosition.y;
-      if (dx === 0 && dy === 0) return;
-      camera.stopFollow();
-      this.followed = null;
-      this.parentNode.dataset.following = 'false';
-      camera.scrollX -= dx / camera.zoom;
-      camera.scrollY -= dy / camera.zoom;
-    });
-  }
-
-  /** The camera back on the wizard, following it; in a story, gliding back to
-   * whoever the last step was about, or to the story's tile before any step. */
+  /** The camera back on the wizard, following it; in a story, with whoever the
+   * last step was about (camera.ts). */
   follow(): void {
-    const camera = this.cameras.main;
-    if (this.options.story) {
-      const target = this.focus ?? this.spot;
-      if (target !== this.followed) {
-        // Phaser's startFollow puts the camera on its target at once: to glide, it
-        // keeps where it was and lets the lerp take it there.
-        const { scrollX, scrollY } = camera;
-        camera.startFollow(target, true, 0.08, 0.08);
-        camera.setScroll(scrollX, scrollY);
-        this.followed = target;
-      }
-      this.fitWindow();
-      this.parentNode.dataset.following = String(this.focus !== null);
-      return;
-    }
-    camera.startFollow(this.wizard, true, 0.2, 0.2);
-    camera.centerOn(this.wizard.x, this.wizard.y);
-    this.parentNode.dataset.following = 'true';
+    this.view.follow();
   }
 
   /** In a story, the camera is with whoever the tick is about (D74): who speaks,
@@ -530,48 +448,17 @@ class LevelScene extends Phaser.Scene {
     const about = [...events].reverse().find((event) => ['say', 'move', 'appear', 'face'].includes(event.kind));
     if (!about) return;
     const sprite = about.actor === 'wizard' ? this.wizard : this.actors.get(about.actor)?.sprite;
-    if (!sprite) return;
-    this.focus = sprite;
+    if (sprite) this.view.focus = sprite;
   }
 
-  /** In a story, the camera's window (D74): a dead zone the size of the view less
-   * the figure followed with its words and a margin. While they are inside, the
-   * camera stays still; when the figure pushes past an edge, the camera glides
-   * just far enough to keep them in. Before any step it keeps on the story's tile.
-   * In the scene's pixels, as Phaser compares the dead zone with the figure. */
-  private fitWindow(): void {
-    const camera = this.cameras.main;
-    if (!this.followed) return;
-    if (!this.focus || this.followed !== this.focus) {
-      camera.setFollowOffset(0, 0);
-      camera.deadzone = null;
-      return;
-    }
-    const box = this.focus.getBounds();
-    if (this.bubble && this.speaker === this.focus) Phaser.Geom.Rectangle.Union(box, this.bubble.getBounds(), box);
-    // The point followed is the middle of the figure and its words.
-    camera.setFollowOffset(this.focus.x - box.centerX, this.focus.y - box.centerY);
-    const width = Math.max(0, camera.width / camera.zoom - box.width - STORY_EDGE * 2);
-    const height = Math.max(0, camera.height / camera.zoom - box.height - STORY_EDGE * 2);
-    // Phaser's setDeadzone puts the camera on its target at once while it follows;
-    // a dead zone already made is only resized, and the camera stays.
-    if (camera.deadzone) camera.deadzone.setSize(width, height);
-    else {
-      const { scrollX, scrollY } = camera;
-      camera.setDeadzone(width, height);
-      camera.setScroll(scrollX, scrollY);
-    }
-  }
-
-  /** Whether the camera can zoom a step: never out so far that its window would
-   * reach past the scene's edges, its margin with them (D83), and show the frame's
-   * colour beside it. */
+  /** Whether the camera can zoom a step (camera.ts). */
   canZoomBy(step: 1 | -1): boolean {
-    const next = this.zoomStep + step;
-    const zoom = ZOOMS[next];
-    if (zoom === undefined) return false;
-    if (step > 0) return true;
-    return this.fits(zoom);
+    return this.view.canZoomBy(step);
+  }
+
+  /** One step in or out of the zooms (camera.ts). */
+  zoomBy(step: 1 | -1): boolean {
+    return this.view.zoomBy(step);
   }
 
   /** The level starting again, seen: a fade to the frame's colour, everything put
@@ -595,44 +482,6 @@ class LevelScene extends Phaser.Scene {
     });
   }
 
-  /** How far the camera is zoomed at the zoom step 1 (D69): the window, VIEW_TILES
-   * of the scene or the whole of a small one, fitted to the canvas, which takes the
-   * frame's shape; the other way the canvas shows more of the scene, so that no
-   * band of the frame's colour is left beside it. */
-  private fit(): number {
-    const { width, height } = this.scale.gameSize;
-    const shownX = Math.min(this.map.width, VIEW_TILES[0]) * TILE;
-    const shownY = Math.min(this.map.height, VIEW_TILES[1]) * TILE;
-    return Math.max(0.01, Math.min(width / shownX, height / shownY));
-  }
-
-  /** The camera at the zoom step, fitted to the canvas; data-zoom is the step's.
-   * Zoomed out further than the scene and its margin hold, at a new size of the
-   * frame, the camera steps back in, never past the step it starts at. */
-  private applyZoom(): void {
-    while (this.zoomStep < ZOOM_START && !this.fits(ZOOMS[this.zoomStep] ?? 1)) this.zoomStep += 1;
-    const step = ZOOMS[this.zoomStep] ?? 1;
-    this.cameras.main.setZoom(this.fit() * step);
-    this.parentNode.dataset.zoom = String(step);
-  }
-
-  /** Whether the window, at a zoom step, lies within the scene and its margin. */
-  private fits(step: number): boolean {
-    const camera = this.cameras.main;
-    const bounds = camera.getBounds();
-    const shown = this.fit() * step;
-    return camera.width / shown <= bounds.width + 1 && camera.height / shown <= bounds.height + 1;
-  }
-
-  /** One step in or out of ZOOMS, about the camera's middle. */
-  zoomBy(step: 1 | -1): boolean {
-    if (!this.canZoomBy(step)) return false;
-    this.zoomStep += step;
-    this.applyZoom();
-    if (this.options.story) this.fitWindow();
-    return true;
-  }
-
   /** A word said follows who says it while they walk. */
   override update(): void {
     // On a painted scene the figures go behind what stands in front of them (D76).
@@ -640,34 +489,18 @@ class LevelScene extends Phaser.Scene {
       this.wizard.setDepth(3 + (this.wizard.y / TILE) * 0.01 + 0.0005);
       for (const actor of this.actors.values()) actor.sprite.setDepth(3 + (actor.sprite.y / TILE) * 0.01);
     }
-    const [x, y] = this.bubbleAnchor();
-    this.bubble?.setPosition(x, y);
-    this.thought?.setPosition(x, y);
+    this.speech.update();
     this.silhouette?.update();
     this.debug?.update(this.cameras.main);
-  }
-
-  /** Over who speaks, or under them when there is no room above; never past the sides. */
-  private bubbleAnchor(): [number, number] {
-    const over = this.speaker ?? this.wizard;
-    const half = this.bubblePlace.width / 2 + 4;
-    const width = this.map.width * TILE;
-    const x = Math.min(Math.max(over.x, half), Math.max(half, width - half));
-    return [x, over.y + (this.bubblePlace.below ? 22 : -this.headroom)];
-  }
-
-  /** Whether a bubble this tall fits over who speaks, inside the scene. */
-  private roomAbove(height: number): boolean {
-    return (this.speaker ?? this.wizard).y - this.headroom - height - 14 >= 2;
   }
 
   /** Everything where it stood before the run. */
   private restart(): void {
     this.restarts += 1;
-    this.clearBubble();
-    this.clearThought();
+    this.speech.clearBubble();
+    this.speech.clearThought();
     this.stopCast();
-    this.focus = null;
+    this.view.focus = null;
     this.seenBy = null;
     this.lit = !this.map.dark;
     this.shownTick = 0;
@@ -718,8 +551,7 @@ class LevelScene extends Phaser.Scene {
     }
     this.parentNode.dataset.tick = String(tick);
     this.shownTick = tick;
-    if (this.bubble && (instant || tick >= this.bubbleUntil)) this.clearBubble();
-    if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
+    this.speech.expire(tick, instant);
     for (const event of events) {
       if (event.actor === 'wizard') this.showWizard(tick, event, instant);
       // A door opened by a spell or a word is the door's own event (D43); so is a
@@ -728,7 +560,7 @@ class LevelScene extends Phaser.Scene {
       else if (event.kind === 'unsealed') this.unseal(String(event.data.id), instant);
       // A word said to a door while its seal holds: the wizard thinks why nothing happened.
       else if (event.kind === 'unheard') {
-        if (!instant) this.think(blockedText('unheard', 'door'), tick);
+        if (!instant) this.speech.think(blockedText('unheard', 'door'), tick, this.sayTicks);
       }
       else if (event.kind === 'pull') this.pull(event, instant);
       else if (event.kind === 'light') this.lit = true;
@@ -896,12 +728,12 @@ class LevelScene extends Phaser.Scene {
         if (!instant) this.nudge(this.wizard, facing ?? 'down', duration);
         if (!instant) play('bump');
         // A friend in the way: the wizard thinks who (D66).
-        if (!instant && event.data.by === 'friend') this.think(friendText(String(event.data.id)), tick);
+        if (!instant && event.data.by === 'friend') this.speech.think(friendText(String(event.data.id)), tick, this.sayTicks);
         break;
       }
       case 'say':
         if (!instant) {
-          this.say(String(event.data.text ?? ''), tick);
+          this.speech.say(String(event.data.text ?? ''), tick, this.sayTicks, this.wizard, 'wizard');
           play('say');
         }
         break;
@@ -958,7 +790,7 @@ class LevelScene extends Phaser.Scene {
           ...(typeof event.data.spell === 'string' ? { spell: event.data.spell } : {}),
           ...(Array.isArray(event.data.things) ? { things: event.data.things.map(String) } : {}),
         };
-        this.think(blockedText(String(event.data.reason), thing?.kind ?? null, detail), tick);
+        this.speech.think(blockedText(String(event.data.reason), thing?.kind ?? null, detail), tick, this.sayTicks);
         if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
         break;
       }
@@ -995,7 +827,7 @@ class LevelScene extends Phaser.Scene {
       // A story's actor speaks, comes into sight and goes (D74).
       case 'say':
         if (!instant) {
-          this.say(String(event.data.text ?? ''), this.shownTick, actor.sprite, event.actor);
+          this.speech.say(String(event.data.text ?? ''), this.shownTick, this.sayTicks, actor.sprite, event.actor);
           play('say');
         }
         break;
@@ -1111,105 +943,6 @@ class LevelScene extends Phaser.Scene {
         if (this.shaking === 0) delete this.parentNode.dataset.shaking;
       },
     });
-  }
-
-  /** A thought over the wizard: grey and rounded, with two small circles under it. */
-  private think(text: string, tick: number): void {
-    this.clearThought();
-    this.clearBubble();
-    this.speaker = null;
-    const words = this.add
-      .text(0, 0, text.replaceAll('`', ''), {
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: '15px',
-        fontStyle: 'italic',
-        color: '#1f2330',
-        wordWrap: { width: TILE * 4 },
-        align: 'center',
-      })
-      .setOrigin(0.5, 1);
-    const pad = 8;
-    const width = words.width + pad * 2;
-    const height = words.height + pad * 2;
-    // Above the wizard, the two small circles lead down to it; below, up to it.
-    const below = !this.roomAbove(height);
-    const sign = below ? 1 : -1;
-    const top = below ? 14 : -height - 14;
-    const cloud = this.add.graphics();
-    cloud.fillStyle(0xe9ecef, 0.97).lineStyle(2, 0x868e96, 1);
-    cloud.fillRoundedRect(-width / 2, top, width, height, 12);
-    cloud.strokeRoundedRect(-width / 2, top, width, height, 12);
-    cloud.fillCircle(-6, sign * 8, 4).strokeCircle(-6, sign * 8, 4);
-    cloud.fillCircle(-12, sign * 1, 2.5).strokeCircle(-12, sign * 1, 2.5);
-    words.setOrigin(0.5, below ? 0 : 1).setY(below ? 14 + pad : -14 - pad);
-    this.bubblePlace = { width, below };
-    this.thought = this.add.container(...this.bubbleAnchor(), [cloud, words]).setDepth(11);
-    this.thoughtUntil = tick + this.sayTicks;
-    this.parentNode.dataset.thought = text.replaceAll('`', '');
-  }
-
-  private clearThought(): void {
-    this.thought?.destroy();
-    this.thought = null;
-    delete this.parentNode.dataset.thought;
-  }
-
-  /** Words said in a bubble over the wizard, or over the actor who says them. */
-  private say(text: string, tick: number, over: Phaser.GameObjects.Sprite = this.wizard, who = 'wizard'): void {
-    this.clearBubble();
-    this.clearThought();
-    this.speaker = over;
-    // A story's words may mark a word to type or a name in code; a bubble shows them plain.
-    const plain = text.replace(/[`*_]/g, '');
-    const words = this.add
-      .text(0, 0, plain, {
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: '15px',
-        color: '#1f2330',
-        wordWrap: { width: TILE * (this.options.story ? 6 : 4) },
-      })
-      .setOrigin(0.5, 0);
-    const pad = 7;
-    const tail = 10;
-    const width = words.width + pad * 2;
-    const height = words.height + pad * 2;
-    // The box above who speaks, its tail pointing down at them; below them, when
-    // there is no room above, with the tail pointing up.
-    const below = !this.roomAbove(height + tail);
-    const top = below ? tail : -height - tail;
-    this.bubblePlace = { width, below };
-    const [x, y] = this.bubbleAnchor();
-    // The tail's tip is at the anchor, over who speaks, even where the box is held
-    // in from the scene's side.
-    const tip = Math.min(Math.max(over.x - x, -width / 2 + 12), width / 2 - 12);
-    const base = below ? top : top + height;
-    const box = this.add.graphics();
-    box.fillStyle(0xffffff, 1).lineStyle(2, 0x1f2330, 1);
-    box.fillRoundedRect(-width / 2, top, width, height, 8);
-    box.strokeRoundedRect(-width / 2, top, width, height, 8);
-    box.fillTriangle(tip - 7, base, tip + 7, base, tip, 0);
-    box.beginPath();
-    box.moveTo(tip - 7, base);
-    box.lineTo(tip, 0);
-    box.lineTo(tip + 7, base);
-    box.strokePath();
-    box.lineStyle(3, 0xffffff, 1);
-    box.beginPath();
-    box.moveTo(tip - 6, base);
-    box.lineTo(tip + 6, base);
-    box.strokePath();
-    words.setY(top + pad);
-    this.bubble = this.add.container(x, y, [box, words]).setDepth(10);
-    this.bubbleUntil = tick + this.sayTicks;
-    this.parentNode.dataset.bubble = plain;
-    this.parentNode.dataset.speaker = who;
-  }
-
-  private clearBubble(): void {
-    this.bubble?.destroy();
-    this.bubble = null;
-    delete this.parentNode.dataset.bubble;
-    delete this.parentNode.dataset.speaker;
   }
 }
 

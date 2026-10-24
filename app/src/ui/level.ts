@@ -19,6 +19,7 @@ import { type Card, startCard, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
 import { type Guide, type GuideText, openGuide } from './guide';
 import { judge, type Verdict } from './stars';
+import { zoomBox } from './zoom';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
@@ -180,35 +181,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   );
   const card: OutcomeCard = outcomeCard();
 
-  // The camera's zoom (D69): in and out a step at a time; the mouse wheel does the same.
-  const zoomIn = element('button', { id: 'zoom-in', type: 'button', className: 'zoom-button' }, ['+']);
-  const zoomOut = element('button', { id: 'zoom-out', type: 'button', className: 'zoom-button' }, ['−']);
-  const titleZoom = () => {
-    for (const [button, words] of [
-      [zoomIn, t('level.zoom_in')],
-      [zoomOut, t('level.zoom_out')],
-    ] as const) {
-      button.title = words;
-      button.setAttribute('aria-label', words);
-    }
-  };
-  titleZoom();
-  const zoomBy = (step: 1 | -1) => {
-    scene?.zoom(step);
-    zoomIn.disabled = !(scene?.canZoom(1) ?? true);
-    zoomOut.disabled = !(scene?.canZoom(-1) ?? true);
-  };
-  zoomIn.addEventListener('click', () => zoomBy(1));
-  zoomOut.addEventListener('click', () => zoomBy(-1));
-  // When the camera has let go of the wizard, a button brings it back (12.6).
-  const findWizard = element('button', { id: 'find-wizard', type: 'button', className: 'zoom-button find-wizard', hidden: true }, [
-    t('level.find_wizard'),
-  ]);
-  findWizard.addEventListener('click', () => scene?.follow());
-  new MutationObserver(() => {
-    findWizard.hidden = sceneParent.dataset.following !== 'false';
-  }).observe(sceneParent, { attributes: true, attributeFilter: ['data-following'] });
-  const zoomBox = element('div', { className: 'zoom-box' }, [zoomIn, zoomOut, findWizard]);
+  // The camera's zoom, and Find my wizard (zoom.ts).
+  const zoom = zoomBox(sceneParent);
 
   // The notebook opens over the scene, beside the editor, so that an example
   // clicked lands where the child can see it.
@@ -223,7 +197,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     sceneParent,
     restartNote,
     goalsSlot,
-    zoomBox,
+    zoom.node,
     notebook.node,
   ]);
   const handle = element('div', { id: 'split', className: 'split-handle', tabIndex: 0 });
@@ -633,8 +607,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           return;
         }
         scene = handle;
-        zoomIn.disabled = !handle.canZoom(1);
-        zoomOut.disabled = !handle.canZoom(-1);
+        zoom.attach(handle);
         controller.attach(handle);
       });
       // The start card opens a level the first time it is played.
@@ -649,14 +622,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       text = await loadLevelText(loaded.id, currentLanguage());
       if (!typed && editor.getDoc() === before.starting_code) editor.setDoc(text.starting_code);
       for (const [labelNode, say] of labels) labelNode.textContent = say();
-      titleZoom();
+      zoom.relabel();
       goals = goalsPanel(goalTexts());
       goalsSlot.replaceChildren(goals.node);
       editor.view.contentDOM.setAttribute('aria-label', t('level.code_label'));
       about.setAttribute('aria-label', t('level.about'));
       about.title = t('level.about');
       restartNote.setAttribute('aria-label', t('level.starting_again'));
-      findWizard.textContent = t('level.find_wizard');
       timeline.setAttribute('aria-label', t('level.timeline'));
       labelSettings();
       labelKeys();

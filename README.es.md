@@ -26,8 +26,10 @@ A partir de ahí, el juego se abre en su pantalla de inicio. *Continuar* te
 lleva a donde lo dejaste. La primera vez, eso es la puerta, donde te
 encuentras con Nuri, que te enseña los primeros pasos.
 
-Cada capítulo empieza y acaba con páginas de historia, dibujadas como las
-páginas de un libro. Entre ellas vienen lecciones y niveles, numerados
+Cada capítulo empieza y acaba con una historia, contada sobre la propia
+escena: los personajes caminan y hablan en bocadillos, y un narrador habla
+bajo la imagen. *Siguiente*, o la tecla Intro, sigue adelante. Entre las
+historias vienen lecciones y niveles, numerados
 dentro del capítulo: *Lección 1*, *Práctica 1*, y así. Una lección son
 unas pocas páginas cortas, que enseña un personaje de la historia, de pie
 junto al texto. Cada página explica una idea, con un ejemplo. En la última página, *Probar* abre el
@@ -38,12 +40,15 @@ te da uno que funciona, para hacerlo mejor.
 
 Los niveles de un capítulo ocurren todos en un mismo lugar, una escena:
 donde acaba un nivel empieza el siguiente, y el amigo que te enseña está a
-tu lado. La escena sigue a tu personaje mientras camina. Los botones *+* y
-*−*, o la rueda del ratón, la acercan y la alejan, y puedes arrastrarla
-para mirar alrededor.
+tu lado. La escena está pintada, y una fina rejilla a lápiz encima te ayuda
+a contar pasos. La escena sigue a tu personaje mientras camina. Los
+botones *+* y *−*, o la rueda del ratón, la acercan y la alejan, y puedes
+arrastrarla para mirar alrededor; *Buscar a mi maga*, o *a mi mago*, la devuelve a tu
+lado.
 
-En un nivel, escribes Python en el editor, a la derecha. *Ejecutar* hace
-que tu personaje haga lo que dice tu código, a la izquierda. Los
+En un nivel, escribes Python en el editor, a la derecha. *Ejecutar* empieza
+el nivel otra vez y hace que tu personaje haga lo que dice tu código, a la
+izquierda. Los
 objetivos, en la esquina, se marcan solos cuando los cumples. Si algo sale
 mal, el juego dice por qué, y *Pista* te da una ayuda. El primer nivel te
 enseña cada parte de la pantalla, una a una; el botón *?* lo enseña otra

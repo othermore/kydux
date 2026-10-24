@@ -58,6 +58,17 @@ To have Gemini write the drafts:
 It prints the files it wrote, under `drafts/<brief>/`, beside a
 `manifest.json` with the model, the brief and the date.
 
+To send the brief through the Antigravity CLI instead, signed in with the
+owner's Google account and with no API key:
+
+```sh
+.venv/bin/python tools/write/write.py tools/write/briefs/chapter-1-levels.md --via agy
+```
+
+It uses Gemini 3.8 Flash unless `--model` names another of `agy models`.
+Each brief gives the solutions of its levels, so that the hints are true
+to them; the solutions never appear in a text.
+
 ## From a draft to content
 
 1. Read every draft whole. Check the facts against the level or the lesson:

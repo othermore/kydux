@@ -12,7 +12,7 @@ Chapters 1 to 3 are given in full and are built, each in its scene (D65):
 its levels are parts of one place, each starting where the one before it
 ended, with the friend who teaches standing by (D66). Chapters 4 and 5 are
 given at the level of lessons and level titles, each with the world
-features it needs, its scene, its story pages (D62) and its fix and
+features it needs, its scene, its stories (D62, D74) and its fix and
 improve levels (D56) in outline; each is built in its own sprint. Every
 text the child reads is drafted by Gemini from a brief (D55).
 
@@ -28,10 +28,12 @@ Nuri lends the wizard a spare wand. The ideas: a program, an action or
 method of an object, a comment, an argument, a string, a thing to carry,
 a spell, each named by the easy word and the proper one together (D59).
 
-Its scene, `the-gate`: the forecourt before the great gate at dusk, its
-hedges, paths and the steps up to the landing; the gate; and the gatehouse
-inside, with the flat stone, a sealed door, the inner gate, two more seals
-and the way out to the castle road. The gate stays shut until the
+Its scene, `the-field`, painted (D76): the open countryside before the
+school at dusk, with trees, rocks, a little fence pen and a grassy rise
+with steps; the school's great gate in the middle of its wall; past it, a
+path between trees and rocks, the wand on a flat stone beside it, a gate
+sealed by a rune, and at the top the castle, whose great door is sealed
+and also listens for the school's word. The gate stays shut until the
 password opens it and stays open after; the wand is picked up once, in
 *The wand*, and carried from then on.
 
@@ -41,20 +43,20 @@ password opens it and stays open after; the wand is picked up once, in
 | `lesson:what-a-program-is` | Lesson 1 | A program is a list of instructions, run from the top down; your program tells your wizard, you, what to do. | `wizard.move_right` |
 | `level:the-gate` | Practice 1 | One instruction, to the gate's circle. Its code starts empty. | |
 | `lesson:objects-and-actions` | Lesson 2 | An instruction can be an action; an action needs someone to do it; characters and things are objects; an action is a method; the dot and the brackets; the notebook. | `wizard.move_left`, `move_up`, `move_down` |
-| `level:the-corridor` | Practice 2 | A sequence, down the path by the hedge and round its corner. Its code starts empty: comments are taught after it. | |
+| `level:the-corridor` | Practice 2 | A sequence, down the path and round into the meadow. Its code starts empty: comments are taught after it. | |
 | `lesson:notes` | Lesson 3 | A note in a program, a comment, is for a person, and the computer skips it; programs may come with notes saying what to do. | `concept:comments` |
-| `level:the-dark-note` | Fix 1 | Nuri's program with one wrong move, to find and fix; its note says one move is wrong. | |
+| `level:the-dark-note` | Fix 1 | Nuri's program with one wrong move, its first, which walks into the fence pen; its note says one move is wrong. | |
 | `lesson:how-much` | Lesson 4 | How much: the number in the brackets, an argument. | `concept:arguments` |
-| `level:the-long-corridor` | Practice 3 | The long path to the foot of the steps: one line with a number. Bonus: fewer than 2 lines. | |
-| `level:the-stairs` | Improve 1 | Nuri's program climbs the steps to the landing but bumps twice, to make clean (`no_bumps`). Bonus: fewer than 5 lines. | |
+| `level:the-long-corridor` | Practice 3 | The long path along the rise to the foot of its steps: one line with a number. Bonus: fewer than 2 lines. | |
+| `level:the-stairs` | Improve 1 | Nuri's program walks back to the gate but bumps twice, into a tree and the wall, to make clean (`no_bumps`). Bonus: fewer than 3 lines. | |
 | `lesson:words` | Lesson 5 | Words in quotes, a string; `say` takes what to say as its argument, as a move takes how much. | `wizard.say`, `concept:strings` |
-| `level:the-password` | Practice 4 | Back at the gate: its word, said beside it, and through; the code's comment gives the word. | |
+| `level:the-password` | Practice 4 | Back at the gate: its word, said beside it, and through, up the path; the code's comment gives the word. | |
 | `lesson:things-to-carry` | Lesson 6 | Things are objects with names; the wizard picks up what is on its tile or beside it, and says which when there are several (D58). | `wizard.pick_up` |
-| `level:the-wand` | Practice 5 | Inside the gatehouse: Nuri's spare wand on the flat stone, lent, picked up. | |
+| `level:the-wand` | Practice 5 | Past the gate: Nuri's spare wand on the flat stone beside the path, lent, picked up. | |
 | `lesson:your-first-spell` | Lesson 7 | A spell's effect depends on where the wizard stands and what is near, and may be nothing; `cast` is the wand's action; `zelim`. | `wizard.cast` |
-| `level:the-sealed-door` | Practice 6 | The wand carried, the seal broken from beside the door. | |
-| `level:the-way-in` | Practice 7 | The chapter together: the inner gate, which listens to the same word, two seals, the castle road. Bonus: fewer than 9 lines. | |
-| `story:up-to-the-castle` | story | Up to the castle; Nuri sums up what was learned; the wand is only lent, and a school wand waits at the wand bank; Ilda waits inside. | |
+| `level:the-sealed-door` | Practice 6 | The wand carried, the sealed gate's rune broken from beside it. | |
+| `level:the-way-in` | Practice 7 | The chapter together: the castle's door, sealed and keyed by the school's word, opened with both. Bonus: fewer than 5 lines. | |
+| `story:up-to-the-castle` | story | At the castle's open door; Nuri sums up what was learned; the wand is only lent, and a school wand waits at the wand bank; Ilda waits inside. | |
 
 ## Chapter 2 — The library (`02-the-library`)
 
@@ -102,7 +104,7 @@ question with a true or false answer, an expression; choosing with `if` and
 The wizard carries the school wand throughout.
 
 Its scenes: `the-passages`, the watchtower's gallery, Dask's round, two
-rooms of two doors and the long stairs; and, after a story page at the
+rooms of two doors and the long stairs; and, after a story at the
 top, `the-night-passages`, Dask's long corridor, the moving stair, the dark
 room and the night walk down to the dormitory.
 
@@ -157,7 +159,7 @@ goal of arriving before it.
 
 Its scene: the broom field behind the castle, its rings and its race
 course, and the village's street to the wand shop. Its rewrite: an
-opening story page, the broom field and the village's wand shop; a closing one, the race won, Zarek a friendly rival, and a wand of
+opening story, the broom field and the village's wand shop; a closing one, the race won, Zarek a friendly rival, and a wand of
 the wizard's own. A fix level follows `for-each`: a loop whose line is not
 moved in, so it runs once. `the-loop-the-loop` is an improve level:
 the program given writes the figure four times, and the child makes it
@@ -183,7 +185,7 @@ into the world and its methods called by it, safely (the sandbox's rules
 hold for it); tiles only a familiar passes; `wizard.send`.
 
 Its scene: the tower, its stair and its rooms, and the small passages
-only a familiar passes. Its rewrite: an opening story page, the tower and
+only a familiar passes. Its rewrite: an opening story, the tower and
 the familiars; a closing
 one, the end of the first year and the challenges ahead. A fix level
 follows `what-it-knows`: an `__init__` that forgets `self`, so the

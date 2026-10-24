@@ -122,13 +122,19 @@ content/
                                           level:<id>; an item's id is its slug, its order the
                                           chapter's (D44); a story item opens and closes it (D62)
     text.en.json  text.es.json            the chapter's title
-  scenes/the-gate/
-    map.txt                               the scene a chapter's levels are parts of: rows
-                                          of # wall, . floor and = shelf (D65)
+  scenes/the-field/
+    map.txt  scene.json                   the scene a chapter's levels are parts of: a grid
+                                          of letters, and what each letter is (its terrain:
+                                          walked on, seen through), its fixed things, its
+                                          props and its rooms (D65, D73)
+  art/scenes/the-field/  art/figures/     a painted scene's ground, rows and things' states,
+                                          and the figures' walking sheets (D76)
   stories/at-the-gate/
-    story.json                            id, who tells it (`speaker`), and `opening` for the
-                                          story before the creator (D61)
-    en.md  es.md                          pages of story separated by ---, with no code (D56)
+    story.json                            the staging on its scene: where the wizard and the
+                                          actors stand, the camera's tile, and each step's
+                                          speaker and action; who tells it (`speaker`), and
+                                          `opening` for the story before the creator (D61, D74)
+    text.en.json  text.es.json            its title and one text a step
   lessons/your-first-action/
     lesson.json                           id, who teaches it (`speaker`, D67), and what it
                                           teaches: the names the level after it needs (`teaches`)
@@ -154,7 +160,7 @@ its example; the level after it starts with its own program (D33, D63). Within a
 numbered by kind: *Lesson 1*, *Practice 1*, *Fix 1*, *Improve 1* (D56). `pack-world.mjs` writes the chapters, in the order of their
 directories, as `content/course.json`, the one order of the course (D32). A
 chapter's picture for the map comes with the art (phase 4); the map draws
-its stops as a path until then. The art draws each scene whole, and a level
+its stops as a path until then. A scene is painted whole (D76), and a level
 shows the part the camera follows (D69).
 
 ```
@@ -444,91 +450,48 @@ another browser.
 ### Phase 4 — Art and sound pipeline
 
 From placeholder squares to the game's look, with reproducible tools. The
-look is a 2D top-down oblique view (a "2.5D" three-quarter view, as the
-classic handheld monster-catching games): the floor seen from above, walls
-and things showing their front face, everything on the tile grid, the
-moves on the grid's plane; not isometric, which the level model and the
-map editor would have to follow. Characters and things are sprite sheets
-on the same grid; the scenes are tilesets with the pieces a wall or a
-hedge needs to join: straights, ends, the four corners, the T and the
-cross junctions, drawn once per terrain and placed by an autotiler.
+look is the owner's style B (D72): painted cartoon art with bold outlines
+and warm light, in a three-quarter top-down view (the ground seen from
+above, every upright thing showing its top and its front), everything on
+the tile grid and nothing on a diagonal, since the wizard moves only along
+it. A chapter's scene is painted by Gemini in one picture from the
+requirements of its levels, with a faint grid; its map is read from the
+picture and its levels placed on it; its raised things are cut out by row,
+so that the figures pass behind and in front of them (D76).
 
-Three questions the phase answers in its first sprint, each by trials on
-one brief, with what each gave, cost and took recorded in the log:
+4.0 **Where the pieces come from** (done, D72): Gemini's image models,
+    art as code, the pixel-art services' corner sets, free tilesets and
+    isometric packs, tried on chapter 1's garden; the painted scene won.
+4.1 **The scene model** (done, D73): terrains, fixed things and rooms in
+    `scene.json`; a level gives the state of a fixed thing.
+4.2 **The tools** (done): `tools/art/generate.py` (a prompt file in, an
+    image out, its prompt and model beside it), `cut.py` and `sprites.py`,
+    `map_from_image.py`, `image_first.py` and `export_scene.py` (a painted
+    scene into `content/art/scenes/<scene>/`), `contact.py` and `demo.py`
+    for the trials; `tools/sound/generate.py` with Lyria; the effects made
+    in the page (`sfx.ts`) with a mute in the settings.
+4.3 **The chapters' scenes painted and placed:** chapter 1's field in the
+    game (sprint 12, 12.8); chapters 2 and 3's library and passages painted,
+    mapped, their levels placed on them and their texts written again.
+4.4 **The masks made right:** every raised thing cut by its outline, no
+    shadow below its row, what opens or is picked up cut against an edit
+    without it, checked with a figure behind and in front of every row.
+4.5 **The figures:** the wizard drawn in the looks the creator offers, or
+    the creator's colours on the drawn sheet; cast, pick up and celebrate
+    frames; the friends, the teachers, Eldra and Bimo on the same scale.
+4.6 **The UI skin:** cards, panels, buttons, the notebook, the map's frame
+    (perhaps the castle drawn isometric, D72), the lesson's speech bubble,
+    icons for goals, actions and spells, a font with its licence readable
+    by children.
+4.7 **Sound:** a theme per chapter from Lyria, short clips, the
+    characters' voices as short sounds.
+4.8 `art/README.md`: the style guide: the view, the grid, the light, how a
+    scene is painted, mapped and cut, how a figure is made, and how each
+    is reviewed; `art/raw/`, which git ignores, for the trials.
 
-4.0 **Where the pieces come from**, tried on the same brief: a wizard's
-    walking sheet (four directions, idle and walk), a wall tileset with
-    its corners and junctions on a chroma key, a grass and path tile that
-    repeats without seams, and a door. The candidates:
-    1. Gemini's image models (`gemini-3.1-flash-image`,
-       `gemini-3-pro-image`), with the key the project has: a first probe
-       gives clean oblique tiles with the wall's top and corners, on a
-       chroma key, for a few cents, but on a loose grid and as JPEG, so a
-       grid-snapping and keying step is needed (`tools/art/cut.py`).
-    2. Claude making the art as code: tiles and figures drawn by
-       programs (Canvas, as the placeholders are, or SVG rendered to
-       pixels), or Blender driven by scripts (`bpy`, free) rendering
-       modular wall pieces from one fixed oblique camera, which gives
-       corners and junctions that match by construction; Gemini's images
-       as textures or references. Deterministic and reproducible, the
-       least pretty at first.
-    3. Free tilesets under a licence a GPL game can ship (CC0, CC BY,
-       CC BY-SA, OFL): Kenney's packs, OpenGameArt's, the Liberated Pixel
-       Cup's, as the terrain, with the characters and things generated to
-       match; each kept with its origin, author and licence.
-    4. Pixel-art services with a trial: Retro Diffusion (free starting
-       credits, then per image) and PixelLab (a free trial of forty
-       generations, then a subscription), both said to do tilesets and
-       sheets; and OpenAI's image model if the owner has it, with the
-       sprite-forge skill tried before.
-    5. A local open model (Stable Diffusion or Flux with a pixel-art
-       adapter) if the machine has the graphics card for it; otherwise
-       set aside.
-    The winner may be a mix: free or Blender-made terrain for the joins,
-    generated characters and things for the charm. Decided in the log.
-4.1 **The scene model the art needs** (world and page): a scene declares
-    its fixed things (doors, the stone, fences) once, and a level says
-    their state; terrains in the scene file beyond wall and floor (grass,
-    path, water, carpet, each walkable or not); rooms as regions, so that
-    a dark room is a room and `kirra` lights it; the autotiler, in the
-    packer or the page, that picks each terrain's piece from its eight
-    neighbours (the 47-piece blob set, built from a few drawn pieces).
-    Chapter 1's scene redrawn as an open garden: the gate, a path with
-    fences and doors, grass the wizard may walk on, the stone beside the
-    path and Nuri off it; its levels' puzzles kept by fences where a
-    puzzle needs a wall.
-4.2 `tools/art/generate.py`: a prompt file in, an image out, the key from
-    `secrets.env`, the prompt and model recorded in the asset's manifest
-    entry; `tools/art/cut.py`: key out the background, snap to the grid,
-    slice, reduce to true pixels, write a sprite sheet and its Phaser atlas
-    JSON; `tools/art/render.py` for the Blender route, if it wins.
-4.3 Terrain and scenes: each terrain's pieces, the three chapters' scenes
-    drawn with them, a tile seam hunt in the browser.
-4.4 The wizard's base sheet with placeholder palette colours: idle, walk
-    (four directions), cast, pick up, celebrate; the palette swap wired to the
-    creator; hats and hair overlays if a sheet comes out on the same grid;
-    the friends and the teacher, Eldra and Bimo on the same grid.
-4.5 Objects and actors of chapters 1–3: wand, books, keys, doors, the stone,
-    stairs, potions; each on the grid.
-4.6 The UI skin: cards, panels, buttons, the notebook, the map's frame, the
-    lesson's book page and speech bubble, icons for goals, actions and
-    spells, a font with its licence (Andika or a pixel font readable by
-    children); the win card with its stars as the event.
-4.7 Sound: `tools/sound/generate.py` with Lyria (`lyria-3.5` and
-    `lyria-3-clip`, reached by the project's key) for a chapter theme and
-    short clips; effects (step, bump, cast, door, pick up, win, fail) made
-    procedurally in the page (an sfxr-like synth, free, deterministic) or
-    taken from CC0 packs where generation is poorer; the characters' voices
-    as short sounds; Phaser's audio with a mute switch; manifests.
-4.8 `art/README.md`: the style guide: the view, the grid, the palette, how a
-    new sprite or terrain is made and reviewed; `art/raw/` outside the
-    repository for the trials.
-
-Sprint 12 has 4.0, 4.1 and 4.2 (`sprint-12.md`); sprint 13 has 4.3 and 4.4;
-sprint 14 has 4.5, 4.6 and 4.7, with 4.8 as each lands.
-
-UAT: the three chapters with real art and sound; the creator's colours
-showing on the map and in the scene; a tile seam hunt; a child's verdict.
+UAT: the three chapters with their paintings and sound; the creator's
+choices showing in the scene; a hunt for things that cover a figure
+wrongly; a child's verdict.
 
 ### Phase 5 — The story and the course
 
@@ -571,8 +534,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
   resumes once the castle is reached; the wand is lent, and the wizard must
   earn one; the wizard grows (a wand of their own, a broom, friends). Every
   level ends with a closing: a word of story and what was learned; every
-  chapter opens and closes with story pages, the closing a recap of the
-  chapter's ideas.
+  chapter opens and closes with a story told on its scene (D74), the
+  closing a recap of the chapter's ideas.
 - **Gemini writes the child's texts** (CLAUDE.md, *Who writes what the child
   reads*), from briefs, with the whole context; Claude reviews.
 - **Kinds and numbers.** Lessons and practices are told apart and numbered
@@ -677,7 +640,7 @@ Not planned in detail; kept possible by the design.
 
 | Risk | Answer |
 |---|---|
-| Generated terrain never tiles seamlessly | Free tilesets in a matching style (phase 4.2 decides early). |
+| A painted scene does not follow the levels it must hold | Paint it from the levels' requirements, read the map from the picture and place the levels on it (D76); paint again rather than force it. |
 | Hats and hair overlays do not align | Colours only for the creator; a few whole-wizard variants later. |
 | Pyodide's first load is slow (10–20 MB) | A loading screen with the story's first lines; the launcher serves it from disk; the browser caches it. |
 | A child's code hangs the worker | Interrupt buffer or restart (1.7), tested in phase 1. |

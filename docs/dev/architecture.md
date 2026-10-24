@@ -26,19 +26,23 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 world's, tested on tests/fixtures/sight.json), a stair's state at
                 a tick (stairs.ts, the same rule as the world's), the playback, and
                 the words the scene shows (words.ts, why an action failed);
-                the looks a wizard may have (looks.ts) and the figures drawn
-                until the art comes, the wizard's and the friends' (placeholders.ts);
-                the camera on the scene, its zoom and its drag (scene.ts, D69)
+                the looks a wizard may have (looks.ts) and the placeholders for a
+                scene without art (placeholders.ts); the camera on the scene, its
+                zoom and its drag (scene.ts, D69), a painted scene drawn from its
+                art with its figures sorted by their feet (scene.ts, D76), and
+                the sound effects, made as the game plays (sfx.ts)
   src/editor/   the child's editor, CodeMirror
   src/ui/       the screens: start with the saved games (start.ts), the
                 wizard's creator (wizard.ts), the map, also over a level (map.ts),
-                a lesson with its teacher or a story page (lesson.ts), the
+                a lesson with its teacher (lesson.ts), a story told on its scene
+                (story.ts, D74), the
                 settings (settings.ts), and the level screen, a view of the run controller
                 (controller.ts), with its goals panel, outcome card, start and
                 win cards (cards.ts), the wizard's notebook (notebook.ts), the
                 stars (stars.ts) and the screen's guide (guide.ts, D68)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
-                and its pages (lessons.ts), the guide's words (guide.ts), and the
+                and its pages (lessons.ts), a story and its steps as the scene's
+                events (stories.ts), the guide's words (guide.ts), and the
                 course (course.ts): its chapters, what comes next, a stop's
                 state, what the child knows in a level (D40)
   src/progress/ the player's progress, a document per game (store.ts), the
@@ -46,8 +50,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 them (progress.ts)
   scripts/      before dev and build: copy Pyodide into public/, pack the world
                 into world.zip, copy the content into content/ with the course in
-                content/course.json and each level on a scene with its map built in,
-                and write the world's table as api.json
+                content/course.json (its items' titles in every language among
+                it), each level and story on a scene with its world built in, and
+                write the world's table as api.json
   e2e/          the browser tests (Playwright), beside the node_modules they need;
                 the loop's screenshots in e2e/shots/ (D39)
 world/          kydux_world, the model of the levels, and its tests: level.py reads
@@ -59,23 +64,32 @@ world/          kydux_world, the model of the levels, and its tests: level.py re
                 sandbox.py keeps it from Pyodide's bridge to JavaScript
 content/        the levels, each with level.json, its words in text.<lang>.json,
                 its solution and its wrong answers (the last two never shipped);
-                the scenes the levels are parts of (scenes/, each a map.txt,
-                D65); the lessons, each with lesson.json and <lang>.md; the
-                story pages (stories/), each with story.json and <lang>.md; the
-                chapters, each with chapter.json and text.<lang>.json; the
-                screen's guide's words (guide/, D68)
+                the scenes the levels are parts of (scenes/, each a map.txt and a
+                scene.json, D65, D73); a painted scene's art and the figures'
+                sheets (art/, D76); the lessons, each with lesson.json and
+                <lang>.md; the stories (stories/), each with story.json, its
+                staging, and text.<lang>.json, D74; the chapters, each with
+                chapter.json and text.<lang>.json; the screen's guide's words
+                (guide/, D68)
 i18n/           en.json, es.json: the app's words, the same keys in each
 docs/dev/       the plan, the sprints, this log, the guide; the story (story.md)
                 and the course (course.md) that the content is written from
 tools/          the i18n check, the forbidden-word check, the names a wizard
-                may not take (reserved_names.py), each level on a scene with its
-                map built in (scene_maps.py, D65), the course as one document
+                may not take (reserved_names.py), each level and story on a scene
+                with its world built in (scene_maps.py, D65, D74), the course as
+                one document
                 to review (course_book.py) and the comments read back from the
                 reviewed document (doc_comments.py), the writing tool (write/:
                 write.py, the rules every text follows in rules.md, and the
                 briefs in briefs/; Gemini drafts the child's texts into
-                drafts/, which git ignores, D55), later the art tools
-tests/tools/    the writing tool's tests, with Gemini faked
+                drafts/, which git ignores, D55, through the API or the
+                Antigravity CLI), the art tools (art/: generate.py asks the
+                image services, cut.py and sprites.py cut what they draw,
+                map_from_image.py and image_first.py read a painting's grid and
+                cut its things, export_scene.py makes content/art/, contact.py
+                and demo.py show the trials; D72, D76) and the music's
+                (sound/generate.py)
+tests/tools/    the writing and art tools' tests, with the services faked
 tests/project/  the repository's own checks
 ci/             check.sh, push.sh and hours.py, dev-cert.sh, the git hooks
 ```
@@ -102,7 +116,10 @@ Pinned exactly, checked against their registries on 2026-10-20:
 | pytest | 9.1.1 | |
 | ruff | 0.17.1 | one configuration for all the Python, `ruff.toml` |
 | google-genai | 2.29.0 | the writing tool's client (D55), `tools/requirements.txt` |
-| Gemini model | gemini-3.1-pro-preview | the writer of the child's texts (D55), pinned in `tools/write/write.py` |
+| Gemini model | gemini-3.1-pro-preview | the writer of the child's texts (D55), pinned in `tools/write/write.py`; Gemini 3.8 Flash through `agy` when asked |
+| Gemini image model | gemini-3-pro-image | the scenes' paintings and the figures (D72, D76), named in each prompt of `tools/art/prompts/` |
+| Lyria | lyria-3-clip-preview | the music's trial (D72) |
+| Pillow, numpy | 13.0.0, 2.5.4 | the art tools, `tools/requirements.txt` |
 | Go | 1.27 | for the launcher, phase 6 |
 
 ## The child's Python
@@ -987,32 +1004,77 @@ one overturns stays, marked as superseded.
   the course as it was. Rules out the map as a screen the player leaves
   the level for.
 - **D72 — Where the game's pieces come from.** Decided 2026-10-23 by the
-  trials of sprint 12 (12.1), each candidate drawing one brief (a wizard's
-  walking sheet, a wall's pieces for every join, grass and a path that
-  repeat without a seam, a door) into `art/raw/`, judged on a contact sheet
-  (`tools/art/contact.py`) that draws a test scene with its pieces:
+  trials of sprint 12 (12.1) and the owner's choice after them. The game's
+  look is the owner's style B: painted cartoon art with bold outlines and
+  warm light, in a three-quarter top-down view (the ground seen from above,
+  every upright thing showing its top and its front), drawn by Gemini 3 Pro
+  Image (`tools/art/generate.py`). A scene is painted in one picture (D76),
+  not built from pieces; the characters are Gemini's style-B walking sheets,
+  PixelLab's four-direction sprites the second choice. The trials, each
+  drawing chapter 1's garden at the gate into `art/raw/` and judged on a
+  contact sheet (`tools/art/contact.py`):
 
-  | Candidate | Joins | Characters | Cost, time |
-  | --- | --- | --- | --- |
-  | Gemini 3.1 Flash Image | No: its own grid, pieces in no order | Charming, a grid of its own | Cents, 12 s |
-  | Gemini 3 Pro Image | Partly: 15 of 16 wall joins, each piece its own shade of grass, so seams show | Good, a grid of its own | Cents, 20 s |
-  | Art as code (`tools/art/draw.py`) | Perfect, by construction | Plain | Free, instant |
-  | Retro Diffusion (`rd_tile__tileset_advanced`, `rd_animation__four_angle_walking`) | Perfect, as a corner set | A walk in four directions, small | 0.10 $ a set, 0.07 $ a walk, 30 s |
-  | PixelLab (`create-tileset`, `create-character-with-4-directions`) | Perfect, as a corner set, with a raised edge | Eight directions, the best | One of 40 trial generations each, 50 s; the raised walls of its pro mode need a paid tier |
+  | Route | What it gave | Cost |
+  | --- | --- | --- |
+  | Gemini, pieces that join (walls, paths) | Pieces in no order, joins that seldom match | Cents an image |
+  | Art as code (`tools/art/draw.py`) | Perfect joins, plain | Free |
+  | Retro Diffusion and PixelLab corner sets | Perfect joins, a flat pixel look | A trial's credits |
+  | Open tilesets (LPC, 16x16 Town Remix, Outdoors) | Free and joined, flatter, of mixed families, lacking the story's own things | Free |
+  | Kenney's isometric packs (CC0) | A rich look; moves that run on diagonals, near walls hiding the wizard | Free |
+  | Gemini, a style frame of the whole scene | The look the owner wants, not on a grid | About 10 cents |
+  | Gemini, the whole scene painted from requirements, the map read from it | The look of the frame, on a grid that can be marked | About 10 cents a picture, an edit per thing that changes |
 
-  Image models draw terrain badly as pieces that must join, and the two
-  pixel-art services draw it well as corner sets (Wang tiles: each piece
-  says which of its four corners are the upper terrain), placed on a
-  grid offset by half a tile from the map's. So the terrain is regions of
-  terrain joined by corner sets, from PixelLab (Retro Diffusion as the
-  cheaper second); a wall or a hedge is a raised terrain with its edge,
-  not a thin line of its own; the characters come from PixelLab, their
-  walks from its animation or from Retro Diffusion's; things, props and
-  the characters' portraits from Gemini 3 Pro, cut by `tools/art/cut.py`;
-  the art made as code stays for the placeholders and the interface's
-  frames. The services draw 32-pixel tiles: the game's grid becomes 32
-  pixels drawn at twice their size. The music comes from Lyria
-  (`lyria-3-clip-preview` for a chapter's theme, through
-  `tools/sound/generate.py`); the effects are made as the game plays
-  (`app/src/engine/sfx.ts`). Rules out thin-wall piece sets and the
-  isometric view.
+  The music comes from Lyria (`lyria-3-clip-preview`, `tools/sound/
+  generate.py`); the effects are made as the game plays (`app/src/engine/
+  sfx.ts`), and the settings mute them. Rules out scenes built from tiles
+  for the levels, and the isometric view for the levels: it may serve the
+  course's map.
+- **D73 — A scene has terrains, fixed things and rooms.** Decided
+  2026-10-23 (sprint 12, 12.2). A scene is a directory `content/scenes/
+  <id>/` with `map.txt`, a grid of letters, and `scene.json`, which says
+  what each letter is (`terrains`: its `kind`, whether it is walked on and
+  whether sight passes it), the scene's fixed things (`things`, by id, with
+  their kind and tile) and props, and its rooms (`rooms`, a rectangle each,
+  by id). A level on the scene gives only the state of a fixed thing it
+  cares about (`{"id": "gate", "open": true}`) and may add things of its
+  own; `dark` names the rooms dark at the start, and `kirra` lights the
+  room the wizard is in. Rules out one letter per terrain fixed in the
+  code, and things declared again in every level.
+- **D74 — The story is told on the scene.** Decided 2026-10-23 (sprint 12,
+  12.3). A story is a script played on its scene in story mode: the scene
+  drawn wide, no editor and no goals; a sequence of steps, each a line said
+  by a character in a bubble over them or by the voice in a band under the
+  scene, with an action before it (a walk in a straight line, a turn, an
+  appearing, a vanishing once the words are said), done by the speaker or
+  by the figure `by` names, so that the voice can tell what another does.
+  `story.json` holds the staging, checked against the scene by
+  `kydux_world.level.story_on_scene`, and `text.<lang>.json` the title and
+  one text a step; *Next*, Enter and Space go on, *Back* replays the step
+  before, *Go on* ends it. The game's opening tells the letter in the past,
+  at the gate, before the creator. Rules out the story told as pages of a
+  book.
+- **D75 — Every run starts the level again, and says so.** Decided
+  2026-10-23 (sprint 12, 12.5). *Run* and *Restart* fade the scene out,
+  put everything back, show *Starting the level again…* and fade it in; a
+  run plays once that and Python are both done. The child sees that a run
+  never goes on from the one before, and that a level played in ways is
+  dealt again each time.
+- **D76 — A scene is painted first, and its map read from the painting.**
+  Decided 2026-10-23 by the owner. Gemini paints a chapter's whole scene
+  from plain requirements (what the levels need: "two paths, one with a
+  door", "the wand on a stone a step off the path"), in style B, at dusk,
+  with nothing on a diagonal and a faint grid of square cells; the cells
+  are marked from the picture (`tools/art/map_from_image.py`) into the
+  scene's map, and the levels are placed on it, which is easier than
+  painting a picture to fit a map. `tools/art/export_scene.py` makes
+  `content/art/scenes/<scene>/`: the ground, with what opens or is picked
+  up taken out by edits of the painting without it; the raised things cut
+  out by the row their foot stands on, never reaching below that row; and
+  each changing thing in its states. The page draws the ground, the rows
+  and the figures sorted by their feet, so that a thing covers who stands
+  behind it and is covered by who stands in front, and a pencil grid that
+  breathes over the ground for counting steps; a scene without art is
+  drawn with placeholders. The figures are `content/art/figures/`, four
+  ways of three walking frames each. A door may be both sealed and keyed
+  by a word, as the castle's is: it opens once both are done, in either
+  order. Rules out building a scene's look from its map.

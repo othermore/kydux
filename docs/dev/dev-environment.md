@@ -84,7 +84,7 @@ checks keep them out, but it is worth knowing what they are.
 
 | File | What it is for |
 |---|---|
-| `secrets.env` | The API keys and credentials the tools use, one `KEY=value` per line. The writing tool reads `GEMINI_API_KEY` from it. Keep its mode at 600. Nothing in the project ever prints its contents. |
+| `secrets.env` | The API keys the tools use, one `KEY=value` per line. The writing, art and sound tools read `GEMINI_API_KEY` from it; the art tool also reads `RETRO_DIFFUSION_API_KEY` and `PIXELLAB_API_KEY` when they are there. Keep its mode at 600. Nothing in the project ever prints its contents. |
 | `forbidden.txt` | The words that must never appear in the repository. The hooks refuse a commit while this file is missing. |
 | `tls/` | The certificate the development server uses for HTTPS. Section 5 explains it. |
 
@@ -116,7 +116,7 @@ everything the browser needs into `app/public/`, which git ignores:
 - Python's WebAssembly build, copied from its npm package into `pyodide/`.
 - The world, packed into `world.zip`, which the browser unpacks into
   Python.
-- The content, copied into `content/`: the chapters, the story pages, the
+- The content, copied into `content/`: the chapters, the stories, the
   lessons, the levels and the screen's guide. A level's solution and its
   wrong answers stay out, so that a child cannot find them in the game. A
   level that is a part of a scene gets the scene's map built in, by
@@ -146,7 +146,7 @@ one to go straight to a screen:
 | Address | Screen |
 | --- | --- |
 | `#start` | The start screen. An address the game does not know opens it too, and so does an address with no hash once a wizard is made. |
-| `#story/the-letter` | A story page, from `content/stories/the-letter/`. This one is the game's opening: an address with no hash opens it while there is no wizard yet. |
+| `#story/the-letter` | A story told on its scene, from `content/stories/the-letter/`. This one is the game's opening: an address with no hash opens it while there is no wizard yet. |
 | `#wizard` | The creator, where the player names their wizard, says whether it is a girl or a boy, and picks its look. |
 | `#map` | The map of the course. |
 | `#lesson/what-a-program-is` | A lesson, from `content/lessons/what-a-program-is/`. |
@@ -189,28 +189,53 @@ the letter, as a child's first visit does.
 ### A level that is part of a scene
 
 A chapter's levels are parts of one scene, so that where one level ends
-the next one begins. The scene is a map of its own, in
-`content/scenes/<id>/map.txt`. It holds only walls (`#`), floor (`.`) and
-shelves (`=`). A level on it says, in its `level.json`, which scene it is
-part of, and where everything of its own stands:
+the next one begins. The scene lives in `content/scenes/<id>/`. Its
+`map.txt` is a grid of letters, and its `scene.json` says what each
+letter is: its terrain, whether the wizard walks on it, and whether sight
+passes it. It also lists the scene's fixed things, like the gate, by id,
+and the scene's rooms. A level on the scene says which scene it is part
+of, where it starts and ends, and the state of each fixed thing it cares
+about:
 
 ```json
 {
-  "id": "the-gate",
-  "scene": "the-gate",
-  "start": [11, 6],
-  "end": [12, 6],
-  "actors": [{ "kind": "friend", "id": "nuri", "at": [10, 6] }]
+  "id": "the-wand",
+  "scene": "the-field",
+  "start": [8, 14],
+  "end": [10, 15],
+  "things": [{ "id": "gate", "open": true }, { "kind": "wand", "id": "wand", "at": [12, 14] }],
+  "actors": [{ "kind": "friend", "id": "nuri", "at": [8, 15] }]
 }
 ```
 
 The coordinates are `x` and `y`, counted from 0 at the map's top-left
 corner. `start` is where the wizard stands. `end` is the tile the reach
-goal asks for, and a level with no reach goal has none. Every thing and
-actor stands at its own `at`. The checks make sure each level starts on
-the tile where the level before it ended, and that the friend never
-stands on the solution's way. To see a level on its scene, run its
-solution in the world's tests, or open its address in the browser.
+goal asks for. The checks make sure each level starts on the tile where
+the level before it ended, and that the friend never stands on the
+solution's way.
+
+### A painted scene
+
+A scene with a folder in `content/art/scenes/<id>/` is drawn from its
+painting: the ground, the raised things cut out row by row, and each door
+or thing that changes in its states. The characters come from
+`content/art/figures/`. A scene without that folder is drawn with
+placeholders. Section 10 says how the art is made.
+
+### A story on its scene
+
+A story is a short play on a scene. Its `story.json` says the scene,
+where the wizard and the others stand, the tile the camera looks at, and
+each step: who speaks and what happens first. Its `text.<lang>.json`
+holds the title and one text for each step. To try a story, open its
+address in the browser, like this one:
+
+```
+https://localhost:5173/#story/at-the-gate
+```
+
+The checks refuse a staging that does not fit its scene, such as a walk
+that is not a straight line or a figure that speaks out of sight.
 
 Two other commands matter. `npm run build` makes the finished game under
 `app/dist/`, the same files a release ships. `npm run preview` serves that
@@ -399,7 +424,12 @@ To have Gemini write the drafts:
 .venv/bin/python tools/write/write.py tools/write/briefs/chapter-1-levels.md
 ```
 
-It prints each file it wrote. The drafts land in
+It prints each file it wrote. With `--via agy`, the brief goes through the
+Antigravity CLI instead, signed in with the owner's Google account and
+with no API key. It uses Gemini 3.8 Flash unless `--model` names another
+of `agy models`.
+
+The drafts land in
 `drafts/chapter-1-levels/`, at the same paths they will have in the
 repository. A `manifest.json` beside them records the model, the brief
 and the date. Git ignores `drafts/`, and the project's checks refuse a
@@ -414,7 +444,7 @@ run `ci/check.sh`, which holds the texts to the game's rules.
 ## 8. Reading the course as one document
 
 The whole course, as the child reads it, can be put in one Markdown file to
-read it through and comment on it: every story page, lesson and level in
+read it through and comment on it: every story, step by step, lesson and level in
 order, with each level's goals, starting code, hints and solution. This
 writes it in Spanish, for a girl wizard, into `drafts/`:
 
@@ -466,3 +496,38 @@ already on GitHub is never rewritten.
 Two files are never committed: `CLAUDE.md` and the `.claude/` directory.
 They hold the project's internal instructions, and `.gitignore` keeps them
 out.
+
+## 10. Making the art and the sound
+
+The art is painted by Gemini, and the tools turn a painting into what the
+game draws. `art/README.md` is the style guide. The trials and the raw
+pictures live in `art/raw/`, which git ignores.
+
+A picture is asked for with a prompt file in `tools/art/prompts/`. Its
+front matter names the service and the model. This draws it into
+`art/raw/<candidate>/`, with the prompt and the model beside the image:
+
+```sh
+.venv/bin/python tools/art/generate.py tools/art/prompts/image-first-field.md
+```
+
+A painted scene is turned into the game's files by one command. It cuts
+the raised things by row, takes each changing thing from its edits, and
+writes `content/art/scenes/<scene>/` and the figures:
+
+```sh
+.venv/bin/python tools/art/export_scene.py all
+```
+
+It also writes check pictures into `art/raw/game-check/`. Look at them
+before committing: every figure should be hidden by what stands in front
+of it and drawn over what stands behind it.
+
+The music is asked for the same way, from `tools/sound/prompts/`:
+
+```sh
+.venv/bin/python tools/sound/generate.py tools/sound/prompts/arrival-theme.md
+```
+
+The sound effects need no files: the game makes them as it plays, and the
+settings can turn them off.

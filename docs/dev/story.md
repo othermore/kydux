@@ -16,8 +16,8 @@ Its parts, in the order the chapters visit them:
 
 | Place | Chapter | What it is |
 | --- | --- | --- |
-| The road and the gate | 1 | The path up the hill at dusk, where the tutorial happens: the forecourt's hedges and paths, the steps up to the landing, and the great gate, which opens to a word. The scene `the-gate`. |
-| The gatehouse | 1 | Stone passages inside the gate: the flat stone where Nuri leaves the spare wand, sealed doors, the inner gate, and the way out to the castle road. The scene `the-gate`. |
+| The field and the gate | 1 | The open countryside before the school at dusk, where the tutorial happens: trees, rocks, a fence pen, a grassy rise with steps, and the great gate in the middle of the school's wall, which opens to a word. The scene `the-field`. |
+| The path to the castle | 1 | Past the gate, a path between trees and rocks: the flat stone where Nuri leaves the spare wand, a gate sealed by a rune, and the castle's great door, sealed too and keyed by the school's word. The scene `the-field`. |
 | The library | 2 | Tall shelves, locked rooms, the archive, Eldra's nook and shelf, books that give spells. The scene `the-library`. |
 | The wand bank | 2 | A counter beyond the library's last aisle, run by the pupils' parents, where a pupil borrows a school wand for the year. |
 | The passages | 3 | At night: the watchtower's gallery, Dask's round, rooms of two doors, the long stairs. The scene `the-passages`. |

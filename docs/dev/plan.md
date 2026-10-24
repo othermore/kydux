@@ -496,9 +496,11 @@ Sprint 7 has 5.1, 5.2, 2.13 and 5.3 (`sprint-7.md`); sprint 8 has 2.14 and
 5.4 (`sprint-8.md`); sprint 9 has 2.15, 2.16 and 5.5 (`sprint-9.md`). The
 owner's UAT of 2026-10-22 reshapes the course: sprint 10 builds the writing
 tool, the kinds, the stars and the rules, and rewrites the story and chapter
-1 (`sprint-10.md`); sprint 11 rewrites chapters 2 and 3 the same way and
-builds the screen's guide and the map over the level; sprint 12 builds the
-saved games on the server. Chapters 4 and 5 come after, each a sprint.
+1 (`sprint-10.md`); sprint 11 puts each chapter's levels in one scene, builds
+the screen's guide, the map over the level and the saved games in the
+browser, and rewrites chapters 2 and 3 the same way (`sprint-11.md`);
+sprint 12 keeps the saved games on the server. Chapters 4 and 5 come
+after, each a sprint, with their scenes.
 
 What the owner's UAT of 2026-10-22 taught, which every chapter follows
 (sprint-10.md has the first pieces; the rest are sprints 11 and 12):

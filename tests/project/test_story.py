@@ -23,4 +23,6 @@ def test_every_speaker_is_a_character_of_the_story(repo_root):
         speaker = json.loads(path.read_text(encoding="utf-8")).get("speaker")
         if speaker is not None:
             where = path.parent.name
-            assert speaker in known, f"{where}: the speaker {speaker!r} is not in story.md"
+            # `friend` is Nuri or Teku, by the wizard's gender (D77).
+            wanted = {"nuri", "teku"} if speaker == "friend" else {speaker}
+            assert wanted <= known, f"{where}: the speaker {speaker!r} is not in story.md"

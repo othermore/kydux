@@ -1,5 +1,5 @@
 import { version } from '../package.json';
-import { type Course, conceptsAt, items, itemHash, knownApi, loadCourse, next, parseItem } from './content/course';
+import { type Course, conceptsAt, courseStart, items, itemHash, knownApi, loadCourse, next, parseItem } from './content/course';
 import { loadGuideText } from './content/guide';
 import { LessonNotFound, loadLesson } from './content/lessons';
 import { loadStory, StoryNotFound } from './content/stories';
@@ -92,6 +92,14 @@ function itemNumber(course: Course, item: string): string | undefined {
   return number ? t(`kinds.${number.kind}`, { n: number.n }) : undefined;
 }
 
+/** An item's label on its own screen, with its chapter (D78): *Chapter 1 · Story 1*. */
+function itemLabel(course: Course, item: string): string | undefined {
+  const number = course.numbers?.[item];
+  const short = itemNumber(course, item);
+  if (!number || !short) return undefined;
+  return number.chapter ? t('kinds.in_chapter', { chapter: number.chapter, item: short }) : short;
+}
+
 /** What a lesson or a story says when there is none by that id. */
 function notFound(content: HTMLElement, kind: 'lesson' | 'story', id: string): void {
   document.title = t('app.title');
@@ -116,7 +124,7 @@ async function showLesson(content: HTMLElement, id: string, key: string, from?: 
       content,
       lessonScreen({
         lesson,
-        label: itemNumber(course, `lesson:${id}`),
+        label: itemLabel(course, `lesson:${id}`),
         next: next(course, `lesson:${id}`),
         // Read again from a level, the lesson goes back to it (D71).
         ...(from ? { backTo: `#level/${from}` } : {}),
@@ -147,7 +155,11 @@ async function showStory(content: HTMLElement, id: string, key: string): Promise
         next: next(course, `story:${id}`),
         // The game's opening goes on to the creator, or, with a wizard made, to the
         // course's first item (D61).
-        ...(story.opening ? { onward: progress.wizard() ? itemHash(items(course)[0] ?? '') : '#wizard' } : {}),
+        // The opening goes on to the creator, or, with a wizard made, to what follows it.
+        ...(story.opening
+          ? { onward: progress.wizard() ? itemHash(next(course, `story:${id}`) ?? courseStart(course)) : '#wizard' }
+          : {}),
+        label: itemLabel(course, `story:${id}`),
         startScene,
         reload: () => loadStory(id, currentLanguage()),
       }),
@@ -207,7 +219,8 @@ function failed(content: HTMLElement, error: unknown): void {
 /** Where Continue goes: the item last opened, else the first of the course. */
 async function continueTarget(course: Course): Promise<{ hash: string; title: string }> {
   const current = progress.load().current;
-  const item = current && items(course).includes(current) ? current : (items(course)[0] ?? '');
+  // Continue never leads back to the opening (D78).
+  const item = current && current !== course.opening && items(course).includes(current) ? current : courseStart(course);
   return { hash: itemHash(item), title: await itemTitle(item) };
 }
 
@@ -284,7 +297,7 @@ async function showStart(content: HTMLElement): Promise<void> {
       continueTo,
       wizard: progress.wizard(),
       opening: OPENING,
-      placeOf: (item) => (item ? places.get(item) : undefined) ?? places.get(items(course)[0] ?? '') ?? '',
+      placeOf: (item) => (item ? places.get(item) : undefined) ?? places.get(courseStart(course)) ?? '',
       onChanged: () => {
         shownRoute = null;
         route();
@@ -318,7 +331,7 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
         runtime,
         loaded,
         next: next(course, `level:${id}`),
-        label: itemNumber(course, `level:${id}`),
+        label: itemLabel(course, `level:${id}`),
         table,
         createEditor,
         startScene,

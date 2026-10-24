@@ -121,9 +121,11 @@ def check_speakers(languages: dict[str, dict[str, str]]) -> list[str]:
         if speaker is None:
             continue
         for lang, catalog in languages.items():
-            if f"characters.{speaker}" not in catalog:
-                where = path.relative_to(REPO).as_posix()
-                findings.append(f"{where}: the speaker {speaker} has no name in i18n/{lang}.json")
+            # `friend` is Nuri or Teku, by the wizard's gender (D77): both need names.
+            for who in FRIENDS if speaker == "friend" else (speaker,):
+                if f"characters.{who}" not in catalog:
+                    where = path.relative_to(REPO).as_posix()
+                    findings.append(f"{where}: the speaker {who} has no name in i18n/{lang}.json")
     return findings
 
 
@@ -138,6 +140,9 @@ def check_stories(languages: dict[str, dict[str, str]]) -> list[str]:
         named = {step.get("who") for step in steps} - {"voice", "wizard"}
         if story.get("speaker"):
             named.add(story["speaker"])
+        # `friend` is Nuri or Teku, by the wizard's gender (D77): both need names.
+        if "friend" in named:
+            named = (named - {"friend"}) | set(FRIENDS)
         for lang, catalog in languages.items():
             text_path = path.parent / f"text.{lang}.json"
             if not text_path.is_file():
@@ -203,6 +208,8 @@ def check_chapters(languages: list[str]) -> list[str]:
     return findings
 
 
+#: The two friends whose names a `friend` speaker or `{friend}` needs (D77).
+FRIENDS = ("nuri", "teku")
 #: Braces holding a bar: a choice for the wizard, well made or not.
 BRACED_BAR = re.compile(r"\{[^{}\n]*\|[^{}\n]*\}")
 #: The words for the wizard that Spanish genders; they belong inside a choice.

@@ -21,7 +21,7 @@
       "facing": "right"
     },
     {
-      "id": "nuri",
+      "id": "friend",
       "kind": "friend"
     }
   ],
@@ -55,7 +55,7 @@
       "by": "wizard"
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": {
         "appear": [
           9,
@@ -74,7 +74,7 @@
       "do": null
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": null
     }
   ]

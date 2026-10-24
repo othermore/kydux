@@ -11,6 +11,6 @@
     "Pon una acción para moverte hacia arriba y una para moverte a la derecha dentro del bucle."
   ],
   "intro": "Estas escaleras no terminan nunca. Escribí todos los pasos uno por uno, pero es mucho para leer. ¿Podemos repetirlos con un bucle?",
-  "outro": "Mucho mejor. El ordenador hizo todo el trabajo duro por {nosotros|nosotras}, y ya estamos arriba.",
+  "outro": "Mucho mejor. El ordenador hizo todo el trabajo duro por nosotros, y ya estamos arriba.",
   "learned": "Ahora sabes qué es un bucle, y cómo `for` repite líneas por ti."
 }

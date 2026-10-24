@@ -5,7 +5,7 @@
     "We did it! We opened it together!",
     "Just think of the first step to the gate, the fixed note, and the long walk in one instruction! A program is a list of instructions; your wizard is an object, the one the code calls `wizard`, and its actions are methods; a comment is a note for a person, and a move's argument says how far.",
     "Then came the password *ambrel*, the wand, and breaking the seals with *zelim*. A string is words in quotes, kept exactly as written, and `say` says one; `pick_up` picks a thing up, and a spell is cast with the wand.",
-    "Thank you for teaching me, Nuri. I think using the wand was my favorite part!",
+    "Thank you for teaching me, {friend}. I think using the wand was my favorite part!",
     "The wand is only lent! Our teacher, Ilda, waits inside, and the wand bank, a counter in the castle run by the pupils' parents, lends every new pupil a school wand for the year; then you can give my spare back.",
     "Together you step into the castle; the real castle begins."
   ]

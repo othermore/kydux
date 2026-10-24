@@ -2,16 +2,27 @@
   "id": "the-long-stairs",
   "kind": "improve",
   "scene": "the-passages",
-  "start": [12, 9],
-  "end": [20, 1],
-  "speaker": "nuri",
-  "carrying": ["wand"],
+  "start": [
+    12,
+    9
+  ],
+  "end": [
+    20,
+    1
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
   "things": [],
   "actors": [
     {
       "kind": "friend",
-      "id": "nuri",
-      "at": [11, 9]
+      "id": "friend",
+      "at": [
+        11,
+        9
+      ]
     }
   ],
   "api": [

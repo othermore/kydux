@@ -1,6 +1,6 @@
 {
   "id": "after-dark",
-  "speaker": "nuri",
+  "speaker": "friend",
   "scene": "the-passages",
   "wizard": [
     2,
@@ -12,7 +12,7 @@
   ],
   "actors": [
     {
-      "id": "nuri",
+      "id": "friend",
       "kind": "friend"
     }
   ],
@@ -25,7 +25,7 @@
       "by": "wizard"
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": {
         "appear": [
           1,
@@ -38,7 +38,7 @@
       "do": null
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": null
     },
     {
@@ -46,7 +46,7 @@
       "do": null
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": null
     },
     {

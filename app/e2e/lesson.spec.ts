@@ -31,10 +31,10 @@ test('a lesson read shows as done on the map, and opens its level', async ({ pag
   for (let turn = 0; turn < 2; turn += 1) await page.locator('#lesson-next').click();
   await page.locator('#lesson-map').click();
   const stops = page.locator('.stop');
-  await expect(stops.nth(1)).toHaveAttribute('data-item', 'lesson:what-a-program-is');
-  await expect(stops.nth(1)).toHaveAttribute('data-state', 'done');
-  await expect(stops.nth(2)).toHaveAttribute('data-state', 'open');
-  await expect(stops.nth(2)).toContainText('The gate');
+  await expect(stops.nth(2)).toHaveAttribute('data-item', 'lesson:what-a-program-is');
+  await expect(stops.nth(2)).toHaveAttribute('data-state', 'done');
+  await expect(stops.nth(3)).toHaveAttribute('data-state', 'open');
+  await expect(stops.nth(3)).toContainText('The gate');
 });
 
 test('a lesson in Spanish', async ({ browser }) => {

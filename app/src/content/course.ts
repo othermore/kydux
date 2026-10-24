@@ -9,10 +9,12 @@ export interface Chapter {
   items: string[];
 }
 
-/** An item's kind and its number within its chapter and kind (D56): Lesson 3. */
+/** An item's kind, its number within its chapter and kind (D56), and its chapter's
+ * number (D78): Chapter 1 · Lesson 3. */
 export interface ItemNumber {
   kind: string;
   n: number;
+  chapter?: number;
 }
 
 export interface Course {
@@ -26,6 +28,8 @@ export interface Course {
   known?: Record<string, string[]>;
   /** Each item's title, and each chapter's as `chapter:<id>`, by language (12.6). */
   titles?: Record<string, Record<string, string>>;
+  /** The game's opening, chapter 1's first story, before the creator (D61, D78). */
+  opening?: string | null;
 }
 
 export type ItemKind = 'story' | 'lesson' | 'level';
@@ -56,6 +60,12 @@ export function items(course: Course): string[] {
   return course.chapters.flatMap((chapter) => chapter.items);
 }
 
+/** Where the course starts for a child who has made a wizard: its first item that is
+ * not the opening (D78). */
+export function courseStart(course: Course): string {
+  return items(course).find((item) => item !== course.opening) ?? '';
+}
+
 /** The item after `item` in the course, or null after the last. */
 export function next(course: Course, item: string): string | null {
   const all = items(course);
@@ -75,10 +85,12 @@ export function previous(course: Course, item: string): string | null {
   return index > 0 ? (all[index - 1] ?? null) : null;
 }
 
-/** Whether an item is done: a story or a lesson read, a level won. */
-export function isDone(item: string, progress: Progress): boolean {
+/** Whether an item is done: a story or a lesson read, a level won; the opening is
+ * behind a child who has made a wizard, read or not (D78). */
+export function isDone(item: string, progress: Progress, course?: Course): boolean {
   const parsed = parseItem(item);
   if (!parsed) return false;
+  if (course?.opening === item && progress.wizard !== null) return true;
   switch (parsed.kind) {
     case 'story':
       return progress.stories[parsed.id]?.read === true;
@@ -97,8 +109,8 @@ export function conceptsAt(course: Course, levelId: string): string[] {
 /** A stop's state on the map (D34): done; open, the first of the course or the one
  * after a done item; locked otherwise. */
 export function stopState(course: Course, item: string, progress: Progress): StopState {
-  if (isDone(item, progress)) return 'done';
+  if (isDone(item, progress, course)) return 'done';
   const before = previous(course, item);
-  if (before === null || isDone(before, progress)) return 'open';
+  if (before === null || isDone(before, progress, course)) return 'open';
   return 'locked';
 }

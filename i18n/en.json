@@ -302,7 +302,8 @@
     "nuri": "Nuri",
     "zarek": "Zarek",
     "bimo": "Bimo",
-    "eldra": "Eldra"
+    "eldra": "Eldra",
+    "teku": "Teku"
   },
   "notebook_simple": {
     "wizard": {
@@ -318,7 +319,9 @@
     "practice": "Practice {n}",
     "fix": "Fix {n}",
     "improve": "Improve {n}",
-    "challenge": "Challenge {n}"
+    "challenge": "Challenge {n}",
+    "story": "Story {n}",
+    "in_chapter": "Chapter {chapter} · {item}"
   },
   "stars": {
     "no_hints": "Solved without a hint",

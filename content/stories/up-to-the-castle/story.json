@@ -1,6 +1,6 @@
 {
   "id": "up-to-the-castle",
-  "speaker": "nuri",
+  "speaker": "friend",
   "scene": "the-field",
   "wizard": [
     8,
@@ -26,7 +26,7 @@
   ],
   "actors": [
     {
-      "id": "nuri",
+      "id": "friend",
       "kind": "friend",
       "at": [
         8,
@@ -46,7 +46,7 @@
       "by": "wizard"
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": {
         "walk": [
           8,
@@ -55,7 +55,7 @@
       }
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": {
         "walk": [
           8,
@@ -64,7 +64,7 @@
       }
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": null
     },
     {
@@ -74,7 +74,7 @@
       }
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": null
     },
     {

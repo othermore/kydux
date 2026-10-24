@@ -41,6 +41,7 @@ import {
   WALL,
   WIZARD_KEY,
 } from './placeholders';
+import { friendOf } from '../i18n/personal';
 import { Playback } from './playback';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
@@ -263,8 +264,10 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** A character's figure: its drawn sheet when there is one, else the placeholder. */
-  private figure(name: string, placeholder: string, tile: Tile, facing: Facing): Phaser.GameObjects.Sprite {
+  private figure(id: string, placeholder: string, tile: Tile, facing: Facing): Phaser.GameObjects.Sprite {
     const figures = this.art?.figures;
+    // The friend is the one of the wizard's other gender (D77).
+    const name = id === 'friend' ? friendOf({ gender: this.look.gender }).id : id;
     if (figures && this.textures.exists(`fig-${name}`)) {
       const sprite = this.add.sprite(...this.figureAt(tile), `fig-${name}`, SHEET_ROW[facing] * 3 + figures.standing);
       sprite.setOrigin(0.5, 1 - figures.foot / figures.frame[1]);

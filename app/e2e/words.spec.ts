@@ -38,16 +38,16 @@ test('the words speak of a boy as a boy', async ({ browser }) => {
   await page.context().close();
 });
 
-test('a story greets the wizard by name, and Nuri is of the wizard\'s gender', async ({ browser }) => {
+test('a story greets the wizard by name, and the friend is of the other gender (D77)', async ({ browser }) => {
   for (const [locale, gender, words] of [
-    ['es-ES', 'girl', 'Encantada de conocerte, Nuri. Yo soy Marta.'],
-    ['es-ES', 'girl', 'Soy una alumna de primer año'],
-    ['es-ES', 'boy', 'Soy un alumno de primer año'],
+    ['es-ES', 'girl', 'Encantada de conocerte, Teku. Yo soy Marta.'],
+    ['es-ES', 'girl', 'Soy Teku. Soy un alumno de primer año'],
+    ['es-ES', 'boy', 'Soy Nuri. Soy una alumna de primer año'],
     ['en-US', 'girl', 'I am Marta.'],
   ] as const) {
     const page = await withWizard(browser, locale, gender);
     await page.goto('/#story/at-the-gate');
-    // Nuri's greeting, reached again with Back; then the wizard's answer, by name.
+    // The friend's greeting, reached again with Back; then the wizard's answer, by name.
     await storyNext(page, 4);
     await page.locator('#story-back').click();
     await expect(page.locator('#story-step')).toHaveText(/^4 /);

@@ -1,6 +1,7 @@
 {
   "id": "01-arrival",
   "items": [
+    "story:the-letter",
     "story:at-the-gate",
     "lesson:what-a-program-is",
     "level:the-gate",

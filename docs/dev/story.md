@@ -17,7 +17,7 @@ Its parts, in the order the chapters visit them:
 | Place | Chapter | What it is |
 | --- | --- | --- |
 | The field and the gate | 1 | The open countryside before the school at dusk, where the tutorial happens: trees, rocks, a fence pen, a grassy rise with steps, and the great gate in the middle of the school's wall, which opens to a word. The scene `the-field`. |
-| The path to the castle | 1 | Past the gate, a path between trees and rocks: the flat stone where Nuri leaves the spare wand, a gate sealed by a rune, and the castle's great door, sealed too and keyed by the school's word. The scene `the-field`. |
+| The path to the castle | 1 | Past the gate, a path between trees and rocks: the flat stone where the friend leaves the spare wand, a gate sealed by a rune, and the castle's great door, sealed too and keyed by the school's word. The scene `the-field`. |
 | The library | 2 | Tall shelves, locked rooms, the archive, Eldra's nook and shelf, books that give spells. The scene `the-library`. |
 | The wand bank | 2 | A counter beyond the library's last aisle, run by the pupils' parents, where a pupil borrows a school wand for the year. |
 | The passages | 3 | At night: the watchtower's gallery, Dask's round, rooms of two doors, the long stairs. The scene `the-passages`. |
@@ -35,12 +35,21 @@ Each with the id a level's `speaker` uses (D45), the name the player reads, who 
 | `orla` | Orla | The head of the school, a woman. She welcomes the pupils at the start and gives the familiar at the end. | Calm and kind, a few words at a time. |
 | `dask` | Dask | A strict teacher, a man, who patrols the passages and does not want pupils there after dark: the one the wizard hides from in chapter 3. | Gruff and brief; never cruel. He is fair, and in the end impressed. |
 | `wenna` | Wenna | The librarian, a woman, keeper of the books and of their rules: chapter 2's teacher. | Precise and quiet; she loves order and a good question. |
-| `nuri` | Nuri | A first-year pupil who arrives at the same moment as the wizard. A girl or a boy to match the wizard's gender. Grew up among wizards and teaches chapters 1 and 3, whispering in the night passages. | Eager, curious, says what the child may be thinking: *What does that do?* |
+| `nuri` | Nuri | A first-year pupil, a girl, who grew up among wizards. For a boy wizard she is the friend who arrives at the gate at the same moment and teaches chapters 1 and 3, whispering in the night passages; for a girl wizard she is the wizard's dormitory mate. | Eager, curious, says what the child may be thinking: *What does that do?* |
+| `teku` | Teku | A first-year pupil, a boy, who grew up among wizards. For a girl wizard he is the friend who arrives at the gate and teaches chapters 1 and 3; for a boy wizard he is the wizard's dormitory mate. | Cheerful and a little impatient, quick to try things: *Let's just try it!* |
 | `zarek` | Zarek | A pupil a year older, the rival: quick, proud, sometimes right. | Boastful but not mean; he races the wizard in chapter 4 and is a good loser. |
 | `bimo` | Bimo | The school's cat, who wanders into levels. | He does not speak: he meows, and the texts say what he seems to mean. |
 | `eldra` | Eldra | A ghost in the library, once a pupil, who lost her books long ago. | Whispers, speaks in old-fashioned ways, is never frightening. |
 
-Nuri, Bimo and Eldra are actors a level may hold; the teachers and pupils speak
+**The two friends** (D77). The friend who meets the wizard at the gate and
+teaches chapters 1 and 3 is of the wizard's other gender: Nuri for a boy
+wizard, Teku for a girl. A level, a lesson or a story names that friend
+`friend`, and a text writes their name `{friend}` and their gendered words
+as `{{boy's words|girl's words}}`. The other friend, of the wizard's own
+gender, is the wizard's dormitory mate, and comes into chapters 2 and 3: in
+the library, and on the night out of bed.
+
+Nuri, Teku, Bimo and Eldra are actors a level may hold; the teachers and pupils speak
 in intros and outros, and Dask patrols as the `teacher` kind.
 
 ## The spells
@@ -62,9 +71,9 @@ The gate's password, the first word the wizard says in chapter 1, is **`ambrel`*
 
 **The Opening.** Before the game's mechanics begin, the story opens. The child receives a letter of admission to Arvelia for their first year. They make the journey, arriving at the school's gate at dusk, alone, unable to open it, and without a wand.
 
-**Chapter 1, Arrival.** *Opening beat:* At the closed gate at dusk, the wizard knows no magic. Nuri arrives at the same moment, having grown up among wizards, and offers to help. Nuri lends the wizard a spare wand to be returned later, and teaches them the basics on the spot: what an instruction is, actions, arguments, words, carrying things, and the first spell, `zelim`. Nuri also teaches the method: try, watch, and try again. *Closing beat:* The wizard speaks the password `ambrel`, the gate opens, and the castle is reached. The wizard has gained a friend, a lent wand, and the first spell.
+**Chapter 1, Arrival.** *Opening beat:* At the closed gate at dusk, the wizard knows no magic. The friend of the other gender, Nuri or Teku, arrives at the same moment, having grown up among wizards, and offers to help. The friend lends the wizard a spare wand to be returned later, and teaches them the basics on the spot: what an instruction is, actions, arguments, words, carrying things, and the first spell, `zelim`. The friend also teaches the method: try, watch, and try again. *Closing beat:* The wizard speaks the password `ambrel`, the gate opens, and the castle is reached. The wizard has gained a friend, a lent wand, and the first spell.
 
-**Chapter 2, The library.** *Opening beat:* The wizard must navigate the castle to the parents' association wand bank to borrow a school wand, and return Nuri's spare. Wenna keeps the library, and the wizard learns variables, attributes, and finding things by kind. Locked rooms need their keys; `fendra` brings a book down from a high shelf. Eldra asks for help finding her lost book. *Closing beat:* The wizard has earned the right to borrow a wand from the wand bank, gained Eldra's trust by returning her book, and mastered pulling things from afar.
+**Chapter 2, The library.** *Opening beat:* The wizard must navigate the castle to the parents' association wand bank to borrow a school wand, and return the friend's spare. Wenna keeps the library, and the wizard learns variables, attributes, and finding things by kind. Locked rooms need their keys; `fendra` brings a book down from a high shelf. Eldra asks for help finding her lost book. *Closing beat:* The wizard has earned the right to borrow a wand from the wand bank, gained Eldra's trust by returning her book, and mastered pulling things from afar.
 
 **Chapter 3, The passages.** *Opening beat:* The wizard explores the night passages, testing their growing skills where Dask patrols. The wizard learns that a question can be true or false, then to choose (`if`, `else`), then to repeat (`for`, `while`), waiting for Dask to turn away. `kirra` lights the dark rooms, `osto` holds the moving stairs. *Closing beat:* Dask catches the wizard but lets them go, impressed; the wizard gains confidence and mastery over the castle's shifting architecture.
 
@@ -74,4 +83,4 @@ The gate's password, the first word the wizard says in chapter 1, is **`ambrel`*
 
 ## The tone
 
-Warm, funny and never scary. The castle is old and full of surprises, not of dangers: a teacher who catches the wizard sends them back to try again, a dark room is only dark until it is lit, a ghost is only lonely. The child is never mocked, and a failure is always the code's, never the child's: *the wizard walked into the wall* rather than *you made a mistake*. Jokes are gentle and come from the characters: Bimo's opinions, Nuri's questions, Zarek's boasts.
+Warm, funny and never scary. The castle is old and full of surprises, not of dangers: a teacher who catches the wizard sends them back to try again, a dark room is only dark until it is lit, a ghost is only lonely. The child is never mocked, and a failure is always the code's, never the child's: *the wizard walked into the wall* rather than *you made a mistake*. Jokes are gentle and come from the characters: Bimo's opinions, Nuri's questions, Teku's hurry, Zarek's boasts.

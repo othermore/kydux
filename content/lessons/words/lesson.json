@@ -1,6 +1,6 @@
 {
   "id": "words",
-  "speaker": "nuri",
+  "speaker": "friend",
   "teaches": [
     "wizard.say",
     "concept:strings"

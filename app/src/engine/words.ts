@@ -2,7 +2,7 @@
 // be done (D28). The engine asks here and nowhere else for i18n, so that the
 // rest of it stays free of the player's language.
 
-import { t } from '../i18n';
+import { characterName, t } from '../i18n';
 
 /** A thing's kind said with its article: "the door", "la puerta". Every kind the
  * world has is in i18n/<lang>.json as things.<kind>, which tools/i18n_check.py holds
@@ -55,7 +55,7 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
   }
 }
 
-/** Who stands in the wizard's way: a friend, by the name the story gives them (D66). */
+/** Who stands in the wizard's way: a friend, by the name the story gives them (D66, D77). */
 export function friendText(id: string): string {
-  return t('blocked.friend', { name: t(`characters.${id}`) });
+  return t('blocked.friend', { name: characterName(id) });
 }

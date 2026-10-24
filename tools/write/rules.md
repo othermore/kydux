@@ -52,8 +52,16 @@ game's developers before it enters the game.
 - English needs few choices: "the wizard", "they" for a child of any gender
   when needed; `{he|she}` and `{his|her}` only where a pronoun cannot be
   avoided.
-- Nuri, the wizard's friend, is a girl when the wizard is a girl and a boy
-  when the wizard is a boy: write Nuri's gendered words as choices too.
+- The friend who meets the wizard at the gate and teaches chapters 1 and 3
+  is of the wizard's other gender: Nuri, a girl, for a boy wizard; Teku, a
+  boy, for a girl wizard. Write the friend's name as `{friend}`, never as
+  Nuri or Teku. In Spanish, write the friend's own gendered words as a
+  choice in double braces, the boy's form first: `{{un alumno|una
+  alumna}}`, `{{cansado|cansada}}`; single braces stay the wizard's. Words
+  for the two of them together are masculine plural in Spanish
+  (*juntos*, *nosotros*), since they are always a boy and a girl.
+- The other friend, of the wizard's own gender, is the wizard's dormitory
+  mate; the brief says when they appear.
 
 ## Names
 

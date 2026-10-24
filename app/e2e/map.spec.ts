@@ -8,14 +8,19 @@ test('the map shows the course in order: the first stop open, the rest locked', 
   await page.goto('/#map');
   await expect(page.locator('.map-chapter h2')).toHaveText(['Arrival', 'The library', 'The passages']);
   const first = page.locator('.stop').first();
-  await expect(first).toHaveAttribute('data-item', 'story:at-the-gate');
+  // The opening is chapter 1's first story, numbered like the rest (D78).
+  await expect(first).toHaveAttribute('data-item', 'story:the-letter');
   await expect(first).toHaveAttribute('data-state', 'open');
-  await expect(first).toContainText('At the gate');
+  await expect(first).toContainText('Story 1');
+  await expect(first).toContainText('The letter');
   await expect(first.locator('.stop-icon.story')).toHaveCount(1);
   // The first locked stop is named; the ones after it show only their kind (D71).
+  const gateStory = stop(page, 'story:at-the-gate');
+  await expect(gateStory).toHaveAttribute('data-state', 'locked');
+  await expect(gateStory).toContainText('At the gate');
   const lesson = stop(page, 'lesson:what-a-program-is');
   await expect(lesson).toHaveAttribute('data-state', 'locked');
-  await expect(lesson).toContainText('What a program is');
+  await expect(lesson).toHaveAttribute('data-unnamed', 'true');
   const gate = stop(page, 'level:the-gate');
   await expect(gate).toHaveAttribute('data-state', 'locked');
   await expect(gate).toHaveAttribute('data-unnamed', 'true');
@@ -72,8 +77,9 @@ test('from a level, the map opens over it, says where you are, and closes back t
 
   // A stop chosen on the map is gone to.
   await page.locator('#level-map').click();
-  await overlay.locator('.stop[data-item="story:at-the-gate"] a').click();
-  await expect(page).toHaveURL(/#story\/at-the-gate$/);
+  // With no wizard yet, the open story is the letter, chapter 1's first (D78).
+  await overlay.locator('.stop[data-item="story:the-letter"] a').click();
+  await expect(page).toHaveURL(/#story\/the-letter$/);
 });
 
 test('a level offers its lesson again, which goes back to the level (D71)', async ({ page }) => {

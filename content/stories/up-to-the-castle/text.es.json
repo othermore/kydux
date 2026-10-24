@@ -2,10 +2,10 @@
   "title": "Hacia el castillo",
   "steps": [
     "La gran puerta del castillo por fin está abierta, con el último sello roto.",
-    "¡Lo logramos! ¡Lo hemos conseguido {juntos|juntas}!",
+    "¡Lo logramos! ¡Lo hemos conseguido juntos!",
     "¡Piensa en el primer paso hacia la puerta, la nota arreglada y la larga caminata en una sola instrucción! Un programa es una lista de instrucciones; tu {mago|maga} es un objeto, el que el código llama `wizard`, y sus acciones son métodos; un comentario es una nota para una persona, y el argumento de un movimiento dice hasta dónde.",
     "Luego vino la contraseña *ambrel*, la varita y romper los sellos con *zelim*. Una cadena son palabras entre comillas que se mantienen exactamente como se escriben, y `say` dice una; `pick_up` recoge algo, y un hechizo se lanza con la varita.",
-    "Gracias por enseñarme, Nuri. ¡Creo que usar la varita ha sido mi parte favorita!",
+    "Gracias por enseñarme, {friend}. ¡Creo que usar la varita ha sido mi parte favorita!",
     "¡La varita es solo prestada! Nuestra profesora, Ilda, espera dentro, y el banco de varitas, un mostrador en el castillo que llevan los padres de los alumnos, presta a cada alumno nuevo una varita de la escuela para el año; entonces podrás devolver la mía de repuesto.",
     "Dais un paso a través de la puerta hacia el interior; el verdadero castillo comienza aquí."
   ]

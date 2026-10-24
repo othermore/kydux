@@ -10,7 +10,7 @@
     8,
     6
   ],
-  "speaker": "nuri",
+  "speaker": "friend",
   "carrying": [
     "wand"
   ],
@@ -30,7 +30,7 @@
   "actors": [
     {
       "kind": "friend",
-      "id": "nuri",
+      "id": "friend",
       "at": [
         8,
         11

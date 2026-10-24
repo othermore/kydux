@@ -10,7 +10,7 @@ import type { Editor, EditorOptions } from '../editor/editor';
 import type { Speed } from '../engine/playback';
 import { type Look, lookOf } from '../engine/looks';
 import type { SceneHandle } from '../engine/scene';
-import { currentLanguage, t } from '../i18n';
+import { characterName, currentLanguage, t } from '../i18n';
 import * as progress from '../progress/progress';
 import { DEFAULT_SETTINGS, SPLIT_MAX, SPLIT_MIN } from '../progress/store';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
@@ -310,7 +310,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   // The level's story, said by its speaker (D45): a name of the story's, through i18n.
   const speaker = typeof loaded.level.speaker === 'string' ? loaded.level.speaker : null;
   const said = (words: string | undefined) =>
-    speaker && words ? { speaker: t(`characters.${speaker}`), text: words } : undefined;
+    speaker && words ? { speaker: characterName(speaker), text: words } : undefined;
   // What the wizard holds from the start (D49), said with each thing's name.
   const carried = Array.isArray(loaded.level.carrying) ? loaded.level.carrying.map(String) : [];
   const carrying = () =>

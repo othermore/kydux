@@ -53,7 +53,7 @@ test('the story at the gate is told on the field', async ({ page }) => {
   await page.goto('/#story/at-the-gate');
   await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done');
   await storyNext(page, 3);
-  await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'nuri:9,20,up');
+  await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'friend:9,20,up');
   await page.waitForTimeout(400);
   await page.screenshot({ path: `${SHOTS}05-at-the-gate.png` });
 });

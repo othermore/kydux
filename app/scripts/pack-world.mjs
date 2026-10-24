@@ -139,6 +139,8 @@ const readJson = (...path) => JSON.parse(readFileSync(join(repo, 'content', ...p
 const known = {};
 const concepts = {};
 const numbers = {};
+/** The game's opening, the story before the creator (D61, D78). */
+let opening = null;
 const taught = new Set();
 const ideas = new Set();
 for (const chapter of chapters) {
@@ -150,11 +152,12 @@ for (const chapter of chapters) {
         if (name.startsWith('concept:')) ideas.add(name.slice('concept:'.length));
       }
     }
+    // Every item is numbered by its kind within its chapter, stories too (D78), and
+    // says its chapter's number.
     const numbered = kind === 'level' ? (readJson('levels', id, 'level.json').kind ?? 'practice') : kind;
-    if (numbered !== 'story') {
-      counted[numbered] = (counted[numbered] ?? 0) + 1;
-      numbers[item] = { kind: numbered, n: counted[numbered] };
-    }
+    counted[numbered] = (counted[numbered] ?? 0) + 1;
+    numbers[item] = { kind: numbered, n: counted[numbered], chapter: chapters.indexOf(chapter) + 1 };
+    if (kind === 'story' && readJson('stories', id, 'story.json').opening === true) opening = item;
     if (kind !== 'level') continue;
     for (const name of readJson('levels', id, 'level.json').api ?? []) taught.add(name);
     known[id] = [...taught];
@@ -196,7 +199,7 @@ for (const chapter of chapters) {
 }
 writeFileSync(
   join(content, 'course.json'),
-  `${JSON.stringify({ chapters, known, concepts, numbers, titles }, null, 2)}\n`,
+  `${JSON.stringify({ chapters, known, concepts, numbers, titles, opening }, null, 2)}\n`,
 );
 
 // The table of what the child can type, from the world itself (D30): the

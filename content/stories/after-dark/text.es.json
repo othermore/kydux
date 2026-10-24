@@ -3,10 +3,10 @@
   "steps": [
     "Ha caído la noche en el castillo y simplemente no logras conciliar el sueño. De repente, escuchas un golpe muy suave en tu puerta.",
     "¿Estás {despierto|despierta}, {wizard}?",
-    "Sí, estoy {despierto|despierta}. ¿Qué pasa, Nuri?",
+    "Sí, estoy {despierto|despierta}. ¿Qué pasa, {friend}?",
     "Los alumnos mayores dicen que los pasadizos de piedra cambian al anochecer, y que Dask, un profesor muy estricto, patrulla para asegurarse de que nadie esté fuera de la cama. ¡Quiero ir a ver!",
     "No lo sé... ¿Qué pasa si Dask nos ve?",
     "¡Tengo un plan! Miraremos antes de cada paso. Te enseñaré cómo hacer preguntas cuya respuesta solo puede ser verdadera o falsa.",
-    "{Juntos|Juntas}, camináis de puntillas por el frío pasillo, en dirección a la galería de la torre de vigilancia. Justo delante, de pie y en silencio junto a la pared, ves una sombra alta: Dask."
+    "Juntos, camináis de puntillas por el frío pasillo, en dirección a la galería de la torre de vigilancia. Justo delante, de pie y en silencio junto a la pared, ves una sombra alta: Dask."
   ]
 }

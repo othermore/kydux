@@ -7,7 +7,7 @@
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
 import type { Lesson } from '../content/lessons';
-import { t } from '../i18n';
+import { characterName, t } from '../i18n';
 import { drawFigurePreview, friendFigure } from '../engine/placeholders';
 import * as progress from '../progress/progress';
 import { element } from './dom';
@@ -38,7 +38,7 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
     drawFigurePreview(figure, friendFigure(speaker, progress.wizard()?.gender ?? 'girl'));
     return element('figure', { id: 'lesson-teacher', className: 'lesson-teacher' }, [
       figure,
-      element('figcaption', {}, [t(`characters.${speaker}`)]),
+      element('figcaption', {}, [characterName(speaker)]),
     ]);
   };
 

@@ -21,7 +21,7 @@
       "facing": "left"
     },
     {
-      "id": "nuri",
+      "id": "friend",
       "kind": "friend",
       "at": [
         3,
@@ -55,7 +55,7 @@
       "do": null
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": {
         "vanish": true
       }

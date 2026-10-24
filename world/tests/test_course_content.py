@@ -322,7 +322,10 @@ def test_a_friend_stands_off_the_solution_s_way(item_id):
 
 @pytest.mark.parametrize("path", LESSONS, ids=lambda p: p.name)
 def test_a_lesson_says_who_teaches_it(path):
-    """D67: a lesson is drawn as its teacher speaking, a character of the story's."""
+    """D67: a lesson is drawn as its teacher speaking, a character of the story's;
+    `friend` is the friend of the wizard's other gender, Nuri or Teku (D77)."""
     speaker = json.loads((path / "lesson.json").read_text(encoding="utf-8")).get("speaker")
     characters = json.loads((ROOT / "i18n" / "en.json").read_text(encoding="utf-8"))["characters"]
-    assert speaker in characters, f"{path.name} names no teacher of the story's"
+    assert speaker == "friend" or speaker in characters, (
+        f"{path.name} names no teacher of the story's"
+    )

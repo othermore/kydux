@@ -117,9 +117,13 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def character(speaker: str, lang: str) -> str:
+def character(speaker: str, lang: str, gender: str) -> str:
+    """A character's name; `friend` is the friend of the wizard's other gender (D77)."""
+    from wizard_words import friend_of
+
     names = load_json(REPO / "i18n" / f"{lang}.json").get("characters", {})
-    return names.get(speaker, speaker)
+    who = friend_of(gender)[0] if speaker == "friend" else speaker
+    return names.get(who, who)
 
 
 def pages(markdown: str) -> list[str]:
@@ -143,7 +147,7 @@ def story_section(story_id: str, lang: str, gender: str, name: str, w: dict) -> 
     def who_is(who: str) -> str:
         if who == "voice":
             return w["voice"]
-        return name if who == "wizard" else character(who, lang)
+        return name if who == "wizard" else character(who, lang, gender)
 
     for step, said in zip(about.get("steps", []), text.get("steps", []), strict=False):
         doing = step.get("do")
@@ -165,7 +169,7 @@ def lesson_section(
     title = re.sub(r"^#\s+", "", parts[0].splitlines()[0]) if parts else lesson_id
     lines = [f"### {number}: {title}", ""]
     if about.get("speaker"):
-        lines += [f"*{w['speaker']}: {character(about['speaker'], lang)}*", ""]
+        lines += [f"*{w['speaker']}: {character(about['speaker'], lang, gender)}*", ""]
     taught = ", ".join(f"`{t}`" for t in about.get("teaches", []))
     if taught:
         lines += [f"*{w['teaches']}: {taught}*", ""]
@@ -187,7 +191,7 @@ def level_section(
     if level.get("scene"):
         facts.append(f"{w['scene']}: `{level['scene']}`")
     if level.get("speaker"):
-        facts.append(f"{w['speaker']}: {character(level['speaker'], lang)}")
+        facts.append(f"{w['speaker']}: {character(level['speaker'], lang, gender)}")
     if level.get("carrying"):
         facts.append(f"{w['carrying']}: {', '.join(level['carrying'])}")
     lines += [f"*{' · '.join(facts)}*", ""]

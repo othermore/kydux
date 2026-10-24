@@ -10,7 +10,7 @@
     10,
     15
   ],
-  "speaker": "nuri",
+  "speaker": "friend",
   "things": [
     {
       "id": "gate",
@@ -28,7 +28,7 @@
   "actors": [
     {
       "kind": "friend",
-      "id": "nuri",
+      "id": "friend",
       "at": [
         8,
         15

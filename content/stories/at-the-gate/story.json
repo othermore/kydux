@@ -1,6 +1,6 @@
 {
   "id": "at-the-gate",
-  "speaker": "nuri",
+  "speaker": "friend",
   "scene": "the-field",
   "wizard": [
     7,
@@ -12,7 +12,7 @@
   ],
   "actors": [
     {
-      "id": "nuri",
+      "id": "friend",
       "kind": "friend"
     }
   ],
@@ -36,10 +36,10 @@
           28
         ]
       },
-      "by": "nuri"
+      "by": "friend"
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": {
         "walk": [
           9,
@@ -54,7 +54,7 @@
       }
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": null
     },
     {
@@ -62,7 +62,7 @@
       "do": null
     },
     {
-      "who": "nuri",
+      "who": "friend",
       "do": null
     }
   ]

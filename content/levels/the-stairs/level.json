@@ -10,12 +10,12 @@
     8,
     20
   ],
-  "speaker": "nuri",
+  "speaker": "friend",
   "things": [],
   "actors": [
     {
       "kind": "friend",
-      "id": "nuri",
+      "id": "friend",
       "at": [
         2,
         24

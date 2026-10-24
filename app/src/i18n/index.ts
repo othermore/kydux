@@ -2,9 +2,10 @@
 // in i18n/ at the repository root: adding one is adding its file, with the
 // same keys as the others (tools/i18n_check.py keeps them in step).
 
-import { personal, type Speaker } from './personal';
+import { friendOf, personal, type Speaker } from './personal';
 
 export type { Gender, Speaker } from './personal';
+export { FRIENDS, friendOf } from './personal';
 
 type Messages = { [key: string]: string | Messages };
 
@@ -36,11 +37,27 @@ export function speakOf(wizard: Speaker | null): void {
   speaker = wizard;
 }
 
-/** A text with its choices made for the wizard and the wizard's name put in. */
+/** A text with its choices made for the wizard and the friend, and their names
+ * put in (D37, D77). */
 export function forWizard(text: string): string {
   const unnamed =
     lookup(catalogs[current], 'wizard.no_name') ?? lookup(catalogs[fallbackLanguage], 'wizard.no_name');
-  return personal(text, speaker, unnamed ?? '');
+  return personal(text, speaker, unnamed ?? '', friendName());
+}
+
+/** The friend the wizard has (D77): Nuri for a boy wizard, Teku for a girl. */
+export function friendId(): string {
+  return friendOf(speaker).id;
+}
+
+function friendName(): string {
+  const key = `characters.${friendId()}`;
+  return lookup(catalogs[current], key) ?? lookup(catalogs[fallbackLanguage], key) ?? '';
+}
+
+/** A character's name: `friend` is the friend the wizard has (D77). */
+export function characterName(id: string): string {
+  return t(`characters.${id === 'friend' ? friendId() : id}`);
 }
 
 /** What detection reads, so tests can give their own. */

@@ -2,31 +2,52 @@
   "id": "the-dark-room",
   "kind": "practice",
   "scene": "the-night-passages",
-  "start": [7, 2],
-  "end": [10, 5],
-  "speaker": "nuri",
-  "carrying": ["wand"],
-  "spells": ["kirra"],
-  "dark": ["dark-room"],
+  "start": [
+    7,
+    2
+  ],
+  "end": [
+    10,
+    5
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "kirra"
+  ],
+  "dark": [
+    "dark-room"
+  ],
   "things": [
     {
       "kind": "key",
       "id": "key",
-      "at": [11, 3],
+      "at": [
+        11,
+        3
+      ],
       "opens": "door"
     },
     {
       "kind": "door",
       "id": "door",
-      "at": [10, 4],
+      "at": [
+        10,
+        4
+      ],
       "locked": true
     }
   ],
   "actors": [
     {
       "kind": "friend",
-      "id": "nuri",
-      "at": [6, 2]
+      "id": "friend",
+      "at": [
+        6,
+        2
+      ]
     }
   ],
   "api": [

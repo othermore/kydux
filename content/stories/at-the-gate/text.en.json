@@ -4,7 +4,7 @@
     "You are at the gate, and you do not know how to open it.",
     "Hello? Is anyone there? Can someone let me in, please?",
     "Someone else is coming up the path: another new pupil, out of breath.",
-    "Hello! I am Nuri. I am a first-year pupil, and I am just arriving too.",
+    "Hello! I am {friend}. I am a first-year pupil, and I am just arriving too.",
     "It is nice to meet you. I am {wizard}. Do you know how this gate opens?",
     "I grew up among wizards, so I know a little magic. This gate is not opened by pushing: it listens to instructions.",
     "An instruction? How do you give an instruction to a gate?",

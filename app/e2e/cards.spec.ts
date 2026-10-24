@@ -93,11 +93,11 @@ test('the stars say why: a hint and a bump each cost one (D57)', async ({ page }
 
 test('a level and a lesson say their number in the chapter (D56)', async ({ page }) => {
   await page.goto('/#level/the-corridor');
-  await expect(page.locator('#card-number')).toHaveText('Practice 2');
+  await expect(page.locator('#card-number')).toHaveText('Chapter 1 · Practice 2');
   await page.locator('#start').click();
-  await expect(page.locator('#level-number')).toHaveText('Practice 2');
+  await expect(page.locator('#level-number')).toHaveText('Chapter 1 · Practice 2');
   await page.goto('/#lesson/how-much');
-  await expect(page.locator('#lesson-number')).toHaveText('Lesson 4');
+  await expect(page.locator('#lesson-number')).toHaveText('Chapter 1 · Lesson 4');
   await page.goto('/#map');
   await expect(page.locator('.stop[data-item="level:the-gate"] .stop-number')).toHaveText('Practice 1');
 });

@@ -5,6 +5,7 @@
 
 import type Phaser from 'phaser';
 import type { DoorLock } from './layout';
+import { friendOf } from '../i18n/personal';
 import { DEFAULT_LOOK, type HairStyle, type Look } from './looks';
 
 export const TILE = 48;
@@ -229,17 +230,28 @@ const GHOST: Figure = {
   skin: '#eef3fa',
 };
 
-/** The friends who teach, each in their own colours (D66): Nuri, a pupil with
- * a hat like the wizard's and the wizard's gender (D37); Wenna, the librarian.
- * A friend the game has no figure for is drawn as a teacher. */
-export function friendFigure(id: string, gender: 'girl' | 'boy'): Figure {
-  if (id === 'nuri') {
+/** The friends who teach, each in their own colours (D66, D77): Nuri, a girl,
+ * and Teku, a boy, pupils with a hat like the wizard's; `friend` is the one of the
+ * wizard's other gender; Wenna, the librarian. A friend the game has no figure for
+ * is drawn as a teacher. */
+export function friendFigure(id: string, wizardGender: 'girl' | 'boy'): Figure {
+  const who = id === 'friend' ? friendOf({ gender: wizardGender }).id : id;
+  if (who === 'nuri') {
     return {
       robe: '#3f8f5a',
       hat: { colour: '#2f6b44', band: '#e8c547' },
       hair: '#4a2c1a',
-      hairStyle: gender === 'girl' ? 'long' : 'short',
+      hairStyle: 'long',
       skin: '#c98e5f',
+    };
+  }
+  if (who === 'teku') {
+    return {
+      robe: '#b5652a',
+      hat: { colour: '#7a3f14', band: '#3fa7c9' },
+      hair: '#1f1a17',
+      hairStyle: 'short',
+      skin: '#a8714a',
     };
   }
   if (id === 'wenna') {

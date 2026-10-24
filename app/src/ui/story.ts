@@ -10,7 +10,7 @@ import { itemHash } from '../content/course';
 import { type Story, storyEvents } from '../content/stories';
 import { lookOf } from '../engine/looks';
 import type { SceneHandle, SceneOptions } from '../engine/scene';
-import { forWizard, t } from '../i18n';
+import { characterName, forWizard, t } from '../i18n';
 import type { LevelJson } from '../runtime/protocol';
 import * as progress from '../progress/progress';
 import { element } from './dom';
@@ -18,6 +18,8 @@ import type { Screen } from './screen';
 
 export interface StoryScreenParts {
   story: Story;
+  /** Its chapter and number (D78): *Chapter 1 · Story 1*. */
+  label?: string;
   /** The course's item after this story, or null after the last. */
   next: string | null;
   /** Where Go on leads when it is not to the course's next item: from the game's
@@ -51,6 +53,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   const forward = element('button', { id: 'story-next', type: 'button', className: 'big-button' });
   const node = element('div', { className: 'story-screen' }, [
     element('div', { className: 'lesson-top' }, [
+      ...(parts.label ? [element('span', { id: 'story-number', className: 'item-number' }, [parts.label])] : []),
       element('h2', { id: 'story-title', className: 'story-title' }),
       element('a', { id: 'story-map', className: 'quiet-button small', href: '#map' }, [t('map.open_map')]),
     ]),
@@ -78,7 +81,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     // The voice's words in the band; a figure's words are in its bubble.
     voice.innerHTML = byVoice ? marked.parseInline(current?.text ?? '', { async: false }) : '';
     voice.classList.toggle('silent', !byVoice);
-    const who = current?.who === 'wizard' ? forWizard('{wizard}') : current ? t(`characters.${current.who}`) : '';
+    const who = current?.who === 'wizard' ? forWizard('{wizard}') : current ? characterName(current.who) : '';
     heard.textContent = current && !byVoice ? `${who}: ${current.text.replace(/[`*_]/g, '')}` : '';
     back.disabled = step === 0;
     forward.textContent = last() ? t('lesson.go_on') : t('story.next');

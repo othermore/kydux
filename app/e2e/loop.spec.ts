@@ -81,8 +81,8 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await shoot(page, 'at-the-gate');
     // Nuri comes up the path, and walks to the wizard's side to speak (D74).
     await storyNext(page, 3);
-    await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'nuri:9,20,up');
-    await expect(page.locator('#scene')).toHaveAttribute('data-speaker', 'nuri');
+    await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'friend:9,20,up');
+    await expect(page.locator('#scene')).toHaveAttribute('data-speaker', 'friend');
     await shoot(page, 'nuri-speaks');
     // The wizard answers by name.
     await storyNext(page);
@@ -103,7 +103,7 @@ for (const [lang, words] of Object.entries(WORDS)) {
     // Try it: the gate, its start card with Nuri's words, the editor empty (D63).
     await page.locator('#lesson-try').click();
     await expect(page.locator('.start-card h3')).toHaveText(words.gate);
-    await expect(page.locator('#card-intro')).toContainText('Nuri');
+    await expect(page.locator('#card-intro')).toContainText('Teku');
     await shoot(page, 'start-card');
     await page.locator('#start').click();
     // The screen's guide, the first time (D68): its first step, then skipped.
@@ -144,9 +144,10 @@ for (const [lang, words] of Object.entries(WORDS)) {
     // The map: the story, the lesson and the gate done, the second lesson open.
     await page.locator('#lesson-map').click();
     const stops = page.locator('.stop');
-    for (const done of [0, 1, 2]) await expect(stops.nth(done)).toHaveAttribute('data-state', 'done');
-    await expect(stops.nth(3)).toHaveAttribute('data-state', 'open');
-    await expect(stops.nth(4)).toHaveAttribute('data-state', 'locked');
+    // The letter, the story at the gate, the first lesson and the gate (D78).
+    for (const done of [0, 1, 2, 3]) await expect(stops.nth(done)).toHaveAttribute('data-state', 'done');
+    await expect(stops.nth(4)).toHaveAttribute('data-state', 'open');
+    await expect(stops.nth(5)).toHaveAttribute('data-state', 'locked');
     await shoot(page, 'map');
 
     // The start screen greets the wizard; the settings.

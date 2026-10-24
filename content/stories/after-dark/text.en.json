@@ -3,7 +3,7 @@
   "steps": [
     "Night has fallen over the castle, and you just cannot seem to fall asleep. Suddenly, you hear a very soft knock at your door.",
     "Are you awake, {wizard}?",
-    "Yes, I am awake. What is it, Nuri?",
+    "Yes, I am awake. What is it, {friend}?",
     "The older pupils say the stone passages change after dark, and that Dask, a strict teacher, patrols them so no one is out of bed. I want to go and see!",
     "I do not know... What happens if Dask sees us?",
     "I have a plan! We will look before every step. I will show you how to ask questions whose answer is only ever true or false.",

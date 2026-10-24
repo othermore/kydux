@@ -6,7 +6,7 @@
     "She drifts away between the shelves, reading as she goes.",
     "At the end of the aisle, just past the last shelf, is the wand bank: a counter where a pupil's parent lends you a school wand for the year.",
     "You made it! Oh, is that your new school wand? It looks perfect for you!",
-    "It is! And here is your spare wand back, Nuri. Thank you so much for lending it to me.",
+    "It is! And here is your spare wand back, {friend}. Thank you so much for lending it to me.",
     "You have learned so much in the library! You know how to use a name for a value, which programmers call a variable, and how to use `print` to see what a thing knows, its attribute. You also caught what a method gives back using `find_nearest`, kept it in a variable, and used `give`. You even opened a door with its own method, `door.open()`, after picking up its key, and cast the *fendra* spell to draw things from the shelves right to you!",
     "Night is falling outside. I heard the older pupils whisper that the passages change after dark... I wonder who walks there at night?"
   ]

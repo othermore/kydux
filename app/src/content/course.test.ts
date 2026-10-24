@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { defaultProgress } from '../progress/store';
-import { type Course, itemHash, knownApi, next, parseItem, previous, stopState } from './course';
+import { type Course, courseStart, itemHash, knownApi, next, parseItem, previous, stopState } from './course';
 
 const COURSE: Course = {
   chapters: [
@@ -50,5 +50,23 @@ describe('what the child knows (D40)', () => {
     const course: Course = { ...COURSE, known: { '02-d': ['wizard.move_right', 'wizard.wait'] } };
     expect(knownApi(course, '02-d', ['wizard.wait'])).toEqual(['wizard.move_right', 'wizard.wait']);
     expect(knownApi(course, 'elsewhere', ['wizard.wait'])).toEqual(['wizard.wait']);
+  });
+});
+
+describe('the opening in chapter 1 (D78)', () => {
+  const course = {
+    chapters: [{ id: '01-arrival', items: ['story:the-letter', 'story:at-the-gate', 'lesson:a'] }],
+    opening: 'story:the-letter',
+  };
+
+  it('starts the course after the opening', () => {
+    expect(courseStart(course)).toBe('story:at-the-gate');
+  });
+
+  it('counts the opening done once a wizard is made, so that nothing after it is locked', () => {
+    const progress = { ...defaultProgress(), wizard: { name: 'Ana', gender: 'girl' as const, look: 'teal' } };
+    expect(stopState(course, 'story:the-letter', progress)).toBe('done');
+    expect(stopState(course, 'story:at-the-gate', progress)).toBe('open');
+    expect(stopState(course, 'story:at-the-gate', defaultProgress())).toBe('locked');
   });
 });

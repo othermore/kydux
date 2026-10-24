@@ -6,7 +6,7 @@
     "Se aleja flotando entre las estanterías, leyendo mientras se va.",
     "Al final del pasillo, justo después de la última estantería, está el banco de varitas: un mostrador donde uno de los padres de los alumnos te presta una varita de la escuela para el año.",
     "¡Lo lograste! Oh, ¿esa es tu nueva varita de la escuela? ¡Parece perfecta para ti!",
-    "¡Sí que lo es! Y aquí tienes tu varita de sobra, Nuri. Muchas gracias por prestármela.",
+    "¡Sí que lo es! Y aquí tienes tu varita de sobra, {friend}. Muchas gracias por prestármela.",
     "¡Has aprendido muchísimo en la biblioteca! Sabes cómo usar un nombre para un valor, que los programadores llaman una variable, y cómo usar `print` para ver lo que sabe una cosa, su atributo. También atrapaste lo que devuelve un método usando `find_nearest`, lo guardaste en una variable y usaste `give`. ¡Incluso abriste una puerta con su propio método, `door.open()`, tras recoger su llave, y lanzaste el hechizo *fendra* para atraer cosas desde los estantes hacia ti!",
     "Está anocheciendo. He oído a los alumnos mayores susurrar que los pasadizos cambian al caer la noche... Me pregunto quién caminará por ahí."
   ]

@@ -2,24 +2,40 @@
   "id": "the-moving-stairs",
   "kind": "practice",
   "scene": "the-night-passages",
-  "start": [2, 4],
-  "end": [7, 2],
-  "speaker": "nuri",
-  "carrying": ["wand"],
-  "spells": ["osto"],
+  "start": [
+    2,
+    4
+  ],
+  "end": [
+    7,
+    2
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "osto"
+  ],
   "things": [
     {
       "kind": "stair",
       "id": "stair",
-      "at": [4, 2],
+      "at": [
+        4,
+        2
+      ],
       "period": 3
     }
   ],
   "actors": [
     {
       "kind": "friend",
-      "id": "nuri",
-      "at": [1, 5]
+      "id": "friend",
+      "at": [
+        1,
+        5
+      ]
     }
   ],
   "api": [

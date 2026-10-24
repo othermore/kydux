@@ -2,28 +2,45 @@
   "id": "the-wrong-door",
   "kind": "fix",
   "scene": "the-passages",
-  "start": [8, 7],
-  "end": [12, 9],
-  "speaker": "nuri",
-  "carrying": ["wand"],
+  "start": [
+    8,
+    7
+  ],
+  "end": [
+    12,
+    9
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
   "things": [
     {
       "kind": "door",
       "id": "left_door",
-      "at": [6, 8],
+      "at": [
+        6,
+        8
+      ],
       "locked": true
     },
     {
       "kind": "door",
       "id": "right_door",
-      "at": [10, 8]
+      "at": [
+        10,
+        8
+      ]
     }
   ],
   "actors": [
     {
       "kind": "friend",
-      "id": "nuri",
-      "at": [8, 6]
+      "id": "friend",
+      "at": [
+        8,
+        6
+      ]
     }
   ],
   "api": [

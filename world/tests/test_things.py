@@ -202,3 +202,59 @@ def test_every_name_the_child_may_use_is_a_member_with_a_docstring_and_an_exampl
 def test_the_child_s_code_holds_the_level_s_things():
     result = run_code(ROOMS, "print(door.locked, key.kind, book.position)")
     assert result.stdout == "True key Position(x=6, y=3)\n"
+
+
+#: A key on the wizard's right, a book above it, and a potion two tiles left.
+REACH = Level.from_dict(
+    {
+        "id": "reach",
+        "map": ["#######", "#..B..#", "#P.SK.#", "#######"],
+        "things": [
+            {"kind": "key", "id": "key", "marker": "K"},
+            {"kind": "book", "id": "book", "marker": "B"},
+            {"kind": "potion", "id": "potion", "marker": "P"},
+        ],
+    }
+)
+
+
+def test_pick_up_takes_the_one_thing_beside_the_wizard():
+    world = World(REACH)
+    world.wizard.move_left()
+    world.wizard.move_left()
+    world.wizard.pick_up()
+    assert [t.name for t in world.carried()] == ["potion"]
+
+
+def test_with_several_in_reach_pick_up_asks_which_and_takes_the_one_named():
+    world = World(REACH)
+    world.wizard.pick_up()
+    last = world.events[-1].data
+    assert (last["reason"], last["things"]) == ("which_one", ["book", "key"])
+    assert not world.carried()
+    world.wizard.pick_up(world.things["key"])
+    assert [t.name for t in world.carried()] == ["key"]
+
+
+def test_pick_up_of_a_thing_out_of_reach_is_refused():
+    world = World(REACH)
+    world.wizard.pick_up(world.things["potion"])
+    assert world.events[-1].data["reason"] == "far"
+
+
+def test_pick_up_takes_a_thing_not_a_word():
+    result = run_code(REACH, "wizard.pick_up('key')\n")
+    assert result.error.explanation["kind"] == "arguments"
+
+
+def test_a_thing_on_a_shelf_beside_the_wizard_is_picked_up_by_hand():
+    level = Level.from_dict(
+        {
+            "id": "shelf",
+            "map": ["#####", "#.=.#", "#.S.#", "#####"],
+            "things": [{"kind": "book", "id": "book", "at": [2, 1]}],
+        }
+    )
+    world = World(level)
+    world.wizard.pick_up()
+    assert [t.name for t in world.carried()] == ["book"]

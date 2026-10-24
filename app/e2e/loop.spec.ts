@@ -67,7 +67,7 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await page.locator('#continue').click();
     await page.locator('#wizard-name').fill('Ada');
     await page.locator('#wizard-gender [data-value="girl"]').click();
-    await page.locator('#wizard-looks .radio').nth(1).click();
+    await page.locator('#wizard-looks .radio').nth(0).click();
     await shoot(page, 'creator');
 
     // The first lesson, page by page; it greets the wizard by name.

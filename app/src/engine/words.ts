@@ -11,11 +11,23 @@ function thingWords(kind: string): string {
   return t(`things.${kind}`);
 }
 
+/** What a `blocked` event says besides its reason: the spell not known, or the
+ * things in reach when the wizard must say which (D58). */
+export interface BlockedDetail {
+  spell?: string;
+  things?: string[];
+}
+
 /** Why an action could not be done, from a `blocked` event's reason, its thing's
- * kind, and for a spell not known, the spell's name. */
-export function blockedText(reason: string, kind: string | null, spell = ''): string {
+ * kind, and its detail. */
+export function blockedText(reason: string, kind: string | null, detail: BlockedDetail = {}): string {
   const thing = kind ? thingWords(kind) : '';
+  const spell = detail.spell ?? '';
   switch (reason) {
+    case 'which_one': {
+      const things = detail.things ?? [];
+      return t('blocked.which_one', { things: things.join(', '), first: things[0] ?? '' });
+    }
     case 'no_wand':
       return t('blocked.no_wand');
     case 'unknown_spell':

@@ -820,3 +820,16 @@ one overturns stays, marked as superseded.
   in `notebook_simple.<role>.<member>`; the notebook and the completion
   show the simple ones until `arguments` is known. A level outside the
   course is shown as one that knows every concept.
+- **D58 — The wizard picks up what is on its tile or beside it, and may
+  say which.** Decided 2026-10-22 by the owner's UAT (sprint-10.md), built
+  the same day. `wizard.pick_up()` takes the thing on the wizard's tile,
+  else the one thing on the four tiles beside it, shelves included; with
+  several in reach and none underfoot it is refused with `which_one`, whose
+  thought names them and shows how to say which. `wizard.pick_up(thing)`
+  takes that thing when it is in reach, and is refused with `far` when it
+  is not; a word in quotes is not a thing, and is explained as an argument
+  of the wrong kind. A thing on a shelf beside the wizard comes down by
+  hand; `fendra` is for what lies farther. The start card opens over the
+  notebook and says *Continue* when the child opens it again with *?*; a
+  password door opens in the second half of its tick, once the word is
+  said.

@@ -27,7 +27,10 @@ describe('blockedText', () => {
   it('says why a spell or a door would not do (D42, D43)', () => {
     initLanguage(english);
     expect(blockedText('no_wand', null)).toBe('I do not know this action yet.');
-    expect(blockedText('unknown_spell', null, 'abra')).toBe('I do not know a spell called “abra”.');
+    expect(blockedText('unknown_spell', null, { spell: 'abra' })).toBe('I do not know a spell called “abra”.');
+    expect(blockedText('which_one', null, { things: ['book', 'key'] })).toBe(
+      'There are several things here: book, key. Say which, like wizard.pick_up(book).',
+    );
     expect(blockedText('sealed', 'door')).toBe(
       'I cannot open the door by hand: it is sealed, and needs a spell.',
     );

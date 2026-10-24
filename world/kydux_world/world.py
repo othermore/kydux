@@ -96,6 +96,10 @@ def child_line() -> int | None:
     return None
 
 
+#: The four tiles beside a tile.
+DELTAS = ((0, -1), (-1, 0), (1, 0), (0, 1))
+
+
 class World:
     def __init__(self, level: Level, code: str = "") -> None:
         self.level = level
@@ -376,20 +380,52 @@ class Wizard(Child):
         for _ in range(_whole("wait", "ticks", ticks)):
             self._k_world.act("wait", {"at": list(self._k_position)})
 
-    def pick_up(self) -> None:
-        """Pick up the thing on the wizard's tile and carry it: `wizard.pick_up()`"""
+    def pick_up(self, thing: Thing | None = None) -> None:
+        """Pick up a thing on the wizard's tile, or beside it, and carry it; with several in
+        reach, say which: `wizard.pick_up()`, `wizard.pick_up(key)`"""
+        if thing is not None and not isinstance(thing, Thing):
+            raise ActionArguments("pick_up", "pick_up() takes a thing by its name, with no quotes")
         world: World = self._k_world
         world.ready()
         here = self._k_position
-        found = world.things_at(here)
-        if not found:
-            world.act(
-                "blocked", {"at": list(here), "by": "wizard", "reason": "nothing", "tried": True}
-            )
-            return
-        thing = found[0]
-        thing._carry()
-        world.act("pick_up", {"id": thing.name, "at": list(here)})
+        reach = self._k_in_reach()
+        if thing is not None:
+            if thing not in reach:
+                refused = {"at": list(here), "by": thing.name, "reason": "far", "tried": False}
+                world.act("blocked", refused)
+                return
+            chosen = thing
+        else:
+            if not reach:
+                world.act(
+                    "blocked",
+                    {"at": list(here), "by": "wizard", "reason": "nothing", "tried": True},
+                )
+                return
+            # The wizard's own tile first; from beside, only when there is one to take.
+            own = [t for t in reach if t._k_position == here]
+            if own:
+                chosen = own[0]
+            elif len(reach) == 1:
+                chosen = reach[0]
+            else:
+                names = [t.name for t in reach]
+                refused = {"at": list(here), "by": "wizard", "reason": "which_one", "tried": False}
+                world.act("blocked", {**refused, "things": names})
+                return
+        chosen._carry()
+        world.act("pick_up", {"id": chosen.name, "at": list(here)})
+
+    def _k_in_reach(self) -> list[Thing]:
+        """The things the wizard can pick up: on its tile, or on one of the four beside it,
+        shelves included (D58), in reading order."""
+        world: World = self._k_world
+        here = self._k_position
+        tiles = [here, *(Position(here.x + dx, here.y + dy) for dx, dy in DELTAS)]
+        found = [t for tile in tiles for t in world.things_at(tile)]
+        return sorted(
+            found, key=lambda t: (t._k_position != here, t._k_position.y, t._k_position.x)
+        )
 
     def _nearby(self, kind: object) -> list[Child]:
         world: World = self._k_world

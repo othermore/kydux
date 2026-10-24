@@ -91,6 +91,8 @@ class LevelScene extends Phaser.Scene {
   /** The tick shown, and each stair's holds seen so far (D53). */
   private shownTick = 0;
   private holds = new Map<string, Hold[]>();
+  /** Counts the restarts, so that a door's delayed opening from a run before is dropped. */
+  private restarts = 0;
 
   constructor(
     private readonly map: Layout,
@@ -176,6 +178,7 @@ class LevelScene extends Phaser.Scene {
 
   /** Everything where it stood before the run. */
   private restart(): void {
+    this.restarts += 1;
     this.clearBubble();
     this.clearThought();
     this.seenBy = null;
@@ -227,7 +230,7 @@ class LevelScene extends Phaser.Scene {
       if (event.actor === 'wizard') this.showWizard(tick, event, instant);
       // A door opened by a spell or a word is the door's own event (D43); so is a
       // thing a spell pulls (D47).
-      else if (event.kind === 'open') this.openDoor(String(event.data.id));
+      else if (event.kind === 'open') this.openDoor(String(event.data.id), instant, event.data.by === 'word');
       else if (event.kind === 'pull') this.pull(event, instant);
       else if (event.kind === 'light') this.lit = true;
       else if (event.kind === 'hold') this.hold(event);
@@ -282,9 +285,18 @@ class LevelScene extends Phaser.Scene {
     });
   }
 
-  private openDoor(id: string): void {
-    this.things.get(id)?.setFrame('open');
+  /** A door opened. One opened by a word opens in the second half of the tick, once
+   * the word is said, so that the child sees the word, then the door. */
+  private openDoor(id: string, instant = true, byWord = false): void {
     this.openDoors.add(id);
+    if (instant || !byWord) {
+      this.things.get(id)?.setFrame('open');
+      return;
+    }
+    const run = this.restarts;
+    this.time.delayedCall(this.playback.tickDuration * 0.5, () => {
+      if (run === this.restarts && this.openDoors.has(id)) this.things.get(id)?.setFrame('open');
+    });
   }
 
   /** A spell cast: a ring of light that grows from the wizard and fades (D42). */
@@ -346,7 +358,7 @@ class LevelScene extends Phaser.Scene {
         break;
       }
       case 'open':
-        this.openDoor(String(event.data.id));
+        this.openDoor(String(event.data.id), instant);
         break;
       case 'cast':
         if (!instant) this.flash(duration);
@@ -361,8 +373,11 @@ class LevelScene extends Phaser.Scene {
         if (instant) break;
         const by = String(event.data.by);
         const thing = this.map.things.find((t) => t.id === by);
-        const spell = typeof event.data.spell === 'string' ? event.data.spell : '';
-        this.think(blockedText(String(event.data.reason), thing?.kind ?? null, spell), tick);
+        const detail = {
+          ...(typeof event.data.spell === 'string' ? { spell: event.data.spell } : {}),
+          ...(Array.isArray(event.data.things) ? { things: event.data.things.map(String) } : {}),
+        };
+        this.think(blockedText(String(event.data.reason), thing?.kind ?? null, detail), tick);
         if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
         break;
       }

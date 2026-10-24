@@ -181,6 +181,15 @@ if (table.status !== 0) {
 }
 writeFileSync(join(publicDir, 'api.json'), table.stdout);
 
+// The names a wizard may not take (D61): the story's, the levels' and the world's,
+// gathered by tools/reserved_names.py from the same files; the creator refuses them.
+const reserved = spawnSync(python, [join(repo, 'tools', 'reserved_names.py')], { encoding: 'utf8' });
+if (reserved.status !== 0) {
+  console.error(reserved.stderr);
+  process.exit(1);
+}
+writeFileSync(join(publicDir, 'reserved.json'), reserved.stdout);
+
 console.log(
   `pack-world: ${entries.length} files in public/world.zip, content/ copied, ${chapters.length} chapters in the course`,
 );

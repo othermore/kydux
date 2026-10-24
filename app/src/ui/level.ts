@@ -253,11 +253,18 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     carried.length > 0
       ? t('level.carrying', { things: carried.map((kind) => t(`things.${kind}`)).join(', ') })
       : undefined;
-  const showStart = () =>
+  // The start card says Start the first time it opens, and Continue when the child
+  // opens it again with ?, or when it is drawn again in another language.
+  let startOpened = false;
+  let startAgain = false;
+  const showStart = (redraw = false) => {
+    if (!redraw) startAgain = startOpened;
+    startOpened = true;
     showCard(
       startCard(
         {
           title: text.title,
+          again: startAgain,
           label: parts.label,
           task: task(),
           goals: goalTexts(),
@@ -268,6 +275,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         () => editor.focus(),
       ),
     );
+  };
   const showWin = (verdict: Verdict) =>
     showCard(
       winCard({
@@ -364,7 +372,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
 
   about.setAttribute('aria-label', t('level.about'));
   about.title = t('level.about');
-  about.addEventListener('click', showStart);
+  about.addEventListener('click', () => showStart());
   run.addEventListener('click', () => runCode());
   stop.addEventListener('click', () => {
     if (controller.snapshot.canPlay) controller.resume();
@@ -495,7 +503,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       timeline.setAttribute('aria-label', t('level.timeline'));
       labelSettings();
       labelKeys();
-      if (shownCard?.open && shownCard.node.querySelector('.start-card')) showStart();
+      if (shownCard?.open && shownCard.node.querySelector('.start-card')) showStart(true);
       renderHints();
       notebook.relabel();
       render(controller.snapshot, true);

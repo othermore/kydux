@@ -65,7 +65,8 @@
     "way_label": "Way",
     "ways": "This level is played {n} ways. One program must get through them all:",
     "kind_fix": "This program does not work yet. Find what is wrong, and fix it.",
-    "kind_improve": "This program works, but it can be better. Make it better."
+    "kind_improve": "This program works, but it can be better. Make it better.",
+    "continue": "Continue"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",
@@ -103,7 +104,8 @@
     "password": "I cannot open {thing} by hand: it wants a word.",
     "nothing_near": "There is nothing near enough for the spell to bring.",
     "not_carried": "I cannot give {thing}: I am not carrying it.",
-    "nobody": "There is no one beside me to give it to."
+    "nobody": "There is no one beside me to give it to.",
+    "which_one": "There are several things here: {things}. Say which, like wizard.pick_up({first})."
   },
   "notebook": {
     "title": "The wizard's notebook",
@@ -119,14 +121,14 @@
       "move_down": "Walks down, one tile per step. Stops at a wall or a closed door.",
       "say": "Says something out loud.",
       "wait": "Stands still while the world moves on, one tick at a time.",
-      "pick_up": "Picks up the thing on the wizard's tile and carries it.",
+      "pick_up": "Picks up a thing on the wizard's tile or beside it, and carries it. With several in reach, say which: wizard.pick_up(key).",
       "find_nearest": "Finds the nearest thing of a kind, or None when there is none.",
       "find_all": "Finds every thing of a kind, nearest first.",
       "has": "Tells whether the wizard carries a thing of a kind.",
       "position": "Where the wizard stands, as x and y.",
       "facing": "The way the wizard looks: up, down, left or right.",
       "items": "The things the wizard carries.",
-      "cast": "Casts a spell with the wand, which the wizard must carry. The spell works where the wizard stands.",
+      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all.",
       "give": "Gives a thing the wizard carries to whoever stands right beside it."
     },
     "thing": {
@@ -254,7 +256,10 @@
     "looks": "Your wizard's look",
     "look_n": "Look {n}",
     "done": "Done",
-    "back": "Back"
+    "back": "Back",
+    "default_name": "Kydux",
+    "name_taken": "That name belongs to someone or something in the game. Choose another.",
+    "gender_first": "Choose first who your wizard is, and their looks appear here."
   },
   "characters": {
     "ilda": "Ilda",

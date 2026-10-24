@@ -3,7 +3,7 @@
 // wizard exists already, the screen opens with it, and Back leaves it as it was.
 
 import { drawLookPreview } from '../engine/placeholders';
-import { LOOKS, lookOf } from '../engine/looks';
+import { lookOf, looksFor } from '../engine/looks';
 import { t } from '../i18n';
 import * as progress from '../progress/progress';
 import { isNameCharacter, NAME_MAX, type Wizard, wizardName } from '../progress/store';
@@ -71,14 +71,25 @@ function figure(lookId: string, className: string): HTMLCanvasElement {
 export function wizardScreen(parts: WizardScreenParts): Screen {
   const node = element('div', { className: 'wizard-screen' });
   const before = progress.wizard();
-  // What the child has chosen so far; the gender is theirs to choose, never preset.
-  let name = before?.name ?? '';
+  // What the child has chosen so far: a name to start from, *Kydux*; the gender is
+  // theirs to choose, never preset; the look is one of that gender's (D61).
+  let name = before?.name ?? t('wizard.default_name');
   let gender: Wizard['gender'] | null = before?.gender ?? null;
-  let look = before?.look ?? (LOOKS[0]?.id as string);
+  let look: string | null = before?.look ?? null;
+  // The names a wizard may not take: the story's, the levels', the world's (D61).
+  let reserved = new Set<string>();
+  void fetch(`${import.meta.env.BASE_URL}reserved.json`)
+    .then((response) => (response.ok ? response.json() : []))
+    .then((names: string[]) => {
+      reserved = new Set(names);
+      draw();
+    })
+    .catch(() => {});
+  const taken = (said: string) => reserved.has(said.trim().toLowerCase());
 
   const done = () => {
     const kept = wizardName(name);
-    if (kept === null || gender === null) return;
+    if (kept === null || gender === null || look === null || taken(kept)) return;
     progress.setWizard({ name: kept, gender, look });
     parts.onDone();
   };
@@ -96,14 +107,19 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
     const rule = element('p', { id: 'wizard-name-rule', className: 'wizard-rule', hidden: true }, [
       t('wizard.name_rule'),
     ]);
-    const preview = figure(look, 'big');
+    const preview = figure(look ?? '', 'big');
+    preview.hidden = look === null;
+    const takenWords = element('p', { id: 'wizard-name-taken', className: 'wizard-rule', hidden: true }, [
+      t('wizard.name_taken'),
+    ]);
     preview.id = 'wizard-preview';
     const previewName = element('p', { id: 'wizard-preview-name', className: 'wizard-preview-name' }, [name]);
     const finish = element('button', { id: 'wizard-done', type: 'button', className: 'big-button' }, [
       t('wizard.done'),
     ]);
     const ready = () => {
-      finish.disabled = wizardName(name) === null || gender === null;
+      takenWords.hidden = !taken(name);
+      finish.disabled = wizardName(name) === null || gender === null || look === null || taken(name);
     };
     input.addEventListener('input', () => {
       // A character the rule refuses is taken out as it is typed, and the rule said.
@@ -118,6 +134,11 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
     input.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') done();
     });
+    // The name to start from is chosen whole on entering the field, so that typing
+    // a name of one's own replaces it rather than adding to it.
+    input.addEventListener('focus', () => {
+      if (input.value === t('wizard.default_name')) input.select();
+    });
     const genders = radioGroup<Wizard['gender']>(
       'wizard-gender',
       t('wizard.gender'),
@@ -127,24 +148,32 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
       ],
       gender,
       (value) => {
-        gender = value;
-        ready();
+        // The looks shown are the gender's; a look of the other is set aside.
+        if (value !== gender) {
+          gender = value;
+          look = looksFor(value)[0]?.id ?? null;
+          draw();
+          node.querySelector<HTMLElement>(`#wizard-gender [data-value="${value}"]`)?.focus();
+        }
       },
     );
-    const looks = radioGroup(
-      'wizard-looks',
-      t('wizard.looks'),
-      LOOKS.map((option, index) => ({
-        value: option.id,
-        content: [figure(option.id, 'small')],
-        label: t('wizard.look_n', { n: index + 1 }),
-      })),
-      look,
-      (value) => {
-        look = value;
-        drawLookPreview(preview, lookOf(look));
-      },
-    );
+    const looks = gender
+      ? radioGroup(
+          'wizard-looks',
+          t('wizard.looks'),
+          looksFor(gender).map((option, index) => ({
+            value: option.id,
+            content: [figure(option.id, 'small')],
+            label: t('wizard.look_n', { n: index + 1 }),
+          })),
+          look,
+          (value) => {
+            look = value;
+            drawLookPreview(preview, lookOf(look));
+            ready();
+          },
+        )
+      : element('p', { id: 'wizard-looks-first', className: 'wizard-rule muted' }, [t('wizard.gender_first')]);
     finish.addEventListener('click', done);
     const buttons: HTMLElement[] = [finish];
     if (before) {
@@ -160,6 +189,7 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
           element('label', { className: 'wizard-field', htmlFor: 'wizard-name' }, [t('wizard.name')]),
           input,
           rule,
+          takenWords,
           element('p', { className: 'wizard-field' }, [t('wizard.gender')]),
           genders,
           element('p', { className: 'wizard-field' }, [t('wizard.looks')]),

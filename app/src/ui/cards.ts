@@ -51,6 +51,8 @@ export interface StartCardText {
   said?: Said;
   /** What the wizard carries from the start, in words (D49). */
   carrying?: string;
+  /** Whether the card is opened again, with ?, so that its button says Continue. */
+  again?: boolean;
   /** The words for each way the level is played, when it has ways (D51). */
   ways?: string[];
 }
@@ -71,7 +73,9 @@ function saidBy(said: Said, id: string): HTMLElement {
 
 /** The level's title, what its speaker says, its goals, and Start. */
 export function startCard(text: StartCardText, onClose: () => void = () => {}): Card {
-  const start = element('button', { id: 'start', type: 'button' }, [t('level.start')]);
+  const start = element('button', { id: 'start', type: 'button' }, [
+    text.again ? t('level.continue') : t('level.start'),
+  ]);
   const list = element(
     'ul',
     { className: 'start-goals' },

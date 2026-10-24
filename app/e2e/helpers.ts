@@ -6,7 +6,7 @@ export interface SeededWizard {
   look: string;
 }
 
-export const MARTA: SeededWizard = { name: 'Marta', gender: 'girl', look: 'amber' };
+export const MARTA: SeededWizard = { name: 'Marta', gender: 'girl', look: 'teal' };
 
 /** Gives the page a progress document holding a wizard (D36) before the game
  * loads, unless one is kept already: a reload or a reset keeps what the game wrote. */

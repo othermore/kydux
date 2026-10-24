@@ -65,7 +65,8 @@
     "way_label": "Manera",
     "ways": "Este nivel se juega de {n} maneras. Un solo programa tiene que superarlas todas:",
     "kind_fix": "Este programa todavía no funciona. Encuentra qué falla, y arréglalo.",
-    "kind_improve": "Este programa funciona, pero puede ser mejor. Mejóralo."
+    "kind_improve": "Este programa funciona, pero puede ser mejor. Mejóralo.",
+    "continue": "Continuar"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",
@@ -103,7 +104,8 @@
     "password": "No puedo abrir {thing} con la mano: quiere una palabra.",
     "nothing_near": "No hay nada lo bastante cerca para que el hechizo lo traiga.",
     "not_carried": "No puedo dar {thing}: no está entre lo que llevo.",
-    "nobody": "No hay nadie a mi lado para dárselo."
+    "nobody": "No hay nadie a mi lado para dárselo.",
+    "which_one": "Aquí hay varias cosas: {things}. Di cuál, como wizard.pick_up({first})."
   },
   "notebook": {
     "title": "El cuaderno {del mago|de la maga}",
@@ -119,14 +121,14 @@
       "move_down": "Camina hacia abajo, una casilla por paso. Se para ante una pared o una puerta cerrada.",
       "say": "Dice algo en voz alta.",
       "wait": "Se queda quiet{o|a} mientras el mundo sigue, un tick cada vez.",
-      "pick_up": "Coge lo que hay en la casilla {del mago|de la maga} y lo lleva consigo.",
+      "pick_up": "Coge una cosa de la casilla {del mago|de la maga} o de una de al lado, y la lleva. Si hay varias, di cuál: wizard.pick_up(key).",
       "find_nearest": "Encuentra la cosa más cercana de un tipo, o None si no hay ninguna.",
       "find_all": "Encuentra todas las cosas de un tipo, de la más cercana a la más lejana.",
       "has": "Dice si {el mago|la maga} lleva una cosa de un tipo.",
       "position": "Dónde está {el mago|la maga}, en x e y.",
       "facing": "Hacia dónde mira {el mago|la maga}: up, down, left o right.",
       "items": "Las cosas que lleva {el mago|la maga}.",
-      "cast": "Lanza un hechizo con la varita, que {el mago|la maga} tiene que llevar. El hechizo funciona donde está.",
+      "cast": "Lanza un hechizo con la varita, que {el mago|la maga} tiene que llevar. Lo que hace un hechizo depende de dónde está y de lo que tiene cerca; puede que no haga nada.",
       "give": "Le da una cosa que lleva a quien esté justo a su lado."
     },
     "thing": {
@@ -254,7 +256,10 @@
     "looks": "Su aspecto",
     "look_n": "Aspecto {n}",
     "done": "Listo",
-    "back": "Volver"
+    "back": "Volver",
+    "default_name": "Kydux",
+    "name_taken": "Ese nombre es de alguien o de algo del juego. Elige otro.",
+    "gender_first": "Elige primero cómo es tu personaje, y aquí aparecerá su aspecto."
   },
   "characters": {
     "ilda": "Ilda",

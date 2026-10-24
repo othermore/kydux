@@ -108,3 +108,20 @@ test('before arguments are taught, the notebook shows a move with no number (D60
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook [data-example="wizard.move_right(3)"]')).toHaveCount(1);
 });
+
+test('? opens the start card over the notebook, and it says Continue', async ({ page }) => {
+  await page.goto('/#level/the-corridor');
+  await expect(page.locator('#start')).toHaveText('Start');
+  await page.locator('#start').click();
+  await page.locator('#notebook-open').click();
+  await expect(page.locator('#notebook')).toBeVisible();
+  await page.locator('#about').click();
+  const button = page.locator('#start');
+  await expect(button).toHaveText('Continue');
+  // The card is on top: the point at its button's middle is the button.
+  const box = await button.boundingBox();
+  if (!box) throw new Error('no button');
+  const middle = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const atPoint = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.id ?? '', middle);
+  expect(atPoint).toBe('start');
+});

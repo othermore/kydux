@@ -23,7 +23,10 @@ test('a first visit makes the wizard first, and Done opens the first lesson by n
   await go.click();
   await expect(page).toHaveURL(/#wizard$/);
   await expect(page.locator('.wizard-screen h2')).toHaveText('Your wizard');
-  await expect(page.locator('#wizard-looks .radio')).toHaveCount(8);
+  // A name to start from (D61); the looks wait for the gender.
+  await expect(page.locator('#wizard-name')).toHaveValue('Kydux');
+  await expect(page.locator('#wizard-looks .radio')).toHaveCount(0);
+  await expect(page.locator('#wizard-looks-first')).toBeVisible();
   await expect(page.locator('#wizard-done')).toBeDisabled();
   await expect(page.locator('#wizard-back')).toHaveCount(0);
 
@@ -31,10 +34,11 @@ test('a first visit makes the wizard first, and Done opens the first lesson by n
   // A name alone is not enough: the wizard's gender is the child's to choose.
   await expect(page.locator('#wizard-done')).toBeDisabled();
   await page.locator('#wizard-gender [data-value="girl"]').click();
+  await expect(page.locator('#wizard-looks .radio')).toHaveCount(4);
   await expect(page.locator('#wizard-done')).toBeEnabled();
   await page.locator('#wizard-looks .radio').nth(2).click();
   await expect(page.locator('#wizard-looks .radio').nth(2)).toHaveAttribute('aria-checked', 'true');
-  expect(await robeColour(page, '#wizard-preview')).toBe('#8e4bb5');
+  expect(await robeColour(page, '#wizard-preview')).toBe('#3b8fd6');
   await expect(page.locator('#wizard-preview-name')).toHaveText('Ana');
 
   await page.locator('#wizard-done').click();
@@ -45,12 +49,29 @@ test('a first visit makes the wizard first, and Done opens the first lesson by n
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Ana');
   await expect(page.locator('#continue')).toHaveText('Continue: What a program is');
   await expect(page.locator('#change-wizard')).toBeVisible();
-  expect(await robeColour(page, '#start-figure')).toBe('#8e4bb5');
+  expect(await robeColour(page, '#start-figure')).toBe('#3b8fd6');
+});
+
+test('a name of the game\'s own is refused, and a boy\'s looks are a boy\'s', async ({ page }) => {
+  await page.goto('/#wizard');
+  await page.locator('#wizard-gender [data-value="boy"]').click();
+  await expect(page.locator('#wizard-looks .radio')).toHaveCount(4);
+  expect(await robeColour(page, '#wizard-preview')).toBe('#d9822b');
+  for (const name of ['Dask', 'zelim', 'Wizard']) {
+    await page.locator('#wizard-name').fill(name);
+    await expect(page.locator('#wizard-name-taken')).toBeVisible();
+    await expect(page.locator('#wizard-done')).toBeDisabled();
+  }
+  await page.locator('#wizard-name').fill('Leo');
+  await expect(page.locator('#wizard-name-taken')).toBeHidden();
+  await expect(page.locator('#wizard-done')).toBeEnabled();
 });
 
 test('a name keeps only the characters a name may have, and says so', async ({ page }) => {
   await page.goto('/#wizard');
   await expect(page.locator('#wizard-name-rule')).toBeHidden();
+  // Typing in the field replaces the name it starts with.
+  await page.locator('#wizard-name').click();
   await page.locator('#wizard-name').pressSequentially('Jo<sé>');
   await expect(page.locator('#wizard-name')).toHaveValue('José');
   await expect(page.locator('#wizard-name-rule')).toBeVisible();
@@ -61,6 +82,7 @@ test('a name keeps only the characters a name may have, and says so', async ({ p
 
 test('the arrow keys move through the looks', async ({ page }) => {
   await page.goto('/#wizard');
+  await page.locator('#wizard-gender [data-value="girl"]').click();
   const looks = page.locator('#wizard-looks .radio');
   await looks.nth(0).focus();
   await page.keyboard.press('ArrowRight');
@@ -68,14 +90,14 @@ test('the arrow keys move through the looks', async ({ page }) => {
   await expect(looks.nth(1)).toBeFocused();
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('ArrowLeft');
-  await expect(looks.nth(7)).toHaveAttribute('aria-checked', 'true');
+  await expect(looks.nth(3)).toHaveAttribute('aria-checked', 'true');
 });
 
 test('the scene draws the look chosen, and the words follow a girl in Spanish', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
   const page = await context.newPage();
   await page.goto('/#wizard');
-  await makeWizard(page, 'Lucía', 'girl', 5);
+  await makeWizard(page, 'Lucía', 'girl', 2);
   await page.locator('#wizard-done').click();
   await expect(page).toHaveURL(/#lesson\/what-a-program-is$/);
   await page.goto('/#level/the-corridor');

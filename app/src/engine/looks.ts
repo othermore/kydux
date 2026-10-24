@@ -1,4 +1,5 @@
-// The looks a child can choose for their wizard (D36). Each has an id, which the
+// The looks a child can choose for their wizard (D36, D61), four for a girl and
+// four for a boy, each four with the four skin tones. Each has an id, which the
 // progress document keeps, and for now the colours and hair style of the
 // placeholder figure; with the art of phase 4, the same ids pick sprite sheets
 // or palette swaps, so the document does not change. The figure is the word:
@@ -9,6 +10,8 @@ export type HairStyle = 'short' | 'long';
 
 export interface Look {
   id: string;
+  /** Whether the look is a girl's or a boy's (D61): the creator shows the gender's. */
+  gender: 'girl' | 'boy';
   skin: string;
   hair: string;
   hairStyle: HairStyle;
@@ -29,6 +32,7 @@ const SKIN = {
 export const LOOKS: readonly Look[] = [
   {
     id: 'amber',
+    gender: 'boy',
     skin: SKIN.pale,
     hair: '#6b4a2b',
     hairStyle: 'short',
@@ -38,6 +42,7 @@ export const LOOKS: readonly Look[] = [
   },
   {
     id: 'teal',
+    gender: 'girl',
     skin: SKIN.brown,
     hair: '#1f1a17',
     hairStyle: 'long',
@@ -47,6 +52,7 @@ export const LOOKS: readonly Look[] = [
   },
   {
     id: 'plum',
+    gender: 'boy',
     skin: SKIN.dark,
     hair: '#1f1a17',
     hairStyle: 'short',
@@ -56,6 +62,7 @@ export const LOOKS: readonly Look[] = [
   },
   {
     id: 'rose',
+    gender: 'girl',
     skin: SKIN.paler,
     hair: '#b5502a',
     hairStyle: 'long',
@@ -65,6 +72,7 @@ export const LOOKS: readonly Look[] = [
   },
   {
     id: 'moss',
+    gender: 'boy',
     skin: SKIN.paler,
     hair: '#e0c060',
     hairStyle: 'short',
@@ -74,6 +82,7 @@ export const LOOKS: readonly Look[] = [
   },
   {
     id: 'sky',
+    gender: 'girl',
     skin: SKIN.dark,
     hair: '#2b211b',
     hairStyle: 'long',
@@ -83,6 +92,7 @@ export const LOOKS: readonly Look[] = [
   },
   {
     id: 'sand',
+    gender: 'boy',
     skin: SKIN.brown,
     hair: '#4a3020',
     hairStyle: 'short',
@@ -92,6 +102,7 @@ export const LOOKS: readonly Look[] = [
   },
   {
     id: 'coral',
+    gender: 'girl',
     skin: SKIN.pale,
     hair: '#6b4a2b',
     hairStyle: 'long',
@@ -110,4 +121,9 @@ export function isLook(id: string): boolean {
 /** The look of that id, or the first look for an id the game does not have. */
 export function lookOf(id: string | null | undefined): Look {
   return LOOKS.find((look) => look.id === id) ?? DEFAULT_LOOK;
+}
+
+/** The looks for a wizard of a gender, in the order they are shown. */
+export function looksFor(gender: Look['gender']): Look[] {
+  return LOOKS.filter((look) => look.gender === gender);
 }

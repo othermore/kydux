@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_LOOK, isLook, LOOKS, lookOf } from './looks';
+import { DEFAULT_LOOK, isLook, LOOKS, lookOf, looksFor } from './looks';
 
 describe('the looks (D36)', () => {
   it('are eight, each with its own id', () => {
@@ -7,12 +7,11 @@ describe('the looks (D36)', () => {
     expect(new Set(LOOKS.map((look) => look.id)).size).toBe(8);
   });
 
-  it('have four skins, and both hair styles with each', () => {
-    const skins = new Set(LOOKS.map((look) => look.skin));
-    expect(skins.size).toBe(4);
-    for (const skin of skins) {
-      const styles = new Set(LOOKS.filter((look) => look.skin === skin).map((look) => look.hairStyle));
-      expect(styles).toEqual(new Set(['short', 'long']));
+  it('are four for each gender, with the four skins in each (D61)', () => {
+    for (const gender of ['girl', 'boy'] as const) {
+      const looks = looksFor(gender);
+      expect(looks).toHaveLength(4);
+      expect(new Set(looks.map((look) => look.skin)).size).toBe(4);
     }
   });
 

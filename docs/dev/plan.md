@@ -489,6 +489,10 @@ so that the figures pass behind and in front of them (D76).
     scene is painted, mapped and cut, how a figure is made, and how each
     is reviewed; `art/raw/`, which git ignores, for the trials.
 
+Sprint 13 (`sprint-13.md`) makes chapter 1 right on its painting, with
+the wizard's looks (4.5) and the first mask rules (4.4); sprint 14 brings
+chapters 2 and 3 onto theirs.
+
 UAT: the three chapters with their paintings and sound; the creator's
 choices showing in the scene; a hunt for things that cover a figure
 wrongly; a child's verdict.

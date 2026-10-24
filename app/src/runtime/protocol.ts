@@ -3,6 +3,16 @@
 /** A level as its level.json says it; the world reads it. */
 export type LevelJson = Record<string, unknown>;
 
+/** What the course gives a level for the page alone, beside its JSON, which goes
+ * to the world as it is: the concepts the course has taught up to it, which the
+ * notebook follows (D60), absent for a level outside the course, which is shown as
+ * one that knows them all; and the words given so far, which the notebook lists
+ * (D80), while the world holds a level's own `words` to its own doors. */
+export interface CourseGiven {
+  concepts?: string[];
+  knownWords: string[];
+}
+
 // A run is stopped through the shared interrupt buffer, or by ending the
 // worker: while Python runs, the worker reads no messages.
 export type ToWorker =

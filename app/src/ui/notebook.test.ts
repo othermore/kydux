@@ -61,12 +61,13 @@ describe('the notebook', () => {
   });
 
   it('lists the spells once the wizard can cast, and the words once it can speak (D80)', () => {
-    const level = { id: 'gate', spells: ['zelim'], known_words: ['ambrel'] };
-    expect(spellsAndWords({ ...level, api: ['wizard.cast', 'wizard.say'] })).toEqual({
+    const level = { id: 'gate', spells: ['zelim'] };
+    const course = { knownWords: ['ambrel'] };
+    expect(spellsAndWords({ ...level, api: ['wizard.cast', 'wizard.say'] }, course)).toEqual({
       spells: ['zelim'],
       words: ['ambrel'],
     });
-    expect(spellsAndWords({ ...level, api: ['wizard.say'] })).toEqual({ spells: [], words: ['ambrel'] });
+    expect(spellsAndWords({ ...level, api: ['wizard.say'] }, course)).toEqual({ spells: [], words: ['ambrel'] });
     expect(spellsAndWords({ id: 'none', api: ['wizard.cast'] })).toEqual({ spells: [], words: [] });
   });
 });

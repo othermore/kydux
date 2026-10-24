@@ -2,7 +2,7 @@
 // words in the player's language (text.<lang>.json), from content/levels/<id>/.
 
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
-import type { LevelJson } from '../runtime/protocol';
+import type { LevelJson, CourseGiven } from '../runtime/protocol';
 import type { ApiTable } from '../ui/notebook';
 
 export interface LevelText {
@@ -25,6 +25,8 @@ export interface LoadedLevel {
   id: string;
   level: LevelJson;
   text: LevelText;
+  /** What the course gives it for the page (main.ts); none outside the course. */
+  course?: CourseGiven;
 }
 
 export class LevelNotFound extends Error {

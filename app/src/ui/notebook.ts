@@ -5,7 +5,7 @@
 // A second tab, once the course has given any, lists the spells and the words
 // (passwords) known up to here, each with what it does (D80).
 
-import type { LevelJson } from '../runtime/protocol';
+import type { LevelJson, CourseGiven } from '../runtime/protocol';
 import { t } from '../i18n';
 import { element } from './dom';
 import { withCode } from './outcome';
@@ -61,9 +61,9 @@ export function heldObjects(level: LevelJson, table: ApiTable): { name: string; 
 /** Every member the level teaches, for every object its code holds; before the
  * course has taught arguments (`concepts` of the level, D60), an action that can
  * go without one is shown without one. */
-export function notebookEntries(level: LevelJson, table: ApiTable): NotebookEntry[] {
+export function notebookEntries(level: LevelJson, table: ApiTable, course?: CourseGiven): NotebookEntry[] {
   const api = (level.api as string[] | undefined) ?? [];
-  const concepts = (level.concepts as string[] | undefined) ?? ['arguments'];
+  const concepts = course?.concepts ?? ['arguments'];
   const entries: NotebookEntry[] = [];
   for (const object of heldObjects(level, table)) {
     for (const member of table.roles[object.role] ?? []) {
@@ -79,12 +79,11 @@ export function notebookEntries(level: LevelJson, table: ApiTable): NotebookEntr
 
 /** The spells and the words the second tab lists (D80): the spells known up to the
  * level once the wizard can cast, and the words given once the wizard can speak. */
-export function spellsAndWords(level: LevelJson): { spells: string[]; words: string[] } {
+export function spellsAndWords(level: LevelJson, course?: CourseGiven): { spells: string[]; words: string[] } {
   const api = (level.api as string[] | undefined) ?? [];
-  const list = (key: string) => (level[key] as string[] | undefined) ?? [];
   return {
-    spells: api.includes('wizard.cast') ? list('spells') : [],
-    words: api.includes('wizard.say') ? list('known_words') : [],
+    spells: api.includes('wizard.cast') ? ((level.spells as string[] | undefined) ?? []) : [],
+    words: api.includes('wizard.say') ? (course?.knownWords ?? []) : [],
   };
 }
 
@@ -108,6 +107,7 @@ export function notebookPanel(
   level: LevelJson,
   table: ApiTable,
   onExample: (example: string) => void,
+  course?: CourseGiven,
 ): NotebookPanel {
   const node = element('aside', { id: 'notebook', className: 'notebook', hidden: true });
   node.setAttribute('aria-labelledby', 'notebook-title');
@@ -125,7 +125,7 @@ export function notebookPanel(
     ]);
   };
   const draw = () => {
-    const entries = notebookEntries(level, table);
+    const entries = notebookEntries(level, table, course);
     const close = element('button', { id: 'notebook-close', type: 'button', className: 'close' }, [
       t('notebook.close'),
     ]);
@@ -166,7 +166,7 @@ export function notebookPanel(
     }
     const actions = sections.length ? sections : [element('p', {}, [t('notebook.nothing')])];
     const header = element('header', {}, [element('h2', { id: 'notebook-title' }, [t('notebook.title')]), close]);
-    const { spells, words } = spellsAndWords(level);
+    const { spells, words } = spellsAndWords(level, course);
     if (spells.length === 0 && words.length === 0) {
       node.replaceChildren(header, ...actions);
       return;

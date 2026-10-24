@@ -160,9 +160,14 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const notebookButton = labelled(element('button', { id: 'notebook-open', type: 'button' }), () =>
     t('notebook.open'),
   );
-  const notebook = notebookPanel(loaded.level, parts.table, (example) => {
-    editor.insertLine(example);
-  });
+  const notebook = notebookPanel(
+    loaded.level,
+    parts.table,
+    (example) => {
+      editor.insertLine(example);
+    },
+    loaded.course,
+  );
   notebookButton.addEventListener('click', () => {
     notebook.toggle();
     notebookButton.setAttribute('aria-expanded', String(notebook.open));
@@ -235,7 +240,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   let typed = saved !== undefined && saved !== text.starting_code;
   // After the name of something the child's code holds and a dot, the editor
   // offers what the level teaches of it, with the notebook's words.
-  const entries = notebookEntries(loaded.level, parts.table);
+  const entries = notebookEntries(loaded.level, parts.table, loaded.course);
   const editor = parts.createEditor(editorParent, {
     doc: typed && saved ? saved : text.starting_code,
     label: t('level.code_label'),

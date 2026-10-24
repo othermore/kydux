@@ -9,7 +9,8 @@
 // and data-speaker (the words said in a bubble and who says them), data-look
 // (the id of the look the wizard is drawn with, D36), data-wizard-figure and
 // data-friend-figure (the sheets they are drawn from, D77), data-casting (present
-// while the wizard's casting frames play), data-opening (the door shown half open
+// while the wizard's casting frames play), data-acting (`pickup` or `win` while
+// the wizard's act plays, 14.3), data-opening (the door shown half open
 // as it opens), data-dark (whether the
 // room is still dark, D52), data-stairs ("id:in" or "id:away" joined by ";",
 // each stair as a step taken now would find it, D53), data-zoom (the
@@ -72,14 +73,15 @@ import {
   loadArt,
   paintScene,
   paintThing,
-  playCast,
+  type Played,
+  playFrames,
   marginOf,
   preloadArt,
   SHEET_ROW,
 } from './painted';
 import { DebugView, debugging } from './debug';
 import { Silhouette } from './silhouette';
-import { Playback } from './playback';
+import { LONG, Playback } from './playback';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
 import { play } from './sfx';
@@ -126,6 +128,8 @@ export interface SceneHandle {
   zoom(step: 1 | -1): boolean;
   /** Whether the camera can zoom one step in (1) or out (-1). */
   canZoom(step: 1 | -1): boolean;
+  /** After a run won, the wizard celebrates; how long it takes, 0 when it does not. */
+  celebrate(): number;
   destroy(): void;
 }
 
@@ -801,11 +805,37 @@ class LevelScene extends Phaser.Scene {
     });
   }
 
+  /** The wizard playing a part of its sheet over `duration` (playFrames), its frames'
+   * timers kept so that a restart or the next move drops them; data-casting is there
+   * while it casts, data-acting names an act while it plays. Null for a sheet
+   * without that part, and on a scene without art. */
+  private playPart(part: Played, duration: number): Phaser.Time.TimerEvent[] | null {
+    this.stopCast();
+    const figures = this.art?.figures;
+    if (!figures || this.still && part !== 'cast') return null;
+    const timers = playFrames(this, this.wizard, figures, part, duration);
+    if (!timers) return null;
+    if (part === 'cast') this.parentNode.dataset.casting = 'true';
+    else this.parentNode.dataset.acting = part;
+    this.casting = [...timers, this.time.delayedCall(duration, () => this.stopCast())];
+    return timers;
+  }
+
+  /** After a run won, the wizard celebrates (14.3): how long it takes, for the page
+   * to wait for it before the win card; 0 when it does not, in a story, on a scene
+   * without art, or for a reader who asks for less motion. */
+  celebrate(): number {
+    if (this.options.story) return 0;
+    const duration = this.playback.tickDuration * 2;
+    return this.playPart('win', duration) ? duration : 0;
+  }
+
   /** A cast's frames stopped where they are, their timers dropped. */
   private stopCast(): void {
     for (const timer of this.casting) timer.remove(false);
     this.casting = [];
     delete this.parentNode.dataset.casting;
+    delete this.parentNode.dataset.acting;
   }
 
   /** The way the wizard faces, read from its figure. */
@@ -894,7 +924,11 @@ class LevelScene extends Phaser.Scene {
           });
         }
         this.carried.add(id);
-        if (!instant) play('pick_up');
+        if (!instant) {
+          // The wizard bends and takes it, as the thing goes (14.3).
+          this.playPart('pickup', this.playback.tickDuration * LONG * 0.95);
+          play('pick_up');
+        }
         break;
       }
       case 'open':
@@ -904,13 +938,8 @@ class LevelScene extends Phaser.Scene {
         if (!instant) {
           // The wand raised, pointed and lowered, on a sheet that has it, taking
           // longer than the tick so that the wand is seen out; its light flies.
-          this.stopCast();
-          const casting = this.playback.tickDuration * 1.6;
-          const timers = playCast(this, this.wizard, this.art?.figures?.standing ?? 1, casting);
-          if (timers) {
-            this.parentNode.dataset.casting = 'true';
-            this.casting = [...timers, this.time.delayedCall(casting, () => this.stopCast())];
-          }
+          const casting = this.playback.tickDuration * LONG * 0.95;
+          const timers = this.playPart('cast', casting);
           this.castLight(timers ? casting : duration);
           play('cast');
         }
@@ -1222,6 +1251,9 @@ export async function startScene(
         },
         canZoom(step) {
           return scene.canZoomBy(step);
+        },
+        celebrate() {
+          return scene.celebrate();
         },
         destroy() {
           resized.disconnect();

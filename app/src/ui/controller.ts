@@ -69,6 +69,9 @@ export interface SceneLike {
   /** Shows the level starting again, everything put back, and resolves once it is
    * shown (D75); a scene without it is only reset. */
   restartShow?(): Promise<void>;
+  /** The wizard celebrating a run won: how long it takes, for the outcome to wait
+   * for it (14.3); a scene without it shows the outcome at once. */
+  celebrate?(): number;
 }
 
 const DEFAULT_TICK_LIMIT = 1000;
@@ -131,7 +134,7 @@ export class RunController {
         this.changed();
       }),
       scene.playback.onState((state) => {
-        if (state === 'done' && this.world) this.finish();
+        if (state === 'done' && this.world) this.done(scene);
         this.changed();
       }),
     );
@@ -303,6 +306,22 @@ export class RunController {
     return this.world.goals.map((goal) =>
       reached(goal.failed_at_tick) ? 'failed' : reached(goal.met_at_tick) ? 'met' : 'open',
     );
+  }
+
+  /** The run played out: a run won is celebrated first, its outcome after it, unless
+   * another run or a restart came meanwhile. */
+  private done(scene: SceneLike): void {
+    const wait = this.world?.status === 'won' ? (scene.celebrate?.() ?? 0) : 0;
+    if (wait <= 0) {
+      this.finish();
+      return;
+    }
+    const generation = this.generation;
+    setTimeout(() => {
+      if (generation !== this.generation) return;
+      this.finish();
+      this.changed();
+    }, wait);
   }
 
   private finish(): void {

@@ -494,11 +494,22 @@ def test_the_exported_figures_are_sheets_of_four_ways_and_three_frames():
     data = json.loads((FIGURES / "figures.json").read_text())
     width, height = data["frame"]
     assert data["ways"] == ["down", "left", "right", "up"] and data["frames"] == 3
+    # A wizard's sheet has its four casting rows after its four walking ones, its
+    # four picking-up rows and its celebrating one, where figures.json's rows say.
+    named = data["rows"]
+    assert named == {"walk": 0, "cast": 4, "pickup": 8, "win": 12}
+    wizard_rows = max(named.values()) + 1
     for name in data["figures"]:
         sheet = Image.open(FIGURES / f"{name}.webp")
-        # A wizard's sheet has its four casting rows after its four walking ones.
-        rows = 8 if name.startswith("wizard-") else 4
+        rows = wizard_rows if name.startswith("wizard-") else 4
         assert sheet.size == (3 * width, rows * height), name
+        if name.startswith("wizard-"):
+            # Every act's frame holds a figure.
+            alpha = np.array(sheet.convert("RGBA"))[..., 3]
+            for row in range(named["pickup"], named["win"] + 1):
+                for step in range(3):
+                    top, left = row * height, step * width
+                    assert alpha[top : top + height, left : left + width].max() > 128, (name, row)
 
 
 def test_a_look_recolours_its_parts_and_keeps_the_rest():

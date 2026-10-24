@@ -1,11 +1,23 @@
 // The playback of a run's events, tick by tick, at a speed the child chooses:
-// each step plays every event of one tick, the wizard's and the actors'. It
+// each step plays every event of one tick, the wizard's and the actors'. A tick
+// in which the wizard does something with its hands, casting or picking up,
+// lasts LONG of a tick, so that it is seen through before the next step. It
 // knows nothing of Phaser: the scene listens to it and draws.
 
 import type { WorldEvent } from '../runtime/protocol';
 
 /** What the playback plays: the world's events, one tick each. */
 export type PlaybackEvent = WorldEvent;
+
+/** How long a tick lasts in which the wizard casts or picks up, against a tick. */
+export const LONG = 1.6;
+/** The wizard's events that take a long tick. */
+const HANDS = new Set(['cast', 'pick_up']);
+
+/** How long a tick's events take, against a tick (LONG for the wizard's hands). */
+export function lengthOf(events: PlaybackEvent[]): number {
+  return events.some((event) => event.actor === 'wizard' && HANDS.has(event.kind)) ? LONG : 1;
+}
 
 export type PlaybackState = 'idle' | 'playing' | 'paused' | 'done';
 export type Speed = 1 | 2 | 4;
@@ -148,7 +160,7 @@ export class Playback {
     this.timer = this.schedule(() => {
       this.timer = null;
       if (this.currentState === 'playing') this.next();
-    }, this.tickDuration);
+    }, this.tickDuration * lengthOf(events));
   }
 
   private clearTimer(): void {

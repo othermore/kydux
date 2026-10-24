@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Playback, type PlaybackEvent, type PlaybackState } from './playback';
+import { LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState } from './playback';
 
 function events(n: number): PlaybackEvent[] {
   return Array.from({ length: n }, (_, i) => ({
@@ -46,6 +46,21 @@ describe('Playback', () => {
     expect(playback.state).toBe('done');
     expect(ticks.map(([t]) => t)).toEqual([0, 1, 2, 3]);
     expect(states).toEqual(['playing', 'done']);
+  });
+
+  it('gives a tick in which the wizard picks up or casts a longer time', () => {
+    const playback = new Playback({ tickMs: 400 });
+    const ticks: number[] = [];
+    playback.onTick((tick) => ticks.push(tick));
+    const [first, second] = events(2);
+    playback.load([{ ...first!, kind: 'pick_up', data: { id: 'wand' } }, second!]);
+    playback.play();
+    expect(ticks).toEqual([0, 1]);
+    vi.advanceTimersByTime(400);
+    expect(ticks).toEqual([0, 1]);
+    vi.advanceTimersByTime(400 * LONG - 400);
+    expect(ticks).toEqual([0, 1, 2]);
+    expect(lengthOf([{ ...first!, actor: 'eldra', kind: 'cast' }])).toBe(1);
   });
 
   it('goes faster from the next tick on', () => {

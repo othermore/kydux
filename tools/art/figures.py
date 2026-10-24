@@ -5,6 +5,8 @@ that the figures stay the same drawing and only their colours change.
 
     tools/art/figures.py [--check]
     tools/art/figures.py --cast <boy|girl> <edit.png>
+    tools/art/figures.py --pickup <boy|girl> <edit.png>
+    tools/art/figures.py --win <boy|girl> <edit.png>
 
 A base sheet is four rows (down, left, right, up) of three frames, as
 content/art/figures/figures.json says. Each opaque pixel is told by its colour
@@ -29,9 +31,14 @@ sheets named in FRIENDS, from the bases in art/figures/ (BASES), and their list 
 figures.json; --check writes art/raw/figures-check.png, every sheet side by
 side, to look at. A wizard's sheet has four more rows after its walking ones,
 the same ways in the same order: casting, the wand raised, pointed with its
-light and lowered, recoloured from the casting base of its gender (CAST_BASES).
---cast makes that base from Gemini's edit of the walking base
-(tools/art/prompts/figure-cast-<gender>.md), put back on the base's grid.
+light and lowered, recoloured from the casting base of its gender (CAST_BASES);
+four more, picking up the way it faces, bending, at the ground with both hands
+in front of its feet and half up again (PICKUP_BASES); and one facing down,
+celebrating (WIN_BASES). figures.json names the rows (`rows`, ROWS). --cast and
+--pickup make their bases from Gemini's edits of the walking base
+(tools/art/prompts/figure-cast-<gender>.md, figure-pickup-<gender>.md); --win
+from an edit of a sheet of the standing frame (figure-act-<gender>.md); each is
+put back on the base's grid.
 """
 
 import argparse
@@ -63,6 +70,23 @@ BASES = {
 }
 #: The wizard's casting frames, by gender: four rows of three, as the walking base's.
 CAST_BASES = {"boy": "wizard-cast-boy.webp", "girl": "wizard-cast-girl.webp"}
+#: The wizard picking up, by gender: four rows of three, as the walking base's,
+#: bending forward, at the ground with both hands in front of the feet, and half
+#: up again, the way it faces.
+PICKUP_BASES = {"boy": "wizard-pickup-boy.webp", "girl": "wizard-pickup-girl.webp"}
+#: The wizard celebrating, by gender: one row facing down, the arms up, a jump,
+#: down again.
+WIN_BASES = {"boy": "wizard-win-boy.webp", "girl": "wizard-win-girl.webp"}
+#: The rows of a wizard's sheet by what they are (figures.json's `rows`): the
+#: walking, casting and picking-up rows four each (down, left, right, up), then
+#: the celebrating one.
+ROWS = {"walk": 0, "cast": 4, "pickup": 8, "win": 12}
+#: How tall the figure is, at most, in each picking-up frame, against its standing
+#: height: bending, at the ground, half up again. A frame the edit draws taller
+#: is lowered (crouched), so that every way and both wizards go as low.
+CROUCH = (0.88, 0.66, 0.9)
+#: How much of the figure, from its feet up, is squeezed in a crouch.
+CROUCHED = 0.5
 #: The friends (D77): their base and their colours, as a look's.
 FRIENDS = {
     "teku": (
@@ -271,11 +295,18 @@ def _dress_grown(standing: np.ndarray, top: int, bottom: int, grow: int) -> np.n
     return made
 
 
-def from_edit(edited: Image.Image, base: Image.Image, frame: tuple[int, int]) -> Image.Image:
+def from_edit(
+    edited: Image.Image,
+    base: Image.Image,
+    frame: tuple[int, int],
+    lifted: frozenset[tuple[int, int]] = frozenset(),
+) -> Image.Image:
     """A Gemini edit of a base sheet, put back on the base's grid: the edit was asked
     of the base enlarged four times on a magenta canvas of 9:16, centred; it is
     sized back, its magenta made transparent, and each figure moved so that its feet
-    stand where the base frame's do (the bottom of the drawing, at its middle)."""
+    stand where the base frame's do (the bottom of the drawing, at its middle). A
+    frame in `lifted`, (row, column), off the ground in a jump, is moved as the
+    first frame of its row is, so that it keeps its height above the others."""
     scale = 4
     width, height = base.width * scale, base.height * scale
     canvas = round(height * 9 / 16)
@@ -293,17 +324,22 @@ def from_edit(edited: Image.Image, base: Image.Image, frame: tuple[int, int]) ->
     old = np.array(base.convert("RGBA"))
     out = np.zeros_like(old)
     fw, fh = frame
+
+    def feet(cell: np.ndarray) -> tuple[int, int]:
+        ys, xs = np.where(cell[..., 3] > 128)
+        return (int(ys.max()), int(round(xs.mean()))) if ys.size else (fh - 1, fw // 2)
+
     for top in range(0, old.shape[0], fh):
+        row_dy = None
         for x0 in range(0, old.shape[1], fw):
             new_cell = small[top : top + fh, x0 : x0 + fw]
             base_cell = old[top : top + fh, x0 : x0 + fw]
-
-            def feet(cell: np.ndarray) -> tuple[int, int]:
-                ys, xs = np.where(cell[..., 3] > 128)
-                return (int(ys.max()), int(round(xs.mean()))) if ys.size else (fh - 1, fw // 2)
-
             (by, bx), (ny, nx) = feet(base_cell), feet(new_cell)
             dy, dx = by - ny, bx - nx
+            if row_dy is None:
+                row_dy = dy
+            if (top // fh, x0 // fw) in lifted:
+                dy = row_dy
             moved = np.zeros_like(new_cell)
             src = new_cell[max(0, -dy) : fh - max(0, dy), max(0, -dx) : fw - max(0, dx)]
             moved[
@@ -333,11 +369,79 @@ def make_cast_base(gender: str, edit: Path) -> Path:
     return target
 
 
-def stacked(top: Image.Image, bottom: Image.Image) -> Image.Image:
-    """One sheet over the other."""
-    sheet = Image.new("RGBA", (top.width, top.height + bottom.height), (0, 0, 0, 0))
-    sheet.paste(top, (0, 0))
-    sheet.paste(bottom, (0, top.height))
+def drawn_height(frame: np.ndarray) -> int:
+    """How tall the figure in a frame is, in pixels, from its top to its feet."""
+    ys = np.nonzero(frame[..., 3].max(axis=1) > 128)[0]
+    return int(ys[-1] - ys[0] + 1) if len(ys) else 0
+
+
+def crouched(standing: np.ndarray, tall: int) -> np.ndarray:
+    """A frame lowered into a crouch, `tall` pixels high at most: its lower part,
+    CROUCHED of the figure from its feet up, squeezed towards the feet, and what is
+    above it moved down with it. A frame already that low is kept."""
+    alpha = standing[..., 3]
+    ys = np.nonzero(alpha.max(axis=1) > 128)[0]
+    if not len(ys) or ys[-1] - ys[0] + 1 <= tall:
+        return standing
+    top, bottom = int(ys[0]), int(ys[-1])
+    start = bottom - int((bottom - top) * CROUCHED)
+    lower = Image.fromarray(standing[start : bottom + 1].astype(np.uint8), "RGBA")
+    height = max(1, lower.height - (bottom - top + 1 - tall))
+    short = np.array(lower.resize((lower.width, height), Image.LANCZOS))
+    made = np.zeros_like(standing)
+    made[bottom + 1 - height : bottom + 1] = short
+    drop = lower.height - height
+    made[top + drop : start + drop] = standing[top:start]
+    return made
+
+
+def make_pickup_base(gender: str, edit: Path) -> Path:
+    """The picking-up base of a gender, from Gemini's edit of its walking base: the
+    rows facing down, left and right as the edit draws them, each frame lowered to
+    CROUCH of its row's standing height where the edit drew it taller; the row
+    seen from behind, which the edit leaves standing, made by lowering the walking
+    base's standing frame from behind the same way."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    fw, fh = tuple(about["frame"])
+    walk = Image.open(BASE_DIR / BASES[gender][0]).convert("RGBA")
+    pixels = np.array(from_edit(Image.open(edit), walk, (fw, fh)))
+    base = np.array(walk)
+    middle = about["standing"]
+    for row in range(4):
+        cells = slice(row * fh, (row + 1) * fh)
+        standing = base[cells, middle * fw : (middle + 1) * fw]
+        full = drawn_height(standing)
+        for step, share in enumerate(CROUCH):
+            columns = slice(step * fw, (step + 1) * fw)
+            # Seen from behind, the edit's frame is the standing one: start from it.
+            drawn = standing if row == 3 else pixels[cells, columns]
+            pixels[cells, columns] = crouched(drawn, round(full * share))
+    target = BASE_DIR / PICKUP_BASES[gender]
+    Image.fromarray(pixels, "RGBA").save(target, quality=90, method=6)
+    return target
+
+
+def make_win_base(gender: str, edit: Path) -> Path:
+    """The celebrating base of a gender, from Gemini's edit of a sheet of its
+    standing frame, four rows of three facing down
+    (art/raw/figures/act-<gender>-base.png), whose second row celebrates (the first
+    and the third pick up, and the fourth is a spare); the jump keeps its height."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    fw, fh = tuple(about["frame"])
+    base = Image.open(RAW / "figures" / f"act-{gender}-base.png")
+    acts = from_edit(Image.open(edit), base, (fw, fh), lifted=frozenset({(1, 1), (3, 1)}))
+    target = BASE_DIR / WIN_BASES[gender]
+    acts.crop((0, fh, 3 * fw, 2 * fh)).save(target, quality=90, method=6)
+    return target
+
+
+def stacked(*sheets: Image.Image) -> Image.Image:
+    """The sheets one under the other."""
+    sheet = Image.new("RGBA", (sheets[0].width, sum(s.height for s in sheets)), (0, 0, 0, 0))
+    top = 0
+    for part in sheets:
+        sheet.paste(part, (0, top))
+        top += part.height
     return sheet
 
 
@@ -349,6 +453,10 @@ def make(check: bool = False) -> list[Path]:
         for key, (name, hues) in BASES.items()
     }
     casts = {key: steadied(Image.open(BASE_DIR / name), frame) for key, name in CAST_BASES.items()}
+    pickups = {
+        key: steadied(Image.open(BASE_DIR / name), frame) for key, name in PICKUP_BASES.items()
+    }
+    wins = {key: Image.open(BASE_DIR / name).convert("RGBA") for key, name in WIN_BASES.items()}
     written = []
     for look_id, look in looks().items():
         base, hues = bases[look["gender"]]
@@ -356,6 +464,8 @@ def make(check: bool = False) -> list[Path]:
         sheet = stacked(
             recolour_sheet(base, frame, colours, hues),
             recolour_sheet(casts[look["gender"]], frame, colours, hues),
+            recolour_sheet(pickups[look["gender"]], frame, colours, hues),
+            recolour_sheet(wins[look["gender"]], frame, colours, hues),
         )
         target = FIGURES / f"wizard-{look_id}.webp"
         sheet.save(target, quality=90, method=6)
@@ -368,6 +478,7 @@ def make(check: bool = False) -> list[Path]:
     # The list is whatever sheets the folder holds: these, and the figures cut once
     # by export_scene.py (Wenna, Eldra, Dask).
     about["figures"] = sorted(p.stem for p in FIGURES.glob("*.webp"))
+    about["rows"] = ROWS
     (FIGURES / "figures.json").write_text(json.dumps(about, indent=2) + "\n", encoding="utf-8")
     if check:
         sheets = [Image.open(p).convert("RGBA") for p in written]
@@ -389,9 +500,21 @@ def main() -> int:
     parser.add_argument(
         "--cast", nargs=2, metavar=("GENDER", "EDIT"), help="make a casting base from an edit"
     )
+    parser.add_argument(
+        "--pickup", nargs=2, metavar=("GENDER", "EDIT"), help="make a picking-up base from an edit"
+    )
+    parser.add_argument(
+        "--win", nargs=2, metavar=("GENDER", "EDIT"), help="make a celebrating base from an edit"
+    )
     args = parser.parse_args()
     if args.cast:
         print(make_cast_base(args.cast[0], Path(args.cast[1])).relative_to(REPO))
+        return 0
+    if args.pickup:
+        print(make_pickup_base(args.pickup[0], Path(args.pickup[1])).relative_to(REPO))
+        return 0
+    if args.win:
+        print(make_win_base(args.win[0], Path(args.win[1])).relative_to(REPO))
         return 0
     for path in make(args.check):
         print(path.relative_to(REPO))

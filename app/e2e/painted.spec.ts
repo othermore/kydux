@@ -36,6 +36,9 @@ test('chapter 1 plays on the painted field', async ({ page }) => {
   await expect(page.locator('#scene')).toHaveAttribute('data-doors', 'gate', { timeout: 30_000 });
   await page.waitForTimeout(1200);
   await page.screenshot({ path: `${SHOTS}02-through-the-gate.png` });
+  // Won, the wizard celebrates before the win card (14.3).
+  await expect.poll(() => page.locator('#scene').getAttribute('data-acting'), { intervals: [50], timeout: 30_000 }).toBe('win');
+  await page.screenshot({ path: `${SHOTS}14-won-celebrating.png` });
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
   await expect(page.locator('.win-card .star').nth(2)).toHaveCSS('opacity', '1');
   await page.screenshot({ path: `${SHOTS}03-won.png` });
@@ -158,4 +161,23 @@ test('with ?debug the scene shows its cells, for a tester to name one', async ({
   await page.locator('#start').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-state', /./, { timeout: 90_000 });
   await expect(page.locator('#scene')).not.toHaveAttribute('data-debug', /./);
+});
+
+test('the wizard bends to pick the wand up, and celebrates a win (14.3)', async ({ page }) => {
+  await seedWizard(page);
+  await page.goto('/#level/the-wand');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await page.locator('#speed').selectOption('1');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_right(3)\nwizard.pick_up()\nwizard.move_left()\nwizard.move_down()');
+  await page.locator('#run').click();
+  const scene = page.locator('#scene');
+  await expect.poll(() => scene.getAttribute('data-acting'), { intervals: [50], timeout: 30_000 }).toBe('pickup');
+  await page.waitForTimeout(250);
+  await page.screenshot({ path: `${SHOTS}13-pick-up.png` });
+  await expect(scene).toHaveAttribute('data-carried', /wand/, { timeout: 10_000 });
+  await expect.poll(() => scene.getAttribute('data-acting'), { intervals: [50], timeout: 30_000 }).toBe('win');
+  await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
 });

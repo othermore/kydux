@@ -207,6 +207,32 @@ describe('RunController', () => {
     expect(last().outcome).toMatchObject({ kind: 'incomplete', met: 0, total: 1 });
   });
 
+  it('lets the wizard celebrate a run won before it says so', async () => {
+    const { runtime, scene, controller, last } = setUp();
+    const celebrating = scene as FakeScene & { celebrate(): number };
+    celebrating.celebrate = () => 600;
+    controller.run('wizard.move_right(2)');
+    runtime.answer(world('won', moves(2), 2));
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 2 + 50);
+    expect(last().outcome).toBeNull();
+    vi.advanceTimersByTime(600);
+    expect(last().outcome).toEqual({ kind: 'won' });
+  });
+
+  it('drops a celebration cut short by a new run', async () => {
+    const { runtime, scene, controller, last } = setUp();
+    const celebrating = scene as FakeScene & { celebrate(): number };
+    celebrating.celebrate = () => 600;
+    controller.run('wizard.move_right(2)');
+    runtime.answer(world('won', moves(2), 2));
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 2 + 50);
+    controller.run('wizard.move_right()');
+    vi.advanceTimersByTime(600);
+    expect(last().outcome).toBeNull();
+  });
+
   it('says a goal walked over and not stopped at', async () => {
     const { runtime, controller, last } = setUp();
     controller.run('wizard.move_right(2)');

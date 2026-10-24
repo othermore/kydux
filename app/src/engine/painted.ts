@@ -45,7 +45,15 @@ export interface FigureArt {
   height_cells: number;
   standing: number;
   figures: string[];
+  /** The first row of each part of a wizard's sheet, by its name: the walking, the
+   * casting and the picking-up rows (four each, down, left, right and up), and
+   * the celebrating one, facing down. */
+  rows?: { walk: number; cast: number; pickup?: number; win?: number };
 }
+
+/** A part of a wizard's sheet played as frames: casting or picking up the way the
+ * figure faces, celebrating facing down (D81, 14.3). */
+export type Played = 'cast' | 'pickup' | 'win';
 
 export interface Art {
   scene: SceneArt;
@@ -71,7 +79,6 @@ export async function loadArt(level: LevelJson): Promise<Art | null> {
 /** The rows of a figure's sheet, by the way it faces: four rows of walking frames,
  * and on the wizard's, four rows of casting frames after them, in the same order. */
 export const SHEET_ROW: Record<Facing, number> = { down: 0, left: 1, right: 2, up: 3 };
-const CAST_ROW = 4;
 const FACING_OF_ROW: readonly Facing[] = ['down', 'left', 'right', 'up'];
 /** Where a figure's feet stand in its cell on a painted scene, as a part of a cell. */
 export const FOOT_IN_CELL = 0.8;
@@ -171,26 +178,33 @@ export function facingOf(sprite: Phaser.GameObjects.Sprite): Facing {
   return FACING_OF_ROW[Math.floor((Number.isFinite(frame) ? frame : 0) / 3) % 4] ?? 'down';
 }
 
-/** The wizard casting: its three casting frames the way it faces, the wand raised,
- * pointed and lowered, then standing again. Gives the timers that step the frames,
- * for the scene to drop if the level starts again meanwhile; null for a sheet
- * without casting frames. */
-export function playCast(
+/** The wizard playing a part of its sheet, the way it faces: casting, the wand
+ * raised, pointed and lowered; picking up, bending, both hands at the ground in
+ * front of its feet and half up again; or, facing down, celebrating, the arms up,
+ * a jump and down; then standing again, the way it faced. The middle frame lasts longest: the wand pointed while its light
+ * flies, the hand at the ground while the thing goes. Gives the timers that step
+ * the frames, for the scene to drop if the level starts again meanwhile; null
+ * for a sheet without that part. */
+export function playFrames(
   scene: Phaser.Scene,
   sprite: Phaser.GameObjects.Sprite,
-  standing: number,
+  figures: FigureArt,
+  part: Played,
   duration: number,
 ): Phaser.Time.TimerEvent[] | null {
-  // A sheet's frames, and Phaser's whole-image frame besides them.
-  if (!sprite.texture.key.startsWith('fig-') || sprite.texture.frameTotal - 1 < (CAST_ROW + 4) * 3) return null;
+  const first = figures.rows?.[part];
+  if (first === undefined || !sprite.texture.key.startsWith('fig-')) return null;
   const facing = facingOf(sprite);
-  const frame = (step: number) => (CAST_ROW + SHEET_ROW[facing]) * 3 + step;
+  // Casting and picking up have a row for each way; celebrating, one facing down.
+  const row = part === 'win' ? first : first + SHEET_ROW[facing];
+  // A sheet's frames, and Phaser's whole-image frame besides them.
+  if (sprite.texture.frameTotal - 1 < (row + 1) * 3) return null;
+  const frame = (step: number) => row * 3 + step;
   sprite.setFrame(frame(0));
-  // The wand stays pointed for the middle part, while its light flies.
   return [
     scene.time.delayedCall(duration * 0.2, () => sprite.setFrame(frame(1))),
     scene.time.delayedCall(duration * 0.8, () => sprite.setFrame(frame(2))),
-    scene.time.delayedCall(duration, () => sprite.setFrame(SHEET_ROW[facing] * 3 + standing)),
+    scene.time.delayedCall(duration, () => sprite.setFrame(SHEET_ROW[facing] * 3 + figures.standing)),
   ];
 }
 

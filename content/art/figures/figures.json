@@ -28,5 +28,11 @@
     "wizard-sand",
     "wizard-sky",
     "wizard-teal"
-  ]
+  ],
+  "rows": {
+    "walk": 0,
+    "cast": 4,
+    "pickup": 8,
+    "win": 12
+  }
 }

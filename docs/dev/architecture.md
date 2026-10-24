@@ -1186,8 +1186,17 @@ one overturns stays, marked as superseded.
   by torches inside. The casting frames are Gemini's edits of the two
   wizard bases, recoloured for every look like the walking rows; the
   half-open state and the lit hall are edits of the painting, cut as the
-  other states are. Rules out a spell seen only as a ring of light, and a
-  door that changes in one frame.
+  other states are. The wizard's acts are seen the same way: it bends the
+  way it faces to take what it picks up, both hands at the ground in front
+  of its feet, the thing fading as they reach it, and it celebrates a run
+  won, facing the viewer, its arms up and a small jump, before the win
+  card, which waits for it (`celebrate`); from Gemini's edits, the row
+  seen from behind lowered from the standing frame, rows named in
+  `figures.json`, still for a reader who asks for less motion. A tick in
+  which the wizard casts or picks up plays 1.6 times as long as another
+  (`LONG` in `playback.ts`), so that what its hands do is seen through
+  before its next step. Rules out a spell seen only as a ring of
+  light, and a door that changes in one frame.
 - **D82 — A scene's settings live beside its art, and the tools take the
   scene's id.** Decided 2026-10-24 (sprint 14, 14.1). Everything the cut
   and the export need of a scene that is its own, not the method's, is one

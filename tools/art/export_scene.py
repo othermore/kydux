@@ -266,19 +266,30 @@ def patched(floor: Image.Image, patches: list[tuple[int, int, int, int]]) -> Ima
 MARGIN_FADE = 20
 
 
-def with_margin(floor: Image.Image, margin: dict) -> Image.Image:
+def with_margin(floor: Image.Image, margin: dict, scene: Settings) -> Image.Image:
     """The ground with the margin round it (D83): the margin painting, joined to the
     scene's painting by tools/art/margin.py, brought onto the page's grid, and the
-    playable ground laid in it at the margin's cells, faded in over its edge."""
+    playable ground laid in it at the margin's cells, faded in over its edge. The
+    grid may begin a little outside the painting, where the playable ground has
+    nothing of it: the fade begins where the painting does, and the margin's
+    painting, which holds it whole, shows there."""
     left, top, right, bottom = margin["cells"]
     grid = json.loads((REPO / margin["grid"]).read_text())
     columns, rows = floor.width // CELL, floor.height // CELL
     painting = Image.open(REPO / margin["painting"])
     out = image_first.aligned(painting, grid, columns + left + right, rows + top + bottom, CELL)
+    # Where the playable ground comes from the painting: a white picture of its size
+    # brought onto the page's grid as the ground was.
+    white = Image.new("RGB", Image.open(scene.painting).size, (255, 255, 255))
+    seen = np.array(image_first.aligned(white, scene.grid, columns, rows, CELL)).min(axis=2)
+    inside = seen > 250
+    xs = np.nonzero(inside[inside.shape[0] // 2])[0]
+    ys = np.nonzero(inside[:, inside.shape[1] // 2])[0]
+    x0, x1, y0, y1 = xs[0], xs[-1], ys[0], ys[-1]
     yy, xx = np.arange(floor.height)[:, None], np.arange(floor.width)[None, :]
-    edge = np.minimum(
-        np.minimum(yy, floor.height - 1 - yy), np.minimum(xx, floor.width - 1 - xx)
-    ).astype(np.float32)
+    edge = np.minimum(np.minimum(yy - y0, y1 - yy), np.minimum(xx - x0, x1 - xx)).astype(
+        np.float32
+    )
     alpha = Image.fromarray((np.clip(edge / MARGIN_FADE, 0, 1) * 255).astype(np.uint8))
     out.paste(floor.convert("RGB"), (left * CELL, top * CELL), alpha)
     return out
@@ -328,7 +339,7 @@ def scene(settings: Settings) -> Path:
     floor = patched(floor, settings.patches)
     margin = settings.data.get("margin")
     if margin:
-        floor = with_margin(floor, margin)
+        floor = with_margin(floor, margin, settings)
     webp(floor, out / "ground.webp")
     rows_out = []
     for layer in field["layers"]:

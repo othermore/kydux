@@ -157,8 +157,15 @@ three when they go wrong over a cell walked on; the others it cannot see.
 
 Each character is a sheet of four rows, one for each way it faces (down,
 left, right, up), with three walking frames in a row. The wizard's sheet
-has four more rows below, in the same order: casting, with the wand
-raised, pointed with its light, and lowered. The frames are drawn on the
+has four more rows below, in the walking rows' order: casting, with the
+wand raised, pointed with its light, and lowered. Then four rows picking
+up, in the same order: bending forward, both hands at the ground in front
+of the feet, in the middle, never to a side, and half up again; a frame
+the model draws too tall is lowered to the same depth for every way, and
+the row seen from behind, which a model leaves standing, is the standing
+frame lowered so. Last, one row facing down, celebrating: the arms up, a
+jump, down again. `figures.json` names where each part begins (`rows`),
+and the page reads it there. The frames are drawn on the
 same scale as the scenes. `content/art/figures/figures.json` says the
 frame's size and where the feet are.
 

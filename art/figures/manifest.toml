@@ -1,4 +1,4 @@
-# The base sheets every look and friend is recoloured from (tools/art/figures.py): the walking sheets, and the wizard's casting frames.
+# The base sheets every look and friend is recoloured from (tools/art/figures.py): the walking sheets, and the wizard's casting, picking-up and celebrating frames.
 
 ["wizard-base-boy.webp"]
 source = "generated: gemini-3-pro-image, tools/art/prompts/demo-wizard.md; cut by tools/art/sprites.py"
@@ -27,5 +27,25 @@ licence = "GPL-3.0-or-later"
 
 ["wizard-cast-girl.webp"]
 source = "generated: gemini-3-pro-image, an edit of wizard-base-girl.webp, tools/art/prompts/figure-cast-girl.md; put on its grid by tools/art/figures.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["wizard-pickup-boy.webp"]
+source = "generated: gemini-3-pro-image, an edit of wizard-base-boy.webp, tools/art/prompts/figure-pickup-boy.md; put on its grid and its frames lowered by tools/art/figures.py --pickup, the row from behind made from the standing frame"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["wizard-pickup-girl.webp"]
+source = "generated: gemini-3-pro-image, an edit of wizard-base-girl.webp, tools/art/prompts/figure-pickup-girl.md; put on its grid and its frames lowered by tools/art/figures.py --pickup, the row from behind made from the standing frame"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["wizard-win-boy.webp"]
+source = "generated: gemini-3-pro-image, an edit of a sheet of wizard-base-boy.webp's standing frame, tools/art/prompts/figure-act-boy.md; its celebrating row put on its grid by tools/art/figures.py --win"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["wizard-win-girl.webp"]
+source = "generated: gemini-3-pro-image, an edit of a sheet of wizard-base-girl.webp's standing frame, tools/art/prompts/figure-act-girl.md; its celebrating row put on its grid by tools/art/figures.py --win"
 author = "Kydux contributors"
 licence = "GPL-3.0-or-later"

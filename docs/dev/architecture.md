@@ -986,3 +986,33 @@ one overturns stays, marked as superseded.
   ends in *Back to the level* in place of *Try it* and leaves the place in
   the course as it was. Rules out the map as a screen the player leaves
   the level for.
+- **D72 — Where the game's pieces come from.** Decided 2026-10-23 by the
+  trials of sprint 12 (12.1), each candidate drawing one brief (a wizard's
+  walking sheet, a wall's pieces for every join, grass and a path that
+  repeat without a seam, a door) into `art/raw/`, judged on a contact sheet
+  (`tools/art/contact.py`) that draws a test scene with its pieces:
+
+  | Candidate | Joins | Characters | Cost, time |
+  | --- | --- | --- | --- |
+  | Gemini 3.1 Flash Image | No: its own grid, pieces in no order | Charming, a grid of its own | Cents, 12 s |
+  | Gemini 3 Pro Image | Partly: 15 of 16 wall joins, each piece its own shade of grass, so seams show | Good, a grid of its own | Cents, 20 s |
+  | Art as code (`tools/art/draw.py`) | Perfect, by construction | Plain | Free, instant |
+  | Retro Diffusion (`rd_tile__tileset_advanced`, `rd_animation__four_angle_walking`) | Perfect, as a corner set | A walk in four directions, small | 0.10 $ a set, 0.07 $ a walk, 30 s |
+  | PixelLab (`create-tileset`, `create-character-with-4-directions`) | Perfect, as a corner set, with a raised edge | Eight directions, the best | One of 40 trial generations each, 50 s; the raised walls of its pro mode need a paid tier |
+
+  Image models draw terrain badly as pieces that must join, and the two
+  pixel-art services draw it well as corner sets (Wang tiles: each piece
+  says which of its four corners are the upper terrain), placed on a
+  grid offset by half a tile from the map's. So the terrain is regions of
+  terrain joined by corner sets, from PixelLab (Retro Diffusion as the
+  cheaper second); a wall or a hedge is a raised terrain with its edge,
+  not a thin line of its own; the characters come from PixelLab, their
+  walks from its animation or from Retro Diffusion's; things, props and
+  the characters' portraits from Gemini 3 Pro, cut by `tools/art/cut.py`;
+  the art made as code stays for the placeholders and the interface's
+  frames. The services draw 32-pixel tiles: the game's grid becomes 32
+  pixels drawn at twice their size. The music comes from Lyria
+  (`lyria-3-clip-preview` for a chapter's theme, through
+  `tools/sound/generate.py`); the effects are made as the game plays
+  (`app/src/engine/sfx.ts`). Rules out thin-wall piece sets and the
+  isometric view.

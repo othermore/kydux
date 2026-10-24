@@ -1,8 +1,10 @@
-// The settings: the language, the playback speed and the editor's text size.
+// The settings: the language, the playback speed, the editor's text size and
+// whether the game's sounds play.
 // Each change is saved in the progress document and applies at once; Back
 // returns to the screen the child came from.
 
 import type { Speed } from '../engine/playback';
+import { setMuted } from '../engine/sfx';
 import { currentLanguage, languages, setLanguage, t } from '../i18n';
 import * as progress from '../progress/progress';
 import { element } from './dom';
@@ -64,6 +66,19 @@ export function settingsScreen(parts: SettingsScreenParts): Screen {
           (size) => {
             progress.setSetting('fontSize', Number(size));
             applyLook(progress.settings());
+          },
+        ),
+        choice(
+          'settings-sound',
+          t('settings.sound'),
+          [
+            ['on', t('settings.sound_on')],
+            ['off', t('settings.sound_off')],
+          ],
+          now.sound ? 'on' : 'off',
+          (value) => {
+            progress.setSetting('sound', value === 'on');
+            setMuted(value !== 'on');
           },
         ),
       ]),

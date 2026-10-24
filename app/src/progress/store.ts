@@ -14,6 +14,8 @@ export interface Settings {
   fontSize: number;
   /** The scene's share of the level screen's width, from 0.35 to 0.75. */
   split: number;
+  /** Whether the game's sounds play. */
+  sound: boolean;
 }
 
 export interface LevelProgress {
@@ -61,7 +63,7 @@ export interface Progress {
 export const SPLIT_MIN = 0.35;
 export const SPLIT_MAX = 0.75;
 
-export const DEFAULT_SETTINGS: Settings = { speed: 1, fontSize: 17, split: 0.6 };
+export const DEFAULT_SETTINGS: Settings = { speed: 1, fontSize: 17, split: 0.6, sound: true };
 /** The most stars a level gives; the map draws that many. */
 export const MAX_STARS = 3;
 const ITEM = /^(lesson|level):[a-z0-9][a-z0-9-]*$/;
@@ -133,7 +135,8 @@ export function readProgress(value: unknown): Progress | null {
   if (typeof value.language === 'string') progress.language = value.language;
   progress.wizard = readWizard(value.wizard, isLook);
   if (isObject(value.settings)) {
-    const { speed, fontSize, split } = value.settings;
+    const { speed, fontSize, split, sound } = value.settings;
+    if (typeof sound === 'boolean') progress.settings.sound = sound;
     if (speed === 1 || speed === 2 || speed === 4) progress.settings.speed = speed;
     if (typeof fontSize === 'number' && fontSize >= 10 && fontSize <= 40) {
       progress.settings.fontSize = fontSize;

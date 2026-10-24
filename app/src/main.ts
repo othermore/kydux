@@ -9,6 +9,7 @@ import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
 import type { MapScreenParts } from './ui/map';
 import type { Screen } from './ui/screen';
+import { setMuted } from './engine/sfx';
 import { applyLook } from './ui/look';
 import { settingsScreen } from './ui/settings';
 import { startScreen } from './ui/start';
@@ -384,6 +385,7 @@ if (root) {
   keepLanguageIn(progress.languageStorage);
   initLanguage();
   applyLook(progress.settings());
+  setMuted(!progress.settings().sound);
   window.addEventListener('hashchange', route);
   // Play time (D70): the seconds a level, a lesson or a story page is on screen,
   // with the tab in sight, counted to the game being played.

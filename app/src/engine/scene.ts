@@ -37,6 +37,7 @@ import {
 import { Playback } from './playback';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
+import { play } from './sfx';
 import { blockedText, friendText } from './words';
 
 /** How long one tick lasts at speed 1. */
@@ -361,6 +362,7 @@ class LevelScene extends Phaser.Scene {
    * the word is said, so that the child sees the word, then the door. */
   private openDoor(id: string, instant = true, byWord = false): void {
     this.openDoors.add(id);
+    if (!instant) play('door');
     if (instant || !byWord) {
       this.things.get(id)?.setFrame('open');
       return;
@@ -399,6 +401,7 @@ class LevelScene extends Phaser.Scene {
         this.wizardTile = to;
         const [x, y] = centre(to);
         this.tweens.add({ targets: this.wizard, x, y, duration, ease: 'Linear' });
+        play('step');
         break;
       }
       case 'bump': {
@@ -406,12 +409,16 @@ class LevelScene extends Phaser.Scene {
         if (!at) return;
         this.placeWizard(at, facing ?? 'down');
         if (!instant) this.nudge(this.wizard, facing ?? 'down', duration);
+        if (!instant) play('bump');
         // A friend in the way: the wizard thinks who (D66).
         if (!instant && event.data.by === 'friend') this.think(friendText(String(event.data.id)), tick);
         break;
       }
       case 'say':
-        if (!instant) this.say(String(event.data.text ?? ''), tick);
+        if (!instant) {
+          this.say(String(event.data.text ?? ''), tick);
+          play('say');
+        }
         break;
       case 'pick_up': {
         const id = String(event.data.id);
@@ -429,13 +436,17 @@ class LevelScene extends Phaser.Scene {
           });
         }
         this.carried.add(id);
+        if (!instant) play('pick_up');
         break;
       }
       case 'open':
         this.openDoor(String(event.data.id), instant);
         break;
       case 'cast':
-        if (!instant) this.flash(duration);
+        if (!instant) {
+          this.flash(duration);
+          play('cast');
+        }
         break;
       case 'give':
         this.give(event, instant);

@@ -65,7 +65,7 @@ describe('LocalProgressStore', () => {
       }),
     );
     const read = new LocalProgressStore(storage).load();
-    expect(read.settings).toEqual({ speed: 1, fontSize: 17, split: 0.5 });
+    expect(read.settings).toEqual({ speed: 1, fontSize: 17, split: 0.5, sound: true });
     expect(read.levels.a).toEqual({ stars: 2 });
     expect(read.levels.b).toEqual({});
     expect(read.levels.c).toEqual({});

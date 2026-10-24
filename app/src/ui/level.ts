@@ -14,6 +14,7 @@ import { currentLanguage, t } from '../i18n';
 import * as progress from '../progress/progress';
 import { DEFAULT_SETTINGS, SPLIT_MAX, SPLIT_MIN } from '../progress/store';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
+import { onPlayed, play } from '../engine/sfx';
 import { type Card, startCard, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
 import { type Guide, type GuideText, openGuide } from './guide';
@@ -104,6 +105,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const kind = typeof loaded.level.kind === 'string' ? loaded.level.kind : 'practice';
   const task = () => (kind === 'fix' || kind === 'improve' ? t(`level.kind_${kind}`) : undefined);
   const sceneParent = element('div', { id: 'scene', className: 'scene' });
+  // The last sound played, for the tests, which cannot hear.
+  onPlayed((name) => {
+    sceneParent.dataset.sound = name;
+  });
   const goalsSlot = element('div', { className: 'goals-slot' });
   const bonus = ((loaded.level.goals as { bonus?: boolean }[] | undefined) ?? []).map(
     (goal) => goal.bonus === true,
@@ -429,6 +434,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     if (force || snapshot.outcome !== shownOutcome) {
       if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed, wayName);
       else card.hide();
+      // A run's end has its sound (the settings may silence it).
+      if (!force && snapshot.outcome) play(snapshot.outcome.kind === 'won' ? 'win' : 'fail');
       if (snapshot.outcome && snapshot.outcome.kind !== 'won' && snapshot.outcome.kind !== 'failed') {
         if (!hintsOffered && !force) progress.markTried(loaded.id);
         hintsOffered = true;

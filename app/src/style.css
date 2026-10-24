@@ -1567,3 +1567,10 @@ a.stop-body:focus-visible {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* Find my wizard, beside the zoom, while the camera has let go of the wizard (12.6). */
+.zoom-button.find-wizard {
+  width: auto;
+  padding: 0 10px;
+  font-size: 14px;
+}

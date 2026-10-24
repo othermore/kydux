@@ -4,7 +4,7 @@ import { loadGuideText } from './content/guide';
 import { LessonNotFound, loadLesson } from './content/lessons';
 import { loadStory, StoryNotFound } from './content/stories';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
-import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
+import { currentLanguage, fallbackLanguage, forWizard, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
 import * as progress from './progress/progress';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
@@ -50,7 +50,19 @@ function parseRoute(hash: string): Route {
   return { name: 'start' };
 }
 
+/** A title from the course, in the language now set or the fallback, made for the
+ * wizard (D37); null when the course has none. */
+function courseTitle(course: Course | null, key: string): string | null {
+  const titles = course?.titles?.[key];
+  const title = titles?.[currentLanguage()] ?? titles?.[fallbackLanguage];
+  return title ? forWizard(title) : null;
+}
+
+let courseForTitles: Course | null = null;
+
 async function chapterTitle(id: string): Promise<string> {
+  const known = courseTitle(courseForTitles, `chapter:${id}`);
+  if (known) return known;
   const response = await fetch(
     `${import.meta.env.BASE_URL}content/chapters/${id}/text.${currentLanguage()}.json`,
   );
@@ -58,8 +70,11 @@ async function chapterTitle(id: string): Promise<string> {
   return ((await response.json()) as { title?: string }).title ?? id;
 }
 
-/** An item's title in the language now set. */
+/** An item's title in the language now set: from the course, else from the item. */
 async function itemTitle(item: string): Promise<string> {
+  courseForTitles ??= await loadCourse().catch(() => null);
+  const known = courseTitle(courseForTitles, item);
+  if (known) return known;
   const parsed = parseItem(item);
   if (!parsed) return item;
   if (parsed.kind === 'level') {

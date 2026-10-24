@@ -24,6 +24,8 @@ export interface Course {
   /** For each level of the course, every name taught by it and by the levels
    * before it (D40). */
   known?: Record<string, string[]>;
+  /** Each item's title, and each chapter's as `chapter:<id>`, by language (12.6). */
+  titles?: Record<string, Record<string, string>>;
 }
 
 export type ItemKind = 'story' | 'lesson' | 'level';

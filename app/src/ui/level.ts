@@ -200,7 +200,15 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   };
   zoomIn.addEventListener('click', () => zoomBy(1));
   zoomOut.addEventListener('click', () => zoomBy(-1));
-  const zoomBox = element('div', { className: 'zoom-box' }, [zoomIn, zoomOut]);
+  // When the camera has let go of the wizard, a button brings it back (12.6).
+  const findWizard = element('button', { id: 'find-wizard', type: 'button', className: 'zoom-button find-wizard', hidden: true }, [
+    t('level.find_wizard'),
+  ]);
+  findWizard.addEventListener('click', () => scene?.follow());
+  new MutationObserver(() => {
+    findWizard.hidden = sceneParent.dataset.following !== 'false';
+  }).observe(sceneParent, { attributes: true, attributeFilter: ['data-following'] });
+  const zoomBox = element('div', { className: 'zoom-box' }, [zoomIn, zoomOut, findWizard]);
 
   // The notebook opens over the scene, beside the editor, so that an example
   // clicked lands where the child can see it.
@@ -645,6 +653,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       about.setAttribute('aria-label', t('level.about'));
       about.title = t('level.about');
       restartNote.textContent = t('level.starting_again');
+      findWizard.textContent = t('level.find_wizard');
       timeline.setAttribute('aria-label', t('level.timeline'));
       labelSettings();
       labelKeys();

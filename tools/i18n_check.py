@@ -23,7 +23,8 @@ Fails, printing file:line: message for each, on:
     step of its story.json (D74); or a figure who speaks in it, or its
     speaker, without its name in a language;
   - the screen's guide, content/guide/, without a text.<lang>.json for every
-    language, or with steps that differ between languages or lack their words;
+    language, or with steps that differ between languages, lack their words, or
+    are not the steps GUIDE_STEPS in app/src/ui/guide.ts walks through, in order;
   - a string literal in the app's code that reads like words for a person (words
     separated by spaces, with a capitalised word or a sentence's final stop),
     which must come from t() instead. A line marked `// i18n-ignore` is left alone, and
@@ -172,6 +173,16 @@ def check_guide(languages: list[str]) -> list[str]:
                 findings.append(f"content/guide/text.{lang}.json: {key} lacks its title or text")
     if len({tuple(keys) for keys in steps.values()}) > 1:
         findings.append("content/guide: the languages' steps differ")
+    # The steps the screen walks through, GUIDE_STEPS in app/src/ui/guide.ts (12.6):
+    # each has its words, and no words are for a step the screen does not have.
+    source = (SOURCES / "ui" / "guide.ts").read_text(encoding="utf-8")
+    listed = re.search(r"GUIDE_STEPS[^=]*=\s*\[(.*?)\];", source, re.S)
+    shown = re.findall(r"key:\s*'([\w-]+)'", listed.group(1)) if listed else []
+    for lang, keys in steps.items():
+        if keys != shown:
+            findings.append(
+                f"content/guide/text.{lang}.json: steps {keys}, not GUIDE_STEPS' {shown}"
+            )
     return findings
 
 

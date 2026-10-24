@@ -71,7 +71,8 @@
     "kind_fix": "This program does not work yet. Find what is wrong, and fix it.",
     "kind_improve": "This program works, but it can be better. Make it better.",
     "continue": "Continue",
-    "starting_again": "Starting the level again…"
+    "starting_again": "Starting the level again…",
+    "find_wizard": "Find my wizard"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",

@@ -161,9 +161,42 @@ for (const chapter of chapters) {
     concepts[id] = [...ideas];
   }
 }
+// Each item's title in every language (12.6), so that the map and the start screen
+// name the items without fetching each one; and each chapter's.
+const languages = readdirSync(join(repo, 'i18n'))
+  .filter((name) => name.endsWith('.json'))
+  .map((name) => name.replace(/\.json$/, ''));
+const readText = (...path) => {
+  const file = join(repo, 'content', ...path);
+  return existsSync(file) ? readFileSync(file, 'utf8') : null;
+};
+const titleOf = (item, lang) => {
+  const [kind, id] = item.split(':');
+  if (kind === 'lesson') {
+    const markdown = readText('lessons', id, `${lang}.md`);
+    return markdown ? (/^#\s+(.+)$/m.exec(markdown)?.[1]?.trim() ?? null) : null;
+  }
+  const folder = kind === 'story' ? 'stories' : 'levels';
+  const text = readText(folder, id, `text.${lang}.json`);
+  return text ? (JSON.parse(text).title ?? null) : null;
+};
+const titles = {};
+for (const chapter of chapters) {
+  for (const item of chapter.items) {
+    titles[item] = Object.fromEntries(languages.flatMap((lang) => {
+      const title = titleOf(item, lang);
+      return title ? [[lang, title]] : [];
+    }));
+  }
+  const words = Object.fromEntries(languages.flatMap((lang) => {
+    const text = readText('chapters', chapter.id, `text.${lang}.json`);
+    return text && JSON.parse(text).title ? [[lang, JSON.parse(text).title]] : [];
+  }));
+  titles[`chapter:${chapter.id}`] = words;
+}
 writeFileSync(
   join(content, 'course.json'),
-  `${JSON.stringify({ chapters, known, concepts, numbers }, null, 2)}\n`,
+  `${JSON.stringify({ chapters, known, concepts, numbers, titles }, null, 2)}\n`,
 );
 
 // The table of what the child can type, from the world itself (D30): the

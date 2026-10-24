@@ -57,6 +57,8 @@ export const VIEW_TILES: Tile = [15, 9];
  * long it stays out (D75). */
 const RESTART_FADE_MS = 180;
 const RESTART_HOLD_MS = 360;
+/** How far, in pixels, the pointer moves before a press is a drag of the camera. */
+const DRAG_THRESHOLD = 6;
 /** The zooms the player steps through, from the whole scene to a close look. */
 export const ZOOMS = [0.5, 0.75, 1, 1.5, 2] as const;
 const ZOOM_START = ZOOMS.indexOf(1);
@@ -129,6 +131,8 @@ export interface SceneHandle {
   /** Shows the level starting again: the scene fades, everything is put back, and
    * it comes back; resolves once it is shown (D75). */
   restartShow(): Promise<void>;
+  /** The camera back on the wizard, following it (12.6). */
+  follow(): void;
   /** Zooms the camera one step in (1) or out (-1); false when it can go no further. */
   zoom(step: 1 | -1): boolean;
   /** Whether the camera can zoom one step in (1) or out (-1). */
@@ -414,8 +418,21 @@ class LevelScene extends Phaser.Scene {
     this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => {
       if (dy !== 0) this.zoomBy(dy < 0 ? 1 : -1);
     });
+    // The wheel over the scene zooms it, and does not scroll the page under it.
+    this.parentNode.addEventListener('wheel', (event) => event.preventDefault(), { passive: false });
+    // A drag lets go of the wizard only once it is a real drag, a few pixels long, so
+    // that a click or a shaky tap does not (12.6).
+    let dragging = false;
+    this.input.on('pointerdown', () => {
+      dragging = false;
+    });
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
       if (!pointer.isDown) return;
+      if (!dragging) {
+        const far = Math.hypot(pointer.x - pointer.downX, pointer.y - pointer.downY);
+        if (far < DRAG_THRESHOLD) return;
+        dragging = true;
+      }
       const dx = pointer.x - pointer.prevPosition.x;
       const dy = pointer.y - pointer.prevPosition.y;
       if (dx === 0 && dy === 0) return;
@@ -985,6 +1002,9 @@ export async function startScene(
         },
         restartShow() {
           return scene.restartShow();
+        },
+        follow() {
+          scene.follow();
         },
         zoom(step) {
           return scene.zoomBy(step);

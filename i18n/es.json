@@ -71,7 +71,8 @@
     "kind_fix": "Este programa todavía no funciona. Encuentra qué falla, y arréglalo.",
     "kind_improve": "Este programa funciona, pero puede ser mejor. Mejóralo.",
     "continue": "Continuar",
-    "starting_again": "Empezando el nivel otra vez…"
+    "starting_again": "Empezando el nivel otra vez…",
+    "find_wizard": "Buscar a {mi mago|mi maga}"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",

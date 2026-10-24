@@ -1,22 +1,26 @@
 {
   "id": "which-way",
-  "map": [
-    "#########",
-    "#S.....##",
-    "#D####.##",
-    "#.####.##",
-    "#E.....##",
-    "#########"
-  ],
+  "kind": "practice",
+  "scene": "the-library",
+  "start": [8, 10],
+  "end": [8, 6],
+  "speaker": "wenna",
+  "carrying": ["wand"],
   "things": [
     {
       "kind": "door",
       "id": "door",
-      "marker": "D",
+      "at": [8, 8],
       "locked": true
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [6, 9]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -38,6 +42,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "wenna"
+  "tick_limit": 100
 }

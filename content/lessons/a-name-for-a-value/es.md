@@ -1,42 +1,28 @@
 # Un nombre para un valor
 
-Un programa usa a menudo el mismo valor muchas veces.
-Imagina que {el mago|la maga} tiene que andar cuatro casillas, tres veces seguidas.
-
-Escribir `4` tres veces funciona.
-Pero si el pasillo cambia, tienes que buscar cada `4` y cambiarlo.
-Y es fácil que se te escape uno.
-
-Por eso un programa puede darle un **nombre** a un valor, y usar el nombre en su lugar.
-Un nombre para un valor es una **variable**.
+Una biblioteca ama el orden. A veces usas el mismo valor muchas veces. Escribir el mismo valor una y otra vez puede llevar a errores. Podemos darle un nombre a un valor para mantener las cosas ordenadas. Un nombre para un valor es lo que los programadores llaman una variable.
 
 ---
 
-## Dar un nombre
+Así es como damos un nombre. Usamos el signo igual. El `=` pone el valor bajo el nombre. No pregunta si son iguales.
 
 ```python
-steps = 4
+steps = 3
 ```
 
-El `=` le da el nombre `steps` al valor `4`.
-No pregunta si son iguales: guarda el valor bajo ese nombre.
-
-A partir de ahí, `steps` significa `4`:
+Desde ahora, `steps` significa `3`. Puedes usarlo como argumento para un método.
 
 ```python
 wizard.move_right(steps)
 ```
 
-Para cambiar el valor, solo cambias la línea que lo da.
-
 ---
 
 ## Pruébalo
 
-En la sala de lectura, {el mago|la maga} anda la misma distancia tres veces.
-Escribe el número una sola vez, como una variable.
+Ahora es tu turno. Escribe el número una sola vez. Mantén el orden en tu código, {wizard}.
 
 ```python try
-steps = 2
+steps = 3
 wizard.move_right(steps)
 ```

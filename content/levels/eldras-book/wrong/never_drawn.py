@@ -1,0 +1,7 @@
+wizard.move_left(2)
+wizard.pick_up()
+wizard.move_left()
+door.open()
+wizard.move_left(3)
+book = wizard.find_nearest("book")
+wizard.give(book)

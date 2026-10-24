@@ -1,13 +1,16 @@
 {
   "title": "The reading room",
   "goals": [
-    "Cross the reading room.",
+    "Reach Wenna's desk.",
     "Write the number only once."
   ],
-  "starting_code": "# Right, down, right: the same number of tiles each time.\n",
+  "starting_code": "# This works, but it writes the same number three times. Give the number a name!\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(3)\n",
   "hints": [
-    "Count the tiles of one stretch: the other two are as long.",
-    "Give the number a name first, like `steps = ...`, and then use the name in every line."
+    "We want to use the number `3` many times.",
+    "Use the `=` sign. Put the number `3` under a name like `steps`.",
+    "Write the name inside the brackets of the actions."
   ],
-  "intro": "Welcome to the library. Walk quietly, please: three stretches, each as long as the others."
+  "intro": "Welcome to the library, {wizard}. This is the reading room. My program here works. But we can make it tidier.",
+  "outro": "Very well done! A tidy program is easier to read.",
+  "learned": "Now you know how to give a name to a value, which programmers call a variable."
 }

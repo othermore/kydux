@@ -1,46 +1,32 @@
 # Finding things
 
-Some actions do something.
-Others give something back: an answer.
-
-`wizard.find_nearest("book")` looks for the nearest book, and gives it back.
-
-To use what an action gives back, keep it under a name.
-A variable can keep a thing, just as it keeps a number.
+Some actions change the world. Other actions give something back to you. They give back an answer. You must keep that answer safe. You keep it under a variable.
 
 ---
 
-## Keeping what is found
+You can look for a lost object. `find_nearest` gives back the nearest thing of that kind.
 
 ```python
 book = wizard.find_nearest("book")
-print(book.position)
 ```
 
-Now `book` is the book itself.
-You can ask it things, like where it lies.
-
-When there is nothing of that kind, `find_nearest` gives back `None`.
-`None` is Python's word for *nothing*.
+Now `book` holds the book itself. You can ask for its attributes, like `book.position`. If there is no book, it gives back `None`. `None` is a special word for nothing.
 
 ---
 
-## Giving
-
-The wizard can give a thing it carries to someone right beside it:
+You can also give things away. You can give an object to someone right beside you. You use the `give` method.
 
 ```python
 wizard.give(book)
 ```
 
-In the brackets goes the thing itself: the one the name keeps.
+The argument is the variable that holds the thing.
 
 ---
 
 ## Try it
 
-Eldra, the library's ghost, has lost a book.
-First find out where it lies.
+A good librarian knows where books are. Find the nearest book. Then print its position.
 
 ```python try
 book = wizard.find_nearest("book")

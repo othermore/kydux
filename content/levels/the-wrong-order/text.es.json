@@ -1,0 +1,16 @@
+{
+  "title": "El orden incorrecto",
+  "goals": [
+    "Abre la puerta.",
+    "Pasa por ella."
+  ],
+  "starting_code": "# Este programa hace las cosas en el orden incorrecto. ¡Encuéntralo y arréglalo!\nwizard.move_right(2)\nwizard.move_right()\ndoor.open()\nwizard.pick_up()\nwizard.move_right(3)\n",
+  "hints": [
+    "Lee las instrucciones de arriba a abajo.",
+    "El programa intenta abrir la puerta antes de coger la llave.",
+    "Mueve la línea que recoge la llave antes de la línea que abre la puerta."
+  ],
+  "intro": "Escribí este programa para la siguiente puerta cerrada con llave. Me equivoqué con el orden. ¿Puedes arreglarlo?",
+  "outro": "Gracias por arreglar mi código, {wizard}.",
+  "learned": "Ahora sabes que el orden de las instrucciones es muy importante."
+}

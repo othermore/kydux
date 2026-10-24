@@ -1,6 +1,7 @@
 {
   "id": "02-the-library",
   "items": [
+    "story:in-the-castle",
     "lesson:a-name-for-a-value",
     "level:the-reading-room",
     "lesson:what-things-know",
@@ -9,9 +10,11 @@
     "level:the-lost-book",
     "lesson:keys-and-doors",
     "level:the-locked-door",
+    "level:the-wrong-order",
     "level:the-archive",
     "lesson:fendra",
     "level:the-high-shelf",
-    "level:eldras-book"
+    "level:eldras-book",
+    "story:the-wand-bank"
   ]
 }

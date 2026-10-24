@@ -1,15 +1,19 @@
 {
   "id": "the-reading-room",
-  "map": [
-    "##########",
-    "#S...#####",
-    "####.#####",
-    "####.#####",
-    "####...E##",
-    "##########"
-  ],
+  "kind": "improve",
+  "scene": "the-library",
+  "start": [2, 13],
+  "end": [8, 10],
+  "speaker": "wenna",
+  "carrying": ["wand"],
   "things": [],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [6, 9]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -23,10 +27,8 @@
     },
     {
       "kind": "numbers_under",
-      "count": 2,
-      "bonus": true
+      "count": 2
     }
   ],
-  "tick_limit": 100,
-  "speaker": "wenna"
+  "tick_limit": 100
 }

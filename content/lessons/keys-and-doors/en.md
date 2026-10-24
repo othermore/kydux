@@ -1,33 +1,28 @@
 # Keys and doors
 
-Most doors open by hand.
-Some are locked, and open only with their key.
-
-So the wizard needs the key first, carried.
-Then the wizard stands beside the door, and opens it.
+We like open doors in the library. Most doors open by hand. A door is an object. It has an action of its own. You can tell it to open.
 
 ---
 
-## Opening a door
-
-A door is an object too, with an action of its own:
+You must stand right beside the door. Then you use its method.
 
 ```python
 door.open()
 ```
 
-The wizard must stand right beside the door.
-If the door is locked, the wizard must carry its key.
-A door that is not locked opens the same way, with no key.
+But some doors are locked. They protect special rooms. A locked door only opens with its key.
+
+---
+
+You must hold the key to open a locked door. So you must pick up the key first. Order is very important here. Walk to the key, pick it up, and then open the door.
 
 ---
 
 ## Try it
 
-In the next room, the key lies on the floor, and the door is locked.
-Pick up the key first.
+The next room is locked. The key lies on the floor. Pick up the key first.
 
 ```python try
-wizard.move_right(4)
+wizard.move_up(2)
 wizard.pick_up()
 ```

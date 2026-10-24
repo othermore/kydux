@@ -3,14 +3,16 @@
   "goals": [
     "Pick up the key.",
     "Open the door.",
-    "Reach the room beyond the door.",
-    "Do it in fewer than 6 lines."
+    "Walk through it.",
+    "In fewer than 7 lines."
   ],
-  "starting_code": "# The door is locked, and its key is on the floor.\n# Walk to the key, pick it up, then open the door.\nwizard.move_right(4)\n",
+  "starting_code": "# Take the key first.\n# Then open the door.\n",
   "hints": [
-    "The door needs the key. Where is the key?",
-    "Walk onto the key's tile and pick it up with `wizard.pick_up()`.",
-    "Stand next to the door before you open it, with `door.open()`."
+    "The key lies on the floor. Walk up to it and take it.",
+    "Now walk to the door. You must stand right next to it.",
+    "Use the door's own action to open it."
   ],
-  "intro": "This room's door is locked, and its key lies on the floor. You know what to do."
+  "intro": "There is a locked door ahead. It needs its key. A good wizard does things in the right order.",
+  "outro": "You opened the locked door. The top corridor waits.",
+  "learned": "Now you know how to open a door with its key."
 }

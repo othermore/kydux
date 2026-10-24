@@ -1,46 +1,32 @@
 # Encontrar cosas
 
-Algunas acciones hacen algo.
-Otras devuelven algo: una respuesta.
-
-`wizard.find_nearest("book")` busca el libro más cercano, y lo devuelve.
-
-Para usar lo que devuelve una acción, guárdalo bajo un nombre.
-Una variable puede guardar una cosa, igual que guarda un número.
+Algunas acciones cambian el mundo. Otras acciones te devuelven algo. Te devuelven una respuesta. Debes guardar esa respuesta a salvo. La guardas en una variable.
 
 ---
 
-## Guardar lo que encuentras
+Puedes buscar un objeto perdido. `find_nearest` devuelve la cosa más cercana de ese tipo.
 
 ```python
 book = wizard.find_nearest("book")
-print(book.position)
 ```
 
-Ahora `book` es el libro mismo.
-Le puedes preguntar cosas, como dónde está.
-
-Cuando no hay nada de ese tipo, `find_nearest` devuelve `None`.
-`None` es la palabra de Python para *nada*.
+Ahora `book` guarda el libro en sí. Puedes preguntar por sus atributos, como `book.position`. Si no hay ningún libro, devuelve `None`. `None` es una palabra especial para nada.
 
 ---
 
-## Dar
-
-{El mago|La maga} puede darle una cosa que lleva a alguien que esté justo a su lado:
+También puedes entregar cosas. Puedes darle un objeto a alguien justo a tu lado. Usas el método `give`.
 
 ```python
 wizard.give(book)
 ```
 
-Entre los paréntesis va la cosa misma: la que guarda el nombre.
+El argumento es la variable que guarda la cosa.
 
 ---
 
 ## Pruébalo
 
-Eldra, el fantasma de la biblioteca, ha perdido un libro.
-Primero averigua dónde está.
+Una buena bibliotecaria sabe dónde están los libros. Encuentra el libro más cercano. Luego imprime su posición.
 
 ```python try
 book = wizard.find_nearest("book")

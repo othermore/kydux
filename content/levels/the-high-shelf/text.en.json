@@ -1,14 +1,16 @@
 {
   "title": "The high shelf",
   "goals": [
-    "Bring down the rare book and carry it.",
-    "Walk on to the end of the aisle."
+    "Take the rare book.",
+    "Walk on down the aisle."
   ],
-  "starting_code": "# The book is on the top shelf. Stand in line with it, near enough, and cast fendra.\n",
+  "starting_code": "# Stand in line with the book.\n# Draw it down with the spell.\n",
   "hints": [
-    "fendra reaches three tiles, straight up, down, left or right, over the shelves.",
-    "Walk along the aisle until the book is straight above the wizard.",
-    "After the spell, the book lies on the wizard's tile: pick it up."
+    "Walk to the left until you stand directly under the book.",
+    "Cast the spell `\"fendra\"` to bring the book down to you.",
+    "Remember to take the book in your hands before you walk on."
   ],
-  "intro": "That book is on the top shelf, and no one climbs my shelves. You have your wand, and now you know fendra."
+  "intro": "A rare book rests on that high shelf. You cannot reach it by hand. This is a good place to use your new spell.",
+  "outro": "You brought the book down smoothly. The spell is very useful.",
+  "learned": "Now you know how to use a spell, a word of magic, with the cast method."
 }

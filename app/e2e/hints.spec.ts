@@ -28,12 +28,12 @@ test.describe('in English', () => {
     await hint.click();
     await expect(page.locator('.hint')).toHaveCount(1);
     await expect(page.locator('.hint').first()).toHaveText(
-      'Hint 1 of 3 The door needs the key. Where is the key?',
+      'Hint 1 of 3 The key lies on the floor. Walk up to it and take it.',
     );
     await hint.click();
     await hint.click();
     await expect(page.locator('.hint')).toHaveCount(3);
-    await expect(page.locator('.hint').nth(2).locator('code')).toHaveText('door.open()');
+    await expect(page.locator('.hint').nth(2)).toContainText('the door\'s own action');
     await expect(hint).toBeDisabled();
   });
 

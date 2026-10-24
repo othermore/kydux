@@ -2,14 +2,15 @@
   "title": "The lost book",
   "goals": [
     "Give Eldra her book.",
-    "Find the book with find_nearest."
+    "Find the book with `find_nearest`."
   ],
-  "starting_code": "# Where is the book? Find it, bring it, and give it to Eldra.\n",
+  "starting_code": "# Find the book.\n# Pick it up and give it to Eldra.\n",
   "hints": [
-    "Keep what `find_nearest` gives back under a name, and print where it lies.",
-    "Pick the book up on its tile, then walk back until you stand right beside Eldra.",
-    "In the brackets of `wizard.give` goes the book itself: the name you kept it under."
+    "Look for the nearest `\"book\"` and give it a name with `=`.",
+    "Find out where the book is. Walk there and pick it up.",
+    "Walk to Eldra. Then use the `give` action with the book's name."
   ],
-  "intro": "Oh, someone new! I lost my book, oh, so long ago. Could you find it, and bring it to me?",
-  "outro": "My book! After all these years. Thank you, {wizard}."
+  "intro": "Eldra the ghost stands over there. She lost a book long ago. I am sure you can find it for her.",
+  "outro": "You brought the book back! Eldra is very happy.",
+  "learned": "Now you know how to find a thing and keep it under a variable."
 }

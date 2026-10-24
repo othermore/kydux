@@ -2,14 +2,15 @@
   "title": "El libro perdido",
   "goals": [
     "Dale a Eldra su libro.",
-    "Encuentra el libro con find_nearest."
+    "Encuentra el libro con `find_nearest`."
   ],
-  "starting_code": "# ¿Dónde está el libro? Encuéntralo, tráelo y dáselo a Eldra.\n",
+  "starting_code": "# Encuentra el libro.\n# Recógelo y dáselo a Eldra.\n",
   "hints": [
-    "Guarda bajo un nombre lo que devuelve `find_nearest`, y escribe dónde está.",
-    "Coge el libro en su casilla, y luego vuelve hasta quedar justo al lado de Eldra.",
-    "Entre los paréntesis de `wizard.give` va el libro mismo: el nombre bajo el que lo guardaste."
+    "Busca el `\"book\"` más cercano y dale un nombre con `=`.",
+    "Averigua dónde está el libro. Camina hasta allí y recógelo.",
+    "Camina hacia Eldra. Luego usa la acción `give` con el nombre del libro."
   ],
-  "intro": "¡Oh, alguien nuevo! Perdí mi libro, ay, hace tanto tiempo. ¿Me lo encuentras, y me lo traes?",
-  "outro": "¡Mi libro! Después de tantos años. Gracias, {wizard}."
+  "intro": "La fantasma Eldra está allí. Perdió un libro hace mucho tiempo. Estoy segura de que puedes encontrarlo para ella.",
+  "outro": "¡Has traído el libro de vuelta! Eldra está muy feliz.",
+  "learned": "Ahora sabes cómo encontrar una cosa y guardarla bajo una variable."
 }

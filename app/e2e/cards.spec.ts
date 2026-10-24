@@ -43,15 +43,15 @@ test('a won run shows its stars, and Next opens what comes next in the course', 
   await page.locator('#speed').selectOption('4');
   await run(
     page,
-    'wizard.move_right(4)\nwizard.pick_up()\nwizard.move_right(2)\ndoor.open()\nwizard.move_down(2)',
+    'wizard.move_up(2)\nwizard.pick_up()\nwizard.move_up()\nwizard.move_right(3)\ndoor.open()\nwizard.move_right(3)',
   );
   const win = page.locator('.win-card');
   await expect(win).toBeVisible();
   await expect(win.locator('.stars')).toHaveAttribute('data-stars', '3');
   await expect(win.locator('.stars')).toHaveAttribute('aria-label', '3 of 3 stars');
   await page.locator('#next').click();
-  await expect(page).toHaveURL(/#level\/the-archive$/);
-  await expect(page.locator('.level-title')).toHaveText('The archive');
+  await expect(page).toHaveURL(/#level\/the-wrong-order$/);
+  await expect(page.locator('.level-title')).toHaveText('The wrong order');
 });
 
 test('Play again closes the win card; the last level says there is no next yet', async ({

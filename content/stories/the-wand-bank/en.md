@@ -1,0 +1,15 @@
+# The wand bank
+
+Eldra the ghost smiles. She holds her lost book. "I thank you, {wizard}," she whispers. "It is wonderful to read my favorite story again." She floats happily away.
+
+---
+
+You reach the counter at the end of the library. This is the wand bank. Nuri is waiting for you there. You borrow a school wand for the year. You give the spare wand back to your friend.
+
+---
+
+You learned a lot from Wenna. You gave a name to a value, a variable. You found out what a thing knows, an attribute. You showed it with `print`. You used an action that gives something back, like `find_nearest`.
+
+---
+
+You used a key on a door that opens with `door.open()`. You learned a spell that reaches far, `fendra`. Now night falls over the castle. People whisper about the dark passages. They wonder who walks there after dark.

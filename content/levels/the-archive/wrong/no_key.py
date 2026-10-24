@@ -1,5 +1,5 @@
-wizard.move_right()
+wizard.move_down()
 archive_door.open()
-wizard.move_right(5)
+wizard.move_down(4)
 vault_door.open()
-wizard.move_right(2)
+wizard.move_down(3)

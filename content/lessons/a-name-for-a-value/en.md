@@ -1,42 +1,28 @@
 # A name for a value
 
-A program often uses the same value many times.
-Say the wizard must walk four tiles, three times over.
-
-Writing `4` three times works.
-But if the corridor changes, you must find every `4` and change it.
-And it is easy to miss one.
-
-So a program can give a value a **name**, and use the name instead.
-A name for a value is a **variable**.
+A library loves order. Sometimes you use the same value many times. Writing the same value over and over can lead to mistakes. We can give a value a name to keep things tidy. A name for a value is what programmers call a variable.
 
 ---
 
-## Giving a name
+Here is how we give a name. We use the equals sign. The `=` puts the value under the name. It does not ask if they are equal.
 
 ```python
-steps = 4
+steps = 3
 ```
 
-The `=` gives the name `steps` to the value `4`.
-It does not ask whether they are equal: it puts the value under the name.
-
-From then on, `steps` means `4`:
+From now on, `steps` means `3`. You can use it as an argument for a method.
 
 ```python
 wizard.move_right(steps)
 ```
 
-To change the value, you change only the line that gives it.
-
 ---
 
 ## Try it
 
-In the reading room, the wizard walks the same distance three times.
-Write the number only once, as a variable.
+Now it is your turn. Write the number once. Keep order in your code, {wizard}.
 
 ```python try
-steps = 2
+steps = 3
 wizard.move_right(steps)
 ```

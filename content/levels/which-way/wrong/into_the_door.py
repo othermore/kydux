@@ -1,1 +1,1 @@
-wizard.move_down(3)
+wizard.move_up(4)

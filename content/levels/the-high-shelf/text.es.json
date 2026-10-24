@@ -1,14 +1,16 @@
 {
-  "title": "La estantería alta",
+  "title": "El estante alto",
   "goals": [
-    "Baja el libro raro y llévalo.",
-    "Sigue hasta el final del pasillo."
+    "Coge el libro raro.",
+    "Sigue caminando por el pasillo."
   ],
-  "starting_code": "# El libro está en la balda de arriba. Ponte en línea con él, lo bastante cerca, y lanza fendra.\n",
+  "starting_code": "# Ponte en línea con el libro.\n# Atráelo hacia abajo con el hechizo.\n",
   "hints": [
-    "fendra alcanza tres casillas, en línea recta arriba, abajo, a la izquierda o a la derecha, por encima de las estanterías.",
-    "Camina por el pasillo hasta que el libro quede justo encima {del mago|de la maga}.",
-    "Después del hechizo, el libro está en la casilla {del mago|de la maga}: cógelo."
+    "Camina hacia la izquierda hasta que estés justo debajo del libro.",
+    "Lanza el hechizo `\"fendra\"` para bajar el libro hasta ti.",
+    "Recuerda coger el libro antes de seguir caminando."
   ],
-  "intro": "Ese libro está en la balda de arriba, y nadie se sube a mis estanterías. Tienes tu varita, y ahora conoces fendra."
+  "intro": "Un libro raro descansa en ese estante alto. No puedes alcanzarlo con la mano. Este es un buen lugar para usar tu nuevo hechizo.",
+  "outro": "Bajaste el libro suavemente. El hechizo es muy útil.",
+  "learned": "Ahora sabes cómo usar un hechizo, una palabra de magia, con el método cast."
 }

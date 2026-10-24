@@ -1,0 +1,16 @@
+{
+  "title": "The wrong order",
+  "goals": [
+    "Open the door.",
+    "Walk through it."
+  ],
+  "starting_code": "# This program does things in the wrong order. Find and fix it!\nwizard.move_right(2)\nwizard.move_right()\ndoor.open()\nwizard.pick_up()\nwizard.move_right(3)\n",
+  "hints": [
+    "Read the instructions from top to bottom.",
+    "The program tries to open the door before it takes the key.",
+    "Move the line that picks up the key before the line that opens the door."
+  ],
+  "intro": "I wrote this program for the next locked door. I made a mistake with the order. Can you fix it?",
+  "outro": "Thank you for fixing my code, {wizard}.",
+  "learned": "Now you know that the order of instructions is very important."
+}

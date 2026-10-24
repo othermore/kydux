@@ -1,4 +1,4 @@
-wizard.move_right(4)
+wizard.move_up(2)
 wizard.pick_up()
-wizard.move_right(2)
-wizard.move_down(2)
+wizard.move_up()
+wizard.move_right(6)

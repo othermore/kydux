@@ -1,15 +1,17 @@
 {
   "title": "The archive",
   "goals": [
-    "Open the vault door.",
-    "Reach the vault.",
-    "Find the key with find_nearest."
+    "Open the vault's door.",
+    "Reach the archive's foot.",
+    "Find the key with `find_nearest`."
   ],
-  "starting_code": "# Two doors: one opens by hand, one needs its key.\n",
+  "starting_code": "# A door, a key, and a locked door wait for you.\n",
   "hints": [
-    "`print(archive_door.locked, vault_door.locked)` says which door needs a key.",
-    "The archive door opens by hand. The key lies between the two doors.",
-    "Ask `find_nearest` for the key, and print its position to know where to stop."
+    "Walk to the first door. Use its action to open it.",
+    "Use `find_nearest` to look for the key. Then take it.",
+    "Walk to the second door and unlock it."
   ],
-  "intro": "The archive keeps the oldest books. Its first door opens by hand; the vault's needs a key, which lies somewhere inside."
+  "intro": "This is the narrow way down to the archive. There are many doors here. Keep your code tidy.",
+  "outro": "You found your way through the archive safely.",
+  "learned": "Now you know that a door opens by hand, and a locked door with its key."
 }

@@ -1,44 +1,33 @@
 # A spell that reaches
 
-Some things lie where the wizard cannot walk.
-On a high shelf.
-Across a gap.
-
-Hands cannot reach them.
-A spell can.
+Some books are hard to reach. They rest on high shelves. They lie across wide gaps. Your hands cannot reach them. But a spell can.
 
 ---
 
-## The spell fendra
-
-`fendra` draws a thing to the wizard.
-
-It reaches three tiles, straight ahead in each of the four ways.
-It passes over shelves.
-Walls and closed doors stop it.
-
-It brings the nearest thing it can reach, onto the wizard's tile.
-Then the wizard picks it up, as always: a spell moves things, and hands carry them.
+The spell `fendra` draws things to you. It reaches up to three tiles straight ahead. It looks in all four ways. It passes over shelves. Walls and closed doors stop it.
 
 ---
 
-## Casting it
+It brings the nearest thing it can reach. The thing lands exactly on your tile. Then you must pick it up. A spell moves things, and hands carry them.
+
+---
+
+Like your first spell, it needs your wand. You use the `cast` method with a string.
 
 ```python
 wizard.cast("fendra")
 wizard.pick_up()
 ```
 
-Like `zelim`, it needs the wand.
-If there is nothing near enough, the wizard will tell you so.
+If nothing is near enough, your wizard will tell you.
 
 ---
 
 ## Try it
 
-A book lies on a high shelf.
-Walk until the wizard stands in line with it, near enough, and cast.
+A book lies on a high shelf. Draw it to you, and pick it up.
 
 ```python try
 wizard.cast("fendra")
+wizard.pick_up()
 ```

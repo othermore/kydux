@@ -1,16 +1,18 @@
 {
   "title": "La puerta cerrada",
   "goals": [
-    "Coge la llave.",
+    "Recoge la llave.",
     "Abre la puerta.",
-    "Llega a la sala del otro lado de la puerta.",
-    "Hazlo en menos de 6 líneas."
+    "Pasa por ella.",
+    "En menos de 7 líneas."
   ],
-  "starting_code": "# La puerta está cerrada con llave, y la llave está en el suelo.\n# Camina hasta la llave, cógela y luego abre la puerta.\nwizard.move_right(4)\n",
+  "starting_code": "# Coge la llave primero.\n# Luego abre la puerta.\n",
   "hints": [
-    "La puerta necesita la llave. ¿Dónde está la llave?",
-    "Camina hasta la casilla de la llave y cógela con `wizard.pick_up()`.",
-    "Ponte junto a la puerta antes de abrirla, con `door.open()`."
+    "La llave está en el suelo. Camina hacia ella y cógela.",
+    "Ahora camina hacia la puerta. Debes ponerte justo a su lado.",
+    "Usa la acción de la puerta para abrirla."
   ],
-  "intro": "La puerta de esta sala está cerrada con llave, y su llave está en el suelo. Ya sabes qué hacer."
+  "intro": "Hay una puerta cerrada con llave más adelante. Necesita su llave. {Un buen mago|Una buena maga} hace las cosas en el orden correcto.",
+  "outro": "Has abierto la puerta cerrada con llave. El pasillo superior te espera.",
+  "learned": "Ahora sabes cómo abrir una puerta con su llave."
 }

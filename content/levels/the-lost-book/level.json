@@ -1,24 +1,27 @@
 {
   "id": "the-lost-book",
-  "map": [
-    "########",
-    "#S....G#",
-    "#.######",
-    "#..B####",
-    "########"
-  ],
+  "kind": "practice",
+  "scene": "the-library",
+  "start": [8, 6],
+  "speaker": "wenna",
+  "carrying": ["wand"],
   "things": [
     {
       "kind": "book",
       "id": "old_book",
-      "marker": "B"
+      "at": [10, 4]
     }
   ],
   "actors": [
     {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [6, 9]
+    },
+    {
       "kind": "ghost",
       "id": "eldra",
-      "marker": "G",
+      "at": [13, 6],
       "facing": "left"
     }
   ],
@@ -29,8 +32,8 @@
     "wizard.move_down",
     "wizard.pick_up",
     "wizard.find_nearest",
-    "wizard.give",
-    "thing.position"
+    "thing.position",
+    "wizard.give"
   ],
   "goals": [
     {
@@ -44,6 +47,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "eldra"
+  "tick_limit": 100
 }

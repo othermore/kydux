@@ -1,13 +1,16 @@
 {
   "title": "La sala de lectura",
   "goals": [
-    "Cruza la sala de lectura.",
-    "Escribe el número una sola vez."
+    "Llega al escritorio de Wenna.",
+    "Escribe el número solo una vez."
   ],
-  "starting_code": "# Derecha, abajo, derecha: el mismo número de casillas cada vez.\n",
+  "starting_code": "# Esto funciona, pero escribe el mismo número tres veces. ¡Dale un nombre al número!\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(3)\n",
   "hints": [
-    "Cuenta las casillas de un tramo: los otros dos son igual de largos.",
-    "Dale primero un nombre al número, como `steps = ...`, y luego usa el nombre en cada línea."
+    "Queremos usar el número `3` muchas veces.",
+    "Usa el signo `=`. Pon el número `3` bajo un nombre como `steps`.",
+    "Escribe el nombre dentro de los paréntesis de las acciones."
   ],
-  "intro": "Te damos la bienvenida a la biblioteca. Camina en silencio, por favor: tres tramos, todos igual de largos."
+  "intro": "Te doy la bienvenida a la biblioteca, {wizard}. Esta es la sala de lectura. Mi programa aquí funciona. Sin embargo, podemos hacerlo más ordenado.",
+  "outro": "¡Muy bien hecho! Un programa ordenado es más fácil de leer.",
+  "learned": "Ahora sabes cómo dar un nombre a un valor, lo que los programadores llaman una variable."
 }

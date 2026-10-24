@@ -1,0 +1,54 @@
+{
+  "id": "the-wrong-order",
+  "kind": "fix",
+  "scene": "the-library",
+  "start": [18, 3],
+  "end": [24, 3],
+  "speaker": "wenna",
+  "carrying": ["wand"],
+  "things": [
+    {
+      "kind": "key",
+      "id": "key",
+      "at": [20, 3],
+      "opens": "door"
+    },
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [22, 3],
+      "locked": true
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [6, 9]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.pick_up",
+    "wizard.find_nearest",
+    "thing.position",
+    "door.open",
+    "door.locked",
+    "wizard.position",
+    "wizard.items"
+  ],
+  "goals": [
+    {
+      "kind": "open",
+      "id": "door"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    }
+  ],
+  "tick_limit": 100
+}

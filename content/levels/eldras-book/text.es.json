@@ -2,14 +2,14 @@
   "title": "El libro de Eldra",
   "goals": [
     "Dale a Eldra su libro.",
-    "Guarda el libro bajo un nombre con find_nearest."
+    "Nombra el libro con `find_nearest` antes de que el hechizo lo mueva."
   ],
-  "starting_code": "# Una puerta cerrada con llave, una estantería alta, y Eldra esperando al final.\n",
+  "starting_code": "# Una llave, una puerta cerrada con llave y Eldra te esperan.\n",
   "hints": [
-    "Una cosa cada vez: la llave, la puerta, la estantería, y luego Eldra.",
-    "Guarda el libro bajo un nombre antes de que el hechizo lo mueva: `find_nearest` lo encuentra en la estantería.",
-    "fendra trae el libro a la casilla {del mago|de la maga}; cógelo antes de seguir."
+    "Coge la llave. Abre la puerta para llegar al estante de Eldra.",
+    "Busca el libro. Dale un nombre antes de usar el hechizo.",
+    "Baja el libro. Recógelo y dáselo a Eldra."
   ],
-  "intro": "Ya me acuerdo: dejé mi libro en la estantería de detrás de la puerta cerrada, la noche en que me volví fantasma. ¿Me lo traes?",
-  "outro": "Lo has encontrado, {wizard}, justo donde lo dejé. Ahora puedo descansar. Los pasadizos te esperan: cuidado con Dask."
+  "intro": "Eldra está esperando junto a su estante. El libro que quiere vuelve a estar en lo alto. La puerta de su estante está cerrada con llave.",
+  "outro": "Abriste la puerta. Usaste el hechizo para ayudar a Eldra. ¡Has aprendido todos los secretos de la biblioteca!"
 }

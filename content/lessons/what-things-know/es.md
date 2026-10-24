@@ -1,49 +1,30 @@
 # Lo que saben las cosas
 
-Un objeto puede hacer cosas: son sus acciones.
-Un objeto también sabe cosas de sí mismo.
-Dónde está.
-Qué lleva.
-Si una puerta está cerrada con llave.
-
-Lo que sabe un objeto es un **atributo**.
+Cada objeto en el castillo tiene secretos. Un objeto puede hacer acciones. Pero también sabe cosas sobre sí mismo. Una puerta sabe si está cerrada con llave. {Tu mago sabe|Tu maga sabe} dónde está. Lo que una cosa sabe es lo que los programadores llaman un atributo.
 
 ---
 
-## Preguntar
-
-Un atributo se escribe como una acción, con un punto antes de su nombre.
-Pero no lleva paréntesis.
-No lleva paréntesis porque no se hace nada: solo preguntas.
+Preguntas por un atributo con un punto. No usas paréntesis. Sin paréntesis significa que no se hace nada. Solo haces una pregunta.
 
 ```python
-wizard.position
+door.locked
 ```
 
-Para ver la respuesta, dásela a `print`, la acción propia de Python para enseñar un valor:
+Para ver la respuesta, usas `print`, la acción de Python para mostrar un valor. Muestra la respuesta en la tarjeta bajo el editor.
 
 ```python
-print(wizard.position)
+print(door.locked)
 ```
-
-Lo que el programa escribe sale en la tarjeta de debajo del editor.
 
 ---
 
-## Lo que se puede saber
-
-- `wizard.position` es dónde está {el mago|la maga}.
-- `wizard.items` es lo que lleva {el mago|la maga}.
-- `door.locked` es `True` mientras la puerta necesita su llave, y `False` cuando no.
-
-`True` y `False` son las palabras de Python para *sí* y *no*.
+Puedes preguntar sobre muchas cosas. `wizard.position` te dice dónde estás. `wizard.items` lista lo que llevas. Vamos a probar esto con cuidado.
 
 ---
 
 ## Pruébalo
 
-El camino corto para salir pasa por una puerta.
-Pregúntale a la puerta antes de chocar con ella.
+Hazle una pregunta a la puerta. Mira a ver si está cerrada con llave.
 
 ```python try
 print(door.locked)

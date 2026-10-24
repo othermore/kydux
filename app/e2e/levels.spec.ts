@@ -32,8 +32,8 @@ test.describe('the locked door', () => {
   });
 
   test('what the code prints shows in the card', async ({ page }) => {
-    await run(page, 'wizard.move_right(4)\nwizard.pick_up()\nprint(wizard.items)');
-    await expect(page.locator('.printed')).toHaveText('[<key key carried>]');
+    await run(page, 'wizard.move_up(2)\nwizard.pick_up()\nprint(wizard.items)');
+    await expect(page.locator('.printed')).toHaveText('[<key key carried>, <wand wand carried>]');
   });
 
   test('a door too far away is not tried: the wizard thinks why, and nothing shakes', async ({
@@ -56,7 +56,7 @@ test.describe('the locked door', () => {
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('wizard.move_right(6)\ndoor.open()');
+    await page.keyboard.insertText('wizard.move_up(3)\nwizard.move_right(3)\ndoor.open()');
     await page.locator('#run').click();
     await expect(scene(page)).toHaveAttribute(
       'data-thought',
@@ -65,29 +65,29 @@ test.describe('the locked door', () => {
     );
     await expect(scene(page)).toHaveAttribute('data-shaking', 'true');
     await expect(page.locator('.outcome-text')).toContainText(
-      'On line 2: I cannot open the door: it is locked',
+      'On line 3: I cannot open the door: it is locked',
       { timeout: 30_000 },
     );
   });
 
   test('a locked door stays shut without its key', async ({ page }) => {
-    const said = await run(page, 'wizard.move_right(6)\ndoor.open()\nwizard.move_down(2)');
+    const said = await run(page, 'wizard.move_up(3)\nwizard.move_right(3)\ndoor.open()\nwizard.move_right(3)');
     expect(said).toBe(
-      'Not yet: 0 of 3 goals met. Try again.\nOn line 2: I cannot open the door: it is locked, and I have no key for it.',
+      'Not yet: 0 of 3 goals met. Try again.\nOn line 3: I cannot open the door: it is locked, and I have no key for it.',
     );
     await expect(scene(page)).toHaveAttribute('data-doors', '');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '7,1');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '15,3');
   });
 
   test('the key opens it, and the goals tick in order with the bonus', async ({ page }) => {
     const said = await run(
       page,
-      'wizard.move_right(4)\nwizard.pick_up()\nwizard.move_right(2)\ndoor.open()\nwizard.move_down(2)',
+      'wizard.move_up(2)\nwizard.pick_up()\nwizard.move_up()\nwizard.move_right(3)\ndoor.open()\nwizard.move_right(3)',
     );
     expect(said).toBe('You did it, apprentice!');
-    await expect(scene(page)).toHaveAttribute('data-carried', 'key');
+    await expect(scene(page)).toHaveAttribute('data-carried', 'key,wand');
     await expect(scene(page)).toHaveAttribute('data-doors', 'door');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '7,3');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '18,3');
     await expect(page.locator('.goal[data-mark="met"]')).toHaveCount(4);
   });
 });
@@ -136,14 +136,14 @@ test('the locked door in Spanish', async ({ browser }) => {
   await context.close();
 });
 
-/** Chapter 1's levels, each with its solution.py, read from the content. */
+/** A chapter's levels, each with its solution.py, read from the content. */
 const CONTENT = fileURLToPath(new URL('../../content/', import.meta.url));
-const CHAPTER_1: [string, string][] = (
-  JSON.parse(readFileSync(`${CONTENT}chapters/01-arrival/chapter.json`, 'utf8')).items as string[]
-)
-  .filter((item) => item.startsWith('level:'))
-  .map((item) => item.slice('level:'.length))
-  .map((id) => [id, readFileSync(`${CONTENT}levels/${id}/solution.py`, 'utf8')]);
+const levelsOf = (chapter: string): [string, string][] =>
+  (JSON.parse(readFileSync(`${CONTENT}chapters/${chapter}/chapter.json`, 'utf8')).items as string[])
+    .filter((item) => item.startsWith('level:'))
+    .map((item) => item.slice('level:'.length))
+    .map((id) => [id, readFileSync(`${CONTENT}levels/${id}/solution.py`, 'utf8')]);
+const CHAPTER_1 = levelsOf('01-arrival');
 
 test.describe('chapter 1', () => {
   for (const [id, code] of CHAPTER_1) {
@@ -191,28 +191,7 @@ test.describe('the sealed door (D42, D43)', () => {
   });
 });
 
-/** Chapter 2's levels with a program that wins each, as its solution.py does. */
-const CHAPTER_2: [string, string][] = [
-  ['the-reading-room', 'steps = 3\nwizard.move_right(steps)\nwizard.move_down(steps)\nwizard.move_right(steps)'],
-  ['which-way', 'print(door.locked)\nwizard.move_right(5)\nwizard.move_down(3)\nwizard.move_left(5)'],
-  [
-    'the-lost-book',
-    'book = wizard.find_nearest("book")\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.pick_up()\n' +
-      'wizard.move_left(2)\nwizard.move_up(2)\nwizard.move_right(4)\nwizard.give(book)',
-  ],
-  [
-    'the-archive',
-    'wizard.move_right()\narchive_door.open()\nwizard.move_right(4)\nwizard.pick_up()\n' +
-      'wizard.move_right()\nvault_door.open()\nwizard.move_right(2)',
-  ],
-  ['the-high-shelf', 'wizard.move_right(4)\nwizard.cast("fendra")\nwizard.pick_up()\nwizard.move_right(2)'],
-  [
-    'eldras-book',
-    'book = wizard.find_nearest("book")\nwizard.move_right(2)\nwizard.pick_up()\nwizard.move_right()\n' +
-      'door.open()\nwizard.move_right(3)\nwizard.cast("fendra")\nwizard.pick_up()\nwizard.move_right(2)\n' +
-      'wizard.give(book)',
-  ],
-];
+const CHAPTER_2 = levelsOf('02-the-library');
 
 test.describe('chapter 2', () => {
   for (const [id, code] of CHAPTER_2) {
@@ -225,19 +204,16 @@ test.describe('chapter 2', () => {
     });
   }
 
-  test('a level says what it prints, and Eldra thanks the wizard on the win card', async ({ page }) => {
+  test('a level says what it prints, and Wenna speaks of Eldra on the win card', async ({ page }) => {
     await page.goto('/#level/the-lost-book');
     await expect(page.locator('#card-intro')).toContainText('Eldra');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(
-      page,
-      'book = wizard.find_nearest("book")\nprint(book.position)\nwizard.move_down(2)\nwizard.move_right(2)\n' +
-        'wizard.pick_up()\nwizard.move_left(2)\nwizard.move_up(2)\nwizard.move_right(4)\nwizard.give(book)',
-    );
-    await expect(page.locator('.printed')).toHaveText('Position(x=3, y=3)');
-    await expect(page.locator('#card-outro')).toContainText('My book!');
+    await run(page, readFileSync(`${CONTENT}levels/the-lost-book/solution.py`, 'utf8'));
+    await expect(page.locator('.printed')).toHaveText('Position(x=10, y=4)');
+    await expect(page.locator('#card-outro')).toContainText('Wenna');
+    await expect(page.locator('#card-outro')).toContainText('Eldra');
   });
 
   test('giving with no one beside the wizard says so', async ({ page }) => {
@@ -245,7 +221,7 @@ test.describe('chapter 2', () => {
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_down(2)\nwizard.move_right(2)\nwizard.pick_up()\nwizard.give(old_book)');
+    await run(page, 'wizard.move_right(2)\nwizard.move_up(2)\nwizard.pick_up()\nwizard.give(old_book)');
     await expect(page.locator('.outcome-text')).toContainText('There is no one beside me to give it to.');
   });
 });
@@ -264,7 +240,7 @@ test.describe('the high shelf (D46, D47, D49)', () => {
 
   test('fendra from below brings the book down, through the shelves', async ({ page }) => {
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_right(4)\nwizard.cast("fendra")\nwizard.pick_up()');
+    await run(page, 'wizard.move_left(5)\nwizard.cast("fendra")\nwizard.pick_up()');
     await expect(scene(page)).toHaveAttribute('data-carried', 'rare_book,wand');
   });
 
@@ -281,26 +257,7 @@ test.describe('the high shelf (D46, D47, D49)', () => {
   });
 });
 
-/** Chapter 3's levels with a program that wins each, in every way. */
-const CHAPTER_3: [string, string][] = [
-  ['the-watchtower', 'print(dask.facing)\nprint(dask.can_see(wizard))\nwizard.move_right(6)'],
-  ['the-watch', 'if dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)'],
-  [
-    'left-or-right',
-    'if left_door.locked:\n    wizard.move_right(2)\n    right_door.open()\n    wizard.move_down(2)\n' +
-      '    wizard.move_left(2)\nelse:\n    wizard.move_left(2)\n    left_door.open()\n    wizard.move_down(2)\n' +
-      '    wizard.move_right(2)\nwizard.move_down()',
-  ],
-  ['the-long-stairs', 'for step in range(8):\n    wizard.move_up()\n    wizard.move_right()'],
-  ['past-the-teacher', 'while dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)'],
-  ['the-moving-stairs', 'wizard.move_right()\nwhile not stair.in_place:\n    wizard.wait()\nwizard.move_right(4)'],
-  [
-    'the-dark-room',
-    'wizard.cast("kirra")\nkey = wizard.find_nearest("key")\nwizard.move_right(4)\nwizard.move_down(2)\n' +
-      'wizard.pick_up()\nwizard.move_left()\ndoor.open()\nwizard.move_down(2)',
-  ],
-  ['the-night-walk', 'wizard.cast("kirra")\nkey = wizard.find_nearest("key")\nwizard.move_right(4)\nwizard.pick_up()\nwizard.move_right()\ndoor.open()\nwizard.move_right(2)\nwhile not stair.in_place:\n    wizard.wait()\nwizard.move_right(3)\nwizard.move_down()\nwhile dask.facing == "right":\n    wizard.wait()\nwizard.move_down(2)'],
-];
+const CHAPTER_3 = levelsOf('03-passages');
 
 test.describe('chapter 3', () => {
   for (const [id, code] of CHAPTER_3) {

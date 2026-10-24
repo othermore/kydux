@@ -1,30 +1,37 @@
 {
   "id": "the-archive",
-  "map": [
-    "###########",
-    "#S.A..K.BE#",
-    "###########"
-  ],
+  "kind": "practice",
+  "scene": "the-library",
+  "start": [24, 3],
+  "end": [24, 11],
+  "speaker": "wenna",
+  "carrying": ["wand"],
   "things": [
     {
       "kind": "door",
       "id": "archive_door",
-      "marker": "A"
+      "at": [24, 5]
     },
     {
       "kind": "key",
       "id": "key",
-      "marker": "K",
+      "at": [24, 7],
       "opens": "vault_door"
     },
     {
       "kind": "door",
       "id": "vault_door",
-      "marker": "B",
+      "at": [24, 9],
       "locked": true
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [6, 9]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -32,9 +39,11 @@
     "wizard.move_down",
     "wizard.pick_up",
     "wizard.find_nearest",
+    "thing.position",
     "door.open",
     "door.locked",
-    "thing.position"
+    "wizard.position",
+    "wizard.items"
   ],
   "goals": [
     {
@@ -51,6 +60,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "wenna"
+  "tick_limit": 100
 }

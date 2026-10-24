@@ -1,45 +1,41 @@
 {
   "id": "eldras-book",
-  "map": [
-    "###########",
-    "#S.K.D....#",
-    "######===G#",
-    "###########"
-  ],
-  "carrying": [
-    "wand"
-  ],
-  "spells": [
-    "fendra"
-  ],
+  "kind": "practice",
+  "scene": "the-library",
+  "start": [16, 11],
+  "speaker": "wenna",
+  "carrying": ["wand"],
+  "spells": ["fendra"],
   "things": [
     {
       "kind": "key",
       "id": "key",
-      "marker": "K",
+      "at": [14, 11],
       "opens": "door"
     },
     {
       "kind": "door",
       "id": "door",
-      "marker": "D",
+      "at": [12, 11],
       "locked": true
     },
     {
       "kind": "book",
       "id": "eldras_book",
-      "at": [
-        7,
-        2
-      ]
+      "at": [10, 8]
     }
   ],
   "actors": [
     {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [6, 9]
+    },
+    {
       "kind": "ghost",
       "id": "eldra",
-      "marker": "G",
-      "facing": "up"
+      "at": [9, 11],
+      "facing": "right"
     }
   ],
   "api": [
@@ -48,12 +44,14 @@
     "wizard.move_up",
     "wizard.move_down",
     "wizard.pick_up",
-    "wizard.cast",
     "wizard.find_nearest",
-    "wizard.give",
+    "thing.position",
     "door.open",
     "door.locked",
-    "thing.position"
+    "wizard.position",
+    "wizard.items",
+    "wizard.cast",
+    "wizard.give"
   ],
   "goals": [
     {
@@ -67,6 +65,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "eldra"
+  "tick_limit": 100
 }

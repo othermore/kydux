@@ -2,14 +2,16 @@
   "title": "El archivo",
   "goals": [
     "Abre la puerta de la cámara.",
-    "Llega a la cámara.",
-    "Encuentra la llave con find_nearest."
+    "Llega a la base del archivo.",
+    "Encuentra la llave con `find_nearest`."
   ],
-  "starting_code": "# Dos puertas: una se abre con la mano, la otra necesita su llave.\n",
+  "starting_code": "# Una puerta, una llave y una puerta cerrada con llave te esperan.\n",
   "hints": [
-    "`print(archive_door.locked, vault_door.locked)` dice qué puerta necesita llave.",
-    "La puerta del archivo se abre con la mano. La llave está entre las dos puertas.",
-    "Pídele la llave a `find_nearest`, y escribe su posición para saber dónde pararte."
+    "Camina hacia la primera puerta. Usa su acción para abrirla.",
+    "Usa `find_nearest` para encontrar la llave. Luego cógela.",
+    "Camina hacia la segunda puerta y ábrela."
   ],
-  "intro": "El archivo guarda los libros más antiguos. Su primera puerta se abre con la mano; la de la cámara necesita una llave, que está en algún sitio dentro."
+  "intro": "Este es el estrecho camino hacia el archivo. Hay muchas puertas aquí. Mantén tu código ordenado.",
+  "outro": "Encontraste tu camino a través del archivo a salvo.",
+  "learned": "Ahora sabes que una puerta se abre a mano, y una cerrada con llave, con su llave."
 }

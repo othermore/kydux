@@ -1,13 +1,16 @@
 {
-  "title": "Por dónde",
+  "title": "¿Por dónde?",
   "goals": [
-    "Llega al mostrador.",
-    "Pregúntale a la puerta si está cerrada con llave."
+    "Llega al otro extremo de los pasillos.",
+    "El programa pregunta a la puerta si está cerrada con llave."
   ],
-  "starting_code": "# El camino corto pasa por la puerta. ¿Está cerrada con llave?\n",
+  "starting_code": "# Pregunta a la puerta con print si está cerrada con llave.\n# Luego toma el camino que está abierto.\n",
   "hints": [
-    "`print(door.locked)` enseña `True` o `False` en la tarjeta.",
-    "Una puerta cerrada con llave, sin llave en la sala, no se abre: el otro camino es más largo, y está abierto."
+    "La puerta sabe si está cerrada con llave. Pregunta por su atributo.",
+    "Usa `print` para mostrar la respuesta a tu pregunta.",
+    "La puerta está cerrada con llave. Debes dar el rodeo más largo."
   ],
-  "intro": "Esa puerta es el camino corto a mi mostrador. Pero aquí algunas puertas están cerradas con llave, y la llave no está en esta sala."
+  "intro": "Los pasillos forman un círculo. Hay un atajo hacia arriba por una puerta. Deberías comprobar si está abierta primero.",
+  "outro": "Comprobaste la puerta y viste que estaba cerrada con llave. Tomaste el único camino.",
+  "learned": "Ahora sabes cómo preguntar lo que sabe una cosa, lo que los programadores llaman un atributo."
 }

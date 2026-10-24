@@ -1,27 +1,32 @@
 {
   "id": "the-locked-door",
-  "map": [
-    "##########",
-    "#S...K...#",
-    "#######D##",
-    "#......E.#",
-    "##########"
-  ],
+  "kind": "practice",
+  "scene": "the-library",
+  "start": [12, 6],
+  "end": [18, 3],
+  "speaker": "wenna",
+  "carrying": ["wand"],
   "things": [
     {
       "kind": "key",
       "id": "key",
-      "marker": "K",
+      "at": [12, 4],
       "opens": "door"
     },
     {
       "kind": "door",
       "id": "door",
-      "marker": "D",
+      "at": [16, 3],
       "locked": true
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [6, 9]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -29,11 +34,11 @@
     "wizard.move_down",
     "wizard.pick_up",
     "wizard.find_nearest",
-    "wizard.position",
-    "wizard.items",
+    "thing.position",
     "door.open",
     "door.locked",
-    "thing.position"
+    "wizard.position",
+    "wizard.items"
   ],
   "goals": [
     {
@@ -50,10 +55,9 @@
     },
     {
       "kind": "lines_under",
-      "lines": 6,
+      "lines": 7,
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "wenna"
+  "tick_limit": 100
 }

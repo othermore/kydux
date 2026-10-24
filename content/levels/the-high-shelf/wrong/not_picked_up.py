@@ -1,3 +1,3 @@
-wizard.move_right(4)
+wizard.move_left(5)
 wizard.cast("fendra")
-wizard.move_right(2)
+wizard.move_left(3)

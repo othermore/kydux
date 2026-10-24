@@ -15,6 +15,9 @@ import contact  # noqa: E402
 import cut  # noqa: E402
 import draw  # noqa: E402
 import generate  # noqa: E402
+import isometric  # noqa: E402
+import layout  # noqa: E402
+import open_scene  # noqa: E402
 
 MAGENTA = (255, 0, 255, 255)
 GRASS = (80, 160, 70, 255)
@@ -204,3 +207,75 @@ def test_the_images_in_a_pixellab_answer_are_found_however_deep():
     answer = {"tiles": [{"image": {"type": "base64", "base64": base64.b64encode(b"x").decode()}}]}
     assert generate._pixellab_images(answer) == [b"x"]
     assert generate._find({"a": [{"tileset_id": "t1"}]}, "tileset_id") == "t1"
+
+
+def small_scene(tmp_path: Path):
+    """A scene of three tiles across and three down: a wall row, grass, a path."""
+    folder = tmp_path / "scenes" / "yard"
+    folder.mkdir(parents=True)
+    (folder / "map.txt").write_text("###\nggg\nppp\n")
+    (folder / "scene.json").write_text(
+        json.dumps(
+            {
+                "terrains": {
+                    "g": {"kind": "grass", "walk": True},
+                    "p": {"kind": "path", "walk": True},
+                }
+            }
+        )
+    )
+    return layout.read("yard", tmp_path / "scenes")
+
+
+def test_the_layout_guide_draws_each_tile_and_a_wall_s_face_at_its_foot(tmp_path):
+    scene = small_scene(tmp_path)
+    image, band = layout.guide(scene)
+    assert image.size == (3 * layout.TILE, 3 * layout.TILE) and band == 0
+    top, face = layout.COLOURS["wall"]
+    assert image.getpixel((10, 5)) == top
+    assert image.getpixel((10, layout.TILE - 3)) == face
+    assert image.getpixel((10, layout.TILE + 10)) == layout.COLOURS["grass"][0]
+
+
+def test_the_guide_is_padded_to_a_shape_with_bands_above_and_below(tmp_path):
+    image, band = layout.guide(small_scene(tmp_path), (9, 16))
+    assert band > 0 and image.height == 3 * layout.TILE + 2 * band
+    assert image.getpixel((5, 2)) == (0, 0, 0)
+
+
+def test_the_check_tints_the_tiles_no_one_walks_on(tmp_path):
+    scene = small_scene(tmp_path)
+    painted = Image.new("RGB", (3 * layout.TILE, 3 * layout.TILE), (0, 0, 255))
+    over = layout.overlay(scene, painted, 0)
+    wall = over.getpixel((20, 20))
+    grass = over.getpixel((20, layout.TILE + 20))
+    assert wall[0] > grass[0]
+
+
+def test_a_character_sheet_s_figures_keep_their_shape(tmp_path):
+    sheet = Image.new("RGBA", (200, 60), (255, 0, 255, 255))
+    for index in range(4):
+        sheet.paste((20, 40, 160, 255), (10 + index * 50, 10, 30 + index * 50, 50))
+    figures = layout.figures(sheet, 20, smooth=False)
+    assert list(figures) == ["down", "left", "right", "up"]
+    assert all(f.size == (10, 20) for f in figures.values())
+
+
+def test_the_isometric_projection_sends_x_down_right_and_y_down_left():
+    assert isometric.screen(1, 0) == (isometric.W / 2, isometric.H / 2)
+    assert isometric.screen(0, 1) == (-isometric.W / 2, isometric.H / 2)
+
+
+def test_an_autotile_inside_its_terrain_takes_the_middle_quarters():
+    # An XP autotile of one colour per row of quarters, so that each quarter says
+    # where it came from.
+    sheet = Image.new("RGBA", (96, 128))
+    for qy in range(8):
+        sheet.paste((qy * 30, 0, 0, 255), (0, qy * 16, 96, qy * 16 + 16))
+    pack = open_scene.Pack({"tile": 32, "path": ("x.png", ("auto", (0, 0), "xp"))})
+    pack.sheets["x.png"] = sheet
+    inside = pack.joined("path", lambda dx, dy: True)
+    # The north quarters from the region's third row of quarters (32 + 2 * 16).
+    assert inside.getpixel((4, 4))[0] == 4 * 30
+    alone = pack.joined("path", lambda dx, dy: False)
+    assert alone.getpixel((4, 4))[0] == 2 * 30

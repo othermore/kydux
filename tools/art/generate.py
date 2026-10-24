@@ -8,7 +8,9 @@ A prompt file is Markdown with a front matter between two `---` lines, each line
 
 - `candidate`: the folder under art/raw/ the image goes to;
 - `service`: `gemini`, `retrodiffusion` or `pixellab`;
-- for Gemini, `model`; for Retro Diffusion, `prompt_style`, `width`, `height`
+- for Gemini, `model`, and optionally `image` (a PNG, from the repository's
+  root, the model works from, like a scene's layout guide), `aspect_ratio`
+  (`16:9`...) and `image_size` (`1K`, `2K`); for Retro Diffusion, `prompt_style`, `width`, `height`
   and its other fields; for PixelLab, `endpoint` (`create-image-pixflux`,
   `create-tileset`, `create-character-with-4-directions`...), `prompt_field`
   (the body's field the prompt goes in, `description` unless it says) and
@@ -110,10 +112,21 @@ def gemini(fields: dict, prompt: str) -> tuple[list[bytes], dict]:
     from google.genai import types
 
     client = genai.Client(api_key=secret("GEMINI_API_KEY"))
+    contents: list = [prompt]
+    # An image to work from, like a scene's layout guide, before the words.
+    if fields.get("image"):
+        guide = REPO / fields["image"]
+        if not guide.is_file():
+            raise ArtError(f"no image {fields['image']} to work from")
+        contents = [types.Part.from_bytes(data=guide.read_bytes(), mime_type="image/png"), prompt]
+    shape = {k: fields[k] for k in ("aspect_ratio", "image_size") if k in fields}
     answer = client.models.generate_content(
         model=fields.get("model", "gemini-3.1-flash-image"),
-        contents=prompt,
-        config=types.GenerateContentConfig(response_modalities=["IMAGE"]),
+        contents=contents,
+        config=types.GenerateContentConfig(
+            response_modalities=["IMAGE"],
+            **({"image_config": types.ImageConfig(**shape)} if shape else {}),
+        ),
     )
     images = [
         part.inline_data.data

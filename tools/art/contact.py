@@ -13,7 +13,8 @@ path's turns, a door and the wizard; a set that joins by its corners instead
 north-west 1, north-east 2, south-west 4, south-east 8) is drawn as a region
 beside it; a piece the candidate lacks shows as a
 magenta square with its name, so that what is missing is seen at once.
-Writes art/raw/contact-sheet-<candidate>.png.
+Writes art/raw/contact-sheet-<candidate>.png. With --frames, the sheet is
+the candidate's whole pictures instead (style frames, mock-ups), two to a row.
 """
 
 import argparse
@@ -185,11 +186,35 @@ def contact(candidate: str, folder: Path) -> Path:
     return target
 
 
+def frames(candidate: str, folder: Path, width: int = 960) -> Path:
+    """Whole pictures, like style frames, two to a row at `width` each, named."""
+    pictures = sorted(p for p in folder.glob("*.png"))
+    shown = [Image.open(p).convert("RGBA") for p in pictures]
+    shown = [im.resize((width, round(im.height * width / im.width))) for im in shown]
+    row = max((im.height for im in shown), default=0) + 20
+    sheet = Image.new("RGBA", (2 * width + 8, 24 + row * (-(-len(shown) // 2))), (24, 24, 30, 255))
+    draw = ImageDraw.Draw(sheet)
+    draw.text((4, 4), f"{candidate}: {len(shown)} pictures", fill=(240, 240, 250, 255))
+    for index, (path, image) in enumerate(zip(pictures, shown, strict=True)):
+        x, y = (index % 2) * (width + 8), 24 + (index // 2) * row
+        draw.text((x, y), path.stem, fill=(220, 220, 230, 255))
+        sheet.alpha_composite(image, (x, y + 16))
+    target = RAW / f"contact-sheet-{candidate}.png"
+    sheet.save(target)
+    return target
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="A candidate's contact sheet.")
     parser.add_argument("candidate")
     parser.add_argument("--pieces", type=Path)
+    parser.add_argument(
+        "--frames", action="store_true", help="whole pictures, not pieces: art/raw/<candidate>/"
+    )
     args = parser.parse_args()
+    if args.frames:
+        print(frames(args.candidate, args.pieces or RAW / args.candidate).relative_to(REPO))
+        return 0
     folder = args.pieces or RAW / args.candidate / "pieces"
     print(contact(args.candidate, folder).relative_to(REPO))
     return 0

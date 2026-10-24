@@ -116,8 +116,10 @@ class Level:
     goals_source: str | None = None
     #: The spells that exist in the level, which the wand can cast (D42).
     spells: tuple[str, ...] = ()
-    #: Whether the room is dark until `kirra` lights it (D52).
+    #: Whether the room is dark until `kirra` lights it (D52), and the tiles it
+    #: covers: the dark rooms of the level's scene, or, when empty, the whole map (D73).
     dark: bool = False
+    dark_area: frozenset[Position] = frozenset()
     #: The level's kind (D56), `practice` unless it says.
     kind: str = "practice"
     #: The ways the level is played, by id, each a level of its own (D51); empty
@@ -218,8 +220,17 @@ class Level:
             raise LevelError(f"{level_id}: a level's kind is one of {', '.join(LEVEL_KINDS)}")
         if dark and "kirra" not in spells:
             raise LevelError(f"{level_id}: a dark level needs kirra among its spells")
+        area = set()
+        for box in _list_of_boxes(data.get("dark_area", []), level_id):
+            x0, y0, x1, y1 = box
+            area.update(Position(x, y) for x in range(x0, x1 + 1) for y in range(y0, y1 + 1))
+        if area and not dark:
+            raise LevelError(f"{level_id}: a dark area needs the level to be dark")
+        # A fixed thing of the scene is there in every level; its seal may be a
+        # spell this level does not have, and the door then stays shut (D73).
+        fixed = set(data.get("fixed", []))
         for thing in things:
-            if thing.sealed is not None and thing.sealed not in spells:
+            if thing.sealed is not None and thing.sealed not in spells and thing.id not in fixed:
                 raise LevelError(
                     f"{level_id}: the door {thing.id} is sealed by {thing.sealed}, "
                     "which is not a spell here"
@@ -250,6 +261,7 @@ class Level:
             goals_source=source,
             spells=tuple(spells),
             dark=dark,
+            dark_area=frozenset(area),
             kind=kind,
         )
         check_api(level)
@@ -269,7 +281,9 @@ class Level:
         (D65), and goals.py when level.json says `"own_goals": true`."""
         data = json.loads((directory / "level.json").read_text(encoding="utf-8"))
         if "scene" in data:
-            data = on_scene(data, scene_rows(directory.parent.parent / "scenes", data))
+            data = on_scene(
+                data, read_scene(directory.parent.parent / "scenes", data["scene"], data.get("id"))
+            )
         goals = directory / "goals.py"
         if goals.is_file() != bool(data.get("own_goals", False)):
             raise LevelError(f"{directory.name}: goals.py and own_goals in level.json go together")
@@ -435,6 +449,15 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
     return ActorSpec(kind, actor_id, position, facing, patrol, sight)
 
 
+def _list_of_boxes(value: Any, level_id: str) -> list[tuple[int, int, int, int]]:
+    if not isinstance(value, list) or not all(
+        isinstance(box, list) and len(box) == 4 and all(isinstance(v, int) for v in box)
+        for box in value
+    ):
+        raise LevelError(f"{level_id}: dark_area is a list of [x0, y0, x1, y1]")
+    return [tuple(box) for box in value]
+
+
 def _ways(data: dict[str, Any]) -> list[tuple[dict[str, Any], dict[str, Any]]]:
     """Each way of a level, with level.json as that way plays it: its things and actors
     merged by id, field by field, and its carrying, spells and dark in place of the
@@ -508,33 +531,121 @@ def _check_ids(
         seen.add(item_id)
 
 
-#: What a scene's map may hold: walls, floor and shelves, no markers (D65).
-SCENE_CHARACTERS = frozenset((WALL, FLOOR, SHELF))
+#: What a scene's letters are when it gives no table of its own (D65): wall,
+#: floor and shelf, as in a level's map.
+DEFAULT_TERRAINS = {
+    WALL: {"kind": "wall", "walk": False, "sight": False},
+    FLOOR: {"kind": "floor", "walk": True, "sight": True},
+    SHELF: {"kind": "shelf", "walk": False, "sight": True},
+}
+
+
+@dataclass(frozen=True)
+class Scene:
+    """A scene a chapter's levels are parts of (D65, D73): its rows of letters,
+    what each letter is, its fixed things, the props drawn on it and its rooms."""
+
+    id: str
+    rows: tuple[str, ...]
+    terrains: dict[str, dict[str, Any]]
+    things: tuple[dict[str, Any], ...] = ()
+    props: tuple[dict[str, Any], ...] = ()
+    rooms: dict[str, tuple[int, int, int, int]] = field(default_factory=dict)
+
+    def walks(self, x: int, y: int) -> bool:
+        return bool(self.terrains[self.rows[y][x]]["walk"])
+
+
+def read_scene(scenes: Path, scene_id: Any, level_id: Any = None) -> Scene:
+    """The scene `scenes/<id>/`: map.txt, and scene.json when it has one (D73)."""
+    if not isinstance(scene_id, str) or not scene_id:
+        raise LevelError(f"{level_id}: scene is the id of a scene")
+    folder = scenes / scene_id
+    path = folder / "map.txt"
+    if not path.is_file():
+        raise LevelError(f"{level_id}: there is no scene {scene_id}")
+    rows = tuple(row for row in path.read_text(encoding="utf-8").splitlines() if row)
+    if not rows or any(len(row) != len(rows[0]) for row in rows):
+        raise LevelError(f"{scene_id}: a scene's rows must all be as long as the first")
+    about = (
+        json.loads((folder / "scene.json").read_text(encoding="utf-8"))
+        if (folder / "scene.json").is_file()
+        else {}
+    )
+    terrains = dict(DEFAULT_TERRAINS)
+    for letter, terrain in about.get("terrains", {}).items():
+        if len(letter) != 1 or letter in (START, "E") or not isinstance(terrain, dict):
+            raise LevelError(f"{scene_id}: a terrain is one letter, not S or E, with its kind")
+        if not isinstance(terrain.get("kind"), str):
+            raise LevelError(f"{scene_id}: the terrain {letter} needs its kind")
+        terrains[letter] = {
+            "kind": terrain["kind"],
+            "walk": bool(terrain.get("walk", False)),
+            "sight": bool(terrain.get("sight", terrain.get("walk", False))),
+        }
+    unknown = sorted({char for row in rows for char in row} - set(terrains))
+    if unknown:
+        raise LevelError(f"{scene_id}: the letters {''.join(unknown)} are no terrain of the scene")
+    rooms = {}
+    for room_id, box in about.get("rooms", {}).items():
+        if not (isinstance(box, list) and len(box) == 4 and all(isinstance(v, int) for v in box)):
+            raise LevelError(f"{scene_id}: the room {room_id} is [x0, y0, x1, y1]")
+        rooms[room_id] = tuple(box)
+    things = tuple(about.get("things", []))
+    ids = [thing.get("id") for thing in things]
+    if len(set(ids)) != len(ids) or not all(isinstance(i, str) for i in ids):
+        raise LevelError(f"{scene_id}: each fixed thing has an id of its own")
+    return Scene(scene_id, rows, terrains, things, tuple(about.get("props", [])), rooms)
 
 
 def scene_rows(scenes: Path, data: dict[str, Any]) -> list[str]:
-    """The rows of the scene a level names, from `scenes/<id>/map.txt` (D65)."""
-    level_id, scene = data.get("id"), data.get("scene")
-    if not isinstance(scene, str) or not scene:
-        raise LevelError(f"{level_id}: scene is the id of a scene")
-    path = scenes / scene / "map.txt"
-    if not path.is_file():
-        raise LevelError(f"{level_id}: there is no scene {scene}")
-    rows = [row for row in path.read_text(encoding="utf-8").splitlines() if row]
-    if not rows or any(len(row) != len(rows[0]) for row in rows):
-        raise LevelError(f"{scene}: a scene's rows must all be as long as the first")
-    if any(char not in SCENE_CHARACTERS for row in rows for char in row):
-        raise LevelError(f"{scene}: a scene holds only #, . and =")
-    return rows
+    """The rows of the scene a level names (D65)."""
+    return list(read_scene(scenes, data.get("scene"), data.get("id")).rows)
 
 
-def on_scene(data: dict[str, Any], rows: list[str]) -> dict[str, Any]:
-    """level.json with the map of its scene in place of `scene`, `start` and `end`:
-    the wizard's `S` at `start`, and the `E` of the reach goal at `end` (D65)."""
+def _merged_things(scene: Scene, data: dict[str, Any]) -> list[dict[str, Any]]:
+    """The scene's fixed things, each in the state the level gives it, then the
+    level's own things (D73). A level's thing with no kind is a state of a fixed
+    thing; a door the level opens is no longer locked, sealed or keyed by a word."""
+    level_id = data.get("id")
+    fixed = {thing["id"]: dict(thing) for thing in scene.things}
+    own = []
+    for thing in data.get("things", []):
+        if not isinstance(thing, dict):
+            raise LevelError(f"{level_id}: things must be a list of objects")
+        if thing.get("id") in fixed:
+            state = fixed[thing["id"]]
+            state.update({k: v for k, v in thing.items() if k != "id"})
+            if state.get("open") is True:
+                for lock in ("locked", "sealed", "password"):
+                    state.pop(lock, None)
+        elif "kind" not in thing:
+            raise LevelError(
+                f"{level_id}: {thing.get('id')} has no kind, and is no fixed thing of the scene"
+            )
+        else:
+            own.append(thing)
+    return [*fixed.values(), *own]
+
+
+def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
+    """level.json made whole on its scene (D65, D73): the map the world reads, its
+    letters walls, floor and shelves by what each terrain lets through, with the
+    wizard's `S` at `start` and the `E` of the reach goal at `end`; the scene's
+    letters and kinds and props, for the page to draw; the fixed things merged
+    with the level's; and the rooms named in `dark` as the dark area."""
     level_id = data.get("id")
     if "map" in data:
         raise LevelError(f"{level_id}: a level has a map or a scene, not both")
-    grid = [list(row) for row in rows]
+    if not isinstance(scene, Scene):
+        scene = Scene(str(data.get("scene")), tuple(scene), dict(DEFAULT_TERRAINS))
+    grid = []
+    for row in scene.rows:
+        line = []
+        for char in row:
+            terrain = scene.terrains[char]
+            line.append(FLOOR if terrain["walk"] else SHELF if terrain["sight"] else WALL)
+        grid.append(line)
     for key, letter in (("start", START), ("end", "E")):
         if key not in data:
             if key == "start":
@@ -553,4 +664,19 @@ def on_scene(data: dict[str, Any], rows: list[str]) -> dict[str, Any]:
         grid[y][x] = letter
     built = {key: value for key, value in data.items() if key not in ("scene", "start", "end")}
     built["map"] = ["".join(row) for row in grid]
+    built["terrain"] = list(scene.rows)
+    built["terrains"] = {letter: terrain["kind"] for letter, terrain in scene.terrains.items()}
+    if scene.props:
+        built["props"] = list(scene.props)
+    if scene.things or data.get("things"):
+        built["things"] = _merged_things(scene, data)
+    if scene.things:
+        built["fixed"] = [thing["id"] for thing in scene.things]
+    dark = data.get("dark")
+    if isinstance(dark, list):
+        missing = [room for room in dark if room not in scene.rooms]
+        if missing:
+            raise LevelError(f"{level_id}: no room {', '.join(map(str, missing))} in the scene")
+        built["dark"] = bool(dark)
+        built["dark_area"] = [list(scene.rooms[room]) for room in dark]
     return built

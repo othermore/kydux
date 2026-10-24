@@ -15,10 +15,17 @@ export const WIZARD_KEY = 'kydux-wizard';
 export const FACINGS = ['down', 'left', 'right', 'up'] as const;
 export type Facing = (typeof FACINGS)[number];
 
-/** The tile indexes in the tiles texture, in the order they are drawn. */
+/** The tile indexes in the tiles texture, in the order they are drawn: one for each
+ * kind of terrain a scene may have (D73), until the art draws them. */
 export const FLOOR = 0;
 export const WALL = 1;
 export const SHELF = 2;
+export const TERRAIN_KINDS = ['floor', 'wall', 'shelf', 'grass', 'path', 'fence', 'hedge', 'water'] as const;
+
+/** A prop's texture: what a scene shows and the world does not hold (D73). */
+export function propKey(kind: string): string {
+  return `kydux-prop-${kind}`;
+}
 
 /** One colour per marker letter, in the order the letters first appear. */
 const MARKER_COLOURS = ['#e8a33d', '#4cb5ae', '#c65d9a', '#7aa04a', '#5b7bd6', '#d0623f'];
@@ -94,6 +101,73 @@ function drawShelf(ctx: CanvasRenderingContext2D, x: number): void {
     ctx.fillStyle = colour;
     ctx.fillRect(x + 7 + index * 7, 14, 5, TILE - 28);
   });
+}
+
+function drawGrass(ctx: CanvasRenderingContext2D, x: number): void {
+  ctx.fillStyle = '#5c9c48';
+  ctx.fillRect(x, 0, TILE, TILE);
+  ctx.fillStyle = '#6fb257';
+  // A few blades, always in the same places, so that the grass repeats evenly.
+  for (const [bx, by] of [[6, 8], [30, 5], [18, 22], [40, 30], [10, 38], [28, 40]] as [number, number][]) {
+    ctx.fillRect(x + bx, by, 2, 4);
+  }
+}
+
+function drawPath(ctx: CanvasRenderingContext2D, x: number): void {
+  ctx.fillStyle = '#c9a26a';
+  ctx.fillRect(x, 0, TILE, TILE);
+  ctx.fillStyle = '#b48d58';
+  for (const [bx, by] of [[8, 10], [32, 18], [16, 34], [38, 38]] as [number, number][]) {
+    ctx.fillRect(x + bx, by, 3, 3);
+  }
+}
+
+function drawFence(ctx: CanvasRenderingContext2D, x: number): void {
+  drawGrass(ctx, x);
+  ctx.fillStyle = '#8a5a35';
+  ctx.fillRect(x, 16, TILE, 5);
+  ctx.fillRect(x, 28, TILE, 5);
+  ctx.fillStyle = '#6b4226';
+  for (const px of [6, TILE - 12]) ctx.fillRect(x + px, 10, 6, 30);
+}
+
+function drawHedge(ctx: CanvasRenderingContext2D, x: number): void {
+  drawGrass(ctx, x);
+  ctx.fillStyle = '#2f6b34';
+  ctx.beginPath();
+  ctx.ellipse(x + TILE / 2, TILE / 2 + 2, TILE / 2 - 2, TILE / 2 - 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#3f8445';
+  ctx.beginPath();
+  ctx.ellipse(x + TILE / 2 - 4, TILE / 2 - 4, TILE / 4, TILE / 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawWater(ctx: CanvasRenderingContext2D, x: number): void {
+  ctx.fillStyle = '#3d7fc4';
+  ctx.fillRect(x, 0, TILE, TILE);
+  ctx.strokeStyle = '#7fb3e6';
+  ctx.lineWidth = 2;
+  for (const y of [14, 32]) {
+    ctx.beginPath();
+    ctx.moveTo(x + 8, y);
+    ctx.quadraticCurveTo(x + 16, y - 4, x + 24, y);
+    ctx.stroke();
+  }
+}
+
+/** A flat stone, as a prop on the grass or the floor. */
+function drawStone(ctx: CanvasRenderingContext2D): void {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+  ctx.beginPath();
+  ctx.ellipse(TILE / 2, TILE / 2 + 8, TILE / 2 - 6, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#a6a8b0';
+  ctx.beginPath();
+  ctx.ellipse(TILE / 2, TILE / 2 + 2, TILE / 2 - 8, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#6f717b';
+  ctx.stroke();
 }
 
 function drawWall(ctx: CanvasRenderingContext2D, x: number): void {
@@ -431,11 +505,13 @@ export function makePlaceholders(
   look: Look = DEFAULT_LOOK,
   friends: string[] = [],
 ): void {
-  const tiles = canvas(scene, TILES_KEY, TILE * 3, TILE);
-  drawFloor(tiles.ctx, FLOOR * TILE);
-  drawWall(tiles.ctx, WALL * TILE);
-  drawShelf(tiles.ctx, SHELF * TILE);
+  const tiles = canvas(scene, TILES_KEY, TILE * TERRAIN_KINDS.length, TILE);
+  const draws = [drawFloor, drawWall, drawShelf, drawGrass, drawPath, drawFence, drawHedge, drawWater];
+  draws.forEach((draw, index) => draw(tiles.ctx, index * TILE));
   tiles.texture.refresh();
+  const stone = canvas(scene, propKey('stone'), TILE, TILE);
+  drawStone(stone.ctx);
+  stone.texture.refresh();
 
   markers.forEach((letter, index) => {
     const marker = canvas(scene, markerKey(letter), TILE, TILE);

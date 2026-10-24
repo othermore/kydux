@@ -18,7 +18,7 @@ CONTENT = REPO / "content"
 
 def scene_maps() -> dict[str, dict]:
     sys.path.insert(0, str(REPO / "world"))
-    from kydux_world.level import Level, on_scene, scene_rows
+    from kydux_world.level import Level, on_scene, read_scene
 
     built = {}
     for path in sorted((CONTENT / "levels").glob("*/level.json")):
@@ -27,7 +27,9 @@ def scene_maps() -> dict[str, dict]:
             continue
         # Read as the world reads it, so that a level badly placed fails here too.
         Level.from_directory(path.parent)
-        built[data["id"]] = on_scene(data, scene_rows(CONTENT / "scenes", data))
+        built[data["id"]] = on_scene(
+            data, read_scene(CONTENT / "scenes", data["scene"], data["id"])
+        )
     return built
 
 

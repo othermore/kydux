@@ -10,7 +10,7 @@
     "kirra",
     "osto"
   ],
-  "dark": true,
+  "dark": ["night-walk"],
   "things": [
     {
       "kind": "key",

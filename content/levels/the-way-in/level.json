@@ -9,34 +9,12 @@
   "spells": ["zelim"],
   "things": [
     {
-      "kind": "door",
       "id": "gate",
-      "at": [13, 6],
       "open": true
     },
     {
-      "kind": "door",
       "id": "door",
-      "at": [23, 6],
       "open": true
-    },
-    {
-      "kind": "door",
-      "id": "inner_gate",
-      "at": [25, 4],
-      "password": "ambrel"
-    },
-    {
-      "kind": "door",
-      "id": "first_seal",
-      "at": [21, 3],
-      "sealed": "zelim"
-    },
-    {
-      "kind": "door",
-      "id": "second_seal",
-      "at": [18, 2],
-      "sealed": "zelim"
     }
   ],
   "actors": [

@@ -7,7 +7,7 @@
   "speaker": "nuri",
   "carrying": ["wand"],
   "spells": ["kirra"],
-  "dark": true,
+  "dark": ["dark-room"],
   "things": [
     {
       "kind": "key",

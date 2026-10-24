@@ -101,6 +101,7 @@ class Thing(Child):
         world: World = self._k_world
         return (
             not world.lit
+            and world.in_dark(self._k_position)
             and self.kind in CARRIED_KINDS
             and not world.near_wizard(self._k_position)
         )

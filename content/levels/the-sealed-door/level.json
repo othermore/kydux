@@ -9,16 +9,8 @@
   "spells": ["zelim"],
   "things": [
     {
-      "kind": "door",
       "id": "gate",
-      "at": [13, 6],
       "open": true
-    },
-    {
-      "kind": "door",
-      "id": "door",
-      "at": [23, 6],
-      "sealed": "zelim"
     }
   ],
   "actors": [

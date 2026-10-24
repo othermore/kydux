@@ -144,6 +144,11 @@ class World:
         here = self.wizard._k_position
         return abs(position.x - here.x) <= 1 and abs(position.y - here.y) <= 1
 
+    def in_dark(self, position: Position) -> bool:
+        """Whether a tile is in the level's dark area: the dark rooms, or anywhere
+        when the level names none (D52, D73)."""
+        return self.level.dark and (not self.level.dark_area or position in self.level.dark_area)
+
     def is_clear(self, position: Position) -> bool:
         """Whether sight passes a tile: floor or a shelf, and no closed door (D46)."""
         return self.level.clear(position) and self._not_shut(position)
@@ -509,8 +514,9 @@ def _fendra(world: World, here: Position) -> Effect:
 
 
 def _kirra(world: World, here: Position) -> Effect:
-    """Lights a dark room for the rest of the run (D52); in a lit room it does nothing."""
-    if world.lit:
+    """Lights the dark room the wizard is in for the rest of the run (D52, D73); in a
+    lit room, or outside the dark one, it does nothing."""
+    if world.lit or not world.in_dark(here):
         return Effect()
 
     def light() -> None:

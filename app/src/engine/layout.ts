@@ -53,8 +53,14 @@ export interface Layout {
   shelves: Tile[];
   /** The ids of the things the wizard carries from the start, each its kind (D49). */
   carrying: string[];
-  /** Whether the room is dark until lit (D52). */
+  /** Whether the room is dark until lit (D52), and the tiles it covers: the dark
+   * rooms of the scene, or none for the whole map (D73). */
   dark: boolean;
+  darkArea: Tile[];
+  /** Each tile's kind of terrain (D73): the scene's, or wall, floor and shelf. */
+  terrain: string[][];
+  /** What the scene shows and the world does not hold, like a flat stone. */
+  props: { kind: string; tile: Tile }[];
 }
 
 const DEFAULT_SIGHT = 4;
@@ -72,6 +78,20 @@ function asTile(value: unknown): Tile | null {
 
 function asList(value: unknown): Record<string, unknown>[] {
   return Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
+}
+
+/** Each tile's kind of terrain: from the scene's letters and their kinds when the
+ * level is on a scene (D73), else from the map's wall, floor and shelf. */
+function terrainOf(level: LevelJson, rows: string[]): string[][] {
+  const letters = Array.isArray(level.terrain) ? (level.terrain as string[]) : null;
+  const kinds = (level.terrains as Record<string, string> | undefined) ?? {};
+  return rows.map((row, y) =>
+    [...row].map((char, x) => {
+      const letter = letters?.[y]?.[x];
+      if (letter && kinds[letter]) return kinds[letter];
+      return char === '#' ? 'wall' : char === '=' ? 'shelf' : 'floor';
+    }),
+  );
 }
 
 export function layout(level: LevelJson): Layout {
@@ -131,5 +151,16 @@ export function layout(level: LevelJson): Layout {
     shelves,
     carrying,
     dark: level.dark === true,
+    darkArea: asList(level.dark_area as unknown).flatMap((box) => {
+      const [x0, y0, x1, y1] = (box as unknown as number[]).map(Number);
+      const tiles: Tile[] = [];
+      for (let y = y0 ?? 0; y <= (y1 ?? -1); y += 1) for (let x = x0 ?? 0; x <= (x1 ?? -1); x += 1) tiles.push([x, y]);
+      return tiles;
+    }),
+    terrain: terrainOf(level, rows),
+    props: asList(level.props).flatMap((prop) => {
+      const tile = asTile(prop.at);
+      return tile ? [{ kind: String(prop.kind), tile }] : [];
+    }),
   };
 }

@@ -5,14 +5,7 @@
   "start": [11, 6],
   "end": [12, 6],
   "speaker": "nuri",
-  "things": [
-    {
-      "kind": "door",
-      "id": "gate",
-      "at": [13, 6],
-      "password": "ambrel"
-    }
-  ],
+  "things": [],
   "actors": [
     {
       "kind": "friend",

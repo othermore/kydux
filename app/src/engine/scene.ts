@@ -27,6 +27,8 @@ import {
   FACINGS,
   makePlaceholders,
   markerKey,
+  propKey,
+  TERRAIN_KINDS,
   SHELF,
   thingKey,
   TILE,
@@ -131,8 +133,12 @@ class LevelScene extends Phaser.Scene {
     );
     // The look the wizard is drawn with, for the tests (D36).
     this.parentNode.dataset.look = this.look.id;
-    const data = this.map.rows.map((row) =>
-      [...row].map((c) => (c === '#' ? WALL : c === '=' ? SHELF : FLOOR)),
+    // Each tile drawn as its kind of terrain (D73), a placeholder until the art.
+    const data = this.map.terrain.map((row) =>
+      row.map((kind) => {
+        const index = (TERRAIN_KINDS as readonly string[]).indexOf(kind);
+        return index >= 0 ? index : kind === 'wall' ? WALL : kind === 'shelf' ? SHELF : FLOOR;
+      }),
     );
     const tilemap = this.make.tilemap({ data, tileWidth: TILE, tileHeight: TILE });
     const tileset = tilemap.addTilesetImage(TILES_KEY, TILES_KEY, TILE, TILE, 0, 0);
@@ -140,6 +146,9 @@ class LevelScene extends Phaser.Scene {
     for (const [letter, tile] of this.map.markers) {
       // A marker, like the way out, shows in the dark: it is the castle's shape.
       this.add.image(...centre(tile), markerKey(letter)).setDepth(2.8);
+    }
+    for (const prop of this.map.props) {
+      if (this.textures.exists(propKey(prop.kind))) this.add.image(...centre(prop.tile), propKey(prop.kind)).setDepth(1.5);
     }
     this.cone = this.add.graphics().setDepth(1);
     this.darkness = this.add.graphics().setDepth(2.5);
@@ -533,14 +542,17 @@ class LevelScene extends Phaser.Scene {
       this.things.get(thing.id)?.setFrame(inPlace ? 'in' : 'away');
       stairs.push(`${thing.id}:${inPlace ? 'in' : 'away'}`);
     }
-    // The dark over every floor tile but the wizard's and its eight neighbours (D52).
+    // The dark over every floor tile of the dark area (the dark rooms, or the whole
+    // map) but the wizard's and its eight neighbours (D52, D73).
     this.darkness.clear();
     if (!this.lit) {
       this.darkness.fillStyle(0x07080c, 0.97);
+      const area = this.map.darkArea.length > 0 ? new Set(this.map.darkArea.map(([x, y]) => `${x},${y}`)) : null;
       this.map.rows.forEach((row, y) => {
         [...row].forEach((char, x) => {
           const near = Math.abs(x - this.wizardTile[0]) <= 1 && Math.abs(y - this.wizardTile[1]) <= 1;
-          if (char !== '#' && !near) this.darkness.fillRect(x * TILE, y * TILE, TILE, TILE);
+          const inside = !area || area.has(`${x},${y}`);
+          if (char !== '#' && inside && !near) this.darkness.fillRect(x * TILE, y * TILE, TILE, TILE);
         });
       });
     }

@@ -46,7 +46,7 @@ with exactly as many steps as the story's list below, in that order.
   object, `wizard`, whose actions are methods, and that things are
   objects too; comments; arguments, a move told how far; strings, and
   `say`; `pick_up`; casting a spell with the wand, `zelim`. The wizard
-  carries Nuri's spare wand, lent at the gate, and must borrow a school
+  carries the friend's spare wand, lent at the gate, and must borrow a school
   wand from the wand bank and give the spare back. This story teaches
   nothing; Wenna's first lesson follows it.
 - Before **the-wand-bank**: chapter 1, and chapter 2 with Wenna: a name
@@ -61,7 +61,7 @@ with exactly as many steps as the story's list below, in that order.
 ## in-the-castle: at the library's door
 
 The scene: inside the castle, at the door of the library, its shelves
-beyond. Ilda, a teacher, stands with the new pupils; Nuri beside the
+beyond. Ilda, a teacher, stands with the new pupils; the friend beside the
 wizard; Wenna, the librarian, comes later.
 
 1. voice. (The wizard turns to Ilda.) Inside at last: the great doors
@@ -72,9 +72,9 @@ wizard; Wenna, the librarian, comes later.
 3. ilda. Ilda notices the wand the wizard carries: a spare, lent by a
    friend. Every new pupil borrows a school wand for the year at the wand
    bank, a counter run by the pupils' parents, on the far side of the
-   library; then the wizard can give Nuri's wand back.
+   library; then the wizard can give the friend's wand back.
 4. wizard. The wizard answers: asks the way, or says they will go now.
-5. nuri. (Nuri goes once the words are said.) Nuri has to go to their
+5. friend. (The friend goes once the words are said.) the friend has to go to their
    first class, and says goodbye for now: they will meet at the wand bank.
 6. voice. (Wenna appears at the library's door.) The library: shelves
    taller than a house, old books, a hush; and the librarian coming to
@@ -90,7 +90,7 @@ everyone: *Bienvenidos* is fine for a group. Title: *In the castle* /
 ## the-wand-bank: Eldra's thanks, and the wand
 
 The scene: the library's lowest aisle. Eldra floats beside the wizard
-with her book; further along is the counter of the wand bank, where Nuri
+with her book; further along is the counter of the wand bank, where the friend
 will appear.
 
 1. voice. (The wizard turns to Eldra.) Eldra holds her lost book again,
@@ -101,17 +101,16 @@ will appear.
 4. voice. (The wizard steps to the aisle's end.) Just beyond it is the
    wand bank: a counter where a pupil's parent lends the wizard a school
    wand for the year.
-5. nuri. (Nuri appears by the counter.) Nuri is there, back from class,
+5. friend. (The friend appears by the counter.) the friend is there, back from class,
    and sees the new wand.
-6. wizard. (The wizard turns to Nuri.) The wizard gives Nuri the spare
+6. wizard. (The wizard turns to the friend.) The wizard gives the friend the spare
    wand back, with thanks.
 7. voice. A look back at what Wenna taught in the library, warmly and in
    a natural way, not as a list: the ideas of chapter 2 above, each with
    its programmer's word.
-8. nuri. Night is falling; Nuri has heard the older pupils whisper that
+8. friend. Night is falling; the friend has heard the older pupils whisper that
    the passages change after dark, and wonders who walks there. A hook
    for chapter 3.
 
-Nuri is of the wizard's gender: in Spanish, Nuri's own gendered words are
-choices, and the wizard's too. Title: *The wand bank* / *El banco de
+The friend is of the other gender (Nuri for a boy wizard, Teku for a girl wizard): write the friend's name as `{friend}` and the friend's own gendered words in double braces, as the rules say; the wizard's words are single-braced choices. Title: *The wand bank* / *El banco de
 varitas*.

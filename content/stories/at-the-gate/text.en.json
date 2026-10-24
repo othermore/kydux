@@ -2,12 +2,12 @@
   "title": "At the gate",
   "steps": [
     "You are at the gate, and you do not know how to open it.",
-    "Hello? Is anyone there? Can someone let me in, please?",
+    "Hello? Is anyone there? Can someone let me in?",
     "Someone else is coming up the path: another new pupil, out of breath.",
-    "Hello! I am {friend}. I am a first-year pupil, and I am just arriving too.",
-    "It is nice to meet you. I am {wizard}. Do you know how this gate opens?",
-    "I grew up among wizards, so I know a little magic. This gate is not opened by pushing: it listens to instructions.",
-    "An instruction? How do you give an instruction to a gate?",
-    "I will show you, one thing at a time, right here! In Arvelia, wizards learn like this: you try, you watch what happens, and you try again. Let's start with what a program is."
+    "Hi there! I am {friend}, a first-year pupil, and I am just arriving too.",
+    "Nice to meet you! I am {wizard}. Do you happen to know how this gate opens?",
+    "I grew up among wizards, so I know a little magic. You do not open this gate by pushing, because it listens to instructions.",
+    "What exactly is an instruction? And how do I give an instruction to a gate?",
+    "In Arvelia, you try, you watch what happens, and you try again. But let me show you the most important things from the beginning."
   ]
 }

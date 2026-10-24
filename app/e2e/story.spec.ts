@@ -30,9 +30,9 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
   await storyNext(page);
   await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up');
   await expect(scene).toHaveAttribute('data-speaker', 'friend');
-  await expect(scene).toHaveAttribute('data-bubble', /Hello! I am Teku\./);
+  await expect(scene).toHaveAttribute('data-bubble', /Hi there! I am Teku, a first-year pupil/);
   await expect(page.locator('#story-voice')).toHaveText('');
-  await expect(storySaid(page)).toContainText('Teku: Hello! I am Teku.');
+  await expect(storySaid(page)).toContainText('Teku: Hi there! I am Teku, a first-year pupil');
   // The bubble stays until the next step.
   await page.waitForTimeout(1500);
   await expect(scene).toHaveAttribute('data-speaker', 'friend');

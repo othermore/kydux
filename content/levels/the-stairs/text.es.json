@@ -1,17 +1,17 @@
 {
-  "title": "Los escalones",
+  "title": "De vuelta a la verja",
   "goals": [
-    "Llega a la marca delante de la verja.",
+    "Llega al punto antes de la verja.",
     "No choques contra nada.",
     "En menos de 3 líneas."
   ],
-  "starting_code": "# El programa llega, pero choca. ¡Mejóralo!\nwizard.move_left(4)\nwizard.move_up(6)\n",
+  "starting_code": "# Este programa llega, pero choca contra la verja. ¡Mejóralo!\nwizard.move_left(4)\nwizard.move_up(6)\n",
   "hints": [
-    "Cuenta el número exacto de pasos que necesitas dar a la derecha y hacia arriba.",
-    "Los números dentro de los paréntesis son un poco grandes.",
-    "Cambia los argumentos para que tu {mago|maga} dé exactamente cinco pasos a la derecha y cuatro hacia arriba."
+    "Fíjate en lo que pasa cuando ejecutas el programa para ver dónde choca tu {mago|maga}.",
+    "Uno de los movimientos llega demasiado lejos.",
+    "Cambia el argumento del método `move_up` para que tu {mago|maga} se detenga antes de la verja."
   ],
-  "intro": "¡Mi programa vuelve a la verja, pero los números son muy grandes y choca contra un árbol y el muro! ¿Puedes mejorar el código para que lleguemos sin darnos ningún golpe?",
-  "outro": "¡Ha sido perfecto! Tu código es cada vez más preciso. Ya estamos de vuelta en la verja.",
-  "learned": "Ahora sabes que un programa que funciona todavía puede mejorarse, como dándole a cada movimiento el argumento exacto que necesita."
+  "intro": "Escribí un programa para volver a la verja, pero podría estar mejor. Llega hasta allí, ¡pero tu {mago|maga} choca contra la verja cerrada!",
+  "outro": "¡Mucho mejor! Ahora nos detenemos exactamente donde debemos, sin chocar con nada.",
+  "learned": "Ahora sabes que un programa que funciona todavía puede mejorarse, aquí dándole a cada movimiento el argumento que necesita."
 }

@@ -87,7 +87,7 @@ test('a level offers its lesson again, which goes back to the level (D71)', asyn
   await page.locator('#start').click();
   await page.locator('#level-lesson').click();
   await expect(page).toHaveURL(/#lesson\/how-much\/from\/the-long-corridor$/);
-  await expect(page.locator('.lesson-page h1')).toHaveText('How much');
+  await expect(page.locator('.lesson-page h1')).toHaveText('How far we move');
   await page.locator('#lesson-to-level').click();
   await expect(page).toHaveURL(/#level\/the-long-corridor$/);
 });

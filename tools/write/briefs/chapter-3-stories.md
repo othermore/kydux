@@ -37,7 +37,7 @@ Each step is said by one speaker:
 Before a step's words, something may happen on the scene: a character
 walks, turns, appears or goes. The words go with it and never contradict
 it. Let the characters sound like themselves (story.md) and talk to each
-other, not only explain. At night Nuri whispers; the tone stays warm and
+other, not only explain. At night the friend whispers; the tone stays warm and
 funny, never scary: Dask is strict but fair.
 
 Each file is a JSON object: `{"title": "...", "steps": ["...", ...]}`,
@@ -50,8 +50,8 @@ with exactly as many steps as the story's list below, in that order.
   `pick_up`, spells cast with the wand (`zelim`, `fendra`); variables,
   attributes and `print`, methods that give something back
   (`find_nearest`), `give`, doors and keys (`door.open()`). The wizard
-  has a school wand now and gave Nuri's spare back. This story teaches
-  nothing; the next lesson, Nuri's, is about questions that are true or
+  has a school wand now and gave the friend's spare back. This story teaches
+  nothing; the next lesson, the friend's, is about questions that are true or
   false.
 - Before **the-top-of-the-stairs**: also questions that are true or false,
   which programmers call expressions; choosing with `if` and `else`, a
@@ -64,19 +64,19 @@ with exactly as many steps as the story's list below, in that order.
 ## after-dark: a knock at the door
 
 The scene: a stone passage at night, at the door of the dormitory. The
-wizard stands just outside it; Nuri comes.
+wizard stands just outside it; the friend comes.
 
 1. voice. (The wizard turns to the door.) Night in the castle; you cannot
    sleep; a soft knock.
-2. nuri. (Nuri appears at the door.) Nuri, in a whisper: are you awake,
+2. friend. (The friend appears at the door.) the friend, in a whisper: are you awake,
    `{wizard}`?
 3. wizard. The wizard whispers back: yes; what is it?
-4. nuri. The older pupils say the passages change at night, and that
+4. friend. The older pupils say the passages change at night, and that
    Dask, a strict teacher, patrols them so that no one is out of bed.
-   Nuri wants to go and see.
+   The friend wants to go and see.
 5. wizard. The wizard hesitates, then is tempted, or asks what happens if
    Dask sees them.
-6. nuri. Nuri has a plan: they will look before every step, and Nuri
+6. friend. The friend has a plan: they will look before every step, and the friend
    will show the wizard how to ask the castle questions whose answer is
    true or false.
 7. voice. Together you tiptoe into the passage towards the watchtower's
@@ -90,13 +90,13 @@ The scene: the top of the long stairs, where the night passages begin.
 
 1. voice. (The wizard looks up the passage.) The top of the long stairs:
    older, darker stones; the night passages begin here.
-2. nuri. (Nuri comes up the last step beside the wizard.) Nuri, out of
+2. friend. (The friend comes up the last step beside the wizard.) the friend, out of
    breath and pleased: the loop got them up the stairs.
 3. voice. Ahead, a stair floats in the air, comes and goes; somewhere
    below, footsteps: Dask again.
 4. wizard. The wizard whispers a worry: how do they get past when they
    do not know how long Dask will look their way?
-5. nuri. Nuri has an idea: they will wait as long as he looks, and Nuri
+5. friend. The friend has an idea: they will wait as long as he looks, and the friend
    will show the wizard how a program can do that.
 
 Title: *The top of the stairs* / *Lo alto de las escaleras*.
@@ -104,14 +104,14 @@ Title: *The top of the stairs* / *Lo alto de las escaleras*.
 ## caught: almost at the dormitory
 
 The scene: the end of the night passages, where the way goes down to the
-dormitory. The wizard and Nuri stand together; Dask steps out of the
+dormitory. The wizard and the friend stand together; Dask steps out of the
 dark in front of them.
 
 1. voice. Almost there: the way down to the dormitory is just ahead.
 2. voice. (Dask appears in front of them.) Dask steps out of the dark.
    You are caught.
 3. dask. Dask, stern: what are two first-year pupils doing out of bed?
-4. nuri. Nuri tries to explain, and makes it a little worse, in a funny
+4. friend. The friend tries to explain, and makes it a little worse, in a funny
    way.
 5. voice. (The wizard turns to Dask.) Dask looks at you both for a long
    moment; then, the smallest smile.
@@ -122,6 +122,6 @@ dark in front of them.
    list: the ideas of chapter 3, each with its programmer's word; and the
    feeling of belonging to the castle at last, falling asleep.
 
-Dask speaks to the two of them: in Spanish, his plural words for them
-(*astutos*) depend on the wizard's gender, since Nuri matches it: write
-them as choices. Title: *Caught* / *{Atrapados|Atrapadas}* in Spanish.
+Dask speaks to the two of them, a boy and a girl: in Spanish, his plural
+words for them are masculine (*astutos*), as the rules say for the pair.
+Title: *Caught* / *Atrapados* in Spanish.

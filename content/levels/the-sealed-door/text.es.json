@@ -1,16 +1,16 @@
 {
-  "title": "La verja sellada",
+  "title": "La puerta sellada",
   "goals": [
-    "Abre la verja sellada.",
-    "Cruza la verja."
+    "Abre la puerta sellada.",
+    "Atraviésala."
   ],
-  "starting_code": "# Camina junto a la verja, lanza el hechizo, y cruza.\n",
+  "starting_code": "# Ponte ante el arco, lanza zelim y pasa.\n",
   "hints": [
-    "Muévete hacia arriba hasta estar junto a la verja primero, y luego lanza tu hechizo.",
-    "El hechizo debe ser una cadena dentro de los paréntesis.",
-    "Usa el método `cast` para lanzar el hechizo *zelim*, y luego camina hacia arriba."
+    "Tienes que moverte a la izquierda hacia el camino y luego hacia arriba hasta el arco antes de lanzar el hechizo.",
+    "Usa el método `cast` para lanzar tu hechizo y romper el sello brillante.",
+    "Una vez roto el sello, usa el método `move_up` para pasar."
   ],
-  "intro": "Mira, esa verja con arco está sellada por una runa brillante. ¡Párate a su lado, lanza el hechizo *zelim* con tu varita nueva y cruza!",
-  "outro": "¡El sello se rompió! ¡Un hechizo de verdad, lanzado con tus propias manos! Bueno, con mi varita, pero tú hiciste la magia.",
-  "learned": "Ahora sabes cómo lanzar un hechizo con tu varita, y que lanzar *zelim* rompe un sello."
+  "intro": "Esa puerta en el murete está sellada por una runa brillante. ¡Muévete hasta ponerte justo delante, lanza tu nuevo hechizo para romper el sello y cruza hasta la marca que hay al otro lado!",
+  "outro": "¡Increíble! Tu primer hechizo ha funcionado perfectamente y ha roto el sello.",
+  "learned": "Ahora sabes cómo lanzar un hechizo con tu varita, y que *zelim* rompe un sello."
 }

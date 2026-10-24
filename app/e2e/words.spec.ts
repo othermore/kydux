@@ -40,9 +40,9 @@ test('the words speak of a boy as a boy', async ({ browser }) => {
 
 test('a story greets the wizard by name, and the friend is of the other gender (D77)', async ({ browser }) => {
   for (const [locale, gender, words] of [
-    ['es-ES', 'girl', 'Encantada de conocerte, Teku. Yo soy Marta.'],
-    ['es-ES', 'girl', 'Soy Teku. Soy un alumno de primer año'],
-    ['es-ES', 'boy', 'Soy Nuri. Soy una alumna de primer año'],
+    ['es-ES', 'girl', '¡Encantada de conocerte! Yo soy Marta.'],
+    ['es-ES', 'girl', 'Soy Teku, un alumno de primer año'],
+    ['es-ES', 'boy', 'Soy Nuri, una alumna de primer año'],
     ['en-US', 'girl', 'I am Marta.'],
   ] as const) {
     const page = await withWizard(browser, locale, gender);

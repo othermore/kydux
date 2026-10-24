@@ -1,12 +1,17 @@
 # Notas
 
-A veces queremos dejar una nota en nuestro programa para recordar por qué lo escribimos, o para explicar qué hace. Los programadores llaman a esto un comentario.
+Queremos dejar una nota en nuestro programa para recordar algo, explicar lo que hace o apuntar algo que nos falta por hacer.
 
-Un comentario es para la persona que lee el programa, no para el ordenador. Cuando el ordenador ejecuta tu programa y ve un comentario, ¡simplemente se lo salta!
+Los programadores llaman a este tipo de nota un comentario. Un comentario es para que lo lea una persona, no el ordenador.
 
 ---
 ## Cómo escribir un comentario
 
 Para escribir un comentario, empiezas la línea con el símbolo `#`. Cualquier cosa que escribas después de ese símbolo en la misma línea es parte de la nota.
 
-En este juego, los comentarios que encuentres en el programa de un nivel están ahí para ayudarte. ¡Te dirán qué hacer para resolver el rompecabezas y seguir adelante!
+Cuando el ordenador ejecuta tu programa y ve un comentario, ¡simplemente se lo salta!
+
+---
+## Comentarios en Arvelia
+
+En este juego, los comentarios que encuentras en el programa de un nivel están ahí para ayudarte. ¡Te dirán qué hacer para resolver el acertijo y seguir adelante!

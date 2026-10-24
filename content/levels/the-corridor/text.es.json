@@ -5,11 +5,11 @@
   ],
   "starting_code": "",
   "hints": [
-    "Tienes que escribir cuatro instrucciones en cuatro líneas.",
-    "Primero muévete hacia abajo dos veces, y luego a la derecha dos veces.",
-    "Usa los métodos `move_down` y `move_right`."
+    "Tienes que bajar por el camino y luego ir a la izquierda hacia la hierba.",
+    "Escribe una instrucción en cada línea por cada paso que quieras dar.",
+    "Necesitarás el método `move_down` y el método `move_left` para llegar a la marca."
   ],
-  "intro": "Como la verja todavía no se abre, ¡vamos a dar una vuelta por el prado! Podemos bajar un poco por el camino y luego girar a la derecha hacia la hierba.",
-  "outro": "¡Muy bien! Puedes usar los métodos para moverte a cualquier parte. Vamos a ver qué más podemos encontrar por aquí.",
-  "learned": "Ahora sabes qué son los objetos y los métodos, y cómo usar los cuatro movimientos."
+  "intro": "¡La verja todavía no se abre! Mientras pensamos, echemos un vistazo por el prado. ¡Baja por el camino y luego ve hacia la hierba para llegar a esa marca!",
+  "outro": "¡Bien hecho! El cuaderno siempre está ahí si se te olvida algún método.",
+  "learned": "Ahora sabes qué son los objetos y los métodos, y los cuatro movimientos."
 }

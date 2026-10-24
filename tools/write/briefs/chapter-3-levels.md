@@ -35,9 +35,8 @@ Write the texts of chapter 3's nine levels, in English and Spanish. The
 chapter's stories and lessons are given, and the last level of chapter 2
 for its voice. Each level comes right after the lesson it practises, in
 the order below, and the levels are where the story moves on between the
-lessons. Nuri speaks in every level, whispering at night, in the voice of
-the lessons, and is of the wizard's gender (Spanish choices for Nuri's
-own gendered words too).
+lessons. The friend speaks in every level, whispering at night, in the voice of
+the lessons. The friend is of the other gender (Nuri for a boy wizard, Teku for a girl wizard): write the friend's name as `{friend}` and the friend's own gendered words in double braces, as the rules say.
 
 ## Where it happens
 
@@ -72,9 +71,9 @@ A JSON object with exactly these keys:
   a line of the solution, not even the first or the shortest: it points
   at the idea, the direction or the method by its name alone (`wait`,
   `in_place`), and lets the child write the line.
-- `intro`: what Nuri whispers before the level, one to three sentences:
+- `intro`: what the friend whispers before the level, one to three sentences:
   where they are and what is wanted, so that the child knows why.
-- `outro`: what Nuri whispers after a win, one or two sentences that
+- `outro`: what the friend whispers after a win, one or two sentences that
   move the story on to what comes next.
 - `learned`: one sentence, "Now you know …" / "Ahora sabes …", that says
   what the idea is and what the child can do with it now (as in "now you
@@ -129,11 +128,11 @@ level:
    the answer is no.
    Solution: `if left_door.locked:;     wizard.move_right(2);     right_door.open();     wizard.move_down(2);     wizard.move_left(2); else:;     wizard.move_left(2);     left_door.open();     wizard.move_down(2);     wizard.move_right(2); wizard.move_down()`.
 
-4. `the-wrong-door` — Fix 1. Nuri's program for the next room of two doors
+4. `the-wrong-door` — Fix 1. The friend's program for the next room of two doors
    goes to the locked one: its `if` and `else` do each other's work.
    Played in two ways, `left_locked` and `right_locked`. Goals: reach the
    foot of the long stairs. Starting code, exactly, after a first comment
-   line saying Nuri's program chooses the wrong door and asking the child
+   line saying the friend's program chooses the wrong door and asking the child
    to find and fix it:
    `if left_door.locked:`, then moved in four spaces `wizard.move_left(2)`,
    `left_door.open()`, `wizard.move_down(2)`, `wizard.move_right(6)`;
@@ -142,7 +141,7 @@ level:
    `if` and its `else` and find which one does what.
    Solution: `if left_door.locked:;     wizard.move_right(2);     right_door.open();     wizard.move_down(2);     wizard.move_right(2); else:;     wizard.move_left(2);     left_door.open();     wizard.move_down(2);     wizard.move_right(6)`.
 
-5. `the-long-stairs` — Improve 1, after *Repeat*. Nuri's program climbs
+5. `the-long-stairs` — Improve 1, after *Repeat*. The friend's program climbs
    the long stairs in sixteen lines, up and right eight times; a loop
    says it in three. Goals: climb to the top; in fewer than 4 lines.
    Starting code, exactly: a comment saying the program works in sixteen

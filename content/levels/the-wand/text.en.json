@@ -2,15 +2,15 @@
   "title": "The wand",
   "goals": [
     "Pick up the wand.",
-    "Reach the spot."
+    "Reach the mark."
   ],
-  "starting_code": "# Walk to the stone, pick up the wand, and come back.\n",
+  "starting_code": "# Walk over, pick up the wand, and come back to the mark.\n",
   "hints": [
-    "Walk right to reach the stone, then use the method to pick things up.",
-    "After you pick it up, you need two more moves to walk back to me.",
-    "Use the `pick_up` method with empty brackets when you are right beside it."
+    "First, move to the right to stand beside the flat stone.",
+    "Use the `pick_up` method to get the wand.",
+    "After you have the wand, use `move_left` and `move_down` to reach the mark."
   ],
-  "intro": "I left my spare wand on that flat stone in the corner over there. Walk over, pick it up, and come back to the path by me!",
-  "outro": "You have a wand now! It is only lent, though: one day you will give it back to me.",
-  "learned": "Now you know that things to carry are objects too, and how to pick them up."
+  "intro": "I have a spare wand I can lend you, but so that you practise a little, I left it on that stone. Walk over, pick it up, and come back to the mark by the path!",
+  "outro": "You got it! Now that you have a wand, we can try casting some real magic.",
+  "learned": "Now you know that things are objects too, and how to pick them up."
 }

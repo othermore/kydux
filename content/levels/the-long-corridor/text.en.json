@@ -1,16 +1,16 @@
 {
-  "title": "The long path",
+  "title": "The long walk",
   "goals": [
-    "Reach the foot of the rise's steps.",
+    "Reach the mark.",
     "In fewer than 2 lines."
   ],
-  "starting_code": "# Walk left to the steps in one instruction.\n",
+  "starting_code": "# Walk to the little fence pen in one instruction.\n",
   "hints": [
-    "You only need one instruction to walk the whole way.",
-    "Put a number inside the brackets to say how far to go.",
-    "Use the `move_left` method with the number of steps as its argument."
+    "You need to move right across the grass and the path.",
+    "Count the steps to the mark by the fence pen.",
+    "Use an argument inside the brackets of the `move_right` method to reach it in one instruction."
   ],
-  "intro": "We want to walk along the foot of the grassy rise. We can go all the way in just one instruction. Tell your move exactly how far to go!",
-  "outro": "Excellent! Giving an argument to your move is much faster than writing step after step.",
-  "learned": "Now you know what an argument is, and how to use a move's argument to say how far to go."
+  "intro": "Let us walk across the meadow to that little fence pen on the right. We can reach it in just one instruction if we use an argument!",
+  "outro": "That was so fast! Arguments save us from typing the same instruction over and over.",
+  "learned": "Now you know what an argument is, and that the move actions have one that says how many steps to take."
 }

@@ -2,15 +2,15 @@
   "title": "La contraseña",
   "goals": [
     "Abre la verja.",
-    "Cruza la verja."
+    "Atraviésala."
   ],
-  "starting_code": "# La contraseña es ambrel. Dila y luego cruza la verja.\n",
+  "starting_code": "# La contraseña es ambrel. ¡Dila y pasa!\n",
   "hints": [
-    "Tienes que hacer que tu {mago|maga} hable, y luego se mueva.",
-    "La contraseña debe escribirse exactamente igual, entre comillas.",
-    "Primero usa el método `say` para decir la cadena, y luego camina hacia arriba."
+    "Primero tienes que hacer que tu {mago|maga} diga la contraseña.",
+    "Usa el método `say` para hablar y luego sube por el camino.",
+    "La verja está esperando escuchar la cadena \"ambrel\"."
   ],
-  "intro": "¡Alguien de un curso superior me dijo la contraseña de esta verja! Es *ambrel*. Dila, y pasa por ella hasta la esquina del camino.",
-  "outro": "¡La verja se ha abierto! Las palabras tienen mucho poder aquí. Sigamos subiendo por el camino.",
-  "learned": "Ahora sabes qué es una cadena, y cómo usarla para hacer que tu {mago|maga} diga cosas."
+  "intro": "Un alumno mayor me dijo la contraseña, *ambrel*. ¡Dila y pasa, dando seis pasos hacia arriba por el camino!",
+  "outro": "¡Se abrió! Una cadena era exactamente lo que la verja estaba esperando escuchar.",
+  "learned": "Ahora sabes qué es una cadena, y cómo hacer que tu {mago|maga} diga cosas."
 }

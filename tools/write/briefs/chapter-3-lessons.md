@@ -26,10 +26,10 @@ context:
   - content/stories/after-dark/text.en.json
 ---
 Write the six lessons of chapter 3 of Kydux, *The passages*, in English
-and Spanish. Nuri teaches them at night, in the castle's passages, in a
-whisper so as not to be heard, between the levels that use them; Nuri
-speaks to the wizard as "you", in Nuri's own voice (story.md), and is of
-the wizard's gender. The lessons of chapters 1 and 2 are given: they are
+and Spanish. The friend teaches them at night, in the castle's passages, in a
+whisper so as not to be heard, between the levels that use them; the friend
+speaks to the wizard as "you", in the friend's own voice (story.md), and
+is of the other gender (Nuri for a boy wizard, Teku for a girl wizard): write the friend's name as `{friend}` and the friend's own gendered words in double braces, as the rules say. The lessons of chapters 1 and 2 are given: they are
 what the child has learned, and they show how a lesson is laid out. The
 child reading is eight to twelve.
 

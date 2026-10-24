@@ -1,16 +1,16 @@
 {
-  "title": "El camino largo",
+  "title": "El paseo largo",
   "goals": [
-    "Llega al pie de los escalones.",
+    "Llega a la marca.",
     "En menos de 2 líneas."
   ],
-  "starting_code": "# Camina hacia la izquierda hasta los escalones en una sola instrucción.\n",
+  "starting_code": "# Camina hasta el pequeño corral en una instrucción.\n",
   "hints": [
-    "Solo necesitas una instrucción para hacer todo el camino.",
-    "Pon un número dentro de los paréntesis para decir la distancia a recorrer.",
-    "Usa el método `move_left` con el número de pasos como su argumento."
+    "Tienes que moverte a la derecha cruzando la hierba y el camino.",
+    "Cuenta los pasos hasta la marca junto al corral.",
+    "Usa un argumento dentro de los paréntesis del método `move_right` para llegar en una sola instrucción."
   ],
-  "intro": "Queremos caminar a lo largo del pie de la colina de hierba. ¡Podemos hacer todo el camino en una sola instrucción! Dile a tu movimiento exactamente hasta dónde debe llegar.",
-  "outro": "¡Excelente! Darle un argumento a tu movimiento es mucho más rápido que escribir paso tras paso.",
-  "learned": "Ahora sabes qué es un argumento, y cómo usar el argumento de un movimiento para indicar la distancia."
+  "intro": "Crucemos el prado hasta ese pequeño corral a la derecha. ¡Podemos llegar en una sola instrucción si usamos un argumento!",
+  "outro": "¡Qué rápido! Los argumentos nos ahorran tener que escribir la misma instrucción una y otra vez.",
+  "learned": "Ahora sabes qué es un argumento, y que las acciones de movimiento tienen uno que dice cuántos pasos dar."
 }

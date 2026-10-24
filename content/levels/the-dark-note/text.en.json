@@ -1,15 +1,15 @@
 {
-  "title": "The note",
+  "title": "Fixing the program",
   "goals": [
-    "Reach the spot."
+    "Reach the mark."
   ],
-  "starting_code": "# Find the wrong move and fix it!\nwizard.move_up()\nwizard.move_left()\nwizard.move_down()\nwizard.move_down()\n",
+  "starting_code": "# One move in this program is wrong. Find it and fix it!\nwizard.move_up()\nwizard.move_left()\nwizard.move_down()\nwizard.move_down()\n",
   "hints": [
-    "Look at the first line below the comment.",
-    "If you move right first, your wizard will walk into the fence. Which way should you go instead?",
-    "Change the first action to the `move_left` method so your wizard goes left instead of right."
+    "Read the comment to see what you need to do.",
+    "Watch the first instruction closely to see if it goes the right way.",
+    "Change the first instruction to the `move_left` method so that your wizard goes the right way."
   ],
-  "intro": "I wrote a program on a note to walk to that spot by the little fence pen, but one of the moves is wrong! Can you read my comment, find the wrong move, and fix it?",
-  "outro": "You fixed it! Sometimes code does not work on the first try, but we can always read it, fix it, and try again.",
+  "intro": "I wrote a program to reach that mark, but I think something is wrong! Your wizard bumps into the grassy bank. Can you find the wrong move and fix it?",
+  "outro": "You fixed it! Reading comments really helps to understand a program.",
   "learned": "Now you know what a comment is, and that a note in a program can tell you what to do."
 }

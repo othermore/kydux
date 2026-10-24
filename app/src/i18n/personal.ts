@@ -5,6 +5,8 @@
 // the friend's name, `{friend}`. All are resolved here, from the wizard the child
 // made; anything else in braces (a t() parameter, a Python set) is left as it is.
 
+import { FRIENDS, teacherFriend } from '../engine/looks';
+
 export type Gender = 'girl' | 'boy';
 
 /** What the words need of the wizard. */
@@ -13,15 +15,12 @@ export interface Speaker {
   gender: Gender;
 }
 
-/** The two friends of the story (D77): the one who teaches is of the wizard's
- * other gender, Nuri for a boy wizard and Teku for a girl. */
-export const FRIENDS: Record<Gender, string> = { girl: 'nuri', boy: 'teku' };
+export { FRIENDS };
 
 /** The friend who meets the wizard at the gate: the other gender's. With no wizard
  * yet, the boy's words are taken for the wizard, so the friend is Nuri. */
 export function friendOf(wizard: Pick<Speaker, 'gender'> | null): { id: string; gender: Gender } {
-  const gender: Gender = wizard?.gender === 'girl' ? 'boy' : 'girl';
-  return { id: FRIENDS[gender], gender };
+  return teacherFriend(wizard?.gender ?? null);
 }
 
 /** The friend's choice: two braces each side, one bar. Resolved before the wizard's. */

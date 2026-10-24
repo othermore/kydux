@@ -5,8 +5,7 @@
 
 import type Phaser from 'phaser';
 import type { DoorLock } from './layout';
-import { friendOf } from '../i18n/personal';
-import { DEFAULT_LOOK, type HairStyle, type Look } from './looks';
+import { DEFAULT_LOOK, type HairStyle, type Look, teacherFriend } from './looks';
 
 export const TILE = 48;
 export const WIZARD_WIDTH = 36;
@@ -235,7 +234,7 @@ const GHOST: Figure = {
  * wizard's other gender; Wenna, the librarian. A friend the game has no figure for
  * is drawn as a teacher. */
 export function friendFigure(id: string, wizardGender: 'girl' | 'boy'): Figure {
-  const who = id === 'friend' ? friendOf({ gender: wizardGender }).id : id;
+  const who = id === 'friend' ? teacherFriend(wizardGender).id : id;
   if (who === 'nuri') {
     return {
       robe: '#3f8f5a',

@@ -8,8 +8,7 @@
 
 import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
-import { friendOf } from '../i18n/personal';
-import type { Look } from './looks';
+import { type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
 import type { Tile } from './sight';
 
@@ -154,7 +153,7 @@ export function paintThing(
 /** The sheet a character is drawn from: the friend is the one of the wizard's other
  * gender (D77), and the wizard is drawn in the look the child chose. */
 export function figureName(id: string, look: Look): string {
-  if (id === 'friend') return friendOf({ gender: look.gender }).id;
+  if (id === 'friend') return teacherFriend(look.gender).id;
   return id === 'wizard' ? `wizard-${look.id}` : id;
 }
 

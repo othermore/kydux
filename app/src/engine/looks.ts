@@ -127,3 +127,15 @@ export function lookOf(id: string | null | undefined): Look {
 export function looksFor(gender: Look['gender']): Look[] {
   return LOOKS.filter((look) => look.gender === gender);
 }
+
+/** The two friends of the story (D77), by their gender: Nuri, a girl, and Teku, a
+ * boy. */
+export const FRIENDS: Record<Look['gender'], string> = { girl: 'nuri', boy: 'teku' };
+
+/** The friend who meets a wizard of this gender at the gate and teaches it (D77):
+ * the one of the other gender, its id and its gender. The figure it is drawn from
+ * and the name and words it is given are both decided by this. */
+export function teacherFriend(wizardGender: Look['gender'] | null): { id: string; gender: Look['gender'] } {
+  const gender: Look['gender'] = wizardGender === 'girl' ? 'boy' : 'girl';
+  return { id: FRIENDS[gender], gender };
+}

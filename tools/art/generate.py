@@ -9,7 +9,8 @@ A prompt file is Markdown with a front matter between two `---` lines, each line
 - `candidate`: the folder under art/raw/ the image goes to;
 - `service`: `gemini`, `retrodiffusion` or `pixellab`;
 - for Gemini, `model`, and optionally `image` (a PNG, from the repository's
-  root, the model works from, like a scene's layout guide), `aspect_ratio`
+  root, the model works from, like a scene's layout guide, or a JSON list of
+  them, given in that order), `aspect_ratio`
   (`16:9`...) and `image_size` (`1K`, `2K`); for Retro Diffusion, `prompt_style`, `width`, `height`
   and its other fields; for PixelLab, `endpoint` (`create-image-pixflux`,
   `create-tileset`, `create-character-with-4-directions`...), `prompt_field`
@@ -112,13 +113,16 @@ def gemini(fields: dict, prompt: str) -> tuple[list[bytes], dict]:
     from google.genai import types
 
     client = genai.Client(api_key=secret("GEMINI_API_KEY"))
-    contents: list = [prompt]
-    # An image to work from, like a scene's layout guide, before the words.
-    if fields.get("image"):
-        guide = REPO / fields["image"]
+    contents: list = []
+    # The images to work from, like a scene's layout guide and a picture of the
+    # style, before the words, in the order the prompt names them.
+    given = fields.get("image") or []
+    for name in [given] if isinstance(given, str) else given:
+        guide = REPO / name
         if not guide.is_file():
-            raise ArtError(f"no image {fields['image']} to work from")
-        contents = [types.Part.from_bytes(data=guide.read_bytes(), mime_type="image/png"), prompt]
+            raise ArtError(f"no image {name} to work from")
+        contents.append(types.Part.from_bytes(data=guide.read_bytes(), mime_type="image/png"))
+    contents.append(prompt)
     shape = {k: fields[k] for k in ("aspect_ratio", "image_size") if k in fields}
     answer = client.models.generate_content(
         model=fields.get("model", "gemini-3.1-flash-image"),

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """A scene's layout guide, and how well a painting of it keeps to the grid (D72).
 
-    tools/art/layout.py guide <scene> [--pad 16:9]
-    tools/art/layout.py check <scene> <painted.png> [--name <candidate>]
+    tools/art/layout.py guide <scene> [--pad 16:9] [--view 34]
+    tools/art/layout.py check <scene> <painted.png> [--name <candidate>] [--view 34]
 
 `guide` draws content/scenes/<scene>/ (map.txt and scene.json) at 48 pixels a
 tile, in flat colours, one per kind of terrain: what is walked on flat, what
@@ -12,7 +12,9 @@ the tile its darker front face; the scene's doors and props on their tiles.
 An image model is given the guide to paint the scene over it, keeping every
 block where it is. With --pad, the guide is padded with black bands to that
 shape (the shapes a model draws in), and `check` crops them off again.
-Writes art/raw/layout/<scene>.png.
+Writes art/raw/layout/<scene>.png. With --view 34, the guide is drawn by
+`guide34`, each raised block's top over the tile behind it (art/raw/layout/
+<scene>-34.png).
 
 `stage` cuts a character sheet (figures in a row on magenta: down, left,
 right, up) into its figures, made `--height` pixels tall (true pixels, or
@@ -51,6 +53,8 @@ COLOURS = {
     "shelf": ((130, 90, 60), (84, 56, 36)),
 }
 DOOR = ((60, 60, 70), (34, 34, 40))
+#: The inside of a mass of wall, in the 3/4 guide: darkness, not a wall top.
+VOID = (34, 38, 52)
 STONE = (120, 120, 128)
 
 
@@ -111,6 +115,79 @@ def guide(scene, pad: tuple[int, int] | None = None) -> tuple[Image.Image, int]:
             padded = Image.new("RGB", (image.width, target))
             padded.paste(image, (0, band))
             image = padded
+    return image, band
+
+
+#: How far a raised tile's top rises over the tile behind it, in the 3/4 guide.
+RISE = TILE // 2
+
+
+def guide34(scene, pad: tuple[int, int] | None = None) -> tuple[Image.Image, int]:
+    """The layout guide in the 3/4 view: what stands up (a wall, a hedge, a
+    shelf) is a block whose top rises RISE pixels over the tile behind it, and
+    whose front face, where the tile in front of it does not stand up, takes the
+    lower RISE pixels of its own tile; a fence is a low rail on its tile. So a
+    block in front covers the lower part of the tile behind it, where a figure's
+    feet are. The inside of a mass of wall, a wall with only walls round it, is
+    left dark (VOID), so that only the walls along the floors read as walls.
+    The doors are left as floor, for the game to draw. A band of RISE
+    pixels above the scene holds the first row's tops; the second value is the
+    height of all the bands above the scene's first tile."""
+    grid = kinds(scene)
+    height, width = len(grid), len(grid[0])
+    image = Image.new("RGB", (width * TILE, height * TILE + RISE), (40, 40, 48))
+    draw = ImageDraw.Draw(image)
+    ground = COLOURS["floor"][0]
+
+    def box(x: int, top: int, bottom: int) -> tuple[int, int, int, int]:
+        return (x * TILE, RISE + top, (x + 1) * TILE - 1, RISE + bottom - 1)
+
+    for y, row in enumerate(grid):
+        for x, kind in enumerate(row):
+            flat = COLOURS.get(kind, (ground, None))[0] if not raised(kind) else None
+            under = flat or (COLOURS["grass"][0] if kind in ("fence", "hedge") else ground)
+            draw.rectangle(box(x, y * TILE, (y + 1) * TILE), fill=under)
+    for prop in scene.props:
+        x, y = prop["at"]
+        draw.ellipse(
+            (x * TILE + 8, RISE + y * TILE + 16, (x + 1) * TILE - 8, RISE + (y + 1) * TILE - 8),
+            fill=STONE,
+        )
+
+    def deep(x: int, y: int) -> bool:
+        """A wall with only walls round it: the inside of a mass, never seen up close."""
+        return all(
+            not (0 <= y + dy < height and 0 <= x + dx < width) or grid[y + dy][x + dx] == "wall"
+            for dy in (-1, 0, 1)
+            for dx in (-1, 0, 1)
+        )
+
+    for y, row in enumerate(grid):
+        for x, kind in enumerate(row):
+            if not raised(kind):
+                continue
+            top, face = COLOURS[kind]
+            if kind == "wall" and deep(x, y):
+                top = VOID
+            if kind == "fence":
+                base = (y + 1) * TILE
+                draw.rectangle(box(x, base - 30, base - 22), fill=top)
+                draw.rectangle(box(x, base - 18, base - 10), fill=top)
+                draw.rectangle(box(x, base - 10, base - 6), fill=face)
+                continue
+            draw.rectangle(box(x, y * TILE - RISE, (y + 1) * TILE - RISE), fill=top)
+            below = grid[y + 1][x] if y + 1 < height else None
+            if not (below and raised(below) and below != "fence"):
+                draw.rectangle(box(x, (y + 1) * TILE - RISE, (y + 1) * TILE), fill=face)
+    band = RISE
+    if pad:
+        wide, high = pad
+        target = round(image.width * high / wide)
+        if target > image.height:
+            extra = (target - image.height) // 2
+            padded = Image.new("RGB", (image.width, target))
+            padded.paste(image, (0, extra))
+            image, band = padded, band + extra
     return image, band
 
 
@@ -228,11 +305,13 @@ def main() -> int:
     make = sub.add_parser("guide")
     make.add_argument("scene")
     make.add_argument("--pad", help="pad to a shape, like 16:9")
+    make.add_argument("--view", choices=("plan", "34"), default="plan")
     look = sub.add_parser("check")
     look.add_argument("scene")
     look.add_argument("painted", type=Path)
     look.add_argument("--pad", help="the shape the guide was padded to, like 16:9")
     look.add_argument("--name", default="layout")
+    look.add_argument("--view", choices=("plan", "34"), default="plan")
     put = sub.add_parser("stage")
     put.add_argument("scene")
     put.add_argument("painted", type=Path)
@@ -244,9 +323,11 @@ def main() -> int:
     put.add_argument("--name", default="figures")
     args = parser.parse_args()
     scene = read(args.scene)
+    drawn = guide34 if getattr(args, "view", "plan") == "34" else guide
     if args.command == "guide":
-        image, _ = guide(scene, _shape(args.pad))
-        target = RAW / "layout" / f"{args.scene}.png"
+        image, _ = drawn(scene, _shape(args.pad))
+        suffix = "-34" if drawn is guide34 else ""
+        target = RAW / "layout" / f"{args.scene}{suffix}.png"
         target.parent.mkdir(parents=True, exist_ok=True)
         image.save(target)
     elif args.command == "stage":
@@ -257,8 +338,8 @@ def main() -> int:
         target = RAW / f"contact-sheet-{args.name}.png"
         sheet.save(target)
     else:
-        _, band = guide(scene, _shape(args.pad))
-        sheet = check_sheet(scene, Image.open(args.painted), band, args.name)
+        guided, band = drawn(scene, _shape(args.pad))
+        sheet = check_sheet(scene, Image.open(args.painted).resize(guided.size), band, args.name)
         target = RAW / f"contact-sheet-{args.name}.png"
         sheet.save(target)
     print(target.relative_to(REPO))

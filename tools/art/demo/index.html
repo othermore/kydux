@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kydux: demo de arte</title>
+<style>
+  :root { --bg: #f3efe6; --ink: #22252e; --muted: #6b6f7a; --accent: #3b5bdb; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 system-ui, sans-serif; }
+  header, .bar, .note { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+  h1 { font-size: 22px; margin: 14px 0 4px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; margin: 8px auto; }
+  .group { display: flex; gap: 4px; align-items: center; }
+  .group span { color: var(--muted); margin-right: 4px; }
+  button { font: inherit; padding: 5px 12px; border: 1px solid #b9b3a6; border-radius: 6px; background: #fff; cursor: pointer; }
+  button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  .stage { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+  canvas { width: 100%; height: auto; display: block; border-radius: 8px; background: #1f2330; }
+  .note { color: var(--muted); margin-top: 8px; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kydux: estilo B con piezas y figuras</h1>
+</header>
+<div class="bar">
+  <div class="group" id="scenes"><span>Escena</span></div>
+  <div class="group" id="variants"><span>Fondo</span></div>
+  <div class="group" id="wizards"><span>Mago</span></div>
+  <div class="group"><span>Animación</span>
+    <button id="play" type="button">Pausa</button>
+    <button id="restart" type="button">Desde el principio</button>
+    <button id="grid" type="button" aria-pressed="false">Rejilla</button>
+  </div>
+</div>
+<div class="stage"><canvas id="view"></canvas></div>
+<p class="note" id="note"></p>
+<script src="scenes.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>

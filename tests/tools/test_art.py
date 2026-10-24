@@ -18,6 +18,7 @@ import generate  # noqa: E402
 import isometric  # noqa: E402
 import layout  # noqa: E402
 import open_scene  # noqa: E402
+import sprites  # noqa: E402
 
 MAGENTA = (255, 0, 255, 255)
 GRASS = (80, 160, 70, 255)
@@ -279,3 +280,104 @@ def test_an_autotile_inside_its_terrain_takes_the_middle_quarters():
     assert inside.getpixel((4, 4))[0] == 4 * 30
     alone = pack.joined("path", lambda dx, dy: False)
     assert alone.getpixel((4, 4))[0] == 2 * 30
+
+
+# The painted pieces (sprites.py), the 3/4 guide (layout.guide34) and the demo.
+
+
+def test_a_soft_key_makes_the_magenta_clear_and_takes_its_tint_off_an_edge():
+    image = np.zeros((1, 3, 4), dtype=np.uint8)
+    image[0, 0] = MAGENTA
+    image[0, 1] = (200, 60, 200, 255)  # a figure's edge, half magenta
+    image[0, 2] = GRASS
+    keyed = sprites.soft_key(image)
+    assert keyed[0, 0, 3] == 0
+    assert 0 < keyed[0, 1, 3] < 255
+    assert keyed[0, 1, 0] < 200 and keyed[0, 1, 2] < 200
+    assert keyed[0, 2, 3] == 255
+
+
+def test_a_thin_line_across_a_sheet_is_taken_out_and_a_wide_figure_is_not():
+    image = np.zeros((40, 40, 4), dtype=np.uint8)
+    image[10:12, :, 3] = 255  # a baseline alone
+    image[25:35, 5:35, 3] = 255  # a figure wider than half the sheet
+    out = sprites.without_lines(image)
+    assert out[10:12, :, 3].max() == 0
+    assert out[25:35, 5:35, 3].min() == 255
+
+
+def test_a_regular_pattern_is_cropped_to_a_whole_number_of_its_periods():
+    stripes = np.zeros((60, 60, 4), dtype=np.uint8)
+    stripes[..., 3] = 255
+    for x in range(0, 60, 12):
+        stripes[:, x : x + 3, :3] = 255
+    assert sprites.period(stripes[..., 0].astype(np.float32).mean(axis=0)) == 12
+    assert sprites.periodic(stripes).shape[1] % 12 == 0
+
+
+def walking_sheet(tmp_path, facing_right_in_the_middle=False):
+    """Three rows of three figures on magenta; the side row's figures carry a
+    mark on the side they face."""
+    image = np.zeros((90, 90, 4), dtype=np.uint8)
+    image[...] = MAGENTA
+    for row in range(3):
+        for col in range(3):
+            top, left = row * 30 + 5, col * 30 + 8
+            image[top : top + 20, left : left + 12] = STONE
+            if row == 1:
+                right = facing_right_in_the_middle and col == 1
+                mark = left + 10 if right else left
+                image[top : top + 4, mark : mark + 2] = DIRT
+    path = tmp_path / "walk.png"
+    Image.fromarray(image).save(path)
+    return path
+
+
+def test_a_walking_sheet_gives_four_ways_and_right_is_left_mirrored(tmp_path):
+    written = sprites.figures(walking_sheet(tmp_path), tmp_path / "out", "nuri", 40)
+    names = sorted(p.stem for p in written)
+    assert len(names) == 12 and "nuri-right-2" in names
+    left = np.array(Image.open(tmp_path / "out" / "nuri-left-1.png"))
+    right = np.array(Image.open(tmp_path / "out" / "nuri-right-1.png"))
+    assert left.shape[0] == 40
+    assert (left[:, ::-1] == right).all()
+
+
+def test_a_side_frame_drawn_the_other_way_is_mirrored_back(tmp_path):
+    sheet = walking_sheet(tmp_path, facing_right_in_the_middle=True)
+    sprites.figures(sheet, tmp_path / "out", "eldra", 40, side="0,1f,2")
+    frames = [np.array(Image.open(tmp_path / "out" / f"eldra-left-{i}.png")) for i in range(3)]
+    # Every left frame now has its mark on the left.
+    for frame in frames:
+        marked = cut.is_path(frame[..., :3]) & (frame[..., 3] > 200)
+        columns = np.nonzero(marked.any(axis=0))[0]
+        assert columns.mean() < frame.shape[1] / 2
+
+
+def test_the_3_4_guide_raises_a_wall_s_top_over_the_tile_behind_it(tmp_path):
+    folder = tmp_path / "yard"
+    folder.mkdir()
+    (folder / "map.txt").write_text("###\n#.#\n#.#\n###\n")
+    scene = layout.read("yard", tmp_path)
+    image, band = layout.guide34(scene)
+    pixels = np.array(image)
+    T, R = layout.TILE, layout.RISE
+    assert band == R and image.size == (3 * T, 4 * T + R)
+    top, face = layout.COLOURS["wall"]
+    floor = layout.COLOURS["floor"][0]
+    # The bottom row's top covers the lower RISE of the floor tile behind it.
+    assert tuple(pixels[R + 3 * T - R // 2, T + T // 2]) == top
+    # The floor shows above it, and the top row's face hangs at its own tile's foot.
+    assert tuple(pixels[R + 2 * T + 4, T + T // 2]) == floor
+    assert tuple(pixels[R + T - 4, T + T // 2]) == face
+
+
+def test_the_demo_reads_the_real_scenes_and_the_levels_it_plays():
+    import demo
+
+    data = demo.scene_data("the-library", ["the-lost-book"])
+    assert data["rows"][0].startswith("#")
+    assert any(t["id"] == "old_book" for t in data["things"])
+    assert {a["id"] for a in data["actors"]} >= {"wenna", "eldra"}
+    gate = demo.scene_data("the-gate", [])
+    assert gate["terrains"]["h"]["kind"] == "hedge"

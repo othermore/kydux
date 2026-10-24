@@ -19,12 +19,15 @@ const THEMES = {
 };
 
 const LABELS = {
+  'the-field': 'Capítulo 1: el campo, una pintura',
   'the-gate': 'Capítulo 1: la puerta',
   'the-library': 'Capítulo 2: la biblioteca',
   'the-night-passages': 'Capítulo 3: los pasadizos',
 };
 
 const NOTES = {
+  'the-field':
+    'Una sola pintura de Gemini, hecha primero; el mapa sale de ella. Lo que se levanta (árboles, rocas, vallas, muros, las verjas) va recortado con transparencia y se dibuja por filas con las figuras, así que quien pasa por detrás queda tapado. La cámara sigue al mago. Se juegan los nueve niveles del capítulo 1 propuestos sobre esta escena. La rejilla es un trazo de lápiz que respira; el botón Rejilla la quita.',
   'the-gate':
     'Las soluciones de los niveles del capítulo 1, una tras otra: la contraseña abre la verja, la varita se recoge de la piedra y *zelim* rompe tres sellos. Nuri sigue al mago. Dentro de la entrada, el muro de delante tapa los pies: la profundidad sale del orden en que se dibujan las filas.',
   'the-library':
@@ -46,8 +49,9 @@ function loadImages() {
         }),
     ),
   ).then(() =>
-    Promise.all(
-      Object.entries(DATA.paintings).map(
+    Promise.all([
+      loadField(),
+      ...Object.entries(DATA.paintings).map(
         ([id, file]) =>
           new Promise((resolve) => {
             const img = new Image();
@@ -57,7 +61,7 @@ function loadImages() {
             IMG[`painting:${id}`] = img;
           }),
       ),
-    ),
+    ]),
   );
 }
 
@@ -718,9 +722,19 @@ let scene = null;
 let world = null;
 let ground = null;
 let last = null;
+/** The field painted first, when it is the scene shown. */
+let field = null;
 
 function choose(sceneId) {
   view.scene = sceneId;
+  field = null;
+  if (sceneId === 'the-field') {
+    field = new FieldView(canvas);
+    if (!['painted', 'baked'].includes(view.variant)) view.variant = 'painted';
+    document.getElementById('note').innerHTML = NOTES[sceneId];
+    buttons();
+    return;
+  }
   scene = new Scene(DATA.scenes[sceneId]);
   if (!DATA.paintings[sceneId]) view.variant = 'pieces';
   [canvas.width, canvas.height] = scene.pixels;
@@ -732,6 +746,11 @@ function choose(sceneId) {
 
 /** The world as it is `seconds` after the start, stepped as the page steps it. */
 function seek(seconds) {
+  if (field) {
+    field.restart();
+    for (let t = 0; t < seconds; t += 1 / 60) field.update(1 / 60);
+    return;
+  }
   world = new World(scene);
   for (let t = 0; t < seconds; t += 1 / 60) world.update(1 / 60);
 }
@@ -750,13 +769,19 @@ function buttons() {
       holder.append(b);
     }
   };
-  make('scenes', Object.keys(DATA.scenes).map((id) => [id, LABELS[id]]), view.scene, (id) => choose(id));
+  const ids = [...(DATA.field ? ['the-field'] : []), ...Object.keys(DATA.scenes)];
+  make('scenes', ids.map((id) => [id, LABELS[id]]), view.scene, (id) => choose(id));
   make(
     'variants',
-    [
-      ['pieces', 'Piezas'],
-      ['painted', 'Una pintura', Boolean(DATA.paintings[view.scene])],
-    ],
+    field
+      ? [
+          ['painted', 'Pintura y lápiz'],
+          ['baked', 'Rejilla de Gemini'],
+        ]
+      : [
+          ['pieces', 'Piezas'],
+          ['painted', 'Una pintura', Boolean(DATA.paintings[view.scene])],
+        ],
     view.variant,
     (v) => {
       view.variant = v;
@@ -784,7 +809,8 @@ document.getElementById('play').addEventListener('click', () => {
   buttons();
 });
 document.getElementById('restart').addEventListener('click', () => {
-  world = new World(scene);
+  if (field) field.restart();
+  else world = new World(scene);
 });
 document.getElementById('grid').addEventListener('click', () => {
   view.grid = !view.grid;
@@ -794,6 +820,12 @@ document.getElementById('grid').addEventListener('click', () => {
 function frame(now) {
   const dt = last === null ? 0 : Math.min(0.05, (now - last) / 1000);
   last = now;
+  if (field) {
+    if (view.playing) field.update(dt);
+    field.render(ctx, { variant: view.variant, wizard: view.wizard, grid: view.grid });
+    requestAnimationFrame(frame);
+    return;
+  }
   if (view.playing) {
     world.update(dt);
     if (world.done) world = new World(scene);
@@ -806,11 +838,14 @@ loadImages().then(() => {
   const params = new URLSearchParams(location.search);
   view.variant = params.get('variant') ?? view.variant;
   view.wizard = params.get('wizard') ?? view.wizard;
-  view.grid = params.get('grid') === '1';
-  choose(params.get('scene') ?? 'the-gate');
+  const first = params.get('scene') ?? (DATA.field ? 'the-field' : 'the-gate');
+  // The field's pencil grid is on unless the address turns it off.
+  view.grid = params.has('grid') ? params.get('grid') === '1' : first === 'the-field';
+  choose(first);
   if (params.has('t')) {
     view.playing = false;
     seek(Number(params.get('t')));
+    if (field) field.render(ctx, { variant: view.variant, wizard: view.wizard, grid: view.grid, instant: true });
     buttons();
   }
   document.body.dataset.ready = 'true';

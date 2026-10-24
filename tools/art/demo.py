@@ -96,7 +96,7 @@ def painted(scene_id: str, painting: Path) -> Path | None:
 
 def build() -> Path:
     DEMO.mkdir(parents=True, exist_ok=True)
-    for name in ("index.html", "demo.js"):
+    for name in ("index.html", "demo.js", "field.js"):
         shutil.copy(HERE / "demo" / name, DEMO / name)
     data = {scene_id: scene_data(scene_id, levels) for scene_id, levels in SCENES.items()}
     pieces = sorted(p.stem for p in (DEMO / "pieces").glob("*.png"))
@@ -105,6 +105,10 @@ def build() -> Path:
     if made:
         paintings["the-gate"] = made.name
     payload = {"scenes": data, "pieces": pieces, "paintings": paintings}
+    # Chapter 1 painted first, cut by tools/art/image_first.py, when it has been.
+    cut = DEMO / "field" / "field.json"
+    if cut.is_file():
+        payload["field"] = json.loads(cut.read_text(encoding="utf-8"))
     (DEMO / "scenes.js").write_text(
         "// Made by tools/art/demo.py from content/; not to be edited.\n"
         f"window.KYDUX_DEMO = {json.dumps(payload, indent=1)};\n",
@@ -153,7 +157,18 @@ def compare() -> list[Path]:
         [("the sketch", sketch), ("one painting, cut by cells", paint), ("pieces", pieces)]
     )
     second.save(shots / "compare-variants.png")
-    return [shots / "compare-sketch.png", shots / "compare-variants.png"]
+    made = [shots / "compare-sketch.png", shots / "compare-variants.png"]
+    # Chapter 1 painted first, beside the sketch, when its shots have been taken.
+    if (shots / "image-first-gate.png").is_file():
+        third = side_by_side(
+            [
+                ("the style-B sketch", sketch),
+                ("chapter 1, painted first", Image.open(shots / "image-first-gate.png")),
+            ]
+        )
+        third.save(shots / "compare-image-first.png")
+        made.append(shots / "compare-image-first.png")
+    return made
 
 
 if __name__ == "__main__":

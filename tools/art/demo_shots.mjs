@@ -20,6 +20,19 @@ mkdirSync(shots, { recursive: true });
 
 /** name: the page's query. */
 const SHOTS = {
+  'image-first-start': 'scene=the-field&t=1.6',
+  'image-first-behind-tree': 'scene=the-field&t=2.4',
+  'image-first-behind-fence': 'scene=the-field&t=5',
+  'image-first-pen': 'scene=the-field&t=7',
+  'image-first-gate': 'scene=the-field&t=17',
+  'image-first-gate-open': 'scene=the-field&t=18.6',
+  'image-first-wand': 'scene=the-field&t=23',
+  'image-first-seal': 'scene=the-field&t=27.3',
+  'image-first-door': 'scene=the-field&t=34.3',
+  'image-first-pixellab': 'scene=the-field&wizard=pixellab&t=2.4',
+  'image-first-grid': 'scene=the-field&t=8',
+  'image-first-nogrid': 'scene=the-field&grid=0&t=8',
+  'image-first-cells-baked': 'scene=the-field&variant=baked&t=8',
   'gate-pieces-start': 'scene=the-gate&variant=pieces&t=1.5',
   'gate-pieces-ambrel': 'scene=the-gate&variant=pieces&t=3.2',
   'gate-pieces-corridor': 'scene=the-gate&variant=pieces&t=9.2',

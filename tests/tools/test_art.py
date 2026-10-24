@@ -381,3 +381,68 @@ def test_the_demo_reads_the_real_scenes_and_the_levels_it_plays():
     assert {a["id"] for a in data["actors"]} >= {"wenna", "eldra"}
     gate = demo.scene_data("the-gate", [])
     assert gate["terrains"]["h"]["kind"] == "hedge"
+
+
+# The scene painted first (image-first): its grid found, its cells marked, its
+# things cut out by difference with its ground.
+
+import image_first  # noqa: E402
+import map_from_image  # noqa: E402
+
+
+def test_the_grid_a_painting_shows_is_found_with_its_spacing_and_offset():
+    image = np.full((400, 600, 3), 90, dtype=np.uint8)
+    image[np.arange(10, 400, 50)] = 140
+    image[:, np.arange(20, 600, 50)] = 140
+    grid = map_from_image.find_grid(Image.fromarray(image), cells=(12, 8))
+    assert abs(grid["x"]["spacing"] - 50) <= 0.5 and abs(grid["y"]["spacing"] - 50) <= 0.5
+    assert abs(grid["x"]["offset"] - 20) <= 1 and abs(grid["y"]["offset"] - 10) <= 1
+
+
+def test_marks_become_a_scene_of_the_game(tmp_path):
+    marks = tmp_path / "marks.txt"
+    marks.write_text("gtg\npfp\n###\n")
+    rows = map_from_image.read_marks(marks)
+    written = map_from_image.scene_files(
+        rows, [{"kind": "door", "id": "gate", "at": [1, 2]}], tmp_path
+    )
+    assert [p.name for p in written] == ["map.txt", "scene.json"]
+    scene = json.loads((tmp_path / "scene.json").read_text())
+    assert scene["terrains"]["t"] == {"kind": "tree", "walk": False, "sight": False}
+    assert "#" not in scene["terrains"] and scene["things"][0]["id"] == "gate"
+    (tmp_path / "bad.txt").write_text("gz\n")
+    with pytest.raises(ValueError, match="z"):
+        map_from_image.read_marks(tmp_path / "bad.txt")
+
+
+def test_things_that_touch_are_numbered_together_and_holes_are_filled():
+    mask = np.zeros((6, 8), dtype=bool)
+    mask[1:4, 1:4] = True
+    mask[2, 2] = False
+    mask[1:3, 6] = True
+    labels = image_first.labels(mask)
+    assert labels[1, 1] == labels[3, 3] != labels[1, 6] != 0
+    assert labels[2, 2] == 0 and image_first.filled(mask, 4)[2, 2]
+    assert not image_first.filled(mask, 4)[5, 0]
+
+
+def test_a_pixel_stands_on_the_first_cell_no_one_walks_on_below_it():
+    marks = ["ggg", "ggg", "gtg", "ggg"]
+    depth = image_first.feet(marks, 8, 6, 2)
+    # Over the tree's trunk (row 2) and within its reach: row 2; beside it on its
+    # own row too; on the row below: its own row.
+    assert depth[0, 2] == 2 and depth[2, 0] == 2 and depth[6, 2] == 3
+
+
+def test_the_wand_is_only_its_brown_wood_and_a_gate_all_it_is_in_its_box():
+    painting = np.zeros((20, 20, 3), dtype=np.uint8)
+    painting[...] = (120, 170, 60)  # grass
+    painting[8:12, 4:16] = (150, 90, 40)  # wood
+    mask = np.zeros((20, 20), dtype=bool)
+    mask[6:14, 2:18] = True
+    inside = np.zeros_like(mask)
+    inside[4:16, 0:20] = True
+    wand = image_first.leaf(painting, mask, "wand", inside)
+    assert wand[10, 10] and not wand[7, 3]
+    gate = image_first.leaf(painting, mask, "gate", inside)
+    assert gate[7, 3] and not gate[2, 2]

@@ -1,0 +1,19 @@
+---
+candidate: image-first
+service: gemini
+model: gemini-3-pro-image
+aspect_ratio: 16:9
+image_size: 4K
+---
+Paint one complete level of a children's adventure game, seen from above in a three-quarter top-down view, as in a classic 2D role-playing game: the ground seen from above, every upright thing showing its top and its front face. The style is painted cartoon 2D game art: hand-drawn bold dark outlines, warm saturated colours, soft painted shading, lit tops and shaded faces, chunky readable shapes, round trimmed hedges, stones with a highlight on their tops, the kind of art a friendly adventure game for children has.
+
+THE GRID. The whole picture is a board of exactly 32 square cells across and 18 cells down, like a board game. A thin, faint, LIGHT (pale cream, half transparent) grid line is painted over the whole picture between the cells, over the lawn, the paths, the floors and the walls alike, so that every cell can be counted; the lines are light, never dark, and there are no numbers, letters or labels anywhere. Everything sits inside the cells: one round hedge bush fills exactly one cell, a fence runs along a row of cells, a path is a run of whole cells, a door is one cell wide, a gate two. Keep the whole place in view, small cells, not a close-up.
+
+THE VIEW. Every east-west edge is perfectly horizontal and every north-south edge perfectly vertical; nothing is drawn on a diagonal, there is no perspective and nothing is isometric. A wall is one cell thick: its flat top of capstones fills its own cell, and its tall front face of fitted grey stone blocks hangs down over the whole cell below it, facing the viewer. A wall that runs up and down the picture shows only its top and its side edge.
+
+THE PLACE, from bottom to top.
+1. The garden, rows 12 to 18, the whole width: a green lawn at dusk-gold light. A dirt road comes in from the bottom-left corner. From the road two paths lead to the great gate. The short path goes almost straight up to the gate. The long path winds to the left: along a row of round trimmed hedge bushes, between several short runs of low wooden fence that make a small maze, along the bottom of the garden, and to a short flight of four stone steps that climb a low grassy bank to a small flagstone landing right beside the gate, on its left. Leave a lot of open lawn, a flat grey stepping stone, flowers and tufts at the edges of the paths.
+2. The great wall, rows 10 and 11: a high stone wall that runs straight across the whole picture, its top on row 10 and its face on row 11. In its middle, at columns 16 and 17, the great iron gate, two cells wide, set in the wall and facing the viewer head-on: tall black bars with spikes, shut.
+3. The gatehouse courtyard, rows 2 to 9, behind the great wall. Every inner wall runs straight across from left to right, its capstone top one cell deep and its face one cell deep, and every door is set in a wall's face, facing the viewer. Between the walls run flagstone passages two cells deep. The lower passage, just inside the great gate, runs to the right from the gate; on its back row, against the wall above it, at columns 19 and 20, a low square stone pedestal with a small wooden wand lying on it, and the front row free to walk past. At the passage's right end, at about column 26, the wall above it has a wooden door sealed by a glowing blue rune: the only way on; there is no other opening and no side passage. Behind it the upper passage runs back to the left, two cells deep, to an inner iron gate in the next wall up, at about columns 12 and 13. Beyond that gate, a short last passage with two more doors sealed by glowing blue runes in the back wall, at about columns 8 and 18, and between them, at columns 14 and 15, the opening where the road to the castle leaves the picture at the top, with the castle's lit windows above.
+
+No people, no animals and no text anywhere. Wide landscape picture.

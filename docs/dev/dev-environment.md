@@ -403,6 +403,45 @@ ssh -L 5173:localhost:5173 hija
 
 Then open `https://localhost:5173` in the browser.
 
+### Opening the game to friends
+
+A few friends can play from their homes. The game runs wholly in each
+browser, and every game is saved in the browser it is played in, so the
+server only hands out files: nginx, which the machine has, serves the
+built game over HTTPS behind a password, at `https://kydux.kidux.org`.
+Nothing of the development server is used.
+
+The pieces, once, in this order. Section 11 holds every command that
+needs `sudo`.
+
+1. **A fixed address for the server on the home network**, so that the
+   router's port forwarding always finds it. Give the wired interface a
+   reserved address in the router (its MAC address is in section 11), or
+   a static one on the machine.
+2. **The name.** In the registrar's DNS zone of `kidux.org`, a CNAME
+   record: name `kydux`, target `home.antonio.mg.`, which follows the
+   home's public address. Nothing more is needed of the registrar, and no
+   certificate is bought there.
+3. **The router forwards two ports** to the server: 443 for the game, and
+   80 for the certificate's renewal and for sending a plain address to
+   HTTPS.
+4. **The certificate**, from Let's Encrypt with certbot: free, made in a
+   minute once port 80 reaches the server, and renewed by itself every
+   two months. A certificate bought elsewhere is not needed.
+5. **The site**: `ci/deploy.sh --site` builds the game, copies it to
+   `/srv/kydux` and installs `deploy/nginx-kydux.conf` as nginx's site
+   for the name. After that, each new build goes up with `ci/deploy.sh`.
+6. **The passwords**: one a friend, with `deploy/password.sh <name>`. The
+   browser asks for the name and the password once, and remembers them.
+
+The site sends the same headers as the development server
+(`app/vite.config.ts`), so that stopping a runaway program works, and
+tells the browser to keep Pyodide and the content for a week.
+
+What a friend needs to know: the address, their name and password, and
+that their game lives in that browser on that computer. *Export* on the
+start screen carries a game to another one.
+
 ## 6. Checking your work
 
 One script runs every check the project has. It stops at the first
@@ -624,3 +663,90 @@ The music is asked for the same way, from `tools/sound/prompts/`:
 
 The sound effects need no files: the game makes them as it plays, and the
 settings can turn them off.
+
+## 11. The commands that need `sudo`, for opening the game to friends
+
+Each step of "Opening the game to friends" (section 4) that changes the
+machine or needs root is here, ready to paste, in order. The machine is
+`hija`, on the home network `10.10.11.0/24` with the router at
+`10.10.11.1`; its wired interface `enp2s0` has the MAC address
+`04:42:1a:89:6f:dc` and holds `10.10.11.226` now from DHCP.
+
+### The fixed address
+
+The simplest is a reservation in the router: in its DHCP settings, bind
+`04:42:1a:89:6f:dc` to `10.10.11.226`. Then nothing changes on the
+machine, and the address it has now stays. If the router cannot, set it
+on the machine instead, with NetworkManager:
+
+```sh
+sudo nmcli connection modify "Conexión cableada 1" ipv4.method manual ipv4.addresses 10.10.11.226/24 ipv4.gateway 10.10.11.1 ipv4.dns "8.8.8.8 8.8.4.4"
+sudo nmcli connection up "Conexión cableada 1"
+```
+
+Check it with `ip -4 addr show enp2s0`: the line should say
+`10.10.11.226/24` without the word `dynamic`.
+
+### The router
+
+Forward, to `10.10.11.226`, the outside port 443 to 443 and the outside
+port 80 to 80, both TCP. The game is on 443; 80 is for the certificate's
+making and renewal, and for sending `http://` to `https://`.
+
+### certbot and the certificate
+
+Install certbot with its nginx plugin, and make the certificate once port
+80 reaches the machine (`curl http://kydux.kidux.org/` from a phone off
+the wifi should answer with nginx's page):
+
+```sh
+sudo apt install certbot python3-certbot-nginx
+sudo certbot certonly --webroot -w /var/www/html -d kydux.kidux.org --agree-tos -m <your email> --no-eff-email
+```
+
+It writes the certificate under `/etc/letsencrypt/live/kydux.kidux.org/`
+and sets a timer that renews it. Check the renewal works:
+
+```sh
+sudo certbot renew --dry-run
+```
+
+### The folder the game is served from
+
+Once, so that `ci/deploy.sh` can write it without sudo:
+
+```sh
+sudo mkdir -p /srv/kydux
+sudo chown other:other /srv/kydux
+```
+
+### The site and the first build
+
+From the repository, with the certificate made:
+
+```sh
+ci/deploy.sh --site
+```
+
+It builds, copies, installs `deploy/nginx-kydux.conf` as
+`/etc/nginx/sites-available/kydux`, enables it, checks nginx's
+configuration and reloads nginx. Later builds go up with `ci/deploy.sh`
+alone, no sudo.
+
+### The passwords
+
+One a friend, asked for twice and hashed:
+
+```sh
+deploy/password.sh ana
+```
+
+`deploy/password.sh --remove ana` takes it away. The file is
+`/etc/nginx/kydux.htpasswd`, readable by nginx alone.
+
+### Checking from outside
+
+From a phone off the wifi, `https://kydux.kidux.org` asks for a name and
+a password, then shows the game. The browser's console shows
+`Kydux: cross-origin isolated`, so that a program that never ends can be
+stopped. `http://kydux.kidux.org` goes to the same place over HTTPS.

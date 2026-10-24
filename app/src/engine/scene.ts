@@ -98,7 +98,7 @@ const RESTART_HOLD_MS = 160;
 
 /** How a scene is played: a level's run, or a story's steps (D74). */
 export interface SceneOptions {
-  /** A story: the camera starts on this tile, and the words stay said. */
+  /** A story: the camera starts on this tile (camera.ts), and the words stay said. */
   story?: { camera: Tile };
 }
 

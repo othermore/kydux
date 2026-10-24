@@ -17,6 +17,7 @@ import { LessonNotFound, loadLesson } from './content/lessons';
 import { loadStory, StoryNotFound } from './content/stories';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
 import { currentLanguage, fallbackLanguage, forWizard, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
+import { startPlayTime } from './progress/playtime';
 import * as progress from './progress/progress';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
@@ -275,11 +276,6 @@ function lessonBefore(course: Course, levelId: string): string | null {
   return null;
 }
 
-/** How often play time is counted, in seconds, and how long the page may go
- * untouched before the child is taken to have walked away and it stops. */
-const PLAY_TICK_S = 10;
-const IDLE_S = 120;
-
 /** The story the game opens with, before the creator (D61). */
 const OPENING = '#story/the-letter';
 
@@ -454,18 +450,13 @@ if (root) {
   applyLook(progress.settings());
   setMuted(!progress.settings().sound);
   window.addEventListener('hashchange', route);
-  // Play time (D70): the seconds a level, a lesson or a story is on screen,
-  // with the tab in sight and the child at the page, touched within the last
-  // IDLE_S, counted to the game being played.
-  let touched = Date.now();
-  for (const kind of ['pointerdown', 'pointermove', 'keydown', 'wheel', 'scroll', 'touchstart']) {
-    window.addEventListener(kind, () => (touched = Date.now()), { capture: true, passive: true });
-  }
-  setInterval(() => {
-    const playing = /^(level|lesson|story)\//.test(shownRoute ?? '');
-    const present = document.visibilityState === 'visible' && Date.now() - touched < IDLE_S * 1000;
-    if (playing && present) progress.addPlayTime(PLAY_TICK_S);
-  }, PLAY_TICK_S * 1000);
+  // Play time (D70, playtime.ts): counted while a level, a lesson or a story is
+  // on screen and the child is at the page.
+  startPlayTime({
+    playing: () => /^(level|lesson|story)\//.test(shownRoute ?? ''),
+    visible: () => document.visibilityState === 'visible',
+    add: (seconds) => progress.addPlayTime(seconds),
+  });
   document.addEventListener('kydux:language', () => {
     // The header and footer are drawn again; the screen keeps what it holds and
     // only says its words again.

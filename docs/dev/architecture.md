@@ -28,7 +28,10 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the words the scene shows (words.ts, why an action failed);
                 the looks a wizard may have (looks.ts) and the placeholders for a
                 scene without art (placeholders.ts); the camera on the scene, its
-                zoom and its drag (scene.ts, D69), a painted scene drawn from its
+                zoom, its drag and a story's window (camera.ts, D69, D74), the
+                words said in bubbles and the wizard's thoughts (speech.ts), the
+                playback of a run's events (playback.ts, its long ticks for
+                what the wizard's hands do), a painted scene drawn from its
                 art with its figures sorted by their feet (scene.ts, painted.ts,
                 D76), the goal's beating mark and the sealed doors' glow (D79),
                 the wizard casting, a seal breaking and a door opening (D81),
@@ -43,17 +46,18 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (story.ts, D74), the
                 settings (settings.ts), and the level screen, a view of the run controller
                 (controller.ts), with its goals panel, outcome card, start and
-                win cards (cards.ts), the wizard's notebook with its spells and
-                words (notebook.ts, D80), the
-                stars (stars.ts) and the screen's guide (guide.ts, D68)
+                win cards (cards.ts), the zoom box over the scene (zoom.ts), the
+                wizard's notebook with its spells and words (notebook.ts, D80),
+                the stars (stars.ts) and the screen's guide (guide.ts, D68)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events (stories.ts), the guide's words (guide.ts), and the
                 course (course.ts): its chapters, what comes next, a stop's
                 state, what the child knows in a level (D40)
   src/progress/ the player's progress, a document per game (store.ts), the
-                saved games (games.ts, D70), and the calls the screens make on
-                them (progress.ts)
+                saved games (games.ts, D70), play time while the child is at the
+                page (playtime.ts, D70), and the calls the screens make on them
+                (progress.ts)
   scripts/      before dev and build: copy Pyodide into public/, pack the world
                 into world.zip, copy the content into content/ with the course in
                 content/course.json (its items' titles in every language among

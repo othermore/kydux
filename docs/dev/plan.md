@@ -481,9 +481,11 @@ so that the figures pass behind and in front of them (D76).
     settings (D82); chapters 2 and 3's library and passages painted with
     their margins, mapped, their levels placed on them and their texts
     written again.
-4.4 **The masks made right:** every raised thing cut by its outline, no
-    shadow below its row, what opens or is picked up cut against an edit
-    without it, checked with a figure behind and in front of every row.
+4.4 **The masks made right** (done, sprint 14): every raised thing cut by
+    its outline, no shadow below its row, what opens or is picked up cut
+    against an edit without it, checked by the sweep with the wizard on
+    every cell walked on (`tools/art/sweep.py`), and the painting's rules
+    for the cut in `art/README.md`.
 4.5 **The figures:** the wizard drawn in every look the creator offers,
     and the two friends, recoloured from base sheets by
     `tools/art/figures.py`, with the wizard's casting frames (sprint 13,
@@ -500,8 +502,12 @@ so that the figures pass behind and in front of them (D76).
     is reviewed; `art/raw/`, which git ignores, for the trials.
 
 Sprint 13 (`sprint-13.md`) makes chapter 1 right on its painting, with
-the wizard's looks (4.5) and the first mask rules (4.4); sprint 14 brings
-chapters 2 and 3 onto theirs.
+the wizard's looks (4.5) and the first mask rules (4.4); sprint 14
+(`sprint-14.md`) closes chapter 1: the scene's settings beside its art
+(D82), the field painted with a margin (D83), the wizard picking up and
+celebrating, the story replayed a step at a time, the debts of the
+reviews. Sprint 15 brings chapters 2 and 3 onto their paintings, with
+their margins.
 
 UAT: the three chapters with their paintings and sound; the creator's
 choices showing in the scene; a hunt for things that cover a figure

@@ -19,6 +19,8 @@ export type Outcome = (
       /** The first action that could not be done: its line, its reason, its thing's
        * kind, and for a spell not known, the spell. */
       blocked?: { line: number; reason: string; thing: string | null; spell?: string; things?: string[] };
+      /** The wizard walked over a tile it had to stop on. */
+      walkedOver?: boolean;
     }
   | { kind: 'too_many_ticks'; limit: number }
   | { kind: 'interrupted'; seconds: number }
@@ -76,12 +78,16 @@ function outcomeWords(outcome: Outcome): string {
     case 'way_won':
       return t('outcome.way_won');
     case 'incomplete': {
-      const said = t('outcome.incomplete', { n: outcome.met, total: outcome.total });
+      const lines = [t('outcome.incomplete', { n: outcome.met, total: outcome.total })];
+      // A goal is stopped at, not walked over.
+      if (outcome.walkedOver) lines.push(t('outcome.walked_over'));
       // Why something could not be done, the first time it happened (D28).
-      if (!outcome.blocked) return said;
-      const { line, reason, thing, spell, things } = outcome.blocked;
-      const why = blockedText(reason, thing, { spell, things });
-      return `${said}\n${t('outcome.blocked', { line, reason: why })}`;
+      if (outcome.blocked) {
+        const { line, reason, thing, spell, things } = outcome.blocked;
+        const why = blockedText(reason, thing, { spell, things });
+        lines.push(t('outcome.blocked', { line, reason: why }));
+      }
+      return lines.join('\n');
     }
     case 'too_many_ticks':
       return t('outcome.too_many_ticks', { limit: outcome.limit });

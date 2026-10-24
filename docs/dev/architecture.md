@@ -31,8 +31,11 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 zoom and its drag (scene.ts, D69), a painted scene drawn from its
                 art with its figures sorted by their feet (scene.ts, painted.ts,
                 D76), the goal's beating mark and the sealed doors' glow (D79),
-                the wizard casting, a seal breaking and a door opening (D81), and
-                the sound effects, made as the game plays (sfx.ts)
+                the wizard casting, a seal breaking and a door opening (D81),
+                the wizard's outline where something painted hides it
+                (silhouette.ts), the tester's view of the cells and the masks
+                (debug.ts, opened with ?debug), and the sound effects, made as
+                the game plays (sfx.ts)
   src/editor/   the child's editor, CodeMirror
   src/ui/       the screens: start with the saved games (start.ts), the
                 wizard's creator (wizard.ts), the map, also over a level (map.ts),
@@ -90,7 +93,9 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 Antigravity CLI), the art tools (art/: generate.py asks the
                 image services, cut.py and sprites.py cut what they draw,
                 map_from_image.py and image_first.py read a painting's grid and
-                cut its things, export_scene.py makes content/art/, figures.py
+                cut its things, export_scene.py makes content/art/ and
+                sweep.py stands the wizard on every cell of a scene to check
+                the cut, figures.py
                 makes the figures' sheets from the base sheets in art/figures/,
                 recoloured for each look, and trials/ the scripts of the art
                 trials, contact.py and demo.py among them; D72, D76) and the
@@ -359,7 +364,10 @@ one overturns stays, marked as superseded.
   not be done (`blocked`), so that trying costs time as doing does. In each
   tick, after the wizard's event, every actor takes its step, a teacher
   who sees the wizard catches it, and the goals are checked; all of a
-  tick's events carry its number and the child's line. Asking takes no
+  tick's events carry its number and the child's line. A `reach` goal is
+  met only by the run's end on its tile: a goal is stopped at, and when
+  the wizard walked over it on the way the result says so
+  (`walked_over`), and the page tells the child. Asking takes no
   tick. The end of a run, past the tick limit or caught, is a
   `BaseException` the child's `except Exception` lets through, and a world
   that has ended refuses every further spell, so not even a bare `except:`
@@ -1057,10 +1065,14 @@ one overturns stays, marked as superseded.
   scene, with an action before it (a walk in a straight line, a turn, an
   appearing, a vanishing once the words are said), done by the speaker or
   by the figure `by` names, so that the voice can tell what another does.
-  The camera starts on the story's tile and goes to whoever each step is
-  about, who speaks, walks, appears or turns, gliding there and keeping a
-  little above them so that their words are in view; a figure's words are
-  in a speech bubble with its tail on them. `story.json` holds the
+  The camera starts on the story's tile and follows whoever each step is
+  about (who speaks, walks, appears or turns) through a window: a dead
+  zone the size of the view less that figure, its bubble and a margin.
+  While they are inside, the camera stays still; when the figure pushes
+  past an edge, it glides just far enough to keep them in, as a game's
+  camera does. It never jumps, not even when *Next* or *Back* replays a
+  step at once. A figure's words are in a speech bubble with its tail on
+  them. `story.json` holds the
   staging, checked against the scene by
   `kydux_world.level.story_on_scene`, and `text.<lang>.json` the title and
   one text a step; *Next*, Enter and Space go on, *Back* replays the step
@@ -1083,8 +1095,18 @@ one overturns stays, marked as superseded.
   painting a picture to fit a map. `tools/art/export_scene.py` makes
   `content/art/scenes/<scene>/`: the ground, with what opens or is picked
   up taken out by edits of the painting without it; the raised things cut
-  out by the row their foot stands on, never reaching below that row; and
-  each changing thing in its states. The page draws the ground, the rows
+  out by the row their foot stands on, never reaching below that row, cut
+  by the scene's own map; and each changing thing in its states. What a
+  row draws in front of a figure hangs from its foot (a crown, a rock, a
+  wall's top), never a shadow, a flower or lawn, and a crown is whole,
+  with its sunlit leaves; `tools/art/sweep.py`, run by the export's
+  `check`, stands the wizard on every cell walked on and fails when a cut
+  breaks either. A cell under only a crown is walked on, the figure
+  behind it, and where something painted covers the wizard, wholly or in
+  part, the page draws a thin yellow line of the wizard's outline over
+  it, only there, beating until it fades and coming back (still for a
+  reader who asks for less motion), so that the child never loses the
+  wizard (`silhouette.ts`, the owner's choice). The page draws the ground, the rows
   and the figures sorted by their feet, so that a thing covers who stands
   behind it and is covered by who stands in front, and a pencil grid that
   breathes over the ground for counting steps; a scene without art is
@@ -1115,7 +1137,7 @@ one overturns stays, marked as superseded.
   it. Every item's label carries its chapter and its number by kind,
   stories too: *Chapter 1 · Story 1*, *Chapter 1 · Practice 4*. Rules out
   an unnumbered story before the course.
-- **D79 — What stands on a cell is marked, and a mark is never hidden.**
+- **D79 — What stands on a cell is marked, and no painting hides a mark.**
   Decided 2026-10-24 (sprint 13, 13.3). Every cell a tree's trunk, a rock,
   a fence or a stone of the painting stands on is in the scene's map as
   not walked on; the flat stone is `o`, seen over, and the wand on it is
@@ -1123,8 +1145,10 @@ one overturns stays, marked as superseded.
   cells no cut-out covers, and nothing painted stands on a cell walked on;
   `tests/project/test_art_content.py` holds every painted scene and its
   levels to both, reading the scene's art. The page draws the goal's mark
-  as a ring that beats in size, alpha and colour, under the cut-outs, or
-  over a door's picture when it lies in its doorway, and over each sealed
+  as a ring that beats in size, alpha and colour, under the cut-outs; in a
+  door's doorway it is drawn over the door's picture and shown only once
+  the door is open, fading in as it opens, since a mark seen through a
+  closed door looks wrong. Over each sealed
   door, while its seal holds, a glowing rune: its sign drawn by the page
   unless the painting draws one (`rune` in `art.json`); both are still for
   a reader who asks for less motion. A painting is asked for things that

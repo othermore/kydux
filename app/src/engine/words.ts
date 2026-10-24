@@ -20,6 +20,11 @@ export interface BlockedDetail {
 
 /** Why an action could not be done, from a `blocked` event's reason, its thing's
  * kind, and its detail. */
+/** A word of the debug view's panel and legend (debug.ts), for a tester. */
+export function debugWord(key: string): string {
+  return t(`debug.${key}`);
+}
+
 export function blockedText(reason: string, kind: string | null, detail: BlockedDetail = {}): string {
   const thing = kind ? thingWords(kind) : '';
   const spell = detail.spell ?? '';

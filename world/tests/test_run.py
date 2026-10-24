@@ -93,8 +93,8 @@ def test_the_tick_limit_ends_the_run():
     assert len(result.events) == 20
 
 
-def test_a_win_after_the_goal_still_counts_when_the_code_goes_on():
-    assert run_code(CORRIDOR, "wizard.move_right(4)\nwizard.move_left()").status == "won"
+def test_a_run_that_walks_off_the_goal_before_it_ends_is_not_won():
+    assert run_code(CORRIDOR, "wizard.move_right(4)\nwizard.move_left()").status == "incomplete"
 
 
 def test_print_is_captured_in_a_level():
@@ -126,5 +126,6 @@ def test_the_worker_s_call_speaks_json():
             "failed": False,
             "failed_at_tick": None,
             "bonus": False,
+            "walked_over": False,
         }
     ]

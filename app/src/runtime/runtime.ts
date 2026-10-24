@@ -61,7 +61,8 @@ export function isWorldResult(value: unknown): value is WorldResult {
         (typeof g.met_at_tick === 'number' || g.met_at_tick === null) &&
         typeof g.failed === 'boolean' &&
         (typeof g.failed_at_tick === 'number' || g.failed_at_tick === null) &&
-        typeof g.bonus === 'boolean',
+        typeof g.bonus === 'boolean' &&
+        typeof g.walked_over === 'boolean',
     ) &&
     typeof ticks === 'number' &&
     typeof stdout === 'string' &&

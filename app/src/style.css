@@ -463,6 +463,72 @@ footer {
   cursor: default;
 }
 
+/* The debug view (?debug, engine/debug.ts): its numbers over the scene, and its
+   panel and legend in the scene's lower left corner. */
+.debug-numbers {
+  position: absolute;
+  pointer-events: none;
+}
+
+.debug-box {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: flex;
+  gap: 4px;
+}
+
+.debug-toggle {
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.debug-toggle[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.debug-legend {
+  position: absolute;
+  left: 10px;
+  bottom: 42px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  max-width: 60%;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--fg);
+  font-size: 11px;
+  opacity: 0.92;
+}
+
+.debug-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.debug-swatch {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+.debug-swatch.crossed {
+  background: linear-gradient(45deg, transparent 42%, #ff2a2a 42%, #ff2a2a 58%, transparent 58%),
+    linear-gradient(-45deg, transparent 42%, #ff2a2a 42%, #ff2a2a 58%, transparent 58%);
+}
+
 .editor {
   flex: 1;
   min-height: 0;

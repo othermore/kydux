@@ -165,9 +165,8 @@ async function showStory(content: HTMLElement, id: string, key: string): Promise
       storyScreen({
         story,
         next: next(course, `story:${id}`),
-        // The game's opening goes on to the creator, or, with a wizard made, to the
-        // course's first item (D61).
-        // The opening goes on to the creator, or, with a wizard made, to what follows it.
+        // The game's opening goes on to the creator, or, with a wizard made, to what
+        // follows it (D61).
         ...(story.opening
           ? { onward: progress.wizard() ? itemHash(next(course, `story:${id}`) ?? courseStart(course)) : '#wizard' }
           : {}),

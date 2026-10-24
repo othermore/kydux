@@ -204,6 +204,7 @@ describe('the worker\'s answers', () => {
         failed: false,
         failed_at_tick: null,
         bonus: false,
+        walked_over: false,
       },
     ],
     ticks: 1,

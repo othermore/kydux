@@ -101,17 +101,17 @@ export function preloadArt(scene: Phaser.Scene, { scene: painted, figures }: Art
   }
 }
 
-/** The painting as the ground, and its raised things by row. */
-export function paintScene(scene: Phaser.Scene, art: Art): void {
+/** The painting as the ground, and its raised things by row, returned. */
+export function paintScene(scene: Phaser.Scene, art: Art): Phaser.GameObjects.Image[] {
   const scale = artScale(art);
   scene.add.image(0, 0, 'art-ground').setOrigin(0, 0).setScale(scale).setDepth(0);
-  for (const row of art.scene.rows) {
+  return art.scene.rows.map((row) =>
     scene.add
       .image(0, row.top * scale, `art-row-${row.row}`)
       .setOrigin(0, 0)
       .setScale(scale)
-      .setDepth(rowDepth(row.row));
-  }
+      .setDepth(rowDepth(row.row)),
+  );
 }
 
 /** A painted thing in its state, among the rows by its foot (D76), or null when the
@@ -275,13 +275,20 @@ function mix(from: number, to: number, t: number): number {
 
 /** The goal's mark (D79): a bright ring with a soft disc in it, centred on a point
  * at `depth`, over the ground and under what stands in front; it beats in size,
- * alpha and colour unless `still`. */
-export function drawMark(scene: Phaser.Scene, [x, y]: [number, number], still: boolean, depth: number): void {
+ * alpha and colour unless `still`. The mark is returned, for the page to hide it
+ * and fade it in, which its beat inside does not touch. */
+export function drawMark(
+  scene: Phaser.Scene,
+  [x, y]: [number, number],
+  still: boolean,
+  depth: number,
+): Phaser.GameObjects.Container {
   const disc = scene.add.circle(0, 0, TILE * 0.32, 0xffe066, 0.35);
   const ring = scene.add.circle(0, 0, TILE * 0.36).setStrokeStyle(3, 0xffc61a, 1);
-  const mark = scene.add.container(x, y, [disc, ring]).setDepth(depth);
-  if (still) return;
-  scene.tweens.add({ targets: mark, scale: 1.18, alpha: 0.7, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+  const beat = scene.add.container(0, 0, [disc, ring]);
+  const mark = scene.add.container(x, y, [beat]).setDepth(depth);
+  if (still) return mark;
+  scene.tweens.add({ targets: beat, scale: 1.18, alpha: 0.7, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   // Its colour beats too, from gold to a warm white and back, slower than its size.
   scene.tweens.addCounter({
     from: 0,
@@ -296,6 +303,7 @@ export function drawMark(scene: Phaser.Scene, [x, y]: [number, number], still: b
       ring.setStrokeStyle(3, mix(0xffc61a, 0xff8a1a, t), 1);
     },
   });
+  return mark;
 }
 
 /** A sealed door's rune (D79), centred on a point just over the door's depth: a

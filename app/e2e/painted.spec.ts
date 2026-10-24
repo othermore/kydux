@@ -22,6 +22,8 @@ test('chapter 1 plays on the painted field', async ({ page }) => {
   await page.locator('#speed').selectOption('2');
   await page.waitForTimeout(500);
   await page.screenshot({ path: `${SHOTS}01-password.png` });
+  // Where something painted hides the wizard, its outline shows over it.
+  await expect(page.locator('#scene')).toHaveAttribute('data-silhouette', 'true');
   await page.locator('.cm-content').click();
   await page.keyboard.insertText('wizard.say("ambrel")\nwizard.move_up(6)');
   await page.locator('#run').click();
@@ -109,10 +111,12 @@ test('a spell is cast with the wand, the seal breaks, a door opens through its h
   await expect(scene).toHaveAttribute('data-doors', /gate/, { timeout: 10_000 });
 
   // The castle's door hears no word while its seal holds: said first, it is not
-  // heard; the spell, then the word, open it.
+  // heard; the spell, then the word, open it. The mark in its doorway shows only
+  // once it is open.
   await page.goto('/#level/the-way-in');
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(scene).toHaveAttribute('data-marks-hidden', 'castle_door');
   await page.locator('#speed').selectOption('4');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
@@ -120,9 +124,32 @@ test('a spell is cast with the wand, the seal breaks, a door opens through its h
   await page.locator('#run').click();
   await expect(page.locator('.outcome')).toBeVisible({ timeout: 30_000 });
   await expect(scene).not.toHaveAttribute('data-doors', /castle_door/);
+  await expect(scene).toHaveAttribute('data-marks-hidden', 'castle_door');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText('wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")');
   await page.locator('#run').click();
   await expect(scene).toHaveAttribute('data-doors', /castle_door/, { timeout: 30_000 });
+  await expect(scene).toHaveAttribute('data-marks-hidden', '');
+});
+
+test('with ?debug the scene shows its cells, for a tester to name one', async ({ page }) => {
+  await seedWizard(page);
+  await page.goto('/?debug#level/the-sealed-door');
+  await page.locator('#start').click();
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-debug', 'true', { timeout: 90_000 });
+  // The numbers are on at first; the cells' kinds and the masks are turned on by hand.
+  await expect(scene).toHaveAttribute('data-debug-layers', 'numbers');
+  await page.locator('#debug-cells').click();
+  await page.locator('#debug-masks').click();
+  await expect(scene).toHaveAttribute('data-debug-layers', 'numbers,cells,masks');
+  await expect(page.locator('.debug-legend')).toBeVisible();
+  await page.screenshot({ path: `${SHOTS}11-debug-cells.png` });
+  await page.locator('#debug-masks').click();
+  await expect(scene).toHaveAttribute('data-debug-layers', 'numbers,cells');
+  await page.goto('/#level/the-gate');
+  await page.locator('#start').click();
+  await expect(page.locator('#scene')).toHaveAttribute('data-state', /./, { timeout: 90_000 });
+  await expect(page.locator('#scene')).not.toHaveAttribute('data-debug', /./);
 });

@@ -4,8 +4,13 @@ choice of 2026-10-23): what the page draws, at CELL pixels a cell.
 
     tools/art/export_scene.py [scene | figures | check | all]
 
+`check` draws pictures of the exported scene to look at, then sweeps it
+(tools/art/sweep.py) and fails when its cut-outs would show a figure a
+problem: a shadow or a flower drawn in front, the lawn drawn in front, a hole.
+
 The scene, from art/raw/image-first/ (the painting without its grid, its grid,
-the cells marked by hand, the ground-only edit) and art/raw/game-field/ (the
+the ground-only edit), the scene's map, content/scenes/the-field/map.txt, whose
+cells were marked by hand and which the world plays on, and art/raw/game-field/ (the
 painting's edits, each with one thing changed: the gateway without its gate,
 the gate open, the arch without its sealed door, the castle's door open onto
 the dark, the flat stone without the wand). Writes content/art/scenes/the-field/:
@@ -47,6 +52,7 @@ sys.path.insert(0, str(HERE))
 import figures as looks  # noqa: E402
 import image_first  # noqa: E402
 import sprites  # noqa: E402
+import sweep  # noqa: E402
 
 REPO = HERE.parents[1]
 RAW = REPO / "art" / "raw"
@@ -54,6 +60,9 @@ SOURCE = RAW / "image-first"
 EDITS = RAW / "game-field"
 WORK = RAW / "game"
 SCENE_OUT = REPO / "content" / "art" / "scenes" / "the-field"
+#: The scene's map, which the world plays on: the cells marked by hand, and the
+#: marks the painting is cut by.
+MAP = REPO / "content" / "scenes" / "the-field" / "map.txt"
 FIGURES_OUT = REPO / "content" / "art" / "figures"
 #: The page's pixels a cell.
 CELL = 96
@@ -142,7 +151,9 @@ def changed(a: np.ndarray, b: np.ndarray, threshold: float = 60) -> np.ndarray:
     smooth = Image.fromarray(np.clip(d, 0, 255).astype(np.uint8)).filter(
         ImageFilter.GaussianBlur(1.5)
     )
-    mask = Image.fromarray(((np.array(smooth) * 3) > threshold).astype(np.uint8) * 255)
+    # Tripled as integers: in its own bytes the strongest differences would wrap round.
+    tripled = np.array(smooth).astype(np.int16) * 3
+    mask = Image.fromarray((tripled > threshold).astype(np.uint8) * 255)
     mask = mask.filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.MinFilter(7))
     mask = mask.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MaxFilter(3))
     return np.array(mask) > 127
@@ -306,7 +317,7 @@ def patched(floor: Image.Image) -> Image.Image:
 
 def scene() -> Path:
     grid = json.loads((SOURCE / "grid.json").read_text())
-    marks = [r for r in (SOURCE / "marks.txt").read_text().splitlines() if r]
+    marks = [r for r in MAP.read_text().splitlines() if r]
     rows, columns = len(marks), len(marks[0])
     ground, withouts, _ = composite(grid)
     # The ground, cut by image_first.py into the rows of what stands up: from a
@@ -315,8 +326,8 @@ def scene() -> Path:
     src = WORK / "field-src"
     src.mkdir(parents=True, exist_ok=True)
     Image.fromarray(ground).save(src / "ground-composite.png")
-    for name in ("grid.json", "marks.txt"):
-        shutil.copy(SOURCE / name, src / name)
+    shutil.copy(SOURCE / "grid.json", src / "grid.json")
+    shutil.copy(MAP, src / "marks.txt")
     shutil.copy(SOURCE / "image-first-field-ground-2.png", src / "ground-only.png")
     empty = [0, 0, 0, 0]
     cut = {
@@ -546,6 +557,9 @@ def main() -> int:
     if what in ("check", "all"):
         for path in checks():
             print(path.relative_to(REPO))
+        # The wizard on every cell walked on, and the cut's problems it would show.
+        if sweep.main() != 0:
+            return 1
     return 0
 
 
@@ -592,24 +606,23 @@ def draw(
 def checks(out: Path = RAW / "game-check") -> list[Path]:
     """Pictures of the exported scene with figures standing behind and in front of
     what stands up, at the levels' starts, and the things open and shut."""
-    marks = [r for r in (SOURCE / "marks.txt").read_text().splitlines() if r]
-    walk = {
-        (x, y) for y, row in enumerate(marks) for x, ch in enumerate(row) if ch not in "trf#bo"
-    }
+    marks = [r for r in MAP.read_text().splitlines() if r]
+    walked = sweep.walks("the-field")
+    walk = {(x, y) for y, x in zip(*np.nonzero(walked), strict=True)}
     # Behind: a cell walked on just above a tree, a rock or a fence; in front: just below.
     behind, front = [], []
     for y, row in enumerate(marks):
         for x, ch in enumerate(row):
             if ch in "trf":
                 if (x, y - 1) in walk:
-                    behind.append(("wizard", x, y - 1))
+                    behind.append((sweep.LOOK, x, y - 1))
                 if (x, y + 1) in walk:
                     front.append(("nuri", x, y + 1))
     starts = []
     for path in sorted((REPO / "content" / "levels").glob("*/level.json")):
         level = json.loads(path.read_text())
         if level.get("scene") == "the-field" and "start" in level:
-            starts.append(("wizard", *level["start"]))
+            starts.append((sweep.LOOK, *level["start"]))
     out.mkdir(parents=True, exist_ok=True)
     written = []
     cell = CELL
@@ -632,7 +645,7 @@ def checks(out: Path = RAW / "game-check") -> list[Path]:
         ("castle", (5, 2, 12, 9)),
     ):
         x0, y0, x1, y1 = (v * cell for v in box)
-        near = [("wizard", 8, box[3] - 2), ("nuri", 8, box[1] + 1)]
+        near = [(sweep.LOOK, 8, box[3] - 2), ("nuri", 8, box[1] + 1)]
         shut = draw(standing=near).crop((x0, y0, x1, y1))
         opened = draw(
             standing=near, states={"gate": "open", "seal_gate": "open", "castle_door": "open"}

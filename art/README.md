@@ -44,14 +44,22 @@ A chapter's scene is one painting. Its map is read from the painting.
    again rather than force a picture that misses a requirement.
 3. Mark each cell from the painting with `tools/art/map_from_image.py`:
    walked on or not, seen through or not, and its kind. Every cell a
-   tree, a rock, a fence or a stone stands on is marked as not walked on.
-   This gives the scene's `map.txt` and `scene.json`.
+   tree's trunk, a rock, a fence or a stone stands on is marked as not
+   walked on. A cell under only a crown, its foot in a cell below, is
+   walked on: the figure passes behind the crown. This gives the scene's
+   `map.txt` and `scene.json`. The world plays on that map, and the
+   painting is cut by it too.
 4. Ask Gemini for an edit of the painting without each thing that opens
    or is picked up, one thing an edit. The edits must line up with the
    painting pixel for pixel.
 5. Run `tools/art/export_scene.py`. It writes the scene's files into
    `content/art/scenes/<scene>/` and the check pictures into
-   `art/raw/game-check/`.
+   `art/raw/game-check/`. Its last step, `check`, also sweeps the scene
+   (`tools/art/sweep.py`): it stands the wizard on every cell walked on,
+   writes `sweep-<scene>.png` with every cell where something covers it,
+   lists the cells where the wizard is wholly hidden, and fails when a
+   cut-out breaks one of the rules below. Run it after every export, and
+   look at its sheet before anyone plays the scene.
 6. Place the levels on the new map, each starting where the one before
    ended. A level's start, its mark, its things and its friend stand on
    free cells that no cut-out covers. `tests/project/test_art_content.py`
@@ -69,12 +77,67 @@ row its foot stands on.
 - **A thing covers only the cells above it.** So it hides a figure that
   stands behind it, and a figure that stands in front of it is drawn over
   it.
+- **What is drawn in front of a figure hangs from its foot.** A crown, a
+  rock or a wall's top reaches down to the row it stands on without a
+  break. A shadow, a flower or a tuft on the lawn, with lawn between it
+  and that row, lies on the ground, and so does the lawn between two
+  things: none is drawn over a figure (`floating` and `lawn` in the
+  sweep).
+- **A crown is whole.** Its sunlit leaves, coloured as the grass, are what
+  its dark outline closes in, and are of it; no gap in a crown shows the
+  figure behind it (`hole` in the sweep). Over a wall, only the leaves are
+  the tree's; the stones stand on the wall's row.
 - **What opens or is picked up is cut against its edit without it.** A
   gate that opens must leave no ghost bars, and a wand picked up must
   leave its stone whole.
 
 Look at every check picture before committing. Each shows a figure behind
-and in front of a row's things.
+and in front of a row's things, and `all-<scene>.png` the wizard on every
+cell walked on at once. To name a cell when something looks wrong, open
+the game with `?debug` (docs/dev/dev-environment.md).
+
+## What a painting must keep to
+
+The cut reads the painting by rules, and a painting that breaks one is cut
+wrong in a way the sweep may not catch. Ask for these in the prompt, and
+look for them in the picture before cutting it.
+
+- **Every raised thing has a dark outline all round it.** A crown's sunlit
+  leaves are found by the outline that closes them in; a crown whose
+  outline fades out on its lit side leaves a hole that shows the figure
+  behind it, and the sweep cannot tell such a hole from the lawn.
+- **Things stand apart.** Two crowns, or a crown and a rock, that touch
+  each other close lawn in between them, and that lawn is cut as theirs
+  and drawn over a figure. Leave grass between things, or let one hide
+  the other wholly.
+- **Flowers, tufts and stones that are walked over lie clear of things.**
+  What touches a crown, or lies within half a cell of it, is taken as the
+  crown's and drawn in front of a figure. Keep them a cell away from
+  anything raised.
+- **A thing is at most three cells tall above its foot.** Higher up, its
+  pixels are given the row they lie on and the figure walks over them.
+  Something taller, like the castle, is ground: say so (`castle` in
+  `cut.json`), and nothing of it is cut out.
+- **A wall's top is a straight row of cells, said in `cuts`.** Things never
+  hold together across it, and a crown over a wall keeps only its green
+  leaves and the outline next to them.
+- **Trees are green, walls are grey.** On a wall, what is green within a
+  tree's reach is the tree's; a green thing painted on a wall, like ivy,
+  would be cut as a crown.
+- **Shadows fall on the ground, below and beside the thing, in its colour
+  darkened.** A shadow is told from a thing by being the ground's own
+  colour made darker; a coloured shadow, or one cast on another thing, is
+  cut as a thing.
+- **The ground-only edit keeps the ground pixel for pixel.** The cut is
+  the difference between the painting and that edit; where the edit moves
+  the lawn's brushstrokes, the difference shows them as things.
+- **Lawn, path and the painting's light stay in the colours of
+  `image_first.groundlike`**, lit grass and tan dirt. A scene painted at
+  night, or indoors on stone, needs its own thresholds in `cut.json`
+  before it is cut; the field's are the defaults.
+
+The rules the sweep checks (`floating`, `lawn`, `hole`) catch the first
+three when they go wrong over a cell walked on; the others it cannot see.
 
 ## The figures
 

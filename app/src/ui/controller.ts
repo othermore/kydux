@@ -347,6 +347,7 @@ export class RunController {
           kind: 'incomplete',
           met: needed.filter((g) => g.met).length,
           total: needed.length,
+          ...(needed.some((g) => g.walked_over) ? { walkedOver: true } : {}),
           blocked:
             first && first.line !== null
               ? {

@@ -35,10 +35,14 @@ The cut-out is the difference between the painting and its ground. A pixel
 that differs strongly belongs to a thing, and stands on the row of the first
 cell that no one walks on at or below it, within three rows, in its column or
 the next: a tree's leaves hang over the cells behind its trunk, and are drawn
-with the trunk's row, so that a figure walking behind them is hidden. A pixel
-that differs but lies on a cell walked on, beside a thing's foot or just below
-a tree, a rock or a fence, is a shadow or a tuft: it goes back into the ground. Everything is
-aligned on the grid, TILE pixels a cell.
+with the trunk's row, so that a figure walking behind them is hidden. Over a
+wall, only a crown's leaves are its tree's; the stones stand on the wall's
+row. A crown is whole: what its dark outline closes in, its sunlit leaves
+coloured as the grass, is of it. What is drawn in front of a cell walked on,
+or of the cell above one, where a figure's hat is, hangs from its foot (held):
+a shadow, a flower or a tuft on the lawn, with lawn between it and the row it
+was given, goes back into the ground, as does a shadow on a cell walked on
+beside a thing's foot. Everything is aligned on the grid, TILE pixels a cell.
 """
 
 import json
@@ -88,7 +92,8 @@ def difference(painting: np.ndarray, ground: np.ndarray, threshold: float = 70) 
             ImageFilter.GaussianBlur(1.5)
         )
     )
-    mask = Image.fromarray(((d * 3) > threshold).astype(np.uint8) * 255)
+    # Tripled as integers: in its own bytes the strongest differences would wrap round.
+    mask = Image.fromarray(((d.astype(np.int16) * 3) > threshold).astype(np.uint8) * 255)
     mask = mask.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.MinFilter(9))
     mask = mask.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MaxFilter(3))
     return np.array(mask) > 127
@@ -125,6 +130,14 @@ DEFAULTS = {
     "door": [7.62, 4.12, 9.44, 6.62],
     "page": {},
 }
+
+
+def green(image: np.ndarray) -> np.ndarray:
+    """The pixels coloured as leaves are, a crown's dark ones and its sunlit ones: any
+    green of some colour, never a wall's grey stone."""
+    hsv = np.array(Image.fromarray(image).convert("HSV")).astype(np.float32)
+    h, sat = hsv[..., 0] * 360 / 255, hsv[..., 1] / 255
+    return (h > 45) & (h < 140) & (sat > 0.25)
 
 
 def groundlike(image: np.ndarray) -> np.ndarray:
@@ -202,6 +215,126 @@ def feet(marks: list[str], height: int, width: int, tile: int) -> np.ndarray:
     return cell_row[ys][:, xs]
 
 
+#: How dark a painted outline is: no channel brighter than this.
+OUTLINE = 60
+
+
+#: How wide a band of the scene's edge closes in a crown it cuts, in working pixels.
+EDGE_BAND = 32
+
+
+def reached(
+    inside: np.ndarray, band: np.ndarray, dark: np.ndarray, b: int = EDGE_BAND
+) -> np.ndarray:
+    """In a band along a box's edges, what lies straight out from `inside`: each
+    band pixel takes the value of the first pixel inward of the band, along its
+    row for a side band, along its column for a top or bottom one, as far out as
+    the first dark outline it meets, that outline too. The band is `b` pixels wide."""
+
+    def out_to(values: np.ndarray, outline: np.ndarray) -> np.ndarray:
+        # Along axis 1, the band's inner edge at index 0 and the box's edge at its end.
+        passed = np.logical_or.accumulate(outline, axis=1)
+        passed[:, 1:] = passed[:, :-1].copy()
+        passed[:, 0] = False
+        return values[:, None] & ~passed
+
+    out = np.zeros_like(inside)
+    height, width = inside.shape
+    if band[:, 0].all() and width > b:
+        out[:, :b] |= out_to(inside[:, b], dark[:, :b][:, ::-1])[:, ::-1]
+    if band[:, -1].all() and width > b:
+        out[:, -b:] |= out_to(inside[:, -b - 1], dark[:, -b:])
+    if band[0].all() and height > b:
+        out[:b] |= out_to(inside[b], dark[:b][::-1].T).T[::-1]
+    if band[-1].all() and height > b:
+        out[-b:] |= out_to(inside[-b - 1], dark[-b:].T).T
+    return out & band
+
+
+def outlined(things: np.ndarray, crowns: np.ndarray, painting: np.ndarray) -> np.ndarray:
+    """What each crown's dark outline closes in, and the outline itself, that the
+    cut-out leaves out: its sunlit leaves, coloured as grass, and the strokes on
+    them. Each crown is looked at in its own box, a crown being the pixels of
+    things within a tree's reach that touch; only what joins a crown is taken
+    into it (spread)."""
+    out = np.zeros_like(things)
+    dark = painting.max(axis=2) < OUTLINE
+    # The crowns found on a coarse grid, and each one's box.
+    step = 8
+    coarse = crowns[::step, ::step]
+    numbers = labels(coarse)
+    # A crown's box reaches past what of it is cut out, to its outline round the
+    # sunlit leaves, the most of them at its top.
+    margin, above = 64, 160
+    height, width = things.shape
+    for number in np.unique(numbers[numbers > 0]):
+        ys, xs = np.nonzero(numbers == number)
+        y0, y1 = max(0, ys.min() * step - above), min(height, (ys.max() + 1) * step + margin)
+        x0, x1 = max(0, xs.min() * step - margin), min(width, (xs.max() + 1) * step + margin)
+        here = things[y0:y1, x0:x1]
+        region = here | dark[y0:y1, x0:x1]
+        # The scene's own edge closes in a crown it cuts, as its outline would, a
+        # band of it wide enough for an outline that stops short of the edge.
+        band = np.zeros_like(region)
+        if y0 == 0:
+            band[:EDGE_BAND] = True
+        if x0 == 0:
+            band[:, :EDGE_BAND] = True
+        if x1 == width:
+            band[:, -EDGE_BAND:] = True
+        if y1 == height:
+            band[-EDGE_BAND:] = True
+        # A hole as large as half the box at most: the lawn round the crown reaches
+        # the box's edge, and is never one. The outline and its strokes inside the
+        # crown are of it too.
+        inside = filled(region | band, region.size // 2) & ~band
+        # Within the band, each row and column goes on as it is just inside it.
+        inside |= band & reached(inside | here, band, dark[y0:y1, x0:x1])
+        out[y0:y1, x0:x1] |= inside & ~here
+    return out
+
+
+#: How far a crown's sunlit leaves and its edge reach out of its mask, in working
+#: pixels: what its outline closes in, and what next to it differs from the ground.
+SUNLIT_STEPS = 160
+EDGE_STEPS = 48
+
+
+def spread(seed: np.ndarray, allowed: np.ndarray, steps: int) -> np.ndarray:
+    """Each value of `seed` (-1 where none) carried into the `allowed` pixels next to
+    it, a pixel a step, `steps` times: where a pixel reached takes its value from."""
+    out = seed.copy()
+    for _ in range(steps):
+        near = out.copy()
+        near[1:] = np.maximum(near[1:], out[:-1])
+        near[:-1] = np.maximum(near[:-1], out[1:])
+        near[:, 1:] = np.maximum(near[:, 1:], out[:, :-1])
+        near[:, :-1] = np.maximum(near[:, :-1], out[:, 1:])
+        new = allowed & (out < 0) & (near >= 0)
+        if not new.any():
+            break
+        out[new] = near[new]
+    return out
+
+
+def held(things: np.ndarray, depth: np.ndarray, own_row: np.ndarray) -> np.ndarray:
+    """The pixels of things that hang from their foot: on their own row, or above it
+    with a way down to it through pixels of the same row, a pixel a step, straight
+    down or slanting. A crown, a rock or a wall's top hangs from its foot so; a
+    shadow or a flower on the lawn, with lawn between it and the foot it was
+    given, does not."""
+    out = np.zeros_like(things)
+    last = things.shape[0] - 1
+    out[last] = things[last] & (own_row[last] == depth[last])
+    for y in range(last - 1, -1, -1):
+        below, under, here = out[y + 1], depth[y + 1], depth[y]
+        way = below & (under == here)
+        way[1:] |= below[:-1] & (under[:-1] == here[1:])
+        way[:-1] |= below[1:] & (under[1:] == here[:-1])
+        out[y] = things[y] & ((own_row[y] == here) | way)
+    return out
+
+
 def grouped(
     mask: np.ndarray,
     marks: list[str],
@@ -209,10 +342,10 @@ def grouped(
     wand_box: tuple[float, float, float, float] = BOXES["wand"],
 ) -> tuple[np.ndarray, np.ndarray, dict[int, int], np.ndarray]:
     """The things of the mask, found at SMALL pixels a cell: each one's number,
-    the holes inside them, each one's foot, the lowest row of a cell no one walks
-    on that it covers half of, or -1 for a patch on the ground (a shadow, a
-    tuft), and for the pixels within a tree's reach its trunk's row (-1 out of
-    every tree's reach)."""
+    the holes closed in by them, each one's foot, the lowest row of a cell no one
+    walks on that it covers half of, or -1 for a patch on the ground (a shadow, a
+    tuft), and for the pixels within a tree's reach, what lies between its edges
+    too, its trunk's row (-1 out of every tree's reach)."""
     rows, columns = len(marks), len(marks[0])
     small = (
         np.array(
@@ -298,7 +431,6 @@ def grouped(
                     & seen[:, None]
                 )
         grown = spans & ~whole & window
-        holes |= grown
         whole |= grown
         lab[grown | part] = numbers[0]
         reach[(grown | part) & window] = row
@@ -347,10 +479,12 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
 
     painting = np.array(read(settings["nogrid"], tile))
     ground = np.array(read(settings["ground"], tile))
-    mask = difference(painting, ground) & ~groundlike(painting)
+    raw = difference(painting, ground)
+    mask = raw & ~groundlike(painting)
     # The castle is ground: nothing of it is cut out, down to the foot of its walls.
     castle = round(settings["castle"] * tile)
     mask[:castle] = False
+    raw[:castle] = False
     lab, holes, foot, reach = grouped(mask, marks, tuple(settings["cuts"]), boxes["wand"])
     # Each pixel of a thing stands on its tree's trunk, within a tree's reach, or
     # else on the first cell no one walks on at or below it.
@@ -362,12 +496,22 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     feet_of = np.array([foot.get(n, -1) for n in range(int(lab.max()) + 1)])
     of_thing = feet_of[up(lab)] >= 0
     trunk = up(reach)
-    depth = np.where(trunk >= 0, trunk, feet(marks, *mask.shape, tile))
+    stands_on = feet(marks, *mask.shape, tile)
+    depth = np.where(trunk >= 0, trunk, stands_on)
     own_row = np.repeat((np.arange(rows * tile) // tile)[:, None], columns * tile, axis=1)
     walked = np.array([[ch not in STANDING for ch in row] for row in marks])
     ys = np.minimum(np.arange(rows * tile) // tile, rows - 1)
     xs = np.minimum(np.arange(columns * tile) // tile, columns - 1)
     on_walked = walked[ys][:, xs]
+    # Over a wall, within a tree's reach, only the crown's leaves and the outline
+    # next to them are the tree's: the stones stand on the wall's own row.
+    on_wall = np.array([[ch == "#" for ch in row] for row in marks])[ys][:, xs]
+    leafy = (trunk >= 0) & on_wall & green(painting)
+    near_leaves = np.array(
+        Image.fromarray(leafy.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(9))
+    )
+    leafy |= (painting.max(axis=2) < OUTLINE) & (near_leaves > 0)
+    depth = np.where((trunk >= 0) & on_wall & ~leafy, stands_on, depth)
     # A thing's pixels are the small grid's, kept to a few pixels round the mask,
     # so that its edge is the mask's and the pinholes inside it are filled. On
     # the ground: a patch with no foot, what lies below a tree's trunk (its
@@ -377,7 +521,34 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     ratio = (painting.astype(np.float32) + 1) / (ground.astype(np.float32) + 1)
     darkened = ((ratio.max(axis=2) - ratio.min(axis=2)) < 0.16) & (ratio.mean(axis=2) < 0.93)
     lying = on_walked & (depth == own_row) & (trunk < 0) & darkened
-    things = (mask | body | up(holes)) & of_thing & (own_row <= depth) & ~lying
+    # A hole a thing closes in is of it where the painting differs from its ground;
+    # what lies between a crown's edges is only the crown's reach, never drawn: the
+    # lawn between two bushes, or a wall's shadow between a wall and a crown, would
+    # be drawn in front of whoever stands there. A crown's sunlit leaves are what
+    # its dark outline closes in (below).
+    things = (mask | body | (up(holes) & raw)) & of_thing & (own_row <= depth) & ~lying
+    # A crown's sunlit leaves, coloured as grass and so left out of the mask: what
+    # its dark outline closes in, and what differs from the ground next to it and
+    # is no shadow, are of the crown.
+    # A crown is what lies within a tree's reach, or stands on a tree's or a rock's
+    # cell, whatever it touches.
+    rounded = np.array([[ch in "tr" for ch in row] for row in marks])
+    on_round = rounded[np.clip(depth, 0, rows - 1), xs[None, :]] | (trunk >= 0)
+    crown = np.where(things & on_round, depth, -1).astype(np.int16)
+    sunlit = outlined(things, crown >= 0, painting)
+    grown = spread(crown, sunlit, SUNLIT_STEPS)
+    grown = spread(grown, raw & ~darkened & ~things, EDGE_STEPS)
+    added = (grown >= 0) & (crown < 0) & (own_row <= grown)
+    depth = np.where(added, grown, depth)
+    things |= added
+    # On a cell walked on, and on the cell above one, where a figure's hat is, what
+    # is drawn in front of whoever stands there hangs from its foot: a crown or a
+    # wall's top, never a shadow, a flower or a tuft on the lawn with lawn between
+    # it and the row it was given.
+    hat = np.zeros_like(walked)
+    hat[:-1] = walked[1:]
+    seen = on_walked | hat[ys][:, xs]
+    things &= ~seen | (own_row == depth) | held(things, depth, own_row)
     # What opens, or is picked up, is its leaf, found by its colour in its box:
     # the gate's dark iron bars, the sealed door's brown wood and its blue rune,
     # the wand's brown wood; and, for a gate or a door, whatever else of the

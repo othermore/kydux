@@ -6,14 +6,14 @@
 #################
 ########.########
 tttttttsssttttttt
-tttttttpppttttttt
-tttttttpppttttttt
+ttttttgpppgtttttt
+tttttttpppgtttttt
 tttttttpppttttttt
 tttt####.####tttt
 tttttttgpggtttttt
 tttttttppgrgggttt
 tttttttgppggoottt
-tttttttgppgtttttt
+tttttttgppgggggtt
 tttttttpppttttttt
 ########.########
 ########.########

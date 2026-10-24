@@ -71,4 +71,5 @@ def test_a_step_that_does_not_follow_on_is_found():
 def test_an_honest_run_adds_up():
     assert run_code(CORRIDOR, "wizard.move_right(6)").status == "won"
     assert run_code(CORRIDOR, "wizard.move_right(3)\nwizard.move_left(2)").status == "incomplete"
-    assert run_code(CORRIDOR, "wizard.move_right(9)\nwizard.move_left(2)").status == "won"
+    code = "wizard.move_right(9)\nwizard.move_left(2)\nwizard.move_right(2)"
+    assert run_code(CORRIDOR, code).status == "won"

@@ -13,7 +13,11 @@
 // as it opens), data-dark (whether the
 // room is still dark, D52), data-stairs ("id:in" or "id:away" joined by ";",
 // each stair as a step taken now would find it, D53), data-zoom (the
-// camera's zoom, D69) and data-following (whether the camera follows the wizard).
+// camera's zoom, D69), data-following (whether the camera follows the wizard),
+// data-marks-hidden (the doors whose doorway's mark waits for them to open, D79),
+// data-silhouette (present when the wizard's outline shows where something hides
+// it, silhouette.ts) and data-debug with data-debug-layers (the tester's view and
+// its layers, debug.ts).
 //
 // The camera is a window on the scene (D69): at most VIEW_TILES of it at zoom
 // 1, the tiles at their size; it follows the wizard, the player zooms it and
@@ -25,8 +29,9 @@
 //
 // A story is played on the scene the same way (D74): its steps come as events,
 // an actor appears, walks, turns, says its words in a bubble and vanishes; the
-// camera starts on the story's tile and goes to whoever each step is about, and
-// a bubble stays until the next step.
+// camera starts on the story's tile and keeps whoever each step is about, with
+// their words, inside its window, gliding only when they push past its edge; a
+// bubble stays until the next step.
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
@@ -68,6 +73,8 @@ import {
   preloadArt,
   SHEET_ROW,
 } from './painted';
+import { DebugView, debugging } from './debug';
+import { Silhouette } from './silhouette';
 import { Playback } from './playback';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
@@ -86,6 +93,9 @@ const RESTART_FADE_MS = 120;
 const RESTART_HOLD_MS = 160;
 /** How far, in pixels, the pointer moves before a press is a drag of the camera. */
 const DRAG_THRESHOLD = 6;
+/** In a story, the room, in the scene's pixels, the camera's window keeps between
+ * its edge and the figure it follows with its words (D74). */
+const STORY_EDGE = TILE;
 /** The zooms the player steps through, from the whole scene to a close look. */
 export const ZOOMS = [0.5, 0.75, 1, 1.5, 2] as const;
 const ZOOM_START = ZOOMS.indexOf(1);
@@ -144,6 +154,13 @@ class LevelScene extends Phaser.Scene {
   private openDoors = new Set<string>();
   /** The rune's glow over each sealed door while its seal holds (D79). */
   private glows = new Map<string, Phaser.GameObjects.Container>();
+  /** The painted rows' images, and what a tester sees with `?debug`. */
+  private rows: Phaser.GameObjects.Image[] = [];
+  private debug: DebugView | null = null;
+  /** On a painted scene, the wizard's outline where something hides it. */
+  private silhouette: Silhouette | null = null;
+  /** The goal's mark in a door's doorway, by the door: shown once it is open (D79). */
+  private doorMarks = new Map<string, Phaser.GameObjects.Container>();
   private carried = new Set<string>();
   private actors = new Map<string, ActorState>();
   private cone!: Phaser.GameObjects.Graphics;
@@ -172,6 +189,11 @@ class LevelScene extends Phaser.Scene {
   private speaker: Phaser.GameObjects.Sprite | null = null;
   /** In a story, who the camera is with: whoever the last step was about (D74). */
   private focus: Phaser.GameObjects.Sprite | null = null;
+  /** In a story, the story's tile, which the camera is with before any step. */
+  private spot = { x: 0, y: 0 };
+  /** In a story, what the camera follows: the focus, or the spot; null once a drag
+   * has let go of it. */
+  private followed: { x: number; y: number } | null = null;
 
   constructor(
     private readonly map: Layout,
@@ -237,6 +259,7 @@ class LevelScene extends Phaser.Scene {
 
   /** A door's look, shut or open: its painted state, or the placeholder's frame. */
   private doorLook(id: string, open: boolean, lock: string, moving = false): void {
+    this.markBehind(id, open, moving);
     const image = this.things.get(id);
     if (!image) return;
     const key = `art-${id}-${open ? 'open' : 'closed'}`;
@@ -263,6 +286,21 @@ class LevelScene extends Phaser.Scene {
       delete this.parentNode.dataset.opening;
       if (run === this.restarts && this.openDoors.has(id)) crossfade(this, image, key, step);
     });
+  }
+
+  /** The mark in a door's doorway: hidden while the door is closed, faded in as it
+   * opens (D79). The doors it is hidden behind are on data-marks-hidden. */
+  private markBehind(id: string, open: boolean, moving: boolean): void {
+    const mark = this.doorMarks.get(id);
+    if (!mark) return;
+    this.tweens.killTweensOf(mark);
+    mark.setVisible(open).setAlpha(1);
+    if (open && moving && !this.still) {
+      mark.setAlpha(0);
+      this.tweens.add({ targets: mark, alpha: 1, duration: this.playback.tickDuration * 0.6 });
+    }
+    const hidden = [...this.doorMarks].filter(([, shown]) => !shown.visible).map(([door]) => door);
+    this.parentNode.dataset.marksHidden = hidden.join(',');
   }
 
   /** Whether the player asks for less motion: the pulses then stand still. */
@@ -313,7 +351,7 @@ class LevelScene extends Phaser.Scene {
     );
     if (this.art) {
       // A painted scene (D76): the painting as the ground, its raised things by row.
-      paintScene(this, this.art);
+      this.rows = paintScene(this, this.art);
       drawGrid(this, [this.map.width, this.map.height]);
     } else {
       const tilemap = this.make.tilemap({ data, tileWidth: TILE, tileHeight: TILE });
@@ -352,8 +390,8 @@ class LevelScene extends Phaser.Scene {
     }
     for (const [letter, tile] of this.map.markers) {
       // A marker, like the way out, shows in the dark: it is the castle's shape. On a
-      // painted scene the goal's mark is a ring that pulses, over the ground, or over
-      // a door's picture when it lies in its doorway (D79).
+      // painted scene the goal's mark is a ring that pulses, over the ground, or, in a
+      // door's doorway, over its picture once the door is open (D79).
       if (!this.art) {
         this.add.image(...centre(tile), markerKey(letter)).setDepth(2.8);
         continue;
@@ -362,7 +400,11 @@ class LevelScene extends Phaser.Scene {
         (thing) => thing.kind === 'door' && thing.tile[0] === tile[0] && thing.tile[1] === tile[1],
       );
       const picture = door ? this.things.get(door.id) : undefined;
-      drawMark(this, centre(tile), this.still, picture ? picture.depth + 0.0002 : 2.9);
+      const mark = drawMark(this, centre(tile), this.still, picture ? picture.depth + 0.0002 : 2.9);
+      if (door && picture) {
+        this.doorMarks.set(door.id, mark);
+        this.markBehind(door.id, door.open, false);
+      }
     }
     this.parentNode.dataset.marks = this.map.markers.map(([, tile]) => tile.join(',')).join(';');
     for (const actor of this.map.actors) {
@@ -372,6 +414,13 @@ class LevelScene extends Phaser.Scene {
     }
     this.wizard = this.figure('wizard', WIZARD_KEY, this.map.start, 'down').setDepth(4);
     this.setUpCamera();
+    // The painted rows and things; a placeholder scene has none.
+    const painted = this.art ? [...this.things.values()].filter((image) => image.texture.key.startsWith('art-')) : [];
+    if (this.art && this.wizard.texture.key.startsWith('fig-')) {
+      this.silhouette = new Silhouette(this, this.wizard, [...this.rows, ...painted], this.still);
+      this.parentNode.dataset.silhouette = 'true';
+    }
+    if (debugging()) this.debug = new DebugView(this, this.map, this.parentNode, [...this.rows, ...painted]);
 
     this.playback.onTick((tick, events, instant) => this.show(tick, events, instant));
     this.playback.onState((state) => {
@@ -392,7 +441,14 @@ class LevelScene extends Phaser.Scene {
     const camera = this.cameras.main;
     camera.setBounds(0, 0, this.map.width * TILE, this.map.height * TILE);
     camera.setRoundPixels(true);
-    this.follow();
+    if (this.options.story) {
+      const [x, y] = centre(this.options.story.camera);
+      this.spot = { x, y };
+      camera.centerOn(x, y);
+      this.follow();
+      // The window is made again for the scene's new size.
+      this.scale.on('resize', () => this.fitWindow());
+    } else this.follow();
     this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => {
       if (dy !== 0) this.zoomBy(dy < 0 ? 1 : -1);
     });
@@ -415,6 +471,7 @@ class LevelScene extends Phaser.Scene {
       const dy = pointer.y - pointer.prevPosition.y;
       if (dx === 0 && dy === 0) return;
       camera.stopFollow();
+      this.followed = null;
       this.parentNode.dataset.following = 'false';
       camera.scrollX -= dx / camera.zoom;
       camera.scrollY -= dy / camera.zoom;
@@ -422,18 +479,22 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.zoom = String(camera.zoom);
   }
 
-  /** The camera back on the wizard, following it; in a story, with whoever the
-   * last step was about, or on the story's tile before any step. */
+  /** The camera back on the wizard, following it; in a story, gliding back to
+   * whoever the last step was about, or to the story's tile before any step. */
   follow(): void {
     const camera = this.cameras.main;
     if (this.options.story) {
-      if (this.focus) {
-        this.frame(this.focus, false);
-        return;
+      const target = this.focus ?? this.spot;
+      if (target !== this.followed) {
+        // Phaser's startFollow puts the camera on its target at once: to glide, it
+        // keeps where it was and lets the lerp take it there.
+        const { scrollX, scrollY } = camera;
+        camera.startFollow(target, true, 0.08, 0.08);
+        camera.setScroll(scrollX, scrollY);
+        this.followed = target;
       }
-      camera.stopFollow();
-      camera.centerOn(...centre(this.options.story.camera));
-      this.parentNode.dataset.following = 'false';
+      this.fitWindow();
+      this.parentNode.dataset.following = String(this.focus !== null);
       return;
     }
     camera.startFollow(this.wizard, true, 0.2, 0.2);
@@ -441,27 +502,47 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.following = 'true';
   }
 
-  /** Whether the camera can zoom a step: never out so far that its window would
-   * reach past the scene's edges and show the frame's colour beside it. */
-  /** The camera with a figure, a little above it, so that its words are in view:
-   * gliding there, or at once. */
-  private frame(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
-    const camera = this.cameras.main;
-    const lerp = instant ? 1 : 0.08;
-    camera.startFollow(sprite, true, lerp, lerp, 0, TILE * 0.75);
-    this.parentNode.dataset.following = 'true';
-  }
-
-  /** In a story, the camera goes to whoever the tick is about (D74): who speaks,
+  /** In a story, the camera is with whoever the tick is about (D74): who speaks,
    * walks, appears or turns. */
-  private frameStory(events: WorldEvent[], instant: boolean): void {
+  private frameStory(events: WorldEvent[]): void {
     const about = [...events].reverse().find((event) => ['say', 'move', 'appear', 'face'].includes(event.kind));
     if (!about) return;
     const sprite = about.actor === 'wizard' ? this.wizard : this.actors.get(about.actor)?.sprite;
     if (!sprite) return;
     this.focus = sprite;
-    this.frame(sprite, instant);
   }
+
+  /** In a story, the camera's window (D74): a dead zone the size of the view less
+   * the figure followed with its words and a margin. While they are inside, the
+   * camera stays still; when the figure pushes past an edge, the camera glides
+   * just far enough to keep them in. Before any step it keeps on the story's tile.
+   * In the scene's pixels, as Phaser compares the dead zone with the figure. */
+  private fitWindow(): void {
+    const camera = this.cameras.main;
+    if (!this.followed) return;
+    if (!this.focus || this.followed !== this.focus) {
+      camera.setFollowOffset(0, 0);
+      camera.deadzone = null;
+      return;
+    }
+    const box = this.focus.getBounds();
+    if (this.bubble && this.speaker === this.focus) Phaser.Geom.Rectangle.Union(box, this.bubble.getBounds(), box);
+    // The point followed is the middle of the figure and its words.
+    camera.setFollowOffset(this.focus.x - box.centerX, this.focus.y - box.centerY);
+    const width = Math.max(0, camera.width / camera.zoom - box.width - STORY_EDGE * 2);
+    const height = Math.max(0, camera.height / camera.zoom - box.height - STORY_EDGE * 2);
+    // Phaser's setDeadzone puts the camera on its target at once while it follows;
+    // a dead zone already made is only resized, and the camera stays.
+    if (camera.deadzone) camera.deadzone.setSize(width, height);
+    else {
+      const { scrollX, scrollY } = camera;
+      camera.setDeadzone(width, height);
+      camera.setScroll(scrollX, scrollY);
+    }
+  }
+
+  /** Whether the camera can zoom a step: never out so far that its window would
+   * reach past the scene's edges and show the frame's colour beside it. */
 
   canZoomBy(step: 1 | -1): boolean {
     const next = this.zoomStep + step;
@@ -500,6 +581,7 @@ class LevelScene extends Phaser.Scene {
     const zoom = ZOOMS[this.zoomStep] ?? 1;
     this.cameras.main.setZoom(zoom);
     this.parentNode.dataset.zoom = String(zoom);
+    if (this.options.story) this.fitWindow();
     return true;
   }
 
@@ -513,6 +595,8 @@ class LevelScene extends Phaser.Scene {
     const [x, y] = this.bubbleAnchor();
     this.bubble?.setPosition(x, y);
     this.thought?.setPosition(x, y);
+    this.silhouette?.update();
+    this.debug?.update(this.cameras.main);
   }
 
   /** Over who speaks, or under them when there is no room above; never past the sides. */
@@ -603,7 +687,10 @@ class LevelScene extends Phaser.Scene {
       else if (event.kind === 'hold') this.hold(event);
       else this.showActor(event, instant);
     }
-    if (this.options.story) this.frameStory(events, instant);
+    if (this.options.story) {
+      this.frameStory(events);
+      this.follow();
+    }
     this.publish();
   }
 

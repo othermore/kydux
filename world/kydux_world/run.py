@@ -209,6 +209,7 @@ def _run_one(level: Level, code: str) -> RunResult:
             index in world.failed_at,
             world.failed_at.get(index),
             spec.bonus,
+            index not in world.met_at and getattr(world.goals[index], "walked_over", False),
         )
         for index, spec in enumerate(level.goals)
     ]

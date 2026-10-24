@@ -229,6 +229,31 @@ or thing that changes in its states. The characters come from
 `content/art/figures/`. A scene without that folder is drawn with
 placeholders. Section 10 says how the art is made.
 
+### Seeing the cells
+
+To say exactly where something looks wrong, open the game with `?debug`
+before the `#`, like this:
+
+```
+https://localhost:5173/?debug#level/the-sealed-door
+```
+
+The scene then has three more buttons in its lower left corner, each
+turning a layer on or off:
+
+- **Numbers** writes in each cell's corner its column and its row: `9,12`
+  is column 9, row 12. Say a cell's place this way when you report a
+  problem.
+- **Cells** tints each cell by its kind of terrain and crosses out in red
+  the cells no one walks on. A legend over the buttons says what each
+  colour is.
+- **Masks** draws over every painted thing its mask, the shape the game
+  cuts it by, see-through and in one colour for each row. A gap in a
+  mask, or a mask over the lawn, is a mistake in the cut.
+
+The browser remembers which layers are on. The address without `?debug`
+shows the game as the child sees it.
+
 ### A story on its scene
 
 A story is a short play on a scene. Its `story.json` says the scene,
@@ -247,6 +272,10 @@ that is not a straight line or a figure that speaks out of sight.
 Two other commands matter. `npm run build` makes the finished game under
 `app/dist/`, the same files a release ships. `npm run preview` serves that
 finished build on port 4173, which is how the browser tests run it.
+`npm run build` rewrites `app/public/content/`, and a development server
+already running loses track of some of its files: it then answers
+`content/course.json` with the page itself, and the game finds no course.
+After a build, stop `npm run dev` and start it again.
 
 ## 5. Trying the game from another computer
 

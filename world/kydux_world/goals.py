@@ -5,7 +5,8 @@ true once the goal is met, and optionally `failed(world)`, true once it can
 no longer be met. The world remembers the first tick each was met or failed
 at. A bonus goal (`"bonus": true`) is not needed to win.
 
-The kinds: reach (a marker's tile, or one at x and y), collect (a thing by
+The kinds: reach (the run ends with the wizard on a marker's tile, or on
+one at x and y; passing over it on the way does not count), collect (a thing by
 id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
 say (a text, word for word), give (a thing by id, to an actor by id), no_bumps
 (the wizard bumps into nothing; failed at the first bump),
@@ -44,6 +45,8 @@ class GoalResult:
     failed: bool = False
     failed_at_tick: int | None = None
     bonus: bool = False
+    #: A reach goal not met that the wizard walked over on the way.
+    walked_over: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -54,6 +57,7 @@ class GoalResult:
             "failed": self.failed,
             "failed_at_tick": self.failed_at_tick,
             "bonus": self.bonus,
+            "walked_over": self.walked_over,
         }
 
 
@@ -66,7 +70,8 @@ def _thing_id(spec: GoalSpec, level: Level, kinds: tuple[str, ...] | None = None
 
 
 class ReachGoal:
-    """Met once the wizard has stood on a tile: a marker's, or one given by x and y."""
+    """Met when the run ends with the wizard on a tile, a marker's or one given by x
+    and y: a goal is stopped at, and walking over it on the way does not count."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
         if "marker" in spec.params:
@@ -78,9 +83,14 @@ class ReachGoal:
                 raise LevelError(f"{level.id}: the reach goal's tile is off the map")
         else:
             raise LevelError(f"{level.id}: a reach goal needs a marker or at")
+        #: Whether the wizard has stood on the tile before the run's end.
+        self.walked_over = False
 
     def check(self, world: "World") -> bool:
-        return world.wizard.position == self.target
+        here = world.wizard.position == self.target
+        if here and not world.finished:
+            self.walked_over = True
+        return world.finished and here
 
 
 class CollectGoal:

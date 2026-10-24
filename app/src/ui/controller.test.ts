@@ -77,6 +77,7 @@ function world(status: WorldResult['status'], events: WorldEvent[], metAt: numbe
         failed: false,
         failed_at_tick: null,
         bonus: false,
+        walked_over: false,
       },
     ],
     ticks: events.length,
@@ -204,6 +205,17 @@ describe('RunController', () => {
     await vi.waitFor(() => expect(last().state).toBe('playing'));
     vi.advanceTimersByTime(800);
     expect(last().outcome).toMatchObject({ kind: 'incomplete', met: 0, total: 1 });
+  });
+
+  it('says a goal walked over and not stopped at', async () => {
+    const { runtime, controller, last } = setUp();
+    controller.run('wizard.move_right(2)');
+    const passed = world('incomplete', moves(2), null);
+    passed.goals = passed.goals.map((goal) => ({ ...goal, walked_over: true }));
+    runtime.answer(passed);
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(800);
+    expect(last().outcome).toMatchObject({ kind: 'incomplete', walkedOver: true });
   });
 
   it('changes speed mid-playback', async () => {

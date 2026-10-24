@@ -55,6 +55,8 @@ export interface WorldGoal {
   failed_at_tick: number | null;
   /** Not needed to win. */
   bonus: boolean;
+  /** A reach goal not met that the wizard walked over on the way. */
+  walked_over: boolean;
 }
 
 /** What the world says of a run in a level (kydux_world.run.RunResult.to_dict). */

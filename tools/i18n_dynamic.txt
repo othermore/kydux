@@ -37,3 +37,6 @@ notebook_simple.
 kinds.
 level.kind_
 stars.
+
+# The debug view's panel and legend (app/src/engine/debug.ts): debugWord(key).
+debug.

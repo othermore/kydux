@@ -20,6 +20,7 @@
   "outcome": {
     "won": "¡Lo has conseguido, {wizard}!",
     "incomplete": "Todavía no: {n} de {total} objetivos cumplidos. Inténtalo otra vez.",
+    "walked_over": "Has pasado por la marca sin pararte en ella: el programa tiene que terminar allí.",
     "too_many_ticks": "Tu programa ha dado más de {limit} pasos y {el mago|la maga} está agotad{o|a}. ¿Hay algún bucle que no termina nunca?",
     "interrupted": "Se ha detenido tu programa: llevaba más de {seconds} segundos sin hacer nada.",
     "error": "Python dice: {type}: {message} (línea {line})",
@@ -343,5 +344,26 @@
   },
   "words": {
     "ambrel": "la palabra de la escuela, que abre sus puertas."
+  },
+  "debug": {
+    "title": "Vista de depuración",
+    "numbers": "Números",
+    "cells": "Casillas",
+    "masks": "Máscaras",
+    "blocked": "No se pisa",
+    "kinds": {
+      "wall": "Muro",
+      "floor": "Suelo",
+      "shelf": "Estante",
+      "grass": "Césped",
+      "path": "Camino",
+      "tree": "Árbol",
+      "rock": "Roca",
+      "fence": "Valla",
+      "steps": "Escalones",
+      "bank": "Ribera",
+      "stone": "Piedra",
+      "other": "Otro"
+    }
   }
 }

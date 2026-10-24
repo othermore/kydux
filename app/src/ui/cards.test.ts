@@ -3,7 +3,7 @@ import type { WorldEvent, WorldGoal, WorldResult } from '../runtime/protocol';
 import { judge } from './stars';
 
 function goal(met: boolean, bonus = false): WorldGoal {
-  return { kind: 'reach', params: {}, met, met_at_tick: met ? 1 : null, failed: false, failed_at_tick: null, bonus };
+  return { kind: 'reach', params: {}, met, met_at_tick: met ? 1 : null, failed: false, failed_at_tick: null, bonus, walked_over: false };
 }
 
 const BUMP: WorldEvent = { tick: 1, actor: 'wizard', kind: 'bump', data: {}, line: 1 };

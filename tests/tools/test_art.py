@@ -299,6 +299,66 @@ def test_a_pixel_stands_on_the_first_cell_no_one_walks_on_below_it():
     assert depth[0, 2] == 2 and depth[2, 0] == 2 and depth[6, 2] == 3
 
 
+def test_the_strongest_differences_from_the_ground_are_kept_in_the_mask():
+    # A pixel a hundred levels from its ground on every channel: tripled in its own
+    # bytes it would wrap round below the threshold and be lost.
+    painting = np.full((12, 12, 3), 200, dtype=np.uint8)
+    ground = painting.copy()
+    painting[3:9, 3:9] = 100
+    assert image_first.difference(painting, ground)[6, 6]
+
+
+def test_what_hangs_from_its_foot_is_held_and_a_patch_with_lawn_below_it_is_not():
+    # A crown from row 0 down to its foot's row (2), and a shadow on row 0 with a
+    # pixel of lawn under it, both given row 2.
+    things = np.zeros((6, 4), dtype=bool)
+    things[0:6, 0] = True
+    things[0, 2] = True
+    things[2:6, 3] = True
+    own = np.repeat((np.arange(6) // 2)[:, None], 4, axis=1)
+    depth = np.full((6, 4), 2, dtype=np.int16)
+    held = image_first.held(things, depth, own)
+    assert held[0, 0] and held[4, 3]
+    assert not held[0, 2]
+    # A slanting way down holds too.
+    slant = np.zeros((6, 4), dtype=bool)
+    slant[0, 0] = slant[1, 1] = slant[2, 2] = slant[3, 2] = slant[4, 2] = True
+    assert image_first.held(slant, depth, own)[0, 0]
+
+
+def test_a_value_spreads_into_the_pixels_allowed_next_to_it_and_no_further():
+    seed = np.full((1, 6), -1, dtype=np.int16)
+    seed[0, 0] = 7
+    allowed = np.array([[False, True, True, False, True, True]])
+    assert image_first.spread(seed, allowed, 10).tolist() == [[7, 7, 7, -1, -1, -1]]
+
+
+def test_a_crown_s_sunlit_leaves_inside_its_outline_are_of_it():
+    # A ring of dark outline, the crown's cut-out filling its lower half, and in its
+    # upper half leaves coloured as the lawn outside it.
+    # Far from the picture's edges, which close a crown in as its outline would.
+    painting = np.full((400, 400, 3), (150, 190, 70), dtype=np.uint8)
+    yy, xx = np.mgrid[:400, :400]
+    away = np.hypot(yy - 200, xx - 200)
+    ring = np.abs(away - 120) < 4
+    painting[ring] = (20, 25, 15)
+    crown = (away < 117) & (yy >= 200)
+    sunlit = image_first.outlined(ring | crown, crown, painting)
+    assert sunlit[140, 200] and not sunlit[20, 20] and not sunlit[250, 200]
+
+
+def test_a_band_at_a_box_s_edge_goes_on_as_inside_it_as_far_as_an_outline():
+    inside = np.zeros((3, 10), dtype=bool)
+    inside[:, 4] = True
+    band = np.zeros_like(inside)
+    band[:, :4] = True
+    dark = np.zeros_like(inside)
+    dark[1, 2] = True
+    reached = image_first.reached(inside, band, dark, 4)
+    assert reached[0].tolist()[:4] == [True] * 4
+    assert reached[1].tolist()[:4] == [False, False, True, True]
+
+
 def test_the_wand_is_only_its_brown_wood_and_a_gate_all_it_is_in_its_box():
     painting = np.zeros((20, 20, 3), dtype=np.uint8)
     painting[...] = (120, 170, 60)  # grass
@@ -325,6 +385,7 @@ def test_a_flat_stone_is_not_walked_on_but_a_thing_may_lie_on_it(tmp_path):
 
 
 import export_scene  # noqa: E402
+import sweep  # noqa: E402
 
 FIELD = generate.REPO / "content" / "art" / "scenes" / "the-field"
 
@@ -375,6 +436,14 @@ def test_the_exported_field_keeps_its_contract_and_nothing_reaches_below_its_row
             image = Image.open(FIELD / state)
             assert thing["top"] + image.height <= round((thing["row"] + 1 + reach) * cell), name
     assert (FIELD / art["source"]).is_file()
+
+
+@pytest.mark.skipif(not (FIELD / "art.json").is_file(), reason="the field is not exported")
+def test_the_exported_field_shows_no_figure_a_problem_of_its_cut():
+    # Floating pixels always; the lawn and the holes where the pictures the export
+    # cut the field from are there (art/raw, kept out of the repository).
+    found = sweep.problems(sweep.load("the-field"))
+    assert not found, "; ".join(str(problem) for problem in found)
 
 
 @pytest.mark.skipif(

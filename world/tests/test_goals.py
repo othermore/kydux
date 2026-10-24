@@ -9,18 +9,19 @@ LEVEL = Level.from_dict(
 )
 
 
-def test_reach_by_marker_is_met_at_the_tick_the_wizard_arrives():
+def test_reach_by_marker_is_met_when_the_run_ends_on_it_at_the_last_tick():
     world = World(LEVEL)
-    world.wizard.move_right(2)
+    world.wizard.move_right(3)
     assert world.met_at == {}
-    world.wizard.move_right()
+    world.finish()
     assert world.met_at == {0: 3}
 
 
-def test_reach_stays_met_after_the_wizard_walks_on():
+def test_reach_is_not_met_by_walking_over_the_tile_and_on():
     world = World(LEVEL)
     world.wizard.move_right(4)
-    assert world.met_at == {0: 3}
+    world.finish()
+    assert world.met_at == {}
 
 
 def test_reach_by_coordinates():
@@ -29,14 +30,32 @@ def test_reach_by_coordinates():
     )
     world = World(level)
     world.wizard.move_right(2)
+    world.finish()
     assert world.met_at == {0: 2}
 
 
-def test_a_goal_met_at_the_start_is_met_at_tick_zero():
+def test_a_run_that_passes_the_goal_does_not_win_and_one_that_stops_on_it_does():
+    assert run_code(LEVEL, "wizard.move_right(4)").status == "incomplete"
+    assert run_code(LEVEL, "wizard.move_right(4)\nwizard.move_left()").status == "won"
+    assert run_code(LEVEL, "wizard.move_right(3)").status == "won"
+
+
+def test_a_reach_goal_walked_over_and_not_met_says_so():
+    passed = run_code(LEVEL, "wizard.move_right(4)").goals[0]
+    assert (passed.met, passed.walked_over) == (False, True)
+    short = run_code(LEVEL, "wizard.move_right(2)").goals[0]
+    assert (short.met, short.walked_over) == (False, False)
+    stopped = run_code(LEVEL, "wizard.move_right(4)\nwizard.move_left()").goals[0]
+    assert (stopped.met, stopped.walked_over) == (True, False)
+
+
+def test_a_run_that_starts_on_the_goal_and_does_nothing_wins_at_tick_zero():
     level = Level.from_dict(
         {"id": "zero", "map": ["S."], "goals": [{"kind": "reach", "at": [0, 0]}]}
     )
-    assert World(level).met_at == {0: 0}
+    result = run_code(level, "")
+    assert result.status == "won"
+    assert result.goals[0].met_at_tick == 0
 
 
 @pytest.mark.parametrize(
@@ -62,6 +81,7 @@ def test_a_goal_result_is_plain_data():
         "failed": False,
         "failed_at_tick": None,
         "bonus": False,
+        "walked_over": False,
     }
 
 

@@ -20,6 +20,7 @@
   "outcome": {
     "won": "You did it, {wizard}!",
     "incomplete": "Not yet: {n} of {total} goals met. Try again.",
+    "walked_over": "You walked over the mark without stopping on it: your program must end there.",
     "too_many_ticks": "Your program has taken more than {limit} steps and the wizard is tired. Is there a loop that never ends?",
     "interrupted": "Your program was stopped: it ran for more than {seconds} seconds without doing anything.",
     "error": "Python says: {type}: {message} (line {line})",
@@ -343,5 +344,26 @@
   },
   "words": {
     "ambrel": "the school's word, which opens its gates."
+  },
+  "debug": {
+    "title": "Debug view",
+    "numbers": "Numbers",
+    "cells": "Cells",
+    "masks": "Masks",
+    "blocked": "Not walked on",
+    "kinds": {
+      "wall": "Wall",
+      "floor": "Floor",
+      "shelf": "Shelf",
+      "grass": "Grass",
+      "path": "Path",
+      "tree": "Tree",
+      "rock": "Rock",
+      "fence": "Fence",
+      "steps": "Steps",
+      "bank": "Bank",
+      "stone": "Stone",
+      "other": "Other"
+    }
   }
 }

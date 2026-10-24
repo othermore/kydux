@@ -81,8 +81,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     // The voice's words in the band; a figure's words are in its bubble.
     voice.innerHTML = byVoice ? marked.parseInline(current?.text ?? '', { async: false }) : '';
     voice.classList.toggle('silent', !byVoice);
-    const who = current?.who === 'wizard' ? forWizard('{wizard}') : current ? characterName(current.who) : '';
-    heard.textContent = current && !byVoice ? `${who}: ${current.text.replace(/[`*_]/g, '')}` : '';
+    // The voice has no name: only a figure's words are kept as said by someone.
+    const said = current && !byVoice ? current : null;
+    const who = said?.who === 'wizard' ? forWizard('{wizard}') : said ? characterName(said.who) : '';
+    heard.textContent = said ? `${who}: ${said.text.replace(/[`*_]/g, '')}` : '';
     back.disabled = step === 0;
     forward.textContent = last() ? t('lesson.go_on') : t('story.next');
     forward.id = last() ? 'story-go-on' : 'story-next';

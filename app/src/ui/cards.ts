@@ -149,9 +149,19 @@ export interface WinCardParts {
  * next yet and the way to the map. */
 export function winCard({ verdict, kept, next, onAgain, onNext, said, learned }: WinCardParts): Card {
   const earned = Math.max(verdict.earned, kept);
-  const shown = element('p', { className: 'stars' }, [
-    '★'.repeat(earned) + '☆'.repeat(MAX_STARS - earned),
-  ]);
+  // The stars are the card's event: big, each drawn in after the one before with a
+  // little bounce; the earned ones gold, the others an outline (12.5).
+  const shown = element(
+    'p',
+    { className: 'stars' },
+    Array.from({ length: MAX_STARS }, (_, index) => {
+      const star = element('span', { className: `star ${index < earned ? 'earned' : 'missed'}` }, [
+        index < earned ? '★' : '☆',
+      ]);
+      star.style.setProperty('--star', String(index));
+      return star;
+    }),
+  );
   shown.setAttribute('aria-label', t('level.stars', { n: earned }));
   shown.dataset.stars = String(earned);
   // A level played again keeps the stars it had, whatever this run earned.
@@ -183,8 +193,15 @@ export function winCard({ verdict, kept, next, onAgain, onNext, said, learned }:
       shown,
       reasons,
       ...keeping,
-      ...(said ? [saidBy(said, 'card-outro')] : []),
-      ...(learned ? [element('p', { id: 'card-learned', className: 'card-learned' }, [learned])] : []),
+      // The story's word and what was learned, smaller, under the stars and their reasons.
+      ...(said || learned
+        ? [
+            element('div', { className: 'card-story' }, [
+              ...(said ? [saidBy(said, 'card-outro')] : []),
+              ...(learned ? [element('p', { id: 'card-learned', className: 'card-learned' }, [learned])] : []),
+            ]),
+          ]
+        : []),
       element('div', { className: 'card-buttons' }, [again, after]),
     ],
     () => {},

@@ -70,7 +70,8 @@
     "ways": "Este nivel se juega de {n} maneras. Un solo programa tiene que superarlas todas:",
     "kind_fix": "Este programa todavía no funciona. Encuentra qué falla, y arréglalo.",
     "kind_improve": "Este programa funciona, pero puede ser mejor. Mejóralo.",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "starting_again": "Empezando el nivel otra vez…"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",

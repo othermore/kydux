@@ -204,8 +204,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
 
   // The notebook opens over the scene, beside the editor, so that an example
   // clicked lands where the child can see it.
+  // What the scene says while the level starts again before a run (D75).
+  const restartNote = element('p', { id: 'restart-note', className: 'restart-note', hidden: true }, [
+    t('level.starting_again'),
+  ]);
   const sceneFrame = element('div', { className: 'scene-frame' }, [
     sceneParent,
+    restartNote,
     goalsSlot,
     zoomBox,
     notebook.node,
@@ -420,6 +425,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   let shownLines: [number | null, number | null] = [null, null];
 
   const render = (snapshot: RunSnapshot, force = false) => {
+    restartNote.hidden = !snapshot.restarting;
     status.textContent = statusLine(snapshot.runtime);
     status.dataset.status = snapshot.runtime;
     run.disabled = !snapshot.canRun;
@@ -638,6 +644,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       editor.view.contentDOM.setAttribute('aria-label', t('level.code_label'));
       about.setAttribute('aria-label', t('level.about'));
       about.title = t('level.about');
+      restartNote.textContent = t('level.starting_again');
       timeline.setAttribute('aria-label', t('level.timeline'));
       labelSettings();
       labelKeys();

@@ -298,3 +298,47 @@ describe('RunController with ways (D51)', () => {
     expect(last().outcome).toEqual({ kind: 'won', way: 'open' });
   });
 });
+
+
+/** A scene that shows the level starting again, done when the test says (D75). */
+class RestartingScene extends FakeScene {
+  shows = 0;
+  finish: (() => void) | null = null;
+  restartShow(): Promise<void> {
+    this.shows += 1;
+    this.playback.reset();
+    return new Promise((resolve) => {
+      this.finish = resolve;
+    });
+  }
+}
+
+describe('RunController, the level starting again (D75)', () => {
+  it('shows the level starting again before every run, and plays only once it is shown', async () => {
+    const runtime = new FakeRuntime();
+    const scene = new RestartingScene();
+    const controller = new RunController({ runtime, level: LEVEL, speed: 1 });
+    controller.attach(scene);
+    controller.run('wizard.move_right()');
+    expect(scene.shows).toBe(1);
+    expect(controller.snapshot.restarting).toBe(true);
+    // Python answers first: the run waits for the scene.
+    runtime.answer(world('won', moves(2), 2));
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(controller.snapshot.state).not.toBe('playing');
+    scene.finish?.();
+    await vi.waitFor(() => expect(controller.snapshot.state).toBe('playing'));
+    expect(controller.snapshot.restarting).toBe(false);
+  });
+
+  it('shows it on Restart too', () => {
+    const runtime = new FakeRuntime();
+    const scene = new RestartingScene();
+    const controller = new RunController({ runtime, level: LEVEL, speed: 1 });
+    controller.attach(scene);
+    controller.restart();
+    expect(scene.shows).toBe(1);
+    expect(controller.snapshot.restarting).toBe(true);
+  });
+});

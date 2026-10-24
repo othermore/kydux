@@ -676,10 +676,61 @@ footer {
 }
 
 .stars {
-  margin: 4px 0 16px;
+  margin: 4px 0 10px;
   color: #f2b705;
-  font-size: 40px;
-  letter-spacing: 6px;
+  font-size: 64px;
+  line-height: 1.1;
+  letter-spacing: 8px;
+}
+
+/* Each star drawn in after the one before, with a little bounce (12.5). */
+.stars .star {
+  display: inline-block;
+  animation: star-in 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--star) * 320ms + 150ms);
+}
+
+.stars .star.missed {
+  color: #c9c2b0;
+}
+
+@keyframes star-in {
+  from {
+    opacity: 0;
+    transform: scale(0.2) rotate(-25deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stars .star {
+    animation: none;
+  }
+}
+
+.card-story {
+  margin: 4px 0 12px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* While the level starts again before a run (D75), its words over the scene. */
+.restart-note {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: rgb(255 253 245 / 92%);
+  color: #1f2330;
+  font-size: 20px;
+  font-weight: 600;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .stars-kept {

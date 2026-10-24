@@ -53,6 +53,10 @@ export const TICK_MS = 400;
 const SAY_TICKS = 3;
 /** The most of a scene the camera shows at zoom 1, in tiles across and down (D69). */
 export const VIEW_TILES: Tile = [15, 9];
+/** How long the scene takes to fade out and in when the level starts again, and how
+ * long it stays out (D75). */
+const RESTART_FADE_MS = 180;
+const RESTART_HOLD_MS = 360;
 /** The zooms the player steps through, from the whole scene to a close look. */
 export const ZOOMS = [0.5, 0.75, 1, 1.5, 2] as const;
 const ZOOM_START = ZOOMS.indexOf(1);
@@ -68,6 +72,9 @@ export interface SceneHandle {
   /** Gives the playback a run's events, with everything back where it started. */
   load(result: WorldResult): void;
   reset(): void;
+  /** Shows the level starting again: the scene fades, everything is put back, and
+   * it comes back; resolves once it is shown (D75). */
+  restartShow(): Promise<void>;
   /** Zooms the camera one step in (1) or out (-1); false when it can go no further. */
   zoom(step: 1 | -1): boolean;
   /** Whether the camera can zoom one step in (1) or out (-1). */
@@ -249,6 +256,26 @@ class LevelScene extends Phaser.Scene {
   canZoomBy(step: 1 | -1): boolean {
     const next = this.zoomStep + step;
     return next >= 0 && next < ZOOMS.length;
+  }
+
+  /** The level starting again, seen: a fade to the frame's colour, everything put
+   * back while it is out, and a fade back in (D75). */
+  restartShow(): Promise<void> {
+    const camera = this.cameras.main;
+    this.parentNode.dataset.restarting = 'true';
+    return new Promise((resolve) => {
+      camera.once('camerafadeoutcomplete', () => {
+        this.playback.reset();
+        this.time.delayedCall(RESTART_HOLD_MS, () => {
+          camera.once('camerafadeincomplete', () => {
+            delete this.parentNode.dataset.restarting;
+            resolve();
+          });
+          camera.fadeIn(RESTART_FADE_MS, 31, 35, 48);
+        });
+      });
+      camera.fadeOut(RESTART_FADE_MS, 31, 35, 48);
+    });
   }
 
   /** One step in or out of ZOOMS, about the camera's middle. */
@@ -758,6 +785,9 @@ export function startScene(
         },
         reset() {
           playback.reset();
+        },
+        restartShow() {
+          return scene.restartShow();
         },
         zoom(step) {
           return scene.zoomBy(step);

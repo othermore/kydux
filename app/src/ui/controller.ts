@@ -48,6 +48,8 @@ export interface RunSnapshot {
   canPlay: boolean;
   /** Whether the timeline can be dragged: there is a run to show. */
   canSeek: boolean;
+  /** Whether the scene is showing the level starting again, before a run (D75). */
+  restarting: boolean;
 }
 
 /** What the controller needs of the runtime, so that tests can give a fake. */
@@ -64,6 +66,9 @@ export interface SceneLike {
   readonly playback: Playback;
   load(world: WorldResult): void;
   reset(): void;
+  /** Shows the level starting again, everything put back, and resolves once it is
+   * shown (D75); a scene without it is only reset. */
+  restartShow?(): Promise<void>;
 }
 
 const DEFAULT_TICK_LIMIT = 1000;
@@ -96,6 +101,8 @@ export class RunController {
   private speed: Speed;
   /** Bumped at every run and restart, so that a run's late answer is dropped. */
   private generation = 0;
+  /** Whether the scene is showing the level starting again (D75). */
+  private restarting = false;
   private listeners: ((snapshot: RunSnapshot) => void)[] = [];
   private unsubscribe: (() => void)[] = [];
 
@@ -152,6 +159,7 @@ export class RunController {
       canPlay: state === 'paused',
       canSeek:
         this.world !== null && (this.scene?.playback.length ?? 0) > 0 && state !== 'running',
+      restarting: this.restarting,
     };
   }
 
@@ -160,10 +168,12 @@ export class RunController {
     if (!scene || this.runtime.status !== 'ready') return;
     if (scene.playback.state === 'playing') scene.playback.stop();
     this.clear();
-    scene.reset();
+    // The level starts again on the scene while Python runs; the run plays once
+    // both are done, so that a run is never seen to go on from the one before.
+    const shown = this.startAgain(scene);
     const generation = ++this.generation;
-    this.runtime.run(code, this.level.level).then(
-      (result) => {
+    Promise.all([this.runtime.run(code, this.level.level), shown]).then(
+      ([result]) => {
         if (generation !== this.generation) return;
         const world = result.world;
         if (!world) {
@@ -208,9 +218,23 @@ export class RunController {
 
   restart(): void {
     this.generation += 1;
-    this.scene?.playback.reset();
+    if (this.scene) void this.startAgain(this.scene);
     this.clear();
     this.changed();
+  }
+
+  /** The scene put back where the level starts, shown as it is done (D75). */
+  private startAgain(scene: SceneLike): Promise<void> {
+    if (!scene.restartShow) {
+      scene.reset();
+      return Promise.resolve();
+    }
+    this.restarting = true;
+    this.changed();
+    return scene.restartShow().then(() => {
+      this.restarting = false;
+      this.changed();
+    });
   }
 
   /** Shows the run as it was at a tick, paused there (the timeline). */

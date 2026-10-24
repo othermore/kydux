@@ -1,2 +1,2 @@
-wizard.wait(2)
+wizard.wait()
 wizard.move_up(2)

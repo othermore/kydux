@@ -1,19 +1,23 @@
 {
   "id": "03-passages",
   "items": [
+    "story:after-dark",
     "lesson:true-or-false",
     "level:the-watchtower",
     "lesson:if",
     "level:the-watch",
     "lesson:else",
     "level:left-or-right",
+    "level:the-wrong-door",
     "lesson:repeat",
     "level:the-long-stairs",
+    "story:the-top-of-the-stairs",
     "lesson:while",
     "level:past-the-teacher",
     "lesson:kirra-and-osto",
     "level:the-moving-stairs",
     "level:the-dark-room",
-    "level:the-night-walk"
+    "level:the-night-walk",
+    "story:caught"
   ]
 }

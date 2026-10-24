@@ -1,15 +1,15 @@
 {
   "title": "The night walk",
   "goals": [
-    "Reach the stair down to the dormitory.",
+    "Reach the way down to the dormitory.",
     "Do not let Dask see you."
   ],
-  "starting_code": "# Dark, a locked door, a stair that comes and goes, and Dask on his round.\n",
+  "starting_code": "# A dark room with a key and a locked door.\n# A moving stair, and Dask below.\n",
   "hints": [
-    "One trouble at a time: the dark, the key and its door, the stair, then Dask.",
-    "Wait for the stair in one `while`, and for Dask in another.",
-    "Dask walks the lower corridor. Cross it while his back is turned: while he faces right, wait."
+    "Cast `kirra`. Pick up the key. Open the door first.",
+    "Move to the gap. Wait for the stair with a `while` loop.",
+    "Cross the stair. Wait for Dask with another `while` loop before you go down."
   ],
-  "intro": "So. You have come this far. One last walk through my passages tonight, in the dark, and past me.",
-  "outro": "Well, well, {wizard}. Nobody has slipped past me in years. Go on to bed. And not a word to the others."
+  "intro": "This is it, {wizard}. The way to the dormitory is past this room. We must use everything we know.",
+  "outro": "We made it! We walked the night passages and Dask never saw us."
 }

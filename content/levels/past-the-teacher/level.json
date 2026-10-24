@@ -1,32 +1,33 @@
 {
   "id": "past-the-teacher",
-  "map": [
-    "##########",
-    "##E#######",
-    "#........#",
-    "##S#######",
-    "##########"
-  ],
+  "kind": "practice",
+  "scene": "the-night-passages",
+  "start": [2, 6],
+  "end": [2, 4],
+  "speaker": "nuri",
+  "carrying": ["wand"],
   "things": [],
   "actors": [
     {
       "kind": "teacher",
       "id": "dask",
-      "at": [
-        7,
-        2
-      ],
+      "at": [7, 5],
       "facing": "left",
       "patrol": [
-        [
-          3,
-          2
-        ]
+        [3, 5]
       ]
+    },
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [2, 7]
     }
   ],
   "api": [
+    "wizard.move_right",
+    "wizard.move_left",
     "wizard.move_up",
+    "wizard.move_down",
     "wizard.wait",
     "teacher.facing",
     "teacher.position",
@@ -42,6 +43,5 @@
       "id": "dask"
     }
   ],
-  "tick_limit": 60,
-  "speaker": "dask"
+  "tick_limit": 60
 }

@@ -1,14 +1,16 @@
 {
-  "title": "La escalera larga",
+  "title": "Las escaleras largas",
   "goals": [
-    "Sube hasta lo alto de la escalera.",
+    "Sube a la cima.",
     "Hazlo en menos de 4 líneas."
   ],
-  "starting_code": "# Arriba y a la derecha, una y otra vez, hasta arriba.\n",
+  "starting_code": "# Este código funciona en dieciséis líneas. Hazlo más corto con un bucle.\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\n",
   "hints": [
-    "Cada peldaño de esta escalera son los mismos dos movimientos: arriba, y luego derecha.",
-    "Cuenta los peldaños desde abajo hasta arriba: ese es el número para `range`.",
-    "Los dos movimientos van debajo del `for`, metidos cuatro espacios."
+    "El código repite `wizard.move_up()` y `wizard.move_right()` ocho veces.",
+    "Borra las líneas sobrantes, y repite los dos movimientos ocho veces con `for`.",
+    "Mueve las dos acciones bajo el bucle. Mételas cuatro espacios hacia dentro."
   ],
-  "intro": "Esta escalera sube a los pasadizos de la noche. Cuenta los peldaños si quieres; un bucle los cuenta por ti."
+  "intro": "Estas escaleras son muy largas. Escribí todos los pasos. Escribir tanto cansa.",
+  "outro": "Eso está mucho mejor. Un bucle nos ahorra mucho trabajo.",
+  "learned": "Ahora sabes cómo repetir cosas con una repetición `for`, que los programadores llaman un bucle."
 }

@@ -1,18 +1,23 @@
 {
   "id": "the-watchtower",
-  "map": [
-    "#########",
-    "####D####",
-    "#S.....E#",
-    "#########"
-  ],
+  "kind": "practice",
+  "scene": "the-passages",
+  "start": [2, 2],
+  "end": [8, 2],
+  "speaker": "nuri",
+  "carrying": ["wand"],
   "things": [],
   "actors": [
     {
       "kind": "teacher",
       "id": "dask",
-      "marker": "D",
+      "at": [5, 1],
       "facing": "up"
+    },
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [1, 2]
     }
   ],
   "api": [
@@ -39,6 +44,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "dask"
+  "tick_limit": 100
 }

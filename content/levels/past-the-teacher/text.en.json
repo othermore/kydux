@@ -1,14 +1,16 @@
 {
   "title": "Past the teacher",
   "goals": [
-    "Reach the way out at the top.",
+    "Cross the corridor.",
     "Do not let Dask see you."
   ],
-  "starting_code": "# Dask walks up and down the corridor, looking ahead.\n# Wait while he looks your way, then cross.\nwizard.wait()\n",
+  "starting_code": "# Wait while Dask looks this way.\n# Then cross up.\n",
   "hints": [
-    "Watch which way Dask looks as he walks.",
-    "`wizard.wait()` lets one tick go by while you stay hidden.",
-    "A `while` loop can keep waiting while `dask.facing` is `\"left\"`."
+    "You must wait as long as Dask looks left. Use a `while` loop.",
+    "Ask with `while` which way `dask.facing` is, and wait under it.",
+    "Dask looks away when the loop stops. Move up two times."
   ],
-  "intro": "Back and forth, all night long. Cross while my back is turned, and not a moment before."
+  "intro": "Dask patrols the long corridor here. We cannot guess when to move. We must wait while he looks this way.",
+  "outro": "We did it! We waited until it was safe.",
+  "learned": "Now you know how to wait with a `while` repeat, which programmers call a loop."
 }

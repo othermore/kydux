@@ -1,18 +1,20 @@
 {
   "title": "The watch",
   "goals": [
-    "Cross to the door above.",
+    "Cross to the room below.",
     "Do not let Dask see you."
   ],
   "ways": {
     "away": "Dask looks away",
     "watching": "Dask looks this way"
   },
-  "starting_code": "# Wait only if Dask looks this way, then cross.\nwizard.move_up(2)\n",
+  "starting_code": "# Wait only if Dask looks this way.\n# Then cross down.\n",
   "hints": [
-    "Look at the start card: the level is played two ways, and one program must get through both.",
-    "Ask which way Dask looks before you move: `dask.facing == \"left\"` is `True` when he looks this way.",
-    "Under the `if`, moved in by four spaces, wait one tick."
+    "Look at the start card. The level is played two ways. One program must get through both.",
+    "Ask which way Dask looks before you move. `dask.facing == \"left\"` is `True` when he looks this way.",
+    "Wait one tick under the `if`. Move it in by four spaces."
   ],
-  "intro": "I walk this corridor every night. Sometimes I look your way, sometimes I do not. Cross when I am not looking, if you can."
+  "intro": "Dask walks his round here. He sometimes looks this way. We must cross when he looks away.",
+  "outro": "Well done, {wizard}. A good condition keeps us safe.",
+  "learned": "Now you know how to make a choice, which programmers call a condition, with `if`."
 }

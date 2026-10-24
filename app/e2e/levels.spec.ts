@@ -96,16 +96,16 @@ test.describe('past the teacher', () => {
   test.beforeEach(({ page }) => open(page, 'past-the-teacher'));
 
   test('the teacher walks the corridor', async ({ page }) => {
-    await expect(scene(page)).toHaveAttribute('data-actors', 'dask:7,2,left');
+    await expect(scene(page)).toHaveAttribute('data-actors', /^dask:7,5,left;/);
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.wait(3)');
     await page.locator('#run').click();
-    await expect(scene(page)).toHaveAttribute('data-actors', 'dask:6,2,left', {
+    await expect(scene(page)).toHaveAttribute('data-actors', /^dask:6,5,left;/, {
       timeout: 10_000,
     });
-    await expect(scene(page)).toHaveAttribute('data-actors', 'dask:4,2,left', {
+    await expect(scene(page)).toHaveAttribute('data-actors', /^dask:4,5,left;/, {
       timeout: 10_000,
     });
   });
@@ -119,7 +119,7 @@ test.describe('past the teacher', () => {
   test('waiting while the teacher looks this way, then crossing, wins', async ({ page }) => {
     const said = await run(page, 'while dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
     expect(said).toBe('You did it, apprentice!');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '2,1');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '2,4');
   });
 });
 
@@ -285,7 +285,7 @@ test.describe('a level played two ways (D51)', () => {
     page,
   }) => {
     await expect(page.locator('#way')).toBeHidden();
-    await run(page, 'wizard.move_up(2)');
+    await run(page, 'wizard.move_down(2)');
     await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks this way”: The teacher saw you!');
     await expect(page.locator('#way')).toBeVisible();
     await expect(page.locator('#way')).toHaveValue('watching');
@@ -296,7 +296,7 @@ test.describe('a level played two ways (D51)', () => {
   });
 
   test('with if, the same program wins every way', async ({ page }) => {
-    await run(page, 'if dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
+    await run(page, 'if dask.facing == "left":\n    wizard.wait()\nwizard.move_down(2)');
     await expect(page.locator('.outcome-text')).toHaveText('You did it, apprentice! In every way!');
     await expect(page.locator('.win-card')).toBeVisible();
   });
@@ -319,9 +319,9 @@ test.describe('the dark and the stairs (D52, D53)', () => {
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await expect(scene(page)).toHaveAttribute('data-stairs', 'stair:in');
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_right()\nwizard.wait()\nprint(stair.in_place)\nwizard.move_right()');
+    await run(page, 'wizard.move_up(2)\nwizard.move_right()\nwizard.wait()\nprint(stair.in_place)\nwizard.move_right()');
     await expect(page.locator('.printed')).toHaveText('False');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '2,1');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '3,2');
   });
 
   test('osto beside the stair holds it', async ({ page }) => {
@@ -329,7 +329,7 @@ test.describe('the dark and the stairs (D52, D53)', () => {
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_right()\nwizard.cast("osto")\nwizard.wait(3)\nprint(stair.in_place)');
+    await run(page, 'wizard.move_up(2)\nwizard.move_right()\nwizard.cast("osto")\nwizard.wait(3)\nprint(stair.in_place)');
     await expect(page.locator('.printed')).toHaveText('True');
   });
 });

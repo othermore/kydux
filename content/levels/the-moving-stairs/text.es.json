@@ -1,14 +1,16 @@
 {
-  "title": "La escalera que se mueve",
+  "title": "Las escaleras móviles",
   "goals": [
     "Cruza el hueco.",
-    "Pregúntale a la escalera si está en su sitio."
+    "Pregunta a la escalera si está en su lugar."
   ],
-  "starting_code": "# La escalera va y viene. Espérala, y luego cruza.\nwizard.move_right()\n",
+  "starting_code": "# Espera a la escalera.\n# Luego cruza.\n",
   "hints": [
-    "Un paso hacia la escalera mientras está apartada no llega: {el mago|la maga} choca.",
-    "`stair.in_place` es `True` cuando un paso dado ahora caería sobre ella.",
-    "Espera en un `while` mientras la escalera no esté en su sitio, y luego cruza."
+    "Camina hacia arriba dos veces y a la derecha una vez. Esto llega al hueco.",
+    "Usa `while` y `not` con `stair.in_place` para esperar a la escalera.",
+    "Espera bajo el bucle. Muévete a la derecha cuatro veces cuando se detenga."
   ],
-  "intro": "Estas escaleras hacen lo que quieren. Písalas cuando estén, no cuando no estén."
+  "intro": "Las escaleras aquí giran de un lado a otro. Debes esperar a que lleguen. Veamos si puedes cruzar el hueco.",
+  "outro": "Cruzaste perfectamente. Las escaleras móviles no son un problema para ti.",
+  "learned": "Ahora sabes cómo esperar a una cosa que se mueve con un bucle `while`."
 }

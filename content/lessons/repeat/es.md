@@ -1,34 +1,25 @@
 # Repetir
 
-Algunas escaleras son largas.
-Arriba, derecha, arriba, derecha, ocho veces seguidas.
-Son dieciséis líneas, y es fácil perder la cuenta.
-
-Un programa puede hacer las mismas líneas una y otra vez.
-Eso es un **bucle**.
+¡Estas escaleras nocturnas son muy largas, {wizard}!
+Sube.
+Camina a la derecha.
+Escribir eso muchas veces es cansado.
+Podemos decirle al castillo que haga las mismas cosas una y otra vez.
+Una repetición, que los programadores llaman un bucle, nos ahorra trabajo.
 
 ---
 
-## Cómo se escribe un for
-
-```python
-for step in range(4):
-    wizard.move_up()
-    wizard.move_right()
-```
-
-`for step in range(4):` hace las líneas de debajo cuatro veces.
-Las líneas van metidas cuatro espacios, como debajo de un `if`.
-
-`step` cuenta las veces, desde `0` hasta `3`.
-Puedes usarlo, o no hacerle caso.
+Escribimos un bucle con `for`.
+Podemos escribir `for step in range(8):` para hacer algo ocho veces.
+Las líneas debajo deben estar movidas hacia dentro por cuatro espacios.
+El castillo ejecuta esas líneas ocho veces seguidas.
 
 ---
 
 ## Pruébalo
 
-Sube la escalera larga con un bucle.
-Cambia el número hasta que {el mago|la maga} llegue arriba.
+Sube las escaleras con un bucle.
+Muévete hacia arriba y luego a la derecha tres veces.
 
 ```python try
 for step in range(3):

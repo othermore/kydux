@@ -5,10 +5,13 @@
     "Do not let Dask see you.",
     "Ask whether Dask can see you."
   ],
-  "starting_code": "# Ask which way Dask looks, and whether he can see you. Then walk on.\n",
+  "starting_code": "# Ask which way Dask faces with print.\n# Ask whether he can see you with print.\n# Then walk past him.\n",
   "hints": [
-    "`print(dask.facing)` shows on the card which way he looks.",
-    "`dask.can_see(wizard)` answers `True` or `False`: give it to `print`."
+    "You must ask two questions using `print` before you walk.",
+    "Give `dask.facing` to `print` to see which way Dask looks.",
+    "Give `dask.can_see(wizard)` to `print` to see if he spots you. Then move right six times."
   ],
-  "intro": "Hmph. A pupil in my passages. I am looking at the wall, not at you. Ask what I can see, if you like, and then walk on quietly."
+  "intro": "Look, {wizard}. Dask is staring at the wall. Let us ask if he can see us.",
+  "outro": "He did not see us! That was close.",
+  "learned": "Now you know how to ask a question, which programmers call an expression."
 }

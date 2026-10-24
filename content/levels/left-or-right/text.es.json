@@ -1,17 +1,19 @@
 {
   "title": "Izquierda o derecha",
   "goals": [
-    "Llega a la escalera de bajada."
+    "Llega a la bajada."
   ],
   "ways": {
-    "left_locked": "la puerta de la izquierda cerrada",
-    "right_locked": "la puerta de la derecha cerrada"
+    "left_locked": "la puerta izquierda está cerrada con llave",
+    "right_locked": "la puerta derecha está cerrada con llave"
   },
-  "starting_code": "# Una puerta está cerrada con llave y la otra no, pero ¿cuál?\n",
+  "starting_code": "# Una puerta está cerrada con llave.\n# Elige con if y else.\n",
   "hints": [
-    "Dos maneras: en cada una, la puerta cerrada es otra. El mismo programa tiene que superar las dos.",
-    "Pregunta `left_door.locked`: debajo del `if`, ve por la puerta de la derecha; debajo del `else`, por la de la izquierda.",
-    "Cada camino es andar hasta la puerta, `open()`, y luego bajar y seguir hasta la escalera."
+    "Hay dos formas. Una puerta diferente está cerrada con llave en cada una. El mismo programa debe pasar por ambas.",
+    "Pregunta `left_door.locked`. Toma la puerta derecha bajo el `if`. Toma la puerta izquierda bajo el `else`.",
+    "Camina hasta la puerta en cada camino. Usa `open()`. Luego muévete hacia abajo y por el pasillo hasta la escalera."
   ],
-  "intro": "Dos puertas, y una la tengo cerrada con llave. ¿Cuál? Eso cambia de noche en noche."
+  "intro": "Una de estas puertas está cerrada con llave. Cambia cada noche. Necesitamos un plan de reserva para pasar.",
+  "outro": "Un plan de reserva funciona perfectamente. Hiciste una elección con dos caminos.",
+  "learned": "Ahora sabes cómo ejecutar un plan de reserva con `else` cuando una condición es falsa."
 }

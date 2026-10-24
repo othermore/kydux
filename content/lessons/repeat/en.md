@@ -1,34 +1,25 @@
 # Repeat
 
-Some stairs are long.
-Up, right, up, right, eight times over.
-That is sixteen lines, and it is easy to lose count.
-
-A program can do the same lines again and again.
-That is a **loop**.
+These night stairs are so long, {wizard}!
+Walk up.
+Walk right.
+Writing that many times is tiring.
+We can tell the castle to do the same things again and again.
+A repeat, which programmers call a loop, saves us work.
 
 ---
 
-## Writing a for
-
-```python
-for step in range(4):
-    wizard.move_up()
-    wizard.move_right()
-```
-
-`for step in range(4):` does the lines under it four times.
-The lines are moved in by four spaces, as under an `if`.
-
-`step` counts the times, from `0` up to `3`.
-You can use it, or leave it alone.
+We write a loop with `for`.
+We can write `for step in range(8):` to do something eight times.
+The lines under it must be moved in by four spaces.
+The castle runs those lines eight times in a row.
 
 ---
 
 ## Try it
 
-Climb the long stairs with a loop.
-Change the number until the wizard reaches the top.
+Climb the stairs with a loop.
+Move up and then right three times.
 
 ```python try
 for step in range(3):

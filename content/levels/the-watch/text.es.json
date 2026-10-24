@@ -1,18 +1,20 @@
 {
   "title": "La guardia",
   "goals": [
-    "Cruza hasta la puerta de arriba.",
-    "Que no te vea Dask."
+    "Cruza a la sala de abajo.",
+    "No dejes que Dask te vea."
   ],
   "ways": {
-    "away": "Dask mira hacia otro lado",
+    "away": "Dask mira a otro lado",
     "watching": "Dask mira hacia aquí"
   },
-  "starting_code": "# Espera solo si Dask mira hacia aquí, y luego cruza.\nwizard.move_up(2)\n",
+  "starting_code": "# Espera solo si Dask mira hacia aquí.\n# Luego cruza hacia abajo.\n",
   "hints": [
-    "Mira la tarjeta de inicio: el nivel se juega de dos maneras, y un solo programa tiene que superar las dos.",
-    "Pregunta hacia dónde mira Dask antes de moverte: `dask.facing == \"left\"` es `True` cuando mira hacia aquí.",
-    "Debajo del `if`, metido cuatro espacios, espera un tick."
+    "Mira la tarjeta de inicio. El nivel se juega de dos formas. Un programa debe pasar por ambas.",
+    "Pregunta hacia dónde mira Dask antes de moverte. `dask.facing == \"left\"` es `True` cuando mira hacia aquí.",
+    "Espera un turno bajo el `if`. Mételo cuatro espacios hacia dentro."
   ],
-  "intro": "Recorro este pasillo todas las noches. A veces miro hacia ti, a veces no. Cruza cuando no mire, si puedes."
+  "intro": "Dask hace su ronda aquí. A veces mira hacia aquí. Debemos cruzar cuando mire a otro lado.",
+  "outro": "Bien hecho, {wizard}. Una buena condición nos mantiene a salvo.",
+  "learned": "Ahora sabes cómo hacer una elección, que los programadores llaman una condición, con `if`."
 }

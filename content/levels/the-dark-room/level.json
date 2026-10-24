@@ -1,45 +1,47 @@
 {
   "id": "the-dark-room",
-  "map": [
-    "########",
-    "#S.....#",
-    "#......#",
-    "#....K.#",
-    "####D###",
-    "####E###",
-    "########"
-  ],
+  "kind": "practice",
+  "scene": "the-night-passages",
+  "start": [7, 2],
+  "end": [10, 5],
+  "speaker": "nuri",
+  "carrying": ["wand"],
+  "spells": ["kirra"],
   "dark": true,
-  "carrying": [
-    "wand"
-  ],
-  "spells": [
-    "kirra"
-  ],
   "things": [
     {
       "kind": "key",
       "id": "key",
-      "marker": "K",
+      "at": [11, 3],
       "opens": "door"
     },
     {
       "kind": "door",
       "id": "door",
-      "marker": "D",
+      "at": [10, 4],
       "locked": true
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [6, 2]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
     "wizard.pick_up",
+    "wizard.wait",
     "wizard.cast",
     "wizard.find_nearest",
     "door.open",
+    "door.locked",
+    "teacher.facing",
+    "stair.in_place",
     "thing.position"
   ],
   "goals": [
@@ -57,6 +59,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "dask"
+  "tick_limit": 100
 }

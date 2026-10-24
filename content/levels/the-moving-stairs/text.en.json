@@ -4,11 +4,13 @@
     "Cross the gap.",
     "Ask the stair whether it is in place."
   ],
-  "starting_code": "# The stair comes and goes. Wait for it, then cross.\nwizard.move_right()\n",
+  "starting_code": "# Wait for the stair.\n# Then cross.\n",
   "hints": [
-    "A step onto the stair while it is away does not land: the wizard bumps.",
-    "`stair.in_place` is `True` when a step taken now would land.",
-    "Wait in a `while` as long as the stair is not in place, then walk across."
+    "Walk up two times and right one time. This reaches the gap.",
+    "Use `while` and `not` with `stair.in_place` to wait for the stair.",
+    "Wait under the loop. Move right four times when it stops."
   ],
-  "intro": "These stairs have a mind of their own. Step on them when they are there, not when they are not."
+  "intro": "The stairs here swing back and forth. You must wait for them. Let us see if you can cross the gap.",
+  "outro": "You crossed perfectly. The moving stairs are no trouble for you.",
+  "learned": "Now you know how to wait for a moving thing with a `while` loop."
 }

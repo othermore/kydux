@@ -2,14 +2,16 @@
   "title": "La sala oscura",
   "goals": [
     "Abre la puerta.",
-    "Crúzala.",
+    "Pasa por ella.",
     "Encuentra la llave con find_nearest."
   ],
-  "starting_code": "# La sala está a oscuras. Ilumínala, encuentra la llave, y abre la puerta.\n",
+  "starting_code": "# Ilumina la sala.\n# Encuentra la llave y abre la puerta.\n",
   "hints": [
-    "A oscuras, `find_nearest` no encuentra nada lejano: ilumina primero la sala.",
-    "Después de `kirra`, escribe dónde está la llave, y camina hasta ella.",
-    "La puerta está cerrada con llave: lleva su llave, y ponte justo a su lado."
+    "Lanza `kirra` primero. Luego encuentra la llave con `wizard.find_nearest(\"key\")`.",
+    "Usa `print`. Pregunta a la llave su `position`.",
+    "Camina hasta la llave y cógela. Luego abre la puerta."
   ],
-  "intro": "Este almacén no tiene lámpara, y la mía no te la presto. La llave de la puerta del fondo está aquí dentro, en algún sitio."
+  "intro": "Está demasiado oscuro ahí dentro. No podemos ver la llave ni la puerta. Necesitamos un poco de luz.",
+  "outro": "Un buen hechizo lo aclara todo. Sigamos adelante.",
+  "learned": "Ahora sabes cómo iluminar una sala oscura con un hechizo, `kirra`, y encontrar lo que hay en ella."
 }

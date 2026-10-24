@@ -1,20 +1,19 @@
 {
   "id": "the-long-stairs",
-  "map": [
-    "###########",
-    "########.E#",
-    "#######..##",
-    "######..###",
-    "#####..####",
-    "####..#####",
-    "###..######",
-    "##..#######",
-    "#..########",
-    "#S#########",
-    "###########"
-  ],
+  "kind": "improve",
+  "scene": "the-passages",
+  "start": [12, 9],
+  "end": [20, 1],
+  "speaker": "nuri",
+  "carrying": ["wand"],
   "things": [],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [11, 9]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -28,10 +27,8 @@
     },
     {
       "kind": "lines_under",
-      "lines": 4,
-      "bonus": true
+      "lines": 4
     }
   ],
-  "tick_limit": 100,
-  "speaker": "dask"
+  "tick_limit": 100
 }

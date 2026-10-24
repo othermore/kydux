@@ -1,32 +1,33 @@
 {
   "id": "the-watch",
-  "map": [
-    "##########",
-    "##E#######",
-    "#........#",
-    "##S#######",
-    "##########"
-  ],
+  "kind": "practice",
+  "scene": "the-passages",
+  "start": [8, 2],
+  "end": [8, 4],
+  "speaker": "nuri",
+  "carrying": ["wand"],
   "things": [],
   "actors": [
     {
       "kind": "teacher",
       "id": "dask",
-      "at": [
-        5,
-        2
-      ],
+      "at": [11, 3],
+      "facing": "right",
       "patrol": [
-        [
-          6,
-          2
-        ]
-      ],
-      "facing": "right"
+        [12, 3]
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [7, 2]
     }
   ],
   "api": [
+    "wizard.move_right",
+    "wizard.move_left",
     "wizard.move_up",
+    "wizard.move_down",
     "wizard.wait",
     "teacher.facing",
     "teacher.position",
@@ -50,22 +51,16 @@
       "id": "watching",
       "actors": [
         {
+          "kind": "teacher",
           "id": "dask",
-          "at": [
-            7,
-            2
-          ],
+          "at": [13, 3],
+          "facing": "left",
           "patrol": [
-            [
-              6,
-              2
-            ]
-          ],
-          "facing": "left"
+            [12, 3]
+          ]
         }
       ]
     }
   ],
-  "tick_limit": 100,
-  "speaker": "dask"
+  "tick_limit": 100
 }

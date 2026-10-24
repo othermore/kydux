@@ -1,55 +1,40 @@
 # True or false
 
-Some questions have only two answers: yes, or no.
+Psst, {wizard}!
+Dask is walking around in the dark.
+We must know what is safe.
+Some questions only have two answers.
+The answer is yes or no.
 Is the door locked?
-Is the wizard carrying the key?
-Can the teacher see the wizard?
-
-A program asks questions like these all the time.
-It asks them so that it can choose what to do.
+Does the teacher see us?
+A question, which programmers call an expression, is answered by the castle.
+The answer is `True` or `False`.
 
 ---
 
-## Questions in Python
-
-In Python, a question is an **expression**, and its answer is `True` or `False`.
-
-```python
-print(3 > 2)
-print(door.locked)
-```
-
-The first line prints `True`: three is more than two.
-The second prints `True` or `False`, as the door is.
+Let us ask some questions.
+`3 > 2` gives `True`.
+We can also ask an attribute like `door.locked`.
+We use two equals signs `==` to see if two things are the same.
+One `=` is for a variable.
+Two `==` ask a question.
+`dask.facing == "left"` asks which way Dask looks.
 
 ---
 
-## Is it the same?
-
-`==` asks whether two values are the same:
-
-```python
-print(dask.facing == "left")
-```
-
-It is not `=`.
-One `=` gives a value a name.
-Two, `==`, ask a question.
-
-`not` turns the answer round: `not door.locked` is `True` when the door is not locked.
-
-An action can answer too:
-
-```python
-print(dask.can_see(wizard))
-```
+Sometimes we want the opposite.
+The word `not` turns the answer around.
+`not door.locked` is `True` when the door is not locked.
+A method can answer too.
+`dask.can_see(wizard)` tells us if Dask spots you!
 
 ---
 
 ## Try it
 
-Dask, the teacher of the passages, stands in the watchtower.
-Ask which way he looks, and whether he can see the wizard.
+Let us spy on Dask.
+Ask which way he looks.
+Then ask if he can see you.
 
 ```python try
 print(dask.facing)

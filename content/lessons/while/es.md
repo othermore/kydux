@@ -1,42 +1,32 @@
-# Mientras
+# While
 
-Un `for` repite un número de veces que conoces.
-Pero a veces no sabes cuántas veces.
-
-Espera, mientras el profesor mire hacia aquí.
-Nadie sabe cuánto rato: depende del profesor.
-
-Un bucle que sigue *mientras* una pregunta dice sí es un `while`.
+Un bucle `for` es genial cuando conoces los pasos.
+¡Pero no sabemos cuánto tiempo mirará Dask hacia aquí!
+Debemos esperar mientras él mire.
+Podemos mezclar un bucle y una condición.
+Esto es un bucle `while`.
 
 ---
 
-## Cómo se escribe un while
-
-```python
-while dask.facing == "left":
-    wizard.wait()
-wizard.move_up(2)
-```
-
-`while` hace su pregunta.
-Si la respuesta es `True`, hace sus líneas, y luego vuelve a preguntar.
-Cuando la respuesta es `False`, para, y el programa sigue por debajo.
+Un bucle `while` repite sus líneas mientras su expresión sea `True`.
+Hace la pregunta.
+Ejecuta las líneas si la respuesta es sí.
+Luego pregunta otra vez.
+Cuando la respuesta es `False`, se detiene.
 
 ---
 
-## Un while que no acaba nunca
-
-Si la respuesta nunca pasa a ser `False`, el bucle no para nunca.
-{El mago|La maga} esperaría para siempre.
-
-El nivel tiene un límite de ticks, así que la partida acaba, y la tarjeta lo dice.
-Entonces mira la pregunta: ¿puede cambiar alguna vez su respuesta?
+¡Si la respuesta nunca cambia, el bucle nunca se detiene!
+Esperarías hasta estar {cansado|cansada}.
+El juego tiene un límite, y la ejecución termina.
+Asegúrate siempre de que la respuesta pueda cambiar.
 
 ---
 
 ## Pruébalo
 
-Espera mientras Dask mire hacia aquí, y luego cruza.
+Espera mientras Dask mire a la izquierda.
+¡Quédate muy {callado|callada}!
 
 ```python try
 while dask.facing == "left":

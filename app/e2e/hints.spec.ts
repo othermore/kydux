@@ -56,7 +56,7 @@ test('hints in Spanish', async ({ browser }) => {
   await page.locator('#hint').click();
   await expect(page.locator('#hint')).toHaveText('Pista');
   await expect(page.locator('.hint').first()).toHaveText(
-    'Pista 1 de 3 Fíjate hacia dónde mira Dask mientras camina.',
+    'Pista 1 de 3 Debes esperar mientras Dask mire a la izquierda. Usa un bucle while.',
   );
   await context.close();
 });

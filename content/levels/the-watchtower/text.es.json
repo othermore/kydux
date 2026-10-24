@@ -1,14 +1,17 @@
 {
   "title": "La torre de vigilancia",
   "goals": [
-    "Recorre la galería.",
-    "Que no te vea Dask.",
-    "Pregunta si Dask puede verte."
+    "Camina por la galería.",
+    "No dejes que Dask te vea.",
+    "Pregunta si Dask te puede ver."
   ],
-  "starting_code": "# Pregunta hacia dónde mira Dask, y si puede verte. Luego sigue andando.\n",
+  "starting_code": "# Pregunta hacia dónde mira Dask con print.\n# Pregunta si te puede ver con print.\n# Luego camina por delante de él.\n",
   "hints": [
-    "`print(dask.facing)` enseña en la tarjeta hacia dónde mira.",
-    "`dask.can_see(wizard)` responde `True` o `False`: dáselo a `print`."
+    "Debes hacer dos preguntas usando `print` antes de caminar.",
+    "Dale `dask.facing` a `print` para ver hacia dónde mira Dask.",
+    "Dale `dask.can_see(wizard)` a `print` para ver si te descubre. Luego muévete a la derecha seis veces."
   ],
-  "intro": "Hmm. Alguien en mis pasadizos. Estoy mirando a la pared, no a ti. Pregunta lo que veo, si quieres, y luego sigue en silencio."
+  "intro": "Mira, {wizard}. Dask está mirando a la pared. Vamos a preguntar si nos puede ver.",
+  "outro": "¡No nos vio! Estuvo cerca.",
+  "learned": "Ahora sabes cómo hacer una pregunta, que los programadores llaman una expresión."
 }

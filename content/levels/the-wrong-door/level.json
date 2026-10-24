@@ -1,0 +1,62 @@
+{
+  "id": "the-wrong-door",
+  "kind": "fix",
+  "scene": "the-passages",
+  "start": [8, 7],
+  "end": [12, 9],
+  "speaker": "nuri",
+  "carrying": ["wand"],
+  "things": [
+    {
+      "kind": "door",
+      "id": "left_door",
+      "at": [6, 8],
+      "locked": true
+    },
+    {
+      "kind": "door",
+      "id": "right_door",
+      "at": [10, 8]
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [8, 6]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "door.open",
+    "door.locked"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    }
+  ],
+  "ways": [
+    {
+      "id": "left_locked"
+    },
+    {
+      "id": "right_locked",
+      "things": [
+        {
+          "id": "left_door",
+          "locked": false
+        },
+        {
+          "id": "right_door",
+          "locked": true
+        }
+      ]
+    }
+  ],
+  "tick_limit": 100
+}

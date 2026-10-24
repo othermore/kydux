@@ -1,17 +1,19 @@
 {
   "title": "Left or right",
   "goals": [
-    "Reach the stair down."
+    "Reach the way down."
   ],
   "ways": {
-    "left_locked": "the left door locked",
-    "right_locked": "the right door locked"
+    "left_locked": "the left door is locked",
+    "right_locked": "the right door is locked"
   },
-  "starting_code": "# One door is locked and the other is not, but which?\n",
+  "starting_code": "# One door is locked.\n# Choose with if and else.\n",
   "hints": [
-    "Two ways: in each, a different door is locked. The same program must get through both.",
-    "Ask `left_door.locked`: under the `if`, take the right door; under the `else`, the left.",
-    "Each way is a walk to the door, `open()`, then down and along to the stair."
+    "There are two ways. A different door is locked in each. The same program must get through both.",
+    "Ask `left_door.locked`. Take the right door under the `if`. Take the left door under the `else`.",
+    "Walk to the door in each way. Use `open()`. Then move down and along to the stair."
   ],
-  "intro": "Two doors, and I keep one of them locked. Which one? That changes from night to night."
+  "intro": "One of these doors is locked. It changes every night. We need a backup plan to go through.",
+  "outro": "A backup plan works perfectly. You made a choice with two paths.",
+  "learned": "Now you know how to run a backup plan with `else` when a condition is false."
 }

@@ -1,33 +1,41 @@
 {
   "id": "the-moving-stairs",
-  "map": [
-    "########",
-    "#S.T..E#",
-    "########"
-  ],
-  "carrying": [
-    "wand"
-  ],
-  "spells": [
-    "osto"
-  ],
+  "kind": "practice",
+  "scene": "the-night-passages",
+  "start": [2, 4],
+  "end": [7, 2],
+  "speaker": "nuri",
+  "carrying": ["wand"],
+  "spells": ["osto"],
   "things": [
     {
       "kind": "stair",
       "id": "stair",
-      "marker": "T",
-      "period": 2
+      "at": [4, 2],
+      "period": 3
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [1, 5]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
+    "wizard.pick_up",
     "wizard.wait",
     "wizard.cast",
-    "stair.in_place"
+    "wizard.find_nearest",
+    "door.open",
+    "door.locked",
+    "teacher.facing",
+    "stair.in_place",
+    "thing.position"
   ],
   "goals": [
     {
@@ -40,6 +48,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "dask"
+  "tick_limit": 100
 }

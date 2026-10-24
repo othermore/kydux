@@ -1,36 +1,28 @@
 # Else
 
-An `if` does its lines when the answer is yes.
-But sometimes there is something else to do when it is no.
-
-Two doors, one locked.
-If the left one is locked, go right.
-Otherwise, go left.
-
-*Otherwise* is `else`.
+Sometimes we need a backup plan.
+What if the door is locked?
+We must go the other way.
+An `if` only runs when the answer is yes.
+We need lines to run when the answer is no.
 
 ---
 
-## Writing an else
-
-```python
-if left_door.locked:
-    print("left is locked")
-else:
-    print("left is open")
-```
-
-`else` comes after the lines of the `if`, at the same place as `if`, with its own colon.
-Its lines, moved in, run only when the answer is `False`.
-
-So one of the two always runs, and never both.
+That is what `else` is for.
+It means otherwise.
+It goes after the lines of the `if`.
+It must not be moved in.
+It has its own colon `:`.
+The lines under `else` are moved in by four spaces.
+They only run when the condition is `False`.
 
 ---
 
 ## Try it
 
-The next level is played two ways: in each, a different door is locked.
-Ask the left door first.
+Let us test the left door.
+Ask if it is locked.
+Print one string if it is, and another if it is open.
 
 ```python try
 if left_door.locked:

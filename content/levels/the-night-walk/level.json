@@ -1,38 +1,33 @@
 {
   "id": "the-night-walk",
-  "map": [
-    "#############",
-    "#S...K.D.T..#",
-    "###########.#",
-    "#...........#",
-    "###########E#",
-    "#############"
-  ],
-  "dark": true,
-  "carrying": [
-    "wand"
-  ],
+  "kind": "practice",
+  "scene": "the-night-passages",
+  "start": [10, 5],
+  "end": [20, 8],
+  "speaker": "nuri",
+  "carrying": ["wand"],
   "spells": [
     "kirra",
     "osto"
   ],
+  "dark": true,
   "things": [
     {
       "kind": "key",
       "id": "key",
-      "marker": "K",
+      "at": [14, 5],
       "opens": "door"
     },
     {
       "kind": "door",
       "id": "door",
-      "marker": "D",
+      "at": [16, 5],
       "locked": true
     },
     {
       "kind": "stair",
       "id": "stair",
-      "marker": "T",
+      "at": [18, 5],
       "period": 2
     }
   ],
@@ -40,16 +35,16 @@
     {
       "kind": "teacher",
       "id": "dask",
-      "at": [
-        3,
-        3
-      ],
+      "at": [12, 7],
+      "facing": "right",
       "patrol": [
-        [
-          8,
-          3
-        ]
+        [17, 7]
       ]
+    },
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [9, 5]
     }
   ],
   "api": [
@@ -62,8 +57,10 @@
     "wizard.cast",
     "wizard.find_nearest",
     "door.open",
+    "door.locked",
     "teacher.facing",
-    "stair.in_place"
+    "stair.in_place",
+    "thing.position"
   ],
   "goals": [
     {
@@ -75,6 +72,5 @@
       "id": "dask"
     }
   ],
-  "tick_limit": 200,
-  "speaker": "dask"
+  "tick_limit": 200
 }

@@ -1,55 +1,40 @@
 # Verdadero o falso
 
-Algunas preguntas solo tienen dos respuestas: sí, o no.
-¿Está la puerta cerrada con llave?
-¿Lleva {el mago|la maga} la llave?
-¿Puede verte el profesor?
-
-Un programa hace preguntas así todo el rato.
-Las hace para poder elegir qué hacer.
-
----
-
-## Preguntas en Python
-
-En Python, una pregunta es una **expresión**, y su respuesta es `True` o `False`.
-
-```python
-print(3 > 2)
-print(door.locked)
-```
-
-La primera línea escribe `True`: tres es más que dos.
-La segunda escribe `True` o `False`, según esté la puerta.
+¡Chis, {wizard}!
+Dask está dando vueltas en la oscuridad.
+Debemos saber qué es seguro.
+Algunas preguntas solo tienen dos respuestas.
+La respuesta es sí o no.
+¿Está cerrada la puerta?
+¿Nos ve el profesor?
+El castillo responde a una pregunta, que los programadores llaman una expresión.
+La respuesta es `True` o `False`.
 
 ---
 
-## ¿Es lo mismo?
+Vamos a hacer algunas preguntas.
+`3 > 2` da `True`.
+También podemos preguntar por un atributo como `door.locked`.
+Usamos dos signos de igual `==` para ver si dos cosas son iguales.
+Un `=` es para una variable.
+Dos `==` hacen una pregunta.
+`dask.facing == "left"` pregunta hacia dónde mira Dask.
 
-`==` pregunta si dos valores son el mismo:
+---
 
-```python
-print(dask.facing == "left")
-```
-
-No es `=`.
-Un `=` le da un nombre a un valor.
-Dos, `==`, hacen una pregunta.
-
-`not` le da la vuelta a la respuesta: `not door.locked` es `True` cuando la puerta se abre con la mano.
-
-Una acción también puede responder:
-
-```python
-print(dask.can_see(wizard))
-```
+A veces queremos lo contrario.
+La palabra `not` da la vuelta a la respuesta.
+`not door.locked` es `True` cuando la puerta no está cerrada con llave.
+Un método también puede responder.
+¡`dask.can_see(wizard)` nos dice si Dask te descubre!
 
 ---
 
 ## Pruébalo
 
-Dask, el profesor de los pasadizos, está en la torre de vigilancia.
-Pregunta hacia dónde mira, y si puede ver {al mago|a la maga}.
+Vamos a espiar a Dask.
+Pregunta hacia dónde mira.
+Luego pregunta si puede verte.
 
 ```python try
 print(dask.facing)

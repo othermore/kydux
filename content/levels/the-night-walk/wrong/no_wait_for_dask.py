@@ -1,5 +1,4 @@
 wizard.cast("kirra")
-key = wizard.find_nearest("key")
 wizard.move_right(4)
 wizard.pick_up()
 wizard.move_right()
@@ -8,5 +7,4 @@ wizard.move_right(2)
 while not stair.in_place:
     wizard.wait()
 wizard.move_right(3)
-wizard.move_down()
-wizard.move_down(2)
+wizard.move_down(3)

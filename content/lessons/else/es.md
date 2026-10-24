@@ -1,36 +1,28 @@
-# Si no
+# Else
 
-Un `if` hace sus líneas cuando la respuesta es sí.
-Pero a veces hay otra cosa que hacer cuando es no.
-
-Dos puertas, una cerrada con llave.
-Si la de la izquierda está cerrada, ve por la derecha.
-Si no, ve por la izquierda.
-
-*Si no* es `else`.
+A veces necesitamos un plan de reserva.
+¿Y si la puerta está cerrada con llave?
+Debemos ir por el otro lado.
+Un `if` solo se ejecuta cuando la respuesta es sí.
+Necesitamos líneas que se ejecuten cuando la respuesta es no.
 
 ---
 
-## Cómo se escribe un else
-
-```python
-if left_door.locked:
-    print("la izquierda está cerrada")
-else:
-    print("la izquierda está abierta")
-```
-
-`else` va después de las líneas del `if`, en el mismo sitio que `if`, con sus propios dos puntos.
-Sus líneas, metidas, solo se hacen cuando la respuesta es `False`.
-
-Así que siempre se hace una de las dos, y nunca las dos.
+Para eso sirve `else`.
+Significa de otro modo.
+Va después de las líneas del `if`.
+No debe estar movido hacia dentro.
+Tiene sus propios dos puntos `:`.
+Las líneas debajo de `else` se mueven hacia dentro cuatro espacios.
+Solo se ejecutan cuando la condición es `False`.
 
 ---
 
 ## Pruébalo
 
-El próximo nivel se juega de dos maneras: en cada una, la puerta cerrada es otra.
-Pregúntale primero a la puerta de la izquierda.
+Vamos a probar la puerta izquierda.
+Pregunta si está cerrada con llave.
+Imprime una cadena si lo está, y otra si está abierta.
 
 ```python try
 if left_door.locked:

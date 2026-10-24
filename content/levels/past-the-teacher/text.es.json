@@ -1,14 +1,16 @@
 {
   "title": "Sin que te vea el profesor",
   "goals": [
-    "Llega a la salida de arriba.",
-    "Que no te vea Dask."
+    "Cruza el pasillo.",
+    "No dejes que Dask te vea."
   ],
-  "starting_code": "# Dask va y viene por el pasillo, mirando hacia delante.\n# Espera mientras mire hacia ti, y luego cruza.\nwizard.wait()\n",
+  "starting_code": "# Espera mientras Dask mire hacia aquí.\n# Luego cruza hacia arriba.\n",
   "hints": [
-    "Fíjate hacia dónde mira Dask mientras camina.",
-    "`wizard.wait()` deja pasar un tick mientras sigues escondid{o|a}.",
-    "Un bucle `while` puede seguir esperando mientras `dask.facing` sea `\"left\"`."
+    "Debes esperar mientras Dask mire a la izquierda. Usa un bucle `while`.",
+    "Pregunta con `while` hacia dónde está `dask.facing`, y espera debajo.",
+    "Cuando el bucle se detiene, Dask mira a otro lado. Muévete hacia arriba dos veces."
   ],
-  "intro": "Adelante y atrás, toda la noche. Cruza cuando esté de espaldas, y ni un momento antes."
+  "intro": "Dask patrulla el largo pasillo aquí. No podemos adivinar cuándo movernos. Debemos esperar mientras mire hacia aquí.",
+  "outro": "¡Lo logramos! Esperamos hasta que fue seguro.",
+  "learned": "Ahora sabes cómo esperar con una repetición `while`, que los programadores llaman un bucle."
 }

@@ -1,27 +1,31 @@
 {
   "id": "left-or-right",
-  "map": [
-    "#######",
-    "#..S..#",
-    "#L###R#",
-    "#.....#",
-    "###E###",
-    "#######"
-  ],
+  "kind": "practice",
+  "scene": "the-passages",
+  "start": [8, 4],
+  "end": [8, 7],
+  "speaker": "nuri",
+  "carrying": ["wand"],
   "things": [
     {
       "kind": "door",
       "id": "left_door",
-      "marker": "L",
+      "at": [6, 5],
       "locked": true
     },
     {
       "kind": "door",
       "id": "right_door",
-      "marker": "R"
+      "at": [10, 5]
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [8, 3]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -54,6 +58,5 @@
       ]
     }
   ],
-  "tick_limit": 100,
-  "speaker": "dask"
+  "tick_limit": 100
 }

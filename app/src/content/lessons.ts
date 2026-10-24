@@ -18,6 +18,8 @@ export interface Lesson {
   tryCode: string | null;
   /** For a story page, whether it is the game's opening, before the course (D61). */
   opening?: boolean;
+  /** Who teaches a lesson, or tells a story page: a character of story.md (D67). */
+  speaker?: string;
 }
 
 export class LessonNotFound extends Error {
@@ -71,12 +73,17 @@ async function loadPages(folder: 'lessons' | 'stories', id: string, lang: Langua
     (await fetched(lessonUrl(id, `${lang}.md`), 'text')) ??
     (await fetched(lessonUrl(id, `${fallbackLanguage}.md`), 'text'));
   if (markdown === null) throw new LessonNotFound(id);
-  const { teaches, opening } = JSON.parse(about) as { teaches?: string[]; opening?: boolean };
+  const { teaches, opening, speaker } = JSON.parse(about) as {
+    teaches?: string[];
+    opening?: boolean;
+    speaker?: string;
+  };
   // The wizard's words go in before the pages are cut (D37).
   return {
     id,
     teaches: teaches ?? [],
     ...readLesson(forWizard(markdown)),
     ...(opening === true ? { opening: true } : {}),
+    ...(typeof speaker === 'string' ? { speaker } : {}),
   };
 }

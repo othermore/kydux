@@ -1,5 +1,6 @@
 {
   "id": "your-first-spell",
+  "speaker": "nuri",
   "teaches": [
     "wizard.cast"
   ]

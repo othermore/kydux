@@ -1,5 +1,6 @@
 {
   "id": "finding-things",
+  "speaker": "wenna",
   "teaches": [
     "wizard.find_nearest",
     "wizard.give"

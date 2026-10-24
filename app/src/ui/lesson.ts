@@ -1,13 +1,15 @@
 // A lesson or a story page, page by page: its Markdown rendered by marked
 // (D33), Back and Next page, and on the last page Try it, which marks the
-// lesson read, gives its example to the next level when the child has typed
-// nothing there yet, and opens what comes next; a story page, or a lesson with
-// no example, has Go on instead (D56). Reaching the last page marks it read.
+// lesson read and opens what comes next; a story page, or a lesson with no
+// example, has Go on instead (D56). Reaching the last page marks it read. A
+// lesson is drawn as its teacher speaking, the figure beside the words; a story
+// page as a page of a book (D67).
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
 import type { Lesson } from '../content/lessons';
 import { t } from '../i18n';
+import { drawFigurePreview, friendFigure } from '../engine/placeholders';
 import * as progress from '../progress/progress';
 import { element } from './dom';
 import type { Screen } from './screen';
@@ -30,7 +32,19 @@ export interface LessonScreenParts {
 export function lessonScreen(parts: LessonScreenParts): Screen {
   let lesson = parts.lesson;
   let page = 0;
-  const node = element('div', { className: 'lesson-screen' });
+  const node = element('div', { className: `lesson-screen ${parts.kind === 'story' ? 'story' : 'taught'}` });
+
+  // The teacher beside a lesson's words: the character's figure, with the name (D67).
+  const teacher = () => {
+    const speaker = parts.kind === 'lesson' ? lesson.speaker : undefined;
+    if (!speaker) return null;
+    const figure = element('canvas', { className: 'lesson-figure' });
+    drawFigurePreview(figure, friendFigure(speaker, progress.wizard()?.gender ?? 'girl'));
+    return element('figure', { id: 'lesson-teacher', className: 'lesson-teacher' }, [
+      figure,
+      element('figcaption', {}, [t(`characters.${speaker}`)]),
+    ]);
+  };
 
   const markRead = () =>
     parts.kind === 'story' ? progress.markStoryRead(lesson.id) : progress.markRead(lesson.id);
@@ -77,7 +91,7 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
         ...(parts.label ? [element('span', { id: 'lesson-number', className: 'item-number' }, [parts.label])] : []),
         element('a', { id: 'lesson-map', className: 'quiet-button small', href: '#map' }, [t('map.open_map')]),
       ]),
-      article,
+      element('div', { className: 'lesson-body' }, [...[teacher()].filter((n) => n !== null), article]),
       element('div', { className: 'lesson-nav' }, [
         back,
         element('span', { id: 'lesson-page', className: 'lesson-count' }, [

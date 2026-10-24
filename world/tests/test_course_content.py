@@ -306,3 +306,11 @@ def test_a_friend_stands_off_the_solution_s_way(item_id):
     for actor in level_json(item_id).get("actors", []):
         if actor["kind"] == "friend":
             assert tuple(actor["at"]) not in path, f"{actor['id']} stands on the way"
+
+
+@pytest.mark.parametrize("path", LESSONS, ids=lambda p: p.name)
+def test_a_lesson_says_who_teaches_it(path):
+    """D67: a lesson is drawn as its teacher speaking, a character of the story's."""
+    speaker = json.loads((path / "lesson.json").read_text(encoding="utf-8")).get("speaker")
+    characters = json.loads((ROOT / "i18n" / "en.json").read_text(encoding="utf-8"))["characters"]
+    assert speaker in characters, f"{path.name} names no teacher of the story's"

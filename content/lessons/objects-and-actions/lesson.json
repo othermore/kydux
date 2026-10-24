@@ -1,5 +1,6 @@
 {
   "id": "objects-and-actions",
+  "speaker": "nuri",
   "teaches": [
     "wizard.move_left",
     "wizard.move_up",

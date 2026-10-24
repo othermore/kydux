@@ -1,5 +1,6 @@
 {
   "id": "things-to-carry",
+  "speaker": "nuri",
   "teaches": [
     "wizard.pick_up"
   ]

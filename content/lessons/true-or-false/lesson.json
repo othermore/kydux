@@ -1,5 +1,6 @@
 {
   "id": "true-or-false",
+  "speaker": "nuri",
   "teaches": [
     "teacher.facing",
     "teacher.position",

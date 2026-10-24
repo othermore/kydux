@@ -120,7 +120,8 @@ content/
   chapters/01-arrival/
     chapter.json                          id, and the items in order: story:<id>, lesson:<id>,
                                           level:<id>; an item's id is its slug, its order the
-                                          chapter's (D44); a story item opens and closes it (D62)
+                                          chapter's (D44); a story item opens and closes it (D62);
+                                          chapter 1's first is the opening (D78)
     text.en.json  text.es.json            the chapter's title
   scenes/the-field/
     map.txt  scene.json                   the scene a chapter's levels are parts of: a grid
@@ -128,7 +129,8 @@ content/
                                           walked on, seen through), its fixed things, its
                                           props and its rooms (D65, D73)
   art/scenes/the-field/  art/figures/     a painted scene's ground, rows and things' states,
-                                          and the figures' walking sheets (D76)
+                                          and the figures' walking sheets: the wizard's in
+                                          every look, and the two friends' (D76, D77)
   stories/at-the-gate/
     story.json                            the staging on its scene: where the wizard and the
                                           actors stand, the camera's tile, and each step's
@@ -144,8 +146,10 @@ content/
     level.json                            its scene, its start and its end on it (D65), or a
                                           map of its own; things and actors by tile,
                                           exposed API, goals, tick limit, the spells it
-                                          has, the speaker of its intro, its kind:
-                                          practice, fix, improve or challenge (D56)
+                                          has and the passwords it gives (`words`, D80),
+                                          the speaker of its intro (`friend` for the friend,
+                                          D77), its kind: practice, fix, improve or
+                                          challenge (D56)
     text.en.json  text.es.json            title, goals, hints, starting code's
                                           comments and strings, intro, outro and what
                                           was learned (D45, D62)
@@ -156,8 +160,10 @@ content/
 Goals are declared (`reach`, `collect`, `open`, `say`, `give`, `no_bumps`,
 `not_seen_by`, `lines_under`, `numbers_under`, `uses`) and a level may add `goals.py` for one of its own. The lesson's
 Markdown, with no HTML in it, may hold one fenced block marked `python try`,
-its example; the level after it starts with its own program (D33, D63). Within a chapter, stories go unnumbered and the rest are
-numbered by kind: *Lesson 1*, *Practice 1*, *Fix 1*, *Improve 1* (D56). `pack-world.mjs` writes the chapters, in the order of their
+its example; the level after it starts with its own program (D33, D63). Within a chapter, every item is
+numbered by kind, stories too, and says its chapter: *Chapter 1 · Story 1*, *Chapter 1 · Practice 1*,
+*Fix 1*, *Improve 1* (D56, D78). A text names the friend as `{friend}`, with the friend's gendered words
+in double braces (D77). `pack-world.mjs` writes the chapters, in the order of their
 directories, as `content/course.json`, the one order of the course (D32). A
 chapter's picture for the map comes with the art (phase 4); the map draws
 its stops as a path until then. A scene is painted whole (D76), and a level
@@ -476,9 +482,10 @@ so that the figures pass behind and in front of them (D76).
 4.4 **The masks made right:** every raised thing cut by its outline, no
     shadow below its row, what opens or is picked up cut against an edit
     without it, checked with a figure behind and in front of every row.
-4.5 **The figures:** the wizard drawn in the looks the creator offers, or
-    the creator's colours on the drawn sheet; cast, pick up and celebrate
-    frames; the friends, the teachers, Eldra and Bimo on the same scale.
+4.5 **The figures:** the wizard drawn in every look the creator offers,
+    and the two friends, recoloured from base sheets by
+    `tools/art/figures.py` (sprint 13); cast, pick up and celebrate
+    frames; the teachers, Eldra and Bimo on the same scale.
 4.6 **The UI skin:** cards, panels, buttons, the notebook, the map's frame
     (perhaps the castle drawn isometric, D72), the lesson's speech bubble,
     icons for goals, actions and spells, a font with its licence readable

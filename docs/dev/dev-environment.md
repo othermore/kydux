@@ -204,7 +204,7 @@ about:
   "start": [8, 14],
   "end": [10, 15],
   "things": [{ "id": "gate", "open": true }, { "kind": "wand", "id": "wand", "at": [12, 14] }],
-  "actors": [{ "kind": "friend", "id": "nuri", "at": [8, 15] }]
+  "actors": [{ "kind": "friend", "id": "friend", "at": [8, 15] }]
 }
 ```
 
@@ -212,7 +212,14 @@ The coordinates are `x` and `y`, counted from 0 at the map's top-left
 corner. `start` is where the wizard stands. `end` is the tile the reach
 goal asks for. The checks make sure each level starts on the tile where
 the level before it ended, and that the friend never stands on the
-solution's way.
+solution's way. The friend is the actor `friend`: the game shows Nuri to a
+boy wizard and Teku to a girl wizard.
+
+On a painted scene, one more check reads the painting. A level's start,
+its mark, its things and its friend must stand on cells that no cut-out
+covers, and nothing painted may stand on a cell the map lets one walk on.
+When it fails, it names the level and the cell. Move that one to a free
+cell, or mark the cell in `map.txt`.
 
 ### A painted scene
 
@@ -435,6 +442,12 @@ repository. A `manifest.json` beside them records the model, the brief
 and the date. Git ignores `drafts/`, and the project's checks refuse a
 draft in a commit.
 
+A text names the friend as `{friend}`. The friend is Nuri for a boy
+wizard and Teku for a girl wizard. In Spanish, the friend's own words that
+change with their gender go in double braces, the boy's first:
+`{{un alumno|una alumna}}`. Single braces hold the wizard's words:
+`{mago|maga}`. `tools/write/rules.md` tells Gemini the same.
+
 Read every draft whole before it enters `content/`. Check it against the
 level or the lesson: what the map has, what the goals ask, what a hint
 gives away. Correct a sentence that is wrong. When much is wrong, correct
@@ -522,6 +535,19 @@ writes `content/art/scenes/<scene>/` and the figures:
 It also writes check pictures into `art/raw/game-check/`. Look at them
 before committing: every figure should be hidden by what stands in front
 of it and drawn over what stands behind it.
+
+The figures change with the look the child picks. Each look's sheet is
+the base sheet of its gender, recoloured. The friends' sheets are made the
+same way. The bases are in `art/figures/`, and the looks' colours are
+those of `app/src/engine/looks.ts`. This writes every sheet into
+`content/art/figures/`:
+
+```sh
+.venv/bin/python tools/art/figures.py --check
+```
+
+With `--check`, it also writes `art/raw/figures-check.png`, every sheet
+side by side. Look at it after changing a look's colours or a base.
 
 The music is asked for the same way, from `tools/sound/prompts/`:
 

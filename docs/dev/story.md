@@ -69,7 +69,7 @@ The gate's password, the first word the wizard says in chapter 1, is **`ambrel`*
 
 ## The wizard's way
 
-**The Opening.** Before the game's mechanics begin, the story opens. The child receives a letter of admission to Arvelia for their first year. They make the journey, arriving at the school's gate at dusk, alone, unable to open it, and without a wand.
+**The Opening.** Chapter 1's first story, *The letter*, comes before the game's mechanics and before the wizard is made (D78). It is told at the gate and goes back in the past: some weeks ago, a letter of admission to Arvelia came for the child's first year. They made the journey, and now they stand at the school's gate at dusk, alone, with no idea how to get in. The creator follows it.
 
 **Chapter 1, Arrival.** *Opening beat:* At the closed gate at dusk, the wizard knows no magic. The friend of the other gender, Nuri or Teku, arrives at the same moment, having grown up among wizards, and offers to help. The friend lends the wizard a spare wand to be returned later, and teaches them the basics on the spot: what an instruction is, actions, arguments, words, carrying things, and the first spell, `zelim`. The friend also teaches the method: try, watch, and try again. *Closing beat:* The wizard speaks the password `ambrel`, the gate opens, and the castle is reached. The wizard has gained a friend, a lent wand, and the first spell.
 

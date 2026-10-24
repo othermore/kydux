@@ -24,13 +24,16 @@ su aspecto. Después, el juego te llama por ese nombre.
 
 A partir de ahí, el juego se abre en su pantalla de inicio. *Continuar* te
 lleva a donde lo dejaste. La primera vez, eso es la puerta, donde te
-encuentras con Nuri, que te enseña los primeros pasos.
+encuentras con un amigo o una amiga que te enseña los primeros pasos. Es
+Nuri, una chica, si tu personaje es un mago, y Teku, un chico, si tu
+personaje es una maga.
 
 Cada capítulo empieza y acaba con una historia, contada sobre la propia
 escena: los personajes caminan y hablan en bocadillos, y un narrador habla
 bajo la imagen. *Siguiente*, o la tecla Intro, sigue adelante. Entre las
-historias vienen lecciones y niveles, numerados
-dentro del capítulo: *Lección 1*, *Práctica 1*, y así. Una lección son
+historias vienen lecciones y niveles. Cada historia, lección y nivel va
+numerado dentro de su capítulo: *Capítulo 1 · Historia 1*, *Capítulo 1 ·
+Lección 1*, y así. Una lección son
 unas pocas páginas cortas, que enseña un personaje de la historia, de pie
 junto al texto. Cada página explica una idea, con un ejemplo. En la última página, *Probar* abre el
 nivel que viene después, donde escribes tu propio programa. La
@@ -48,11 +51,15 @@ lado.
 
 En un nivel, escribes Python en el editor, a la derecha. *Ejecutar* empieza
 el nivel otra vez y hace que tu personaje haga lo que dice tu código, a la
-izquierda. Los
-objetivos, en la esquina, se marcan solos cuando los cumples. Si algo sale
+izquierda. Una marca redonda que late en el suelo enseña a dónde debe
+llegar tu personaje. Los objetivos, en la esquina, se marcan solos cuando
+los cumples. Si algo sale
 mal, el juego dice por qué, y *Pista* te da una ayuda. El primer nivel te
 enseña cada parte de la pantalla, una a una; el botón *?* lo enseña otra
-vez. *Lección* vuelve a leer la lección del nivel, y *Mapa* abre el mapa
+vez. *Cuaderno* enseña lo que sabe hacer tu personaje, cada cosa con un
+ejemplo que se puede pulsar. Cuando ya sabes un hechizo o una contraseña,
+su segunda pestaña, *Hechizos y palabras*, los enseña también, con lo que
+hace cada uno. *Lección* vuelve a leer la lección del nivel, y *Mapa* abre el mapa
 encima del nivel.
 
 Gana el nivel, y el juego te da hasta tres estrellas, y te dice por qué.

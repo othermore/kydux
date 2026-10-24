@@ -19,7 +19,7 @@ there by pytest, without a browser.
 ```
 app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/i18n/     every string the player sees, from i18n/<lang>.json, made for
-                the wizard by personal.ts (D37)
+                the wizard and the friend by personal.ts (D37, D77)
   src/runtime/  the worker that holds Pyodide, and the page's side of it
   src/engine/   the scene in Phaser, where everything stands before a run
                 (layout.ts), what an actor sees (sight.ts, the same rule as the
@@ -29,7 +29,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the looks a wizard may have (looks.ts) and the placeholders for a
                 scene without art (placeholders.ts); the camera on the scene, its
                 zoom and its drag (scene.ts, D69), a painted scene drawn from its
-                art with its figures sorted by their feet (scene.ts, D76), and
+                art with its figures sorted by their feet (scene.ts, D76), the
+                goal's beating mark and the sealed doors' glow (D79), and
                 the sound effects, made as the game plays (sfx.ts)
   src/editor/   the child's editor, CodeMirror
   src/ui/       the screens: start with the saved games (start.ts), the
@@ -38,7 +39,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (story.ts, D74), the
                 settings (settings.ts), and the level screen, a view of the run controller
                 (controller.ts), with its goals panel, outcome card, start and
-                win cards (cards.ts), the wizard's notebook (notebook.ts), the
+                win cards (cards.ts), the wizard's notebook with its spells and
+                words (notebook.ts, D80), the
                 stars (stars.ts) and the screen's guide (guide.ts, D68)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
@@ -66,7 +68,8 @@ content/        the levels, each with level.json, its words in text.<lang>.json,
                 its solution and its wrong answers (the last two never shipped);
                 the scenes the levels are parts of (scenes/, each a map.txt and a
                 scene.json, D65, D73); a painted scene's art and the figures'
-                sheets (art/, D76); the lessons, each with lesson.json and
+                sheets, the wizard's in every look and the two friends' (art/,
+                D76, D77); the lessons, each with lesson.json and
                 <lang>.md; the stories (stories/), each with story.json, its
                 staging, and text.<lang>.json, D74; the chapters, each with
                 chapter.json and text.<lang>.json; the screen's guide's words
@@ -86,7 +89,9 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 Antigravity CLI), the art tools (art/: generate.py asks the
                 image services, cut.py and sprites.py cut what they draw,
                 map_from_image.py and image_first.py read a painting's grid and
-                cut its things, export_scene.py makes content/art/, contact.py
+                cut its things, export_scene.py makes content/art/, figures.py
+                makes the figures' sheets from the base sheets in art/figures/,
+                recoloured for each look, contact.py
                 and demo.py show the trials; D72, D76) and the music's
                 (sound/generate.py)
 tests/tools/    the writing and art tools' tests, with the services faked
@@ -1055,8 +1060,8 @@ one overturns stays, marked as superseded.
   book.
 - **D75 — Every run starts the level again, and says so.** Decided
   2026-10-23 (sprint 12, 12.5). *Run* and *Restart* fade the scene out,
-  put everything back, show *Starting the level again…* and fade it in; a
-  run plays once that and Python are both done. The child sees that a run
+  put everything back, show a spinner, quickly, and fade it in; a run
+  plays once that and Python are both done. The child sees that a run
   never goes on from the one before, and that a level played in ways is
   dealt again each time.
 - **D76 — A scene is painted first, and its map read from the painting.**
@@ -1078,3 +1083,51 @@ one overturns stays, marked as superseded.
   ways of three walking frames each. A door may be both sealed and keyed
   by a word, as the castle's is: it opens once both are done, in either
   order. Rules out building a scene's look from its map.
+- **D77 — Two friends, and the one who teaches is of the other gender.**
+  Decided 2026-10-24 by the owner (sprint 13, 13.1). The story has two
+  first-year friends: Nuri, a girl, and Teku, a boy. The friend who meets
+  the wizard at the gate and teaches chapters 1 and 3 is the one of the
+  other gender: Nuri for a boy wizard, Teku for a girl wizard; the other,
+  of the wizard's gender, is the wizard's dormitory mate in chapters 2
+  and 3. A text names the friend as `{friend}`, and writes the friend's
+  gendered words as a double-braced choice, `{{boy's words|girl's
+  words}}`, resolved by the friend's gender before the wizard's single
+  braces (D37); in Spanish, the words for the two of them together are
+  masculine. In `level.json`, `lesson.json` and `story.json` the friend is
+  the actor and the speaker `friend`; the page resolves the figure and the
+  name from the wizard's gender. Rules out a friend of the wizard's own
+  gender as the teacher, and a friend's name fixed in a text.
+- **D78 — The opening belongs to chapter 1, and stories are numbered.**
+  Decided 2026-10-24 (sprint 13, 13.1). `story:the-letter` is chapter 1's
+  first item, named by `course.json`'s `opening`, and is done once a
+  wizard exists; the creator follows it, and *Continue* never goes back to
+  it. Every item's label carries its chapter and its number by kind,
+  stories too: *Chapter 1 · Story 1*, *Chapter 1 · Practice 4*. Rules out
+  an unnumbered story before the course.
+- **D79 — What stands on a cell is marked, and a mark is never hidden.**
+  Decided 2026-10-24 (sprint 13, 13.3). Every cell a tree's trunk, a rock,
+  a fence or a stone of the painting stands on is in the scene's map as
+  not walked on; the flat stone is `o`, seen over, and the wand on it is
+  picked up from beside. A level's start, end, things and friend lie on
+  cells no cut-out covers, and nothing painted stands on a cell walked on;
+  `tests/project/test_art_content.py` holds every painted scene and its
+  levels to both, reading the scene's art. The page draws the goal's mark
+  as a ring that beats in size, alpha and colour, under the cut-outs, and
+  a glow over each sealed door while its seal holds; both are still for a
+  reader who asks for less motion. A painting is asked for things that
+  fit one cell where they can, and paths along the rows and columns.
+  Rules out a mark under a crown or an arch, and a cell walked through a
+  tree.
+- **D80 — The notebook has the spells and the words.** Decided 2026-10-24
+  (sprint 13, 13.5). A level's `level.json` names the spells it has
+  (`spells`, D42) and the passwords it gives (`words`, each the password
+  of one of its doors); the course packs every spell and word known on
+  reaching each level (`spells_known`, `words_known` in `course.json`).
+  The page gives the world the spells known, as it gives the API (D40),
+  and the notebook the words known, which the world does not take: it
+  holds a level's own words to its own doors. Once there is one, the
+  notebook has a second tab, *Spells and words*: each in italics with what
+  it does or opens, from i18n (`spells.<name>`, `words.<name>`, held by
+  the i18n check to the world's spells and the levels' words), and an
+  example to click. Rules out a child having to remember a spell's or a
+  word's spelling from a lesson pages back.

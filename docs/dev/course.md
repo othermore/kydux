@@ -21,10 +21,11 @@ a level, across the course, only to refer to them here.
 
 ## Chapter 1 — Arrival (`01-arrival`)
 
-Before it, the game's opening, `story:the-letter`: the letter of admission,
-the journey, the shut gate at dusk (D61). The chapter is the game's
-tutorial, taught by Nuri at the gate and on the road up, in Nuri's voice;
-Nuri lends the wizard a spare wand. The ideas: a program, an action or
+It opens with the game's opening, `story:the-letter`: the letter of
+admission, the journey, the shut gate at dusk (D61, D78). The chapter is
+the game's tutorial, taught at the gate and on the road up by the friend
+of the other gender, Nuri for a boy wizard and Teku for a girl wizard
+(D77), in the friend's voice; the friend lends the wizard a spare wand. The ideas: a program, an action or
 method of an object, a comment, an argument, a string, a thing to carry,
 a spell, each named by the easy word and the proper one together (D59).
 
@@ -39,24 +40,25 @@ password opens it and stays open after; the wand is picked up once, in
 
 | Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
-| `story:at-the-gate` | story | The shut gate; Nuri arrives and offers to teach; the method: try, watch, try again. | |
-| `lesson:what-a-program-is` | Lesson 1 | A program is a list of instructions, run from the top down; your program tells your wizard, you, what to do. | `wizard.move_right` |
-| `level:the-gate` | Practice 1 | One instruction, to the gate's circle. Its code starts empty. | |
+| `story:the-letter` | Story 1 | The letter of admission, told in the past at the gate; the journey; the shut gate; then the creator. | |
+| `story:at-the-gate` | Story 2 | The shut gate; the friend arrives and offers to teach; the method: try, watch, try again. | |
+| `lesson:what-a-program-is` | Lesson 1 | A program is a list of instructions, run from the top down; your program tells your wizard, you, what to do; the round mark is where the wizard must get to. | `wizard.move_right` |
+| `level:the-gate` | Practice 1 | One instruction, to the mark before the gate. Its code starts empty. | |
 | `lesson:objects-and-actions` | Lesson 2 | An instruction can be an action; an action needs someone to do it; characters and things are objects; an action is a method; the dot and the brackets; the notebook. | `wizard.move_left`, `move_up`, `move_down` |
-| `level:the-corridor` | Practice 2 | A sequence, down the path and round into the meadow. Its code starts empty: comments are taught after it. | |
+| `level:the-corridor` | Practice 2 | A sequence, down the path and left onto the meadow's grass. Its code starts empty: comments are taught after it. | |
 | `lesson:notes` | Lesson 3 | A note in a program, a comment, is for a person, and the computer skips it; programs may come with notes saying what to do. | `concept:comments` |
-| `level:the-dark-note` | Fix 1 | Nuri's program with one wrong move, its first, which walks into the fence pen; its note says one move is wrong. | |
-| `lesson:how-much` | Lesson 4 | How much: the number in the brackets, an argument. | `concept:arguments` |
-| `level:the-long-corridor` | Practice 3 | The long path along the rise to the foot of its steps: one line with a number. Bonus: fewer than 2 lines. | |
-| `level:the-stairs` | Improve 1 | Nuri's program walks back to the gate but bumps twice, into a tree and the wall, to make clean (`no_bumps`). Bonus: fewer than 3 lines. | |
+| `level:the-dark-note` | Fix 1 | *Fixing the program*: the friend's program with one wrong move, its first, which walks into the grassy bank; its note says one move is wrong. | |
+| `lesson:how-much` | Lesson 4 | *How far we move*: the number in the brackets, an argument, says how many steps to take. | `concept:arguments` |
+| `level:the-long-corridor` | Practice 3 | Across the meadow to the fence pen: one line with a number. Bonus: fewer than 2 lines. | |
+| `level:the-stairs` | Improve 1 | *Back to the gate*: the friend's program walks back to the gate but bumps into it, to make clean (`no_bumps`). Bonus: fewer than 3 lines. | |
 | `lesson:words` | Lesson 5 | Words in quotes, a string; `say` takes what to say as its argument, as a move takes how much. | `wizard.say`, `concept:strings` |
 | `level:the-password` | Practice 4 | Back at the gate: its word, said beside it, and through, up the path; the code's comment gives the word. | |
 | `lesson:things-to-carry` | Lesson 6 | Things are objects with names; the wizard picks up what is on its tile or beside it, and says which when there are several (D58). | `wizard.pick_up` |
-| `level:the-wand` | Practice 5 | Past the gate: Nuri's spare wand on the flat stone beside the path, lent, picked up. | |
+| `level:the-wand` | Practice 5 | Past the gate: the friend's spare wand on the flat stone off the path, lent, picked up from beside the stone. | |
 | `lesson:your-first-spell` | Lesson 7 | A spell's effect depends on where the wizard stands and what is near, and may be nothing; `cast` is the wand's action; `zelim`. | `wizard.cast` |
 | `level:the-sealed-door` | Practice 6 | The wand carried, the sealed gate's rune broken from beside it. | |
 | `level:the-way-in` | Practice 7 | The chapter together: the castle's door, sealed and keyed by the school's word, opened with both. Bonus: fewer than 5 lines. | |
-| `story:up-to-the-castle` | story | At the castle's open door; Nuri sums up what was learned; the wand is only lent, and a school wand waits at the wand bank; Ilda waits inside. | |
+| `story:up-to-the-castle` | Story 3 | At the castle's open door; the friend sums up what was learned; the wand is only lent, and a school wand waits at the wand bank; Ilda waits inside. | |
 
 ## Chapter 2 — The library (`02-the-library`)
 
@@ -64,7 +66,7 @@ Inside the castle, Ilda sends the wizard to the wand bank through the
 library, where Wenna, the librarian, teaches on the way and Eldra, a ghost,
 has lost her books. The ideas: a name for a value, a variable; what a thing
 knows, an attribute; an action that gives something back; a door and its
-key; a spell that reaches. The wizard carries Nuri's lent wand throughout.
+key; a spell that reaches. The wizard carries the friend's lent wand throughout.
 
 Its scene, `the-library`: the library's door and the reading room up to
 Wenna's desk, where Wenna stands in every level; the aisles round tall
@@ -74,7 +76,7 @@ the long aisle under the high shelves to Eldra's shelf and the wand bank.
 
 | Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
-| `story:in-the-castle` | story | Ilda's welcome; the errand to the wand bank, through the library; Wenna at its door. | |
+| `story:in-the-castle` | Story 1 | Ilda's welcome; the errand to the wand bank, through the library; Wenna at its door. | |
 | `lesson:a-name-for-a-value` | Lesson 1 | A variable: a name the program gives a value, to use it again. `steps = 3`, then `wizard.move_right(steps)`. | (Python's `=`) |
 | `level:the-reading-room` | Improve 1 | Wenna's program writes the same number three times; the number given a name (`numbers_under`). | |
 | `lesson:what-things-know` | Lesson 2 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.position`, `wizard.items`, `door.locked`, `thing.position`, `concept:print` |
@@ -88,7 +90,7 @@ the long aisle under the high shelves to Eldra's shelf and the wand bank.
 | `lesson:fendra` | Lesson 5 | A spell that reaches: `fendra` draws the nearest thing in reach to the wizard's tile. | (the spell `fendra`) |
 | `level:the-high-shelf` | Practice 5 | A rare book on the high shelf, drawn down from in line with it. | |
 | `level:eldras-book` | Practice 6 | The chapter together: a key and its door, Eldra's book on her shelf, `fendra`, the book given. Bonus: the book named with `find_nearest` before the spell moves it. | |
-| `story:the-wand-bank` | story | Eldra's thanks; a school wand borrowed, Nuri's spare given back; the chapter's ideas summed up. | |
+| `story:the-wand-bank` | Story 2 | Eldra's thanks; a school wand borrowed, the friend's spare given back; the chapter's ideas summed up. | |
 
 The world features chapter 2 needs: shelves, tiles the wizard cannot walk
 on but can see across (D46); `fendra`, which pulls the nearest thing in
@@ -98,7 +100,7 @@ start (D49); a scene and a friend (D65, D66).
 
 ## Chapter 3 — The passages (`03-passages`)
 
-At night, with Nuri, through the passages where Dask patrols. The ideas: a
+At night, with the friend, through the passages where Dask patrols. The ideas: a
 question with a true or false answer, an expression; choosing with `if` and
 `else`, a condition; repeating with `for` and `while`, a loop; two spells.
 The wizard carries the school wand throughout.
@@ -110,24 +112,24 @@ room and the night walk down to the dormitory.
 
 | Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
-| `story:after-dark` | story | Night; Nuri at the door; the passages and Dask; look before you step. | |
+| `story:after-dark` | Story 1 | Night; the friend at the door; the passages and Dask; look before you step. | |
 | `lesson:true-or-false` | Lesson 1 | An expression is a question answered `True` or `False`: `3 > 2`, `door.locked`, `dask.facing == "left"`; `not`; a method can answer, `dask.can_see(wizard)` (D54). | `teacher.facing`, `teacher.position`, `teacher.can_see` |
 | `level:the-watchtower` | Practice 1 | Dask stares at the wall: print what he faces and whether he sees the wizard, then walk past. Bonus: the code asks `can_see`. | |
 | `lesson:if` | Lesson 2 | A condition: `if` runs its lines, moved in by four spaces, only when its expression is true; `wizard.wait()`; a level played two ways. | `wizard.wait` (and Python's `if`) |
 | `level:the-watch` | Practice 2 | Played two ways (D51): Dask looks away, or this way. `if` he looks this way, wait; then cross. | |
 | `lesson:else` | Lesson 3 | `else`: the lines to run when the condition is false. | (Python's `else`) |
 | `level:left-or-right` | Practice 3 | Played two ways: one of two doors is locked. `if` and `else`. | |
-| `level:the-wrong-door` | Fix 1 | Played two ways: Nuri's program has its `if` and `else` lines the wrong way round. | |
+| `level:the-wrong-door` | Fix 1 | Played two ways: the friend's program has its `if` and `else` lines the wrong way round. | |
 | `lesson:repeat` | Lesson 4 | A loop: `for step in range(8):` repeats its lines. | (Python's `for`) |
-| `level:the-long-stairs` | Improve 1 | Nuri's program climbs in sixteen lines; a `for` in fewer than 4. | |
-| `story:the-top-of-the-stairs` | story | The night passages begin; a stair that comes and goes; Dask below. | |
+| `level:the-long-stairs` | Improve 1 | The friend's program climbs in sixteen lines; a `for` in fewer than 4. | |
+| `story:the-top-of-the-stairs` | Story 2 | The night passages begin; a stair that comes and goes; Dask below. | |
 | `lesson:while` | Lesson 5 | `while` repeats its lines as long as its expression is true; a `while` that never ends is stopped by the tick limit. | |
 | `level:past-the-teacher` | Practice 4 | Wait while Dask looks this way, then cross his corridor. | |
 | `lesson:kirra-and-osto` | Lesson 6 | `kirra` lights a dark room; `osto` holds a moving stair; `stair.in_place` asks whether a step would land. | `stair.in_place` (and the spells `kirra`, `osto`) |
 | `level:the-moving-stairs` | Practice 5 | Wait `while not stair.in_place`, then cross (D53). Bonus: the code asks `in_place`. | |
 | `level:the-dark-room` | Practice 6 | A dark room (D52): `kirra`, the key found, the door opened. Bonus: the key found with `find_nearest`. | |
 | `level:the-night-walk` | Practice 7 | The chapter together: dark, a key and its door, a stair, and Dask on his round below. | |
-| `story:caught` | story | Dask steps out of the dark, and lets them go; the chapter's ideas summed up. | |
+| `story:caught` | Story 3 | Dask steps out of the dark, and lets them go; the chapter's ideas summed up. | |
 
 The world features chapter 3 needs: a level played in several ways,
 which the same program must win in all of them (D51); dark rooms whose

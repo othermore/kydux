@@ -13,6 +13,8 @@ export interface ApiMember {
   name: string;
   kind: 'action' | 'attribute';
   example: string;
+  /** The example with no argument, for before arguments are taught (D60). */
+  simple?: string;
 }
 
 export interface ApiTable {
@@ -28,6 +30,8 @@ export interface NotebookEntry {
   member: ApiMember;
   /** The member's example with the object's own name: `left_door.open()`. */
   example: string;
+  /** Whether the example and its words are the simple ones, with no argument (D60). */
+  simple: boolean;
 }
 
 /** The role of an object of a kind, as kydux_world.api.role_of says. */
@@ -52,24 +56,29 @@ export function heldObjects(level: LevelJson, table: ApiTable): { name: string; 
   ];
 }
 
-/** Every member the level teaches, for every object its code holds. */
+/** Every member the level teaches, for every object its code holds; before the
+ * course has taught arguments (`concepts` of the level, D60), an action that can
+ * go without one is shown without one. */
 export function notebookEntries(level: LevelJson, table: ApiTable): NotebookEntry[] {
   const api = (level.api as string[] | undefined) ?? [];
+  const concepts = (level.concepts as string[] | undefined) ?? ['arguments'];
   const entries: NotebookEntry[] = [];
   for (const object of heldObjects(level, table)) {
     for (const member of table.roles[object.role] ?? []) {
       if (!allows(api, table, object.role, member.name)) continue;
+      const simple = member.simple !== undefined && !concepts.includes('arguments');
       // The example names its own object first; the child's is named here.
-      const example = member.example.replace(/^\w+(?=\.)/, object.name);
-      entries.push({ object: object.name, role: object.role, member, example });
+      const example = (simple ? (member.simple ?? '') : member.example).replace(/^\w+(?=\.)/, object.name);
+      entries.push({ object: object.name, role: object.role, member, example, simple });
     }
   }
   return entries;
 }
 
-/** The words the notebook has for a member, from i18n (notebook.<role>.<member>). */
-export function describe(role: string, member: string): string {
-  return t(`notebook.${role}.${member}`);
+/** The words the notebook has for a member, from i18n: notebook.<role>.<member>,
+ * or notebook_simple.<role>.<member> for its simple example (D60). */
+export function describe(role: string, member: string, simple = false): string {
+  return t(`${simple ? 'notebook_simple' : 'notebook'}.${role}.${member}`);
 }
 
 export interface NotebookPanel {
@@ -115,7 +124,7 @@ export function notebookPanel(
               example.addEventListener('click', () => onExample(entry.example));
               return element('li', {}, [
                 example,
-                element('span', { className: 'description' }, withCode(describe(entry.role, entry.member.name))),
+                element('span', { className: 'description' }, withCode(describe(entry.role, entry.member.name, entry.simple))),
               ]);
             }),
           ),

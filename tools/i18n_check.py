@@ -169,7 +169,7 @@ def player_texts(languages: dict[str, dict[str, str]]) -> list[tuple[str, str, s
         where = path.relative_to(REPO).as_posix()
         found = strings(json.loads(path.read_text(encoding="utf-8")))
         texts.extend((lang, where, text) for text in found)
-    for path in sorted(content.glob("lessons/*/*.md")):
+    for path in sorted([*content.glob("lessons/*/*.md"), *content.glob("stories/*/*.md")]):
         where = path.relative_to(REPO).as_posix()
         texts.append((path.stem, where, path.read_text(encoding="utf-8")))
     return texts
@@ -192,7 +192,8 @@ def check_choices(languages: dict[str, dict[str, str]]) -> list[str]:
 
 def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
     """The words the page has for what the world defines, held to the world itself:
-    notebook.<role>.<member> for every member of kydux_world.api's table (D30), and
+    notebook.<role>.<member> for every member of kydux_world.api's table (D30),
+    notebook_simple.<role>.<member> for every action with a simple example (D60), and
     things.<kind> for every kind of thing in kydux_world.level, each language having
     them all and nothing more."""
     sys.path.insert(0, str(REPO / "world"))
@@ -202,12 +203,20 @@ def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
         f"notebook.{role}.{member}" for role, members in api.MEMBERS.items() for member in members
     }
     wanted |= {f"things.{kind}" for kind in level.THING_KINDS}
+    # An action with a simple example has simple words too (D60).
+    wanted |= {
+        f"notebook_simple.{role}.{member['name']}"
+        for role, members in api.table().items()
+        for member in members
+        if "simple" in member
+    }
     findings = []
     for lang, catalog in languages.items():
         said = {
             key
             for key in catalog
-            if (key.startswith("notebook.") and key.count(".") == 2) or key.startswith("things.")
+            if (key.split(".")[0] in ("notebook", "notebook_simple") and key.count(".") == 2)
+            or key.startswith("things.")
         }
         for key in sorted(wanted - said):
             findings.append(f"i18n/{lang}.json: lacks {key}, the words for it")

@@ -46,8 +46,8 @@ test('a won run shows its stars, and Next opens what comes next in the course', 
   );
   const win = page.locator('.win-card');
   await expect(win).toBeVisible();
-  await expect(win.locator('.stars')).toHaveAttribute('data-stars', '2');
-  await expect(win.locator('.stars')).toHaveAttribute('aria-label', '2 of 3 stars');
+  await expect(win.locator('.stars')).toHaveAttribute('data-stars', '3');
+  await expect(win.locator('.stars')).toHaveAttribute('aria-label', '3 of 3 stars');
   await page.locator('#next').click();
   await expect(page).toHaveURL(/#level\/the-archive$/);
   await expect(page.locator('.level-title')).toHaveText('The archive');
@@ -61,9 +61,50 @@ test('Play again closes the win card; the last level says there is no next yet',
   await ready(page);
   await page.locator('#speed').selectOption('4');
   await run(page, 'wizard.cast("kirra")\nkey = wizard.find_nearest("key")\nwizard.move_right(4)\nwizard.pick_up()\nwizard.move_right()\ndoor.open()\nwizard.move_right(2)\nwhile not stair.in_place:\n    wizard.wait()\nwizard.move_right(3)\nwizard.move_down()\nwhile dask.facing == "right":\n    wizard.wait()\nwizard.move_down(2)');
-  await expect(page.locator('.win-card .stars')).toHaveAttribute('data-stars', '1');
+  await expect(page.locator('.win-card .stars')).toHaveAttribute('data-stars', '3');
   await expect(page.locator('#last')).toHaveText('That is all for now. More levels are coming.');
   await expect(page.locator('#to-map')).toHaveAttribute('href', '#map');
   await page.locator('#again').click();
   await expect(page.locator('.win-card')).toBeHidden();
+});
+
+test('the stars say why: a hint and a bump each cost one (D57)', async ({ page }) => {
+  await page.goto('/#level/the-long-corridor');
+  await page.locator('#start').click();
+  await ready(page);
+  await page.locator('#speed').selectOption('4');
+  await run(page, 'wizard.move_up()');
+  await page.locator('#hint').click();
+  await run(page, 'wizard.move_up()\nwizard.move_right(6)');
+  const win = page.locator('.win-card');
+  await expect(win.locator('.stars')).toHaveAttribute('data-stars', '1');
+  await expect(win.locator('#star-reasons li')).toHaveText([
+    'Solved without a hint',
+    'Without bumping into anything',
+    'The extra goal met',
+  ]);
+  await expect(win.locator('#star-reasons li[data-kept="false"]')).toHaveCount(3);
+});
+
+test('a level and a lesson say their number in the chapter (D56)', async ({ page }) => {
+  await page.goto('/#level/the-corridor');
+  await expect(page.locator('#card-number')).toHaveText('Practice 2');
+  await page.locator('#start').click();
+  await expect(page.locator('#level-number')).toHaveText('Practice 2');
+  await page.goto('/#lesson/how-much');
+  await expect(page.locator('#lesson-number')).toHaveText('Lesson 3');
+  await page.goto('/#map');
+  await expect(page.locator('.stop[data-item="level:the-gate"] .stop-number')).toHaveText('Practice 1');
+});
+
+test('before arguments are taught, the notebook shows a move with no number (D60)', async ({ page }) => {
+  await page.goto('/#level/the-gate');
+  await page.locator('#start').click();
+  await page.locator('#notebook-open').click();
+  await expect(page.locator('#notebook [data-example="wizard.move_right()"]')).toHaveCount(1);
+  await expect(page.locator('#notebook')).toContainText('Walks one step to the right.');
+  await page.goto('/#level/the-long-corridor');
+  await page.locator('#start').click();
+  await page.locator('#notebook-open').click();
+  await expect(page.locator('#notebook [data-example="wizard.move_right(3)"]')).toHaveCount(1);
 });

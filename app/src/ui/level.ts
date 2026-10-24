@@ -14,8 +14,9 @@ import { currentLanguage, t } from '../i18n';
 import * as progress from '../progress/progress';
 import { DEFAULT_SETTINGS, SPLIT_MAX, SPLIT_MIN } from '../progress/store';
 import type { Runtime, RuntimeStatus } from '../runtime/runtime';
-import { type Card, startCard, stars, winCard } from './cards';
+import { type Card, startCard, winCard } from './cards';
 import { RunController, type RunSnapshot } from './controller';
+import { judge, type Verdict } from './stars';
 import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
@@ -39,6 +40,8 @@ export interface LevelScreenParts {
   /** The course's item after this level, `lesson:<id>` or `level:<id>`, or null after
    * the last. */
   next: string | null;
+  /** The level's number in its chapter, in words (*Practice 4*, D56), or none. */
+  label?: string;
   /** What the child can type, for the notebook and the editor's completion. */
   table: ApiTable;
   /** Made by the caller, so that Phaser and CodeMirror load on their own. */
@@ -70,7 +73,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     t('map.open_map'),
   );
   const toSettings = element('a', { id: 'level-settings', className: 'gear', href: '#settings' }, ['⚙']);
-  const heading = element('div', { className: 'level-heading' }, [title, about, toMap, toSettings]);
+  const number = parts.label
+    ? [element('span', { id: 'level-number', className: 'item-number' }, [parts.label])]
+    : [];
+  const heading = element('div', { className: 'level-heading' }, [...number, title, about, toMap, toSettings]);
+  // A fix or an improve level says on its start card what is to be done (D56).
+  const kind = typeof loaded.level.kind === 'string' ? loaded.level.kind : 'practice';
+  const task = () => (kind === 'fix' || kind === 'improve' ? t(`level.kind_${kind}`) : undefined);
   const sceneParent = element('div', { id: 'scene', className: 'scene' });
   const goalsSlot = element('div', { className: 'goals-slot' });
   const bonus = ((loaded.level.goals as { bonus?: boolean }[] | undefined) ?? []).map(
@@ -200,12 +209,12 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         options: own.map((entry) => ({
           label: entry.member.name,
           type: entry.member.kind === 'action' ? 'method' : 'property',
-          detail: describe(entry.role, entry.member.name),
+          detail: describe(entry.role, entry.member.name, entry.simple),
         })),
         validFor: /^\w*$/,
       };
     },
-    onRun: () => controller.run(editor.getDoc()),
+    onRun: () => runCode(),
     onChange: (doc) => {
       typed = doc !== text.starting_code;
       progress.setCode(loaded.id, doc);
@@ -249,6 +258,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       startCard(
         {
           title: text.title,
+          label: parts.label,
+          task: task(),
           goals: goalTexts(),
           said: said(text.intro),
           carrying: carrying(),
@@ -257,18 +268,26 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         () => editor.focus(),
       ),
     );
-  const showWin = (earned: number) =>
+  const showWin = (verdict: Verdict) =>
     showCard(
-      winCard(
-        earned,
-        parts.next ? itemHash(parts.next) : null,
-        () => editor.focus(),
-        (hash) => {
+      winCard({
+        verdict,
+        next: parts.next ? itemHash(parts.next) : null,
+        onAgain: () => editor.focus(),
+        onNext: (hash) => {
           location.hash = hash;
         },
-        said(text.outro),
-      ),
+        said: said(text.outro),
+        learned: text.learned,
+      }),
     );
+
+  // A run, counted in the progress, so that the stars know whether it was the first.
+  const runCode = () => {
+    if (!controller.snapshot.canRun) return;
+    progress.countRun(loaded.id);
+    controller.run(editor.getDoc());
+  };
 
   // Hints: one more at each press, offered once a run has not won; the hints
   // shown are kept in the progress document.
@@ -323,11 +342,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         renderHints();
       }
       if (!force && snapshot.outcome?.kind === 'won' && snapshot.world) {
-        const earned = stars(snapshot.world);
-        progress.markWon(loaded.id, earned, editor.getDoc());
+        // The runs before this one that did not win cost the first-try star (D57).
+        const misses = Math.max(0, (progress.levelProgress(loaded.id).runs ?? 1) - 1);
+        const verdict = judge({ world: snapshot.world, hintsShown, misses });
+        progress.markWon(loaded.id, verdict.earned, editor.getDoc());
         // Continue, on the start screen, goes to what comes after.
         if (parts.next) progress.setCurrent(parts.next);
-        showWin(earned);
+        showWin(verdict);
       } else if (!force && shownCard?.node.querySelector('.win-card')) {
         shownCard.close();
       }
@@ -344,7 +365,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   about.setAttribute('aria-label', t('level.about'));
   about.title = t('level.about');
   about.addEventListener('click', showStart);
-  run.addEventListener('click', () => controller.run(editor.getDoc()));
+  run.addEventListener('click', () => runCode());
   stop.addEventListener('click', () => {
     if (controller.snapshot.canPlay) controller.resume();
     else controller.stop();
@@ -416,7 +437,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     if (!event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.code === 'KeyR') {
       event.preventDefault();
-      if (controller.snapshot.canRun) controller.run(editor.getDoc());
+      runCode();
     } else if (event.code === 'KeyN') {
       event.preventDefault();
       notebookButton.click();

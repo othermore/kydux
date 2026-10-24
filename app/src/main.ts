@@ -1,6 +1,6 @@
 import { version } from '../package.json';
-import { type Course, items, itemHash, knownApi, loadCourse, next, parseItem } from './content/course';
-import { LessonNotFound, loadLesson } from './content/lessons';
+import { type Course, conceptsAt, items, itemHash, knownApi, loadCourse, next, parseItem } from './content/course';
+import { LessonNotFound, loadLesson, loadStory } from './content/lessons';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
 import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
 import * as progress from './progress/progress';
@@ -25,7 +25,8 @@ type Route =
   | { name: 'settings' }
   | { name: 'wizard' }
   | { name: 'level'; id: string }
-  | { name: 'lesson'; id: string };
+  | { name: 'lesson'; id: string }
+  | { name: 'story'; id: string };
 
 /** The screen the address names; the start screen for an address that names none. */
 function parseRoute(hash: string): Route {
@@ -33,6 +34,8 @@ function parseRoute(hash: string): Route {
   if (level) return { name: 'level', id: decodeURIComponent(level[1] ?? '') };
   const lesson = /^#lesson\/(.+)$/.exec(hash);
   if (lesson) return { name: 'lesson', id: decodeURIComponent(lesson[1] ?? '') };
+  const story = /^#story\/(.+)$/.exec(hash);
+  if (story) return { name: 'story', id: decodeURIComponent(story[1] ?? '') };
   if (hash === '#map') return { name: 'map' };
   if (hash === '#settings') return { name: 'settings' };
   if (hash === '#wizard') return { name: 'wizard' };
@@ -55,14 +58,28 @@ async function itemTitle(item: string): Promise<string> {
     const text = await loadLevelText(parsed.id, currentLanguage()).catch(() => null);
     return text?.title ?? parsed.id;
   }
-  const lesson = await loadLesson(parsed.id, currentLanguage()).catch(() => null);
-  return lesson?.title ?? parsed.id;
+  const load = parsed.kind === 'story' ? loadStory : loadLesson;
+  const pages = await load(parsed.id, currentLanguage()).catch(() => null);
+  return pages?.title ?? parsed.id;
 }
 
-async function showLesson(content: HTMLElement, id: string, key: string): Promise<void> {
+/** An item's number in words, *Lesson 3* or *Practice 4* (D56), or undefined. */
+function itemNumber(course: Course, item: string): string | undefined {
+  const number = course.numbers?.[item];
+  return number ? t(`kinds.${number.kind}`, { n: number.n }) : undefined;
+}
+
+/** A lesson, or a story page (D56): pages read one after another. */
+async function showLesson(
+  content: HTMLElement,
+  kind: 'lesson' | 'story',
+  id: string,
+  key: string,
+): Promise<void> {
+  const load = kind === 'story' ? loadStory : loadLesson;
   try {
     const [lesson, course, { lessonScreen }] = await Promise.all([
-      loadLesson(id, currentLanguage()),
+      load(id, currentLanguage()),
       loadCourse(),
       import('./ui/lesson'),
     ]);
@@ -71,8 +88,10 @@ async function showLesson(content: HTMLElement, id: string, key: string): Promis
       content,
       lessonScreen({
         lesson,
-        next: next(course, `lesson:${id}`),
-        reload: () => loadLesson(id, currentLanguage()),
+        kind,
+        label: itemNumber(course, `${kind}:${id}`),
+        next: next(course, `${kind}:${id}`),
+        reload: () => load(id, currentLanguage()),
       }),
     );
   } catch (error) {
@@ -159,6 +178,12 @@ async function showMap(content: HTMLElement): Promise<void> {
       course,
       progress: progress.load(),
       titles: new Map(titles),
+      numbers: new Map(
+        all.flatMap((item) => {
+          const number = itemNumber(course, item);
+          return number ? [[item, number] as const] : [];
+        }),
+      ),
       chapterTitles: new Map(chapterTitles),
     }),
   );
@@ -197,12 +222,16 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
     // The world, the notebook and the editor's completion all read the level's
     // api: what the course has taught up to here, not only this level (D40).
     loaded.level.api = knownApi(course, id, (loaded.level.api as string[] | undefined) ?? []);
+    // The concepts the course has taught up to here, which the notebook follows (D60);
+    // a level outside the course is shown as one that knows them all.
+    if (course.concepts?.[id]) loaded.level.concepts = conceptsAt(course, id);
     show(
       content,
       levelScreen({
         runtime,
         loaded,
         next: next(course, `level:${id}`),
+        label: itemNumber(course, `level:${id}`),
         table,
         createEditor,
         startScene,
@@ -232,7 +261,7 @@ function route(): void {
   if (!root) return;
   const wanted = parseRoute(location.hash);
   const key =
-    wanted.name === 'level' || wanted.name === 'lesson'
+    wanted.name === 'level' || wanted.name === 'lesson' || wanted.name === 'story'
       ? `${wanted.name}/${wanted.id}`
       : wanted.name;
   if (key === shownRoute && screen) return;
@@ -269,8 +298,8 @@ function route(): void {
   const shown =
     wanted.name === 'level'
       ? showLevel(content, wanted.id, key)
-      : wanted.name === 'lesson'
-        ? showLesson(content, wanted.id, key)
+      : wanted.name === 'lesson' || wanted.name === 'story'
+        ? showLesson(content, wanted.name, wanted.id, key)
         : wanted.name === 'map'
           ? showMap(content)
           : showStart(content);

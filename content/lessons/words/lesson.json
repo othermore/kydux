@@ -1,6 +1,7 @@
 {
   "id": "words",
   "teaches": [
-    "wizard.say"
+    "wizard.say",
+    "concept:strings"
   ]
 }

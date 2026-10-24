@@ -20,3 +20,14 @@ settings.key.
 # A level's speaker is named by `characters.${speaker}` (D45); tools/i18n_check.py
 # holds every speaker of content/levels/ to a key here.
 characters.
+
+# The notebook says an action's simple example, before arguments are taught, by
+# `notebook_simple.${role}.${member}` (D60); tools/i18n_check.py holds those keys
+# to the world's table.
+notebook_simple.
+
+# An item's number names its kind by `kinds.${kind}` (D56), a level's task by
+# `level.kind_${kind}`, and a star's reason by `stars.${key}` (D57).
+kinds.
+level.kind_
+stars.

@@ -1,6 +1,6 @@
-// The course: chapters of lessons and levels, in order (D32), read from
-// content/course.json, which pack-world writes from content/chapters/. An item
-// is `lesson:<id>` or `level:<id>`.
+// The course: chapters of story pages, lessons and levels, in order (D32, D56),
+// read from content/course.json, which pack-world writes from content/chapters/.
+// An item is `story:<id>`, `lesson:<id>` or `level:<id>`.
 
 import type { Progress } from '../progress/store';
 
@@ -9,18 +9,28 @@ export interface Chapter {
   items: string[];
 }
 
+/** An item's kind and its number within its chapter and kind (D56): Lesson 3. */
+export interface ItemNumber {
+  kind: string;
+  n: number;
+}
+
 export interface Course {
   chapters: Chapter[];
+  /** The number of each lesson and level; a story page has none. */
+  numbers?: Record<string, ItemNumber>;
+  /** For each level, the concepts the lessons before it taught (D60). */
+  concepts?: Record<string, string[]>;
   /** For each level of the course, every name taught by it and by the levels
    * before it (D40). */
   known?: Record<string, string[]>;
 }
 
-export type ItemKind = 'lesson' | 'level';
+export type ItemKind = 'story' | 'lesson' | 'level';
 export type StopState = 'done' | 'open' | 'locked';
 
 export function parseItem(item: string): { kind: ItemKind; id: string } | null {
-  const match = /^(lesson|level):([a-z0-9][a-z0-9-]*)$/.exec(item);
+  const match = /^(story|lesson|level):([a-z0-9][a-z0-9-]*)$/.exec(item);
   return match ? { kind: match[1] as ItemKind, id: match[2] ?? '' } : null;
 }
 
@@ -63,13 +73,23 @@ export function previous(course: Course, item: string): string | null {
   return index > 0 ? (all[index - 1] ?? null) : null;
 }
 
-/** Whether an item is done: a lesson read, a level won. */
+/** Whether an item is done: a story page or a lesson read, a level won. */
 export function isDone(item: string, progress: Progress): boolean {
   const parsed = parseItem(item);
   if (!parsed) return false;
-  return parsed.kind === 'lesson'
-    ? progress.lessons[parsed.id]?.read === true
-    : progress.levels[parsed.id]?.won === true;
+  switch (parsed.kind) {
+    case 'story':
+      return progress.stories[parsed.id]?.read === true;
+    case 'lesson':
+      return progress.lessons[parsed.id]?.read === true;
+    case 'level':
+      return progress.levels[parsed.id]?.won === true;
+  }
+}
+
+/** The concepts known on reaching a level (D60). */
+export function conceptsAt(course: Course, levelId: string): string[] {
+  return course.concepts?.[levelId] ?? [];
 }
 
 /** A stop's state on the map (D34): done; open, the first of the course or the one

@@ -15,6 +15,8 @@ export interface LevelText {
   /** What the level's speaker says on the start card, and on the win card (D45). */
   intro?: string;
   outro?: string;
+  /** What the child now knows, said on the win card (D62). */
+  learned?: string;
   /** The words for each of the level's ways (D51), by the way's id. */
   ways?: Record<string, string>;
 }
@@ -64,6 +66,7 @@ function madeForWizard(text: LevelText): LevelText {
     ...(text.hints ? { hints: text.hints.map(forWizard) } : {}),
     ...(text.intro !== undefined ? { intro: forWizard(text.intro) } : {}),
     ...(text.outro !== undefined ? { outro: forWizard(text.outro) } : {}),
+    ...(text.learned !== undefined ? { learned: forWizard(text.learned) } : {}),
     ...(text.ways
       ? { ways: Object.fromEntries(Object.entries(text.ways).map(([id, words]) => [id, forWizard(words)])) }
       : {}),

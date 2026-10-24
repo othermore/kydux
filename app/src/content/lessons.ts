@@ -1,7 +1,8 @@
-// Loading a lesson: lesson.json and its Markdown in the player's language, from
-// content/lessons/<id>/ (D33). Pages are separated by a line of `---`; a fenced
-// block marked `python try` on the last page is the lesson's Try it, which goes
-// into the next level's editor, and is not shown as a page's code.
+// Loading a lesson or a story page: lesson.json or story.json and its Markdown
+// in the player's language, from content/lessons/<id>/ or content/stories/<id>/
+// (D33, D56). Pages are separated by a line of `---`; a fenced block marked
+// `python try` on a lesson's last page is its Try it, which goes into the next
+// level's editor, and is not shown as a page's code. A story page has none.
 
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
 
@@ -38,10 +39,6 @@ export function readLesson(markdown: string): Pick<Lesson, 'title' | 'pages' | '
   return { title, pages, tryCode };
 }
 
-function lessonUrl(id: string, file: string): string {
-  return `${import.meta.env.BASE_URL}content/lessons/${id}/${file}`;
-}
-
 async function fetched(url: string, kind: 'json' | 'text'): Promise<string | null> {
   const response = await fetch(url);
   const type = response.headers.get('content-type') ?? '';
@@ -52,8 +49,20 @@ async function fetched(url: string, kind: 'json' | 'text'): Promise<string | nul
 }
 
 export async function loadLesson(id: string, lang: Language): Promise<Lesson> {
+  return loadPages('lessons', id, lang);
+}
+
+/** A story page (D56): pages like a lesson's, with no Try it. */
+export async function loadStory(id: string, lang: Language): Promise<Lesson> {
+  const story = await loadPages('stories', id, lang);
+  return { ...story, tryCode: null };
+}
+
+async function loadPages(folder: 'lessons' | 'stories', id: string, lang: Language): Promise<Lesson> {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) throw new LessonNotFound(id);
-  const about = await fetched(lessonUrl(id, 'lesson.json'), 'json');
+  const lessonUrl = (lessonId: string, file: string) =>
+    `${import.meta.env.BASE_URL}content/${folder}/${lessonId}/${file}`;
+  const about = await fetched(lessonUrl(id, folder === 'lessons' ? 'lesson.json' : 'story.json'), 'json');
   if (!about) throw new LessonNotFound(id);
   const markdown =
     (await fetched(lessonUrl(id, `${lang}.md`), 'text')) ??

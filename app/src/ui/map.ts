@@ -13,6 +13,8 @@ export interface MapScreenParts {
   progress: Progress;
   /** Every item's title, and every chapter's, in the language now set. */
   titles: Map<string, string>;
+  /** Every numbered item's number in words, *Lesson 3* (D56). */
+  numbers: Map<string, string>;
   chapterTitles: Map<string, string>;
 }
 
@@ -39,7 +41,11 @@ export function mapScreen(parts: MapScreenParts): Screen {
         const stars = parsed?.kind === 'level' ? (progress.levels[parsed.id]?.stars ?? 0) : 0;
         const icon = element('span', { className: `stop-icon ${parsed?.kind ?? 'level'}` });
         icon.setAttribute('aria-hidden', 'true');
-        const label = element('span', { className: 'stop-title' }, [title]);
+        const number = parts.numbers.get(item);
+        const label = element('span', { className: 'stop-title' }, [
+          ...(number ? [element('span', { className: 'stop-number' }, [number]), ' '] : []),
+          title,
+        ]);
         const extra =
           state === 'done' && parsed?.kind === 'level'
             ? [element('span', { className: 'stop-stars' }, ['★'.repeat(stars) + '☆'.repeat(MAX_STARS - stars)])]

@@ -63,7 +63,9 @@
     "notebook_key": "Abre o cierra el cuaderno: Alt+N",
     "carrying": "Llevas {things}.",
     "way_label": "Manera",
-    "ways": "Este nivel se juega de {n} maneras. Un solo programa tiene que superarlas todas:"
+    "ways": "Este nivel se juega de {n} maneras. Un solo programa tiene que superarlas todas:",
+    "kind_fix": "Este programa todavía no funciona. Encuentra qué falla, y arréglalo.",
+    "kind_improve": "Este programa funciona, pero puede ser mejor. Mejóralo."
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",
@@ -263,5 +265,27 @@
     "zarek": "Zarek",
     "bimo": "Bimo",
     "eldra": "Eldra"
+  },
+  "notebook_simple": {
+    "wizard": {
+      "move_right": "Da un paso a la derecha.",
+      "move_left": "Da un paso a la izquierda.",
+      "move_up": "Da un paso hacia arriba.",
+      "move_down": "Da un paso hacia abajo.",
+      "wait": "Se queda quiet{o|a} un tick, mientras el mundo sigue."
+    }
+  },
+  "kinds": {
+    "lesson": "Lección {n}",
+    "practice": "Práctica {n}",
+    "fix": "Arreglo {n}",
+    "improve": "Mejora {n}",
+    "challenge": "Reto {n}"
+  },
+  "stars": {
+    "no_hints": "Sin pedir pistas",
+    "clean": "Sin chocar con nada",
+    "bonus": "El objetivo extra cumplido",
+    "first_try": "A la primera"
   }
 }

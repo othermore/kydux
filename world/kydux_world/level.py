@@ -45,6 +45,9 @@ ACTOR_KINDS = ("teacher", "ghost", "cat")
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
 KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto")
+#: The kinds of level (D56): a screen to solve, a program to repair, a program to
+#: make better, a challenge with no lesson before it.
+LEVEL_KINDS = ("practice", "fix", "improve", "challenge")
 #: What a way may say differently from the level it is a way of (D51).
 WAY_FIELDS = ("id", "things", "actors", "carrying", "spells", "dark")
 FACINGS = ("up", "down", "left", "right")
@@ -107,6 +110,8 @@ class Level:
     spells: tuple[str, ...] = ()
     #: Whether the room is dark until `kirra` lights it (D52).
     dark: bool = False
+    #: The level's kind (D56), `practice` unless it says.
+    kind: str = "practice"
     #: The ways the level is played, by id, each a level of its own (D51); empty
     #: for a level played one way.
     ways: tuple[tuple[str, "Level"], ...] = ()
@@ -196,6 +201,9 @@ class Level:
         dark = data.get("dark", False)
         if not isinstance(dark, bool):
             raise LevelError(f"{level_id}: dark is true or false")
+        kind = data.get("kind", "practice")
+        if kind not in LEVEL_KINDS:
+            raise LevelError(f"{level_id}: a level's kind is one of {', '.join(LEVEL_KINDS)}")
         if dark and "kirra" not in spells:
             raise LevelError(f"{level_id}: a dark level needs kirra among its spells")
         for thing in things:
@@ -230,6 +238,7 @@ class Level:
             goals_source=source,
             spells=tuple(spells),
             dark=dark,
+            kind=kind,
         )
         check_api(level)
         return level

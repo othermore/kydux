@@ -17,6 +17,9 @@ CONTENT = ROOT / "content"
 LANGUAGES = sorted(p.stem for p in (ROOT / "i18n").glob("*.json"))
 CHAPTERS = sorted(p for p in (CONTENT / "chapters").iterdir() if (p / "chapter.json").is_file())
 LESSONS = sorted(p for p in (CONTENT / "lessons").iterdir() if (p / "lesson.json").is_file())
+STORIES = sorted(p for p in (CONTENT / "stories").glob("*") if (p / "story.json").is_file())
+#: The concepts a lesson may teach, beside the API's names (D60).
+CONCEPTS = {"arguments", "comments", "print", "strings"}
 TRY = re.compile(r"```python try\n(.*?)```", re.S)
 FENCED = re.compile(r"```.*?```", re.S)
 INLINE = re.compile(r"`[^`\n]*`")
@@ -55,8 +58,8 @@ def test_a_chapter_s_id_is_its_directory_and_its_items_exist(path):
     assert data["id"] == path.name
     for item in data["items"]:
         kind, _, item_id = item.partition(":")
-        assert kind in ("lesson", "level"), item
-        folder = CONTENT / f"{kind}s" / item_id
+        assert kind in ("story", "lesson", "level"), item
+        folder = CONTENT / ("stories" if kind == "story" else f"{kind}s") / item_id
         assert (folder / f"{kind}.json").is_file(), f"{item} names nothing in content/"
 
 
@@ -65,6 +68,12 @@ def test_every_item_is_in_the_course_once():
     assert len(items) == len(set(items))
     for path in LESSONS:
         assert f"lesson:{path.name}" in items, f"the lesson {path.name} is in no chapter"
+    for path in STORIES:
+        story = json.loads((path / "story.json").read_text(encoding="utf-8"))
+        assert story["id"] == path.name
+        # The game's opening comes before the course (D61); every other story page is in it.
+        if not story.get("opening"):
+            assert f"story:{path.name}" in items, f"the story page {path.name} is in no chapter"
     for path in sorted((CONTENT / "levels").iterdir()):
         if (path / "level.json").is_file():
             assert f"level:{path.name}" in items, f"the level {path.name} is in no chapter"
@@ -100,8 +109,17 @@ def test_what_a_lesson_explains_the_level_after_it_teaches(path):
     level = level_after(f"lesson:{path.name}")
     assert level is not None, f"no level comes after {path.name}"
     api = Level.from_directory(level).api
-    missing = [name for name in teaches if name not in api]
+    names = [name for name in teaches if not name.startswith("concept:")]
+    missing = [name for name in names if name not in api]
     assert not missing, f"{level.name} does not teach {missing}"
+
+
+@pytest.mark.parametrize("path", LESSONS, ids=lambda p: p.name)
+def test_a_lesson_s_concepts_are_ones_the_game_knows(path):
+    """A concept a lesson teaches (D60) is one the notebook and the checks follow."""
+    teaches = json.loads((path / "lesson.json").read_text(encoding="utf-8"))["teaches"]
+    concepts = [name.split(":", 1)[1] for name in teaches if name.startswith("concept:")]
+    assert set(concepts) <= CONCEPTS, f"{path.name} teaches {set(concepts) - CONCEPTS}"
 
 
 @pytest.mark.parametrize(
@@ -142,3 +160,17 @@ def test_a_level_teaches_only_what_a_lesson_before_it_explained(path):
             unexplained = [name for name in api if name not in explained]
             assert not unexplained, f"{item_id} teaches {unexplained}, which no lesson explained"
         explained.update(api)
+
+
+@pytest.mark.parametrize("path", STORIES, ids=lambda p: p.name)
+def test_a_story_page_is_in_every_language_with_the_same_pages_no_html_and_no_try_it(path):
+    """A story page (D56) is read like a lesson, and has no example to try."""
+    counts = {}
+    for lang in LANGUAGES:
+        text = (path / f"{lang}.md").read_text(encoding="utf-8")
+        counts[lang] = len(pages(text))
+        assert re.match(r"#\s+\S", text), f"{path.name}/{lang}.md does not open with its title"
+        assert not TRY.findall(text), f"{path.name}/{lang}.md has a Try it"
+        prose = INLINE.sub("", FENCED.sub("", text))
+        assert not HTML.search(prose), f"{path.name}/{lang}.md has HTML"
+    assert len(set(counts.values())) == 1, f"{path.name}: pages differ, {counts}"

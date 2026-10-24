@@ -4,6 +4,7 @@
     "wizard.position",
     "wizard.items",
     "door.locked",
-    "thing.position"
+    "thing.position",
+    "concept:print"
   ]
 }

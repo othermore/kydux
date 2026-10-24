@@ -31,8 +31,8 @@ test('a won level is done with its stars, and opens the next stop', async ({ pag
   await page.locator('#level-map').click();
   const won = stop(page, 'level:the-long-corridor');
   await expect(won).toHaveAttribute('data-state', 'done');
-  // One line: the bonus of fewer than two lines met too.
-  await expect(won.locator('.stop-stars')).toHaveText('★★☆');
+  // One line, no hint, no bump: every star (D57).
+  await expect(won.locator('.stop-stars')).toHaveText('★★★');
   await expect(stop(page, 'level:the-stairs')).toHaveAttribute('data-state', 'open');
   await expect(stop(page, 'lesson:words')).toHaveAttribute('data-state', 'locked');
 });

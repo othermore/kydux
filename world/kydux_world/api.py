@@ -98,16 +98,25 @@ def table() -> dict[str, list[dict[str, str]]]:
         found[role] = []
         for member in members:
             attribute = isinstance(getattr(owner, member), property)
-            found[role].append(
-                {
-                    "name": member,
-                    "kind": "attribute" if attribute else "action",
-                    "example": _attribute_example(owner, member)
-                    if attribute
-                    else example(owner, member),
-                }
-            )
+            shown = _attribute_example(owner, member) if attribute else example(owner, member)
+            kind = "attribute" if attribute else "action"
+            entry = {"name": member, "kind": kind, "example": shown}
+            simple = None if attribute else _simple_example(owner, member, shown)
+            if simple is not None:
+                entry["simple"] = simple
+            found[role].append(entry)
     return found
+
+
+def _simple_example(owner: type, member: str, shown: str) -> str | None:
+    """An action's example with no argument, when it can be called with none and its
+    example has one: what the notebook shows before arguments are taught (D60)."""
+    import inspect
+
+    parameters = list(inspect.signature(getattr(owner, member)).parameters.values())[1:]
+    if any(p.default is inspect.Parameter.empty for p in parameters) or shown.endswith("()"):
+        return None
+    return shown[: shown.index("(")] + "()"
 
 
 def _attribute_example(owner: type, member: str) -> str:

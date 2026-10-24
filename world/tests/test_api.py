@@ -55,5 +55,8 @@ def test_the_table_for_the_page_has_every_member_with_its_kind_and_example():
         "name": "move_right",
         "kind": "action",
         "example": "wizard.move_right(3)",
+        "simple": "wizard.move_right()",
     }
+    # An action that needs its argument, or has none, has no simpler example (D60).
+    assert "simple" not in wizard["say"] and "simple" not in wizard["pick_up"]
     assert wizard["position"]["kind"] == "attribute"

@@ -131,16 +131,40 @@ const chapters = existsSync(chaptersDir)
 // level and by every level before it in the course. The page gives it to the
 // world and to the notebook in place of the level's own `api`, so that an action
 // once learned stays known; the notebook still shows only the objects present.
+// The concepts known on reaching each level (D60): every `concept:<name>` the
+// lessons before it teach, as arguments or comments, which the notebook follows.
+// And each item's number within its chapter and its kind (D56): Lesson 3,
+// Practice 4, so that no text carries a number.
+const readJson = (...path) => JSON.parse(readFileSync(join(repo, 'content', ...path), 'utf8'));
 const known = {};
+const concepts = {};
+const numbers = {};
 const taught = new Set();
-for (const item of chapters.flatMap((chapter) => chapter.items)) {
-  const [kind, id] = item.split(':');
-  if (kind !== 'level') continue;
-  const level = JSON.parse(readFileSync(join(repo, 'content', 'levels', id, 'level.json'), 'utf8'));
-  for (const name of level.api ?? []) taught.add(name);
-  known[id] = [...taught];
+const ideas = new Set();
+for (const chapter of chapters) {
+  const counted = {};
+  for (const item of chapter.items) {
+    const [kind, id] = item.split(':');
+    if (kind === 'lesson') {
+      for (const name of readJson('lessons', id, 'lesson.json').teaches ?? []) {
+        if (name.startsWith('concept:')) ideas.add(name.slice('concept:'.length));
+      }
+    }
+    const numbered = kind === 'level' ? (readJson('levels', id, 'level.json').kind ?? 'practice') : kind;
+    if (numbered !== 'story') {
+      counted[numbered] = (counted[numbered] ?? 0) + 1;
+      numbers[item] = { kind: numbered, n: counted[numbered] };
+    }
+    if (kind !== 'level') continue;
+    for (const name of readJson('levels', id, 'level.json').api ?? []) taught.add(name);
+    known[id] = [...taught];
+    concepts[id] = [...ideas];
+  }
 }
-writeFileSync(join(content, 'course.json'), `${JSON.stringify({ chapters, known }, null, 2)}\n`);
+writeFileSync(
+  join(content, 'course.json'),
+  `${JSON.stringify({ chapters, known, concepts, numbers }, null, 2)}\n`,
+);
 
 // The table of what the child can type, from the world itself (D30): the
 // notebook and the editor's completion read it, so the page needs no Python

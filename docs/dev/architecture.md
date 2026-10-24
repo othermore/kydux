@@ -784,3 +784,39 @@ one overturns stays, marked as superseded.
   recall no famous story of wizards, and the hooks check what comes back.
   Claude writes the briefs, the corrections, and words too small to brief:
   a button, a label, a notebook entry.
+- **D56 — Items have kinds, and a number in their chapter.** Decided
+  2026-10-22 by the owner's UAT (sprint-10.md), built the same day. A
+  chapter's items are `story:<id>`, `lesson:<id>` and `level:<id>`. A story
+  page is `content/stories/<id>/` with `story.json` (`id`, and `opening`
+  for the game's opening, which is not in the course) and `<lang>.md`,
+  pages like a lesson's with no Try it; it is read on the lesson screen,
+  ends in *Go on*, is done once read to its end (`progress.stories`), and
+  is a scroll on the map. A level's `kind` in `level.json` is `practice`
+  (the default), `fix` (a program given that does not work, to repair),
+  `improve` (a program that works, to make better) or `challenge`; a fix
+  or improve level says on its start card what is to be done.
+  `pack-world.mjs` numbers each lesson and level within its chapter and its
+  kind into `course.json`'s `numbers`, and the map, the headings and the
+  start card say *Lesson 3*, *Practice 4*, *Fix 1* (`kinds.<kind>`), so
+  that no text carries a number and an item can move without renumbering
+  by hand. Story pages are not numbered.
+- **D57 — Stars say how well, and why.** Decided 2026-10-22 by the owner's
+  UAT (sprint-10.md), built the same day. A win earns three stars and
+  loses one for each of: a hint shown in the level; the winning run
+  bumping into a wall, a door or a stair; and a bonus goal unmet, or, in a
+  level with no bonus goal, a run before the winning one (the progress
+  counts runs per level, `runs`). A win is one star at least.
+  `app/src/ui/stars.ts` judges, and the win card lists the three reasons,
+  kept or lost (`stars.<reason>`), so that the child knows what to try
+  again for; the progress keeps the most stars.
+- **D60 — A lesson may teach a concept, which the notebook follows.**
+  Decided 2026-10-22 by the owner's UAT (sprint-10.md), built the same
+  day. `teaches` in `lesson.json` may name a concept beside the API's
+  names: `concept:arguments`, `concept:comments`, `concept:print`,
+  `concept:strings`. `pack-world.mjs` writes the concepts known at each
+  level into `course.json`'s `concepts`, and the page gives them to the
+  level as `concepts`. `api.table()` gives an action that can go without
+  its argument a `simple` example (`wizard.move_right()`), with its words
+  in `notebook_simple.<role>.<member>`; the notebook and the completion
+  show the simple ones until `arguments` is known. A level outside the
+  course is shown as one that knows every concept.

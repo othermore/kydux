@@ -63,7 +63,9 @@
     "notebook_key": "Open or close the notebook: Alt+N",
     "carrying": "You carry {things}.",
     "way_label": "Way",
-    "ways": "This level is played {n} ways. One program must get through them all:"
+    "ways": "This level is played {n} ways. One program must get through them all:",
+    "kind_fix": "This program does not work yet. Find what is wrong, and fix it.",
+    "kind_improve": "This program works, but it can be better. Make it better."
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",
@@ -263,5 +265,27 @@
     "zarek": "Zarek",
     "bimo": "Bimo",
     "eldra": "Eldra"
+  },
+  "notebook_simple": {
+    "wizard": {
+      "move_right": "Walks one step to the right.",
+      "move_left": "Walks one step to the left.",
+      "move_up": "Walks one step up.",
+      "move_down": "Walks one step down.",
+      "wait": "Stands still for one tick, while the world goes on."
+    }
+  },
+  "kinds": {
+    "lesson": "Lesson {n}",
+    "practice": "Practice {n}",
+    "fix": "Fix {n}",
+    "improve": "Improve {n}",
+    "challenge": "Challenge {n}"
+  },
+  "stars": {
+    "no_hints": "Solved without a hint",
+    "clean": "Without bumping into anything",
+    "bonus": "The extra goal met",
+    "first_try": "At the first try"
   }
 }

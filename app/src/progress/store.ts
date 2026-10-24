@@ -26,6 +26,8 @@ export interface LevelProgress {
   hints?: number;
   /** Whether the level has been played without winning, so hints are offered. */
   tried?: boolean;
+  /** How many runs the child has started in the level, for the first-try star (D57). */
+  runs?: number;
 }
 
 /** The wizard the child made (D36). `gender` chooses the words, nothing else;
@@ -44,6 +46,8 @@ export interface Progress {
   wizard: Wizard | null;
   settings: Settings;
   lessons: Record<string, { read?: boolean }>;
+  /** The story pages read (D56). */
+  stories: Record<string, { read?: boolean }>;
   levels: Record<string, LevelProgress>;
   /** The levels whose start card has been seen. */
   started: string[];
@@ -71,6 +75,7 @@ export function defaultProgress(): Progress {
     wizard: null,
     settings: { ...DEFAULT_SETTINGS },
     lessons: {},
+    stories: {},
     levels: {},
     started: [],
     current: null,
@@ -134,9 +139,11 @@ export function readProgress(value: unknown): Progress | null {
       progress.settings.split = split;
     }
   }
-  if (isObject(value.lessons)) {
-    for (const [id, lesson] of Object.entries(value.lessons)) {
-      if (isObject(lesson)) progress.lessons[id] = { read: lesson.read === true };
+  for (const key of ['lessons', 'stories'] as const) {
+    const read = value[key];
+    if (!isObject(read)) continue;
+    for (const [id, item] of Object.entries(read)) {
+      if (isObject(item)) progress[key][id] = { read: item.read === true };
     }
   }
   if (isObject(value.levels)) {
@@ -148,6 +155,7 @@ export function readProgress(value: unknown): Progress | null {
       if (typeof level.code === 'string') kept.code = level.code;
       if (isCount(level.hints)) kept.hints = level.hints;
       if (typeof level.tried === 'boolean') kept.tried = level.tried;
+      if (isCount(level.runs)) kept.runs = level.runs;
       progress.levels[id] = kept;
     }
   }

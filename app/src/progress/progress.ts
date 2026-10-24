@@ -91,6 +91,20 @@ export function markStarted(id: string): void {
   });
 }
 
+/** A run started in a level (D57). */
+export function countRun(id: string): void {
+  editLevel(id, (level) => {
+    level.runs = (level.runs ?? 0) + 1;
+  });
+}
+
+/** A story page read to its end (D56). */
+export function markStoryRead(storyId: string): void {
+  change((progress) => {
+    progress.stories[storyId] = { read: true };
+  });
+}
+
 export function markRead(lessonId: string): void {
   change((progress) => {
     progress.lessons[lessonId] = { ...progress.lessons[lessonId], read: true };

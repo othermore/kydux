@@ -4,15 +4,8 @@
 
 import { t } from '../i18n';
 import { MAX_STARS } from '../progress/store';
-import type { WorldResult } from '../runtime/protocol';
 import { element } from './dom';
-
-/** One star for winning, one more for each bonus goal met, three at most. */
-export function stars(world: WorldResult): number {
-  if (world.status !== 'won') return 0;
-  const bonus = world.goals.filter((goal) => goal.bonus && goal.met).length;
-  return Math.min(MAX_STARS, 1 + bonus);
-}
+import type { Verdict } from './stars';
 
 export interface Card {
   node: HTMLElement;
@@ -49,6 +42,10 @@ function overlay(className: string, children: (Node | string)[], onClose: () => 
 
 export interface StartCardText {
   title: string;
+  /** The level's number in its chapter, in words, and what a fix or improve level
+   * asks to be done (D56). */
+  label?: string;
+  task?: string;
   goals: { text: string; bonus?: boolean }[];
   /** What a character of the story says before the level, with the character's name. */
   said?: Said;
@@ -85,8 +82,10 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
   const card = overlay(
     'start-card',
     [
+      ...(text.label ? [element('p', { id: 'card-number', className: 'item-number' }, [text.label])] : []),
       element('h3', {}, [text.title]),
       ...(text.said ? [saidBy(text.said, 'card-intro')] : []),
+      ...(text.task ? [element('p', { id: 'card-task', className: 'card-task' }, [text.task])] : []),
       element('p', {}, [t('goals.title')]),
       list,
       ...(text.carrying ? [element('p', { id: 'card-carrying', className: 'card-carrying' }, [text.carrying])] : []),
@@ -111,21 +110,38 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
   return card;
 }
 
-/** You did it, the stars, what the speaker says after the level, Play again, and
- * Next; after the course's last item, the word that there is no next yet and the
- * way to the map. `next` is an address. */
-export function winCard(
-  earned: number,
-  next: string | null,
-  onAgain: () => void,
-  onNext: (hash: string) => void,
-  said?: Said,
-): Card {
+export interface WinCardParts {
+  /** The stars earned and why (D57). */
+  verdict: Verdict;
+  /** The address of what comes next, or null after the course's last item. */
+  next: string | null;
+  onAgain: () => void;
+  onNext: (hash: string) => void;
+  /** What the level's speaker says after it (D45), and what the child now knows (D62). */
+  said?: Said;
+  learned?: string;
+}
+
+/** You did it, the stars and why, what the speaker says, what the child learned,
+ * Play again, and Next; after the course's last item, the word that there is no
+ * next yet and the way to the map. */
+export function winCard({ verdict, next, onAgain, onNext, said, learned }: WinCardParts): Card {
+  const { earned } = verdict;
   const shown = element('p', { className: 'stars' }, [
     '★'.repeat(earned) + '☆'.repeat(MAX_STARS - earned),
   ]);
   shown.setAttribute('aria-label', t('level.stars', { n: earned }));
   shown.dataset.stars = String(earned);
+  // Each star's reason, kept or lost, so that the child knows what to try again for.
+  const reasons = element(
+    'ul',
+    { id: 'star-reasons', className: 'star-reasons' },
+    verdict.reasons.map((reason) => {
+      const item = element('li', {}, [t(`stars.${reason.key}`)]);
+      item.dataset.kept = String(reason.kept);
+      return item;
+    }),
+  );
   const again = element('button', { id: 'again', type: 'button' }, [t('level.again')]);
   const after = next
     ? element('button', { id: 'next', type: 'button' }, [t('level.next')])
@@ -138,7 +154,9 @@ export function winCard(
     [
       element('h3', {}, [t('outcome.won')]),
       shown,
+      reasons,
       ...(said ? [saidBy(said, 'card-outro')] : []),
+      ...(learned ? [element('p', { id: 'card-learned', className: 'card-learned' }, [learned])] : []),
       element('div', { className: 'card-buttons' }, [again, after]),
     ],
     () => {},

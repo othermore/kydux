@@ -1,7 +1,8 @@
-// A lesson, page by page: its Markdown rendered by marked (D33), Back and Next
-// page, and on the last page Try it, which marks the lesson read, gives its
-// example to the next level when the child has typed nothing there yet, and
-// opens what comes next. Reaching the last page marks the lesson read too.
+// A lesson or a story page, page by page: its Markdown rendered by marked
+// (D33), Back and Next page, and on the last page Try it, which marks the
+// lesson read, gives its example to the next level when the child has typed
+// nothing there yet, and opens what comes next; a story page, or a lesson with
+// no example, has Go on instead (D56). Reaching the last page marks it read.
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
@@ -13,6 +14,10 @@ import type { Screen } from './screen';
 
 export interface LessonScreenParts {
   lesson: Lesson;
+  /** A lesson, or a story page, which is read the same way and kept apart. */
+  kind: 'lesson' | 'story';
+  /** The lesson's number in its chapter, in words (*Lesson 3*), or none. */
+  label?: string;
   /** The course's item after this lesson, or null after the last. */
   next: string | null;
   /** The lesson in the language now set, for a change of language. */
@@ -24,7 +29,8 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
   let page = 0;
   const node = element('div', { className: 'lesson-screen' });
 
-  const markRead = () => progress.markRead(lesson.id);
+  const markRead = () =>
+    parts.kind === 'story' ? progress.markStoryRead(lesson.id) : progress.markRead(lesson.id);
 
   const tryIt = () => {
     markRead();
@@ -69,7 +75,10 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
       }
     });
     node.replaceChildren(
-      element('a', { id: 'lesson-map', className: 'quiet-button small', href: '#map' }, [t('map.open_map')]),
+      element('div', { className: 'lesson-top' }, [
+        ...(parts.label ? [element('span', { id: 'lesson-number', className: 'item-number' }, [parts.label])] : []),
+        element('a', { id: 'lesson-map', className: 'quiet-button small', href: '#map' }, [t('map.open_map')]),
+      ]),
       article,
       element('div', { className: 'lesson-nav' }, [
         back,
@@ -85,7 +94,7 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
   return {
     node,
     mount: () => {
-      progress.setCurrent(`lesson:${lesson.id}`);
+      progress.setCurrent(`${parts.kind}:${lesson.id}`);
       draw();
     },
     async relabel() {

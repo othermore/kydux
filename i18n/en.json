@@ -244,7 +244,9 @@
   "story": {
     "next": "Next",
     "step": "{n} of {total}",
-    "not_found": "There is no story called “{id}”."
+    "not_found": "There is no story called “{id}”.",
+    "again": "Again",
+    "skip": "Skip to the end"
   },
   "settings": {
     "title": "Settings",

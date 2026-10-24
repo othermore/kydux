@@ -73,3 +73,26 @@ test('a figure who goes says its words first, and is gone at the next step', asy
   await expect(scene).not.toHaveAttribute('data-actors', /friend/);
   await expect(scene).toHaveAttribute('data-actors', /wenna:5,12/);
 });
+
+test('Again plays a step once more, as R does; Skip goes to the end (14.4)', async ({ page }) => {
+  await page.goto('/#story/at-the-gate');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  // The step where the friend walks up the path.
+  await storyNext(page, 3);
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: 10_000 });
+  await expect(page.locator('#story-again')).toBeVisible();
+  await page.locator('#story-again').click();
+  // The walk again: the friend sets out from the path's end, then comes up.
+  await expect(scene).toHaveAttribute('data-state', 'playing');
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: 10_000 });
+  await page.locator('#story-title').click();
+  await page.keyboard.press('r');
+  await expect(scene).toHaveAttribute('data-state', 'playing');
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: 10_000 });
+  // Skip: the last step, read.
+  await page.locator('#story-skip').click();
+  await expect(page.locator('#story-go-on')).toBeVisible();
+  await expect(page.locator('#story-skip')).toBeHidden();
+  await expect(page.locator('#story-step')).toHaveText(/^(\d+) of \1$/);
+});

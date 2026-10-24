@@ -1672,6 +1672,34 @@ a.stop-body:focus-visible {
   line-height: 1.55;
 }
 
+/* Skip, at the band's right; Again beside Back. */
+.story-said {
+  display: flex;
+  flex-direction: column;
+}
+
+.link-button {
+  align-self: flex-end;
+  margin-top: 4px;
+  padding: 2px 4px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 0.9em;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-button[hidden] {
+  display: none;
+}
+
+.story-back {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .story-voice.silent {
   border-style: dashed;
   background: transparent;

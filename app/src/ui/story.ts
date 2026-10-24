@@ -2,8 +2,11 @@
 // goals; under it the voice's band; each step's action played on the scene,
 // then its words said in a bubble over who says them, or by the voice in the
 // band. Next goes on to the step after, Back to the one before; Enter and Space
-// do what Next does. On the last step Go on leads to what comes next; reaching
-// it marks the story read, as reading a story to its end does.
+// do what Next does. Again plays the step's action once more, as R does, on a
+// step that has one; Skip goes to the last step, every figure where the story
+// leaves it, for a child who has read it before. On the last step Go on leads to
+// what comes next; reaching it marks the story read, as reading a story to its
+// end does.
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
@@ -50,6 +53,12 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     t('lesson.previous'),
   ]);
   const count = element('span', { id: 'story-step', className: 'lesson-count' });
+  const again = element('button', { id: 'story-again', type: 'button', className: 'quiet-button small' }, [
+    t('story.again'),
+  ]);
+  const skip = element('button', { id: 'story-skip', type: 'button', className: 'link-button' }, [
+    t('story.skip'),
+  ]);
   const forward = element('button', { id: 'story-next', type: 'button', className: 'big-button' });
   const node = element('div', { className: 'story-screen' }, [
     element('div', { className: 'lesson-top' }, [
@@ -58,8 +67,8 @@ export function storyScreen(parts: StoryScreenParts): Screen {
       element('a', { id: 'story-map', className: 'quiet-button small', href: '#map' }, [t('map.open_map')]),
     ]),
     frame,
-    element('div', { className: 'story-said' }, [voice, heard]),
-    element('div', { className: 'lesson-nav' }, [back, count, forward]),
+    element('div', { className: 'story-said' }, [voice, heard, skip]),
+    element('div', { className: 'lesson-nav' }, [element('span', { className: 'story-back' }, [back, again]), count, forward]),
   ]);
 
   const last = () => step === story.steps.length - 1;
@@ -86,6 +95,9 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     const who = said?.who === 'wizard' ? forWizard('{wizard}') : said ? characterName(said.who) : '';
     heard.textContent = said ? `${who}: ${said.text.replace(/[`*_]/g, '')}` : '';
     back.disabled = step === 0;
+    // Again only where the step does something; Skip until the last step.
+    again.hidden = !current?.do;
+    skip.hidden = last();
     forward.textContent = last() ? t('lesson.go_on') : t('story.next');
     forward.id = last() ? 'story-go-on' : 'story-next';
     count.textContent = t('story.step', { n: step + 1, total: story.steps.length });
@@ -114,11 +126,22 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   };
   back.addEventListener('click', () => go(-1));
   forward.addEventListener('click', () => go(1));
-  // Enter and Space go on, unless a button or a link has them already.
+  again.addEventListener('click', () => play());
+  skip.addEventListener('click', () => {
+    step = story.steps.length - 1;
+    play();
+    forward.focus();
+  });
+  // Enter and Space go on, and R plays the step again, unless a button or a link
+  // has the key already.
   const onKey = (event: KeyboardEvent) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
     const target = event.target as HTMLElement | null;
     if (target?.closest('button, a, input, select, textarea')) return;
+    if (event.key === 'r' || event.key === 'R') {
+      if (!again.hidden) play();
+      return;
+    }
+    if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
     go(1);
   };

@@ -20,7 +20,7 @@ context:
 ---
 Write the seven lessons of chapter 1 of Kydux, *Arrival*, in English and
 Spanish. They are the game's tutorial, taught by Nuri at the castle's gate
-and in the gatehouse, between the levels that use them. Nuri speaks every
+and on the path beyond it, between the levels that use them. Nuri speaks every
 lesson to the wizard as "you", in Nuri's own voice (story.md): a friend
 who knows a bit more, explaining it the way they wish someone had
 explained it to them. The child reading is eight to twelve and has never
@@ -110,7 +110,7 @@ an earlier lesson taught is known, and is used, never explained again.
    the thing must be on your tile or right beside you. When several are
    near, you must say exactly which one you want, by giving its name as
    the argument: `wizard.pick_up(key)`. At the end, Nuri says they have
-   left their spare wand inside the gatehouse for you to pick up: it is
+   left their spare wand on a flat stone past the gate for you to pick up: it is
    lent, to be given back one day.
    Try code: `wizard.move_right(2)` then `wizard.pick_up()` on two lines.
 

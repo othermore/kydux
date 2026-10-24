@@ -1,6 +1,7 @@
-// The tiles and the wizard drawn at run time, until the game has its art
-// (plan, phase 4). Plain Canvas 2D, so that nothing is loaded from a file and
-// the same drawing comes out everywhere.
+// The tiles, the things and the figures drawn at run time for a scene without
+// art of its own (D76; chapters 2 and 3 until their scenes are painted). Plain
+// Canvas 2D, so that nothing is loaded from a file and the same drawing comes
+// out everywhere.
 
 import type Phaser from 'phaser';
 import type { DoorLock } from './layout';

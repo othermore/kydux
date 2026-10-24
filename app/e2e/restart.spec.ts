@@ -28,6 +28,8 @@ test('a run shows the level starting again before it plays, and Restart does too
   await expect(stars).toHaveCount(3);
   await expect(page.locator('.win-card .stars .star.earned')).toHaveCount(3);
   await expect(page.locator('.win-card .stars')).toHaveText('★★★');
+  // Each star is drawn in after the one before, and stays.
+  await expect(stars.nth(2)).toHaveCSS('opacity', '1');
 
   await page.locator('#again').click();
   await page.locator('#restart').click();

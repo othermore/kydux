@@ -132,6 +132,8 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await type(page, 'wizard.move_right()');
     await page.locator('#run').click();
     await expect(page.locator('.win-card h3')).toHaveText(words.won, { timeout: 30_000 });
+    // The stars are drawn in one after another: the photograph waits for the last.
+    await expect(page.locator('.win-card .star').nth(2)).toHaveCSS('opacity', '1');
     await shoot(page, 'win');
 
     // Next: the second lesson, not a level.

@@ -833,7 +833,7 @@ one overturns stays, marked as superseded.
   kind into `course.json`'s `numbers`, and the map, the headings and the
   start card say *Lesson 3*, *Practice 4*, *Fix 1* (`kinds.<kind>`), so
   that no text carries a number and an item can move without renumbering
-  by hand. Story pages are not numbered.
+  by hand. Stories are not numbered.
 - **D57 — Stars say how well, and why.** Decided 2026-10-22 by the owner's
   UAT (sprint-10.md), built the same day. A win earns three stars and
   loses one for each of: a hint shown in the level; the winning run
@@ -900,9 +900,9 @@ one overturns stays, marked as superseded.
   level's text has `outro`, said by its speaker on the win card, and
   `learned`, one sentence of what the child now knows, shown under the
   stars; a chapter's last level has no `learned`, since the chapter's
-  closing story page sums the chapter up. A chapter opens and closes with a
-  story page. The content tests hold a chapter to this when it opens with a
-  story page, which is how a chapter rewritten in the shape of the UAT is
+  closing story sums the chapter up. A chapter opens and closes with a
+  story (D74). The content tests hold a chapter to this when it opens with a
+  story, which is how a chapter rewritten in the shape of the UAT is
   told from one not yet rewritten; the same chapters are held to D60's
   concepts. An improve level asks for a clean run with the goal `no_bumps`,
   failed at the first bump.
@@ -949,13 +949,13 @@ one overturns stays, marked as superseded.
   Wenna of chapter 2; each is drawn as the character (`friendFigure` in
   `placeholders.ts`), Nuri with the wizard's gender. The level's intro and
   outro are the friend's words (D45).
-- **D67 — A lesson shows who teaches it; a story page looks like story.**
-  Decided 2026-10-22 by the owner's UAT (sprint-11.md), built the same day.
-  `lesson.json` names its `speaker`, a character of `story.md`; the lesson
-  screen draws the speaker's figure large beside the words, with the name,
-  and frames the words as the speaker's speech. A story page has no figure
-  and is framed as a page of a book. A content test refuses a lesson that
-  names no teacher. Rules out a lesson that looks like a story page.
+- **D67 — A lesson shows who teaches it.** Decided 2026-10-22 by the
+  owner's UAT (sprint-11.md), built the same day. `lesson.json` names its
+  `speaker`, a character of `story.md`; the lesson screen draws the
+  speaker's figure large beside the words, with the name, and frames the
+  words as the speaker's speech. A story is told on its scene instead
+  (D74). A content test refuses a lesson that names no teacher. Rules out
+  a lesson that looks like a story.
 - **D68 — The screen explains itself once, with arrows.** Decided 2026-10-22
   by the owner's UAT (sprint-11.md), built the same day. The course's first
   level opens the screen's guide once its start card is closed, the first
@@ -987,7 +987,7 @@ one overturns stays, marked as superseded.
   game*; a first visit with no game opens the story, and with saved games
   and none being played the start screen offers them. An imported file
   becomes one more game; *Export* keeps the game being played. Play time is
-  counted every ten seconds a level, a lesson or a story page is on screen
+  counted every ten seconds a level, a lesson or a story is on screen
   with the tab in sight. The single document of before, `kydux.progress`,
   becomes the list's first game the first time the list is read, so the
   document keeps its version: its shape is the same. The online game

@@ -59,7 +59,7 @@ with exactly as many steps as the story's list below, in that order.
 
 ## the-letter: the opening, told from the gate
 
-The scene: the garden before the castle's great gate, at dusk. The wizard
+The scene: the field before the school's great gate, at dusk. The wizard
 stands at the end of the path, the gate ahead. The story starts here and
 now, at the gate, and goes back in the past to tell how the wizard came:
 the owner wants the letter told as something that happened weeks ago,
@@ -86,7 +86,7 @@ Title: *The letter* / *La carta*.
 ## at-the-gate: Nuri arrives
 
 The scene: the wizard before the shut gate; the path leads back from it
-through the garden. Nuri comes up that path.
+through the field. Nuri comes up that path.
 
 1. voice. (The wizard turns to the gate.) You are at the gate, and you do
    not know how to open it.

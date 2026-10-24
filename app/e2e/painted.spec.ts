@@ -29,6 +29,7 @@ test('chapter 1 plays on the painted field', async ({ page }) => {
   await page.waitForTimeout(1200);
   await page.screenshot({ path: `${SHOTS}02-through-the-gate.png` });
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.win-card .star').nth(2)).toHaveCSS('opacity', '1');
   await page.screenshot({ path: `${SHOTS}03-won.png` });
 });
 

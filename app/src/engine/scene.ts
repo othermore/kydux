@@ -476,10 +476,11 @@ class LevelScene extends Phaser.Scene {
             delete this.parentNode.dataset.restarting;
             resolve();
           });
-          camera.fadeIn(RESTART_FADE_MS, 31, 35, 48);
+          camera.fadeFrom(RESTART_FADE_MS, 31, 35, 48, true);
         });
       });
-      camera.fadeOut(RESTART_FADE_MS, 31, 35, 48);
+      // Forced, so that a restart asked for during a fade still fades and resolves.
+      camera.fade(RESTART_FADE_MS, 31, 35, 48, true);
     });
   }
 

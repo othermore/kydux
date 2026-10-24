@@ -154,7 +154,7 @@ export class RunController {
       tick: this.tick,
       length: this.scene?.playback.length ?? 0,
       speed: this.speed,
-      canRun: this.scene !== null && this.runtime.status === 'ready',
+      canRun: this.scene !== null && this.runtime.status === 'ready' && !this.restarting,
       canStop: state === 'running' || state === 'playing',
       canPlay: state === 'paused',
       canSeek:
@@ -168,10 +168,10 @@ export class RunController {
     if (!scene || this.runtime.status !== 'ready') return;
     if (scene.playback.state === 'playing') scene.playback.stop();
     this.clear();
+    const generation = ++this.generation;
     // The level starts again on the scene while Python runs; the run plays once
     // both are done, so that a run is never seen to go on from the one before.
-    const shown = this.startAgain(scene);
-    const generation = ++this.generation;
+    const shown = this.startAgain(scene, generation);
     Promise.all([this.runtime.run(code, this.level.level), shown]).then(
       ([result]) => {
         if (generation !== this.generation) return;
@@ -218,13 +218,15 @@ export class RunController {
 
   restart(): void {
     this.generation += 1;
-    if (this.scene) void this.startAgain(this.scene);
+    if (this.scene) void this.startAgain(this.scene, this.generation);
     this.clear();
     this.changed();
   }
 
-  /** The scene put back where the level starts, shown as it is done (D75). */
-  private startAgain(scene: SceneLike): Promise<void> {
+  /** The scene put back where the level starts, shown as it is done (D75): no run
+   * starts while it is shown, and a showing from a run or restart since is left
+   * to the later one. */
+  private startAgain(scene: SceneLike, generation: number): Promise<void> {
     if (!scene.restartShow) {
       scene.reset();
       return Promise.resolve();
@@ -232,6 +234,7 @@ export class RunController {
     this.restarting = true;
     this.changed();
     return scene.restartShow().then(() => {
+      if (generation !== this.generation) return;
       this.restarting = false;
       this.changed();
     });

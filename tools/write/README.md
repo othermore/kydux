@@ -46,13 +46,13 @@ The tool needs the packages of `requirements.txt` in the repository's
 To see the prompt without sending it:
 
 ```sh
-.venv/bin/python tools/write/write.py tools/write/briefs/chapter-1.md --dry-run
+.venv/bin/python tools/write/write.py tools/write/briefs/chapter-1-levels.md --dry-run
 ```
 
 To have Gemini write the drafts:
 
 ```sh
-.venv/bin/python tools/write/write.py tools/write/briefs/chapter-1.md
+.venv/bin/python tools/write/write.py tools/write/briefs/chapter-1-levels.md
 ```
 
 It prints the files it wrote, under `drafts/<brief>/`, beside a

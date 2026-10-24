@@ -11,36 +11,44 @@ condition only once both are known. The story is `story.md`'s.
 Chapter 1 is given in full and is built; chapters 2 to 5 are given at the
 level of lessons and level titles, and each is built in its own sprint,
 where its levels get their maps and goals. Each chapter ends with the
-world features it needs that the world does not have yet.
+world features it needs that the world does not have yet, and with its
+rewrite: the opening and closing story pages it gains (D62) and its fix
+and improve levels (D56), in outline. Chapters 2 and 3 are rewritten in
+sprint 11, chapters 4 and 5 as they are built. Every text of a rewrite is
+drafted by Gemini from a brief (D55).
 
 An id is a slug (D44). *T* numbers a lesson, *L* a level, across the
 course, only to refer to them here.
 
 ## Chapter 1 — Arrival (`01-arrival`)
 
-Ilda meets the new pupils at the gate. The ideas: a program, an action,
-an argument, a string, a thing, a spell.
+Before it, the game's opening, `story:the-letter`: the letter of admission,
+the journey, the shut gate at dusk (D61). The chapter is the game's
+tutorial, taught by Nuri at the gate and on the road up, in Nuri's voice;
+Nuri lends the wizard a spare wand. The ideas: a program, an action or
+method of an object, a comment, an argument, a string, a thing to carry,
+a spell, each named by the easy word and the proper one together (D59).
 
-| # | Item | The idea, or what it practises | API it unlocks |
+| Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
-| T1 | `lesson:what-a-program-is` | A program is a list of instructions for a computer, done one after the other, from the top down. The wizard does what the program says, exactly. | `wizard.move_right` |
-| L1 | `level:the-gate` | One instruction: walk one tile to the gate. Goal: reach it. | |
-| T2 | `lesson:your-first-action` | The wizard is an object: a thing in the program that can do things. What it can do are its actions, written with a dot and brackets. Each line is one instruction; more lines, more steps. | `wizard.move_up`, `wizard.move_down`, `wizard.move_left` |
-| L2 | `level:the-corridor` | A sequence: three or four instructions, around a corner. Goal: reach the door. | |
-| T3 | `lesson:how-much` | An argument: a number in the brackets tells an action how much to do. One line instead of six. | (the moves with a number) |
-| L3 | `level:the-long-corridor` | An argument: `move_right(6)`. Goals: reach the end; bonus, in fewer than 2 lines. | |
-| L4 | `level:the-stairs` | Arguments in two directions: up, right, up, right. Goal: reach the top. | |
-| T4 | `lesson:words` | A string: words in quotes are text, not instructions; the computer keeps them as they are. The wizard can say them. | `wizard.say` |
-| L5 | `level:the-password` | Say the gate's word beside the gate: `wizard.say("ambrel")`. Goals: open the gate, walk through. | |
-| T5 | `lesson:things-to-carry` | A thing lies on the floor; the wizard stands on its tile and picks it up with an action, and carries it. | `wizard.pick_up` |
-| L6 | `level:the-pedestal` | Walk to the wand on its pedestal and pick it up. Goals: carry the wand; reach the end of the room. | |
-| T6 | `lesson:your-first-spell` | A spell is a word of magic, cast with the wand. Without the wand the wizard does not know the action; with it, the spell does what its word means where the wizard stands. `zelim` breaks seals. | `wizard.cast` |
-| L7 | `level:the-sealed-door` | Pick up the wand, walk to the sealed door, cast `zelim`. Goals: open the door; reach the room. | |
-| L8 | `level:the-way-in` | The chapter together: a password door, the wand on the way, two sealed doors. Ten instructions, one per stretch or door. Goals: reach the hall; bonus, in fewer than 11 lines, so with no line to spare. | |
-
-The world features chapter 1 needs: the wand and `wizard.cast`; sealed
-doors and password doors (D42, D43); a level's intro on its start card
-(D45). Built in sprint 7 (2.13).
+| `story:at-the-gate` | story | The shut gate; Nuri arrives and offers to teach; the method: try, watch, try again. | |
+| `lesson:what-a-program-is` | Lesson 1 | A program is a list of instructions, run from the top down; your program tells your wizard, you, what to do. | `wizard.move_right` |
+| `level:the-gate` | Practice 1 | One instruction, to the gate. No comment in its code: comments are not taught yet. | |
+| `lesson:objects-and-actions` | Lesson 2 | An instruction can be an action; an action needs someone to do it; characters and things are objects; an action is a method; the dot and the brackets; the notebook. | `wizard.move_left`, `move_up`, `move_down` |
+| `level:the-corridor` | Practice 2 | A sequence, round a corner. | |
+| `lesson:notes` | Lesson 3 | A note in a program, a comment, is for a person, and the computer skips it; programs may come with notes saying what to do. | `concept:comments` |
+| `level:the-dark-note` | Fix 1 | A program with one wrong move, to find and fix. | |
+| `lesson:how-much` | Lesson 4 | How much: the number in the brackets, an argument. | `concept:arguments` |
+| `level:the-long-corridor` | Practice 3 | One line with a number. Bonus: fewer than 2 lines. | |
+| `level:the-stairs` | Improve 1 | A program that reaches the top but bumps twice, to make clean (`no_bumps`). Bonus: fewer than 5 lines. | |
+| `lesson:words` | Lesson 5 | Words in quotes, a string; `say` takes what to say as its argument, as a move takes how much. | `wizard.say`, `concept:strings` |
+| `level:the-password` | Practice 4 | The gate's word, said beside it; the code's comment gives the word. | |
+| `lesson:things-to-carry` | Lesson 6 | Things are objects with names; the wizard picks up what is on its tile or beside it, and says which when there are several (D58). | `wizard.pick_up` |
+| `level:the-pedestal` | Practice 5 | Nuri's spare wand, lent. | |
+| `lesson:your-first-spell` | Lesson 7 | A spell's effect depends on where the wizard stands and what is near, and may be nothing; `cast` is the wand's action; `zelim`. | `wizard.cast` |
+| `level:the-sealed-door` | Practice 6 | The wand set down, picked up, and the seal broken. | |
+| `level:the-way-in` | Practice 7 | The chapter together, the lent wand in hand from the start: the gate that listens, two seals. Bonus: fewer than 9 lines. | |
+| `story:up-to-the-castle` | story | Through the gate, up to the castle; Nuri sums up what was learned; the wand is only lent; Ilda waits inside. | |
 
 ## Chapter 2 — The library (`02-the-library`)
 
@@ -67,6 +75,14 @@ on but can see across (D46); `fendra`, which pulls the nearest thing in
 sight to the wizard's tile (D47); Eldra as an actor who stands and
 speaks, and `wizard.give` with a `give` goal (D48); the wand carried from
 a level's start (D49). Built in sprint 8 (2.14).
+
+Its rewrite: an opening story page, the way through the castle to the wand
+bank, with Nuri's spare wand to give back and the library on the way; a
+closing one, Eldra's book returned, a school wand borrowed, and the
+chapter's ideas summed up. `the-reading-room` is an improve level:
+the program given writes its number three times, and the child keeps it
+in a variable. A fix level follows `keys-and-doors`: a program that walks
+to the door and opens it before picking up the key.
 
 ## Chapter 3 — The passages (`03-passages`)
 
@@ -96,6 +112,13 @@ something to decide (D51); dark rooms whose things are hidden until lit
 (D52); stairs that come and go, held by `osto` (D53). Built in sprint 9
 (2.15, 2.16).
 
+Its rewrite: an opening story page, the passages at night and Dask on his
+round; a closing one, Dask catching the wizard and letting them go, and the
+chapter's ideas summed up. A fix level follows `else`: a program whose
+`if` and `else` lines are the wrong way round. `the-long-stairs` is an
+improve level: the program given climbs in sixteen lines, and the child
+makes it a `for`.
+
 ## Chapter 4 — The broom (`04-the-broom`)
 
 On the broom field, against Zarek. The ideas: lists, a loop over a list,
@@ -119,6 +142,13 @@ fly over and not walk on; a goal of reaching several tiles in order
 (`reach_in_order`); an actor with a fixed path to race (Zarek), and a
 goal of arriving before it.
 
+Its rewrite: an opening story page, the broom field and the village's wand
+shop; a closing one, the race won, Zarek a friendly rival, and a wand of
+the wizard's own. A fix level follows `for-each`: a loop whose line is not
+moved in, so it runs once. `the-loop-the-loop` is an improve level:
+the program given writes the figure four times, and the child makes it
+one function.
+
 ## Chapter 5 — The familiar (`05-the-familiar`)
 
 In the tower, Orla gives the familiars. The ideas: a class, its
@@ -138,6 +168,12 @@ The world features chapter 5 needs: an object of the child's class taken
 into the world and its methods called by it, safely (the sandbox's rules
 hold for it); tiles only a familiar passes; `wizard.send`.
 
+Its rewrite: an opening story page, the tower and the familiars; a closing
+one, the end of the first year and the challenges ahead. A fix level
+follows `what-it-knows`: an `__init__` that forgets `self`, so the
+familiar knows nothing. An improve level follows `what-it-does`: two
+familiars made with the same lines twice, made one class.
+
 ## The challenges
 
 Ten levels with no lesson, after the course, each combining more of it,
@@ -150,6 +186,7 @@ stairs* (moving tiles and functions), *Zarek's revenge* (the race again),
 
 ## The count
 
-Twenty-five lessons and thirty-two levels, then ten challenges. The draft
+Twenty-six lessons and thirty-three levels, thirty-seven with the fix
+levels of the rewrites, then ten challenges. The draft
 asked for 10 to 20 lessons; one idea per lesson, each with its theory,
 asks for more, and each is short: a few pages.

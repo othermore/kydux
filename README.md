@@ -16,23 +16,32 @@ software under the GNU General Public License, version 3 or later.
 Kydux runs in a web browser. There is nothing to install yet: for now it
 runs only from this repository, as `docs/dev/dev-environment.md` explains.
 
-The first time, you make your wizard. You give it a name, say whether it
-is a girl or a boy, and choose how it looks. The game then calls you by
-that name.
+The first time, the game opens on a story. A letter invites you to
+Arvelia, a school of magic, and you travel to its gate. Then you make your
+wizard. You give it a name, say whether it is a girl or a boy, and choose
+how it looks. The game then calls you by that name.
 
 After that, the game opens on its start screen. *Continue* takes you to
-where you left off. The first time, that is the first lesson.
+where you left off. The first time, that is the gate, where a friend
+called Nuri meets you and teaches you the first steps.
 
-A lesson is a few short pages. Each one explains one idea, with an example.
-On the last page, *Try it* opens the level that comes next, with the
-example already in the editor.
+A chapter opens and closes with pages of story. Between them come lessons
+and levels, each numbered in the chapter: *Lesson 1*, *Practice 1*, and
+so on. A lesson is a few short pages. Each one explains one idea, with an
+example. On the last page, *Try it* opens the level that comes next, with
+the example already in the editor. Most levels are practices, a screen to
+solve. A *fix* level gives you a program that does not work, to repair. An
+*improve* level gives you one that works, to make better.
 
 In a level, you write Python in the editor, on the right. *Run* makes the
 wizard do what your code says, on the left. The goals, in the corner,
 tick themselves off as you reach them. If a run goes wrong, the game says
 why, and *Hint* gives you a clue.
 
-Win the level, and *Next* takes you on. The map shows the whole course:
+Win the level, and the game gives you up to three stars, and says why.
+You keep all three if you need no hint, never bump into a wall, and meet
+the bonus goal, or win at the first try when there is none. *Next* takes
+you on. The map shows the whole course:
 what you have done, what is open, and what is still locked.
 
 The game remembers your progress in the browser. *Export*, on the start

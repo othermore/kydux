@@ -53,14 +53,18 @@ world/          kydux_world, the model of the levels, and its tests: level.py re
                 sandbox.py keeps it from Pyodide's bridge to JavaScript
 content/        the levels, each with level.json, its words in text.<lang>.json,
                 its solution and its wrong answers (the last two never shipped);
-                the lessons, each with lesson.json and <lang>.md; the chapters,
-                each with chapter.json and text.<lang>.json
+                the lessons, each with lesson.json and <lang>.md; the story
+                pages (stories/), each with story.json and <lang>.md; the
+                chapters, each with chapter.json and text.<lang>.json
 i18n/           en.json, es.json: the app's words, the same keys in each
 docs/dev/       the plan, the sprints, this log, the guide; the story (story.md)
                 and the course (course.md) that the content is written from
-tools/          the i18n check, the forbidden-word check, the writing tool
-                (write/: Gemini drafts the child's texts from a brief, D55),
-                later the art tools
+tools/          the i18n check, the forbidden-word check, the names a wizard
+                may not take (reserved_names.py), the writing tool (write/:
+                write.py, the rules every text follows in rules.md, and the
+                briefs in briefs/; Gemini drafts the child's texts into
+                drafts/, which git ignores, D55), later the art tools
+tests/tools/    the writing tool's tests, with Gemini faked
 tests/project/  the repository's own checks
 ci/             check.sh, push.sh and hours.py, dev-cert.sh, the git hooks
 ```

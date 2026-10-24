@@ -17,23 +17,33 @@ Kydux funciona en un navegador web. Todavía no hay nada que instalar: por
 ahora solo funciona desde este repositorio, como explica
 `docs/dev/dev-environment.md`.
 
-La primera vez, creas tu personaje. Le pones un nombre, eliges si es una
-maga o un mago, y escoges su aspecto. Después, el juego te llama por ese
-nombre.
+La primera vez, el juego se abre con una historia. Una carta te invita a
+Arvelia, un colegio de magia, y viajas hasta su puerta. Después creas tu
+personaje. Le pones un nombre, eliges si es una maga o un mago, y escoges
+su aspecto. Después, el juego te llama por ese nombre.
 
 A partir de ahí, el juego se abre en su pantalla de inicio. *Continuar* te
-lleva a donde lo dejaste. La primera vez, eso es la primera lección.
+lleva a donde lo dejaste. La primera vez, eso es la puerta, donde te
+encuentras con Nuri, que te enseña los primeros pasos.
 
-Una lección son unas pocas páginas cortas. Cada una explica una idea, con
-un ejemplo. En la última página, *Probar* abre el nivel que viene después,
-con el ejemplo ya escrito en el editor.
+Cada capítulo empieza y acaba con páginas de historia. Entre ellas vienen
+lecciones y niveles, numerados dentro del capítulo: *Lección 1*,
+*Práctica 1*, y así. Una lección son unas pocas páginas cortas. Cada una
+explica una idea, con un ejemplo. En la última página, *Probar* abre el
+nivel que viene después, con el ejemplo ya escrito en el editor. La
+mayoría de los niveles son prácticas, una pantalla que resolver. Un
+*arreglo* te da un programa que no funciona, para repararlo. Una *mejora*
+te da uno que funciona, para hacerlo mejor.
 
 En un nivel, escribes Python en el editor, a la derecha. *Ejecutar* hace
 que el mago haga lo que dice tu código, a la izquierda. Los objetivos, en
 la esquina, se marcan solos cuando los cumples. Si algo sale mal, el juego
 dice por qué, y *Pista* te da una ayuda.
 
-Gana el nivel, y *Siguiente* te lleva más allá. El mapa enseña el curso
+Gana el nivel, y el juego te da hasta tres estrellas, y te dice por qué.
+Te quedas con las tres si no necesitas pistas, no chocas nunca contra una
+pared y cumples el objetivo extra, o ganas al primer intento cuando no lo
+hay. *Siguiente* te lleva más allá. El mapa enseña el curso
 entero: lo que ya has hecho, lo que está abierto y lo que sigue cerrado.
 
 El juego recuerda tu progreso en el navegador. *Exportar*, en la pantalla

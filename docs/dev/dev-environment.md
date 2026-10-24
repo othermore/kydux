@@ -69,6 +69,13 @@ The browser tests drive a real browser. This downloads the one they use:
 (cd app && npx playwright install chromium)
 ```
 
+The writing tool asks Gemini for the texts the child reads (section 7). It
+needs Google's client in the same virtual environment:
+
+```sh
+.venv/bin/pip install -r tools/requirements.txt
+```
+
 ## 3. Files that stay outside the repository
 
 Some files must exist on the machine but must never be committed. They all
@@ -77,7 +84,7 @@ checks keep them out, but it is worth knowing what they are.
 
 | File | What it is for |
 |---|---|
-| `secrets.env` | The API keys and credentials the tools use, one `KEY=value` per line. Keep its mode at 600. Nothing in the project ever prints its contents. |
+| `secrets.env` | The API keys and credentials the tools use, one `KEY=value` per line. The writing tool reads `GEMINI_API_KEY` from it. Keep its mode at 600. Nothing in the project ever prints its contents. |
 | `forbidden.txt` | The words that must never appear in the repository. The hooks refuse a commit while this file is missing. |
 | `tls/` | The certificate the development server uses for HTTPS. Section 5 explains it. |
 
@@ -109,8 +116,8 @@ everything the browser needs into `app/public/`, which git ignores:
 - Python's WebAssembly build, copied from its npm package into `pyodide/`.
 - The world, packed into `world.zip`, which the browser unpacks into
   Python.
-- The content, copied into `content/`: the chapters, the lessons and the
-  levels. A level's solution and its wrong answers stay out, so that a
+- The content, copied into `content/`: the chapters, the story pages, the
+  lessons and the levels. A level's solution and its wrong answers stay out, so that a
   child cannot find them in the game.
 - The course, in `content/course.json`: its chapters in order, each with
   its lessons and levels. It comes from each chapter's `chapter.json`, in
@@ -118,6 +125,9 @@ everything the browser needs into `app/public/`, which git ignores:
 - The table of everything the child can type, in `api.json`. It comes from
   the world itself, by running `python -m kydux_world.api`. The notebook
   and the editor's completion read it.
+- The names a wizard may not take, in `reserved.json`: the story's
+  characters, the spells, the passwords and the game's own words. The
+  creator reads it.
 
 You never run these scripts by hand, with one exception. If you change
 something under `world/` or `content/` while the server is already
@@ -133,7 +143,8 @@ one to go straight to a screen:
 
 | Address | Screen |
 | --- | --- |
-| `#start` | The start screen. An address with no hash, or one the game does not know, opens it too. |
+| `#start` | The start screen. An address the game does not know opens it too, and so does an address with no hash once a wizard is made. |
+| `#story/the-letter` | A story page, from `content/stories/the-letter/`. This one is the game's opening: an address with no hash opens it while there is no wizard yet. |
 | `#wizard` | The creator, where the player names their wizard, says whether it is a girl or a boy, and picks its look. |
 | `#map` | The map of the course. |
 | `#lesson/what-a-program-is` | A lesson, from `content/lessons/what-a-program-is/`. |
@@ -330,7 +341,43 @@ forbidden word in any file, path or commit message. They keep the two
 READMEs saying the same things. And they require every piece of art and
 sound to be listed in a manifest with its source and licence.
 
-## 7. Committing and pushing
+## 7. Writing a text the child reads
+
+Every text the child reads is drafted by Gemini: the story, the lessons,
+and each level's goals, hints and words. A person writes the brief, then
+reads and corrects the draft. The brief stays in the repository, as the
+record of what was asked.
+
+A brief is a Markdown file in `tools/write/briefs/`. Its front matter
+names the files to write and the files Gemini reads first. Its words say
+what each text is for and the facts it must hold. `tools/write/README.md`
+explains the format.
+
+To see the prompt the tool would send, without sending it:
+
+```sh
+.venv/bin/python tools/write/write.py tools/write/briefs/chapter-1-levels.md --dry-run
+```
+
+To have Gemini write the drafts:
+
+```sh
+.venv/bin/python tools/write/write.py tools/write/briefs/chapter-1-levels.md
+```
+
+It prints each file it wrote. The drafts land in
+`drafts/chapter-1-levels/`, at the same paths they will have in the
+repository. A `manifest.json` beside them records the model, the brief
+and the date. Git ignores `drafts/`, and the project's checks refuse a
+draft in a commit.
+
+Read every draft whole before it enters `content/`. Check it against the
+level or the lesson: what the map has, what the goals ask, what a hint
+gives away. Correct a sentence that is wrong. When much is wrong, correct
+the brief and run the tool again. Then copy the files into `content/` and
+run `ci/check.sh`, which holds the texts to the game's rules.
+
+## 8. Committing and pushing
 
 Commits are made locally at any time. They are authored as the
 repository's `git config` says, `othermore <info@kidux.org>`. Two hooks run

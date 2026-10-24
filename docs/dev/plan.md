@@ -20,14 +20,16 @@ own.
 | Progress | A `ProgressStore` interface; local storage in the browser now, a server later | Local first, online later, without touching the game. |
 | The launcher | A small **Go** program that embeds the built game, serves it on `localhost` and opens the browser | One executable per platform (Linux, Windows, macOS), no runtime to install, cross-compiled from Linux in one command. |
 | Checks | `pytest` for the world and the levels, **Vitest** for TypeScript, **Playwright** for the game in a browser, and project checks (i18n parity, forbidden words, secrets) | Fast checks run at every change; the browser checks before a release. |
+| Writing tool | A Python script in `tools/write/` calling Gemini's text model with a brief and its context | Every text the child reads is drafted from the whole story and course, then reviewed (D55); the brief stays as the record of what was asked. |
 | Art tools | Python scripts in `tools/art/` calling Gemini's image models and cutting sheets | Reproducible: every generated asset keeps its prompt. |
 | Sound tools | Scripts calling Lyria for music and effects; free CC0 effects where simpler | The game's own music. |
 
-Versions to pin when phase 0 starts, each checked against its latest release:
-Node 20.19 (the machine's; Vite needs 20.19+), Vite 6, TypeScript 5, Phaser
-3.90, CodeMirror 6, Pyodide 314.0.x, Vitest 3, Playwright 1.5x, Go 1.27 (the
-machine's), Tiled 1.11, Python 3.13 on the machine (the world keeps to syntax
-that runs on 3.12 and up, so that it runs on both).
+Every version is pinned exactly, each checked against its latest release, in
+the versions table of `architecture.md`: Node, Vite, TypeScript, Phaser,
+CodeMirror, Pyodide, Vitest, Playwright, the writing tool's `google-genai`
+and its Gemini model, Go for the launcher, Tiled, and Python 3.13 on the
+machine (the world keeps to syntax that runs on 3.12 and up, so that it
+runs on both).
 
 ### Why not the alternatives
 
@@ -116,9 +118,13 @@ exposes. Every key is in `i18n/<lang>.json` like any other text.
 ```
 content/
   chapters/01-arrival/
-    chapter.json                          id, and the items in order: lesson:<id>, level:<id>;
-                                          an item's id is its slug, its order the chapter's (D44)
+    chapter.json                          id, and the items in order: story:<id>, lesson:<id>,
+                                          level:<id>; an item's id is its slug, its order the
+                                          chapter's (D44); a story item opens and closes it (D62)
     text.en.json  text.es.json            the chapter's title
+  stories/at-the-gate/
+    story.json                            id, and `opening` for the story before the creator (D61)
+    en.md  es.md                          pages of story separated by ---, with no code (D56)
   lessons/your-first-action/
     lesson.json                           id, and what it teaches: the names the
                                           level after it needs (`teaches`)
@@ -126,19 +132,22 @@ content/
                                           the idea's theory, then the game's way, then Try it (D41)
   levels/the-corridor/
     level.json                            map file, actors, exposed API, goals, tick
-                                          limit, the spells it has, the speaker of its intro
+                                          limit, the spells it has, the speaker of its intro,
+                                          its kind: practice, fix, improve or challenge (D56)
     map.tmj                               Tiled map: layers floor, walls, objects
     text.en.json  text.es.json            title, goals, hints, starting code's
-                                          comments and strings, intro and outro (D45)
+                                          comments and strings, intro, outro and what
+                                          was learned (D45, D62)
     solution.py                           wins the level
     wrong/*.py                            each must not win (the naive mistakes)
 ```
 
-Goals are declared (`reach`, `collect`, `not_seen_by`, `say`, `lines_under`,
-`open`) and a level may add `goals.py` for one of its own. The lesson's
+Goals are declared (`reach`, `collect`, `open`, `say`, `give`, `no_bumps`,
+`not_seen_by`, `lines_under`, `numbers_under`, `uses`) and a level may add `goals.py` for one of its own. The lesson's
 Markdown, with no HTML in it, may hold one fenced block marked `python try`:
 *Try it* puts it in the next level's editor when the child has typed nothing
-there (D33). `pack-world.mjs` writes the chapters, in the order of their
+there (D33). Within a chapter, stories go unnumbered and the rest are
+numbered by kind: *Lesson 1*, *Practice 1*, *Fix 1*, *Improve 1* (D56). `pack-world.mjs` writes the chapters, in the order of their
 directories, as `content/course.json`, the one order of the course (D32). A
 chapter's picture for the map comes with the art (phase 4); the map draws
 its stops as a path until then.
@@ -534,9 +543,10 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     their goals; the challenges after it. The order of the draft, refined
     to one idea at a time, as above; the lessons and levels of sprint 5 are
     replaced by it.
-5.3 Chapter 1, Arrival (methods, sequences, arguments, strings): about four
-    lessons, eight levels: the gate, the corridor, the wand on its pedestal,
-    the first spell.
+5.3 Chapter 1, Arrival (methods, sequences, comments, arguments, strings):
+    the story at the gate, seven lessons, nine levels (seven practices, a
+    fix, an improve) taught by Nuri, the wand lent on its pedestal, the
+    first spell, and the story up to the castle (`course.md`).
 5.4 Chapter 2, The library (variables, attributes, finding things): books
     give spells; locked doors and keys.
 5.5 Chapter 3, Corridors and passages (loops, conditions): the moving

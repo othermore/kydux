@@ -1,31 +1,20 @@
 # A spell that reaches
 
-Some books are hard to reach. They rest on high shelves. They lie across wide gaps. Your hands cannot reach them. But a spell can.
+Sometimes a book you want is out of reach, high on a shelf or across a gap. Magic can help us reach across the empty space!
+
+The spell *fendra*, cast with your wand, draws a thing to your tile. It finds the nearest thing up to three tiles away in a straight line, in any of the four ways.
 
 ---
+## How the spell travels
 
-The spell `fendra` draws things to you. It reaches up to three tiles straight ahead. It looks in all four ways. It passes over shelves. Walls and closed doors stop it.
+The spell can fly over shelves, but it cannot go through walls or closed doors. If nothing is near enough, nothing comes, and your wizard will say so!
 
----
-
-It brings the nearest thing it can reach. The thing lands exactly on your tile. Then you must pick it up. A spell moves things, and hands carry them.
-
----
-
-Like your first spell, it needs your wand. You use the `cast` method with a string.
-
-```python
-wizard.cast("fendra")
-wizard.pick_up()
-```
-
-If nothing is near enough, your wizard will tell you.
+Because a spell moves things, and hands carry them, you must pick the object up after it arrives on your tile.
 
 ---
-
 ## Try it
 
-A book lies on a high shelf. Walk left until you stand under it. Then draw it to you, and pick it up.
+Let us move close, cast *fendra* to pull a book to us, and then pick it up.
 
 ```python try
 wizard.move_left(5)

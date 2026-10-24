@@ -1,25 +1,20 @@
 # Repetir
 
-¡Estas escaleras nocturnas son muy largas, {wizard}!
-Sube.
-Camina a la derecha.
-Escribir eso muchas veces es cansado.
-Podemos decirle al castillo que haga las mismas cosas una y otra vez.
-Una repetición, que los programadores llaman un bucle, nos ahorra trabajo.
+Caminar por estos pasillos tan largos lleva muchos pasos. Hacer las mismas instrucciones muchas veces significa tener que escribirlas un montón de veces, ¡y eso es mucho trabajo!
+
+Podemos pedirle al ordenador que repita las instrucciones una y otra vez por nosotros. Los programadores llaman a esto un bucle.
 
 ---
+## Hacerlo otra vez
 
-Escribimos un bucle con `for`.
-Podemos escribir `for step in range(8):` para hacer algo ocho veces.
-Las líneas debajo deben estar movidas hacia dentro por cuatro espacios.
-El castillo ejecuta esas líneas ocho veces seguidas.
+Escribimos un bucle con `for`. Escribimos `for step in range(8):` y, metidas debajo, las líneas a repetir, ocho veces.
+
+La palabra `step` es solo una variable con la que el bucle cuenta. El ordenador ejecutará esas líneas con espacios una y otra vez hasta que termine de contar.
 
 ---
-
 ## Pruébalo
 
-Sube las escaleras con un bucle.
-Muévete hacia arriba y luego a la derecha tres veces.
+Vamos a hacer un bucle para caminar sin tener que escribir tantas líneas. ¡Las instrucciones de dentro ocurrirán tres veces seguidas!
 
 ```python try
 for step in range(3):

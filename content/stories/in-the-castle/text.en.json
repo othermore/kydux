@@ -1,11 +1,12 @@
 {
   "title": "In the castle",
   "steps": [
-    "The great doors close behind us. The castle is warm and bright. Ilda, a teacher, smiles at the new pupils.",
-    "Welcome to Arvelia. You will learn great things here.",
-    "That is a spare wand, {wizard}. You must go to the wand bank to borrow a school wand for the year. Then you can give Nuri's wand back. The bank is on the other side of the library.",
-    "Nuri waves goodbye and goes to class.",
-    "You walk to the library. The room is full of tall shelves and old books. Wenna, the librarian, stands by the door. She is quiet and loves a good question.",
-    "The library is a place of order. I will help you find your way across it. Before you reach the wand bank, there are new rules of magic to learn. I will teach them to you on the way. Let us begin."
+    "Inside at last: the great doors close behind you, and the castle is warm and bright after the cold road. A teacher is waiting for the new pupils.",
+    "Welcome to Arvelia, everyone! I am Ilda, your teacher, and I am so glad you are all here.",
+    "I see you are carrying a spare wand lent by a friend, {wizard}. Every new pupil borrows a school wand for the year at the wand bank, a counter run by the pupils' parents, on the far side of the library; then you can give Nuri's wand back.",
+    "Thank you, Ilda! I will head to the library right now to find the wand bank.",
+    "I have to go to my first class now, but we will meet at the wand bank later. See you soon!",
+    "The library: shelves taller than a house, old books, a hush; and the librarian coming to meet you.",
+    "Hello, {wizard}. I am Wenna, the librarian. This library is a place of order, and I will see you across it, teaching you a few new things on the way."
   ]
 }

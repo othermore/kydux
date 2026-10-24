@@ -1,10 +1,12 @@
 {
   "title": "After dark",
   "steps": [
-    "It is night in the castle. You cannot sleep. There is a soft knock at the door.",
+    "Night has fallen over the castle, and you just cannot seem to fall asleep. Suddenly, you hear a very soft knock at your door.",
     "Are you awake, {wizard}?",
-    "The older pupils say the passages change at night. Dask patrols the halls. He does not want anyone out of bed. Let us go see.",
-    "You tiptoe into the dark. Nuri knows the way to the watchtower gallery. Nuri teaches you a new rule of magic. You must look before you step.",
-    "We must get past Dask. We must ask a question with a true or false answer. Programmers call this question an expression. Let me show you how."
+    "Yes, I am awake. What is it, Nuri?",
+    "The older pupils say the stone passages change after dark, and that Dask, a strict teacher, patrols them so no one is out of bed. I want to go and see!",
+    "I do not know... What happens if Dask sees us?",
+    "I have a plan! We will look before every step. I will show you how to ask questions whose answer is only ever true or false.",
+    "Together, you tiptoe out into the cold passage, heading towards the watchtower's gallery. Just ahead, standing quietly by the wall, you spot a tall shadow: Dask."
   ]
 }

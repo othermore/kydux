@@ -2,15 +2,15 @@
   "title": "The long stairs",
   "goals": [
     "Climb to the top.",
-    "Do it in fewer than 4 lines."
+    "In fewer than 4 lines."
   ],
-  "starting_code": "# This code works in sixteen lines. Make it shorter with a loop.\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\n",
+  "starting_code": "# This program works in sixteen lines! Make it shorter with a loop.\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\nwizard.move_up()\nwizard.move_right()\n",
   "hints": [
-    "The code repeats `wizard.move_up()` and `wizard.move_right()` eight times.",
-    "Delete the extra lines, and repeat the two moves eight times with `for`.",
-    "Move the two actions under the loop. Move them in by four spaces."
+    "A loop repeats lines for you.",
+    "Use a `for` loop to repeat the steps eight times.",
+    "Put one move up action and one move right action inside the loop."
   ],
-  "intro": "These stairs are very long. I wrote all the steps. Writing so much is tiring.",
-  "outro": "That is much better. A loop saves us a lot of work.",
-  "learned": "Now you know how to repeat things with a `for` repeat, which programmers call a loop."
+  "intro": "These stairs go up forever. I wrote all the steps one by one, but that is a lot of reading. Can we repeat them with a loop?",
+  "outro": "That is much better. The computer did all the hard work for us, and we are at the top.",
+  "learned": "Now you know what a loop is, and how `for` repeats lines for you."
 }

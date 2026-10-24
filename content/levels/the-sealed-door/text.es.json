@@ -1,16 +1,16 @@
 {
   "title": "La puerta sellada",
   "goals": [
-    "Rompe el sello de la puerta.",
-    "Cruza la puerta."
+    "Abre la puerta.",
+    "Llega al final del pasaje."
   ],
-  "starting_code": "# Camina hasta la puerta.\n# Lanza zelim a su lado para romper el sello.\n# Cruza la puerta hasta el final del pasillo.\n",
+  "starting_code": "# Camina hasta la puerta, rompe el sello y camina hasta el final.\n",
   "hints": [
-    "Da dos pasos hacia la derecha para ponerte junto a la puerta.",
-    "Usa la acción `cast` para el hechizo.",
-    "Camina tres pasos hacia la derecha cuando el sello se rompa."
+    "Usa `move_right` para pararte junto a la puerta, ¡entonces podrás usar tu nuevo hechizo!",
+    "Usa `cast` y dale el hechizo como una cadena.",
+    "Lanza el hechizo *zelim* con comillas, y luego usa `move_right` para llegar al final del pasaje."
   ],
-  "intro": "Esa puerta está sellada con una runa brillante. Necesitas un hechizo para romper el sello, ¡y un hechizo necesita una varita! Ponte a su lado y lanza zelim.",
-  "outro": "¡Has lanzado tu primer hechizo! La runa ha desaparecido y la puerta está abierta.",
-  "learned": "Ahora sabes sobre tu primer hechizo, una cadena lanzada con una varita."
+  "intro": "¡Mira, una puerta sellada por una runa brillante! Ahora que tienes una varita, ponte a su lado y lanza *zelim* para romper el sello.",
+  "outro": "¡Has lanzado tu primer hechizo! Ha sido increíble. El camino del castillo ya está muy cerca.",
+  "learned": "Ahora sabes cómo lanzar un hechizo con tu varita, y que *zelim* rompe un sello."
 }

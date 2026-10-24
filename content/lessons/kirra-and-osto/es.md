@@ -1,33 +1,20 @@
 # Luz y escaleras
 
-El castillo esconde dos cosas engañosas por la noche.
-Algunas salas son muy oscuras.
-No puedes ver qué hay dentro de ellas.
-¡Y algunas escaleras se mueven!
-Giran hasta su lugar por un momento.
-Luego se alejan.
-Necesitamos dos nuevos hechizos para esto.
+Estos pasadizos nocturnos están llenos de secretos. ¿Ves esas habitaciones oscuras? Necesitamos un nuevo hechizo para ver su interior. El hechizo *kirra* ilumina la habitación en la que estás, para que se vea lo que hay en la oscuridad.
+
+¡También hay escaleras móviles por aquí! Se colocan en su sitio por un momento y luego se vuelven a apartar.
 
 ---
+## Pasos seguros
 
-Lanza `kirra` con tu varita para arreglar la oscuridad.
-`kirra` ilumina la sala para que puedas ver todo.
-Debes esperar a que llegue una escalera móvil.
-Puedes comprobar el atributo `stair.in_place`.
-Pregunta si un paso sobre la escalera aterrizaría a salvo.
+Una escalera sabe si está en su sitio con el atributo `stair.in_place`. Esto dice si dar un paso hacia ella en este momento sería seguro.
 
----
-
-Lanza `osto` con tu varita junto a la escalera cuando llegue.
-`osto` sujeta la escalera móvil en su lugar por un rato.
-¡Entonces puedes cruzar sin chocar!
+Si te paras junto a una escalera móvil, puedes lanzar el hechizo *osto*. ¡Mantiene la escalera móvil quieta durante un rato y te da tiempo a cruzar!
 
 ---
-
 ## Pruébalo
 
-Camina hasta el hueco.
-Mira a ver si la escalera está en su lugar ahora mismo.
+Vamos a acercarnos a una escalera y comprobar si está lista para que la pisemos. ¡Podemos imprimir lo que sabe la escalera!
 
 ```python try
 wizard.move_up(2)

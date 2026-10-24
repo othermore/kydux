@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { levelText, shown } from './helpers';
 
 async function open(page: Page, id: string): Promise<void> {
   await page.goto(`/#level/${id}`);
@@ -27,13 +28,12 @@ test.describe('in English', () => {
     await expect(hint).toBeEnabled();
     await hint.click();
     await expect(page.locator('.hint')).toHaveCount(1);
-    await expect(page.locator('.hint').first()).toHaveText(
-      'Hint 1 of 3 The key lies on the floor. Walk up to it and take it.',
-    );
+    const hints = levelText('the-locked-door', 'en').hints.map(shown);
+    await expect(page.locator('.hint').first()).toHaveText(`Hint 1 of 3 ${hints[0]}`);
     await hint.click();
     await hint.click();
     await expect(page.locator('.hint')).toHaveCount(3);
-    await expect(page.locator('.hint').nth(2)).toContainText('the door\'s own action');
+    await expect(page.locator('.hint').nth(2)).toContainText(hints[2] ?? '');
     await expect(hint).toBeDisabled();
   });
 
@@ -55,8 +55,7 @@ test('hints in Spanish', async ({ browser }) => {
   await run(page, 'wizard.move_up(2)');
   await page.locator('#hint').click();
   await expect(page.locator('#hint')).toHaveText('Pista');
-  await expect(page.locator('.hint').first()).toHaveText(
-    'Pista 1 de 3 Debes esperar mientras Dask mire a la izquierda. Usa un bucle while.',
-  );
+  const first = shown(levelText('past-the-teacher', 'es').hints[0] ?? '');
+  await expect(page.locator('.hint').first()).toHaveText(`Pista 1 de 3 ${first}`);
   await context.close();
 });

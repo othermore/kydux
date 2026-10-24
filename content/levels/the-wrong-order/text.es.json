@@ -2,15 +2,15 @@
   "title": "El orden incorrecto",
   "goals": [
     "Abre la puerta.",
-    "Pasa por ella."
+    "Cruza la puerta."
   ],
-  "starting_code": "# Este programa hace las cosas en el orden incorrecto. ¡Encuéntralo y arréglalo!\nwizard.move_right(2)\nwizard.move_right()\ndoor.open()\nwizard.pick_up()\nwizard.move_right(3)\n",
+  "starting_code": "# Este programa hace las cosas en el orden incorrecto.\n# ¡Encuentra el error y arréglalo!\nwizard.move_right(2)\nwizard.move_right()\ndoor.open()\nwizard.pick_up()\nwizard.move_right(3)\n",
   "hints": [
-    "Lee las instrucciones de arriba a abajo.",
-    "El programa intenta abrir la puerta antes de coger la llave.",
-    "Mueve la línea que recoge la llave antes de la línea que abre la puerta."
+    "Fíjate en cuándo intenta el programa recoger la llave. ¿Es antes o después de pedirle a la puerta que use `open`?",
+    "Debes recoger la llave tan pronto como estés a su lado.",
+    "Mueve la acción de recoger la llave para que vaya justo antes de pedirle a la puerta que use `open`."
   ],
-  "intro": "Escribí este programa para la siguiente puerta cerrada con llave. Me equivoqué con el orden. ¿Puedes arreglarlo?",
-  "outro": "Gracias por arreglar mi código, {wizard}.",
-  "learned": "Ahora sabes que el orden de las instrucciones es muy importante."
+  "intro": "Uno de mis programas antiguos está intentando abrir esta puerta, pero está un poco confundido. Intenta hacer las cosas en el orden incorrecto.",
+  "outro": "¡Excelente! Los pasos correctos solo sirven cuando los damos en el orden correcto.",
+  "learned": "Ahora sabes que el orden de las instrucciones importa, y cómo encontrar la que está en el lugar equivocado."
 }

@@ -15,7 +15,7 @@
       "id": "nuri",
       "kind": "friend",
       "at": [
-        18,
+        19,
         7
       ],
       "facing": "right"
@@ -39,6 +39,14 @@
         ]
       },
       "by": "dask"
+    },
+    {
+      "who": "dask",
+      "do": null
+    },
+    {
+      "who": "nuri",
+      "do": null
     },
     {
       "who": "voice",

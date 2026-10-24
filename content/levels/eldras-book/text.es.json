@@ -4,12 +4,12 @@
     "Dale a Eldra su libro.",
     "Nombra el libro con `find_nearest` antes de que el hechizo lo mueva."
   ],
-  "starting_code": "# Una llave, una puerta cerrada con llave y Eldra te esperan.\n",
+  "starting_code": "# Una llave, una puerta cerrada y el propio libro de Eldra en un estante alto.\n# Eldra está esperando.\n",
   "hints": [
-    "Coge la llave. Abre la puerta para llegar al estante de Eldra.",
-    "Busca el libro. Dale un nombre antes de usar el hechizo.",
-    "Baja el libro. Recógelo y dáselo a Eldra."
+    "Primero, toma la llave y abre la puerta.",
+    "Encuentra el libro, ponte en línea con él y usa *fendra* para bajarlo hacia ti.",
+    "Recoge el libro y luego dáselo a Eldra."
   ],
-  "intro": "Eldra está esperando junto a su estante. El libro que quiere vuelve a estar en lo alto. La puerta de su estante está cerrada con llave.",
-  "outro": "Abriste la puerta. Usaste el hechizo para ayudar a Eldra. ¡Has aprendido todos los secretos de la biblioteca!"
+  "intro": "Este es el momento, {wizard}. El propio libro de Eldra está en ese estante alto, pasando la puerta cerrada. Sabes exactamente qué hacer.",
+  "outro": "Has hecho sonreír a un fantasma muy antiguo. Estoy orgullosa de ti."
 }

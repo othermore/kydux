@@ -1,17 +1,17 @@
 {
   "title": "Los escalones",
   "goals": [
-    "Sube hasta el rellano.",
-    "No choques contra nada.",
-    "Hazlo en menos de 5 líneas."
+    "Llega al rellano.",
+    "Nunca choques contra nada.",
+    "En menos de 5 líneas."
   ],
   "starting_code": "# Este programa llega al rellano pero choca dos veces. ¡Mejóralo!\nwizard.move_up(3)\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(2)\n",
   "hints": [
-    "Mira cómo camina tu {mago|maga}. Choca contra la pared al moverse hacia arriba.",
-    "Los números en ambas acciones `move_up` son demasiado grandes.",
-    "Cambia el número en ambas acciones `move_up` a un 2."
+    "Dos de los argumentos son demasiado grandes, lo que hace que te choques.",
+    "Mira la primera instrucción y la tercera instrucción. ¿Cuántos pasos deberían dar realmente?",
+    "Cambia el primer y el tercer argumento a dos en lugar de tres."
   ],
-  "intro": "Mi programa sube los escalones de piedra hasta el rellano. Choca contra la pared dos veces porque dos números son demasiado grandes. ¡Puedes mejorarlo!",
-  "outro": "¡Perfecto! Estamos de vuelta en la puerta, sin ningún golpe.",
-  "learned": "Ahora sabes más sobre cuánto hacer, que los programadores llaman argumentos."
+  "intro": "Mi programa sube los escalones hasta el rellano junto a la verja, ¡pero {el mago|la maga} se choca dos veces! ¿Puedes mejorar el código?",
+  "outro": "¡Perfecto! Hemos llegado al rellano sin un solo choque.",
+  "learned": "Ahora sabes que un programa que funciona todavía se puede mejorar, aquí dándole a cada movimiento el argumento que necesita."
 }

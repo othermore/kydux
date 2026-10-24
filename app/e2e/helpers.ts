@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { type BrowserContext, expect, type Page } from '@playwright/test';
 
 /** The screen's guide skipped (D68): the first level opens it after its start card,
@@ -47,4 +49,22 @@ export async function finishStory(page: Page): Promise<void> {
   await expect(page.locator('.story-screen')).toBeVisible();
   while ((await page.locator('#story-next').count()) > 0) await storyNext(page);
   await page.locator('#story-go-on').click();
+}
+
+/** A level's words in a language, as content/ has them, for a test that checks
+ * what the page shows without copying the words into the test. */
+export function levelText(id: string, lang: 'en' | 'es'): {
+  title: string;
+  goals: string[];
+  starting_code: string;
+  hints: string[];
+  outro?: string;
+} {
+  const path = fileURLToPath(new URL(`../../content/levels/${id}/text.${lang}.json`, import.meta.url));
+  return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+/** A text as the page shows it: Markdown's backticks and stars gone. */
+export function shown(text: string): string {
+  return text.replace(/[`*]/g, '');
 }

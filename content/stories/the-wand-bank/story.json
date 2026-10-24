@@ -7,7 +7,7 @@
     11
   ],
   "camera": [
-    12,
+    9,
     10
   ],
   "actors": [
@@ -48,28 +48,33 @@
       "who": "voice",
       "do": {
         "walk": [
-          15,
+          9,
           11
         ]
       },
       "by": "wizard"
     },
     {
-      "who": "voice",
+      "who": "nuri",
       "do": {
         "appear": [
-          16,
-          11
+          9,
+          10
         ]
-      },
-      "by": "nuri"
+      }
+    },
+    {
+      "who": "wizard",
+      "do": {
+        "face": "up"
+      }
     },
     {
       "who": "voice",
       "do": null
     },
     {
-      "who": "voice",
+      "who": "nuri",
       "do": null
     }
   ]

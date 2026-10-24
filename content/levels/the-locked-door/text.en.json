@@ -6,13 +6,13 @@
     "Walk through it.",
     "In fewer than 7 lines."
   ],
-  "starting_code": "# Take the key first.\n# Then open the door.\n",
+  "starting_code": "# The key is on the floor.\n",
   "hints": [
-    "The key lies on the floor. Walk up to it and take it.",
-    "Now walk to the door. You must stand right next to it.",
-    "Use the door's own action to open it."
+    "Walk up to the key first and use `pick_up`.",
+    "Walk to the door and use `open` to open it.",
+    "Once the door is open, walk right to go through it."
   ],
-  "intro": "There is a locked door ahead. It needs its key. A good wizard does things in the right order.",
-  "outro": "You opened the locked door. The top corridor waits.",
-  "learned": "Now you know how to open a door with its key."
+  "intro": "This corridor leads to the archive, but the door is locked. Do you see the key on the floor? You will need it.",
+  "outro": "Well done. You keep your eyes open, and that is a good trait in a wizard.",
+  "learned": "Now you know how to open a door with its own method, and that a locked one needs its key first."
 }

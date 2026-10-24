@@ -7,13 +7,13 @@
     "left_locked": "the left door is locked",
     "right_locked": "the right door is locked"
   },
-  "starting_code": "# One door is locked.\n# Choose with if and else.\n",
+  "starting_code": "# One door is locked, the other is open.\n# Choose the open door to reach the way down.\n",
   "hints": [
-    "There are two ways. A different door is locked in each. The same program must get through both.",
-    "Ask `left_door.locked`. Take the right door under the `if`. Take the left door under the `else`.",
-    "Walk to the door in each way. Use `open()`. Then move down and along to the stair."
+    "Use `if` to check if the left door is locked.",
+    "If it is, go to the right door and open it.",
+    "Use `else` to go to the left door and open it when it is not locked, then move down to the exit."
   ],
-  "intro": "One of these doors is locked. It changes every night. We need a backup plan to go through.",
-  "outro": "A backup plan works perfectly. You made a choice with two paths.",
-  "learned": "Now you know how to run a backup plan with `else` when a condition is false."
+  "intro": "There are two doors here, {wizard}, but one of them is locked. We need to check one door, and choose the other if it will not open.",
+  "outro": "Brilliant. Knowing what to do when the answer is no is just as important as knowing what to do when it is yes.",
+  "learned": "Now you know how `else` chooses what to do when the answer is no."
 }

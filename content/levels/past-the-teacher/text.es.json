@@ -1,16 +1,16 @@
 {
-  "title": "Sin que te vea el profesor",
+  "title": "Más allá del profesor",
   "goals": [
     "Cruza el pasillo.",
     "No dejes que Dask te vea."
   ],
-  "starting_code": "# Espera mientras Dask mire hacia aquí.\n# Luego cruza hacia arriba.\n",
+  "starting_code": "# Dask está vigilando el pasillo.\n# Espera mientras mire en tu dirección, luego cruza a escondidas.\n",
   "hints": [
-    "Debes esperar mientras Dask mire a la izquierda. Usa un bucle `while`.",
-    "Pregunta con `while` hacia dónde está `dask.facing`, y espera debajo.",
-    "Cuando el bucle se detiene, Dask mira a otro lado. Muévete hacia arriba dos veces."
+    "Usa un bucle `while` para comprobar si Dask mira a la izquierda.",
+    "Dentro del bucle, haz que tu personaje espere usando `wait`.",
+    "Cuando Dask por fin se dé la vuelta, muévete hacia arriba para pasar."
   ],
-  "intro": "Dask patrulla el largo pasillo aquí. No podemos adivinar cuándo movernos. Debemos esperar mientras mire hacia aquí.",
-  "outro": "¡Lo logramos! Esperamos hasta que fue seguro.",
-  "learned": "Ahora sabes cómo esperar con una repetición `while`, que los programadores llaman un bucle."
+  "intro": "Dask está vigilando su largo pasillo. Mira hacia aquí, pero no sabemos por cuánto tiempo... Tenemos que esperar mientras siga mirando.",
+  "outro": "Pasamos justo a su lado sin que nos viera. Esperar mientras algo sigue siendo cierto es muy útil.",
+  "learned": "Ahora sabes cómo `while` se repite mientras algo se mantenga cierto."
 }

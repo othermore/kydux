@@ -4,13 +4,13 @@
     "Give Eldra her book.",
     "Find the book with `find_nearest`."
   ],
-  "starting_code": "# Find the book.\n# Pick it up and give it to Eldra.\n",
+  "starting_code": "# Eldra lost her book somewhere in this nook.\n# Find it, pick it up, and give it to her.\n",
   "hints": [
-    "Look for the nearest `\"book\"` and give it a name with `=`.",
-    "Find out where the book is. Walk there and pick it up.",
-    "Walk to Eldra. Then use the `give` action with the book's name."
+    "Use `find_nearest` to find the book, and put it under a variable.",
+    "Ask the book for its position so you know where to walk.",
+    "Walk to the book and use `pick_up`, then walk back to Eldra and use `give`."
   ],
-  "intro": "Eldra the ghost stands over there. She lost a book long ago. I am sure you can find it for her.",
-  "outro": "You brought the book back! Eldra is very happy.",
-  "learned": "Now you know how to find a thing and keep it under a variable."
+  "intro": "Listen... that whisper is Eldra. She lost a book in this nook long ago. Let us find it and give it back to her.",
+  "outro": "How kind of you. Giving Eldra back her lost book is the finest magic of all.",
+  "learned": "Now you know how a method can give something back, and how to find a thing and give it to someone."
 }

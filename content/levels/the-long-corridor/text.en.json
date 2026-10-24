@@ -1,16 +1,16 @@
 {
-  "title": "The long path",
+  "title": "The long corridor",
   "goals": [
     "Reach the foot of the steps.",
-    "Do it in fewer than 2 lines."
+    "In fewer than 2 lines."
   ],
-  "starting_code": "# Go to the foot of the steps in one instruction.\n# Tell the action how many steps to take.\n",
+  "starting_code": "# Walk to the foot of the steps in one instruction.\n",
   "hints": [
-    "Put the number inside the brackets.",
-    "You need to take six steps to the left.",
-    "Use the `move_left` action and tell it to take 6 steps."
+    "You can walk all the way to the steps with just one instruction.",
+    "Use `move_left` and give it a number.",
+    "Put the number six as the argument inside the brackets."
   ],
-  "intro": "This path is long. Writing the same instruction many times is slow. You can tell an action how much to do!",
-  "outro": "That was much faster! You reached the steps in no time.",
-  "learned": "Now you know about how much, which programmers call an argument."
+  "intro": "This path goes all the way to the foot of the steps. Instead of writing six lines, let's use an argument to walk there in just one instruction!",
+  "outro": "That was so much faster! Now we just have to climb these steps to get back to the gate.",
+  "learned": "Now you know what an argument is, and that the move actions have one that says how far."
 }

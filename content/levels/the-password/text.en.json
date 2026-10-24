@@ -4,13 +4,13 @@
     "Open the gate.",
     "Walk through it."
   ],
-  "starting_code": "# The password is ambrel in small letters.\n# Stand beside the gate, say the word, and walk through.\n",
+  "starting_code": "# Walk to the gate, say the password, and walk through.\n",
   "hints": [
-    "First, walk five steps to the right.",
-    "Use the `say` action to speak the password.",
-    "Do not forget the quotes! Then take two more steps to the right."
+    "You need three instructions: one to reach the gate, one to speak, and one to walk through.",
+    "First use `move_right` to take five steps. Then use `say`!",
+    "Give `say` a string with the word *ambrel* inside quotes, then use `move_right` again."
   ],
-  "intro": "I learned the secret word from an older pupil! You must stand right beside the gate and say exactly ambrel in small letters.",
-  "outro": "The gate heard you! The way is open and we are inside the gatehouse.",
-  "learned": "Now you know about words in quotes, which programmers call a string."
+  "intro": "An older pupil told me the password for the gate! It is *ambrel*. Stand right beside the gate, say the word, and walk through!",
+  "outro": "The gate opened! We are inside the gatehouse. Look, I left something for you on that flat stone.",
+  "learned": "Now you know what a string is, and how to make your wizard say things."
 }

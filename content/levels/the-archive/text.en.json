@@ -5,13 +5,13 @@
     "Reach the archive's foot.",
     "Find the key with `find_nearest`."
   ],
-  "starting_code": "# A door, a key, and a locked door wait for you.\n",
+  "starting_code": "# Down the archive waits an unlocked door, a key, and a locked door.\n",
   "hints": [
-    "Walk to the first door. Use its action to open it.",
-    "Use `find_nearest` to look for the key. Then take it.",
-    "Walk to the second door and unlock it."
+    "Walk to the first door and tell it to `open` using its name, `archive_door`.",
+    "Walk to the key and pick it up.",
+    "Walk to the second door and use its own name, `vault_door`, to open it."
   ],
-  "intro": "This is the narrow way down to the archive. There are many doors here. Keep your code tidy.",
-  "outro": "You found your way through the archive safely.",
-  "learned": "Now you know that a door opens by hand, and a locked door with its key."
+  "intro": "The archive runs down from here. There are two doors here, so they have different names: `archive_door` and `vault_door`.",
+  "outro": "You have a good memory for names. That will help you greatly with your magic.",
+  "learned": "Now you know how to tell apart two doors by their names."
 }

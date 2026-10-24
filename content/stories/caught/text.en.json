@@ -1,10 +1,12 @@
 {
   "title": "Caught",
   "steps": [
-    "You are almost at the dormitory.",
-    "Suddenly, Dask steps out of the dark. You are caught.",
-    "Dask looks very stern. Then, he smiles a little.",
-    "I watched you use your heads. You were very clever. I will let you go, just this once, {wizard}.",
-    "You learned a lot tonight. You asked a question with a true or false answer, an expression. You made a choice with `if` and `else`, a condition. You learned to repeat with `for`, a loop. You repeated while something is true, with `while`. You lit the dark with `kirra`. You held a moving stair with `osto`. You feel at home in the castle at last. You fall fast asleep."
+    "You are almost there. The familiar way down to the warm dormitory is just ahead.",
+    "Suddenly, Dask steps right out of the dark. You are caught!",
+    "What are two first-year pupils doing out of bed at this hour?",
+    "We were just inspecting the floating stairs, sir! To make sure they do not float away completely!",
+    "Dask looks at you both for a long, quiet moment. Then, you see the smallest smile appear on his face.",
+    "I watched you. You looked before you stepped, you waited, and you lit the dark. Clever work. I will let you go, just this once, {wizard}.",
+    "Safe in bed at last, you think about how much you have grown tonight. Asking questions with expressions and choosing with `if` and `else` kept you safe from Dask. A `for` loop easily climbed the stairs, and a `while` made you wait patiently in the shadows. As you remember casting the *kirra* and *osto* spells, a warm feeling of finally belonging to Arvelia washes over you, and you drift happily to sleep."
   ]
 }

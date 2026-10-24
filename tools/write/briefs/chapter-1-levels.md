@@ -12,17 +12,16 @@ outputs:
   - content/levels/the-stairs/text.es.json
   - content/levels/the-password/text.en.json
   - content/levels/the-password/text.es.json
-  - content/levels/the-pedestal/text.en.json
-  - content/levels/the-pedestal/text.es.json
+  - content/levels/the-wand/text.en.json
+  - content/levels/the-wand/text.es.json
   - content/levels/the-sealed-door/text.en.json
   - content/levels/the-sealed-door/text.es.json
   - content/levels/the-way-in/text.en.json
   - content/levels/the-way-in/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/the-letter/text.en.json
   - content/stories/at-the-gate/text.en.json
-  - content/stories/at-the-gate/text.es.json
+  - content/stories/up-to-the-castle/text.en.json
   - content/lessons/what-a-program-is/en.md
   - content/lessons/objects-and-actions/en.md
   - content/lessons/notes/en.md
@@ -30,106 +29,152 @@ context:
   - content/lessons/words/en.md
   - content/lessons/things-to-carry/en.md
   - content/lessons/your-first-spell/en.md
-  - content/lessons/your-first-spell/es.md
-  - content/stories/up-to-the-castle/text.en.json
 ---
-Write the texts of chapter 1's eight levels, in English and Spanish. The
-story pages and lessons of the chapter are given: the levels come between
-them, in this order, each just after the lesson it practises. Nuri speaks
-in every level, in the same voice as the lessons, and is of the wizard's
-gender (Spanish choices for Nuri's gendered words too).
+Write the texts of chapter 1's nine levels, in English and Spanish. The
+chapter's stories and lessons are given: each level comes right after the
+lesson it practises, in the order below, and the levels are where the
+story moves on between the lessons. Nuri speaks in every level, in the
+voice of the lessons, and is of the wizard's gender (Spanish choices for
+Nuri's own gendered words too).
 
-Each file is a JSON object with exactly these keys:
+## Where it happens
+
+One scene for the whole chapter. Outside the castle's wall is a garden at
+dusk: grass the wizard can walk on anywhere, a dirt path, low wooden
+fences and a hedge, and the great iron gate in the stone wall; from the
+end of the path the way goes down past the hedge, along the bottom of the
+garden to the foot of a few stone steps, and up the steps to a landing
+beside the gate. Inside the gate is the gatehouse, stone passages with a
+flat stone in the first, a door sealed by a glowing rune, an inner gate,
+two more sealed doors, and at the top the way out to the castle road.
+
+## Each file
+
+A JSON object with exactly these keys:
 
 - `title`: the level's name, short.
-- `goals`: a list of strings, exactly as many as the level's goals below,
-  in the same order, each one short sentence. A bonus goal's sentence is
-  plain (the game writes *Bonus:* before it).
-- `starting_code`: the program the level starts with, as one string with
-  `\n` between lines and a `\n` at the end. It holds exactly the code lines
-  given below, in that order, and, only where this brief allows it, comment
-  lines (`# ...`, in the child's language) before or between them. Where it
-  says *no comments*, write only the code lines given, or an empty string
-  when none are given.
+- `goals`: a list of strings, as many as the level's goals below and in
+  their order, each a short sentence. A bonus goal's sentence is plain:
+  the game writes *Bonus:* before it.
+- `starting_code`: the program the level starts with, one string, `\n`
+  between lines and at the end. It holds exactly the code lines given
+  below, in order; where the level allows comments, comment lines
+  (`# ...`, in the child's language) may say what to do, never how. Where
+  no code is given and no comments are allowed, an empty string.
 - `hints`: two or three, from the gentlest to the one that nearly says it.
-  A hint never is, nor quotes, a whole line of the solution; it may name an
-  action in backticks (`move_down`).
-- `intro`: one to three short sentences Nuri says before the level.
-- `outro`: one or two short sentences Nuri says after a win: a word of the
-  story, what happens next.
-- `learned`: one sentence that starts "Now you know" / "Ahora sabes", with
-  the idea the level practised, using the easy word and the programmer's
-  word together. The last level, `the-way-in`, has no `learned` key at all.
+  Each level below gives its solution, so that the hints are true to it
+  (which way, how many steps, which line is wrong); the solution is for
+  you, and never appears in a text. A hint never is, quotes or spells out
+  a line of the solution, not even the first or the shortest: it points
+  at the idea, the direction or the method by its name alone (`say`,
+  `move_left`), and lets the child write the line.
+- `intro`: what Nuri says before the level, one to three sentences: where
+  they are and what they want to do, so that the child knows why.
+- `outro`: what Nuri says after a win, one or two sentences that move the
+  story on to what comes next (as the owner put it for the first one:
+  "Great! You've learned to move your wizard. Now let's see how we get
+  through this gate.").
+- `learned`: one sentence, "Now you know …" / "Ahora sabes …", that says
+  what the idea is and what the child can do with it now (the owner's
+  examples: "now you know what a program and an instruction are, and the
+  instruction that moves your wizard"; "now you know what an argument
+  is, and that the move actions have one that says how far"). Only where
+  the level has it, below.
 
-The levels, with what the scene shows, the goals, the code, and the
-solution (which the hints must not give away):
+## What the child knows by now
 
-1. `the-gate` (Practice 1, after *what a program is*). The wizard stands one
-   tile left of the great gate (a glowing circle on the ground in front of
-   it); walking to it does not open it, it only reaches it. Goals: walk to
-   the gate. Code: none, no comments (an empty starting code). Solution:
-   `wizard.move_right()`. The outro: the gate is still shut, but now you can
-   move; Nuri has more to show.
+The texts never explain again what a lesson has taught. Before each
+level the child knows what the lessons before it say (given), and
+nothing more:
 
-2. `the-corridor` (Practice 2, after *objects and actions*). A path round
-   the corner of the gatehouse wall: two tiles right, then two down, to its
-   end. Goals: reach the end of the path. Code: `wizard.move_right()`. No
-   comments. Solution: two `move_right()` and two `move_down()`, one per
-   line.
+- the-gate: what a computer does with a program, what an instruction and
+  a program are, and `move_right`.
+- the-corridor: also objects and methods, `wizard` as an object, the four
+  moves, the notebook.
+- the-dark-note: also comments. Do not say "which programmers call a
+  comment" again: the child has just read the lesson.
+- the-long-corridor and the-stairs: also arguments, a move told how far.
+- the-password: also strings and `say`.
+- the-wand: also things as objects and `pick_up`.
+- the-sealed-door and the-way-in: also spells, the wand, `cast` and
+  `zelim`.
 
-3. `the-dark-note` (Fix 1, after *notes*). A path two tiles left, then two
-   down. The program given has one wrong move: the child finds and fixes
-   it. Goals: reach the end of the path. Code, in this order:
+## The levels
+
+1. `the-gate` — Practice 1, after *What a program is*. The wizard stands
+   one step from the gate, in the circle drawn before it; Nuri beside.
+   One instruction takes them there; the gate stays shut, which Nuri
+   knew: first the basics. Goals: walk to the gate. Starting code: empty,
+   no comments. Learned: what a program and an instruction are, and the
+   instruction that moves your wizard.
+   Solution: `wizard.move_right()`.
+
+2. `the-corridor` — Practice 2, after *Objects and actions*. The gate
+   will not open yet; Nuri wants to look round the garden: down along
+   the path beside the hedge, then round its corner to the left. Goals:
+   reach the spot. Starting code: empty, no comments (comments are taught
+   in the next lesson).
+   Learned: what objects and methods are, and the four moves.
+   Solution: `wizard.move_down(); wizard.move_down(); wizard.move_left(); wizard.move_left()`.
+
+3. `the-dark-note` — Fix 1, after *Notes*. On the way up the hill Nuri
+   wrote a program for the next bit of the path, with a note at the top,
+   and one of its moves is wrong. Goals: reach the spot. Starting code,
+   exactly: a first comment line saying that one move in this program is
+   wrong and asking the child to find it and fix it, then
    `wizard.move_left()`, `wizard.move_left()`, `wizard.move_down()`,
-   `wizard.move_right()`. Comments allowed: one line at the top saying one
-   move is wrong and to fix it, without saying which. Solution: the last
-   move made `move_down()`.
+   `wizard.move_right()`. Learned: what a comment is, and that a note in
+   a program can tell you what to do.
+   Solution: `wizard.move_left(); wizard.move_left(); wizard.move_down(); wizard.move_down()`.
+   The wrong move is the last one, which goes right where the path goes down.
 
-4. `the-long-corridor` (Practice 3, after *how much*). A long straight path,
-   six tiles to the right, to a door. Goals: reach the door at the end; bonus:
-   do it in fewer than 2 lines. Code: `wizard.move_right()`. Comments
-   allowed. Solution: `wizard.move_right(6)`.
+4. `the-long-corridor` — Practice 3, after *How much*. A long path along
+   the bottom of the garden to the foot of the steps, six steps to the
+   left. Goals: reach the foot of the steps; bonus: in fewer than 2 lines.
+   Starting code: comments allowed, saying where to go in one
+   instruction. Learned: what an argument is, and that the move actions
+   have one that says how far.
+   Solution: `wizard.move_left(6)`.
 
-5. `the-stairs` (Improve 1, after *how much*). Stairs going up two, right
-   three, up two, right two to the top. The program given reaches the top
-   but bumps into the wall twice, because two of its numbers are too big;
-   the child makes it better: no bumps. Goals: climb to the top; do not bump
-   into anything; bonus: do it in fewer than 5 lines. Code, in this order:
-   `wizard.move_up(3)`, `wizard.move_right(3)`, `wizard.move_up(3)`,
-   `wizard.move_right(2)`. Comments allowed: say it reaches the top but
-   bumps twice, and to make it better. Solution: the two `move_up` with 2.
+5. `the-stairs` — Improve 1. Nuri's program climbs the steps to the
+   landing beside the gate, but bumps into the wall twice: two of its
+   numbers are too big. Goals: reach the landing; never bump into
+   anything; bonus: in fewer than 5 lines. Starting code, exactly: a
+   comment saying the program reaches the landing but bumps, and to make
+   it better; then `wizard.move_up(3)`, `wizard.move_right(3)`,
+   `wizard.move_up(3)`, `wizard.move_right(2)`. Learned: that a program
+   that works can still be made better, here by giving each move the
+   argument it needs.
+   Solution: `wizard.move_up(2); wizard.move_right(3); wizard.move_up(2); wizard.move_right(2)`.
 
-6. `the-password` (Practice 4, after *words*). The gate itself, two tiles to
-   the right: it opens to the word **ambrel**, said beside it, exactly, in
-   small letters; then two more steps through it. Goals: open the gate; walk
-   through it. Code: none. Comments allowed: one comment line that gives the
-   word, so the child need not remember the intro, and one that says to
-   stand beside the gate and say it. Nuri tells the word in the intro too
-   (Nuri learned it from an older pupil). Solution: move two to the right,
-   `wizard.say("ambrel")`, move two to the right.
+6. `the-password` — Practice 4, after *Words*. Back at the gate: an older
+   pupil told Nuri the gate's password, *ambrel*, in small letters. Stand
+   right beside the gate, say it, and walk through. In the intro the word
+   is in italics (*ambrel*) with its sentence punctuated. Goals: open the
+   gate; walk through it. Starting code: comments allowed, saying the
+   password and what to do. Learned: what a string is, and how to make
+   your wizard say things.
+   Solution: `wizard.move_right(5); wizard.say("ambrel"); wizard.move_right(2)`.
+   The wizard starts five steps from the tile beside the gate.
 
-7. `the-pedestal` (Practice 5, after *things to carry*). Nuri's spare wand
-   lies on a flat stone three tiles to the right; Nuri lends it, to be given
-   back one day. Goals: pick up the wand; walk on to the end. Code: none.
-   Comments allowed. Solution: three steps right, `wizard.pick_up()`, three
-   steps right.
+7. `the-wand` — Practice 5, after *Things to carry*. Inside the
+   gatehouse, Nuri has gone ahead and set the spare wand on the flat
+   stone: lent, to be given back one day. Pick it up and walk on to Nuri.
+   Goals: pick up the wand; reach Nuri. Starting code: comments allowed.
+   Learned: that things are objects too, and how to pick them up.
+   Solution: `wizard.move_right(3); wizard.pick_up(); wizard.move_right(3)`.
 
-8. `the-sealed-door` (Practice 6, after *your first spell*). The wand lies
-   on the ground one tile to the right: Nuri set it down to show how a spell
-   needs it; a sealed door with a glowing rune is three tiles further on.
-   Goals: break the door's seal; walk through the door. Code: none.
-   Comments allowed. Solution: one step right, `wizard.pick_up()`, two steps
-   right, `wizard.cast("zelim")`, three steps right.
+8. `the-sealed-door` — Practice 6, after *Your first spell*. A door
+   sealed by a glowing rune; the wizard has a wand now. Stand beside it,
+   cast *zelim*, and walk through. Goals: open the door; reach the end of
+   the passage. Starting code: comments allowed. Learned: how to cast a
+   spell with your wand, and that *zelim* breaks a seal.
+   Solution: `wizard.move_right(2); wizard.cast("zelim"); wizard.move_right(3)`.
 
-9. `the-way-in` (Practice 7, the chapter's last). The wizard holds the lent
-   wand from the start. The gate that listens, one tile right; beyond it,
-   the path goes right, then down through a sealed door, then left through
-   another sealed door, to the road up to the castle. Everything of the
-   chapter together. Goals: reach the castle road; bonus: do it in fewer
-   than 9 lines. Code: none. Comments allowed: say what waits (a gate that
-   listens, two seals), not how. Solution: one step right, `say` the word,
-   six right, `cast` zelim, two down, four left, `cast` zelim, three left.
-   No `learned` key: the chapter's closing story page recaps.
-
-Keep every text short and warm, for a child of eight. The goals say what
-to reach, not how.
+9. `the-way-in` — Practice 7, the chapter's last. Everything together:
+   the inner gate listens to the same word as the great gate; then two
+   sealed doors; then up to the castle road. Goals: reach the castle
+   road; bonus: in fewer than 9 lines. Starting code: comments allowed,
+   saying what lies ahead, never how. Learned: none (the closing story
+   recaps).
+   Solution: `wizard.move_up(); wizard.say("ambrel"); wizard.move_up(2); wizard.move_left(3); wizard.cast("zelim"); wizard.move_left(4); wizard.cast("zelim"); wizard.move_up(2)`.

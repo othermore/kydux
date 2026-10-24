@@ -4,12 +4,12 @@
     "Give Eldra her book.",
     "Name the book with `find_nearest` before the spell moves it."
   ],
-  "starting_code": "# A key, a locked door, and Eldra wait for you.\n",
+  "starting_code": "# A key, a locked door, and Eldra's own book on a high shelf.\n# Eldra is waiting.\n",
   "hints": [
-    "Take the key. Open the door to reach Eldra's shelf.",
-    "Look for the book. Give it a name before you use the spell.",
-    "Bring the book down. Pick it up and give it to Eldra."
+    "First, get the key and open the door.",
+    "Find the book, stand in line with it, and use *fendra* to pull it down to you.",
+    "Pick the book up, and then give it to Eldra."
   ],
-  "intro": "Eldra is waiting by her shelf. The book she wants is up high again. The door to her shelf is locked.",
-  "outro": "You opened the door. You used the spell to help Eldra. You have learned all the library's secrets!"
+  "intro": "This is it, {wizard}. Eldra's own book is on that high shelf, past the locked door. You know exactly what to do.",
+  "outro": "You have brought a smile to a very old ghost. I am proud of you."
 }

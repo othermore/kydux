@@ -13,14 +13,17 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
   await page.goto('/#story/at-the-gate');
   const scene = page.locator('#scene');
   await expect(page.locator('#story-title')).toHaveText('At the gate');
-  await expect(page.locator('#story-voice')).toContainText('You stand at the great iron gate.');
+  await expect(page.locator('#story-voice')).toContainText('You are at the gate');
   await expect(scene).toHaveAttribute('data-state', 'done');
   // Nuri is not there yet, and the camera stays on the story's tile.
   await expect(scene).toHaveAttribute('data-actors', '');
   await expect(scene).toHaveAttribute('data-following', 'false');
   await expect(page.locator('#story-back')).toBeDisabled();
 
-  // Nuri appears at the path's end; then walks up to the wizard and speaks.
+  // The wizard calls out; Nuri appears at the path's end, then walks up and speaks.
+  await storyNext(page);
+  await expect(scene).toHaveAttribute('data-speaker', 'wizard');
+  await expect(scene).toHaveAttribute('data-bubble', /Is anyone there\?/);
   await storyNext(page);
   await expect(scene).toHaveAttribute('data-actors', 'nuri:5,6,right');
   await expect(scene).not.toHaveAttribute('data-bubble', /./);
@@ -37,7 +40,7 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
   // Back shows the step before as it was: Nuri back at the path's end.
   await page.locator('#story-back').click();
   await expect(scene).toHaveAttribute('data-actors', 'nuri:5,6,right');
-  await expect(page.locator('#story-voice')).toContainText('Another child walks up the path.');
+  await expect(page.locator('#story-voice')).toContainText('Someone else is coming up the path');
 });
 
 test('Enter and Space go on; Go on ends the story, read, at what comes next', async ({ page }) => {
@@ -49,7 +52,9 @@ test('Enter and Space go on; Go on ends the story, read, at what comes next', as
   await page.locator('#story-title').click();
   await page.keyboard.press(' ');
   await expect(page.locator('#story-step')).toHaveText(/^3 /);
-  await storyNext(page, 3);
+  await storyNext(page, 4);
+  await expect(page.locator('#story-next')).toHaveText('Next');
+  await storyNext(page);
   await expect(page.locator('#story-go-on')).toHaveText('Go on');
   await page.locator('#story-go-on').click();
   await expect(page).toHaveURL(/#lesson\/what-a-program-is$/);
@@ -61,8 +66,8 @@ test('a figure who goes says its words first, and is gone at the next step', asy
   await page.goto('/#story/in-the-castle');
   const scene = page.locator('#scene');
   await expect(scene).toHaveAttribute('data-actors', /nuri:3,13/);
-  await storyNext(page, 3);
-  await expect(page.locator('#story-voice')).toContainText('Nuri waves goodbye');
+  await storyNext(page, 4);
+  await expect(scene).toHaveAttribute('data-speaker', 'nuri');
   await expect(scene).toHaveAttribute('data-actors', /nuri:3,13/);
   await storyNext(page);
   await expect(scene).not.toHaveAttribute('data-actors', /nuri/);

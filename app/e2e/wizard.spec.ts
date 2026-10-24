@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
-import { seedWizard, storyNext, storySaid } from './helpers';
+import { finishStory, seedWizard, storyNext, storySaid } from './helpers';
 
 test.use({ locale: 'en-US' });
 
@@ -23,9 +23,7 @@ test('a first visit opens on the story, which leads to the creator (D61)', async
   // No code in the opening: the story comes first, told on the scene (D74).
   await expect(page.locator('.cm-content')).toHaveCount(0);
   await expect(page.locator('#scene canvas')).toBeVisible();
-  await storyNext(page, 3);
-  await expect(page.locator('#story-go-on')).toHaveText('Go on');
-  await page.locator('#story-go-on').click();
+  await finishStory(page);
   await expect(page).toHaveURL(/#wizard$/);
   // The start screen, reached on purpose, begins the story too.
   await page.goto('/#start');
@@ -55,7 +53,7 @@ test('the creator, and Done opens the first lesson by name', async ({ page }) =>
   await expect(page.locator('#wizard-preview-name')).toHaveText('Ana');
 
   await page.locator('#wizard-done').click();
-  // Chapter 1 opens at the gate, where Nuri greets the wizard by name.
+  // Chapter 1 opens at the gate, where the wizard meets Nuri and says their name.
   await expect(page).toHaveURL(/#story\/at-the-gate$/);
   await storyNext(page, 4);
   await expect(storySaid(page)).toContainText('Ana');
@@ -117,7 +115,7 @@ test('the scene draws the look chosen, and the words follow a girl in Spanish', 
   await expect(page).toHaveURL(/#story\/at-the-gate$/);
   await page.goto('/#lesson/what-a-program-is');
   await page.locator('#lesson-next').click();
-  await expect(page.locator('.lesson-page')).toContainText('Tu maga, que eres tú');
+  await expect(page.locator('.lesson-page')).toContainText('a tu maga');
   await page.goto('/#level/the-corridor');
   await page.locator('#start').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-look', 'sky');

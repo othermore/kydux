@@ -5,13 +5,13 @@
     "Do not let Dask see you.",
     "Ask whether Dask can see you."
   ],
-  "starting_code": "# Ask which way Dask faces with print.\n# Ask whether he can see you with print.\n# Then walk past him.\n",
+  "starting_code": "# Dask is standing in the gallery.\n# Ask the computer what he is looking at, then sneak past him.\n",
   "hints": [
-    "You must ask two questions using `print` before you walk.",
-    "Give `dask.facing` to `print` to see which way Dask looks.",
-    "Give `dask.can_see(wizard)` to `print` to see if he spots you. Then move right six times."
+    "First, ask the computer to print which way Dask is facing.",
+    "Next, ask the computer to print if Dask can see your wizard.",
+    "Finally, move all the way to the right."
   ],
-  "intro": "Look, {wizard}. Dask is staring at the wall. Let us ask if he can see us.",
-  "outro": "He did not see us! That was close.",
-  "learned": "Now you know how to ask a question, which programmers call an expression."
+  "intro": "Look, {wizard}, it is Dask. He is staring at the wall. Let us ask if he can see us before we walk past him.",
+  "outro": "Phew. We made it past him. The computer gave us the right answers.",
+  "learned": "Now you know what an expression is, and how to ask one whose answer is `True` or `False`."
 }

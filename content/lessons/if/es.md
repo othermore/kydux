@@ -1,33 +1,20 @@
-# If
+# Si
 
-Ahora sabemos si Dask está mirando.
-Pero solo queremos escondernos cuando mira hacia aquí.
-Necesitamos una elección, que los programadores llaman una condición.
-Hacemos una pregunta.
-Solo hacemos algo cuando la respuesta es sí.
+Saber la respuesta a una expresión está muy bien, ¡pero hacer algo solo cuando la respuesta es sí es aún mejor! Los programadores llaman a esto una condición. La escribimos con la palabra `if`.
+
+En este juego, un nivel puede ocurrir de distintas maneras, ¡así que el mismo programa debe poder ganarlas todas! A veces Dask está mirando, y a veces no.
 
 ---
+## Escribir una condición
 
-Para esto sirve `if`.
-Después de `if` viene tu expresión.
-Luego vienen dos puntos `:`.
-Las líneas debajo deben estar movidas hacia dentro por cuatro espacios.
-Eso le dice al castillo que estas líneas pertenecen al `if`.
-Solo se ejecutan cuando la expresión es `True`.
+Escribimos `if`, luego nuestra expresión, y al final dos puntos. Debajo, metemos nuestras líneas hacia dentro dejando cuatro espacios. El ordenador solo ejecutará estas líneas con espacios si la respuesta es `True`.
+
+Si Dask está mirando, tenemos que esperar. El método `wizard.wait()` hace que {el mago|la maga} se quede quiet{o|a} por un momento mientras todo lo demás se mueve.
 
 ---
-
-Debes quedarte {quieto|quieta} cuando Dask mira hacia aquí.
-`wizard.wait()` te hace esperar un instante mientras el mundo sigue.
-La siguiente sala se juega de dos formas diferentes.
-¡El mismo código debe llevarte a salvo por ambas!
-
----
-
 ## Pruébalo
 
-Comprueba hacia dónde mira Dask.
-Espera solo si mira a la izquierda.
+Vamos a escribir una condición para escondernos de él. ¡La instrucción de esperar solo se ejecutará si Dask está mirando a la izquierda!
 
 ```python try
 if dask.facing == "left":

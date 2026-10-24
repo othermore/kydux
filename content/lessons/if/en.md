@@ -1,33 +1,20 @@
 # If
 
-Now we know if Dask is looking.
-But we only want to hide when he looks our way.
-We need a choice, which programmers call a condition.
-We ask a question.
-We only do something when the answer is yes.
+Knowing the answer to an expression is good, but doing something only when the answer is yes is even better! Programmers call this a condition. We write it with `if`.
+
+In this game, a level can be played in more than one way, and the same program must win them all! Sometimes Dask is looking, and sometimes he is not.
 
 ---
+## Writing a condition
 
-This is what `if` is for.
-After `if` comes your expression.
-Then comes a colon `:`.
-The lines under it must be moved in by four spaces.
-That tells the castle these lines belong to the `if`.
-They only run when the expression is `True`.
+We write `if`, then our expression, and finally a colon. Underneath, we move our lines in by four spaces. The computer will only run these moved-in lines when the answer is `True`.
+
+If Dask is looking, we need to wait. The method `wizard.wait()` makes your wizard stand still for a moment while everything else moves on.
 
 ---
-
-You must stand still when Dask looks this way.
-`wizard.wait()` makes you wait for one tick while the world moves on.
-The next room plays out in two different ways.
-The same code must get you safely through both!
-
----
-
 ## Try it
 
-Check which way Dask looks.
-Wait only if he is looking left.
+Let us write a condition to hide from him. The wait instruction will only run if Dask is looking left!
 
 ```python try
 if dask.facing == "left":

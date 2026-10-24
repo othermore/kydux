@@ -1,20 +1,12 @@
 # Notes
 
-Sometimes you want to write something in your program for a person. It is not an instruction. It is a note, which programmers call a comment. You explain what a part does or what to do.
+Sometimes we want to leave a note in our program to remember why we wrote it, or to explain what it does. Programmers call this a comment.
+
+A comment is for a person reading the program, not for the computer. When the computer runs your program and sees a comment, it simply skips it!
 
 ---
+## How to write a comment
 
-A comment always starts with a `#`. The computer skips it. From now on, you will sometimes see comments that help you solve a level.
+To write a comment, you start the line with the `#` sign. Anything you write after that sign on the same line is part of the note.
 
----
-
-A comment can tell you what to do. It might ask you to find a mistake. The next level gives a program with one wrong move to fix.
-
----
-
-## Try it
-
-```python try
-# The first step is to the left
-wizard.move_left()
-```
+In this game, the comments you find in a level's program are there to help you. They will tell you what to do to solve the puzzle and move forward!

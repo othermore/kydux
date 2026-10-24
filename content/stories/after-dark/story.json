@@ -3,12 +3,12 @@
   "speaker": "nuri",
   "scene": "the-passages",
   "wizard": [
-    3,
+    2,
     2
   ],
   "camera": [
-    5,
-    3
+    4,
+    2
   ],
   "actors": [
     {
@@ -34,32 +34,24 @@
       }
     },
     {
+      "who": "wizard",
+      "do": null
+    },
+    {
       "who": "nuri",
-      "do": {
-        "walk": [
-          2,
-          2
-        ]
-      }
+      "do": null
+    },
+    {
+      "who": "wizard",
+      "do": null
+    },
+    {
+      "who": "nuri",
+      "do": null
     },
     {
       "who": "voice",
-      "do": {
-        "walk": [
-          6,
-          2
-        ]
-      },
-      "by": "wizard"
-    },
-    {
-      "who": "nuri",
-      "do": {
-        "walk": [
-          5,
-          2
-        ]
-      }
+      "do": null
     }
   ]
 }

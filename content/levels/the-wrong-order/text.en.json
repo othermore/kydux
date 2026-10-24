@@ -4,13 +4,13 @@
     "Open the door.",
     "Walk through it."
   ],
-  "starting_code": "# This program does things in the wrong order. Find and fix it!\nwizard.move_right(2)\nwizard.move_right()\ndoor.open()\nwizard.pick_up()\nwizard.move_right(3)\n",
+  "starting_code": "# This program does things in the wrong order.\n# Find the mistake and fix it!\nwizard.move_right(2)\nwizard.move_right()\ndoor.open()\nwizard.pick_up()\nwizard.move_right(3)\n",
   "hints": [
-    "Read the instructions from top to bottom.",
-    "The program tries to open the door before it takes the key.",
-    "Move the line that picks up the key before the line that opens the door."
+    "Look at when the program tries to pick up the key. Is it before or after it asks the door to `open`?",
+    "You must pick up the key as soon as you stand beside it.",
+    "Move the action that picks up the key so it comes just before you ask the door to `open`."
   ],
-  "intro": "I wrote this program for the next locked door. I made a mistake with the order. Can you fix it?",
-  "outro": "Thank you for fixing my code, {wizard}.",
-  "learned": "Now you know that the order of instructions is very important."
+  "intro": "One of my old programs is trying to open this door, but it is a bit muddled. It tries to do things in the wrong order.",
+  "outro": "Excellent! The right steps are only useful when we take them in the right order.",
+  "learned": "Now you know that the order of the instructions matters, and how to find the one in the wrong place."
 }

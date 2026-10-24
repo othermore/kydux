@@ -1,30 +1,20 @@
 # What things know
 
-Every object in the castle has secrets. An object can do actions. But it also knows things about itself. A door knows if it is locked. Your wizard knows where they stand. What a thing knows is what programmers call an attribute.
+An object does actions, which are its methods. But it also knows things about itself! Programmers call what an object knows its attributes.
+
+A door knows whether it is locked. Your wizard knows where they stand, and what they carry.
 
 ---
+## Asking for an attribute
 
-You ask for an attribute with a dot. You do not use brackets. No brackets means nothing is done. You only ask a question.
+Because asking for an attribute does not do an action, we write it with a dot but no brackets. We write `door.locked`, not `door.locked()`.
 
-```python
-door.locked
-```
-
-To see the answer, you use `print`, Python's own action for showing a value. It shows the answer on the card under the editor.
-
-```python
-print(door.locked)
-```
+To see the answer, we use `print`. This is Python's own way to show a value, and it shows the answer right under your code. You can also print `wizard.position` or `wizard.items`.
 
 ---
-
-You can ask about many things. `wizard.position` tells you where you are. `wizard.items` lists what you carry. Let us test this carefully.
-
----
-
 ## Try it
 
-Ask the door a question. See if it is locked.
+Let us ask a door if it is locked. When you run the program, the computer will show you what the door knows.
 
 ```python try
 print(door.locked)

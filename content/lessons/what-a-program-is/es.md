@@ -1,26 +1,20 @@
 # Qué es un programa
 
-Un ordenador hace exactamente lo que le dicen. El castillo de Arvelia hace lo mismo. Da un paso cada vez. Cada paso es una instrucción.
+¿Alguna vez has deseado poder decirle a un ordenador exactamente qué hacer? Un ordenador hace exactamente lo que se le dice, paso a paso, ¡pero necesita que le digamos cómo!
+
+Cada paso que le damos a un ordenador es una instrucción. Una lista de instrucciones es un programa. El ordenador lee el programa de arriba abajo, haciendo cada instrucción en orden.
 
 ---
+## El código y tú
 
-Una lista de instrucciones es un programa. Un programa se ejecuta de arriba a abajo. En Arvelia, tú escribes un programa. Tu {mago|maga}, que eres tú, lo hace.
+En este juego, el ordenador hace todo por ti. Tú solo le das las instrucciones, y él hace que {tu mago|tu maga} haga exactamente lo que dicen. ¡Ni más, ni menos!
 
----
-
-Tu programa le dice a tu {mago|maga} qué hacer. Lo hará exactamente, ni más ni menos. Esta es una instrucción:
-
-```python
-wizard.move_right()
-```
-
-Hace que tu {mago|maga} dé un paso a la derecha. La puerta está a un paso a la derecha.
+Tu personaje en el juego eres tú. Nuestra primera instrucción será `wizard.move_right()`. Esto le dice a {tu mago|tu maga} que dé un paso a la derecha. ¡Pronto te enseñaré qué significa cada parte de esta instrucción!
 
 ---
-
 ## Pruébalo
 
-Pulsa el botón Ejecutar para caminar.
+Vamos a escribir nuestro primer programa. Le daremos a {tu mago|tu maga} una instrucción para moverse a la derecha. Cuando ejecutes el programa, ¡mira lo que pasa!
 
 ```python try
 wizard.move_right()

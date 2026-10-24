@@ -14,7 +14,8 @@ model, the brief and the date. A person reads every draft, corrects it and
 moves it into content/; drafts/ is never committed.
 
 The key is read from GEMINI_API_KEY in the environment or in
-~/.config/kydux/secrets.env, and never printed.
+~/.config/kydux/secrets.env, and never printed; a second key, GEMINI_API_KEY_2,
+is tried in turn while the model is busy.
 """
 
 import argparse
@@ -91,14 +92,26 @@ def prompt(brief: Path) -> tuple[str, list[str]]:
     return "\n\n".join(parts), fields["outputs"]
 
 
-def api_key() -> str:
-    if os.environ.get("GEMINI_API_KEY"):
-        return os.environ["GEMINI_API_KEY"]
+#: The keys tried in turn while the model is busy: the first, and a second if there is one.
+KEY_NAMES = ("GEMINI_API_KEY", "GEMINI_API_KEY_2")
+
+
+def api_keys() -> list[str]:
+    """The Gemini keys there are, from the environment or from SECRETS, in order."""
+    saved = {}
     if SECRETS.is_file():
         for line in SECRETS.read_text(encoding="utf-8").splitlines():
-            if line.startswith("GEMINI_API_KEY="):
-                return line.split("=", 1)[1].strip().strip("\"'")
-    raise BriefError(f"no GEMINI_API_KEY in the environment or in {SECRETS}")
+            name, _, value = line.partition("=")
+            saved[name.strip()] = value.strip().strip("\"'")
+    keys = [os.environ.get(name) or saved.get(name) for name in KEY_NAMES]
+    keys = [key for key in keys if key]
+    if not keys:
+        raise BriefError(f"no GEMINI_API_KEY in the environment or in {SECRETS}")
+    return keys
+
+
+def api_key() -> str:
+    return api_keys()[0]
 
 
 #: How many times a call is tried while the model is busy, and the first wait.
@@ -108,13 +121,15 @@ FIRST_WAIT_S = 15
 
 def gemini(text: str) -> str:
     """Gemini's answer to a prompt, as JSON text. A model busy for a while (503, 429)
-    is tried again, waiting twice as long each time."""
+    is tried again, with the next key when there are two, waiting twice as long
+    each time both have been tried."""
     from google import genai
     from google.genai import errors, types
 
-    client = genai.Client(api_key=api_key())
+    clients = [genai.Client(api_key=key) for key in api_keys()]
     wait = FIRST_WAIT_S
-    for attempt in range(1, ATTEMPTS + 1):
+    for attempt in range(1, ATTEMPTS * len(clients) + 1):
+        client = clients[(attempt - 1) % len(clients)]
         try:
             answer = client.models.generate_content(
                 model=MODEL,
@@ -123,8 +138,15 @@ def gemini(text: str) -> str:
             )
             return answer.text or ""
         except (errors.ServerError, errors.ClientError) as busy:
-            if getattr(busy, "code", None) not in (429, 500, 503) or attempt == ATTEMPTS:
+            if getattr(busy, "code", None) not in (429, 500, 503):
                 raise
+            if attempt == ATTEMPTS * len(clients):
+                raise
+            if attempt % len(clients):
+                print(
+                    f"write: the model is busy ({busy.code}); trying the next key", file=sys.stderr
+                )
+                continue
             said = f"write: the model is busy ({busy.code}); trying again in {wait} s"
             print(said, file=sys.stderr)
             time.sleep(wait)

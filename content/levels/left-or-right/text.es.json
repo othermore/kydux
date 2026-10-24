@@ -4,16 +4,16 @@
     "Llega a la bajada."
   ],
   "ways": {
-    "left_locked": "la puerta izquierda está cerrada con llave",
-    "right_locked": "la puerta derecha está cerrada con llave"
+    "left_locked": "la puerta izquierda está cerrada",
+    "right_locked": "la puerta derecha está cerrada"
   },
-  "starting_code": "# Una puerta está cerrada con llave.\n# Elige con if y else.\n",
+  "starting_code": "# Una puerta está cerrada con llave, la otra está abierta.\n# Elige la puerta abierta para llegar a la bajada.\n",
   "hints": [
-    "Hay dos formas. Una puerta diferente está cerrada con llave en cada una. El mismo programa debe pasar por ambas.",
-    "Pregunta `left_door.locked`. Toma la puerta derecha bajo el `if`. Toma la puerta izquierda bajo el `else`.",
-    "Camina hasta la puerta en cada camino. Usa `open()`. Luego muévete hacia abajo y por el pasillo hasta la escalera."
+    "Usa `if` para comprobar si la puerta izquierda está cerrada (`locked`).",
+    "Si lo está, ve a la puerta derecha y ábrela.",
+    "Usa `else` para ir a la puerta izquierda y abrirla cuando no esté cerrada, y luego baja hacia la salida."
   ],
-  "intro": "Una de estas puertas está cerrada con llave. Cambia cada noche. Necesitamos un plan de reserva para pasar.",
-  "outro": "Un plan de reserva funciona perfectamente. Hiciste una elección con dos caminos.",
-  "learned": "Ahora sabes cómo ejecutar un plan de reserva con `else` cuando una condición es falsa."
+  "intro": "Aquí hay dos puertas, {wizard}, pero una de ellas está cerrada con llave. Tenemos que comprobar una puerta y elegir la otra si no se abre.",
+  "outro": "Genial. Saber qué hacer cuando la respuesta es no, es tan importante como saber qué hacer cuando es sí.",
+  "learned": "Ahora sabes cómo `else` elige qué hacer cuando la respuesta es no."
 }

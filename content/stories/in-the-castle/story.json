@@ -51,11 +51,14 @@
       "do": null
     },
     {
-      "who": "voice",
+      "who": "wizard",
+      "do": null
+    },
+    {
+      "who": "nuri",
       "do": {
         "vanish": true
-      },
-      "by": "nuri"
+      }
     },
     {
       "who": "voice",

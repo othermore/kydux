@@ -1,40 +1,22 @@
 # True or false
 
-Psst, {wizard}!
-Dask is walking around in the dark.
-We must know what is safe.
-Some questions only have two answers.
-The answer is yes or no.
-Is the door locked?
-Does the teacher see us?
-A question, which programmers call an expression, is answered by the castle.
-The answer is `True` or `False`.
+Some questions have only two answers: yes or no. Is the door locked? Is Dask looking this way? In a program, this kind of question is called an expression.
+
+The computer answers an expression with `True` or `False`.
 
 ---
+## Comparing things
 
-Let us ask some questions.
-`3 > 2` gives `True`.
-We can also ask an attribute like `door.locked`.
-We use two equals signs `==` to see if two things are the same.
-One `=` is for a variable.
-Two `==` ask a question.
-`dask.facing == "left"` asks which way Dask looks.
+An attribute can be one of these answers, like `door.locked`. We can also compare two values to see if they are the same.
+
+We use two equals signs `==` to ask the question (remember, one `=` names a value!). For example, `dask.facing == "left"` asks if Dask is looking left. We can even flip the answer using `not`.
 
 ---
+## Asking methods
 
-Sometimes we want the opposite.
-The word `not` turns the answer around.
-`not door.locked` is `True` when the door is not locked.
-A method can answer too.
-`dask.can_see(wizard)` tells us if Dask spots you!
+Some methods answer these questions too. The computer can check `dask.can_see(wizard)` to tell us if Dask can see you.
 
----
-
-## Try it
-
-Let us spy on Dask.
-Ask which way he looks.
-Then ask if he can see you.
+Let us try printing some answers to see what the computer says. Remember to keep your voice down!
 
 ```python try
 print(dask.facing)

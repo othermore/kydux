@@ -1,26 +1,20 @@
 # Llaves y puertas
 
-Nos gustan las puertas abiertas en la biblioteca. La mayoría de las puertas se abren a mano. Una puerta es un objeto. Tiene una acción propia. Puedes decirle que se abra.
+Hay muchas salas cerradas con llave en la biblioteca. Una puerta es un objeto con su propio método: `door.open()`. Puedes abrir una puerta cuando estás justo a su lado.
+
+¡Pero una puerta cerrada solo se abre para {el mago|la maga} que lleva su llave!
 
 ---
+## El orden de las cosas
 
-Debes estar justo al lado de la puerta. Luego usas su método.
+Como el ordenador lee tu programa de arriba a abajo, haciendo cada paso en orden, debes hacer las cosas en el orden correcto.
 
-```python
-door.open()
-```
-
-Pero algunas puertas están cerradas con llave. Protegen habitaciones especiales. Una puerta cerrada con llave solo se abre con su llave.
+Tienes que recoger la llave primero, antes de intentar abrir la puerta. Si le pides a la puerta que se abra antes de tener la llave, se quedará bien cerrada.
 
 ---
-
-Debes llevar la llave para abrir una puerta cerrada con llave. Así que debes recoger la llave primero. El orden es muy importante aquí. Camina hacia la llave, recógela y luego abre la puerta.
-
----
-
 ## Pruébalo
 
-La puerta de la siguiente habitación está cerrada con llave. La llave descansa en el suelo. Recoge la llave primero.
+Vamos a caminar hacia una llave y a recogerla. ¡Una vez que la tengas, estarás {listo|lista} para abrir la puerta!
 
 ```python try
 wizard.move_up(2)

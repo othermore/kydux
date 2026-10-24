@@ -1,26 +1,20 @@
 # What a program is
 
-A computer does exactly what it is told. The castle of Arvelia does the same. It takes one step at a time. Each step is an instruction.
+Have you ever wished you could tell a computer exactly what to do? A computer does exactly what it is told, one step at a time, but it needs us to tell it how!
+
+Each step we give a computer is an instruction. A list of instructions is a program. The computer reads the program from the top down, doing each instruction in order.
 
 ---
+## The wizard and the code
 
-A list of instructions is a program. A program runs from top to bottom. In Arvelia, you write a program, and your wizard does it. Your wizard is you.
+In this game, the computer does everything for you. You just give it the instructions, and it makes your wizard do exactly what they say. No more, and no less!
 
----
-
-Your program tells your wizard what to do. Your wizard does exactly what you write. They do no more and no less. Here is one instruction:
-
-```python
-wizard.move_right()
-```
-
-It makes your wizard take one step to the right. The gate is one step to the right.
+Your wizard is you in the game. Our very first instruction will be `wizard.move_right()`. This tells your wizard to take one step to the right. I will show you what each part of that instruction means very soon!
 
 ---
-
 ## Try it
 
-Press the Run button to walk.
+Let us write our first program. We will give the wizard one instruction to move right. When you run the program, watch what happens!
 
 ```python try
 wizard.move_right()

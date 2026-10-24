@@ -4,13 +4,13 @@
     "Cross the corridor.",
     "Do not let Dask see you."
   ],
-  "starting_code": "# Wait while Dask looks this way.\n# Then cross up.\n",
+  "starting_code": "# Dask is watching the corridor.\n# Wait as long as he is looking your way, then sneak across.\n",
   "hints": [
-    "You must wait as long as Dask looks left. Use a `while` loop.",
-    "Ask with `while` which way `dask.facing` is, and wait under it.",
-    "Dask looks away when the loop stops. Move up two times."
+    "Use a `while` loop to check if Dask is facing left.",
+    "Inside the loop, make your wizard wait.",
+    "When Dask finally turns away, move up past him."
   ],
-  "intro": "Dask patrols the long corridor here. We cannot guess when to move. We must wait while he looks this way.",
-  "outro": "We did it! We waited until it was safe.",
-  "learned": "Now you know how to wait with a `while` repeat, which programmers call a loop."
+  "intro": "Dask is guarding his long corridor. He looks this way, but we do not know for how long... We have to wait as long as he looks.",
+  "outro": "We sneaked right past him. Waiting as long as something is true is very useful.",
+  "learned": "Now you know how `while` repeats as long as something stays true."
 }

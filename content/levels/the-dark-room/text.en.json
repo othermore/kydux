@@ -3,15 +3,15 @@
   "goals": [
     "Open the door.",
     "Go through it.",
-    "Find the key with find_nearest."
+    "Find the key with `find_nearest`."
   ],
-  "starting_code": "# Light the room.\n# Find the key, and open the door.\n",
+  "starting_code": "# It is too dark to see anything!\n# Light the room, find the key, and open the door.\n",
   "hints": [
-    "Cast `kirra` first. Then find the key with `wizard.find_nearest(\"key\")`.",
-    "Use `print`. Ask the key for its `position`.",
-    "Walk to the key and pick it up. Then open the door."
+    "Cast the *kirra* spell to light up the room.",
+    "Use `find_nearest` to find the key and save it in a variable.",
+    "Move to the key, pick it up, then go to the door and open it."
   ],
-  "intro": "It is too dark in there. We cannot see the key or the door. We need a little light.",
-  "outro": "A good spell makes everything clear. Let us keep going.",
-  "learned": "Now you know how to light a dark room with a spell, `kirra`, and find what is in it."
+  "intro": "It is completely dark in here, {wizard}. We need to light the room with a spell to find the key to that door.",
+  "outro": "The *kirra* spell worked beautifully. The key was hiding, but the light showed us exactly where it was.",
+  "learned": "Now you know how *kirra* lights the room you are in."
 }

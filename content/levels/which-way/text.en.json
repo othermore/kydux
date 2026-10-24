@@ -1,16 +1,16 @@
 {
-  "title": "Which way?",
+  "title": "Which way",
   "goals": [
     "Reach the far end of the aisles.",
     "The program asks the door whether it is locked."
   ],
-  "starting_code": "# Ask the door with print if it is locked.\n# Then take the way that is open.\n",
+  "starting_code": "# Ask the door whether it is locked.\n# If it is, take the long way round!\n",
   "hints": [
-    "The door knows if it is locked. Ask for its attribute.",
-    "Use `print` to show the answer to your question.",
-    "The door is locked. You must take the long way round."
+    "Ask the door what it knows with `door.locked`, and use `print` to see the answer.",
+    "Because the door is locked, you must walk around the shelves.",
+    "Move right, then up, then left to reach the far end."
   ],
-  "intro": "The aisles form a loop. There is a short way up through a door. You should check if it is open first.",
-  "outro": "You checked the door and found it locked. You took the only way.",
-  "learned": "Now you know how to ask what a thing knows, which programmers call an attribute."
+  "intro": "The short way up the aisles is through that door, {wizard}. Ask the door whether it is locked first, so you know which way to go.",
+  "outro": "Very wise. Always look before you walk, especially when exploring an old castle.",
+  "learned": "Now you know what an attribute is, and how to see one with `print`."
 }

@@ -1,28 +1,20 @@
 # Your first spell
 
-A spell is a word of magic. By itself, it is only a string. You must cast it with a wand. Then it does something.
+Spells are cast with a wand, and when they are cast, they do something! A spell is a word of magic, a string, and if you say it without a wand it is only a normal word.
+
+Casting is an action the wand gives your wizard, `wizard.cast("zelim")`. Without the wand, your wizard cannot cast spells!
 
 ---
+## What a spell does
 
-What a spell does depends on where you stand. It depends on what is near you. It may do nothing at all. Later, some spells will need to be told what to act on.
+What a spell does depends on where you are and what you have near you, and it may do nothing at all.
 
----
-
-`cast` is an action the wand gives your wizard. Without the wand, your wizard does not know it.
-
----
-
-`zelim` is a spell. It breaks the seal of a door. You must stand right beside the door:
-
-```python
-wizard.cast("zelim")
-```
-
-A sealed door shows a glowing rune.
+Our first spell is *zelim*. This spell breaks the seal of a door right beside you. You can tell when a door is sealed because it shows a glowing rune.
 
 ---
-
 ## Try it
+
+Let us cast your very first spell! We will move near a sealed door and cast *zelim* to break its seal.
 
 ```python try
 wizard.move_right(2)

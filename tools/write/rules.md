@@ -69,19 +69,26 @@ game's developers before it enters the game.
 
 ## The game's text formats
 
-- A lesson or a story page is Markdown: the first page opens with a `#`
-  title; pages are separated by a line with only `---`; `##` for a page's
-  heading; bold, italic, lists, `inline code` and fenced ```python code;
-  no HTML. A lesson's last page ends with exactly one block fenced
-  ```python try, the lesson's example, shown on that page. The level after
-  the lesson never starts with it: the child writes their own program.
+- A lesson is Markdown: the first page opens with a `#` title; pages are
+  separated by a line with only `---`; `##` for a page's heading; bold,
+  italic, lists, `inline code` and fenced ```python code; no HTML. A
+  lesson's last page ends with exactly one block fenced ```python try, the
+  lesson's example, shown on that page, unless the brief says the lesson
+  has none. The level after the lesson never starts with it: the child
+  writes their own program.
+- A story is played on the game's scene, step by step, and is JSON: its
+  `title` and its `steps`, one text a step, as many as the brief lists.
+  A step is said by the voice, the narrator, in a band under the scene,
+  or by a character, in a speech bubble over them; the brief says which,
+  and what happens on the scene before it. Inline Markdown only (italic,
+  `inline code`), no HTML.
 - A level's starting code never holds part of the solution. A practice
   starts empty, or with comments (`# ...`, in the child's language) that
   say what to do, never how; a fix level starts with the whole program to
   repair; an improve level with the whole program to make better.
 - A level's text is JSON with the keys the brief lists.
-- Write both languages, with the same meaning and the same number of pages,
-  hints and sentences. The Spanish is natural Spanish from Spain for a
+- Write both languages, with the same meaning and the same number of
+  pages, steps and hints. The Spanish is natural Spanish from Spain for a
   child, not a translation word for word.
 
 ## Your answer

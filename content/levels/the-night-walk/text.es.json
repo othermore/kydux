@@ -1,15 +1,15 @@
 {
   "title": "El paseo nocturno",
   "goals": [
-    "Llega a la bajada hacia el dormitorio.",
+    "Llega a la bajada del dormitorio.",
     "No dejes que Dask te vea."
   ],
-  "starting_code": "# Una sala oscura con una llave y una puerta cerrada con llave.\n# Una escalera móvil, y Dask debajo.\n",
+  "starting_code": "# Una habitación oscura, una puerta cerrada, una escalera móvil y Dask abajo.\n# Junta todo lo que has aprendido para llegar al dormitorio a salvo.\n",
   "hints": [
-    "Lanza `kirra`. Coge la llave. Abre la puerta primero.",
-    "Muévete al hueco. Espera a la escalera con un bucle `while`.",
-    "Cruza la escalera. Espera a Dask con otro bucle `while` antes de bajar."
+    "Ilumina la habitación, recoge la llave y abre la puerta.",
+    "Espera junto al borde hasta que la escalera móvil esté en su lugar.",
+    "Antes de bajar los últimos escalones, espera a que Dask mire hacia otro lado."
   ],
-  "intro": "Ya estamos, {wizard}. El camino al dormitorio está al otro lado de esta sala. Debemos usar todo lo que sabemos.",
-  "outro": "¡Lo logramos! Caminamos por los pasadizos nocturnos y Dask nunca nos vio."
+  "intro": "Ya casi estamos, {wizard}. Estamos a punto de llegar al dormitorio. Hay una habitación oscura, una escalera móvil y Dask caminando por abajo. ¡Tenemos que usar todo lo que sabemos!",
+  "outro": "¡Hemos llegado a la bajada al dormitorio! Pero espera... oigo pasos justo detrás de {nosotros|nosotras}."
 }

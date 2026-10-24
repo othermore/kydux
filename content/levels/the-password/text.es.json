@@ -1,16 +1,16 @@
 {
   "title": "La contraseña",
   "goals": [
-    "Abre la puerta.",
-    "Cruza la puerta."
+    "Abre la verja.",
+    "Crúzala."
   ],
-  "starting_code": "# La contraseña es ambrel en letras minúsculas.\n# Ponte junto a la puerta, di la palabra y cruza.\n",
+  "starting_code": "# Camina hasta la verja, di la contraseña y crúzala.\n",
   "hints": [
-    "Primero, camina cinco pasos hacia la derecha.",
-    "Usa la acción `say` para decir la contraseña.",
-    "¡No olvides las comillas! Luego da dos pasos más hacia la derecha."
+    "Necesitas tres instrucciones: una para llegar a la verja, una para hablar y otra para cruzarla.",
+    "Primero usa `move_right` para dar cinco pasos. ¡Luego usa `say`!",
+    "Dale a `say` una cadena con la palabra *ambrel* entre comillas, y luego usa `move_right` de nuevo."
   ],
-  "intro": "¡Un alumno mayor me enseñó la palabra secreta! Debes estar justo al lado de la puerta y decir exactamente ambrel en minúsculas.",
-  "outro": "¡La puerta te ha oído! El camino está abierto y ya estamos dentro.",
-  "learned": "Ahora sabes sobre las palabras entre comillas, que los programadores llaman cadena."
+  "intro": "¡Un alumno mayor me ha dicho la contraseña de la verja! Es *ambrel*. ¡Ponte justo al lado de la verja, di la palabra y crúzala!",
+  "outro": "¡La verja se ha abierto! Estamos dentro de la entrada. Mira, he dejado algo para ti en esa piedra plana.",
+  "learned": "Ahora sabes qué es una cadena, y cómo hacer que {tu mago|tu maga} diga cosas."
 }

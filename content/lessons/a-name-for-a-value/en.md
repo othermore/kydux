@@ -1,26 +1,20 @@
 # A name for a value
 
-A library loves order. Sometimes you use the same value many times. Writing the same value over and over can lead to mistakes. We can give a value a name to keep things tidy. A name for a value is what programmers call a variable.
+A library is built on order. When a program uses the same value in several places, writing it again each time is easy to get wrong and hard to change.
+
+Instead, you can give the value a name once and use that name after. A name for a value is what programmers call a variable.
 
 ---
+## Giving a value a name
 
-Here is how we give a name. We use the equals sign. The `=` puts the value under the name. It does not ask if they are equal.
+To make a variable, you write the name, then an equals sign, and then the value. We will write `steps = 3`. The `=` sign puts the value under the name; it does not ask whether they are equal.
 
-```python
-steps = 3
-```
-
-From now on, `steps` means `3`. You can use it as an argument for a method.
-
-```python
-wizard.move_right(steps)
-```
+Then, you can use the name `steps` wherever the number three would go, such as a move's argument!
 
 ---
-
 ## Try it
 
-Now it is your turn. Write the number once. Keep order in your code, {wizard}.
+Let us put a value under a name, and use it to walk. Watch how neat and orderly the code becomes!
 
 ```python try
 steps = 3

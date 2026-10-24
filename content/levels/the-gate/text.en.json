@@ -5,11 +5,11 @@
   ],
   "starting_code": "",
   "hints": [
-    "Use an action to make your wizard walk.",
-    "You need to take one step to the right.",
-    "Use the `move_right` action."
+    "Remember the instruction from the lesson? You need to move your wizard.",
+    "You only need one instruction to take a step towards the gate.",
+    "Write `move_right` with empty brackets."
   ],
-  "intro": "A program is a list of instructions. Write one to take a step toward the gate. Let us see what happens!",
-  "outro": "The gate is still shut, but you made your wizard move! I have more to show you.",
-  "learned": "Now you know what a program is."
+  "intro": "We are one step away from the gate! Let's write our very first program to walk up to it. It won't open yet, but we must start at the beginning!",
+  "outro": "Great! You have learned to move your wizard. Now let's see how we get through this gate.",
+  "learned": "Now you know what a program and an instruction are, and the instruction that moves your wizard."
 }

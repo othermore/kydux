@@ -1,32 +1,20 @@
 # Encontrar cosas
 
-Algunas acciones cambian el mundo. Otras acciones te devuelven algo. Te devuelven una respuesta. Debes guardar esa respuesta a salvo. La guardas en una variable.
+Una biblioteca guarda muchos secretos, y {un buen mago|una buena maga} sabe cómo buscar. Algunos métodos hacen algo en el mundo, como moverse. Otros métodos devuelven algo, una respuesta.
+
+Cuando un método te da una respuesta, ¡puedes guardarla bajo una variable para usarla después!
 
 ---
+## Guardar la respuesta
 
-Puedes buscar un objeto perdido. `find_nearest` devuelve la cosa más cercana de ese tipo.
+El método `wizard.find_nearest("book")` mira alrededor y devuelve el libro más cercano, la cosa en sí. Podemos guardarlo escribiendo `book = wizard.find_nearest("book")`.
 
-```python
-book = wizard.find_nearest("book")
-```
-
-Ahora `book` guarda el libro en sí. Puedes preguntar por sus atributos, como `book.position`. Si no hay ningún libro, devuelve `None`. `None` es una palabra especial para nada.
+Si no hay ningún libro lo bastante cerca, devuelve `None`, que es la palabra de Python para nada. Una vez que has encontrado un libro, podrías comprobar dónde está con `book.position`, o dárselo a un amigo justo a tu lado con `wizard.give(book)`.
 
 ---
-
-También puedes entregar cosas. Puedes darle un objeto a alguien justo a tu lado. Usas el método `give`.
-
-```python
-wizard.give(book)
-```
-
-El argumento es la variable que guarda la cosa.
-
----
-
 ## Pruébalo
 
-Una buena bibliotecaria sabe dónde están los libros. Encuentra el libro más cercano. Luego imprime su posición.
+Vamos a buscar un libro y a ver dónde está. ¡Primero buscamos y luego le preguntamos al libro por su posición!
 
 ```python try
 book = wizard.find_nearest("book")

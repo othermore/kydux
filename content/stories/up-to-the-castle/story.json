@@ -76,7 +76,17 @@
       "do": null
     },
     {
+      "who": "wizard",
+      "do": {
+        "face": "down"
+      }
+    },
+    {
       "who": "nuri",
+      "do": null
+    },
+    {
+      "who": "voice",
       "do": null
     }
   ]

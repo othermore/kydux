@@ -23,7 +23,7 @@ test('the words speak of a girl as a girl: the notebook and a level\'s outro', a
   const page = await withWizard(browser, 'es-ES', 'girl');
   await page.goto('/#level/the-gate');
   await winTheGate(page);
-  await expect(page.locator('#card-outro')).toContainText('has hecho que tu maga se mueva');
+  await expect(page.locator('#card-outro')).toContainText('Has aprendido a mover a tu maga');
   await page.locator('#again').click();
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook')).toContainText('El cuaderno de la maga');
@@ -34,25 +34,25 @@ test('the words speak of a boy as a boy', async ({ browser }) => {
   const page = await withWizard(browser, 'es-ES', 'boy');
   await page.goto('/#level/the-gate');
   await winTheGate(page);
-  await expect(page.locator('#card-outro')).toContainText('has hecho que tu mago se mueva');
+  await expect(page.locator('#card-outro')).toContainText('Has aprendido a mover a tu mago');
   await page.context().close();
 });
 
 test('a story greets the wizard by name, and Nuri is of the wizard\'s gender', async ({ browser }) => {
   for (const [locale, gender, words] of [
-    ['es-ES', 'girl', 'No te preocupes, Marta.'],
+    ['es-ES', 'girl', 'Encantada de conocerte, Nuri. Yo soy Marta.'],
     ['es-ES', 'girl', 'Soy una alumna de primer año'],
     ['es-ES', 'boy', 'Soy un alumno de primer año'],
-    ['en-US', 'girl', 'Do not worry, Marta.'],
+    ['en-US', 'girl', 'I am Marta.'],
   ] as const) {
     const page = await withWizard(browser, locale, gender);
     await page.goto('/#story/at-the-gate');
-    // Nuri's greeting, reached again with Back; then Nuri's first words of advice.
-    await storyNext(page, 3);
+    // Nuri's greeting, reached again with Back; then the wizard's answer, by name.
+    await storyNext(page, 4);
     await page.locator('#story-back').click();
-    await expect(page.locator('#story-step')).toHaveText(/^3 /);
+    await expect(page.locator('#story-step')).toHaveText(/^4 /);
     if (words.startsWith('Soy')) await expect(storySaid(page)).toContainText(words);
-    await storyNext(page, 2);
+    await storyNext(page);
     if (!words.startsWith('Soy')) await expect(storySaid(page)).toContainText(words);
     await page.context().close();
   }
@@ -61,5 +61,5 @@ test('a story greets the wizard by name, and Nuri is of the wizard\'s gender', a
 test('with no wizard yet, a story says the word for one', async ({ page }) => {
   await page.goto('/#story/at-the-gate');
   await storyNext(page, 4);
-  await expect(storySaid(page)).toContainText('Do not worry, apprentice.');
+  await expect(storySaid(page)).toContainText('I am apprentice.');
 });

@@ -4,13 +4,13 @@
     "Dale a Eldra su libro.",
     "Encuentra el libro con `find_nearest`."
   ],
-  "starting_code": "# Encuentra el libro.\n# Recógelo y dáselo a Eldra.\n",
+  "starting_code": "# Eldra perdió su libro en algún lugar de este rincón.\n# Encuéntralo, recógelo y dáselo.\n",
   "hints": [
-    "Busca el `\"book\"` más cercano y dale un nombre con `=`.",
-    "Averigua dónde está el libro. Camina hasta allí y recógelo.",
-    "Camina hacia Eldra. Luego usa la acción `give` con el nombre del libro."
+    "Usa `find_nearest` para encontrar el libro y guárdalo bajo una variable.",
+    "Pregúntale al libro su posición para saber hacia dónde caminar.",
+    "Camina hacia el libro y usa `pick_up`, luego vuelve donde está Eldra y usa `give`."
   ],
-  "intro": "La fantasma Eldra está allí. Perdió un libro hace mucho tiempo. Estoy segura de que puedes encontrarlo para ella.",
-  "outro": "¡Has traído el libro de vuelta! Eldra está muy feliz.",
-  "learned": "Ahora sabes cómo encontrar una cosa y guardarla bajo una variable."
+  "intro": "Escucha... ese susurro es Eldra. Perdió un libro en este rincón hace mucho tiempo. Vamos a encontrarlo y a devolvérselo.",
+  "outro": "Qué amable eres. Devolverle a Eldra su libro perdido es la magia más hermosa de todas.",
+  "learned": "Ahora sabes cómo un método puede devolver algo, y cómo encontrar un objeto y dárselo a alguien."
 }

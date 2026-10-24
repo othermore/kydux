@@ -1,28 +1,20 @@
-# Else
+# Si no
 
-A veces necesitamos un plan de reserva.
-¿Y si la puerta está cerrada con llave?
-Debemos ir por el otro lado.
-Un `if` solo se ejecuta cuando la respuesta es sí.
-Necesitamos líneas que se ejecuten cuando la respuesta es no.
+Cuando haces una pregunta con `if`, sabes qué hacer si la respuesta es `True`. Pero, ¿y si la respuesta es no? A lo mejor quieres hacer otra cosa en su lugar.
+
+Usamos la palabra `else` para decir qué pasa cuando la condición es `False`.
 
 ---
+## Tomar una decisión
 
-Para eso sirve `else`.
-Significa de otro modo.
-Va después de las líneas del `if`.
-No debe estar movido hacia dentro.
-Tiene sus propios dos puntos `:`.
-Las líneas debajo de `else` se mueven hacia dentro cuatro espacios.
-Solo se ejecutan cuando la condición es `False`.
+El `else` se pone en el mismo sitio que su `if`, sin espacios delante, y lleva sus propios dos puntos. Luego, metemos sus líneas hacia la derecha con cuatro espacios por debajo.
+
+Cuando el ordenador lee esto, una de las dos partes siempre se ejecutará. ¡Si ejecuta la primera parte, se salta la segunda; y si se salta la primera, ejecuta la segunda!
 
 ---
-
 ## Pruébalo
 
-Vamos a probar la puerta izquierda.
-Pregunta si está cerrada con llave.
-Imprime una cadena si lo está, y otra si está abierta.
+Vamos a comprobar una puerta para ver si está cerrada. El ordenador imprimirá una cadena u otra, ¡pero nunca las dos!
 
 ```python try
 if left_door.locked:

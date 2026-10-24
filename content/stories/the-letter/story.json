@@ -3,11 +3,11 @@
   "opening": true,
   "scene": "the-gate",
   "wizard": [
-    11,
+    5,
     6
   ],
   "camera": [
-    11,
+    9,
     6
   ],
   "actors": [],
@@ -23,9 +23,16 @@
     {
       "who": "voice",
       "do": {
-        "face": "right"
+        "walk": [
+          11,
+          6
+        ]
       },
       "by": "wizard"
+    },
+    {
+      "who": "voice",
+      "do": null
     },
     {
       "who": "voice",

@@ -2,15 +2,15 @@
   "title": "The wand",
   "goals": [
     "Pick up the wand.",
-    "Walk on to Nuri."
+    "Reach Nuri."
   ],
-  "starting_code": "# Walk to the flat stone.\n# Pick up the wand.\n# Walk on to Nuri.\n",
+  "starting_code": "# Walk to the stone, pick up the wand, and walk to me.\n",
   "hints": [
-    "Walk three steps to the right to reach the stone.",
-    "Use the `pick_up` action to take the wand.",
-    "Take three more steps to the right to reach me."
+    "Use `move_right` to walk to the stone first. Then you can grab what is on it!",
+    "Use `pick_up` with empty brackets to take the wand.",
+    "After you pick it up, you need one more `move_right` instruction to reach me."
   ],
-  "intro": "I went ahead and set my spare wand on that flat stone for you. I will lend it to you, and you will give it back to me one day!",
-  "outro": "You have a wand! Now you can do some real magic.",
-  "learned": "Now you know about things to carry, which are objects too."
+  "intro": "I went ahead and left my spare wand on the flat stone for you. It is only lent, so we will have to give it back one day. Pick it up and walk on to me!",
+  "outro": "Now you have a wand of your own! Well, a lent one. Let's see what you can do with it!",
+  "learned": "Now you know that things are objects too, and how to pick them up."
 }

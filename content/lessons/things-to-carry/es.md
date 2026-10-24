@@ -1,22 +1,20 @@
-# Cosas para llevar
+# Cosas que llevar
 
-Arvelia está llena de cosas. Encontrarás llaves, libros y varitas. Cada cosa es también un objeto. Cada cosa tiene un nombre.
+Las cosas son objetos, al igual que los personajes, {tu mago|tu maga} entre ellos. Cada cosa tiene el nombre por el que el código la conoce, como `key` o `book`.
 
----
-
-Puedes recoger una cosa. La cosa debe estar en tu casilla. También puede estar justo a tu lado. Escribes `wizard.pick_up()`.
+¡Tu personaje puede recoger cosas! El método `wizard.pick_up()` recoge una cosa, pero la cosa debe estar en tu casilla o justo a tu lado.
 
 ---
+## Qué cosa recoger
 
-A veces hay varias cosas cerca. Debes pedir una. Usas el nombre de la cosa como argumento. Escribes `wizard.pick_up(key)`.
+Cuando hay varias cosas cerca de ti, debes decirle al ordenador exactamente cuál quieres. Haces esto dando el nombre de la cosa como argumento, como `wizard.pick_up(key)`.
+
+He dejado mi varita de repuesto dentro de la entrada para que la recojas. ¡Solo es prestada, así que tendremos que devolverla algún día!
 
 ---
-
-Te prestaré mi varita de repuesto. La he dejado cerca de la puerta. Por favor, recógela. Tendrás que devolvérmela algún día.
-
----
-
 ## Pruébalo
+
+Vamos a caminar y recoger la varita. ¡Primero nos movemos, y luego usamos el método para recogerla!
 
 ```python try
 wizard.move_right(2)

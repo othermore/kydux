@@ -1,11 +1,13 @@
 {
   "title": "Ante la puerta",
   "steps": [
-    "Estás ante la gran puerta de hierro. La puerta está cerrada. No sabes cómo abrirla.",
-    "Alguien se acerca por el camino.",
-    "¡Hola! Me llamo Nuri. Soy {un alumno|una alumna} de primer año como tú. He crecido entre magos. Ya sé un poco de magia.",
-    "Nuri te sonríe.",
-    "No te preocupes, {wizard}. La puerta escucha las instrucciones. Te enseñaré a abrirla ahora mismo. {Un buen mago investiga|Una buena maga investiga} primero. Probamos, vemos qué pasa y volvemos a probar.",
-    "Antes de abrir la puerta, hay algunas cosas que aprender. Te ayudarán en todo el colegio. Te las enseñaré una por una, justo aquí. ¡Empecemos con qué es un programa!"
+    "Estás ante la puerta, y no sabes cómo abrirla.",
+    "¡Hola! ¿Hay alguien ahí? ¿Podéis abrirme, por favor?",
+    "Alguien más sube por el camino: {otro alumno nuevo|otra alumna nueva}, sin aliento.",
+    "¡Hola! Soy Nuri. Soy {un alumno de primer año|una alumna de primer año} y acabo de llegar.",
+    "Encantad{o|a} de conocerte, Nuri. Yo soy {wizard}. ¿Sabes cómo se abre esta puerta?",
+    "He crecido entre magos y sé un poco de magia. Esta puerta no se abre empujando: escucha instrucciones.",
+    "¿Una instrucción? ¿Y cómo se le da una instrucción a una puerta?",
+    "Te lo enseñaré, paso a paso, aquí mismo. En Arvelia los magos aprenden así: pruebas algo, observas qué pasa y vuelves a intentar. Empecemos por ver qué es un programa."
   ]
 }

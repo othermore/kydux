@@ -1,8 +1,10 @@
 {
   "title": "Lo alto de las escaleras",
   "steps": [
-    "Llegas a lo alto de las escaleras largas. Los pasadizos nocturnos empiezan aquí. Las piedras son más antiguas y oscuras.",
-    "Una escalera flota en el aire más adelante. Aparece y desaparece. Escuchas pasos en algún lugar más abajo. Es Dask.",
-    "Debemos tener cuidado aquí. Tenemos que esperar el momento justo. Necesitamos repetir una acción mientras algo siga siendo verdadero."
+    "Has llegado a lo alto de las largas escaleras, donde las piedras son más antiguas y oscuras. Aquí es donde comienzan los misteriosos pasadizos nocturnos.",
+    "¡Uf! ¡Usar un bucle para repetir nuestros pasos fue una forma brillante de subir todas esas escaleras!",
+    "Justo delante, un escalón de piedra flota en el aire, yendo y viniendo lentamente. En algún lugar más abajo, escuchas el sonido constante de unos pasos: Dask se mueve de nuevo.",
+    "¿Cómo pasamos sin que nos vea? ¡No sabemos cuánto tiempo mirará hacia aquí!",
+    "Tengo una idea. Esperaremos todo el tiempo que él mire, y te enseñaré cómo un programa puede hacer eso."
   ]
 }

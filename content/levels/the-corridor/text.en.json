@@ -1,15 +1,15 @@
 {
-  "title": "The path by the hedge",
+  "title": "The corridor",
   "goals": [
-    "Reach the end of the path."
+    "Reach the spot."
   ],
   "starting_code": "",
   "hints": [
-    "Remember to put each step on a new line.",
-    "First, take two steps down.",
-    "Then, take two steps left."
+    "You need four instructions in total, one on each line.",
+    "First use `move_down` twice, then `move_left` twice.",
+    "Remember to put your object, a dot, and the method with empty brackets on each line."
   ],
-  "intro": "Let us look round the forecourt for another way in. Follow the path by the hedge.",
-  "outro": "Great job! The path goes on, but I want to show you something else first.",
-  "learned": "Now you know about objects and actions, which programmers call methods."
+  "intro": "The gate will not open for us yet, so let's look around the garden! Write a program to walk down along the path, then around the corner to the left.",
+  "outro": "Well done! You used different methods to turn the corner. Look, I found a program I wrote earlier!",
+  "learned": "Now you know what objects and methods are, and the four moves."
 }

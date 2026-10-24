@@ -25,6 +25,10 @@
       "by": "wizard"
     },
     {
+      "who": "wizard",
+      "do": null
+    },
+    {
       "who": "voice",
       "do": {
         "appear": [
@@ -44,14 +48,17 @@
       }
     },
     {
-      "who": "voice",
+      "who": "wizard",
       "do": {
         "face": "left"
-      },
-      "by": "wizard"
+      }
     },
     {
       "who": "nuri",
+      "do": null
+    },
+    {
+      "who": "wizard",
       "do": null
     },
     {

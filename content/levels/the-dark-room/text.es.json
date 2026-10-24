@@ -1,17 +1,17 @@
 {
-  "title": "La sala oscura",
+  "title": "La habitación oscura",
   "goals": [
     "Abre la puerta.",
     "Pasa por ella.",
-    "Encuentra la llave con find_nearest."
+    "Encuentra la llave con `find_nearest`."
   ],
-  "starting_code": "# Ilumina la sala.\n# Encuentra la llave y abre la puerta.\n",
+  "starting_code": "# ¡Está demasiado oscuro para ver nada!\n# Ilumina la habitación, encuentra la llave y abre la puerta.\n",
   "hints": [
-    "Lanza `kirra` primero. Luego encuentra la llave con `wizard.find_nearest(\"key\")`.",
-    "Usa `print`. Pregunta a la llave su `position`.",
-    "Camina hasta la llave y cógela. Luego abre la puerta."
+    "Lanza el hechizo *kirra* con `cast` para iluminar la habitación.",
+    "Usa `find_nearest` para encontrar la llave y guárdala en una variable.",
+    "Muévete hacia la llave, recógela, luego ve a la puerta y ábrela."
   ],
-  "intro": "Está demasiado oscuro ahí dentro. No podemos ver la llave ni la puerta. Necesitamos un poco de luz.",
-  "outro": "Un buen hechizo lo aclara todo. Sigamos adelante.",
-  "learned": "Ahora sabes cómo iluminar una sala oscura con un hechizo, `kirra`, y encontrar lo que hay en ella."
+  "intro": "Está completamente oscuro aquí, {wizard}. Tenemos que iluminar la habitación con un hechizo para encontrar la llave de esa puerta.",
+  "outro": "El hechizo *kirra* funcionó de maravilla. La llave estaba escondida, pero la luz nos mostró exactamente dónde estaba.",
+  "learned": "Ahora sabes cómo *kirra* ilumina la habitación en la que estás."
 }

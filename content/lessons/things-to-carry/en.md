@@ -1,22 +1,20 @@
 # Things to carry
 
-Arvelia is full of things. You will find keys, books, and wands. Each thing is an object too. Each thing has a name.
+Things are objects, just as the characters are, your wizard among them. Each thing has the name the code knows it by, like `key` or `book`.
+
+Your wizard can pick things up! The method `wizard.pick_up()` picks up a thing, but the thing must be on your tile or right beside you.
 
 ---
+## Which thing to pick up
 
-You can pick up a thing. The thing must be on your tile. It can also be right beside you. You write `wizard.pick_up()`.
+When there are several things near you, you must tell the computer exactly which one you want. You do this by giving the thing's name as the argument, like `wizard.pick_up(key)`.
 
----
-
-Sometimes there are several things near you. You must ask for one. You put the thing's name as an argument. You write `wizard.pick_up(key)`.
-
----
-
-I will lend you my spare wand. I set it down near the gate. Please pick it up. You must give it back one day.
+I have left my spare wand inside the gatehouse for you to pick up. It is only lent, so we will have to give it back one day!
 
 ---
-
 ## Try it
+
+Let us walk over and pick up the wand. First we move, and then we use the method to pick it up!
 
 ```python try
 wizard.move_right(2)

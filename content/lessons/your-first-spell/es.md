@@ -1,28 +1,20 @@
 # Tu primer hechizo
 
-Un hechizo es una palabra mágica. Por sí solo, es solo una cadena. Debes lanzarlo con una varita. Entonces hace algo.
+Los hechizos se lanzan con una varita, y cuando se lanzan, ¡hacen algo! Un hechizo es una palabra de magia, una cadena, y si la dices sin una varita, es solo una palabra normal.
+
+Lanzar un hechizo es una acción que la varita le da a {tu mago|tu maga}, `wizard.cast("zelim")`. ¡Sin la varita, tu personaje no puede lanzar hechizos!
 
 ---
+## Qué hace un hechizo
 
-Lo que hace un hechizo depende de dónde estés. Depende de lo que haya cerca. Puede que no haga nada en absoluto. Más adelante, algunos hechizos necesitarán saber sobre qué actuar.
+Lo que hace un hechizo depende de dónde estés y de lo que tengas cerca, y puede que no haga nada en absoluto.
 
----
-
-`cast` es una acción que la varita le da a tu {mago|maga}. Sin la varita, no la conoce.
-
----
-
-`zelim` es un hechizo. Rompe el sello de una puerta. Debes estar justo al lado de la puerta:
-
-```python
-wizard.cast("zelim")
-```
-
-Una puerta sellada muestra una runa brillante.
+Nuestro primer hechizo es *zelim*. Este hechizo rompe el sello de una puerta que esté justo a tu lado. Puedes saber cuándo una puerta está sellada porque muestra una runa brillante.
 
 ---
-
 ## Pruébalo
+
+¡Vamos a lanzar tu primer hechizo! Nos moveremos cerca de una puerta sellada y lanzaremos *zelim* para romper su sello.
 
 ```python try
 wizard.move_right(2)

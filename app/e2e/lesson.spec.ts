@@ -7,17 +7,16 @@ test('a lesson turns its pages, theory first, and Try it opens the level, its ed
 }) => {
   await page.goto('/#lesson/what-a-program-is');
   await expect(page.locator('.lesson-page h1')).toHaveText('What a program is');
-  await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 4');
+  await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 3');
   await expect(page.locator('#lesson-back')).toBeDisabled();
   // The idea comes before any code (D41).
-  await expect(page.locator('.lesson-page pre')).toHaveCount(0);
-  await page.locator('#lesson-next').click();
   await expect(page.locator('.lesson-page')).toContainText('A list of instructions is a program.');
-  await expect(page.locator('.lesson-page pre')).toHaveCount(0);
+  await expect(page.locator('.lesson-page code')).toHaveCount(0);
   await page.locator('#lesson-next').click();
+  await expect(page.locator('.lesson-page code')).toContainText('wizard.move_right()');
+  await page.locator('#lesson-next').click();
+  await expect(page.locator('#lesson-page')).toHaveText('Page 3 of 3');
   await expect(page.locator('.lesson-page pre')).toContainText('wizard.move_right()');
-  await page.locator('#lesson-next').click();
-  await expect(page.locator('#lesson-page')).toHaveText('Page 4 of 4');
   await expect(page.locator('.lesson-page pre')).not.toContainText('try');
 
   await page.locator('#lesson-try').click();
@@ -29,7 +28,7 @@ test('a lesson turns its pages, theory first, and Try it opens the level, its ed
 
 test('a lesson read shows as done on the map, and opens its level', async ({ page }) => {
   await page.goto('/#lesson/what-a-program-is');
-  for (let turn = 0; turn < 3; turn += 1) await page.locator('#lesson-next').click();
+  for (let turn = 0; turn < 2; turn += 1) await page.locator('#lesson-next').click();
   await page.locator('#lesson-map').click();
   const stops = page.locator('.stop');
   await expect(stops.nth(1)).toHaveAttribute('data-item', 'lesson:what-a-program-is');

@@ -1,15 +1,15 @@
 {
-  "title": "La puerta",
+  "title": "La verja",
   "goals": [
-    "Camina hacia la puerta."
+    "Camina hasta la verja."
   ],
   "starting_code": "",
   "hints": [
-    "Usa una acción para que tu {mago|maga} camine.",
-    "Tienes que dar un paso hacia la derecha.",
-    "Usa la acción `move_right`."
+    "¿Recuerdas la instrucción de la lección? Necesitas mover a {tu mago|tu maga}.",
+    "Solo necesitas una instrucción para dar un paso hacia la verja.",
+    "Escribe `move_right` con los paréntesis vacíos."
   ],
-  "intro": "Un programa es una lista de instrucciones. Escribe una para dar un paso hacia la puerta. ¡Veamos qué pasa!",
-  "outro": "¡La puerta sigue cerrada, pero has hecho que tu {mago|maga} se mueva! Tengo más cosas que enseñarte.",
-  "learned": "Ahora sabes qué es un programa."
+  "intro": "¡Estamos a un paso de la verja! Vamos a escribir nuestro primer programa para acercarnos a ella. Aún no se abrirá, ¡pero debemos empezar por el principio!",
+  "outro": "¡Genial! Has aprendido a mover a {tu mago|tu maga}. Ahora vamos a ver cómo cruzamos esta verja.",
+  "learned": "Ahora sabes qué son un programa y una instrucción, y la instrucción que mueve a {tu mago|tu maga}."
 }

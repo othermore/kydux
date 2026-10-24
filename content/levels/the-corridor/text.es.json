@@ -1,15 +1,15 @@
 {
-  "title": "El camino junto al seto",
+  "title": "El pasillo",
   "goals": [
-    "Llega al final del camino."
+    "Llega hasta el lugar."
   ],
   "starting_code": "",
   "hints": [
-    "Recuerda poner cada paso en una línea nueva.",
-    "Primero, da dos pasos hacia abajo.",
-    "Luego, da dos pasos a la izquierda."
+    "Necesitas cuatro instrucciones en total, una en cada línea.",
+    "Primero usa `move_down` dos veces, y luego `move_left` dos veces.",
+    "Recuerda poner tu objeto, un punto y el método con los paréntesis vacíos en cada línea."
   ],
-  "intro": "Vamos a explorar el patio por si hay otra entrada. Sigue el camino junto al seto.",
-  "outro": "¡Gran trabajo! El camino sigue, pero primero quiero enseñarte otra cosa.",
-  "learned": "Ahora sabes sobre objetos y acciones, que los programadores llaman métodos."
+  "intro": "La verja aún no se abrirá para {nosotros|nosotras}, ¡así que vamos a echar un vistazo por el jardín! Escribe un programa para bajar por el camino y luego doblar la esquina hacia la izquierda.",
+  "outro": "¡Bien hecho! Has usado distintos métodos para doblar la esquina. ¡Mira, he encontrado un programa que escribí antes!",
+  "learned": "Ahora sabes qué son los objetos y los métodos, y los cuatro movimientos."
 }

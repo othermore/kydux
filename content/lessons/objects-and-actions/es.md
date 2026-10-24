@@ -1,24 +1,22 @@
 # Objetos y acciones
 
-Un programa es una lista de instrucciones. Una instrucción puede ser una acción, que los programadores llaman método. Un método necesita a alguien que lo haga.
+En un programa, todo es un objeto. Los personajes, las cosas que encuentras, una puerta, un libro... todos son objetos. {Tu mago|Tu maga} también es un objeto, al que llamamos `wizard`.
+
+Un objeto puede hacer acciones, que los programadores llaman métodos. Cada objeto tiene sus propios métodos. Por ejemplo, `move_right` es un método de `wizard`.
 
 ---
+## Cómo escribir una instrucción
 
-Los personajes de un programa son objetos. Una puerta es un objeto. Un libro es un objeto. Tu {mago|maga} también es un objeto. `move_right` es un método del objeto `wizard`.
+Cuando escribes una instrucción, primero pones el objeto, luego un punto para mostrar que la acción le pertenece. Después viene el método, y finalmente unos paréntesis, ¡que le dicen al ordenador que lo haga ahora mismo!
 
----
+Hay cuatro métodos para moverse, uno para cada dirección, y cada uno da un paso. Escribimos una instrucción en cada línea.
 
-```python
-wizard.move_right()
-```
-
-El punto significa que el método pertenece a tu {mago|maga}. Los paréntesis significan que debe hacerlo ahora. Aquí, tu {mago|maga} sabe hacer cuatro movimientos, y por eso `wizard` tiene cuatro métodos: `move_right`, `move_left`, `move_up` y `move_down`. Escribimos un paso en cada línea.
+Si alguna vez olvidas qué puede hacer {tu mago|tu maga}, ¡solo tienes que abrir tu cuaderno! Es un botón en la pantalla que muestra una lista con todos los métodos que tu personaje conoce.
 
 ---
-
 ## Pruébalo
 
-Baja por el camino junto al seto, y luego dobla la esquina.
+Vamos a intentar escribir dos instrucciones, una en cada línea. Este programa hará que des dos pasos hacia abajo.
 
 ```python try
 wizard.move_down()

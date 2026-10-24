@@ -1,25 +1,20 @@
 # Repeat
 
-These night stairs are so long, {wizard}!
-Walk up.
-Walk right.
-Writing that many times is tiring.
-We can tell the castle to do the same things again and again.
-A repeat, which programmers call a loop, saves us work.
+Walking down these long passages takes a lot of steps. Doing the same instructions many times means writing them many times, and that is a lot of work!
+
+We can ask the computer to do the instructions again and again for us. Programmers call this a loop.
 
 ---
+## Doing it again
 
-We write a loop with `for`.
-We can write `for step in range(8):` to do something eight times.
-The lines under it must be moved in by four spaces.
-The castle runs those lines eight times in a row.
+We write a loop with `for`. We write `for step in range(8):` and, moved in under it, the lines to repeat, eight times.
+
+The word `step` is just a variable the loop counts with. The computer will run those moved-in lines over and over until it finishes counting.
 
 ---
-
 ## Try it
 
-Climb the stairs with a loop.
-Move up and then right three times.
+Let us make a loop to walk without having to write so many lines. The instructions inside will happen three times in a row!
 
 ```python try
 for step in range(3):

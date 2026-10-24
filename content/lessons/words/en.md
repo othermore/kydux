@@ -1,24 +1,20 @@
 # Words
 
-Your wizard can say things. Words in a program go between quotes. Words in quotes, which programmers call a string, keep the word exactly as it is.
+Your wizard can also say things! You do this with the `say` method. Its argument is what you want your wizard to say.
+
+When we write words in a program, we put them between quotes. Words in quotes are called a string. The computer keeps a string exactly as it is written, every character of it, capitals, small letters, digits and signs.
 
 ---
+## Why we need strings
 
-Without quotes, the computer reads a word as a name. It might read it as an instruction. With quotes, it keeps the word as it is, so capitals matter.
+If we wrote a word without quotes, the computer would read it as a name in the program, like `wizard` or `move_right`. Quotes tell the computer that these are just words.
 
----
-
-Just as `move_right` takes how much to move, the `say` method takes what to say:
-
-```python
-wizard.say("Hello!")
-```
-
-The string is its argument. Some doors in Arvelia listen for a word.
+In Arvelia, what you say can be heard. Sometimes, saying the right string does something special, like opening a door that knows its password!
 
 ---
-
 ## Try it
+
+Let us make your wizard speak. Remember to put your words inside the quotes so they become a string!
 
 ```python try
 wizard.say("Hello!")

@@ -1,16 +1,16 @@
 {
   "title": "El estante alto",
   "goals": [
-    "Coge el libro raro.",
-    "Sigue caminando por el pasillo."
+    "Toma el libro raro.",
+    "Sigue por el pasillo."
   ],
-  "starting_code": "# Ponte en línea con el libro.\n# Atráelo hacia abajo con el hechizo.\n",
+  "starting_code": "# Un libro raro descansa en un estante alto.\n# Ponte en línea con él, lanza el hechizo fendra y recógelo.\n",
   "hints": [
-    "Camina hacia la izquierda hasta que estés justo debajo del libro.",
-    "Lanza el hechizo `\"fendra\"` para bajar el libro hasta ti.",
-    "Recuerda coger el libro antes de seguir caminando."
+    "Camina hacia la izquierda hasta que estés en línea con el libro.",
+    "Lanza el hechizo *fendra* usando tu varita para atraer el libro a tu casilla.",
+    "Una vez que el libro esté en tu casilla, debes usar `pick_up` antes de seguir caminando."
   ],
-  "intro": "Un libro raro descansa en ese estante alto. No puedes alcanzarlo con la mano. Este es un buen lugar para usar tu nuevo hechizo.",
-  "outro": "Bajaste el libro suavemente. El hechizo es muy útil.",
-  "learned": "Ahora sabes cómo usar un hechizo, una palabra de magia, con el método cast."
+  "intro": "Hay un libro raro en ese estante alto, lejos de tu alcance. Es el momento perfecto para probar tu nuevo hechizo.",
+  "outro": "¡Un precioso toque de magia! Los libros parecen muy felices de volar hacia tus manos.",
+  "learned": "Ahora sabes cómo *fendra* atrae un objeto hacia ti, y que debes recogerlo después."
 }

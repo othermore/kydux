@@ -87,3 +87,14 @@ def test_a_brief_writes_only_into_content_and_the_developers_docs(tmp_path):
 def test_every_brief_in_the_repository_can_be_read(tmp_path):
     for path in sorted((REPO / "tools" / "write" / "briefs").glob("*.md")):
         write.prompt(path)
+
+
+def test_the_second_key_is_read_after_the_first(tmp_path, monkeypatch):
+    secrets = tmp_path / "secrets.env"
+    secrets.write_text("OTHER=x\nGEMINI_API_KEY_2=two\nGEMINI_API_KEY=one\n", encoding="utf-8")
+    monkeypatch.setattr(write, "SECRETS", secrets)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GEMINI_API_KEY_2", raising=False)
+    assert write.api_keys() == ["one", "two"]
+    secrets.write_text("GEMINI_API_KEY=one\n", encoding="utf-8")
+    assert write.api_keys() == ["one"]

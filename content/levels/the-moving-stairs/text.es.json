@@ -2,15 +2,15 @@
   "title": "Las escaleras móviles",
   "goals": [
     "Cruza el hueco.",
-    "Pregunta a la escalera si está en su lugar."
+    "Pregunta a la escalera si está en su sitio."
   ],
-  "starting_code": "# Espera a la escalera.\n# Luego cruza.\n",
+  "starting_code": "# La escalera se mueve a su sitio y luego se aleja.\n# Espera hasta que esté lista para que la pises.\n",
   "hints": [
-    "Camina hacia arriba dos veces y a la derecha una vez. Esto llega al hueco.",
-    "Usa `while` y `not` con `stair.in_place` para esperar a la escalera.",
-    "Espera bajo el bucle. Muévete a la derecha cuatro veces cuando se detenga."
+    "Camina hacia el hueco primero.",
+    "Usa un bucle `while` para esperar mientras la escalera no esté en su sitio.",
+    "Una vez que la escalera esté en su lugar, camina hacia la derecha para cruzar el hueco."
   ],
-  "intro": "Las escaleras aquí giran de un lado a otro. Debes esperar a que lleguen. Veamos si puedes cruzar el hueco.",
-  "outro": "Cruzaste perfectamente. Las escaleras móviles no son un problema para ti.",
-  "learned": "Ahora sabes cómo esperar a una cosa que se mueve con un bucle `while`."
+  "intro": "Una escalera móvil... Se balancea sobre el hueco y luego se aleja. Deberíamos acercarnos al borde y esperar a que esté lista.",
+  "outro": "Justo a tiempo. Las escaleras móviles no asustan tanto cuando sabes cómo comprobar si están en su sitio.",
+  "learned": "Ahora sabes cómo esperar a una escalera móvil con `stair.in_place`, y que *osto* puede mantenerla quieta."
 }

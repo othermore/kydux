@@ -1,12 +1,13 @@
 {
   "title": "El banco de varitas",
   "steps": [
-    "Eldra, la fantasma, sonríe. Sostiene su libro perdido.",
-    "Te doy las gracias, {wizard}. Es maravilloso volver a leer mi historia favorita.",
-    "Se aleja flotando feliz.",
-    "Llegas al mostrador al final de la biblioteca. Este es el banco de varitas.",
-    "Nuri te espera allí. Pides prestada una varita del colegio para el año. Le devuelves la varita de repuesto a tu {amigo|amiga}.",
-    "Has aprendido mucho de Wenna. Has dado un nombre a un valor, una variable. Has descubierto lo que sabe una cosa, un atributo. Lo has mostrado con `print`. Has usado una acción que devuelve algo, como `find_nearest`.",
-    "Has usado una llave en una puerta que se abre con `door.open()`. Has aprendido un hechizo que llega lejos, `fendra`. Ahora cae la noche sobre el castillo. La gente susurra sobre los pasadizos oscuros. Se preguntan quién camina por ellos después del anochecer."
+    "Eldra vuelve a sostener su libro perdido, después de tantos años.",
+    "Mil gracias te sean dadas, amable {wizard}. Hoy has traído gran dicha a este viejo espíritu.",
+    "Se aleja flotando entre las estanterías, leyendo mientras se va.",
+    "Al final del pasillo, justo después de la última estantería, está el banco de varitas: un mostrador donde uno de los padres de los alumnos te presta una varita de la escuela para el año.",
+    "¡Lo lograste! Oh, ¿esa es tu nueva varita de la escuela? ¡Parece perfecta para ti!",
+    "¡Sí que lo es! Y aquí tienes tu varita de sobra, Nuri. Muchas gracias por prestármela.",
+    "¡Has aprendido muchísimo en la biblioteca! Sabes cómo usar un nombre para un valor, que los programadores llaman una variable, y cómo usar `print` para ver lo que sabe una cosa, su atributo. También atrapaste lo que devuelve un método usando `find_nearest`, lo guardaste en una variable y usaste `give`. ¡Incluso abriste una puerta con su propio método, `door.open()`, tras recoger su llave, y lanzaste el hechizo *fendra* para atraer cosas desde los estantes hacia ti!",
+    "Está anocheciendo. He oído a los alumnos mayores susurrar que los pasadizos cambian al caer la noche... Me pregunto quién caminará por ahí."
   ]
 }

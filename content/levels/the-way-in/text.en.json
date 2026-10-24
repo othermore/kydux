@@ -2,14 +2,14 @@
   "title": "The way in",
   "goals": [
     "Reach the castle road.",
-    "Do it in fewer than 9 lines."
+    "In fewer than 9 lines."
   ],
-  "starting_code": "# An inner gate listens for a word.\n# Two doors are sealed by runes.\n",
+  "starting_code": "# The inner gate listens to a word. Then there are two sealed doors. Good luck!\n",
   "hints": [
-    "Take one step up and use `say` for the password to open the inner gate.",
-    "Take two steps up, then three steps left, and use `cast` to open the first door.",
-    "Walk four steps left and use `cast` again, then go up to the road."
+    "Take this one step at a time. First, use `move_up` to stand by the inner gate and `say` its password.",
+    "The password is the same as the great gate's. Then use `move_up` and `move_left` to reach the first sealed door.",
+    "Use `cast` to open the first door, move left to the second door, `cast` again, and move up to the road!"
   ],
-  "intro": "There is an inner gate just ahead. It listens to the same word as the great gate. After that, the passage turns past two sealed doors up to the castle road.",
-  "outro": "We made it! The castle road is just ahead, and you are ready for school."
+  "intro": "This is it, the way out to the castle road! The inner gate listens to the same word as the great gate, and then there are two sealed doors. You can do this!",
+  "outro": "We did it! We are on the castle road now. I am so glad we met!"
 }

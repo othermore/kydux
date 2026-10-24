@@ -1,10 +1,12 @@
 {
   "title": "{Atrapados|Atrapadas}",
   "steps": [
-    "Estáis casi en el dormitorio.",
-    "De repente, Dask sale de la oscuridad. Estáis {atrapados|atrapadas}.",
-    "Dask parece muy severo. Luego, sonríe un poco.",
-    "Os he visto usar la cabeza. Habéis sido muy {astutos|astutas}. Os dejaré ir, solo por esta vez, {wizard}.",
-    "Has aprendido mucho esta noche. Has hecho una pregunta con una respuesta verdadera o falsa, una expresión. Has tomado una decisión con `if` y `else`, una condición. Has aprendido a repetir con `for`, un bucle. Has repetido mientras algo es verdadero, con `while`. Has iluminado la oscuridad con `kirra`. Has detenido una escalera móvil con `osto`. Por fin te sientes como en casa en el castillo. Te quedas {profundamente dormido|profundamente dormida}."
+    "Ya casi estáis. El camino conocido de bajada al cálido dormitorio está justo delante.",
+    "De repente, Dask sale directamente de la oscuridad. ¡Estáis {atrapados|atrapadas}!",
+    "¿Qué hacen {dos alumnos|dos alumnas} de primer año fuera de la cama a estas horas?",
+    "¡Solo estábamos inspeccionando las escaleras flotantes, señor! ¡Para asegurarnos de que no se fueran flotando del todo!",
+    "Dask os mira a {ambos|ambas} durante un momento largo y silencioso. Entonces, ves aparecer la más pequeña de las sonrisas en su rostro.",
+    "Os he estado observando. Mirasteis antes de dar un paso, esperasteis e iluminasteis la oscuridad. {Sois muy astutos|Sois muy astutas}. Os dejaré ir, solo por esta vez, {wizard}.",
+    "Por fin a salvo en la cama, piensas en lo mucho que has crecido esta noche. Hacer preguntas con expresiones y elegir con `if` y `else` te mantuvo a salvo de Dask. Un bucle `for` te ayudó a subir las escaleras sin esfuerzo, y un `while` te hizo esperar pacientemente en las sombras. Al recordar cómo lanzaste los hechizos *kirra* y *osto*, te invade el cálido sentimiento de pertenecer por fin a Arvelia, y te quedas {dormido|dormida} felizmente."
   ]
 }

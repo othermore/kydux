@@ -4,16 +4,16 @@
     "Llega al pie de las escaleras largas."
   ],
   "ways": {
-    "left_locked": "la puerta izquierda está cerrada con llave",
-    "right_locked": "la puerta derecha está cerrada con llave"
+    "left_locked": "la puerta izquierda está cerrada",
+    "right_locked": "la puerta derecha está cerrada"
   },
-  "starting_code": "# El programa elige la puerta equivocada. ¡Encuentra el error y arréglalo!\nif left_door.locked:\n    wizard.move_left(2)\n    left_door.open()\n    wizard.move_down(2)\n    wizard.move_right(6)\nelse:\n    wizard.move_right(2)\n    right_door.open()\n    wizard.move_down(2)\n    wizard.move_right(2)\n",
+  "starting_code": "# ¡Mi programa elige la puerta equivocada! Encuentra el error y arréglalo para pasar por la puerta abierta.\nif left_door.locked:\n    wizard.move_left(2)\n    left_door.open()\n    wizard.move_down(2)\n    wizard.move_right(6)\nelse:\n    wizard.move_right(2)\n    right_door.open()\n    wizard.move_down(2)\n    wizard.move_right(2)\n",
   "hints": [
-    "Ejecuta el código. Observa qué pasa cuando la puerta izquierda está cerrada con llave.",
-    "El código intenta abrir la puerta izquierda cuando está cerrada con llave. Las acciones están en el lugar equivocado.",
-    "Intercambia todas las líneas bajo `if` con todas las líneas bajo `else`."
+    "Mira la condición `if`. ¡Cuando la puerta izquierda está cerrada (`locked`), el programa intenta abrirla!",
+    "Intercambia las instrucciones dentro del `if` y del `else`.",
+    "Cuando la puerta izquierda esté cerrada, muévete a la puerta derecha en su lugar."
   ],
-  "intro": "Escribí este programa para nosotros. Elige la puerta cerrada con llave. ¿Puedes arreglar mi código?",
-  "outro": "¡Gracias! Puse las acciones en el sitio equivocado.",
-  "learned": "Ahora sabes cómo arreglar una elección, una condición, en tu código."
+  "intro": "Oh no, {wizard}... Intenté escribir el programa para esta habitación, pero sigo chocando con la puerta cerrada. ¿Puedes ver en qué me equivoqué?",
+  "outro": "¡Gracias! Puse las instrucciones correctas en los lugares equivocados. Ahora estamos al pie de las escaleras largas.",
+  "learned": "Ahora sabes cómo leer un `if` y su `else` y encontrar qué hace cada uno."
 }

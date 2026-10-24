@@ -4,12 +4,12 @@
     "Reach the way down to the dormitory.",
     "Do not let Dask see you."
   ],
-  "starting_code": "# A dark room with a key and a locked door.\n# A moving stair, and Dask below.\n",
+  "starting_code": "# A dark room, a locked door, a moving stair, and Dask below.\n# Put everything you have learned together to safely reach the dormitory.\n",
   "hints": [
-    "Cast `kirra`. Pick up the key. Open the door first.",
-    "Move to the gap. Wait for the stair with a `while` loop.",
-    "Cross the stair. Wait for Dask with another `while` loop before you go down."
+    "Light the room, pick up the key, and open the door.",
+    "Wait by the edge until the moving stair is in place.",
+    "Before going down the last steps, wait for Dask to look away."
   ],
-  "intro": "This is it, {wizard}. The way to the dormitory is past this room. We must use everything we know.",
-  "outro": "We made it! We walked the night passages and Dask never saw us."
+  "intro": "This is it, {wizard}. We are almost back to the dormitory. There is a dark room, a moving stair, and Dask walking below. We have to use everything we know.",
+  "outro": "We made it to the way down to the dormitory! But wait... I can hear footsteps right behind us."
 }

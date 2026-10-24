@@ -1,10 +1,12 @@
 {
   "title": "Hacia el castillo",
   "steps": [
-    "La entrada está abierta.",
-    "Subimos juntos por el camino hacia el castillo. Las ventanas están iluminadas. Las grandes puertas nos esperan.",
-    "Has aprendido mucho hoy. Has escrito una lista de instrucciones. Esto es un programa. Has conocido los objetos y sus acciones, los métodos.",
-    "Has escrito notas, los comentarios. Has dicho a los métodos cuánto, con argumentos. Has puesto palabras entre comillas, las cadenas. Has recogido una varita. Has lanzado un hechizo.",
-    "Recuerda que la varita es solo prestada. Nuestra profesora, Ilda, nos espera dentro. Tenemos que ir al banco de varitas, un mostrador dentro del castillo que llevan los padres de los alumnos, para pedir prestada una varita del colegio para ti. Luego podrás devolverme mi varita de repuesto. ¡Ahora viene el castillo de verdad!"
+    "El último sello se ha roto y el camino hacia el castillo queda abierto.",
+    "¡Lo logramos! ¡Lo hicimos {juntos|juntas}!",
+    "¡Hicimos mucho hoy, desde dar ese primer paso cuando aprendimos que un programa es una lista de instrucciones, hasta ver que eres un objeto que el código llama `wizard` y que tus acciones son métodos!",
+    "En el camino largo usaste un argumento para decirle a tu movimiento exactamente qué distancia recorrer, y con la nota sobre el movimiento equivocado vimos que un comentario es solo una nota para una persona. Por último, usaste `say` para decir la contraseña *ambrel* como una cadena, que guarda las palabras exactamente como se escriben entre comillas, ¡antes de usar `pick_up` para coger la varita y lanzar el hechizo *zelim* para romper el sello!",
+    "Gracias por toda tu ayuda, Nuri. ¡Lo que más me ha gustado ha sido lanzar la magia con la varita!",
+    "Esa varita es solo prestada. Ilda, nuestra profesora, espera dentro, y el banco de varitas, un mostrador en el castillo que llevan los padres de los alumnos, presta a cada alumno nuevo una varita de la escuela para el año; luego podrás devolverme la mía.",
+    "Subís por el camino {juntos|juntas}. Las ventanas del castillo están iluminadas y las grandes puertas aguardan. El verdadero castillo comienza aquí."
   ]
 }

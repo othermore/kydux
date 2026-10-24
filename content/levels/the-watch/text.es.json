@@ -1,20 +1,20 @@
 {
   "title": "La guardia",
   "goals": [
-    "Cruza a la sala de abajo.",
+    "Cruza a la habitación de abajo.",
     "No dejes que Dask te vea."
   ],
   "ways": {
-    "away": "Dask mira a otro lado",
+    "away": "Dask mira hacia otro lado",
     "watching": "Dask mira hacia aquí"
   },
-  "starting_code": "# Espera solo si Dask mira hacia aquí.\n# Luego cruza hacia abajo.\n",
+  "starting_code": "# Dask está haciendo su ronda.\n# Cruza el pasillo, pero espera si mira en tu dirección.\n",
   "hints": [
-    "Mira la tarjeta de inicio. El nivel se juega de dos formas. Un programa debe pasar por ambas.",
-    "Pregunta hacia dónde mira Dask antes de moverte. `dask.facing == \"left\"` es `True` cuando mira hacia aquí.",
-    "Espera un turno bajo el `if`. Mételo cuatro espacios hacia dentro."
+    "Usa una condición `if` para comprobar si Dask mira hacia la izquierda.",
+    "Si la condición es `True`, haz que tu personaje espere usando `wait`.",
+    "Después de la condición, muévete hacia abajo a la habitación."
   ],
-  "intro": "Dask hace su ronda aquí. A veces mira hacia aquí. Debemos cruzar cuando mire a otro lado.",
-  "outro": "Bien hecho, {wizard}. Una buena condición nos mantiene a salvo.",
-  "learned": "Ahora sabes cómo hacer una elección, que los programadores llaman una condición, con `if`."
+  "intro": "Dask está caminando por el pasillo de abajo. Tenemos que cruzarlo, pero podría mirar hacia nosotros. Solo deberíamos esperar si lo hace.",
+  "outro": "Buen trabajo. Una condición es la forma perfecta de mantenernos sin que nos vean cuando las cosas cambian.",
+  "learned": "Ahora sabes qué es una condición, y cómo `if` hace algo solo cuando la respuesta es sí."
 }

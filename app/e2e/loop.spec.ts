@@ -16,7 +16,7 @@ const WORDS = {
     opening: 'The letter',
     lesson: 'What a program is',
     story: 'At the gate',
-    greeting: 'Do not worry, Ada.',
+    greeting: 'I am Ada.',
     gate: 'The gate',
     won: 'You did it, Ada!',
     second: 'Objects and actions',
@@ -27,8 +27,8 @@ const WORDS = {
     opening: 'La carta',
     lesson: 'Qué es un programa',
     story: 'Ante la puerta',
-    greeting: 'No te preocupes, Ada.',
-    gate: 'La puerta',
+    greeting: 'Yo soy Ada.',
+    gate: 'La verja',
     won: '¡Lo has conseguido, Ada!',
     second: 'Objetos y acciones',
     hello: 'Hola, Ada',
@@ -66,7 +66,7 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await expect(page.locator('#story-title')).toHaveText(words.opening);
     await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done');
     await shoot(page, 'opening');
-    await storyNext(page, 3);
+    await storyNext(page, 4);
     await page.locator('#story-go-on').click();
 
     // The creator: a name, a girl, a look.
@@ -75,19 +75,20 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await page.locator('#wizard-looks .radio').nth(0).click();
     await shoot(page, 'creator');
 
-    // Chapter 1 opens at the gate, where Nuri greets the wizard by name.
+    // Chapter 1 opens at the gate, where the wizard meets Nuri and says their name.
     await page.locator('#wizard-done').click();
     await expect(page.locator('#story-title')).toHaveText(words.story);
     await shoot(page, 'at-the-gate');
     // Nuri comes up the path, and walks to the wizard's side to speak (D74).
-    await storyNext(page, 2);
+    await storyNext(page, 3);
     await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'nuri:10,6,right');
     await expect(page.locator('#scene')).toHaveAttribute('data-speaker', 'nuri');
     await shoot(page, 'nuri-speaks');
-    await storyNext(page, 2);
+    // The wizard answers by name.
+    await storyNext(page);
     await expect(storySaid(page)).toContainText(words.greeting);
     // The story's last step: Nuri turns to teaching.
-    await storyNext(page);
+    await storyNext(page, 3);
     await shoot(page, 'nuri-teaches');
     await page.locator('#story-go-on').click();
 
@@ -96,8 +97,6 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await shoot(page, 'lesson-first-page');
     await page.locator('#lesson-next').click();
     await shoot(page, 'lesson-second-page');
-    await page.locator('#lesson-next').click();
-    await shoot(page, 'lesson-third-page');
     await page.locator('#lesson-next').click();
     await shoot(page, 'lesson-last-page');
 

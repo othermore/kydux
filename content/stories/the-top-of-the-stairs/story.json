@@ -3,8 +3,8 @@
   "speaker": "nuri",
   "scene": "the-passages",
   "wizard": [
-    19,
-    2
+    20,
+    1
   ],
   "camera": [
     17,
@@ -15,35 +15,42 @@
       "id": "nuri",
       "kind": "friend",
       "at": [
-        18,
+        19,
         2
       ],
-      "facing": "right"
+      "facing": "up"
     }
   ],
   "steps": [
     {
       "who": "voice",
       "do": {
-        "walk": [
-          19,
-          1
-        ]
-      },
-      "by": "wizard"
-    },
-    {
-      "who": "voice",
-      "do": {
-        "face": "left"
+        "face": "up"
       },
       "by": "wizard"
     },
     {
       "who": "nuri",
       "do": {
-        "face": "up"
+        "walk": [
+          19,
+          1
+        ]
       }
+    },
+    {
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "wizard",
+      "do": {
+        "face": "left"
+      }
+    },
+    {
+      "who": "nuri",
+      "do": null
     }
   ]
 }

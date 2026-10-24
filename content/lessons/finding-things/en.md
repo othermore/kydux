@@ -1,32 +1,20 @@
 # Finding things
 
-Some actions change the world. Other actions give something back to you. They give back an answer. You must keep that answer safe. You keep it under a variable.
+A library holds many secrets, and a good wizard knows how to search. Some methods do something in the world, like moving. Other methods give something back, an answer.
+
+When a method gives you an answer, you can keep it under a variable to use later!
 
 ---
+## Keeping the answer
 
-You can look for a lost object. `find_nearest` gives back the nearest thing of that kind.
+The method `wizard.find_nearest("book")` looks around and gives back the nearest book, the thing itself. We can keep it by writing `book = wizard.find_nearest("book")`.
 
-```python
-book = wizard.find_nearest("book")
-```
-
-Now `book` holds the book itself. You can ask for its attributes, like `book.position`. If there is no book, it gives back `None`. `None` is a special word for nothing.
+If there is no book near enough, it gives back `None`, which is Python's word for nothing. Once you have found a book, you could check where it is with `book.position`, or hand it to a friend right beside you with `wizard.give(book)`.
 
 ---
-
-You can also give things away. You can give an object to someone right beside you. You use the `give` method.
-
-```python
-wizard.give(book)
-```
-
-The argument is the variable that holds the thing.
-
----
-
 ## Try it
 
-A good librarian knows where books are. Find the nearest book. Then print its position.
+Let us find a book and see where it is. First we search, and then we ask the book for its position!
 
 ```python try
 book = wizard.find_nearest("book")

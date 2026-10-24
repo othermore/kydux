@@ -1,40 +1,22 @@
 # Verdadero o falso
 
-¡Chis, {wizard}!
-Dask está dando vueltas en la oscuridad.
-Debemos saber qué es seguro.
-Algunas preguntas solo tienen dos respuestas.
-La respuesta es sí o no.
-¿Está cerrada la puerta?
-¿Nos ve el profesor?
-El castillo responde a una pregunta, que los programadores llaman una expresión.
-La respuesta es `True` o `False`.
+Algunas preguntas solo tienen dos respuestas: sí o no. ¿Está cerrada la puerta? ¿Está Dask mirando hacia aquí? En un programa, a este tipo de pregunta se le llama una expresión.
+
+El ordenador responde a una expresión con `True` o `False`, que significan verdadero y falso.
 
 ---
+## Comparar cosas
 
-Vamos a hacer algunas preguntas.
-`3 > 2` da `True`.
-También podemos preguntar por un atributo como `door.locked`.
-Usamos dos signos de igual `==` para ver si dos cosas son iguales.
-Un `=` es para una variable.
-Dos `==` hacen una pregunta.
-`dask.facing == "left"` pregunta hacia dónde mira Dask.
+Un atributo puede ser una de estas respuestas, como `door.locked`. También podemos comparar dos valores para ver si son iguales.
+
+Usamos dos signos de igual `==` para hacer la pregunta (¡recuerda que un solo `=` nombra un valor!). Por ejemplo, `dask.facing == "left"` pregunta si Dask está mirando a la izquierda. ¡Incluso podemos darle la vuelta a la respuesta usando `not`!
 
 ---
+## Preguntar a los métodos
 
-A veces queremos lo contrario.
-La palabra `not` da la vuelta a la respuesta.
-`not door.locked` es `True` cuando la puerta no está cerrada con llave.
-Un método también puede responder.
-¡`dask.can_see(wizard)` nos dice si Dask te descubre!
+Algunos métodos también responden a estas preguntas. El ordenador puede comprobar `dask.can_see(wizard)` para decirnos si Dask te puede ver.
 
----
-
-## Pruébalo
-
-Vamos a espiar a Dask.
-Pregunta hacia dónde mira.
-Luego pregunta si puede verte.
+Vamos a probar a imprimir algunas respuestas para ver qué dice el ordenador. ¡Recuerda hablar bajito!
 
 ```python try
 print(dask.facing)

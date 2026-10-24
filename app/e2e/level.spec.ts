@@ -1,4 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
+import { levelText } from './helpers';
+
+const LONG = { en: levelText('the-long-corridor', 'en'), es: levelText('the-long-corridor', 'es') };
 
 /** Replaces the editor's text, as typing it would, without the editor's auto-closing. */
 async function setCode(page: Page, code: string): Promise<void> {
@@ -30,12 +33,12 @@ test.describe('in English', () => {
 
   test('the page opens on the long path, isolated, with Python ready', async ({ page }) => {
     await expect(page).toHaveURL(/#level\/the-long-corridor$/);
-    await expect(page).toHaveTitle('Kydux — The long path');
+    await expect(page).toHaveTitle(`Kydux — ${LONG.en.title}`);
     expect(await page.evaluate(() => globalThis.crossOriginIsolated)).toBe(true);
     await expect(page.locator('#status')).toHaveText(/^Python 3\.14\.\d+ ready$/);
     await expect(scene(page)).toHaveAttribute('data-wizard', '8,10');
-    await expect(page.locator('.cm-content')).toContainText('# Tell the action how many steps to take.');
-    await expect(page.locator('.goal').first()).toHaveText('Reach the foot of the steps.');
+    await expect(page.locator('.cm-content')).toContainText(LONG.en.starting_code.trim());
+    await expect(page.locator('.goal').first()).toHaveText(LONG.en.goals[0] ?? '');
   });
 
   test('one step left, and the goal is not met', async ({ page }) => {
@@ -115,16 +118,16 @@ test('in Spanish, and switching to English keeps the code typed', async ({ brows
   const page = await context.newPage();
   await page.goto('/#level/the-long-corridor');
   await waitReady(page);
-  await expect(page.locator('.level-title')).toHaveText('El camino largo');
-  await expect(page.locator('.goal').first()).toHaveText('Llega al pie de los escalones.');
-  await expect(page.locator('.cm-content')).toContainText('# Dile a la acción cuántos pasos debe dar.');
+  await expect(page.locator('.level-title')).toHaveText(LONG.es.title);
+  await expect(page.locator('.goal').first()).toHaveText(LONG.es.goals[0] ?? '');
+  await expect(page.locator('.cm-content')).toContainText(LONG.es.starting_code.trim());
   await expect(page.locator('#run')).toHaveText('Ejecutar');
 
   await page.locator('#language').selectOption('en');
-  await expect(page.locator('.level-title')).toHaveText('The long path');
-  await expect(page.locator('.cm-content')).toContainText('# Tell the action how many steps to take.');
+  await expect(page.locator('.level-title')).toHaveText(LONG.en.title);
+  await expect(page.locator('.cm-content')).toContainText(LONG.en.starting_code.trim());
   await expect(page.locator('#run')).toHaveText('Run');
-  await expect(page).toHaveTitle('Kydux — The long path');
+  await expect(page).toHaveTitle(`Kydux — ${LONG.en.title}`);
 
   await setCode(page, 'wizard.move_left(2)');
   await page.locator('#run').click();

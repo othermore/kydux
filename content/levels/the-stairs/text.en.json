@@ -1,17 +1,17 @@
 {
   "title": "The stairs",
   "goals": [
-    "Climb to the landing.",
-    "Do not bump into anything.",
-    "Do it in fewer than 5 lines."
+    "Reach the landing.",
+    "Never bump into anything.",
+    "In fewer than 5 lines."
   ],
   "starting_code": "# This program reaches the landing but bumps twice. Make it better!\nwizard.move_up(3)\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(2)\n",
   "hints": [
-    "Watch your wizard walk. Your wizard bumps into the wall when moving up.",
-    "The numbers in both `move_up` actions are too big.",
-    "Change the number in both `move_up` actions to a 2."
+    "Two of the arguments are too big, which makes you bump into things.",
+    "Look at the first instruction and the third instruction. How many steps should they really take?",
+    "Change the first and third arguments to two instead of three."
   ],
-  "intro": "My program climbs the stone steps to the landing. It bumps into the wall twice because two numbers are too big. You can make it better!",
-  "outro": "Perfect! We are back at the gate, without any bumps.",
-  "learned": "Now you know more about how much, which programmers call arguments."
+  "intro": "My program climbs the steps to the landing beside the gate, but the wizard bumps into things twice! Can you make the code better?",
+  "outro": "Perfect! We made it up to the landing without a single bump.",
+  "learned": "Now you know that a program that works can still be made better, here by giving each move the argument it needs."
 }

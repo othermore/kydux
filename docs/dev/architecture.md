@@ -23,7 +23,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/runtime/  the worker that holds Pyodide, and the page's side of it
   src/engine/   the scene in Phaser, where everything stands before a run
                 (layout.ts), what an actor sees (sight.ts, the same rule as the
-                world's, tested on tests/fixtures/sight.json), the playback, and
+                world's, tested on tests/fixtures/sight.json), a stair's state at
+                a tick (stairs.ts, the same rule as the world's), the playback, and
                 the words the scene shows (words.ts, why an action failed);
                 the looks a wizard may have (looks.ts) and the figures drawn
                 until the art comes (placeholders.ts)
@@ -733,8 +734,9 @@ one overturns stays, marked as superseded.
   actors are the castle's shape, and are seen. `kirra` makes a `light`
   event, the world's, and lights the room for the rest of the run; in a
   lit room it does nothing. A teacher's sight is not darkness's
-  business: Dask carries a lantern. Rules out darkness that moves with the
-  wizard, which a child cannot reason about from the code.
+  business: Dask carries a lantern. What is seen is what is near the
+  wizard now, which the code can ask about; rules out a fog that
+  remembers where the wizard has been, which it cannot.
 - **D53 — A stair comes and goes, and `osto` holds it.** Decided
   2026-10-21 (sprint-9.md), built the same day. A thing of kind `stair`,
   with a whole `period`, lies on a floor tile and is in place for

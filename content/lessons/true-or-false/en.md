@@ -36,7 +36,7 @@ It is not `=`.
 One `=` gives a value a name.
 Two, `==`, ask a question.
 
-`not` turns the answer round: `not door.locked` is `True` when the door is open to a hand.
+`not` turns the answer round: `not door.locked` is `True` when the door is not locked.
 
 An action can answer too:
 

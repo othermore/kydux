@@ -22,6 +22,7 @@ The lines under it, moved in by four spaces, run only when the answer is `True`.
 The four spaces say which lines belong to the `if`.
 
 `wizard.wait()` makes the wizard stand still for one tick, while the world goes on.
+A tick is one step of the castle's clock: every action the wizard does takes one.
 
 The line that is not moved in runs every time, after the `if`.
 

@@ -22,6 +22,7 @@ Las líneas de debajo, metidas cuatro espacios, solo se hacen cuando la respuest
 Los cuatro espacios dicen qué líneas son del `if`.
 
 `wizard.wait()` hace que {el mago|la maga} se quede quiet{o|a} un tick, mientras el mundo sigue.
+Un tick es un paso del reloj del castillo: cada acción {del mago|de la maga} dura uno.
 
 La línea que no está metida se hace siempre, después del `if`.
 
@@ -34,8 +35,8 @@ En una, Dask mira hacia otro lado.
 En la otra, mira hacia aquí.
 
 El mismo programa tiene que superar las dos.
-Un programa que solo camina te deja ver en una de ellas.
-Un programa que solo espera te deja ver en la otra.
+Con un programa que solo camina, te ven en una de ellas.
+Con un programa que solo espera, te ven en la otra.
 
 ---
 

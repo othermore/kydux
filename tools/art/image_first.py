@@ -3,22 +3,32 @@
 art demo: the painting cut into the ground and the things that stand up, by
 difference matting.
 
-    tools/art/image_first.py
+    tools/art/image_first.py [<source folder> <out folder>]
 
-From art/raw/image-first/: the painting without its grid (an edit of the
-gridded one Gemini drew first), the same picture with only the ground left (a
-second and third edit: no trees, bushes, rocks, fences, walls or gates), the
-grid found in the gridded painting (grid.json, map_from_image.py) and the
-cells marked by hand (marks.txt). Writes art/raw/demo/field/:
+From art/raw/image-first/, or the source folder given: the painting without
+its grid (an edit of the gridded one Gemini drew first), the same picture
+with only the ground left (a second and third edit: no trees, bushes, rocks,
+fences, walls or gates), the grid found in the gridded painting (grid.json,
+map_from_image.py) and the cells marked by hand (marks.txt). Writes
+art/raw/demo/field/, or the out folder given:
 
-- ground.png: the ground, with the shadows of what stands up painted back into
-  it, so that a shadow lies under a figure, never over it;
+- ground.png: the painting itself, with the ground alone under what opens or
+  is picked up (a gate's leaf and the shadow of its bars, a sealed door, the
+  wand), so that a shadow lies under a figure, never over it, and nothing is
+  missing where a cut-out falls short;
 - baked.png: the gridded painting, for comparing the grid Gemini drew;
 - one layer for each row of cells, layer-<row>.png: the pixels of what stands
   up, cut out with transparency, whose foot is on that row;
 - gate.png, seal.png, wand.png: the school's gate, the sealed gate and the wand,
   each cut out apart, for the page to take away when it opens or is picked up;
 - field.json: where each layer goes and on which row it stands.
+
+A source folder may hold cut.json, which names its pictures (`gridded`,
+`nogrid`, `ground`), the boxes of the gate, the seal and the wand in cells
+(`boxes`), the rows where the walls' tops begin (`cuts`), the row above which
+the castle is left as ground (`castle`), the castle door's box (`door`), and
+anything else for the page (`page`: the levels it plays, where the seal glows,
+where the wand lies); without it, the first painting's are taken.
 
 The cut-out is the difference between the painting and its ground. A pixel
 that differs strongly belongs to a thing, and stands on the row of the first
@@ -43,8 +53,8 @@ OUT = REPO / "art" / "raw" / "demo" / "field"
 TILE = 64
 #: Worked at twice the page's size, then brought down, for soft edges.
 WORK = 2
-#: What no one walks on and stands up: trees and bushes, rocks, fences, walls.
-STANDING = set("trf#")
+#: What no one walks on and stands up: trees and bushes, rocks, fences, walls, a flat stone.
+STANDING = set("trf#o")
 #: The things the page changes, each by its box in cells: (x0, y0, x1, y1).
 BOXES = {
     "gate": (7.18, 16.2, 9.82, 19.55),
@@ -102,6 +112,17 @@ def rgba(image: np.ndarray, alpha: np.ndarray) -> Image.Image:
 SMALL = 32
 #: Where the walls' tops begin, in rows: a thing never holds together across them.
 CUTS = (10.55, 16.6)
+#: The first painting's settings; another painting's are in its folder's cut.json.
+DEFAULTS = {
+    "gridded": "image-first-field.png",
+    "nogrid": "image-first-field-nogrid.png",
+    "ground": "image-first-field-ground-2.png",
+    "boxes": BOXES,
+    "cuts": CUTS,
+    "castle": 6.75,
+    "door": [7.62, 4.12, 9.44, 6.62],
+    "page": {},
+}
 
 
 def groundlike(image: np.ndarray) -> np.ndarray:
@@ -180,7 +201,10 @@ def feet(marks: list[str], height: int, width: int, tile: int) -> np.ndarray:
 
 
 def grouped(
-    mask: np.ndarray, marks: list[str]
+    mask: np.ndarray,
+    marks: list[str],
+    cuts: tuple[float, ...] = CUTS,
+    wand_box: tuple[float, float, float, float] = BOXES["wand"],
 ) -> tuple[np.ndarray, np.ndarray, dict[int, int], np.ndarray]:
     """The things of the mask, found at SMALL pixels a cell: each one's number,
     the holes inside them, each one's foot, the lowest row of a cell no one walks
@@ -201,13 +225,18 @@ def grouped(
     holes = whole & ~small
     # A thing never holds together across a wall's top: the rows there are left
     # out while the things are numbered, and take the number of the pixel below.
+    # A cut is a row, or [row, first column, last column] for a wall's top that
+    # runs only between two trees whose crowns rise over it.
     cut = whole.copy()
-    lines = [round(c * SMALL) for c in CUTS]
-    for line in lines:
-        cut[line] = False
+    lines = []
+    for c in cuts:
+        row, x0, x1 = (c, 0, columns) if isinstance(c, int | float) else c
+        lines.append((round(row * SMALL), round(x0 * SMALL), round(x1 * SMALL)))
+    for line, x0, x1 in lines:
+        cut[line, x0:x1] = False
     lab = labels(cut)
-    for line in lines:
-        lab[line] = np.where(whole[line], lab[line + 1], 0)
+    for line, x0, x1 in lines:
+        lab[line, x0:x1] = np.where(whole[line, x0:x1], lab[line + 1, x0:x1], 0)
     standing = np.array([[ch in STANDING for ch in row] for row in marks])
     foot: dict[int, int] = {}
     # The cells each thing stands on, to join the parts of one tree.
@@ -236,7 +265,7 @@ def grouped(
             low = under[under[:, 0] == foot[number]]
             trunks.setdefault((foot[number], int(low[0][1])), []).append(number)
         # The flat stone the wand lies on stands on cells walked on, and is a thing.
-        x0, y0, x1, y1 = BOXES["wand"]
+        x0, y0, x1, y1 = wand_box
         box = part[round(y0 * SMALL) : round(y1 * SMALL), round(x0 * SMALL) : round(x1 * SMALL)]
         if foot[number] < 0 and box.mean() > 0.2:
             foot[number] = int(round(y1 - 0.5))
@@ -250,16 +279,18 @@ def grouped(
         x0, x1 = max(0, round((col - 1.4) * SMALL)), round((col + 2.4) * SMALL)
         window[: round((row + 0.8) * SMALL), x0:x1] = True
         part = np.isin(lab, numbers) & window
-        spans = np.zeros_like(part)
+        # Inside the crown is what lies between its edges both across and down: a
+        # pixel between them only one way is beside the crown, the lawn by it.
+        spans = np.ones_like(part)
         for axis in (0, 1):
             seen = part.any(axis=axis)
             first = np.argmax(part, axis=axis)
             last = part.shape[axis] - 1 - np.argmax(np.flip(part, axis=axis), axis=axis)
             index = np.arange(part.shape[axis])
             if axis == 0:
-                spans |= (index[:, None] >= first) & (index[:, None] <= last) & seen
+                spans &= (index[:, None] >= first) & (index[:, None] <= last) & seen
             else:
-                spans |= (
+                spans &= (
                     (index[None, :] >= first[:, None])
                     & (index[None, :] <= last[:, None])
                     & seen[:, None]
@@ -275,8 +306,10 @@ def grouped(
 def leaf(painting: np.ndarray, mask: np.ndarray, name: str, inside: np.ndarray) -> np.ndarray:
     """The part of a boxed thing that opens or is picked up. A gate or a door is
     everything that differs from the ground in its box, which is drawn tight
-    round the leaf, and its dark iron, wood and rune besides; the wand is the
-    brown wood in its box that differs from the ground."""
+    round the leaf, and its dark iron, wood and rune besides; the wand is what in
+    its box, drawn tight round it, differs from the ground and is the wand's own:
+    its brown wood, much redder than blue and redder than green, and its dark
+    outline, never the grey or pink stone it lies on nor the grass."""
     hsv = np.array(Image.fromarray(painting).convert("HSV")).astype(np.int16)
     sat, v = hsv[..., 1], hsv[..., 2]
     p = painting.astype(np.int16)
@@ -286,7 +319,9 @@ def leaf(painting: np.ndarray, mask: np.ndarray, name: str, inside: np.ndarray) 
     elif name == "seal":
         found = mask | ((r > b + 25) & (v < 170) & (sat > 70)) | ((b > r + 40) & (v > 120))
     else:
-        found = mask & (r > g + 10) & (r > b + 40) & (r > 90)
+        # Wood is much redder than blue, and redder than green; the stone, grey or
+        # pink in the light, and the grass are not.
+        found = mask & (((r > b + 45) & (r > g)) | (v < 80))
     found &= inside
     # Closed over its small gaps, opened of its specks, kept in its box.
     image = Image.fromarray(found.astype(np.uint8) * 255)
@@ -295,21 +330,26 @@ def leaf(painting: np.ndarray, mask: np.ndarray, name: str, inside: np.ndarray) 
     return (np.array(image) > 0) & inside
 
 
-def build() -> Path:
-    grid = json.loads((SOURCE / "grid.json").read_text())
-    marks = [r for r in (SOURCE / "marks.txt").read_text().splitlines() if r]
+def build(source: Path = SOURCE, out: Path = OUT) -> Path:
+    settings = dict(DEFAULTS)
+    if (source / "cut.json").is_file():
+        settings.update(json.loads((source / "cut.json").read_text()))
+    boxes = {name: tuple(box) for name, box in settings["boxes"].items()}
+    grid = json.loads((source / "grid.json").read_text())
+    marks = [r for r in (source / "marks.txt").read_text().splitlines() if r]
     rows, columns = len(marks), len(marks[0])
     tile = TILE * WORK
 
     def read(name: str, size: int) -> Image.Image:
-        return aligned(Image.open(SOURCE / name), grid, columns, rows, size)
+        return aligned(Image.open(source / name), grid, columns, rows, size)
 
-    painting = np.array(read("image-first-field-nogrid.png", tile))
-    ground = np.array(read("image-first-field-ground-2.png", tile))
+    painting = np.array(read(settings["nogrid"], tile))
+    ground = np.array(read(settings["ground"], tile))
     mask = difference(painting, ground) & ~groundlike(painting)
     # The castle is ground: nothing of it is cut out, down to the foot of its walls.
-    mask[: round(6.75 * tile)] = False
-    lab, holes, foot, reach = grouped(mask, marks)
+    castle = round(settings["castle"] * tile)
+    mask[:castle] = False
+    lab, holes, foot, reach = grouped(mask, marks, tuple(settings["cuts"]), boxes["wand"])
     # Each pixel of a thing stands on its tree's trunk, within a tree's reach, or
     # else on the first cell no one walks on at or below it.
     scale = tile // SMALL
@@ -336,32 +376,39 @@ def build() -> Path:
     darkened = ((ratio.max(axis=2) - ratio.min(axis=2)) < 0.16) & (ratio.mean(axis=2) < 0.93)
     lying = on_walked & (depth == own_row) & (trunk < 0) & darkened
     things = (mask | body | up(holes)) & of_thing & (own_row <= depth) & ~lying
-    shade = mask & ~things
-    # What opens, or is picked up, is its leaf alone, found by its colour in its
-    # box: the gate's dark iron bars, the sealed door's brown wood and its blue
-    # rune, the wand's brown wood; its frame, the pillars and the arch, stays.
-    # Under a leaf lies only the ground.
-    leaves = {
-        name: leaf(painting, mask, name, box_mask(things.shape, box, tile))
-        for name, box in BOXES.items()
-    }
+    # What opens, or is picked up, is its leaf, found by its colour in its box:
+    # the gate's dark iron bars, the sealed door's brown wood and its blue rune,
+    # the wand's brown wood; and, for a gate or a door, whatever else of the
+    # things lies in its box, which is drawn tight round it; its frame, the
+    # pillars and the arch, stays.
+    leaves = {}
+    for name, box in boxes.items():
+        inside = box_mask(things.shape, box, tile)
+        part = leaf(painting, mask, name, inside)
+        if name != "wand":
+            part |= things & inside
+            things |= part
+        leaves[name] = part
+    # The floor is the painting itself: what stands up is drawn over it again, cut
+    # out, in front of whoever is behind it, so that nothing is missing where a cut
+    # falls short. Only under what opens, or is picked up, lies the ground alone,
+    # and under a gate the bars' shadow on the path goes with it.
+    bare = np.zeros_like(things)
     for name, part in leaves.items():
         grown = (
             np.array(Image.fromarray(part.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(9)))
             > 0
         )
-        shade &= ~grown
-        if name != "wand":
-            things |= part
-    OUT.mkdir(parents=True, exist_ok=True)
-    floor = ground.copy()
-    floor[shade] = painting[shade]
-    # Above the castle's line nothing is cut out: the ground there is the painting.
-    castle = round(6.75 * tile)
-    floor[:castle] = painting[:castle]
+        bare |= grown
+        if name == "gate":
+            x0, y0, x1, y1 = boxes[name]
+            bare |= box_mask(bare.shape, (x0, y0, x1, y1 + 0.8), tile)
+    out.mkdir(parents=True, exist_ok=True)
+    floor = painting.copy()
+    floor[bare] = ground[bare]
     page = (columns * TILE, rows * TILE)
-    Image.fromarray(floor).resize(page, Image.LANCZOS).save(OUT / "ground.png")
-    read("image-first-field.png", TILE).save(OUT / "baked.png")
+    Image.fromarray(floor).resize(page, Image.LANCZOS).save(out / "ground.png")
+    read(settings["gridded"], TILE).save(out / "baked.png")
     # Soft edges: the thing's mask a little blurred, as alpha.
     soft = Image.fromarray(things.astype(np.uint8) * 255).filter(ImageFilter.GaussianBlur(1.2))
     alpha = np.array(soft).astype(np.float32) / 255
@@ -369,18 +416,18 @@ def build() -> Path:
     alpha[~things & ~mask] = 0.0
     layers = []
     taken = np.zeros_like(things)
-    for name, box in BOXES.items():
+    for name, box in boxes.items():
         part = leaves[name]
         alpha[part] = 1.0
         image = rgba(painting, alpha * part)
         bbox = image.getbbox()
-        image.crop(bbox).save(OUT / f"{name}.png")
+        image.crop(bbox).save(out / f"{name}.png")
         row = int(round(box[3] - 0.5))
         layers.append({"name": name, "file": f"{name}.png", "at": list(bbox[:2]), "row": row})
         taken |= part
     rest = things & ~taken
     # Under the wand, the stone it lay on: the stone's grey, taken from round it.
-    stone = box_mask(things.shape, BOXES["wand"], tile)
+    stone = box_mask(things.shape, boxes["wand"], tile)
     under = stone & taken
     p = painting.astype(np.int16)
     greyish = (p.max(axis=2) - p.min(axis=2)) < 30
@@ -393,7 +440,7 @@ def build() -> Path:
         bbox = image.getbbox()
         if not bbox:
             continue
-        image.crop(bbox).save(OUT / f"layer-{row}.png")
+        image.crop(bbox).save(out / f"layer-{row}.png")
         layers.append(
             {"name": f"row {row}", "file": f"layer-{row}.png", "at": list(bbox[:2]), "row": row}
         )
@@ -403,11 +450,16 @@ def build() -> Path:
         "rows": rows,
         "marks": marks,
         "layers": layers,
-        "door": {"box": [7.62, 4.12, 9.44, 6.62]},
+        "door": {"box": list(settings["door"])},
+        "dir": out.name,
+        **settings["page"],
     }
-    (OUT / "field.json").write_text(json.dumps(data, indent=1) + "\n")
-    return OUT / "field.json"
+    (out / "field.json").write_text(json.dumps(data, indent=1) + "\n")
+    return out / "field.json"
 
 
 if __name__ == "__main__":
-    print(build().relative_to(REPO))
+    import sys
+
+    folders = [REPO / arg for arg in sys.argv[1:3]]
+    print(build(*folders).relative_to(REPO))

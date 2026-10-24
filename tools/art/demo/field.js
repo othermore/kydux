@@ -5,16 +5,21 @@
 // wall in front hides who is behind it. The camera follows the wizard down the
 // tall scene; the cells are a pencil grid drawn over the whole scene, which
 // breathes slowly. The wizard and Nuri play chapter 1's nine levels, each from
-// its own start, as art/raw/image-first/levels.md proposes them.
+// its own start, as the painting's levels.md proposes them. There may be several
+// such paintings (window.KYDUX_DEMO.fields, by scene id), each with its own
+// levels; the first one's are below.
 'use strict';
 
-const FIELD = window.KYDUX_DEMO.field;
-const FT = FIELD ? FIELD.tile : 64;
+const FIELDS =
+  window.KYDUX_DEMO.fields ?? (window.KYDUX_DEMO.field ? { 'the-field': window.KYDUX_DEMO.field } : {});
+/** The field shown, and what follows from it: set by useField. */
+let FIELD = null;
+let FT = 64;
 const VIEW_ROWS = 12;
 /** The figures were drawn for 48 pixels a cell. */
-const FIGURE_SCALE = FT / 48;
+let FIGURE_SCALE = FT / 48;
 
-const FIELD_LEVELS = [
+const DEFAULT_LEVELS = [
   { title: 'Práctica 1: La puerta', place: [7, 20, 'right'], friend: [7, 21], actions: [{ walk: 'right', n: 1 }] },
   {
     title: 'Práctica 2: El rodeo',
@@ -68,13 +73,26 @@ const FIELD_LEVELS = [
   },
 ];
 
+let FIELD_LEVELS = DEFAULT_LEVELS;
+
+/** The field to show, by its scene id. */
+function useField(id) {
+  FIELD = FIELDS[id];
+  FT = FIELD.tile;
+  FIGURE_SCALE = FT / 48;
+  FIELD_LEVELS = FIELD.levels ?? DEFAULT_LEVELS;
+}
+
 function fieldImage(name) {
-  return IMG[`field:${name}`];
+  return IMG[`field:${FIELD.dir ?? 'field'}/${name}`];
 }
 
 function loadField() {
-  if (!FIELD) return Promise.resolve();
-  const files = ['ground.png', 'baked.png', ...FIELD.layers.map((layer) => layer.file)];
+  const files = Object.values(FIELDS).flatMap((field) =>
+    ['ground.png', 'baked.png', ...field.layers.map((layer) => layer.file)].map(
+      (file) => `${field.dir ?? 'field'}/${file}`,
+    ),
+  );
   return Promise.all(
     files.map(
       (file) =>
@@ -82,7 +100,7 @@ function loadField() {
           const img = new Image();
           img.onload = () => resolve();
           img.onerror = () => resolve();
-          img.src = `field/${file}`;
+          img.src = file;
           IMG[`field:${file}`] = img;
         }),
     ),
@@ -138,8 +156,10 @@ class FieldWorld {
     this.opening = new Set();
     this.carried = false;
     this.inside = 0;
-    this.wizard = { x: 7, y: 20, facing: 'right', from: null, to: null, t: 0, walked: 0, alpha: 1 };
-    this.friend = { x: 7, y: 21, facing: 'right', from: null, to: null, t: 0, walked: 0, alpha: 1 };
+    const [wx, wy, facing] = FIELD_LEVELS[0].place;
+    const [fx, fy] = FIELD_LEVELS[0].friend;
+    this.wizard = { x: wx, y: wy, facing, from: null, to: null, t: 0, walked: 0, alpha: 1 };
+    this.friend = { x: fx, y: fy, facing, from: null, to: null, t: 0, walked: 0, alpha: 1 };
     this.fade = 0;
     this.begin();
   }
@@ -265,7 +285,8 @@ class FieldWorld {
       this.inside = Math.min(1, this.actionTime / 1.2);
       wiz.alpha = Math.max(0, 1 - this.actionTime / 0.5);
       const f = this.friend;
-      if (this.actionTime > 0.35 && !f.to && f.y > 6) this.start(f, 'up');
+      const doorRow = Math.floor(FIELD.door.box[3]);
+      if (this.actionTime > 0.35 && !f.to && f.y > doorRow) this.start(f, 'up');
       if (this.actionTime > 0.7) f.alpha = Math.max(0, 1 - (this.actionTime - 0.7) / 0.6);
       if (this.actionTime >= 2.4) next();
     }
@@ -332,9 +353,12 @@ class FieldView {
       if (layer.name === 'seal') alpha = 1 - world.open.seal;
       if (layer.name === 'wand' && world.carried) alpha = 0;
       if (alpha <= 0) continue;
+      // What opens or is picked up is drawn over the rest of its row: the wand
+      // over the stone it lies on.
+      const own = ['gate', 'seal', 'wand'].includes(layer.name);
       items.push({
         key: layer.row + 1,
-        layer: 0,
+        layer: own ? 0.5 : 0,
         draw: () => {
           ctx.globalAlpha = alpha;
           ctx.drawImage(img, layer.at[0], layer.at[1]);
@@ -347,8 +371,9 @@ class FieldView {
           key: layer.row + 1.01,
           layer: 1,
           draw: () => {
-            const cx = 8.55 * FT;
-            const cy = 11.35 * FT;
+            const [gx, gy] = FIELD.glow ?? [8.55, 11.35];
+            const cx = gx * FT;
+            const cy = gy * FT;
             const g = ctx.createRadialGradient(cx, cy, 2, cx, cy, FT * 0.7);
             g.addColorStop(0, `rgba(120,200,255,${0.45 * (0.8 + 0.2 * Math.sin(world.time * 4))})`);
             g.addColorStop(1, 'rgba(120,200,255,0)');

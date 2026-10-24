@@ -20,6 +20,23 @@ mkdirSync(shots, { recursive: true });
 
 /** name: the page's query. */
 const SHOTS = {
+  'image-first-3-start': 'scene=the-field-3&t=0.6',
+  'image-first-3-corner': 'scene=the-field-3&t=3.6',
+  'image-first-3-behind-log': 'scene=the-field-3&t=4.7',
+  'image-first-3-fix': 'scene=the-field-3&t=7.4',
+  'image-first-3-long': 'scene=the-field-3&t=10.2',
+  'image-first-3-rise': 'scene=the-field-3&t=15.2',
+  'image-first-3-gate': 'scene=the-field-3&t=18.0',
+  'image-first-3-gate-open': 'scene=the-field-3&t=20.2',
+  'image-first-3-wand': 'scene=the-field-3&t=24.3',
+  'image-first-3-seal': 'scene=the-field-3&t=27.0',
+  'image-first-3-behind-wall': 'scene=the-field-3&t=29.4',
+  'image-first-3-door-word': 'scene=the-field-3&t=33.4',
+  'image-first-3-door': 'scene=the-field-3&t=36.4',
+  'image-first-3-after-wand': 'scene=the-field-3&t=26.0',
+  'image-first-3-pixellab': 'scene=the-field-3&wizard=pixellab&t=0.6',
+  'image-first-3-grid': 'scene=the-field-3&t=0.6',
+  'image-first-3-nogrid': 'scene=the-field-3&grid=0&t=0.6',
   'image-first-start': 'scene=the-field&t=1.6',
   'image-first-behind-tree': 'scene=the-field&t=2.4',
   'image-first-behind-fence': 'scene=the-field&t=5',

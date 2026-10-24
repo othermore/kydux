@@ -108,11 +108,24 @@ def _http(method: str, url: str, headers: dict, body: dict | None = None) -> dic
         raise ArtError(f"{method} {url}: {error.code} {detail}") from error
 
 
+def gemini_keys() -> list[str]:
+    """The Gemini keys there are: GEMINI_API_KEY, and GEMINI_API_KEY_2 if set,
+    tried in turn while the model is busy."""
+    keys = []
+    for name in ("GEMINI_API_KEY", "GEMINI_API_KEY_2"):
+        try:
+            keys.append(secret(name))
+        except ArtError:
+            pass
+    if not keys:
+        raise ArtError(f"no GEMINI_API_KEY in the environment or in {SECRETS}")
+    return keys
+
+
 def gemini(fields: dict, prompt: str) -> tuple[list[bytes], dict]:
     from google import genai
-    from google.genai import types
+    from google.genai import errors, types
 
-    client = genai.Client(api_key=secret("GEMINI_API_KEY"))
     contents: list = []
     # The images to work from, like a scene's layout guide and a picture of the
     # style, before the words, in the order the prompt names them.
@@ -124,14 +137,24 @@ def gemini(fields: dict, prompt: str) -> tuple[list[bytes], dict]:
         contents.append(types.Part.from_bytes(data=guide.read_bytes(), mime_type="image/png"))
     contents.append(prompt)
     shape = {k: fields[k] for k in ("aspect_ratio", "image_size") if k in fields}
-    answer = client.models.generate_content(
-        model=fields.get("model", "gemini-3.1-flash-image"),
-        contents=contents,
-        config=types.GenerateContentConfig(
-            response_modalities=["IMAGE"],
-            **({"image_config": types.ImageConfig(**shape)} if shape else {}),
-        ),
-    )
+    keys = gemini_keys()
+    for index, key in enumerate(keys):
+        try:
+            # The client is kept while it answers: one dropped at once closes its connection.
+            client = genai.Client(api_key=key)
+            answer = client.models.generate_content(
+                model=fields.get("model", "gemini-3.1-flash-image"),
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    response_modalities=["IMAGE"],
+                    **({"image_config": types.ImageConfig(**shape)} if shape else {}),
+                ),
+            )
+            break
+        except (errors.ServerError, errors.ClientError) as busy:
+            # A busy model, or a key out of quota: the next key, if there is one.
+            if getattr(busy, "code", None) not in (429, 500, 503) or index == len(keys) - 1:
+                raise
     images = [
         part.inline_data.data
         for candidate in answer.candidates or []

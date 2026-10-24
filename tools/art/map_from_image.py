@@ -22,8 +22,8 @@ the grid up with them; the same for the rows.
 The marks are a text file, one line a row of cells, one letter a cell, with
 the letters of scene.json's terrains (`g` grass, `p` path, `#` wall, `.` floor,
 `f` fence, `h` hedge, `s` steps, `b` a bank, `t` a tree's trunk or a bush, `r`
-a rock). A tree blocks only the cell its trunk stands in: its leaves hang over
-cells a figure walks behind. The things are a JSON list in
+a rock, `o` a flat stone a thing may lie on). A tree blocks only the cell its
+trunk stands in: its leaves hang over cells a figure walks behind. The things are a JSON list in
 scene.json's form ({"kind", "id", "at": [x, y]}).
 """
 
@@ -49,6 +49,7 @@ TERRAINS = {
     "b": {"kind": "bank", "walk": False, "sight": True},
     "t": {"kind": "tree", "walk": False, "sight": False},
     "r": {"kind": "rock", "walk": False, "sight": False},
+    "o": {"kind": "stone", "walk": False, "sight": True},
 }
 TINTS = {
     "g": (80, 200, 80),
@@ -61,6 +62,7 @@ TINTS = {
     "b": (200, 120, 200),
     "t": (10, 80, 20),
     "r": (130, 130, 140),
+    "o": (200, 200, 210),
 }
 
 

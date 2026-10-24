@@ -446,3 +446,14 @@ def test_the_wand_is_only_its_brown_wood_and_a_gate_all_it_is_in_its_box():
     assert wand[10, 10] and not wand[7, 3]
     gate = image_first.leaf(painting, mask, "gate", inside)
     assert gate[7, 3] and not gate[2, 2]
+
+
+def test_a_flat_stone_is_not_walked_on_but_a_thing_may_lie_on_it(tmp_path):
+    marks = tmp_path / "marks.txt"
+    marks.write_text("ggo\nggg\n", encoding="utf-8")
+    rows = map_from_image.read_marks(marks)
+    map_from_image.scene_files(rows, [{"kind": "wand", "id": "wand", "at": [2, 0]}], tmp_path)
+    scene = json.loads((tmp_path / "scene.json").read_text())
+    assert scene["terrains"]["o"] == {"kind": "stone", "walk": False, "sight": True}
+    # What stands up is cut out of the painting, and the stone with it.
+    assert "o" in image_first.STANDING

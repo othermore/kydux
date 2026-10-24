@@ -105,10 +105,15 @@ def build() -> Path:
     if made:
         paintings["the-gate"] = made.name
     payload = {"scenes": data, "pieces": pieces, "paintings": paintings}
-    # Chapter 1 painted first, cut by tools/art/image_first.py, when it has been.
-    cut = DEMO / "field" / "field.json"
-    if cut.is_file():
-        payload["field"] = json.loads(cut.read_text(encoding="utf-8"))
+    # Chapter 1 painted first, cut by tools/art/image_first.py, when it has been:
+    # the latest painting first, the page's default.
+    fields = {}
+    for scene_id, folder in (("the-field-3", "field-3"), ("the-field", "field")):
+        cut = DEMO / folder / "field.json"
+        if cut.is_file():
+            fields[scene_id] = {"dir": folder, **json.loads(cut.read_text(encoding="utf-8"))}
+    if fields:
+        payload["fields"] = fields
     (DEMO / "scenes.js").write_text(
         "// Made by tools/art/demo.py from content/; not to be edited.\n"
         f"window.KYDUX_DEMO = {json.dumps(payload, indent=1)};\n",
@@ -168,6 +173,19 @@ def compare() -> list[Path]:
         )
         third.save(shots / "compare-image-first.png")
         made.append(shots / "compare-image-first.png")
+    # The third painting, simpler and with the field before the gate, beside the sketch.
+    if (shots / "image-first-3-gate.png").is_file():
+        fourth = side_by_side(
+            [
+                ("the style-B sketch", sketch),
+                (
+                    "chapter 1, the field before the gate",
+                    Image.open(shots / "image-first-3-gate.png"),
+                ),
+            ]
+        )
+        fourth.save(shots / "compare-image-first-3.png")
+        made.append(shots / "compare-image-first-3.png")
     return made
 
 

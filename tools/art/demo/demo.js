@@ -19,13 +19,16 @@ const THEMES = {
 };
 
 const LABELS = {
-  'the-field': 'Capítulo 1: el campo, una pintura',
+  'the-field-3': 'Capítulo 1: el campo ante la verja',
+  'the-field': 'Capítulo 1: el campo, la pintura anterior',
   'the-gate': 'Capítulo 1: la puerta',
   'the-library': 'Capítulo 2: la biblioteca',
   'the-night-passages': 'Capítulo 3: los pasadizos',
 };
 
 const NOTES = {
+  'the-field-3':
+    'Una sola pintura de Gemini, hecha primero y sencilla: sin diagonales, con el campo ante la verja como casi toda la escena, porque allí se encuentran el mago y Nuri y allí empieza el tutorial. Pasada la verja, la varita junto al camino, la verja sellada y el castillo. Lo que se levanta va recortado con transparencia y se dibuja por filas con las figuras. Se juegan los nueve niveles del capítulo 1 propuestos sobre ella. La rejilla es un trazo de lápiz que respira; el botón Rejilla la quita.',
   'the-field':
     'Una sola pintura de Gemini, hecha primero; el mapa sale de ella. Lo que se levanta (árboles, rocas, vallas, muros, las verjas) va recortado con transparencia y se dibuja por filas con las figuras, así que quien pasa por detrás queda tapado. La cámara sigue al mago. Se juegan los nueve niveles del capítulo 1 propuestos sobre esta escena. La rejilla es un trazo de lápiz que respira; el botón Rejilla la quita.',
   'the-gate':
@@ -728,7 +731,8 @@ let field = null;
 function choose(sceneId) {
   view.scene = sceneId;
   field = null;
-  if (sceneId === 'the-field') {
+  if (FIELDS[sceneId]) {
+    useField(sceneId);
     field = new FieldView(canvas);
     if (!['painted', 'baked'].includes(view.variant)) view.variant = 'painted';
     document.getElementById('note').innerHTML = NOTES[sceneId];
@@ -769,7 +773,7 @@ function buttons() {
       holder.append(b);
     }
   };
-  const ids = [...(DATA.field ? ['the-field'] : []), ...Object.keys(DATA.scenes)];
+  const ids = [...Object.keys(FIELDS), ...Object.keys(DATA.scenes)];
   make('scenes', ids.map((id) => [id, LABELS[id]]), view.scene, (id) => choose(id));
   make(
     'variants',
@@ -838,9 +842,9 @@ loadImages().then(() => {
   const params = new URLSearchParams(location.search);
   view.variant = params.get('variant') ?? view.variant;
   view.wizard = params.get('wizard') ?? view.wizard;
-  const first = params.get('scene') ?? (DATA.field ? 'the-field' : 'the-gate');
-  // The field's pencil grid is on unless the address turns it off.
-  view.grid = params.has('grid') ? params.get('grid') === '1' : first === 'the-field';
+  const first = params.get('scene') ?? Object.keys(FIELDS)[0] ?? 'the-gate';
+  // A field's pencil grid is on unless the address turns it off.
+  view.grid = params.has('grid') ? params.get('grid') === '1' : Boolean(FIELDS[first]);
   choose(first);
   if (params.has('t')) {
     view.playing = false;

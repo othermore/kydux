@@ -423,9 +423,15 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.following = 'true';
   }
 
+  /** Whether the camera can zoom a step: never out so far that its window would
+   * reach past the scene's edges and show the frame's colour beside it. */
   canZoomBy(step: 1 | -1): boolean {
     const next = this.zoomStep + step;
-    return next >= 0 && next < ZOOMS.length;
+    const zoom = ZOOMS[next];
+    if (zoom === undefined) return false;
+    if (step > 0) return true;
+    const camera = this.cameras.main;
+    return camera.width / zoom <= this.map.width * TILE && camera.height / zoom <= this.map.height * TILE;
   }
 
   /** The level starting again, seen: a fade to the frame's colour, everything put

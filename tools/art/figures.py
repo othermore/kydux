@@ -15,6 +15,10 @@ outlines, the eyes' darkest and the boots are left as they are. A part takes
 its new colour with its shading kept: each pixel's lightness against the
 part's middle lightness. The looks' colours are app/src/engine/looks.ts's.
 
+Every sheet is steadied before it is used (`steadied`): each frame is shifted
+sideways so that its body lies over its row's standing frame, which keeps a
+figure from swaying as it walks, whatever each frame's drawing or cut did.
+
 Writes content/art/figures/wizard-<look>.webp for every look and the friends'
 sheets named in FRIENDS, from the bases in art/figures/ (BASES), and their list in
 figures.json; --check writes art/raw/figures-check.png, every sheet side by
@@ -168,6 +172,42 @@ def recolour_sheet(
     return Image.fromarray(pixels)
 
 
+def _shifted(cell: np.ndarray, dx: int) -> np.ndarray:
+    """A frame moved `dx` pixels to the right (left when negative)."""
+    out = np.zeros_like(cell)
+    width = cell.shape[1]
+    if dx >= 0:
+        out[:, dx:] = cell[:, : width - dx]
+    else:
+        out[:, : width + dx] = cell[:, -dx:]
+    return out
+
+
+def steadied(sheet: Image.Image, frame: tuple[int, int], reach: int = 20) -> Image.Image:
+    """Every frame moved sideways so that its body lies over its row's standing
+    frame, the second of the row, as far as the two overlap best within `reach`
+    pixels; a casting row (the fifth on) follows the walking row of its way."""
+    pixels = np.array(sheet.convert("RGBA"))
+    fw, fh = frame
+    out = pixels.copy()
+    for row in range(pixels.shape[0] // fh):
+        walking = row % 4
+        standing = pixels[walking * fh : (walking + 1) * fh, fw : 2 * fw, 3] > 128
+        for column in range(3):
+            if row == walking and column == 1:
+                continue
+            cell = pixels[row * fh : (row + 1) * fh, column * fw : (column + 1) * fw]
+            best = max(range(-reach, reach + 1), key=lambda dx: _overlap(cell, standing, dx))
+            out[row * fh : (row + 1) * fh, column * fw : (column + 1) * fw] = _shifted(cell, best)
+    return Image.fromarray(out, "RGBA")
+
+
+def _overlap(cell: np.ndarray, standing: np.ndarray, dx: int) -> int:
+    """How many pixels of a frame moved `dx` lie over the standing frame's."""
+    moved = _shifted(cell[..., 3:] > 128, dx)[..., 0]
+    return int((moved & standing).sum())
+
+
 def from_edit(edited: Image.Image, base: Image.Image, frame: tuple[int, int]) -> Image.Image:
     """A Gemini edit of a base sheet, put back on the base's grid: the edit was asked
     of the base enlarged four times on a magenta canvas of 9:16, centred; it is
@@ -241,8 +281,11 @@ def stacked(top: Image.Image, bottom: Image.Image) -> Image.Image:
 def make(check: bool = False) -> list[Path]:
     about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
     frame = tuple(about["frame"])
-    bases = {key: (Image.open(BASE_DIR / name), hues) for key, (name, hues) in BASES.items()}
-    casts = {key: Image.open(BASE_DIR / name) for key, name in CAST_BASES.items()}
+    bases = {
+        key: (steadied(Image.open(BASE_DIR / name), frame), hues)
+        for key, (name, hues) in BASES.items()
+    }
+    casts = {key: steadied(Image.open(BASE_DIR / name), frame) for key, name in CAST_BASES.items()}
     written = []
     for look_id, look in looks().items():
         base, hues = bases[look["gender"]]

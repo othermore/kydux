@@ -467,6 +467,8 @@ def figures() -> Path:
                 x = c * width + (width - frame.width) // 2
                 y = r * height + height - FOOT - frame.height
                 sheet.alpha_composite(frame, (x, y))
+        # Each frame over its row's standing frame, so that the figure walks steadily.
+        sheet = looks.steadied(sheet, (width, height))
         webp(sheet, looks.BASE_DIR / AS_BASES[name] if name in AS_BASES else out / f"{name}.webp")
     wizard = every["wizard"]["down"][1].height
     data = {

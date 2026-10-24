@@ -978,7 +978,8 @@ one overturns stays, marked as superseded.
   the canvas is at most `VIEW_TILES` (15 by 9) at zoom 1, the tiles at
   their size, and the camera, bounded by the scene, follows the wizard.
   The player zooms with *+* and *−* over the scene or the mouse wheel,
-  through `ZOOMS` (0.5 to 2), and drags the scene to look around, which
+  through `ZOOMS` (0.5 to 2), never out so far that the window would reach
+  past the scene's edges, and drags the scene to look around, which
   lets go of the wizard; a run or a restart brings the camera back to it.
   The scene publishes `data-zoom` and `data-following` for the tests; the
   world's coordinates, which the tests read, do not change with the camera.

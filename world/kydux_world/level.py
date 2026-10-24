@@ -17,7 +17,8 @@ wizard at `start` and the `E` the reach goal wants at `end`, each [x, y];
 Beside the map: `things` (keys, doors, books...) and `actors` (the teacher,
 the ghost, the cat, a friend), each placed by a marker or at x and y, with an
 id the child's code knows it by; `carrying`, the kinds of thing the wizard holds
-from the start (D49); `spells`, the spells that can be cast (D42); `api`,
+from the start (D49); `spells`, the spells that can be cast (D42); `words`,
+the passwords the level gives the child, each a door's (D80); `api`,
 the names the level teaches (D23); `goals`, some of them bonus goals;
 `tick_limit`; `dark`, a room unlit until `kirra` (D52); and `ways`, the ways
 the level is played, each one the same program must win (D51). A level may
@@ -117,6 +118,8 @@ class Level:
     goals_source: str | None = None
     #: The spells that exist in the level, which the wand can cast (D42).
     spells: tuple[str, ...] = ()
+    #: The passwords the level gives the child, for the notebook (D80).
+    words: tuple[str, ...] = ()
     #: Whether the room is dark until `kirra` lights it (D52), and the tiles it
     #: covers: the dark rooms of the level's scene, or, when empty, the whole map (D73).
     dark: bool = False
@@ -213,6 +216,16 @@ class Level:
             if spell not in KNOWN_SPELLS:
                 raise LevelError(f"{level_id}: {spell} is not a spell the world knows")
 
+        words = data.get("words", [])
+        if not isinstance(words, list) or not all(
+            isinstance(word, str) and word.isalpha() and word.islower() for word in words
+        ):
+            raise LevelError(f"{level_id}: words must be a list of words in small letters")
+        passwords = {thing.password for thing in things if thing.password is not None}
+        for word in words:
+            if word not in passwords:
+                raise LevelError(f"{level_id}: {word} is the password of no door here")
+
         dark = data.get("dark", False)
         if not isinstance(dark, bool):
             raise LevelError(f"{level_id}: dark is true or false")
@@ -261,6 +274,7 @@ class Level:
             api=tuple(api),
             goals_source=source,
             spells=tuple(spells),
+            words=tuple(words),
             dark=dark,
             dark_area=frozenset(area),
             kind=kind,

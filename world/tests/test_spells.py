@@ -125,6 +125,14 @@ def test_spells_are_words_in_small_letters():
         Level.from_dict({**HALL, "spells": ["Zelim"]})
 
 
+def test_a_level_gives_the_passwords_of_its_own_doors():
+    assert Level.from_dict({**HALL, "words": ["ambrel"]}).words == ("ambrel",)
+    with pytest.raises(LevelError, match="small letters"):
+        Level.from_dict({**HALL, "words": ["Ambrel"]})
+    with pytest.raises(LevelError, match="password of no door"):
+        Level.from_dict({**HALL, "words": ["osmel"]})
+
+
 #: The castle's door: sealed and keyed by a word, open once both are done.
 CASTLE = {
     "id": "castle",

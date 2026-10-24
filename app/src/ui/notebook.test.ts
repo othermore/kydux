@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type ApiTable, allows, heldObjects, notebookEntries } from './notebook';
+import { type ApiTable, allows, heldObjects, notebookEntries, spellsAndWords } from './notebook';
 
 const TABLE: ApiTable = {
   roles: {
@@ -58,5 +58,15 @@ describe('the notebook', () => {
 
   it('is empty for a level that teaches nothing yet', () => {
     expect(notebookEntries({ id: 'none', api: [] }, TABLE)).toEqual([]);
+  });
+
+  it('lists the spells once the wizard can cast, and the words once it can speak (D80)', () => {
+    const level = { id: 'gate', spells: ['zelim'], known_words: ['ambrel'] };
+    expect(spellsAndWords({ ...level, api: ['wizard.cast', 'wizard.say'] })).toEqual({
+      spells: ['zelim'],
+      words: ['ambrel'],
+    });
+    expect(spellsAndWords({ ...level, api: ['wizard.say'] })).toEqual({ spells: [], words: ['ambrel'] });
+    expect(spellsAndWords({ id: 'none', api: ['wizard.cast'] })).toEqual({ spells: [], words: [] });
   });
 });

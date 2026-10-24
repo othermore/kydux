@@ -4,7 +4,7 @@
     "Abre la verja.",
     "Cruza la verja."
   ],
-  "starting_code": "# Di la contraseña y luego cruza la verja.\n",
+  "starting_code": "# La contraseña es ambrel. Dila y luego cruza la verja.\n",
   "hints": [
     "Tienes que hacer que tu {mago|maga} hable, y luego se mueva.",
     "La contraseña debe escribirse exactamente igual, entre comillas.",

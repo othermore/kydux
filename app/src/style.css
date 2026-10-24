@@ -498,6 +498,35 @@ footer {
   font-size: 17px;
 }
 
+/* The notebook's two tabs (D80): what the wizard can do, and the spells and words. */
+.notebook-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 10px 0 4px;
+  border-bottom: 2px solid var(--border);
+}
+
+.notebook-tab {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.notebook-tab[aria-selected='true'] {
+  background: #f3ead0;
+  color: #1f2330;
+  font-weight: 600;
+}
+
+.notebook-magic em {
+  font-weight: 600;
+}
+
 .notebook h4 {
   margin: 8px 0 2px;
   color: var(--muted);

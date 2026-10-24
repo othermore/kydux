@@ -2,6 +2,8 @@
 // each, the actions and attributes the course has taught up to here (D40),
 // with an example to click and a sentence in the child's language (D30).
 // Nothing not taught yet is shown, and no object that is not in the level.
+// A second tab, once the course has given any, lists the spells and the words
+// (passwords) known up to here, each with what it does (D80).
 
 import type { LevelJson } from '../runtime/protocol';
 import { t } from '../i18n';
@@ -75,6 +77,17 @@ export function notebookEntries(level: LevelJson, table: ApiTable): NotebookEntr
   return entries;
 }
 
+/** The spells and the words the second tab lists (D80): the spells known up to the
+ * level once the wizard can cast, and the words given once the wizard can speak. */
+export function spellsAndWords(level: LevelJson): { spells: string[]; words: string[] } {
+  const api = (level.api as string[] | undefined) ?? [];
+  const list = (key: string) => (level[key] as string[] | undefined) ?? [];
+  return {
+    spells: api.includes('wizard.cast') ? list('spells') : [],
+    words: api.includes('wizard.say') ? list('known_words') : [],
+  };
+}
+
 /** The words the notebook has for a member, from i18n: notebook.<role>.<member>,
  * or notebook_simple.<role>.<member> for its simple example (D60). */
 export function describe(role: string, member: string, simple = false): string {
@@ -98,6 +111,19 @@ export function notebookPanel(
 ): NotebookPanel {
   const node = element('aside', { id: 'notebook', className: 'notebook', hidden: true });
   node.setAttribute('aria-labelledby', 'notebook-title');
+  let tab: 'actions' | 'spells' = 'actions';
+  // A spell or a word, in italics as a word to type, with what it does, and its
+  // example to click: `wizard.cast("zelim")`, `wizard.say("ambrel")`.
+  const magic = (word: string, key: string, action: string) => {
+    const said = `wizard.${action}("${word}")`;
+    const example = element('button', { type: 'button', className: 'example' }, [element('code', {}, [said])]);
+    example.dataset.example = said;
+    example.addEventListener('click', () => onExample(said));
+    return element('li', {}, [
+      example,
+      element('span', { className: 'description' }, [element('em', {}, [word]), `: ${t(`${key}.${word}`)}`]),
+    ]);
+  };
   const draw = () => {
     const entries = notebookEntries(level, table);
     const close = element('button', { id: 'notebook-close', type: 'button', className: 'close' }, [
@@ -138,10 +164,41 @@ export function notebookPanel(
         ]),
       );
     }
-    node.replaceChildren(
-      element('header', {}, [element('h2', { id: 'notebook-title' }, [t('notebook.title')]), close]),
-      ...(sections.length ? sections : [element('p', {}, [t('notebook.nothing')])]),
-    );
+    const actions = sections.length ? sections : [element('p', {}, [t('notebook.nothing')])];
+    const header = element('header', {}, [element('h2', { id: 'notebook-title' }, [t('notebook.title')]), close]);
+    const { spells, words } = spellsAndWords(level);
+    if (spells.length === 0 && words.length === 0) {
+      node.replaceChildren(header, ...actions);
+      return;
+    }
+    const tabs = (['actions', 'spells'] as const).map((key) => {
+      const button = element('button', { id: `notebook-tab-${key}`, type: 'button', className: 'notebook-tab' }, [
+        t(`notebook.tab_${key}`),
+      ]);
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-selected', String(tab === key));
+      button.addEventListener('click', () => {
+        tab = key;
+        draw();
+      });
+      return button;
+    });
+    const tabList = element('div', { className: 'notebook-tabs' }, tabs);
+    tabList.setAttribute('role', 'tablist');
+    const magicList = [
+      ...(spells.length
+        ? [element('h4', {}, [t('notebook.spells')]), element('ul', {}, spells.map((s) => magic(s, 'spells', 'cast')))]
+        : []),
+      ...(words.length
+        ? [element('h4', {}, [t('notebook.words')]), element('ul', {}, words.map((w) => magic(w, 'words', 'say')))]
+        : []),
+    ];
+    const shown = element('div', { id: 'notebook-shown', className: 'notebook-shown' }, [
+      ...(tab === 'actions' ? actions : [element('section', { className: 'notebook-magic' }, magicList)]),
+    ]);
+    shown.setAttribute('role', 'tabpanel');
+    node.dataset.tab = tab;
+    node.replaceChildren(header, tabList, shown);
   };
   draw();
   const panel: NotebookPanel = {

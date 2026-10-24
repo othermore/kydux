@@ -29,6 +29,9 @@
     "wizard.move_down",
     "wizard.say"
   ],
+  "words": [
+    "ambrel"
+  ],
   "goals": [
     {
       "kind": "open",

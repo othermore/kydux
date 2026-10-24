@@ -26,6 +26,10 @@ export interface Course {
   /** For each level of the course, every name taught by it and by the levels
    * before it (D40). */
   known?: Record<string, string[]>;
+  /** For each level of the course, every spell and every word (password) named by
+   * it and by the levels before it (D80). */
+  spells_known?: Record<string, string[]>;
+  words_known?: Record<string, string[]>;
   /** Each item's title, and each chapter's as `chapter:<id>`, by language (12.6). */
   titles?: Record<string, Record<string, string>>;
   /** The game's opening, chapter 1's first story, before the creator (D61, D78). */
@@ -77,6 +81,17 @@ export function next(course: Course, item: string): string | null {
  * for a level outside the course, the level's own `api`. */
 export function knownApi(course: Course, levelId: string, own: readonly string[]): string[] {
   return course.known?.[levelId] ?? [...own];
+}
+
+/** The spells a level may cast, and the words the child has been given, up to it
+ * (D80): what the course has named up to here, or, for a level outside the course,
+ * the level's own. */
+export function knownSpells(course: Course, levelId: string, own: readonly string[]): string[] {
+  return course.spells_known?.[levelId] ?? [...own];
+}
+
+export function knownWords(course: Course, levelId: string, own: readonly string[]): string[] {
+  return course.words_known?.[levelId] ?? [...own];
 }
 
 export function previous(course: Course, item: string): string | null {

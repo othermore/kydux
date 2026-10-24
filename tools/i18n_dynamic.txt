@@ -10,6 +10,12 @@ language.
 notebook.
 things.
 
+# The notebook's second tab says each spell by `spells.${name}` and each word by
+# `words.${name}` (D80); tools/i18n_check.py holds those keys to the world's spells
+# and the levels' words.
+spells.
+words.
+
 # The word for a wizard not yet made, which the words that follow the wizard
 # (app/src/i18n/index.ts, forWizard) read without t(), since t() calls them.
 wizard.no_name

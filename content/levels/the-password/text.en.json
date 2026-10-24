@@ -4,7 +4,7 @@
     "Open the gate.",
     "Walk through the gate."
   ],
-  "starting_code": "# Say the password, then walk through the gate.\n",
+  "starting_code": "# The password is ambrel. Say it, then walk through the gate.\n",
   "hints": [
     "You need to make your wizard speak, and then move.",
     "The password must be exactly as written, inside quotes.",

@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
 
 test.use({ locale: 'en-US' });
@@ -89,4 +90,46 @@ test('a level\'s notebook has nothing the course has not taught yet', async ({ p
   await expect(notebook.locator('[data-example="door.open()"]')).toHaveCount(1);
   await expect(notebook.locator('[data-example="wizard.wait(2)"]')).toHaveCount(0);
   await expect(notebook.locator('[data-example="dask.facing"]')).toHaveCount(0);
+});
+
+test('the notebook\'s second tab has the spells and the words given so far (D80)', async ({ page }) => {
+  // Before any: no tabs.
+  await open(page, 'the-long-corridor');
+  await page.locator('#notebook-open').click();
+  await expect(page.locator('#notebook-tab-spells')).toHaveCount(0);
+
+  // The password's level gives its word, and the comment says it too.
+  await open(page, 'the-password');
+  await expect(page.locator('.cm-content')).toContainText('The password is ambrel.');
+  await page.locator('#notebook-open').click();
+  const notebook = page.locator('#notebook');
+  await expect(notebook).toHaveAttribute('data-tab', 'actions');
+  await page.locator('#notebook-tab-spells').click();
+  await expect(notebook).toHaveAttribute('data-tab', 'spells');
+  await expect(notebook.locator('.notebook-magic em')).toHaveText(['ambrel']);
+  await expect(notebook).toContainText("ambrel: the school's word, which opens its gates.");
+
+  // The way in: the spell learned, the word remembered; a click puts either in the editor.
+  await open(page, 'the-way-in');
+  await page.locator('#notebook-open').click();
+  await page.locator('#notebook-tab-spells').click();
+  await expect(notebook.locator('.notebook-magic em')).toHaveText(['zelim', 'ambrel']);
+  await page.screenshot({ path: fileURLToPath(new URL('./shots/painted/08-notebook-spells.png', import.meta.url)) });
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+End');
+  await notebook.locator('[data-example=\'wizard.cast("zelim")\']').click();
+  await expect(page.locator('.cm-content')).toContainText('wizard.cast("zelim")');
+  await notebook.locator('[data-example=\'wizard.say("ambrel")\']').click();
+  await expect(page.locator('.cm-content')).toContainText('wizard.say("ambrel")');
+});
+
+test('the spells and words in Spanish', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'es-ES' });
+  const page = await context.newPage();
+  await open(page, 'the-way-in');
+  await page.locator('#notebook-open').click();
+  await expect(page.locator('#notebook-tab-spells')).toHaveText('Hechizos y palabras');
+  await page.locator('#notebook-tab-spells').click();
+  await expect(page.locator('#notebook')).toContainText('zelim: rompe el sello de una puerta que tienes al lado.');
+  await context.close();
 });

@@ -1,5 +1,17 @@
 import { version } from '../package.json';
-import { type Course, conceptsAt, courseStart, items, itemHash, knownApi, loadCourse, next, parseItem } from './content/course';
+import {
+  type Course,
+  conceptsAt,
+  courseStart,
+  items,
+  itemHash,
+  knownApi,
+  knownSpells,
+  knownWords,
+  loadCourse,
+  next,
+  parseItem,
+} from './content/course';
 import { loadGuideText } from './content/guide';
 import { LessonNotFound, loadLesson } from './content/lessons';
 import { loadStory, StoryNotFound } from './content/stories';
@@ -322,6 +334,10 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
     // The world, the notebook and the editor's completion all read the level's
     // api: what the course has taught up to here, not only this level (D40).
     loaded.level.api = knownApi(course, id, (loaded.level.api as string[] | undefined) ?? []);
+    // So do the spells (D80). The words given so far go to the notebook alone, as
+    // `known_words`: the world holds a level's own `words` to its own doors.
+    loaded.level.spells = knownSpells(course, id, (loaded.level.spells as string[] | undefined) ?? []);
+    loaded.level.known_words = knownWords(course, id, (loaded.level.words as string[] | undefined) ?? []);
     // The concepts the course has taught up to here, which the notebook follows (D60);
     // a level outside the course is shown as one that knows them all.
     if (course.concepts?.[id]) loaded.level.concepts = conceptsAt(course, id);

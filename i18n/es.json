@@ -188,7 +188,11 @@
       "name": "El nombre propio de la escalera en este nivel.",
       "position": "Dónde está la escalera, en x e y.",
       "in_place": "True cuando un paso hacia la escalera, dado ahora, cae sobre ella."
-    }
+    },
+    "tab_actions": "Acciones",
+    "tab_spells": "Hechizos y palabras",
+    "spells": "Hechizos",
+    "words": "Palabras"
   },
   "start": {
     "welcome": "Te damos la bienvenida al colegio de magia",
@@ -329,5 +333,14 @@
     "bonus": "El objetivo extra cumplido",
     "first_try": "A la primera",
     "kept": "Te quedas con las {n} estrellas que ya tenías."
+  },
+  "spells": {
+    "zelim": "rompe el sello de una puerta que tienes al lado.",
+    "fendra": "atrae hasta tu casilla la cosa más cercana, a tres casillas como mucho y en línea recta.",
+    "kirra": "ilumina la sala oscura en la que estás.",
+    "osto": "detiene un rato una escalera móvil que tienes al lado."
+  },
+  "words": {
+    "ambrel": "la palabra de la escuela, que abre sus puertas."
   }
 }

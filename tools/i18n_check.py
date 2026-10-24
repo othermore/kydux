@@ -10,7 +10,9 @@ Fails, printing file:line: message for each, on:
     (for keys made at run time, like `language.${lang}`);
   - a member of kydux_world.api's table without its words in the notebook,
     notebook.<role>.<member>, a kind of thing without its name, things.<kind>, or
-    words for a member or a kind the world does not have;
+    words for a member or a kind the world does not have; a spell of the world,
+    KNOWN_SPELLS, without spells.<name>, or a word (password) a level gives
+    without words.<name>, or either for one that is not (D80);
   - a level, content/levels/<id>/, without a text.<lang>.json for every language
     in i18n/, or with texts whose keys differ, or with a different number of goals
     than its level.json, or a different number of hints in each language;
@@ -268,7 +270,8 @@ def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
     notebook.<role>.<member> for every member of kydux_world.api's table (D30),
     notebook_simple.<role>.<member> for every action with a simple example (D60), and
     things.<kind> for every kind of thing in kydux_world.level, each language having
-    them all and nothing more."""
+    them all and nothing more; and spells.<name> and words.<name> for the
+    notebook's spells and words (D80)."""
     sys.path.insert(0, str(REPO / "world"))
     from kydux_world import api, level
 
@@ -276,6 +279,12 @@ def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
         f"notebook.{role}.{member}" for role, members in api.MEMBERS.items() for member in members
     }
     wanted |= {f"things.{kind}" for kind in level.THING_KINDS}
+    # The notebook's spells and words (D80): every spell the world casts, and every
+    # word a level gives.
+    wanted |= {f"spells.{spell}" for spell in level.KNOWN_SPELLS}
+    for path in sorted((REPO / "content" / "levels").glob("*/level.json")):
+        given = json.loads(path.read_text(encoding="utf-8")).get("words", [])
+        wanted |= {f"words.{word}" for word in given}
     # An action with a simple example has simple words too (D60).
     wanted |= {
         f"notebook_simple.{role}.{member['name']}"
@@ -289,7 +298,7 @@ def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
             key
             for key in catalog
             if (key.split(".")[0] in ("notebook", "notebook_simple") and key.count(".") == 2)
-            or key.startswith("things.")
+            or key.startswith(("things.", "spells.", "words."))
         }
         for key in sorted(wanted - said):
             findings.append(f"i18n/{lang}.json: lacks {key}, the words for it")

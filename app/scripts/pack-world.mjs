@@ -131,17 +131,24 @@ const chapters = existsSync(chaptersDir)
 // level and by every level before it in the course. The page gives it to the
 // world and to the notebook in place of the level's own `api`, so that an action
 // once learned stays known; the notebook still shows only the objects present.
+// The spells and the words (passwords) known on reaching each level (D80): every
+// one named by that level and by every level before it, for the world and the
+// notebook's second tab, as `known` is for the API.
 // The concepts known on reaching each level (D60): every `concept:<name>` the
 // lessons before it teach, as arguments or comments, which the notebook follows.
 // And each item's number within its chapter and its kind (D56): Lesson 3,
 // Practice 4, so that no text carries a number.
 const readJson = (...path) => JSON.parse(readFileSync(join(repo, 'content', ...path), 'utf8'));
 const known = {};
+const spellsKnown = {};
+const wordsKnown = {};
 const concepts = {};
 const numbers = {};
 /** The game's opening, the story before the creator (D61, D78). */
 let opening = null;
 const taught = new Set();
+const spells = new Set();
+const words = new Set();
 const ideas = new Set();
 for (const chapter of chapters) {
   const counted = {};
@@ -159,8 +166,13 @@ for (const chapter of chapters) {
     numbers[item] = { kind: numbered, n: counted[numbered], chapter: chapters.indexOf(chapter) + 1 };
     if (kind === 'story' && readJson('stories', id, 'story.json').opening === true) opening = item;
     if (kind !== 'level') continue;
-    for (const name of readJson('levels', id, 'level.json').api ?? []) taught.add(name);
+    const level = readJson('levels', id, 'level.json');
+    for (const name of level.api ?? []) taught.add(name);
+    for (const spell of level.spells ?? []) spells.add(spell);
+    for (const word of level.words ?? []) words.add(word);
     known[id] = [...taught];
+    spellsKnown[id] = [...spells];
+    wordsKnown[id] = [...words];
     concepts[id] = [...ideas];
   }
 }
@@ -199,7 +211,11 @@ for (const chapter of chapters) {
 }
 writeFileSync(
   join(content, 'course.json'),
-  `${JSON.stringify({ chapters, known, concepts, numbers, titles, opening }, null, 2)}\n`,
+  `${JSON.stringify(
+    { chapters, known, spells_known: spellsKnown, words_known: wordsKnown, concepts, numbers, titles, opening },
+    null,
+    2,
+  )}\n`,
 );
 
 // The table of what the child can type, from the world itself (D30): the

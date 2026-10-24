@@ -22,7 +22,8 @@ the grid up with them; the same for the rows.
 The marks are a text file, one line a row of cells, one letter a cell, with
 the letters of scene.json's terrains (`g` grass, `p` path, `#` wall, `.` floor,
 `f` fence, `h` hedge, `s` steps, `b` a bank, `t` a tree's trunk or a bush, `r`
-a rock, `o` a flat stone a thing may lie on). A tree blocks only the cell its
+a rock, `o` a flat stone a thing may lie on, `k` a bookcase and `u` furniture,
+which sight passes and a thing may lie on). A tree blocks only the cell its
 trunk stands in: its leaves hang over cells a figure walks behind. The things are a JSON list in
 scene.json's form ({"kind", "id", "at": [x, y]}).
 """
@@ -50,6 +51,8 @@ TERRAINS = {
     "t": {"kind": "tree", "walk": False, "sight": False},
     "r": {"kind": "rock", "walk": False, "sight": False},
     "o": {"kind": "stone", "walk": False, "sight": True},
+    "k": {"kind": "bookcase", "walk": False, "sight": True},
+    "u": {"kind": "furniture", "walk": False, "sight": True},
 }
 TINTS = {
     "g": (80, 200, 80),
@@ -63,6 +66,8 @@ TINTS = {
     "t": (10, 80, 20),
     "r": (130, 130, 140),
     "o": (200, 200, 210),
+    "k": (150, 60, 200),
+    "u": (240, 120, 160),
 }
 
 
@@ -189,6 +194,9 @@ def main() -> int:
     s.add_argument("out", type=Path)
     s.add_argument("--cells", default="32x18")
     s.add_argument("--marks", type=Path)
+    s.add_argument(
+        "--grid", type=Path, help="a grid.json found before, for a painting without its grid"
+    )
     m = sub.add_parser("scene")
     m.add_argument("marks", type=Path)
     m.add_argument("things", type=Path)
@@ -202,7 +210,8 @@ def main() -> int:
         return 0
     cells = tuple(int(n) for n in args.cells.split("x"))
     image = Image.open(args.painting)
-    grid = find_grid(image, cells)
+    given = getattr(args, "grid", None)
+    grid = json.loads(given.read_text()) if given else find_grid(image, cells)
     if args.command == "grid":
         print(json.dumps(grid))
         return 0

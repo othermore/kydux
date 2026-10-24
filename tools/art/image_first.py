@@ -54,8 +54,9 @@ OUT = REPO / "art" / "raw" / "demo" / "field"
 TILE = 64
 #: Worked at twice the page's size, then brought down, for soft edges.
 WORK = 2
-#: What no one walks on and stands up: trees and bushes, rocks, fences, walls, a flat stone.
-STANDING = set("trf#o")
+#: What no one walks on and stands up: trees and bushes, rocks, fences, walls, a flat
+#: stone, bookcases and furniture.
+STANDING = set("trf#oku")
 #: The things the page changes, each by its box in cells: (x0, y0, x1, y1).
 BOXES = {
     "gate": (7.18, 16.2, 9.82, 19.55),

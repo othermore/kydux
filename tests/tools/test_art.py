@@ -520,3 +520,71 @@ def test_the_exported_figures_are_sheets_of_four_ways_and_three_frames():
     for name in data["figures"]:
         sheet = Image.open(FIGURES / f"{name}.webp")
         assert sheet.size == (3 * width, 4 * height), name
+
+
+# A painted interior exported for the game (interior.py): each pixel on the row
+# it stands on, by the cells no one walks on.
+
+import interior  # noqa: E402
+
+CELL = interior.CELL
+
+
+def test_a_bookcase_s_top_rising_into_the_cell_above_stands_on_its_row():
+    marks = ["..", "k."]
+    rising = np.zeros((2 * CELL, 2 * CELL), dtype=bool)
+    rising[CELL - 30 : CELL, 5:15] = True  # the top, joined to the bookcase below
+    rising[5:10, 5:15] = True  # a lamp high up, joined to nothing
+    rising[CELL - 30 : CELL, CELL + 5 : CELL + 15] = True  # above a floor cell
+    foot = interior.feet(marks, rising)
+    assert foot[CELL - 10, 10] == 1 and foot[CELL - 28, 10] == 1
+    assert foot[7, 10] == -1 and foot[CELL - 10, CELL + 10] == -1
+    assert foot[CELL + 5, 5] == 1
+
+
+def test_an_interior_is_cut_by_rows_and_what_is_picked_up_leaves_no_ghost(tmp_path):
+    floor = np.full((2 * CELL, 2 * CELL, 3), 120, dtype=np.uint8)
+    painting = floor.copy()
+    painting[CELL:, :CELL] = (150, 90, 40)  # a bookcase on row 1
+    painting[CELL - 30 : CELL, :CELL] = (170, 110, 50)  # its top, over the cell above
+    without = painting.copy()
+    painting[30:60, CELL + 30 : CELL + 60] = (240, 200, 40)  # a key on row 0
+    for name, image in (("painting", painting), ("floor", floor), ("without", without)):
+        Image.fromarray(image).save(tmp_path / f"{name}.png")
+    (tmp_path / "marks.txt").write_text("..\nk.\n")
+    (tmp_path / "grid.json").write_text(
+        json.dumps({"x": {"spacing": CELL, "offset": 0}, "y": {"spacing": CELL, "offset": 0}})
+    )
+    (tmp_path / "export.json").write_text(
+        json.dumps(
+            {
+                "painting": "painting.png",
+                "floor": "floor.png",
+                "source": "A test.\n",
+                "things": {
+                    "key": {
+                        "box": [1, 0, 2, 1],
+                        "row": 0,
+                        "solid": True,
+                        "without": "without.png",
+                        "states": {"lying": "painting", "gone": None},
+                    }
+                },
+            }
+        )
+    )
+    out = tmp_path / "out"
+    art = json.loads(interior.build(tmp_path, out).read_text())
+    assert art["size"] == [2, 2] and art["cell"] == CELL
+    (row,) = art["rows"]
+    strip = Image.open(out / row["image"])
+    # The bookcase's row, from its top in the cell above down to its own bottom edge.
+    assert row["row"] == 1 and row["top"] <= CELL - 28
+    assert row["top"] + strip.height == 2 * CELL
+    key = art["things"]["key"]
+    assert (key["left"], key["top"]) == (CELL, 0)
+    lying = np.array(Image.open(out / key["states"]["lying"]))
+    assert lying.shape[0] <= CELL and lying[45, 45, 3] == 255
+    ground = np.array(Image.open(out / art["ground"]).convert("RGB")).astype(int)
+    assert abs(ground[45, CELL + 45] - 120).max() < 12
+    assert (out / art["source"]).read_text() == "A test.\n"

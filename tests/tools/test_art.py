@@ -588,3 +588,39 @@ def test_an_interior_is_cut_by_rows_and_what_is_picked_up_leaves_no_ghost(tmp_pa
     ground = np.array(Image.open(out / art["ground"]).convert("RGB")).astype(int)
     assert abs(ground[45, CELL + 45] - 120).max() < 12
     assert (out / art["source"]).read_text() == "A test.\n"
+
+
+def test_a_look_recolours_its_parts_and_keeps_the_rest():
+    import figures
+
+    frame = np.zeros((40, 20, 4), dtype=np.uint8)
+    frame[2:8, 6:14] = (40, 70, 190, 255)  # the hat, blue
+    frame[8:10, 4:16] = (230, 180, 40, 255)  # its band, gold
+    frame[10:16, 7:13] = (233, 185, 143, 255)  # the face, skin
+    frame[16:34, 5:15] = (40, 70, 190, 255)  # the robe, blue
+    frame[34:38, 7:13] = (20, 20, 20, 255)  # the boots, dark
+    out = figures.recolour(
+        frame,
+        {
+            "hat": "#a85d14",
+            "robe": "#d9822b",
+            "band": "#ffe08a",
+            "skin": "#8d5524",
+            "hair": "#000000",
+        },
+    )
+    assert tuple(out[4, 10, :3]) != tuple(frame[4, 10, :3])
+    assert out[20, 10, 0] > out[20, 10, 2]  # the robe is orange now, red over blue
+    assert tuple(out[36, 10]) == tuple(frame[36, 10])  # the boots are left as they are
+    assert (out[..., 3] == frame[..., 3]).all()  # the outline and the shape do not move
+
+
+def test_every_look_has_its_sheet_and_the_friends_theirs():
+    import figures
+
+    about = json.loads((figures.FIGURES / "figures.json").read_text())
+    for look in figures.looks():
+        assert f"wizard-{look}" in about["figures"]
+        assert (figures.FIGURES / f"wizard-{look}.webp").is_file()
+    for friend in figures.FRIENDS:
+        assert friend in about["figures"]

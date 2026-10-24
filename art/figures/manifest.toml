@@ -1,0 +1,21 @@
+# The base walking sheets every look and friend is recoloured from (tools/art/figures.py).
+
+["wizard-base-boy.webp"]
+source = "generated: gemini-3-pro-image, tools/art/prompts/demo-wizard.md; cut by tools/art/sprites.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["wizard-base-girl.webp"]
+source = "generated: gemini-3-pro-image, an edit of wizard-base-boy.webp, tools/art/prompts/figure-wizard-girl.md; put on its grid by tools/art/figures.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["friend-base-boy.webp"]
+source = "generated: gemini-3-pro-image, tools/art/prompts/demo-nuri.md; cut by tools/art/sprites.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["friend-base-girl.webp"]
+source = "generated: gemini-3-pro-image, an edit of friend-base-boy.webp, tools/art/prompts/figure-nuri-girl.md; put on its grid by tools/art/figures.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"

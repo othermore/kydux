@@ -15,10 +15,18 @@
   "frames": 3,
   "standing": 1,
   "figures": [
-    "wizard",
-    "nuri",
-    "wenna",
+    "dask",
     "eldra",
-    "dask"
+    "nuri",
+    "teku",
+    "wenna",
+    "wizard-amber",
+    "wizard-coral",
+    "wizard-moss",
+    "wizard-plum",
+    "wizard-rose",
+    "wizard-sand",
+    "wizard-sky",
+    "wizard-teal"
   ]
 }

@@ -7,7 +7,8 @@
 // data-thought (why an action could not be done, while the wizard thinks it),
 // data-shaking (present while something shakes at a failed try), data-bubble
 // and data-speaker (the words said in a bubble and who says them), data-look
-// (the id of the look the wizard is drawn with, D36), data-dark (whether the
+// (the id of the look the wizard is drawn with, D36), data-wizard-figure and
+// data-friend-figure (the sheets they are drawn from, D77), data-dark (whether the
 // room is still dark, D52), data-stairs ("id:in" or "id:away" joined by ";",
 // each stair as a step taken now would find it, D53), data-zoom (the
 // camera's zoom, D69) and data-following (whether the camera follows the wizard).
@@ -266,9 +267,16 @@ class LevelScene extends Phaser.Scene {
   /** A character's figure: its drawn sheet when there is one, else the placeholder. */
   private figure(id: string, placeholder: string, tile: Tile, facing: Facing): Phaser.GameObjects.Sprite {
     const figures = this.art?.figures;
-    // The friend is the one of the wizard's other gender (D77).
-    const name = id === 'friend' ? friendOf({ gender: this.look.gender }).id : id;
-    if (figures && this.textures.exists(`fig-${name}`)) {
+    // The friend is the one of the wizard's other gender (D77); the wizard is drawn
+    // in the look the child chose.
+    const name =
+      id === 'friend' ? friendOf({ gender: this.look.gender }).id : id === 'wizard' ? `wizard-${this.look.id}` : id;
+    const drawn = figures && this.textures.exists(`fig-${name}`);
+    // Which sheet the wizard and the friend are drawn from, for the tests (D77, 13.2).
+    if (id === 'wizard' || id === 'friend') {
+      this.parentNode.dataset[id === 'wizard' ? 'wizardFigure' : 'friendFigure'] = drawn ? name : 'placeholder';
+    }
+    if (figures && drawn) {
       const sprite = this.add.sprite(...this.figureAt(tile), `fig-${name}`, SHEET_ROW[facing] * 3 + figures.standing);
       sprite.setOrigin(0.5, 1 - figures.foot / figures.frame[1]);
       sprite.setScale(TILE / figures.cell);

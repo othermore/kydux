@@ -57,3 +57,21 @@ test('the story at the gate is told on the field', async ({ page }) => {
   await page.waitForTimeout(400);
   await page.screenshot({ path: `${SHOTS}05-at-the-gate.png` });
 });
+
+test('the wizard is drawn in the look chosen, and the friend is of the other gender (D77)', async ({ browser }) => {
+  for (const [gender, look, friend] of [
+    ['girl', 'teal', 'teku'],
+    ['boy', 'amber', 'nuri'],
+  ] as const) {
+    const context = await browser.newContext({ locale: 'en-US' });
+    await seedWizard(context, { name: 'Ana', gender, look });
+    const page = await context.newPage();
+    await page.goto('/#level/the-corridor');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#scene')).toHaveAttribute('data-wizard-figure', `wizard-${look}`);
+    await expect(page.locator('#scene')).toHaveAttribute('data-friend-figure', friend);
+    await page.screenshot({ path: `${SHOTS}06-${gender}-${look}.png` });
+    await context.close();
+  }
+});

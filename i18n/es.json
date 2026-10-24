@@ -60,6 +60,7 @@
     "settings": "Ajustes",
     "split": "Arrastra para cambiar el tamaño de la escena y del editor",
     "show_screen": "Enséñame la pantalla",
+    "lesson": "Lección",
     "zoom_in": "Acercar (o la rueda del ratón)",
     "zoom_out": "Alejar (o la rueda del ratón)",
     "run_key": "Ejecuta tu código: Alt+R, o Ctrl+Intro en el editor",
@@ -213,6 +214,9 @@
     "begin": "Empezar la historia"
   },
   "map": {
+    "here": "Estás aquí",
+    "back_level": "Volver al nivel",
+    "leave_run": "Tu programa todavía se está ejecutando. ¿Salir del nivel?",
     "back": "Volver al inicio",
     "done": "hecho",
     "open": "abierto",
@@ -221,6 +225,7 @@
     "title_page": "Kydux — el mapa"
   },
   "lesson": {
+    "back_to_level": "Volver al nivel",
     "previous": "Atrás",
     "next": "Página siguiente",
     "page": "Página {n} de {total}",

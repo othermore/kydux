@@ -1445,3 +1445,26 @@ a.stop-body:focus-visible {
   display: flex;
   gap: 6px;
 }
+
+/* The map over a level (D71): the level stays under it, as it was. */
+.map-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  overflow-y: auto;
+  padding: 16px;
+  background: rgb(247 244 238 / 97%);
+}
+
+.stop[data-here='true'] .stop-body {
+  outline: 3px solid var(--accent);
+}
+
+.stop-here {
+  margin-left: auto;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+}

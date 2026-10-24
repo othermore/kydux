@@ -12,9 +12,14 @@ test('the map shows the course in order: the first stop open, the rest locked', 
   await expect(first).toHaveAttribute('data-state', 'open');
   await expect(first).toContainText('At the gate');
   await expect(first.locator('.stop-icon.story')).toHaveCount(1);
+  // The first locked stop is named; the ones after it show only their kind (D71).
+  const lesson = stop(page, 'lesson:what-a-program-is');
+  await expect(lesson).toHaveAttribute('data-state', 'locked');
+  await expect(lesson).toContainText('What a program is');
   const gate = stop(page, 'level:the-gate');
   await expect(gate).toHaveAttribute('data-state', 'locked');
-  await expect(gate).toContainText('The gate');
+  await expect(gate).toHaveAttribute('data-unnamed', 'true');
+  await expect(gate.locator('.stop-title')).toHaveText('Practice 1 ?');
   await expect(gate.locator('a')).toHaveCount(0);
 });
 
@@ -42,6 +47,41 @@ test('the map in Spanish', async ({ browser }) => {
   const page = await context.newPage();
   await page.goto('/#map');
   await expect(page.locator('.map-chapter h2').first()).toHaveText('La llegada');
-  await expect(stop(page, 'level:the-locked-door')).toContainText('La puerta cerrada');
+  await expect(stop(page, 'level:the-locked-door').locator('.stop-number')).toHaveText('Práctica 3');
   await context.close();
+});
+
+test('from a level, the map opens over it, says where you are, and closes back to it (D71)', async ({ page }) => {
+  await page.goto('/#level/the-long-corridor');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_left(2)');
+
+  await page.locator('#level-map').click();
+  const overlay = page.locator('#map-overlay');
+  await expect(overlay).toBeVisible();
+  await expect(page).toHaveURL(/#level\/the-long-corridor$/);
+  const here = overlay.locator('.stop[data-here="true"]');
+  await expect(here).toHaveAttribute('data-item', 'level:the-long-corridor');
+  await expect(here).toContainText('You are here');
+  await page.locator('#map-close').click();
+  await expect(overlay).toHaveCount(0);
+  await expect(page.locator('.cm-content')).toHaveText('wizard.move_left(2)');
+
+  // A stop chosen on the map is gone to.
+  await page.locator('#level-map').click();
+  await overlay.locator('.stop[data-item="story:at-the-gate"] a').click();
+  await expect(page).toHaveURL(/#story\/at-the-gate$/);
+});
+
+test('a level offers its lesson again, which goes back to the level (D71)', async ({ page }) => {
+  await page.goto('/#level/the-long-corridor');
+  await page.locator('#start').click();
+  await page.locator('#level-lesson').click();
+  await expect(page).toHaveURL(/#lesson\/how-much\/from\/the-long-corridor$/);
+  await expect(page.locator('.lesson-page h1')).toHaveText('How much');
+  await page.locator('#lesson-to-level').click();
+  await expect(page).toHaveURL(/#level\/the-long-corridor$/);
 });

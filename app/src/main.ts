@@ -7,6 +7,7 @@ import { currentLanguage, initLanguage, keepLanguageIn, languages, setLanguage, 
 import * as progress from './progress/progress';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
+import type { MapScreenParts } from './ui/map';
 import type { Screen } from './ui/screen';
 import { applyLook } from './ui/look';
 import { settingsScreen } from './ui/settings';
@@ -26,15 +27,19 @@ type Route =
   | { name: 'settings' }
   | { name: 'wizard' }
   | { name: 'level'; id: string }
-  | { name: 'lesson'; id: string }
+  | { name: 'lesson'; id: string; from?: string }
   | { name: 'story'; id: string };
 
 /** The screen the address names; the start screen for an address that names none. */
 function parseRoute(hash: string): Route {
   const level = /^#level\/(.+)$/.exec(hash);
   if (level) return { name: 'level', id: decodeURIComponent(level[1] ?? '') };
-  const lesson = /^#lesson\/(.+)$/.exec(hash);
-  if (lesson) return { name: 'lesson', id: decodeURIComponent(lesson[1] ?? '') };
+  // A lesson read again from a level, #lesson/<id>/from/<level>, goes back to it (D71).
+  const lesson = /^#lesson\/([^/]+)(?:\/from\/(.+))?$/.exec(hash);
+  if (lesson) {
+    const id = decodeURIComponent(lesson[1] ?? '');
+    return lesson[2] ? { name: 'lesson', id, from: decodeURIComponent(lesson[2]) } : { name: 'lesson', id };
+  }
   const story = /^#story\/(.+)$/.exec(hash);
   if (story) return { name: 'story', id: decodeURIComponent(story[1] ?? '') };
   if (hash === '#map') return { name: 'map' };
@@ -76,6 +81,7 @@ async function showLesson(
   kind: 'lesson' | 'story',
   id: string,
   key: string,
+  from?: string,
 ): Promise<void> {
   const load = kind === 'story' ? loadStory : loadLesson;
   try {
@@ -97,6 +103,8 @@ async function showLesson(
         ...(lesson.opening
           ? { onward: progress.wizard() ? itemHash(items(course)[0] ?? '') : '#wizard' }
           : {}),
+        // Read again from a level, the lesson goes back to it (D71).
+        ...(from ? { backTo: `#level/${from}` } : {}),
         reload: () => load(id, currentLanguage()),
       }),
     );
@@ -168,31 +176,44 @@ async function continueTarget(course: Course): Promise<{ hash: string; title: st
   return { hash: itemHash(item), title: await itemTitle(item) };
 }
 
-async function showMap(content: HTMLElement): Promise<void> {
-  document.title = t('map.title_page');
+/** What the map shows: the course, the progress, and every item's and chapter's
+ * title and number in the language now set. */
+async function mapParts(): Promise<MapScreenParts> {
   const course = await loadCourse();
   const all = items(course);
   const [titles, chapterTitles] = await Promise.all([
     Promise.all(all.map(async (item) => [item, await itemTitle(item)] as const)),
     Promise.all(course.chapters.map(async (c) => [c.id, await chapterTitle(c.id)] as const)),
   ]);
+  return {
+    course,
+    progress: progress.load(),
+    titles: new Map(titles),
+    numbers: new Map(
+      all.flatMap((item) => {
+        const number = itemNumber(course, item);
+        return number ? [[item, number] as const] : [];
+      }),
+    ),
+    chapterTitles: new Map(chapterTitles),
+  };
+}
+
+async function showMap(content: HTMLElement): Promise<void> {
+  document.title = t('map.title_page');
+  const [parts, { mapScreen }] = await Promise.all([mapParts(), import('./ui/map')]);
   if (shownRoute !== 'map') return;
-  const { mapScreen } = await import('./ui/map');
-  show(
-    content,
-    mapScreen({
-      course,
-      progress: progress.load(),
-      titles: new Map(titles),
-      numbers: new Map(
-        all.flatMap((item) => {
-          const number = itemNumber(course, item);
-          return number ? [[item, number] as const] : [];
-        }),
-      ),
-      chapterTitles: new Map(chapterTitles),
-    }),
-  );
+  show(content, mapScreen(parts));
+}
+
+/** The last lesson before a level in the course, which the level offers to read again. */
+function lessonBefore(course: Course, levelId: string): string | null {
+  const all = items(course);
+  for (let index = all.indexOf(`level:${levelId}`) - 1; index >= 0; index -= 1) {
+    const parsed = parseItem(all[index] ?? '');
+    if (parsed?.kind === 'lesson') return parsed.id;
+  }
+  return null;
 }
 
 /** How often play time is counted, in seconds. */
@@ -267,6 +288,14 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
         createEditor,
         startScene,
         loadGuide: () => loadGuideText(currentLanguage()),
+        openMap: async () => {
+          const [parts, { mapScreen }] = await Promise.all([mapParts(), import('./ui/map')]);
+          return (overlay) => mapScreen({ ...parts, here: `level:${id}`, overlay });
+        },
+        lesson: (() => {
+          const before = lessonBefore(course, id);
+          return before ? `#lesson/${before}/from/${id}` : undefined;
+        })(),
         guideFirst: items(course).find((item) => item.startsWith('level:')) === `level:${id}`,
       }),
     );
@@ -295,7 +324,7 @@ function route(): void {
   const wanted = parseRoute(location.hash);
   const key =
     wanted.name === 'level' || wanted.name === 'lesson' || wanted.name === 'story'
-      ? `${wanted.name}/${wanted.id}`
+      ? `${wanted.name}/${wanted.id}${wanted.name === 'lesson' && wanted.from ? `/from/${wanted.from}` : ''}`
       : wanted.name;
   if (key === shownRoute && screen) return;
   shownRoute = key;
@@ -332,7 +361,7 @@ function route(): void {
     wanted.name === 'level'
       ? showLevel(content, wanted.id, key)
       : wanted.name === 'lesson' || wanted.name === 'story'
-        ? showLesson(content, wanted.name, wanted.id, key)
+        ? showLesson(content, wanted.name, wanted.id, key, wanted.name === 'lesson' ? wanted.from : undefined)
         : wanted.name === 'map'
           ? showMap(content)
           : showStart(content);

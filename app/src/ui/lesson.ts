@@ -25,6 +25,8 @@ export interface LessonScreenParts {
   /** Where Go on leads when it is not to the course's next item: from the game's
    * opening, to the creator or to the course's start (D61). */
   onward?: string;
+  /** A lesson read again from a level: where Back to the level goes (D71). */
+  backTo?: string;
   /** The lesson in the language now set, for a change of language. */
   reload: () => Promise<Lesson>;
 }
@@ -51,6 +53,10 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
 
   const tryIt = () => {
     markRead();
+    if (parts.backTo) {
+      location.hash = parts.backTo;
+      return;
+    }
     const next = parts.next;
     if (next) progress.setCurrent(next);
     location.hash = parts.onward ?? (next ? itemHash(next) : '#map');
@@ -74,7 +80,7 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
     });
     const forward = last
       ? element('button', { id: 'lesson-try', type: 'button', className: 'big-button' }, [
-          lesson.tryCode !== null ? t('lesson.try') : t('lesson.go_on'),
+          parts.backTo ? t('lesson.back_to_level') : lesson.tryCode !== null ? t('lesson.try') : t('lesson.go_on'),
         ])
       : element('button', { id: 'lesson-next', type: 'button', className: 'big-button' }, [
           t('lesson.next'),
@@ -89,6 +95,13 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
     node.replaceChildren(
       element('div', { className: 'lesson-top' }, [
         ...(parts.label ? [element('span', { id: 'lesson-number', className: 'item-number' }, [parts.label])] : []),
+        ...(parts.backTo
+          ? [
+              element('a', { id: 'lesson-to-level', className: 'quiet-button small', href: parts.backTo }, [
+                t('lesson.back_to_level'),
+              ]),
+            ]
+          : []),
         element('a', { id: 'lesson-map', className: 'quiet-button small', href: '#map' }, [t('map.open_map')]),
       ]),
       element('div', { className: 'lesson-body' }, [...[teacher()].filter((n) => n !== null), article]),
@@ -107,7 +120,8 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
     node,
     mount: () => {
       // The opening is before the course: Continue does not come back to it.
-      if (!lesson.opening) progress.setCurrent(`${parts.kind}:${lesson.id}`);
+      // So is a lesson read again from a level: the child is still at the level.
+      if (!lesson.opening && !parts.backTo) progress.setCurrent(`${parts.kind}:${lesson.id}`);
       draw();
     },
     async relabel() {

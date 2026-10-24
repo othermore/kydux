@@ -23,6 +23,7 @@ import { type GoalsPanel, goalsPanel } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
 import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
 import { type Outcome, type OutcomeCard, outcomeCard, withCode } from './outcome';
+import type { Screen } from './screen';
 
 const SPEEDS: Speed[] = [1, 2, 4];
 
@@ -48,6 +49,11 @@ export interface LevelScreenParts {
   /** Made by the caller, so that Phaser and CodeMirror load on their own. */
   createEditor: (parent: HTMLElement, options: EditorOptions) => Editor;
   startScene: (parent: HTMLElement, level: LoadedLevel['level'], look: Look) => Promise<SceneHandle>;
+  /** The map over the level (D71): made once its data is loaded, given how to close
+   * it and where a stop chosen goes. */
+  openMap?: () => Promise<(overlay: { onClose: () => void; onGo: (hash: string) => void }) => Screen>;
+  /** The address of the last lesson before the level, read again from here (D71). */
+  lesson?: string;
   /** The screen's guide's words (D68), and whether this level opens the guide the
    * first time it is played: the course's first level. */
   loadGuide?: () => Promise<GuideText>;
@@ -78,10 +84,22 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     t('map.open_map'),
   );
   const toSettings = element('a', { id: 'level-settings', className: 'gear', href: '#settings' }, ['⚙']);
+  const toLesson = parts.lesson
+    ? [labelled(element('a', { id: 'level-lesson', className: 'quiet-button small', href: parts.lesson }), () =>
+        t('level.lesson'),
+      )]
+    : [];
   const number = parts.label
     ? [element('span', { id: 'level-number', className: 'item-number' }, [parts.label])]
     : [];
-  const heading = element('div', { className: 'level-heading' }, [...number, title, about, toMap, toSettings]);
+  const heading = element('div', { className: 'level-heading' }, [
+    ...number,
+    title,
+    about,
+    ...toLesson,
+    toMap,
+    toSettings,
+  ]);
   // A fix or an improve level says on its start card what is to be done (D56).
   const kind = typeof loaded.level.kind === 'string' ? loaded.level.kind : 'practice';
   const task = () => (kind === 'fix' || kind === 'improve' ? t(`level.kind_${kind}`) : undefined);
@@ -440,6 +458,49 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   about.setAttribute('aria-label', t('level.about'));
   about.title = t('level.about');
   about.addEventListener('click', () => showStart(false, true));
+
+  // The map over the level (D71): the run and the editor stay as they are; Back,
+  // or Escape, closes it, and leaving for another stop while a run goes on asks.
+  let mapShown: { node: HTMLElement; destroy: () => void } | null = null;
+  const closeMap = () => {
+    mapShown?.destroy();
+    mapShown = null;
+    editor.focus();
+  };
+  const openMap = async () => {
+    if (mapShown || !parts.openMap) return;
+    const make = await parts.openMap();
+    if (destroyed || mapShown) return;
+    const screen = make({
+      onClose: closeMap,
+      onGo: (hash) => {
+        if (controller.snapshot.canStop && !window.confirm(t('map.leave_run'))) return;
+        closeMap();
+        location.hash = hash;
+      },
+    });
+    const layer = element('div', { id: 'map-overlay', className: 'map-overlay' }, [screen.node]);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeMap();
+    };
+    addEventListener('keydown', onKey);
+    document.body.append(layer);
+    screen.mount?.();
+    mapShown = {
+      node: layer,
+      destroy: () => {
+        removeEventListener('keydown', onKey);
+        screen.destroy();
+        layer.remove();
+      },
+    };
+    layer.querySelector<HTMLElement>('#map-close')?.focus();
+  };
+  toMap.addEventListener('click', (event) => {
+    if (!parts.openMap) return;
+    event.preventDefault();
+    void openMap();
+  });
   run.addEventListener('click', () => runCode());
   stop.addEventListener('click', () => {
     if (controller.snapshot.canPlay) controller.resume();
@@ -583,6 +644,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       destroyed = true;
       shownCard?.close();
       guide?.node.remove();
+      mapShown?.destroy();
       for (const unsubscribe of stopped) unsubscribe();
       stopped = [];
       controller.destroy();

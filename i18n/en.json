@@ -60,6 +60,7 @@
     "settings": "Settings",
     "split": "Drag to resize the scene and the editor",
     "show_screen": "Show me the screen",
+    "lesson": "Lesson",
     "zoom_in": "Zoom in (or the mouse wheel)",
     "zoom_out": "Zoom out (or the mouse wheel)",
     "run_key": "Run your code: Alt+R, or Ctrl+Enter in the editor",
@@ -213,6 +214,9 @@
     "begin": "Begin the story"
   },
   "map": {
+    "here": "You are here",
+    "back_level": "Back to the level",
+    "leave_run": "Your program is still running. Leave the level?",
     "back": "Back to the start",
     "done": "done",
     "open": "open",
@@ -221,6 +225,7 @@
     "title_page": "Kydux — the map"
   },
   "lesson": {
+    "back_to_level": "Back to the level",
     "previous": "Back",
     "next": "Next page",
     "page": "Page {n} of {total}",

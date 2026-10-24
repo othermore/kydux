@@ -52,7 +52,7 @@ export function openGuide(root: HTMLElement, text: GuideText, hooks: GuideHooks)
   const skip = element('button', { id: 'guide-skip', type: 'button', className: 'quiet-button' }, [
     t('guide.skip'),
   ]);
-  const next = element('button', { id: 'guide-next', type: 'button' });
+  const next = element('button', { id: 'guide-next', type: 'button', className: 'big-button' });
   const card = element('div', { className: 'guide-card', role: 'dialog' }, [
     count,
     title,

@@ -69,7 +69,9 @@ docs/dev/       the plan, the sprints, this log, the guide; the story (story.md)
                 and the course (course.md) that the content is written from
 tools/          the i18n check, the forbidden-word check, the names a wizard
                 may not take (reserved_names.py), each level on a scene with its
-                map built in (scene_maps.py, D65), the writing tool (write/:
+                map built in (scene_maps.py, D65), the course as one document
+                to review (course_book.py) and the comments read back from the
+                reviewed document (doc_comments.py), the writing tool (write/:
                 write.py, the rules every text follows in rules.md, and the
                 briefs in briefs/; Gemini drafts the child's texts into
                 drafts/, which git ignores, D55), later the art tools
@@ -971,8 +973,8 @@ one overturns stays, marked as superseded.
   counted every ten seconds a level, a lesson or a story page is on screen
   with the tab in sight. The single document of before, `kydux.progress`,
   becomes the list's first game the first time the list is read, so the
-  document keeps its version: its shape is the same. Sprint 12 keeps the
-  same list on the server the game runs from.
+  document keeps its version: its shape is the same. The online game
+  (plan, phase 7) keeps the same list on the server it runs from.
 - **D71 — The map opens over the level, and a lesson from it.** Decided
   2026-10-22 by the owner's UAT (sprint-11.md), built the same day. From a
   level, *Map* opens the map over it (the run and the editor kept), the

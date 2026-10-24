@@ -443,46 +443,92 @@ another browser.
 
 ### Phase 4 — Art and sound pipeline
 
-From placeholder squares to the game's look, with reproducible tools.
+From placeholder squares to the game's look, with reproducible tools. The
+look is a 2D top-down oblique view (a "2.5D" three-quarter view, as the
+classic handheld monster-catching games): the floor seen from above, walls
+and things showing their front face, everything on the tile grid, the
+moves on the grid's plane; not isometric, which the level model and the
+map editor would have to follow. Characters and things are sprite sheets
+on the same grid; the scenes are tilesets with the pieces a wall or a
+hedge needs to join: straights, ends, the four corners, the T and the
+cross junctions, drawn once per terrain and placed by an autotiler.
 
-4.0 The way the sprites are made, decided by trying two on the same brief
-    (the wizard's walking sheet in the retro pixel style of `draft.md`,
-    section 5, and one object), each with GPT Image and with Gemini's image
-    model where it generates:
-    1. autosprite.io: close to what is wanted, with cleanup and some back
-       and forth still needed.
-    2. GPT-image 2.5, a clear step above Gemini's image model, with the
-       agent-sprite-forge skill (https://github.com/0x0funky/agent-sprite-forge)
-       for consistency from one sheet to the next, iterating until good
-       enough.
-    What each gives, what it cost in time and money, and how the pieces cut
-    and fit, go in the architecture log with the choice. GPT Image needs an
-    OpenAI key in `secrets.env` (`OPENAI_API_KEY`), beside the Gemini one.
-4.1 `tools/art/generate.py`: a prompt file in, an image out, the key from
+Three questions the phase answers in its first sprint, each by trials on
+one brief, with what each gave, cost and took recorded in the log:
+
+4.0 **Where the pieces come from**, tried on the same brief: a wizard's
+    walking sheet (four directions, idle and walk), a wall tileset with
+    its corners and junctions on a chroma key, a grass and path tile that
+    repeats without seams, and a door. The candidates:
+    1. Gemini's image models (`gemini-3.1-flash-image`,
+       `gemini-3-pro-image`), with the key the project has: a first probe
+       gives clean oblique tiles with the wall's top and corners, on a
+       chroma key, for a few cents, but on a loose grid and as JPEG, so a
+       grid-snapping and keying step is needed (`tools/art/cut.py`).
+    2. Claude making the art as code: tiles and figures drawn by
+       programs (Canvas, as the placeholders are, or SVG rendered to
+       pixels), or Blender driven by scripts (`bpy`, free) rendering
+       modular wall pieces from one fixed oblique camera, which gives
+       corners and junctions that match by construction; Gemini's images
+       as textures or references. Deterministic and reproducible, the
+       least pretty at first.
+    3. Free tilesets under a licence a GPL game can ship (CC0, CC BY,
+       CC BY-SA, OFL): Kenney's packs, OpenGameArt's, the Liberated Pixel
+       Cup's, as the terrain, with the characters and things generated to
+       match; each kept with its origin, author and licence.
+    4. Pixel-art services with a trial: Retro Diffusion (free starting
+       credits, then per image) and PixelLab (a free trial of forty
+       generations, then a subscription), both said to do tilesets and
+       sheets; and OpenAI's image model if the owner has it, with the
+       sprite-forge skill tried before.
+    5. A local open model (Stable Diffusion or Flux with a pixel-art
+       adapter) if the machine has the graphics card for it; otherwise
+       set aside.
+    The winner may be a mix: free or Blender-made terrain for the joins,
+    generated characters and things for the charm. Decided in the log.
+4.1 **The scene model the art needs** (world and page): a scene declares
+    its fixed things (doors, the stone, fences) once, and a level says
+    their state; terrains in the scene file beyond wall and floor (grass,
+    path, water, carpet, each walkable or not); rooms as regions, so that
+    a dark room is a room and `kirra` lights it; the autotiler, in the
+    packer or the page, that picks each terrain's piece from its eight
+    neighbours (the 47-piece blob set, built from a few drawn pieces).
+    Chapter 1's scene redrawn as an open garden: the gate, a path with
+    fences and doors, grass the wizard may walk on, the stone beside the
+    path and Nuri off it; its levels' puzzles kept by fences where a
+    puzzle needs a wall.
+4.2 `tools/art/generate.py`: a prompt file in, an image out, the key from
     `secrets.env`, the prompt and model recorded in the asset's manifest
-    entry; `tools/art/cut.py`: key out the background, slice a grid, reduce to
-    true pixels, write a sprite sheet and its Phaser atlas JSON.
-4.2 Terrain, second round: each terrain asked for alone as a seamless tile
-    (floor variants, wall top and face, carpet, grass, water), and a free
-    tileset in a matching style as the fallback; the decision in the
-    architecture log.
-4.3 The wizard's base sheet with placeholder palette colours: idle, walk
+    entry; `tools/art/cut.py`: key out the background, snap to the grid,
+    slice, reduce to true pixels, write a sprite sheet and its Phaser atlas
+    JSON; `tools/art/render.py` for the Blender route, if it wins.
+4.3 Terrain and scenes: each terrain's pieces, the three chapters' scenes
+    drawn with them, a tile seam hunt in the browser.
+4.4 The wizard's base sheet with placeholder palette colours: idle, walk
     (four directions), cast, pick up, celebrate; the palette swap wired to the
-    creator; hats and hair overlays if a sheet comes out on the same grid.
-4.4 Objects and actors of chapters 1–2: wand, books, keys, doors, chests,
-    potions, broom, teacher, cat, ghost, portraits; each on the grid.
-4.5 The UI skin: cards, panels, buttons, the notebook, the map's
-    frame, icons for goals, actions and spells, a font with its licence (Andika or a
-    pixel font readable by children).
-4.6 Sound: `tools/sound/generate.py` with Lyria for a chapter theme and short
-    effects (step, cast, door, pick up, win, fail), free CC0 effects where
-    generation is poorer; the characters' voices as short sounds; Phaser's
-    audio with a mute switch; manifests.
-4.7 `art/README.md`: the style guide: grid, palette, the view angle, how a
-    new sprite is made and reviewed.
+    creator; hats and hair overlays if a sheet comes out on the same grid;
+    the friends and the teacher, Eldra and Bimo on the same grid.
+4.5 Objects and actors of chapters 1–3: wand, books, keys, doors, the stone,
+    stairs, potions; each on the grid.
+4.6 The UI skin: cards, panels, buttons, the notebook, the map's frame, the
+    lesson's book page and speech bubble, icons for goals, actions and
+    spells, a font with its licence (Andika or a pixel font readable by
+    children); the win card with its stars as the event.
+4.7 Sound: `tools/sound/generate.py` with Lyria (`lyria-3.5` and
+    `lyria-3-clip`, reached by the project's key) for a chapter theme and
+    short clips; effects (step, bump, cast, door, pick up, win, fail) made
+    procedurally in the page (an sfxr-like synth, free, deterministic) or
+    taken from CC0 packs where generation is poorer; the characters' voices
+    as short sounds; Phaser's audio with a mute switch; manifests.
+4.8 `art/README.md`: the style guide: the view, the grid, the palette, how a
+    new sprite or terrain is made and reviewed; `art/raw/` outside the
+    repository for the trials.
 
-UAT: the three levels of phase 2 with real art and sound; the creator's
-colours showing on the map and in the scene; a tile seam hunt.
+Sprint 12 has 4.0, 4.1 and 4.2 (`sprint-12.md`); sprint 13 has 4.3 and 4.4;
+sprint 14 has 4.5, 4.6 and 4.7, with 4.8 as each lands.
+
+UAT: the three chapters with real art and sound; the creator's colours
+showing on the map and in the scene; a tile seam hunt; a child's verdict.
 
 ### Phase 5 — The story and the course
 
@@ -511,9 +557,11 @@ owner's UAT of 2026-10-22 reshapes the course: sprint 10 builds the writing
 tool, the kinds, the stars and the rules, and rewrites the story and chapter
 1 (`sprint-10.md`); sprint 11 puts each chapter's levels in one scene, builds
 the screen's guide, the map over the level and the saved games in the
-browser, and rewrites chapters 2 and 3 the same way (`sprint-11.md`);
-sprint 12 keeps the saved games on the server. Chapters 4 and 5 come
-after, each a sprint, with their scenes.
+browser, and rewrites chapters 2 and 3 the same way (`sprint-11.md`).
+Phase 4, the art and the sound, comes next (sprints 12 to 14), on the
+scenes that exist; then chapters 4 and 5, each a sprint with its scene,
+and the challenges. The saved games on the server wait for phase 7, when
+the game runs online.
 
 What the owner's UAT of 2026-10-22 taught, which every chapter follows
 (sprint-10.md has the first pieces; the rest are sprints 11 and 12):
@@ -545,8 +593,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
 - **Saved games.** A game per wizard, listed with its wizard, its place,
   its play time and its dates, loaded on return; export and import stay as
   the way to carry one away. Sprint 11 keeps the list in the browser
-  (D70); sprint 12 keeps the same list on the server the game runs from,
-  with the browser's as the fallback.
+  (D70); the same list on the server the game runs from, with the
+  browser's as the fallback, comes with the online game (phase 7).
 - **One scene per chapter.** A chapter's levels are parts of one scene, or
   of a few, where a level ends the next begins and the friend who teaches
   stands in it; the camera is a window on the scene, zoomed and dragged
@@ -617,7 +665,8 @@ machine; the guide followed as written.
 
 Not planned in detail; kept possible by the design.
 
-- Online: the built game on a paid host, with a `RemoteProgressStore` and
+- Online: the built game on a paid host, with the saved games kept on the
+  server (the same list as the browser's, D70, behind the same store) and
   accounts; then rankings by stars and lines; then duels between wizards as
   a level type where two programs run in the same world.
 - More languages: a new pair of files per language.

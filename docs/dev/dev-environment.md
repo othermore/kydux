@@ -411,7 +411,32 @@ gives away. Correct a sentence that is wrong. When much is wrong, correct
 the brief and run the tool again. Then copy the files into `content/` and
 run `ci/check.sh`, which holds the texts to the game's rules.
 
-## 8. Committing and pushing
+## 8. Reading the course as one document
+
+The whole course, as the child reads it, can be put in one Markdown file to
+read it through and comment on it: every story page, lesson and level in
+order, with each level's goals, starting code, hints and solution. This
+writes it in Spanish, for a girl wizard, into `drafts/`:
+
+```sh
+.venv/bin/python tools/course_book.py
+```
+
+The last line printed is the file's path. `--lang en` writes the English,
+`--gender boy` the boy's words. Import the file into a Google Doc (File >
+Import, or paste it into a new doc) to comment on it.
+
+To bring the comments back, download the Google Doc as Microsoft Word
+(File > Download > Microsoft Word), which keeps them, and print them:
+
+```sh
+.venv/bin/python tools/doc_comments.py ~/Downloads/the-book.docx
+```
+
+Each comment comes out with the words it was made on, in the document's
+order, so that the texts can be corrected one by one.
+
+## 9. Committing and pushing
 
 Commits are made locally at any time. They are authored as the
 repository's `git config` says, `othermore <info@kidux.org>`. Two hooks run

@@ -190,9 +190,9 @@
     "import": "Import",
     "import_failed": "That file is not a Kydux progress file. Nothing has changed.",
     "map": "The map",
-    "create": "Make your wizard",
     "hello": "Hello, {wizard}",
-    "change_wizard": "Change my wizard"
+    "change_wizard": "Change my wizard",
+    "begin": "Begin the story"
   },
   "map": {
     "back": "Back to the start",

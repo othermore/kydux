@@ -43,6 +43,10 @@ game's developers before it enters the game.
 
 ## Names
 
+- Recall no famous story of wizards in anything: not its names, and not its
+  well-known devices either (an owl that brings letters, a hat that sorts
+  pupils, a train from a hidden platform, a scar, houses with animals for
+  emblems, a ball game on brooms). Arvelia's magic is its own.
 - Use only the names of the story bible you are given. If you need a new
   name, invent one that recalls no famous story of wizards, no famous school
   of magic and no famous wizard, and that is a word of neither English nor

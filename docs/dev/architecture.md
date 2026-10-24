@@ -833,3 +833,18 @@ one overturns stays, marked as superseded.
   notebook and says *Continue* when the child opens it again with *?*; a
   password door opens in the second half of its tick, once the word is
   said.
+- **D61 — The game opens in the story.** Decided 2026-10-22 by the owner's
+  UAT (sprint-10.md), built the same day. A first visit, with no wizard and
+  no address, opens on `story:the-letter`, the game's opening (`story.json`
+  has `opening: true`, and it is in no chapter): the letter of admission,
+  the journey, the shut gate at dusk, and no mechanics. Its *Go on* leads
+  to the creator, or, once a wizard exists, to the course's first item; it
+  is never the place *Continue* returns to. The start screen's big button
+  begins the story while there is no wizard, and *Start from the beginning*
+  begins it again, keeping the wizard, the language and the settings. The
+  creator shows the looks of the gender chosen, four each (`looksFor`),
+  none before a gender is; its name starts as *Kydux*, chosen whole on
+  entering the field so that typing replaces it; a name that is the
+  story's, a level's thing or actor, a spell, a password or one of the
+  world's roles is refused (`tools/reserved_names.py`, written as
+  `reserved.json` by `pack-world.mjs`, held to the content by a test).

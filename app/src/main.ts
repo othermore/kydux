@@ -91,6 +91,11 @@ async function showLesson(
         kind,
         label: itemNumber(course, `${kind}:${id}`),
         next: next(course, `${kind}:${id}`),
+        // The game's opening goes on to the creator, or, with a wizard made, to the
+        // course's first item (D61).
+        ...(lesson.opening
+          ? { onward: progress.wizard() ? itemHash(items(course)[0] ?? '') : '#wizard' }
+          : {}),
         reload: () => load(id, currentLanguage()),
       }),
     );
@@ -189,7 +194,15 @@ async function showMap(content: HTMLElement): Promise<void> {
   );
 }
 
+/** The story page the game opens with, before the creator (D61). */
+const OPENING = '#story/the-letter';
+
 async function showStart(content: HTMLElement): Promise<void> {
+  // A first visit, with no wizard and no address, opens on the story (D61).
+  if (!progress.wizard() && location.hash === '') {
+    location.replace(OPENING);
+    return;
+  }
   document.title = t('app.title');
   const continueTo = await continueTarget(await loadCourse());
   if (shownRoute !== 'start') return;
@@ -198,6 +211,7 @@ async function showStart(content: HTMLElement): Promise<void> {
     startScreen({
       continueTo,
       wizard: progress.wizard(),
+      opening: OPENING,
       onChanged: () => {
         shownRoute = null;
         route();

@@ -47,6 +47,9 @@ test('progress exported, cleared and imported comes back', async ({ page }) => {
 
   page.once('dialog', (dialog) => dialog.accept());
   await page.locator('#new').click();
+  // A new game begins with the story again (D61); the wizard is kept.
+  await expect(page).toHaveURL(/#story\/the-letter$/);
+  await page.locator('#home').click();
   await expect(page.locator('#continue')).toHaveText('Continue: What a program is');
 
   await page.locator('#import-file').setInputFiles(file as string);

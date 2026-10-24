@@ -16,6 +16,8 @@ export interface StartScreenParts {
   continueTo: { hash: string; title: string };
   /** The wizard the child made, or null before there is one (D36). */
   wizard: Wizard | null;
+  /** The address of the game's opening story, where a new game begins (D61). */
+  opening: string;
   /** The progress changed (cleared or imported): the screen is drawn again. */
   onChanged: () => void;
 }
@@ -40,14 +42,15 @@ export function startScreen(parts: StartScreenParts): Screen {
       ? element('a', { id: 'continue', className: 'big-button', href: parts.continueTo.hash }, [
           t('start.continue', { title: parts.continueTo.title }),
         ])
-      : element('a', { id: 'continue', className: 'big-button', href: '#wizard' }, [t('start.create')]);
+      : element('a', { id: 'continue', className: 'big-button', href: parts.opening }, [t('start.begin')]);
     const fresh = element('button', { id: 'new', type: 'button', className: 'quiet-button' }, [
       t('start.new'),
     ]);
     fresh.addEventListener('click', () => {
       if (!window.confirm(t('start.new_confirm'))) return;
       progress.reset();
-      parts.onChanged();
+      // A new game begins with the story again.
+      location.hash = parts.opening;
     });
     const settings = element('a', { id: 'settings-link', className: 'quiet-button', href: '#settings' }, [
       t('start.settings'),

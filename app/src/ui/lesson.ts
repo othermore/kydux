@@ -20,6 +20,9 @@ export interface LessonScreenParts {
   label?: string;
   /** The course's item after this lesson, or null after the last. */
   next: string | null;
+  /** Where Go on leads when it is not to the course's next item: from the game's
+   * opening, to the creator or to the course's start (D61). */
+  onward?: string;
   /** The lesson in the language now set, for a change of language. */
   reload: () => Promise<Lesson>;
 }
@@ -41,7 +44,7 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
       if (progress.levelProgress(id).code === undefined) progress.setCode(id, lesson.tryCode);
     }
     if (next) progress.setCurrent(next);
-    location.hash = next ? itemHash(next) : '#map';
+    location.hash = parts.onward ?? (next ? itemHash(next) : '#map');
   };
 
   const draw = () => {
@@ -94,7 +97,8 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
   return {
     node,
     mount: () => {
-      progress.setCurrent(`${parts.kind}:${lesson.id}`);
+      // The opening is before the course: Continue does not come back to it.
+      if (!lesson.opening) progress.setCurrent(`${parts.kind}:${lesson.id}`);
       draw();
     },
     async relabel() {

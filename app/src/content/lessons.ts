@@ -15,6 +15,8 @@ export interface Lesson {
   pages: string[];
   /** The Try it example, or null when the lesson has none. */
   tryCode: string | null;
+  /** For a story page, whether it is the game's opening, before the course (D61). */
+  opening?: boolean;
 }
 
 export class LessonNotFound extends Error {
@@ -68,7 +70,12 @@ async function loadPages(folder: 'lessons' | 'stories', id: string, lang: Langua
     (await fetched(lessonUrl(id, `${lang}.md`), 'text')) ??
     (await fetched(lessonUrl(id, `${fallbackLanguage}.md`), 'text'));
   if (markdown === null) throw new LessonNotFound(id);
-  const { teaches } = JSON.parse(about) as { teaches?: string[] };
+  const { teaches, opening } = JSON.parse(about) as { teaches?: string[]; opening?: boolean };
   // The wizard's words go in before the pages are cut (D37).
-  return { id, teaches: teaches ?? [], ...readLesson(forWizard(markdown)) };
+  return {
+    id,
+    teaches: teaches ?? [],
+    ...readLesson(forWizard(markdown)),
+    ...(opening === true ? { opening: true } : {}),
+  };
 }

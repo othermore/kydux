@@ -15,7 +15,7 @@ const editorFontSize = (page: Page) =>
 const stageWidth = async (page: Page) => (await page.locator('.stage').boundingBox())?.width ?? 0;
 
 test('the settings open from the start screen, and Back returns to it', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#start');
   await page.locator('#settings-link').click();
   await expect(page).toHaveURL(/#settings$/);
   await expect(page.locator('.settings-screen h2')).toHaveText('Settings');

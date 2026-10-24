@@ -190,9 +190,9 @@
     "import": "Importar",
     "import_failed": "Ese fichero no es un fichero de progreso de Kydux. No ha cambiado nada.",
     "map": "El mapa",
-    "create": "Crea tu personaje",
     "hello": "Hola, {wizard}",
-    "change_wizard": "Cambiar mi personaje"
+    "change_wizard": "Cambiar mi personaje",
+    "begin": "Empezar la historia"
   },
   "map": {
     "back": "Volver al inicio",

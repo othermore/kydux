@@ -16,12 +16,26 @@ async function makeWizard(page: Page, name: string, gender: 'girl' | 'boy', look
   await page.locator('#wizard-looks .radio').nth(look).click();
 }
 
-test('a first visit makes the wizard first, and Done opens the first lesson by name', async ({ page }) => {
+test('a first visit opens on the story, which leads to the creator (D61)', async ({ page }) => {
   await page.goto('/');
-  const go = page.locator('#continue');
-  await expect(go).toHaveText('Make your wizard');
-  await go.click();
+  await expect(page).toHaveURL(/#story\/the-letter$/);
+  await expect(page.locator('.lesson-page h1')).toHaveText('The letter');
+  // No code in the opening: the story comes first.
+  for (let turn = 0; turn < 3; turn += 1) {
+    await expect(page.locator('.lesson-page pre')).toHaveCount(0);
+    await page.locator('#lesson-next').click();
+  }
+  await expect(page.locator('#lesson-try')).toHaveText('Go on');
+  await page.locator('#lesson-try').click();
   await expect(page).toHaveURL(/#wizard$/);
+  // The start screen, reached on purpose, begins the story too.
+  await page.goto('/#start');
+  await expect(page.locator('#continue')).toHaveText('Begin the story');
+  await expect(page.locator('#continue')).toHaveAttribute('href', '#story/the-letter');
+});
+
+test('the creator, and Done opens the first lesson by name', async ({ page }) => {
+  await page.goto('/#wizard');
   await expect(page.locator('.wizard-screen h2')).toHaveText('Your wizard');
   // A name to start from (D61); the looks wait for the gender.
   await expect(page.locator('#wizard-name')).toHaveValue('Kydux');
@@ -137,8 +151,8 @@ test('the wizard goes with exported progress to another browser', async ({ page,
 
   const other = await browser.newContext({ locale: 'en-US' });
   const elsewhere = await other.newPage();
-  await elsewhere.goto('/');
-  await expect(elsewhere.locator('#continue')).toHaveText('Make your wizard');
+  await elsewhere.goto('/#start');
+  await expect(elsewhere.locator('#continue')).toHaveText('Begin the story');
   await elsewhere.locator('#import-file').setInputFiles(file as string);
   await expect(elsewhere.locator('.start-screen h2')).toHaveText('Hello, Marta');
   await other.close();

@@ -12,7 +12,7 @@ const SHOTS = fileURLToPath(new URL('./shots/', import.meta.url));
 
 const WORDS = {
   en: {
-    create: 'Make your wizard',
+    opening: 'The letter',
     lesson: 'What a program is',
     greeting: 'Welcome to Arvelia, Ada!',
     gate: 'The gate',
@@ -22,7 +22,7 @@ const WORDS = {
     settings: 'Settings',
   },
   es: {
-    create: 'Crea tu personaje',
+    opening: 'La carta',
     lesson: 'Qué es un programa',
     greeting: '¡Te damos la bienvenida a Arvelia, Ada!',
     gate: 'El portón',
@@ -58,13 +58,14 @@ for (const [lang, words] of Object.entries(WORDS)) {
     });
     const page = await context.newPage();
 
-    // A fresh visit: the start screen asks for a wizard first.
+    // A fresh visit: the story's opening, then the creator (D61).
     await page.goto('/');
-    await expect(page.locator('#continue')).toHaveText(words.create);
-    await shoot(page, 'start');
+    await expect(page.locator('.lesson-page h1')).toHaveText(words.opening);
+    await shoot(page, 'opening');
+    for (let turn = 0; turn < 3; turn += 1) await page.locator('#lesson-next').click();
+    await page.locator('#lesson-try').click();
 
     // The creator: a name, a girl, a look.
-    await page.locator('#continue').click();
     await page.locator('#wizard-name').fill('Ada');
     await page.locator('#wizard-gender [data-value="girl"]').click();
     await page.locator('#wizard-looks .radio').nth(0).click();

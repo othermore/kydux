@@ -485,9 +485,45 @@ every chapter follow:
   The levels after a theory lesson practise exactly what it explained.
 
 Sprint 7 has 5.1, 5.2, 2.13 and 5.3 (`sprint-7.md`); sprint 8 has 2.14 and
-5.4 (`sprint-8.md`); sprint 9 has 2.15, 2.16 and 5.5 (`sprint-9.md`); each
-later chapter is a sprint of its own, and the owner's notes on a chapter
-become fixes at the start of the sprint after.
+5.4 (`sprint-8.md`); sprint 9 has 2.15, 2.16 and 5.5 (`sprint-9.md`). The
+owner's UAT of 2026-10-22 reshapes the course: sprint 10 builds the writing
+tool, the kinds, the stars and the rules, and rewrites the story and chapter
+1 (`sprint-10.md`); sprint 11 rewrites chapters 2 and 3 the same way and
+builds the screen's guide and the map over the level; sprint 12 builds the
+saved games on the server. Chapters 4 and 5 come after, each a sprint.
+
+What the owner's UAT of 2026-10-22 taught, which every chapter follows
+(sprint-10.md has the first pieces; the rest are sprints 11 and 12):
+
+- **Story first.** An introduction before the character is made; the first
+  chapter is a tutorial taught by a friend (Nuri) at the gate, and the story
+  resumes once the castle is reached; the wand is lent, and the wizard must
+  earn one; the wizard grows (a wand of their own, a broom, friends). Every
+  level ends with a closing: a word of story and what was learned; every
+  chapter opens and closes with story pages, the closing a recap of the
+  chapter's ideas.
+- **Gemini writes the child's texts** (CLAUDE.md, *Who writes what the child
+  reads*), from briefs, with the whole context; Claude reviews.
+- **Kinds and numbers.** Lessons and practices are told apart and numbered
+  within the chapter; there are fix-it levels (a program to repair) and
+  improve levels, besides practices and challenges. A lesson that uses a
+  thing in its code (a comment, an argument) comes after the lesson that
+  explains it; the notebook shows an action without arguments until
+  arguments are taught.
+- **Stars mean something.** Three for a clean win; one lost for hints, one
+  for bumping into walls or a bonus unmet; the win card says why.
+- **The screen explains itself.** A guided overlay on the first level names
+  the scene, the editor, the buttons and the notebook; the notebook is
+  nudged; the `?` card reopens with *Continue*, above the notebook; probing
+  and watching is said to be the method from the start.
+- **The map does not throw the player out.** It opens over the level, shows
+  where the player is, closes back to it, asks before leaving; a chapter is a
+  mini-map, and what lies ahead is unnamed. Lessons can be read from a level.
+- **Saved games.** A game per wizard, saved on the server the game runs
+  from, listed with its wizard, its place, its play time and its dates,
+  loaded on return; export and import stay as the way to carry one away.
+- **Sound and animation everywhere**, with the art (phase 4), the whole page
+  restyled in the magic.
 
 5.1 The story bible, `docs/dev/story.md`: the school, its name and places,
     the characters (the head, the teachers, a rival, a friend, the cat, a

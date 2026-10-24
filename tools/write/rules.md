@@ -8,21 +8,35 @@ game's developers before it enters the game.
 
 ## How a text for the child is written
 
-- One idea per sentence. Short sentences. No chains of clauses held together
-  by commas.
+- Natural, warm prose, as a good storyteller or teacher speaks to a child of
+  eight: sentences with rhythm, of the length a child reads with ease, not a
+  string of clipped sentences and not long chains of clauses either. Write
+  as you write best.
 - Say why before how: what a thing is for, before how to do it.
 - Warm, funny, never scary. The child is never mocked. A failure is the
   code's, never the child's: "the wizard walked into the wall", not "you made
   a mistake".
 - Words a child of eight understands. A new idea is named by the child's word
-  beside the programmer's word the first times it appears ("an action, which
+  beside the programmer's word the first time it appears ("an action, which
   programmers call a method"; "a question, which programmers call an
-  expression"); later, the programmer's word alone.
+  expression"); from then on, the programmer's word alone. Never explain
+  again an idea the course has already taught: the brief says what the
+  child knows by now, and a text that follows builds on it.
+- Precise about what things are: the computer (the game) runs the program
+  and does what it is told, never "the castle"; a character or a thing in
+  a program is an object, and the text says the name the code knows it by
+  (`wizard`, `door`); an action is a method, and each method has its own
+  arguments, which mean its own things, or none; a string holds any
+  characters, capitals, small letters, digits and signs, exactly as written.
+- A sentence of what was learned says both what the idea is and what the
+  child can now do with it ("now you know what an argument is, and that a
+  move's argument says how far to move").
 - The game's own words: an action is a method of an object
   (`wizard.move_right()`); a spell is a word of magic, a string, cast with the
   wand (`wizard.cast("zelim")`), never a method; the button that runs the
   code is "Run" / "Ejecutar"; the panel that lists what the wizard can do is
-  the notebook / "cuaderno"; a module is a book of the school's library.
+  the notebook / "cuaderno"; a module is a book of the school's library. A
+  name a text asks the child to type (a password, a spell) is in italics.
 - Python stays Python: keywords, the game's names (`wizard`, `move_right`,
   `door`, `find_nearest`...) and the code are never translated. Comments and
   strings inside code are translated.

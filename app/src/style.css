@@ -434,6 +434,35 @@ footer {
   max-width: 60%;
 }
 
+/* The camera's zoom, over the scene's corner (D69). */
+.zoom-box {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zoom-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--fg);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.zoom-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .editor {
   flex: 1;
   min-height: 0;

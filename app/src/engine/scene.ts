@@ -7,8 +7,13 @@
 // data-thought (why an action could not be done, while the wizard thinks it),
 // data-shaking (present while something shakes at a failed try), data-look
 // (the id of the look the wizard is drawn with, D36), data-dark (whether the
-// room is still dark, D52) and data-stairs ("id:in" or "id:away" joined by ";",
-// each stair as a step taken now would find it, D53).
+// room is still dark, D52), data-stairs ("id:in" or "id:away" joined by ";",
+// each stair as a step taken now would find it, D53), data-zoom (the
+// camera's zoom, D69) and data-following (whether the camera follows the wizard).
+//
+// The camera is a window on the scene (D69): at most VIEW_TILES of it at zoom
+// 1, the tiles at their size; it follows the wizard, the player zooms it and
+// drags it to look around, and a run or a restart brings it back to the wizard.
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
@@ -17,6 +22,7 @@ import { DEFAULT_LOOK, type Look } from './looks';
 import {
   actorKey,
   FLOOR,
+  friendKey,
   type Facing,
   FACINGS,
   makePlaceholders,
@@ -31,18 +37,27 @@ import {
 import { Playback } from './playback';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
-import { blockedText } from './words';
+import { blockedText, friendText } from './words';
 
 /** How long one tick lasts at speed 1. */
 export const TICK_MS = 400;
 /** How many ticks a word said stays over the wizard. */
 const SAY_TICKS = 3;
+/** The most of a scene the camera shows at zoom 1, in tiles across and down (D69). */
+export const VIEW_TILES: Tile = [15, 9];
+/** The zooms the player steps through, from the whole scene to a close look. */
+export const ZOOMS = [0.5, 0.75, 1, 1.5, 2] as const;
+const ZOOM_START = ZOOMS.indexOf(1);
 
 export interface SceneHandle {
   playback: Playback;
   /** Gives the playback a run's events, with everything back where it started. */
   load(result: WorldResult): void;
   reset(): void;
+  /** Zooms the camera one step in (1) or out (-1); false when it can go no further. */
+  zoom(step: 1 | -1): boolean;
+  /** Whether the camera can zoom one step in (1) or out (-1). */
+  canZoom(step: 1 | -1): boolean;
   destroy(): void;
 }
 
@@ -93,6 +108,8 @@ class LevelScene extends Phaser.Scene {
   private holds = new Map<string, Hold[]>();
   /** Counts the restarts, so that a door's delayed opening from a run before is dropped. */
   private restarts = 0;
+  /** The zoom's step in ZOOMS (D69). */
+  private zoomStep = ZOOM_START;
 
   constructor(
     private readonly map: Layout,
@@ -109,6 +126,7 @@ class LevelScene extends Phaser.Scene {
       this,
       this.map.markers.map(([letter]) => letter),
       this.look,
+      this.map.actors.filter((actor) => actor.kind === 'friend').map((actor) => actor.id),
     );
     // The look the wizard is drawn with, for the tests (D36).
     this.parentNode.dataset.look = this.look.id;
@@ -127,7 +145,7 @@ class LevelScene extends Phaser.Scene {
     for (const thing of this.map.things) {
       const image =
         thing.kind === 'door'
-          ? this.add.image(...centre(thing.tile), thingKey('door'), thing.lock)
+          ? this.add.image(...centre(thing.tile), thingKey('door'), thing.open ? 'open' : thing.lock)
           : thing.kind === 'stair'
             ? this.add.image(...centre(thing.tile), thingKey('stair'), 'in')
             : this.add.image(...centre(thing.tile), thingKey(thing.kind));
@@ -138,24 +156,74 @@ class LevelScene extends Phaser.Scene {
       if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
     }
     for (const actor of this.map.actors) {
+      const key = actor.kind === 'friend' ? friendKey(actor.id) : actorKey(actor.kind);
       const sprite = this.add
-        .sprite(...centre(actor.tile), actorKey(actor.kind), actor.facing)
+        .sprite(...centre(actor.tile), key, actor.facing)
         .setOrigin(0.5, 0.6)
         .setDepth(3);
       this.actors.set(actor.id, { sprite, tile: actor.tile, facing: actor.facing, sight: actor.sight });
     }
     this.wizard = this.add.sprite(...centre(this.map.start), WIZARD_KEY, 'down');
     this.wizard.setOrigin(0.5, 0.6).setDepth(4);
+    this.setUpCamera();
 
     this.playback.onTick((tick, events, instant) => this.show(tick, events, instant));
     this.playback.onState((state) => {
       this.parentNode.dataset.state = state;
+      // A run brings the camera back to the wizard.
+      if (state === 'playing') this.follow();
       // A word said near the end of the run would stay for ever: it fades.
       if (state === 'done') this.time.delayedCall(this.playback.tickDuration * SAY_TICKS, () => this.clearBubble());
     });
     this.restart();
     this.parentNode.dataset.state = this.playback.state;
     this.ready();
+  }
+
+  /** The camera over the whole scene, on the wizard; the wheel zooms it and a drag
+   * moves it, which lets go of the wizard until the next run (D69). */
+  private setUpCamera(): void {
+    const camera = this.cameras.main;
+    camera.setBounds(0, 0, this.map.width * TILE, this.map.height * TILE);
+    camera.setRoundPixels(true);
+    this.follow();
+    this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => {
+      if (dy !== 0) this.zoomBy(dy < 0 ? 1 : -1);
+    });
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (!pointer.isDown) return;
+      const dx = pointer.x - pointer.prevPosition.x;
+      const dy = pointer.y - pointer.prevPosition.y;
+      if (dx === 0 && dy === 0) return;
+      camera.stopFollow();
+      this.parentNode.dataset.following = 'false';
+      camera.scrollX -= dx / camera.zoom;
+      camera.scrollY -= dy / camera.zoom;
+    });
+    this.parentNode.dataset.zoom = String(camera.zoom);
+  }
+
+  /** The camera back on the wizard, following it. */
+  follow(): void {
+    const camera = this.cameras.main;
+    camera.startFollow(this.wizard, true, 0.2, 0.2);
+    camera.centerOn(this.wizard.x, this.wizard.y);
+    this.parentNode.dataset.following = 'true';
+  }
+
+  canZoomBy(step: 1 | -1): boolean {
+    const next = this.zoomStep + step;
+    return next >= 0 && next < ZOOMS.length;
+  }
+
+  /** One step in or out of ZOOMS, about the camera's middle. */
+  zoomBy(step: 1 | -1): boolean {
+    if (!this.canZoomBy(step)) return false;
+    this.zoomStep += step;
+    const zoom = ZOOMS[this.zoomStep] ?? 1;
+    this.cameras.main.setZoom(zoom);
+    this.parentNode.dataset.zoom = String(zoom);
+    return true;
   }
 
   /** A word said follows the wizard while it walks. */
@@ -195,7 +263,8 @@ class LevelScene extends Phaser.Scene {
       if (!image) continue;
       this.tweens.killTweensOf(image);
       image.setPosition(...centre(thing.tile)).setVisible(true).setAlpha(1);
-      if (thing.kind === 'door') image.setFrame(thing.lock);
+      if (thing.kind === 'door') image.setFrame(thing.open ? 'open' : thing.lock);
+      if (thing.open) this.openDoors.add(thing.id);
     }
     for (const actor of this.map.actors) {
       const state = this.actors.get(actor.id);
@@ -208,6 +277,7 @@ class LevelScene extends Phaser.Scene {
     this.placeWizard(this.map.start, 'down');
     this.parentNode.dataset.tick = '0';
     this.publish();
+    if (this.restarts > 1) this.follow();
   }
 
   private placeWizard(tile: Tile, facing: Facing): void {
@@ -336,6 +406,8 @@ class LevelScene extends Phaser.Scene {
         if (!at) return;
         this.placeWizard(at, facing ?? 'down');
         if (!instant) this.nudge(this.wizard, facing ?? 'down', duration);
+        // A friend in the way: the wizard thinks who (D66).
+        if (!instant && event.data.by === 'friend') this.think(friendText(String(event.data.id)), tick);
         break;
       }
       case 'say':
@@ -591,6 +663,12 @@ export function startScene(
         reset() {
           playback.reset();
         },
+        zoom(step) {
+          return scene.zoomBy(step);
+        },
+        canZoom(step) {
+          return scene.canZoomBy(step);
+        },
         destroy() {
           resized.disconnect();
           playback.stop();
@@ -603,8 +681,9 @@ export function startScene(
     game = new Phaser.Game({
       type: Phaser.AUTO,
       parent,
-      width: map.width * TILE,
-      height: map.height * TILE,
+      // The camera's window: the whole scene when it is small, VIEW_TILES of it when not.
+      width: Math.min(map.width, VIEW_TILES[0]) * TILE,
+      height: Math.min(map.height, VIEW_TILES[1]) * TILE,
       pixelArt: true,
       backgroundColor: '#1f2330',
       banner: false,

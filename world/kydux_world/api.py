@@ -3,8 +3,9 @@
 A level lists in `api` the names it uses, as `role.member` (D23):
 `wizard.move_right`, `door.open`, `thing.position`. A role is what an object
 is to the child: `wizard`; a thing's kind when it has members of its own
-(`door`), or `thing`; an actor's kind (`teacher`, `ghost`, `cat`). A door is a thing too, so
-`thing.position` covers a door's position; so does a key's.
+(`door`), or `thing`; an actor's kind (`teacher`, `ghost`, `cat`, `friend`). A
+door is a thing too, so `thing.position` covers a door's position; so does a
+key's.
 
 The table here is the one list of what the child can type. It is plain data,
 so that a level can be checked without the world's classes; a test holds the
@@ -44,6 +45,8 @@ MEMBERS: dict[str, tuple[str, ...]] = {
     "teacher": ("kind", "name", "position", "facing", "can_see"),
     "ghost": ("kind", "name", "position", "facing"),
     "cat": ("kind", "name", "position", "facing"),
+    # A friend teaches by words, not by code: the child's code has nothing of it (D66).
+    "friend": (),
 }
 
 #: The roles that are things, and so have a thing's members.

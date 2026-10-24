@@ -2,7 +2,9 @@
 // draw: the map's walls and markers, the wizard's start, the things and the
 // actors. It follows kydux_world.level, which validates the same file: a thing
 // or actor is placed by its marker or at [x, y], and an actor without a
-// facing faces its first step, or down. The world's events say the rest.
+// facing faces its first step, or, a friend, the wizard (D66), or down. A
+// level on a scene (D65) comes with the scene's map built in by pack-world.
+// The world's events say the rest.
 
 import type { LevelJson } from '../runtime/protocol';
 import type { Facing, Tile } from './sight';
@@ -18,6 +20,8 @@ export interface ThingLayout {
   lock: DoorLock;
   /** For a stair, the ticks it is in place and then away (D53). */
   period?: number;
+  /** For a door, open from the start: an earlier level of the scene opened it (D65). */
+  open: boolean;
 }
 
 function lockOf(spec: Record<string, unknown>): DoorLock {
@@ -90,7 +94,8 @@ export function layout(level: LevelJson): Layout {
     if (typeof spec.marker === 'string') used.add(spec.marker);
     if (tile) {
       const period = typeof spec.period === 'number' ? { period: spec.period } : {};
-      things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec), ...period });
+      const open = spec.kind === 'door' && spec.open === true;
+      things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec), open, ...period });
     }
   }
   const actors: ActorLayout[] = [];
@@ -99,7 +104,10 @@ export function layout(level: LevelJson): Layout {
     if (typeof spec.marker === 'string') used.add(spec.marker);
     if (!tile) continue;
     const first = asTile(asList(spec.patrol)[0] ?? null);
-    const facing = (spec.facing as Facing | undefined) ?? (first ? towards(tile, first) : 'down');
+    const looking = spec.kind === 'friend' && (tile[0] !== start[0] || tile[1] !== start[1]);
+    const facing =
+      (spec.facing as Facing | undefined) ??
+      (first ? towards(tile, first) : looking ? towards(tile, start) : 'down');
     // Only a teacher looks out for the wizard; a ghost or a cat sees nothing to catch.
     const sight = spec.kind !== 'teacher' ? 0 : typeof spec.sight === 'number' ? spec.sight : DEFAULT_SIGHT;
     actors.push({ id: String(spec.id), kind: String(spec.kind), tile, facing, sight });

@@ -254,3 +254,55 @@ def test_every_level_of_a_rewritten_chapter_closes(path):
             else:
                 assert text.get("learned", "").strip(), f"{level_id} says no learned in {lang}"
     assert chapter(path)["items"][-1].startswith("story:"), "the chapter closes with a story page"
+
+
+def level_json(item_id: str) -> dict:
+    return json.loads((CONTENT / "levels" / item_id / "level.json").read_text(encoding="utf-8"))
+
+
+def walked(item_id: str) -> list[tuple[int, int]]:
+    """The tiles the wizard stands on in a level's solution, from its start to its end,
+    in its first way."""
+    directory = CONTENT / "levels" / item_id
+    level = Level.from_directory(directory)
+    level = level.ways[0][1] if level.ways else level
+    result = run_code(level, (directory / "solution.py").read_text(encoding="utf-8"))
+    tiles = [tuple(level.start)]
+    tiles += [
+        tuple(e.data["to"]) for e in result.events if e.actor == "wizard" and e.kind == "move"
+    ]
+    return tiles
+
+
+def scene_pairs() -> list[tuple[str, str]]:
+    """Each level on a scene with the level before it in its chapter on the same scene."""
+    pairs = []
+    for path in CHAPTERS:
+        levels = [i.partition(":")[2] for i in chapter(path)["items"] if i.startswith("level:")]
+        for before, after in zip(levels, levels[1:], strict=False):
+            scene = level_json(after).get("scene")
+            if scene and level_json(before).get("scene") == scene:
+                pairs.append((before, after))
+    return pairs
+
+
+@pytest.mark.parametrize(("before", "after"), scene_pairs(), ids=lambda v: v)
+def test_a_level_on_a_scene_starts_where_the_one_before_it_ended(before, after):
+    """D65: where a level ends the next begins, on the same tile: its end, or, with no
+    end, the tile its solution leaves the wizard on."""
+    ended = level_json(before).get("end") or list(walked(before)[-1])
+    assert level_json(after)["start"] == ended
+
+
+SCENE_LEVELS = sorted(
+    p.name for p in (CONTENT / "levels").iterdir() if "scene" in level_json(p.name)
+)
+
+
+@pytest.mark.parametrize("item_id", SCENE_LEVELS)
+def test_a_friend_stands_off_the_solution_s_way(item_id):
+    """D66: the friend who teaches stands near, never where the solution walks."""
+    path = set(walked(item_id))
+    for actor in level_json(item_id).get("actors", []):
+        if actor["kind"] == "friend":
+            assert tuple(actor["at"]) not in path, f"{actor['id']} stands on the way"

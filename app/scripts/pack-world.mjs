@@ -190,6 +190,17 @@ if (reserved.status !== 0) {
 }
 writeFileSync(join(publicDir, 'reserved.json'), reserved.stdout);
 
+// A level on a chapter's scene (D65) ships with the scene's map built in, its
+// start and its end on it, so that the page loads it as any other level.
+const scened = spawnSync(python, [join(repo, 'tools', 'scene_maps.py')], { encoding: 'utf8' });
+if (scened.status !== 0) {
+  console.error(scened.stderr);
+  process.exit(1);
+}
+for (const [id, level] of Object.entries(JSON.parse(scened.stdout))) {
+  writeFileSync(join(content, 'levels', id, 'level.json'), `${JSON.stringify(level, null, 2)}\n`);
+}
+
 console.log(
   `pack-world: ${entries.length} files in public/world.zip, content/ copied, ${chapters.length} chapters in the course`,
 );

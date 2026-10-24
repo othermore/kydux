@@ -59,6 +59,8 @@
     "go_start": "Go to the start",
     "settings": "Settings",
     "split": "Drag to resize the scene and the editor",
+    "zoom_in": "Zoom in (or the mouse wheel)",
+    "zoom_out": "Zoom out (or the mouse wheel)",
     "run_key": "Run your code: Alt+R, or Ctrl+Enter in the editor",
     "notebook_key": "Open or close the notebook: Alt+N",
     "carrying": "You carry {things}.",
@@ -93,6 +95,7 @@
     "stair": "the stair"
   },
   "blocked": {
+    "friend": "{name} is in my way: I must walk round.",
     "far": "I cannot reach {thing} from here.",
     "locked": "I cannot open {thing}: it is locked, and I have no key for it.",
     "open": "I do not need to: {thing} is already open.",

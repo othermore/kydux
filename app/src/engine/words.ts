@@ -54,3 +54,8 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
       return t('blocked.unknown_action');
   }
 }
+
+/** Who stands in the wizard's way: a friend, by the name the story gives them (D66). */
+export function friendText(id: string): string {
+  return t('blocked.friend', { name: t(`characters.${id}`) });
+}

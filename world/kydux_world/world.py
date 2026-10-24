@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
-from .actors import Actor, Teacher, make_actor, sight_tiles
+from .actors import Actor, Friend, Teacher, make_actor, sight_tiles
 from .goals import make_goal
 from .level import CARRIED_KINDS, Level, Position
 from .things import Child, Door, Stair, Thing, make_thing
@@ -152,6 +152,13 @@ class World:
         door = self.door_at(position)
         return door is None or door.is_open
 
+    def friend_at(self, position: Position) -> str | None:
+        """The id of the friend standing on a tile, or None (D66)."""
+        for actor in self.actors.values():
+            if isinstance(actor, Friend) and actor.position == position:
+                return actor.name
+        return None
+
     def door_at(self, position: Position) -> Door | None:
         for thing in self.things.values():
             if isinstance(thing, Door) and thing._k_position == position:
@@ -278,6 +285,14 @@ class Wizard(Child):
             dx, dy = direction.delta
             here = self._k_position
             ahead = Position(here.x + dx, here.y + dy)
+            friend = world.friend_at(ahead)
+            if friend is not None:
+                # A friend stands in the way: the wizard walks round (D66).
+                world.act(
+                    "bump",
+                    {"at": list(here), "facing": direction.value, "by": "friend", "id": friend},
+                )
+                return
             if not world.is_free(ahead):
                 by = (
                     "door"

@@ -59,6 +59,8 @@
     "go_start": "Ir al inicio",
     "settings": "Ajustes",
     "split": "Arrastra para cambiar el tamaño de la escena y del editor",
+    "zoom_in": "Acercar (o la rueda del ratón)",
+    "zoom_out": "Alejar (o la rueda del ratón)",
     "run_key": "Ejecuta tu código: Alt+R, o Ctrl+Intro en el editor",
     "notebook_key": "Abre o cierra el cuaderno: Alt+N",
     "carrying": "Llevas {things}.",
@@ -93,6 +95,7 @@
     "stair": "la escalera"
   },
   "blocked": {
+    "friend": "{name} está en mi camino: tengo que dar un rodeo.",
     "far": "No llego a {thing} desde aquí.",
     "locked": "No puedo abrir {thing}: está cerrada con llave y no tengo la llave.",
     "open": "No hace falta: {thing} ya está abierta.",

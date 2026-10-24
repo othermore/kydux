@@ -37,6 +37,11 @@ export function actorKey(kind: string): string {
   return `kydux-actor-${kind}`;
 }
 
+/** A friend's texture, one per friend: each is drawn as the character (D66). */
+export function friendKey(id: string): string {
+  return `kydux-friend-${id}`;
+}
+
 function canvas(
   scene: Phaser.Scene,
   key: string,
@@ -124,7 +129,7 @@ function drawMarker(ctx: CanvasRenderingContext2D, colour: string): void {
   ctx.fill();
 }
 
-interface Figure {
+export interface Figure {
   robe: string;
   /** The hat and its band, or null for a figure without one. */
   hat: { colour: string; band: string } | null;
@@ -148,6 +153,25 @@ const GHOST: Figure = {
   hairStyle: 'short',
   skin: '#eef3fa',
 };
+
+/** The friends who teach, each in their own colours (D66): Nuri, a pupil with
+ * a hat like the wizard's and the wizard's gender (D37); Wenna, the librarian.
+ * A friend the game has no figure for is drawn as a teacher. */
+export function friendFigure(id: string, gender: 'girl' | 'boy'): Figure {
+  if (id === 'nuri') {
+    return {
+      robe: '#3f8f5a',
+      hat: { colour: '#2f6b44', band: '#e8c547' },
+      hair: '#4a2c1a',
+      hairStyle: gender === 'girl' ? 'long' : 'short',
+      skin: '#c98e5f',
+    };
+  }
+  if (id === 'wenna') {
+    return { robe: '#5a4a8f', hat: null, hair: '#2b2b2b', hairStyle: 'long', skin: '#f0c8a0' };
+  }
+  return TEACHER;
+}
 
 /** The cat, facing one way: a body, a head with ears, a tail. */
 function drawCat(ctx: CanvasRenderingContext2D, x: number, facing: Facing): void {
@@ -208,6 +232,18 @@ export function drawLookPreview(target: HTMLCanvasElement, look: Look): void {
   if (!ctx) return;
   ctx.clearRect(0, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
   drawWizard(ctx, 0, 'down', look);
+}
+
+/** A figure facing the viewer, on a canvas of its own: a character beside a
+ * lesson (D67). The canvas is WIZARD_WIDTH by WIZARD_HEIGHT; CSS makes it
+ * bigger, pixelated. */
+export function drawFigurePreview(target: HTMLCanvasElement, figure: Figure): void {
+  target.width = WIZARD_WIDTH;
+  target.height = WIZARD_HEIGHT;
+  const ctx = target.getContext('2d');
+  if (!ctx) return;
+  ctx.clearRect(0, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
+  drawFigure(ctx, 0, 'down', figure);
 }
 
 /** Long hair: past the hat's brim at the sides, and from behind over the robe. */
@@ -387,11 +423,13 @@ function drawThing(ctx: CanvasRenderingContext2D, x: number, kind: string, open 
   }
 }
 
-/** Makes every placeholder texture a level with these marker letters needs. */
+/** Makes every placeholder texture a level with these marker letters and these
+ * friends needs. */
 export function makePlaceholders(
   scene: Phaser.Scene,
   markers: string[],
   look: Look = DEFAULT_LOOK,
+  friends: string[] = [],
 ): void {
   const tiles = canvas(scene, TILES_KEY, TILE * 3, TILE);
   drawFloor(tiles.ctx, FLOOR * TILE);
@@ -427,6 +465,15 @@ export function makePlaceholders(
     ghost.texture.add(facing, 0, index * WIZARD_WIDTH, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
   });
   ghost.texture.refresh();
+  for (const id of friends) {
+    const friend = canvas(scene, friendKey(id), WIZARD_WIDTH * FACINGS.length, WIZARD_HEIGHT);
+    const figure = friendFigure(id, look.gender);
+    FACINGS.forEach((facing, index) => {
+      drawFigure(friend.ctx, index * WIZARD_WIDTH, facing, figure);
+      friend.texture.add(facing, 0, index * WIZARD_WIDTH, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
+    });
+    friend.texture.refresh();
+  }
   const cat = canvas(scene, actorKey('cat'), WIZARD_WIDTH * FACINGS.length, WIZARD_HEIGHT);
   FACINGS.forEach((facing, index) => {
     drawCat(cat.ctx, index * WIZARD_WIDTH, facing);

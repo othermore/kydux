@@ -1,4 +1,5 @@
-"""The actors: who moves in the world besides the wizard. The teacher, for now.
+"""The actors: who moves in the world besides the wizard, or stands in it: the
+teacher, the ghost, the cat, and a friend who teaches (D66).
 
 An actor takes its step in every tick, after the wizard has done its thing
 (architecture.md, D21). The teacher walks its patrol one tile per tick,
@@ -133,8 +134,15 @@ class Cat(Actor):
     _k_role = "cat"
 
 
+class Friend(Actor):
+    """A friend who teaches, standing in the scene and looking at the wizard: the
+    wizard walks round, never through (D66)."""
+
+    _k_role = "friend"
+
+
 #: Each actor kind's class, by the kind's name in level.json.
-ACTORS: dict[str, type[Actor]] = {"teacher": Teacher, "ghost": Ghost, "cat": Cat}
+ACTORS: dict[str, type[Actor]] = {"teacher": Teacher, "ghost": Ghost, "cat": Cat, "friend": Friend}
 
 
 def make_actor(world: "World", spec: ActorSpec) -> Actor:

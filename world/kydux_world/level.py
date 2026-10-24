@@ -7,9 +7,15 @@ letter a floor tile that things, actors and goals may name by that letter (a
 marker), like `D` for a door. Positions are (x, y) from the top-left corner,
 x to the right and y down.
 
+A level that is a part of a chapter's scene (D65) names it in `scene` instead
+of giving a map: the scene's rows are read from content/scenes/<id>/map.txt
+(`#`, `.` and `=` only), and the level puts the wizard at `start` and the
+`E` the reach goal wants at `end`, each [x, y]; `from_directory` builds the
+level's map from them.
+
 Beside the map: `things` (keys, doors, books...) and `actors` (the teacher,
-the ghost, the cat), each placed by a marker or at x and y, with an id the
-child's code knows it by; `carrying`, the kinds of thing the wizard holds
+the ghost, the cat, a friend), each placed by a marker or at x and y, with an
+id the child's code knows it by; `carrying`, the kinds of thing the wizard holds
 from the start (D49); `spells`, the spells that can be cast (D42); `api`,
 the names the level teaches (D23); `goals`, some of them bonus goals;
 `tick_limit`; `dark`, a room unlit until `kirra` (D52); and `ways`, the ways
@@ -41,7 +47,7 @@ WALL, FLOOR, SHELF, START = "#", ".", "=", "S"
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
 THING_KINDS = ("key", "door", "book", "wand", "potion", "stair")
 CARRIED_KINDS = ("key", "book", "wand", "potion")
-ACTOR_KINDS = ("teacher", "ghost", "cat")
+ACTOR_KINDS = ("teacher", "ghost", "cat", "friend")
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
 KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto")
@@ -78,6 +84,8 @@ class ThingSpec:
     carried: bool = False
     #: For a stair, the ticks it is in place and then away, in turn (D53).
     period: int | None = None
+    #: For a door, open from the start: a door an earlier level of the scene opened (D65).
+    open: bool = False
 
 
 @dataclass(frozen=True)
@@ -123,6 +131,8 @@ class Level:
         level_id = data.get("id")
         if not isinstance(level_id, str) or not level_id:
             raise LevelError("a level needs an id")
+        if "scene" in data:
+            raise LevelError(f"{level_id}: a level on a scene is read with its scene (on_scene)")
         if "ways" in data:
             ways = tuple((way["id"], cls._one(merged)) for way, merged in _ways(data))
             return replace(ways[0][1], ways=ways)
@@ -159,7 +169,9 @@ class Level:
         if len(starts) != 1:
             raise LevelError(f"{level_id}: the map needs exactly one S, and has {len(starts)}")
 
-        shape = _Shape(level_id, width, len(rows), frozenset(walls), frozenset(shelves), markers)
+        shape = _Shape(
+            level_id, width, len(rows), frozenset(walls), frozenset(shelves), markers, starts[0]
+        )
         things = tuple(_thing(shape, spec) for spec in _list(data, "things", level_id))
         things += _carrying(data, level_id, starts[0])
         actors = tuple(_actor(shape, spec) for spec in _list(data, "actors", level_id))
@@ -253,9 +265,11 @@ class Level:
 
     @classmethod
     def from_directory(cls, directory: Path) -> "Level":
-        """A level from its directory: level.json, and goals.py when level.json says
-        `"own_goals": true`."""
+        """A level from its directory: level.json, its scene's map when it names one
+        (D65), and goals.py when level.json says `"own_goals": true`."""
         data = json.loads((directory / "level.json").read_text(encoding="utf-8"))
+        if "scene" in data:
+            data = on_scene(data, scene_rows(directory.parent.parent / "scenes", data))
         goals = directory / "goals.py"
         if goals.is_file() != bool(data.get("own_goals", False)):
             raise LevelError(f"{directory.name}: goals.py and own_goals in level.json go together")
@@ -288,6 +302,7 @@ class _Shape:
     walls: frozenset[Position]
     shelves: frozenset[Position]
     markers: dict[str, Position]
+    start: Position
 
     def place(self, spec: dict[str, Any], what: str, walks: bool = False) -> Position:
         """Where a thing lies, or, with `walks`, where an actor stands: not on a shelf."""
@@ -360,6 +375,13 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
     whole = isinstance(period, int) and not isinstance(period, bool) and period >= 1
     if (kind == "stair") != (period is not None) or (period is not None and not whole):
         raise LevelError(f"{shape.level_id}: a stair, and only a stair, has a whole period")
+    opened = spec.get("open", False)
+    if not isinstance(opened, bool) or (opened and kind != "door"):
+        raise LevelError(f"{shape.level_id}: only a door is open from the start, true or false")
+    if opened and (locked or sealed is not None):
+        raise LevelError(
+            f"{shape.level_id}: the door {thing_id} is open, and so neither locked nor sealed"
+        )
     return ThingSpec(
         kind,
         thing_id,
@@ -369,6 +391,7 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         sealed,
         password,
         period=period,
+        open=opened,
     )
 
 
@@ -379,6 +402,8 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
     actor_id = _identifier(shape.level_id, spec.get("id"), f"a {kind}")
     position = shape.place(spec, actor_id, walks=True)
     waypoints = spec.get("patrol", [])
+    if kind == "friend" and waypoints:
+        raise LevelError(f"{shape.level_id}: {actor_id} is a friend, who stands still")
     if not isinstance(waypoints, list):
         raise LevelError(f"{shape.level_id}: {actor_id}'s patrol must be a list of [x, y]")
     path, here = [position], position
@@ -396,6 +421,9 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
                 )
             path.append(here)
     facing = spec.get("facing")
+    if facing is None and kind == "friend" and position != shape.start:
+        # A friend looks at the wizard (D66).
+        facing = _towards(position, shape.start)
     if facing is None:
         facing = _towards(path[0], path[1]) if len(path) > 1 else "down"
     if facing not in FACINGS:
@@ -478,3 +506,51 @@ def _check_ids(
         if item_id in seen:
             raise LevelError(f"{level_id}: two things or actors are called {item_id}")
         seen.add(item_id)
+
+
+#: What a scene's map may hold: walls, floor and shelves, no markers (D65).
+SCENE_CHARACTERS = frozenset((WALL, FLOOR, SHELF))
+
+
+def scene_rows(scenes: Path, data: dict[str, Any]) -> list[str]:
+    """The rows of the scene a level names, from `scenes/<id>/map.txt` (D65)."""
+    level_id, scene = data.get("id"), data.get("scene")
+    if not isinstance(scene, str) or not scene:
+        raise LevelError(f"{level_id}: scene is the id of a scene")
+    path = scenes / scene / "map.txt"
+    if not path.is_file():
+        raise LevelError(f"{level_id}: there is no scene {scene}")
+    rows = [row for row in path.read_text(encoding="utf-8").splitlines() if row]
+    if not rows or any(len(row) != len(rows[0]) for row in rows):
+        raise LevelError(f"{scene}: a scene's rows must all be as long as the first")
+    if any(char not in SCENE_CHARACTERS for row in rows for char in row):
+        raise LevelError(f"{scene}: a scene holds only #, . and =")
+    return rows
+
+
+def on_scene(data: dict[str, Any], rows: list[str]) -> dict[str, Any]:
+    """level.json with the map of its scene in place of `scene`, `start` and `end`:
+    the wizard's `S` at `start`, and the `E` of the reach goal at `end` (D65)."""
+    level_id = data.get("id")
+    if "map" in data:
+        raise LevelError(f"{level_id}: a level has a map or a scene, not both")
+    grid = [list(row) for row in rows]
+    for key, letter in (("start", START), ("end", "E")):
+        if key not in data:
+            if key == "start":
+                raise LevelError(f"{level_id}: a level on a scene needs its start")
+            continue
+        value = data[key]
+        if not (
+            isinstance(value, list)
+            and len(value) == 2
+            and all(isinstance(v, int) and not isinstance(v, bool) for v in value)
+        ):
+            raise LevelError(f"{level_id}: {key} must be [x, y]")
+        x, y = value
+        if not (0 <= y < len(grid) and 0 <= x < len(grid[0])) or grid[y][x] != FLOOR:
+            raise LevelError(f"{level_id}: its {key} {x},{y} is not floor on the scene")
+        grid[y][x] = letter
+    built = {key: value for key, value in data.items() if key not in ("scene", "start", "end")}
+    built["map"] = ["".join(row) for row in grid]
+    return built

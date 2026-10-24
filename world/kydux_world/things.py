@@ -130,7 +130,7 @@ class Door(Thing):
 
     def __init__(self, world: "World", spec: ThingSpec) -> None:
         super().__init__(world, spec)
-        self._set(locked=spec.locked, seal=spec.sealed, open=False)
+        self._set(locked=spec.locked, seal=spec.sealed, open=spec.open)
 
     def __repr__(self) -> str:
         state = (

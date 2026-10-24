@@ -29,7 +29,9 @@ figure's twelve frames in one sheet, content/art/figures/<id>.webp, four rows
 (down, left, right, up) of three frames, every frame the same size, the figure
 standing on the frame's foot line in its middle; figures.json says the frame's
 size and its foot. A side frame a model drew facing the other way is turned by
-comparing it with the demo's frames, which were turned by eye.
+comparing it with the demo's frames, which were turned by eye. The wizard's and
+Nuri's sheets are the bases in art/figures/ that tools/art/figures.py recolours
+for every look and friend, and it is run last, so that every sheet is made.
 """
 
 import json

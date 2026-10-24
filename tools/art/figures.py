@@ -259,8 +259,9 @@ def make(check: bool = False) -> list[Path]:
         base, hues = bases[key]
         recolour_sheet(base, frame, colours, hues).save(target, quality=90, method=6)
         written.append(target)
-    names = sorted({p.stem for p in written} | {"wenna", "eldra", "dask"})
-    about["figures"] = names
+    # The list is whatever sheets the folder holds: these, and the figures cut once
+    # by export_scene.py (Wenna, Eldra, Dask).
+    about["figures"] = sorted(p.stem for p in FIGURES.glob("*.webp"))
     (FIGURES / "figures.json").write_text(json.dumps(about, indent=2) + "\n", encoding="utf-8")
     if check:
         sheets = [Image.open(p).convert("RGBA") for p in written]

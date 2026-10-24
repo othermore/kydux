@@ -162,6 +162,8 @@ class LevelScene extends Phaser.Scene {
   private holds = new Map<string, Hold[]>();
   /** Counts the restarts, so that a door's delayed opening from a run before is dropped. */
   private restarts = 0;
+  /** The timers of a cast being played (D81), dropped when the level starts again. */
+  private casting: Phaser.Time.TimerEvent[] = [];
   /** The zoom's step in ZOOMS (D69). */
   private zoomStep = ZOOM_START;
   /** Who a bubble or a thought is over: the wizard, or an actor who speaks. */
@@ -488,6 +490,7 @@ class LevelScene extends Phaser.Scene {
     this.restarts += 1;
     this.clearBubble();
     this.clearThought();
+    this.stopCast();
     this.seenBy = null;
     this.lit = !this.map.dark;
     this.shownTick = 0;
@@ -617,6 +620,13 @@ class LevelScene extends Phaser.Scene {
     });
   }
 
+  /** A cast's frames stopped where they are, their timers dropped. */
+  private stopCast(): void {
+    for (const timer of this.casting) timer.remove(false);
+    this.casting = [];
+    delete this.parentNode.dataset.casting;
+  }
+
   /** A spell cast: a ring of light that grows from the wizard and fades (D42). */
   private flash(duration: number): void {
     const lift = this.art ? TILE * 0.5 : 6;
@@ -693,9 +703,11 @@ class LevelScene extends Phaser.Scene {
       case 'cast':
         if (!instant) {
           // The wand raised, pointed and lowered, on a sheet that has it.
-          if (playCast(this, this.wizard, this.art?.figures?.standing ?? 1, duration)) {
+          this.stopCast();
+          const timers = playCast(this, this.wizard, this.art?.figures?.standing ?? 1, duration);
+          if (timers) {
             this.parentNode.dataset.casting = 'true';
-            this.time.delayedCall(duration, () => delete this.parentNode.dataset.casting);
+            this.casting = [...timers, this.time.delayedCall(duration, () => this.stopCast())];
           }
           this.flash(duration);
           play('cast');

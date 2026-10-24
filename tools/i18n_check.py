@@ -43,6 +43,8 @@ I18N = REPO / "i18n"
 SOURCES = REPO / "app" / "src"
 DYNAMIC = REPO / "tools" / "i18n_dynamic.txt"
 LEVELS = REPO / "content" / "levels"
+#: The two friends whose names a `friend` speaker or `{friend}` needs (D77).
+FRIENDS = ("nuri", "teku")
 
 KEY_USE = re.compile(r"""\bt\(\s*(['"])([\w.-]+)\1""")
 LITERAL = re.compile(r"""'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`([^`$]*)`""")
@@ -210,8 +212,6 @@ def check_chapters(languages: list[str]) -> list[str]:
     return findings
 
 
-#: The two friends whose names a `friend` speaker or `{friend}` needs (D77).
-FRIENDS = ("nuri", "teku")
 #: Braces holding a bar: a choice for the wizard, well made or not.
 BRACED_BAR = re.compile(r"\{[^{}\n]*\|[^{}\n]*\}")
 #: The words for the wizard that Spanish genders; they belong inside a choice.

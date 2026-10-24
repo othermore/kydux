@@ -995,7 +995,9 @@ one overturns stays, marked as superseded.
   and none being played the start screen offers them. An imported file
   becomes one more game; *Export* keeps the game being played. Play time is
   counted every ten seconds a level, a lesson or a story is on screen
-  with the tab in sight. The single document of before, `kydux.progress`,
+  with the tab in sight and the child at the page: a key, a click, a scroll or
+  a move of the pointer within the last two minutes; a child who walks away is
+  not counted. The single document of before, `kydux.progress`,
   becomes the list's first game the first time the list is read, so the
   document keeps its version: its shape is the same. The online game
   (plan, phase 7) keeps the same list on the server it runs from.

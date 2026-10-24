@@ -1,9 +1,10 @@
 // A scene painted in one picture (D76), drawn in Phaser: its art loaded, the
 // ground and the raised things by row, each changing thing in its state, the
 // figures from their sheets, the pencil grid, the goal's beating mark and the
-// sealed doors' glow (D79); and what moves when a spell is cast: the wizard's
-// casting frames, a door passing through its states, a seal breaking. scene.ts holds what changes as a run plays and calls
-// these to draw; a scene without art is drawn by placeholders.ts.
+// sealed doors' glow (D79); and what moves when a spell is cast (D81): the
+// wizard's casting frames, a door passing through its states, a seal breaking.
+// scene.ts holds what changes as a run plays and calls these to draw; a scene
+// without art is drawn by placeholders.ts.
 
 import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
@@ -25,9 +26,10 @@ export interface SceneArt {
 }
 
 /** The figures drawn for the characters (D76): one sheet each of four rows (down,
- * left, right, up) of three walking frames, drawn at `cell` pixels a cell, each
- * figure at its own height; `foot` is how far above a frame's bottom the feet are,
- * from content/art/figures/figures.json. */
+ * left, right, up) of three walking frames, and on the wizard's four rows of
+ * casting frames after them (D81), drawn at `cell` pixels a cell, each figure at
+ * its own height; `foot` is how far above a frame's bottom the feet are, from
+ * content/art/figures/figures.json. */
 export interface FigureArt {
   base: string;
   cell: number;
@@ -87,10 +89,11 @@ export function preloadArt(scene: Phaser.Scene, { scene: painted, figures }: Art
       scene.load.image(`art-${id}-${state}`, painted.base + image);
     }
   }
-  for (const name of figures?.figures ?? []) {
-    scene.load.spritesheet(`fig-${name}`, `${figures?.base}${name}.webp`, {
-      frameWidth: figures?.frame[0] ?? 0,
-      frameHeight: figures?.frame[1] ?? 0,
+  if (!figures) return;
+  for (const name of figures.figures) {
+    scene.load.spritesheet(`fig-${name}`, `${figures.base}${name}.webp`, {
+      frameWidth: figures.frame[0],
+      frameHeight: figures.frame[1],
     });
   }
 }
@@ -154,22 +157,25 @@ export function facingOf(sprite: Phaser.GameObjects.Sprite): Facing {
 }
 
 /** The wizard casting: its three casting frames the way it faces, the wand raised,
- * pointed and lowered, then standing again; false for a sheet without them. */
+ * pointed and lowered, then standing again. Gives the timers that step the frames,
+ * for the scene to drop if the level starts again meanwhile; null for a sheet
+ * without casting frames. */
 export function playCast(
   scene: Phaser.Scene,
   sprite: Phaser.GameObjects.Sprite,
   standing: number,
   duration: number,
-): boolean {
+): Phaser.Time.TimerEvent[] | null {
   // A sheet's frames, and Phaser's whole-image frame besides them.
-  if (!sprite.texture.key.startsWith('fig-') || sprite.texture.frameTotal - 1 < (CAST_ROW + 4) * 3) return false;
+  if (!sprite.texture.key.startsWith('fig-') || sprite.texture.frameTotal - 1 < (CAST_ROW + 4) * 3) return null;
   const facing = facingOf(sprite);
   const frame = (step: number) => (CAST_ROW + SHEET_ROW[facing]) * 3 + step;
   sprite.setFrame(frame(0));
-  scene.time.delayedCall(duration * 0.25, () => sprite.setFrame(frame(1)));
-  scene.time.delayedCall(duration * 0.7, () => sprite.setFrame(frame(2)));
-  scene.time.delayedCall(duration, () => sprite.setFrame(SHEET_ROW[facing] * 3 + standing));
-  return true;
+  return [
+    scene.time.delayedCall(duration * 0.25, () => sprite.setFrame(frame(1))),
+    scene.time.delayedCall(duration * 0.7, () => sprite.setFrame(frame(2))),
+    scene.time.delayedCall(duration, () => sprite.setFrame(SHEET_ROW[facing] * 3 + standing)),
+  ];
 }
 
 /** A thing passing from one painted state to the next: the new state shown at once

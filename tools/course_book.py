@@ -22,6 +22,7 @@ REPO = Path(__file__).resolve().parents[1]
 CONTENT = REPO / "content"
 sys.path.insert(0, str(REPO / "world"))
 sys.path.insert(0, str(REPO / "world" / "tests"))
+from wizard_words import friend_of  # noqa: E402
 
 WORDS = {
     "es": {
@@ -119,8 +120,6 @@ def load_json(path: Path) -> dict:
 
 def character(speaker: str, lang: str, gender: str) -> str:
     """A character's name; `friend` is the friend of the wizard's other gender (D77)."""
-    from wizard_words import friend_of
-
     names = load_json(REPO / "i18n" / f"{lang}.json").get("characters", {})
     who = friend_of(gender)[0] if speaker == "friend" else speaker
     return names.get(who, who)

@@ -16,6 +16,12 @@ moves it into content/; drafts/ is never committed.
 The key is read from GEMINI_API_KEY in the environment or in
 ~/.config/kydux/secrets.env, and never printed; a second key, GEMINI_API_KEY_2,
 is tried in turn while the model is busy.
+
+    tools/write/write.py <brief> --via agy [--model gemini-4-argon-medium]
+
+sends the brief through the Antigravity CLI (`agy`) instead, signed in with
+the owner's Google account, with no API key: Gemini 3.8 Flash unless
+--model names another of `agy models`.
 """
 
 import argparse
@@ -23,7 +29,9 @@ import datetime
 import glob
 import json
 import os
+import subprocess
 import sys
+import tempfile
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -154,8 +162,55 @@ def gemini(text: str) -> str:
     raise BriefError("the model stayed busy")
 
 
+#: The model `agy` writes with unless told otherwise: Argon's quota is small.
+AGY_MODEL = "gemini-3.8-flash-high"
+
+
+def agy(text: str, model: str = AGY_MODEL) -> str:
+    """The answer to a prompt from the Antigravity CLI, as JSON text: run in an
+    empty folder, so that the agent sees no files but the prompt's. The rules ask
+    for one JSON object; it is taken from the reply, fenced or not."""
+    # agy is an agent with tools: it is asked for the reply alone, as text.
+    asked = (
+        "Use no tool: run no command and write no file. Your whole reply is the JSON "
+        "object the instructions below ask for, as text, and nothing else.\n\n" + text
+    )
+    with tempfile.TemporaryDirectory() as empty:
+        done = subprocess.run(
+            [
+                "agy",
+                "-p",
+                asked,
+                "--model",
+                model,
+                "--output-format",
+                "json",
+                "--print-timeout",
+                "1500s",
+            ],
+            cwd=empty,
+            capture_output=True,
+            text=True,
+            stdin=subprocess.DEVNULL,
+            timeout=1600,
+        )
+    if done.returncode != 0:
+        raise BriefError(f"agy failed: {done.stderr.strip()[:300]}")
+    try:
+        said = json.loads(done.stdout)
+    except json.JSONDecodeError as broken:
+        raise BriefError(f"agy's answer is not JSON: {done.stdout[:200]}") from broken
+    if said.get("status") != "SUCCESS":
+        raise BriefError(f"agy says {said.get('status')}: {str(said)[:300]}")
+    reply = str(said.get("response", ""))
+    first, last = reply.find("{"), reply.rfind("}")
+    if first < 0 or last < first:
+        raise BriefError(f"agy's reply holds no JSON object: {reply[:200]}")
+    return reply[first : last + 1]
+
+
 def write_drafts(
-    brief: Path, ask: Callable[[str], str] = gemini, drafts: Path = DRAFTS
+    brief: Path, ask: Callable[[str], str] = gemini, drafts: Path = DRAFTS, model: str = MODEL
 ) -> list[Path]:
     """Sends the brief and writes the answer under drafts/<name>/, with its manifest."""
     text, outputs = prompt(brief)
@@ -182,7 +237,7 @@ def write_drafts(
         target.write_text(value.rstrip("\n") + "\n", encoding="utf-8")
         written.append(target)
     manifest = {
-        "model": MODEL,
+        "model": model,
         "brief": brief.relative_to(REPO).as_posix() if brief.is_relative_to(REPO) else str(brief),
         "date": datetime.date.today().isoformat(),
         "files": outputs,
@@ -195,12 +250,21 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Have Gemini draft texts from a brief.")
     parser.add_argument("brief", type=Path)
     parser.add_argument("--dry-run", action="store_true", help="print the prompt, send nothing")
+    parser.add_argument("--via", choices=("api", "agy"), default="api", help="the API, or agy")
+    parser.add_argument("--model", help="with --via agy, the model (agy models lists them)")
     args = parser.parse_args()
     try:
         if args.dry_run:
             print(prompt(args.brief.resolve())[0])
             return 0
-        for path in write_drafts(args.brief.resolve()):
+        if args.via == "agy":
+            model = args.model or AGY_MODEL
+            written = write_drafts(
+                args.brief.resolve(), lambda text: agy(text, model), model=model
+            )
+        else:
+            written = write_drafts(args.brief.resolve())
+        for path in written:
             print(path.relative_to(REPO))
     except BriefError as error:
         print(f"write: {error}", file=sys.stderr)

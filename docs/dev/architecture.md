@@ -58,7 +58,9 @@ content/        the levels, each with level.json, its words in text.<lang>.json,
 i18n/           en.json, es.json: the app's words, the same keys in each
 docs/dev/       the plan, the sprints, this log, the guide; the story (story.md)
                 and the course (course.md) that the content is written from
-tools/          the i18n check, the forbidden-word check, later the art tools
+tools/          the i18n check, the forbidden-word check, the writing tool
+                (write/: Gemini drafts the child's texts from a brief, D55),
+                later the art tools
 tests/project/  the repository's own checks
 ci/             check.sh, push.sh and hours.py, dev-cert.sh, the git hooks
 ```
@@ -84,6 +86,8 @@ Pinned exactly, checked against their registries on 2026-10-20:
 | Python on the machine | 3.13 | `kydux_world` keeps to syntax that runs on 3.12 and up |
 | pytest | 9.1.1 | |
 | ruff | 0.17.1 | one configuration for all the Python, `ruff.toml` |
+| google-genai | 2.29.0 | the writing tool's client (D55), `tools/requirements.txt` |
+| Gemini model | gemini-3.1-pro-preview | the writer of the child's texts (D55), pinned in `tools/write/write.py` |
 | Go | 1.27 | for the launcher, phase 6 |
 
 ## The child's Python
@@ -762,3 +766,21 @@ one overturns stays, marked as superseded.
   lesson of its own. The teacher of the passages is `dask` in the
   child's code in every level, the name the story gives him, and his kind
   is `teacher`, as the notebook says.
+- **D55 — Gemini drafts the child's words; Claude briefs and reviews.**
+  Decided 2026-10-22 by the owner, built the same day. Every text the
+  child reads, and the story bible, is drafted by Gemini through
+  `tools/write/write.py`: a brief (`tools/write/briefs/<name>.md`, its
+  front matter naming the files to write and the context to read), the
+  rules every text follows (`tools/write/rules.md`: the style, the choices
+  for the wizard's gender and for Nuri's, the names rule, the formats, the
+  answer's shape), and the context files in full make the prompt; Gemini
+  answers with a JSON object of path to text, written under `drafts/<name>/`
+  with a manifest of the model, the brief and the date. `drafts/` is ignored
+  by git and refused by the repository's checks; a person reads each draft,
+  corrects it, and moves it into `content/` or `docs/dev/`. The brief stays
+  in the repository as the record of what was asked. The model is pinned in
+  the tool; a busy model (429, 500, 503) is tried again, waiting longer each
+  time. The prompt never carries the forbidden list: it asks for names that
+  recall no famous story of wizards, and the hooks check what comes back.
+  Claude writes the briefs, the corrections, and words too small to brief:
+  a button, a label, a notebook entry.

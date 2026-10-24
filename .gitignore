@@ -19,6 +19,9 @@ vendor/
 # Raw generated art before it is reviewed and cut into sprites.
 art/raw/
 
+# Gemini's drafts before they are reviewed and moved into content/ (D55).
+drafts/
+
 __pycache__/
 *.pyc
 .pytest_cache/

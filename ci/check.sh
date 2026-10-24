@@ -31,7 +31,7 @@ ruff check world tools tests
 ruff format --check world tools tests
 
 step "The world's and the project's tests"
-pytest -q world tests/project
+pytest -q world tests/project tests/tools
 
 step "The i18n files"
 python3 tools/i18n_check.py

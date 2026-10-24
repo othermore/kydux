@@ -55,3 +55,11 @@ def test_no_value_of_this_machine_s_secrets():
         if value in text
     ]
     assert not findings, "\n".join(findings)
+
+
+def test_no_draft_is_tracked():
+    """Gemini's drafts are reviewed and moved into content/ before they are committed
+    (D55); drafts/ itself never is."""
+    from conftest import REPO, tracked_files
+
+    assert not [p for p in tracked_files() if p.relative_to(REPO).parts[0] == "drafts"]

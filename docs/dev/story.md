@@ -16,10 +16,12 @@ Its parts, in the order the chapters visit them:
 
 | Place | Chapter | What it is |
 | --- | --- | --- |
-| The road and the gate | 1 | The path up the hill at dusk, where the tutorial happens. The gate opens to a word. |
-| The first corridors | 1 | Stone corridors with sealed doors, where the new pupils are welcomed. |
-| The library | 2 | Tall shelves, locked rooms, books that give spells. |
-| The passages | 3 | Moving stairs, dark rooms, the corridor where Dask patrols. |
+| The road and the gate | 1 | The path up the hill at dusk, where the tutorial happens: the forecourt's hedges and paths, the steps up to the landing, and the great gate, which opens to a word. The scene `the-gate`. |
+| The gatehouse | 1 | Stone passages inside the gate: the flat stone where Nuri leaves the spare wand, sealed doors, the inner gate, and the way out to the castle road. The scene `the-gate`. |
+| The library | 2 | Tall shelves, locked rooms, the archive, Eldra's nook and shelf, books that give spells. The scene `the-library`. |
+| The wand bank | 2 | A counter beyond the library's last aisle, run by the pupils' parents, where a pupil borrows a school wand for the year. |
+| The passages | 3 | At night: the watchtower's gallery, Dask's round, rooms of two doors, the long stairs. The scene `the-passages`. |
+| The night passages | 3 | Above the long stairs: Dask's long corridor, a moving stair, a dark room, the way down to the dormitory. The scene `the-night-passages`. |
 | The broom field | 4 | A lawn behind the castle, rings to fly through, a race. |
 | The tower | 5 | Where a pupil is given a familiar, and the course ends. |
 

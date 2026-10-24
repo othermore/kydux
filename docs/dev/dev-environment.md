@@ -117,8 +117,10 @@ everything the browser needs into `app/public/`, which git ignores:
 - The world, packed into `world.zip`, which the browser unpacks into
   Python.
 - The content, copied into `content/`: the chapters, the story pages, the
-  lessons and the levels. A level's solution and its wrong answers stay out, so that a
-  child cannot find them in the game.
+  lessons, the levels and the screen's guide. A level's solution and its
+  wrong answers stay out, so that a child cannot find them in the game. A
+  level that is a part of a scene gets the scene's map built in, by
+  `tools/scene_maps.py`, so that the page reads it as any other level.
 - The course, in `content/course.json`: its chapters in order, each with
   its lessons and levels. It comes from each chapter's `chapter.json`, in
   `content/chapters/`.
@@ -148,6 +150,7 @@ one to go straight to a screen:
 | `#wizard` | The creator, where the player names their wizard, says whether it is a girl or a boy, and picks its look. |
 | `#map` | The map of the course. |
 | `#lesson/what-a-program-is` | A lesson, from `content/lessons/what-a-program-is/`. |
+| `#lesson/how-much/from/the-long-corridor` | A lesson read again from a level. It ends in *Back to the level* instead of *Try it*. |
 | `#level/the-locked-door` | A level, from `content/levels/the-locked-door/`. |
 | `#settings` | The settings: the language, the speed and the editor's text size. |
 
@@ -160,23 +163,54 @@ The map keeps a locked stop closed. A level's or a lesson's address opens
 it anyway. That is on purpose, so that you can test any level without
 playing the ones before it.
 
-The first time the game opens, its big button leads to the creator. The
-course begins once the player has a wizard. A level's or a lesson's
-address works without one: the texts then call the player *apprentice*.
+The first time the game opens, it opens on the story, which leads to the
+creator. The course begins once the player has a wizard. A level's or a
+lesson's address works without one: the texts then call the player
+*apprentice*. The first level of the course shows the screen's guide the
+first time it is played; the `?` card shows it again.
 
-The browser remembers the player's progress. It keeps it as one document
-in its `localStorage`, under the key `kydux.progress`. The document holds
-everything: the wizard, the language, the settings, the code typed in each
-level, the hints opened, the stars won and the lessons read. Closing the
-tab or the browser does not lose it.
+The browser remembers the player's games. Each game is one document in its
+`localStorage`, under the key `kydux.game.` followed by the game's id. The
+document holds everything about that game: the wizard, the language, the
+settings, the code typed in each level, the hints opened, the stars won and
+the lessons read. The list of games is under `kydux.games`, with when each
+was begun, when it was last played and how long. The game being played is
+under `kydux.current`. Closing the tab or the browser loses nothing.
 
-The start screen can move that document to another browser. *Export*
-downloads it as `kydux-progress.json`. *Import* reads such a file back. To
-start from a clean page, press *Start from the beginning* on the start
-screen. It clears the progress but keeps the wizard, the language and the
-settings.
-To clear everything, clear the site's data in the browser, or open the
-game in a private window.
+The start screen lists the games under *Load a game*, where each one can be
+played or deleted. *New game* begins the story again for a new wizard and
+keeps the other games. *Export* downloads the game being played as
+`kydux-progress.json`, and *Import* adds such a file as one more game.
+
+To start from a clean page, with no game at all, clear the site's data in
+the browser, or open the game in a private window. The game then opens on
+the letter, as a child's first visit does.
+
+### A level that is part of a scene
+
+A chapter's levels are parts of one scene, so that where one level ends
+the next one begins. The scene is a map of its own, in
+`content/scenes/<id>/map.txt`. It holds only walls (`#`), floor (`.`) and
+shelves (`=`). A level on it says, in its `level.json`, which scene it is
+part of, and where everything of its own stands:
+
+```json
+{
+  "id": "the-gate",
+  "scene": "the-gate",
+  "start": [11, 6],
+  "end": [12, 6],
+  "actors": [{ "kind": "friend", "id": "nuri", "at": [10, 6] }]
+}
+```
+
+The coordinates are `x` and `y`, counted from 0 at the map's top-left
+corner. `start` is where the wizard stands. `end` is the tile the reach
+goal asks for, and a level with no reach goal has none. Every thing and
+actor stands at its own `at`. The checks make sure each level starts on
+the tile where the level before it ended, and that the friend never
+stands on the solution's way. To see a level on its scene, run its
+solution in the world's tests, or open its address in the browser.
 
 Two other commands matter. `npm run build` makes the finished game under
 `app/dist/`, the same files a release ships. `npm run preview` serves that

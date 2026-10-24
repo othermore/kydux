@@ -122,19 +122,24 @@ content/
                                           level:<id>; an item's id is its slug, its order the
                                           chapter's (D44); a story item opens and closes it (D62)
     text.en.json  text.es.json            the chapter's title
+  scenes/the-gate/
+    map.txt                               the scene a chapter's levels are parts of: rows
+                                          of # wall, . floor and = shelf (D65)
   stories/at-the-gate/
-    story.json                            id, and `opening` for the story before the creator (D61)
+    story.json                            id, who tells it (`speaker`), and `opening` for the
+                                          story before the creator (D61)
     en.md  es.md                          pages of story separated by ---, with no code (D56)
   lessons/your-first-action/
-    lesson.json                           id, and what it teaches: the names the
-                                          level after it needs (`teaches`)
+    lesson.json                           id, who teaches it (`speaker`, D67), and what it
+                                          teaches: the names the level after it needs (`teaches`)
     en.md  es.md                          the lesson, a few short pages separated by ---:
                                           the idea's theory, then the game's way, then Try it (D41)
   levels/the-corridor/
-    level.json                            map file, actors, exposed API, goals, tick
-                                          limit, the spells it has, the speaker of its intro,
-                                          its kind: practice, fix, improve or challenge (D56)
-    map.tmj                               Tiled map: layers floor, walls, objects
+    level.json                            its scene, its start and its end on it (D65), or a
+                                          map of its own; things and actors by tile,
+                                          exposed API, goals, tick limit, the spells it
+                                          has, the speaker of its intro, its kind:
+                                          practice, fix, improve or challenge (D56)
     text.en.json  text.es.json            title, goals, hints, starting code's
                                           comments and strings, intro, outro and what
                                           was learned (D45, D62)
@@ -149,7 +154,14 @@ its example; the level after it starts with its own program (D33, D63). Within a
 numbered by kind: *Lesson 1*, *Practice 1*, *Fix 1*, *Improve 1* (D56). `pack-world.mjs` writes the chapters, in the order of their
 directories, as `content/course.json`, the one order of the course (D32). A
 chapter's picture for the map comes with the art (phase 4); the map draws
-its stops as a path until then.
+its stops as a path until then. The art draws each scene whole, and a level
+shows the part the camera follows (D69).
+
+```
+  guide/
+    text.en.json  text.es.json            the screen's guide's words, a title and a text per
+                                          step (D68)
+```
 
 ### 2.6 Internationalization
 
@@ -174,10 +186,11 @@ its stops as a path until then.
   settings: {speed, fontSize, split}, lessons: {id: {read}}, levels: {id:
   {won, stars, code, hints, tried}}, started, current}`: `wizard` what the
   child made (D36), `started` the levels whose start card was seen,
-  `current` the item last opened, where *Continue* goes. `LocalProgressStore`
-  keeps it in `localStorage`
-  under `kydux.progress` (IndexedDB when it outgrows it); *Export* and
-  *Import*, on the start screen, move it as a JSON file between computers;
+  `current` the item last opened, where *Continue* goes. Each saved game is
+  one such document (D70): `GamesStore` keeps them in `localStorage` under
+  `kydux.game.<id>`, with their list under `kydux.games` (IndexedDB when it
+  outgrows it); *Export* and *Import*, on the start screen, move a game as
+  a JSON file between computers;
   the launcher can also keep it as a file beside itself when asked. An
   online store comes later behind the same interface.
 - The wizard's look: a base sprite drawn with placeholder colours for skin,
@@ -529,9 +542,16 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
 - **The map does not throw the player out.** It opens over the level, shows
   where the player is, closes back to it, asks before leaving; a chapter is a
   mini-map, and what lies ahead is unnamed. Lessons can be read from a level.
-- **Saved games.** A game per wizard, saved on the server the game runs
-  from, listed with its wizard, its place, its play time and its dates,
-  loaded on return; export and import stay as the way to carry one away.
+- **Saved games.** A game per wizard, listed with its wizard, its place,
+  its play time and its dates, loaded on return; export and import stay as
+  the way to carry one away. Sprint 11 keeps the list in the browser
+  (D70); sprint 12 keeps the same list on the server the game runs from,
+  with the browser's as the fallback.
+- **One scene per chapter.** A chapter's levels are parts of one scene, or
+  of a few, where a level ends the next begins and the friend who teaches
+  stands in it; the camera is a window on the scene, zoomed and dragged
+  (D65, D66, D69). Bigger levels done in one go come later, on the same
+  scenes.
 - **Sound and animation everywhere**, with the art (phase 4), the whole page
   restyled in the magic.
 
@@ -544,18 +564,21 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     their goals; the challenges after it. The order of the draft, refined
     to one idea at a time, as above; the lessons and levels of sprint 5 are
     replaced by it.
-5.3 Chapter 1, Arrival (methods, sequences, comments, arguments, strings):
-    the story at the gate, seven lessons, nine levels (seven practices, a
-    fix, an improve) taught by Nuri, the wand lent on its pedestal, the
-    first spell, and the story up to the castle (`course.md`).
-5.4 Chapter 2, The library (variables, attributes, finding things): books
-    give spells; locked doors and keys.
-5.5 Chapter 3, Corridors and passages (loops, conditions): the moving
-    staircases, the patrolling teacher, slipping out of class.
-5.6 Chapter 4, The broom (lists, functions): flying, the race, an action of the
-    child's own.
-5.7 Chapter 5, The familiar (classes and objects): the child defines a
-    creature with its attributes and methods and sends it through a passage.
+5.3 Chapter 1, Arrival (methods, sequences, comments, arguments, strings),
+    in the scene of the gate: the story at the gate, seven lessons, nine
+    levels (seven practices, a fix, an improve) taught by Nuri, the wand
+    lent, the first spell, and the story up to the castle (`course.md`).
+5.4 Chapter 2, The library (variables, attributes, finding things), in the
+    scene of the library: Wenna's five lessons, eight levels (an improve, a
+    fix), Eldra's books, locked doors and keys, and the wand bank.
+5.5 Chapter 3, The passages (conditions, loops), in two scenes, the
+    passages and the night passages: Nuri's six lessons, nine levels (a fix,
+    an improve), the patrolling teacher, the moving stairs, the dark rooms.
+5.6 Chapter 4, The broom (lists, functions), in a scene of the broom field
+    and the village: flying, the race, an action of the child's own.
+5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
+    the child defines a creature with its attributes and methods and sends
+    it through a passage.
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

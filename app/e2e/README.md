@@ -21,8 +21,9 @@ npm run e2e
 
 `loop.spec.ts` walks the whole game once in each language. It opens the game
 fresh on the story's opening, makes a wizard, reads the story page at the
-gate and the first lesson, fails the gate once, asks for a hint, wins, goes
-on to the next lesson, and opens the map and the settings.
+gate and the first lesson, sees the first step of the screen's guide, fails
+the gate once, asks for a hint, wins, goes on to the next lesson, and opens
+the map and the settings.
 
 At each step it saves a screenshot. They are for a person to look at: the
 test already checks what each step shows. They land in `shots/`, one folder

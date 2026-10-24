@@ -26,29 +26,43 @@ A partir de ahí, el juego se abre en su pantalla de inicio. *Continuar* te
 lleva a donde lo dejaste. La primera vez, eso es la puerta, donde te
 encuentras con Nuri, que te enseña los primeros pasos.
 
-Cada capítulo empieza y acaba con páginas de historia. Entre ellas vienen
-lecciones y niveles, numerados dentro del capítulo: *Lección 1*,
-*Práctica 1*, y así. Una lección son unas pocas páginas cortas. Cada una
-explica una idea, con un ejemplo. En la última página, *Probar* abre el
+Cada capítulo empieza y acaba con páginas de historia, dibujadas como las
+páginas de un libro. Entre ellas vienen lecciones y niveles, numerados
+dentro del capítulo: *Lección 1*, *Práctica 1*, y así. Una lección son
+unas pocas páginas cortas, que enseña un personaje de la historia, de pie
+junto al texto. Cada página explica una idea, con un ejemplo. En la última página, *Probar* abre el
 nivel que viene después, donde escribes tu propio programa. La
 mayoría de los niveles son prácticas, una pantalla que resolver. Un
 *arreglo* te da un programa que no funciona, para repararlo. Una *mejora*
 te da uno que funciona, para hacerlo mejor.
 
+Los niveles de un capítulo ocurren todos en un mismo lugar, una escena:
+donde acaba un nivel empieza el siguiente, y el amigo que te enseña está a
+tu lado. La escena sigue a tu personaje mientras camina. Los botones *+* y
+*−*, o la rueda del ratón, la acercan y la alejan, y puedes arrastrarla
+para mirar alrededor.
+
 En un nivel, escribes Python en el editor, a la derecha. *Ejecutar* hace
-que el mago haga lo que dice tu código, a la izquierda. Los objetivos, en
-la esquina, se marcan solos cuando los cumples. Si algo sale mal, el juego
-dice por qué, y *Pista* te da una ayuda.
+que tu personaje haga lo que dice tu código, a la izquierda. Los
+objetivos, en la esquina, se marcan solos cuando los cumples. Si algo sale
+mal, el juego dice por qué, y *Pista* te da una ayuda. El primer nivel te
+enseña cada parte de la pantalla, una a una; el botón *?* lo enseña otra
+vez. *Lección* vuelve a leer la lección del nivel, y *Mapa* abre el mapa
+encima del nivel.
 
 Gana el nivel, y el juego te da hasta tres estrellas, y te dice por qué.
 Te quedas con las tres si no necesitas pistas, no chocas nunca contra una
 pared y cumples el objetivo extra, o ganas al primer intento cuando no lo
-hay. *Siguiente* te lleva más allá. El mapa enseña el curso
+hay. Jugar otra vez un nivel nunca te quita estrellas. *Siguiente* te lleva
+más allá. El mapa enseña el curso
 entero: lo que ya has hecho, lo que está abierto y lo que sigue cerrado.
 
-El juego recuerda tu progreso en el navegador. *Exportar*, en la pantalla
-de inicio, lo guarda en un fichero, e *Importar* lo recupera en otro
-ordenador.
+El juego guarda tu partida en el navegador mientras juegas. Guarda varias
+partidas, una por personaje: *Cargar una partida*, en la pantalla de
+inicio, las enseña, con dónde está cada una y cuánto se ha jugado.
+*Partida nueva* empieza otra vez la historia para un personaje nuevo.
+*Exportar* guarda la partida que juegas en un fichero, e *Importar* la
+recupera en otro ordenador.
 
 ## Lecciones
 

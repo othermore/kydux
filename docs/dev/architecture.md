@@ -27,40 +27,49 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 a tick (stairs.ts, the same rule as the world's), the playback, and
                 the words the scene shows (words.ts, why an action failed);
                 the looks a wizard may have (looks.ts) and the figures drawn
-                until the art comes (placeholders.ts)
+                until the art comes, the wizard's and the friends' (placeholders.ts);
+                the camera on the scene, its zoom and its drag (scene.ts, D69)
   src/editor/   the child's editor, CodeMirror
-  src/ui/       the screens: start (start.ts), the wizard's creator
-                (wizard.ts), the map (map.ts), a lesson (lesson.ts), the
+  src/ui/       the screens: start with the saved games (start.ts), the
+                wizard's creator (wizard.ts), the map, also over a level (map.ts),
+                a lesson with its teacher or a story page (lesson.ts), the
                 settings (settings.ts), and the level screen, a view of the run controller
                 (controller.ts), with its goals panel, outcome card, start and
-                win cards (cards.ts), and the wizard's notebook (notebook.ts)
+                win cards (cards.ts), the wizard's notebook (notebook.ts), the
+                stars (stars.ts) and the screen's guide (guide.ts, D68)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
-                and its pages (lessons.ts), and the course (course.ts): its
-                chapters, what comes next, a stop's state, what the child
-                knows in a level (D40)
-  src/progress/ the player's progress, one document (store.ts), and the calls
-                the screens make on it (progress.ts)
+                and its pages (lessons.ts), the guide's words (guide.ts), and the
+                course (course.ts): its chapters, what comes next, a stop's
+                state, what the child knows in a level (D40)
+  src/progress/ the player's progress, a document per game (store.ts), the
+                saved games (games.ts, D70), and the calls the screens make on
+                them (progress.ts)
   scripts/      before dev and build: copy Pyodide into public/, pack the world
                 into world.zip, copy the content into content/ with the course in
-                content/course.json, and write the world's table as api.json
+                content/course.json and each level on a scene with its map built in,
+                and write the world's table as api.json
   e2e/          the browser tests (Playwright), beside the node_modules they need;
                 the loop's screenshots in e2e/shots/ (D39)
 world/          kydux_world, the model of the levels, and its tests: level.py reads
                 a level; world.py holds the wizard and the ticks; things.py the
                 read-only base and the things; actors.py the teacher and the sight
-                rule; goals.py the goals; api.py the names a level may teach;
+                rule, the ghost, the cat and the friend; goals.py the goals; api.py
+                the names a level may teach;
                 explain.py errors in the child's words; run.py runs the child's code;
                 sandbox.py keeps it from Pyodide's bridge to JavaScript
 content/        the levels, each with level.json, its words in text.<lang>.json,
                 its solution and its wrong answers (the last two never shipped);
-                the lessons, each with lesson.json and <lang>.md; the story
-                pages (stories/), each with story.json and <lang>.md; the
-                chapters, each with chapter.json and text.<lang>.json
+                the scenes the levels are parts of (scenes/, each a map.txt,
+                D65); the lessons, each with lesson.json and <lang>.md; the
+                story pages (stories/), each with story.json and <lang>.md; the
+                chapters, each with chapter.json and text.<lang>.json; the
+                screen's guide's words (guide/, D68)
 i18n/           en.json, es.json: the app's words, the same keys in each
 docs/dev/       the plan, the sprints, this log, the guide; the story (story.md)
                 and the course (course.md) that the content is written from
 tools/          the i18n check, the forbidden-word check, the names a wizard
-                may not take (reserved_names.py), the writing tool (write/:
+                may not take (reserved_names.py), each level on a scene with its
+                map built in (scene_maps.py, D65), the writing tool (write/:
                 write.py, the rules every text follows in rules.md, and the
                 briefs in briefs/; Gemini drafts the child's texts into
                 drafts/, which git ignores, D55), later the art tools
@@ -440,9 +449,10 @@ one overturns stays, marked as superseded.
   it, and nothing else: Python's keywords would be noise at this age.
 - **D31 — Progress is one document behind one interface.** Decided
   2026-10-21 (sprint-5.md), built the same day. `ProgressStore`
-  (`app/src/progress/store.ts`) has `load()` and `save(progress)`;
-  `LocalProgressStore` keeps the document in `localStorage` under
-  `kydux.progress`, and a remote store can come later behind the same
+  (`app/src/progress/store.ts`) has `load()` and `save(progress)`; the
+  game's store is `GamesStore`, which keeps a document per saved game
+  (D70), and `LocalProgressStore`, one document under `kydux.progress`,
+  serves the tests; a remote store can come later behind the same
   interface. The document has a `version`; one of another version, or
   none, is read as the defaults, and each field read back is checked for
   its shape. The language chosen, the settings, the code typed in each
@@ -516,7 +526,7 @@ one overturns stays, marked as superseded.
   gender is never preset, since a default would choose for the child.
   The gender buttons are words, not a figure each, since a figure is a
   look and any look is either's. Escape and Back leave an existing wizard
-  as it was. *Start from the beginning* keeps the wizard; an import keeps
+  as it was. *New game* begins with no wizard (D64, D70); an import keeps
   the file's, or the current one when the file has none. The scene draws
   the wizard from the look and says its id in `data-look`, which the
   browser tests read: a WebGL canvas's pixels cannot be read reliably, so
@@ -847,8 +857,9 @@ one overturns stays, marked as superseded.
   the journey, the shut gate at dusk, and no mechanics. Its *Go on* leads
   to the creator, or, once a wizard exists, to the course's first item; it
   is never the place *Continue* returns to. The start screen's big button
-  begins the story while there is no wizard, and *Start from the beginning*
-  begins it again, keeping the wizard, the language and the settings. The
+  begins the story while there is no wizard, and *New game* begins it
+  again for a new wizard, keeping the language and the settings (D64,
+  D70). The
   creator shows the looks of the gender chosen, four each (`looksFor`),
   none before a gender is; its name starts as *Kydux*, chosen whole on
   entering the field so that typing replaces it; a name that is the
@@ -884,8 +895,92 @@ one overturns stays, marked as superseded.
   never gives part of its solution as code: what the child has to do is
   said in comments. Rules out the example copied into the editor, which
   left a fix level with half a program and a practice half done.
-- **D64 — Starting from the beginning forgets the wizard.** Decided 2026-10-22
-  by the owner's UAT (sprint-11.md). *Start from the beginning* clears the
-  progress and the wizard, after a word that says so, and the story opens
-  again from the letter to the creator. The language and the settings are
-  kept, since they are the machine's, not the game's.
+- **D64 — Starting again forgets the wizard.** Decided 2026-10-22 by the
+  owner's UAT (sprint-11.md). A game begun again begins with no wizard:
+  *New game* (D70) opens the story from the letter to the creator, and the
+  new wizard is made there. The language and the settings are kept, since
+  they are the machine's, not the game's.
+- **D65 — A chapter's levels are parts of one scene.** Decided 2026-10-22 by
+  the owner's UAT (sprint-11.md), built the same day. A scene is
+  `content/scenes/<id>/map.txt`, rows of `#`, `.` and `=` with no markers.
+  A level names its scene in `level.json` (`scene`) and puts what is its
+  own on it by coordinates: `start`, `end` (the tile of the `E` its reach
+  goal wants, when it has one) and `at` for every thing and actor; it has
+  no `map`. `Level.from_directory` builds the level's map from the scene
+  (`kydux_world.level.on_scene`), so that the world, the goals, the
+  solutions and the wrong answers work as for any level; `Level.from_dict`
+  refuses a level that still names its scene. `tools/scene_maps.py` gives
+  each such level with its map built in, and `pack-world.mjs` ships it so,
+  so that the page loads it as any other. Where one level ends the next
+  begins, on the same tile, and what an earlier level opened or took stays
+  as the story has it: a door opened is a door `open` from the start, a
+  thing picked up is `carrying`; the content tests hold each level on a
+  scene to start where the one before it on the same scene ended. Chapter
+  1 is the scene `the-gate`, chapter 2 `the-library`, chapter 3
+  `the-passages` and `the-night-passages`. Rules out one map per level,
+  which showed the same gate nine times from nine angles.
+- **D66 — A friend stands in the scene.** Decided 2026-10-22 by the owner's
+  UAT (sprint-11.md), built the same day. The actor kind `friend` stands
+  where the level puts it, looks at the wizard's start unless it says
+  otherwise, never moves and never catches. A step onto a friend is a bump,
+  `by: friend` with the friend's `id`, and the wizard thinks who is in the
+  way; the content tests keep a friend off the solution's way. The child's
+  code has nothing of a friend: a friend teaches by words, so the API's
+  table gives the role no members. Nuri is the friend of chapters 1 and 3,
+  Wenna of chapter 2; each is drawn as the character (`friendFigure` in
+  `placeholders.ts`), Nuri with the wizard's gender. The level's intro and
+  outro are the friend's words (D45).
+- **D67 — A lesson shows who teaches it; a story page looks like story.**
+  Decided 2026-10-22 by the owner's UAT (sprint-11.md), built the same day.
+  `lesson.json` names its `speaker`, a character of `story.md`; the lesson
+  screen draws the speaker's figure large beside the words, with the name,
+  and frames the words as the speaker's speech. A story page has no figure
+  and is framed as a page of a book. A content test refuses a lesson that
+  names no teacher. Rules out a lesson that looks like a story page.
+- **D68 — The screen explains itself once, with arrows.** Decided 2026-10-22
+  by the owner's UAT (sprint-11.md), built the same day. The course's first
+  level opens the screen's guide once its start card is closed, the first
+  time it is played (`progress.guided`): `app/src/ui/guide.ts` dims the
+  screen but one part at a time, with a card beside it and an arrow to it,
+  *Next* and *Skip*: the scene, the goals, the editor, *Run*, the notebook
+  (opened for its step), *Hint* and *?*, and the way to learn. The card
+  opened with *?* offers *Show me the screen*. The guide's words are
+  Gemini's, `content/guide/text.<lang>.json`, and the i18n check holds them
+  to the same steps in every language.
+- **D69 — The camera: a window on the scene.** Decided 2026-10-22 by the
+  owner's UAT (sprint-11.md), built the same day. The scene is drawn whole;
+  the canvas is at most `VIEW_TILES` (15 by 9) at zoom 1, the tiles at
+  their size, and the camera, bounded by the scene, follows the wizard.
+  The player zooms with *+* and *−* over the scene or the mouse wheel,
+  through `ZOOMS` (0.5 to 2), and drags the scene to look around, which
+  lets go of the wizard; a run or a restart brings the camera back to it.
+  The scene publishes `data-zoom` and `data-following` for the tests; the
+  world's coordinates, which the tests read, do not change with the camera.
+- **D70 — Games are saved, several, in the browser.** Decided 2026-10-22 by
+  the owner's UAT (sprint-11.md), built the same day. `GamesStore`
+  (`app/src/progress/games.ts`) keeps each game's progress document under
+  `kydux.game.<id>`, the list under `kydux.games` (begun, last played,
+  seconds played) and the game being played under `kydux.current`; a game
+  is begun by its first save, and the list shows the games with a wizard.
+  Every change saves the game being played; there is no *Save*. The start
+  screen offers *Continue*, *Load a game* (each game with its wizard, where
+  it is, its play time and dates, *Play* and *Delete*, which asks) and *New
+  game*; a first visit with no game opens the story, and with saved games
+  and none being played the start screen offers them. An imported file
+  becomes one more game; *Export* keeps the game being played. Play time is
+  counted every ten seconds a level, a lesson or a story page is on screen
+  with the tab in sight. The single document of before, `kydux.progress`,
+  becomes the list's first game the first time the list is read, so the
+  document keeps its version: its shape is the same. Sprint 12 keeps the
+  same list on the server the game runs from.
+- **D71 — The map opens over the level, and a lesson from it.** Decided
+  2026-10-22 by the owner's UAT (sprint-11.md), built the same day. From a
+  level, *Map* opens the map over it (the run and the editor kept), the
+  stop being played marked *You are here*; *Back to the level* or Escape
+  closes it, and choosing another stop while a run goes on asks first. On
+  every map, the locked stops after the first are unnamed: their kind and
+  number show, not their title. A level's heading has *Lesson*, the last
+  lesson before it in the course, at `#lesson/<id>/from/<level>`, which
+  ends in *Back to the level* in place of *Try it* and leaves the place in
+  the course as it was. Rules out the map as a screen the player leaves
+  the level for.

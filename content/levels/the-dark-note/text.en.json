@@ -1,15 +1,15 @@
 {
-  "title": "The dark note",
+  "title": "The note",
   "goals": [
     "Reach the end of the path."
   ],
-  "starting_code": "# One move is wrong. Fix it.\nwizard.move_left()\nwizard.move_left()\nwizard.move_down()\nwizard.move_right()\n",
+  "starting_code": "# One move in this program is wrong. Find it and fix it!\nwizard.move_left()\nwizard.move_left()\nwizard.move_down()\nwizard.move_right()\n",
   "hints": [
-    "Read the code from top to bottom.",
-    "Watch what your wizard does when you press Run.",
-    "The very last step goes the wrong way."
+    "Read the moves one by one and see where they take you.",
+    "The last move takes you the wrong way.",
+    "Change the last action to `move_down`."
   ],
-  "intro": "I left a note in this program to help you. Read the note first. Then find the mistake and fix it.",
-  "outro": "You fixed the program perfectly! Notes make everything much easier to understand.",
-  "learned": "Now you know that a note, which programmers call a comment, helps explain a program."
+  "intro": "I wrote a program on the way up the hill to walk the next bit of path. I think one of its moves is wrong. You can read my note, which programmers call a comment.",
+  "outro": "You fixed it! Reading code is just as important as writing it.",
+  "learned": "Now you know about notes, which programmers call comments."
 }

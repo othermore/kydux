@@ -25,7 +25,7 @@ test('a won level is done with its stars, and opens the next stop', async ({ pag
   await page.locator('#speed').selectOption('4');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
-  await page.keyboard.insertText('wizard.move_right(6)');
+  await page.keyboard.insertText('wizard.move_left(6)');
   await page.locator('#run').click();
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
   await page.locator('#level-map').click();

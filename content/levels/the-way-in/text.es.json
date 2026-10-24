@@ -4,12 +4,12 @@
     "Llega al camino del castillo.",
     "Hazlo en menos de 9 líneas."
   ],
-  "starting_code": "# Una puerta que escucha te espera\n# Dos sellos bloquean el camino después\n",
+  "starting_code": "# Una puerta interior espera una palabra.\n# Dos puertas están selladas por runas.\n",
   "hints": [
-    "Da un paso a la derecha y di ambrel.",
-    "Camina hasta la primera puerta y lanza zelim.",
-    "Camina hacia abajo dos pasos. Luego muévete a la izquierda cuatro pasos hasta la segunda puerta."
+    "Da un paso hacia arriba y usa `say` para la contraseña y abrir la puerta interior.",
+    "Da dos pasos hacia arriba, luego tres a la izquierda, y usa `cast` para abrir la primera puerta.",
+    "Camina cuatro pasos a la izquierda y usa `cast` de nuevo, luego sube hacia el camino."
   ],
-  "intro": "Ya casi estamos en el castillo. Una puerta que escucha bloquea el camino. Dos puertas selladas también bloquean el camino. ¡Enséñame lo que sabes hacer!",
-  "outro": "¡Lo conseguimos! El castillo de Arvelia parece enorme de cerca."
+  "intro": "Hay una puerta interior justo delante. Escucha la misma palabra que la gran puerta. Después, el pasillo gira pasando por dos puertas selladas hasta el camino del castillo.",
+  "outro": "¡Lo hemos conseguido! El camino del castillo está justo delante, y el castillo nos espera."
 }

@@ -1,12 +1,25 @@
 {
   "id": "the-long-corridor",
-  "map": [
-    "#########",
-    "#S.....D#",
-    "#########"
+  "kind": "practice",
+  "scene": "the-gate",
+  "start": [8, 10],
+  "end": [2, 10],
+  "speaker": "nuri",
+  "things": [
+    {
+      "kind": "door",
+      "id": "gate",
+      "at": [13, 6],
+      "password": "ambrel"
+    }
   ],
-  "things": [],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [8, 9]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -16,7 +29,7 @@
   "goals": [
     {
       "kind": "reach",
-      "marker": "D"
+      "marker": "E"
     },
     {
       "kind": "lines_under",
@@ -24,7 +37,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "nuri",
-  "kind": "practice"
+  "tick_limit": 100
 }

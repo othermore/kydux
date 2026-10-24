@@ -28,37 +28,38 @@ test.describe('in English', () => {
     await page.locator('#speed').selectOption('4');
   });
 
-  test('the page opens on the corridor, isolated, with Python ready', async ({ page }) => {
+  test('the page opens on the long path, isolated, with Python ready', async ({ page }) => {
     await expect(page).toHaveURL(/#level\/the-long-corridor$/);
-    await expect(page).toHaveTitle('Kydux — The long corridor');
+    await expect(page).toHaveTitle('Kydux — The long path');
     expect(await page.evaluate(() => globalThis.crossOriginIsolated)).toBe(true);
     await expect(page.locator('#status')).toHaveText(/^Python 3\.14\.\d+ ready$/);
-    await expect(scene(page)).toHaveAttribute('data-wizard', '1,1');
-    await expect(page.locator('.cm-content')).toContainText('# Tell the method how many steps to take');
-    await expect(page.locator('.goal').first()).toHaveText('Reach the door at the end.');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '8,10');
+    await expect(page.locator('.cm-content')).toContainText('# Tell the action how many steps to take.');
+    await expect(page.locator('.goal').first()).toHaveText('Reach the foot of the steps.');
   });
 
-  test('the starting code takes one step, and the goal is not met', async ({ page }) => {
+  test('one step left, and the goal is not met', async ({ page }) => {
+    await setCode(page, 'wizard.move_left()');
     await run(page);
-    await expect(scene(page)).toHaveAttribute('data-wizard', '2,1');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '7,10');
     await expect(scene(page)).toHaveAttribute('data-tick', '1');
     await expect(outcome(page)).toHaveText('Not yet: 0 of 1 goals met. Try again.');
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
   });
 
-  test('six steps reach the door, the goal ticked as the wizard arrives', async ({ page }) => {
-    await setCode(page, 'wizard.move_right(6)');
+  test('six steps reach the foot of the steps, the goal ticked as the wizard arrives', async ({ page }) => {
+    await setCode(page, 'wizard.move_left(6)');
     await page.locator('#run').click();
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(1);
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'met', { timeout: 10_000 });
     await expect(outcome(page)).toHaveText('You did it, apprentice!');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '7,1');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '2,10');
     await expect(scene(page)).toHaveAttribute('data-state', 'done');
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(0);
   });
 
   test("an error is said in the child's words, its line marked in the editor", async ({ page }) => {
-    await setCode(page, 'wizrd.move_right(6)');
+    await setCode(page, 'wizrd.move_left(6)');
     await run(page);
     await expect(outcome(page)).toHaveText(
       'There is nothing called wizrd here. Did you mean wizard? (line 1)',
@@ -88,22 +89,22 @@ test.describe('in English', () => {
       'Your program was stopped: it ran for more than 5 seconds without doing anything.',
     );
     await waitReady(page, 30_000);
-    await setCode(page, 'wizard.move_right(6)');
+    await setCode(page, 'wizard.move_left(6)');
     await run(page);
     await expect(outcome(page)).toHaveText('You did it, apprentice!');
   });
 
   test('Restart puts the wizard back at the start', async ({ page }) => {
-    await setCode(page, 'wizard.move_right(6)');
+    await setCode(page, 'wizard.move_left(6)');
     await run(page);
     await page.locator('#restart').click();
-    await expect(scene(page)).toHaveAttribute('data-wizard', '1,1');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '8,10');
     await expect(page.locator('.outcome')).toBeHidden();
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
   });
 
   test('Ctrl-Enter runs the program from the editor', async ({ page }) => {
-    await setCode(page, 'wizard.move_right(6)');
+    await setCode(page, 'wizard.move_left(6)');
     await page.keyboard.press('ControlOrMeta+Enter');
     await expect(outcome(page)).toHaveText('You did it, apprentice!', { timeout: 30_000 });
   });
@@ -114,24 +115,24 @@ test('in Spanish, and switching to English keeps the code typed', async ({ brows
   const page = await context.newPage();
   await page.goto('/#level/the-long-corridor');
   await waitReady(page);
-  await expect(page.locator('.level-title')).toHaveText('El largo pasillo');
-  await expect(page.locator('.goal').first()).toHaveText('Llega a la puerta del final.');
-  await expect(page.locator('.cm-content')).toContainText('# Dile al método cuántos pasos dar');
+  await expect(page.locator('.level-title')).toHaveText('El camino largo');
+  await expect(page.locator('.goal').first()).toHaveText('Llega al pie de los escalones.');
+  await expect(page.locator('.cm-content')).toContainText('# Dile a la acción cuántos pasos debe dar.');
   await expect(page.locator('#run')).toHaveText('Ejecutar');
 
   await page.locator('#language').selectOption('en');
-  await expect(page.locator('.level-title')).toHaveText('The long corridor');
-  await expect(page.locator('.cm-content')).toContainText('# Tell the method how many steps to take');
+  await expect(page.locator('.level-title')).toHaveText('The long path');
+  await expect(page.locator('.cm-content')).toContainText('# Tell the action how many steps to take.');
   await expect(page.locator('#run')).toHaveText('Run');
-  await expect(page).toHaveTitle('Kydux — The long corridor');
+  await expect(page).toHaveTitle('Kydux — The long path');
 
-  await setCode(page, 'wizard.move_right(2)');
+  await setCode(page, 'wizard.move_left(2)');
   await page.locator('#run').click();
   await expect(outcome(page)).toHaveText('Not yet: 0 of 1 goals met. Try again.', {
     timeout: 30_000,
   });
   await page.locator('#language').selectOption('es');
-  await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(2)');
+  await expect(page.locator('.cm-content')).toHaveText('wizard.move_left(2)');
   await expect(outcome(page)).toHaveText(
     'Todavía no: 0 de 1 objetivos cumplidos. Inténtalo otra vez.',
   );

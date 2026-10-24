@@ -13,3 +13,7 @@ Alguien se acerca por el camino.
 Nuri te sonríe.
 
 "No te preocupes, {wizard}. La puerta escucha las instrucciones. Te enseñaré a abrirla ahora mismo. {Un buen mago investiga|Una buena maga investiga} primero. Probamos, vemos qué pasa y volvemos a probar."
+
+---
+
+"Antes de abrir la puerta, hay algunas cosas que aprender. Te ayudarán en todo el colegio. Te las enseñaré una por una, justo aquí. ¡Empecemos con qué es un programa!"

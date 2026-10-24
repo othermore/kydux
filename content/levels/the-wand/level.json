@@ -1,18 +1,30 @@
 {
-  "id": "the-pedestal",
-  "map": [
-    "#########",
-    "#S..W..E#",
-    "#########"
-  ],
+  "id": "the-wand",
+  "kind": "practice",
+  "scene": "the-gate",
+  "start": [14, 6],
+  "end": [20, 6],
+  "speaker": "nuri",
   "things": [
+    {
+      "kind": "door",
+      "id": "gate",
+      "at": [13, 6],
+      "open": true
+    },
     {
       "kind": "wand",
       "id": "wand",
-      "marker": "W"
+      "at": [17, 6]
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [21, 6]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -31,7 +43,5 @@
       "marker": "E"
     }
   ],
-  "tick_limit": 50,
-  "speaker": "nuri",
-  "kind": "practice"
+  "tick_limit": 50
 }

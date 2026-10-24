@@ -1,2 +1,2 @@
 wizard.say("ambrel")
-wizard.move_right(4)
+wizard.move_right(7)

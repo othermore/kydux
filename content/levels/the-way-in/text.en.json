@@ -4,12 +4,12 @@
     "Reach the castle road.",
     "Do it in fewer than 9 lines."
   ],
-  "starting_code": "# A gate that listens waits for you\n# Two seals block the way beyond it\n",
+  "starting_code": "# An inner gate listens for a word.\n# Two doors are sealed by runes.\n",
   "hints": [
-    "Walk right one step and say ambrel.",
-    "Walk to the first door and cast zelim.",
-    "Walk down two steps. Then move left four steps to the second door."
+    "Take one step up and use `say` for the password to open the inner gate.",
+    "Take two steps up, then three steps left, and use `cast` to open the first door.",
+    "Walk four steps left and use `cast` again, then go up to the road."
   ],
-  "intro": "We are almost at the castle. A gate that listens blocks the way. Two sealed doors block the way too. Show me what you can do!",
-  "outro": "We made it! The castle of Arvelia looks so big up close."
+  "intro": "There is an inner gate just ahead. It listens to the same word as the great gate. After that, the passage turns past two sealed doors up to the castle road.",
+  "outro": "We made it! The castle road is just ahead, and you are ready for school."
 }

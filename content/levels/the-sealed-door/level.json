@@ -1,27 +1,33 @@
 {
   "id": "the-sealed-door",
-  "map": [
-    "#########",
-    "#SW..A.E#",
-    "#########"
-  ],
-  "spells": [
-    "zelim"
-  ],
+  "kind": "practice",
+  "scene": "the-gate",
+  "start": [20, 6],
+  "end": [25, 6],
+  "speaker": "nuri",
+  "carrying": ["wand"],
+  "spells": ["zelim"],
   "things": [
     {
-      "kind": "wand",
-      "id": "wand",
-      "marker": "W"
+      "kind": "door",
+      "id": "gate",
+      "at": [13, 6],
+      "open": true
     },
     {
       "kind": "door",
       "id": "door",
-      "marker": "A",
+      "at": [23, 6],
       "sealed": "zelim"
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [19, 6]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -41,7 +47,5 @@
       "marker": "E"
     }
   ],
-  "tick_limit": 50,
-  "speaker": "nuri",
-  "kind": "practice"
+  "tick_limit": 50
 }

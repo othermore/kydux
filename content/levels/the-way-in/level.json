@@ -1,36 +1,51 @@
 {
   "id": "the-way-in",
-  "map": [
-    "###########",
-    "#S.G.....##",
-    "########A##",
-    "#E.B.....##",
-    "###########"
-  ],
-  "spells": [
-    "zelim"
-  ],
+  "kind": "practice",
+  "scene": "the-gate",
+  "start": [25, 6],
+  "end": [18, 1],
+  "speaker": "nuri",
+  "carrying": ["wand"],
+  "spells": ["zelim"],
   "things": [
     {
       "kind": "door",
       "id": "gate",
-      "marker": "G",
+      "at": [13, 6],
+      "open": true
+    },
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [23, 6],
+      "open": true
+    },
+    {
+      "kind": "door",
+      "id": "inner_gate",
+      "at": [25, 4],
       "password": "ambrel"
     },
     {
       "kind": "door",
       "id": "first_seal",
-      "marker": "A",
+      "at": [21, 3],
       "sealed": "zelim"
     },
     {
       "kind": "door",
       "id": "second_seal",
-      "marker": "B",
+      "at": [18, 2],
       "sealed": "zelim"
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [24, 6]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -50,10 +65,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "nuri",
-  "kind": "practice",
-  "carrying": [
-    "wand"
-  ]
+  "tick_limit": 100
 }

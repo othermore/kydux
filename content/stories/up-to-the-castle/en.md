@@ -12,4 +12,4 @@ You wrote notes, the comments. You told methods how much, with arguments. You pu
 
 ---
 
-Remember that the wand is only lent. Our teacher, Ilda, waits for us inside. The real castle comes next!
+Remember that the wand is only lent. Our teacher, Ilda, waits for us inside. We must go to the wand bank, a counter inside the castle run by the pupils' parents, to borrow a school wand for you. Then you can give my spare wand back to me. The real castle comes next!

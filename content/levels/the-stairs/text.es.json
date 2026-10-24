@@ -1,17 +1,17 @@
 {
-  "title": "Las escaleras",
+  "title": "Los escalones",
   "goals": [
-    "Sube hasta arriba.",
+    "Sube hasta el rellano.",
     "No choques contra nada.",
     "Hazlo en menos de 5 líneas."
   ],
-  "starting_code": "# Esto llega arriba pero choca dos veces. Mejóralo.\nwizard.move_up(3)\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(2)\n",
+  "starting_code": "# Este programa llega al rellano pero choca dos veces. ¡Mejóralo!\nwizard.move_up(3)\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(2)\n",
   "hints": [
-    "Pulsa Ejecutar y mira dónde choca tu {mago|maga} contra el muro.",
-    "Cuenta las casillas de los pasos hacia arriba.",
-    "Cambia los dos argumentos de `move_up` por un 2."
+    "Mira cómo camina tu {mago|maga}. Choca contra la pared al moverse hacia arriba.",
+    "Los números en ambas acciones `move_up` son demasiado grandes.",
+    "Cambia el número en ambas acciones `move_up` a un 2."
   ],
-  "intro": "Este programa sube las escaleras. Pero choca contra los muros. Cambia los números para que tu {mago|maga} no choque.",
-  "outro": "¡Qué subida tan suave! Estás aprendiendo a probar y arreglar un programa.",
-  "learned": "Ahora sabes que puedes mejorar un programa probándolo y cambiando sus números, que los programadores llaman argumentos."
+  "intro": "Mi programa sube los escalones de piedra hasta el rellano. Choca contra la pared dos veces porque dos números son demasiado grandes. ¡Puedes mejorarlo!",
+  "outro": "¡Perfecto! Estamos de vuelta en la puerta, sin ningún golpe.",
+  "learned": "Ahora sabes más sobre cuánto hacer, que los programadores llaman argumentos."
 }

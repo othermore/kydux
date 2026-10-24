@@ -1,19 +1,25 @@
 {
   "id": "the-password",
-  "map": [
-    "#######",
-    "#S..GE#",
-    "#######"
-  ],
+  "kind": "practice",
+  "scene": "the-gate",
+  "start": [7, 6],
+  "end": [14, 6],
+  "speaker": "nuri",
   "things": [
     {
       "kind": "door",
       "id": "gate",
-      "marker": "G",
+      "at": [13, 6],
       "password": "ambrel"
     }
   ],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [6, 6]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -31,7 +37,5 @@
       "marker": "E"
     }
   ],
-  "tick_limit": 50,
-  "speaker": "nuri",
-  "kind": "practice"
+  "tick_limit": 50
 }

@@ -1,15 +1,15 @@
 {
-  "title": "El pasillo",
+  "title": "El camino junto al seto",
   "goals": [
     "Llega al final del camino."
   ],
-  "starting_code": "wizard.move_right()\n",
+  "starting_code": "",
   "hints": [
-    "Necesitarás cuatro acciones en total.",
-    "Recuerda poner los paréntesis después de cada método.",
-    "Primero muévete a la derecha dos veces. Luego muévete hacia abajo dos veces."
+    "Recuerda poner cada paso en una línea nueva.",
+    "Primero, da dos pasos hacia abajo.",
+    "Luego, da dos pasos a la izquierda."
   ],
-  "intro": "Tenemos que seguir este camino por la esquina. Dale a tu {mago|maga} una acción para cada paso.",
-  "outro": "¡Llegaste al final del camino! Se te da muy bien escribir instrucciones.",
-  "learned": "Ahora sabes que una acción, que los programadores llaman método, necesita a alguien que la haga."
+  "intro": "Vamos a explorar el patio por si hay otra entrada. Sigue el camino junto al seto.",
+  "outro": "¡Gran trabajo! El camino sigue, pero primero quiero enseñarte otra cosa.",
+  "learned": "Ahora sabes sobre objetos y acciones, que los programadores llaman métodos."
 }

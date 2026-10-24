@@ -8,11 +8,22 @@ async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'bo
   return context.newPage();
 }
 
-test('the words speak of a girl as a girl: a level\'s intro and the notebook', async ({ browser }) => {
-  const page = await withWizard(browser, 'es-ES', 'girl');
-  await page.goto('/#level/the-corridor');
-  await expect(page.locator('#card-intro')).toContainText('Dale a tu maga una acción para cada paso.');
+/** The gate won, its win card open with Nuri's words. */
+async function winTheGate(page: Page): Promise<void> {
   await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await page.locator('.cm-content').click();
+  await page.keyboard.insertText('wizard.move_right()');
+  await page.locator('#run').click();
+  await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+}
+
+test('the words speak of a girl as a girl: the notebook and a level\'s outro', async ({ browser }) => {
+  const page = await withWizard(browser, 'es-ES', 'girl');
+  await page.goto('/#level/the-gate');
+  await winTheGate(page);
+  await expect(page.locator('#card-outro')).toContainText('has hecho que tu maga se mueva');
+  await page.locator('#again').click();
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook')).toContainText('El cuaderno de la maga');
   await page.context().close();
@@ -20,8 +31,9 @@ test('the words speak of a girl as a girl: a level\'s intro and the notebook', a
 
 test('the words speak of a boy as a boy', async ({ browser }) => {
   const page = await withWizard(browser, 'es-ES', 'boy');
-  await page.goto('/#level/the-corridor');
-  await expect(page.locator('#card-intro')).toContainText('Dale a tu mago una acción para cada paso.');
+  await page.goto('/#level/the-gate');
+  await winTheGate(page);
+  await expect(page.locator('#card-outro')).toContainText('has hecho que tu mago se mueva');
   await page.context().close();
 });
 

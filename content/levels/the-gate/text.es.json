@@ -5,11 +5,11 @@
   ],
   "starting_code": "",
   "hints": [
-    "Mira en el cuaderno para ver qué acciones conoce tu {mago|maga}.",
-    "Necesitas una acción que te mueva a la derecha.",
+    "Usa una acción para que tu {mago|maga} camine.",
+    "Tienes que dar un paso hacia la derecha.",
     "Usa la acción `move_right`."
   ],
-  "intro": "Podemos escribir nuestro primer programa aquí. Dile a tu {mago|maga} que dé un paso hacia la puerta.",
-  "outro": "¡Gran trabajo! La puerta sigue cerrada. Pero ahora puedes moverte. Tengo más cosas que enseñarte.",
-  "learned": "Ahora sabes que una lista de instrucciones es un programa."
+  "intro": "Un programa es una lista de instrucciones. Escribe una para dar un paso hacia la puerta. ¡Veamos qué pasa!",
+  "outro": "¡La puerta sigue cerrada, pero has hecho que tu {mago|maga} se mueva! Tengo más cosas que enseñarte.",
+  "learned": "Ahora sabes qué es un programa."
 }

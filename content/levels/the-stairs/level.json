@@ -1,16 +1,25 @@
 {
   "id": "the-stairs",
-  "map": [
-    "#########",
-    "#####..E#",
-    "#####.###",
-    "##....###",
-    "##.######",
-    "##S######",
-    "#########"
+  "kind": "improve",
+  "scene": "the-gate",
+  "start": [2, 10],
+  "end": [7, 6],
+  "speaker": "nuri",
+  "things": [
+    {
+      "kind": "door",
+      "id": "gate",
+      "at": [13, 6],
+      "password": "ambrel"
+    }
   ],
-  "things": [],
-  "actors": [],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "nuri",
+      "at": [3, 10]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -31,7 +40,5 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
-  "speaker": "nuri",
-  "kind": "improve"
+  "tick_limit": 100
 }

@@ -80,6 +80,9 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await page.locator('#lesson-next').click();
     await page.locator('#lesson-next').click();
     await expect(page.locator('.lesson-page')).toContainText(words.greeting);
+    // The story's last page: Nuri turns to teaching.
+    await page.locator('#lesson-next').click();
+    await shoot(page, 'nuri-teaches');
     await page.locator('#lesson-try').click();
 
     // The first lesson, page by page.

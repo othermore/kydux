@@ -1,0 +1,16 @@
+{
+  "title": "La varita",
+  "goals": [
+    "Recoge la varita.",
+    "Camina hasta Nuri."
+  ],
+  "starting_code": "# Camina hasta la piedra plana.\n# Recoge la varita.\n# Camina hasta Nuri.\n",
+  "hints": [
+    "Camina tres pasos hacia la derecha para llegar a la piedra.",
+    "Usa la acción `pick_up` para coger la varita.",
+    "Da tres pasos más hacia la derecha para llegar a mí."
+  ],
+  "intro": "Me adelanté y dejé mi varita de repuesto en esa piedra plana para ti. Te la prestaré, ¡y me la devolverás algún día!",
+  "outro": "¡Tienes una varita! Ahora puedes hacer magia de verdad.",
+  "learned": "Ahora sabes sobre las cosas que se pueden llevar, que también son objetos."
+}

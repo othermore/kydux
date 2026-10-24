@@ -5,11 +5,11 @@
   ],
   "starting_code": "",
   "hints": [
-    "Check the notebook to see what actions your wizard knows.",
-    "You need an action that moves you to the right.",
-    "Use the action `move_right`."
+    "Use an action to make your wizard walk.",
+    "You need to take one step to the right.",
+    "Use the `move_right` action."
   ],
-  "intro": "We can write our first program here. Tell your wizard to take a step towards the gate.",
-  "outro": "Great job! The gate is still shut. But now you can move. I have more to show you.",
-  "learned": "Now you know that a list of instructions is a program."
+  "intro": "A program is a list of instructions. Write one to take a step toward the gate. Let us see what happens!",
+  "outro": "The gate is still shut, but you made your wizard move! I have more to show you.",
+  "learned": "Now you know what a program is."
 }

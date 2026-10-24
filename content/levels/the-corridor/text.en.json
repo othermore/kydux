@@ -1,15 +1,15 @@
 {
-  "title": "The corridor",
+  "title": "The path by the hedge",
   "goals": [
     "Reach the end of the path."
   ],
-  "starting_code": "wizard.move_right()\n",
+  "starting_code": "",
   "hints": [
-    "You will need four actions in total.",
-    "Remember to put the brackets after each method.",
-    "First move right twice. Then move down twice."
+    "Remember to put each step on a new line.",
+    "First, take two steps down.",
+    "Then, take two steps left."
   ],
-  "intro": "We need to follow this path round the corner. Give your wizard one action for every step.",
-  "outro": "You reached the end of the path! You are getting good at writing instructions.",
-  "learned": "Now you know that an action, which programmers call a method, needs someone to do it."
+  "intro": "Let us look round the forecourt for another way in. Follow the path by the hedge.",
+  "outro": "Great job! The path goes on, but I want to show you something else first.",
+  "learned": "Now you know about objects and actions, which programmers call methods."
 }

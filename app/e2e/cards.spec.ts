@@ -75,7 +75,7 @@ test('the stars say why: a hint and a bump each cost one (D57)', async ({ page }
   await page.locator('#speed').selectOption('4');
   await run(page, 'wizard.move_up()');
   await page.locator('#hint').click();
-  await run(page, 'wizard.move_up()\nwizard.move_right(6)');
+  await run(page, 'wizard.move_up()\nwizard.move_left(6)');
   const win = page.locator('.win-card');
   await expect(win.locator('.stars')).toHaveAttribute('data-stars', '1');
   await expect(win.locator('#star-reasons li')).toHaveText([

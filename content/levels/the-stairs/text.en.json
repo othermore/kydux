@@ -1,17 +1,17 @@
 {
   "title": "The stairs",
   "goals": [
-    "Climb to the top.",
+    "Climb to the landing.",
     "Do not bump into anything.",
     "Do it in fewer than 5 lines."
   ],
-  "starting_code": "# This reaches the top but bumps twice. Make it better.\nwizard.move_up(3)\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(2)\n",
+  "starting_code": "# This program reaches the landing but bumps twice. Make it better!\nwizard.move_up(3)\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(2)\n",
   "hints": [
-    "Press Run and watch where your wizard hits the wall.",
-    "Count the tiles for the upwards steps.",
-    "Change both `move_up` arguments to 2."
+    "Watch your wizard walk. Your wizard bumps into the wall when moving up.",
+    "The numbers in both `move_up` actions are too big.",
+    "Change the number in both `move_up` actions to a 2."
   ],
-  "intro": "This program climbs the stairs. But it bumps into the walls. Change the numbers so the wizard does not bump.",
-  "outro": "Very smooth climbing! You are learning how to test and fix a program.",
-  "learned": "Now you know that you can make a program better by trying it and changing its numbers, which programmers call arguments."
+  "intro": "My program climbs the stone steps to the landing. It bumps into the wall twice because two numbers are too big. You can make it better!",
+  "outro": "Perfect! We are back at the gate, without any bumps.",
+  "learned": "Now you know more about how much, which programmers call arguments."
 }

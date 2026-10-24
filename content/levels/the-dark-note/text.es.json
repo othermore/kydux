@@ -1,15 +1,15 @@
 {
-  "title": "La nota oscura",
+  "title": "La nota",
   "goals": [
     "Llega al final del camino."
   ],
-  "starting_code": "# Un paso está mal. Arréglalo.\nwizard.move_left()\nwizard.move_left()\nwizard.move_down()\nwizard.move_right()\n",
+  "starting_code": "# Un movimiento de este programa está mal. ¡Encuéntralo y arréglalo!\nwizard.move_left()\nwizard.move_left()\nwizard.move_down()\nwizard.move_right()\n",
   "hints": [
-    "Lee el código de arriba a abajo.",
-    "Mira lo que hace tu {mago|maga} cuando pulsas Ejecutar.",
-    "El último paso va en la dirección equivocada."
+    "Lee los movimientos uno a uno y mira a dónde te llevan.",
+    "El último movimiento te lleva en la dirección equivocada.",
+    "Cambia la última acción a `move_down`."
   ],
-  "intro": "He dejado una nota en este programa para ayudarte. Lee primero la nota. Luego busca el error y arréglalo.",
-  "outro": "¡Has arreglado el programa perfectamente! Las notas hacen que todo sea mucho más fácil de entender.",
-  "learned": "Ahora sabes que una nota, que los programadores llaman comentario, ayuda a explicar un programa."
+  "intro": "Escribí un programa al subir la colina para recorrer el siguiente tramo. Creo que uno de sus movimientos está mal. Puedes leer mi nota, que los programadores llaman comentario.",
+  "outro": "¡Lo has arreglado! Leer código es tan importante como escribirlo.",
+  "learned": "Ahora sabes sobre las notas, que los programadores llaman comentarios."
 }

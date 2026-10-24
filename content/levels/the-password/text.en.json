@@ -4,13 +4,13 @@
     "Open the gate.",
     "Walk through it."
   ],
-  "starting_code": "# The secret word is ambrel\n# Stand beside the gate and say it\n",
+  "starting_code": "# The password is ambrel in small letters.\n# Stand beside the gate, say the word, and walk through.\n",
   "hints": [
-    "First move right until you are next to the gate.",
-    "Use the `say` method with the string \"ambrel\".",
-    "After the gate opens, move two steps to the right. This lets you walk through it."
+    "First, walk five steps to the right.",
+    "Use the `say` action to speak the password.",
+    "Do not forget the quotes! Then take two more steps to the right."
   ],
-  "intro": "An older pupil told me the secret word! It is ambrel. Stand right beside the gate and say it.",
-  "outro": "The gate opened! Arvelia is waiting for us on the other side.",
-  "learned": "Now you know that a word in quotes, which programmers call a string, can open a door."
+  "intro": "I learned the secret word from an older pupil! You must stand right beside the gate and say exactly ambrel in small letters.",
+  "outro": "The gate heard you! The way is open and we are inside the gatehouse.",
+  "learned": "Now you know about words in quotes, which programmers call a string."
 }

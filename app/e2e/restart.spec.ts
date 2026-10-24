@@ -33,5 +33,5 @@ test('a run shows the level starting again before it plays, and Restart does too
   await page.locator('#restart').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-restarting', 'true');
   await expect(page.locator('#scene')).not.toHaveAttribute('data-restarting', /./);
-  await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '11,6');
+  await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '7,20');
 });

@@ -1,16 +1,25 @@
 {
   "id": "the-stairs",
   "kind": "improve",
-  "scene": "the-gate",
-  "start": [2, 10],
-  "end": [7, 6],
+  "scene": "the-field",
+  "start": [
+    3,
+    24
+  ],
+  "end": [
+    8,
+    20
+  ],
   "speaker": "nuri",
   "things": [],
   "actors": [
     {
       "kind": "friend",
       "id": "nuri",
-      "at": [3, 10]
+      "at": [
+        2,
+        24
+      ]
     }
   ],
   "api": [
@@ -29,7 +38,7 @@
     },
     {
       "kind": "lines_under",
-      "lines": 5,
+      "lines": 3,
       "bonus": true
     }
   ],

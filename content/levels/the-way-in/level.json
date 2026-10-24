@@ -1,19 +1,29 @@
 {
   "id": "the-way-in",
   "kind": "practice",
-  "scene": "the-gate",
-  "start": [25, 6],
-  "end": [18, 1],
+  "scene": "the-field",
+  "start": [
+    8,
+    10
+  ],
+  "end": [
+    8,
+    6
+  ],
   "speaker": "nuri",
-  "carrying": ["wand"],
-  "spells": ["zelim"],
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "zelim"
+  ],
   "things": [
     {
       "id": "gate",
       "open": true
     },
     {
-      "id": "door",
+      "id": "seal_gate",
       "open": true
     }
   ],
@@ -21,7 +31,10 @@
     {
       "kind": "friend",
       "id": "nuri",
-      "at": [24, 6]
+      "at": [
+        8,
+        11
+      ]
     }
   ],
   "api": [
@@ -34,12 +47,16 @@
   ],
   "goals": [
     {
+      "kind": "open",
+      "id": "castle_door"
+    },
+    {
       "kind": "reach",
       "marker": "E"
     },
     {
       "kind": "lines_under",
-      "lines": 9,
+      "lines": 5,
       "bonus": true
     }
   ],

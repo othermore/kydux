@@ -1,16 +1,25 @@
 {
   "id": "the-dark-note",
   "kind": "fix",
-  "scene": "the-gate",
-  "start": [10, 8],
-  "end": [8, 10],
+  "scene": "the-field",
+  "start": [
+    10,
+    22
+  ],
+  "end": [
+    9,
+    24
+  ],
   "speaker": "nuri",
   "things": [],
   "actors": [
     {
       "kind": "friend",
       "id": "nuri",
-      "at": [11, 8]
+      "at": [
+        10,
+        21
+      ]
     }
   ],
   "api": [

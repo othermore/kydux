@@ -174,8 +174,8 @@ test.describe('the sealed door (D42, D43)', () => {
     await page.locator('#speed').selectOption('4');
     await run(page, 'wizard.cast("zelim")');
     await expect(scene(page)).toHaveAttribute('data-doors', 'gate');
-    await run(page, 'wizard.move_right(2)\nwizard.cast("zelim")');
-    await expect(scene(page)).toHaveAttribute('data-doors', 'door,gate');
+    await run(page, 'wizard.move_left(2)\nwizard.move_up(3)\nwizard.cast("zelim")');
+    await expect(scene(page)).toHaveAttribute('data-doors', 'gate,seal_gate');
   });
 
   test('a spell the level does not have is named in the wizard\'s thought', async ({ page }) => {
@@ -184,7 +184,7 @@ test.describe('the sealed door (D42, D43)', () => {
   });
 
   test('the door opened by hand wants its spell', async ({ page }) => {
-    await run(page, 'wizard.move_right(2)\ndoor.open()');
+    await run(page, 'wizard.move_left(2)\nwizard.move_up(3)\nseal_gate.open()');
     await expect(page.locator('.outcome-text')).toContainText(
       'I cannot open the door by hand: it is sealed, and needs a spell.',
     );

@@ -26,7 +26,8 @@ art/raw/demo/field/, or the out folder given:
 A source folder may hold cut.json, which names its pictures (`gridded`,
 `nogrid`, `ground`), the boxes of the gate, the seal and the wand in cells
 (`boxes`), the rows where the walls' tops begin (`cuts`), the row above which
-the castle is left as ground (`castle`), the castle door's box (`door`), and
+the castle is left as ground (`castle`), the castle door's box (`door`), the
+things whose leaves are cut (`leaves`, all of them unless it says), and
 anything else for the page (`page`: the levels it plays, where the seal glows,
 where the wand lies); without it, the first painting's are taken.
 
@@ -383,6 +384,10 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     # pillars and the arch, stays.
     leaves = {}
     for name, box in boxes.items():
+        # A painting with these things already taken out has no leaves to cut.
+        if name not in settings.get("leaves", boxes):
+            leaves[name] = np.zeros_like(things)
+            continue
         inside = box_mask(things.shape, box, tile)
         part = leaf(painting, mask, name, inside)
         if name != "wand":
@@ -421,10 +426,13 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
         alpha[part] = 1.0
         image = rgba(painting, alpha * part)
         bbox = image.getbbox()
+        taken |= part
+        # A picture with the thing already taken out has nothing in its box.
+        if not bbox:
+            continue
         image.crop(bbox).save(out / f"{name}.png")
         row = int(round(box[3] - 0.5))
         layers.append({"name": name, "file": f"{name}.png", "at": list(bbox[:2]), "row": row})
-        taken |= part
     rest = things & ~taken
     # Under the wand, the stone it lay on: the stone's grey, taken from round it.
     stone = box_mask(things.shape, boxes["wand"], tile)

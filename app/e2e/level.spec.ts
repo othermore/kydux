@@ -36,7 +36,7 @@ test.describe('in English', () => {
     await expect(page).toHaveTitle(`Kydux — ${LONG.en.title}`);
     expect(await page.evaluate(() => globalThis.crossOriginIsolated)).toBe(true);
     await expect(page.locator('#status')).toHaveText(/^Python 3\.14\.\d+ ready$/);
-    await expect(scene(page)).toHaveAttribute('data-wizard', '8,10');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '9,24');
     await expect(page.locator('.cm-content')).toContainText(LONG.en.starting_code.trim());
     await expect(page.locator('.goal').first()).toHaveText(LONG.en.goals[0] ?? '');
   });
@@ -44,7 +44,7 @@ test.describe('in English', () => {
   test('one step left, and the goal is not met', async ({ page }) => {
     await setCode(page, 'wizard.move_left()');
     await run(page);
-    await expect(scene(page)).toHaveAttribute('data-wizard', '7,10');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '8,24');
     await expect(scene(page)).toHaveAttribute('data-tick', '1');
     await expect(outcome(page)).toHaveText('Not yet: 0 of 1 goals met. Try again.');
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
@@ -56,7 +56,7 @@ test.describe('in English', () => {
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(1);
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'met', { timeout: 10_000 });
     await expect(outcome(page)).toHaveText('You did it, apprentice!');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '2,10');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '3,24');
     await expect(scene(page)).toHaveAttribute('data-state', 'done');
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(0);
   });
@@ -101,7 +101,7 @@ test.describe('in English', () => {
     await setCode(page, 'wizard.move_left(6)');
     await run(page);
     await page.locator('#restart').click();
-    await expect(scene(page)).toHaveAttribute('data-wizard', '8,10');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '9,24');
     await expect(page.locator('.outcome')).toBeHidden();
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
   });

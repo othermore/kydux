@@ -379,8 +379,9 @@ def test_the_demo_reads_the_real_scenes_and_the_levels_it_plays():
     assert data["rows"][0].startswith("#")
     assert any(t["id"] == "old_book" for t in data["things"])
     assert {a["id"] for a in data["actors"]} >= {"wenna", "eldra"}
-    gate = demo.scene_data("the-gate", [])
-    assert gate["terrains"]["h"]["kind"] == "hedge"
+    field = demo.scene_data("the-field", [])
+    assert field["terrains"]["t"]["kind"] == "tree"
+    assert {t["id"] for t in field["things"]} >= {"gate", "seal_gate", "castle_door"}
 
 
 # The scene painted first (image-first): its grid found, its cells marked, its
@@ -457,3 +458,65 @@ def test_a_flat_stone_is_not_walked_on_but_a_thing_may_lie_on_it(tmp_path):
     assert scene["terrains"]["o"] == {"kind": "stone", "walk": False, "sight": True}
     # What stands up is cut out of the painting, and the stone with it.
     assert "o" in image_first.STANDING
+
+
+# The scene and the figures exported for the game (export_scene.py).
+
+import export_scene  # noqa: E402
+
+FIELD = generate.REPO / "content" / "art" / "scenes" / "the-field"
+FIGURES = generate.REPO / "content" / "art" / "figures"
+
+
+def test_a_thing_is_emptied_below_its_own_row():
+    alpha = np.ones((300, 10), dtype=np.float32)
+    # An image whose top is at 100 px, of a thing on row 1 of 96-pixel cells:
+    # its own row ends at 192, so 92 rows of it stay.
+    out = export_scene.clip_below(alpha, 1, 100, cell=96)
+    assert out[:92].all() and not out[92:].any()
+
+
+def test_a_mask_keeps_its_large_pieces_and_drops_the_scraps():
+    mask = np.zeros((80, 80), dtype=bool)
+    mask[10:50, 10:50] = True
+    mask[70:73, 70:73] = True
+    kept = export_scene.kept(mask, 0.2)
+    assert kept[20, 20] and not kept[71, 71]
+
+
+def test_a_solid_thing_s_mask_has_its_holes_filled():
+    mask = np.zeros((60, 60), dtype=bool)
+    mask[10:50, 10:50] = True
+    mask[25:30, 25:30] = False
+    assert export_scene.filled_mask(mask)[27, 27]
+
+
+@pytest.mark.skipif(not (FIELD / "art.json").is_file(), reason="the field is not exported")
+def test_the_exported_field_keeps_its_contract_and_nothing_reaches_below_its_row():
+    art = json.loads((FIELD / "art.json").read_text())
+    cell, (columns, rows) = art["cell"], art["size"]
+    ground = Image.open(FIELD / art["ground"])
+    assert ground.size == (columns * cell, rows * cell)
+    for layer in art["rows"]:
+        image = Image.open(FIELD / layer["image"])
+        # The full width, from its top down to its row's bottom edge and no lower.
+        assert image.width == columns * cell
+        assert layer["top"] + image.height == (layer["row"] + 1) * cell
+    assert set(art["things"]) == {"gate", "seal_gate", "castle_door", "wand"}
+    for name, thing in art["things"].items():
+        for state in thing["states"].values():
+            image = Image.open(FIELD / state)
+            assert thing["top"] + image.height <= (thing["row"] + 1) * cell, name
+    assert (FIELD / art["source"]).is_file()
+
+
+@pytest.mark.skipif(
+    not (FIGURES / "figures.json").is_file(), reason="the figures are not exported"
+)
+def test_the_exported_figures_are_sheets_of_four_ways_and_three_frames():
+    data = json.loads((FIGURES / "figures.json").read_text())
+    width, height = data["frame"]
+    assert data["ways"] == ["down", "left", "right", "up"] and data["frames"] == 3
+    for name in data["figures"]:
+        sheet = Image.open(FIGURES / f"{name}.webp")
+        assert sheet.size == (3 * width, 4 * height), name

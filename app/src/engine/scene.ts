@@ -61,10 +61,64 @@ const RESTART_HOLD_MS = 360;
 export const ZOOMS = [0.5, 0.75, 1, 1.5, 2] as const;
 const ZOOM_START = ZOOMS.indexOf(1);
 
-/** How the scene is played: a level's run, or a story's steps (D74). */
+/** How a scene is played: a level's run, or a story's steps (D74). */
 export interface SceneOptions {
   /** A story: the camera stays on this tile, and the words stay said. */
   story?: { camera: Tile };
+}
+
+/** A scene painted in one picture (D76): its ground, its raised things cut out by
+ * the row their foot stands on, and the things that change, each in its states;
+ * all at `cell` pixels a cell, from content/art/scenes/<scene>/art.json. */
+export interface SceneArt {
+  base: string;
+  cell: number;
+  size: Tile;
+  ground: string;
+  rows: { row: number; image: string; top: number }[];
+  things: Record<string, { row: number; left: number; top: number; states: Record<string, string> }>;
+}
+
+/** The figures drawn for the characters (D76): one sheet each of four rows (down,
+ * left, right, up) of three walking frames, drawn at `cell` pixels a cell, each
+ * figure at its own height; `foot` is how far above a frame's bottom the feet are,
+ * from content/art/figures/figures.json. */
+export interface FigureArt {
+  base: string;
+  cell: number;
+  frame: Tile;
+  foot: number;
+  height_cells: number;
+  standing: number;
+  figures: string[];
+}
+
+/** The art of a level or a story on a painted scene, or null on a scene without. */
+export async function loadArt(
+  level: LevelJson,
+): Promise<{ scene: SceneArt; figures: FigureArt | null } | null> {
+  if (typeof level.art !== 'string') return null;
+  const root = `${import.meta.env.BASE_URL}content/art/`;
+  const json = async <T,>(url: string): Promise<T | null> => {
+    const response = await fetch(url);
+    if (!response.ok || !response.headers.get('content-type')?.includes('json')) return null;
+    return (await response.json()) as T;
+  };
+  const base = `${root}scenes/${level.art}/`;
+  const scene = await json<Omit<SceneArt, 'base'>>(`${base}art.json`);
+  if (!scene) return null;
+  const figures = await json<Omit<FigureArt, 'base'>>(`${root}figures/figures.json`);
+  return { scene: { ...scene, base }, figures: figures ? { ...figures, base: `${root}figures/` } : null };
+}
+
+/** The rows of a figure's sheet, by the way it faces. */
+const SHEET_ROW: Record<Facing, number> = { down: 0, left: 1, right: 2, up: 3 };
+/** Where a figure's feet stand in its cell on a painted scene, as a part of a cell. */
+const FOOT_IN_CELL = 0.8;
+/** The depth of a painted row's things, at three quarters of its cell; a figure's
+ * is at its feet, so that a row's things cover the figures above them (D76). */
+function rowDepth(row: number): number {
+  return 3 + (row + 0.75) * 0.01;
 }
 
 export interface SceneHandle {
@@ -141,8 +195,116 @@ class LevelScene extends Phaser.Scene {
     private readonly ready: () => void,
     private readonly look: Look,
     private readonly options: SceneOptions = {},
+    private readonly art: { scene: SceneArt; figures: FigureArt | null } | null = null,
   ) {
     super({ key: 'level' });
+  }
+
+  /** A painted scene's images, and the figures' sheets (D76). */
+  preload(): void {
+    if (!this.art) return;
+    const { scene, figures } = this.art;
+    this.load.image('art-ground', scene.base + scene.ground);
+    for (const row of scene.rows) this.load.image(`art-row-${row.row}`, scene.base + row.image);
+    for (const [id, thing] of Object.entries(scene.things)) {
+      for (const [state, image] of Object.entries(thing.states)) {
+        this.load.image(`art-${id}-${state}`, scene.base + image);
+      }
+    }
+    if (figures) {
+      for (const name of figures.figures) {
+        this.load.spritesheet(`fig-${name}`, `${figures.base}${name}.webp`, {
+          frameWidth: figures.frame[0],
+          frameHeight: figures.frame[1],
+        });
+      }
+    }
+  }
+
+  /** How much a painted scene's pixels are scaled to the scene's tiles. */
+  private get artScale(): number {
+    return this.art ? TILE / this.art.scene.cell : 1;
+  }
+
+  /** How far above a figure's feet a word said over it goes. */
+  private get headroom(): number {
+    return this.art ? TILE * (this.art.figures?.height_cells ?? 1.3) + 4 : 34;
+  }
+
+  /** Where a figure stands on a tile: its centre, or on a painted scene its feet. */
+  private figureAt([x, y]: Tile): [number, number] {
+    return this.art ? [x * TILE + TILE / 2, y * TILE + TILE * FOOT_IN_CELL] : centre([x, y]);
+  }
+
+  /** A figure turned to face a way: its sheet's frame, or the placeholder's. */
+  private face(sprite: Phaser.GameObjects.Sprite, facing: Facing, step = this.art?.figures?.standing ?? 1): void {
+    if (sprite.texture.key.startsWith('fig-')) sprite.setFrame(SHEET_ROW[facing] * 3 + step);
+    else sprite.setFrame(facing);
+  }
+
+  /** A figure walking to a point, its frames stepping as it goes on a painted scene. */
+  private walk(sprite: Phaser.GameObjects.Sprite, facing: Facing, x: number, y: number, duration: number): void {
+    const stepping = sprite.texture.key.startsWith('fig-');
+    this.tweens.add({
+      targets: sprite,
+      x,
+      y,
+      duration,
+      ease: 'Linear',
+      onUpdate: (tween) => {
+        if (stepping) this.face(sprite, facing, [0, 1, 2, 1][Math.floor(tween.progress * 4) % 4] ?? 1);
+      },
+      onComplete: () => this.face(sprite, facing),
+    });
+  }
+
+  /** A character's figure: its drawn sheet when there is one, else the placeholder. */
+  private figure(name: string, placeholder: string, tile: Tile, facing: Facing): Phaser.GameObjects.Sprite {
+    const figures = this.art?.figures;
+    if (figures && this.textures.exists(`fig-${name}`)) {
+      const sprite = this.add.sprite(...this.figureAt(tile), `fig-${name}`, SHEET_ROW[facing] * 3 + figures.standing);
+      sprite.setOrigin(0.5, 1 - figures.foot / figures.frame[1]);
+      sprite.setScale(TILE / figures.cell);
+      return sprite;
+    }
+    return this.add.sprite(...centre(tile), placeholder, facing).setOrigin(0.5, 0.6);
+  }
+
+  /** A door's look, shut or open: its painted state, or the placeholder's frame. */
+  private doorLook(id: string, open: boolean, lock: string): void {
+    const image = this.things.get(id);
+    if (!image) return;
+    const key = `art-${id}-${open ? 'open' : 'closed'}`;
+    if (this.textures.exists(key)) image.setTexture(key);
+    else image.setFrame(open ? 'open' : lock);
+  }
+
+  /** The pencil grid over a painted scene, for counting steps (D76): thin lines a
+   * little crooked, as drawn by hand, the same every time, breathing slowly. */
+  private drawGrid(): void {
+    const grid = this.add.graphics().setDepth(0.5);
+    let seed = 11;
+    const wobble = () => {
+      seed = (seed * 16807) % 2147483647;
+      return (seed / 2147483647 - 0.5) * 1.6;
+    };
+    const width = this.map.width * TILE;
+    const height = this.map.height * TILE;
+    const line = (x0: number, y0: number, x1: number, y1: number) => {
+      grid.lineStyle(1, 0x3b2f1e, 0.55 + wobble() * 0.2);
+      grid.beginPath();
+      grid.moveTo(x0 + wobble(), y0 + wobble());
+      const steps = 6;
+      for (let i = 1; i <= steps; i += 1) {
+        const t = i / steps;
+        grid.lineTo(x0 + (x1 - x0) * t + wobble(), y0 + (y1 - y0) * t + wobble());
+      }
+      grid.strokePath();
+    };
+    for (let x = 0; x <= this.map.width; x += 1) line(x * TILE, 0, x * TILE, height);
+    for (let y = 0; y <= this.map.height; y += 1) line(0, y * TILE, width, y * TILE);
+    grid.setAlpha(0.18);
+    this.tweens.add({ targets: grid, alpha: 0.32, duration: 1750, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   }
 
   /** How many ticks a word said stays: in a story, until the next step. */
@@ -166,19 +328,49 @@ class LevelScene extends Phaser.Scene {
         return index >= 0 ? index : kind === 'wall' ? WALL : kind === 'shelf' ? SHELF : FLOOR;
       }),
     );
-    const tilemap = this.make.tilemap({ data, tileWidth: TILE, tileHeight: TILE });
-    const tileset = tilemap.addTilesetImage(TILES_KEY, TILES_KEY, TILE, TILE, 0, 0);
-    if (tileset) tilemap.createLayer(0, tileset, 0, 0);
+    if (this.art) {
+      // A painted scene (D76): the painting as the ground, its raised things by row.
+      const scale = this.artScale;
+      this.add.image(0, 0, 'art-ground').setOrigin(0, 0).setScale(scale).setDepth(0);
+      for (const row of this.art.scene.rows) {
+        this.add
+          .image(0, row.top * scale, `art-row-${row.row}`)
+          .setOrigin(0, 0)
+          .setScale(scale)
+          .setDepth(rowDepth(row.row));
+      }
+      this.drawGrid();
+    } else {
+      const tilemap = this.make.tilemap({ data, tileWidth: TILE, tileHeight: TILE });
+      const tileset = tilemap.addTilesetImage(TILES_KEY, TILES_KEY, TILE, TILE, 0, 0);
+      if (tileset) tilemap.createLayer(0, tileset, 0, 0);
+    }
     for (const [letter, tile] of this.map.markers) {
       // A marker, like the way out, shows in the dark: it is the castle's shape.
       this.add.image(...centre(tile), markerKey(letter)).setDepth(2.8);
     }
     for (const prop of this.map.props) {
-      if (this.textures.exists(propKey(prop.kind))) this.add.image(...centre(prop.tile), propKey(prop.kind)).setDepth(1.5);
+      // A painted scene has its props in the painting.
+      if (!this.art && this.textures.exists(propKey(prop.kind))) {
+        this.add.image(...centre(prop.tile), propKey(prop.kind)).setDepth(1.5);
+      }
     }
     this.cone = this.add.graphics().setDepth(1);
     this.darkness = this.add.graphics().setDepth(2.5);
     for (const thing of this.map.things) {
+      const painted = this.art?.scene.things[thing.id];
+      if (painted) {
+        // A painted thing, in its state, among the rows by its foot (D76).
+        const state = thing.kind === 'door' ? (thing.open ? 'open' : 'closed') : Object.keys(painted.states)[0];
+        const image = this.add
+          .image(painted.left * this.artScale, painted.top * this.artScale, `art-${thing.id}-${state}`)
+          .setOrigin(0, 0)
+          .setScale(this.artScale)
+          .setDepth(rowDepth(painted.row) + 0.001);
+        this.things.set(thing.id, image);
+        if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
+        continue;
+      }
       const image =
         thing.kind === 'door'
           ? this.add.image(...centre(thing.tile), thingKey('door'), thing.open ? 'open' : thing.lock)
@@ -193,14 +385,10 @@ class LevelScene extends Phaser.Scene {
     }
     for (const actor of this.map.actors) {
       const key = actor.kind === 'friend' ? friendKey(actor.id) : actorKey(actor.kind);
-      const sprite = this.add
-        .sprite(...centre(actor.tile), key, actor.facing)
-        .setOrigin(0.5, 0.6)
-        .setDepth(3);
+      const sprite = this.figure(actor.id, key, actor.tile, actor.facing).setDepth(3);
       this.actors.set(actor.id, { sprite, tile: actor.tile, facing: actor.facing, sight: actor.sight });
     }
-    this.wizard = this.add.sprite(...centre(this.map.start), WIZARD_KEY, 'down');
-    this.wizard.setOrigin(0.5, 0.6).setDepth(4);
+    this.wizard = this.figure('wizard', WIZARD_KEY, this.map.start, 'down').setDepth(4);
     this.setUpCamera();
 
     this.playback.onTick((tick, events, instant) => this.show(tick, events, instant));
@@ -290,6 +478,11 @@ class LevelScene extends Phaser.Scene {
 
   /** A word said follows who says it while they walk. */
   override update(): void {
+    // On a painted scene the figures go behind what stands in front of them (D76).
+    if (this.art) {
+      this.wizard.setDepth(3 + (this.wizard.y / TILE) * 0.01 + 0.0005);
+      for (const actor of this.actors.values()) actor.sprite.setDepth(3 + (actor.sprite.y / TILE) * 0.01);
+    }
     const [x, y] = this.bubbleAnchor();
     this.bubble?.setPosition(x, y);
     this.thought?.setPosition(x, y);
@@ -301,12 +494,12 @@ class LevelScene extends Phaser.Scene {
     const half = this.bubblePlace.width / 2 + 4;
     const width = this.map.width * TILE;
     const x = Math.min(Math.max(over.x, half), Math.max(half, width - half));
-    return [x, over.y + (this.bubblePlace.below ? 22 : -34)];
+    return [x, over.y + (this.bubblePlace.below ? 22 : -this.headroom)];
   }
 
   /** Whether a bubble this tall fits over who speaks, inside the scene. */
   private roomAbove(height: number): boolean {
-    return (this.speaker ?? this.wizard).y - 34 - height - 14 >= 2;
+    return (this.speaker ?? this.wizard).y - this.headroom - height - 14 >= 2;
   }
 
   /** Everything where it stood before the run. */
@@ -325,8 +518,11 @@ class LevelScene extends Phaser.Scene {
       const image = this.things.get(thing.id);
       if (!image) continue;
       this.tweens.killTweensOf(image);
-      image.setPosition(...centre(thing.tile)).setVisible(true).setAlpha(1);
-      if (thing.kind === 'door') image.setFrame(thing.open ? 'open' : thing.lock);
+      const painted = this.art?.scene.things[thing.id];
+      if (painted) image.setPosition(painted.left * this.artScale, painted.top * this.artScale);
+      else image.setPosition(...centre(thing.tile));
+      image.setVisible(true).setAlpha(1);
+      if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
       if (thing.open) this.openDoors.add(thing.id);
     }
     for (const actor of this.map.actors) {
@@ -335,7 +531,8 @@ class LevelScene extends Phaser.Scene {
       this.tweens.killTweensOf(state.sprite);
       state.tile = actor.tile;
       state.facing = actor.facing;
-      state.sprite.setPosition(...centre(actor.tile)).setFrame(actor.facing).setAlpha(1).setVisible(!actor.hidden);
+      state.sprite.setPosition(...this.figureAt(actor.tile)).setAlpha(1).setVisible(!actor.hidden);
+      this.face(state.sprite, actor.facing);
     }
     this.placeWizard(this.map.start, 'down');
     this.parentNode.dataset.tick = '0';
@@ -345,8 +542,8 @@ class LevelScene extends Phaser.Scene {
 
   private placeWizard(tile: Tile, facing: Facing): void {
     this.tweens.killTweensOf(this.wizard);
-    this.wizard.setPosition(...centre(tile));
-    this.wizard.setFrame(facing);
+    this.wizard.setPosition(...this.figureAt(tile));
+    this.face(this.wizard, facing);
     this.wizardTile = tile;
   }
 
@@ -400,7 +597,7 @@ class LevelScene extends Phaser.Scene {
     const image = this.things.get(id);
     if (actor) {
       actor.facing = towards(actor.tile, this.wizardTile);
-      actor.sprite.setFrame(actor.facing);
+      this.face(actor.sprite, actor.facing);
     }
     if (!image || !actor) return;
     this.tweens.killTweensOf(image);
@@ -425,19 +622,21 @@ class LevelScene extends Phaser.Scene {
   private openDoor(id: string, instant = true, byWord = false): void {
     this.openDoors.add(id);
     if (!instant) play('door');
+    const lock = this.map.things.find((thing) => thing.id === id)?.lock ?? 'none';
     if (instant || !byWord) {
-      this.things.get(id)?.setFrame('open');
+      this.doorLook(id, true, lock);
       return;
     }
     const run = this.restarts;
     this.time.delayedCall(this.playback.tickDuration * 0.5, () => {
-      if (run === this.restarts && this.openDoors.has(id)) this.things.get(id)?.setFrame('open');
+      if (run === this.restarts && this.openDoors.has(id)) this.doorLook(id, true, lock);
     });
   }
 
   /** A spell cast: a ring of light that grows from the wizard and fades (D42). */
   private flash(duration: number): void {
-    const ring = this.add.circle(this.wizard.x, this.wizard.y - 6, 10, 0xfff3bf, 0.8).setDepth(5);
+    const lift = this.art ? TILE * 0.5 : 6;
+    const ring = this.add.circle(this.wizard.x, this.wizard.y - lift, 10, 0xfff3bf, 0.8).setDepth(5);
     this.tweens.add({
       targets: ring,
       scale: 3,
@@ -461,8 +660,8 @@ class LevelScene extends Phaser.Scene {
         }
         this.placeWizard(from, facing ?? 'down');
         this.wizardTile = to;
-        const [x, y] = centre(to);
-        this.tweens.add({ targets: this.wizard, x, y, duration, ease: 'Linear' });
+        const [x, y] = this.figureAt(to);
+        this.walk(this.wizard, facing ?? 'down', x, y, duration);
         play('step');
         break;
       }
@@ -483,7 +682,7 @@ class LevelScene extends Phaser.Scene {
         }
         break;
       case 'turn':
-        if (facing) this.wizard.setFrame(facing);
+        if (facing) this.face(this.wizard, facing);
         break;
       case 'pick_up': {
         const id = String(event.data.id);
@@ -548,23 +747,18 @@ class LevelScene extends Phaser.Scene {
         actor.tile = to;
         actor.facing = facing;
         if (instant) {
-          actor.sprite.setPosition(...centre(to)).setFrame(facing);
+          actor.sprite.setPosition(...this.figureAt(to));
+          this.face(actor.sprite, facing);
           break;
         }
-        actor.sprite.setPosition(...centre(from)).setFrame(facing);
-        const [x, y] = centre(to);
-        this.tweens.add({
-          targets: actor.sprite,
-          x,
-          y,
-          duration: this.playback.tickDuration * 0.9,
-          ease: 'Linear',
-        });
+        actor.sprite.setPosition(...this.figureAt(from));
+        const [x, y] = this.figureAt(to);
+        this.walk(actor.sprite, facing, x, y, this.playback.tickDuration * 0.9);
         break;
       }
       case 'turn':
         actor.facing = facing;
-        actor.sprite.setFrame(facing);
+        this.face(actor.sprite, facing);
         break;
       // A story's actor speaks, comes into sight and goes (D74).
       case 'say':
@@ -578,7 +772,8 @@ class LevelScene extends Phaser.Scene {
         if (!at) return;
         this.tweens.killTweensOf(actor.sprite);
         actor.tile = at;
-        actor.sprite.setPosition(...centre(at)).setFrame(actor.facing).setVisible(true);
+        actor.sprite.setPosition(...this.figureAt(at)).setVisible(true);
+        this.face(actor.sprite, actor.facing);
         if (instant) actor.sprite.setAlpha(1);
         else {
           actor.sprite.setAlpha(0);
@@ -763,7 +958,7 @@ class LevelScene extends Phaser.Scene {
 
 /** Starts the level's scene in `parent`, its wizard drawn with `look`, or a
  * story's (D74); resolves once it is drawn. */
-export function startScene(
+export async function startScene(
   parent: HTMLElement,
   level: LevelJson,
   look: Look = DEFAULT_LOOK,
@@ -771,6 +966,8 @@ export function startScene(
 ): Promise<SceneHandle> {
   const map = layout(level);
   const playback = new Playback({ tickMs: TICK_MS });
+  // A painted scene's art, when it has some (D76); a scene without is drawn as before.
+  const art = await loadArt(level).catch(() => null);
 
   return new Promise((resolve) => {
     let game: Phaser.Game | null = null;
@@ -803,7 +1000,7 @@ export function startScene(
         },
       });
     };
-    const scene = new LevelScene(map, parent, playback, onReady, look, options);
+    const scene = new LevelScene(map, parent, playback, onReady, look, options, art);
     game = new Phaser.Game({
       type: Phaser.AUTO,
       parent,

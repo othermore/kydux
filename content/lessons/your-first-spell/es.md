@@ -17,6 +17,7 @@ Nuestro primer hechizo es *zelim*. Este hechizo rompe el sello de una puerta que
 ¡Vamos a lanzar tu primer hechizo! Nos moveremos cerca de una puerta sellada y lanzaremos *zelim* para romper su sello.
 
 ```python try
-wizard.move_right(2)
+wizard.move_left(2)
+wizard.move_up(3)
 wizard.cast("zelim")
 ```

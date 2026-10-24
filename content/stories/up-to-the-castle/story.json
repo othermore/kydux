@@ -1,14 +1,14 @@
 {
   "id": "up-to-the-castle",
   "speaker": "nuri",
-  "scene": "the-gate",
+  "scene": "the-field",
   "wizard": [
-    18,
-    2
+    8,
+    8
   ],
   "camera": [
-    18,
-    3
+    8,
+    8
   ],
   "things": [
     {
@@ -16,19 +16,11 @@
       "open": true
     },
     {
-      "id": "door",
+      "id": "seal_gate",
       "open": true
     },
     {
-      "id": "inner_gate",
-      "open": true
-    },
-    {
-      "id": "first_seal",
-      "open": true
-    },
-    {
-      "id": "second_seal",
+      "id": "castle_door",
       "open": true
     }
   ],
@@ -37,8 +29,8 @@
       "id": "nuri",
       "kind": "friend",
       "at": [
-        19,
-        3
+        8,
+        10
       ]
     }
   ],
@@ -47,8 +39,8 @@
       "who": "voice",
       "do": {
         "walk": [
-          18,
-          1
+          8,
+          7
         ]
       },
       "by": "wizard"
@@ -57,8 +49,8 @@
       "who": "nuri",
       "do": {
         "walk": [
-          18,
-          3
+          8,
+          9
         ]
       }
     },
@@ -66,8 +58,8 @@
       "who": "nuri",
       "do": {
         "walk": [
-          18,
-          2
+          8,
+          8
         ]
       }
     },
@@ -87,7 +79,13 @@
     },
     {
       "who": "voice",
-      "do": null
+      "do": {
+        "walk": [
+          8,
+          6
+        ]
+      },
+      "by": "wizard"
     }
   ]
 }

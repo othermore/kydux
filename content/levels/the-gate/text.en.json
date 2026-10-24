@@ -5,11 +5,11 @@
   ],
   "starting_code": "",
   "hints": [
-    "Remember the instruction from the lesson? You need to move your wizard.",
-    "You only need one instruction to take a step towards the gate.",
-    "Write `move_right` with empty brackets."
+    "Your wizard needs an instruction to take one step.",
+    "Look at your notebook to see the move actions.",
+    "Use the `move_right` method on your wizard, followed by empty brackets."
   ],
-  "intro": "We are one step away from the gate! Let's write our very first program to walk up to it. It won't open yet, but we must start at the beginning!",
-  "outro": "Great! You have learned to move your wizard. Now let's see how we get through this gate.",
+  "intro": "Here we are, right in front of the great gate! We need to step up to it to see if it opens. Let us write a program to walk one step to the right.",
+  "outro": "Great! You have learned to move your wizard. The gate stays shut for now, but that is fine: first we master the basics, and then we will figure out how to get through.",
   "learned": "Now you know what a program and an instruction are, and the instruction that moves your wizard."
 }

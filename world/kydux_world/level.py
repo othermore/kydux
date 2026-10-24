@@ -381,10 +381,12 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
     for name, value in (("sealed", sealed), ("password", password)):
         if value is not None and (kind != "door" or not isinstance(value, str) or not value):
             raise LevelError(f"{shape.level_id}: only a door is {name}, by a word")
-    if sum((locked, sealed is not None, password is not None)) > 1:
+    # A door is locked, or sealed, or has a password, or is both sealed and keyed by
+    # a word, as the castle's door is: it opens once its word is said and its seal broken.
+    if locked and (sealed is not None or password is not None):
         raise LevelError(
-            f"{shape.level_id}: the door {thing_id} is locked, sealed or has a password, "
-            "one of them at most"
+            f"{shape.level_id}: the door {thing_id} is locked, and so neither sealed "
+            "nor keyed by a word"
         )
     period = spec.get("period")
     whole = isinstance(period, int) and not isinstance(period, bool) and period >= 1

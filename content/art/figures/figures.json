@@ -1,0 +1,24 @@
+{
+  "cell": 96,
+  "frame": [
+    98,
+    172
+  ],
+  "foot": 6,
+  "height_cells": 1.25,
+  "ways": [
+    "down",
+    "left",
+    "right",
+    "up"
+  ],
+  "frames": 3,
+  "standing": 1,
+  "figures": [
+    "wizard",
+    "nuri",
+    "wenna",
+    "eldra",
+    "dask"
+  ]
+}

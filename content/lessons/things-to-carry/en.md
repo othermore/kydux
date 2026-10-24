@@ -9,7 +9,7 @@ Your wizard can pick things up! The method `wizard.pick_up()` picks up a thing, 
 
 When there are several things near you, you must tell the computer exactly which one you want. You do this by giving the thing's name as the argument, like `wizard.pick_up(key)`.
 
-I have left my spare wand inside the gatehouse for you to pick up. It is only lent, so we will have to give it back one day!
+I have left my spare wand on a flat stone past the gate for you to pick up. It is only lent, so we will have to give it back one day!
 
 ---
 ## Try it
@@ -17,6 +17,6 @@ I have left my spare wand inside the gatehouse for you to pick up. It is only le
 Let us walk over and pick up the wand. First we move, and then we use the method to pick it up!
 
 ```python try
-wizard.move_right(2)
+wizard.move_right(3)
 wizard.pick_up()
 ```

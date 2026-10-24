@@ -1,15 +1,15 @@
 {
-  "title": "El pasillo",
+  "title": "El camino",
   "goals": [
-    "Llega hasta el lugar."
+    "Llega a la marca."
   ],
   "starting_code": "",
   "hints": [
-    "Necesitas cuatro instrucciones en total, una en cada línea.",
-    "Primero usa `move_down` dos veces, y luego `move_left` dos veces.",
-    "Recuerda poner tu objeto, un punto y el método con los paréntesis vacíos en cada línea."
+    "Tienes que escribir cuatro instrucciones en cuatro líneas.",
+    "Primero muévete hacia abajo dos veces, y luego a la derecha dos veces.",
+    "Usa los métodos `move_down` y `move_right`."
   ],
-  "intro": "La verja aún no se abrirá para {nosotros|nosotras}, ¡así que vamos a echar un vistazo por el jardín! Escribe un programa para bajar por el camino y luego doblar la esquina hacia la izquierda.",
-  "outro": "¡Bien hecho! Has usado distintos métodos para doblar la esquina. ¡Mira, he encontrado un programa que escribí antes!",
-  "learned": "Ahora sabes qué son los objetos y los métodos, y los cuatro movimientos."
+  "intro": "Como la verja todavía no se abre, ¡vamos a dar una vuelta por el prado! Podemos bajar un poco por el camino y luego girar a la derecha hacia la hierba.",
+  "outro": "¡Muy bien! Puedes usar los métodos para moverte a cualquier parte. Vamos a ver qué más podemos encontrar por aquí.",
+  "learned": "Ahora sabes qué son los objetos y los métodos, y cómo usar los cuatro movimientos."
 }

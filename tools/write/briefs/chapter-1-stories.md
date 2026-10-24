@@ -112,37 +112,37 @@ Nuri is a girl when the wizard is a girl and a boy when the wizard is a
 boy: in Spanish, Nuri's own gendered words are choices too. Title: *At
 the gate* / *Ante la puerta*.
 
-## up-to-the-castle: the castle road
+## up-to-the-castle: at the castle's door
 
-The scene: the top of the gatehouse's stone passage, every door and seal
-open behind them; ahead, the road up to the castle.
+The scene: the top of the path, before the castle's great door, which the
+wizard has just opened with the word and the spell: inside, the dark of
+the hall. Nuri comes up the path behind.
 
-1. voice. (The wizard steps out onto the castle road.) The last seal is
-   broken, and the road to the castle is open.
-2. nuri. (Nuri comes up the passage behind.) Nuri is delighted: they did
+1. voice. (The wizard steps up to the open door.) The castle's great door
+   stands open at last, the last seal broken.
+2. nuri. (Nuri comes up the path behind.) Nuri is delighted: they did
    it, the two of them.
-3. nuri. (Nuri comes to the wizard's side.) Nuri looks back on what the
-   wizard learned today, as a friend remembering the day, in two or three
-   flowing sentences, not a list of names: what they did at each place
-   (the first step to the gate, the note with the wrong move, the long
-   path in one instruction, the password, the wand, the seal), and the
-   idea each one taught, said exactly: a program is a list of
-   instructions; your wizard is an object, the one the code calls
-   `wizard`, and its actions are methods; a comment is a note for a
-   person; a move's argument says how far; a string is words in quotes,
-   kept exactly as written, and `say` says one; `pick_up` picks a thing
-   up; a spell is cast with the wand. In Spanish the programmer's words
-   are the course's: *instrucción*, *programa*, *objeto*, *método*,
+3. nuri. (Nuri comes to the wizard's side.) Nuri looks back on the first
+   half of what the wizard learned today, as a friend remembering the
+   day, in two flowing sentences: the first step to the gate, the fixed
+   note, the long walk in one instruction; each idea said exactly (a
+   program is a list of instructions; your wizard is an object, the one
+   the code calls `wizard`, and its actions are methods; a comment is a
+   note for a person; a move's argument says how far).
+4. nuri. Nuri goes on with the second half: the password, the wand, the
+   seals, said exactly (a string is words in quotes, kept exactly as
+   written, and `say` says one; `pick_up` picks a thing up; a spell is
+   cast with the wand). In Spanish the programmer's words are the
+   course's: *instrucción*, *programa*, *objeto*, *método*,
    *comentario*, *argumento*, *cadena* (never *string*). A spell or a
-   password is a word to type: in italics (*zelim*, *ambrel*), not as
-   code.
-4. wizard. (The wizard turns to Nuri.) The wizard thanks Nuri, and says
+   password is in italics (*zelim*, *ambrel*), not as code.
+5. wizard. (The wizard turns to Nuri.) The wizard thanks Nuri, and says
    something about the wand, or about what they liked most.
-5. nuri. The wand is only lent: Ilda, their teacher, waits inside, and
+6. nuri. The wand is only lent: Ilda, their teacher, waits inside, and
    the wand bank, a counter in the castle run by the pupils' parents,
    lends every new pupil a school wand for the year; then the wizard can
    give Nuri's spare back.
-6. voice. They walk up the road together; the castle's windows are lit,
-   and the great doors wait. The real castle begins.
+7. voice. (The wizard walks in through the door.) Together you step into
+   the castle; the real castle begins.
 
 Title: *Up to the castle* / *Hacia el castillo*.

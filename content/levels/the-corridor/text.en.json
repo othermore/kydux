@@ -1,15 +1,15 @@
 {
-  "title": "The corridor",
+  "title": "The path",
   "goals": [
     "Reach the spot."
   ],
   "starting_code": "",
   "hints": [
-    "You need four instructions in total, one on each line.",
-    "First use `move_down` twice, then `move_left` twice.",
-    "Remember to put your object, a dot, and the method with empty brackets on each line."
+    "You need to write four instructions on four lines.",
+    "First move down twice, then right twice.",
+    "Use the `move_down` and `move_right` methods."
   ],
-  "intro": "The gate will not open for us yet, so let's look around the garden! Write a program to walk down along the path, then around the corner to the left.",
-  "outro": "Well done! You used different methods to turn the corner. Look, I found a program I wrote earlier!",
-  "learned": "Now you know what objects and methods are, and the four moves."
+  "intro": "The gate will not open yet, so let us look around the meadow! We can walk down the path a little, then turn right into the grass.",
+  "outro": "Well done! You can use methods to move anywhere. Let us see what else we can find out here.",
+  "learned": "Now you know what objects and methods are, and how to use the four moves."
 }

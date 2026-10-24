@@ -17,6 +17,7 @@ Our first spell is *zelim*. This spell breaks the seal of a door right beside yo
 Let us cast your very first spell! We will move near a sealed door and cast *zelim* to break its seal.
 
 ```python try
-wizard.move_right(2)
+wizard.move_left(2)
+wizard.move_up(3)
 wizard.cast("zelim")
 ```

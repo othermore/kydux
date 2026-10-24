@@ -34,6 +34,7 @@ import layout  # noqa: E402
 #: The scenes the page plays, and the levels whose things and actors it shows.
 SCENES = {
     "the-gate": [],
+    "the-field": [],
     "the-library": ["the-lost-book"],
     "the-night-passages": ["past-the-teacher", "the-moving-stairs", "the-dark-room"],
 }
@@ -98,10 +99,15 @@ def build() -> Path:
     DEMO.mkdir(parents=True, exist_ok=True)
     for name in ("index.html", "demo.js", "field.js"):
         shutil.copy(HERE / "demo" / name, DEMO / name)
-    data = {scene_id: scene_data(scene_id, levels) for scene_id, levels in SCENES.items()}
+    # A scene the content no longer has is left out: chapter 1 is on the-field now.
+    data = {
+        scene_id: scene_data(scene_id, levels)
+        for scene_id, levels in SCENES.items()
+        if (REPO / "content" / "scenes" / scene_id / "map.txt").is_file()
+    }
     pieces = sorted(p.stem for p in (DEMO / "pieces").glob("*.png"))
     paintings = {}
-    made = painted("the-gate", SOURCE / "demo-painted-gate-3.png")
+    made = painted("the-gate", SOURCE / "demo-painted-gate-3.png") if "the-gate" in data else None
     if made:
         paintings["the-gate"] = made.name
     payload = {"scenes": data, "pieces": pieces, "paintings": paintings}

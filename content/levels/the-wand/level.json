@@ -1,9 +1,15 @@
 {
   "id": "the-wand",
   "kind": "practice",
-  "scene": "the-gate",
-  "start": [14, 6],
-  "end": [20, 6],
+  "scene": "the-field",
+  "start": [
+    8,
+    14
+  ],
+  "end": [
+    10,
+    15
+  ],
   "speaker": "nuri",
   "things": [
     {
@@ -13,14 +19,20 @@
     {
       "kind": "wand",
       "id": "wand",
-      "at": [17, 6]
+      "at": [
+        12,
+        14
+      ]
     }
   ],
   "actors": [
     {
       "kind": "friend",
       "id": "nuri",
-      "at": [21, 6]
+      "at": [
+        8,
+        15
+      ]
     }
   ],
   "api": [

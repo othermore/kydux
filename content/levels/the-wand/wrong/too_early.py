@@ -1,3 +1,3 @@
-wizard.move_right()
+wizard.move_right(2)
 wizard.pick_up()
-wizard.move_right(5)
+wizard.move_down()

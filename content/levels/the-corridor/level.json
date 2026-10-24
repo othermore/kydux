@@ -1,16 +1,25 @@
 {
   "id": "the-corridor",
   "kind": "practice",
-  "scene": "the-gate",
-  "start": [12, 6],
-  "end": [10, 8],
+  "scene": "the-field",
+  "start": [
+    8,
+    20
+  ],
+  "end": [
+    10,
+    22
+  ],
   "speaker": "nuri",
   "things": [],
   "actors": [
     {
       "kind": "friend",
       "id": "nuri",
-      "at": [11, 6]
+      "at": [
+        7,
+        20
+      ]
     }
   ],
   "api": [

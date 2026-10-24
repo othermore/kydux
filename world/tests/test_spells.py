@@ -109,7 +109,7 @@ def test_cast_takes_a_spell_s_name_in_quotes():
 @pytest.mark.parametrize(
     ("door", "says"),
     [
-        ({"locked": True, "sealed": "zelim"}, "one of them at most"),
+        ({"locked": True, "sealed": "zelim"}, "locked, and so neither"),
         ({"sealed": "kirra"}, "not a spell here"),
         ({"password": ""}, "by a word"),
     ],
@@ -123,3 +123,47 @@ def test_the_loader_refuses_a_door_that_cannot_be(door, says):
 def test_spells_are_words_in_small_letters():
     with pytest.raises(LevelError, match="spells"):
         Level.from_dict({**HALL, "spells": ["Zelim"]})
+
+
+#: The castle's door: sealed and keyed by a word, open once both are done.
+CASTLE = {
+    "id": "castle",
+    "map": ["#######", "#SWD.E#", "#######"],
+    "spells": ["zelim"],
+    "things": [
+        {"kind": "wand", "id": "wand", "marker": "W"},
+        {
+            "kind": "door",
+            "id": "castle_door",
+            "marker": "D",
+            "sealed": "zelim",
+            "password": "ambrel",
+        },
+    ],
+    "goals": [{"kind": "reach", "marker": "E"}],
+}
+
+
+@pytest.mark.parametrize("first", ["say", "cast"], ids=["word first", "spell first"])
+def test_a_door_sealed_and_keyed_by_a_word_opens_once_both_are_done(first):
+    word, spell = "wizard.say('ambrel')\n", "wizard.cast('zelim')\n"
+    both = word + spell if first == "say" else spell + word
+    result = run_code(
+        Level.from_dict(CASTLE),
+        "wizard.move_right()\nwizard.pick_up()\n" + both + "wizard.move_right(3)\n",
+    )
+    assert result.status == "won", result
+    done = [e.kind for e in result.events if e.actor == "castle_door"]
+    assert done == ["heard" if first == "say" else "unsealed", "open"]
+
+
+def test_a_door_sealed_and_keyed_by_a_word_stays_shut_with_one_alone():
+    result = run_code(
+        Level.from_dict(CASTLE),
+        "wizard.move_right()\nwizard.pick_up()\nwizard.say('ambrel')\nwizard.move_right(3)\n",
+    )
+    assert result.status != "won"
+    with pytest.raises(LevelError, match="locked, and so neither"):
+        Level.from_dict(
+            {**CASTLE, "things": [{**CASTLE["things"][1], "sealed": None, "locked": True}]}
+        )

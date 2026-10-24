@@ -25,10 +25,10 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
   await expect(scene).toHaveAttribute('data-speaker', 'wizard');
   await expect(scene).toHaveAttribute('data-bubble', /Is anyone there\?/);
   await storyNext(page);
-  await expect(scene).toHaveAttribute('data-actors', 'nuri:5,6,right');
+  await expect(scene).toHaveAttribute('data-actors', 'nuri:9,28,left');
   await expect(scene).not.toHaveAttribute('data-bubble', /./);
   await storyNext(page);
-  await expect(scene).toHaveAttribute('data-actors', 'nuri:10,6,right');
+  await expect(scene).toHaveAttribute('data-actors', 'nuri:9,20,up');
   await expect(scene).toHaveAttribute('data-speaker', 'nuri');
   await expect(scene).toHaveAttribute('data-bubble', /Hello! I am Nuri\./);
   await expect(page.locator('#story-voice')).toHaveText('');
@@ -39,7 +39,7 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
 
   // Back shows the step before as it was: Nuri back at the path's end.
   await page.locator('#story-back').click();
-  await expect(scene).toHaveAttribute('data-actors', 'nuri:5,6,right');
+  await expect(scene).toHaveAttribute('data-actors', 'nuri:9,28,left');
   await expect(page.locator('#story-voice')).toContainText('Someone else is coming up the path');
 });
 

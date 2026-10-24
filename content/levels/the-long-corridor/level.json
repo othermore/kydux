@@ -1,16 +1,25 @@
 {
   "id": "the-long-corridor",
   "kind": "practice",
-  "scene": "the-gate",
-  "start": [8, 10],
-  "end": [2, 10],
+  "scene": "the-field",
+  "start": [
+    9,
+    24
+  ],
+  "end": [
+    3,
+    24
+  ],
   "speaker": "nuri",
   "things": [],
   "actors": [
     {
       "kind": "friend",
       "id": "nuri",
-      "at": [8, 9]
+      "at": [
+        9,
+        25
+      ]
     }
   ],
   "api": [

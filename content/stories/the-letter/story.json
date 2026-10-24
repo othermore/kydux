@@ -1,14 +1,14 @@
 {
   "id": "the-letter",
   "opening": true,
-  "scene": "the-gate",
+  "scene": "the-field",
   "wizard": [
-    5,
-    6
+    7,
+    28
   ],
   "camera": [
-    9,
-    6
+    8,
+    22
   ],
   "actors": [],
   "steps": [
@@ -24,15 +24,18 @@
       "who": "voice",
       "do": {
         "walk": [
-          11,
-          6
+          7,
+          20
         ]
       },
       "by": "wizard"
     },
     {
       "who": "voice",
-      "do": null
+      "do": {
+        "face": "right"
+      },
+      "by": "wizard"
     },
     {
       "who": "voice",

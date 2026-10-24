@@ -1,15 +1,15 @@
 {
-  "title": "La nota oscura",
+  "title": "La nota",
   "goals": [
-    "Llega hasta el lugar."
+    "Llega a la marca."
   ],
-  "starting_code": "# Un movimiento de este programa está mal. ¡Encuéntralo y arréglalo!\nwizard.move_left()\nwizard.move_left()\nwizard.move_down()\nwizard.move_right()\n",
+  "starting_code": "# ¡Encuentra el movimiento equivocado y arréglalo!\nwizard.move_right()\nwizard.move_down()\nwizard.move_down()\n",
   "hints": [
-    "Lee la nota en la parte superior para ver qué hacer. ¡Una de las líneas nos lleva por el camino equivocado!",
-    "Los primeros tres pasos son correctos. ¿Hacia dónde va el camino después de eso?",
-    "Cambia la última instrucción a `move_down`."
+    "Mira la primera línea debajo del comentario.",
+    "Si te mueves a la derecha primero, tu {mago|maga} chocará con la valla. ¿Hacia dónde deberías ir en su lugar?",
+    "Cambia la primera acción al método `move_left` para que tu {mago|maga} vaya a la izquierda en lugar de a la derecha."
   ],
-  "intro": "He escrito un programa para este siguiente tramo del camino, ¡pero uno de los movimientos está mal y nos lleva por donde no es! ¿Puedes leer mi nota y arreglar el código?",
-  "outro": "¡Gracias por arreglar mi código! Notas como esa nos ayudan mucho a recordar qué hacer.",
-  "learned": "Ahora sabes qué es un comentario, y que una nota en un programa puede decirte qué hacer."
+  "intro": "Escribí un programa en una nota para llegar a esa marca junto a la valla de madera, ¡pero uno de los movimientos está mal! ¿Puedes leer mi comentario, encontrar el movimiento equivocado y arreglarlo?",
+  "outro": "¡Lo has arreglado! A veces el código no funciona a la primera, pero siempre podemos leerlo, arreglarlo y volver a intentarlo.",
+  "learned": "Ahora sabes qué es un comentario, y que una nota en un programa te puede decir qué hacer."
 }

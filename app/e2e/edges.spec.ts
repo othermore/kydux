@@ -39,7 +39,7 @@ test('a Run during the playback starts the new run from the start', async ({ pag
   await expect(page.locator('.outcome-text')).toHaveText('Not yet: 0 of 1 goals met. Try again.', {
     timeout: 30_000,
   });
-  await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '6,10');
+  await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '7,24');
 });
 
 test('without isolation, a loop that never ends is stopped by starting Python again', async ({

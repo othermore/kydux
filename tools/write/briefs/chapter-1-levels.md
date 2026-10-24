@@ -39,14 +39,16 @@ Nuri's own gendered words too).
 
 ## Where it happens
 
-One scene for the whole chapter. Outside the castle's wall is a garden at
-dusk: grass the wizard can walk on anywhere, a dirt path, low wooden
-fences and a hedge, and the great iron gate in the stone wall; from the
-end of the path the way goes down past the hedge, along the bottom of the
-garden to the foot of a few stone steps, and up the steps to a landing
-beside the gate. Inside the gate is the gatehouse, stone passages with a
-flat stone in the first, a door sealed by a glowing rune, an inner gate,
-two more sealed doors, and at the top the way out to the castle road.
+One scene for the whole chapter, at dusk. The open countryside before the
+school: a meadow of grass with trees, rocks, flowers, a little pen of low
+wooden fences, and a grassy rise with stone steps up it; a dirt path comes
+up from the road at the bottom to the school's great iron gate, set in the
+middle of a high stone wall. Past the gate a path climbs between trees and
+rocks; beside it, in a corner, the wand lies on a flat stone; further up,
+a low wall with an arched gate sealed by a glowing rune; and at the top
+the whole castle, whose great door is sealed too and also listens for a
+word. The scene has no wall round it: its edge is simply where one cannot
+go, and trees, rocks, fences and the rise's bank cannot be walked on.
 
 ## Each file
 
@@ -102,7 +104,7 @@ nothing more:
 ## The levels
 
 1. `the-gate` — Practice 1, after *What a program is*. The wizard stands
-   one step from the gate, in the circle drawn before it; Nuri beside.
+   one step from the spot right in front of the great gate; Nuri beside.
    One instruction takes them there; the gate stays shut, which Nuri
    knew: first the basics. Goals: walk to the gate. Starting code: empty,
    no comments. Learned: what a program and an instruction are, and the
@@ -110,71 +112,71 @@ nothing more:
    Solution: `wizard.move_right()`.
 
 2. `the-corridor` — Practice 2, after *Objects and actions*. The gate
-   will not open yet; Nuri wants to look round the garden: down along
-   the path beside the hedge, then round its corner to the left. Goals:
-   reach the spot. Starting code: empty, no comments (comments are taught
-   in the next lesson).
-   Learned: what objects and methods are, and the four moves.
-   Solution: `wizard.move_down(); wizard.move_down(); wizard.move_left(); wizard.move_left()`.
+   will not open yet; Nuri wants to look round the meadow: down the path
+   a little, then round to the right into the grass. Goals: reach the
+   spot. Starting code: empty, no comments (comments are taught in the
+   next lesson). Learned: what objects and methods are, and the four
+   moves.
+   Solution: `wizard.move_down(); wizard.move_down(); wizard.move_right(); wizard.move_right()`.
 
-3. `the-dark-note` — Fix 1, after *Notes*. On the way up the hill Nuri
-   wrote a program for the next bit of the path, with a note at the top,
-   and one of its moves is wrong. Goals: reach the spot. Starting code,
-   exactly: a first comment line saying that one move in this program is
-   wrong and asking the child to find it and fix it, then
-   `wizard.move_left()`, `wizard.move_left()`, `wizard.move_down()`,
-   `wizard.move_right()`. Learned: what a comment is, and that a note in
-   a program can tell you what to do.
-   Solution: `wizard.move_left(); wizard.move_left(); wizard.move_down(); wizard.move_down()`.
-   The wrong move is the last one, which goes right where the path goes down.
+3. `the-dark-note` — Fix 1, after *Notes*. Nuri wrote a program on a
+   note to walk to a spot by the little fence pen, and one of its moves
+   is wrong: the first one, which goes right and walks the wizard into
+   the fence. Goals: reach the spot. Starting code, exactly: a first
+   comment line saying that one move in this program is wrong and asking
+   the child to find it and fix it, then `wizard.move_right()`,
+   `wizard.move_down()`, `wizard.move_down()`. Learned: what a comment
+   is, and that a note in a program can tell you what to do.
+   Solution: `wizard.move_left(); wizard.move_down(); wizard.move_down()`.
 
-4. `the-long-corridor` — Practice 3, after *How much*. A long path along
-   the bottom of the garden to the foot of the steps, six steps to the
-   left. Goals: reach the foot of the steps; bonus: in fewer than 2 lines.
-   Starting code: comments allowed, saying where to go in one
-   instruction. Learned: what an argument is, and that the move actions
-   have one that says how far.
+4. `the-long-corridor` — Practice 3, after *How much*. The path along
+   the foot of the grassy rise, six steps to the left, in one
+   instruction. Goals: reach the foot of the rise's steps; bonus: in
+   fewer than 2 lines. Starting code: comments allowed, saying where to
+   go in one instruction. Learned: what an argument is, and that the
+   move actions have one that says how far.
    Solution: `wizard.move_left(6)`.
 
-5. `the-stairs` — Improve 1. Nuri's program climbs the steps to the
-   landing beside the gate, but bumps into the wall twice: two of its
-   numbers are too big. Goals: reach the landing; never bump into
-   anything; bonus: in fewer than 5 lines. Starting code, exactly: a
-   comment saying the program reaches the landing but bumps, and to make
-   it better; then `wizard.move_up(3)`, `wizard.move_right(3)`,
-   `wizard.move_up(3)`, `wizard.move_right(2)`. Learned: that a program
+5. `the-stairs` — Improve 1. Nuri's program walks back to the gate, but
+   bumps twice, into a tree and into the wall: its two numbers are too
+   big. Goals: reach the spot before the gate; never bump into anything;
+   bonus: in fewer than 3 lines. Starting code, exactly: a comment saying
+   the program gets there but bumps, and to make it better; then
+   `wizard.move_right(7)`, `wizard.move_up(5)`. Learned: that a program
    that works can still be made better, here by giving each move the
    argument it needs.
-   Solution: `wizard.move_up(2); wizard.move_right(3); wizard.move_up(2); wizard.move_right(2)`.
+   Solution: `wizard.move_right(5); wizard.move_up(4)`.
 
-6. `the-password` — Practice 4, after *Words*. Back at the gate: an older
-   pupil told Nuri the gate's password, *ambrel*, in small letters. Stand
-   right beside the gate, say it, and walk through. In the intro the word
-   is in italics (*ambrel*) with its sentence punctuated. Goals: open the
-   gate; walk through it. Starting code: comments allowed, saying the
-   password and what to do. Learned: what a string is, and how to make
-   your wizard say things.
-   Solution: `wizard.move_right(5); wizard.say("ambrel"); wizard.move_right(2)`.
-   The wizard starts five steps from the tile beside the gate.
+6. `the-password` — Practice 4, after *Words*. At the gate: an older
+   pupil told Nuri the gate's password, *ambrel*, in small letters. Say
+   it, and walk through, up the path beyond as far as the wand's corner.
+   In the intro the word is in italics (*ambrel*) with its sentence
+   punctuated. Goals: open the gate; walk through it. Starting code:
+   comments allowed, saying the password and what to do. Learned: what a
+   string is, and how to make your wizard say things.
+   Solution: `wizard.say("ambrel"); wizard.move_up(6)`.
 
-7. `the-wand` — Practice 5, after *Things to carry*. Inside the
-   gatehouse, Nuri has gone ahead and set the spare wand on the flat
-   stone: lent, to be given back one day. Pick it up and walk on to Nuri.
-   Goals: pick up the wand; reach Nuri. Starting code: comments allowed.
-   Learned: that things are objects too, and how to pick them up.
-   Solution: `wizard.move_right(3); wizard.pick_up(); wizard.move_right(3)`.
+7. `the-wand` — Practice 5, after *Things to carry*. Past the gate, Nuri
+   has set the spare wand on a flat stone in a corner beside the path:
+   lent, to be given back one day. Walk over, pick it up, and come back
+   to the path by Nuri. Goals: pick up the wand; reach the spot. Starting
+   code: comments allowed. Learned: that things are objects too, and how
+   to pick them up.
+   Solution: `wizard.move_right(3); wizard.pick_up(); wizard.move_left(); wizard.move_down()`.
 
-8. `the-sealed-door` — Practice 6, after *Your first spell*. A door
-   sealed by a glowing rune; the wizard has a wand now. Stand beside it,
-   cast *zelim*, and walk through. Goals: open the door; reach the end of
-   the passage. Starting code: comments allowed. Learned: how to cast a
-   spell with your wand, and that *zelim* breaks a seal.
-   Solution: `wizard.move_right(2); wizard.cast("zelim"); wizard.move_right(3)`.
+8. `the-sealed-door` — Practice 6, after *Your first spell*. Up the
+   path, the low wall's arched gate is sealed by a glowing rune; the
+   wizard has a wand now. Stand beside it, cast *zelim*, and walk
+   through. Goals: open the sealed gate; walk through it. Starting code:
+   comments allowed. Learned: how to cast a spell with your wand, and
+   that *zelim* breaks a seal.
+   Solution: `wizard.move_left(2); wizard.move_up(3); wizard.cast("zelim"); wizard.move_up(2)`.
 
-9. `the-way-in` — Practice 7, the chapter's last. Everything together:
-   the inner gate listens to the same word as the great gate; then two
-   sealed doors; then up to the castle road. Goals: reach the castle
-   road; bonus: in fewer than 9 lines. Starting code: comments allowed,
-   saying what lies ahead, never how. Learned: none (the closing story
-   recaps).
-   Solution: `wizard.move_up(); wizard.say("ambrel"); wizard.move_up(2); wizard.move_left(3); wizard.cast("zelim"); wizard.move_left(4); wizard.cast("zelim"); wizard.move_up(2)`.
+9. `the-way-in` — Practice 7, the chapter's last. Up the steps to the
+   castle's great door, which is sealed by a rune and also listens for
+   the school's word: everything together. Say *ambrel*, cast *zelim*,
+   and the door opens onto the dark of the hall; walk in. Goals: open
+   the castle's door; walk in; bonus: in fewer than 5 lines. Starting
+   code: comments allowed, saying what the door wants, never how. No
+   `learned` key: the closing story looks back.
+   Solution: `wizard.move_up(3); wizard.say("ambrel"); wizard.cast("zelim"); wizard.move_up()`.

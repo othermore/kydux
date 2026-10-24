@@ -1,15 +1,16 @@
 {
   "title": "The way in",
   "goals": [
-    "Reach the castle road.",
-    "In fewer than 9 lines."
+    "Open the castle's door.",
+    "Walk in.",
+    "In fewer than 5 lines."
   ],
-  "starting_code": "# The inner gate listens to a word. Then there are two sealed doors. Good luck!\n",
+  "starting_code": "# Walk up to the door. It wants its password, and its seal broken!\n",
   "hints": [
-    "Take this one step at a time. First, use `move_up` to stand by the inner gate and `say` its password.",
-    "The password is the same as the great gate's. Then use `move_up` and `move_left` to reach the first sealed door.",
-    "Use `cast` to open the first door, move left to the second door, `cast` again, and move up to the road!"
+    "You have everything you need: a move, a word, and a spell.",
+    "First walk up to the door, then say the password and cast your spell.",
+    "Use `say` for the password, and `cast` for the seal, before taking the last step in."
   ],
-  "intro": "This is it, the way out to the castle road! The inner gate listens to the same word as the great gate, and then there are two sealed doors. You can do this!",
-  "outro": "We did it! We are on the castle road now. I am so glad we met!"
+  "intro": "Here we are! Up the steps is the castle's great door. It is sealed by a rune, and it also listens for the school's word. We need everything we have learned!",
+  "outro": "The door is opening onto the dark hall. We did it! Let us go inside."
 }

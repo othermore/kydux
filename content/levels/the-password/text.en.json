@@ -2,15 +2,15 @@
   "title": "The password",
   "goals": [
     "Open the gate.",
-    "Walk through it."
+    "Walk through the gate."
   ],
-  "starting_code": "# Walk to the gate, say the password, and walk through.\n",
+  "starting_code": "# Say the password, then walk through the gate.\n",
   "hints": [
-    "You need three instructions: one to reach the gate, one to speak, and one to walk through.",
-    "First use `move_right` to take five steps. Then use `say`!",
-    "Give `say` a string with the word *ambrel* inside quotes, then use `move_right` again."
+    "You need to make your wizard speak, and then move.",
+    "The password must be exactly as written, inside quotes.",
+    "First use the `say` method to speak the string, then walk up."
   ],
-  "intro": "An older pupil told me the password for the gate! It is *ambrel*. Stand right beside the gate, say the word, and walk through!",
-  "outro": "The gate opened! We are inside the gatehouse. Look, I left something for you on that flat stone.",
-  "learned": "Now you know what a string is, and how to make your wizard say things."
+  "intro": "An older pupil told me the password for this gate! It is *ambrel*. Say it, and walk through to the corner up the path.",
+  "outro": "The gate opened! Words have real power here. Let us keep going up the path.",
+  "learned": "Now you know what a string is, and how to use it to make your wizard say things."
 }

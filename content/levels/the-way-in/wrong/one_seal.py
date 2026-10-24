@@ -1,7 +1,0 @@
-wizard.move_up()
-wizard.say("ambrel")
-wizard.move_up(2)
-wizard.move_left(3)
-wizard.cast("zelim")
-wizard.move_left(4)
-wizard.move_up(2)

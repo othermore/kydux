@@ -1,1 +1,2 @@
-wizard.move_right(7)
+gate.open()
+wizard.move_up(6)

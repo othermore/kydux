@@ -1,15 +1,15 @@
 {
-  "title": "The dark note",
+  "title": "The note",
   "goals": [
     "Reach the spot."
   ],
-  "starting_code": "# One move in this program is wrong. Find it and fix it!\nwizard.move_left()\nwizard.move_left()\nwizard.move_down()\nwizard.move_right()\n",
+  "starting_code": "# Find the wrong move and fix it!\nwizard.move_right()\nwizard.move_down()\nwizard.move_down()\n",
   "hints": [
-    "Read the note at the top to see what to do. One of the lines takes us the wrong way!",
-    "The first three steps are correct. Where does the path go after that?",
-    "Change the last instruction to `move_down`."
+    "Look at the first line below the comment.",
+    "If you move right first, your wizard will walk into the fence. Which way should you go instead?",
+    "Change the first action to the `move_left` method so your wizard goes left instead of right."
   ],
-  "intro": "I wrote a program for this next bit of the path, but one of the moves is wrong and takes us the wrong way! Can you read my note and fix the code?",
-  "outro": "Thank you for fixing my code! Notes like that really help us remember what to do.",
+  "intro": "I wrote a program on a note to walk to that spot by the little fence pen, but one of the moves is wrong! Can you read my comment, find the wrong move, and fix it?",
+  "outro": "You fixed it! Sometimes code does not work on the first try, but we can always read it, fix it, and try again.",
   "learned": "Now you know what a comment is, and that a note in a program can tell you what to do."
 }

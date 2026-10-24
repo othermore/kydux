@@ -1,15 +1,15 @@
 {
   "title": "La verja",
   "goals": [
-    "Camina hasta la verja."
+    "Camina hacia la verja."
   ],
   "starting_code": "",
   "hints": [
-    "¿Recuerdas la instrucción de la lección? Necesitas mover a {tu mago|tu maga}.",
-    "Solo necesitas una instrucción para dar un paso hacia la verja.",
-    "Escribe `move_right` con los paréntesis vacíos."
+    "Tu {mago|maga} necesita una instrucción para dar un paso.",
+    "Mira tu cuaderno para ver las acciones de movimiento.",
+    "Usa el método `move_right` en tu {mago|maga}, seguido de unos paréntesis vacíos."
   ],
-  "intro": "¡Estamos a un paso de la verja! Vamos a escribir nuestro primer programa para acercarnos a ella. Aún no se abrirá, ¡pero debemos empezar por el principio!",
-  "outro": "¡Genial! Has aprendido a mover a {tu mago|tu maga}. Ahora vamos a ver cómo cruzamos esta verja.",
-  "learned": "Ahora sabes qué son un programa y una instrucción, y la instrucción que mueve a {tu mago|tu maga}."
+  "intro": "¡Aquí estamos, justo delante de la gran verja! Tenemos que acercarnos a ella para ver si se abre. Vamos a escribir un programa para dar un paso a la derecha.",
+  "outro": "¡Genial! Has aprendido a mover a tu {mago|maga}. La verja sigue cerrada por ahora, pero no pasa nada: primero dominamos lo básico y luego averiguaremos cómo pasar.",
+  "learned": "Ahora sabes qué son un programa y una instrucción, y la instrucción que mueve a tu {mago|maga}."
 }

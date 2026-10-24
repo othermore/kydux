@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
-import { seedWizard } from './helpers';
+import { levelText, seedWizard } from './helpers';
+
+const STAIRS = levelText('the-stairs', 'en').title;
 
 test.use({ locale: 'en-US' });
 
@@ -32,7 +34,7 @@ test('after a win, Continue names what comes next, and the title leads home', as
   await page.goto('/#level/the-long-corridor');
   await winTheCorridor(page);
   await page.locator('#home').click();
-  await expect(page.locator('#continue')).toHaveText('Continue: The stairs');
+  await expect(page.locator('#continue')).toHaveText(`Continue: ${STAIRS}`);
 });
 
 test('a game exported comes back, imported as one more game', async ({ page }) => {
@@ -47,7 +49,7 @@ test('a game exported comes back, imported as one more game', async ({ page }) =
   expect(file).toBeTruthy();
 
   await page.locator('#import-file').setInputFiles(file as string);
-  await expect(page.locator('#continue')).toHaveText('Continue: The stairs');
+  await expect(page.locator('#continue')).toHaveText(`Continue: ${STAIRS}`);
   await page.locator('#load-game').click();
   await expect(page.locator('#games .game')).toHaveCount(2);
 });
@@ -73,10 +75,10 @@ test('a new game begins the story for a new wizard; the games are loaded by name
   await expect(games).toHaveCount(2);
   await expect(games.nth(0)).toContainText('Leo');
   await expect(games.nth(1)).toContainText('Marta');
-  await expect(games.nth(1)).toContainText('Improve 1: The stairs');
+  await expect(games.nth(1)).toContainText(`Improve 1: ${STAIRS}`);
   await games.nth(1).locator('.play').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Marta');
-  await expect(page.locator('#continue')).toHaveText('Continue: The stairs');
+  await expect(page.locator('#continue')).toHaveText(`Continue: ${STAIRS}`);
 
   // Delete asks first.
   await page.locator('#load-game').click();

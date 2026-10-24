@@ -1,16 +1,25 @@
 {
   "id": "the-gate",
   "kind": "practice",
-  "scene": "the-gate",
-  "start": [11, 6],
-  "end": [12, 6],
+  "scene": "the-field",
+  "start": [
+    7,
+    20
+  ],
+  "end": [
+    8,
+    20
+  ],
   "speaker": "nuri",
   "things": [],
   "actors": [
     {
       "kind": "friend",
       "id": "nuri",
-      "at": [10, 6]
+      "at": [
+        9,
+        20
+      ]
     }
   ],
   "api": [

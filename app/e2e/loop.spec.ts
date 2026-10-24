@@ -81,7 +81,7 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await shoot(page, 'at-the-gate');
     // Nuri comes up the path, and walks to the wizard's side to speak (D74).
     await storyNext(page, 3);
-    await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'nuri:10,6,right');
+    await expect(page.locator('#scene')).toHaveAttribute('data-actors', 'nuri:9,20,up');
     await expect(page.locator('#scene')).toHaveAttribute('data-speaker', 'nuri');
     await shoot(page, 'nuri-speaks');
     // The wizard answers by name.

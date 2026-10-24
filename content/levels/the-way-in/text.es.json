@@ -1,15 +1,16 @@
 {
-  "title": "El camino de entrada",
+  "title": "La entrada",
   "goals": [
-    "Llega al camino del castillo.",
-    "En menos de 9 líneas."
+    "Abre la puerta del castillo.",
+    "Entra.",
+    "En menos de 5 líneas."
   ],
-  "starting_code": "# La verja interior escucha una palabra. Luego hay dos puertas selladas. ¡Buena suerte!\n",
+  "starting_code": "# Sube hasta la puerta. ¡Quiere su contraseña, y que rompas su sello!\n",
   "hints": [
-    "Ve paso a paso. Primero, usa `move_up` para ponerte junto a la verja interior y usa `say` para decir su contraseña.",
-    "La contraseña es la misma que la de la gran verja. Luego usa `move_up` y `move_left` para llegar a la primera puerta sellada.",
-    "¡Usa `cast` para abrir la primera puerta, muévete a la izquierda hacia la segunda, usa `cast` de nuevo y muévete hacia arriba hasta el camino!"
+    "Tienes todo lo que necesitas: un movimiento, una palabra y un hechizo.",
+    "Primero camina hasta la puerta, luego di la contraseña y lanza tu hechizo.",
+    "Usa `say` para la contraseña y `cast` para el sello antes de dar el último paso hacia adentro."
   ],
-  "intro": "¡Aquí es, la salida al camino del castillo! La verja interior escucha la misma palabra que la gran verja, y luego hay dos puertas selladas. ¡Tú puedes hacerlo!",
-  "outro": "¡Lo hemos conseguido! Ya estamos en el camino del castillo. ¡Me alegro mucho de haberte conocido!"
+  "intro": "¡Ya estamos aquí! Subiendo los escalones está la gran puerta del castillo. Está sellada por una runa, y también escucha la palabra de la escuela. ¡Necesitamos todo lo que hemos aprendido!",
+  "outro": "La puerta se está abriendo hacia el vestíbulo oscuro. ¡Lo logramos! Vamos adentro."
 }

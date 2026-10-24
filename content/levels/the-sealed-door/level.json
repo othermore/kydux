@@ -1,12 +1,22 @@
 {
   "id": "the-sealed-door",
   "kind": "practice",
-  "scene": "the-gate",
-  "start": [20, 6],
-  "end": [25, 6],
+  "scene": "the-field",
+  "start": [
+    10,
+    15
+  ],
+  "end": [
+    8,
+    10
+  ],
   "speaker": "nuri",
-  "carrying": ["wand"],
-  "spells": ["zelim"],
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "zelim"
+  ],
   "things": [
     {
       "id": "gate",
@@ -17,7 +27,10 @@
     {
       "kind": "friend",
       "id": "nuri",
-      "at": [19, 6]
+      "at": [
+        9,
+        16
+      ]
     }
   ],
   "api": [
@@ -32,7 +45,7 @@
   "goals": [
     {
       "kind": "open",
-      "id": "door"
+      "id": "seal_gate"
     },
     {
       "kind": "reach",

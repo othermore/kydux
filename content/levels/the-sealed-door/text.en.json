@@ -1,16 +1,16 @@
 {
-  "title": "The sealed door",
+  "title": "The sealed gate",
   "goals": [
-    "Open the door.",
-    "Reach the end of the passage."
+    "Open the sealed gate.",
+    "Walk through the gate."
   ],
-  "starting_code": "# Walk to the door, break the seal, and walk to the end.\n",
+  "starting_code": "# Walk beside the gate, cast the spell, and walk through.\n",
   "hints": [
-    "Use `move_right` to stand next to the door, then you can use your new spell!",
-    "Use `cast` and give it the spell as a string.",
-    "Cast the spell *zelim* with quotes, and then use `move_right` to reach the end of the passage."
+    "Move up beside the gate first, then cast your spell.",
+    "The spell must be a string inside the brackets.",
+    "Use the `cast` method to cast the spell *zelim*, then walk up."
   ],
-  "intro": "Look, a door sealed by a glowing rune! Now that you have a wand, stand beside it and cast *zelim* to break the seal.",
-  "outro": "You cast your first spell! That was amazing. The castle road is so close now.",
-  "learned": "Now you know how to cast a spell with your wand, and that *zelim* breaks a seal."
+  "intro": "Look, that arched gate is sealed by a glowing rune. Stand beside it, cast the spell *zelim* with your new wand, and walk through!",
+  "outro": "The seal broke! A real spell, cast with your own hands! Well, with my wand, but you did the magic.",
+  "learned": "Now you know how to cast a spell with your wand, and that casting *zelim* breaks a seal."
 }

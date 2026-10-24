@@ -68,6 +68,12 @@ function hex(colour: number): string {
   return `#${colour.toString(16).padStart(6, '0')}`;
 }
 
+/** A painted image, and the row its foot stands on. */
+export interface PaintedImage {
+  image: Phaser.GameObjects.Image;
+  row: number;
+}
+
 /** A painted image and the mask drawn over it. */
 interface Masked {
   source: Phaser.GameObjects.Image;
@@ -85,13 +91,13 @@ export class DebugView {
     private readonly scene: Phaser.Scene,
     private readonly map: Layout,
     private readonly parent: HTMLElement,
-    painted: Phaser.GameObjects.Image[],
+    painted: PaintedImage[],
     /** The cells painted beyond the playable area on each side (D83): left, top,
      * right, bottom. */
     private readonly margin: [number, number, number, number] = [0, 0, 0, 0],
   ) {
     this.cells = this.drawCells();
-    for (const source of painted) this.masks.push({ source, mask: this.maskOf(source) });
+    for (const { image, row } of painted) this.masks.push({ source: image, mask: this.maskOf(image, row) });
     // Over the scene's canvas, in the frame the scene is in.
     const frame = parent.parentElement ?? parent;
     this.numbers = Object.assign(document.createElement('canvas'), { className: 'debug-numbers' });
@@ -139,8 +145,7 @@ export class DebugView {
   }
 
   /** A painted image's mask: its shape filled with its row's colour, see-through. */
-  private maskOf(source: Phaser.GameObjects.Image): Phaser.GameObjects.Image {
-    const row = Math.round((source.depth - 3) * 100 - 0.75);
+  private maskOf(source: Phaser.GameObjects.Image, row: number): Phaser.GameObjects.Image {
     return this.scene.add
       .image(source.x, source.y, source.texture.key)
       .setOrigin(source.originX, source.originY)

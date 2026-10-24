@@ -77,7 +77,7 @@ import {
   SHEET_ROW,
 } from './painted';
 import { SceneCamera, VIEW_TILES } from './camera';
-import { DebugView, debugging } from './debug';
+import { DebugView, debugging, type PaintedImage } from './debug';
 import { Speech } from './speech';
 import { Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
@@ -413,14 +413,27 @@ class LevelScene extends Phaser.Scene {
       around: (figure) => this.speech.around(figure),
     });
     this.view.setUp();
-    // The painted rows and things; a placeholder scene has none.
-    const painted = this.art ? [...this.things.values()].filter((image) => image.texture.key.startsWith('art-')) : [];
+    // The painted rows and things, each with the row its foot stands on; a placeholder
+    // scene has none.
+    const scene = this.art?.scene;
+    const painted: PaintedImage[] = scene
+      ? [
+          ...scene.rows.flatMap((row, index) => {
+            const image = this.rows[index];
+            return image ? [{ image, row: row.row }] : [];
+          }),
+          ...[...this.things].flatMap(([id, image]) => {
+            const thing = scene.things[id];
+            return thing && image.texture.key.startsWith('art-') ? [{ image, row: thing.row }] : [];
+          }),
+        ]
+      : [];
     if (this.art && this.wizard.texture.key.startsWith('fig-')) {
-      this.silhouette = new Silhouette(this, this.wizard, [...this.rows, ...painted], this.still);
+      this.silhouette = new Silhouette(this, this.wizard, painted.map(({ image }) => image), this.still);
       this.parentNode.dataset.silhouette = 'true';
     }
     if (debugging()) {
-      this.debug = new DebugView(this, this.map, this.parentNode, [...this.rows, ...painted], marginOf(this.art));
+      this.debug = new DebugView(this, this.map, this.parentNode, painted, marginOf(this.art));
     }
 
     this.playback.onTick((tick, events, instant) => this.show(tick, events, instant));

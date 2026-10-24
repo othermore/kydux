@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Chapter 1's garden at the gate, built from an open tileset (D72 trials).
 
-    tools/art/open_scene.py <pack> [--scene the-gate]
+    tools/art/trials/open_scene.py <pack> [--scene the-gate]
 
 <pack> is one of RECIPES: which piece of the pack's sheets stands for each kind
 of terrain of content/scenes/<scene>/, its doors, its stone and a child. The
@@ -23,7 +23,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 RAW = REPO / "art" / "raw"
 OPEN = RAW / "open"
 CONTENT = REPO / "content"

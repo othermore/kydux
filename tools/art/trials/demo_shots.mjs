@@ -1,7 +1,7 @@
-// Screenshots of the art demo (tools/art/demo.py), with the app's Playwright:
+// Screenshots of the art demo (tools/art/trials/demo.py), with the app's Playwright:
 // each scene at a moment of its story, opened from the disk.
 //
-//     node tools/art/demo_shots.mjs
+//     node tools/art/trials/demo_shots.mjs
 //
 // Writes art/raw/demo/shots/<name>.png, the canvas alone.
 
@@ -10,7 +10,7 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const repo = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const repo = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const require = createRequire(join(repo, 'app', 'package.json'));
 const { chromium } = require('@playwright/test');
 

@@ -21,7 +21,7 @@ on the tile grid; never isometric. The native tile is 24 pixels (drawn at
 ×2 on the game's 48-pixel grid) or 48; the background is the key colour
 #FF00FF where a piece is not a full tile.
 
-The pieces are named as `tools/art/draw.py` names them, so that
-`tools/art/contact.py` draws each candidate's test scene the same way:
+The pieces are named as `tools/art/trials/draw.py` names them, so that
+`tools/art/trials/contact.py` draws each candidate's test scene the same way:
 `grass`, `wall-M`, `path-M` (M the neighbours: north 1, east 2, south 4,
 west 8), `door-closed`, `door-open`, `wizard-<way>-<frame>`.

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """A scene's layout guide, and how well a painting of it keeps to the grid (D72).
 
-    tools/art/layout.py guide <scene> [--pad 16:9] [--view 34]
-    tools/art/layout.py check <scene> <painted.png> [--name <candidate>] [--view 34]
+    tools/art/trials/layout.py guide <scene> [--pad 16:9] [--view 34]
+    tools/art/trials/layout.py check <scene> <painted.png> [--name <candidate>] [--view 34]
 
 `guide` draws content/scenes/<scene>/ (map.txt and scene.json) at 48 pixels a
 tile, in flat colours, one per kind of terrain: what is walked on flat, what
@@ -34,7 +34,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 RAW = REPO / "art" / "raw"
 SCENES = REPO / "content" / "scenes"
 TILE = 48

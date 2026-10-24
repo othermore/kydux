@@ -3,7 +3,7 @@
 scene's ground, its raised things by row, and what opens or is picked up, in the
 format content/art/scenes/<scene>/art.json gives the page (D76).
 
-    tools/art/interior.py <source folder> <out folder>
+    tools/art/trials/interior.py <source folder> <out folder>
 
 The source folder holds the painting without its grid, the grid found in the
 gridded one (grid.json), the cells marked by hand (marks.txt), an edit of the
@@ -43,7 +43,7 @@ import numpy as np
 from PIL import Image, ImageFilter
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent))
 import export_scene  # noqa: E402
 import image_first  # noqa: E402
 

@@ -91,8 +91,9 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 map_from_image.py and image_first.py read a painting's grid and
                 cut its things, export_scene.py makes content/art/, figures.py
                 makes the figures' sheets from the base sheets in art/figures/,
-                recoloured for each look, contact.py
-                and demo.py show the trials; D72, D76) and the music's
+                recoloured for each look, and trials/ the scripts of the art
+                trials, contact.py and demo.py among them; D72, D76) and the
+                music's
                 (sound/generate.py)
 tests/tools/    the writing and art tools' tests, with the services faked
 tests/project/  the repository's own checks
@@ -1017,12 +1018,12 @@ one overturns stays, marked as superseded.
   not built from pieces; the characters are Gemini's style-B walking sheets,
   PixelLab's four-direction sprites the second choice. The trials, each
   drawing chapter 1's garden at the gate into `art/raw/` and judged on a
-  contact sheet (`tools/art/contact.py`):
+  contact sheet (`tools/art/trials/contact.py`):
 
   | Route | What it gave | Cost |
   | --- | --- | --- |
   | Gemini, pieces that join (walls, paths) | Pieces in no order, joins that seldom match | Cents an image |
-  | Art as code (`tools/art/draw.py`) | Perfect joins, plain | Free |
+  | Art as code (`tools/art/trials/draw.py`) | Perfect joins, plain | Free |
   | Retro Diffusion and PixelLab corner sets | Perfect joins, a flat pixel look | A trial's credits |
   | Open tilesets (LPC, 16x16 Town Remix, Outdoors) | Free and joined, flatter, of mixed families, lacking the story's own things | Free |
   | Kenney's isometric packs (CC0) | A rich look; moves that run on diagonals, near walls hiding the wizard | Free |

@@ -2,7 +2,8 @@
 """A scene drawn isometric from its square grid, with an open isometric set (D72
 trials).
 
-    tools/art/isometric.py <scene> [--level <id>] [--pack art/raw/open/isometric-dungeon-tiles]
+    tools/art/trials/isometric.py <scene> [--level <id>]
+        [--pack art/raw/open/isometric-dungeon-tiles]
 
 The world stays a square grid; only the picture projects it. A tile (x, y) is
 drawn as a diamond whose top corner is at ((x - y) * W/2, (x + y) * H/2), W
@@ -27,7 +28,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 RAW = REPO / "art" / "raw"
 CONTENT = REPO / "content"
 #: The diamond of a piece: its width, its height and where its top corner is.

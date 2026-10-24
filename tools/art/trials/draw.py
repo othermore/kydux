@@ -2,7 +2,7 @@
 """The art made as code (D72, candidate 2): the trials' pieces drawn by a
 program, in the oblique view, at 24 pixels a tile, on one palette.
 
-    tools/art/draw.py [--out art/raw/code/pieces]
+    tools/art/trials/draw.py [--out art/raw/code/pieces]
 
 The walls and the paths are drawn as their sixteen pieces, one for each way a
 tile's four neighbours (north, east, south, west) are of the same terrain, so
@@ -19,7 +19,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 TILE = 24
 NORTH, EAST, SOUTH, WEST = 1, 2, 4, 8
 

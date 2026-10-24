@@ -2,9 +2,9 @@
 """A candidate's contact sheet (D72): a small test scene drawn with its pieces,
 at the game's 48 pixels a tile, and under it every piece it has.
 
-    tools/art/contact.py <candidate> [--pieces art/raw/<candidate>/pieces]
+    tools/art/trials/contact.py <candidate> [--pieces art/raw/<candidate>/pieces]
 
-The pieces are named as tools/art/draw.py names them: `grass`, `wall-M` and
+The pieces are named as tools/art/trials/draw.py names them: `grass`, `wall-M` and
 `path-M` for M the mask of the tile's neighbours of the same terrain (north 1,
 east 2, south 4, west 8), `door-closed`, `door-open`, `wizard-<way>-<frame>`.
 The test scene holds a wall's every join (ends, corners, a T, a cross), a
@@ -23,7 +23,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 RAW = REPO / "art" / "raw"
 SCALE = 2
 

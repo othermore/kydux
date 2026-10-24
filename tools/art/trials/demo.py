@@ -3,11 +3,11 @@
 played, in a page of its own, so that the owner sees how the style would look
 in the game before the game draws it.
 
-    tools/art/demo.py            build the page
-    tools/art/demo.py compare    after demo_shots.mjs: the sketch beside the shots
+    tools/art/trials/demo.py            build the page
+    tools/art/trials/demo.py compare    after demo_shots.mjs: the sketch beside the shots
 
 Builds art/raw/demo/ (not committed): index.html and demo.js, copied from
-tools/art/demo/; scenes.js, the scenes the page draws, read from
+tools/art/trials/demo/; scenes.js, the scenes the page draws, read from
 content/scenes/ (each tile's terrain, the fixed things, the rooms) and from
 the levels the page plays (where their things and actors stand); and, from
 the painting of chapter 1's scene over its 3/4 guide (layout.py guide34),
@@ -25,7 +25,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[1]
+REPO = HERE.parents[2]
 DEMO = REPO / "art" / "raw" / "demo"
 SOURCE = REPO / "art" / "raw" / "demo-src"
 sys.path.insert(0, str(HERE))
@@ -121,7 +121,7 @@ def build() -> Path:
     if fields:
         payload["fields"] = fields
     (DEMO / "scenes.js").write_text(
-        "// Made by tools/art/demo.py from content/; not to be edited.\n"
+        "// Made by tools/art/trials/demo.py from content/; not to be edited.\n"
         f"window.KYDUX_DEMO = {json.dumps(payload, indent=1)};\n",
         encoding="utf-8",
     )

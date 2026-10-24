@@ -1,17 +1,11 @@
-// The one progress store the game uses, and the small changes it makes to the
-// document: each loads it, changes it, and saves it (D31).
+// The one progress store the game uses, the saved games' list (D70), and the small
+// changes the game makes to the document of the game being played: each loads
+// it, changes it, and saves it (D31).
 
-import {
-  defaultProgress,
-  type LevelProgress,
-  LocalProgressStore,
-  type Progress,
-  type ProgressStore,
-  type Settings,
-  type Wizard,
-} from './store';
+import { GamesStore, type SavedGame } from './games';
+import { type LevelProgress, type Progress, type ProgressStore, type Settings, type Wizard } from './store';
 
-function browserStorage(): Pick<Storage, 'getItem' | 'setItem'> | null {
+function browserStorage(): Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null {
   try {
     return globalThis.localStorage ?? null;
   } catch {
@@ -19,11 +13,59 @@ function browserStorage(): Pick<Storage, 'getItem' | 'setItem'> | null {
   }
 }
 
-let store: ProgressStore = new LocalProgressStore(browserStorage());
+let games = new GamesStore(browserStorage());
+let store: ProgressStore = games;
 
 /** For tests, and for a remote store later: the store every helper uses. */
 export function useStore(next: ProgressStore): void {
   store = next;
+}
+
+/** For tests: the saved games, which are the store too. */
+export function useGames(next: GamesStore): void {
+  games = next;
+  store = next;
+}
+
+/** The saved games with a wizard, the last played first (D70). */
+export function savedGames(): SavedGame[] {
+  return games.games();
+}
+
+/** The id of the game being played, or null before one is begun. */
+export function currentGame(): string | null {
+  return games.current();
+}
+
+/** Plays a saved game, in the language and with the settings chosen now: they are
+ * the machine's, not the game's. */
+export function chooseGame(id: string): void {
+  const { language, settings } = store.load();
+  games.choose(id);
+  change((progress) => {
+    progress.language = language;
+    progress.settings = settings;
+  });
+}
+
+/** A new game: the story from the letter, a new wizard (D64); the game being
+ * played stays in the list. */
+export function newGame(): void {
+  games.startNew();
+}
+
+export function deleteGame(id: string): void {
+  games.remove(id);
+}
+
+/** A game brought from a file, added to the list and played. */
+export function addGame(progress: Progress): void {
+  games.add(progress);
+}
+
+/** Seconds of play, counted to the game being played. */
+export function addPlayTime(seconds: number): void {
+  games.addTime(seconds);
 }
 
 export function load(): Progress {
@@ -158,12 +200,3 @@ export function setWizard(made: Wizard): void {
   });
 }
 
-/** Start from the beginning: the course's progress and the wizard cleared
- * (D64); the language and the settings, the machine's, kept. */
-export function reset(): void {
-  const kept = store.load();
-  const fresh = defaultProgress();
-  fresh.language = kept.language;
-  fresh.settings = kept.settings;
-  store.save(fresh);
-}

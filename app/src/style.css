@@ -1383,3 +1383,62 @@ a.stop-body:focus-visible {
 .guide-card.middle::before {
   display: none;
 }
+
+/* The saved games on the start screen (D70). */
+.saved-note {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.games {
+  margin: 12px 0 20px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.games h3 {
+  margin: 0 0 8px;
+}
+
+.games ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.game {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.game:first-child {
+  border-top: none;
+}
+
+.game[data-current='true'] .game-name::after {
+  content: ' ★';
+  color: #f2b705;
+}
+
+.game-about {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.game-place,
+.game-time {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.game-buttons {
+  display: flex;
+  gap: 6px;
+}

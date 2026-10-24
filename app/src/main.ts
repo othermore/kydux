@@ -195,17 +195,32 @@ async function showMap(content: HTMLElement): Promise<void> {
   );
 }
 
+/** How often play time is counted, in seconds. */
+const PLAY_TICK_S = 10;
+
 /** The story page the game opens with, before the creator (D61). */
 const OPENING = '#story/the-letter';
 
 async function showStart(content: HTMLElement): Promise<void> {
-  // A first visit, with no wizard and no address, opens on the story (D61).
-  if (!progress.wizard() && location.hash === '') {
+  // A first visit, with no wizard, no saved game and no address, opens on the
+  // story (D61); with saved games, the start screen offers them (D70).
+  if (!progress.wizard() && progress.savedGames().length === 0 && location.hash === '') {
     location.replace(OPENING);
     return;
   }
   document.title = t('app.title');
-  const continueTo = await continueTarget(await loadCourse());
+  const course = await loadCourse();
+  const continueTo = await continueTarget(course);
+  // Where each saved game is: its item's number and title, or the course's start.
+  const places = new Map(
+    await Promise.all(
+      items(course).map(async (item) => {
+        const number = itemNumber(course, item);
+        const title = await itemTitle(item);
+        return [item, number ? `${number}: ${title}` : title] as const;
+      }),
+    ),
+  );
   if (shownRoute !== 'start') return;
   show(
     content,
@@ -213,6 +228,7 @@ async function showStart(content: HTMLElement): Promise<void> {
       continueTo,
       wizard: progress.wizard(),
       opening: OPENING,
+      placeOf: (item) => (item ? places.get(item) : undefined) ?? places.get(items(course)[0] ?? '') ?? '',
       onChanged: () => {
         shownRoute = null;
         route();
@@ -340,6 +356,13 @@ if (root) {
   initLanguage();
   applyLook(progress.settings());
   window.addEventListener('hashchange', route);
+  // Play time (D70): the seconds a level, a lesson or a story page is on screen,
+  // with the tab in sight, counted to the game being played.
+  setInterval(() => {
+    if (document.visibilityState === 'visible' && /^(level|lesson|story)\//.test(shownRoute ?? '')) {
+      progress.addPlayTime(PLAY_TICK_S);
+    }
+  }, PLAY_TICK_S * 1000);
   document.addEventListener('kydux:language', () => {
     // The header and footer are drawn again; the screen keeps what it holds and
     // only says its words again.

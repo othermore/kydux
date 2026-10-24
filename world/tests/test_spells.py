@@ -133,7 +133,8 @@ def test_a_level_gives_the_passwords_of_its_own_doors():
         Level.from_dict({**HALL, "words": ["osmel"]})
 
 
-#: The castle's door: sealed and keyed by a word, open once both are done.
+#: The castle's door: sealed and keyed by a word, open once the seal is broken and
+#: then the word said: a word said while the seal holds is not heard.
 CASTLE = {
     "id": "castle",
     "map": ["#######", "#SWD.E#", "#######"],
@@ -152,17 +153,32 @@ CASTLE = {
 }
 
 
-@pytest.mark.parametrize("first", ["say", "cast"], ids=["word first", "spell first"])
-def test_a_door_sealed_and_keyed_by_a_word_opens_once_both_are_done(first):
-    word, spell = "wizard.say('ambrel')\n", "wizard.cast('zelim')\n"
-    both = word + spell if first == "say" else spell + word
+def test_a_door_sealed_and_keyed_by_a_word_opens_to_the_spell_and_then_the_word():
     result = run_code(
         Level.from_dict(CASTLE),
-        "wizard.move_right()\nwizard.pick_up()\n" + both + "wizard.move_right(3)\n",
+        "wizard.move_right()\nwizard.pick_up()\nwizard.cast('zelim')\n"
+        "wizard.say('ambrel')\nwizard.move_right(3)\n",
     )
     assert result.status == "won", result
     done = [e.kind for e in result.events if e.actor == "castle_door"]
-    assert done == ["heard" if first == "say" else "unsealed", "open"]
+    assert done == ["unsealed", "open"]
+
+
+def test_a_word_said_while_the_seal_holds_is_not_heard_and_must_be_said_again():
+    result = run_code(
+        Level.from_dict(CASTLE),
+        "wizard.move_right()\nwizard.pick_up()\nwizard.say('ambrel')\n"
+        "wizard.cast('zelim')\nwizard.move_right(3)\n",
+    )
+    assert result.status != "won"
+    done = [e.kind for e in result.events if e.actor == "castle_door"]
+    assert done == ["unheard", "unsealed"]
+    result = run_code(
+        Level.from_dict(CASTLE),
+        "wizard.move_right()\nwizard.pick_up()\nwizard.say('ambrel')\n"
+        "wizard.cast('zelim')\nwizard.say('ambrel')\nwizard.move_right(3)\n",
+    )
+    assert result.status == "won", result
 
 
 def test_a_door_sealed_and_keyed_by_a_word_stays_shut_with_one_alone():

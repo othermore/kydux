@@ -125,7 +125,8 @@ class Key(Thing):
 class Door(Thing):
     """A door in a doorway, closed until it opens, in one of four ways (D43): by hand
     (`door.open()`), locked (`door.open()` with its key carried), sealed (its spell
-    cast beside it) or with a password (its word said beside it); a door both sealed
+    cast beside it) or with a password (its word said beside it, once no seal
+    holds); a door both sealed
     and keyed by a word opens once both are done, in either order."""
 
     _k_role = "door"
@@ -157,21 +158,24 @@ class Door(Thing):
         return self._k_spec.password
 
     def _opened_by(self, how: str) -> None:
-        """Its spell or its word, done beside it in the tick of the wizard's that did it:
-        the door opens, unless the other is still to be done, when the scene is told
-        what was done (`unsealed` or `heard`)."""
+        """Its spell or its word, done beside it in the tick of the wizard's that did it.
+        A word is heard only once the seal is broken: said while the seal holds, it
+        does nothing, and the scene is told (`unheard`). The spell breaks the seal
+        (`unsealed`), and the door opens when nothing else is wanted of it."""
         world: World = self._k_world
+        at = list(self._k_position)
         if how == "word":
+            if self._k_seal is not None:
+                world.note(self.name, "unheard", {"id": self.name, "at": at})
+                return
             self._set(heard=True)
         else:
             self._set(seal=None)
-        at = list(self._k_position)
         if self._k_seal is None and (self._k_spec.password is None or self._k_heard):
             self._set(open=True, locked=False)
             world.note(self.name, "open", {"id": self.name, "at": at, "by": how})
         else:
-            done = "heard" if how == "word" else "unsealed"
-            world.note(self.name, done, {"id": self.name, "at": at})
+            world.note(self.name, "unsealed", {"id": self.name, "at": at})
 
     @property
     def locked(self) -> bool:

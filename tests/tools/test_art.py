@@ -368,9 +368,12 @@ def test_the_exported_field_keeps_its_contract_and_nothing_reaches_below_its_row
         assert layer["top"] + image.height == (layer["row"] + 1) * cell
     assert set(art["things"]) == {"gate", "seal_gate", "castle_door", "wand"}
     for name, thing in art["things"].items():
+        # A thing may reach into the row below by what export_scene allows it (a
+        # door's threshold), and no further.
+        reach = export_scene.THINGS[name].get("reach", 0.0)
         for state in thing["states"].values():
             image = Image.open(FIELD / state)
-            assert thing["top"] + image.height <= (thing["row"] + 1) * cell, name
+            assert thing["top"] + image.height <= round((thing["row"] + 1 + reach) * cell), name
     assert (FIELD / art["source"]).is_file()
 
 

@@ -118,7 +118,8 @@
     "nothing_near": "No hay nada lo bastante cerca para que el hechizo lo traiga.",
     "not_carried": "No puedo dar {thing}: no está entre lo que llevo.",
     "nobody": "No hay nadie a mi lado para dárselo.",
-    "which_one": "Aquí hay varias cosas: {things}. Di cuál, como wizard.pick_up({first})."
+    "which_one": "Aquí hay varias cosas: {things}. Di cuál, como wizard.pick_up({first}).",
+    "unheard": "Con el sello puesto, {thing} no oye ninguna palabra."
   },
   "notebook": {
     "title": "El cuaderno {del mago|de la maga}",

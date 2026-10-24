@@ -5,12 +5,12 @@
     "Walk in.",
     "In fewer than 5 lines."
   ],
-  "starting_code": "# The door is sealed and also listens for the school's word.\n",
+  "starting_code": "# The door is sealed, and listens for the school's word once the seal is broken.\n",
   "hints": [
     "Move up to stand before the door first.",
-    "You have to use the `say` method for the password and the `cast` method for the spell.",
-    "After doing both things, take one more step to walk into the hall."
+    "The door listens only once its seal is broken: use the `cast` method before the `say` method.",
+    "After the seal and the word, take one more step to walk into the hall."
   ],
-  "intro": "This is it, the castle's great door! It is sealed by a rune, and it also listens for the school's word. We have to do everything together to get in!",
+  "intro": "This is it, the castle's great door! It is sealed by a rune, and it also listens for the school's word, but it cannot hear a word while its seal holds. Break the seal first, then say the word, and we are in!",
   "outro": "The door is open! Let us walk into the great hall."
 }

@@ -17,7 +17,12 @@ part's middle lightness. The looks' colours are app/src/engine/looks.ts's.
 
 Every sheet is steadied before it is used (`steadied`): each frame is shifted
 sideways so that its body lies over its row's standing frame, which keeps a
-figure from swaying as it walks, whatever each frame's drawing or cut did.
+figure from swaying as it walks, whatever each frame's drawing or cut did. Then
+every walking row is made from its standing frame (`walking`): a step frame is
+the standing frame with only its legs, the lowest LEGS of the figure, taken
+from the step's drawing, so that a figure walks moving its feet alone, never
+turning its head or its arms; a figure that floats (FLOATING) has no legs, and
+its step frames are the standing frame with its dress grown downward.
 
 Writes content/art/figures/wizard-<look>.webp for every look and the friends'
 sheets named in FRIENDS, from the bases in art/figures/ (BASES), and their list in
@@ -82,6 +87,16 @@ FRIENDS = {
     ),
 }
 PARTS = ("skin", "hair", "robe", "hat", "band")
+#: How much of a figure, from its feet up, a step frame keeps of its own drawing:
+#: the boots and the robe's hem. The rest is the standing frame's.
+LEGS = 0.2
+#: The figures that float, and how many pixels each step frame's dress grows.
+FLOATING = {"eldra": (3, 5)}
+#: A row whose standing frame is not the one to keep, and the frame it keeps: Dask's
+#: back has his hands behind it in the first frame, not in the standing one.
+KEPT_FRAME = {"dask": {"up": 0}}
+#: How much of a floating figure, from the bottom up, is the dress that grows.
+DRESS = 0.4
 
 
 def looks() -> dict[str, dict[str, str]]:
@@ -208,6 +223,54 @@ def _overlap(cell: np.ndarray, standing: np.ndarray, dx: int) -> int:
     return int((moved & standing).sum())
 
 
+def walking(
+    sheet: Image.Image,
+    frame: tuple[int, int],
+    floats: tuple[int, int] | None = None,
+    kept: dict[str, int] | None = None,
+) -> Image.Image:
+    """Each walking row (the first four) made from its standing frame, the second of
+    the row unless `kept` names another for its way, on a sheet already steadied:
+    every other frame keeps its own legs, the lowest LEGS of the figure, blended into
+    the kept frame above them over a few rows; or, for a figure that floats, the
+    step frames are the kept frame with its dress, the lowest DRESS of it, stretched
+    down by `floats` pixels (the first step's, the last's)."""
+    pixels = np.array(sheet.convert("RGBA")).astype(np.float32)
+    fw, fh = frame
+    out = pixels.copy()
+    for row in range(min(4, pixels.shape[0] // fh)):
+        keep = (kept or {}).get(("down", "left", "right", "up")[row], 1)
+        standing = pixels[row * fh : (row + 1) * fh, keep * fw : (keep + 1) * fw]
+        opaque = np.where(standing[..., 3] > 128)[0]
+        if not opaque.size:
+            continue
+        top, bottom = int(opaque.min()), int(opaque.max())
+        others = [column for column in range(3) if column != keep]
+        for step, column in enumerate(others):
+            cell = pixels[row * fh : (row + 1) * fh, column * fw : (column + 1) * fw]
+            if floats is not None:
+                made = _dress_grown(standing, top, bottom, floats[step])
+            else:
+                cut = bottom - int((bottom - top) * LEGS)
+                blend = 6
+                weight = np.clip((np.arange(fh) - (cut - blend)) / blend, 0, 1)[:, None, None]
+                made = standing * (1 - weight) + cell * weight
+            out[row * fh : (row + 1) * fh, column * fw : (column + 1) * fw] = made
+    return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGBA")
+
+
+def _dress_grown(standing: np.ndarray, top: int, bottom: int, grow: int) -> np.ndarray:
+    """A floating figure's standing frame with its dress stretched `grow` pixels down."""
+    start = bottom - int((bottom - top) * DRESS)
+    height = bottom + 1 - start
+    dress = Image.fromarray(standing[start : bottom + 1].astype(np.uint8), "RGBA")
+    longer = np.array(dress.resize((dress.width, height + grow), Image.LANCZOS)).astype(np.float32)
+    made = standing.copy()
+    end = min(made.shape[0], start + longer.shape[0])
+    made[start:end] = longer[: end - start]
+    return made
+
+
 def from_edit(edited: Image.Image, base: Image.Image, frame: tuple[int, int]) -> Image.Image:
     """A Gemini edit of a base sheet, put back on the base's grid: the edit was asked
     of the base enlarged four times on a magenta canvas of 9:16, centred; it is
@@ -282,7 +345,7 @@ def make(check: bool = False) -> list[Path]:
     about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
     frame = tuple(about["frame"])
     bases = {
-        key: (steadied(Image.open(BASE_DIR / name), frame), hues)
+        key: (walking(steadied(Image.open(BASE_DIR / name), frame), frame), hues)
         for key, (name, hues) in BASES.items()
     }
     casts = {key: steadied(Image.open(BASE_DIR / name), frame) for key, name in CAST_BASES.items()}

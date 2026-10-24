@@ -118,7 +118,8 @@
     "nothing_near": "There is nothing near enough for the spell to bring.",
     "not_carried": "I cannot give {thing}: I am not carrying it.",
     "nobody": "There is no one beside me to give it to.",
-    "which_one": "There are several things here: {things}. Say which, like wizard.pick_up({first})."
+    "which_one": "There are several things here: {things}. Say which, like wizard.pick_up({first}).",
+    "unheard": "While its seal holds, {thing} cannot hear a word."
   },
   "notebook": {
     "title": "The wizard's notebook",

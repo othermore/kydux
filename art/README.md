@@ -63,7 +63,9 @@ Each raised thing is cut out and drawn in order with the figures, by the
 row its foot stands on.
 
 - **Nothing reaches below its own row.** A shadow that falls lower goes
-  back to the ground, or is painted apart.
+  back to the ground, or is painted apart. A door may reach a little into
+  the cell below, its threshold (`reach` in `export_scene.py`); a figure
+  standing there is drawn over it.
 - **A thing covers only the cells above it.** So it hides a figure that
   stands behind it, and a figure that stands in front of it is drawn over
   it.
@@ -82,6 +84,14 @@ has four more rows below, in the same order: casting, with the wand
 raised, pointed with its light, and lowered. The frames are drawn on the
 same scale as the scenes. `content/art/figures/figures.json` says the
 frame's size and where the feet are.
+
+Every sheet is steadied before the game uses it: each frame is shifted
+sideways so that its body lies over its row's standing frame, which keeps
+a figure from swaying as it walks. Then each step frame becomes the
+standing frame with only its legs taken from the step's drawing, so that
+a figure walks moving its feet alone, never turning its head or its arms.
+A figure that floats, the ghost, has its dress grow downward in its step
+frames instead. Both are done by `tools/art/figures.py`.
 
 A door that opens may have a half-open state, between its closed and its
 open ones. It is an edit of the painting like the others, and the game

@@ -22,7 +22,10 @@ export interface SceneArt {
   size: Tile;
   ground: string;
   rows: { row: number; image: string; top: number }[];
-  things: Record<string, { row: number; left: number; top: number; states: Record<string, string> }>;
+  things: Record<
+    string,
+    { row: number; left: number; top: number; states: Record<string, string>; rune?: string }
+  >;
 }
 
 /** The figures drawn for the characters (D76): one sheet each of four rows (down,
@@ -171,9 +174,10 @@ export function playCast(
   const facing = facingOf(sprite);
   const frame = (step: number) => (CAST_ROW + SHEET_ROW[facing]) * 3 + step;
   sprite.setFrame(frame(0));
+  // The wand stays pointed for the middle part, while its light flies.
   return [
-    scene.time.delayedCall(duration * 0.25, () => sprite.setFrame(frame(1))),
-    scene.time.delayedCall(duration * 0.7, () => sprite.setFrame(frame(2))),
+    scene.time.delayedCall(duration * 0.2, () => sprite.setFrame(frame(1))),
+    scene.time.delayedCall(duration * 0.8, () => sprite.setFrame(frame(2))),
     scene.time.delayedCall(duration, () => sprite.setFrame(SHEET_ROW[facing] * 3 + standing)),
   ];
 }
@@ -198,10 +202,10 @@ export function crossfade(
 /** A seal broken (D79): its glow goes at once, a flare of it grows and fades in its
  * place, and sparks of its light fly out and fade; the glow itself is left as it
  * was, hidden, for the level to start again with. */
-export function breakSeal(scene: Phaser.Scene, glow: Phaser.GameObjects.Ellipse, duration: number): void {
+export function breakSeal(scene: Phaser.Scene, glow: Phaser.GameObjects.Container, duration: number): void {
   glow.setVisible(false);
   const flare = scene.add
-    .ellipse(glow.x, glow.y, glow.width, glow.height, 0x6fd6ff, 0.8)
+    .ellipse(glow.x, glow.y, TILE * 0.9, TILE * 1.1, 0x6fd6ff, 0.8)
     .setBlendMode(Phaser.BlendModes.ADD)
     .setDepth(glow.depth);
   scene.tweens.add({
@@ -269,13 +273,13 @@ function mix(from: number, to: number, t: number): number {
   return channel(16) | channel(8) | channel(0);
 }
 
-/** The goal's mark (D79): a bright ring with a soft disc in it, centred on a point,
- * over the ground and under what stands in front; it beats in size, alpha and
- * colour unless `still`. */
-export function drawMark(scene: Phaser.Scene, [x, y]: [number, number], still: boolean): void {
+/** The goal's mark (D79): a bright ring with a soft disc in it, centred on a point
+ * at `depth`, over the ground and under what stands in front; it beats in size,
+ * alpha and colour unless `still`. */
+export function drawMark(scene: Phaser.Scene, [x, y]: [number, number], still: boolean, depth: number): void {
   const disc = scene.add.circle(0, 0, TILE * 0.32, 0xffe066, 0.35);
   const ring = scene.add.circle(0, 0, TILE * 0.36).setStrokeStyle(3, 0xffc61a, 1);
-  const mark = scene.add.container(x, y, [disc, ring]).setDepth(2.9);
+  const mark = scene.add.container(x, y, [disc, ring]).setDepth(depth);
   if (still) return;
   scene.tweens.add({ targets: mark, scale: 1.18, alpha: 0.7, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   // Its colour beats too, from gold to a warm white and back, slower than its size.
@@ -294,20 +298,43 @@ export function drawMark(scene: Phaser.Scene, [x, y]: [number, number], still: b
   });
 }
 
-/** A sealed door's glow (D79), centred on a point just over the door's depth,
- * pulsing unless `still`. */
+/** A sealed door's rune (D79), centred on a point just over the door's depth: a
+ * glow, and the rune's sign drawn in it unless the painting draws one; pulsing
+ * unless `still`. */
 export function drawGlow(
   scene: Phaser.Scene,
   [x, y]: [number, number],
   depth: number,
   still: boolean,
-): Phaser.GameObjects.Ellipse {
-  const glow = scene.add
-    .ellipse(x, y, TILE * 0.9, TILE * 1.1, 0x6fd6ff, 0.35)
-    .setBlendMode(Phaser.BlendModes.ADD)
-    .setDepth(depth + 0.0005);
+  sign: boolean,
+): Phaser.GameObjects.Container {
+  const halo = scene.add.ellipse(0, 0, TILE * 0.9, TILE * 1.1, 0x6fd6ff, 0.5).setBlendMode(Phaser.BlendModes.ADD);
+  const parts: Phaser.GameObjects.GameObject[] = [halo];
+  if (sign) {
+    // The sign: a ring, and in it a stem with two branches, like a bare twig; drawn
+    // twice, wide and faint under narrow and bright, so that it glows on dark wood.
+    const r = TILE * 0.22;
+    const rune = scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD);
+    for (const [width, colour, alpha] of [
+      [9, 0x3fc4ff, 0.45],
+      [4, 0xd8f6ff, 1],
+    ] as const) {
+      rune.lineStyle(width, colour, alpha);
+      rune.strokeCircle(0, 0, r + 8);
+      rune.beginPath();
+      rune.moveTo(0, r);
+      rune.lineTo(0, -r);
+      rune.moveTo(0, -r * 0.15);
+      rune.lineTo(-r * 0.75, -r * 0.85);
+      rune.moveTo(0, -r * 0.15);
+      rune.lineTo(r * 0.75, -r * 0.85);
+      rune.strokePath();
+    }
+    parts.push(rune);
+  }
+  const glow = scene.add.container(x, y, parts).setDepth(depth + 0.0005);
   if (!still) {
-    scene.tweens.add({ targets: glow, alpha: 0.75, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    scene.tweens.add({ targets: glow, alpha: 0.6, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   }
   return glow;
 }

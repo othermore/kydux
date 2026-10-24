@@ -40,7 +40,7 @@ test('the castle door opens onto the dark', async ({ page }) => {
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await page.locator('#speed').selectOption('2');
   await page.locator('.cm-content').click();
-  await page.keyboard.insertText('wizard.move_up(2)\nwizard.say("ambrel")\nwizard.cast("zelim")\nwizard.move_up()');
+  await page.keyboard.insertText('wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")\nwizard.move_up()');
   await page.locator('#run').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-doors', /castle_door/, { timeout: 30_000 });
   await page.waitForTimeout(600);
@@ -76,7 +76,7 @@ test('the wizard is drawn in the look chosen, and the friend is of the other gen
   }
 });
 
-test('a spell is cast with the wand, the seal breaks, and a door opens through its half-open state (13.9)', async ({
+test('a spell is cast with the wand, the seal breaks, a door opens through its half-open state, and a word waits for the seal (13.9)', async ({
   page,
 }) => {
   await seedWizard(page);
@@ -95,16 +95,34 @@ test('a spell is cast with the wand, the seal breaks, and a door opens through i
   await expect(scene).toHaveAttribute('data-glowing', 'castle_door', { timeout: 10_000 });
   await expect(scene).toHaveAttribute('data-doors', 'gate,seal_gate');
 
-  // The castle's door, opened by the word and the spell, is seen half open first.
-  await page.goto('/#level/the-way-in');
+  // The gate, opened by its word, is seen half open first.
+  await page.goto('/#level/the-password');
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await page.locator('#speed').selectOption('1');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.say("ambrel")');
+  await page.locator('#run').click();
+  await expect.poll(() => scene.getAttribute('data-opening'), { intervals: [50], timeout: 30_000 }).toBe('gate');
+  await page.screenshot({ path: `${SHOTS}10-door-half-open.png` });
+  await expect(scene).toHaveAttribute('data-doors', /gate/, { timeout: 10_000 });
+
+  // The castle's door hears no word while its seal holds: said first, it is not
+  // heard; the spell, then the word, open it.
+  await page.goto('/#level/the-way-in');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await page.locator('#speed').selectOption('4');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText('wizard.move_up(2)\nwizard.say("ambrel")\nwizard.cast("zelim")');
   await page.locator('#run').click();
-  await expect.poll(() => scene.getAttribute('data-opening'), { intervals: [50], timeout: 30_000 }).toBe('castle_door');
-  await page.screenshot({ path: `${SHOTS}10-door-half-open.png` });
-  await expect(scene).toHaveAttribute('data-doors', /castle_door/, { timeout: 10_000 });
+  await expect(page.locator('.outcome')).toBeVisible({ timeout: 30_000 });
+  await expect(scene).not.toHaveAttribute('data-doors', /castle_door/);
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")');
+  await page.locator('#run').click();
+  await expect(scene).toHaveAttribute('data-doors', /castle_door/, { timeout: 30_000 });
 });

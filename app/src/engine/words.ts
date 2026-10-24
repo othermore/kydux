@@ -36,6 +36,8 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
       return t('blocked.sealed', { thing });
     case 'password':
       return t('blocked.password', { thing });
+    case 'unheard':
+      return t('blocked.unheard', { thing });
     case 'nothing_near':
       return t('blocked.nothing_near');
     case 'not_carried':

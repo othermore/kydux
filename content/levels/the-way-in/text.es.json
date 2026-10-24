@@ -5,12 +5,12 @@
     "Entra.",
     "En menos de 5 líneas."
   ],
-  "starting_code": "# La puerta está sellada y también escucha la palabra de la escuela.\n",
+  "starting_code": "# La puerta está sellada, y escucha la palabra de la escuela cuando el sello está roto.\n",
   "hints": [
     "Primero muévete hacia arriba para ponerte delante de la puerta.",
-    "Tienes que usar el método `say` para la contraseña y el método `cast` para el hechizo.",
-    "Después de hacer ambas cosas, da un paso más para entrar al vestíbulo."
+    "La puerta solo escucha cuando su sello está roto: usa el método `cast` antes que el método `say`.",
+    "Después del sello y la palabra, da un paso más para entrar en el vestíbulo."
   ],
-  "intro": "¡Aquí está, la gran puerta del castillo! Está sellada por una runa, y también espera escuchar la palabra de la escuela. ¡Tenemos que hacerlo todo junto para entrar!",
+  "intro": "¡Aquí está, la gran puerta del castillo! Está sellada por una runa, y también escucha la palabra de la escuela, pero no oye ninguna palabra mientras el sello aguanta. Primero rompe el sello, luego di la palabra, ¡y dentro!",
   "outro": "¡La puerta está abierta! Entremos al gran vestíbulo."
 }

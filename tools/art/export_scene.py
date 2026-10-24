@@ -76,23 +76,27 @@ THINGS = {
         },
     },
     "seal_gate": {
-        "box": (7.45, 10.35, 9.6, 12.0),
+        # Down to its threshold, a little into the row below, drawn under whoever
+        # stands there; its mask filled from edge to edge in every row, since the
+        # wood near its latch is the colour of the sand behind.
+        "box": (7.45, 10.35, 9.6, 12.25),
         "row": 11,
+        "reach": 0.25,
+        "hull": True,
         "solid": True,
         "without": "game-field-noseal.png",
         "states": {"closed": "painting", "open": None},
+        # The painting draws this door's rune; the page draws one on the others (D79).
+        "rune": "painted",
     },
     "castle_door": {
-        # Wide enough on its left for the door half open, swung out past the arch.
-        "box": (6.7, 3.95, 9.6, 6.7),
+        "box": (7.45, 3.95, 9.6, 6.7),
         "row": 6,
         "solid": True,
         "without": "game-field-castle-open.png",
-        "states": {
-            "closed": "painting",
-            "ajar": "game-field-castle-ajar.png",
-            "open": "without",
-        },
+        # Open onto the lit hall; the dark doorway is the picture without the door,
+        # which the states are cut against.
+        "states": {"closed": "painting", "open": "game-field-castle-lit.png"},
     },
     "wand": {
         "box": (11.9, 13.5, 14.1, 15.0),
@@ -108,6 +112,10 @@ THINGS = {
         "states": {"lying": "painting"},
     },
 }
+#: Patches of the ground, in the page's pixels (x0, y0, x1, y1), each filled with
+#: the band of the same height right above it, faded into it: where an edit without
+#: a thing left a trace of it (the sealed gate's planks on the archway's floor).
+GROUND_PATCHES = ((764, 1134, 876, 1174),)
 FIGURES = ("wizard", "nuri", "wenna", "eldra", "dask")
 #: The figures every look and friend is recoloured from (tools/art/figures.py),
 #: kept in art/figures/ as their bases.
@@ -206,6 +214,8 @@ def sprite_alpha(
     if thing["solid"]:
         mask = filled_mask(changed(shown, without) & inside)
         mask = kept(mask, 0.6 if thing.get("largest") else 0.05)
+        if thing.get("hull"):
+            mask = row_hull(mask) & inside
         return soft(mask, 1.5) * inside
     d = np.abs(shown.astype(np.int16) - without.astype(np.int16)).sum(axis=2) / 3
     d = Image.fromarray(np.clip(d, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.0))
@@ -230,11 +240,23 @@ def webp(image: Image.Image, path: Path) -> None:
     image.save(path, "WEBP", quality=QUALITY, method=6, alpha_quality=90)
 
 
-def clip_below(alpha: np.ndarray, row: int, top: int, cell: int = CELL) -> np.ndarray:
+def row_hull(mask: np.ndarray) -> np.ndarray:
+    """A mask filled, in every row, from its leftmost pixel to its rightmost."""
+    out = mask.copy()
+    for y in np.nonzero(mask.any(axis=1))[0]:
+        xs = np.nonzero(mask[y])[0]
+        out[y, xs[0] : xs[-1] + 1] = True
+    return out
+
+
+def clip_below(
+    alpha: np.ndarray, row: int, top: int, cell: int = CELL, reach: float = 0.0
+) -> np.ndarray:
     """The alpha of an image whose top is at `top`, emptied below row's bottom edge:
-    nothing of a thing reaches into the cells below its own row."""
+    nothing of a thing reaches into the cells below its own row, but by `reach` of a
+    cell for a thing that names it (a door's threshold)."""
     out = alpha.copy()
-    bottom = (row + 1) * cell - top
+    bottom = round((row + 1 + reach) * cell) - top
     if bottom < out.shape[0]:
         out[max(0, bottom) :] = 0
     return out
@@ -261,6 +283,25 @@ def composite(grid: dict) -> tuple[np.ndarray, dict[str, np.ndarray], dict[str, 
         ground = (ground * (1 - alpha) + without * alpha).astype(np.uint8)
         withouts[name], masks[name] = without, mask
     return ground, withouts, masks
+
+
+def patched(floor: Image.Image) -> Image.Image:
+    """The ground with each GROUND_PATCHES rectangle filled from the band below it."""
+    pixels = np.array(floor.convert("RGB"))
+    for x0, y0, x1, y1 in GROUND_PATCHES:
+        height = y1 - y0
+        above = pixels[y0 - height : y0, x0:x1].astype(np.float32)
+        here = pixels[y0:y1, x0:x1].astype(np.float32)
+        # The band above, laid over the patch, fading out over its last rows and its
+        # sides so that no edge shows.
+        fade = np.ones((height, x1 - x0), dtype=np.float32)
+        edge = 6
+        fade[-edge:] *= np.linspace(1, 0, edge)[:, None]
+        fade[:, :edge] *= np.linspace(0, 1, edge)[None, :]
+        fade[:, -edge:] *= np.linspace(1, 0, edge)[None, :]
+        laid = fade[..., None]
+        pixels[y0:y1, x0:x1] = (above * laid + here * (1 - laid)).astype(np.uint8)
+    return Image.fromarray(pixels)
 
 
 def scene() -> Path:
@@ -299,6 +340,7 @@ def scene() -> Path:
     out.mkdir(parents=True)
     width = columns * CELL
     floor = image_first.aligned(Image.fromarray(ground), grid, columns, rows, CELL)
+    floor = patched(floor)
     webp(floor, out / "ground.webp")
     rows_out = []
     for layer in field["layers"]:
@@ -349,10 +391,13 @@ def scene() -> Path:
             rgba = np.dstack([shown, (alpha * 255).astype(np.uint8)])
             sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
             sprite = sprite.copy()
-            below = clip_below(sprite[..., 3] / 255, thing["row"], top)
+            reach = thing.get("reach", 0.0)
+            below = clip_below(sprite[..., 3] / 255, thing["row"], top, reach=reach)
             sprite[..., 3] = (below * 255).astype(np.uint8)
             webp(Image.fromarray(sprite, "RGBA"), out / states[state])
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
+        if "rune" in thing:
+            things[name]["rune"] = thing["rune"]
     art = {
         "cell": CELL,
         "size": [columns, rows],
@@ -378,9 +423,9 @@ later, like the rest of it.
   (`image-first-field-ground.md`, `image-first-field-ground-2.md`), and with
   each thing that opens or is picked up changed (`game-field-nogate.md`,
   `game-field-gate-open.md`, `game-field-noseal.md`,
-  `game-field-castle-open.md`, `game-field-nowand.md`), and the gate and the
-  castle's door half open (`game-field-gate-ajar.md`,
-  `game-field-castle-ajar.md`).
+  `game-field-castle-open.md`, `game-field-nowand.md`), the gate half open
+  (`game-field-gate-ajar.md`) and the castle's hall lit behind its open door
+  (`game-field-castle-lit.md`).
 - Its cells marked by hand, cut by `tools/art/image_first.py` and exported by
   `tools/art/export_scene.py`.
 """
@@ -467,8 +512,12 @@ def figures() -> Path:
                 x = c * width + (width - frame.width) // 2
                 y = r * height + height - FOOT - frame.height
                 sheet.alpha_composite(frame, (x, y))
-        # Each frame over its row's standing frame, so that the figure walks steadily.
+        # Each frame over its row's standing frame, and each walking row made from
+        # it, so that the figure walks moving its feet alone (or its dress, floating).
         sheet = looks.steadied(sheet, (width, height))
+        sheet = looks.walking(
+            sheet, (width, height), looks.FLOATING.get(name), looks.KEPT_FRAME.get(name)
+        )
         webp(sheet, looks.BASE_DIR / AS_BASES[name] if name in AS_BASES else out / f"{name}.webp")
     wizard = every["wizard"]["down"][1].height
     data = {

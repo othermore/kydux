@@ -1,9 +1,0 @@
----
-candidate: game-field
-service: gemini
-model: gemini-3-pro-image
-image: art/raw/image-first/nogrid-2k.png
-aspect_ratio: 9:16
-image_size: 4K
----
-Edit this picture: the castle's great wooden door at the top of the picture is half open. It has swung halfway inward, away from the viewer, on its hinges at the left side of its stone arch, so that the door is seen at an angle, foreshortened, and beside it, inside the same arch, a deep dark doorway shows, the inside of the castle unseen. The arch, its steps and the castle stay. Change nothing else at all: every tree, bush, rock, fence, flower, the walls, the castle, the paths, the grassy rise and its steps, the light and the colours stay exactly as they are, with exactly the same shapes, sizes and places, pixel for pixel.

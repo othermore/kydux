@@ -27,7 +27,7 @@ export interface Story {
   steps: StoryStep[];
   /** The scene the story is played on, with the wizard and the actors placed. */
   world: LevelJson;
-  /** The tile the camera stays on. */
+  /** The tile the camera starts on, before any step (D74). */
   camera: Tile;
   /** The game's opening, before the course (D61). */
   opening?: boolean;

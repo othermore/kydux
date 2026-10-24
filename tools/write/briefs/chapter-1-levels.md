@@ -212,9 +212,10 @@ numbers of cells, only directions and what is there.
 
 9. `the-way-in` — Practice 7, the chapter's last. Up the steps to the
    castle's great door, which is sealed by a rune and also listens for
-   the school's word: everything together. Two steps up to stand before
-   it, say *ambrel*, cast *zelim*, and the door opens onto the dark of
-   the hall; walk in. Goals: open the castle's door; walk in; bonus: in
-   fewer than 5 lines. Starting code: comments allowed, saying what the
-   door wants, never how. No `learned` key: the closing story looks back.
-   Solution: `wizard.move_up(2); wizard.say("ambrel"); wizard.cast("zelim"); wizard.move_up()`.
+   the school's word, but hears no word while its seal holds: everything
+   together, in order. Two steps up to stand before it, cast *zelim*,
+   then say *ambrel*, and the door opens onto the castle's lit hall;
+   walk in. Goals: open the castle's door; walk in; bonus: in fewer than
+   5 lines. Starting code: comments allowed, saying what the door wants,
+   never how. No `learned` key: the closing story looks back.
+   Solution: `wizard.move_up(2); wizard.cast("zelim"); wizard.say("ambrel"); wizard.move_up()`.

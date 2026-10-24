@@ -145,15 +145,15 @@
       "states": {
         "closed": "seal_gate-closed.webp",
         "open": "seal_gate-open.webp"
-      }
+      },
+      "rune": "painted"
     },
     "castle_door": {
       "row": 6,
-      "left": 643,
+      "left": 715,
       "top": 379,
       "states": {
         "closed": "castle_door-closed.webp",
-        "ajar": "castle_door-ajar.webp",
         "open": "castle_door-open.webp"
       }
     },

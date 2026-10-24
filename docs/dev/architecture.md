@@ -1057,7 +1057,11 @@ one overturns stays, marked as superseded.
   scene, with an action before it (a walk in a straight line, a turn, an
   appearing, a vanishing once the words are said), done by the speaker or
   by the figure `by` names, so that the voice can tell what another does.
-  `story.json` holds the staging, checked against the scene by
+  The camera starts on the story's tile and goes to whoever each step is
+  about, who speaks, walks, appears or turns, gliding there and keeping a
+  little above them so that their words are in view; a figure's words are
+  in a speech bubble with its tail on them. `story.json` holds the
+  staging, checked against the scene by
   `kydux_world.level.story_on_scene`, and `text.<lang>.json` the title and
   one text a step; *Next*, Enter and Space go on, *Back* replays the step
   before, *Go on* ends it. The game's opening tells the letter in the past,
@@ -1086,8 +1090,10 @@ one overturns stays, marked as superseded.
   breathes over the ground for counting steps; a scene without art is
   drawn with placeholders. The figures are `content/art/figures/`, four
   ways of three walking frames each. A door may be both sealed and keyed
-  by a word, as the castle's is: it opens once both are done, in either
-  order. Rules out building a scene's look from its map.
+  by a word, as the castle's is: it hears no word while its seal holds,
+  so the spell comes first and the word after, and the door opens to the
+  word. Rules out building a scene's look from its map, and a word that
+  counts before the seal is broken.
 - **D77 — Two friends, and the one who teaches is of the other gender.**
   Decided 2026-10-24 by the owner (sprint 13, 13.1). The story has two
   first-year friends: Nuri, a girl, and Teku, a boy. The friend who meets
@@ -1117,9 +1123,11 @@ one overturns stays, marked as superseded.
   cells no cut-out covers, and nothing painted stands on a cell walked on;
   `tests/project/test_art_content.py` holds every painted scene and its
   levels to both, reading the scene's art. The page draws the goal's mark
-  as a ring that beats in size, alpha and colour, under the cut-outs, and
-  a glow over each sealed door while its seal holds; both are still for a
-  reader who asks for less motion. A painting is asked for things that
+  as a ring that beats in size, alpha and colour, under the cut-outs, or
+  over a door's picture when it lies in its doorway, and over each sealed
+  door, while its seal holds, a glowing rune: its sign drawn by the page
+  unless the painting draws one (`rune` in `art.json`); both are still for
+  a reader who asks for less motion. A painting is asked for things that
   fit one cell where they can, and paths along the rows and columns.
   Rules out a mark under a crown or an arch, and a cell walked through a
   tree.
@@ -1139,12 +1147,15 @@ one overturns stays, marked as superseded.
 - **D81 — What a spell does is seen.** Decided 2026-10-24 by the owner
   (sprint 13, 13.9). The wizard's sheet has four casting rows after its
   four walking ones, the same ways in the same order: the wand raised,
-  pointed with its light, and lowered, played when the wizard casts. A
+  pointed with its light, and lowered, played when the wizard casts,
+  over more than the tick so that the wand is seen out, while a point of
+  light leaves its tip and bursts a tile ahead. A
   sealed door's glow breaks into sparks and a flare as its seal goes. A
   door seen opening passes from one painted state to the next, each
   fading into the next, through a half-open state (`ajar`) where the
-  painting has one: the gate and the castle's door. The casting frames
-  are Gemini's edits of the two wizard bases, recoloured for every look
-  like the walking rows; the half-open states are edits of the painting,
-  cut as the other states are. Rules out a spell seen only as a ring of
-  light, and a door that changes in one frame.
+  painting has one: the gate. The castle's door opens onto its hall, lit
+  by torches inside. The casting frames are Gemini's edits of the two
+  wizard bases, recoloured for every look like the walking rows; the
+  half-open state and the lit hall are edits of the painting, cut as the
+  other states are. Rules out a spell seen only as a ring of light, and a
+  door that changes in one frame.

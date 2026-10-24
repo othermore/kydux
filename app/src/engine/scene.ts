@@ -25,7 +25,8 @@
 //
 // A story is played on the scene the same way (D74): its steps come as events,
 // an actor appears, walks, turns, says its words in a bubble and vanishes; the
-// camera stays on the story's tile, and a bubble stays until the next step.
+// camera starts on the story's tile and goes to whoever each step is about, and
+// a bubble stays until the next step.
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
@@ -57,6 +58,7 @@ import {
   drawGlow,
   drawGrid,
   drawMark,
+  facingOf,
   figureName,
   FOOT_IN_CELL,
   loadArt,
@@ -90,7 +92,7 @@ const ZOOM_START = ZOOMS.indexOf(1);
 
 /** How a scene is played: a level's run, or a story's steps (D74). */
 export interface SceneOptions {
-  /** A story: the camera stays on this tile, and the words stay said. */
+  /** A story: the camera starts on this tile, and the words stay said. */
   story?: { camera: Tile };
 }
 
@@ -140,12 +142,12 @@ class LevelScene extends Phaser.Scene {
   private things = new Map<string, Phaser.GameObjects.Image>();
   private doors = new Map<string, Tile>();
   private openDoors = new Set<string>();
-  /** The glow over each sealed door while its seal holds (D79). */
-  private glows = new Map<string, Phaser.GameObjects.Ellipse>();
+  /** The rune's glow over each sealed door while its seal holds (D79). */
+  private glows = new Map<string, Phaser.GameObjects.Container>();
   private carried = new Set<string>();
   private actors = new Map<string, ActorState>();
   private cone!: Phaser.GameObjects.Graphics;
-  private bubble: Phaser.GameObjects.Text | null = null;
+  private bubble: Phaser.GameObjects.Container | null = null;
   private bubbleUntil = 0;
   private thought: Phaser.GameObjects.Container | null = null;
   private thoughtUntil = 0;
@@ -168,6 +170,8 @@ class LevelScene extends Phaser.Scene {
   private zoomStep = ZOOM_START;
   /** Who a bubble or a thought is over: the wizard, or an actor who speaks. */
   private speaker: Phaser.GameObjects.Sprite | null = null;
+  /** In a story, who the camera is with: whoever the last step was about (D74). */
+  private focus: Phaser.GameObjects.Sprite | null = null;
 
   constructor(
     private readonly map: Layout,
@@ -274,7 +278,8 @@ class LevelScene extends Phaser.Scene {
       this.art?.scene.things[id] && image
         ? [image.x + (image.displayWidth || TILE) / 2, image.y + (image.displayHeight || TILE) / 2]
         : centre(tile);
-    this.glows.set(id, drawGlow(this, at, image?.depth ?? 3, this.still));
+    const sign = this.art?.scene.things[id]?.rune !== 'painted';
+    this.glows.set(id, drawGlow(this, at, image?.depth ?? 3, this.still, sign));
   }
 
   /** A seal broken: its glow goes, breaking into sparks when it is seen go. */
@@ -315,13 +320,6 @@ class LevelScene extends Phaser.Scene {
       const tileset = tilemap.addTilesetImage(TILES_KEY, TILES_KEY, TILE, TILE, 0, 0);
       if (tileset) tilemap.createLayer(0, tileset, 0, 0);
     }
-    for (const [letter, tile] of this.map.markers) {
-      // A marker, like the way out, shows in the dark: it is the castle's shape. On a
-      // painted scene the goal's mark is a ring that pulses, over the ground (D79).
-      if (this.art) drawMark(this, centre(tile), this.still);
-      else this.add.image(...centre(tile), markerKey(letter)).setDepth(2.8);
-    }
-    this.parentNode.dataset.marks = this.map.markers.map(([, tile]) => tile.join(',')).join(';');
     for (const prop of this.map.props) {
       // A painted scene has its props in the painting.
       if (!this.art && this.textures.exists(propKey(prop.kind))) {
@@ -352,6 +350,21 @@ class LevelScene extends Phaser.Scene {
     for (const thing of this.map.things) {
       if (thing.kind === 'door' && thing.lock === 'spell') this.addGlow(thing.id, thing.tile);
     }
+    for (const [letter, tile] of this.map.markers) {
+      // A marker, like the way out, shows in the dark: it is the castle's shape. On a
+      // painted scene the goal's mark is a ring that pulses, over the ground, or over
+      // a door's picture when it lies in its doorway (D79).
+      if (!this.art) {
+        this.add.image(...centre(tile), markerKey(letter)).setDepth(2.8);
+        continue;
+      }
+      const door = this.map.things.find(
+        (thing) => thing.kind === 'door' && thing.tile[0] === tile[0] && thing.tile[1] === tile[1],
+      );
+      const picture = door ? this.things.get(door.id) : undefined;
+      drawMark(this, centre(tile), this.still, picture ? picture.depth + 0.0002 : 2.9);
+    }
+    this.parentNode.dataset.marks = this.map.markers.map(([, tile]) => tile.join(',')).join(';');
     for (const actor of this.map.actors) {
       const key = actor.kind === 'friend' ? friendKey(actor.id) : actorKey(actor.kind);
       const sprite = this.figure(actor.id, key, actor.tile, actor.facing).setDepth(3);
@@ -409,10 +422,15 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.zoom = String(camera.zoom);
   }
 
-  /** The camera back on the wizard, following it; in a story, on the story's tile. */
+  /** The camera back on the wizard, following it; in a story, with whoever the
+   * last step was about, or on the story's tile before any step. */
   follow(): void {
     const camera = this.cameras.main;
     if (this.options.story) {
+      if (this.focus) {
+        this.frame(this.focus, false);
+        return;
+      }
       camera.stopFollow();
       camera.centerOn(...centre(this.options.story.camera));
       this.parentNode.dataset.following = 'false';
@@ -425,6 +443,26 @@ class LevelScene extends Phaser.Scene {
 
   /** Whether the camera can zoom a step: never out so far that its window would
    * reach past the scene's edges and show the frame's colour beside it. */
+  /** The camera with a figure, a little above it, so that its words are in view:
+   * gliding there, or at once. */
+  private frame(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
+    const camera = this.cameras.main;
+    const lerp = instant ? 1 : 0.08;
+    camera.startFollow(sprite, true, lerp, lerp, 0, TILE * 0.75);
+    this.parentNode.dataset.following = 'true';
+  }
+
+  /** In a story, the camera goes to whoever the tick is about (D74): who speaks,
+   * walks, appears or turns. */
+  private frameStory(events: WorldEvent[], instant: boolean): void {
+    const about = [...events].reverse().find((event) => ['say', 'move', 'appear', 'face'].includes(event.kind));
+    if (!about) return;
+    const sprite = about.actor === 'wizard' ? this.wizard : this.actors.get(about.actor)?.sprite;
+    if (!sprite) return;
+    this.focus = sprite;
+    this.frame(sprite, instant);
+  }
+
   canZoomBy(step: 1 | -1): boolean {
     const next = this.zoomStep + step;
     const zoom = ZOOMS[next];
@@ -497,6 +535,7 @@ class LevelScene extends Phaser.Scene {
     this.clearBubble();
     this.clearThought();
     this.stopCast();
+    this.focus = null;
     this.seenBy = null;
     this.lit = !this.map.dark;
     this.shownTick = 0;
@@ -555,11 +594,16 @@ class LevelScene extends Phaser.Scene {
       // thing a spell pulls (D47).
       else if (event.kind === 'open') this.openDoor(String(event.data.id), instant, event.data.by === 'word');
       else if (event.kind === 'unsealed') this.unseal(String(event.data.id), instant);
+      // A word said to a door while its seal holds: the wizard thinks why nothing happened.
+      else if (event.kind === 'unheard') {
+        if (!instant) this.think(blockedText('unheard', 'door'), tick);
+      }
       else if (event.kind === 'pull') this.pull(event, instant);
       else if (event.kind === 'light') this.lit = true;
       else if (event.kind === 'hold') this.hold(event);
       else this.showActor(event, instant);
     }
+    if (this.options.story) this.frameStory(events, instant);
     this.publish();
   }
 
@@ -633,16 +677,34 @@ class LevelScene extends Phaser.Scene {
     delete this.parentNode.dataset.casting;
   }
 
-  /** A spell cast: a ring of light that grows from the wizard and fades (D42). */
-  private flash(duration: number): void {
-    const lift = this.art ? TILE * 0.5 : 6;
-    const ring = this.add.circle(this.wizard.x, this.wizard.y - lift, 10, 0xfff3bf, 0.8).setDepth(5);
+  /** The way the wizard faces, read from its figure. */
+  private wizardFacing(): Facing {
+    if (this.wizard.texture.key.startsWith('fig-')) return facingOf(this.wizard);
+    return isFacing(this.wizard.frame.name) ? this.wizard.frame.name : 'down';
+  }
+
+  /** A spell cast (D42, D81): a point of light leaves the wand's tip once the wand
+   * is pointed, flies a tile ahead, and bursts there in a ring that fades. */
+  private castLight(duration: number): void {
+    const [dx, dy] = DELTA[this.wizardFacing()];
+    const lift = this.art ? TILE * 0.55 : 6;
+    const [x0, y0] = [this.wizard.x + dx * TILE * 0.3, this.wizard.y - lift + dy * TILE * 0.15];
+    const [x1, y1] = [this.wizard.x + dx * TILE, this.wizard.y - lift + dy * TILE * 0.8];
+    const dot = this.add.circle(x0, y0, 5, 0xffffff, 1).setBlendMode(Phaser.BlendModes.ADD).setDepth(5);
+    const halo = this.add.circle(x0, y0, 11, 0xfff3bf, 0.6).setBlendMode(Phaser.BlendModes.ADD).setDepth(5);
     this.tweens.add({
-      targets: ring,
-      scale: 3,
-      alpha: 0,
-      duration,
-      onComplete: () => ring.destroy(),
+      targets: [dot, halo],
+      x: x1,
+      y: y1,
+      delay: duration * 0.2,
+      duration: duration * 0.45,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        dot.destroy();
+        halo.destroy();
+        const ring = this.add.circle(x1, y1, 8, 0xfff3bf, 0.9).setBlendMode(Phaser.BlendModes.ADD).setDepth(5);
+        this.tweens.add({ targets: ring, scale: 3, alpha: 0, duration: duration * 0.35, onComplete: () => ring.destroy() });
+      },
     });
   }
 
@@ -658,6 +720,7 @@ class LevelScene extends Phaser.Scene {
           this.placeWizard(to, facing ?? 'down');
           break;
         }
+        this.stopCast();
         this.placeWizard(from, facing ?? 'down');
         this.wizardTile = to;
         const [x, y] = this.figureAt(to);
@@ -708,14 +771,16 @@ class LevelScene extends Phaser.Scene {
         break;
       case 'cast':
         if (!instant) {
-          // The wand raised, pointed and lowered, on a sheet that has it.
+          // The wand raised, pointed and lowered, on a sheet that has it, taking
+          // longer than the tick so that the wand is seen out; its light flies.
           this.stopCast();
-          const timers = playCast(this, this.wizard, this.art?.figures?.standing ?? 1, duration);
+          const casting = this.playback.tickDuration * 1.6;
+          const timers = playCast(this, this.wizard, this.art?.figures?.standing ?? 1, casting);
           if (timers) {
             this.parentNode.dataset.casting = 'true';
-            this.casting = [...timers, this.time.delayedCall(duration, () => this.stopCast())];
+            this.casting = [...timers, this.time.delayedCall(casting, () => this.stopCast())];
           }
-          this.flash(duration);
+          this.castLight(timers ? casting : duration);
           play('cast');
         }
         break;
@@ -936,21 +1001,45 @@ class LevelScene extends Phaser.Scene {
     this.speaker = over;
     // A story's words may mark a word to type or a name in code; a bubble shows them plain.
     const plain = text.replace(/[`*_]/g, '');
-    const bubble = this.add
+    const words = this.add
       .text(0, 0, plain, {
         fontFamily: 'system-ui, sans-serif',
         fontSize: '15px',
         color: '#1f2330',
-        backgroundColor: '#ffffff',
-        padding: { x: 6, y: 3 },
         wordWrap: { width: TILE * (this.options.story ? 6 : 4) },
       })
-      .setDepth(10);
-    const below = !this.roomAbove(bubble.height);
-    bubble.setOrigin(0.5, below ? 0 : 1);
-    this.bubblePlace = { width: bubble.width, below };
-    bubble.setPosition(...this.bubbleAnchor());
-    this.bubble = bubble;
+      .setOrigin(0.5, 0);
+    const pad = 7;
+    const tail = 10;
+    const width = words.width + pad * 2;
+    const height = words.height + pad * 2;
+    // The box above who speaks, its tail pointing down at them; below them, when
+    // there is no room above, with the tail pointing up.
+    const below = !this.roomAbove(height + tail);
+    const top = below ? tail : -height - tail;
+    this.bubblePlace = { width, below };
+    const [x, y] = this.bubbleAnchor();
+    // The tail's tip is at the anchor, over who speaks, even where the box is held
+    // in from the scene's side.
+    const tip = Math.min(Math.max(over.x - x, -width / 2 + 12), width / 2 - 12);
+    const base = below ? top : top + height;
+    const box = this.add.graphics();
+    box.fillStyle(0xffffff, 1).lineStyle(2, 0x1f2330, 1);
+    box.fillRoundedRect(-width / 2, top, width, height, 8);
+    box.strokeRoundedRect(-width / 2, top, width, height, 8);
+    box.fillTriangle(tip - 7, base, tip + 7, base, tip, 0);
+    box.beginPath();
+    box.moveTo(tip - 7, base);
+    box.lineTo(tip, 0);
+    box.lineTo(tip + 7, base);
+    box.strokePath();
+    box.lineStyle(3, 0xffffff, 1);
+    box.beginPath();
+    box.moveTo(tip - 6, base);
+    box.lineTo(tip + 6, base);
+    box.strokePath();
+    words.setY(top + pad);
+    this.bubble = this.add.container(x, y, [box, words]).setDepth(10);
     this.bubbleUntil = tick + this.sayTicks;
     this.parentNode.dataset.bubble = plain;
     this.parentNode.dataset.speaker = who;

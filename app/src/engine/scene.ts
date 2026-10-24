@@ -150,6 +150,8 @@ class LevelScene extends Phaser.Scene {
     this.playback.onTick((tick, events, instant) => this.show(tick, events, instant));
     this.playback.onState((state) => {
       this.parentNode.dataset.state = state;
+      // A word said near the end of the run would stay for ever: it fades.
+      if (state === 'done') this.time.delayedCall(this.playback.tickDuration * SAY_TICKS, () => this.clearBubble());
     });
     this.restart();
     this.parentNode.dataset.state = this.playback.state;

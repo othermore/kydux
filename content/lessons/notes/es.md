@@ -4,7 +4,7 @@ A veces quieres escribir algo en tu programa para una persona. No es una instruc
 
 ---
 
-Un comentario siempre empieza con un `#`. El ordenador se lo salta. A partir de ahora, los programas pueden tener comentarios.
+Un comentario siempre empieza con un `#`. El ordenador se lo salta. A partir de ahora, a veces verás comentarios que te ayudan a resolver un nivel.
 
 ---
 

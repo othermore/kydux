@@ -12,11 +12,7 @@ The characters in a program are objects. A door is an object. A book is an objec
 wizard.move_right()
 ```
 
-The dot means the method belongs to the wizard. The brackets mean do the action now. There are four moves. They are `move_right`, `move_left`, `move_up`, and `move_down`. We write one step on one line.
-
----
-
-The notebook on your screen is very useful. It lists the actions your wizard knows. Open your notebook often.
+The dot means the method belongs to the wizard. The brackets mean do the action now. Here, your wizard knows four moves, so `wizard` has four methods: `move_right`, `move_left`, `move_up` and `move_down`. We write one step on one line.
 
 ---
 

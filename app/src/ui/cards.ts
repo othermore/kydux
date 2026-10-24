@@ -117,6 +117,8 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
 export interface WinCardParts {
   /** The stars earned and why (D57). */
   verdict: Verdict;
+  /** The stars the level had before this win: a win never shows fewer. */
+  kept: number;
   /** The address of what comes next, or null after the course's last item. */
   next: string | null;
   onAgain: () => void;
@@ -129,13 +131,18 @@ export interface WinCardParts {
 /** You did it, the stars and why, what the speaker says, what the child learned,
  * Play again, and Next; after the course's last item, the word that there is no
  * next yet and the way to the map. */
-export function winCard({ verdict, next, onAgain, onNext, said, learned }: WinCardParts): Card {
-  const { earned } = verdict;
+export function winCard({ verdict, kept, next, onAgain, onNext, said, learned }: WinCardParts): Card {
+  const earned = Math.max(verdict.earned, kept);
   const shown = element('p', { className: 'stars' }, [
     '★'.repeat(earned) + '☆'.repeat(MAX_STARS - earned),
   ]);
   shown.setAttribute('aria-label', t('level.stars', { n: earned }));
   shown.dataset.stars = String(earned);
+  // A level played again keeps the stars it had, whatever this run earned.
+  const keeping =
+    kept > verdict.earned
+      ? [element('p', { id: 'stars-kept', className: 'stars-kept' }, [t('stars.kept', { n: kept })])]
+      : [];
   // Each star's reason, kept or lost, so that the child knows what to try again for.
   const reasons = element(
     'ul',
@@ -159,6 +166,7 @@ export function winCard({ verdict, next, onAgain, onNext, said, learned }: WinCa
       element('h3', {}, [t('outcome.won')]),
       shown,
       reasons,
+      ...keeping,
       ...(said ? [saidBy(said, 'card-outro')] : []),
       ...(learned ? [element('p', { id: 'card-learned', className: 'card-learned' }, [learned])] : []),
       element('div', { className: 'card-buttons' }, [again, after]),

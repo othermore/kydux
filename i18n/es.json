@@ -182,7 +182,7 @@
     "intro": "Acabas de llegar al colegio. Cada paso que des aquí lo darás escribiendo Python.",
     "continue": "Continuar: {title}",
     "new": "Empezar desde el principio",
-    "new_confirm": "Esto borra todo lo que has hecho hasta ahora. ¿Empezar desde el principio?",
+    "new_confirm": "Esto borra todo lo que has hecho hasta ahora, y tu personaje. ¿Empezar desde el principio?",
     "settings": "Ajustes",
     "progress": "Tu progreso",
     "progress_about": "Tu progreso se guarda en este navegador. Para llevarlo a otro ordenador, expórtalo a un fichero e impórtalo allí.",
@@ -291,6 +291,7 @@
     "no_hints": "Sin pedir pistas",
     "clean": "Sin chocar con nada",
     "bonus": "El objetivo extra cumplido",
-    "first_try": "A la primera"
+    "first_try": "A la primera",
+    "kept": "Te quedas con las {n} estrellas que ya tenías."
   }
 }

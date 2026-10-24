@@ -182,7 +182,7 @@
     "intro": "You have just arrived at the school. Every step you take here, you take by writing Python.",
     "continue": "Continue: {title}",
     "new": "Start from the beginning",
-    "new_confirm": "This clears everything you have done so far. Start from the beginning?",
+    "new_confirm": "This clears everything you have done so far, and your wizard. Start from the beginning?",
     "settings": "Settings",
     "progress": "Your progress",
     "progress_about": "Your progress is kept in this browser. To take it to another computer, export it to a file and import it there.",
@@ -291,6 +291,7 @@
     "no_hints": "Solved without a hint",
     "clean": "Without bumping into anything",
     "bonus": "The extra goal met",
-    "first_try": "At the first try"
+    "first_try": "At the first try",
+    "kept": "You keep the {n} stars you had."
   }
 }

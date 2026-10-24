@@ -147,13 +147,12 @@ export function setWizard(made: Wizard): void {
   });
 }
 
-/** Start from the beginning: the course's progress cleared; the language, the
- * settings and the wizard the child chose kept. */
+/** Start from the beginning: the course's progress and the wizard cleared
+ * (D64); the language and the settings, the machine's, kept. */
 export function reset(): void {
   const kept = store.load();
   const fresh = defaultProgress();
   fresh.language = kept.language;
   fresh.settings = kept.settings;
-  fresh.wizard = kept.wizard;
   store.save(fresh);
 }

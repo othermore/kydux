@@ -4,7 +4,7 @@ Sometimes you want to write something in your program for a person. It is not an
 
 ---
 
-A comment always starts with a `#`. The computer skips it. From now on, programs may come with comments.
+A comment always starts with a `#`. The computer skips it. From now on, you will sometimes see comments that help you solve a level.
 
 ---
 

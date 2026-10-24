@@ -28,8 +28,8 @@ called Nuri meets you and teaches you the first steps.
 A chapter opens and closes with pages of story. Between them come lessons
 and levels, each numbered in the chapter: *Lesson 1*, *Practice 1*, and
 so on. A lesson is a few short pages. Each one explains one idea, with an
-example. On the last page, *Try it* opens the level that comes next, with
-the example already in the editor. Most levels are practices, a screen to
+example. On the last page, *Try it* opens the level that comes next, where
+you write your own program. Most levels are practices, a screen to
 solve. A *fix* level gives you a program that does not work, to repair. An
 *improve* level gives you one that works, to make better.
 

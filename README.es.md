@@ -30,7 +30,7 @@ Cada capítulo empieza y acaba con páginas de historia. Entre ellas vienen
 lecciones y niveles, numerados dentro del capítulo: *Lección 1*,
 *Práctica 1*, y así. Una lección son unas pocas páginas cortas. Cada una
 explica una idea, con un ejemplo. En la última página, *Probar* abre el
-nivel que viene después, con el ejemplo ya escrito en el editor. La
+nivel que viene después, donde escribes tu propio programa. La
 mayoría de los niveles son prácticas, una pantalla que resolver. Un
 *arreglo* te da un programa que no funciona, para repararlo. Una *mejora*
 te da uno que funciona, para hacerlo mejor.

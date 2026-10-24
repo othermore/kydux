@@ -1,8 +1,9 @@
 // Loading a lesson or a story page: lesson.json or story.json and its Markdown
 // in the player's language, from content/lessons/<id>/ or content/stories/<id>/
 // (D33, D56). Pages are separated by a line of `---`; a fenced block marked
-// `python try` on a lesson's last page is its Try it, which goes into the next
-// level's editor, and is not shown as a page's code. A story page has none.
+// `python try` on a lesson's last page is its example, shown as code: the
+// level after it starts with its own program, never with the example (D63). A
+// story page has none.
 
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
 

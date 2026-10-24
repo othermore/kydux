@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test.use({ locale: 'en-US' });
 
-test('a lesson turns its pages, theory first, and Try it opens the level with its example', async ({
+test('a lesson turns its pages, theory first, and Try it opens the level, its editor its own', async ({
   page,
 }) => {
   await page.goto('/#lesson/what-a-program-is');
@@ -23,7 +23,8 @@ test('a lesson turns its pages, theory first, and Try it opens the level with it
   await page.locator('#lesson-try').click();
   await expect(page).toHaveURL(/#level\/the-gate$/);
   await page.locator('#start').click();
-  await expect(page.locator('.cm-content')).toHaveText('wizard.move_right()');
+  // The gate starts with no program: the example stays in the lesson (D63).
+  await expect(page.locator('.cm-content')).toHaveText('');
 });
 
 test('a lesson read shows as done on the map, and opens its level', async ({ page }) => {

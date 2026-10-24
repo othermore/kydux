@@ -650,6 +650,11 @@ footer {
   letter-spacing: 6px;
 }
 
+.stars-kept {
+  margin: -8px 0 12px;
+  color: var(--muted);
+}
+
 .card-buttons {
   display: flex;
   gap: 10px;

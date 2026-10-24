@@ -38,11 +38,6 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
   const tryIt = () => {
     markRead();
     const next = parts.next;
-    if (next?.startsWith('level:') && lesson.tryCode !== null) {
-      const id = next.slice('level:'.length);
-      // The example goes into the level only when the child has typed nothing there.
-      if (progress.levelProgress(id).code === undefined) progress.setCode(id, lesson.tryCode);
-    }
     if (next) progress.setCurrent(next);
     location.hash = parts.onward ?? (next ? itemHash(next) : '#map');
   };

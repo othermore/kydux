@@ -144,9 +144,8 @@ content/
 
 Goals are declared (`reach`, `collect`, `open`, `say`, `give`, `no_bumps`,
 `not_seen_by`, `lines_under`, `numbers_under`, `uses`) and a level may add `goals.py` for one of its own. The lesson's
-Markdown, with no HTML in it, may hold one fenced block marked `python try`:
-*Try it* puts it in the next level's editor when the child has typed nothing
-there (D33). Within a chapter, stories go unnumbered and the rest are
+Markdown, with no HTML in it, may hold one fenced block marked `python try`,
+its example; the level after it starts with its own program (D33, D63). Within a chapter, stories go unnumbered and the rest are
 numbered by kind: *Lesson 1*, *Practice 1*, *Fix 1*, *Improve 1* (D56). `pack-world.mjs` writes the chapters, in the order of their
 directories, as `content/course.json`, the one order of the course (D32). A
 chapter's picture for the map comes with the art (phase 4); the map draws

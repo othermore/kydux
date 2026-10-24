@@ -92,13 +92,13 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await page.locator('#lesson-next').click();
     await shoot(page, 'lesson-last-page');
 
-    // Try it: the gate, its start card with the teacher's words, the example in the editor.
+    // Try it: the gate, its start card with Nuri's words, the editor empty (D63).
     await page.locator('#lesson-try').click();
     await expect(page.locator('.start-card h3')).toHaveText(words.gate);
     await expect(page.locator('#card-intro')).toContainText('Nuri');
     await shoot(page, 'start-card');
     await page.locator('#start').click();
-    await expect(page.locator('.cm-content')).toContainText('wizard.move_right()');
+    await expect(page.locator('.cm-content')).toHaveText('');
     await expect(page.locator('#scene')).toHaveAttribute('data-look', 'teal');
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');

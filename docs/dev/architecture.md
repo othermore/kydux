@@ -468,8 +468,8 @@ one overturns stays, marked as superseded.
   (`teaches`), and its text in `<lang>.md`, falling back to English. Its
   pages are separated by a line of `---`; the first page opens with its
   title as a `#` heading. A fenced block marked `python try` is the Try it:
-  it is shown as code, and Try it puts it in the next level's editor when
-  the child has typed nothing there. marked (`app/src/ui/lesson.ts`) turns
+  its example, shown as code; the level after it starts with its own
+  program (D63). marked (`app/src/ui/lesson.ts`) turns
   the Markdown into HTML, put in as it is: the lessons are the project's
   own, and `world/tests/test_course_content.py` refuses HTML in them, as
   well as a lesson missing in a language, pages that differ in number
@@ -809,11 +809,13 @@ one overturns stays, marked as superseded.
   UAT (sprint-10.md), built the same day. A win earns three stars and
   loses one for each of: a hint shown in the level; the winning run
   bumping into a wall, a door or a stair; and a bonus goal unmet, or, in a
-  level with no bonus goal, a run before the winning one (the progress
-  counts runs per level, `runs`). A win is one star at least.
-  `app/src/ui/stars.ts` judges, and the win card lists the three reasons,
-  kept or lost (`stars.<reason>`), so that the child knows what to try
-  again for; the progress keeps the most stars.
+  level with no bonus goal, a run before the winning one in the same visit
+  to the level (the progress also counts every run, `runs`). A win is one
+  star at least. `app/src/ui/stars.ts` judges, and the win card lists the
+  three reasons, kept or lost (`stars.<reason>`), so that the child knows
+  what to try again for. A level played again never loses: the progress
+  keeps the most stars, and the win card shows them, with a line that says
+  they are kept, when this run earned fewer.
 - **D60 — A lesson may teach a concept, which the notebook follows.**
   Decided 2026-10-22 by the owner's UAT (sprint-10.md), built the same
   day. `teaches` in `lesson.json` may name a concept beside the API's
@@ -874,3 +876,16 @@ one overturns stays, marked as superseded.
   told from one not yet rewritten; the same chapters are held to D60's
   concepts. An improve level asks for a clean run with the goal `no_bumps`,
   failed at the first bump.
+- **D63 — A level starts with its own program, never with a lesson's
+  example.** Decided 2026-10-22 by the owner's UAT (sprint-11.md). A lesson's
+  Try it is an example on its last page; the level after it opens with the
+  `starting_code` of its own text, which is empty, comments that say what
+  to do, or, in a fix or improve level, the program to work on. A practice
+  never gives part of its solution as code: what the child has to do is
+  said in comments. Rules out the example copied into the editor, which
+  left a fix level with half a program and a practice half done.
+- **D64 — Starting from the beginning forgets the wizard.** Decided 2026-10-22
+  by the owner's UAT (sprint-11.md). *Start from the beginning* clears the
+  progress and the wizard, after a word that says so, and the story opens
+  again from the letter to the creator. The language and the settings are
+  kept, since they are the machine's, not the game's.

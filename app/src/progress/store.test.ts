@@ -150,7 +150,7 @@ describe('the wizard (D36)', () => {
     expect(readWizard('Marta', looks)).toBeNull();
   });
 
-  it('is read as none in a document without one, and kept by a reset', () => {
+  it('is read as none in a document without one, and forgotten by a reset (D64)', () => {
     const storage = memoryStorage();
     storage.setItem('kydux.progress', JSON.stringify({ version: PROGRESS_VERSION }));
     expect(new LocalProgressStore(storage).load().wizard).toBeNull();
@@ -158,7 +158,7 @@ describe('the wizard (D36)', () => {
     progress.setWizard({ name: 'Marta', gender: 'girl', look: 'amber' });
     progress.markWon('a', 1, 'x');
     progress.reset();
-    expect(progress.wizard()?.name).toBe('Marta');
+    expect(progress.wizard()).toBeNull();
     expect(progress.levelProgress('a')).toEqual({});
   });
 });

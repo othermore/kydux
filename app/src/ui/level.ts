@@ -276,10 +276,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       ),
     );
   };
-  const showWin = (verdict: Verdict) =>
+  const showWin = (verdict: Verdict, kept: number) =>
     showCard(
       winCard({
         verdict,
+        kept,
         next: parts.next ? itemHash(parts.next) : null,
         onAgain: () => editor.focus(),
         onNext: (hash) => {
@@ -290,10 +291,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       }),
     );
 
-  // A run, counted in the progress, so that the stars know whether it was the first.
+  // A run, counted in the progress and in this visit: the first-try star asks
+  // whether this visit's first run won (D57).
+  let runsHere = 0;
   const runCode = () => {
     if (!controller.snapshot.canRun) return;
     progress.countRun(loaded.id);
+    runsHere += 1;
     controller.run(editor.getDoc());
   };
 
@@ -350,13 +354,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         renderHints();
       }
       if (!force && snapshot.outcome?.kind === 'won' && snapshot.world) {
-        // The runs before this one that did not win cost the first-try star (D57).
-        const misses = Math.max(0, (progress.levelProgress(loaded.id).runs ?? 1) - 1);
-        const verdict = judge({ world: snapshot.world, hintsShown, misses });
+        // The runs before this one in this visit cost the first-try star (D57).
+        const verdict = judge({ world: snapshot.world, hintsShown, misses: Math.max(0, runsHere - 1) });
+        const kept = progress.levelProgress(loaded.id).stars ?? 0;
         progress.markWon(loaded.id, verdict.earned, editor.getDoc());
         // Continue, on the start screen, goes to what comes after.
         if (parts.next) progress.setCurrent(parts.next);
-        showWin(verdict);
+        showWin(verdict, kept);
       } else if (!force && shownCard?.node.querySelector('.win-card')) {
         shownCard.close();
       }

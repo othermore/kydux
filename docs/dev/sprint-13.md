@@ -103,7 +103,12 @@ story screen with no way to replay a step (left out).
 - `docs/dev/story.md`: the two friends, with the boy's name from a brief
   to Gemini (`tools/write/briefs/story-bible.md` asks for three names
   that are words of neither language; the implementer picks one that is
-  not reserved and not forbidden). `i18n` gains `characters.<boy>`.
+  not reserved and not forbidden; the owner's example is Kidu). The bible
+  says where each friend is: the one of the other gender meets the wizard
+  at the gate and teaches chapters 1 and 3; the one of the wizard's own
+  gender is their dormitory mate, and comes into chapters 2 and 3 (the
+  library, the night out of bed), written in sprint 14. `i18n` gains
+  `characters.<boy>`.
 - `app/src/i18n/personal.ts`: `{friend}` and the double-braced choice;
   `friendOf(gender)` gives the friend's id and gender; the i18n check
   holds double braces to one bar, and Spanish `mago`/`maga` to single
@@ -258,7 +263,9 @@ story screen with no way to replay a step (left out).
 Chapters 2 and 3 on their paintings (sprint 14: the owner's choice on the
 long stairs and the two rooms, the darkness and the sight cones drawn
 above the cut-outs, a thing picked up staying gone, a goal to reach any
-of several cells); the art of the lessons, the start screen and the map
+of several cells); the second friend, the wizard's dormitory mate, written
+into chapters 2 and 3's stories and levels, with their texts briefed again
+(sprint 14, from the bible of 13.1); the art of the lessons, the start screen and the map
 (4.6); the story screen's replay of a step; chapters 4 and 5; the saved
 games on the server.
 

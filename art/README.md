@@ -52,7 +52,14 @@ A chapter's scene is one painting. Its map is read from the painting.
 4. Ask Gemini for an edit of the painting without each thing that opens
    or is picked up, one thing an edit. The edits must line up with the
    painting pixel for pixel.
-5. Run `tools/art/export_scene.py`. It writes the scene's files into
+5. Write the scene's settings, `art/scenes/<scene>/cut.json`, the field's
+   as the model: where its pictures are in `art/raw/`, each thing that
+   opens or is picked up (its box in cells, its row, its states and the
+   edit without it), the rows of the walls' tops (`cuts`), the row above
+   which the painting stays ground (`castle`), the patches of the ground,
+   and the colours the painting is read by (`thresholds`), when its light
+   is not the field's.
+6. Run `tools/art/export_scene.py <scene>`. It writes the scene's files into
    `content/art/scenes/<scene>/` and the check pictures into
    `art/raw/game-check/`. Its last step, `check`, also sweeps the scene
    (`tools/art/sweep.py`): it stands the wizard on every cell walked on,
@@ -60,7 +67,7 @@ A chapter's scene is one painting. Its map is read from the painting.
    lists the cells where the wizard is wholly hidden, and fails when a
    cut-out breaks one of the rules below. Run it after every export, and
    look at its sheet before anyone plays the scene.
-6. Place the levels on the new map, each starting where the one before
+7. Place the levels on the new map, each starting where the one before
    ended. A level's start, its mark, its things and its friend stand on
    free cells that no cut-out covers. `tests/project/test_art_content.py`
    checks both rules against the painting's cut-outs.
@@ -72,7 +79,7 @@ row its foot stands on.
 
 - **Nothing reaches below its own row.** A shadow that falls lower goes
   back to the ground, or is painted apart. A door may reach a little into
-  the cell below, its threshold (`reach` in `export_scene.py`); a figure
+  the cell below, its threshold (`reach` in the scene's `cut.json`); a figure
   standing there is drawn over it.
 - **A thing covers only the cells above it.** So it hides a figure that
   stands behind it, and a figure that stands in front of it is drawn over

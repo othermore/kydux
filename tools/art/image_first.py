@@ -27,9 +27,11 @@ A source folder may hold cut.json, which names its pictures (`gridded`,
 `nogrid`, `ground`), the boxes of the gate, the seal and the wand in cells
 (`boxes`), the rows where the walls' tops begin (`cuts`), the row above which
 the castle is left as ground (`castle`), the castle door's box (`door`), the
-things whose leaves are cut (`leaves`, all of them unless it says), and
-anything else for the page (`page`: the levels it plays, where the seal glows,
-where the wand lies); without it, the first painting's are taken.
+things whose leaves are cut (`leaves`, all of them unless it says), the
+colours the painting is read by (`thresholds`, THRESHOLDS for any left out),
+and anything else for the page (`page`: the levels it plays, where the seal
+glows, where the wand lies); without it, the first painting's are taken.
+tools/art/export_scene.py writes that folder from a scene's settings (D82).
 
 The cut-out is the difference between the painting and its ground. A pixel
 that differs strongly belongs to a thing, and stands on the row of the first
@@ -132,24 +134,83 @@ DEFAULTS = {
 }
 
 
-def green(image: np.ndarray) -> np.ndarray:
+#: The colours a painting is read by, the field's (D82): a scene painted in another
+#: light gives its own in its cut.json, each left out taken from here. Hues in
+#: degrees, saturations and values from 0 to 1: the lit grass and the dirt path,
+#: the darkness of an outline (no channel brighter than it), the leaves' green, and
+#: a shadow, the ground darkened evenly (its channels' ratios to the ground within
+#: `spread` of each other, their mean under `darker`).
+THRESHOLDS = {
+    "grass": {"hue": [50, 105], "saturation": 0.35, "value": 0.5},
+    "path": {"hue": [18, 48], "saturation": [0.33, 0.75], "value": 0.6},
+    "outline": 60,
+    "leaves": {"hue": [45, 140], "saturation": 0.25},
+    "shadow": {"spread": 0.16, "darker": 0.93},
+}
+
+
+def thresholds(given: dict | None = None) -> dict:
+    """The field's thresholds with a scene's own over them, each key by itself."""
+    out = {
+        key: (dict(value) if isinstance(value, dict) else value)
+        for key, value in THRESHOLDS.items()
+    }
+    for key, value in (given or {}).items():
+        if isinstance(value, dict) and isinstance(out.get(key), dict):
+            out[key].update(value)
+        else:
+            out[key] = value
+    return out
+
+
+def hsv_of(image: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Each pixel's hue in degrees, and its saturation and value from 0 to 1."""
+    hsv = np.array(Image.fromarray(image).convert("HSV")).astype(np.float32)
+    return hsv[..., 0] * 360 / 255, hsv[..., 1] / 255, hsv[..., 2] / 255
+
+
+def green(image: np.ndarray, th: dict = THRESHOLDS) -> np.ndarray:
     """The pixels coloured as leaves are, a crown's dark ones and its sunlit ones: any
     green of some colour, never a wall's grey stone."""
-    hsv = np.array(Image.fromarray(image).convert("HSV")).astype(np.float32)
-    h, sat = hsv[..., 0] * 360 / 255, hsv[..., 1] / 255
-    return (h > 45) & (h < 140) & (sat > 0.25)
+    h, sat, _ = hsv_of(image)
+    (low, high), least = th["leaves"]["hue"], th["leaves"]["saturation"]
+    return (h > low) & (h < high) & (sat > least)
 
 
-def groundlike(image: np.ndarray) -> np.ndarray:
+def groundlike(image: np.ndarray, th: dict = THRESHOLDS) -> np.ndarray:
     """The pixels coloured as the ground is: lit grass, a light yellow-green, and
     the dirt path's tan. A thing's own colours are darker greens, greys, browns
     and its dark outline; its sunlit leaves may look like grass, but lie inside
     the outline, and are filled in as a hole."""
-    hsv = np.array(Image.fromarray(image).convert("HSV")).astype(np.float32)
-    h, sat, v = hsv[..., 0] * 360 / 255, hsv[..., 1] / 255, hsv[..., 2] / 255
-    grass = (h > 50) & (h < 105) & (sat > 0.35) & (v > 0.5)
-    path = (h > 18) & (h < 48) & (sat > 0.33) & (sat < 0.75) & (v > 0.6)
-    return grass | path
+    h, sat, v = hsv_of(image)
+    grass, path = th["grass"], th["path"]
+    lawn = (
+        (h > grass["hue"][0])
+        & (h < grass["hue"][1])
+        & (sat > grass["saturation"])
+        & (v > grass["value"])
+    )
+    dirt = (
+        (h > path["hue"][0])
+        & (h < path["hue"][1])
+        & (sat > path["saturation"][0])
+        & (sat < path["saturation"][1])
+        & (v > path["value"])
+    )
+    return lawn | dirt
+
+
+def outline(image: np.ndarray, th: dict = THRESHOLDS) -> np.ndarray:
+    """The pixels of a painted outline: no channel brighter than the threshold."""
+    return image[..., :3].max(axis=2) < th["outline"]
+
+
+def darkened(painting: np.ndarray, ground: np.ndarray, th: dict = THRESHOLDS) -> np.ndarray:
+    """Where the painting is its ground in shadow: every channel darker by about as
+    much, as a shadow on the lawn is, and unlike a thing's own colours."""
+    ratio = (painting[..., :3].astype(np.float32) + 1) / (ground[..., :3].astype(np.float32) + 1)
+    spread, darker = th["shadow"]["spread"], th["shadow"]["darker"]
+    return ((ratio.max(axis=2) - ratio.min(axis=2)) < spread) & (ratio.mean(axis=2) < darker)
 
 
 def labels(mask: np.ndarray) -> np.ndarray:
@@ -215,10 +276,6 @@ def feet(marks: list[str], height: int, width: int, tile: int) -> np.ndarray:
     return cell_row[ys][:, xs]
 
 
-#: How dark a painted outline is: no channel brighter than this.
-OUTLINE = 60
-
-
 #: How wide a band of the scene's edge closes in a crown it cuts, in working pixels.
 EDGE_BAND = 32
 
@@ -251,14 +308,16 @@ def reached(
     return out & band
 
 
-def outlined(things: np.ndarray, crowns: np.ndarray, painting: np.ndarray) -> np.ndarray:
+def outlined(
+    things: np.ndarray, crowns: np.ndarray, painting: np.ndarray, th: dict = THRESHOLDS
+) -> np.ndarray:
     """What each crown's dark outline closes in, and the outline itself, that the
     cut-out leaves out: its sunlit leaves, coloured as grass, and the strokes on
     them. Each crown is looked at in its own box, a crown being the pixels of
     things within a tree's reach that touch; only what joins a crown is taken
     into it (spread)."""
     out = np.zeros_like(things)
-    dark = painting.max(axis=2) < OUTLINE
+    dark = outline(painting, th)
     # The crowns found on a coarse grid, and each one's box.
     step = 8
     coarse = crowns[::step, ::step]
@@ -479,8 +538,9 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
 
     painting = np.array(read(settings["nogrid"], tile))
     ground = np.array(read(settings["ground"], tile))
+    th = thresholds(settings.get("thresholds"))
     raw = difference(painting, ground)
-    mask = raw & ~groundlike(painting)
+    mask = raw & ~groundlike(painting, th)
     # The castle is ground: nothing of it is cut out, down to the foot of its walls.
     castle = round(settings["castle"] * tile)
     mask[:castle] = False
@@ -506,11 +566,11 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     # Over a wall, within a tree's reach, only the crown's leaves and the outline
     # next to them are the tree's: the stones stand on the wall's own row.
     on_wall = np.array([[ch == "#" for ch in row] for row in marks])[ys][:, xs]
-    leafy = (trunk >= 0) & on_wall & green(painting)
+    leafy = (trunk >= 0) & on_wall & green(painting, th)
     near_leaves = np.array(
         Image.fromarray(leafy.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(9))
     )
-    leafy |= (painting.max(axis=2) < OUTLINE) & (near_leaves > 0)
+    leafy |= outline(painting, th) & (near_leaves > 0)
     depth = np.where((trunk >= 0) & on_wall & ~leafy, stands_on, depth)
     # A thing's pixels are the small grid's, kept to a few pixels round the mask,
     # so that its edge is the mask's and the pinholes inside it are filled. On
@@ -518,9 +578,8 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     # shadow), and the shadow on a cell walked on beside a thing's foot.
     near = np.array(Image.fromarray(mask.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(9)))
     body = up(lab > 0) & (near > 0)
-    ratio = (painting.astype(np.float32) + 1) / (ground.astype(np.float32) + 1)
-    darkened = ((ratio.max(axis=2) - ratio.min(axis=2)) < 0.16) & (ratio.mean(axis=2) < 0.93)
-    lying = on_walked & (depth == own_row) & (trunk < 0) & darkened
+    shadow = darkened(painting, ground, th)
+    lying = on_walked & (depth == own_row) & (trunk < 0) & shadow
     # A hole a thing closes in is of it where the painting differs from its ground;
     # what lies between a crown's edges is only the crown's reach, never drawn: the
     # lawn between two bushes, or a wall's shadow between a wall and a crown, would
@@ -535,9 +594,9 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     rounded = np.array([[ch in "tr" for ch in row] for row in marks])
     on_round = rounded[np.clip(depth, 0, rows - 1), xs[None, :]] | (trunk >= 0)
     crown = np.where(things & on_round, depth, -1).astype(np.int16)
-    sunlit = outlined(things, crown >= 0, painting)
+    sunlit = outlined(things, crown >= 0, painting, th)
     grown = spread(crown, sunlit, SUNLIT_STEPS)
-    grown = spread(grown, raw & ~darkened & ~things, EDGE_STEPS)
+    grown = spread(grown, raw & ~shadow & ~things, EDGE_STEPS)
     added = (grown >= 0) & (crown < 0) & (own_row <= grown)
     depth = np.where(added, grown, depth)
     things |= added

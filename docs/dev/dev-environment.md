@@ -553,17 +553,28 @@ front matter names the service and the model. This draws it into
 .venv/bin/python tools/art/generate.py tools/art/prompts/image-first-field.md
 ```
 
-A painted scene is turned into the game's files by one command. It cuts
-the raised things by row, takes each changing thing from its edits, and
-writes `content/art/scenes/<scene>/` and the figures:
+A painted scene is turned into the game's files by one command, named by
+the scene's id. It reads the scene's settings in
+`art/scenes/<scene>/cut.json`: where its pictures are, its things, the
+colours it is read by. Then it cuts the raised things by row, takes each
+changing thing from its edits, and writes `content/art/scenes/<scene>/`:
 
 ```sh
-.venv/bin/python tools/art/export_scene.py all
+.venv/bin/python tools/art/export_scene.py the-field
 ```
 
-It also writes check pictures into `art/raw/game-check/`. Look at them
-before committing: every figure should be hidden by what stands in front
-of it and drawn over what stands behind it.
+It ends by checking the scene. It writes check pictures into
+`art/raw/game-check/`, among them `all-the-field.png`, the wizard on
+every cell walked on, and it fails if a cut-out would show a figure a
+problem. Look at the pictures before committing: every figure should be
+hidden by what stands in front of it and drawn over what stands behind
+it. `export_scene.py the-field check` checks again without cutting.
+
+The figures are no scene's, and are made apart:
+
+```sh
+.venv/bin/python tools/art/export_scene.py figures
+```
 
 The figures change with the look the child picks. Each look's sheet is
 the base sheet of its gender, recoloured. The friends' sheets are made the

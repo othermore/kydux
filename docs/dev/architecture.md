@@ -93,7 +93,9 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 Antigravity CLI), the art tools (art/: generate.py asks the
                 image services, cut.py and sprites.py cut what they draw,
                 map_from_image.py and image_first.py read a painting's grid and
-                cut its things, export_scene.py makes content/art/ and
+                cut its things, scene_settings.py reads a scene's settings
+                (art/scenes/<scene>/cut.json, D82), export_scene.py makes
+                content/art/ and
                 sweep.py stands the wizard on every cell of a scene to check
                 the cut, figures.py
                 makes the figures' sheets from the base sheets in art/figures/,
@@ -1183,3 +1185,20 @@ one overturns stays, marked as superseded.
   half-open state and the lit hall are edits of the painting, cut as the
   other states are. Rules out a spell seen only as a ring of light, and a
   door that changes in one frame.
+- **D82 — A scene's settings live beside its art, and the tools take the
+  scene's id.** Decided 2026-10-24 (sprint 14, 14.1). Everything the cut
+  and the export need of a scene that is its own, not the method's, is one
+  file in the repository, `art/scenes/<scene>/cut.json`: where its pictures
+  are in `art/raw/` (the painting without its grid, its grid, the
+  ground-only edit, an edit for each thing that opens or is picked up),
+  the things with their boxes, rows, states, `solid`, `hull`, `reach`,
+  `largest`, `whole_box` and `rune`, the rows of the walls' tops (`cuts`),
+  the row above which the painting is ground (`castle`), the patches of
+  its ground, the colours it is read by (`thresholds`: the lawn's and the
+  path's, an outline's darkness, the leaves' green, a shadow's), and its
+  SOURCE.md. The field's values are the defaults in
+  `tools/art/image_first.py`, so that a setting left out is the field's.
+  `tools/art/scene_settings.py` reads it; `export_scene.py <scene>` and
+  `sweep.py <scene>` take the scene's id, and the art tests run over
+  every scene that has settings and is exported. Rules out a scene cut by
+  editing the tools.

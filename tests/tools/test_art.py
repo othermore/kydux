@@ -299,6 +299,27 @@ def test_a_pixel_stands_on_the_first_cell_no_one_walks_on_below_it():
     assert depth[0, 2] == 2 and depth[2, 0] == 2 and depth[6, 2] == 3
 
 
+def test_a_scene_s_own_thresholds_are_used_and_the_rest_are_the_field_s():
+    # A grey-blue night lawn is no ground by the field's colours, and is by a
+    # scene's that says so.
+    lawn = np.full((4, 4, 3), (70, 90, 130), dtype=np.uint8)
+    assert not image_first.groundlike(lawn).any()
+    night = image_first.thresholds({"grass": {"hue": [200, 240], "value": 0.3}})
+    assert night["grass"]["saturation"] == image_first.THRESHOLDS["grass"]["saturation"]
+    assert night["outline"] == image_first.THRESHOLDS["outline"]
+    assert image_first.groundlike(lawn, night).all()
+
+
+def test_every_scene_s_settings_name_its_pictures_and_its_things():
+    for name in export_scene.scenes():
+        settings = scene_settings.settings(name)
+        assert {"folder", "edits", "painting", "grid", "ground"} <= set(settings.data["sources"])
+        for thing in settings.things.values():
+            assert len(thing["box"]) == 4 and isinstance(thing["row"], int)
+            assert thing["states"] and "without" in thing
+        assert settings.map.is_file(), name
+
+
 def test_the_strongest_differences_from_the_ground_are_kept_in_the_mask():
     # A pixel a hundred levels from its ground on every channel: tripled in its own
     # bytes it would wrap round below the threshold and be lost.
@@ -385,9 +406,24 @@ def test_a_flat_stone_is_not_walked_on_but_a_thing_may_lie_on_it(tmp_path):
 
 
 import export_scene  # noqa: E402
+import scene_settings  # noqa: E402
 import sweep  # noqa: E402
 
-FIELD = generate.REPO / "content" / "art" / "scenes" / "the-field"
+SCENE_ART = generate.REPO / "content" / "art" / "scenes"
+
+
+def scene_ids() -> list:
+    """Every scene with settings (D82), each skipped with its reason while it is
+    not exported."""
+    return [
+        pytest.param(
+            name,
+            marks=pytest.mark.skipif(
+                not (SCENE_ART / name / "art.json").is_file(), reason=f"{name} is not exported"
+            ),
+        )
+        for name in export_scene.scenes()
+    ]
 
 
 FIGURES = generate.REPO / "content" / "art" / "figures"
@@ -416,33 +452,35 @@ def test_a_solid_thing_s_mask_has_its_holes_filled():
     assert export_scene.filled_mask(mask)[27, 27]
 
 
-@pytest.mark.skipif(not (FIELD / "art.json").is_file(), reason="the field is not exported")
-def test_the_exported_field_keeps_its_contract_and_nothing_reaches_below_its_row():
-    art = json.loads((FIELD / "art.json").read_text())
+@pytest.mark.parametrize("scene", scene_ids())
+def test_an_exported_scene_keeps_its_contract_and_nothing_reaches_below_its_row(scene):
+    folder = SCENE_ART / scene
+    art = json.loads((folder / "art.json").read_text())
     cell, (columns, rows) = art["cell"], art["size"]
-    ground = Image.open(FIELD / art["ground"])
+    ground = Image.open(folder / art["ground"])
     assert ground.size == (columns * cell, rows * cell)
     for layer in art["rows"]:
-        image = Image.open(FIELD / layer["image"])
+        image = Image.open(folder / layer["image"])
         # The full width, from its top down to its row's bottom edge and no lower.
         assert image.width == columns * cell
         assert layer["top"] + image.height == (layer["row"] + 1) * cell
-    assert set(art["things"]) == {"gate", "seal_gate", "castle_door", "wand"}
+    things = export_scene.settings(scene).things
+    assert set(art["things"]) == set(things)
     for name, thing in art["things"].items():
-        # A thing may reach into the row below by what export_scene allows it (a
+        # A thing may reach into the row below by what its settings allow it (a
         # door's threshold), and no further.
-        reach = export_scene.THINGS[name].get("reach", 0.0)
+        reach = things[name].get("reach", 0.0)
         for state in thing["states"].values():
-            image = Image.open(FIELD / state)
+            image = Image.open(folder / state)
             assert thing["top"] + image.height <= round((thing["row"] + 1 + reach) * cell), name
-    assert (FIELD / art["source"]).is_file()
+    assert (folder / art["source"]).is_file()
 
 
-@pytest.mark.skipif(not (FIELD / "art.json").is_file(), reason="the field is not exported")
-def test_the_exported_field_shows_no_figure_a_problem_of_its_cut():
+@pytest.mark.parametrize("scene", scene_ids())
+def test_an_exported_scene_shows_no_figure_a_problem_of_its_cut(scene):
     # Floating pixels always; the lawn and the holes where the pictures the export
-    # cut the field from are there (art/raw, kept out of the repository).
-    found = sweep.problems(sweep.load("the-field"))
+    # cut the scene from are there (art/raw, kept out of the repository).
+    found = sweep.problems(sweep.load(scene))
     assert not found, "; ".join(str(problem) for problem in found)
 
 

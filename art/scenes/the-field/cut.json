@@ -1,0 +1,128 @@
+{
+  "about": "The field before the school's gate, chapter 1's scene: what the cut and the export need of it (D82). Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/image-first",
+    "edits": "art/raw/game-field",
+    "painting": "image-first-field-nogrid.png",
+    "grid": "grid.json",
+    "ground": "image-first-field-ground-2.png"
+  },
+  "things": {
+    "gate": {
+      "about": "Half open between closed and open, as the page shows it opening (13.9).",
+      "box": [
+        6.95,
+        15.9,
+        10.05,
+        20.0
+      ],
+      "row": 19,
+      "solid": false,
+      "without": "game-field-nogate.png",
+      "states": {
+        "closed": "painting",
+        "ajar": "game-field-gate-ajar.png",
+        "open": "game-field-gate-open.png"
+      }
+    },
+    "seal_gate": {
+      "about": "Down to its threshold, a little into the row below, drawn under whoever stands there; its mask filled from edge to edge in every row, since the wood near its latch is the colour of the sand behind. The painting draws this door's rune; the page draws one on the others (D79).",
+      "box": [
+        7.45,
+        10.35,
+        9.6,
+        12.25
+      ],
+      "row": 11,
+      "reach": 0.25,
+      "hull": true,
+      "solid": true,
+      "without": "game-field-noseal.png",
+      "states": {
+        "closed": "painting",
+        "open": null
+      },
+      "rune": "painted"
+    },
+    "castle_door": {
+      "about": "Open onto the lit hall; the dark doorway is the picture without the door, which the states are cut against.",
+      "box": [
+        7.45,
+        3.95,
+        9.6,
+        6.7
+      ],
+      "row": 6,
+      "solid": true,
+      "without": "game-field-castle-open.png",
+      "states": {
+        "closed": "painting",
+        "open": "game-field-castle-lit.png"
+      }
+    },
+    "wand": {
+      "about": "The flat stone it lies on stands with the bush below it, on row 15, and the wand lies on the stone, drawn just after it. The edit draws the stone again, a little differently: the whole of it comes from the edit, so that no two outlines meet.",
+      "box": [
+        11.9,
+        13.5,
+        14.1,
+        15.0
+      ],
+      "row": 15,
+      "solid": true,
+      "largest": true,
+      "whole_box": true,
+      "without": "game-field-nowand.png",
+      "states": {
+        "lying": "painting"
+      }
+    }
+  },
+  "cuts": [
+    10.55,
+    16.6
+  ],
+  "castle": 6.75,
+  "patches": [
+    [
+      764,
+      1134,
+      876,
+      1174
+    ]
+  ],
+  "thresholds": {
+    "grass": {
+      "hue": [
+        50,
+        105
+      ],
+      "saturation": 0.35,
+      "value": 0.5
+    },
+    "path": {
+      "hue": [
+        18,
+        48
+      ],
+      "saturation": [
+        0.33,
+        0.75
+      ],
+      "value": 0.6
+    },
+    "outline": 60,
+    "leaves": {
+      "hue": [
+        45,
+        140
+      ],
+      "saturation": 0.25
+    },
+    "shadow": {
+      "spread": 0.16,
+      "darker": 0.93
+    }
+  },
+  "source": "# The field before the school's gate\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`), from\n  `tools/art/prompts/image-first-field.md`, with the style-B sketch as its\n  reference, then edited by it without its grid\n  (`image-first-field-nogrid.md`), with the ground alone\n  (`image-first-field-ground.md`, `image-first-field-ground-2.md`), and with\n  each thing that opens or is picked up changed (`game-field-nogate.md`,\n  `game-field-gate-open.md`, `game-field-noseal.md`,\n  `game-field-castle-open.md`, `game-field-nowand.md`), the gate half open\n  (`game-field-gate-ajar.md`) and the castle's hall lit behind its open door\n  (`game-field-castle-lit.md`).\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n"
+}

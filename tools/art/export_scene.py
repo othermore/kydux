@@ -2,18 +2,24 @@
 """A scene painted first, and the figures, exported for the game (the owner's
 choice of 2026-10-23): what the page draws, at CELL pixels a cell.
 
-    tools/art/export_scene.py [scene | figures | check | all]
+    tools/art/export_scene.py <scene> [scene | check | all]
+    tools/art/export_scene.py figures
+
+A scene is named by its id, and everything of it that is its own is in its
+settings, art/scenes/<scene>/cut.json (D82): where its pictures are in
+art/raw/ (the painting without its grid, its grid, the ground-only edit, and
+an edit for each thing that opens or is picked up, without it or in another
+state), its things with their boxes, rows and states, the rows of its walls'
+tops, the row above which the painting is ground, the patches of its ground,
+the colours it is read by, and its SOURCE.md. The cells come from the scene's
+map, content/scenes/<scene>/map.txt, marked by hand, which the world plays on
+too. `all`, the default, is `scene` then `check`.
 
 `check` draws pictures of the exported scene to look at, then sweeps it
 (tools/art/sweep.py) and fails when its cut-outs would show a figure a
 problem: a shadow or a flower drawn in front, the lawn drawn in front, a hole.
 
-The scene, from art/raw/image-first/ (the painting without its grid, its grid,
-the ground-only edit), the scene's map, content/scenes/the-field/map.txt, whose
-cells were marked by hand and which the world plays on, and art/raw/game-field/ (the
-painting's edits, each with one thing changed: the gateway without its gate,
-the gate open, the arch without its sealed door, the castle's door open onto
-the dark, the flat stone without the wand). Writes content/art/scenes/the-field/:
+`scene` writes content/art/scenes/<scene>/:
 
 - ground.webp: the painting with everything that opens or is picked up taken
   out, each from the edit without it, so that no ghost of a leaf remains;
@@ -53,78 +59,17 @@ import figures as looks  # noqa: E402
 import image_first  # noqa: E402
 import sprites  # noqa: E402
 import sweep  # noqa: E402
+from scene_settings import Settings, scenes, settings  # noqa: E402
 
 REPO = HERE.parents[1]
 RAW = REPO / "art" / "raw"
-SOURCE = RAW / "image-first"
-EDITS = RAW / "game-field"
 WORK = RAW / "game"
-SCENE_OUT = REPO / "content" / "art" / "scenes" / "the-field"
-#: The scene's map, which the world plays on: the cells marked by hand, and the
-#: marks the painting is cut by.
-MAP = REPO / "content" / "scenes" / "the-field" / "map.txt"
 FIGURES_OUT = REPO / "content" / "art" / "figures"
 #: The page's pixels a cell.
 CELL = 96
 QUALITY = 86
 
-#: What opens or is picked up: its box in cells (x0, y0, x1, y1), the row its
-#: foot stands on, and its states, each the picture showing it, against the
-#: picture without it.
-THINGS = {
-    "gate": {
-        "box": (6.95, 15.9, 10.05, 20.0),
-        "row": 19,
-        "solid": False,
-        "without": "game-field-nogate.png",
-        # Half open between the two, as the page shows it opening (13.9).
-        "states": {
-            "closed": "painting",
-            "ajar": "game-field-gate-ajar.png",
-            "open": "game-field-gate-open.png",
-        },
-    },
-    "seal_gate": {
-        # Down to its threshold, a little into the row below, drawn under whoever
-        # stands there; its mask filled from edge to edge in every row, since the
-        # wood near its latch is the colour of the sand behind.
-        "box": (7.45, 10.35, 9.6, 12.25),
-        "row": 11,
-        "reach": 0.25,
-        "hull": True,
-        "solid": True,
-        "without": "game-field-noseal.png",
-        "states": {"closed": "painting", "open": None},
-        # The painting draws this door's rune; the page draws one on the others (D79).
-        "rune": "painted",
-    },
-    "castle_door": {
-        "box": (7.45, 3.95, 9.6, 6.7),
-        "row": 6,
-        "solid": True,
-        "without": "game-field-castle-open.png",
-        # Open onto the lit hall; the dark doorway is the picture without the door,
-        # which the states are cut against.
-        "states": {"closed": "painting", "open": "game-field-castle-lit.png"},
-    },
-    "wand": {
-        "box": (11.9, 13.5, 14.1, 15.0),
-        # The flat stone it lies on stands with the bush below it, on row 15, and
-        # the wand lies on the stone, drawn just after it.
-        "row": 15,
-        "solid": True,
-        "largest": True,
-        # The edit draws the stone again, a little differently: the whole of it
-        # comes from the edit, so that no two outlines meet.
-        "whole_box": True,
-        "without": "game-field-nowand.png",
-        "states": {"lying": "painting"},
-    },
-}
-#: Patches of the ground, in the page's pixels (x0, y0, x1, y1), each filled with
-#: the band of the same height right above it, faded into it: where an edit without
-#: a thing left a trace of it (the sealed gate's planks on the archway's floor).
-GROUND_PATCHES = ((764, 1134, 876, 1174),)
+
 FIGURES = ("wizard", "nuri", "wenna", "eldra", "dask")
 #: The figures every look and friend is recoloured from (tools/art/figures.py),
 #: kept in art/figures/ as their bases.
@@ -273,15 +218,17 @@ def clip_below(
     return out
 
 
-def composite(grid: dict) -> tuple[np.ndarray, dict[str, np.ndarray], dict[str, np.ndarray]]:
+def composite(
+    scene: Settings, grid: dict
+) -> tuple[np.ndarray, dict[str, np.ndarray], dict[str, np.ndarray]]:
     """The painting with what opens or is picked up taken out, each from the edit
     without it, in the painting's own pixels; and each thing's picture without it,
     and the mask of where it was."""
-    painting = np.array(Image.open(SOURCE / "image-first-field-nogrid.png").convert("RGB"))
+    painting = np.array(Image.open(scene.painting).convert("RGB"))
     ground = painting.copy()
     withouts, masks = {}, {}
-    for name, thing in THINGS.items():
-        without = np.array(Image.open(EDITS / thing["without"]).convert("RGB"))
+    for name, thing in scene.things.items():
+        without = np.array(Image.open(scene.edits / thing["without"]).convert("RGB"))
         box = native_box(grid, thing["box"])
         if thing.get("whole_box"):
             mask = in_box(painting.shape[:2], box)
@@ -296,10 +243,10 @@ def composite(grid: dict) -> tuple[np.ndarray, dict[str, np.ndarray], dict[str, 
     return ground, withouts, masks
 
 
-def patched(floor: Image.Image) -> Image.Image:
-    """The ground with each GROUND_PATCHES rectangle filled from the band below it."""
+def patched(floor: Image.Image, patches: list[tuple[int, int, int, int]]) -> Image.Image:
+    """The ground with each patch filled from the band right above it."""
     pixels = np.array(floor.convert("RGB"))
-    for x0, y0, x1, y1 in GROUND_PATCHES:
+    for x0, y0, x1, y1 in patches:
         height = y1 - y0
         above = pixels[y0 - height : y0, x0:x1].astype(np.float32)
         here = pixels[y0:y1, x0:x1].astype(np.float32)
@@ -315,50 +262,55 @@ def patched(floor: Image.Image) -> Image.Image:
     return Image.fromarray(pixels)
 
 
-def scene() -> Path:
-    grid = json.loads((SOURCE / "grid.json").read_text())
-    marks = [r for r in MAP.read_text().splitlines() if r]
+def scene(settings: Settings) -> Path:
+    grid = settings.grid
+    marks = settings.marks()
     rows, columns = len(marks), len(marks[0])
-    ground, withouts, _ = composite(grid)
+    ground, withouts, _ = composite(settings, grid)
     # The ground, cut by image_first.py into the rows of what stands up: from a
     # source folder holding the ground in place of the painting, with no box for
     # a gate or a seal, since nothing of them is left in it.
-    src = WORK / "field-src"
+    src = settings.src
     src.mkdir(parents=True, exist_ok=True)
     Image.fromarray(ground).save(src / "ground-composite.png")
-    shutil.copy(SOURCE / "grid.json", src / "grid.json")
-    shutil.copy(MAP, src / "marks.txt")
-    shutil.copy(SOURCE / "image-first-field-ground-2.png", src / "ground-only.png")
+    (src / "grid.json").write_text(json.dumps(grid))
+    shutil.copy(settings.map, src / "marks.txt")
+    shutil.copy(settings.ground_only, src / "ground-only.png")
     empty = [0, 0, 0, 0]
+    # A thing lying on a flat stone, cut whole from its box, stands the stone on
+    # its row; nothing is left of the things to cut.
+    lying = next((t["box"] for t in settings.things.values() if t.get("whole_box")), empty)
     cut = {
         "gridded": "ground-composite.png",
         "nogrid": "ground-composite.png",
         "ground": "ground-only.png",
-        "boxes": {"gate": empty, "seal": empty, "wand": list(THINGS["wand"]["box"])},
-        # The wand's box only stands the flat stone on its row; nothing is left to cut.
+        "boxes": {"gate": empty, "seal": empty, "wand": list(lying)},
         "leaves": [],
+        "cuts": settings.data.get("cuts", list(image_first.CUTS)),
+        "castle": settings.data.get("castle", image_first.DEFAULTS["castle"]),
+        "thresholds": settings.data.get("thresholds", {}),
     }
     (src / "cut.json").write_text(json.dumps(cut))
     keep = image_first.TILE
     image_first.TILE = CELL
     try:
-        field = json.loads(image_first.build(src, WORK / "field-cut").read_text())
+        field = json.loads(image_first.build(src, settings.cut).read_text())
     finally:
         image_first.TILE = keep
-    out = SCENE_OUT
+    out = settings.out
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
     width = columns * CELL
     floor = image_first.aligned(Image.fromarray(ground), grid, columns, rows, CELL)
-    floor = patched(floor)
+    floor = patched(floor, settings.patches)
     webp(floor, out / "ground.webp")
     rows_out = []
     for layer in field["layers"]:
         if not layer["name"].startswith("row "):
             continue
         row = layer["row"]
-        crop = Image.open(WORK / "field-cut" / layer["file"]).convert("RGBA")
+        crop = Image.open(settings.cut / layer["file"]).convert("RGBA")
         x, y = layer["at"]
         top = y
         strip = Image.new("RGBA", (width, (row + 1) * CELL - top), (0, 0, 0, 0))
@@ -373,13 +325,9 @@ def scene() -> Path:
         rows_out.append({"row": row, "image": f"row-{row}.webp", "top": top})
     # Each thing's states, at the page's size: the picture of the state where it
     # differs from the picture without the thing.
-    painting = np.array(Image.open(SOURCE / "image-first-field-nogrid.png").convert("RGB"))
-
-    def page(picture: np.ndarray) -> np.ndarray:
-        return np.array(image_first.aligned(Image.fromarray(picture), grid, columns, rows, CELL))
-
+    painting = np.array(Image.open(settings.painting).convert("RGB"))
     things = {}
-    for name, thing in THINGS.items():
+    for name, thing in settings.things.items():
         without = withouts[name]
         native = native_box(grid, thing["box"])
         box = tuple(round(v * CELL) for v in thing["box"])
@@ -397,7 +345,7 @@ def scene() -> Path:
                 # The open door is the dark where the closed door was.
                 shown, alpha = without, sprite_alpha(painting, without, native, thing)
             else:
-                shown = np.array(Image.open(EDITS / picture).convert("RGB"))
+                shown = np.array(Image.open(settings.edits / picture).convert("RGB"))
                 alpha = sprite_alpha(shown, without, native, thing)
             rgba = np.dstack([shown, (alpha * 255).astype(np.uint8)])
             sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
@@ -418,28 +366,9 @@ def scene() -> Path:
         "source": "SOURCE.md",
     }
     (out / "art.json").write_text(json.dumps(art, indent=2) + "\n")
-    (out / "SOURCE.md").write_text(SCENE_SOURCE)
+    (out / "SOURCE.md").write_text(settings.data["source"])
     return out / "art.json"
 
-
-SCENE_SOURCE = """# The field before the school's gate
-
-Kydux's own art, made for the game and under the GNU GPL, version 3 or
-later, like the rest of it.
-
-- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`), from
-  `tools/art/prompts/image-first-field.md`, with the style-B sketch as its
-  reference, then edited by it without its grid
-  (`image-first-field-nogrid.md`), with the ground alone
-  (`image-first-field-ground.md`, `image-first-field-ground-2.md`), and with
-  each thing that opens or is picked up changed (`game-field-nogate.md`,
-  `game-field-gate-open.md`, `game-field-noseal.md`,
-  `game-field-castle-open.md`, `game-field-nowand.md`), the gate half open
-  (`game-field-gate-ajar.md`) and the castle's hall lit behind its open door
-  (`game-field-castle-lit.md`).
-- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by
-  `tools/art/export_scene.py`.
-"""
 
 FIGURES_SOURCE = """# The figures
 
@@ -548,23 +477,29 @@ def figures() -> Path:
     return out / "figures.json"
 
 
-def main() -> int:
-    what = sys.argv[1] if len(sys.argv) > 1 else "all"
-    if what in ("scene", "all"):
-        print(scene().relative_to(REPO))
-    if what in ("figures", "all"):
+def main(arguments: list[str]) -> int:
+    if arguments[:1] == ["figures"]:
         print(figures().relative_to(REPO))
+        return 0
+    if not arguments or arguments[0] not in scenes():
+        print(f"usage: export_scene.py <{' | '.join(scenes())}> [scene | check | all]")
+        print("       export_scene.py figures")
+        return 2
+    settings_of = settings(arguments[0])
+    what = arguments[1] if len(arguments) > 1 else "all"
+    if what in ("scene", "all"):
+        print(scene(settings_of).relative_to(REPO))
     if what in ("check", "all"):
-        for path in checks():
+        for path in checks(settings_of):
             print(path.relative_to(REPO))
         # The wizard on every cell walked on, and the cut's problems it would show.
-        if sweep.main() != 0:
+        if sweep.main(settings_of.id) != 0:
             return 1
     return 0
 
 
 def draw(
-    folder: Path = SCENE_OUT,
+    folder: Path,
     figures_folder: Path = FIGURES_OUT,
     standing: list[tuple[str, int, int]] = (),
     states: dict[str, str] | None = None,
@@ -603,11 +538,13 @@ def draw(
     return picture
 
 
-def checks(out: Path = RAW / "game-check") -> list[Path]:
+def checks(settings: Settings, out: Path = RAW / "game-check") -> list[Path]:
     """Pictures of the exported scene with figures standing behind and in front of
-    what stands up, at the levels' starts, and the things open and shut."""
-    marks = [r for r in MAP.read_text().splitlines() if r]
-    walked = sweep.walks("the-field")
+    what stands up, at the levels' starts, and the things open and shut, each named
+    after the scene."""
+    marks = settings.marks()
+    rows, columns = len(marks), len(marks[0])
+    walked = sweep.walks(settings.id)
     walk = {(x, y) for y, x in zip(*np.nonzero(walked), strict=True)}
     # Behind: a cell walked on just above a tree, a rock or a fence; in front: just below.
     behind, front = [], []
@@ -621,8 +558,9 @@ def checks(out: Path = RAW / "game-check") -> list[Path]:
     starts = []
     for path in sorted((REPO / "content" / "levels").glob("*/level.json")):
         level = json.loads(path.read_text())
-        if level.get("scene") == "the-field" and "start" in level:
+        if level.get("scene") == settings.id and "start" in level:
             starts.append((sweep.LOOK, *level["start"]))
+    opened = {name: "open" for name, thing in settings.things.items() if "open" in thing["states"]}
     out.mkdir(parents=True, exist_ok=True)
     written = []
     cell = CELL
@@ -630,34 +568,36 @@ def checks(out: Path = RAW / "game-check") -> list[Path]:
         ("behind", behind[::2], None),
         ("front", front[::2], None),
         ("starts", starts, None),
-        ("open", starts, {"gate": "open", "seal_gate": "open", "castle_door": "open"}),
+        ("open", starts, opened),
     ):
-        picture = draw(standing=standing, states=states)
-        target = out / f"{name}.png"
+        picture = draw(settings.out, standing=standing, states=states)
+        target = out / f"{settings.id}-{name}.png"
         small = picture.resize((picture.width // 2, picture.height // 2), Image.LANCZOS)
         small.save(target)
         written.append(target)
-    # Close looks at the gate, the seal, the wand and the castle door, shut and open.
-    for name, box in (
-        ("gate", (5, 15, 12, 22)),
-        ("seal", (5, 8, 12, 14)),
-        ("wand", (9, 11, 16, 17)),
-        ("castle", (5, 2, 12, 9)),
-    ):
-        x0, y0, x1, y1 = (v * cell for v in box)
-        near = [(sweep.LOOK, 8, box[3] - 2), ("nuri", 8, box[1] + 1)]
-        shut = draw(standing=near).crop((x0, y0, x1, y1))
-        opened = draw(
-            standing=near, states={"gate": "open", "seal_gate": "open", "castle_door": "open"}
-        ).crop((x0, y0, x1, y1))
+    # A close look at each thing, its box grown by two cells, shut and open, with a
+    # figure in front of it and one behind.
+    for name, thing in settings.things.items():
+        x0, y0, x1, y1 = thing["box"]
+        box = (
+            max(0, int(x0) - 2),
+            max(0, int(y0) - 2),
+            min(columns, int(np.ceil(x1)) + 2),
+            min(rows, int(np.ceil(y1)) + 2),
+        )
+        middle = int((x0 + x1) / 2)
+        near = [(sweep.LOOK, middle, box[3] - 2), ("nuri", middle, box[1] + 1)]
+        crop = tuple(v * cell for v in box)
+        shut = draw(settings.out, standing=near).crop(crop)
+        open_ = draw(settings.out, standing=near, states=opened).crop(crop)
         both = Image.new("RGBA", (shut.width * 2 + 12, shut.height), (20, 20, 26, 255))
         both.alpha_composite(shut, (0, 0))
-        both.alpha_composite(opened, (shut.width + 12, 0))
-        target = out / f"close-{name}.png"
+        both.alpha_composite(open_, (shut.width + 12, 0))
+        target = out / f"{settings.id}-close-{name}.png"
         both.save(target)
         written.append(target)
     return written
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))

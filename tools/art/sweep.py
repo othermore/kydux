@@ -27,7 +27,8 @@ The problems, each on a cell walked on:
   wizard seen through them.
 
 The last two read the pictures the export cut the scene from
-(art/raw/game/field-src/), and are left out when they are not there.
+(art/raw/game/<scene>-src/), and are left out when they are not there. The
+colours an outline and a shadow are told by are the scene's (scene_settings).
 """
 
 import json
@@ -41,6 +42,7 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import image_first  # noqa: E402
+import scene_settings  # noqa: E402
 
 REPO = HERE.parents[1]
 CONTENT = REPO / "content"
@@ -82,6 +84,8 @@ class Scene:
     walked: np.ndarray
     ground: np.ndarray
     layers: list[Layer] = field(default_factory=list)
+    #: The colours the scene is read by (D82).
+    thresholds: dict = field(default_factory=image_first.thresholds)
 
 
 def walks(scene: str) -> np.ndarray:
@@ -100,6 +104,8 @@ def load(scene: str) -> Scene:
     columns, rows = art["size"]
     ground = np.array(Image.open(folder / art["ground"]).convert("RGBA"))
     found = Scene(scene, cell, columns, rows, walks(scene), ground)
+    if (scene_settings.SCENES / scene / "cut.json").is_file():
+        found.thresholds = scene_settings.settings(scene).thresholds
     for row in art["rows"]:
         rgba = np.array(Image.open(folder / row["image"]).convert("RGBA"))
         found.layers.append(
@@ -262,7 +268,7 @@ def outlined(
     rgba = layer.rgba
     height, width = rgba.shape[:2]
     solid = rgba[..., 3] > 128
-    dark = solid & (rgba[..., :3].max(axis=2) < image_first.OUTLINE)
+    dark = solid & image_first.outline(rgba, scene.thresholds)
     walls = dark | (solid & raw[:height, :width])
     for other in scene.layers:
         if other is not (whole or layer):
@@ -310,8 +316,8 @@ class Differs:
 def differs(scene: Scene) -> Differs | None:
     """The scene's differences from its ground; None when the pictures the export
     cut it from are not there."""
-    source = RAW / "game" / "field-src"
-    if scene.name != "the-field" or not (source / "ground-composite.png").is_file():
+    source = scene_settings.WORK / f"{scene.name}-src"
+    if not (source / "ground-composite.png").is_file():
         return None
     grid = json.loads((source / "grid.json").read_text())
 
@@ -320,8 +326,7 @@ def differs(scene: Scene) -> Differs | None:
         return np.array(image_first.aligned(image, grid, scene.columns, scene.rows, scene.cell))
 
     painting, ground = read("ground-composite.png"), read("ground-only.png")
-    ratio = (painting.astype(np.float32) + 1) / (ground.astype(np.float32) + 1)
-    shadow = ((ratio.max(axis=2) - ratio.min(axis=2)) < 0.16) & (ratio.mean(axis=2) < 0.93)
+    shadow = image_first.darkened(painting, ground, scene.thresholds)
     return Differs(image_first.difference(painting, ground), shadow)
 
 
@@ -477,7 +482,7 @@ def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
     return out
 
 
-def main(name: str = "the-field") -> int:
+def main(name: str) -> int:
     scene = load(name)
     found = covers(scene)
     for covered in found:
@@ -503,4 +508,7 @@ def main(name: str = "the-field") -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main(*sys.argv[1:2]))
+    if len(sys.argv) != 2:
+        print("usage: sweep.py <scene>")
+        sys.exit(2)
+    sys.exit(main(sys.argv[1]))

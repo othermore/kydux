@@ -1,13 +1,16 @@
 {
   "title": "The long corridor",
   "goals": [
-    "Reach the door at the end of the corridor.",
+    "Reach the door at the end.",
     "Do it in fewer than 2 lines."
   ],
-  "starting_code": "# Walk to the door at the end of the corridor.\nwizard.move_right()\n",
+  "starting_code": "# Tell the method how many steps to take\nwizard.move_right()\n",
   "hints": [
-    "How many tiles away is the door? Count them.",
-    "`move_right` can take a number: `wizard.move_right(2)` takes two steps."
+    "Count the tiles to the door.",
+    "Put the number of steps between the brackets.",
+    "You need to walk six steps to the right."
   ],
-  "intro": "A long corridor! Six lines would walk it. One line with a number walks it too."
+  "intro": "This path is very long. We can tell an action how much to do. Put a number inside the brackets.",
+  "outro": "You saved so much time! That door looks interesting.",
+  "learned": "Now you know that a number, which programmers call an argument, tells a method how much to do."
 }

@@ -1,12 +1,15 @@
 {
   "title": "El pasillo",
   "goals": [
-    "Llega al final del pasillo."
+    "Llega al final del camino."
   ],
-  "starting_code": "# A la derecha hasta la esquina, y luego hacia abajo hasta el final.\n",
+  "starting_code": "wizard.move_right()\n",
   "hints": [
-    "Camina primero a la derecha hasta la esquina, y luego hacia abajo.",
-    "Cada `move_down()` es un paso hacia abajo. ¿Cuántas casillas hay debajo de la esquina?"
+    "Necesitarás cuatro acciones en total.",
+    "Recuerda poner los paréntesis después de cada método.",
+    "Primero muévete a la derecha dos veces. Luego muévete hacia abajo dos veces."
   ],
-  "intro": "Este pasillo dobla una esquina. Cada línea mueve {al mago|a la maga} una casilla. Cuenta antes de escribir."
+  "intro": "Tenemos que seguir este camino por la esquina. Dale a tu {mago|maga} una acción para cada paso.",
+  "outro": "¡Llegaste al final del camino! Se te da muy bien escribir instrucciones.",
+  "learned": "Ahora sabes que una acción, que los programadores llaman método, necesita a alguien que la haga."
 }

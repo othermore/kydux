@@ -4,10 +4,13 @@
     "Open the gate.",
     "Walk through it."
   ],
-  "starting_code": "# Walk up to the gate, and say its word beside it.\n",
+  "starting_code": "# The secret word is ambrel\n# Stand beside the gate and say it\n",
   "hints": [
-    "The gate only hears a word said right beside it.",
-    "A word in the program goes between quotes, in the brackets of `wizard.say`. Capitals matter."
+    "First move right until you are next to the gate.",
+    "Use the `say` method with the string \"ambrel\".",
+    "After the gate opens, move two steps to the right. This lets you walk through it."
   ],
-  "intro": "This inner gate opens to a word, and the word is ambrel. Stand beside it and say it, just as I wrote it."
+  "intro": "An older pupil told me the secret word! It is ambrel. Stand right beside the gate and say it.",
+  "outro": "The gate opened! Arvelia is waiting for us on the other side.",
+  "learned": "Now you know that a word in quotes, which programmers call a string, can open a door."
 }

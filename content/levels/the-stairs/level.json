@@ -23,11 +23,15 @@
       "marker": "E"
     },
     {
+      "kind": "no_bumps"
+    },
+    {
       "kind": "lines_under",
       "lines": 5,
       "bonus": true
     }
   ],
   "tick_limit": 100,
-  "speaker": "ilda"
+  "speaker": "nuri",
+  "kind": "improve"
 }

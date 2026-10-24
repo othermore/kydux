@@ -56,12 +56,15 @@ test('the creator, and Done opens the first lesson by name', async ({ page }) =>
   await expect(page.locator('#wizard-preview-name')).toHaveText('Ana');
 
   await page.locator('#wizard-done').click();
-  await expect(page).toHaveURL(/#lesson\/what-a-program-is$/);
-  await expect(page.locator('.lesson-page')).toContainText('Welcome to Arvelia, Ana!');
+  // Chapter 1 opens at the gate, where Nuri greets the wizard by name.
+  await expect(page).toHaveURL(/#story\/at-the-gate$/);
+  await page.locator('#lesson-next').click();
+  await page.locator('#lesson-next').click();
+  await expect(page.locator('.lesson-page')).toContainText('Ana');
 
   await page.locator('#home').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Ana');
-  await expect(page.locator('#continue')).toHaveText('Continue: What a program is');
+  await expect(page.locator('#continue')).toHaveText('Continue: At the gate');
   await expect(page.locator('#change-wizard')).toBeVisible();
   expect(await robeColour(page, '#start-figure')).toBe('#3b8fd6');
 });
@@ -113,9 +116,11 @@ test('the scene draws the look chosen, and the words follow a girl in Spanish', 
   await page.goto('/#wizard');
   await makeWizard(page, 'Lucía', 'girl', 2);
   await page.locator('#wizard-done').click();
-  await expect(page).toHaveURL(/#lesson\/what-a-program-is$/);
+  await expect(page).toHaveURL(/#story\/at-the-gate$/);
+  await page.goto('/#lesson/what-a-program-is');
+  await page.locator('#lesson-next').click();
+  await expect(page.locator('.lesson-page')).toContainText('Tu maga, que eres tú');
   await page.goto('/#level/the-corridor');
-  await expect(page.locator('#card-intro')).toContainText('mueve a la maga');
   await page.locator('#start').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-look', 'sky');
   await context.close();

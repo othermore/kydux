@@ -12,7 +12,7 @@ test('a lesson turns its pages, theory first, and Try it opens the level with it
   // The idea comes before any code (D41).
   await expect(page.locator('.lesson-page pre')).toHaveCount(0);
   await page.locator('#lesson-next').click();
-  await expect(page.locator('.lesson-page h2')).toHaveText('A list of instructions');
+  await expect(page.locator('.lesson-page')).toContainText('A list of instructions is a program.');
   await expect(page.locator('.lesson-page pre')).toHaveCount(0);
   await page.locator('#lesson-next').click();
   await expect(page.locator('.lesson-page pre')).toContainText('wizard.move_right()');
@@ -31,9 +31,10 @@ test('a lesson read shows as done on the map, and opens its level', async ({ pag
   for (let turn = 0; turn < 3; turn += 1) await page.locator('#lesson-next').click();
   await page.locator('#lesson-map').click();
   const stops = page.locator('.stop');
-  await expect(stops.nth(0)).toHaveAttribute('data-state', 'done');
-  await expect(stops.nth(1)).toHaveAttribute('data-state', 'open');
-  await expect(stops.nth(1)).toContainText('The gate');
+  await expect(stops.nth(1)).toHaveAttribute('data-item', 'lesson:what-a-program-is');
+  await expect(stops.nth(1)).toHaveAttribute('data-state', 'done');
+  await expect(stops.nth(2)).toHaveAttribute('data-state', 'open');
+  await expect(stops.nth(2)).toContainText('The gate');
 });
 
 test('a lesson in Spanish', async ({ browser }) => {

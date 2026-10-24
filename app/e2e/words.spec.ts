@@ -11,7 +11,7 @@ async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'bo
 test('the words speak of a girl as a girl: a level\'s intro and the notebook', async ({ browser }) => {
   const page = await withWizard(browser, 'es-ES', 'girl');
   await page.goto('/#level/the-corridor');
-  await expect(page.locator('#card-intro')).toContainText('Cada línea mueve a la maga una casilla.');
+  await expect(page.locator('#card-intro')).toContainText('Dale a tu maga una acción para cada paso.');
   await page.locator('#start').click();
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook')).toContainText('El cuaderno de la maga');
@@ -21,23 +21,32 @@ test('the words speak of a girl as a girl: a level\'s intro and the notebook', a
 test('the words speak of a boy as a boy', async ({ browser }) => {
   const page = await withWizard(browser, 'es-ES', 'boy');
   await page.goto('/#level/the-corridor');
-  await expect(page.locator('#card-intro')).toContainText('Cada línea mueve al mago una casilla.');
+  await expect(page.locator('#card-intro')).toContainText('Dale a tu mago una acción para cada paso.');
   await page.context().close();
 });
 
-test('a lesson greets the wizard by name, in both languages', async ({ browser }) => {
-  for (const [locale, words] of [
-    ['es-ES', '¡Te damos la bienvenida a Arvelia, Marta!'],
-    ['en-US', 'Welcome to Arvelia, Marta!'],
+test('a story page greets the wizard by name, and Nuri is of the wizard\'s gender', async ({ browser }) => {
+  for (const [locale, gender, words] of [
+    ['es-ES', 'girl', 'No te preocupes, Marta.'],
+    ['es-ES', 'girl', 'Soy una alumna de primer año'],
+    ['es-ES', 'boy', 'Soy un alumno de primer año'],
+    ['en-US', 'girl', 'Do not worry, Marta.'],
   ] as const) {
-    const page = await withWizard(browser, locale, 'girl');
-    await page.goto('/#lesson/what-a-program-is');
-    await expect(page.locator('.lesson-page')).toContainText(words);
+    const page = await withWizard(browser, locale, gender);
+    await page.goto('/#story/at-the-gate');
+    await page.locator('#lesson-next').click();
+    await page.locator('#lesson-next').click();
+    await page.locator('#lesson-back').click();
+    await expect(page.locator('.lesson-page')).toContainText(words.startsWith('Soy') ? words : 'Nuri');
+    await page.locator('#lesson-next').click();
+    if (!words.startsWith('Soy')) await expect(page.locator('.lesson-page')).toContainText(words);
     await page.context().close();
   }
 });
 
-test('with no wizard yet, a lesson says the word for one', async ({ page }) => {
-  await page.goto('/#lesson/what-a-program-is');
-  await expect(page.locator('.lesson-page')).toContainText('Welcome to Arvelia, apprentice!');
+test('with no wizard yet, a story page says the word for one', async ({ page }) => {
+  await page.goto('/#story/at-the-gate');
+  await page.locator('#lesson-next').click();
+  await page.locator('#lesson-next').click();
+  await expect(page.locator('.lesson-page')).toContainText('Do not worry, apprentice.');
 });

@@ -155,6 +155,8 @@ def test_a_level_teaches_only_what_a_lesson_before_it_explained(path):
             lesson = json.loads((CONTENT / "lessons" / item_id / "lesson.json").read_text())
             explained.update(lesson["teaches"])
             continue
+        if kind != "level":
+            continue
         api = level_api(item_id)
         if item in chapter(path)["items"]:
             unexplained = [name for name in api if name not in explained]
@@ -174,3 +176,81 @@ def test_a_story_page_is_in_every_language_with_the_same_pages_no_html_and_no_tr
         prose = INLINE.sub("", FENCED.sub("", text))
         assert not HTML.search(prose), f"{path.name}/{lang}.md has HTML"
     assert len(set(counts.values())) == 1, f"{path.name}: pages differ, {counts}"
+
+
+def rewritten(chapter_path: Path) -> bool:
+    """A chapter in the shape of the owner's UAT (D56, D62): it opens with a story page.
+    The chapters not yet rewritten are held to it in their own sprint."""
+    items = chapter(chapter_path)["items"]
+    return bool(items) and items[0].startswith("story:")
+
+
+def concepts_used(code: str) -> set[str]:
+    """The concepts a piece of code needs known (D60): a comment, an action given
+    something in its brackets, a string, print."""
+    import ast
+    import io
+    import tokenize
+
+    used = set()
+    tokens = tokenize.generate_tokens(io.StringIO(code).readline)
+    if any(token.type == tokenize.COMMENT for token in tokens):
+        used.add("comments")
+    for node in ast.walk(ast.parse(code)):
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Attribute) and (node.args or node.keywords):
+                used.add("arguments")
+            if isinstance(node.func, ast.Name) and node.func.id == "print":
+                used.add("print")
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            used.add("strings")
+    return used
+
+
+def levels_with_concepts() -> list[tuple[Path, str, set[str]]]:
+    """Every level of a rewritten chapter, with the concepts known on reaching it."""
+    found, known = [], set()
+    for path in CHAPTERS:
+        for item in chapter(path)["items"]:
+            kind, _, item_id = item.partition(":")
+            if kind == "lesson":
+                lesson = json.loads((CONTENT / "lessons" / item_id / "lesson.json").read_text())
+                taught = lesson["teaches"]
+                known |= {n.split(":", 1)[1] for n in taught if n.startswith("concept:")}
+            elif kind == "level" and rewritten(path):
+                found.append((CONTENT / "levels" / item_id, item, set(known)))
+    return found
+
+
+@pytest.mark.parametrize(
+    ("directory", "item", "known"), levels_with_concepts(), ids=lambda v: getattr(v, "name", "")
+)
+def test_a_level_s_code_needs_only_the_concepts_taught_before_it(directory, item, known):
+    """A level's starting code and solution use no comment, argument, string or print
+    that a lesson before it has not explained (D60)."""
+    codes = {"solution": (directory / "solution.py").read_text(encoding="utf-8")}
+    for lang in LANGUAGES:
+        text = json.loads((directory / f"text.{lang}.json").read_text(encoding="utf-8"))
+        for gender in ("girl", "boy"):
+            codes[f"starting code, {lang}"] = for_wizard(text["starting_code"], gender)
+    for where, code in codes.items():
+        unknown = concepts_used(code) - known
+        assert not unknown, f"{item}'s {where} uses {sorted(unknown)} before a lesson explains it"
+
+
+@pytest.mark.parametrize("path", [p for p in CHAPTERS if rewritten(p)], ids=lambda p: p.name)
+def test_every_level_of_a_rewritten_chapter_closes(path):
+    """Every level says an outro and what was learned; the chapter's last level says
+    no learned, since the chapter's closing story page recaps (D62)."""
+    levels = [i.partition(":")[2] for i in chapter(path)["items"] if i.startswith("level:")]
+    for level_id in levels:
+        for lang in LANGUAGES:
+            text = json.loads(
+                (CONTENT / "levels" / level_id / f"text.{lang}.json").read_text(encoding="utf-8")
+            )
+            assert text.get("outro", "").strip(), f"{level_id} has no outro in {lang}"
+            if level_id == levels[-1]:
+                assert "learned" not in text, f"{level_id}, the chapter's last, says learned"
+            else:
+                assert text.get("learned", "").strip(), f"{level_id} says no learned in {lang}"
+    assert chapter(path)["items"][-1].startswith("story:"), "the chapter closes with a story page"

@@ -1,34 +1,24 @@
 # How much
 
-Some corridors are long.
-Writing the same line six times is slow.
-And it is easy to lose count.
-
-So an action can be told **how much** to do.
+Some paths are long. Writing the same line six times is slow. It is easy to miscount.
 
 ---
 
-## A number in the brackets
-
-Put a number between the brackets:
+An action can be told how much to do. You put a number in the brackets:
 
 ```python
 wizard.move_right(4)
 ```
 
-Now the wizard takes four steps to the right.
+This number is the how much, which programmers call an argument.
 
-The number is an **argument**.
-It is something you give the action, so that it knows how much to do.
-With no number, the wizard takes one step, as before.
+---
+
+An argument tells the method how much to do. If you give no number, your wizard takes one step. Let us try more steps.
 
 ---
 
 ## Try it
-
-The next corridor is long.
-One line can walk all of it.
-Change the number until the wizard reaches the end.
 
 ```python try
 wizard.move_right(3)

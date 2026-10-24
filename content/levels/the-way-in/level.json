@@ -2,7 +2,7 @@
   "id": "the-way-in",
   "map": [
     "###########",
-    "#S.G.W...##",
+    "#S.G.....##",
     "########A##",
     "#E.B.....##",
     "###########"
@@ -16,11 +16,6 @@
       "id": "gate",
       "marker": "G",
       "password": "ambrel"
-    },
-    {
-      "kind": "wand",
-      "id": "wand",
-      "marker": "W"
     },
     {
       "kind": "door",
@@ -42,7 +37,6 @@
     "wizard.move_up",
     "wizard.move_down",
     "wizard.say",
-    "wizard.pick_up",
     "wizard.cast"
   ],
   "goals": [
@@ -52,10 +46,14 @@
     },
     {
       "kind": "lines_under",
-      "lines": 11,
+      "lines": 9,
       "bonus": true
     }
   ],
   "tick_limit": 100,
-  "speaker": "ilda"
+  "speaker": "nuri",
+  "kind": "practice",
+  "carrying": [
+    "wand"
+  ]
 }

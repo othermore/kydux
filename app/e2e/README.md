@@ -20,19 +20,19 @@ npm run e2e
 ## The loop and its screenshots
 
 `loop.spec.ts` walks the whole game once in each language. It opens the game
-fresh, makes a wizard, reads the first lesson, fails the corridor once, asks
-for a hint, wins, goes on to the next lesson, and opens the map and the
-settings.
+fresh on the story's opening, makes a wizard, reads the story page at the
+gate and the first lesson, fails the gate once, asks for a hint, wins, goes
+on to the next lesson, and opens the map and the settings.
 
 At each step it saves a screenshot. They are for a person to look at: the
 test already checks what each step shows. They land in `shots/`, one folder
 per language, numbered in the order they were taken:
 
 ```
-app/e2e/shots/en/01-start.png
+app/e2e/shots/en/01-opening.png
 app/e2e/shots/en/02-creator.png
 ...
-app/e2e/shots/es/15-settings.png
+app/e2e/shots/es/16-settings.png
 ```
 
 Git ignores the folder. Each run of the loop replaces it, so the shots are

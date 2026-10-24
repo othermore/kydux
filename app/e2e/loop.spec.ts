@@ -14,7 +14,8 @@ const WORDS = {
   en: {
     opening: 'The letter',
     lesson: 'What a program is',
-    greeting: 'Welcome to Arvelia, Ada!',
+    story: 'At the gate',
+    greeting: 'Do not worry, Ada.',
     gate: 'The gate',
     won: 'You did it, Ada!',
     second: 'Objects and actions',
@@ -24,8 +25,9 @@ const WORDS = {
   es: {
     opening: 'La carta',
     lesson: 'Qué es un programa',
-    greeting: '¡Te damos la bienvenida a Arvelia, Ada!',
-    gate: 'El portón',
+    story: 'Ante la puerta',
+    greeting: 'No te preocupes, Ada.',
+    gate: 'La puerta',
     won: '¡Lo has conseguido, Ada!',
     second: 'Objetos y acciones',
     hello: 'Hola, Ada',
@@ -71,10 +73,17 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await page.locator('#wizard-looks .radio').nth(0).click();
     await shoot(page, 'creator');
 
-    // The first lesson, page by page; it greets the wizard by name.
+    // Chapter 1 opens at the gate, where Nuri greets the wizard by name.
     await page.locator('#wizard-done').click();
-    await expect(page.locator('.lesson-page h1')).toHaveText(words.lesson);
+    await expect(page.locator('.lesson-page h1')).toHaveText(words.story);
+    await shoot(page, 'at-the-gate');
+    await page.locator('#lesson-next').click();
+    await page.locator('#lesson-next').click();
     await expect(page.locator('.lesson-page')).toContainText(words.greeting);
+    await page.locator('#lesson-try').click();
+
+    // The first lesson, page by page.
+    await expect(page.locator('.lesson-page h1')).toHaveText(words.lesson);
     await shoot(page, 'lesson-first-page');
     await page.locator('#lesson-next').click();
     await shoot(page, 'lesson-second-page');
@@ -86,7 +95,7 @@ for (const [lang, words] of Object.entries(WORDS)) {
     // Try it: the gate, its start card with the teacher's words, the example in the editor.
     await page.locator('#lesson-try').click();
     await expect(page.locator('.start-card h3')).toHaveText(words.gate);
-    await expect(page.locator('#card-intro')).toContainText('Ilda');
+    await expect(page.locator('#card-intro')).toContainText('Nuri');
     await shoot(page, 'start-card');
     await page.locator('#start').click();
     await expect(page.locator('.cm-content')).toContainText('wizard.move_right()');
@@ -118,13 +127,12 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await expect(page.locator('.lesson-page h1')).toHaveText(words.second);
     await shoot(page, 'next-lesson');
 
-    // The map: the lesson and the corridor done, the second lesson open.
+    // The map: the story, the lesson and the gate done, the second lesson open.
     await page.locator('#lesson-map').click();
     const stops = page.locator('.stop');
-    await expect(stops.nth(0)).toHaveAttribute('data-state', 'done');
-    await expect(stops.nth(1)).toHaveAttribute('data-state', 'done');
-    await expect(stops.nth(2)).toHaveAttribute('data-state', 'open');
-    await expect(stops.nth(3)).toHaveAttribute('data-state', 'locked');
+    for (const done of [0, 1, 2]) await expect(stops.nth(done)).toHaveAttribute('data-state', 'done');
+    await expect(stops.nth(3)).toHaveAttribute('data-state', 'open');
+    await expect(stops.nth(4)).toHaveAttribute('data-state', 'locked');
     await shoot(page, 'map');
 
     // The start screen greets the wizard; the settings.

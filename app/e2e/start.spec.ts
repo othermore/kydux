@@ -23,9 +23,9 @@ test('the start screen opens the game, and Continue opens the first lesson', asy
 }) => {
   await page.goto('/');
   const go = page.locator('#continue');
-  await expect(go).toHaveText('Continue: What a program is');
+  await expect(go).toHaveText('Continue: At the gate');
   await go.click();
-  await expect(page.locator('.lesson-page h1')).toHaveText('What a program is');
+  await expect(page.locator('.lesson-page h1')).toHaveText('At the gate');
 });
 
 test('after a win, Continue names what comes next, and the title leads home', async ({ page }) => {
@@ -50,7 +50,7 @@ test('progress exported, cleared and imported comes back', async ({ page }) => {
   // A new game begins with the story again (D61); the wizard is kept.
   await expect(page).toHaveURL(/#story\/the-letter$/);
   await page.locator('#home').click();
-  await expect(page.locator('#continue')).toHaveText('Continue: What a program is');
+  await expect(page.locator('#continue')).toHaveText('Continue: At the gate');
 
   await page.locator('#import-file').setInputFiles(file as string);
   await expect(page.locator('#continue')).toHaveText('Continue: The stairs');
@@ -66,7 +66,7 @@ test('a file that is not progress is refused, and nothing changes', async ({ pag
   await expect(page.locator('#start-message')).toHaveText(
     'That file is not a Kydux progress file. Nothing has changed.',
   );
-  await expect(page.locator('#continue')).toHaveText('Continue: What a program is');
+  await expect(page.locator('#continue')).toHaveText('Continue: At the gate');
 });
 
 test('the start screen in Spanish', async ({ browser }) => {
@@ -74,9 +74,9 @@ test('the start screen in Spanish', async ({ browser }) => {
   await seedWizard(context);
   const page = await context.newPage();
   await page.goto('/');
-  await expect(page.locator('#continue')).toHaveText('Continuar: Qué es un programa');
+  await expect(page.locator('#continue')).toHaveText('Continuar: Ante la puerta');
   await expect(page.locator('#new')).toHaveText('Empezar desde el principio');
   await page.locator('#language').selectOption('en');
-  await expect(page.locator('#continue')).toHaveText('Continue: What a program is');
+  await expect(page.locator('#continue')).toHaveText('Continue: At the gate');
   await context.close();
 });

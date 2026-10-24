@@ -394,7 +394,8 @@ one overturns stays, marked as superseded.
   **notebook** (*cuaderno*), not a grimoire. Until this decision the
   game's texts, docstrings and plans said *spell* for *method* and *Cast*
   for *Run*; sprint 4 renames them. Rules out a word of the story's for a
-  mechanism of the language's.
+  mechanism of the language's. These are the proper
+  words; how a child reaches them, beside the easy word first, is D59.
 - **D28 — An action that cannot be done says why, where it happens.**
   Decided 2026-10-21 (sprint-4.md), on the owner's acceptance test of
   sprint 3. A `blocked` event is shown as a thought over the wizard, a grey
@@ -848,3 +849,24 @@ one overturns stays, marked as superseded.
   story's, a level's thing or actor, a spell, a password or one of the
   world's roles is refused (`tools/reserved_names.py`, written as
   `reserved.json` by `pack-world.mjs`, held to the content by a test).
+- **D59 — Easy word and technical word together, then the technical.**
+  Decided 2026-10-22 by the owner's UAT (sprint-10.md), built the same day.
+  Each idea has the child's word and the proper one: an action, which
+  programmers call a method; any character or thing in a program, an
+  object; a note, a comment; how much, the number in the brackets, an
+  argument; words in quotes, a string; a name for a value, a variable;
+  what a thing knows, an attribute; a question, an expression. The
+  chapter that introduces an idea uses both, side by side; the chapters
+  after it use the proper word alone. Gemini's rules (`tools/write/rules.md`)
+  and each chapter's brief carry the pairs; D27 keeps the proper words.
+- **D62 — Every level closes, and a chapter opens and closes.** Decided
+  2026-10-22 by the owner's UAT (sprint-10.md), built the same day. A
+  level's text has `outro`, said by its speaker on the win card, and
+  `learned`, one sentence of what the child now knows, shown under the
+  stars; a chapter's last level has no `learned`, since the chapter's
+  closing story page sums the chapter up. A chapter opens and closes with a
+  story page. The content tests hold a chapter to this when it opens with a
+  story page, which is how a chapter rewritten in the shape of the UAT is
+  told from one not yet rewritten; the same chapters are held to D60's
+  concepts. An improve level asks for a clean run with the goal `no_bumps`,
+  failed at the first bump.

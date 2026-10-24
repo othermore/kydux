@@ -1,13 +1,16 @@
 {
-  "title": "El pasillo largo",
+  "title": "El largo pasillo",
   "goals": [
-    "Llega a la puerta del final del pasillo.",
+    "Llega a la puerta del final.",
     "Hazlo en menos de 2 líneas."
   ],
-  "starting_code": "# Camina hasta la puerta del final del pasillo.\nwizard.move_right()\n",
+  "starting_code": "# Dile al método cuántos pasos dar\nwizard.move_right()\n",
   "hints": [
-    "¿A cuántas casillas está la puerta? Cuéntalas.",
-    "`move_right` puede llevar un número: `wizard.move_right(2)` da dos pasos."
+    "Cuenta las casillas hasta la puerta.",
+    "Pon el número de pasos entre los paréntesis.",
+    "Tienes que caminar seis pasos a la derecha."
   ],
-  "intro": "¡Un pasillo largo! Seis líneas lo recorren. Una sola línea con un número, también."
+  "intro": "Este camino es muy largo. Podemos decirle a una acción cuánto debe hacer. Pon un número dentro de los paréntesis.",
+  "outro": "¡Has ahorrado mucho tiempo! Esa puerta parece interesante.",
+  "learned": "Ahora sabes que un número, que los programadores llaman argumento, le dice a un método cuánto hacer."
 }

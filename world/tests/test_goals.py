@@ -209,3 +209,11 @@ def test_uses_is_met_when_the_code_names_the_member():
     )
     assert run_code(level, "print(wizard.position)\n").goals[1].met
     assert not run_code(level, "wizard.move_right()\n").goals[1].met
+
+
+def test_no_bumps_is_failed_at_the_first_bump_and_met_by_a_clean_run():
+    level = rooms({"kind": "reach", "marker": "E"}, {"kind": "no_bumps"})
+    bumped = run_code(level, "wizard.move_up()\nwizard.move_right(4)\n")
+    assert bumped.goals[1].failed and bumped.status != "won"
+    clean = run_code(level, "wizard.move_right(4)\n")
+    assert clean.goals[1].met and not clean.goals[1].failed

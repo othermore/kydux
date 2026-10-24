@@ -1,15 +1,15 @@
 {
   "title": "The way in",
   "goals": [
-    "Reach the castle's hall.",
-    "Do it in fewer than 11 lines."
+    "Reach the castle road.",
+    "Do it in fewer than 9 lines."
   ],
-  "starting_code": "# The gate listens, the wand waits, and two doors are sealed.\n",
+  "starting_code": "# A gate that listens waits for you\n# Two seals block the way beyond it\n",
   "hints": [
-    "Go one door at a time: what does each door want?",
-    "The wand lies beyond the gate. The seals come after it.",
-    "Count the tiles of each stretch, so that each one is a single line with its number."
+    "Walk right one step and say ambrel.",
+    "Walk to the first door and cast zelim.",
+    "Walk down two steps. Then move left four steps to the second door."
   ],
-  "intro": "This is the way into the castle. A gate that listens, a wand to find, and two seals. Everything you have learned, together.",
-  "outro": "You are in, {wizard}! This is the castle of Arvelia. Tomorrow, the library."
+  "intro": "We are almost at the castle. A gate that listens blocks the way. Two sealed doors block the way too. Show me what you can do!",
+  "outro": "We made it! The castle of Arvelia looks so big up close."
 }

@@ -1,32 +1,22 @@
-# Cosas que llevar
+# Cosas para llevar
 
-Arvelia está llena de cosas: llaves, libros, varitas.
-Una cosa está en una casilla del suelo.
-
-{El mago|La maga} puede llevar cosas.
-Para llevar una, se pone en su casilla, y la coge.
+Arvelia está llena de cosas. Encontrarás llaves, libros y varitas. Cada cosa es también un objeto. Cada cosa tiene un nombre.
 
 ---
 
-## Coger
+Puedes recoger una cosa. La cosa debe estar en tu casilla. También puede estar justo a tu lado. Escribes `wizard.pick_up()`.
 
-```python
-wizard.pick_up()
-```
+---
 
-Esta acción coge la cosa que hay en la casilla {del mago|de la maga}.
-Sus paréntesis están vacíos.
-Coge lo que tiene a sus pies, así que no hace falta decirle nada más.
+A veces hay varias cosas cerca. Debes pedir una. Usas el nombre de la cosa como argumento. Escribes `wizard.pick_up(key)`.
 
-Si no hay nada en la casilla, no hay nada que coger.
-{El mago|La maga} te lo dirá.
+---
+
+Te prestaré mi varita de repuesto. La he dejado cerca de la puerta. Por favor, recógela. Tendrás que devolvérmela algún día.
 
 ---
 
 ## Pruébalo
-
-Tu varita está a unas casillas.
-Camina primero hasta su casilla, y luego cógela.
 
 ```python try
 wizard.move_right(2)

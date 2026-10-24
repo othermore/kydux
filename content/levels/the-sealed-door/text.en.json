@@ -4,10 +4,13 @@
     "Break the door's seal.",
     "Walk through the door."
   ],
-  "starting_code": "# Pick up the wand, walk up beside the door, and cast the spell.\n",
+  "starting_code": "# Pick up the wand first\n# Then cast zelim beside the door\n",
   "hints": [
-    "A spell works only where the wizard stands: right beside the door.",
-    "The wand first: without it, the wizard does not know `cast`."
+    "Move to the wand and pick it up. Do this before going to the door.",
+    "Stand next to the sealed door before you cast the spell.",
+    "Use the `cast` method with \"zelim\" to break the seal. Then walk through."
   ],
-  "intro": "A sealed door. Can you see its rune? Only zelim breaks it, and only with the wand in hand."
+  "intro": "I set the wand down to show you something. A spell needs a wand. Pick it up and cast zelim at the sealed door.",
+  "outro": "The seal broke! The wand makes your words into magic.",
+  "learned": "Now you know that a spell is a string cast with a wand."
 }

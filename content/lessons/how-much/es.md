@@ -1,34 +1,24 @@
 # Cuánto
 
-Algunos pasillos son largos.
-Escribir la misma línea seis veces es lento.
-Y es fácil perder la cuenta.
-
-Por eso a una acción se le puede decir **cuánto** tiene que hacer.
+Algunos caminos son largos. Escribir la misma línea seis veces es lento. Es fácil contar mal.
 
 ---
 
-## Un número entre los paréntesis
-
-Pon un número entre los paréntesis:
+A una acción se le puede decir cuánto debe hacer. Pones un número dentro de los paréntesis:
 
 ```python
 wizard.move_right(4)
 ```
 
-Ahora {el mago|la maga} da cuatro pasos a la derecha.
+Este número es el cuánto, que los programadores llaman argumento.
 
-El número es un **argumento**.
-Es algo que le das a la acción, para que sepa cuánto tiene que hacer.
-Sin número, {el mago|la maga} da un paso, como antes.
+---
+
+Un argumento le dice al método cuánto hacer. Si no pones ningún número, tu {mago|maga} da un solo paso. Vamos a dar más pasos.
 
 ---
 
 ## Pruébalo
-
-El próximo pasillo es largo.
-Una sola línea puede recorrerlo entero.
-Cambia el número hasta que {el mago|la maga} llegue al final.
 
 ```python try
 wizard.move_right(3)

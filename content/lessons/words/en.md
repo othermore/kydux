@@ -1,39 +1,24 @@
 # Words
 
-So far, the program has told the wizard where to go.
-It can also tell the wizard what to **say**.
-
-Words in a program go between quotes: `"Hello!"`.
-Words in quotes are called a **string**: a string of letters, one after another.
+Your wizard can say things. Words in a program go between quotes. Words in quotes, which programmers call a string, keep the word exactly as it is.
 
 ---
 
-## Why the quotes
-
-Without quotes, the computer reads a word as an instruction, or as the name of something.
-With quotes, it keeps the word just as it is.
-It does not try to understand it.
-
-That is why capitals matter.
-To the computer, `"Hello"` and `"hello"` are not the same string.
+Without quotes, the computer reads a word as a name. It might read it as an instruction. With quotes, it keeps the word as it is, so capitals matter.
 
 ---
 
-## Saying something
+Just as `move_right` takes how much to move, the `say` method takes what to say:
 
 ```python
 wizard.say("Hello!")
 ```
 
-The wizard says the words in a bubble.
-The string goes in the brackets, as a number does: it is the action's argument.
+The string is its argument. Some doors in Arvelia listen for a word.
 
 ---
 
 ## Try it
-
-Some doors in Arvelia listen.
-Say the right word beside them, and they open.
 
 ```python try
 wizard.say("Hello!")

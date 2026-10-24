@@ -1,10 +1,13 @@
 {
   "id": "01-arrival",
   "items": [
+    "story:at-the-gate",
     "lesson:what-a-program-is",
     "level:the-gate",
-    "lesson:your-first-action",
+    "lesson:objects-and-actions",
     "level:the-corridor",
+    "lesson:notes",
+    "level:the-dark-note",
     "lesson:how-much",
     "level:the-long-corridor",
     "level:the-stairs",
@@ -14,6 +17,7 @@
     "level:the-pedestal",
     "lesson:your-first-spell",
     "level:the-sealed-door",
-    "level:the-way-in"
+    "level:the-way-in",
+    "story:up-to-the-castle"
   ]
 }

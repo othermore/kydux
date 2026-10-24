@@ -7,7 +7,8 @@ at. A bonus goal (`"bonus": true`) is not needed to win.
 
 The kinds: reach (a marker's tile, or one at x and y), collect (a thing by
 id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
-say (a text, word for word), give (a thing by id, to an actor by id),
+say (a text, word for word), give (a thing by id, to an actor by id), no_bumps
+(the wizard bumps into nothing; failed at the first bump),
 not_seen_by (an actor; failed when it catches the wizard), and three read
 from the code before the run: lines_under (fewer lines than that, not
 counting blank lines and comments), numbers_under (fewer numbers written in
@@ -145,6 +146,20 @@ class NotSeenByGoal:
         return world.caught_by == self.id
 
 
+class NoBumpsGoal:
+    """Met at the end of a run in which the wizard bumped into nothing; failed at the
+    first bump: what an improve level asks (D56)."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        pass
+
+    def check(self, world: "World") -> bool:
+        return world.finished and not self.failed(world)
+
+    def failed(self, world: "World") -> bool:
+        return any(e.actor == "wizard" and e.kind == "bump" for e in world.events)
+
+
 def code_lines(code: str) -> int:
     """How many lines of the child's code do something: not blank, not only a comment."""
     return sum(
@@ -233,6 +248,7 @@ GOALS: dict[str, type] = {
     "open": OpenGoal,
     "say": SayGoal,
     "give": GiveGoal,
+    "no_bumps": NoBumpsGoal,
     "not_seen_by": NotSeenByGoal,
     "lines_under": LinesUnderGoal,
     "numbers_under": NumbersUnderGoal,

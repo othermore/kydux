@@ -1,13 +1,17 @@
 {
-  "title": "La escalera",
+  "title": "Las escaleras",
   "goals": [
-    "Sube hasta lo alto de la escalera.",
+    "Sube hasta arriba.",
+    "No choques contra nada.",
     "Hazlo en menos de 5 líneas."
   ],
-  "starting_code": "# Arriba, derecha, arriba, derecha: una línea para cada tramo del camino.\nwizard.move_up(2)\n",
+  "starting_code": "# Esto llega arriba pero choca dos veces. Mejóralo.\nwizard.move_up(3)\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(2)\n",
   "hints": [
-    "Cuenta las casillas de cada tramo antes de escribir su línea.",
-    "Después de subir, {el mago|la maga} gira a la derecha: `move_right` con el número de casillas de ese tramo."
+    "Pulsa Ejecutar y mira dónde choca tu {mago|maga} contra el muro.",
+    "Cuenta las casillas de los pasos hacia arriba.",
+    "Cambia los dos argumentos de `move_up` por un 2."
   ],
-  "intro": "Esta escalera sube hacia arriba y a la derecha, dos veces. Cada tramo del camino es una línea, con su número."
+  "intro": "Este programa sube las escaleras. Pero choca contra los muros. Cambia los números para que tu {mago|maga} no choque.",
+  "outro": "¡Qué subida tan suave! Estás aprendiendo a probar y arreglar un programa.",
+  "learned": "Ahora sabes que puedes mejorar un programa probándolo y cambiando sus números, que los programadores llaman argumentos."
 }

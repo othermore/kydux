@@ -1,5 +1,5 @@
 {
-  "id": "your-first-action",
+  "id": "objects-and-actions",
   "teaches": [
     "wizard.move_left",
     "wizard.move_up",

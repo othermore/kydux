@@ -92,7 +92,7 @@ test('a level and a lesson say their number in the chapter (D56)', async ({ page
   await page.locator('#start').click();
   await expect(page.locator('#level-number')).toHaveText('Practice 2');
   await page.goto('/#lesson/how-much');
-  await expect(page.locator('#lesson-number')).toHaveText('Lesson 3');
+  await expect(page.locator('#lesson-number')).toHaveText('Lesson 4');
   await page.goto('/#map');
   await expect(page.locator('.stop[data-item="level:the-gate"] .stop-number')).toHaveText('Practice 1');
 });

@@ -1,12 +1,15 @@
 {
   "title": "The corridor",
   "goals": [
-    "Reach the end of the corridor."
+    "Reach the end of the path."
   ],
-  "starting_code": "# Right to the corner, then down to the end.\n",
+  "starting_code": "wizard.move_right()\n",
   "hints": [
-    "Walk right to the corner first, then down.",
-    "Each `move_down()` is one step down. How many tiles are there below the corner?"
+    "You will need four actions in total.",
+    "Remember to put the brackets after each method.",
+    "First move right twice. Then move down twice."
   ],
-  "intro": "This corridor turns a corner. Each line moves the wizard one tile. Count before you write."
+  "intro": "We need to follow this path round the corner. Give your wizard one action for every step.",
+  "outro": "You reached the end of the path! You are getting good at writing instructions.",
+  "learned": "Now you know that an action, which programmers call a method, needs someone to do it."
 }

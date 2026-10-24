@@ -1,13 +1,17 @@
 {
   "title": "The stairs",
   "goals": [
-    "Climb to the top of the stairs.",
+    "Climb to the top.",
+    "Do not bump into anything.",
     "Do it in fewer than 5 lines."
   ],
-  "starting_code": "# Up, right, up, right: one line for each stretch of the way.\nwizard.move_up(2)\n",
+  "starting_code": "# This reaches the top but bumps twice. Make it better.\nwizard.move_up(3)\nwizard.move_right(3)\nwizard.move_up(3)\nwizard.move_right(2)\n",
   "hints": [
-    "Count the tiles of each stretch before you write its line.",
-    "After going up, the wizard turns right: `move_right` with the number of tiles of that stretch."
+    "Press Run and watch where your wizard hits the wall.",
+    "Count the tiles for the upwards steps.",
+    "Change both `move_up` arguments to 2."
   ],
-  "intro": "These stairs climb up and to the right, twice. Each stretch of the way is one line, with its number."
+  "intro": "This program climbs the stairs. But it bumps into the walls. Change the numbers so the wizard does not bump.",
+  "outro": "Very smooth climbing! You are learning how to test and fix a program.",
+  "learned": "Now you know that you can make a program better by trying it and changing its numbers, which programmers call arguments."
 }

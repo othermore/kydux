@@ -1,13 +1,16 @@
 {
   "title": "The pedestal",
   "goals": [
-    "Pick up your wand.",
-    "Walk on to the end of the room."
+    "Pick up the wand.",
+    "Walk on to the end."
   ],
-  "starting_code": "# The wand is on its pedestal. Walk onto it, pick it up, and walk on.\n",
+  "starting_code": "# Walk to the stone. Pick up the wand. Keep going.\n",
   "hints": [
-    "The wizard picks up only what lies on its own tile.",
-    "Stop on the wand's tile, then `wizard.pick_up()`, then walk on."
+    "Move three steps to reach the stone.",
+    "Use the `pick_up` method to take the wand.",
+    "Move three more steps to the end of the path."
   ],
-  "intro": "In Arvelia, every apprentice has a wand. Yours is on that pedestal. Pick it up: you will need it soon."
+  "intro": "I set my spare wand on that stone for you. Go pick it up. I will lend it to you for now.",
+  "outro": "You have a wand! You will give it back to me one day. Let us keep moving.",
+  "learned": "Now you know that things you carry are objects too."
 }

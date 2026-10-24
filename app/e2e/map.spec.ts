@@ -8,10 +8,10 @@ test('the map shows the course in order: the first stop open, the rest locked', 
   await page.goto('/#map');
   await expect(page.locator('.map-chapter h2')).toHaveText(['Arrival', 'The library', 'The passages']);
   const first = page.locator('.stop').first();
-  await expect(first).toHaveAttribute('data-item', 'lesson:what-a-program-is');
+  await expect(first).toHaveAttribute('data-item', 'story:at-the-gate');
   await expect(first).toHaveAttribute('data-state', 'open');
-  await expect(first).toContainText('What a program is');
-  await expect(first.locator('.stop-icon.lesson')).toHaveCount(1);
+  await expect(first).toContainText('At the gate');
+  await expect(first.locator('.stop-icon.story')).toHaveCount(1);
   const gate = stop(page, 'level:the-gate');
   await expect(gate).toHaveAttribute('data-state', 'locked');
   await expect(gate).toContainText('The gate');

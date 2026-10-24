@@ -1,0 +1,30 @@
+# Objects and actions
+
+A program is a list of instructions. An instruction can be an action, which programmers call a method. A method needs someone to do it.
+
+---
+
+The characters in a program are objects. A door is an object. A book is an object. Your wizard is an object too. `move_right` is a method of the object `wizard`.
+
+---
+
+```python
+wizard.move_right()
+```
+
+The dot means the method belongs to the wizard. The brackets mean do the action now. There are four moves. They are `move_right`, `move_left`, `move_up`, and `move_down`. We write one step on one line.
+
+---
+
+The notebook on your screen is very useful. It lists the actions your wizard knows. Open your notebook often.
+
+---
+
+## Try it
+
+Walk down the corridor that turns a corner.
+
+```python try
+wizard.move_right()
+wizard.move_down()
+```

@@ -1,0 +1,15 @@
+{
+  "title": "La nota oscura",
+  "goals": [
+    "Llega al final del camino."
+  ],
+  "starting_code": "# Un paso está mal. Arréglalo.\nwizard.move_left()\nwizard.move_left()\nwizard.move_down()\nwizard.move_right()\n",
+  "hints": [
+    "Lee el código de arriba a abajo.",
+    "Mira lo que hace tu {mago|maga} cuando pulsas Ejecutar.",
+    "El último paso va en la dirección equivocada."
+  ],
+  "intro": "He dejado una nota en este programa para ayudarte. Lee primero la nota. Luego busca el error y arréglalo.",
+  "outro": "¡Has arreglado el programa perfectamente! Las notas hacen que todo sea mucho más fácil de entender.",
+  "learned": "Ahora sabes que una nota, que los programadores llaman comentario, ayuda a explicar un programa."
+}

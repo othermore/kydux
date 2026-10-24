@@ -1,12 +1,15 @@
 {
-  "title": "El portón",
+  "title": "La puerta",
   "goals": [
-    "Camina hasta el portón."
+    "Camina hacia la puerta."
   ],
-  "starting_code": "# El portón está a un paso, a la derecha.\n",
+  "starting_code": "",
   "hints": [
-    "{El mago|La maga} tiene que dar un paso, a la derecha.",
-    "La instrucción de la lección es la que sirve: `move_right` da un paso a la derecha."
+    "Mira en el cuaderno para ver qué acciones conoce tu {mago|maga}.",
+    "Necesitas una acción que te mueva a la derecha.",
+    "Usa la acción `move_right`."
   ],
-  "intro": "¡Hola, {wizard}! Este es el portón de Arvelia. Está a un solo paso."
+  "intro": "Podemos escribir nuestro primer programa aquí. Dile a tu {mago|maga} que dé un paso hacia la puerta.",
+  "outro": "¡Gran trabajo! La puerta sigue cerrada. Pero ahora puedes moverte. Tengo más cosas que enseñarte.",
+  "learned": "Ahora sabes que una lista de instrucciones es un programa."
 }

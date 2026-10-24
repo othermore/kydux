@@ -34,8 +34,8 @@ test.describe('in English', () => {
     expect(await page.evaluate(() => globalThis.crossOriginIsolated)).toBe(true);
     await expect(page.locator('#status')).toHaveText(/^Python 3\.14\.\d+ ready$/);
     await expect(scene(page)).toHaveAttribute('data-wizard', '1,1');
-    await expect(page.locator('.cm-content')).toContainText('# Walk to the door at the end of the corridor.');
-    await expect(page.locator('.goal').first()).toHaveText('Reach the door at the end of the corridor.');
+    await expect(page.locator('.cm-content')).toContainText('# Tell the method how many steps to take');
+    await expect(page.locator('.goal').first()).toHaveText('Reach the door at the end.');
   });
 
   test('the starting code takes one step, and the goal is not met', async ({ page }) => {
@@ -114,14 +114,14 @@ test('in Spanish, and switching to English keeps the code typed', async ({ brows
   const page = await context.newPage();
   await page.goto('/#level/the-long-corridor');
   await waitReady(page);
-  await expect(page.locator('.level-title')).toHaveText('El pasillo largo');
-  await expect(page.locator('.goal').first()).toHaveText('Llega a la puerta del final del pasillo.');
-  await expect(page.locator('.cm-content')).toContainText('# Camina hasta la puerta del final del pasillo.');
+  await expect(page.locator('.level-title')).toHaveText('El largo pasillo');
+  await expect(page.locator('.goal').first()).toHaveText('Llega a la puerta del final.');
+  await expect(page.locator('.cm-content')).toContainText('# Dile al método cuántos pasos dar');
   await expect(page.locator('#run')).toHaveText('Ejecutar');
 
   await page.locator('#language').selectOption('en');
   await expect(page.locator('.level-title')).toHaveText('The long corridor');
-  await expect(page.locator('.cm-content')).toContainText('# Walk to the door at the end of the corridor.');
+  await expect(page.locator('.cm-content')).toContainText('# Tell the method how many steps to take');
   await expect(page.locator('#run')).toHaveText('Run');
   await expect(page).toHaveTitle('Kydux — The long corridor');
 

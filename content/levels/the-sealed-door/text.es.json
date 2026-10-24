@@ -4,10 +4,13 @@
     "Rompe el sello de la puerta.",
     "Cruza la puerta."
   ],
-  "starting_code": "# Coge la varita, acércate hasta el lado de la puerta, y lanza el hechizo.\n",
+  "starting_code": "# Recoge la varita primero\n# Luego lanza zelim junto a la puerta\n",
   "hints": [
-    "Un hechizo solo funciona donde está {el mago|la maga}: justo al lado de la puerta.",
-    "Primero la varita: sin ella, {el mago|la maga} no conoce `cast`."
+    "Muévete hacia la varita y recógela. Haz esto antes de ir a la puerta.",
+    "Ponte al lado de la puerta sellada antes de lanzar el hechizo.",
+    "Usa el método `cast` con \"zelim\" para romper el sello. Luego cruza."
   ],
-  "intro": "Una puerta sellada. ¿Ves su runa? Solo zelim la rompe, y solo con la varita en la mano."
+  "intro": "He dejado la varita para enseñarte algo. Un hechizo necesita una varita. Recógela y lanza zelim a la puerta sellada.",
+  "outro": "¡El sello se rompió! La varita convierte tus palabras en magia.",
+  "learned": "Ahora sabes que un hechizo es una cadena lanzada con una varita."
 }

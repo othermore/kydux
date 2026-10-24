@@ -2,12 +2,15 @@
   "title": "La contraseña",
   "goals": [
     "Abre la puerta.",
-    "Pasa al otro lado."
+    "Cruza la puerta."
   ],
-  "starting_code": "# Camina hasta la puerta, y di su palabra a su lado.\n",
+  "starting_code": "# La palabra secreta es ambrel\n# Ponte al lado de la puerta y dila\n",
   "hints": [
-    "La puerta solo oye una palabra dicha justo a su lado.",
-    "Una palabra del programa va entre comillas, en los paréntesis de `wizard.say`. Las mayúsculas importan."
+    "Primero muévete a la derecha hasta estar junto a la puerta.",
+    "Usa el método `say` con la cadena \"ambrel\".",
+    "Después de que la puerta se abra, da dos pasos a la derecha. Esto te permite cruzarla."
   ],
-  "intro": "Esta puerta interior se abre con una palabra, y la palabra es ambrel. Ponte a su lado y dila, tal como la he escrito."
+  "intro": "¡Un alumno mayor me dijo la palabra secreta! Es ambrel. Ponte justo al lado de la puerta y dila.",
+  "outro": "¡La puerta se abrió! Arvelia nos espera al otro lado.",
+  "learned": "Ahora sabes que una palabra entre comillas, que los programadores llaman cadena, puede abrir una puerta."
 }

@@ -1,32 +1,22 @@
 # Things to carry
 
-Arvelia is full of things: keys, books, wands.
-A thing lies on a tile of the floor.
-
-The wizard can carry things.
-To carry one, the wizard stands on its tile, and picks it up.
+Arvelia is full of things. You will find keys, books, and wands. Each thing is an object too. Each thing has a name.
 
 ---
 
-## Picking up
+You can pick up a thing. The thing must be on your tile. It can also be right beside you. You write `wizard.pick_up()`.
 
-```python
-wizard.pick_up()
-```
+---
 
-This action picks up the thing on the wizard's tile.
-Its brackets are empty.
-The wizard picks up what is under its feet, so there is nothing more to tell it.
+Sometimes there are several things near you. You must ask for one. You put the thing's name as an argument. You write `wizard.pick_up(key)`.
 
-If there is nothing on the tile, there is nothing to pick up.
-The wizard will tell you so.
+---
+
+I will lend you my spare wand. I set it down near the gate. Please pick it up. You must give it back one day.
 
 ---
 
 ## Try it
-
-Your wand lies a few tiles away.
-Walk onto its tile first, and then pick it up.
 
 ```python try
 wizard.move_right(2)

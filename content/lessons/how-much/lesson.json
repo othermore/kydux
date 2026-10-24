@@ -1,7 +1,6 @@
 {
   "id": "how-much",
   "teaches": [
-    "wizard.move_right",
     "concept:arguments"
   ]
 }

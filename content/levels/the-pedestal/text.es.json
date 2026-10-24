@@ -1,13 +1,16 @@
 {
   "title": "El pedestal",
   "goals": [
-    "Coge tu varita.",
-    "Sigue hasta el final de la sala."
+    "Recoge la varita.",
+    "Camina hasta el final."
   ],
-  "starting_code": "# La varita está en su pedestal. Ponte encima, cógela, y sigue.\n",
+  "starting_code": "# Camina hasta la piedra. Recoge la varita. Sigue adelante.\n",
   "hints": [
-    "{El mago|La maga} solo coge lo que hay en su propia casilla.",
-    "Párate en la casilla de la varita, luego `wizard.pick_up()`, y luego sigue."
+    "Da tres pasos para llegar a la piedra.",
+    "Usa el método `pick_up` para coger la varita.",
+    "Da tres pasos más hasta el final del camino."
   ],
-  "intro": "En Arvelia, cada aprendiz tiene su varita. La tuya está en ese pedestal. Cógela: pronto la vas a necesitar."
+  "intro": "He dejado mi varita de repuesto en esa piedra para ti. Ve a cogerla. Te la prestaré por ahora.",
+  "outro": "¡Tienes una varita! Me la devolverás algún día. Sigamos avanzando.",
+  "learned": "Ahora sabes que las cosas que llevas también son objetos."
 }

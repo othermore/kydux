@@ -33,7 +33,8 @@ test('a Run during the playback starts the new run from the start', async ({ pag
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
   await setCode(page, 'wizard.move_right(8)');
   await page.locator('#run').click();
-  await expect(page.locator('#scene')).toHaveAttribute('data-tick', '2', { timeout: 10_000 });
+  // Under way: past its first steps, not yet at its end.
+  await expect(page.locator('#scene')).toHaveAttribute('data-tick', /^[2-7]$/, { timeout: 10_000 });
   await setCode(page, 'wizard.move_right(2)');
   await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText('Not yet: 0 of 1 goals met. Try again.', {

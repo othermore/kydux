@@ -1,32 +1,36 @@
 {
   "steps": {
     "scene": {
-      "title": "The scene",
-      "text": "This is where your program happens. You can drag the scene to look around and use the buttons to zoom."
+      "title": "The game scene",
+      "text": "Here you see the game and the characters of the game. You can drag the scene to look around, and zoom in or out with the `+` and `−` buttons."
     },
     "goals": {
-      "title": "Your goals",
-      "text": "These are the tasks you need to finish. A task gets a tick when it is done."
+      "title": "Your level goals",
+      "text": "These are the tasks you must finish to complete the level. The round mark that beats on the ground is the place the wizard must get to, and a goal is ticked when it is done."
     },
     "editor": {
-      "title": "The editor",
-      "text": "This is where you write your program. You type one instruction on each line."
+      "title": "The code editor",
+      "text": "This is where you write your program to control your wizard in the game. You write one instruction on each line, and with them you tell your wizard what to do."
     },
     "run": {
       "title": "Run and Restart",
-      "text": "To test your program, press the Run button. The Restart button puts everything back to the start."
+      "text": "The *Run* button makes the wizard do what the program says. The *Restart* button puts everything back where it started."
     },
     "notebook": {
       "title": "The notebook",
-      "text": "This list shows what your wizard can do. You can click an example to put it in the editor."
+      "text": "This button opens the *Notebook*. It lists what the wizard can do, each with an example, and clicking an example puts it right in the editor."
     },
     "hint": {
-      "title": "Hints and help",
-      "text": "The Hint button gives a clue when your code fails. The question mark opens this guide again."
+      "title": "The Hint button",
+      "text": "After a run that did not work, the *Hint* button gives you a clue. A clue costs one of the level's stars."
+    },
+    "about": {
+      "title": "The level card",
+      "text": "The `?` button shows the level's starting card again. It reminds you of what the level asks for, and lets you see this guide once more."
     },
     "method": {
       "title": "How we learn",
-      "text": "We try, we watch what happens and we try again. Now let us write your first instruction!"
+      "text": "Try, watch what happens, and try again! A run that does not work is how a wizard finds out what to change. Now we are going to write the first instruction."
     }
   }
 }

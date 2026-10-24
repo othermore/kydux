@@ -57,8 +57,8 @@ const SAY_TICKS = 3;
 export const VIEW_TILES: Tile = [15, 9];
 /** How long the scene takes to fade out and in when the level starts again, and how
  * long it stays out (D75). */
-const RESTART_FADE_MS = 180;
-const RESTART_HOLD_MS = 360;
+const RESTART_FADE_MS = 120;
+const RESTART_HOLD_MS = 160;
 /** How far, in pixels, the pointer moves before a press is a drag of the camera. */
 const DRAG_THRESHOLD = 6;
 /** The zooms the player steps through, from the whole scene to a close look. */

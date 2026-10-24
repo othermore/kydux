@@ -1,5 +1,5 @@
-// Every run starts the level again, and says so (D75); the win card's stars
-// are big, each drawn in after the one before.
+// Every run starts the level again, quickly, with a spinner (D75); the win card's
+// stars are big, each drawn in after the one before.
 
 import { expect, test } from '@playwright/test';
 import { seedWizard, skipGuide } from './helpers';
@@ -18,7 +18,10 @@ test('a run shows the level starting again before it plays, and Restart does too
   await page.keyboard.insertText('wizard.move_right()');
   await page.locator('#run').click();
   await expect(note).toBeVisible();
-  await expect(note).toHaveText('Starting the level again…');
+  // A spinner, no words on the screen; the words are for a screen reader.
+  await expect(note.locator('.restart-spinner')).toHaveCount(1);
+  await expect(note).toHaveText('');
+  await expect(note).toHaveAttribute('aria-label', 'Starting the level again…');
   await expect(page.locator('#scene')).toHaveAttribute('data-restarting', 'true');
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
   await expect(note).toBeHidden();

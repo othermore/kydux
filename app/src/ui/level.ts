@@ -212,10 +212,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
 
   // The notebook opens over the scene, beside the editor, so that an example
   // clicked lands where the child can see it.
-  // What the scene says while the level starts again before a run (D75).
-  const restartNote = element('p', { id: 'restart-note', className: 'restart-note', hidden: true }, [
-    t('level.starting_again'),
+  // What the scene shows while the level starts again before a run (D75): a
+  // spinner, its words only for a screen reader.
+  const restartNote = element('div', { id: 'restart-note', className: 'restart-note', hidden: true }, [
+    element('span', { className: 'restart-spinner' }),
   ]);
+  restartNote.setAttribute('role', 'status');
+  restartNote.setAttribute('aria-label', t('level.starting_again'));
   const sceneFrame = element('div', { className: 'scene-frame' }, [
     sceneParent,
     restartNote,
@@ -652,7 +655,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       editor.view.contentDOM.setAttribute('aria-label', t('level.code_label'));
       about.setAttribute('aria-label', t('level.about'));
       about.title = t('level.about');
-      restartNote.textContent = t('level.starting_again');
+      restartNote.setAttribute('aria-label', t('level.starting_again'));
       findWizard.textContent = t('level.find_wizard');
       timeline.setAttribute('aria-label', t('level.timeline'));
       labelSettings();

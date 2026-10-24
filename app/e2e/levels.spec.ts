@@ -58,12 +58,14 @@ test.describe('the locked door', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.move_up(3)\nwizard.move_right(3)\ndoor.open()');
     await page.locator('#run').click();
+    // The shake is short: looked for often, before the thought, which stays.
+    await expect
+      .poll(() => scene(page).getAttribute('data-shaking'), { intervals: [50], timeout: 15_000 })
+      .toBe('true');
     await expect(scene(page)).toHaveAttribute(
       'data-thought',
       'I cannot open the door: it is locked, and I have no key for it.',
-      { timeout: 15_000 },
     );
-    await expect(scene(page)).toHaveAttribute('data-shaking', 'true');
     await expect(page.locator('.outcome-text')).toContainText(
       'On line 3: I cannot open the door: it is locked',
       { timeout: 30_000 },

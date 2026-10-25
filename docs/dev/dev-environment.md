@@ -435,8 +435,10 @@ needs `sudo`.
    browser asks for the name and the password once, and remembers them.
 
 The site sends the same headers as the development server
-(`app/vite.config.ts`), so that stopping a runaway program works, and
-tells the browser to keep Pyodide and the content for a week.
+(`app/vite.config.ts`), so that stopping a runaway program works. The
+browser keeps the game's code for good, since a new build gives it new
+names. It asks again for everything else on each visit, so a friend sees
+a new build as soon as they reload.
 
 What a friend needs to know: the address, their name and password, and
 that their game lives in that browser on that computer. *Export* on the

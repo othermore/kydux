@@ -1230,9 +1230,15 @@ one overturns stays, marked as superseded.
   blurred round it, which Gemini paints the border of; then the model's
   picture laid on the canvas by the least difference, the seam measured
   cell by cell along the edge, and the scene's own painting kept inside,
-  pixel for pixel, joined to the border by a short fade. Nothing of the
-  margin rises into the playable area, so the margin is ground, drawn
-  under everything and never cut: `ground.webp` holds it, `art.json` says
+  pixel for pixel, joined to the border by a short fade. The seam does not
+  show: the painting's few outermost pixels are left out, since a model's
+  painting often has a dark line along its edge, and the cut-outs fade out
+  before them; and the border's colours are brought to the painting's
+  along the edge, by how far the model's own copy of the inside drifted
+  from the painting there. The margin is a little in shadow outward, as a
+  game shows what cannot be entered. Nothing of the margin rises into the
+  playable area, so the margin is ground, drawn under everything and
+  never cut: `ground.webp` holds it, `art.json` says
   its cells (`margin`, left, top, right, bottom) and the playable
   corner's place in the ground (`origin`), and the page draws the ground
   there and bounds the camera over it. The debug view numbers the

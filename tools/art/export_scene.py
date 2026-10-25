@@ -262,35 +262,58 @@ def patched(floor: Image.Image, patches: list[tuple[int, int, int, int]]) -> Ima
     return Image.fromarray(pixels)
 
 
-#: How wide, in the page's pixels, the playable ground fades into the margin's.
+#: How wide, in the page's pixels, the playable ground fades into the margin's, and
+#: how far the margin darkens outward, and how much (D83): what lies beyond the
+#: playable area is a little in shadow, as a game shows what cannot be entered.
 MARGIN_FADE = 20
+#: How wide, in the page's pixels, a cut-out fades out before the painting's edge.
+EDGE_FEATHER = 4
+SHADE_REACH = 2 * CELL
+SHADE = 0.8
 
 
-def with_margin(floor: Image.Image, margin: dict, scene: Settings) -> Image.Image:
+def painted_area(scene: Settings, columns: int, rows: int) -> np.ndarray:
+    """How far each pixel of the playable area, at the page's size, lies inside what
+    the painting holds, in pixels: the grid may begin a little outside the painting,
+    and the painting's own outermost pixels, margin.TRIM wide, are left out, since a
+    model's painting often has a dark line along its edge. Below zero is outside."""
+    import margin as margins
+
+    source = Image.open(scene.painting)
+    trim = margins.TRIM
+    white = Image.new("RGB", source.size, (0, 0, 0))
+    white.paste((255, 255, 255), (trim, trim, source.width - trim, source.height - trim))
+    seen = np.array(image_first.aligned(white, scene.grid, columns, rows, CELL)).min(axis=2) > 250
+    xs = np.nonzero(seen[seen.shape[0] // 2])[0]
+    ys = np.nonzero(seen[:, seen.shape[1] // 2])[0]
+    x0, x1, y0, y1 = xs[0], xs[-1], ys[0], ys[-1]
+    yy = np.arange(rows * CELL)[:, None]
+    xx = np.arange(columns * CELL)[None, :]
+    return np.minimum(np.minimum(yy - y0, y1 - yy), np.minimum(xx - x0, x1 - xx)).astype(
+        np.float32
+    )
+
+
+def with_margin(floor: Image.Image, margin: dict, inside: np.ndarray) -> Image.Image:
     """The ground with the margin round it (D83): the margin painting, joined to the
-    scene's painting by tools/art/margin.py, brought onto the page's grid, and the
-    playable ground laid in it at the margin's cells, faded in over its edge. The
-    grid may begin a little outside the painting, where the playable ground has
-    nothing of it: the fade begins where the painting does, and the margin's
-    painting, which holds it whole, shows there."""
+    scene's painting by tools/art/margin.py, brought onto the page's grid and a
+    little in shadow outward, and the playable ground laid in it at the margin's
+    cells, faded in from where the painting begins (`inside`, painted_area), the
+    margin's painting showing where the playable ground has none of it."""
     left, top, right, bottom = margin["cells"]
     grid = json.loads((REPO / margin["grid"]).read_text())
     columns, rows = floor.width // CELL, floor.height // CELL
     painting = Image.open(REPO / margin["painting"])
     out = image_first.aligned(painting, grid, columns + left + right, rows + top + bottom, CELL)
-    # Where the playable ground comes from the painting: a white picture of its size
-    # brought onto the page's grid as the ground was.
-    white = Image.new("RGB", Image.open(scene.painting).size, (255, 255, 255))
-    seen = np.array(image_first.aligned(white, scene.grid, columns, rows, CELL)).min(axis=2)
-    inside = seen > 250
-    xs = np.nonzero(inside[inside.shape[0] // 2])[0]
-    ys = np.nonzero(inside[:, inside.shape[1] // 2])[0]
-    x0, x1, y0, y1 = xs[0], xs[-1], ys[0], ys[-1]
-    yy, xx = np.arange(floor.height)[:, None], np.arange(floor.width)[None, :]
-    edge = np.minimum(np.minimum(yy - y0, y1 - yy), np.minimum(xx - x0, x1 - xx)).astype(
-        np.float32
-    )
-    alpha = Image.fromarray((np.clip(edge / MARGIN_FADE, 0, 1) * 255).astype(np.uint8))
+    # The shade: none at the playable area's edge, SHADE at SHADE_REACH beyond it.
+    pixels = np.array(out).astype(np.float32)
+    height, width = pixels.shape[:2]
+    gx = np.maximum(left * CELL - np.arange(width), np.arange(width) - (left + columns) * CELL)
+    gy = np.maximum(top * CELL - np.arange(height), np.arange(height) - (top + rows) * CELL)
+    gone = np.hypot(gx.clip(0)[None, :], gy.clip(0)[:, None])
+    shade = 1 - (1 - SHADE) * np.clip(gone / SHADE_REACH, 0, 1)
+    out = Image.fromarray((pixels * shade[..., None]).clip(0, 255).astype(np.uint8))
+    alpha = Image.fromarray((np.clip(inside / MARGIN_FADE, 0, 1) * 255).astype(np.uint8))
     out.paste(floor.convert("RGB"), (left * CELL, top * CELL), alpha)
     return out
 
@@ -338,8 +361,11 @@ def scene(settings: Settings) -> Path:
     floor = image_first.aligned(Image.fromarray(ground), grid, columns, rows, CELL)
     floor = patched(floor, settings.patches)
     margin = settings.data.get("margin")
+    # Where the painting holds the playable area: a cut-out fades out before its edge,
+    # so that nothing of what lies outside the painting is drawn (D83).
+    inside = painted_area(settings, columns, rows) if margin else None
     if margin:
-        floor = with_margin(floor, margin, settings)
+        floor = with_margin(floor, margin, inside)
     webp(floor, out / "ground.webp")
     rows_out = []
     for layer in field["layers"]:
@@ -354,7 +380,10 @@ def scene(settings: Settings) -> Path:
             crop.crop((0, 0, crop.width, min(crop.height, strip.height))), (x, 0)
         )
         pixels = np.array(strip)
-        pixels[..., 3] = (clip_below(pixels[..., 3] / 255, row, top) * 255).astype(np.uint8)
+        alpha = clip_below(pixels[..., 3] / 255, row, top)
+        if inside is not None:
+            alpha *= np.clip(inside[top : top + alpha.shape[0]] / EDGE_FEATHER, 0, 1)
+        pixels[..., 3] = (alpha * 255).astype(np.uint8)
         if not pixels[..., 3].any():
             continue
         webp(Image.fromarray(pixels), out / f"row-{row}.webp")

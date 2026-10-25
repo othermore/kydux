@@ -20,6 +20,14 @@ border meets the painting's edge, cell by cell, and writes the margin painting:
 the model's border round the scene's own painting, joined by a short fade. The
 inside is always the painting's, pixel for pixel, whatever the model did to it:
 the cut and the edits line up with the painting, not with the model's copy.
+
+Two things keep the seam from showing. The painting's own outermost pixels, a
+few wide, are left out (TRIM): a model's painting often has a dark line along
+its edge. And the border's colours are brought to the painting's along the
+seam: the model's copy of the inside, laid beside the painting itself, says
+how far its colours drifted at each place along the edge, and that drift,
+smoothed along the edge, is taken off the border, fully at the seam and less
+and less outward, gone REACH beyond it (`matched`). The shapes are the model's.
 Since nothing of the margin rises into the playable area, the margin is ground,
 drawn under everything, and is never cut.
 """
@@ -41,8 +49,17 @@ REPO = HERE.parents[1]
 #: there is said to be bad; and how wide that band is, in the painting's pixels.
 BAD = 0.2
 BAND = 60
-#: How wide the fade is where the inside meets the border, in the painting's pixels.
+#: How wide the fade is where the inside meets the border, in the painting's pixels,
+#: and how many of the painting's outermost pixels are left out before it.
 FADE = 40
+TRIM = 8
+#: The colours' drift along the seam: measured on a band this wide just inside
+#: the painting's edge, smoothed this far along the edge, taken off the border up
+#: to this far out, and never more than this, in the painting's pixels and levels.
+DRIFT_BAND = 110
+DRIFT_SMOOTH = 90
+REACH = 280
+DRIFT_MOST = 45.0
 
 
 def margin_of(settings: scene_settings.Settings) -> dict:
@@ -148,6 +165,73 @@ def seam(settings: scene_settings.Settings, whole: np.ndarray) -> list[tuple[str
     return found
 
 
+def smoothed(values: np.ndarray, radius: int) -> np.ndarray:
+    """A profile along an edge, (length, 3), smoothed by three passes of a running
+    mean `radius` wide each way: near a Gaussian, the ends held by their values."""
+    out = values.astype(np.float32)
+    for _ in range(3):
+        padded = np.concatenate(
+            [np.repeat(out[:1], radius, 0), out, np.repeat(out[-1:], radius, 0)]
+        )
+        sums = np.cumsum(np.concatenate([np.zeros((1, 3), np.float32), padded]), axis=0)
+        out = (sums[2 * radius + 1 :] - sums[: -2 * radius - 1]) / (2 * radius + 1)
+    return out
+
+
+def matched(whole: np.ndarray, painting: np.ndarray, ox: int, oy: int) -> np.ndarray:
+    """The laid picture with its border's colours brought to the painting's along
+    the seam: on each side, the drift of the model's copy of the inside from the
+    painting, averaged over a band inside the edge and smoothed along it, added to
+    the border, fully at the seam and less and less out to REACH. A corner's border
+    takes the drifts of its two sides, each by how near it is to that side."""
+    ph, pw = painting.shape[:2]
+    inside = whole[oy : oy + ph, ox : ox + pw].astype(np.float32)
+    drift = painting - inside
+    band = slice(TRIM, TRIM + DRIFT_BAND)
+    sides = {
+        "left": drift[:, band].mean(axis=1),
+        "right": drift[:, pw - TRIM - DRIFT_BAND : pw - TRIM].mean(axis=1),
+        "top": drift[band, :].mean(axis=0),
+        "bottom": drift[ph - TRIM - DRIFT_BAND : ph - TRIM, :].mean(axis=0),
+    }
+    sides = {
+        name: np.clip(smoothed(v, DRIFT_SMOOTH), -DRIFT_MOST, DRIFT_MOST)
+        for name, v in sides.items()
+    }
+    height, width = whole.shape[:2]
+    ys, xs = np.arange(height), np.arange(width)
+    # How far each column and row lies out of the painting, and on which side.
+    out_x = np.maximum(ox - xs, xs - (ox + pw - 1)).clip(0).astype(np.float32)
+    out_y = np.maximum(oy - ys, ys - (oy + ph - 1)).clip(0).astype(np.float32)
+    along_y = np.clip(ys - oy, 0, ph - 1)
+    along_x = np.clip(xs - ox, 0, pw - 1)
+    horizontal = np.where(
+        (xs < ox + pw // 2)[None, :, None],
+        sides["left"][along_y][:, None, :],
+        sides["right"][along_y][:, None, :],
+    )
+    vertical = np.where(
+        (ys < oy + ph // 2)[:, None, None],
+        sides["top"][along_x][None, :, :],
+        sides["bottom"][along_x][None, :, :],
+    )
+    beside_x = np.broadcast_to((out_x > 0)[None, :], (height, width))
+    beside_y = np.broadcast_to((out_y > 0)[:, None], (height, width))
+    inner = ~beside_x & ~beside_y
+    # Inside the painting, where the fade uses the border too, the nearer edge's
+    # drift is taken; beside it, the side's, and in a corner both, halved.
+    nearer_x = (
+        np.minimum(xs - ox, ox + pw - 1 - xs)[None, :]
+        <= np.minimum(ys - oy, oy + ph - 1 - ys)[:, None]
+    )
+    wx = np.where(inner, nearer_x, beside_x).astype(np.float32)[..., None]
+    wy = np.where(inner, ~nearer_x, beside_y).astype(np.float32)[..., None]
+    gone = np.hypot(out_x[None, :], out_y[:, None])
+    weight = np.clip(1 - gone / REACH, 0, 1)[..., None]
+    correction = (horizontal * wx + vertical * wy) / np.maximum(wx + wy, 1) * weight
+    return np.clip(whole.astype(np.float32) + correction, 0, 255)
+
+
 def join(settings: scene_settings.Settings, picture_path: Path) -> Path:
     grid, _, _, ox, oy = placed(settings)
     whole, difference = laid(settings, Image.open(picture_path).convert("RGB"))
@@ -158,8 +242,9 @@ def join(settings: scene_settings.Settings, picture_path: Path) -> Path:
     ph, pw = painting.shape[:2]
     yy, xx = np.arange(ph)[:, None], np.arange(pw)[None, :]
     edge = np.minimum(np.minimum(yy, ph - 1 - yy), np.minimum(xx, pw - 1 - xx)).astype(np.float32)
-    alpha = np.clip(edge / FADE, 0, 1)[..., None]
-    out = whole.astype(np.float32)
+    # The painting's outermost pixels left out, then faded in over FADE.
+    alpha = np.clip((edge - TRIM) / FADE, 0, 1)[..., None]
+    out = matched(whole, painting, ox, oy)
     inside = out[oy : oy + ph, ox : ox + pw]
     out[oy : oy + ph, ox : ox + pw] = painting * alpha + inside * (1 - alpha)
     margin = margin_of(settings)

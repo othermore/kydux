@@ -73,7 +73,12 @@ A chapter's scene is one painting. Its map is read from the painting.
    (the field's prompt is `tools/art/prompts/image-first-field-margin.md`),
    and join it with `tools/art/margin.py <scene> join <picture>`. The tool
    says where the border does not meet the painting's edge; ask again for
-   a border that breaks there, naming what the edge cuts. Then export.
+   a border that breaks there, naming what the edge cuts. It leaves out
+   the painting's few outermost pixels and brings the border's colours to
+   the painting's along the seam. Then export: the margin is drawn a
+   little in shadow outward. A scene painted from the start with its
+   margin, the next ones, has no seam at all: ask for the whole picture,
+   its playable area in the middle, and make every edit of it whole.
 8. Place the levels on the new map, each starting where the one before
    ended. A level's start, its mark, its things and its friend stand on
    free cells that no cut-out covers. `tests/project/test_art_content.py`

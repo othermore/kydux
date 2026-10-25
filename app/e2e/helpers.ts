@@ -29,6 +29,26 @@ export async function seedWizard(target: Page | BrowserContext, wizard: SeededWi
   }, document);
 }
 
+/** The wizard's acts (data-acting on the scene: `pickup`, `win`) recorded as
+ * they start, so that a test checks an act played even after it ended: a slow
+ * runner may finish a short act before the test looks. Called once the scene is
+ * on the page; the acts seen are read with actsSeen. */
+export async function watchActs(page: Page): Promise<void> {
+  await page.locator('#scene').evaluate((scene) => {
+    const seen: string[] = [];
+    (window as unknown as { kyduxActs: string[] }).kyduxActs = seen;
+    new MutationObserver(() => {
+      const act = scene.getAttribute('data-acting');
+      if (act && seen.at(-1) !== act) seen.push(act);
+    }).observe(scene, { attributes: true, attributeFilter: ['data-acting'] });
+  });
+}
+
+/** The acts the wizard has played since watchActs, in order. */
+export function actsSeen(page: Page): Promise<string[]> {
+  return page.evaluate(() => (window as unknown as { kyduxActs?: string[] }).kyduxActs ?? []);
+}
+
 /** What a story says at its step (D74): the voice's band, or what a figure says,
  * which the screen gives a screen reader beside the bubble. */
 export function storySaid(page: Page) {

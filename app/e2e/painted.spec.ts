@@ -5,7 +5,7 @@
 import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
-import { seedWizard, storyNext } from './helpers';
+import { actsSeen, seedWizard, storyNext, watchActs } from './helpers';
 
 const SHOTS = fileURLToPath(new URL('./shots/painted/', import.meta.url));
 mkdirSync(SHOTS, { recursive: true });
@@ -32,12 +32,13 @@ test('chapter 1 plays on the painted field', async ({ page }) => {
   await expect(page.locator('#scene')).toHaveAttribute('data-silhouette', 'true');
   await page.locator('.cm-content').click();
   await page.keyboard.insertText('wizard.say("ambrel")\nwizard.move_up(6)');
+  await watchActs(page);
   await page.locator('#run').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-doors', 'gate', { timeout: 30_000 });
   await page.waitForTimeout(1200);
   await page.screenshot({ path: `${SHOTS}02-through-the-gate.png` });
   // Won, the wizard celebrates before the win card (14.3).
-  await expect.poll(() => page.locator('#scene').getAttribute('data-acting'), { intervals: [50], timeout: 30_000 }).toBe('win');
+  await expect.poll(() => actsSeen(page), { intervals: [50], timeout: 30_000 }).toContain('win');
   await page.screenshot({ path: `${SHOTS}14-won-celebrating.png` });
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
   await expect(page.locator('.win-card .star').nth(2)).toHaveCSS('opacity', '1');
@@ -172,12 +173,13 @@ test('the wizard bends to pick the wand up, and celebrates a win (14.3)', async 
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText('wizard.move_right(3)\nwizard.pick_up()\nwizard.move_left()\nwizard.move_down()');
+  await watchActs(page);
   await page.locator('#run').click();
   const scene = page.locator('#scene');
-  await expect.poll(() => scene.getAttribute('data-acting'), { intervals: [50], timeout: 30_000 }).toBe('pickup');
+  await expect.poll(() => actsSeen(page), { intervals: [50], timeout: 30_000 }).toContain('pickup');
   await page.waitForTimeout(250);
   await page.screenshot({ path: `${SHOTS}13-pick-up.png` });
   await expect(scene).toHaveAttribute('data-carried', /wand/, { timeout: 10_000 });
-  await expect.poll(() => scene.getAttribute('data-acting'), { intervals: [50], timeout: 30_000 }).toBe('win');
   await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+  expect(await actsSeen(page)).toEqual(['pickup', 'win']);
 });

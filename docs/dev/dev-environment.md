@@ -701,11 +701,17 @@ the wifi should answer with nginx's page):
 
 ```sh
 sudo apt install certbot python3-certbot-nginx
-sudo certbot certonly --webroot -w /var/www/html -d kydux.kidux.org --agree-tos -m <your email> --no-eff-email
+sudo certbot certonly --webroot -w /var/www/html -d kydux.kidux.org --agree-tos -m <your email> --no-eff-email --deploy-hook "systemctl reload nginx"
 ```
 
 It writes the certificate under `/etc/letsencrypt/live/kydux.kidux.org/`
-and sets a timer that renews it. Check the renewal works:
+and sets a timer that renews it, reloading nginx after each renewal so
+that the new certificate is served. The site needs no other file of
+certbot's: its TLS settings are in `deploy/nginx-kydux.conf`. Make the
+certificate before the site: `ci/deploy.sh --site` refuses to install a
+site whose certificate is not there, and takes the site out again if
+nginx refuses it, so that nginx and the other sites keep running. Check
+the renewal works:
 
 ```sh
 sudo certbot renew --dry-run

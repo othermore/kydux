@@ -254,6 +254,22 @@ turning a layer on or off:
 The browser remembers which layers are on. The address without `?debug`
 shows the game as the child sees it.
 
+Two more things help you test quickly in this mode:
+
+- **The map opens every stop.** Each lesson, level and story is a link,
+  even those still locked, so you can go straight to any of them. Open
+  the map like this:
+
+  ```
+  https://localhost:5173/?debug#map
+  ```
+
+- **Write the solution** is a button under the editor, beside the
+  notebook. It replaces the code with the level's solution, so that a run
+  shows the level solved. It is there only on the development server
+  (`npm run dev`). The solutions never go into a build, so the game served
+  to friends has no such button.
+
 ### A story on its scene
 
 A story is a short play on a scene. Its `story.json` says the scene,

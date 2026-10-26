@@ -35,10 +35,6 @@ const KIND_COLOURS: Record<string, number> = {
 };
 const OTHER = 0xff66cc;
 
-/** Whether the page was opened with `?debug`. */
-export function debugging(): boolean {
-  return new URLSearchParams(globalThis.location?.search ?? '').has('debug');
-}
 
 function kept(): Record<DebugLayer, boolean> {
   const shown = { numbers: true, cells: false, masks: false };

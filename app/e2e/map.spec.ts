@@ -91,3 +91,18 @@ test('a level offers its lesson again, which goes back to the level (D71)', asyn
   await page.locator('#lesson-to-level').click();
   await expect(page).toHaveURL(/#level\/the-long-corridor$/);
 });
+
+test('with ?debug every stop opens and is named, for a tester to go straight to it', async ({ page }) => {
+  await page.goto('/?debug#map');
+  const last = stop(page, 'level:the-watchtower');
+  await expect(last).toHaveAttribute('data-state', 'locked');
+  await expect(last).not.toHaveAttribute('data-unnamed', /./);
+  await expect(page.locator('.stop:not(:has(a))')).toHaveCount(0);
+  await last.locator('a').click();
+  await expect(page).toHaveURL(/#level\/the-watchtower$/);
+  // The button that writes the solution is the development server's alone:
+  // the solutions never ship.
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeVisible({ timeout: 90_000 });
+  await expect(page.locator('#debug-solution')).toHaveCount(0);
+});

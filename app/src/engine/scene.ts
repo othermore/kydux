@@ -77,7 +77,8 @@ import {
   SHEET_ROW,
 } from './painted';
 import { SceneCamera, VIEW_TILES } from './camera';
-import { DebugView, debugging, type PaintedImage } from './debug';
+import { DebugView, type PaintedImage } from './debug';
+import { debugging } from './debugging';
 import { Speech } from './speech';
 import { Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';

@@ -7,6 +7,7 @@
 import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
 import type { Editor, EditorOptions } from '../editor/editor';
+import { debugging } from '../engine/debugging';
 import type { Speed } from '../engine/playback';
 import { type Look, lookOf } from '../engine/looks';
 import type { SceneHandle } from '../engine/scene';
@@ -160,6 +161,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const notebookButton = labelled(element('button', { id: 'notebook-open', type: 'button' }), () =>
     t('notebook.open'),
   );
+  // On the development server in the tester's mode, a button writes the level's
+  // solution in the editor; the solutions never ship (pack-world.mjs), so the
+  // server reads them from content/ (vite.config.ts).
+  const solution =
+    import.meta.env.DEV && debugging()
+      ? [labelled(element('button', { id: 'debug-solution', type: 'button' }), () => t('debug.solution'))]
+      : [];
   const notebook = notebookPanel(
     loaded.level,
     parts.table,
@@ -227,6 +235,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         restart,
         hint,
         notebookButton,
+        ...solution,
         element('label', { className: 'speed' }, [speedLabel, ' ', speed]),
       ]),
       hintsBox,
@@ -408,6 +417,12 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     renderHints();
   });
   renderHints();
+  if (import.meta.env.DEV) {
+    solution[0]?.addEventListener('click', async () => {
+      const response = await fetch(`${import.meta.env.BASE_URL}__debug/solution/${loaded.id}`);
+      if (response.ok) editor.setDoc(await response.text());
+    });
+  }
 
   // What was last drawn, so that the card and the editor's marks change only
   // when the controller's do.

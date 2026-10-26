@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir, hostname } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -41,7 +42,31 @@ const isolation = {
   'Content-Security-Policy': contentSecurityPolicy,
 };
 
+// The tester's button that writes a level's solution (src/ui/level.ts) asks
+// /__debug/solution/<level> of the development server, which reads it from
+// content/. Only `npm run dev` has it: the solutions never go into a build.
+function debugSolutions(): Plugin {
+  return {
+    name: 'kydux-debug-solutions',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/__debug/solution/', (request, response) => {
+        const id = (request.url ?? '').replace(/^\//, '').split('?')[0] ?? '';
+        const path = join(repoRoot, 'content', 'levels', id, 'solution.py');
+        if (!/^[a-z0-9-]+$/.test(id) || !existsSync(path)) {
+          response.statusCode = 404;
+          response.end();
+          return;
+        }
+        response.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        response.end(readFileSync(path, 'utf8'));
+      });
+    },
+  };
+}
+
 export default defineConfig({
+  plugins: [debugSolutions()],
   server: {
     host: true,
     port: 5173,

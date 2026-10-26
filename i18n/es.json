@@ -350,6 +350,7 @@
     "ambrel": "la palabra de la escuela, que abre sus puertas."
   },
   "debug": {
+    "solution": "Escribir la solución",
     "title": "Vista de depuración",
     "numbers": "Números",
     "cells": "Casillas",

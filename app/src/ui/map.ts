@@ -4,8 +4,11 @@
 // after the first are unnamed: their kind and number show, not what they hold
 // (D71). From a level the map opens over it, marks the stop played, and closes
 // back to it; choosing a stop from there goes through the level's own question.
+// In the tester's mode (?debug) every stop opens and is named, for a tester to
+// go straight to any of them.
 
 import { type Course, itemHash, parseItem, stopState } from '../content/course';
+import { debugging } from '../engine/debugging';
 import { t } from '../i18n';
 import { MAX_STARS, type Progress } from '../progress/store';
 import { element } from './dom';
@@ -42,12 +45,14 @@ export function mapScreen(parts: MapScreenParts): Screen {
   const draw = () => {
     // Only the first locked stop is named: what lies further on is a surprise.
     let lockedSeen = 0;
+    const testing = debugging();
     const chapters = course.chapters.map((chapter) => {
       const stops = chapter.items.map((item) => {
         const parsed = parseItem(item);
         const state = stopState(course, item, progress);
         if (state === 'locked') lockedSeen += 1;
-        const unnamed = state === 'locked' && lockedSeen > 1;
+        const unnamed = state === 'locked' && lockedSeen > 1 && !testing;
+        const closed = state === 'locked' && !testing;
         const title = unnamed ? '?' : (parts.titles.get(item) ?? parsed?.id ?? item);
         const stars = parsed?.kind === 'level' ? (progress.levels[parsed.id]?.stars ?? 0) : 0;
         const icon = element('span', { className: `stop-icon ${parsed?.kind ?? 'level'}` });
@@ -68,12 +73,11 @@ export function mapScreen(parts: MapScreenParts): Screen {
           ...extra,
           ...(here ? [element('span', { className: 'stop-here' }, [t('map.here')])] : []),
         ];
-        const stop =
-          state === 'locked'
-            ? element('span', { className: 'stop-body' }, body)
-            : element('a', { className: 'stop-body', href: itemHash(item) }, body);
+        const stop = closed
+          ? element('span', { className: 'stop-body' }, body)
+          : element('a', { className: 'stop-body', href: itemHash(item) }, body);
         stop.setAttribute('aria-label', `${title}: ${stateWords(state)}`);
-        if (parts.overlay && state !== 'locked') {
+        if (parts.overlay && !closed) {
           const { onGo } = parts.overlay;
           stop.addEventListener('click', (event) => {
             event.preventDefault();

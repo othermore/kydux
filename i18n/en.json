@@ -1,5 +1,7 @@
 {
   "app": {
+    "handheld": "Kydux is made for a computer, with a keyboard and a mouse. On a phone or a tablet, some things may not work well.",
+    "handheld_close": "Got it",
     "title": "Kydux",
     "tagline": "A game for learning Python",
     "language": "Language",

@@ -1,5 +1,7 @@
 {
   "app": {
+    "handheld": "Kydux está pensado para un ordenador con teclado y ratón. En un móvil o una tableta, puede que algunas cosas no funcionen bien.",
+    "handheld_close": "Entendido",
     "title": "Kydux",
     "tagline": "Un juego para aprender Python",
     "language": "Idioma",

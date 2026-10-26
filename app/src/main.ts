@@ -21,6 +21,7 @@ import { startPlayTime } from './progress/playtime';
 import * as progress from './progress/progress';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
+import { handheldNote } from './ui/handheld';
 import type { MapScreenParts } from './ui/map';
 import type { Screen } from './ui/screen';
 import { setMuted } from './engine/sfx';
@@ -205,6 +206,7 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
       ]),
       languagePicker(),
     ]),
+    ...handheldNote(),
     content,
     element('footer', {}, [element('span', {}, [t('app.version', { version })])]),
   );

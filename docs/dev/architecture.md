@@ -48,7 +48,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (controller.ts), with its goals panel, outcome card, start and
                 win cards (cards.ts), the zoom box over the scene (zoom.ts), the
                 wizard's notebook with its spells and words (notebook.ts, D80),
-                the stars (stars.ts) and the screen's guide (guide.ts, D68)
+                the stars (stars.ts), the screen's guide (guide.ts, D68), and
+                the note on a phone or a tablet that the game is made for a
+                computer (handheld.ts)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events (stories.ts), the guide's words (guide.ts), and the

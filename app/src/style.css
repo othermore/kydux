@@ -67,6 +67,20 @@ header.top {
   color: var(--muted);
 }
 
+/* On a phone or a tablet: the game is made for a computer. */
+.handheld-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8px 16px;
+  padding: 8px 12px;
+  border: 1px solid var(--warning);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .content {
   flex: 1;
   display: flex;
@@ -921,6 +935,7 @@ footer {
 .start-message {
   color: var(--warning);
 }
+
 
 /* The map. */
 

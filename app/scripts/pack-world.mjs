@@ -3,6 +3,12 @@
 // what the game needs of a level, never its solution or its wrong answers,
 // which are the tests' and would otherwise ship with the game.
 //
+// The content is made in a folder of its own, then brought into public/content/
+// file by file: a file unchanged is left alone, a file changed is written over,
+// and only a file gone is deleted. A running development server keeps serving
+// public/ while a build runs this, and a file deleted and made again under it
+// is one it stops serving.
+//
 // The zip is written here, stored without compression and with a fixed date, so
 // that the same sources always give the same bytes and no zip library is needed.
 
@@ -10,6 +16,7 @@ import {
   cpSync,
   existsSync,
   mkdirSync,
+  mkdtempSync,
   readdirSync,
   readFileSync,
   rmSync,
@@ -17,6 +24,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -103,8 +111,8 @@ const entries = [...walk(world)].map((path) => ({
 mkdirSync(publicDir, { recursive: true });
 writeFileSync(join(publicDir, 'world.zip'), zip(entries));
 
-const content = join(publicDir, 'content');
-rmSync(content, { recursive: true, force: true });
+const content = mkdtempSync(join(tmpdir(), 'kydux-content-'));
+process.on('exit', () => rmSync(content, { recursive: true, force: true }));
 const shipped = (path) => {
   const name = relative(join(repo, 'content'), path).split(sep);
   return !(name.includes('wrong') || name.at(-1) === 'solution.py');
@@ -112,8 +120,6 @@ const shipped = (path) => {
 if (existsSync(join(repo, 'content'))) {
   cpSync(join(repo, 'content'), content, { recursive: true, filter: shipped });
 }
-
-mkdirSync(content, { recursive: true });
 
 // The course: its chapters in order, each with its items, lessons and levels
 // (D32). The page reads it to draw the map and to know what comes next.
@@ -257,6 +263,27 @@ for (const [id, level] of Object.entries(built.levels)) {
 for (const [id, story] of Object.entries(built.stories)) {
   writeFileSync(join(content, 'stories', id, 'story.json'), `${JSON.stringify(story, null, 2)}\n`);
 }
+
+/** Makes `to` hold what `from` holds, touching only what differs. */
+function bring(from, to) {
+  if (existsSync(to) && !statSync(to).isDirectory()) rmSync(to);
+  mkdirSync(to, { recursive: true });
+  const names = new Set(readdirSync(from));
+  for (const name of readdirSync(to)) {
+    if (!names.has(name)) rmSync(join(to, name), { recursive: true, force: true });
+  }
+  for (const name of names) {
+    const [source, target] = [join(from, name), join(to, name)];
+    if (statSync(source).isDirectory()) {
+      bring(source, target);
+      continue;
+    }
+    if (existsSync(target) && statSync(target).isDirectory()) rmSync(target, { recursive: true });
+    const data = readFileSync(source);
+    if (!existsSync(target) || !readFileSync(target).equals(data)) writeFileSync(target, data);
+  }
+}
+bring(content, join(publicDir, 'content'));
 
 console.log(
   `pack-world: ${entries.length} files in public/world.zip, content/ copied, ${chapters.length} chapters in the course`,

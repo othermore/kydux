@@ -16,8 +16,9 @@
 // each stair as a step taken now would find it, D53), data-zoom (the
 // camera's zoom, D69), data-following (whether the camera follows the wizard),
 // data-marks-hidden (the doors whose doorway's mark waits for them to open, D79),
-// data-silhouette (present when the wizard's outline shows where something hides
-// it, silhouette.ts) and data-debug with data-debug-layers (the tester's view and
+// data-silhouette (present on a painted scene, where the wizard's outline shows
+// when something hides more than a quarter of it, silhouette.ts), data-outlined
+// (present while it shows) and data-debug with data-debug-layers (the tester's view and
 // its layers, debug.ts).
 //
 // The camera is a window on the scene (D69, camera.ts): it follows the wizard,
@@ -504,7 +505,11 @@ class LevelScene extends Phaser.Scene {
       for (const actor of this.actors.values()) actor.sprite.setDepth(3 + (actor.sprite.y / TILE) * 0.01);
     }
     this.speech.update();
-    this.silhouette?.update();
+    if (this.silhouette) {
+      this.silhouette.update();
+      if (this.silhouette.shown) this.parentNode.dataset.outlined = 'true';
+      else delete this.parentNode.dataset.outlined;
+    }
     this.debug?.update(this.cameras.main);
   }
 

@@ -1,21 +1,47 @@
-// The wizard's outline where something painted hides it (the owner's choice of
-// 2026-10-24): on a painted scene a crown, a rock or a wall drawn in front of the
-// wizard may cover it wholly, and the child would lose it. A thin yellow line of
-// its figure is drawn over what covers it, only there, beating until it fades
-// away and comes back, so that the child knows the wizard is behind.
+// The wizard's outline where something painted hides it (the owner's choice):
+// on a painted scene a crown, a rock or a wall drawn in front of the wizard may
+// cover it, and the child would lose it. When more than a quarter of the figure
+// is covered, a thin yellow line of it is drawn over what covers it, only there,
+// beating until it fades away and comes back, so that the child knows the
+// wizard is behind. A figure covered less is seen well enough without it.
 //
 // The line is a sheet of outlines made once from the wizard's sheet, frame for
 // frame, and a sprite of it follows the wizard. It is cut by a mask: copies of
 // the painted rows and things, of which only those in front of the wizard are
 // shown, so that the line shows where they cover the wizard and nowhere else.
+// How much is covered is counted by cover.ts.
 
 import Phaser from 'phaser';
+import { coveredShare, HIDDEN_SHARE, type Solid } from './cover';
 
 /** The outline's colour, and how thick it is in the sheet's pixels. */
 const COLOUR = [255, 214, 51] as const;
 const THICK = 2;
 /** How long the line takes to fade away, and as long to come back. */
 const BEAT_MS = 650;
+
+/** The textures' pixels, solid or not, read once for each. */
+const solids = new Map<string, Solid | null>();
+
+function solidOf(scene: Phaser.Scene, key: string): Solid | null {
+  const known = solids.get(key);
+  if (known !== undefined) return known;
+  const image = scene.textures.get(key).getSourceImage() as HTMLImageElement | HTMLCanvasElement;
+  const canvas = document.createElement('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  let read: Solid | null = null;
+  if (context && image.width > 0 && image.height > 0) {
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, image.width, image.height).data;
+    const solid = new Uint8Array(image.width * image.height);
+    for (let index = 0; index < solid.length; index += 1) solid[index] = (pixels[index * 4 + 3] ?? 0) > 127 ? 1 : 0;
+    read = { width: image.width, solid };
+  }
+  solids.set(key, read);
+  return read;
+}
 
 /** The outlines of a sheet's figures, frame for frame, as a texture named `key`. */
 function outlineSheet(scene: Phaser.Scene, sheet: string, key: string): void {
@@ -73,9 +99,11 @@ interface Covering {
 export class Silhouette {
   private readonly line: Phaser.GameObjects.Sprite;
   private readonly covers: Covering[] = [];
+  /** Whether the line shows now: more than HIDDEN_SHARE of the figure covered. */
+  shown = false;
 
   constructor(
-    scene: Phaser.Scene,
+    private readonly scene: Phaser.Scene,
     private readonly figure: Phaser.GameObjects.Sprite,
     painted: Phaser.GameObjects.Image[],
     still: boolean,
@@ -98,20 +126,25 @@ export class Silhouette {
     else scene.tweens.add({ targets: this.line, alpha: { from: 1, to: 0 }, duration: BEAT_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   }
 
-  /** Every frame: the line on the figure, in its frame, and the mask of what is in
-   * front of it now. */
+  /** Every frame: the mask of what is in front of the figure now, how much of it
+   * that covers, and the line on the figure, in its frame, when enough does. */
   update(): void {
     const figure = this.figure;
+    const front: Phaser.GameObjects.Image[] = [];
+    for (const { source, copy } of this.covers) {
+      if (copy.texture.key !== source.texture.key) copy.setTexture(source.texture.key);
+      copy.setPosition(source.x, source.y);
+      const before = source.visible && source.alpha > 0.05 && source.depth > figure.depth;
+      copy.setVisible(before);
+      if (before) front.push(source);
+    }
+    const share = figure.visible ? coveredShare(figure, front, (key) => solidOf(this.scene, key)) : 0;
+    this.shown = share > HIDDEN_SHARE;
     this.line
       .setPosition(figure.x, figure.y)
       .setOrigin(figure.originX, figure.originY)
       .setScale(figure.scaleX, figure.scaleY)
       .setFrame(figure.frame.name)
-      .setVisible(figure.visible);
-    for (const { source, copy } of this.covers) {
-      if (copy.texture.key !== source.texture.key) copy.setTexture(source.texture.key);
-      copy.setPosition(source.x, source.y);
-      copy.setVisible(source.visible && source.alpha > 0.05 && source.depth > figure.depth);
-    }
+      .setVisible(this.shown);
   }
 }

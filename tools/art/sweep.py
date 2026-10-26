@@ -54,8 +54,8 @@ FOOT_IN_CELL = 0.8
 SHARE = 0.015
 HOLE = 0.02
 #: How much of the wizard covered is the wizard hidden: a problem on that cell is not
-#: seen, and the cell is listed apart; there the page shows the wizard by its
-#: outline (app/src/engine/silhouette.ts).
+#: seen, and the cell is listed apart. The page shows the wizard by its outline
+#: wherever more than a quarter of it is covered (app/src/engine/silhouette.ts).
 HIDDEN = 0.95
 #: How much of the wizard may be covered before its cell goes on the sheet.
 SHOWN = 0.02

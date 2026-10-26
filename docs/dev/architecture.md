@@ -35,8 +35,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 art with its figures sorted by their feet (scene.ts, painted.ts,
                 D76), the goal's beating mark and the sealed doors' glow (D79),
                 the wizard casting, a seal breaking and a door opening (D81),
-                the wizard's outline where something painted hides it
-                (silhouette.ts), the tester's view of the cells and the masks
+                the wizard's outline where something painted hides more than
+                a quarter of it (silhouette.ts, cover.ts), the tester's view of the cells and the masks
                 (debug.ts, opened with ?debug), and the sound effects, made as
                 the game plays (sfx.ts)
   src/editor/   the child's editor, CodeMirror
@@ -1113,9 +1113,9 @@ one overturns stays, marked as superseded.
   with its sunlit leaves; `tools/art/sweep.py`, run by the export's
   `check`, stands the wizard on every cell walked on and fails when a cut
   breaks either. A cell under only a crown is walked on, the figure
-  behind it, and where something painted covers the wizard, wholly or in
-  part, the page draws a thin yellow line of the wizard's outline over
-  it, only there, beating until it fades and coming back (still for a
+  behind it, and where something painted covers more than a quarter of
+  the wizard (`cover.ts` counts it), the page draws a thin yellow line of
+  the wizard's outline over it, only there, beating until it fades and coming back (still for a
   reader who asks for less motion), so that the child never loses the
   wizard (`silhouette.ts`, the owner's choice). The page draws the ground, the rows
   and the figures sorted by their feet, so that a thing covers who stands

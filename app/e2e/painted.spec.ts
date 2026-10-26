@@ -164,6 +164,26 @@ test('with ?debug the scene shows its cells, for a tester to name one', async ({
   await expect(page.locator('#scene')).not.toHaveAttribute('data-debug', /./);
 });
 
+test('the outline shows only where more than a quarter of the wizard is hidden', async ({ page }) => {
+  await seedWizard(page);
+  await page.goto('/#level/the-corridor');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  const scene = page.locator('#scene');
+  // At the start nothing stands in front of the wizard.
+  await expect(scene).toHaveAttribute('data-silhouette', 'true');
+  await expect(scene).not.toHaveAttribute('data-outlined', /./);
+  await page.locator('#speed').selectOption('4');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  // At 9,23 what is painted in front hides the wizard (tools/art/sweep.py).
+  await page.keyboard.insertText('wizard.move_down(3)\nwizard.move_right()');
+  await page.locator('#run').click();
+  await expect(scene).toHaveAttribute('data-wizard', '9,23', { timeout: 30_000 });
+  await expect(scene).toHaveAttribute('data-outlined', 'true');
+  await page.screenshot({ path: `${SHOTS}15-outlined.png` });
+});
+
 test('the wizard bends to pick the wand up, and celebrates a win (14.3)', async ({ page }) => {
   await seedWizard(page);
   await page.goto('/#level/the-wand');

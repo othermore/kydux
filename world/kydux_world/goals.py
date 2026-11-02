@@ -252,12 +252,26 @@ class GiveGoal:
         return world.things[self.id]._k_given == self.to
 
 
+class SleepGoal:
+    """Met once the wizard sleeps in a bed (D84): `{"kind": "sleep", "bed": "bed_2"}`."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        self.bed = spec.params.get("bed")
+        beds = {t.id for t in level.things if t.kind == "bed"}
+        if self.bed not in beds:
+            raise LevelError(f"{level.id}: the sleep goal names {self.bed}, no bed")
+
+    def check(self, world: "World") -> bool:
+        return world.slept == self.bed
+
+
 GOALS: dict[str, type] = {
     "reach": ReachGoal,
     "collect": CollectGoal,
     "open": OpenGoal,
     "say": SayGoal,
     "give": GiveGoal,
+    "sleep": SleepGoal,
     "no_bumps": NoBumpsGoal,
     "not_seen_by": NotSeenByGoal,
     "lines_under": LinesUnderGoal,

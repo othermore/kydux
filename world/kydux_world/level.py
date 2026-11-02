@@ -20,8 +20,10 @@ id the child's code knows it by; `carrying`, the kinds of thing the wizard holds
 from the start (D49); `spells`, the spells that can be cast (D42); `words`,
 the passwords the level gives the child, each a door's (D80); `api`,
 the names the level teaches (D23); `goals`, some of them bonus goals;
-`tick_limit`; `dark`, a room unlit until `kirra` (D52); and `ways`, the ways
-the level is played, each one the same program must win (D51). A level may
+`tick_limit`; `dark`, a room unlit until `kirra` (D52); `forbidden`, the
+tiles the wizard may not step on and why, which its scene gives (D84); and
+`ways`, the ways the level is played, each one the same program must win
+(D51). A level may
 come with goals of its own, in a goals.py beside level.json, whose source
 the loader passes as `goals_source`.
 """
@@ -47,7 +49,7 @@ class LevelError(ValueError):
 WALL, FLOOR, SHELF, START = "#", ".", "=", "S"
 
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
-THING_KINDS = ("key", "door", "book", "wand", "potion", "stair")
+THING_KINDS = ("key", "door", "book", "wand", "potion", "stair", "bed")
 CARRIED_KINDS = ("key", "book", "wand", "potion")
 ACTOR_KINDS = ("teacher", "ghost", "cat", "friend")
 #: The spells the world knows how to cast; a level names those it has (D42).
@@ -88,6 +90,11 @@ class ThingSpec:
     period: int | None = None
     #: For a door, open from the start: a door an earlier level of the scene opened (D65).
     open: bool = False
+    #: For a bed, whether no one sleeps in it, so that the wizard may (D84).
+    free: bool = True
+    #: Lying where something painted covers it wholly, so that it is not seen until
+    #: it is revealed or picked up (D85); the world treats it as any thing.
+    hidden: bool = False
 
 
 @dataclass(frozen=True)
@@ -129,6 +136,10 @@ class Level:
     #: The ways the level is played, by id, each a level of its own (D51); empty
     #: for a level played one way.
     ways: tuple[tuple[str, "Level"], ...] = ()
+    #: The tiles the wizard may not step on, though others may, and why: the other
+    #: dormitory's arch (D84).
+    forbidden: frozenset[Position] = frozenset()
+    forbidden_reason: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Level":
@@ -250,6 +261,10 @@ class Level:
                     "which is not a spell here"
                 )
 
+        forbidden, forbidden_reason = _forbidden(
+            data.get("forbidden"), level_id, walls, len(rows), width
+        )
+
         own = data.get("own_goals", False)
         source = data.get("goals_source")
         if not isinstance(own, bool) or (source is not None and not isinstance(source, str)):
@@ -278,6 +293,8 @@ class Level:
             dark=dark,
             dark_area=frozenset(area),
             kind=kind,
+            forbidden=forbidden,
+            forbidden_reason=forbidden_reason,
         )
         check_api(level)
         return level
@@ -413,6 +430,12 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         raise LevelError(
             f"{shape.level_id}: the door {thing_id} is open, and so neither locked nor sealed"
         )
+    free = spec.get("free", True)
+    if not isinstance(free, bool) or ("free" in spec and kind != "bed"):
+        raise LevelError(f"{shape.level_id}: only a bed is free, true or false")
+    hidden = spec.get("hidden", False)
+    if not isinstance(hidden, bool) or (hidden and kind not in CARRIED_KINDS):
+        raise LevelError(f"{shape.level_id}: only a thing the wizard carries is hidden")
     return ThingSpec(
         kind,
         thing_id,
@@ -423,6 +446,8 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         password,
         period=period,
         open=opened,
+        free=free,
+        hidden=hidden,
     )
 
 
@@ -464,6 +489,32 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
         raise LevelError(f"{shape.level_id}: {actor_id}'s sight must be a whole number, 1 or more")
     patrol = tuple(path) if len(path) > 1 else ()
     return ActorSpec(kind, actor_id, position, facing, patrol, sight)
+
+
+def _forbidden(
+    value: Any, level_id: str, walls: set[Position], height: int, width: int
+) -> tuple[frozenset[Position], str]:
+    """The tiles the wizard may not step on, and the reason it is told (D84):
+    `{"reason": "not_my_dormitory", "cells": [[x, y], ...]}`, each a floor tile."""
+    if value is None:
+        return frozenset(), ""
+    reason = value.get("reason") if isinstance(value, dict) else None
+    cells = value.get("cells") if isinstance(value, dict) else None
+    if not isinstance(reason, str) or not reason.isidentifier() or not isinstance(cells, list):
+        raise LevelError(f"{level_id}: forbidden is a reason and its cells")
+    found = set()
+    for cell in cells:
+        if not (
+            isinstance(cell, list)
+            and len(cell) == 2
+            and all(isinstance(v, int) and not isinstance(v, bool) for v in cell)
+        ):
+            raise LevelError(f"{level_id}: a forbidden cell is [x, y]")
+        here = Position(*cell)
+        if not (0 <= here.x < width and 0 <= here.y < height) or here in walls:
+            raise LevelError(f"{level_id}: the forbidden cell {here.x},{here.y} is not floor")
+        found.add(here)
+    return frozenset(found), reason
 
 
 def _list_of_boxes(value: Any, level_id: str) -> list[tuple[int, int, int, int]]:
@@ -568,6 +619,8 @@ class Scene:
     things: tuple[dict[str, Any], ...] = ()
     props: tuple[dict[str, Any], ...] = ()
     rooms: dict[str, tuple[int, int, int, int]] = field(default_factory=dict)
+    #: The tiles the wizard may not step on, with the reason (D84), or None.
+    forbidden: dict[str, Any] | None = None
 
     def walks(self, x: int, y: int) -> bool:
         return bool(self.terrains[self.rows[y][x]]["walk"])
@@ -612,7 +665,10 @@ def read_scene(scenes: Path, scene_id: Any, level_id: Any = None) -> Scene:
     ids = [thing.get("id") for thing in things]
     if len(set(ids)) != len(ids) or not all(isinstance(i, str) for i in ids):
         raise LevelError(f"{scene_id}: each fixed thing has an id of its own")
-    return Scene(scene_id, rows, terrains, things, tuple(about.get("props", [])), rooms)
+    forbidden = about.get("forbidden")
+    if forbidden is not None and not isinstance(forbidden, dict):
+        raise LevelError(f"{scene_id}: forbidden is a reason and its cells")
+    return Scene(scene_id, rows, terrains, things, tuple(about.get("props", [])), rooms, forbidden)
 
 
 def scene_rows(scenes: Path, data: dict[str, Any]) -> list[str]:
@@ -689,6 +745,8 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
         built["things"] = _merged_things(scene, data)
     if scene.things:
         built["fixed"] = [thing["id"] for thing in scene.things]
+    if scene.forbidden is not None:
+        built["forbidden"] = scene.forbidden
     dark = data.get("dark")
     if isinstance(dark, list):
         missing = [room for room in dark if room not in scene.rooms]

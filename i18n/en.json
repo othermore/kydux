@@ -99,7 +99,8 @@
     "book": "the book",
     "wand": "the wand",
     "potion": "the potion",
-    "stair": "the stair"
+    "stair": "the stair",
+    "bed": "the bed"
   },
   "guide": {
     "next": "Next",
@@ -146,12 +147,16 @@
       "facing": "The way the wizard looks: up, down, left or right.",
       "items": "The things the wizard carries.",
       "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all.",
-      "give": "Gives a thing the wizard carries to whoever stands right beside it."
+      "give": "Gives a thing the wizard carries to whoever stands right beside it.",
+      "sleep": "Lies down in a free bed right beside it, and sleeps.",
+      "distance_to": "How many steps lie to a thing or someone, along the rows and the columns."
     },
     "thing": {
       "kind": "What the thing is, like \"key\" or \"book\".",
       "name": "The thing's own name in this level.",
-      "position": "Where the thing lies, or None once the wizard carries it."
+      "position": "Where the thing lies, or None once the wizard carries it.",
+      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
+      "reveal": "Shows where the thing lies, its outline drawn through whatever hides it."
     },
     "door": {
       "kind": "What it is: \"door\".",
@@ -161,42 +166,59 @@
       "is_open": "True once the door is open, and the wizard can go through.",
       "open": "Opens the door. The wizard must stand next to it, and carry its key if it is locked. A sealed door, or one with a password, does not open by hand.",
       "sealed": "True while the door is sealed, until its spell is cast beside it.",
-      "password": "The word that opens the door when it is said beside it, or None."
+      "password": "The word that opens the door when it is said beside it, or None.",
+      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
+      "reveal": "Shows where the door lies, its outline drawn through whatever hides it."
     },
     "key": {
       "kind": "What it is: \"key\".",
       "name": "The key's own name in this level.",
-      "position": "Where the key lies, or None once the wizard carries it."
+      "position": "Where the key lies, or None once the wizard carries it.",
+      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
+      "reveal": "Shows where the key lies, its outline drawn through whatever hides it."
     },
     "teacher": {
       "kind": "What they are: \"teacher\".",
       "name": "The teacher's own name in this level.",
       "position": "Where the teacher stands, as x and y.",
       "facing": "The way the teacher looks: up, down, left or right.",
-      "can_see": "Tells whether the teacher can see something straight ahead, close enough."
+      "can_see": "Tells whether the teacher can see something straight ahead, close enough.",
+      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns."
     },
     "ghost": {
       "kind": "What it is: \"ghost\".",
       "name": "The ghost's name in this level.",
       "position": "Where the ghost floats, in x and y.",
-      "facing": "The way the ghost looks: up, down, left or right."
+      "facing": "The way the ghost looks: up, down, left or right.",
+      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns."
     },
     "cat": {
       "kind": "What it is: \"cat\".",
       "name": "The cat's name in this level.",
       "position": "Where the cat sits, in x and y.",
-      "facing": "The way the cat looks: up, down, left or right."
+      "facing": "The way the cat looks: up, down, left or right.",
+      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns."
     },
     "stair": {
       "kind": "What it is: \"stair\".",
       "name": "The stair's own name in this level.",
       "position": "Where the stair is, in x and y.",
-      "in_place": "True when a step onto the stair, taken now, lands on it."
+      "in_place": "True when a step onto the stair, taken now, lands on it.",
+      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
+      "reveal": "Shows where the stair lies, its outline drawn through whatever hides it."
     },
     "tab_actions": "Actions",
     "tab_spells": "Spells and words",
     "spells": "Spells",
-    "words": "Words"
+    "words": "Words",
+    "bed": {
+      "kind": "What it is: \"bed\".",
+      "name": "The bed's own name in this level.",
+      "position": "Where the bed stands, in x and y.",
+      "free": "True when no one sleeps in the bed.",
+      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
+      "reveal": "Shows where the bed lies, its outline drawn through whatever hides it."
+    }
   },
   "start": {
     "welcome": "Welcome to the school of magic",

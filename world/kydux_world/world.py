@@ -22,7 +22,7 @@ from typing import Any
 from .actors import Actor, Friend, Teacher, make_actor, sight_tiles
 from .goals import make_goal
 from .level import CARRIED_KINDS, Level, Position
-from .things import Child, Door, Stair, Thing, make_thing
+from .things import Bed, Child, Door, Stair, Thing, make_thing, steps_between
 
 CHILD = "<child>"
 
@@ -114,6 +114,8 @@ class World:
         self.actors: dict[str, Actor] = {s.id: make_actor(self, s) for s in level.actors}
         #: Who caught the wizard, when someone did.
         self.caught_by: str | None = None
+        #: The bed the wizard sleeps in, once it does (D84).
+        self.slept: str | None = None
         self.over: RunOver | None = None
         #: Whether the child's code has come to its end, however it did.
         self.finished = False
@@ -298,6 +300,12 @@ class Wizard(Child):
                     {"at": list(here), "facing": direction.value, "by": "friend", "id": friend},
                 )
                 return
+            if ahead in world.level.forbidden:
+                # A tile the wizard may not step on, though anyone else may (D84).
+                reason = world.level.forbidden_reason
+                refused = {"at": list(here), "by": "wizard", "reason": reason, "tried": False}
+                world.act("blocked", {**refused, "facing": direction.value})
+                return
             if not world.is_free(ahead):
                 by = (
                     "door"
@@ -467,6 +475,36 @@ class Wizard(Child):
     def find_all(self, kind: str) -> list[Child]:
         """Every thing of a kind, nearest first, as a list: `wizard.find_all("book")`"""
         return self._nearby(kind)
+
+    def sleep(self) -> None:
+        """Lie down in a free bed beside the wizard, and sleep: `wizard.sleep()`"""
+        world: World = self._k_world
+        world.ready()
+        here = self._k_position
+        beds = [
+            thing
+            for thing in sorted(world.things.values(), key=lambda t: t.name)
+            if isinstance(thing, Bed)
+            and abs(thing._k_position.x - here.x) + abs(thing._k_position.y - here.y) == 1
+        ]
+        free = [bed for bed in beds if bed.free]
+        if not free:
+            reason = "bed_taken" if beds else "no_bed"
+            world.act(
+                "blocked", {"at": list(here), "by": "wizard", "reason": reason, "tried": False}
+            )
+            return
+        bed = free[0]
+        world.slept = bed.name
+        world.act("sleep", {"id": bed.name, "at": list(here), "bed": list(bed._k_position)})
+
+    def distance_to(self, other: object) -> int | None:
+        """How many steps lie between the wizard and a thing or someone, along the rows
+        and the columns: `wizard.distance_to(key)`"""
+        return steps_between(self, other)
+
+    def _k_where(self) -> Position:
+        return self._k_position
 
     def has(self, kind: str) -> bool:
         """True when the wizard carries a thing of that kind: `wizard.has("key")`"""

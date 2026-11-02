@@ -95,6 +95,33 @@ class Thing(Child):
             return None
         return self._k_position
 
+    def reveal(self) -> None:
+        """Show where the thing lies, its outline drawn through whatever hides it:
+        `key.reveal()`"""
+        world: World = self._k_world
+        world.ready()
+        where = self.position
+        if where is None:
+            refused = {"at": list(world.wizard.position), "by": self.name, "reason": "not_here"}
+            world.act("blocked", {**refused, "tried": False})
+            return
+        world.act("reveal", {"id": self.name, "at": list(where)})
+
+    def distance_to(self, other: Any) -> int | None:
+        """How many steps lie between the thing and another, the wizard or someone,
+        along the rows and the columns: `key.distance_to(wizard)`"""
+        return steps_between(self, other)
+
+    def _k_where(self) -> Position | None:
+        """Where the thing is, whoever holds it: on its tile, with the wizard when
+        carried, with the actor it was given to; None when it is unseen."""
+        world: World = self._k_world
+        if self._k_given is not None:
+            return world.actors[self._k_given]._k_position
+        if self._k_carried:
+            return world.wizard._k_position
+        return None if self._k_unseen() else self._k_position
+
     def _k_unseen(self) -> bool:
         """Whether the thing lies in the dark, out of the wizard's reach (D52): a thing
         on the floor, not a door or a stair, which are the castle's shape."""
@@ -212,6 +239,33 @@ class Door(Thing):
             world.act("open", {"id": self.name, "at": at, "by": "hand"})
 
 
+class Bed(Thing):
+    """A bed, in which the wizard may sleep when no one else does (D84)."""
+
+    _k_role = "bed"
+
+    @property
+    def free(self) -> bool:
+        """True when no one sleeps in the bed, so that the wizard may: `bed.free`"""
+        return self._k_spec.free
+
+
+def steps_between(one: Any, other: Any) -> int | None:
+    """The steps between two of the child's objects along the rows and the columns
+    (D86), or None when either is unseen. Anything else is refused, as an action's
+    wrong argument is."""
+    from .world import ActionArguments
+
+    if not isinstance(other, Child) or not hasattr(other, "_k_where"):
+        raise ActionArguments(
+            "distance_to", "distance_to() takes the wizard, a thing or someone, by its name"
+        )
+    here, there = one._k_where(), other._k_where()
+    if here is None or there is None:
+        return None
+    return abs(here.x - there.x) + abs(here.y - there.y)
+
+
 #: How many ticks `osto` holds a stair in place (D53).
 HOLD_TICKS = 6
 
@@ -251,7 +305,7 @@ class Stair(Thing):
 
 
 #: Each kind of thing with a class of its own; any other kind is a Thing.
-THINGS: dict[str, type[Thing]] = {"door": Door, "key": Key, "stair": Stair}
+THINGS: dict[str, type[Thing]] = {"door": Door, "key": Key, "stair": Stair, "bed": Bed}
 
 
 def make_thing(world: "World", spec: ThingSpec) -> Thing:

@@ -58,6 +58,16 @@ class Actor(Child):
         here, spec = self._k_position, self._k_spec
         return f"<{spec.kind} {spec.id} at {here.x}, {here.y} facing {self._k_facing}>"
 
+    def distance_to(self, other: Any) -> int | None:
+        """How many steps lie between them and another, the wizard or a thing, along
+        the rows and the columns: `eldra.distance_to(wizard)`"""
+        from .things import steps_between
+
+        return steps_between(self, other)
+
+    def _k_where(self) -> Position:
+        return self._k_position
+
     @property
     def kind(self) -> str:
         """What the actor is: `"teacher"`: `teacher.kind`"""

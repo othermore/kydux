@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .level import Level
 
-THING_MEMBERS = ("kind", "name", "position")
+THING_MEMBERS = ("kind", "name", "position", "distance_to", "reveal")
 
 MEMBERS: dict[str, tuple[str, ...]] = {
     "wizard": (
@@ -34,6 +34,8 @@ MEMBERS: dict[str, tuple[str, ...]] = {
         "has",
         "give",
         "cast",
+        "sleep",
+        "distance_to",
         "position",
         "facing",
         "items",
@@ -42,15 +44,16 @@ MEMBERS: dict[str, tuple[str, ...]] = {
     "door": (*THING_MEMBERS, "locked", "sealed", "password", "is_open", "open"),
     "key": THING_MEMBERS,
     "stair": (*THING_MEMBERS, "in_place"),
-    "teacher": ("kind", "name", "position", "facing", "can_see"),
-    "ghost": ("kind", "name", "position", "facing"),
-    "cat": ("kind", "name", "position", "facing"),
+    "bed": (*THING_MEMBERS, "free"),
+    "teacher": ("kind", "name", "position", "facing", "distance_to", "can_see"),
+    "ghost": ("kind", "name", "position", "facing", "distance_to"),
+    "cat": ("kind", "name", "position", "facing", "distance_to"),
     # A friend teaches by words, not by code: the child's code has nothing of it (D66).
     "friend": (),
 }
 
 #: The roles that are things, and so have a thing's members.
-THING_ROLES = ("thing", "door", "key", "stair")
+THING_ROLES = ("thing", "door", "key", "stair", "bed")
 
 
 def role_of(kind: str) -> str:

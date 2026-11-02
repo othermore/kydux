@@ -125,8 +125,9 @@ def check_speakers(languages: dict[str, dict[str, str]]) -> list[str]:
         if speaker is None:
             continue
         for lang, catalog in languages.items():
-            # `friend` is Nuri or Teku, by the wizard's gender (D77): both need names.
-            for who in FRIENDS if speaker == "friend" else (speaker,):
+            # `friend` and `mate` are Nuri or Teku, by the wizard's gender (D77,
+            # D84): both need names.
+            for who in FRIENDS if speaker in ("friend", "mate") else (speaker,):
                 if f"characters.{who}" not in catalog:
                     where = path.relative_to(REPO).as_posix()
                     findings.append(f"{where}: the speaker {who} has no name in i18n/{lang}.json")
@@ -145,8 +146,8 @@ def check_stories(languages: dict[str, dict[str, str]]) -> list[str]:
         if story.get("speaker"):
             named.add(story["speaker"])
         # `friend` is Nuri or Teku, by the wizard's gender (D77): both need names.
-        if "friend" in named:
-            named = (named - {"friend"}) | set(FRIENDS)
+        if named & {"friend", "mate"}:
+            named = (named - {"friend", "mate"}) | set(FRIENDS)
         for lang, catalog in languages.items():
             text_path = path.parent / f"text.{lang}.json"
             if not text_path.is_file():

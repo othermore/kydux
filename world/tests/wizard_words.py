@@ -1,7 +1,8 @@
-"""The words that follow the wizard (D37) and the friend (D77), resolved as the
-page resolves them, so that a test can read a text as a boy's wizard and as a
-girl's would see it. The friend is of the wizard's other gender, as
-app/src/engine/looks.ts has it; their names are the page's, from i18n."""
+"""The words that follow the wizard (D37), the friend (D77) and the dormitory mate
+(D84), resolved as the page resolves them, so that a test can read a text as a
+boy's wizard and as a girl's would see it. The friend is of the wizard's other
+gender and the mate of its own, as app/src/engine/looks.ts has them; their names
+are the page's, from i18n."""
 
 import json
 import re
@@ -15,6 +16,8 @@ SIDES = {"boy": 1, "girl": 2}
 #: The friend who teaches, by the wizard's gender: the other gender's, its id and
 #: its gender (D77, looks.ts's teacherFriend).
 FRIEND = {"boy": ("nuri", "girl"), "girl": ("teku", "boy")}
+#: The dormitory mate, by the wizard's gender: its own (D84, looks.ts's dormitoryMate).
+MATE = {"boy": "teku", "girl": "nuri"}
 
 
 @cache
@@ -29,8 +32,14 @@ def friend_of(gender: str, lang: str = "en") -> tuple[str, str, str]:
     return friend_id, friend_gender, names(lang)[friend_id]
 
 
+def mate_of(gender: str, lang: str = "en") -> tuple[str, str]:
+    """The dormitory mate of a wizard of `gender`: their id and their name."""
+    return MATE[gender], names(lang)[MATE[gender]]
+
+
 def for_wizard(text: str, gender: str, name: str = "Ana", lang: str = "en") -> str:
     _id, friend_gender, friend_name = friend_of(gender, lang)
     text = FRIEND_CHOICE.sub(lambda m: m.group(SIDES[friend_gender]), text)
     text = CHOICE.sub(lambda m: m.group(SIDES[gender]), text)
-    return text.replace("{wizard}", name).replace("{friend}", friend_name)
+    text = text.replace("{wizard}", name).replace("{friend}", friend_name)
+    return text.replace("{mate}", mate_of(gender, lang)[1])

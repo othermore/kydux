@@ -65,6 +65,10 @@ WORDS = {
             "face": "se vuelve",
             "appear": "aparece",
             "vanish": "se va",
+            "sleep": "se acuesta",
+            "wake": "se levanta",
+            "open": "abre la puerta",
+            "close": "cierra la puerta",
         },
         "carrying": "Lleva desde el principio",
     },
@@ -108,6 +112,10 @@ WORDS = {
             "face": "turns",
             "appear": "appears",
             "vanish": "goes",
+            "sleep": "lies down",
+            "wake": "gets up",
+            "open": "opens the door",
+            "close": "closes the door",
         },
         "carrying": "Carried from the start",
     },
@@ -156,10 +164,13 @@ def story_section(story_id: str, lang: str, gender: str, name: str, w: dict) -> 
         return name if who == "wizard" else character(who, lang, gender)
 
     for step, said in zip(about.get("steps", []), text.get("steps", []), strict=False):
-        doing = step.get("do")
-        if doing:
-            kind = next(iter(doing))
-            lines += [f"*({who_is(step.get('by', step['who']))} {w['does'][kind]})*", ""]
+        # A step may do several things, each by its own figure (D103).
+        doing = step.get("do") or []
+        for action in doing if isinstance(doing, list) else [doing]:
+            kind = next((key for key in action if key in w["does"]), None)
+            if kind:
+                who = action.get("by", step.get("by", step["who"]))
+                lines += [f"*({who_is(who)} {w['does'][kind]})*", ""]
         lines += [f"**{who_is(step['who'])}:** {made(said, lang, gender, name)}", ""]
     return lines
 
@@ -199,7 +210,8 @@ def level_section(
     if level.get("speaker"):
         facts.append(f"{w['speaker']}: {character(level['speaker'], lang, gender)}")
     if level.get("carrying"):
-        facts.append(f"{w['carrying']}: {', '.join(level['carrying'])}")
+        kinds = [entry if isinstance(entry, str) else entry["kind"] for entry in level["carrying"]]
+        facts.append(f"{w['carrying']}: {', '.join(kinds)}")
     lines += [f"*{' · '.join(facts)}*", ""]
     if text.get("intro"):
         lines += [f"**{w['intro']}** — {say(text['intro'])}", ""]

@@ -1717,6 +1717,13 @@ one overturns stays, marked as superseded.
   threshold's top; the threshold covers whatever outline of the closed
   leaf lay at the fill's foot. Where the floor before the door is stone,
   the painting's stone stays below the threshold with no line added.
-  Rules out a straight line of the outlines' width drawn at the foot, a
-  threshold laid over the floor before the door, and a leaf's outline
-  left as a floor line.
+  The jambs' feet are where their bottom outline ends, measured on the
+  painting beside the fill's span; where the fill's foot is the closed
+  leaf's own bottom outline, the threshold reaches down to the jambs'
+  feet over the doorway's own floor, and where it is the floor's own
+  line, the edge of the floor before the door, the threshold ends on that
+  line even where the jambs stand lower (the owner, 2026-10-29, on the
+  review of sprint 20). Rules out a straight line of the outlines' width
+  drawn at the foot, a threshold laid over the floor before the door, a
+  leaf's outline left as a floor line, and a board that ends above the
+  jambs' feet with floor between.

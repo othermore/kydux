@@ -111,7 +111,10 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 map on its grid before it is painted and over a try (D102),
                 margin.py paints a scene on beyond its playable area (D83),
                 repaint.py mends a chosen painting in a few boxes and nowhere
-                else and opens its doorways (D88, D108),
+                else and opens its doorways (D88, D108), trace.py helps to
+                trace a door's polygons (D113: look, a crop enlarged with a
+                grid and a polygon's points; outline, a first polygon round
+                a leaf; footprint, the doorway's polygon from its fill),
                 export_scene.py makes
                 content/art/ and draws each door's states over the
                 painting at three times their size to check (D113) and
@@ -1727,3 +1730,46 @@ one overturns stays, marked as superseded.
   drawn at the foot, a threshold laid over the floor before the door, a
   leaf's outline left as a floor line, and a board that ends above the
   jambs' feet with floor between.
+- **D115 — A scene is painted on the grid as if the grid lay on the
+  floor.** Decided 2026-10-29 by the owner, on the lessons of chapters 1
+  and 2. The prompt of a scene asks the model to make the things and the
+  edges of the picture coincide, roughly, with the grid drawn on the
+  floor: a wall, a doorway, a piece of furniture, a path's edge on a
+  cell's lines, as the layout shows them (D102), without naming what each
+  cell holds. A thing has height, so it may rise over the cell above the
+  one it stands on; its base is what keeps to the grid. The nearer a
+  painting comes to the grid from the start, the less the cut and the
+  levels have to be bent to it. Rules out a prompt that lists the cells'
+  contents, and a try kept whose walls fall between columns.
+- **D116 — A door is painted shut and open from the start, and the floors
+  meet in a painted joint.** Decided 2026-10-29 by the owner. Every door
+  of a scene is asked of the model in both states when the scene is
+  painted, the shut picture and the open one, and both masks are made
+  from them: the shut leaf within its doorway, the open leaf swung beside
+  it (D111, D113). Through an open door the floor seen is the floor of
+  the room beyond, never the room before it (D108), and where the two
+  floors meet at the doorway's foot the painting itself holds a joint, a
+  board or a row of paving from jamb to jamb, so that no joint has to be
+  made by hand; the threshold `repaint.py doorways` draws (D114) is for
+  a painting that lacks one. The lower corners of a leaf and the row the
+  leaf is cut at below are what most often go wrong: the doors sheet
+  (`doors-<scene>.png`) is looked at there first. Rules out a door painted
+  shut alone and opened by an edit, and an open doorway showing the floor
+  of the room the viewer stands in.
+- **D117 — Figures that go together move together in a story.** Decided
+  2026-10-29 by the owner. A story's step stages every figure that moves
+  at that moment at once, as the page can play them (D103): three who
+  leave a room go in one step, not three; a walk is staged one figure at
+  a time only where the story means it, a teacher leaving while the
+  others wait. Rules out a story whose figures take turns to walk when
+  nothing in the tale makes them wait.
+- **D118 — A scene's margin is wide: four or five cells at the sides,
+  two above and below.** Decided 2026-10-29 by the owner, for every scene
+  from chapter 3 on; the field, the dormitory and the library keep theirs
+  (D83). A scene is taller than wide more often than not, so the zoom
+  wants most of its room at the sides: four to five cells of margin on
+  each side and two above and below, painted with the scene from the
+  start (D83), and painted so that what fills them keeps a figure out of
+  them of itself, walls, bushes, rocks, water, a drop, never a floor one
+  could walk on. Rules out a margin the zoom runs out of, and a margin
+  of open floor that only the map forbids.

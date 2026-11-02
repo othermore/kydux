@@ -113,9 +113,11 @@ owner on 2026-10-26, for every scene from the dormitory on:
   short of the canvas's edge, its outermost pixels are stretched out to
   it. The library's sides are painted so (D92).
 - **The margin is painted with the scene from the start**, in one
-  picture, the playable area in the middle, three or more cells on each
-  side and two or more above and below; a wider one costs nothing and
-  frees the zoom. Every edit of the painting is made whole, margin
+  picture, the playable area in the middle, four or five cells on each
+  side and two above and below (D118): a scene is taller than wide more
+  often than not, and the zoom wants its room at the sides. What fills
+  the margin keeps a figure out of it of itself, walls, bushes, rocks,
+  water, a drop, never a floor one could walk on. Every edit of the painting is made whole, margin
   included. Ask for every cell painted, and say "never black": a model
   asked for "no floor there" paints black.
 - **One winding way.** Each chapter's levels chain, each starting where
@@ -243,8 +245,18 @@ row its foot stands on.
   and never over the floor before it: a strip of the floor seen through
   the doorway turned a quarter, a board with its grain across the doorway
   or a flagstone, a tenth darker than that floor, its two edges thin wavy
-  lines in the colour of that floor's joints, never the outlines' black;
-  and its leaf, so that the door is seen open and the doorway is not taken for
+  lines in the colour of that floor's joints, never the outlines' black.
+  Over the closed leaf's own outline, the threshold reaches down to the
+  jambs' feet, where their bottom outline ends beside the fill, over the
+  doorway's own floor, and the fill reaches down to its top; on the
+  floor's own line, where the floor before the door begins, it ends on
+  that line, even where the jambs stand lower. The fill and its threshold
+  are laid into the scene's other pictures that show the doorway shut,
+  its ground-only edit and its marked picture (`also`), so that the cut
+  finds no difference there, each from its untouched copy beside it
+  (`<stem>-untouched.<suffix>`), made from the picture on the first run
+  that finds none: a doorway laid again leaves nothing of the one before.
+  Its leaf, so that the door is seen open and the doorway is not taken for
   the floor, is swung out against the wall beside the arch: a model's
   picture, painted on the guide the tool draws (`guide`, the shut leaf
   turned over on its hinges, with its shadow) and joined as any box is,
@@ -258,15 +270,18 @@ row its foot stands on.
   again beside the hinges. It is drawn at the painting's size with its
   edge soft over one pixel, and nothing of it is snapped, flooded or kept
   by size. The closed state is the painting within the doorway's polygon
-  (`doorway`: the open doorway's fill, the painting against the doorway
-  picture, grown over the arch's inner line by the width of the
-  painting's outlines, about seven pixels), so that the wall keeps its
-  line round the door's cut-out, no mortar line of the wall beside the
-  arch comes with the leaf, and nothing of the open doorway shows through
-  it. A static thing's hole (`holes`) takes every pixel its polygon
-  touches and two more round them, the reach of the page's resampling, so
-  that a hole traced from a leaf leaves no pixel of the wall on it.
-  `tools/art/trace.py` helps to trace: `outline` gives a first
+  (`doorway`: the open doorway's fill and its threshold, every pixel
+  where the doorway picture differs from the painting, grown over the
+  arch's inner line by the width of the painting's outlines, about seven
+  pixels), so that the wall keeps its line round the door's cut-out, no
+  mortar line of the wall beside the arch comes with the leaf, and
+  nothing of the open doorway shows through it. `tools/art/trace.py
+  <scene> footprint <door>` makes that polygon, and it is made again
+  whenever `repaint.py doorways` lays the fill again. A static thing's
+  hole (`holes`) takes every pixel its polygon touches and two more round
+  them, the reach of the page's resampling, so that a hole traced from a
+  leaf leaves no pixel of the wall on it.
+  `tools/art/trace.py` helps to trace a leaf: `outline` gives a first
   polygon, `look` a crop at three times the size with a grid every tenth
   of a cell and the points numbered, and `--diff` shows in red what the
   model painted again round the leaf. Twenty to sixty points a leaf, the
@@ -305,10 +320,11 @@ with no figure: the ground, every row and every thing at its depth, the
 others resting, each panel round the thing's box with a cell of margin,
 enlarged as on the states sheet and numbered from 1, four a row. On it,
 each open leaf is whole to its foot, its lower corners rounded; each open
-doorway ends in its threshold, its foot on the jambs' feet, the floor
-before the door untouched below it; no outline of the closed leaf is left
-at a doorway's foot. To name a cell when something looks wrong, open the
-game with `?debug` (docs/dev/dev-environment.md).
+doorway ends in its threshold, its foot on the jambs' feet with no floor
+between them, or on the floor's own line where the floor before the door
+begins, the floor before the door untouched below it; no outline of the
+closed leaf is left at a doorway's foot. To name a cell when something
+looks wrong, open the game with `?debug` (docs/dev/dev-environment.md).
 
 ## What a painting must keep to
 
@@ -368,7 +384,11 @@ the choice among Gemini's tries:
   (`art/raw/<scene>/layout.png`), and it is the prompt's first picture; a
   try is laid under the same grid with `layout.py <scene> --over <try>`
   and chosen only when its walls, doorways and furniture lie in the
-  layout's cells. A try that is off is asked for again, not mended.
+  layout's cells. A try that is off is asked for again, not mended. The
+  prompt asks for the picture on the grid as if the grid lay on the floor
+  (D115): the things and the edges coincide roughly with the cells'
+  lines, a thing's base in its cells and its height free to rise over the
+  cell above; it never lists what each cell holds.
 - **The floor a figure walks is open.** Furniture stands against the top
   wall or in the corners, where no figure walks beside or behind it. A
   thing in the middle of the floor costs a mask to make and to check; one a
@@ -377,7 +397,14 @@ the choice among Gemini's tries:
   from the front, with an arch at least two cells wide and a fifth of a
   cell taller than the tallest figure, so that the check's tenth (D98)
   holds with room to spare; open, it shows the floor of the
-  room beyond, at that room's light (D108). No slits in walls seen from
+  room beyond, at that room's light (D108). Every door is asked of the
+  model shut and open when the scene is painted, and both masks are made
+  from those pictures (D116); the open picture shows the floor of the room
+  beyond, never the room before, and at the doorway's foot a joint
+  painted from jamb to jamb, a board or a row of paving, where the two
+  floors meet, so that the tool's threshold (D114) is not needed. A leaf's
+  lower corners and the row it is cut at below are what most often go
+  wrong: look there first on the doors sheet. No slits in walls seen from
   above: a wall between rooms is seen from the front, or the rooms are two
   scenes. Where a painting has a doorway in a wall seen from above, the
   walked cells go through that doorway and no other, and whoever stands in

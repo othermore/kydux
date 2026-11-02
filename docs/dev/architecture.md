@@ -1809,3 +1809,16 @@ one overturns stays, marked as superseded.
   go from the wizard's hands to whoever takes it. Rules out a name put
   into the child's program unseen, `find_nearest` looking into the
   wizard's hands, and lists with their brackets before chapter 4.
+- **D124 — Going to sleep is seen: the lights go out, the sleeper is
+  seen, the morning comes.** Decided 2026-10-29 by the owner. When a
+  level is won by the wizard going to sleep (a `sleep` goal), the card
+  waits: once the wizard lies in the bed, the night falls over the whole
+  scene, a dark blue that leaves the sleeper and the room faintly seen,
+  the wizard is seen asleep for a moment with a small thought of sleep,
+  and then the dark lifts into a warm morning light that stays on the
+  scene until the level is left; only then the card shows. A story that
+  plays in the morning on a scene painted at night opens under that same
+  morning light (`light` in its staging). The times are the page's own,
+  not the run's speed. Rules out a win card over a wizard who has just
+  lain down in the dark, and a morning story told on a night scene with
+  no light of morning.

@@ -6,7 +6,7 @@
   ],
   "starting_code": "# ¡Compartimos dormitorio! Ve a la cama libre junto a la mía y duerme.\n",
   "hints": [
-    "Primero, camina hacia arriba para entrar a nuestro dormitorio por el arco de la derecha.",
+    "Primero, camina un poco a la derecha y luego hacia arriba, hasta el arco de la derecha de nuestro dormitorio.",
     "Da unos pasos a la derecha para situarte junto a la cama libre.",
     "Por último, usa el método `sleep` para acostarte y descansar."
   ],

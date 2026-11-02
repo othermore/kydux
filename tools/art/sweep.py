@@ -73,6 +73,9 @@ class Layer:
     rgba: np.ndarray
     left: int
     top: int
+    #: A static thing's row image, drawn over the painting as it is (D89): what
+    #: covers a figure there is the thing itself, never the lawn or a hole.
+    static: bool = False
 
 
 @dataclass
@@ -111,8 +114,11 @@ def load(scene: str) -> Scene:
         found.thresholds = scene_settings.settings(scene).thresholds
     for row in art["rows"]:
         rgba = np.array(Image.open(folder / row["image"]).convert("RGBA"))
+        name = f"row {row['row']}" + (" static" if row.get("static") else "")
         found.layers.append(
-            Layer(f"row {row['row']}", row["row"] + 0.75, row["row"], rgba, 0, row["top"])
+            Layer(
+                name, row["row"] + 0.75, row["row"], rgba, 0, row["top"], row.get("static", False)
+            )
         )
     for name, thing in art["things"].items():
         state = "closed" if "closed" in thing["states"] else next(iter(thing["states"]))
@@ -291,9 +297,12 @@ def outlined(
 
 
 def floating(scene: Scene) -> list[Problem]:
+    """Pixels of a row's image not held down to its foot: a shadow or a flower cut
+    as a thing. A static thing is boxed by hand, and an arch's lintel is held by its
+    posts across the opening it spans (D89): it is never looked at."""
     found = []
     for layer in scene.layers:
-        if layer.row is None:
+        if layer.row is None or layer.static:
             continue
         height = layer.rgba.shape[0]
         solid = layer.rgba[..., 3] > 128
@@ -338,7 +347,7 @@ def lawn(scene: Scene, seen: Differs) -> list[Problem]:
     the lawn between two things, drawn in front of whoever stands there."""
     found = []
     for layer in scene.layers:
-        if layer.row is None:
+        if layer.row is None or layer.static:
             continue
         height, width = layer.rgba.shape[:2]
         same = ~seen.raw[layer.top : layer.top + height, :width]
@@ -369,7 +378,7 @@ def holes(scene: Scene, seen: Differs) -> list[Problem]:
     scale = scene.cell // small
     found = []
     for layer in scene.layers:
-        if layer.row is None:
+        if layer.row is None or layer.static:
             continue
         height, width = layer.rgba.shape[:2]
         solid = layer.rgba[..., 3] > 128

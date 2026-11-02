@@ -2,8 +2,8 @@
 """A chosen painting mended in a few places, and nowhere else (the owner's rule of
 2026-10-26: once a scene's painting is chosen it does not change, unless it must).
 
-    tools/art/repaint.py <scene> canvas
-    tools/art/repaint.py <scene> join <picture>
+    tools/art/repaint.py <scene> canvas [--section <name>]
+    tools/art/repaint.py <scene> join <picture> [--section <name>]
 
 What to mend is the scene's settings' `repaint` (art/scenes/<scene>/cut.json,
 D82): the painting it starts from (`from`), how many pixels it grows by below
@@ -24,6 +24,13 @@ the grown band, each faded in over FADE, the painting's own everywhere else.
 Rows below where the model's picture reaches take its last row. Models paint
 the whole picture again when asked to edit it, and sometimes paint over what was
 asked to be kept: the join keeps it whatever the model did.
+
+The same is done for any other section of the settings, named by `--section`:
+`without`, the edit of a scene indoors without its static things (D89), which
+those things are cut against. There, `boxes` may be `"statics"`, every static
+thing's box, a little grown; `plain` gives the model the painting itself, not
+blurred, for it to take the things out of; and with no `crop` the model is given
+the whole painting.
 """
 
 import json
@@ -45,10 +52,35 @@ SMALL = 8
 BLUR = 60
 
 
-def settings_of(scene: str) -> dict:
-    found = scene_settings.settings(scene).data.get("repaint")
+#: How far round a static thing's box the model's picture is taken, in the
+#: painting's pixels.
+STATIC_PAD = 24
+
+
+def settings_of(scene: str, section: str = "repaint") -> dict:
+    settings = scene_settings.settings(scene)
+    found = settings.data.get(section)
     if not found:
-        raise SystemExit(f"{scene}: its settings name nothing to repaint")
+        raise SystemExit(f"{scene}: its settings have no {section}")
+    found = dict(found)
+    if found.get("boxes") == "statics":
+        gx, gy = settings.grid["x"], settings.grid["y"]
+        found["boxes"] = [
+            [
+                round(gx["offset"] + x0 * gx["spacing"]) - STATIC_PAD,
+                round(gy["offset"] + y0 * gy["spacing"]) - STATIC_PAD,
+                round(gx["offset"] + x1 * gx["spacing"]) + STATIC_PAD,
+                round(gy["offset"] + y1 * gy["spacing"]) + STATIC_PAD,
+            ]
+            for x0, y0, x1, y1 in (
+                thing["box"]
+                for thing in settings.data.get("things", {}).values()
+                if thing.get("static")
+            )
+        ]
+    if "crop" not in found:
+        width, height = Image.open(REPO / found["from"]).size
+        found["crop"] = [0, 0, width, height + found.get("grow", 0)]
     return found
 
 
@@ -73,10 +105,14 @@ def grown(repaint: dict) -> np.ndarray:
     return painting
 
 
-def canvas(scene: str) -> Path:
-    repaint = settings_of(scene)
+def canvas(scene: str, section: str = "repaint") -> Path:
+    repaint = settings_of(scene, section)
     painting = grown(repaint)
-    blurred = np.array(Image.fromarray(painting).filter(ImageFilter.GaussianBlur(BLUR)))
+    blurred = (
+        painting
+        if repaint.get("plain")
+        else np.array(Image.fromarray(painting).filter(ImageFilter.GaussianBlur(BLUR)))
+    )
     part = painted_part(painting.shape[:2], repaint.get("boxes", []), repaint.get("grow", 0))[
         ..., None
     ]
@@ -135,8 +171,8 @@ def laid(crop: np.ndarray, kept: np.ndarray, picture: Image.Image) -> np.ndarray
     return whole.astype(np.float32)
 
 
-def join(scene: str, picture_path: Path) -> Path:
-    repaint = settings_of(scene)
+def join(scene: str, picture_path: Path, section: str = "repaint") -> Path:
+    repaint = settings_of(scene, section)
     painting = grown(repaint).astype(np.float32)
     part = painted_part(painting.shape[:2], repaint.get("boxes", []), repaint.get("grow", 0))
     x0, y0, x1, y1 = repaint["crop"]
@@ -156,13 +192,18 @@ def join(scene: str, picture_path: Path) -> Path:
 
 
 def main(arguments: list[str]) -> int:
+    section = "repaint"
+    if "--section" in arguments:
+        at = arguments.index("--section")
+        section = arguments[at + 1]
+        arguments = arguments[:at] + arguments[at + 2 :]
     if len(arguments) < 2 or arguments[1] not in ("canvas", "join"):
-        print("usage: repaint.py <scene> canvas | repaint.py <scene> join <picture>")
+        print("usage: repaint.py <scene> canvas | join <picture> [--section <name>]")
         return 2
     if arguments[1] == "canvas":
-        print(canvas(arguments[0]).relative_to(REPO))
+        print(canvas(arguments[0], section).relative_to(REPO))
     else:
-        print(join(arguments[0], Path(arguments[2])).relative_to(REPO))
+        print(join(arguments[0], Path(arguments[2]), section).relative_to(REPO))
     return 0
 
 

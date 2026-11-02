@@ -6,7 +6,7 @@
   ],
   "starting_code": "# We share a dormitory! Walk to the free bed beside mine and sleep.\n",
   "hints": [
-    "First, walk up to enter our dormitory through the arch on the right.",
+    "First, walk a little to the right and then up, to the arch on the right into our dormitory.",
     "Take a few steps right to stand beside the free bed.",
     "Finally, use the `sleep` method to lie down and rest."
   ],

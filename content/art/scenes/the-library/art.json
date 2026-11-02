@@ -7,6 +7,12 @@
   "ground": "ground.webp",
   "rows": [
     {
+      "row": 6,
+      "image": "row-6-static.webp",
+      "top": 418,
+      "static": true
+    },
+    {
       "row": 8,
       "image": "row-8.webp",
       "top": 822
@@ -17,9 +23,21 @@
       "top": 861
     },
     {
+      "row": 9,
+      "image": "row-9-static.webp",
+      "top": 712,
+      "static": true
+    },
+    {
       "row": 10,
       "image": "row-10.webp",
       "top": 861
+    },
+    {
+      "row": 17,
+      "image": "row-17-static.webp",
+      "top": 1445,
+      "static": true
     }
   ],
   "things": {

@@ -6,7 +6,7 @@
 ####uuuu.#.uuuu#.uuuu####
 ####uuuu.#uu.uu#.uuuu####
 ####uuuu..uu.uu..uuuu####
-####uuuu.........uuuu####
+####uuuu.....u...uuuu####
 ####uuuu.#...u.#.uuuu####
 ####uuuu.#.....#.uuuu####
 ####uuuu.#.....#.uuuu####

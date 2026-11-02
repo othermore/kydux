@@ -27,7 +27,12 @@ problem: a shadow or a flower drawn in front, the lawn drawn in front, a hole.
   has its foot on row r, cut from that ground by image_first.py, from its top
   down to the bottom edge of row r and never lower: a thing only ever covers
   the cells above its own, where a figure standing behind it is, and never the
-  cells below, where a figure standing in front of it is;
+  cells below, where a figure standing in front of it is. A scene indoors is cut
+  by its settings' static things instead (`"cut": false`, D89): each is named
+  with its box and its row, cut against the edit without it as a thing that
+  opens is, and drawn into its row's image, never on its own; a door's own
+  pixels are left to the door, so that an arch round it is static and the door
+  still opens;
 - <thing>-<state>.webp: each state of what opens or is picked up, cut by the
   difference between the picture of that state and the edit without the thing,
   and trimmed at its own row's bottom edge;
@@ -182,6 +187,32 @@ def sprite_alpha(
     return alpha * kept(alpha > 0.5, 0.03)
 
 
+#: A static thing masked as `pale` (D89): the stone or plaster of an arch, a
+#: wall's face, light and grey against the wood and the dark round it, in the
+#: HSV's value and saturation; and how far its dark outline beside it is taken.
+PALE_VALUE = 0.55
+PALE_SATURATION = 0.32
+PALE_OUTLINE = 7
+
+
+def static_alpha(painting: np.ndarray, box: tuple[int, int, int, int], thing: dict) -> np.ndarray:
+    """A static thing's alpha in the painting's own pixels, inside its box: what is
+    pale there and its outline (`"mask": "pale"`), or the whole box (`"box"`)."""
+    inside = in_box(painting.shape[:2], box)
+    if thing.get("mask") == "box":
+        return inside.astype(np.float32)
+    hsv = np.array(Image.fromarray(painting).convert("HSV")).astype(np.float32) / 255
+    pale = (hsv[..., 2] > thing.get("value", PALE_VALUE)) & (
+        hsv[..., 1] < thing.get("saturation", PALE_SATURATION)
+    )
+    pale &= inside
+    pale = kept(pale, 0.02)
+    near = Image.fromarray(pale.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(PALE_OUTLINE))
+    dark = hsv[..., 2] < 0.38
+    mask = (pale | ((np.array(near) > 0) & dark)) & inside
+    return soft(mask, 1.2) * inside
+
+
 def aligned_rgba(image: np.ndarray, grid: dict, columns: int, rows: int) -> np.ndarray:
     """An RGBA picture in the painting's pixels moved onto the page's grid."""
     gx, gy = grid["x"], grid["y"]
@@ -222,15 +253,19 @@ def clip_below(
 
 
 def composite(
-    scene: Settings, grid: dict
+    scene: Settings, grid: dict, statics: bool = True
 ) -> tuple[np.ndarray, dict[str, np.ndarray], dict[str, np.ndarray]]:
     """The painting with what opens or is picked up taken out, each from the edit
-    without it, in the painting's own pixels; and each thing's picture without it,
-    and the mask of where it was."""
+    without it, in the painting's own pixels, the static things too unless
+    `statics` is false; and each thing's picture without it, and the mask of where
+    it was."""
     painting = np.array(Image.open(scene.painting).convert("RGB"))
     ground = painting.copy()
     withouts, masks = {}, {}
     for name, thing in scene.things.items():
+        # A static thing with no edit without it is drawn over the painting as it is.
+        if thing.get("static") and (not statics or "without" not in thing):
+            continue
         without = np.array(Image.open(scene.edits / thing["without"]).convert("RGB"))
         box = native_box(grid, thing["box"])
         if thing.get("whole_box"):
@@ -325,16 +360,25 @@ def scene(settings: Settings) -> Path:
     grid = settings.grid
     marks = settings.marks()
     rows, columns = len(marks), len(marks[0])
-    ground, withouts, _ = composite(settings, grid)
+    ground, withouts, masks = composite(settings, grid)
     # The ground, cut by image_first.py into the rows of what stands up: from a
     # source folder holding the ground in place of the painting, with no box for
-    # a gate or a seal, since nothing of them is left in it.
+    # a gate or a seal, since nothing of them is left in it. A scene cut by its
+    # static things (D89) keeps the painting with them as its source, and the
+    # ground without them as its ground-only edit, for the sweep's checks.
+    cutting = settings.data.get("cut", True)
     src = settings.src
     src.mkdir(parents=True, exist_ok=True)
-    Image.fromarray(ground).save(src / "ground-composite.png")
     (src / "grid.json").write_text(json.dumps(grid))
     shutil.copy(settings.map, src / "marks.txt")
-    shutil.copy(settings.ground_only, src / "ground-only.png")
+    if cutting:
+        Image.fromarray(ground).save(src / "ground-composite.png")
+        shutil.copy(settings.ground_only, src / "ground-only.png")
+    else:
+        Image.fromarray(composite(settings, grid, statics=False)[0]).save(
+            src / "ground-composite.png"
+        )
+        Image.fromarray(ground).save(src / "ground-only.png")
     empty = [0, 0, 0, 0]
     # A thing lying on a flat stone, cut whole from its box, stands the stone on
     # its row; nothing is left of the things to cut.
@@ -350,12 +394,14 @@ def scene(settings: Settings) -> Path:
         "thresholds": settings.data.get("thresholds", {}),
     }
     (src / "cut.json").write_text(json.dumps(cut))
-    keep = image_first.TILE
-    image_first.TILE = CELL
-    try:
-        field = json.loads(image_first.build(src, settings.cut).read_text())
-    finally:
-        image_first.TILE = keep
+    field: dict = {"layers": []}
+    if cutting:
+        keep = image_first.TILE
+        image_first.TILE = CELL
+        try:
+            field = json.loads(image_first.build(src, settings.cut).read_text())
+        finally:
+            image_first.TILE = keep
     out = settings.out
     if out.exists():
         shutil.rmtree(out)
@@ -370,32 +416,62 @@ def scene(settings: Settings) -> Path:
     if margin:
         floor = with_margin(floor, margin, inside)
     webp(floor, out / "ground.webp")
-    rows_out = []
+    # Each row's image, as a strip of the scene's width from its top down to the
+    # row's bottom edge: what image_first.py cut, and the static things after.
+    # The static things' strips are their rows' images of their own, `static` in
+    # art.json, so that the sweep looks at what the cut made apart from them (D89).
+    strips: dict[tuple[int, bool], tuple[int, Image.Image]] = {}
+
+    def into_row(row: int, sprite: Image.Image, x: int, y: int, static: bool = False) -> None:
+        key = (row, static)
+        top, strip = strips.get(key, (y, None))
+        top = min(top, y)
+        bottom = max((row + 1) * CELL, y + sprite.height)
+        grown = Image.new("RGBA", (width, bottom - top), (0, 0, 0, 0))
+        if strip is not None:
+            grown.alpha_composite(strip, (0, strips[key][0] - top))
+        grown.alpha_composite(sprite, (x, y - top))
+        strips[key] = (top, grown)
+
     for layer in field["layers"]:
         if not layer["name"].startswith("row "):
             continue
         row = layer["row"]
         crop = Image.open(settings.cut / layer["file"]).convert("RGBA")
         x, y = layer["at"]
-        top = y
-        strip = Image.new("RGBA", (width, (row + 1) * CELL - top), (0, 0, 0, 0))
-        strip.alpha_composite(
-            crop.crop((0, 0, crop.width, min(crop.height, strip.height))), (x, 0)
-        )
-        pixels = np.array(strip)
-        alpha = clip_below(pixels[..., 3] / 255, row, top)
-        if inside is not None:
-            alpha *= np.clip(inside[top : top + alpha.shape[0]] / EDGE_FEATHER, 0, 1)
-        pixels[..., 3] = (alpha * 255).astype(np.uint8)
-        if not pixels[..., 3].any():
-            continue
-        webp(Image.fromarray(pixels), out / f"row-{row}.webp")
-        rows_out.append({"row": row, "image": f"row-{row}.webp", "top": top})
+        crop = crop.crop((0, 0, crop.width, min(crop.height, (row + 1) * CELL - y)))
+        into_row(row, crop, x, y)
     # Each thing's states, at the page's size: the picture of the state where it
     # differs from the picture without the thing.
     painting = np.array(Image.open(settings.painting).convert("RGB"))
+    # Where a thing that opens or is picked up lies, which no static thing takes.
+    doors = np.zeros(painting.shape[:2], dtype=bool)
+    for name, thing in settings.things.items():
+        if not thing.get("static"):
+            doors |= masks[name]
+    doors = (
+        np.array(Image.fromarray(doors.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(9)))
+        > 0
+    )
     things = {}
     for name, thing in settings.things.items():
+        if thing.get("static"):
+            native = native_box(grid, thing["box"])
+            box = tuple(round(v * CELL) for v in thing["box"])
+            if name in withouts:
+                alpha = sprite_alpha(painting, withouts[name], native, thing)
+            else:
+                alpha = static_alpha(painting, native, thing)
+            alpha = alpha * ~doors
+            rgba = np.dstack([painting, (alpha * 255).astype(np.uint8)])
+            sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
+            sprite = sprite.copy()
+            below = clip_below(
+                sprite[..., 3] / 255, thing["row"], box[1], reach=thing.get("reach", 0.0)
+            )
+            sprite[..., 3] = (below * 255).astype(np.uint8)
+            into_row(thing["row"], Image.fromarray(sprite, "RGBA"), box[0], box[1], static=True)
+            continue
         without = withouts[name]
         native = native_box(grid, thing["box"])
         box = tuple(round(v * CELL) for v in thing["box"])
@@ -428,6 +504,22 @@ def scene(settings: Settings) -> Path:
         # The cell it is painted on, for a level that lays it on another (D85).
         if "at" in thing:
             things[name]["at"] = thing["at"]
+    rows_out = []
+    for row, static in sorted(strips):
+        top, strip = strips[(row, static)]
+        # Each piece was clipped at its row's bottom edge, or its reach, before.
+        pixels = np.array(strip)
+        alpha = pixels[..., 3] / 255
+        if inside is not None:
+            alpha *= np.clip(inside[top : top + alpha.shape[0]] / EDGE_FEATHER, 0, 1)
+        pixels[..., 3] = (alpha * 255).astype(np.uint8)
+        if not pixels[..., 3].any():
+            continue
+        image = f"row-{row}{'-static' if static else ''}.webp"
+        webp(Image.fromarray(pixels), out / image)
+        rows_out.append(
+            {"row": row, "image": image, "top": top, **({"static": True} if static else {})}
+        )
     art = {
         "cell": CELL,
         "size": [columns, rows],

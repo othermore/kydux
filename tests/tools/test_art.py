@@ -316,7 +316,8 @@ def test_every_scene_s_settings_name_its_pictures_and_its_things():
         assert {"folder", "edits", "painting", "grid", "ground"} <= set(settings.data["sources"])
         for thing in settings.things.values():
             assert len(thing["box"]) == 4 and isinstance(thing["row"], int)
-            assert thing["states"] and "without" in thing
+            # A static thing is cut against an edit without it, or by its mask (D89).
+            assert thing["states"] and ("without" in thing or thing.get("mask") in ("pale", "box"))
         assert settings.map.is_file(), name
 
 
@@ -467,7 +468,8 @@ def test_an_exported_scene_keeps_its_contract_and_nothing_reaches_below_its_row(
         # The full width, from its top down to its row's bottom edge and no lower.
         assert image.width == columns * cell
         assert layer["top"] + image.height == (layer["row"] + 1) * cell
-    things = export_scene.settings(scene).things
+    # A static thing is drawn into its row's image, never as a thing (D89).
+    things = {k: v for k, v in export_scene.settings(scene).things.items() if not v.get("static")}
     assert set(art["things"]) == set(things)
     for name, thing in art["things"].items():
         # A thing may reach into the row below by what its settings allow it (a

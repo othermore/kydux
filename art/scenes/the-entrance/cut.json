@@ -1,5 +1,5 @@
 {
-  "about": "The castle's entrance hall at night, chapter 2's first story: the painting (image-first-entrance) with its grid removed by Gemini. A story's scene with no level: nothing in it opens or is picked up, and no one stands behind anything tall, so the whole painting is ground. Pictures named here are in art/raw/, which git ignores.",
+  "about": "The castle's entrance hall at night, chapter 2's first story: the painting (image-first-entrance) with its grid removed by Gemini. A story's scene with no level: nothing in it opens or is picked up. The far wall's face round its three arches is cut as a static thing (D89), so that whoever walks into an arch goes under it; the rest is ground. Pictures named here are in art/raw/, which git ignores.",
   "sources": {
     "folder": "art/raw/game-entrance",
     "edits": "art/raw/game-entrance",
@@ -7,8 +7,26 @@
     "grid": "grid.json",
     "ground": "game-entrance-nogrid.png"
   },
-  "things": {},
+  "things": {
+    "far_wall": {
+      "about": "The far wall's face, its pillars and its knights, drawn over whoever walks into the arches.",
+      "box": [
+        4.0,
+        2.4,
+        36.0,
+        9.15
+      ],
+      "row": 9,
+      "static": true,
+      "solid": true,
+      "mask": "pale",
+      "states": {
+        "standing": "painting"
+      }
+    }
+  },
   "cuts": [],
   "castle": 0,
-  "source": "# The entrance hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-entrance.md`, with the field as its style's\n  reference, then edited by it without its grid (`game-entrance-nogrid.md`).\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n"
+  "source": "# The entrance hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-entrance.md`, with the field as its style's\n  reference, then edited by it without its grid (`game-entrance-nogrid.md`).\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
+  "cut": false
 }

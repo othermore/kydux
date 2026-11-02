@@ -222,6 +222,54 @@
         5
       ],
       "about": "The door of Eldra's little room, at the top aisle's left end."
+    },
+    "wenna_door_arch": {
+      "about": "The stone arch round Wenna's door, over whoever stands in its doorway.",
+      "box": [
+        6.62,
+        15.05,
+        8.38,
+        17.05
+      ],
+      "row": 17,
+      "static": true,
+      "solid": true,
+      "mask": "pale",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "centre_door_arch": {
+      "about": "The stone arch round the centre door, over whoever stands in its doorway.",
+      "box": [
+        6.62,
+        7.42,
+        8.38,
+        9.05
+      ],
+      "row": 9,
+      "static": true,
+      "solid": true,
+      "mask": "pale",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "room_door_arch": {
+      "about": "The stone arch round Eldra's door, over whoever stands in its doorway.",
+      "box": [
+        1.75,
+        4.35,
+        3.15,
+        6.05
+      ],
+      "row": 6,
+      "static": true,
+      "solid": true,
+      "mask": "pale",
+      "states": {
+        "standing": "painting"
+      }
     }
   },
   "cuts": [],

@@ -450,6 +450,7 @@ class LevelScene extends Phaser.Scene {
       story: story ? { x: centre(story.camera)[0], y: centre(story.camera)[1] } : null,
       wizard: () => this.wizard,
       around: (figure) => this.speech.around(figure),
+      zoomed: (cameraZoom) => this.speech.setZoom(cameraZoom),
     });
     this.view.setUp();
     // The painted rows and things, each with the row its foot stands on; a placeholder

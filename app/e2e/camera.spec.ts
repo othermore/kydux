@@ -1,5 +1,6 @@
 // The camera on a scene bigger than its window (D69): it follows the wizard, the
-// player zooms it with the buttons and the wheel and drags it to look around, and
+// player zooms it with the buttons a step at a time and with the wheel a little at
+// a time (D106), on a level's scene and a story's, and drags it to look around, and
 // a run brings it back to the wizard. The canvas takes the frame's shape, so how
 // far it zooms out is the scene's size and its painted margin's (D83) against the
 // frame: the field, painted with a margin, is zoomed on.
@@ -30,7 +31,12 @@ test('the camera zooms, is dragged, and comes back to the wizard on a run', asyn
   if (!box) throw new Error('the scene has no canvas');
   const [x, y] = [box.x + box.width / 2, box.y + box.height / 2];
   await page.mouse.move(x, y);
+  // The wheel turns the zoom a little at a time (D106): two notches out from 2.
   await page.mouse.wheel(0, 200);
+  await expect(scene).toHaveAttribute('data-zoom', '1.65');
+  await expect(page.locator('#zoom-in')).toBeEnabled();
+  // The buttons step on from there to the next of their zooms.
+  await page.locator('#zoom-out').click();
   await expect(scene).toHaveAttribute('data-zoom', '1.5');
 
   // A drag looks around: the camera lets go of the wizard.
@@ -108,3 +114,26 @@ test('a shaky press does not let go of the wizard; Find my wizard brings the cam
   await expect(scene).toHaveAttribute('data-following', 'true');
   await expect(page.locator('#find-wizard')).toBeHidden();
 });
+
+test('a story has the zoom box, opens at zoom 1, and its words keep their size zoomed out (D106)', async ({
+  page,
+}) => {
+  await page.goto('/#story/the-first-night');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  await expect(page.locator('#zoom-in')).toBeVisible();
+  await expect(scene).toHaveAttribute('data-zoom', '1');
+  await page.locator('#zoom-in').click();
+  await expect(scene).toHaveAttribute('data-zoom', '1.5');
+  const box = await scene.locator('canvas').boundingBox();
+  if (!box) throw new Error('the scene has no canvas');
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.wheel(0, -100);
+  await expect(scene).toHaveAttribute('data-zoom', '1.65');
+  // Find my wizard waits for a drag in a story too.
+  await expect(page.locator('#find-wizard')).toBeHidden();
+  // The words are drawn at the scene's size zoomed in, larger zoomed out.
+  const scale = Number(await scene.getAttribute('data-words-scale'));
+  expect(scale).toBeGreaterThanOrEqual(1);
+});
+

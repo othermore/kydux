@@ -1,11 +1,14 @@
 // The words said on the scene: a bubble with a tail over whoever says them, and
 // the wizard's thoughts in a grey cloud when an action could not be done (D28).
 // Each stays some ticks, follows who it is over as they walk, sits below them
-// when there is no room above, and is never held past the scene's sides. The
-// scene's parent says what is said: data-bubble and data-speaker, data-thought.
+// when there is no room above, and is never held past the scene's sides. Its
+// words are never smaller on the screen than at zoom 1 (D106): zoomed out, they
+// are drawn larger. The scene's parent says what is said: data-bubble and
+// data-speaker, data-thought, and data-words-scale.
 
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
+import { wordsScale } from './zooming';
 
 /** How far a bubble's drawn box and tail reach beyond its words, at most: a
  * container's bounds are its words' alone. */
@@ -31,6 +34,8 @@ export class Speech {
   private place = { width: 0, below: false };
   /** Who a bubble or a thought is over: the wizard, or an actor who speaks. */
   private speaker: Phaser.GameObjects.Sprite | null = null;
+  /** How much larger the words are drawn than the scene's pixels (wordsScale). */
+  private scale = 1;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -47,6 +52,15 @@ export class Speech {
   expire(tick: number, instant: boolean): void {
     if (this.bubble && (instant || tick >= this.bubbleUntil)) this.clearBubble();
     if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
+  }
+
+  /** The camera's zoom, the scene's pixels to the screen's: the words drawn larger
+   * when it is less than 1, a bubble already said with them. */
+  setZoom(cameraZoom: number): void {
+    this.scale = wordsScale(cameraZoom);
+    this.bubble?.setScale(this.scale);
+    this.thought?.setScale(this.scale);
+    this.parent.dataset.wordsScale = String(Math.round(this.scale * 100) / 100);
   }
 
   /** Every frame: the words over who says them, as they walk. */
@@ -76,14 +90,14 @@ export class Speech {
   /** Over who speaks, or under them when there is no room above; never past the sides. */
   private anchor(): [number, number] {
     const over = this.speaker ?? this.parts.wizard();
-    const half = this.place.width / 2 + 4;
+    const half = (this.place.width / 2 + 4) * this.scale;
     const x = Math.min(Math.max(over.x, half), Math.max(half, this.parts.width - half));
     return [x, over.y + (this.place.below ? 22 : -this.parts.headroom)];
   }
 
   /** Whether a bubble this tall fits over who speaks, inside the scene. */
   private roomAbove(height: number): boolean {
-    return (this.speaker ?? this.parts.wizard()).y - this.parts.headroom - height - 14 >= 2;
+    return (this.speaker ?? this.parts.wizard()).y - this.parts.headroom - (height + 14) * this.scale >= 2;
   }
 
   /** A thought over the wizard: grey and rounded, with two small circles under it,
@@ -117,7 +131,7 @@ export class Speech {
     cloud.fillCircle(-12, sign * 1, 2.5).strokeCircle(-12, sign * 1, 2.5);
     words.setOrigin(0.5, below ? 0 : 1).setY(below ? 14 + pad : -14 - pad);
     this.place = { width, below };
-    this.thought = this.scene.add.container(...this.anchor(), [cloud, words]).setDepth(11);
+    this.thought = this.scene.add.container(...this.anchor(), [cloud, words]).setDepth(11).setScale(this.scale);
     this.thoughtUntil = tick + ticks;
     this.parent.dataset.thought = text.replaceAll('`', '');
   }
@@ -168,7 +182,7 @@ export class Speech {
     box.lineTo(tip + 6, base);
     box.strokePath();
     words.setY(top + pad);
-    this.bubble = this.scene.add.container(x, y, [box, words]).setDepth(10);
+    this.bubble = this.scene.add.container(x, y, [box, words]).setDepth(10).setScale(this.scale);
     this.bubbleUntil = tick + ticks;
     this.parent.dataset.bubble = plain;
     this.parent.dataset.speaker = who;

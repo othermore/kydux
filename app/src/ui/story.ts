@@ -1,12 +1,12 @@
 // A story told on its scene (D74): the scene drawn wide, with no editor and no
-// goals; under it the voice's band; each step's action played on the scene,
-// then its words said in a bubble over who says them, or by the voice in the
-// band. Next goes on to the step after, Back to the one before; Enter and Space
-// do what Next does. Again plays the step's action once more, as R does, on a
-// step that has one; Skip goes to the last step, every figure where the story
-// leaves it, for a child who has read it before. On the last step Go on leads to
-// what comes next; reaching it marks the story read, as reading a story to its
-// end does.
+// goals, and the zoom box on it (D106); under it the voice's band; each step's
+// actions played on the scene, then its words said in a bubble over who says
+// them, or by the voice in the band. Next goes on to the step after, Back to the
+// one before; Enter and Space do what Next does. Again plays the step's actions
+// once more, as R does, on a step that has some; Skip goes to the last step,
+// every figure where the story leaves it, for a child who has read it before. On
+// the last step Go on leads to what comes next; reaching it marks the story read,
+// as reading a story to its end does.
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
@@ -18,6 +18,7 @@ import type { LevelJson } from '../runtime/protocol';
 import * as progress from '../progress/progress';
 import { element } from './dom';
 import type { Screen } from './screen';
+import { zoomBox } from './zoom';
 
 export interface StoryScreenParts {
   story: Story;
@@ -45,7 +46,9 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   let destroyed = false;
 
   const sceneParent = element('div', { id: 'scene', className: 'scene' });
-  const frame = element('div', { className: 'scene-frame story-frame' }, [sceneParent]);
+  // The camera's zoom, as on a level's scene (D106).
+  const zoom = zoomBox(sceneParent, { story: true });
+  const frame = element('div', { className: 'scene-frame story-frame' }, [sceneParent, zoom.node]);
   const voice = element('div', { id: 'story-voice', className: 'story-voice' });
   // What a figure says, for a screen reader, which cannot read the bubble.
   const heard = element('p', { id: 'story-heard', className: 'visually-hidden', ariaLive: 'polite' });
@@ -161,12 +164,14 @@ export function storyScreen(parts: StoryScreenParts): Screen {
           return;
         }
         scene = handle;
+        zoom.attach(handle);
         play();
       });
       forward.focus();
     },
     async relabel() {
       story = await parts.reload();
+      zoom.relabel();
       play();
     },
     destroy() {

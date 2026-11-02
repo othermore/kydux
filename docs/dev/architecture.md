@@ -1773,3 +1773,36 @@ one overturns stays, marked as superseded.
   them of itself, walls, bushes, rocks, water, a drop, never a floor one
   could walk on. Rules out a margin the zoom runs out of, and a margin
   of open floor that only the map forbids.
+- **D119 — A wizard with no name is Kydux.** Decided 2026-10-29 by the
+  owner. Where no wizard has been made, which only the tester's mode
+  brings about by skipping the creator, the wizard's name in every text
+  is the creator's default name, *Kydux*, in every language; no other
+  word stands in for it. Rules out *apprentice* as a stand-in.
+- **D120 — A floating figure never stands still.** Decided 2026-10-29 by
+  the owner. A figure that floats (Eldra) is drawn, while it stands, with
+  its dress swaying at the hem, slowly and without end, in a level and in
+  a story alike; walking, it steps as every figure does (its step frames
+  are its dress grown and swung, `tools/art/figures.py`). Rules out a
+  ghost that hangs in the air like a picture.
+- **D121 — A way's places are taken while the level is out of sight.**
+  Decided 2026-10-29 by the owner. When a run starts, the scene fades out
+  and stays out until Python has run and the way to show is known; the
+  things and the figures are put at that way's places while nothing is
+  seen, and the scene fades back in with everything in place (D51, D75).
+  Rules out a thing seen to jump to its place after the level has come
+  back.
+- **D122 — The map opens at the place the child has reached.** Decided
+  2026-10-29 by the owner. Opened from a level, a lesson or a story, the
+  map scrolls to that item and marks it; opened from the start screen, it
+  scrolls to the item last opened and marks it the same way. A story
+  opened counts as the item last opened, as a lesson and a level do.
+  Rules out a map that opens at its top.
+- **D123 — What the wizard carries is found, and is seen when given.**
+  Decided 2026-10-29 by the designer, for the practice of giving. A level
+  may start with a thing in the wizard's hands that has a picture
+  (`carrying` names the kind, or the kind with its `art`), and
+  `find_nearest` finds a carried thing first, at no distance: a name kept
+  in one program is gone in the next, so the next program asks again, and
+  what is held is the nearest of all. Given, the thing is seen to go from
+  the wizard's hands to whoever takes it. Rules out a practice of giving
+  that first makes the child find and pick the thing up again.

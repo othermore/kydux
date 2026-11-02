@@ -42,6 +42,18 @@ design:
   years ago; it moves because someone moves it; the door is far because
   the program is old. The idea and the story agree, so the child remembers
   both.
+- **A lesson teaches one idea, and its practice needs that idea alone.**
+  A lesson that would teach two ideas is two lessons, each with its
+  practice: finding a thing and revealing it, then giving it. Rule given
+  by the owner on 2026-10-29, when the lost book's practice asked for
+  three ideas at once.
+- **A practice's starting code guides the child in comments**, one a
+  step, in the child's words, naming the method of each step and never
+  writing the program; the child writes the line under each comment
+  (the owner, 2026-10-29).
+- **Two things are never hidden in the same place**, and a figure that
+  appears in a story has a reason to be there that the story says (the
+  owner, 2026-10-29).
 - **A number the child cannot see is taught with a way to see it.** The
   grid's cells are taught with the naughty child's map, whose spell shows
   their numbers on the scene (D112); the child counts the cells between
@@ -128,17 +140,18 @@ that stays locked.
 | `story:the-morning` | Story 3 | The mate needs a wand, and the wizard's is lent: out of the door to the library, together. | |
 | `story:at-the-library` | Story 4 | Wenna receives them, walks to the shut door into the main library and opens it for them: the other doors on their way they open themselves. | |
 | `lesson:what-things-know` | Lesson 2 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.items`, `door.locked`, `concept:print` |
-| `lesson:finding-things` | Lesson 3 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept under a name, a variable; `reveal` makes it glow where it lies, through whatever hides it (D110); `give` hands a thing to whoever stands beside. | `wizard.find_nearest`, `thing.reveal`, `wizard.give` (and Python's `=`) |
-| `level:the-lost-book` | Practice 2 | Eldra's book, hidden in the aisle between the two long bookcases: found, made to glow, picked up, given. Bonus: made to glow with `reveal`. | |
-| `lesson:keys-and-doors` | Lesson 4 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. | `door.open` |
-| `level:the-hidden-key` | Practice 3 | The centre door's key lies under the front bookcase, out of sight: found, revealed, picked up from the aisle beside it, the door opened. Bonus: found with `find_nearest`. | |
-| `lesson:the-distance` | Lesson 5 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
+| `lesson:finding-things` | Lesson 3 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept under a name, a variable; `reveal` makes it glow where it lies, through whatever hides it (D110). | `wizard.find_nearest`, `thing.reveal` (and Python's `=`) |
+| `level:the-lost-book` | Practice 2 | Eldra's book, by the pile of books in the corner, half behind it (1,13): found, made to glow, picked up from beside the pile; the starting code guides each step in comments. Bonus: made to glow with `reveal`. | |
+| `lesson:giving-things` | Lesson 4 | A thing kept under a name is given to whoever stands beside the wizard with `give`; a name lives only in its program, so the next program asks for the thing again, and `find_nearest` finds what the wizard holds first of all. | `wizard.give` |
+| `level:the-book-returned` | Practice 3 | The book in hand from the start: asked for again, carried along the bookcases to the aisle's end and given to Eldra; the starting code guides each step in comments. Bonus: in fewer than 5 lines. | |
+| `lesson:keys-and-doors` | Lesson 5 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. | `door.open` |
+| `level:the-hidden-key` | Practice 4 | The centre door's key lies under the front bookcase, out of sight: found, revealed, picked up from the aisle beside it, the door opened; the starting code guides each step in comments. Bonus: found with `find_nearest`. | |
+| `lesson:the-distance` | Lesson 6 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
 | `level:the-moving-key` | Improve 1 | Eldra's room key lies at three, five or seven steps, in three ways; Wenna's program walks yesterday's five. Bonus: no number written. | |
 | `level:the-wrong-order` | Fix 1 | Wenna's program opens Eldra's door from across the aisle, then walks to it. | |
-| `lesson:fendra` | Lesson 6 | A spell that reaches: `wizard.cast("fendra", book)` draws the thing it is told, in a straight line three tiles away at most, to the wizard's tile. | (the spell `fendra`) |
-| `level:the-high-shelf` | Practice 4 | The rare book among many on the high shelf: found, revealed, drawn down from below it, glowing as it comes. Bonus: revealed with `reveal`. | |
-| `level:eldras-book` | Practice 5 | The chapter together: Eldra's own book from her little room, named, drawn down, given. Bonus: in fewer than 6 lines. | |
-| `story:the-wand-bank` | Story 5 | Eldra's thanks; the school wands; the friend's spare given back; the chapter summed up; at dusk, the rumour of the passages. | |
+| `lesson:fendra` | Lesson 7 | A spell that reaches: `wizard.cast("fendra", book)` draws the thing it is told, in a straight line three tiles away at most, to the wizard's tile. | (the spell `fendra`) |
+| `level:the-high-shelf` | Practice 5 | The chapter together: Eldra's other lost book among many on the high shelf: found, revealed, drawn down from below it with *fendra*, picked up, given to her. Bonus: revealed with `reveal`. | |
+| `story:the-wand-bank` | Story 5 | Eldra's thanks; the school wands; the friend comes out from behind the shelves, there for a book, having known the wizard's voice; the wizard introduces the mate; the spare wand given back; the chapter summed up; at dusk, the rumour of the passages. | |
 
 The world features chapter 2 needs: shelves and bookcases, tiles the
 wizard cannot walk on but can see across (D46); `fendra`, which pulls the

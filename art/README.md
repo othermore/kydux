@@ -426,6 +426,13 @@ the choice among Gemini's tries:
 - **Figures fit** (D98): a child at most 1.15 cells, a grown-up, who wears
   no hat, at most 1.31, every door a tenth of a cell taller than who walks
   through it.
+- **Where a painting's strip still falls off its cells, the figure moves,
+  not the map** (D95, D105): the cells are named in the scene's settings
+  with how far a figure on them is drawn lower (`lowered`: the library's
+  counter, half a cell) or sideways (`nudged`: the library's cells beside
+  the vault's wall, the dormitory's along the wall between the rooms),
+  so that the figure walks the painted strip and the map stays the map.
+  Lesson the owner drew on 2026-10-29 from chapter 2.
 
 ## The figures
 

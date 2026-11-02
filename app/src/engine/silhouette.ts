@@ -14,11 +14,15 @@
 import Phaser from 'phaser';
 import { coveredShare, HIDDEN_SHARE, type Solid } from './cover';
 
-/** The outline's colour, and how thick it is in the sheet's pixels. */
+/** The outline's colour, and how thick it is in the sheet's pixels: a figure's, and
+ * a thing's, which is small and drawn at half its size, so thicker. */
 const COLOUR = [255, 214, 51] as const;
 const THICK = 2;
-/** How long the line takes to fade away, and as long to come back. */
+const THING_THICK = 5;
+/** How long the line takes to fade away, and as long to come back; a thing's line
+ * never fades wholly, so that a small thing is never lost. */
 const BEAT_MS = 650;
+const THING_FAINTEST = 0.4;
 
 /** The textures' pixels, solid or not, read once for each. */
 const solids = new Map<string, Solid | null>();
@@ -44,7 +48,7 @@ function solidOf(scene: Phaser.Scene, key: string): Solid | null {
 }
 
 /** The outlines of a sheet's figures, frame for frame, as a texture named `key`. */
-function outlineSheet(scene: Phaser.Scene, sheet: string, key: string): void {
+function outlineSheet(scene: Phaser.Scene, sheet: string, key: string, thick = THICK): void {
   if (scene.textures.exists(key)) return;
   const source = scene.textures.get(sheet);
   const image = source.getSourceImage() as HTMLImageElement | HTMLCanvasElement;
@@ -64,11 +68,11 @@ function outlineSheet(scene: Phaser.Scene, sheet: string, key: string): void {
       if (solid[y * width + x]) continue;
       // A pixel just outside the figure, within THICK of it, is the line.
       let near = false;
-      for (let dy = -THICK; dy <= THICK && !near; dy += 1) {
-        for (let dx = -THICK; dx <= THICK && !near; dx += 1) {
+      for (let dy = -thick; dy <= thick && !near; dy += 1) {
+        for (let dx = -thick; dx <= thick && !near; dx += 1) {
           const nx = x + dx;
           const ny = y + dy;
-          if (nx >= 0 && ny >= 0 && nx < width && ny < height && dx * dx + dy * dy <= THICK * THICK) {
+          if (nx >= 0 && ny >= 0 && nx < width && ny < height && dx * dx + dy * dy <= thick * thick) {
             near = solid[ny * width + nx] === 1;
           }
         }
@@ -114,7 +118,7 @@ export class Silhouette {
     private readonly always = false,
   ) {
     const key = `${figure.texture.key}-outline`;
-    outlineSheet(scene, figure.texture.key, key);
+    outlineSheet(scene, figure.texture.key, key, always ? THING_THICK : THICK);
     this.line = scene.add.sprite(figure.x, figure.y, key, figure.frame.name).setDepth(9.5);
     // The mask: copies of what is painted, kept off the scene's own display list.
     const mask = new Phaser.GameObjects.Container(scene, 0, 0);
@@ -129,8 +133,9 @@ export class Silhouette {
     }
     this.line.enableFilters();
     this.line.filters?.external.addMask(mask, false, scene.cameras.main);
+    const faintest = always ? THING_FAINTEST : 0;
     if (still) this.line.setAlpha(0.85);
-    else scene.tweens.add({ targets: this.line, alpha: { from: 1, to: 0 }, duration: BEAT_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    else scene.tweens.add({ targets: this.line, alpha: { from: 1, to: faintest }, duration: BEAT_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   }
 
   /** Every frame: the mask of what is in front of the figure now, how much of it

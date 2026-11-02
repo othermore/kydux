@@ -2,7 +2,7 @@
   "title": "The first night",
   "steps": [
     "The common room is very quiet, with a warm fire crackling in the fireplace and a round rug between two open arches.",
-    "These are the first-years' rooms. The girls sleep on the left, the boys on the right, and you will all share this common room.",
+    "These are the first-years' rooms. {The girls sleep on the left, the boys on the right|The boys sleep on the left, the girls on the right}, and you all share this common room.",
     "Good night to both of you, and I will see you in the morning.",
     "Goodnight, {wizard}. I am so sleepy! I will see you tomorrow.",
     "{friend} walks through the arch on the left, heading into the other dormitory.",

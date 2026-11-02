@@ -17,7 +17,9 @@
 // camera's zoom, D69), data-following (whether the camera follows the wizard),
 // data-marks-hidden (the doors whose doorway's mark waits for them to open, D79),
 // data-revealed (the things whose outline shows where they lie, D85),
-// data-sleeping (the bed the wizard sleeps in, D84),
+// data-sleeping (the bed the wizard sleeps in, D84), data-asleep (each figure
+// asleep with its bed, "id:bed" joined by ",", and "lying" when it is drawn lying
+// under the bed's quilt, "id:bed:lying", D91),
 // data-silhouette (present on a painted scene, where the wizard's outline shows
 // when something hides more than a quarter of it, silhouette.ts), data-outlined
 // (present while it shows) and data-debug with data-debug-layers (the tester's view and
@@ -80,6 +82,7 @@ import {
   rowDepth,
   SHEET_ROW,
   shiftOf,
+  sleepFrame,
 } from './painted';
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
@@ -143,6 +146,10 @@ function tileOf(value: unknown): Tile | null {
   return Array.isArray(value) && value.length === 2 ? [Number(value[0]), Number(value[1])] : null;
 }
 
+/** How far a figure's head lies from its feet, a part of its height: where the
+ * middle of the head is, on the pillow, for a figure asleep (D91). */
+const HEAD_REACH = 0.65;
+
 const DELTA: Record<Facing, Tile> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
 interface ActorState {
@@ -173,6 +180,9 @@ class LevelScene extends Phaser.Scene {
   private doorMarks = new Map<string, Phaser.GameObjects.Container>();
   private carried = new Set<string>();
   private actors = new Map<string, ActorState>();
+  /** Who lies asleep (D91), by their figure: their id and bed, and whether they are
+   * drawn lying under its quilt, whose depth they keep. */
+  private readonly asleep = new Map<Phaser.GameObjects.Sprite, { id: string; bed: string; lying: boolean }>();
   private cone!: Phaser.GameObjects.Graphics;
   /** The words said, in bubbles and thoughts (speech.ts), and the camera (camera.ts). */
   private speech!: Speech;
@@ -519,11 +529,14 @@ class LevelScene extends Phaser.Scene {
   override update(): void {
     // On a painted scene the figures go behind what stands in front of them (D76).
     if (this.art) {
-      this.wizard.setDepth(3 + (this.wizard.y / TILE) * 0.01 + 0.0005);
-      for (const actor of this.actors.values()) actor.sprite.setDepth(3 + (actor.sprite.y / TILE) * 0.01);
+      if (!this.asleep.get(this.wizard)?.lying) this.wizard.setDepth(3 + (this.wizard.y / TILE) * 0.01 + 0.0005);
+      for (const actor of this.actors.values()) {
+        if (!this.asleep.get(actor.sprite)?.lying) actor.sprite.setDepth(3 + (actor.sprite.y / TILE) * 0.01);
+      }
     }
     this.speech.update();
     if (this.silhouette) {
+      this.silhouette.off = this.asleep.get(this.wizard)?.lying === true;
       this.silhouette.update();
       if (this.silhouette.shown) this.parentNode.dataset.outlined = 'true';
       else delete this.parentNode.dataset.outlined;
@@ -545,6 +558,8 @@ class LevelScene extends Phaser.Scene {
   private restart(): void {
     this.restarts += 1;
     for (const id of [...this.revealed.keys()]) this.unreveal(id);
+    this.asleep.clear();
+    this.markAsleep();
     this.wizard.setAngle(0);
     delete this.parentNode.dataset.sleeping;
     this.speech.clearBubble();
@@ -577,8 +592,9 @@ class LevelScene extends Phaser.Scene {
       this.tweens.killTweensOf(state.sprite);
       state.tile = this.startTile(actor.id, actor.tile);
       state.facing = actor.facing;
-      state.sprite.setPosition(...this.figureAt(state.tile)).setAlpha(1).setVisible(!actor.hidden);
+      state.sprite.setPosition(...this.figureAt(state.tile)).setAlpha(1).setVisible(!actor.hidden).setAngle(0);
       this.face(state.sprite, actor.facing);
+      if (actor.asleep) this.layDown(state.sprite, actor.id, actor.asleep, true);
     }
     this.placeWizard(this.map.start, 'down');
     this.parentNode.dataset.tick = '0';
@@ -655,21 +671,76 @@ class LevelScene extends Phaser.Scene {
     else delete this.parentNode.dataset.revealed;
   }
 
-  /** The wizard lies down in the bed beside it and sleeps (D84): it goes onto the bed
-   * and lies along it, its head towards the pillow; data-sleeping names the bed. */
+  /** The wizard lies down in the bed beside it and sleeps (D84, D91); data-sleeping
+   * names the bed. */
   private sleep(event: WorldEvent, instant: boolean): void {
-    const bed = tileOf(event.data.bed);
     this.parentNode.dataset.sleeping = String(event.data.id);
-    if (!bed) return;
+    if (!tileOf(event.data.bed)) return;
     this.stopCast();
-    this.face(this.wizard, 'down');
-    const [x, y] = this.figureAt(bed);
-    const lying = { x: x - TILE * 0.55, y: y - TILE * 0.35, angle: 90 };
-    if (instant || this.still) {
-      this.wizard.setPosition(lying.x, lying.y).setAngle(lying.angle);
+    this.layDown(this.wizard, 'wizard', String(event.data.id), instant);
+  }
+
+  /** The beds' tiles, by their ids. */
+  private bedTile(bed: string): Tile | null {
+    return this.map.things.find((thing) => thing.kind === 'bed' && thing.id === bed)?.tile ?? null;
+  }
+
+  /** A figure laid in a bed (D91). On a painted scene that knows where the bed's
+   * pillow is, with a lying frame on the figure's sheet: that frame, turned along
+   * the bed with its head on the pillow, just under the bed's quilt, which the
+   * scene's static things draw over it. Else the standing figure, turned along
+   * the bed over it (D84). */
+  private layDown(sprite: Phaser.GameObjects.Sprite, id: string, bed: string, instant: boolean): void {
+    const tile = this.bedTile(bed);
+    if (!tile) return;
+    this.tweens.killTweensOf(sprite);
+    const place = this.art?.scene.beds?.[bed];
+    const figures = this.art?.figures;
+    const frame = figures && sprite.texture.key.startsWith('fig-') ? sleepFrame(figures, figureName(id, this.look)) : null;
+    if (place && figures && frame !== null) {
+      const toward = place.toward === 'right' ? 1 : -1;
+      // The figure's feet are its origin: they lie the head's reach from the pillow.
+      const x = (place.head[0] - toward * figures.height_cells * HEAD_REACH) * TILE;
+      const y = place.head[1] * TILE;
+      sprite.setFrame(frame).setAngle(90 * toward).setPosition(x, y).setDepth(rowDepth(place.row) - 0.002);
+      this.asleep.set(sprite, { id, bed, lying: true });
+      this.markAsleep();
+      if (!instant && !this.still) {
+        sprite.setAlpha(0);
+        this.tweens.add({ targets: sprite, alpha: 1, duration: this.playback.tickDuration * 0.6 });
+      }
       return;
     }
-    this.tweens.add({ targets: this.wizard, ...lying, duration: this.playback.tickDuration * 0.9, ease: 'Sine.easeInOut' });
+    this.asleep.set(sprite, { id, bed, lying: false });
+    this.markAsleep();
+    this.face(sprite, 'down');
+    const [x, y] = this.figureAt(tile);
+    const lying = { x: x - TILE * 0.55, y: y - TILE * 0.35, angle: 90 };
+    if (instant || this.still) {
+      sprite.setPosition(lying.x, lying.y).setAngle(lying.angle);
+      return;
+    }
+    this.tweens.add({ targets: sprite, ...lying, duration: this.playback.tickDuration * 0.9, ease: 'Sine.easeInOut' });
+  }
+
+  /** A figure asleep gets up, and stands on its tile beside the bed, facing a way. */
+  private getUp(sprite: Phaser.GameObjects.Sprite, tile: Tile, facing: Facing, instant: boolean): void {
+    if (!this.asleep.delete(sprite)) return;
+    this.markAsleep();
+    this.tweens.killTweensOf(sprite);
+    sprite.setAngle(0).setPosition(...this.figureAt(tile));
+    this.face(sprite, facing);
+    if (!instant && !this.still) {
+      sprite.setAlpha(0);
+      this.tweens.add({ targets: sprite, alpha: 1, duration: this.playback.tickDuration * 0.6 });
+    } else sprite.setAlpha(1);
+  }
+
+  /** data-asleep, for the tests: who lies asleep in which bed, and how drawn. */
+  private markAsleep(): void {
+    const asleep = [...this.asleep.values()].map(({ id, bed, lying }) => `${id}:${bed}${lying ? ':lying' : ''}`);
+    if (asleep.length > 0) this.parentNode.dataset.asleep = asleep.sort().join(',');
+    else delete this.parentNode.dataset.asleep;
   }
 
   /** A thing drawn by a spell from where it lay to the wizard's tile (D47); a painted
@@ -849,6 +920,10 @@ class LevelScene extends Phaser.Scene {
       case 'sleep':
         this.sleep(event, instant);
         break;
+      case 'wake':
+        delete this.parentNode.dataset.sleeping;
+        this.getUp(this.wizard, this.wizardTile, 'down', instant);
+        break;
       case 'pick_up': {
         const id = String(event.data.id);
         this.unreveal(id);
@@ -936,6 +1011,13 @@ class LevelScene extends Phaser.Scene {
       case 'turn':
         actor.facing = facing;
         this.face(actor.sprite, facing);
+        break;
+      // A story's actor lies down in a bed and gets up (D91).
+      case 'sleep':
+        this.layDown(actor.sprite, event.actor, String(event.data.id), instant);
+        break;
+      case 'wake':
+        this.getUp(actor.sprite, actor.tile, actor.facing, instant);
         break;
       // A story's actor speaks, comes into sight and goes (D74).
       case 'say':

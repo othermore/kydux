@@ -47,4 +47,20 @@ describe('layout', () => {
     expect(map.ways).toEqual({ near: { key: [2, 1] }, far: { key: [5, 1], eldra: [3, 1] } });
     expect(map.things[0]?.tile).toEqual([4, 1]);
   });
+
+  it('keeps the bed an actor lies asleep in, and the tile it gets up on (D91)', () => {
+    const map = layout({
+      id: 'room',
+      map: ['#####', '#S..#', '#####'],
+      things: [{ kind: 'bed', id: 'bed_1', at: [3, 1] }],
+      actors: [
+        { kind: 'friend', id: 'mate', at: [2, 1], asleep: 'bed_1' },
+        { kind: 'friend', id: 'nuri', at: [1, 1] },
+      ],
+    });
+    expect(map.actors.map((actor) => [actor.id, actor.tile, actor.asleep])).toEqual([
+      ['mate', [2, 1], 'bed_1'],
+      ['nuri', [1, 1], undefined],
+    ]);
+  });
 });

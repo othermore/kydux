@@ -213,6 +213,25 @@ def static_alpha(painting: np.ndarray, box: tuple[int, int, int, int], thing: di
     return soft(mask, 1.2) * inside
 
 
+def beds_of(settings: Settings) -> dict[str, dict]:
+    """Where a pupil asleep in each bed lies (D91), for the page: its head's point
+    on the pillow, in cells; the way the pillow lies from the quilt, right or left;
+    and the row of the quilt, a static thing drawn over the sleeper."""
+    beds = {}
+    for bed, about in settings.data["beds"].items():
+        cover = settings.things[about["cover"]]
+        if not cover.get("static"):
+            raise SystemExit(f"{bed}'s cover {about['cover']} is not a static thing")
+        x0, _, x1, _ = cover["box"]
+        head = about["head"]
+        beds[bed] = {
+            "head": head,
+            "toward": "right" if head[0] > (x0 + x1) / 2 else "left",
+            "row": cover["row"],
+        }
+    return beds
+
+
 def aligned_rgba(image: np.ndarray, grid: dict, columns: int, rows: int) -> np.ndarray:
     """An RGBA picture in the painting's pixels moved onto the page's grid."""
     gx, gy = grid["x"], grid["y"]
@@ -536,6 +555,7 @@ def scene(settings: Settings) -> Path:
         ),
         "rows": rows_out,
         "things": things,
+        **({"beds": beds_of(settings)} if settings.data.get("beds") else {}),
         "source": "SOURCE.md",
     }
     (out / "art.json").write_text(json.dumps(art, indent=2) + "\n")

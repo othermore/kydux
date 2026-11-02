@@ -50,6 +50,8 @@ test('after a name and a dot, the editor offers what the level teaches of it', a
   await expect(offered).toContainText('locked');
   await expect(offered).not.toContainText('move_right');
   await page.keyboard.type('op');
+  // Enter takes the offer chosen, once the list has caught up with what was typed.
+  await expect(offered.locator('li[aria-selected="true"]')).toContainText('open');
   await page.keyboard.press('Enter');
   await expect(page.locator('.cm-content')).toHaveText('door.open');
 });

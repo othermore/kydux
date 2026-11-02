@@ -140,6 +140,10 @@ export class Silhouette {
 
   /** Every frame: the mask of what is in front of the figure now, how much of it
    * that covers, and the line on the figure, in its frame, when enough does. */
+  /** Whether the outline is left off: the wizard asleep is under its quilt, not
+   * hidden by it (D91). */
+  off = false;
+
   update(): void {
     const figure = this.figure;
     const front: Phaser.GameObjects.Image[] = [];
@@ -151,7 +155,7 @@ export class Silhouette {
       if (before) front.push(source);
     }
     const share = figure.visible ? coveredShare(figure, front, (key) => solidOf(this.scene, key)) : 0;
-    this.shown = this.always ? figure.visible && share > 0 : share > HIDDEN_SHARE;
+    this.shown = !this.off && (this.always ? figure.visible && share > 0 : share > HIDDEN_SHARE);
     this.line
       .setPosition(figure.x, figure.y)
       .setOrigin(figure.originX, figure.originY)

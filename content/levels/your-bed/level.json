@@ -12,38 +12,7 @@
   ],
   "things": [
     {
-      "kind": "bed",
       "id": "bed_1",
-      "at": [
-        17,
-        5
-      ],
-      "free": false
-    },
-    {
-      "kind": "bed",
-      "id": "bed_2",
-      "at": [
-        17,
-        8
-      ]
-    },
-    {
-      "kind": "bed",
-      "id": "bed_3",
-      "at": [
-        17,
-        10
-      ],
-      "free": false
-    },
-    {
-      "kind": "bed",
-      "id": "bed_4",
-      "at": [
-        17,
-        12
-      ],
       "free": false
     }
   ],
@@ -55,6 +24,24 @@
         16,
         6
       ]
+    },
+    {
+      "kind": "friend",
+      "id": "pupil_1",
+      "at": [
+        16,
+        10
+      ],
+      "asleep": "bed_3"
+    },
+    {
+      "kind": "friend",
+      "id": "pupil_2",
+      "at": [
+        16,
+        12
+      ],
+      "asleep": "bed_4"
     }
   ],
   "api": [

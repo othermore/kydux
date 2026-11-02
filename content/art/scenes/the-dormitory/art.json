@@ -7,6 +7,30 @@
   "ground": "ground.webp",
   "rows": [
     {
+      "row": 6,
+      "image": "row-6-static.webp",
+      "top": 451,
+      "static": true
+    },
+    {
+      "row": 8,
+      "image": "row-8-static.webp",
+      "top": 672,
+      "static": true
+    },
+    {
+      "row": 11,
+      "image": "row-11-static.webp",
+      "top": 902,
+      "static": true
+    },
+    {
+      "row": 13,
+      "image": "row-13-static.webp",
+      "top": 1138,
+      "static": true
+    },
+    {
       "row": 14,
       "image": "row-14-static.webp",
       "top": 1171,
@@ -14,5 +38,71 @@
     }
   ],
   "things": {},
+  "beds": {
+    "bed_1": {
+      "head": [
+        19.42,
+        5.4
+      ],
+      "toward": "right",
+      "row": 6
+    },
+    "bed_2": {
+      "head": [
+        19.7,
+        7.8
+      ],
+      "toward": "right",
+      "row": 8
+    },
+    "bed_3": {
+      "head": [
+        20.0,
+        10.0
+      ],
+      "toward": "right",
+      "row": 11
+    },
+    "bed_4": {
+      "head": [
+        20.4,
+        12.45
+      ],
+      "toward": "right",
+      "row": 13
+    },
+    "bed_5": {
+      "head": [
+        4.85,
+        5.3
+      ],
+      "toward": "left",
+      "row": 6
+    },
+    "bed_6": {
+      "head": [
+        4.55,
+        7.65
+      ],
+      "toward": "left",
+      "row": 8
+    },
+    "bed_7": {
+      "head": [
+        4.2,
+        9.95
+      ],
+      "toward": "left",
+      "row": 11
+    },
+    "bed_8": {
+      "head": [
+        3.9,
+        12.35
+      ],
+      "toward": "left",
+      "row": 13
+    }
+  },
   "source": "SOURCE.md"
 }

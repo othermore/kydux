@@ -16,7 +16,8 @@ wizard at `start` and the `E` the reach goal wants at `end`, each [x, y];
 
 Beside the map: `things` (keys, doors, books...) and `actors` (the teacher,
 the ghost, the cat, a friend), each placed by a marker or at x and y, with an
-id the child's code knows it by; `carrying`, the kinds of thing the wizard holds
+id the child's code knows it by, an actor maybe `asleep` in a bed beside it
+(D91); `carrying`, the kinds of thing the wizard holds
 from the start (D49); `spells`, the spells that can be cast (D42); `words`,
 the passwords the level gives the child, each a door's (D80); `api`,
 the names the level teaches (D23); `goals`, some of them bonus goals;
@@ -106,6 +107,9 @@ class ActorSpec:
     #: The tiles the actor walks, from its position, one per tick, back and forth.
     patrol: tuple[Position, ...] = ()
     sight: int = DEFAULT_SIGHT
+    #: The bed the actor lies asleep in (D91), or None. A sleeper is placed beside
+    #: its bed, where it gets up, and lies on the bed's tile, standing in no one's way.
+    asleep: str | None = None
 
 
 @dataclass(frozen=True)
@@ -193,6 +197,7 @@ class Level:
         things += _carrying(data, level_id, starts[0])
         actors = tuple(_actor(shape, spec) for spec in _list(data, "actors", level_id))
         _check_ids(level_id, things, actors)
+        things, actors = _sleepers(level_id, things, actors)
         doors = {t.id for t in things if t.kind == "door"}
         for thing in things:
             if thing.opens is not None and thing.opens not in doors:
@@ -488,7 +493,45 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
     if not isinstance(sight, int) or isinstance(sight, bool) or sight < 1:
         raise LevelError(f"{shape.level_id}: {actor_id}'s sight must be a whole number, 1 or more")
     patrol = tuple(path) if len(path) > 1 else ()
-    return ActorSpec(kind, actor_id, position, facing, patrol, sight)
+    asleep = spec.get("asleep")
+    if asleep is not None and not isinstance(asleep, str):
+        raise LevelError(f"{shape.level_id}: {actor_id} is asleep in a bed, named by its id")
+    if asleep is not None and patrol:
+        raise LevelError(f"{shape.level_id}: {actor_id} is asleep, and walks no patrol")
+    return ActorSpec(kind, actor_id, position, facing, patrol, sight, asleep)
+
+
+def _beside(one: Position, other: Position) -> bool:
+    return abs(one.x - other.x) + abs(one.y - other.y) == 1
+
+
+def _sleepers(
+    level_id: str, things: tuple[ThingSpec, ...], actors: tuple[ActorSpec, ...]
+) -> tuple[tuple[ThingSpec, ...], tuple[ActorSpec, ...]]:
+    """The things with every bed someone lies asleep in taken, and the actors with
+    each sleeper on its bed's tile (D91): a sleeper's bed is a bed of the level,
+    beside where the sleeper is placed, and has one sleeper."""
+    beds = {thing.id: thing for thing in things if thing.kind == "bed"}
+    taken: dict[str, str] = {}
+    for actor in actors:
+        if actor.asleep is None:
+            continue
+        bed = beds.get(actor.asleep)
+        if bed is None:
+            raise LevelError(f"{level_id}: {actor.id} is asleep in {actor.asleep}, no bed")
+        if not _beside(actor.position, bed.position):
+            raise LevelError(f"{level_id}: {actor.id} stands beside no {actor.asleep}")
+        if actor.asleep in taken:
+            raise LevelError(
+                f"{level_id}: {taken[actor.asleep]} and {actor.id} are asleep in {actor.asleep}"
+            )
+        taken[actor.asleep] = actor.id
+    things = tuple(replace(thing, free=False) if thing.id in taken else thing for thing in things)
+    actors = tuple(
+        replace(actor, position=beds[actor.asleep].position) if actor.asleep else actor
+        for actor in actors
+    )
+    return things, actors
 
 
 def _forbidden(
@@ -757,7 +800,7 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
     return built
 
 
-STORY_DOINGS = ("walk", "face", "appear", "vanish")
+STORY_DOINGS = ("walk", "face", "appear", "vanish", "sleep", "wake")
 
 
 def _story_tile(value: Any, what: str, story_id: Any) -> Position:
@@ -780,8 +823,10 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     action (`do`), done by its speaker or by the figure `by` names: a walk in a
     straight line to a tile, every tile on the way walked on and free (no one
     standing there, no door shut); a turn to face a way; appearing on a free
-    tile; vanishing, once its words are said. The voice does nothing itself;
-    no one speaks or moves out of sight."""
+    tile; vanishing, once its words are said; lying down asleep in a bed beside
+    it, no one else's, and waking (D91). An actor may start `asleep` in a bed
+    beside its `at`. The voice does nothing itself; no one speaks or moves out
+    of sight, and no one asleep walks, turns or goes."""
     story_id = data.get("id")
     if "scene" not in data:
         raise LevelError(f"{story_id}: a story is told on a scene")
@@ -835,6 +880,28 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         taken = any(at == tile for who, at in where.items() if who != mover)
         return walked(tile) and tile not in shut and not taken
 
+    beds = {
+        thing["id"]: Position(*thing["at"])
+        for thing in built.get("things", [])
+        if thing.get("kind") == "bed" and "at" in thing
+    }
+    # The bed each figure lies asleep in.
+    asleep: dict[str, str] = {}
+
+    def lie_down(who: str, bed: Any, here: str) -> None:
+        if bed not in beds:
+            raise LevelError(f"{here}: {who} is asleep in {bed}, no bed of the scene")
+        at = where[who]
+        if at is None or abs(at.x - beds[bed].x) + abs(at.y - beds[bed].y) != 1:
+            raise LevelError(f"{here}: {who} stands beside no {bed}")
+        if bed in asleep.values():
+            raise LevelError(f"{here}: someone is asleep in {bed} already")
+        asleep[who] = bed
+
+    for actor in actors:
+        if "asleep" in actor:
+            lie_down(actor["id"], actor["asleep"], str(story_id))
+
     first_seen: dict[str, Position] = {}
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
@@ -866,6 +933,14 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
             first_seen.setdefault(doer, tile)
         elif where[doer] is None:
             raise LevelError(f"{here}: {doer} is out of sight")
+        elif "wake" in doing:
+            if doer not in asleep:
+                raise LevelError(f"{here}: {doer} is not asleep")
+            del asleep[doer]
+        elif doer in asleep:
+            raise LevelError(f"{here}: {doer} is asleep")
+        elif "sleep" in doing:
+            lie_down(doer, doing["sleep"], here)
         elif "vanish" in doing:
             if doer == "wizard":
                 raise LevelError(f"{here}: the wizard stays in the story")

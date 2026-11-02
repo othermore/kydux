@@ -230,7 +230,8 @@ tiles are `[x, y]`.
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
 | `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
 | `give` | wizard | `id`, `to`, `at` | the thing floats from the wizard to the actor and fades; the actor faces the wizard (D48) |
-| `sleep` | wizard | `id`, the bed; `at`; `bed`, its tile | the wizard lies along the bed, no celebration after; `data-sleeping` (D84) |
+| `sleep` | wizard, or in a story an actor | `id`, the bed; `at`; `bed`, its tile | the figure lies in the bed, its head on the pillow, under the quilt, no celebration after; `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
+| `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile beside the bed (D91) |
 | `reveal` | wizard | `id`, `at` | the thing's outline beats wherever something covers it, until it is picked up or given; `data-revealed` (D85) |
 | `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (with `spell`), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
@@ -1093,7 +1094,8 @@ one overturns stays, marked as superseded.
   drawn wide, no editor and no goals; a sequence of steps, each a line said
   by a character in a bubble over them or by the voice in a band under the
   scene, with an action before it (a walk in a straight line, a turn, an
-  appearing, a vanishing once the words are said), done by the speaker or
+  appearing, a vanishing once the words are said, lying down in a bed and
+  getting up, D91), done by the speaker or
   by the figure `by` names, so that the voice can tell what another does.
   The camera starts on the story's tile and follows whoever each step is
   about (who speaks, walks, appears or turns) through a window: a dead

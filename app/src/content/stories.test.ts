@@ -45,6 +45,29 @@ describe('a story as the scene\'s events (D74)', () => {
     ]);
   });
 
+  it('lets a figure the voice tells of go at once, before the words', () => {
+    const { events } = storyEvents({
+      world,
+      steps: steps({ who: 'voice', do: { vanish: true }, by: 'nuri' }),
+    });
+    expect(events.map((e) => [e.tick, e.actor, e.kind])).toEqual([[1, 'nuri', 'vanish']]);
+  });
+
+  it('lays a figure down in a bed and gets it up again, the bed found by its id (D91)', () => {
+    const { events } = storyEvents({
+      world: { ...world, things: [{ id: 'bed_1', kind: 'bed', at: [3, 1] }] },
+      steps: steps(
+        { who: 'voice', do: { sleep: 'bed_1' }, by: 'nuri' },
+        { who: 'nuri', do: { wake: true } },
+      ),
+    });
+    expect(events.map((e) => [e.tick, e.actor, e.kind, e.data])).toEqual([
+      [1, 'nuri', 'sleep', { id: 'bed_1', at: [3, 2], bed: [3, 1] }],
+      [2, 'nuri', 'wake', { at: [3, 2] }],
+      [3, 'nuri', 'say', { text: 'words 1' }],
+    ]);
+  });
+
   it('places an appearing figure where the step says', () => {
     const { events } = storyEvents({ world, steps: steps({ who: 'nuri', do: { appear: [2, 1] } }) });
     expect(events[0]).toMatchObject({ actor: 'nuri', kind: 'appear', data: { at: [2, 1] } });

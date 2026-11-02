@@ -118,3 +118,66 @@ def test_an_actor_never_seen_or_seen_twice_is_an_error():
     ]
     with pytest.raises(LevelError, match="already in sight"):
         staged(steps=twice)
+
+
+#: A room with two beds in it, for the figures who sleep in them (D91).
+ROOM = Scene(
+    "room",
+    ("#######", "#..u..#", "#.....#", "#..u..#", "#######"),
+    {**DEFAULT_TERRAINS, "u": {"kind": "furniture", "walk": False, "sight": True}},
+    (
+        {"kind": "bed", "id": "bed_1", "at": [3, 1]},
+        {"kind": "bed", "id": "bed_2", "at": [3, 3]},
+    ),
+)
+MATE = {"id": "mate", "kind": "friend", "at": [2, 1], "asleep": "bed_1"}
+
+
+def in_the_room(steps, actors=(MATE,)):
+    data = {"id": "a-night", "scene": "room", "wizard": [1, 2], "actors": list(actors)}
+    return story_on_scene({**data, "steps": steps}, ROOM)
+
+
+def by(who, doing):
+    return {"who": "voice", "do": doing, "by": who}
+
+
+def test_a_figure_lies_down_in_a_bed_beside_it_and_wakes():
+    story = in_the_room(
+        [
+            by("mate", {"wake": True}),
+            by("mate", {"walk": [2, 3]}),
+            by("mate", {"sleep": "bed_2"}),
+            by("wizard", {"walk": [4, 2]}),
+            by("wizard", {"walk": [4, 1]}),
+            by("wizard", {"sleep": "bed_1"}),
+        ]
+    )
+    assert story["world"]["actors"][0]["asleep"] == "bed_1"
+
+
+@pytest.mark.parametrize(
+    ("steps", "says"),
+    [
+        ([by("mate", {"walk": [2, 2]})], "mate is asleep"),
+        ([by("mate", {"face": "left"})], "mate is asleep"),
+        ([{"who": "voice", "do": {"vanish": True}, "by": "mate"}], "mate is asleep"),
+        ([by("wizard", {"wake": True})], "wizard is not asleep"),
+        ([by("wizard", {"sleep": "bed_2"})], "beside no bed_2"),
+        ([by("wizard", {"sleep": "bed_3"})], "no bed of the scene"),
+        ([by("wizard", {"walk": [3, 2]}), by("wizard", {"sleep": "bed_1"})], "in bed_1 already"),
+        # Who is asleep may still speak.
+        ([{"who": "mate"}], ""),
+    ],
+)
+def test_who_is_asleep_does_nothing_but_wake_and_a_bed_holds_one(steps, says):
+    if not says:
+        in_the_room(steps)
+        return
+    with pytest.raises(LevelError, match=says):
+        in_the_room(steps)
+
+
+def test_a_sleeper_is_staged_beside_its_bed():
+    with pytest.raises(LevelError, match="beside no bed_1"):
+        in_the_room([{"who": "voice"}], actors=[{**MATE, "at": [1, 1]}])

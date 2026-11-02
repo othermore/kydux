@@ -28,7 +28,8 @@ def rows_of(scene: str) -> tuple[dict, dict[int, np.ndarray]]:
         image = np.array(Image.open(folder / row["image"]).convert("RGBA"))
         mask = np.zeros((height * cell, width * cell), dtype=bool)
         mask[row["top"] : row["top"] + image.shape[0], : image.shape[1]] = image[..., 3] > 128
-        masks[row["row"]] = mask
+        # A row's things and its static things are two images of the same row (D89).
+        masks[row["row"]] = masks.get(row["row"], False) | mask
     return art, masks
 
 
@@ -101,3 +102,23 @@ def test_a_level_s_start_mark_things_and_friend_are_never_hidden(scene):
             if front > HIDDEN:
                 hidden.append(f"{level['id']}: its {what} at {x},{y}")
     assert not hidden, f"{scene}: hidden by a cut-out: " + "; ".join(hidden)
+
+
+@pytest.mark.parametrize("scene", SCENES)
+def test_every_bed_of_the_scene_has_its_pillow_and_its_quilt(scene):
+    """A pupil asleep lies with its head on the bed's pillow, under its quilt (D91):
+    every bed the scene holds has its place in the art, beside the bed's tile, and
+    its quilt is a static row."""
+    art = json.loads((CONTENT / "art" / "scenes" / scene / "art.json").read_text())
+    spec = json.loads((CONTENT / "scenes" / scene / "scene.json").read_text())
+    beds = {t["id"]: t["at"] for t in spec.get("things", []) if t.get("kind") == "bed"}
+    places = art.get("beds", {})
+    assert set(places) == set(beds), scene
+    statics = {row["row"] for row in art["rows"] if row.get("static")}
+    for bed, (x, y) in beds.items():
+        place = places[bed]
+        assert place["row"] in statics, bed
+        hx, hy = place["head"]
+        # The pillow lies along the bed's own row, a cell or more from its tile.
+        assert abs(hy - (y + 0.5)) < 1.5 and 1 <= abs(hx - (x + 0.5)) < 4, bed
+        assert place["toward"] == ("right" if hx > x + 0.5 else "left"), bed

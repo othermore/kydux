@@ -9,8 +9,16 @@ import { fallbackLanguage, forWizard, type Language } from '../i18n';
 import type { LevelJson, WorldEvent } from '../runtime/protocol';
 
 /** What a step does before its words: a walk in a straight line, a turn, an
- * appearing, a vanishing once the words are said. */
-export type Doing = null | { walk: Tile } | { face: Facing } | { appear: Tile } | { vanish: true };
+ * appearing, a vanishing once the words are said, lying down asleep in a bed and
+ * waking (D91). */
+export type Doing =
+  | null
+  | { walk: Tile }
+  | { face: Facing }
+  | { appear: Tile }
+  | { vanish: true }
+  | { sleep: string }
+  | { wake: true };
 
 export interface StoryStep {
   /** Who says the words: `voice`, under the scene; `wizard`; or an actor's id. */
@@ -95,6 +103,10 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world'>): {
   for (const actor of (story.world.actors as { id: string; at?: Tile }[] | undefined) ?? []) {
     if (actor.at) where.set(actor.id, actor.at);
   }
+  const beds = new Map<string, Tile>();
+  for (const thing of (story.world.things as { id: string; kind?: string; at?: Tile }[] | undefined) ?? []) {
+    if (thing.kind === 'bed' && thing.at) beds.set(thing.id, thing.at);
+  }
   const events: WorldEvent[] = [];
   const spans: { first: number; last: number }[] = [];
   let tick = 1;
@@ -127,7 +139,13 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world'>): {
       add(doer, 'appear', { at: doing.appear });
       where.set(doer, doing.appear);
     } else if (doing && 'vanish' in doing) {
-      vanishing = doer;
+      // Who goes says its words first; one the voice tells of goes at once.
+      if (doer === step.who) vanishing = doer;
+      else add(doer, 'vanish', {});
+    } else if (doing && 'sleep' in doing) {
+      add(doer, 'sleep', { id: doing.sleep, at: where.get(doer) ?? null, bed: beds.get(doing.sleep) ?? null });
+    } else if (doing && 'wake' in doing) {
+      add(doer, 'wake', { at: where.get(doer) ?? null });
     }
     if (step.who !== 'voice') add(step.who, 'say', { text: step.text });
     spans.push({ first, last: tick - 1 });

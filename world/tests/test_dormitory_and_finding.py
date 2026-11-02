@@ -64,6 +64,28 @@ def test_a_bed_says_whether_it_is_free():
     assert (world.things["bed_1"].free, world.things["bed_2"].free) == (False, True)
 
 
+def test_a_bed_someone_sleeps_in_is_not_free_and_the_sleeper_lies_beside_it():
+    # The mate asleep in bed_1 takes it, though the level does not say so (D91).
+    things = [{"kind": "bed", "id": "bed_1", "at": [7, 1]}, DORMITORY["things"][1]]
+    actors = [{"kind": "friend", "id": "mate", "at": [6, 1], "asleep": "bed_1"}]
+    level = Level.from_dict({**DORMITORY, "things": things, "actors": actors})
+    # The mate lies on the bed's tile, in no one's way.
+    assert (level.actors[0].asleep, level.actors[0].position) == ("bed_1", Position(7, 1))
+    world = World(level)
+    assert (world.things["bed_1"].free, world.things["bed_2"].free) == (False, True)
+    for asleep, says in (
+        ("bed_9", "asleep in bed_9, no bed"),
+        ("bed_2", "beside no bed_2"),
+        (3, "named by its id"),
+    ):
+        wrong = [{**actors[0], "asleep": asleep}]
+        with pytest.raises(LevelError, match=says):
+            Level.from_dict({**DORMITORY, "things": things, "actors": wrong})
+    two = [*actors, {"kind": "friend", "id": "pupil_1", "at": [7, 2], "asleep": "bed_1"}]
+    with pytest.raises(LevelError, match="are asleep in bed_1"):
+        Level.from_dict({**DORMITORY, "things": things, "actors": two})
+
+
 def test_the_forbidden_tile_stops_the_wizard_with_its_reason_and_the_wizard_faces_it():
     world = World(Level.from_dict(DORMITORY))
     world.wizard.move_up()

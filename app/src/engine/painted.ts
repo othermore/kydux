@@ -8,7 +8,7 @@
 
 import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
-import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
+import { dormitoryMate, friendSheet, type Look, pupilLook, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
 import { shiftBy } from './shift';
 import type { Tile } from './sight';
@@ -25,7 +25,9 @@ export interface SceneArt {
    * (left, top, right, bottom), and the playable corner in the ground's pixels. */
   margin?: [number, number, number, number];
   origin?: Tile;
-  rows: { row: number; image: string; top: number }[];
+  /** The raised rows, each drawn over the figures above it; a row's static things
+   * (D89), the walls that never change, are an image of their own. */
+  rows: { row: number; image: string; top: number; static?: boolean }[];
   /** Each thing that opens or is picked up: its row, its corner in the painting's
    * pixels, its states' images, and `at`, the cell it is painted on, when a level
    * may place it on another (D85). */
@@ -33,6 +35,10 @@ export interface SceneArt {
     string,
     { row: number; left: number; top: number; states: Record<string, string>; rune?: string; at?: Tile }
   >;
+  /** Where a pupil asleep in each bed lies (D91): its head's point on the pillow, in
+   * cells; the way the pillow lies from the quilt; and the row of the quilt, a
+   * static thing drawn over the sleeper. */
+  beds?: Record<string, { head: [number, number]; toward: 'left' | 'right'; row: number }>;
 }
 
 /** The figures drawn for the characters (D76): one sheet each of four rows (down,
@@ -49,9 +55,12 @@ export interface FigureArt {
   standing: number;
   figures: string[];
   /** The first row of each part of a wizard's sheet, by its name: the walking, the
-   * casting and the picking-up rows (four each, down, left, right and up), and
-   * the celebrating one, facing down. */
-  rows?: { walk: number; cast: number; pickup?: number; win?: number };
+   * casting and the picking-up rows (four each, down, left, right and up), the
+   * celebrating one, facing down, and the lying one, asleep (D91). */
+  rows?: { walk: number; cast: number; pickup?: number; win?: number; sleep?: number };
+  /** The rows of a sheet laid out otherwise than a wizard's, by its name: a
+   * friend's walking rows and its lying one (D91). */
+  sheets?: Record<string, { walk: number; sleep?: number }>;
 }
 
 /** A part of a wizard's sheet played as frames: casting or picking up the way the
@@ -97,10 +106,15 @@ export function artScale(art: Art): number {
   return TILE / art.scene.cell;
 }
 
+/** A raised row's texture: a row's things and its static things are two images. */
+function rowKey(row: { row: number; static?: boolean }): string {
+  return `art-row-${row.row}${row.static ? '-static' : ''}`;
+}
+
 /** Loads the painting's images and the figures' sheets. */
 export function preloadArt(scene: Phaser.Scene, { scene: painted, figures }: Art): void {
   scene.load.image('art-ground', painted.base + painted.ground);
-  for (const row of painted.rows) scene.load.image(`art-row-${row.row}`, painted.base + row.image);
+  for (const row of painted.rows) scene.load.image(rowKey(row), painted.base + row.image);
   for (const [id, thing] of Object.entries(painted.things)) {
     for (const [state, image] of Object.entries(thing.states)) {
       scene.load.image(`art-${id}-${state}`, painted.base + image);
@@ -129,7 +143,7 @@ export function paintScene(scene: Phaser.Scene, art: Art): Phaser.GameObjects.Im
   scene.add.image(-x * scale, -y * scale, 'art-ground').setOrigin(0, 0).setScale(scale).setDepth(0);
   return art.scene.rows.map((row) =>
     scene.add
-      .image(0, row.top * scale, `art-row-${row.row}`)
+      .image(0, row.top * scale, rowKey(row))
       .setOrigin(0, 0)
       .setScale(scale)
       .setDepth(rowDepth(row.row)),
@@ -179,7 +193,15 @@ export function figureName(id: string, look: Look): string {
   if (id === 'friend') return friendSheet(teacherFriend(look.gender).id, look);
   if (id === 'mate') return friendSheet(dormitoryMate(look.gender).id, look);
   if (id === 'nuri' || id === 'teku') return friendSheet(id, look);
+  const pupil = /^pupil_(\d+)$/.exec(id);
+  if (pupil) return `wizard-${pupilLook(Number(pupil[1]), look).id}`;
   return id === 'wizard' ? `wizard-${look.id}` : id;
+}
+
+/** The lying frame of a figure's sheet (D91), or null for a sheet without one. */
+export function sleepFrame(figures: FigureArt, name: string): number | null {
+  const row = figures.sheets?.[name]?.sleep ?? (name.startsWith('wizard-') ? figures.rows?.sleep : undefined);
+  return row === undefined ? null : row * 3;
 }
 
 /** A character drawn from its sheet, standing at a point, facing a way. */

@@ -211,3 +211,10 @@ export function dormitoryMate(wizardGender: Look['gender'] | null): { id: string
   const gender: Look['gender'] = wizardGender ?? 'boy';
   return { id: FRIENDS[gender], gender };
 }
+
+/** The look a pupil of the wizard's dormitory is drawn in, `pupil_<n>` (D91): the
+ * looks of the wizard's gender but the wizard's own, in turn. */
+export function pupilLook(n: number, look: Look): Look {
+  const others = looksFor(look.gender).filter((other) => other.id !== look.id);
+  return others[(Math.max(1, n) - 1) % others.length] ?? look;
+}

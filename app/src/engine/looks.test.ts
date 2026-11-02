@@ -10,6 +10,7 @@ import {
   LOOKS,
   lookOf,
   looksFor,
+  pupilLook,
   teacherFriend,
 } from './looks';
 
@@ -62,5 +63,19 @@ describe("the friends' colours (D90)", () => {
     expect(friendSheet('nuri', moss)).toBe(`nuri-${friendSets(moss).nuri}`);
     expect(friendSheet('nuri', moss)).not.toBe('nuri-a');
     expect(friendSheet('wenna', moss)).toBe('wenna');
+  });
+});
+
+describe("the pupils of the wizard's dormitory (D91)", () => {
+  it("are drawn in the other looks of the wizard's gender, in turn", () => {
+    for (const look of LOOKS) {
+      const pupils = [1, 2, 3].map((n) => pupilLook(n, look));
+      expect(new Set(pupils.map((pupil) => pupil.id)).size, look.id).toBe(3);
+      for (const pupil of pupils) {
+        expect(pupil.gender).toBe(look.gender);
+        expect(pupil.id).not.toBe(look.id);
+      }
+      expect(pupilLook(4, look)).toBe(pupils[0]);
+    }
   });
 });

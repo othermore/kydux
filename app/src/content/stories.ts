@@ -1,30 +1,39 @@
 // Loading a story (D74): its staging, story.json, which pack-world gives the
 // world it is played in, and its words in the player's language,
 // text.<lang>.json, from content/stories/<id>/. And the scene's events for its
-// steps: each step's action played as the world's events would be, then its
-// words said in a bubble, or by the voice under the scene.
+// steps: each step's actions played as the world's events would be, the figures'
+// at once (D103), then its words said in a bubble, or by the voice under the
+// scene.
 
 import type { Facing, Tile } from '../engine/sight';
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
 import type { LevelJson, WorldEvent } from '../runtime/protocol';
 
-/** What a step does before its words: a walk in a straight line, a turn, an
- * appearing, a vanishing once the words are said, lying down asleep in a bed and
- * waking (D91). */
-export type Doing =
-  | null
-  | { walk: Tile }
+/** One thing a figure does in a step (D103), by its `by`, the step's, or the
+ * speaker: a walk to a tile or through a list of them, each in a straight line,
+ * ending out of sight when it says `vanish`; a turn; an appearing; a vanishing
+ * (a speaker's once its words are said); lying down asleep in a bed and waking
+ * (D91); opening or closing a door. */
+export type Action = { by?: string } & (
+  | { walk: Tile | Tile[]; vanish?: true }
   | { face: Facing }
   | { appear: Tile }
   | { vanish: true }
   | { sleep: string }
-  | { wake: true };
+  | { wake: true }
+  | { open: string }
+  | { close: string }
+);
+
+/** What a step does before its words: nothing, one action, or a list of them. */
+export type Doing = null | Action | Action[];
 
 export interface StoryStep {
   /** Who says the words: `voice`, under the scene; `wizard`; or an actor's id. */
   who: string;
   do: Doing;
-  /** Who does the action when it is not the speaker, as when the voice tells it. */
+  /** Who does the actions when they do not say, and who the camera keeps with:
+   * the speaker when it is not given. */
   by?: string;
   text: string;
 }
@@ -86,10 +95,25 @@ export async function loadStory(id: string, lang: Language): Promise<Story> {
   };
 }
 
+/** A step's actions as a list. */
+export function actionsOf(doing: Doing | undefined): Action[] {
+  if (!doing) return [];
+  return Array.isArray(doing) ? doing : [doing];
+}
+
+/** A walk's tiles: one, or the list it goes through. */
+function waypoints(walk: Tile | Tile[]): Tile[] {
+  return Array.isArray(walk[0]) ? (walk as Tile[]) : [walk as Tile];
+}
+
 /** The scene's events for a story, and for each step the ticks it plays: from
  * `first` to `last`, both included (a step with no tick of its own has `last`
  * one before `first`). Every tick has an event, so that tick n is the
- * playback's n-th. */
+ * playback's n-th. A step's actions are each figure's in turn, and the figures
+ * play at once (D103): at each tick, each figure with an event left plays its
+ * next, in the order the figures are first named. An event of a figure other
+ * than the step's `by`, or its speaker, says `aside`, for the camera to keep
+ * with the one the step is about. */
 export function storyEvents(story: Pick<Story, 'steps' | 'world'>): {
   events: WorldEvent[];
   spans: { first: number; last: number }[];
@@ -120,32 +144,57 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world'>): {
     // Who vanished at the step before goes as this one begins.
     if (vanishing) add(vanishing, 'vanish', {});
     vanishing = null;
-    const doer = step.by ?? step.who;
-    const doing = step.do;
-    if (doing && 'walk' in doing) {
-      let [x, y] = where.get(doer) ?? doing.walk;
-      const [tx, ty] = doing.walk;
-      const way: Facing = tx > x ? 'right' : tx < x ? 'left' : ty > y ? 'down' : 'up';
-      while (x !== tx || y !== ty) {
-        const from: Tile = [x, y];
-        x += Math.sign(tx - x);
-        y += Math.sign(ty - y);
-        add(doer, 'move', { from, to: [x, y], facing: way });
+    const about = step.by ?? step.who;
+    const queues = new Map<string, { kind: string; data: Record<string, unknown> }[]>();
+    for (const action of actionsOf(step.do)) {
+      const doer = action.by ?? about;
+      if ('vanish' in action && !('walk' in action) && doer === step.who && step.who !== 'voice') {
+        // Who goes says its words first.
+        vanishing = doer;
+        continue;
       }
-      where.set(doer, [tx, ty]);
-    } else if (doing && 'face' in doing) {
-      add(doer, 'turn', { facing: doing.face });
-    } else if (doing && 'appear' in doing) {
-      add(doer, 'appear', { at: doing.appear });
-      where.set(doer, doing.appear);
-    } else if (doing && 'vanish' in doing) {
-      // Who goes says its words first; one the voice tells of goes at once.
-      if (doer === step.who) vanishing = doer;
-      else add(doer, 'vanish', {});
-    } else if (doing && 'sleep' in doing) {
-      add(doer, 'sleep', { id: doing.sleep, at: where.get(doer) ?? null, bed: beds.get(doing.sleep) ?? null });
-    } else if (doing && 'wake' in doing) {
-      add(doer, 'wake', { at: where.get(doer) ?? null });
+      const queue = queues.get(doer) ?? [];
+      queues.set(doer, queue);
+      const aside = doer !== about ? { aside: true } : {};
+      if ('walk' in action) {
+        let [x, y] = where.get(doer) ?? waypoints(action.walk)[0] ?? [0, 0];
+        for (const [tx, ty] of waypoints(action.walk)) {
+          const way: Facing = tx > x ? 'right' : tx < x ? 'left' : ty > y ? 'down' : 'up';
+          while (x !== tx || y !== ty) {
+            const from: Tile = [x, y];
+            x += Math.sign(tx - x);
+            y += Math.sign(ty - y);
+            queue.push({ kind: 'move', data: { from, to: [x, y], facing: way, ...aside } });
+          }
+        }
+        where.set(doer, [x, y]);
+        if (action.vanish) queue.push({ kind: 'vanish', data: { ...aside } });
+      } else if ('face' in action) {
+        queue.push({ kind: 'turn', data: { facing: action.face, ...aside } });
+      } else if ('appear' in action) {
+        queue.push({ kind: 'appear', data: { at: action.appear, ...aside } });
+        where.set(doer, action.appear);
+      } else if ('vanish' in action) {
+        queue.push({ kind: 'vanish', data: { ...aside } });
+      } else if ('sleep' in action) {
+        queue.push({
+          kind: 'sleep',
+          data: { id: action.sleep, at: where.get(doer) ?? null, bed: beds.get(action.sleep) ?? null, ...aside },
+        });
+      } else if ('wake' in action) {
+        queue.push({ kind: 'wake', data: { at: where.get(doer) ?? null, ...aside } });
+      } else if ('open' in action) {
+        queue.push({ kind: 'open', data: { id: action.open, ...aside } });
+      } else if ('close' in action) {
+        queue.push({ kind: 'close', data: { id: action.close, ...aside } });
+      }
+    }
+    while ([...queues.values()].some((queue) => queue.length > 0)) {
+      for (const [actor, queue] of queues) {
+        const next = queue.shift();
+        if (next) events.push({ tick, actor, kind: next.kind, data: next.data, line: null });
+      }
+      tick += 1;
     }
     if (step.who !== 'voice') add(step.who, 'say', { text: step.text });
     spans.push({ first, last: tick - 1 });

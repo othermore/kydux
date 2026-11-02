@@ -800,7 +800,32 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
     return built
 
 
-STORY_DOINGS = ("walk", "face", "appear", "vanish", "sleep", "wake")
+STORY_DOINGS = ("walk", "face", "appear", "vanish", "sleep", "wake", "open", "close")
+
+
+def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
+    """A step's actions (D103): none, one, or a list, each one of STORY_DOINGS with
+    the figure who does it in `by` when it is not the step's; a walk may end in
+    `vanish`."""
+    if doing is None:
+        return []
+    listed = doing if isinstance(doing, list) else [doing]
+    if not listed:
+        raise LevelError(f"{here}: do is one of {', '.join(STORY_DOINGS)}")
+    for action in listed:
+        kinds = set(action) - {"by"} if isinstance(action, dict) else set()
+        if "walk" in kinds and kinds <= {"walk", "vanish"} and action.get("vanish", True) is True:
+            continue
+        if len(kinds) != 1 or not kinds <= set(STORY_DOINGS):
+            raise LevelError(f"{here}: do is one of {', '.join(STORY_DOINGS)}")
+    return listed
+
+
+def _waypoints(walk: Any, here: str) -> list[Position]:
+    """A walk's tiles: one tile, or a list of them, each reached in a straight line."""
+    if isinstance(walk, list) and walk and all(isinstance(tile, list) for tile in walk):
+        return [_story_tile(tile, "walk", here) for tile in walk]
+    return [_story_tile(walk, "walk", here)]
 
 
 def _story_tile(value: Any, what: str, story_id: Any) -> Position:
@@ -819,14 +844,19 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
 
     The staging puts the wizard at `wizard`, the camera on `camera`, and each
     actor at its `at`; an actor with no `at` is out of sight until a step makes
-    it appear. Each step is said by `voice`, `wizard` or an actor, after its
-    action (`do`), done by its speaker or by the figure `by` names: a walk in a
-    straight line to a tile, every tile on the way walked on and free (no one
-    standing there, no door shut); a turn to face a way; appearing on a free
-    tile; vanishing, once its words are said; lying down asleep in a bed beside
-    it, no one else's, and waking (D91). An actor may start `asleep` in a bed
-    beside its `at`. The voice does nothing itself; no one speaks or moves out
-    of sight, and no one asleep walks, turns or goes."""
+    it appear; the story's `things` place the scene's things or add a door.
+    Each step is said by `voice`, `wizard` or an actor, after its actions
+    (`do`, one or a list, D103), each done by its `by`, the step's `by`, or its
+    speaker: a walk to a tile or through a list of them, each in a straight
+    line, every tile on the way walked on and free (no one standing there, no
+    door shut), and ending out of sight when it says `vanish`; a turn to face
+    a way; appearing on a free tile; vanishing, a speaker once its words are
+    said; lying down asleep in a bed beside it, no one else's, and waking
+    (D91); opening or closing a door beside it. One figure's actions follow
+    one another; different figures' are played at once, tick by tick, in the
+    order they are first named, and are checked so. An actor may start
+    `asleep` in a bed beside its `at`. The voice does nothing itself; no one
+    speaks or moves out of sight, and no one asleep walks, turns or goes."""
     story_id = data.get("id")
     if "scene" not in data:
         raise LevelError(f"{story_id}: a story is told on a scene")
@@ -902,6 +932,17 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         if "asleep" in actor:
             lie_down(actor["id"], actor["asleep"], str(story_id))
 
+    doors = {
+        thing["id"]: Position(*thing["at"])
+        for thing in built.get("things", [])
+        if thing.get("kind") == "door" and "at" in thing
+    }
+    opened = {name for name, at in doors.items() if at not in shut}
+
+    def beside(who: str, tile: Position) -> bool:
+        at = where[who]
+        return at is not None and abs(at.x - tile.x) + abs(at.y - tile.y) == 1
+
     first_seen: dict[str, Position] = {}
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
@@ -911,57 +952,114 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         if not isinstance(step, dict):
             raise LevelError(f"{here}: a step is an object")
         who, doing = step.get("who"), step.get("do")
-        # Who does the step's action: its speaker, or `by` when the voice tells it.
-        doer = step.get("by", who)
         if who != "voice" and who not in where:
             raise LevelError(f"{here}: {who} is no one in the story")
-        if doing is not None and doer not in where:
-            raise LevelError(f"{here}: the action is done by no one in the story; give its by")
         if "by" in step and doing is None:
             raise LevelError(f"{here}: by names who does the action, and there is none")
-        if doing is None:
-            pass
-        elif not (isinstance(doing, dict) and len(doing) == 1 and set(doing) <= set(STORY_DOINGS)):
-            raise LevelError(f"{here}: do is one of {', '.join(STORY_DOINGS)}")
-        elif "appear" in doing:
-            tile = _story_tile(doing["appear"], "appear", here)
-            if where[doer] is not None:
-                raise LevelError(f"{here}: {doer} is already in sight")
-            if not free(tile, doer):
-                raise LevelError(f"{here}: {doer} appears on a tile not free")
-            where[doer] = tile
-            first_seen.setdefault(doer, tile)
-        elif where[doer] is None:
-            raise LevelError(f"{here}: {doer} is out of sight")
-        elif "wake" in doing:
-            if doer not in asleep:
-                raise LevelError(f"{here}: {doer} is not asleep")
-            del asleep[doer]
-        elif doer in asleep:
-            raise LevelError(f"{here}: {doer} is asleep")
-        elif "sleep" in doing:
-            lie_down(doer, doing["sleep"], here)
-        elif "vanish" in doing:
-            if doer == "wizard":
-                raise LevelError(f"{here}: the wizard stays in the story")
-            where[doer] = None
-        elif "face" in doing:
-            if doing["face"] not in FACINGS:
-                raise LevelError(f"{here}: face is one of {', '.join(FACINGS)}")
-        else:
-            to = _story_tile(doing["walk"], "walk", here)
-            at = where[doer]
-            if (to.x != at.x) == (to.y != at.y):
-                raise LevelError(f"{here}: {doer} walks in a straight line, to another tile")
-            dx, dy = (to.x > at.x) - (to.x < at.x), (to.y > at.y) - (to.y < at.y)
-            tile = at
-            while tile != to:
-                tile = Position(tile.x + dx, tile.y + dy)
-                if not free(tile, doer):
-                    raise LevelError(f"{here}: {doer}'s walk is stopped at {tile.x},{tile.y}")
-            where[doer] = to
-        # Who vanishes says the step's words first, then goes.
-        vanishing = isinstance(doing, dict) and "vanish" in doing and doer == who
+        actions = _story_actions(doing, here)
+        # Each figure's part of the step, its actions one after another as single
+        # events (a walk is a move a tile), with where each leaves it; the figures
+        # play at once, tick by tick, as the page plays them (D103).
+        queues: dict[str, list[tuple[str, Any]]] = {}
+        planned = dict(where)
+        vanishing = False
+        for action in actions:
+            # Who does an action: its by, the step's by, or the step's speaker.
+            doer = action.get("by", step.get("by", who))
+            if doer not in where:
+                raise LevelError(f"{here}: the action is done by no one in the story; give its by")
+            # A speaker who goes says the step's words first, then goes.
+            if set(action) - {"by"} == {"vanish"} and doer == who and who != "voice":
+                if doer == "wizard":
+                    raise LevelError(f"{here}: the wizard stays in the story")
+                vanishing = True
+                continue
+            queue = queues.setdefault(doer, [])
+            if "appear" in action:
+                tile = _story_tile(action["appear"], "appear", here)
+                if planned[doer] is not None:
+                    raise LevelError(f"{here}: {doer} is already in sight")
+                planned[doer] = tile
+                queue.append(("appear", tile))
+                continue
+            if planned[doer] is None:
+                raise LevelError(f"{here}: {doer} is out of sight")
+            if "walk" in action:
+                at = planned[doer]
+                for to in _waypoints(action["walk"], here):
+                    if (to.x != at.x) == (to.y != at.y):
+                        raise LevelError(
+                            f"{here}: {doer} walks in a straight line, to another tile"
+                        )
+                    dx, dy = (to.x > at.x) - (to.x < at.x), (to.y > at.y) - (to.y < at.y)
+                    while at != to:
+                        at = Position(at.x + dx, at.y + dy)
+                        queue.append(("move", at))
+                planned[doer] = at
+                if action.get("vanish") is True:
+                    if doer == "wizard":
+                        raise LevelError(f"{here}: the wizard stays in the story")
+                    planned[doer] = None
+                    queue.append(("vanish", None))
+            elif "vanish" in action:
+                if doer == "wizard":
+                    raise LevelError(f"{here}: the wizard stays in the story")
+                planned[doer] = None
+                queue.append(("vanish", None))
+            elif "face" in action:
+                if action["face"] not in FACINGS:
+                    raise LevelError(f"{here}: face is one of {', '.join(FACINGS)}")
+                queue.append(("face", action["face"]))
+            elif "open" in action or "close" in action:
+                kind = "open" if "open" in action else "close"
+                if action[kind] not in doors:
+                    raise LevelError(f"{here}: no door {action[kind]} in the story")
+                queue.append((kind, action[kind]))
+            else:
+                kind = "sleep" if "sleep" in action else "wake"
+                queue.append((kind, action.get("sleep")))
+        while any(queues.values()):
+            for doer, queue in queues.items():
+                if not queue:
+                    continue
+                kind, value = queue.pop(0)
+                if kind == "appear":
+                    if not free(value, doer):
+                        raise LevelError(f"{here}: {doer} appears on a tile not free")
+                    where[doer] = value
+                    first_seen.setdefault(doer, value)
+                elif kind == "wake":
+                    if doer not in asleep:
+                        raise LevelError(f"{here}: {doer} is not asleep")
+                    del asleep[doer]
+                elif doer in asleep:
+                    raise LevelError(f"{here}: {doer} is asleep")
+                elif kind == "sleep":
+                    lie_down(doer, value, here)
+                elif kind == "vanish":
+                    where[doer] = None
+                elif kind == "move":
+                    if not free(value, doer):
+                        raise LevelError(
+                            f"{here}: {doer}'s walk is stopped at {value.x},{value.y}"
+                        )
+                    where[doer] = value
+                elif kind in ("open", "close"):
+                    if not beside(doer, doors[value]):
+                        raise LevelError(f"{here}: {doer} stands beside no {value}")
+                    if (value in opened) == (kind == "open"):
+                        state = "open" if kind == "open" else "shut"
+                        raise LevelError(f"{here}: {value} is {state} already")
+                    if kind == "open":
+                        opened.add(value)
+                        shut.discard(doors[value])
+                    else:
+                        if any(at == doors[value] for at in where.values()):
+                            raise LevelError(f"{here}: someone stands in {value}'s doorway")
+                        opened.discard(value)
+                        shut.add(doors[value])
+        if vanishing:
+            where[who] = None
         if who != "voice" and where[who] is None and not vanishing:
             raise LevelError(f"{here}: {who} speaks out of sight")
 

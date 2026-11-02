@@ -304,7 +304,7 @@ class LevelScene extends Phaser.Scene {
     const run = this.restarts;
     this.time.delayedCall(step, () => {
       delete this.parentNode.dataset.opening;
-      if (run === this.restarts && this.openDoors.has(id)) crossfade(this, image, key, step);
+      if (run === this.restarts && this.openDoors.has(id) === open) crossfade(this, image, key, step);
     });
   }
 
@@ -496,9 +496,11 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** In a story, the camera is with whoever the tick is about (D74): who speaks,
-   * walks, appears or turns. */
+   * walks, appears or turns, unless the step is about someone else (D103). */
   private frameStory(events: WorldEvent[]): void {
-    const about = [...events].reverse().find((event) => ['say', 'move', 'appear', 'face'].includes(event.kind));
+    const about = [...events]
+      .reverse()
+      .find((event) => ['say', 'move', 'appear', 'face'].includes(event.kind) && event.data.aside !== true);
     if (!about) return;
     const sprite = about.actor === 'wizard' ? this.wizard : this.actors.get(about.actor)?.sprite;
     if (sprite) this.view.focus = sprite;
@@ -655,6 +657,8 @@ class LevelScene extends Phaser.Scene {
       // A door opened by a spell or a word is the door's own event (D43); so is a
       // thing a spell pulls (D47).
       else if (event.kind === 'open') this.openDoor(String(event.data.id), instant, event.data.by === 'word');
+      // A story's figure closes a door behind it (D103).
+      else if (event.kind === 'close') this.closeDoor(String(event.data.id), instant);
       else if (event.kind === 'unsealed') this.unseal(String(event.data.id), instant);
       // A word said to a door while its seal holds: the wizard thinks why nothing happened.
       else if (event.kind === 'unheard') {
@@ -826,6 +830,15 @@ class LevelScene extends Phaser.Scene {
     });
   }
 
+  /** A door closed, in a story (D103): its closed picture, and the doorway's mark
+   * hidden behind it again. */
+  private closeDoor(id: string, instant = true): void {
+    this.openDoors.delete(id);
+    if (!instant) play('door');
+    const lock = this.map.things.find((thing) => thing.id === id)?.lock ?? 'none';
+    this.doorLook(id, false, lock, !instant);
+  }
+
   /** A door opened. One opened by a word opens in the second half of the tick, once
    * the word is said, so that the child sees the word, then the door. */
   private openDoor(id: string, instant = true, byWord = false): void {
@@ -983,6 +996,9 @@ class LevelScene extends Phaser.Scene {
       }
       case 'open':
         this.openDoor(String(event.data.id), instant);
+        break;
+      case 'close':
+        this.closeDoor(String(event.data.id), instant);
         break;
       case 'cast':
         if (!instant) {

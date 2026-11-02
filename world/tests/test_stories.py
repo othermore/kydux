@@ -181,3 +181,92 @@ def test_who_is_asleep_does_nothing_but_wake_and_a_bed_holds_one(steps, says):
 def test_a_sleeper_is_staged_beside_its_bed():
     with pytest.raises(LevelError, match="beside no bed_1"):
         in_the_room([{"who": "voice"}], actors=[{**MATE, "at": [1, 1]}])
+
+
+def test_a_step_does_several_things_and_two_figures_walk_together():
+    # D103: nuri and the wizard walk at once, nuri first named, so that each tile
+    # nuri leaves is free for the wizard at the same tick.
+    story = staged(
+        actors=[{"id": "nuri", "kind": "friend", "at": [2, 1]}],
+        steps=[
+            {
+                "who": "voice",
+                "by": "wizard",
+                "do": [{"by": "nuri", "walk": [4, 1]}, {"by": "wizard", "walk": [3, 1]}],
+            },
+            {"who": "voice", "by": "nuri", "do": [{"walk": [[4, 3], [3, 3]]}, {"face": "up"}]},
+        ],
+    )
+    assert story["steps"][1]["do"][0]["walk"] == [[4, 3], [3, 3]]
+    # Named the other way round, the wizard walks into nuri, who has not moved yet.
+    with pytest.raises(LevelError, match="stopped at 2,1"):
+        staged(
+            actors=[{"id": "nuri", "kind": "friend", "at": [2, 1]}],
+            steps=[
+                {
+                    "who": "voice",
+                    "do": [{"by": "wizard", "walk": [3, 1]}, {"by": "nuri", "walk": [4, 1]}],
+                }
+            ],
+        )
+
+
+def test_a_walk_through_a_corner_must_go_straight_each_way():
+    with pytest.raises(LevelError, match="straight line"):
+        staged(actors=[], steps=[{"who": "wizard", "do": {"walk": [[1, 3], [3, 1]]}}])
+    staged(actors=[], steps=[{"who": "wizard", "do": {"walk": [[1, 3], [3, 3], [3, 1]]}}])
+
+
+def test_a_walk_may_end_out_of_sight_and_the_wizard_never_goes():
+    story = staged(
+        actors=[{"id": "nuri", "kind": "friend", "at": [3, 1]}],
+        steps=[
+            {"who": "nuri", "do": None},
+            {"who": "voice", "do": {"by": "nuri", "walk": [5, 1], "vanish": True}},
+        ],
+    )
+    assert story["world"]["actors"][0]["at"] == [3, 1]
+    with pytest.raises(LevelError, match="speaks out of sight"):
+        staged(
+            actors=[{"id": "nuri", "kind": "friend", "at": [3, 1]}],
+            steps=[{"who": "nuri", "do": {"walk": [5, 1], "vanish": True}}],
+        )
+    with pytest.raises(LevelError, match="stays in the story"):
+        staged(actors=[], steps=[{"who": "wizard", "do": {"walk": [3, 1], "vanish": True}}])
+
+
+def test_a_figure_opens_and_closes_a_door_beside_it():
+    # The gate at 5,2 is shut; nuri opens it from beside it, walks through,
+    # and closes it behind from the other side.
+    story = staged(
+        actors=[{"id": "nuri", "kind": "friend", "at": [4, 2]}],
+        steps=[
+            {
+                "who": "voice",
+                "by": "nuri",
+                "do": [{"open": "gate"}, {"walk": [[5, 2], [5, 3]]}, {"close": "gate"}],
+            }
+        ],
+    )
+    assert story["steps"][0]["do"][0] == {"open": "gate"}
+    with pytest.raises(LevelError, match="beside no gate"):
+        staged(actors=[], steps=[{"who": "voice", "by": "wizard", "do": {"open": "gate"}}])
+    with pytest.raises(LevelError, match="no door porch"):
+        staged(actors=[], steps=[{"who": "voice", "by": "wizard", "do": {"open": "porch"}}])
+    with pytest.raises(LevelError, match="shut already"):
+        staged(
+            actors=[{"id": "nuri", "kind": "friend", "at": [4, 2]}],
+            steps=[{"who": "voice", "by": "nuri", "do": {"close": "gate"}}],
+        )
+    with pytest.raises(LevelError, match="doorway"):
+        staged(
+            actors=[{"id": "nuri", "kind": "friend", "at": [4, 2]}],
+            steps=[
+                {"who": "voice", "by": "nuri", "do": [{"open": "gate"}, {"walk": [5, 2]}]},
+                {
+                    "who": "voice",
+                    "by": "wizard",
+                    "do": [{"walk": [[4, 1], [4, 2]]}, {"close": "gate"}],
+                },
+            ],
+        )

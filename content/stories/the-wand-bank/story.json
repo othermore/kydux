@@ -70,18 +70,30 @@
     },
     {
       "who": "friend",
-      "do": {
-        "appear": [
-          12,
-          6
-        ]
-      }
+      "do": [
+        {
+          "appear": [
+            10,
+            5
+          ]
+        },
+        {
+          "face": "down"
+        },
+        {
+          "by": "wizard",
+          "face": "up"
+        }
+      ]
     },
     {
       "who": "wizard"
     },
     {
       "who": "mate"
+    },
+    {
+      "who": "wizard"
     },
     {
       "who": "wenna"

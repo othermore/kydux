@@ -148,6 +148,7 @@
       "wait": "Stands still while the world moves on, one tick at a time.",
       "pick_up": "Picks up a thing on the wizard's tile or beside it, and carries it. With several in reach, say which: wizard.pick_up(key).",
       "find_nearest": "Finds the nearest thing of a kind, or None when there is none.",
+      "find_item": "Finds the thing of a kind the wizard carries, or None when it carries none.",
       "find_all": "Finds every thing of a kind, nearest first.",
       "has": "Tells whether the wizard carries a thing of a kind.",
       "position": "Where the wizard stands, as x and y.",

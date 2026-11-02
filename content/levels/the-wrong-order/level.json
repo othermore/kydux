@@ -54,6 +54,7 @@
     "door.locked",
     "wizard.pick_up",
     "wizard.find_nearest",
+    "wizard.find_item",
     "wizard.give",
     "door.open",
     "thing.reveal",

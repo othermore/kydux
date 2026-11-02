@@ -1,0 +1,9 @@
+{
+  "id": "giving-things",
+  "speaker": "wenna",
+  "teaches": [
+    "wizard.find_item",
+    "wizard.give"
+  ],
+  "try": "refused"
+}

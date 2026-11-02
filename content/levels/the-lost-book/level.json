@@ -25,7 +25,7 @@
       "kind": "book",
       "id": "old_book",
       "at": [
-        5,
+        1,
         13
       ]
     }
@@ -46,15 +46,6 @@
         9,
         17
       ]
-    },
-    {
-      "kind": "ghost",
-      "id": "eldra",
-      "at": [
-        11,
-        10
-      ],
-      "facing": "down"
     }
   ],
   "api": [
@@ -66,14 +57,12 @@
     "door.locked",
     "wizard.pick_up",
     "wizard.find_nearest",
-    "thing.reveal",
-    "wizard.give"
+    "thing.reveal"
   ],
   "goals": [
     {
-      "kind": "give",
-      "id": "old_book",
-      "to": "eldra"
+      "kind": "collect",
+      "id": "old_book"
     },
     {
       "kind": "uses",

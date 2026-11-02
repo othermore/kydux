@@ -129,8 +129,11 @@ class World:
         self._check_goals()
 
     def namespace(self) -> dict[str, Child]:
-        """What the child's code holds: the wizard, and the level's things and actors by id."""
-        return {"wizard": self.wizard, **self.things, **self.actors}
+        """What the child's code holds: the wizard, and the level's things and actors by
+        id; not what the wizard holds from the start, which the code asks for with
+        `find_item` (D123), so that no name is put into the program unseen."""
+        things = {name: thing for name, thing in self.things.items() if not thing._k_spec.carried}
+        return {"wizard": self.wizard, **things, **self.actors}
 
     def is_free(self, position: Position) -> bool:
         """Whether the wizard or an actor can walk onto a tile in the next tick: floor,
@@ -497,6 +500,12 @@ class Wizard(Child):
         `wizard.find_nearest("key")`"""
         nearby = self._nearby(kind)
         return nearby[0] if nearby else None
+
+    def find_item(self, kind: str) -> Thing | None:
+        """The thing of a kind the wizard carries, or None when it carries none:
+        `wizard.find_item("book")`"""
+        carried = [item for item in self._k_world.carried() if item.kind == kind]
+        return sorted(carried, key=lambda item: item.name)[0] if carried else None
 
     def find_all(self, kind: str) -> list[Child]:
         """Every thing of a kind, nearest first, as a list: `wizard.find_all("book")`"""

@@ -204,6 +204,8 @@ def test_a_ghost_stands_and_catches_no_one():
     [
         ({"carrying": ["door"]}, "carrying lists"),
         ({"carrying": ["wand", "wand"]}, "twice"),
+        ({"carrying": [{"kind": "book", "art": 3}]}, "carrying lists"),
+        ({"carrying": [{"kind": "book", "glow": True}]}, "carrying lists"),
         ({"spells": ["abra"]}, "not a spell the world knows"),
         ({"actors": [{"kind": "ghost", "id": "eldra", "at": [2, 1]}]}, "cannot stand on a shelf"),
     ],
@@ -223,3 +225,32 @@ def test_the_spells_a_level_may_name_are_the_spells_the_world_casts():
     """level.KNOWN_SPELLS and world.SPELLS are two lists of the same names: the loader
     checks a level without the world, and the world casts; neither may drift."""
     assert set(KNOWN_SPELLS) == set(SPELLS)
+
+
+def test_a_thing_in_hand_from_the_start_is_asked_for_with_find_item_and_given():
+    # The book in the wizard's hands, drawn when it leaves them (D123), and another
+    # on the floor.
+    level = Level.from_dict(
+        {
+            "id": "in-hand",
+            "map": ["######", "#SG..#", "######"],
+            "carrying": ["wand", {"kind": "book", "art": "old_book"}],
+            "things": [{"kind": "book", "id": "far", "at": [4, 1]}],
+            "actors": [{"kind": "ghost", "id": "eldra", "marker": "G", "facing": "left"}],
+            "goals": [{"kind": "give", "id": "book", "to": "eldra"}],
+        }
+    )
+    world = World(level)
+    wizard = world.wizard
+    book = wizard.find_item("book")
+    assert book is not None and book.name == "book" and book.position is None
+    # find_nearest looks on the map, not in the wizard's hands.
+    assert wizard.find_nearest("book").name == "far"
+    assert wizard.find_item("key") is None
+    # No name is put into the program for it: the program asks for it.
+    assert "book" not in world.namespace() and "far" in world.namespace()
+    wizard.give(book)
+    assert last(world) == ("wizard", "give", {"id": "book", "to": "eldra", "at": [1, 1]})
+    assert wizard.find_item("book") is None
+    world.finish()
+    assert world.won()

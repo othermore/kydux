@@ -29,7 +29,6 @@ context:
   - content/lessons/repeat/en.md
   - content/lessons/while/en.md
   - content/lessons/kirra-and-osto/en.md
-  - content/levels/eldras-book/text.en.json
 ---
 Write the texts of chapter 3's nine levels, in English and Spanish. The
 chapter's stories and lessons are given, and the last level of chapter 2

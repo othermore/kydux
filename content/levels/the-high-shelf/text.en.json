@@ -1,16 +1,15 @@
 {
   "title": "The high shelf",
   "goals": [
-    "Take the rare book.",
-    "Show the book with `reveal` before the spell brings it."
+    "Give Eldra her book.",
+    "Make the book glow with `reveal`."
   ],
-  "starting_code": "# The rare book is somewhere among the books up on the high shelf.\n",
+  "starting_code": "# Find the book with `find_nearest` and keep it under a name.\n\n# Make it glow with `reveal`.\n\n# Walk right until you stand right under it.\n\n# Cast fendra with `cast` and the book's name.\n\n# Pick it up with `pick_up`.\n\n# Give it to Eldra with `give`.\n",
   "hints": [
-    "Find the book with `find_nearest`, keep it under a name, and show it with `reveal`.",
-    "Walk to stand right beneath it.",
-    "Use `cast` to cast *fendra* with the book, then use `pick_up`."
+    "Find it and `reveal` it.",
+    "Walk right until you stand right below the glowing book.",
+    "`cast` *fendra* with the book, then `pick_up` and `give`."
   ],
-  "intro": "The rare book I have wanted for so long is up there among all the others, and I cannot tell which one it is! But your program can find it.",
-  "outro": "You have it! The spell worked perfectly.",
-  "learned": "Now you know that the *fendra* spell is told which thing to bring, and that a thing it brings must still be picked up."
+  "intro": "Eldra's other lost book is up on the high shelf among all the others, and she cannot tell which one it is. Your program can! Find it, make it glow, stand under it, bring it down with *fendra*, pick it up, and give it to her.",
+  "outro": "Both her books are back! Eldra is at peace at last."
 }

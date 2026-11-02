@@ -1,16 +1,15 @@
 {
   "title": "El estante alto",
   "goals": [
-    "Coge el libro raro.",
-    "Muestra el libro con `reveal` antes de que el hechizo lo traiga."
+    "Dale a Eldra su libro.",
+    "Haz que el libro brille con `reveal`."
   ],
-  "starting_code": "# El libro raro está en algún lugar entre los libros del estante alto.\n",
+  "starting_code": "# Encuentra el libro con `find_nearest` y guárdalo bajo un nombre.\n\n# Haz que brille con `reveal`.\n\n# Camina a la derecha hasta que estés justo debajo de él.\n\n# Lanza fendra con `cast` y el nombre del libro.\n\n# Recógelo con `pick_up`.\n\n# Dáselo a Eldra con `give`.\n",
   "hints": [
-    "Encuentra el libro con `find_nearest`, guárdalo bajo un nombre y muéstralo con `reveal`.",
-    "Camina hasta ponerte justo debajo de él.",
-    "Usa `cast` para lanzar *fendra* con el libro, y luego usa `pick_up`."
+    "Encuéntralo y usa `reveal` en él.",
+    "Camina a la derecha hasta que estés justo debajo del libro brillante.",
+    "Usa `cast` para lanzar *fendra* con el libro, luego `pick_up` y `give`."
   ],
-  "intro": "El libro raro que he querido durante tanto tiempo está ahí arriba entre todos los demás, ¡y no puedo distinguir cuál es! Pero tu programa puede encontrarlo.",
-  "outro": "¡Lo tienes! El hechizo ha funcionado a la perfección.",
-  "learned": "Ahora sabes que al hechizo *fendra* se le dice qué cosa debe traer, y que una cosa que trae todavía se debe recoger."
+  "intro": "El otro libro perdido de Eldra está en el estante alto entre todos los demás, y ella no puede distinguir cuál es. ¡Tu programa sí puede! Encuéntralo, haz que brille, ponte debajo de él, bájalo con *fendra*, recógelo y dáselo.",
+  "outro": "¡Eldra ya tiene sus dos libros! Por fin está en paz."
 }

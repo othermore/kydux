@@ -39,6 +39,15 @@
         10,
         6
       ]
+    },
+    {
+      "kind": "ghost",
+      "id": "eldra",
+      "at": [
+        8,
+        6
+      ],
+      "facing": "left"
     }
   ],
   "api": [
@@ -50,6 +59,7 @@
     "door.locked",
     "wizard.pick_up",
     "wizard.find_nearest",
+    "wizard.find_item",
     "wizard.give",
     "door.open",
     "thing.reveal",
@@ -58,8 +68,9 @@
   ],
   "goals": [
     {
-      "kind": "collect",
-      "id": "rare_book"
+      "kind": "give",
+      "id": "rare_book",
+      "to": "eldra"
     },
     {
       "kind": "uses",

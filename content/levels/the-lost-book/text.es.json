@@ -1,16 +1,16 @@
 {
   "title": "El libro perdido",
   "goals": [
-    "Dale a Eldra su libro.",
+    "Recoge el libro.",
     "Haz que el libro brille con `reveal`."
   ],
-  "starting_code": "# El libro de Eldra está escondido entre las dos grandes estanterías; encuéntralo y llévaselo.\n",
+  "starting_code": "# Encuentra el libro con `find_nearest` y la palabra \"book\", y guárdalo bajo un nombre.\n\n# Haz que brille con `reveal`.\n\n# Camina hacia él: sube por la puerta, ve a la derecha hasta el paso del lado, sube hasta la sala, recórrela hacia la izquierda hasta el final y baja un paso, junto a la pila.\n\n# Recógelo con `pick_up`.\n",
   "hints": [
-    "Usa `find_nearest` con la palabra \"book\" para encontrarlo, guárdalo bajo un nombre y usa `reveal` en él.",
-    "Camina hasta donde brilla: sube por la puerta, ve a la derecha hasta el pasillo, sube y entra entre las dos estanterías, y sigue a la izquierda; allí usa el método `pick_up`.",
-    "Sal del pasillo por su extremo derecho y sube hasta Eldra, que te espera flotando a la salida; usa el método `give` con el nombre de tu variable para darle el libro."
+    "Encuéntralo con `find_nearest` y la palabra \"book\", guárdalo bajo un nombre y usa `reveal` en él.",
+    "Camina: sube por la puerta, ve a la derecha hasta el paso del lado, sube hasta la sala, recórrela hacia la izquierda hasta el final y baja un paso.",
+    "Junto a la pila de libros, usa `pick_up`."
   ],
-  "intro": "Eldra, la fantasma, perdió un libro hace mucho tiempo. Debe de haberse colado en el pasillo entre las dos grandes estanterías, donde nadie puede verlo. Encuéntralo con `find_nearest`, haz que brille y llévaselo.",
-  "outro": "¡Gracias! Eldra está muy contenta de tener su libro de vuelta.",
-  "learned": "Ahora sabes cómo un método devuelve algo, cómo una variable lo guarda, que una cosa revelada muestra adónde ir y cómo darle una cosa a alguien."
+  "intro": "Eldra perdió un libro hace mucho tiempo. Está en el rincón, junto a la pila de libros viejos, al final del pasillo entre las dos grandes estanterías, medio escondido; llegas a él desde el final de la sala, justo encima. Encuéntralo, haz que brille y recógelo.",
+  "outro": "¡Lo tienes! Eldra espera al otro extremo de la sala, y se alegrará muchísimo de volver a verlo.",
+  "learned": "Ahora sabes que un método puede devolver algo, que un nombre lo guarda y que una cosa revelada muestra adónde ir."
 }

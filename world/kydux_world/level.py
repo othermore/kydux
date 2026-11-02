@@ -615,13 +615,28 @@ def _merged_by_id(
 
 def _carrying(data: dict[str, Any], level_id: str, start: Position) -> tuple[ThingSpec, ...]:
     """The things the wizard holds from the start (D49): one of each kind named, its id
-    the kind's name, with no tile of its own."""
-    kinds = data.get("carrying", [])
-    if not isinstance(kinds, list) or not all(kind in CARRIED_KINDS for kind in kinds):
+    the kind's name, with no tile of its own. An entry is the kind, or an object
+    with the kind and the painted thing the page draws it from when it leaves the
+    wizard's hands (`{"kind": "book", "art": "old_book"}`, D123)."""
+    entries = data.get("carrying", [])
+    if not isinstance(entries, list):
+        raise LevelError(f"{level_id}: carrying lists kinds of thing the wizard can carry")
+    kinds = [_carried_kind(entry) for entry in entries]
+    if not all(kind in CARRIED_KINDS for kind in kinds):
         raise LevelError(f"{level_id}: carrying lists kinds of thing the wizard can carry")
     if len(set(kinds)) != len(kinds):
         raise LevelError(f"{level_id}: carrying names a kind twice")
     return tuple(ThingSpec(kind, kind, start, carried=True) for kind in kinds)
+
+
+def _carried_kind(entry: Any) -> Any:
+    """The kind of an entry of `carrying`: the entry itself, or an object's `kind`
+    beside its `art`, a string, and nothing else."""
+    if isinstance(entry, dict):
+        if set(entry) - {"kind", "art"} or not isinstance(entry.get("art", ""), str):
+            return None
+        return entry.get("kind")
+    return entry
 
 
 def _towards(here: Position, there: Position) -> str:

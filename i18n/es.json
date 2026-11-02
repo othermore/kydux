@@ -148,6 +148,7 @@
       "wait": "Se queda quiet{o|a} mientras el mundo sigue, un tick cada vez.",
       "pick_up": "Coge una cosa de la casilla {del mago|de la maga} o de una de al lado, y la lleva. Si hay varias, di cuál: wizard.pick_up(key).",
       "find_nearest": "Encuentra la cosa más cercana de un tipo, o None si no hay ninguna.",
+      "find_item": "Encuentra la cosa de un tipo que lleva {el mago|la maga}, o None si no lleva ninguna.",
       "find_all": "Encuentra todas las cosas de un tipo, de la más cercana a la más lejana.",
       "has": "Dice si {el mago|la maga} lleva una cosa de un tipo.",
       "position": "Dónde está {el mago|la maga}, en x e y.",

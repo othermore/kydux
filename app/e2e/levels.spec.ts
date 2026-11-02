@@ -212,27 +212,40 @@ test.describe('chapter 2', () => {
     });
   }
 
-  test('the book is drawn in its cell, glows when revealed, and Wenna speaks of Eldra on the win card', async ({
+  test('the book is drawn in its cell by the pile, and Wenna speaks of Eldra on the win card', async ({
     page,
   }) => {
     await page.goto('/#level/the-lost-book');
     await expect(page.locator('#card-intro')).toContainText('Eldra');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
-    // Laid between the two bookcases, the book is drawn in its cell's middle (D109).
-    await expect(scene(page)).toHaveAttribute('data-drawn', /old_book:5\.50,13\.50/);
+    // Laid by the pile of books, the book is drawn in its cell's middle (D109).
+    await expect(scene(page)).toHaveAttribute('data-drawn', /old_book:1\.50,13\.50/);
     await page.locator('#speed').selectOption('4');
     await run(page, readFileSync(`${CONTENT}levels/the-lost-book/solution.py`, 'utf8'));
     await expect(page.locator('#card-outro')).toContainText('Wenna');
     await expect(page.locator('#card-outro')).toContainText('Eldra');
   });
 
+  test('the book in hand is asked for with find_item, unseen until it is given (D123)', async ({ page }) => {
+    await page.goto('/#level/the-book-returned');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(scene(page)).toHaveAttribute('data-carried', 'book,wand');
+    await expect(scene(page)).not.toHaveAttribute('data-drawn', /book:/);
+    await page.locator('#speed').selectOption('4');
+    expect(await run(page, readFileSync(`${CONTENT}levels/the-book-returned/solution.py`, 'utf8'))).toMatch(
+      /^You did it/,
+    );
+    await expect(scene(page)).toHaveAttribute('data-carried', 'wand');
+  });
+
   test('giving with no one beside the wizard says so', async ({ page }) => {
-    await page.goto('/#level/the-lost-book');
+    await page.goto('/#level/the-book-returned');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_up(2)\nwizard.move_right(4)\nwizard.move_up(2)\nwizard.move_left(6)\nwizard.pick_up()\nwizard.give(old_book)');
+    await run(page, 'book = wizard.find_item("book")\nwizard.give(book)');
     await expect(page.locator('.outcome-text')).toContainText('There is no one beside me to give it to.');
   });
 });

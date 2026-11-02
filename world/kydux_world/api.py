@@ -30,6 +30,7 @@ MEMBERS: dict[str, tuple[str, ...]] = {
         "wait",
         "pick_up",
         "find_nearest",
+        "find_item",
         "find_all",
         "has",
         "give",

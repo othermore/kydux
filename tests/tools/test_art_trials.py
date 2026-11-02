@@ -146,7 +146,7 @@ def test_the_demo_reads_the_real_scenes_and_the_levels_it_plays():
     data = demo.scene_data("the-library", ["the-lost-book"])
     assert data["rows"][0].startswith("#")
     assert any(t["id"] == "old_book" for t in data["things"])
-    assert {a["id"] for a in data["actors"]} >= {"wenna", "eldra"}
+    assert {a["id"] for a in data["actors"]} >= {"wenna", "mate"}
     field = demo.scene_data("the-field", [])
     assert field["terrains"]["t"]["kind"] == "tree"
     assert {t["id"] for t in field["things"]} >= {"gate", "seal_gate", "castle_door"}

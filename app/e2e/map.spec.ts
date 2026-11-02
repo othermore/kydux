@@ -53,7 +53,7 @@ test('the map in Spanish', async ({ browser }) => {
   const page = await context.newPage();
   await page.goto('/#map');
   await expect(page.locator('.map-chapter h2').first()).toHaveText('La llegada');
-  await expect(stop(page, 'level:the-hidden-key').locator('.stop-number')).toHaveText('Práctica 3');
+  await expect(stop(page, 'level:the-hidden-key').locator('.stop-number')).toHaveText('Práctica 4');
   await context.close();
 });
 

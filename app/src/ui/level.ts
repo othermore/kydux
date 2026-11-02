@@ -8,6 +8,7 @@ import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
 import type { Editor, EditorOptions } from '../editor/editor';
 import { debugging } from '../engine/debugging';
+import { carriedKinds } from '../engine/layout';
 import type { Speed } from '../engine/playback';
 import { type Look, lookOf } from '../engine/looks';
 import type { SceneHandle } from '../engine/scene';
@@ -303,7 +304,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const said = (words: string | undefined) =>
     speaker && words ? { speaker: characterName(speaker), text: words } : undefined;
   // What the wizard holds from the start (D49), said with each thing's name.
-  const carried = Array.isArray(loaded.level.carrying) ? loaded.level.carrying.map(String) : [];
+  const carried = carriedKinds(loaded.level);
   const carrying = () =>
     carried.length > 0
       ? t('level.carrying', { things: carried.map((kind) => t(`things.${kind}`)).join(', ') })

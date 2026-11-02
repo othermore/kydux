@@ -6,13 +6,13 @@
     "Go through it.",
     "Find the key with `find_nearest`."
   ],
-  "starting_code": "# The door's key is under the big bookcase.\n",
+  "starting_code": "# Find the key with `find_nearest` and the word \"key\", and keep it under a name.\n\n# Make it glow with `reveal`.\n\n# Go down into the aisle and left along it to beside the key.\n\n# Pick it up with `pick_up`.\n\n# Go back right to the aisle's end, up into the hall, left along it and up to the door.\n\n# Open it with its `open` method.\n\n# Go up through it.\n",
   "hints": [
     "Find the key with `find_nearest` and `reveal` it.",
     "Walk to where it glows: down into the aisle between the two bookcases and left along it; `pick_up` from there, beside it.",
     "Go back along the aisle to its right end, up into the hall, walk to the locked door, use its `open` method, and go through."
   ],
-  "intro": "The way goes on through that locked door. Its key fell under the big bookcase long ago, where no one can see it. Find it, show where it is, pick it up, open the door, and go through.",
+  "intro": "The way goes on through that locked door. Its key fell under the big bookcase long ago, where no one can see it. Eldra's book is back with her, and no book lies in the aisle any more; this time it is the key that is out of sight. Find it, show where it is, pick it up, open the door, and go through.",
   "outro": "Well done! The door is open, and the top aisle is just ahead.",
   "learned": "Now you know that a thing out of sight is there all the same for a program, and how a door opens with its key."
 }

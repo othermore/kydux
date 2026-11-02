@@ -1,2 +1,3 @@
 book = wizard.find_nearest("book")
-wizard.give(book)
+book.reveal()
+wizard.pick_up()

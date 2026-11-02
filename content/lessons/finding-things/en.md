@@ -19,11 +19,9 @@ If there is no book at all, the answer is `None`, which is Python's word for not
 To see which thing the name holds and where it is, `book.reveal()` makes it glow where it lies. It glows even through whatever hides it, and from then on you know where to walk.
 
 ---
-## What to do with a thing
+## Try it
 
-Once a thing is kept under a name, you can hand it to whoever stands right beside your wizard, using `wizard.give(book)`.
-
-Eldra, our ghost, has lost a book somewhere between the two big bookcases. Let us find it and make it glow!
+Eldra, our ghost, lost one of her books long ago. It lies in a corner of the library, by the pile of old books, half hidden behind it. A program finds it wherever it lies, so let us find it and make it glow!
 
 ```python try
 book = wizard.find_nearest("book")

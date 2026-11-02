@@ -681,7 +681,8 @@ class LevelScene extends Phaser.Scene {
         // Back in the state it lies in, a book the spell took at the run before.
         if (thing.kind !== 'door') image.setTexture(`art-${this.artOf(thing.id)}-${Object.keys(painted.states)[0]}`);
       } else image.setPosition(...centre(tile));
-      image.setVisible(true).setAlpha(1);
+      // A thing in the wizard's hands from the start is seen only once given (D123).
+      image.setVisible(!thing.carried).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
       this.glows.get(thing.id)?.setVisible(!thing.open);
       if (thing.open) this.openDoors.add(thing.id);

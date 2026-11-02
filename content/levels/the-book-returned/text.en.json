@@ -1,0 +1,16 @@
+{
+  "title": "The book returned",
+  "goals": [
+    "Give Eldra her book.",
+    "In fewer than 5 lines."
+  ],
+  "starting_code": "# Ask for the book in your hands with `find_item` and the word \"book\", and keep it under a name.\n\n# Go up a step into the hall, and right along it to Eldra.\n\n# Give her the book with `give` and the name.\n",
+  "hints": [
+    "`find_item` with the word \"book\" gives the book you carry; keep it under a name.",
+    "Go up a step, then right along the hall, until Eldra is right beside you.",
+    "Use `give` with the name you kept the book under."
+  ],
+  "intro": "The book is in your hands, and Eldra floats at the other end of the hall. Take it to her.",
+  "outro": "Eldra holds her book again, and thanks you with all her heart.",
+  "learned": "Now you know that a name lives in its own program, that `find_item` asks for what you carry, and that `give` hands a thing to whoever stands beside you."
+}

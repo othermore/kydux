@@ -19,11 +19,9 @@ Si no hay ningún libro, la respuesta es `None`, que es la palabra de Python par
 Para ver qué cosa guarda el nombre y dónde está, `book.reveal()` hace que brille donde se encuentra. Brilla incluso a través de lo que la esconda, y a partir de entonces sabes adónde caminar.
 
 ---
-## Qué hacer con una cosa
+## Pruébalo
 
-Una vez que guardas una cosa bajo un nombre, puedes entregársela a quien esté justo al lado de tu {mago|maga}, usando `wizard.give(book)`.
-
-Nuestra fantasma, Eldra, ha perdido un libro en algún lugar entre las dos grandes estanterías. ¡Vamos a encontrarlo y hacer que brille!
+Nuestra fantasma, Eldra, perdió uno de sus libros hace mucho tiempo. Está en un rincón de la biblioteca, junto a la pila de libros viejos, medio escondido detrás de ella. Un programa lo encuentra dondequiera que esté, ¡así que vamos a encontrarlo y a hacer que brille!
 
 ```python try
 book = wizard.find_nearest("book")

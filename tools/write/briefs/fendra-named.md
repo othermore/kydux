@@ -19,8 +19,6 @@ context:
   - content/levels/the-wrong-order/text.en.json
   - content/levels/the-high-shelf/text.en.json
   - content/levels/the-high-shelf/text.es.json
-  - content/levels/eldras-book/text.en.json
-  - content/levels/eldras-book/text.es.json
   - content/stories/the-wand-bank/text.en.json
 ---
 ## What changes, and why

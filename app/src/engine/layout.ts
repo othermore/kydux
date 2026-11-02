@@ -25,6 +25,20 @@ export interface ThingLayout {
   /** The painted thing it is drawn from, when the level names one other than its id
    * (D85): every level's key is `key`, each drawn from the key painted for it. */
   art?: string;
+  /** In the wizard's hands from the start, and drawn only once it leaves them,
+   * given (D123); its tile is the wizard's start. */
+  carried?: boolean;
+}
+
+/** The kinds a level's wizard carries from the start (D49): each entry of
+ * `carrying` is a kind, or the kind with the painted thing it is drawn from
+ * (`{"kind": "book", "art": "old_book"}`, D123). */
+export function carriedKinds(level: LevelJson): string[] {
+  return Array.isArray(level.carrying) ? level.carrying.map((entry) => String(isRecord(entry) ? entry.kind : entry)) : [];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function lockOf(spec: Record<string, unknown>): DoorLock {
@@ -154,7 +168,14 @@ export function layout(level: LevelJson): Layout {
       if (char === '=') shelves.push([x, y]);
     });
   });
-  const carrying = Array.isArray(level.carrying) ? level.carrying.map(String) : [];
+  const carrying = carriedKinds(level);
+  // A thing carried with a picture is drawn from it when it is given (D123).
+  for (const entry of Array.isArray(level.carrying) ? level.carrying : []) {
+    if (isRecord(entry) && typeof entry.art === 'string') {
+      const kind = String(entry.kind);
+      things.push({ id: kind, kind, tile: start, lock: 'none', open: false, art: entry.art, carried: true });
+    }
+  }
   const ways: Record<string, Record<string, Tile>> = {};
   for (const way of asList(level.ways)) {
     const moved: Record<string, Tile> = {};

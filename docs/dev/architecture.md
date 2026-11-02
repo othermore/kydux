@@ -178,6 +178,7 @@ wizard.cast(spell, thing=None)  # a tick: with the wand carried, a spell of the 
 wizard.wait(ticks=1)         # a tick each: stands still while the world moves on
 wizard.pick_up()             # a tick: the thing on the wizard's tile, into wizard.items
 wizard.find_nearest(kind)    # the nearest thing or actor of a kind ("key"...), or None
+wizard.find_item(kind)       # the thing of a kind it carries, or None (D123)
 wizard.find_all(kind)        # all of them, nearest first, then in reading order
 wizard.has(kind)             # whether it carries one of that kind
 wizard.position              # Position(x, y), which compares as a tuple

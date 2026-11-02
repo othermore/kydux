@@ -33,6 +33,18 @@ describe('layout', () => {
     expect(map.actors[0]?.sight).toBe(0);
   });
 
+  it('draws a thing carried with a picture from it, in the hands from the start (D123)', () => {
+    const map = layout({
+      id: 'in-hand',
+      map: ['#####', '#S.G#', '#####'],
+      carrying: ['wand', { kind: 'book', art: 'old_book' }],
+    });
+    expect(map.carrying).toEqual(['wand', 'book']);
+    expect(map.things).toEqual([
+      { id: 'book', kind: 'book', tile: [1, 1], lock: 'none', open: false, art: 'old_book', carried: true },
+    ]);
+  });
+
   it("keeps where each way puts the things and actors it moves (D51, D85)", () => {
     const map = layout({
       id: 'ways',

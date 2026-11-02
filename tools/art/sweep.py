@@ -404,6 +404,10 @@ def floating(scene: Scene) -> list[Problem]:
     return found
 
 
+#: How much of a page pixel a line found at the painting's size must cover to be one.
+LINE = 60
+
+
 @dataclass
 class Differs:
     """Where the picture a scene's rows were cut from differs from its ground-only
@@ -414,6 +418,11 @@ class Differs:
     shadow: np.ndarray
     painting: np.ndarray
     ground: np.ndarray
+    #: The painting's outlines, by the scene's colours and by the painting's black,
+    #: found at the painting's own size and brought down: a thin line a painting
+    #: drawn large has would blur away at the page's size.
+    dark: np.ndarray
+    black: np.ndarray
 
 
 def differs(scene: Scene) -> Differs | None:
@@ -430,7 +439,16 @@ def differs(scene: Scene) -> Differs | None:
 
     painting, ground = read("ground-composite.png"), read("ground-only.png")
     shadow = image_first.darkened(painting, ground, scene.thresholds)
-    return Differs(image_first.difference(painting, ground), shadow, painting, ground)
+    native = np.array(Image.open(source / "ground-composite.png").convert("RGB"))
+
+    def lines(th: dict) -> np.ndarray:
+        found = Image.fromarray(image_first.dark_lines(native, th).astype(np.uint8) * 255)
+        brought = image_first.aligned(found, grid, scene.columns, scene.rows, scene.cell)
+        return np.array(brought)[..., 0] > LINE
+
+    dark, black = lines(scene.thresholds), lines(image_first.THRESHOLDS)
+    raw = image_first.difference(painting, ground)
+    return Differs(raw, shadow, painting, ground, dark, black)
 
 
 def lawn(scene: Scene, seen: Differs) -> list[Problem]:
@@ -523,7 +541,7 @@ def edges(scene: Scene, seen: Differs) -> list[Problem]:
     band = max(2, round(image_first.SNAP_BAND * scene.cell))
     reach = max(1, round(image_first.SNAP_REACH * scene.cell))
     height, width = scene.rows * scene.cell, scene.columns * scene.cell
-    dark = image_first.dark_lines(seen.painting[:height, :width], scene.thresholds)
+    dark = seen.dark[:height, :width]
     same = image_first.like(seen.painting[:height, :width], seen.ground[:height, :width])
     # What Gemini painted magenta in a scene's marked picture is no outline: the
     # inside of an opening a wall is cut round.
@@ -532,7 +550,7 @@ def edges(scene: Scene, seen: Differs) -> list[Problem]:
     holes = image_first.eroded(painted, edge)
     # An outline left out is the painting's black line, whatever a darker scene's
     # outlines are read by: its shading and the cracks of its floor are not one.
-    black = image_first.dark_lines(seen.painting[:height, :width])
+    black = seen.black[:height, :width]
     solids = [window(layer, 0, 0, width, height)[..., 3] > 128 for layer in scene.layers]
     count = np.sum(solids, axis=0, dtype=np.int16)
     inner = np.zeros((height, width), dtype=bool)
@@ -547,8 +565,10 @@ def edges(scene: Scene, seen: Differs) -> list[Problem]:
         y0, y1 = max(0, ys.min() - 2 * band), min(height, ys.max() + 1 + 2 * band)
         x0, x1 = max(0, xs.min() - 2 * band), min(width, xs.max() + 1 + 2 * band)
         piece, lines = solid[y0:y1, x0:x1], dark[y0:y1, x0:x1]
-        outside = image_first.outside_of(piece, lines, band)
-        given = image_first.outside_of(piece, lines, band, same[y0:y1, x0:x1])
+        # The scene's own edge lets no ground in: a crown it cuts has its outline
+        # beyond it, in the margin.
+        outside = image_first.outside_of(piece, lines, band, border=False)
+        given = image_first.outside_of(piece, lines, band, same[y0:y1, x0:x1], border=False)
         behind = (
             behind_cells(scene, reach_of(scene, layer), (x0, y0, x1, y1)) & inner[y0:y1, x0:x1]
         )
@@ -566,10 +586,12 @@ def edges(scene: Scene, seen: Differs) -> list[Problem]:
     return found
 
 
-#: How far from the scene's edge, in the page's pixels, a cut-out's edge is looked at: a
-#: painting's outermost pixels are left out (margin.TRIM), and a cut-out fades out
-#: before them (export_scene.EDGE_FEATHER).
-EDGE = 12
+#: How far from the scene's edge, in the page's pixels, a cut-out's edge is looked at:
+#: a painting's outermost pixels are left out (margin.TRIM), a cut-out fades out
+#: before them (export_scene.EDGE_FEATHER), and the grid may begin a little
+#: outside the painting, so that a crown the edge cuts is faded beside the edge and
+#: its strip next to the fade would look like a fringe.
+EDGE = 40
 #: How many pixels of one thing cut across a row's edge, over a figure, are a spill
 #: (D94): a tenth of a cell's width.
 SPILL = 0.1
@@ -585,7 +607,11 @@ def spills(scene: Scene, seen: Differs) -> list[Problem]:
     tall, wide = frame.shape[:2]
     shape = image_first.dilated(frame[..., 3] > 128, 2)
     height, width = scene.rows * scene.cell, scene.columns * scene.cell
-    dark = image_first.dark_lines(seen.painting[:height, :width], scene.thresholds)
+    dark = seen.dark[:height, :width]
+    # What the scene's settings keep whole is not looked at (`kept`, D93).
+    kept = np.zeros((height, width), dtype=bool)
+    for area in scene.kept:
+        kept |= image_first.area_mask(kept.shape, area, scene.cell)
     found = []
     for y, x in zip(*np.nonzero(scene.walked), strict=True):
         left = int((x + 0.5) * scene.cell) - wide // 2
@@ -609,6 +635,7 @@ def spills(scene: Scene, seen: Differs) -> list[Problem]:
         lines = dark[top:bottom, left : left + wide]
         back &= ~front & ~lines
         contact = front & ~lines & image_first.dilated(back, 1) & shape
+        contact &= ~kept[top:bottom, left : left + wide]
         pixels = int(contact.sum())
         if pixels >= SPILL * scene.cell:
             found.append(Problem("spill", (int(x), int(y)), ", ".join(sorted(names)), pixels))

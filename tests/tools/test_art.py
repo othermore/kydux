@@ -481,7 +481,8 @@ def swept(painting: np.ndarray, walked: np.ndarray, layers: list) -> tuple:
     still = np.zeros(painting.shape[:2], dtype=bool)
     ground = np.zeros_like(painting)
     ground[:] = (150, 200, 70)
-    return scene, sweep.Differs(still, still, painting, ground)
+    dark = image_first.dark_lines(painting)
+    return scene, sweep.Differs(still, still, painting, ground, dark, dark)
 
 
 def layer_of(painting: np.ndarray, mask: np.ndarray, row: int) -> "sweep.Layer":
@@ -611,6 +612,11 @@ def test_a_picture_drawn_again_is_moved_part_by_part_onto_the_painting():
     moved = repaint.moved_locally(drawn, painting)
     assert (moved[100:140, 380:386].max(axis=2) < 80).mean() > 0.9
     assert (moved[100:140, 60:66].max(axis=2) < 80).mean() > 0.9
+
+
+def test_a_box_past_the_picture_s_edge_holds_what_of_it_is_in_the_picture():
+    inside = export_scene.in_box((10, 10), (-3, 2, 4, 20))
+    assert inside[2:, :4].all() and not inside[:, 4:].any() and not inside[:2].any()
 
 
 def test_a_solid_thing_s_mask_has_its_holes_filled():

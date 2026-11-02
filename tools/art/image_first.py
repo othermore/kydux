@@ -29,8 +29,8 @@ A source folder may hold cut.json, which names its pictures (`gridded`,
 the castle is left as ground (`castle`), the castle door's box (`door`), the
 things whose leaves are cut (`leaves`, all of them unless it says), the
 colours the painting is read by (`thresholds`, THRESHOLDS for any left out),
-the parts it mends (`grounds`, `kept`, `rows`, each a box or a polygon in
-cells), and anything else for the page (`page`: the levels it plays, where the seal
+the parts it mends (`grounds`, `kept`, `whole`, `rows`, each a box or a
+polygon in cells), and anything else for the page (`page`: the levels it plays, where the seal
 glows, where the wand lies); without it, the first painting's are taken.
 tools/art/export_scene.py writes that folder from a scene's settings (D82).
 
@@ -303,18 +303,24 @@ def dark_lines(painting: np.ndarray, th: dict = THRESHOLDS) -> np.ndarray:
 
 
 def outside_of(
-    mask: np.ndarray, dark: np.ndarray, band: int, same: np.ndarray | None = None
+    mask: np.ndarray,
+    dark: np.ndarray,
+    band: int,
+    same: np.ndarray | None = None,
+    border: bool = True,
 ) -> np.ndarray:
     """The pixels within `band` of the mask's edge, on either side, that the ground
     beyond it reaches without crossing an outline, nor, where `same` is given, a
-    pixel unlike the ground: flooded in from `band` outside the mask, or from the
-    picture's own edge beside it, never deeper into it than `band`."""
+    pixel unlike the ground: flooded in from `band` outside the mask, or, with
+    `border`, from the picture's own edge beside it, never deeper into it than
+    `band`."""
     near = dilated(mask, band)
     edge = near & ~dilated(mask, band - 1)
-    border = np.zeros_like(mask)
-    border[[0, -1]] = True
-    border[:, [0, -1]] = True
-    edge |= border & near & ~mask
+    if border:
+        rim = np.zeros_like(mask)
+        rim[[0, -1]] = True
+        rim[:, [0, -1]] = True
+        edge |= rim & near & ~mask
     passable = near & ~dark & ~eroded(mask, band)
     if same is not None:
         passable &= same
@@ -783,6 +789,17 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     # thing cut across a row's edge made one again.
     for area in settings.get("grounds", []):
         things &= ~area_mask(things.shape, area, tile)
+    # A part whose things are whole (`whole`): what they close in is of them, a pale
+    # patch on an armchair that its ground-only edit is too like.
+    for area in settings.get("whole", []):
+        inside = area_mask(things.shape, area, tile)
+        found = filled(things & inside, int(inside.sum())) & inside
+        depth = np.where(
+            found & ~things,
+            spread(np.where(things, depth, -1).astype(np.int16), found, tile),
+            depth,
+        )
+        things |= found
     for part in settings.get("rows", []):
         depth = np.where(area_mask(things.shape, part["area"], tile), part["row"], depth)
     # What opens, or is picked up, is its leaf, found by its colour in its box:

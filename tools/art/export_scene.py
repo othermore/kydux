@@ -113,9 +113,10 @@ def changed(a: np.ndarray, b: np.ndarray, threshold: float = 60) -> np.ndarray:
 
 
 def in_box(shape: tuple[int, int], box: tuple[int, int, int, int]) -> np.ndarray:
+    """The pixels of a box, which may reach past the picture's edges."""
     inside = np.zeros(shape, dtype=bool)
     x0, y0, x1, y1 = box
-    inside[y0:y1, x0:x1] = True
+    inside[max(0, y0) : max(0, y1), max(0, x0) : max(0, x1)] = True
     return inside
 
 
@@ -166,13 +167,25 @@ def sprite_alpha(
     thing: dict,
     cell: int,
     th: dict | None = None,
+    marked: np.ndarray | None = None,
 ) -> np.ndarray:
     """A state's alpha, in the painting's own pixels, a cell `cell` pixels wide: a
     solid door's or the wand's where the state differs from the picture without
-    the thing, its holes filled, its edge on its outline (D93); an open-work gate's
+    the thing, its holes filled, its edge on its outline (D93), or, when it is
+    `marked`, where Gemini painted it magenta; an open-work gate's
     by how much each pixel differs, so that the path between its bars stays the
     ground's."""
     inside = in_box(shown.shape[:2], box)
+    if marked is not None:
+        # Where Gemini painted the thing magenta in a picture of the scene, with
+        # its outline: what an edit by hand leaves too close in colour to it.
+        mask = image_first.rimmed(
+            kept(image_first.marked(marked) & inside, MARK_SPECK),
+            shown,
+            cell,
+            image_first.thresholds(th),
+        )
+        return (mask & inside).astype(np.float32)
     if thing["solid"]:
         mask = filled_mask(changed(shown, without) & inside)
         mask = kept(mask, 0.6 if thing.get("largest") else 0.05)
@@ -277,8 +290,10 @@ def static_alpha(
     mask = image_first.snapped(mask & inside, painting, cell, image_first.thresholds(th))
     if thing["mask"] == "polygon":
         # A polygon drawn by hand runs beside its outline, not on it: the line just
-        # beyond its edge is the thing's too.
+        # beyond its edge is the thing's too; what its holes hold is another's.
         mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th))
+        for hole in thing.get("holes", []):
+            mask &= ~native_area(painting.shape[:2], grid, hole)
     return (mask & inside).astype(np.float32)
 
 
@@ -489,6 +504,7 @@ def scene(settings: Settings) -> Path:
         "thresholds": settings.data.get("thresholds", {}),
         "grounds": settings.data.get("grounds", []),
         "kept": settings.data.get("kept", []),
+        "whole": settings.data.get("whole", []),
         "rows": settings.data.get("rows", []),
     }
     (src / "cut.json").write_text(json.dumps(cut))
@@ -579,6 +595,9 @@ def scene(settings: Settings) -> Path:
                 sprite[..., 3] / 255, thing["row"], box[1], reach=thing.get("reach", 0.0)
             )
             sprite[..., 3] = (below * 255).astype(np.uint8)
+            # A static thing's image ends at its row's bottom edge, as a row's does.
+            reach = thing.get("reach", 0.0)
+            sprite = sprite[: max(1, round((thing["row"] + 1 + reach) * CELL) - box[1])]
             layer = next((k for k in LAYERS if thing.get(k)), "")
             into_row(thing["row"], Image.fromarray(sprite, "RGBA"), box[0], box[1], True, layer)
             continue
@@ -595,7 +614,10 @@ def scene(settings: Settings) -> Path:
                 continue
             if picture == "painting":
                 shown = painting
-                alpha = sprite_alpha(painting, without, native, thing, spacing, th)
+                marks = None
+                if "marked" in thing:
+                    marks = np.array(Image.open(settings.edits / thing["marked"]).convert("RGB"))
+                alpha = sprite_alpha(painting, without, native, thing, spacing, th, marks)
             elif picture == "without":
                 # The open door is the dark where the closed door was.
                 shown, alpha = without, sprite_alpha(painting, without, native, thing, spacing, th)

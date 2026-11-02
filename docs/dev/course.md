@@ -35,9 +35,10 @@ design:
   cannot see.** `find_nearest` earns its place when the key lies hidden
   behind a bookcase and `reveal` shows its outline; on a thing in plain
   sight the child would walk to it and never see why the method exists.
-- **A method with a precondition is taught by a level that breaks it.**
-  A fix level opens the door from across the room, and the child moves
-  the line to where the wizard stands beside it.
+- **A method with a precondition is taught by a level that breaks it,
+  or by the hint of the level that needs it.** A door opened from across
+  the room is refused, and the hint says a door listens only to who
+  stands beside it.
 - **The level's story is the reason.** The key is hidden because it fell
   years ago; it moves because someone moves it; the door is far because
   the program is old. The idea and the story agree, so the child remembers
@@ -147,8 +148,8 @@ that stays locked.
 | `lesson:keys-and-doors` | Lesson 5 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. | `door.open` |
 | `level:the-hidden-key` | Practice 4 | The centre door's key lies under the front bookcase, out of sight: found, revealed, picked up from the aisle beside it, the door opened; the starting code guides each step in comments. Bonus: found with `find_nearest`. | |
 | `lesson:the-distance` | Lesson 6 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
-| `level:the-moving-key` | Improve 1 | Eldra's room key lies at three, five or seven steps, in three ways; Wenna's program walks yesterday's five. Bonus: no number written. | |
-| `level:the-wrong-order` | Fix 1 | Wenna's program opens Eldra's door from across the aisle, then walks to it. | |
+| `level:the-moving-key` | Fix 1 | Eldra's room key lies at a different distance each time, in three ways; Wenna's program from yesterday walks five: repaired with `distance_to` kept under a name, it ends with the key in hand. Bonus: no number written. | |
+| `level:eldras-door` | Improve 1 | The repaired program given whole: back to the start with the same name, five to the door, open it, in. A door listens only to who stands beside it. Bonus: one number written. | |
 | `lesson:fendra` | Lesson 7 | A spell that reaches: `wizard.cast("fendra", book)` draws the thing it is told, in a straight line three tiles away at most, to the wizard's tile. | (the spell `fendra`) |
 | `level:eldras-room` | Practice 5 | The chapter together: Eldra's other lost book on the bookcase in her little room, among many standing like it, too high for hands: found, revealed, drawn down with *fendra* from the room's doorway, which the spell's line does not pass (D129), picked up, given to her in the aisle; the starting code guides each step in comments. Bonus: revealed with `reveal`. | |
 | `story:the-wand-bank` | Story 5 | Eldra's thanks; the school wands; the friend comes out from behind the shelves, there for a book, having known the wizard's voice; the wizard introduces the mate; the spare wand given back; the chapter summed up; at dusk, the rumour of the passages. | |

@@ -246,7 +246,7 @@ tiles are `[x, y]`.
 | `pull` | the thing, in the wizard's tick | `id`, `from`, `to` | once the spell's light reaches it, the thing flies to the wizard's hands, in its `pulled` state when it is painted one, a book glowing (D47), and stays there, held (D127) |
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
 | `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
-| `give` | wizard | `id`, `to`, `at` | the thing floats from the wizard's hands to the actor and fades; the actor faces the wizard (D48) |
+| `give` | wizard | `id`, `to`, `at` | the thing floats from the middle of the wizard's hands to the middle of the figure that takes it, where it is drawn, and fades there; the actor faces the wizard (D48) |
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
@@ -1931,3 +1931,11 @@ one overturns stays, marked as superseded.
   open (*Run*, *Restart* and *Play again* keep it). Rules out a level that
   opens on the last program typed days ago, and a child who cannot find
   the comments that guide the practice.
+- **D132 — Every figure's steps are heard: the wizard's soft and its
+  own, the others' alike.** Decided 2026-11-01 by the owner. A walk of
+  any figure, the wizard's, a friend's, a teacher's, in a level or a
+  story, plays a step sound a cell; the wizard's step is quieter and of
+  its own timbre, and every other figure's steps share a second timbre,
+  so that the child tells whose steps they hear (`sfx.ts`). Rules out
+  steps heard for the wizard alone, and the wizard's steps louder than
+  the scene.

@@ -36,6 +36,12 @@
   "floating": [
     "eldra"
   ],
+  "adults": [
+    "baro",
+    "dask",
+    "ilda",
+    "wenna"
+  ],
   "rows": {
     "walk": 0,
     "cast": 4,

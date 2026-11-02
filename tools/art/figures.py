@@ -635,6 +635,8 @@ def make(check: bool = False) -> list[Path]:
     about["figures"] = sorted(p.stem for p in FIGURES.glob("*.webp"))
     about["rows"] = ROWS
     about["floating"] = sorted(FLOATING)
+    # The grown-ups, whose steps the page plays heavier than the children's (D132).
+    about["adults"] = sorted(GROWN_UPS)
     # A sheet whose rows are not a wizard's says its own (D91).
     about["sheets"] = {
         f"{name}-{set_name}": FRIEND_ROWS for name in FRIENDS for set_name in sets[name]

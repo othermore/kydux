@@ -7,13 +7,16 @@
 // and every painted image's mask, each row in its own colour. Which layers are on
 // is kept in the browser for the next time. The panel says which page this is and
 // which world it runs: the page's build, the stamp of the world it was built with,
-// and the stamp of the world running (stamp.ts), the two the same.
+// and the stamp of the world running (stamp.ts), the two the same; and a row of
+// buttons plays each figure's step (D132), its numbers on it, for the owner to tune
+// by ear.
 
 import Phaser from 'phaser';
 import type { Layout } from './layout';
 import { FOOT_IN_CELL } from './depth';
 import { TILE } from './placeholders';
 import { debugWord } from './words';
+import { EFFECTS, play, STEPS } from './sfx';
 
 /** The layers a tester turns on and off. */
 const LAYERS = ['numbers', 'cells', 'masks'] as const;
@@ -202,8 +205,27 @@ export class DebugView {
       });
       box.append(button);
     }
-    box.append(this.stamps);
+    box.append(this.stamps, this.drawSteps());
     return box;
+  }
+
+  /** A button for each step, the wizard's, a child's and a grown-up's, which plays it
+   * and says its numbers: length, the filter's sweep, volume. */
+  private drawSteps(): HTMLElement {
+    const row = document.createElement('span');
+    row.className = 'debug-steps';
+    for (const name of STEPS) {
+      const effect = EFFECTS[name];
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'debug-toggle';
+      button.id = `debug-${name.replace('_', '-')}`;
+      button.textContent = debugWord(`steps.${name}`);
+      button.title = `${effect.seconds} s, ${effect.from}→${effect.to} Hz, ${effect.volume}`;
+      button.addEventListener('click', () => play(name));
+      row.append(button);
+    }
+    return row;
   }
 
   /** The page's build and its world's stamp, and the running world's, each with its

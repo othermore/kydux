@@ -3,23 +3,44 @@
 // and whose loudness rises and falls, so that no sound file is loaded and the
 // same effect always sounds the same. The settings can silence them.
 
-/** What an effect is made of: its wave, its pitch from start to end in hertz,
- * its length in seconds, and how loud it is from 0 to 1. */
+/** What an effect is made of: its wave, its pitch from start to end in hertz (for
+ * noise, the lowpass filter's cutoff), its length in seconds, and how loud it is
+ * from 0 to 1; `attack`, how long it takes to reach that, 0.01 s unless it says. */
 export interface Effect {
   wave: OscillatorType | 'noise';
   from: number;
   to: number;
   seconds: number;
   volume: number;
+  attack?: number;
   /** A second note after the first, for a chime. */
   then?: Effect;
 }
 
+/** The three steps (D132), tuned against the owner's sample of light footsteps,
+ * art/raw/sounds/ (a reference only, never shipped): its taps last about 50 to 120 ms
+ * to 30 dB below their peak, their brightness about 1100 to 2700 Hz, every other one
+ * lower. The wizard's lasts about 46 ms so measured, brightest and quietest; a
+ * child's about 56 ms; a grown-up's about 62 ms, the lowest. */
+const STEP_WIZARD: Effect = { wave: 'noise', from: 2600, to: 900, seconds: 0.09, volume: 0.05, attack: 0.003 };
+const STEP_CHILD: Effect = { wave: 'noise', from: 2200, to: 800, seconds: 0.11, volume: 0.06, attack: 0.003 };
+const STEP_ADULT: Effect = { wave: 'noise', from: 1300, to: 450, seconds: 0.14, volume: 0.08, attack: 0.004 };
+
+/** How much lower every other step is, its filter's frequencies times this, so that a
+ * walk does not tick like a clock (D132). */
+export const STEP_LOWER = 0.85;
+
+/** The steps, by the figure's kind. */
+export const STEPS = ['step', 'step_child', 'step_adult'] as const;
+export type StepName = (typeof STEPS)[number];
+
 export const EFFECTS = {
-  // Every figure's steps are heard (D132): the wizard's soft and its own, every other
-  // figure's of a second, rounder timbre.
-  step: { wave: 'triangle', from: 220, to: 180, seconds: 0.06, volume: 0.07 },
-  step_other: { wave: 'sine', from: 160, to: 130, seconds: 0.07, volume: 0.09 },
+  // Every figure's steps are heard (D132): a short tap of filtered noise, never a
+  // tone; the wizard's its own, the children's (the friends, Eldra) alike, the
+  // grown-ups' (the teachers, Baro) lower and a little longer, all quiet.
+  step: STEP_WIZARD,
+  step_child: STEP_CHILD,
+  step_adult: STEP_ADULT,
   bump: { wave: 'square', from: 120, to: 60, seconds: 0.14, volume: 0.18 },
   cast: { wave: 'sine', from: 600, to: 1400, seconds: 0.35, volume: 0.2 },
   door: { wave: 'noise', from: 400, to: 200, seconds: 0.25, volume: 0.15 },
@@ -87,7 +108,7 @@ function noise(ctx: AudioContext, seconds: number): AudioBufferSourceNode {
 function sound(ctx: AudioContext, effect: Effect, at: number): void {
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.0001, at);
-  gain.gain.exponentialRampToValueAtTime(effect.volume, at + 0.01);
+  gain.gain.exponentialRampToValueAtTime(effect.volume, at + (effect.attack ?? 0.01));
   gain.gain.exponentialRampToValueAtTime(0.0001, at + effect.seconds);
   gain.connect(ctx.destination);
   if (effect.wave === 'noise') {
@@ -111,12 +132,18 @@ function sound(ctx: AudioContext, effect: Effect, at: number): void {
   if (effect.then) sound(ctx, effect.then, at + effect.seconds);
 }
 
-/** Plays an effect, unless the sound is off. */
-export function play(name: EffectName): void {
+/** An effect with its pitch, or its filter, `pitch` times as high: a step's lower
+ * variant. */
+export function pitched(effect: Effect, pitch: number): Effect {
+  return { ...effect, from: effect.from * pitch, to: effect.to * pitch };
+}
+
+/** Plays an effect, unless the sound is off; `pitch` makes it higher or lower. */
+export function play(name: EffectName, pitch = 1): void {
   played(name);
   if (muted) return;
   const ctx = audio();
   if (!ctx) return;
   if (ctx.state === 'suspended') void ctx.resume();
-  sound(ctx, EFFECTS[name], ctx.currentTime);
+  sound(ctx, pitch === 1 ? EFFECTS[name] : pitched(EFFECTS[name], pitch), ctx.currentTime);
 }

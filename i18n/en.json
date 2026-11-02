@@ -392,6 +392,11 @@
     "build": "Build",
     "page_world": "Page's world",
     "world": "World running",
+    "steps": {
+      "step": "Wizard’s step",
+      "step_child": "Child’s step",
+      "step_adult": "Grown-up’s step"
+    },
     "blocked": "Not walked on",
     "leaf": "Not walked on while its door is open",
     "kinds": {

@@ -105,6 +105,8 @@ export interface FigureArt {
   figures: string[];
   /** The figures that float, which sway while they stand (D120). */
   floating?: string[];
+  /** The grown-ups, whose steps are heavier than the children's (D132). */
+  adults?: string[];
   /** The first row of each part of a wizard's sheet, by its name: the walking, the
    * casting and the picking-up rows (four each, down, left, right and up), the
    * celebrating one, facing down, and the lying one, asleep (D91). */

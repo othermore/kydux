@@ -109,7 +109,7 @@ import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
-import { type EffectName, play } from './sfx';
+import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, friendText, sleepingText } from './words';
 
 /** How long one tick lasts at speed 1. */
@@ -870,7 +870,7 @@ class LevelScene extends Phaser.Scene {
       this.placeWizard(from, facing);
       this.wizardTile = to;
       this.walk(this.wizard, facing, ...this.figureAt(to), this.playback.tickDuration * 0.9);
-      this.playSound('step');
+      this.step('wizard');
       return;
     }
     const actor = this.actors.get(id);
@@ -885,15 +885,29 @@ class LevelScene extends Phaser.Scene {
     }
     actor.sprite.setPosition(...this.figureAt(from));
     this.walk(actor.sprite, facing, ...this.figureAt(to), this.playback.tickDuration * 0.9);
-    this.playSound('step_other');
+    this.step(id);
   }
 
   /** The names of the last sounds played, newest last, for the tests (data-sounds). */
   private readonly playedSounds: string[] = [];
 
+  /** Each figure's last step, whether it was the lower one (D132). */
+  private readonly lowerSteps = new Map<string, boolean>();
+
+  /** A figure's step (D132): the wizard's, a grown-up's (figures.json's `adults`) or
+   * a child's, every other one a little lower. */
+  private step(id: string): void {
+    const sheet = figureName(id, this.look);
+    const name: StepName =
+      id === 'wizard' ? 'step' : (this.art?.figures?.adults ?? []).includes(sheet) ? 'step_adult' : 'step_child';
+    const lower = !this.lowerSteps.get(id);
+    this.lowerSteps.set(id, lower);
+    this.playSound(name, lower ? STEP_LOWER : 1);
+  }
+
   /** A sound of the scene played (sfx.ts), and said on data-sounds. */
-  private playSound(name: EffectName): void {
-    play(name);
+  private playSound(name: EffectName, pitch = 1): void {
+    play(name, pitch);
     this.playedSounds.push(name);
     if (this.playedSounds.length > SOUNDS_KEPT) this.playedSounds.shift();
     this.parentNode.dataset.sounds = this.playedSounds.join(',');
@@ -1349,7 +1363,7 @@ class LevelScene extends Phaser.Scene {
         this.wizardTile = to;
         const [x, y] = this.figureAt(to);
         this.walk(this.wizard, facing ?? 'down', x, y, duration);
-        this.playSound('step');
+        this.step('wizard');
         break;
       }
       case 'bump': {
@@ -1485,7 +1499,7 @@ class LevelScene extends Phaser.Scene {
         actor.sprite.setPosition(...this.figureAt(from));
         const [x, y] = this.figureAt(to);
         this.walk(actor.sprite, facing, x, y, this.playback.tickDuration * 0.9);
-        this.playSound('step_other');
+        this.step(event.actor);
         break;
       }
       case 'turn':
@@ -1523,7 +1537,7 @@ class LevelScene extends Phaser.Scene {
           actor.facing = towards(from, at);
           actor.sprite.setPosition(...this.figureAt(from)).setAlpha(1);
           this.walk(actor.sprite, actor.facing, ...this.figureAt(at), this.playback.tickDuration * 0.9);
-          this.playSound('step_other');
+          this.step(event.actor);
         } else if (instant) actor.sprite.setAlpha(1);
         else {
           actor.sprite.setAlpha(0);

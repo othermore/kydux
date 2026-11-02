@@ -499,6 +499,11 @@ footer .build {
   align-items: center;
 }
 
+.debug-steps {
+  display: flex;
+  gap: 4px;
+}
+
 .debug-stamps {
   display: flex;
   gap: 8px;

@@ -235,7 +235,7 @@ tiles are `[x, y]`.
 
 | kind | actor | data | the scene |
 |---|---|---|---|
-| `move` | wizard, or an actor | `from`, `to`, `facing` | walks it one tile, facing that way, with a step's sound: the wizard's `step`, any other figure's `step_other` (D132) |
+| `move` | wizard, or an actor | `from`, `to`, `facing` | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132) |
 | `bump` | wizard | `at`, `facing`, `by`: `wall`, `door` or `stair` | nudges the wizard against it |
 | `say` | wizard | `text` | a bubble over the wizard for three ticks, under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |

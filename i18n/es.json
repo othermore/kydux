@@ -392,6 +392,11 @@
     "build": "Versión",
     "page_world": "Mundo de la página",
     "world": "Mundo en marcha",
+    "steps": {
+      "step": "Paso de {tu mago|tu maga}",
+      "step_child": "Paso de niño",
+      "step_adult": "Paso de adulto"
+    },
     "blocked": "No se pisa",
     "leaf": "No se pisa con su puerta abierta",
     "kinds": {

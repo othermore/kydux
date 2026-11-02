@@ -34,7 +34,7 @@ test('the settings turn the sound off, and it stays off', async ({ page }) => {
   await expect(page.locator('#settings-sound')).toHaveValue('off');
 });
 
-test("every figure's steps are heard: the wizard's own, the others' another (D132)", async ({ page }) => {
+test("every figure's steps are heard: the wizard's own, a child's, a grown-up's (D132)", async ({ page }) => {
   await seedWizard(page);
   await page.goto('/#story/the-morning');
   const scene = page.locator('#scene');
@@ -42,7 +42,34 @@ test("every figure's steps are heard: the wizard's own, the others' another (D13
   // Step 5: the wizard and the mate walk to the door side by side.
   await storyNext(page, 4);
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
-  const sounds = ((await scene.getAttribute('data-sounds')) ?? '').split(',');
+  let sounds = ((await scene.getAttribute('data-sounds')) ?? '').split(',');
   expect(sounds, sounds.join(' ')).toContain('step');
-  expect(sounds, sounds.join(' ')).toContain('step_other');
+  expect(sounds, sounds.join(' ')).toContain('step_child');
+  // The first night's step 5: Ilda, a grown-up, walks out as the friend goes.
+  await page.goto('/#story/the-first-night');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  await storyNext(page, 4);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  sounds = ((await scene.getAttribute('data-sounds')) ?? '').split(',');
+  expect(sounds, sounds.join(' ')).toContain('step_adult');
+  expect(sounds, sounds.join(' ')).toContain('step_child');
+});
+
+test('with ?debug, a row of buttons plays each step for the owner to tune by ear (D132)', async ({ page }) => {
+  await seedWizard(page);
+  // Not the course's first level, whose guide opens over the scene.
+  await page.goto('/?debug#level/the-sealed-door');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-debug', 'true', { timeout: 90_000 });
+  for (const [button, name] of [
+    ['#debug-step', 'step'],
+    ['#debug-step-child', 'step_child'],
+    ['#debug-step-adult', 'step_adult'],
+  ] as const) {
+    await page.locator(button).click();
+    await expect(scene).toHaveAttribute('data-sound', name);
+  }
+  await expect(page.locator('#debug-step-adult')).toHaveAttribute('title', /s, \d+\u2192\d+ Hz, 0\.\d+/);
 });

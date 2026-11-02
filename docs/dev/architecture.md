@@ -33,12 +33,16 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 playback of a run's events (playback.ts, its long ticks for
                 what the wizard's hands do), a painted scene drawn from its
                 art with its figures sorted by their feet (scene.ts, painted.ts,
-                D76), a painted thing drawn on the tile its level lays it on
-                (shift.ts, D85), the goal's beating mark and the sealed doors' glow (D79),
+                D76), a painted thing drawn on the tile its level lays it on,
+                in its middle (shift.ts, D85, D109), a figure drawn on its
+                scene's painted strip (depth.ts, D105), the camera's zoom with
+                the buttons and the wheel (zooming.ts, D106), the goal's
+                beating mark and the sealed doors' glow (D79),
                 the wizard casting, a seal breaking and a door opening (D81),
                 the wizard's outline where something painted hides more than
-                a quarter of it, and a revealed thing's wherever something
-                covers it (silhouette.ts, cover.ts, D85), the wizard asleep
+                a quarter of it, and a revealed thing's glow wherever
+                something covers it (silhouette.ts, cover.ts, D85, D107),
+                the wizard asleep
                 (D84), the tester's view of the cells and the masks
                 (debug.ts, opened with ?debug), and the sound effects, made as
                 the game plays (sfx.ts)
@@ -103,9 +107,11 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 image services, cut.py and sprites.py cut what they draw,
                 map_from_image.py and image_first.py read a painting's grid and
                 cut its things, scene_settings.py reads a scene's settings
-                (art/scenes/<scene>/cut.json, D82), margin.py paints a scene
-                on beyond its playable area (D83), repaint.py mends a chosen
-                painting in a few boxes and nowhere else (D88),
+                (art/scenes/<scene>/cut.json, D82), layout.py draws a scene's
+                map on its grid before it is painted and over a try (D102),
+                margin.py paints a scene on beyond its playable area (D83),
+                repaint.py mends a chosen painting in a few boxes and nowhere
+                else and opens its doorways (D88, D108),
                 export_scene.py makes
                 content/art/ and
                 sweep.py stands the wizard on every cell of a scene to check
@@ -1102,12 +1108,15 @@ one overturns stays, marked as superseded.
   12.3). A story is a script played on its scene in story mode: the scene
   drawn wide, no editor and no goals; a sequence of steps, each a line said
   by a character in a bubble over them or by the voice in a band under the
-  scene, with an action before it (a walk in a straight line, a turn, an
-  appearing, a vanishing once the words are said, lying down in a bed and
-  getting up, D91), done by the speaker or
-  by the figure `by` names, so that the voice can tell what another does.
+  scene, with its actions before it (D103: a walk through a tile or a list
+  of them, each leg straight, ending out of sight when it says so, a turn,
+  an appearing, a vanishing once the words are said, lying down in a bed
+  and getting up, D91, a door opened or closed), each done by its own
+  `by`, the step's `by`, or the speaker, so that the voice can tell what
+  others do; different figures' actions play at once.
   The camera starts on the story's tile and follows whoever each step is
-  about (who speaks, walks, appears or turns) through a window: a dead
+  about (who speaks, walks, appears or turns, the step's `by`) through a
+  window: a dead
   zone the size of the view less that figure, its bubble and a margin.
   While they are inside, the camera stays still; when the figure pushes
   past an edge, it glides just far enough to keep them in, as a game's
@@ -1301,15 +1310,15 @@ one overturns stays, marked as superseded.
 - **D85 — A thing is drawn where the level lays it, and may be hidden and
   revealed.** Decided 2026-10-26 (sprint 15). `art.json` gives each
   painted thing the cell it is painted on (`at`), and the page draws it on
-  the level's tile, moved by the cells between and among the rows by its
+  the level's tile, in that cell's middle (D109) and among the rows by its
   new foot; a level's thing may name the painted thing it is drawn from
   (`art`), so that each level calls its door `door` and its key `key`.
   fendra's pull moves a painted thing the same way. A thing the wizard
   carries may be `hidden`, lying under a cut-out on purpose, which the
   content test allows; the world treats it as any thing, `find_nearest`
-  finds it, and `thing.reveal()` shows its whole outline, over whatever
-  covers it, the wizard's outline made for any sprite (`silhouette.ts`),
-  so that it is found among things like it too, a book among books.
+  finds it, and `thing.reveal()` makes it glow, its whole shape over
+  whatever covers it (D107, `silhouette.ts`), so that it is found among
+  things like it too, a book among books.
   Rules out a second painting of a key in each place, and a world where
   what is hidden is absent.
 - **D86 — `distance_to` is the steps between two of the child's objects.**
@@ -1520,9 +1529,116 @@ one overturns stays, marked as superseded.
   in a wall seen from the front with room behind it swings in out of
   sight instead: open, its whole doorway, from the arch to the threshold,
   shows the floor of the room beyond (`doorways` in the scene's settings,
-  `repaint.py doorways`, the floor taken from Gemini's edit of the
-  doorway), as the library's three doors; and a doorway always open has
+  `repaint.py doorways`, the floor taken from the painting itself, D108),
+  as the library's three doors and the dormitory's; and a doorway always
+  open has
   no door at all, as the entrance's side arches, whose doors a repaint
   section marked `opened` takes out, flooding the doorway's dark into the
   marked picture as magenta. Rules out a door drawn
   open wrong because its edit is.
+- **D102 — A scene's grid is laid out before the scene is painted.**
+  Decided 2026-10-28 by the owner. The map comes first: the rooms, the
+  walls, the doorways, the furniture and every strip a figure walks are
+  drawn on the grid before any prompt is written, with every wall on a
+  cell line, every doorway whole cells wide, every walked strip at least
+  a cell wide and in the middle of its cells, every thing in whole cells,
+  and no slanting perspective that takes a wall from one column into the
+  next. The layout, drawn from the map by `tools/art/layout.py`, is the
+  first picture of the painting's prompt, and a try is chosen only when
+  its walls, doorways and furniture lie in the layout's cells, checked
+  with `layout.py --over` before any cut is made; a try that is off is
+  asked for again, not mended. Chapter 2's scenes, painted before this,
+  are fitted to their grids by `nudged` cells (D105) and mends; chapter
+  3's passages and night passages keep to it. Rules out a painting chosen
+  for its look and fitted to the grid afterwards, which cost three
+  sprints in chapter 2.
+- **D103 — A story step can do several things, and a figure can open and
+  close a door.** Decided 2026-10-28 by the owner. A step's `do` is one
+  action or a list, each done by its `by`, the step's `by`, or the
+  speaker. One figure's actions play one after another, in the list's
+  order; different figures' play at once, tick by tick, in the order they
+  are first named, so that two friends walk together. A `walk` is a tile
+  or a list of tiles, each reached in a straight line; a walk may end in
+  `vanish`, for a figure walking out of sight. `open` and `close` name a
+  door of the story beside the figure, which changes state as a level's
+  door does. The camera keeps with the step's `by`, or its speaker: the
+  others' events say `aside`, and a teacher walking away down a corridor
+  is not followed when the step is the wizard's. The staging check plays
+  the actions tick by tick as the page does. Rules out a story that walks
+  one figure at a time, and a teacher who vanishes before a shut door.
+- **D104 — A doorway is where the painting has it, and the walked cells
+  go through it; a door in a wall seen from the front is a thing with a
+  state of rest.** Decided 2026-10-28 by the owner. The cells walked
+  between two rooms are the doorway's own, as the painting draws it, and
+  no cell beside it is: in the dormitory, row 9, under each wall's open
+  leaf. Whoever stands in a doorway seen from above is behind the wall's
+  band and in front of the doorway's inside: the wall's polygon takes in
+  the band all along and leaves the inside out. A door in a wall seen
+  from the front (the dormitory's door to the corridor, the library's
+  three doors) is a thing with a closed and an open picture, and the
+  scene's settings name the state it rests in (`rest`) where no level or
+  story places it: the library's doors rest open, the dormitory's front
+  door rests shut. A story opens and closes it (D103); a level places it
+  as its goals need. Rules out a crossing through a wall beside its
+  doorway, a gap painted in a wall where the painting has its own
+  doorway, and a shut door taken out of the painting to save a picture.
+- **D105 — A figure walks the painted strip: `nudged` cells.** Decided
+  2026-10-28 by the owner. Where a painting's walked strip is not in the
+  middle of its cells (a wall's band leaning across a column, trunks
+  reaching into the next, a doorway off its cell's middle), the scene's
+  settings name the cells and how far sideways, in cells, a figure
+  standing on them is drawn (`nudged`, like `lowered`), measured as the
+  strip's middle less the cell's; the figure's words, its outline and its
+  walks follow the drawing, and the sweep draws it there too. The map
+  stays the map. Rules out a figure drawn over the trunks it walks beside
+  and a figure half behind a wall it walks along.
+- **D106 — The zoom is the child's to set, finely, in every scene, and
+  the words on the scene are always readable.** Decided 2026-10-28 by the
+  owner. The zoom box (+, −, Find my wizard) is on a story's scene as on
+  a level's. The buttons step through the zooms; the wheel turns the zoom
+  a tenth a notch, at most a quarter a turn, between the same limits.
+  Every scene opens at zoom 1, a story on its camera's tile. A bubble and
+  a thought are drawn larger as the camera zooms out, so that their words
+  are never smaller on the screen than at zoom 1; zoomed in, they grow
+  with the scene. Rules out words of seven pixels under a teacher's face
+  and a wheel that leaps from the whole scene to a close look in two
+  notches.
+- **D107 — A revealed thing glows.** Decided 2026-10-28 by the owner. A
+  thing revealed (D85) is drawn as its own shape filled with the
+  outline's yellow, half seen, beating, over whatever covers it, until
+  it is picked up or given: a filled shape reads as "it is here" whatever
+  the thing's shape, where a line round a thin key reads as a bar across
+  it. The wizard's outline where something hides it stays a line, and is
+  counted and drawn only from the images drawn in front of the wizard.
+  Rules out the key's outline with a line through it and the wizard's
+  outline lit where nothing hides it.
+- **D108 — An open doorway shows the floor beyond at the room's own
+  light, under every figure.** Decided 2026-10-28 by the owner. The
+  opening of an open door is filled with the floor of the room beyond,
+  taken from the painting itself where that floor is plain, darker under
+  the arch and as lit as the room at the threshold, never brighter; the
+  fill covers the leaf and its threshold's line (`sill`), so that no line
+  of the frame is left on the floor (`repaint.py doorways`). Such a door
+  is marked `through`: open, its picture is drawn just over the ground,
+  under every figure, so that a figure standing beyond the door is seen
+  through it and not counted as hidden by it. Rules out a doorway lit
+  like a lamp before a dim room, and a model's edit as the source of a
+  fill the painting holds.
+- **D109 — A thing drawn away from where it is painted is drawn in the
+  middle of its cell.** Decided 2026-10-28 by the owner. A thing a level
+  places on another cell than the one it is painted on (D85) has the
+  middle of what is drawn of it put at the middle of that cell, not the
+  painted offset carried along; on its painted cell it is drawn as
+  painted. A thing laid on a cell no one walks, under a bookcase, is
+  drawn just under that row's things, hidden in them. Rules out a book
+  that is in one cell and looks to be in the one above.
+- **D110 — The child sees where a thing is; its numbers wait.** Decided
+  2026-10-28 by the owner. In chapter 2 no text prints or speaks of a
+  position: the grid's numbers mean nothing to a child who does not see
+  them. A thing found with `find_nearest` is shown with `reveal`, taught
+  in the same lesson as `find_nearest`, and a level puts a lost thing
+  where the child can walk to it once it glows. `position` stays in the
+  world's API for a later chapter that teaches it with the grid on the
+  scene; chapter 3's lesson *true or false* keeps `teacher.position`
+  until that chapter is reviewed on its painted scenes. Rules out
+  `print(book.position)` as the way to find a book.

@@ -22,8 +22,8 @@ context:
   - content/levels/the-lost-book/text.es.json
   - content/levels/the-hidden-key/text.en.json
   - content/levels/the-hidden-key/text.es.json
-  - content/levels/the-high-shelf/text.en.json
-  - content/levels/the-high-shelf/text.es.json
+  - content/levels/eldras-room/text.en.json
+  - content/levels/eldras-room/text.es.json
   - content/levels/the-moving-key/text.en.json
 ---
 ## What changes, and why

@@ -3,9 +3,9 @@
   "sources": {
     "folder": "art/raw/game-library6",
     "edits": "art/raw/game-library6",
-    "painting": "library-book.png",
+    "painting": "library-room-books.png",
     "grid": "library-mended-grid.json",
-    "ground": "library-ground-bare-book.png"
+    "ground": "library-ground-bare-room.png"
   },
   "repaint": {
     "about": "Painted by Gemini 3 Pro Image from tools/art/prompts/game-library-margin-3.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the boxes and the band. Two earlier tries are kept with their prompts: game-library-margin.md, given the whole canvas, painted over the reading room; game-library-margin-2.md kept the two dark arches beside the door, which the owner asked to have gone.",
@@ -151,6 +151,69 @@
       ]
     ]
   },
+  "room_books": {
+    "about": "Eldra's little room made a bookcase full of books (the owner, 2026-11-01): against the room's back wall, a wooden bookcase as wide as the room, its three shelves full of books standing upright, and among them on the middle shelf Eldra's old red book, standing upright as the others do, its spine a little thicker, with a gold sigil. Painted by Gemini 3 Pro Image from tools/art/prompts/game-library-room-books.md on the canvas this makes, the room's inside blurred, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the box; the ground-only edit and the marked picture mended with it, so that the bookcase is theirs too.",
+    "from": "art/raw/game-library6/library-book.png",
+    "boxes": [
+      [
+        236,
+        662,
+        702,
+        1066
+      ]
+    ],
+    "fade": 20,
+    "crop": [
+      0,
+      380,
+      1000,
+      1380
+    ],
+    "canvas": "art/raw/game-library6/library-room-books-canvas.png",
+    "painting": "art/raw/game-library6/library-room-books.png",
+    "also": [
+      [
+        "art/raw/game-library6/library-ground-bare-book.png",
+        "art/raw/game-library6/library-ground-bare-room.png"
+      ],
+      [
+        "art/raw/game-library6/library-marked-book.png",
+        "art/raw/game-library6/library-marked-room.png"
+      ]
+    ]
+  },
+  "room_books_without": {
+    "about": "Eldra's bookcase without her book: the red book taken out of the middle shelf and the shelf's dark back painted where it stood, by Gemini 3 Pro Image from tools/art/prompts/game-library-room-books-without.md, given the painting as it is, and joined by tools/art/repaint.py in the book's box alone, so that this picture and the painting differ only there: the picture Eldra's book is cut against, and the ground-only edit and the marked picture mended with it.",
+    "from": "art/raw/game-library6/library-room-books.png",
+    "plain": true,
+    "boxes": [
+      [
+        512,
+        846,
+        584,
+        972
+      ]
+    ],
+    "fade": 12,
+    "crop": [
+      180,
+      560,
+      820,
+      1200
+    ],
+    "canvas": "art/raw/game-library6/library-room-without-canvas.png",
+    "painting": "art/raw/game-library6/library-room-without.png",
+    "also": [
+      [
+        "art/raw/game-library6/library-ground-bare-room.png",
+        "art/raw/game-library6/library-ground-bare-room.png"
+      ],
+      [
+        "art/raw/game-library6/library-marked-room.png",
+        "art/raw/game-library6/library-marked-room.png"
+      ]
+    ]
+  },
   "wenna_swung": {
     "about": "The wenna door seen open (D111): its leaf swung out of the doorway nearly all the way, hanging on hinges at the opening's edge, lying over the arch's right stones and the wall beyond, as large as the opening, the hinges seen, its free edge a little off the wall and its shadow on the wall. Painted by Gemini 3 Pro Image from tools/art/prompts/game-library-wenna-swung.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box.",
     "from": "art/raw/game-library6/library-wenna-doorway.png",
@@ -243,8 +306,8 @@
           17.0
         ],
         "also": [
-          "art/raw/game-library6/library-ground-bare-book.png",
-          "art/raw/game-library6/library-marked-book.png"
+          "art/raw/game-library6/library-ground-bare-room.png",
+          "art/raw/game-library6/library-marked-room.png"
         ]
       },
       {
@@ -271,8 +334,8 @@
           9.0
         ],
         "also": [
-          "art/raw/game-library6/library-ground-bare-book.png",
-          "art/raw/game-library6/library-marked-book.png"
+          "art/raw/game-library6/library-ground-bare-room.png",
+          "art/raw/game-library6/library-marked-room.png"
         ]
       },
       {
@@ -299,8 +362,8 @@
           6.0
         ],
         "also": [
-          "art/raw/game-library6/library-ground-bare-book.png",
-          "art/raw/game-library6/library-marked-book.png"
+          "art/raw/game-library6/library-ground-bare-room.png",
+          "art/raw/game-library6/library-marked-room.png"
         ]
       }
     ]
@@ -364,131 +427,153 @@
       "about": "Eldra's lost book, on the rug in her nook.",
       "scale": 0.6
     },
-    "rare_book": {
+    "eldras_book": {
       "box": [
-        6.6,
-        3.2,
-        7.8,
-        4.25
+        2.28,
+        3.84,
+        2.62,
+        4.34
       ],
       "row": 4,
       "solid": true,
       "without": {
-        "picture": "library-book.png",
+        "picture": "library-room-books.png",
         "box": [
-          7.262,
-          3.6,
-          7.366,
-          3.93
+          2.3,
+          3.865,
+          2.6,
+          4.32
         ],
-        "from": "library-shelf.png"
+        "from": "library-room-without.png"
       },
       "states": {
-        "lying": "painting",
-        "pulled": {
-          "picture": "library-vault.png",
+        "lying": {
+          "picture": "library-room-books.png",
           "traced": [
             [
-              6.785,
-              3.578
+              2.321,
+              3.886
             ],
             [
-              6.81,
-              3.563
+              2.36,
+              3.884
             ],
             [
-              7.127,
-              3.476
+              2.4,
+              3.883
             ],
             [
-              7.168,
-              3.478
+              2.44,
+              3.883
             ],
             [
-              7.192,
-              3.502
+              2.48,
+              3.884
             ],
             [
-              7.402,
-              3.808
+              2.497,
+              3.885
             ],
             [
-              7.4,
-              3.838
+              2.508,
+              3.891
             ],
             [
-              7.38,
-              3.892
+              2.517,
+              3.902
             ],
             [
-              7.4,
-              3.905
+              2.524,
+              3.917
             ],
             [
-              7.39,
-              3.942
+              2.528,
+              3.937
             ],
             [
-              7.085,
-              4.012
+              2.529,
+              3.98
             ],
             [
-              7.02,
+              2.528,
               4.05
             ],
             [
-              6.98,
-              4.044
+              2.527,
+              4.12
             ],
             [
-              6.872,
+              2.526,
+              4.19
+            ],
+            [
+              2.526,
+              4.255
+            ],
+            [
+              2.517,
+              4.277
+            ],
+            [
+              2.496,
+              4.291
+            ],
+            [
+              2.466,
+              4.299
+            ],
+            [
+              2.44,
+              4.3
+            ],
+            [
+              2.412,
+              4.298
+            ],
+            [
+              2.386,
+              4.289
+            ],
+            [
+              2.369,
+              4.272
+            ],
+            [
+              2.355,
+              4.245
+            ],
+            [
+              2.336,
+              4.19
+            ],
+            [
+              2.322,
+              4.14
+            ],
+            [
+              2.318,
+              4.1
+            ],
+            [
+              2.317,
+              4.0
+            ],
+            [
+              2.318,
               3.94
             ],
             [
-              6.792,
-              3.775
-            ],
-            [
-              6.771,
-              3.633
-            ],
-            [
-              6.775,
-              3.598
+              2.319,
+              3.9
             ]
           ]
         }
       },
       "at": [
-        7,
-        3
-      ],
-      "about": "The rare book standing on the high bookcase's lower shelf among the others, three cells above the top aisle: fendra's reach. Its picture without it is the painting with its own box taken from the shelf without it, so that the brown book beside it stays. Taken by the spell, it glows as it comes down (pulled): the glowing book the painting first had, cut by the polygon traced round its outline (`traced`), which leaves out the shelf Gemini painted again round it, drawn smaller.",
-      "scale": {
-        "pulled": 0.72
-      },
-      "snap": false
-    },
-    "eldras_book": {
-      "box": [
-        1.6,
-        3.7,
-        2.45,
-        4.4
-      ],
-      "row": 4,
-      "solid": false,
-      "without": "library-noeldrasbook.png",
-      "states": {
-        "lying": "painting"
-      },
-      "at": [
         2,
         3
       ],
-      "about": "Eldra's own book on the shelf of her little room; its edit without it is the shelf's back carried over it by hand, and its mask is where Gemini painted it magenta; drawn smaller than painted.",
-      "marked": "library-marked-book.png",
-      "scale": 0.75
+      "about": "Eldra's old red book, standing upright among the others on the middle shelf of the bookcase in her little room (room_books), which fendra brings down from the room's doorway (D129). Cut by the polygon traced round it on its outline (`traced`), so that nothing of the books beside it comes with it; its picture without it is the painting with its own box taken from the bookcase without it (room_books_without), the gap where it stood."
     },
     "wenna_door": {
       "box": [
@@ -1612,10 +1697,10 @@
       ]
     },
     "room_door_arch": {
-      "about": "The stone arch round Eldra's door, over whoever stands in its doorway: the arch's dome and its sides down to the threshold, the door's own cut-out left to the door.",
+      "about": "The stone arch round Eldra's door, over whoever stands in its doorway: the arch's dome and its jambs down to the threshold, traced on the outer edge of their black outline, the outline in it, and kept as traced (`fixed`), since where the arch meets the wall's top the line is too light to hold the snap; with its own line and no other (`lined`); the door's own cut-out left to the door. Its box begins at the dome's top, so that nothing of the bookcase in the room behind it, whose bottom board runs just above the dome, comes with it.",
       "box": [
         1.75,
-        4.35,
+        4.745,
         3.22,
         6.05
       ],
@@ -1629,40 +1714,297 @@
       "under": true,
       "polygon": [
         [
-          1.8,
+          1.852,
           6.05
         ],
         [
-          1.8,
+          1.852,
+          5.9
+        ],
+        [
+          1.843,
+          5.75
+        ],
+        [
+          1.838,
+          5.6
+        ],
+        [
+          1.83,
+          5.45
+        ],
+        [
+          1.838,
+          5.35
+        ],
+        [
+          1.852,
+          5.29
+        ],
+        [
+          1.865,
+          5.23
+        ],
+        [
+          1.883,
+          5.17
+        ],
+        [
+          1.914,
+          5.1
+        ],
+        [
+          1.958,
           5.05
         ],
         [
-          1.88,
-          4.92
+          1.993,
+          5.0
+        ],
+        [
+          2.033,
+          4.96
         ],
         [
           2.08,
-          4.8
+          4.91
+        ],
+        [
+          2.13,
+          4.866
+        ],
+        [
+          2.2,
+          4.837
+        ],
+        [
+          2.3,
+          4.802
+        ],
+        [
+          2.4,
+          4.763
         ],
         [
           2.5,
-          4.69
+          4.756
         ],
         [
-          2.92,
-          4.8
+          2.6,
+          4.768
         ],
         [
-          3.12,
-          4.92
+          2.7,
+          4.811
         ],
         [
-          3.18,
+          2.8,
+          4.862
+        ],
+        [
+          2.87,
+          4.907
+        ],
+        [
+          2.946,
+          4.96
+        ],
+        [
+          2.966,
+          5.0
+        ],
+        [
+          3.0,
           5.05
         ],
         [
-          3.18,
+          3.043,
+          5.1
+        ],
+        [
+          3.074,
+          5.17
+        ],
+        [
+          3.096,
+          5.23
+        ],
+        [
+          3.109,
+          5.29
+        ],
+        [
+          3.122,
+          5.35
+        ],
+        [
+          3.122,
+          5.45
+        ],
+        [
+          3.122,
+          5.6
+        ],
+        [
+          3.12,
+          5.75
+        ],
+        [
+          3.104,
+          5.9
+        ],
+        [
+          3.104,
           6.05
+        ]
+      ],
+      "lined": true,
+      "fixed": [
+        [
+          [
+            1.852,
+            6.05
+          ],
+          [
+            1.852,
+            5.9
+          ],
+          [
+            1.843,
+            5.75
+          ],
+          [
+            1.838,
+            5.6
+          ],
+          [
+            1.83,
+            5.45
+          ],
+          [
+            1.838,
+            5.35
+          ],
+          [
+            1.852,
+            5.29
+          ],
+          [
+            1.865,
+            5.23
+          ],
+          [
+            1.883,
+            5.17
+          ],
+          [
+            1.914,
+            5.1
+          ],
+          [
+            1.958,
+            5.05
+          ],
+          [
+            1.993,
+            5.0
+          ],
+          [
+            2.033,
+            4.96
+          ],
+          [
+            2.08,
+            4.91
+          ],
+          [
+            2.13,
+            4.866
+          ],
+          [
+            2.2,
+            4.837
+          ],
+          [
+            2.3,
+            4.802
+          ],
+          [
+            2.4,
+            4.763
+          ],
+          [
+            2.5,
+            4.756
+          ],
+          [
+            2.6,
+            4.768
+          ],
+          [
+            2.7,
+            4.811
+          ],
+          [
+            2.8,
+            4.862
+          ],
+          [
+            2.87,
+            4.907
+          ],
+          [
+            2.946,
+            4.96
+          ],
+          [
+            2.966,
+            5.0
+          ],
+          [
+            3.0,
+            5.05
+          ],
+          [
+            3.043,
+            5.1
+          ],
+          [
+            3.074,
+            5.17
+          ],
+          [
+            3.096,
+            5.23
+          ],
+          [
+            3.109,
+            5.29
+          ],
+          [
+            3.122,
+            5.35
+          ],
+          [
+            3.122,
+            5.45
+          ],
+          [
+            3.122,
+            5.6
+          ],
+          [
+            3.12,
+            5.75
+          ],
+          [
+            3.104,
+            5.9
+          ],
+          [
+            3.104,
+            6.05
+          ]
         ]
       ]
     },
@@ -1678,14 +2020,14 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-book.png",
+      "marked": "library-marked-room.png",
       "states": {
         "standing": "painting"
       },
       "lined": true
     },
     "shelf_high": {
-      "about": "The tall bookcase along the top aisle's back wall, its two tiers of shelves from the top board down to its legs on the floor: whoever stands behind it, a friend about to step out from behind its right end into the gap before the counter (D128), is hidden, and it is drawn over whoever stands on its row (D95); the rare book on its upper shelf keeps its own cut-out (D93). Cut by the polygon traced on its outer outline.",
+      "about": "The tall bookcase along the top aisle's back wall, its two tiers of shelves from the top board down to its legs on the floor: whoever stands behind it, a friend about to step out from behind its right end into the gap before the counter (D128), is hidden, and it is drawn over whoever stands on its row (D95), the books on its shelves with it, the rare book among them. Cut by the polygon traced on its outer outline.",
       "box": [
         3.85,
         2.75,
@@ -1779,7 +2121,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-book.png",
+      "marked": "library-marked-room.png",
       "states": {
         "standing": "painting"
       }
@@ -1796,7 +2138,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-book.png",
+      "marked": "library-marked-room.png",
       "states": {
         "standing": "painting"
       }
@@ -1813,7 +2155,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-book.png",
+      "marked": "library-marked-room.png",
       "states": {
         "standing": "painting"
       }
@@ -2050,7 +2392,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-book.png",
+      "marked": "library-marked-room.png",
       "states": {
         "standing": "painting"
       }
@@ -2534,6 +2876,12 @@
       14.98,
       11.65,
       15.45
+    ],
+    [
+      1.95,
+      4.7,
+      3.05,
+      4.745
     ]
   ],
   "grounds": [
@@ -2590,7 +2938,7 @@
       10.6
     ]
   ],
-  "source": "# The library\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-library-6.md`, with the field as its\n  style's reference, then edited by it without its grid\n  (`game-library6-nogrid.md`).\n- Its bottom mended by Gemini from `game-library-margin-3.md`, joined by\n  `tools/art/repaint.py`, the painting kept pixel for pixel elsewhere: the\n  castle's corridor below the double door, plain pillars in the corners,\n  plain wall beside the door.\n- The way to the vault ending in an iron safe, painted by Gemini from\n  `game-library-vault-2.md` in a box of the painting, joined by\n  `tools/art/repaint.py`.\n- The rare book standing on its shelf among the others, not floating and\n  glowing: the glowing book taken out of the painting and the shelf behind\n  it painted (`game-library-rare-shelf.md`), then the book painted standing\n  in the shelf's gap (`game-library-rare-book-3.md`), each by Gemini in a\n  box of the painting, joined by `tools/art/repaint.py`; the glowing book\n  is drawn as the spell brings it down.\n- Its sides painted on by Gemini from `image-first-library-margin.md`, three\n  cells on each side, on a canvas made and joined by `tools/art/margin.py`:\n  the castle's walls going on, and grass and trees beyond them.\n- Its door arches drawn over whoever passes under them, and its walls and\n  the little table by Eldra's armchair, cut by polygons, each edge on its\n  outline (static things).\n- Its counter, bookcases, pile of books, tables, chairs, desk and Eldra's\n  book painted flat magenta by Gemini in crops of the painting\n  (`game-library-marked-*.md`, each asked three times and voted), and cut\n  there with their outlines.\n- Each door open, swung in out of sight, its whole doorway the floor of the\n  room beyond from Gemini's edit of the doorway alone\n  (`game-library-centre-open.md`, `-wenna-open.md`, `-room-open.md`), laid\n  in by `tools/art/repaint.py doorways`.\n- Each thing that opens or is picked up cut against Gemini's edit without it\n  (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`); Eldra's own\n  book against the shelf's back carried over it by hand; the armchair, which\n  stands in front of whoever is behind it, against Gemini's edit without it\n  (`game-library-noarmchair.md`). The two books drawn smaller than painted.\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n",
+  "source": "# The library\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-library-6.md`, with the field as its\n  style's reference, then edited by it without its grid\n  (`game-library6-nogrid.md`).\n- Its bottom mended by Gemini from `game-library-margin-3.md`, joined by\n  `tools/art/repaint.py`, the painting kept pixel for pixel elsewhere: the\n  castle's corridor below the double door, plain pillars in the corners,\n  plain wall beside the door.\n- The way to the vault ending in an iron safe, painted by Gemini from\n  `game-library-vault-2.md` in a box of the painting, joined by\n  `tools/art/repaint.py`.\n- The rare book standing on its shelf among the others, not floating and\n  glowing: the glowing book taken out of the painting and the shelf behind\n  it painted (`game-library-rare-shelf.md`), then the book painted standing\n  in the shelf's gap (`game-library-rare-book-3.md`), each by Gemini in a\n  box of the painting, joined by `tools/art/repaint.py`.\n- Eldra's little room made a bookcase full of books standing upright, her\n  red book among them on the middle shelf (`game-library-room-books.md`),\n  and the same bookcase without that book\n  (`game-library-room-books-without.md`), each by Gemini in a box of the\n  painting, joined by `tools/art/repaint.py`.\n- Its sides painted on by Gemini from `image-first-library-margin.md`, three\n  cells on each side, on a canvas made and joined by `tools/art/margin.py`:\n  the castle's walls going on, and grass and trees beyond them.\n- Its door arches drawn over whoever passes under them, and its walls and\n  the little table by Eldra's armchair, cut by polygons, each edge on its\n  outline (static things).\n- Its counter, bookcases, pile of books, tables, chairs and desk painted\n  flat magenta by Gemini in crops of the painting\n  (`game-library-marked-*.md`, each asked three times and voted), and cut\n  there with their outlines.\n- Each door open, swung in out of sight, its whole doorway the floor of the\n  room beyond from Gemini's edit of the doorway alone\n  (`game-library-centre-open.md`, `-wenna-open.md`, `-room-open.md`), laid\n  in by `tools/art/repaint.py doorways`.\n- Each thing that opens or is picked up cut against Gemini's edit without it\n  (`game-library-nokeys.md`, `-nooldbook.md`); Eldra's own book by the\n  polygon traced round it, against the bookcase without it; the armchair,\n  which stands in front of whoever is behind it, against Gemini's edit\n  without it (`game-library-noarmchair.md`). The old book drawn smaller\n  than painted.\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n",
   "lowered": [
     {
       "cells": [
@@ -2676,7 +3024,7 @@
         ]
       }
     ],
-    "mended": "art/raw/game-library6/library-marked-book.png"
+    "mended": "art/raw/game-library6/library-marked-room.png"
   },
   "rows": [
     {

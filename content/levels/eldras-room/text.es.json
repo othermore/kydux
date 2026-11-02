@@ -1,0 +1,15 @@
+{
+  "title": "La pequeña habitación de Eldra",
+  "goals": [
+    "Dale a Eldra su libro.",
+    "Haz que el libro brille con `reveal`."
+  ],
+  "starting_code": "# Encuentra el libro con `find_nearest` y guárdalo bajo un nombre.\n\n# Haz que brille con `reveal`.\n\n# Da un paso hacia arriba, hasta el umbral de la puerta.\n\n# Lanza fendra con `cast` y el nombre del libro.\n\n# Recógelo con `pick_up`.\n\n# Da un paso hacia abajo para volver junto a Eldra.\n\n# Dáselo con `give`.\n",
+  "hints": [
+    "Encuentra el libro y haz que brille con `reveal`.",
+    "Desde el pasillo, el hechizo no llega al interior de la habitación. ¡Primero da un paso hacia arriba, hasta el umbral!",
+    "Usa `cast` para lanzar *fendra* con el libro, luego `pick_up`, da un paso hacia abajo y usa `give` para dárselo a Eldra."
+  ],
+  "intro": "Ahora que la puerta está abierta, puedes recuperar el otro libro perdido de Eldra de la estantería de su pequeña habitación. Está entre muchos libros iguales, demasiado alto para tus manos, y *fendra* solo llega hasta él desde el umbral, no desde el pasillo. Encuéntralo, haz que brille, sube al umbral y bájalo con el hechizo, recógelo y dáselo a Eldra.",
+  "outro": "¡Sus dos libros han vuelto! Eldra por fin está en paz."
+}

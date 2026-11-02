@@ -250,9 +250,9 @@ test.describe('chapter 2', () => {
   });
 });
 
-test.describe('the high shelf (D46, D47, D49)', () => {
+test.describe("Eldra's room (D46, D47, D49, D129)", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/#level/the-high-shelf');
+    await page.goto('/#level/eldras-room');
     await expect(page.locator('#card-carrying')).toHaveText('You carry the wand.');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
@@ -262,10 +262,10 @@ test.describe('the high shelf (D46, D47, D49)', () => {
     await expect(scene(page)).toHaveAttribute('data-carried', 'wand');
   });
 
-  test('fendra from below brings the book it is told down, glowing, through the shelves', async ({ page }) => {
+  test('fendra from the doorway brings the book it is told down, through the shelves', async ({ page }) => {
     await page.locator('#speed').selectOption('4');
-    await run(page, 'book = wizard.find_nearest("book")\nwizard.move_right(5)\nwizard.cast("fendra", book)\nwizard.pick_up()');
-    await expect(scene(page)).toHaveAttribute('data-carried', 'rare_book,wand');
+    await run(page, 'book = wizard.find_nearest("book")\nwizard.move_up()\nwizard.cast("fendra", book)\nwizard.pick_up()');
+    await expect(scene(page)).toHaveAttribute('data-carried', 'eldras_book,wand');
   });
 
   test('the light reaches the book, the book flies to the hands, the hands take it, then it goes to Eldra (D127)', async ({
@@ -275,15 +275,15 @@ test.describe('the high shelf (D46, D47, D49)', () => {
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText(
-      'book = wizard.find_nearest("book")\nwizard.move_right(5)\nwizard.cast("fendra", book)\nwizard.pick_up()\nwizard.give(book)',
+      'book = wizard.find_nearest("book")\nwizard.move_up()\nwizard.cast("fendra", book)\nwizard.pick_up()\nwizard.move_down()\nwizard.give(book)',
     );
     // Every change of whether the book is carried and drawn, with its tick.
     await scene(page).evaluate((node) => {
       const seen: string[] = [];
       (window as unknown as { kyduxBook: string[] }).kyduxBook = seen;
       new MutationObserver(() => {
-        const carried = (node.getAttribute('data-carried') ?? '').split(',').includes('rare_book');
-        const drawn = (node.getAttribute('data-drawn') ?? '').includes('rare_book');
+        const carried = (node.getAttribute('data-carried') ?? '').split(',').includes('eldras_book');
+        const drawn = (node.getAttribute('data-drawn') ?? '').includes('eldras_book');
         const now = `${node.getAttribute('data-tick')}:${carried ? 'carried' : '-'}:${drawn ? 'drawn' : '-'}`;
         if (seen.at(-1) !== now) seen.push(now);
       }).observe(node, { attributes: true, attributeFilter: ['data-tick', 'data-carried', 'data-drawn'] });
@@ -292,48 +292,51 @@ test.describe('the high shelf (D46, D47, D49)', () => {
     // Where the book is drawn, in cells, and whether the wizard carries it.
     const book = () =>
       scene(page).evaluate((node) => {
-        const drawn = /rare_book:([\d.]+),([\d.]+)/.exec(node.getAttribute('data-drawn') ?? '');
-        const carried = (node.getAttribute('data-carried') ?? '').split(',').includes('rare_book');
+        const drawn = /eldras_book:([\d.]+),([\d.]+)/.exec(node.getAttribute('data-drawn') ?? '');
+        const carried = (node.getAttribute('data-carried') ?? '').split(',').includes('eldras_book');
         return { at: drawn ? [Number(drawn[1]), Number(drawn[2])] : null, carried };
       });
-    // Half a tick into the cast (tick 6), the light is on its way and the book on its
+    // Half a tick into the cast (tick 2), the light is on its way and the book on its
     // shelf: the tick's start waited for frame by frame, as an expect's polls come late.
-    await page.waitForFunction(() => document.querySelector('#scene')?.getAttribute('data-tick') === '6', null, {
+    await page.waitForFunction(() => document.querySelector('#scene')?.getAttribute('data-tick') === '2', null, {
       timeout: 60_000,
       polling: 'raf',
     });
     await page.waitForTimeout(170);
     const waiting = await book();
     expect(waiting.carried).toBe(false);
-    expect(waiting.at?.[1]).toBeLessThan(4);
+    expect(waiting.at?.[1]).toBeLessThan(4.5);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-cast-light.png` });
-    // Before the cast's tick ends the book is at the wizard's hands, at 7,6, not yet carried.
+    // Before the cast's tick ends the book is at the wizard's hands, in the doorway at
+    // 2,5, not yet carried.
     await page.waitForFunction(() => {
       const node = document.querySelector('#scene');
-      const drawn = /rare_book:([\d.]+),([\d.]+)/.exec(node?.getAttribute('data-drawn') ?? '');
-      const carried = (node?.getAttribute('data-carried') ?? '').split(',').includes('rare_book');
-      return node?.getAttribute('data-tick') === '6' && drawn !== null && Number(drawn[2]) > 6 && !carried;
+      const drawn = /eldras_book:([\d.]+),([\d.]+)/.exec(node?.getAttribute('data-drawn') ?? '');
+      const carried = (node?.getAttribute('data-carried') ?? '').split(',').includes('eldras_book');
+      return node?.getAttribute('data-tick') === '2' && drawn !== null && Number(drawn[2]) > 5 && !carried;
     });
     const held = await book();
-    expect(held.at?.[0]).toBeGreaterThan(7);
-    expect(held.at?.[0]).toBeLessThan(8);
+    expect(held.at?.[0]).toBeGreaterThan(2);
+    expect(held.at?.[0]).toBeLessThan(3);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-cast-hands.png` });
-    // The give (tick 8) starts from the hands, after the pick-up.
-    await expect(scene(page)).toHaveAttribute('data-tick', '8');
+    // The give (tick 5) starts from the hands, after the pick-up and the step down.
+    await expect(scene(page)).toHaveAttribute('data-tick', '5');
     await page.waitForTimeout(150);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-give.png` });
     await expect.poll(book).toEqual({ at: null, carried: false });
-    // Picked up (tick 7) it was carried and no longer drawn before the give began.
+    // Picked up (tick 3) it was carried and no longer drawn before the give began.
     const seen = await page.evaluate(() => (window as unknown as { kyduxBook: string[] }).kyduxBook);
-    const taken = seen.indexOf('7:carried:-');
+    const taken = seen.indexOf('3:carried:-');
     expect(taken, seen.join(' ')).toBeGreaterThan(-1);
-    expect(seen.indexOf('8:-:drawn'), seen.join(' ')).toBeGreaterThan(taken);
+    expect(seen.indexOf('5:-:drawn'), seen.join(' ')).toBeGreaterThan(taken);
+    await expect(page.locator('.outcome-text')).toContainText('You did it', { timeout: 30_000 });
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-eldras-room-win.png` });
   });
 
-  test('beneath the book, the hands cannot reach it: it is too high', async ({ page }) => {
+  test('in the doorway, the hands cannot reach the book: it is too high (D129)', async ({ page }) => {
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('wizard.move_right(5)\nwizard.pick_up()');
+    await page.keyboard.insertText('wizard.move_up()\nwizard.pick_up()');
     await page.locator('#run').click();
     await expect(scene(page)).toHaveAttribute(
       'data-thought',
@@ -342,7 +345,7 @@ test.describe('the high shelf (D46, D47, D49)', () => {
     );
   });
 
-  test('fendra out of line with the book cannot reach it', async ({ page }) => {
+  test('fendra from the aisle cannot reach into the room (D129)', async ({ page }) => {
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('book = wizard.find_nearest("book")\nwizard.cast("fendra", book)');
@@ -363,7 +366,7 @@ test.describe('the high shelf (D46, D47, D49)', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('book = wizard.find_nearest("book")\nbook.reveal()\nwizard.wait(4)');
     await page.locator('#run').click();
-    await expect(scene(page)).toHaveAttribute('data-revealed', 'rare_book', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-revealed', 'eldras_book', { timeout: 30_000 });
     await page.waitForTimeout(400);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}revealed-book.png` });
   });

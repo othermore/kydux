@@ -150,7 +150,7 @@ that stays locked.
 | `level:the-moving-key` | Improve 1 | Eldra's room key lies at three, five or seven steps, in three ways; Wenna's program walks yesterday's five. Bonus: no number written. | |
 | `level:the-wrong-order` | Fix 1 | Wenna's program opens Eldra's door from across the aisle, then walks to it. | |
 | `lesson:fendra` | Lesson 7 | A spell that reaches: `wizard.cast("fendra", book)` draws the thing it is told, in a straight line three tiles away at most, to the wizard's tile. | (the spell `fendra`) |
-| `level:the-high-shelf` | Practice 5 | The chapter together: Eldra's other lost book among many on the high shelf: found, revealed, drawn down from below it with *fendra*, picked up, given to her. Bonus: revealed with `reveal`. | |
+| `level:eldras-room` | Practice 5 | The chapter together: Eldra's other lost book on the bookcase in her little room, among many standing like it, too high for hands: found, revealed, drawn down with *fendra* from the room's doorway, which the spell's line does not pass (D129), picked up, given to her in the aisle; the starting code guides each step in comments. Bonus: revealed with `reveal`. | |
 | `story:the-wand-bank` | Story 5 | Eldra's thanks; the school wands; the friend comes out from behind the shelves, there for a book, having known the wizard's voice; the wizard introduces the mate; the spare wand given back; the chapter summed up; at dusk, the rumour of the passages. | |
 
 The world features chapter 2 needs: shelves and bookcases, tiles the

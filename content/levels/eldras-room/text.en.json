@@ -1,0 +1,15 @@
+{
+  "title": "Eldra's little room",
+  "goals": [
+    "Give Eldra her book.",
+    "Make the book glow with `reveal`."
+  ],
+  "starting_code": "# Find the book with `find_nearest` and keep it under a name.\n\n# Make it glow with `reveal`.\n\n# Step up into the doorway.\n\n# Cast fendra with `cast` and the book's name.\n\n# Pick it up with `pick_up`.\n\n# Step back down beside Eldra.\n\n# Give it to her with `give`.\n",
+  "hints": [
+    "Find the book and make it glow with `reveal`.",
+    "From the aisle, the spell cannot reach into the room. Step up into the doorway first!",
+    "`cast` *fendra* with the book, then `pick_up`, step down, and `give` it to Eldra."
+  ],
+  "intro": "Now that the door is open, you can fetch Eldra's other lost book from the bookcase in her little room. It stands among many books just like it, too high for your hands, and *fendra* reaches it only from the doorway, not from the aisle. Find it, make it glow, step up into the doorway and bring it down with the spell, pick it up, and give it to Eldra.",
+  "outro": "Both her books are back! Eldra is at peace at last."
+}

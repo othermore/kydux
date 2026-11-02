@@ -179,6 +179,11 @@ class World:
                 return thing
         return None
 
+    def up_high(self, thing: Thing) -> bool:
+        """Whether a thing lies up on a shelf, out of the hands' reach from any tile
+        (D129): on one of the level's high shelves, and not hidden under it (D85)."""
+        return thing._k_position in self.level.high and not thing._k_spec.hidden
+
     def leaf_over(self, position: Position) -> Door | None:
         """The open door whose leaf lies on a tile (D125), or None."""
         for thing in self.things.values():
@@ -514,12 +519,13 @@ class Wizard(Child):
         world.act("pick_up", {"id": chosen.name, "at": list(here)})
 
     def _k_in_reach(self) -> list[Thing]:
-        """The things the wizard can pick up: on its tile, or on one of the four beside it,
-        shelves included (D58), in reading order."""
+        """The things the wizard can pick up: on its tile, or on one of the four beside it
+        (D58), but for one up on a shelf, which only fendra brings down (D129); in
+        reading order."""
         world: World = self._k_world
         here = self._k_position
         tiles = [here, *(Position(here.x + dx, here.y + dy) for dx, dy in DELTAS)]
-        found = [t for tile in tiles for t in world.things_at(tile)]
+        found = [t for tile in tiles for t in world.things_at(tile) if not world.up_high(t)]
         return sorted(
             found, key=lambda t: (t._k_position != here, t._k_position.y, t._k_position.x)
         )
@@ -621,7 +627,8 @@ AIMED = ("fendra",)
 
 def in_line(world: World, here: Position) -> list[tuple[int, Thing]]:
     """The things lying in sight from a tile along the four ways, FENDRA_REACH tiles at
-    most each, through shelves and not through walls or closed doors, with how far
+    most each, through shelves and not through walls or closed doors, nor past a
+    door's cell, open or shut, but the one the wizard stands on (D129), with how far
     each is: nearest first, then in reading order."""
     found: list[tuple[int, int, int, Thing]] = []
     for facing in ("up", "down", "left", "right"):
@@ -629,13 +636,16 @@ def in_line(world: World, here: Position) -> list[tuple[int, Thing]]:
             for thing in world.things_at(tile):
                 distance = abs(tile.x - here.x) + abs(tile.y - here.y)
                 found.append((distance, tile.y, tile.x, thing))
+            if world.door_at(tile) is not None:
+                break
     return [(distance, thing) for distance, _, _, thing in sorted(found, key=lambda f: f[:3])]
 
 
 def _fendra(world: World, here: Position, thing: Thing | None) -> Effect:
     """Draws the thing named onto the wizard's tile, when it lies in sight along one of
     the four ways, three tiles at most, through shelves and not through walls or closed
-    doors (D47); anywhere else, or carried, it is out of the spell's reach."""
+    doors (D47), nor past a doorway the wizard does not stand in (D129); anywhere else,
+    or carried, it is out of the spell's reach."""
     if thing is None or thing not in [found for _, found in in_line(world, here)]:
         return Effect(refused="out_of_reach")
 

@@ -247,14 +247,35 @@ def test_pick_up_takes_a_thing_not_a_word():
     assert result.error.explanation["kind"] == "arguments"
 
 
-def test_a_thing_on_a_shelf_beside_the_wizard_is_picked_up_by_hand():
-    level = Level.from_dict(
-        {
-            "id": "shelf",
-            "map": ["#####", "#.=.#", "#.S.#", "#####"],
-            "things": [{"kind": "book", "id": "book", "at": [2, 1]}],
-        }
-    )
-    world = World(level)
-    world.wizard.pick_up()
-    assert [t.name for t in world.carried()] == ["book"]
+def test_a_thing_on_a_shelf_is_too_high_for_the_hands_from_beside_and_below():
+    # D129: only the spell brings down what stands on a shelf.
+    for start, book in (([2, 2], [2, 1]), ([1, 1], [2, 1]), ([2, 3], [2, 1])):
+        rows = ["#####", "#.=.#", "#.=.#", "#...#", "#####"]
+        row = rows[start[1]]
+        rows[start[1]] = row[: start[0]] + "S" + row[start[0] + 1 :]
+        level = Level.from_dict(
+            {"id": "shelf", "map": rows, "things": [{"kind": "book", "id": "book", "at": book}]}
+        )
+        world = World(level)
+        world.wizard.pick_up()
+        assert world.events[-1].data["reason"] == "too_high", start
+        world.wizard.pick_up(world.things["book"])
+        assert world.events[-1].data["reason"] == "too_high", start
+        assert world.carried() == []
+
+
+def test_a_thing_hidden_under_a_shelf_or_on_a_low_tile_is_picked_up_from_beside():
+    # Hidden under a bookcase (D85), or on a pile of books: lying low, not up on a shelf.
+    for terrain, hidden in (("k", True), ("u", False)):
+        level = Level.from_dict(
+            {
+                "id": "low",
+                "map": ["#####", "#.=.#", "#.S.#", "#####"],
+                "terrain": ["#####", f"#.{terrain}.#", "#...#", "#####"],
+                "terrains": {"#": "wall", ".": "floor", "k": "bookcase", "u": "furniture"},
+                "things": [{"kind": "key", "id": "key", "at": [2, 1], "hidden": hidden}],
+            }
+        )
+        world = World(level)
+        world.wizard.pick_up()
+        assert [t.name for t in world.carried()] == ["key"], terrain

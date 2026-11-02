@@ -763,7 +763,8 @@ one overturns stays, marked as superseded.
   thing as its second argument, `wizard.cast("fendra", book)`, `fendra`
   moves that thing onto the wizard's tile when it lies along one of the
   four ways from the wizard's tile, up to three tiles (`FENDRA_REACH`),
-  through shelves and not through walls or closed doors (`world.in_line`).
+  through shelves and not through walls or closed doors, nor past a door's
+  cell the wizard does not stand on (D129; `world.in_line`).
   The other spells take no thing; a spell given the wrong arguments is
   explained with the example that fits it (`ActionArguments.example`).
   The thing's `pull` event comes in the wizard's tick, the thing's own, as
@@ -928,13 +929,15 @@ one overturns stays, marked as superseded.
 - **D58 — The wizard picks up what is on its tile or beside it, and may
   say which.** Decided 2026-10-22 by the owner's UAT (sprint-10.md), built
   the same day. `wizard.pick_up()` takes the thing on the wizard's tile,
-  else the one thing on the four tiles beside it, shelves included; with
+  else the one thing on the four tiles beside it, but for one up on a
+  shelf or a bookcase, which only `fendra` brings down (D129); with
   several in reach and none underfoot it is refused with `which_one`, whose
   thought names them and shows how to say which. `wizard.pick_up(thing)`
   takes that thing when it is in reach, and is refused with `far` when it
   is not; a word in quotes is not a thing, and is explained as an argument
-  of the wrong kind. A thing on a shelf beside the wizard comes down by
-  hand; `fendra` is for what lies farther. The start card opens over the
+  of the wrong kind. A thing hidden under a bookcase (D85), or on a stone
+  or a pile of books, lies within reach of the tile beside it. The start
+  card opens over the
   notebook and says *Continue* when the child opens it again with *?*; a
   password door opens in the second half of its tick, once the word is
   said.
@@ -1432,7 +1435,7 @@ one overturns stays, marked as superseded.
   raised thing in Kydux's art is drawn with a dark outline all round; the
   outline is of the thing, and nothing of the ground beyond it is. Every
   mask the export makes, but a box's and one its thing says not to
-  (`snap: false`, the rare book, whose shelf's lines the snap runs into),
+  (`snap: false`, a thing set among others whose lines the snap runs into),
   is moved onto the outline (`image_first.snapped`): what of it the ground
   beyond reaches without crossing an outline goes back to the ground,
   where the painting is as its picture without the thing when it has one,
@@ -1882,9 +1885,13 @@ one overturns stays, marked as superseded.
   thing inside a room is reached from its doorway or from inside, never
   from the room before it through the open door. A thing on a shelf is
   never picked up by hand, from beside or from below: it is too high
-  (`too_high`), and only the spell brings it down. Rules out a book
-  fetched out of a locked room from across its threshold, and a door
-  opened for nothing.
+  (`too_high`), and only the spell brings it down. A shelf is a level
+  map's shelf or a scene's bookcase (`level.HIGH_KINDS`); a thing hidden
+  under a bookcase (D85), as the hidden key is, or lying on a stone or a
+  pile of books, as the wand and the old book are, lies low, within the
+  hands' reach from beside (built 2026-11-01). Rules out a book fetched
+  out of a locked room from across its threshold, and a door opened for
+  nothing.
 - **D130 — Going to sleep is seen: the wizard walks to the pillow's side
   and lies down; the cell to sleep from is marked.** Decided 2026-11-01
   by the owner. `wizard.sleep()` from the cell beside the bed is drawn in

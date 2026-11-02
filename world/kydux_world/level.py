@@ -52,6 +52,10 @@ WALL, FLOOR, SHELF, START = "#", ".", "=", "S"
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
 THING_KINDS = ("key", "door", "book", "wand", "potion", "stair", "bed")
 CARRIED_KINDS = ("key", "book", "wand", "potion")
+#: The terrains a thing lies up on, out of the hands' reach (D129): a level map's
+#: shelf, a scene's bookcase. A thing on another tile no one walks, a stone or a
+#: pile of books, lies within reach of the tile beside it.
+HIGH_KINDS = ("shelf", "bookcase")
 ACTOR_KINDS = ("teacher", "ghost", "cat", "friend")
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
@@ -122,6 +126,8 @@ class Level:
     height: int = 1
     walls: frozenset[Position] = frozenset()
     shelves: frozenset[Position] = frozenset()
+    #: The shelves a thing lies up on, out of the hands' reach (HIGH_KINDS, D129).
+    high: frozenset[Position] = frozenset()
     start: Position = Position(0, 0)
     goals: tuple[GoalSpec, ...] = ()
     tick_limit: int = 1000
@@ -293,6 +299,7 @@ class Level:
             height=len(rows),
             walls=frozenset(walls),
             shelves=frozenset(shelves),
+            high=_high(data, frozenset(shelves)),
             start=starts[0],
             goals=tuple(goals),
             tick_limit=tick_limit,
@@ -652,6 +659,16 @@ def _carrying(data: dict[str, Any], level_id: str, start: Position) -> tuple[Thi
     if len(set(kinds)) != len(kinds):
         raise LevelError(f"{level_id}: carrying names a kind twice")
     return tuple(ThingSpec(kind, kind, start, carried=True) for kind in kinds)
+
+
+def _high(data: dict[str, Any], shelves: frozenset[Position]) -> frozenset[Position]:
+    """The shelves a thing lies up on (D129): on a scene, those whose terrain is of
+    HIGH_KINDS (on_scene gives the scene's letters, `terrain`, and their kinds,
+    `terrains`); on a level's own map, every shelf."""
+    rows, kinds = data.get("terrain"), data.get("terrains")
+    if not isinstance(rows, list) or not isinstance(kinds, dict):
+        return shelves
+    return frozenset(cell for cell in shelves if kinds.get(rows[cell.y][cell.x]) in HIGH_KINDS)
 
 
 def _carried_kind(entry: Any) -> Any:

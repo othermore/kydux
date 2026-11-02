@@ -1,5 +1,5 @@
 {
-  "id": "the-high-shelf",
+  "id": "eldras-room",
   "kind": "practice",
   "scene": "the-library",
   "start": [
@@ -15,39 +15,49 @@
   ],
   "things": [
     {
-      "kind": "book",
-      "id": "rare_book",
+      "kind": "door",
+      "id": "door",
       "at": [
-        7,
+        2,
+        5
+      ],
+      "open": true,
+      "art": "room_door"
+    },
+    {
+      "kind": "book",
+      "id": "eldras_book",
+      "at": [
+        2,
         3
       ]
     }
   ],
   "actors": [
     {
-      "kind": "friend",
-      "id": "wenna",
+      "kind": "ghost",
+      "id": "eldra",
       "at": [
-        10,
-        5
-      ]
+        3,
+        6
+      ],
+      "facing": "left"
     },
     {
       "kind": "friend",
       "id": "mate",
       "at": [
-        10,
+        4,
         6
       ]
     },
     {
-      "kind": "ghost",
-      "id": "eldra",
+      "kind": "friend",
+      "id": "wenna",
       "at": [
-        8,
+        5,
         6
-      ],
-      "facing": "left"
+      ]
     }
   ],
   "api": [
@@ -69,7 +79,7 @@
   "goals": [
     {
       "kind": "give",
-      "id": "rare_book",
+      "id": "eldras_book",
       "to": "eldra"
     },
     {

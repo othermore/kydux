@@ -153,6 +153,45 @@ def test_fendra_reaches_three_tiles_and_no_further():
     assert last(world)[1] == "pull"
 
 
+#: Eldra's little room (D129): a book up on the shelf at the room's back, the shelf
+#: before it, the room's open door, and the aisle before the door.
+ROOM = {
+    **LIBRARY,
+    "map": ["#####", "#.=.#", "#.=.#", "##D##", "#.S.#", "#####"],
+    "actors": [],
+    "goals": [],
+    "things": [
+        {"kind": "book", "id": "book", "at": [2, 1]},
+        {"kind": "door", "id": "door", "marker": "D", "open": True},
+    ],
+}
+
+
+def test_fendra_reaches_into_a_room_from_its_doorway_and_not_from_before_it():
+    world = World(Level.from_dict(ROOM))
+    book = world.things["book"]
+    world.wizard.cast("fendra", book)
+    assert last(world)[2]["reason"] == "out_of_reach"
+    world.wizard.pick_up()
+    assert last(world)[2]["reason"] == "nothing"
+    world.wizard.move_up()
+    world.wizard.pick_up()
+    assert last(world)[2] == {"at": [2, 3], "by": "book", "reason": "too_high", "tried": True}
+    world.wizard.cast("fendra", book)
+    assert last(world)[1] == "pull" and book.position == (2, 3)
+    world.wizard.pick_up()
+    assert book in world.wizard.items
+
+
+def test_fendra_reaches_past_a_doorway_from_inside_the_room():
+    level = Level.from_dict(
+        {**ROOM, "map": ["#####", "#.=.#", "#.S.#", "##D##", "#...#", "#####"]}
+    )
+    world = World(level)
+    world.wizard.cast("fendra", world.things["book"])
+    assert last(world)[1] == "pull"
+
+
 GIVING = {
     "id": "giving",
     "map": ["#######", "#S.BG.#", "#######"],

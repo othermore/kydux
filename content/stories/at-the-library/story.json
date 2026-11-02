@@ -30,6 +30,18 @@
       "facing": "left"
     }
   ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "wenna_door",
+      "at": [
+        7,
+        16
+      ],
+      "art": "wenna_door",
+      "open": false
+    }
+  ],
   "steps": [
     {
       "who": "voice"
@@ -45,12 +57,23 @@
     },
     {
       "who": "wenna",
-      "do": {
-        "walk": [
-          7,
-          17
-        ]
-      }
+      "do": [
+        {
+          "walk": [
+            7,
+            17
+          ]
+        },
+        {
+          "open": "wenna_door"
+        },
+        {
+          "walk": [
+            6,
+            17
+          ]
+        }
+      ]
     },
     {
       "who": "mate"

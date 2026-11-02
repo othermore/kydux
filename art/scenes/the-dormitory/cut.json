@@ -1,5 +1,5 @@
 {
-  "about": "The first-year dormitory, chapter 2's night scene: the chosen painting (image-first-dormitory-3) with its two wands taken off the trunks and its border mended by Gemini (game-dormitory-border), its grid removed, and its corridor's right end mended (repaint, corner) so that the castle's wall, going on from the rooms' front wall, closes the corridor off from the walk along the battlements. Its beds, trunks, bedside tables, armchairs and round table are cut by Gemini's magenta (marks); the walls between the rooms, with their open leaves, by polygons drawn over every figure (D95), the one in a doorway on row 9 too, but for the doorway's inside under the leaf (D104); the front wall, with the door's arch, by a polygon on its foot's row, over whoever stands behind it and under whoever walks the corridor; the door to the corridor is a thing, shut or open (doorways, D108); each bed's quilt and folded sheet, drawn over the pupil asleep in it, by Gemini's magenta too (D97). Figures on the strips beside the walls and in the doorways are drawn on the painted strip (nudged, D105). Pictures named here are in art/raw/, which git ignores.",
+  "about": "The first-year dormitory, chapter 2's night scene: the chosen painting (image-first-dormitory-3) with its two wands taken off the trunks and its border mended by Gemini (game-dormitory-border), its grid removed, and its corridor's right end mended (repaint, corner) so that the castle's wall, going on from the rooms' front wall, closes the corridor off from the walk along the battlements. Its beds, trunks, bedside tables, armchairs and round table are cut by Gemini's magenta (marks); the walls between the rooms, with their open leaves, by polygons drawn over every figure (D95), the one in a doorway on row 9 too, but for the inside of the open leaf's arch (D104); the front wall, with the door's arch, by a polygon on its foot's row, over whoever stands behind it and under whoever walks the corridor; the door to the corridor is a thing, shut or open (doorways, D108); each bed's quilt and folded sheet, drawn over the pupil asleep in it, by Gemini's magenta too (D97). Figures on the strips beside the walls and in the doorways are drawn on the painted strip (nudged, D105). Pictures named here are in art/raw/, which git ignores.",
   "sources": {
     "folder": "art/raw/game-dormitory",
     "edits": "art/raw/game-dormitory",
@@ -185,11 +185,11 @@
       "rest": "closed"
     },
     "wall_left": {
-      "about": "The wall between the common room and the left dormitory, its open door's leaf with it: over every figure (D95), the one in its doorway on row 9 too, but for the doorway's inside under the leaf, which is under them (D104); its foot, the grey of the beam it stands on with no outline between, as drawn.",
+      "about": "The wall between the common room and the left dormitory, its open door's leaf with it: over every figure (D95), the one in its doorway on row 9 too, but for the inside of the open leaf's arch, which is under them (D104): the wall's band, the light strip of the doorway and the leaf's board below the arch, and the cupboard against the wall below, are over them; its foot, the grey of the beam it stands on with no outline between, as drawn.",
       "box": [
         8.3,
         3.95,
-        9.7,
+        10.05,
         13.6
       ],
       "row": 13,
@@ -215,30 +215,34 @@
         ],
         [
           9.55,
-          8.6
+          7.95
         ],
         [
-          9.5,
-          8.85
+          9.12,
+          7.95
         ],
         [
-          9.0,
-          8.85
+          9.12,
+          8.88
         ],
         [
-          9.0,
-          10.1
-        ],
-        [
-          9.13,
-          10.1
-        ],
-        [
-          9.13,
-          12.5
+          9.2,
+          8.88
         ],
         [
           9.3,
+          9.6
+        ],
+        [
+          9.42,
+          10.08
+        ],
+        [
+          9.97,
+          10.08
+        ],
+        [
+          9.97,
           13.53
         ],
         [
@@ -292,9 +296,9 @@
       ]
     },
     "wall_right": {
-      "about": "The wall between the common room and the right dormitory, its open door's leaf with it: over every figure (D95), the one in its doorway on row 9 too, but for the doorway's inside under the leaf, which is under them (D104); its foot, the grey of the beam it stands on with no outline between, as drawn.",
+      "about": "The wall between the common room and the right dormitory, its open door's leaf with it: over every figure (D95), the one in its doorway on row 9 too, but for the inside of the open leaf's arch, which is under them (D104): the wall's band, the light strip of the doorway and the leaf's board below the arch, and the cupboard against the wall below, are over them; its foot, the grey of the beam it stands on with no outline between, as drawn.",
       "box": [
-        14.85,
+        14.65,
         3.95,
         16.2,
         13.6
@@ -341,32 +345,48 @@
           13.53
         ],
         [
-          15.62,
+          14.76,
           13.53
         ],
         [
-          15.6,
-          12.0
+          14.6,
+          12.1
         ],
         [
-          15.52,
-          11.0
+          14.55,
+          11.95
         ],
         [
-          15.45,
-          10.3
+          14.72,
+          10.08
         ],
         [
-          15.4,
-          10.05
+          15.06,
+          10.08
         ],
         [
-          15.4,
-          8.85
+          15.12,
+          9.6
         ],
         [
-          15.04,
-          8.85
+          15.18,
+          9.0
+        ],
+        [
+          15.22,
+          8.88
+        ],
+        [
+          15.44,
+          8.88
+        ],
+        [
+          15.44,
+          7.95
+        ],
+        [
+          15.05,
+          7.95
         ],
         [
           15.04,
@@ -995,19 +1015,6 @@
     {
       "cells": [
         [
-          9,
-          9
-        ],
-        [
-          9,
-          9
-        ]
-      ],
-      "by": -0.35
-    },
-    {
-      "cells": [
-        [
           15,
           9
         ],
@@ -1017,26 +1024,27 @@
         ]
       ],
       "by": -0.3
+    },
+    {
+      "cells": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "by": -0.2
     }
   ],
   "kept": [
     [
-      8.95,
-      8.55,
-      9.6,
-      8.9
-    ],
-    [
-      8.6,
-      8.85,
-      9.45,
-      10.1
-    ],
-    [
-      15.0,
-      8.85,
-      15.85,
-      10.1
+      14.5,
+      10.0,
+      14.72,
+      13.5
     ]
   ]
 }

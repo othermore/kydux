@@ -163,7 +163,7 @@
       "name": "El nombre de la cosa en este nivel.",
       "position": "Dónde está la cosa, o None cuando {el mago|la maga} la lleva.",
       "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}.",
-      "reveal": "Hace latir el contorno de una cosa, también a través de lo que la oculta, para que veas dónde está."
+      "reveal": "Hace que una cosa brille donde está, incluso a través de lo que la esconde, para que veas dónde se encuentra."
     },
     "door": {
       "kind": "Qué es: \"door\".",

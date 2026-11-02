@@ -2,7 +2,7 @@
 
 Some methods do something in the world, like moving or picking things up. Others give something back to you, like an answer!
 
-The method `wizard.find_nearest("book")` gives you the nearest book. It gives you the thing itself, even if it is far away.
+The method `wizard.find_nearest("book")` gives you the nearest book. It gives you the thing itself, even if it is very far away.
 
 ---
 ## Keeping the answer
@@ -14,13 +14,18 @@ We write it like this: `book = wizard.find_nearest("book")`. The `=` sign simply
 If there is no book at all, the answer is `None`, which is Python's word for nothing.
 
 ---
+## Making it glow
+
+To see which thing the name holds and where it is, `book.reveal()` makes it glow where it lies. It glows even through whatever hides it, and from then on you know where to walk.
+
+---
 ## What to do with a thing
 
-Once a thing is kept under a name, you can ask what it knows, like `book.position`. You can also hand it to whoever stands right beside your wizard, using `wizard.give(book)`.
+Once a thing is kept under a name, you can hand it to whoever stands right beside your wizard, using `wizard.give(book)`.
 
-Our ghost, Eldra, has lost a book somewhere across the hall. Let us find it for her!
+Our ghost, Eldra, has lost a book somewhere among the piles by the left wall. Let us find it and make it glow!
 
 ```python try
 book = wizard.find_nearest("book")
-print(book.position)
+book.reveal()
 ```

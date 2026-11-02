@@ -163,7 +163,7 @@
       "name": "The thing's own name in this level.",
       "position": "Where the thing lies, or None once the wizard carries it.",
       "distance_to": "Gives the number of steps from an object to the wizard.",
-      "reveal": "Makes a thing's outline beat, through whatever hides it too, so that you see where it is."
+      "reveal": "Makes a thing glow where it lies, even through whatever hides it, so that you see where it is."
     },
     "door": {
       "kind": "What it is: \"door\".",

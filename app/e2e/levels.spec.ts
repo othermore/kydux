@@ -35,7 +35,7 @@ test.describe('the hidden key', () => {
   });
 
   test('what the code prints shows in the card', async ({ page }) => {
-    await run(page, 'wizard.move_up(2)\nwizard.move_left()\nwizard.pick_up()\nprint(wizard.items)');
+    await run(page, 'wizard.move_down(2)\nwizard.move_left()\nwizard.pick_up()\nprint(wizard.items)');
     await expect(page.locator('.printed')).toHaveText('[<key key carried>, <wand wand carried>]');
   });
 
@@ -212,14 +212,17 @@ test.describe('chapter 2', () => {
     });
   }
 
-  test('a level says what it prints, and Wenna speaks of Eldra on the win card', async ({ page }) => {
+  test('the book is drawn in its cell, glows when revealed, and Wenna speaks of Eldra on the win card', async ({
+    page,
+  }) => {
     await page.goto('/#level/the-lost-book');
     await expect(page.locator('#card-intro')).toContainText('Eldra');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    // Laid by the piles, the book is drawn in its cell's middle (D109).
+    await expect(scene(page)).toHaveAttribute('data-drawn', /old_book:2\.50,15\.50/);
     await page.locator('#speed').selectOption('4');
     await run(page, readFileSync(`${CONTENT}levels/the-lost-book/solution.py`, 'utf8'));
-    await expect(page.locator('.printed')).toHaveText('Position(x=4, y=11)');
     await expect(page.locator('#card-outro')).toContainText('Wenna');
     await expect(page.locator('#card-outro')).toContainText('Eldra');
   });
@@ -229,7 +232,7 @@ test.describe('chapter 2', () => {
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_up(2)\nwizard.move_right(4)\nwizard.move_up(4)\nwizard.move_left(6)\nwizard.pick_up()\nwizard.give(old_book)');
+    await run(page, 'wizard.move_up(2)\nwizard.move_left(5)\nwizard.pick_up()\nwizard.give(old_book)');
     await expect(page.locator('.outcome-text')).toContainText('There is no one beside me to give it to.');
   });
 });

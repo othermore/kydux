@@ -228,6 +228,13 @@ function drawnAt(scene: Phaser.Scene, art: Art, id: string, tile: Tile): [number
   return [painted.left * scale + dx * TILE, painted.top * scale + dy * TILE];
 }
 
+/** Where the middle of what is drawn of a painted thing's image is, in cells, for
+ * the tests (data-drawn, D109). */
+export function drawnMiddle(image: Phaser.GameObjects.Image): [number, number] {
+  const [mx, my] = middleOf(image.scene, image.texture.key);
+  return [(image.x + mx * image.scaleX) / TILE, (image.y + my * image.scaleY) / TILE];
+}
+
 /** How a thing on a tile is drawn among the rows: a door as open or shut, and
  * `inside` the furniture of a cell no one walks on, under it. */
 export interface ThingPlaced {

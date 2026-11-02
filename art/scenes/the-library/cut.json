@@ -152,7 +152,7 @@
     ]
   },
   "doorways": {
-    "about": "Each door of the library opened by tools/art/repaint.py doorways (the owner, 2026-10-28): its whole leaf, from the arch to the threshold, painted with the floor of the room beyond from Gemini's edit of its doorway (game-library-*-open.md), the leaf Gemini drew against the arch's side and the bottom planks it left out.",
+    "about": "Each door of the library opened by tools/art/repaint.py doorways (D108): its whole leaf, from the arch to the threshold and the threshold's line, painted with the floor of the room beyond from the painting itself, a plain part of it, darker under the arch and as lit as the room at the threshold.",
     "doors": [
       {
         "thing": "wenna_door",
@@ -168,14 +168,14 @@
             15.715
           ]
         ],
-        "picture": "library-wenna-open-floor.png",
         "floor": [
-          7.15,
-          15.8,
-          7.98,
-          16.66
+          7.1,
+          11.05,
+          7.9,
+          11.85
         ],
-        "painting": "library-wenna-doorway.png"
+        "painting": "library-wenna-doorway.png",
+        "sill": 0.08
       },
       {
         "thing": "centre_door",
@@ -186,14 +186,14 @@
             8.6
           ]
         ],
-        "picture": "library-centre-open-floor.png",
         "floor": [
-          7.0,
-          7.75,
-          8.05,
-          8.85
+          7.1,
+          6.1,
+          7.9,
+          6.9
         ],
-        "painting": "library-centre-doorway.png"
+        "painting": "library-centre-doorway.png",
+        "sill": 0.08
       },
       {
         "thing": "room_door",
@@ -204,14 +204,14 @@
             5.7
           ]
         ],
-        "picture": "library-room-open-floor.png",
         "floor": [
-          2.15,
-          5.2,
-          2.85,
-          5.88
+          5.1,
+          6.1,
+          5.9,
+          6.9
         ],
-        "painting": "library-room-doorway.png"
+        "painting": "library-room-doorway.png",
+        "sill": 0.06
       }
     ]
   },
@@ -1294,13 +1294,7 @@
       7.4
     ],
     [
-      6.3,
-      7.3,
-      6.85,
-      8.2
-    ],
-    [
-      1.0,
+      1.55,
       8.95,
       2.5,
       9.6
@@ -1313,33 +1307,9 @@
     ],
     [
       0.6,
-      15.22,
+      15.42,
       13.95,
       15.65
-    ],
-    [
-      6.3,
-      15.2,
-      6.85,
-      16.2
-    ],
-    [
-      10.4,
-      4.55,
-      14.1,
-      4.95
-    ],
-    [
-      2.9,
-      16.8,
-      4.0,
-      17.9
-    ],
-    [
-      7.0,
-      16.8,
-      8.2,
-      17.9
     ],
     [
       0,
@@ -1372,15 +1342,15 @@
       9.1
     ],
     [
-      6.2,
-      14.95,
+      6.4,
+      15.2,
       6.8,
       16.2
     ],
     [
       8.2,
-      14.95,
-      8.8,
+      15.2,
+      8.6,
       16.2
     ],
     [
@@ -1388,6 +1358,24 @@
       8.7,
       3.6,
       9.0
+    ],
+    [
+      3.55,
+      17.75,
+      3.85,
+      18.0
+    ],
+    [
+      7.2,
+      17.75,
+      7.45,
+      18.0
+    ],
+    [
+      11.5,
+      14.98,
+      11.65,
+      15.45
     ]
   ],
   "grounds": [
@@ -1542,6 +1530,21 @@
         10.6
       ],
       "row": 10
+    }
+  ],
+  "nudged": [
+    {
+      "cells": [
+        [
+          11,
+          10
+        ],
+        [
+          11,
+          15
+        ]
+      ],
+      "by": -0.35
     }
   ]
 }

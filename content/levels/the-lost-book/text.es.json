@@ -2,15 +2,15 @@
   "title": "El libro perdido",
   "goals": [
     "Dale a Eldra su libro.",
-    "Encuentra el libro con `find_nearest`."
+    "Haz que el libro brille con `reveal`."
   ],
-  "starting_code": "# El libro de Eldra no se ve desde aquí. Encuéntralo y llévaselo.\n",
+  "starting_code": "# El libro de Eldra está junto a los montones de libros de la pared izquierda. Encuéntralo y llévaselo.\n",
   "hints": [
-    "Usa `find_nearest` con la palabra \"book\" para encontrarlo, y guárdalo con un nombre nuevo, una variable.",
-    "Camina hasta el sillón de Eldra, y luego usa el método `pick_up`.",
-    "Vuelve junto a Eldra y usa el método `give` con el nombre de tu variable para darle el libro."
+    "Usa `find_nearest` con la palabra \"book\" para encontrarlo, guárdalo bajo un nombre y usa `reveal` en él.",
+    "Camina hasta donde brilla: dos pasos hacia arriba, por la puerta, y luego a la izquierda a lo largo de las estanterías; allí usa el método `pick_up`.",
+    "Vuelve junto a Eldra por el pasillo de la derecha y usa el método `give` con el nombre de tu variable para darle el libro."
   ],
-  "intro": "Te doy la bienvenida a la biblioteca. Eldra, el fantasma, perdió un libro hace mucho tiempo en su rincón al otro lado del pasillo. ¿Podrías encontrarlo y devolvérselo? Debe estar en la alfombra junto a su viejo sillón, donde no podemos verlo desde aquí.",
+  "intro": "Eldra, la fantasma, perdió un libro hace mucho tiempo. Debe de estar en uno de los montones del suelo, junto a la pared izquierda. Encuéntralo con `find_nearest`, haz que brille y llévaselo.",
   "outro": "¡Gracias! Eldra está muy contenta de tener su libro de vuelta.",
-  "learned": "Ahora sabes cómo un método devuelve algo, cómo una variable lo guarda, y cómo darle una cosa a alguien."
+  "learned": "Ahora sabes cómo un método devuelve algo, cómo una variable lo guarda, que una cosa revelada muestra adónde ir y cómo darle una cosa a alguien."
 }

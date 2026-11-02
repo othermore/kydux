@@ -15,8 +15,8 @@
       "kind": "key",
       "id": "key",
       "at": [
-        2,
-        9
+        3,
+        14
       ],
       "opens": "door",
       "hidden": true,
@@ -56,10 +56,8 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
-    "wizard.position",
     "wizard.items",
     "door.locked",
-    "thing.position",
     "wizard.pick_up",
     "wizard.find_nearest",
     "wizard.give",

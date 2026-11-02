@@ -146,9 +146,11 @@ test.describe('in the library (D85, D86, D51)', () => {
   test.use({ locale: 'en-US' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
-  test('the hidden key is out of sight until it is revealed', async ({ page }) => {
+  test('the hidden key is out of sight under the bookcase until it is revealed', async ({ page }) => {
     await open(page, 'the-hidden-key');
     await expect(page.locator('#scene')).not.toHaveAttribute('data-revealed', /./);
+    // Laid under the front bookcase, in its cell's middle, drawn under the shelves (D109).
+    await expect(page.locator('#scene')).toHaveAttribute('data-drawn', /key:3\.50,14\.50/);
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');

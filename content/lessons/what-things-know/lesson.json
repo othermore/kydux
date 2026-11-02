@@ -2,10 +2,8 @@
   "id": "what-things-know",
   "speaker": "wenna",
   "teaches": [
-    "wizard.position",
     "wizard.items",
     "door.locked",
-    "thing.position",
     "concept:print"
   ]
 }

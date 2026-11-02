@@ -2,14 +2,14 @@
 
 Un objeto hace acciones, que ya sabes que son sus métodos. Pero un objeto también sabe cosas sobre sí mismo, algo que los programadores llaman atributos.
 
-Por ejemplo, tu {mago|maga} sabe dónde está y qué lleva encima. Una puerta sabe si está cerrada con llave o no.
+Por ejemplo, tu {mago|maga} sabe qué lleva encima. Una puerta sabe si está cerrada con llave o no.
 
 ---
 ## Preguntar lo que sabe un objeto
 
 Para preguntarle a un objeto por su atributo, escribimos un punto después de su nombre, pero sin paréntesis. ¡Dejamos los paréntesis fuera porque no se está haciendo ninguna acción!
 
-Simplemente escribimos `door.locked`, `wizard.position` o `wizard.items`.
+Simplemente escribimos `door.locked` o `wizard.items`.
 
 ---
 ## Mostrar la respuesta

@@ -25,8 +25,8 @@
       "kind": "book",
       "id": "old_book",
       "at": [
-        4,
-        11
+        2,
+        15
       ]
     }
   ],
@@ -62,12 +62,11 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
-    "wizard.position",
     "wizard.items",
     "door.locked",
-    "thing.position",
     "wizard.pick_up",
     "wizard.find_nearest",
+    "thing.reveal",
     "wizard.give"
   ],
   "goals": [
@@ -78,7 +77,7 @@
     },
     {
       "kind": "uses",
-      "member": "find_nearest",
+      "member": "reveal",
       "bonus": true
     }
   ],

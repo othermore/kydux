@@ -50,8 +50,7 @@
     "door.open",
     "door.locked",
     "teacher.facing",
-    "stair.in_place",
-    "thing.position"
+    "stair.in_place"
   ],
   "goals": [
     {

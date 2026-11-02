@@ -2,15 +2,15 @@
   "title": "The lost book",
   "goals": [
     "Give Eldra her book.",
-    "Find the book with `find_nearest`."
+    "Make the book glow with `reveal`."
   ],
-  "starting_code": "# Eldra's book is out of sight in her nook. Find it and bring it to her.\n",
+  "starting_code": "# Eldra's book is somewhere by the piles near the left wall; find it and bring it to her.\n",
   "hints": [
-    "Use `find_nearest` with the word \"book\" to find it, and keep it under a new name, a variable.",
-    "Walk all the way to Eldra's armchair, then use the `pick_up` method.",
-    "Walk back to Eldra and use the `give` method with your variable's name to hand her the book."
+    "Use `find_nearest` with the word \"book\" to find it, keep it under a name, and `reveal` it.",
+    "Walk to where it glows, two steps up through the door and then left along the bookcases, and use the `pick_up` method.",
+    "Go back to Eldra by the passage on the right, and use the `give` method with your variable's name to hand her the book."
   ],
-  "intro": "Welcome to the library. Eldra, the ghost, lost a book long ago in her nook across the hall. Could you find it and give it back to her? It must be on the rug by her old armchair, out of sight from here.",
+  "intro": "Eldra, the ghost, lost a book long ago. It must be in one of the piles on the floor by the left wall. Find it with `find_nearest`, make it glow, and bring it to her.",
   "outro": "Thank you! Eldra is very happy to have her book back.",
-  "learned": "Now you know how a method gives something back, how a variable keeps it, and how to give a thing to someone."
+  "learned": "Now you know how a method gives something back, how a variable keeps it, that a revealed thing shows where to go, and how to give a thing to someone."
 }

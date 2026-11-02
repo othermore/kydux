@@ -34,7 +34,7 @@ test('the notebook of the hidden key has the door and the key', async ({ page })
   await page.locator('#notebook-open').click();
   const notebook = page.locator('#notebook');
   await expect(notebook.locator('[data-example="door.open()"]')).toBeVisible();
-  await expect(notebook.locator('[data-example="key.position"]')).toBeVisible();
+  await expect(notebook.locator('[data-example="key.reveal()"]')).toBeVisible();
   await expect(notebook.locator('[data-example="wizard.pick_up()"]')).toBeVisible();
 });
 

@@ -6,13 +6,13 @@
     "Go through it.",
     "Find the key with `find_nearest`."
   ],
-  "starting_code": "# The key to the door is hidden behind the armchair.\n",
+  "starting_code": "# The door's key is under the big bookcase.\n",
   "hints": [
-    "Find the key with `find_nearest`, then use the `reveal` method on it to see where it lies.",
-    "Walk to where the key is and use the `pick_up` method.",
-    "Walk up to the locked door and use its `open` method, then take a few more steps to go through."
+    "Find the key with `find_nearest` and `reveal` it.",
+    "Walk to where it glows, down into the aisle beside the bookcase, and `pick_up` from beside it.",
+    "Walk to the locked door, use its `open` method, and go through."
   ],
-  "intro": "The way on is through that locked door. Its key fell behind Eldra's armchair long ago, where no one can see it. Find the key, show where it lies, pick it up, and then open the door to go through.",
+  "intro": "The way goes on through that locked door. Its key fell under the big bookcase long ago, where no one can see it. Find it, show where it is, pick it up, open the door, and go through.",
   "outro": "Well done! The door is open, and the top aisle is just ahead.",
   "learned": "Now you know that a thing out of sight is there all the same for a program, and how a door opens with its key."
 }

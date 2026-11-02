@@ -9,14 +9,14 @@ Pero una puerta solo se abre para {un mago|una maga} que esté justo a su lado. 
 
 A veces no puedes ver una cosa en el suelo, pero para el programa está ahí de todos modos.
 
-Tu método `find_nearest` la encontrará dondequiera que esté. Luego, el método `key.reveal()` muestra su contorno a través de lo que sea que la esconda, para que sepas adónde ir.
+Tu método `find_nearest` la encuentra dondequiera que esté, y `reveal` la muestra a través de lo que sea que la esconda, como ya has aprendido.
 
 ---
 ## Pruébalo
 
-La llave de la puerta de enfrente cayó hace mucho tiempo detrás de algo, y nadie la ha visto desde entonces.
+La llave de la puerta de enfrente cayó bajo la gran estantería hace mucho tiempo, y nadie la ha visto desde entonces.
 
-¡Vamos a encontrarla y a revelarla!
+¡Vamos a encontrarla y a hacer que brille!
 
 ```python try
 key = wizard.find_nearest("key")

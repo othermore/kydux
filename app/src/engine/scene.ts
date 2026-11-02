@@ -3,7 +3,9 @@
 // rest of the page only through its handle and its parent's data-* attributes:
 // data-tick, data-state, data-wizard ("x,y"), data-actors ("id:x,y,facing"
 // joined by ";"), data-doors (the open doors' ids, joined by ","),
-// data-carried (the ids of what the wizard carries, joined by ","),
+// data-carried (the ids of what the wizard carries, joined by ","), data-drawn
+// (each painted thing seen and the middle of its picture, "id:x,y" in cells,
+// joined by ";", D109),
 // data-thought (why an action could not be done, while the wizard thinks it),
 // data-shaking (present while something shakes at a failed try), data-bubble
 // and data-speaker (the words said in a bubble and who says them), data-look
@@ -66,6 +68,7 @@ import {
   artScale,
   breakSeal,
   crossfade,
+  drawnMiddle,
   drawFigure,
   drawGlow,
   drawGrid,
@@ -1205,6 +1208,12 @@ class LevelScene extends Phaser.Scene {
     dataset.doors = [...this.openDoors].sort().join(',');
     dataset.glowing = [...this.glows].filter(([, glow]) => glow.visible).map(([id]) => id).sort().join(',');
     dataset.carried = [...this.carried].sort().join(',');
+    // Where each painted thing seen is drawn, its middle in cells (D109).
+    dataset.drawn = [...this.things]
+      .filter(([, image]) => image.visible && image.texture.key.startsWith('art-'))
+      .map(([id, image]) => `${id}:${drawnMiddle(image).map((v) => v.toFixed(2)).join(',')}`)
+      .sort()
+      .join(';');
   }
 
   private nudge(target: Phaser.GameObjects.Sprite, facing: Facing, ms: number): void {

@@ -3,6 +3,7 @@
   "speaker": "wenna",
   "teaches": [
     "wizard.find_nearest",
+    "thing.reveal",
     "wizard.give"
   ]
 }

@@ -6,13 +6,13 @@
     "Pasa por ella.",
     "Encuentra la llave con `find_nearest`."
   ],
-  "starting_code": "# La llave de la puerta está escondida detrás del sillón.\n",
+  "starting_code": "# La llave de la puerta está debajo de la gran estantería.\n",
   "hints": [
-    "Encuentra la llave con `find_nearest`, y luego usa el método `reveal` en ella para ver dónde está.",
-    "Camina hacia donde está la llave y usa el método `pick_up`.",
-    "Camina hacia la puerta cerrada y usa su método `open`, luego da unos pasos más para pasar."
+    "Encuentra la llave con `find_nearest` y usa `reveal` en ella.",
+    "Camina hasta donde brilla: baja al pasillo que hay junto a la estantería y usa `pick_up` desde allí, a su lado.",
+    "Camina hacia la puerta cerrada, usa su método `open` y pasa."
   ],
-  "intro": "El camino sigue por esa puerta cerrada. Su llave se cayó detrás del sillón de Eldra hace mucho tiempo, donde nadie puede verla. Encuentra la llave, muestra dónde está, recógela y luego abre la puerta para pasar.",
+  "intro": "El camino sigue por esa puerta cerrada. Su llave cayó bajo la gran estantería hace mucho tiempo, donde nadie puede verla. Encuéntrala, muestra dónde está, recógela, abre la puerta y pasa.",
   "outro": "¡Bien hecho! La puerta está abierta, y el pasillo superior está justo delante.",
   "learned": "Ahora sabes que una cosa que no está a la vista sigue ahí para un programa, y cómo una puerta se abre con su llave."
 }

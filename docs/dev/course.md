@@ -116,16 +116,16 @@ that stays locked.
 | Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
 | `story:the-entrance` | Story 1 | Ilda welcomes the first-years in the entrance hall and takes them to their dormitory. | |
-| `story:the-first-night` | Story 2 | The common room; the friend goes to the other dormitory. | |
-| `lesson:the-right-place` | Lesson 1 | Taught by the mate: an action may need the right place; `wizard.sleep()` only beside a free bed, its *Try it* refused in the common room. | `wizard.sleep` |
-| `level:your-bed` | Practice 1 | To one's own dormitory, past the other's arch, which refuses the wizard; the mate met; asleep in the free bed. Bonus: no bumps. | |
-| `story:the-morning` | Story 3 | The mate needs a wand, and the wizard's is lent: to the library, together. | |
-| `story:at-the-library` | Story 4 | Wenna receives them and opens her door. | |
-| `lesson:what-things-know` | Lesson 2 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.position`, `wizard.items`, `door.locked`, `thing.position`, `concept:print` |
-| `lesson:finding-things` | Lesson 3 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept under a name, a variable; `give` hands a thing to whoever stands beside. | `wizard.find_nearest`, `wizard.give` (and Python's `=`) |
-| `level:the-lost-book` | Practice 2 | Eldra's book across the hall: found, picked up, given. Bonus: found with `find_nearest`. | |
-| `lesson:keys-and-doors` | Lesson 4 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. | `door.open`, `thing.reveal` |
-| `level:the-hidden-key` | Practice 3 | The centre door's key lies behind Eldra's armchair, out of sight: found, revealed, picked up, the door opened. Bonus: found with `find_nearest`. | |
+| `story:the-first-night` | Story 2 | The common room; Ilda goes out by the door as the friend goes to the other dormitory; the mate, waiting in the wizard's, says their name and asks the wizard's, and goes to bed. | |
+| `lesson:the-right-place` | Lesson 1 | Taught by the mate: an action may need the right place; `wizard.sleep()` only beside the trunk at a free bed's foot, its *Try it* refused between the beds. | `wizard.sleep` |
+| `level:your-bed` | Practice 1 | In one's own dormitory, between the first two beds: a step to the free bed's trunk, and asleep; the other dormitory's doorway refuses the wizard. Bonus: no bumps. | |
+| `story:the-morning` | Story 3 | The mate needs a wand, and the wizard's is lent: out of the door to the library, together. | |
+| `story:at-the-library` | Story 4 | Wenna receives them, walks to her shut door and opens it. | |
+| `lesson:what-things-know` | Lesson 2 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.items`, `door.locked`, `concept:print` |
+| `lesson:finding-things` | Lesson 3 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept under a name, a variable; `reveal` makes it glow where it lies, through whatever hides it (D110); `give` hands a thing to whoever stands beside. | `wizard.find_nearest`, `thing.reveal`, `wizard.give` (and Python's `=`) |
+| `level:the-lost-book` | Practice 2 | Eldra's book by the piles at the hall's left wall: found, made to glow, picked up, given. Bonus: made to glow with `reveal`. | |
+| `lesson:keys-and-doors` | Lesson 4 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. | `door.open` |
+| `level:the-hidden-key` | Practice 3 | The centre door's key lies under the front bookcase, out of sight: found, revealed, picked up from the aisle beside it, the door opened. Bonus: found with `find_nearest`. | |
 | `lesson:the-distance` | Lesson 5 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
 | `level:the-moving-key` | Improve 1 | Eldra's room key lies at three, five or seven steps, in three ways; Wenna's program walks yesterday's five. Bonus: no number written. | |
 | `level:the-wrong-order` | Fix 1 | Wenna's program opens Eldra's door from across the aisle, then walks to it. | |

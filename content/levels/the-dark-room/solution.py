@@ -1,6 +1,6 @@
 wizard.cast("kirra")
 key = wizard.find_nearest("key")
-print(key.position)
+key.reveal()
 wizard.move_right(4)
 wizard.move_down()
 wizard.pick_up()

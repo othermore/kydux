@@ -58,18 +58,47 @@ section 6 the hand-over, section 7 the prompt.
 
 ## 3. The pieces
 
-### 28.1 The world's stamp, and the walk to bed seen in the game
+### 28.1 The world's stamp: shown, matched, and never cached
 
-`app/scripts/pack-world.mjs` writes into `world.zip` a file `stamp.txt`
-holding the content hash of the world's Python files and the level and
-scene content it packs (the same hash the page's build computes, put
-into the page as a constant by Vite, `__WORLD_STAMP__`); `app/src/
-engine/debug.ts` shows the world's stamp beside its own in the `?debug`
-corner, and `main.ts` refuses to run a level when the two differ, with
-the message `level.stale_world` through `t()` in both languages ("The
-game's world is older than the page: restart the server." / "El mundo
-del juego es más viejo que la página: reinicia el servidor."), shown
-where `load_failed` is shown. A unit test of the stamp's comparison.
+**The stamp.** `app/scripts/pack-world.mjs` computes a stamp of the
+world it packs: the short hash of the content of the world's Python
+files and the level, scene, story and lesson content it packs (sha256,
+first 12 hex digits), writes it into `world.zip` as `stamp.txt`, and
+writes `app/public/world-stamp.json` (`{"stamp": "..."}`), which Vite
+puts into the page at build and dev start (`__WORLD_STAMP__`, through
+`define` in `vite.config.ts`, read from that file).
+
+**No cache can serve an old world.** `app/src/runtime/worker.ts`
+fetches `${base}world.zip?v=${__WORLD_STAMP__}` with `cache:
+"no-store"`: the address changes with every world, so a browser's cached
+copy is never used, and the fetch itself bypasses the cache. The
+worker reads `stamp.txt` from the archive and sends it to the page with
+its ready message; the page compares it with `__WORLD_STAMP__` and, when
+they differ, refuses to run any level with the message `level.stale_
+world` through `t()` in both languages ("The game's world does not match
+the page: reload the page (Ctrl+Shift+R)." / "El mundo del juego no
+coincide con la página: recarga la página (Ctrl+Mayús+R)."), shown where
+`load_failed` is shown.
+
+**The version, seen.** The page's footer, which says *Version 0.0.1*,
+says beside it the page's build: the short git hash and the date
+(`__BUILD__`, through `define`, from `git rev-parse --short HEAD` and
+`date -I` at build or dev start; `local` when git is unavailable); and
+the `?debug` corner shows the page's build, the page's world stamp and
+the running world's stamp. A unit test of the comparison and of the
+stamp's computation (the same files give the same stamp; a changed
+line changes it); a browser test reads the footer's build and the debug
+corner's stamps and holds the two world stamps equal.
+
+**In the dev server.** `predev` packs the world as now; the stamp file
+is written before Vite starts, so a page served by `npm run dev` carries
+the stamp of the world it packed; a `ci/check.sh` build while the dev
+server runs rewrites `world.zip` and `world-stamp.json` in place, and
+the running page, whose `__WORLD_STAMP__` is older, refuses with the
+message until reloaded: the message says to reload. `docs/dev/
+dev-environment.md` says it where the restart after a build is
+explained.
+
 **The walk, checked once.** In the game served by `npm run dev` on a
 port of the programmer's own (4174, stopped after), in a fresh private
 window, *Your bed*'s solution at speed 1: five ticks on the timeline

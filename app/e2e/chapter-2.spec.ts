@@ -105,6 +105,43 @@ test.describe('in the dormitory (D84)', () => {
     await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
   });
 
+  test('the cell to sleep from is marked, and the wizard walks to the pillow and lies down, a tick each (D130)', async ({
+    page,
+  }) => {
+    await seedWizard(page, MARTA);
+    await open(page, 'your-bed');
+    const scene = page.locator('#scene');
+    // The cell before the free bed's trunk, ringed with a sign of sleep.
+    await expect(scene).toHaveAttribute('data-marks', '16,8');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-sleep-mark.png` });
+    await page.locator('#speed').selectOption('1');
+    // When the wizard is taken to be asleep in the bed, and when lying in it.
+    await scene.evaluate((node) => {
+      const seen: [string, number][] = [];
+      (window as unknown as { kyduxAsleep: [string, number][] }).kyduxAsleep = seen;
+      new MutationObserver(() => {
+        const asleep = (node.getAttribute('data-asleep') ?? '').split(',').find((s) => s.startsWith('wizard'));
+        if (asleep && seen.at(-1)?.[0] !== asleep) seen.push([asleep, performance.now()]);
+      }).observe(node, { attributes: true, attributeFilter: ['data-asleep'] });
+    });
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText(solution('your-bed'));
+    await page.locator('#run').click();
+    await expect(scene).toHaveAttribute('data-asleep', /wizard:bed_2(,|$)/, { timeout: 60_000 });
+    // A tick apart at speed 1: walking along the bed, lying down, lying.
+    for (const shot of [1, 2, 3]) {
+      await page.waitForTimeout(shot === 1 ? 200 : 400);
+      await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-sleep-${shot}.png` });
+    }
+    await expect(scene).toHaveAttribute('data-asleep', /wizard:bed_2:lying/, { timeout: 15_000 });
+    const seen = await page.evaluate(() => (window as unknown as { kyduxAsleep: [string, number][] }).kyduxAsleep);
+    const [begun, lying] = [seen.find(([s]) => s === 'wizard:bed_2'), seen.find(([s]) => s === 'wizard:bed_2:lying')];
+    expect(begun && lying, JSON.stringify(seen)).toBeTruthy();
+    // Lying only after the walk's tick and most of the next: 1.7 ticks of 400 ms.
+    expect(lying![1] - begun![1]).toBeGreaterThan(400 * 1.6);
+  });
+
   test('going to sleep, the night falls and the morning comes before the card (D124)', async ({ browser }) => {
     const context = await browser.newContext({ locale: 'es-ES', viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
@@ -204,7 +241,6 @@ test.describe('in the dormitory (D84)', () => {
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
     await expect(scene).toHaveAttribute('data-asleep', 'mate:bed_1:lying');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-mate.png` });
-    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-morning-story.png` });
     await storyNext(page);
     await expect(scene).not.toHaveAttribute('data-asleep', /mate/);
     await expect(scene).toHaveAttribute('data-actors', /mate:16,5/);
@@ -226,6 +262,13 @@ test.describe('in the dormitory (D84)', () => {
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
     await expect(scene).toHaveAttribute('data-light', 'morning');
     await expect(scene).toHaveAttribute('data-ground', 'morning');
+    // Zoomed out, the windows with the morning sky in them, the fire and the
+    // candles out (D126).
+    while ((await page.locator('#zoom-out').count()) > 0 && (await page.locator('#zoom-out').isEnabled())) {
+      await page.locator('#zoom-out').click();
+    }
+    await page.waitForTimeout(600);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-morning-story.png` });
   });
 });
 

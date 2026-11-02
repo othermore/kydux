@@ -77,6 +77,7 @@ import {
   drawGlow,
   drawGrid,
   drawMark,
+  drawSleepMark,
   facingOf,
   figureName,
   hourKey,
@@ -164,6 +165,10 @@ function tileOf(value: unknown): Tile | null {
 /** How far a figure's head lies from its feet, a part of its height: where the
  * middle of the head is, on the pillow, for a figure asleep (D91). */
 const HEAD_REACH = 0.65;
+/** How far before its pillow, toward the bed's foot, a figure stands on the floor
+ * in front of a bed to lie down in it, a part of a cell: the bedside table stands
+ * beside the pillow itself (D130). */
+const SIDE_ALONG = 0.6;
 
 const DELTA: Record<Facing, Tile> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
@@ -505,7 +510,12 @@ class LevelScene extends Phaser.Scene {
         this.markBehind(door.id, door.open, false);
       }
     }
-    this.parentNode.dataset.marks = this.map.markers.map(([, tile]) => tile.join(',')).join(';');
+    // The cell a sleep goal is met from, marked as a reach goal's is, with a sign of
+    // sleep in its ring (D130).
+    const sleepAt = this.map.sleepAt;
+    if (sleepAt) drawSleepMark(this, centre(sleepAt), this.still, 2.9);
+    const marked = [...this.map.markers.map(([, tile]) => tile), ...(sleepAt ? [sleepAt] : [])];
+    this.parentNode.dataset.marks = marked.map((tile) => tile.join(',')).join(';');
     for (const actor of this.map.actors) {
       const key = actor.kind === 'friend' ? friendKey(actor.id) : actorKey(actor.kind);
       const sprite = this.figure(actor.id, key, actor.tile, actor.facing).setDepth(3);
@@ -876,8 +886,9 @@ class LevelScene extends Phaser.Scene {
    * names the bed. */
   private sleep(event: WorldEvent, instant: boolean): void {
     this.parentNode.dataset.sleeping = String(event.data.id);
-    // Lying down takes the tween's length (layDown); the night waits for it (D124).
-    this.lyingUntil = this.time.now + (instant ? 0 : this.playback.tickDuration * 1.1);
+    // Going to sleep takes the walk to the pillow's side and the lying down, a tick
+    // each (layDown, D130); the night waits for it (D124).
+    this.lyingUntil = this.time.now + (instant ? 0 : this.playback.tickDuration * 2.1);
     if (!tileOf(event.data.bed)) return;
     this.stopCast();
     this.layDown(this.wizard, 'wizard', String(event.data.id), instant);
@@ -914,19 +925,40 @@ class LevelScene extends Phaser.Scene {
         lie();
         return;
       }
-      // Seen lying down: the figure goes to the bed's place, then lies there (18.3).
+      // Seen going to sleep (D130): over a tick the figure walks along the bed's side
+      // to the floor before its pillow and turns to the bed; over the next it goes
+      // to the bed's place and lies there.
       this.asleep.set(sprite, { id, bed, lying: false });
       this.markAsleep();
+      const tick = this.playback.tickDuration;
+      const side: [number, number] = [(place.head[0] - toward * SIDE_ALONG) * TILE, this.figureAt([0, place.row])[1]];
+      const across = Math.abs(side[0] - sprite.x) >= Math.abs(side[1] - sprite.y);
+      const going: Facing = across ? (side[0] < sprite.x ? 'left' : 'right') : side[1] < sprite.y ? 'up' : 'down';
+      const stepping = sprite.texture.key.startsWith('fig-');
       this.tweens.add({
         targets: sprite,
-        x,
-        y,
-        duration: this.playback.tickDuration * 0.8,
-        ease: 'Sine.easeInOut',
+        x: side[0],
+        y: side[1],
+        duration: tick * 0.9,
+        ease: 'Linear',
+        onUpdate: (tween) => {
+          if (stepping) this.face(sprite, going, [0, 1, 2, 1][Math.floor(tween.progress * 4) % 4] ?? 1);
+        },
         onComplete: () => {
-          lie();
-          sprite.setAlpha(0);
-          this.tweens.add({ targets: sprite, alpha: 1, duration: this.playback.tickDuration * 0.3 });
+          this.face(sprite, 'up');
+          this.tweens.add({
+            targets: sprite,
+            x,
+            y,
+            delay: tick * 0.1,
+            duration: tick * 0.7,
+            ease: 'Sine.easeInOut',
+            onComplete: () => {
+              lie();
+              sprite.setAlpha(0);
+              this.tweens.add({ targets: sprite, alpha: 1, duration: tick * 0.3 });
+            },
+          });
         },
       });
       return;

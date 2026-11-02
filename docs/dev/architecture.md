@@ -247,7 +247,7 @@ tiles are `[x, y]`.
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
 | `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
 | `give` | wizard | `id`, `to`, `at` | the thing floats from the wizard's hands to the actor and fades; the actor faces the wizard (D48) |
-| `sleep` | wizard, or in a story an actor | `id`, the bed; `at`; `bed`, its tile | the figure lies in the bed, its head on the pillow, under the quilt; for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
+| `sleep` | wizard, or in a story an actor | `id`, the bed; `at`; `bed`, its tile | two ticks long (`playback.SLEEP`): over the first the figure walks along the bed's side to the floor before its pillow and turns to the bed, over the second it lies in the bed, its head on the pillow, under the quilt (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile beside the bed (D91) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
 | `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
@@ -1906,9 +1906,14 @@ one overturns stays, marked as superseded.
   the point beside its pillow, then lies down in it, head on the pillow.
   A level whose goal is to sleep marks the cell the wizard must stand on
   to do it (the goal's `at`), with the goal's ring and a sign of sleep
-  drawn by the page, as a reach goal marks its cell. Rules out a figure
-  that snaps into the bed in a blink, and a child who does not know where
-  to stand.
+  drawn by the page, as a reach goal marks its cell. Built 2026-11-01:
+  the figure stands on the floor in front of the bed, `SIDE_ALONG` (0.6
+  of a cell) before its pillow toward the bed's foot, since the bedside
+  table stands beside the pillow itself; the goal's `at` is a floor cell
+  beside the bed (`goals.SleepGoal`), and the sign is a crescent and two
+  "z" in the ring's colour; a story's figure going to bed is drawn the
+  same and takes as long. Rules out a figure that snaps into the bed in a
+  blink, and a child who does not know where to stand.
 - **D131 — A level opened again starts from its starting code.** Decided
   2026-11-01 by the owner. Opening a level from the map, from the course
   or from its lesson shows the level's starting code, as the first time;

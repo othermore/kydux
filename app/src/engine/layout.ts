@@ -97,6 +97,8 @@ export interface Layout {
   ways: Record<string, Record<string, Tile>>;
   /** What the scene shows and the world does not hold, like a flat stone. */
   props: { kind: string; tile: Tile }[];
+  /** The cell a sleep goal marks to sleep from (D130), or none. */
+  sleepAt?: Tile;
 }
 
 const DEFAULT_SIGHT = 4;
@@ -220,5 +222,15 @@ export function layout(level: LevelJson): Layout {
       const tile = asTile(prop.at);
       return tile ? [{ kind: String(prop.kind), tile }] : [];
     }),
+    ...sleepAtOf(level),
   };
+}
+
+/** The cell a level's sleep goal marks to sleep from (D130), when it names one. */
+function sleepAtOf(level: LevelJson): { sleepAt?: Tile } {
+  for (const goal of asList(level.goals)) {
+    const tile = goal.kind === 'sleep' ? asTile(goal.at) : null;
+    if (tile) return { sleepAt: tile };
+  }
+  return {};
 }

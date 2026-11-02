@@ -37,7 +37,11 @@
   "goals": [
     {
       "kind": "sleep",
-      "bed": "bed_2"
+      "bed": "bed_2",
+      "at": [
+        16,
+        8
+      ]
     },
     {
       "kind": "no_bumps",

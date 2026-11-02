@@ -253,13 +253,27 @@ class GiveGoal:
 
 
 class SleepGoal:
-    """Met once the wizard sleeps in a bed (D84): `{"kind": "sleep", "bed": "bed_2"}`."""
+    """Met once the wizard sleeps in a bed (D84): `{"kind": "sleep", "bed": "bed_2"}`;
+    with `at`, the cell to sleep from, which the page marks (D130): a floor cell
+    beside the bed. The wizard sleeps in it from any cell beside it all the same."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
         self.bed = spec.params.get("bed")
-        beds = {t.id for t in level.things if t.kind == "bed"}
+        beds = {t.id: t for t in level.things if t.kind == "bed"}
         if self.bed not in beds:
             raise LevelError(f"{level.id}: the sleep goal names {self.bed}, no bed")
+        at = spec.params.get("at")
+        if at is None:
+            return
+        if not (
+            isinstance(at, list)
+            and len(at) == 2
+            and all(isinstance(v, int) and not isinstance(v, bool) for v in at)
+        ):
+            raise LevelError(f"{level.id}: the sleep goal's at is [x, y]")
+        cell, bed = Position(*at), beds[self.bed].position
+        if not level.free(cell) or abs(cell.x - bed.x) + abs(cell.y - bed.y) != 1:
+            raise LevelError(f"{level.id}: the sleep goal's at is no floor cell beside {self.bed}")
 
     def check(self, world: "World") -> bool:
         return world.slept == self.bed

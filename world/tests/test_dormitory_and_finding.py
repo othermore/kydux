@@ -48,6 +48,19 @@ def test_the_wizard_sleeps_beside_a_free_bed_and_the_goal_is_met():
     ]
 
 
+def test_the_sleep_goal_marks_a_floor_cell_beside_its_bed_and_any_cell_beside_wins():
+    # D130: the goal's `at` is the cell the page marks; the bed is the goal.
+    level = Level.from_dict(
+        {**DORMITORY, "goals": [{"kind": "sleep", "bed": "bed_2", "at": [6, 3]}]}
+    )
+    beside = "wizard.move_up()\nwizard.move_right(3)\nwizard.sleep()"
+    assert run_code(level, beside).status == "won"
+    for at, says in (([5, 3], "no floor cell"), ([5, 2], "no floor cell"), ([6], "is \\[x, y\\]")):
+        goals = [{"kind": "sleep", "bed": "bed_2", "at": at}]
+        with pytest.raises(LevelError, match=says):
+            run_code(Level.from_dict({**DORMITORY, "goals": goals}), "wizard.sleep()")
+
+
 def test_a_taken_bed_and_no_bed_at_all_are_refused_with_their_reasons():
     world = World(Level.from_dict(DORMITORY))
     world.wizard.sleep()

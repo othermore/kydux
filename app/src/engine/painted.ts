@@ -535,6 +535,45 @@ export function drawMark(
   return mark;
 }
 
+/** The mark of the cell to sleep from (D130): the goal's ring, as a reach goal's,
+ * and in it a sign of sleep drawn by the page in the ring's colour, a crescent and
+ * two "z" growing smaller up to the right, with a thin dark line under them so
+ * that they read on the floor. */
+export function drawSleepMark(
+  scene: Phaser.Scene,
+  at: [number, number],
+  still: boolean,
+  depth: number,
+): Phaser.GameObjects.Container {
+  const mark = drawMark(scene, at, still, depth);
+  const sign = scene.add.graphics();
+  const crescent = (width: number, colour: number, alpha: number) => {
+    sign.lineStyle(width, colour, alpha);
+    sign.beginPath();
+    sign.arc(-TILE * 0.06, TILE * 0.04, TILE * 0.14, Phaser.Math.DegToRad(70), Phaser.Math.DegToRad(290));
+    sign.strokePath();
+  };
+  const zed = (x: number, y: number, size: number, width: number, colour: number, alpha: number) => {
+    sign.lineStyle(width, colour, alpha);
+    sign.beginPath();
+    sign.moveTo(x, y);
+    sign.lineTo(x + size, y);
+    sign.lineTo(x, y + size);
+    sign.lineTo(x + size, y + size);
+    sign.strokePath();
+  };
+  for (const [extra, colour, alpha] of [
+    [2.5, 0x4a2a08, 0.55],
+    [0, 0xffc61a, 1],
+  ] as const) {
+    crescent(TILE * 0.07 + extra, colour, alpha);
+    zed(TILE * 0.08, -TILE * 0.06, TILE * 0.1, 2.5 + extra, colour, alpha);
+    zed(TILE * 0.19, -TILE * 0.17, TILE * 0.07, 2 + extra, colour, alpha);
+  }
+  mark.add(sign);
+  return mark;
+}
+
 /** A sealed door's rune (D79), centred on a point just over the door's depth: a
  * glow, and the rune's sign drawn in it unless the painting draws one; pulsing
  * unless `still`. */

@@ -1,8 +1,9 @@
 # Sprint 28 — Chapter 2 after the owner's pass of 2026-11-01: the wizard's walk to bed, the door's bad frame, the give's way, every figure's steps, and the key and the door as one tale
 
 The owner's pass after sprint 27 (2026-11-01, on commit 549c6f0) found
-five things. The wizard still goes straight from the trunk into the bed,
-while the other figures walk round as staged; in *The morning* the door
+five things. The wizard seemed to go straight from the trunk into the
+bed, which turned out to be the browser's cached world, older than the
+page, a trap worth closing for good; in *The morning* the door
 shows a bad frame as it closes; when the first book is given to Eldra it
 flies right, toward the wall, instead of up to her; the wizard's steps
 sound loud and the other figures' not at all; and *Improve 1* and *Fix
@@ -49,7 +50,7 @@ section 6 the hand-over, section 7 the prompt.
 
 | Finding | Cause | Where |
 |---|---|---|
-| The wizard goes straight from the trunk into the bed, at speed 1 and with the server restarted; the others walk round. | Not reproduced in the world (`Your bed`'s solution gives four moves then `sleep` at 18,9) nor in the browser test, which reads only `data-wizard` a tick at a time, not what is drawn. The packed world matches the source. So the fault is in what the page draws for the wizard's moves of a `sleep`, or in what the owner's browser runs (a cached page); to be found on a frame capture. | 28.1: the walk found and fixed on frames of the real game; and a world stamp in `?debug`, so that a stale world is never again a guess. |
+| The wizard seemed to go straight from the trunk into the bed, in two ticks. | The owner's browser ran a cached `world.zip` (the Python world the page unpacks), older than the page: the server served the new one, and the world walks (the tests and the browser test hold it); a private window showed the five ticks and the walk. Nothing tells which world a page runs. | 28.1: the world carries a build stamp the page shows in `?debug` and refuses when it differs from the page's, so that a stale world is never again a guess. |
 | *The morning*: a bad frame as the door closes. | `doorLook` on closing sets the closed state's depth and crossfades the texture at once; the open and closed pictures differ in size (open 403 × 384, closed 403 × 288) and in row (open 15, closed 14), so for a frame the open leaf is drawn at the closed depth or at the closed picture's size. To be confirmed on a frame capture. | 28.2. |
 | The first book given to Eldra flies right, to the wall, not up to her. | `give` tweens the image's corner to the middle of the actor's cell, so the image's middle lands half its size right and down of the actor; and the actor's drawn point (nudged on 11,10) is not the cell's middle. | 28.3 (D48). |
 | The wizard's steps sound; no one else's do; the wizard's are loud. | `play('step')` is called only on the wizard's `move`, at volume 0.12. | 28.4 (D132). |
@@ -69,22 +70,11 @@ the message `level.stale_world` through `t()` in both languages ("The
 game's world is older than the page: restart the server." / "El mundo
 del juego es más viejo que la página: reinicia el servidor."), shown
 where `load_failed` is shown. A unit test of the stamp's comparison.
-**The walk, first.** In the game served by `npm run dev` on a port of
-the programmer's own (4174, stopped after), *Your bed*'s solution at
-speed 1, recorded by the browser's screencast as sprint 27's hop was,
-one frame every 100 ms from *Run* to the lying: the wizard must be seen
-on 16,9, 17,9 and 18,9 in turn, with its walking frames, before the hop.
-The owner sees it go from the circle (16,8) straight into the bed, at
-speed 1, with the server restarted; the world's events are right, so the
-page's drawing of a `sleep`'s moves is suspected (the `sleep` event's
-`layDown` killing or skipping the walk tweens of the same run, the
-night's timer, the wizard's sprite texture not stepping), or the browser
-running a cached page. The programmer reproduces it, names the cause in
-the commit, fixes it, and keeps the frames `s28-walk-1.png` to `-4.png`
-(16,9, 17,9, 18,9, the hop's top). The browser test of *Your bed* then
-reads the wizard sprite's drawn position (`data-drawn-wizard`, the
-sprite's x,y in cells, published each frame as `data-drawn` is) at
-three moments a tick apart and holds it on the three cells.
+**The walk, checked once.** In the game served by `npm run dev` on a
+port of the programmer's own (4174, stopped after), in a fresh private
+window, *Your bed*'s solution at speed 1: five ticks on the timeline
+and the wizard seen on 16,9, 17,9 and 18,9 before the hop (one
+screenshot mid-walk, `s28-walk.png`); nothing to fix there.
 
 ### 28.2 The door closing without a bad frame
 

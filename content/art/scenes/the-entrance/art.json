@@ -27,10 +27,10 @@
     },
     {
       "row": 13,
-      "image": "row-13-static-under.webp",
+      "image": "row-13-static-over.webp",
       "top": 936,
       "static": true,
-      "under": true
+      "over": true
     },
     {
       "row": 15,

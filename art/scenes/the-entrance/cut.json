@@ -369,7 +369,7 @@
       }
     },
     "lamp": {
-      "about": "The chandelier, hanging from its ring as if from a ceiling out of the picture: over whoever walks under it on rows 10 to 13 (D95).",
+      "about": "The chandelier, hanging from its ring as if from a ceiling out of the picture: above every head, over every figure of the scene (D95), those walking under it on the carpet too.",
       "box": [
         17.75,
         9.75,
@@ -384,7 +384,7 @@
       "states": {
         "standing": "painting"
       },
-      "under": true,
+      "over": true,
       "open_work": true
     },
     "front_wall_left": {

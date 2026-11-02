@@ -193,7 +193,8 @@ owner on 2026-10-26, for every scene from the dormitory on:
   foot, over the figures standing above it; a shut door and an arch
   (`"under"`) over the figure in its doorway too, while an open door's
   doorway, what is seen through it, is under that figure; a wall seen from
-  above (`"over"`) over every figure; what hangs on a wall (`"hangs"`) as
+  above and a chandelier hanging above every head (`"over"`) over every
+  figure; what hangs on a wall at a figure's height (`"hangs"`) as
   its row's, standing on no cell. A scene's `lowered` cells draw a figure
   lower, so that a counter on the row below hides its legs, and its
   `nudged` cells draw a figure sideways, by the strip's middle less the

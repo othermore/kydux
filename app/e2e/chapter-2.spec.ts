@@ -273,8 +273,11 @@ test.describe('in the entrance (D100)', () => {
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
     await expect(scene).toHaveAttribute('data-shade', /^ilda:0\.\d\d$/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}into-the-arch.png` });
-    // The two children follow her side by side, at once (D103).
+    // The two children follow her side by side, at once (D103), under the
+    // chandelier, which hangs over every head (D95).
     await storyNext(page);
+    await expect(scene).toHaveAttribute('data-wizard', '20,13', { timeout: 30_000 });
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-lamp.png` });
     await expect(scene).toHaveAttribute('data-wizard', '20,8', { timeout: 30_000 });
     await expect(scene).toHaveAttribute('data-actors', /friend:19,8/);
   });

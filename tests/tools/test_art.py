@@ -728,6 +728,136 @@ def test_a_door_s_leaf_is_found_up_to_its_black_line_across_its_planks():
     assert not leaf[:, :20].any() and not leaf[:, 81:].any() and not leaf[:19].any()
 
 
+def test_an_open_doorway_is_filled_down_to_the_floor_s_line_from_jamb_to_jamb():
+    import repaint
+
+    crop = np.full((100, 100, 3), (150, 150, 160), dtype=np.uint8)  # the stones
+    crop[10:62, 20:80] = (20, 15, 10)  # the leaf's black line
+    crop[14:58, 24:76] = (120, 70, 40)  # its wood, its foot a step higher on the left
+    crop[52:58, 24:30] = (20, 15, 10)
+    crop[62:76] = (170, 165, 175)  # the threshold's stone
+    crop[76:79] = (60, 50, 70)  # the floor's own line under it
+    crop[79:] = (140, 135, 150)  # the floor beyond
+    leaf = repaint.leaf_of(crop, [(30, 70, 30)])
+    grown, feet, first = repaint.to_foot(crop, leaf, 64)
+    # Down to the floor's line and not over it, the left corner's step filled too.
+    assert np.allclose(feet, 76, atol=1)
+    assert grown[50:75, first : first + len(feet)].all()
+    assert not grown[77:].any() and not grown[:, :20].any() and not grown[:, 81:].any()
+    # Stone meets wood there: a line as dark as the jambs' is drawn on the fill's foot.
+    out = crop.copy()
+    out[10:62, 15:20] = (25, 20, 30)  # the jambs' outline beside the leaf
+    out[10:62, 80:85] = (25, 20, 30)
+    line = repaint.sill_line(out, first, feet, (0, 0, 100, 100), 200)
+    middle = first + len(feet) // 2
+    assert line[76, middle] and out[76, middle].max() < 40
+    assert not line[66, middle] and not line[84, middle]
+
+
+def test_a_leaf_traced_by_hand_is_its_polygon_with_an_edge_one_pixel_soft(tmp_path):
+    grid = {"x": {"offset": 0, "spacing": 100}, "y": {"offset": 0, "spacing": 100}}
+    leaf = [[0.2, 0.2], [0.605, 0.2], [0.605, 0.7], [0.2, 0.7]]
+    alpha = export_scene.soft_area((100, 100), grid, leaf)
+    assert (alpha[21:69, 21:60] == 1).all()
+    assert not alpha[:19].any() and not alpha[:, 62:].any() and not alpha[71:].any()
+    # The right edge falls in the middle of pixel 60: half of it is the leaf's.
+    assert 0.3 < alpha[40, 60] < 0.7
+    # Its state is that polygon alone, whatever the swung picture holds round it.
+    swung = np.full((100, 100, 3), 90, dtype=np.uint8)
+    swung[5:95, 5:95] = (200, 100, 50)
+    Image.fromarray(swung).save(tmp_path / "swung.png")
+
+    class Scene:
+        edits = tmp_path
+
+    Scene.grid = grid
+    picture = {"picture": "swung.png", "without": "swung.png", "leaf": leaf}
+    painting = np.zeros((100, 100, 3), dtype=np.uint8)
+    thing = {"solid": True}
+    _, state = export_scene.state_alpha(
+        Scene, thing, picture, painting, painting, (0, 0, 99, 99), None
+    )
+    assert (state == alpha).all()
+
+
+def test_a_closed_leaf_cut_from_the_painting_ends_at_its_doorway():
+    grid = {"x": {"offset": 0, "spacing": 100}, "y": {"offset": 0, "spacing": 100}}
+    painting = np.full((120, 120, 3), (150, 150, 160), dtype=np.uint8)
+    painting[20:100, 30:90] = (20, 15, 10)  # the leaf's line
+    painting[24:96, 34:86] = (120, 70, 40)  # its wood
+    painting[50:53, 0:30] = (40, 40, 45)  # a mortar line of the wall touching it
+    without = np.full_like(painting, (150, 150, 160))
+    without[24:96, 34:86] = (200, 160, 110)  # the floor beyond the open doorway
+
+    class Scene:
+        edits = None
+
+    Scene.grid = grid
+    doorway = [[0.32, 0.22], [0.88, 0.22], [0.88, 0.98], [0.32, 0.98]]
+    thing = {"solid": True, "snap": False, "doorway": doorway}
+    _, alpha = export_scene.state_alpha(
+        Scene, thing, "painting", painting, without, (0, 0, 120, 120), None
+    )
+    # The leaf, its line and the open doorway's whole floor are under it, and not
+    # the mortar line beside it.
+    inside = export_scene.soft_area(painting.shape[:2], grid, doorway)
+    assert (alpha == inside).all() and (alpha[24:96, 34:86] == 1).all()
+    assert not alpha[50:53, 0:30].any()
+
+
+def test_the_states_sheet_has_a_row_for_each_thing_and_a_panel_for_each_state(tmp_path):
+    cell = export_scene.CELL
+    Image.new("RGB", (4 * cell, 4 * cell), (90, 90, 90)).save(tmp_path / "ground.webp")
+    door = Image.new("RGBA", (cell, 2 * cell), (0, 0, 0, 0))
+    door.paste((140, 80, 40, 255), (10, 10, cell - 10, 2 * cell - 10))
+    door.save(tmp_path / "door-closed.webp")
+    door.save(tmp_path / "door-open.webp")
+    door.save(tmp_path / "key-lying.webp")
+    Image.new("RGBA", (1, 1), (0, 0, 0, 0)).save(tmp_path / "key-taken.webp")
+    art = {
+        "cell": cell,
+        "size": [4, 4],
+        "ground": "ground.webp",
+        "rows": [],
+        "things": {
+            "door": {
+                "row": 2,
+                "left": cell,
+                "top": cell,
+                "states": {"closed": "door-closed.webp", "open": "door-open.webp"},
+            },
+            "key": {
+                "row": 1,
+                "left": 0,
+                "top": 0,
+                "states": {"lying": "key-lying.webp", "taken": "key-taken.webp"},
+            },
+        },
+    }
+    (tmp_path / "art.json").write_text(json.dumps(art))
+
+    class Scene:
+        id = "drawn"
+        out = tmp_path
+        things = {"door": {"states": {}}, "key": {"states": {}}, "wall": {"static": True}}
+
+    Scene.things["door"]["states"] = art["things"]["door"]["states"]
+    Scene.things["key"]["states"] = art["things"]["key"]["states"]
+    sheet = np.array(Image.open(export_scene.states_sheet(Scene, tmp_path)))
+    # Each panel the thing's box with 0.4 cells round it, three times as large; the
+    # door has the ground and its two states, the key the ground and the state drawn.
+    panel = (cell + 2 * round(export_scene.STATES_MARGIN * cell)) * 3
+    label = export_scene.STATES_LABEL
+    tall = (2 * cell + 2 * round(export_scene.STATES_MARGIN * cell)) * 3
+    assert sheet.shape[0] == (tall + label) * 2
+    assert sheet.shape[1] == 3 * panel + 2 * label
+    magenta = (sheet == export_scene.STATES_EDGE[:3]).all(axis=2)
+    # The ground's panel has no edge; each state's has its edge.
+    assert not magenta[label : label + tall, :panel].any()
+    assert magenta[label : label + tall, panel + label : 2 * panel + label].any()
+    assert magenta[label : label + tall, 2 * panel + 2 * label :].any()
+
+
 def test_a_box_past_the_picture_s_edge_holds_what_of_it_is_in_the_picture():
     inside = export_scene.in_box((10, 10), (-3, 2, 4, 20))
     assert inside[2:, :4].all() and not inside[:, 4:].any() and not inside[:2].any()

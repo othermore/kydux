@@ -235,11 +235,30 @@ row its foot stands on.
   whole doorway, from the arch to the threshold and over the threshold's
   line, is the floor of the room beyond, taken from the painting itself
   where that floor is plain, darker under the arch and as lit as the room
-  at the threshold, laid in by `tools/art/repaint.py doorways` (D108); and
+  at the threshold, laid in by `tools/art/repaint.py doorways` (D108),
+  from one jamb to the other and down to the floor's own dark line under
+  the threshold, so that no board of the leaf is left at its foot; where
+  the stone before the door meets the wood beyond it, a dark line as wide
+  as the painting's outlines is drawn along that foot (`sill_line`); and
   its leaf, so that the door is seen open and the doorway is not taken for
-  the floor, is swung out against the wall beside the arch (`swing`): the
-  shut leaf turned over, narrowed and a little darker, the open state's
-  picture (D111).
+  the floor, is swung out against the wall beside the arch (`swing`), the
+  open state's picture (D111).
+- **A door's leaves are cut by the shapes traced round them** (D113). The
+  open state is the polygon traced by hand on the swung picture (`leaf`,
+  in cells): round the wood, the hinges and the iron of the leaf, on the
+  outer edge of its dark outline, and round the shadow it throws on the
+  wall out to where the shadow fades into the painting's own wall; the
+  free edge and both bottom corners whole, and no stone the model painted
+  again beside the hinges. It is drawn at the painting's size with its
+  edge soft over one pixel, and nothing of it is snapped, flooded or kept
+  by size. The closed state, cut from the painting, ends at the doorway's
+  polygon (`doorway`: the arch's inner line and the floor's line under the
+  threshold), so that no mortar line of the wall beside the arch comes
+  with it. `tools/art/trace.py` helps to trace: `outline` gives a first
+  polygon, `look` a crop at three times the size with a grid every tenth
+  of a cell and the points numbered, and `--diff` shows in red what the
+  model painted again round the leaf. Twenty to sixty points a leaf, the
+  top's curve with a point about every 0.05 cells.
 - **A cut-out ends at the outer edge of its outline** (D93): the outline is
   the thing's, and nothing of the ground beyond it is (`fringe` and `bare`
   in the sweep). Every mask but a box's, and one its thing says not to (`snap: false`),
@@ -260,7 +279,15 @@ row its foot stands on.
 Look at every check picture before committing. Each shows a figure behind
 and in front of a row's things, and `all-<scene>.png` the wizard on every
 cell walked on at once, every door open, as it is when someone stands in
-its doorway, and every passage as dark as the page draws it. To name a cell when something looks wrong, open
+its doorway, and every passage as dark as the page draws it.
+`states-<scene>.png` shows each thing with states, a row each: the ground
+round its box and each state drawn on it, at three times the page's size
+(twice for a thing 300 pixels wide or more), with the state's edge in
+magenta. A door's state is accepted only when that edge lies on the
+leaf's outline all round: the bottom corners whole, the shadow's edge a
+smooth line, no floor or wall inside it but the shadow, no pale fringe
+along the free edge; a closed leaf's edge on the arch's inner line and the
+threshold, no line reaching into the wall. To name a cell when something looks wrong, open
 the game with `?debug` (docs/dev/dev-environment.md).
 
 ## What a painting must keep to

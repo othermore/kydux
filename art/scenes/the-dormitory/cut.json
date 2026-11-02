@@ -181,7 +181,7 @@
       ]
     },
     "front_door": {
-      "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95); open, swung out of it nearly flat against the front wall on its left, its foot on the corridor's floor (D111, door_swung), drawn among the rows as the front wall is, the doorway showing the common room's own floor (D108); it rests shut, and a story opens and closes it (D103).",
+      "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95), its closed leaf within the doorway traced on the painting (`doorway`, D113); open, swung out of it nearly flat against the front wall on its left, its foot on the corridor floor (D111, door_swung), cut by the polygon traced round the leaf, its hinges and its shadow on the wall (`leaf`, D113), drawn among the rows as the front wall is, the doorway showing the common room's own floor down to the corridor floor's line, a dark line where stone meets wood (D108); it rests shut, and a story opens and closes it (D103).",
       "box": [
         9.2,
         12.4,
@@ -198,58 +198,226 @@
           "picture": "dormitory-door-swung.png",
           "without": "dormitory-door-open.png",
           "row": 15,
-          "area": [
+          "leaf": [
             [
-              9.391,
-              13.893
+              10.0,
+              13.105
             ],
             [
-              9.582,
-              13.546
+              10.1,
+              13.035
             ],
             [
-              9.894,
-              13.147
+              10.2,
+              12.98
             ],
             [
-              10.242,
-              12.938
+              10.25,
+              12.96
             ],
             [
-              10.624,
-              12.886
+              10.4,
+              12.915
             ],
             [
-              10.971,
-              12.973
+              10.45,
+              12.905
             ],
             [
-              11.214,
-              13.147
+              10.6,
+              12.885
             ],
             [
-              11.37,
-              13.372
+              10.7,
+              12.885
             ],
             [
-              11.492,
-              13.511
+              10.8,
+              12.905
             ],
             [
-              11.519,
-              15.525
+              10.9,
+              12.94
             ],
             [
-              9.964,
-              16.261
+              11.05,
+              13.03
             ],
             [
-              9.79,
-              16.226
+              11.15,
+              13.115
             ],
             [
-              9.391,
-              15.525
+              11.21,
+              13.2
+            ],
+            [
+              11.27,
+              13.31
+            ],
+            [
+              11.3,
+              13.38
+            ],
+            [
+              11.33,
+              13.474
+            ],
+            [
+              11.357,
+              13.65
+            ],
+            [
+              11.36,
+              13.71
+            ],
+            [
+              11.468,
+              13.73
+            ],
+            [
+              11.468,
+              13.86
+            ],
+            [
+              11.442,
+              13.9
+            ],
+            [
+              11.442,
+              14.02
+            ],
+            [
+              11.375,
+              14.04
+            ],
+            [
+              11.409,
+              14.78
+            ],
+            [
+              11.473,
+              14.81
+            ],
+            [
+              11.473,
+              15.16
+            ],
+            [
+              11.43,
+              15.18
+            ],
+            [
+              11.435,
+              15.4
+            ],
+            [
+              11.5,
+              15.44
+            ],
+            [
+              11.5,
+              15.46
+            ],
+            [
+              11.45,
+              15.468
+            ],
+            [
+              11.25,
+              15.588
+            ],
+            [
+              10.65,
+              15.892
+            ],
+            [
+              10.4,
+              16.012
+            ],
+            [
+              10.2,
+              16.102
+            ],
+            [
+              10.0,
+              16.212
+            ],
+            [
+              9.95,
+              16.245
+            ],
+            [
+              9.81,
+              16.2
+            ],
+            [
+              9.78,
+              16.1
+            ],
+            [
+              9.732,
+              16.0
+            ],
+            [
+              9.674,
+              15.9
+            ],
+            [
+              9.607,
+              15.7
+            ],
+            [
+              9.56,
+              15.6
+            ],
+            [
+              9.529,
+              15.5
+            ],
+            [
+              9.47,
+              15.2
+            ],
+            [
+              9.414,
+              14.8
+            ],
+            [
+              9.372,
+              14.2
+            ],
+            [
+              9.383,
+              14.0
+            ],
+            [
+              9.4,
+              13.9
+            ],
+            [
+              9.46,
+              13.8
+            ],
+            [
+              9.5,
+              13.7
+            ],
+            [
+              9.57,
+              13.6
+            ],
+            [
+              9.648,
+              13.5
+            ],
+            [
+              9.71,
+              13.4
+            ],
+            [
+              9.799,
+              13.3
             ]
           ]
         }
@@ -259,10 +427,164 @@
         14
       ],
       "under": true,
-      "rest": "closed"
+      "rest": "closed",
+      "doorway": [
+        [
+          12.161,
+          12.938
+        ],
+        [
+          12.438,
+          12.943
+        ],
+        [
+          12.505,
+          12.958
+        ],
+        [
+          12.609,
+          12.968
+        ],
+        [
+          12.688,
+          12.998
+        ],
+        [
+          12.87,
+          13.098
+        ],
+        [
+          12.896,
+          13.122
+        ],
+        [
+          12.906,
+          13.157
+        ],
+        [
+          12.938,
+          13.157
+        ],
+        [
+          12.958,
+          13.172
+        ],
+        [
+          13.12,
+          13.347
+        ],
+        [
+          13.188,
+          13.457
+        ],
+        [
+          13.203,
+          13.562
+        ],
+        [
+          13.208,
+          13.741
+        ],
+        [
+          13.167,
+          14.45
+        ],
+        [
+          13.167,
+          15.439
+        ],
+        [
+          11.438,
+          15.449
+        ],
+        [
+          11.438,
+          14.515
+        ],
+        [
+          11.406,
+          14.061
+        ],
+        [
+          11.406,
+          13.821
+        ],
+        [
+          11.422,
+          13.816
+        ],
+        [
+          11.427,
+          13.796
+        ],
+        [
+          11.443,
+          13.781
+        ],
+        [
+          11.443,
+          13.542
+        ],
+        [
+          11.453,
+          13.357
+        ],
+        [
+          11.5,
+          13.292
+        ],
+        [
+          11.536,
+          13.287
+        ],
+        [
+          11.536,
+          13.277
+        ],
+        [
+          11.552,
+          13.262
+        ],
+        [
+          11.552,
+          13.227
+        ],
+        [
+          11.661,
+          13.132
+        ],
+        [
+          11.693,
+          13.132
+        ],
+        [
+          11.698,
+          13.113
+        ],
+        [
+          11.719,
+          13.098
+        ],
+        [
+          11.974,
+          12.983
+        ],
+        [
+          12.031,
+          12.963
+        ],
+        [
+          12.057,
+          12.963
+        ],
+        [
+          12.089,
+          12.943
+        ]
+      ]
     },
     "wall_left": {
-      "about": "The wall between the common room and the left dormitory, its open door's leaf with it: over every figure (D95), the one in its doorway on row 9 too, but for the inside of the open leaf's arch, which is under them (D104): the wall's band, the light strip of the doorway and the leaf's board below the arch, and the cupboard against the wall below, are over them; its foot, the grey of the beam it stands on with no outline between, as drawn.",
+      "about": "The wall between the common room and the left dormitory, its open door's leaf with it: over every figure (D95), the one in its doorway on row 9 too, but for the inside of the open leaf's arch, which is under them (D104): the wall's band, the light strip of the doorway and the leaf's board below the arch, and the cupboard against the wall below, are over them; its foot, the grey of the beam it stands on with no outline between, as drawn. Where the front door's leaf lies open over its foot, the leaf's traced shape is a hole in it, so that the leaf is whole (D113).",
       "box": [
         8.3,
         3.95,
@@ -380,6 +702,228 @@
           [
             9.12,
             8.93
+          ]
+        ],
+        [
+          [
+            10.0,
+            13.105
+          ],
+          [
+            10.1,
+            13.035
+          ],
+          [
+            10.2,
+            12.98
+          ],
+          [
+            10.25,
+            12.96
+          ],
+          [
+            10.4,
+            12.915
+          ],
+          [
+            10.45,
+            12.905
+          ],
+          [
+            10.6,
+            12.885
+          ],
+          [
+            10.7,
+            12.885
+          ],
+          [
+            10.8,
+            12.905
+          ],
+          [
+            10.9,
+            12.94
+          ],
+          [
+            11.05,
+            13.03
+          ],
+          [
+            11.15,
+            13.115
+          ],
+          [
+            11.21,
+            13.2
+          ],
+          [
+            11.27,
+            13.31
+          ],
+          [
+            11.3,
+            13.38
+          ],
+          [
+            11.33,
+            13.474
+          ],
+          [
+            11.357,
+            13.65
+          ],
+          [
+            11.36,
+            13.71
+          ],
+          [
+            11.468,
+            13.73
+          ],
+          [
+            11.468,
+            13.86
+          ],
+          [
+            11.442,
+            13.9
+          ],
+          [
+            11.442,
+            14.02
+          ],
+          [
+            11.375,
+            14.04
+          ],
+          [
+            11.409,
+            14.78
+          ],
+          [
+            11.473,
+            14.81
+          ],
+          [
+            11.473,
+            15.16
+          ],
+          [
+            11.43,
+            15.18
+          ],
+          [
+            11.435,
+            15.4
+          ],
+          [
+            11.5,
+            15.44
+          ],
+          [
+            11.5,
+            15.46
+          ],
+          [
+            11.45,
+            15.468
+          ],
+          [
+            11.25,
+            15.588
+          ],
+          [
+            10.65,
+            15.892
+          ],
+          [
+            10.4,
+            16.012
+          ],
+          [
+            10.2,
+            16.102
+          ],
+          [
+            10.0,
+            16.212
+          ],
+          [
+            9.95,
+            16.245
+          ],
+          [
+            9.81,
+            16.2
+          ],
+          [
+            9.78,
+            16.1
+          ],
+          [
+            9.732,
+            16.0
+          ],
+          [
+            9.674,
+            15.9
+          ],
+          [
+            9.607,
+            15.7
+          ],
+          [
+            9.56,
+            15.6
+          ],
+          [
+            9.529,
+            15.5
+          ],
+          [
+            9.47,
+            15.2
+          ],
+          [
+            9.414,
+            14.8
+          ],
+          [
+            9.372,
+            14.2
+          ],
+          [
+            9.383,
+            14.0
+          ],
+          [
+            9.4,
+            13.9
+          ],
+          [
+            9.46,
+            13.8
+          ],
+          [
+            9.5,
+            13.7
+          ],
+          [
+            9.57,
+            13.6
+          ],
+          [
+            9.648,
+            13.5
+          ],
+          [
+            9.71,
+            13.4
+          ],
+          [
+            9.799,
+            13.3
           ]
         ]
       ]
@@ -985,7 +1529,7 @@
     ]
   },
   "doorways": {
-    "about": "The front door opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch to the threshold and the threshold's line, painted with the common room's own floor, darker under the arch.",
+    "about": "The front door opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch down to the corridor floor's own dark line under the threshold and from one jamb to the other, painted with the common room's own floor, darker under the arch, with a dark line drawn along its foot where the corridor's stone meets the common room's wood (`sill_line`); the fill is laid into the marked picture too (`also`).",
     "doors": [
       {
         "thing": "front_door",
@@ -1019,6 +1563,10 @@
           12.4,
           13.4,
           15.4
+        ],
+        "sill_line": true,
+        "also": [
+          "art/raw/game-dormitory/dormitory-marked.png"
         ]
       }
     ]

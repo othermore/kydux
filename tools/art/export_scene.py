@@ -15,9 +15,11 @@ the colours it is read by, and its SOURCE.md. The cells come from the scene's
 map, content/scenes/<scene>/map.txt, marked by hand, which the world plays on
 too. `all`, the default, is `scene` then `check`.
 
-`check` draws pictures of the exported scene to look at, then sweeps it
-(tools/art/sweep.py) and fails when its cut-outs would show a figure a
-problem: a shadow or a flower drawn in front, the lawn drawn in front, a hole.
+`check` draws pictures of the exported scene to look at, among them
+states-<scene>.png, each door's states over the ground at three times their
+size with their edges marked (D113), then sweeps it (tools/art/sweep.py) and
+fails when its cut-outs would show a figure a problem: a shadow or a flower
+drawn in front, the lawn drawn in front, a hole.
 
 `scene` writes content/art/scenes/<scene>/:
 
@@ -35,7 +37,9 @@ problem: a shadow or a flower drawn in front, the lawn drawn in front, a hole.
   still opens;
 - <thing>-<state>.webp: each state of what opens or is picked up, cut by the
   difference between the picture of that state and the edit without the thing,
-  and trimmed at its own row's bottom edge;
+  and trimmed at its own row's bottom edge; a door's leaf swung open is cut by
+  the polygon traced round it (`leaf`), and its closed leaf within its
+  doorway's (`doorway`), D113;
 - art.json, which says where each image goes (the page's contract), and
   SOURCE.md.
 
@@ -230,6 +234,75 @@ def native_area(shape: tuple[int, int], grid: dict, area: list) -> np.ndarray:
     image = Image.new("L", shape[::-1], 0)
     ImageDraw.Draw(image).polygon(corners, fill=255)
     return np.array(image) > 0
+
+
+#: How many times larger a traced polygon is drawn before it is averaged down to the
+#: painting's size, so that its edge is soft over one pixel (D113).
+SOFT = 4
+
+
+def soft_area(shape: tuple[int, int], grid: dict, area: list) -> np.ndarray:
+    """A polygon in cells as an alpha in the painting's pixels: 1 inside, 0 outside,
+    and between over one pixel at its edge, drawn SOFT times larger and averaged
+    down within its own box."""
+    gx, gy = grid["x"], grid["y"]
+    corners = [
+        (gx["offset"] + x * gx["spacing"], gy["offset"] + y * gy["spacing"]) for x, y in area
+    ]
+    height, width = shape
+    xs, ys = [x for x, _ in corners], [y for _, y in corners]
+    x0, y0 = max(0, int(np.floor(min(xs))) - 1), max(0, int(np.floor(min(ys))) - 1)
+    x1, y1 = min(width, int(np.ceil(max(xs))) + 1), min(height, int(np.ceil(max(ys))) + 1)
+    alpha = np.zeros(shape, dtype=np.float32)
+    if x1 <= x0 or y1 <= y0:
+        return alpha
+    large = Image.new("L", ((x1 - x0) * SOFT, (y1 - y0) * SOFT), 0)
+    # Each small pixel taken by its middle, half a small pixel off its corner.
+    ImageDraw.Draw(large).polygon(
+        [((x - x0) * SOFT - 0.5, (y - y0) * SOFT - 0.5) for x, y in corners], fill=255
+    )
+    cells = np.array(large).astype(np.float32) / 255
+    alpha[y0:y1, x0:x1] = cells.reshape(y1 - y0, SOFT, x1 - x0, SOFT).mean(axis=(1, 3))
+    return alpha
+
+
+def state_alpha(
+    settings: Settings,
+    thing: dict,
+    picture: str | dict,
+    painting: np.ndarray,
+    without: np.ndarray,
+    native: tuple[int, int, int, int],
+    th: dict | None,
+) -> tuple[np.ndarray, np.ndarray]:
+    """A state's picture and its alpha, in the painting's own pixels. A door's leaf
+    swung open is the polygon traced round it on its picture (`leaf`), nothing else;
+    a door's closed leaf is the painting within its doorway's polygon (`doorway`),
+    the arch's inner line and the threshold, so that no line of the wall beside the
+    arch comes with it and nothing of the open doorway shows through it (D113)."""
+    grid = settings.grid
+    spacing = round(grid["x"]["spacing"])
+    if picture == "painting":
+        if "doorway" in thing:
+            return painting, soft_area(painting.shape[:2], grid, thing["doorway"])
+        marks = None
+        if "marked" in thing:
+            marks = np.array(Image.open(settings.edits / thing["marked"]).convert("RGB"))
+        return painting, sprite_alpha(painting, without, native, thing, spacing, th, marks)
+    if picture == "without":
+        # The open door is the dark where the closed door was.
+        return without, sprite_alpha(painting, without, native, thing, spacing, th)
+    if isinstance(picture, dict):
+        shown = np.array(Image.open(settings.edits / picture["picture"]).convert("RGB"))
+        if "leaf" in picture:
+            return shown, soft_area(painting.shape[:2], grid, picture["leaf"])
+        # A state cut from a picture against its own edit without it: a book
+        # glowing as the spell takes it.
+        apart = np.array(Image.open(settings.edits / picture["without"]).convert("RGB"))
+        own = {**thing, "solid": picture.get("solid", thing["solid"])}
+        return shown, sprite_alpha(shown, apart, native, own, spacing, th)
+    shown = np.array(Image.open(settings.edits / picture).convert("RGB"))
+    return shown, sprite_alpha(shown, without, native, thing, spacing, th)
 
 
 def static_alpha(
@@ -629,23 +702,13 @@ def scene(settings: Settings) -> Path:
     for name, thing in settings.things.items():
         if thing.get("static"):
             continue
-        marks = None
-        if "marked" in thing:
-            marks = np.array(Image.open(settings.edits / thing["marked"]).convert("RGB"))
         native = native_box(grid, thing["box"])
         without = withouts[name]
         for picture in thing["states"].values():
             # A state that is drawn only away from where the thing lies is not here.
             if picture is None or isinstance(picture, dict):
                 continue
-            shown = (
-                painting
-                if picture == "painting"
-                else without
-                if picture == "without"
-                else np.array(Image.open(settings.edits / picture).convert("RGB"))
-            )
-            alpha = sprite_alpha(shown, without, native, thing, spacing, th, marks)
+            _, alpha = state_alpha(settings, thing, picture, painting, without, native, th)
             doors |= alpha > 0.5
     things = {}
     for name, thing in settings.things.items():
@@ -684,30 +747,7 @@ def scene(settings: Settings) -> Path:
                 # Nothing is drawn: the ground under it is the thing's absence.
                 webp(Image.new("RGBA", (1, 1), (0, 0, 0, 0)), out / states[state])
                 continue
-            if picture == "painting":
-                shown = painting
-                marks = None
-                if "marked" in thing:
-                    marks = np.array(Image.open(settings.edits / thing["marked"]).convert("RGB"))
-                alpha = sprite_alpha(painting, without, native, thing, spacing, th, marks)
-            elif picture == "without":
-                # The open door is the dark where the closed door was.
-                shown, alpha = without, sprite_alpha(painting, without, native, thing, spacing, th)
-            elif isinstance(picture, dict):
-                # A state cut from a picture against its own edit without it: a book
-                # glowing as the spell takes it.
-                shown = np.array(Image.open(settings.edits / picture["picture"]).convert("RGB"))
-                apart = np.array(Image.open(settings.edits / picture["without"]).convert("RGB"))
-                own = {**thing, "solid": picture.get("solid", thing["solid"])}
-                alpha = sprite_alpha(shown, apart, native, own, spacing, th)
-                # Only what lies within its `area`, a polygon in cells: a door's leaf
-                # swung open and its shadow, not the stones and the floor a model drew
-                # again round it (D111).
-                if "area" in picture:
-                    alpha = alpha * native_area(painting.shape[:2], grid, picture["area"])
-            else:
-                shown = np.array(Image.open(settings.edits / picture).convert("RGB"))
-                alpha = sprite_alpha(shown, without, native, thing, spacing, th)
+            shown, alpha = state_alpha(settings, thing, picture, painting, without, native, th)
             rgba = np.dstack([shown, (alpha * 255).astype(np.uint8)])
             sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
             sprite = sprite.copy()
@@ -1010,8 +1050,8 @@ def draw(
 
 def checks(settings: Settings, out: Path = RAW / "game-check") -> list[Path]:
     """Pictures of the exported scene with figures standing behind and in front of
-    what stands up, at the levels' starts, and the things open and shut, each named
-    after the scene."""
+    what stands up, at the levels' starts, the things open and shut, and every
+    thing's states with their edges marked, each named after the scene."""
     marks = settings.marks()
     rows, columns = len(marks), len(marks[0])
     walked = sweep.walks(settings.id)
@@ -1066,7 +1106,100 @@ def checks(settings: Settings, out: Path = RAW / "game-check") -> list[Path]:
         target = out / f"{settings.id}-close-{name}.png"
         both.save(target)
         written.append(target)
+    written.append(states_sheet(settings, out))
     return written
+
+
+#: The states sheet (D113): the margin round a thing's box, in cells; how much a
+#: thing narrower than STATES_NARROW pixels of the page is enlarged, and a wider one;
+#: the edge's colour, and the height of a panel's name.
+STATES_MARGIN = 0.4
+STATES_NARROW = 300
+STATES_LARGE, STATES_SMALL = 3, 2
+STATES_EDGE = (255, 0, 255, 255)
+STATES_LABEL = 16
+
+
+def edge_of(alpha: np.ndarray) -> np.ndarray:
+    """A mask's edge: a pixel drawn beside one not drawn at all, either way."""
+    drawn = alpha > 0
+    beside = np.zeros_like(drawn)
+    beside[1:] |= ~drawn[:-1]
+    beside[:-1] |= ~drawn[1:]
+    beside[:, 1:] |= ~drawn[:, :-1]
+    beside[:, :-1] |= ~drawn[:, 1:]
+    return drawn & beside
+
+
+def state_panels(folder: Path, name: str) -> list[tuple[str, Image.Image]]:
+    """A thing of an exported scene as the page draws it, at the page's size: the
+    ground round its box, then each of its states composed on that ground with the
+    state's edge in magenta, enlarged as STATES_LARGE or STATES_SMALL says."""
+    art = json.loads((folder / "art.json").read_text())
+    cell = art["cell"]
+    thing = art["things"][name]
+    ox, oy = art.get("origin", [0, 0])
+    ground = Image.open(folder / art["ground"]).convert("RGBA")
+    images = {
+        state: Image.open(folder / file).convert("RGBA") for state, file in thing["states"].items()
+    }
+    width = max(image.width for image in images.values())
+    height = max(image.height for image in images.values())
+    margin = round(STATES_MARGIN * cell)
+    left, top = thing["left"] + ox - margin, thing["top"] + oy - margin
+    box = (left, top, left + width + 2 * margin, top + height + 2 * margin)
+    times = STATES_LARGE if width < STATES_NARROW else STATES_SMALL
+    size = ((box[2] - box[0]) * times, (box[3] - box[1]) * times)
+    plain = ground.crop(box)
+    panels = [("ground", plain.resize(size, Image.LANCZOS))]
+    for state, image in images.items():
+        if image.width <= 1 and image.height <= 1:
+            continue
+        layer = Image.new("RGBA", plain.size, (0, 0, 0, 0))
+        layer.alpha_composite(image, (margin, margin))
+        shown = plain.copy()
+        shown.alpha_composite(layer)
+        shown = shown.resize(size, Image.LANCZOS)
+        # The edge at the enlarged size, a line one pixel wide between the pixels of
+        # the state that are drawn and those that are not.
+        alpha = np.array(layer.resize(size, Image.NEAREST))[..., 3]
+        pixels = np.array(shown)
+        pixels[edge_of(alpha)] = STATES_EDGE
+        panels.append((state, Image.fromarray(pixels)))
+    return panels
+
+
+def states_sheet(settings: Settings, out: Path) -> Path:
+    """Every thing of the scene that has states, a row each: the ground round it and
+    each state on it, its edge marked, named over each panel, side by side on black
+    (D113)."""
+    rows = []
+    for name, thing in settings.things.items():
+        if thing.get("static") or not thing.get("states"):
+            continue
+        panels = state_panels(settings.out, name)
+        width = sum(panel.width for _, panel in panels) + STATES_LABEL * (len(panels) - 1)
+        height = max(panel.height for _, panel in panels) + STATES_LABEL
+        row = Image.new("RGBA", (width, height), (0, 0, 0, 255))
+        pen = ImageDraw.Draw(row)
+        x = 0
+        for state, panel in panels:
+            pen.text((x + 2, 2), f"{name}: {state}", fill=(255, 255, 255, 255))
+            row.alpha_composite(panel, (x, STATES_LABEL))
+            x += panel.width + STATES_LABEL
+        rows.append(row)
+    sheet = Image.new(
+        "RGBA",
+        (max([row.width for row in rows], default=1), sum(row.height for row in rows) or 1),
+        (0, 0, 0, 255),
+    )
+    y = 0
+    for row in rows:
+        sheet.alpha_composite(row, (0, y))
+        y += row.height
+    target = out / f"states-{settings.id}.png"
+    sheet.convert("RGB").save(target)
+    return target
 
 
 if __name__ == "__main__":

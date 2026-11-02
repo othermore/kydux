@@ -212,7 +212,7 @@
     "painting": "art/raw/game-library6/library-room-swung.png"
   },
   "doorways": {
-    "about": "Each door of the library opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch to the threshold and the threshold's line, painted with the floor of the room beyond from the painting itself, darker under the arch and as lit as the room at the threshold.",
+    "about": "Each door of the library opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch down to the floor's own dark line under the threshold (to the jambs' foot for Wenna's door, `sill` 0) and from one jamb to the other, painted with the floor of the room beyond from the painting itself, darker under the arch and as lit as the room at the threshold; a dark line drawn along the foot of Wenna's door, where the hall's wood meets the reading room's stone (`sill_line`); the fill laid into the ground-only and marked pictures too (`also`).",
     "doors": [
       {
         "thing": "wenna_door",
@@ -235,12 +235,17 @@
           11.85
         ],
         "painting": "library-wenna-doorway.png",
-        "sill": 0.08,
+        "sill": 0.0,
         "leaf": [
           6.6,
           15.4,
           8.4,
           17.0
+        ],
+        "sill_line": true,
+        "also": [
+          "art/raw/game-library6/library-ground-bare-book.png",
+          "art/raw/game-library6/library-marked-book.png"
         ]
       },
       {
@@ -259,12 +264,16 @@
           6.9
         ],
         "painting": "library-centre-doorway.png",
-        "sill": 0.08,
+        "sill": 0.3,
         "leaf": [
           6.6,
           7.4,
           8.4,
           9.0
+        ],
+        "also": [
+          "art/raw/game-library6/library-ground-bare-book.png",
+          "art/raw/game-library6/library-marked-book.png"
         ]
       },
       {
@@ -283,12 +292,16 @@
           6.9
         ],
         "painting": "library-room-doorway.png",
-        "sill": 0.06,
+        "sill": 0.1,
         "leaf": [
           1.8,
           4.7,
           3.1,
           6.0
+        ],
+        "also": [
+          "art/raw/game-library6/library-ground-bare-book.png",
+          "art/raw/game-library6/library-marked-book.png"
         ]
       }
     ]
@@ -426,54 +439,214 @@
           "picture": "library-wenna-swung.png",
           "without": "library-wenna-doorway.png",
           "row": 17,
-          "area": [
+          "leaf": [
             [
-              7.982,
-              15.994
+              8.45,
+              15.495
             ],
             [
-              8.051,
-              15.682
+              8.55,
+              15.493
             ],
             [
-              8.232,
-              15.543
+              8.65,
+              15.495
             ],
             [
-              8.51,
-              15.494
+              8.75,
+              15.54
             ],
             [
-              8.822,
-              15.564
+              8.85,
+              15.6
             ],
             [
-              9.031,
-              15.744
+              8.891,
+              15.65
             ],
             [
-              9.197,
-              15.89
+              8.94,
+              15.7
             ],
             [
-              9.246,
-              17.147
+              9.02,
+              15.74
             ],
             [
-              9.086,
-              17.356
+              9.1,
+              15.8
             ],
             [
-              8.683,
-              17.251
+              9.16,
+              15.86
             ],
             [
-              8.051,
-              17.043
+              9.2,
+              15.95
             ],
             [
-              7.982,
-              16.974
+              9.215,
+              16.05
+            ],
+            [
+              9.222,
+              16.2
+            ],
+            [
+              9.225,
+              16.4
+            ],
+            [
+              9.222,
+              16.8
+            ],
+            [
+              9.226,
+              17.1
+            ],
+            [
+              9.195,
+              17.15
+            ],
+            [
+              9.164,
+              17.2
+            ],
+            [
+              9.147,
+              17.25
+            ],
+            [
+              9.102,
+              17.3
+            ],
+            [
+              9.07,
+              17.345
+            ],
+            [
+              9.0,
+              17.335
+            ],
+            [
+              8.95,
+              17.326
+            ],
+            [
+              8.9,
+              17.309
+            ],
+            [
+              8.8,
+              17.275
+            ],
+            [
+              8.7,
+              17.237
+            ],
+            [
+              8.6,
+              17.207
+            ],
+            [
+              8.55,
+              17.194
+            ],
+            [
+              8.52,
+              17.17
+            ],
+            [
+              8.5,
+              17.156
+            ],
+            [
+              8.45,
+              17.156
+            ],
+            [
+              8.4,
+              17.139
+            ],
+            [
+              8.3,
+              17.105
+            ],
+            [
+              8.25,
+              17.088
+            ],
+            [
+              8.2,
+              17.07
+            ],
+            [
+              8.15,
+              17.047
+            ],
+            [
+              8.09,
+              17.022
+            ],
+            [
+              8.085,
+              17.0
+            ],
+            [
+              8.085,
+              16.1
+            ],
+            [
+              8.065,
+              16.05
+            ],
+            [
+              8.07,
+              16.0
+            ],
+            [
+              8.074,
+              15.95
+            ],
+            [
+              8.083,
+              15.9
+            ],
+            [
+              8.096,
+              15.85
+            ],
+            [
+              8.114,
+              15.8
+            ],
+            [
+              8.136,
+              15.75
+            ],
+            [
+              8.168,
+              15.7
+            ],
+            [
+              8.2,
+              15.661
+            ],
+            [
+              8.25,
+              15.614
+            ],
+            [
+              8.3,
+              15.585
+            ],
+            [
+              8.35,
+              15.555
+            ],
+            [
+              8.4,
+              15.515
             ]
           ]
         }
@@ -482,10 +655,113 @@
         7,
         16
       ],
-      "about": "Wenna's door, in the wall between the reading room and the shelves: open, swung out nearly flat against its wall beside the arch (D111, wenna_swung), its doorway showing the floor of the room beyond (doorways, D108); shut, it is over whoever stands in its doorway (D95).",
+      "about": "Wenna's door, in the wall between the reading room and the shelves: open, swung out nearly flat against its wall beside the arch (D111, wenna_swung), cut by the polygon traced round the leaf and its shadow on the wall (`leaf`, D113), its doorway showing the floor of the room beyond down to the jambs' foot, a dark line where the hall's wood meets the reading room's stone (doorways, D108); shut, it is over whoever stands in its doorway (D95), its leaf within the doorway traced on the painting (`doorway`, D113).",
       "opening": 1.17,
       "under": true,
-      "rest": "open"
+      "rest": "open",
+      "doorway": [
+        [
+          7.485,
+          15.642
+        ],
+        [
+          7.71,
+          15.655
+        ],
+        [
+          7.737,
+          15.663
+        ],
+        [
+          7.745,
+          15.676
+        ],
+        [
+          7.798,
+          15.689
+        ],
+        [
+          7.926,
+          15.761
+        ],
+        [
+          7.997,
+          15.829
+        ],
+        [
+          8.05,
+          15.906
+        ],
+        [
+          8.103,
+          16.046
+        ],
+        [
+          8.116,
+          16.114
+        ],
+        [
+          8.116,
+          17.046
+        ],
+        [
+          6.938,
+          17.046
+        ],
+        [
+          6.938,
+          16.14
+        ],
+        [
+          6.942,
+          16.084
+        ],
+        [
+          6.964,
+          15.991
+        ],
+        [
+          6.986,
+          15.957
+        ],
+        [
+          7.022,
+          15.923
+        ],
+        [
+          7.075,
+          15.846
+        ],
+        [
+          7.088,
+          15.816
+        ],
+        [
+          7.132,
+          15.761
+        ],
+        [
+          7.229,
+          15.719
+        ],
+        [
+          7.278,
+          15.71
+        ],
+        [
+          7.295,
+          15.685
+        ],
+        [
+          7.335,
+          15.668
+        ],
+        [
+          7.401,
+          15.651
+        ]
+      ],
+      "reach": 0.05
     },
     "centre_door": {
       "box": [
@@ -503,54 +779,210 @@
           "picture": "library-centre-swung.png",
           "without": "library-centre-doorway.png",
           "row": 9,
-          "area": [
+          "leaf": [
             [
-              7.999,
-              8.083
+              8.45,
+              7.61
             ],
             [
-              8.086,
-              7.799
+              8.55,
+              7.627
             ],
             [
-              8.301,
-              7.625
+              8.65,
+              7.648
             ],
             [
-              8.544,
-              7.59
+              8.75,
+              7.69
             ],
             [
-              8.822,
-              7.66
+              8.8,
+              7.68
             ],
             [
-              9.003,
-              7.799
+              8.95,
+              7.69
             ],
             [
-              9.107,
-              8.042
+              9.06,
+              7.72
             ],
             [
-              9.128,
-              9.514
+              9.12,
+              7.78
             ],
             [
-              9.051,
-              9.611
+              9.13,
+              7.9
             ],
             [
-              8.544,
-              9.479
+              9.125,
+              8.05
             ],
             [
-              8.086,
-              9.201
+              9.1,
+              8.2
             ],
             [
-              7.999,
-              9.132
+              9.1,
+              8.4
+            ],
+            [
+              9.115,
+              8.6
+            ],
+            [
+              9.13,
+              8.8
+            ],
+            [
+              9.13,
+              9.0
+            ],
+            [
+              9.12,
+              9.2
+            ],
+            [
+              9.12,
+              9.4
+            ],
+            [
+              9.1,
+              9.5
+            ],
+            [
+              9.08,
+              9.6
+            ],
+            [
+              9.05,
+              9.65
+            ],
+            [
+              9.03,
+              9.68
+            ],
+            [
+              8.97,
+              9.705
+            ],
+            [
+              8.9,
+              9.688
+            ],
+            [
+              8.8,
+              9.632
+            ],
+            [
+              8.7,
+              9.568
+            ],
+            [
+              8.6,
+              9.504
+            ],
+            [
+              8.5,
+              9.441
+            ],
+            [
+              8.4,
+              9.381
+            ],
+            [
+              8.3,
+              9.309
+            ],
+            [
+              8.2,
+              9.253
+            ],
+            [
+              8.15,
+              9.215
+            ],
+            [
+              8.1,
+              9.181
+            ],
+            [
+              8.088,
+              9.165
+            ],
+            [
+              8.088,
+              9.0
+            ],
+            [
+              8.075,
+              8.98
+            ],
+            [
+              8.025,
+              8.98
+            ],
+            [
+              8.025,
+              8.73
+            ],
+            [
+              8.074,
+              8.72
+            ],
+            [
+              8.074,
+              8.35
+            ],
+            [
+              8.015,
+              8.33
+            ],
+            [
+              8.012,
+              8.08
+            ],
+            [
+              8.074,
+              8.07
+            ],
+            [
+              8.092,
+              8.0
+            ],
+            [
+              8.113,
+              7.9
+            ],
+            [
+              8.127,
+              7.852
+            ],
+            [
+              8.15,
+              7.805
+            ],
+            [
+              8.183,
+              7.738
+            ],
+            [
+              8.23,
+              7.69
+            ],
+            [
+              8.305,
+              7.652
+            ],
+            [
+              8.35,
+              7.627
+            ],
+            [
+              8.4,
+              7.614
             ]
           ]
         }
@@ -559,10 +991,141 @@
         7,
         8
       ],
-      "about": "The door in the middle of the wall between the wide hall and the top aisle: open, its doorway shows the floor of the aisle beyond from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
+      "about": "The door in the middle of the wall between the wide hall and the top aisle: open, swung out against the wall beside the arch (D111, centre_swung), cut by the polygon traced round the leaf, its hinges and its shadow (`leaf`, D113), its doorway showing the floor of the aisle beyond from the arch down to the threshold's own line (doorways); shut, it is over whoever stands in its doorway (D95), its leaf within the doorway traced on the painting (`doorway`, D113).",
       "opening": 1.18,
       "under": true,
-      "rest": "open"
+      "rest": "open",
+      "doorway": [
+        [
+          7.481,
+          7.591
+        ],
+        [
+          7.622,
+          7.595
+        ],
+        [
+          7.701,
+          7.608
+        ],
+        [
+          7.754,
+          7.629
+        ],
+        [
+          7.772,
+          7.646
+        ],
+        [
+          7.785,
+          7.646
+        ],
+        [
+          7.904,
+          7.697
+        ],
+        [
+          8.015,
+          7.799
+        ],
+        [
+          8.076,
+          7.876
+        ],
+        [
+          8.085,
+          7.901
+        ],
+        [
+          8.129,
+          7.969
+        ],
+        [
+          8.151,
+          8.067
+        ],
+        [
+          8.151,
+          8.241
+        ],
+        [
+          8.169,
+          8.488
+        ],
+        [
+          8.169,
+          9.1
+        ],
+        [
+          6.845,
+          9.113
+        ],
+        [
+          6.845,
+          8.241
+        ],
+        [
+          6.854,
+          8.212
+        ],
+        [
+          6.867,
+          8.067
+        ],
+        [
+          6.929,
+          7.893
+        ],
+        [
+          6.977,
+          7.824
+        ],
+        [
+          7.0,
+          7.803
+        ],
+        [
+          7.017,
+          7.803
+        ],
+        [
+          7.022,
+          7.782
+        ],
+        [
+          7.079,
+          7.731
+        ],
+        [
+          7.119,
+          7.705
+        ],
+        [
+          7.216,
+          7.659
+        ],
+        [
+          7.233,
+          7.659
+        ],
+        [
+          7.238,
+          7.65
+        ],
+        [
+          7.295,
+          7.629
+        ],
+        [
+          7.353,
+          7.62
+        ],
+        [
+          7.436,
+          7.595
+        ]
+      ],
+      "reach": 0.1
     },
     "room_door": {
       "box": [
@@ -580,50 +1143,190 @@
           "picture": "library-room-swung.png",
           "without": "library-room-doorway.png",
           "row": 6,
-          "area": [
+          "leaf": [
             [
-              1.99,
-              5.075
+              1.6,
+              5.109
             ],
             [
-              2.049,
-              5.214
+              1.65,
+              5.08
             ],
             [
-              2.153,
-              5.353
+              1.7,
+              5.065
             ],
             [
-              2.174,
-              6.089
+              1.75,
+              5.058
             ],
             [
-              1.556,
-              6.478
+              1.8,
+              5.06
             ],
             [
-              1.41,
-              6.374
+              1.85,
+              5.07
             ],
             [
-              1.323,
-              6.096
-            ],
-            [
-              1.34,
-              5.526
-            ],
-            [
-              1.444,
-              5.266
-            ],
-            [
-              1.618,
+              1.9,
               5.092
             ],
             [
-              1.833,
-              5.023
+              1.95,
+              5.121
+            ],
+            [
+              1.984,
+              5.15
+            ],
+            [
+              2.011,
+              5.2
+            ],
+            [
+              2.033,
+              5.25
+            ],
+            [
+              2.04,
+              5.262
+            ],
+            [
+              2.08,
+              5.25
+            ],
+            [
+              2.108,
+              5.262
+            ],
+            [
+              2.108,
+              5.5
+            ],
+            [
+              2.059,
+              5.52
+            ],
+            [
+              2.059,
+              5.8
+            ],
+            [
+              2.108,
+              5.82
+            ],
+            [
+              2.108,
+              6.03
+            ],
+            [
+              2.05,
+              6.055
+            ],
+            [
+              2.0,
+              6.097
+            ],
+            [
+              1.95,
+              6.136
+            ],
+            [
+              1.9,
+              6.17
+            ],
+            [
+              1.85,
+              6.2
+            ],
+            [
+              1.8,
+              6.229
+            ],
+            [
+              1.75,
+              6.272
+            ],
+            [
+              1.7,
+              6.306
+            ],
+            [
+              1.65,
+              6.336
+            ],
+            [
+              1.6,
+              6.36
+            ],
+            [
+              1.55,
+              6.39
+            ],
+            [
+              1.5,
+              6.425
+            ],
+            [
+              1.45,
+              6.435
+            ],
+            [
+              1.4,
+              6.41
+            ],
+            [
+              1.375,
+              6.4
+            ],
+            [
+              1.335,
+              6.35
+            ],
+            [
+              1.305,
+              6.25
+            ],
+            [
+              1.29,
+              6.1
+            ],
+            [
+              1.28,
+              5.95
+            ],
+            [
+              1.29,
+              5.8
+            ],
+            [
+              1.285,
+              5.6
+            ],
+            [
+              1.29,
+              5.45
+            ],
+            [
+              1.32,
+              5.32
+            ],
+            [
+              1.4,
+              5.25
+            ],
+            [
+              1.45,
+              5.225
+            ],
+            [
+              1.503,
+              5.2
+            ],
+            [
+              1.547,
+              5.15
             ]
           ]
         }
@@ -632,9 +1335,99 @@
         2,
         5
       ],
-      "about": "The door of Eldra's little room, at the top aisle's left end: open, its doorway shows the room's floor from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
+      "about": "The door of Eldra's little room, at the top aisle's left end: open, swung out against the wall beside the arch (D111, room_swung), cut by the polygon traced round the leaf, its hinges and its shadow (`leaf`, D113), its doorway showing the room's floor from the arch down to the threshold's own line (doorways); shut, it is over whoever stands in its doorway (D95), its leaf within the doorway traced on the painting (`doorway`, D113).",
       "under": true,
-      "rest": "open"
+      "rest": "open",
+      "doorway": [
+        [
+          2.406,
+          5.043
+        ],
+        [
+          2.609,
+          5.047
+        ],
+        [
+          2.639,
+          5.056
+        ],
+        [
+          2.648,
+          5.068
+        ],
+        [
+          2.684,
+          5.073
+        ],
+        [
+          2.785,
+          5.128
+        ],
+        [
+          2.851,
+          5.192
+        ],
+        [
+          2.917,
+          5.268
+        ],
+        [
+          2.94,
+          5.319
+        ],
+        [
+          2.953,
+          5.383
+        ],
+        [
+          2.953,
+          6.025
+        ],
+        [
+          2.008,
+          6.03
+        ],
+        [
+          2.004,
+          5.375
+        ],
+        [
+          2.026,
+          5.294
+        ],
+        [
+          2.044,
+          5.255
+        ],
+        [
+          2.075,
+          5.213
+        ],
+        [
+          2.167,
+          5.128
+        ],
+        [
+          2.238,
+          5.085
+        ],
+        [
+          2.264,
+          5.073
+        ],
+        [
+          2.286,
+          5.073
+        ],
+        [
+          2.313,
+          5.056
+        ],
+        [
+          2.344,
+          5.047
+        ]
+      ]
     },
     "wenna_door_arch": {
       "about": "The stone arch round Wenna's door, over whoever stands in its doorway: the arch's dome and its sides down to the floor, the door's own cut-out left to the door.",
@@ -1610,6 +2403,12 @@
       14.98,
       11.65,
       15.45
+    ],
+    [
+      2.0,
+      5.2,
+      2.12,
+      6.0
     ]
   ],
   "grounds": [

@@ -113,7 +113,8 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 repaint.py mends a chosen painting in a few boxes and nowhere
                 else and opens its doorways (D88, D108),
                 export_scene.py makes
-                content/art/ and
+                content/art/ and draws each door's states over the
+                painting at three times their size to check (D113), and
                 sweep.py stands the wizard on every cell of a scene to check
                 the cut, figures.py
                 makes the figures' sheets from the base sheets in art/figures/,
@@ -1621,8 +1622,11 @@ one overturns stays, marked as superseded.
   opening of an open door is filled with the floor of the room beyond,
   taken from the painting itself where that floor is plain, darker under
   the arch and as lit as the room at the threshold, never brighter; the
-  fill covers the leaf and its threshold's line (`sill`), so that no line
-  of the frame is left on the floor (`repaint.py doorways`). The fill is
+  fill covers the leaf from one jamb to the other down to the floor's own
+  dark line under the threshold (`sill`), so that no board or line of the
+  frame is left on the floor, and where stone meets wood a dark line is
+  drawn along its foot as the painting draws one wherever the two meet
+  (`sill_line`; `repaint.py doorways`). The fill is
   the ground's, under every figure, so that a figure standing beyond the
   door is seen through it and not counted as hidden by it; the open
   door's own picture is its leaf, swung beside the doorway (D111). Rules
@@ -1635,9 +1639,9 @@ one overturns stays, marked as superseded.
   beside the arch, over the wall. The leaf is the painting's own, shut,
   turned over, narrowed to the span it lies in and a little darker
   (`repaint.py doorways`, `swing`); it is the open state's picture, cut
-  against the doorway's, and is drawn among the rows as the wall it lies
-  on is (a state's own `row`, the dormitory's front door's on the front
-  wall's). A door that rests open where no level places it is drawn so
+  by the shape traced round it (D113), and is drawn among the rows as the
+  wall it lies on is (a state's own `row`, the dormitory's front door's on
+  the front wall's). A door that rests open where no level places it is drawn so
   too. Rules out an open door taken out of sight, and a door seen open
   only by the floor in its doorway.
 - **D109 — A thing drawn away from where it is painted is drawn in the
@@ -1673,3 +1677,19 @@ one overturns stays, marked as superseded.
   says where to walk. Only then do chapter 3's conditions use
   `teacher.position`. Rules out `position` listed in a lesson no level
   needs, and a goal mark shown where the child is to count.
+- **D113 — An open leaf is cut by its traced shape, never by a difference
+  snapped to lines.** Decided 2026-10-29 by the owner, who found the masks
+  loose at every leaf's bottom corners and along its shadow. The open
+  state of a door is cut by a polygon traced by hand on the swung picture,
+  `leaf`, round the wood, the hinges and the iron of the leaf and round
+  the shadow it throws on the wall, the free edge and the bottom corners
+  whole; the polygon is drawn at the painting's own size with its edge
+  softened over one pixel, and nothing is snapped, flooded or kept by
+  size. The closed state keeps its cut-out of the painting, but within
+  the doorway's own shape, so that no mortar line of the wall beside the
+  arch comes along with the leaf. Every scene's check draws each door's
+  states over the painting at three times their size, the mask's edge
+  marked, and a state is accepted only when its edge lies on the leaf's
+  outline all round. Rules out a mask whose edge is found by a difference
+  where the leaf's foot meets the floor, and a door looked at only in the
+  game's small picture.

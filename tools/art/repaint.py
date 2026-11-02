@@ -55,12 +55,22 @@ across it. A model given such a strip blurred painted the chain again.
 (D108): the door's leaf is found in the painting from bands of seeds across it
 (`seeds`, each x0, x1 and y in cells), flooded up to the black line that bounds
 it, its planks' lighter lines crossed, and filled row by row; and the whole
-leaf, from the arch to the threshold and `sill` cells below it, over the
-threshold's line, is painted with the floor of the room beyond (`floor`, a box
-in cells of the painting itself, a plain part of that room's floor), stretched
-to it, DOORWAY_SHADE darker at the arch's top and as lit as the room at the
-threshold. The leaf swung open beside the doorway (D111) is a model's, mended
-into the doorway's picture as any box is, on a guide the tool draws first
+leaf, from the arch down to the floor's own dark line under the leaf's box (the
+first such line within `sill` cells below it, or `sill` cells below it where
+there is none) and from one jamb to the other, is painted with the floor of the
+room beyond (`floor`, a box in cells of the painting itself, a plain part of
+that room's floor), stretched to it, DOORWAY_SHADE darker at the arch's top and
+as lit as the room at the threshold, so that no board, rail or shadow of the
+leaf is left at its foot. Where stone meets wood at the threshold
+(`sill_line`), a dark line as wide as the painting's outlines is drawn along
+the fill's foot from jamb to jamb, in the colour of the jambs' outline there.
+The fill and its line are laid into the scene's other pictures that show the
+doorway shut (`also`, each mended in place: its ground-only edit and its
+marked picture), so that the cut finds no difference there; never into the
+swung picture, whose leaf may lie a little over the opening and is cut by its
+own traced shape (D113). The leaf swung open beside the doorway (D111) is a
+model's, mended into the doorway's picture as any box is, on a guide the tool
+draws first
 (`guide`): the shut leaf, exactly the opening's size, turned over on its hinges
 at the opening's edge, its free edge a little forward, and its shadow, which the
 model is given as it is to paint the door's hinges and finish on. A model asked
@@ -380,6 +390,16 @@ DOOR_LINE = 0.14
 #: How much darker an open doorway's floor is at the arch's top than at its
 #: threshold, where it is the room's own light (D108).
 DOORWAY_SHADE = 0.15
+#: The floor's dark line under a doorway: a row of the leaf's span darker than
+#: the rows round it by FOOT_DARKER of the painting's value, each column's own
+#: point of it looked for FOOT_NEAR pixels about that row; the share of the
+#: leaf's height its lowest straight part starts at, which gives its width.
+FOOT_DARKER = 0.03
+FOOT_NEAR = 5
+FOOT_BAND = 0.7
+#: The drawn sill line's colour: the darkest 1 in SILL_DARKEST pixels of the jambs
+#: beside the doorway's foot, their outline.
+SILL_DARKEST = 30
 
 
 def leaf_of(crop: np.ndarray, bands: list[tuple[int, int, int]]) -> np.ndarray:
@@ -430,15 +450,15 @@ def doorways(scene: str) -> list[Path]:
             (px(left) - box[0], px(right) - box[0], py(across) - box[1])
             for left, right, across in door["seeds"]
         ]
-        leaf = leaf_of(crop, bands)
-        shut = leaf.copy()
-        # The threshold's line under the leaf is covered too, `sill` cells of it.
-        sill = round(door.get("sill", 0.0) * gy["spacing"])
-        if sill:
-            grown = leaf.copy()
-            for step in range(1, sill + 1):
-                grown[step:] |= leaf[:-step]
-            leaf = grown
+        shut = leaf_of(crop, bands)
+        # Down to the floor's own line under the box, looked for `sill` cells below it.
+        below = round(door.get("sill", 0.0) * gy["spacing"])
+        tall = np.pad(painting, ((0, below), (0, 0), (0, 0)), mode="edge")
+        deeper = tall[box[1] : box[3] + below, box[0] : box[2]]
+        leaf, foot, start = to_foot(deeper, np.pad(shut, ((0, below), (0, 0))), box[3] - box[1])
+        ends = (box[1] + foot[[0, -1]] - gy["offset"]) / gy["spacing"]
+        print(f"{door['thing']}: the fill ends on {ends[0]:.3f} to {ends[1]:.3f}")
+        leaf = leaf[: painting.shape[0] - box[1]]
         ys, xs = np.nonzero(leaf)
         top, bottom, first, last = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
         fx0, fy0, fx1, fy1 = door["floor"]
@@ -453,15 +473,110 @@ def doorways(scene: str) -> list[Path]:
         here = out[box[1] + top : box[1] + bottom, box[0] + first : box[0] + last]
         inside = leaf[top:bottom, first:last]
         here[inside] = floor[inside]
+        mended = np.zeros(painting.shape[:2], dtype=bool)
+        mended[box[1] : box[1] + leaf.shape[0], box[0] : box[0] + leaf.shape[1]] = leaf
+        if door.get("sill_line"):
+            line = sill_line(out, start, foot, box, gx["spacing"])
+            mended[box[1] : box[1] + line.shape[0], box[0] : box[0] + line.shape[1]] |= line
         target = settings.edits / door["painting"]
         Image.fromarray(out).save(target)
         written.append(target)
+        # The scene's pictures that show the doorway shut, mended in place with it.
+        for also in door.get("also", []):
+            picture = np.array(Image.open(REPO / also).convert("RGB"))
+            picture[mended] = out[mended]
+            Image.fromarray(picture).save(REPO / also)
+            written.append(REPO / also)
         if "guide" in door:
             target = settings.edits / door["guide"]["picture"]
             picture = guided(out, crop, shut, box, door["guide"], gx["spacing"])
             Image.fromarray(picture).save(target)
             written.append(target)
     return written
+
+
+def to_foot(crop: np.ndarray, leaf: np.ndarray, under: int) -> tuple[np.ndarray, np.ndarray, int]:
+    """A door's leaf grown down to the floor's dark line under its box, `under`
+    rows down the crop, from one jamb to the other: the leaf's lowest straight
+    part gives its width, and each column of it is filled to its own point of the
+    line, a straight line fitted through them; where no line is found, to the
+    crop's foot. Gives the grown leaf, the row each of its columns ends on, and
+    its first column."""
+    value = np.array(Image.fromarray(crop).convert("L")).astype(np.float32) / 255
+    rows = np.nonzero(leaf.any(axis=1))[0]
+    top, bottom = rows[0], rows[-1] + 1
+    band = range(top + round(FOOT_BAND * (bottom - top)), bottom)
+    first = min(np.nonzero(leaf[y])[0][0] for y in band if leaf[y].any())
+    last = max(np.nonzero(leaf[y])[0][-1] for y in band if leaf[y].any()) + 1
+    inner = slice(first + (last - first) // 10, last - (last - first) // 10)
+    profile = value[:, inner].mean(axis=1)
+    height, far = len(value), 2 * FOOT_NEAR
+    found = height
+    # The first row darker than the rows a little above and below it: a line, not
+    # the planks' even brown nor the floor's.
+    for y in range(under, height):
+        round_it = min(profile[max(0, y - far)], profile[min(height - 1, y + far)])
+        if round_it - profile[y] > FOOT_DARKER:
+            found = y
+            break
+    feet = np.full(last - first, found, dtype=np.float32)
+    if found < height:
+        points = []
+        for x in range(first, last):
+            # The column's own first pixel of the line, darker than it is just above.
+            above = value[max(0, found - far), x]
+            near = np.arange(max(0, found - FOOT_NEAR), min(height, found + FOOT_NEAR + 1))
+            dark = near[value[near, x] < above - FOOT_DARKER]
+            if len(dark):
+                points.append((x - first, dark[0]))
+        if len(points) > 2:
+            xs, ys = np.array(points, dtype=np.float32).T
+            fit = np.polyfit(xs, ys, 1)
+            # Again without the points far off it, a plank's line or a speck.
+            close = np.abs(np.polyval(fit, xs) - ys) <= 2
+            if close.sum() > 2:
+                fit = np.polyfit(xs[close], ys[close], 1)
+            feet = np.polyval(fit, np.arange(last - first)).astype(np.float32)
+    grown = leaf.copy()
+    for x in range(first, last):
+        grown[band.start : max(band.start, round(float(feet[x - first]))), x] = True
+    return grown, feet, first
+
+
+def sill_line(
+    out: np.ndarray, first: int, feet: np.ndarray, box: tuple, spacing: float
+) -> np.ndarray:
+    """A dark line drawn in `out` along an open doorway's foot, from one jamb to the
+    other, as wide as the painting's outlines, its ends softened, in the colour of
+    the jambs' outline beside it: where stone meets wood, as everywhere else in the
+    painting. Gives the pixels it is drawn on, in the leaf's crop."""
+    width = max(2.0, image_first.LINE_WIDTH * spacing)
+    count = len(feet)
+    middle = float(np.median(feet))
+    # The jambs' outline: the darkest pixels just beside the leaf at its foot.
+    reach = round(width * 2)
+    y0, y1 = round(middle - 3 * width), round(middle + width)
+    sides = [
+        out[box[1] + y0 : box[1] + y1, box[0] + max(0, first - reach) : box[0] + first],
+        out[box[1] + y0 : box[1] + y1, box[0] + first + count : box[0] + first + count + reach],
+    ]
+    pixels = np.concatenate([side.reshape(-1, 3) for side in sides]).astype(np.float32)
+    darkest = pixels[np.argsort(pixels.max(axis=1))[: max(1, len(pixels) // SILL_DARKEST)]]
+    colour = darkest.mean(axis=0)
+    height = round(middle + 2 * width) + 1
+    alpha = np.zeros((height, first + count), dtype=np.float32)
+    yy = np.arange(height, dtype=np.float32)[:, None]
+    xs = np.arange(count, dtype=np.float32)
+    # Over the floor's line, the fill's foot on its middle, its edge soft over a pixel.
+    across = np.clip(width / 2 + 0.5 - np.abs(yy - feet[None, :]), 0, 1)
+    ends = np.clip(np.minimum(xs + 1, count - xs) / width, 0, 1)[None, :]
+    alpha[:, first:] = across * ends
+    here = out[box[1] : box[1] + height, box[0] : box[0] + first + count].astype(np.float32)
+    here = here * (1 - alpha[..., None]) + colour * alpha[..., None]
+    out[box[1] : box[1] + height, box[0] : box[0] + first + count] = here.clip(0, 255).astype(
+        np.uint8
+    )
+    return alpha > 0
 
 
 #: A door swung open nearly flat against its wall (D111): how much darker its leaf

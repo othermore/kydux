@@ -105,6 +105,51 @@ test.describe('in the dormitory (D84)', () => {
     await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
   });
 
+  test('going to sleep, the night falls and the morning comes before the card (D124)', async ({ browser }) => {
+    const context = await browser.newContext({ locale: 'es-ES', viewport: { width: 1440, height: 900 } });
+    const page = await context.newPage();
+    await seedWizard(page, MARTA);
+    await open(page, 'your-bed');
+    const scene = page.locator('#scene');
+    await expect(scene).toHaveAttribute('data-light', 'none');
+    // Every light the scene goes through, as it goes (data-light).
+    await scene.evaluate((node) => {
+      const seen: string[] = [];
+      (window as unknown as { kyduxLights: string[] }).kyduxLights = seen;
+      new MutationObserver(() => {
+        const light = node.getAttribute('data-light');
+        if (light && seen.at(-1) !== light) seen.push(light);
+      }).observe(node, { attributes: true, attributeFilter: ['data-light'] });
+    });
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText(solution('your-bed'));
+    await page.locator('#run').click();
+    await expect(scene).toHaveAttribute('data-light', 'night', { timeout: 60_000 });
+    // The sleeper is seen asleep in the night, with no card over it.
+    await expect(page.locator('.win-card')).toHaveCount(0);
+    await expect(scene).toHaveAttribute('data-thought', 'z z z');
+    await page.screenshot({ path: `${SHOTS}night.png` });
+    await expect(scene).toHaveAttribute('data-light', 'morning', { timeout: 15_000 });
+    await expect(page.locator('.win-card')).toBeVisible({ timeout: 15_000 });
+    await expect(scene).not.toHaveAttribute('data-thought', 'z z z');
+    await page.screenshot({ path: `${SHOTS}morning-light.png` });
+    expect(await page.evaluate(() => (window as unknown as { kyduxLights: string[] }).kyduxLights)).toEqual([
+      'falling',
+      'night',
+      'dawning',
+      'morning',
+    ]);
+    // Played again, the level starts again (D75) under the painting's own light.
+    await page.locator('#again').click();
+    await page.locator('#run').click();
+    await expect(scene).toHaveAttribute('data-restarting', 'true');
+    await expect(scene).toHaveAttribute('data-light', 'none');
+    await expect(scene).not.toHaveAttribute('data-restarting', 'true');
+    await expect(scene).toHaveAttribute('data-light', 'none');
+    await context.close();
+  });
+
   test('at the first night, the friend and the mate go to bed, each in their dormitory (D96)', async ({ page }) => {
     await seedWizard(page, MARTA);
     await page.goto('/#story/the-first-night');
@@ -115,6 +160,8 @@ test.describe('in the dormitory (D84)', () => {
     }
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
     await expect(scene).toHaveAttribute('data-asleep', 'friend:bed_6:lying,mate:bed_1:lying');
+    // The first night is told on the night painting as it is (D124).
+    await expect(scene).toHaveAttribute('data-light', 'none');
     await page.waitForTimeout(400);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-friend.png` });
   });
@@ -123,6 +170,8 @@ test.describe('in the dormitory (D84)', () => {
     await seedWizard(page, PABLO);
     await page.goto('/#story/the-morning');
     const scene = page.locator('#scene');
+    // Told in the morning on the night painting, under the morning's light (D124).
+    await expect(scene).toHaveAttribute('data-light', 'morning');
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
     await expect(scene).toHaveAttribute('data-asleep', 'mate:bed_1:lying');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-mate.png` });
@@ -139,6 +188,13 @@ test.describe('in the dormitory (D84)', () => {
     await expect(scene).toHaveAttribute('data-actors', /mate:12,15/, { timeout: 30_000 });
     await expect(scene).not.toHaveAttribute('data-doors', /front_door/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}morning-out.png` });
+    // Back and Again keep the morning's light.
+    await page.locator('#story-back').click();
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-light', 'morning');
+    await page.locator('#story-again').click();
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-light', 'morning');
   });
 });
 

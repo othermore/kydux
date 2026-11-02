@@ -46,6 +46,8 @@ export interface Story {
   world: LevelJson;
   /** The tile the camera starts on, before any step (D74). */
   camera: Tile;
+  /** The light the story is told under, besides its scene's own (D124). */
+  light?: 'morning';
   /** The game's opening, before the course (D61). */
   opening?: boolean;
   /** Who tells the story, for the map and the characters' names (D67). */
@@ -63,6 +65,7 @@ interface StoryJson {
   steps: Omit<StoryStep, 'text'>[];
   world: LevelJson;
   camera: Tile;
+  light?: string;
   opening?: boolean;
   speaker?: string;
 }
@@ -90,6 +93,7 @@ export async function loadStory(id: string, lang: Language): Promise<Story> {
     steps: staging.steps.map((step, index) => ({ ...step, text: forWizard(text.steps[index] ?? '') })),
     world: staging.world,
     camera: staging.camera,
+    ...(staging.light === 'morning' ? { light: 'morning' as const } : {}),
     ...(staging.opening === true ? { opening: true } : {}),
     ...(typeof staging.speaker === 'string' ? { speaker: staging.speaker } : {}),
   };

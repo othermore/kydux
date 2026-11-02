@@ -270,3 +270,11 @@ def test_a_figure_opens_and_closes_a_door_beside_it():
                 },
             ],
         )
+
+
+def test_a_story_may_be_told_under_the_morning_light_and_no_other():
+    # A morning story on a scene painted at night (D124).
+    assert staged(light="morning")["light"] == "morning"
+    assert "light" not in staged()
+    with pytest.raises(LevelError, match="light"):
+        staged(light="noon")

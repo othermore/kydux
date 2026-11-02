@@ -64,6 +64,12 @@ export function overDepth(rows: number): number {
   return figureDepth(rows + 2);
 }
 
+/** The depth of the light over a scene `rows` rows tall (D124): over every row and
+ * figure, under the speech. */
+export function lightDepth(rows: number): number {
+  return overDepth(rows) + 1;
+}
+
 /** The cells a scene draws a figure lower on: each range is its first and last cell,
  * and by how much of a cell (D95). */
 export type Lowered = { cells: [Tile, Tile]; by: number }[];

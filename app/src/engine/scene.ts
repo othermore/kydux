@@ -90,7 +90,8 @@ import {
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
-import { FOOT_IN_CELL, figureDepth, loweredBy, nudgedBy, sleeperDepth } from './depth';
+import { FOOT_IN_CELL, figureDepth, lightDepth, loweredBy, nudgedBy, sleeperDepth } from './depth';
+import { type LightName, type LightState, NIGHT_MS, SceneLight } from './light';
 import { Speech } from './speech';
 import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
@@ -99,7 +100,7 @@ import { LONG, Playback } from './playback';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
 import { play } from './sfx';
-import { blockedText, friendText } from './words';
+import { blockedText, friendText, sleepingText } from './words';
 
 /** How long one tick lasts at speed 1. */
 export const TICK_MS = 400;
@@ -114,7 +115,7 @@ const RESTART_HOLD_MS = 160;
 /** How a scene is played: a level's run, or a story's steps (D74). */
 export interface SceneOptions {
   /** A story: the camera starts on this tile (camera.ts), and the words stay said. */
-  story?: { camera: Tile };
+  story?: { camera: Tile; light?: LightName };
 }
 
 export { type Art, type FigureArt, loadArt, type SceneArt } from './painted';
@@ -211,6 +212,15 @@ class LevelScene extends Phaser.Scene {
   private restarts = 0;
   /** The timers of a cast being played (D81), dropped when the level starts again. */
   private casting: Phaser.Time.TimerEvent[] = [];
+  /** The light over the scene (D124): the painting's own, the night that falls once
+   * the wizard sleeps and the morning after it, or a morning story's. */
+  private light = new SceneLight();
+  private lightCover!: Phaser.GameObjects.Rectangle;
+  private shownLight: LightState | null = null;
+  /** When the wizard has lain down in its bed, on the scene's clock, and the timer
+   * that lets the night fall then. */
+  private lyingUntil = 0;
+  private nightFall: Phaser.Time.TimerEvent | null = null;
 
   constructor(
     private readonly map: Layout,
@@ -491,6 +501,9 @@ class LevelScene extends Phaser.Scene {
       }
     }
     this.wizard = this.figure('wizard', WIZARD_KEY, this.map.start, 'down').setDepth(4);
+    // Fixed over the camera's view each frame (lit), so that no zoom or drag shows its edge.
+    this.lightCover = this.add.rectangle(0, 0, 1, 1, 0x000000, 0).setOrigin(0, 0).setDepth(lightDepth(this.map.height));
+    this.light.set(this.options.story?.light ?? 'none');
     this.speech = new Speech(this, this.parentNode, {
       width: this.map.width * TILE,
       headroom: this.headroom,
@@ -606,6 +619,7 @@ class LevelScene extends Phaser.Scene {
 
   /** A word said follows who says it while they walk. */
   override update(): void {
+    this.drawLight();
     // On a painted scene the figures go behind what stands in front of them (D76).
     if (this.art) {
       if (!this.asleep.get(this.wizard)?.lying) this.wizard.setDepth(figureDepth(this.wizard.y / TILE) + 0.0005);
@@ -662,6 +676,7 @@ class LevelScene extends Phaser.Scene {
     this.speech.clearBubble();
     this.speech.clearThought();
     this.stopCast();
+    this.resetLight();
     this.view.focus = null;
     this.seenBy = null;
     this.lit = !this.map.dark;
@@ -777,6 +792,8 @@ class LevelScene extends Phaser.Scene {
    * names the bed. */
   private sleep(event: WorldEvent, instant: boolean): void {
     this.parentNode.dataset.sleeping = String(event.data.id);
+    // Lying down takes the tween's length (layDown); the night waits for it (D124).
+    this.lyingUntil = this.time.now + (instant ? 0 : this.playback.tickDuration * 1.1);
     if (!tileOf(event.data.bed)) return;
     this.stopCast();
     this.layDown(this.wizard, 'wizard', String(event.data.id), instant);
@@ -964,10 +981,40 @@ class LevelScene extends Phaser.Scene {
    * to wait for it before the win card; 0 when it does not, in a story, on a scene
    * without art, or for a reader who asks for less motion. */
   celebrate(): number {
-    // A wizard asleep is not woken to celebrate (D84).
-    if (this.options.story || this.parentNode.dataset.sleeping) return 0;
+    if (this.options.story) return 0;
+    // A wizard asleep is not woken to celebrate: the night falls once it lies in its
+    // bed, it sleeps, and the morning comes (D124); the card waits for all of it.
+    if (this.parentNode.dataset.sleeping) {
+      const wait = Math.max(0, this.lyingUntil - this.time.now);
+      this.nightFall?.remove(false);
+      this.nightFall = this.time.delayedCall(wait, () => this.light.fall(this.time.now));
+      return wait + NIGHT_MS;
+    }
     const duration = this.playback.tickDuration * 2;
     return this.playPart('win', duration) ? duration : 0;
+  }
+
+  /** The light drawn over the camera's view as it is now, and said on the scene's
+   * node; the sleeper's thought while the night holds (D124). */
+  private drawLight(): void {
+    const look = this.light.at(this.time.now);
+    const view = this.cameras.main.worldView;
+    const cover = this.lightCover;
+    if (cover.x !== view.x - 2 || cover.y !== view.y - 2) cover.setPosition(view.x - 2, view.y - 2);
+    if (cover.width !== view.width + 4 || cover.height !== view.height + 4) cover.setSize(view.width + 4, view.height + 4);
+    cover.setFillStyle(Phaser.Display.Color.GetColor(...look.colour), look.alpha);
+    if (look.state === this.shownLight) return;
+    this.shownLight = look.state;
+    this.parentNode.dataset.light = look.state;
+    if (look.state === 'night') this.speech.think(sleepingText(), this.shownTick, Number.POSITIVE_INFINITY);
+    else if (look.state === 'dawning') this.speech.clearThought();
+  }
+
+  /** The light back to what it is before a run: the painting's own, or the story's. */
+  private resetLight(): void {
+    this.nightFall?.remove(false);
+    this.nightFall = null;
+    this.light.set(this.options.story?.light ?? 'none');
   }
 
   /** A cast's frames stopped where they are, their timers dropped. */

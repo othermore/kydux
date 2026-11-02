@@ -20,6 +20,11 @@ export interface BlockedDetail {
 
 /** Why an action could not be done, from a `blocked` event's reason, its thing's
  * kind, and its detail. */
+/** The wizard's thought while asleep, in the night (D124). */
+export function sleepingText(): string {
+  return t('level.sleeping');
+}
+
 /** A word of the debug view's panel and legend (debug.ts), for a tester. */
 export function debugWord(key: string): string {
   return t(`debug.${key}`);

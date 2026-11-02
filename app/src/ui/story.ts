@@ -160,7 +160,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
       words();
       // The wizard the child made, or the first look before there is one.
       const look = lookOf(progress.wizard()?.look);
-      void parts.startScene(sceneParent, story.world, look, { story: { camera: story.camera } }).then((handle) => {
+      void parts.startScene(sceneParent, story.world, look, { story: { camera: story.camera, ...(story.light ? { light: story.light } : {}) } }).then((handle) => {
         if (destroyed) {
           handle.destroy();
           return;

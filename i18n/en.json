@@ -48,6 +48,7 @@
     "failed": "Python could not start. Reload the page to try again.",
     "reload": "Reload",
     "load_failed": "The level could not be loaded. Reload the page to try again.",
+    "sleeping": "z z z",
     "run": "Run",
     "about": "About this level",
     "start": "Start",

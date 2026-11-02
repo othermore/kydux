@@ -816,6 +816,8 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
 
 
 STORY_DOINGS = ("walk", "face", "appear", "vanish", "sleep", "wake", "open", "close")
+#: The lights a story may be told under, besides its scene's own (D124).
+STORY_LIGHTS = ("morning",)
 
 
 def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
@@ -857,9 +859,10 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     """A story's staging checked against its scene and made whole (D74): the
     world the page draws, as a level on the scene is built, under `world`.
 
-    The staging puts the wizard at `wizard`, the camera on `camera`, and each
-    actor at its `at`; an actor with no `at` is out of sight until a step makes
-    it appear; the story's `things` place the scene's things or add a door.
+    The staging puts the wizard at `wizard`, the camera on `camera`, the light
+    over the scene on `light` (`morning`, D124), and each actor at its `at`; an
+    actor with no `at` is out of sight until a step makes it appear; the story's
+    `things` place the scene's things or add a door.
     Each step is said by `voice`, `wizard` or an actor, after its actions
     (`do`, one or a list, D103), each done by its `by`, the step's `by`, or its
     speaker: a walk to a tile or through a list of them, each in a straight
@@ -896,6 +899,9 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         if thing.get("kind") == "door" and thing.get("open") is not True and "at" in thing
     }
     camera = _story_tile(data.get("camera", list(wizard)), "camera", story_id)
+    # A morning story on a scene painted at night opens under the morning's light (D124).
+    if data.get("light", "morning") not in STORY_LIGHTS:
+        raise LevelError(f"{story_id}: a story's light is one of {', '.join(STORY_LIGHTS)}")
     if not (0 <= camera.x < width and 0 <= camera.y < height):
         raise LevelError(f"{story_id}: the camera's tile {camera.x},{camera.y} is off the scene")
 

@@ -48,6 +48,7 @@
     "failed": "Python no ha podido arrancar. Recarga la página para intentarlo de nuevo.",
     "reload": "Recargar",
     "load_failed": "No se ha podido cargar el nivel. Recarga la página para intentarlo de nuevo.",
+    "sleeping": "z z z",
     "run": "Ejecutar",
     "about": "Sobre este nivel",
     "start": "Empezar",

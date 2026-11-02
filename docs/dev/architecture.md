@@ -43,7 +43,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 a quarter of it, and a revealed thing's glow wherever
                 something covers it (silhouette.ts, cover.ts, D85, D107),
                 the wizard asleep
-                (D84), the tester's view of the cells and the masks
+                (D84), the night that falls once it sleeps and the morning
+                after it, and a morning story's light (light.ts, D124), the
+                tester's view of the cells and the masks
                 (debug.ts, opened with ?debug), and the sound effects, made as
                 the game plays (sfx.ts)
   src/editor/   the child's editor, CodeMirror
@@ -244,7 +246,7 @@ tiles are `[x, y]`.
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
 | `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
 | `give` | wizard | `id`, `to`, `at` | the thing floats from the wizard to the actor and fades; the actor faces the wizard (D48) |
-| `sleep` | wizard, or in a story an actor | `id`, the bed; `at`; `bed`, its tile | the figure lies in the bed, its head on the pillow, under the quilt, no celebration after; `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
+| `sleep` | wizard, or in a story an actor | `id`, the bed; `at`; `bed`, its tile | the figure lies in the bed, its head on the pillow, under the quilt; for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile beside the bed (D91) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
 | `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |

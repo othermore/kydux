@@ -175,7 +175,9 @@ test.describe('in the library (D85, D86, D51)', () => {
 test.describe('in the entrance (D100)', () => {
   test.use({ locale: 'es-ES' });
 
-  test('Ilda goes dark as she walks into the middle arch', async ({ page }) => {
+  test('Ilda goes dark as she walks into the middle arch, and the two follow her side by side', async ({
+    page,
+  }) => {
     await seedWizard(page, MARTA);
     await page.goto('/#story/the-entrance');
     const scene = page.locator('#scene');
@@ -185,6 +187,10 @@ test.describe('in the entrance (D100)', () => {
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
     await expect(scene).toHaveAttribute('data-shade', /^ilda:0\.\d\d$/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}into-the-arch.png` });
+    // The two children follow her side by side, at once (D103).
+    await storyNext(page);
+    await expect(scene).toHaveAttribute('data-wizard', '20,8', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-actors', /friend:19,8/);
   });
 });
 

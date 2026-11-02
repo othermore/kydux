@@ -58,12 +58,22 @@
     {
       "who": "voice",
       "by": "wizard",
-      "do": {
-        "walk": [
-          20,
-          8
-        ]
-      }
+      "do": [
+        {
+          "by": "wizard",
+          "walk": [
+            20,
+            8
+          ]
+        },
+        {
+          "by": "friend",
+          "walk": [
+            19,
+            8
+          ]
+        }
+      ]
     },
     {
       "who": "ilda",

@@ -3,7 +3,7 @@
   "speaker": "ilda",
   "scene": "the-dormitory",
   "wizard": [
-    12,
+    11,
     12
   ],
   "camera": [
@@ -15,7 +15,7 @@
       "id": "friend",
       "kind": "friend",
       "at": [
-        11,
+        10,
         12
       ],
       "facing": "up"
@@ -24,19 +24,19 @@
       "id": "ilda",
       "kind": "friend",
       "at": [
-        13,
+        12,
         12
       ],
-      "facing": "up"
+      "facing": "left"
     },
     {
       "id": "mate",
       "kind": "friend",
       "at": [
-        14,
-        8
+        16,
+        6
       ],
-      "facing": "left"
+      "facing": "down"
     }
   ],
   "steps": [
@@ -47,63 +47,116 @@
       "who": "ilda"
     },
     {
-      "who": "ilda",
-      "do": {
-        "vanish": true
-      }
+      "who": "ilda"
     },
     {
-      "who": "friend",
-      "do": {
-        "walk": [
-          11,
-          8
-        ]
-      }
+      "who": "friend"
     },
     {
       "who": "voice",
-      "by": "friend",
+      "by": "wizard",
+      "do": [
+        {
+          "by": "ilda",
+          "walk": [
+            12,
+            13
+          ]
+        },
+        {
+          "by": "ilda",
+          "open": "front_door"
+        },
+        {
+          "by": "ilda",
+          "walk": [
+            12,
+            15
+          ]
+        },
+        {
+          "by": "ilda",
+          "close": "front_door"
+        },
+        {
+          "by": "ilda",
+          "walk": [
+            3,
+            15
+          ],
+          "vanish": true
+        },
+        {
+          "by": "friend",
+          "walk": [
+            [
+              10,
+              9
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              8,
+              8
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "who": "voice",
+      "by": "wizard",
       "do": {
         "walk": [
-          8,
-          8
+          [
+            11,
+            10
+          ],
+          [
+            14,
+            10
+          ],
+          [
+            14,
+            9
+          ],
+          [
+            16,
+            9
+          ],
+          [
+            16,
+            7
+          ]
         ]
       }
     },
     {
       "who": "mate",
-      "by": "friend",
       "do": {
+        "by": "friend",
         "sleep": "bed_6"
       }
     },
     {
-      "who": "voice",
-      "by": "mate",
-      "do": {
-        "walk": [
-          16,
-          8
-        ]
-      }
+      "who": "wizard"
     },
     {
       "who": "voice",
       "by": "mate",
-      "do": {
-        "walk": [
-          16,
-          5
-        ]
-      }
-    },
-    {
-      "who": "voice",
-      "by": "mate",
-      "do": {
-        "sleep": "bed_1"
-      }
+      "do": [
+        {
+          "walk": [
+            16,
+            5
+          ]
+        },
+        {
+          "sleep": "bed_1"
+        }
+      ]
     }
   ]
 }

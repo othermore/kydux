@@ -7,9 +7,12 @@ later, like the rest of it.
   `tools/art/prompts/image-first-dormitory-3.md`, with the field as its
   style's reference; its border and the wands on its trunks edited by it
   (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).
-- Its bottom right corner mended by Gemini from `game-dormitory-corner.md`,
-  joined by `tools/art/repaint.py`, the painting kept pixel for pixel
-  elsewhere: a wall closing the corridor off from the battlements.
+- Its corridor's right end mended by Gemini, joined by `tools/art/repaint.py`,
+  the painting kept pixel for pixel elsewhere: the castle's wall closing the
+  corridor off from the battlements, going on from the rooms' front wall
+  (`game-dormitory-corner-2.md`).
+- Its door to the corridor opened without a model (`repaint.py doorways`),
+  its leaf painted with the common room's own floor.
 - Its beds, trunks, bedside tables, armchairs and table, and the beds' quilts
   and sheets, cut where Gemini painted them flat magenta in pictures of the
   dormitory (`game-dormitory-marked-*.md`, `game-dormitory-covers-*.md`); its

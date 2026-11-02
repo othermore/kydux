@@ -62,16 +62,20 @@ test('Enter and Space go on; Go on ends the story, read, at what comes next', as
   await expect(page.locator('.stop[data-item="story:at-the-gate"]')).toHaveAttribute('data-state', 'done');
 });
 
-test('a figure who goes says its words first, and is gone at the next step', async ({ page }) => {
+test('Ilda goes out by the door and shuts it as the friend goes to the other dormitory (D103)', async ({ page }) => {
   await page.goto('/#story/the-first-night');
   const scene = page.locator('#scene');
-  await expect(scene).toHaveAttribute('data-actors', /ilda:13,12/);
-  await storyNext(page, 2);
-  await expect(scene).toHaveAttribute('data-speaker', 'ilda');
-  await expect(scene).toHaveAttribute('data-actors', /ilda:13,12/);
+  // The three stand before the door; the mate waits in the wizard's dormitory.
+  await expect(scene).toHaveAttribute('data-actors', /ilda:12,12/);
+  await expect(scene).toHaveAttribute('data-actors', /mate:16,6/);
+  await storyNext(page, 3);
+  await expect(scene).toHaveAttribute('data-speaker', 'friend');
+  await expect(scene).toHaveAttribute('data-actors', /ilda:12,12/);
   await storyNext(page);
-  await expect(scene).not.toHaveAttribute('data-actors', /ilda/);
-  await expect(scene).toHaveAttribute('data-actors', /friend:11,8/);
+  // Ilda's walk is the longest: she is gone once it ends, the door shut behind her.
+  await expect(scene).not.toHaveAttribute('data-actors', /ilda/, { timeout: 30_000 });
+  await expect(scene).toHaveAttribute('data-actors', /friend:8,8/);
+  await expect(scene).not.toHaveAttribute('data-doors', /front_door/);
 });
 
 test('Again plays a step once more, as R does; Skip goes to the end (14.4)', async ({ page }) => {

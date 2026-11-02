@@ -1,14 +1,14 @@
 {
   "title": "The first night",
   "steps": [
-    "The common room is very quiet, with a warm fire crackling in the fireplace and a round rug between two open arches.",
+    "The common room is very quiet, with a warm fire crackling in the fireplace, a round rug, and a doorway on each side to a dormitory.",
     "These are the first-years' rooms. {The girls sleep on the left, the boys on the right|The boys sleep on the left, the girls on the right}, and you all share this common room.",
-    "Good night to the three of you, and I will see you in the morning.",
+    "Tomorrow is a long day. Good night to the three of you, and I will see you in the morning.",
     "Goodnight, {wizard}. I am so sleepy! I will see you tomorrow.",
-    "{friend} walks through the arch on the left, heading into the other dormitory.",
-    "Hello, {wizard}! We share this dormitory. The free bed is the one right beside mine.",
-    "{mate} walks through the arch on the right into your dormitory.",
-    "{mate} walks to the first bed, by the window.",
-    "{mate} gets into bed under the sheet and falls asleep. Now you are alone in the common room, and very tired. Your own warm bed is waiting beside {mate}'s, through the arch on the right."
+    "Ilda goes out through the door and closes it behind her, and her steps go away down the corridor. {friend} crosses the doorway on the left into the other dormitory and stops by a bed.",
+    "You cross the doorway on the right into your dormitory, between the beds. By the first bed, under the window, someone is waiting for you.",
+    "Hello, I am {mate}. I think we share this dormitory! This bed by the window is mine, and I think yours is the one right beside it. What is your name?",
+    "I am {wizard}. I am very glad to meet you and to share the room, but I am so tired!",
+    "{mate} goes to the first bed, slips under the sheet and falls asleep. In the other dormitory {friend} is asleep already. You are tired too, and your bed is the next one: to sleep in a bed, you stand beside the trunk at its foot."
   ]
 }

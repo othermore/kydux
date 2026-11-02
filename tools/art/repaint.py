@@ -51,15 +51,17 @@ by row from the pixels just left and right of it, blended across, so that what
 lies under a thin thing (the entrance lamp's chain over a plain floor) goes on
 across it. A model given such a strip blurred painted the chain again.
 
-`doorways` opens each door of the scene's settings' `doorways` without a model:
-the door's leaf is found in the painting from bands of seeds across it (`seeds`,
-each x0, x1 and y in cells), flooded up to the black line that bounds it, its
-planks' lighter lines crossed, and filled row by row; and the whole leaf, from
-the arch to the threshold, is painted with the floor of the room beyond, the
-part of a model's edit of the doorway that is floor alone (`floor`, a box in
-cells of `picture`), stretched to it. The door has swung in out of sight. A
-model asked to open a door drew its leaf against the arch's side and left its
-bottom planks.
+`doorways` opens each door of the scene's settings' `doorways` without a model
+(D108): the door's leaf is found in the painting from bands of seeds across it
+(`seeds`, each x0, x1 and y in cells), flooded up to the black line that bounds
+it, its planks' lighter lines crossed, and filled row by row; and the whole
+leaf, from the arch to the threshold and `sill` cells below it, over the
+threshold's line, is painted with the floor of the room beyond (`floor`, a box
+in cells of the painting itself, a plain part of that room's floor), stretched
+to it, DOORWAY_SHADE darker at the arch's top and as lit as the room at the
+threshold. The door has swung in out of sight. A model asked to open a door drew
+its leaf against the arch's side and left its bottom planks, and a model's floor
+was lit brighter than the room it is the floor of.
 
 The same is done for any other section of the settings, named by `--section`:
 `without`, the edit of a scene indoors without its static things (D89), which
@@ -371,6 +373,9 @@ def marks(scene: str) -> list[Path]:
 #: How dark, in the painting's value from 0 to 1, a line is that bounds a door's
 #: leaf: the lines between its planks are lighter, and a flood crosses them.
 DOOR_LINE = 0.14
+#: How much darker an open doorway's floor is at the arch's top than at its
+#: threshold, where it is the room's own light (D108).
+DOORWAY_SHADE = 0.15
 
 
 def leaf_of(crop: np.ndarray, bands: list[tuple[int, int, int]]) -> np.ndarray:
@@ -378,9 +383,10 @@ def leaf_of(crop: np.ndarray, bands: list[tuple[int, int, int]]) -> np.ndarray:
     seeds across it, each from one pixel to another on a row (x0, x1, y), up to
     the black line round it, the lighter lines between its planks crossed; each
     row then filled from its leftmost pixel to its rightmost, so that the
-    keyhole's plate and the darkest planks' lines are of the leaf too. A band
-    across its top rail, which a line as dark as the leaf's own cuts off, finds
-    that rail too."""
+    keyhole's plate and the darkest planks' lines are of the leaf too, and each
+    column from its top to its bottom, for a hinge's arm that reaches the
+    leaf's edge. A band across its top rail, which a line as dark as the leaf's
+    own cuts off, finds that rail too."""
     value = np.array(Image.fromarray(crop).convert("L")).astype(np.float32) / 255
     passable = value > DOOR_LINE
     seeds = np.zeros_like(passable)
@@ -390,6 +396,11 @@ def leaf_of(crop: np.ndarray, bands: list[tuple[int, int, int]]) -> np.ndarray:
     for y in np.nonzero(leaf.any(axis=1))[0]:
         xs = np.nonzero(leaf[y])[0]
         leaf[y, xs[0] : xs[-1] + 1] = True
+    # And each column from its top to its bottom, so that a hinge's arm reaching
+    # the leaf's edge, which no row fills, is of the leaf too.
+    for x in np.nonzero(leaf.any(axis=0))[0]:
+        ys = np.nonzero(leaf[:, x])[0]
+        leaf[ys[0] : ys[-1] + 1, x] = True
     return image_first.filled(leaf, leaf.size)
 
 
@@ -414,12 +425,28 @@ def doorways(scene: str) -> list[Path]:
             for left, right, across in door["seeds"]
         ]
         leaf = leaf_of(crop, bands)
+        # The threshold's line under the leaf is covered too, `sill` cells of it.
+        sill = round(door.get("sill", 0.0) * gy["spacing"])
+        if sill:
+            grown = leaf.copy()
+            for step in range(1, sill + 1):
+                grown[step:] |= leaf[:-step]
+            leaf = grown
         ys, xs = np.nonzero(leaf)
         top, bottom, first, last = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
-        picture = Image.open(settings.edits / door["picture"]).convert("RGB")
+        source = (
+            Image.fromarray(painting)
+            if "picture" not in door
+            else Image.open(settings.edits / door["picture"]).convert("RGB")
+        )
         fx0, fy0, fx1, fy1 = door["floor"]
-        floor = picture.crop((px(fx0), py(fy0), px(fx1), py(fy1)))
-        floor = np.array(floor.resize((last - first, bottom - top), Image.LANCZOS))
+        floor = source.crop((px(fx0), py(fy0), px(fx1), py(fy1)))
+        floor = np.array(floor.resize((last - first, bottom - top), Image.LANCZOS)).astype(
+            np.float32
+        )
+        # Darker under the arch, the room's own light at the threshold.
+        light = 1 - DOORWAY_SHADE * np.linspace(1, 0, bottom - top)[:, None, None]
+        floor = (floor * light).clip(0, 255).astype(np.uint8)
         out = painting.copy()
         here = out[box[1] + top : box[1] + bottom, box[0] + first : box[0] + last]
         inside = leaf[top:bottom, first:last]

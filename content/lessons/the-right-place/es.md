@@ -5,16 +5,14 @@
 ---
 ## Dónde hacer una acción
 
-En este juego, el método `wizard.sleep()` acuesta a tu {mago|maga} en una cama libre, pero solo cuando hay una justo a tu lado. Si intentas dormir en cualquier otro sitio, tu {mago|maga} se preguntará por qué se lo pides, ¡y no pasará nada!
+En este juego, el método `wizard.sleep()` acuesta a tu {mago|maga} en una cama libre, pero solo cuando está junto al baúl que hay a los pies de esa cama. Si intentas dormir en cualquier otro sitio, tu {mago|maga} se preguntará por qué se lo pides, ¡y no pasará nada!
 
 Por eso, un programa primero debe caminar hasta el lugar correcto, y luego hacer la acción.
 
 ---
 ## Pruébalo
 
-Nuestro propio dormitorio está cruzando el arco de la derecha. El arco de la izquierda es el otro dormitorio, que no es el nuestro.
-
-¡Vamos a ver qué pasa si intentamos dormir ahora mismo aquí, en la sala común, donde no hay ninguna cama a nuestro lado!
+Estás en tu propio dormitorio, entre las camas, pero no estás junto al baúl de ninguna de ellas. ¡Vamos a ver qué pasa si intentamos dormir ahora mismo aquí!
 
 ```python try
 wizard.sleep()

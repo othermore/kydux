@@ -78,14 +78,30 @@
       "over": true
     },
     {
-      "row": 17,
-      "image": "row-17-static-over.webp",
+      "row": 15,
+      "image": "row-15-static.webp",
       "top": 1181,
-      "static": true,
-      "over": true
+      "static": true
     }
   ],
-  "things": {},
+  "things": {
+    "front_door": {
+      "row": 14,
+      "left": 1085,
+      "top": 1190,
+      "states": {
+        "closed": "front_door-closed.webp",
+        "open": "front_door-open.webp"
+      },
+      "under": true,
+      "through": true,
+      "rest": "closed",
+      "at": [
+        12,
+        14
+      ]
+    }
+  },
   "beds": {
     "bed_1": {
       "head": [
@@ -152,5 +168,124 @@
       "row": 13
     }
   },
+  "nudged": [
+    {
+      "cells": [
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          6
+        ]
+      ],
+      "by": -0.05
+    },
+    {
+      "cells": [
+        [
+          8,
+          7
+        ],
+        [
+          8,
+          8
+        ]
+      ],
+      "by": -0.3
+    },
+    {
+      "cells": [
+        [
+          8,
+          9
+        ],
+        [
+          8,
+          10
+        ]
+      ],
+      "by": -0.45
+    },
+    {
+      "cells": [
+        [
+          8,
+          11
+        ],
+        [
+          8,
+          13
+        ]
+      ],
+      "by": -0.65
+    },
+    {
+      "cells": [
+        [
+          16,
+          5
+        ],
+        [
+          16,
+          6
+        ]
+      ],
+      "by": -0.4
+    },
+    {
+      "cells": [
+        [
+          16,
+          7
+        ],
+        [
+          16,
+          8
+        ]
+      ],
+      "by": -0.25
+    },
+    {
+      "cells": [
+        [
+          16,
+          9
+        ],
+        [
+          16,
+          10
+        ]
+      ],
+      "by": -0.1
+    },
+    {
+      "cells": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "by": -0.35
+    },
+    {
+      "cells": [
+        [
+          15,
+          9
+        ],
+        [
+          15,
+          9
+        ]
+      ],
+      "by": -0.3
+    }
+  ],
   "source": "SOURCE.md"
 }

@@ -1139,7 +1139,11 @@ class LevelScene extends Phaser.Scene {
             targets: actor.sprite,
             alpha: 0,
             duration: this.playback.tickDuration * 0.9,
-            onComplete: () => actor.sprite.setVisible(false).setAlpha(1),
+            onComplete: () => {
+              actor.sprite.setVisible(false).setAlpha(1);
+              // Gone at a step's last tick, no tick after says so (D103).
+              this.publish();
+            },
           });
         }
         break;

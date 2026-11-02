@@ -58,21 +58,31 @@ for (const [wizard, locale, won] of [
   });
 }
 
+/** From the wizard's dormitory, round the common room's table, into the other's doorway. */
+const OTHER_DORMITORY = [
+  'wizard.move_down(2)',
+  'wizard.move_left(2)',
+  'wizard.move_down()',
+  'wizard.move_left(4)',
+  'wizard.move_up()',
+  'wizard.move_left()',
+].join('\n');
+
 test.describe('in the dormitory (D84)', () => {
   test.use({ locale: 'en-US' });
 
   test("the other dormitory's arch refuses the wizard, with the wizard's own words", async ({ page }) => {
     await seedWizard(page, PABLO);
     await open(page, 'your-bed');
-    await run(page, 'wizard.move_up(5)\nwizard.move_left(4)');
-    await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '10,8');
+    await run(page, OTHER_DORMITORY);
+    await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '10,9');
     await expect(page.locator('.outcome-text')).toContainText("girls' dormitory");
   });
 
   test('a girl wizard is refused the boys’ dormitory', async ({ page }) => {
     await seedWizard(page, MARTA);
     await open(page, 'your-bed');
-    await run(page, 'wizard.move_up(5)\nwizard.move_left(4)');
+    await run(page, OTHER_DORMITORY);
     await expect(page.locator('.outcome-text')).toContainText("boys' dormitory");
   });
 
@@ -119,6 +129,16 @@ test.describe('in the dormitory (D84)', () => {
     await storyNext(page);
     await expect(scene).not.toHaveAttribute('data-asleep', /mate/);
     await expect(scene).toHaveAttribute('data-actors', /mate:16,5/);
+    // The two leave together (D103): the wizard opens the door, both go out, the
+    // mate shuts it behind them.
+    await storyNext(page, 3);
+    await expect(scene).toHaveAttribute('data-actors', /mate:13,12/, { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-wizard', '12,12');
+    await storyNext(page);
+    await expect(scene).toHaveAttribute('data-wizard', '11,15', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-actors', /mate:12,15/, { timeout: 30_000 });
+    await expect(scene).not.toHaveAttribute('data-doors', /front_door/);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}morning-out.png` });
   });
 });
 

@@ -1,11 +1,11 @@
 {
-  "about": "The first-year dormitory, chapter 2's night scene: the chosen painting (image-first-dormitory-3) with its two wands taken off the trunks and its border mended by Gemini (game-dormitory-border), its grid removed, and its bottom right corner mended (repaint) so that a wall closes the corridor off from the walk along the battlements. Its beds, trunks, bedside tables, armchairs and round table are cut by Gemini's magenta (marks); its walls, the ones between the rooms and the front one with the door, by polygons, drawn over every figure (D95); each bed's quilt and folded sheet, drawn over the pupil asleep in it, by Gemini's magenta too (D97). Pictures named here are in art/raw/, which git ignores.",
+  "about": "The first-year dormitory, chapter 2's night scene: the chosen painting (image-first-dormitory-3) with its two wands taken off the trunks and its border mended by Gemini (game-dormitory-border), its grid removed, and its corridor's right end mended (repaint, corner) so that the castle's wall, going on from the rooms' front wall, closes the corridor off from the walk along the battlements. Its beds, trunks, bedside tables, armchairs and round table are cut by Gemini's magenta (marks); the walls between the rooms, with their open leaves, by polygons drawn over every figure (D95), the one in a doorway on row 9 too, but for the doorway's inside under the leaf (D104); the front wall, with the door's arch, by a polygon on its foot's row, over whoever stands behind it and under whoever walks the corridor; the door to the corridor is a thing, shut or open (doorways, D108); each bed's quilt and folded sheet, drawn over the pupil asleep in it, by Gemini's magenta too (D97). Figures on the strips beside the walls and in the doorways are drawn on the painted strip (nudged, D105). Pictures named here are in art/raw/, which git ignores.",
   "sources": {
     "folder": "art/raw/game-dormitory",
     "edits": "art/raw/game-dormitory",
-    "painting": "dormitory-mended.png",
+    "painting": "dormitory-walls.png",
     "grid": "grid.json",
-    "ground": "dormitory-mended.png"
+    "ground": "dormitory-walls.png"
   },
   "repaint": {
     "about": "Painted by Gemini 3 Pro Image from tools/art/prompts/game-dormitory-corner.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the box.",
@@ -27,16 +27,36 @@
     "canvas": "art/raw/game-dormitory/dormitory-repaint-canvas.png",
     "painting": "art/raw/game-dormitory/dormitory-mended.png"
   },
+  "corner": {
+    "about": "The corridor's right end, closed by the castle's wall going on straight down from the corner of the rooms' front wall, the same stones and light, the walk along the battlements beyond it. Painted by Gemini 3 Pro Image from tools/art/prompts/game-dormitory-corner-2.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the box.",
+    "from": "art/raw/game-dormitory/dormitory-mended.png",
+    "boxes": [
+      [
+        4014,
+        2652,
+        4300,
+        3584
+      ]
+    ],
+    "crop": [
+      2757,
+      1984,
+      4800,
+      3584
+    ],
+    "canvas": "art/raw/game-dormitory/dormitory-corner-canvas.png",
+    "painting": "art/raw/game-dormitory/dormitory-walls.png"
+  },
   "things": {
     "front_wall": {
-      "about": "The front wall along the common room and the dormitories, with the door and its arch: over every figure (D95), who walks behind it on row 14 and stands in the doorway behind the door; its beam where each wall between the rooms stands on it, with no outline between, as drawn.",
+      "about": "The front wall along the common room and the dormitories, with the door's arch, from the floor's edge to the wall's foot, the line between its plinth and the corridor's flagstones: on its foot's row, 15, over whoever stands behind it on the rows above and under whoever walks the corridor before it; its beam where each wall between the rooms stands on it, with no outline between, as drawn. It gives up the door's cut-out.",
       "box": [
         0,
         12.3,
         25,
-        18
+        15.45
       ],
-      "row": 17,
+      "row": 15,
       "static": true,
       "solid": true,
       "mask": "polygon",
@@ -91,17 +111,16 @@
         ],
         [
           25,
-          18
+          15.28
         ],
         [
           0,
-          18
+          15.28
         ]
       ],
       "states": {
         "standing": "painting"
       },
-      "over": true,
       "fixed": [
         [
           [
@@ -141,8 +160,32 @@
         ]
       ]
     },
+    "front_door": {
+      "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95); open, the doorway shows the common room's floor, from the painting, under every figure (D108, doorways); it rests shut, and a story opens and closes it (D103).",
+      "box": [
+        11.3,
+        12.4,
+        13.4,
+        15.4
+      ],
+      "row": 14,
+      "reach": 0.4,
+      "solid": true,
+      "without": "dormitory-door-open.png",
+      "states": {
+        "closed": "painting",
+        "open": "without"
+      },
+      "at": [
+        12,
+        14
+      ],
+      "under": true,
+      "through": true,
+      "rest": "closed"
+    },
     "wall_left": {
-      "about": "The wall between the common room and the left dormitory, its doorway's open door with it: over every figure (D95); its foot, the grey of the beam it stands on with no outline between, as drawn.",
+      "about": "The wall between the common room and the left dormitory, its open door's leaf with it: over every figure (D95), the one in its doorway on row 9 too, but for the doorway's inside under the leaf, which is under them (D104); its foot, the grey of the beam it stands on with no outline between, as drawn.",
       "box": [
         8.3,
         3.95,
@@ -175,12 +218,16 @@
           8.6
         ],
         [
-          9.42,
-          9.3
+          9.5,
+          8.85
         ],
         [
-          9.3,
-          9.9
+          9.0,
+          8.85
+        ],
+        [
+          9.0,
+          10.1
         ],
         [
           9.13,
@@ -245,7 +292,7 @@
       ]
     },
     "wall_right": {
-      "about": "The wall between the common room and the right dormitory, its doorway's open door with it: over every figure (D95); its foot, the grey of the beam it stands on with no outline between, as drawn.",
+      "about": "The wall between the common room and the right dormitory, its open door's leaf with it: over every figure (D95), the one in its doorway on row 9 too, but for the doorway's inside under the leaf, which is under them (D104); its foot, the grey of the beam it stands on with no outline between, as drawn.",
       "box": [
         14.85,
         3.95,
@@ -310,16 +357,16 @@
           10.3
         ],
         [
-          15.25,
-          9.9
+          15.4,
+          10.05
         ],
         [
-          15.08,
-          9.4
+          15.4,
+          8.85
         ],
         [
           15.04,
-          8.6
+          8.85
         ],
         [
           15.04,
@@ -689,7 +736,7 @@
   },
   "cuts": [],
   "castle": 0,
-  "source": "# The dormitory\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-dormitory-3.md`, with the field as its\n  style's reference; its border and the wands on its trunks edited by it\n  (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).\n- Its bottom right corner mended by Gemini from `game-dormitory-corner.md`,\n  joined by `tools/art/repaint.py`, the painting kept pixel for pixel\n  elsewhere: a wall closing the corridor off from the battlements.\n- Its beds, trunks, bedside tables, armchairs and table, and the beds' quilts\n  and sheets, cut where Gemini painted them flat magenta in pictures of the\n  dormitory (`game-dormitory-marked-*.md`, `game-dormitory-covers-*.md`); its\n  walls by polygons, each edge on its outline.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
+  "source": "# The dormitory\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-dormitory-3.md`, with the field as its\n  style's reference; its border and the wands on its trunks edited by it\n  (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).\n- Its corridor's right end mended by Gemini, joined by `tools/art/repaint.py`,\n  the painting kept pixel for pixel elsewhere: the castle's wall closing the\n  corridor off from the battlements, going on from the rooms' front wall\n  (`game-dormitory-corner-2.md`).\n- Its door to the corridor opened without a model (`repaint.py doorways`),\n  its leaf painted with the common room's own floor.\n- Its beds, trunks, bedside tables, armchairs and table, and the beds' quilts\n  and sheets, cut where Gemini painted them flat magenta in pictures of the\n  dormitory (`game-dormitory-marked-*.md`, `game-dormitory-covers-*.md`); its\n  walls by polygons, each edge on its outline.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
   "cut": false,
   "beds": {
     "bed_1": {
@@ -819,5 +866,177 @@
         ]
       }
     ]
-  }
+  },
+  "doorways": {
+    "about": "The front door opened by tools/art/repaint.py doorways (D108): its whole leaf, from the arch to the threshold and the threshold's line, painted with the common room's own floor, darker under the arch.",
+    "doors": [
+      {
+        "thing": "front_door",
+        "seeds": [
+          [
+            11.62,
+            12.95,
+            13.35
+          ],
+          [
+            11.62,
+            12.95,
+            14.2
+          ],
+          [
+            11.62,
+            12.95,
+            15.05
+          ]
+        ],
+        "floor": [
+          11.7,
+          10.4,
+          13.3,
+          11.9
+        ],
+        "sill": 0.1,
+        "painting": "dormitory-door-open.png"
+      }
+    ]
+  },
+  "nudged": [
+    {
+      "cells": [
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          6
+        ]
+      ],
+      "by": -0.05
+    },
+    {
+      "cells": [
+        [
+          8,
+          7
+        ],
+        [
+          8,
+          8
+        ]
+      ],
+      "by": -0.3
+    },
+    {
+      "cells": [
+        [
+          8,
+          9
+        ],
+        [
+          8,
+          10
+        ]
+      ],
+      "by": -0.45
+    },
+    {
+      "cells": [
+        [
+          8,
+          11
+        ],
+        [
+          8,
+          13
+        ]
+      ],
+      "by": -0.65
+    },
+    {
+      "cells": [
+        [
+          16,
+          5
+        ],
+        [
+          16,
+          6
+        ]
+      ],
+      "by": -0.4
+    },
+    {
+      "cells": [
+        [
+          16,
+          7
+        ],
+        [
+          16,
+          8
+        ]
+      ],
+      "by": -0.25
+    },
+    {
+      "cells": [
+        [
+          16,
+          9
+        ],
+        [
+          16,
+          10
+        ]
+      ],
+      "by": -0.1
+    },
+    {
+      "cells": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "by": -0.35
+    },
+    {
+      "cells": [
+        [
+          15,
+          9
+        ],
+        [
+          15,
+          9
+        ]
+      ],
+      "by": -0.3
+    }
+  ],
+  "kept": [
+    [
+      8.95,
+      8.55,
+      9.6,
+      8.9
+    ],
+    [
+      8.6,
+      8.85,
+      9.45,
+      10.1
+    ],
+    [
+      15.0,
+      8.85,
+      15.85,
+      10.1
+    ]
+  ]
 }

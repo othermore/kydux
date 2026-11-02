@@ -4,13 +4,13 @@
     "Sleep in the free bed beside {mate}'s.",
     "Without bumping into anything."
   ],
-  "starting_code": "# We share a dormitory! Walk to the free bed beside mine and sleep.\n",
+  "starting_code": "# Go to the free bed's trunk and sleep.\n",
   "hints": [
-    "First, walk a little to the right and then up, to the arch on the right into our dormitory.",
-    "Take a few steps right to stand beside the free bed.",
-    "Finally, use the `sleep` method to lie down and rest."
+    "`sleep` works only beside the trunk at the foot of a free bed, and the free bed is the one below {mate}'s.",
+    "One step down puts you beside its trunk.",
+    "Then use the method `sleep`."
   ],
-  "intro": "Come on in and take the free bed right beside mine. Lie down and get some sleep.",
+  "intro": "This is our dormitory! The free bed is the one right beside mine. To sleep, stand beside its trunk, and then sleep.",
   "outro": "Good morning! Let us go to the library and find you a school wand of your own.",
   "learned": "Now you know that an action may need the right place, and that a program must walk there first."
 }

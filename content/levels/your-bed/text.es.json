@@ -4,13 +4,13 @@
     "Duerme en la cama libre junto a la de {mate}.",
     "Sin chocar con nada."
   ],
-  "starting_code": "# ¡Compartimos dormitorio! Ve a la cama libre junto a la mía y duerme.\n",
+  "starting_code": "# Ve al baúl de la cama libre y duerme.\n",
   "hints": [
-    "Primero, camina un poco a la derecha y luego hacia arriba, hasta el arco de la derecha de nuestro dormitorio.",
-    "Da unos pasos a la derecha para situarte junto a la cama libre.",
-    "Por último, usa el método `sleep` para acostarte y descansar."
+    "`sleep` solo funciona junto al baúl que hay a los pies de una cama libre, y la cama libre es la que está debajo de la de {mate}.",
+    "Con un paso hacia abajo te quedas junto a su baúl.",
+    "Luego usa el método `sleep`."
   ],
-  "intro": "Entra y coge la cama libre justo al lado de la mía. Acuéstate y duerme un poco.",
+  "intro": "¡Este es nuestro dormitorio! La cama libre es la que está justo al lado de la mía. Para dormir, ponte junto a su baúl y luego duerme.",
   "outro": "¡Buenos días! Vamos a la biblioteca a buscarte una varita de la escuela para ti.",
   "learned": "Ahora sabes que una acción solo se puede hacer en el lugar correcto, y que un programa debe caminar hasta allí primero."
 }

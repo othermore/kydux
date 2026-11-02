@@ -137,8 +137,10 @@ class World:
 
     def is_free(self, position: Position) -> bool:
         """Whether the wizard or an actor can walk onto a tile in the next tick: floor,
-        no closed door, and no stair that is away (D53)."""
+        no closed door, no open door's leaf (D125), and no stair that is away (D53)."""
         if not (self.level.free(position) and self._not_shut(position)):
+            return False
+        if self.leaf_over(position) is not None:
             return False
         return all(
             stair._k_in_place_at(self.tick + 1)
@@ -176,6 +178,43 @@ class World:
             if isinstance(thing, Door) and thing._k_position == position:
                 return thing
         return None
+
+    def leaf_over(self, position: Position) -> Door | None:
+        """The open door whose leaf lies on a tile (D125), or None."""
+        for thing in self.things.values():
+            if isinstance(thing, Door) and thing.is_open and position in thing._k_spec.covers:
+                return thing
+        return None
+
+    def shove(self, door: Door) -> None:
+        """A door has opened: whoever stands where its leaf comes to lie steps to the
+        nearest free tile of the same row, away from the door (D125), in the door's
+        tick, as an event of the door's."""
+        figures: list[Child] = [self.wizard, *self.actors.values()]
+        for figure in figures:
+            here = figure._k_position
+            if here not in door._k_spec.covers:
+                continue
+            taken = {other._k_position for other in figures if other is not figure}
+            way = -1 if here.x < door._k_position.x else 1
+            to = None
+            for along in (way, -way):
+                x = here.x + along
+                while self.level.inside(Position(x, here.y)) and to is None:
+                    tile = Position(x, here.y)
+                    if not self.level.free(tile) or not self._not_shut(tile):
+                        break
+                    if self.is_free(tile) and tile not in taken:
+                        to = tile
+                    x += along
+                if to is not None:
+                    break
+            if to is None:
+                continue
+            name = "wizard" if figure is self.wizard else figure.name
+            figure._set(position=to)
+            moved = {"id": name, "from": list(here), "to": list(to), "by": door.name}
+            self.note(door.name, "shoved", moved)
 
     def door_beside(self, position: Position, opens: Callable[[Door], bool]) -> Door | None:
         """The first closed door next to `position`, by id, for which `opens` holds."""
@@ -309,6 +348,17 @@ class Wizard(Child):
                 # A tile the wizard may not step on, though anyone else may (D84).
                 reason = world.level.forbidden_reason
                 refused = {"at": list(here), "by": "wizard", "reason": reason, "tried": False}
+                world.act("blocked", {**refused, "facing": direction.value})
+                return
+            leaf = world.leaf_over(ahead)
+            if leaf is not None:
+                # An open door's leaf lies there (D125).
+                refused = {
+                    "at": list(here),
+                    "by": leaf.name,
+                    "reason": "door_leaf",
+                    "tried": False,
+                }
                 world.act("blocked", {**refused, "facing": direction.value})
                 return
             if not world.is_free(ahead):

@@ -2,7 +2,8 @@
 // the scene that name and show its cells, turned on and off from a small panel in
 // the scene's corner. Each cell's column and row, drawn on a canvas of its own at
 // the screen's resolution, so that they stay sharp however the scene is scaled;
-// each cell tinted by its kind of terrain, crossed out when no one walks on it;
+// each cell tinted by its kind of terrain, crossed out when no one walks on it,
+// and in another colour while an open door's leaf lies on it (D125);
 // and every painted image's mask, each row in its own colour. Which layers are on
 // is kept in the browser for the next time.
 
@@ -35,6 +36,8 @@ const KIND_COLOURS: Record<string, number> = {
   margin: 0x4a3f5c,
 };
 const OTHER = 0xff66cc;
+/** The cross on a cell an open door's leaf lies on (D125). */
+const LEAF = 0xff9f1a;
 
 
 function kept(): Record<DebugLayer, boolean> {
@@ -80,6 +83,8 @@ interface Masked {
 export class DebugView {
   private readonly shown = kept();
   private readonly cells: Phaser.GameObjects.Graphics;
+  /** The cells the open doors' leaves lie on, crossed out while they are open. */
+  private readonly leaves: Phaser.GameObjects.Graphics;
   private readonly masks: Masked[] = [];
   private readonly numbers: HTMLCanvasElement;
   private readonly legend: HTMLElement;
@@ -94,6 +99,7 @@ export class DebugView {
     private readonly margin: [number, number, number, number] = [0, 0, 0, 0],
   ) {
     this.cells = this.drawCells();
+    this.leaves = this.scene.add.graphics().setDepth(DEPTH);
     for (const { image, row } of painted) this.masks.push({ source: image, mask: this.maskOf(image, row) });
     // Over the scene's canvas, in the frame the scene is in.
     const frame = parent.parentElement ?? parent;
@@ -139,6 +145,23 @@ export class DebugView {
     for (let x = x0; x <= x1; x += 1) cells.lineBetween(x * TILE, y0 * TILE, x * TILE, y1 * TILE);
     for (let y = y0; y <= y1; y += 1) cells.lineBetween(x0 * TILE, y * TILE, x1 * TILE, y * TILE);
     return cells;
+  }
+
+  /** The cells the open doors' leaves lie on (D125), crossed out while they are
+   * open; data-debug-leaves names them, "x,y" joined by ";". */
+  doorsOpen(open: ReadonlySet<string>): void {
+    this.leaves.clear();
+    const covered = this.map.things
+      .filter((thing) => thing.kind === 'door' && open.has(thing.id))
+      .flatMap((thing) => thing.covers ?? []);
+    this.leaves.lineStyle(3, LEAF, 0.95);
+    for (const [x, y] of covered) {
+      this.leaves.fillStyle(LEAF, 0.3).fillRect(x * TILE, y * TILE, TILE, TILE);
+      this.leaves.lineBetween(x * TILE + 6, y * TILE + 6, (x + 1) * TILE - 6, (y + 1) * TILE - 6);
+      this.leaves.lineBetween((x + 1) * TILE - 6, y * TILE + 6, x * TILE + 6, (y + 1) * TILE - 6);
+    }
+    if (covered.length > 0) this.parent.dataset.debugLeaves = covered.map((tile) => tile.join(',')).join(';');
+    else delete this.parent.dataset.debugLeaves;
   }
 
   /** A painted image's mask: its shape filled with its row's colour, see-through. */
@@ -206,12 +229,14 @@ export class DebugView {
       entry(hex(KIND_COLOURS[kind] ?? OTHER), shown ? `${shown} · ${words}` : words);
     }
     entry('', debugWord('blocked'), true);
+    if (this.map.things.some((thing) => (thing.covers ?? []).length > 0)) entry(hex(LEAF), debugWord('leaf'));
     return legend;
   }
 
   /** Each layer shown as the panel says. */
   private apply(): void {
     this.cells.setVisible(this.shown.cells);
+    this.leaves.setVisible(this.shown.cells);
     this.legend.hidden = !this.shown.cells;
     for (const { mask } of this.masks) mask.setVisible(this.shown.masks);
     this.numbers.hidden = !this.shown.numbers;

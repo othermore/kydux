@@ -8,6 +8,13 @@ const spanish = { languages: ['es'], storage: null };
 afterEach(() => initLanguage(english));
 
 describe('blockedText', () => {
+  it('says an open door\'s leaf is in the way, in both languages (D125)', () => {
+    initLanguage(english);
+    expect(blockedText('door_leaf', 'door')).toBe("The open door's leaf is in the way.");
+    initLanguage(spanish);
+    expect(blockedText('door_leaf', 'door')).toBe('La hoja de la puerta abierta está delante.');
+  });
+
   it('says why an action could not be done, with the thing named', () => {
     initLanguage(english);
     expect(blockedText('far', 'door')).toBe('I cannot reach the door from here.');

@@ -183,7 +183,12 @@ owner on 2026-10-26, for every scene from the dormitory on:
   off its cells' middle (D105). An open door is its leaf swung against the
   wall beside its doorway (D111), drawn by its open state's `row` when that
   wall is drawn on another row than the door, and its doorway's floor is
-  the ground's, under every figure (D108); a door's `rest` is the state it
+  the ground's, under every figure (D108); the cells of that row its leaf
+  lies on, where a figure would stand behind it, are the door's `covers`
+  in the scene's `scene.json`, which no one walks onto while it is open
+  (D125): a cell whose lower part, from 0.45 of it down and its sides left
+  out, the leaf covers by more than a fifth, measured by `export_scene.py
+  check` and held by the content test; a door's `rest` is the state it
   is drawn in where no level or story places it (D104). A
   scene's `dark` passages draw a figure darker the deeper it goes into
   them, its head darker than its feet (D100).

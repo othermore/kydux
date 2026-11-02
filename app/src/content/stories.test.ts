@@ -127,6 +127,30 @@ describe('a story as the scene\'s events (D74)', () => {
     ]);
   });
 
+  it('moves whoever stands on an opening door\'s leaf aside along the row, away from it (D125)', () => {
+    const corridor = {
+      map: ['#######', '###S###', '#.....#', '#.....#', '#######'],
+      things: [{ kind: 'door', id: 'door', at: [3, 1], covers: { open: [[2, 2]] } }],
+      actors: [{ id: 'nuri', kind: 'friend', at: [2, 2] }],
+    };
+    const { events } = storyEvents({
+      world: corridor,
+      steps: steps({ who: 'voice', by: 'wizard', do: { open: 'door' } }, { who: 'nuri', do: { walk: [1, 3] } }),
+    });
+    expect(events.map((e) => [e.tick, e.actor, e.kind])).toEqual([
+      [1, 'wizard', 'open'],
+      [1, 'door', 'shoved'],
+      [2, 'nuri', 'move'],
+      [3, 'nuri', 'say'],
+    ]);
+    expect(events[1]?.data).toEqual({ id: 'nuri', from: [2, 2], to: [1, 2], by: 'door' });
+    // The walk after it starts where the leaf moved nuri to.
+    expect(events[2]?.data).toEqual({ from: [1, 2], to: [1, 3], facing: 'down' });
+    // Shut, the door's leaf moves no one.
+    const shut = storyEvents({ world: corridor, steps: steps({ who: 'nuri', do: { walk: [4, 2] } }) });
+    expect(shut.events.some((e) => e.kind === 'shoved')).toBe(false);
+  });
+
   it('keeps the speaker who goes till the next step, in a list as alone', () => {
     const { events } = storyEvents({
       world,

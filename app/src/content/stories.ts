@@ -3,7 +3,8 @@
 // text.<lang>.json, from content/stories/<id>/. And the scene's events for its
 // steps: each step's actions played as the world's events would be, the figures'
 // at once (D103), then its words said in a bubble, or by the voice under the
-// scene.
+// scene; a door's leaf, opening, moves whoever stands where it comes to lie
+// (D125).
 
 import type { Facing, Tile } from '../engine/sight';
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
@@ -132,15 +133,67 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world'>): {
     if (actor.at) where.set(actor.id, actor.at);
   }
   const beds = new Map<string, Tile>();
-  for (const thing of (story.world.things as { id: string; kind?: string; at?: Tile }[] | undefined) ?? []) {
+  const doors = new Map<string, { at: Tile; covers: Tile[] }>();
+  const opened = new Set<string>();
+  type Placed = { id: string; kind?: string; at?: Tile; open?: boolean; covers?: { open?: Tile[] } };
+  for (const thing of (story.world.things as Placed[] | undefined) ?? []) {
     if (thing.kind === 'bed' && thing.at) beds.set(thing.id, thing.at);
+    if (thing.kind === 'door' && thing.at) {
+      doors.set(thing.id, { at: thing.at, covers: thing.covers?.open ?? [] });
+      if (thing.open === true) opened.add(thing.id);
+    }
   }
+  // Where each figure in sight stands as the events play, for an opening door's
+  // leaf to move whoever stands on it (D125).
+  const standing = new Map(where);
+  const same = (one: Tile, other: Tile) => one[0] === other[0] && one[1] === other[1];
+  const underLeaf = (tile: Tile) => [...opened].some((id) => doors.get(id)?.covers.some((cell) => same(cell, tile)));
+  const shut = (tile: Tile) => [...doors].some(([id, door]) => !opened.has(id) && same(door.at, tile));
+  const floor = ([x, y]: Tile) => {
+    const char = start[y]?.[x];
+    return char !== undefined && char !== '#' && char !== '=';
+  };
   const events: WorldEvent[] = [];
   const spans: { first: number; last: number }[] = [];
   let tick = 1;
   let vanishing: string | null = null;
+  /** Whoever stands on a door's leaf as it opens steps to the nearest free tile
+   * of the row, away from the door, as the world's staging check moves them. */
+  const shove = (id: string) => {
+    const door = doors.get(id);
+    if (!door) return;
+    for (const [who, at] of [...standing]) {
+      if (!door.covers.some((cell) => same(cell, at))) continue;
+      const away = at[0] < door.at[0] ? -1 : 1;
+      let to: Tile | null = null;
+      for (const along of [away, -away]) {
+        for (let x = at[0] + along; !to && floor([x, at[1]]) && !shut([x, at[1]]); x += along) {
+          const tile: Tile = [x, at[1]];
+          const taken = [...standing].some(([other, there]) => other !== who && same(there, tile));
+          if (!underLeaf(tile) && !taken) to = tile;
+        }
+        if (to) break;
+      }
+      if (!to) continue;
+      events.push({ tick, actor: id, kind: 'shoved', data: { id: who, from: at, to, by: id }, line: null });
+      standing.set(who, to);
+      where.set(who, to);
+    }
+  };
+  /** What an event does to who stands where and which doors are open. */
+  const played = (actor: string, kind: string, data: Record<string, unknown>) => {
+    if (kind === 'move') standing.set(actor, data.to as Tile);
+    else if (kind === 'appear') standing.set(actor, data.at as Tile);
+    else if (kind === 'vanish') standing.delete(actor);
+    else if (kind === 'close') opened.delete(String(data.id));
+    else if (kind === 'open') {
+      opened.add(String(data.id));
+      shove(String(data.id));
+    }
+  };
   const add = (actor: string, kind: string, data: Record<string, unknown>) => {
     events.push({ tick, actor, kind, data, line: null });
+    played(actor, kind, data);
     tick += 1;
   };
   for (const step of story.steps) {
@@ -196,7 +249,9 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world'>): {
     while ([...queues.values()].some((queue) => queue.length > 0)) {
       for (const [actor, queue] of queues) {
         const next = queue.shift();
-        if (next) events.push({ tick, actor, kind: next.kind, data: next.data, line: null });
+        if (!next) continue;
+        events.push({ tick, actor, kind: next.kind, data: next.data, line: null });
+        played(actor, next.kind, next.data);
       }
       tick += 1;
     }

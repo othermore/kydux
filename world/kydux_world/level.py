@@ -96,6 +96,9 @@ class ThingSpec:
     #: Lying where something painted covers it wholly, so that it is not seen until
     #: it is revealed or picked up (D85); the world treats it as any thing.
     hidden: bool = False
+    #: For a door, the cells its open leaf lies on beside its doorway, which no one
+    #: walks onto while it is open (D125).
+    covers: tuple[Position, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -199,6 +202,11 @@ class Level:
         _check_ids(level_id, things, actors)
         things, actors = _sleepers(level_id, things, actors)
         doors = {t.id for t in things if t.kind == "door"}
+        # No one stands where an open door's leaf lies (D125).
+        covered = {cell: t.id for t in things if t.open for cell in t.covers}
+        for who, at in [("the wizard", starts[0]), *((a.id, a.position) for a in actors)]:
+            if at in covered:
+                raise LevelError(f"{level_id}: {who} stands under {covered[at]}'s open leaf")
         for thing in things:
             if thing.opens is not None and thing.opens not in doors:
                 raise LevelError(f"{level_id}: the key {thing.id} opens {thing.opens}, no door")
@@ -441,6 +449,7 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
     hidden = spec.get("hidden", False)
     if not isinstance(hidden, bool) or (hidden and kind not in CARRIED_KINDS):
         raise LevelError(f"{shape.level_id}: only a thing the wizard carries is hidden")
+    covers = _covers(shape, spec, thing_id)
     return ThingSpec(
         kind,
         thing_id,
@@ -453,7 +462,23 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         open=opened,
         free=free,
         hidden=hidden,
+        covers=covers,
     )
+
+
+def _covers(shape: _Shape, spec: dict[str, Any], thing_id: str) -> tuple[Position, ...]:
+    """A door's `covers`: the floor cells its open leaf lies on, `{"open": [[x, y]...]}`,
+    which its scene names (D125)."""
+    covers = spec.get("covers")
+    if covers is None:
+        return ()
+    cells = covers.get("open") if isinstance(covers, dict) and set(covers) == {"open"} else None
+    if spec.get("kind") != "door" or not isinstance(cells, list):
+        raise LevelError(f"{shape.level_id}: only a door covers cells, by its open state's")
+    placed = tuple(shape.tile(cell, f"a cell {thing_id} covers") for cell in cells)
+    if any(cell in shape.shelves for cell in placed):
+        raise LevelError(f"{shape.level_id}: {thing_id} covers a shelf, not floor")
+    return placed
 
 
 def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
@@ -873,8 +898,10 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     (D91); opening or closing a door beside it. One figure's actions follow
     one another; different figures' are played at once, tick by tick, in the
     order they are first named, and are checked so. An actor may start
-    `asleep` in a bed beside its `at`. The voice does nothing itself; no one
-    speaks or moves out of sight, and no one asleep walks, turns or goes."""
+    `asleep` in a bed beside its `at`. No one walks onto an open door's leaf, and
+    whoever stands on it as the door opens steps aside along the row (D125). The
+    voice does nothing itself; no one speaks or moves out of sight, and no one
+    asleep walks, turns or goes."""
     story_id = data.get("id")
     if "scene" not in data:
         raise LevelError(f"{story_id}: a story is told on a scene")
@@ -927,9 +954,21 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         if where[actor_id] is not None and not walked(where[actor_id]):
             raise LevelError(f"{story_id}: {actor_id} stands on no floor")
 
+    # The cells each door's open leaf lies on (D125), and the doors open now; no
+    # one walks onto an open door's leaf.
+    leaves = {
+        thing["id"]: [Position(*cell) for cell in thing.get("covers", {}).get("open", [])]
+        for thing in built.get("things", [])
+        if thing.get("kind") == "door" and "at" in thing
+    }
+    opened: set[str] = set()
+
+    def under_leaf(tile: Position) -> bool:
+        return any(tile in leaves[door] for door in opened)
+
     def free(tile: Position, mover: str) -> bool:
         taken = any(at == tile for who, at in where.items() if who != mover)
-        return walked(tile) and tile not in shut and not taken
+        return walked(tile) and tile not in shut and not under_leaf(tile) and not taken
 
     beds = {
         thing["id"]: Position(*thing["at"])
@@ -958,7 +997,29 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         for thing in built.get("things", [])
         if thing.get("kind") == "door" and "at" in thing
     }
-    opened = {name for name, at in doors.items() if at not in shut}
+    opened.update(name for name, at in doors.items() if at not in shut)
+
+    def shove(door: str, queues: dict[str, list[tuple[str, Any]]], here: str) -> None:
+        """Whoever stands on the door's leaf as it opens steps to the nearest free
+        tile of the row, away from the door, as the world moves them (D125)."""
+        for who, at in list(where.items()):
+            if at is None or at not in leaves[door]:
+                continue
+            if queues.get(who):
+                raise LevelError(f"{here}: {who} is in the way of {door}'s leaf, mid-way")
+            way = -1 if at.x < doors[door].x else 1
+            to = None
+            for along in (way, -way):
+                tile = Position(at.x + along, at.y)
+                while to is None and walked(tile) and tile not in shut:
+                    if free(tile, who):
+                        to = tile
+                    tile = Position(tile.x + along, tile.y)
+                if to is not None:
+                    break
+            if to is None:
+                raise LevelError(f"{here}: {who} has nowhere to step from {door}'s leaf")
+            where[who] = to
 
     def beside(who: str, tile: Position) -> bool:
         at = where[who]
@@ -1074,6 +1135,7 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                     if kind == "open":
                         opened.add(value)
                         shut.discard(doors[value])
+                        shove(value, queues, here)
                     else:
                         if any(at == doors[value] for at in where.values()):
                             raise LevelError(f"{here}: someone stands in {value}'s doorway")

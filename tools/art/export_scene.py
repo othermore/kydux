@@ -1015,10 +1015,75 @@ def main(arguments: list[str]) -> int:
     if what in ("check", "all"):
         for path in checks(settings_of):
             print(path.relative_to(REPO))
+        # The cells each open leaf lies on, as the scene names them (D125).
+        wrong = leaves_differ(settings_of.id)
+        for line in wrong:
+            print(line)
         # The wizard on every cell walked on, and the cut's problems it would show.
-        if sweep.main(settings_of.id) != 0:
+        if sweep.main(settings_of.id) != 0 or wrong:
             return 1
     return 0
+
+
+#: A cell walked on lies under an open leaf (D125) when the leaf covers more than
+#: LEAF_SHARE of its lower part, from LEAF_BAND of the cell down, its sides
+#: (LEAF_SIDE each) left out: where a figure standing there has its legs and feet,
+#: as tests/project/test_art_content.py says something of the painting stands on a
+#: cell.
+LEAF_BAND = 0.45
+LEAF_SIDE = 0.2
+LEAF_SHARE = 0.2
+
+
+def leaf_cells(scene_id: str, folder: Path | None = None) -> dict[str, list[list[int]]]:
+    """For each door of the exported scene with an open state, the cells walked on of
+    that state's row, its own doorway left out, that its open leaf lies on (D125),
+    measured on its exported picture, in reading order."""
+    folder = folder or REPO / "content" / "art" / "scenes" / scene_id
+    art = json.loads((folder / "art.json").read_text())
+    cell = art["cell"]
+    walked = sweep.walks(scene_id)
+    about = json.loads((REPO / "content" / "scenes" / scene_id / "scene.json").read_text())
+    doorways = {thing["id"]: thing.get("at") for thing in about.get("things", [])}
+    found = {}
+    for name, thing in art["things"].items():
+        picture = thing["states"].get("open")
+        if picture is None:
+            continue
+        row = thing.get("rows", {}).get("open", thing["row"])
+        doorway = thing.get("at", doorways.get(name))
+        alpha = np.array(Image.open(folder / picture).convert("RGBA"))[..., 3] > 128
+        left, top = thing["left"], thing["top"]
+        side = int(cell * LEAF_SIDE)
+        y0, y1 = row * cell + int(cell * LEAF_BAND) - top, (row + 1) * cell - top
+        cells = []
+        for x in range(walked.shape[1]):
+            if not walked[row, x] or [x, row] == doorway:
+                continue
+            x0, x1 = x * cell + side - left, (x + 1) * cell - side - left
+            band = alpha[max(0, y0) : max(0, y1), max(0, x0) : max(0, x1)]
+            share = band.sum() / ((y1 - y0) * (x1 - x0))
+            if share > LEAF_SHARE:
+                cells.append([x, row])
+        found[name] = cells
+    return found
+
+
+def leaves_differ(scene_id: str) -> list[str]:
+    """Where the cells the scene names under each open leaf (`covers`, scene.json)
+    are not the cells its exported picture lies on, one line each."""
+    about = json.loads((REPO / "content" / "scenes" / scene_id / "scene.json").read_text())
+    named = {
+        thing["id"]: thing.get("covers", {}).get("open", []) for thing in about.get("things", [])
+    }
+    wrong = []
+    for name, cells in leaf_cells(scene_id).items():
+        if sorted(named.get(name, [])) != sorted(cells):
+            shown = " ".join(f"{x},{y}" for x, y in cells) or "none"
+            wrong.append(
+                f"{name}: its open leaf lies on {shown}; scene.json's covers say otherwise"
+            )
+    return wrong
 
 
 def draw(

@@ -166,6 +166,25 @@ test.describe('in the dormitory (D84)', () => {
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-friend.png` });
   });
 
+  test("at the first night, Ilda opens the door with no one behind its leaf, whose cells ?debug shows (D125)", async ({ page }) => {
+    await seedWizard(page, MARTA);
+    await page.goto('/?debug#story/the-first-night');
+    const scene = page.locator('#scene');
+    await expect(scene).toHaveAttribute('data-debug', 'true', { timeout: 90_000 });
+    if ((await scene.getAttribute('data-debug-layers'))?.includes('cells') !== true) await page.locator('#debug-cells').click();
+    for (let step = 1; step < 5; step += 1) {
+      await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+      await storyNext(page);
+    }
+    // Step 5: Ilda opens the door, steps out and shuts it; while it is open, the
+    // cells its leaf lies on are not walked.
+    await expect(scene).toHaveAttribute('data-debug-leaves', '9,15;10,15', { timeout: 30_000 });
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}door-leaf-debug.png` });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(scene).not.toHaveAttribute('data-debug-leaves', /./);
+    await expect(scene).not.toHaveAttribute('data-shoved', /./);
+  });
+
   test('the mate lies asleep in the morning, and gets up to speak (D91)', async ({ page }) => {
     await seedWizard(page, PABLO);
     await page.goto('/#story/the-morning');

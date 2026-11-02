@@ -28,6 +28,9 @@ export interface ThingLayout {
   /** In the wizard's hands from the start, and drawn only once it leaves them,
    * given (D123); its tile is the wizard's start. */
   carried?: boolean;
+  /** For a door, the cells its open leaf lies on, which no one walks onto while it
+   * is open (D125). */
+  covers?: Tile[];
 }
 
 /** The kinds a level's wizard carries from the start (D49): each entry of
@@ -47,6 +50,12 @@ function lockOf(spec: Record<string, unknown>): DoorLock {
   if (typeof spec.sealed === 'string') return 'spell';
   if (typeof spec.password === 'string') return 'word';
   return 'none';
+}
+
+/** A door's `covers`, the cells its open leaf lies on (D125). */
+function coversOf(spec: Record<string, unknown>): Tile[] {
+  const covers = isRecord(spec.covers) ? spec.covers.open : null;
+  return Array.isArray(covers) ? covers.map(asTile).filter((tile): tile is Tile => tile !== null) : [];
 }
 
 export interface ActorLayout {
@@ -143,7 +152,9 @@ export function layout(level: LevelJson): Layout {
       const period = typeof spec.period === 'number' ? { period: spec.period } : {};
       const open = spec.kind === 'door' && spec.open === true;
       const art = typeof spec.art === 'string' ? { art: spec.art } : {};
-      things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec), open, ...period, ...art });
+      const covered = coversOf(spec);
+      const covers = covered.length > 0 ? { covers: covered } : {};
+      things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec), open, ...period, ...art, ...covers });
     }
   }
   const actors: ActorLayout[] = [];

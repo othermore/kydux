@@ -1,13 +1,18 @@
 """A painted scene and the levels on it hold together (D79): nothing of the painting
-stands on a cell the map lets one walk on, and no level puts its start, its mark,
-its things or its friend where a cut-out covers them."""
+stands on a cell the map lets one walk on, no level puts its start, its mark, its
+things or its friend where a cut-out covers them, and an open door's leaf lies on
+the cells its scene names (D125)."""
 
 import json
+import sys
 
 import numpy as np
 import pytest
 from conftest import REPO
 from PIL import Image
+
+sys.path.insert(0, str(REPO / "tools" / "art"))
+import export_scene  # noqa: E402
 
 CONTENT = REPO / "content"
 SCENES = sorted(p.parent.name for p in (CONTENT / "art" / "scenes").glob("*/art.json"))
@@ -128,3 +133,18 @@ def test_every_bed_of_the_scene_has_its_pillow_and_its_quilt(scene):
         # The pillow lies along the bed's own row, a cell or more from its tile.
         assert abs(hy - (y + 0.5)) < 1.5 and 1 <= abs(hx - (x + 0.5)) < 4, bed
         assert place["toward"] == ("right" if hx > x + 0.5 else "left"), bed
+
+
+@pytest.mark.parametrize("scene", SCENES)
+def test_the_cells_an_open_leaf_lies_on_are_the_cells_its_scene_names(scene):
+    """A door whose open leaf lies on cells beside its doorway names them in
+    scene.json (`covers`, D125), measured on its exported picture, so that a leaf
+    cut again keeps them true."""
+    measured = export_scene.leaf_cells(scene)
+    spec = json.loads((CONTENT / "scenes" / scene / "scene.json").read_text())
+    named = {
+        thing["id"]: sorted(thing["covers"]["open"])
+        for thing in spec.get("things", [])
+        if "covers" in thing
+    }
+    assert {door: cells for door, cells in measured.items() if cells} == named, scene

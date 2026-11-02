@@ -70,7 +70,15 @@ def check_consistency(world: World) -> None:
     if [e.tick for e in own] != list(range(1, world.tick + 1)):
         raise WorldError("the wizard's ticks do not follow one another")
     here = list(world.level.start)
-    for event in own:
+    for event in world.events:
+        # A door's leaf, opening, moves the wizard aside (D125).
+        if event.kind == "shoved" and event.data["id"] == "wizard":
+            if event.data["from"] != here:
+                raise WorldError(f"the wizard is not where it was at tick {event.tick}")
+            here = event.data["to"]
+            continue
+        if event.actor != "wizard":
+            continue
         if event.kind == "move":
             there = event.data["to"]
             if (

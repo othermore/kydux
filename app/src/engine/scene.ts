@@ -3,7 +3,8 @@
 // rest of the page only through its handle and its parent's data-* attributes:
 // data-tick, data-state, data-wizard ("x,y"), data-actors ("id:x,y,facing"
 // joined by ";"), data-doors (the open doors' ids, joined by ","),
-// data-carried (the ids of what the wizard carries, joined by ","), data-drawn
+// data-carried (the ids of what the wizard carries, joined by ","), data-shoved
+// (who an opening door's leaf moved aside, joined by ",", D125), data-drawn
 // (each painted thing seen and the middle of its picture, "id:x,y" in cells,
 // joined by ";", D109),
 // data-thought (why an action could not be done, while the wizard thinks it),
@@ -26,7 +27,8 @@
 // when something hides more than a quarter of it, silhouette.ts), data-outlined
 // (present while it shows), data-shade (each figure in a dark passage and how dark
 // its feet are drawn, "id:shade" joined by ",", shade.ts) and data-debug with
-// data-debug-layers (the tester's view and its layers, debug.ts).
+// data-debug-layers and data-debug-leaves (the tester's view, its layers and the
+// cells under an open door's leaf, debug.ts).
 //
 // The camera is a window on the scene (D69, camera.ts): it follows the wizard,
 // the player zooms it and drags it to look around, and a run or a restart brings
@@ -191,6 +193,8 @@ class LevelScene extends Phaser.Scene {
   /** The goal's mark in a door's doorway, by the door: shown once it is open (D79). */
   private doorMarks = new Map<string, Phaser.GameObjects.Container>();
   private carried = new Set<string>();
+  /** Who an opening door's leaf moved aside in the run shown (D125). */
+  private shoved = new Set<string>();
   private actors = new Map<string, ActorState>();
   /** Who lies asleep (D91), by their figure: their id and bed, and whether they are
    * drawn lying under its quilt, whose depth they keep. */
@@ -685,6 +689,7 @@ class LevelScene extends Phaser.Scene {
     this.openDoors.clear();
     // What the wizard holds from the start is carried at tick 0 (D49).
     this.carried = new Set(this.map.carrying);
+    this.shoved.clear();
     for (const thing of this.map.things) {
       const image = this.things.get(thing.id);
       if (!image) continue;
@@ -751,6 +756,8 @@ class LevelScene extends Phaser.Scene {
         if (!instant) this.speech.think(blockedText('unheard', 'door'), tick, this.sayTicks);
       }
       else if (event.kind === 'pull') this.pull(event, instant);
+      // A door's leaf, opening, moves whoever stands where it comes to lie (D125).
+      else if (event.kind === 'shoved') this.shove(event, instant);
       else if (event.kind === 'light') this.lit = true;
       else if (event.kind === 'hold') this.hold(event);
       else this.showActor(event, instant);
@@ -760,6 +767,40 @@ class LevelScene extends Phaser.Scene {
       this.view.keep();
     }
     this.publish();
+  }
+
+  /** A figure on an opening door's leaf walks aside to its tile along the row, in
+   * the door's tick, the wizard as any other (D125). */
+  private shove(event: WorldEvent, instant: boolean): void {
+    const from = tileOf(event.data.from);
+    const to = tileOf(event.data.to);
+    if (!from || !to) return;
+    const facing = towards(from, to);
+    const id = String(event.data.id);
+    this.shoved.add(id);
+    if (id === 'wizard') {
+      if (instant) {
+        this.placeWizard(to, facing);
+        return;
+      }
+      this.stopCast();
+      this.placeWizard(from, facing);
+      this.wizardTile = to;
+      this.walk(this.wizard, facing, ...this.figureAt(to), this.playback.tickDuration * 0.9);
+      return;
+    }
+    const actor = this.actors.get(id);
+    if (!actor) return;
+    this.tweens.killTweensOf(actor.sprite);
+    actor.tile = to;
+    actor.facing = facing;
+    if (instant) {
+      actor.sprite.setPosition(...this.figureAt(to));
+      this.face(actor.sprite, facing);
+      return;
+    }
+    actor.sprite.setPosition(...this.figureAt(from));
+    this.walk(actor.sprite, facing, ...this.figureAt(to), this.playback.tickDuration * 0.9);
   }
 
   /** A stair held by osto: its hold kept, for the stair's state at later ticks (D53). */
@@ -1300,8 +1341,11 @@ class LevelScene extends Phaser.Scene {
       .map(([id, a]) => `${id}:${a.tile.join(',')},${a.facing}`)
       .join(';');
     dataset.doors = [...this.openDoors].sort().join(',');
+    this.debug?.doorsOpen(this.openDoors);
     dataset.glowing = [...this.glows].filter(([, glow]) => glow.visible).map(([id]) => id).sort().join(',');
     dataset.carried = [...this.carried].sort().join(',');
+    if (this.shoved.size > 0) dataset.shoved = [...this.shoved].sort().join(',');
+    else delete dataset.shoved;
     // Where each painted thing seen is drawn, its middle in cells (D109).
     dataset.drawn = [...this.things]
       .filter(([, image]) => image.visible && image.texture.key.startsWith('art-'))

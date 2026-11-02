@@ -201,6 +201,7 @@ class Door(Thing):
         if self._k_seal is None and (self._k_spec.password is None or self._k_heard):
             self._set(open=True, locked=False)
             world.note(self.name, "open", {"id": self.name, "at": at, "by": how})
+            world.shove(self)
         else:
             world.note(self.name, "unsealed", {"id": self.name, "at": at})
 
@@ -236,7 +237,9 @@ class Door(Thing):
             world.act("blocked", {"at": at, "by": self.name, "reason": "locked", "tried": True})
         else:
             self._set(open=True, locked=False)
-            world.act("open", {"id": self.name, "at": at, "by": "hand"})
+            world.act(
+                "open", {"id": self.name, "at": at, "by": "hand"}, then=lambda: world.shove(self)
+            )
 
 
 class Bed(Thing):

@@ -212,7 +212,7 @@
     "painting": "art/raw/game-library6/library-room-swung.png"
   },
   "doorways": {
-    "about": "Each door of the library opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch down to its foot and from one jamb to the other, painted with the floor of the room beyond from the painting itself, darker under the arch and as lit as the room at the threshold; its foot the jambs' feet for Wenna's door (`sill` 0, 17.00), and the closed leaf's own bottom outline, gone through to its lower edge, for the centre door (9.11) and the room door (6.02); at that foot a threshold of the floor beyond, a board 0.08 cells high with its grain across the doorway (D114), the reading room's stone below Wenna's as painted; the fill and its threshold laid into the ground-only and marked pictures too (`also`).",
+    "about": "Each door of the library opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch down to its foot and from one jamb to the other, painted with the floor of the room beyond from the painting itself, darker under the arch and as lit as the room at the threshold; at its foot a threshold of the floor beyond, a board 0.08 cells high with its grain across the doorway (D114), on the jambs' feet: at Wenna's door the leaf box's own foot (`sill` 0, 17.00), the reading room's stone below it as painted; at the centre door (9.17) and the room door (6.08) below the closed leaf's own bottom outline, which the fill goes through and the board covers, over the doorway's own floor; the fill and its threshold laid into the ground-only and marked pictures too (`also`), each from its untouched copy beside it.",
     "doors": [
       {
         "thing": "wenna_door",
@@ -990,7 +990,7 @@
         7,
         8
       ],
-      "about": "The door in the middle of the wall between the wide hall and the top aisle: open, swung out against the wall beside the arch (D111, centre_swung), cut by the polygon traced round the leaf, its hinges and its shadow (`leaf`, D113), the box reaching below the leaf's foot; its doorway showing the floor of the aisle beyond down to a threshold of that floor where the closed leaf's bottom outline was (doorways, D108, D114); shut, it is over whoever stands in its doorway (D95), its leaf within the doorway's own shape, the open doorway's fill grown over the arch's inner line (`doorway`, D113), reaching over the threshold (`reach`).",
+      "about": "The door in the middle of the wall between the wide hall and the top aisle: open, swung out against the wall beside the arch (D111, centre_swung), cut by the polygon traced round the leaf, its hinges and its shadow (`leaf`, D113), the box reaching below the leaf's foot; its doorway showing the floor of the aisle beyond down to a threshold of that floor on the jambs' feet, the closed leaf's own bottom outline under the fill and the threshold (doorways, D108, D114); shut, it is over whoever stands in its doorway (D95), its leaf within the doorway's own shape, the open doorway's fill and threshold grown over the arch's inner line (`doorway`, D113, tools/art/trace.py footprint), reaching over the threshold's lower line (`reach`).",
       "opening": 1.18,
       "under": true,
       "rest": "open",
@@ -1016,10 +1016,6 @@
           7.646
         ],
         [
-          7.785,
-          7.646
-        ],
-        [
           7.904,
           7.697
         ],
@@ -1030,10 +1026,6 @@
         [
           8.076,
           7.876
-        ],
-        [
-          8.085,
-          7.901
         ],
         [
           8.129,
@@ -1053,47 +1045,27 @@
         ],
         [
           8.169,
-          9.147
+          9.207
         ],
         [
-          7.975,
-          9.143
+          7.176,
+          9.207
         ],
         [
-          7.953,
-          9.152
+          7.145,
+          9.198
         ],
         [
-          7.781,
-          9.152
-        ],
-        [
-          7.75,
-          9.143
-        ],
-        [
-          7.662,
-          9.152
-        ],
-        [
-          7.379,
-          9.147
-        ],
-        [
-          7.353,
-          9.156
+          6.947,
+          9.207
         ],
         [
           6.845,
-          9.152
+          9.198
         ],
         [
           6.845,
           8.241
-        ],
-        [
-          6.854,
-          8.212
         ],
         [
           6.867,
@@ -1120,39 +1092,19 @@
           7.782
         ],
         [
-          7.079,
-          7.731
-        ],
-        [
           7.119,
           7.705
-        ],
-        [
-          7.216,
-          7.659
-        ],
-        [
-          7.233,
-          7.659
-        ],
-        [
-          7.238,
-          7.65
         ],
         [
           7.295,
           7.629
         ],
         [
-          7.353,
-          7.62
-        ],
-        [
           7.436,
           7.595
         ]
       ],
-      "reach": 0.15
+      "reach": 0.2
     },
     "room_door": {
       "box": [
@@ -1362,7 +1314,7 @@
         2,
         5
       ],
-      "about": "The door of Eldra's little room, at the top aisle's left end: open, swung out against the wall beside the arch (D111, room_swung), cut by the polygon traced round the leaf, its hinges and its shadow (`leaf`, D113), its lower left corner out to where the model's pale wood ends; its doorway showing the room's floor down to a threshold of that floor where the closed leaf's bottom outline was (doorways, D108, D114); shut, it is over whoever stands in its doorway (D95), its leaf within the doorway's own shape, the open doorway's fill grown over the arch's inner line (`doorway`, D113), reaching over the threshold (`reach`).",
+      "about": "The door of Eldra's little room, at the top aisle's left end: open, swung out against the wall beside the arch (D111, room_swung), cut by the polygon traced round the leaf, its hinges and its shadow (`leaf`, D113), its lower left corner out to where the model's pale wood ends; its doorway showing the room's floor down to a threshold of that floor on the jambs' feet, the closed leaf's own bottom outline under the fill and the threshold (doorways, D108, D114); shut, it is over whoever stands in its doorway (D95), its leaf within the doorway's own shape, the open doorway's fill and threshold grown over the arch's inner line (`doorway`, D113, tools/art/trace.py footprint), reaching over the threshold's lower line (`reach`).",
       "under": true,
       "rest": "open",
       "doorway": [
@@ -1391,16 +1343,12 @@
           5.128
         ],
         [
-          2.851,
-          5.192
+          2.887,
+          5.23
         ],
         [
-          2.917,
-          5.268
-        ],
-        [
-          2.94,
-          5.319
+          2.926,
+          5.285
         ],
         [
           2.953,
@@ -1408,35 +1356,31 @@
         ],
         [
           2.953,
-          6.055
+          6.115
         ],
         [
-          2.873,
-          6.055
+          2.851,
+          6.123
         ],
         [
-          2.838,
-          6.064
+          2.653,
+          6.115
         ],
         [
-          2.662,
-          6.055
+          2.551,
+          6.123
         ],
         [
-          2.379,
-          6.059
+          2.353,
+          6.115
         ],
         [
-          2.348,
-          6.051
-        ],
-        [
-          2.154,
-          6.059
+          2.15,
+          6.123
         ],
         [
           2.008,
-          6.047
+          6.115
         ],
         [
           2.004,
@@ -1445,10 +1389,6 @@
         [
           2.026,
           5.294
-        ],
-        [
-          2.044,
-          5.255
         ],
         [
           2.075,
@@ -1463,23 +1403,11 @@
           5.085
         ],
         [
-          2.264,
-          5.073
-        ],
-        [
-          2.286,
-          5.073
-        ],
-        [
           2.313,
           5.056
-        ],
-        [
-          2.344,
-          5.047
         ]
       ],
-      "reach": 0.05
+      "reach": 0.1
     },
     "wenna_door_arch": {
       "about": "The stone arch round Wenna's door, over whoever stands in its doorway: the arch's dome and its sides down to the floor, the door's own cut-out left to the door.",

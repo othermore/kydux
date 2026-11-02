@@ -61,16 +61,23 @@ itself, a plain part of that room's floor), stretched to it, DOORWAY_SHADE
 darker at the arch's top and as lit as the room at the threshold, so that no
 board, rail or shadow of the leaf is left there. Its foot is the first dark line
 under the leaf's box, within `sill` cells below it (`sill` 0: the box's own
-foot, the jambs' feet): the floor's own line under a threshold, whose top it
-ends on; or, with nothing but the leaf's wood above it, the closed leaf's own
-bottom outline, which it covers down to its lower edge. At that foot lies a
-threshold (D114), THRESHOLD cells high, inside the doorway: a strip of the
-`floor` box, the plainest one, turned a quarter so that what ran down the box
-runs across the doorway (a board's grain, a flagstone), THRESHOLD_SHADE darker,
-its two edges drawn as thin wavy lines in the colour of that floor's joints.
-The fill and its threshold are laid into the scene's other pictures that show
-the doorway shut (`also`, each mended in place: its ground-only edit and its
-marked picture), so that the cut finds no difference there; never into the
+foot, the jambs' feet): the floor's own line under a threshold, the edge of the
+floor before the door, whose top it ends on; or, with nothing but the leaf's
+wood above it, the closed leaf's own bottom outline, which it covers down to its
+lower edge. At that foot lies a threshold (D114), THRESHOLD cells high, inside
+the doorway: a strip of the `floor` box, the plainest one, turned a quarter so
+that what ran down the box runs across the doorway (a board's grain, a
+flagstone), THRESHOLD_SHADE darker, its two edges drawn as thin wavy lines in
+the colour of that floor's joints. Over the closed leaf's own outline, the
+threshold reaches down to the jambs' feet, where the jambs' bottom outline ends
+beside the fill's span (`jambs_feet`), over the doorway's own floor, and the
+fill reaches down to its top; on the floor's own line it ends there, even
+where the jambs stand lower. The fill and its threshold are laid into the
+scene's other pictures that show the doorway shut (`also`: its ground-only edit
+and its marked picture), so that the cut finds no difference there; each is
+laid from the picture's untouched copy beside it (`<stem>-untouched.<suffix>`),
+made from the picture on the first run that finds none, so that a doorway laid
+again leaves nothing of the one before; never into the
 swung picture, whose leaf may lie a little over the opening and is cut by its
 own traced shape (D113). The leaf swung open beside the doorway (D111) is a
 model's, mended into the doorway's picture as any box is, on a guide the tool
@@ -90,6 +97,7 @@ the whole painting.
 """
 
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -416,6 +424,11 @@ THRESHOLD_SCAN = 4
 THRESHOLD_JOINTS = 20
 THRESHOLD_ENDS = 3
 THRESHOLD_SOFT = 4
+#: The jambs' feet beside an open doorway's fill (D114), in cells of the painting:
+#: the columns looked at on each side, from and to how far outside the fill's span,
+#: and how far below the fill's foot the jamb's bottom outline may begin.
+JAMB_OUT = (0.03, 0.08)
+JAMB_BELOW = 0.12
 
 
 def leaf_of(crop: np.ndarray, bands: list[tuple[int, int, int]]) -> np.ndarray:
@@ -455,7 +468,14 @@ def doorways(scene: str) -> list[Path]:
     def py(y: float) -> int:
         return round(gy["offset"] + y * gy["spacing"])
 
+    def cy(row: float) -> float:
+        return (row - gy["offset"]) / gy["spacing"]
+
+    value = np.array(Image.fromarray(painting).convert("L")).astype(np.float32) / 255
     written = []
+    # The pictures that show the doorways shut, each laid from its untouched copy
+    # once and then with every door's fill, and written when all are laid.
+    shut_pictures: dict[Path, np.ndarray] = {}
     for door in settings.data["doorways"]["doors"]:
         # The leaf is looked for in its own box: the thing's may reach on to where
         # the leaf swings to.
@@ -471,9 +491,47 @@ def doorways(scene: str) -> list[Path]:
         below = round(door.get("sill", 0.0) * gy["spacing"])
         tall = np.pad(painting, ((0, below), (0, 0), (0, 0)), mode="edge")
         deeper = tall[box[1] : box[3] + below, box[0] : box[2]]
-        leaf, foot, start = to_foot(deeper, np.pad(shut, ((0, below), (0, 0))), box[3] - box[1])
-        ends = (box[1] + foot[[0, -1]] - gy["offset"]) / gy["spacing"]
-        print(f"{door['thing']}: the fill ends on {ends[0]:.3f} to {ends[1]:.3f}")
+        leaf, foot, start, own = to_foot(
+            deeper, np.pad(shut, ((0, below), (0, 0))), box[3] - box[1]
+        )
+        ends = cy(box[1] + foot[[0, -1]])
+        if own:
+            found = "the closed leaf's own outline"
+        elif (foot >= len(deeper) - 0.5).all():
+            found = "the foot of the leaf's box and its `sill`, no line there"
+        else:
+            found = "the floor's own line"
+        print(f"{door['thing']}: the foot on {ends[0]:.3f} to {ends[1]:.3f}, {found}")
+        if own:
+            # Over the closed leaf's own outline, the threshold reaches down to the
+            # jambs' feet, and the fill down to its top (D114).
+            sides = jambs_feet(
+                value,
+                box[0] + start,
+                box[0] + start + len(foot),
+                box[1] + foot,
+                (gx["spacing"], gy["spacing"]),
+            )
+            if None in sides:
+                print(
+                    f"{door['thing']}: the jambs' feet are not both found; the threshold's"
+                    " foot stays the outline's lower edge"
+                )
+            else:
+                left, right = (side - box[1] for side in sides)
+                foot = np.linspace(left, right, len(foot)).astype(np.float32)
+                board = foot - max(1, round(THRESHOLD * gy["spacing"]))
+                leaf = leaf.copy()
+                for x in range(len(foot)):
+                    rows = np.nonzero(leaf[:, start + x])[0]
+                    if len(rows):
+                        leaf[rows[-1] + 1 : round(float(board[x])), start + x] = True
+                print(
+                    f"{door['thing']}: the jambs' feet {cy(sides[0]):.3f} (left) and"
+                    f" {cy(sides[1]):.3f} (right); the threshold's foot"
+                    f" {cy(box[1] + float(foot.mean())):.3f}; the fill ends at its top,"
+                    f" {cy(box[1] + float(board[0])):.3f} to {cy(box[1] + float(board[-1])):.3f}"
+                )
         leaf = leaf[: painting.shape[0] - box[1]]
         ys, xs = np.nonzero(leaf)
         top, bottom, first, last = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
@@ -527,21 +585,73 @@ def doorways(scene: str) -> list[Path]:
         target = settings.edits / door["painting"]
         Image.fromarray(out).save(target)
         written.append(target)
-        # The scene's pictures that show the doorway shut, mended in place with it.
+        # The scene's pictures that show the doorway shut, laid with it.
         for also in door.get("also", []):
-            picture = np.array(Image.open(REPO / also).convert("RGB"))
-            picture[mended] = out[mended]
-            Image.fromarray(picture).save(REPO / also)
-            written.append(REPO / also)
+            path = REPO / also
+            if path not in shut_pictures:
+                shut_pictures[path] = np.array(Image.open(untouched(path)).convert("RGB"))
+            shut_pictures[path][mended] = out[mended]
         if "guide" in door:
             target = settings.edits / door["guide"]["picture"]
             picture = guided(out, crop, shut, box, door["guide"], gx["spacing"])
             Image.fromarray(picture).save(target)
             written.append(target)
+    for path, picture in shut_pictures.items():
+        Image.fromarray(picture).save(path)
+        written.append(path)
     return written
 
 
-def to_foot(crop: np.ndarray, leaf: np.ndarray, under: int) -> tuple[np.ndarray, np.ndarray, int]:
+def untouched(path: Path) -> Path:
+    """A picture's untouched copy, beside it as `<stem>-untouched.<suffix>`: the
+    picture before any doorway was laid into it, made from it when no copy exists,
+    and what every run lays the doorways on."""
+    copy = path.with_name(f"{path.stem}-untouched{path.suffix}")
+    if not copy.exists():
+        shutil.copyfile(path, copy)
+    return copy
+
+
+def jambs_feet(
+    value: np.ndarray,
+    first: int,
+    last: int,
+    feet: np.ndarray,
+    spacing: tuple[float, float],
+) -> list[float | None]:
+    """The feet of the jambs on either side of a doorway's fill, columns `first` to
+    `last` of the painting's value (0 to 1), the fill's foot `feet` (its rows, per
+    column, in the painting): on each side, the columns from JAMB_OUT[0] to
+    JAMB_OUT[1] cells outside the span, the mean of their values, and in it the
+    first run of rows darker than DOOR_LINE that begins below the fill's foot and
+    within JAMB_BELOW cells of it, the jamb's bottom outline; the row under its
+    last is that jamb's foot. None on a side where no such run is found."""
+    sx, sy = spacing
+    near, far = (round(share * sx) for share in JAMB_OUT)
+    height, width = value.shape
+    found: list[float | None] = []
+    for columns, foot in (
+        (slice(max(0, first - far), max(0, first - near)), feet[0]),
+        (slice(min(width, last + near), min(width, last + far)), feet[-1]),
+    ):
+        side = None
+        if columns.stop > columns.start:
+            dark = value[:, columns].mean(axis=1) < DOOR_LINE
+            begin = int(np.ceil(float(foot)))
+            for y in range(begin, min(height, begin + round(JAMB_BELOW * sy) + 1)):
+                if dark[y] and not dark[y - 1]:
+                    end = y
+                    while end < height and dark[end]:
+                        end += 1
+                    side = float(end)
+                    break
+        found.append(side)
+    return found
+
+
+def to_foot(
+    crop: np.ndarray, leaf: np.ndarray, under: int
+) -> tuple[np.ndarray, np.ndarray, int, bool]:
     """A door's leaf grown down to the first dark line under its box, `under` rows
     down the crop, from one jamb to the other: the leaf's lowest straight part
     gives its width, and each column of it is filled to its own point of the line,
@@ -550,8 +660,8 @@ def to_foot(crop: np.ndarray, leaf: np.ndarray, under: int) -> tuple[np.ndarray,
     leaf's own outline over a threshold, is the floor's: the fill ends on its top.
     A line with nothing but the leaf's wood above it is the closed leaf's own
     bottom outline: the fill goes down through it to its lower edge and looks no
-    further. Gives the grown leaf, the row each of its columns ends on, and its
-    first column."""
+    further. Gives the grown leaf, the row each of its columns ends on, its first
+    column, and whether that foot is the closed leaf's own outline (`own`)."""
     value = np.array(Image.fromarray(crop).convert("L")).astype(np.float32) / 255
     rows = np.nonzero(leaf.any(axis=1))[0]
     top, bottom = rows[0], rows[-1] + 1
@@ -607,7 +717,7 @@ def to_foot(crop: np.ndarray, leaf: np.ndarray, under: int) -> tuple[np.ndarray,
     grown = leaf.copy()
     for x in range(first, last):
         grown[band.start : max(band.start, round(float(feet[x - first]))), x] = True
-    return grown, feet, first
+    return grown, feet, first, bool(own)
 
 
 def threshold(

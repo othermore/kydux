@@ -1529,7 +1529,7 @@
     ]
   },
   "doorways": {
-    "about": "The front door opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch down to the corridor floor's own dark line under the threshold (15.39) and from one jamb to the other, painted with the common room's own floor, darker under the arch, and at its foot a threshold of that floor, a board 0.08 cells high with its grain across the doorway (D114), the corridor's stone below it as painted; the fill and its threshold laid into the marked picture too (`also`).",
+    "about": "The front door opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch down to the corridor floor's own dark line (15.39) and from one jamb to the other, painted with the common room's own floor, darker under the arch, the closed leaf's own bottom outline under it; at its foot a threshold of that floor, a board 0.08 cells high with its grain across the doorway (D114), ending on that line, the edge of the floor before the door, while the jambs' feet stand a little lower on the corridor's stone, which stays below it as painted; the fill and its threshold laid into the marked picture too (`also`), from its untouched copy beside it.",
     "doors": [
       {
         "thing": "front_door",

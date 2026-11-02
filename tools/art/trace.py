@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Aids for tracing a polygon by hand on a scene's picture, in cells (D113).
+"""Aids for a door's polygons on a scene's pictures, in cells (D113): a leaf's,
+traced by hand, and its doorway's, made from the open doorway's fill.
 
     tools/art/trace.py <scene> look <picture> x0 y0 x1 y1 [--scale 3] [--poly <json>]
                                     [--diff <other picture>] [--out <png>]
     tools/art/trace.py <scene> outline <picture> x0 y0 x1 y1 <seed x> <seed y>
                                     [--dark 70] [--tolerance 1.5] [--out <json>]
+    tools/art/trace.py <scene> footprint <door thing> [--grow 7] [--tolerance 1.5]
+                                    [--out <json>]
 
 `look` writes a crop of the picture, the box given in cells, enlarged `--scale`
 times, with a grid line every tenth of a cell, numbered every half cell; with
@@ -20,6 +23,13 @@ boundary simplified to points at most `--tolerance` pixels off the true edge.
 It is a start for the hand: the outline of a leaf is continuous and the result
 follows it, but where the leaf's outline touches another (a jamb, a hinge's
 plate) the region spills, and the points there are moved by hand with `look`.
+
+`footprint` writes a door's `doorway` polygon, within which its closed leaf is the
+painting: the open doorway's fill and its threshold, every pixel where the
+door's doorway picture (the thing's `without`) differs from the painting within
+the thing's box, its holes filled, grown `--grow` pixels over the arch's inner
+line, the width of the painting's outlines, and its boundary simplified as
+`outline`'s. It is made again whenever `repaint.py doorways` lays the fill again.
 """
 
 import argparse
@@ -31,6 +41,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import export_scene  # noqa: E402
 import image_first  # noqa: E402
 import scene_settings  # noqa: E402
 
@@ -171,41 +182,99 @@ def outline(
     if not at:
         raise SystemExit("the seed is not inside a region closed by the outline")
     region = closed_in(~(labels == at)) | (labels == at)
+    return edge_in_cells(region, (pixels[0], pixels[1]), grid, tolerance)
+
+
+def edge_in_cells(
+    region: np.ndarray, corner: tuple[int, int], grid: dict, tolerance: float
+) -> list[list[float]]:
+    """A region's outer boundary, simplified to points at most `tolerance` pixels
+    off it, in cells: the region lies in the painting from `corner` (x, y), and each
+    point is taken at its pixel's middle."""
     edge = simplified(boundary(region), tolerance)[:-1]
     gx, gy = grid["x"], grid["y"]
     return [
         [
-            round((x + pixels[0] + 0.5 - gx["offset"]) / gx["spacing"], 3),
-            round((y + pixels[1] + 0.5 - gy["offset"]) / gy["spacing"], 3),
+            round((x + corner[0] + 0.5 - gx["offset"]) / gx["spacing"], 3),
+            round((y + corner[1] + 0.5 - gy["offset"]) / gy["spacing"], 3),
         ]
         for x, y in edge
     ]
 
 
+#: How far round a door's box its pictures are compared for its footprint, beyond
+#: what it is grown by, in the painting's pixels.
+FOOTPRINT_MARGIN = 4
+
+
+def footprint(
+    settings: scene_settings.Settings, name: str, grow: int, tolerance: float
+) -> list[list[float]]:
+    """A door's doorway polygon (D113): where its doorway picture differs from the
+    painting within its box, its holes filled, its largest part, grown `grow`
+    pixels, its boundary simplified, in cells."""
+    thing = settings.things[name]
+    painting = np.array(Image.open(settings.painting).convert("RGB"))
+    doorway = export_scene.without_of(settings, settings.grid, thing)
+    x0, y0, x1, y1 = export_scene.native_box(settings.grid, thing["box"])
+    height, width = painting.shape[:2]
+    reach = grow + FOOTPRINT_MARGIN
+    left, top = max(0, x0 - reach), max(0, y0 - reach)
+    right, bottom = min(width, x1 + reach), min(height, y1 + reach)
+    crop = (slice(top, bottom), slice(left, right))
+    inside = export_scene.in_box(
+        (bottom - top, right - left), (x0 - left, y0 - top, x1 - left, y1 - top)
+    )
+    # Every pixel the fill or its threshold changed, however little: where the
+    # floor beyond is as dark as the leaf was, a difference over a threshold
+    # leaves a notch the open doorway would show through.
+    differs = np.abs(painting[crop].astype(np.int16) - doorway[crop]).sum(axis=2) > 0
+    region = export_scene.filled_mask(differs & inside)
+    labels = image_first.labels(region)
+    numbers, sizes = np.unique(labels[labels > 0], return_counts=True)
+    if not len(numbers):
+        raise SystemExit(f"{name}: its doorway picture does not differ from the painting")
+    region = image_first.dilated(labels == numbers[np.argmax(sizes)], grow)
+    return edge_in_cells(region, (left, top), settings.grid, tolerance)
+
+
 def main(arguments: list[str]) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser = argparse.ArgumentParser(description=" ".join(__doc__.split("\n\n")[0].split()))
     parser.add_argument("scene")
-    parser.add_argument("command", choices=["look", "outline"])
-    parser.add_argument("picture", type=Path)
-    parser.add_argument("box", type=float, nargs=4, metavar=("X0", "Y0", "X1", "Y1"))
-    parser.add_argument("seed", type=float, nargs="*", metavar=("SX", "SY"))
-    parser.add_argument("--scale", type=float, default=3.0)
-    parser.add_argument("--poly", type=json.loads)
-    parser.add_argument("--diff", type=Path)
-    parser.add_argument("--dark", type=int, default=70)
-    parser.add_argument("--tolerance", type=float, default=1.5)
-    parser.add_argument("--out", type=Path)
+    commands = parser.add_subparsers(dest="command", required=True)
+    for command in ("look", "outline"):
+        on = commands.add_parser(command)
+        on.add_argument("picture", type=Path)
+        on.add_argument("box", type=float, nargs=4, metavar=("X0", "Y0", "X1", "Y1"))
+        on.add_argument("--out", type=Path)
+    looking, outlining = commands.choices["look"], commands.choices["outline"]
+    looking.add_argument("--scale", type=float, default=3.0)
+    looking.add_argument("--poly", type=json.loads)
+    looking.add_argument("--diff", type=Path)
+    outlining.add_argument("seed", type=float, nargs=2, metavar=("SX", "SY"))
+    outlining.add_argument("--dark", type=int, default=70)
+    outlining.add_argument("--tolerance", type=float, default=1.5)
+    footprinting = commands.add_parser("footprint")
+    footprinting.add_argument("thing")
+    footprinting.add_argument("--grow", type=int, default=7)
+    footprinting.add_argument("--tolerance", type=float, default=1.5)
+    footprinting.add_argument("--out", type=Path)
     found = parser.parse_args(arguments)
     settings = scene_settings.settings(found.scene)
+    if found.command == "footprint":
+        target = found.out or Path(f"{found.thing}-footprint.json")
+        points = footprint(settings, found.thing, found.grow, found.tolerance)
+        target.write_text(json.dumps(points), encoding="utf-8")
+        print(f"{len(points)} points")
+        print(target)
+        return 0
     picture = found.picture if found.picture.is_absolute() else REPO / found.picture
-    other = found.diff and (found.diff if found.diff.is_absolute() else REPO / found.diff)
     box = tuple(found.box)
     if found.command == "look":
+        other = found.diff and (found.diff if found.diff.is_absolute() else REPO / found.diff)
         target = found.out or Path(f"{picture.stem}-look.png")
         look(settings.grid, picture, box, found.scale, found.poly, other).save(target)
     else:
-        if len(found.seed) != 2:
-            parser.error("outline needs the seed's x and y, in cells")
         target = found.out or Path(f"{picture.stem}-outline.json")
         seed = (found.seed[0], found.seed[1])
         points = outline(settings.grid, picture, box, seed, found.dark, found.tolerance)

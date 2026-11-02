@@ -753,8 +753,8 @@ def test_the_fill_ends_on_the_floor_s_line_and_goes_through_the_leaf_s_own():
     # Under a threshold of stone, the line is the floor's: the fill ends on its top.
     crop = doorway_crop("threshold")
     leaf = repaint.leaf_of(crop, [(30, 70, 30)])
-    grown, feet, first = repaint.to_foot(crop, leaf, 64)
-    assert np.allclose(feet, 76, atol=1)
+    grown, feet, first, own = repaint.to_foot(crop, leaf, 64)
+    assert np.allclose(feet, 76, atol=1) and not own
     assert grown[50:75, first : first + len(feet)].all()
     assert not grown[77:].any() and not grown[:, :20].any() and not grown[:, 81:].any()
     # With nothing but the leaf's wood above it, the line is the closed leaf's own
@@ -763,8 +763,8 @@ def test_the_fill_ends_on_the_floor_s_line_and_goes_through_the_leaf_s_own():
     crop = doorway_crop("outline")
     leaf = repaint.leaf_of(crop, [(30, 70, 30)])
     leaf[64:] = False
-    grown, feet, first = repaint.to_foot(crop, leaf, 64)
-    assert np.allclose(feet, 76, atol=1)
+    grown, feet, first, own = repaint.to_foot(crop, leaf, 64)
+    assert np.allclose(feet, 76, atol=1) and own
     assert grown[64:75, first : first + len(feet)].all() and not grown[77:].any()
 
 
@@ -773,7 +773,7 @@ def test_an_open_doorway_ends_in_a_threshold_of_the_floor_beyond():
 
     crop = doorway_crop("threshold")
     leaf = repaint.leaf_of(crop, [(30, 70, 30)])
-    _, feet, first = repaint.to_foot(crop, leaf, 64)
+    _, feet, first, _ = repaint.to_foot(crop, leaf, 64)
     # The floor beyond: planks running down the box, with their dark joints.
     floor = np.full((60, 40, 3), (160, 100, 60), dtype=np.uint8)
     floor[:, ::10] = (90, 50, 30)
@@ -794,6 +794,154 @@ def test_an_open_doorway_ends_in_a_threshold_of_the_floor_beyond():
     assert np.allclose(measured["colour"], (90, 50, 30), atol=1)
     for edge in (76 - tall, 76):
         assert out[edge - 1 : edge + 2, middle].astype(float).mean() < board
+
+
+def jambed_doorway(foot: str) -> np.ndarray:
+    """A shut door in its arch, 200 pixels square, the jambs' bottom outline lower
+    than the door's foot: the leaf on its own bottom outline over the floor
+    (`"outline"`), or on its outline over a stone threshold and the floor's own
+    line, the edge of the floor before the door (`"threshold"`); and in a corner a
+    plain patch of the floor beyond, its planks' joints darker."""
+    painting = np.full((200, 200, 3), (150, 150, 160), dtype=np.uint8)  # the stones
+    painting[0:18, 0:40] = (100, 160, 200)  # the floor beyond
+    painting[0:18, 0:40:10] = (40, 70, 90)  # its joints
+    painting[20:124, 46:154] = (20, 15, 10)  # the leaf's line, its foot from 116
+    painting[22:116, 48:152] = (120, 70, 40)  # its wood
+    if foot == "outline":
+        painting[124:, 46:154] = (160, 110, 70)  # the doorway's own floor
+        jambs = 132
+    else:
+        painting[124:140, 46:154] = (170, 165, 175)  # a stone threshold
+        painting[140:143, 46:154] = (60, 50, 70)  # the floor's own line
+        painting[143:, 46:154] = (140, 135, 150)  # the floor before the door
+        jambs = 146
+    for side in (slice(0, 46), slice(154, 200)):
+        painting[jambs : jambs + 6, side] = (20, 15, 10)  # the jamb's bottom outline
+        painting[jambs + 6 :, side] = (160, 110, 70)  # the floor beyond the jamb
+    return painting
+
+
+def door_scene(tmp_path: Path, painting: np.ndarray, leaf_foot: float):
+    """A scene of one door, its settings and pictures in tmp_path, a cell 100
+    pixels each way; its doorway picture `doorway.png`, laid also into a marked
+    picture, `marked.png`, the painting with a magenta patch."""
+    Image.fromarray(painting).save(tmp_path / "painting.png")
+    marked = painting.copy()
+    marked[180:195, 180:195] = (255, 0, 255)
+    Image.fromarray(marked).save(tmp_path / "marked.png")
+    grid = {"x": {"offset": 0, "spacing": 100}, "y": {"offset": 0, "spacing": 100}}
+    (tmp_path / "grid.json").write_text(json.dumps(grid))
+    door = {
+        "thing": "door",
+        "seeds": [[0.6, 1.4, 0.6]],
+        "floor": [0.0, 0.0, 0.4, 0.18],
+        "painting": "doorway.png",
+        "sill": 0.3,
+        "leaf": [0.4, 0.1, 1.6, leaf_foot],
+        "also": [str(tmp_path / "marked.png")],
+    }
+    data = {
+        "sources": {
+            "folder": str(tmp_path),
+            "edits": str(tmp_path),
+            "painting": "painting.png",
+            "grid": "grid.json",
+            "ground": "painting.png",
+        },
+        "things": {"door": {"box": [0.4, 0.1, 1.6, 1.6], "without": "doorway.png"}},
+        "doorways": {"doors": [door]},
+    }
+    return scene_settings.Settings("door", data)
+
+
+def test_the_threshold_reaches_the_jambs_feet_below_the_leaf_s_own_outline(tmp_path, monkeypatch):
+    import repaint
+
+    # The fill's foot is the closed leaf's own outline (116 to 124), and the jambs
+    # end lower (their outline 132 to 138): the threshold's foot is on their feet,
+    # over the doorway's own floor, and the fill reaches down to its top.
+    painting = jambed_doorway("outline")
+    scene = door_scene(tmp_path, painting, 1.1)
+    monkeypatch.setattr(repaint.scene_settings, "settings", lambda _: scene)
+    repaint.doorways("door")
+    doorway = np.array(Image.open(tmp_path / "doorway.png").convert("RGB")).astype(int)
+    tall = round(repaint.THRESHOLD * 100)
+    span = slice(52, 148)
+    # Nothing of the leaf's outline, nor of the floor between it and the
+    # threshold: the fill, the floor beyond, bluer than any of them.
+    fill = doorway[100 : 138 - tall, span]
+    assert (fill[..., 2] > fill[..., 0] + 30).all()
+    # The threshold's lower line on the jambs' feet, darker than its board, and
+    # the painting below it.
+    assert doorway[137:139, 100].mean() < doorway[138 - tall // 2, 100].mean() - 20
+    assert (doorway[141:] == painting[141:]).all()
+    assert (doorway[:, :46] == painting[:, :46]).all()
+
+
+def test_the_threshold_ends_on_the_floor_s_line_where_the_jambs_stand_lower(tmp_path, monkeypatch):
+    import repaint
+
+    # The fill's foot is the floor's own line (140), the edge of the floor before
+    # the door; the jambs end lower (152): the threshold ends on the line.
+    painting = jambed_doorway("threshold")
+    scene = door_scene(tmp_path, painting, 1.26)
+    monkeypatch.setattr(repaint.scene_settings, "settings", lambda _: scene)
+    repaint.doorways("door")
+    doorway = np.array(Image.open(tmp_path / "doorway.png").convert("RGB")).astype(int)
+    assert doorway[139:141, 100].mean() < doorway[136, 100].mean() - 20
+    assert (doorway[143:] == painting[143:]).all()
+
+
+def test_the_doorways_are_laid_on_the_untouched_copy_of_each_picture(tmp_path, monkeypatch):
+    import repaint
+
+    scene = door_scene(tmp_path, jambed_doorway("outline"), 1.1)
+    monkeypatch.setattr(repaint.scene_settings, "settings", lambda _: scene)
+    before = (tmp_path / "marked.png").read_bytes()
+    repaint.doorways("door")
+    first = (tmp_path / "marked.png").read_bytes()
+    repaint.doorways("door")
+    # The copy is the picture before the first run, and a second run gives the
+    # same picture as the first.
+    assert (tmp_path / "marked-untouched.png").read_bytes() == before
+    assert (tmp_path / "marked.png").read_bytes() == first != before
+    marked = np.array(Image.open(tmp_path / "marked.png").convert("RGB")).astype(int)
+    assert marked[110, 100, 2] > marked[110, 100, 0] + 30
+    assert (marked[185, 185] == (255, 0, 255)).all()
+
+
+def test_a_doorway_s_footprint_is_every_pixel_its_fill_changed_grown(tmp_path):
+    import trace
+
+    painting = np.full((100, 100, 3), 120, dtype=np.uint8)
+    Image.fromarray(painting).save(tmp_path / "painting.png")
+    # The fill differs from the painting by a few levels only, and not at all in
+    # a hole inside it.
+    doorway = painting.copy()
+    doorway[30:60, 20:70] += 3
+    doorway[40:45, 40:45] = 120
+    Image.fromarray(doorway).save(tmp_path / "doorway.png")
+    grid = {"x": {"offset": 0, "spacing": 100}, "y": {"offset": 0, "spacing": 100}}
+    (tmp_path / "grid.json").write_text(json.dumps(grid))
+    data = {
+        "sources": {
+            "folder": str(tmp_path),
+            "edits": str(tmp_path),
+            "painting": "painting.png",
+            "grid": "grid.json",
+            "ground": "painting.png",
+        },
+        "things": {"door": {"box": [0.1, 0.1, 0.9, 0.9], "without": "doorway.png"}},
+    }
+    scene = scene_settings.Settings("door", data)
+    polygon = trace.footprint(scene, "door", 7, 1.0)
+    alpha = export_scene.soft_area((100, 100), grid, polygon)
+    # Round the fill, 7 pixels out, the boundary's points at its pixels' middles.
+    assert (alpha[24:66, 14:76] == 1).all() and 0 < alpha[23, 40] < 1
+    assert not alpha[:22].any() and not alpha[68:].any()
+    assert not alpha[:, :13].any() and not alpha[:, 77:].any()
+    xs, ys = np.array(polygon).T
+    assert np.allclose((xs.min(), xs.max(), ys.min(), ys.max()), (0.135, 0.765, 0.235, 0.665))
 
 
 def test_a_hole_covers_the_soft_edge_of_the_leaf_it_is_traced_from():

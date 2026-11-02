@@ -497,14 +497,26 @@ def test_the_exported_figures_are_sheets_of_four_ways_and_three_frames():
     width, height = data["frame"]
     assert data["ways"] == ["down", "left", "right", "up"] and data["frames"] == 3
     # A wizard's sheet has its four casting rows after its four walking ones, its
-    # four picking-up rows and its celebrating one, where figures.json's rows say.
+    # four picking-up rows, its celebrating one and its sleeping one, where
+    # figures.json's rows say; a friend's has its walking rows and its sleeping
+    # one, where its `sheets` say (D91).
     named = data["rows"]
-    assert named == {"walk": 0, "cast": 4, "pickup": 8, "win": 12}
+    assert named == {"walk": 0, "cast": 4, "pickup": 8, "win": 12, "sleep": 13}
     wizard_rows = max(named.values()) + 1
+    sheets = data.get("sheets", {})
     for name in data["figures"]:
         sheet = Image.open(FIGURES / f"{name}.webp")
-        rows = wizard_rows if name.startswith("wizard-") else 4
+        if name in sheets:
+            rows = max(sheets[name].values()) + 1
+        else:
+            rows = wizard_rows if name.startswith("wizard-") else 4
         assert sheet.size == (3 * width, rows * height), name
+        sleep = (sheets.get(name) or (named if name.startswith("wizard-") else {})).get("sleep")
+        if sleep is not None:
+            # The lying frame holds a figure.
+            alpha = np.array(sheet.convert("RGBA"))[..., 3]
+            top = sleep * height
+            assert alpha[top : top + height, :width].max() > 128, (name, "sleep")
         if name.startswith("wizard-"):
             # Every act's frame holds a figure.
             alpha = np.array(sheet.convert("RGBA"))[..., 3]
@@ -547,4 +559,5 @@ def test_every_look_has_its_sheet_and_the_friends_theirs():
         assert f"wizard-{look}" in about["figures"]
         assert (figures.FIGURES / f"wizard-{look}.webp").is_file()
     for friend in figures.FRIENDS:
-        assert friend in about["figures"]
+        for colours in ("a", "b"):
+            assert f"{friend}-{colours}" in about["figures"]

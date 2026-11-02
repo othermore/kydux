@@ -70,10 +70,12 @@ test('the story at the gate is told on the field', async ({ page }) => {
   await page.screenshot({ path: `${SHOTS}05-at-the-gate.png` });
 });
 
-test('the wizard is drawn in the look chosen, and the friend is of the other gender (D77)', async ({ browser }) => {
+test('the wizard is drawn in the look chosen, and the friend is of the other gender in colours unlike the wizard’s (D77, D90)', async ({ browser }) => {
   for (const [gender, look, friend] of [
-    ['girl', 'teal', 'teku'],
-    ['boy', 'amber', 'nuri'],
+    ['girl', 'teal', 'teku-b'],
+    ['girl', 'sky', 'teku-a'],
+    ['boy', 'amber', 'nuri-a'],
+    ['boy', 'moss', 'nuri-b'],
   ] as const) {
     const context = await browser.newContext({ locale: 'en-US' });
     await seedWizard(context, { name: 'Ana', gender, look });

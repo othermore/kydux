@@ -560,7 +560,8 @@ later, like the rest of it.
   (`figure-cast-boy.md`, `figure-cast-girl.md`), each put back on its grid
   by `tools/art/figures.py`. The base sheets are in `art/figures/`.
 - `wizard-<look>.webp` for each look of the creator, its walking rows and
-  its casting rows, and Teku's and Nuri's, are those bases recoloured by
+  its casting rows, and `nuri-a`, `nuri-b`, `teku-a` and `teku-b`, each
+  friend in two sets of colours (D90), are those bases recoloured by
   `tools/art/figures.py`: the robe, the hat, its band, the hair and the
   skin in the look's colours (`app/src/engine/looks.ts`), their shading
   kept.
@@ -754,7 +755,7 @@ def checks(settings: Settings, out: Path = RAW / "game-check") -> list[Path]:
                 if (x, y - 1) in walk:
                     behind.append((sweep.LOOK, x, y - 1))
                 if (x, y + 1) in walk:
-                    front.append(("nuri", x, y + 1))
+                    front.append(("nuri-a", x, y + 1))
     starts = []
     for path in sorted((REPO / "content" / "levels").glob("*/level.json")):
         level = json.loads(path.read_text())
@@ -786,7 +787,7 @@ def checks(settings: Settings, out: Path = RAW / "game-check") -> list[Path]:
             min(rows, int(np.ceil(y1)) + 2),
         )
         middle = int((x0 + x1) / 2)
-        near = [(sweep.LOOK, middle, box[3] - 2), ("nuri", middle, box[1] + 1)]
+        near = [(sweep.LOOK, middle, box[3] - 2), ("nuri-a", middle, box[1] + 1)]
         crop = tuple(v * cell for v in box)
         shut = draw(settings.out, standing=near).crop(crop)
         open_ = draw(settings.out, standing=near, states=opened).crop(crop)

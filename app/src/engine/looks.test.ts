@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_LOOK, dormitoryMate, isLook, LOOKS, lookOf, looksFor, teacherFriend } from './looks';
+import {
+  colourDistance,
+  DEFAULT_LOOK,
+  dormitoryMate,
+  FRIEND_SETS,
+  friendSets,
+  friendSheet,
+  isLook,
+  LOOKS,
+  lookOf,
+  looksFor,
+  teacherFriend,
+} from './looks';
 
 describe('the looks (D36)', () => {
   it('are eight, each with its own id', () => {
@@ -30,5 +42,25 @@ describe('the friends (D77, D84)', () => {
     expect(dormitoryMate('girl').id).toBe('nuri');
     expect(dormitoryMate('boy').id).toBe('teku');
     expect(dormitoryMate(null).id).toBe('teku');
+  });
+});
+
+describe("the friends' colours (D90)", () => {
+  it('never put a friend near the wizard, nor the two friends near each other', () => {
+    for (const look of LOOKS) {
+      const sets = friendSets(look);
+      const nuri = FRIEND_SETS.nuri[sets.nuri].robe;
+      const teku = FRIEND_SETS.teku[sets.teku].robe;
+      expect(colourDistance(nuri, look.robe), `Nuri for ${look.id}`).toBeGreaterThan(30);
+      expect(colourDistance(teku, look.robe), `Teku for ${look.id}`).toBeGreaterThan(30);
+      expect(colourDistance(nuri, teku), `the friends for ${look.id}`).toBeGreaterThan(30);
+    }
+  });
+
+  it("names the sheet of a friend's set, the same for a look all the game", () => {
+    const moss = lookOf('moss');
+    expect(friendSheet('nuri', moss)).toBe(`nuri-${friendSets(moss).nuri}`);
+    expect(friendSheet('nuri', moss)).not.toBe('nuri-a');
+    expect(friendSheet('wenna', moss)).toBe('wenna');
   });
 });

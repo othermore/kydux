@@ -18,8 +18,10 @@
     "dask",
     "eldra",
     "ilda",
-    "nuri",
-    "teku",
+    "nuri-a",
+    "nuri-b",
+    "teku-a",
+    "teku-b",
     "wenna",
     "wizard-amber",
     "wizard-coral",
@@ -34,6 +36,25 @@
     "walk": 0,
     "cast": 4,
     "pickup": 8,
-    "win": 12
+    "win": 12,
+    "sleep": 13
+  },
+  "sheets": {
+    "teku-a": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "teku-b": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "nuri-a": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "nuri-b": {
+      "walk": 0,
+      "sleep": 4
+    }
   }
 }

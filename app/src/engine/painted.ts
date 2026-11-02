@@ -8,7 +8,7 @@
 
 import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
-import { dormitoryMate, type Look, teacherFriend } from './looks';
+import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
 import { shiftBy } from './shift';
 import type { Tile } from './sight';
@@ -172,11 +172,13 @@ export function placeThing(image: Phaser.GameObjects.Image, art: Art, id: string
 }
 
 /** The sheet a character is drawn from: the friend is the one of the wizard's other
- * gender (D77), the dormitory mate the one of its own (D84), and the wizard is drawn
- * in the look the child chose. */
+ * gender (D77), the dormitory mate the one of its own (D84), each in the set of
+ * colours unlike the wizard's and each other's (D90), and the wizard is drawn in
+ * the look the child chose. */
 export function figureName(id: string, look: Look): string {
-  if (id === 'friend') return teacherFriend(look.gender).id;
-  if (id === 'mate') return dormitoryMate(look.gender).id;
+  if (id === 'friend') return friendSheet(teacherFriend(look.gender).id, look);
+  if (id === 'mate') return friendSheet(dormitoryMate(look.gender).id, look);
+  if (id === 'nuri' || id === 'teku') return friendSheet(id, look);
   return id === 'wizard' ? `wizard-${look.id}` : id;
 }
 

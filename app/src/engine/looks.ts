@@ -140,6 +140,71 @@ export function teacherFriend(wizardGender: Look['gender'] | null): { id: string
   return { id: FRIENDS[gender], gender };
 }
 
+/** A friend's colours (D90): the robe, the hat and its band, as a look's. */
+export interface FriendColours {
+  robe: string;
+  hat: string;
+  band: string;
+}
+
+/** Each friend's two sets of colours (D90), chosen far apart: Nuri green or
+ * burgundy, Teku orange or navy. tools/art/figures.py draws a sheet for each,
+ * `<friend>-<set>`. */
+export const FRIEND_SETS: Record<'nuri' | 'teku', Record<'a' | 'b', FriendColours>> = {
+  nuri: {
+    a: { robe: '#3f8f5a', hat: '#2f6b44', band: '#e8c547' },
+    b: { robe: '#9b2d3a', hat: '#6b1d27', band: '#e8c547' },
+  },
+  teku: {
+    a: { robe: '#c86f2c', hat: '#8a4515', band: '#3fa7c9' },
+    b: { robe: '#33438f', hat: '#222d63', band: '#e89a3f' },
+  },
+};
+
+/** A colour in CIELAB, from its hex. */
+function lab(hex: string): [number, number, number] {
+  const channel = (at: number) => {
+    const c = parseInt(hex.slice(at, at + 2), 16) / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const [r, g, b] = [channel(1), channel(3), channel(5)];
+  const [x, y, z] = [
+    (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047,
+    r * 0.2126 + g * 0.7152 + b * 0.0722,
+    (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883,
+  ];
+  const f = (t: number) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
+  return [116 * f(y) - 16, 500 * (f(x) - f(y)), 200 * (f(y) - f(z))];
+}
+
+/** How far apart two colours look, CIE76's ΔE. */
+export function colourDistance(one: string, other: string): number {
+  const [a, b] = [lab(one), lab(other)];
+  return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+}
+
+/** Each friend's set for a wizard's look (D90): of the four pairings of Nuri's
+ * and Teku's sets, the one whose three robes, the wizard's and the two friends',
+ * stand farthest apart, the closest two of them counting. Decided by the look
+ * alone, so that a friend wears the same colours all the game. */
+export function friendSets(look: Pick<Look, 'robe'>): Record<'nuri' | 'teku', 'a' | 'b'> {
+  let best = { nuri: 'a' as 'a' | 'b', teku: 'a' as 'a' | 'b', apart: -1 };
+  for (const nuri of ['a', 'b'] as const) {
+    for (const teku of ['a', 'b'] as const) {
+      const [n, t] = [FRIEND_SETS.nuri[nuri].robe, FRIEND_SETS.teku[teku].robe];
+      const apart = Math.min(colourDistance(n, look.robe), colourDistance(t, look.robe), colourDistance(n, t));
+      if (apart > best.apart) best = { nuri, teku, apart };
+    }
+  }
+  return { nuri: best.nuri, teku: best.teku };
+}
+
+/** The sheet a friend is drawn from for a wizard's look: `nuri-a`, `teku-b`... */
+export function friendSheet(friendId: string, look: Pick<Look, 'robe'>): string {
+  if (friendId !== 'nuri' && friendId !== 'teku') return friendId;
+  return `${friendId}-${friendSets(look)[friendId]}`;
+}
+
 /** The wizard's dormitory mate (D84): the friend of the wizard's own gender, a boy
  * when there is no wizard yet, as the words take a boy then. */
 export function dormitoryMate(wizardGender: Look['gender'] | null): { id: string; gender: Look['gender'] } {

@@ -5,7 +5,7 @@
 
 import type Phaser from 'phaser';
 import type { DoorLock } from './layout';
-import { DEFAULT_LOOK, dormitoryMate, type HairStyle, type Look, teacherFriend } from './looks';
+import { DEFAULT_LOOK, dormitoryMate, FRIEND_SETS, friendSets, type HairStyle, type Look, teacherFriend } from './looks';
 
 export const TILE = 48;
 export const WIZARD_WIDTH = 36;
@@ -233,25 +233,19 @@ const GHOST: Figure = {
  * and Teku, a boy, pupils with a hat like the wizard's; `friend` is the one of the
  * wizard's other gender and `mate` the one of its own (D84); Wenna, the librarian. A friend the game has no figure for
  * is drawn as a teacher. */
-export function friendFigure(id: string, wizardGender: 'girl' | 'boy'): Figure {
+export function friendFigure(id: string, wizardGender: 'girl' | 'boy', look?: Pick<Look, 'robe'>): Figure {
   const who =
     id === 'friend' ? teacherFriend(wizardGender).id : id === 'mate' ? dormitoryMate(wizardGender).id : id;
-  if (who === 'nuri') {
+  if (who === 'nuri' || who === 'teku') {
+    // In the set of colours unlike the wizard's (D90); the first with no look given.
+    const colours = FRIEND_SETS[who][look ? friendSets(look)[who] : 'a'];
+    const nuri = who === 'nuri';
     return {
-      robe: '#3f8f5a',
-      hat: { colour: '#2f6b44', band: '#e8c547' },
-      hair: '#4a2c1a',
-      hairStyle: 'long',
-      skin: '#c98e5f',
-    };
-  }
-  if (who === 'teku') {
-    return {
-      robe: '#b5652a',
-      hat: { colour: '#7a3f14', band: '#3fa7c9' },
-      hair: '#1f1a17',
-      hairStyle: 'short',
-      skin: '#a8714a',
+      robe: colours.robe,
+      hat: { colour: colours.hat, band: colours.band },
+      hair: nuri ? '#4a2c1a' : '#1f1a17',
+      hairStyle: nuri ? 'long' : 'short',
+      skin: nuri ? '#c98e5f' : '#a8714a',
     };
   }
   if (id === 'wenna') {
@@ -556,7 +550,7 @@ export function makePlaceholders(
   ghost.texture.refresh();
   for (const id of friends) {
     const friend = canvas(scene, friendKey(id), WIZARD_WIDTH * FACINGS.length, WIZARD_HEIGHT);
-    const figure = friendFigure(id, look.gender);
+    const figure = friendFigure(id, look.gender, look);
     FACINGS.forEach((facing, index) => {
       drawFigure(friend.ctx, index * WIZARD_WIDTH, facing, figure);
       friend.texture.add(facing, 0, index * WIZARD_WIDTH, 0, WIZARD_WIDTH, WIZARD_HEIGHT);

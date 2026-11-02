@@ -49,3 +49,23 @@ licence = "GPL-3.0-or-later"
 source = "generated: gemini-3-pro-image, an edit of a sheet of wizard-base-girl.webp's standing frame, tools/art/prompts/figure-act-girl.md; its celebrating row put on its grid by tools/art/figures.py --win"
 author = "Kydux contributors"
 licence = "GPL-3.0-or-later"
+
+["wizard-sleep-boy.webp"]
+source = "generated: gemini-3-pro-image, an edit of a sheet of wizard-base-boy.webp's standing frame made by tools/art/figures.py --sleep-input, tools/art/prompts/figure-sleep-boy.md; its lying frame put on its grid by tools/art/figures.py --sleep"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["wizard-sleep-girl.webp"]
+source = "generated: gemini-3-pro-image, an edit of a sheet of wizard-base-girl.webp's standing frame made by tools/art/figures.py --sleep-input, tools/art/prompts/figure-sleep-girl.md; its lying frame put on its grid by tools/art/figures.py --sleep"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["friend-sleep-boy.webp"]
+source = "generated: gemini-3-pro-image, an edit of a sheet of friend-base-boy.webp's standing frame made by tools/art/figures.py --sleep-input, tools/art/prompts/figure-sleep-friend-boy.md; its first lying figure cut at the wizard's height and put on its grid by tools/art/figures.py --sleep --like boy"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["friend-sleep-girl.webp"]
+source = "generated: gemini-3-pro-image, an edit of a sheet of friend-base-girl.webp's standing frame made by tools/art/figures.py --sleep-input, tools/art/prompts/figure-sleep-friend-girl.md; its lying frame put on its grid by tools/art/figures.py --sleep"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"

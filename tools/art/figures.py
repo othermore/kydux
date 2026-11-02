@@ -33,12 +33,15 @@ side, to look at. A wizard's sheet has four more rows after its walking ones,
 the same ways in the same order: casting, the wand raised, pointed with its
 light and lowered, recoloured from the casting base of its gender (CAST_BASES);
 four more, picking up the way it faces, bending, at the ground with both hands
-in front of its feet and half up again (PICKUP_BASES); and one facing down,
-celebrating (WIN_BASES). figures.json names the rows (`rows`, ROWS). --cast and
---pickup make their bases from Gemini's edits of the walking base
-(tools/art/prompts/figure-cast-<gender>.md, figure-pickup-<gender>.md); --win
-from an edit of a sheet of the standing frame (figure-act-<gender>.md); each is
-put back on the base's grid.
+in front of its feet and half up again (PICKUP_BASES); one facing down,
+celebrating (WIN_BASES); and one asleep (SLEEP_BASES, D91), which the friends'
+sheets have too, after their walking rows. figures.json names the rows (`rows`,
+ROWS, and `sheets` for a sheet whose rows differ). --cast and --pickup make their
+bases from Gemini's edits of the walking base (tools/art/prompts/figure-cast-
+<gender>.md, figure-pickup-<gender>.md); --win from an edit of a sheet of the
+standing frame (figure-act-<gender>.md); --sleep from an edit of the standing
+sheet --sleep-input makes (figure-sleep-<kind>.md); each is put back on the
+base's grid.
 """
 
 import argparse
@@ -77,38 +80,32 @@ PICKUP_BASES = {"boy": "wizard-pickup-boy.webp", "girl": "wizard-pickup-girl.web
 #: The wizard celebrating, by gender: one row facing down, the arms up, a jump,
 #: down again.
 WIN_BASES = {"boy": "wizard-win-boy.webp", "girl": "wizard-win-girl.webp"}
+#: Asleep, lying on the back seen from above, upright in the frame (the page lays
+#: it along the bed, D91), by the sheet it is drawn for: one frame, three times.
+SLEEP_BASES = {
+    "boy": "wizard-sleep-boy.webp",
+    "girl": "wizard-sleep-girl.webp",
+    "friend-boy": "friend-sleep-boy.webp",
+    "friend-girl": "friend-sleep-girl.webp",
+}
 #: The rows of a wizard's sheet by what they are (figures.json's `rows`): the
 #: walking, casting and picking-up rows four each (down, left, right, up), then
-#: the celebrating one.
-ROWS = {"walk": 0, "cast": 4, "pickup": 8, "win": 12}
+#: the celebrating one, then the sleeping one. A friend's sheet has its walking
+#: rows and its sleeping row after them (`sheets`, FRIEND_ROWS).
+ROWS = {"walk": 0, "cast": 4, "pickup": 8, "win": 12, "sleep": 13}
+FRIEND_ROWS = {"walk": 0, "sleep": 4}
 #: How tall the figure is, at most, in each picking-up frame, against its standing
 #: height: bending, at the ground, half up again. A frame the edit draws taller
 #: is lowered (crouched), so that every way and both wizards go as low.
 CROUCH = (0.88, 0.66, 0.9)
 #: How much of the figure, from its feet up, is squeezed in a crouch.
 CROUCHED = 0.5
-#: The friends (D77): their base and their colours, as a look's.
+#: The friends (D77): their base, and the skin and hair they always have. Their
+#: robe, hat and band come in two sets each (D90), read from looks.ts's
+#: FRIEND_SETS, a sheet a set, `<friend>-<set>`.
 FRIENDS = {
-    "teku": (
-        "friend-boy",
-        {
-            "skin": "#a8714a",
-            "hair": "#1f1a17",
-            "robe": "#c86f2c",
-            "hat": "#8a4515",
-            "band": "#3fa7c9",
-        },
-    ),
-    "nuri": (
-        "friend-girl",
-        {
-            "skin": "#c98e5f",
-            "hair": "#4a2c1a",
-            "robe": "#3f8f5a",
-            "hat": "#2f6b44",
-            "band": "#e8c547",
-        },
-    ),
+    "teku": ("friend-boy", {"skin": "#a8714a", "hair": "#1f1a17"}),
+    "nuri": ("friend-girl", {"skin": "#c98e5f", "hair": "#4a2c1a"}),
 }
 PARTS = ("skin", "hair", "robe", "hat", "band")
 #: How much of a figure, from its feet up, a step frame keeps of its own drawing:
@@ -135,6 +132,19 @@ def looks() -> dict[str, dict[str, str]]:
         if skin:
             fields["skin"] = skins[skin.group(1)]
         found[look_id] = fields
+    return found
+
+
+def friend_sets() -> dict[str, dict[str, dict[str, str]]]:
+    """Each friend's sets of colours (D90), read from looks.ts's FRIEND_SETS."""
+    text = LOOKS_TS.read_text(encoding="utf-8").split("export const FRIEND_SETS")[1]
+    text = text.split("};")[0]
+    found: dict[str, dict[str, dict[str, str]]] = {}
+    for friend, body in re.findall(r"(\w+): \{\s*(a: \{.*?\},\s*b: \{.*?\}),?\s*\}", text, re.S):
+        found[friend] = {
+            name: dict(re.findall(r"(\w+): '(#[0-9a-f]{6})'", fields))
+            for name, fields in re.findall(r"(\w): \{([^}]*)\}", body)
+        }
     return found
 
 
@@ -435,6 +445,83 @@ def make_win_base(gender: str, edit: Path) -> Path:
     return target
 
 
+def standing_sheet(base: Image.Image, frame: tuple[int, int]) -> tuple[Image.Image, Image.Image]:
+    """A figure's standing frame facing down, four rows of three, and the same
+    enlarged four times and centred on a magenta canvas of 9:16: what Gemini is
+    asked to edit when a sheet of one pose is wanted (the celebrating and the
+    sleeping rows), and the base its edit is put back on."""
+    fw, fh = frame
+    standing = base.convert("RGBA").crop((fw, 0, 2 * fw, fh))
+    sheet = Image.new("RGBA", (3 * fw, 4 * fh), (0, 0, 0, 0))
+    for row in range(4):
+        for column in range(3):
+            sheet.alpha_composite(standing, (column * fw, row * fh))
+    scale = 4
+    height = sheet.height * scale
+    canvas = Image.new("RGB", (round(height * 9 / 16), height), (255, 0, 255))
+    big = sheet.resize((sheet.width * scale, height), Image.LANCZOS)
+    canvas.paste(big, ((canvas.width - big.width) // 2, 0), big)
+    return sheet, canvas
+
+
+def make_sleep_input(kind: str) -> Path:
+    """The picture Gemini edits into a sheet asleep, for a kind of SLEEP_BASES, from
+    its walking base's standing frame."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    frame = tuple(about["frame"])
+    sheet, canvas = standing_sheet(Image.open(BASE_DIR / BASES[kind][0]), frame)
+    sheet.save(RAW / "figures" / f"sleep-{kind}-base.png")
+    target = RAW / "figures" / f"sleep-{kind}-input.png"
+    canvas.save(target)
+    return target
+
+
+def one_figure(edited: Image.Image, height: int, frame: tuple[int, int], foot: int) -> Image.Image:
+    """The first figure of an edit Gemini drew in more figures than asked, or larger:
+    the piece of its top-left quarter keyed off its magenta, sized to `height` and
+    set in a frame with its feet on the frame's foot line, in the middle."""
+    rgb = np.array(edited.convert("RGB")).astype(int)
+    quarter = rgb[: rgb.shape[0] // 4, : rgb.shape[1] // 4]
+    distance = np.abs(quarter - np.array([255, 0, 255])).sum(axis=2)
+    solid = distance > 150
+    ys, xs = np.nonzero(solid)
+    box = (xs.min(), ys.min(), xs.max() + 1, ys.max() + 1)
+    alpha = np.clip((distance - 90) * 3, 0, 255).astype(np.uint8)
+    piece = Image.fromarray(np.dstack([quarter.astype(np.uint8), alpha]), "RGBA").crop(box)
+    width = round(piece.width * height / piece.height)
+    piece = piece.resize((width, height), Image.LANCZOS)
+    fw, fh = frame
+    out = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+    out.alpha_composite(piece, ((fw - width) // 2, fh - foot - height))
+    return out
+
+
+def make_sleep_base(kind: str, edit: Path, like: str | None = None) -> Path:
+    """The sleeping base of a kind, from Gemini's edit of its standing sheet
+    (make_sleep_input): the first figure of the edit, three times in a row; with
+    `like`, an edit that drew its figures otherwise, its first figure made as
+    tall as that kind's (one_figure)."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    fw, fh = tuple(about["frame"])
+    if like is None:
+        base = Image.open(RAW / "figures" / f"sleep-{kind}-base.png")
+        asleep = from_edit(Image.open(edit), base, (fw, fh))
+        one = asleep.crop((fw, 0, 2 * fw, fh))
+    else:
+        # The edit drew its figures otherwise: the first one, as tall as `like`'s.
+        other = np.array(Image.open(BASE_DIR / SLEEP_BASES[like]).convert("RGBA"))[..., 3] > 128
+        rows = np.nonzero(other[:, fw : 2 * fw].any(axis=1))[0]
+        one = one_figure(
+            Image.open(edit), int(rows[-1] - rows[0] + 1), (fw, fh), fh - 1 - int(rows[-1])
+        )
+    row = Image.new("RGBA", (3 * fw, fh), (0, 0, 0, 0))
+    for column in range(3):
+        row.alpha_composite(one, (column * fw, 0))
+    target = BASE_DIR / SLEEP_BASES[kind]
+    row.save(target, quality=90, method=6)
+    return target
+
+
 def stacked(*sheets: Image.Image) -> Image.Image:
     """The sheets one under the other."""
     sheet = Image.new("RGBA", (sheets[0].width, sum(s.height for s in sheets)), (0, 0, 0, 0))
@@ -457,6 +544,11 @@ def make(check: bool = False) -> list[Path]:
         key: steadied(Image.open(BASE_DIR / name), frame) for key, name in PICKUP_BASES.items()
     }
     wins = {key: Image.open(BASE_DIR / name).convert("RGBA") for key, name in WIN_BASES.items()}
+    sleeps = {
+        key: Image.open(BASE_DIR / name).convert("RGBA")
+        for key, name in SLEEP_BASES.items()
+        if (BASE_DIR / name).is_file()
+    }
     written = []
     for look_id, look in looks().items():
         base, hues = bases[look["gender"]]
@@ -466,19 +558,32 @@ def make(check: bool = False) -> list[Path]:
             recolour_sheet(casts[look["gender"]], frame, colours, hues),
             recolour_sheet(pickups[look["gender"]], frame, colours, hues),
             recolour_sheet(wins[look["gender"]], frame, colours, hues),
+            recolour_sheet(sleeps[look["gender"]], frame, colours, hues),
         )
         target = FIGURES / f"wizard-{look_id}.webp"
         sheet.save(target, quality=90, method=6)
         written.append(target)
-    for name, (key, colours) in FRIENDS.items():
-        target = FIGURES / f"{name}.webp"
+    sets = friend_sets()
+    for name, (key, own) in FRIENDS.items():
         base, hues = bases[key]
-        recolour_sheet(base, frame, colours, hues).save(target, quality=90, method=6)
-        written.append(target)
+        for set_name, colours in sets[name].items():
+            target = FIGURES / f"{name}-{set_name}.webp"
+            both = {**own, **colours}
+            sheet = stacked(
+                recolour_sheet(base, frame, both, hues),
+                recolour_sheet(sleeps[key], frame, both, hues),
+            )
+            sheet.save(target, quality=90, method=6)
+            written.append(target)
+        (FIGURES / f"{name}.webp").unlink(missing_ok=True)
     # The list is whatever sheets the folder holds: these, and the figures cut once
     # by export_scene.py (Wenna, Eldra, Dask).
     about["figures"] = sorted(p.stem for p in FIGURES.glob("*.webp"))
     about["rows"] = ROWS
+    # A sheet whose rows are not a wizard's says its own (D91).
+    about["sheets"] = {
+        f"{name}-{set_name}": FRIEND_ROWS for name in FRIENDS for set_name in sets[name]
+    }
     (FIGURES / "figures.json").write_text(json.dumps(about, indent=2) + "\n", encoding="utf-8")
     if check:
         sheets = [Image.open(p).convert("RGBA") for p in written]
@@ -506,7 +611,24 @@ def main() -> int:
     parser.add_argument(
         "--win", nargs=2, metavar=("GENDER", "EDIT"), help="make a celebrating base from an edit"
     )
+    parser.add_argument(
+        "--sleep-input", metavar="KIND", help="make the picture Gemini edits into a sheet asleep"
+    )
+    parser.add_argument(
+        "--sleep", nargs=2, metavar=("KIND", "EDIT"), help="make a sleeping base from an edit"
+    )
+    parser.add_argument(
+        "--like",
+        metavar="KIND",
+        help="with --sleep, for an edit of other figures: as tall as KIND",
+    )
     args = parser.parse_args()
+    if args.sleep_input:
+        print(make_sleep_input(args.sleep_input).relative_to(REPO))
+        return 0
+    if args.sleep:
+        print(make_sleep_base(args.sleep[0], Path(args.sleep[1]), args.like).relative_to(REPO))
+        return 0
     if args.cast:
         print(make_cast_base(args.cast[0], Path(args.cast[1])).relative_to(REPO))
         return 0

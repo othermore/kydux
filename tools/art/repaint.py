@@ -51,8 +51,11 @@ the opening's magenta, so that a wall cut round its openings leaves it out.
 
 `fill` mends without a model: each box, a narrow upright strip, is painted row
 by row from the pixels just left and right of it, blended across, so that what
-lies under a thin thing (the entrance lamp's chain over a plain floor) goes on
-across it. A model given such a strip blurred painted the chain again.
+lies under a thin thing (the entrance lamp's chain over a plain floor, the foot
+of a door taken out) goes on across it, and its `also` pictures with it; a box
+as wide as tall, on a floor whose light changes both ways, is painted from all
+four sides (`sides` 4). A model given such a strip blurred painted the chain
+again.
 
 `doorways` opens each door of the scene's settings' `doorways` without a model
 (D108): the door's leaf is found in the painting from bands of seeds across it
@@ -293,15 +296,49 @@ def opened(marked: np.ndarray, painting: np.ndarray, part: np.ndarray, cell: flo
     return out
 
 
+def filled(picture: np.ndarray, boxes: list, sides: int = 2) -> np.ndarray:
+    """A picture with each box painted row by row from the pixels just left and right
+    of it, blended across; with `sides` 4, from the pixels round it on all four
+    sides, blended so that the box meets each of them (a Coons patch), for a box as
+    wide as tall on a floor whose light changes both ways."""
+    picture = picture.astype(np.float32)
+    for x0, y0, x1, y1 in boxes:
+        if sides != 4:
+            left, right = picture[y0:y1, x0 - 1], picture[y0:y1, x1]
+            across = ((np.arange(x0, x1) - (x0 - 1)) / (x1 - (x0 - 1)))[None, :, None]
+            picture[y0:y1, x0:x1] = left[:, None] * (1 - across) + right[:, None] * across
+            continue
+        left, right = picture[y0 - 1 : y1 + 1, x0 - 1], picture[y0 - 1 : y1 + 1, x1]
+        top, bottom = picture[y0 - 1, x0 - 1 : x1 + 1], picture[y1, x0 - 1 : x1 + 1]
+        v = (np.arange(len(left)) / (len(left) - 1))[:, None, None]
+        u = (np.arange(len(top)) / (len(top) - 1))[None, :, None]
+        corners = (
+            (1 - u) * (1 - v) * top[0]
+            + u * (1 - v) * top[-1]
+            + (1 - u) * v * bottom[0]
+            + u * v * bottom[-1]
+        )
+        patch = (
+            (1 - u) * left[:, None]
+            + u * right[:, None]
+            + (1 - v) * top[None]
+            + v * bottom[None]
+            - corners
+        )
+        picture[y0:y1, x0:x1] = patch[1:-1, 1:-1]
+    return picture.clip(0, 255).astype(np.uint8)
+
+
 def fill(scene: str, section: str = "repaint") -> Path:
     repaint = settings_of(scene, section)
-    painting = grown(repaint).astype(np.float32)
-    for x0, y0, x1, y1 in repaint["boxes"]:
-        left, right = painting[y0:y1, x0 - 1], painting[y0:y1, x1]
-        across = ((np.arange(x0, x1) - (x0 - 1)) / (x1 - (x0 - 1)))[None, :, None]
-        painting[y0:y1, x0:x1] = left[:, None] * (1 - across) + right[:, None] * across
     target = REPO / repaint["painting"]
-    Image.fromarray(painting.clip(0, 255).astype(np.uint8)).save(target)
+    sides = repaint.get("sides", 2)
+    Image.fromarray(filled(grown(repaint), repaint["boxes"], sides)).save(target)
+    # The scene's other pictures that show the part as the painting does, each filled
+    # the same into a picture of its own ([edit, written]), as `join` mends them.
+    for edit, written in repaint.get("also", []):
+        picture = np.array(Image.open(REPO / edit).convert("RGB"))
+        Image.fromarray(filled(picture, repaint["boxes"], sides)).save(REPO / written)
     return target
 
 

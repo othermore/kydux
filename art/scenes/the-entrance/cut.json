@@ -3,9 +3,9 @@
   "sources": {
     "folder": "art/raw/game-entrance",
     "edits": "art/raw/game-entrance",
-    "painting": "entrance-doors.png",
+    "painting": "entrance-stubs.png",
     "grid": "grid.json",
-    "ground": "entrance-doors.png"
+    "ground": "entrance-stubs.png"
   },
   "repaint": {
     "about": "The chain the lamp hangs from, taken out so that it hangs from its wooden ring as if fixed to a ceiling out of the picture: filled from its sides by tools/art/repaint.py (fill), the painting kept pixel for pixel elsewhere.",
@@ -80,6 +80,32 @@
     ],
     "opened": true
   },
+  "fill": {
+    "about": "The foot of each door taken out of the far wall's side arches (door_left, door_right), left on the floor below each arch, at 11,10 and 28,10, by the edits that took the doors out: filled from all four sides by tools/art/repaint.py (fill), the floor going on across it, the painting kept pixel for pixel elsewhere; the marked picture filled with it.",
+    "from": "art/raw/game-entrance/entrance-doors.png",
+    "boxes": [
+      [
+        1296,
+        1210,
+        1396,
+        1298
+      ],
+      [
+        3411,
+        1218,
+        3511,
+        1306
+      ]
+    ],
+    "sides": 4,
+    "painting": "art/raw/game-entrance/entrance-stubs.png",
+    "also": [
+      [
+        "art/raw/game-entrance/entrance-marked-doors.png",
+        "art/raw/game-entrance/entrance-marked-stubs.png"
+      ]
+    ]
+  },
   "things": {
     "far_wall": {
       "about": "The far wall's face, its arches' stones, its pillars and its knights, drawn over whoever walks into the arches: the wall's box less what is seen through its three openings, which Gemini painted magenta.",
@@ -98,7 +124,7 @@
       },
       "opening": 3.4,
       "adults": true,
-      "marked": "entrance-marked-doors.png"
+      "marked": "entrance-marked-stubs.png"
     },
     "bench_top_left": {
       "about": "The bench by the far wall, left of the door.",
@@ -112,7 +138,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -129,7 +155,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -146,7 +172,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -163,7 +189,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -180,7 +206,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -197,7 +223,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -214,7 +240,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       },
@@ -232,7 +258,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       },
@@ -250,7 +276,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       },
@@ -268,7 +294,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       },
@@ -286,7 +312,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -303,7 +329,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -320,7 +346,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -337,7 +363,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       }
@@ -354,7 +380,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked-doors.png",
+      "marked": "entrance-marked-stubs.png",
       "states": {
         "standing": "painting"
       },
@@ -609,7 +635,7 @@
       }
     ],
     "painting": "art/raw/game-entrance/entrance-marked.png",
-    "mended": "art/raw/game-entrance/entrance-marked-doors.png"
+    "mended": "art/raw/game-entrance/entrance-marked-stubs.png"
   },
   "dark": [
     {

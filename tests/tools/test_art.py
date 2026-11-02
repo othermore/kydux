@@ -715,6 +715,22 @@ def test_a_picture_drawn_again_is_moved_part_by_part_onto_the_painting():
     assert (moved[100:140, 60:66].max(axis=2) < 80).mean() > 0.9
 
 
+def test_a_fill_from_four_sides_follows_a_light_that_changes_both_ways():
+    import repaint
+
+    # A floor lit from the top left, and a door's foot left on it.
+    yy, xx = np.mgrid[0:60, 0:80].astype(np.float32)
+    floor = np.repeat((60 + xx + yy)[..., None], 3, axis=2).astype(np.uint8)
+    stub = floor.copy()
+    stub[20:40, 30:50] = (120, 60, 30)
+    filled = repaint.filled(stub, [[30, 20, 50, 40]], sides=4)
+    assert np.abs(filled.astype(int) - floor.astype(int)).max() <= 1
+    # From two sides only, each row is blended across, as the lamp's chain is.
+    across = repaint.filled(stub, [[30, 20, 50, 40]])
+    assert np.abs(across.astype(int) - floor.astype(int)).max() <= 1
+    assert (filled[:20] == stub[:20]).all() and (filled[40:] == stub[40:]).all()
+
+
 def test_a_door_s_leaf_is_found_up_to_its_black_line_across_its_planks():
     import repaint
 

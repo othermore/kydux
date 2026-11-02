@@ -158,6 +158,9 @@ export class Silhouette {
   /** Whether the outline is left off: the wizard asleep is under its quilt, not
    * hidden by it (D91). */
   off = false;
+  /** What the figure holds in its hands, which is in front of it and hides nothing
+   * of it: a thing a spell has brought (D127). */
+  held: ReadonlySet<Phaser.GameObjects.Image> = new Set();
 
   update(): void {
     const figure = this.figure;
@@ -165,7 +168,7 @@ export class Silhouette {
     for (const { source, copy } of this.covers) {
       if (copy.texture.key !== source.texture.key) copy.setTexture(source.texture.key);
       copy.setPosition(source.x, source.y);
-      const before = inFront(figure, [source]).length > 0;
+      const before = !this.held.has(source) && inFront(figure, [source]).length > 0;
       copy.setVisible(before);
       if (before) front.push(source);
     }

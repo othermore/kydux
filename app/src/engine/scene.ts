@@ -200,6 +200,8 @@ class LevelScene extends Phaser.Scene {
   /** The things a spell has brought to the wizard's hands in the run shown, held
    * there until picked up (D127), each with where it lies on its tile's floor. */
   private inHands = new Map<string, { x: number; y: number; depth: number }>();
+  /** The images seen in the wizard's hands, which hide nothing of it (silhouette.ts). */
+  private held = new Set<Phaser.GameObjects.Image>();
   /** The thing a spell takes in the tick shown, which its light flies to, and when
    * the light reaches it, in milliseconds from the cast (D127). */
   private pulling: string | null = null;
@@ -668,6 +670,7 @@ class LevelScene extends Phaser.Scene {
     this.speech.update();
     if (this.silhouette) {
       this.silhouette.off = this.asleep.get(this.wizard)?.lying === true;
+      this.silhouette.held = this.held;
       this.silhouette.update();
       if (this.silhouette.shown) this.parentNode.dataset.outlined = 'true';
       else delete this.parentNode.dataset.outlined;
@@ -719,6 +722,7 @@ class LevelScene extends Phaser.Scene {
     this.carried = new Set(this.map.carrying);
     this.shoved.clear();
     this.inHands.clear();
+    this.held.clear();
     for (const thing of this.map.things) {
       const image = this.things.get(thing.id);
       if (!image) continue;
@@ -975,6 +979,7 @@ class LevelScene extends Phaser.Scene {
           }
         : { x: centre(to)[0], y: centre(to)[1], depth: image.depth };
     this.inHands.set(id, floor);
+    this.held.add(image);
     // A thing the spell takes glows as it comes, when it is painted so (D47).
     const glowing = `art-${this.artOf(id)}-pulled`;
     const key = this.textures.exists(glowing) ? glowing : image.texture.key;
@@ -1014,6 +1019,7 @@ class LevelScene extends Phaser.Scene {
       const image = this.things.get(id);
       if (!image) continue;
       this.tweens.killTweensOf(image);
+      this.held.delete(image);
       image.setDepth(floor.depth);
       if (instant) image.setPosition(floor.x, floor.y);
       else this.tweens.add({ targets: image, x: floor.x, y: floor.y, duration: this.playback.tickDuration * 0.4 });
@@ -1038,6 +1044,8 @@ class LevelScene extends Phaser.Scene {
       return;
     }
     image.setPosition(...this.handsFor(image)).setVisible(true).setAlpha(1);
+    // Leaving the hands, it hides nothing of the wizard (silhouette.ts).
+    this.held.add(image);
     const [x, y] = centre(actor.tile);
     this.tweens.add({
       targets: image,
@@ -1045,7 +1053,10 @@ class LevelScene extends Phaser.Scene {
       y: y - 10,
       alpha: 0,
       duration: this.playback.tickDuration * 0.9,
-      onComplete: () => image.setVisible(false).setAlpha(1),
+      onComplete: () => {
+        image.setVisible(false).setAlpha(1);
+        this.held.delete(image);
+      },
     });
   }
 
@@ -1246,6 +1257,7 @@ class LevelScene extends Phaser.Scene {
         const taking = this.playback.tickDuration * LONG * 0.95;
         if (image && instant) {
           this.tweens.killTweensOf(image);
+          this.held.delete(image);
           image.setVisible(false);
         } else if (image && held) {
           // In the hands already (D127): the hands close on it, no second rise; it
@@ -1256,7 +1268,11 @@ class LevelScene extends Phaser.Scene {
             alpha: 0,
             delay: (taking * 2) / 3,
             duration: taking / 3,
-            onComplete: () => image.setVisible(false).setAlpha(1),
+            onComplete: () => {
+              image.setVisible(false).setAlpha(1);
+              this.held.delete(image);
+              this.publishDrawn();
+            },
           });
         } else if (image) {
           this.tweens.add({

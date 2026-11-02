@@ -224,8 +224,11 @@ owner on 2026-10-26, for every scene from the dormitory on:
   thing stays; its mask is that difference, left unsnapped (`snap: false`)
   where the snap runs into lines that are not the thing's. A state may be
   cut from a picture of its own against its own edit (`{"picture",
-  "without", "solid"}`): the rare book's `pulled`, a glowing book drawn
-  while fendra brings it down.
+  "without", "solid"}`), or, where the model painted the thing's
+  surroundings again so that the difference takes them too, by the polygon
+  traced round the thing on its outline (`{"picture", "traced"}`): the rare
+  book's `pulled`, a glowing book drawn while fendra brings it down and
+  held in the wizard's hands, with nothing of its shelf.
 - **A bed's cover is its quilt and its folded sheet** (D97), from the
   sheet's dark line by the pillow to the foot, the pillow left out. Its
   mask takes only its own line (`image_first.lined`), so that the pillow's

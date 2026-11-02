@@ -298,7 +298,10 @@ def state_alpha(
     swung open is the polygon traced round it on its picture (`leaf`), nothing else;
     a door's closed leaf is the painting within its doorway's polygon (`doorway`),
     the arch's inner line and the threshold, so that no line of the wall beside the
-    arch comes with it and nothing of the open doorway shows through it (D113)."""
+    arch comes with it and nothing of the open doorway shows through it (D113); and
+    a state painted on a picture that differs from its edit beyond the thing, a book
+    glowing in a model's picture of its shelf, is the polygon traced round the thing
+    on its outline (`traced`), so that nothing of the shelf comes with it."""
     grid = settings.grid
     spacing = round(grid["x"]["spacing"])
     if picture == "painting":
@@ -313,8 +316,9 @@ def state_alpha(
         return without, sprite_alpha(painting, without, native, thing, spacing, th)
     if isinstance(picture, dict):
         shown = np.array(Image.open(settings.edits / picture["picture"]).convert("RGB"))
-        if "leaf" in picture:
-            return shown, soft_area(painting.shape[:2], grid, picture["leaf"])
+        traced = picture.get("leaf", picture.get("traced"))
+        if traced is not None:
+            return shown, soft_area(painting.shape[:2], grid, traced)
         # A state cut from a picture against its own edit without it: a book
         # glowing as the spell takes it.
         apart = np.array(Image.open(settings.edits / picture["without"]).convert("RGB"))

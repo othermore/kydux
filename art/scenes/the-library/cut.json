@@ -387,15 +387,83 @@
         "lying": "painting",
         "pulled": {
           "picture": "library-vault.png",
-          "without": "library-nobook.png",
-          "solid": false
+          "traced": [
+            [
+              6.785,
+              3.578
+            ],
+            [
+              6.81,
+              3.563
+            ],
+            [
+              7.127,
+              3.476
+            ],
+            [
+              7.168,
+              3.478
+            ],
+            [
+              7.192,
+              3.502
+            ],
+            [
+              7.402,
+              3.808
+            ],
+            [
+              7.4,
+              3.838
+            ],
+            [
+              7.38,
+              3.892
+            ],
+            [
+              7.4,
+              3.905
+            ],
+            [
+              7.39,
+              3.942
+            ],
+            [
+              7.085,
+              4.012
+            ],
+            [
+              7.02,
+              4.05
+            ],
+            [
+              6.98,
+              4.044
+            ],
+            [
+              6.872,
+              3.94
+            ],
+            [
+              6.792,
+              3.775
+            ],
+            [
+              6.771,
+              3.633
+            ],
+            [
+              6.775,
+              3.598
+            ]
+          ]
         }
       },
       "at": [
         7,
         3
       ],
-      "about": "The rare book standing on the high bookcase's lower shelf among the others, three cells above the top aisle: fendra's reach. Its picture without it is the painting with its own box taken from the shelf without it, so that the brown book beside it stays. Taken by the spell, it glows as it comes down (pulled): the glowing book the painting first had, cut against Gemini's edit without it, drawn smaller.",
+      "about": "The rare book standing on the high bookcase's lower shelf among the others, three cells above the top aisle: fendra's reach. Its picture without it is the painting with its own box taken from the shelf without it, so that the brown book beside it stays. Taken by the spell, it glows as it comes down (pulled): the glowing book the painting first had, cut by the polygon traced round its outline (`traced`), which leaves out the shelf Gemini painted again round it, drawn smaller.",
       "scale": {
         "pulled": 0.72
       },

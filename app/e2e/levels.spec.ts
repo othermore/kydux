@@ -277,6 +277,17 @@ test.describe('the high shelf (D46, D47, D49)', () => {
     await page.keyboard.insertText(
       'book = wizard.find_nearest("book")\nwizard.move_right(5)\nwizard.cast("fendra", book)\nwizard.pick_up()\nwizard.give(book)',
     );
+    // Every change of whether the book is carried and drawn, with its tick.
+    await scene(page).evaluate((node) => {
+      const seen: string[] = [];
+      (window as unknown as { kyduxBook: string[] }).kyduxBook = seen;
+      new MutationObserver(() => {
+        const carried = (node.getAttribute('data-carried') ?? '').split(',').includes('rare_book');
+        const drawn = (node.getAttribute('data-drawn') ?? '').includes('rare_book');
+        const now = `${node.getAttribute('data-tick')}:${carried ? 'carried' : '-'}:${drawn ? 'drawn' : '-'}`;
+        if (seen.at(-1) !== now) seen.push(now);
+      }).observe(node, { attributes: true, attributeFilter: ['data-tick', 'data-carried', 'data-drawn'] });
+    });
     await page.locator('#run').click();
     // Where the book is drawn, in cells, and whether the wizard carries it.
     const book = () =>
@@ -307,21 +318,16 @@ test.describe('the high shelf (D46, D47, D49)', () => {
     expect(held.at?.[0]).toBeGreaterThan(7);
     expect(held.at?.[0]).toBeLessThan(8);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-cast-hands.png` });
-    // Once picked up (tick 7) it is carried and no longer drawn, until the give.
-    await page.waitForFunction(
-      () => {
-        const node = document.querySelector('#scene');
-        const carried = (node?.getAttribute('data-carried') ?? '').split(',').includes('rare_book');
-        return carried && !(node?.getAttribute('data-drawn') ?? '').includes('rare_book');
-      },
-      null,
-      { polling: 'raf' },
-    );
     // The give (tick 8) starts from the hands, after the pick-up.
     await expect(scene(page)).toHaveAttribute('data-tick', '8');
     await page.waitForTimeout(150);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-give.png` });
     await expect.poll(book).toEqual({ at: null, carried: false });
+    // Picked up (tick 7) it was carried and no longer drawn before the give began.
+    const seen = await page.evaluate(() => (window as unknown as { kyduxBook: string[] }).kyduxBook);
+    const taken = seen.indexOf('7:carried:-');
+    expect(taken, seen.join(' ')).toBeGreaterThan(-1);
+    expect(seen.indexOf('8:-:drawn'), seen.join(' ')).toBeGreaterThan(taken);
   });
 
   test('beneath the book, the hands cannot reach it: it is too high', async ({ page }) => {

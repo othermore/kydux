@@ -5,7 +5,9 @@
 // a step of ZOOMS at a time, and with the wheel, a little at a time (D106), and
 // drags it to look around, which lets go of the wizard until the next run. In a
 // story (D74) it is a window that keeps whoever each step is about, with their
-// words, inside it, gliding only when they push past its edge, and never jumping.
+// words, inside it, gliding only when they push past its edge, and never jumping;
+// dragged, it stays where it was dragged until the next step, so that the child
+// can watch someone the story does not follow (D106).
 // It says data-zoom (the zoom, to two decimals), data-following, data-dragged
 // while a drag has let go of it, and data-view and data-bounds (the window and
 // the scene with its margin, in tiles across and down, "w×h") on the scene's
@@ -52,6 +54,8 @@ export class SceneCamera {
   /** In a story, what the camera follows: the focus, or the story's point; null
    * once a drag has let go of it. */
   private followed: { x: number; y: number } | null = null;
+  /** Whether a drag has let go of what the camera follows, until follow(). */
+  private dragged = false;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -106,6 +110,7 @@ export class SceneCamera {
       this.followed = null;
       this.parent.dataset.following = 'false';
       this.parent.dataset.dragged = 'true';
+      this.dragged = true;
       camera.scrollX -= dx / camera.zoom;
       camera.scrollY -= dy / camera.zoom;
     });
@@ -116,6 +121,7 @@ export class SceneCamera {
   follow(): void {
     const camera = this.camera;
     const story = this.parts.story;
+    this.dragged = false;
     delete this.parent.dataset.dragged;
     if (story) {
       const target = this.focus ?? story;
@@ -135,6 +141,12 @@ export class SceneCamera {
     camera.startFollow(wizard, true, 0.2, 0.2);
     camera.centerOn(wizard.x, wizard.y);
     this.parent.dataset.following = 'true';
+  }
+
+  /** In a story, at each tick: with whoever the step is about, unless a drag has
+   * let go of them, until the next step. */
+  keep(): void {
+    if (!this.dragged) this.follow();
   }
 
   /** In a story, the camera's window: a dead zone the size of the view less the

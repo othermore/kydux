@@ -699,7 +699,7 @@ class LevelScene extends Phaser.Scene {
     }
     if (this.options.story) {
       this.frameStory(events);
-      this.follow();
+      this.view.keep();
     }
     this.publish();
   }

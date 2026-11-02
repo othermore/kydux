@@ -1597,7 +1597,10 @@ one overturns stays, marked as superseded.
   owner. The zoom box (+, −, Find my wizard) is on a story's scene as on
   a level's. The buttons step through the zooms; the wheel turns the zoom
   a tenth a notch, at most a quarter a turn, between the same limits.
-  Every scene opens at zoom 1, a story on its camera's tile. A bubble and
+  Every scene opens at zoom 1, a story on its camera's tile. A drag in a
+  story holds until the next step or Find my wizard, so that the child can
+  watch someone the story does not follow, a teacher walking away down a
+  corridor. A bubble and
   a thought are drawn larger as the camera zooms out, so that their words
   are never smaller on the screen than at zoom 1; zoomed in, they grow
   with the scene. Rules out words of seven pixels under a teacher's face

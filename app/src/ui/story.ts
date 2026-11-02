@@ -114,6 +114,8 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     const { events, spans } = storyEvents(story);
     const span = spans[step];
     if (!span) return;
+    // A step played again brings back a camera a drag let go of (D106).
+    scene.follow();
     scene.playback.load(events.filter((event) => event.tick <= span.last));
     scene.playback.seek(span.first - 1);
     scene.playback.play();

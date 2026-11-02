@@ -137,3 +137,29 @@ test('a story has the zoom box, opens at zoom 1, and its words keep their size z
   expect(scale).toBeGreaterThanOrEqual(1);
 });
 
+test('in a story, the camera stays where it is dragged until the next step (D106)', async ({ page }) => {
+  await page.goto('/#story/the-first-night');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  await page.locator('#story-title').click();
+  // Ilda's long walk out by the door, as the camera stays with the wizard.
+  for (let step = 0; step < 4; step += 1) await page.locator('#story-next').click();
+  await expect(scene).toHaveAttribute('data-state', 'playing');
+  const box = await scene.locator('canvas').boundingBox();
+  if (!box) throw new Error('the scene has no canvas');
+  const [x, y] = [box.x + box.width / 2, box.y + box.height / 2];
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 40, y - 160, { steps: 6 });
+  await page.mouse.up();
+  await expect(scene).toHaveAttribute('data-dragged', 'true');
+  // Ticks go on, and the camera stays dragged.
+  await page.waitForTimeout(2000);
+  await expect(scene).toHaveAttribute('data-dragged', 'true');
+  await expect(page.locator('#find-wizard')).toBeVisible();
+  // The next step brings it back.
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+  await page.locator('#story-next').click();
+  await expect(scene).not.toHaveAttribute('data-dragged', /./);
+});
+

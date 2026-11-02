@@ -64,7 +64,7 @@ export interface RuntimeLike {
 /** What the controller needs of the scene. */
 export interface SceneLike {
   readonly playback: Playback;
-  load(world: WorldResult): void;
+  load(world: WorldResult, way?: string | null): void;
   reset(): void;
   /** Shows the level starting again, everything put back, and resolves once it is
    * shown (D75); a scene without it is only reset. */
@@ -255,7 +255,7 @@ export class RunController {
     const scene = this.scene;
     if (!scene) return;
     this.world = world as WorldResult;
-    scene.load(this.world);
+    scene.load(this.world, this.shownWay);
     scene.playback.setSpeed(this.speed);
     if (world.events.length === 0) this.finish();
     else scene.playback.play();

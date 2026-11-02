@@ -32,4 +32,19 @@ describe('layout', () => {
     expect(map.carrying).toEqual(['wand']);
     expect(map.actors[0]?.sight).toBe(0);
   });
+
+  it("keeps where each way puts the things and actors it moves (D51, D85)", () => {
+    const map = layout({
+      id: 'ways',
+      map: ['#######', '#S..K.#', '#######'],
+      things: [{ kind: 'key', id: 'key', marker: 'K' }],
+      actors: [{ kind: 'ghost', id: 'eldra', at: [5, 1] }],
+      ways: [
+        { id: 'near', things: [{ id: 'key', at: [2, 1] }] },
+        { id: 'far', things: [{ id: 'key', at: [5, 1] }], actors: [{ id: 'eldra', at: [3, 1] }] },
+      ],
+    });
+    expect(map.ways).toEqual({ near: { key: [2, 1] }, far: { key: [5, 1], eldra: [3, 1] } });
+    expect(map.things[0]?.tile).toEqual([4, 1]);
+  });
 });

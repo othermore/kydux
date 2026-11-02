@@ -113,7 +113,9 @@ export { type Art, type FigureArt, loadArt, type SceneArt } from './painted';
 export interface SceneHandle {
   playback: Playback;
   /** Gives the playback a run's events, with everything back where it started. */
-  load(result: WorldResult): void;
+  /** A run's events to play; `way` names the way of the level they are of (D51),
+   * whose places the restart uses. */
+  load(result: WorldResult, way?: string | null): void;
   reset(): void;
   /** Shows the level starting again: the scene fades, everything is put back, and
    * it comes back; resolves once it is shown (D75). */
@@ -530,6 +532,15 @@ class LevelScene extends Phaser.Scene {
     this.debug?.update(this.cameras.main);
   }
 
+  /** The way of the level being shown (D51), whose places a restart uses; null for
+   * the level's own. */
+  shownWay: string | null = null;
+
+  /** Where a thing or an actor starts in the way shown: the way's tile, or its own. */
+  private startTile(id: string, own: Tile): Tile {
+    return (this.shownWay ? this.map.ways[this.shownWay]?.[id] : undefined) ?? own;
+  }
+
   /** Everything where it stood before the run. */
   private restart(): void {
     this.restarts += 1;
@@ -551,9 +562,10 @@ class LevelScene extends Phaser.Scene {
       const image = this.things.get(thing.id);
       if (!image) continue;
       this.tweens.killTweensOf(image);
+      const tile = this.startTile(thing.id, thing.tile);
       const painted = this.art?.scene.things[this.artOf(thing.id)];
-      if (this.art && painted) placeThing(image, this.art, this.artOf(thing.id), thing.tile);
-      else image.setPosition(...centre(thing.tile));
+      if (this.art && painted) placeThing(image, this.art, this.artOf(thing.id), tile);
+      else image.setPosition(...centre(tile));
       image.setVisible(true).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
       this.glows.get(thing.id)?.setVisible(!thing.open);
@@ -563,9 +575,9 @@ class LevelScene extends Phaser.Scene {
       const state = this.actors.get(actor.id);
       if (!state) continue;
       this.tweens.killTweensOf(state.sprite);
-      state.tile = actor.tile;
+      state.tile = this.startTile(actor.id, actor.tile);
       state.facing = actor.facing;
-      state.sprite.setPosition(...this.figureAt(actor.tile)).setAlpha(1).setVisible(!actor.hidden);
+      state.sprite.setPosition(...this.figureAt(state.tile)).setAlpha(1).setVisible(!actor.hidden);
       this.face(state.sprite, actor.facing);
     }
     this.placeWizard(this.map.start, 'down');
@@ -1068,7 +1080,8 @@ export async function startScene(
     const onReady = () => {
       resolve({
         playback,
-        load(result: WorldResult) {
+        load(result: WorldResult, way = null) {
+          scene.shownWay = way;
           playback.load(result.events);
         },
         reset() {

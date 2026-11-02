@@ -64,6 +64,10 @@ export interface Layout {
   darkArea: Tile[];
   /** Each tile's kind of terrain (D73): the scene's, or wall, floor and shelf. */
   terrain: string[][];
+  /** For a level played in several ways (D51), where each way puts the things and
+   * actors it moves, by the way's id then the thing's: what a restart for that way
+   * places (D85). */
+  ways: Record<string, Record<string, Tile>>;
   /** What the scene shows and the world does not hold, like a flat stone. */
   props: { kind: string; tile: Tile }[];
 }
@@ -146,6 +150,15 @@ export function layout(level: LevelJson): Layout {
     });
   });
   const carrying = Array.isArray(level.carrying) ? level.carrying.map(String) : [];
+  const ways: Record<string, Record<string, Tile>> = {};
+  for (const way of asList(level.ways)) {
+    const moved: Record<string, Tile> = {};
+    for (const spec of [...asList(way.things), ...asList(way.actors)]) {
+      const tile = place(spec);
+      if (tile) moved[String(spec.id)] = tile;
+    }
+    ways[String(way.id)] = moved;
+  }
   return {
     rows,
     width: Math.max(1, rows[0]?.length ?? 1),
@@ -156,6 +169,7 @@ export function layout(level: LevelJson): Layout {
     actors,
     shelves,
     carrying,
+    ways,
     dark: level.dark === true,
     darkArea: asList(level.dark_area as unknown).flatMap((box) => {
       const [x0, y0, x1, y1] = (box as unknown as number[]).map(Number);

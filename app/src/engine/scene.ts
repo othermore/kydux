@@ -72,6 +72,7 @@ import {
   breakSeal,
   crossfade,
   drawnMiddle,
+  fadeBetween,
   middleOffset,
   drawFigure,
   drawGlow,
@@ -343,7 +344,7 @@ class LevelScene extends Phaser.Scene {
     this.markBehind(id, open, moving);
     const image = this.things.get(id);
     if (!image) return;
-    const key = `art-${this.artOf(id)}-${open ? 'open' : 'closed'}`;
+    const key = this.atHour(`art-${this.artOf(id)}-${open ? 'open' : 'closed'}`);
     if (!this.textures.exists(key)) {
       image.setFrame(open ? 'open' : lock);
       return;
@@ -351,28 +352,47 @@ class LevelScene extends Phaser.Scene {
     // Open, what is seen through the doorway is under whoever stands in it (D95).
     const painted = this.art?.scene.things[this.artOf(id)];
     const tile = this.doors.get(id);
-    if (this.art && painted && tile) {
-      image.setDepth(thingDepthOn(this.art, this.artOf(id), tile, { open, inside: this.inside(tile) }));
-    }
+    const depth =
+      this.art && painted && tile
+        ? thingDepthOn(this.art, this.artOf(id), tile, { open, inside: this.inside(tile) })
+        : image.depth;
     if (!moving || this.still) {
-      image.setTexture(key);
+      image.setTexture(key).setDepth(depth).setAlpha(1);
       return;
     }
-    // Seen opening: through its half-open state when it has one, each state fading
-    // into the next.
+    // Seen opening or closing: through its half-open state when it has one, each
+    // picture fading out at its own depth as the next fades in at its own; the
+    // picture of the hour the scene shows (D126), never a frame of another.
     const step = this.playback.tickDuration * 0.3;
-    const ajar = `art-${this.artOf(id)}-ajar`;
+    const ajar = this.atHour(`art-${this.artOf(id)}-ajar`);
+    const fade = (to: string, length: number) => {
+      const from = image.texture.key;
+      const before = image.depth;
+      fadeBetween(this, image, to, depth, length);
+      this.parentNode.dataset.fading = `${id}:${from}@${before.toFixed(4)}>${to}@${depth.toFixed(4)}`;
+      this.time.delayedCall(length, () => {
+        if (this.parentNode.dataset.fading?.startsWith(`${id}:${from}@`)) delete this.parentNode.dataset.fading;
+      });
+    };
     if (!this.textures.exists(ajar)) {
-      crossfade(this, image, key, step * 2);
+      fade(key, step * 2);
       return;
     }
-    crossfade(this, image, ajar, step);
+    fade(ajar, step);
     this.parentNode.dataset.opening = id;
     const run = this.restarts;
     this.time.delayedCall(step, () => {
       delete this.parentNode.dataset.opening;
-      if (run === this.restarts && this.openDoors.has(id) === open) crossfade(this, image, key, step);
+      if (run === this.restarts && this.openDoors.has(id) === open) fade(key, step);
     });
+  }
+
+  /** A painted thing's texture at the hour the scene shows: its morning picture
+   * once the day is all there, on a scene painted whole by morning (D126). */
+  private atHour(key: string): string {
+    if (!this.art?.scene.hours?.morning || (this.shownDay ?? 0) < 1) return key;
+    const morning = hourKey(key, 'morning');
+    return this.textures.exists(morning) ? morning : key;
   }
 
   /** The mark in a door's doorway: hidden while the door is closed, faded in as it

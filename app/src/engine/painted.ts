@@ -428,6 +428,30 @@ export function crossfade(
   scene.tweens.add({ targets: old, alpha: 0, duration, onComplete: () => old.destroy() });
 }
 
+/** A door passing from one state to the next whose pictures lie at other depths, a
+ * leaf swung against the wall of another row (D111): the old picture fades out at
+ * its own depth and size, a copy of it, while the image, now the new picture at
+ * the new state's `depth`, fades in, so that no frame draws a picture at the other
+ * state's depth. Returns the old picture's copy, gone when the fade ends. */
+export function fadeBetween(
+  scene: Phaser.Scene,
+  image: Phaser.GameObjects.Image,
+  key: string,
+  depth: number,
+  duration: number,
+): Phaser.GameObjects.Image {
+  const old = scene.add
+    .image(image.x, image.y, image.texture.key)
+    .setOrigin(image.originX, image.originY)
+    .setScale(image.scaleX, image.scaleY)
+    .setDepth(image.depth)
+    .setAlpha(image.alpha);
+  image.setTexture(key).setDepth(depth).setAlpha(0);
+  scene.tweens.add({ targets: image, alpha: 1, duration });
+  scene.tweens.add({ targets: old, alpha: 0, duration, onComplete: () => old.destroy() });
+  return old;
+}
+
 /** A seal broken (D79): its glow goes at once, a flare of it grows and fades in its
  * place, and sparks of its light fly out and fade; the glow itself is left as it
  * was, hidden, for the level to start again with. */

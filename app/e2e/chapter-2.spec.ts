@@ -278,10 +278,25 @@ test.describe('in the dormitory (D84)', () => {
     await storyNext(page, 3);
     await expect(scene).toHaveAttribute('data-actors', /mate:13,12/, { timeout: 30_000 });
     await expect(scene).toHaveAttribute('data-wizard', '12,12');
+    // Every fade of the door's pictures, as it comes: which picture, at which depth.
+    await scene.evaluate((node) => {
+      const seen: string[] = [];
+      (window as unknown as { kyduxFades: string[] }).kyduxFades = seen;
+      new MutationObserver(() => {
+        const fading = node.getAttribute('data-fading');
+        if (fading && seen.at(-1) !== fading) seen.push(fading);
+      }).observe(node, { attributes: true, attributeFilter: ['data-fading'] });
+    });
     await storyNext(page);
     await expect(scene).toHaveAttribute('data-wizard', '11,15', { timeout: 30_000 });
     await expect(scene).toHaveAttribute('data-actors', /mate:12,15/, { timeout: 30_000 });
     await expect(scene).not.toHaveAttribute('data-doors', /front_door/);
+    // Opened and shut, each picture of the hour fades at its own depth: the open leaf,
+    // swung against the row below, out above the shut door's depth (28.2).
+    const fades = await page.evaluate(() => (window as unknown as { kyduxFades: string[] }).kyduxFades);
+    const closing = fades.map((fade) => /^front_door:art-front_door-open-morning@([\d.]+)>art-front_door-closed-morning@([\d.]+)$/.exec(fade)).find(Boolean);
+    expect(closing, fades.join(' ')).toBeTruthy();
+    expect(Number(closing![1]), fades.join(' ')).toBeGreaterThan(Number(closing![2]));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}morning-out.png` });
     // Back and Again keep the morning's light.
     await page.locator('#story-back').click();

@@ -3,6 +3,7 @@
 // hear, and the settings silence them.
 
 import { expect, test } from '@playwright/test';
+import { seedWizard, storyNext } from './helpers';
 
 test.use({ locale: 'en-US' });
 
@@ -31,4 +32,17 @@ test('the settings turn the sound off, and it stays off', async ({ page }) => {
   await sound.selectOption('off');
   await page.reload();
   await expect(page.locator('#settings-sound')).toHaveValue('off');
+});
+
+test("every figure's steps are heard: the wizard's own, the others' another (D132)", async ({ page }) => {
+  await seedWizard(page);
+  await page.goto('/#story/the-morning');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  // Step 5: the wizard and the mate walk to the door side by side.
+  await storyNext(page, 4);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  const sounds = ((await scene.getAttribute('data-sounds')) ?? '').split(',');
+  expect(sounds, sounds.join(' ')).toContain('step');
+  expect(sounds, sounds.join(' ')).toContain('step_other');
 });

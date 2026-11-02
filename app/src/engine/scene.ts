@@ -109,7 +109,7 @@ import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
-import { play } from './sfx';
+import { type EffectName, play } from './sfx';
 import { blockedText, friendText, sleepingText } from './words';
 
 /** How long one tick lasts at speed 1. */
@@ -167,6 +167,8 @@ function tileOf(value: unknown): Tile | null {
 /** How far a figure's head lies from its feet, a part of its height: where the
  * middle of the head is, on the pillow, for a figure asleep (D91). */
 const HEAD_REACH = 0.65;
+/** How many of the last sounds played data-sounds names. */
+const SOUNDS_KEPT = 16;
 /** How long the wizard is seen turned to who takes a thing before it goes, against a
  * tick (D48). */
 const GIVE_TURN = 0.2;
@@ -868,6 +870,7 @@ class LevelScene extends Phaser.Scene {
       this.placeWizard(from, facing);
       this.wizardTile = to;
       this.walk(this.wizard, facing, ...this.figureAt(to), this.playback.tickDuration * 0.9);
+      this.playSound('step');
       return;
     }
     const actor = this.actors.get(id);
@@ -882,6 +885,18 @@ class LevelScene extends Phaser.Scene {
     }
     actor.sprite.setPosition(...this.figureAt(from));
     this.walk(actor.sprite, facing, ...this.figureAt(to), this.playback.tickDuration * 0.9);
+    this.playSound('step_other');
+  }
+
+  /** The names of the last sounds played, newest last, for the tests (data-sounds). */
+  private readonly playedSounds: string[] = [];
+
+  /** A sound of the scene played (sfx.ts), and said on data-sounds. */
+  private playSound(name: EffectName): void {
+    play(name);
+    this.playedSounds.push(name);
+    if (this.playedSounds.length > SOUNDS_KEPT) this.playedSounds.shift();
+    this.parentNode.dataset.sounds = this.playedSounds.join(',');
   }
 
   /** A stair held by osto: its hold kept, for the stair's state at later ticks (D53). */
@@ -1334,7 +1349,7 @@ class LevelScene extends Phaser.Scene {
         this.wizardTile = to;
         const [x, y] = this.figureAt(to);
         this.walk(this.wizard, facing ?? 'down', x, y, duration);
-        play('step');
+        this.playSound('step');
         break;
       }
       case 'bump': {
@@ -1470,6 +1485,7 @@ class LevelScene extends Phaser.Scene {
         actor.sprite.setPosition(...this.figureAt(from));
         const [x, y] = this.figureAt(to);
         this.walk(actor.sprite, facing, x, y, this.playback.tickDuration * 0.9);
+        this.playSound('step_other');
         break;
       }
       case 'turn':
@@ -1507,6 +1523,7 @@ class LevelScene extends Phaser.Scene {
           actor.facing = towards(from, at);
           actor.sprite.setPosition(...this.figureAt(from)).setAlpha(1);
           this.walk(actor.sprite, actor.facing, ...this.figureAt(at), this.playback.tickDuration * 0.9);
+          this.playSound('step_other');
         } else if (instant) actor.sprite.setAlpha(1);
         else {
           actor.sprite.setAlpha(0);

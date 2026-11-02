@@ -16,7 +16,10 @@ export interface Effect {
 }
 
 export const EFFECTS = {
-  step: { wave: 'triangle', from: 220, to: 180, seconds: 0.06, volume: 0.12 },
+  // Every figure's steps are heard (D132): the wizard's soft and its own, every other
+  // figure's of a second, rounder timbre.
+  step: { wave: 'triangle', from: 220, to: 180, seconds: 0.06, volume: 0.07 },
+  step_other: { wave: 'sine', from: 160, to: 130, seconds: 0.07, volume: 0.09 },
   bump: { wave: 'square', from: 120, to: 60, seconds: 0.14, volume: 0.18 },
   cast: { wave: 'sine', from: 600, to: 1400, seconds: 0.35, volume: 0.2 },
   door: { wave: 'noise', from: 400, to: 200, seconds: 0.25, volume: 0.15 },

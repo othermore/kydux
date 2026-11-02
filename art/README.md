@@ -241,8 +241,10 @@ row its foot stands on.
   the stone before the door meets the wood beyond it, a dark line as wide
   as the painting's outlines is drawn along that foot (`sill_line`); and
   its leaf, so that the door is seen open and the doorway is not taken for
-  the floor, is swung out against the wall beside the arch (`swing`), the
-  open state's picture (D111).
+  the floor, is swung out against the wall beside the arch: a model's
+  picture, painted on the guide the tool draws (`guide`, the shut leaf
+  turned over on its hinges, with its shadow) and joined as any box is,
+  the open state's picture (D111).
 - **A door's leaves are cut by the shapes traced round them** (D113). The
   open state is the polygon traced by hand on the swung picture (`leaf`,
   in cells): round the wood, the hinges and the iron of the leaf, on the
@@ -251,10 +253,13 @@ row its foot stands on.
   free edge and both bottom corners whole, and no stone the model painted
   again beside the hinges. It is drawn at the painting's size with its
   edge soft over one pixel, and nothing of it is snapped, flooded or kept
-  by size. The closed state, cut from the painting, ends at the doorway's
-  polygon (`doorway`: the arch's inner line and the floor's line under the
-  threshold), so that no mortar line of the wall beside the arch comes
-  with it. `tools/art/trace.py` helps to trace: `outline` gives a first
+  by size. The closed state is the painting within the doorway's polygon
+  (`doorway`: the open doorway's fill, the painting against the doorway
+  picture, grown over the arch's inner line by the width of the
+  painting's outlines, about seven pixels), so that the wall keeps its
+  line round the door's cut-out, no mortar line of the wall beside the
+  arch comes with the leaf, and nothing of the open doorway shows through
+  it. `tools/art/trace.py` helps to trace: `outline` gives a first
   polygon, `look` a crop at three times the size with a grid every tenth
   of a cell and the points numbered, and `--diff` shows in red what the
   model painted again round the leaf. Twenty to sixty points a leaf, the

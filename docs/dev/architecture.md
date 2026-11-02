@@ -1636,10 +1636,13 @@ one overturns stays, marked as superseded.
   beside its doorway.** Decided 2026-10-28 by the owner. A doorway with
   no leaf in sight is taken for floor: an open door shows its leaf,
   swung out of the doorway toward the viewer and lying against the wall
-  beside the arch, over the wall. The leaf is the painting's own, shut,
-  turned over, narrowed to the span it lies in and a little darker
-  (`repaint.py doorways`, `swing`); it is the open state's picture, cut
-  by the shape traced round it (D113), and is drawn among the rows as the
+  beside the arch, over the wall. The leaf is a model's, painted on the
+  guide `repaint.py doorways` draws for it (`guide`): the shut leaf
+  turned over on its hinges at the opening's edge, narrowed to the span
+  it lies in and a little darker, its free edge a little forward and its
+  shadow on the wall; the model's picture is joined into the doorway's as
+  any box is (D88). It is the open state's picture, cut by the shape
+  traced round it (D113), and is drawn among the rows as the
   wall it lies on is (a state's own `row`, the dormitory's front door's on
   the front wall's). A door that rests open where no level places it is drawn so
   too. Rules out an open door taken out of sight, and a door seen open
@@ -1685,9 +1688,13 @@ one overturns stays, marked as superseded.
   the shadow it throws on the wall, the free edge and the bottom corners
   whole; the polygon is drawn at the painting's own size with its edge
   softened over one pixel, and nothing is snapped, flooded or kept by
-  size. The closed state keeps its cut-out of the painting, but within
-  the doorway's own shape, so that no mortar line of the wall beside the
-  arch comes along with the leaf. Every scene's check draws each door's
+  size. The closed state is the painting within the doorway's own shape,
+  `doorway`: the open doorway's fill grown over the arch's inner line by
+  the width of the painting's outlines, so that the wall keeps its line
+  round the door's cut-out, no mortar line of the wall beside the arch
+  comes along with the leaf, and nothing of the open doorway shows through
+  it (the painting's cut-out within that shape left gaps where the leaf's
+  edge and the fill's are alike). Every scene's check draws each door's
   states over the painting at three times their size, the mask's edge
   marked, and a state is accepted only when its edge lies on the leaf's
   outline all round. Rules out a mask whose edge is found by a difference

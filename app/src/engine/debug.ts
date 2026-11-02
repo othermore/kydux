@@ -8,6 +8,7 @@
 
 import Phaser from 'phaser';
 import type { Layout } from './layout';
+import { FOOT_IN_CELL } from './painted';
 import { TILE } from './placeholders';
 import { debugWord } from './words';
 
@@ -190,9 +191,19 @@ export class DebugView {
       item.append(swatch, words);
       legend.append(item);
     };
+    // Each kind with the map's letters for it, so that a cell reads against map.txt.
+    const letters = new Map<string, Set<string>>();
+    this.map.terrain.forEach((row, y) =>
+      row.forEach((kind, x) => {
+        const letter = this.map.letters[y]?.[x];
+        if (letter) letters.set(kind, (letters.get(kind) ?? new Set()).add(letter));
+      }),
+    );
     for (const kind of kinds) {
       const known = kind in KIND_COLOURS;
-      entry(hex(KIND_COLOURS[kind] ?? OTHER), debugWord(known ? `kinds.${kind}` : 'kinds.other'));
+      const shown = [...(letters.get(kind) ?? [])].sort().join(' ');
+      const words = debugWord(known ? `kinds.${kind}` : 'kinds.other');
+      entry(hex(KIND_COLOURS[kind] ?? OTHER), shown ? `${shown} · ${words}` : words);
     }
     entry('', debugWord('blocked'), true);
     return legend;
@@ -219,7 +230,8 @@ export class DebugView {
     if (this.shown.numbers) this.drawNumbers(camera);
   }
 
-  /** The column and row of each cell in view, at the screen's own resolution. */
+  /** The column and row of each cell in view, at the screen's own resolution, on
+   * the cell's floor: centred where a figure standing in it has its feet. */
   private drawNumbers(camera: Phaser.Cameras.Scene2D.Camera): void {
     const canvas = this.scene.game.canvas;
     const frame = this.numbers.parentElement;
@@ -246,7 +258,8 @@ export class DebugView {
     const scale = (box.width / canvas.width) * camera.zoom * ratio;
     const view = camera.worldView;
     context.font = `bold ${Math.max(8, 9 * scale)}px monospace`;
-    context.textBaseline = 'top';
+    context.textBaseline = 'middle';
+    context.textAlign = 'center';
     context.lineWidth = Math.max(2, 2.5 * ratio);
     context.strokeStyle = '#000000';
     context.fillStyle = '#fff36b';
@@ -255,8 +268,8 @@ export class DebugView {
     const last = [Math.min(x1, Math.ceil(view.right / TILE)), Math.min(y1, Math.ceil(view.bottom / TILE))];
     for (let y = first[1] ?? 0; y < (last[1] ?? 0); y += 1) {
       for (let x = first[0] ?? 0; x < (last[0] ?? 0); x += 1) {
-        const left = (x * TILE - view.x) * scale + 2 * scale;
-        const top = (y * TILE - view.y) * scale + 1 * scale;
+        const left = ((x + 0.5) * TILE - view.x) * scale;
+        const top = ((y + FOOT_IN_CELL) * TILE - view.y) * scale;
         const words = `${x},${y}`;
         context.strokeText(words, left, top);
         context.fillText(words, left, top);

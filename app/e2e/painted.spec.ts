@@ -157,6 +157,9 @@ test('with ?debug the scene shows its cells, for a tester to name one', async ({
   await page.locator('#debug-masks').click();
   await expect(scene).toHaveAttribute('data-debug-layers', 'numbers,cells,masks');
   await expect(page.locator('.debug-legend')).toBeVisible();
+  // Each kind is named with its letter in the scene's map.txt (16.6): the field's
+  // grass is `g` and its trees `t`.
+  await expect(page.locator('.debug-legend')).toContainText(/(^|\s)\S( \S)* · /);
   await page.screenshot({ path: `${SHOTS}11-debug-cells.png` });
   await page.locator('#debug-masks').click();
   await expect(scene).toHaveAttribute('data-debug-layers', 'numbers,cells');

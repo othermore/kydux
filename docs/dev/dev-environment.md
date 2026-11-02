@@ -241,12 +241,12 @@ https://localhost:5173/?debug#level/the-sealed-door
 The scene then has three more buttons in its lower left corner, each
 turning a layer on or off:
 
-- **Numbers** writes in each cell's corner its column and its row: `9,12`
-  is column 9, row 12. Say a cell's place this way when you report a
-  problem.
+- **Numbers** writes on each cell's floor, where a figure standing in it
+  has its feet, its column and its row: `9,12` is column 9, row 12. Say a
+  cell's place this way when you report a problem.
 - **Cells** tints each cell by its kind of terrain and crosses out in red
   the cells no one walks on. A legend over the buttons says what each
-  colour is.
+  colour is, with the cell's letter in the scene's `map.txt`.
 - **Masks** draws over every painted thing its mask, the shape the game
   cuts it by, see-through and in one colour for each row. A gap in a
   mask, or a mask over the lawn, is a mistake in the cut.

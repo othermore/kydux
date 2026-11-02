@@ -66,6 +66,8 @@ export interface Layout {
   darkArea: Tile[];
   /** Each tile's kind of terrain (D73): the scene's, or wall, floor and shelf. */
   terrain: string[][];
+  /** Each tile's letter in the scene's map.txt (D73), or in the level's own map. */
+  letters: string[];
   /** For a level played in several ways (D51), where each way puts the things and
    * actors it moves, by the way's id then the thing's: what a restart for that way
    * places (D85). */
@@ -181,6 +183,7 @@ export function layout(level: LevelJson): Layout {
       return tiles;
     }),
     terrain: terrainOf(level, rows),
+    letters: Array.isArray(level.terrain) ? (level.terrain as string[]) : rows,
     props: asList(level.props).flatMap((prop) => {
       const tile = asTile(prop.at);
       return tile ? [{ kind: String(prop.kind), tile }] : [];

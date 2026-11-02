@@ -111,13 +111,25 @@ picture are mended with the doorway picture as `also` does.
 
 **Tracing.** Each `leaf` is traced on the swung picture joined into the
 painting (`art/raw/game-dormitory/dormitory-door-swung.png`,
-`art/raw/game-library6/library-{wenna,centre,room}-swung.png`), on a crop
-at three times its size with the grid's lines and numbers over it
-(`tools/art/layout.py --over` gives the grid; crop the door's box), point
-by point along the outer edge of the leaf's dark outline, the hinge's
-plate and the iron's ends, and along the outer edge of the shadow where
-it fades into the wall; the bottom corners whole, the top's curve with a
-point every 0.05 cells. Between twenty and forty points a leaf. Where the
+`art/raw/game-library6/library-{wenna,centre,room}-swung.png`) with
+`tools/art/trace.py`: `outline` gives a first polygon, the region the
+leaf's dark outline closes in, simplified; `look` writes a crop at three
+times its size with a grid line every tenth of a cell and the polygon's
+points numbered over it, and with `--diff` against the doorway picture
+shows in red what the model painted again round the leaf. The points are
+then moved by hand, crop by crop (the top, each side, the foot), to the
+outer edge of the leaf's dark outline, the hinge's plate and the iron's
+ends, and to the outer edge of the shadow where it fades into the wall;
+the bottom corners whole, the top's curve with a point every 0.05 cells.
+Between twenty and sixty points a leaf. Measured on the dormitory's
+leaf by the designer, for the others to be measured the same way: the
+leaf's outline is continuous all round, the bottom corners included; the
+shadow on the wall is the painting's own wall darkened, from 9.39 to the
+outline at 9.56 on row 14.6, and beyond the shadow the wall is the
+painting's pixel for pixel, so a polygon that ends where the shadow fades
+leaves no seam; to the right of the hinges the model painted the arch's
+jamb again, so the polygon follows the leaf's and the hinges' edge there
+and takes no stone. Where the
 swung picture itself lacks a corner (the room door's lower left is the
 one to look at), the owner's rule holds, "bottom corners whole": the
 corner is painted by Gemini in a box of that corner alone (`repaint`,

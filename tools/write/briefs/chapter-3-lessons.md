@@ -18,7 +18,7 @@ context:
   - content/lessons/how-much/en.md
   - content/lessons/words/en.md
   - content/lessons/your-first-spell/en.md
-  - content/lessons/a-name-for-a-value/en.md
+  - content/lessons/the-distance/en.md
   - content/lessons/what-things-know/en.md
   - content/lessons/finding-things/en.md
   - content/lessons/keys-and-doors/en.md

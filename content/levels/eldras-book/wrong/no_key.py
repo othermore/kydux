@@ -1,5 +1,0 @@
-wizard.move_left(3)
-door.open()
-wizard.move_left(3)
-wizard.cast("fendra")
-wizard.pick_up()

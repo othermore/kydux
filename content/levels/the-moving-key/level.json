@@ -1,0 +1,120 @@
+{
+  "id": "the-moving-key",
+  "kind": "improve",
+  "scene": "the-library",
+  "start": [
+    7,
+    6
+  ],
+  "speaker": "wenna",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "key",
+      "id": "key",
+      "at": [
+        3,
+        6
+      ],
+      "opens": "door",
+      "art": "room_key"
+    },
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [
+        2,
+        5
+      ],
+      "locked": true,
+      "art": "room_door"
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [
+        8,
+        6
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        9,
+        6
+      ]
+    }
+  ],
+  "ways": [
+    {
+      "id": "near",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            5,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "middle",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            3,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "far",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            1,
+            6
+          ]
+        }
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.position",
+    "wizard.items",
+    "door.locked",
+    "thing.position",
+    "wizard.pick_up",
+    "wizard.find_nearest",
+    "wizard.give",
+    "door.open",
+    "thing.reveal",
+    "thing.distance_to"
+  ],
+  "goals": [
+    {
+      "kind": "give",
+      "id": "key",
+      "to": "wenna"
+    },
+    {
+      "kind": "numbers_under",
+      "count": 1,
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100
+}

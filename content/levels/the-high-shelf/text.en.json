@@ -2,15 +2,15 @@
   "title": "The high shelf",
   "goals": [
     "Take the rare book.",
-    "Walk on down the aisle."
+    "Name the book with `find_nearest` first."
   ],
-  "starting_code": "# A rare book sits on a high shelf.\n# Stand in line with it, cast fendra, and pick it up.\n",
+  "starting_code": "# Bring the rare book down with a spell.\n",
   "hints": [
-    "Walk left until you are in line with the book.",
-    "Cast the spell *fendra* using your wand to draw the book to your tile.",
-    "Once the book is on your tile, you must use `pick_up` before walking on."
+    "Walk to stand right beneath the rare book.",
+    "Use the `cast` method with the string \"fendra\" to pull the book down to you.",
+    "The spell brings it to your feet, so you must still use the `pick_up` method."
   ],
-  "intro": "There is a rare book on that high shelf, far out of reach. It is the perfect time to try your new spell.",
-  "outro": "A lovely bit of magic! The books seem quite happy to fly into your hands.",
-  "learned": "Now you know how *fendra* draws a thing to you, and that it is picked up after."
+  "intro": "There is a glowing rare book on top of that high bookcase, out of our reach. I have wanted it down for a long time! Walk under it and cast the *fendra* spell to draw it down to you.",
+  "outro": "You have it! The spell worked perfectly.",
+  "learned": "Now you know how the *fendra* spell reaches a thing in a straight line, and that a thing it brings must still be picked up."
 }

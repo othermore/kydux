@@ -1,0 +1,23 @@
+{
+  "terrains": {
+    "u": {
+      "kind": "furniture",
+      "walk": false,
+      "sight": true
+    }
+  },
+  "forbidden": {
+    "reason": "not_my_dormitory",
+    "cells": [
+      [
+        9,
+        7
+      ],
+      [
+        9,
+        8
+      ]
+    ]
+  },
+  "things": []
+}

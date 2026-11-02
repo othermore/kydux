@@ -211,6 +211,11 @@ class LevelScene extends Phaser.Scene {
     return this.art ? TILE * (this.art.figures?.height_cells ?? 1.3) + 4 : 34;
   }
 
+  /** The painted thing a level's thing is drawn from: its `art`, or its id (D85). */
+  private artOf(id: string): string {
+    return this.map.things.find((thing) => thing.id === id)?.art ?? id;
+  }
+
   /** Where a figure stands on a tile: its centre, or on a painted scene its feet. */
   private figureAt([x, y]: Tile): [number, number] {
     return this.art ? [x * TILE + TILE / 2, y * TILE + TILE * FOOT_IN_CELL] : centre([x, y]);
@@ -256,7 +261,7 @@ class LevelScene extends Phaser.Scene {
     this.markBehind(id, open, moving);
     const image = this.things.get(id);
     if (!image) return;
-    const key = `art-${id}-${open ? 'open' : 'closed'}`;
+    const key = `art-${this.artOf(id)}-${open ? 'open' : 'closed'}`;
     if (!this.textures.exists(key)) {
       image.setFrame(open ? 'open' : lock);
       return;
@@ -268,7 +273,7 @@ class LevelScene extends Phaser.Scene {
     // Seen opening: through its half-open state when it has one, each state fading
     // into the next.
     const step = this.playback.tickDuration * 0.3;
-    const ajar = `art-${id}-ajar`;
+    const ajar = `art-${this.artOf(id)}-ajar`;
     if (!this.textures.exists(ajar)) {
       crossfade(this, image, key, step * 2);
       return;
@@ -307,10 +312,10 @@ class LevelScene extends Phaser.Scene {
   private addGlow(id: string, tile: Tile): void {
     const image = this.things.get(id);
     const at: [number, number] =
-      this.art?.scene.things[id] && image
+      this.art?.scene.things[this.artOf(id)] && image
         ? [image.x + (image.displayWidth || TILE) / 2, image.y + (image.displayHeight || TILE) / 2]
         : centre(tile);
-    const sign = this.art?.scene.things[id]?.rune !== 'painted';
+    const sign = this.art?.scene.things[this.artOf(id)]?.rune !== 'painted';
     this.glows.set(id, drawGlow(this, at, image?.depth ?? 3, this.still, sign));
   }
 
@@ -361,6 +366,8 @@ class LevelScene extends Phaser.Scene {
     this.cone = this.add.graphics().setDepth(1);
     this.darkness = this.add.graphics().setDepth(2.5);
     for (const thing of this.map.things) {
+      // A bed is the scene's: the painting draws it, and nothing is drawn for it (D84).
+      if (thing.kind === 'bed') continue;
       const painted = this.art ? paintThing(this, this.art, thing) : null;
       if (painted) {
         this.things.set(thing.id, painted);
@@ -433,7 +440,7 @@ class LevelScene extends Phaser.Scene {
             return image ? [{ image, row: row.row }] : [];
           }),
           ...[...this.things].flatMap(([id, image]) => {
-            const thing = scene.things[id];
+            const thing = scene.things[this.artOf(id)];
             return thing && image.texture.key.startsWith('art-') ? [{ image, row: thing.row }] : [];
           }),
         ]
@@ -544,8 +551,8 @@ class LevelScene extends Phaser.Scene {
       const image = this.things.get(thing.id);
       if (!image) continue;
       this.tweens.killTweensOf(image);
-      const painted = this.art?.scene.things[thing.id];
-      if (this.art && painted) placeThing(image, this.art, thing.id, thing.tile);
+      const painted = this.art?.scene.things[this.artOf(thing.id)];
+      if (this.art && painted) placeThing(image, this.art, this.artOf(thing.id), thing.tile);
       else image.setPosition(...centre(thing.tile));
       image.setVisible(true).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
@@ -662,10 +669,10 @@ class LevelScene extends Phaser.Scene {
     const to = tileOf(event.data.to);
     if (!image || !to || !from) return;
     this.tweens.killTweensOf(image);
-    const painted = this.art?.scene.things[id];
+    const painted = this.art?.scene.things[this.artOf(id)];
     if (this.art && painted) {
       const [x, y] = [image.x + (to[0] - from[0]) * TILE, image.y + (to[1] - from[1]) * TILE];
-      image.setDepth(rowDepth(painted.row + shiftOf(this.art, id, to)[1]) + 0.001);
+      image.setDepth(rowDepth(painted.row + shiftOf(this.art, this.artOf(id), to)[1]) + 0.001);
       if (instant) image.setPosition(x, y);
       else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });
       return;

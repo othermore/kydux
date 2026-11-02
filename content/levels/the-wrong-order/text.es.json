@@ -2,15 +2,15 @@
   "title": "El orden incorrecto",
   "goals": [
     "Abre la puerta.",
-    "Cruza la puerta."
+    "Párate delante de ella."
   ],
-  "starting_code": "# Este programa hace las cosas en el orden incorrecto.\n# ¡Encuentra el error y arréglalo!\nwizard.move_right(2)\nwizard.move_right()\ndoor.open()\nwizard.pick_up()\nwizard.move_right(3)\n",
+  "starting_code": "# ¡Este programa hace las cosas en el orden incorrecto!\ndoor.open()\nwizard.move_left(5)\n",
   "hints": [
-    "Fíjate en cuándo intenta el programa recoger la llave. ¿Es antes o después de pedirle a la puerta que use `open`?",
-    "Debes recoger la llave tan pronto como estés a su lado.",
-    "Mueve la acción de recoger la llave para que vaya justo antes de pedirle a la puerta que use `open`."
+    "Una puerta solo escucha a quien está justo a su lado.",
+    "Mueve las líneas para que {tu mago|tu maga} dé los pasos primero.",
+    "El ordenador ejecuta las líneas de arriba a abajo, así que el método para moverse debe ir antes que el método para abrir."
   ],
-  "intro": "Uno de mis programas antiguos está intentando abrir esta puerta, pero está un poco confundido. Intenta hacer las cosas en el orden incorrecto.",
-  "outro": "¡Excelente! Los pasos correctos solo sirven cuando los damos en el orden correcto.",
-  "learned": "Ahora sabes que el orden de las instrucciones importa, y cómo encontrar la que está en el lugar equivocado."
+  "intro": "Aquí tienes tu llave de vuelta. Mi antiguo programa la lleva a la pequeña habitación de Eldra, ¡pero hace las cosas en el orden incorrecto! Le pide a la puerta que se abra desde donde empieza, y solo entonces camina hacia ella. Una puerta solo escucha a quien se para a su lado. ¿Puedes arreglarlo?",
+  "outro": "¡Mucho mejor! La puerta está abierta y ya puedes entrar.",
+  "learned": "Ahora sabes que el ordenador da los pasos de arriba a abajo, y que un paso en el lugar equivocado no hace nada."
 }

@@ -20,7 +20,7 @@ test.describe('in English', () => {
   test.use({ locale: 'en-US' });
 
   test('hints are offered after a run that does not win, one at a time', async ({ page }) => {
-    await open(page, 'the-locked-door');
+    await open(page, 'the-hidden-key');
     const hint = page.locator('#hint');
     await expect(hint).toHaveText('Hint');
     await expect(hint).toBeDisabled();
@@ -28,7 +28,7 @@ test.describe('in English', () => {
     await expect(hint).toBeEnabled();
     await hint.click();
     await expect(page.locator('.hint')).toHaveCount(1);
-    const hints = levelText('the-locked-door', 'en').hints.map(shown);
+    const hints = levelText('the-hidden-key', 'en').hints.map(shown);
     await expect(page.locator('.hint').first()).toHaveText(`Hint 1 of 3 ${hints[0]}`);
     await hint.click();
     await hint.click();

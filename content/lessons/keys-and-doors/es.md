@@ -1,22 +1,24 @@
 # Llaves y puertas
 
-Hay muchas salas cerradas con llave en la biblioteca. Una puerta es un objeto con su propio método: `door.open()`. Puedes abrir una puerta cuando estás justo a su lado.
+Una puerta es un objeto y tiene su propio método: `door.open()`.
 
-¡Pero una puerta cerrada solo se abre para {el mago|la maga} que lleva su llave!
+Pero una puerta solo se abre para {un mago|una maga} que esté justo a su lado. ¡Y si la puerta está cerrada con llave, solo se abrirá cuando lleves su llave encima!
 
 ---
-## El orden de las cosas
+## Cosas ocultas
 
-Como el ordenador lee tu programa de arriba a abajo, haciendo cada paso en orden, debes hacer las cosas en el orden correcto.
+A veces no puedes ver una cosa en el suelo, pero para el programa está ahí de todos modos.
 
-Tienes que recoger la llave primero, antes de intentar abrir la puerta. Si le pides a la puerta que se abra antes de tener la llave, se quedará bien cerrada.
+Tu método `find_nearest` la encontrará dondequiera que esté. Luego, el método `key.reveal()` muestra su contorno a través de lo que sea que la esconda, para que sepas adónde ir.
 
 ---
 ## Pruébalo
 
-Vamos a caminar hacia una llave y a recogerla. ¡Una vez que la tengas, estarás {listo|lista} para abrir la puerta!
+La llave de la puerta de enfrente cayó hace mucho tiempo detrás de algo, y nadie la ha visto desde entonces.
+
+¡Vamos a encontrarla y a revelarla!
 
 ```python try
-wizard.move_up(2)
-wizard.pick_up()
+key = wizard.find_nearest("key")
+key.reveal()
 ```

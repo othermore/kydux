@@ -70,7 +70,10 @@ CELL = 96
 QUALITY = 86
 
 
-FIGURES = ("wizard", "nuri", "wenna", "eldra", "dask")
+FIGURES = ("wizard", "nuri", "wenna", "eldra", "dask", "ilda")
+#: A figure drawn after the demo has no pieces of its own in it: its height and the
+#: way its side frames face are read from a figure of its build.
+REFERENCE = {"ilda": "wenna"}
 #: The figures every look and friend is recoloured from (tools/art/figures.py),
 #: kept in art/figures/ as their bases.
 AS_BASES = {"wizard": "wizard-base-boy.webp", "nuri": "friend-base-boy.webp"}
@@ -422,6 +425,9 @@ def scene(settings: Settings) -> Path:
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
         if "rune" in thing:
             things[name]["rune"] = thing["rune"]
+        # The cell it is painted on, for a level that lays it on another (D85).
+        if "at" in thing:
+            things[name]["at"] = thing["at"]
     art = {
         "cell": CELL,
         "size": [columns, rows],
@@ -452,9 +458,10 @@ later, like the rest of it.
 
 - Drawn by Gemini 3 Pro Image (`gemini-3-pro-image`) as walking sheets, from
   `tools/art/prompts/demo-wizard.md`, `demo-nuri.md`, `demo-wenna.md`,
-  `demo-eldra.md` and `demo-dask.md`, each with the style-B wizard as its
-  reference (`chibi-b-gemini.md`); cut by `tools/art/sprites.py` and put
-  together by `tools/art/export_scene.py`.
+  `demo-eldra.md`, `demo-dask.md` and `demo-ilda.md`, each with the style-B
+  wizard as its reference (`chibi-b-gemini.md`); cut by
+  `tools/art/sprites.py` and put together by `tools/art/export_scene.py`,
+  Ilda's sized and turned by Wenna's, a figure of her build.
 - The wizard's girl and Nuri's are Gemini's edits of those sheets
   (`figure-wizard-girl.md`, `figure-nuri-girl.md`), and the wizard's
   casting frames are Gemini's edits of the wizard's two sheets
@@ -481,7 +488,8 @@ def figure_frames(name: str, scale: float) -> dict[str, list[Image.Image]]:
     """A figure's frames at `scale` times the demo's, each side frame turned to
     match the demo's own, which were turned by eye."""
     demo = RAW / "demo" / "pieces"
-    standing = Image.open(demo / f"{name}-down-1.png")
+    reference = REFERENCE.get(name, name)
+    standing = Image.open(demo / f"{reference}-down-1.png")
     height = round(standing.height * scale)
     cut_dir = WORK / "figures" / name
     sprites.figures(RAW / "demo-src" / f"demo-{name}.png", cut_dir, name, height)
@@ -491,7 +499,7 @@ def figure_frames(name: str, scale: float) -> dict[str, list[Image.Image]]:
         for index in range(3):
             frame = Image.open(cut_dir / f"{name}-{way}-{index}.png").convert("RGBA")
             if way == "left":
-                target = Image.open(demo / f"{name}-left-{index}.png").convert("RGBA")
+                target = Image.open(demo / f"{reference}-left-{index}.png").convert("RGBA")
                 small = frame.resize(target.size, Image.LANCZOS)
                 flipped = small.transpose(Image.FLIP_LEFT_RIGHT)
                 a, b, t = (np.array(x).astype(np.int16) for x in (small, flipped, target))
@@ -515,6 +523,27 @@ FOOT = 6
 
 def figures() -> Path:
     every = {name: figure_frames(name, FIGURE_SCALE) for name in FIGURES}
+    # A figure drawn after the demo is fitted into the frame the others make, so
+    # that every sheet keeps the frame's size and the bases stay its own.
+    others = [
+        f
+        for name, frames in every.items()
+        if name not in REFERENCE
+        for way in frames.values()
+        for f in way
+    ]
+    widest = max(f.width for f in others)
+    for name in REFERENCE:
+        own = max(f.width for way in every[name].values() for f in way)
+        if own > widest:
+            factor = widest / own
+            every[name] = {
+                way: [
+                    f.resize((round(f.width * factor), round(f.height * factor)), Image.LANCZOS)
+                    for f in frames
+                ]
+                for way, frames in every[name].items()
+            }
     width = max(f.width for frames in every.values() for way in frames.values() for f in way)
     height = max(f.height for frames in every.values() for way in frames.values() for f in way)
     width, height = width + 4, height + FOOT + 2

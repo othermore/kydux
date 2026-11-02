@@ -1,0 +1,59 @@
+{
+  "id": "at-the-library",
+  "speaker": "wenna",
+  "scene": "the-library",
+  "wizard": [
+    7,
+    19
+  ],
+  "camera": [
+    7,
+    17
+  ],
+  "actors": [
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        8,
+        19
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "wenna",
+      "kind": "friend",
+      "at": [
+        9,
+        17
+      ],
+      "facing": "left"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice"
+    },
+    {
+      "who": "wenna"
+    },
+    {
+      "who": "wizard"
+    },
+    {
+      "who": "wenna"
+    },
+    {
+      "who": "wenna",
+      "do": {
+        "walk": [
+          7,
+          17
+        ]
+      }
+    },
+    {
+      "who": "mate"
+    }
+  ]
+}

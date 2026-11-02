@@ -1,20 +1,22 @@
 # Lo que saben las cosas
 
-Un objeto hace acciones, que son sus métodos. ¡Pero también sabe cosas sobre sí mismo! Los programadores llaman atributos a lo que un objeto sabe.
+Un objeto hace acciones, que ya sabes que son sus métodos. Pero un objeto también sabe cosas sobre sí mismo, algo que los programadores llaman atributos.
 
-Una puerta sabe si está cerrada con llave. Tu {mago|maga} sabe dónde está y qué lleva.
-
----
-## Preguntar por un atributo
-
-Como preguntar por un atributo no hace ninguna acción, lo escribimos con un punto pero sin paréntesis. Escribimos `door.locked`, no `door.locked()`.
-
-Para ver la respuesta, usamos `print`. Esta es la propia forma que tiene Python de mostrar un valor, y muestra la respuesta justo debajo de tu código. También puedes imprimir `wizard.position` o `wizard.items`.
+Por ejemplo, tu {mago|maga} sabe dónde está y qué lleva encima. Una puerta sabe si está cerrada con llave o no.
 
 ---
-## Pruébalo
+## Preguntar lo que sabe un objeto
 
-Vamos a preguntarle a una puerta si está cerrada con llave. Cuando ejecutes el programa, el ordenador te mostrará lo que sabe la puerta.
+Para preguntarle a un objeto por su atributo, escribimos un punto después de su nombre, pero sin paréntesis. ¡Dejamos los paréntesis fuera porque no se está haciendo ninguna acción!
+
+Simplemente escribimos `door.locked`, `wizard.position` o `wizard.items`.
+
+---
+## Mostrar la respuesta
+
+Para ver la respuesta, usamos `print`. Es la forma que tiene Python de mostrar un valor, y muestra la respuesta justo debajo del editor donde escribes tu código.
+
+La puerta que os acabo de abrir es perfecta para preguntarle. ¡Vamos a ver qué sabe!
 
 ```python try
 print(door.locked)

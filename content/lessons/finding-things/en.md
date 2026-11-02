@@ -1,20 +1,24 @@
 # Finding things
 
-A library holds many secrets, and a good wizard knows how to search. Some methods do something in the world, like moving. Other methods give something back, an answer.
+Some methods do something in the world, like moving or picking things up. Others give something back to you, like an answer!
 
-When a method gives you an answer, you can keep it under a variable to use later!
+The method `wizard.find_nearest("book")` gives you the nearest book. It gives you the thing itself, even if it is far away.
 
 ---
 ## Keeping the answer
 
-The method `wizard.find_nearest("book")` looks around and gives back the nearest book, the thing itself. We can keep it by writing `book = wizard.find_nearest("book")`.
+To keep an answer, we give it a name, which programmers call a variable.
 
-If there is no book near enough, it gives back `None`, which is Python's word for nothing. Once you have found a book, you could check where it is with `book.position`, or hand it to a friend right beside you with `wizard.give(book)`.
+We write it like this: `book = wizard.find_nearest("book")`. The `=` sign simply puts the value under the name so we can use it. It does not ask whether they are equal!
+
+If there is no book at all, the answer is `None`, which is Python's word for nothing.
 
 ---
-## Try it
+## What to do with a thing
 
-Let us find a book and see where it is. First we search, and then we ask the book for its position!
+Once a thing is kept under a name, you can ask what it knows, like `book.position`. You can also hand it to whoever stands right beside your wizard, using `wizard.give(book)`.
+
+Our ghost, Eldra, has lost a book somewhere across the hall. Let us find it for her!
 
 ```python try
 book = wizard.find_nearest("book")

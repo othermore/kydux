@@ -1,0 +1,14 @@
+{
+  "about": "The castle's entrance hall at night, chapter 2's first story: the painting (image-first-entrance) with its grid removed by Gemini. A story's scene with no level: nothing in it opens or is picked up, and no one stands behind anything tall, so the whole painting is ground. Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-entrance",
+    "edits": "art/raw/game-entrance",
+    "painting": "game-entrance-nogrid.png",
+    "grid": "grid.json",
+    "ground": "game-entrance-nogrid.png"
+  },
+  "things": {},
+  "cuts": [],
+  "castle": 0,
+  "source": "# The entrance hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-entrance.md`, with the field as its style's\n  reference, then edited by it without its grid (`game-entrance-nogrid.md`).\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n"
+}

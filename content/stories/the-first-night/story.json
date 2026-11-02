@@ -1,0 +1,73 @@
+{
+  "id": "the-first-night",
+  "speaker": "ilda",
+  "scene": "the-dormitory",
+  "wizard": [
+    12,
+    13
+  ],
+  "camera": [
+    12,
+    10
+  ],
+  "actors": [
+    {
+      "id": "friend",
+      "kind": "friend",
+      "at": [
+        11,
+        13
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "ilda",
+      "kind": "friend",
+      "at": [
+        13,
+        13
+      ],
+      "facing": "up"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice"
+    },
+    {
+      "who": "ilda"
+    },
+    {
+      "who": "ilda",
+      "do": {
+        "vanish": true
+      }
+    },
+    {
+      "who": "friend",
+      "do": {
+        "walk": [
+          11,
+          8
+        ]
+      }
+    },
+    {
+      "who": "voice",
+      "by": "friend",
+      "do": {
+        "walk": [
+          8,
+          8
+        ]
+      }
+    },
+    {
+      "who": "voice",
+      "by": "friend",
+      "do": {
+        "vanish": true
+      }
+    }
+  ]
+}

@@ -1,5 +1,0 @@
-wizard.move_down(4)
-wizard.pick_up()
-wizard.move_down()
-vault_door.open()
-wizard.move_down(3)

@@ -1,5 +1,0 @@
-wizard.move_down()
-archive_door.open()
-wizard.move_down(4)
-vault_door.open()
-wizard.move_down(3)

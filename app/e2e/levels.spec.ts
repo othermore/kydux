@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
-import { skipGuide } from './helpers';
+import { skipGuide, levelText } from './helpers';
 
 test.use({ locale: 'en-US' });
 
@@ -22,17 +22,17 @@ async function run(page: Page, code: string): Promise<string> {
 
 const scene = (page: Page) => page.locator('#scene');
 
-test.describe('the locked door', () => {
-  test.beforeEach(({ page }) => open(page, 'the-locked-door'));
+test.describe('the hidden key', () => {
+  test.beforeEach(({ page }) => open(page, 'the-hidden-key'));
 
   test('shows its goals, the bonus among them', async ({ page }) => {
-    await expect(page.locator('.level-title')).toHaveText('The locked door');
+    await expect(page.locator('.level-title')).toHaveText(levelText('the-hidden-key', 'en').title);
     await expect(page.locator('.goal')).toHaveCount(4);
     await expect(page.locator('.goal[data-bonus="true"]')).toContainText('Bonus:');
   });
 
   test('what the code prints shows in the card', async ({ page }) => {
-    await run(page, 'wizard.move_up(2)\nwizard.pick_up()\nprint(wizard.items)');
+    await run(page, 'wizard.move_up(2)\nwizard.move_left()\nwizard.pick_up()\nprint(wizard.items)');
     await expect(page.locator('.printed')).toHaveText('[<key key carried>, <wand wand carried>]');
   });
 
@@ -56,7 +56,7 @@ test.describe('the locked door', () => {
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('wizard.move_up(3)\nwizard.move_right(3)\ndoor.open()');
+    await page.keyboard.insertText('wizard.move_up()\nwizard.move_right(3)\nwizard.move_up()\ndoor.open()');
     await page.locator('#run').click();
     // The shake is short: looked for often, before the thought, which stays.
     await expect
@@ -67,29 +67,26 @@ test.describe('the locked door', () => {
       'I cannot open the door: it is locked, and I have no key for it.',
     );
     await expect(page.locator('.outcome-text')).toContainText(
-      'On line 3: I cannot open the door: it is locked',
+      'On line 4: I cannot open the door: it is locked',
       { timeout: 30_000 },
     );
   });
 
   test('a locked door stays shut without its key', async ({ page }) => {
-    const said = await run(page, 'wizard.move_up(3)\nwizard.move_right(3)\ndoor.open()\nwizard.move_right(3)');
+    const said = await run(page, 'wizard.move_up()\nwizard.move_right(3)\nwizard.move_up()\ndoor.open()\nwizard.move_up(3)');
     expect(said).toBe(
-      'Not yet: 0 of 3 goals met. Try again.\nOn line 3: I cannot open the door: it is locked, and I have no key for it.',
+      'Not yet: 0 of 3 goals met. Try again.\nOn line 4: I cannot open the door: it is locked, and I have no key for it.',
     );
     await expect(scene(page)).toHaveAttribute('data-doors', '');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '15,3');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '7,9');
   });
 
   test('the key opens it, and the goals tick in order with the bonus', async ({ page }) => {
-    const said = await run(
-      page,
-      'wizard.move_up(2)\nwizard.pick_up()\nwizard.move_up()\nwizard.move_right(3)\ndoor.open()\nwizard.move_right(3)',
-    );
+    const said = await run(page, readFileSync(`${CONTENT}levels/the-hidden-key/solution.py`, 'utf8'));
     expect(said).toBe('You did it, apprentice!');
     await expect(scene(page)).toHaveAttribute('data-carried', 'key,wand');
     await expect(scene(page)).toHaveAttribute('data-doors', 'door');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '18,3');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '7,6');
     await expect(page.locator('.goal[data-mark="met"]')).toHaveCount(4);
   });
 });
@@ -125,11 +122,11 @@ test.describe('past the teacher', () => {
   });
 });
 
-test('the locked door in Spanish', async ({ browser }) => {
+test('the hidden key in Spanish', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
   const page = await context.newPage();
-  await open(page, 'the-locked-door');
-  await expect(page.locator('.level-title')).toHaveText('La puerta cerrada');
+  await open(page, 'the-hidden-key');
+  await expect(page.locator('.level-title')).toHaveText(levelText('the-hidden-key', 'es').title);
   await expect(page.locator('.goal[data-bonus="true"]')).toContainText('Extra:');
   const said = await run(page, 'wizard.mvoe_right(4)');
   expect(said).toBe(
@@ -219,7 +216,7 @@ test.describe('chapter 2', () => {
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
     await run(page, readFileSync(`${CONTENT}levels/the-lost-book/solution.py`, 'utf8'));
-    await expect(page.locator('.printed')).toHaveText('Position(x=10, y=4)');
+    await expect(page.locator('.printed')).toHaveText('Position(x=4, y=11)');
     await expect(page.locator('#card-outro')).toContainText('Wenna');
     await expect(page.locator('#card-outro')).toContainText('Eldra');
   });
@@ -229,7 +226,7 @@ test.describe('chapter 2', () => {
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_right(2)\nwizard.move_up(2)\nwizard.pick_up()\nwizard.give(old_book)');
+    await run(page, 'wizard.move_up(2)\nwizard.move_right(4)\nwizard.move_up(4)\nwizard.move_left(6)\nwizard.pick_up()\nwizard.give(old_book)');
     await expect(page.locator('.outcome-text')).toContainText('There is no one beside me to give it to.');
   });
 });
@@ -248,7 +245,7 @@ test.describe('the high shelf (D46, D47, D49)', () => {
 
   test('fendra from below brings the book down, through the shelves', async ({ page }) => {
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_left(5)\nwizard.cast("fendra")\nwizard.pick_up()');
+    await run(page, 'wizard.move_right(5)\nwizard.cast("fendra")\nwizard.pick_up()');
     await expect(scene(page)).toHaveAttribute('data-carried', 'rare_book,wand');
   });
 

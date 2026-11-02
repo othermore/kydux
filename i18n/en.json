@@ -124,10 +124,10 @@
     "nobody": "There is no one beside me to give it to.",
     "which_one": "There are several things here: {things}. Say which, like wizard.pick_up({first}).",
     "unheard": "While its seal holds, {thing} cannot hear a word.",
-    "not_my_dormitory": "I don't think I should go into the {girls'|boys'} dormitory.",
+    "not_my_dormitory": "I should not go into the {girls'|boys'} dormitory.",
     "no_bed": "There is no bed right beside me.",
-    "bed_taken": "This bed is not free: someone sleeps in it.",
-    "not_here": "I cannot show {thing}: it is not lying anywhere."
+    "bed_taken": "This bed belongs to someone else.",
+    "not_here": "I am carrying {thing}, so it cannot be shown where it lies."
   },
   "notebook": {
     "title": "The wizard's notebook",
@@ -152,15 +152,15 @@
       "items": "The things the wizard carries.",
       "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all.",
       "give": "Gives a thing the wizard carries to whoever stands right beside it.",
-      "sleep": "Lies down in a free bed right beside it, and sleeps.",
-      "distance_to": "How many steps lie to a thing or someone, along the rows and the columns."
+      "sleep": "Lies down and sleeps in a free bed.",
+      "distance_to": "Gives the number of steps from the wizard to an object."
     },
     "thing": {
       "kind": "What the thing is, like \"key\" or \"book\".",
       "name": "The thing's own name in this level.",
       "position": "Where the thing lies, or None once the wizard carries it.",
-      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
-      "reveal": "Shows where the thing lies, its outline drawn through whatever hides it."
+      "distance_to": "Gives the number of steps from an object to the wizard.",
+      "reveal": "Shows where a hidden thing lies."
     },
     "door": {
       "kind": "What it is: \"door\".",
@@ -171,15 +171,15 @@
       "open": "Opens the door. The wizard must stand next to it, and carry its key if it is locked. A sealed door, or one with a password, does not open by hand.",
       "sealed": "True while the door is sealed, until its spell is cast beside it.",
       "password": "The word that opens the door when it is said beside it, or None.",
-      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
-      "reveal": "Shows where the door lies, its outline drawn through whatever hides it."
+      "distance_to": "Gives the number of steps from an object to the wizard.",
+      "reveal": "Shows where a hidden thing lies."
     },
     "key": {
       "kind": "What it is: \"key\".",
       "name": "The key's own name in this level.",
       "position": "Where the key lies, or None once the wizard carries it.",
-      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
-      "reveal": "Shows where the key lies, its outline drawn through whatever hides it."
+      "distance_to": "Gives the number of steps from an object to the wizard.",
+      "reveal": "Shows where a hidden thing lies."
     },
     "teacher": {
       "kind": "What they are: \"teacher\".",
@@ -187,29 +187,29 @@
       "position": "Where the teacher stands, as x and y.",
       "facing": "The way the teacher looks: up, down, left or right.",
       "can_see": "Tells whether the teacher can see something straight ahead, close enough.",
-      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns."
+      "distance_to": "Gives the number of steps from an object to the wizard."
     },
     "ghost": {
       "kind": "What it is: \"ghost\".",
       "name": "The ghost's name in this level.",
       "position": "Where the ghost floats, in x and y.",
       "facing": "The way the ghost looks: up, down, left or right.",
-      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns."
+      "distance_to": "Gives the number of steps from an object to the wizard."
     },
     "cat": {
       "kind": "What it is: \"cat\".",
       "name": "The cat's name in this level.",
       "position": "Where the cat sits, in x and y.",
       "facing": "The way the cat looks: up, down, left or right.",
-      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns."
+      "distance_to": "Gives the number of steps from an object to the wizard."
     },
     "stair": {
       "kind": "What it is: \"stair\".",
       "name": "The stair's own name in this level.",
       "position": "Where the stair is, in x and y.",
       "in_place": "True when a step onto the stair, taken now, lands on it.",
-      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
-      "reveal": "Shows where the stair lies, its outline drawn through whatever hides it."
+      "distance_to": "Gives the number of steps from an object to the wizard.",
+      "reveal": "Shows where a hidden thing lies."
     },
     "tab_actions": "Actions",
     "tab_spells": "Spells and words",
@@ -220,8 +220,8 @@
       "name": "The bed's own name in this level.",
       "position": "Where the bed stands, in x and y.",
       "free": "True when no one sleeps in the bed.",
-      "distance_to": "How many steps lie to the wizard, a thing or someone, along the rows and the columns.",
-      "reveal": "Shows where the bed lies, its outline drawn through whatever hides it."
+      "distance_to": "Gives the number of steps from an object to the wizard.",
+      "reveal": "Shows where a hidden thing lies."
     }
   },
   "start": {

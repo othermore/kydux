@@ -1,0 +1,75 @@
+{
+  "id": "the-entrance",
+  "speaker": "ilda",
+  "scene": "the-entrance",
+  "wizard": [
+    20,
+    21
+  ],
+  "camera": [
+    20,
+    18
+  ],
+  "actors": [
+    {
+      "id": "friend",
+      "kind": "friend",
+      "at": [
+        19,
+        21
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "ilda",
+      "kind": "friend",
+      "at": [
+        20,
+        16
+      ],
+      "facing": "down"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice"
+    },
+    {
+      "who": "ilda"
+    },
+    {
+      "who": "ilda"
+    },
+    {
+      "who": "wizard"
+    },
+    {
+      "who": "friend"
+    },
+    {
+      "who": "ilda",
+      "do": {
+        "walk": [
+          20,
+          10
+        ]
+      }
+    },
+    {
+      "who": "voice",
+      "by": "wizard",
+      "do": {
+        "walk": [
+          20,
+          11
+        ]
+      }
+    },
+    {
+      "who": "ilda",
+      "do": {
+        "vanish": true
+      }
+    }
+  ]
+}

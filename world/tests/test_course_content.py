@@ -136,8 +136,13 @@ def test_a_lesson_s_try_it_runs_in_the_level_after_it(path, lang, gender):
     level = level_after(f"lesson:{path.name}")
     result = run_code(Level.from_directory(level), found[0])
     assert result.status != "error", result.error
-    # The example is the level's own: it bumps into nothing and is refused nothing.
     stumbles = [e for e in result.events if e.kind in ("bump", "blocked")]
+    lesson = json.loads((path / "lesson.json").read_text(encoding="utf-8"))
+    if lesson.get("try") == "refused":
+        # A lesson on where an action works shows it refused where it does not (D84).
+        assert stumbles, f"{path.name}'s example is refused nothing in {level.name}"
+        return
+    # The example is the level's own: it bumps into nothing and is refused nothing.
     assert not stumbles, f"{path.name}'s example stumbles in {level.name}: {stumbles[0].data}"
 
 
@@ -323,9 +328,10 @@ def test_a_friend_stands_off_the_solution_s_way(item_id):
 @pytest.mark.parametrize("path", LESSONS, ids=lambda p: p.name)
 def test_a_lesson_says_who_teaches_it(path):
     """D67: a lesson is drawn as its teacher speaking, a character of the story's;
-    `friend` is the friend of the wizard's other gender, Nuri or Teku (D77)."""
+    `friend` is the friend of the wizard's other gender, Nuri or Teku (D77), and
+    `mate` the friend of the wizard's own (D84)."""
     speaker = json.loads((path / "lesson.json").read_text(encoding="utf-8")).get("speaker")
     characters = json.loads((ROOT / "i18n" / "en.json").read_text(encoding="utf-8"))["characters"]
-    assert speaker == "friend" or speaker in characters, (
+    assert speaker in ("friend", "mate") or speaker in characters, (
         f"{path.name} names no teacher of the story's"
     )

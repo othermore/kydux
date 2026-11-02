@@ -4,10 +4,11 @@ outputs:
   - docs/dev/story-villain.es.md
 context:
   - docs/dev/story.md
-  - drafts/chapter-2-story-hook/docs/dev/the-wizards-way.en.md
-  - drafts/chapter-2-story-hook/docs/dev/story-hook.es.md
-  - drafts/chapter-2-story-hook/REVIEW.md
 ---
+The owner's design document of chapter 2 (`drafts/chapter-2/capitulo-2.md`,
+outside the repository) and the earlier drafts were given with this brief when
+it was run, on 2026-10-26.
+
 This brief is not for texts the child reads. It is for the story bible,
 `docs/dev/story.md`, which every later text is written from, and for its
 owner, who reads Spanish.

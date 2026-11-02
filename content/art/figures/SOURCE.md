@@ -5,9 +5,10 @@ later, like the rest of it.
 
 - Drawn by Gemini 3 Pro Image (`gemini-3-pro-image`) as walking sheets, from
   `tools/art/prompts/demo-wizard.md`, `demo-nuri.md`, `demo-wenna.md`,
-  `demo-eldra.md` and `demo-dask.md`, each with the style-B wizard as its
-  reference (`chibi-b-gemini.md`); cut by `tools/art/sprites.py` and put
-  together by `tools/art/export_scene.py`.
+  `demo-eldra.md`, `demo-dask.md` and `demo-ilda.md`, each with the style-B
+  wizard as its reference (`chibi-b-gemini.md`); cut by
+  `tools/art/sprites.py` and put together by `tools/art/export_scene.py`,
+  Ilda's sized and turned by Wenna's, a figure of her build.
 - The wizard's girl and Nuri's are Gemini's edits of those sheets
   (`figure-wizard-girl.md`, `figure-nuri-girl.md`), and the wizard's
   casting frames are Gemini's edits of the wizard's two sheets

@@ -30,7 +30,7 @@ for (const [width, height] of [
 ] as const) {
   test(`at ${width}×${height}, the level screen shows all it needs without scrolling`, async ({ page }) => {
     await page.setViewportSize({ width, height });
-    await page.goto('/#level/the-locked-door');
+    await page.goto('/#level/the-hidden-key');
     const view: Box = { x: 0, y: 0, width, height };
     // The start card fits inside the scene's frame.
     expect(inside(await box(page, '.start-card'), await box(page, '.scene-frame'))).toBe(true);

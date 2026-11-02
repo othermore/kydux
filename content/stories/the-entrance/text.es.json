@@ -1,0 +1,13 @@
+{
+  "title": "El vestíbulo",
+  "steps": [
+    "{friend} y tú acabáis de entrar por la gran puerta. El vestíbulo es enorme y brillante, con una gruesa alfombra roja y armaduras que brillan a la luz de las antorchas. Es un lugar muy cálido después de la noche fría de fuera.",
+    "¡Os doy la bienvenida a Arvelia! Soy Ilda, una de vuestras profesoras, y me encargo de cuidar de los alumnos de primer año.",
+    "Como visteis en la verja, este castillo escucha a quienes le dan las instrucciones correctas. ¡Pero es muy tarde para aprender más magia por hoy!",
+    "¡Este lugar es enorme! Estamos muy cansados, ¿dónde dormimos?",
+    "¡Qué ganas tengo de verlo todo mañana!",
+    "Seguidme, por favor. Os llevaré al dormitorio de primer año.",
+    "Sigues a Ilda por el vestíbulo, con {friend} a tu lado, bajo una lámpara de araña gigante que brilla como las estrellas.",
+    "No está nada lejos, y vuestras camas calentitas os están esperando."
+  ]
+}

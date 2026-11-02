@@ -1,0 +1,5 @@
+book = wizard.find_nearest("book")
+wizard.move_left(4)
+wizard.cast("fendra")
+wizard.pick_up()
+wizard.give(book)

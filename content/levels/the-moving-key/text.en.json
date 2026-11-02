@@ -1,0 +1,21 @@
+{
+  "title": "The moving key",
+  "goals": [
+    "Give Wenna the key.",
+    "Write no number at all."
+  ],
+  "starting_code": "# This is yesterday's program, but the key has moved!\nwizard.move_left(4)\nwizard.pick_up()\nwizard.move_right(4)\nwizard.give(key)\n",
+  "hints": [
+    "First, ask the key for its `distance_to` you. Keep that number under a name, a variable.",
+    "Put your new variable inside the brackets of the `move_left` method.",
+    "Use the same variable in the `move_right` method to walk the exact same distance back."
+  ],
+  "intro": "The key to Eldra's little room is never twice in the same place! I think she moves it. Yesterday's program walked four steps, but today the key is somewhere else. Make your program ask the key how far it is, keep that number under a name, and use it to walk there and back.",
+  "outro": "Perfect! Your program works no matter where Eldra leaves the key.",
+  "learned": "Now you know what a variable is for: a value the program cannot know when it is written, kept under a name and used twice.",
+  "ways": {
+    "near": "The key is near",
+    "middle": "The key is halfway",
+    "far": "The key is far"
+  }
+}

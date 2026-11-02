@@ -63,15 +63,15 @@ test('Enter and Space go on; Go on ends the story, read, at what comes next', as
 });
 
 test('a figure who goes says its words first, and is gone at the next step', async ({ page }) => {
-  await page.goto('/#story/in-the-castle');
+  await page.goto('/#story/the-first-night');
   const scene = page.locator('#scene');
-  await expect(scene).toHaveAttribute('data-actors', /friend:3,13/);
-  await storyNext(page, 4);
-  await expect(scene).toHaveAttribute('data-speaker', 'friend');
-  await expect(scene).toHaveAttribute('data-actors', /friend:3,13/);
+  await expect(scene).toHaveAttribute('data-actors', /ilda:13,13/);
+  await storyNext(page, 2);
+  await expect(scene).toHaveAttribute('data-speaker', 'ilda');
+  await expect(scene).toHaveAttribute('data-actors', /ilda:13,13/);
   await storyNext(page);
-  await expect(scene).not.toHaveAttribute('data-actors', /friend/);
-  await expect(scene).toHaveAttribute('data-actors', /wenna:5,12/);
+  await expect(scene).not.toHaveAttribute('data-actors', /ilda/);
+  await expect(scene).toHaveAttribute('data-actors', /friend:11,8/);
 });
 
 test('Again plays a step once more, as R does; Skip goes to the end (14.4)', async ({ page }) => {

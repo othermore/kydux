@@ -1,0 +1,11 @@
+{
+  "title": "La primera noche",
+  "steps": [
+    "La sala común es muy tranquila, con un cálido fuego crepitando en la chimenea y una alfombra redonda entre dos arcos abiertos.",
+    "Estas son las habitaciones de primer año. Las chicas duermen a la izquierda, los chicos a la derecha, y todos compartiréis esta sala común.",
+    "Buenas noches a los dos, nos vemos por la mañana.",
+    "Buenas noches, {wizard}. ¡Estoy tan {{cansado|cansada}}! Nos vemos mañana.",
+    "{friend} cruza el arco de la izquierda y entra en el otro dormitorio.",
+    "Ahora te has quedado a solas en la sala común y tienes mucho sueño. Tu propia cama calentita te espera cruzando el arco de la derecha."
+  ]
+}

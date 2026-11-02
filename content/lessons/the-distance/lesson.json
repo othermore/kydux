@@ -1,0 +1,7 @@
+{
+  "id": "the-distance",
+  "speaker": "wenna",
+  "teaches": [
+    "thing.distance_to"
+  ]
+}

@@ -1,0 +1,6 @@
+# The settings of the-library for the cut and the export (D82): what tools/art/export_scene.py needs of this scene.
+
+["cut.json"]
+source = "written by hand from the library's painting and its edits (art/raw/image-first-library-6, art/raw/game-library, art/raw/game-library6); read by tools/art/scene_settings.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"

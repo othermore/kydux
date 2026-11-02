@@ -2,15 +2,15 @@
   "title": "The wrong order",
   "goals": [
     "Open the door.",
-    "Walk through it."
+    "Stand before it."
   ],
-  "starting_code": "# This program does things in the wrong order.\n# Find the mistake and fix it!\nwizard.move_right(2)\nwizard.move_right()\ndoor.open()\nwizard.pick_up()\nwizard.move_right(3)\n",
+  "starting_code": "# This program does things in the wrong order!\ndoor.open()\nwizard.move_left(5)\n",
   "hints": [
-    "Look at when the program tries to pick up the key. Is it before or after it asks the door to `open`?",
-    "You must pick up the key as soon as you stand beside it.",
-    "Move the action that picks up the key so it comes just before you ask the door to `open`."
+    "A door only listens to whoever stands right beside it.",
+    "Move the lines around so your wizard takes the steps first.",
+    "The computer runs the lines from the top down, so the move method must come before the open method."
   ],
-  "intro": "One of my old programs is trying to open this door, but it is a bit muddled. It tries to do things in the wrong order.",
-  "outro": "Excellent! The right steps are only useful when we take them in the right order.",
-  "learned": "Now you know that the order of the instructions matters, and how to find the one in the wrong place."
+  "intro": "Here is your key back. My old program takes it to Eldra's little room, but it does things in the wrong order! It asks the door to open from where it starts, and only then walks to it. A door only listens to whoever stands beside it. Can you fix it?",
+  "outro": "Much better! The door is open, and you are ready to go in.",
+  "learned": "Now you know that the computer does the steps from the top down, and that a step in the wrong place does nothing."
 }

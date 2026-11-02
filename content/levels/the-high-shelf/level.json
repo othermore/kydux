@@ -2,23 +2,43 @@
   "id": "the-high-shelf",
   "kind": "practice",
   "scene": "the-library",
-  "start": [24, 11],
-  "end": [16, 11],
+  "start": [
+    2,
+    6
+  ],
   "speaker": "wenna",
-  "carrying": ["wand"],
-  "spells": ["fendra"],
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "fendra"
+  ],
   "things": [
     {
       "kind": "book",
       "id": "rare_book",
-      "at": [19, 8]
+      "at": [
+        7,
+        3
+      ]
     }
   ],
   "actors": [
     {
       "kind": "friend",
       "id": "wenna",
-      "at": [6, 9]
+      "at": [
+        10,
+        5
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        10,
+        6
+      ]
     }
   ],
   "api": [
@@ -26,7 +46,16 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
+    "wizard.position",
+    "wizard.items",
+    "door.locked",
+    "thing.position",
     "wizard.pick_up",
+    "wizard.find_nearest",
+    "wizard.give",
+    "door.open",
+    "thing.reveal",
+    "thing.distance_to",
     "wizard.cast"
   ],
   "goals": [
@@ -35,8 +64,9 @@
       "id": "rare_book"
     },
     {
-      "kind": "reach",
-      "marker": "E"
+      "kind": "uses",
+      "member": "find_nearest",
+      "bonus": true
     }
   ],
   "tick_limit": 100

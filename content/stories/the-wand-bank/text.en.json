@@ -1,13 +1,13 @@
 {
   "title": "The wand bank",
   "steps": [
-    "Eldra holds her lost book again, after so many years.",
-    "I thank thee, kind {wizard}. Thou hast brought much joy to this old spirit today.",
-    "She drifts away between the shelves, reading as she goes.",
-    "At the end of the aisle, just past the last shelf, is the wand bank: a counter where a pupil's parent lends you a school wand for the year.",
-    "You made it! Oh, is that your new school wand? It looks perfect for you!",
-    "It is! And here is your spare wand back, {friend}. Thank you so much for lending it to me.",
-    "You have learned so much in the library! You know how to use a name for a value, which programmers call a variable, and how to use `print` to see what a thing knows, its attribute. You also caught what a method gives back using `find_nearest`, kept it in a variable, and used `give`. You even opened a door with its own method, `door.open()`, after picking up its key, and cast the *fendra* spell to draw things from the shelves right to you!",
-    "Night is falling outside. I heard the older pupils whisper that the passages change after dark... I wonder who walks there at night?"
+    "After so many years, Eldra is finally holding her own book again.",
+    "I thank thee from the bottom of my heart, young wizard. Thou hast brought peace to a very old soul.",
+    "You reach the end of the aisle, where a parent behind the wand bank counter lends a school wand for the year to both you and {mate}.",
+    "Hey, you made it! I came to get my school wand too. It is so good to see you!",
+    "It is great to see you too! Here is your spare wand back, and thank you so much for lending it to me.",
+    "I cannot believe we finally have our own wands! This is going to be a wonderful year.",
+    "You did wonderfully today. You learned how to check what a thing knows, which programmers call an attribute, and how to save a result under a name, which programmers call a variable. You opened doors with their own method, found hidden things with `reveal`, and drew objects to you with the spell *fendra*. You used a variable to store a distance, and saw how important the order of your steps is!",
+    "As you leave, you look out the windows and see it is already dusk. Nearby, you hear older pupils whispering a rumour: at night, the passages of the castle change and come alive."
   ]
 }

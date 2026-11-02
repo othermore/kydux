@@ -1,0 +1,34 @@
+{
+  "about": "The first-year dormitory, chapter 2's night scene: the chosen painting (image-first-dormitory-3) with its two wands taken off the trunks and its border mended by Gemini (game-dormitory-border), its grid removed, and its bottom right corner mended (repaint) so that a wall closes the corridor off from the walk along the battlements. Nothing in it stands in front of a figure: its beds are low and its tall furniture stands against the walls, so the whole painting is ground. Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-dormitory",
+    "edits": "art/raw/game-dormitory",
+    "painting": "dormitory-mended.png",
+    "grid": "grid.json",
+    "ground": "dormitory-mended.png"
+  },
+  "repaint": {
+    "about": "Painted by Gemini 3 Pro Image from tools/art/prompts/game-dormitory-corner.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the box.",
+    "from": "art/raw/game-dormitory/game-dormitory-nogrid.png",
+    "boxes": [
+      [
+        4120,
+        2930,
+        4520,
+        3584
+      ]
+    ],
+    "crop": [
+      2400,
+      1600,
+      4800,
+      3584
+    ],
+    "canvas": "art/raw/game-dormitory/dormitory-repaint-canvas.png",
+    "painting": "art/raw/game-dormitory/dormitory-mended.png"
+  },
+  "things": {},
+  "cuts": [],
+  "castle": 0,
+  "source": "# The dormitory\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-dormitory-3.md`, with the field as its\n  style's reference; its border and the wands on its trunks edited by it\n  (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).\n- Its bottom right corner mended by Gemini from `game-dormitory-corner.md`,\n  joined by `tools/art/repaint.py`, the painting kept pixel for pixel\n  elsewhere: a wall closing the corridor off from the battlements.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n"
+}

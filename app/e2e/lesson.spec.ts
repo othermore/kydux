@@ -51,7 +51,7 @@ test('a lesson shows who teaches it; a story is told on its scene instead (D67, 
   await expect(page.locator('.lesson-screen')).toHaveClass(/taught/);
   await expect(page.locator('#lesson-teacher figcaption')).toHaveText('Nuri');
   await expect(page.locator('#lesson-teacher canvas')).toBeVisible();
-  await page.goto('/#lesson/a-name-for-a-value');
+  await page.goto('/#lesson/what-things-know');
   await expect(page.locator('#lesson-teacher figcaption')).toHaveText('Wenna');
   await page.goto('/#story/at-the-gate');
   await expect(page.locator('.story-screen #scene canvas')).toBeVisible();

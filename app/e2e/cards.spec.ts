@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
-import { skipGuide } from './helpers';
+import { skipGuide, levelText } from './helpers';
 
 test.use({ locale: 'en-US' });
 
@@ -20,10 +20,10 @@ async function run(page: Page, code: string): Promise<void> {
 test('the start card opens a level the first time in a visit, and ? brings it back', async ({
   page,
 }) => {
-  await page.goto('/#level/the-locked-door');
+  await page.goto('/#level/the-hidden-key');
   const card = page.locator('.start-card');
   await expect(card).toBeVisible();
-  await expect(card.locator('h3')).toHaveText('The locked door');
+  await expect(card.locator('h3')).toHaveText(levelText('the-hidden-key', 'en').title);
   await expect(card.locator('li')).toHaveCount(4);
   await page.locator('#start').click();
   await expect(card).toBeHidden();
@@ -39,21 +39,17 @@ test('the start card opens a level the first time in a visit, and ? brings it ba
 });
 
 test('a won run shows its stars, and Next opens what comes next in the course', async ({ page }) => {
-  await page.goto('/#level/the-locked-door');
+  await page.goto('/#level/the-hidden-key');
   await page.locator('#start').click();
   await ready(page);
   await page.locator('#speed').selectOption('4');
-  await run(
-    page,
-    'wizard.move_up(2)\nwizard.pick_up()\nwizard.move_up()\nwizard.move_right(3)\ndoor.open()\nwizard.move_right(3)',
-  );
+  await run(page, readFileSync(fileURLToPath(new URL('../../content/levels/the-hidden-key/solution.py', import.meta.url)), 'utf8'));
   const win = page.locator('.win-card');
   await expect(win).toBeVisible();
   await expect(win.locator('.stars')).toHaveAttribute('data-stars', '3');
   await expect(win.locator('.stars')).toHaveAttribute('aria-label', '3 of 3 stars');
   await page.locator('#next').click();
-  await expect(page).toHaveURL(/#level\/the-wrong-order$/);
-  await expect(page.locator('.level-title')).toHaveText('The wrong order');
+  await expect(page).toHaveURL(/#lesson\/the-distance$/);
 });
 
 test('Play again closes the win card; the chapter\'s last level leads to its closing story', async ({

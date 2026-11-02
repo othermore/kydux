@@ -1,0 +1,251 @@
+{
+  "about": "The library, chapter 2's morning scene: the chosen painting (image-first-library-6), its grid removed by Gemini, and its bottom mended (repaint): below the double door the castle's corridor, in the two bottom corners plain stone pillars where turrets made the way in look like a way out, and plain wall where two dark arches beside the door led nowhere. Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-library6",
+    "edits": "art/raw/game-library6",
+    "painting": "library-mended.png",
+    "grid": "library-mended-grid.json",
+    "ground": "library-ground-bare.png"
+  },
+  "repaint": {
+    "about": "Painted by Gemini 3 Pro Image from tools/art/prompts/game-library-margin-3.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the boxes and the band. Two earlier tries are kept with their prompts: game-library-margin.md, given the whole canvas, painted over the reading room; game-library-margin-2.md kept the two dark arches beside the door, which the owner asked to have gone.",
+    "from": "art/raw/game-library6/game-library6-nogrid.png",
+    "from_grid": "art/raw/game-library6/grid.json",
+    "grow": 534,
+    "boxes": [
+      [
+        0,
+        4150,
+        500,
+        5056
+      ],
+      [
+        2890,
+        4150,
+        3392,
+        5056
+      ],
+      [
+        700,
+        4740,
+        1130,
+        5056
+      ],
+      [
+        2270,
+        4740,
+        2700,
+        5056
+      ]
+    ],
+    "crop": [
+      0,
+      3447,
+      3392,
+      5590
+    ],
+    "canvas": "art/raw/game-library6/library-repaint-canvas.png",
+    "painting": "art/raw/game-library6/library-mended.png",
+    "grid": "art/raw/game-library6/library-mended-grid.json"
+  },
+  "things": {
+    "centre_key": {
+      "box": [
+        6.9,
+        10.1,
+        8.1,
+        10.9
+      ],
+      "row": 10,
+      "solid": false,
+      "without": "library-nokeys.png",
+      "states": {
+        "lying": "painting"
+      },
+      "at": [
+        7,
+        10
+      ],
+      "about": "The key painted on the wide hall's floor: the centre door's, which a level may lay anywhere, behind the armchair too (D85)."
+    },
+    "room_key": {
+      "box": [
+        1.9,
+        6.1,
+        3.1,
+        6.95
+      ],
+      "row": 6,
+      "solid": false,
+      "without": "library-nokeys.png",
+      "states": {
+        "lying": "painting"
+      },
+      "at": [
+        2,
+        6
+      ],
+      "about": "The key painted on the top aisle, before Eldra's door: the one that moves (D51, D85)."
+    },
+    "vault_key": {
+      "box": [
+        12.9,
+        9.1,
+        14.0,
+        9.95
+      ],
+      "row": 9,
+      "solid": false,
+      "without": "library-nokeys.png",
+      "states": {
+        "lying": "painting"
+      },
+      "at": [
+        13,
+        9
+      ],
+      "about": "The key painted in the narrow way to the vault, which stays shut: taken out of the ground, and in no level."
+    },
+    "old_book": {
+      "box": [
+        3.8,
+        10.2,
+        5.05,
+        11.5
+      ],
+      "row": 11,
+      "solid": false,
+      "without": "library-nooldbook.png",
+      "states": {
+        "lying": "painting"
+      },
+      "at": [
+        4,
+        11
+      ],
+      "about": "Eldra's lost book, on the rug in her nook."
+    },
+    "rare_book": {
+      "box": [
+        6.6,
+        3.2,
+        7.8,
+        4.25
+      ],
+      "row": 4,
+      "solid": false,
+      "without": "library-nobook.png",
+      "states": {
+        "lying": "painting"
+      },
+      "at": [
+        7,
+        3
+      ],
+      "about": "The rare book glowing on the top of the high bookcases, three cells above the top aisle: fendra's reach."
+    },
+    "eldras_book": {
+      "box": [
+        1.6,
+        3.7,
+        2.45,
+        4.4
+      ],
+      "row": 4,
+      "solid": false,
+      "without": "library-noeldrasbook.png",
+      "states": {
+        "lying": "painting"
+      },
+      "at": [
+        2,
+        3
+      ],
+      "about": "Eldra's own book on the shelf of her little room; its edit without it is the shelf's back carried over it by hand."
+    },
+    "wenna_door": {
+      "box": [
+        6.6,
+        15.4,
+        8.4,
+        17.0
+      ],
+      "row": 16,
+      "solid": true,
+      "without": "library-partition-open.png",
+      "states": {
+        "closed": "painting",
+        "open": "without"
+      },
+      "at": [
+        7,
+        16
+      ],
+      "about": "Wenna's door, in the wall between the reading room and the shelves."
+    },
+    "centre_door": {
+      "box": [
+        6.6,
+        7.4,
+        8.4,
+        9.0
+      ],
+      "row": 8,
+      "solid": true,
+      "without": "library-centre-open.png",
+      "states": {
+        "closed": "painting",
+        "open": "without"
+      },
+      "at": [
+        7,
+        8
+      ],
+      "about": "The door in the middle of the wall between the wide hall and the top aisle."
+    },
+    "room_door": {
+      "box": [
+        1.8,
+        4.7,
+        3.1,
+        6.0
+      ],
+      "row": 5,
+      "solid": true,
+      "without": "library-room-open.png",
+      "states": {
+        "closed": "painting",
+        "open": "without"
+      },
+      "at": [
+        2,
+        5
+      ],
+      "about": "The door of Eldra's little room, at the top aisle's left end."
+    }
+  },
+  "cuts": [],
+  "castle": 0,
+  "thresholds": {
+    "grass": {
+      "hue": [
+        0,
+        0
+      ],
+      "saturation": 2.0,
+      "value": 2.0
+    },
+    "path": {
+      "hue": [
+        0,
+        0
+      ],
+      "saturation": [
+        2.0,
+        2.0
+      ],
+      "value": 2.0
+    }
+  },
+  "source": "# The library\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-library-6.md`, with the field as its\n  style's reference, then edited by it without its grid\n  (`game-library6-nogrid.md`).\n- Its bottom mended by Gemini from `game-library-margin-3.md`, joined by\n  `tools/art/repaint.py`, the painting kept pixel for pixel elsewhere: the\n  castle's corridor below the double door, plain pillars in the corners,\n  plain wall beside the door.\n- Each thing that opens or is picked up cut against Gemini's edit without it\n  (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`,\n  `-partition-open.md`, `-centre-open.md`, `-room-open.md`); Eldra's own book\n  against the shelf's back carried over it by hand; the armchair and its\n  table, which stand in front of whoever is behind them, against Gemini's edit\n  without them (`game-library-noarmchair.md`).\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n"
+}

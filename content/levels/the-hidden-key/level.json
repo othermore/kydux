@@ -1,0 +1,93 @@
+{
+  "id": "the-hidden-key",
+  "kind": "practice",
+  "scene": "the-library",
+  "start": [
+    4,
+    11
+  ],
+  "speaker": "wenna",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "key",
+      "id": "key",
+      "at": [
+        2,
+        9
+      ],
+      "opens": "door",
+      "hidden": true,
+      "art": "centre_key"
+    },
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [
+        7,
+        8
+      ],
+      "locked": true,
+      "art": "centre_door"
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [
+        6,
+        11
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        5,
+        11
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.position",
+    "wizard.items",
+    "door.locked",
+    "thing.position",
+    "wizard.pick_up",
+    "wizard.find_nearest",
+    "wizard.give",
+    "door.open",
+    "thing.reveal"
+  ],
+  "goals": [
+    {
+      "kind": "collect",
+      "id": "key"
+    },
+    {
+      "kind": "open",
+      "id": "door"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "uses",
+      "member": "find_nearest",
+      "bonus": true
+    }
+  ],
+  "end": [
+    7,
+    6
+  ],
+  "tick_limit": 100
+}

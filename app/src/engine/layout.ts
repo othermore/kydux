@@ -22,6 +22,9 @@ export interface ThingLayout {
   period?: number;
   /** For a door, open from the start: an earlier level of the scene opened it (D65). */
   open: boolean;
+  /** The painted thing it is drawn from, when the level names one other than its id
+   * (D85): every level's key is `key`, each drawn from the key painted for it. */
+  art?: string;
 }
 
 function lockOf(spec: Record<string, unknown>): DoorLock {
@@ -117,7 +120,8 @@ export function layout(level: LevelJson): Layout {
     if (tile) {
       const period = typeof spec.period === 'number' ? { period: spec.period } : {};
       const open = spec.kind === 'door' && spec.open === true;
-      things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec), open, ...period });
+      const art = typeof spec.art === 'string' ? { art: spec.art } : {};
+      things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec), open, ...period, ...art });
     }
   }
   const actors: ActorLayout[] = [];

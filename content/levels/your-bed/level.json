@@ -1,0 +1,78 @@
+{
+  "id": "your-bed",
+  "kind": "practice",
+  "scene": "the-dormitory",
+  "start": [
+    12,
+    13
+  ],
+  "speaker": "mate",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "bed",
+      "id": "bed_1",
+      "at": [
+        17,
+        5
+      ],
+      "free": false
+    },
+    {
+      "kind": "bed",
+      "id": "bed_2",
+      "at": [
+        17,
+        8
+      ]
+    },
+    {
+      "kind": "bed",
+      "id": "bed_3",
+      "at": [
+        17,
+        10
+      ],
+      "free": false
+    },
+    {
+      "kind": "bed",
+      "id": "bed_4",
+      "at": [
+        17,
+        12
+      ],
+      "free": false
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        16,
+        6
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.sleep"
+  ],
+  "goals": [
+    {
+      "kind": "sleep",
+      "bed": "bed_2"
+    },
+    {
+      "kind": "no_bumps",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 60
+}

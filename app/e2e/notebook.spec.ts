@@ -29,8 +29,8 @@ test('the notebook lists what the level teaches, and a click puts an example in 
   await expect(notebook).toBeHidden();
 });
 
-test('the notebook of the locked door has the door and the key', async ({ page }) => {
-  await open(page, 'the-locked-door');
+test('the notebook of the hidden key has the door and the key', async ({ page }) => {
+  await open(page, 'the-hidden-key');
   await page.locator('#notebook-open').click();
   const notebook = page.locator('#notebook');
   await expect(notebook.locator('[data-example="door.open()"]')).toBeVisible();
@@ -39,7 +39,7 @@ test('the notebook of the locked door has the door and the key', async ({ page }
 });
 
 test('after a name and a dot, the editor offers what the level teaches of it', async ({ page }) => {
-  await open(page, 'the-locked-door');
+  await open(page, 'the-hidden-key');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.press('Delete');
@@ -83,7 +83,7 @@ test('a level\'s notebook has what the course has taught so far, for what is in 
 });
 
 test('a level\'s notebook has nothing the course has not taught yet', async ({ page }) => {
-  await page.goto('/#level/the-locked-door');
+  await page.goto('/#level/the-hidden-key');
   await page.locator('#start').click();
   await page.locator('#notebook-open').click();
   const notebook = page.locator('#notebook');

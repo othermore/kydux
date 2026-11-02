@@ -1,22 +1,24 @@
 # Keys and doors
 
-There are many locked rooms in the library. A door is an object with a method of its own: `door.open()`. You can open a door when you stand right beside it.
+A door is an object, and it has a method of its own: `door.open()`.
 
-But a locked door only opens for a wizard who carries its key!
+But a door only opens for a wizard standing right beside it. And if the door is locked, it will only open when its key is carried!
 
 ---
-## The order of things
+## Hidden things
 
-Because the computer reads your program from top to bottom, doing each step in order, you must do things in the right order.
+Sometimes you cannot see a thing on the floor, but it is there all the same for the program.
 
-You have to pick up the key first, before you try to open the door. If you ask the door to open before you hold the key, it will stay firmly shut.
+Your method `find_nearest` will find it wherever it lies. Then, the method `key.reveal()` shows its outline through whatever hides it, so that you know where to go.
 
 ---
 ## Try it
 
-Let us walk up to a key and pick it up. Once you have it, you will be ready to open the door!
+The key of the door ahead fell long ago behind something, and no one has seen it since.
+
+Let us find it and reveal it!
 
 ```python try
-wizard.move_up(2)
-wizard.pick_up()
+key = wizard.find_nearest("key")
+key.reveal()
 ```

@@ -1,0 +1,5 @@
+wizard.move_up()
+wizard.move_right(3)
+wizard.move_up()
+door.open()
+wizard.move_up(3)

@@ -61,7 +61,12 @@ game's developers before it enters the game.
   for the two of them together are masculine plural in Spanish
   (*juntos*, *nosotros*), since they are always a boy and a girl.
 - The other friend, of the wizard's own gender, is the wizard's dormitory
-  mate; the brief says when they appear.
+  mate: Teku for a boy wizard, Nuri for a girl wizard. Write the mate's name
+  as `{mate}`, never as Nuri or Teku. The mate is of the wizard's own
+  gender, so in Spanish the mate's own gendered words take the wizard's
+  choice in single braces: `{tu compañero|tu compañera}`, `cansad{o|a}`.
+  Words for the wizard and the mate together follow the wizard's gender
+  too: `{juntos|juntas}`. The brief says when the mate appears.
 
 ## Names
 

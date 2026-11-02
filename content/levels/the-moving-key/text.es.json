@@ -1,0 +1,21 @@
+{
+  "title": "La llave que se mueve",
+  "goals": [
+    "Dale la llave a Wenna.",
+    "No escribas ningún número."
+  ],
+  "starting_code": "# ¡Este es el programa de ayer, pero la llave se ha movido!\nwizard.move_left(4)\nwizard.pick_up()\nwizard.move_right(4)\nwizard.give(key)\n",
+  "hints": [
+    "Primero, pregúntale a la llave su `distance_to` hacia ti. Guarda ese número bajo un nombre, una variable.",
+    "Pon tu nueva variable dentro de los paréntesis del método `move_left`.",
+    "Usa la misma variable en el método `move_right` para caminar exactamente la misma distancia de vuelta."
+  ],
+  "intro": "¡La llave de la pequeña habitación de Eldra nunca está dos veces en el mismo sitio! Creo que ella la mueve. El programa de ayer dio cuatro pasos, pero hoy la llave está en otro lugar. Haz que tu programa le pregunte a la llave a qué distancia está, guarda ese número bajo un nombre, y úsalo para ir y volver.",
+  "outro": "¡Perfecto! Tu programa funciona sin importar dónde deje Eldra la llave.",
+  "learned": "Ahora sabes para qué sirve una variable: para un valor que el programa no puede saber cuando se escribe, que se guarda con un nombre y se usa dos veces.",
+  "ways": {
+    "near": "La llave está cerca",
+    "middle": "La llave está a media distancia",
+    "far": "La llave está lejos"
+  }
+}

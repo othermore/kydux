@@ -1,23 +1,25 @@
 # Un hechizo que alcanza
 
-A veces, un libro que quieres está fuera de tu alcance, en lo alto de una estantería o al otro lado de un hueco. ¡La magia puede ayudarnos a alcanzar cosas a través del espacio vacío!
+¡Un hechizo puede cruzar el espacio vacío! El hechizo *fendra*, lanzado con la varita usando `wizard.cast("fendra")`, atrae la cosa más cercana a la propia casilla de tu {mago|maga}.
 
-El hechizo *fendra*, lanzado con tu varita, atrae un objeto a tu casilla. Encuentra la cosa más cercana hasta a tres casillas de distancia en línea recta, en cualquiera de las cuatro direcciones.
+Puede alcanzar hasta a tres casillas de distancia en línea recta, en cualquiera de las cuatro direcciones.
 
 ---
-## Cómo viaja el hechizo
+## Volar sobre las cosas
 
-El hechizo puede volar por encima de las estanterías, pero no puede atravesar paredes ni puertas cerradas. Si no hay nada lo bastante cerca, no viene nada, ¡y tu {mago|maga} lo dirá!
+El hechizo vuela sobre estantes y librerías, pero no puede atravesar paredes ni puertas cerradas.
 
-Como un hechizo mueve las cosas y las manos las llevan, debes recoger el objeto después de que llegue a tu casilla.
+Si no hay nada lo suficientemente cerca para atraer, no vendrá nada, y tu {mago|maga} lo dirá.
 
 ---
 ## Pruébalo
 
-Vamos a acercarnos, a lanzar *fendra* para atraer un libro y luego a recogerlo.
+Un libro raro brilla en lo alto de una librería cercana, pero está fuera de tu alcance. ¡Usaremos *fendra* para bajarlo!
+
+Recuerda que un hechizo mueve las cosas, pero tus manos las llevan. Debes recoger la cosa una vez que haya llegado hasta ti.
 
 ```python try
-wizard.move_left(5)
+wizard.move_right(5)
 wizard.cast("fendra")
 wizard.pick_up()
 ```

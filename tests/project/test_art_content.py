@@ -80,8 +80,14 @@ def test_a_level_s_start_mark_things_and_friend_are_never_hidden(scene):
         if "end" in level:
             cells["mark"] = level["end"]
         for thing in level.get("things", []):
-            # A door is in its wall, and a thing lying on a stone is drawn over it.
-            if "kind" in thing and thing["kind"] != "door" and "at" in thing:
+            # A door is in its wall, a thing lying on a stone is drawn over it, and a
+            # thing the level hides lies under a cut-out on purpose (D85).
+            if (
+                "kind" in thing
+                and thing["kind"] != "door"
+                and "at" in thing
+                and not thing.get("hidden")
+            ):
                 cells[thing["id"]] = thing["at"]
         for actor in level.get("actors", []):
             cells[actor["id"]] = actor["at"]

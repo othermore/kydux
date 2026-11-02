@@ -1,0 +1,6 @@
+# The settings of the-entrance for the cut and the export (D82): what tools/art/export_scene.py needs of this scene.
+
+["cut.json"]
+source = "written by hand from the entrance hall's painting and its edit (art/raw/image-first-entrance, art/raw/game-entrance); read by tools/art/scene_settings.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"

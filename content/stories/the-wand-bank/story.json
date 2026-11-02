@@ -4,21 +4,39 @@
   "scene": "the-library",
   "wizard": [
     10,
-    11
+    6
   ],
   "camera": [
-    9,
-    10
+    11,
+    5
   ],
   "actors": [
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        9,
+        6
+      ],
+      "facing": "right"
+    },
+    {
+      "id": "wenna",
+      "kind": "friend",
+      "at": [
+        8,
+        6
+      ],
+      "facing": "right"
+    },
     {
       "id": "eldra",
       "kind": "ghost",
       "at": [
-        9,
-        11
+        11,
+        6
       ],
-      "facing": "right"
+      "facing": "left"
     },
     {
       "id": "friend",
@@ -27,55 +45,37 @@
   ],
   "steps": [
     {
-      "who": "voice",
-      "do": {
-        "face": "left"
-      },
-      "by": "wizard"
+      "who": "voice"
     },
     {
       "who": "eldra",
-      "do": null
-    },
-    {
-      "who": "voice",
       "do": {
         "vanish": true
-      },
-      "by": "eldra"
+      }
     },
     {
-      "who": "voice",
-      "do": {
-        "walk": [
-          9,
-          11
-        ]
-      },
-      "by": "wizard"
+      "who": "voice"
     },
     {
       "who": "friend",
       "do": {
         "appear": [
-          9,
-          10
+          12,
+          6
         ]
       }
     },
     {
-      "who": "wizard",
-      "do": {
-        "face": "up"
-      }
+      "who": "wizard"
     },
     {
-      "who": "voice",
-      "do": null
+      "who": "mate"
     },
     {
-      "who": "friend",
-      "do": null
+      "who": "wenna"
+    },
+    {
+      "who": "voice"
     }
   ]
 }

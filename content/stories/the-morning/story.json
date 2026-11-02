@@ -1,0 +1,68 @@
+{
+  "id": "the-morning",
+  "speaker": "mate",
+  "scene": "the-dormitory",
+  "wizard": [
+    16,
+    8
+  ],
+  "camera": [
+    15,
+    8
+  ],
+  "actors": [
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        16,
+        6
+      ],
+      "facing": "down"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice"
+    },
+    {
+      "who": "mate"
+    },
+    {
+      "who": "wizard"
+    },
+    {
+      "who": "mate"
+    },
+    {
+      "who": "voice",
+      "by": "wizard",
+      "do": {
+        "walk": [
+          12,
+          8
+        ]
+      }
+    },
+    {
+      "who": "voice",
+      "by": "mate",
+      "do": {
+        "walk": [
+          16,
+          8
+        ]
+      }
+    },
+    {
+      "who": "voice",
+      "by": "wizard",
+      "do": {
+        "walk": [
+          12,
+          13
+        ]
+      }
+    }
+  ]
+}

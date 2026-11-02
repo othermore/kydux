@@ -1,0 +1,6 @@
+# The settings of the-dormitory for the cut and the export (D82): what tools/art/export_scene.py needs of this scene.
+
+["cut.json"]
+source = "written by hand from the dormitory's painting and its edits (art/raw/image-first-dormitory-3, art/raw/game-dormitory); read by tools/art/scene_settings.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"

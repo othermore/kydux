@@ -146,15 +146,16 @@ export function shiftOf(art: Art, id: string, tile: Tile): Tile {
 export function paintThing(
   scene: Phaser.Scene,
   art: Art,
-  thing: { id: string; kind: string; open?: boolean; tile: Tile },
+  thing: { id: string; kind: string; open?: boolean; tile: Tile; art?: string },
 ): Phaser.GameObjects.Image | null {
-  const painted = art.scene.things[thing.id];
+  const id = thing.art ?? thing.id;
+  const painted = art.scene.things[id];
   if (!painted) return null;
   const state = thing.kind === 'door' ? (thing.open ? 'open' : 'closed') : Object.keys(painted.states)[0];
   const scale = artScale(art);
-  const [dx, dy] = shiftOf(art, thing.id, thing.tile);
+  const [dx, dy] = shiftOf(art, id, thing.tile);
   return scene.add
-    .image(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE, `art-${thing.id}-${state}`)
+    .image(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE, `art-${id}-${state}`)
     .setOrigin(0, 0)
     .setScale(scale)
     .setDepth(rowDepth(painted.row + dy) + 0.001);

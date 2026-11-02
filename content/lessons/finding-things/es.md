@@ -1,20 +1,24 @@
 # Encontrar cosas
 
-Una biblioteca guarda muchos secretos, y {un buen mago|una buena maga} sabe cómo buscar. Algunos métodos hacen algo en el mundo, como moverse. Otros métodos devuelven algo, una respuesta.
+Algunos métodos hacen algo en el mundo, como moverse o recoger cosas. ¡Otros te devuelven algo, como una respuesta!
 
-Cuando un método te da una respuesta, ¡puedes guardarla bajo una variable para usarla después!
+El método `wizard.find_nearest("book")` te da el libro más cercano. Te da la cosa en sí, incluso si está muy lejos.
 
 ---
 ## Guardar la respuesta
 
-El método `wizard.find_nearest("book")` mira alrededor y devuelve el libro más cercano, la cosa en sí. Podemos guardarlo escribiendo `book = wizard.find_nearest("book")`.
+Para guardar una respuesta, le damos un nombre, algo que los programadores llaman una variable.
 
-Si no hay ningún libro lo bastante cerca, devuelve `None`, que es la palabra de Python para nada. Una vez que has encontrado un libro, podrías comprobar dónde está con `book.position`, o dárselo a un amigo justo a tu lado con `wizard.give(book)`.
+Lo escribimos así: `book = wizard.find_nearest("book")`. El signo `=` simplemente pone el valor bajo el nombre para que podamos usarlo. ¡No pregunta si son iguales!
+
+Si no hay ningún libro, la respuesta es `None`, que es la palabra de Python para decir nada.
 
 ---
-## Pruébalo
+## Qué hacer con una cosa
 
-Vamos a buscar un libro y a ver dónde está. ¡Primero buscamos y luego le preguntamos al libro por su posición!
+Una vez que guardas una cosa bajo un nombre, puedes preguntarle lo que sabe, como `book.position`. También puedes entregársela a quien esté justo al lado de tu {mago|maga}, usando `wizard.give(book)`.
+
+Nuestra fantasma, Eldra, ha perdido un libro en algún lugar al otro lado de la sala. ¡Vamos a encontrarlo para ella!
 
 ```python try
 book = wizard.find_nearest("book")

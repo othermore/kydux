@@ -261,6 +261,13 @@ function drawnAt(scene: Phaser.Scene, art: Art, id: string, tile: Tile): [number
   return [painted.left * scale + dx * TILE, painted.top * scale + dy * TILE];
 }
 
+/** How far the middle of what is drawn of a picture lies from an image's corner,
+ * in the scene's pixels, the picture `key` drawn at the image's scale. */
+export function middleOffset(image: Phaser.GameObjects.Image, key: string): [number, number] {
+  const [mx, my] = middleOf(image.scene, key);
+  return [mx * image.scaleX, my * image.scaleY];
+}
+
 /** Where the middle of what is drawn of a painted thing's image is, in cells, for
  * the tests (data-drawn, D109). */
 export function drawnMiddle(image: Phaser.GameObjects.Image): [number, number] {

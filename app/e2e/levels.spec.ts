@@ -268,6 +268,62 @@ test.describe('the high shelf (D46, D47, D49)', () => {
     await expect(scene(page)).toHaveAttribute('data-carried', 'rare_book,wand');
   });
 
+  test('the light reaches the book, the book flies to the hands, the hands take it, then it goes to Eldra (D127)', async ({
+    page,
+  }) => {
+    await page.locator('#speed').selectOption('1');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText(
+      'book = wizard.find_nearest("book")\nwizard.move_right(5)\nwizard.cast("fendra", book)\nwizard.pick_up()\nwizard.give(book)',
+    );
+    await page.locator('#run').click();
+    // Where the book is drawn, in cells, and whether the wizard carries it.
+    const book = () =>
+      scene(page).evaluate((node) => {
+        const drawn = /rare_book:([\d.]+),([\d.]+)/.exec(node.getAttribute('data-drawn') ?? '');
+        const carried = (node.getAttribute('data-carried') ?? '').split(',').includes('rare_book');
+        return { at: drawn ? [Number(drawn[1]), Number(drawn[2])] : null, carried };
+      });
+    // Half a tick into the cast (tick 6), the light is on its way and the book on its
+    // shelf: the tick's start waited for frame by frame, as an expect's polls come late.
+    await page.waitForFunction(() => document.querySelector('#scene')?.getAttribute('data-tick') === '6', null, {
+      timeout: 60_000,
+      polling: 'raf',
+    });
+    await page.waitForTimeout(170);
+    const waiting = await book();
+    expect(waiting.carried).toBe(false);
+    expect(waiting.at?.[1]).toBeLessThan(4);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-cast-light.png` });
+    // Before the cast's tick ends the book is at the wizard's hands, at 7,6, not yet carried.
+    await page.waitForFunction(() => {
+      const node = document.querySelector('#scene');
+      const drawn = /rare_book:([\d.]+),([\d.]+)/.exec(node?.getAttribute('data-drawn') ?? '');
+      const carried = (node?.getAttribute('data-carried') ?? '').split(',').includes('rare_book');
+      return node?.getAttribute('data-tick') === '6' && drawn !== null && Number(drawn[2]) > 6 && !carried;
+    });
+    const held = await book();
+    expect(held.at?.[0]).toBeGreaterThan(7);
+    expect(held.at?.[0]).toBeLessThan(8);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-cast-hands.png` });
+    // Once picked up (tick 7) it is carried and no longer drawn, until the give.
+    await page.waitForFunction(
+      () => {
+        const node = document.querySelector('#scene');
+        const carried = (node?.getAttribute('data-carried') ?? '').split(',').includes('rare_book');
+        return carried && !(node?.getAttribute('data-drawn') ?? '').includes('rare_book');
+      },
+      null,
+      { polling: 'raf' },
+    );
+    // The give (tick 8) starts from the hands, after the pick-up.
+    await expect(scene(page)).toHaveAttribute('data-tick', '8');
+    await page.waitForTimeout(150);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-give.png` });
+    await expect.poll(book).toEqual({ at: null, carried: false });
+  });
+
   test('beneath the book, the hands cannot reach it: it is too high', async ({ page }) => {
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');

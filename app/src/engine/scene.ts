@@ -72,6 +72,7 @@ import {
   breakSeal,
   crossfade,
   drawnMiddle,
+  middleOffset,
   drawFigure,
   drawGlow,
   drawGrid,
@@ -101,6 +102,7 @@ import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
 import { Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
+import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
 import { play } from './sfx';
@@ -195,6 +197,13 @@ class LevelScene extends Phaser.Scene {
   /** The goal's mark in a door's doorway, by the door: shown once it is open (D79). */
   private doorMarks = new Map<string, Phaser.GameObjects.Container>();
   private carried = new Set<string>();
+  /** The things a spell has brought to the wizard's hands in the run shown, held
+   * there until picked up (D127), each with where it lies on its tile's floor. */
+  private inHands = new Map<string, { x: number; y: number; depth: number }>();
+  /** The thing a spell takes in the tick shown, which its light flies to, and when
+   * the light reaches it, in milliseconds from the cast (D127). */
+  private pulling: string | null = null;
+  private lightReaches = 0;
   /** Who an opening door's leaf moved aside in the run shown (D125). */
   private shoved = new Set<string>();
   private actors = new Map<string, ActorState>();
@@ -665,6 +674,18 @@ class LevelScene extends Phaser.Scene {
     }
     for (const outline of this.revealed.values()) outline.update();
     this.debug?.update(this.cameras.main);
+    if (this.art) this.publishDrawn();
+  }
+
+  /** Where each painted thing seen is drawn, its middle in cells (D109), in
+   * data-drawn: said each frame, for a thing on its way to be seen where it is. */
+  private publishDrawn(): void {
+    const drawn = [...this.things]
+      .filter(([, image]) => image.visible && image.texture.key.startsWith('art-'))
+      .map(([id, image]) => `${id}:${drawnMiddle(image).map((v) => v.toFixed(2)).join(',')}`)
+      .sort()
+      .join(';');
+    if (this.parentNode.dataset.drawn !== drawn) this.parentNode.dataset.drawn = drawn;
   }
 
   /** The way of the level being shown (D51), whose places a restart uses; null for
@@ -697,6 +718,7 @@ class LevelScene extends Phaser.Scene {
     // What the wizard holds from the start is carried at tick 0 (D49).
     this.carried = new Set(this.map.carrying);
     this.shoved.clear();
+    this.inHands.clear();
     for (const thing of this.map.things) {
       const image = this.things.get(thing.id);
       if (!image) continue;
@@ -750,6 +772,10 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.tick = String(tick);
     this.shownTick = tick;
     this.speech.expire(tick, instant);
+    // A spell's light flies to the thing it takes, which waits for it (D127).
+    const pulled = events.find((event) => event.kind === 'pull');
+    this.pulling = pulled ? String(pulled.data.id) : null;
+    this.lightReaches = 0;
     for (const event of events) {
       if (event.actor === 'wizard') this.showWizard(tick, event, instant);
       // A door opened by a spell or a word is the door's own event (D43); so is a
@@ -927,8 +953,11 @@ class LevelScene extends Phaser.Scene {
     else delete this.parentNode.dataset.asleep;
   }
 
-  /** A thing drawn by a spell from where it lay to the wizard's tile (D47); a painted
-   * one moves by the cells between, and goes among the rows by its new foot (D85). */
+  /** A thing drawn by a spell from where it lay to the wizard's tile (D47): it
+   * leaves its place when the spell's light reaches it, and flies to the wizard's
+   * hands, glowing when it is painted so, where it lands before the tick ends and
+   * stays, held, in front of the wizard (D127). The world has it on the wizard's
+   * tile: where it lies there is kept, for a thing set down. */
   private pull(event: WorldEvent, instant: boolean): void {
     const id = String(event.data.id);
     const image = this.things.get(id);
@@ -937,22 +966,59 @@ class LevelScene extends Phaser.Scene {
     if (!image || !to || !from) return;
     this.tweens.killTweensOf(image);
     const painted = this.art?.scene.things[this.artOf(id)];
-    if (this.art && painted) {
-      const [x, y] = [image.x + (to[0] - from[0]) * TILE, image.y + (to[1] - from[1]) * TILE];
-      // A thing the spell takes glows as it comes, when it is painted so (D47).
-      const pulled = `art-${this.artOf(id)}-pulled`;
-      if (this.textures.exists(pulled)) {
-        if (instant) image.setTexture(pulled);
-        else crossfade(this, image, pulled, this.playback.tickDuration * 0.5);
-      }
-      image.setDepth(thingDepthOn(this.art, this.artOf(id), to, { inside: this.inside(to) }));
-      if (instant) image.setPosition(x, y);
-      else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });
+    const floor =
+      this.art && painted
+        ? {
+            x: image.x + (to[0] - from[0]) * TILE,
+            y: image.y + (to[1] - from[1]) * TILE,
+            depth: thingDepthOn(this.art, this.artOf(id), to, { inside: this.inside(to) }),
+          }
+        : { x: centre(to)[0], y: centre(to)[1], depth: image.depth };
+    this.inHands.set(id, floor);
+    // A thing the spell takes glows as it comes, when it is painted so (D47).
+    const glowing = `art-${this.artOf(id)}-pulled`;
+    const key = this.textures.exists(glowing) ? glowing : image.texture.key;
+    const [x, y] = this.handsFor(image, key);
+    const depth = figureDepth(this.wizard.y / TILE) + 0.001;
+    if (instant) {
+      image.setTexture(key).setPosition(x, y).setDepth(depth).setVisible(true).setAlpha(1);
       return;
     }
-    const [x, y] = centre(to);
-    if (instant) image.setPosition(x, y);
-    else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });
+    const { delay, flight } = pullTimes(this.lightReaches, this.playback.tickDuration);
+    this.tweens.add({
+      targets: image,
+      x,
+      y,
+      delay,
+      duration: flight,
+      ease: 'Quad.easeIn',
+      onStart: () => {
+        if (key !== image.texture.key) crossfade(this, image, key, flight * 0.5);
+        image.setDepth(depth);
+      },
+    });
+  }
+
+  /** Where an image is drawn for its middle to be at the wizard's hands. */
+  private handsFor(image: Phaser.GameObjects.Image, key: string = image.texture.key): [number, number] {
+    const [x, y] = [this.wizard.x, this.wizard.y - 16];
+    if (image.originX !== 0 || !key.startsWith('art-')) return [x, y];
+    const [mx, my] = middleOffset(image, key);
+    return [x - mx, y - my];
+  }
+
+  /** The things held in the wizard's hands set down where the world has them, on
+   * the tile the spell brought them to, when the wizard does something else (D127). */
+  private setDown(instant: boolean): void {
+    for (const [id, floor] of this.inHands) {
+      const image = this.things.get(id);
+      if (!image) continue;
+      this.tweens.killTweensOf(image);
+      image.setDepth(floor.depth);
+      if (instant) image.setPosition(floor.x, floor.y);
+      else this.tweens.add({ targets: image, x: floor.x, y: floor.y, duration: this.playback.tickDuration * 0.4 });
+    }
+    this.inHands.clear();
   }
 
   /** A thing handed to the actor beside the wizard: it floats over and fades (D48). */
@@ -971,7 +1037,7 @@ class LevelScene extends Phaser.Scene {
       image.setVisible(false);
       return;
     }
-    image.setPosition(this.wizard.x, this.wizard.y - 16).setVisible(true).setAlpha(1);
+    image.setPosition(...this.handsFor(image)).setVisible(true).setAlpha(1);
     const [x, y] = centre(actor.tile);
     this.tweens.add({
       targets: image,
@@ -1088,26 +1154,34 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** A spell cast (D42, D81): a point of light leaves the wand's tip once the wand
-   * is pointed, flies a tile ahead, and bursts there in a ring that fades. */
+   * is pointed, flies to the thing the spell takes (D127), or a tile ahead, and
+   * bursts there in a ring that fades; when it gets there is kept for the thing. */
   private castLight(duration: number): void {
     const [dx, dy] = DELTA[this.wizardFacing()];
     const lift = this.art ? TILE * 0.55 : 6;
     const [x0, y0] = [this.wizard.x + dx * TILE * 0.3, this.wizard.y - lift + dy * TILE * 0.15];
-    const [x1, y1] = [this.wizard.x + dx * TILE, this.wizard.y - lift + dy * TILE * 0.8];
+    const target = this.pulling ? this.things.get(this.pulling) : undefined;
+    const [x1, y1] = target
+      ? target.originX === 0
+        ? drawnMiddle(target).map((cells) => cells * TILE)
+        : [target.x, target.y]
+      : [this.wizard.x + dx * TILE, this.wizard.y - lift + dy * TILE * 0.8];
+    const { delay, flight, reaches } = lightTimes(duration);
+    this.lightReaches = reaches;
     const dot = this.add.circle(x0, y0, 5, 0xffffff, 1).setBlendMode(Phaser.BlendModes.ADD).setDepth(5);
     const halo = this.add.circle(x0, y0, 11, 0xfff3bf, 0.6).setBlendMode(Phaser.BlendModes.ADD).setDepth(5);
     this.tweens.add({
       targets: [dot, halo],
       x: x1,
       y: y1,
-      delay: duration * 0.2,
-      duration: duration * 0.45,
+      delay,
+      duration: flight,
       ease: 'Quad.easeOut',
       onComplete: () => {
         dot.destroy();
         halo.destroy();
         const ring = this.add.circle(x1, y1, 8, 0xfff3bf, 0.9).setBlendMode(Phaser.BlendModes.ADD).setDepth(5);
-        this.tweens.add({ targets: ring, scale: 3, alpha: 0, duration: duration * 0.35, onComplete: () => ring.destroy() });
+        this.tweens.add({ targets: ring, scale: 3, alpha: 0, duration: duration * LIGHT_RING, onComplete: () => ring.destroy() });
       },
     });
   }
@@ -1115,6 +1189,8 @@ class LevelScene extends Phaser.Scene {
   private showWizard(tick: number, event: WorldEvent, instant: boolean): void {
     const facing = isFacing(event.data.facing) ? event.data.facing : null;
     const duration = this.playback.tickDuration * 0.9;
+    // What the hands hold is picked up, or set down when the wizard does anything else.
+    if (event.kind !== 'pick_up' && event.kind !== 'cast') this.setDown(instant);
     switch (event.kind) {
       case 'move': {
         const from = tileOf(event.data.from);
@@ -1165,9 +1241,23 @@ class LevelScene extends Phaser.Scene {
         const id = String(event.data.id);
         this.unreveal(id);
         const image = this.things.get(id);
+        const held = this.inHands.delete(id);
+        this.setDown(instant);
+        const taking = this.playback.tickDuration * LONG * 0.95;
         if (image && instant) {
           this.tweens.killTweensOf(image);
           image.setVisible(false);
+        } else if (image && held) {
+          // In the hands already (D127): the hands close on it, no second rise; it
+          // fades where it is over the pick-up frames' last third.
+          this.tweens.killTweensOf(image);
+          this.tweens.add({
+            targets: image,
+            alpha: 0,
+            delay: (taking * 2) / 3,
+            duration: taking / 3,
+            onComplete: () => image.setVisible(false).setAlpha(1),
+          });
         } else if (image) {
           this.tweens.add({
             targets: image,
@@ -1180,7 +1270,7 @@ class LevelScene extends Phaser.Scene {
         this.carried.add(id);
         if (!instant) {
           // The wizard bends and takes it, as the thing goes (14.3).
-          this.playPart('pickup', this.playback.tickDuration * LONG * 0.95);
+          this.playPart('pickup', taking);
           play('pick_up');
         }
         break;
@@ -1361,12 +1451,7 @@ class LevelScene extends Phaser.Scene {
     dataset.carried = [...this.carried].sort().join(',');
     if (this.shoved.size > 0) dataset.shoved = [...this.shoved].sort().join(',');
     else delete dataset.shoved;
-    // Where each painted thing seen is drawn, its middle in cells (D109).
-    dataset.drawn = [...this.things]
-      .filter(([, image]) => image.visible && image.texture.key.startsWith('art-'))
-      .map(([id, image]) => `${id}:${drawnMiddle(image).map((v) => v.toFixed(2)).join(',')}`)
-      .sort()
-      .join(';');
+    this.publishDrawn();
   }
 
   private nudge(target: Phaser.GameObjects.Sprite, facing: Facing, ms: number): void {

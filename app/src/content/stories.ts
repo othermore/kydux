@@ -12,13 +12,14 @@ import type { LevelJson, WorldEvent } from '../runtime/protocol';
 
 /** One thing a figure does in a step (D103), by its `by`, the step's, or the
  * speaker: a walk to a tile or through a list of them, each in a straight line,
- * ending out of sight when it says `vanish`; a turn; an appearing; a vanishing
+ * ending out of sight when it says `vanish`; a turn; an appearing, maybe stepping
+ * out `from` behind a thing on a cell beside (D128); a vanishing
  * (a speaker's once its words are said); lying down asleep in a bed and waking
  * (D91); opening or closing a door. */
 export type Action = { by?: string } & (
   | { walk: Tile | Tile[]; vanish?: true }
   | { face: Facing }
-  | { appear: Tile }
+  | { appear: Tile; from?: Tile }
   | { vanish: true }
   | { sleep: string }
   | { wake: true }
@@ -229,7 +230,8 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world'>): {
       } else if ('face' in action) {
         queue.push({ kind: 'turn', data: { facing: action.face, ...aside } });
       } else if ('appear' in action) {
-        queue.push({ kind: 'appear', data: { at: action.appear, ...aside } });
+        const from = action.from ? { from: action.from } : {};
+        queue.push({ kind: 'appear', data: { at: action.appear, ...from, ...aside } });
         where.set(doer, action.appear);
       } else if ('vanish' in action) {
         queue.push({ kind: 'vanish', data: { ...aside } });

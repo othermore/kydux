@@ -210,7 +210,11 @@ owner on 2026-10-26, for every scene from the dormitory on:
   check` and held by the content test; a door's `rest` is the state it
   is drawn in where no level or story places it (D104). A
   scene's `dark` passages draw a figure darker the deeper it goes into
-  them, its head darker than its feet (D100).
+  them, its head darker than its feet (D100). A tall bookcase a figure in
+  a story steps out from behind (D128) is a static thing cut by the
+  polygon traced on its outline and `"under"` on its row, so that the
+  figure is wholly hidden on the cell behind its end; `export_scene.py
+  check` counts the figure's pixels seen there, none.
 - **A thing painted too big for its place is drawn smaller** (`scale`), on
   its foot's middle, over the picture without it: a book on a shelf; a
   scale by state (`{"pulled": 0.72}`) shrinks that state alone.

@@ -1616,6 +1616,89 @@
       },
       "lined": true
     },
+    "shelf_high": {
+      "about": "The tall bookcase along the top aisle's back wall, its two tiers of shelves from the top board down to its legs on the floor: whoever stands behind it, a friend about to step out from behind its right end into the gap before the counter (D128), is hidden, and it is drawn over whoever stands on its row (D95); the rare book on its upper shelf keeps its own cut-out (D93). Cut by the polygon traced on its outer outline.",
+      "box": [
+        3.85,
+        2.75,
+        10.3,
+        6.15
+      ],
+      "row": 5,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "polygon": [
+        [
+          3.98,
+          2.8
+        ],
+        [
+          10.14,
+          2.8
+        ],
+        [
+          10.15,
+          3.26
+        ],
+        [
+          10.12,
+          3.27
+        ],
+        [
+          10.12,
+          4.05
+        ],
+        [
+          10.18,
+          4.06
+        ],
+        [
+          10.21,
+          4.52
+        ],
+        [
+          10.16,
+          4.56
+        ],
+        [
+          10.16,
+          6.07
+        ],
+        [
+          3.97,
+          6.07
+        ],
+        [
+          3.97,
+          4.56
+        ],
+        [
+          3.91,
+          4.52
+        ],
+        [
+          3.94,
+          4.07
+        ],
+        [
+          4.02,
+          4.05
+        ],
+        [
+          4.02,
+          3.27
+        ],
+        [
+          3.97,
+          3.26
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      },
+      "under": true
+    },
     "shelves_back": {
       "about": "The back row of the middle bookcases, down to its base on row 13: whoever walks on row 12 is behind it, and whoever walks between the rows, on row 13, in front of it.",
       "box": [

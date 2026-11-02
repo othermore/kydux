@@ -848,7 +848,7 @@ STORY_LIGHTS = ("morning",)
 def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
     """A step's actions (D103): none, one, or a list, each one of STORY_DOINGS with
     the figure who does it in `by` when it is not the step's; a walk may end in
-    `vanish`."""
+    `vanish`, and an appearing may come `from` a cell beside (D128)."""
     if doing is None:
         return []
     listed = doing if isinstance(doing, list) else [doing]
@@ -857,6 +857,9 @@ def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
     for action in listed:
         kinds = set(action) - {"by"} if isinstance(action, dict) else set()
         if "walk" in kinds and kinds <= {"walk", "vanish"} and action.get("vanish", True) is True:
+            continue
+        # An appearing from behind a thing beside the cell (D128).
+        if kinds == {"appear", "from"}:
             continue
         if len(kinds) != 1 or not kinds <= set(STORY_DOINGS):
             raise LevelError(f"{here}: do is one of {', '.join(STORY_DOINGS)}")
@@ -893,9 +896,10 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     speaker: a walk to a tile or through a list of them, each in a straight
     line, every tile on the way walked on and free (no one standing there, no
     door shut), and ending out of sight when it says `vanish`; a turn to face
-    a way; appearing on a free tile; vanishing, a speaker once its words are
-    said; lying down asleep in a bed beside it, no one else's, and waking
-    (D91); opening or closing a door beside it. One figure's actions follow
+    a way; appearing on a free tile, maybe stepping out `from` behind a thing
+    on a cell beside it, a shelf or a floor (D128); vanishing, a speaker once
+    its words are said; lying down asleep in a bed beside it, no one else's,
+    and waking (D91); opening or closing a door beside it. One figure's actions follow
     one another; different figures' are played at once, tick by tick, in the
     order they are first named, and are checked so. An actor may start
     `asleep` in a bed beside its `at`. No one walks onto an open door's leaf, and
@@ -1061,6 +1065,15 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                 tile = _story_tile(action["appear"], "appear", here)
                 if planned[doer] is not None:
                     raise LevelError(f"{here}: {doer} is already in sight")
+                if "from" in action:
+                    behind = _story_tile(action["from"], "from", here)
+                    inside = 0 <= behind.y < height and 0 <= behind.x < width
+                    if abs(behind.x - tile.x) + abs(behind.y - tile.y) != 1 or not inside:
+                        raise LevelError(
+                            f"{here}: {doer} comes from a cell beside {tile.x},{tile.y}"
+                        )
+                    if grid[behind.y][behind.x] == WALL:
+                        raise LevelError(f"{here}: {doer} comes out of a wall")
                 planned[doer] = tile
                 queue.append(("appear", tile))
                 continue

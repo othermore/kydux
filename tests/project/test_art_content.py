@@ -167,3 +167,13 @@ def test_a_scene_a_morning_story_is_told_on_has_its_morning_ground():
         for row in art["rows"]:
             for image in row.get("hours", {}).values():
                 assert (folder / image).is_file(), (scene, image)
+
+
+@pytest.mark.parametrize("scene", SCENES)
+def test_a_figure_stepping_out_from_behind_a_thing_is_unseen_before(scene):
+    """A story's figure that steps out from behind a thing (`appear` with `from`,
+    D128) shows nothing of itself at the cell it comes from."""
+    seen = [
+        line for line in export_scene.behind_seen(scene) if not line.endswith(" 0 pixels seen")
+    ]
+    assert not seen, seen

@@ -278,3 +278,23 @@ def test_a_story_may_be_told_under_the_morning_light_and_no_other():
     assert "light" not in staged()
     with pytest.raises(LevelError, match="light"):
         staged(light="noon")
+
+
+def test_a_figure_may_step_out_from_behind_a_thing_on_a_cell_beside_it():
+    # From behind the fence at 2,2 onto 2,1 (D128); the figure is on its cell.
+    out = {"who": "nuri", "do": {"appear": [2, 1], "from": [2, 2]}}
+    story = staged(steps=[out, {"who": "nuri", "do": {"walk": [4, 1]}}])
+    assert story["steps"][0]["do"] == {"appear": [2, 1], "from": [2, 2]}
+    # Two cells away, or out of a wall: refused.
+    for behind, says in (([2, 3], "beside 2,1"), ([4, 1], "beside 2,1"), ([2, 0], "wall")):
+        with pytest.raises(LevelError, match=says):
+            staged(steps=[{"who": "nuri", "do": {"appear": [2, 1], "from": behind}}])
+    # Off the map, on a scene whose floor reaches its edge.
+    strip = Scene("strip", ("...",), dict(DEFAULT_TERRAINS))
+    data = {"id": "a-story", "scene": "strip", "wizard": [2, 0]}
+    off = {"who": "nuri", "do": {"appear": [0, 0], "from": [-1, 0]}}
+    actors = [{"id": "nuri", "kind": "friend"}]
+    with pytest.raises(LevelError, match="beside 0,0"):
+        story_on_scene({**data, "actors": actors, "steps": [off]}, strip)
+    with pytest.raises(LevelError, match="do is one of"):
+        staged(steps=[{"who": "nuri", "do": {"walk": [2, 1], "from": [2, 2]}}])

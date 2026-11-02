@@ -68,6 +68,11 @@ describe('a story as the scene\'s events (D74)', () => {
     ]);
   });
 
+  it('has a figure step out from behind a thing when its appearing says from where (D128)', () => {
+    const { events } = storyEvents({ world, steps: steps({ who: 'voice', by: 'nuri', do: { appear: [2, 1], from: [1, 1] } }) });
+    expect(events[0]?.data).toEqual({ at: [2, 1], from: [1, 1] });
+  });
+
   it('places an appearing figure where the step says', () => {
     const { events } = storyEvents({ world, steps: steps({ who: 'nuri', do: { appear: [2, 1] } }) });
     expect(events[0]).toMatchObject({ actor: 'nuri', kind: 'appear', data: { at: [2, 1] } });

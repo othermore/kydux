@@ -1366,7 +1366,14 @@ class LevelScene extends Phaser.Scene {
         actor.sprite.setPosition(...this.figureAt(at)).setVisible(true);
         this.face(actor.sprite, actor.facing);
         this.sways.get(actor.sprite)?.start();
-        if (instant) actor.sprite.setAlpha(1);
+        // Out from behind a thing on the cell beside (D128): drawn there, behind it,
+        // and walking onto the cell over the tick, facing the way it goes.
+        const from = tileOf(event.data.from);
+        if (from && !instant) {
+          actor.facing = towards(from, at);
+          actor.sprite.setPosition(...this.figureAt(from)).setAlpha(1);
+          this.walk(actor.sprite, actor.facing, ...this.figureAt(at), this.playback.tickDuration * 0.9);
+        } else if (instant) actor.sprite.setAlpha(1);
         else {
           actor.sprite.setAlpha(0);
           this.tweens.add({ targets: actor.sprite, alpha: 1, duration: this.playback.tickDuration * 0.9 });

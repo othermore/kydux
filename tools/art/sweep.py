@@ -263,17 +263,36 @@ def window(layer: Layer, x0: int, y0: int, x1: int, y1: int) -> np.ndarray:
     return out
 
 
-def figure() -> tuple[np.ndarray, int]:
-    """The wizard's standing frame, facing down, and how far above its bottom the
-    feet are."""
+def figure(name: str = LOOK) -> tuple[np.ndarray, int]:
+    """A figure's standing frame, facing down, the wizard's unless named, and how far
+    above its bottom the feet are."""
     figures = CONTENT / "art" / "figures"
     data = json.loads((figures / "figures.json").read_text(encoding="utf-8"))
     width, height = data["frame"]
-    sheet = Image.open(figures / f"{LOOK}.webp").convert("RGBA")
+    sheet = Image.open(figures / f"{name}.webp").convert("RGBA")
     standing = data["standing"]
     return np.array(sheet.crop((standing * width, 0, (standing + 1) * width, height))), data[
         "foot"
     ]
+
+
+def seen_at(scene: Scene, x: int, y: int, name: str = LOOK) -> int:
+    """How many pixels of a figure standing on (x, y) are seen, nothing drawn in
+    front of them: none for a figure wholly behind a thing, as one about to step
+    out from behind it is (D128)."""
+    frame, foot = figure(name)
+    height, width = frame.shape[:2]
+    alpha = frame[..., 3].astype(np.float32) / 255
+    left = int(middle_at(scene, x, y) * scene.cell) - width // 2
+    bottom = int(feet_at(scene, x, y) * scene.cell) + foot
+    top = bottom - height
+    here = feet_at(scene, x, y) + 0.0005
+    front = np.zeros_like(alpha)
+    for layer in scene.layers:
+        if layer.depth > here:
+            over = window(layer, left, top, left + width, bottom)[..., 3].astype(np.float32) / 255
+            front = np.maximum(front, over)
+    return int(((alpha * (1 - front)) > 0.5).sum())
 
 
 @dataclass

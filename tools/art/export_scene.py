@@ -1060,8 +1060,13 @@ def main(arguments: list[str]) -> int:
     if what in ("check", "all"):
         for path in checks(settings_of):
             print(path.relative_to(REPO))
-        # The cells each open leaf lies on, as the scene names them (D125).
+        # The cells each open leaf lies on, as the scene names them (D125), and the
+        # figures that step out from behind a thing, unseen before they do (D128).
         wrong = leaves_differ(settings_of.id)
+        for line in behind_seen(settings_of.id):
+            print(line)
+            if not line.endswith(" 0 pixels seen"):
+                wrong.append(line)
         for line in wrong:
             print(line)
         # The wizard on every cell walked on, and the cut's problems it would show.
@@ -1112,6 +1117,36 @@ def leaf_cells(scene_id: str, folder: Path | None = None) -> dict[str, list[list
                 cells.append([x, row])
         found[name] = cells
     return found
+
+
+#: The sheets a story's figure may be drawn from: the friend and the dormitory mate
+#: in either gender and either set of colours (D77, D90), anyone else by its name.
+FRIEND_SHEETS = ("nuri-a", "nuri-b", "teku-a", "teku-b")
+
+
+def behind_seen(scene_id: str) -> list[str]:
+    """For each figure a story of the scene has step out from behind a thing
+    (`appear` with `from`, D128), how many of its pixels are seen at the cell it
+    comes from, in any sheet it may be drawn from: none, for it to come out of
+    hiding. A line each."""
+    scene = sweep.load(scene_id)
+    lines = []
+    for path in sorted((REPO / "content" / "stories").glob("*/story.json")):
+        story = json.loads(path.read_text())
+        if story.get("scene") != scene_id:
+            continue
+        for number, step in enumerate(story["steps"], 1):
+            doing = step.get("do") or []
+            for action in doing if isinstance(doing, list) else [doing]:
+                if "from" not in action:
+                    continue
+                who = action.get("by", step.get("by", step["who"]))
+                sheets = FRIEND_SHEETS if who in ("friend", "mate") else (who,)
+                x, y = action["from"]
+                seen = max(sweep.seen_at(scene, x, y, sheet) for sheet in sheets)
+                where = f"{story['id']}, step {number}"
+                lines.append(f"{where}: {who} behind {x},{y}, {seen} pixels seen")
+    return lines
 
 
 def leaves_differ(scene_id: str) -> list[str]:

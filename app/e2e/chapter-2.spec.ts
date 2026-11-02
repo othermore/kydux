@@ -283,6 +283,28 @@ test.describe('in the entrance (D100)', () => {
   });
 });
 
+test.describe('at the wand bank (D128)', () => {
+  test.use({ locale: 'es-ES' });
+
+  test('the friend walks out from behind the high shelf into the gap before the counter', async ({ page }) => {
+    await seedWizard(page, MARTA);
+    await page.goto('/#story/the-wand-bank');
+    const scene = page.locator('#scene');
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(scene).not.toHaveAttribute('data-actors', /friend:/);
+    await storyNext(page, 4);
+    // Step 5: in sight from the step's start, on 10,5, drawn stepping out from 9,5.
+    await page.waitForFunction(() => /friend:10,5/.test(document.querySelector('#scene')?.getAttribute('data-actors') ?? ''), null, {
+      polling: 'raf',
+      timeout: 30_000,
+    });
+    await page.waitForTimeout(60);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-friend-steps-out.png` });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-actors', /friend:10,5,down/);
+  });
+});
+
 test.describe('the stories', () => {
   test.use({ locale: 'es-ES' });
 

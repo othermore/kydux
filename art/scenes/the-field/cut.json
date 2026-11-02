@@ -91,6 +91,208 @@
       1174
     ]
   ],
+  "grounds": [
+    [
+      [
+        6.0,
+        8.3
+      ],
+      [
+        6.3,
+        8.18
+      ],
+      [
+        6.72,
+        8.02
+      ],
+      [
+        6.72,
+        8.9
+      ],
+      [
+        6.5,
+        8.9
+      ],
+      [
+        6.38,
+        8.68
+      ],
+      [
+        6.0,
+        8.7
+      ]
+    ],
+    [
+      [
+        14.22,
+        19.47
+      ],
+      [
+        15.1,
+        19.47
+      ],
+      [
+        15.1,
+        20.32
+      ],
+      [
+        14.95,
+        20.32
+      ]
+    ],
+    [
+      [
+        15.2,
+        20.3
+      ],
+      [
+        15.35,
+        20.42
+      ],
+      [
+        15.85,
+        21.0
+      ],
+      [
+        15.2,
+        21.0
+      ]
+    ],
+    [
+      [
+        10.4,
+        11.99
+      ],
+      [
+        10.95,
+        11.99
+      ],
+      [
+        10.78,
+        12.17
+      ],
+      [
+        10.72,
+        12.24
+      ],
+      [
+        10.4,
+        12.24
+      ]
+    ]
+  ],
+  "kept": [
+    [
+      13.7,
+      15.18,
+      14.4,
+      15.7
+    ]
+  ],
+  "rows": [
+    {
+      "about": "The crown of the tree whose trunk is on 5,8, where it hangs over 6,8: the tree's row, behind whoever stands on 6,8.",
+      "area": [
+        [
+          6.0,
+          7.95
+        ],
+        [
+          6.75,
+          7.95
+        ],
+        [
+          6.3,
+          8.2
+        ],
+        [
+          6.0,
+          8.32
+        ]
+      ],
+      "row": 8
+    },
+    {
+      "about": "The bush on 11,12, its lobe over 10,12 with it: one thing, in front of whoever stands on 10,12.",
+      "area": [
+        [
+          11.0,
+          11.55
+        ],
+        [
+          12.7,
+          11.55
+        ],
+        [
+          12.7,
+          13.25
+        ],
+        [
+          10.6,
+          13.25
+        ],
+        [
+          10.6,
+          12.26
+        ],
+        [
+          10.78,
+          12.17
+        ],
+        [
+          10.95,
+          12.0
+        ],
+        [
+          11.0,
+          12.0
+        ]
+      ],
+      "row": 13
+    },
+    {
+      "about": "The boulder on 14,14 down to its foot on 14,15, which no one walks on.",
+      "area": [
+        [
+          14.38,
+          13.9
+        ],
+        [
+          15.05,
+          13.9
+        ],
+        [
+          15.05,
+          15.18
+        ],
+        [
+          14.38,
+          15.18
+        ]
+      ],
+      "row": 15
+    },
+    {
+      "about": "The bush on 14,16, where its top rises into 14,15 below the boulder: the bush's row.",
+      "area": [
+        14.0,
+        15.18,
+        15.05,
+        16.0
+      ],
+      "row": 16
+    },
+    {
+      "about": "The crown on 16,20, where its left edge meets the wall: the crown's row.",
+      "area": [
+        15.1,
+        19.45,
+        15.45,
+        20.42
+      ],
+      "row": 21
+    }
+  ],
   "margin": {
     "about": "The painting gone on beyond the playable area (D83), three cells on each side and two above and below: painted by Gemini 3 Pro Image round the painting from tools/art/prompts/image-first-field-margin.md, on a canvas made by tools/art/margin.py with the lower right corner's bush sketched in from an earlier try so that the model kept it, and joined by tools/art/margin.py.",
     "cells": [

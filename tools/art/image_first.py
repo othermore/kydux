@@ -29,7 +29,8 @@ A source folder may hold cut.json, which names its pictures (`gridded`,
 the castle is left as ground (`castle`), the castle door's box (`door`), the
 things whose leaves are cut (`leaves`, all of them unless it says), the
 colours the painting is read by (`thresholds`, THRESHOLDS for any left out),
-and anything else for the page (`page`: the levels it plays, where the seal
+the parts it mends (`grounds`, `kept`, `rows`, each a box or a polygon in
+cells), and anything else for the page (`page`: the levels it plays, where the seal
 glows, where the wand lies); without it, the first painting's are taken.
 tools/art/export_scene.py writes that folder from a scene's settings (D82).
 
@@ -44,14 +45,19 @@ coloured as the grass, is of it. What is drawn in front of a cell walked on,
 or of the cell above one, where a figure's hat is, hangs from its foot (held):
 a shadow, a flower or a tuft on the lawn, with lawn between it and the row it
 was given, goes back into the ground, as does a shadow on a cell walked on
-beside a thing's foot. Everything is aligned on the grid, TILE pixels a cell.
+beside a thing's foot. Every edge then lies on its thing's outline (snapped,
+D93): the lawn beyond the outline goes back to the ground, the outline comes
+in. Last, the scene's settings mend what the painting asks of it (D94): parts
+given back to the ground (`grounds`), parts kept (`kept`), and parts whose
+things stand on a row (`rows`). Everything is aligned on the grid, TILE pixels
+a cell.
 """
 
 import json
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
@@ -108,6 +114,16 @@ def box_mask(
     inside = np.zeros(shape, dtype=bool)
     inside[y0:y1, x0:x1] = True
     return inside
+
+
+def area_mask(shape: tuple[int, int], area: list, tile: int) -> np.ndarray:
+    """A part of a scene in cells: a box, (x0, y0, x1, y1), or a polygon, a list of
+    its corners [x, y]."""
+    if not isinstance(area[0], list | tuple):
+        return box_mask(shape, tuple(area), tile)
+    image = Image.new("L", shape[::-1], 0)
+    ImageDraw.Draw(image).polygon([(x * tile, y * tile) for x, y in area], fill=255)
+    return np.array(image) > 0
 
 
 def rgba(image: np.ndarray, alpha: np.ndarray) -> Image.Image:
@@ -211,6 +227,117 @@ def darkened(painting: np.ndarray, ground: np.ndarray, th: dict = THRESHOLDS) ->
     ratio = (painting[..., :3].astype(np.float32) + 1) / (ground[..., :3].astype(np.float32) + 1)
     spread, darker = th["shadow"]["spread"], th["shadow"]["darker"]
     return ((ratio.max(axis=2) - ratio.min(axis=2)) < spread) & (ratio.mean(axis=2) < darker)
+
+
+def dilated(mask: np.ndarray, r: int) -> np.ndarray:
+    """The mask grown by `r` pixels every way, as far as a square reaches: shifted
+    by 1, 2, 4... pixels along each axis, each shift doubling what is covered."""
+    out = mask.copy()
+    for axis in (0, 1):
+        reach, step = 0, 1
+        while reach < r:
+            s = min(step, r - reach)
+            grown = out.copy()
+            if axis == 0:
+                grown[s:] |= out[:-s]
+                grown[:-s] |= out[s:]
+            else:
+                grown[:, s:] |= out[:, :-s]
+                grown[:, :-s] |= out[:, s:]
+            out, reach, step = grown, reach + s, step * 2
+    return out
+
+
+def eroded(mask: np.ndarray, r: int) -> np.ndarray:
+    """The mask shrunk by `r` pixels every way."""
+    return ~dilated(~mask, r)
+
+
+def flooded(seeds: np.ndarray, passable: np.ndarray, steps: int) -> np.ndarray:
+    """What `seeds` reach through `passable` pixels, a pixel a step to the four
+    sides, in at most `steps` steps."""
+    out = seeds & passable
+    for index in range(steps):
+        grown = out.copy()
+        grown[1:] |= out[:-1]
+        grown[:-1] |= out[1:]
+        grown[:, 1:] |= out[:, :-1]
+        grown[:, :-1] |= out[:, 1:]
+        grown &= passable
+        if index % 8 == 7 and grown.sum() == out.sum():
+            break
+        out = grown
+    return out
+
+
+#: How a mask's edge is moved onto its thing's outline (D93), in parts of a cell:
+#: how deep on each side of the edge the ground outside is let in, and how far
+#: beyond the edge the outline is taken; and how near in colour, on average over
+#: its channels, the painting is to its picture without the thing where the ground
+#: is let in, when there is such a picture.
+SNAP_BAND = 0.16
+SNAP_REACH = 0.07
+SNAP_SAME = 30
+
+
+def dark_lines(painting: np.ndarray, th: dict = THRESHOLDS) -> np.ndarray:
+    """The painting's outlines, a gap of a pixel or two in them closed."""
+    dark = outline(painting, th)
+    return eroded(dilated(dark, 1), 1)
+
+
+def outside_of(
+    mask: np.ndarray, dark: np.ndarray, band: int, same: np.ndarray | None = None
+) -> np.ndarray:
+    """The pixels within `band` of the mask's edge, on either side, that the ground
+    beyond it reaches without crossing an outline, nor, where `same` is given, a
+    pixel unlike the ground: flooded in from `band` outside the mask, or from the
+    picture's own edge beside it, never deeper into it than `band`."""
+    near = dilated(mask, band)
+    edge = near & ~dilated(mask, band - 1)
+    border = np.zeros_like(mask)
+    border[[0, -1]] = True
+    border[:, [0, -1]] = True
+    edge |= border & near & ~mask
+    passable = near & ~dark & ~eroded(mask, band)
+    if same is not None:
+        passable &= same
+    return flooded(edge & ~dark, passable, 3 * band)
+
+
+def like(painting: np.ndarray, ground: np.ndarray) -> np.ndarray:
+    """Where the painting is its picture without the things, SNAP_SAME near."""
+    difference = np.abs(painting[..., :3].astype(np.int16) - ground[..., :3].astype(np.int16))
+    return difference.mean(axis=2) < SNAP_SAME
+
+
+def snapped(
+    mask: np.ndarray,
+    painting: np.ndarray,
+    cell: int,
+    th: dict = THRESHOLDS,
+    ground: np.ndarray | None = None,
+) -> np.ndarray:
+    """The mask's edge on the outer edge of its thing's dark outline (D93): what of
+    it the ground beyond reaches without crossing an outline is the ground's, and
+    what lies just beyond it that the ground does not reach, the outline and the
+    sliver of the thing inside it, is the thing's. `cell` is a cell's size in
+    pixels. With the picture without the thing, `ground`, the ground goes in only
+    where the painting is as that picture: where a tuft of grass breaks a rock's
+    outline, the rock's own colours keep it out. A lawn cut deeper than SNAP_BAND
+    with a thing is given back by the scene's settings (`grounds`)."""
+    dark = dark_lines(painting, th)
+    band = max(2, round(SNAP_BAND * cell))
+    reach = max(1, round(SNAP_REACH * cell))
+    outside = outside_of(mask, dark, band)
+    if ground is not None:
+        given = outside_of(mask, dark, band, like(painting, ground))
+    else:
+        given = outside
+    # What the ground reaches goes back to it; what no outline lets it reach, just
+    # beyond the edge, comes in, and the outline thicker than the reach with it.
+    edged = (mask & ~given) | (dilated(mask, reach) & ~outside)
+    return flooded(edged, edged | (dark & ~outside), band)
 
 
 def labels(mask: np.ndarray) -> np.ndarray:
@@ -353,10 +480,9 @@ def outlined(
     return out
 
 
-#: How far a crown's sunlit leaves and its edge reach out of its mask, in working
-#: pixels: what its outline closes in, and what next to it differs from the ground.
+#: How far a crown's sunlit leaves reach out of its mask, in working pixels: what
+#: its outline closes in.
 SUNLIT_STEPS = 160
-EDGE_STEPS = 48
 
 
 def spread(seed: np.ndarray, allowed: np.ndarray, steps: int) -> np.ndarray:
@@ -587,8 +713,7 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     # its dark outline closes in (below).
     things = (mask | body | (up(holes) & raw)) & of_thing & (own_row <= depth) & ~lying
     # A crown's sunlit leaves, coloured as grass and so left out of the mask: what
-    # its dark outline closes in, and what differs from the ground next to it and
-    # is no shadow, are of the crown.
+    # its dark outline closes in is of the crown. Its edge is the outline's (below).
     # A crown is what lies within a tree's reach, or stands on a tree's or a rock's
     # cell, whatever it touches.
     rounded = np.array([[ch in "tr" for ch in row] for row in marks])
@@ -596,7 +721,6 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     crown = np.where(things & on_round, depth, -1).astype(np.int16)
     sunlit = outlined(things, crown >= 0, painting, th)
     grown = spread(crown, sunlit, SUNLIT_STEPS)
-    grown = spread(grown, raw & ~shadow & ~things, EDGE_STEPS)
     added = (grown >= 0) & (crown < 0) & (own_row <= grown)
     depth = np.where(added, grown, depth)
     things |= added
@@ -608,6 +732,27 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     hat[:-1] = walked[1:]
     seen = on_walked | hat[ys][:, xs]
     things &= ~seen | (own_row == depth) | held(things, depth, own_row)
+    # Every edge on its thing's outline (D93): what an edge took of the ground beyond
+    # the outline goes back to it, and the outline an edge left out comes in, on the
+    # row of the thing it is next to.
+    edged = snapped(things, painting, tile, th, ground)
+    edged[:castle] = False
+    # A part the scene's settings keep (`kept`): a crown's sunlit edge behind a gap in
+    # its outline, which the ground would otherwise be let into.
+    for area in settings.get("kept", []):
+        edged |= things & area_mask(things.shape, area, tile)
+    added = edged & ~things
+    next_to = spread(np.where(things, depth, -1).astype(np.int16), added, round(SNAP_BAND * tile))
+    depth = np.where(added, next_to, depth)
+    things = edged & (~added | (next_to >= 0))
+    # What the scene's settings say of its cut, where its painting asks it (D94): a
+    # part given back to the ground (`grounds`), a lawn cut with a thing deeper than
+    # its outline is looked for; a part whose things stand on a row (`rows`), one
+    # thing cut across a row's edge made one again.
+    for area in settings.get("grounds", []):
+        things &= ~area_mask(things.shape, area, tile)
+    for part in settings.get("rows", []):
+        depth = np.where(area_mask(things.shape, part["area"], tile), part["row"], depth)
     # What opens, or is picked up, is its leaf, found by its colour in its box:
     # the gate's dark iron bars, the sealed door's brown wood and its blue rune,
     # the wand's brown wood; and, for a gate or a door, whatever else of the
@@ -645,11 +790,9 @@ def build(source: Path = SOURCE, out: Path = OUT) -> Path:
     page = (columns * TILE, rows * TILE)
     Image.fromarray(floor).resize(page, Image.LANCZOS).save(out / "ground.png")
     read(settings["gridded"], TILE).save(out / "baked.png")
-    # Soft edges: the thing's mask a little blurred, as alpha.
-    soft = Image.fromarray(things.astype(np.uint8) * 255).filter(ImageFilter.GaussianBlur(1.2))
-    alpha = np.array(soft).astype(np.float32) / 255
-    alpha[things] = 1.0
-    alpha[~things & ~mask] = 0.0
+    # The edge lies on the outline, so nothing beyond it is drawn; brought down to
+    # the page's size, it is soft by a pixel.
+    alpha = things.astype(np.float32)
     layers = []
     taken = np.zeros_like(things)
     for name, box in boxes.items():

@@ -13,7 +13,7 @@ tttt####.####tttt
 tttttttgpggtttttt
 tttttttppgrgggttt
 tttttttgppggoottt
-tttttttgppgggggtt
+tttttttgppggggrtt
 tttttttpppttttttt
 ########.########
 ########.########

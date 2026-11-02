@@ -112,14 +112,6 @@ def changed(a: np.ndarray, b: np.ndarray, threshold: float = 60) -> np.ndarray:
     return np.array(mask) > 127
 
 
-def soft(mask: np.ndarray, radius: float = 1.2) -> np.ndarray:
-    """The mask as alpha, its edge a little blurred, its inside whole."""
-    blurred = Image.fromarray(mask.astype(np.uint8) * 255).filter(ImageFilter.GaussianBlur(radius))
-    alpha = np.array(blurred).astype(np.float32) / 255
-    alpha[mask] = 1.0
-    return alpha
-
-
 def in_box(shape: tuple[int, int], box: tuple[int, int, int, int]) -> np.ndarray:
     inside = np.zeros(shape, dtype=bool)
     x0, y0, x1, y1 = box
@@ -168,19 +160,26 @@ def kept(mask: np.ndarray, share: float) -> np.ndarray:
 
 
 def sprite_alpha(
-    shown: np.ndarray, without: np.ndarray, box: tuple[int, int, int, int], thing: dict
+    shown: np.ndarray,
+    without: np.ndarray,
+    box: tuple[int, int, int, int],
+    thing: dict,
+    cell: int,
+    th: dict | None = None,
 ) -> np.ndarray:
-    """A state's alpha, in the painting's own pixels: a solid door's or the wand's
-    where the state differs from the picture without the thing, its holes filled;
-    an open-work gate's by how much each pixel differs, so that the path between
-    its bars stays the ground's."""
+    """A state's alpha, in the painting's own pixels, a cell `cell` pixels wide: a
+    solid door's or the wand's where the state differs from the picture without
+    the thing, its holes filled, its edge on its outline (D93); an open-work gate's
+    by how much each pixel differs, so that the path between its bars stays the
+    ground's."""
     inside = in_box(shown.shape[:2], box)
     if thing["solid"]:
         mask = filled_mask(changed(shown, without) & inside)
         mask = kept(mask, 0.6 if thing.get("largest") else 0.05)
         if thing.get("hull"):
             mask = row_hull(mask) & inside
-        return soft(mask, 1.5) * inside
+        mask = image_first.snapped(mask, shown, cell, image_first.thresholds(th), without)
+        return (mask & inside).astype(np.float32)
     d = np.abs(shown.astype(np.int16) - without.astype(np.int16)).sum(axis=2) / 3
     d = Image.fromarray(np.clip(d, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.0))
     alpha = np.clip((np.array(d).astype(np.float32) - 22) / 30, 0, 1) * inside
@@ -195,9 +194,16 @@ PALE_SATURATION = 0.32
 PALE_OUTLINE = 7
 
 
-def static_alpha(painting: np.ndarray, box: tuple[int, int, int, int], thing: dict) -> np.ndarray:
+def static_alpha(
+    painting: np.ndarray,
+    box: tuple[int, int, int, int],
+    thing: dict,
+    cell: int,
+    th: dict | None = None,
+) -> np.ndarray:
     """A static thing's alpha in the painting's own pixels, inside its box: what is
-    pale there and its outline (`"mask": "pale"`), or the whole box (`"box"`)."""
+    pale there and its outline (`"mask": "pale"`), its edge on its outline (D93), or
+    the whole box (`"box"`)."""
     inside = in_box(painting.shape[:2], box)
     if thing.get("mask") == "box":
         return inside.astype(np.float32)
@@ -210,7 +216,8 @@ def static_alpha(painting: np.ndarray, box: tuple[int, int, int, int], thing: di
     near = Image.fromarray(pale.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(PALE_OUTLINE))
     dark = hsv[..., 2] < 0.38
     mask = (pale | ((np.array(near) > 0) & dark)) & inside
-    return soft(mask, 1.2) * inside
+    mask = image_first.snapped(mask, painting, cell, image_first.thresholds(th))
+    return (mask & inside).astype(np.float32)
 
 
 def beds_of(settings: Settings) -> dict[str, dict]:
@@ -411,6 +418,9 @@ def scene(settings: Settings) -> Path:
         "cuts": settings.data.get("cuts", list(image_first.CUTS)),
         "castle": settings.data.get("castle", image_first.DEFAULTS["castle"]),
         "thresholds": settings.data.get("thresholds", {}),
+        "grounds": settings.data.get("grounds", []),
+        "kept": settings.data.get("kept", []),
+        "rows": settings.data.get("rows", []),
     }
     (src / "cut.json").write_text(json.dumps(cut))
     field: dict = {"layers": []}
@@ -463,6 +473,9 @@ def scene(settings: Settings) -> Path:
     # Each thing's states, at the page's size: the picture of the state where it
     # differs from the picture without the thing.
     painting = np.array(Image.open(settings.painting).convert("RGB"))
+    # A cell in the painting's own pixels, and the colours its outlines are read by.
+    spacing = round(grid["x"]["spacing"])
+    th = settings.data.get("thresholds")
     # Where a thing that opens or is picked up lies, which no static thing takes.
     doors = np.zeros(painting.shape[:2], dtype=bool)
     for name, thing in settings.things.items():
@@ -478,9 +491,9 @@ def scene(settings: Settings) -> Path:
             native = native_box(grid, thing["box"])
             box = tuple(round(v * CELL) for v in thing["box"])
             if name in withouts:
-                alpha = sprite_alpha(painting, withouts[name], native, thing)
+                alpha = sprite_alpha(painting, withouts[name], native, thing, spacing, th)
             else:
-                alpha = static_alpha(painting, native, thing)
+                alpha = static_alpha(painting, native, thing, spacing, th)
             alpha = alpha * ~doors
             rgba = np.dstack([painting, (alpha * 255).astype(np.uint8)])
             sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
@@ -503,13 +516,14 @@ def scene(settings: Settings) -> Path:
                 webp(Image.new("RGBA", (1, 1), (0, 0, 0, 0)), out / states[state])
                 continue
             if picture == "painting":
-                shown, alpha = painting, sprite_alpha(painting, without, native, thing)
+                shown = painting
+                alpha = sprite_alpha(painting, without, native, thing, spacing, th)
             elif picture == "without":
                 # The open door is the dark where the closed door was.
-                shown, alpha = without, sprite_alpha(painting, without, native, thing)
+                shown, alpha = without, sprite_alpha(painting, without, native, thing, spacing, th)
             else:
                 shown = np.array(Image.open(settings.edits / picture).convert("RGB"))
-                alpha = sprite_alpha(shown, without, native, thing)
+                alpha = sprite_alpha(shown, without, native, thing, spacing, th)
             rgba = np.dstack([shown, (alpha * 255).astype(np.uint8)])
             sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
             sprite = sprite.copy()

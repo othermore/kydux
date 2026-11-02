@@ -25,10 +25,17 @@ The problems, each on a cell walked on:
 - holes: a gap closed in on every side by a row's image where the painting
   differs from its ground-only edit: a crown's sunlit leaves left out, and the
   wizard seen through them.
+- fringe and bare: a cut-out's edge off its thing's outline (D93), the ground
+  beyond the outline drawn over the wizard, or the outline left on the ground
+  under it.
+- spill: one thing drawn partly in front of the wizard and partly behind it, cut
+  across a row's edge with no outline between its parts (D94).
 
-The last two read the pictures the export cut the scene from
+All but the first read the pictures the export cut the scene from
 (art/raw/game/<scene>-src/), and are left out when they are not there. The
-colours an outline and a shadow are told by are the scene's (scene_settings).
+colours an outline and a shadow are told by are the scene's (scene_settings);
+a scene may name the kinds it is held to (`checks`), and parts of it whose
+things are kept whatever the ground beside them (`kept`).
 """
 
 import json
@@ -76,6 +83,9 @@ class Layer:
     #: A static thing's row image, drawn over the painting as it is (D89): what
     #: covers a figure there is the thing itself, never the lawn or a hole.
     static: bool = False
+    #: An open-work thing, a gate of bars, drawn by how much each pixel differs
+    #: from the picture without it: its edge is no outline's.
+    open_work: bool = False
 
 
 @dataclass
@@ -89,6 +99,12 @@ class Scene:
     layers: list[Layer] = field(default_factory=list)
     #: The colours the scene is read by (D82).
     thresholds: dict = field(default_factory=image_first.thresholds)
+    #: The kinds of problem the scene is held to, every kind when None: a scene
+    #: whose things are still to be cut again by the outline rule (D93) names the
+    #: checks it already keeps (`checks` in its settings).
+    checks: list[str] | None = None
+    #: The parts of the scene its settings keep in its things (`kept`, D93), in cells.
+    kept: list = field(default_factory=list)
 
 
 def walks(scene: str) -> np.ndarray:
@@ -111,7 +127,10 @@ def load(scene: str) -> Scene:
     ground = ground[oy : oy + rows * cell, ox : ox + columns * cell]
     found = Scene(scene, cell, columns, rows, walks(scene), ground)
     if (scene_settings.SCENES / scene / "cut.json").is_file():
-        found.thresholds = scene_settings.settings(scene).thresholds
+        own = scene_settings.settings(scene)
+        found.thresholds = own.thresholds
+        found.checks = own.data.get("checks")
+        found.kept = own.data.get("kept", [])
     for row in art["rows"]:
         rgba = np.array(Image.open(folder / row["image"]).convert("RGBA"))
         name = f"row {row['row']}" + (" static" if row.get("static") else "")
@@ -120,12 +139,23 @@ def load(scene: str) -> Scene:
                 name, row["row"] + 0.75, row["row"], rgba, 0, row["top"], row.get("static", False)
             )
         )
+    solid = {}
+    if (scene_settings.SCENES / scene / "cut.json").is_file():
+        solid = {n: t.get("solid", True) for n, t in scene_settings.settings(scene).things.items()}
     for name, thing in art["things"].items():
         state = "closed" if "closed" in thing["states"] else next(iter(thing["states"]))
         rgba = np.array(Image.open(folder / thing["states"][state]).convert("RGBA"))
         # A thing is drawn just after its row's image (painted.ts).
         found.layers.append(
-            Layer(name, thing["row"] + 0.75 + 0.001, None, rgba, thing["left"], thing["top"])
+            Layer(
+                name,
+                thing["row"] + 0.75 + 0.001,
+                None,
+                rgba,
+                thing["left"],
+                thing["top"],
+                open_work=not solid.get(name, True),
+            )
         )
     found.layers.sort(key=lambda layer: layer.depth)
     return found
@@ -235,16 +265,22 @@ class Problem:
 
 
 def by_cell(
-    kind: str, layer: str, where: np.ndarray, cell: int, top: int = 0, share: float = SHARE
+    kind: str,
+    layer: str,
+    where: np.ndarray,
+    cell: int,
+    top: int = 0,
+    share: float = SHARE,
+    left: int = 0,
 ) -> list[Problem]:
     """A problem for each cell where `where`, an image's box starting at row `top`
-    of the scene's pixels, holds at least `share` of the cell."""
+    and column `left` of the scene's pixels, holds at least `share` of the cell."""
     found = []
     ys, xs = np.nonzero(where)
     if not len(ys):
         return found
     cells, counts = np.unique(
-        np.stack([xs // cell, (ys + top) // cell], axis=1), axis=0, return_counts=True
+        np.stack([(xs + left) // cell, (ys + top) // cell], axis=1), axis=0, return_counts=True
     )
     for (x, y), count in zip(cells, counts, strict=True):
         if count >= share * cell * cell:
@@ -278,7 +314,10 @@ def outlined(
     height, width = rgba.shape[:2]
     solid = rgba[..., 3] > 128
     dark = solid & image_first.outline(rgba, scene.thresholds)
-    walls = dark | (solid & raw[:height, :width])
+    # Its edge is on its outline (D93), and what lies just beyond it that differs
+    # from the ground closes it in as the outline does.
+    reach = max(1, round(image_first.SNAP_REACH * scene.cell))
+    walls = dark | (image_first.dilated(solid, reach) & raw[:height, :width])
     for other in scene.layers:
         if other is not (whole or layer):
             box = window(other, layer.left, layer.top, layer.left + width, layer.top + height)
@@ -311,6 +350,10 @@ def floating(scene: Scene) -> list[Problem]:
         )
         depth = np.full(solid.shape, layer.row, dtype=np.int16)
         hanging = image_first.held(solid, depth, own)
+        # The edge round what hangs from the foot hangs with it (D93), as far as the
+        # cut moves an edge.
+        band = max(2, round(image_first.SNAP_BAND * scene.cell))
+        hanging = image_first.flooded(hanging, solid, band)
         where = solid & before(scene, layer) & ~hanging
         found += by_cell("floating", layer.name, where, scene.cell, layer.top)
     return found
@@ -319,10 +362,13 @@ def floating(scene: Scene) -> list[Problem]:
 @dataclass
 class Differs:
     """Where the picture a scene's rows were cut from differs from its ground-only
-    edit, and where it is that ground in shadow, at the page's size."""
+    edit, and where it is that ground in shadow, at the page's size; and that
+    picture itself, whose outlines the cut-outs' edges lie on (D93)."""
 
     raw: np.ndarray
     shadow: np.ndarray
+    painting: np.ndarray
+    ground: np.ndarray
 
 
 def differs(scene: Scene) -> Differs | None:
@@ -339,7 +385,7 @@ def differs(scene: Scene) -> Differs | None:
 
     painting, ground = read("ground-composite.png"), read("ground-only.png")
     shadow = image_first.darkened(painting, ground, scene.thresholds)
-    return Differs(image_first.difference(painting, ground), shadow)
+    return Differs(image_first.difference(painting, ground), shadow, painting, ground)
 
 
 def lawn(scene: Scene, seen: Differs) -> list[Problem]:
@@ -398,6 +444,111 @@ def holes(scene: Scene, seen: Differs) -> list[Problem]:
     return found
 
 
+def behind_cells(scene: Scene, row: int, box: tuple[int, int, int, int]) -> np.ndarray:
+    """Over the scene's box (x0, y0, x1, y1), where an image whose foot is on `row`
+    may be drawn in front of a figure: a cell walked on above that row, or the cell
+    just above one, where the figure's hat is."""
+    x0, y0, x1, y1 = box
+    ys = np.arange(y0, y1) // scene.cell
+    xs = np.minimum(np.arange(x0, x1) // scene.cell, scene.columns - 1)
+    here = np.minimum(ys, scene.rows - 1)
+    below = np.minimum(ys + 1, scene.rows - 1)
+    stands = scene.walked[here][:, xs] & (ys < row)[:, None]
+    hat = scene.walked[below][:, xs] & (ys + 1 < row)[:, None]
+    return stands | hat
+
+
+def foot_of(layer: Layer) -> int:
+    """The row a layer's foot stands on: a row's image's own, a thing's by its depth."""
+    return layer.row if layer.row is not None else int(np.floor(layer.depth - 0.75 + 1e-6))
+
+
+def edges(scene: Scene, seen: Differs) -> list[Problem]:
+    """A cut-out's edge off its thing's outline (D93), where a figure may stand behind
+    it: `fringe`, its pixels that the ground beyond reaches without crossing an
+    outline, drawn over the figure; `bare`, the outline's pixels just beyond its
+    edge that the ground does not reach and no other image draws, left under the
+    figure. As image_first.snapped holds an edge, at the page's size: the ground
+    reaching in only where the painting is as its ground-only picture."""
+    band = max(2, round(image_first.SNAP_BAND * scene.cell))
+    reach = max(1, round(image_first.SNAP_REACH * scene.cell))
+    height, width = scene.rows * scene.cell, scene.columns * scene.cell
+    dark = image_first.dark_lines(seen.painting[:height, :width], scene.thresholds)
+    same = image_first.like(seen.painting[:height, :width], seen.ground[:height, :width])
+    solids = [window(layer, 0, 0, width, height)[..., 3] > 128 for layer in scene.layers]
+    count = np.sum(solids, axis=0, dtype=np.int16)
+    inner = np.zeros((height, width), dtype=bool)
+    inner[EDGE:-EDGE, EDGE:-EDGE] = True
+    for area in scene.kept:
+        inner &= ~image_first.area_mask(inner.shape, area, scene.cell)
+    found = []
+    for layer, solid in zip(scene.layers, solids, strict=True):
+        ys, xs = np.nonzero(solid)
+        if not len(ys) or layer.open_work:
+            continue
+        y0, y1 = max(0, ys.min() - 2 * band), min(height, ys.max() + 1 + 2 * band)
+        x0, x1 = max(0, xs.min() - 2 * band), min(width, xs.max() + 1 + 2 * band)
+        piece, lines = solid[y0:y1, x0:x1], dark[y0:y1, x0:x1]
+        outside = image_first.outside_of(piece, lines, band)
+        given = image_first.outside_of(piece, lines, band, same[y0:y1, x0:x1])
+        behind = behind_cells(scene, foot_of(layer), (x0, y0, x1, y1)) & inner[y0:y1, x0:x1]
+        others = (count[y0:y1, x0:x1] - piece) > 0
+        fringe = piece & given & behind
+        bare = lines & image_first.dilated(piece, reach) & ~piece & ~outside & ~others & behind
+        found += by_cell("fringe", layer.name, fringe, scene.cell, y0, left=x0)
+        found += by_cell("bare", layer.name, bare, scene.cell, y0, left=x0)
+    return found
+
+
+#: How far from the scene's edge, in the page's pixels, a cut-out's edge is looked at: a
+#: painting's outermost pixels are left out (margin.TRIM), and a cut-out fades out
+#: before them (export_scene.EDGE_FEATHER).
+EDGE = 12
+#: How many pixels of one thing cut across a row's edge, over a figure, are a spill
+#: (D94): a tenth of a cell's width.
+SPILL = 0.1
+
+
+def spills(scene: Scene, seen: Differs) -> list[Problem]:
+    """One thing drawn partly in front of a figure and partly behind it (D94): over
+    the wizard on a cell walked on, an image drawn in front of it meets one drawn
+    behind it with no outline between them, so that the two are one thing cut
+    across a row's edge, the figure standing inside it. The problem is the cell the
+    wizard stands on."""
+    frame, foot = figure()
+    tall, wide = frame.shape[:2]
+    shape = image_first.dilated(frame[..., 3] > 128, 2)
+    height, width = scene.rows * scene.cell, scene.columns * scene.cell
+    dark = image_first.dark_lines(seen.painting[:height, :width], scene.thresholds)
+    found = []
+    for y, x in zip(*np.nonzero(scene.walked), strict=True):
+        left = int((x + 0.5) * scene.cell) - wide // 2
+        bottom = int((y + FOOT_IN_CELL) * scene.cell) + foot
+        top = bottom - tall
+        if top < 0 or bottom > height or left < 0 or left + wide > width:
+            continue
+        here = y + FOOT_IN_CELL + 0.0005
+        front = np.zeros((tall, wide), dtype=bool)
+        back = np.zeros_like(front)
+        names = set()
+        for layer in scene.layers:
+            solid = window(layer, left, top, left + wide, bottom)[..., 3] > 128
+            if not solid.any():
+                continue
+            if layer.depth > here:
+                front |= solid
+                names.add(layer.name)
+            else:
+                back |= solid
+        lines = dark[top:bottom, left : left + wide]
+        back &= ~front & ~lines
+        contact = front & ~lines & image_first.dilated(back, 1) & shape
+        pixels = int(contact.sum())
+        if pixels >= SPILL * scene.cell:
+            found.append(Problem("spill", (int(x), int(y)), ", ".join(sorted(names)), pixels))
+    return found
+
+
 def problems(scene: Scene, covered: list[Covered] | None = None) -> list[Problem]:
     """The problems a figure would show: none on a cell where the wizard is hidden,
     nor over the cell above it, where its hat is."""
@@ -407,7 +558,10 @@ def problems(scene: Scene, covered: list[Covered] | None = None) -> list[Problem
     found = floating(scene)
     seen = differs(scene)
     if seen is not None:
-        found += lawn(scene, seen) + holes(scene, seen)
+        found += lawn(scene, seen) + holes(scene, seen) + edges(scene, seen) + spills(scene, seen)
+
+    if scene.checks is not None:
+        found = [problem for problem in found if problem.kind in scene.checks]
 
     def shown(problem: Problem) -> bool:
         x, y = problem.cell

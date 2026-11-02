@@ -446,6 +446,92 @@ def test_a_mask_keeps_its_large_pieces_and_drops_the_scraps():
     assert kept[20, 20] and not kept[71, 71]
 
 
+def drawn_disc(size: int = 120, radius: int = 34, line: int = 5) -> np.ndarray:
+    """A painted thing as Kydux's art draws it: a brown disc with a dark outline all
+    round, on lit grass."""
+    yy, xx = np.mgrid[:size, :size]
+    distance = np.hypot(yy - size / 2, xx - size / 2)
+    picture = np.zeros((size, size, 3), dtype=np.uint8)
+    picture[:] = (150, 200, 70)
+    picture[distance < radius + line] = (20, 15, 10)
+    picture[distance < radius] = (130, 80, 40)
+    return picture
+
+
+def test_a_mask_s_edge_is_moved_onto_its_thing_s_outline():
+    picture = drawn_disc()
+    yy, xx = np.mgrid[:120, :120]
+    distance = np.hypot(yy - 60, xx - 60)
+    thing = distance < 39
+    # Too far on the left, onto the grass; too short on the right, the outline left out.
+    rough = (distance < 33) | ((distance < 46) & (xx < 60))
+    edged = image_first.snapped(rough, picture, 96)
+    assert not (edged & ~thing).any()
+    assert (edged & thing).sum() >= 0.99 * thing.sum()
+
+
+def swept(painting: np.ndarray, walked: np.ndarray, layers: list) -> tuple:
+    """A drawn scene for the sweep: its painting, the cells walked on, its layers."""
+    rows, columns = walked.shape
+    rgba = np.dstack([painting, np.full(painting.shape[:2], 255, dtype=np.uint8)])
+    scene = sweep.Scene("drawn", 96, columns, rows, walked, rgba, layers)
+    still = np.zeros(painting.shape[:2], dtype=bool)
+    ground = np.zeros_like(painting)
+    ground[:] = (150, 200, 70)
+    return scene, sweep.Differs(still, still, painting, ground)
+
+
+def layer_of(painting: np.ndarray, mask: np.ndarray, row: int) -> "sweep.Layer":
+    """A row's image: the painting where the mask is, as the export cuts one."""
+    rgba = np.dstack([painting, mask.astype(np.uint8) * 255])
+    return sweep.Layer(f"row {row}", row + 0.75, row, rgba, 0, 0)
+
+
+def test_the_sweep_finds_a_cut_out_s_edge_off_its_outline():
+    painting = np.zeros((288, 288, 3), dtype=np.uint8)
+    painting[:] = (150, 200, 70)
+    yy, xx = np.mgrid[:288, :288]
+    distance = np.hypot(yy - 150, xx - 144)
+    painting[distance < 60] = (20, 15, 10)
+    painting[distance < 54] = (130, 80, 40)
+    walked = np.zeros((3, 3), dtype=bool)
+    walked[1, 0] = True
+    # A rock standing on row 2, a figure behind it on the cell to its left: its
+    # mask runs onto the grass there.
+    rough = (distance < 60) | ((xx > 60) & (xx < 96) & (yy > 110) & (yy < 190))
+    scene, seen = swept(painting, walked, [layer_of(painting, rough, 2)])
+    assert {(p.kind, p.cell) for p in sweep.edges(scene, seen)} == {("fringe", (0, 1))}
+    exact = layer_of(painting, distance < 60, 2)
+    scene, seen = swept(painting, walked, [exact])
+    assert not sweep.edges(scene, seen)
+    # Its outline left out on the left, under the figure.
+    short = layer_of(painting, (distance < 60) & (xx > 92), 2)
+    scene, seen = swept(painting, walked, [short])
+    assert ("bare", (0, 1)) in {(p.kind, p.cell) for p in sweep.edges(scene, seen)}
+
+
+def test_the_sweep_finds_a_thing_cut_across_a_row_round_a_figure():
+    painting = np.zeros((288, 288, 3), dtype=np.uint8)
+    painting[:] = (150, 200, 70)
+    # A rock from the middle of row 0 to the middle of row 1, outlined, its parts
+    # given two rows: what is in row 1 the row below's, in front of the figure.
+    painting[40:150, 100:200] = (20, 15, 10)
+    painting[46:144, 106:194] = (130, 80, 40)
+    walked = np.zeros((3, 3), dtype=bool)
+    walked[1, 1] = True
+    top = np.zeros((288, 288), dtype=bool)
+    top[40:96, 100:200] = True
+    bottom = np.zeros_like(top)
+    bottom[96:150, 100:200] = True
+    layers = [layer_of(painting, top, 0), layer_of(painting, bottom, 2)]
+    scene, seen = swept(painting, walked, layers)
+    assert [(p.kind, p.cell) for p in sweep.spills(scene, seen)] == [("spill", (1, 1))]
+    # Cut on its outline, the bottom part a thing of its own, there is none.
+    painting[94:98, 100:200] = (20, 15, 10)
+    scene, seen = swept(painting, walked, layers)
+    assert not sweep.spills(scene, seen)
+
+
 def test_a_solid_thing_s_mask_has_its_holes_filled():
     mask = np.zeros((60, 60), dtype=bool)
     mask[10:50, 10:50] = True

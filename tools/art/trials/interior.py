@@ -181,7 +181,9 @@ def build(source: Path, out: Path) -> Path:
                 if picture == "painting"
                 else np.array(Image.open(source / picture).convert("RGB"))
             )
-            alpha = export_scene.sprite_alpha(shown, without, native, thing)
+            alpha = export_scene.sprite_alpha(
+                shown, without, native, thing, round(grid["x"]["spacing"])
+            )
             rgba = np.dstack([shown, (alpha * 255).astype(np.uint8)])
             sprite = export_scene.aligned_rgba(rgba, grid, columns, rows)[
                 box[1] : box[3], box[0] : box[2]

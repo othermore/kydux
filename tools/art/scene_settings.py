@@ -26,7 +26,12 @@ class Settings:
     painting itself, None for nothing drawn), with `hull`, `reach`, `largest`,
     `whole_box` and `rune` where it needs them. A patch of the ground is a box in
     the page's pixels (x0, y0, x1, y1), filled from the band of the same height
-    right above it, faded into it: where an edit without a thing left a trace of it."""
+    right above it, faded into it: where an edit without a thing left a trace of it.
+    What the cut is told of the painting where it asks it (D93, D94): `grounds`,
+    the parts given back to the ground; `kept`, the parts whose things stay whole
+    whatever the ground beside them; `rows`, the parts whose things stand on a
+    row; each a box or a polygon in cells. `checks`, when given, are the kinds of
+    problem the sweep holds the scene to."""
 
     id: str
     data: dict

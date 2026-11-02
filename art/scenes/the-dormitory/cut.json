@@ -234,5 +234,10 @@
       ],
       "cover": "bed_8_cover"
     }
-  }
+  },
+  "checks": [
+    "floating",
+    "lawn",
+    "hole"
+  ]
 }

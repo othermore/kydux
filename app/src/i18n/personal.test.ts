@@ -27,7 +27,7 @@ describe('personal', () => {
   });
 
   it('takes the first side, and the word given, when there is no wizard', () => {
-    expect(personal('Hola, {wizard}: {el mago|la maga}', null, 'aprendiz')).toBe('Hola, aprendiz: el mago');
+    expect(personal('Hola, {wizard}: {el mago|la maga}', null, 'Kydux')).toBe('Hola, Kydux: el mago');
   });
 
   it('leaves a parameter and a Python set as they are', () => {

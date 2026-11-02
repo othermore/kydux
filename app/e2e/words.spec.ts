@@ -61,5 +61,5 @@ test('a story greets the wizard by name, and the friend is of the other gender (
 test('with no wizard yet, a story says the word for one', async ({ page }) => {
   await page.goto('/#story/at-the-gate');
   await storyNext(page, 4);
-  await expect(storySaid(page)).toContainText('I am apprentice.');
+  await expect(storySaid(page)).toContainText('I am Kydux.');
 });

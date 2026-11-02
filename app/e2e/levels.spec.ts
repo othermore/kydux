@@ -86,7 +86,7 @@ test.describe('the hidden key', () => {
 
   test('the key opens it, and the goals tick in order with the bonus', async ({ page }) => {
     const said = await run(page, readFileSync(`${CONTENT}levels/the-hidden-key/solution.py`, 'utf8'));
-    expect(said).toBe('You did it, apprentice!');
+    expect(said).toBe('You did it, Kydux!');
     await expect(scene(page)).toHaveAttribute('data-carried', 'key,wand');
     await expect(scene(page)).toHaveAttribute('data-doors', 'door');
     await expect(scene(page)).toHaveAttribute('data-wizard', '7,6');
@@ -120,7 +120,7 @@ test.describe('past the teacher', () => {
 
   test('waiting while the teacher looks this way, then crossing, wins', async ({ page }) => {
     const said = await run(page, 'while dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
-    expect(said).toBe('You did it, apprentice!');
+    expect(said).toBe('You did it, Kydux!');
     await expect(scene(page)).toHaveAttribute('data-wizard', '2,4');
   });
 });
@@ -334,7 +334,7 @@ test.describe('a level played two ways (D51)', () => {
 
   test('with if, the same program wins every way', async ({ page }) => {
     await run(page, 'if dask.facing == "left":\n    wizard.wait()\nwizard.move_down(2)');
-    await expect(page.locator('.outcome-text')).toHaveText('You did it, apprentice! In every way!');
+    await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux! In every way!');
     await expect(page.locator('.win-card')).toBeVisible();
   });
 });

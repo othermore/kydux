@@ -338,13 +338,28 @@ describe('RunController with ways (D51)', () => {
 });
 
 
-/** A scene that shows the level starting again, done when the test says (D75). */
+/** A scene that shows the level starting again, done when the test says (D75): it
+ * calls `ready` once it is out of sight (D121), and keeps the loads and the plays. */
 class RestartingScene extends FakeScene {
   shows = 0;
   finish: (() => void) | null = null;
-  restartShow(): Promise<void> {
+  ready: Promise<void> | null = null;
+  loaded: (string | null)[] = [];
+  played = 0;
+  constructor() {
+    super();
+    this.playback.onState((state) => {
+      if (state === 'playing') this.played += 1;
+    });
+  }
+  override load(world: WorldResult, way: string | null = null): void {
+    this.loaded.push(way);
+    super.load(world);
+  }
+  restartShow(ready: () => Promise<void> = () => Promise.resolve()): Promise<void> {
     this.shows += 1;
     this.playback.reset();
+    this.ready = ready();
     return new Promise((resolve) => {
       this.finish = resolve;
     });
@@ -368,6 +383,39 @@ describe('RunController, the level starting again (D75)', () => {
     scene.finish?.();
     await vi.waitFor(() => expect(controller.snapshot.state).toBe('playing'));
     expect(controller.snapshot.restarting).toBe(false);
+  });
+
+  it("takes the way's places while the scene is out of sight, and plays after (D121)", async () => {
+    const runtime = new FakeRuntime();
+    const scene = new RestartingScene();
+    const controller = new RunController({ runtime, level: LEVEL, speed: 1 });
+    controller.attach(scene);
+    controller.run('wizard.move_right(6)');
+    expect(scene.loaded).toEqual([]);
+    const open = { ...world('won', moves(6), 6), id: 'open' };
+    const locked = { ...world('incomplete', moves(2), null), id: 'locked' };
+    runtime.answer({ ...locked, status: 'incomplete', way: 'locked', ways: [open, locked] });
+    await scene.ready;
+    // Loaded with its way before the scene is back, and not played yet.
+    expect(scene.loaded).toEqual(['locked']);
+    expect(scene.played).toBe(0);
+    scene.finish?.();
+    await vi.waitFor(() => expect(controller.snapshot.state).toBe('playing'));
+    expect(scene.loaded).toEqual(['locked']);
+    expect(scene.played).toBe(1);
+  });
+
+  it('comes back after a run that gives no world', async () => {
+    const runtime = new FakeRuntime();
+    const scene = new RestartingScene();
+    const controller = new RunController({ runtime, level: LEVEL, speed: 1 });
+    controller.attach(scene);
+    controller.run('while True: pass');
+    runtime.answer(undefined, 'interrupted');
+    await scene.ready;
+    expect(scene.loaded).toEqual([]);
+    scene.finish?.();
+    await vi.waitFor(() => expect(controller.snapshot.outcome).not.toBeNull());
   });
 
   it('shows it on Restart too', () => {

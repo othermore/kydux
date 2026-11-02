@@ -125,9 +125,10 @@ export interface SceneHandle {
    * whose places the restart uses. */
   load(result: WorldResult, way?: string | null): void;
   reset(): void;
-  /** Shows the level starting again: the scene fades, everything is put back, and
-   * it comes back; resolves once it is shown (D75). */
-  restartShow(): Promise<void>;
+  /** Shows the level starting again: the scene fades, everything is put back,
+   * `ready` is called and awaited while nothing is seen, and it comes back;
+   * resolves once it is shown (D75, D121). */
+  restartShow(ready?: () => Promise<void>): Promise<void>;
   /** The camera back on the wizard, following it (12.6). */
   follow(): void;
   /** Zooms the camera one step in (1) or out (-1); false when it can go no further. */
@@ -167,6 +168,8 @@ interface ActorState {
 class LevelScene extends Phaser.Scene {
   private wizard!: Phaser.GameObjects.Sprite;
   private wizardTile: Tile = [0, 0];
+  /** Counts the showings of the level starting again, so that only the last fades in. */
+  private showing = 0;
   private things = new Map<string, Phaser.GameObjects.Image>();
   private doors = new Map<string, Tile>();
   private openDoors = new Set<string>();
@@ -546,13 +549,23 @@ class LevelScene extends Phaser.Scene {
 
   /** The level starting again, seen: a fade to the frame's colour, everything put
    * back while it is out, and a fade back in (D75). */
-  restartShow(): Promise<void> {
+  restartShow(ready: () => Promise<void> = () => Promise.resolve()): Promise<void> {
     const camera = this.cameras.main;
+    const showing = ++this.showing;
     this.parentNode.dataset.restarting = 'true';
     return new Promise((resolve) => {
       camera.once('camerafadeoutcomplete', () => {
         this.playback.reset();
-        this.time.delayedCall(RESTART_HOLD_MS, () => {
+        const held = new Promise<void>((done) => {
+          this.time.delayedCall(RESTART_HOLD_MS, () => done());
+        });
+        // Out of sight until what is to be shown is in place (D121); a showing asked
+        // for since fades in for both.
+        void Promise.all([held, ready().catch(() => undefined)]).then(() => {
+          if (showing !== this.showing || !this.sys.isActive()) {
+            resolve();
+            return;
+          }
           camera.once('camerafadeincomplete', () => {
             delete this.parentNode.dataset.restarting;
             resolve();
@@ -1273,8 +1286,8 @@ export async function startScene(
         reset() {
           playback.reset();
         },
-        restartShow() {
-          return scene.restartShow();
+        restartShow(ready) {
+          return scene.restartShow(ready);
         },
         follow() {
           scene.follow();

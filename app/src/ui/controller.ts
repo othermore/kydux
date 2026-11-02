@@ -66,9 +66,10 @@ export interface SceneLike {
   readonly playback: Playback;
   load(world: WorldResult, way?: string | null): void;
   reset(): void;
-  /** Shows the level starting again, everything put back, and resolves once it is
-   * shown (D75); a scene without it is only reset. */
-  restartShow?(): Promise<void>;
+  /** Shows the level starting again: fades out, puts everything back, calls `ready`
+   * and waits for it while nothing is seen, then fades in, and resolves once it is
+   * shown (D75, D121); a scene without it is only reset. */
+  restartShow?(ready?: () => Promise<void>): Promise<void>;
   /** The wizard celebrating a run won: how long it takes, for the outcome to wait
    * for it (14.3); a scene without it shows the outcome at once. */
   celebrate?(): number;
@@ -161,7 +162,10 @@ export class RunController {
       canStop: state === 'running' || state === 'playing',
       canPlay: state === 'paused',
       canSeek:
-        this.world !== null && (this.scene?.playback.length ?? 0) > 0 && state !== 'running',
+        this.world !== null &&
+        (this.scene?.playback.length ?? 0) > 0 &&
+        state !== 'running' &&
+        !this.restarting,
       restarting: this.restarting,
     };
   }
@@ -172,22 +176,27 @@ export class RunController {
     if (scene.playback.state === 'playing') scene.playback.stop();
     this.clear();
     const generation = ++this.generation;
-    // The level starts again on the scene while Python runs; the run plays once
-    // both are done, so that a run is never seen to go on from the one before.
-    const shown = this.startAgain(scene, generation);
-    Promise.all([this.runtime.run(code, this.level.level), shown]).then(
+    const ran = this.runtime.run(code, this.level.level);
+    // The level starts again on the scene while Python runs, and stays out of sight
+    // until the way to show is known and its places are taken (D121); the run plays
+    // once both are done, so that a run is never seen to go on from the one before.
+    const placed = () =>
+      ran.then(
+        (result) => {
+          if (generation === this.generation) this.take(result);
+        },
+        () => undefined,
+      );
+    const shown = this.startAgain(scene, generation, placed);
+    Promise.all([ran, shown]).then(
       ([result]) => {
         if (generation !== this.generation) return;
-        const world = result.world;
-        if (!world) {
+        if (!result.world) {
           this.world = emptyWorld(result.status === 'interrupted' ? 'interrupted' : 'error', result);
           this.finish();
           return;
         }
-        this.result = world;
-        const shown = world.ways?.find((way) => way.id === world.way);
-        this.shownWay = shown?.id ?? null;
-        this.play(shown ?? world);
+        this.start();
       },
       (error: unknown) => {
         if (generation !== this.generation || this.runtime.status === 'failed') return;
@@ -221,22 +230,26 @@ export class RunController {
 
   restart(): void {
     this.generation += 1;
-    if (this.scene) void this.startAgain(this.scene, this.generation);
+    if (this.scene) void this.startAgain(this.scene, this.generation, () => Promise.resolve());
     this.clear();
     this.changed();
   }
 
-  /** The scene put back where the level starts, shown as it is done (D75): no run
-   * starts while it is shown, and a showing from a run or restart since is left
-   * to the later one. */
-  private startAgain(scene: SceneLike, generation: number): Promise<void> {
+  /** The scene put back where the level starts, shown as it is done (D75), `ready`
+   * awaited while it is out of sight (D121): no run starts while it is shown, and a
+   * showing from a run or restart since is left to the later one. */
+  private startAgain(
+    scene: SceneLike,
+    generation: number,
+    ready: () => Promise<void>,
+  ): Promise<void> {
     if (!scene.restartShow) {
       scene.reset();
-      return Promise.resolve();
+      return ready();
     }
     this.restarting = true;
     this.changed();
-    return scene.restartShow().then(() => {
+    return scene.restartShow(ready).then(() => {
       if (generation !== this.generation) return;
       this.restarting = false;
       this.changed();
@@ -250,16 +263,36 @@ export class RunController {
     this.changed();
   }
 
-  /** Loads a world into the scene and plays it from the start. */
-  private play(world: WorldResult | WayResult): void {
-    const scene = this.scene;
-    if (!scene) return;
+  /** A run's result kept, and the world to show loaded into the scene, its way's
+   * places taken (D51, D121). */
+  private take(result: RunResult): void {
+    const world = result.world;
+    if (!world) return;
+    this.result = world;
+    const shown = world.ways?.find((way) => way.id === world.way);
+    this.shownWay = shown?.id ?? null;
+    this.load(shown ?? world);
+  }
+
+  private load(world: WorldResult | WayResult): void {
     this.world = world as WorldResult;
-    scene.load(this.world, this.shownWay);
+    this.scene?.load(this.world, this.shownWay);
+  }
+
+  /** Plays the world loaded from its start. */
+  private start(): void {
+    const scene = this.scene;
+    if (!scene || !this.world) return;
     scene.playback.setSpeed(this.speed);
-    if (world.events.length === 0) this.finish();
+    if (this.world.events.length === 0) this.finish();
     else scene.playback.play();
     this.changed();
+  }
+
+  /** Loads a world into the scene and plays it from the start. */
+  private play(world: WorldResult | WayResult): void {
+    this.load(world);
+    this.start();
   }
 
   /** Goes on from where a seek left the playback. */

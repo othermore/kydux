@@ -10,7 +10,7 @@ afterEach(() => initLanguage(english));
 describe('outcomeText', () => {
   it('says each outcome in English', () => {
     initLanguage(english);
-    expect(outcomeText({ kind: 'won' })).toBe('You did it, apprentice!');
+    expect(outcomeText({ kind: 'won' })).toBe('You did it, Kydux!');
     expect(outcomeText({ kind: 'incomplete', met: 0, total: 1 })).toBe(
       'Not yet: 0 of 1 goals met. Try again.',
     );
@@ -38,7 +38,7 @@ describe('outcomeText', () => {
 
   it('says it in Spanish', () => {
     initLanguage(spanish);
-    expect(outcomeText({ kind: 'won' })).toBe('¡Lo has conseguido, aprendiz!');
+    expect(outcomeText({ kind: 'won' })).toBe('¡Lo has conseguido, Kydux!');
     expect(outcomeText({ kind: 'incomplete', met: 1, total: 2 })).toBe(
       'Todavía no: 1 de 2 objetivos cumplidos. Inténtalo otra vez.',
     );
@@ -83,7 +83,7 @@ describe('an error explained', () => {
     expect(outcomeText({ kind: 'caught', way: 'away' }, name)).toBe(
       'In the way “Dask looks away”: The teacher saw you! Try again, and watch which way they look.',
     );
-    expect(outcomeText({ kind: 'won', way: 'away' }, name)).toBe('You did it, apprentice! In every way!');
+    expect(outcomeText({ kind: 'won', way: 'away' }, name)).toBe('You did it, Kydux! In every way!');
     expect(outcomeText({ kind: 'way_won', way: 'away' }, name)).toContain('Not every way yet');
   });
 });

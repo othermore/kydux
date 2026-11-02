@@ -6,6 +6,7 @@ import {
   importProgress,
   LocalProgressStore,
   PROGRESS_VERSION,
+  readProgress,
   readWizard,
   wizardName,
 } from './store';
@@ -71,6 +72,12 @@ describe('LocalProgressStore', () => {
     expect(read.levels.c).toEqual({});
     expect(read.started).toEqual(['a']);
     expect(read.current).toBeNull();
+  });
+
+  it('keeps a story as the item last opened, as a lesson and a level (D122)', () => {
+    for (const item of ['story:the-morning', 'lesson:the-distance', 'level:the-gate']) {
+      expect(readProgress({ version: PROGRESS_VERSION, current: item })?.current).toBe(item);
+    }
   });
 
   it('keeps the document in memory for the visit when storage throws', () => {

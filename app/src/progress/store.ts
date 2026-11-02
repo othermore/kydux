@@ -66,7 +66,9 @@ export const SPLIT_MAX = 0.75;
 export const DEFAULT_SETTINGS: Settings = { speed: 1, fontSize: 17, split: 0.6, sound: true };
 /** The most stars a level gives; the map draws that many. */
 export const MAX_STARS = 3;
-const ITEM = /^(lesson|level):[a-z0-9][a-z0-9-]*$/;
+/** An item of the course that can be the one last opened: a lesson, a level or a
+ * story (D122). */
+const ITEM = /^(lesson|level|story):[a-z0-9][a-z0-9-]*$/;
 
 function isCount(value: unknown, most = Number.POSITIVE_INFINITY): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= most;

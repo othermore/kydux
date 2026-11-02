@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
+import { seedWizard } from './helpers';
 
 test.use({ locale: 'en-US' });
 
@@ -105,4 +106,25 @@ test('with ?debug every stop opens and is named, for a tester to go straight to 
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeVisible({ timeout: 90_000 });
   await expect(page.locator('#debug-solution')).toHaveCount(0);
+});
+
+test('opened by itself, the map opens at the item last opened, marked (D122)', async ({ page }) => {
+  await seedWizard(page);
+  // A story opened is the item last opened, as a lesson and a level are.
+  await page.goto('/#story/the-morning');
+  await expect(page.locator('#scene')).toBeVisible();
+  await page.goto('/#map');
+  const here = page.locator('.stop[data-here="true"]');
+  await expect(here).toHaveAttribute('data-item', 'story:the-morning');
+  await expect(here).toBeInViewport();
+  await page.goto('/#lesson/the-distance');
+  await expect(page.locator('.lesson-page h1')).toBeVisible();
+  await page.goto('/#map');
+  await expect(here).toHaveAttribute('data-item', 'lesson:the-distance');
+  await expect(here).toBeInViewport();
+  // From the start screen too.
+  await page.goto('/#');
+  await page.locator('#map-link').click();
+  await expect(here).toHaveAttribute('data-item', 'lesson:the-distance');
+  await expect(here).toBeInViewport();
 });

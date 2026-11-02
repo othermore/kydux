@@ -55,7 +55,7 @@ test.describe('in English', () => {
     await page.locator('#run').click();
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(1);
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'met', { timeout: 10_000 });
-    await expect(outcome(page)).toHaveText('You did it, apprentice!');
+    await expect(outcome(page)).toHaveText('You did it, Kydux!');
     await expect(scene(page)).toHaveAttribute('data-wizard', '12,25');
     await expect(scene(page)).toHaveAttribute('data-state', 'done');
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(0);
@@ -94,7 +94,7 @@ test.describe('in English', () => {
     await waitReady(page, 30_000);
     await setCode(page, 'wizard.move_right(8)');
     await run(page);
-    await expect(outcome(page)).toHaveText('You did it, apprentice!');
+    await expect(outcome(page)).toHaveText('You did it, Kydux!');
   });
 
   test('Restart puts the wizard back at the start', async ({ page }) => {
@@ -109,7 +109,7 @@ test.describe('in English', () => {
   test('Ctrl-Enter runs the program from the editor', async ({ page }) => {
     await setCode(page, 'wizard.move_right(8)');
     await page.keyboard.press('ControlOrMeta+Enter');
-    await expect(outcome(page)).toHaveText('You did it, apprentice!', { timeout: 30_000 });
+    await expect(outcome(page)).toHaveText('You did it, Kydux!', { timeout: 30_000 });
   });
 });
 

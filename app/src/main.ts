@@ -265,7 +265,8 @@ async function showMap(content: HTMLElement): Promise<void> {
   document.title = t('map.title_page');
   const [parts, { mapScreen }] = await Promise.all([mapParts(), import('./ui/map')]);
   if (shownRoute !== 'map') return;
-  show(content, mapScreen(parts));
+  // Opened by itself, the map opens at the item last opened, marked (D122).
+  show(content, mapScreen({ ...parts, here: parts.progress.current ?? undefined }));
 }
 
 /** The last lesson before a level in the course, which the level offers to read again. */

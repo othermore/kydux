@@ -620,8 +620,8 @@ one overturns stays, marked as superseded.
   must never be read for a choice. Braces with no bar, or with more than
   one, are left alone, so `t()`'s `{name}` and a Python set survive. With
   no wizard, which only a developer's direct address brings about, the
-  first side is taken and `{wizard}` is `wizard.no_name` (*apprentice*,
-  *aprendiz*: a word with no gender in either language).
+  first side is taken and `{wizard}` is `wizard.no_name`, *Kydux* in
+  every language, the creator's default name (D119).
   `tools/i18n_check.py` refuses a choice with other than two sides in any
   text for the player, and, in Spanish, `mago` or `maga` outside a choice;
   the world's tests run every level's starting code and every lesson's Try

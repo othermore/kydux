@@ -56,6 +56,23 @@ test('the camera never zooms out past a scene that does not fill the frame', asy
   await expect(page.locator('#zoom-out')).toBeDisabled();
 });
 
+test('on a window wider than a painted scene, the camera zooms in until the painting fills it (D92)', async ({
+  page,
+}) => {
+  // The library is fifteen cells wide and three more on each side; a window this
+  // wide shows more than twenty-one across at the zoom of fifteen by nine.
+  await page.setViewportSize({ width: 1900, height: 650 });
+  await page.goto('/#story/at-the-library');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  await expect(scene).toHaveAttribute('data-bounds', '21.00×24.00');
+  const [width, height] = ((await scene.getAttribute('data-view')) ?? '').split('×').map(Number);
+  expect(width).toBeLessThanOrEqual(21.01);
+  expect(height).toBeLessThanOrEqual(24.01);
+  expect(width).toBeGreaterThan(20.9);
+  await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/library-wide.png' });
+});
+
 test('a shaky press does not let go of the wizard; Find my wizard brings the camera back (12.6)', async ({
   page,
 }) => {

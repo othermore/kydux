@@ -103,7 +103,9 @@ def canvas(settings: scene_settings.Settings) -> Path:
 def laid(settings: scene_settings.Settings, picture: Image.Image) -> tuple[np.ndarray, float]:
     """The model's picture scaled and moved onto the canvas: the affine, from a
     first guess by the sizes, that gives the least difference with the painting
-    over its inside, searched at a quarter of the size; and that difference."""
+    over its inside, searched at a quarter of the size; and that difference. Where
+    the picture laid so falls short of the canvas's edge, its own outermost
+    painted pixels are stretched out to it (`filled`)."""
     _, width, height, ox, oy = placed(settings)
     painting = Image.open(settings.painting).convert("RGB")
     quarter = 4
@@ -134,7 +136,31 @@ def laid(settings: scene_settings.Settings, picture: Image.Image) -> tuple[np.nd
     sx, sy, tx, ty = best_p
     affine = (sx, 0, tx, 0, sy, ty)
     whole = picture.transform((width, height), Image.AFFINE, affine, Image.BILINEAR)
-    return np.array(whole), best
+    seen = Image.new("L", picture.size, 255).transform((width, height), Image.AFFINE, affine)
+    return filled(np.array(whole), np.array(seen) == 255), best
+
+
+def filled(picture: np.ndarray, seen: np.ndarray) -> np.ndarray:
+    """The picture with what lies outside `seen` taken from the nearest seen pixel
+    along its row, then along its column: a band the model did not paint, at the
+    canvas's edge, carries on the colours beside it."""
+    out = picture.copy()
+    for axis in (1, 0):
+        if seen.all():
+            break
+        size = seen.shape[axis]
+        line = np.arange(size).reshape((1, size) if axis == 1 else (size, 1))
+        # The nearest seen pixel at or before each, else at or after it.
+        before = np.maximum.accumulate(np.where(seen, line, -1), axis=axis)
+        after = np.maximum.accumulate(np.where(np.flip(seen, axis=axis), line, -1), axis=axis)
+        after = np.flip(np.where(after >= 0, size - 1 - after, -1), axis=axis)
+        nearest = np.where(before >= 0, before, after)
+        rows, columns = np.indices(seen.shape)
+        own = columns if axis == 1 else rows
+        index = np.where(nearest >= 0, nearest, own)
+        out = out[rows, index] if axis == 1 else out[index, columns]
+        seen = nearest >= 0
+    return out
 
 
 def seam(settings: scene_settings.Settings, whole: np.ndarray) -> list[tuple[str, int, float]]:

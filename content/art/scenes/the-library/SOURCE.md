@@ -11,6 +11,11 @@ later, like the rest of it.
   `tools/art/repaint.py`, the painting kept pixel for pixel elsewhere: the
   castle's corridor below the double door, plain pillars in the corners,
   plain wall beside the door.
+- Its sides painted on by Gemini from `image-first-library-margin.md`, three
+  cells on each side, on a canvas made and joined by `tools/art/margin.py`:
+  the castle's walls going on, and grass and trees beyond them.
+- Its door arches drawn over whoever passes under them, cut by their pale
+  stone (static things).
 - Each thing that opens or is picked up cut against Gemini's edit without it
   (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`,
   `-partition-open.md`, `-centre-open.md`, `-room-open.md`); Eldra's own book

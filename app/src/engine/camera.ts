@@ -5,8 +5,9 @@
 // and the wheel and drags it to look around, which lets go of the wizard until the
 // next run. In a story (D74) it is a window that keeps whoever each step is about,
 // with their words, inside it, gliding only when they push past its edge, and
-// never jumping. It says data-zoom (the zoom's step) and data-following on the
-// scene's parent.
+// never jumping. It says data-zoom (the zoom's step), data-following, and
+// data-view and data-bounds (the window and the scene with its margin, in tiles
+// across and down, "w×h") on the scene's parent.
 
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
@@ -29,6 +30,9 @@ export interface CameraParts {
   columns: number;
   rows: number;
   margin: [number, number, number, number];
+  /** Whether the scene is painted: then the window never reaches past the painting
+   * and its margin, however wide the canvas (D92). */
+  painted: boolean;
   /** In a story, the point the camera is on before any step. */
   story: { x: number; y: number } | null;
   wizard: () => Phaser.GameObjects.Sprite;
@@ -177,12 +181,18 @@ export class SceneCamera {
   /** How far the camera is zoomed at the zoom step 1: the window, VIEW_TILES of the
    * scene or the whole of a small one, fitted to the canvas, which takes the
    * frame's shape; the other way the canvas shows more of the scene, so that no
-   * band of the frame's colour is left beside it. */
+   * band of the frame's colour is left beside it. On a painted scene the zoom
+   * goes no lower than the painting and its margin fill the canvas (D92). */
   private fit(): number {
     const { width, height } = this.scene.scale.gameSize;
-    const shownX = Math.min(this.parts.columns, VIEW_TILES[0]) * TILE;
-    const shownY = Math.min(this.parts.rows, VIEW_TILES[1]) * TILE;
-    return Math.max(0.01, Math.min(width / shownX, height / shownY));
+    const { columns, rows, margin } = this.parts;
+    const shownX = Math.min(columns, VIEW_TILES[0]) * TILE;
+    const shownY = Math.min(rows, VIEW_TILES[1]) * TILE;
+    const fitted = Math.min(width / shownX, height / shownY);
+    if (!this.parts.painted) return Math.max(0.01, fitted);
+    const [left, top, right, bottom] = margin;
+    const floor = Math.max(width / ((columns + left + right) * TILE), height / ((rows + top + bottom) * TILE));
+    return Math.max(0.01, fitted, floor);
   }
 
   /** The camera at the zoom step, fitted to the canvas; data-zoom is the step's.
@@ -193,6 +203,11 @@ export class SceneCamera {
     const step = ZOOMS[this.zoomStep] ?? 1;
     this.camera.setZoom(this.fit() * step);
     this.parent.dataset.zoom = String(step);
+    const camera = this.camera;
+    const bounds = camera.getBounds();
+    const tiles = (width: number, height: number) => `${(width / TILE).toFixed(2)}×${(height / TILE).toFixed(2)}`;
+    this.parent.dataset.view = tiles(camera.width / camera.zoom, camera.height / camera.zoom);
+    this.parent.dataset.bounds = tiles(bounds.width, bounds.height);
   }
 
   /** Whether the window, at a zoom step, lies within the scene and its margin. */

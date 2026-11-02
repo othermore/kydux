@@ -437,6 +437,7 @@ class LevelScene extends Phaser.Scene {
       columns: this.map.width,
       rows: this.map.height,
       margin: marginOf(this.art),
+      painted: this.art !== null,
       story: story ? { x: centre(story.camera)[0], y: centre(story.camera)[1] } : null,
       wizard: () => this.wizard,
       around: (figure) => this.speech.around(figure),

@@ -1332,3 +1332,61 @@ one overturns stays, marked as superseded.
   `cut.json`'s `repaint`. Rules out an edit of the whole picture to fix its
   edge: an edit paints the whole picture again, and once removed the
   library's reading room.
+- **D89 — Indoors, what a figure passes under or behind is cut as a static
+  thing.** Decided 2026-10-26 by the owner, from the check sheets of
+  sprint 15. A raised part of an indoor painting that never changes (an
+  arch a figure walks through, a wall's top, a bed's quilt) is a static
+  thing in `cut.json`: `"static": true`, its box and the row it covers
+  from, and its mask: `"pale"`, the light stone or plaster inside the box
+  with its dark outline; `"box"`, the whole box; or the difference with a
+  `without` edit. The static things of a row are an image of their own,
+  `row-<r>-static`, beside the row's cut things, drawn at the row's depth;
+  the sweep leaves them out of its floating, lawn and hole checks, which
+  are for what the cut makes. A scene with `"cut": false` is its ground and
+  its static things only. What no figure stands beside or behind stays
+  ground, its cells not walked on; an opening narrower than a figure stays
+  ground. The sweep's `all-<scene>.png`, the wizard on every walked-on
+  cell, is the proof. Rules out an indoor scene with no cut-outs, and a
+  Gemini edit a wall: a pale mask needs no picture and keeps the painting
+  as chosen (D88).
+- **D90 — A friend never wears the wizard's colours, nor the other
+  friend's.** Decided 2026-10-26 by the owner. Nuri and Teku each have two
+  sets of colours, robe, hat and band (`FRIEND_SETS` in `looks.ts`): Nuri
+  green or burgundy, Teku orange or navy. For a look, `friendSets` takes,
+  of the four pairings, the one whose three robes, the wizard's and the
+  two friends', stand farthest apart as seen (CIELAB's ΔE), the closest
+  two counting; it depends on the look alone, so a friend wears the same
+  colours all the game. `tools/art/figures.py` draws a sheet a set,
+  `<friend>-a` and `<friend>-b`, and `figureName` picks it. Rules out a
+  single colour a friend, which with eight looks always meets one of them,
+  and a rule by hue: no saturated colour is far in hue from all eight.
+- **D91 — A pupil asleep lies in the bed, under its quilt.** Decided
+  2026-10-26 by the owner, for the wizard and the friends alike. Every
+  wizard sheet has a lying row (13) and each friend's sheet one (4, named
+  in figures.json's `sheets`), made from Gemini's edits of the boy's, the
+  girl's and each friend's standing frame. A scene's beds are its fixed
+  things; `cut.json` gives each bed its quilt, a static box thing, and its
+  pillow's point, which art.json's `beds` carry with the pillow's side and
+  the quilt's row. The page draws a sleeper's lying frame turned along the
+  bed, the head on the pillow, just under the quilt's row, so that the
+  quilt covers the body; while the wizard lies under it, its outline is
+  off. The wizard lies down by `wizard.sleep()`; an actor of a level or a
+  story starts `asleep` in a bed beside its tile (the world takes the bed,
+  not free, and lays the sleeper on the bed's own tile, in no one's way),
+  and a story's step lays a figure down or gets it up (`{"sleep":
+  "bed_1"}`, `{"wake": true}`). The other pupils of the wizard's dormitory,
+  `pupil_<n>`, are drawn in the other looks of the wizard's gender. Rules
+  out the standing figure turned on top of the bed, and a sleeper only the
+  wizard; a scene without a bed's place, or a sheet without a lying row,
+  keeps that turned figure.
+- **D92 — A painted scene is painted on at its sides when the view would
+  run out of it, and the view never reaches past it.** Decided 2026-10-26
+  by the owner, as for the field (D83). The library, fifteen cells wide,
+  has three cells on each side, castle walls above and grass and trees
+  beyond them, painted by Gemini on `tools/art/margin.py`'s canvas and
+  joined by it (where the model's picture falls short of the canvas's
+  edge, its outermost pixels are stretched out). On a painted scene the
+  camera's zoom at its first step goes no lower than the painting and its
+  margin fill the canvas, so a window wider than the scene zooms in;
+  `data-view` and `data-bounds` say the window and the scene in tiles.
+  Rules out a band of the frame's colour beside a story.

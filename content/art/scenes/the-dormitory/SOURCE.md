@@ -10,4 +10,6 @@ later, like the rest of it.
 - Its bottom right corner mended by Gemini from `game-dormitory-corner.md`,
   joined by `tools/art/repaint.py`, the painting kept pixel for pixel
   elsewhere: a wall closing the corridor off from the battlements.
+- Its door arch and the beds' quilts drawn over whoever is under them, cut
+  by its pale stone and by the quilts' boxes (static things).
 - Its cells marked by hand and exported by `tools/art/export_scene.py`.

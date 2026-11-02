@@ -104,6 +104,14 @@ owner on 2026-10-26, for every scene from the dormitory on:
   scene is painted at its own hour, and its light says so.
 - **Outdoors, the margin is more of the same ground**, woods, rocks and
   fences no one could walk through, as the field's.
+- **A margin painted on later is joined, the painting kept.** For a
+  scene chosen without one, `tools/art/margin.py <scene> canvas` puts the
+  painting on a canvas grown by the margin's cells, its edge blurred
+  outward; the model paints the border; `margin.py <scene> join
+  <picture>` lays its picture by the least difference over the painting
+  and keeps the painting pixel for pixel. Where the model's picture falls
+  short of the canvas's edge, its outermost pixels are stretched out to
+  it. The library's sides are painted so (D92).
 - **The margin is painted with the scene from the start**, in one
   picture, the playable area in the middle, three or more cells on each
   side and two or more above and below; a wider one costs nothing and
@@ -131,11 +139,21 @@ owner on 2026-10-26, for every scene from the dormitory on:
   `tools/art/prompts/`); then `repaint.py <scene> join <picture>` takes only
   the boxes and the band from the model's picture, the painting pixel for
   pixel elsewhere.
-- **Indoors, only what a figure can stand behind is cut.** A bed, a low
-  table, furniture against a wall is ground. Where something must stand in
-  front of a figure (Eldra's armchair, which hides the key), its ground is
-  the painting with only that thing taken out, from the model's edit
-  without it laid on a crop of the corner, so that nothing else differs.
+- **Indoors, what a figure passes under or behind is a static thing**
+  (D89): an arch over a doorway, a wall's top, a bed's quilt. It is a box
+  in `cut.json` with `"static": true`, the row it covers from, and its
+  mask: `"pale"` takes the light stone or plaster inside the box and its
+  dark outline, `"box"` the whole box. No edit is needed, so the painting
+  stays as chosen. Furniture against a wall that no one walks beside is
+  ground, its cells not walked on, and so is an opening narrower than a
+  figure. Where something must stand in front of a figure and be taken
+  away (Eldra's armchair, which hides the key), its ground is the
+  painting with only that thing taken out, from the model's edit without
+  it laid on a crop of the corner, so that nothing else differs.
+- **A bed has its quilt and its pillow** (D91): a static box over the
+  quilt from the pillow to the foot, and the pillow's point, in `cut.json`'s
+  `beds`; a pupil asleep lies there with the head on the pillow, under
+  the quilt.
 
 ## The rules for the cut-outs
 
@@ -222,8 +240,11 @@ of the feet, in the middle, never to a side, and half up again; a frame
 the model draws too tall is lowered to the same depth for every way, and
 the row seen from behind, which a model leaves standing, is the standing
 frame lowered so. Last, one row facing down, celebrating: the arms up, a
-jump, down again. `figures.json` names where each part begins (`rows`),
-and the page reads it there. The frames are drawn on the
+jump, down again. Then one row lying on the back, eyes closed, head at
+the top, for a pupil asleep (D91): the page turns it along the bed. A
+friend's sheet has its walking rows and its lying row after them.
+`figures.json` names where each part begins (`rows`, and `sheets` for a
+sheet laid out otherwise), and the page reads it there. The frames are drawn on the
 same scale as the scenes. `content/art/figures/figures.json` says the
 frame's size and where the feet are.
 
@@ -234,6 +255,11 @@ standing frame with only its legs taken from the step's drawing, so that
 a figure walks moving its feet alone, never turning its head or its arms.
 A figure that floats, the ghost, has its dress grow downward in its step
 frames instead. Both are done by `tools/art/figures.py`.
+
+Each friend comes in two sets of colours (D90), `nuri-a`, `nuri-b`,
+`teku-a` and `teku-b`, recoloured from the friends' bases with the colours
+of `FRIEND_SETS` in `app/src/engine/looks.ts`; the game wears the set
+farthest from the wizard's look and from the other friend's.
 
 A door that opens may have a half-open state, between its closed and its
 open ones. It is an edit of the painting like the others, and the game

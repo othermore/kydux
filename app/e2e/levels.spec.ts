@@ -1,9 +1,12 @@
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
 import { skipGuide, levelText } from './helpers';
 
 test.use({ locale: 'en-US' });
+
+const SHOTS = fileURLToPath(new URL('./shots/levels/', import.meta.url));
+mkdirSync(SHOTS, { recursive: true });
 
 async function open(page: Page, id: string): Promise<void> {
   await page.goto(`/#level/${id}`);
@@ -243,22 +246,48 @@ test.describe('the high shelf (D46, D47, D49)', () => {
     await expect(scene(page)).toHaveAttribute('data-carried', 'wand');
   });
 
-  test('fendra from below brings the book down, through the shelves', async ({ page }) => {
+  test('fendra from below brings the book it is told down, glowing, through the shelves', async ({ page }) => {
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_right(5)\nwizard.cast("fendra")\nwizard.pick_up()');
+    await run(page, 'book = wizard.find_nearest("book")\nwizard.move_right(5)\nwizard.cast("fendra", book)\nwizard.pick_up()');
     await expect(scene(page)).toHaveAttribute('data-carried', 'rare_book,wand');
   });
 
-  test('fendra out of line with the book finds nothing near', async ({ page }) => {
+  test('beneath the book, the hands cannot reach it: it is too high', async ({ page }) => {
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('wizard.cast("fendra")');
+    await page.keyboard.insertText('wizard.move_right(5)\nwizard.pick_up()');
     await page.locator('#run').click();
     await expect(scene(page)).toHaveAttribute(
       'data-thought',
-      'There is nothing near enough for the spell to bring.',
-      { timeout: 15_000 },
+      'I can see the book up there, but it is too high to reach by hand.',
+      { timeout: 30_000 },
     );
+  });
+
+  test('fendra out of line with the book cannot reach it', async ({ page }) => {
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('book = wizard.find_nearest("book")\nwizard.cast("fendra", book)');
+    await page.locator('#run').click();
+    await expect(scene(page)).toHaveAttribute('data-thought', 'The spell cannot reach the book from here.', {
+      timeout: 15_000,
+    });
+  });
+
+  test('fendra with no thing named says how it is cast', async ({ page }) => {
+    const said = await run(page, 'wizard.cast("fendra")');
+    expect(said).toContain('wizard.cast("fendra", book)');
+  });
+
+  test('reveal outlines the book among the others on the shelf', async ({ page }) => {
+    await page.locator('#speed').selectOption('1');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('book = wizard.find_nearest("book")\nbook.reveal()\nwizard.wait(4)');
+    await page.locator('#run').click();
+    await expect(scene(page)).toHaveAttribute('data-revealed', 'rare_book', { timeout: 30_000 });
+    await page.waitForTimeout(400);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}revealed-book.png` });
   });
 });
 

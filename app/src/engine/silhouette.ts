@@ -9,7 +9,9 @@
 // frame, and a sprite of it follows the wizard. It is cut by a mask: copies of
 // the painted rows and things, of which only those in front of the wizard are
 // shown, so that the line shows where they cover the wizard and nowhere else.
-// How much is covered is counted by cover.ts.
+// How much is covered is counted by cover.ts. A thing revealed (D85) has its
+// whole outline drawn, over whatever covers it, so that it is found among
+// things like it too.
 
 import Phaser from 'phaser';
 import { coveredShare, HIDDEN_SHARE, type Solid } from './cover';
@@ -109,7 +111,7 @@ export class Silhouette {
   shown = false;
 
   /** The outline of a figure, or of a thing revealed (D85) with `always`, which
-   * shows wherever something covers it, however little. */
+   * shows whole, over whatever covers it. */
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly figure: Phaser.GameObjects.Image,
@@ -131,8 +133,10 @@ export class Silhouette {
       mask.add(copy);
       this.covers.push({ source, copy });
     }
-    this.line.enableFilters();
-    this.line.filters?.external.addMask(mask, false, scene.cameras.main);
+    if (!always) {
+      this.line.enableFilters();
+      this.line.filters?.external.addMask(mask, false, scene.cameras.main);
+    }
     const faintest = always ? THING_FAINTEST : 0;
     if (still) this.line.setAlpha(0.85);
     else scene.tweens.add({ targets: this.line, alpha: { from: 1, to: faintest }, duration: BEAT_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
@@ -154,8 +158,15 @@ export class Silhouette {
       copy.setVisible(before);
       if (before) front.push(source);
     }
-    const share = figure.visible ? coveredShare(figure, front, (key) => solidOf(this.scene, key)) : 0;
-    this.shown = !this.off && (this.always ? figure.visible && share > 0 : share > HIDDEN_SHARE);
+    const share =
+      figure.visible && !this.always ? coveredShare(figure, front, (key) => solidOf(this.scene, key)) : 0;
+    this.shown = !this.off && (this.always ? figure.visible : share > HIDDEN_SHARE);
+    // A thing drawn in another state, a book the spell has taken, is outlined so.
+    const key = `${figure.texture.key}-outline`;
+    if (this.line.texture.key !== key) {
+      outlineSheet(this.scene, figure.texture.key, key, this.always ? THING_THICK : THICK);
+      this.line.setTexture(key);
+    }
     this.line
       .setPosition(figure.x, figure.y)
       .setOrigin(figure.originX, figure.originY)

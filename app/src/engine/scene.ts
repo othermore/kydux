@@ -607,8 +607,11 @@ class LevelScene extends Phaser.Scene {
       this.tweens.killTweensOf(image);
       const tile = this.startTile(thing.id, thing.tile);
       const painted = this.art?.scene.things[this.artOf(thing.id)];
-      if (this.art && painted) placeThing(image, this.art, this.artOf(thing.id), tile, thing.open);
-      else image.setPosition(...centre(tile));
+      if (this.art && painted) {
+        placeThing(image, this.art, this.artOf(thing.id), tile, thing.open);
+        // Back in the state it lies in, a book the spell took at the run before.
+        if (thing.kind !== 'door') image.setTexture(`art-${this.artOf(thing.id)}-${Object.keys(painted.states)[0]}`);
+      } else image.setPosition(...centre(tile));
       image.setVisible(true).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
       this.glows.get(thing.id)?.setVisible(!thing.open);
@@ -676,16 +679,12 @@ class LevelScene extends Phaser.Scene {
     this.holds.set(id, [...(this.holds.get(id) ?? []), held]);
   }
 
-  /** A thing shown where it lies (D85): its outline drawn through whatever covers it,
-   * beating, until it is picked up; data-revealed names the things shown. */
+  /** A thing shown where it lies (D85): its whole outline drawn over whatever covers
+   * it, beating, until it is picked up; data-revealed names the things shown. */
   private reveal(id: string, instant: boolean): void {
     const image = this.things.get(id);
     if (!image || this.revealed.has(id)) return;
-    if (this.art && image.texture.key.startsWith('art-')) {
-      this.revealed.set(id, new Silhouette(this, image, this.coverings, this.still || instant, true));
-    } else {
-      this.revealed.set(id, new Silhouette(this, image, [], this.still || instant, true));
-    }
+    this.revealed.set(id, new Silhouette(this, image, [], this.still || instant, true));
     this.parentNode.dataset.revealed = [...this.revealed.keys()].join(',');
     if (!instant) play('cast');
   }
@@ -783,6 +782,12 @@ class LevelScene extends Phaser.Scene {
     const painted = this.art?.scene.things[this.artOf(id)];
     if (this.art && painted) {
       const [x, y] = [image.x + (to[0] - from[0]) * TILE, image.y + (to[1] - from[1]) * TILE];
+      // A thing the spell takes glows as it comes, when it is painted so (D47).
+      const pulled = `art-${this.artOf(id)}-pulled`;
+      if (this.textures.exists(pulled)) {
+        if (instant) image.setTexture(pulled);
+        else crossfade(this, image, pulled, this.playback.tickDuration * 0.5);
+      }
       image.setDepth(thingDepth(painted.row + shiftOf(this.art, this.artOf(id), to)[1], painted.under));
       if (instant) image.setPosition(x, y);
       else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });

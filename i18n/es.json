@@ -111,6 +111,7 @@
   "blocked": {
     "friend": "{name} está en mi camino: tengo que dar un rodeo.",
     "far": "No llego a {thing} desde aquí.",
+    "too_high": "Veo {thing} ahí arriba, pero no llego con la mano: está demasiado arriba.",
     "locked": "No puedo abrir {thing}: está cerrada con llave y no tengo la llave.",
     "open": "No hace falta: {thing} ya está abierta.",
     "nothing": "Aquí no hay nada que coger.",
@@ -120,6 +121,7 @@
     "sealed": "No puedo abrir {thing} con la mano: está sellada, y necesita un hechizo.",
     "password": "No puedo abrir {thing} con la mano: quiere una palabra.",
     "nothing_near": "No hay nada lo bastante cerca para que el hechizo lo traiga.",
+    "out_of_reach": "El hechizo no puede alcanzar {thing} desde aquí.",
     "not_carried": "No puedo dar {thing}: no está entre lo que llevo.",
     "nobody": "No hay nadie a mi lado para dárselo.",
     "which_one": "Aquí hay varias cosas: {things}. Di cuál, como wizard.pick_up({first}).",
@@ -151,7 +153,7 @@
       "position": "Dónde está {el mago|la maga}, en x e y.",
       "facing": "Hacia dónde mira {el mago|la maga}: up, down, left o right.",
       "items": "Las cosas que lleva {el mago|la maga}.",
-      "cast": "Lanza un hechizo con la varita, que {el mago|la maga} tiene que llevar. Lo que hace un hechizo depende de dónde está y de lo que tiene cerca; puede que no haga nada.",
+      "cast": "Lanza un hechizo con la varita, que {el mago|la maga} tiene que llevar. Lo que hace un hechizo depende de dónde está y de lo que tiene cerca; puede que no haga nada. Al hechizo fendra también se le da la cosa que debe traer: wizard.cast(\"fendra\", book).",
       "give": "Le da una cosa que lleva a quien esté justo a su lado.",
       "sleep": "Se acuesta y duerme en una cama libre.",
       "distance_to": "Da el número de pasos desde {el mago|la maga} hasta un objeto."
@@ -161,7 +163,7 @@
       "name": "El nombre de la cosa en este nivel.",
       "position": "Dónde está la cosa, o None cuando {el mago|la maga} la lleva.",
       "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}.",
-      "reveal": "Muestra dónde se encuentra una cosa oculta."
+      "reveal": "Hace latir el contorno de una cosa, también a través de lo que la oculta, para que veas dónde está."
     },
     "door": {
       "kind": "Qué es: \"door\".",
@@ -370,7 +372,7 @@
   },
   "spells": {
     "zelim": "rompe el sello de una puerta que tienes al lado.",
-    "fendra": "atrae hasta tu casilla la cosa más cercana, a tres casillas como mucho y en línea recta.",
+    "fendra": "atrae a tu casilla la cosa que nombres, a tres casillas de distancia como máximo en línea recta.",
     "kirra": "ilumina la sala oscura en la que estás.",
     "osto": "detiene un rato una escalera móvil que tienes al lado."
   },

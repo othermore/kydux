@@ -191,7 +191,11 @@ def sprite_alpha(
         mask = kept(mask, 0.6 if thing.get("largest") else 0.05)
         if thing.get("hull"):
             mask = row_hull(mask) & inside
-        mask = image_first.snapped(mask, shown, cell, image_first.thresholds(th), without)
+        # A thing set in among others, a book on a full shelf, whose picture without
+        # it differs only in its own box, is that difference: its outline is in it,
+        # and snapping would run on into the shelf's lines (`snap` false).
+        if thing.get("snap", True):
+            mask = image_first.snapped(mask, shown, cell, image_first.thresholds(th), without)
         return (mask & inside).astype(np.float32)
     d = np.abs(shown.astype(np.int16) - without.astype(np.int16)).sum(axis=2) / 3
     d = Image.fromarray(np.clip(d, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.0))
@@ -372,19 +376,34 @@ def clip_below(
     return out
 
 
-def shrunk(sprite: np.ndarray, scale: float) -> tuple[np.ndarray, int, int]:
+def shrunk(sprite: np.ndarray, scale: float) -> np.ndarray:
     """A thing's sprite drawn at `scale` of its painted size, standing where it was
-    painted, on the middle of its bottom; and how far right and down its corner
-    moves. A book painted too big for its shelf is drawn smaller on the picture
-    without it."""
+    painted, on the middle of its bottom, in a sprite of the same size: a book
+    painted too big is drawn smaller on the picture without it."""
     ys, xs = np.nonzero(sprite[..., 3])
     if not len(ys):
-        return sprite, 0, 0
+        return sprite
     foot_x, foot_y = (xs.min() + xs.max() + 1) / 2, ys.max() + 1
     height, width = sprite.shape[:2]
     size = (max(1, round(width * scale)), max(1, round(height * scale)))
     small = Image.fromarray(sprite, "RGBA").resize(size, Image.LANCZOS)
-    return np.array(small), round(foot_x * (1 - scale)), round(foot_y * (1 - scale))
+    out = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    out.alpha_composite(small, (round(foot_x * (1 - scale)), round(foot_y * (1 - scale))))
+    return np.array(out)
+
+
+def without_of(scene: Settings, grid: dict, thing: dict) -> np.ndarray:
+    """A thing's picture without it: an edit of the scene, or, where an edit also
+    changed what lies beside the thing, the painting with the thing's own box taken
+    from that edit, sharp (`{"picture", "box", "from"}`, the box in cells)."""
+    without = thing["without"]
+    if isinstance(without, str):
+        return np.array(Image.open(scene.edits / without).convert("RGB"))
+    picture = np.array(Image.open(scene.edits / without["picture"]).convert("RGB"))
+    source = np.array(Image.open(scene.edits / without["from"]).convert("RGB"))
+    x0, y0, x1, y1 = native_box(grid, without["box"])
+    picture[y0:y1, x0:x1] = source[y0:y1, x0:x1]
+    return picture
 
 
 def composite(
@@ -401,7 +420,7 @@ def composite(
         # A static thing with no edit without it is drawn over the painting as it is.
         if thing.get("static") and (not statics or "without" not in thing):
             continue
-        without = np.array(Image.open(scene.edits / thing["without"]).convert("RGB"))
+        without = without_of(scene, grid, thing)
         box = native_box(grid, thing["box"])
         if thing.get("whole_box"):
             mask = in_box(painting.shape[:2], box)
@@ -616,7 +635,8 @@ def scene(settings: Settings) -> Path:
         native = native_box(grid, thing["box"])
         without = withouts[name]
         for picture in thing["states"].values():
-            if picture is None:
+            # A state that is drawn only away from where the thing lies is not here.
+            if picture is None or isinstance(picture, dict):
                 continue
             shown = (
                 painting
@@ -670,6 +690,13 @@ def scene(settings: Settings) -> Path:
             elif picture == "without":
                 # The open door is the dark where the closed door was.
                 shown, alpha = without, sprite_alpha(painting, without, native, thing, spacing, th)
+            elif isinstance(picture, dict):
+                # A state cut from a picture against its own edit without it: a book
+                # glowing as the spell takes it, as it was painted before it rested.
+                shown = np.array(Image.open(settings.edits / picture["picture"]).convert("RGB"))
+                apart = np.array(Image.open(settings.edits / picture["without"]).convert("RGB"))
+                own = {**thing, "solid": picture.get("solid", thing["solid"])}
+                alpha = sprite_alpha(shown, apart, native, own, spacing, th)
             else:
                 shown = np.array(Image.open(settings.edits / picture).convert("RGB"))
                 alpha = sprite_alpha(shown, without, native, thing, spacing, th)
@@ -679,9 +706,11 @@ def scene(settings: Settings) -> Path:
             reach = thing.get("reach", 0.0)
             below = clip_below(sprite[..., 3] / 255, thing["row"], box[1], reach=reach)
             sprite[..., 3] = (below * 255).astype(np.uint8)
-            if thing.get("scale"):
-                sprite, dx, dy = shrunk(sprite, thing["scale"])
-                left, top = box[0] + dx, box[1] + dy
+            # Drawn smaller than painted, the thing in every state or in one (`scale`).
+            scale = thing.get("scale")
+            scale = scale.get(state) if isinstance(scale, dict) else scale
+            if scale:
+                sprite = shrunk(sprite, scale)
             webp(Image.fromarray(sprite, "RGBA"), out / states[state])
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
         if thing.get("under"):

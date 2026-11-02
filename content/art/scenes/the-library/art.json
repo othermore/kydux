@@ -17,6 +17,11 @@
   ],
   "rows": [
     {
+      "row": 3,
+      "image": "row-3.webp",
+      "top": 344
+    },
+    {
       "row": 5,
       "image": "row-5.webp",
       "top": 573
@@ -164,10 +169,11 @@
     },
     "rare_book": {
       "row": 4,
-      "left": 650,
-      "top": 333,
+      "left": 634,
+      "top": 307,
       "states": {
-        "lying": "rare_book-lying.webp"
+        "lying": "rare_book-lying.webp",
+        "pulled": "rare_book-pulled.webp"
       },
       "at": [
         7,
@@ -176,8 +182,8 @@
     },
     "eldras_book": {
       "row": 4,
-      "left": 164,
-      "top": 372,
+      "left": 154,
+      "top": 355,
       "states": {
         "lying": "eldras_book-lying.webp"
       },

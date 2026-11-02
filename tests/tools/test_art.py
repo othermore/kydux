@@ -505,13 +505,34 @@ def test_a_wall_s_part_with_no_outline_beyond_it_is_kept_as_drawn():
     assert kept[42:50, 60:130].all()
 
 
+def test_a_thing_s_picture_without_it_may_be_its_own_box_from_another(tmp_path):
+    # Beside the rare book, the edit that took it out also changed its neighbour: the
+    # picture without it is the painting with the book's box from that edit.
+    painting = np.zeros((200, 200, 3), dtype=np.uint8)
+    painting[50:100, 50:70] = (40, 60, 160)  # the book
+    painting[50:100, 70:90] = (120, 80, 40)  # its neighbour
+    shelf = np.full((200, 200, 3), 30, dtype=np.uint8)
+    Image.fromarray(painting).save(tmp_path / "painting.png")
+    Image.fromarray(shelf).save(tmp_path / "shelf.png")
+
+    class Edits:
+        edits = tmp_path
+
+    grid = {"x": {"offset": 0, "spacing": 100}, "y": {"offset": 0, "spacing": 100}}
+    without = {"picture": "painting.png", "box": [0.5, 0.5, 0.7, 1.0], "from": "shelf.png"}
+    out = export_scene.without_of(Edits, grid, {"without": without})
+    assert (out[50:100, 50:70] == 30).all()
+    assert (out[50:100, 70:90] == (120, 80, 40)).all()
+
+
 def test_a_thing_drawn_smaller_stands_where_it_was_painted():
     sprite = np.zeros((100, 80, 4), dtype=np.uint8)
     sprite[40:90, 20:60] = (200, 50, 50, 255)
-    small, dx, dy = export_scene.shrunk(sprite, 0.5)
+    small = export_scene.shrunk(sprite, 0.5)
+    assert small.shape == sprite.shape
     ys, xs = np.nonzero(small[..., 3] > 128)
-    assert abs((xs.min() + xs.max() + 1) / 2 + dx - 40) <= 1
-    assert abs(ys.max() + 1 + dy - 90) <= 1
+    assert abs((xs.min() + xs.max() + 1) / 2 - 40) <= 1
+    assert abs(ys.max() + 1 - 90) <= 1
     assert abs((ys.max() - ys.min() + 1) - 25) <= 1
 
 

@@ -10,6 +10,9 @@ import { t } from '../i18n';
 import { element } from './dom';
 import { withCode } from './outcome';
 
+/** The spells cast on a thing the child names (kydux_world.world.AIMED). */
+const AIMED = new Set(['fendra']);
+
 /** One member of kydux_world.api's table, as api.json has it. */
 export interface ApiMember {
   name: string;
@@ -113,9 +116,10 @@ export function notebookPanel(
   node.setAttribute('aria-labelledby', 'notebook-title');
   let tab: 'actions' | 'spells' = 'actions';
   // A spell or a word, in italics as a word to type, with what it does, and its
-  // example to click: `wizard.cast("zelim")`, `wizard.say("ambrel")`.
+  // example to click: `wizard.cast("zelim")`, `wizard.say("ambrel")`; a spell cast
+  // on a thing names it, `wizard.cast("fendra", book)`.
   const magic = (word: string, key: string, action: string) => {
-    const said = `wizard.${action}("${word}")`;
+    const said = AIMED.has(word) ? `wizard.${action}("${word}", book)` : `wizard.${action}("${word}")`;
     const example = element('button', { type: 'button', className: 'example' }, [element('code', {}, [said])]);
     example.dataset.example = said;
     example.addEventListener('click', () => onExample(said));

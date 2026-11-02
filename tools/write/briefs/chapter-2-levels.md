@@ -162,20 +162,21 @@ spells cast with the wand, *zelim*). In chapter 2, before each level:
 
 6. `the-high-shelf` — Practice 4, after *A spell that reaches*. By
    Eldra's open door. Before Eldra's own book, Wenna asks for a rare book
-   she has long wanted down: it glows on top of a high bookcase over the
-   aisle, three cells up, out of reach. Goals: take the rare book; bonus:
-   name the book with `find_nearest` first. Starting code: comments
-   allowed. Learned: how *fendra* reaches a thing in a straight line, and
-   that a thing it brings must still be picked up.
-   Solution: `book = wizard.find_nearest("book"); wizard.move_right(5); wizard.cast("fendra"); wizard.pick_up()`.
+   she has long wanted down: it stands among many books on a high
+   bookcase over the aisle, three cells up, out of reach, and no one can
+   tell which it is. Goals: take the rare book; bonus: show the book with
+   `reveal` before the spell brings it. Starting code: comments allowed.
+   Learned: that *fendra* is told which thing to bring, and that a thing
+   it brings must still be picked up.
+   Solution: `book = wizard.find_nearest("book"); book.reveal(); wizard.move_right(5); wizard.cast("fendra", book); wizard.pick_up()`.
 
 7. `eldras-book` — Practice 5. Below the high shelves; Eldra waits by her
    little room. Her own book lies on the shelf inside it, which no one
-   can step into: bring it down with *fendra* from the doorway's line, and
-   give it to her. The chapter together. Goals: give Eldra her book;
-   bonus: name the book with `find_nearest` before the spell moves it.
-   Starting code: comments allowed. No learned.
-   Solution: `book = wizard.find_nearest("book"); wizard.move_left(5); wizard.cast("fendra"); wizard.pick_up(); wizard.give(book)`.
+   can step into: bring it down with *fendra* from her doorway, in line
+   with it, and give it to her. The chapter together. Goals: give Eldra
+   her book; bonus: in fewer than 6 lines. Starting code: comments
+   allowed. No learned.
+   Solution: `book = wizard.find_nearest("book"); wizard.move_left(5); wizard.cast("fendra", book); wizard.pick_up(); wizard.give(book)`.
 
 ## The words round the levels
 

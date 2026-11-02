@@ -210,11 +210,12 @@ row its foot stands on.
   the tree's; the stones stand on the wall's row.
 - **What opens or is picked up is cut against its edit without it.** A
   gate that opens must leave no ghost bars, and a wand picked up must
-  leave its stone whole. An open door has swung in out of sight (D101):
-  its whole doorway, from the arch to the threshold, is the floor of the
-  room beyond, from Gemini's edit of the doorway alone, laid in by
-  `tools/art/repaint.py doorways`. A door in a side wall, or with no room
-  behind it, is drawn open as painted.
+  leave its stone whole. An open door is drawn as its edit shows it open,
+  its leaves seen (D101). Where that picture goes wrong, a door in a wall
+  seen from the front with room behind it swings in out of sight: its
+  whole doorway, from the arch to the threshold, is the floor of the room
+  beyond, from Gemini's edit of the doorway alone, laid in by
+  `tools/art/repaint.py doorways`.
 - **A cut-out ends at the outer edge of its outline** (D93): the outline is
   the thing's, and nothing of the ground beyond it is (`fringe` and `bare`
   in the sweep). Every mask is moved onto its outline

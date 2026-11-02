@@ -130,13 +130,14 @@ known from then on.
    `steps = key.distance_to(wizard)`, then `print(steps)`, on three lines.
 
 6. `fendra` — *A spell that reaches* / *Un hechizo que alcanza*. A spell
-   can reach across empty space: *fendra*, cast with the wand,
-   `wizard.cast("fendra")`, draws to the wizard's own cell the nearest
-   thing up to three cells away in a straight line, in any of the four
-   ways. It flies over shelves and bookcases, but not through walls or
-   closed doors; with nothing near enough, nothing comes, and the wizard
-   says so. A spell moves things and hands carry them: pick the thing up
-   once it has come. In the library, a rare book glows on top of a
-   bookcase, out of reach.
-   Try code: `wizard.move_right(5)`, then `wizard.cast("fendra")`, then
-   `wizard.pick_up()`, on three lines.
+   can reach across empty space: *fendra*, cast with the wand and told
+   which thing to bring, by its name in the program, as its second
+   argument, `wizard.cast("fendra", book)`, draws that thing to the
+   wizard's own cell, when it lies up to three cells away in a straight
+   line, in any of the four ways. It flies over shelves and bookcases,
+   but not through walls or closed doors; with the thing out of its
+   reach, nothing comes, and the wizard says so. A spell moves things and
+   hands carry them: pick the thing up once it has come. In the library,
+   a rare book lies among many on a high bookcase, out of reach.
+   Try code: `book = wizard.find_nearest("book")`, `wizard.move_right(5)`,
+   `wizard.cast("fendra", book)`, then `wizard.pick_up()`, on four lines.

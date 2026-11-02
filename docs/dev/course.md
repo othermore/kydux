@@ -129,14 +129,14 @@ that stays locked.
 | `lesson:the-distance` | Lesson 5 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
 | `level:the-moving-key` | Improve 1 | Eldra's room key lies at three, five or seven steps, in three ways; Wenna's program walks yesterday's five. Bonus: no number written. | |
 | `level:the-wrong-order` | Fix 1 | Wenna's program opens Eldra's door from across the aisle, then walks to it. | |
-| `lesson:fendra` | Lesson 6 | A spell that reaches: `fendra` draws the nearest thing in reach to the wizard's tile. | (the spell `fendra`) |
-| `level:the-high-shelf` | Practice 4 | The glowing rare book on the high shelf, drawn down from below it. | |
-| `level:eldras-book` | Practice 5 | The chapter together: Eldra's own book from her little room, named, drawn down, given. Bonus: named with `find_nearest` before the spell moves it. | |
+| `lesson:fendra` | Lesson 6 | A spell that reaches: `wizard.cast("fendra", book)` draws the thing it is told, in a straight line three tiles away at most, to the wizard's tile. | (the spell `fendra`) |
+| `level:the-high-shelf` | Practice 4 | The rare book among many on the high shelf: found, revealed, drawn down from below it, glowing as it comes. Bonus: revealed with `reveal`. | |
+| `level:eldras-book` | Practice 5 | The chapter together: Eldra's own book from her little room, named, drawn down, given. Bonus: in fewer than 6 lines. | |
 | `story:the-wand-bank` | Story 5 | Eldra's thanks; the school wands; the friend's spare given back; the chapter summed up; at dusk, the rumour of the passages. | |
 
 The world features chapter 2 needs: shelves and bookcases, tiles the
 wizard cannot walk on but can see across (D46); `fendra`, which pulls the
-nearest thing in sight to the wizard's tile (D47); Eldra as an actor who
+thing it is told, in sight, to the wizard's tile (D47); Eldra as an actor who
 stands, and `wizard.give` with a `give` goal (D48); the wand carried from
 a level's start (D49); a level in several ways (D51); scenes and a friend
 (D65, D66); a bed and `wizard.sleep`, and the tiles the wizard may not

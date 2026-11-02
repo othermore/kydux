@@ -74,8 +74,8 @@
       "to": "eldra"
     },
     {
-      "kind": "uses",
-      "member": "find_nearest",
+      "kind": "lines_under",
+      "lines": 6,
       "bonus": true
     }
   ],

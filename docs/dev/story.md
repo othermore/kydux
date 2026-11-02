@@ -66,7 +66,7 @@ A spell is a word cast with the wand, `wizard.cast("<spell>")` (D42). Each chapt
 | Spell | What it does | Chapter |
 | --- | --- | --- |
 | `zelim` | Breaks the seal of a door the wizard stands next to. | 1 |
-| `fendra` | Draws a thing on a shelf or across a gap to the wizard's tile. | 2 |
+| `fendra` | Draws the thing named, on a shelf or across a gap, to the wizard's tile. | 2 |
 | `kirra` | Lights the room the wizard is in, so that what is in the dark shows. | 3 |
 | `osto` | Holds a moving stair still for a few ticks. | 3 |
 | `drevo` | Lifts the broom into the air, so the wizard can fly. | 4 |

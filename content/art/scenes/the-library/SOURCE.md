@@ -14,6 +14,12 @@ later, like the rest of it.
 - The way to the vault ending in an iron safe, painted by Gemini from
   `game-library-vault-2.md` in a box of the painting, joined by
   `tools/art/repaint.py`.
+- The rare book standing on its shelf among the others, not floating and
+  glowing: the glowing book taken out of the painting and the shelf behind
+  it painted (`game-library-rare-shelf.md`), then the book painted standing
+  in the shelf's gap (`game-library-rare-book-3.md`), each by Gemini in a
+  box of the painting, joined by `tools/art/repaint.py`; the glowing book
+  is drawn as the spell brings it down.
 - Its sides painted on by Gemini from `image-first-library-margin.md`, three
   cells on each side, on a canvas made and joined by `tools/art/margin.py`:
   the castle's walls going on, and grass and trees beyond them.

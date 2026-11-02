@@ -78,11 +78,13 @@ class Caught(RunOver):
 
 
 class ActionArguments(TypeError):
-    """An action given what it cannot take."""
+    """An action given what it cannot take; `example`, how to call it, when its
+    docstring's first example is not the one the child needs."""
 
-    def __init__(self, action: str, message: str) -> None:
+    def __init__(self, action: str, message: str, example: str | None = None) -> None:
         super().__init__(message)
         self.action = action
+        self.example = example
 
 
 def child_line() -> int | None:
@@ -355,11 +357,18 @@ class Wizard(Child):
         opens = (lambda: door._opened_by("word")) if door else None
         world.act("say", {"text": said}, then=opens)
 
-    def cast(self, spell: str) -> None:
+    def cast(self, spell: str, thing: Thing | None = None) -> None:
         """Cast a spell with the wand, which the wizard must carry; it works where the
-        wizard stands: `wizard.cast("zelim")`"""
+        wizard stands, and fendra on the thing it is given: `wizard.cast("zelim")`,
+        `wizard.cast("fendra", book)`"""
         if not isinstance(spell, str):
             raise ActionArguments("cast", "cast() takes a spell's name, in quotes")
+        if spell in AIMED and not isinstance(thing, Thing):
+            raise ActionArguments(
+                "cast", f"{spell} takes the thing to bring", f'wizard.cast("{spell}", book)'
+            )
+        if spell not in AIMED and thing is not None:
+            raise ActionArguments("cast", f"{spell} takes no thing", f'wizard.cast("{spell}")')
         world: World = self._k_world
         world.ready()
         here = list(self._k_position)
@@ -371,9 +380,10 @@ class Wizard(Child):
             refused = {"at": here, "by": "wizard", "reason": "unknown_spell", "tried": True}
             world.act("blocked", {**refused, "spell": spell})
             return
-        effect = SPELLS[spell](world, self._k_position)
+        effect = SPELLS[spell](world, self._k_position, thing)
         if effect.refused is not None:
-            refused = {"at": here, "by": "wizard", "reason": effect.refused, "tried": True}
+            by = thing.name if thing is not None else "wizard"
+            refused = {"at": here, "by": by, "reason": effect.refused, "tried": True}
             world.act("blocked", {**refused, "spell": spell})
             return
         world.act("cast", {"spell": spell, "at": here}, then=effect.then)
@@ -419,16 +429,22 @@ class Wizard(Child):
         reach = self._k_in_reach()
         if thing is not None:
             if thing not in reach:
-                refused = {"at": list(here), "by": thing.name, "reason": "far", "tried": False}
+                # Seen up on a shelf in a straight line, it is too high for the hands.
+                high = thing in self._k_too_high()
+                reason = "too_high" if high else "far"
+                refused = {"at": list(here), "by": thing.name, "reason": reason, "tried": high}
                 world.act("blocked", refused)
                 return
             chosen = thing
         else:
             if not reach:
-                world.act(
-                    "blocked",
-                    {"at": list(here), "by": "wizard", "reason": "nothing", "tried": True},
+                high = self._k_too_high()
+                refused = (
+                    {"by": high[0].name, "reason": "too_high"}
+                    if high
+                    else {"by": "wizard", "reason": "nothing"}
                 )
+                world.act("blocked", {"at": list(here), **refused, "tried": True})
                 return
             # The wizard's own tile first; from beside, only when there is one to take.
             own = [t for t in reach if t._k_position == here]
@@ -454,6 +470,16 @@ class Wizard(Child):
         return sorted(
             found, key=lambda t: (t._k_position != here, t._k_position.y, t._k_position.x)
         )
+
+    def _k_too_high(self) -> list[Thing]:
+        """The things the hands cannot reach and fendra could: on a tile no one walks
+        on, a shelf, in sight along one of the four ways, FENDRA_REACH tiles at most,
+        nearest first."""
+        world: World = self._k_world
+        here = self._k_position
+        return [
+            thing for _, thing in in_line(world, here) if not world.level.free(thing._k_position)
+        ]
 
     def _nearby(self, kind: object) -> list[Child]:
         world: World = self._k_world
@@ -520,7 +546,7 @@ class Effect:
     refused: str | None = None
 
 
-def _zelim(world: World, here: Position) -> Effect:
+def _zelim(world: World, here: Position, _thing: Thing | None = None) -> Effect:
     """Breaks the seal of a door beside the wizard; away from one it does nothing."""
     door = world.door_beside(here, lambda d: d._k_seal == "zelim")
     return Effect(then=(lambda: door._opened_by("spell")) if door else None)
@@ -530,18 +556,29 @@ def _zelim(world: World, here: Position) -> Effect:
 FENDRA_REACH = 3
 
 
-def _fendra(world: World, here: Position) -> Effect:
-    """Draws the nearest thing in sight, three tiles at most along each way, through
-    shelves and not through walls or closed doors, onto the wizard's tile (D47)."""
+#: The spells cast on a thing the child names, the second argument of `cast`.
+AIMED = ("fendra",)
+
+
+def in_line(world: World, here: Position) -> list[tuple[int, Thing]]:
+    """The things lying in sight from a tile along the four ways, FENDRA_REACH tiles at
+    most each, through shelves and not through walls or closed doors, with how far
+    each is: nearest first, then in reading order."""
     found: list[tuple[int, int, int, Thing]] = []
     for facing in ("up", "down", "left", "right"):
         for tile in sight_tiles(world.is_clear, here, facing, FENDRA_REACH):
             for thing in world.things_at(tile):
                 distance = abs(tile.x - here.x) + abs(tile.y - here.y)
                 found.append((distance, tile.y, tile.x, thing))
-    if not found:
-        return Effect(refused="nothing_near")
-    *_, thing = min(found, key=lambda f: f[:3])
+    return [(distance, thing) for distance, _, _, thing in sorted(found, key=lambda f: f[:3])]
+
+
+def _fendra(world: World, here: Position, thing: Thing | None) -> Effect:
+    """Draws the thing named onto the wizard's tile, when it lies in sight along one of
+    the four ways, three tiles at most, through shelves and not through walls or closed
+    doors (D47); anywhere else, or carried, it is out of the spell's reach."""
+    if thing is None or thing not in [found for _, found in in_line(world, here)]:
+        return Effect(refused="out_of_reach")
 
     def pull() -> None:
         before = thing._k_position
@@ -551,7 +588,7 @@ def _fendra(world: World, here: Position) -> Effect:
     return Effect(then=pull)
 
 
-def _kirra(world: World, here: Position) -> Effect:
+def _kirra(world: World, here: Position, _thing: Thing | None = None) -> Effect:
     """Lights the dark room the wizard is in for the rest of the run (D52, D73); in a
     lit room, or outside the dark one, it does nothing."""
     if world.lit or not world.in_dark(here):
@@ -564,7 +601,7 @@ def _kirra(world: World, here: Position) -> Effect:
     return Effect(then=light)
 
 
-def _osto(world: World, here: Position) -> Effect:
+def _osto(world: World, here: Position, _thing: Thing | None = None) -> Effect:
     """Holds a stair beside the wizard in place (D53); with none beside, refused."""
     beside = [
         thing
@@ -579,7 +616,7 @@ def _osto(world: World, here: Position) -> Effect:
 
 #: Each spell's effect, by its name (D42); kydux_world.level.KNOWN_SPELLS lists the
 #: same names, so that a level can be checked without the world.
-SPELLS: dict[str, Callable[[World, Position], Effect]] = {
+SPELLS: dict[str, Callable[[World, Position, Thing | None], Effect]] = {
     "zelim": _zelim,
     "fendra": _fendra,
     "kirra": _kirra,

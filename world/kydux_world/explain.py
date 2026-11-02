@@ -88,6 +88,8 @@ def explain(error: BaseException, level: Level) -> Explanation:
         kind = "read_only" if error.exists else "no_new_attribute"
         return Explanation(kind, {"object": error.owner, "name": error.attribute})
     if isinstance(error, ActionArguments):
+        if error.example:
+            return Explanation("arguments", {"name": error.action, "example": error.example})
         return _arguments(error.action, level)
     if isinstance(error, AttributeError) and isinstance(getattr(error, "obj", None), Child):
         owner: Child = error.obj  # type: ignore[attr-defined]

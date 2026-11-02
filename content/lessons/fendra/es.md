@@ -1,25 +1,26 @@
 # Un hechizo que alcanza
 
-¡Un hechizo puede cruzar el espacio vacío! El hechizo *fendra*, lanzado con la varita usando `wizard.cast("fendra")`, atrae la cosa más cercana a la propia casilla de tu {mago|maga}.
+¡Un hechizo puede cruzar el espacio vacío! El hechizo *fendra*, lanzado con la varita, atrae una cosa a la propia casilla de tu {mago|maga}.
 
-Puede alcanzar hasta a tres casillas de distancia en línea recta, en cualquiera de las cuatro direcciones.
+Como los estantes altos de la biblioteca están llenos de libros, el hechizo necesita saber exactamente cuál quieres. Debes darle el nombre bajo el que tu programa guarda la cosa, como su segundo argumento: `wizard.cast("fendra", book)`.
 
 ---
 ## Volar sobre las cosas
 
-El hechizo vuela sobre estantes y librerías, pero no puede atravesar paredes ni puertas cerradas.
+El hechizo alcanza hasta a tres casillas de distancia en línea recta, en cualquiera de las cuatro direcciones. Vuela sobre estantes y librerías, pero no puede atravesar paredes ni puertas cerradas.
 
-Si no hay nada lo suficientemente cerca para atraer, no vendrá nada, y tu {mago|maga} lo dirá.
+Si la cosa que pides está fuera de su alcance, no vendrá nada, y tu {mago|maga} lo dirá.
 
 ---
 ## Pruébalo
 
-Un libro raro brilla en lo alto de una librería cercana, pero está fuera de tu alcance. ¡Usaremos *fendra* para bajarlo!
+Un libro raro se encuentra entre muchos otros en una librería alta, fuera de tu alcance. Primero, lo encontraremos y lo guardaremos bajo un nombre. ¡Luego caminaremos debajo de él y le lanzaremos *fendra*!
 
-Recuerda que un hechizo mueve las cosas, pero tus manos las llevan. Debes recoger la cosa una vez que haya llegado hasta ti.
+Recuerda que un hechizo mueve las cosas, pero tus manos las llevan. Debes recoger la cosa una vez que haya bajado hasta ti.
 
 ```python try
+book = wizard.find_nearest("book")
 wizard.move_right(5)
-wizard.cast("fendra")
+wizard.cast("fendra", book)
 wizard.pick_up()
 ```

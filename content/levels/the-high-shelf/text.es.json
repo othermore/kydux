@@ -2,15 +2,15 @@
   "title": "El estante alto",
   "goals": [
     "Coge el libro raro.",
-    "Nombra el libro con `find_nearest` primero."
+    "Muestra el libro con `reveal` antes de que el hechizo lo traiga."
   ],
-  "starting_code": "# Baja el libro raro con un hechizo.\n",
+  "starting_code": "# El libro raro está en algún lugar entre los libros del estante alto.\n",
   "hints": [
-    "Camina hasta pararte justo debajo del libro raro.",
-    "Usa el método `cast` con la palabra \"fendra\" para atraer el libro hacia ti.",
-    "El hechizo lo trae a tus pies, así que aún debes usar el método `pick_up`."
+    "Encuentra el libro con `find_nearest`, guárdalo bajo un nombre y muéstralo con `reveal`.",
+    "Camina hasta pararte justo debajo de él.",
+    "Usa `cast` para lanzar *fendra* con el libro, y luego usa `pick_up`."
   ],
-  "intro": "Hay un libro raro brillando en lo alto de esa estantería alta, fuera de nuestro alcance. ¡Llevo mucho tiempo queriendo bajarlo! Camina debajo de él y lanza el hechizo *fendra* para que baje hasta ti.",
+  "intro": "El libro raro que he querido durante tanto tiempo está ahí arriba entre todos los demás, ¡y no puedo distinguir cuál es! Pero tu programa puede encontrarlo.",
   "outro": "¡Lo tienes! El hechizo funcionó a la perfección.",
-  "learned": "Ahora sabes cómo el hechizo *fendra* alcanza una cosa en línea recta, y que una cosa que trae todavía se debe recoger."
+  "learned": "Ahora sabes que al hechizo *fendra* se le dice qué cosa debe traer, y que una cosa que trae todavía se debe recoger."
 }

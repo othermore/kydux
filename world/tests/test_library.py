@@ -4,7 +4,7 @@
 import pytest
 from kydux_world.level import KNOWN_SPELLS, Level, LevelError, Position
 from kydux_world.run import check_consistency, run_code
-from kydux_world.world import SPELLS, World
+from kydux_world.world import SPELLS, ActionArguments, World
 
 #: The wizard below a shelf with a book on it; a wall with a book behind it to
 #: the right; Eldra at the end of the corridor.
@@ -44,10 +44,10 @@ def test_the_wizard_carries_the_wand_from_the_start():
     assert world.things["wand"].position is None
 
 
-def test_fendra_draws_the_nearest_thing_in_sight_onto_the_wizard_s_tile():
+def test_fendra_draws_the_thing_named_onto_the_wizard_s_tile():
     world = World(LEVEL)
     world.wizard.move_right()
-    world.wizard.cast("fendra")
+    world.wizard.cast("fendra", world.things["book"])
     tick = world.events[-1].tick
     assert [(e.actor, e.kind, e.tick) for e in world.events[-2:]] == [
         ("wizard", "cast", tick),
@@ -63,11 +63,76 @@ def test_fendra_draws_the_nearest_thing_in_sight_onto_the_wizard_s_tile():
 def test_fendra_does_not_see_through_a_wall():
     world = World(LEVEL)
     world.wizard.move_right(2)
-    # The shelf's book is two tiles away, up and to the left; the hidden one is
-    # behind the wall to the right, and the up and left ways see nothing.
-    world.wizard.cast("fendra")
-    assert last(world)[2]["reason"] == "nothing_near"
+    # The hidden book is behind the wall to the right.
+    world.wizard.cast("fendra", world.things["hidden"])
+    assert last(world)[1:] == (
+        "blocked",
+        {"at": [3, 2], "by": "hidden", "reason": "out_of_reach", "tried": True, "spell": "fendra"},
+    )
     assert world.things["hidden"].position == (5, 2)
+
+
+def test_fendra_draws_only_a_thing_in_a_straight_line():
+    world = World(LEVEL)
+    world.wizard.move_right(2)
+    # The shelf's book is up and to the left, in no straight line.
+    world.wizard.cast("fendra", world.things["book"])
+    assert last(world)[2]["reason"] == "out_of_reach"
+    assert world.things["book"].position == (2, 1)
+
+
+def test_fendra_draws_the_thing_named_and_not_the_nearest():
+    level = Level.from_dict(
+        {
+            **LIBRARY,
+            "map": ["#######", "#S....#", "#######"],
+            "actors": [],
+            "goals": [],
+            "things": [
+                {"kind": "book", "id": "near", "at": [2, 1]},
+                {"kind": "book", "id": "rare", "at": [4, 1]},
+            ],
+        }
+    )
+    world = World(level)
+    world.wizard.cast("fendra", world.things["rare"])
+    assert world.things["rare"].position == (1, 1)
+    assert world.things["near"].position == (2, 1)
+
+
+def test_fendra_is_told_which_thing_and_the_other_spells_none():
+    world = World(LEVEL)
+    with pytest.raises(ActionArguments) as told:
+        world.wizard.cast("fendra")
+    assert told.value.example == 'wizard.cast("fendra", book)'
+    with pytest.raises(ActionArguments):
+        world.wizard.cast("fendra", "book")
+    with pytest.raises(ActionArguments) as told:
+        world.wizard.cast("zelim", world.things["book"])
+    assert told.value.example == 'wizard.cast("zelim")'
+
+
+def test_a_thing_up_on_a_shelf_is_too_high_for_the_hands():
+    level = Level.from_dict(
+        {
+            **LIBRARY,
+            "map": ["#####", "#.=.#", "#.=.#", "#.S.#", "#####"],
+            "actors": [],
+            "goals": [],
+            "things": [{"kind": "book", "id": "book", "at": [2, 1]}],
+        }
+    )
+    world = World(level)
+    world.wizard.pick_up()
+    assert last(world)[1:] == (
+        "blocked",
+        {"at": [2, 3], "by": "book", "reason": "too_high", "tried": True},
+    )
+    world.wizard.pick_up(world.things["book"])
+    assert last(world)[2]["reason"] == "too_high"
+    world.wizard.move_left()
+    world.wizard.pick_up()
+    assert last(world)[2]["reason"] == "nothing"
 
 
 def test_fendra_reaches_three_tiles_and_no_further():
@@ -81,10 +146,10 @@ def test_fendra_reaches_three_tiles_and_no_further():
         }
     )
     world = World(level)
-    world.wizard.cast("fendra")
-    assert last(world)[2]["reason"] == "nothing_near"
+    world.wizard.cast("fendra", world.things["book"])
+    assert last(world)[2]["reason"] == "out_of_reach"
     world.wizard.move_right()
-    world.wizard.cast("fendra")
+    world.wizard.cast("fendra", world.things["book"])
     assert last(world)[1] == "pull"
 
 

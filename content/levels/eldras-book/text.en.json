@@ -2,14 +2,14 @@
   "title": "Eldra's book",
   "goals": [
     "Give Eldra her book.",
-    "Name the book with `find_nearest` before the spell moves it."
+    "In fewer than 6 lines."
   ],
-  "starting_code": "# Eldra's book is inside her room. Use fendra to reach it.\n",
+  "starting_code": "# Eldra's book is inside her room. Find it and use fendra to reach it.\n",
   "hints": [
-    "Walk to the doorway of Eldra's little room so you are in line with the book.",
-    "Cast the *fendra* spell to bring the book to you, then use `pick_up`.",
-    "Walk back to Eldra and use the `give` method to hand her the book."
+    "Find the book and keep it under a name.",
+    "Stand in line with it, in the doorway of her room.",
+    "Use `cast` to cast *fendra* with the book, use `pick_up` to pick it up, and use `give` to give it to Eldra, who is beside the door."
   ],
-  "intro": "Eldra's own book lies on the shelf inside her little room, where we cannot step. Bring it down with the *fendra* spell from the doorway's line, and give it to her.",
+  "intro": "Eldra's own book lies on the shelf inside her little room, where we cannot step. The *fendra* spell must be told which book to bring. Find it and keep it under a name, then bring it down from her doorway, in line with it, and give it to her.",
   "outro": "Wonderful! You have helped Eldra, and now you know your way around the library."
 }

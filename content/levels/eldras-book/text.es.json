@@ -2,14 +2,14 @@
   "title": "El libro de Eldra",
   "goals": [
     "Dale a Eldra su libro.",
-    "Nombra el libro con `find_nearest` antes de que el hechizo lo mueva."
+    "En menos de 6 líneas."
   ],
-  "starting_code": "# El libro de Eldra está dentro de su habitación. Usa fendra para alcanzarlo.\n",
+  "starting_code": "# El libro de Eldra está dentro de su habitación. Encuéntralo y usa fendra para alcanzarlo.\n",
   "hints": [
-    "Camina hasta la puerta de la pequeña habitación de Eldra para estar en línea con el libro.",
-    "Lanza el hechizo *fendra* para traer el libro hacia ti, y luego usa `pick_up`.",
-    "Vuelve junto a Eldra y usa el método `give` para darle el libro."
+    "Encuentra el libro y guárdalo bajo un nombre.",
+    "Párate en línea con él, en la puerta de su habitación.",
+    "Usa `cast` para lanzar *fendra* con el libro, usa `pick_up` para recogerlo y usa `give` para dárselo a Eldra, que está junto a la puerta."
   ],
-  "intro": "El libro de Eldra está en el estante dentro de su pequeña habitación, donde no podemos pisar. Bájalo con el hechizo *fendra* desde la línea de la puerta, y dáselo.",
+  "intro": "El libro de Eldra está en el estante dentro de su pequeña habitación, donde no podemos pisar. Hay que decirle al hechizo *fendra* qué libro debe traer. Encuéntralo y guárdalo bajo un nombre, luego bájalo desde su puerta, en línea con él, y dáselo.",
   "outro": "¡Fantástico! Has ayudado a Eldra y ahora ya sabes cómo moverte por la biblioteca."
 }

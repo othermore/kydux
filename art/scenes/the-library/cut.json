@@ -3,9 +3,9 @@
   "sources": {
     "folder": "art/raw/game-library6",
     "edits": "art/raw/game-library6",
-    "painting": "library-vault.png",
+    "painting": "library-book.png",
     "grid": "library-mended-grid.json",
-    "ground": "library-ground-bare-vault.png"
+    "ground": "library-ground-bare-book.png"
   },
   "repaint": {
     "about": "Painted by Gemini 3 Pro Image from tools/art/prompts/game-library-margin-3.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the boxes and the band. Two earlier tries are kept with their prompts: game-library-margin.md, given the whole canvas, painted over the reading room; game-library-margin-2.md kept the two dark arches beside the door, which the owner asked to have gone.",
@@ -87,6 +87,67 @@
       [
         "art/raw/game-library6/library-marked.png",
         "art/raw/game-library6/library-marked-vault.png"
+      ]
+    ]
+  },
+  "rare_shelf": {
+    "about": "The rare book's shelf without it (the owner, 2026-10-28: the book rests on its shelf, not floating and glowing): the glowing book taken out of the painting and the shelf behind it painted, by Gemini 3 Pro Image from tools/art/prompts/game-library-rare-shelf.md, given the painting as it is, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the box; the ground-only edit and the marked picture mended with it. The picture the resting book is cut against.",
+    "from": "art/raw/game-library6/library-vault.png",
+    "plain": true,
+    "boxes": [
+      [
+        1452,
+        680,
+        1806,
+        977
+      ]
+    ],
+    "crop": [
+      1017,
+      323,
+      2263,
+      1405
+    ],
+    "canvas": "art/raw/game-library6/library-rare-shelf-canvas.png",
+    "painting": "art/raw/game-library6/library-shelf.png",
+    "also": [
+      [
+        "art/raw/game-library6/library-marked-vault.png",
+        "art/raw/game-library6/library-marked-shelf.png"
+      ],
+      [
+        "art/raw/game-library6/library-ground-bare-vault.png",
+        "art/raw/game-library6/library-ground-bare-shelf.png"
+      ]
+    ]
+  },
+  "rare_book_resting": {
+    "about": "The rare book standing on its shelf among the others, its blue spine with gold bands, with a plain brown book beside it, in the gap the shelf without it has, painted by Gemini 3 Pro Image from tools/art/prompts/game-library-rare-book-3.md on the canvas this makes, the gap blurred, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box: the painting. Three other tries are kept with their prompts: -rare-book.md painted a book lying across the board, -2 one too tall, -4 none; and -rare-book-alone.md, asked to take the brown book out again, narrowed the blue one.",
+    "from": "art/raw/game-library6/library-shelf.png",
+    "boxes": [
+      [
+        1629,
+        798,
+        1688,
+        859
+      ]
+    ],
+    "crop": [
+      1425,
+      652,
+      1878,
+      1005
+    ],
+    "canvas": "art/raw/game-library6/library-rare-book-canvas.png",
+    "painting": "art/raw/game-library6/library-book.png",
+    "also": [
+      [
+        "art/raw/game-library6/library-marked-shelf.png",
+        "art/raw/game-library6/library-marked-book.png"
+      ],
+      [
+        "art/raw/game-library6/library-ground-bare-shelf.png",
+        "art/raw/game-library6/library-ground-bare-book.png"
       ]
     ]
   },
@@ -220,17 +281,34 @@
         4.25
       ],
       "row": 4,
-      "solid": false,
-      "without": "library-nobook.png",
+      "solid": true,
+      "without": {
+        "picture": "library-book.png",
+        "box": [
+          7.262,
+          3.6,
+          7.366,
+          3.93
+        ],
+        "from": "library-shelf.png"
+      },
       "states": {
-        "lying": "painting"
+        "lying": "painting",
+        "pulled": {
+          "picture": "library-vault.png",
+          "without": "library-nobook.png",
+          "solid": false
+        }
       },
       "at": [
         7,
         3
       ],
-      "about": "The rare book glowing in the high bookcase, three cells above the top aisle: fendra's reach; drawn smaller than painted, on the picture without it.",
-      "scale": 0.72
+      "about": "The rare book standing on the high bookcase's lower shelf among the others, three cells above the top aisle: fendra's reach. Its picture without it is the painting with its own box taken from the shelf without it, so that the brown book beside it stays. Taken by the spell, it glows as it comes down (pulled): the glowing book the painting first had, cut against Gemini's edit without it, drawn smaller.",
+      "scale": {
+        "pulled": 0.72
+      },
+      "snap": false
     },
     "eldras_book": {
       "box": [
@@ -250,7 +328,7 @@
         3
       ],
       "about": "Eldra's own book on the shelf of her little room; its edit without it is the shelf's back carried over it by hand, and its mask is where Gemini painted it magenta; drawn smaller than painted.",
-      "marked": "library-marked-vault.png",
+      "marked": "library-marked-book.png",
       "scale": 0.75
     },
     "wenna_door": {
@@ -519,7 +597,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-vault.png",
+      "marked": "library-marked-book.png",
       "states": {
         "standing": "painting"
       },
@@ -537,7 +615,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-vault.png",
+      "marked": "library-marked-book.png",
       "states": {
         "standing": "painting"
       }
@@ -554,7 +632,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-vault.png",
+      "marked": "library-marked-book.png",
       "states": {
         "standing": "painting"
       }
@@ -571,7 +649,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-vault.png",
+      "marked": "library-marked-book.png",
       "states": {
         "standing": "painting"
       }
@@ -808,7 +886,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "library-marked-vault.png",
+      "marked": "library-marked-book.png",
       "states": {
         "standing": "painting"
       }
@@ -1360,7 +1438,7 @@
       10.6
     ]
   ],
-  "source": "# The library\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-library-6.md`, with the field as its\n  style's reference, then edited by it without its grid\n  (`game-library6-nogrid.md`).\n- Its bottom mended by Gemini from `game-library-margin-3.md`, joined by\n  `tools/art/repaint.py`, the painting kept pixel for pixel elsewhere: the\n  castle's corridor below the double door, plain pillars in the corners,\n  plain wall beside the door.\n- The way to the vault ending in an iron safe, painted by Gemini from\n  `game-library-vault-2.md` in a box of the painting, joined by\n  `tools/art/repaint.py`.\n- Its sides painted on by Gemini from `image-first-library-margin.md`, three\n  cells on each side, on a canvas made and joined by `tools/art/margin.py`:\n  the castle's walls going on, and grass and trees beyond them.\n- Its door arches drawn over whoever passes under them, and its walls and\n  the little table by Eldra's armchair, cut by polygons, each edge on its\n  outline (static things).\n- Its counter, bookcases, pile of books, tables, chairs, desk and Eldra's\n  book painted flat magenta by Gemini in crops of the painting\n  (`game-library-marked-*.md`, each asked three times and voted), and cut\n  there with their outlines.\n- Each door open, swung in out of sight, its whole doorway the floor of the\n  room beyond from Gemini's edit of the doorway alone\n  (`game-library-centre-open.md`, `-wenna-open.md`, `-room-open.md`), laid\n  in by `tools/art/repaint.py doorways`.\n- Each thing that opens or is picked up cut against Gemini's edit without it\n  (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`); Eldra's own\n  book against the shelf's back carried over it by hand; the armchair, which\n  stands in front of whoever is behind it, against Gemini's edit without it\n  (`game-library-noarmchair.md`). The two books drawn smaller than painted.\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n",
+  "source": "# The library\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-library-6.md`, with the field as its\n  style's reference, then edited by it without its grid\n  (`game-library6-nogrid.md`).\n- Its bottom mended by Gemini from `game-library-margin-3.md`, joined by\n  `tools/art/repaint.py`, the painting kept pixel for pixel elsewhere: the\n  castle's corridor below the double door, plain pillars in the corners,\n  plain wall beside the door.\n- The way to the vault ending in an iron safe, painted by Gemini from\n  `game-library-vault-2.md` in a box of the painting, joined by\n  `tools/art/repaint.py`.\n- The rare book standing on its shelf among the others, not floating and\n  glowing: the glowing book taken out of the painting and the shelf behind\n  it painted (`game-library-rare-shelf.md`), then the book painted standing\n  in the shelf's gap (`game-library-rare-book-3.md`), each by Gemini in a\n  box of the painting, joined by `tools/art/repaint.py`; the glowing book\n  is drawn as the spell brings it down.\n- Its sides painted on by Gemini from `image-first-library-margin.md`, three\n  cells on each side, on a canvas made and joined by `tools/art/margin.py`:\n  the castle's walls going on, and grass and trees beyond them.\n- Its door arches drawn over whoever passes under them, and its walls and\n  the little table by Eldra's armchair, cut by polygons, each edge on its\n  outline (static things).\n- Its counter, bookcases, pile of books, tables, chairs, desk and Eldra's\n  book painted flat magenta by Gemini in crops of the painting\n  (`game-library-marked-*.md`, each asked three times and voted), and cut\n  there with their outlines.\n- Each door open, swung in out of sight, its whole doorway the floor of the\n  room beyond from Gemini's edit of the doorway alone\n  (`game-library-centre-open.md`, `-wenna-open.md`, `-room-open.md`), laid\n  in by `tools/art/repaint.py doorways`.\n- Each thing that opens or is picked up cut against Gemini's edit without it\n  (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`); Eldra's own\n  book against the shelf's back carried over it by hand; the armchair, which\n  stands in front of whoever is behind it, against Gemini's edit without it\n  (`game-library-noarmchair.md`). The two books drawn smaller than painted.\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n",
   "lowered": [
     {
       "cells": [
@@ -1446,7 +1524,7 @@
         ]
       }
     ],
-    "mended": "art/raw/game-library6/library-marked-vault.png"
+    "mended": "art/raw/game-library6/library-marked-book.png"
   },
   "rows": [
     {

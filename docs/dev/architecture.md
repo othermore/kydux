@@ -160,8 +160,9 @@ notebook shows. A level lists in its `api` which of them it teaches
 wizard.move_right(steps=1)   # and move_left, move_up, move_down: a tick per step;
                              # stops at a wall or a closed door
 wizard.say(text)             # a tick; a door beside the wizard whose password it is opens
-wizard.cast(spell)           # a tick: with the wand carried, a spell of the level's,
-                             # where the wizard stands (D42); zelim breaks a seal beside it
+wizard.cast(spell, thing=None)  # a tick: with the wand carried, a spell of the level's,
+                             # where the wizard stands (D42); zelim breaks a seal beside it;
+                             # fendra is given the thing to bring (D47)
 wizard.wait(ticks=1)         # a tick each: stands still while the world moves on
 wizard.pick_up()             # a tick: the thing on the wizard's tile, into wizard.items
 wizard.find_nearest(kind)    # the nearest thing or actor of a kind ("key"...), or None
@@ -181,8 +182,8 @@ thing.kind, thing.name       # a key, a book, a wand, a potion, a door, a bed: b
 thing.position               # where it lies; None once carried
 thing.distance_to(other)     # the steps to the wizard, a thing or an actor (D86); a
                              # carried thing is where the wizard is
-thing.reveal()               # a tick: its outline drawn where it lies, through what
-                             # covers it; refused once carried (not_here) (D85)
+thing.reveal()               # a tick: its whole outline drawn where it lies, over
+                             # what covers it; refused once carried (not_here) (D85)
 
 bed.free                     # whether no one sleeps in it (D84)
 
@@ -226,14 +227,14 @@ tiles are `[x, y]`.
 | `pick_up` | wizard | `id`, `at` | the thing rises and vanishes; `data-carried` |
 | `open` | wizard, by `door.open()`; or the door, in the wizard's tick, opened by a spell or a word | `id`, `at`, `by`: `hand`, `spell` or `word` | the door's frame turns open; `data-doors` |
 | `cast` | wizard | `spell`, `at` | a ring of light grows from the wizard and fades |
-| `pull` | the thing, in the wizard's tick | `id`, `from`, `to` | the thing slides to the wizard's tile (D47) |
+| `pull` | the thing, in the wizard's tick | `id`, `from`, `to` | the thing slides to the wizard's tile, in its `pulled` state when it is painted one, a book glowing (D47) |
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
 | `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
 | `give` | wizard | `id`, `to`, `at` | the thing floats from the wizard to the actor and fades; the actor faces the wizard (D48) |
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`; `bed`, its tile | the figure lies in the bed, its head on the pillow, under the quilt, no celebration after; `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile beside the bed (D91) |
-| `reveal` | wizard | `id`, `at` | the thing's outline beats wherever something covers it, until it is picked up or given; `data-revealed` (D85) |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (with `spell`), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
+| `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
 
@@ -663,7 +664,8 @@ one overturns stays, marked as superseded.
   course has not taught yet is shown nowhere.
 - **D42 — Spells.** Decided 2026-10-21 (sprint-7.md), built the same day.
   A spell is a word, cast with the wand: `wizard.cast("<spell>")` is the
-  wand's action (D27), and without the wand carried it is refused with a
+  wand's action (D27), and a spell that acts on a thing is given it too,
+  `wizard.cast("fendra", book)` (D47), and without the wand carried it is refused with a
   `blocked` event of reason `no_wand`, which the wizard thinks as *I do not
   know this action yet*; nothing is tried, so nothing shakes. A level says
   which spells exist in it, `"spells"` in `level.json`, words in small
@@ -737,17 +739,24 @@ one overturns stays, marked as superseded.
   tile, so a thing on a shelf comes down only by a spell. Both sides'
   sight is tested with their own rule on `tests/fixtures/sight.json`,
   which holds shelves.
-- **D47 — `fendra` pulls the nearest thing the wizard can see.** Decided
-  2026-10-21 (sprint-8.md), built the same day. Cast with the wand,
-  `fendra` looks along the four ways from the wizard's tile, up to three
-  tiles each (`FENDRA_REACH`), through shelves and not through walls or
-  closed doors, and moves the nearest thing that can be carried onto the
-  wizard's tile: nearest by distance, then by reading order, as
-  `find_nearest` chooses. The thing's `pull` event comes in the wizard's
-  tick, the thing's own, as a door's `open` by a spell is (D43). With
-  nothing to pull the cast is refused, `nothing_near`, and the wizard
-  shakes, having tried. The wizard then picks the thing up: a spell moves
-  the world, the hands carry. A spell's effect is looked up by name in
+- **D47 — `fendra` pulls the thing it is told, when the wizard can see
+  it.** Decided 2026-10-21 (sprint-8.md), and the thing named on
+  2026-10-28 by the owner: the library's shelves hold many books, and the
+  nearest one is not the one wanted. Cast with the wand and given the
+  thing as its second argument, `wizard.cast("fendra", book)`, `fendra`
+  moves that thing onto the wizard's tile when it lies along one of the
+  four ways from the wizard's tile, up to three tiles (`FENDRA_REACH`),
+  through shelves and not through walls or closed doors (`world.in_line`).
+  The other spells take no thing; a spell given the wrong arguments is
+  explained with the example that fits it (`ActionArguments.example`).
+  The thing's `pull` event comes in the wizard's tick, the thing's own, as
+  a door's `open` by a spell is (D43). A thing out of reach refuses the
+  cast, `out_of_reach`, and the wizard shakes, having tried. The wizard
+  then picks the thing up: a spell moves the world, the hands carry. A
+  `pick_up` with nothing in the hands' reach and a thing up on a shelf in
+  the spell's is refused `too_high`, so that the child thinks of the
+  spell. A thing painted in a state of its own for the pull (`pulled`, a
+  book glowing) is drawn so while it comes. A spell's effect is looked up by name in
   `SPELLS` (`world.py`), a function from the world and the wizard's tile
   to an `Effect`, the change to make in the tick or the reason to refuse;
   `level.KNOWN_SPELLS` names the same spells, so that a level naming a
@@ -1298,8 +1307,9 @@ one overturns stays, marked as superseded.
   fendra's pull moves a painted thing the same way. A thing the wizard
   carries may be `hidden`, lying under a cut-out on purpose, which the
   content test allows; the world treats it as any thing, `find_nearest`
-  finds it, and `thing.reveal()` shows its outline wherever something
-  covers it, the wizard's outline made for any sprite (`silhouette.ts`).
+  finds it, and `thing.reveal()` shows its whole outline, over whatever
+  covers it, the wizard's outline made for any sprite (`silhouette.ts`),
+  so that it is found among things like it too, a book among books.
   Rules out a second painting of a key in each place, and a world where
   what is hidden is absent.
 - **D86 — `distance_to` is the steps between two of the child's objects.**
@@ -1494,13 +1504,15 @@ one overturns stays, marked as superseded.
   from the figure's top to its feet). The entrance's three arches are
   such passages, the middle one deeper. Rules out a figure as lit in a
   dark corridor as in the hall.
-- **D101 — An open door is out of sight.** Decided 2026-10-28 by the
-  owner. A door in a wall seen from the front, with room behind it, swings
-  in and goes behind the wall: open, its whole doorway, from the arch to
-  the threshold, shows the floor of the room beyond (`doorways` in the
-  scene's settings, `repaint.py doorways`, the floor taken from Gemini's
-  edit of the doorway); a doorway always open has no door at all, as the
-  entrance's side arches. A door in a side wall, or with no room behind it
-  to swing into, is drawn open as painted. Rules out a leaf against its
-  arch's side covering part of the doorway, and half a leaf before a round
-  doorway.
+- **D101 — An open door is seen open; one whose picture goes wrong
+  swings out of sight.** Decided 2026-10-28 by the owner. An open door is
+  drawn as its edit shows it, its leaves seen: it looks better so. Where
+  that picture goes wrong, a leaf covering part of the doorway, the closed
+  door's planks left under it, half a leaf before a round doorway, a door
+  in a wall seen from the front with room behind it swings in out of
+  sight instead: open, its whole doorway, from the arch to the threshold,
+  shows the floor of the room beyond (`doorways` in the scene's settings,
+  `repaint.py doorways`, the floor taken from Gemini's edit of the
+  doorway), as the library's three doors; and a doorway always open has
+  no door at all, as the entrance's side arches. Rules out a door drawn
+  open wrong because its edit is.

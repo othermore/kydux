@@ -51,6 +51,10 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
       return t('blocked.nobody');
     case 'far':
       return t('blocked.far', { thing });
+    case 'too_high':
+      return t('blocked.too_high', { thing });
+    case 'out_of_reach':
+      return t('blocked.out_of_reach', { thing });
     case 'locked':
       return t('blocked.locked', { thing });
     case 'open':

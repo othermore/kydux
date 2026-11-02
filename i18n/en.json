@@ -111,6 +111,7 @@
   "blocked": {
     "friend": "{name} is in my way: I must walk round.",
     "far": "I cannot reach {thing} from here.",
+    "too_high": "I can see {thing} up there, but it is too high to reach by hand.",
     "locked": "I cannot open {thing}: it is locked, and I have no key for it.",
     "open": "I do not need to: {thing} is already open.",
     "nothing": "There is nothing here to pick up.",
@@ -120,6 +121,7 @@
     "sealed": "I cannot open {thing} by hand: it is sealed, and needs a spell.",
     "password": "I cannot open {thing} by hand: it wants a word.",
     "nothing_near": "There is nothing near enough for the spell to bring.",
+    "out_of_reach": "The spell cannot reach {thing} from here.",
     "not_carried": "I cannot give {thing}: I am not carrying it.",
     "nobody": "There is no one beside me to give it to.",
     "which_one": "There are several things here: {things}. Say which, like wizard.pick_up({first}).",
@@ -151,7 +153,7 @@
       "position": "Where the wizard stands, as x and y.",
       "facing": "The way the wizard looks: up, down, left or right.",
       "items": "The things the wizard carries.",
-      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all.",
+      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all. The fendra spell is also given the thing to bring: wizard.cast(\"fendra\", book).",
       "give": "Gives a thing the wizard carries to whoever stands right beside it.",
       "sleep": "Lies down and sleeps in a free bed.",
       "distance_to": "Gives the number of steps from the wizard to an object."
@@ -161,7 +163,7 @@
       "name": "The thing's own name in this level.",
       "position": "Where the thing lies, or None once the wizard carries it.",
       "distance_to": "Gives the number of steps from an object to the wizard.",
-      "reveal": "Shows where a hidden thing lies."
+      "reveal": "Makes a thing's outline beat, through whatever hides it too, so that you see where it is."
     },
     "door": {
       "kind": "What it is: \"door\".",
@@ -370,7 +372,7 @@
   },
   "spells": {
     "zelim": "breaks the seal of a door beside you.",
-    "fendra": "draws to your tile the nearest thing up to three tiles away in a straight line.",
+    "fendra": "brings to your cell the thing you name, three cells away at most in a straight line.",
     "kirra": "lights the dark room you are in.",
     "osto": "holds a moving stair beside you still for a while."
   },

@@ -65,7 +65,7 @@
     },
     {
       "kind": "uses",
-      "member": "find_nearest",
+      "member": "reveal",
       "bonus": true
     }
   ],

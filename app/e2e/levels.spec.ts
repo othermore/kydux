@@ -250,6 +250,56 @@ test.describe('chapter 2', () => {
   });
 });
 
+/** A give's way (D48), from data-given: the thing's middle where it leaves the hands
+ * and where it goes, in cells, and a screenshot half-way. */
+async function watchGive(page: Page, shot: string): Promise<{ from: [number, number]; to: [number, number] }> {
+  await page.waitForFunction(() => document.querySelector('#scene')?.hasAttribute('data-given'), null, {
+    timeout: 60_000,
+    polling: 'raf',
+  });
+  await page.waitForTimeout(200);
+  await page.locator('.scene-frame').screenshot({ path: `${SHOTS}${shot}` });
+  const given = (await page.locator('#scene').getAttribute('data-given')) ?? '';
+  const [, from = '', to = ''] = /^[^:]+:([\d.,]+)>([\d.,]+)$/.exec(given) ?? [];
+  const cell = (text: string) => text.split(',').map(Number) as [number, number];
+  return { from: cell(from), to: cell(to) };
+}
+
+test.describe('a thing given goes to who takes it (D48)', () => {
+  test('in The book returned, the book rises from the wizard to Eldra above', async ({ page }) => {
+    await page.goto('/#level/the-book-returned');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('1');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText(readFileSync(`${CONTENT}levels/the-book-returned/solution.py`, 'utf8'));
+    await page.locator('#run').click();
+    const { from, to } = await watchGive(page, 's28-give-up.png');
+    // Eldra stands on the cell above, drawn a little left of its middle (nudged, D105),
+    // and the wizard, who walked right along the hall, turns up to her first.
+    expect(to[1], `${from} > ${to}`).toBeLessThan(from[1] - 0.5);
+    expect(Math.abs(to[0] - from[0]), `${from} > ${to}`).toBeLessThan(0.5);
+    await expect(page.locator('#scene')).toHaveAttribute('data-given-facing', 'up');
+  });
+
+  test("in Eldra's room, the book goes sideways to Eldra beside the wizard", async ({ page }) => {
+    await page.goto('/#level/eldras-room');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('1');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText(readFileSync(`${CONTENT}levels/eldras-room/solution.py`, 'utf8'));
+    await page.locator('#run').click();
+    const { from, to } = await watchGive(page, 's28-give-side.png');
+    expect(to[0], `${from} > ${to}`).toBeGreaterThan(from[0] + 0.6);
+    expect(Math.abs(to[1] - from[1]), `${from} > ${to}`).toBeLessThan(0.4);
+    // Stepped down from the doorway, the wizard turns right to Eldra first.
+    await expect(page.locator('#scene')).toHaveAttribute('data-given-facing', 'right');
+  });
+});
+
 test.describe("Eldra's room (D46, D47, D49, D129)", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#level/eldras-room');

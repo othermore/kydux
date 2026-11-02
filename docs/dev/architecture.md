@@ -246,7 +246,7 @@ tiles are `[x, y]`.
 | `pull` | the thing, in the wizard's tick | `id`, `from`, `to` | once the spell's light reaches it, the thing flies to the wizard's hands, in its `pulled` state when it is painted one, a book glowing (D47), and stays there, held (D127) |
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
 | `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
-| `give` | wizard | `id`, `to`, `at` | the thing floats from the middle of the wizard's hands to the middle of the figure that takes it, where it is drawn, and fades there; the actor faces the wizard (D48) |
+| `give` | wizard | `id`, `to`, `at` | the wizard turns to the figure that takes the thing, which faces the wizard; then the thing floats from the middle of the wizard's hands to the middle of that figure, where it is drawn, and fades there (D48) |
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
@@ -796,7 +796,11 @@ one overturns stays, marked as superseded.
   which is not what goes wrong. `give` takes the thing
   as an object, so that a variable holding what `find_nearest` gave back
   is what is given. The goal `give` (`id`, `to`) is met once that thing
-  has been given to that actor.
+  has been given to that actor. On the page the wizard turns to the
+  figure that takes the thing, then the thing goes from the middle of the
+  wizard's hands to the middle of that figure, where it is drawn (its
+  nudge and its lowering included), and fades there (the owner,
+  2026-11-01).
 - **D49 — A level may hand the wizard things from the start.** Decided
   2026-10-21 (sprint-8.md), built the same day. `"carrying": ["wand"]` in
   `level.json` lists kinds of thing the wizard holds at tick 0, each once,

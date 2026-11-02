@@ -167,6 +167,9 @@ function tileOf(value: unknown): Tile | null {
 /** How far a figure's head lies from its feet, a part of its height: where the
  * middle of the head is, on the pillow, for a figure asleep (D91). */
 const HEAD_REACH = 0.65;
+/** How long the wizard is seen turned to who takes a thing before it goes, against a
+ * tick (D48). */
+const GIVE_TURN = 0.2;
 
 const DELTA: Record<Facing, Tile> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
@@ -1070,6 +1073,17 @@ class LevelScene extends Phaser.Scene {
     return [x - mx, y - my];
   }
 
+  /** Where an image's corner goes for its middle to lie on the middle of the figure
+   * standing on a tile, half its height above its feet, as it is drawn there. */
+  private middleOnFigure(image: Phaser.GameObjects.Image, tile: Tile): [number, number] {
+    const [fx, fy] = this.figureAt(tile);
+    const height = (this.art?.figures?.height_cells ?? 0.8) * TILE;
+    const [x, y] = [fx, fy - height * 0.5];
+    if (image.originX !== 0 || !image.texture.key.startsWith('art-')) return [x, y];
+    const [mx, my] = middleOffset(image, image.texture.key);
+    return [x - mx, y - my];
+  }
+
   /** The things held in the wizard's hands set down where the world has them, on
    * the tile the spell brought them to, when the wizard does something else (D127). */
   private setDown(instant: boolean): void {
@@ -1094,6 +1108,10 @@ class LevelScene extends Phaser.Scene {
     if (actor) {
       actor.facing = towards(actor.tile, this.wizardTile);
       this.face(actor.sprite, actor.facing);
+      // The wizard turns to who takes the thing before it leaves the hands (D48).
+      const turned = towards(this.wizardTile, actor.tile);
+      this.face(this.wizard, turned);
+      this.parentNode.dataset.givenFacing = turned;
     }
     if (!image || !actor) return;
     this.tweens.killTweensOf(image);
@@ -1104,13 +1122,22 @@ class LevelScene extends Phaser.Scene {
     image.setPosition(...this.handsFor(image)).setVisible(true).setAlpha(1);
     // Leaving the hands, it hides nothing of the wizard (silhouette.ts).
     this.held.add(image);
-    const [x, y] = centre(actor.tile);
+    // To the middle of the figure that takes it, where that figure is drawn, its
+    // nudge and its lowering included (D48, D105): the image's middle, not its corner.
+    const [x, y] = this.middleOnFigure(image, actor.tile);
+    const middle = (px: number, py: number) => {
+      const [mx, my] = image.originX === 0 ? middleOffset(image, image.texture.key) : [0, 0];
+      return `${((px + mx) / TILE).toFixed(2)},${((py + my) / TILE).toFixed(2)}`;
+    };
+    this.parentNode.dataset.given = `${id}:${middle(image.x, image.y)}>${middle(x, y)}`;
+    // Seen turned first, then the thing goes.
     this.tweens.add({
       targets: image,
       x,
-      y: y - 10,
+      y,
       alpha: 0,
-      duration: this.playback.tickDuration * 0.9,
+      delay: this.playback.tickDuration * GIVE_TURN,
+      duration: this.playback.tickDuration * (0.9 - GIVE_TURN),
       onComplete: () => {
         image.setVisible(false).setAlpha(1);
         this.held.delete(image);

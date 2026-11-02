@@ -24,7 +24,8 @@
         "ajar": "game-field-gate-ajar.png",
         "open": "game-field-gate-open.png"
       },
-      "under": true
+      "under": true,
+      "opening": 3.6
     },
     "seal_gate": {
       "about": "Down to its threshold, a little into the row below, drawn under whoever stands there; its mask filled from edge to edge in every row, since the wood near its latch is the colour of the sand behind. The painting draws this door's rune; the page draws one on the others (D79).",
@@ -44,7 +45,8 @@
         "open": null
       },
       "rune": "painted",
-      "under": true
+      "under": true,
+      "opening": 1.22
     },
     "castle_door": {
       "about": "Open onto the lit hall; the dark doorway is the picture without the door, which the states are cut against.",
@@ -61,7 +63,8 @@
         "closed": "painting",
         "open": "game-field-castle-lit.png"
       },
-      "under": true
+      "under": true,
+      "opening": 2.5
     },
     "wand": {
       "about": "The flat stone it lies on stands with the bush below it, on row 15, and the wand lies on the stone, drawn just after it. The edit draws the stone again, a little differently: the whole of it comes from the edit, so that no two outlines meet.",

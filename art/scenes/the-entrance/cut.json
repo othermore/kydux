@@ -22,7 +22,9 @@
       "mask": "pale",
       "states": {
         "standing": "painting"
-      }
+      },
+      "opening": 3.4,
+      "adults": true
     }
   },
   "cuts": [],

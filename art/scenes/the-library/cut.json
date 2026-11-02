@@ -193,7 +193,8 @@
         7,
         16
       ],
-      "about": "Wenna's door, in the wall between the reading room and the shelves."
+      "about": "Wenna's door, in the wall between the reading room and the shelves.",
+      "opening": 1.17
     },
     "centre_door": {
       "box": [
@@ -213,7 +214,8 @@
         7,
         8
       ],
-      "about": "The door in the middle of the wall between the wide hall and the top aisle."
+      "about": "The door in the middle of the wall between the wide hall and the top aisle.",
+      "opening": 1.18
     },
     "room_door": {
       "box": [

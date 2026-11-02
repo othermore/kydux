@@ -221,6 +221,31 @@ def recolour_sheet(
     return Image.fromarray(pixels)
 
 
+#: How tall every figure is drawn, as a part of the height it is cut at (D98): the
+#: children then stand at most 1.15 cells and the grown-ups 1.45, a third taller,
+#: and every figure passes under the doors it walks through with a tenth of a cell
+#: over its hat.
+SIZE = 0.82
+
+
+def sized(
+    sheet: Image.Image, frame: tuple[int, int], foot: int, size: float = SIZE
+) -> Image.Image:
+    """Every frame of the sheet drawn `size` as tall and as wide, its feet on the
+    frame's foot line and its middle in the frame's middle, as before."""
+    fw, fh = frame
+    sheet = sheet.convert("RGBA")
+    out = Image.new("RGBA", sheet.size, (0, 0, 0, 0))
+    w, h = round(fw * size), round(fh * size)
+    for row in range(sheet.height // fh):
+        for column in range(sheet.width // fw):
+            cell = sheet.crop((column * fw, row * fh, (column + 1) * fw, (row + 1) * fh))
+            x = column * fw + round(fw * (1 - size) / 2)
+            y = row * fh + round((fh - foot) * (1 - size))
+            out.alpha_composite(cell.resize((w, h), Image.LANCZOS), (x, y))
+    return out
+
+
 def _shifted(cell: np.ndarray, dx: int) -> np.ndarray:
     """A frame moved `dx` pixels to the right (left when negative)."""
     out = np.zeros_like(cell)
@@ -561,7 +586,7 @@ def make(check: bool = False) -> list[Path]:
             recolour_sheet(sleeps[look["gender"]], frame, colours, hues),
         )
         target = FIGURES / f"wizard-{look_id}.webp"
-        sheet.save(target, quality=90, method=6)
+        sized(sheet, frame, about["foot"]).save(target, quality=90, method=6)
         written.append(target)
     sets = friend_sets()
     for name, (key, own) in FRIENDS.items():
@@ -573,7 +598,7 @@ def make(check: bool = False) -> list[Path]:
                 recolour_sheet(base, frame, both, hues),
                 recolour_sheet(sleeps[key], frame, both, hues),
             )
-            sheet.save(target, quality=90, method=6)
+            sized(sheet, frame, about["foot"]).save(target, quality=90, method=6)
             written.append(target)
         (FIGURES / f"{name}.webp").unlink(missing_ok=True)
     # The list is whatever sheets the folder holds: these, and the figures cut once

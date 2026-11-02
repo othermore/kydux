@@ -563,6 +563,38 @@ def test_a_figure_on_a_lowered_cell_is_drawn_lower():
     assert sweep.feet_at(scene, 0, 1) == 1 + sweep.FOOT_IN_CELL
 
 
+def standing_height(name: str) -> float:
+    """How tall a figure stands in its sheet's standing frame, in cells."""
+    data = json.loads((FIGURES / "figures.json").read_text())
+    width, height = data["frame"]
+    sheet = np.array(Image.open(FIGURES / f"{name}.webp").convert("RGBA"))
+    rows = np.nonzero(sheet[:height, width : 2 * width, 3].max(axis=1) > 20)[0]
+    return (rows.max() - rows.min() + 1) / data["cell"]
+
+
+@pytest.mark.skipif(
+    not (FIGURES / "figures.json").is_file(), reason="the figures are not exported"
+)
+def test_every_figure_passes_under_the_doors_it_walks_through():
+    # D98: a child at most 1.15 cells, a grown-up at most 1.45 and clearly taller,
+    # and a door's opening, from the feet of a figure in its doorway to the top of
+    # its arch, a tenth of a cell taller than the tallest figure that walks through.
+    names = json.loads((FIGURES / "figures.json").read_text())["figures"]
+    children = [n for n in names if n.startswith(("wizard-", "nuri-", "teku-")) or n == "eldra"]
+    grown = [n for n in names if n not in children]
+    child = max(standing_height(n) for n in children)
+    adult = max(standing_height(n) for n in grown)
+    assert child <= 1.15 and adult <= 1.45
+    assert min(standing_height(n) for n in grown) > child + 0.15
+    # Eldra, a ghost, keeps to her nook and never walks through a door.
+    walker = max(standing_height(n) for n in children if n != "eldra")
+    for scene in export_scene.scenes():
+        for name, thing in export_scene.settings(scene).things.items():
+            if "opening" in thing:
+                tallest = adult if thing.get("adults") else walker
+                assert thing["opening"] >= tallest + 0.1, (scene, name)
+
+
 def test_a_solid_thing_s_mask_has_its_holes_filled():
     mask = np.zeros((60, 60), dtype=bool)
     mask[10:50, 10:50] = True

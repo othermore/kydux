@@ -708,13 +708,18 @@ def figures() -> Path:
         sheet = looks.walking(
             sheet, (width, height), looks.FLOATING.get(name), looks.KEPT_FRAME.get(name)
         )
-        webp(sheet, looks.BASE_DIR / AS_BASES[name] if name in AS_BASES else out / f"{name}.webp")
+        # A base is recoloured into the looks' sheets, which are drawn smaller then;
+        # every other figure is drawn smaller here (D98).
+        if name in AS_BASES:
+            webp(sheet, looks.BASE_DIR / AS_BASES[name])
+        else:
+            webp(looks.sized(sheet, (width, height), FOOT), out / f"{name}.webp")
     wizard = every["wizard"]["down"][1].height
     data = {
         "cell": CELL,
         "frame": [width, height],
         "foot": FOOT,
-        "height_cells": round(wizard / CELL, 2),
+        "height_cells": round(wizard * looks.SIZE / CELL, 2),
         "ways": list(WAYS),
         "frames": 3,
         "standing": 1,

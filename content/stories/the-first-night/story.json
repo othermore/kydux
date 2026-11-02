@@ -135,10 +135,25 @@
     },
     {
       "who": "mate",
-      "do": {
-        "by": "friend",
-        "sleep": "bed_6"
-      }
+      "do": [
+        {
+          "by": "friend",
+          "walk": [
+            [
+              8,
+              9
+            ],
+            [
+              5,
+              9
+            ]
+          ]
+        },
+        {
+          "by": "friend",
+          "sleep": "bed_6"
+        }
+      ]
     },
     {
       "who": "wizard"
@@ -149,8 +164,8 @@
       "do": [
         {
           "walk": [
-            16,
-            5
+            18,
+            6
           ]
         },
         {

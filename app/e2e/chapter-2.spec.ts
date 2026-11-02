@@ -105,7 +105,7 @@ test.describe('in the dormitory (D84)', () => {
     await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
   });
 
-  test('the cell to sleep from is marked, and the wizard walks to the pillow and lies down, a tick each (D130)', async ({
+  test('the cell to sleep from is marked, and the wizard walks to the cell under the pillow, then hops in (D130)', async ({
     page,
   }) => {
     await seedWizard(page, MARTA);
@@ -115,25 +115,29 @@ test.describe('in the dormitory (D84)', () => {
     await expect(scene).toHaveAttribute('data-marks', '16,8');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-sleep-mark.png` });
     await page.locator('#speed').selectOption('1');
-    // When the wizard is taken to be asleep in the bed, and when lying in it.
+    // Each cell the wizard stands on, and when it lies in the bed, as they come.
     await scene.evaluate((node) => {
       const seen: [string, number][] = [];
-      (window as unknown as { kyduxAsleep: [string, number][] }).kyduxAsleep = seen;
+      (window as unknown as { kyduxSeen: [string, number][] }).kyduxSeen = seen;
       new MutationObserver(() => {
         const asleep = (node.getAttribute('data-asleep') ?? '').split(',').find((s) => s.startsWith('wizard'));
-        if (asleep && seen.at(-1)?.[0] !== asleep) seen.push([asleep, performance.now()]);
-      }).observe(node, { attributes: true, attributeFilter: ['data-asleep'] });
+        const now = asleep === 'wizard:bed_2:lying' ? 'lying' : (node.getAttribute('data-wizard') ?? '');
+        if (seen.at(-1)?.[0] !== now) seen.push([now, performance.now()]);
+      }).observe(node, { attributes: true, attributeFilter: ['data-wizard', 'data-asleep'] });
     });
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText(solution('your-bed'));
     await page.locator('#run').click();
     await expect(scene).toHaveAttribute('data-asleep', /wizard:bed_2:lying/, { timeout: 60_000 });
-    const seen = await page.evaluate(() => (window as unknown as { kyduxAsleep: [string, number][] }).kyduxAsleep);
-    const [begun, lying] = [seen.find(([s]) => s === 'wizard:bed_2'), seen.find(([s]) => s === 'wizard:bed_2:lying')];
-    expect(begun && lying, JSON.stringify(seen)).toBeTruthy();
-    // Lying only after the walk's tick and most of the next: 1.7 ticks of 400 ms.
-    expect(lying![1] - begun![1]).toBeGreaterThan(400 * 1.6);
+    const seen = await page.evaluate(() => (window as unknown as { kyduxSeen: [string, number][] }).kyduxSeen);
+    // Down one cell, right two along the floor before the bed to the cell under the
+    // pillow, a tick of 400 ms each at speed 1, then into the bed.
+    const at = (state: string) => seen.find(([s]) => s === state)?.[1] ?? Number.NaN;
+    const times = ['16,9', '17,9', '18,9', 'lying'].map(at);
+    expect(times.every((t) => !Number.isNaN(t)), JSON.stringify(seen)).toBe(true);
+    for (let i = 1; i < 3; i += 1) expect(times[i]! - times[i - 1]!, JSON.stringify(seen)).toBeGreaterThan(300);
+    expect(times[3]!).toBeGreaterThan(times[2]!);
   });
 
   test('going to sleep, the night falls and the morning comes before the card (D124)', async ({ browser }) => {
@@ -193,12 +197,35 @@ test.describe('in the dormitory (D84)', () => {
     await seedWizard(page, MARTA);
     await page.goto('/#story/the-first-night');
     const scene = page.locator('#scene');
+    // Every cell the friend and the mate stand on, as they come.
+    await scene.evaluate((node) => {
+      const seen: Record<string, string[]> = { friend: [], mate: [] };
+      (window as unknown as { kyduxWalks: Record<string, string[]> }).kyduxWalks = seen;
+      new MutationObserver(() => {
+        for (const part of (node.getAttribute('data-actors') ?? '').split(';')) {
+          const [who, x, y] = part.split(/[:,]/);
+          const cells = who ? seen[who] : undefined;
+          if (cells && cells.at(-1) !== `${x},${y}`) cells.push(`${x},${y}`);
+        }
+      }).observe(node, { attributes: true, attributeFilter: ['data-actors'] });
+    });
     for (let step = 1; step < 9; step += 1) {
       await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
       await storyNext(page);
     }
+    // The mate half-way along the floor before bed_1, to the cell under its pillow.
+    await page.waitForFunction(() => /mate:17,6/.test(document.querySelector('#scene')?.getAttribute('data-actors') ?? ''), null, {
+      timeout: 60_000,
+      polling: 'raf',
+    });
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s27-mate-walk.png` });
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
     await expect(scene).toHaveAttribute('data-asleep', 'friend:bed_6:lying,mate:bed_1:lying');
+    // Each walked round to the floor under its bed's pillow, and crossed no bed (D130).
+    const walks = await page.evaluate(() => (window as unknown as { kyduxWalks: Record<string, string[]> }).kyduxWalks);
+    expect(walks.friend!.slice(-4), JSON.stringify(walks)).toEqual(['8,9', '7,9', '6,9', '5,9']);
+    expect(walks.mate!.slice(-2), JSON.stringify(walks)).toEqual(['17,6', '18,6']);
+    expect(walks.mate!.filter((cell) => /^(1[7-9]|20),5$/.test(cell)), JSON.stringify(walks)).toEqual([]);
     // The first night is told on the night painting as it is (D124).
     await expect(scene).toHaveAttribute('data-light', 'none');
     await page.waitForTimeout(400);
@@ -244,7 +271,8 @@ test.describe('in the dormitory (D84)', () => {
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-morning-story.png` });
     await storyNext(page);
     await expect(scene).not.toHaveAttribute('data-asleep', /mate/);
-    await expect(scene).toHaveAttribute('data-actors', /mate:16,5/);
+    // Up on the floor under bed_1's pillow (D130).
+    await expect(scene).toHaveAttribute('data-actors', /mate:18,6/);
     // The two leave together (D103): the wizard opens the door, both go out, the
     // mate shuts it behind them.
     await storyNext(page, 3);

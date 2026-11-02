@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState, SLEEP } from './playback';
+import { LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState } from './playback';
 
 function events(n: number): PlaybackEvent[] {
   return Array.from({ length: n }, (_, i) => ({
@@ -63,20 +63,18 @@ describe('Playback', () => {
     expect(lengthOf([{ ...first!, actor: 'eldra', kind: 'cast' }])).toBe(1);
   });
 
-  it('gives going to sleep two ticks, the walk to the pillow and the lying down (D130)', () => {
+  it('gives going to sleep a tick, the hop, the walk to the pillow being moves of the world (D130)', () => {
     const playback = new Playback({ tickMs: 400 });
     const ticks: number[] = [];
     playback.onTick((tick) => ticks.push(tick));
     const [first, second] = events(2);
     playback.load([{ ...first!, kind: 'sleep', data: { id: 'bed_2' } }, second!]);
     playback.play();
-    expect(SLEEP).toBe(2);
-    vi.advanceTimersByTime(400 * 2 - 1);
+    vi.advanceTimersByTime(399);
     expect(ticks).toEqual([0, 1]);
     vi.advanceTimersByTime(1);
     expect(ticks).toEqual([0, 1, 2]);
-    // A story's figure lying down is drawn the same, and takes as long.
-    expect(lengthOf([{ ...first!, actor: 'mate', kind: 'sleep' }])).toBe(SLEEP);
+    expect(lengthOf([{ ...first!, actor: 'mate', kind: 'sleep' }])).toBe(1);
   });
 
   it('goes faster from the next tick on', () => {

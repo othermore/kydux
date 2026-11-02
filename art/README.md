@@ -250,7 +250,11 @@ owner on 2026-10-26, for every scene from the dormitory on:
   pillow's middle is the head's point in `cut.json`'s `beds`, as far from
   the sheet's line in every bed. A sleeper lies over the bed's frame and
   under its cover, with the head on the pillow and the sheet's line over
-  the body.
+  the body. The scene's `scene.json` names, on each bed, the floor cell
+  under its pillow (`pillow_side`): the cell of the row just below the
+  bed nearest the pillow's point, which a figure going to bed walks to and
+  hops in from (D130); a bed with a wall in front of it has none, and no
+  level or story sends anyone to bed in it.
 
 ## The rules for the cut-outs
 

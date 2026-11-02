@@ -2,6 +2,8 @@
 not step on, a thing revealed through what hides it, and the steps between two
 of the child's objects."""
 
+from pathlib import Path
+
 import pytest
 from kydux_world.level import Level, LevelError, Position
 from kydux_world.run import run_code
@@ -42,7 +44,7 @@ def test_the_wizard_sleeps_beside_a_free_bed_and_the_goal_is_met():
             "tick": 5,
             "actor": "wizard",
             "kind": "sleep",
-            "data": {"id": "bed_2", "at": [6, 3], "bed": [7, 3]},
+            "data": {"id": "bed_2", "at": [6, 3], "bed": [7, 3], "facing": "right"},
             "line": 4,
         }
     ]
@@ -59,6 +61,73 @@ def test_the_sleep_goal_marks_a_floor_cell_beside_its_bed_and_any_cell_beside_wi
         goals = [{"kind": "sleep", "bed": "bed_2", "at": at}]
         with pytest.raises(LevelError, match=says):
             run_code(Level.from_dict({**DORMITORY, "goals": goals}), "wizard.sleep()")
+
+
+CONTENT = Path(__file__).resolve().parents[2] / "content"
+
+
+def test_going_to_bed_walks_to_the_cell_under_the_pillow_a_cell_a_tick():
+    # D130: Your bed's solution walks down, then right along the floor before the
+    # bed to the cell under bed_2's pillow, and sleeps there facing the bed.
+    level = Level.from_directory(CONTENT / "levels" / "your-bed")
+    code = (CONTENT / "levels" / "your-bed" / "solution.py").read_text(encoding="utf-8")
+    result = run_code(level, code)
+    assert result.status == "won"
+    walked = [
+        (e.data["from"], e.data["to"], e.data["facing"]) for e in result.events if e.kind == "move"
+    ]
+    assert walked == [
+        ([16, 7], [16, 8], "down"),
+        ([16, 8], [16, 9], "down"),
+        ([16, 9], [17, 9], "right"),
+        ([17, 9], [18, 9], "right"),
+    ]
+    sleep = [e for e in result.events if e.kind == "sleep"]
+    assert [(e.tick, e.data["at"], e.data["facing"]) for e in sleep] == [(5, [18, 9], "up")]
+    assert result.ticks == 5
+    assert all(goal.met for goal in result.goals), result.goals
+
+
+#: A bed, the cell under its pillow in front of it, and a bed with none.
+PILLOWED = {
+    "id": "pillowed",
+    "map": ["#######", "#.==..#", "#....S#", "#######"],
+    "things": [{"kind": "bed", "id": "bed", "at": [2, 1], "pillow_side": [3, 2]}],
+    "goals": [{"kind": "sleep", "bed": "bed"}],
+}
+
+
+def test_going_to_bed_from_the_cell_under_the_pillow_walks_nothing():
+    level = Level.from_dict({**PILLOWED, "map": ["#######", "#.==..#", "#..S..#", "#######"]})
+    result = run_code(level, "wizard.sleep()")
+    assert result.status == "won"
+    assert [e.kind for e in result.events] == ["sleep"]
+    assert result.events[0].data["at"] == [3, 2] and result.events[0].data["facing"] == "up"
+
+
+def test_going_to_bed_from_beside_it_walks_round_to_the_pillow():
+    level = Level.from_dict({**PILLOWED, "map": ["#######", "#.==..#", "#S....#", "#######"]})
+    result = run_code(level, "wizard.move_up()\nwizard.sleep()")
+    assert result.status == "won"
+    moves = [e.data["to"] for e in result.events if e.kind == "move"]
+    assert moves == [[1, 1], [1, 2], [2, 2], [3, 2]]
+    assert [e.data["at"] for e in result.events if e.kind == "sleep"] == [[3, 2]]
+
+
+def test_a_bed_with_no_cell_under_its_pillow_is_slept_in_from_beside():
+    code = "wizard.move_up()\nwizard.move_right(2)\nwizard.move_down()\nwizard.sleep()"
+    result = run_code(Level.from_dict(DORMITORY), code)
+    assert [e.data["at"] for e in result.events if e.kind == "sleep"] == [[6, 3]]
+
+
+def test_a_pillow_side_is_a_bed_s_and_on_the_floor():
+    for thing, says in (
+        ({"kind": "bed", "id": "bed", "at": [2, 1], "pillow_side": [2, 1]}, "no floor cell"),
+        ({"kind": "bed", "id": "bed", "at": [2, 1], "pillow_side": [3]}, "only a bed"),
+        ({"kind": "key", "id": "key", "at": [4, 1], "pillow_side": [4, 2]}, "only a bed"),
+    ):
+        with pytest.raises(LevelError, match=says):
+            Level.from_dict({**PILLOWED, "things": [thing], "goals": []})
 
 
 def test_a_taken_bed_and_no_bed_at_all_are_refused_with_their_reasons():

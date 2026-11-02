@@ -183,6 +183,35 @@ def test_a_sleeper_is_staged_beside_its_bed():
         in_the_room([{"who": "voice"}], actors=[{**MATE, "at": [1, 1]}])
 
 
+#: A room whose bed names the cell under its pillow (D130).
+DORM = Scene(
+    "dorm",
+    ("#######", "#.uu..#", "#.....#", "#######"),
+    {**DEFAULT_TERRAINS, "u": {"kind": "furniture", "walk": False, "sight": True}},
+    ({"kind": "bed", "id": "bed_1", "at": [2, 1], "pillow_side": [3, 2]},),
+)
+
+
+def in_the_dorm(steps, actors):
+    data = {"id": "to-bed", "scene": "dorm", "wizard": [5, 2], "actors": list(actors)}
+    return story_on_scene({**data, "steps": steps}, DORM)
+
+
+def test_a_figure_goes_to_bed_from_the_cell_under_its_pillow():
+    friend = {"id": "nuri", "kind": "friend", "at": [1, 2]}
+    in_the_dorm([by("nuri", [{"walk": [3, 2]}, {"sleep": "bed_1"}])], [friend])
+    with pytest.raises(LevelError, match="from the cell under its pillow, 3,2"):
+        in_the_dorm([by("nuri", {"sleep": "bed_1"})], [{**friend, "at": [1, 1]}])
+
+
+def test_a_figure_asleep_from_the_start_is_staged_under_its_pillow():
+    sleeper = {"id": "nuri", "kind": "friend", "at": [3, 2], "asleep": "bed_1"}
+    story = in_the_dorm([by("nuri", {"wake": True})], [sleeper])
+    assert story["world"]["actors"][0]["at"] == [3, 2]
+    with pytest.raises(LevelError, match="from the cell under its pillow, 3,2"):
+        in_the_dorm([{"who": "voice"}], [{**sleeper, "at": [1, 1]}])
+
+
 def test_a_step_does_several_things_and_two_figures_walk_together():
     # D103: nuri and the wizard walk at once, nuri first named, so that each tile
     # nuri leaves is free for the wizard at the same tick.

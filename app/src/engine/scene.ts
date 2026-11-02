@@ -104,6 +104,7 @@ import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
 import { Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
+import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, stairInPlace } from './stairs';
@@ -165,10 +166,6 @@ function tileOf(value: unknown): Tile | null {
 /** How far a figure's head lies from its feet, a part of its height: where the
  * middle of the head is, on the pillow, for a figure asleep (D91). */
 const HEAD_REACH = 0.65;
-/** How far before its pillow, toward the bed's foot, a figure stands on the floor
- * in front of a bed to lie down in it, a part of a cell: the bedside table stands
- * beside the pillow itself (D130). */
-const SIDE_ALONG = 0.6;
 
 const DELTA: Record<Facing, Tile> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
@@ -218,6 +215,9 @@ class LevelScene extends Phaser.Scene {
   /** Who lies asleep (D91), by their figure: their id and bed, and whether they are
    * drawn lying under its quilt, whose depth they keep. */
   private readonly asleep = new Map<Phaser.GameObjects.Sprite, { id: string; bed: string; lying: boolean }>();
+  /** The figures hopping into a bed (D130), drawn at the depth they hop from, then
+   * as sleepers, and not by where they are on the way. */
+  private readonly hopping = new Set<Phaser.GameObjects.Sprite>();
   private cone!: Phaser.GameObjects.Graphics;
   /** The words said, in bubbles and thoughts (speech.ts), and the camera (camera.ts). */
   private speech!: Speech;
@@ -660,9 +660,13 @@ class LevelScene extends Phaser.Scene {
     this.drawLight();
     // On a painted scene the figures go behind what stands in front of them (D76).
     if (this.art) {
-      if (!this.asleep.get(this.wizard)?.lying) this.wizard.setDepth(figureDepth(this.wizard.y / TILE) + 0.0005);
+      if (!this.asleep.get(this.wizard)?.lying && !this.hopping.has(this.wizard)) {
+        this.wizard.setDepth(figureDepth(this.wizard.y / TILE) + 0.0005);
+      }
       for (const actor of this.actors.values()) {
-        if (!this.asleep.get(actor.sprite)?.lying) actor.sprite.setDepth(figureDepth(actor.sprite.y / TILE));
+        if (!this.asleep.get(actor.sprite)?.lying && !this.hopping.has(actor.sprite)) {
+          actor.sprite.setDepth(figureDepth(actor.sprite.y / TILE));
+        }
       }
       // A figure walking into a dark passage is drawn darker, head first.
       const dark = this.art.scene.dark;
@@ -721,6 +725,7 @@ class LevelScene extends Phaser.Scene {
     this.restarts += 1;
     for (const id of [...this.revealed.keys()]) this.unreveal(id);
     this.asleep.clear();
+    this.hopping.clear();
     this.markAsleep();
     this.wizard.setAngle(0);
     delete this.parentNode.dataset.sleeping;
@@ -886,9 +891,9 @@ class LevelScene extends Phaser.Scene {
    * names the bed. */
   private sleep(event: WorldEvent, instant: boolean): void {
     this.parentNode.dataset.sleeping = String(event.data.id);
-    // Going to sleep takes the walk to the pillow's side and the lying down, a tick
-    // each (layDown, D130); the night waits for it (D124).
-    this.lyingUntil = this.time.now + (instant ? 0 : this.playback.tickDuration * 2.1);
+    // The hop into the bed takes the sleep's tick (layDown, D130); the night waits
+    // for it (D124).
+    this.lyingUntil = this.time.now + (instant ? 0 : this.playback.tickDuration);
     if (!tileOf(event.data.bed)) return;
     this.stopCast();
     this.layDown(this.wizard, 'wizard', String(event.data.id), instant);
@@ -925,40 +930,33 @@ class LevelScene extends Phaser.Scene {
         lie();
         return;
       }
-      // Seen going to sleep (D130): over a tick the figure walks along the bed's side
-      // to the floor before its pillow and turns to the bed; over the next it goes
-      // to the bed's place and lies there.
+      // Seen going to bed (D130): the figure has walked to the floor under the
+      // pillow, a cell a tick, the world's moves; from there, facing the bed, it hops
+      // in an arc into the bed's place, takes its lying frame at the arc's top, and
+      // settles lying there, under the quilt once it lands. Until then it stays in
+      // front of the bed, at the depth it stood at.
       this.asleep.set(sprite, { id, bed, lying: false });
       this.markAsleep();
-      const tick = this.playback.tickDuration;
-      const side: [number, number] = [(place.head[0] - toward * SIDE_ALONG) * TILE, this.figureAt([0, place.row])[1]];
-      const across = Math.abs(side[0] - sprite.x) >= Math.abs(side[1] - sprite.y);
-      const going: Facing = across ? (side[0] < sprite.x ? 'left' : 'right') : side[1] < sprite.y ? 'up' : 'down';
-      const stepping = sprite.texture.key.startsWith('fig-');
+      this.face(sprite, place.head[1] * TILE < sprite.y ? 'up' : 'down');
+      const from: [number, number] = [sprite.x, sprite.y];
+      let turned = false;
+      this.hopping.add(sprite);
       this.tweens.add({
         targets: sprite,
-        x: side[0],
-        y: side[1],
-        duration: tick * 0.9,
+        x,
+        y,
+        duration: this.playback.tickDuration * HOP_TICKS,
         ease: 'Linear',
         onUpdate: (tween) => {
-          if (stepping) this.face(sprite, going, [0, 1, 2, 1][Math.floor(tween.progress * 4) % 4] ?? 1);
+          sprite.setPosition(...hopAt(from, [x, y], tween.progress, HOP_RISE * TILE));
+          if (!turned && hopTop(tween.progress)) {
+            turned = true;
+            sprite.setFrame(frame).setAngle(90 * toward);
+          }
         },
         onComplete: () => {
-          this.face(sprite, 'up');
-          this.tweens.add({
-            targets: sprite,
-            x,
-            y,
-            delay: tick * 0.1,
-            duration: tick * 0.7,
-            ease: 'Sine.easeInOut',
-            onComplete: () => {
-              lie();
-              sprite.setAlpha(0);
-              this.tweens.add({ targets: sprite, alpha: 1, duration: tick * 0.3 });
-            },
-          });
+          this.hopping.delete(sprite);
+          lie();
         },
       });
       return;
@@ -975,8 +973,10 @@ class LevelScene extends Phaser.Scene {
     this.tweens.add({ targets: sprite, ...lying, duration: this.playback.tickDuration * 0.9, ease: 'Sine.easeInOut' });
   }
 
-  /** A figure asleep gets up, and stands on its tile beside the bed, facing a way. */
+  /** A figure asleep gets up, and stands on its tile, the floor under the pillow,
+   * facing a way. */
   private getUp(sprite: Phaser.GameObjects.Sprite, tile: Tile, facing: Facing, instant: boolean): void {
+    this.hopping.delete(sprite);
     if (!this.asleep.delete(sprite)) return;
     this.markAsleep();
     this.tweens.killTweensOf(sprite);

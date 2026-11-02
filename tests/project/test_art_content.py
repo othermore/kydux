@@ -185,3 +185,50 @@ def test_a_figure_stepping_out_from_behind_a_thing_is_unseen_before(scene):
         line for line in export_scene.behind_seen(scene) if not line.endswith(" 0 pixels seen")
     ]
     assert not seen, seen
+
+
+@pytest.mark.parametrize("scene", SCENES)
+def test_a_bed_s_pillow_side_is_the_floor_cell_nearest_its_pillow_in_front_of_it(scene):
+    """Each bed's `pillow_side` (D130) is a floor cell of the row just below the bed's
+    tile, the one nearest the pillow's point (art.json's `beds`)."""
+    spec = json.loads((CONTENT / "scenes" / scene / "scene.json").read_text())
+    rows = (CONTENT / "scenes" / scene / "map.txt").read_text().split()
+    walks = {
+        letter
+        for letter, terrain in {".": {"walk": True}, **spec.get("terrains", {})}.items()
+        if terrain.get("walk")
+    }
+    beds = json.loads((CONTENT / "art" / "scenes" / scene / "art.json").read_text()).get(
+        "beds", {}
+    )
+    for bed in (t for t in spec.get("things", []) if t["kind"] == "bed" and "pillow_side" in t):
+        x, y = bed["pillow_side"]
+        assert y == bed["at"][1] + 1, (scene, bed["id"])
+        floor = [cx for cx, letter in enumerate(rows[y]) if letter in walks]
+        head = beds[bed["id"]]["head"][0]
+        assert x == min(floor, key=lambda cx: abs(cx + 0.5 - head)), (scene, bed["id"])
+
+
+def test_every_bed_gone_to_has_a_pillow_side():
+    """A bed a level's sleep goal or a story's sleep names has the cell under its
+    pillow to be gone to bed from (D130)."""
+    sides = {}
+    for path in (CONTENT / "scenes").glob("*/scene.json"):
+        for thing in json.loads(path.read_text()).get("things", []):
+            if thing["kind"] == "bed":
+                sides[(path.parent.name, thing["id"])] = "pillow_side" in thing
+    named = set()
+    for path in (CONTENT / "levels").glob("*/level.json"):
+        level = json.loads(path.read_text())
+        for goal in level.get("goals", []):
+            if goal["kind"] == "sleep":
+                named.add((level["scene"], goal["bed"]))
+    for path in (CONTENT / "stories").glob("*/story.json"):
+        story = json.loads(path.read_text())
+        for step in story["steps"]:
+            doing = step.get("do") or []
+            for action in doing if isinstance(doing, list) else [doing]:
+                if "sleep" in action:
+                    named.add((story["scene"], action["sleep"]))
+    assert named
+    assert [bed for bed in sorted(named) if not sides.get(bed)] == []

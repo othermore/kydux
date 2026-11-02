@@ -247,8 +247,8 @@ tiles are `[x, y]`.
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
 | `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
 | `give` | wizard | `id`, `to`, `at` | the thing floats from the wizard's hands to the actor and fades; the actor faces the wizard (D48) |
-| `sleep` | wizard, or in a story an actor | `id`, the bed; `at`; `bed`, its tile | two ticks long (`playback.SLEEP`): over the first the figure walks along the bed's side to the floor before its pillow and turns to the bed, over the second it lies in the bed, its head on the pillow, under the quilt (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
-| `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile beside the bed (D91) |
+| `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
+| `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
 | `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
@@ -1318,8 +1318,9 @@ one overturns stays, marked as superseded.
   is told (`not_my_dormitory`, worded by the wizard's gender), which a
   level on the scene carries: the wizard's step is refused and turned
   that way, and anyone else passes. A bed is a thing, `free` or not, drawn
-  by the painting and never by the page; `wizard.sleep()` lies down in a
-  free bed beside the wizard; a goal `sleep` names the bed. The dormitory
+  by the painting and never by the page; `wizard.sleep()` beside a free bed
+  walks to the floor under its pillow and lies down in it (D130); a goal
+  `sleep` names the bed. The dormitory
   mate, the friend of the wizard's own gender, is the actor `mate`, drawn
   and named as Nuri or Teku by the wizard's gender, and a text writes
   `{mate}`. Rules out mirroring the painting by gender: what changes is who
@@ -1416,7 +1417,8 @@ one overturns stays, marked as superseded.
   the bed, the head on the pillow, between the bed's frame and its cover,
   so that the cover lies over the body; while the wizard lies under it, its
   outline is off. The wizard lies down by `wizard.sleep()`; an actor of a level or a
-  story starts `asleep` in a bed beside its tile (the world takes the bed,
+  story starts `asleep` in a bed beside its tile, or, in a story, its tile
+  the bed's `pillow_side`, where it gets up (D130) (the world takes the bed,
   not free, and lays the sleeper on the bed's own tile, in no one's way),
   and a story's step lays a figure down or gets it up (`{"sleep":
   "bed_1"}`, `{"wake": true}`). Rules out the standing figure turned on top

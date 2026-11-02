@@ -1,9 +1,8 @@
 // The playback of a run's events, tick by tick, at a speed the child chooses:
 // each step plays every event of one tick, the wizard's and the actors'. A tick
 // in which the wizard does something with its hands, casting or picking up,
-// lasts LONG of a tick, so that it is seen through before the next step; one in
-// which a figure goes to sleep, SLEEP. It knows nothing of Phaser: the scene
-// listens to it and draws.
+// lasts LONG of a tick, so that it is seen through before the next step. It
+// knows nothing of Phaser: the scene listens to it and draws.
 
 import type { WorldEvent } from '../runtime/protocol';
 
@@ -14,16 +13,8 @@ export type PlaybackEvent = WorldEvent;
 export const LONG = 1.6;
 /** The wizard's events that take a long tick. */
 const HANDS = new Set(['cast', 'pick_up']);
-/** How long a tick lasts in which a figure goes to sleep, against a tick: the walk
- * along the bed's side to its pillow, and the lying down, a tick each (D130). */
-export const SLEEP = 2;
-/** The events that take a sleep's tick, the wizard's or a story's figure's. */
-const SLEEPING = new Set(['sleep']);
-
-/** How long a tick's events take, against a tick (SLEEP for going to sleep, LONG
- * for the wizard's hands). */
+/** How long a tick's events take, against a tick (LONG for the wizard's hands). */
 export function lengthOf(events: PlaybackEvent[]): number {
-  if (events.some((event) => SLEEPING.has(event.kind))) return SLEEP;
   return events.some((event) => event.actor === 'wizard' && HANDS.has(event.kind)) ? LONG : 1;
 }
 

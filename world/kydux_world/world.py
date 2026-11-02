@@ -100,6 +100,16 @@ def child_line() -> int | None:
 
 #: The four tiles beside a tile.
 DELTAS = ((0, -1), (-1, 0), (1, 0), (0, 1))
+#: How far the wizard walks to the cell under a bed's pillow to go to bed, at most
+#: (D130).
+PILLOW_WALK = 8
+
+
+def _direction(here: Position, there: Position) -> Direction:
+    """The way from a cell to one beside it, or along its row or column."""
+    if there.x != here.x:
+        return Direction.RIGHT if there.x > here.x else Direction.LEFT
+    return Direction.DOWN if there.y > here.y else Direction.UP
 
 
 class World:
@@ -572,11 +582,15 @@ class Wizard(Child):
         world: World = self._k_world
         world.ready()
         here = self._k_position
+        # A bed beside the wizard, or one whose pillow it stands under (D84, D130).
         beds = [
             thing
             for thing in sorted(world.things.values(), key=lambda t: t.name)
             if isinstance(thing, Bed)
-            and abs(thing._k_position.x - here.x) + abs(thing._k_position.y - here.y) == 1
+            and (
+                abs(thing._k_position.x - here.x) + abs(thing._k_position.y - here.y) == 1
+                or thing._k_spec.pillow_side == here
+            )
         ]
         free = [bed for bed in beds if bed.free]
         if not free:
@@ -586,8 +600,56 @@ class Wizard(Child):
             )
             return
         bed = free[0]
+        # To the floor under the bed's pillow first, a cell a tick, as any walk (D130).
+        side = bed._k_spec.pillow_side
+        for step in self._k_way_to(side) if side is not None else []:
+            world.ready()
+            direction = _direction(here, step)
+            self._set(facing=direction, position=step)
+            world.act("move", {"from": list(here), "to": list(step), "facing": direction.value})
+            here = step
+        # Then, facing the bed, into it.
+        spot = bed._k_position
+        facing = (
+            _direction(here, Position(here.x, spot.y))
+            if spot.y != here.y
+            else _direction(here, Position(spot.x, here.y))
+        )
+        self._set(facing=facing)
         world.slept = bed.name
-        world.act("sleep", {"id": bed.name, "at": list(here), "bed": list(bed._k_position)})
+        data = {"id": bed.name, "at": list(here), "bed": list(spot), "facing": facing.value}
+        world.act("sleep", data)
+
+    def _k_way_to(self, target: Position) -> list[Position]:
+        """The cells the wizard walks to reach `target`, by the shortest way over cells it
+        can step on in turn (free, not forbidden it, no friend there), PILLOW_WALK at
+        most; none when it is there already, or no such way."""
+        world: World = self._k_world
+        start = self._k_position
+        came: dict[Position, Position | None] = {start: None}
+        edge = [start]
+        for _ in range(PILLOW_WALK):
+            if target in came:
+                break
+            ahead = []
+            for cell in edge:
+                for dx, dy in DELTAS:
+                    there = Position(cell.x + dx, cell.y + dy)
+                    if there in came or there in world.level.forbidden:
+                        continue
+                    if not world.is_free(there) or world.friend_at(there) is not None:
+                        continue
+                    came[there] = cell
+                    ahead.append(there)
+            edge = ahead
+        if target not in came or target == start:
+            return []
+        # Back from the target to the start, each cell to the one it was reached from.
+        way, cell = [], target
+        while cell != start:
+            way.append(cell)
+            cell = came[cell] or start
+        return way[::-1]
 
     def distance_to(self, other: object) -> int | None:
         """How many steps lie between the wizard and a thing or someone, along the rows

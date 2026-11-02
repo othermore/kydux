@@ -97,6 +97,9 @@ class ThingSpec:
     open: bool = False
     #: For a bed, whether no one sleeps in it, so that the wizard may (D84).
     free: bool = True
+    #: For a bed, the floor cell under its pillow, in front of it, which whoever goes
+    #: to bed walks to and hops in from (D130); None for a bed with no floor there.
+    pillow_side: Position | None = None
     #: Lying where something painted covers it wholly, so that it is not seen until
     #: it is revealed or picked up (D85); the world treats it as any thing.
     hidden: bool = False
@@ -457,6 +460,7 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
     if not isinstance(hidden, bool) or (hidden and kind not in CARRIED_KINDS):
         raise LevelError(f"{shape.level_id}: only a thing the wizard carries is hidden")
     covers = _covers(shape, spec, thing_id)
+    pillow_side = _pillow_side(shape, spec, thing_id)
     return ThingSpec(
         kind,
         thing_id,
@@ -470,7 +474,27 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         free=free,
         hidden=hidden,
         covers=covers,
+        pillow_side=pillow_side,
     )
+
+
+def _pillow_side(shape: _Shape, spec: dict[str, Any], thing_id: str) -> Position | None:
+    """A bed's `pillow_side`, [x, y]: the floor cell under its pillow (D130), which
+    its scene names."""
+    value = spec.get("pillow_side")
+    if value is None:
+        return None
+    if spec.get("kind") != "bed" or not (
+        isinstance(value, list)
+        and len(value) == 2
+        and all(isinstance(v, int) and not isinstance(v, bool) for v in value)
+    ):
+        raise LevelError(f"{shape.level_id}: only a bed has a pillow_side, [x, y]")
+    cell = Position(*value)
+    inside = 0 <= cell.x < shape.width and 0 <= cell.y < shape.height
+    if not inside or cell in shape.walls or cell in shape.shelves:
+        raise LevelError(f"{shape.level_id}: {thing_id}'s pillow_side is no floor cell")
+    return cell
 
 
 def _covers(shape: _Shape, spec: dict[str, Any], thing_id: str) -> tuple[Position, ...]:
@@ -542,7 +566,8 @@ def _sleepers(
 ) -> tuple[tuple[ThingSpec, ...], tuple[ActorSpec, ...]]:
     """The things with every bed someone lies asleep in taken, and the actors with
     each sleeper on its bed's tile (D91): a sleeper's bed is a bed of the level,
-    beside where the sleeper is placed, and has one sleeper."""
+    beside where the sleeper is placed or with its pillow_side there (D130), and has
+    one sleeper."""
     beds = {thing.id: thing for thing in things if thing.kind == "bed"}
     taken: dict[str, str] = {}
     for actor in actors:
@@ -551,7 +576,7 @@ def _sleepers(
         bed = beds.get(actor.asleep)
         if bed is None:
             raise LevelError(f"{level_id}: {actor.id} is asleep in {actor.asleep}, no bed")
-        if not _beside(actor.position, bed.position):
+        if not _beside(actor.position, bed.position) and actor.position != bed.pillow_side:
             raise LevelError(f"{level_id}: {actor.id} stands beside no {actor.asleep}")
         if actor.asleep in taken:
             raise LevelError(
@@ -915,14 +940,15 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     door shut), and ending out of sight when it says `vanish`; a turn to face
     a way; appearing on a free tile, maybe stepping out `from` behind a thing
     on a cell beside it, a shelf or a floor (D128); vanishing, a speaker once
-    its words are said; lying down asleep in a bed beside it, no one else's,
-    and waking (D91); opening or closing a door beside it. One figure's actions follow
+    its words are said; lying down asleep in a bed, no one else's, from the cell
+    under its pillow (`pillow_side`, D130), or from beside a bed with none, and
+    waking (D91); opening or closing a door beside it. One figure's actions follow
     one another; different figures' are played at once, tick by tick, in the
     order they are first named, and are checked so. An actor may start
-    `asleep` in a bed beside its `at`. No one walks onto an open door's leaf, and
-    whoever stands on it as the door opens steps aside along the row (D125). The
-    voice does nothing itself; no one speaks or moves out of sight, and no one
-    asleep walks, turns or goes."""
+    `asleep` in a bed, its `at` the bed's pillow_side, where it gets up. No one
+    walks onto an open door's leaf, and whoever stands on it as the door opens
+    steps aside along the row (D125). The voice does nothing itself; no one
+    speaks or moves out of sight, and no one asleep walks, turns or goes."""
     story_id = data.get("id")
     if "scene" not in data:
         raise LevelError(f"{story_id}: a story is told on a scene")
@@ -996,6 +1022,12 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         for thing in built.get("things", [])
         if thing.get("kind") == "bed" and "at" in thing
     }
+    # The cell under each bed's pillow, which a figure goes to bed from (D130).
+    pillow_sides = {
+        thing["id"]: Position(*thing["pillow_side"])
+        for thing in built.get("things", [])
+        if thing.get("kind") == "bed" and "pillow_side" in thing
+    }
     # The bed each figure lies asleep in.
     asleep: dict[str, str] = {}
 
@@ -1003,7 +1035,13 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         if bed not in beds:
             raise LevelError(f"{here}: {who} is asleep in {bed}, no bed of the scene")
         at = where[who]
-        if at is None or abs(at.x - beds[bed].x) + abs(at.y - beds[bed].y) != 1:
+        side = pillow_sides.get(bed)
+        if side is not None and at != side:
+            raise LevelError(
+                f"{here}: {who} goes to bed in {bed} from the cell under its pillow,"
+                f" {side.x},{side.y}"
+            )
+        if side is None and (at is None or abs(at.x - beds[bed].x) + abs(at.y - beds[bed].y) != 1):
             raise LevelError(f"{here}: {who} stands beside no {bed}")
         if bed in asleep.values():
             raise LevelError(f"{here}: someone is asleep in {bed} already")

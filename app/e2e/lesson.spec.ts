@@ -35,7 +35,10 @@ for (const [locale, tryIt, goOn] of [
   }) => {
     const context = await browser.newContext({ locale });
     const page = await context.newPage();
+    // The lesson drawn before its pages are counted, so that a slow load is not
+    // taken for its last page.
     const toLastPage = async () => {
+      await expect(page.locator('.lesson-page')).toBeVisible();
       while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
     };
     // What things know comes before Finding things: its example is shown, and its

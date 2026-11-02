@@ -1,11 +1,14 @@
 {
-  "about": "The first-year dormitory, chapter 2's night scene: the chosen painting (image-first-dormitory-3) with its two wands taken off the trunks and its border mended by Gemini (game-dormitory-border), its grid removed, and its corridor's right end mended (repaint, corner) so that the castle's wall, going on from the rooms' front wall, closes the corridor off from the walk along the battlements. Its beds, trunks, bedside tables, armchairs and round table are cut by Gemini's magenta (marks); the walls between the rooms, with their open leaves, by polygons drawn over every figure (D95), the one in a doorway on row 9 too, but for the inside of the open leaf's arch (D104); the front wall, with the door's arch, by a polygon on its foot's row, over whoever stands behind it and under whoever walks the corridor; the door to the corridor is a thing, shut or open (doorways, D108); each bed's quilt and folded sheet, drawn over the pupil asleep in it, by Gemini's magenta too (D97). Figures on the strips beside the walls and in the doorways are drawn on the painted strip (nudged, D105). Pictures named here are in art/raw/, which git ignores.",
+  "about": "The first-year dormitory, chapter 2's night scene: the chosen painting (image-first-dormitory-3) with its two wands taken off the trunks and its border mended by Gemini (game-dormitory-border), its grid removed, and its corridor's right end mended (repaint, corner) so that the castle's wall, going on from the rooms' front wall, closes the corridor off from the walk along the battlements. Its beds, trunks, bedside tables, armchairs and round table are cut by Gemini's magenta (marks); the walls between the rooms, with their open leaves, by polygons drawn over every figure (D95), the one in a doorway on row 9 too, but for the inside of the open leaf's arch (D104); the front wall, with the door's arch, by a polygon on its foot's row, over whoever stands behind it and under whoever walks the corridor; the door to the corridor is a thing, shut or open (doorways, D108); each bed's quilt and folded sheet, drawn over the pupil asleep in it, by Gemini's magenta too (D97). Figures on the strips beside the walls and in the doorways are drawn on the painted strip (nudged, D105). By morning (D126), its sky, its windows and everything beyond the castle's right wall are Gemini's morning picture (`morning`, `grounds`), and the front wall's row, whose strip runs out over the battlements and the grass, has its morning image (`rows_morning`). Pictures named here are in art/raw/, which git ignores.",
   "sources": {
     "folder": "art/raw/game-dormitory",
     "edits": "art/raw/game-dormitory",
     "painting": "dormitory-walls.png",
     "grid": "grid.json",
-    "ground": "dormitory-walls.png"
+    "ground": "dormitory-walls.png",
+    "grounds": {
+      "morning": "dormitory-morning.png"
+    }
   },
   "repaint": {
     "about": "Painted by Gemini 3 Pro Image from tools/art/prompts/game-dormitory-corner.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the box.",
@@ -26,6 +29,90 @@
     ],
     "canvas": "art/raw/game-dormitory/dormitory-repaint-canvas.png",
     "painting": "art/raw/game-dormitory/dormitory-mended.png"
+  },
+  "morning": {
+    "about": "The dormitory by morning (D126): Gemini 3 Pro Image painted the whole night painting again by morning from tools/art/prompts/game-dormitory-morning.md (game-dormitory-morning, the first of its tries), and tools/art/repaint.py join takes from it only what lies outside: the sky above the walls (the box across the top), each window with its panes (the three boxes, the neighbouring dormitory's, the left one's and the right one's), and everything beyond the castle's right wall, the tower, the battlements, their walk and the grass (the polygon along that wall's outer line), each faded in over `fade` pixels; the inside is the night painting's, pixel for pixel. The scene's morning ground (`grounds`).",
+    "from": "art/raw/game-dormitory/dormitory-walls.png",
+    "boxes": [
+      [
+        0,
+        0,
+        4800,
+        382
+      ],
+      [
+        88,
+        495,
+        440,
+        808
+      ],
+      [
+        1090,
+        495,
+        1455,
+        808
+      ],
+      [
+        3190,
+        495,
+        3605,
+        808
+      ]
+    ],
+    "areas": [
+      [
+        [
+          4800,
+          380
+        ],
+        [
+          4800,
+          3584
+        ],
+        [
+          4305,
+          3584
+        ],
+        [
+          4283,
+          3400
+        ],
+        [
+          4260,
+          3200
+        ],
+        [
+          4211,
+          2800
+        ],
+        [
+          4166,
+          2400
+        ],
+        [
+          4095,
+          1800
+        ],
+        [
+          4044,
+          1400
+        ],
+        [
+          3994,
+          1000
+        ],
+        [
+          3917,
+          400
+        ],
+        [
+          3915,
+          380
+        ]
+      ]
+    ],
+    "fade": 4,
+    "painting": "art/raw/game-dormitory/dormitory-morning.png"
   },
   "corner": {
     "about": "The corridor's right end, closed by the castle's wall going on straight down from the corner of the rooms' front wall, the same stones and light, the walk along the battlements beyond it. Painted by Gemini 3 Pro Image from tools/art/prompts/game-dormitory-corner-2.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the box.",
@@ -1688,6 +1775,9 @@
       ],
       "by": -0.2
     }
+  ],
+  "rows_morning": [
+    15
   ],
   "kept": [
     [

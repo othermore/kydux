@@ -10,10 +10,12 @@
 
 What to mend is the scene's settings' `repaint` (art/scenes/<scene>/cut.json,
 D82): the painting it starts from (`from`), how many pixels it grows by below
-(`grow`), the boxes of it, in its pixels, a model paints again (`boxes`), the
-part of the canvas the model is given (`crop`, x0, y0, x1, y1, so that what is to
-be kept is large in its picture and hard to paint over), and where the canvas
-and the mended painting go.
+(`grow`), the boxes of it, in its pixels, a model paints again (`boxes`), and
+polygons where a box will not follow an edge (`areas`, each a list of [x, y]
+pixels), each faded in over FADE pixels round it or `fade`, the part of the
+canvas the model is given (`crop`, x0, y0, x1, y1, so that what is to be kept is
+large in its picture and hard to paint over), and where the canvas and the
+mended painting go.
 
 `canvas` writes the picture the model is given: the painting, grown below by its
 own bottom row stretched down, with the boxes and the grown band blurred, so that
@@ -100,7 +102,10 @@ The same is done for any other section of the settings, named by `--section`:
 those things are cut against. There, `boxes` may be `"statics"`, every static
 thing's box, a little grown; `plain` gives the model the painting itself, not
 blurred, for it to take the things out of; and with no `crop` the model is given
-the whole painting.
+the whole painting. A scene painted at night has `morning` (D126): the model,
+given the whole painting as it is, paints it by morning, and `join` takes from
+it the sky, the windows and what lies beyond the castle's walls, faded in over a
+few pixels on the outlines that bound them, into the scene's morning picture.
 """
 
 import json
@@ -109,7 +114,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -156,16 +161,31 @@ def settings_of(scene: str, section: str = "repaint") -> dict:
     return found
 
 
-def painted_part(shape: tuple[int, int], boxes: list[list[int]], grow: int) -> np.ndarray:
-    """How much of each pixel the model paints: 1 in a box or the grown band, 0 a
-    FADE beyond them."""
+def painted_part(shape: tuple[int, int], repaint: dict) -> np.ndarray:
+    """How much of each pixel the model paints: 1 in a box (`boxes`, x0, y0, x1, y1),
+    a polygon (`areas`, a list of [x, y]) or the grown band, 0 a fade beyond them
+    (`fade` pixels, FADE unless the section says)."""
     height, width = shape
+    grow, fade = repaint.get("grow", 0), repaint.get("fade", FADE)
     yy, xx = np.arange(height)[:, None], np.arange(width)[None, :]
     kept = np.ones(shape, dtype=np.float32)
+    boxes = repaint.get("boxes", [])
     for x0, y0, x1, y1 in [*boxes, *([[0, height - grow, width, height]] if grow else [])]:
         dx = np.maximum(np.maximum(x0 - xx, xx - x1), 0)
         dy = np.maximum(np.maximum(y0 - yy, yy - y1), 0)
-        kept = np.minimum(kept, np.clip(np.hypot(dx, dy) / FADE, 0, 1))
+        kept = np.minimum(kept, np.clip(np.hypot(dx, dy) / fade, 0, 1))
+    if repaint.get("areas"):
+        inside = Image.new("L", (width, height), 0)
+        draw = ImageDraw.Draw(inside)
+        for area in repaint["areas"]:
+            draw.polygon([tuple(point) for point in area], fill=255)
+        # Grown a pixel at a time, each ring a step further from the polygon.
+        ring = np.array(inside) > 0
+        kept = np.minimum(kept, np.where(ring, 0.0, 1.0))
+        for step in range(1, fade):
+            inside = inside.filter(ImageFilter.MaxFilter(3))
+            ring = np.array(inside) > 0
+            kept = np.minimum(kept, np.where(ring, step / fade, 1.0))
     return 1 - kept
 
 
@@ -185,9 +205,7 @@ def canvas(scene: str, section: str = "repaint") -> Path:
         if repaint.get("plain")
         else np.array(Image.fromarray(painting).filter(ImageFilter.GaussianBlur(BLUR)))
     )
-    part = painted_part(painting.shape[:2], repaint.get("boxes", []), repaint.get("grow", 0))[
-        ..., None
-    ]
+    part = painted_part(painting.shape[:2], repaint)[..., None]
     out = (painting * (1 - part) + blurred * part).astype(np.uint8)
     x0, y0, x1, y1 = repaint["crop"]
     target = REPO / repaint["canvas"]
@@ -246,7 +264,7 @@ def laid(crop: np.ndarray, kept: np.ndarray, picture: Image.Image) -> np.ndarray
 def join(scene: str, picture_path: Path, section: str = "repaint") -> Path:
     repaint = settings_of(scene, section)
     painting = grown(repaint).astype(np.float32)
-    part = painted_part(painting.shape[:2], repaint.get("boxes", []), repaint.get("grow", 0))
+    part = painted_part(painting.shape[:2], repaint)
     x0, y0, x1, y1 = repaint["crop"]
     crop = painting[y0:y1, x0:x1].astype(np.uint8)
     whole = laid(crop, 1 - part[y0:y1, x0:x1], Image.open(picture_path).convert("RGB"))

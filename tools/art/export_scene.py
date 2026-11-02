@@ -17,15 +17,21 @@ too. `all`, the default, is `scene` then `check`.
 
 `check` draws pictures of the exported scene to look at, among them
 states-<scene>.png, each door's states over the ground at three times their
-size with their edges marked (D113), and doors-<scene>.png, each state of every
-thing composed as the page draws the scene, then sweeps it (tools/art/sweep.py) and
-fails when its cut-outs would show a figure a problem: a shadow or a flower
-drawn in front, the lawn drawn in front, a hole.
+size with their edges marked (D113), doors-<scene>.png, each state of every
+thing composed as the page draws the scene, and <hour>-<scene>.png, a ground at
+another hour with every row and thing over it (D126), then sweeps it
+(tools/art/sweep.py) and fails when its cut-outs would show a figure a problem: a
+shadow or a flower drawn in front, the lawn drawn in front, a hole.
 
 `scene` writes content/art/scenes/<scene>/:
 
 - ground.webp: the painting with everything that opens or is picked up taken
-  out, each from the edit without it, so that no ghost of a leaf remains;
+  out, each from the edit without it, so that no ghost of a leaf remains; and
+  ground-<hour>.webp, for a scene painted at night that has its picture by
+  morning (`grounds` in the settings' `sources`, D126), the same ground with
+  what that picture mended (its sky, its windows, its outside) laid over it,
+  and row-<r>-...-<hour>.webp for a row named in `rows_morning`, whose image
+  holds some of that outside (a wall's strip running out over the grass);
 - row-<r>.webp: the full scene's width, with alpha, holding what stands up and
   has its foot on row r, cut from that ground by image_first.py, from its top
   down to the bottom edge of row r and never lower: a thing only ever covers
@@ -663,15 +669,26 @@ def scene(settings: Settings) -> Path:
         shutil.rmtree(out)
     out.mkdir(parents=True)
     width = columns * CELL
-    floor = image_first.aligned(Image.fromarray(ground), grid, columns, rows, CELL)
-    floor = patched(floor, settings.patches)
     margin = settings.data.get("margin")
     # Where the painting holds the playable area: a cut-out fades out before its edge,
     # so that nothing of what lies outside the painting is drawn (D83).
     inside = painted_area(settings, columns, rows) if margin else None
-    if margin:
-        floor = with_margin(floor, margin, inside)
-    webp(floor, out / "ground.webp")
+
+    def ground_image(pixels: np.ndarray) -> Image.Image:
+        floor = image_first.aligned(Image.fromarray(pixels), grid, columns, rows, CELL)
+        floor = patched(floor, settings.patches)
+        return with_margin(floor, margin, inside) if margin else floor
+
+    webp(ground_image(ground), out / "ground.webp")
+    # A scene's other grounds (D126): its painting at another hour, mended from the
+    # painting in boxes, laid over the ground where it differs from the painting, so
+    # that what the ground takes out of the painting stays out.
+    grounds = settings.data["sources"].get("grounds", {})
+    painted = np.array(Image.open(settings.painting).convert("RGB")) if grounds else None
+    for hour, picture in grounds.items():
+        other = np.array(Image.open(settings.folder / picture).convert("RGB"))
+        differs = np.any(other != painted, axis=2)[..., None]
+        webp(ground_image(np.where(differs, other, ground)), out / f"ground-{hour}.webp")
     # Each row's image, as a strip of the scene's width from its top down to the
     # row's bottom edge: what image_first.py cut, and the static things after.
     # The static things' strips are their rows' images of their own, `static` in
@@ -800,6 +817,21 @@ def scene(settings: Settings) -> Path:
         # The cell it is painted on, for a level that lays it on another (D85).
         if "at" in thing:
             things[name]["at"] = thing["at"]
+    # A row whose image holds something of what a ground at another hour mends (a
+    # wall's strip running out over the grass), named in `rows_morning`, has an image
+    # at that hour too: the same cut-out, its pixels the morning picture's where that
+    # picture differs from the painting (D126).
+    at_hours = {}
+    for hour, picture in grounds.items():
+        if hour != "morning" or not settings.data.get("rows_morning"):
+            continue
+        night = np.array(
+            image_first.aligned(Image.fromarray(painted), grid, columns, rows, CELL).convert("RGB")
+        )
+        other = Image.open(settings.folder / picture).convert("RGB")
+        other = np.array(image_first.aligned(other, grid, columns, rows, CELL).convert("RGB"))
+        named = set(settings.data["rows_morning"])
+        at_hours[hour] = (other, np.any(other != night, axis=2), named)
     rows_out = []
     for row, static, layer in sorted(strips):
         top, strip = strips[(row, static, layer)]
@@ -813,6 +845,16 @@ def scene(settings: Settings) -> Path:
             continue
         image = f"row-{row}{'-static' if static else ''}{'-' + layer if layer else ''}.webp"
         webp(Image.fromarray(pixels), out / image)
+        hours = {}
+        for hour, (other, differs, named) in at_hours.items():
+            if row not in named:
+                continue
+            band = slice(top, top + pixels.shape[0])
+            shown = pixels.copy()
+            mended = differs[band, : pixels.shape[1], None]
+            shown[..., :3] = np.where(mended, other[band, : pixels.shape[1]], pixels[..., :3])
+            hours[hour] = image.replace(".webp", f"-{hour}.webp")
+            webp(Image.fromarray(shown), out / hours[hour])
         rows_out.append(
             {
                 "row": row,
@@ -820,12 +862,15 @@ def scene(settings: Settings) -> Path:
                 "top": top,
                 **({"static": True} if static else {}),
                 **({layer: True} if layer else {}),
+                **({"hours": hours} if hours else {}),
             }
         )
     art = {
         "cell": CELL,
         "size": [columns, rows],
         "ground": "ground.webp",
+        # The scene's grounds at other hours, by the hour (D126).
+        **({"grounds": {hour: f"ground-{hour}.webp" for hour in grounds}} if grounds else {}),
         # The ground reaches past the playable area by the margin's cells, its
         # playable corner at `origin` in its own pixels (D83).
         **(
@@ -1091,14 +1136,17 @@ def draw(
     figures_folder: Path = FIGURES_OUT,
     standing: list[tuple[str, int, int]] = (),
     states: dict[str, str] | None = None,
+    hour: str | None = None,
 ) -> Image.Image:
-    """The exported scene as the page draws it: the ground, then row by row what
-    stands up and has its foot there, the things in their states, and the
-    figures standing on that row; each figure is `(name, x, y)` in cells."""
+    """The exported scene as the page draws it: the ground, or its ground at another
+    `hour` (D126), then row by row what stands up and has its foot there, the
+    things in their states, and the figures standing on that row; each figure is
+    `(name, x, y)` in cells."""
     art = json.loads((folder / "art.json").read_text())
     fig = json.loads((figures_folder / "figures.json").read_text())
     cell = art["cell"]
-    picture = Image.open(folder / art["ground"]).convert("RGBA")
+    ground = art["grounds"][hour] if hour else art["ground"]
+    picture = Image.open(folder / ground).convert("RGBA")
     # The playable part of a ground painted with a margin (D83).
     ox, oy = art.get("origin", [0, 0])
     columns, rows = art["size"]
@@ -1110,7 +1158,8 @@ def draw(
     }
     by_row: dict[int, list[tuple[Image.Image, tuple[int, int]]]] = {}
     for layer in art["rows"]:
-        image = Image.open(folder / layer["image"]).convert("RGBA")
+        shown = layer.get("hours", {}).get(hour, layer["image"]) if hour else layer["image"]
+        image = Image.open(folder / shown).convert("RGBA")
         by_row.setdefault(layer["row"], []).append((image, (0, layer["top"])))
     for name, thing in art["things"].items():
         state = (states or {}).get(name, next(iter(thing["states"])))
@@ -1190,6 +1239,12 @@ def checks(settings: Settings, out: Path = RAW / "game-check") -> list[Path]:
         written.append(target)
     written.append(states_sheet(settings, out))
     written.append(doors_sheet(settings, out))
+    # Each ground at another hour with every row and thing over it, for a night
+    # piece left over the day to be seen (D126).
+    for hour in settings.data["sources"].get("grounds", {}):
+        target = out / f"{hour}-{settings.id}.png"
+        draw(settings.out, standing=starts, hour=hour).save(target)
+        written.append(target)
     return written
 
 

@@ -1,7 +1,9 @@
 // The light over a scene (D124): none, the painting's own; the night that falls when
 // the wizard has gone to sleep, a dark blue that leaves the sleeper and the room
 // faintly seen; and the warm morning that follows it and stays, or that a morning
-// story opens under. The times are the page's own, not the run's speed.
+// story opens under. With it, how much of the day is seen (`day`): a scene painted
+// at night shows its morning ground that much over its night one, from the dawn
+// on (D126). The times are the page's own, not the run's speed.
 
 export type LightName = 'none' | 'night' | 'morning';
 /** What the light is doing, for the tests (`data-light`). */
@@ -25,6 +27,10 @@ export const DAWN_MS = 1500;
 /** The whole sequence, from the first dimming to the morning. */
 export const NIGHT_MS = NIGHT_FALL_MS + NIGHT_HOLD_MS + DAWN_MS;
 
+/** The light at a moment: what it is doing, its colour, and how much of the day
+ * is seen, from 0, the night, to 1, the morning (D126). */
+export type Light = LightLook & { state: LightState; day: number };
+
 function between(from: LightLook, to: LightLook, share: number): LightLook {
   const t = Math.min(1, Math.max(0, share));
   return {
@@ -35,13 +41,14 @@ function between(from: LightLook, to: LightLook, share: number): LightLook {
 
 /** The light at `ms` since the night began to fall: falling into the night, the night
  * held, dawning into the morning, then the morning for good. */
-export function nightAt(ms: number): LightLook & { state: LightState } {
-  if (ms < NIGHT_FALL_MS) return { state: 'falling', ...between(LIGHTS.none, LIGHTS.night, ms / NIGHT_FALL_MS) };
-  if (ms < NIGHT_FALL_MS + NIGHT_HOLD_MS) return { state: 'night', ...LIGHTS.night };
+export function nightAt(ms: number): Light {
+  if (ms < NIGHT_FALL_MS) return { state: 'falling', day: 0, ...between(LIGHTS.none, LIGHTS.night, ms / NIGHT_FALL_MS) };
+  if (ms < NIGHT_FALL_MS + NIGHT_HOLD_MS) return { state: 'night', day: 0, ...LIGHTS.night };
   if (ms < NIGHT_MS) {
-    return { state: 'dawning', ...between(LIGHTS.night, LIGHTS.morning, (ms - NIGHT_FALL_MS - NIGHT_HOLD_MS) / DAWN_MS) };
+    const day = (ms - NIGHT_FALL_MS - NIGHT_HOLD_MS) / DAWN_MS;
+    return { state: 'dawning', day, ...between(LIGHTS.night, LIGHTS.morning, day) };
   }
-  return { state: 'morning', ...LIGHTS.morning };
+  return { state: 'morning', day: 1, ...LIGHTS.morning };
 }
 
 /** The light over a scene as time goes: a still light, or the night's sequence from
@@ -61,8 +68,8 @@ export class SceneLight {
     this.began = now;
   }
 
-  at(now: number): LightLook & { state: LightState } {
+  at(now: number): Light {
     if (this.began !== null) return nightAt(now - this.began);
-    return { state: this.still, ...LIGHTS[this.still] };
+    return { state: this.still, day: this.still === 'morning' ? 1 : 0, ...LIGHTS[this.still] };
   }
 }

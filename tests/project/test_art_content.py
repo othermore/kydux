@@ -148,3 +148,22 @@ def test_the_cells_an_open_leaf_lies_on_are_the_cells_its_scene_names(scene):
         if "covers" in thing
     }
     assert {door: cells for door, cells in measured.items() if cells} == named, scene
+
+
+def test_a_scene_a_morning_story_is_told_on_has_its_morning_ground():
+    """A story under the morning light draws its scene's morning ground: the sky,
+    the windows and the outside by day (D126)."""
+    scenes = set()
+    for path in sorted((CONTENT / "stories").glob("*/story.json")):
+        story = json.loads(path.read_text(encoding="utf-8"))
+        if story.get("light") == "morning":
+            scenes.add(story["scene"])
+    assert scenes
+    for scene in sorted(scenes):
+        folder = CONTENT / "art" / "scenes" / scene
+        art = json.loads((folder / "art.json").read_text(encoding="utf-8"))
+        ground = art.get("grounds", {}).get("morning")
+        assert ground and (folder / ground).is_file(), scene
+        for row in art["rows"]:
+            for image in row.get("hours", {}).values():
+                assert (folder / image).is_file(), (scene, image)

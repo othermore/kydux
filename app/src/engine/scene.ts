@@ -20,7 +20,8 @@
 // camera's zoom, D69), data-following (whether the camera follows the wizard),
 // data-marks-hidden (the doors whose doorway's mark waits for them to open, D79),
 // data-revealed (the things whose outline shows where they lie, D85),
-// data-sleeping (the bed the wizard sleeps in, D84), data-asleep (each figure
+// data-sleeping (the bed the wizard sleeps in, D84), data-ground (`morning` while
+// a scene painted at night shows its morning ground, `painting` otherwise, D126), data-asleep (each figure
 // asleep with its bed, "id:bed" joined by ",", and "lying" when it is drawn lying
 // under the bed's quilt, "id:bed:lying", D91),
 // data-silhouette (present on a painted scene, where the wizard's outline shows
@@ -78,6 +79,7 @@ import {
   facingOf,
   figureName,
   loadArt,
+  paintGrounds,
   paintScene,
   paintThing,
   placeThing,
@@ -221,6 +223,10 @@ class LevelScene extends Phaser.Scene {
   private light = new SceneLight();
   private lightCover!: Phaser.GameObjects.Rectangle;
   private shownLight: LightState | null = null;
+  /** The scene's grounds at other hours over the painting's own (D126): the
+   * morning's, shown as much as the light shows the day. */
+  private grounds = new Map<string, Phaser.GameObjects.Image[]>();
+  private shownDay: number | null = null;
   /** When the wizard has lain down in its bed, on the scene's clock, and the timer
    * that lets the night fall then. */
   private lyingUntil = 0;
@@ -413,6 +419,7 @@ class LevelScene extends Phaser.Scene {
     if (this.art) {
       // A painted scene (D76): the painting as the ground, its raised things by row.
       this.rows = paintScene(this, this.art);
+      this.grounds = paintGrounds(this, this.art);
       drawGrid(this, [this.map.width, this.map.height]);
     } else {
       const tilemap = this.make.tilemap({ data, tileWidth: TILE, tileHeight: TILE });
@@ -1044,6 +1051,14 @@ class LevelScene extends Phaser.Scene {
     if (cover.x !== view.x - 2 || cover.y !== view.y - 2) cover.setPosition(view.x - 2, view.y - 2);
     if (cover.width !== view.width + 4 || cover.height !== view.height + 4) cover.setSize(view.width + 4, view.height + 4);
     cover.setFillStyle(Phaser.Display.Color.GetColor(...look.colour), look.alpha);
+    // The morning ground over the night one as the day comes (D126), said in
+    // data-ground: `morning` once it is all there, `painting` otherwise.
+    const morning = this.grounds.get('morning');
+    if (morning && look.day !== this.shownDay) {
+      this.shownDay = look.day;
+      for (const image of morning) image.setAlpha(look.day);
+      this.parentNode.dataset.ground = look.day >= 1 ? 'morning' : 'painting';
+    }
     if (look.state === this.shownLight) return;
     this.shownLight = look.state;
     this.parentNode.dataset.light = look.state;

@@ -5,6 +5,9 @@
     18
   ],
   "ground": "ground.webp",
+  "grounds": {
+    "morning": "ground-morning.webp"
+  },
   "rows": [
     {
       "row": 6,
@@ -81,7 +84,10 @@
       "row": 15,
       "image": "row-15-static.webp",
       "top": 1181,
-      "static": true
+      "static": true,
+      "hours": {
+        "morning": "row-15-static-morning.webp"
+      }
     }
   ],
   "things": {

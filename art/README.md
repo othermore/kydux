@@ -102,6 +102,24 @@ owner on 2026-10-26, for every scene from the dormitory on:
   in the corners: a starry night sky for a scene at night, the same the
   windows show; a pale morning sky with clouds for a scene by day. Each
   scene is painted at its own hour, and its light says so.
+- **A scene painted at night has its morning picture** (D126), when a
+  morning story plays on it or a night spent in it ends in the morning.
+  Gemini paints the whole painting again by morning, given it as it is
+  (the dormitory's prompt is `tools/art/prompts/game-dormitory-morning.md`);
+  `tools/art/repaint.py <scene> join <picture> --section morning` takes
+  from it only the sky above the walls, each window and everything beyond
+  the castle's walls (boxes, and polygons, `areas`, along a slanting
+  wall's outer line), each faded in over a few pixels on the outlines
+  that bound it, into a picture of its own. The inside stays the night
+  painting's, its candles and torches as they are. The settings'
+  `sources` name it in `grounds` (`{"morning": ...}`); the export writes
+  `ground-morning.webp` beside `ground.webp`, and `morning-<scene>.png`
+  among the check pictures, every row and thing over it, to look at for
+  a night piece left over the day: a row's image that holds some of the
+  outside, a wall's strip running out over the grass, is named in
+  `rows_morning` and has a morning image of its own, the same cut-out
+  with the morning picture's pixels. The page draws them under a story's
+  morning light, and fades them in over the night ones at the dawn (D124).
 - **Outdoors, the margin is more of the same ground**, woods, rocks and
   fences no one could walk through, as the field's.
 - **A margin painted on later is joined, the painting kept.** For a

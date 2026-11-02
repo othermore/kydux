@@ -23,6 +23,9 @@ export interface SceneArt {
   cell: number;
   size: Tile;
   ground: string;
+  /** The scene's ground at other hours, by the hour: a scene painted at night has
+   * its morning (D126). */
+  grounds?: Record<string, string>;
   /** The ground painted beyond the playable area (D83): the cells on each side
    * (left, top, right, bottom), and the playable corner in the ground's pixels. */
   margin?: [number, number, number, number];
@@ -41,6 +44,9 @@ export interface SceneArt {
     over?: boolean;
     cover?: boolean;
     hangs?: boolean;
+    /** The row's image at another hour, by the hour, where it holds some of what
+     * the scene's ground at that hour mends (D126). */
+    hours?: Record<string, string>;
   }[];
   /** Each thing that opens or is picked up: its row, its corner in the painting's
    * pixels, its states' images, and `at`, the cell it is painted on, when a level
@@ -146,7 +152,11 @@ function rowKey(row: SceneArt['rows'][number]): string {
 /** Loads the painting's images and the figures' sheets. */
 export function preloadArt(scene: Phaser.Scene, { scene: painted, figures }: Art): void {
   scene.load.image('art-ground', painted.base + painted.ground);
-  for (const row of painted.rows) scene.load.image(rowKey(row), painted.base + row.image);
+  for (const [hour, image] of Object.entries(painted.grounds ?? {})) scene.load.image(`art-ground-${hour}`, painted.base + image);
+  for (const row of painted.rows) {
+    scene.load.image(rowKey(row), painted.base + row.image);
+    for (const [hour, image] of Object.entries(row.hours ?? {})) scene.load.image(`${rowKey(row)}-${hour}`, painted.base + image);
+  }
   for (const [id, thing] of Object.entries(painted.things)) {
     for (const [state, image] of Object.entries(thing.states)) {
       scene.load.image(`art-${id}-${state}`, painted.base + image);
@@ -173,14 +183,34 @@ export function paintScene(scene: Phaser.Scene, art: Art): Phaser.GameObjects.Im
   const scale = artScale(art);
   const [x, y] = art.scene.origin ?? [0, 0];
   scene.add.image(-x * scale, -y * scale, 'art-ground').setOrigin(0, 0).setScale(scale).setDepth(0);
+  return art.scene.rows.map((row) => rowImage(scene, art, row, rowKey(row)));
+}
+
+/** A row's image, `key`, where the row is drawn among the figures. */
+function rowImage(scene: Phaser.Scene, art: Art, row: SceneArt['rows'][number], key: string): Phaser.GameObjects.Image {
   const rows = art.scene.size[1];
-  return art.scene.rows.map((row) =>
-    scene.add
-      .image(0, row.top * scale, rowKey(row))
-      .setOrigin(0, 0)
-      .setScale(scale)
-      .setDepth(row.over ? overDepth(rows) : row.cover ? coverDepth(row.row) : rowDepth(row.row, row.under)),
-  );
+  return scene.add
+    .image(0, row.top * artScale(art), key)
+    .setOrigin(0, 0)
+    .setScale(artScale(art))
+    .setDepth(row.over ? overDepth(rows) : row.cover ? coverDepth(row.row) : rowDepth(row.row, row.under));
+}
+
+/** The scene at other hours (D126), unseen until the light shows it, by the
+ * hour: its ground over the painting's own and under everything else, and each
+ * row's image at that hour over the row's own. */
+export function paintGrounds(scene: Phaser.Scene, art: Art): Map<string, Phaser.GameObjects.Image[]> {
+  const scale = artScale(art);
+  const [x, y] = art.scene.origin ?? [0, 0];
+  const grounds = new Map<string, Phaser.GameObjects.Image[]>();
+  for (const hour of Object.keys(art.scene.grounds ?? {})) {
+    const ground = scene.add.image(-x * scale, -y * scale, `art-ground-${hour}`).setOrigin(0, 0).setScale(scale);
+    const rows = art.scene.rows
+      .filter((row) => row.hours?.[hour])
+      .map((row) => rowImage(scene, art, row, `${rowKey(row)}-${hour}`));
+    grounds.set(hour, [ground.setDepth(0), ...rows].map((image) => image.setAlpha(0)));
+  }
+  return grounds;
 }
 
 /** How many cells a painted thing is moved from where it is painted (D85): the

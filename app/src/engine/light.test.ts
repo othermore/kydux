@@ -18,6 +18,19 @@ describe('the night seen when the wizard goes to sleep (D124)', () => {
     expect(light.at(1000 + NIGHT_MS * 10)).toMatchObject({ state: 'morning', ...LIGHTS.morning });
   });
 
+  it('shows the day only from the dawn, all of it once the morning has come (D126)', () => {
+    const light = new SceneLight();
+    expect(light.at(0).day).toBe(0);
+    light.fall(0);
+    expect(light.at(NIGHT_FALL_MS + NIGHT_HOLD_MS - 1).day).toBe(0);
+    expect(light.at(NIGHT_FALL_MS + NIGHT_HOLD_MS + DAWN_MS / 2).day).toBeCloseTo(0.5);
+    expect(light.at(NIGHT_MS).day).toBe(1);
+    light.set('morning');
+    expect(light.at(5).day).toBe(1);
+    light.set('none');
+    expect(light.at(5).day).toBe(0);
+  });
+
   it('is the painting’s own light after a reset, and a morning story’s morning', () => {
     const light = new SceneLight();
     light.fall(0);

@@ -244,6 +244,22 @@ test.describe('in the library (D85, D86, D51)', () => {
     await page.locator('#run').click();
     await expect(page.locator('#scene')).toHaveAttribute('data-revealed', 'key', { timeout: 30_000 });
     await page.screenshot({ path: `${SHOTS}revealed.png` });
+    // The glow is the key's own shape, traced on its outline, with no line of the floor.
+    await page.waitForTimeout(400);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-key-glow.png` });
+  });
+
+  test('the old book by the pile glows in its own shape, nothing of the pile with it', async ({ page }) => {
+    await open(page, 'the-lost-book');
+    await page.locator('#speed').selectOption('1');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('book = wizard.find_nearest("book")\nbook.reveal()\nwizard.move_up(2)\nwizard.move_right(4)\nwizard.move_up(4)\nwizard.move_left(6)');
+    await page.locator('#run').click();
+    await expect(page.locator('#scene')).toHaveAttribute('data-revealed', 'old_book', { timeout: 30_000 });
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: 60_000 });
+    await page.waitForTimeout(400);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-book-glow.png` });
   });
 
   test('the moving key: the given program fails a way, distance_to wins all three', async ({ page }) => {

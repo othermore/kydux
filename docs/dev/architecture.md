@@ -1654,7 +1654,22 @@ one overturns stays, marked as superseded.
   them. A thing found with `find_nearest` is shown with `reveal`, taught
   in the same lesson as `find_nearest`, and a level puts a lost thing
   where the child can walk to it once it glows. `position` stays in the
-  world's API for a later chapter that teaches it with the grid on the
-  scene; chapter 3's lesson *true or false* keeps `teacher.position`
-  until that chapter is reviewed on its painted scenes. Rules out
-  `print(book.position)` as the way to find a book.
+  world's API for chapter 3, which teaches the grid first and `position`
+  after it (D112). Rules out `print(book.position)` as the way to find a
+  book.
+- **D112 — The grid is taught before `position`, with the naughty
+  child's map.** Decided 2026-10-29 by the owner. A cell's numbers mean
+  nothing until the child has seen them on the scene and counted cells by
+  hand. Chapter 3 opens with the naughty child's map, a thing the wizard
+  carries, and the spell `orvim`, cast only with the map carried: for a
+  few ticks the scene shows every cell's numbers, as the debug view draws
+  them, and every thing and person outlined with its name and its cell.
+  The lesson *The cells* says what the two numbers are (x from the left,
+  y from the top, both from 0, a step right adding one to x and a step
+  down one to y) and the first level names the wizard's cell and the
+  goal's, shows no mark, and asks for the moves; the second gives the
+  goal's cell only, and `wizard.position` tells the wizard's; the third
+  gives neither, and a thing's `position`, found with `find_nearest`,
+  says where to walk. Only then do chapter 3's conditions use
+  `teacher.position`. Rules out `position` listed in a lesson no level
+  needs, and a goal mark shown where the child is to count.

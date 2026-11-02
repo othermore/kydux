@@ -42,6 +42,12 @@ design:
   years ago; it moves because someone moves it; the door is far because
   the program is old. The idea and the story agree, so the child remembers
   both.
+- **A number the child cannot see is taught with a way to see it.** The
+  grid's cells are taught with the naughty child's map, whose spell shows
+  their numbers on the scene (D112); the child counts the cells between
+  two named ones before any program asks `position`, then reads the
+  wizard's own cell, then a thing's. Rule given by the owner on
+  2026-10-29.
 
 Each later chapter's design is checked against this before its texts are
 briefed: every lesson names the level that needs it, and what in that
@@ -145,41 +151,61 @@ step on (D84); a thing drawn where the level says, hidden and revealed
 
 ## Chapter 3 — The passages (`03-passages`)
 
-At night, with the friend, through the passages where Dask patrols. The ideas: a
-question with a true or false answer, an expression; choosing with `if` and
-`else`, a condition; repeating with `for` and `while`, a loop; two spells.
-The wizard carries the school wand throughout.
+At night, with the friend, through the passages where Dask patrols. The
+chapter opens with the naughty child's map: an old map of the castle, drawn
+years ago by a pupil who slipped out at night, with every floor in numbered
+cells and a spell word in its corner, `orvim`, which with the map carried
+shows the cells' numbers on the scene for a moment and every thing and
+person with its name and its cell (D112). With it the child learns the
+grid: a cell's two numbers, x from the left and y from the top, both from 0;
+then reads the wizard's own cell, `wizard.position`, and a thing's,
+`key.position`, `dask.position`. The ideas after it: a question with a
+true or false answer, an expression; choosing with `if` and `else`, a
+condition; repeating with `for` and `while`, a loop; two spells. The walks
+are short and straight, with little in the way: the levels' difficulty is
+in the counting, the conditions and the waits (owner, 2026-10-29). The
+wizard carries the school wand and the map throughout.
 
 Its scenes: `the-passages`, the watchtower's gallery, Dask's round, two
 rooms of two doors and the long stairs; and, after a story at the
 top, `the-night-passages`, Dask's long corridor, the moving stair, the dark
-room and the night walk down to the dormitory.
+room and the night walk down to the dormitory. Both are laid out on the
+grid before they are painted (D102).
 
 | Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
-| `story:after-dark` | Story 1 | Night; the friend at the door; the passages and Dask; look before you step. | |
-| `lesson:true-or-false` | Lesson 1 | An expression is a question answered `True` or `False`: `3 > 2`, `door.locked`, `dask.facing == "left"`; `not`; a method can answer, `dask.can_see(wizard)` (D54). | `teacher.facing`, `teacher.position`, `teacher.can_see` |
-| `level:the-watchtower` | Practice 1 | Dask stares at the wall: print what he faces and whether he sees the wizard, then walk past. Bonus: the code asks `can_see`. | |
-| `lesson:if` | Lesson 2 | A condition: `if` runs its lines, moved in by four spaces, only when its expression is true; `wizard.wait()`; a level played two ways. | `wizard.wait` (and Python's `if`) |
-| `level:the-watch` | Practice 2 | Played two ways (D51): Dask looks away, or this way. `if` he looks this way, wait; then cross. | |
-| `lesson:else` | Lesson 3 | `else`: the lines to run when the condition is false. | (Python's `else`) |
-| `level:left-or-right` | Practice 3 | Played two ways: one of two doors is locked. `if` and `else`. | |
+| `story:after-dark` | Story 1 | Night; the friend at the door with the naughty child's map: the passages, Dask, a map that shows the castle's cells; look before you step. | |
+| `lesson:the-cells` | Lesson 1 | The castle's floor is a grid of cells; a cell is named by two numbers, x counted from the left and y from the top, both from 0; a step right adds one to x, a step down adds one to y; with the map, `wizard.cast("orvim")` shows the numbers on the scene for a moment. | `concept:cells` (and the spell `orvim`) |
+| `level:the-loose-stone` | Practice 1 | The friend reads the map: we stand at one cell, the loose stone with the hiding place is at another; no mark is shown; count the cells and walk there in two straight moves. Bonus: the map's spell cast. | |
+| `lesson:where-i-am` | Lesson 2 | The wizard knows its own cell: `wizard.position`, x and y, an attribute; `print` shows it. | `wizard.position` |
+| `level:the-dark-corner` | Practice 2 | The way out of a dark corner is at a cell the friend names; where the wizard stands is not said: print the position, count, walk. | |
+| `lesson:where-things-are` | Lesson 3 | Every thing and person knows its cell too: `key.position`, `dask.position`; a thing found with `find_nearest` says with its cell where to walk; the map's spell shows the same names and numbers. | `thing.position`, `teacher.position` |
+| `level:the-keys-cell` | Practice 3 | The gallery's door is locked and its key lies somewhere in the room, out of sight: find it, print its cell and the wizard's, count, walk, pick it up, open the door. Bonus: `position` asked. | |
+| `lesson:true-or-false` | Lesson 4 | An expression is a question answered `True` or `False`: `3 > 2`, `door.locked`, `dask.facing == "left"`; `not`; a method can answer, `dask.can_see(wizard)` (D54). | `teacher.facing`, `teacher.can_see` |
+| `level:the-watchtower` | Practice 4 | Dask stares at the wall: print what he faces and whether he sees the wizard, then walk past. Bonus: the code asks `can_see`. | |
+| `lesson:if` | Lesson 5 | A condition: `if` runs its lines, moved in by four spaces, only when its expression is true; `wizard.wait()`; a level played two ways. | `wizard.wait` (and Python's `if`) |
+| `level:the-watch` | Practice 5 | Played two ways (D51): Dask looks away, or this way. `if` he looks this way, wait; then cross. | |
+| `lesson:else` | Lesson 6 | `else`: the lines to run when the condition is false. | (Python's `else`) |
+| `level:left-or-right` | Practice 6 | Played two ways: one of two doors is locked. `if` and `else`. | |
 | `level:the-wrong-door` | Fix 1 | Played two ways: the friend's program has its `if` and `else` lines the wrong way round. | |
-| `lesson:repeat` | Lesson 4 | A loop: `for step in range(8):` repeats its lines. | (Python's `for`) |
+| `lesson:repeat` | Lesson 7 | A loop: `for step in range(8):` repeats its lines. | (Python's `for`) |
 | `level:the-long-stairs` | Improve 1 | The friend's program climbs in sixteen lines; a `for` in fewer than 4. | |
 | `story:the-top-of-the-stairs` | Story 2 | The night passages begin; a stair that comes and goes; Dask below. | |
-| `lesson:while` | Lesson 5 | `while` repeats its lines as long as its expression is true; a `while` that never ends is stopped by the tick limit. | |
-| `level:past-the-teacher` | Practice 4 | Wait while Dask looks this way, then cross his corridor. | |
-| `lesson:kirra-and-osto` | Lesson 6 | `kirra` lights a dark room; `osto` holds a moving stair; `stair.in_place` asks whether a step would land. | `stair.in_place` (and the spells `kirra`, `osto`) |
-| `level:the-moving-stairs` | Practice 5 | Wait `while not stair.in_place`, then cross (D53). Bonus: the code asks `in_place`. | |
-| `level:the-dark-room` | Practice 6 | A dark room (D52): `kirra`, the key found, the door opened. Bonus: the key found with `find_nearest`. | |
-| `level:the-night-walk` | Practice 7 | The chapter together: dark, a key and its door, a stair, and Dask on his round below. | |
+| `lesson:while` | Lesson 8 | `while` repeats its lines as long as its expression is true; a `while` that never ends is stopped by the tick limit. | |
+| `level:past-the-teacher` | Practice 7 | Wait while Dask looks this way, then cross his corridor. | |
+| `lesson:kirra-and-osto` | Lesson 9 | `kirra` lights a dark room; `osto` holds a moving stair; `stair.in_place` asks whether a step would land. | `stair.in_place` (and the spells `kirra`, `osto`) |
+| `level:the-moving-stairs` | Practice 8 | Wait `while not stair.in_place`, then cross (D53). Bonus: the code asks `in_place`. | |
+| `level:the-dark-room` | Practice 9 | A dark room (D52): `kirra`, the key found, the door opened. Bonus: the key found with `find_nearest`. | |
+| `level:the-night-walk` | Practice 10 | The chapter together: dark, a key and its door, a stair, and Dask on his round below. | |
 | `story:caught` | Story 3 | Dask steps out of the dark, and lets them go; the chapter's ideas summed up. | |
 
-The world features chapter 3 needs: a level played in several ways,
-which the same program must win in all of them (D51); dark rooms whose
-things are hidden until lit (D52); stairs that come and go, held by `osto`
-(D53); scenes and a friend (D65, D66).
+The world features chapter 3 needs: the naughty child's map, a thing
+carried, and `orvim`, cast only with it, which for a few ticks shows every
+cell's numbers and every thing's and person's name and cell on the scene
+(D112); a `reach` goal whose mark is not shown; a level played in several
+ways, which the same program must win in all of them (D51); dark rooms
+whose things are hidden until lit (D52); stairs that come and go, held by
+`osto` (D53); scenes and a friend (D65, D66).
 
 ## Chapter 4 — The broom (`04-the-broom`)
 
@@ -251,7 +277,7 @@ stairs* (moving tiles and functions), *Zarek's revenge* (the race again),
 
 ## The count
 
-Twenty-seven lessons and thirty-four levels, thirty-six with the fix
+Thirty lessons and thirty-seven levels, thirty-nine with the fix
 levels of chapters 4 and 5, then ten challenges. The draft
 asked for 10 to 20 lessons; one idea per lesson, each with its theory,
 asks for more, and each is short: a few pages.

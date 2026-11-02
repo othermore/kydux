@@ -601,9 +601,11 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
 5.4 Chapter 2, The library (variables, attributes, finding things), in the
     scene of the library: Wenna's five lessons, eight levels (an improve, a
     fix), Eldra's books, locked doors and keys, and the wand bank.
-5.5 Chapter 3, The passages (conditions, loops), in two scenes, the
-    passages and the night passages: Nuri's six lessons, nine levels (a fix,
-    an improve), the patrolling teacher, the moving stairs, the dark rooms.
+5.5 Chapter 3, The passages (the cells and `position`, conditions, loops),
+    in two scenes, the passages and the night passages: the friend's nine
+    lessons, twelve levels (a fix, an improve), the naughty child's map and
+    its spell (D112), the patrolling teacher, the moving stairs, the dark
+    rooms.
 5.6 Chapter 4, The broom (lists, functions), in a scene of the broom field
     and the village: flying, the race, an action of the child's own.
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

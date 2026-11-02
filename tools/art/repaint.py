@@ -59,9 +59,13 @@ leaf, from the arch to the threshold and `sill` cells below it, over the
 threshold's line, is painted with the floor of the room beyond (`floor`, a box
 in cells of the painting itself, a plain part of that room's floor), stretched
 to it, DOORWAY_SHADE darker at the arch's top and as lit as the room at the
-threshold. The door has swung in out of sight. A model asked to open a door drew
-its leaf against the arch's side and left its bottom planks, and a model's floor
-was lit brighter than the room it is the floor of.
+threshold. The leaf swung open beside the doorway (D111) is a model's, mended
+into the doorway's picture as any box is, on a guide the tool draws first
+(`guide`): the shut leaf, exactly the opening's size, turned over on its hinges
+at the opening's edge, its free edge a little forward, and its shadow, which the
+model is given as it is to paint the door's hinges and finish on. A model asked
+to open a whole door drew its leaf against the arch's side and left its bottom
+planks, and a model's floor was lit brighter than the room it is the floor of.
 
 The same is done for any other section of the settings, named by `--section`:
 `without`, the edit of a scene indoors without its static things (D89), which
@@ -417,7 +421,9 @@ def doorways(scene: str) -> list[Path]:
 
     written = []
     for door in settings.data["doorways"]["doors"]:
-        x0, y0, x1, y1 = settings.things[door["thing"]]["box"]
+        # The leaf is looked for in its own box: the thing's may reach on to where
+        # the leaf swings to.
+        x0, y0, x1, y1 = door.get("leaf", settings.things[door["thing"]]["box"])
         box = (px(x0), py(y0), px(x1), py(y1))
         crop = painting[box[1] : box[3], box[0] : box[2]]
         bands = [
@@ -425,6 +431,7 @@ def doorways(scene: str) -> list[Path]:
             for left, right, across in door["seeds"]
         ]
         leaf = leaf_of(crop, bands)
+        shut = leaf.copy()
         # The threshold's line under the leaf is covered too, `sill` cells of it.
         sill = round(door.get("sill", 0.0) * gy["spacing"])
         if sill:
@@ -434,13 +441,8 @@ def doorways(scene: str) -> list[Path]:
             leaf = grown
         ys, xs = np.nonzero(leaf)
         top, bottom, first, last = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
-        source = (
-            Image.fromarray(painting)
-            if "picture" not in door
-            else Image.open(settings.edits / door["picture"]).convert("RGB")
-        )
         fx0, fy0, fx1, fy1 = door["floor"]
-        floor = source.crop((px(fx0), py(fy0), px(fx1), py(fy1)))
+        floor = Image.fromarray(painting).crop((px(fx0), py(fy0), px(fx1), py(fy1)))
         floor = np.array(floor.resize((last - first, bottom - top), Image.LANCZOS)).astype(
             np.float32
         )
@@ -454,7 +456,70 @@ def doorways(scene: str) -> list[Path]:
         target = settings.edits / door["painting"]
         Image.fromarray(out).save(target)
         written.append(target)
+        if "guide" in door:
+            target = settings.edits / door["guide"]["picture"]
+            picture = guided(out, crop, shut, box, door["guide"], gx["spacing"])
+            Image.fromarray(picture).save(target)
+            written.append(target)
     return written
+
+
+#: A door swung open nearly flat against its wall (D111): how much darker its leaf
+#: is than shut, how much its free edge stands forward, lower in the picture, and
+#: how wide and dark its shadow on the wall is, as parts of a cell.
+GUIDE_SHADE = 0.88
+GUIDE_DROP = 0.08
+GUIDE_SHADOW = 0.14
+GUIDE_SHADOW_DARK = 0.45
+
+
+def guided(
+    doorway: np.ndarray,
+    crop: np.ndarray,
+    leaf: np.ndarray,
+    box: tuple[int, int, int, int],
+    guide: dict,
+    cell: float,
+) -> np.ndarray:
+    """The doorway's picture with its door swung open out of it, as the guide a model
+    paints the open door on (D111): the shut leaf, exactly the opening's size,
+    turned over on its hinges at the opening's edge (`side`, the side it swings
+    to), so that it lies over the arch's stones there and the wall beyond; its
+    free edge a little forward, lower in the picture, and a little darker; its
+    shadow on the wall beyond that edge."""
+    ys, xs = np.nonzero(leaf)
+    top, bottom, first, last = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+    height, width = bottom - top, last - first
+    patch = crop[top:bottom, first:last].astype(np.float32)[:, ::-1] * GUIDE_SHADE
+    alpha = leaf[top:bottom, first:last][:, ::-1].astype(np.float32)
+    # The free edge is the far one from the hinges: drawn lower the further from them.
+    drop = round(GUIDE_DROP * cell)
+    toward = 1 if guide["side"] == "right" else -1
+    columns = np.arange(width)
+    far = columns if toward > 0 else columns[::-1]
+    shifts = np.round(far / max(1, width - 1) * drop).astype(int)
+    tall = height + drop
+    moved = np.zeros((tall, width, 3), dtype=np.float32)
+    moved_alpha = np.zeros((tall, width), dtype=np.float32)
+    for column, shift in zip(columns, shifts, strict=True):
+        moved[shift : shift + height, column] = patch[:, column]
+        moved_alpha[shift : shift + height, column] = alpha[:, column]
+    out = doorway.astype(np.float32)
+    y0 = box[1] + top
+    hinge = box[0] + (last if toward > 0 else first)
+    x0 = hinge if toward > 0 else hinge - width
+    # The shadow on the wall, beyond the free edge, fading away from it.
+    reach = max(2, round(GUIDE_SHADOW * cell))
+    edge = x0 + width if toward > 0 else x0
+    for step in range(reach):
+        x = edge + step if toward > 0 else edge - 1 - step
+        dark = GUIDE_SHADOW_DARK * (1 - step / reach)
+        column = moved_alpha[:, -1 if toward > 0 else 0] > 0.5
+        out[y0 : y0 + tall, x][column] *= 1 - dark
+    here = out[y0 : y0 + tall, x0 : x0 + width]
+    a = moved_alpha[..., None]
+    here[:] = here * (1 - a) + moved * a
+    return out.clip(0, 255).astype(np.uint8)
 
 
 def mark_sets(marks: dict) -> list[dict]:

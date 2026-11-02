@@ -151,8 +151,68 @@
       ]
     ]
   },
+  "wenna_swung": {
+    "about": "The wenna door seen open (D111): its leaf swung out of the doorway nearly all the way, hanging on hinges at the opening's edge, lying over the arch's right stones and the wall beyond, as large as the opening, the hinges seen, its free edge a little off the wall and its shadow on the wall. Painted by Gemini 3 Pro Image from tools/art/prompts/game-library-wenna-swung.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box.",
+    "from": "art/raw/game-library6/library-wenna-doorway.png",
+    "boxes": [
+      [
+        1794,
+        3520,
+        2060,
+        4030
+      ]
+    ],
+    "crop": [
+      1400,
+      3100,
+      2700,
+      4140
+    ],
+    "canvas": "art/raw/game-library6/library-wenna-swung-canvas.png",
+    "painting": "art/raw/game-library6/library-wenna-swung.png"
+  },
+  "centre_swung": {
+    "about": "The centre door seen open (D111): its leaf swung out of the doorway nearly all the way, hanging on hinges at the opening's edge, lying over the arch's right stones and the wall beyond, as large as the opening, the hinges seen, its free edge a little off the wall and its shadow on the wall. Painted by Gemini 3 Pro Image from tools/art/prompts/game-library-centre-swung.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box.",
+    "from": "art/raw/game-library6/library-centre-doorway.png",
+    "boxes": [
+      [
+        1794,
+        1630,
+        2048,
+        2235
+      ]
+    ],
+    "crop": [
+      1400,
+      1250,
+      2700,
+      2290
+    ],
+    "canvas": "art/raw/game-library6/library-centre-swung-canvas.png",
+    "painting": "art/raw/game-library6/library-centre-swung.png"
+  },
+  "room_swung": {
+    "about": "The room door seen open (D111): its leaf swung out of the doorway nearly all the way, hanging on hinges at the opening's edge, lying over the arch's left stones and the wall beyond, as large as the opening, the hinges seen, its free edge a little off the wall and its shadow on the wall. Painted by Gemini 3 Pro Image from tools/art/prompts/game-library-room-swung.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box.",
+    "from": "art/raw/game-library6/library-room-doorway.png",
+    "boxes": [
+      [
+        312,
+        1080,
+        500,
+        1430
+      ]
+    ],
+    "crop": [
+      0,
+      800,
+      1000,
+      1600
+    ],
+    "canvas": "art/raw/game-library6/library-room-swung-canvas.png",
+    "painting": "art/raw/game-library6/library-room-swung.png"
+  },
   "doorways": {
-    "about": "Each door of the library opened by tools/art/repaint.py doorways (D108): its whole leaf, from the arch to the threshold and the threshold's line, painted with the floor of the room beyond from the painting itself, a plain part of it, darker under the arch and as lit as the room at the threshold.",
+    "about": "Each door of the library opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch to the threshold and the threshold's line, painted with the floor of the room beyond from the painting itself, darker under the arch and as lit as the room at the threshold.",
     "doors": [
       {
         "thing": "wenna_door",
@@ -175,7 +235,13 @@
           11.85
         ],
         "painting": "library-wenna-doorway.png",
-        "sill": 0.08
+        "sill": 0.08,
+        "leaf": [
+          6.6,
+          15.4,
+          8.4,
+          17.0
+        ]
       },
       {
         "thing": "centre_door",
@@ -193,7 +259,13 @@
           6.9
         ],
         "painting": "library-centre-doorway.png",
-        "sill": 0.08
+        "sill": 0.08,
+        "leaf": [
+          6.6,
+          7.4,
+          8.4,
+          9.0
+        ]
       },
       {
         "thing": "room_door",
@@ -211,7 +283,13 @@
           6.9
         ],
         "painting": "library-room-doorway.png",
-        "sill": 0.06
+        "sill": 0.06,
+        "leaf": [
+          1.8,
+          4.7,
+          3.1,
+          6.0
+        ]
       }
     ]
   },
@@ -271,7 +349,8 @@
         4,
         11
       ],
-      "about": "Eldra's lost book, on the rug in her nook."
+      "about": "Eldra's lost book, on the rug in her nook.",
+      "scale": 0.6
     },
     "rare_book": {
       "box": [
@@ -334,40 +413,147 @@
     "wenna_door": {
       "box": [
         6.6,
-        15.4,
-        8.4,
-        17.0
+        15.3,
+        9.45,
+        17.4
       ],
       "row": 16,
       "solid": true,
       "without": "library-wenna-doorway.png",
       "states": {
         "closed": "painting",
-        "open": "without"
+        "open": {
+          "picture": "library-wenna-swung.png",
+          "without": "library-wenna-doorway.png",
+          "row": 17,
+          "area": [
+            [
+              7.982,
+              15.994
+            ],
+            [
+              8.051,
+              15.682
+            ],
+            [
+              8.232,
+              15.543
+            ],
+            [
+              8.51,
+              15.494
+            ],
+            [
+              8.822,
+              15.564
+            ],
+            [
+              9.031,
+              15.744
+            ],
+            [
+              9.197,
+              15.89
+            ],
+            [
+              9.246,
+              17.147
+            ],
+            [
+              9.086,
+              17.356
+            ],
+            [
+              8.683,
+              17.251
+            ],
+            [
+              8.051,
+              17.043
+            ],
+            [
+              7.982,
+              16.974
+            ]
+          ]
+        }
       },
       "at": [
         7,
         16
       ],
-      "about": "Wenna's door, in the wall between the reading room and the shelves: open, its doorway shows the floor of the hall beyond from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
+      "about": "Wenna's door, in the wall between the reading room and the shelves: open, swung out nearly flat against its wall beside the arch (D111, wenna_swung), its doorway showing the floor of the room beyond (doorways, D108); shut, it is over whoever stands in its doorway (D95).",
       "opening": 1.17,
       "under": true,
-      "through": true,
       "rest": "open"
     },
     "centre_door": {
       "box": [
         6.6,
-        7.4,
-        8.4,
-        9.0
+        7.25,
+        9.45,
+        9.6
       ],
       "row": 8,
       "solid": true,
       "without": "library-centre-doorway.png",
       "states": {
         "closed": "painting",
-        "open": "without"
+        "open": {
+          "picture": "library-centre-swung.png",
+          "without": "library-centre-doorway.png",
+          "row": 9,
+          "area": [
+            [
+              7.999,
+              8.083
+            ],
+            [
+              8.086,
+              7.799
+            ],
+            [
+              8.301,
+              7.625
+            ],
+            [
+              8.544,
+              7.59
+            ],
+            [
+              8.822,
+              7.66
+            ],
+            [
+              9.003,
+              7.799
+            ],
+            [
+              9.107,
+              8.042
+            ],
+            [
+              9.128,
+              9.514
+            ],
+            [
+              9.051,
+              9.611
+            ],
+            [
+              8.544,
+              9.479
+            ],
+            [
+              8.086,
+              9.201
+            ],
+            [
+              7.999,
+              9.132
+            ]
+          ]
+        }
       },
       "at": [
         7,
@@ -376,22 +562,71 @@
       "about": "The door in the middle of the wall between the wide hall and the top aisle: open, its doorway shows the floor of the aisle beyond from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
       "opening": 1.18,
       "under": true,
-      "through": true,
       "rest": "open"
     },
     "room_door": {
       "box": [
-        1.8,
+        1.0,
         4.7,
         3.1,
-        6.0
+        6.55
       ],
       "row": 5,
       "solid": true,
       "without": "library-room-doorway.png",
       "states": {
         "closed": "painting",
-        "open": "without"
+        "open": {
+          "picture": "library-room-swung.png",
+          "without": "library-room-doorway.png",
+          "row": 6,
+          "area": [
+            [
+              1.99,
+              5.075
+            ],
+            [
+              2.049,
+              5.214
+            ],
+            [
+              2.153,
+              5.353
+            ],
+            [
+              2.174,
+              6.089
+            ],
+            [
+              1.556,
+              6.478
+            ],
+            [
+              1.41,
+              6.374
+            ],
+            [
+              1.323,
+              6.096
+            ],
+            [
+              1.34,
+              5.526
+            ],
+            [
+              1.444,
+              5.266
+            ],
+            [
+              1.618,
+              5.092
+            ],
+            [
+              1.833,
+              5.023
+            ]
+          ]
+        }
       },
       "at": [
         2,
@@ -399,7 +634,6 @@
       ],
       "about": "The door of Eldra's little room, at the top aisle's left end: open, its doorway shows the room's floor from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
       "under": true,
-      "through": true,
       "rest": "open"
     },
     "wenna_door_arch": {

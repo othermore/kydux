@@ -56,8 +56,9 @@ export interface SceneArt {
       at?: Tile;
       /** Drawn over whoever stands in its doorway (D95). */
       under?: boolean;
-      /** Open, its doorway shows the floor beyond, under every figure (D108). */
-      through?: boolean;
+      /** The row a state is drawn among the rows by, when not the thing's: a door
+       * swung open against the wall it lies on (D111). */
+      rows?: Record<string, number>;
       /** The state a door is drawn in where no level or story places it (D104). */
       rest?: 'open' | 'closed';
     }
@@ -245,12 +246,9 @@ export interface ThingPlaced {
 function depthOn(art: Art, id: string, tile: Tile, { open = false, inside = false }: ThingPlaced): number {
   const painted = art.scene.things[id];
   if (!painted) return 3;
-  return thingDepth(painted.row + shiftOf(art, id, tile)[1], {
-    under: painted.under,
-    open,
-    through: painted.through,
-    inside,
-  });
+  // A door swung open lies on the wall beside its doorway, among the rows as it is (D111).
+  const row = (open ? painted.rows?.open : undefined) ?? painted.row;
+  return thingDepth(row + shiftOf(art, id, tile)[1], { under: painted.under, open, inside });
 }
 
 /** A painted thing in its state, among the rows by its foot (D76), drawn on the

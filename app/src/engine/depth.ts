@@ -1,8 +1,7 @@
 // Where a painted scene's things and its figures are drawn among one another
 // (D76, D95): a row's things over the figures standing above the row, a shut door
-// or an arch over the figure standing in its doorway, an open doorway seen through
-// to the floor beyond under every figure (D108), a thing lying inside furniture
-// under it, a wall seen from above over every figure, and a figure drawn lower on
+// or an arch over the figure standing in its doorway, a door swung open on the
+// row of the wall it lies against (D111), a thing lying inside furniture under it, a wall seen from above over every figure, and a figure drawn lower on
 // a cell the scene lowers, its legs behind what stands below it, or sideways on a
 // cell the scene nudges, on the painted strip (D105). Kept apart from painted.ts so
 // that it is tested without Phaser.
@@ -30,28 +29,21 @@ export function rowDepth(row: number, under = false): number {
 }
 
 /** How a painted thing is drawn among the rows, besides its row: `under`, a door
- * or a gate over the figure in its doorway while it is shut (D95); `through`, a
- * doorway whose open picture is the floor beyond, under every figure (D108);
- * `inside`, a thing lying on a cell no one walks, inside the furniture there,
- * under that row's things. */
+ * or a gate over the figure in its doorway while it is shut (D95); `inside`, a
+ * thing lying on a cell no one walks, inside the furniture there, under that
+ * row's things. */
 export interface ThingDrawn {
   under?: boolean;
   open?: boolean;
-  through?: boolean;
   inside?: boolean;
 }
-
-/** The depth of what is drawn just over the ground, under every row and figure. */
-export const GROUND_DEPTH = 1;
 
 /** The depth of a painted thing standing on row `row`, just over its row's image
  * and under the figure standing on the row: a door or a gate marked `under` is over
  * the figure in its doorway while it is shut; open, what is seen through it is
- * under that figure, and its arch over them (D95), or, seen `through` to the floor
- * beyond, under every figure (D108); a thing `inside` furniture is just under its
- * row's image. */
-export function thingDepth(row: number, { under = false, open = false, through = false, inside = false }: ThingDrawn = {}): number {
-  if (open && through) return GROUND_DEPTH;
+ * under that figure, and its arch over them (D95); a thing `inside` furniture is
+ * just under its row's image. */
+export function thingDepth(row: number, { under = false, open = false, inside = false }: ThingDrawn = {}): number {
   if (inside) return rowDepth(row) - 0.00001;
   return rowDepth(row, under && !open) + 0.00001;
 }

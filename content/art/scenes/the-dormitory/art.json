@@ -87,14 +87,16 @@
   "things": {
     "front_door": {
       "row": 14,
-      "left": 1085,
+      "left": 883,
       "top": 1190,
       "states": {
         "closed": "front_door-closed.webp",
         "open": "front_door-open.webp"
       },
       "under": true,
-      "through": true,
+      "rows": {
+        "open": 15
+      },
       "rest": "closed",
       "at": [
         12,

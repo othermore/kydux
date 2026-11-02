@@ -47,6 +47,26 @@
     "canvas": "art/raw/game-dormitory/dormitory-corner-canvas.png",
     "painting": "art/raw/game-dormitory/dormitory-walls.png"
   },
+  "door_swung": {
+    "about": "The door to the corridor seen open (D111): its leaf swung out of the doorway nearly all the way, hanging on hinges at the opening's edge, lying over the arch's left stones and the front wall beyond, as large as the opening, the hinges seen, its free edge a little off the wall and its shadow on the wall. Painted by Gemini 3 Pro Image from tools/art/prompts/game-dormitory-door-swung.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box.",
+    "from": "art/raw/game-dormitory/dormitory-door-open.png",
+    "boxes": [
+      [
+        1835,
+        2482,
+        2233,
+        3260
+      ]
+    ],
+    "crop": [
+      1500,
+      2100,
+      3100,
+      3380
+    ],
+    "canvas": "art/raw/game-dormitory/dormitory-door-swung-canvas.png",
+    "painting": "art/raw/game-dormitory/dormitory-door-swung.png"
+  },
   "things": {
     "front_wall": {
       "about": "The front wall along the common room and the dormitories, with the door's arch, from the floor's edge to the wall's foot, the line between its plinth and the corridor's flagstones: on its foot's row, 15, over whoever stands behind it on the rows above and under whoever walks the corridor before it; its beam where each wall between the rooms stands on it, with no outline between, as drawn. It gives up the door's cut-out.",
@@ -161,12 +181,12 @@
       ]
     },
     "front_door": {
-      "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95); open, the doorway shows the common room's floor, from the painting, under every figure (D108, doorways); it rests shut, and a story opens and closes it (D103).",
+      "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95); open, swung out of it nearly flat against the front wall on its left, its foot on the corridor's floor (D111, door_swung), drawn among the rows as the front wall is, the doorway showing the common room's own floor (D108); it rests shut, and a story opens and closes it (D103).",
       "box": [
-        11.3,
+        9.2,
         12.4,
         13.4,
-        15.4
+        16.4
       ],
       "row": 14,
       "reach": 0.4,
@@ -174,14 +194,71 @@
       "without": "dormitory-door-open.png",
       "states": {
         "closed": "painting",
-        "open": "without"
+        "open": {
+          "picture": "dormitory-door-swung.png",
+          "without": "dormitory-door-open.png",
+          "row": 15,
+          "area": [
+            [
+              9.391,
+              13.893
+            ],
+            [
+              9.582,
+              13.546
+            ],
+            [
+              9.894,
+              13.147
+            ],
+            [
+              10.242,
+              12.938
+            ],
+            [
+              10.624,
+              12.886
+            ],
+            [
+              10.971,
+              12.973
+            ],
+            [
+              11.214,
+              13.147
+            ],
+            [
+              11.37,
+              13.372
+            ],
+            [
+              11.492,
+              13.511
+            ],
+            [
+              11.519,
+              15.525
+            ],
+            [
+              9.964,
+              16.261
+            ],
+            [
+              9.79,
+              16.226
+            ],
+            [
+              9.391,
+              15.525
+            ]
+          ]
+        }
       },
       "at": [
         12,
         14
       ],
       "under": true,
-      "through": true,
       "rest": "closed"
     },
     "wall_left": {
@@ -908,7 +985,7 @@
     ]
   },
   "doorways": {
-    "about": "The front door opened by tools/art/repaint.py doorways (D108): its whole leaf, from the arch to the threshold and the threshold's line, painted with the common room's own floor, darker under the arch.",
+    "about": "The front door opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch to the threshold and the threshold's line, painted with the common room's own floor, darker under the arch.",
     "doors": [
       {
         "thing": "front_door",
@@ -936,7 +1013,13 @@
           11.9
         ],
         "sill": 0.1,
-        "painting": "dormitory-door-open.png"
+        "painting": "dormitory-door-open.png",
+        "leaf": [
+          11.3,
+          12.4,
+          13.4,
+          15.4
+        ]
       }
     ]
   },
@@ -1077,6 +1160,12 @@
       7.9,
       15.5,
       8.96
+    ],
+    [
+      9.6,
+      12.75,
+      11.5,
+      13.6
     ]
   ]
 }

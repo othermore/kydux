@@ -640,14 +640,15 @@ def test_a_figure_on_a_nudged_cell_is_drawn_sideways():
     assert sweep.middle_at(scene, 0, 1) == 0.5
 
 
-def test_a_doorway_seen_through_is_under_every_figure():
-    """An open door whose picture is the floor beyond (D108) covers no one."""
-    folder = sweep.CONTENT / "art" / "scenes" / "the-library"
+def test_a_door_swung_open_lies_on_the_row_of_its_wall():
+    """An open door is its leaf swung against the wall beside its doorway (D111),
+    drawn by the row its open state gives: the dormitory's on the front wall's."""
+    folder = sweep.CONTENT / "art" / "scenes" / "the-dormitory"
     if not (folder / "art.json").is_file():
         return
-    scene = sweep.load("the-library")
-    doorway = next(layer for layer in scene.layers if layer.name == "wenna_door")
-    assert doorway.depth < 0
+    scene = sweep.load("the-dormitory")
+    door = next(layer for layer in scene.layers if layer.name == "front_door")
+    assert door.depth == sweep.depth_of(15, scene.rows) + 0.001
 
 
 def test_a_figure_in_a_dark_passage_is_drawn_darker_the_deeper_head_first():
@@ -759,11 +760,13 @@ def test_an_exported_scene_keeps_its_contract_and_nothing_reaches_below_its_row(
     assert set(art["things"]) == set(things)
     for name, thing in art["things"].items():
         # A thing may reach into the row below by what its settings allow it (a
-        # door's threshold), and no further.
+        # door's threshold), and no further; a state drawn on a row of its own, a
+        # door swung open against its wall (D111), no further than that row.
         reach = things[name].get("reach", 0.0)
-        for state in thing["states"].values():
-            image = Image.open(folder / state)
-            assert thing["top"] + image.height <= round((thing["row"] + 1 + reach) * cell), name
+        for state, picture in thing["states"].items():
+            image = Image.open(folder / picture)
+            row = thing.get("rows", {}).get(state, thing["row"])
+            assert thing["top"] + image.height <= round((row + 1 + reach) * cell), name
     assert (folder / art["source"]).is_file()
 
 

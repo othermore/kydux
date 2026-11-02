@@ -4,13 +4,13 @@
     "Dale a Eldra su libro.",
     "Haz que el libro brille con `reveal`."
   ],
-  "starting_code": "# El libro de Eldra está junto a los montones de libros de la pared izquierda. Encuéntralo y llévaselo.\n",
+  "starting_code": "# El libro de Eldra está escondido entre las dos grandes estanterías; encuéntralo y llévaselo.\n",
   "hints": [
     "Usa `find_nearest` con la palabra \"book\" para encontrarlo, guárdalo bajo un nombre y usa `reveal` en él.",
-    "Camina hasta donde brilla: dos pasos hacia arriba, por la puerta, y luego a la izquierda a lo largo de las estanterías; allí usa el método `pick_up`.",
-    "Vuelve junto a Eldra por el pasillo de la derecha y usa el método `give` con el nombre de tu variable para darle el libro."
+    "Camina hasta donde brilla: sube por la puerta, ve a la derecha hasta el pasillo, sube y entra entre las dos estanterías, y sigue a la izquierda; allí usa el método `pick_up`.",
+    "Sube hasta Eldra, junto a su sillón, y usa el método `give` con el nombre de tu variable para darle el libro."
   ],
-  "intro": "Eldra, la fantasma, perdió un libro hace mucho tiempo. Debe de estar en uno de los montones del suelo, junto a la pared izquierda. Encuéntralo con `find_nearest`, haz que brille y llévaselo.",
+  "intro": "Eldra, la fantasma, perdió un libro hace mucho tiempo. Debe de haberse colado en el pasillo entre las dos grandes estanterías, donde nadie puede verlo. Encuéntralo con `find_nearest`, haz que brille y llévaselo.",
   "outro": "¡Gracias! Eldra está muy contenta de tener su libro de vuelta.",
   "learned": "Ahora sabes cómo un método devuelve algo, cómo una variable lo guarda, que una cosa revelada muestra adónde ir y cómo darle una cosa a alguien."
 }

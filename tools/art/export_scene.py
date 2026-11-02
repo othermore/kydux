@@ -656,7 +656,10 @@ def scene(settings: Settings) -> Path:
                 alpha = sprite_alpha(painting, withouts[name], native, thing, spacing, th)
             else:
                 alpha = static_alpha(painting, native, thing, spacing, th, grid, settings.edits)
-            alpha = alpha * ~doors
+            # A wall keeps its own line round a door's cut-out: a door swung open
+            # draws nothing in its doorway, where the line is the wall's (D111).
+            line = max(1, round(image_first.LINE_WIDTH * spacing))
+            alpha = alpha * ~image_first.eroded(doors, line)
             rgba = np.dstack([painting, (alpha * 255).astype(np.uint8)])
             sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
             sprite = sprite.copy()
@@ -697,6 +700,11 @@ def scene(settings: Settings) -> Path:
                 apart = np.array(Image.open(settings.edits / picture["without"]).convert("RGB"))
                 own = {**thing, "solid": picture.get("solid", thing["solid"])}
                 alpha = sprite_alpha(shown, apart, native, own, spacing, th)
+                # Only what lies within its `area`, a polygon in cells: a door's leaf
+                # swung open and its shadow, not the stones and the floor a model drew
+                # again round it (D111).
+                if "area" in picture:
+                    alpha = alpha * native_area(painting.shape[:2], grid, picture["area"])
             else:
                 shown = np.array(Image.open(settings.edits / picture).convert("RGB"))
                 alpha = sprite_alpha(shown, without, native, thing, spacing, th)
@@ -704,8 +712,12 @@ def scene(settings: Settings) -> Path:
             sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
             sprite = sprite.copy()
             reach = thing.get("reach", 0.0)
-            below = clip_below(sprite[..., 3] / 255, thing["row"], box[1], reach=reach)
+            # A state on a row of its own ends at that row's bottom edge (D111).
+            row = picture.get("row", thing["row"]) if isinstance(picture, dict) else thing["row"]
+            below = clip_below(sprite[..., 3] / 255, row, box[1], reach=reach)
             sprite[..., 3] = (below * 255).astype(np.uint8)
+            # Each state's picture ends at its row's bottom edge, as a row's does.
+            sprite = sprite[: max(1, round((row + 1 + reach) * CELL) - box[1])]
             # Drawn smaller than painted, the thing in every state or in one (`scale`).
             scale = thing.get("scale")
             scale = scale.get(state) if isinstance(scale, dict) else scale
@@ -715,9 +727,15 @@ def scene(settings: Settings) -> Path:
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
         if thing.get("under"):
             things[name]["under"] = True
-        # Open, its doorway shows the floor beyond, under every figure (D108).
-        if thing.get("through"):
-            things[name]["through"] = True
+        # A state drawn among the rows by its own row: a door swung open against the
+        # wall it lies on (D111).
+        rows_of = {
+            state: picture["row"]
+            for state, picture in thing["states"].items()
+            if isinstance(picture, dict) and "row" in picture
+        }
+        if rows_of:
+            things[name]["rows"] = rows_of
         # The state a door is drawn in where no level or story places it (D104).
         if "rest" in thing:
             things[name]["rest"] = thing["rest"]

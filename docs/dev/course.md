@@ -120,10 +120,10 @@ that stays locked.
 | `lesson:the-right-place` | Lesson 1 | Taught by the mate: an action may need the right place; `wizard.sleep()` only beside the trunk at a free bed's foot, its *Try it* refused between the beds. | `wizard.sleep` |
 | `level:your-bed` | Practice 1 | In one's own dormitory, between the first two beds: a step to the free bed's trunk, and asleep; the other dormitory's doorway refuses the wizard. Bonus: no bumps. | |
 | `story:the-morning` | Story 3 | The mate needs a wand, and the wizard's is lent: out of the door to the library, together. | |
-| `story:at-the-library` | Story 4 | Wenna receives them, walks to her shut door and opens it. | |
+| `story:at-the-library` | Story 4 | Wenna receives them, walks to the shut door into the main library and opens it for them: the other doors on their way they open themselves. | |
 | `lesson:what-things-know` | Lesson 2 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.items`, `door.locked`, `concept:print` |
 | `lesson:finding-things` | Lesson 3 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept under a name, a variable; `reveal` makes it glow where it lies, through whatever hides it (D110); `give` hands a thing to whoever stands beside. | `wizard.find_nearest`, `thing.reveal`, `wizard.give` (and Python's `=`) |
-| `level:the-lost-book` | Practice 2 | Eldra's book by the piles at the hall's left wall: found, made to glow, picked up, given. Bonus: made to glow with `reveal`. | |
+| `level:the-lost-book` | Practice 2 | Eldra's book, hidden in the aisle between the two long bookcases: found, made to glow, picked up, given. Bonus: made to glow with `reveal`. | |
 | `lesson:keys-and-doors` | Lesson 4 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. | `door.open` |
 | `level:the-hidden-key` | Practice 3 | The centre door's key lies under the front bookcase, out of sight: found, revealed, picked up from the aisle beside it, the door opened. Bonus: found with `find_nearest`. | |
 | `lesson:the-distance` | Lesson 5 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |

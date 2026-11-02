@@ -178,10 +178,11 @@ owner on 2026-10-26, for every scene from the dormitory on:
   lower, so that a counter on the row below hides its legs, and its
   `nudged` cells draw a figure sideways, by the strip's middle less the
   cell's, so that it walks the painted strip where the painting's strip is
-  off its cells' middle (D105). A door marked `through`, whose open picture
-  is the floor beyond, is drawn open under every figure, so that one
-  standing beyond it is seen through it (D108); a door's `rest` is the
-  state it is drawn in where no level or story places it (D104). A
+  off its cells' middle (D105). An open door is its leaf swung against the
+  wall beside its doorway (D111), drawn by its open state's `row` when that
+  wall is drawn on another row than the door, and its doorway's floor is
+  the ground's, under every figure (D108); a door's `rest` is the state it
+  is drawn in where no level or story places it (D104). A
   scene's `dark` passages draw a figure darker the deeper it goes into
   them, its head darker than its feet (D100).
 - **A thing painted too big for its place is drawn smaller** (`scale`), on
@@ -234,7 +235,11 @@ row its foot stands on.
   whole doorway, from the arch to the threshold and over the threshold's
   line, is the floor of the room beyond, taken from the painting itself
   where that floor is plain, darker under the arch and as lit as the room
-  at the threshold, laid in by `tools/art/repaint.py doorways` (D108).
+  at the threshold, laid in by `tools/art/repaint.py doorways` (D108); and
+  its leaf, so that the door is seen open and the doorway is not taken for
+  the floor, is swung out against the wall beside the arch (`swing`): the
+  shut leaf turned over, narrowed and a little darker, the open state's
+  picture (D111).
 - **A cut-out ends at the outer edge of its outline** (D93): the outline is
   the thing's, and nothing of the ground beyond it is (`fringe` and `bare`
   in the sweep). Every mask but a box's, and one its thing says not to (`snap: false`),

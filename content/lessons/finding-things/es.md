@@ -23,7 +23,7 @@ Para ver qué cosa guarda el nombre y dónde está, `book.reveal()` hace que bri
 
 Una vez que guardas una cosa bajo un nombre, puedes entregársela a quien esté justo al lado de tu {mago|maga}, usando `wizard.give(book)`.
 
-Nuestra fantasma, Eldra, ha perdido un libro en algún lugar entre los montones junto a la pared izquierda. ¡Vamos a encontrarlo y hacer que brille!
+Nuestra fantasma, Eldra, ha perdido un libro en algún lugar entre las dos grandes estanterías. ¡Vamos a encontrarlo y hacer que brille!
 
 ```python try
 book = wizard.find_nearest("book")

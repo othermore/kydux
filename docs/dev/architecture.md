@@ -1526,8 +1526,9 @@ one overturns stays, marked as superseded.
   drawn as its edit shows it, its leaves seen: it looks better so. Where
   that picture goes wrong, a leaf covering part of the doorway, the closed
   door's planks left under it, half a leaf before a round doorway, a door
-  in a wall seen from the front with room behind it swings in out of
-  sight instead: open, its whole doorway, from the arch to the threshold,
+  in a wall seen from the front with room behind it swings out against the
+  wall beside its doorway instead (D111): open, its whole doorway, from the
+  arch to the threshold,
   shows the floor of the room beyond (`doorways` in the scene's settings,
   `repaint.py doorways`, the floor taken from the painting itself, D108),
   as the library's three doors and the dormitory's; and a doorway always
@@ -1621,12 +1622,24 @@ one overturns stays, marked as superseded.
   taken from the painting itself where that floor is plain, darker under
   the arch and as lit as the room at the threshold, never brighter; the
   fill covers the leaf and its threshold's line (`sill`), so that no line
-  of the frame is left on the floor (`repaint.py doorways`). Such a door
-  is marked `through`: open, its picture is drawn just over the ground,
-  under every figure, so that a figure standing beyond the door is seen
-  through it and not counted as hidden by it. Rules out a doorway lit
-  like a lamp before a dim room, and a model's edit as the source of a
-  fill the painting holds.
+  of the frame is left on the floor (`repaint.py doorways`). The fill is
+  the ground's, under every figure, so that a figure standing beyond the
+  door is seen through it and not counted as hidden by it; the open
+  door's own picture is its leaf, swung beside the doorway (D111). Rules
+  out a doorway lit like a lamp before a dim room, and a model's edit as
+  the source of a fill the painting holds.
+- **D111 — An open door is seen open, its leaf swung against the wall
+  beside its doorway.** Decided 2026-10-28 by the owner. A doorway with
+  no leaf in sight is taken for floor: an open door shows its leaf,
+  swung out of the doorway toward the viewer and lying against the wall
+  beside the arch, over the wall. The leaf is the painting's own, shut,
+  turned over, narrowed to the span it lies in and a little darker
+  (`repaint.py doorways`, `swing`); it is the open state's picture, cut
+  against the doorway's, and is drawn among the rows as the wall it lies
+  on is (a state's own `row`, the dormitory's front door's on the front
+  wall's). A door that rests open where no level places it is drawn so
+  too. Rules out an open door taken out of sight, and a door seen open
+  only by the floor in its doorway.
 - **D109 — A thing drawn away from where it is painted is drawn in the
   middle of its cell.** Decided 2026-10-28 by the owner. A thing a level
   places on another cell than the one it is painted on (D85) has the

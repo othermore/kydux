@@ -195,13 +195,15 @@
     "wenna_door": {
       "row": 16,
       "left": 634,
-      "top": 1478,
+      "top": 1469,
       "states": {
         "closed": "wenna_door-closed.webp",
         "open": "wenna_door-open.webp"
       },
       "under": true,
-      "through": true,
+      "rows": {
+        "open": 17
+      },
       "rest": "open",
       "at": [
         7,
@@ -211,13 +213,15 @@
     "centre_door": {
       "row": 8,
       "left": 634,
-      "top": 710,
+      "top": 696,
       "states": {
         "closed": "centre_door-closed.webp",
         "open": "centre_door-open.webp"
       },
       "under": true,
-      "through": true,
+      "rows": {
+        "open": 9
+      },
       "rest": "open",
       "at": [
         7,
@@ -226,14 +230,16 @@
     },
     "room_door": {
       "row": 5,
-      "left": 173,
+      "left": 96,
       "top": 451,
       "states": {
         "closed": "room_door-closed.webp",
         "open": "room_door-open.webp"
       },
       "under": true,
-      "through": true,
+      "rows": {
+        "open": 6
+      },
       "rest": "open",
       "at": [
         2,

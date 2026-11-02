@@ -423,16 +423,16 @@ class LevelScene extends Phaser.Scene {
       if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
     }
     // A painted door no level or story places is drawn in the state it rests in
-    // (D104): the ground shows it open, and one resting shut is drawn shut.
+    // (D104): shut, or open, swung against the wall beside its doorway (D111).
     for (const [id, painted] of Object.entries(this.art?.scene.things ?? {})) {
-      if (!this.art || painted.rest !== 'closed' || !this.textures.exists(`art-${id}-closed`)) continue;
+      if (!this.art || !painted.rest || !this.textures.exists(`art-${id}-${painted.rest}`)) continue;
       if (this.map.things.some((thing) => (thing.art ?? thing.id) === id)) continue;
       const scale = artScale(this.art);
       this.add
-        .image(painted.left * scale, painted.top * scale, `art-${id}-closed`)
+        .image(painted.left * scale, painted.top * scale, `art-${id}-${painted.rest}`)
         .setOrigin(0, 0)
         .setScale(scale)
-        .setDepth(thingDepthOn(this.art, id, painted.at ?? [0, painted.row]));
+        .setDepth(thingDepthOn(this.art, id, painted.at ?? [0, painted.row], { open: painted.rest === 'open' }));
     }
     for (const thing of this.map.things) {
       if (thing.kind === 'door' && thing.lock === 'spell') this.addGlow(thing.id, thing.tile);

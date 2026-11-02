@@ -222,17 +222,17 @@ def load(scene: str) -> Scene:
     for name, thing in art["things"].items():
         # A door is drawn open: one stands in its doorway, the only cell it is walked
         # on from, only when it is open, and what is seen through it is then under
-        # them, its arch over them (D95); a doorway seen `through` to the floor
-        # beyond is under every figure (D108).
+        # them, its arch over them (D95); a door swung open lies on the wall beside
+        # its doorway, among the rows by the row that state gives (D111).
         state = "open" if "open" in thing["states"] else next(iter(thing["states"]))
         rgba = np.array(Image.open(folder / thing["states"][state]).convert("RGBA"))
         # A thing is drawn just after its row's image (painted.ts).
         under = thing.get("under", False) and state != "open"
-        through = thing.get("through", False) and state == "open"
+        row = thing.get("rows", {}).get(state, thing["row"])
         found.layers.append(
             Layer(
                 name,
-                -1.0 if through else depth_of(thing["row"], rows, under) + 0.001,
+                depth_of(row, rows, under) + 0.001,
                 None,
                 rgba,
                 thing["left"],

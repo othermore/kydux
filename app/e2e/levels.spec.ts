@@ -219,8 +219,8 @@ test.describe('chapter 2', () => {
     await expect(page.locator('#card-intro')).toContainText('Eldra');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
-    // Laid by the piles, the book is drawn in its cell's middle (D109).
-    await expect(scene(page)).toHaveAttribute('data-drawn', /old_book:2\.50,15\.50/);
+    // Laid between the two bookcases, the book is drawn in its cell's middle (D109).
+    await expect(scene(page)).toHaveAttribute('data-drawn', /old_book:5\.50,13\.50/);
     await page.locator('#speed').selectOption('4');
     await run(page, readFileSync(`${CONTENT}levels/the-lost-book/solution.py`, 'utf8'));
     await expect(page.locator('#card-outro')).toContainText('Wenna');
@@ -232,7 +232,7 @@ test.describe('chapter 2', () => {
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_up(2)\nwizard.move_left(5)\nwizard.pick_up()\nwizard.give(old_book)');
+    await run(page, 'wizard.move_up(2)\nwizard.move_right(4)\nwizard.move_up(2)\nwizard.move_left(6)\nwizard.pick_up()\nwizard.give(old_book)');
     await expect(page.locator('.outcome-text')).toContainText('There is no one beside me to give it to.');
   });
 });

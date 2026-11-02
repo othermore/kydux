@@ -3,7 +3,6 @@ import {
   coverDepth,
   FOOT_IN_CELL,
   figureDepth,
-  GROUND_DEPTH,
   loweredBy,
   nudgedBy,
   overDepth,
@@ -30,14 +29,6 @@ describe('the depths of a painted scene (D76, D95)', () => {
     expect(thingDepth(8, { under: true })).toBeGreaterThan(standing);
     expect(thingDepth(8, { under: true, open: true })).toBeLessThan(standing);
     expect(thingDepth(8, { under: true, open: true })).toBeGreaterThan(figureDepth(7 + FOOT_IN_CELL));
-  });
-
-  it('draws an open doorway seen through to the floor beyond under every figure (D108)', () => {
-    const open = thingDepth(16, { under: true, open: true, through: true });
-    expect(open).toBe(GROUND_DEPTH);
-    expect(open).toBeLessThan(figureDepth(0));
-    // Shut, it is over the figure in its doorway as any door.
-    expect(thingDepth(16, { under: true, through: true })).toBeGreaterThan(figureDepth(16 + FOOT_IN_CELL));
   });
 
   it('draws a thing lying inside furniture under its row, a thing on the floor over it', () => {

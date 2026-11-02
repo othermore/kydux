@@ -23,7 +23,7 @@ To see which thing the name holds and where it is, `book.reveal()` makes it glow
 
 Once a thing is kept under a name, you can hand it to whoever stands right beside your wizard, using `wizard.give(book)`.
 
-Our ghost, Eldra, has lost a book somewhere among the piles by the left wall. Let us find it and make it glow!
+Eldra, our ghost, has lost a book somewhere between the two big bookcases. Let us find it and make it glow!
 
 ```python try
 book = wizard.find_nearest("book")

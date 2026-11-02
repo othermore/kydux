@@ -22,8 +22,9 @@
 // under the bed's quilt, "id:bed:lying", D91),
 // data-silhouette (present on a painted scene, where the wizard's outline shows
 // when something hides more than a quarter of it, silhouette.ts), data-outlined
-// (present while it shows) and data-debug with data-debug-layers (the tester's view and
-// its layers, debug.ts).
+// (present while it shows), data-shade (each figure in a dark passage and how dark
+// its feet are drawn, "id:shade" joined by ",", shade.ts) and data-debug with
+// data-debug-layers (the tester's view and its layers, debug.ts).
 //
 // The camera is a window on the scene (D69, camera.ts): it follows the wizard,
 // the player zooms it and drags it to look around, and a run or a restart brings
@@ -85,8 +86,9 @@ import {
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
-import { FOOT_IN_CELL, figureDepth, loweredBy, rowDepth, sleeperDepth } from './depth';
+import { FOOT_IN_CELL, figureDepth, loweredBy, sleeperDepth, thingDepth } from './depth';
 import { Speech } from './speech';
+import { shadeAt, tintOf } from './shade';
 import { Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
 import { clearOf, sightTiles, type Tile } from './sight';
@@ -278,6 +280,12 @@ class LevelScene extends Phaser.Scene {
     if (!this.textures.exists(key)) {
       image.setFrame(open ? 'open' : lock);
       return;
+    }
+    // Open, what is seen through the doorway is under whoever stands in it (D95).
+    const painted = this.art?.scene.things[this.artOf(id)];
+    const tile = this.doors.get(id);
+    if (this.art && painted && tile) {
+      image.setDepth(thingDepth(painted.row + shiftOf(this.art, this.artOf(id), tile)[1], painted.under, open));
     }
     if (!moving || this.still) {
       image.setTexture(key);
@@ -535,6 +543,24 @@ class LevelScene extends Phaser.Scene {
       for (const actor of this.actors.values()) {
         if (!this.asleep.get(actor.sprite)?.lying) actor.sprite.setDepth(figureDepth(actor.sprite.y / TILE));
       }
+      // A figure walking into a dark passage is drawn darker, head first.
+      const dark = this.art.scene.dark;
+      if (dark) {
+        const figures: [string, Phaser.GameObjects.Sprite][] = [
+          ['wizard', this.wizard],
+          ...[...this.actors].map(([id, { sprite }]): [string, Phaser.GameObjects.Sprite] => [id, sprite]),
+        ];
+        const shaded: string[] = [];
+        for (const [id, sprite] of figures) {
+          const [head, feet] = shadeAt(dark, [sprite.x / TILE, sprite.y / TILE]);
+          if (feet > 0) {
+            sprite.setTint(tintOf(head), tintOf(head), tintOf(feet), tintOf(feet));
+            shaded.push(`${id}:${feet.toFixed(2)}`);
+          } else sprite.clearTint();
+        }
+        if (shaded.length) this.parentNode.dataset.shade = shaded.join(',');
+        else delete this.parentNode.dataset.shade;
+      }
     }
     this.speech.update();
     if (this.silhouette) {
@@ -581,7 +607,7 @@ class LevelScene extends Phaser.Scene {
       this.tweens.killTweensOf(image);
       const tile = this.startTile(thing.id, thing.tile);
       const painted = this.art?.scene.things[this.artOf(thing.id)];
-      if (this.art && painted) placeThing(image, this.art, this.artOf(thing.id), tile);
+      if (this.art && painted) placeThing(image, this.art, this.artOf(thing.id), tile, thing.open);
       else image.setPosition(...centre(tile));
       image.setVisible(true).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
@@ -757,7 +783,7 @@ class LevelScene extends Phaser.Scene {
     const painted = this.art?.scene.things[this.artOf(id)];
     if (this.art && painted) {
       const [x, y] = [image.x + (to[0] - from[0]) * TILE, image.y + (to[1] - from[1]) * TILE];
-      image.setDepth(rowDepth(painted.row + shiftOf(this.art, this.artOf(id), to)[1], painted.under) + 0.001);
+      image.setDepth(thingDepth(painted.row + shiftOf(this.art, this.artOf(id), to)[1], painted.under));
       if (instant) image.setPosition(x, y);
       else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });
       return;

@@ -29,7 +29,7 @@
   },
   "things": {
     "front_wall": {
-      "about": "The front wall along the common room and the dormitories, with the door and its arch: over every figure (D95), who walks behind it on row 14 and stands in the doorway behind the door.",
+      "about": "The front wall along the common room and the dormitories, with the door and its arch: over every figure (D95), who walks behind it on row 14 and stands in the doorway behind the door; its beam where each wall between the rooms stands on it, with no outline between, as drawn.",
       "box": [
         0,
         12.3,
@@ -101,10 +101,48 @@
       "states": {
         "standing": "painting"
       },
-      "over": true
+      "over": true,
+      "fixed": [
+        [
+          [
+            8.2,
+            13.5
+          ],
+          [
+            9.45,
+            13.5
+          ],
+          [
+            9.45,
+            13.7
+          ],
+          [
+            8.2,
+            13.7
+          ]
+        ],
+        [
+          [
+            15.4,
+            13.5
+          ],
+          [
+            16.3,
+            13.5
+          ],
+          [
+            16.3,
+            13.7
+          ],
+          [
+            15.4,
+            13.7
+          ]
+        ]
+      ]
     },
     "wall_left": {
-      "about": "The wall between the common room and the left dormitory, its doorway's open door with it: over every figure (D95).",
+      "about": "The wall between the common room and the left dormitory, its doorway's open door with it: over every figure (D95); its foot, the grey of the beam it stands on with no outline between, as drawn.",
       "box": [
         8.3,
         3.95,
@@ -184,10 +222,30 @@
       "states": {
         "standing": "painting"
       },
-      "over": true
+      "over": true,
+      "fixed": [
+        [
+          [
+            8.56,
+            12.9
+          ],
+          [
+            9.2,
+            12.9
+          ],
+          [
+            9.3,
+            13.56
+          ],
+          [
+            8.55,
+            13.56
+          ]
+        ]
+      ]
     },
     "wall_right": {
-      "about": "The wall between the common room and the right dormitory, as the left one.",
+      "about": "The wall between the common room and the right dormitory, its doorway's open door with it: over every figure (D95); its foot, the grey of the beam it stands on with no outline between, as drawn.",
       "box": [
         14.85,
         3.95,
@@ -275,7 +333,27 @@
       "states": {
         "standing": "painting"
       },
-      "over": true
+      "over": true,
+      "fixed": [
+        [
+          [
+            15.61,
+            12.9
+          ],
+          [
+            16.08,
+            12.9
+          ],
+          [
+            16.09,
+            13.56
+          ],
+          [
+            15.62,
+            13.56
+          ]
+        ]
+      ]
     },
     "bed_1_frame": {
       "about": "bed_1, its trunk and its bedside table: a figure on the row above is behind it, one beside it or below it in front of it.",

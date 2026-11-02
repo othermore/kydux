@@ -150,6 +150,22 @@ test.describe('in the library (D85, D86, D51)', () => {
   });
 });
 
+test.describe('in the entrance (D100)', () => {
+  test.use({ locale: 'es-ES' });
+
+  test('Ilda goes dark as she walks into the middle arch', async ({ page }) => {
+    await seedWizard(page, MARTA);
+    await page.goto('/#story/the-entrance');
+    const scene = page.locator('#scene');
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(scene).not.toHaveAttribute('data-shade', /./);
+    await storyNext(page, 5);
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-shade', /^ilda:0\.\d\d$/);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}into-the-arch.png` });
+  });
+});
+
 test.describe('the stories', () => {
   test.use({ locale: 'es-ES' });
 

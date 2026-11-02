@@ -48,9 +48,14 @@
     {
       "row": 8,
       "image": "row-8-static-under.webp",
-      "top": 712,
+      "top": 691,
       "static": true,
       "under": true
+    },
+    {
+      "row": 9,
+      "image": "row-9.webp",
+      "top": 866
     },
     {
       "row": 10,
@@ -58,15 +63,21 @@
       "top": 852
     },
     {
-      "row": 12,
-      "image": "row-12-static.webp",
+      "row": 10,
+      "image": "row-10-static.webp",
+      "top": 835,
+      "static": true
+    },
+    {
+      "row": 13,
+      "image": "row-13-static.webp",
       "top": 1138,
       "static": true
     },
     {
       "row": 14,
       "image": "row-14-static.webp",
-      "top": 1262,
+      "top": 1273,
       "static": true
     },
     {
@@ -90,7 +101,7 @@
     {
       "row": 16,
       "image": "row-16-static.webp",
-      "top": 1459,
+      "top": 1445,
       "static": true
     },
     {
@@ -139,18 +150,6 @@
         6
       ]
     },
-    "vault_key": {
-      "row": 9,
-      "left": 1238,
-      "top": 874,
-      "states": {
-        "lying": "vault_key-lying.webp"
-      },
-      "at": [
-        13,
-        9
-      ]
-    },
     "old_book": {
       "row": 11,
       "left": 365,
@@ -165,8 +164,8 @@
     },
     "rare_book": {
       "row": 4,
-      "left": 634,
-      "top": 307,
+      "left": 650,
+      "top": 333,
       "states": {
         "lying": "rare_book-lying.webp"
       },
@@ -177,8 +176,8 @@
     },
     "eldras_book": {
       "row": 4,
-      "left": 154,
-      "top": 355,
+      "left": 164,
+      "top": 372,
       "states": {
         "lying": "eldras_book-lying.webp"
       },

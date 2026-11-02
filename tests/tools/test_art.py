@@ -490,6 +490,31 @@ def test_a_quilt_takes_its_sheet_s_line_and_not_the_pillow_s_beside_it():
     assert not edged[:10].any() and not edged[91:].any()
 
 
+def test_a_wall_s_part_with_no_outline_beyond_it_is_kept_as_drawn():
+    # A light stone block on a floor of its own colour, outlined but on its top.
+    painting = np.full((192, 192, 3), (225, 215, 200), dtype=np.uint8)
+    painting[40:150, 40:44] = painting[40:150, 148:152] = (20, 15, 10)
+    painting[146:150, 40:152] = (20, 15, 10)
+    grid = {"x": {"offset": 0, "spacing": 96}, "y": {"offset": 0, "spacing": 96}}
+    wall = {"mask": "polygon", "polygon": [[0.45, 0.42], [1.55, 0.42], [1.55, 1.55], [0.45, 1.55]]}
+    box = (30, 30, 162, 162)
+    cut = export_scene.static_alpha(painting, box, wall, 96, grid=grid) > 0.5
+    assert not cut[42:50, 60:130].all()
+    fixed = {**wall, "fixed": [[[0.45, 0.42], [1.55, 0.42], [1.55, 0.6], [0.45, 0.6]]]}
+    kept = export_scene.static_alpha(painting, box, fixed, 96, grid=grid) > 0.5
+    assert kept[42:50, 60:130].all()
+
+
+def test_a_thing_drawn_smaller_stands_where_it_was_painted():
+    sprite = np.zeros((100, 80, 4), dtype=np.uint8)
+    sprite[40:90, 20:60] = (200, 50, 50, 255)
+    small, dx, dy = export_scene.shrunk(sprite, 0.5)
+    ys, xs = np.nonzero(small[..., 3] > 128)
+    assert abs((xs.min() + xs.max() + 1) / 2 + dx - 40) <= 1
+    assert abs(ys.max() + 1 + dy - 90) <= 1
+    assert abs((ys.max() - ys.min() + 1) - 25) <= 1
+
+
 def swept(painting: np.ndarray, walked: np.ndarray, layers: list) -> tuple:
     """A drawn scene for the sweep: its painting, the cells walked on, its layers."""
     rows, columns = walked.shape
@@ -582,6 +607,22 @@ def test_a_figure_on_a_lowered_cell_is_drawn_lower():
     scene.lowered = {(1, 1): 0.5}
     assert sweep.feet_at(scene, 1, 1) == 1 + sweep.FOOT_IN_CELL + 0.5
     assert sweep.feet_at(scene, 0, 1) == 1 + sweep.FOOT_IN_CELL
+
+
+def test_a_figure_in_a_dark_passage_is_drawn_darker_the_deeper_head_first():
+    painting = np.zeros((288, 288, 3), dtype=np.uint8)
+    walked = np.ones((3, 3), dtype=bool)
+    scene, _ = swept(painting, walked, [])
+    scene.dark = [{"columns": [1, 1], "from": 2.8, "to": 1.8, "most": 0.9}]
+    frame = np.full((40, 10, 4), 200, dtype=np.uint8)
+    assert (sweep.shaded(scene, frame, 1, 2) == frame).all()
+    assert (sweep.shaded(scene, frame, 0, 0) == frame).all()
+    deep = sweep.shaded(scene, frame, 1, 1)
+    assert deep[..., 0].max() <= 21 and deep[-1, 0, 0] <= 21
+    scene.dark[0]["to"] = 0.8
+    half = sweep.shaded(scene, frame, 1, 1)
+    assert half[0, 0, 0] < half[-1, 0, 0] < 200
+    assert half[0, 0, 3] == 200
 
 
 def standing_height(name: str) -> float:

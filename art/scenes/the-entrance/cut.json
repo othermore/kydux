@@ -555,5 +555,37 @@
       }
     ],
     "painting": "art/raw/game-entrance/entrance-marked.png"
-  }
+  },
+  "dark": [
+    {
+      "about": "The left arch's dark corridor: a figure going in from row 8 darkens on row 7 and is all but lost on row 6.",
+      "columns": [
+        13,
+        14
+      ],
+      "from": 8.6,
+      "to": 6.8,
+      "most": 0.88
+    },
+    {
+      "about": "The middle arch's deeper corridor: a figure darkens from row 7 and is all but lost on row 5.",
+      "columns": [
+        19,
+        20
+      ],
+      "from": 8.6,
+      "to": 5.8,
+      "most": 0.88
+    },
+    {
+      "about": "The right arch's dark corridor, as the left one's.",
+      "columns": [
+        25,
+        26
+      ],
+      "from": 8.6,
+      "to": 6.8,
+      "most": 0.88
+    }
+  ]
 }

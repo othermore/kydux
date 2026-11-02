@@ -1,6 +1,6 @@
 // Where a painted scene's things and its figures are drawn among one another
-// (D76, D95): a row's things over the figures standing above the row, a door or
-// its arch over the figure standing in its doorway, a wall seen from above over
+// (D76, D95): a row's things over the figures standing above the row, a shut door
+// or an arch over the figure standing in its doorway, a wall seen from above over
 // every figure, and a figure drawn lower on a cell the scene lowers, its legs
 // behind what stands below it. Kept apart from painted.ts so that it is tested
 // without Phaser.
@@ -25,6 +25,14 @@ export function figureDepth(feet: number): number {
  * standing on its row too (D95). */
 export function rowDepth(row: number, under = false): number {
   return figureDepth(row + (under ? UNDER_IN_CELL : ROW_IN_CELL));
+}
+
+/** The depth of a painted thing standing on row `row`, just over its row's image
+ * and under the figure standing on the row: a door or a gate marked `under` is over
+ * the figure in its doorway while it is shut; open, what is seen through it is
+ * under that figure, and its arch over them (D95). */
+export function thingDepth(row: number, under = false, open = false): number {
+  return rowDepth(row, under && !open) + 0.00001;
 }
 
 /** A bed's frame is its row's; a pupil asleep in it lies just over the frame, and

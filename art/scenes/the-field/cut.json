@@ -48,6 +48,23 @@
       "under": true,
       "opening": 1.22
     },
+    "seal_keystone": {
+      "about": "The keystone of the sealed door's arch, which the cut lets the sand behind the door into: drawn as it is painted, over whoever stands behind the wall or in the doorway.",
+      "box": [
+        8.25,
+        10.45,
+        8.8,
+        10.69
+      ],
+      "row": 11,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "states": {
+        "standing": "painting"
+      },
+      "under": true
+    },
     "castle_door": {
       "about": "Open onto the lit hall; the dark doorway is the picture without the door, which the states are cut against.",
       "box": [

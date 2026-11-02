@@ -10,7 +10,8 @@ import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
 import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
-import { coverDepth, type Lowered, overDepth, rowDepth } from './depth';
+import { coverDepth, type Lowered, overDepth, rowDepth, thingDepth } from './depth';
+import type { Dark } from './shade';
 import { shiftBy } from './shift';
 import type { Tile } from './sight';
 
@@ -65,6 +66,8 @@ export interface SceneArt {
    * cells; the way the pillow lies from the quilt; and the row of the quilt, a
    * static thing drawn over the sleeper. */
   beds?: Record<string, { head: [number, number]; toward: 'left' | 'right'; row: number }>;
+  /** The dark passages a figure is drawn darker in, the deeper it goes (shade.ts). */
+  dark?: Dark;
 }
 
 /** The figures drawn for the characters (D76): one sheet each of four rows (down,
@@ -192,17 +195,18 @@ export function paintThing(
     .image(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE, `art-${id}-${state}`)
     .setOrigin(0, 0)
     .setScale(scale)
-    .setDepth(rowDepth(painted.row + dy, painted.under) + 0.001);
+    .setDepth(thingDepth(painted.row + dy, painted.under, thing.kind === 'door' && thing.open));
 }
 
-/** A painted thing's image put where it is drawn on a tile (D85), for a restart. */
-export function placeThing(image: Phaser.GameObjects.Image, art: Art, id: string, tile: Tile): void {
+/** A painted thing's image put where it is drawn on a tile (D85), for a restart,
+ * and among the rows as it is drawn there, a door as open or shut. */
+export function placeThing(image: Phaser.GameObjects.Image, art: Art, id: string, tile: Tile, open = false): void {
   const painted = art.scene.things[id];
   if (!painted) return;
   const scale = artScale(art);
   const [dx, dy] = shiftOf(art, id, tile);
   image.setPosition(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE);
-  image.setDepth(rowDepth(painted.row + dy, painted.under) + 0.001);
+  image.setDepth(thingDepth(painted.row + dy, painted.under, open));
 }
 
 /** The sheet a character is drawn from: the friend is the one of the wizard's other

@@ -204,6 +204,13 @@ def join(scene: str, picture_path: Path, section: str = "repaint") -> Path:
     painting[y0:y1, x0:x1] = painting[y0:y1, x0:x1] * (1 - inside) + whole * inside
     target = REPO / repaint["painting"]
     Image.fromarray(painting.clip(0, 255).astype(np.uint8)).save(target)
+    # The scene's edits that showed the mended part as the painting did, each mended
+    # with it into a picture of its own ([edit, written]), so that the cut finds no
+    # difference there that is not a thing's.
+    for edit, written in repaint.get("also", []):
+        picture = np.array(Image.open(REPO / edit).convert("RGB")).astype(np.float32)
+        picture[y0:y1, x0:x1] = picture[y0:y1, x0:x1] * (1 - inside) + whole * inside
+        Image.fromarray(picture.clip(0, 255).astype(np.uint8)).save(REPO / written)
     if "grid" in repaint:
         grid = json.loads((REPO / repaint["from_grid"]).read_text())
         grid["y"]["cells"] = int(

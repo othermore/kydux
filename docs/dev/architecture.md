@@ -1401,7 +1401,13 @@ one overturns stays, marked as superseded.
   back to the ground, where the painting is as its picture without the
   thing, and the outline just beyond it comes in; a mask drawn inside its
   outline, Gemini's magenta (D89), has the outline added and nothing taken
-  away (`image_first.rimmed`). The alpha is the mask itself, softened only
+  away (`image_first.rimmed`), or, for a thing with another's line just
+  beside it (a quilt, a counter before its wands), only its own line
+  (`image_first.lined`). A part of a polygon with no outline between it
+  and what lies beyond, a stone's sunlit top, is the polygon's as drawn
+  (`fixed`), and a static thing gives up to a door or a thing picked up
+  exactly that thing's cut-out, so that nothing between them shows a
+  figure behind. The alpha is the mask itself, softened only
   by the bringing down to the page's size. The sweep checks it on every
   cut-out a figure may stand behind, reading the outlines at the painting's
   own size: `fringe`, the ground beyond the outline in the mask; `bare`, the
@@ -1421,18 +1427,23 @@ one overturns stays, marked as superseded.
   is one the sweep flags and the eye finds right, a light stone top with no
   line on it, and the commit names it. Rules out a figure over a rock's
   base and behind its top.
-- **D95 — Doors and arches are over whoever stands in them; a wall seen
-  from above is over everyone; a counter hides half of who stands behind
-  it.** Decided 2026-10-27 by the owner. A thing or a static thing marked
-  `under` (a door, its arch) is drawn at nine tenths of its cell, over the
-  figure standing on its row and under the next row (`depth.ts`); a static
+- **D95 — Shut doors and arches are over whoever stands in them; a wall
+  seen from above is over everyone; a counter hides half of who stands
+  behind it.** Decided 2026-10-27 by the owner, and for open doors on
+  2026-10-28. A thing or a static thing marked `under` (a door, its arch)
+  is drawn at nine tenths of its cell, over the figure standing on its row
+  and under the next row (`depth.ts`); a door's cell is walked on only
+  while it is open, and then what is seen through it is drawn under the
+  figure in the doorway and its arch over them, so that the figure stands
+  in the doorway (`thingDepth`); a static
   thing marked `over` (a wall between rooms, a front wall) over every
   figure of the scene, the wizard's outline showing through it; one marked
   `hangs` (a torch) as its row's, standing on no cell. A scene's `lowered`
   cells draw a figure lower by a part of a cell, at the depth its feet are
   drawn at, so that a counter on the row below hides its legs: Baro behind
   the wand bank's. Rules out the wizard over the door it walks through and
-  Baro standing on his counter.
+  Baro standing on his counter, and a figure hidden behind the doorway it
+  stands in.
 - **D96 — There are three first-years, and each sleeps in the dormitory
   of their gender.** Decided 2026-10-27 by the owner. The first-years are
   the wizard, the friend of the other gender and the mate of the same
@@ -1471,3 +1482,12 @@ one overturns stays, marked as superseded.
   magenta when the painting is chosen, and figures that fit. Rules out the
   furniture, the slits and the double shelves that cost chapter 2's scenes
   three sprints.
+- **D100 — A figure going into a dark passage goes dark.** Decided
+  2026-10-28 by the owner. A scene's settings name its dark passages
+  (`dark`: the columns each spans, the row a figure's feet are on where
+  its dark begins and where it is darkest, and how dark it is there); a
+  figure walking in is drawn darker the deeper it goes, its head half as
+  dark again as its feet, until it is hardly seen (`shade.ts`, a tint
+  from the figure's top to its feet). The entrance's three arches are
+  such passages, the middle one deeper. Rules out a figure as lit in a
+  dark corridor as in the hall.

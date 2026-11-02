@@ -276,7 +276,10 @@ def static_alpha(
             # bed's quilt, drawn over its sleeper, takes only the line it touches:
             # the pillow's beside its sheet stays under the sleeper's head (D97).
             mask = kept(paint, MARK_SPECK)
-            rim = image_first.lined if thing.get("cover") else image_first.rimmed
+            # A counter marked `lined` takes its own line and not the wands' ends
+            # standing just behind it.
+            own = thing.get("cover") or thing.get("lined")
+            rim = image_first.lined if own else image_first.rimmed
             mask = rim(mask, painting, cell, image_first.thresholds(th))
             return (mask & inside).astype(np.float32)
         mask = inside & ~paint
@@ -297,6 +300,10 @@ def static_alpha(
         mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th))
         for hole in thing.get("holes", []):
             mask &= ~native_area(painting.shape[:2], grid, hole)
+        # A part with no outline between it and the floor beyond, a stone's sunlit
+        # top, is the polygon's as drawn: the floor would be let into it.
+        for part in thing.get("fixed", []):
+            mask |= native_area(painting.shape[:2], grid, part)
     return (mask & inside).astype(np.float32)
 
 
@@ -356,6 +363,21 @@ def clip_below(
     if bottom < out.shape[0]:
         out[max(0, bottom) :] = 0
     return out
+
+
+def shrunk(sprite: np.ndarray, scale: float) -> tuple[np.ndarray, int, int]:
+    """A thing's sprite drawn at `scale` of its painted size, standing where it was
+    painted, on the middle of its bottom; and how far right and down its corner
+    moves. A book painted too big for its shelf is drawn smaller on the picture
+    without it."""
+    ys, xs = np.nonzero(sprite[..., 3])
+    if not len(ys):
+        return sprite, 0, 0
+    foot_x, foot_y = (xs.min() + xs.max() + 1) / 2, ys.max() + 1
+    height, width = sprite.shape[:2]
+    size = (max(1, round(width * scale)), max(1, round(height * scale)))
+    small = Image.fromarray(sprite, "RGBA").resize(size, Image.LANCZOS)
+    return np.array(small), round(foot_x * (1 - scale)), round(foot_y * (1 - scale))
 
 
 def composite(
@@ -466,7 +488,7 @@ def scene(settings: Settings) -> Path:
     grid = settings.grid
     marks = settings.marks()
     rows, columns = len(marks), len(marks[0])
-    ground, withouts, masks = composite(settings, grid)
+    ground, withouts, _ = composite(settings, grid)
     # The ground, cut by image_first.py into the rows of what stands up: from a
     # source folder holding the ground in place of the painting, with no box for
     # a gate or a seal, since nothing of them is left in it. A scene cut by its
@@ -572,15 +594,18 @@ def scene(settings: Settings) -> Path:
     # A cell in the painting's own pixels, and the colours its outlines are read by.
     spacing = round(grid["x"]["spacing"])
     th = settings.data.get("thresholds")
-    # Where a thing that opens or is picked up lies, which no static thing takes.
+    # Where a thing that opens or is picked up is drawn, which no static thing
+    # takes: its cut-out and no more, so that a wall and the door in it leave no gap
+    # between them for a figure behind them to be seen through.
     doors = np.zeros(painting.shape[:2], dtype=bool)
     for name, thing in settings.things.items():
-        if not thing.get("static"):
-            doors |= masks[name]
-    doors = (
-        np.array(Image.fromarray(doors.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(9)))
-        > 0
-    )
+        if thing.get("static"):
+            continue
+        marks = None
+        if "marked" in thing:
+            marks = np.array(Image.open(settings.edits / thing["marked"]).convert("RGB"))
+        native = native_box(grid, thing["box"])
+        doors |= sprite_alpha(painting, withouts[name], native, thing, spacing, th, marks) > 0.5
     things = {}
     for name, thing in settings.things.items():
         if thing.get("static"):
@@ -631,8 +656,11 @@ def scene(settings: Settings) -> Path:
             sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
             sprite = sprite.copy()
             reach = thing.get("reach", 0.0)
-            below = clip_below(sprite[..., 3] / 255, thing["row"], top, reach=reach)
+            below = clip_below(sprite[..., 3] / 255, thing["row"], box[1], reach=reach)
             sprite[..., 3] = (below * 255).astype(np.uint8)
+            if thing.get("scale"):
+                sprite, dx, dy = shrunk(sprite, thing["scale"])
+                left, top = box[0] + dx, box[1] + dy
             webp(Image.fromarray(sprite, "RGBA"), out / states[state])
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
         if thing.get("under"):
@@ -683,6 +711,17 @@ def scene(settings: Settings) -> Path:
         **({"beds": beds_of(settings)} if settings.data.get("beds") else {}),
         # The cells a figure is drawn lower on, behind what stands below it (D95).
         **({"lowered": settings.data["lowered"]} if settings.data.get("lowered") else {}),
+        # The dark passages a figure is drawn darker in, the deeper it goes (shade.ts).
+        **(
+            {
+                "dark": [
+                    {key: part[key] for key in ("columns", "from", "to", "most")}
+                    for part in settings.data["dark"]
+                ]
+            }
+            if settings.data.get("dark")
+            else {}
+        ),
         "source": "SOURCE.md",
     }
     (out / "art.json").write_text(json.dumps(art, indent=2) + "\n")

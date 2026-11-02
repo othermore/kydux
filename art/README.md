@@ -138,7 +138,9 @@ owner on 2026-10-26, for every scene from the dormitory on:
   fills it (`repaint` in `cut.json`, with its prompt in
   `tools/art/prompts/`); then `repaint.py <scene> join <picture>` takes only
   the boxes and the band from the model's picture, the painting pixel for
-  pixel elsewhere.
+  pixel elsewhere. The scene's edits that showed the part as the painting
+  did, its ground-only edit and its marked picture, are mended with it
+  (`also`), so that the cut finds no difference there.
 - **What stands in front of a figure and never changes is a static thing**
   (D89): a bed, an armchair, a counter, a bookcase, a lamp, a wall. It is
   marked flat magenta by Gemini (the owner's way): the scene's settings'
@@ -151,16 +153,28 @@ owner on 2026-10-26, for every scene from the dormitory on:
   painting's outline beside it (`"mask": "marked"`); a wall cut round its
   openings is its box less the magenta (`"unmarked"`); a wall a model
   cannot paint flat is a polygon in cells, each edge on its outline
-  (`"polygon"`). Things that lie on other things, a bed's covers, are marked
-  in a set of their own (`sets`). Ask Gemini to name every small part, the
-  candles and their flames too: it leaves out what the prompt does not
-  name.
+  (`"polygon"`), and its part with no outline between it and what lies
+  beyond, a stone's sunlit top or a wall's foot on a beam of its colour, is
+  the polygon's as drawn (`fixed`). A thing with others standing just behind
+  it, a counter before its wands, takes only its own line (`lined`). Things
+  that lie on other things, a bed's covers, are marked in a set of their own
+  (`sets`). Ask Gemini to name every small part, the candles and their
+  flames too: it leaves out what the prompt does not name.
+- **A wall and the door in it leave no gap.** A static thing gives up to a
+  door, a key or a book exactly the pixels of its cut-out, so that nothing
+  between them shows a figure behind. An arch is a polygon of its dome and
+  its sides, less the door's cut-out and the threshold between them.
 - **Where a thing is drawn among the figures** (D95): on the row of its
-  foot, over the figures standing above it; a door and its arch
-  (`"under"`) over the figure in its doorway too; a wall seen from above
-  (`"over"`) over every figure; what hangs on a wall (`"hangs"`) as its
-  row's, standing on no cell. A scene's `lowered` cells draw a figure
-  lower, so that a counter on the row below hides its legs.
+  foot, over the figures standing above it; a shut door and an arch
+  (`"under"`) over the figure in its doorway too, while an open door's
+  doorway, what is seen through it, is under that figure; a wall seen from
+  above (`"over"`) over every figure; what hangs on a wall (`"hangs"`) as
+  its row's, standing on no cell. A scene's `lowered` cells draw a figure
+  lower, so that a counter on the row below hides its legs. A scene's
+  `dark` passages draw a figure darker the deeper it goes into them, its
+  head darker than its feet (D100).
+- **A thing painted too big for its place is drawn smaller** (`scale`), on
+  its foot's middle, over the picture without it: a book on a shelf.
 - **A bed's cover is its quilt and its folded sheet** (D97), from the
   sheet's dark line by the pillow to the foot, the pillow left out. Its
   mask takes only its own line (`image_first.lined`), so that the pillow's
@@ -215,7 +229,8 @@ row its foot stands on.
 
 Look at every check picture before committing. Each shows a figure behind
 and in front of a row's things, and `all-<scene>.png` the wizard on every
-cell walked on at once. To name a cell when something looks wrong, open
+cell walked on at once, every door open, as it is when someone stands in
+its doorway, and every passage as dark as the page draws it. To name a cell when something looks wrong, open
 the game with `?debug` (docs/dev/dev-environment.md).
 
 ## What a painting must keep to

@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { coverDepth, FOOT_IN_CELL, figureDepth, loweredBy, overDepth, rowDepth, sleeperDepth } from './depth';
+import {
+  coverDepth,
+  FOOT_IN_CELL,
+  figureDepth,
+  loweredBy,
+  overDepth,
+  rowDepth,
+  sleeperDepth,
+  thingDepth,
+} from './depth';
 
 describe('the depths of a painted scene (D76, D95)', () => {
   it('draws a row over the figures above it and under the figure standing on it', () => {
@@ -12,6 +21,13 @@ describe('the depths of a painted scene (D76, D95)', () => {
     expect(rowDepth(8, true)).toBeGreaterThan(figureDepth(8 + FOOT_IN_CELL) + 0.0005);
     expect(rowDepth(8, true) + 0.001).toBeLessThan(figureDepth(9 + FOOT_IN_CELL));
     expect(rowDepth(8, true) + 0.001).toBeLessThan(rowDepth(9));
+  });
+
+  it('draws a shut door over the figure in its doorway, and an open one under them', () => {
+    const standing = figureDepth(8 + FOOT_IN_CELL);
+    expect(thingDepth(8, true, false)).toBeGreaterThan(standing);
+    expect(thingDepth(8, true, true)).toBeLessThan(standing);
+    expect(thingDepth(8, true, true)).toBeGreaterThan(figureDepth(7 + FOOT_IN_CELL));
   });
 
   it('draws a wall seen from above over every figure of the scene', () => {

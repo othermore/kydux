@@ -113,6 +113,8 @@ class Scene:
     marked: bool = False
     #: The cells a figure is drawn lower on, and by how much of a cell (D95).
     lowered: dict = field(default_factory=dict)
+    #: The dark passages a figure is drawn darker in, the deeper it goes (shade.ts).
+    dark: list = field(default_factory=list)
 
 
 def walks(scene: str) -> np.ndarray:
@@ -145,6 +147,28 @@ def feet_at(scene: Scene, x: int, y: int) -> float:
     return y + FOOT_IN_CELL + scene.lowered.get((x, y), 0.0)
 
 
+#: How much darker a figure's head is than its feet in a dark passage (shade.ts).
+HEAD_SHADE = 0.5
+
+
+def shaded(scene: Scene, frame: np.ndarray, x: int, y: int) -> np.ndarray:
+    """The wizard's frame as the page draws it on (x, y): in a dark passage darker
+    the deeper the cell, from its feet up to its head, which is darker still."""
+    feet = feet_at(scene, x, y)
+    passage = next((p for p in scene.dark if p["columns"][0] <= x <= p["columns"][1]), None)
+    if passage is None:
+        return frame
+    depth = (passage["from"] - feet) / (passage["from"] - passage["to"])
+    low = passage["most"] * min(1.0, max(0.0, depth))
+    if low <= 0:
+        return frame
+    high = min(passage["most"], low * (1 + HEAD_SHADE))
+    shade = np.linspace(high, low, frame.shape[0])[:, None, None]
+    out = frame.copy()
+    out[..., :3] = (frame[..., :3] * (1 - shade)).astype(np.uint8)
+    return out
+
+
 def load(scene: str) -> Scene:
     folder = CONTENT / "art" / "scenes" / scene
     art = json.loads((folder / "art.json").read_text(encoding="utf-8"))
@@ -161,6 +185,7 @@ def load(scene: str) -> Scene:
         found.checks = own.data.get("checks")
         found.kept = own.data.get("kept", [])
         found.marked = "marks" in own.data
+    found.dark = art.get("dark", [])
     for part in art.get("lowered", []):
         (x0, y0), (x1, y1) = part["cells"]
         for y in range(y0, y1 + 1):
@@ -191,10 +216,13 @@ def load(scene: str) -> Scene:
     if (scene_settings.SCENES / scene / "cut.json").is_file():
         solid = {n: t.get("solid", True) for n, t in scene_settings.settings(scene).things.items()}
     for name, thing in art["things"].items():
-        state = "closed" if "closed" in thing["states"] else next(iter(thing["states"]))
+        # A door is drawn open: one stands in its doorway, the only cell it is walked
+        # on from, only when it is open, and what is seen through it is then under
+        # them, its arch over them (D95).
+        state = "open" if "open" in thing["states"] else next(iter(thing["states"]))
         rgba = np.array(Image.open(folder / thing["states"][state]).convert("RGBA"))
         # A thing is drawn just after its row's image (painted.ts).
-        under = thing.get("under", False)
+        under = thing.get("under", False) and state != "open"
         found.layers.append(
             Layer(
                 name,
@@ -289,7 +317,7 @@ def picture(scene: Scene, x: int, y: int) -> Image.Image:
     height, width = frame.shape[:2]
     left = int((x + 0.5) * cell) - width // 2 - x0
     top = int(feet_at(scene, x, y) * cell) + foot - height - y0
-    wizard = Image.fromarray(frame)
+    wizard = Image.fromarray(shaded(scene, frame, x, y))
     placed = False
     for layer in scene.layers:
         if not placed and layer.depth > feet_at(scene, x, y):
@@ -567,12 +595,16 @@ def edges(scene: Scene, seen: Differs) -> list[Problem]:
         piece, lines = solid[y0:y1, x0:x1], dark[y0:y1, x0:x1]
         # The scene's own edge lets no ground in: a crown it cuts has its outline
         # beyond it, in the margin.
+        others = (count[y0:y1, x0:x1] - piece) > 0
         outside = image_first.outside_of(piece, lines, band, border=False)
-        given = image_first.outside_of(piece, lines, band, same[y0:y1, x0:x1], border=False)
+        # What another image draws beside the edge is no ground let in: a wall and
+        # the door cut out of it meet with no outline between them.
+        given = image_first.outside_of(
+            piece, lines, band, same[y0:y1, x0:x1] & ~others, border=False
+        )
         behind = (
             behind_cells(scene, reach_of(scene, layer), (x0, y0, x1, y1)) & inner[y0:y1, x0:x1]
         )
-        others = (count[y0:y1, x0:x1] - piece) > 0
         fringe = piece & given & behind
         if scene.marked:
             # In a scene Gemini marked, its magenta is the thing (D93): only what
@@ -694,7 +726,6 @@ def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
     width, height = scene.columns * cell, scene.rows * cell
     out = Image.fromarray(scene.ground).convert("RGBA")
     frame, foot = figure()
-    wizard = Image.fromarray(frame)
     tall, wide = frame.shape[:2]
     standing = [
         (feet_at(scene, x, y), (x, y)) for y, x in zip(*np.nonzero(scene.walked), strict=True)
@@ -709,7 +740,8 @@ def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
             x, y = what
             left = int((x + 0.5) * cell) - wide // 2
             top = int(feet_at(scene, x, y) * cell) + foot - tall
-            out.paste(wizard, (left, top), wizard)
+            seen = Image.fromarray(shaded(scene, frame, x, y))
+            out.paste(seen, (left, top), seen)
     lines = Image.new("RGBA", out.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(lines)
     for y in range(scene.rows):

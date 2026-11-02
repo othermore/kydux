@@ -48,6 +48,13 @@
       "under": true
     },
     {
+      "row": 11,
+      "image": "row-11-static-under.webp",
+      "top": 1003,
+      "static": true,
+      "under": true
+    },
+    {
       "row": 12,
       "image": "row-12.webp",
       "top": 1149

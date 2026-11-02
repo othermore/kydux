@@ -33,10 +33,13 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 playback of a run's events (playback.ts, its long ticks for
                 what the wizard's hands do), a painted scene drawn from its
                 art with its figures sorted by their feet (scene.ts, painted.ts,
-                D76), the goal's beating mark and the sealed doors' glow (D79),
+                D76), a painted thing drawn on the tile its level lays it on
+                (shift.ts, D85), the goal's beating mark and the sealed doors' glow (D79),
                 the wizard casting, a seal breaking and a door opening (D81),
                 the wizard's outline where something painted hides more than
-                a quarter of it (silhouette.ts, cover.ts), the tester's view of the cells and the masks
+                a quarter of it, and a revealed thing's wherever something
+                covers it (silhouette.ts, cover.ts, D85), the wizard asleep
+                (D84), the tester's view of the cells and the masks
                 (debug.ts, opened with ?debug), and the sound effects, made as
                 the game plays (sfx.ts)
   src/editor/   the child's editor, CodeMirror
@@ -100,7 +103,10 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 image services, cut.py and sprites.py cut what they draw,
                 map_from_image.py and image_first.py read a painting's grid and
                 cut its things, scene_settings.py reads a scene's settings
-                (art/scenes/<scene>/cut.json, D82), export_scene.py makes
+                (art/scenes/<scene>/cut.json, D82), margin.py paints a scene
+                on beyond its playable area (D83), repaint.py mends a chosen
+                painting in a few boxes and nowhere else (D88),
+                export_scene.py makes
                 content/art/ and
                 sweep.py stands the wizard on every cell of a scene to check
                 the cut, figures.py
@@ -166,9 +172,19 @@ wizard.facing                # "up", "down", "left" or "right"
 wizard.items                 # the things it carries, from the start those of the
                              # level's carrying (D49)
 wizard.give(thing)           # a tick: a thing it carries, to the actor beside it (D48)
+wizard.sleep()               # a tick: lies down in a free bed beside it; refused with
+                             # no bed beside (no_bed) or a taken one (bed_taken) (D84)
+wizard.distance_to(other)    # the steps to a thing or an actor along the rows and the
+                             # columns; asks, so no tick (D86)
 
-thing.kind, thing.name       # a key, a book, a wand, a potion, a door: by its id
+thing.kind, thing.name       # a key, a book, a wand, a potion, a door, a bed: by its id
 thing.position               # where it lies; None once carried
+thing.distance_to(other)     # the steps to the wizard, a thing or an actor (D86); a
+                             # carried thing is where the wizard is
+thing.reveal()               # a tick: its outline drawn where it lies, through what
+                             # covers it; refused once carried (not_here) (D85)
+
+bed.free                     # whether no one sleeps in it (D84)
 
 door.locked, door.sealed, door.password, door.is_open
 door.open()                  # a tick: from a tile beside it (D24), with its key when
@@ -181,6 +197,7 @@ teacher.can_see(target)      # the target straight ahead, within its sight (4 ti
                              # over a shelf (D46)
 
 ghost.kind, ghost.name, ghost.position, ghost.facing    # and cat.*: they stand (D48)
+teacher.distance_to(other), ghost.distance_to(other), cat.distance_to(other)
 
 stair.in_place               # whether a step onto it, taken now, lands on it (D53)
 ```
@@ -213,7 +230,9 @@ tiles are `[x, y]`.
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
 | `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
 | `give` | wizard | `id`, `to`, `at` | the thing floats from the wizard to the actor and fades; the actor faces the wizard (D48) |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (with `spell`), `not_carried` or `nobody`; `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
+| `sleep` | wizard | `id`, the bed; `at`; `bed`, its tile | the wizard lies along the bed, no celebration after; `data-sleeping` (D84) |
+| `reveal` | wizard | `id`, `at` | the thing's outline beats wherever something covers it, until it is picked up or given; `data-revealed` (D85) |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (with `spell`), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
 
@@ -1250,3 +1269,64 @@ one overturns stays, marked as superseded.
   out a map grown to hold the margin, which would move every coordinate,
   and the model's copy of the inside, which the cut and the edits do not
   line up with.
+
+- **D84 — The castle's entrance hall and the first-year dormitory are
+  scenes, and a scene may forbid the wizard a tile.** Decided 2026-10-26
+  (sprint 15). `the-entrance` holds a story and no level, and nothing in
+  it is cut: no one stands behind anything tall. `the-dormitory` holds a
+  level and two stories: a common room between the girls' dormitory on
+  the left and the boys' on the right; the wizard's is always the
+  right-hand one, whoever the wizard is, and the scene names the other
+  arch's tiles in `scene.json`'s `forbidden`, with the reason the wizard
+  is told (`not_my_dormitory`, worded by the wizard's gender), which a
+  level on the scene carries: the wizard's step is refused and turned
+  that way, and anyone else passes. A bed is a thing, `free` or not, drawn
+  by the painting and never by the page; `wizard.sleep()` lies down in a
+  free bed beside the wizard; a goal `sleep` names the bed. The dormitory
+  mate, the friend of the wizard's own gender, is the actor `mate`, drawn
+  and named as Nuri or Teku by the wizard's gender, and a text writes
+  `{mate}`. Rules out mirroring the painting by gender: what changes is who
+  stands where and what the arch says.
+- **D85 — A thing is drawn where the level lays it, and may be hidden and
+  revealed.** Decided 2026-10-26 (sprint 15). `art.json` gives each
+  painted thing the cell it is painted on (`at`), and the page draws it on
+  the level's tile, moved by the cells between and among the rows by its
+  new foot; a level's thing may name the painted thing it is drawn from
+  (`art`), so that each level calls its door `door` and its key `key`.
+  fendra's pull moves a painted thing the same way. A thing the wizard
+  carries may be `hidden`, lying under a cut-out on purpose, which the
+  content test allows; the world treats it as any thing, `find_nearest`
+  finds it, and `thing.reveal()` shows its outline wherever something
+  covers it, the wizard's outline made for any sprite (`silhouette.ts`).
+  Rules out a second painting of a key in each place, and a world where
+  what is hidden is absent.
+- **D86 — `distance_to` is the steps between two of the child's objects.**
+  Decided 2026-10-26 (sprint 15). Along the rows and the columns, an
+  integer; on the wizard, a thing and an actor, a carried thing being
+  where the wizard is, one given where its actor is, one in the dark
+  unknown (None). It asks, so it takes no tick. It is the number a
+  variable keeps when the program cannot know it (*How a level earns its
+  idea*, course.md): the key of `the-moving-key` lies at another distance
+  in each of its three ways (D51). Rules out a float distance, which a
+  child cannot walk.
+- **D87 — The story has a hook.** Decided 2026-10-26 by the owner (sprint
+  15). The story bible's *The wizard's way* runs a thread from chapter 3 to
+  the end: in the night passages the children overhear that the brooms of
+  the next day's flying lesson have been tampered with; in chapter 4 they
+  stop the accident; in chapter 5 the familiar finds the proof that the
+  one behind it is Korvel, who long ago wrote the castle's enchantments
+  and vanished, and whom everyone believes gone. He is felt, never seen,
+  and the children are never in danger (*The tone*). Chapters 3 to 5 keep
+  their lessons; their levels are rewoven round the hook chapter by
+  chapter, before each is painted.
+- **D88 — A chosen painting is mended, never repainted.** Decided
+  2026-10-26 by the owner (sprint 15): once a scene's painting is chosen it
+  does not change unless it must. A fix is a few boxes of it, and the
+  canvas's grown band when it must go on, that a model paints again on a
+  canvas where they are blurred, given a crop large enough that it cannot
+  paint over what is kept; `tools/art/repaint.py` lays the model's picture
+  on the crop by the least difference over what is kept and takes only the
+  boxes from it, the painting pixel for pixel elsewhere. Settings in
+  `cut.json`'s `repaint`. Rules out an edit of the whole picture to fix its
+  edge: an edit paints the whole picture again, and once removed the
+  library's reading room.

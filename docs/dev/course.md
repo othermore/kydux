@@ -117,18 +117,19 @@ that stays locked.
 | --- | --- | --- | --- |
 | `story:the-entrance` | Story 1 | Ilda welcomes the first-years in the entrance hall and takes them to their dormitory. | |
 | `story:the-first-night` | Story 2 | The common room; the friend goes to the other dormitory. | |
-| `level:your-bed` | Practice 1 | To one's own dormitory, past the other's arch, which refuses the wizard; the mate met; asleep in the free bed. Bonus: no bumps. | `wizard.sleep` |
+| `lesson:the-right-place` | Lesson 1 | Taught by the mate: an action may need the right place; `wizard.sleep()` only beside a free bed, its *Try it* refused in the common room. | `wizard.sleep` |
+| `level:your-bed` | Practice 1 | To one's own dormitory, past the other's arch, which refuses the wizard; the mate met; asleep in the free bed. Bonus: no bumps. | |
 | `story:the-morning` | Story 3 | The mate needs a wand, and the wizard's is lent: to the library, together. | |
 | `story:at-the-library` | Story 4 | Wenna receives them and opens her door. | |
-| `lesson:what-things-know` | Lesson 1 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.position`, `wizard.items`, `door.locked`, `thing.position`, `concept:print` |
-| `lesson:finding-things` | Lesson 2 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept under a name, a variable; `give` hands a thing to whoever stands beside. | `wizard.find_nearest`, `wizard.give` (and Python's `=`) |
+| `lesson:what-things-know` | Lesson 2 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.position`, `wizard.items`, `door.locked`, `thing.position`, `concept:print` |
+| `lesson:finding-things` | Lesson 3 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept under a name, a variable; `give` hands a thing to whoever stands beside. | `wizard.find_nearest`, `wizard.give` (and Python's `=`) |
 | `level:the-lost-book` | Practice 2 | Eldra's book across the hall: found, picked up, given. Bonus: found with `find_nearest`. | |
-| `lesson:keys-and-doors` | Lesson 3 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. | `door.open`, `thing.reveal` |
+| `lesson:keys-and-doors` | Lesson 4 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. | `door.open`, `thing.reveal` |
 | `level:the-hidden-key` | Practice 3 | The centre door's key lies behind Eldra's armchair, out of sight: found, revealed, picked up, the door opened. Bonus: found with `find_nearest`. | |
-| `lesson:the-distance` | Lesson 4 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
+| `lesson:the-distance` | Lesson 5 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
 | `level:the-moving-key` | Improve 1 | Eldra's room key lies at three, five or seven steps, in three ways; Wenna's program walks yesterday's five. Bonus: no number written. | |
 | `level:the-wrong-order` | Fix 1 | Wenna's program opens Eldra's door from across the aisle, then walks to it. | |
-| `lesson:fendra` | Lesson 5 | A spell that reaches: `fendra` draws the nearest thing in reach to the wizard's tile. | (the spell `fendra`) |
+| `lesson:fendra` | Lesson 6 | A spell that reaches: `fendra` draws the nearest thing in reach to the wizard's tile. | (the spell `fendra`) |
 | `level:the-high-shelf` | Practice 4 | The glowing rare book on the high shelf, drawn down from below it. | |
 | `level:eldras-book` | Practice 5 | The chapter together: Eldra's own book from her little room, named, drawn down, given. Bonus: named with `find_nearest` before the spell moves it. | |
 | `story:the-wand-bank` | Story 5 | Eldra's thanks; the school wands; the friend's spare given back; the chapter summed up; at dusk, the rumour of the passages. | |
@@ -250,7 +251,7 @@ stairs* (moving tiles and functions), *Zarek's revenge* (the race again),
 
 ## The count
 
-Twenty-six lessons and thirty-four levels, thirty-six with the fix
+Twenty-seven lessons and thirty-four levels, thirty-six with the fix
 levels of chapters 4 and 5, then ten challenges. The draft
 asked for 10 to 20 lessons; one idea per lesson, each with its theory,
 asks for more, and each is short: a few pages.

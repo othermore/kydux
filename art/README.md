@@ -119,7 +119,23 @@ owner on 2026-10-26, for every scene from the dormitory on:
 - **A thing the levels move stands in the painting at one place**, where
   the cut takes its picture from: a key that lies behind a bookcase or in
   a different cell each time the level is played is painted once on open
-  floor, and the game draws it where the level says.
+  floor, and the game draws it where the level says (`at` in the scene's
+  `cut.json`, D85).
+- **Once chosen, a painting is mended, not painted again** (D88). A
+  model asked to edit a whole picture paints it all again, and may change
+  what was to be kept: the library's border edit took its reading room
+  away. A fix is made with `tools/art/repaint.py <scene> canvas`: the boxes
+  to mend, and a band below when the picture must go on, blurred on a
+  canvas, and the model given a crop of it large enough that what is kept
+  fills it (`repaint` in `cut.json`, with its prompt in
+  `tools/art/prompts/`); then `repaint.py <scene> join <picture>` takes only
+  the boxes and the band from the model's picture, the painting pixel for
+  pixel elsewhere.
+- **Indoors, only what a figure can stand behind is cut.** A bed, a low
+  table, furniture against a wall is ground. Where something must stand in
+  front of a figure (Eldra's armchair, which hides the key), its ground is
+  the painting with only that thing taken out, from the model's edit
+  without it laid on a crop of the corner, so that nothing else differs.
 
 ## The rules for the cut-outs
 
@@ -230,6 +246,9 @@ shows it for a moment as the door opens.
 - `tools/art/prompts/`: every prompt, with its service and model.
 - `art/raw/`: the trials, the raw pictures and the check pictures. Git
   ignores this folder.
+- `art/scenes/<scene>/`: each painted scene's settings, `cut.json`, with
+  its manifest: the field, the entrance hall, the dormitory and the
+  library.
 
 Everything the project makes ships under the GPL, like the code. A picture
 from anywhere else comes in only under a licence that lets it ship with a

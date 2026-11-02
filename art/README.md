@@ -128,7 +128,9 @@ owner on 2026-10-26, for every scene from the dormitory on:
   the cut takes its picture from: a key that lies behind a bookcase or in
   a different cell each time the level is played is painted once on open
   floor, and the game draws it where the level says (`at` in the scene's
-  `cut.json`, D85).
+  `cut.json`, D85), the middle of its picture on the middle of that cell
+  (D109); laid on a cell no one walks, under a bookcase, it is drawn under
+  that row's things.
 - **Once chosen, a painting is mended, not painted again** (D88). A
   model asked to edit a whole picture paints it all again, and moves what
   is to be kept. A fix is made with `tools/art/repaint.py <scene> canvas`: the boxes
@@ -156,7 +158,9 @@ owner on 2026-10-26, for every scene from the dormitory on:
   cannot paint flat is a polygon in cells, each edge on its outline
   (`"polygon"`), and its part with no outline between it and what lies
   beyond, a stone's sunlit top or a wall's foot on a beam of its colour, is
-  the polygon's as drawn (`fixed`). A thing with others standing just behind
+  the polygon's as drawn (`fixed`); a part of it that is behind a figure,
+  the inside of a doorway's arch and its line, is a hole (`holes`), taken
+  out after the snap, which would take the line back in. A thing with others standing just behind
   it, a counter before its wands, takes only its own line (`lined`). Things
   that lie on other things, a bed's covers, are marked in a set of their own
   (`sets`). Ask Gemini to name every small part, the candles and their
@@ -171,9 +175,15 @@ owner on 2026-10-26, for every scene from the dormitory on:
   doorway, what is seen through it, is under that figure; a wall seen from
   above (`"over"`) over every figure; what hangs on a wall (`"hangs"`) as
   its row's, standing on no cell. A scene's `lowered` cells draw a figure
-  lower, so that a counter on the row below hides its legs. A scene's
-  `dark` passages draw a figure darker the deeper it goes into them, its
-  head darker than its feet (D100).
+  lower, so that a counter on the row below hides its legs, and its
+  `nudged` cells draw a figure sideways, by the strip's middle less the
+  cell's, so that it walks the painted strip where the painting's strip is
+  off its cells' middle (D105). A door marked `through`, whose open picture
+  is the floor beyond, is drawn open under every figure, so that one
+  standing beyond it is seen through it (D108); a door's `rest` is the
+  state it is drawn in where no level or story places it (D104). A
+  scene's `dark` passages draw a figure darker the deeper it goes into
+  them, its head darker than its feet (D100).
 - **A thing painted too big for its place is drawn smaller** (`scale`), on
   its foot's middle, over the picture without it: a book on a shelf; a
   scale by state (`{"pulled": 0.72}`) shrinks that state alone.
@@ -221,9 +231,10 @@ row its foot stands on.
   leave its stone whole. An open door is drawn as its edit shows it open,
   its leaves seen (D101). Where that picture goes wrong, a door in a wall
   seen from the front with room behind it swings in out of sight: its
-  whole doorway, from the arch to the threshold, is the floor of the room
-  beyond, from Gemini's edit of the doorway alone, laid in by
-  `tools/art/repaint.py doorways`.
+  whole doorway, from the arch to the threshold and over the threshold's
+  line, is the floor of the room beyond, taken from the painting itself
+  where that floor is plain, darker under the arch and as lit as the room
+  at the threshold, laid in by `tools/art/repaint.py doorways` (D108).
 - **A cut-out ends at the outer edge of its outline** (D93): the outline is
   the thing's, and nothing of the ground beyond it is (`fringe` and `bare`
   in the sweep). Every mask but a box's, and one its thing says not to (`snap: false`),
@@ -296,6 +307,16 @@ A painting asks things of the cut, and a scene painted for the cut asks
 little (D99). A scene still to paint keeps to these, in its prompt and in
 the choice among Gemini's tries:
 
+- **The grid comes first** (D102). The map is drawn before the prompt is
+  written: rooms, walls, doorways, furniture and every walked strip on the
+  grid, every wall on a cell line, every doorway whole cells wide, every
+  walked strip at least a cell wide and in the middle of its cells, every
+  thing in whole cells, no slanting perspective that takes a wall from one
+  column into the next. `tools/art/layout.py <scene>` draws it
+  (`art/raw/<scene>/layout.png`), and it is the prompt's first picture; a
+  try is laid under the same grid with `layout.py <scene> --over <try>`
+  and chosen only when its walls, doorways and furniture lie in the
+  layout's cells. A try that is off is asked for again, not mended.
 - **The floor a figure walks is open.** Furniture stands against the top
   wall or in the corners, where no figure walks beside or behind it. A
   thing in the middle of the floor costs a mask to make and to check; one a
@@ -304,8 +325,12 @@ the choice among Gemini's tries:
   from the front, with an arch at least two cells wide and a fifth of a
   cell taller than the tallest figure, so that the check's tenth (D98)
   holds with room to spare; open, it shows the floor of the
-  room beyond, lit. No slits in walls seen from above: a wall between rooms
-  is seen from the front, or the rooms are two scenes.
+  room beyond, at that room's light (D108). No slits in walls seen from
+  above: a wall between rooms is seen from the front, or the rooms are two
+  scenes. Where a painting has a doorway in a wall seen from above, the
+  walked cells go through that doorway and no other, and whoever stands in
+  it is behind the wall's band and in front of the doorway's inside
+  (D104): the wall's polygon takes in the band and leaves the inside out.
 - **Shelves are one row, against a wall.**
 - **Nothing hangs from what the picture does not show.** A lamp is on a
   wall or a stand, or ends at its ring.

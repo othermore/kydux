@@ -476,9 +476,11 @@ so that the figures pass behind and in front of them (D76).
     in the page (`sfx.ts`) with a mute in the settings.
 4.3 **The chapters' scenes painted and placed:** chapter 1's field in the
     game (sprint 12, 12.8), with its margin (sprint 14, D83) and its
-    settings (D82); chapters 2 and 3's library and passages painted with
-    their margins, mapped, their levels placed on them and their texts
-    written again.
+    settings (D82); chapter 2's entrance, dormitory and library painted
+    with their margins, mapped, their levels placed on them and their texts
+    written again; chapter 3's passages and night passages laid out on the
+    grid before they are painted (D102, `tools/art/layout.py`), then painted
+    to that layout, mapped and placed.
 4.4 **The masks made right** (done, sprint 14): every raised thing cut by
     its outline, no shadow below its row, what opens or is picked up cut
     against an edit without it, checked by the sweep with the wizard on

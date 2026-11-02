@@ -1824,3 +1824,24 @@ one overturns stays, marked as superseded.
   not the run's speed. Rules out a win card over a wizard who has just
   lain down in the dark, and a morning story told on a night scene with
   no light of morning.
+- **D125 — The cells an open leaf lies on are not walked while it is
+  open.** Decided 2026-10-30 by the owner. A door whose open leaf lies on
+  the floor beside its doorway covers the cells its foot stands on (the
+  scene names them, `covers` on the door's open state, measured on the
+  leaf's picture); while the door is open no one walks onto them, the
+  wizard's step is refused and the child told why (`door_leaf`); and when
+  the door opens with the wizard or an actor on one of them, that figure
+  steps to the nearest free cell along the row, away from the door, as
+  the leaf swings (`shoved`). Rules out a figure drawn behind the leaf of
+  a door it stands beside.
+- **D126 — A scene painted at night has a morning picture: its sky, its
+  windows and its outside by day.** Decided 2026-10-30 by the owner. A
+  scene painted at night that a morning story plays on, or that a night
+  spent in it ends in, has a second ground (`grounds.morning`): the night
+  painting with the sky above its walls, the sky in every window and
+  everything outside the walls (grass, towers, battlements) painted by
+  day and taken in boxes (D88), the inside as painted, candles and torches
+  as they are. A story under the morning light (`light`, D124) draws that
+  ground, and the dawn of D124 crossfades the night ground into it under
+  the warm light. Rules out a morning told under a night sky, and a scene
+  painted twice.

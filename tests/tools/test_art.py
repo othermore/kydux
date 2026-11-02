@@ -473,6 +473,23 @@ def test_a_mask_s_edge_is_moved_onto_its_thing_s_outline():
     assert (edged & thing).sum() >= 0.99 * thing.sum()
 
 
+def test_a_quilt_takes_its_sheet_s_line_and_not_the_pillow_s_beside_it():
+    picture = np.full((100, 80, 3), (230, 220, 210), dtype=np.uint8)
+    ink = (25, 20, 30)
+    picture[10:91, 50:54] = ink  # the sheet's edge
+    picture[10:91, 60:64] = ink  # the pillow's, beside it
+    picture[40:46, 54:60] = ink  # where the two lines touch
+    picture[10:91, 30:33] = ink  # the line between the sheet and the quilt
+    marked = np.zeros((100, 80), dtype=bool)
+    marked[10:91, 10:50] = True
+    marked[60:81, 46:50] = False  # Gemini's magenta short of the sheet's line
+    marked[10:91, 30:33] = False
+    edged = image_first.lined(marked, picture, 192)
+    assert edged[10:91, 10:54].all()
+    assert not edged[:, 57:].any()
+    assert not edged[:10].any() and not edged[91:].any()
+
+
 def swept(painting: np.ndarray, walked: np.ndarray, layers: list) -> tuple:
     """A drawn scene for the sweep: its painting, the cells walked on, its layers."""
     rows, columns = walked.shape

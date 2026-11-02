@@ -1446,8 +1446,12 @@ one overturns stays, marked as superseded.
   folded over it at the pillow's end. Its cover, the static thing drawn
   over the sleeper (`cover`), is the quilt and the sheet together, from the
   sheet's dark line by the pillow to the foot, marked in magenta with the
-  pillow left out, so that the line stays seen over the sleeper; the head's
-  point is the pillow's middle. A sleeper lies just over the bed's frame
+  pillow left out. Its mask takes only the outline its magenta touches
+  (`image_first.lined`), so that the sheet's line stays seen over the
+  sleeper, and the pillow, its outline and the strip of bed beside the
+  sheet stay under the head. The head's point is the pillow's middle, as
+  far from the sheet's line in every bed, so that the face lies whole on
+  the pillow and the shoulders show over the sheet. A sleeper lies just over the bed's frame
   and its cover just over the sleeper, all under a figure standing on the
   bed's row. Rules out a sleeper between the sheet and the quilt.
 - **D98 — Every figure walks through every door with room to spare.**

@@ -162,10 +162,13 @@ owner on 2026-10-26, for every scene from the dormitory on:
   row's, standing on no cell. A scene's `lowered` cells draw a figure
   lower, so that a counter on the row below hides its legs.
 - **A bed's cover is its quilt and its folded sheet** (D97), from the
-  sheet's dark line by the pillow to the foot, the pillow left out; the
-  pillow's middle is the head's point in `cut.json`'s `beds`. A sleeper
-  lies over the bed's frame and under its cover, with the head on the
-  pillow and the sheet's line over the body.
+  sheet's dark line by the pillow to the foot, the pillow left out. Its
+  mask takes only its own line (`image_first.lined`), so that the pillow's
+  line and the strip of bed beside the sheet stay under the head. The
+  pillow's middle is the head's point in `cut.json`'s `beds`, as far from
+  the sheet's line in every bed. A sleeper lies over the bed's frame and
+  under its cover, with the head on the pillow and the sheet's line over
+  the body.
 
 ## The rules for the cut-outs
 

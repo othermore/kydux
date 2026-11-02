@@ -272,9 +272,12 @@ def static_alpha(
             # Gemini's magenta is the thing, whole: the outline beside it comes in
             # and nothing is taken away, so that no part of it is lost and the floor
             # seen through open work stays the floor. A flame Gemini painted apart
-            # from its candle is a small piece of it, and kept; only specks go.
+            # from its candle is a small piece of it, and kept; only specks go. A
+            # bed's quilt, drawn over its sleeper, takes only the line it touches:
+            # the pillow's beside its sheet stays under the sleeper's head (D97).
             mask = kept(paint, MARK_SPECK)
-            mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th))
+            rim = image_first.lined if thing.get("cover") else image_first.rimmed
+            mask = rim(mask, painting, cell, image_first.thresholds(th))
             return (mask & inside).astype(np.float32)
         mask = inside & ~paint
         mask = image_first.snapped(mask, painting, cell, image_first.thresholds(th), picture)

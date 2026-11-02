@@ -378,6 +378,44 @@ def rimmed(mask: np.ndarray, painting: np.ndarray, cell: int, th: dict = THRESHO
     return flooded(edged, edged | (dark & ~outside), band)
 
 
+#: How wide an outline a thing takes beside its magenta, at most, in parts of a
+#: cell: its own line, and not the next one where the two touch.
+LINE_WIDTH = 0.03
+
+
+def lined(mask: np.ndarray, painting: np.ndarray, cell: int, th: dict = THRESHOLDS) -> np.ndarray:
+    """A mask Gemini painted inside its thing's outline with only its own outline
+    added: at each end of each of its rows and columns, the gap there and the first
+    outline beyond it, if one lies within SNAP_REACH, no wider than LINE_WIDTH, and
+    a pixel of the line's soft edge; and the lines inside it, between two of its
+    parts, no wider than two LINE_WIDTH. The next line beyond, another thing's,
+    stays out even where the two touch: a bed's quilt takes its sheet's edge, and
+    the pillow's outline beside it is the bed's (D97)."""
+    dark = dark_lines(painting, th)
+    reach = max(1, round(SNAP_REACH * cell))
+    widest = max(1, round(LINE_WIDTH * cell))
+    mask = eroded(dilated(mask, widest), widest)
+    out = mask.copy()
+    # The rows, then the columns, through the transposed views of the same arrays.
+    for ours, lines, into in ((mask, dark, out), (mask.T, dark.T, out.T)):
+        length = ours.shape[1]
+        for i in np.nonzero(ours.any(axis=1))[0]:
+            xs = np.nonzero(ours[i])[0]
+            for end, step in ((xs[0], -1), (xs[-1], 1)):
+                # The pixels beyond this end, outward, as far as its line may lie.
+                ahead = end + step * np.arange(1, reach + widest + 2)
+                ahead = ahead[(ahead >= 0) & (ahead < length)]
+                inked = lines[i, ahead]
+                found = np.nonzero(inked[:reach])[0]
+                if not found.size:
+                    continue
+                first = last = found[0]
+                while last + 1 - first < widest and last + 1 < len(ahead) and inked[last + 1]:
+                    last += 1
+                into[i, ahead[: last + 2]] = True
+    return out
+
+
 def labels(mask: np.ndarray) -> np.ndarray:
     """Each group of mask pixels that touch, by its number (0 where none): every
     pixel takes the smallest number among its own and its four neighbours',

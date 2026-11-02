@@ -460,6 +460,11 @@ if (root) {
     visible: () => document.visibilityState === 'visible',
     add: (seconds) => progress.addPlayTime(seconds),
   });
+  // A screen opened again where it is, a level from its own stop on the map (D131).
+  document.addEventListener('kydux:reopen', () => {
+    shownRoute = null;
+    route();
+  });
   document.addEventListener('kydux:language', () => {
     // The header and footer are drawn again; the screen keeps what it holds and
     // only says its words again.

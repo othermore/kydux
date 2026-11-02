@@ -535,8 +535,8 @@ one overturns stays, marked as superseded.
   serves the tests; a remote store can come later behind the same
   interface. The document has a `version`; one of another version, or
   none, is read as the defaults, and each field read back is checked for
-  its shape. The language chosen, the settings, the code typed in each
-  level, the hints shown, whether a level was tried, its stars, the start
+  its shape. The language chosen, the settings, the hints shown in each
+  level, whether a level was tried, its stars, the start
   cards seen and the item last opened all live in it, so that export and
   import carry everything, and nothing else in the page keeps state: i18n
   keeps the language where the game tells it to (`keepLanguageIn`). A

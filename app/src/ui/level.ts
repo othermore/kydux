@@ -244,15 +244,15 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     ]),
   ]);
 
-  // The editor keeps what the child typed in the progress document; the
-  // starting code, while untouched, follows the language.
-  const saved = kept.code;
-  let typed = saved !== undefined && saved !== text.starting_code;
+  // The editor opens on the level's starting code, as the first time (D131): what
+  // the child types is kept while the screen is open, through Run, Restart and Play
+  // again, and the starting code, while untouched, follows the language.
+  let typed = false;
   // After the name of something the child's code holds and a dot, the editor
   // offers what the level teaches of it, with the notebook's words.
   const entries = notebookEntries(loaded.level, parts.table, loaded.course);
   const editor = parts.createEditor(editorParent, {
-    doc: typed && saved ? saved : text.starting_code,
+    doc: text.starting_code,
     label: t('level.code_label'),
     complete: (context) => {
       const before = context.matchBefore(/\b(\w+)\.\w*$/);
@@ -273,7 +273,6 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     onRun: () => runCode(),
     onChange: (doc) => {
       typed = doc !== text.starting_code;
-      progress.setCode(loaded.id, doc);
     },
   });
 
@@ -457,7 +456,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         // The runs before this one in this visit cost the first-try star (D57).
         const verdict = judge({ world: snapshot.world, hintsShown, misses: Math.max(0, runsHere - 1) });
         const kept = progress.levelProgress(loaded.id).stars ?? 0;
-        progress.markWon(loaded.id, verdict.earned, editor.getDoc());
+        progress.markWon(loaded.id, verdict.earned);
         // Continue, on the start screen, goes to what comes after.
         if (parts.next) progress.setCurrent(parts.next);
         showWin(verdict, kept);
@@ -495,7 +494,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       onGo: (hash) => {
         if (controller.snapshot.canStop && !window.confirm(t('map.leave_run'))) return;
         closeMap();
-        location.hash = hash;
+        // The level's own stop opens it again, from its starting code (D131).
+        if (hash === location.hash) document.dispatchEvent(new CustomEvent('kydux:reopen'));
+        else location.hash = hash;
       },
     });
     const layer = element('div', { id: 'map-overlay', className: 'map-overlay' }, [screen.node]);

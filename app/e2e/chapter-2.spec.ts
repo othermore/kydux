@@ -128,10 +128,23 @@ test.describe('in the dormitory (D84)', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText(solution('your-bed'));
     await page.locator('#run').click();
-    await expect(scene).toHaveAttribute('data-asleep', /wizard:bed_2(,|$)/, { timeout: 60_000 });
-    // A tick apart at speed 1: walking along the bed, lying down, lying.
-    for (const shot of [1, 2, 3]) {
-      await page.waitForTimeout(shot === 1 ? 200 : 400);
+    // From the moment the wizard goes to bed, waited for frame by frame, as an
+    // expect's polls come late: walking along the bed, lying down, lying, a tick of
+    // 400 ms apart at speed 1, each shot taken a little before its moment.
+    for (const [shot, at] of [
+      [1, 80],
+      [2, 520],
+      [3, 950],
+    ] as const) {
+      await page.waitForFunction(
+        (after) => {
+          const seen = (window as unknown as { kyduxAsleep: [string, number][] }).kyduxAsleep;
+          const begun = seen.find(([state]) => state === 'wizard:bed_2');
+          return begun !== undefined && performance.now() - begun[1] >= after;
+        },
+        at,
+        { timeout: 60_000, polling: 'raf' },
+      );
       await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-sleep-${shot}.png` });
     }
     await expect(scene).toHaveAttribute('data-asleep', /wizard:bed_2:lying/, { timeout: 15_000 });
@@ -241,6 +254,13 @@ test.describe('in the dormitory (D84)', () => {
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
     await expect(scene).toHaveAttribute('data-asleep', 'mate:bed_1:lying');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-mate.png` });
+    // Zoomed out, the windows with the morning sky in them, the fire and the
+    // candles out (D126).
+    while ((await page.locator('#zoom-out').count()) > 0 && (await page.locator('#zoom-out').isEnabled())) {
+      await page.locator('#zoom-out').click();
+    }
+    await page.waitForTimeout(600);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-morning-story.png` });
     await storyNext(page);
     await expect(scene).not.toHaveAttribute('data-asleep', /mate/);
     await expect(scene).toHaveAttribute('data-actors', /mate:16,5/);
@@ -262,13 +282,6 @@ test.describe('in the dormitory (D84)', () => {
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
     await expect(scene).toHaveAttribute('data-light', 'morning');
     await expect(scene).toHaveAttribute('data-ground', 'morning');
-    // Zoomed out, the windows with the morning sky in them, the fire and the
-    // candles out (D126).
-    while ((await page.locator('#zoom-out').count()) > 0 && (await page.locator('#zoom-out').isEnabled())) {
-      await page.locator('#zoom-out').click();
-    }
-    await page.waitForTimeout(600);
-    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-morning-story.png` });
   });
 });
 

@@ -29,6 +29,27 @@ test('the map shows the course in order: the first stop open, the rest locked', 
   await expect(gate.locator('a')).toHaveCount(0);
 });
 
+test('a level won and opened again from the map starts from its starting code (D131)', async ({ page }) => {
+  await page.goto('/#level/the-long-corridor');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  const starting = await page.locator('.cm-content').innerText();
+  await page.locator('#speed').selectOption('4');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_right(8)');
+  await page.locator('#run').click();
+  await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+  // Play again keeps the program the child typed, while the screen is open.
+  await page.locator('#again').click();
+  await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(8)');
+  await page.locator('#level-map').click();
+  await stop(page, 'level:the-long-corridor').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('.cm-content')).toHaveText(starting);
+  expect(starting).not.toContain('move_right(8)');
+});
+
 test('a won level is done with its stars, and opens the next stop', async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();

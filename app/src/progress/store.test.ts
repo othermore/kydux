@@ -105,10 +105,18 @@ describe('export and import', () => {
 describe('the helpers', () => {
   beforeEach(() => progress.useStore(new LocalProgressStore(memoryStorage())));
 
-  it('keep the most stars a level has earned, and its winning code', () => {
-    progress.markWon('a', 2, 'two');
-    progress.markWon('a', 1, 'one');
-    expect(progress.levelProgress('a')).toEqual({ won: true, stars: 2, code: 'one' });
+  it('keep the most stars a level has earned, and no program (D131)', () => {
+    progress.markWon('a', 2);
+    progress.markWon('a', 1);
+    expect(progress.levelProgress('a')).toEqual({ won: true, stars: 2 });
+  });
+
+  it('leave a program an older saved game kept as it was, and add none (D131)', () => {
+    const saved = defaultProgress();
+    saved.levels.a = { won: true, stars: 1, code: 'wizard.move_right(6)\n' };
+    progress.save(saved);
+    progress.markWon('a', 3);
+    expect(progress.levelProgress('a')).toEqual({ won: true, stars: 3, code: 'wizard.move_right(6)\n' });
   });
 
   it('remember the start cards seen, the hints shown and the settings', () => {

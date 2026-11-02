@@ -22,7 +22,8 @@ export interface LevelProgress {
   won?: boolean;
   /** The most stars a run of the level has earned. */
   stars?: number;
-  /** The last code typed in the level. */
+  /** A program an older saved game kept for the level: read, so that such a game
+   * loads, and never shown, since a level opens on its starting code (D131). */
   code?: string;
   /** How many hints have been shown. */
   hints?: number;

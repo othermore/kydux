@@ -95,12 +95,12 @@ function editLevel(id: string, edit: (level: LevelProgress) => void): void {
   });
 }
 
-/** A won run: the level won, the most stars kept, and the code that won it. */
-export function markWon(id: string, stars: number, code: string): void {
+/** A won run: the level won, and the most stars kept. The program is not kept: a
+ * level opened again starts from its starting code (D131). */
+export function markWon(id: string, stars: number): void {
   editLevel(id, (level) => {
     level.won = true;
     level.stars = Math.max(level.stars ?? 0, stars);
-    level.code = code;
   });
 }
 
@@ -108,12 +108,6 @@ export function markWon(id: string, stars: number, code: string): void {
 export function markTried(id: string): void {
   editLevel(id, (level) => {
     level.tried = true;
-  });
-}
-
-export function setCode(id: string, code: string): void {
-  editLevel(id, (level) => {
-    level.code = code;
   });
 }
 

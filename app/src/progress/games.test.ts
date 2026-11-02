@@ -43,7 +43,7 @@ describe('GamesStore (D70)', () => {
 
   it('keeps each game apart, and plays the one chosen from where it was left', () => {
     progress.setWizard(ANA);
-    progress.markWon('the-gate', 3, 'x');
+    progress.markWon('the-gate', 3);
     const ana = games.current() as string;
     progress.newGame();
     expect(progress.wizard()).toBeNull();

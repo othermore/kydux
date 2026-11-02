@@ -66,11 +66,11 @@ test('Ilda goes out by the door and shuts it as the friend goes to the other dor
   await page.goto('/#story/the-first-night');
   const scene = page.locator('#scene');
   // The three stand before the door; the mate waits in the wizard's dormitory.
-  await expect(scene).toHaveAttribute('data-actors', /ilda:12,12/);
+  await expect(scene).toHaveAttribute('data-actors', /ilda:12,11/);
   await expect(scene).toHaveAttribute('data-actors', /mate:16,6/);
   await storyNext(page, 3);
   await expect(scene).toHaveAttribute('data-speaker', 'friend');
-  await expect(scene).toHaveAttribute('data-actors', /ilda:12,12/);
+  await expect(scene).toHaveAttribute('data-actors', /ilda:12,11/);
   await storyNext(page);
   // Ilda's walk is the longest: she is gone once it ends, the door shut behind her.
   await expect(scene).not.toHaveAttribute('data-actors', /ilda/, { timeout: 30_000 });

@@ -47,7 +47,6 @@
     "wizard.move_down",
     "wizard.wait",
     "teacher.facing",
-    "teacher.position",
     "teacher.can_see"
   ],
   "goals": [

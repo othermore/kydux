@@ -51,10 +51,10 @@
       "kind": "ghost",
       "id": "eldra",
       "at": [
-        3,
-        11
+        11,
+        10
       ],
-      "facing": "right"
+      "facing": "down"
     }
   ],
   "api": [

@@ -8,7 +8,7 @@
   "hints": [
     "Usa `find_nearest` con la palabra \"book\" para encontrarlo, guárdalo bajo un nombre y usa `reveal` en él.",
     "Camina hasta donde brilla: sube por la puerta, ve a la derecha hasta el pasillo, sube y entra entre las dos estanterías, y sigue a la izquierda; allí usa el método `pick_up`.",
-    "Sube hasta Eldra, junto a su sillón, y usa el método `give` con el nombre de tu variable para darle el libro."
+    "Sal del pasillo por su extremo derecho y sube hasta Eldra, que te espera flotando a la salida; usa el método `give` con el nombre de tu variable para darle el libro."
   ],
   "intro": "Eldra, la fantasma, perdió un libro hace mucho tiempo. Debe de haberse colado en el pasillo entre las dos grandes estanterías, donde nadie puede verlo. Encuéntralo con `find_nearest`, haz que brille y llévaselo.",
   "outro": "¡Gracias! Eldra está muy contenta de tener su libro de vuelta.",

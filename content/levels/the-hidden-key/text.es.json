@@ -9,8 +9,8 @@
   "starting_code": "# La llave de la puerta está debajo de la gran estantería.\n",
   "hints": [
     "Encuentra la llave con `find_nearest` y usa `reveal` en ella.",
-    "Camina hasta donde brilla: baja al pasillo que hay junto a la estantería y usa `pick_up` desde allí, a su lado.",
-    "Camina hacia la puerta cerrada, usa su método `open` y pasa."
+    "Camina hasta donde brilla: baja al pasillo que hay entre las dos estanterías y recórrelo hacia la izquierda; usa `pick_up` desde allí, a su lado.",
+    "Vuelve por el pasillo hasta su extremo derecho, sube a la sala, camina hasta la puerta cerrada, usa su método `open` y pasa."
   ],
   "intro": "El camino sigue por esa puerta cerrada. Su llave cayó bajo la gran estantería hace mucho tiempo, donde nadie puede verla. Encuéntrala, muestra dónde está, recógela, abre la puerta y pasa.",
   "outro": "¡Bien hecho! La puerta está abierta, y el pasillo superior está justo delante.",

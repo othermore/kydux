@@ -9,8 +9,8 @@
   "starting_code": "# The door's key is under the big bookcase.\n",
   "hints": [
     "Find the key with `find_nearest` and `reveal` it.",
-    "Walk to where it glows, down into the aisle beside the bookcase, and `pick_up` from beside it.",
-    "Walk to the locked door, use its `open` method, and go through."
+    "Walk to where it glows: down into the aisle between the two bookcases and left along it; `pick_up` from there, beside it.",
+    "Go back along the aisle to its right end, up into the hall, walk to the locked door, use its `open` method, and go through."
   ],
   "intro": "The way goes on through that locked door. Its key fell under the big bookcase long ago, where no one can see it. Find it, show where it is, pick it up, open the door, and go through.",
   "outro": "Well done! The door is open, and the top aisle is just ahead.",

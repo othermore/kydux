@@ -4,7 +4,7 @@
   "scene": "the-dormitory",
   "wizard": [
     11,
-    12
+    11
   ],
   "camera": [
     12,
@@ -16,7 +16,7 @@
       "kind": "friend",
       "at": [
         10,
-        12
+        11
       ],
       "facing": "up"
     },
@@ -25,7 +25,7 @@
       "kind": "friend",
       "at": [
         12,
-        12
+        11
       ],
       "facing": "left"
     },

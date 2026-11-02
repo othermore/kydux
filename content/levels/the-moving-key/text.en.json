@@ -4,7 +4,7 @@
     "Give Wenna the key.",
     "Write no number at all."
   ],
-  "starting_code": "# This is yesterday's program, but the key has moved!\nwizard.move_left(4)\nwizard.pick_up()\nwizard.move_right(4)\nwizard.give(key)\n",
+  "starting_code": "# This is yesterday's program, but the key has moved!\nkey = wizard.find_nearest(\"key\")\nwizard.move_left(4)\nwizard.pick_up()\nwizard.move_right(4)\nwizard.give(key)\n",
   "hints": [
     "First, ask the key for its `distance_to` you. Keep that number under a name, a variable.",
     "Put your new variable inside the brackets of the `move_left` method.",

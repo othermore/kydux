@@ -3,7 +3,7 @@
   "kind": "practice",
   "scene": "the-library",
   "start": [
-    4,
+    11,
     11
   ],
   "speaker": "wenna",
@@ -38,16 +38,16 @@
       "kind": "friend",
       "id": "wenna",
       "at": [
-        6,
-        11
+        10,
+        10
       ]
     },
     {
       "kind": "friend",
       "id": "mate",
       "at": [
-        5,
-        11
+        9,
+        10
       ]
     }
   ],

@@ -35,7 +35,7 @@ test.describe('the hidden key', () => {
   });
 
   test('what the code prints shows in the card', async ({ page }) => {
-    await run(page, 'wizard.move_down(2)\nwizard.move_left()\nwizard.pick_up()\nprint(wizard.items)');
+    await run(page, 'wizard.move_down(2)\nwizard.move_left(8)\nwizard.pick_up()\nprint(wizard.items)');
     await expect(page.locator('.printed')).toHaveText('[<key key carried>, <wand wand carried>]');
   });
 
@@ -59,7 +59,7 @@ test.describe('the hidden key', () => {
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('wizard.move_up()\nwizard.move_right(3)\nwizard.move_up()\ndoor.open()');
+    await page.keyboard.insertText('wizard.move_left(4)\nwizard.move_up(2)\ndoor.open()');
     await page.locator('#run').click();
     // The shake is short: looked for often, before the thought, which stays.
     await expect
@@ -70,15 +70,15 @@ test.describe('the hidden key', () => {
       'I cannot open the door: it is locked, and I have no key for it.',
     );
     await expect(page.locator('.outcome-text')).toContainText(
-      'On line 4: I cannot open the door: it is locked',
+      'On line 3: I cannot open the door: it is locked',
       { timeout: 30_000 },
     );
   });
 
   test('a locked door stays shut without its key', async ({ page }) => {
-    const said = await run(page, 'wizard.move_up()\nwizard.move_right(3)\nwizard.move_up()\ndoor.open()\nwizard.move_up(3)');
+    const said = await run(page, 'wizard.move_left(4)\nwizard.move_up(2)\ndoor.open()\nwizard.move_up(3)');
     expect(said).toBe(
-      'Not yet: 0 of 3 goals met. Try again.\nOn line 4: I cannot open the door: it is locked, and I have no key for it.',
+      'Not yet: 0 of 3 goals met. Try again.\nOn line 3: I cannot open the door: it is locked, and I have no key for it.',
     );
     await expect(scene(page)).toHaveAttribute('data-doors', '');
     await expect(scene(page)).toHaveAttribute('data-wizard', '7,9');

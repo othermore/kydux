@@ -40,7 +40,6 @@
     "wizard.move_up",
     "wizard.move_down",
     "teacher.facing",
-    "teacher.position",
     "teacher.can_see"
   ],
   "goals": [

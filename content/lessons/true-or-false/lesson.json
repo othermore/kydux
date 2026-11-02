@@ -3,7 +3,6 @@
   "speaker": "friend",
   "teaches": [
     "teacher.facing",
-    "teacher.position",
     "teacher.can_see"
   ]
 }

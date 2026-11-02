@@ -8,7 +8,7 @@
   "hints": [
     "Use `find_nearest` with the word \"book\" to find it, keep it under a name, and `reveal` it.",
     "Walk to where it glows: up through the door, right to the passage, up into the aisle between the bookcases and left along it, then use the `pick_up` method.",
-    "Go up to Eldra, beside her armchair, and use the `give` method with your variable's name to hand her the book."
+    "Leave the aisle by its right end and go up to Eldra, who waits floating at the way out; use the `give` method with your variable's name to hand her the book."
   ],
   "intro": "Eldra, the ghost, lost a book long ago. It must have slipped into the aisle between the two big bookcases, where no one can see it. Find it with `find_nearest`, make it glow, and bring it to her.",
   "outro": "Thank you! Eldra is very happy to have her book back.",

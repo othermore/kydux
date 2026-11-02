@@ -1013,7 +1013,10 @@ one overturns stays, marked as superseded.
   begins, on the same tile, and what an earlier level opened or took stays
   as the story has it: a door opened is a door `open` from the start, a
   thing picked up is `carrying`; the content tests hold each level on a
-  scene to start where the one before it on the same scene ended. Chapter
+  scene to start where the one before it on the same scene ended. An
+  improve level that plays the level before it again from its start, the
+  program just repaired given to do more (*Eldra's door* after *The moving
+  key*, the owner, 2026-11-01), begins where that level began. Chapter
   1 is the scene `the-gate`, chapter 2 `the-library`, chapter 3
   `the-passages` and `the-night-passages`. Rules out one map per level,
   which showed the same gate nine times from nine angles.

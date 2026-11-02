@@ -1,0 +1,23 @@
+{
+  "title": "Eldra's door",
+  "goals": [
+    "Pick up the key.",
+    "Open the door.",
+    "Stand in front of it.",
+    "Write only one number."
+  ],
+  "starting_code": "key = wizard.find_nearest(\"key\")\nsteps = key.distance_to(wizard)\nwizard.move_left(steps)\nwizard.pick_up()\n\n# Come back to where you started, with `move_right` and the same name.\n\n# Walk left to the door: it is five steps from where you started.\n\n# Open it with `open`.\n",
+  "hints": [
+    "Come back with `move_right` and the very same name the walk there used, since the program cannot know the number.",
+    "A door only listens to who stands right beside it: walk to it before you open it.",
+    "Walk back with the name, then five steps left to the door, and `open` it."
+  ],
+  "intro": "But wait: what if, besides taking the key, you want to open the door? Let's practise it! Let's try again from the start, but this time, once you have the key, go to the door and open it. The program from before is already written for you.",
+  "outro": "The door is open and the key is in your hand! Eldra's little room is waiting, where her other lost book lies.",
+  "learned": "Now you know that one name can be used as many times as the program needs, and that a program that works can be made to do more.",
+  "ways": {
+    "near": "The key is near",
+    "middle": "The key is halfway",
+    "far": "The key is far"
+  }
+}

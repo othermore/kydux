@@ -1,5 +1,3 @@
 key = wizard.find_nearest("key")
 wizard.move_left(2)
 wizard.pick_up()
-wizard.move_right(2)
-wizard.give(key)

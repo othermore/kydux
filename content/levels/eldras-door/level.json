@@ -1,6 +1,6 @@
 {
-  "id": "the-wrong-order",
-  "kind": "fix",
+  "id": "eldras-door",
+  "kind": "improve",
   "scene": "the-library",
   "start": [
     7,
@@ -12,10 +12,19 @@
   ],
   "speaker": "wenna",
   "carrying": [
-    "wand",
-    "key"
+    "wand"
   ],
   "things": [
+    {
+      "kind": "key",
+      "id": "key",
+      "at": [
+        3,
+        6
+      ],
+      "opens": "door",
+      "art": "room_key"
+    },
     {
       "kind": "door",
       "id": "door",
@@ -45,6 +54,44 @@
       ]
     }
   ],
+  "ways": [
+    {
+      "id": "near",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            5,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "middle",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            3,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "far",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            1,
+            6
+          ]
+        }
+      ]
+    }
+  ],
   "api": [
     "wizard.move_right",
     "wizard.move_left",
@@ -62,12 +109,21 @@
   ],
   "goals": [
     {
+      "kind": "collect",
+      "id": "key"
+    },
+    {
       "kind": "open",
       "id": "door"
     },
     {
       "kind": "reach",
       "marker": "E"
+    },
+    {
+      "kind": "numbers_under",
+      "count": 2,
+      "bonus": true
     }
   ],
   "tick_limit": 100

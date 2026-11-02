@@ -1,6 +1,6 @@
 {
   "id": "the-moving-key",
-  "kind": "improve",
+  "kind": "fix",
   "scene": "the-library",
   "start": [
     7,
@@ -105,9 +105,8 @@
   ],
   "goals": [
     {
-      "kind": "give",
-      "id": "key",
-      "to": "wenna"
+      "kind": "collect",
+      "id": "key"
     },
     {
       "kind": "numbers_under",

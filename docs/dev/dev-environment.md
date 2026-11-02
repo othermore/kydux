@@ -622,10 +622,32 @@ changing thing from its edits, and writes `content/art/scenes/<scene>/`:
 
 It ends by checking the scene. It writes check pictures into
 `art/raw/game-check/`, among them `all-the-field.png`, the wizard on
-every cell walked on, and it fails if a cut-out would show a figure a
-problem. Look at the pictures before committing: every figure should be
-hidden by what stands in front of it and drawn over what stands behind
-it. `export_scene.py the-field check` checks again without cutting.
+every cell walked on, each cell numbered, the number yellow where the
+wizard is wholly hidden. It fails if a cut-out would show a figure a
+problem, and prints each problem with its cell:
+
+- `floating`, `lawn`, `hole`: a shadow or a patch of lawn drawn over a
+  figure, or a gap in a crown that shows it;
+- `fringe`: the ground beyond a thing's outline cut with the thing;
+- `bare`: a thing's black outline left on the ground beside it;
+- `spill`: one thing drawn partly in front of a figure and partly behind
+  it, cut across a row's edge.
+
+Look at the pictures before committing: every figure should be hidden
+by what stands in front of it and drawn over what stands behind it.
+`export_scene.py the-field check` checks again without cutting. When a
+problem is in the painting itself, the scene's `cut.json` says how to
+cut it there (art/README.md, "The rules for the cut-outs").
+
+An indoor scene's things are marked by Gemini in flat magenta. The
+scene's settings say the crops and the pictures (`marks`). This lays
+the pictures on the painting, where the export reads them:
+
+```sh
+.venv/bin/python tools/art/repaint.py the-library marks
+```
+
+It prints the pictures it wrote. Then export the scene again.
 
 A scene is painted beyond its playable area too, so that zooming out
 never shows the frame's colour. The margin is painted by Gemini on a

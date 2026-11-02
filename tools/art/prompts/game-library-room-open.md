@@ -1,9 +1,9 @@
 ---
-candidate: game-library
+candidate: game-library6
 service: gemini
 model: gemini-3-pro-image
-image: art/raw/game-library/game-library-nogrid.png
-aspect_ratio: 2:3
-image_size: 4K
+image: art/raw/game-library6/open-room-canvas.png
+aspect_ratio: 1:1
+image_size: 2K
 ---
-Edit this picture of a library seen from above: the small locked wooden door at the top left, the door of the tiny room with one shelf, is now open: paint it swung open against the wall, showing the dark doorway. Change nothing else at all: everything else in the picture, every wall, floor, piece of furniture, door, window, lamp, shadow, colour, stays exactly where it is and exactly as it is, pixel for pixel, with the same shapes, sizes and places. The picture keeps exactly the same size and framing.
+Edit this picture of a library seen from above at an angle. In the grey stone wall there is a closed wooden door in a stone archway. Open the door wide: it swings away from us into the room beyond, so that only its edge shows, upright against the left side of the archway. Through the open archway we see the small room beyond the wall: its dark wooden floorboards, lit as that little room above the wall is, going on through the doorway. Nothing in the doorway is dark or black: it shows that floor. The stone archway keeps exactly its shape, its stones and its dark outline. Change nothing else at all: the wall, the archway's stones, the bookcases, the lamps, the tables, the floor and the light stay exactly as they are, with the same shapes, sizes, colours and places, pixel for pixel. The same painted cartoon style, bold dark outlines, soft shading. No text, no grid, no lines between cells, no figures.

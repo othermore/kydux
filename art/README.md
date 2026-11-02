@@ -139,21 +139,33 @@ owner on 2026-10-26, for every scene from the dormitory on:
   `tools/art/prompts/`); then `repaint.py <scene> join <picture>` takes only
   the boxes and the band from the model's picture, the painting pixel for
   pixel elsewhere.
-- **Indoors, what a figure passes under or behind is a static thing**
-  (D89): an arch over a doorway, a wall's top, a bed's quilt. It is a box
-  in `cut.json` with `"static": true`, the row it covers from, and its
-  mask: `"pale"` takes the light stone or plaster inside the box and its
-  dark outline, `"box"` the whole box. No edit is needed, so the painting
-  stays as chosen. Furniture against a wall that no one walks beside is
-  ground, its cells not walked on, and so is an opening narrower than a
-  figure. Where something must stand in front of a figure and be taken
-  away (Eldra's armchair, which hides the key), its ground is the
-  painting with only that thing taken out, from the model's edit without
-  it laid on a crop of the corner, so that nothing else differs.
-- **A bed has its quilt and its pillow** (D91): a static box over the
-  quilt from the pillow to the foot, and the pillow's point, in `cut.json`'s
-  `beds`; a pupil asleep lies there with the head on the pillow, under
-  the quilt.
+- **What stands in front of a figure and never changes is a static thing**
+  (D89): a bed, an armchair, a counter, a bookcase, a lamp, a wall. It is
+  marked flat magenta by Gemini (the owner's way): the scene's settings'
+  `marks` give the crops of the painting Gemini is given, each asked to
+  turn only the named things magenta and to redraw nothing, and
+  `tools/art/repaint.py <scene> marks` lays each answer on the painting,
+  whole and then part by part, its outlines onto the painting's. A part is
+  asked three times or more and is magenta where most tries agree: each
+  try strays somewhere else. The thing is its magenta whole, with the
+  painting's outline beside it (`"mask": "marked"`); a wall cut round its
+  openings is its box less the magenta (`"unmarked"`); a wall a model
+  cannot paint flat is a polygon in cells, each edge on its outline
+  (`"polygon"`). Things that lie on other things, a bed's covers, are marked
+  in a set of their own (`sets`). Ask Gemini to name every small part, the
+  candles and their flames too: it leaves out what the prompt does not
+  name.
+- **Where a thing is drawn among the figures** (D95): on the row of its
+  foot, over the figures standing above it; a door and its arch
+  (`"under"`) over the figure in its doorway too; a wall seen from above
+  (`"over"`) over every figure; what hangs on a wall (`"hangs"`) as its
+  row's, standing on no cell. A scene's `lowered` cells draw a figure
+  lower, so that a counter on the row below hides its legs.
+- **A bed's cover is its quilt and its folded sheet** (D97), from the
+  sheet's dark line by the pillow to the foot, the pillow left out; the
+  pillow's middle is the head's point in `cut.json`'s `beds`. A sleeper
+  lies over the bed's frame and under its cover, with the head on the
+  pillow and the sheet's line over the body.
 
 ## The rules for the cut-outs
 
@@ -179,7 +191,24 @@ row its foot stands on.
   the tree's; the stones stand on the wall's row.
 - **What opens or is picked up is cut against its edit without it.** A
   gate that opens must leave no ghost bars, and a wand picked up must
-  leave its stone whole.
+  leave its stone whole. An open door shows the floor of the room beyond,
+  from Gemini's edit of the doorway alone, laid on the painting.
+- **A cut-out ends at the outer edge of its outline** (D93): the outline is
+  the thing's, and nothing of the ground beyond it is (`fringe` and `bare`
+  in the sweep). Every mask is moved onto its outline
+  (`image_first.snapped`); a mask drawn inside the outline, Gemini's
+  magenta, has the outline added and nothing taken away
+  (`image_first.rimmed`). A painting whose outlines are not black, a night
+  scene or a brown-lined room, gives its outline's darkness in `cut.json`
+  (`thresholds`, `outline`).
+- **A thing is one thing, on the row of its foot** (D94). Where a thing is
+  cut across a row's edge, the figure stands inside it, behind one part and
+  in front of the other (`spill` in the sweep): the scene's settings give
+  the thing its row (`rows`), give a patch of lawn cut as a thing back to the
+  ground (`grounds`), keep a crown whole behind a gap in its outline
+  (`kept`), or fill its holes (`whole`). Where the sweep flags what is the
+  thing all the same (a light stone top with no line on it), `kept` says so,
+  and the commit names it.
 
 Look at every check picture before committing. Each shows a figure behind
 and in front of a row's things, and `all-<scene>.png` the wizard on every
@@ -228,6 +257,37 @@ look for them in the picture before cutting it.
 
 The rules the sweep checks (`floating`, `lawn`, `hole`) catch the first
 three when they go wrong over a cell walked on; the others it cannot see.
+
+## What a scene is painted for
+
+The three sprints that went to chapter 2's scenes went to things the
+paintings asked of the cut (D99). A scene still to paint keeps to these, in
+its prompt and in the choice among Gemini's tries:
+
+- **The floor a figure walks is open.** Furniture stands against the top
+  wall or in the corners, where no figure walks beside or behind it. A
+  thing in the middle of the floor costs a mask to make and to check; one a
+  scene at most, and only where the story needs it.
+- **Doors are doorways.** A door a figure walks through is in a wall seen
+  from the front, with an arch at least two cells wide and a fifth of a
+  cell taller than the tallest figure; open, it shows the floor of the
+  room beyond, lit. No slits in walls seen from above: a wall between rooms
+  is seen from the front, or the rooms are two scenes.
+- **Shelves are one row, against a wall.**
+- **Nothing hangs from what the picture does not show.** A lamp is on a
+  wall or a stand, or ends at its ring.
+- **No one is painted into the scene.** A keeper or a teacher is a figure
+  the page places; a counter stands where the figure behind it is drawn
+  whole, or lowered behind it.
+- **Every thing has its outline closed, black, and its base in its own
+  cells.** A rock's base, a tree's roots and a bed's foot end in the cells
+  the map marks not walked on.
+- **Things stand apart**: a chair is not tucked under a table, a torch is
+  on the wall, a book is on the floor, not against a shelf.
+- **Each thing is marked in magenta when the painting is chosen**, three
+  tries a part, every small part named, so that no scene is cut by colour.
+- **Figures fit** (D98): a child at most 1.15 cells, a grown-up at most
+  1.45, every door a tenth of a cell taller than who walks through it.
 
 ## The figures
 

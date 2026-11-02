@@ -15,11 +15,18 @@ later, like the rest of it.
   cells on each side, on a canvas made and joined by `tools/art/margin.py`:
   the castle's walls going on, and grass and trees beyond them.
 - Its door arches drawn over whoever passes under them, cut by their pale
-  stone (static things).
+  stone, and its walls by polygons, each edge on its outline (static
+  things).
+- Its counter, bookcases, pile of books, tables, chairs, desk and Eldra's
+  book painted flat magenta by Gemini in crops of the painting
+  (`game-library-marked-*.md`, each asked three times and voted), and cut
+  there with their outlines.
+- Each door open onto the floor of the room beyond, Gemini's edit of the
+  doorway alone (`game-library-centre-open.md`, `-wenna-open.md`,
+  `-room-open.md`).
 - Each thing that opens or is picked up cut against Gemini's edit without it
-  (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`,
-  `-partition-open.md`, `-centre-open.md`, `-room-open.md`); Eldra's own book
-  against the shelf's back carried over it by hand; the armchair and its
+  (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`); Eldra's own
+  book against the shelf's back carried over it by hand; the armchair and its
   table, which stand in front of whoever is behind them, against Gemini's edit
   without them (`game-library-noarmchair.md`).
 - Its cells marked by hand, cut by `tools/art/image_first.py` and exported by

@@ -1333,22 +1333,26 @@ one overturns stays, marked as superseded.
   edge: an edit paints the whole picture again, and once removed the
   library's reading room.
 - **D89 — Indoors, what a figure passes under or behind is cut as a static
-  thing.** Decided 2026-10-26 by the owner, from the check sheets of
-  sprint 15. A raised part of an indoor painting that never changes (an
-  arch a figure walks through, a wall's top, a bed's quilt) is a static
-  thing in `cut.json`: `"static": true`, its box and the row it covers
-  from, and its mask: `"pale"`, the light stone or plaster inside the box
-  with its dark outline; `"box"`, the whole box; or the difference with a
-  `without` edit. The static things of a row are an image of their own,
-  `row-<r>-static`, beside the row's cut things, drawn at the row's depth;
-  the sweep leaves them out of its floating, lawn and hole checks, which
-  are for what the cut makes. A scene with `"cut": false` is its ground and
-  its static things only. What no figure stands beside or behind stays
-  ground, its cells not walked on; an opening narrower than a figure stays
-  ground. The sweep's `all-<scene>.png`, the wizard on every walked-on
-  cell, is the proof. Rules out an indoor scene with no cut-outs, and a
-  Gemini edit a wall: a pale mask needs no picture and keeps the painting
-  as chosen (D88).
+  thing, where Gemini marks it.** Decided 2026-10-26 by the owner, from
+  the check sheets of sprint 15, and on 2026-10-27 how it is marked. A
+  raised part of an indoor painting that never changes (an arch, a wall, a
+  bed, an armchair, a counter, a bookcase, a lamp) is a static thing in
+  `cut.json`: `"static": true`, its box and the row it stands on, and its
+  mask. Gemini is given crops of the chosen painting and asked to turn only
+  the named things flat magenta and to redraw nothing, three tries a crop or
+  more; `tools/art/repaint.py <scene> marks` lays each try on the painting,
+  whole and then part by part, and a pixel is magenta where most tries
+  agree. The thing is its magenta whole with the painting's outline beside
+  it (`"marked"`), a box less the magenta for a wall cut round its openings
+  (`"unmarked"`), or a polygon in cells for a wall (`"polygon"`); the
+  stone's pale colour (`"pale"`) and the whole box (`"box"`) are kept for
+  an arch and a quilt's simple shape. The static things of a row are an
+  image of their own, `row-<r>-static`, drawn at the row's depth, or as
+  D95 says. What no figure stands beside or behind stays ground, its cells
+  not walked on. The sweep's `all-<scene>.png`, the wizard on every
+  walked-on cell, is the proof. Rules out an indoor scene cut by colour,
+  and a Gemini edit without the things, whose repainting moved what it
+  was to keep.
 - **D90 — A friend never wears the wizard's colours, nor the other
   friend's.** Decided 2026-10-26 by the owner. Nuri and Teku each have two
   sets of colours, robe, hat and band (`FRIEND_SETS` in `looks.ts`): Nuri
@@ -1360,24 +1364,22 @@ one overturns stays, marked as superseded.
   `<friend>-a` and `<friend>-b`, and `figureName` picks it. Rules out a
   single colour a friend, which with eight looks always meets one of them,
   and a rule by hue: no saturated colour is far in hue from all eight.
-- **D91 — A pupil asleep lies in the bed, under its quilt.** Decided
+- **D91 — A pupil asleep lies in the bed, under its covers.** Decided
   2026-10-26 by the owner, for the wizard and the friends alike. Every
   wizard sheet has a lying row (13) and each friend's sheet one (4, named
   in figures.json's `sheets`), made from Gemini's edits of the boy's, the
   girl's and each friend's standing frame. A scene's beds are its fixed
-  things; `cut.json` gives each bed its quilt, a static box thing, and its
-  pillow's point, which art.json's `beds` carry with the pillow's side and
-  the quilt's row. The page draws a sleeper's lying frame turned along the
-  bed, the head on the pillow, just under the quilt's row, so that the
-  quilt covers the body; while the wizard lies under it, its outline is
-  off. The wizard lies down by `wizard.sleep()`; an actor of a level or a
+  things; `cut.json` gives each bed its cover, a static thing (D97), and
+  its pillow's point, which art.json's `beds` carry with the pillow's side
+  and the cover's row. The page draws a sleeper's lying frame turned along
+  the bed, the head on the pillow, between the bed's frame and its cover,
+  so that the cover lies over the body; while the wizard lies under it, its
+  outline is off. The wizard lies down by `wizard.sleep()`; an actor of a level or a
   story starts `asleep` in a bed beside its tile (the world takes the bed,
   not free, and lays the sleeper on the bed's own tile, in no one's way),
   and a story's step lays a figure down or gets it up (`{"sleep":
-  "bed_1"}`, `{"wake": true}`). The other pupils of the wizard's dormitory,
-  `pupil_<n>`, are drawn in the other looks of the wizard's gender. Rules
-  out the standing figure turned on top of the bed, and a sleeper only the
-  wizard; a scene without a bed's place, or a sheet without a lying row,
+  "bed_1"}`, `{"wake": true}`). Rules out the standing figure turned on top
+  of the bed, and a sleeper only the wizard; a scene without a bed's place, or a sheet without a lying row,
   keeps that turned figure.
 - **D92 — A painted scene is painted on at its sides when the view would
   run out of it, and the view never reaches past it.** Decided 2026-10-26
@@ -1390,3 +1392,78 @@ one overturns stays, marked as superseded.
   margin fill the canvas, so a window wider than the scene zooms in;
   `data-view` and `data-bounds` say the window and the scene in tiles.
   Rules out a band of the frame's colour beside a story.
+- **D93 — A cut-out ends at the outer edge of its thing's outline.**
+  Decided 2026-10-27 by the owner, from the field's check sheet. Every
+  raised thing in Kydux's art is drawn with a dark outline all round; the
+  outline is of the thing, and nothing of the ground beyond it is. Every
+  mask the export makes is moved onto the outline (`image_first.snapped`):
+  what of it the ground beyond reaches without crossing an outline goes
+  back to the ground, where the painting is as its picture without the
+  thing, and the outline just beyond it comes in; a mask drawn inside its
+  outline, Gemini's magenta (D89), has the outline added and nothing taken
+  away (`image_first.rimmed`). The alpha is the mask itself, softened only
+  by the bringing down to the page's size. The sweep checks it on every
+  cut-out a figure may stand behind, reading the outlines at the painting's
+  own size: `fringe`, the ground beyond the outline in the mask; `bare`, the
+  painting's black line beside the mask left out. A scene whose outlines
+  are not black gives their darkness (`thresholds`, `outline`). Rules out a
+  mask's edge set by a colour threshold, which took grass with a tree and
+  left outlines on the ground.
+- **D94 — A thing is one thing, on the row of its foot.** Decided
+  2026-10-27 by the owner. A thing cut across a row's edge has the figure
+  standing inside it, behind one part and in front of the other; the sweep
+  reports it (`spill`, by the cell the figure stands on), and the scene's
+  settings mend it where the painting asks: `rows`, a part whose things
+  stand on a row; `grounds`, a part given back to the ground (a lawn cut
+  with a tree, a doorway the cut took); `kept`, a part kept whatever the
+  ground beside it, which the sweep does not look at; `whole`, a part whose
+  things' holes are filled; each a box or a polygon in cells. A `kept` part
+  is one the sweep flags and the eye finds right, a light stone top with no
+  line on it, and the commit names it. Rules out a figure over a rock's
+  base and behind its top.
+- **D95 — Doors and arches are over whoever stands in them; a wall seen
+  from above is over everyone; a counter hides half of who stands behind
+  it.** Decided 2026-10-27 by the owner. A thing or a static thing marked
+  `under` (a door, its arch) is drawn at nine tenths of its cell, over the
+  figure standing on its row and under the next row (`depth.ts`); a static
+  thing marked `over` (a wall between rooms, a front wall) over every
+  figure of the scene, the wizard's outline showing through it; one marked
+  `hangs` (a torch) as its row's, standing on no cell. A scene's `lowered`
+  cells draw a figure lower by a part of a cell, at the depth its feet are
+  drawn at, so that a counter on the row below hides its legs: Baro behind
+  the wand bank's. Rules out the wizard over the door it walks through and
+  Baro standing on his counter.
+- **D96 — There are three first-years, and each sleeps in the dormitory
+  of their gender.** Decided 2026-10-27 by the owner. The first-years are
+  the wizard, the friend of the other gender and the mate of the same
+  gender; no other pupil is seen. At the first night's end the friend goes
+  into the other dormitory and lies down, and the mate, waiting by the
+  wizard's arch, goes into the wizard's dormitory and lies down in `bed_1`;
+  then the wizard goes to bed (*Your bed*), and the morning wakes the mate.
+  Rules out pupils no one knows in the wizard's room.
+- **D97 — A sleeper lies under the sheet, head on the pillow.** Decided
+  2026-10-27 by the owner. A bed is painted with a quilt and a white sheet
+  folded over it at the pillow's end. Its cover, the static thing drawn
+  over the sleeper (`cover`), is the quilt and the sheet together, from the
+  sheet's dark line by the pillow to the foot, marked in magenta with the
+  pillow left out, so that the line stays seen over the sleeper; the head's
+  point is the pillow's middle. A sleeper lies just over the bed's frame
+  and its cover just over the sleeper, all under a figure standing on the
+  bed's row. Rules out a sleeper between the sheet and the quilt.
+- **D98 — Every figure walks through every door with room to spare.**
+  Decided 2026-10-27 by the owner. Every figure is drawn at 0.82 of the
+  height it is cut at: a child stands at most 1.15 cells tall, a grown-up
+  at most 1.45 and a third taller, and every door a figure walks through
+  leaves a tenth of a cell over the tallest figure that does (`opening` in
+  the scene's settings, measured on the painting, `adults` where a grown-up
+  walks through); a test asserts it. Rules out a hat over the arch it is
+  passing under.
+- **D99 — A scene is painted for the cut.** Decided 2026-10-27 by the
+  owner, as the lesson of sprints 15 to 17, and written as rules in
+  `art/README.md` ("What a scene is painted for"): open floors, doorways in
+  walls seen from the front, shelves in one row against a wall, nothing
+  hanging from a ceiling not shown, no one painted in, outlines closed and
+  black, bases in their own cells, things apart, every thing marked in
+  magenta when the painting is chosen, and figures that fit. Rules out the
+  furniture, the slits and the double shelves that cost chapter 2's scenes
+  three sprints.

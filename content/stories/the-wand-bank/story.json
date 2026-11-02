@@ -30,6 +30,15 @@
       "facing": "right"
     },
     {
+      "id": "baro",
+      "kind": "friend",
+      "at": [
+        12,
+        4
+      ],
+      "facing": "down"
+    },
+    {
       "id": "eldra",
       "kind": "ghost",
       "at": [
@@ -55,6 +64,9 @@
     },
     {
       "who": "voice"
+    },
+    {
+      "who": "baro"
     },
     {
       "who": "friend",

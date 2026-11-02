@@ -75,10 +75,10 @@ CELL = 96
 QUALITY = 86
 
 
-FIGURES = ("wizard", "nuri", "wenna", "eldra", "dask", "ilda")
+FIGURES = ("wizard", "nuri", "wenna", "eldra", "dask", "ilda", "baro")
 #: A figure drawn after the demo has no pieces of its own in it: its height and the
 #: way its side frames face are read from a figure of its build.
-REFERENCE = {"ilda": "wenna"}
+REFERENCE = {"ilda": "wenna", "baro": "dask"}
 #: The figures every look and friend is recoloured from (tools/art/figures.py),
 #: kept in art/figures/ as their bases.
 AS_BASES = {"wizard": "wizard-base-boy.webp", "nuri": "friend-base-boy.webp"}
@@ -570,10 +570,11 @@ later, like the rest of it.
 
 - Drawn by Gemini 3 Pro Image (`gemini-3-pro-image`) as walking sheets, from
   `tools/art/prompts/demo-wizard.md`, `demo-nuri.md`, `demo-wenna.md`,
-  `demo-eldra.md`, `demo-dask.md` and `demo-ilda.md`, each with the style-B
-  wizard as its reference (`chibi-b-gemini.md`); cut by
+  `demo-eldra.md`, `demo-dask.md`, `demo-ilda.md` and `demo-baro.md`, each
+  with the style-B wizard as its reference (`chibi-b-gemini.md`); cut by
   `tools/art/sprites.py` and put together by `tools/art/export_scene.py`,
-  Ilda's sized and turned by Wenna's, a figure of her build.
+  Ilda's sized and turned by Wenna's, a figure of her build, and Baro's by
+  Dask's.
 - The wizard's girl and Nuri's are Gemini's edits of those sheets
   (`figure-wizard-girl.md`, `figure-nuri-girl.md`), and the wizard's
   casting frames are Gemini's edits of the wizard's two sheets

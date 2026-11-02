@@ -21,7 +21,7 @@ Its parts, in the order the chapters visit them:
 | The entrance hall | 2 | The castle's great entrance at night: a red carpet from the great door to three arches into the passages, pillars, banners and armour. Ilda receives the first-years here. The scene `the-entrance`. |
 | The dormitory | 2 | The first-years' rooms: a common room with a fireplace and a door to the corridor, the girls' dormitory on its left and the boys' on its right, each through an open arch; the second-years' rooms beyond a wall. The scene `the-dormitory`. |
 | The library | 2 | Tall shelves, Wenna's desk and her door, Eldra's nook and her little room, the high shelves, a vault that stays locked. The scene `the-library`. |
-| The wand bank | 2 | A counter beyond the library's last aisle, run by the pupils' parents, where a pupil borrows a school wand for the year. |
+| The wand bank | 2 | A counter beyond the library's last aisle, under a striped awning, where a pupil borrows a school wand for the year; Baro, a pupil's father, keeps it in the mornings. |
 | The passages | 3 | At night: the watchtower's gallery, Dask's round, rooms of two doors, the long stairs. The scene `the-passages`. |
 | The night passages | 3 | Above the long stairs: Dask's long corridor, a moving stair, a dark room, the way down to the dormitory. The scene `the-night-passages`. |
 | The broom field | 4 | A lawn behind the castle, rings to fly through, a race. |
@@ -41,6 +41,7 @@ Each with the id a level's `speaker` uses (D45), the name the player reads, who 
 | `teku` | Teku | A first-year pupil, a boy, who grew up among wizards. For a girl wizard he is the friend who arrives at the gate and teaches chapters 1 and 3; for a boy wizard he is the wizard's dormitory mate. | Cheerful and a little impatient, quick to try things: *Let's just try it!* |
 | `zarek` | Zarek | A pupil a year older, the rival: quick, proud, sometimes right. | Boastful but not mean; he races the wizard in chapter 4 and is a good loser. |
 | `bimo` | Bimo | The school's cat, who wanders into levels. | He does not speak: he meows, and the texts say what he seems to mean. |
+| `baro` | Baro | A pupil's father, who keeps the wand bank in the mornings and lends the first-years their school wands. | Kindly and unhurried, few words; he hands a wand over as if it mattered. |
 | `eldra` | Eldra | A ghost in the library, once a pupil, who lost her books long ago. | Whispers, speaks in old-fashioned ways, is never frightening. |
 | `korvel` | Korvel | The villain, never seen: long ago he wrote the castle's own enchantments and tried to make the castle obey him alone, then vanished; everyone believes him gone. From chapter 3 he is a cold voice in the walls, and he is trying to return. | Cold, precise and persuasive; he never shouts, he talks others round. |
 | `rinlo` | Rinlo | A second-year pupil, a boy, whom Korvel's voice talks into tampering with the brooms. Sorry when he is found. | Anxious and quick to apologise, in rushes: *I didn't know what it would do!* |

@@ -1902,21 +1902,26 @@ one overturns stays, marked as superseded.
   hands' reach from beside (built 2026-11-01). Rules out a book fetched
   out of a locked room from across its threshold, and a door opened for
   nothing.
-- **D130 — Going to sleep is seen: the wizard walks to the pillow's side
-  and lies down; the cell to sleep from is marked.** Decided 2026-11-01
-  by the owner. `wizard.sleep()` from the cell beside the bed is drawn in
-  two parts, each a tick long: the wizard walks along the bed's side to
-  the point beside its pillow, then lies down in it, head on the pillow.
-  A level whose goal is to sleep marks the cell the wizard must stand on
-  to do it (the goal's `at`), with the goal's ring and a sign of sleep
-  drawn by the page, as a reach goal marks its cell. Built 2026-11-01:
-  the figure stands on the floor in front of the bed, `SIDE_ALONG` (0.6
-  of a cell) before its pillow toward the bed's foot, since the bedside
-  table stands beside the pillow itself; the goal's `at` is a floor cell
-  beside the bed (`goals.SleepGoal`), and the sign is a crescent and two
-  "z" in the ring's colour; a story's figure going to bed is drawn the
-  same and takes as long. Rules out a figure that snaps into the bed in a
-  blink, and a child who does not know where to stand.
+- **D130 — Going to sleep is seen: the wizard walks to the cell under
+  the pillow and hops into the bed; the cell to sleep from is marked.**
+  Decided 2026-11-01 by the owner. Each bed names the floor cell under
+  its pillow (`pillow_side` in the scene's `scene.json`), on the row in
+  front of the bed, the cell nearest the pillow. `wizard.sleep()` from a
+  cell beside the bed walks the wizard along free cells to that cell by
+  the shortest way, a `move` a tick with its facing as any walk, then
+  faces the bed and sleeps: the `sleep` event comes from the pillow-side
+  cell. The page draws the moves as every walk, and the `sleep` as a hop:
+  the figure, facing the bed, rises in an arc from the cell into the
+  bed's place and settles lying there, head on the pillow, under the
+  quilt, in one tick. A story's figure going to bed sleeps from that cell,
+  its walk written in its staging. A bed with no floor under its pillow
+  is not slept in from the side. A level whose goal is to sleep marks the
+  cell the wizard must stand on to do it (the goal's `at`), with the
+  goal's ring and a sign of sleep drawn by the page, a crescent and two
+  "z" in the ring's colour, as a reach goal marks its cell. Rules out a
+  figure that snaps into the bed in a blink, one that slides to the
+  pillow faster than it walks, one that crosses the bed to get there, and
+  a child who does not know where to stand.
 - **D131 — A level opened again starts from its starting code.** Decided
   2026-11-01 by the owner. Opening a level from the map, from the course
   or from its lesson shows the level's starting code, as the first time;

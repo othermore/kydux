@@ -145,6 +145,21 @@ def test_lines_under_counts_lines_that_do_something():
     assert long.goals[1].bonus
 
 
+def test_ticks_under_goes_to_the_run_that_ends_in_fewer_ticks():
+    # D133: of two programs that both win, the shorter earns the bonus.
+    short = run_code(rooms({"kind": "reach", "marker": "E"}), SOLVES_ROOMS)
+    ticks = short.ticks
+    level = rooms(
+        {"kind": "reach", "marker": "E"},
+        {"kind": "ticks_under", "count": ticks + 1, "bonus": True},
+    )
+    short = run_code(level, SOLVES_ROOMS)
+    assert short.status == "won" and [g.met for g in short.goals] == [True, True]
+    long = run_code(level, SOLVES_ROOMS + "\nwizard.wait(1)")
+    assert long.status == "won", "a bonus goal is not needed to win"
+    assert [g.met for g in long.goals] == [True, False]
+
+
 def test_a_goal_that_is_not_met_leaves_the_run_incomplete():
     result = run_code(rooms({"kind": "reach", "marker": "E"}), "wizard.move_right()")
     assert result.status == "incomplete"
@@ -207,6 +222,8 @@ def test_a_level_s_own_goals_come_from_its_goals_py():
         ({"kind": "say"}, "a text"),
         ({"kind": "not_seen_by", "id": "ghost"}, "no actor"),
         ({"kind": "lines_under", "lines": 0}, "whole number"),
+        ({"kind": "ticks_under", "count": 0}, "whole number"),
+        ({"kind": "ticks_under", "count": "8"}, "whole number"),
     ],
 )
 def test_a_goal_that_cannot_be_checked_names_its_fault(goal, says):

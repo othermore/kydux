@@ -818,7 +818,10 @@ one overturns stays, marked as superseded.
   needs to ask for it, so one goal serves them all. A code that does not
   parse meets neither. They are bonus goals in chapter 2: a run that wins
   without the idea still wins, and the extra star says the idea was
-  used.
+  used. A goal read from the run, `ticks_under` (D133), is met when the run
+  ends in fewer ticks than its count; it is judged only at the run's end
+  and never fails on the way, since a goal failed loses the run, and a
+  longer program that wins still wins, without the star.
 - **D51 — A level may be played in several ways, and the program must win
   them all.** Decided 2026-10-21 (sprint-9.md), built the same day.
   `level.json`'s `ways` is a list of two or more, each with an `id`, a
@@ -1353,7 +1356,7 @@ one overturns stays, marked as superseded.
   unknown (None). It asks, so it takes no tick. It is the number a
   variable keeps when the program cannot know it (*How a level earns its
   idea*, course.md): the key of `the-moving-key` lies at another distance
-  in each of its three ways (D51). Rules out a float distance, which a
+  in each of its four ways (D51). Rules out a float distance, which a
   child cannot walk.
 - **D87 — The story has a hook.** Decided 2026-10-26 by the owner (sprint
   15). The story bible's *The wizard's way* runs a thread from chapter 3 to

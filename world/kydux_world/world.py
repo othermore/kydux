@@ -314,6 +314,14 @@ def _whole(name: str, what: str, value: object) -> int:
     return value
 
 
+def _steps(name: str, value: object) -> int:
+    """A move's steps: a whole number, 0 or more. Zero walks nothing and takes no tick,
+    the rest of a walk already done (D133); a number below zero is refused."""
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ActionArguments(name, f"{name}() takes a whole number of steps, 0 or more")
+    return value
+
+
 class Wizard(Child):
     """The child's wizard. Its methods are its actions, which the child's code makes it do:
     moving, waiting, saying, picking up, finding, looking at what it carries, and casting
@@ -398,22 +406,22 @@ class Wizard(Child):
     def move_right(self, steps: int = 1) -> None:
         """Walk right, one tile per step, stopping at a wall or a closed door:
         `wizard.move_right(3)`"""
-        self._move(Direction.RIGHT, _whole("move_right", "steps", steps))
+        self._move(Direction.RIGHT, _steps("move_right", steps))
 
     def move_left(self, steps: int = 1) -> None:
         """Walk left, one tile per step, stopping at a wall or a closed door:
         `wizard.move_left(3)`"""
-        self._move(Direction.LEFT, _whole("move_left", "steps", steps))
+        self._move(Direction.LEFT, _steps("move_left", steps))
 
     def move_up(self, steps: int = 1) -> None:
         """Walk up, one tile per step, stopping at a wall or a closed door:
         `wizard.move_up(3)`"""
-        self._move(Direction.UP, _whole("move_up", "steps", steps))
+        self._move(Direction.UP, _steps("move_up", steps))
 
     def move_down(self, steps: int = 1) -> None:
         """Walk down, one tile per step, stopping at a wall or a closed door:
         `wizard.move_down(3)`"""
-        self._move(Direction.DOWN, _whole("move_down", "steps", steps))
+        self._move(Direction.DOWN, _steps("move_down", steps))
 
     def say(self, text: object) -> None:
         """Say something out loud; a door beside the wizard opens to its password:

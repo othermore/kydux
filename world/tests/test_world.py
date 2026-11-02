@@ -69,12 +69,21 @@ def test_past_the_tick_limit_the_world_stops_the_run():
     assert len(world.events) == 10
 
 
-@pytest.mark.parametrize("steps", [0, -1, 1.5, "2", True, None])
-def test_steps_must_be_a_whole_number_of_one_or_more(steps):
+@pytest.mark.parametrize("steps", [-1, -3, 1.5, "2", True, None])
+def test_steps_must_be_a_whole_number_of_zero_or_more(steps):
     world = World(ROOM)
-    with pytest.raises((TypeError, ValueError), match="move_right"):
+    with pytest.raises((TypeError, ValueError), match="move_right.*0 or more"):
         world.wizard.move_right(steps)
     assert world.events == []
+
+
+def test_a_move_of_no_steps_walks_nothing_and_takes_no_tick():
+    # D133: the rest of a walk already done is zero, and no error.
+    world = World(ROOM)
+    for move in (world.wizard.move_right, world.wizard.move_left, world.wizard.move_up):
+        move(0)
+    world.wizard.move_down(0)
+    assert world.events == [] and world.tick == 0
 
 
 def test_events_carry_the_child_s_line():

@@ -10,12 +10,13 @@
     "Put that name inside the brackets of the `move_left` method.",
     "Then `pick_up` the key where the walk ends."
   ],
-  "intro": "The key to Eldra's little room is never twice in the same place; I think Eldra moves it! Yesterday's program walked four steps, but today the key is somewhere else. Make your program ask the key how far it is, keep that number under a name, and use it to walk there and pick the key up.",
+  "intro": "The key to Eldra's little room is never twice in the same place; I think Eldra moves it! Yesterday's program walked four steps, but today the key lies somewhere between two and five steps away. Make your program ask the key how far it is, keep that number under a name, and use it to walk there and pick the key up.",
   "outro": "The key is in your hand, wherever Eldra left it, and Eldra's door is waiting.",
   "learned": "Now you know what a variable is for: a number the program cannot know when it is written, kept under a name.",
   "ways": {
-    "near": "The key is near",
-    "middle": "The key is halfway",
-    "far": "The key is far"
+    "two": "The key is two steps away",
+    "three": "The key is three steps away",
+    "four": "The key is four steps away",
+    "five": "The key is five steps away"
   }
 }

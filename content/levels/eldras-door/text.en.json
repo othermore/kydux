@@ -4,20 +4,21 @@
     "Pick up the key.",
     "Open the door.",
     "Stand in front of it.",
-    "Write only one number."
+    "Take the shortest way: fewer than 8 steps in all."
   ],
-  "starting_code": "key = wizard.find_nearest(\"key\")\nsteps = key.distance_to(wizard)\nwizard.move_left(steps)\nwizard.pick_up()\n\n# Come back to where you started, with `move_right` and the same name.\n\n# Walk left to the door: it is five steps from where you started.\n\n# Open it with `open`.\n",
+  "starting_code": "key = wizard.find_nearest(\"key\")\nsteps = key.distance_to(wizard)\nwizard.move_left(steps)\nwizard.pick_up()\n\n# Take the steps you walked from the five to the door, and keep the rest under a name.\n\n# Walk left the rest, to the door, with `move_left`.\n\n# Open it with `open`.\n",
   "hints": [
-    "Come back with `move_right` and the very same name the walk there used, since the program cannot know the number.",
+    "The door is five steps from the start: the rest is five less the steps you already walked, `5 - steps`.",
     "A door only listens to who stands right beside it: walk to it before you open it.",
-    "Walk back with the name, then five steps left to the door, and `open` it."
+    "Keep `5 - steps` under a name, walk left that many, then `open` the door."
   ],
-  "intro": "But wait: what if, besides taking the key, you want to open the door? Let's practise it! Let's try again from the start, but this time, once you have the key, go to the door and open it. The program from before is already written for you.",
-  "outro": "The door is open and the key is in your hand! Eldra's little room is waiting, where her other lost book lies.",
-  "learned": "Now you know that one name can be used as many times as the program needs, and that a program that works can be made to do more.",
+  "intro": "But wait: what if, besides taking the key, you want to open the door? Let's practise it! Let's try again from the start, but this time, once you have the key, go to the door and open it. The door is five steps from where you started, and you have already walked some of them to the key; walk only the rest. The program from before is already written for you.",
+  "outro": "The door is open and the key is in your hand, by the shortest way! Eldra's little room is waiting.",
+  "learned": "Now you know that a number can be made from a name, `5 - steps`, kept under a name of its own or written straight into a move.",
   "ways": {
-    "near": "The key is near",
-    "middle": "The key is halfway",
-    "far": "The key is far"
+    "two": "The key is two steps away",
+    "three": "The key is three steps away",
+    "four": "The key is four steps away",
+    "five": "The key is five steps away"
   }
 }

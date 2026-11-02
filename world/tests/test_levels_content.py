@@ -157,3 +157,34 @@ def test_a_level_played_in_ways_has_a_wrong_answer_that_wins_only_some(directory
         if 0 < len(won) < len(result.ways):
             some.append(wrong.name)
     assert some, "no wrong answer wins one way and not another: do the ways matter?"
+
+
+def test_the_key_and_the_door_are_played_in_the_same_ways():
+    """*Eldra's door* plays *The moving key* again from the start (D133): the same
+    ways, the key two to five steps from the start, never past the door."""
+    ways = {}
+    for level_id in ("the-moving-key", "eldras-door"):
+        data = json.loads((CONTENT / level_id / "level.json").read_text(encoding="utf-8"))
+        ways[level_id] = data["ways"]
+        start = data["start"]
+        for way in data["ways"]:
+            (key,) = [thing["at"] for thing in way["things"] if thing["id"] == "key"]
+            assert key[1] == start[1] and 2 <= start[0] - key[0] <= 5, (level_id, way["id"])
+    assert ways["the-moving-key"] == ways["eldras-door"]
+
+
+def test_eldras_door_gives_its_bonus_to_the_subtraction_and_not_to_the_return():
+    """D133: walking the rest, `5 - steps`, wins every way in 7 ticks with the bonus;
+    walking back to the start and then the five wins too, without it."""
+    level = load(CONTENT / "eldras-door")
+    found = "key = wizard.find_nearest('key')\nsteps = key.distance_to(wizard)\n"
+    there = found + "wizard.move_left(steps)\nwizard.pick_up()\n"
+    rest = run_code(level, (CONTENT / "eldras-door" / "solution.py").read_text(encoding="utf-8"))
+    assert rest.status == "won"
+    for _, way in rest.ways:
+        assert way.ticks == 7 and all(goal.met for goal in way.goals), way.goals
+    back = run_code(level, there + "wizard.move_right(steps)\nwizard.move_left(5)\ndoor.open()\n")
+    assert back.status == "won"
+    for _, way in back.ways:
+        bonus = [goal for goal in way.goals if goal.kind == "ticks_under"]
+        assert way.ticks >= 11 and bonus and not bonus[0].met

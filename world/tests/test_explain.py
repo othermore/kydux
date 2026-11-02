@@ -59,7 +59,7 @@ def explained(code):
             1,
         ),
         (
-            "wizard.move_right(0)",
+            "wizard.move_right(-1)",
             "arguments",
             {"name": "move_right", "example": "wizard.move_right(3)"},
             1,

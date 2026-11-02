@@ -4,20 +4,21 @@
     "Recoge la llave.",
     "Abre la puerta.",
     "Quédate delante de ella.",
-    "Escribe solo un número."
+    "Ve por el camino más corto: menos de 8 pasos en total."
   ],
-  "starting_code": "key = wizard.find_nearest(\"key\")\nsteps = key.distance_to(wizard)\nwizard.move_left(steps)\nwizard.pick_up()\n\n# Vuelve a donde empezaste con `move_right` y el mismo nombre.\n\n# Camina a la izquierda hacia la puerta: está a cinco pasos de donde empezaste.\n\n# Ábrela con `open`.\n",
+  "starting_code": "key = wizard.find_nearest(\"key\")\nsteps = key.distance_to(wizard)\nwizard.move_left(steps)\nwizard.pick_up()\n\n# Resta de los cinco pasos hasta la puerta los que ya has caminado, y guarda el resto bajo un nombre.\n\n# Camina a la izquierda el resto, hacia la puerta, con `move_left`.\n\n# Ábrela con `open`.\n",
   "hints": [
-    "Vuelve con `move_right` y el mismo nombre que usaste a la ida, ya que el programa no puede saber el número.",
+    "La puerta está a cinco pasos del inicio: el resto son cinco menos los pasos que ya has caminado, `5 - steps`.",
     "Una puerta solo escucha a quien está justo a su lado: camina hacia ella antes de abrirla.",
-    "Vuelve usando el nombre, luego da cinco pasos a la izquierda hacia la puerta y usa `open` para abrirla."
+    "Guarda `5 - steps` bajo un nombre, camina a la izquierda esos pasos y luego abre la puerta con `open`."
   ],
-  "intro": "Pero espera: ¿y si, además de coger la llave, quieres abrir la puerta? ¡Vamos a practicarlo! Intentémoslo otra vez desde el principio, pero esta vez, cuando tengas la llave, ve hasta la puerta y ábrela. El programa de antes ya está escrito para ti.",
-  "outro": "¡La puerta está abierta y tienes la llave en la mano! Te espera la pequeña habitación de Eldra, donde está su otro libro perdido.",
-  "learned": "Ahora sabes que un nombre se puede usar tantas veces como el programa lo necesite, y que a un programa que ya funciona se le puede pedir que haga más.",
+  "intro": "Pero espera: ¿y si, además de coger la llave, quieres abrir la puerta? ¡Vamos a practicarlo! Intentémoslo otra vez desde el principio, pero esta vez, cuando tengas la llave, ve hasta la puerta y ábrela. La puerta está a cinco pasos de donde empezaste, y ya has caminado algunos de ellos hasta la llave; camina solo el resto. El programa de antes ya está escrito para ti.",
+  "outro": "¡La puerta está abierta y tienes la llave en la mano, por el camino más corto! La pequeña habitación de Eldra te espera.",
+  "learned": "Ahora sabes que se puede crear un número a partir de un nombre, como `5 - steps`, y guardarlo bajo su propio nombre o escribirlo directamente en un movimiento.",
   "ways": {
-    "near": "La llave está cerca",
-    "middle": "La llave está a media distancia",
-    "far": "La llave está lejos"
+    "two": "La llave está a dos pasos",
+    "three": "La llave está a tres pasos",
+    "four": "La llave está a cuatro pasos",
+    "five": "La llave está a cinco pasos"
   }
 }

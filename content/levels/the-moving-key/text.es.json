@@ -10,12 +10,13 @@
     "Pon ese nombre dentro de los paréntesis del método `move_left`.",
     "Luego recoge la llave con `pick_up` donde termina el paseo."
   ],
-  "intro": "¡La llave de la pequeña habitación de Eldra nunca está dos veces en el mismo sitio; creo que Eldra la mueve! El programa de ayer daba cuatro pasos, pero hoy la llave está en otro lugar. Haz que tu programa le pregunte a la llave a qué distancia está, guarda ese número bajo un nombre, y úsalo para caminar hasta allí y recoger la llave.",
+  "intro": "¡La llave de la pequeña habitación de Eldra nunca está dos veces en el mismo sitio; creo que Eldra la mueve! El programa de ayer daba cuatro pasos, pero hoy la llave está a dos, tres, cuatro o cinco pasos. Haz que tu programa le pregunte a la llave a qué distancia está, guarda ese número bajo un nombre, y úsalo para caminar hasta allí y recoger la llave.",
   "outro": "¡Tienes la llave en la mano, dondequiera que Eldra la haya dejado, y la puerta de Eldra te espera!",
   "learned": "Ahora sabes para qué sirve una variable: para un número que el programa no puede saber cuando se escribe, guardado bajo un nombre.",
   "ways": {
-    "near": "La llave está cerca",
-    "middle": "La llave está a media distancia",
-    "far": "La llave está lejos"
+    "two": "La llave está a dos pasos",
+    "three": "La llave está a tres pasos",
+    "four": "La llave está a cuatro pasos",
+    "five": "La llave está a cinco pasos"
   }
 }

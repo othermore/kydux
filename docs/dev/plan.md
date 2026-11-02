@@ -158,7 +158,7 @@ content/
 ```
 
 Goals are declared (`reach`, `collect`, `open`, `say`, `give`, `no_bumps`,
-`not_seen_by`, `lines_under`, `numbers_under`, `uses`) and a level may add `goals.py` for one of its own. The lesson's
+`not_seen_by`, `ticks_under`, `lines_under`, `numbers_under`, `uses`) and a level may add `goals.py` for one of its own. The lesson's
 Markdown, with no HTML in it, may hold one fenced block marked `python try`,
 its example; the level after it starts with its own program (D33, D63). Within a chapter, every item is
 numbered by kind, stories too, and says its chapter: *Chapter 1 · Story 1*, *Chapter 1 · Practice 1*,

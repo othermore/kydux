@@ -19,7 +19,7 @@
       "kind": "key",
       "id": "key",
       "at": [
-        3,
+        5,
         6
       ],
       "opens": "door",
@@ -56,7 +56,7 @@
   ],
   "ways": [
     {
-      "id": "near",
+      "id": "two",
       "things": [
         {
           "id": "key",
@@ -68,7 +68,19 @@
       ]
     },
     {
-      "id": "middle",
+      "id": "three",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            4,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "four",
       "things": [
         {
           "id": "key",
@@ -80,12 +92,12 @@
       ]
     },
     {
-      "id": "far",
+      "id": "five",
       "things": [
         {
           "id": "key",
           "at": [
-            1,
+            2,
             6
           ]
         }
@@ -121,8 +133,8 @@
       "marker": "E"
     },
     {
-      "kind": "numbers_under",
-      "count": 2,
+      "kind": "ticks_under",
+      "count": 8,
       "bonus": true
     }
   ],

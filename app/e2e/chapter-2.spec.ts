@@ -343,15 +343,40 @@ test.describe('in the library (D85, D86, D51)', () => {
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-book-glow.png` });
   });
 
-  test('the moving key: the given program fails a way, distance_to wins all three', async ({ page }) => {
+  test('the moving key: the given program fails a way, distance_to wins all four (D133)', async ({ page }) => {
     await page.goto('/#level/the-moving-key');
-    await expect(page.locator('#card-ways li')).toHaveCount(3);
+    // The key two, three, four or five steps away, never past the door.
+    await expect(page.locator('#card-ways li')).toHaveCount(4);
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
     const given = JSON.parse(readFileSync(`${CONTENT}levels/the-moving-key/text.en.json`, 'utf8')).starting_code;
-    expect(await run(page, given)).toContain('In the way “The key is near”');
+    expect(await run(page, given)).toContain('In the way “The key is two steps away”');
     expect(await run(page, solution('the-moving-key'))).toContain('In every way!');
+  });
+
+  test("Eldra's door: the rest of the walk wins every way with the bonus, the return without it (D133)", async ({
+    page,
+  }) => {
+    await page.goto('/#level/eldras-door');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('4');
+    const bonus = page.locator('#star-reasons li', { hasText: 'The extra goal met' });
+    const back = [
+      'key = wizard.find_nearest("key")',
+      'steps = key.distance_to(wizard)',
+      'wizard.move_left(steps)',
+      'wizard.pick_up()',
+      'wizard.move_right(steps)',
+      'wizard.move_left(5)',
+      'door.open()',
+    ].join('\n');
+    expect(await run(page, back)).toContain('In every way!');
+    await expect(bonus).toHaveAttribute('data-kept', 'false');
+    await page.locator('#again').click();
+    expect(await run(page, solution('eldras-door'))).toContain('In every way!');
+    await expect(bonus).toHaveAttribute('data-kept', 'true');
   });
 });
 
@@ -373,7 +398,12 @@ test.describe('in the entrance (D100)', () => {
     // The two children follow her side by side, at once (D103), under the
     // chandelier, which hangs over every head (D95).
     await storyNext(page);
-    await expect(scene).toHaveAttribute('data-wizard', '20,13', { timeout: 30_000 });
+    // A cell walked through for a tick, waited for frame by frame: an expect's polls
+    // may come either side of it.
+    await page.waitForFunction(() => document.querySelector('#scene')?.getAttribute('data-wizard') === '20,13', null, {
+      timeout: 30_000,
+      polling: 'raf',
+    });
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-lamp.png` });
     await expect(scene).toHaveAttribute('data-wizard', '20,8', { timeout: 30_000 });
     await expect(scene).toHaveAttribute('data-actors', /friend:19,8/);

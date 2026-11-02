@@ -10,11 +10,13 @@ one at x and y; passing over it on the way does not count), collect (a thing by
 id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
 say (a text, word for word), give (a thing by id, to an actor by id), no_bumps
 (the wizard bumps into nothing; failed at the first bump),
-not_seen_by (an actor; failed when it catches the wizard), and three read
-from the code before the run: lines_under (fewer lines than that, not
-counting blank lines and comments), numbers_under (fewer numbers written in
-it than that, so that a value is named once, as a variable) and uses (the
-code names an action or an attribute: `{"kind": "uses", "member": "locked"}`).
+not_seen_by (an actor; failed when it catches the wizard), ticks_under (the
+run ends in fewer ticks than that, so that the shorter of two winning programs
+earns it, D133), and three read from the code before the run: lines_under
+(fewer lines than that, not counting blank lines and comments), numbers_under
+(fewer numbers written in it than that, so that a value is named once, as a
+variable) and uses (the code names an action or an attribute: `{"kind":
+"uses", "member": "locked"}`).
 A level may add its own in a goals.py beside its level.json, which says so
 with `"own_goals": true`: a module whose `GOALS` maps each kind to its class,
 in the same shape as these.
@@ -177,6 +179,22 @@ def code_lines(code: str) -> int:
     )
 
 
+class TicksUnderGoal:
+    """Met once the run has ended in fewer ticks than a count: `{"kind": "ticks_under",
+    "count": 8}` gives a bonus to the shorter of two programs that both win (D133)."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        count = spec.params.get("count")
+        if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+            raise LevelError(f"{level.id}: a ticks_under goal needs a whole number of ticks")
+        self.count = count
+
+    def check(self, world: "World") -> bool:
+        # Judged only once the run is over, never failed on the way: a goal failed
+        # loses the run (World.won), and a longer program still wins.
+        return world.finished and world.tick < self.count
+
+
 class LinesUnderGoal:
     """Met, before the run starts, when the code has fewer lines than a number."""
 
@@ -289,6 +307,7 @@ GOALS: dict[str, type] = {
     "no_bumps": NoBumpsGoal,
     "not_seen_by": NotSeenByGoal,
     "lines_under": LinesUnderGoal,
+    "ticks_under": TicksUnderGoal,
     "numbers_under": NumbersUnderGoal,
     "uses": UsesGoal,
 }

@@ -123,7 +123,11 @@
     "not_carried": "I cannot give {thing}: I am not carrying it.",
     "nobody": "There is no one beside me to give it to.",
     "which_one": "There are several things here: {things}. Say which, like wizard.pick_up({first}).",
-    "unheard": "While its seal holds, {thing} cannot hear a word."
+    "unheard": "While its seal holds, {thing} cannot hear a word.",
+    "not_my_dormitory": "I don't think I should go into the {girls'|boys'} dormitory.",
+    "no_bed": "There is no bed right beside me.",
+    "bed_taken": "This bed is not free: someone sleeps in it.",
+    "not_here": "I cannot show {thing}: it is not lying anywhere."
   },
   "notebook": {
     "title": "The wizard's notebook",

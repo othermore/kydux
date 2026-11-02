@@ -123,7 +123,11 @@
     "not_carried": "No puedo dar {thing}: no está entre lo que llevo.",
     "nobody": "No hay nadie a mi lado para dárselo.",
     "which_one": "Aquí hay varias cosas: {things}. Di cuál, como wizard.pick_up({first}).",
-    "unheard": "Con el sello puesto, {thing} no oye ninguna palabra."
+    "unheard": "Con el sello puesto, {thing} no oye ninguna palabra.",
+    "not_my_dormitory": "Creo que no debería entrar en el dormitorio de {las chicas|los chicos}.",
+    "no_bed": "Aquí no hay ninguna cama a mi lado.",
+    "bed_taken": "Esta cama no está libre: alguien duerme en ella.",
+    "not_here": "No puedo enseñar {thing}: no está en el suelo."
   },
   "notebook": {
     "title": "El cuaderno {del mago|de la maga}",

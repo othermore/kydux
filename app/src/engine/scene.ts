@@ -16,6 +16,8 @@
 // each stair as a step taken now would find it, D53), data-zoom (the
 // camera's zoom, D69), data-following (whether the camera follows the wizard),
 // data-marks-hidden (the doors whose doorway's mark waits for them to open, D79),
+// data-revealed (the things whose outline shows where they lie, D85),
+// data-sleeping (the bed the wizard sleeps in, D84),
 // data-silhouette (present on a painted scene, where the wizard's outline shows
 // when something hides more than a quarter of it, silhouette.ts), data-outlined
 // (present while it shows) and data-debug with data-debug-layers (the tester's view and
@@ -58,7 +60,6 @@ import {
 } from './placeholders';
 import {
   type Art,
-  artScale,
   breakSeal,
   crossfade,
   drawFigure,
@@ -71,11 +72,14 @@ import {
   loadArt,
   paintScene,
   paintThing,
+  placeThing,
   type Played,
   playFrames,
   marginOf,
   preloadArt,
+  rowDepth,
   SHEET_ROW,
+  shiftOf,
 } from './painted';
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
@@ -159,6 +163,10 @@ class LevelScene extends Phaser.Scene {
   private debug: DebugView | null = null;
   /** On a painted scene, the wizard's outline where something hides it. */
   private silhouette: Silhouette | null = null;
+  /** What is painted, which may cover a figure or a thing, for their outlines. */
+  private coverings: Phaser.GameObjects.Image[] = [];
+  /** The things revealed (D85), each with its outline, until it is picked up. */
+  private readonly revealed = new Map<string, Silhouette>();
   /** The goal's mark in a door's doorway, by the door: shown once it is open (D79). */
   private doorMarks = new Map<string, Phaser.GameObjects.Container>();
   private carried = new Set<string>();
@@ -430,8 +438,9 @@ class LevelScene extends Phaser.Scene {
           }),
         ]
       : [];
+    this.coverings = painted.map(({ image }) => image);
     if (this.art && this.wizard.texture.key.startsWith('fig-')) {
-      this.silhouette = new Silhouette(this, this.wizard, painted.map(({ image }) => image), this.still);
+      this.silhouette = new Silhouette(this, this.wizard, this.coverings, this.still);
       this.parentNode.dataset.silhouette = 'true';
     }
     if (debugging()) {
@@ -510,12 +519,16 @@ class LevelScene extends Phaser.Scene {
       if (this.silhouette.shown) this.parentNode.dataset.outlined = 'true';
       else delete this.parentNode.dataset.outlined;
     }
+    for (const outline of this.revealed.values()) outline.update();
     this.debug?.update(this.cameras.main);
   }
 
   /** Everything where it stood before the run. */
   private restart(): void {
     this.restarts += 1;
+    for (const id of [...this.revealed.keys()]) this.unreveal(id);
+    this.wizard.setAngle(0);
+    delete this.parentNode.dataset.sleeping;
     this.speech.clearBubble();
     this.speech.clearThought();
     this.stopCast();
@@ -532,7 +545,7 @@ class LevelScene extends Phaser.Scene {
       if (!image) continue;
       this.tweens.killTweensOf(image);
       const painted = this.art?.scene.things[thing.id];
-      if (this.art && painted) image.setPosition(painted.left * artScale(this.art), painted.top * artScale(this.art));
+      if (this.art && painted) placeThing(image, this.art, thing.id, thing.tile);
       else image.setPosition(...centre(thing.tile));
       image.setVisible(true).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
@@ -600,12 +613,63 @@ class LevelScene extends Phaser.Scene {
     this.holds.set(id, [...(this.holds.get(id) ?? []), held]);
   }
 
-  /** A thing drawn by a spell from where it lay to the wizard's tile (D47). */
+  /** A thing shown where it lies (D85): its outline drawn through whatever covers it,
+   * beating, until it is picked up; data-revealed names the things shown. */
+  private reveal(id: string, instant: boolean): void {
+    const image = this.things.get(id);
+    if (!image || this.revealed.has(id)) return;
+    if (this.art && image.texture.key.startsWith('art-')) {
+      this.revealed.set(id, new Silhouette(this, image, this.coverings, this.still || instant, true));
+    } else {
+      this.revealed.set(id, new Silhouette(this, image, [], this.still || instant, true));
+    }
+    this.parentNode.dataset.revealed = [...this.revealed.keys()].join(',');
+    if (!instant) play('cast');
+  }
+
+  private unreveal(id: string): void {
+    const outline = this.revealed.get(id);
+    if (!outline) return;
+    outline.destroy();
+    this.revealed.delete(id);
+    if (this.revealed.size > 0) this.parentNode.dataset.revealed = [...this.revealed.keys()].join(',');
+    else delete this.parentNode.dataset.revealed;
+  }
+
+  /** The wizard lies down in the bed beside it and sleeps (D84): it goes onto the bed
+   * and lies along it, its head towards the pillow; data-sleeping names the bed. */
+  private sleep(event: WorldEvent, instant: boolean): void {
+    const bed = tileOf(event.data.bed);
+    this.parentNode.dataset.sleeping = String(event.data.id);
+    if (!bed) return;
+    this.stopCast();
+    this.face(this.wizard, 'down');
+    const [x, y] = this.figureAt(bed);
+    const lying = { x: x - TILE * 0.55, y: y - TILE * 0.35, angle: 90 };
+    if (instant || this.still) {
+      this.wizard.setPosition(lying.x, lying.y).setAngle(lying.angle);
+      return;
+    }
+    this.tweens.add({ targets: this.wizard, ...lying, duration: this.playback.tickDuration * 0.9, ease: 'Sine.easeInOut' });
+  }
+
+  /** A thing drawn by a spell from where it lay to the wizard's tile (D47); a painted
+   * one moves by the cells between, and goes among the rows by its new foot (D85). */
   private pull(event: WorldEvent, instant: boolean): void {
-    const image = this.things.get(String(event.data.id));
+    const id = String(event.data.id);
+    const image = this.things.get(id);
+    const from = tileOf(event.data.from);
     const to = tileOf(event.data.to);
-    if (!image || !to) return;
+    if (!image || !to || !from) return;
     this.tweens.killTweensOf(image);
+    const painted = this.art?.scene.things[id];
+    if (this.art && painted) {
+      const [x, y] = [image.x + (to[0] - from[0]) * TILE, image.y + (to[1] - from[1]) * TILE];
+      image.setDepth(rowDepth(painted.row + shiftOf(this.art, id, to)[1]) + 0.001);
+      if (instant) image.setPosition(x, y);
+      else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });
+      return;
+    }
     const [x, y] = centre(to);
     if (instant) image.setPosition(x, y);
     else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });
@@ -676,7 +740,8 @@ class LevelScene extends Phaser.Scene {
    * to wait for it before the win card; 0 when it does not, in a story, on a scene
    * without art, or for a reader who asks for less motion. */
   celebrate(): number {
-    if (this.options.story) return 0;
+    // A wizard asleep is not woken to celebrate (D84).
+    if (this.options.story || this.parentNode.dataset.sleeping) return 0;
     const duration = this.playback.tickDuration * 2;
     return this.playPart('win', duration) ? duration : 0;
   }
@@ -759,8 +824,15 @@ class LevelScene extends Phaser.Scene {
       case 'turn':
         if (facing) this.face(this.wizard, facing);
         break;
+      case 'reveal':
+        this.reveal(String(event.data.id), instant);
+        break;
+      case 'sleep':
+        this.sleep(event, instant);
+        break;
       case 'pick_up': {
         const id = String(event.data.id);
+        this.unreveal(id);
         const image = this.things.get(id);
         if (image && instant) {
           this.tweens.killTweensOf(image);
@@ -796,12 +868,15 @@ class LevelScene extends Phaser.Scene {
         }
         break;
       case 'give':
+        this.unreveal(String(event.data.id));
         this.give(event, instant);
         break;
       case 'blocked': {
         // The wizard thinks why; and when it did try, what would not do shakes:
         // a locked door, or the wizard with nothing to pick up (D28). From too
-        // far away there was nothing to try, so nothing shakes.
+        // far away there was nothing to try, so nothing shakes. A step refused
+        // turns the wizard the way it would have gone (D84).
+        if (facing) this.face(this.wizard, facing);
         if (instant) break;
         const by = String(event.data.by);
         const thing = this.map.things.find((t) => t.id === by);

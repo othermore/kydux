@@ -139,3 +139,10 @@ export function teacherFriend(wizardGender: Look['gender'] | null): { id: string
   const gender: Look['gender'] = wizardGender === 'girl' ? 'boy' : 'girl';
   return { id: FRIENDS[gender], gender };
 }
+
+/** The wizard's dormitory mate (D84): the friend of the wizard's own gender, a boy
+ * when there is no wizard yet, as the words take a boy then. */
+export function dormitoryMate(wizardGender: Look['gender'] | null): { id: string; gender: Look['gender'] } {
+  const gender: Look['gender'] = wizardGender ?? 'boy';
+  return { id: FRIENDS[gender], gender };
+}

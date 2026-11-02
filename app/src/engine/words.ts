@@ -57,6 +57,14 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
       return t('blocked.open', { thing });
     case 'nothing':
       return t('blocked.nothing');
+    case 'not_my_dormitory':
+      return t('blocked.not_my_dormitory');
+    case 'no_bed':
+      return t('blocked.no_bed');
+    case 'bed_taken':
+      return t('blocked.bed_taken');
+    case 'not_here':
+      return t('blocked.not_here', { thing });
     default:
       return t('blocked.unknown_action');
   }

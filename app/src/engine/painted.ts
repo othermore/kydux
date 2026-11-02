@@ -8,8 +8,9 @@
 
 import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
-import { type Look, teacherFriend } from './looks';
+import { dormitoryMate, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
+import { shiftBy } from './shift';
 import type { Tile } from './sight';
 
 /** A scene painted in one picture (D76): its ground, its raised things cut out by
@@ -25,9 +26,12 @@ export interface SceneArt {
   margin?: [number, number, number, number];
   origin?: Tile;
   rows: { row: number; image: string; top: number }[];
+  /** Each thing that opens or is picked up: its row, its corner in the painting's
+   * pixels, its states' images, and `at`, the cell it is painted on, when a level
+   * may place it on another (D85). */
   things: Record<
     string,
-    { row: number; left: number; top: number; states: Record<string, string>; rune?: string }
+    { row: number; left: number; top: number; states: Record<string, string>; rune?: string; at?: Tile }
   >;
 }
 
@@ -132,28 +136,46 @@ export function paintScene(scene: Phaser.Scene, art: Art): Phaser.GameObjects.Im
   );
 }
 
-/** A painted thing in its state, among the rows by its foot (D76), or null when the
- * painting has no such thing. */
+/** How many cells a painted thing is drawn away from where it is painted (D85). */
+export function shiftOf(art: Art, id: string, tile: Tile): Tile {
+  return shiftBy(art.scene.things[id]?.at, tile);
+}
+
+/** A painted thing in its state, among the rows by its foot (D76), drawn on the
+ * level's tile (D85), or null when the painting has no such thing. */
 export function paintThing(
   scene: Phaser.Scene,
   art: Art,
-  thing: { id: string; kind: string; open?: boolean },
+  thing: { id: string; kind: string; open?: boolean; tile: Tile },
 ): Phaser.GameObjects.Image | null {
   const painted = art.scene.things[thing.id];
   if (!painted) return null;
   const state = thing.kind === 'door' ? (thing.open ? 'open' : 'closed') : Object.keys(painted.states)[0];
   const scale = artScale(art);
+  const [dx, dy] = shiftOf(art, thing.id, thing.tile);
   return scene.add
-    .image(painted.left * scale, painted.top * scale, `art-${thing.id}-${state}`)
+    .image(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE, `art-${thing.id}-${state}`)
     .setOrigin(0, 0)
     .setScale(scale)
-    .setDepth(rowDepth(painted.row) + 0.001);
+    .setDepth(rowDepth(painted.row + dy) + 0.001);
+}
+
+/** A painted thing's image put where it is drawn on a tile (D85), for a restart. */
+export function placeThing(image: Phaser.GameObjects.Image, art: Art, id: string, tile: Tile): void {
+  const painted = art.scene.things[id];
+  if (!painted) return;
+  const scale = artScale(art);
+  const [dx, dy] = shiftOf(art, id, tile);
+  image.setPosition(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE);
+  image.setDepth(rowDepth(painted.row + dy) + 0.001);
 }
 
 /** The sheet a character is drawn from: the friend is the one of the wizard's other
- * gender (D77), and the wizard is drawn in the look the child chose. */
+ * gender (D77), the dormitory mate the one of its own (D84), and the wizard is drawn
+ * in the look the child chose. */
 export function figureName(id: string, look: Look): string {
   if (id === 'friend') return teacherFriend(look.gender).id;
+  if (id === 'mate') return dormitoryMate(look.gender).id;
   return id === 'wizard' ? `wizard-${look.id}` : id;
 }
 

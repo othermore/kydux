@@ -98,22 +98,29 @@ interface Covering {
 
 export class Silhouette {
   private readonly line: Phaser.GameObjects.Sprite;
+  private readonly mask: Phaser.GameObjects.Container;
   private readonly covers: Covering[] = [];
-  /** Whether the line shows now: more than HIDDEN_SHARE of the figure covered. */
+  /** Whether the line shows now: more than HIDDEN_SHARE of the figure covered, or,
+   * for a thing revealed, whenever anything covers it. */
   shown = false;
 
+  /** The outline of a figure, or of a thing revealed (D85) with `always`, which
+   * shows wherever something covers it, however little. */
   constructor(
     private readonly scene: Phaser.Scene,
-    private readonly figure: Phaser.GameObjects.Sprite,
+    private readonly figure: Phaser.GameObjects.Image,
     painted: Phaser.GameObjects.Image[],
     still: boolean,
+    private readonly always = false,
   ) {
     const key = `${figure.texture.key}-outline`;
     outlineSheet(scene, figure.texture.key, key);
     this.line = scene.add.sprite(figure.x, figure.y, key, figure.frame.name).setDepth(9.5);
     // The mask: copies of what is painted, kept off the scene's own display list.
     const mask = new Phaser.GameObjects.Container(scene, 0, 0);
+    this.mask = mask;
     for (const source of painted) {
+      if (source === figure) continue;
       const copy = new Phaser.GameObjects.Image(scene, source.x, source.y, source.texture.key)
         .setOrigin(source.originX, source.originY)
         .setScale(source.scaleX, source.scaleY);
@@ -139,12 +146,19 @@ export class Silhouette {
       if (before) front.push(source);
     }
     const share = figure.visible ? coveredShare(figure, front, (key) => solidOf(this.scene, key)) : 0;
-    this.shown = share > HIDDEN_SHARE;
+    this.shown = this.always ? figure.visible && share > 0 : share > HIDDEN_SHARE;
     this.line
       .setPosition(figure.x, figure.y)
       .setOrigin(figure.originX, figure.originY)
       .setScale(figure.scaleX, figure.scaleY)
       .setFrame(figure.frame.name)
       .setVisible(this.shown);
+  }
+
+  /** The line taken away, with its mask. */
+  destroy(): void {
+    this.scene.tweens.killTweensOf(this.line);
+    this.line.destroy();
+    this.mask.destroy();
   }
 }

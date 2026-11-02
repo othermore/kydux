@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { personal, friendOf } from './personal';
+import { personal, friendOf, mateOf } from './personal';
 
 const marta = { name: 'Marta', gender: 'girl' as const };
 const pablo = { name: 'Pablo', gender: 'boy' as const };
@@ -13,6 +13,13 @@ describe('personal', () => {
   it('lets a side be empty, so an ending can vary', () => {
     expect(personal('está cansad{o|a}', marta)).toBe('está cansada');
     expect(personal('{|ella }llega', pablo)).toBe('llega');
+  });
+
+  it("names the dormitory mate, the friend of the wizard's own gender (D84)", () => {
+    expect(personal('{mate} y {friend}', marta, '', 'Teku', 'Nuri')).toBe('Nuri y Teku');
+    expect(mateOf(marta).id).toBe('nuri');
+    expect(mateOf(pablo).id).toBe('teku');
+    expect(mateOf(null).id).toBe('teku');
   });
 
   it('puts the name in', () => {

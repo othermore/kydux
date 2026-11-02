@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_LOOK, isLook, LOOKS, lookOf, looksFor } from './looks';
+import { DEFAULT_LOOK, dormitoryMate, isLook, LOOKS, lookOf, looksFor, teacherFriend } from './looks';
 
 describe('the looks (D36)', () => {
   it('are eight, each with its own id', () => {
@@ -21,5 +21,14 @@ describe('the looks (D36)', () => {
     expect(lookOf('teal').id).toBe('teal');
     expect(lookOf('gold')).toBe(DEFAULT_LOOK);
     expect(lookOf(null)).toBe(DEFAULT_LOOK);
+  });
+});
+
+describe('the friends (D77, D84)', () => {
+  it("are the other gender's at the gate and the wizard's own in the dormitory", () => {
+    expect(teacherFriend('girl').id).toBe('teku');
+    expect(dormitoryMate('girl').id).toBe('nuri');
+    expect(dormitoryMate('boy').id).toBe('teku');
+    expect(dormitoryMate(null).id).toBe('teku');
   });
 });

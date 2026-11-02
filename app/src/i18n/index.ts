@@ -2,7 +2,7 @@
 // in i18n/ at the repository root: adding one is adding its file, with the
 // same keys as the others (tools/i18n_check.py keeps them in step).
 
-import { friendOf, personal, type Speaker } from './personal';
+import { friendOf, mateOf, personal, type Speaker } from './personal';
 
 export type { Gender, Speaker } from './personal';
 export { FRIENDS, friendOf } from './personal';
@@ -42,7 +42,7 @@ export function speakOf(wizard: Speaker | null): void {
 export function forWizard(text: string): string {
   const unnamed =
     lookup(catalogs[current], 'wizard.no_name') ?? lookup(catalogs[fallbackLanguage], 'wizard.no_name');
-  return personal(text, speaker, unnamed ?? '', friendName());
+  return personal(text, speaker, unnamed ?? '', friendName(), mateName());
 }
 
 /** The friend the wizard has (D77): Nuri for a boy wizard, Teku for a girl. */
@@ -55,9 +55,19 @@ function friendName(): string {
   return lookup(catalogs[current], key) ?? lookup(catalogs[fallbackLanguage], key) ?? '';
 }
 
+/** The wizard's dormitory mate (D84): Teku for a boy wizard, Nuri for a girl. */
+export function mateId(): string {
+  return mateOf(speaker).id;
+}
+
+function mateName(): string {
+  const key = `characters.${mateId()}`;
+  return lookup(catalogs[current], key) ?? lookup(catalogs[fallbackLanguage], key) ?? '';
+}
+
 /** A character's name: `friend` is the friend the wizard has (D77). */
 export function characterName(id: string): string {
-  return t(`characters.${id === 'friend' ? friendId() : id}`);
+  return t(`characters.${id === 'friend' ? friendId() : id === 'mate' ? mateId() : id}`);
 }
 
 /** What detection reads, so tests can give their own. */

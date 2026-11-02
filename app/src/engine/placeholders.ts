@@ -5,7 +5,7 @@
 
 import type Phaser from 'phaser';
 import type { DoorLock } from './layout';
-import { DEFAULT_LOOK, type HairStyle, type Look, teacherFriend } from './looks';
+import { DEFAULT_LOOK, dormitoryMate, type HairStyle, type Look, teacherFriend } from './looks';
 
 export const TILE = 48;
 export const WIZARD_WIDTH = 36;
@@ -231,10 +231,11 @@ const GHOST: Figure = {
 
 /** The friends who teach, each in their own colours (D66, D77): Nuri, a girl,
  * and Teku, a boy, pupils with a hat like the wizard's; `friend` is the one of the
- * wizard's other gender; Wenna, the librarian. A friend the game has no figure for
+ * wizard's other gender and `mate` the one of its own (D84); Wenna, the librarian. A friend the game has no figure for
  * is drawn as a teacher. */
 export function friendFigure(id: string, wizardGender: 'girl' | 'boy'): Figure {
-  const who = id === 'friend' ? teacherFriend(wizardGender).id : id;
+  const who =
+    id === 'friend' ? teacherFriend(wizardGender).id : id === 'mate' ? dormitoryMate(wizardGender).id : id;
   if (who === 'nuri') {
     return {
       robe: '#3f8f5a',

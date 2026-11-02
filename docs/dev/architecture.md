@@ -1700,3 +1700,21 @@ one overturns stays, marked as superseded.
   outline all round. Rules out a mask whose edge is found by a difference
   where the leaf's foot meets the floor, and a door looked at only in the
   game's small picture.
+- **D114 — An open doorway ends in a threshold of the floor beyond it.**
+  Decided 2026-10-29 by the owner, on mock-ups of a drawn line, a wooden
+  board and a stone sill. At the foot of every open doorway filled by
+  `repaint.py doorways` lies a threshold from one jamb to the other, 0.08
+  cells high, inside the doorway: from the wall's edge inward, its foot
+  on the jambs' feet, never over the floor before the door. It is made of
+  the floor seen through the doorway, the `floor` box the fill is taken
+  from: a plain strip of that floor turned a quarter, so that a wooden
+  floor gives a board with its grain across the doorway and a stone floor
+  a flagstone sill; a tenth darker than the floor, with its two edges
+  drawn as thin, slightly wavy lines in the colour of that floor's own
+  joints, never in the black of the outlines. The fill ends at the
+  threshold's top; the threshold covers whatever outline of the closed
+  leaf lay at the fill's foot. Where the floor before the door is stone,
+  the painting's stone stays below the threshold with no line added.
+  Rules out a straight line of the outlines' width drawn at the foot, a
+  threshold laid over the floor before the door, and a leaf's outline
+  left as a floor line.

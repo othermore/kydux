@@ -90,41 +90,57 @@ password opens it and stays open after; the wand is picked up once, in
 
 ## Chapter 2 — The library (`02-the-library`)
 
-Inside the castle, Ilda sends the wizard to the wand bank through the
-library, where Wenna, the librarian, teaches on the way and Eldra, a ghost,
-has lost her books. The ideas: a name for a value, a variable; what a thing
-knows, an attribute; an action that gives something back; a door and its
-key; a spell that reaches. The wizard carries the friend's lent wand throughout.
+Inside the castle at night, Ilda receives the first-years in the entrance
+hall and takes them to their dormitory; there the wizard meets the
+dormitory mate, the friend of their own gender, and sleeps. In the
+morning both go to the library for a school wand, the mate having none
+and the wizard only the friend's spare; Wenna, the librarian, opens her
+door to them and teaches on the way, and Eldra, a ghost, has lost her
+books. The ideas, each where its level needs it (*How a level earns its
+idea*, above): what a thing knows, an attribute; an action that gives
+something back, kept under a name, a variable, on a thing the wizard
+cannot see; a door and its key; a number the program cannot know when it
+is written, the steps to a key that is never twice in the same place,
+kept under a name and used twice; a spell that reaches. The wizard
+carries the friend's lent wand throughout.
 
-Its scene, `the-library`: the library's door and the reading room up to
-Wenna's desk, where Wenna stands in every level; the aisles round tall
-shelves, with a locked short way; Eldra's nook and shelf; a key's room and
-the top corridor with its locked doors; the archive's narrow way down; and
-the long aisle under the high shelves to Eldra's shelf and the wand bank.
+Its scenes (D84): `the-entrance`, the hall at night, for a story;
+`the-dormitory`, the common room between the girls' dormitory on the left
+and the boys' on the right, the wizard's always the right-hand one, the
+other's arch refusing the wizard; and `the-library`: the reading room
+and Wenna's door, the bookcases, the wide hall with Eldra's nook and the
+door to the top aisle, the top aisle under the high shelves with Eldra's
+little room at its left end and the wand bank at its right, and a vault
+that stays locked.
 
 | Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
-| `story:in-the-castle` | Story 1 | Ilda's welcome; the errand to the wand bank, through the library; Wenna at its door. | |
-| `lesson:a-name-for-a-value` | Lesson 1 | A variable: a name the program gives a value, to use it again. `steps = 3`, then `wizard.move_right(steps)`. | (Python's `=`) |
-| `level:the-reading-room` | Improve 1 | Wenna's program writes the same number three times; the number given a name (`numbers_under`). | |
-| `lesson:what-things-know` | Lesson 2 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.position`, `wizard.items`, `door.locked`, `thing.position`, `concept:print` |
-| `level:which-way` | Practice 1 | The short way is a locked door with no key: print `door.locked`, then the long way round. Bonus: the code asks the door. | |
-| `lesson:finding-things` | Lesson 3 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept in a variable; `give` hands a thing to whoever stands beside. | `wizard.find_nearest`, `wizard.give` |
-| `level:the-lost-book` | Practice 2 | Eldra's book in her nook: found, picked up, given. Bonus: found with `find_nearest`. | |
-| `lesson:keys-and-doors` | Lesson 4 | A locked door opens with `door.open()` beside it, once its key is carried. | `door.open` |
-| `level:the-locked-door` | Practice 3 | The key's room and its door. Bonus: fewer than 7 lines. | |
-| `level:the-wrong-order` | Fix 1 | Wenna's program opens the door before it has the key. | |
-| `level:the-archive` | Practice 4 | Down the archive: a door by hand, a key, the vault's locked door. Bonus: the key found with `find_nearest`. | |
+| `story:the-entrance` | Story 1 | Ilda welcomes the first-years in the entrance hall and takes them to their dormitory. | |
+| `story:the-first-night` | Story 2 | The common room; the friend goes to the other dormitory. | |
+| `level:your-bed` | Practice 1 | To one's own dormitory, past the other's arch, which refuses the wizard; the mate met; asleep in the free bed. Bonus: no bumps. | `wizard.sleep` |
+| `story:the-morning` | Story 3 | The mate needs a wand, and the wizard's is lent: to the library, together. | |
+| `story:at-the-library` | Story 4 | Wenna receives them and opens her door. | |
+| `lesson:what-things-know` | Lesson 1 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.position`, `wizard.items`, `door.locked`, `thing.position`, `concept:print` |
+| `lesson:finding-things` | Lesson 2 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept under a name, a variable; `give` hands a thing to whoever stands beside. | `wizard.find_nearest`, `wizard.give` (and Python's `=`) |
+| `level:the-lost-book` | Practice 2 | Eldra's book across the hall: found, picked up, given. Bonus: found with `find_nearest`. | |
+| `lesson:keys-and-doors` | Lesson 3 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. | `door.open`, `thing.reveal` |
+| `level:the-hidden-key` | Practice 3 | The centre door's key lies behind Eldra's armchair, out of sight: found, revealed, picked up, the door opened. Bonus: found with `find_nearest`. | |
+| `lesson:the-distance` | Lesson 4 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
+| `level:the-moving-key` | Improve 1 | Eldra's room key lies at three, five or seven steps, in three ways; Wenna's program walks yesterday's five. Bonus: no number written. | |
+| `level:the-wrong-order` | Fix 1 | Wenna's program opens Eldra's door from across the aisle, then walks to it. | |
 | `lesson:fendra` | Lesson 5 | A spell that reaches: `fendra` draws the nearest thing in reach to the wizard's tile. | (the spell `fendra`) |
-| `level:the-high-shelf` | Practice 5 | A rare book on the high shelf, drawn down from in line with it. | |
-| `level:eldras-book` | Practice 6 | The chapter together: a key and its door, Eldra's book on her shelf, `fendra`, the book given. Bonus: the book named with `find_nearest` before the spell moves it. | |
-| `story:the-wand-bank` | Story 2 | Eldra's thanks; a school wand borrowed, the friend's spare given back; the chapter's ideas summed up. | |
+| `level:the-high-shelf` | Practice 4 | The glowing rare book on the high shelf, drawn down from below it. | |
+| `level:eldras-book` | Practice 5 | The chapter together: Eldra's own book from her little room, named, drawn down, given. Bonus: named with `find_nearest` before the spell moves it. | |
+| `story:the-wand-bank` | Story 5 | Eldra's thanks; the school wands; the friend's spare given back; the chapter summed up; at dusk, the rumour of the passages. | |
 
-The world features chapter 2 needs: shelves, tiles the wizard cannot walk
-on but can see across (D46); `fendra`, which pulls the nearest thing in
-sight to the wizard's tile (D47); Eldra as an actor who stands, and
-`wizard.give` with a `give` goal (D48); the wand carried from a level's
-start (D49); a scene and a friend (D65, D66).
+The world features chapter 2 needs: shelves and bookcases, tiles the
+wizard cannot walk on but can see across (D46); `fendra`, which pulls the
+nearest thing in sight to the wizard's tile (D47); Eldra as an actor who
+stands, and `wizard.give` with a `give` goal (D48); the wand carried from
+a level's start (D49); a level in several ways (D51); scenes and a friend
+(D65, D66); a bed and `wizard.sleep`, and the tiles the wizard may not
+step on (D84); a thing drawn where the level says, hidden and revealed
+(D85); `distance_to` (D86).
 
 ## Chapter 3 — The passages (`03-passages`)
 
@@ -234,7 +250,7 @@ stairs* (moving tiles and functions), *Zarek's revenge* (the race again),
 
 ## The count
 
-Twenty-six lessons and thirty-five levels, thirty-seven with the fix
+Twenty-six lessons and thirty-four levels, thirty-six with the fix
 levels of chapters 4 and 5, then ten challenges. The draft
 asked for 10 to 20 lessons; one idea per lesson, each with its theory,
 asks for more, and each is short: a few pages.

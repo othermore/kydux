@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { FOOT_IN_CELL, figureDepth, loweredBy, overDepth, rowDepth } from './depth';
+import { coverDepth, FOOT_IN_CELL, figureDepth, loweredBy, overDepth, rowDepth, sleeperDepth } from './depth';
 
 describe('the depths of a painted scene (D76, D95)', () => {
   it('draws a row over the figures above it and under the figure standing on it', () => {
@@ -16,6 +16,12 @@ describe('the depths of a painted scene (D76, D95)', () => {
 
   it('draws a wall seen from above over every figure of the scene', () => {
     expect(overDepth(24)).toBeGreaterThan(figureDepth(24 + FOOT_IN_CELL + 0.5) + 0.0005);
+  });
+
+  it('lays a sleeper over its bed and under its quilt, under a figure on the bed’s row (D97)', () => {
+    expect(sleeperDepth(6)).toBeGreaterThan(rowDepth(6));
+    expect(coverDepth(6)).toBeGreaterThan(sleeperDepth(6));
+    expect(coverDepth(6)).toBeLessThan(figureDepth(6 + FOOT_IN_CELL));
   });
 
   it('lowers a figure only on the cells a scene names', () => {

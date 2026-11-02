@@ -33,12 +33,13 @@ onto its crop by the least difference with the painting, as `join` lays a mended
 part, and writes the painting with the magenta where they have it: the picture
 that says which thing a static thing's mask is (`"mask": "marked"`,
 export_scene.static_alpha), whole, with the painting's outline beside it added;
-the sweep checks the scene against it. A model keeps shapes but not places to the
-pixel, so each picture laid whole is then moved part by part, its outlines onto
-the painting's (moved_locally). A part may be asked several times, its
+the sweep checks the scene against it. A model keeps shapes but not places to
+the pixel, so each picture laid whole is then moved part by part, its outlines
+onto the painting's (moved_locally). A part may be asked several times, its
 `picture` a list: it is magenta where more than half the tries are. The scene's
 settings' `marks` give the pictures, each with its crop, and where the painting
-goes.
+goes; things that lie on other things, a bed's covers on the bed, are marked in
+a set of their own, each set a painting (`sets`), the first the sweep's.
 
 `fill` mends without a model: each box, a narrow upright strip, is painted row
 by row from the pixels just left and right of it, blended across, so that what
@@ -292,28 +293,37 @@ def moved_locally(shown: np.ndarray, crop: np.ndarray) -> np.ndarray:
     return shown[sy, sx]
 
 
-def marks(scene: str) -> Path:
+def marks(scene: str) -> list[Path]:
     settings = scene_settings.settings(scene)
-    found = settings.data["marks"]
     painting = np.array(Image.open(settings.painting).convert("RGB"))
-    out = painting.copy()
-    for part in found["pictures"]:
-        x0, y0, x1, y1 = part["crop"]
-        crop = painting[y0:y1, x0:x1]
-        # A part asked of Gemini several times is magenta where most tries agree:
-        # each try strays somewhere else, and the vote keeps what they share.
-        names = part["picture"] if isinstance(part["picture"], list) else [part["picture"]]
-        votes = np.zeros(crop.shape[:2], dtype=np.int16)
-        for name in names:
-            picture = Image.open(settings.edits / name).convert("RGB")
-            whole = laid(crop, np.ones(crop.shape[:2], dtype=np.float32), picture)
-            shown = moved_locally(whole.clip(0, 255).astype(np.uint8), crop)
-            votes += image_first.marked(shown)
-        here = votes * 2 > len(names)
-        out[y0:y1, x0:x1][here] = (255, 0, 255)
-    target = REPO / found["painting"]
-    Image.fromarray(out).save(target)
-    return target
+    written = []
+    for found in mark_sets(settings.data["marks"]):
+        out = painting.copy()
+        for part in found["pictures"]:
+            x0, y0, x1, y1 = part["crop"]
+            crop = painting[y0:y1, x0:x1]
+            # A part asked of Gemini several times is magenta where most tries
+            # agree: each try strays somewhere else, and the vote keeps what they
+            # share.
+            names = part["picture"] if isinstance(part["picture"], list) else [part["picture"]]
+            votes = np.zeros(crop.shape[:2], dtype=np.int16)
+            for name in names:
+                picture = Image.open(settings.edits / name).convert("RGB")
+                whole = laid(crop, np.ones(crop.shape[:2], dtype=np.float32), picture)
+                shown = moved_locally(whole.clip(0, 255).astype(np.uint8), crop)
+                votes += image_first.marked(shown)
+            here = votes * 2 > len(names)
+            out[y0:y1, x0:x1][here] = (255, 0, 255)
+        target = REPO / found["painting"]
+        Image.fromarray(out).save(target)
+        written.append(target)
+    return written
+
+
+def mark_sets(marks: dict) -> list[dict]:
+    """A scene's sets of marked pictures, each written into a painting of its own:
+    its things in one, and a bed's covers, which lie on its bed, in another."""
+    return marks["sets"] if "sets" in marks else [marks]
 
 
 def main(arguments: list[str]) -> int:
@@ -328,7 +338,8 @@ def main(arguments: list[str]) -> int:
         )
         return 2
     if arguments[1] == "marks":
-        print(marks(arguments[0]).relative_to(REPO))
+        for path in marks(arguments[0]):
+            print(path.relative_to(REPO))
         return 0
     if arguments[1] == "canvas":
         print(canvas(arguments[0], section).relative_to(REPO))

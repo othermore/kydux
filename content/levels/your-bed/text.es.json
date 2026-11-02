@@ -10,7 +10,7 @@
     "Da unos pasos a la derecha para situarte junto a la cama libre.",
     "Por último, usa el método `sleep` para acostarte y descansar."
   ],
-  "intro": "¡Hola! Este año compartimos dormitorio. ¡Debes estar muy cansad{o|a} después del viaje! La cama libre es la que está justo al lado de la mía. Entra, acuéstate y duerme un poco.",
+  "intro": "Entra y coge la cama libre justo al lado de la mía. Acuéstate y duerme un poco.",
   "outro": "¡Buenos días! Vamos a la biblioteca a buscarte una varita de la escuela para ti.",
   "learned": "Ahora sabes que una acción solo se puede hacer en el lugar correcto, y que un programa debe caminar hasta allí primero."
 }

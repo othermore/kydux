@@ -79,8 +79,8 @@ test.describe('in the dormitory (D84)', () => {
   test('sleep beside the free bed ends the level; elsewhere it is refused', async ({ page }) => {
     await seedWizard(page, MARTA);
     await open(page, 'your-bed');
-    // Two pupils lie asleep from the start, under their quilts (D91).
-    await expect(page.locator('#scene')).toHaveAttribute('data-asleep', 'pupil_1:bed_3:lying,pupil_2:bed_4:lying');
+    // The mate lies asleep from the start, under the sheet, and no one else (D96, D97).
+    await expect(page.locator('#scene')).toHaveAttribute('data-asleep', 'mate:bed_1:lying');
     expect(await run(page, 'wizard.sleep()')).toContain('There is no bed right beside me.');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
@@ -95,15 +95,29 @@ test.describe('in the dormitory (D84)', () => {
     await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
   });
 
+  test('at the first night, the friend and the mate go to bed, each in their dormitory (D96)', async ({ page }) => {
+    await seedWizard(page, MARTA);
+    await page.goto('/#story/the-first-night');
+    const scene = page.locator('#scene');
+    for (let step = 1; step < 9; step += 1) {
+      await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+      await storyNext(page);
+    }
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(scene).toHaveAttribute('data-asleep', 'friend:bed_6:lying,mate:bed_1:lying');
+    await page.waitForTimeout(400);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-friend.png` });
+  });
+
   test('the mate lies asleep in the morning, and gets up to speak (D91)', async ({ page }) => {
     await seedWizard(page, PABLO);
     await page.goto('/#story/the-morning');
     const scene = page.locator('#scene');
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
-    await expect(scene).toHaveAttribute('data-asleep', 'mate:bed_1:lying,pupil_1:bed_3:lying,pupil_2:bed_4:lying');
+    await expect(scene).toHaveAttribute('data-asleep', 'mate:bed_1:lying');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-mate.png` });
     await storyNext(page);
-    await expect(scene).toHaveAttribute('data-asleep', 'pupil_1:bed_3:lying,pupil_2:bed_4:lying');
+    await expect(scene).not.toHaveAttribute('data-asleep', /mate/);
     await expect(scene).toHaveAttribute('data-actors', /mate:16,5/);
   });
 });

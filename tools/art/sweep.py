@@ -116,17 +116,13 @@ class Scene:
 
 
 def walks(scene: str) -> np.ndarray:
-    """The cells walked on, from the scene's map and its terrains, less those the
-    wizard is refused."""
+    """The cells walked on, from the scene's map and its terrains: the cells the
+    wizard is refused too, which the others walk on (D84)."""
     folder = CONTENT / "scenes" / scene
     marks = (folder / "map.txt").read_text(encoding="utf-8").split()
-    data = json.loads((folder / "scene.json").read_text(encoding="utf-8"))
-    walk = {letter for letter, terrain in data["terrains"].items() if terrain.get("walk")} | {"."}
-    walked = np.array([[char in walk for char in row] for row in marks])
-    # A cell the wizard is refused (D84) is never stood on.
-    for x, y in data.get("forbidden", {}).get("cells", []):
-        walked[y, x] = False
-    return walked
+    terrains = json.loads((folder / "scene.json").read_text(encoding="utf-8"))["terrains"]
+    walk = {letter for letter, terrain in terrains.items() if terrain.get("walk")} | {"."}
+    return np.array([[char in walk for char in row] for row in marks])
 
 
 #: Where in its cell a row's things are drawn, as a part of a cell (painted.ts): under

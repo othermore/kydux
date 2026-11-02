@@ -275,6 +275,10 @@ def static_alpha(
         for hole in thing.get("holes", []):
             mask &= ~native_area(painting.shape[:2], grid, hole)
     mask = image_first.snapped(mask & inside, painting, cell, image_first.thresholds(th))
+    if thing["mask"] == "polygon":
+        # A polygon drawn by hand runs beside its outline, not on it: the line just
+        # beyond its edge is the thing's too.
+        mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th))
     return (mask & inside).astype(np.float32)
 
 
@@ -466,7 +470,8 @@ def scene(settings: Settings) -> Path:
         # picture, as a cut scene is against its ground-only edit.
         marks = settings.data.get("marks")
         if marks:
-            shutil.copy(REPO / marks["painting"], src / "ground-only.png")
+            first = marks["sets"][0] if "sets" in marks else marks
+            shutil.copy(REPO / first["painting"], src / "ground-only.png")
         else:
             Image.fromarray(ground).save(src / "ground-only.png")
     empty = [0, 0, 0, 0]

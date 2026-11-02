@@ -9,7 +9,20 @@
     {
       "row": 6,
       "image": "row-6-static.webp",
-      "top": 451,
+      "top": 384,
+      "static": true
+    },
+    {
+      "row": 6,
+      "image": "row-6-static-cover.webp",
+      "top": 403,
+      "static": true,
+      "cover": true
+    },
+    {
+      "row": 7,
+      "image": "row-7-static.webp",
+      "top": 509,
       "static": true
     },
     {
@@ -19,69 +32,104 @@
       "static": true
     },
     {
+      "row": 8,
+      "image": "row-8-static-cover.webp",
+      "top": 634,
+      "static": true,
+      "cover": true
+    },
+    {
+      "row": 9,
+      "image": "row-9-static.webp",
+      "top": 749,
+      "static": true
+    },
+    {
       "row": 11,
       "image": "row-11-static.webp",
-      "top": 902,
+      "top": 864,
       "static": true
+    },
+    {
+      "row": 11,
+      "image": "row-11-static-cover.webp",
+      "top": 864,
+      "static": true,
+      "cover": true
     },
     {
       "row": 13,
       "image": "row-13-static.webp",
-      "top": 1138,
+      "top": 1142,
       "static": true
     },
     {
-      "row": 14,
-      "image": "row-14-static.webp",
-      "top": 1171,
-      "static": true
+      "row": 13,
+      "image": "row-13-static-cover.webp",
+      "top": 1104,
+      "static": true,
+      "cover": true
+    },
+    {
+      "row": 13,
+      "image": "row-13-static-over.webp",
+      "top": 379,
+      "static": true,
+      "over": true
+    },
+    {
+      "row": 17,
+      "image": "row-17-static-over.webp",
+      "top": 1181,
+      "static": true,
+      "over": true
     }
   ],
   "things": {},
   "beds": {
     "bed_1": {
       "head": [
-        19.42,
-        5.4
+        19.72,
+        5.3
       ],
       "toward": "right",
       "row": 6
     },
     "bed_2": {
       "head": [
-        19.7,
-        7.8
+        19.95,
+        7.65
       ],
       "toward": "right",
       "row": 8
     },
     "bed_3": {
       "head": [
-        20.0,
-        10.0
+        20.2,
+        10.08
       ],
       "toward": "right",
       "row": 11
     },
     "bed_4": {
       "head": [
-        20.4,
-        12.45
+        20.45,
+        12.5
       ],
       "toward": "right",
       "row": 13
     },
     "bed_5": {
       "head": [
-        4.85,
-        5.3
+        4.82,
+        5.32
       ],
       "toward": "left",
       "row": 6
     },
     "bed_6": {
       "head": [
-        4.55,
+        4.58,
         7.65
       ],
       "toward": "left",
@@ -90,15 +138,15 @@
     "bed_7": {
       "head": [
         4.2,
-        9.95
+        10.08
       ],
       "toward": "left",
       "row": 11
     },
     "bed_8": {
       "head": [
-        3.9,
-        12.35
+        3.85,
+        12.5
       ],
       "toward": "left",
       "row": 13

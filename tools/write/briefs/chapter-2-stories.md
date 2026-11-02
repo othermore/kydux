@@ -103,8 +103,8 @@ The scene: the first-years' rooms at night. A common room with a fire, two
 armchairs, a round rug; an open arch on its left into the girls'
 dormitory, an open arch on its right into the boys'; its door at the
 bottom, to the castle's corridor. Ilda, the wizard and the friend stand by
-the door. Through the arch of the wizard's dormitory, two pupils already lie
-asleep in their beds; they say nothing.
+the door. (Its staging, with both friends going to bed, is
+`chapter-2-first-night.md`'s.)
 
 1. voice. The common room: the fire, the quiet, the two arches.
 2. ilda. Ilda says these are the first-years' rooms: the girls sleep on
@@ -122,8 +122,7 @@ asleep in their beds; they say nothing.
 
 The scene: the wizard's dormitory in the morning, light at its window,
 four beds. The wizard stands by the bed they slept in; {mate}, the
-dormitory mate met last night, is still asleep in theirs, and two other
-pupils sleep on in the other beds.
+dormitory mate met last night, is still asleep in theirs.
 
 1. voice. Morning light through the window: you slept well.
 2. mate. ({mate} wakes and gets up.) {mate} says good morning, and that they must go to the library,

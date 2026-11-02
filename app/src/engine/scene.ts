@@ -85,7 +85,7 @@ import {
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
-import { FOOT_IN_CELL, figureDepth, loweredBy, rowDepth } from './depth';
+import { FOOT_IN_CELL, figureDepth, loweredBy, rowDepth, sleeperDepth } from './depth';
 import { Speech } from './speech';
 import { Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
@@ -704,7 +704,7 @@ class LevelScene extends Phaser.Scene {
       // The figure's feet are its origin: they lie the head's reach from the pillow.
       const x = (place.head[0] - toward * figures.height_cells * HEAD_REACH) * TILE;
       const y = place.head[1] * TILE;
-      sprite.setFrame(frame).setAngle(90 * toward).setPosition(x, y).setDepth(rowDepth(place.row) - 0.002);
+      sprite.setFrame(frame).setAngle(90 * toward).setPosition(x, y).setDepth(sleeperDepth(place.row));
       this.asleep.set(sprite, { id, bed, lying: true });
       this.markAsleep();
       if (!instant && !this.still) {

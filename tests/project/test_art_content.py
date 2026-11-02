@@ -95,7 +95,9 @@ def test_a_level_s_start_mark_things_and_friend_are_never_hidden(scene):
             ):
                 cells[thing["id"]] = thing["at"]
         for actor in level.get("actors", []):
-            cells[actor["id"]] = actor["at"]
+            # A pupil asleep lies in its bed, under its quilt (D97).
+            if "asleep" not in actor:
+                cells[actor["id"]] = actor["at"]
         for what, (x, y) in cells.items():
             if what in art["things"]:
                 continue

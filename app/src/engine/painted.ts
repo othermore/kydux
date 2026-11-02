@@ -8,9 +8,9 @@
 
 import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
-import { dormitoryMate, friendSheet, type Look, pupilLook, teacherFriend } from './looks';
+import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
-import { type Lowered, overDepth, rowDepth } from './depth';
+import { coverDepth, type Lowered, overDepth, rowDepth } from './depth';
 import { shiftBy } from './shift';
 import type { Tile } from './sight';
 
@@ -166,7 +166,7 @@ export function paintScene(scene: Phaser.Scene, art: Art): Phaser.GameObjects.Im
       .image(0, row.top * scale, rowKey(row))
       .setOrigin(0, 0)
       .setScale(scale)
-      .setDepth(row.over ? overDepth(rows) : rowDepth(row.row, row.under)),
+      .setDepth(row.over ? overDepth(rows) : row.cover ? coverDepth(row.row) : rowDepth(row.row, row.under)),
   );
 }
 
@@ -213,8 +213,6 @@ export function figureName(id: string, look: Look): string {
   if (id === 'friend') return friendSheet(teacherFriend(look.gender).id, look);
   if (id === 'mate') return friendSheet(dormitoryMate(look.gender).id, look);
   if (id === 'nuri' || id === 'teku') return friendSheet(id, look);
-  const pupil = /^pupil_(\d+)$/.exec(id);
-  if (pupil) return `wizard-${pupilLook(Number(pupil[1]), look).id}`;
   return id === 'wizard' ? `wizard-${look.id}` : id;
 }
 

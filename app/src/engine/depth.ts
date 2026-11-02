@@ -27,6 +27,16 @@ export function rowDepth(row: number, under = false): number {
   return figureDepth(row + (under ? UNDER_IN_CELL : ROW_IN_CELL));
 }
 
+/** A bed's frame is its row's; a pupil asleep in it lies just over the frame, and
+ * the bed's quilt and sheet just over the sleeper (D97): all under a figure
+ * standing on the bed's row, in front of the bed. */
+export function sleeperDepth(row: number): number {
+  return rowDepth(row) + 0.0002;
+}
+export function coverDepth(row: number): number {
+  return rowDepth(row) + 0.0004;
+}
+
 /** The depth of what is drawn over every figure of a scene `rows` rows tall: a wall
  * seen from above (D95). */
 export function overDepth(rows: number): number {

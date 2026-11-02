@@ -10,7 +10,7 @@
     "Take a few steps right to stand beside the free bed.",
     "Finally, use the `sleep` method to lie down and rest."
   ],
-  "intro": "Hello! We are sharing a dormitory this year. You must be tired after the journey! The free bed is the one right beside mine. Come on in, lie down and get some sleep.",
+  "intro": "Come on in and take the free bed right beside mine. Lie down and get some sleep.",
   "outro": "Good morning! Let us go to the library and find you a school wand of your own.",
   "learned": "Now you know that an action may need the right place, and that a program must walk there first."
 }

@@ -20,26 +20,6 @@
       ],
       "facing": "down",
       "asleep": "bed_1"
-    },
-    {
-      "id": "pupil_1",
-      "kind": "friend",
-      "at": [
-        16,
-        10
-      ],
-      "asleep": "bed_3",
-      "facing": "down"
-    },
-    {
-      "id": "pupil_2",
-      "kind": "friend",
-      "at": [
-        16,
-        12
-      ],
-      "asleep": "bed_4",
-      "facing": "down"
     }
   ],
   "steps": [

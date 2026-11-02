@@ -22,26 +22,9 @@
       "id": "mate",
       "at": [
         16,
-        6
-      ]
-    },
-    {
-      "kind": "friend",
-      "id": "pupil_1",
-      "at": [
-        16,
-        10
+        5
       ],
-      "asleep": "bed_3"
-    },
-    {
-      "kind": "friend",
-      "id": "pupil_2",
-      "at": [
-        16,
-        12
-      ],
-      "asleep": "bed_4"
+      "asleep": "bed_1"
     }
   ],
   "api": [

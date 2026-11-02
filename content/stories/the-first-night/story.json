@@ -30,24 +30,13 @@
       "facing": "up"
     },
     {
-      "id": "pupil_1",
+      "id": "mate",
       "kind": "friend",
       "at": [
-        16,
-        10
+        14,
+        8
       ],
-      "asleep": "bed_3",
-      "facing": "down"
-    },
-    {
-      "id": "pupil_2",
-      "kind": "friend",
-      "at": [
-        16,
-        12
-      ],
-      "asleep": "bed_4",
-      "facing": "down"
+      "facing": "left"
     }
   ],
   "steps": [
@@ -83,10 +72,37 @@
       }
     },
     {
-      "who": "voice",
+      "who": "mate",
       "by": "friend",
       "do": {
-        "vanish": true
+        "sleep": "bed_6"
+      }
+    },
+    {
+      "who": "voice",
+      "by": "mate",
+      "do": {
+        "walk": [
+          16,
+          8
+        ]
+      }
+    },
+    {
+      "who": "voice",
+      "by": "mate",
+      "do": {
+        "walk": [
+          16,
+          5
+        ]
+      }
+    },
+    {
+      "who": "voice",
+      "by": "mate",
+      "do": {
+        "sleep": "bed_1"
       }
     }
   ]

@@ -1,5 +1,5 @@
 {
-  "about": "The first-year dormitory, chapter 2's night scene: the chosen painting (image-first-dormitory-3) with its two wands taken off the trunks and its border mended by Gemini (game-dormitory-border), its grid removed, and its bottom right corner mended (repaint) so that a wall closes the corridor off from the walk along the battlements. What a figure passes under is cut as static things (D89): the arch over the common room's door, by its pale stone; the openings into the two dormitories are a quarter of a cell wide in a wall seen from above, narrower than a figure, and stay ground; each bed's quilt is a static box, drawn over the pupil asleep in it, its head on the pillow left out (D91); everything else is ground, its cells not walked on. Pictures named here are in art/raw/, which git ignores.",
+  "about": "The first-year dormitory, chapter 2's night scene: the chosen painting (image-first-dormitory-3) with its two wands taken off the trunks and its border mended by Gemini (game-dormitory-border), its grid removed, and its bottom right corner mended (repaint) so that a wall closes the corridor off from the walk along the battlements. Its beds, trunks, bedside tables, armchairs and round table are cut by Gemini's magenta (marks); its walls, the ones between the rooms and the front one with the door, by polygons, drawn over every figure (D95); each bed's quilt and folded sheet, drawn over the pupil asleep in it, by Gemini's magenta too (D97). Pictures named here are in art/raw/, which git ignores.",
   "sources": {
     "folder": "art/raw/game-dormitory",
     "edits": "art/raw/game-dormitory",
@@ -28,194 +28,630 @@
     "painting": "art/raw/game-dormitory/dormitory-mended.png"
   },
   "things": {
-    "door_arch": {
-      "about": "The stone arch over the common room's door, drawn over whoever stands in the doorway.",
+    "front_wall": {
+      "about": "The front wall along the common room and the dormitories, with the door and its arch: over every figure (D95), who walks behind it on row 14 and stands in the doorway behind the door.",
       "box": [
-        10.95,
-        12.2,
-        13.75,
-        14.15
+        0,
+        12.3,
+        25,
+        18
       ],
-      "row": 14,
+      "row": 17,
       "static": true,
       "solid": true,
-      "mask": "pale",
+      "mask": "polygon",
+      "polygon": [
+        [
+          0,
+          13.53
+        ],
+        [
+          11.25,
+          13.53
+        ],
+        [
+          11.25,
+          13.4
+        ],
+        [
+          11.4,
+          13.0
+        ],
+        [
+          11.7,
+          12.65
+        ],
+        [
+          12.2,
+          12.42
+        ],
+        [
+          12.6,
+          12.42
+        ],
+        [
+          13.1,
+          12.6
+        ],
+        [
+          13.45,
+          12.95
+        ],
+        [
+          13.62,
+          13.35
+        ],
+        [
+          13.65,
+          13.53
+        ],
+        [
+          25,
+          13.53
+        ],
+        [
+          25,
+          18
+        ],
+        [
+          0,
+          18
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      },
+      "over": true
+    },
+    "wall_left": {
+      "about": "The wall between the common room and the left dormitory, its doorway's open door with it: over every figure (D95).",
+      "box": [
+        8.3,
+        3.95,
+        9.7,
+        13.6
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "polygon": [
+        [
+          8.99,
+          4.05
+        ],
+        [
+          9.6,
+          4.05
+        ],
+        [
+          9.5,
+          6.9
+        ],
+        [
+          9.55,
+          7.0
+        ],
+        [
+          9.55,
+          8.6
+        ],
+        [
+          9.42,
+          9.3
+        ],
+        [
+          9.3,
+          9.9
+        ],
+        [
+          9.13,
+          10.1
+        ],
+        [
+          9.13,
+          12.5
+        ],
+        [
+          9.3,
+          13.53
+        ],
+        [
+          8.55,
+          13.53
+        ],
+        [
+          8.57,
+          12.8
+        ],
+        [
+          8.65,
+          11.3
+        ],
+        [
+          8.73,
+          9.8
+        ],
+        [
+          8.82,
+          8.3
+        ],
+        [
+          8.9,
+          6.8
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      },
+      "over": true
+    },
+    "wall_right": {
+      "about": "The wall between the common room and the right dormitory, as the left one.",
+      "box": [
+        14.85,
+        3.95,
+        16.2,
+        13.6
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "polygon": [
+        [
+          14.96,
+          4.05
+        ],
+        [
+          15.55,
+          4.05
+        ],
+        [
+          15.57,
+          5.3
+        ],
+        [
+          15.66,
+          6.8
+        ],
+        [
+          15.74,
+          8.3
+        ],
+        [
+          15.83,
+          9.8
+        ],
+        [
+          15.99,
+          11.3
+        ],
+        [
+          16.07,
+          12.8
+        ],
+        [
+          16.09,
+          13.53
+        ],
+        [
+          15.62,
+          13.53
+        ],
+        [
+          15.6,
+          12.0
+        ],
+        [
+          15.52,
+          11.0
+        ],
+        [
+          15.45,
+          10.3
+        ],
+        [
+          15.25,
+          9.9
+        ],
+        [
+          15.08,
+          9.4
+        ],
+        [
+          15.04,
+          8.6
+        ],
+        [
+          15.04,
+          7.0
+        ],
+        [
+          15.0,
+          6.3
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      },
+      "over": true
+    },
+    "bed_1_frame": {
+      "about": "bed_1, its trunk and its bedside table: a figure on the row above is behind it, one beside it or below it in front of it.",
+      "box": [
+        16.5,
+        4.0,
+        20.7,
+        7.0
+      ],
+      "row": 6,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bed_2_frame": {
+      "about": "bed_2, its trunk and its bedside table: a figure on the row above is behind it, one beside it or below it in front of it.",
+      "box": [
+        16.8,
+        7.0,
+        20.9,
+        9.0
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bed_3_frame": {
+      "about": "bed_3, its trunk and its bedside table: a figure on the row above is behind it, one beside it or below it in front of it.",
+      "box": [
+        17.0,
+        9.0,
+        21.0,
+        11.9
+      ],
+      "row": 11,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bed_4_frame": {
+      "about": "bed_4, its trunk and its bedside table: a figure on the row above is behind it, one beside it or below it in front of it.",
+      "box": [
+        17.2,
+        11.9,
+        21.2,
+        13.52
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bed_5_frame": {
+      "about": "bed_5, its trunk and its bedside table, as the right dormitory's beds.",
+      "box": [
+        3.9,
+        4.0,
+        8.0,
+        7.0
+      ],
+      "row": 6,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bed_6_frame": {
+      "about": "bed_6, its trunk and its bedside table, as the right dormitory's beds.",
+      "box": [
+        3.6,
+        7.0,
+        7.6,
+        9.0
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bed_7_frame": {
+      "about": "bed_7, its trunk and its bedside table, as the right dormitory's beds.",
+      "box": [
+        3.3,
+        9.0,
+        7.3,
+        11.9
+      ],
+      "row": 11,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bed_8_frame": {
+      "about": "bed_8, its trunk and its bedside table, as the right dormitory's beds.",
+      "box": [
+        2.9,
+        11.9,
+        7.0,
+        13.52
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "armchair_left": {
+      "about": "The common room's left armchair: whoever stands behind it, on row 6, is behind it.",
+      "box": [
+        10.4,
+        5.5,
+        12.1,
+        7.6
+      ],
+      "row": 7,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "armchair_right": {
+      "about": "The common room's right armchair, as the left one.",
+      "box": [
+        13.0,
+        5.3,
+        14.75,
+        7.4
+      ],
+      "row": 7,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "round_table": {
+      "about": "The round table with its candle.",
+      "box": [
+        12.9,
+        7.8,
+        14.0,
+        9.45
+      ],
+      "row": 9,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "dormitory-marked.png",
       "states": {
         "standing": "painting"
       }
     },
     "bed_1_cover": {
-      "about": "bed_1's quilt from the pillow to its foot, drawn over whoever sleeps in it (D91).",
+      "about": "bed_1's quilt with its folded sheet, from the sheet's line by the pillow to the bed's foot, drawn over whoever sleeps in it (D97).",
       "box": [
-        17.35,
-        4.7,
-        19.0,
-        6.5
+        17.3,
+        4.2,
+        19.6,
+        6.6
       ],
       "row": 6,
       "static": true,
       "solid": true,
-      "mask": "box",
+      "mask": "marked",
+      "marked": "dormitory-covers.png",
       "states": {
         "standing": "painting"
-      }
+      },
+      "cover": true
     },
     "bed_2_cover": {
-      "about": "bed_2's quilt from the pillow to its foot, drawn over whoever sleeps in it (D91).",
+      "about": "bed_2's quilt with its folded sheet, from the sheet's line by the pillow to the bed's foot, drawn over whoever sleeps in it (D97).",
       "box": [
-        17.6,
-        7.05,
-        19.25,
-        8.9
+        17.55,
+        6.85,
+        19.85,
+        9.0
       ],
       "row": 8,
       "static": true,
       "solid": true,
-      "mask": "box",
+      "mask": "marked",
+      "marked": "dormitory-covers.png",
       "states": {
         "standing": "painting"
-      }
+      },
+      "cover": true
     },
     "bed_3_cover": {
-      "about": "bed_3's quilt from the pillow to its foot, drawn over whoever sleeps in it (D91).",
+      "about": "bed_3's quilt with its folded sheet, from the sheet's line by the pillow to the bed's foot, drawn over whoever sleeps in it (D97).",
       "box": [
-        17.95,
-        9.45,
-        19.55,
-        11.3
+        17.75,
+        9.15,
+        20.0,
+        11.4
       ],
       "row": 11,
       "static": true,
       "solid": true,
-      "mask": "box",
+      "mask": "marked",
+      "marked": "dormitory-covers.png",
       "states": {
         "standing": "painting"
-      }
+      },
+      "cover": true
     },
     "bed_4_cover": {
-      "about": "bed_4's quilt from the pillow to its foot, drawn over whoever sleeps in it (D91).",
+      "about": "bed_4's quilt with its folded sheet, from the sheet's line by the pillow to the bed's foot, drawn over whoever sleeps in it (D97).",
       "box": [
-        18.25,
-        11.9,
-        19.95,
-        13.85
+        18.0,
+        11.6,
+        20.3,
+        13.52
       ],
       "row": 13,
       "static": true,
       "solid": true,
-      "mask": "box",
+      "mask": "marked",
+      "marked": "dormitory-covers.png",
       "states": {
         "standing": "painting"
-      }
+      },
+      "cover": true
     },
     "bed_5_cover": {
-      "about": "bed_5's quilt from the pillow to its foot, drawn over whoever sleeps in it (D91).",
+      "about": "bed_5's quilt with its folded sheet, from the sheet's line by the pillow to the bed's foot, drawn over whoever sleeps in it (D97).",
       "box": [
-        5.15,
-        4.7,
-        7.0,
-        6.5
+        5.0,
+        4.2,
+        7.1,
+        6.6
       ],
       "row": 6,
       "static": true,
       "solid": true,
-      "mask": "box",
+      "mask": "marked",
+      "marked": "dormitory-covers.png",
       "states": {
         "standing": "painting"
-      }
+      },
+      "cover": true
     },
     "bed_6_cover": {
-      "about": "bed_6's quilt from the pillow to its foot, drawn over whoever sleeps in it (D91).",
+      "about": "bed_6's quilt with its folded sheet, from the sheet's line by the pillow to the bed's foot, drawn over whoever sleeps in it (D97).",
       "box": [
-        4.95,
-        7.0,
-        6.75,
-        8.9
+        4.7,
+        6.6,
+        6.95,
+        9.0
       ],
       "row": 8,
       "static": true,
       "solid": true,
-      "mask": "box",
+      "mask": "marked",
+      "marked": "dormitory-covers.png",
       "states": {
         "standing": "painting"
-      }
+      },
+      "cover": true
     },
     "bed_7_cover": {
-      "about": "bed_7's quilt from the pillow to its foot, drawn over whoever sleeps in it (D91).",
+      "about": "bed_7's quilt with its folded sheet, from the sheet's line by the pillow to the bed's foot, drawn over whoever sleeps in it (D97).",
       "box": [
-        4.55,
-        9.4,
-        6.5,
-        11.3
+        4.4,
+        9.0,
+        6.7,
+        11.4
       ],
       "row": 11,
       "static": true,
       "solid": true,
-      "mask": "box",
+      "mask": "marked",
+      "marked": "dormitory-covers.png",
       "states": {
         "standing": "painting"
-      }
+      },
+      "cover": true
     },
     "bed_8_cover": {
-      "about": "bed_8's quilt from the pillow to its foot, drawn over whoever sleeps in it (D91).",
+      "about": "bed_8's quilt with its folded sheet, from the sheet's line by the pillow to the bed's foot, drawn over whoever sleeps in it (D97).",
       "box": [
-        4.25,
-        11.85,
-        6.25,
-        13.85
+        4.1,
+        11.5,
+        6.35,
+        13.52
       ],
       "row": 13,
       "static": true,
       "solid": true,
-      "mask": "box",
+      "mask": "marked",
+      "marked": "dormitory-covers.png",
       "states": {
         "standing": "painting"
-      }
+      },
+      "cover": true
     }
   },
   "cuts": [],
   "castle": 0,
-  "source": "# The dormitory\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-dormitory-3.md`, with the field as its\n  style's reference; its border and the wands on its trunks edited by it\n  (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).\n- Its bottom right corner mended by Gemini from `game-dormitory-corner.md`,\n  joined by `tools/art/repaint.py`, the painting kept pixel for pixel\n  elsewhere: a wall closing the corridor off from the battlements.\n- Its door arch and the beds' quilts drawn over whoever is under them, cut\n  by its pale stone and by the quilts' boxes (static things).\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
+  "source": "# The dormitory\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-dormitory-3.md`, with the field as its\n  style's reference; its border and the wands on its trunks edited by it\n  (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).\n- Its bottom right corner mended by Gemini from `game-dormitory-corner.md`,\n  joined by `tools/art/repaint.py`, the painting kept pixel for pixel\n  elsewhere: a wall closing the corridor off from the battlements.\n- Its beds, trunks, bedside tables, armchairs and table, and the beds' quilts\n  and sheets, cut where Gemini painted them flat magenta in pictures of the\n  dormitory (`game-dormitory-marked-*.md`, `game-dormitory-covers-*.md`); its\n  walls by polygons, each edge on its outline.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
   "cut": false,
   "beds": {
     "bed_1": {
       "head": [
-        19.42,
-        5.4
+        19.72,
+        5.3
       ],
       "cover": "bed_1_cover"
     },
     "bed_2": {
       "head": [
-        19.7,
-        7.8
+        19.95,
+        7.65
       ],
       "cover": "bed_2_cover"
     },
     "bed_3": {
       "head": [
-        20.0,
-        10.0
+        20.2,
+        10.08
       ],
       "cover": "bed_3_cover"
     },
     "bed_4": {
       "head": [
-        20.4,
-        12.45
+        20.45,
+        12.5
       ],
       "cover": "bed_4_cover"
     },
     "bed_5": {
       "head": [
-        4.85,
-        5.3
+        4.82,
+        5.32
       ],
       "cover": "bed_5_cover"
     },
     "bed_6": {
       "head": [
-        4.55,
+        4.58,
         7.65
       ],
       "cover": "bed_6_cover"
@@ -223,21 +659,87 @@
     "bed_7": {
       "head": [
         4.2,
-        9.95
+        10.08
       ],
       "cover": "bed_7_cover"
     },
     "bed_8": {
       "head": [
-        3.9,
-        12.35
+        3.85,
+        12.5
       ],
       "cover": "bed_8_cover"
     }
   },
-  "checks": [
-    "floating",
-    "lawn",
-    "hole"
-  ]
+  "marks": {
+    "about": "Gemini's pictures of the dormitory's parts with their things painted flat magenta (the owner's way, 2026-10-27), laid on the painting by tools/art/repaint.py marks: the beds with their trunks and bedside tables, the armchairs and the round table; and, apart, each bed's quilt with its folded sheet, the pillow left out, voted from several tries.",
+    "sets": [
+      {
+        "painting": "art/raw/game-dormitory/dormitory-marked.png",
+        "pictures": [
+          {
+            "picture": "game-dormitory-marked-right.png",
+            "crop": [
+              3100,
+              750,
+              4300,
+              2900
+            ]
+          },
+          {
+            "picture": "game-dormitory-marked-left.png",
+            "crop": [
+              500,
+              750,
+              1700,
+              2900
+            ]
+          },
+          {
+            "picture": "game-dormitory-marked-common.png",
+            "crop": [
+              1850,
+              850,
+              3150,
+              2050
+            ]
+          }
+        ]
+      },
+      {
+        "painting": "art/raw/game-dormitory/dormitory-covers.png",
+        "pictures": [
+          {
+            "picture": [
+              "game-dormitory-covers-right-1.png",
+              "game-dormitory-covers-right-2.png",
+              "game-dormitory-covers-right-4.png",
+              "game-dormitory-covers-right-5.png",
+              "game-dormitory-covers-right-6.png"
+            ],
+            "crop": [
+              3100,
+              750,
+              4300,
+              2900
+            ]
+          },
+          {
+            "picture": [
+              "game-dormitory-covers-left-2.png",
+              "game-dormitory-covers-left-4.png",
+              "game-dormitory-covers-left-5.png",
+              "game-dormitory-covers-left-6.png"
+            ],
+            "crop": [
+              500,
+              750,
+              1700,
+              2900
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

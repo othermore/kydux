@@ -33,6 +33,9 @@
     "wizard-sky",
     "wizard-teal"
   ],
+  "floating": [
+    "eldra"
+  ],
   "rows": {
     "walk": 0,
     "cast": 4,

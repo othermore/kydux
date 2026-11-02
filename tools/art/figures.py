@@ -24,7 +24,9 @@ every walking row is made from its standing frame (`walking`): a step frame is
 the standing frame with only its legs, the lowest LEGS of the figure, taken
 from the step's drawing, so that a figure walks moving its feet alone, never
 turning its head or its arms; a figure that floats (FLOATING) has no legs, and
-its step frames are the standing frame with its dress grown downward.
+its step frames are the standing frame with its dress grown downward and its hem
+swung, left in one and right in the other, which the page cycles through while
+the figure stands (D120); figures.json lists them (`floating`).
 
 Writes content/art/figures/wizard-<look>.webp for every look and the friends'
 sheets named in FRIENDS, from the bases in art/figures/ (BASES), and their list in
@@ -111,8 +113,12 @@ PARTS = ("skin", "hair", "robe", "hat", "band")
 #: How much of a figure, from its feet up, a step frame keeps of its own drawing:
 #: the boots and the robe's hem. The rest is the standing frame's.
 LEGS = 0.2
-#: The figures that float, and how many pixels each step frame's dress grows.
-FLOATING = {"eldra": (3, 5)}
+#: The figures that float, and how many pixels each step frame's dress grows; and
+#: how far the hem of a step frame's dress swings sideways, in pixels, left in the
+#: first step frame and right in the second, from nothing at the dress's top
+#: (D120: the page sways a floating figure through its frames while it stands).
+FLOATING = {"eldra": (4, 8)}
+FLOATING_SWAY = 3
 #: A row whose standing frame is not the one to keep, and the frame it keeps: Dask's
 #: back has his hands behind it in the first frame, not in the standing one.
 KEPT_FRAME = {"dask": {"up": 0}}
@@ -296,7 +302,8 @@ def walking(
     every other frame keeps its own legs, the lowest LEGS of the figure, blended into
     the kept frame above them over a few rows; or, for a figure that floats, the
     step frames are the kept frame with its dress, the lowest DRESS of it, stretched
-    down by `floats` pixels (the first step's, the last's)."""
+    down by `floats` pixels (the first step's, the last's) and its hem swung
+    FLOATING_SWAY pixels, left in the first and right in the last."""
     pixels = np.array(sheet.convert("RGBA")).astype(np.float32)
     fw, fh = frame
     out = pixels.copy()
@@ -311,7 +318,8 @@ def walking(
         for step, column in enumerate(others):
             cell = pixels[row * fh : (row + 1) * fh, column * fw : (column + 1) * fw]
             if floats is not None:
-                made = _dress_grown(standing, top, bottom, floats[step])
+                sway = FLOATING_SWAY if step else -FLOATING_SWAY
+                made = _dress_grown(standing, top, bottom, floats[step], sway)
             else:
                 cut = bottom - int((bottom - top) * LEGS)
                 blend = 6
@@ -321,12 +329,30 @@ def walking(
     return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGBA")
 
 
-def _dress_grown(standing: np.ndarray, top: int, bottom: int, grow: int) -> np.ndarray:
-    """A floating figure's standing frame with its dress stretched `grow` pixels down."""
+def _dress_grown(
+    standing: np.ndarray, top: int, bottom: int, grow: int, sway: int = 0
+) -> np.ndarray:
+    """A floating figure's standing frame with its dress stretched `grow` pixels down
+    and sheared sideways, nothing at the dress's top to `sway` pixels at its hem (to
+    the right when positive)."""
     start = bottom - int((bottom - top) * DRESS)
     height = bottom + 1 - start
     dress = Image.fromarray(standing[start : bottom + 1].astype(np.uint8), "RGBA")
     longer = np.array(dress.resize((dress.width, height + grow), Image.LANCZOS)).astype(np.float32)
+    if sway:
+        rows = longer.shape[0]
+        # Each row moved by its share of the sway, a fraction of a pixel blended.
+        swung = np.zeros_like(longer)
+        for row in range(rows):
+            by = sway * row / max(1, rows - 1)
+            whole = int(np.floor(by))
+            part = by - whole
+            line = longer[row]
+            here = (
+                np.roll(line, whole, axis=0) * (1 - part) + np.roll(line, whole + 1, axis=0) * part
+            )
+            swung[row] = here
+        longer = swung
     made = standing.copy()
     end = min(made.shape[0], start + longer.shape[0])
     made[start:end] = longer[: end - start]
@@ -608,6 +634,7 @@ def make(check: bool = False) -> list[Path]:
     # by export_scene.py (Wenna, Eldra, Dask).
     about["figures"] = sorted(p.stem for p in FIGURES.glob("*.webp"))
     about["rows"] = ROWS
+    about["floating"] = sorted(FLOATING)
     # A sheet whose rows are not a wizard's says its own (D91).
     about["sheets"] = {
         f"{name}-{set_name}": FRIEND_ROWS for name in FRIENDS for set_name in sets[name]

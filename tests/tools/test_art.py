@@ -1205,3 +1205,49 @@ def test_every_look_has_its_sheet_and_the_friends_theirs():
     for friend in figures.FRIENDS:
         for colours in ("a", "b"):
             assert f"{friend}-{colours}" in about["figures"]
+
+
+def test_a_floating_figure_s_step_frames_have_its_dress_grown_and_swung():
+    import figures
+
+    width, height = 20, 48
+    sheet = np.zeros((height * 4, width * 3, 4), dtype=np.uint8)
+    for row in range(4):
+        for column in range(3):
+            # A figure 4 pixels wide from row 4 to row 35 of its frame.
+            sheet[
+                row * height + 4 : row * height + 36, column * width + 8 : column * width + 12
+            ] = (
+                120,
+                120,
+                200,
+                255,
+            )
+    made = np.array(figures.walking(Image.fromarray(sheet), (width, height), (4, 8)))
+    grow, sway = (4, 8), figures.FLOATING_SWAY
+
+    def frame(column: int) -> np.ndarray:
+        return made[:height, column * width : (column + 1) * width, 3] > 128
+
+    def hem(alpha: np.ndarray) -> float:
+        bottom = np.nonzero(alpha.any(axis=1))[0].max()
+        return float(np.nonzero(alpha[bottom])[0].mean())
+
+    standing, first, last = frame(1), frame(0), frame(2)
+    lowest = [np.nonzero(f.any(axis=1))[0].max() for f in (standing, first, last)]
+    # Taller than the standing frame by the growth; the hem swung left, then right.
+    assert lowest[1] - lowest[0] == grow[0] and lowest[2] - lowest[0] == grow[1]
+    assert hem(first) < hem(standing) - sway / 2 and hem(last) > hem(standing) + sway / 2
+    # The dress's top does not move.
+    assert (first[4:20] == standing[4:20]).all() and (last[4:20] == standing[4:20]).all()
+
+
+@pytest.mark.skipif(
+    not (FIGURES / "figures.json").is_file(), reason="the figures are not exported"
+)
+def test_the_figures_that_float_are_listed_for_the_page():
+    import figures
+
+    assert json.loads((FIGURES / "figures.json").read_text())["floating"] == sorted(
+        figures.FLOATING
+    )

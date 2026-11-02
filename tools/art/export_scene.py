@@ -991,6 +991,7 @@ def figures() -> Path:
         "frames": 3,
         "standing": 1,
         "figures": [name for name in FIGURES if name not in AS_BASES],
+        "floating": sorted(looks.FLOATING),
     }
     (out / "figures.json").write_text(json.dumps(data, indent=2) + "\n")
     # Every look's sheet and the friends', from the bases, and their names in the list.

@@ -92,6 +92,7 @@ import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
 import { FOOT_IN_CELL, figureDepth, loweredBy, nudgedBy, sleeperDepth } from './depth';
 import { Speech } from './speech';
+import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
 import { Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
@@ -170,6 +171,8 @@ class LevelScene extends Phaser.Scene {
   private wizardTile: Tile = [0, 0];
   /** Counts the showings of the level starting again, so that only the last fades in. */
   private showing = 0;
+  /** The floating figures' swaying while they stand, by their sprite (D120). */
+  private sways = new Map<Phaser.GameObjects.Sprite, Sway>();
   private things = new Map<string, Phaser.GameObjects.Image>();
   private doors = new Map<string, Tile>();
   private openDoors = new Set<string>();
@@ -263,6 +266,9 @@ class LevelScene extends Phaser.Scene {
   /** A figure walking to a point, its frames stepping as it goes on a painted scene. */
   private walk(sprite: Phaser.GameObjects.Sprite, facing: Facing, x: number, y: number, duration: number): void {
     const stepping = sprite.texture.key.startsWith('fig-');
+    // A floating figure steps as every figure does, and sways again once there (D120).
+    const sway = this.sways.get(sprite);
+    sway?.stop();
     this.tweens.add({
       targets: sprite,
       x,
@@ -272,7 +278,10 @@ class LevelScene extends Phaser.Scene {
       onUpdate: (tween) => {
         if (stepping) this.face(sprite, facing, [0, 1, 2, 1][Math.floor(tween.progress * 4) % 4] ?? 1);
       },
-      onComplete: () => this.face(sprite, facing),
+      onComplete: () => {
+        this.face(sprite, facing);
+        sway?.start();
+      },
     });
   }
 
@@ -463,6 +472,23 @@ class LevelScene extends Phaser.Scene {
       const key = actor.kind === 'friend' ? friendKey(actor.id) : actorKey(actor.kind);
       const sprite = this.figure(actor.id, key, actor.tile, actor.facing).setDepth(3);
       this.actors.set(actor.id, { sprite, tile: actor.tile, facing: actor.facing, sight: actor.sight });
+      if (sprite.texture.key.startsWith('fig-') && this.art?.figures?.floating?.includes(figureName(actor.id, this.look))) {
+        this.sways.set(
+          sprite,
+          new Sway(
+            {
+              every: (delay, callback) => {
+                const event = this.time.addEvent({ delay, loop: true, callback });
+                return () => event.remove(false);
+              },
+            },
+            (step) => {
+              const state = this.actors.get(actor.id);
+              if (state) this.face(state.sprite, state.facing, step);
+            },
+          ),
+        );
+      }
     }
     this.wizard = this.figure('wizard', WIZARD_KEY, this.map.start, 'down').setDepth(4);
     this.speech = new Speech(this, this.parentNode, {
@@ -669,6 +695,9 @@ class LevelScene extends Phaser.Scene {
       state.sprite.setPosition(...this.figureAt(state.tile)).setAlpha(1).setVisible(!actor.hidden).setAngle(0);
       this.face(state.sprite, actor.facing);
       if (actor.asleep) this.layDown(state.sprite, actor.id, actor.asleep, true);
+      const sway = this.sways.get(state.sprite);
+      if (actor.hidden || actor.asleep) sway?.stop();
+      else sway?.start();
     }
     this.placeWizard(this.map.start, 'down');
     this.parentNode.dataset.tick = '0';
@@ -1121,10 +1150,12 @@ class LevelScene extends Phaser.Scene {
         break;
       // A story's actor lies down in a bed and gets up (D91).
       case 'sleep':
+        this.sways.get(actor.sprite)?.stop();
         this.layDown(actor.sprite, event.actor, String(event.data.id), instant);
         break;
       case 'wake':
         this.getUp(actor.sprite, actor.tile, actor.facing, instant);
+        this.sways.get(actor.sprite)?.start();
         break;
       // A story's actor speaks, comes into sight and goes (D74).
       case 'say':
@@ -1140,6 +1171,7 @@ class LevelScene extends Phaser.Scene {
         actor.tile = at;
         actor.sprite.setPosition(...this.figureAt(at)).setVisible(true);
         this.face(actor.sprite, actor.facing);
+        this.sways.get(actor.sprite)?.start();
         if (instant) actor.sprite.setAlpha(1);
         else {
           actor.sprite.setAlpha(0);
@@ -1149,6 +1181,7 @@ class LevelScene extends Phaser.Scene {
       }
       case 'vanish':
         this.tweens.killTweensOf(actor.sprite);
+        this.sways.get(actor.sprite)?.stop();
         if (instant) actor.sprite.setVisible(false);
         else {
           this.tweens.add({

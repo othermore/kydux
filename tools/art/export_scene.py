@@ -56,7 +56,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -194,29 +194,87 @@ PALE_SATURATION = 0.32
 PALE_OUTLINE = 7
 
 
+#: The smallest piece of a thing's magenta that is of it, as a share of its largest;
+#: and the widest pinhole in open work's magenta that is filled, in parts of a cell.
+MARK_SPECK = 0.003
+MARK_PINHOLE = 0.15
+
+
+#: The kinds of a static thing's image, each a row's image of its own (D95, D97).
+LAYERS = ("over", "under", "cover", "hangs")
+
+
+def native_area(shape: tuple[int, int], grid: dict, area: list) -> np.ndarray:
+    """A polygon in cells, a list of its corners [x, y], in the painting's pixels."""
+    gx, gy = grid["x"], grid["y"]
+    corners = [
+        (gx["offset"] + x * gx["spacing"], gy["offset"] + y * gy["spacing"]) for x, y in area
+    ]
+    image = Image.new("L", shape[::-1], 0)
+    ImageDraw.Draw(image).polygon(corners, fill=255)
+    return np.array(image) > 0
+
+
 def static_alpha(
     painting: np.ndarray,
     box: tuple[int, int, int, int],
     thing: dict,
     cell: int,
     th: dict | None = None,
+    grid: dict | None = None,
+    edits: Path | None = None,
 ) -> np.ndarray:
-    """A static thing's alpha in the painting's own pixels, inside its box: what is
-    pale there and its outline (`"mask": "pale"`), its edge on its outline (D93), or
-    the whole box (`"box"`)."""
+    """A static thing's alpha in the painting's own pixels, inside its box, its edge
+    on its outline (D93): where Gemini painted it flat magenta in a picture of the
+    scene (`"mask": "marked"`, the picture `marked`, among the edits), its holes, the
+    lines Gemini left inside it, filled, unless it is `open_work`; the box less that
+    magenta (`"unmarked"`); a polygon in cells (`"polygon"`, less its
+    `holes`); what is pale there and its outline (`"pale"`); or the whole box
+    (`"box"`), not moved."""
     inside = in_box(painting.shape[:2], box)
-    if thing.get("mask") == "box":
+    if thing["mask"] == "box":
         return inside.astype(np.float32)
-    hsv = np.array(Image.fromarray(painting).convert("HSV")).astype(np.float32) / 255
-    pale = (hsv[..., 2] > thing.get("value", PALE_VALUE)) & (
-        hsv[..., 1] < thing.get("saturation", PALE_SATURATION)
-    )
-    pale &= inside
-    pale = kept(pale, 0.02)
-    near = Image.fromarray(pale.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(PALE_OUTLINE))
-    dark = hsv[..., 2] < 0.38
-    mask = (pale | ((np.array(near) > 0) & dark)) & inside
-    mask = image_first.snapped(mask, painting, cell, image_first.thresholds(th))
+    if thing["mask"] == "pale":
+        hsv = np.array(Image.fromarray(painting).convert("HSV")).astype(np.float32) / 255
+        pale = (hsv[..., 2] > PALE_VALUE) & (hsv[..., 1] < PALE_SATURATION) & inside
+        pale = kept(pale, 0.02)
+        near = Image.fromarray(pale.astype(np.uint8) * 255).filter(
+            ImageFilter.MaxFilter(PALE_OUTLINE)
+        )
+        mask = pale | ((np.array(near) > 0) & (hsv[..., 2] < 0.38))
+    elif thing["mask"] in ("marked", "unmarked"):
+        # The ground is let in only where Gemini left the painting as it is: its
+        # magenta is the thing, and only the outline beside it is added. An
+        # open-work thing, a chandelier, keeps the floor seen between its parts;
+        # what is `unmarked` is the box less the magenta, a wall less its openings.
+        picture = np.array(Image.open(edits / thing["marked"]).convert("RGB"))
+        paint = image_first.marked(picture) & inside
+        if not thing.get("open_work"):
+            paint = filled_mask(paint)
+        else:
+            # Open work keeps the floor between its parts, and fills the pinholes
+            # its tries left, smaller than any of those gaps.
+            paint = image_first.filled(paint, round((MARK_PINHOLE * cell) ** 2))
+        if thing["mask"] == "marked":
+            # Gemini's magenta is the thing, whole: the outline beside it comes in
+            # and nothing is taken away, so that no part of it is lost and the floor
+            # seen through open work stays the floor. A flame Gemini painted apart
+            # from its candle is a small piece of it, and kept; only specks go.
+            mask = kept(paint, MARK_SPECK)
+            mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th))
+            return (mask & inside).astype(np.float32)
+        mask = inside & ~paint
+        mask = image_first.snapped(mask, painting, cell, image_first.thresholds(th), picture)
+        if thing["mask"] == "unmarked":
+            # A dark corridor in an opening is no outline to take in; the outline
+            # the magenta's edge runs over is.
+            mask &= ~image_first.eroded(paint, max(1, round(image_first.MARK_EDGE * cell)))
+        return (mask & inside).astype(np.float32)
+    else:
+        mask = native_area(painting.shape[:2], grid, thing["polygon"])
+        for hole in thing.get("holes", []):
+            mask &= ~native_area(painting.shape[:2], grid, hole)
+    mask = image_first.snapped(mask & inside, painting, cell, image_first.thresholds(th))
     return (mask & inside).astype(np.float32)
 
 
@@ -404,7 +462,13 @@ def scene(settings: Settings) -> Path:
         Image.fromarray(composite(settings, grid, statics=False)[0]).save(
             src / "ground-composite.png"
         )
-        Image.fromarray(ground).save(src / "ground-only.png")
+        # A scene whose things Gemini marked in magenta is checked against that
+        # picture, as a cut scene is against its ground-only edit.
+        marks = settings.data.get("marks")
+        if marks:
+            shutil.copy(REPO / marks["painting"], src / "ground-only.png")
+        else:
+            Image.fromarray(ground).save(src / "ground-only.png")
     empty = [0, 0, 0, 0]
     # A thing lying on a flat stone, cut whole from its box, stands the stone on
     # its row; nothing is left of the things to cut.
@@ -452,7 +516,8 @@ def scene(settings: Settings) -> Path:
     # A row's images are also told apart by where they are drawn among the figures
     # (D95): `under`, over whoever stands on the row itself, a door's or an arch's;
     # `over`, over every figure, a wall seen from above; `cover`, a bed's, over
-    # whoever sleeps in it (D97).
+    # whoever sleeps in it (D97); and `hangs`, what hangs on a wall over the cells
+    # below it and stands on none of them, a torch.
     strips: dict[tuple[int, bool, str], tuple[int, Image.Image]] = {}
     under_rows = set(settings.data.get("under", []))
 
@@ -500,7 +565,7 @@ def scene(settings: Settings) -> Path:
             if name in withouts:
                 alpha = sprite_alpha(painting, withouts[name], native, thing, spacing, th)
             else:
-                alpha = static_alpha(painting, native, thing, spacing, th)
+                alpha = static_alpha(painting, native, thing, spacing, th, grid, settings.edits)
             alpha = alpha * ~doors
             rgba = np.dstack([painting, (alpha * 255).astype(np.uint8)])
             sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
@@ -509,7 +574,7 @@ def scene(settings: Settings) -> Path:
                 sprite[..., 3] / 255, thing["row"], box[1], reach=thing.get("reach", 0.0)
             )
             sprite[..., 3] = (below * 255).astype(np.uint8)
-            layer = next((k for k in ("over", "under", "cover") if thing.get(k)), "")
+            layer = next((k for k in LAYERS if thing.get(k)), "")
             into_row(thing["row"], Image.fromarray(sprite, "RGBA"), box[0], box[1], True, layer)
             continue
         without = withouts[name]

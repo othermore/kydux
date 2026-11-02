@@ -229,6 +229,22 @@ def darkened(painting: np.ndarray, ground: np.ndarray, th: dict = THRESHOLDS) ->
     return ((ratio.max(axis=2) - ratio.min(axis=2)) < spread) & (ratio.mean(axis=2) < darker)
 
 
+#: The flat colour a thing is painted in to mark it (the owner's way, 2026-10-27):
+#: pure magenta, told by its hue in degrees, its saturation and its value.
+MARK_HUE = (275, 335)
+MARK_SATURATION = 0.75
+MARK_VALUE = 0.45
+#: How far into an opening Gemini painted magenta its edge may run over the outline
+#: round it, in parts of a cell.
+MARK_EDGE = 0.04
+
+
+def marked(picture: np.ndarray) -> np.ndarray:
+    """The pixels of a picture painted in the marking magenta."""
+    h, s, v = hsv_of(picture[..., :3])
+    return (h > MARK_HUE[0]) & (h < MARK_HUE[1]) & (s > MARK_SATURATION) & (v > MARK_VALUE)
+
+
 def dilated(mask: np.ndarray, r: int) -> np.ndarray:
     """The mask grown by `r` pixels every way, as far as a square reaches: shifted
     by 1, 2, 4... pixels along each axis, each shift doubling what is covered."""
@@ -337,6 +353,22 @@ def snapped(
     # What the ground reaches goes back to it; what no outline lets it reach, just
     # beyond the edge, comes in, and the outline thicker than the reach with it.
     edged = (mask & ~given) | (dilated(mask, reach) & ~outside)
+    return flooded(edged, edged | (dark & ~outside), band)
+
+
+def rimmed(mask: np.ndarray, painting: np.ndarray, cell: int, th: dict = THRESHOLDS) -> np.ndarray:
+    """A mask Gemini painted inside its thing's outline (its magenta, D93) with the
+    outline added and nothing taken away: the dark pixels within SNAP_REACH of it,
+    what lies between them and it, and the outline they run on into, as far as
+    SNAP_BAND. The floor seen through open work, which the mask leaves out, stays
+    out."""
+    dark = dark_lines(painting, th)
+    band = max(2, round(SNAP_BAND * cell))
+    reach = max(1, round(SNAP_REACH * cell))
+    near = dilated(mask, reach)
+    lines = near & dark
+    edged = mask | lines | (near & eroded(dilated(mask | lines, 2), 2))
+    outside = outside_of(edged, dark, band)
     return flooded(edged, edged | (dark & ~outside), band)
 
 

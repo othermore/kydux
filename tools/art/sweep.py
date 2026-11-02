@@ -109,17 +109,24 @@ class Scene:
     checks: list[str] | None = None
     #: The parts of the scene its settings keep in its things (`kept`, D93), in cells.
     kept: list = field(default_factory=list)
+    #: Whether Gemini marked its things in magenta (`marks`), which are then whole.
+    marked: bool = False
     #: The cells a figure is drawn lower on, and by how much of a cell (D95).
     lowered: dict = field(default_factory=dict)
 
 
 def walks(scene: str) -> np.ndarray:
-    """The cells walked on, from the scene's map and its terrains."""
+    """The cells walked on, from the scene's map and its terrains, less those the
+    wizard is refused."""
     folder = CONTENT / "scenes" / scene
     marks = (folder / "map.txt").read_text(encoding="utf-8").split()
-    terrains = json.loads((folder / "scene.json").read_text(encoding="utf-8"))["terrains"]
-    walk = {letter for letter, terrain in terrains.items() if terrain.get("walk")} | {"."}
-    return np.array([[char in walk for char in row] for row in marks])
+    data = json.loads((folder / "scene.json").read_text(encoding="utf-8"))
+    walk = {letter for letter, terrain in data["terrains"].items() if terrain.get("walk")} | {"."}
+    walked = np.array([[char in walk for char in row] for row in marks])
+    # A cell the wizard is refused (D84) is never stood on.
+    for x, y in data.get("forbidden", {}).get("cells", []):
+        walked[y, x] = False
+    return walked
 
 
 #: Where in its cell a row's things are drawn, as a part of a cell (painted.ts): under
@@ -157,6 +164,7 @@ def load(scene: str) -> Scene:
         found.thresholds = own.thresholds
         found.checks = own.data.get("checks")
         found.kept = own.data.get("kept", [])
+        found.marked = "marks" in own.data
     for part in art.get("lowered", []):
         (x0, y0), (x1, y1) = part["cells"]
         for y in range(y0, y1 + 1):
@@ -164,7 +172,7 @@ def load(scene: str) -> Scene:
                 found.lowered[(x, y)] = part["by"]
     for row in art["rows"]:
         rgba = np.array(Image.open(folder / row["image"]).convert("RGBA"))
-        kind = next((k for k in ("over", "under", "cover") if row.get(k)), "")
+        kind = next((k for k in ("over", "under", "cover", "hangs") if row.get(k)), "")
         name = (
             f"row {row['row']}"
             + (" static" if row.get("static") else "")
@@ -521,6 +529,14 @@ def edges(scene: Scene, seen: Differs) -> list[Problem]:
     height, width = scene.rows * scene.cell, scene.columns * scene.cell
     dark = image_first.dark_lines(seen.painting[:height, :width], scene.thresholds)
     same = image_first.like(seen.painting[:height, :width], seen.ground[:height, :width])
+    # What Gemini painted magenta in a scene's marked picture is no outline: the
+    # inside of an opening a wall is cut round.
+    edge = max(1, round(image_first.MARK_EDGE * scene.cell))
+    painted = image_first.marked(seen.ground[:height, :width])
+    holes = image_first.eroded(painted, edge)
+    # An outline left out is the painting's black line, whatever a darker scene's
+    # outlines are read by: its shading and the cracks of its floor are not one.
+    black = image_first.dark_lines(seen.painting[:height, :width])
     solids = [window(layer, 0, 0, width, height)[..., 3] > 128 for layer in scene.layers]
     count = np.sum(solids, axis=0, dtype=np.int16)
     inner = np.zeros((height, width), dtype=bool)
@@ -542,7 +558,13 @@ def edges(scene: Scene, seen: Differs) -> list[Problem]:
         )
         others = (count[y0:y1, x0:x1] - piece) > 0
         fringe = piece & given & behind
-        bare = lines & image_first.dilated(piece, reach) & ~piece & ~outside & ~others & behind
+        if scene.marked:
+            # In a scene Gemini marked, its magenta is the thing (D93): only what
+            # goes beyond it is a fringe.
+            fringe &= ~painted[y0:y1, x0:x1]
+        bare = black[y0:y1, x0:x1] & image_first.dilated(piece, reach)
+        bare &= ~piece & ~outside & ~others & behind
+        bare &= ~holes[y0:y1, x0:x1]
         found += by_cell("fringe", layer.name, fringe, scene.cell, y0, left=x0)
         found += by_cell("bare", layer.name, bare, scene.cell, y0, left=x0)
     return found

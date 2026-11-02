@@ -25,6 +25,10 @@ def rows_of(scene: str) -> tuple[dict, dict[int, np.ndarray]]:
     width, height = art["size"]
     masks = {}
     for row in art["rows"]:
+        # What is drawn over whoever stands on its row, and what hangs on a wall,
+        # stands on no cell (D95).
+        if row.get("under") or row.get("hangs") or row.get("over"):
+            continue
         image = np.array(Image.open(folder / row["image"]).convert("RGBA"))
         mask = np.zeros((height * cell, width * cell), dtype=bool)
         mask[row["top"] : row["top"] + image.shape[0], : image.shape[1]] = image[..., 3] > 128

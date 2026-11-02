@@ -29,8 +29,18 @@ export interface SceneArt {
   /** The raised rows, each drawn over the figures above it; a row's static things
    * (D89), the walls that never change, are an image of their own. A row's image
    * `under` is drawn over whoever stands on the row itself too, a door's arch; one
-   * `over`, over every figure, a wall seen from above (D95). */
-  rows: { row: number; image: string; top: number; static?: boolean; under?: boolean; over?: boolean }[];
+   * `over`, over every figure, a wall seen from above (D95); a bed's `cover` and
+   * what `hangs` on a wall are images of their own, drawn as the row's. */
+  rows: {
+    row: number;
+    image: string;
+    top: number;
+    static?: boolean;
+    under?: boolean;
+    over?: boolean;
+    cover?: boolean;
+    hangs?: boolean;
+  }[];
   /** Each thing that opens or is picked up: its row, its corner in the painting's
    * pixels, its states' images, and `at`, the cell it is painted on, when a level
    * may place it on another (D85). */
@@ -116,7 +126,7 @@ export function artScale(art: Art): number {
 /** A raised row's texture: a row's things and its static things are two images,
  * and each of them under or over the figures another (D95). */
 function rowKey(row: SceneArt['rows'][number]): string {
-  const kind = row.over ? '-over' : row.under ? '-under' : '';
+  const kind = row.over ? '-over' : row.under ? '-under' : row.cover ? '-cover' : row.hangs ? '-hangs' : '';
   return `art-row-${row.row}${row.static ? '-static' : ''}${kind}`;
 }
 

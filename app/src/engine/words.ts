@@ -59,6 +59,8 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
       return t('blocked.nothing');
     case 'not_my_dormitory':
       return t('blocked.not_my_dormitory');
+    case 'not_now_outside':
+      return t('blocked.not_now_outside');
     case 'no_bed':
       return t('blocked.no_bed');
     case 'bed_taken':

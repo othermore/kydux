@@ -316,8 +316,11 @@ def test_every_scene_s_settings_name_its_pictures_and_its_things():
         assert {"folder", "edits", "painting", "grid", "ground"} <= set(settings.data["sources"])
         for thing in settings.things.values():
             assert len(thing["box"]) == 4 and isinstance(thing["row"], int)
-            # A static thing is cut against an edit without it, or by its mask (D89).
-            assert thing["states"] and ("without" in thing or thing.get("mask") in ("pale", "box"))
+            # A static thing is cut against an edit without it, or by its mask (D89):
+            # Gemini's magenta round it or round what it is cut round, a polygon,
+            # its pale stone or its box.
+            masks = ("marked", "unmarked", "polygon", "pale", "box")
+            assert thing["states"] and ("without" in thing or thing.get("mask") in masks)
         assert settings.map.is_file(), name
 
 
@@ -593,6 +596,21 @@ def test_every_figure_passes_under_the_doors_it_walks_through():
             if "opening" in thing:
                 tallest = adult if thing.get("adults") else walker
                 assert thing["opening"] >= tallest + 0.1, (scene, name)
+
+
+def test_a_picture_drawn_again_is_moved_part_by_part_onto_the_painting():
+    import repaint
+
+    painting = np.full((240, 480, 3), 200, dtype=np.uint8)
+    painting[60:180, 60:66] = 10
+    painting[60:180, 380:386] = 10
+    # Gemini's picture: the left line where it is, the right one 8 pixels astray.
+    drawn = np.full_like(painting, 200)
+    drawn[60:180, 60:66] = 10
+    drawn[60:180, 388:394] = 10
+    moved = repaint.moved_locally(drawn, painting)
+    assert (moved[100:140, 380:386].max(axis=2) < 80).mean() > 0.9
+    assert (moved[100:140, 60:66].max(axis=2) < 80).mean() > 0.9
 
 
 def test_a_solid_thing_s_mask_has_its_holes_filled():

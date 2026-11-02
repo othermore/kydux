@@ -125,6 +125,7 @@
     "which_one": "Aquí hay varias cosas: {things}. Di cuál, como wizard.pick_up({first}).",
     "unheard": "Con el sello puesto, {thing} no oye ninguna palabra.",
     "not_my_dormitory": "No debería entrar en el dormitorio de {las chicas|los chicos}.",
+    "not_now_outside": "Ahora mismo no es buen momento para salir del castillo.",
     "no_bed": "No hay ninguna cama justo a mi lado.",
     "bed_taken": "Esta cama es de otra persona.",
     "not_here": "Llevo {thing}, así que no se puede mostrar dónde está."

@@ -3,13 +3,32 @@
   "sources": {
     "folder": "art/raw/game-entrance",
     "edits": "art/raw/game-entrance",
-    "painting": "game-entrance-nogrid.png",
+    "painting": "entrance-mended.png",
     "grid": "grid.json",
-    "ground": "game-entrance-nogrid.png"
+    "ground": "entrance-mended.png"
+  },
+  "repaint": {
+    "about": "The chain the lamp hangs from, taken out so that it hangs from its wooden ring as if fixed to a ceiling out of the picture: filled from its sides by tools/art/repaint.py (fill), the painting kept pixel for pixel elsewhere.",
+    "from": "art/raw/game-entrance/game-entrance-nogrid.png",
+    "boxes": [
+      [
+        2378,
+        1030,
+        2422,
+        1205
+      ],
+      [
+        2387,
+        1205,
+        2414,
+        1244
+      ]
+    ],
+    "painting": "art/raw/game-entrance/entrance-mended.png"
   },
   "things": {
     "far_wall": {
-      "about": "The far wall's face, its pillars and its knights, drawn over whoever walks into the arches.",
+      "about": "The far wall's face, its arches' stones, its pillars and its knights, drawn over whoever walks into the arches: the wall's box less what is seen through its three openings, which Gemini painted magenta.",
       "box": [
         4.0,
         2.4,
@@ -19,21 +38,522 @@
       "row": 9,
       "static": true,
       "solid": true,
-      "mask": "pale",
+      "mask": "unmarked",
       "states": {
         "standing": "painting"
       },
       "opening": 3.4,
-      "adults": true
+      "adults": true,
+      "marked": "entrance-marked.png"
+    },
+    "bench_top_left": {
+      "about": "The bench by the far wall, left of the door.",
+      "box": [
+        6.55,
+        9.35,
+        9.75,
+        10.7
+      ],
+      "row": 10,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bench_top_right": {
+      "about": "The bench by the far wall, right of the door.",
+      "box": [
+        30.25,
+        9.35,
+        33.45,
+        10.7
+      ],
+      "row": 10,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bench_left_1": {
+      "about": "The upper bench along the left wall.",
+      "box": [
+        3.95,
+        12.65,
+        5.25,
+        15.75
+      ],
+      "row": 15,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bench_right_1": {
+      "about": "The upper bench along the right wall.",
+      "box": [
+        34.75,
+        12.65,
+        36.05,
+        15.75
+      ],
+      "row": 15,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bench_left_2": {
+      "about": "The lower bench along the left wall.",
+      "box": [
+        3.95,
+        16.6,
+        5.25,
+        19.75
+      ],
+      "row": 19,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "bench_right_2": {
+      "about": "The lower bench along the right wall.",
+      "box": [
+        34.75,
+        16.6,
+        36.05,
+        19.75
+      ],
+      "row": 19,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "torch_left_1": {
+      "about": "The upper torch on the left pillar.",
+      "box": [
+        13.7,
+        11.75,
+        14.8,
+        13.95
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      },
+      "hangs": true
+    },
+    "torch_right_1": {
+      "about": "The upper torch on the right pillar.",
+      "box": [
+        25.2,
+        11.75,
+        26.3,
+        13.95
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      },
+      "hangs": true
+    },
+    "torch_left_2": {
+      "about": "The lower torch on the left pillar.",
+      "box": [
+        13.7,
+        17.35,
+        14.8,
+        19.75
+      ],
+      "row": 19,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      },
+      "hangs": true
+    },
+    "torch_right_2": {
+      "about": "The lower torch on the right pillar.",
+      "box": [
+        25.2,
+        17.35,
+        26.3,
+        19.75
+      ],
+      "row": 19,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      },
+      "hangs": true
+    },
+    "knight_left": {
+      "about": "The suit of armour beside the left pillar.",
+      "box": [
+        14.05,
+        13.35,
+        15.4,
+        16.85
+      ],
+      "row": 16,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "knight_right": {
+      "about": "The suit of armour beside the right pillar.",
+      "box": [
+        24.6,
+        13.35,
+        25.95,
+        16.85
+      ],
+      "row": 16,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "knight_niche_left": {
+      "about": "The suit of armour in the niche left of the middle arch.",
+      "box": [
+        15.55,
+        7.75,
+        17.35,
+        10.65
+      ],
+      "row": 10,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "knight_niche_right": {
+      "about": "The suit of armour in the niche right of the middle arch.",
+      "box": [
+        22.65,
+        7.75,
+        24.45,
+        10.65
+      ],
+      "row": 10,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "lamp": {
+      "about": "The chandelier, hanging from its ring as if from a ceiling out of the picture: over whoever walks under it on rows 10 to 13 (D95).",
+      "box": [
+        17.75,
+        9.75,
+        22.15,
+        14.0
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "marked",
+      "marked": "entrance-marked.png",
+      "states": {
+        "standing": "painting"
+      },
+      "under": true,
+      "open_work": true
+    },
+    "front_wall_left": {
+      "about": "The front wall left of the gate, its corner turret, the gate's post and its open leaf, and the bushes before it: over every figure, who walks behind it on rows 22 to 26 (D95).",
+      "box": [
+        0.0,
+        17.0,
+        17.7,
+        30.0
+      ],
+      "row": 29,
+      "static": true,
+      "solid": true,
+      "over": true,
+      "mask": "polygon",
+      "polygon": [
+        [
+          0,
+          17.2
+        ],
+        [
+          3.05,
+          17.2
+        ],
+        [
+          3.75,
+          19.45
+        ],
+        [
+          4.45,
+          19.5
+        ],
+        [
+          4.55,
+          19.95
+        ],
+        [
+          4.55,
+          21.8
+        ],
+        [
+          4.4,
+          22.2
+        ],
+        [
+          4.25,
+          22.3
+        ],
+        [
+          15.5,
+          22.3
+        ],
+        [
+          15.5,
+          21.6
+        ],
+        [
+          17.5,
+          21.6
+        ],
+        [
+          17.5,
+          22.62
+        ],
+        [
+          17.43,
+          22.62
+        ],
+        [
+          17.43,
+          23.25
+        ],
+        [
+          17.38,
+          23.25
+        ],
+        [
+          17.38,
+          30
+        ],
+        [
+          0,
+          30
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "front_wall_right": {
+      "about": "The front wall right of the gate, as on the left.",
+      "box": [
+        22.3,
+        17.0,
+        40.0,
+        30.0
+      ],
+      "row": 29,
+      "static": true,
+      "solid": true,
+      "over": true,
+      "mask": "polygon",
+      "polygon": [
+        [
+          40,
+          17.2
+        ],
+        [
+          36.95,
+          17.2
+        ],
+        [
+          36.25,
+          19.45
+        ],
+        [
+          35.6,
+          19.5
+        ],
+        [
+          35.45,
+          19.95
+        ],
+        [
+          35.45,
+          21.8
+        ],
+        [
+          35.6,
+          22.2
+        ],
+        [
+          35.75,
+          22.3
+        ],
+        [
+          24.5,
+          22.3
+        ],
+        [
+          24.5,
+          21.6
+        ],
+        [
+          22.53,
+          21.6
+        ],
+        [
+          22.53,
+          22.75
+        ],
+        [
+          22.6,
+          22.75
+        ],
+        [
+          22.6,
+          23.26
+        ],
+        [
+          22.7,
+          23.38
+        ],
+        [
+          22.64,
+          23.65
+        ],
+        [
+          22.57,
+          23.95
+        ],
+        [
+          22.55,
+          30
+        ],
+        [
+          40,
+          30
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      }
     }
   },
   "cuts": [],
   "castle": 0,
+  "thresholds": {
+    "outline": 100
+  },
   "source": "# The entrance hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-entrance.md`, with the field as its style's\n  reference, then edited by it without its grid (`game-entrance-nogrid.md`).\n- Its far wall drawn over whoever passes under its arches, cut by its pale\n  stone (a static thing).\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
   "cut": false,
-  "checks": [
-    "floating",
-    "lawn",
-    "hole"
-  ]
+  "marks": {
+    "about": "Gemini's pictures of parts of the hall with its things painted flat magenta (the owner's way, 2026-10-27), laid on the painting by tools/art/repaint.py marks: which thing each of the benches', torches', knights' and the lamp's masks is, its edge the painting's outline; and the three openings the far wall is cut round.",
+    "pictures": [
+      {
+        "picture": "game-entrance-marked-left.png",
+        "crop": [
+          0,
+          820,
+          2160,
+          2440
+        ]
+      },
+      {
+        "picture": "game-entrance-marked-right.png",
+        "crop": [
+          2640,
+          820,
+          4800,
+          2440
+        ]
+      },
+      {
+        "picture": "game-entrance-marked-torches.png",
+        "crop": [
+          2759,
+          1371,
+          3299,
+          2431
+        ]
+      },
+      {
+        "picture": [
+          "game-entrance-marked-lamp-try2.png",
+          "game-entrance-marked-lamp.png",
+          "game-entrance-marked-lamp-2.png",
+          "game-entrance-marked-lamp-3.png",
+          "game-entrance-marked-lamp-4.png",
+          "game-entrance-marked-lamp-5.png",
+          "game-entrance-marked-lamp-6.png"
+        ],
+        "crop": [
+          1950,
+          1180,
+          2850,
+          1800
+        ]
+      },
+      {
+        "picture": "game-entrance-marked-arches.png",
+        "crop": [
+          1260,
+          300,
+          3540,
+          1277
+        ]
+      }
+    ],
+    "painting": "art/raw/game-entrance/entrance-marked.png"
+  }
 }

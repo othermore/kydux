@@ -125,6 +125,7 @@
     "which_one": "There are several things here: {things}. Say which, like wizard.pick_up({first}).",
     "unheard": "While its seal holds, {thing} cannot hear a word.",
     "not_my_dormitory": "I should not go into the {girls'|boys'} dormitory.",
+    "not_now_outside": "Now is not a good time to leave the castle.",
     "no_bed": "There is no bed right beside me.",
     "bed_taken": "This bed belongs to someone else.",
     "not_here": "I am carrying {thing}, so it cannot be shown where it lies."

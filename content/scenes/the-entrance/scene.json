@@ -6,5 +6,30 @@
       "sight": true
     }
   },
-  "things": []
+  "things": [],
+  "forbidden": {
+    "reason": "not_now_outside",
+    "cells": [
+      [
+        18,
+        27
+      ],
+      [
+        19,
+        27
+      ],
+      [
+        20,
+        27
+      ],
+      [
+        21,
+        27
+      ],
+      [
+        22,
+        27
+      ]
+    ]
+  }
 }

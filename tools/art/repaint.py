@@ -4,6 +4,8 @@
 
     tools/art/repaint.py <scene> canvas [--section <name>]
     tools/art/repaint.py <scene> join <picture> [--section <name>]
+    tools/art/repaint.py <scene> fill [--section <name>]
+    tools/art/repaint.py <scene> marks
 
 What to mend is the scene's settings' `repaint` (art/scenes/<scene>/cut.json,
 D82): the painting it starts from (`from`), how many pixels it grows by below
@@ -25,6 +27,24 @@ Rows below where the model's picture reaches take its last row. Models paint
 the whole picture again when asked to edit it, and sometimes paint over what was
 asked to be kept: the join keeps it whatever the model did.
 
+`marks` lays Gemini's pictures of parts of the scene with its things painted
+flat magenta (the owner's way, 2026-10-27) on the painting, each moved and scaled
+onto its crop by the least difference with the painting, as `join` lays a mended
+part, and writes the painting with the magenta where they have it: the picture
+that says which thing a static thing's mask is (`"mask": "marked"`,
+export_scene.static_alpha), whole, with the painting's outline beside it added;
+the sweep checks the scene against it. A model keeps shapes but not places to the
+pixel, so each picture laid whole is then moved part by part, its outlines onto
+the painting's (moved_locally). A part may be asked several times, its
+`picture` a list: it is magenta where more than half the tries are. The scene's
+settings' `marks` give the pictures, each with its crop, and where the painting
+goes.
+
+`fill` mends without a model: each box, a narrow upright strip, is painted row
+by row from the pixels just left and right of it, blended across, so that what
+lies under a thin thing (the entrance lamp's chain over a plain floor) goes on
+across it. A model given such a strip blurred painted the chain again.
+
 The same is done for any other section of the settings, named by `--section`:
 `without`, the edit of a scene indoors without its static things (D89), which
 those things are cut against. There, `boxes` may be `"statics"`, every static
@@ -42,6 +62,7 @@ from PIL import Image, ImageFilter
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import image_first  # noqa: E402
 import scene_settings  # noqa: E402
 
 REPO = HERE.parents[1]
@@ -191,17 +212,128 @@ def join(scene: str, picture_path: Path, section: str = "repaint") -> Path:
     return target
 
 
+def fill(scene: str, section: str = "repaint") -> Path:
+    repaint = settings_of(scene, section)
+    painting = grown(repaint).astype(np.float32)
+    for x0, y0, x1, y1 in repaint["boxes"]:
+        left, right = painting[y0:y1, x0 - 1], painting[y0:y1, x1]
+        across = ((np.arange(x0, x1) - (x0 - 1)) / (x1 - (x0 - 1)))[None, :, None]
+        painting[y0:y1, x0:x1] = left[:, None] * (1 - across) + right[:, None] * across
+    target = REPO / repaint["painting"]
+    Image.fromarray(painting.clip(0, 255).astype(np.uint8)).save(target)
+    return target
+
+
+#: How the marked pictures are laid on the painting part by part, after the whole
+#: picture is laid (marks): squares of TILE pixels, a square every STRIDE, each moved
+#: by up to REACH pixels to lay its outlines on the painting's, worked at a WORK-th of
+#: the size; a square with fewer than INKED outline pixels takes its neighbours' move.
+LOCAL_TILE = 96
+LOCAL_STRIDE = 48
+LOCAL_REACH = 24
+LOCAL_WORK = 2
+LOCAL_INKED = 40
+
+
+def moved_locally(shown: np.ndarray, crop: np.ndarray) -> np.ndarray:
+    """A picture Gemini drew again, laid on its crop as a whole, moved part by part so
+    that its outlines lie on the crop's: a model keeps a thing's shapes but not
+    their places to the pixel, and a whole laying leaves some parts astray."""
+    f = LOCAL_WORK
+    h, w = crop.shape[:2]
+    hs, ws = h // f, w // f
+
+    def ink(image: np.ndarray) -> np.ndarray:
+        small = np.array(Image.fromarray(image).resize((ws, hs), Image.BOX))
+        return small.max(axis=2) < 80
+
+    theirs, ours = ink(shown), ink(crop)
+    tile, stride, reach = LOCAL_TILE // f, LOCAL_STRIDE // f, LOCAL_REACH // f
+    ys = list(range(0, max(1, hs - tile) + 1, stride))
+    xs = list(range(0, max(1, ws - tile) + 1, stride))
+    best = np.full((len(ys), len(xs)), -1.0)
+    moves = np.zeros((len(ys), len(xs), 2))
+    padded = np.pad(theirs, reach)
+    for dy in range(-reach, reach + 1):
+        for dx in range(-reach, reach + 1):
+            # Their outline moved by (dx, dy), over ours: the overlap, summed by square.
+            here = padded[reach - dy : reach - dy + hs, reach - dx : reach - dx + ws] & ours
+            total = np.pad(here.cumsum(0).cumsum(1), ((1, 0), (1, 0)))
+            for i, y in enumerate(ys):
+                y1 = min(hs, y + tile)
+                row = total[y1, :] - total[y, :]
+                for j, x in enumerate(xs):
+                    x1 = min(ws, x + tile)
+                    score = row[x1] - row[x] - 0.01 * (dx * dx + dy * dy)
+                    if score > best[i, j]:
+                        best[i, j] = score
+                        moves[i, j] = (dy, dx)
+    # A square with little outline in it takes the middle of its neighbours' moves.
+    inked = np.array(
+        [[ours[y : y + tile, x : x + tile].sum() >= LOCAL_INKED for x in xs] for y in ys]
+    )
+    steady = moves.copy()
+    for i in range(len(ys)):
+        for j in range(len(xs)):
+            near = moves[max(0, i - 1) : i + 2, max(0, j - 1) : j + 2]
+            ok = inked[max(0, i - 1) : i + 2, max(0, j - 1) : j + 2]
+            picked = near[ok] if ok.any() else near.reshape(-1, 2)
+            steady[i, j] = np.median(picked, axis=0)
+    # Each pixel's move, from the squares' middles, and the picture taken from there.
+    cy = np.array(ys) + tile / 2
+    cx = np.array(xs) + tile / 2
+    yy, xx = np.arange(h) / f, np.arange(w) / f
+    field = np.zeros((h, w, 2))
+    for k in range(2):
+        across = np.array([np.interp(xx, cx, steady[i, :, k]) for i in range(len(ys))])
+        field[..., k] = np.array([np.interp(yy, cy, across[:, c]) for c in range(w)]).T
+    sy = np.clip(np.arange(h)[:, None] - np.round(field[..., 0] * f).astype(int), 0, h - 1)
+    sx = np.clip(np.arange(w)[None, :] - np.round(field[..., 1] * f).astype(int), 0, w - 1)
+    return shown[sy, sx]
+
+
+def marks(scene: str) -> Path:
+    settings = scene_settings.settings(scene)
+    found = settings.data["marks"]
+    painting = np.array(Image.open(settings.painting).convert("RGB"))
+    out = painting.copy()
+    for part in found["pictures"]:
+        x0, y0, x1, y1 = part["crop"]
+        crop = painting[y0:y1, x0:x1]
+        # A part asked of Gemini several times is magenta where most tries agree:
+        # each try strays somewhere else, and the vote keeps what they share.
+        names = part["picture"] if isinstance(part["picture"], list) else [part["picture"]]
+        votes = np.zeros(crop.shape[:2], dtype=np.int16)
+        for name in names:
+            picture = Image.open(settings.edits / name).convert("RGB")
+            whole = laid(crop, np.ones(crop.shape[:2], dtype=np.float32), picture)
+            shown = moved_locally(whole.clip(0, 255).astype(np.uint8), crop)
+            votes += image_first.marked(shown)
+        here = votes * 2 > len(names)
+        out[y0:y1, x0:x1][here] = (255, 0, 255)
+    target = REPO / found["painting"]
+    Image.fromarray(out).save(target)
+    return target
+
+
 def main(arguments: list[str]) -> int:
     section = "repaint"
     if "--section" in arguments:
         at = arguments.index("--section")
         section = arguments[at + 1]
         arguments = arguments[:at] + arguments[at + 2 :]
-    if len(arguments) < 2 or arguments[1] not in ("canvas", "join"):
-        print("usage: repaint.py <scene> canvas | join <picture> [--section <name>]")
+    if len(arguments) < 2 or arguments[1] not in ("canvas", "join", "fill", "marks"):
+        print(
+            "usage: repaint.py <scene> canvas | join <picture> | fill | marks [--section <name>]"
+        )
         return 2
+    if arguments[1] == "marks":
+        print(marks(arguments[0]).relative_to(REPO))
+        return 0
     if arguments[1] == "canvas":
         print(canvas(arguments[0], section).relative_to(REPO))
+    elif arguments[1] == "fill":
+        print(fill(arguments[0], section).relative_to(REPO))
     else:
         print(join(arguments[0], Path(arguments[2]), section).relative_to(REPO))
     return 0

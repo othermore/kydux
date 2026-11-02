@@ -1474,7 +1474,9 @@ one overturns stays, marked as superseded.
   in the doorway (`thingDepth`); a static
   thing marked `over` (a wall between rooms, a front wall) over every
   figure of the scene, the wizard's outline showing through it; one marked
-  `hangs` (a torch) as its row's, standing on no cell. A scene's `lowered`
+  `hangs` (a torch) as its row's, standing on no cell; one that hangs
+  above every head (a chandelier) is `over`, as a wall seen from above is
+  (the owner, 2026-10-31). A scene's `lowered`
   cells draw a figure lower by a part of a cell, at the depth its feet are
   drawn at, so that a counter on the row below hides its legs: Baro behind
   the wand bank's. Rules out the wizard over the door it walks through and
@@ -1845,3 +1847,23 @@ one overturns stays, marked as superseded.
   ground, and the dawn of D124 crossfades the night ground into it under
   the warm light. Rules out a morning told under a night sky, and a scene
   painted twice.
+- **D127 — A spell's pull is seen in order: the light, then the thing to
+  the hands, then the hands.** Decided 2026-10-31 by the owner. When
+  *fendra* takes a thing, the light leaves the wand and flies to the
+  thing; only when the light reaches it does the thing leave its place,
+  and it flies to the wizard's hands, where it stays seen, held, until
+  the tick ends; the pick-up of a thing already in the hands shows the
+  wizard's hands close on it with no second rise; and a give starts from
+  the hands, after the pick-up has ended. Every step waits for the one
+  before. Rules out a book that lands at the wizard's feet before the
+  light has reached it, and a hand-over that begins while the book is
+  still on its way.
+- **D128 — A figure in a story may step out from behind a thing.**
+  Decided 2026-10-31 by the owner. A story's `appear` may say `from`, a
+  cell next to the one the figure appears on, which no one walks (a shelf,
+  a counter) or which something covers: the figure is drawn walking out
+  of it onto its cell over the step's tick, behind what stands there, and
+  the world has it on its cell from the step's start; nothing of it shows
+  before it steps out, the check counting its pixels seen there. Rules
+  out a figure that comes out of nothing where the scene has a thing to
+  come out from behind.

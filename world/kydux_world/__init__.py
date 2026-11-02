@@ -5,4 +5,4 @@ browser, under Pyodide, and on the development machine, under CPython,
 where every level is checked by pytest.
 """
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"

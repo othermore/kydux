@@ -86,6 +86,10 @@ class Layer:
     #: An open-work thing, a gate of bars, drawn by how much each pixel differs
     #: from the picture without it: its edge is no outline's.
     open_work: bool = False
+    #: Drawn over whoever stands on its own row too, a door or its arch; or over
+    #: every figure, a wall seen from above (D95).
+    under: bool = False
+    over: bool = False
 
 
 @dataclass
@@ -105,6 +109,8 @@ class Scene:
     checks: list[str] | None = None
     #: The parts of the scene its settings keep in its things (`kept`, D93), in cells.
     kept: list = field(default_factory=list)
+    #: The cells a figure is drawn lower on, and by how much of a cell (D95).
+    lowered: dict = field(default_factory=dict)
 
 
 def walks(scene: str) -> np.ndarray:
@@ -114,6 +120,26 @@ def walks(scene: str) -> np.ndarray:
     terrains = json.loads((folder / "scene.json").read_text(encoding="utf-8"))["terrains"]
     walk = {letter for letter, terrain in terrains.items() if terrain.get("walk")} | {"."}
     return np.array([[char in walk for char in row] for row in marks])
+
+
+#: Where in its cell a row's things are drawn, as a part of a cell (painted.ts): under
+#: whoever stands on the row, or over them, a door or its arch (D95).
+ROW_IN_CELL = 0.75
+UNDER_IN_CELL = 0.9
+
+
+def depth_of(row: int, rows: int, under: bool = False, over: bool = False) -> float:
+    """The depth, in rows, a row's image is drawn at among the figures: over every
+    figure for a wall seen from above."""
+    if over:
+        return rows + 2.0
+    return row + (UNDER_IN_CELL if under else ROW_IN_CELL)
+
+
+def feet_at(scene: Scene, x: int, y: int) -> float:
+    """Where the wizard's feet are drawn on a cell, in rows: lower on a cell the
+    scene lowers (D95)."""
+    return y + FOOT_IN_CELL + scene.lowered.get((x, y), 0.0)
 
 
 def load(scene: str) -> Scene:
@@ -131,12 +157,30 @@ def load(scene: str) -> Scene:
         found.thresholds = own.thresholds
         found.checks = own.data.get("checks")
         found.kept = own.data.get("kept", [])
+    for part in art.get("lowered", []):
+        (x0, y0), (x1, y1) = part["cells"]
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                found.lowered[(x, y)] = part["by"]
     for row in art["rows"]:
         rgba = np.array(Image.open(folder / row["image"]).convert("RGBA"))
-        name = f"row {row['row']}" + (" static" if row.get("static") else "")
+        kind = next((k for k in ("over", "under", "cover") if row.get(k)), "")
+        name = (
+            f"row {row['row']}"
+            + (" static" if row.get("static") else "")
+            + (f" {kind}" if kind else "")
+        )
         found.layers.append(
             Layer(
-                name, row["row"] + 0.75, row["row"], rgba, 0, row["top"], row.get("static", False)
+                name,
+                depth_of(row["row"], rows, row.get("under", False), row.get("over", False)),
+                row["row"],
+                rgba,
+                0,
+                row["top"],
+                row.get("static", False),
+                under=row.get("under", False),
+                over=row.get("over", False),
             )
         )
     solid = {}
@@ -146,15 +190,17 @@ def load(scene: str) -> Scene:
         state = "closed" if "closed" in thing["states"] else next(iter(thing["states"]))
         rgba = np.array(Image.open(folder / thing["states"][state]).convert("RGBA"))
         # A thing is drawn just after its row's image (painted.ts).
+        under = thing.get("under", False)
         found.layers.append(
             Layer(
                 name,
-                thing["row"] + 0.75 + 0.001,
+                depth_of(thing["row"], rows, under) + 0.001,
                 None,
                 rgba,
                 thing["left"],
                 thing["top"],
                 open_work=not solid.get(name, True),
+                under=under,
             )
         )
     found.layers.sort(key=lambda layer: layer.depth)
@@ -207,11 +253,11 @@ def covers(scene: Scene) -> list[Covered]:
     found = []
     for y, x in zip(*np.nonzero(scene.walked), strict=True):
         left = int((x + 0.5) * scene.cell) - width // 2
-        bottom = int((y + FOOT_IN_CELL) * scene.cell) + foot
+        bottom = int(feet_at(scene, x, y) * scene.cell) + foot
         top = bottom - height
         if top < 0 or bottom > scene.rows * scene.cell or left < 0:
             continue
-        here = y + FOOT_IN_CELL + 0.0005
+        here = feet_at(scene, x, y) + 0.0005
         front = np.zeros_like(alpha)
         by = {}
         for layer in scene.layers:
@@ -238,11 +284,11 @@ def picture(scene: Scene, x: int, y: int) -> Image.Image:
     frame, foot = figure()
     height, width = frame.shape[:2]
     left = int((x + 0.5) * cell) - width // 2 - x0
-    top = int((y + FOOT_IN_CELL) * cell) + foot - height - y0
+    top = int(feet_at(scene, x, y) * cell) + foot - height - y0
     wizard = Image.fromarray(frame)
     placed = False
     for layer in scene.layers:
-        if not placed and layer.depth > y + FOOT_IN_CELL:
+        if not placed and layer.depth > feet_at(scene, x, y):
             out.paste(wizard, (left, top), wizard)
             placed = True
         out.alpha_composite(Image.fromarray(window(layer, x0, y0, x1, y1)))
@@ -293,13 +339,8 @@ def before(scene: Scene, layer: Layer) -> np.ndarray:
     above its own row, where the figure stands, or over the cell just above one,
     where its hat is."""
     height, width = layer.rgba.shape[:2]
-    ys = (np.arange(height) + layer.top) // scene.cell
-    xs = np.minimum((np.arange(width) + layer.left) // scene.cell, scene.columns - 1)
-    here = np.minimum(ys, scene.rows - 1)
-    below = np.minimum(ys + 1, scene.rows - 1)
-    stands = scene.walked[here][:, xs] & (ys < layer.row)[:, None]
-    hat = scene.walked[below][:, xs] & (ys + 1 < layer.row)[:, None]
-    return stands | hat
+    box = (layer.left, layer.top, layer.left + width, layer.top + height)
+    return behind_cells(scene, reach_of(scene, layer), box)
 
 
 def outlined(
@@ -445,9 +486,9 @@ def holes(scene: Scene, seen: Differs) -> list[Problem]:
 
 
 def behind_cells(scene: Scene, row: int, box: tuple[int, int, int, int]) -> np.ndarray:
-    """Over the scene's box (x0, y0, x1, y1), where an image whose foot is on `row`
-    may be drawn in front of a figure: a cell walked on above that row, or the cell
-    just above one, where the figure's hat is."""
+    """Over the scene's box (x0, y0, x1, y1), where an image drawn over the figures
+    standing above `row` may be drawn in front of one: a cell walked on above that
+    row, or the cell just above one, where the figure's hat is."""
     x0, y0, x1, y1 = box
     ys = np.arange(y0, y1) // scene.cell
     xs = np.minimum(np.arange(x0, x1) // scene.cell, scene.columns - 1)
@@ -458,9 +499,14 @@ def behind_cells(scene: Scene, row: int, box: tuple[int, int, int, int]) -> np.n
     return stands | hat
 
 
-def foot_of(layer: Layer) -> int:
-    """The row a layer's foot stands on: a row's image's own, a thing's by its depth."""
-    return layer.row if layer.row is not None else int(np.floor(layer.depth - 0.75 + 1e-6))
+def reach_of(scene: Scene, layer: Layer) -> int:
+    """The first row whose figures a layer is drawn behind: the row below its foot's,
+    or below its own row for what is over whoever stands on it (D95); below the
+    scene, for a wall over every figure."""
+    if layer.over:
+        return scene.rows + 1
+    row = layer.row if layer.row is not None else int(np.floor(layer.depth))
+    return row + 1 if layer.under else row
 
 
 def edges(scene: Scene, seen: Differs) -> list[Problem]:
@@ -491,7 +537,9 @@ def edges(scene: Scene, seen: Differs) -> list[Problem]:
         piece, lines = solid[y0:y1, x0:x1], dark[y0:y1, x0:x1]
         outside = image_first.outside_of(piece, lines, band)
         given = image_first.outside_of(piece, lines, band, same[y0:y1, x0:x1])
-        behind = behind_cells(scene, foot_of(layer), (x0, y0, x1, y1)) & inner[y0:y1, x0:x1]
+        behind = (
+            behind_cells(scene, reach_of(scene, layer), (x0, y0, x1, y1)) & inner[y0:y1, x0:x1]
+        )
         others = (count[y0:y1, x0:x1] - piece) > 0
         fringe = piece & given & behind
         bare = lines & image_first.dilated(piece, reach) & ~piece & ~outside & ~others & behind
@@ -523,11 +571,11 @@ def spills(scene: Scene, seen: Differs) -> list[Problem]:
     found = []
     for y, x in zip(*np.nonzero(scene.walked), strict=True):
         left = int((x + 0.5) * scene.cell) - wide // 2
-        bottom = int((y + FOOT_IN_CELL) * scene.cell) + foot
+        bottom = int(feet_at(scene, x, y) * scene.cell) + foot
         top = bottom - tall
         if top < 0 or bottom > height or left < 0 or left + wide > width:
             continue
-        here = y + FOOT_IN_CELL + 0.0005
+        here = feet_at(scene, x, y) + 0.0005
         front = np.zeros((tall, wide), dtype=bool)
         back = np.zeros_like(front)
         names = set()
@@ -603,7 +651,9 @@ def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
     frame, foot = figure()
     wizard = Image.fromarray(frame)
     tall, wide = frame.shape[:2]
-    standing = [(y + FOOT_IN_CELL, (x, y)) for y, x in zip(*np.nonzero(scene.walked), strict=True)]
+    standing = [
+        (feet_at(scene, x, y), (x, y)) for y, x in zip(*np.nonzero(scene.walked), strict=True)
+    ]
     drawn: list[tuple[float, Layer | tuple[int, int]]] = [
         (layer.depth, layer) for layer in scene.layers
     ]
@@ -613,7 +663,7 @@ def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
         else:
             x, y = what
             left = int((x + 0.5) * cell) - wide // 2
-            top = int((y + FOOT_IN_CELL) * cell) + foot - tall
+            top = int(feet_at(scene, x, y) * cell) + foot - tall
             out.paste(wizard, (left, top), wizard)
     lines = Image.new("RGBA", out.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(lines)

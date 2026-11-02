@@ -10,6 +10,7 @@ import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
 import { dormitoryMate, friendSheet, type Look, pupilLook, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
+import { type Lowered, overDepth, rowDepth } from './depth';
 import { shiftBy } from './shift';
 import type { Tile } from './sight';
 
@@ -26,15 +27,30 @@ export interface SceneArt {
   margin?: [number, number, number, number];
   origin?: Tile;
   /** The raised rows, each drawn over the figures above it; a row's static things
-   * (D89), the walls that never change, are an image of their own. */
-  rows: { row: number; image: string; top: number; static?: boolean }[];
+   * (D89), the walls that never change, are an image of their own. A row's image
+   * `under` is drawn over whoever stands on the row itself too, a door's arch; one
+   * `over`, over every figure, a wall seen from above (D95). */
+  rows: { row: number; image: string; top: number; static?: boolean; under?: boolean; over?: boolean }[];
   /** Each thing that opens or is picked up: its row, its corner in the painting's
    * pixels, its states' images, and `at`, the cell it is painted on, when a level
    * may place it on another (D85). */
   things: Record<
     string,
-    { row: number; left: number; top: number; states: Record<string, string>; rune?: string; at?: Tile }
+    {
+      row: number;
+      left: number;
+      top: number;
+      states: Record<string, string>;
+      rune?: string;
+      at?: Tile;
+      /** Drawn over whoever stands in its doorway (D95). */
+      under?: boolean;
+    }
   >;
+  /** The cells a figure is drawn lower on, by a part of a cell, so that what stands
+   * on the row below hides its legs: a keeper behind a counter (D95). Each range is
+   * its first and last cell. */
+  lowered?: Lowered;
   /** Where a pupil asleep in each bed lies (D91): its head's point on the pillow, in
    * cells; the way the pillow lies from the quilt; and the row of the quilt, a
    * static thing drawn over the sleeper. */
@@ -92,23 +108,16 @@ export async function loadArt(level: LevelJson): Promise<Art | null> {
  * and on the wizard's, four rows of casting frames after them, in the same order. */
 export const SHEET_ROW: Record<Facing, number> = { down: 0, left: 1, right: 2, up: 3 };
 const FACING_OF_ROW: readonly Facing[] = ['down', 'left', 'right', 'up'];
-/** Where a figure's feet stand in its cell on a painted scene, as a part of a cell. */
-export const FOOT_IN_CELL = 0.8;
-
-/** The depth of a painted row's things, at three quarters of its cell; a figure's
- * is at its feet, so that a row's things cover the figures above them (D76). */
-export function rowDepth(row: number): number {
-  return 3 + (row + 0.75) * 0.01;
-}
-
 /** How much a painted scene's pixels are scaled to the scene's tiles. */
 export function artScale(art: Art): number {
   return TILE / art.scene.cell;
 }
 
-/** A raised row's texture: a row's things and its static things are two images. */
-function rowKey(row: { row: number; static?: boolean }): string {
-  return `art-row-${row.row}${row.static ? '-static' : ''}`;
+/** A raised row's texture: a row's things and its static things are two images,
+ * and each of them under or over the figures another (D95). */
+function rowKey(row: SceneArt['rows'][number]): string {
+  const kind = row.over ? '-over' : row.under ? '-under' : '';
+  return `art-row-${row.row}${row.static ? '-static' : ''}${kind}`;
 }
 
 /** Loads the painting's images and the figures' sheets. */
@@ -141,12 +150,13 @@ export function paintScene(scene: Phaser.Scene, art: Art): Phaser.GameObjects.Im
   const scale = artScale(art);
   const [x, y] = art.scene.origin ?? [0, 0];
   scene.add.image(-x * scale, -y * scale, 'art-ground').setOrigin(0, 0).setScale(scale).setDepth(0);
+  const rows = art.scene.size[1];
   return art.scene.rows.map((row) =>
     scene.add
       .image(0, row.top * scale, rowKey(row))
       .setOrigin(0, 0)
       .setScale(scale)
-      .setDepth(rowDepth(row.row)),
+      .setDepth(row.over ? overDepth(rows) : rowDepth(row.row, row.under)),
   );
 }
 
@@ -172,7 +182,7 @@ export function paintThing(
     .image(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE, `art-${id}-${state}`)
     .setOrigin(0, 0)
     .setScale(scale)
-    .setDepth(rowDepth(painted.row + dy) + 0.001);
+    .setDepth(rowDepth(painted.row + dy, painted.under) + 0.001);
 }
 
 /** A painted thing's image put where it is drawn on a tile (D85), for a restart. */
@@ -182,7 +192,7 @@ export function placeThing(image: Phaser.GameObjects.Image, art: Art, id: string
   const scale = artScale(art);
   const [dx, dy] = shiftOf(art, id, tile);
   image.setPosition(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE);
-  image.setDepth(rowDepth(painted.row + dy) + 0.001);
+  image.setDepth(rowDepth(painted.row + dy, painted.under) + 0.001);
 }
 
 /** The sheet a character is drawn from: the friend is the one of the wizard's other

@@ -43,8 +43,9 @@
     },
     {
       "row": 11,
-      "image": "row-11.webp",
-      "top": 975
+      "image": "row-11-under.webp",
+      "top": 975,
+      "under": true
     },
     {
       "row": 12,
@@ -83,8 +84,9 @@
     },
     {
       "row": 19,
-      "image": "row-19.webp",
-      "top": 1821
+      "image": "row-19-under.webp",
+      "top": 1821,
+      "under": true
     },
     {
       "row": 20,
@@ -146,7 +148,8 @@
         "closed": "gate-closed.webp",
         "ajar": "gate-ajar.webp",
         "open": "gate-open.webp"
-      }
+      },
+      "under": true
     },
     "seal_gate": {
       "row": 11,
@@ -156,6 +159,7 @@
         "closed": "seal_gate-closed.webp",
         "open": "seal_gate-open.webp"
       },
+      "under": true,
       "rune": "painted"
     },
     "castle_door": {
@@ -165,7 +169,8 @@
       "states": {
         "closed": "castle_door-closed.webp",
         "open": "castle_door-open.webp"
-      }
+      },
+      "under": true
     },
     "wand": {
       "row": 15,

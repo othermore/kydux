@@ -532,6 +532,37 @@ def test_the_sweep_finds_a_thing_cut_across_a_row_round_a_figure():
     assert not sweep.spills(scene, seen)
 
 
+def test_a_door_is_drawn_over_whoever_stands_in_its_doorway_and_a_wall_over_all():
+    painting = np.zeros((288, 288, 3), dtype=np.uint8)
+    painting[:] = (150, 200, 70)
+    walked = np.zeros((3, 3), dtype=bool)
+    walked[1, 1] = walked[0, 1] = True
+    # A door filling the middle cell, on the row the figure stands on (D95).
+    door = np.zeros((288, 288), dtype=bool)
+    door[96:192, 110:178] = True
+    plain = layer_of(painting, door, 1)
+    scene, _ = swept(painting, walked, [plain])
+    assert (1, 1) not in {c.cell for c in sweep.covers(scene)}
+    under = sweep.Layer("door", sweep.depth_of(1, 3, under=True), 1, plain.rgba, 0, 0, under=True)
+    scene, _ = swept(painting, walked, [under])
+    assert (1, 1) in {c.cell for c in sweep.covers(scene)}
+    # A wall seen from above, on the scene's top row, over a figure two rows below it.
+    over = sweep.Layer("wall", sweep.depth_of(0, 3, over=True), 0, plain.rgba, 0, 0, over=True)
+    scene, _ = swept(painting, walked, [over])
+    assert (1, 1) in {c.cell for c in sweep.covers(scene)}
+    assert sweep.reach_of(scene, over) == 4
+
+
+def test_a_figure_on_a_lowered_cell_is_drawn_lower():
+    painting = np.zeros((288, 288, 3), dtype=np.uint8)
+    walked = np.zeros((3, 3), dtype=bool)
+    walked[1, 1] = True
+    scene, _ = swept(painting, walked, [])
+    scene.lowered = {(1, 1): 0.5}
+    assert sweep.feet_at(scene, 1, 1) == 1 + sweep.FOOT_IN_CELL + 0.5
+    assert sweep.feet_at(scene, 0, 1) == 1 + sweep.FOOT_IN_CELL
+
+
 def test_a_solid_thing_s_mask_has_its_holes_filled():
     mask = np.zeros((60, 60), dtype=bool)
     mask[10:50, 10:50] = True

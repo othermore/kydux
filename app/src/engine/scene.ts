@@ -70,7 +70,6 @@ import {
   drawMark,
   facingOf,
   figureName,
-  FOOT_IN_CELL,
   loadArt,
   paintScene,
   paintThing,
@@ -79,7 +78,6 @@ import {
   playFrames,
   marginOf,
   preloadArt,
-  rowDepth,
   SHEET_ROW,
   shiftOf,
   sleepFrame,
@@ -87,6 +85,7 @@ import {
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
+import { FOOT_IN_CELL, figureDepth, loweredBy, rowDepth } from './depth';
 import { Speech } from './speech';
 import { Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
@@ -228,9 +227,11 @@ class LevelScene extends Phaser.Scene {
     return this.map.things.find((thing) => thing.id === id)?.art ?? id;
   }
 
-  /** Where a figure stands on a tile: its centre, or on a painted scene its feet. */
+  /** Where a figure stands on a tile: its centre, or on a painted scene its feet,
+   * lower on a tile the scene lowers (D95). */
   private figureAt([x, y]: Tile): [number, number] {
-    return this.art ? [x * TILE + TILE / 2, y * TILE + TILE * FOOT_IN_CELL] : centre([x, y]);
+    if (!this.art) return centre([x, y]);
+    return [x * TILE + TILE / 2, (y + FOOT_IN_CELL + loweredBy(this.art.scene.lowered, [x, y])) * TILE];
   }
 
   /** A figure turned to face a way: its sheet's frame, or the placeholder's. */
@@ -530,9 +531,9 @@ class LevelScene extends Phaser.Scene {
   override update(): void {
     // On a painted scene the figures go behind what stands in front of them (D76).
     if (this.art) {
-      if (!this.asleep.get(this.wizard)?.lying) this.wizard.setDepth(3 + (this.wizard.y / TILE) * 0.01 + 0.0005);
+      if (!this.asleep.get(this.wizard)?.lying) this.wizard.setDepth(figureDepth(this.wizard.y / TILE) + 0.0005);
       for (const actor of this.actors.values()) {
-        if (!this.asleep.get(actor.sprite)?.lying) actor.sprite.setDepth(3 + (actor.sprite.y / TILE) * 0.01);
+        if (!this.asleep.get(actor.sprite)?.lying) actor.sprite.setDepth(figureDepth(actor.sprite.y / TILE));
       }
     }
     this.speech.update();
@@ -756,7 +757,7 @@ class LevelScene extends Phaser.Scene {
     const painted = this.art?.scene.things[this.artOf(id)];
     if (this.art && painted) {
       const [x, y] = [image.x + (to[0] - from[0]) * TILE, image.y + (to[1] - from[1]) * TILE];
-      image.setDepth(rowDepth(painted.row + shiftOf(this.art, this.artOf(id), to)[1]) + 0.001);
+      image.setDepth(rowDepth(painted.row + shiftOf(this.art, this.artOf(id), to)[1], painted.under) + 0.001);
       if (instant) image.setPosition(x, y);
       else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });
       return;

@@ -8,7 +8,7 @@
 
 import Phaser from 'phaser';
 import type { Layout } from './layout';
-import { FOOT_IN_CELL } from './painted';
+import { FOOT_IN_CELL } from './depth';
 import { TILE } from './placeholders';
 import { debugWord } from './words';
 

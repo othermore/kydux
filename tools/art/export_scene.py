@@ -449,10 +449,17 @@ def scene(settings: Settings) -> Path:
     # row's bottom edge: what image_first.py cut, and the static things after.
     # The static things' strips are their rows' images of their own, `static` in
     # art.json, so that the sweep looks at what the cut made apart from them (D89).
-    strips: dict[tuple[int, bool], tuple[int, Image.Image]] = {}
+    # A row's images are also told apart by where they are drawn among the figures
+    # (D95): `under`, over whoever stands on the row itself, a door's or an arch's;
+    # `over`, over every figure, a wall seen from above; `cover`, a bed's, over
+    # whoever sleeps in it (D97).
+    strips: dict[tuple[int, bool, str], tuple[int, Image.Image]] = {}
+    under_rows = set(settings.data.get("under", []))
 
-    def into_row(row: int, sprite: Image.Image, x: int, y: int, static: bool = False) -> None:
-        key = (row, static)
+    def into_row(
+        row: int, sprite: Image.Image, x: int, y: int, static: bool = False, layer: str = ""
+    ) -> None:
+        key = (row, static, layer)
         top, strip = strips.get(key, (y, None))
         top = min(top, y)
         bottom = max((row + 1) * CELL, y + sprite.height)
@@ -469,7 +476,7 @@ def scene(settings: Settings) -> Path:
         crop = Image.open(settings.cut / layer["file"]).convert("RGBA")
         x, y = layer["at"]
         crop = crop.crop((0, 0, crop.width, min(crop.height, (row + 1) * CELL - y)))
-        into_row(row, crop, x, y)
+        into_row(row, crop, x, y, layer="under" if row in under_rows else "")
     # Each thing's states, at the page's size: the picture of the state where it
     # differs from the picture without the thing.
     painting = np.array(Image.open(settings.painting).convert("RGB"))
@@ -502,7 +509,8 @@ def scene(settings: Settings) -> Path:
                 sprite[..., 3] / 255, thing["row"], box[1], reach=thing.get("reach", 0.0)
             )
             sprite[..., 3] = (below * 255).astype(np.uint8)
-            into_row(thing["row"], Image.fromarray(sprite, "RGBA"), box[0], box[1], static=True)
+            layer = next((k for k in ("over", "under", "cover") if thing.get(k)), "")
+            into_row(thing["row"], Image.fromarray(sprite, "RGBA"), box[0], box[1], True, layer)
             continue
         without = withouts[name]
         native = native_box(grid, thing["box"])
@@ -532,14 +540,16 @@ def scene(settings: Settings) -> Path:
             sprite[..., 3] = (below * 255).astype(np.uint8)
             webp(Image.fromarray(sprite, "RGBA"), out / states[state])
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
+        if thing.get("under"):
+            things[name]["under"] = True
         if "rune" in thing:
             things[name]["rune"] = thing["rune"]
         # The cell it is painted on, for a level that lays it on another (D85).
         if "at" in thing:
             things[name]["at"] = thing["at"]
     rows_out = []
-    for row, static in sorted(strips):
-        top, strip = strips[(row, static)]
+    for row, static, layer in sorted(strips):
+        top, strip = strips[(row, static, layer)]
         # Each piece was clipped at its row's bottom edge, or its reach, before.
         pixels = np.array(strip)
         alpha = pixels[..., 3] / 255
@@ -548,10 +558,16 @@ def scene(settings: Settings) -> Path:
         pixels[..., 3] = (alpha * 255).astype(np.uint8)
         if not pixels[..., 3].any():
             continue
-        image = f"row-{row}{'-static' if static else ''}.webp"
+        image = f"row-{row}{'-static' if static else ''}{'-' + layer if layer else ''}.webp"
         webp(Image.fromarray(pixels), out / image)
         rows_out.append(
-            {"row": row, "image": image, "top": top, **({"static": True} if static else {})}
+            {
+                "row": row,
+                "image": image,
+                "top": top,
+                **({"static": True} if static else {}),
+                **({layer: True} if layer else {}),
+            }
         )
     art = {
         "cell": CELL,
@@ -570,6 +586,8 @@ def scene(settings: Settings) -> Path:
         "rows": rows_out,
         "things": things,
         **({"beds": beds_of(settings)} if settings.data.get("beds") else {}),
+        # The cells a figure is drawn lower on, behind what stands below it (D95).
+        **({"lowered": settings.data["lowered"]} if settings.data.get("lowered") else {}),
         "source": "SOURCE.md",
     }
     (out / "art.json").write_text(json.dumps(art, indent=2) + "\n")

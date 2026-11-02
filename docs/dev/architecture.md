@@ -1847,8 +1847,14 @@ one overturns stays, marked as superseded.
   day and taken in boxes (D88), the inside as painted, candles and torches
   as they are. A story under the morning light (`light`, D124) draws that
   ground, and the dawn of D124 crossfades the night ground into it under
-  the warm light. Rules out a morning told under a night sky, and a scene
-  painted twice.
+  the warm light. Where Gemini's morning picture fits the night painting
+  whole, every wall, bed and door within three pixels, the morning is the
+  whole picture: every image of the scene has a morning twin cut with the
+  same masks, the torches, candles and fire out, and no light is laid over
+  it; where it does not fit, the sky, the windows and the outside are
+  taken in boxes with their tones matched to the painting along the
+  boxes' edges (the owner, 2026-11-01). Rules out a morning told under a
+  night sky, and a scene painted twice by hand.
 - **D127 — A spell's pull is seen in order: the light, then the thing to
   the hands, then the hands.** Decided 2026-10-31 by the owner. When
   *fendra* takes a thing, the light leaves the wand and flies to the
@@ -1869,3 +1875,30 @@ one overturns stays, marked as superseded.
   before it steps out, the check counting its pixels seen there. Rules
   out a figure that comes out of nothing where the scene has a thing to
   come out from behind.
+- **D129 — A spell's line stops at a doorway the wizard does not stand
+  in.** Decided 2026-11-01 by the owner. *fendra* reaches a thing in a
+  straight line of at most three cells, and that line does not pass
+  through a door's cell, open or shut, unless the wizard stands on it: a
+  thing inside a room is reached from its doorway or from inside, never
+  from the room before it through the open door. A thing on a shelf is
+  never picked up by hand, from beside or from below: it is too high
+  (`too_high`), and only the spell brings it down. Rules out a book
+  fetched out of a locked room from across its threshold, and a door
+  opened for nothing.
+- **D130 — Going to sleep is seen: the wizard walks to the pillow's side
+  and lies down; the cell to sleep from is marked.** Decided 2026-11-01
+  by the owner. `wizard.sleep()` from the cell beside the bed is drawn in
+  two parts, each a tick long: the wizard walks along the bed's side to
+  the point beside its pillow, then lies down in it, head on the pillow.
+  A level whose goal is to sleep marks the cell the wizard must stand on
+  to do it (the goal's `at`), with the goal's ring and a sign of sleep
+  drawn by the page, as a reach goal marks its cell. Rules out a figure
+  that snaps into the bed in a blink, and a child who does not know where
+  to stand.
+- **D131 — A level opened again starts from its starting code.** Decided
+  2026-11-01 by the owner. Opening a level from the map, from the course
+  or from its lesson shows the level's starting code, as the first time;
+  the program the child typed is kept only while the level's screen is
+  open (*Run*, *Restart* and *Play again* keep it). Rules out a level that
+  opens on the last program typed days ago, and a child who cannot find
+  the comments that guide the practice.

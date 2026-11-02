@@ -567,7 +567,10 @@ one overturns stays, marked as superseded.
   not teach, and a Try it that fails in that level. Code on a page is
   plain `<pre>`, not highlighted: a highlighter would be one more
   dependency for a few short lines, and the editor already shows the
-  colours. Reaching the last page marks a lesson read.
+  colours. Reaching the last page marks a lesson read. Its last page's
+  button says *Try it* only where a level comes next, the one the example
+  is tried in; a lesson before another lesson or a story says *Go on*,
+  its example shown all the same.
 - **D34 — An item is open once the one before it is done.** Decided
   2026-10-21 (sprint-5.md), built the same day. On the map, a stop is done
   (a lesson read, a level won), open (the course's first item, or the one

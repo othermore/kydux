@@ -26,6 +26,41 @@ test('a lesson turns its pages, theory first, and Try it opens the level, its ed
   await expect(page.locator('.cm-content')).toHaveText('');
 });
 
+for (const [locale, tryIt, goOn] of [
+  ['en-US', 'Try it', 'Go on'],
+  ['es-ES', 'Probar', 'Seguir'],
+] as const) {
+  test(`only a lesson before a level says ${tryIt}: one before another lesson goes on to it (${locale})`, async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({ locale });
+    const page = await context.newPage();
+    const toLastPage = async () => {
+      while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
+    };
+    // What things know comes before Finding things: its example is shown, and its
+    // button goes on to the next lesson.
+    await page.goto('/#lesson/what-things-know');
+    await toLastPage();
+    await expect(page.locator('.lesson-page pre')).toHaveCount(1);
+    await expect(page.locator('#lesson-try')).toHaveText(goOn);
+    await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
+    await page.locator('#lesson-try').click();
+    await expect(page).toHaveURL(/#lesson\/finding-things$/);
+    // Finding things comes before The lost book: one Try button, on its last page.
+    for (let turn = 0; turn < 3; turn += 1) {
+      await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
+      await page.locator('#lesson-next').click();
+    }
+    await expect(page.locator('#lesson-next')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: tryIt })).toHaveCount(1);
+    await expect(page.locator('#lesson-try')).toHaveText(tryIt);
+    await page.locator('#lesson-try').click();
+    await expect(page).toHaveURL(/#level\/the-lost-book$/);
+    await context.close();
+  });
+}
+
 test('a lesson read shows as done on the map, and opens its level', async ({ page }) => {
   await page.goto('/#lesson/what-a-program-is');
   for (let turn = 0; turn < 2; turn += 1) await page.locator('#lesson-next').click();

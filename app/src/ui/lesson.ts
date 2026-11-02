@@ -1,8 +1,9 @@
 // A lesson, page by page: its Markdown rendered by marked (D33), Back and Next
-// page, and on the last page Try it, which marks the lesson read and opens what
-// comes next; a lesson with no example has Go on instead (D56). Reaching the
-// last page marks it read. A lesson is drawn as its teacher speaking, the
-// figure beside the words (D67).
+// page, and on the last page the button that marks the lesson read and opens what
+// comes next: Try it, where a level comes next for the example to be tried in;
+// Go on, before another lesson or a story, and for a lesson with no example
+// (D56). Reaching the last page marks it read. A lesson is drawn as its teacher
+// speaking, the figure beside the words (D67).
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
@@ -43,6 +44,9 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
   };
 
   const markRead = () => progress.markRead(lesson.id);
+  // Try it leads to a level, where the example is tried; a lesson followed by
+  // another lesson has nothing to try yet, and goes on to it.
+  const tries = () => lesson.tryCode !== null && (parts.next?.startsWith('level:') ?? false);
 
   const tryIt = () => {
     markRead();
@@ -73,7 +77,7 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
     });
     const forward = last
       ? element('button', { id: 'lesson-try', type: 'button', className: 'big-button' }, [
-          parts.backTo ? t('lesson.back_to_level') : lesson.tryCode !== null ? t('lesson.try') : t('lesson.go_on'),
+          parts.backTo ? t('lesson.back_to_level') : tries() ? t('lesson.try') : t('lesson.go_on'),
         ])
       : element('button', { id: 'lesson-next', type: 'button', className: 'big-button' }, [
           t('lesson.next'),

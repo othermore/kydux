@@ -10,9 +10,9 @@ import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
 import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
-import { coverDepth, type Lowered, overDepth, rowDepth, thingDepth } from './depth';
+import { coverDepth, type Lowered, type Nudged, overDepth, rowDepth, thingDepth } from './depth';
 import type { Dark } from './shade';
-import { shiftBy } from './shift';
+import { drawnShift, shiftBy } from './shift';
 import type { Tile } from './sight';
 
 /** A scene painted in one picture (D76): its ground, its raised things cut out by
@@ -56,12 +56,19 @@ export interface SceneArt {
       at?: Tile;
       /** Drawn over whoever stands in its doorway (D95). */
       under?: boolean;
+      /** Open, its doorway shows the floor beyond, under every figure (D108). */
+      through?: boolean;
+      /** The state a door is drawn in where no level or story places it (D104). */
+      rest?: 'open' | 'closed';
     }
   >;
   /** The cells a figure is drawn lower on, by a part of a cell, so that what stands
    * on the row below hides its legs: a keeper behind a counter (D95). Each range is
    * its first and last cell. */
   lowered?: Lowered;
+  /** The cells a figure is drawn sideways on, by a part of a cell, to stand on the
+   * painted strip where it is off its cells' middle (D105). */
+  nudged?: Nudged;
   /** Where a pupil asleep in each bed lies (D91): its head's point on the pillow, in
    * cells; the way the pillow lies from the quilt; and the row of the quilt, a
    * static thing drawn over the sleeper. */
@@ -173,40 +180,104 @@ export function paintScene(scene: Phaser.Scene, art: Art): Phaser.GameObjects.Im
   );
 }
 
-/** How many cells a painted thing is drawn away from where it is painted (D85). */
+/** How many cells a painted thing is moved from where it is painted (D85): the
+ * rows it is drawn among follow it so. */
 export function shiftOf(art: Art, id: string, tile: Tile): Tile {
   return shiftBy(art.scene.things[id]?.at, tile);
 }
 
+/** The middle of what is drawn of each picture, in its own pixels: its solid
+ * pixels' box, read once a picture. */
+const middles = new Map<string, [number, number]>();
+
+function middleOf(scene: Phaser.Scene, key: string): [number, number] {
+  const known = middles.get(key);
+  if (known) return known;
+  const image = scene.textures.get(key).getSourceImage() as HTMLImageElement | HTMLCanvasElement;
+  let middle: [number, number] = [image.width / 2, image.height / 2];
+  const canvas = document.createElement('canvas');
+  [canvas.width, canvas.height] = [image.width, image.height];
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (context && image.width > 0 && image.height > 0) {
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, image.width, image.height).data;
+    let [x0, y0, x1, y1] = [image.width, image.height, -1, -1];
+    for (let y = 0; y < image.height; y += 1) {
+      for (let x = 0; x < image.width; x += 1) {
+        if ((pixels[(y * image.width + x) * 4 + 3] ?? 0) <= 127) continue;
+        [x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)];
+      }
+    }
+    if (x1 >= 0) middle = [(x0 + x1 + 1) / 2, (y0 + y1 + 1) / 2];
+  }
+  middles.set(key, middle);
+  return middle;
+}
+
+/** Where a painted thing's picture is drawn for a tile, its corner in the scene's
+ * pixels (D85): as painted on its own cell; on another, its middle on the tile's
+ * middle (D109), read from the picture of the state it is first painted in. */
+function drawnAt(scene: Phaser.Scene, art: Art, id: string, tile: Tile): [number, number] {
+  const painted = art.scene.things[id];
+  if (!painted) return [0, 0];
+  const scale = artScale(art);
+  const first = `art-${id}-${Object.keys(painted.states)[0]}`;
+  const [mx, my] = scene.textures.exists(first) ? middleOf(scene, first) : [0, 0];
+  const middle: [number, number] = [((painted.left + mx) * scale) / TILE, ((painted.top + my) * scale) / TILE];
+  const [dx, dy] = drawnShift(painted.at, tile, middle);
+  return [painted.left * scale + dx * TILE, painted.top * scale + dy * TILE];
+}
+
+/** How a thing on a tile is drawn among the rows: a door as open or shut, and
+ * `inside` the furniture of a cell no one walks on, under it. */
+export interface ThingPlaced {
+  open?: boolean;
+  inside?: boolean;
+}
+
+function depthOn(art: Art, id: string, tile: Tile, { open = false, inside = false }: ThingPlaced): number {
+  const painted = art.scene.things[id];
+  if (!painted) return 3;
+  return thingDepth(painted.row + shiftOf(art, id, tile)[1], {
+    under: painted.under,
+    open,
+    through: painted.through,
+    inside,
+  });
+}
+
 /** A painted thing in its state, among the rows by its foot (D76), drawn on the
- * level's tile (D85), or null when the painting has no such thing. */
+ * level's tile (D85, D109), or null when the painting has no such thing. */
 export function paintThing(
   scene: Phaser.Scene,
   art: Art,
   thing: { id: string; kind: string; open?: boolean; tile: Tile; art?: string },
+  inside = false,
 ): Phaser.GameObjects.Image | null {
   const id = thing.art ?? thing.id;
   const painted = art.scene.things[id];
   if (!painted) return null;
   const state = thing.kind === 'door' ? (thing.open ? 'open' : 'closed') : Object.keys(painted.states)[0];
-  const scale = artScale(art);
-  const [dx, dy] = shiftOf(art, id, thing.tile);
+  const open = thing.kind === 'door' && thing.open === true;
   return scene.add
-    .image(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE, `art-${id}-${state}`)
+    .image(...drawnAt(scene, art, id, thing.tile), `art-${id}-${state}`)
     .setOrigin(0, 0)
-    .setScale(scale)
-    .setDepth(thingDepth(painted.row + dy, painted.under, thing.kind === 'door' && thing.open));
+    .setScale(artScale(art))
+    .setDepth(depthOn(art, id, thing.tile, { open, inside }));
 }
 
-/** A painted thing's image put where it is drawn on a tile (D85), for a restart,
- * and among the rows as it is drawn there, a door as open or shut. */
-export function placeThing(image: Phaser.GameObjects.Image, art: Art, id: string, tile: Tile, open = false): void {
-  const painted = art.scene.things[id];
-  if (!painted) return;
-  const scale = artScale(art);
-  const [dx, dy] = shiftOf(art, id, tile);
-  image.setPosition(painted.left * scale + dx * TILE, painted.top * scale + dy * TILE);
-  image.setDepth(thingDepth(painted.row + dy, painted.under, open));
+/** A painted thing's image put where it is drawn on a tile (D85, D109), for a
+ * restart, and among the rows as it is drawn there. */
+export function placeThing(image: Phaser.GameObjects.Image, art: Art, id: string, tile: Tile, placed: ThingPlaced = {}): void {
+  if (!art.scene.things[id]) return;
+  image.setPosition(...drawnAt(image.scene, art, id, tile));
+  image.setDepth(depthOn(art, id, tile, placed));
+}
+
+/** The depth a painted thing is drawn at on a tile (depthOn), for a door opened or
+ * shut and a thing a spell brings. */
+export function thingDepthOn(art: Art, id: string, tile: Tile, placed: ThingPlaced = {}): number {
+  return depthOn(art, id, tile, placed);
 }
 
 /** The sheet a character is drawn from: the friend is the one of the wizard's other

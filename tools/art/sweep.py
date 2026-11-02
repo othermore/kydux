@@ -109,6 +109,8 @@ class Scene:
     marked: bool = False
     #: The cells a figure is drawn lower on, and by how much of a cell (D95).
     lowered: dict = field(default_factory=dict)
+    #: The cells a figure is drawn sideways on, and by how much of a cell (D105).
+    nudged: dict = field(default_factory=dict)
     #: The dark passages a figure is drawn darker in, the deeper it goes (shade.ts).
     dark: list = field(default_factory=list)
 
@@ -141,6 +143,12 @@ def feet_at(scene: Scene, x: int, y: int) -> float:
     """Where the wizard's feet are drawn on a cell, in rows: lower on a cell the
     scene lowers (D95)."""
     return y + FOOT_IN_CELL + scene.lowered.get((x, y), 0.0)
+
+
+def middle_at(scene: Scene, x: int, y: int) -> float:
+    """Where the wizard's middle is drawn on a cell, in columns: sideways on a cell
+    the scene nudges (D105)."""
+    return x + 0.5 + scene.nudged.get((x, y), 0.0)
 
 
 #: How much darker a figure's head is than its feet in a dark passage (shade.ts).
@@ -181,11 +189,12 @@ def load(scene: str) -> Scene:
         found.kept = own.data.get("kept", [])
         found.marked = "marks" in own.data
     found.dark = art.get("dark", [])
-    for part in art.get("lowered", []):
-        (x0, y0), (x1, y1) = part["cells"]
-        for y in range(y0, y1 + 1):
-            for x in range(x0, x1 + 1):
-                found.lowered[(x, y)] = part["by"]
+    for key in ("lowered", "nudged"):
+        for part in art.get(key, []):
+            (x0, y0), (x1, y1) = part["cells"]
+            for y in range(y0, y1 + 1):
+                for x in range(x0, x1 + 1):
+                    getattr(found, key)[(x, y)] = part["by"]
     for row in art["rows"]:
         rgba = np.array(Image.open(folder / row["image"]).convert("RGBA"))
         kind = next((k for k in ("over", "under", "cover", "hangs") if row.get(k)), "")
@@ -213,15 +222,17 @@ def load(scene: str) -> Scene:
     for name, thing in art["things"].items():
         # A door is drawn open: one stands in its doorway, the only cell it is walked
         # on from, only when it is open, and what is seen through it is then under
-        # them, its arch over them (D95).
+        # them, its arch over them (D95); a doorway seen `through` to the floor
+        # beyond is under every figure (D108).
         state = "open" if "open" in thing["states"] else next(iter(thing["states"]))
         rgba = np.array(Image.open(folder / thing["states"][state]).convert("RGBA"))
         # A thing is drawn just after its row's image (painted.ts).
         under = thing.get("under", False) and state != "open"
+        through = thing.get("through", False) and state == "open"
         found.layers.append(
             Layer(
                 name,
-                depth_of(thing["row"], rows, under) + 0.001,
+                -1.0 if through else depth_of(thing["row"], rows, under) + 0.001,
                 None,
                 rgba,
                 thing["left"],
@@ -279,7 +290,7 @@ def covers(scene: Scene) -> list[Covered]:
     neck = int(seen[0] + (seen[-1] - seen[0]) * 0.45)
     found = []
     for y, x in zip(*np.nonzero(scene.walked), strict=True):
-        left = int((x + 0.5) * scene.cell) - width // 2
+        left = int(middle_at(scene, x, y) * scene.cell) - width // 2
         bottom = int(feet_at(scene, x, y) * scene.cell) + foot
         top = bottom - height
         if top < 0 or bottom > scene.rows * scene.cell or left < 0:
@@ -310,7 +321,7 @@ def picture(scene: Scene, x: int, y: int) -> Image.Image:
     out = Image.fromarray(scene.ground[y0:y1, x0:x1])
     frame, foot = figure()
     height, width = frame.shape[:2]
-    left = int((x + 0.5) * cell) - width // 2 - x0
+    left = int(middle_at(scene, x, y) * cell) - width // 2 - x0
     top = int(feet_at(scene, x, y) * cell) + foot - height - y0
     wizard = Image.fromarray(shaded(scene, frame, x, y))
     placed = False
@@ -641,7 +652,7 @@ def spills(scene: Scene, seen: Differs) -> list[Problem]:
         kept |= image_first.area_mask(kept.shape, area, scene.cell)
     found = []
     for y, x in zip(*np.nonzero(scene.walked), strict=True):
-        left = int((x + 0.5) * scene.cell) - wide // 2
+        left = int(middle_at(scene, x, y) * scene.cell) - wide // 2
         bottom = int(feet_at(scene, x, y) * scene.cell) + foot
         top = bottom - tall
         if top < 0 or bottom > height or left < 0 or left + wide > width:
@@ -730,7 +741,7 @@ def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
             out.alpha_composite(Image.fromarray(window(what, 0, 0, width, height)))
         else:
             x, y = what
-            left = int((x + 0.5) * cell) - wide // 2
+            left = int(middle_at(scene, x, y) * cell) - wide // 2
             top = int(feet_at(scene, x, y) * cell) + foot - tall
             seen = Image.fromarray(shaded(scene, frame, x, y))
             out.paste(seen, (left, top), seen)

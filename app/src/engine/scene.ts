@@ -63,6 +63,7 @@ import {
 } from './placeholders';
 import {
   type Art,
+  artScale,
   breakSeal,
   crossfade,
   drawFigure,
@@ -80,13 +81,13 @@ import {
   marginOf,
   preloadArt,
   SHEET_ROW,
-  shiftOf,
   sleepFrame,
+  thingDepthOn,
 } from './painted';
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
-import { FOOT_IN_CELL, figureDepth, loweredBy, sleeperDepth, thingDepth } from './depth';
+import { FOOT_IN_CELL, figureDepth, loweredBy, nudgedBy, sleeperDepth } from './depth';
 import { Speech } from './speech';
 import { shadeAt, tintOf } from './shade';
 import { Silhouette } from './silhouette';
@@ -229,11 +230,22 @@ class LevelScene extends Phaser.Scene {
     return this.map.things.find((thing) => thing.id === id)?.art ?? id;
   }
 
+  /** Whether a tile is one no one walks on, the inside of a bookcase or a bed: a
+   * thing laid there is drawn under what stands on it. */
+  private inside([x, y]: Tile): boolean {
+    const letter = this.map.rows[y]?.[x];
+    return letter === '#' || letter === '=';
+  }
+
   /** Where a figure stands on a tile: its centre, or on a painted scene its feet,
-   * lower on a tile the scene lowers (D95). */
+   * lower on a tile the scene lowers (D95) and sideways on one it nudges (D105). */
   private figureAt([x, y]: Tile): [number, number] {
     if (!this.art) return centre([x, y]);
-    return [x * TILE + TILE / 2, (y + FOOT_IN_CELL + loweredBy(this.art.scene.lowered, [x, y])) * TILE];
+    const { lowered, nudged } = this.art.scene;
+    return [
+      (x + 0.5 + nudgedBy(nudged, [x, y])) * TILE,
+      (y + FOOT_IN_CELL + loweredBy(lowered, [x, y])) * TILE,
+    ];
   }
 
   /** A figure turned to face a way: its sheet's frame, or the placeholder's. */
@@ -285,7 +297,7 @@ class LevelScene extends Phaser.Scene {
     const painted = this.art?.scene.things[this.artOf(id)];
     const tile = this.doors.get(id);
     if (this.art && painted && tile) {
-      image.setDepth(thingDepth(painted.row + shiftOf(this.art, this.artOf(id), tile)[1], painted.under, open));
+      image.setDepth(thingDepthOn(this.art, this.artOf(id), tile, { open, inside: this.inside(tile) }));
     }
     if (!moving || this.still) {
       image.setTexture(key);
@@ -389,7 +401,7 @@ class LevelScene extends Phaser.Scene {
     for (const thing of this.map.things) {
       // A bed is the scene's: the painting draws it, and nothing is drawn for it (D84).
       if (thing.kind === 'bed') continue;
-      const painted = this.art ? paintThing(this, this.art, thing) : null;
+      const painted = this.art ? paintThing(this, this.art, thing, this.inside(thing.tile)) : null;
       if (painted) {
         this.things.set(thing.id, painted);
         if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
@@ -406,6 +418,18 @@ class LevelScene extends Phaser.Scene {
       const shape = thing.kind === 'door' || thing.kind === 'stair';
       this.things.set(thing.id, image.setDepth(shape ? 2.8 : 2));
       if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
+    }
+    // A painted door no level or story places is drawn in the state it rests in
+    // (D104): the ground shows it open, and one resting shut is drawn shut.
+    for (const [id, painted] of Object.entries(this.art?.scene.things ?? {})) {
+      if (!this.art || painted.rest !== 'closed' || !this.textures.exists(`art-${id}-closed`)) continue;
+      if (this.map.things.some((thing) => (thing.art ?? thing.id) === id)) continue;
+      const scale = artScale(this.art);
+      this.add
+        .image(painted.left * scale, painted.top * scale, `art-${id}-closed`)
+        .setOrigin(0, 0)
+        .setScale(scale)
+        .setDepth(thingDepthOn(this.art, id, painted.at ?? [0, painted.row]));
     }
     for (const thing of this.map.things) {
       if (thing.kind === 'door' && thing.lock === 'spell') this.addGlow(thing.id, thing.tile);
@@ -611,7 +635,7 @@ class LevelScene extends Phaser.Scene {
       const tile = this.startTile(thing.id, thing.tile);
       const painted = this.art?.scene.things[this.artOf(thing.id)];
       if (this.art && painted) {
-        placeThing(image, this.art, this.artOf(thing.id), tile, thing.open);
+        placeThing(image, this.art, this.artOf(thing.id), tile, { open: thing.open, inside: this.inside(tile) });
         // Back in the state it lies in, a book the spell took at the run before.
         if (thing.kind !== 'door') image.setTexture(`art-${this.artOf(thing.id)}-${Object.keys(painted.states)[0]}`);
       } else image.setPosition(...centre(tile));
@@ -718,10 +742,10 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** A figure laid in a bed (D91). On a painted scene that knows where the bed's
-   * pillow is, with a lying frame on the figure's sheet: that frame, turned along
-   * the bed with its head on the pillow, just under the bed's quilt, which the
-   * scene's static things draw over it. Else the standing figure, turned along
-   * the bed over it (D84). */
+   * pillow is, with a lying frame on the figure's sheet: the figure goes there, then
+   * takes that frame, turned along the bed with its head on the pillow, just under
+   * the bed's quilt, which the scene's static things draw over it. Else the
+   * standing figure, turned along the bed over it (D84). */
   private layDown(sprite: Phaser.GameObjects.Sprite, id: string, bed: string, instant: boolean): void {
     const tile = this.bedTile(bed);
     if (!tile) return;
@@ -734,13 +758,30 @@ class LevelScene extends Phaser.Scene {
       // The figure's feet are its origin: they lie the head's reach from the pillow.
       const x = (place.head[0] - toward * figures.height_cells * HEAD_REACH) * TILE;
       const y = place.head[1] * TILE;
-      sprite.setFrame(frame).setAngle(90 * toward).setPosition(x, y).setDepth(sleeperDepth(place.row));
-      this.asleep.set(sprite, { id, bed, lying: true });
-      this.markAsleep();
-      if (!instant && !this.still) {
-        sprite.setAlpha(0);
-        this.tweens.add({ targets: sprite, alpha: 1, duration: this.playback.tickDuration * 0.6 });
+      const lie = () => {
+        sprite.setFrame(frame).setAngle(90 * toward).setPosition(x, y).setDepth(sleeperDepth(place.row));
+        this.asleep.set(sprite, { id, bed, lying: true });
+        this.markAsleep();
+      };
+      if (instant || this.still) {
+        lie();
+        return;
       }
+      // Seen lying down: the figure goes to the bed's place, then lies there (18.3).
+      this.asleep.set(sprite, { id, bed, lying: false });
+      this.markAsleep();
+      this.tweens.add({
+        targets: sprite,
+        x,
+        y,
+        duration: this.playback.tickDuration * 0.8,
+        ease: 'Sine.easeInOut',
+        onComplete: () => {
+          lie();
+          sprite.setAlpha(0);
+          this.tweens.add({ targets: sprite, alpha: 1, duration: this.playback.tickDuration * 0.3 });
+        },
+      });
       return;
     }
     this.asleep.set(sprite, { id, bed, lying: false });
@@ -793,7 +834,7 @@ class LevelScene extends Phaser.Scene {
         if (instant) image.setTexture(pulled);
         else crossfade(this, image, pulled, this.playback.tickDuration * 0.5);
       }
-      image.setDepth(thingDepth(painted.row + shiftOf(this.art, this.artOf(id), to)[1], painted.under));
+      image.setDepth(thingDepthOn(this.art, this.artOf(id), to, { inside: this.inside(to) }));
       if (instant) image.setPosition(x, y);
       else this.tweens.add({ targets: image, x, y, duration: this.playback.tickDuration * 0.9 });
       return;

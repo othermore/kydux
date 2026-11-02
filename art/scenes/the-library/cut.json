@@ -351,7 +351,9 @@
       ],
       "about": "Wenna's door, in the wall between the reading room and the shelves: open, its doorway shows the floor of the hall beyond from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
       "opening": 1.17,
-      "under": true
+      "under": true,
+      "through": true,
+      "rest": "open"
     },
     "centre_door": {
       "box": [
@@ -373,7 +375,9 @@
       ],
       "about": "The door in the middle of the wall between the wide hall and the top aisle: open, its doorway shows the floor of the aisle beyond from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
       "opening": 1.18,
-      "under": true
+      "under": true,
+      "through": true,
+      "rest": "open"
     },
     "room_door": {
       "box": [
@@ -394,7 +398,9 @@
         5
       ],
       "about": "The door of Eldra's little room, at the top aisle's left end: open, its doorway shows the room's floor from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
-      "under": true
+      "under": true,
+      "through": true,
+      "rest": "open"
     },
     "wenna_door_arch": {
       "about": "The stone arch round Wenna's door, over whoever stands in its doorway: the arch's dome and its sides down to the floor, the door's own cut-out left to the door.",

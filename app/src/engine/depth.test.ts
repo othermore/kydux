@@ -3,7 +3,9 @@ import {
   coverDepth,
   FOOT_IN_CELL,
   figureDepth,
+  GROUND_DEPTH,
   loweredBy,
+  nudgedBy,
   overDepth,
   rowDepth,
   sleeperDepth,
@@ -25,9 +27,22 @@ describe('the depths of a painted scene (D76, D95)', () => {
 
   it('draws a shut door over the figure in its doorway, and an open one under them', () => {
     const standing = figureDepth(8 + FOOT_IN_CELL);
-    expect(thingDepth(8, true, false)).toBeGreaterThan(standing);
-    expect(thingDepth(8, true, true)).toBeLessThan(standing);
-    expect(thingDepth(8, true, true)).toBeGreaterThan(figureDepth(7 + FOOT_IN_CELL));
+    expect(thingDepth(8, { under: true })).toBeGreaterThan(standing);
+    expect(thingDepth(8, { under: true, open: true })).toBeLessThan(standing);
+    expect(thingDepth(8, { under: true, open: true })).toBeGreaterThan(figureDepth(7 + FOOT_IN_CELL));
+  });
+
+  it('draws an open doorway seen through to the floor beyond under every figure (D108)', () => {
+    const open = thingDepth(16, { under: true, open: true, through: true });
+    expect(open).toBe(GROUND_DEPTH);
+    expect(open).toBeLessThan(figureDepth(0));
+    // Shut, it is over the figure in its doorway as any door.
+    expect(thingDepth(16, { under: true, through: true })).toBeGreaterThan(figureDepth(16 + FOOT_IN_CELL));
+  });
+
+  it('draws a thing lying inside furniture under its row, a thing on the floor over it', () => {
+    expect(thingDepth(14, { inside: true })).toBeLessThan(rowDepth(14));
+    expect(thingDepth(14)).toBeGreaterThan(rowDepth(14));
   });
 
   it('draws a wall seen from above over every figure of the scene', () => {
@@ -47,5 +62,12 @@ describe('the depths of a painted scene (D76, D95)', () => {
     expect(loweredBy(undefined, [12, 4])).toBe(0);
     // Drawn lower, the keeper behind a counter on the row below is behind it.
     expect(figureDepth(4 + FOOT_IN_CELL + 0.5)).toBeLessThan(rowDepth(5));
+  });
+
+  it('nudges a figure sideways only on the cells a scene names (D105)', () => {
+    const nudged = [{ cells: [[16, 5], [16, 6]] as [[number, number], [number, number]], by: -0.4 }];
+    expect(nudgedBy(nudged, [16, 6])).toBe(-0.4);
+    expect(nudgedBy(nudged, [16, 7])).toBe(0);
+    expect(nudgedBy(undefined, [16, 6])).toBe(0);
   });
 });

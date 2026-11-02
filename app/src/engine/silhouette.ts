@@ -9,22 +9,22 @@
 // frame, and a sprite of it follows the wizard. It is cut by a mask: copies of
 // the painted rows and things, of which only those in front of the wizard are
 // shown, so that the line shows where they cover the wizard and nowhere else.
-// How much is covered is counted by cover.ts. A thing revealed (D85) has its
-// whole outline drawn, over whatever covers it, so that it is found among
-// things like it too.
+// How much is covered is counted by cover.ts. A thing revealed (D85) glows
+// (D107): its own shape filled with the line's yellow, half seen and beating,
+// over whatever covers it, so that it is found among things like it too and a
+// thin key reads as a key, not as a line through it.
 
 import Phaser from 'phaser';
-import { coveredShare, HIDDEN_SHARE, type Solid } from './cover';
+import { coveredShare, HIDDEN_SHARE, inFront, type Solid } from './cover';
 
-/** The outline's colour, and how thick it is in the sheet's pixels: a figure's, and
- * a thing's, which is small and drawn at half its size, so thicker. */
+/** The outline's colour, and how thick it is in the sheet's pixels. */
 const COLOUR = [255, 214, 51] as const;
 const THICK = 2;
-const THING_THICK = 5;
-/** How long the line takes to fade away, and as long to come back; a thing's line
- * never fades wholly, so that a small thing is never lost. */
+/** How long the line takes to fade away, and as long to come back; a thing's glow
+ * beats between half seen and less, never gone, so that a small thing is never lost. */
 const BEAT_MS = 650;
-const THING_FAINTEST = 0.4;
+const GLOW_MOST = 0.75;
+const GLOW_LEAST = 0.35;
 
 /** The textures' pixels, solid or not, read once for each. */
 const solids = new Map<string, Solid | null>();
@@ -49,8 +49,10 @@ function solidOf(scene: Phaser.Scene, key: string): Solid | null {
   return read;
 }
 
-/** The outlines of a sheet's figures, frame for frame, as a texture named `key`. */
-function outlineSheet(scene: Phaser.Scene, sheet: string, key: string, thick = THICK): void {
+/** The outlines of a sheet's figures, frame for frame, as a texture named `key`;
+ * `filled`, their shapes filled with the colour instead (D107). */
+function outlineSheet(scene: Phaser.Scene, sheet: string, key: string, filled = false): void {
+  const thick = THICK;
   if (scene.textures.exists(key)) return;
   const source = scene.textures.get(sheet);
   const image = source.getSourceImage() as HTMLImageElement | HTMLCanvasElement;
@@ -67,6 +69,15 @@ function outlineSheet(scene: Phaser.Scene, sheet: string, key: string, thick = T
   const out = context.createImageData(width, height);
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
+      if (filled) {
+        if (!solid[y * width + x]) continue;
+        const at = (y * width + x) * 4;
+        out.data[at] = COLOUR[0];
+        out.data[at + 1] = COLOUR[1];
+        out.data[at + 2] = COLOUR[2];
+        out.data[at + 3] = 255;
+        continue;
+      }
       if (solid[y * width + x]) continue;
       // A pixel just outside the figure, within THICK of it, is the line.
       let near = false;
@@ -119,8 +130,8 @@ export class Silhouette {
     still: boolean,
     private readonly always = false,
   ) {
-    const key = `${figure.texture.key}-outline`;
-    outlineSheet(scene, figure.texture.key, key, always ? THING_THICK : THICK);
+    const key = `${figure.texture.key}-${always ? 'glow' : 'outline'}`;
+    outlineSheet(scene, figure.texture.key, key, always);
     this.line = scene.add.sprite(figure.x, figure.y, key, figure.frame.name).setDepth(9.5);
     // The mask: copies of what is painted, kept off the scene's own display list.
     const mask = new Phaser.GameObjects.Container(scene, 0, 0);
@@ -137,9 +148,9 @@ export class Silhouette {
       this.line.enableFilters();
       this.line.filters?.external.addMask(mask, false, scene.cameras.main);
     }
-    const faintest = always ? THING_FAINTEST : 0;
-    if (still) this.line.setAlpha(0.85);
-    else scene.tweens.add({ targets: this.line, alpha: { from: 1, to: faintest }, duration: BEAT_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    const [most, least] = always ? [GLOW_MOST, GLOW_LEAST] : [1, 0];
+    if (still) this.line.setAlpha(always ? GLOW_MOST : 0.85);
+    else scene.tweens.add({ targets: this.line, alpha: { from: most, to: least }, duration: BEAT_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   }
 
   /** Every frame: the mask of what is in front of the figure now, how much of it
@@ -154,17 +165,17 @@ export class Silhouette {
     for (const { source, copy } of this.covers) {
       if (copy.texture.key !== source.texture.key) copy.setTexture(source.texture.key);
       copy.setPosition(source.x, source.y);
-      const before = source.visible && source.alpha > 0.05 && source.depth > figure.depth;
+      const before = inFront(figure, [source]).length > 0;
       copy.setVisible(before);
       if (before) front.push(source);
     }
     const share =
       figure.visible && !this.always ? coveredShare(figure, front, (key) => solidOf(this.scene, key)) : 0;
     this.shown = !this.off && (this.always ? figure.visible : share > HIDDEN_SHARE);
-    // A thing drawn in another state, a book the spell has taken, is outlined so.
-    const key = `${figure.texture.key}-outline`;
+    // A thing drawn in another state, a book the spell has taken, glows so.
+    const key = `${figure.texture.key}-${this.always ? 'glow' : 'outline'}`;
     if (this.line.texture.key !== key) {
-      outlineSheet(this.scene, figure.texture.key, key, this.always ? THING_THICK : THICK);
+      outlineSheet(this.scene, figure.texture.key, key, this.always);
       this.line.setTexture(key);
     }
     this.line

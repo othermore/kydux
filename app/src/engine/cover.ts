@@ -44,6 +44,16 @@ function solidAt(placed: Placed, solid: Solid, x: number, y: number): boolean {
   return solid.solid[(frame.cutY + iy) * solid.width + frame.cutX + ix] === 1;
 }
 
+/** What is drawn in front of a figure, of the painted images: those seen, and
+ * drawn over it, deeper than it. An image under the figure, an open doorway's
+ * floor beyond (D108), never counts (D107). */
+export function inFront<T extends { depth: number; visible: boolean; alpha: number }>(
+  figure: { depth: number },
+  images: T[],
+): T[] {
+  return images.filter((image) => image.visible && image.alpha > 0.05 && image.depth > figure.depth);
+}
+
 /** The covered share of a figure, from 0 to 1: of its solid pixels counted, those
  * on which a solid pixel of one of the images in front falls. */
 export function coveredShare(figure: Placed, front: Placed[], solidOf: (key: string) => Solid | null): number {

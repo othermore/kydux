@@ -201,6 +201,8 @@
         "open": "wenna_door-open.webp"
       },
       "under": true,
+      "through": true,
+      "rest": "open",
       "at": [
         7,
         16
@@ -215,6 +217,8 @@
         "open": "centre_door-open.webp"
       },
       "under": true,
+      "through": true,
+      "rest": "open",
       "at": [
         7,
         8
@@ -229,6 +233,8 @@
         "open": "room_door-open.webp"
       },
       "under": true,
+      "through": true,
+      "rest": "open",
       "at": [
         2,
         5

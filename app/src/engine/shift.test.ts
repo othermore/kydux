@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { shiftBy } from './shift';
+import { drawnShift, shiftBy } from './shift';
 
 describe('shiftBy', () => {
   it('is the cells between the painted cell and the level tile (D85)', () => {
@@ -11,3 +11,18 @@ describe('shiftBy', () => {
     expect(shiftBy(undefined, [12, 14])).toEqual([0, 0]);
   });
 });
+
+describe('drawnShift (D109)', () => {
+  it('puts the middle of a moved thing on the middle of its tile', () => {
+    // A book painted with its middle at 4.43, 10.85, laid on 2,15.
+    const [dx, dy] = drawnShift([4, 11], [2, 15], [4.43, 10.85]);
+    expect(4.43 + dx).toBeCloseTo(2.5);
+    expect(10.85 + dy).toBeCloseTo(15.5);
+  });
+
+  it('leaves a thing on its painted cell as it is painted', () => {
+    expect(drawnShift([4, 11], [4, 11], [4.43, 10.85])).toEqual([0, 0]);
+    expect(drawnShift(undefined, [2, 15], [4.43, 10.85])).toEqual([0, 0]);
+  });
+});
+

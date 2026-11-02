@@ -715,6 +715,12 @@ def scene(settings: Settings) -> Path:
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
         if thing.get("under"):
             things[name]["under"] = True
+        # Open, its doorway shows the floor beyond, under every figure (D108).
+        if thing.get("through"):
+            things[name]["through"] = True
+        # The state a door is drawn in where no level or story places it (D104).
+        if "rest" in thing:
+            things[name]["rest"] = thing["rest"]
         if "rune" in thing:
             things[name]["rune"] = thing["rune"]
         # The cell it is painted on, for a level that lays it on another (D85).
@@ -761,6 +767,8 @@ def scene(settings: Settings) -> Path:
         **({"beds": beds_of(settings)} if settings.data.get("beds") else {}),
         # The cells a figure is drawn lower on, behind what stands below it (D95).
         **({"lowered": settings.data["lowered"]} if settings.data.get("lowered") else {}),
+        # The cells a figure is drawn sideways on, on the painted strip (D105).
+        **({"nudged": settings.data["nudged"]} if settings.data.get("nudged") else {}),
         # The dark passages a figure is drawn darker in, the deeper it goes (shade.ts).
         **(
             {

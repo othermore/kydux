@@ -630,6 +630,26 @@ def test_a_figure_on_a_lowered_cell_is_drawn_lower():
     assert sweep.feet_at(scene, 0, 1) == 1 + sweep.FOOT_IN_CELL
 
 
+def test_a_figure_on_a_nudged_cell_is_drawn_sideways():
+    painting = np.zeros((288, 288, 3), dtype=np.uint8)
+    walked = np.zeros((3, 3), dtype=bool)
+    walked[1, 1] = True
+    scene, _ = swept(painting, walked, [])
+    scene.nudged = {(1, 1): -0.3}
+    assert sweep.middle_at(scene, 1, 1) == 1.5 - 0.3
+    assert sweep.middle_at(scene, 0, 1) == 0.5
+
+
+def test_a_doorway_seen_through_is_under_every_figure():
+    """An open door whose picture is the floor beyond (D108) covers no one."""
+    folder = sweep.CONTENT / "art" / "scenes" / "the-library"
+    if not (folder / "art.json").is_file():
+        return
+    scene = sweep.load("the-library")
+    doorway = next(layer for layer in scene.layers if layer.name == "wenna_door")
+    assert doorway.depth < 0
+
+
 def test_a_figure_in_a_dark_passage_is_drawn_darker_the_deeper_head_first():
     painting = np.zeros((288, 288, 3), dtype=np.uint8)
     walked = np.ones((3, 3), dtype=bool)

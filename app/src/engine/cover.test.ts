@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { coveredShare, type Placed, type Solid } from './cover';
+import { coveredShare, inFront, type Placed, type Solid } from './cover';
 
 /** A texture `width`×`height`, solid where `solid` says. */
 function texture(width: number, height: number, solid: (x: number, y: number) => boolean): Solid {
@@ -54,3 +54,17 @@ describe('coveredShare', () => {
     expect(coveredShare(figure, [placed('wall', 100, 100, 100, 100, 0.1)], solidOf)).toBeCloseTo(0.125, 2);
   });
 });
+
+describe('inFront (D107)', () => {
+  it('counts only the images seen and drawn over the figure', () => {
+    const doorway = { name: 'open doorway', depth: 1, visible: true, alpha: 1 };
+    const wall = { name: 'wall', depth: 3.17, visible: true, alpha: 1 };
+    const hidden = { name: 'gone', depth: 3.2, visible: false, alpha: 1 };
+    const faded = { name: 'faded', depth: 3.2, visible: true, alpha: 0 };
+    const behind = { name: 'row above', depth: 3.15, visible: true, alpha: 1 };
+    expect(inFront({ depth: 3.158 }, [doorway, wall, hidden, faded, behind]).map((image) => image.name)).toEqual([
+      'wall',
+    ]);
+  });
+});
+

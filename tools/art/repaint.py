@@ -55,17 +55,21 @@ across it. A model given such a strip blurred painted the chain again.
 (D108): the door's leaf is found in the painting from bands of seeds across it
 (`seeds`, each x0, x1 and y in cells), flooded up to the black line that bounds
 it, its planks' lighter lines crossed, and filled row by row; and the whole
-leaf, from the arch down to the floor's own dark line under the leaf's box (the
-first such line within `sill` cells below it, or `sill` cells below it where
-there is none) and from one jamb to the other, is painted with the floor of the
-room beyond (`floor`, a box in cells of the painting itself, a plain part of
-that room's floor), stretched to it, DOORWAY_SHADE darker at the arch's top and
-as lit as the room at the threshold, so that no board, rail or shadow of the
-leaf is left at its foot. Where stone meets wood at the threshold
-(`sill_line`), a dark line as wide as the painting's outlines is drawn along
-the fill's foot from jamb to jamb, in the colour of the jambs' outline there.
-The fill and its line are laid into the scene's other pictures that show the
-doorway shut (`also`, each mended in place: its ground-only edit and its
+leaf, from the arch down to its foot and from one jamb to the other, is painted
+with the floor of the room beyond (`floor`, a box in cells of the painting
+itself, a plain part of that room's floor), stretched to it, DOORWAY_SHADE
+darker at the arch's top and as lit as the room at the threshold, so that no
+board, rail or shadow of the leaf is left there. Its foot is the first dark line
+under the leaf's box, within `sill` cells below it (`sill` 0: the box's own
+foot, the jambs' feet): the floor's own line under a threshold, whose top it
+ends on; or, with nothing but the leaf's wood above it, the closed leaf's own
+bottom outline, which it covers down to its lower edge. At that foot lies a
+threshold (D114), THRESHOLD cells high, inside the doorway: a strip of the
+`floor` box, the plainest one, turned a quarter so that what ran down the box
+runs across the doorway (a board's grain, a flagstone), THRESHOLD_SHADE darker,
+its two edges drawn as thin wavy lines in the colour of that floor's joints.
+The fill and its threshold are laid into the scene's other pictures that show
+the doorway shut (`also`, each mended in place: its ground-only edit and its
 marked picture), so that the cut finds no difference there; never into the
 swung picture, whose leaf may lie a little over the opening and is cut by its
 own traced shape (D113). The leaf swung open beside the doorway (D111) is a
@@ -397,9 +401,21 @@ DOORWAY_SHADE = 0.15
 FOOT_DARKER = 0.03
 FOOT_NEAR = 5
 FOOT_BAND = 0.7
-#: The drawn sill line's colour: the darkest 1 in SILL_DARKEST pixels of the jambs
-#: beside the doorway's foot, their outline.
-SILL_DARKEST = 30
+#: The threshold at an open doorway's foot (D114), in cells of the painting: its
+#: height; how much darker it is than the floor it is made of; its edge lines'
+#: width, their waves' amplitude and periods, and how far apart its strip is looked
+#: for in the floor's box (in the painting's pixels); the share of that box's
+#: darkest pixels that give its joints' colour; how far its lines' ends fade (in
+#: the painting's pixels); how many times larger its lines are drawn and averaged.
+THRESHOLD = 0.08
+THRESHOLD_SHADE = 0.1
+THRESHOLD_LINE = 0.011
+THRESHOLD_WAVE = 0.004
+THRESHOLD_PERIODS = (0.3, 0.1)
+THRESHOLD_SCAN = 4
+THRESHOLD_JOINTS = 20
+THRESHOLD_ENDS = 3
+THRESHOLD_SOFT = 4
 
 
 def leaf_of(crop: np.ndarray, bands: list[tuple[int, int, int]]) -> np.ndarray:
@@ -475,9 +491,39 @@ def doorways(scene: str) -> list[Path]:
         here[inside] = floor[inside]
         mended = np.zeros(painting.shape[:2], dtype=bool)
         mended[box[1] : box[1] + leaf.shape[0], box[0] : box[0] + leaf.shape[1]] = leaf
-        if door.get("sill_line"):
-            line = sill_line(out, start, foot, box, gx["spacing"])
-            mended[box[1] : box[1] + line.shape[0], box[0] : box[0] + line.shape[1]] |= line
+        # At its foot, the threshold (D114).
+        floor_box = (px(fx0), py(fy0), px(fx1), py(fy1))
+        drawn, measured = threshold(
+            out,
+            painting[floor_box[1] : floor_box[3], floor_box[0] : floor_box[2]],
+            start,
+            foot,
+            box,
+            (gx["spacing"], gy["spacing"]),
+            gx["offset"],
+        )
+        mended[box[1] : box[1] + drawn.shape[0], box[0] : box[0] + drawn.shape[1]] |= drawn
+        span = [(box[0] + v - gx["offset"]) / gx["spacing"] for v in (start, start + len(foot))]
+        strip = floor_box[0] + measured["strip"]
+        print(
+            f"{door['thing']}: the threshold spans {span[0]:.3f} to {span[1]:.3f}, from the"
+            f" strip x {strip} to {strip + measured['wide']}, y {floor_box[1]} to"
+            f" {floor_box[3]} of the painting; its joints"
+            f" {tuple(round(float(c)) for c in measured['colour'])}"
+        )
+        # What lies under the threshold, the floor before the door, below the reach of
+        # its lower line and that line's wave: the painting's.
+        reach = int(np.ceil((THRESHOLD_LINE / 2 + 1.5 * THRESHOLD_WAVE) * gy["spacing"])) + 1
+        under = [
+            np.abs(out[y : y + 4, x].astype(int) - painting[y : y + 4, x]).mean()
+            for x, y in (
+                (box[0] + start + i, box[1] + round(float(v)) + reach) for i, v in enumerate(foot)
+            )
+        ]
+        print(
+            f"{door['thing']}: under the threshold, {np.mean(under):.2f} levels"
+            f" (at most {np.max(under):.2f}) from the painting"
+        )
         target = settings.edits / door["painting"]
         Image.fromarray(out).save(target)
         written.append(target)
@@ -496,12 +542,16 @@ def doorways(scene: str) -> list[Path]:
 
 
 def to_foot(crop: np.ndarray, leaf: np.ndarray, under: int) -> tuple[np.ndarray, np.ndarray, int]:
-    """A door's leaf grown down to the floor's dark line under its box, `under`
-    rows down the crop, from one jamb to the other: the leaf's lowest straight
-    part gives its width, and each column of it is filled to its own point of the
-    line, a straight line fitted through them; where no line is found, to the
-    crop's foot. Gives the grown leaf, the row each of its columns ends on, and
-    its first column."""
+    """A door's leaf grown down to the first dark line under its box, `under` rows
+    down the crop, from one jamb to the other: the leaf's lowest straight part
+    gives its width, and each column of it is filled to its own point of the line,
+    a straight line fitted through them; where no line is found, to the crop's
+    foot. A line with something of a line's darkness between it and the leaf, the
+    leaf's own outline over a threshold, is the floor's: the fill ends on its top.
+    A line with nothing but the leaf's wood above it is the closed leaf's own
+    bottom outline: the fill goes down through it to its lower edge and looks no
+    further. Gives the grown leaf, the row each of its columns ends on, and its
+    first column."""
     value = np.array(Image.fromarray(crop).convert("L")).astype(np.float32) / 255
     rows = np.nonzero(leaf.any(axis=1))[0]
     top, bottom = rows[0], rows[-1] + 1
@@ -520,6 +570,10 @@ def to_foot(crop: np.ndarray, leaf: np.ndarray, under: int) -> tuple[np.ndarray,
             found = y
             break
     feet = np.full(last - first, found, dtype=np.float32)
+    # The leaf's own: every row between its foot and the line mostly lighter than
+    # its outlines (the centre door's planks under its box), or none at all.
+    between = value[bottom:found, inner] > DOOR_LINE
+    own = found < height and (found <= bottom or bool(between.mean(axis=1).min() > 0.5))
     if found < height:
         points = []
         for x in range(first, last):
@@ -527,7 +581,20 @@ def to_foot(crop: np.ndarray, leaf: np.ndarray, under: int) -> tuple[np.ndarray,
             above = value[max(0, found - far), x]
             near = np.arange(max(0, found - FOOT_NEAR), min(height, found + FOOT_NEAR + 1))
             dark = near[value[near, x] < above - FOOT_DARKER]
-            if len(dark):
+            if not len(dark):
+                continue
+            if own:
+                # Down through the line to its lower edge: the first pixel lighter
+                # than halfway between its darkest and the floor a little below it.
+                run = np.arange(dark[0], min(height, dark[0] + 3 * FOOT_NEAR))
+                floor = value[min(height - 1, dark[0] + 3 * FOOT_NEAR), x]
+                half = (value[run, x].min() + floor) / 2
+                darkest = run[int(np.argmin(value[run, x]))]
+                lighter = np.nonzero(value[darkest : run[-1] + 1, x] > half)[0]
+                if not len(lighter):
+                    continue
+                points.append((x - first, darkest + lighter[0]))
+            else:
                 points.append((x - first, dark[0]))
         if len(points) > 2:
             xs, ys = np.array(points, dtype=np.float32).T
@@ -543,40 +610,80 @@ def to_foot(crop: np.ndarray, leaf: np.ndarray, under: int) -> tuple[np.ndarray,
     return grown, feet, first
 
 
-def sill_line(
-    out: np.ndarray, first: int, feet: np.ndarray, box: tuple, spacing: float
-) -> np.ndarray:
-    """A dark line drawn in `out` along an open doorway's foot, from one jamb to the
-    other, as wide as the painting's outlines, its ends softened, in the colour of
-    the jambs' outline beside it: where stone meets wood, as everywhere else in the
-    painting. Gives the pixels it is drawn on, in the leaf's crop."""
-    width = max(2.0, image_first.LINE_WIDTH * spacing)
+def threshold(
+    out: np.ndarray,
+    floor: np.ndarray,
+    first: int,
+    feet: np.ndarray,
+    box: tuple,
+    spacing: tuple[float, float],
+    origin: float,
+) -> tuple[np.ndarray, dict]:
+    """The threshold of an open doorway (D114), drawn in `out`: from the fill's
+    first column across its span, its foot on the fill's foot (`feet`, rows of the
+    crop at `box`), THRESHOLD cells high; made of the plainest strip of the floor
+    seen through the doorway (`floor`, that floor's box in the painting), turned a
+    quarter, as bright as that floor on the whole and THRESHOLD_SHADE darker; its
+    two edges drawn as thin wavy lines in the colour of that floor's joints.
+    `spacing` is the painting's pixels a cell, each way; `origin` the grid's x
+    offset, for the waves' phase. Gives the pixels it is drawn on, in the crop at
+    `box`, and what was measured of it."""
+    sx, sy = spacing
     count = len(feet)
-    middle = float(np.median(feet))
-    # The jambs' outline: the darkest pixels just beside the leaf at its foot.
-    reach = round(width * 2)
-    y0, y1 = round(middle - 3 * width), round(middle + width)
-    sides = [
-        out[box[1] + y0 : box[1] + y1, box[0] + max(0, first - reach) : box[0] + first],
-        out[box[1] + y0 : box[1] + y1, box[0] + first + count : box[0] + first + count + reach],
+    tall = max(1, round(THRESHOLD * sy))
+    wide = max(1, round(THRESHOLD * sx))
+    # The plainest strip, THRESHOLD wide and the box's height, looked for every few
+    # pixels across it: the least colour spread over its pixels.
+    spread = [
+        (floor[:, x : x + wide].reshape(-1, 3).std(axis=0).sum(), x)
+        for x in range(0, max(1, floor.shape[1] - wide + 1), THRESHOLD_SCAN)
     ]
-    pixels = np.concatenate([side.reshape(-1, 3) for side in sides]).astype(np.float32)
-    darkest = pixels[np.argsort(pixels.max(axis=1))[: max(1, len(pixels) // SILL_DARKEST)]]
-    colour = darkest.mean(axis=0)
-    height = round(middle + 2 * width) + 1
-    alpha = np.zeros((height, first + count), dtype=np.float32)
-    yy = np.arange(height, dtype=np.float32)[:, None]
-    xs = np.arange(count, dtype=np.float32)
-    # Over the floor's line, the fill's foot on its middle, its edge soft over a pixel.
-    across = np.clip(width / 2 + 0.5 - np.abs(yy - feet[None, :]), 0, 1)
-    ends = np.clip(np.minimum(xs + 1, count - xs) / width, 0, 1)[None, :]
-    alpha[:, first:] = across * ends
-    here = out[box[1] : box[1] + height, box[0] : box[0] + first + count].astype(np.float32)
-    here = here * (1 - alpha[..., None]) + colour * alpha[..., None]
-    out[box[1] : box[1] + height, box[0] : box[0] + first + count] = here.clip(0, 255).astype(
-        np.uint8
+    _, at = min(spread)
+    strip = np.rot90(floor[:, at : at + wide], 1)
+    board = Image.fromarray(np.ascontiguousarray(strip)).resize((count, tall), Image.LANCZOS)
+    # As bright as the floor's box on the whole, then a tenth darker: the plainest
+    # strip may be one plank lighter or darker than the floor round it.
+    board = np.array(board).astype(np.float32)
+    level = floor.astype(np.float32).mean() / max(1.0, float(strip.astype(np.float32).mean()))
+    board = (board * level * (1 - THRESHOLD_SHADE)).clip(0, 255)
+    # The floor's joints: the darkest of its pixels.
+    pixels = floor.reshape(-1, 3).astype(np.float32)
+    joints = pixels[np.argsort(pixels.sum(axis=1))[: max(1, len(pixels) // THRESHOLD_JOINTS)]]
+    colour = joints.mean(axis=0)
+    height = int(np.ceil(feet.max())) + tall + 4
+    width = first + count
+    drawn = np.zeros((height, width), dtype=bool)
+    here = out[box[1] : box[1] + height, box[0] : box[0] + width].astype(np.float32)
+    for x in range(count):
+        foot = round(float(feet[x]))
+        here[foot - tall : foot, first + x] = board[:, x]
+        drawn[foot - tall : foot, first + x] = True
+    # Its edges, drawn THRESHOLD_SOFT times larger and averaged: each a wave about
+    # its edge, THRESHOLD_LINE wide, its ends fading over THRESHOLD_ENDS pixels.
+    soft = THRESHOLD_SOFT
+    xs = (np.arange(count * soft) + 0.5) / soft
+    cells = (box[0] + first + xs - origin) / sx
+    amplitude = THRESHOLD_WAVE * sy
+    long, short = THRESHOLD_PERIODS
+    wave = amplitude * np.sin(2 * np.pi * cells / long) + amplitude / 2 * np.sin(
+        2 * np.pi * cells / short + 1
     )
-    return alpha > 0
+    feet_fine = np.interp(xs - 0.5, np.arange(count), feet)
+    ys = (np.arange(height * soft) + 0.5)[:, None] / soft
+    line = THRESHOLD_LINE * sy / 2
+    covered = np.zeros((height * soft, count * soft), dtype=bool)
+    for middle in (feet_fine - tall, feet_fine):
+        covered |= np.abs(ys - (middle + wave)[None, :]) <= line
+    alpha = covered.reshape(height, soft, count, soft).mean(axis=(1, 3))
+    ends = np.clip(
+        np.minimum(np.arange(count) + 1, count - np.arange(count)) / THRESHOLD_ENDS, 0, 1
+    )
+    alpha = alpha * ends[None, :]
+    span = here[:, first:]
+    span[:] = span * (1 - alpha[..., None]) + colour * alpha[..., None]
+    drawn[:, first:] |= alpha > 0
+    out[box[1] : box[1] + height, box[0] : box[0] + width] = here.clip(0, 255).astype(np.uint8)
+    return drawn, {"strip": at, "wide": wide, "colour": colour}
 
 
 #: A door swung open nearly flat against its wall (D111): how much darker its leaf

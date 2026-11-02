@@ -236,11 +236,15 @@ row its foot stands on.
   line, is the floor of the room beyond, taken from the painting itself
   where that floor is plain, darker under the arch and as lit as the room
   at the threshold, laid in by `tools/art/repaint.py doorways` (D108),
-  from one jamb to the other and down to the floor's own dark line under
-  the threshold, so that no board of the leaf is left at its foot; where
-  the stone before the door meets the wood beyond it, a dark line as wide
-  as the painting's outlines is drawn along that foot (`sill_line`); and
-  its leaf, so that the door is seen open and the doorway is not taken for
+  from one jamb to the other and down to its foot, so that no board of the
+  leaf is left there: the floor's own dark line under a threshold, or the
+  closed leaf's own bottom outline, gone through to its lower edge. At
+  that foot lies a threshold (D114), 0.08 cells high, inside the doorway
+  and never over the floor before it: a strip of the floor seen through
+  the doorway turned a quarter, a board with its grain across the doorway
+  or a flagstone, a tenth darker than that floor, its two edges thin wavy
+  lines in the colour of that floor's joints, never the outlines' black;
+  and its leaf, so that the door is seen open and the doorway is not taken for
   the floor, is swung out against the wall beside the arch: a model's
   picture, painted on the guide the tool draws (`guide`, the shut leaf
   turned over on its hinges, with its shadow) and joined as any box is,
@@ -259,7 +263,10 @@ row its foot stands on.
   painting's outlines, about seven pixels), so that the wall keeps its
   line round the door's cut-out, no mortar line of the wall beside the
   arch comes with the leaf, and nothing of the open doorway shows through
-  it. `tools/art/trace.py` helps to trace: `outline` gives a first
+  it. A static thing's hole (`holes`) takes every pixel its polygon
+  touches and two more round them, the reach of the page's resampling, so
+  that a hole traced from a leaf leaves no pixel of the wall on it.
+  `tools/art/trace.py` helps to trace: `outline` gives a first
   polygon, `look` a crop at three times the size with a grid every tenth
   of a cell and the points numbered, and `--diff` shows in red what the
   model painted again round the leaf. Twenty to sixty points a leaf, the
@@ -292,8 +299,16 @@ magenta. A door's state is accepted only when that edge lies on the
 leaf's outline all round: the bottom corners whole, the shadow's edge a
 smooth line, no floor or wall inside it but the shadow, no pale fringe
 along the free edge; a closed leaf's edge on the arch's inner line and the
-threshold, no line reaching into the wall. To name a cell when something looks wrong, open
-the game with `?debug` (docs/dev/dev-environment.md).
+threshold, no line reaching into the wall. `doors-<scene>.png` shows every
+state of every thing with states composed as the page draws the scene,
+with no figure: the ground, every row and every thing at its depth, the
+others resting, each panel round the thing's box with a cell of margin,
+enlarged as on the states sheet and numbered from 1, four a row. On it,
+each open leaf is whole to its foot, its lower corners rounded; each open
+doorway ends in its threshold, its foot on the jambs' feet, the floor
+before the door untouched below it; no outline of the closed leaf is left
+at a doorway's foot. To name a cell when something looks wrong, open the
+game with `?debug` (docs/dev/dev-environment.md).
 
 ## What a painting must keep to
 

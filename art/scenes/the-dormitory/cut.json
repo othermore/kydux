@@ -181,7 +181,7 @@
       ]
     },
     "front_door": {
-      "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95), its closed leaf within the doorway traced on the painting (`doorway`, D113); open, swung out of it nearly flat against the front wall on its left, its foot on the corridor floor (D111, door_swung), cut by the polygon traced round the leaf, its hinges and its shadow on the wall (`leaf`, D113), drawn among the rows as the front wall is, the doorway showing the common room's own floor down to the corridor floor's line, a dark line where stone meets wood (D108); it rests shut, and a story opens and closes it (D103).",
+      "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95), its leaf within the doorway's own shape, the open doorway's fill grown over the arch's inner line (`doorway`, D113); open, swung out of it nearly flat against the front wall on its left, its foot on the corridor floor (D111, door_swung), cut by the polygon traced round the leaf, its hinges and its shadow on the wall (`leaf`, D113), drawn among the rows as the front wall is, the doorway showing the common room's own floor down to its threshold, a board of that floor, on the corridor floor's line (D108, D114); it rests shut, and a story opens and closes it (D103).",
       "box": [
         9.2,
         12.4,
@@ -1529,7 +1529,7 @@
     ]
   },
   "doorways": {
-    "about": "The front door opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch down to the corridor floor's own dark line under the threshold and from one jamb to the other, painted with the common room's own floor, darker under the arch, with a dark line drawn along its foot where the corridor's stone meets the common room's wood (`sill_line`); the fill is laid into the marked picture too (`also`).",
+    "about": "The front door opened by tools/art/repaint.py doorways (D108, D111): its whole leaf, from the arch down to the corridor floor's own dark line under the threshold (15.39) and from one jamb to the other, painted with the common room's own floor, darker under the arch, and at its foot a threshold of that floor, a board 0.08 cells high with its grain across the doorway (D114), the corridor's stone below it as painted; the fill and its threshold laid into the marked picture too (`also`).",
     "doors": [
       {
         "thing": "front_door",
@@ -1564,7 +1564,6 @@
           13.4,
           15.4
         ],
-        "sill_line": true,
         "also": [
           "art/raw/game-dormitory/dormitory-marked.png"
         ]

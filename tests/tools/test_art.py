@@ -728,30 +728,87 @@ def test_a_door_s_leaf_is_found_up_to_its_black_line_across_its_planks():
     assert not leaf[:, :20].any() and not leaf[:, 81:].any() and not leaf[:19].any()
 
 
-def test_an_open_doorway_is_filled_down_to_the_floor_s_line_from_jamb_to_jamb():
-    import repaint
-
+def doorway_crop(foot: str) -> np.ndarray:
+    """A shut door in its arch, seen from the front: its foot on a stone threshold
+    and the floor's own line under it (`"threshold"`), or on its own bottom
+    outline and the floor beyond (`"outline"`)."""
     crop = np.full((100, 100, 3), (150, 150, 160), dtype=np.uint8)  # the stones
     crop[10:62, 20:80] = (20, 15, 10)  # the leaf's black line
     crop[14:58, 24:76] = (120, 70, 40)  # its wood, its foot a step higher on the left
     crop[52:58, 24:30] = (20, 15, 10)
-    crop[62:76] = (170, 165, 175)  # the threshold's stone
-    crop[76:79] = (60, 50, 70)  # the floor's own line under it
-    crop[79:] = (140, 135, 150)  # the floor beyond
+    if foot == "threshold":
+        crop[62:76] = (170, 165, 175)  # the threshold's stone
+        crop[76:79] = (60, 50, 70)  # the floor's own line under it
+        crop[79:] = (140, 135, 150)  # the floor beyond
+    else:
+        crop[14:72, 24:76] = (120, 70, 40)  # the wood down to its own bottom outline
+        crop[72:76, 20:80] = (25, 15, 10)
+        crop[76:] = (160, 110, 70)  # the floor beyond
+    return crop
+
+
+def test_the_fill_ends_on_the_floor_s_line_and_goes_through_the_leaf_s_own():
+    import repaint
+
+    # Under a threshold of stone, the line is the floor's: the fill ends on its top.
+    crop = doorway_crop("threshold")
     leaf = repaint.leaf_of(crop, [(30, 70, 30)])
     grown, feet, first = repaint.to_foot(crop, leaf, 64)
-    # Down to the floor's line and not over it, the left corner's step filled too.
     assert np.allclose(feet, 76, atol=1)
     assert grown[50:75, first : first + len(feet)].all()
     assert not grown[77:].any() and not grown[:, :20].any() and not grown[:, 81:].any()
-    # Stone meets wood there: a line as dark as the jambs' is drawn on the fill's foot.
+    # With nothing but the leaf's wood above it, the line is the closed leaf's own
+    # outline: the fill goes down through it to its lower edge, even where the
+    # leaf's box ends above it.
+    crop = doorway_crop("outline")
+    leaf = repaint.leaf_of(crop, [(30, 70, 30)])
+    leaf[64:] = False
+    grown, feet, first = repaint.to_foot(crop, leaf, 64)
+    assert np.allclose(feet, 76, atol=1)
+    assert grown[64:75, first : first + len(feet)].all() and not grown[77:].any()
+
+
+def test_an_open_doorway_ends_in_a_threshold_of_the_floor_beyond():
+    import repaint
+
+    crop = doorway_crop("threshold")
+    leaf = repaint.leaf_of(crop, [(30, 70, 30)])
+    _, feet, first = repaint.to_foot(crop, leaf, 64)
+    # The floor beyond: planks running down the box, with their dark joints.
+    floor = np.full((60, 40, 3), (160, 100, 60), dtype=np.uint8)
+    floor[:, ::10] = (90, 50, 30)
     out = crop.copy()
-    out[10:62, 15:20] = (25, 20, 30)  # the jambs' outline beside the leaf
-    out[10:62, 80:85] = (25, 20, 30)
-    line = repaint.sill_line(out, first, feet, (0, 0, 100, 100), 200)
+    drawn, measured = repaint.threshold(out, floor, first, feet, (0, 0, 100, 100), (200, 200), 0)
+    tall = round(repaint.THRESHOLD * 200)
+    span = slice(first, first + len(feet))
+    # Between the jambs, from the fill's foot up THRESHOLD cells, and nothing of it
+    # under the foot but its lower line's soft edge.
+    assert drawn[76 - tall + 3 : 74, span].all()
+    assert not drawn[:, :first].any() and not drawn[:, first + len(feet) :].any()
+    assert not drawn[79:].any() and (out[79:] == crop[79:]).all()
+    # A board of that floor, a tenth darker than it on the whole, with a line on each
+    # edge in its joints' colour.
     middle = first + len(feet) // 2
-    assert line[76, middle] and out[76, middle].max() < 40
-    assert not line[66, middle] and not line[84, middle]
+    board = out[76 - tall // 2, span].astype(float).mean()
+    assert board < floor.astype(float).mean()
+    assert np.allclose(measured["colour"], (90, 50, 30), atol=1)
+    for edge in (76 - tall, 76):
+        assert out[edge - 1 : edge + 2, middle].astype(float).mean() < board
+
+
+def test_a_hole_covers_the_soft_edge_of_the_leaf_it_is_traced_from():
+    grid = {"x": {"offset": 0, "spacing": 100}, "y": {"offset": 0, "spacing": 100}}
+    leaf = [[0.305, 0.205], [0.605, 0.205], [0.605, 0.705], [0.305, 0.705]]
+    painting = np.full((100, 100, 3), 150, dtype=np.uint8)
+    wall = {"mask": "polygon", "polygon": [[0, 0], [1, 0], [1, 1], [0, 1]], "holes": [leaf]}
+    alpha = export_scene.static_alpha(painting, (0, 0, 100, 100), wall, 100, None, grid)
+    # Every pixel the leaf's soft edge touches, and the page's resampling reach
+    # beyond it, and no further.
+    soft = export_scene.soft_area((100, 100), grid, leaf)
+    hole = export_scene.holed((100, 100), grid, leaf)
+    assert (hole == image_first.dilated(soft > 0, export_scene.HOLE_REACH)).all()
+    assert hole[50, 60 + export_scene.HOLE_REACH] and not hole[50, 61 + export_scene.HOLE_REACH]
+    assert not alpha[hole].any() and alpha[90, 90] == 1
 
 
 def test_a_leaf_traced_by_hand_is_its_polygon_with_an_edge_one_pixel_soft(tmp_path):
@@ -856,6 +913,26 @@ def test_the_states_sheet_has_a_row_for_each_thing_and_a_panel_for_each_state(tm
     assert not magenta[label : label + tall, :panel].any()
     assert magenta[label : label + tall, panel + label : 2 * panel + label].any()
     assert magenta[label : label + tall, 2 * panel + 2 * label :].any()
+
+
+@pytest.mark.skipif(
+    not (SCENE_ART / "the-dormitory" / "art.json").is_file(),
+    reason="the-dormitory is not exported",
+)
+def test_the_doors_sheet_has_a_numbered_panel_for_each_state_and_none_for_the_ground():
+    settings = export_scene.settings("the-dormitory")
+    art = json.loads((settings.out / "art.json").read_text())
+    states = [
+        f"{name} {state}"
+        for name, thing in settings.things.items()
+        if not thing.get("static") and thing.get("states")
+        for state in art["things"][name]["states"]
+    ]
+    panels = export_scene.door_panels(settings)
+    assert [label for label, _ in panels] == [f"{n}. {s}" for n, s in enumerate(states, 1)]
+    # The door is drawn among the scene's rows: shut, its panel differs from open.
+    shut, open_ = (np.array(panel) for _, panel in panels[:2])
+    assert shut.shape == open_.shape and (shut != open_).any()
 
 
 def test_a_box_past_the_picture_s_edge_holds_what_of_it_is_in_the_picture():

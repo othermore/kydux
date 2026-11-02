@@ -114,7 +114,9 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 else and opens its doorways (D88, D108),
                 export_scene.py makes
                 content/art/ and draws each door's states over the
-                painting at three times their size to check (D113), and
+                painting at three times their size to check (D113) and
+                every state as the page draws the scene (the doors
+                sheet), and
                 sweep.py stands the wizard on every cell of a scene to check
                 the cut, figures.py
                 makes the figures' sheets from the base sheets in art/figures/,
@@ -1622,11 +1624,11 @@ one overturns stays, marked as superseded.
   opening of an open door is filled with the floor of the room beyond,
   taken from the painting itself where that floor is plain, darker under
   the arch and as lit as the room at the threshold, never brighter; the
-  fill covers the leaf from one jamb to the other down to the floor's own
-  dark line under the threshold (`sill`), so that no board or line of the
-  frame is left on the floor, and where stone meets wood a dark line is
-  drawn along its foot as the painting draws one wherever the two meet
-  (`sill_line`; `repaint.py doorways`). The fill is
+  fill covers the leaf from one jamb to the other down to its foot, the
+  floor's own dark line under the threshold or the closed leaf's own
+  bottom outline gone through (`sill`), so that no board or line of the
+  frame is left on the floor, and ends in a threshold of the floor beyond
+  (D114; `repaint.py doorways`). The fill is
   the ground's, under every figure, so that a figure standing beyond the
   door is seen through it and not counted as hidden by it; the open
   door's own picture is its leaf, swung beside the doorway (D111). Rules

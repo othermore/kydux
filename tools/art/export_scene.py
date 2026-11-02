@@ -17,7 +17,8 @@ too. `all`, the default, is `scene` then `check`.
 
 `check` draws pictures of the exported scene to look at, among them
 states-<scene>.png, each door's states over the ground at three times their
-size with their edges marked (D113), then sweeps it (tools/art/sweep.py) and
+size with their edges marked (D113), and doors-<scene>.png, each state of every
+thing composed as the page draws the scene, then sweeps it (tools/art/sweep.py) and
 fails when its cut-outs would show a figure a problem: a shadow or a flower
 drawn in front, the lawn drawn in front, a hole.
 
@@ -266,6 +267,18 @@ def soft_area(shape: tuple[int, int], grid: dict, area: list) -> np.ndarray:
     return alpha
 
 
+#: How far a static thing's hole reaches beyond the pixels its polygon touches, in
+#: the painting's pixels: the bicubic kernel's reach when aligned_rgba moves it
+#: onto the page's grid.
+HOLE_REACH = 2
+
+
+def holed(shape: tuple[int, int], grid: dict, hole: list) -> np.ndarray:
+    """A hole's pixels: every one its polygon touches (`soft_area` above 0), grown by
+    HOLE_REACH."""
+    return image_first.dilated(soft_area(shape, grid, hole) > 0, HOLE_REACH)
+
+
 def state_alpha(
     settings: Settings,
     thing: dict,
@@ -369,8 +382,11 @@ def static_alpha(
         return (mask & inside).astype(np.float32)
     else:
         mask = native_area(painting.shape[:2], grid, thing["polygon"])
+        # A hole takes every pixel its polygon touches, and the reach of the page's
+        # resampling beyond them: traced from a leaf whose edge is soft over one
+        # pixel (D113), it leaves nothing of the wall on that edge at the page's size.
         for hole in thing.get("holes", []):
-            mask &= ~native_area(painting.shape[:2], grid, hole)
+            mask &= ~holed(painting.shape[:2], grid, hole)
     if thing.get("lined"):
         # A polygon drawn just inside its outline, where a light edge of the floor
         # beyond the line would be taken with it, takes its own line and no more.
@@ -383,7 +399,7 @@ def static_alpha(
         if not thing.get("lined"):
             mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th))
         for hole in thing.get("holes", []):
-            mask &= ~native_area(painting.shape[:2], grid, hole)
+            mask &= ~holed(painting.shape[:2], grid, hole)
         # A part with no outline between it and the floor beyond, a stone's sunlit
         # top, is the polygon's as drawn: the floor would be let into it.
         for part in thing.get("fixed", []):
@@ -1107,6 +1123,7 @@ def checks(settings: Settings, out: Path = RAW / "game-check") -> list[Path]:
         both.save(target)
         written.append(target)
     written.append(states_sheet(settings, out))
+    written.append(doors_sheet(settings, out))
     return written
 
 
@@ -1198,6 +1215,88 @@ def states_sheet(settings: Settings, out: Path) -> Path:
         sheet.alpha_composite(row, (0, y))
         y += row.height
     target = out / f"states-{settings.id}.png"
+    sheet.convert("RGB").save(target)
+    return target
+
+
+#: The doors sheet: the margin round a thing's box, in cells, and how many panels
+#: a row.
+DOORS_MARGIN = 1.0
+DOORS_ACROSS = 4
+
+
+def composed(folder: Path, name: str, state: str) -> tuple[Image.Image, int]:
+    """A thing of an exported scene in one of its states, composed as the page draws
+    the scene, with no figure: the playable ground, every row's image and every
+    thing at its depth (sweep.load), the other things in their resting state (their
+    `rest`, else their first), the thing in `state`, by that state's own row and
+    over whoever stands in its doorway as the page draws it (D95, D111). Cropped
+    round the thing's box with DOORS_MARGIN cells, at the page's size; and how much
+    it is enlarged on the sheet."""
+    art = json.loads((folder / "art.json").read_text())
+    scene = sweep.load(folder.name)
+    things = art["things"]
+
+    def drawn(other: str, shown: str) -> sweep.Layer:
+        thing = things[other]
+        rgba = np.array(Image.open(folder / thing["states"][shown]).convert("RGBA"))
+        under = thing.get("under", False) and shown != "open"
+        row = thing.get("rows", {}).get(shown, thing["row"])
+        depth = sweep.depth_of(row, scene.rows, under) + 0.001
+        return sweep.Layer(other, depth, None, rgba, thing["left"], thing["top"], under=under)
+
+    layers = [layer for layer in scene.layers if layer.name not in things]
+    for other, thing in things.items():
+        resting = thing.get("rest") if thing.get("rest") in thing["states"] else None
+        layers.append(
+            drawn(other, state if other == name else resting or next(iter(thing["states"])))
+        )
+    layers.sort(key=lambda layer: layer.depth)
+    thing = things[name]
+    sizes = [Image.open(folder / file).size for file in thing["states"].values()]
+    width, height = max(w for w, _ in sizes), max(h for _, h in sizes)
+    margin = round(DOORS_MARGIN * scene.cell)
+    x0, y0 = max(0, thing["left"] - margin), max(0, thing["top"] - margin)
+    x1 = min(scene.columns * scene.cell, thing["left"] + width + margin)
+    y1 = min(scene.rows * scene.cell, thing["top"] + height + margin)
+    picture = Image.fromarray(scene.ground[y0:y1, x0:x1]).convert("RGBA")
+    for layer in layers:
+        picture.alpha_composite(Image.fromarray(sweep.window(layer, x0, y0, x1, y1)))
+    return picture, STATES_LARGE if width < STATES_NARROW else STATES_SMALL
+
+
+def door_panels(settings: Settings) -> list[tuple[str, Image.Image]]:
+    """Every state of every thing of the scene that has states, composed as the page
+    draws the scene (`composed`) and enlarged, each named `<n>. <thing> <state>`,
+    numbered from 1; the ground alone is none of them."""
+    panels: list[tuple[str, Image.Image]] = []
+    things = json.loads((settings.out / "art.json").read_text())["things"]
+    for name, thing in settings.things.items():
+        if thing.get("static") or not thing.get("states"):
+            continue
+        for state in things[name]["states"]:
+            picture, times = composed(settings.out, name, state)
+            size = (picture.width * times, picture.height * times)
+            label = f"{len(panels) + 1}. {name} {state}"
+            panels.append((label, picture.resize(size, Image.LANCZOS)))
+    return panels
+
+
+def doors_sheet(settings: Settings, out: Path) -> Path:
+    """The scene's door panels (`door_panels`), DOORS_ACROSS a row on black, each
+    named over it."""
+    panels = door_panels(settings)
+    width = max([panel.width for _, panel in panels], default=1)
+    height = max([panel.height for _, panel in panels], default=1) + STATES_LABEL
+    rows = max(1, -(-len(panels) // DOORS_ACROSS))
+    across = min(DOORS_ACROSS, max(1, len(panels)))
+    sheet = Image.new("RGBA", (across * (width + STATES_LABEL), rows * height), (0, 0, 0, 255))
+    pen = ImageDraw.Draw(sheet)
+    for number, (label, panel) in enumerate(panels):
+        x, y = (number % DOORS_ACROSS) * (width + STATES_LABEL), (number // DOORS_ACROSS) * height
+        pen.text((x + 2, y + 2), label, fill=(255, 255, 255, 255))
+        sheet.alpha_composite(panel, (x, y + STATES_LABEL))
+    target = out / f"doors-{settings.id}.png"
     sheet.convert("RGB").save(target)
     return target
 

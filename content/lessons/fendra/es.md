@@ -14,7 +14,7 @@ Si la cosa que pides está fuera de su alcance, no vendrá nada, y tu {mago|maga
 ---
 ## Pruébalo
 
-Un libro raro se encuentra entre muchos otros en una librería alta, fuera de tu alcance. Primero, lo encontraremos y lo guardaremos bajo un nombre. ¡Luego caminaremos debajo de él y le lanzaremos *fendra*!
+Un libro raro se encuentra entre muchos otros en una librería alta, fuera de tu alcance. Primero, lo encontraremos y lo guardaremos bajo un nombre. ¡Luego iremos hasta debajo de él y le lanzaremos *fendra*!
 
 Recuerda que un hechizo mueve las cosas, pero tus manos las llevan. Debes recoger la cosa una vez que haya bajado hasta ti.
 

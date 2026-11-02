@@ -1337,11 +1337,15 @@ one overturns stays, marked as superseded.
   canvas's grown band when it must go on, that a model paints again on a
   canvas where they are blurred, given a crop large enough that it cannot
   paint over what is kept; `tools/art/repaint.py` lays the model's picture
-  on the crop by the least difference over what is kept and takes only the
-  boxes from it, the painting pixel for pixel elsewhere. Settings in
+  on the crop by the least difference over what is kept and takes the
+  boxes from it, faded into the painting over a few pixels round each, the
+  painting itself elsewhere. A named section (`--section`) mends one set of
+  boxes; `also` mends the scene's other pictures, the ground-only edit and
+  the marked picture, with the same boxes; `plain` keeps the canvas
+  unblurred; `fill` mends a thin strip with no model. Settings in
   `cut.json`'s `repaint`. Rules out an edit of the whole picture to fix its
-  edge: an edit paints the whole picture again, and once removed the
-  library's reading room.
+  edge: an edit paints the whole picture again and moves what it is to
+  keep.
 - **D89 — Indoors, what a figure passes under or behind is cut as a static
   thing, where Gemini marks it.** Decided 2026-10-26 by the owner, from
   the check sheets of sprint 15, and on 2026-10-27 how it is marked. A
@@ -1349,20 +1353,21 @@ one overturns stays, marked as superseded.
   bed, an armchair, a counter, a bookcase, a lamp) is a static thing in
   `cut.json`: `"static": true`, its box and the row it stands on, and its
   mask. Gemini is given crops of the chosen painting and asked to turn only
-  the named things flat magenta and to redraw nothing, three tries a crop or
-  more; `tools/art/repaint.py <scene> marks` lays each try on the painting,
-  whole and then part by part, and a pixel is magenta where most tries
-  agree. The thing is its magenta whole with the painting's outline beside
+  the named things flat magenta and to redraw nothing, one try a crop or
+  several; `tools/art/repaint.py <scene> marks` lays each try on the
+  painting, whole and then part by part, and with several a pixel is
+  magenta where most tries agree. The thing is its magenta whole with the painting's outline beside
   it (`"marked"`), a box less the magenta for a wall cut round its openings
   (`"unmarked"`), or a polygon in cells for a wall (`"polygon"`); the
-  stone's pale colour (`"pale"`) and the whole box (`"box"`) are kept for
-  an arch and a quilt's simple shape. The static things of a row are an
+  whole box (`"box"`) serves a thing of a simple shape, the seal gate's
+  keystone; the stone's pale colour (`"pale"`) is a kind the tools keep
+  and no scene uses. The static things of a row are an
   image of their own, `row-<r>-static`, drawn at the row's depth, or as
   D95 says. What no figure stands beside or behind stays ground, its cells
   not walked on. The sweep's `all-<scene>.png`, the wizard on every
   walked-on cell, is the proof. Rules out an indoor scene cut by colour,
-  and a Gemini edit without the things, whose repainting moved what it
-  was to keep.
+  and a Gemini edit without the things, whose repainting moves what it
+  is to keep.
 - **D90 — A friend never wears the wizard's colours, nor the other
   friend's.** Decided 2026-10-26 by the owner. Nuri and Teku each have two
   sets of colours, robe, hat and band (`FRIEND_SETS` in `looks.ts`): Nuri
@@ -1406,10 +1411,12 @@ one overturns stays, marked as superseded.
   Decided 2026-10-27 by the owner, from the field's check sheet. Every
   raised thing in Kydux's art is drawn with a dark outline all round; the
   outline is of the thing, and nothing of the ground beyond it is. Every
-  mask the export makes is moved onto the outline (`image_first.snapped`):
-  what of it the ground beyond reaches without crossing an outline goes
-  back to the ground, where the painting is as its picture without the
-  thing, and the outline just beyond it comes in; a mask drawn inside its
+  mask the export makes, but a box's and one its thing says not to
+  (`snap: false`, the rare book, whose shelf's lines the snap runs into),
+  is moved onto the outline (`image_first.snapped`): what of it the ground
+  beyond reaches without crossing an outline goes back to the ground,
+  where the painting is as its picture without the thing when it has one,
+  and the outline just beyond it comes in; a mask drawn inside its
   outline, Gemini's magenta (D89), has the outline added and nothing taken
   away (`image_first.rimmed`), or, for a thing with another's line just
   beside it (a quilt, a counter before its wands), only its own line
@@ -1418,19 +1425,20 @@ one overturns stays, marked as superseded.
   (`fixed`), and a static thing gives up to a door or a thing picked up
   exactly that thing's cut-out, so that nothing between them shows a
   figure behind. The alpha is the mask itself, softened only
-  by the bringing down to the page's size. The sweep checks it on every
+  by the bringing down to the page's size, and faded out over a few pixels
+  before a scene's margin. The sweep checks it on every
   cut-out a figure may stand behind, reading the outlines at the painting's
   own size: `fringe`, the ground beyond the outline in the mask; `bare`, the
   painting's black line beside the mask left out. A scene whose outlines
   are not black gives their darkness (`thresholds`, `outline`). Rules out a
-  mask's edge set by a colour threshold, which took grass with a tree and
-  left outlines on the ground.
+  mask's edge set by a colour threshold, which takes grass with a tree and
+  leaves outlines on the ground.
 - **D94 — A thing is one thing, on the row of its foot.** Decided
   2026-10-27 by the owner. A thing cut across a row's edge has the figure
   standing inside it, behind one part and in front of the other; the sweep
   reports it (`spill`, by the cell the figure stands on), and the scene's
-  settings mend it where the painting asks: `rows`, a part whose things
-  stand on a row; `grounds`, a part given back to the ground (a lawn cut
+  settings mend it where the painting asks: `rows`, a part (`area`) whose things
+  stand on a row (`row`); `grounds`, a part given back to the ground (a lawn cut
   with a tree, a doorway the cut took); `kept`, a part kept whatever the
   ground beside it, which the sweep does not look at; `whole`, a part whose
   things' holes are filled; each a box or a polygon in cells. A `kept` part
@@ -1487,14 +1495,14 @@ one overturns stays, marked as superseded.
   it. Rules out a hat over the arch it is passing under, and grown-ups who
   stand a head too tall beside the pupils.
 - **D99 — A scene is painted for the cut.** Decided 2026-10-27 by the
-  owner, as the lesson of sprints 15 to 17, and written as rules in
+  owner, and written as rules in
   `art/README.md` ("What a scene is painted for"): open floors, doorways in
   walls seen from the front, shelves in one row against a wall, nothing
   hanging from a ceiling not shown, no one painted in, outlines closed and
   black, bases in their own cells, things apart, every thing marked in
-  magenta when the painting is chosen, and figures that fit. Rules out the
-  furniture, the slits and the double shelves that cost chapter 2's scenes
-  three sprints.
+  magenta when the painting is chosen, and figures that fit. Rules out
+  furniture a figure walks beside, slits in walls seen from above and
+  double rows of shelves, each a cut-out to make and to mend.
 - **D100 — A figure going into a dark passage goes dark.** Decided
   2026-10-28 by the owner. A scene's settings name its dark passages
   (`dark`: the columns each spans, the row a figure's feet are on where
@@ -1514,5 +1522,7 @@ one overturns stays, marked as superseded.
   shows the floor of the room beyond (`doorways` in the scene's settings,
   `repaint.py doorways`, the floor taken from Gemini's edit of the
   doorway), as the library's three doors; and a doorway always open has
-  no door at all, as the entrance's side arches. Rules out a door drawn
+  no door at all, as the entrance's side arches, whose doors a repaint
+  section marked `opened` takes out, flooding the doorway's dark into the
+  marked picture as magenta. Rules out a door drawn
   open wrong because its edit is.

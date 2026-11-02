@@ -426,9 +426,7 @@ Sprint 5 has 3.5, 3.1, 3.3, 3.4 and 3.6 (`sprint-5.md`); sprint 6 has 3.9, 3.2,
 
 3.1 The start screen: language, New wizard / Continue, Export / Import.
 3.2 The wizard creator: a name, a girl or a boy, and a look chosen among
-    several (D36): now palettes and hair styles on the placeholder figure,
-    later palette swaps and overlays on the base sprite; shown in every
-    scene.
+    several (D36), each a sprite sheet of its own; shown in every scene.
 3.3 The chapter map: levels as places on a picture, the path lit as levels
     are won, lessons as books on the path; the map opens where the child
     left off.
@@ -593,8 +591,7 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
 5.2 The course outline, `docs/dev/course.md`: every lesson with the idea it
     teaches, theory or practice, the API it unlocks, and its levels with
     their goals; the challenges after it. The order of the draft, refined
-    to one idea at a time, as above; the lessons and levels of sprint 5 are
-    replaced by it.
+    to one idea at a time, as above.
 5.3 Chapter 1, Arrival (methods, sequences, comments, arguments, strings),
     in the scene of the gate: the story at the gate, seven lessons, nine
     levels (seven practices, a fix, an improve) taught by Nuri, the wand

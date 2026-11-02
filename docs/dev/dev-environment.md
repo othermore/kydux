@@ -469,8 +469,8 @@ failure and says which check failed. Run it from the repository's root:
 ci/check.sh
 ```
 
-It runs, in this order: the Python linter and formatter, the world's tests
-and the repository's own checks, the check that keeps the languages in
+It runs, in this order: the Python linter and formatter, the world's tests,
+the art tools' tests and the repository's own checks, the check that keeps the languages in
 step, and the app's type check, unit tests and build. When everything
 passes, the last line says `==> All checks passed`.
 
@@ -706,7 +706,7 @@ settings can turn them off.
 
 ## 11. The commands that need `sudo`, for opening the game to friends
 
-Each step of "Opening the game to friends" (section 4) that changes the
+Each step of "Opening the game to friends" (section 5) that changes the
 machine or needs root is here, ready to paste, in order. The machine is
 `hija`, on the home network `10.10.11.0/24` with the router at
 `10.10.11.1`; its wired interface `enp2s0` has the MAC address

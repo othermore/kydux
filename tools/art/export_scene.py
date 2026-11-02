@@ -692,7 +692,7 @@ def scene(settings: Settings) -> Path:
                 shown, alpha = without, sprite_alpha(painting, without, native, thing, spacing, th)
             elif isinstance(picture, dict):
                 # A state cut from a picture against its own edit without it: a book
-                # glowing as the spell takes it, as it was painted before it rested.
+                # glowing as the spell takes it.
                 shown = np.array(Image.open(settings.edits / picture["picture"]).convert("RGB"))
                 apart = np.array(Image.open(settings.edits / picture["without"]).convert("RGB"))
                 own = {**thing, "solid": picture.get("solid", thing["solid"])}

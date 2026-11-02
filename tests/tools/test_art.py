@@ -659,7 +659,7 @@ def standing_height(name: str) -> float:
     not (FIGURES / "figures.json").is_file(), reason="the figures are not exported"
 )
 def test_every_figure_passes_under_the_doors_it_walks_through():
-    # D98: a child at most 1.15 cells, a grown-up at most 1.32 and taller than every
+    # D98: a child at most 1.15 cells, a grown-up at most 1.31 and taller than every
     # pupil who walks, and a door's opening, from the feet of a figure in its
     # doorway to the top of its arch, a tenth of a cell taller than the tallest
     # figure that walks through.
@@ -668,7 +668,7 @@ def test_every_figure_passes_under_the_doors_it_walks_through():
     grown = [n for n in names if n not in children]
     child = max(standing_height(n) for n in children)
     adult = max(standing_height(n) for n in grown)
-    assert child <= 1.15 and adult <= 1.32
+    assert child <= 1.15 and adult <= 1.31
     # Eldra, a ghost, keeps to her nook and never walks through a door.
     walker = max(standing_height(n) for n in children if n != "eldra")
     assert min(standing_height(n) for n in grown) > walker + 0.05

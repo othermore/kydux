@@ -7,7 +7,7 @@
   "starting_code": "# El libro de Eldra está dentro de su habitación. Encuéntralo y usa fendra para alcanzarlo.\n",
   "hints": [
     "Encuentra el libro y guárdalo bajo un nombre.",
-    "Párate en línea con él, en la puerta de su habitación.",
+    "Ponte en línea con él, en la puerta de su habitación.",
     "Usa `cast` para lanzar *fendra* con el libro, usa `pick_up` para recogerlo y usa `give` para dárselo a Eldra, que está junto a la puerta."
   ],
   "intro": "El libro de Eldra está en el estante dentro de su pequeña habitación, donde no podemos pisar. Hay que decirle al hechizo *fendra* qué libro debe traer. Encuéntralo y guárdalo bajo un nombre, luego bájalo desde su puerta, en línea con él, y dáselo.",

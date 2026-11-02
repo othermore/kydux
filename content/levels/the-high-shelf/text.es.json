@@ -7,10 +7,10 @@
   "starting_code": "# El libro raro está en algún lugar entre los libros del estante alto.\n",
   "hints": [
     "Encuentra el libro con `find_nearest`, guárdalo bajo un nombre y muéstralo con `reveal`.",
-    "Camina hasta pararte justo debajo de él.",
+    "Camina hasta ponerte justo debajo de él.",
     "Usa `cast` para lanzar *fendra* con el libro, y luego usa `pick_up`."
   ],
   "intro": "El libro raro que he querido durante tanto tiempo está ahí arriba entre todos los demás, ¡y no puedo distinguir cuál es! Pero tu programa puede encontrarlo.",
-  "outro": "¡Lo tienes! El hechizo funcionó a la perfección.",
+  "outro": "¡Lo tienes! El hechizo ha funcionado a la perfección.",
   "learned": "Ahora sabes que al hechizo *fendra* se le dice qué cosa debe traer, y que una cosa que trae todavía se debe recoger."
 }

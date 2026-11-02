@@ -103,10 +103,6 @@ class Scene:
     layers: list[Layer] = field(default_factory=list)
     #: The colours the scene is read by (D82).
     thresholds: dict = field(default_factory=image_first.thresholds)
-    #: The kinds of problem the scene is held to, every kind when None: a scene
-    #: whose things are still to be cut again by the outline rule (D93) names the
-    #: checks it already keeps (`checks` in its settings).
-    checks: list[str] | None = None
     #: The parts of the scene its settings keep in its things (`kept`, D93), in cells.
     kept: list = field(default_factory=list)
     #: Whether Gemini marked its things in magenta (`marks`), which are then whole.
@@ -182,7 +178,6 @@ def load(scene: str) -> Scene:
     if (scene_settings.SCENES / scene / "cut.json").is_file():
         own = scene_settings.settings(scene)
         found.thresholds = own.thresholds
-        found.checks = own.data.get("checks")
         found.kept = own.data.get("kept", [])
         found.marked = "marks" in own.data
     found.dark = art.get("dark", [])
@@ -684,9 +679,6 @@ def problems(scene: Scene, covered: list[Covered] | None = None) -> list[Problem
     seen = differs(scene)
     if seen is not None:
         found += lawn(scene, seen) + holes(scene, seen) + edges(scene, seen) + spills(scene, seen)
-
-    if scene.checks is not None:
-        found = [problem for problem in found if problem.kind in scene.checks]
 
     def shown(problem: Problem) -> bool:
         x, y = problem.cell

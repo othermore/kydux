@@ -130,15 +130,14 @@ owner on 2026-10-26, for every scene from the dormitory on:
   floor, and the game draws it where the level says (`at` in the scene's
   `cut.json`, D85).
 - **Once chosen, a painting is mended, not painted again** (D88). A
-  model asked to edit a whole picture paints it all again, and may change
-  what was to be kept: the library's border edit took its reading room
-  away. A fix is made with `tools/art/repaint.py <scene> canvas`: the boxes
+  model asked to edit a whole picture paints it all again, and moves what
+  is to be kept. A fix is made with `tools/art/repaint.py <scene> canvas`: the boxes
   to mend, and a band below when the picture must go on, blurred on a
   canvas, and the model given a crop of it large enough that what is kept
   fills it (`repaint` in `cut.json`, with its prompt in
-  `tools/art/prompts/`); then `repaint.py <scene> join <picture>` takes only
-  the boxes and the band from the model's picture, the painting pixel for
-  pixel elsewhere. The scene's edits that showed the part as the painting
+  `tools/art/prompts/`); then `repaint.py <scene> join <picture>` takes
+  the boxes and the band from the model's picture, faded into the painting
+  over a few pixels round them, the painting itself elsewhere. The scene's edits that showed the part as the painting
   did, its ground-only edit and its marked picture, are mended with it
   (`also`), so that the cut finds no difference there; a mend that takes a
   door out of its doorway makes the doorway's dark magenta in the marked
@@ -149,8 +148,8 @@ owner on 2026-10-26, for every scene from the dormitory on:
   `marks` give the crops of the painting Gemini is given, each asked to
   turn only the named things magenta and to redraw nothing, and
   `tools/art/repaint.py <scene> marks` lays each answer on the painting,
-  whole and then part by part, its outlines onto the painting's. A part is
-  asked three times or more and is magenta where most tries agree: each
+  whole and then part by part, its outlines onto the painting's. A part may be
+  asked several times, and is then magenta where most tries agree: each
   try strays somewhere else. The thing is its magenta whole, with the
   painting's outline beside it (`"mask": "marked"`); a wall cut round its
   openings is its box less the magenta (`"unmarked"`); a wall a model
@@ -176,7 +175,16 @@ owner on 2026-10-26, for every scene from the dormitory on:
   `dark` passages draw a figure darker the deeper it goes into them, its
   head darker than its feet (D100).
 - **A thing painted too big for its place is drawn smaller** (`scale`), on
-  its foot's middle, over the picture without it: a book on a shelf.
+  its foot's middle, over the picture without it: a book on a shelf; a
+  scale by state (`{"pulled": 0.72}`) shrinks that state alone.
+- **A thing's picture without it may be a box of another picture**
+  (`without` as `{"picture", "box", "from"}`): the painting with that box
+  taken from the picture named, so that what Gemini painted beside the
+  thing stays; its mask is that difference, left unsnapped (`snap: false`)
+  where the snap runs into lines that are not the thing's. A state may be
+  cut from a picture of its own against its own edit (`{"picture",
+  "without", "solid"}`): the rare book's `pulled`, a glowing book drawn
+  while fendra brings it down.
 - **A bed's cover is its quilt and its folded sheet** (D97), from the
   sheet's dark line by the pillow to the foot, the pillow left out. Its
   mask takes only its own line (`image_first.lined`), so that the pillow's
@@ -218,8 +226,8 @@ row its foot stands on.
   `tools/art/repaint.py doorways`.
 - **A cut-out ends at the outer edge of its outline** (D93): the outline is
   the thing's, and nothing of the ground beyond it is (`fringe` and `bare`
-  in the sweep). Every mask is moved onto its outline
-  (`image_first.snapped`); a mask drawn inside the outline, Gemini's
+  in the sweep). Every mask but a box's, and one its thing says not to (`snap: false`),
+  is moved onto its outline (`image_first.snapped`); a mask drawn inside the outline, Gemini's
   magenta, has the outline added and nothing taken away
   (`image_first.rimmed`). A painting whose outlines are not black, a night
   scene or a brown-lined room, gives its outline's darkness in `cut.json`
@@ -284,9 +292,9 @@ three when they go wrong over a cell walked on; the others it cannot see.
 
 ## What a scene is painted for
 
-The three sprints that went to chapter 2's scenes went to things the
-paintings asked of the cut (D99). A scene still to paint keeps to these, in
-its prompt and in the choice among Gemini's tries:
+A painting asks things of the cut, and a scene painted for the cut asks
+little (D99). A scene still to paint keeps to these, in its prompt and in
+the choice among Gemini's tries:
 
 - **The floor a figure walks is open.** Furniture stands against the top
   wall or in the corners, where no figure walks beside or behind it. A
@@ -294,7 +302,8 @@ its prompt and in the choice among Gemini's tries:
   scene at most, and only where the story needs it.
 - **Doors are doorways.** A door a figure walks through is in a wall seen
   from the front, with an arch at least two cells wide and a fifth of a
-  cell taller than the tallest figure; open, it shows the floor of the
+  cell taller than the tallest figure, so that the check's tenth (D98)
+  holds with room to spare; open, it shows the floor of the
   room beyond, lit. No slits in walls seen from above: a wall between rooms
   is seen from the front, or the rooms are two scenes.
 - **Shelves are one row, against a wall.**

@@ -65,10 +65,10 @@ test('Enter and Space go on; Go on ends the story, read, at what comes next', as
 test('a figure who goes says its words first, and is gone at the next step', async ({ page }) => {
   await page.goto('/#story/the-first-night');
   const scene = page.locator('#scene');
-  await expect(scene).toHaveAttribute('data-actors', /ilda:13,13/);
+  await expect(scene).toHaveAttribute('data-actors', /ilda:13,12/);
   await storyNext(page, 2);
   await expect(scene).toHaveAttribute('data-speaker', 'ilda');
-  await expect(scene).toHaveAttribute('data-actors', /ilda:13,13/);
+  await expect(scene).toHaveAttribute('data-actors', /ilda:13,12/);
   await storyNext(page);
   await expect(scene).not.toHaveAttribute('data-actors', /ilda/);
   await expect(scene).toHaveAttribute('data-actors', /friend:11,8/);

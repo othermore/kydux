@@ -1,8 +1,8 @@
 // The looks a child can choose for their wizard (D36, D61), four for a girl and
 // four for a boy, each four with the four skin tones. Each has an id, which the
-// progress document keeps, and for now the colours and hair style of the
-// placeholder figure; with the art of phase 4, the same ids pick sprite sheets
-// or palette swaps, so the document does not change. The figure is the word:
+// progress document keeps and which picks the wizard's sprite sheet, and its
+// colours and hair style, by which the friends' sets are chosen too (D90).
+// The figure is the word:
 // a look has no name to translate. Nothing here imitates a famous wizard: no
 // grey robe and long beard, no stars and moons, no school colours of a story.
 

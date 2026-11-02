@@ -24,9 +24,10 @@ later, like the rest of it.
   book painted flat magenta by Gemini in crops of the painting
   (`game-library-marked-*.md`, each asked three times and voted), and cut
   there with their outlines.
-- Each door open onto the floor of the room beyond, Gemini's edit of the
-  doorway alone (`game-library-centre-open.md`, `-wenna-open.md`,
-  `-room-open.md`).
+- Each door open, swung in out of sight, its whole doorway the floor of the
+  room beyond from Gemini's edit of the doorway alone
+  (`game-library-centre-open.md`, `-wenna-open.md`, `-room-open.md`), laid
+  in by `tools/art/repaint.py doorways`.
 - Each thing that opens or is picked up cut against Gemini's edit without it
   (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`); Eldra's own
   book against the shelf's back carried over it by hand; the armchair, which

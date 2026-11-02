@@ -638,18 +638,19 @@ def standing_height(name: str) -> float:
     not (FIGURES / "figures.json").is_file(), reason="the figures are not exported"
 )
 def test_every_figure_passes_under_the_doors_it_walks_through():
-    # D98: a child at most 1.15 cells, a grown-up at most 1.45 and clearly taller,
-    # and a door's opening, from the feet of a figure in its doorway to the top of
-    # its arch, a tenth of a cell taller than the tallest figure that walks through.
+    # D98: a child at most 1.15 cells, a grown-up at most 1.32 and taller than every
+    # pupil who walks, and a door's opening, from the feet of a figure in its
+    # doorway to the top of its arch, a tenth of a cell taller than the tallest
+    # figure that walks through.
     names = json.loads((FIGURES / "figures.json").read_text())["figures"]
     children = [n for n in names if n.startswith(("wizard-", "nuri-", "teku-")) or n == "eldra"]
     grown = [n for n in names if n not in children]
     child = max(standing_height(n) for n in children)
     adult = max(standing_height(n) for n in grown)
-    assert child <= 1.15 and adult <= 1.45
-    assert min(standing_height(n) for n in grown) > child + 0.15
+    assert child <= 1.15 and adult <= 1.32
     # Eldra, a ghost, keeps to her nook and never walks through a door.
     walker = max(standing_height(n) for n in children if n != "eldra")
+    assert min(standing_height(n) for n in grown) > walker + 0.05
     for scene in export_scene.scenes():
         for name, thing in export_scene.settings(scene).things.items():
             if "opening" in thing:
@@ -670,6 +671,19 @@ def test_a_picture_drawn_again_is_moved_part_by_part_onto_the_painting():
     moved = repaint.moved_locally(drawn, painting)
     assert (moved[100:140, 380:386].max(axis=2) < 80).mean() > 0.9
     assert (moved[100:140, 60:66].max(axis=2) < 80).mean() > 0.9
+
+
+def test_a_door_s_leaf_is_found_up_to_its_black_line_across_its_planks():
+    import repaint
+
+    crop = np.full((120, 100, 3), (150, 150, 160), dtype=np.uint8)  # the arch's stones
+    crop[20:110, 20:80] = (20, 15, 10)  # the leaf's black line
+    crop[24:106, 24:76] = (120, 70, 40)  # its wood
+    crop[24:106, 49:51] = (60, 35, 20)  # a line between two planks
+    crop[60:72, 44:56] = (40, 40, 45)  # the keyhole's plate
+    leaf = repaint.leaf_of(crop, [(30, 70, 90)])
+    assert leaf[24:106, 24:76].all()
+    assert not leaf[:, :20].any() and not leaf[:, 81:].any() and not leaf[:19].any()
 
 
 def test_a_box_past_the_picture_s_edge_holds_what_of_it_is_in_the_picture():

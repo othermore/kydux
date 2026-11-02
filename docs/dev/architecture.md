@@ -1466,13 +1466,16 @@ one overturns stays, marked as superseded.
   and its cover just over the sleeper, all under a figure standing on the
   bed's row. Rules out a sleeper between the sheet and the quilt.
 - **D98 — Every figure walks through every door with room to spare.**
-  Decided 2026-10-27 by the owner. Every figure is drawn at 0.82 of the
-  height it is cut at: a child stands at most 1.15 cells tall, a grown-up
-  at most 1.45 and a third taller, and every door a figure walks through
-  leaves a tenth of a cell over the tallest figure that does (`opening` in
-  the scene's settings, measured on the painting, `adults` where a grown-up
-  walks through); a test asserts it. Rules out a hat over the arch it is
-  passing under.
+  Decided 2026-10-27 by the owner, and the grown-ups' height on 2026-10-28.
+  Every figure is drawn at 0.82 of the height it is cut at, and a grown-up
+  (Wenna, Ilda, Dask, Baro) at 0.9 of that, since a grown-up wears no hat:
+  a child stands at most 1.15 cells tall, a grown-up at most 1.31 and
+  taller than every pupil who walks; Eldra, a pupil's ghost, is a child's
+  size. Every door a figure walks through leaves a tenth of a cell over the
+  tallest figure that does (`opening` in the scene's settings, measured on
+  the painting, `adults` where a grown-up walks through); a test asserts
+  it. Rules out a hat over the arch it is passing under, and grown-ups who
+  stand a head too tall beside the pupils.
 - **D99 — A scene is painted for the cut.** Decided 2026-10-27 by the
   owner, as the lesson of sprints 15 to 17, and written as rules in
   `art/README.md` ("What a scene is painted for"): open floors, doorways in
@@ -1491,3 +1494,13 @@ one overturns stays, marked as superseded.
   from the figure's top to its feet). The entrance's three arches are
   such passages, the middle one deeper. Rules out a figure as lit in a
   dark corridor as in the hall.
+- **D101 — An open door is out of sight.** Decided 2026-10-28 by the
+  owner. A door in a wall seen from the front, with room behind it, swings
+  in and goes behind the wall: open, its whole doorway, from the arch to
+  the threshold, shows the floor of the room beyond (`doorways` in the
+  scene's settings, `repaint.py doorways`, the floor taken from Gemini's
+  edit of the doorway); a doorway always open has no door at all, as the
+  entrance's side arches. A door in a side wall, or with no room behind it
+  to swing into, is drawn open as painted. Rules out a leaf against its
+  arch's side covering part of the doorway, and half a leaf before a round
+  doorway.

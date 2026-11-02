@@ -6,6 +6,7 @@
     tools/art/repaint.py <scene> join <picture> [--section <name>]
     tools/art/repaint.py <scene> fill [--section <name>]
     tools/art/repaint.py <scene> marks
+    tools/art/repaint.py <scene> doorways
 
 What to mend is the scene's settings' `repaint` (art/scenes/<scene>/cut.json,
 D82): the painting it starts from (`from`), how many pixels it grows by below
@@ -41,10 +42,24 @@ settings' `marks` give the pictures, each with its crop, and where the painting
 goes; things that lie on other things, a bed's covers on the bed, are marked in
 a set of their own, each set a painting (`sets`), the first the sweep's.
 
+A section that takes a door out of a doorway (`opened`) has the dark of the
+doorway the door hid made magenta in each of its `also` pictures, flooded from
+the opening's magenta, so that a wall cut round its openings leaves it out.
+
 `fill` mends without a model: each box, a narrow upright strip, is painted row
 by row from the pixels just left and right of it, blended across, so that what
 lies under a thin thing (the entrance lamp's chain over a plain floor) goes on
 across it. A model given such a strip blurred painted the chain again.
+
+`doorways` opens each door of the scene's settings' `doorways` without a model:
+the door's leaf is found in the painting from bands of seeds across it (`seeds`,
+each x0, x1 and y in cells), flooded up to the black line that bounds it, its
+planks' lighter lines crossed, and filled row by row; and the whole leaf, from
+the arch to the threshold, is painted with the floor of the room beyond, the
+part of a model's edit of the doorway that is floor alone (`floor`, a box in
+cells of `picture`), stretched to it. The door has swung in out of sight. A
+model asked to open a door drew its leaf against the arch's side and left its
+bottom planks.
 
 The same is done for any other section of the settings, named by `--section`:
 `without`, the edit of a scene indoors without its static things (D89), which
@@ -210,7 +225,11 @@ def join(scene: str, picture_path: Path, section: str = "repaint") -> Path:
     for edit, written in repaint.get("also", []):
         picture = np.array(Image.open(REPO / edit).convert("RGB")).astype(np.float32)
         picture[y0:y1, x0:x1] = picture[y0:y1, x0:x1] * (1 - inside) + whole * inside
-        Image.fromarray(picture.clip(0, 255).astype(np.uint8)).save(REPO / written)
+        picture = picture.clip(0, 255).astype(np.uint8)
+        if repaint.get("opened"):
+            cell = scene_settings.settings(scene).grid["x"]["spacing"]
+            picture = opened(picture, painting.clip(0, 255).astype(np.uint8), part, cell)
+        Image.fromarray(picture).save(REPO / written)
     if "grid" in repaint:
         grid = json.loads((REPO / repaint["from_grid"]).read_text())
         grid["y"]["cells"] = int(
@@ -218,6 +237,28 @@ def join(scene: str, picture_path: Path, section: str = "repaint") -> Path:
         )
         (REPO / repaint["grid"]).write_text(json.dumps(grid, indent=2) + "\n")
     return target
+
+
+#: The dark of a doorway, in the painting's value from 0 to 1: lighter than its
+#: black outline, darker than the stones round it; and how far into what the door
+#: hid it is looked for, as a part of a cell.
+DOORWAY_DARK = (0.12, 0.35)
+DOORWAY_REACH = 0.5
+
+
+def opened(marked: np.ndarray, painting: np.ndarray, part: np.ndarray, cell: float) -> np.ndarray:
+    """A marked picture whose mended part opened a doorway (`opened`): the dark of
+    the doorway that a door hid there is magenta, as the rest of its opening, the
+    magenta flooded into it up to the doorway's outline and its stones."""
+    value = np.array(Image.fromarray(painting).convert("L")).astype(np.float32) / 255
+    low, high = DOORWAY_DARK
+    painted = part > 0.5
+    dark = (value > low) & (value < high) & image_first.dilated(painted, 2)
+    seeds = image_first.marked(marked) & image_first.dilated(painted, 4)
+    grown = image_first.flooded(seeds, seeds | dark, round(DOORWAY_REACH * cell))
+    out = marked.copy()
+    out[grown & painted] = (255, 0, 255)
+    return out
 
 
 def fill(scene: str, section: str = "repaint") -> Path:
@@ -327,6 +368,68 @@ def marks(scene: str) -> list[Path]:
     return written
 
 
+#: How dark, in the painting's value from 0 to 1, a line is that bounds a door's
+#: leaf: the lines between its planks are lighter, and a flood crosses them.
+DOOR_LINE = 0.14
+
+
+def leaf_of(crop: np.ndarray, bands: list[tuple[int, int, int]]) -> np.ndarray:
+    """A door's leaf in a crop of the painting round it: flooded from bands of
+    seeds across it, each from one pixel to another on a row (x0, x1, y), up to
+    the black line round it, the lighter lines between its planks crossed; each
+    row then filled from its leftmost pixel to its rightmost, so that the
+    keyhole's plate and the darkest planks' lines are of the leaf too. A band
+    across its top rail, which a line as dark as the leaf's own cuts off, finds
+    that rail too."""
+    value = np.array(Image.fromarray(crop).convert("L")).astype(np.float32) / 255
+    passable = value > DOOR_LINE
+    seeds = np.zeros_like(passable)
+    for x0, x1, row in bands:
+        seeds[row - 2 : row + 3, x0:x1] = True
+    leaf = image_first.flooded(seeds & passable, passable, passable.size)
+    for y in np.nonzero(leaf.any(axis=1))[0]:
+        xs = np.nonzero(leaf[y])[0]
+        leaf[y, xs[0] : xs[-1] + 1] = True
+    return image_first.filled(leaf, leaf.size)
+
+
+def doorways(scene: str) -> list[Path]:
+    settings = scene_settings.settings(scene)
+    painting = np.array(Image.open(settings.painting).convert("RGB"))
+    gx, gy = settings.grid["x"], settings.grid["y"]
+
+    def px(x: float) -> int:
+        return round(gx["offset"] + x * gx["spacing"])
+
+    def py(y: float) -> int:
+        return round(gy["offset"] + y * gy["spacing"])
+
+    written = []
+    for door in settings.data["doorways"]["doors"]:
+        x0, y0, x1, y1 = settings.things[door["thing"]]["box"]
+        box = (px(x0), py(y0), px(x1), py(y1))
+        crop = painting[box[1] : box[3], box[0] : box[2]]
+        bands = [
+            (px(left) - box[0], px(right) - box[0], py(across) - box[1])
+            for left, right, across in door["seeds"]
+        ]
+        leaf = leaf_of(crop, bands)
+        ys, xs = np.nonzero(leaf)
+        top, bottom, first, last = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+        picture = Image.open(settings.edits / door["picture"]).convert("RGB")
+        fx0, fy0, fx1, fy1 = door["floor"]
+        floor = picture.crop((px(fx0), py(fy0), px(fx1), py(fy1)))
+        floor = np.array(floor.resize((last - first, bottom - top), Image.LANCZOS))
+        out = painting.copy()
+        here = out[box[1] + top : box[1] + bottom, box[0] + first : box[0] + last]
+        inside = leaf[top:bottom, first:last]
+        here[inside] = floor[inside]
+        target = settings.edits / door["painting"]
+        Image.fromarray(out).save(target)
+        written.append(target)
+    return written
+
+
 def mark_sets(marks: dict) -> list[dict]:
     """A scene's sets of marked pictures, each written into a painting of its own:
     its things in one, and a bed's covers, which lie on its bed, in another."""
@@ -339,13 +442,14 @@ def main(arguments: list[str]) -> int:
         at = arguments.index("--section")
         section = arguments[at + 1]
         arguments = arguments[:at] + arguments[at + 2 :]
-    if len(arguments) < 2 or arguments[1] not in ("canvas", "join", "fill", "marks"):
+    if len(arguments) < 2 or arguments[1] not in ("canvas", "join", "fill", "marks", "doorways"):
         print(
-            "usage: repaint.py <scene> canvas | join <picture> | fill | marks [--section <name>]"
+            "usage: repaint.py <scene> canvas | join <picture> | fill | marks | doorways"
+            " [--section <name>]"
         )
         return 2
-    if arguments[1] == "marks":
-        for path in marks(arguments[0]):
+    if arguments[1] in ("marks", "doorways"):
+        for path in (marks if arguments[1] == "marks" else doorways)(arguments[0]):
             print(path.relative_to(REPO))
         return 0
     if arguments[1] == "canvas":

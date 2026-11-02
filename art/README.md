@@ -140,7 +140,9 @@ owner on 2026-10-26, for every scene from the dormitory on:
   the boxes and the band from the model's picture, the painting pixel for
   pixel elsewhere. The scene's edits that showed the part as the painting
   did, its ground-only edit and its marked picture, are mended with it
-  (`also`), so that the cut finds no difference there.
+  (`also`), so that the cut finds no difference there; a mend that takes a
+  door out of its doorway makes the doorway's dark magenta in the marked
+  picture (`opened`), which the scene's `marks` then name (`mended`).
 - **What stands in front of a figure and never changes is a static thing**
   (D89): a bed, an armchair, a counter, a bookcase, a lamp, a wall. It is
   marked flat magenta by Gemini (the owner's way): the scene's settings'
@@ -208,8 +210,11 @@ row its foot stands on.
   the tree's; the stones stand on the wall's row.
 - **What opens or is picked up is cut against its edit without it.** A
   gate that opens must leave no ghost bars, and a wand picked up must
-  leave its stone whole. An open door shows the floor of the room beyond,
-  from Gemini's edit of the doorway alone, laid on the painting.
+  leave its stone whole. An open door has swung in out of sight (D101):
+  its whole doorway, from the arch to the threshold, is the floor of the
+  room beyond, from Gemini's edit of the doorway alone, laid in by
+  `tools/art/repaint.py doorways`. A door in a side wall, or with no room
+  behind it, is drawn open as painted.
 - **A cut-out ends at the outer edge of its outline** (D93): the outline is
   the thing's, and nothing of the ground beyond it is (`fringe` and `bare`
   in the sweep). Every mask is moved onto its outline
@@ -304,8 +309,9 @@ its prompt and in the choice among Gemini's tries:
   on the wall, a book is on the floor, not against a shelf.
 - **Each thing is marked in magenta when the painting is chosen**, three
   tries a part, every small part named, so that no scene is cut by colour.
-- **Figures fit** (D98): a child at most 1.15 cells, a grown-up at most
-  1.45, every door a tenth of a cell taller than who walks through it.
+- **Figures fit** (D98): a child at most 1.15 cells, a grown-up, who wears
+  no hat, at most 1.31, every door a tenth of a cell taller than who walks
+  through it.
 
 ## The figures
 

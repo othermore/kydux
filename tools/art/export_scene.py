@@ -242,8 +242,9 @@ def static_alpha(
     scene (`"mask": "marked"`, the picture `marked`, among the edits), its holes, the
     lines Gemini left inside it, filled, unless it is `open_work`; the box less that
     magenta (`"unmarked"`); a polygon in cells (`"polygon"`, less its
-    `holes`); what is pale there and its outline (`"pale"`); or the whole box
-    (`"box"`), not moved."""
+    `holes`, with its `fixed` parts, and only its own line when `lined`); what
+    is pale there and its outline (`"pale"`); or the whole box (`"box"`), not
+    moved."""
     inside = in_box(painting.shape[:2], box)
     if thing["mask"] == "box":
         return inside.astype(np.float32)
@@ -293,11 +294,17 @@ def static_alpha(
         mask = native_area(painting.shape[:2], grid, thing["polygon"])
         for hole in thing.get("holes", []):
             mask &= ~native_area(painting.shape[:2], grid, hole)
-    mask = image_first.snapped(mask & inside, painting, cell, image_first.thresholds(th))
+    if thing.get("lined"):
+        # A polygon drawn just inside its outline, where a light edge of the floor
+        # beyond the line would be taken with it, takes its own line and no more.
+        mask = image_first.lined(mask & inside, painting, cell, image_first.thresholds(th))
+    else:
+        mask = image_first.snapped(mask & inside, painting, cell, image_first.thresholds(th))
     if thing["mask"] == "polygon":
         # A polygon drawn by hand runs beside its outline, not on it: the line just
         # beyond its edge is the thing's too; what its holes hold is another's.
-        mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th))
+        if not thing.get("lined"):
+            mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th))
         for hole in thing.get("holes", []):
             mask &= ~native_area(painting.shape[:2], grid, hole)
         # A part with no outline between it and the floor beyond, a stone's sunlit
@@ -511,7 +518,9 @@ def scene(settings: Settings) -> Path:
         marks = settings.data.get("marks")
         if marks:
             first = marks["sets"][0] if "sets" in marks else marks
-            shutil.copy(REPO / first["painting"], src / "ground-only.png")
+            # Mended after it was marked, a door taken out of its doorway, the
+            # picture is its mended copy (`mended`, repaint.py's `also`).
+            shutil.copy(REPO / first.get("mended", first["painting"]), src / "ground-only.png")
         else:
             Image.fromarray(ground).save(src / "ground-only.png")
     empty = [0, 0, 0, 0]
@@ -594,9 +603,9 @@ def scene(settings: Settings) -> Path:
     # A cell in the painting's own pixels, and the colours its outlines are read by.
     spacing = round(grid["x"]["spacing"])
     th = settings.data.get("thresholds")
-    # Where a thing that opens or is picked up is drawn, which no static thing
-    # takes: its cut-out and no more, so that a wall and the door in it leave no gap
-    # between them for a figure behind them to be seen through.
+    # Where a thing that opens or is picked up is drawn, in any of its states, which
+    # no static thing takes: its cut-outs and no more, so that a wall and the door in
+    # it leave no gap between them for a figure behind them to be seen through.
     doors = np.zeros(painting.shape[:2], dtype=bool)
     for name, thing in settings.things.items():
         if thing.get("static"):
@@ -605,7 +614,19 @@ def scene(settings: Settings) -> Path:
         if "marked" in thing:
             marks = np.array(Image.open(settings.edits / thing["marked"]).convert("RGB"))
         native = native_box(grid, thing["box"])
-        doors |= sprite_alpha(painting, withouts[name], native, thing, spacing, th, marks) > 0.5
+        without = withouts[name]
+        for picture in thing["states"].values():
+            if picture is None:
+                continue
+            shown = (
+                painting
+                if picture == "painting"
+                else without
+                if picture == "without"
+                else np.array(Image.open(settings.edits / picture).convert("RGB"))
+            )
+            alpha = sprite_alpha(shown, without, native, thing, spacing, th, marks)
+            doors |= alpha > 0.5
     things = {}
     for name, thing in settings.things.items():
         if thing.get("static"):
@@ -847,7 +868,8 @@ def figures() -> Path:
         if name in AS_BASES:
             webp(sheet, looks.BASE_DIR / AS_BASES[name])
         else:
-            webp(looks.sized(sheet, (width, height), FOOT), out / f"{name}.webp")
+            size = looks.SIZE * (looks.GROWN_UP if name in looks.GROWN_UPS else 1)
+            webp(looks.sized(sheet, (width, height), FOOT, size), out / f"{name}.webp")
     wizard = every["wizard"]["down"][1].height
     data = {
         "cell": CELL,

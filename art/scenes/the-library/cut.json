@@ -90,6 +90,70 @@
       ]
     ]
   },
+  "doorways": {
+    "about": "Each door of the library opened by tools/art/repaint.py doorways (the owner, 2026-10-28): its whole leaf, from the arch to the threshold, painted with the floor of the room beyond from Gemini's edit of its doorway (game-library-*-open.md), the leaf Gemini drew against the arch's side and the bottom planks it left out.",
+    "doors": [
+      {
+        "thing": "wenna_door",
+        "seeds": [
+          [
+            7.15,
+            7.95,
+            16.6
+          ],
+          [
+            7.42,
+            7.68,
+            15.715
+          ]
+        ],
+        "picture": "library-wenna-open-floor.png",
+        "floor": [
+          7.15,
+          15.8,
+          7.98,
+          16.66
+        ],
+        "painting": "library-wenna-doorway.png"
+      },
+      {
+        "thing": "centre_door",
+        "seeds": [
+          [
+            6.92,
+            8.05,
+            8.6
+          ]
+        ],
+        "picture": "library-centre-open-floor.png",
+        "floor": [
+          7.0,
+          7.75,
+          8.05,
+          8.85
+        ],
+        "painting": "library-centre-doorway.png"
+      },
+      {
+        "thing": "room_door",
+        "seeds": [
+          [
+            2.2,
+            2.85,
+            5.7
+          ]
+        ],
+        "picture": "library-room-open-floor.png",
+        "floor": [
+          2.15,
+          5.2,
+          2.85,
+          5.88
+        ],
+        "painting": "library-room-doorway.png"
+      }
+    ]
+  },
   "things": {
     "centre_key": {
       "box": [
@@ -198,7 +262,7 @@
       ],
       "row": 16,
       "solid": true,
-      "without": "library-wenna-open-floor.png",
+      "without": "library-wenna-doorway.png",
       "states": {
         "closed": "painting",
         "open": "without"
@@ -207,7 +271,7 @@
         7,
         16
       ],
-      "about": "Wenna's door, in the wall between the reading room and the shelves: open, the floor of the room beyond seen through it (Gemini's edit of the doorway alone), and over whoever stands in its doorway (D95).",
+      "about": "Wenna's door, in the wall between the reading room and the shelves: open, its doorway shows the floor of the hall beyond from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
       "opening": 1.17,
       "under": true
     },
@@ -220,7 +284,7 @@
       ],
       "row": 8,
       "solid": true,
-      "without": "library-centre-open-floor.png",
+      "without": "library-centre-doorway.png",
       "states": {
         "closed": "painting",
         "open": "without"
@@ -229,7 +293,7 @@
         7,
         8
       ],
-      "about": "The door in the middle of the wall between the wide hall and the top aisle: open, the floor of the room beyond seen through it (Gemini's edit of the doorway alone), and over whoever stands in its doorway (D95).",
+      "about": "The door in the middle of the wall between the wide hall and the top aisle: open, its doorway shows the floor of the aisle beyond from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
       "opening": 1.18,
       "under": true
     },
@@ -242,7 +306,7 @@
       ],
       "row": 5,
       "solid": true,
-      "without": "library-room-open-floor.png",
+      "without": "library-room-doorway.png",
       "states": {
         "closed": "painting",
         "open": "without"
@@ -251,11 +315,11 @@
         2,
         5
       ],
-      "about": "The door of Eldra's little room, at the top aisle's left end: open, the floor of the room beyond seen through it (Gemini's edit of the doorway alone), and over whoever stands in its doorway (D95).",
+      "about": "The door of Eldra's little room, at the top aisle's left end: open, its doorway shows the room's floor from the arch to the threshold (doorways); shut, it is over whoever stands in its doorway (D95).",
       "under": true
     },
     "wenna_door_arch": {
-      "about": "The stone arch round Wenna's door, over whoever stands in its doorway: the arch's dome and its sides down to the floor, the door's own cut-out left to the door and the threshold between the sides to the floor.",
+      "about": "The stone arch round Wenna's door, over whoever stands in its doorway: the arch's dome and its sides down to the floor, the door's own cut-out left to the door.",
       "box": [
         6.62,
         15.05,
@@ -314,26 +378,6 @@
         [
           8.34,
           17.0
-        ]
-      ],
-      "holes": [
-        [
-          [
-            6.96,
-            16.62
-          ],
-          [
-            8.04,
-            16.62
-          ],
-          [
-            8.04,
-            17.05
-          ],
-          [
-            6.96,
-            17.05
-          ]
         ]
       ]
     },
@@ -770,7 +814,7 @@
       }
     },
     "wall_aisle": {
-      "about": "The wall between the top aisle and the wide hall, its lamps and the vault's door: whoever walks along it on row 7 is behind it; the centre door is its own.",
+      "about": "The wall between the top aisle and the wide hall, its lamps and the vault's door: whoever walks along it on row 7 is behind it; the centre door is its own; the coping stone by the right wall, whose top line has a gap, as drawn.",
       "box": [
         0.55,
         6.85,
@@ -801,7 +845,27 @@
       ],
       "states": {
         "standing": "painting"
-      }
+      },
+      "fixed": [
+        [
+          [
+            12.9,
+            7.0
+          ],
+          [
+            13.95,
+            7.0
+          ],
+          [
+            13.95,
+            7.4
+          ],
+          [
+            12.9,
+            7.4
+          ]
+        ]
+      ]
     },
     "wall_vault": {
       "about": "The wall between the wide hall and the way to the vault: over every figure (D95); its lowest stone, as light as the coping below it with no outline between, as drawn.",
@@ -840,26 +904,26 @@
       "fixed": [
         [
           [
-            11.58,
+            11.56,
             15.0
           ],
           [
-            11.96,
+            11.98,
             15.0
           ],
           [
-            11.96,
-            15.47
+            11.98,
+            15.53
           ],
           [
-            11.58,
-            15.47
+            11.56,
+            15.53
           ]
         ]
       ]
     },
     "wall_reading": {
-      "about": "The wall between the wide hall and the reading room, with the dome of Wenna's door's arch: whoever walks along it on row 15 is behind it; the door is its own, and the floor beside the pile of books is the floor.",
+      "about": "The wall between the wide hall and the reading room, with the dome of Wenna's door's arch: whoever walks along it on row 15 is behind it, up to its coping's black line, the polygon drawn just under that line so that the dark floor above it stays out; the door is its own, and the pile of books by its left end, which its outline touches, the pile's; the coping's light tops, where its line has gaps between the stones and under the vault's wall, as drawn.",
       "box": [
         0.55,
         15.05,
@@ -873,7 +937,11 @@
       "polygon": [
         [
           0.6,
-          15.3
+          15.53
+        ],
+        [
+          6.9,
+          15.53
         ],
         [
           6.9,
@@ -904,8 +972,12 @@
           15.3
         ],
         [
+          8.1,
+          15.53
+        ],
+        [
           13.95,
-          15.3
+          15.53
         ],
         [
           13.95,
@@ -922,7 +994,7 @@
       "holes": [
         [
           [
-            1.07,
+            0.98,
             14.9
           ],
           [
@@ -934,8 +1006,64 @@
             15.46
           ],
           [
-            1.07,
+            0.98,
             15.46
+          ]
+        ]
+      ],
+      "fixed": [
+        [
+          [
+            0.98,
+            15.5
+          ],
+          [
+            13.95,
+            15.5
+          ],
+          [
+            13.95,
+            15.62
+          ],
+          [
+            0.98,
+            15.62
+          ]
+        ],
+        [
+          [
+            1.7,
+            15.5
+          ],
+          [
+            2.75,
+            15.5
+          ],
+          [
+            2.75,
+            15.7
+          ],
+          [
+            1.7,
+            15.7
+          ]
+        ],
+        [
+          [
+            10.95,
+            15.5
+          ],
+          [
+            12.02,
+            15.5
+          ],
+          [
+            12.02,
+            15.8
+          ],
+          [
+            10.95,
+            15.8
           ]
         ]
       ]
@@ -1232,7 +1360,7 @@
       10.6
     ]
   ],
-  "source": "# The library\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-library-6.md`, with the field as its\n  style's reference, then edited by it without its grid\n  (`game-library6-nogrid.md`).\n- Its bottom mended by Gemini from `game-library-margin-3.md`, joined by\n  `tools/art/repaint.py`, the painting kept pixel for pixel elsewhere: the\n  castle's corridor below the double door, plain pillars in the corners,\n  plain wall beside the door.\n- The way to the vault ending in an iron safe, painted by Gemini from\n  `game-library-vault-2.md` in a box of the painting, joined by\n  `tools/art/repaint.py`.\n- Its sides painted on by Gemini from `image-first-library-margin.md`, three\n  cells on each side, on a canvas made and joined by `tools/art/margin.py`:\n  the castle's walls going on, and grass and trees beyond them.\n- Its door arches drawn over whoever passes under them, and its walls and\n  the little table by Eldra's armchair, cut by polygons, each edge on its\n  outline (static things).\n- Its counter, bookcases, pile of books, tables, chairs, desk and Eldra's\n  book painted flat magenta by Gemini in crops of the painting\n  (`game-library-marked-*.md`, each asked three times and voted), and cut\n  there with their outlines.\n- Each door open onto the floor of the room beyond, Gemini's edit of the\n  doorway alone (`game-library-centre-open.md`, `-wenna-open.md`,\n  `-room-open.md`).\n- Each thing that opens or is picked up cut against Gemini's edit without it\n  (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`); Eldra's own\n  book against the shelf's back carried over it by hand; the armchair, which\n  stands in front of whoever is behind it, against Gemini's edit without it\n  (`game-library-noarmchair.md`). The two books drawn smaller than painted.\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n",
+  "source": "# The library\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-library-6.md`, with the field as its\n  style's reference, then edited by it without its grid\n  (`game-library6-nogrid.md`).\n- Its bottom mended by Gemini from `game-library-margin-3.md`, joined by\n  `tools/art/repaint.py`, the painting kept pixel for pixel elsewhere: the\n  castle's corridor below the double door, plain pillars in the corners,\n  plain wall beside the door.\n- The way to the vault ending in an iron safe, painted by Gemini from\n  `game-library-vault-2.md` in a box of the painting, joined by\n  `tools/art/repaint.py`.\n- Its sides painted on by Gemini from `image-first-library-margin.md`, three\n  cells on each side, on a canvas made and joined by `tools/art/margin.py`:\n  the castle's walls going on, and grass and trees beyond them.\n- Its door arches drawn over whoever passes under them, and its walls and\n  the little table by Eldra's armchair, cut by polygons, each edge on its\n  outline (static things).\n- Its counter, bookcases, pile of books, tables, chairs, desk and Eldra's\n  book painted flat magenta by Gemini in crops of the painting\n  (`game-library-marked-*.md`, each asked three times and voted), and cut\n  there with their outlines.\n- Each door open, swung in out of sight, its whole doorway the floor of the\n  room beyond from Gemini's edit of the doorway alone\n  (`game-library-centre-open.md`, `-wenna-open.md`, `-room-open.md`), laid\n  in by `tools/art/repaint.py doorways`.\n- Each thing that opens or is picked up cut against Gemini's edit without it\n  (`game-library-nokeys.md`, `-nobook.md`, `-nooldbook.md`); Eldra's own\n  book against the shelf's back carried over it by hand; the armchair, which\n  stands in front of whoever is behind it, against Gemini's edit without it\n  (`game-library-noarmchair.md`). The two books drawn smaller than painted.\n- Its cells marked by hand, cut by `tools/art/image_first.py` and exported by\n  `tools/art/export_scene.py`.\n",
   "lowered": [
     {
       "cells": [
@@ -1250,7 +1378,7 @@
   ],
   "marks": {
     "about": "Gemini's pictures of the library's parts with their things painted flat magenta (the owner's way, 2026-10-27), laid on the painting by tools/art/repaint.py marks, each voted from three tries: the wand bank's counter, Eldra's book, the middle bookcases and the pile of books, the reading room's tables, chairs and desk.",
-    "painting": "art/raw/game-library6/library-marked-vault.png",
+    "painting": "art/raw/game-library6/library-marked.png",
     "pictures": [
       {
         "picture": [
@@ -1317,7 +1445,8 @@
           4555
         ]
       }
-    ]
+    ],
+    "mended": "art/raw/game-library6/library-marked-vault.png"
   },
   "rows": [
     {

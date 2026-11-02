@@ -8,6 +8,10 @@ later, like the rest of it.
   reference, then edited by it without its grid (`game-entrance-nogrid.md`).
 - The chain its chandelier hung from taken out, filled from its sides by
   `tools/art/repaint.py` (fill), so that the chandelier hangs from its ring.
+- The doors of its two side arches taken out, each swung in out of sight
+  and its doorway open, painted by Gemini from `game-entrance-door-left.md`
+  and `-right.md` in a box of the painting each, joined by
+  `tools/art/repaint.py`.
 - Its benches, torches, knights and chandelier, and the openings of its far
   wall's arches, painted flat magenta by Gemini in crops of the painting
   (`game-entrance-marked-*.md`, the chandelier asked eight times and voted),

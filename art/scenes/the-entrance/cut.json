@@ -1,11 +1,11 @@
 {
-  "about": "The castle's entrance hall at night, chapter 2's first story: the painting (image-first-entrance) with its grid removed by Gemini. A story's scene with no level: nothing in it opens or is picked up. The far wall's face round its three arches is cut as a static thing (D89), so that whoever walks into an arch goes under it; the rest is ground. Pictures named here are in art/raw/, which git ignores.",
+  "about": "The castle's entrance hall at night, chapter 2's first story: the painting (image-first-entrance) with its grid removed by Gemini. A story's scene with no level: nothing in it opens or is picked up. The far wall's face round its three arches is cut as a static thing (D89), so that whoever walks into an arch goes under it; the rest is ground; the doors of its two side arches are taken out (door_left, door_right). Pictures named here are in art/raw/, which git ignores.",
   "sources": {
     "folder": "art/raw/game-entrance",
     "edits": "art/raw/game-entrance",
-    "painting": "entrance-mended.png",
+    "painting": "entrance-doors.png",
     "grid": "grid.json",
-    "ground": "entrance-mended.png"
+    "ground": "entrance-doors.png"
   },
   "repaint": {
     "about": "The chain the lamp hangs from, taken out so that it hangs from its wooden ring as if fixed to a ceiling out of the picture: filled from its sides by tools/art/repaint.py (fill), the painting kept pixel for pixel elsewhere.",
@@ -26,6 +26,60 @@
     ],
     "painting": "art/raw/game-entrance/entrance-mended.png"
   },
+  "door_left": {
+    "about": "The left arch's door, one leaf open toward us before a round doorway (the owner, 2026-10-28: an open door swings in, out of sight): taken out, the arch's stones and the wall's face going on there. Painted by Gemini 3 Pro Image from tools/art/prompts/game-entrance-door-left.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel outside the box; the marked picture mended with it.",
+    "from": "art/raw/game-entrance/entrance-mended.png",
+    "boxes": [
+      [
+        1284,
+        555,
+        1470,
+        1215
+      ]
+    ],
+    "crop": [
+      960,
+      303,
+      1920,
+      1263
+    ],
+    "canvas": "art/raw/game-entrance/entrance-door-left-canvas.png",
+    "painting": "art/raw/game-entrance/entrance-door-left.png",
+    "also": [
+      [
+        "art/raw/game-entrance/entrance-marked.png",
+        "art/raw/game-entrance/entrance-marked-left.png"
+      ]
+    ],
+    "opened": true
+  },
+  "door_right": {
+    "about": "The right arch's door, as the left one's, mended after it.",
+    "from": "art/raw/game-entrance/entrance-door-left.png",
+    "boxes": [
+      [
+        3330,
+        555,
+        3516,
+        1227
+      ]
+    ],
+    "crop": [
+      2880,
+      303,
+      3840,
+      1263
+    ],
+    "canvas": "art/raw/game-entrance/entrance-door-right-canvas.png",
+    "painting": "art/raw/game-entrance/entrance-doors.png",
+    "also": [
+      [
+        "art/raw/game-entrance/entrance-marked-left.png",
+        "art/raw/game-entrance/entrance-marked-doors.png"
+      ]
+    ],
+    "opened": true
+  },
   "things": {
     "far_wall": {
       "about": "The far wall's face, its arches' stones, its pillars and its knights, drawn over whoever walks into the arches: the wall's box less what is seen through its three openings, which Gemini painted magenta.",
@@ -44,7 +98,7 @@
       },
       "opening": 3.4,
       "adults": true,
-      "marked": "entrance-marked.png"
+      "marked": "entrance-marked-doors.png"
     },
     "bench_top_left": {
       "about": "The bench by the far wall, left of the door.",
@@ -58,7 +112,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -75,7 +129,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -92,7 +146,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -109,7 +163,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -126,7 +180,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -143,7 +197,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -160,7 +214,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       },
@@ -178,7 +232,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       },
@@ -196,7 +250,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       },
@@ -214,7 +268,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       },
@@ -232,7 +286,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -249,7 +303,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -266,7 +320,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -283,7 +337,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       }
@@ -300,7 +354,7 @@
       "static": true,
       "solid": true,
       "mask": "marked",
-      "marked": "entrance-marked.png",
+      "marked": "entrance-marked-doors.png",
       "states": {
         "standing": "painting"
       },
@@ -495,7 +549,7 @@
   "thresholds": {
     "outline": 100
   },
-  "source": "# The entrance hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-entrance.md`, with the field as its style's\n  reference, then edited by it without its grid (`game-entrance-nogrid.md`).\n- The chain its chandelier hung from taken out, filled from its sides by\n  `tools/art/repaint.py` (fill), so that the chandelier hangs from its ring.\n- Its benches, torches, knights and chandelier, and the openings of its far\n  wall's arches, painted flat magenta by Gemini in crops of the painting\n  (`game-entrance-marked-*.md`, the chandelier asked eight times and voted),\n  and cut there with their outlines (static things); its front wall and the\n  gate's posts cut by polygons, each edge on its outline.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
+  "source": "# The entrance hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-entrance.md`, with the field as its style's\n  reference, then edited by it without its grid (`game-entrance-nogrid.md`).\n- The chain its chandelier hung from taken out, filled from its sides by\n  `tools/art/repaint.py` (fill), so that the chandelier hangs from its ring.\n- The doors of its two side arches taken out, each swung in out of sight\n  and its doorway open, painted by Gemini from `game-entrance-door-left.md`\n  and `-right.md` in a box of the painting each, joined by\n  `tools/art/repaint.py`.\n- Its benches, torches, knights and chandelier, and the openings of its far\n  wall's arches, painted flat magenta by Gemini in crops of the painting\n  (`game-entrance-marked-*.md`, the chandelier asked eight times and voted),\n  and cut there with their outlines (static things); its front wall and the\n  gate's posts cut by polygons, each edge on its outline.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
   "cut": false,
   "marks": {
     "about": "Gemini's pictures of parts of the hall with its things painted flat magenta (the owner's way, 2026-10-27), laid on the painting by tools/art/repaint.py marks: which thing each of the benches', torches', knights' and the lamp's masks is, its edge the painting's outline; and the three openings the far wall is cut round.",
@@ -554,7 +608,8 @@
         ]
       }
     ],
-    "painting": "art/raw/game-entrance/entrance-marked.png"
+    "painting": "art/raw/game-entrance/entrance-marked.png",
+    "mended": "art/raw/game-entrance/entrance-marked-doors.png"
   },
   "dark": [
     {

@@ -221,11 +221,14 @@ def recolour_sheet(
     return Image.fromarray(pixels)
 
 
-#: How tall every figure is drawn, as a part of the height it is cut at (D98): the
-#: children then stand at most 1.15 cells and the grown-ups 1.45, a third taller,
+#: How tall every figure is drawn, as a part of the height it is cut at (D98), and
+#: a grown-up as a part of that: the children then stand at most 1.15 cells and the
+#: grown-ups, who wear no hat, at most 1.31, taller than every pupil and no giants,
 #: and every figure passes under the doors it walks through with a tenth of a cell
 #: over its hat.
 SIZE = 0.82
+GROWN_UP = 0.9
+GROWN_UPS = ("wenna", "ilda", "dask", "baro")
 
 
 def sized(

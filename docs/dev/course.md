@@ -19,6 +19,34 @@ text the child reads is drafted by Gemini from a brief (D55).
 An id is a slug (D44). In chapters 4 and 5, *T* numbers a lesson and *L*
 a level, across the course, only to refer to them here.
 
+## How a level earns its idea
+
+An idea is taught where the level cannot be solved without it, and the
+level shows why. Rule given by the owner on 2026-10-26, from chapter 2's
+design:
+
+- **A variable holds a value the program cannot know when it is written,
+  or uses more than once.** A key that lies in a different place each
+  time the level is played (D51) asks for `steps = key.distance_to(wizard)`,
+  and the same `steps` walks there and back. Giving a name to a number
+  the child could simply type, as in `steps = 3` for `move_right(3)`, is
+  forced, and is never the way a variable is introduced.
+- **A method that gives something back is taught on something the wizard
+  cannot see.** `find_nearest` earns its place when the key lies hidden
+  behind a bookcase and `reveal` shows its outline; on a thing in plain
+  sight the child would walk to it and never see why the method exists.
+- **A method with a precondition is taught by a level that breaks it.**
+  A fix level opens the door from across the room, and the child moves
+  the line to where the wizard stands beside it.
+- **The level's story is the reason.** The key is hidden because it fell
+  years ago; it moves because someone moves it; the door is far because
+  the program is old. The idea and the story agree, so the child remembers
+  both.
+
+Each later chapter's design is checked against this before its texts are
+briefed: every lesson names the level that needs it, and what in that
+level would fail without the idea.
+
 ## Chapter 1 — Arrival (`01-arrival`)
 
 It opens with the game's opening, `story:the-letter`: the letter of

@@ -84,6 +84,43 @@ A chapter's scene is one painting. Its map is read from the painting.
    free cells that no cut-out covers. `tests/project/test_art_content.py`
    checks both rules against the painting's cut-outs.
 
+## What surrounds a scene
+
+A scene's margin (D83) is the rest of the place seen from above, where
+no one walks, never a frame and never a void: a painting zoomed out shows
+more of the castle, not black and not a floating room. Rule given by the
+owner on 2026-10-26, for every scene from the dormitory on:
+
+- **Indoors, the margin is the castle.** The room's own thick outer
+  walls; beyond them, on one side, a neighbouring room of the same kind
+  seen in shadow, with a solid wall between and no way in, such as the
+  second-year dormitory beside the first-year one; on another side, the
+  castle's massive walls and round towers with battlements and roofs;
+  below, the corridor that gives access to the room through its door, and
+  to the neighbouring room through a door of its own.
+- **Where the castle ends, the sky.** Above the walls and the towers, and
+  in the corners: a starry night sky for a scene at night, the same the
+  windows show; a pale morning sky with clouds for a scene by day. Each
+  scene is painted at its own hour, and its light says so.
+- **Outdoors, the margin is more of the same ground**, woods, rocks and
+  fences no one could walk through, as the field's.
+- **The margin is painted with the scene from the start**, in one
+  picture, the playable area in the middle, three or more cells on each
+  side and two or more above and below; a wider one costs nothing and
+  frees the zoom. Every edit of the painting is made whole, margin
+  included. Ask for every cell painted, and say "never black": a model
+  asked for "no floor there" paints black.
+- **One winding way.** Each chapter's levels chain, each starting where
+  the one before ended, so the scene is one route from its entrance to
+  its end, like a snake, with no second way from one part to the next:
+  a second route leaves a level with nowhere to start. Say in the prompt
+  how many doors there are, which wall each is in, and that no other
+  opening exists; a model given two routes paints a third.
+- **A thing the levels move stands in the painting at one place**, where
+  the cut takes its picture from: a key that lies behind a bookcase or in
+  a different cell each time the level is played is painted once on open
+  floor, and the game draws it where the level says.
+
 ## The rules for the cut-outs
 
 Each raised thing is cut out and drawn in order with the figures, by the

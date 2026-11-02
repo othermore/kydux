@@ -1,0 +1,17 @@
+---
+candidate: image-first-entrance
+service: gemini
+model: gemini-3-pro-image
+image: art/raw/image-first/field-2k.png
+aspect_ratio: 4:3
+image_size: 4K
+---
+Paint one complete level of a children's adventure game, a wide picture, in exactly the same style as the reference picture: seen from above in a three-quarter top-down view, as in a classic 2D role-playing game, the floor seen from above and every upright thing showing its top and its front face, which faces the viewer. Painted cartoon 2D game art: hand-drawn bold dark outlines, warm saturated colours, soft painted shading, lit tops and shaded faces, chunky readable shapes. Take only the style, the brushwork and the outlines from the reference, not its layout: this picture is indoors, at night.
+
+THE GRID. The whole picture is a board of exactly 28 square cells across and 21 cells down, like a board game. A thin, faint, LIGHT (pale cream, half transparent) grid line is painted over the whole picture between the cells, over everything, so that every cell can be counted; the lines are light, never dark, and there are no numbers, letters or labels anywhere. Everything sits inside whole cells. Keep the whole place in view, small cells, not a close-up. The picture is filled right to its four edges: no paper, no margin, no frame.
+
+THE VIEW. This is the most important rule. The whole picture is seen straight from above at one and the same angle, like a board game on a table: no vanishing point, no converging lines, no perspective, nothing isometric. Every east-west edge is perfectly horizontal and every north-south edge perfectly vertical. A wall running across shows its lit stone top on one row and its front face on the row below. A wall running up and down is a straight band of stone of the same width from end to end, with no side face. A tower is a round disc of battlements with its conical roof's point in the middle. Every door is set in the front face of a wall running across and faces the viewer head-on. Every raised thing has a dark outline all round it and stands apart from the next with floor between them. Nothing stands more than three cells tall. Shadows fall on the floor as the floor's own colour darkened.
+
+THE PLACE: the great entrance hall of a school of magic in an old castle, at night, lit by torches and a big hanging chandelier: a wide hall of grey stone with a floor of large flagstones and a long red carpet running up its middle from the door to the far end. In the middle of the hall's bottom wall, the castle's great arched double door, tall dark wood with iron bands, facing the viewer, standing open onto the night: the pupils have just come in. Along the side walls, stone pillars, tall banners in the school's colours, a few benches, suits of armour, torches in iron holders. At the far end, the top wall, three wide arched openings without doors, leading into the castle's corridors, and between them two tall windows with stars. Nothing else stands on the carpet. All round the hall, the outermost four columns on the left and right and the outermost three rows at the top and at the bottom, is the castle seen from above where no one walks: thick stone walls, round towers with battlements and pointed blue roofs at the corners, and above the walls at the top the night sky full of stars; at the bottom, below the great door, the dark path and the first trees of the grounds outside at night. Every cell is painted, never black.
+
+No people, no animals and no text anywhere. Wide landscape picture.

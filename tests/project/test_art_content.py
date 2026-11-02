@@ -152,7 +152,8 @@ def test_the_cells_an_open_leaf_lies_on_are_the_cells_its_scene_names(scene):
 
 def test_a_scene_a_morning_story_is_told_on_has_its_morning_ground():
     """A story under the morning light draws its scene's morning ground: the sky,
-    the windows and the outside by day (D126)."""
+    the windows and the outside by day, and, where the scene is painted whole by
+    morning, every row and every thing's state at that hour too (D126)."""
     scenes = set()
     for path in sorted((CONTENT / "stories").glob("*/story.json")):
         story = json.loads(path.read_text(encoding="utf-8"))
@@ -162,10 +163,17 @@ def test_a_scene_a_morning_story_is_told_on_has_its_morning_ground():
     for scene in sorted(scenes):
         folder = CONTENT / "art" / "scenes" / scene
         art = json.loads((folder / "art.json").read_text(encoding="utf-8"))
-        ground = art.get("grounds", {}).get("morning")
+        whole = "morning" in art.get("hours", {})
+        ground = {**art.get("grounds", {}), **art.get("hours", {})}.get("morning")
         assert ground and (folder / ground).is_file(), scene
         for row in art["rows"]:
+            assert not whole or "morning" in row.get("hours", {}), (scene, row["image"])
             for image in row.get("hours", {}).values():
+                assert (folder / image).is_file(), (scene, image)
+        for name, thing in art["things"].items():
+            states = thing.get("hours", {}).get("morning", {})
+            assert not whole or set(states) == set(thing["states"]), (scene, name)
+            for image in states.values():
                 assert (folder / image).is_file(), (scene, image)
 
 

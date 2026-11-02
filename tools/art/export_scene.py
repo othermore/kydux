@@ -28,10 +28,15 @@ shadow or a flower drawn in front, the lawn drawn in front, a hole.
 - ground.webp: the painting with everything that opens or is picked up taken
   out, each from the edit without it, so that no ghost of a leaf remains; and
   ground-<hour>.webp, for a scene painted at night that has its picture by
-  morning (`grounds` in the settings' `sources`, D126), the same ground with
-  what that picture mended (its sky, its windows, its outside) laid over it,
-  and row-<r>-...-<hour>.webp for a row named in `rows_morning`, whose image
-  holds some of that outside (a wall's strip running out over the grass);
+  morning (D126): where that picture fits the painting whole (`hours` in the
+  settings' `sources`), the ground cut from it, what the ground takes out of the
+  painting given that hour's light (`relit`), with a twin of every row's image,
+  row-<r>-...-<hour>.webp, and of every thing's state, <thing>-<state>-<hour>.webp,
+  cut with the same masks from it; where it is taken in boxes (`grounds`), the
+  same ground with what that picture mended (its sky, its windows, its outside)
+  laid over it, and row-<r>-...-<hour>.webp for a row named in `rows_morning`,
+  whose image holds some of that outside (a wall's strip running out over the
+  grass);
 - row-<r>.webp: the full scene's width, with alpha, holding what stands up and
   has its foot on row r, cut from that ground by image_first.py, from its top
   down to the bottom edge of row r and never lower: a thing only ever covers
@@ -609,6 +614,51 @@ def with_margin(floor: Image.Image, margin: dict, inside: np.ndarray) -> Image.I
     return out
 
 
+def state_sprite(
+    pixels: np.ndarray,
+    alpha: np.ndarray,
+    grid: dict,
+    columns: int,
+    rows: int,
+    box: tuple[int, ...],
+    row: int,
+    reach: float,
+    scale: float | None,
+) -> Image.Image:
+    """A thing's state at the page's size: its pixels and alpha in the painting's own
+    moved onto the page's grid, cut to the thing's box, ending at its row's bottom
+    edge (or its reach below it) as a row's image does, and drawn smaller than
+    painted when the thing says (`scale`)."""
+    rgba = np.dstack([pixels, (alpha * 255).astype(np.uint8)])
+    sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]].copy()
+    below = clip_below(sprite[..., 3] / 255, row, box[1], reach=reach)
+    sprite[..., 3] = (below * 255).astype(np.uint8)
+    sprite = sprite[: max(1, round((row + 1 + reach) * CELL) - box[1])]
+    return Image.fromarray(shrunk(sprite, scale) if scale else sprite, "RGBA")
+
+
+#: How far the light of a scene's picture at another hour is averaged, in the
+#: painting's pixels, to give it to an image painted at the painting's hour (D126).
+RELIGHT_BLUR = 24
+
+
+def light_ratio(night: np.ndarray, day: np.ndarray) -> np.ndarray:
+    """How each pixel's colour changes from the painting to its picture at another
+    hour, averaged round it: what an image painted at the painting's hour is
+    multiplied by to be seen in that hour's light."""
+
+    def soft(pixels: np.ndarray) -> np.ndarray:
+        image = Image.fromarray(pixels).filter(ImageFilter.GaussianBlur(RELIGHT_BLUR))
+        return np.array(image).astype(np.float32)
+
+    return np.clip((soft(day) + 8) / (soft(night) + 8), 0.25, 4.0)
+
+
+def relit(pixels: np.ndarray, ratio: np.ndarray) -> np.ndarray:
+    """An image painted at the painting's hour in another hour's light (light_ratio)."""
+    return np.clip(pixels.astype(np.float32) * ratio, 0, 255).astype(np.uint8)
+
+
 def scene(settings: Settings) -> Path:
     grid = settings.grid
     marks = settings.marks()
@@ -693,6 +743,28 @@ def scene(settings: Settings) -> Path:
         other = np.array(Image.open(settings.folder / picture).convert("RGB"))
         differs = np.any(other != painted, axis=2)[..., None]
         webp(ground_image(np.where(differs, other, ground)), out / f"ground-{hour}.webp")
+    # A scene's picture at another hour that fits the painting whole (D126): the
+    # ground cut from it, and what the ground takes out of the painting, a door's
+    # doorway, given that hour's light.
+    hours = settings.data["sources"].get("hours", {})
+    pictures, ratios = {}, {}
+    night = np.array(Image.open(settings.painting).convert("RGB")) if hours else None
+    for hour, picture in hours.items():
+        pictures[hour] = np.array(Image.open(settings.folder / picture).convert("RGB"))
+        ratios[hour] = light_ratio(night, pictures[hour])
+        taken = Image.fromarray(np.any(ground != night, axis=2).astype(np.uint8) * 255)
+        soft = np.array(taken.filter(ImageFilter.GaussianBlur(2))).astype(np.float32) / 255
+        # A doorway opened with the floor of the room beyond (D108) is that floor in
+        # the hour's light: as much lighter as that floor is in the hour's picture.
+        lit = ratios[hour].copy()
+        for door in settings.data.get("doorways", {}).get("doors", []):
+            fx0, fy0, fx1, fy1 = native_box(grid, door["floor"])
+            floor = pictures[hour][fy0:fy1, fx0:fx1].reshape(-1, 3).mean(axis=0)
+            floor_night = night[fy0:fy1, fx0:fx1].reshape(-1, 3).mean(axis=0)
+            x0, y0, x1, y1 = native_box(grid, settings.things[door["thing"]]["box"])
+            lit[y0:y1, x0:x1] = (floor + 8) / (floor_night + 8)
+        mixed = pictures[hour] * (1 - soft[..., None]) + relit(ground, lit) * soft[..., None]
+        webp(ground_image(mixed.astype(np.uint8)), out / f"ground-{hour}.webp")
     # Each row's image, as a strip of the scene's width from its top down to the
     # row's bottom edge: what image_first.py cut, and the static things after.
     # The static things' strips are their rows' images of their own, `static` in
@@ -777,6 +849,7 @@ def scene(settings: Settings) -> Path:
         native = native_box(grid, thing["box"])
         box = tuple(round(v * CELL) for v in thing["box"])
         states = {}
+        at_hour: dict[str, dict[str, str]] = {hour: {} for hour in hours}
         left, top = box[0], box[1]
         for state, picture in thing["states"].items():
             states[state] = f"{name}-{state}.webp"
@@ -785,23 +858,24 @@ def scene(settings: Settings) -> Path:
                 webp(Image.new("RGBA", (1, 1), (0, 0, 0, 0)), out / states[state])
                 continue
             shown, alpha = state_alpha(settings, thing, picture, painting, without, native, th)
-            rgba = np.dstack([shown, (alpha * 255).astype(np.uint8)])
-            sprite = aligned_rgba(rgba, grid, columns, rows)[box[1] : box[3], box[0] : box[2]]
-            sprite = sprite.copy()
             reach = thing.get("reach", 0.0)
             # A state on a row of its own ends at that row's bottom edge (D111).
             row = picture.get("row", thing["row"]) if isinstance(picture, dict) else thing["row"]
-            below = clip_below(sprite[..., 3] / 255, row, box[1], reach=reach)
-            sprite[..., 3] = (below * 255).astype(np.uint8)
-            # Each state's picture ends at its row's bottom edge, as a row's does.
-            sprite = sprite[: max(1, round((row + 1 + reach) * CELL) - box[1])]
             # Drawn smaller than painted, the thing in every state or in one (`scale`).
             scale = thing.get("scale")
             scale = scale.get(state) if isinstance(scale, dict) else scale
-            if scale:
-                sprite = shrunk(sprite, scale)
-            webp(Image.fromarray(sprite, "RGBA"), out / states[state])
+            shape = (grid, columns, rows, box, row, reach, scale)
+            webp(state_sprite(shown, alpha, *shape), out / states[state])
+            # Its twin at each hour the scene is painted whole at (D126), with the same
+            # mask: that hour's picture where the state is the painting's, else the
+            # state's own picture in that hour's light.
+            for hour in hours:
+                pixels = pictures[hour] if shown is painting else relit(shown, ratios[hour])
+                at_hour[hour][state] = f"{name}-{state}-{hour}.webp"
+                webp(state_sprite(pixels, alpha, *shape), out / at_hour[hour][state])
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
+        if hours:
+            things[name]["hours"] = at_hour
         if thing.get("under"):
             things[name]["under"] = True
         # A state drawn among the rows by its own row: a door swung open against the
@@ -836,6 +910,13 @@ def scene(settings: Settings) -> Path:
         other = np.array(image_first.aligned(other, grid, columns, rows, CELL).convert("RGB"))
         named = set(settings.data["rows_morning"])
         at_hours[hour] = (other, np.any(other != night, axis=2), named)
+    # A scene painted whole at another hour has every row's image at that hour too:
+    # the same cut-out, its pixels that hour's picture's (D126).
+    for hour in hours:
+        other = Image.fromarray(pictures[hour])
+        other = np.array(image_first.aligned(other, grid, columns, rows, CELL).convert("RGB"))
+        every = {row for row, _, _ in strips}
+        at_hours[hour] = (other, np.ones(other.shape[:2], dtype=bool), every)
     rows_out = []
     for row, static, layer in sorted(strips):
         top, strip = strips[(row, static, layer)]
@@ -873,8 +954,10 @@ def scene(settings: Settings) -> Path:
         "cell": CELL,
         "size": [columns, rows],
         "ground": "ground.webp",
-        # The scene's grounds at other hours, by the hour (D126).
+        # The scene's grounds at other hours, by the hour (D126): taken in boxes,
+        # `grounds`; painted whole, `hours`, where every row and thing has its twin.
         **({"grounds": {hour: f"ground-{hour}.webp" for hour in grounds}} if grounds else {}),
+        **({"hours": {hour: f"ground-{hour}.webp" for hour in hours}} if hours else {}),
         # The ground reaches past the playable area by the margin's cells, its
         # playable corner at `origin` in its own pixels (D83).
         **(
@@ -1184,7 +1267,7 @@ def draw(
     art = json.loads((folder / "art.json").read_text())
     fig = json.loads((figures_folder / "figures.json").read_text())
     cell = art["cell"]
-    ground = art["grounds"][hour] if hour else art["ground"]
+    ground = {**art.get("grounds", {}), **art.get("hours", {})}[hour] if hour else art["ground"]
     picture = Image.open(folder / ground).convert("RGBA")
     # The playable part of a ground painted with a margin (D83).
     ox, oy = art.get("origin", [0, 0])
@@ -1202,7 +1285,8 @@ def draw(
         by_row.setdefault(layer["row"], []).append((image, (0, layer["top"])))
     for name, thing in art["things"].items():
         state = (states or {}).get(name, next(iter(thing["states"])))
-        image = Image.open(folder / thing["states"][state]).convert("RGBA")
+        shown = thing.get("hours", {}).get(hour, {}).get(state, thing["states"][state])
+        image = Image.open(folder / shown).convert("RGBA")
         by_row.setdefault(thing["row"], []).append((image, (thing["left"], thing["top"])))
     for name, x, y in standing:
         # The standing frame, facing down, its feet on the cell's lower middle.
@@ -1280,7 +1364,8 @@ def checks(settings: Settings, out: Path = RAW / "game-check") -> list[Path]:
     written.append(doors_sheet(settings, out))
     # Each ground at another hour with every row and thing over it, for a night
     # piece left over the day to be seen (D126).
-    for hour in settings.data["sources"].get("grounds", {}):
+    sources = settings.data["sources"]
+    for hour in {**sources.get("grounds", {}), **sources.get("hours", {})}:
         target = out / f"{hour}-{settings.id}.png"
         draw(settings.out, standing=starts, hour=hour).save(target)
         written.append(target)

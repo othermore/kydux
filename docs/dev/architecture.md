@@ -1856,8 +1856,15 @@ one overturns stays, marked as superseded.
   same masks, the torches, candles and fire out, and no light is laid over
   it; where it does not fit, the sky, the windows and the outside are
   taken in boxes with their tones matched to the painting along the
-  boxes' edges (the owner, 2026-11-01). Rules out a morning told under a
-  night sky, and a scene painted twice by hand.
+  boxes' edges (the owner, 2026-11-01). The fit is measured box by box,
+  every static thing's and every door's (`trace.py fit`): each laid within
+  three pixels; the share of the night's outlines the picture covers,
+  which a night's outlines thickened by its shadows and its rooms in the
+  dark keep low even where the picture lies in place, does not decide (the
+  owner, 2026-11-01, on the dormitory's, whole since: `sources.hours`,
+  every image's twin at the hour, a doorway's fill in the hour's light of
+  the floor it is taken from). Rules out a morning told under a night sky,
+  and a scene painted twice by hand.
 - **D127 — A spell's pull is seen in order: the light, then the thing to
   the hands, then the hands.** Decided 2026-10-31 by the owner. When
   *fendra* takes a thing, the light leaves the wand and flies to the

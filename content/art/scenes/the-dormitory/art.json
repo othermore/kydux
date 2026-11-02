@@ -5,7 +5,7 @@
     18
   ],
   "ground": "ground.webp",
-  "grounds": {
+  "hours": {
     "morning": "ground-morning.webp"
   },
   "rows": [
@@ -13,72 +13,105 @@
       "row": 6,
       "image": "row-6-static.webp",
       "top": 384,
-      "static": true
+      "static": true,
+      "hours": {
+        "morning": "row-6-static-morning.webp"
+      }
     },
     {
       "row": 6,
       "image": "row-6-static-cover.webp",
       "top": 403,
       "static": true,
-      "cover": true
+      "cover": true,
+      "hours": {
+        "morning": "row-6-static-cover-morning.webp"
+      }
     },
     {
       "row": 7,
       "image": "row-7-static.webp",
       "top": 509,
-      "static": true
+      "static": true,
+      "hours": {
+        "morning": "row-7-static-morning.webp"
+      }
     },
     {
       "row": 8,
       "image": "row-8-static.webp",
       "top": 672,
-      "static": true
+      "static": true,
+      "hours": {
+        "morning": "row-8-static-morning.webp"
+      }
     },
     {
       "row": 8,
       "image": "row-8-static-cover.webp",
       "top": 634,
       "static": true,
-      "cover": true
+      "cover": true,
+      "hours": {
+        "morning": "row-8-static-cover-morning.webp"
+      }
     },
     {
       "row": 9,
       "image": "row-9-static.webp",
       "top": 749,
-      "static": true
+      "static": true,
+      "hours": {
+        "morning": "row-9-static-morning.webp"
+      }
     },
     {
       "row": 11,
       "image": "row-11-static.webp",
       "top": 864,
-      "static": true
+      "static": true,
+      "hours": {
+        "morning": "row-11-static-morning.webp"
+      }
     },
     {
       "row": 11,
       "image": "row-11-static-cover.webp",
       "top": 864,
       "static": true,
-      "cover": true
+      "cover": true,
+      "hours": {
+        "morning": "row-11-static-cover-morning.webp"
+      }
     },
     {
       "row": 13,
       "image": "row-13-static.webp",
       "top": 1142,
-      "static": true
+      "static": true,
+      "hours": {
+        "morning": "row-13-static-morning.webp"
+      }
     },
     {
       "row": 13,
       "image": "row-13-static-cover.webp",
       "top": 1104,
       "static": true,
-      "cover": true
+      "cover": true,
+      "hours": {
+        "morning": "row-13-static-cover-morning.webp"
+      }
     },
     {
       "row": 13,
       "image": "row-13-static-over.webp",
       "top": 379,
       "static": true,
-      "over": true
+      "over": true,
+      "hours": {
+        "morning": "row-13-static-over-morning.webp"
+      }
     },
     {
       "row": 15,
@@ -98,6 +131,12 @@
       "states": {
         "closed": "front_door-closed.webp",
         "open": "front_door-open.webp"
+      },
+      "hours": {
+        "morning": {
+          "closed": "front_door-closed-morning.webp",
+          "open": "front_door-open-morning.webp"
+        }
       },
       "under": true,
       "rows": {

@@ -8,6 +8,7 @@ traced by hand, and its doorway's, made from the open doorway's fill.
                                     [--dark 70] [--tolerance 1.5] [--out <json>]
     tools/art/trace.py <scene> footprint <door thing> [--grow 7] [--tolerance 1.5]
                                     [--out <json>]
+    tools/art/trace.py <scene> fit <picture>
 
 `look` writes a crop of the picture, the box given in cells, enlarged `--scale`
 times, with a grid line every tenth of a cell, numbered every half cell; with
@@ -30,6 +31,15 @@ door's doorway picture (the thing's `without`) differs from the painting within
 the thing's box, its holes filled, grown `--grow` pixels over the arch's inner
 line, the width of the painting's outlines, and its boundary simplified as
 `outline`'s. It is made again whenever `repaint.py doorways` lays the fill again.
+
+`fit` measures how well a model's picture of the whole scene at another hour lays
+on the painting (D126), before anything is cut from it: the dark outlines of both
+(image_first.dark_lines), and for each static thing's box and each door's box, the
+shift of the picture, up to FIT_REACH pixels each way, that differs least from
+the painting's outlines there, and the share of the painting's outline pixels
+the shifted picture's outlines cover. It prints them as a table, and whether the
+picture fits: every box's shift at most FIT_SHIFT pixels each way and its share at
+least FIT_SHARE.
 """
 
 import argparse
@@ -238,6 +248,50 @@ def footprint(
     return edge_in_cells(region, (left, top), settings.grid, tolerance)
 
 
+#: How far a box of a scene's picture at another hour is shifted to lay it on the
+#: painting, in the painting's pixels; how far it may be off and how much of the
+#: painting's outlines it must cover for the picture to fit whole (D126).
+FIT_REACH = 12
+FIT_SHIFT = 3
+FIT_SHARE = 0.85
+
+
+def fit(settings: scene_settings.Settings, picture: Path) -> list[dict]:
+    """For each static thing and door of the scene, the shift (dx, dy) of `picture`
+    whose outlines differ least from the painting's in the thing's box, and the
+    share of the painting's outline pixels there that they cover so shifted."""
+    painting = np.array(Image.open(settings.painting).convert("RGB"))
+    shown = Image.open(picture).convert("RGB")
+    if shown.size != (painting.shape[1], painting.shape[0]):
+        shown = shown.resize((painting.shape[1], painting.shape[0]), Image.LANCZOS)
+    ours = image_first.dark_lines(painting, settings.thresholds)
+    theirs = image_first.dark_lines(np.array(shown), settings.thresholds)
+    height, width = ours.shape
+    reach = FIT_REACH
+    found = []
+    for name, thing in settings.things.items():
+        states = thing.get("states", {})
+        if not (thing.get("static") or "open" in states or "closed" in states):
+            continue
+        x0, y0, x1, y1 = export_scene.native_box(settings.grid, thing["box"])
+        x0, y0 = max(reach, x0), max(reach, y0)
+        x1, y1 = min(width - reach, x1), min(height - reach, y1)
+        lines = ours[y0:y1, x0:x1]
+        best = None
+        for dy in range(-reach, reach + 1):
+            for dx in range(-reach, reach + 1):
+                moved = theirs[y0 + dy : y1 + dy, x0 + dx : x1 + dx]
+                differs = int(np.count_nonzero(lines ^ moved))
+                if best is None or differs < best[0]:
+                    best = (differs, dx, dy, moved)
+        assert best is not None
+        _, dx, dy, moved = best
+        share = float(np.count_nonzero(lines & moved)) / max(1, int(np.count_nonzero(lines)))
+        fits = abs(dx) <= FIT_SHIFT and abs(dy) <= FIT_SHIFT and share >= FIT_SHARE
+        found.append({"thing": name, "shift": [dx, dy], "share": round(share, 3), "fits": fits})
+    return found
+
+
 def main(arguments: list[str]) -> int:
     parser = argparse.ArgumentParser(description=" ".join(__doc__.split("\n\n")[0].split()))
     parser.add_argument("scene")
@@ -259,8 +313,24 @@ def main(arguments: list[str]) -> int:
     footprinting.add_argument("--grow", type=int, default=7)
     footprinting.add_argument("--tolerance", type=float, default=1.5)
     footprinting.add_argument("--out", type=Path)
+    fitting = commands.add_parser("fit")
+    fitting.add_argument("picture", type=Path)
     found = parser.parse_args(arguments)
     settings = scene_settings.settings(found.scene)
+    if found.command == "fit":
+        picture = found.picture if found.picture.is_absolute() else REPO / found.picture
+        rows = fit(settings, picture)
+        print("| thing | shift (dx, dy) | share | fits |")
+        print("| --- | --- | --- | --- |")
+        for row in rows:
+            dx, dy = row["shift"]
+            print(f"| {row['thing']} | {dx:+d}, {dy:+d} | {row['share']:.3f} | {row['fits']} |")
+        whole = all(row["fits"] for row in rows)
+        missed = sum(not row["fits"] for row in rows)
+        print(
+            "the picture fits whole" if whole else f"the picture does not fit: {missed} boxes off"
+        )
+        return 0
     if found.command == "footprint":
         target = found.out or Path(f"{found.thing}-footprint.json")
         points = footprint(settings, found.thing, found.grow, found.tolerance)

@@ -79,6 +79,7 @@ import {
   drawMark,
   facingOf,
   figureName,
+  hourKey,
   loadArt,
   paintGrounds,
   paintScene,
@@ -96,7 +97,7 @@ import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
 import { FOOT_IN_CELL, figureDepth, lightDepth, loweredBy, nudgedBy, sleeperDepth } from './depth';
-import { type LightName, type LightState, NIGHT_MS, SceneLight } from './light';
+import { type LightName, type LightState, NIGHT_MS, SceneLight, WHOLE_MORNING } from './light';
 import { Speech } from './speech';
 import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
@@ -237,6 +238,9 @@ class LevelScene extends Phaser.Scene {
   /** The scene's grounds at other hours over the painting's own (D126): the
    * morning's, shown as much as the light shows the day. */
   private grounds = new Map<string, Phaser.GameObjects.Image[]>();
+  /** Each thing's morning image over its night one while the day comes, on a scene
+   * painted whole by morning (D126), by the thing's id. */
+  private dayTwins = new Map<string, Phaser.GameObjects.Image>();
   private shownDay: number | null = null;
   /** When the wizard has lain down in its bed, on the scene's clock, and the timer
    * that lets the night fall then. */
@@ -431,6 +435,8 @@ class LevelScene extends Phaser.Scene {
       // A painted scene (D76): the painting as the ground, its raised things by row.
       this.rows = paintScene(this, this.art);
       this.grounds = paintGrounds(this, this.art);
+      // A scene painted whole by morning is the morning itself: no light over it (D126).
+      if (this.art.scene.hours?.morning) this.light.morning = WHOLE_MORNING;
       drawGrid(this, [this.map.width, this.map.height]);
     } else {
       const tilemap = this.make.tilemap({ data, tileWidth: TILE, tileHeight: TILE });
@@ -1136,11 +1142,44 @@ class LevelScene extends Phaser.Scene {
       for (const image of morning) image.setAlpha(look.day);
       this.parentNode.dataset.ground = look.day >= 1 ? 'morning' : 'painting';
     }
+    this.showHour(look.day);
     if (look.state === this.shownLight) return;
     this.shownLight = look.state;
     this.parentNode.dataset.light = look.state;
     if (look.state === 'night') this.speech.think(sleepingText(), this.shownTick, Number.POSITIVE_INFINITY);
     else if (look.state === 'dawning') this.speech.clearThought();
+  }
+
+  /** The things of a scene painted whole by morning, as much as the day is seen
+   * (D126): each in its state's morning image once the day is all there; while it
+   * comes, that image over its night one, `day` seen, in the same place. */
+  private showHour(day: number): void {
+    if (!this.art?.scene.hours?.morning) return;
+    const suffix = hourKey('', 'morning');
+    for (const [id, image] of this.things) {
+      const key = image.texture.key;
+      const night = key.endsWith(suffix) ? key.slice(0, -suffix.length) : key;
+      const morning = hourKey(night, 'morning');
+      const has = this.textures.exists(morning);
+      const wanted = has && day >= 1 ? morning : night;
+      if (key !== wanted) image.setTexture(wanted);
+      const twin = this.dayTwins.get(id);
+      if (!has || day <= 0 || day >= 1 || !image.visible) {
+        twin?.setVisible(false);
+        continue;
+      }
+      const shown = twin ?? this.add.image(image.x, image.y, morning);
+      this.dayTwins.set(id, shown);
+      shown
+        .setTexture(morning)
+        .setPosition(image.x, image.y)
+        .setOrigin(image.originX, image.originY)
+        .setScale(image.scaleX, image.scaleY)
+        .setAngle(image.angle)
+        .setDepth(image.depth + 0.00005)
+        .setAlpha(image.alpha * day)
+        .setVisible(true);
+    }
   }
 
   /** The light back to what it is before a run: the painting's own, or the story's. */

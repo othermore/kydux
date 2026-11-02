@@ -104,22 +104,36 @@ owner on 2026-10-26, for every scene from the dormitory on:
   scene is painted at its own hour, and its light says so.
 - **A scene painted at night has its morning picture** (D126), when a
   morning story plays on it or a night spent in it ends in the morning.
-  Gemini paints the whole painting again by morning, given it as it is
-  (the dormitory's prompt is `tools/art/prompts/game-dormitory-morning.md`);
-  `tools/art/repaint.py <scene> join <picture> --section morning` takes
-  from it only the sky above the walls, each window and everything beyond
-  the castle's walls (boxes, and polygons, `areas`, along a slanting
-  wall's outer line), each faded in over a few pixels on the outlines
-  that bound it, into a picture of its own. The inside stays the night
-  painting's, its candles and torches as they are. The settings'
-  `sources` name it in `grounds` (`{"morning": ...}`); the export writes
-  `ground-morning.webp` beside `ground.webp`, and `morning-<scene>.png`
-  among the check pictures, every row and thing over it, to look at for
-  a night piece left over the day: a row's image that holds some of the
-  outside, a wall's strip running out over the grass, is named in
-  `rows_morning` and has a morning image of its own, the same cut-out
-  with the morning picture's pixels. The page draws them under a story's
-  morning light, and fades them in over the night ones at the dawn (D124).
+  Gemini paints the whole painting again by morning, given it as it is:
+  the same things in the same places, the sky and the outside by day, the
+  rooms lit by day and every torch, candle and fire out (the dormitory's
+  prompt is `tools/art/prompts/game-dormitory-day.md`). `tools/art/trace.py
+  <scene> fit <picture>` lays it on the painting box by box, every static
+  thing's and every door's, and says how far each is off and how much of
+  the painting's dark outlines it covers. Where every box lies within
+  three pixels, the picture is the morning, whole: a section with `whole`
+  (`repaint.py <scene> join <picture> --section <name>`) lays it on the
+  painting by its outlines, the settings' `sources` name it in `hours`
+  (`{"morning": ...}`), and the export cuts every image of the scene from
+  it a second time with the same masks, `<image>-morning.webp`: the
+  ground, a doorway's fill given the hour's light of the floor it is taken
+  from; every row's image; every state of every thing, a door's leaf
+  swung open given the hour's light round it. The page shows them over
+  the night ones as the day comes and lays no light over the morning. The
+  share of the outlines covered tells a picture painted wrong; a night's
+  outlines, thickened by its shadows, and its rooms in the dark keep it
+  low even where the picture lies in place, as the dormitory's does.
+  Where the picture does not fit, the sky above the walls, each window
+  and everything beyond the castle's walls are taken from it in boxes
+  (and polygons, `areas`, along a slanting wall's outer line), each faded
+  in on the outlines that bound it, into a picture the settings'
+  `sources` name in `grounds`; the inside stays the night painting's,
+  under the morning's light, and a row's image that holds some of the
+  outside is named in `rows_morning` and has a morning image of its own.
+  Either way the export writes `ground-morning.webp` beside `ground.webp`,
+  and `morning-<scene>.png` among the check pictures, every row and thing
+  over it, to look at for a night piece left over the day, and the page
+  fades the morning in over the night at the dawn (D124).
 - **Outdoors, the margin is more of the same ground**, woods, rocks and
   fences no one could walk through, as the field's.
 - **A margin painted on later is joined, the painting kept.** For a

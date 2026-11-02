@@ -17,4 +17,9 @@ later, like the rest of it.
   and sheets, cut where Gemini painted them flat magenta in pictures of the
   dormitory (`game-dormitory-marked-*.md`, `game-dormitory-covers-*.md`); its
   walls by polygons, each edge on its outline.
+- Its morning painted whole by Gemini, given the night painting as it is
+  (`game-dormitory-day.md`): the same rooms a few hours later, the sky and
+  the outside by day, every torch, candle and the fireplace out; laid on the
+  painting by its outlines (`tools/art/repaint.py`), and every image of the
+  scene cut from it a second time with the same masks.
 - Its cells marked by hand and exported by `tools/art/export_scene.py`.

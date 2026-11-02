@@ -106,6 +106,11 @@ the whole painting. A scene painted at night has `morning` (D126): the model,
 given the whole painting as it is, paints it by morning, and `join` takes from
 it the sky, the windows and what lies beyond the castle's walls, faded in over a
 few pixels on the outlines that bound them, into the scene's morning picture.
+Where the model's picture fits the painting whole (`trace.py fit`), the section
+is `whole`: `join` lays the picture on the painting by the affine that lays its
+dark outlines best on the painting's, over the whole picture, since the light of
+another hour changes every tone, and takes it whole, the scene's picture at that
+hour (the settings' `sources` `hours`).
 """
 
 import json
@@ -261,8 +266,75 @@ def laid(crop: np.ndarray, kept: np.ndarray, picture: Image.Image) -> np.ndarray
     return whole.astype(np.float32)
 
 
+#: How much smaller a whole picture's outlines are compared while it is laid, and
+#: how far they are softened, in the painting's pixels, so that a step of a pixel
+#: tells.
+WHOLE_SMALL = 4
+WHOLE_SOFT = 3
+
+
+def laid_whole(painting: np.ndarray, picture: Image.Image, th: dict) -> np.ndarray:
+    """A model's picture of the whole scene at another hour laid on the painting:
+    the affine, a scale and a shift each way, whose dark outlines, softened, differ
+    least from the painting's, searched from no change at all."""
+    height, width = painting.shape[:2]
+    if picture.size != (width, height):
+        picture = picture.resize((width, height), Image.LANCZOS)
+    size = (width // WHOLE_SMALL, height // WHOLE_SMALL)
+
+    def softened(lines: np.ndarray) -> Image.Image:
+        image = Image.fromarray(lines.astype(np.uint8) * 255)
+        return image.filter(ImageFilter.GaussianBlur(WHOLE_SOFT))
+
+    target = np.array(softened(image_first.dark_lines(painting, th)).resize(size)).astype(
+        np.float32
+    )
+    theirs = softened(image_first.dark_lines(np.array(picture), th))
+
+    def score(a: float, b: float, tx: float, ty: float) -> float:
+        seen = theirs.transform(
+            size,
+            Image.AFFINE,
+            (a, 0, tx, 0, b, ty),
+            Image.BILINEAR,
+        )
+        # The transform maps the small picture's pixels to the whole one's.
+        return float(np.abs(np.array(seen).astype(np.float32) - target).mean())
+
+    small = WHOLE_SMALL
+    p = [float(small), float(small), 0.0, 0.0]
+    value = score(*p)
+    for da, dt in ((0.004, 4.0), (0.001, 1.0), (0.0003, 0.3)):
+        better = True
+        while better:
+            better = False
+            for index, step in ((0, da), (1, da), (2, dt), (3, dt)):
+                for sign in (-1, 1):
+                    tried = list(p)
+                    tried[index] += sign * step
+                    found = score(*tried)
+                    if found < value - 1e-5:
+                        value, p, better = found, tried, True
+    a, b, tx, ty = p[0] / small, p[1] / small, p[2], p[3]
+    print(
+        f"laid whole: scale {a:.5f} x {b:.5f}, shift {tx:+.2f}, {ty:+.2f} pixels,"
+        f" a mean difference of {value:.2f} between the softened outlines"
+    )
+    return np.array(
+        picture.transform((width, height), Image.AFFINE, (a, 0, tx, 0, b, ty), Image.BICUBIC)
+    )
+
+
 def join(scene: str, picture_path: Path, section: str = "repaint") -> Path:
     repaint = settings_of(scene, section)
+    if repaint.get("whole"):
+        # The scene at another hour, whole (D126): laid by its outlines, taken whole.
+        settings = scene_settings.settings(scene)
+        painting = np.array(Image.open(REPO / repaint["from"]).convert("RGB"))
+        picture = Image.open(picture_path).convert("RGB")
+        target = REPO / repaint["painting"]
+        Image.fromarray(laid_whole(painting, picture, settings.thresholds)).save(target)
+        return target
     painting = grown(repaint).astype(np.float32)
     part = painted_part(painting.shape[:2], repaint)
     x0, y0, x1, y1 = repaint["crop"]

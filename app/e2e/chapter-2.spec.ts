@@ -112,7 +112,7 @@ test.describe('in the dormitory (D84)', () => {
     await open(page, 'your-bed');
     const scene = page.locator('#scene');
     await expect(scene).toHaveAttribute('data-light', 'none');
-    // The night painting, its morning ground unseen until the dawn (D126).
+    // The night painting, its picture by morning unseen until the dawn (D126).
     await expect(scene).toHaveAttribute('data-ground', 'painting');
     // Every light the scene goes through, as it goes (data-light).
     await scene.evaluate((node) => {
@@ -133,9 +133,10 @@ test.describe('in the dormitory (D84)', () => {
     await expect(scene).toHaveAttribute('data-thought', 'z z z');
     await expect(scene).toHaveAttribute('data-ground', 'painting');
     await page.screenshot({ path: `${SHOTS}night.png` });
-    // At the dawn the windows and the outside turn to day as the light warms.
+    // At the dawn the whole scene turns to day as the night lifts, its torches,
+    // candles and fire out, and no light is laid over the morning (D126).
     await expect(scene).toHaveAttribute('data-ground', 'morning', { timeout: 15_000 });
-    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s24-morning-after-dawn.png` });
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-morning-after-dawn.png` });
     await expect(scene).toHaveAttribute('data-light', 'morning', { timeout: 15_000 });
     await expect(page.locator('.win-card')).toBeVisible({ timeout: 15_000 });
     await expect(scene).not.toHaveAttribute('data-thought', 'z z z');
@@ -196,14 +197,14 @@ test.describe('in the dormitory (D84)', () => {
     await seedWizard(page, PABLO);
     await page.goto('/#story/the-morning');
     const scene = page.locator('#scene');
-    // Told in the morning on the night painting, under the morning's light (D124),
-    // its sky, its windows and its outside by day from the first step (D126).
+    // Told in the morning (D124) on the scene's picture by morning, whole, from the
+    // first step (D126).
     await expect(scene).toHaveAttribute('data-light', 'morning');
     await expect(scene).toHaveAttribute('data-ground', 'morning');
     await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
     await expect(scene).toHaveAttribute('data-asleep', 'mate:bed_1:lying');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-mate.png` });
-    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s24-morning-story.png` });
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-morning-story.png` });
     await storyNext(page);
     await expect(scene).not.toHaveAttribute('data-asleep', /mate/);
     await expect(scene).toHaveAttribute('data-actors', /mate:16,5/);

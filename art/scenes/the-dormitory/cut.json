@@ -6,7 +6,7 @@
     "painting": "dormitory-walls.png",
     "grid": "grid.json",
     "ground": "dormitory-walls.png",
-    "grounds": {
+    "hours": {
       "morning": "dormitory-morning.png"
     }
   },
@@ -30,88 +30,10 @@
     "canvas": "art/raw/game-dormitory/dormitory-repaint-canvas.png",
     "painting": "art/raw/game-dormitory/dormitory-mended.png"
   },
-  "morning": {
-    "about": "The dormitory by morning (D126): Gemini 3 Pro Image painted the whole night painting again by morning from tools/art/prompts/game-dormitory-morning.md (game-dormitory-morning, the first of its tries), and tools/art/repaint.py join takes from it only what lies outside: the sky above the walls (the box across the top), each window with its panes (the three boxes, the neighbouring dormitory's, the left one's and the right one's), and everything beyond the castle's right wall, the tower, the battlements, their walk and the grass (the polygon along that wall's outer line), each faded in over `fade` pixels; the inside is the night painting's, pixel for pixel. The scene's morning ground (`grounds`).",
+  "day": {
+    "about": "The dormitory by morning, whole (D126): Gemini 3 Pro Image, given the whole night painting as it is, painted it again a few hours later from tools/art/prompts/game-dormitory-day.md (game-dormitory-day, its first try), the same things in the same places, the morning sky above the walls and in every window, the outside by day, the rooms lit by day and every torch, candle and the fireplace out. tools/art/trace.py fit laid it on the painting box by box: every static thing's and door's box within three pixels (one to three right, none down), the share of the night's dark outlines it covers 0.56 to 0.78, below the plan's 0.85 because the night's outlines are thickened by its shadows and the neighbouring dormitory is nearly black, and 0.845 to 0.96 with a pixel's tolerance but for the front wall (0.69, that dormitory's dark in its box); the owner chose the whole picture on 2026-11-01. tools/art/repaint.py join lays it whole by its outlines (`whole`) into the scene's picture by morning (`sources` `hours`), which every image of the scene is cut from a second time.",
     "from": "art/raw/game-dormitory/dormitory-walls.png",
-    "boxes": [
-      [
-        0,
-        0,
-        4800,
-        382
-      ],
-      [
-        88,
-        495,
-        440,
-        808
-      ],
-      [
-        1090,
-        495,
-        1455,
-        808
-      ],
-      [
-        3190,
-        495,
-        3605,
-        808
-      ]
-    ],
-    "areas": [
-      [
-        [
-          4800,
-          380
-        ],
-        [
-          4800,
-          3584
-        ],
-        [
-          4305,
-          3584
-        ],
-        [
-          4283,
-          3400
-        ],
-        [
-          4260,
-          3200
-        ],
-        [
-          4211,
-          2800
-        ],
-        [
-          4166,
-          2400
-        ],
-        [
-          4095,
-          1800
-        ],
-        [
-          4044,
-          1400
-        ],
-        [
-          3994,
-          1000
-        ],
-        [
-          3917,
-          400
-        ],
-        [
-          3915,
-          380
-        ]
-      ]
-    ],
-    "fade": 4,
+    "whole": true,
     "painting": "art/raw/game-dormitory/dormitory-morning.png"
   },
   "corner": {
@@ -1484,7 +1406,7 @@
   },
   "cuts": [],
   "castle": 0,
-  "source": "# The dormitory\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-dormitory-3.md`, with the field as its\n  style's reference; its border and the wands on its trunks edited by it\n  (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).\n- Its corridor's right end mended by Gemini, joined by `tools/art/repaint.py`,\n  the painting kept pixel for pixel elsewhere: the castle's wall closing the\n  corridor off from the battlements, going on from the rooms' front wall\n  (`game-dormitory-corner-2.md`).\n- Its door to the corridor opened without a model (`repaint.py doorways`),\n  its leaf painted with the common room's own floor.\n- Its beds, trunks, bedside tables, armchairs and table, and the beds' quilts\n  and sheets, cut where Gemini painted them flat magenta in pictures of the\n  dormitory (`game-dormitory-marked-*.md`, `game-dormitory-covers-*.md`); its\n  walls by polygons, each edge on its outline.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
+  "source": "# The dormitory\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-dormitory-3.md`, with the field as its\n  style's reference; its border and the wands on its trunks edited by it\n  (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).\n- Its corridor's right end mended by Gemini, joined by `tools/art/repaint.py`,\n  the painting kept pixel for pixel elsewhere: the castle's wall closing the\n  corridor off from the battlements, going on from the rooms' front wall\n  (`game-dormitory-corner-2.md`).\n- Its door to the corridor opened without a model (`repaint.py doorways`),\n  its leaf painted with the common room's own floor.\n- Its beds, trunks, bedside tables, armchairs and table, and the beds' quilts\n  and sheets, cut where Gemini painted them flat magenta in pictures of the\n  dormitory (`game-dormitory-marked-*.md`, `game-dormitory-covers-*.md`); its\n  walls by polygons, each edge on its outline.\n- Its morning painted whole by Gemini, given the night painting as it is\n  (`game-dormitory-day.md`): the same rooms a few hours later, the sky and\n  the outside by day, every torch, candle and the fireplace out; laid on the\n  painting by its outlines (`tools/art/repaint.py`), and every image of the\n  scene cut from it a second time with the same masks.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
   "cut": false,
   "beds": {
     "bed_1": {
@@ -1775,9 +1697,6 @@
       ],
       "by": -0.2
     }
-  ],
-  "rows_morning": [
-    15
   ],
   "kept": [
     [

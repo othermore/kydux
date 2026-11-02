@@ -960,6 +960,46 @@ def test_a_doorway_s_footprint_is_every_pixel_its_fill_changed_grown(tmp_path):
     assert np.allclose((xs.min(), xs.max(), ys.min(), ys.max()), (0.135, 0.765, 0.235, 0.665))
 
 
+def test_a_picture_at_another_hour_is_measured_box_by_box_on_the_painting(tmp_path):
+    import trace
+
+    painting = np.full((120, 160, 3), 200, dtype=np.uint8)
+    painting[30:32, 20:60] = 0
+    painting[30:70, 20:22] = 0
+    painting[40:42, 100:140] = 0
+    Image.fromarray(painting).save(tmp_path / "painting.png")
+    # The picture by day: lighter, its first thing in place, its second two pixels
+    # right and five down.
+    day = np.full((120, 160, 3), 240, dtype=np.uint8)
+    day[30:32, 20:60] = 10
+    day[30:70, 20:22] = 10
+    day[45:47, 102:142] = 10
+    Image.fromarray(day).save(tmp_path / "day.png")
+    grid = {"x": {"offset": 0, "spacing": 40}, "y": {"offset": 0, "spacing": 40}}
+    (tmp_path / "grid.json").write_text(json.dumps(grid))
+    data = {
+        "sources": {
+            "folder": str(tmp_path),
+            "edits": str(tmp_path),
+            "painting": "painting.png",
+            "grid": "grid.json",
+            "ground": "painting.png",
+        },
+        "things": {
+            "wall": {"box": [0.3, 0.5, 1.8, 2.0], "static": True},
+            "door": {"box": [2.3, 0.6, 3.7, 1.6], "states": {"closed": "painting"}},
+            "key": {"box": [0.3, 2.3, 0.7, 2.7], "states": {"lying": "painting"}},
+        },
+    }
+    scene = scene_settings.Settings("hour", data)
+    rows = {row["thing"]: row for row in trace.fit(scene, tmp_path / "day.png")}
+    assert set(rows) == {"wall", "door"}
+    assert (
+        rows["wall"]["shift"] == [0, 0] and rows["wall"]["share"] == 1.0 and rows["wall"]["fits"]
+    )
+    assert rows["door"]["shift"] == [2, 5] and not rows["door"]["fits"]
+
+
 def test_a_hole_covers_the_soft_edge_of_the_leaf_it_is_traced_from():
     grid = {"x": {"offset": 0, "spacing": 100}, "y": {"offset": 0, "spacing": 100}}
     leaf = [[0.305, 0.205], [0.605, 0.205], [0.605, 0.705], [0.305, 0.705]]

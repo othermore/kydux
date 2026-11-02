@@ -9,8 +9,8 @@ Prints, for each cell where something is drawn in front of the wizard, how much
 of the wizard it covers, how much of its head, and which images; writes a sheet
 of those cells, each with the wizard on it, to art/raw/game-check/sweep-<scene>.png,
 and the whole scene with the wizard on every cell walked on at once, each cell
-numbered, those no one walks on crossed out and those where the wizard is wholly
-hidden framed, to all-<scene>.png; and prints the problems found, failing when
+numbered, the number yellow where the wizard is wholly hidden, to
+all-<scene>.png; and prints the problems found, failing when
 there are any. The page draws a
 row's image at the row's depth, R + 0.75, a figure on row r at r + FOOT_IN_CELL,
 and a thing among the rows by its own row (painted.ts).
@@ -441,9 +441,8 @@ def sheet(scene: Scene, found: list[Covered], flagged: set[tuple[int, int]]) -> 
 
 def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
     """The scene as the page draws it with the wizard standing on every cell walked
-    on, each drawn by its feet among the rows; over it every cell's edges and its
-    column and row, a red cross on each cell no one walks on, and a yellow frame
-    round each cell where the wizard is wholly hidden."""
+    on, each drawn by its feet among the rows; over it every cell's faint edges and
+    its column and row, in yellow where the wizard is wholly hidden."""
     cell = scene.cell
     width, height = scene.columns * cell, scene.rows * cell
     out = Image.fromarray(scene.ground).convert("RGBA")
@@ -462,33 +461,26 @@ def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
             left = int((x + 0.5) * cell) - wide // 2
             top = int((y + FOOT_IN_CELL) * cell) + foot - tall
             out.paste(wizard, (left, top), wizard)
-    marks = Image.new("RGBA", out.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(marks)
+    lines = Image.new("RGBA", out.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(lines)
     for y in range(scene.rows):
         for x in range(scene.columns):
-            x0, y0, x1, y1 = x * cell, y * cell, (x + 1) * cell - 1, (y + 1) * cell - 1
-            if not scene.walked[y, x]:
-                draw.rectangle((x0, y0, x1, y1), fill=(255, 40, 40, 60))
-                draw.line((x0 + 10, y0 + 10, x1 - 10, y1 - 10), fill=(255, 40, 40, 190), width=3)
-                draw.line((x1 - 10, y0 + 10, x0 + 10, y1 - 10), fill=(255, 40, 40, 190), width=3)
-            draw.rectangle((x0, y0, x1, y1), outline=(255, 255, 255, 110), width=1)
-    for x, y in hidden:
-        draw.rectangle(
-            (x * cell + 3, y * cell + 3, (x + 1) * cell - 4, (y + 1) * cell - 4),
-            outline=(255, 225, 0, 255),
-            width=6,
-        )
-    out.alpha_composite(marks)
+            draw.rectangle(
+                (x * cell, y * cell, (x + 1) * cell - 1, (y + 1) * cell - 1),
+                outline=(255, 255, 255, 70),
+                width=1,
+            )
+    out.alpha_composite(lines)
     words = ImageDraw.Draw(out)
-    font = ImageFont.load_default(size=cell // 5)
+    font = ImageFont.load_default(size=cell // 6)
     for y in range(scene.rows):
         for x in range(scene.columns):
             words.text(
-                (x * cell + 4, y * cell + 2),
+                (x * cell + 2, y * cell + 1),
                 f"{x},{y}",
                 font=font,
-                fill=(255, 243, 107),
-                stroke_width=3,
+                fill=(255, 225, 0) if (x, y) in hidden else (255, 255, 255),
+                stroke_width=2,
                 stroke_fill=(0, 0, 0),
             )
     return out

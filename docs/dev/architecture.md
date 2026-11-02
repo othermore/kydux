@@ -1941,8 +1941,23 @@ one overturns stays, marked as superseded.
 - **D132 — Every figure's steps are heard: the wizard's soft and its
   own, the others' alike.** Decided 2026-11-01 by the owner. A walk of
   any figure, the wizard's, a friend's, a teacher's, in a level or a
-  story, plays a step sound a cell; the wizard's step is quieter and of
-  its own timbre, and every other figure's steps share a second timbre,
-  so that the child tells whose steps they hear (`sfx.ts`). Rules out
-  steps heard for the wizard alone, and the wizard's steps louder than
-  the scene.
+  story, plays a step a cell: a short tap of filtered noise, never a
+  tone, quiet; the wizard's its own, the children's (the friends, Eldra)
+  alike, the grown-ups' (the teachers, Baro) lower and a little longer,
+  so that the child tells whose steps they hear (`sfx.ts`); every other
+  step a little lower, so that a walk does not tick like a clock. Rules
+  out steps heard for the wizard alone, steps that sound like a drum, and
+  the wizard's steps louder than the scene.
+- **D133 — A sum or a subtraction with a name is taught where a level
+  needs the rest of a walk, and a level never asks for a number below
+  zero.** Decided 2026-11-01 by the owner. After the variable (D86), a
+  lesson teaches that `5 - steps` and `steps + 2` are numbers made from
+  a name, kept under a name of their own or written straight into a
+  method's brackets, and `print` shows them. The level that needs it
+  walks to a key that lies two to five cells away and then the rest of
+  the five cells to the door: `rest = 5 - steps`, never below zero, since
+  a move of a number below zero is for a later chapter. A level that can
+  be won by a longer way gives its bonus to the shorter one: the bonus
+  counts the run's ticks (`ticks_under`). Rules out a key farther than
+  the door, a subtraction that goes below zero, and a bonus the long way
+  earns.

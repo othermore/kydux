@@ -40,7 +40,10 @@ onto the painting's (moved_locally). A part may be asked several times, its
 `picture` a list: it is magenta where more than half the tries are. The scene's
 settings' `marks` give the pictures, each with its crop, and where the painting
 goes; things that lie on other things, a bed's covers on the bed, are marked in
-a set of their own, each set a painting (`sets`), the first the sweep's.
+a set of their own, each set a painting (`sets`), the first the sweep's. A
+marked picture that `doorways` lays its fills into (`also`) has its untouched
+copy written too, the same picture, so that `doorways` run after it lays the
+fills on the new one.
 
 A section that takes a door out of a doorway (`opened`) has the dark of the
 doorway the door hid made magenta in each of its `also` pictures, flooded from
@@ -53,7 +56,8 @@ across it. A model given such a strip blurred painted the chain again.
 
 `doorways` opens each door of the scene's settings' `doorways` without a model
 (D108): the door's leaf is found in the painting from bands of seeds across it
-(`seeds`, each x0, x1 and y in cells), flooded up to the black line that bounds
+(`seeds`, each x0, x1 and y in cells), within the box it is looked for in
+(`leaf_box`, in cells; the thing's box by default), flooded up to the black line that bounds
 it, its planks' lighter lines crossed, and filled row by row; and the whole
 leaf, from the arch down to its foot and from one jamb to the other, is painted
 with the floor of the room beyond (`floor`, a box in cells of the painting
@@ -393,7 +397,22 @@ def marks(scene: str) -> list[Path]:
         target = REPO / found["painting"]
         Image.fromarray(out).save(target)
         written.append(target)
+        # A marked picture the doorways are laid into starts again untouched: its copy
+        # is the new picture, which `doorways` lays the fills on.
+        if target in also_pictures(settings):
+            shutil.copyfile(target, untouched_copy(target))
+            written.append(untouched_copy(target))
     return written
+
+
+def also_pictures(settings: scene_settings.Settings) -> set[Path]:
+    """The scene's pictures that show its doorways shut, which `doorways` lays the
+    fills into (`also`)."""
+    return {
+        REPO / also
+        for door in settings.data.get("doorways", {}).get("doors", [])
+        for also in door.get("also", [])
+    }
 
 
 #: How dark, in the painting's value from 0 to 1, a line is that bounds a door's
@@ -477,9 +496,9 @@ def doorways(scene: str) -> list[Path]:
     # once and then with every door's fill, and written when all are laid.
     shut_pictures: dict[Path, np.ndarray] = {}
     for door in settings.data["doorways"]["doors"]:
-        # The leaf is looked for in its own box: the thing's may reach on to where
-        # the leaf swings to.
-        x0, y0, x1, y1 = door.get("leaf", settings.things[door["thing"]]["box"])
+        # The leaf is looked for in its own box (`leaf_box`): the thing's may reach on
+        # to where the leaf swings to.
+        x0, y0, x1, y1 = door.get("leaf_box", settings.things[door["thing"]]["box"])
         box = (px(x0), py(y0), px(x1), py(y1))
         crop = painting[box[1] : box[3], box[0] : box[2]]
         bands = [
@@ -602,11 +621,15 @@ def doorways(scene: str) -> list[Path]:
     return written
 
 
+def untouched_copy(path: Path) -> Path:
+    """Where a picture's untouched copy is kept: beside it, `<stem>-untouched.<suffix>`."""
+    return path.with_name(f"{path.stem}-untouched{path.suffix}")
+
+
 def untouched(path: Path) -> Path:
-    """A picture's untouched copy, beside it as `<stem>-untouched.<suffix>`: the
-    picture before any doorway was laid into it, made from it when no copy exists,
-    and what every run lays the doorways on."""
-    copy = path.with_name(f"{path.stem}-untouched{path.suffix}")
+    """A picture's untouched copy: the picture before any doorway was laid into it,
+    made from it when no copy exists, and what every run lays the doorways on."""
+    copy = untouched_copy(path)
     if not copy.exists():
         shutil.copyfile(path, copy)
     return copy

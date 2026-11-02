@@ -837,7 +837,7 @@ def door_scene(tmp_path: Path, painting: np.ndarray, leaf_foot: float):
         "floor": [0.0, 0.0, 0.4, 0.18],
         "painting": "doorway.png",
         "sill": 0.3,
-        "leaf": [0.4, 0.1, 1.6, leaf_foot],
+        "leaf_box": [0.4, 0.1, 1.6, leaf_foot],
         "also": [str(tmp_path / "marked.png")],
     }
     data = {
@@ -1251,3 +1251,62 @@ def test_the_figures_that_float_are_listed_for_the_page():
     assert json.loads((FIGURES / "figures.json").read_text())["floating"] == sorted(
         figures.FLOATING
     )
+
+
+def test_the_sweep_judges_an_open_leaf_on_its_own_picture():
+    # The ground the scene was cut from has no leaf where the leaf is swung (D111):
+    # its edge and its hinge's plate have their outlines on its own picture only.
+    painting = np.full((288, 288, 3), (150, 200, 70), dtype=np.uint8)
+    leaf = np.zeros((288, 288, 4), dtype=np.uint8)
+    leaf[100:190, 20:90] = (20, 15, 10, 255)  # its outline
+    leaf[106:184, 26:84] = (130, 80, 40, 255)  # its wood
+    leaf[130:142, 20:40] = (20, 15, 10, 255)  # a hinge's plate on its edge
+    walked = np.zeros((3, 3), dtype=bool)
+    walked[1, 0] = True
+    shut = sweep.Layer("door", 2.75, None, leaf, 0, 0)
+    scene, seen = swept(painting, walked, [shut])
+    assert ("fringe", (0, 1)) in {(p.kind, p.cell) for p in sweep.edges(scene, seen)}
+    swung = sweep.Layer("door", 2.75, None, leaf, 0, 0, swung=True)
+    scene, seen = swept(painting, walked, [swung])
+    assert not sweep.edges(scene, seen)
+
+
+def test_marks_writes_the_untouched_copy_of_a_picture_the_doorways_are_laid_into(
+    tmp_path, monkeypatch
+):
+    import repaint
+
+    painting = np.full((40, 40, 3), 120, dtype=np.uint8)
+    Image.fromarray(painting).save(tmp_path / "painting.png")
+    edit = painting.copy()
+    edit[10:20, 10:20] = (255, 0, 255)  # Gemini's magenta on a thing
+    Image.fromarray(edit).save(tmp_path / "edit.png")
+    grid = {"x": {"offset": 0, "spacing": 20}, "y": {"offset": 0, "spacing": 20}}
+    (tmp_path / "grid.json").write_text(json.dumps(grid))
+    marked = tmp_path / "marked.png"
+    # A copy kept from before, which the doorways would otherwise be laid on.
+    Image.fromarray(np.zeros_like(painting)).save(repaint.untouched_copy(marked))
+    data = {
+        "sources": {
+            "folder": str(tmp_path),
+            "edits": str(tmp_path),
+            "painting": "painting.png",
+            "grid": "grid.json",
+            "ground": "painting.png",
+        },
+        "marks": {
+            "painting": str(marked),
+            "pictures": [{"picture": "edit.png", "crop": [0, 0, 40, 40]}],
+        },
+        "doorways": {"doors": [{"thing": "door", "also": [str(marked)]}]},
+    }
+    scene = scene_settings.Settings("marked", data)
+    monkeypatch.setattr(repaint.scene_settings, "settings", lambda _: scene)
+    # Gemini's picture laid as it is, with no search.
+    monkeypatch.setattr(
+        repaint, "laid", lambda crop, kept, picture: np.array(picture).astype(np.float32)
+    )
+    monkeypatch.setattr(repaint, "moved_locally", lambda shown, crop: shown)
+    repaint.marks("marked")
+    assert (np.array(Image.open(marked).convert("RGB"))[15, 15] == (255, 0, 255)).all()
+    assert repaint.untouched_copy(marked).read_bytes() == marked.read_bytes()

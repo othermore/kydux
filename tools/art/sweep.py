@@ -27,7 +27,8 @@ The problems, each on a cell walked on:
   wizard seen through them.
 - fringe and bare: a cut-out's edge off its thing's outline (D93), the ground
   beyond the outline drawn over the wizard, or the outline left on the ground
-  under it.
+  under it; a door's leaf swung open (D111) is judged on its own picture
+  composed on the ground, whose outlines are the leaf's.
 - spill: one thing drawn partly in front of the wizard and partly behind it, cut
   across a row's edge with no outline between its parts (D94).
 
@@ -90,6 +91,9 @@ class Layer:
     #: every figure, a wall seen from above (D95).
     under: bool = False
     over: bool = False
+    #: A door drawn open, its leaf swung against the wall beside its doorway (D111):
+    #: its edge is judged on its own picture composed on the ground.
+    swung: bool = False
 
 
 @dataclass
@@ -239,6 +243,7 @@ def load(scene: str) -> Scene:
                 thing["top"],
                 open_work=not solid.get(name, True),
                 under=under,
+                swung=state == "open",
             )
         )
     found.layers.sort(key=lambda layer: layer.depth)
@@ -599,15 +604,24 @@ def edges(scene: Scene, seen: Differs) -> list[Problem]:
         y0, y1 = max(0, ys.min() - 2 * band), min(height, ys.max() + 1 + 2 * band)
         x0, x1 = max(0, xs.min() - 2 * band), min(width, xs.max() + 1 + 2 * band)
         piece, lines = solid[y0:y1, x0:x1], dark[y0:y1, x0:x1]
+        alike = same[y0:y1, x0:x1]
+        if layer.swung:
+            # A leaf swung open lies over the wall and the doorway beside it (D111):
+            # its outlines, its hinges' too, are on its own picture composed on the
+            # ground, not on the ground the scene was cut from, which has no leaf.
+            shown = window(layer, x0, y0, x1, y1)
+            alpha = shown[..., 3:] / 255
+            composed = seen.painting[y0:y1, x0:x1] * (1 - alpha) + shown[..., :3] * alpha
+            composed = composed.astype(np.uint8)
+            lines = lines | image_first.dark_lines(composed, scene.thresholds)
+            alike = image_first.like(composed, seen.ground[y0:y1, x0:x1])
         # The scene's own edge lets no ground in: a crown it cuts has its outline
         # beyond it, in the margin.
         others = (count[y0:y1, x0:x1] - piece) > 0
         outside = image_first.outside_of(piece, lines, band, border=False)
         # What another image draws beside the edge is no ground let in: a wall and
         # the door cut out of it meet with no outline between them.
-        given = image_first.outside_of(
-            piece, lines, band, same[y0:y1, x0:x1] & ~others, border=False
-        )
+        given = image_first.outside_of(piece, lines, band, alike & ~others, border=False)
         behind = (
             behind_cells(scene, reach_of(scene, layer), (x0, y0, x1, y1)) & inner[y0:y1, x0:x1]
         )

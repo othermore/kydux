@@ -238,6 +238,7 @@ row its foot stands on.
   line, is the floor of the room beyond, taken from the painting itself
   where that floor is plain, darker under the arch and as lit as the room
   at the threshold, laid in by `tools/art/repaint.py doorways` (D108),
+  the leaf found from seeds across it within its own box (`leaf_box`),
   from one jamb to the other and down to its foot, so that no board of the
   leaf is left there: the floor's own dark line under a threshold, or the
   closed leaf's own bottom outline, gone through to its lower edge. At
@@ -256,6 +257,9 @@ row its foot stands on.
   finds no difference there, each from its untouched copy beside it
   (`<stem>-untouched.<suffix>`), made from the picture on the first run
   that finds none: a doorway laid again leaves nothing of the one before.
+  `repaint.py marks`, writing a marked picture the doorways are laid
+  into, writes its untouched copy too, so that the doorways laid after it
+  go on the new one.
   Its leaf, so that the door is seen open and the doorway is not taken for
   the floor, is swung out against the wall beside the arch: a model's
   picture, painted on the guide the tool draws (`guide`, the shut leaf
@@ -269,8 +273,10 @@ row its foot stands on.
   free edge and both bottom corners whole, and no stone the model painted
   again beside the hinges. It is drawn at the painting's size with its
   edge soft over one pixel, and nothing of it is snapped, flooded or kept
-  by size. The closed state is the painting within the doorway's polygon
-  (`doorway`: the open doorway's fill and its threshold, every pixel
+  by size; the sweep judges its edge on its own picture composed on the
+  ground, its hinges' outlines there, not on the ground the scene was cut
+  from, which has no leaf. The closed state is the painting within the
+  doorway's polygon (`doorway`: the open doorway's fill and its threshold, every pixel
   where the doorway picture differs from the painting, grown over the
   arch's inner line by the width of the painting's outlines, about seven
   pixels), so that the wall keeps its line round the door's cut-out, no

@@ -1558,7 +1558,7 @@
         ],
         "sill": 0.1,
         "painting": "dormitory-door-open.png",
-        "leaf": [
+        "leaf_box": [
           11.3,
           12.4,
           13.4,

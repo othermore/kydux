@@ -47,14 +47,17 @@ acceptance test, section 6 the hand-over, section 7 the prompt.
   map scrolls to that item and marks it; opened from the start screen, it
   scrolls to the item last opened and marks it the same way. A story
   opened counts as the item last opened, as a lesson and a level do.
-- **D123 — What the wizard carries is found, and is seen when given.**
-  Decided 2026-10-29 by the designer, for the practice of giving. A level
-  may start with a thing in the wizard's hands that has a picture
-  (`carrying` names the kind, or the kind with its `art`), and
-  `find_nearest` finds a carried thing first, at no distance: a name kept
-  in one program is gone in the next, so the next program asks again,
-  and what is held is the nearest of all. Given, the thing is seen to go
-  from the wizard's hands to whoever takes it.
+- **D123 — What the wizard carries is asked for with `find_item`, and is
+  seen when given.** Decided 2026-10-29 by the owner. A level may start
+  with a thing in the wizard's hands that has a picture (`carrying`
+  names the kind, or the kind with its `art`). `wizard.find_item("book")`
+  gives the thing of that kind the wizard carries, or `None`, as
+  `find_nearest` gives the nearest one on the map: a name kept in one
+  program is gone in the next, each level being a new program (D75), so
+  the next program asks for the thing again. Given, the thing is seen to
+  go from the wizard's hands to whoever takes it. Rules out a name put
+  into the child's program unseen, `find_nearest` looking into the
+  wizard's hands, and lists with their brackets before chapter 4.
 
 Course rules the owner gave, written into `docs/dev/course.md` ("How a
 level earns its idea"): a lesson teaches one idea, and its practice needs
@@ -72,7 +75,7 @@ a reason to be there that the story says.
 | Eldra floats stock still. | Her sheet's step frames have the dress grown 3 and 5 pixels, and the page shows the standing frame while a figure stands. | 22.2 (D120). |
 | In *The moving key* the key moves after the scene has faded back in. | `controller.run` fades out, puts back and fades in (`startAgain`) in parallel with Python; the way is known only after, and `scene.load(world, way)` moves the key then. | 22.1 (D121). |
 | The map does not scroll to where the child is when opened from the start screen, a lesson or a story. | `mapScreen` scrolls to `here` only, and `here` is given only from a level's overlay; a story never sets `progress.current`. | 22.1 (D122). |
-| *The lost book* is too hard: the child must find, keep, reveal, walk, pick up and give in one go, with one comment. | Lesson 3 teaches `find_nearest`, `reveal` and `give` together; the practice needs all three and its starting code guides nothing. | 22.3: lesson 3 teaches finding and revealing; a new lesson 4 teaches giving; a practice each, with guiding comments. |
+| *The lost book* is too hard: the child must find, keep, reveal, walk, pick up and give in one go, with one comment. | Lesson 3 teaches `find_nearest`, `reveal` and `give` together; the practice needs all three and its starting code guides nothing. | 22.3: lesson 3 teaches finding and revealing; a new lesson 4 teaches `find_item` and giving; a practice each, with guiding comments. |
 | *The hidden key* gives no guidance; its key and the book are hidden in the same aisle. | One comment; the book was at 5,13 and the key is at 3,14. | 22.3: guiding comments; the book lies by the pile of books at 1,13, seen but half covered. |
 | *Eldra's book* repeats *The high shelf*. | Two practices of `fendra` with the same shape. | 22.3: one practice: the book on the high shelf is Eldra's other lost book, found, drawn down and given; *Eldra's book* goes. |
 | The friend has no reason to be at the wand bank: she already had two wands. | The story says she came for her school wand. | 22.3: she comes out from behind the shelves, looking for a book, having heard the wizard's voice; the wizard introduces the mate. |
@@ -156,25 +159,32 @@ mentions in the tests (`app/e2e/levels.spec.ts`, `chapter-2.spec.ts`,
 
 **The world (D123).** `world/kydux_world/level.py`: an entry of
 `carrying` is a kind, as now, or an object `{"kind": ..., "art": ...}`;
-the thing's id is the kind's name, as now. `world.py` `_nearby`: a thing
-carried by the wizard is found at distance 0 (the wizard's position),
-before anything on the map. `wizard_words`, `api.py`'s docstring of
-`find_nearest` ("the nearest thing of a kind, what you carry first"). A
-test: a level carrying a book from the start, `find_nearest("book")`
-gives it, and `give` hands it over. The page (`scene.ts`, `painted.ts`):
-a carried thing with `art` has its image loaded and hidden, and `give`
-shows it going from the wizard's hands to the actor as it does for a
-thing picked up.
+the thing's id is the kind's name, as now. `world.py`: a new method
+`wizard.find_item(kind)`, the thing of that kind the wizard carries, or
+`None` ("the thing you carry of a kind: `wizard.find_item("book")`"),
+beside `find_nearest`, which stays as it is; in `api.py`, in the API
+check of `api` lists, in the notebook's descriptions (`i18n`, both
+languages, the same key shape as `wizard.find_nearest`), in
+`wizard_words` and in D27's vocabulary where the methods are listed. A
+test: a level carrying a book from the start, `find_item("book")` gives
+it, `find_nearest("book")` does not, and `give` hands it over. The page
+(`scene.ts`, `painted.ts`): a carried thing with `art` has its image
+loaded and hidden, and `give` shows it going from the wizard's hands to
+the actor as it does for a thing picked up. `wizard.find_item` is in
+the `api` of `the-book-returned` and of every level of the chapter after
+it.
 
 **`lesson:finding-things`** (Lesson 3, Wenna, teaches
 `wizard.find_nearest`, `thing.reveal`): as now without its last section
 on `give`; its *Try it* finds and reveals the book. **`lesson:giving-
-things`** (Lesson 4, Wenna, teaches `wizard.give`), new: a thing kept
-under a name is given to whoever stands beside the wizard with
-`wizard.give(book)`; a name lives only in its program, every run starts
-again (D75), so the next program asks for the thing again with
-`find_nearest`, which finds what the wizard holds first of all; one
-*Try it*: `book = wizard.find_nearest("book")` then `wizard.give(book)`.
+things`** (Lesson 4, Wenna, teaches `wizard.find_item`, `wizard.give`),
+new: each level is a new program, so a name kept in the last one is
+gone (D75) and the thing in the wizard's hands is asked for again:
+`book = wizard.find_item("book")` gives what the wizard carries of a
+kind, as `find_nearest` gives what lies nearest on the map; then a thing
+kept under a name is given to whoever stands beside the wizard with
+`wizard.give(book)`; one *Try it*: `book = wizard.find_item("book")`
+then `wizard.give(book)`.
 Both drafted by Gemini from one brief (`tools/write/briefs/
 chapter-2-finding-and-giving.md`), with the rules of `rules.md` and the
 owner's writing rules (natural prose, one idea once, no re-explaining).
@@ -202,11 +212,12 @@ where to go.
 `carrying` `["wand", {"kind": "book", "art": "old_book"}]`, Wenna at
 2,15 and the mate at 3,15 (on the free cells of row 15, checked whole on
 the sweep), Eldra at 11,10 facing down; goals: `give book to eldra`;
-bonus `lines_under 5`. Solution: `book = wizard.find_nearest("book")`,
+bonus `lines_under 5`. Solution: `book = wizard.find_item("book")`,
 `wizard.move_right(9)`, `wizard.move_up(2)`, `wizard.give(book)`. The
-starting code: comments, one a step: ask for the book again with
-`find_nearest`, it is in your hands; walk right along the bookcases to
-the aisle's end and up to Eldra; give it with `give` and the name.
+starting code: comments, one a step: ask for the book in your hands with
+`find_item` and the word "book", and keep it under a name; walk right
+along the bookcases to the aisle's end and up to Eldra; give it with
+`give` and the name.
 Intro: the book is in your hands, Eldra floats at the aisle's end; take
 it to her; outro: Eldra's thanks; learned: a name lives in its program,
 and `give` hands a thing to whoever stands beside.
@@ -302,8 +313,8 @@ the look `teal`:
    steps; the book is seen by the pile of books in the corner, half
    behind it; the solution wins with three stars.
 4. **Giving.** `#lesson/giving-things`, then `#level/the-book-returned`:
-   the starting code says the steps; the program asks for the book again
-   and gives it.
+   the starting code says the steps; the program asks for the book in
+   hand with `find_item` and gives it; the notebook lists `find_item`.
 5. **The hidden key.** `#level/the-hidden-key`: the comments say the
    steps; no book lies in the aisle.
 6. **The moving key.** `#level/the-moving-key`, Run three times at

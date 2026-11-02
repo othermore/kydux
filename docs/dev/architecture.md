@@ -1797,12 +1797,14 @@ one overturns stays, marked as superseded.
   scrolls to the item last opened and marks it the same way. A story
   opened counts as the item last opened, as a lesson and a level do.
   Rules out a map that opens at its top.
-- **D123 — What the wizard carries is found, and is seen when given.**
-  Decided 2026-10-29 by the designer, for the practice of giving. A level
-  may start with a thing in the wizard's hands that has a picture
-  (`carrying` names the kind, or the kind with its `art`), and
-  `find_nearest` finds a carried thing first, at no distance: a name kept
-  in one program is gone in the next, so the next program asks again, and
-  what is held is the nearest of all. Given, the thing is seen to go from
-  the wizard's hands to whoever takes it. Rules out a practice of giving
-  that first makes the child find and pick the thing up again.
+- **D123 — What the wizard carries is asked for with `find_item`, and is
+  seen when given.** Decided 2026-10-29 by the owner. A level may start
+  with a thing in the wizard's hands that has a picture (`carrying`
+  names the kind, or the kind with its `art`). `wizard.find_item("book")`
+  gives the thing of that kind the wizard carries, or `None`, as
+  `find_nearest` gives the nearest one on the map: a name kept in one
+  program is gone in the next, each level being a new program (D75), so
+  the next program asks for the thing again. Given, the thing is seen to
+  go from the wizard's hands to whoever takes it. Rules out a name put
+  into the child's program unseen, `find_nearest` looking into the
+  wizard's hands, and lists with their brackets before chapter 4.

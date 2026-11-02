@@ -11,6 +11,10 @@
 //
 // The zip is written here, stored without compression and with a fixed date, so
 // that the same sources always give the same bytes and no zip library is needed.
+// It holds `stamp.txt`, the stamp of the world and the content packed with it
+// (stamp.mjs), which public/world-stamp.json says too: the page is built with the
+// stamp of the world it was packed with, fetches world.zip by that stamp, and
+// refuses a world whose stamp is another, so that no cached world is ever run.
 
 import {
   cpSync,
@@ -24,6 +28,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { worldStamp } from './stamp.mjs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -109,7 +114,6 @@ const entries = [...walk(world)].map((path) => ({
   data: readFileSync(path),
 }));
 mkdirSync(publicDir, { recursive: true });
-writeFileSync(join(publicDir, 'world.zip'), zip(entries));
 
 const content = mkdtempSync(join(tmpdir(), 'kydux-content-'));
 process.on('exit', () => rmSync(content, { recursive: true, force: true }));
@@ -285,6 +289,16 @@ function bring(from, to) {
 }
 bring(content, join(publicDir, 'content'));
 
+// The world and the content packed with it, stamped; the zip written last, with
+// its stamp, beside the stamp the page is built with.
+const packed = [...walk(content)].map((path) => ({
+  name: `content/${relative(content, path).split(sep).join('/')}`,
+  data: readFileSync(path),
+}));
+const stamp = worldStamp([...entries, ...packed]);
+writeFileSync(join(publicDir, 'world.zip'), zip([...entries, { name: 'stamp.txt', data: Buffer.from(stamp) }]));
+writeFileSync(join(publicDir, 'world-stamp.json'), `${JSON.stringify({ stamp })}\n`);
+
 console.log(
-  `pack-world: ${entries.length} files in public/world.zip, content/ copied, ${chapters.length} chapters in the course`,
+  `pack-world: ${entries.length} files in public/world.zip, stamp ${stamp}, content/ copied, ${chapters.length} chapters in the course`,
 );

@@ -288,6 +288,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         return t('level.restarting');
       case 'failed':
         return t('level.failed');
+      case 'stale':
+        return t('level.stale_world');
     }
   };
 

@@ -115,7 +115,10 @@ everything the browser needs into `app/public/`, which git ignores:
 
 - Python's WebAssembly build, copied from its npm package into `pyodide/`.
 - The world, packed into `world.zip`, which the browser unpacks into
-  Python.
+  Python. It carries a stamp, a short hash of the world and the content
+  packed with it, which `world-stamp.json` says too. The page is made with
+  that stamp, fetches `world.zip` by it, and refuses to run a level when the
+  world it gets has another stamp.
 - The content, copied into `content/`: the chapters, the stories, the
   lessons, the levels and the screen's guide. A level's solution and its
   wrong answers stay out, so that a child cannot find them in the game. A
@@ -133,12 +136,26 @@ everything the browser needs into `app/public/`, which git ignores:
 
 You never run these scripts by hand, with one exception. If you change
 something under `world/` or `content/` while the server is already
-running, the browser keeps the old copy. Run this from `app/` to prepare
-the new one, then reload the page:
+running, the browser keeps the old copy. Stop the server with Ctrl+C,
+start it again, then reload the page:
 
 ```sh
-npm run predev
+npm run dev
 ```
+
+The same holds after a build, `ci/check.sh` or `npm run build`, while the
+server runs: the build packs the world again, with a new stamp, and the
+page the server gives keeps the stamp it was started with. Until the
+server is started again, every level says *The game's world does not match
+the page: reload the page*. On the server, the page's stamp is the one of
+the day it started, so reloading alone is not enough there; for the game
+built and served from `app/dist/`, reloading the page is.
+
+To see which page and which world you have, open a level with `?debug` in
+the address. The panel in the scene's corner shows the page's build, the
+stamp of the world the page was made with, and the stamp of the world
+running; the two stamps are the same. The page's footer shows the build
+too, beside the version.
 
 The hash in the address says which screen the page shows. You can type
 one to go straight to a screen:

@@ -2,6 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FromWorker, ToWorker } from './protocol';
 import { isRunResult, isWorldResult, Runtime, type RuntimeStatus, type WorkerLike } from './runtime';
 
+/** The stamp of the world the tests' page is built with. */
+const STAMP = 'cdc7d1ab9503';
+
 class FakeWorker implements WorkerLike {
   sent: ToWorker[] = [];
   terminated = false;
@@ -20,8 +23,8 @@ class FakeWorker implements WorkerLike {
     this.onmessage?.({ data: message } as MessageEvent<FromWorker>);
   }
 
-  ready(): void {
-    this.answer({ type: 'ready', pythonVersion: '3.14.2', worldVersion: '0.0.1' });
+  ready(worldStamp = STAMP): void {
+    this.answer({ type: 'ready', pythonVersion: '3.14.2', worldVersion: '0.0.1', worldStamp });
   }
 
   lastRun(): Extract<ToWorker, { type: 'run' }> {
@@ -37,6 +40,7 @@ function setUp(isolated: boolean) {
   const runtime = new Runtime({
     isolated,
     wallClockMs: 5000,
+    stamp: STAMP,
     createWorker: () => {
       const worker = new FakeWorker();
       workers.push(worker);
@@ -58,13 +62,23 @@ describe('Runtime', () => {
     const worker = workers[0]!;
     expect(worker.sent[0]).toEqual({ type: 'load' });
     worker.ready();
-    await expect(runtime.ready).resolves.toEqual({ pythonVersion: '3.14.2', worldVersion: '0.0.1' });
+    await expect(runtime.ready).resolves.toEqual({ pythonVersion: '3.14.2', worldVersion: '0.0.1', worldStamp: STAMP });
 
     const result = runtime.run('print(1 + 1)');
     await vi.waitFor(() => expect(worker.lastRun().code).toBe('print(1 + 1)'));
     worker.answer({ type: 'result', id: worker.lastRun().id, result: ok });
     await expect(result).resolves.toEqual(ok);
     expect(statuses).toEqual(['loading', 'ready', 'running', 'ready']);
+  });
+
+  it('refuses to run a world whose stamp is not the page\'s, and says it is stale', async () => {
+    const { runtime, workers, statuses } = setUp(false);
+    workers[0]!.ready('0123456789ab');
+    await expect(runtime.ready).rejects.toThrow(/not the page's cdc7d1ab9503/);
+    expect(statuses.at(-1)).toBe('stale');
+    expect(runtime.info?.worldStamp).toBe('0123456789ab');
+    await expect(runtime.run('print(2)')).rejects.toThrow();
+    expect(workers[0]!.sent.filter((m) => m.type === 'run')).toEqual([]);
   });
 
   it('refuses a second run asked for while Python still loads', async () => {

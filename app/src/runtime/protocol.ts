@@ -20,7 +20,7 @@ export type ToWorker =
   | { type: 'run'; id: number; code: string; level?: LevelJson };
 
 export type FromWorker =
-  | { type: 'ready'; pythonVersion: string; worldVersion: string }
+  | { type: 'ready'; pythonVersion: string; worldVersion: string; worldStamp: string }
   | { type: 'load-error'; message: string }
   | { type: 'result'; id: number; result: RunResult }
   | { type: 'crashed'; id: number; message: string };
@@ -98,4 +98,6 @@ export interface RunResult {
 export interface RuntimeInfo {
   pythonVersion: string;
   worldVersion: string;
+  /** The stamp of the world running, read from world.zip (scripts/stamp.mjs). */
+  worldStamp: string;
 }

@@ -48,6 +48,7 @@
     "failed": "Python could not start. Reload the page to try again.",
     "reload": "Reload",
     "load_failed": "The level could not be loaded. Reload the page to try again.",
+    "stale_world": "The game's world does not match the page: reload the page (Ctrl+Shift+R).",
     "sleeping": "z z z",
     "run": "Run",
     "about": "About this level",
@@ -388,6 +389,9 @@
     "numbers": "Numbers",
     "cells": "Cells",
     "masks": "Masks",
+    "build": "Build",
+    "page_world": "Page's world",
+    "world": "World running",
     "blocked": "Not walked on",
     "leaf": "Not walked on while its door is open",
     "kinds": {

@@ -5,7 +5,9 @@
 // each cell tinted by its kind of terrain, crossed out when no one walks on it,
 // and in another colour while an open door's leaf lies on it (D125);
 // and every painted image's mask, each row in its own colour. Which layers are on
-// is kept in the browser for the next time.
+// is kept in the browser for the next time. The panel says which page this is and
+// which world it runs: the page's build, the stamp of the world it was built with,
+// and the stamp of the world running (stamp.ts), the two the same.
 
 import Phaser from 'phaser';
 import type { Layout } from './layout';
@@ -88,6 +90,8 @@ export class DebugView {
   private readonly masks: Masked[] = [];
   private readonly numbers: HTMLCanvasElement;
   private readonly legend: HTMLElement;
+  /** The page's build and the worlds' stamps, in the panel. */
+  private readonly stamps: HTMLElement;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -106,6 +110,7 @@ export class DebugView {
     this.numbers = Object.assign(document.createElement('canvas'), { className: 'debug-numbers' });
     this.numbers.setAttribute('aria-hidden', 'true');
     this.legend = this.drawLegend();
+    this.stamps = this.drawStamps();
     frame.append(this.numbers, this.panel(), this.legend);
     this.apply();
     parent.dataset.debug = 'true';
@@ -197,7 +202,33 @@ export class DebugView {
       });
       box.append(button);
     }
+    box.append(this.stamps);
     return box;
+  }
+
+  /** The page's build and its world's stamp, and the running world's, each with its
+   * name; the running world's said once it has loaded (main.ts puts it on the root). */
+  private drawStamps(): HTMLElement {
+    const stamps = document.createElement('span');
+    stamps.className = 'debug-stamps';
+    const part = (id: string, word: string, value: string) => {
+      const item = document.createElement('span');
+      item.id = id;
+      item.dataset.stamp = value;
+      item.textContent = `${debugWord(word)} ${value}`;
+      return item;
+    };
+    stamps.append(
+      part('debug-build', 'build', __BUILD__),
+      part('debug-page-world', 'page_world', __WORLD_STAMP__),
+      part('debug-world', 'world', this.running()),
+    );
+    return stamps;
+  }
+
+  /** The running world's stamp, or a dash while it loads. */
+  private running(): string {
+    return document.documentElement.dataset.worldStamp ?? '–';
   }
 
   /** What each colour of the cells' layer means. */
@@ -246,6 +277,11 @@ export class DebugView {
   /** Every frame: the masks follow their images (a door opens, the wand is picked
    * up), and the numbers are drawn over the cells in view. */
   update(camera: Phaser.Cameras.Scene2D.Camera): void {
+    const world = this.stamps.querySelector<HTMLElement>('#debug-world');
+    if (world && world.dataset.stamp !== this.running()) {
+      world.dataset.stamp = this.running();
+      world.textContent = `${debugWord('world')} ${this.running()}`;
+    }
     if (this.shown.masks) {
       for (const { source, mask } of this.masks) {
         if (mask.texture.key !== source.texture.key) mask.setTexture(source.texture.key);

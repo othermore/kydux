@@ -10,8 +10,11 @@ import type {
   ToWorker,
   WorldResult,
 } from './protocol';
+import { staleWorld } from './stamp';
 
-export type RuntimeStatus = 'loading' | 'ready' | 'running' | 'restarting' | 'failed';
+/** `stale`: the world loaded is another than the page's, and nothing runs until the
+ * page is reloaded (stamp.ts). */
+export type RuntimeStatus = 'loading' | 'ready' | 'running' | 'restarting' | 'failed' | 'stale';
 
 /** What the runtime needs of a worker, so that tests can give a fake one. */
 export interface WorkerLike {
@@ -29,6 +32,16 @@ export interface RuntimeOptions {
   createWorker?: () => WorkerLike;
   /** Whether to share an interrupt buffer; by default, when the page is isolated. */
   isolated?: boolean;
+  /** The stamp of the world the page is built with, which the world loaded must
+   * have (`__WORLD_STAMP__` by default). */
+  stamp?: string;
+}
+
+/** The world loaded is another than the page's: the page must be reloaded. */
+export class StaleWorld extends Error {
+  constructor(readonly page: string, readonly world: string) {
+    super(`the world ${world || '(no stamp)'} is not the page's ${page}`);
+  }
 }
 
 const RUN_STATUSES = ['ok', 'error', 'interrupted'];
@@ -119,9 +132,11 @@ export class Runtime {
   private listeners: ((status: RuntimeStatus) => void)[] = [];
   private lastStatus: RuntimeStatus = 'loading';
   private lastInfo: RuntimeInfo | null = null;
+  private readonly stamp: string;
 
   constructor(options: RuntimeOptions = {}) {
     this.wallClockMs = options.wallClockMs ?? 5000;
+    this.stamp = options.stamp ?? __WORLD_STAMP__;
     this.loadTimeoutMs = options.loadTimeoutMs ?? LOAD_TIMEOUT_MS;
     this.createWorker = options.createWorker ?? defaultWorker;
     const isolated = options.isolated ?? globalThis.crossOriginIsolated === true;
@@ -220,7 +235,14 @@ export class Runtime {
             this.lastInfo = {
               pythonVersion: message.pythonVersion,
               worldVersion: message.worldVersion,
+              worldStamp: message.worldStamp,
             };
+            // A world older or newer than the page runs no level of the page's.
+            if (staleWorld(this.stamp, message.worldStamp)) {
+              this.setStatus('stale');
+              reject(new StaleWorld(this.stamp, message.worldStamp));
+              break;
+            }
             this.setStatus('ready');
             resolve(this.lastInfo);
             break;

@@ -111,6 +111,12 @@ footer {
   font-size: 13px;
 }
 
+/* The page's build, beside the version. */
+footer .build {
+  margin-right: auto;
+  font-family: var(--mono);
+}
+
 .buttons {
   display: flex;
   flex-wrap: wrap;
@@ -490,6 +496,17 @@ footer {
   bottom: 10px;
   display: flex;
   gap: 4px;
+  align-items: center;
+}
+
+.debug-stamps {
+  display: flex;
+  gap: 8px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: 11px;
 }
 
 .debug-toggle {

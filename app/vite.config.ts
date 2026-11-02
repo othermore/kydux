@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir, hostname } from 'node:os';
 import { join } from 'node:path';
@@ -6,6 +7,31 @@ import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+
+// The stamp of the world the page is built with, which pack-world.mjs wrote
+// before Vite starts (predev, prebuild): the page fetches world.zip by it and
+// refuses a running world whose stamp is another (runtime.ts).
+function worldStamp(): string {
+  try {
+    const path = fileURLToPath(new URL('public/world-stamp.json', import.meta.url));
+    return (JSON.parse(readFileSync(path, 'utf8')) as { stamp?: string }).stamp ?? 'none';
+  } catch {
+    return 'none';
+  }
+}
+
+// The page's build, said in its footer: the short git hash and the day, in the
+// form `date -I` gives, at build or dev start; `local` where git is not at hand.
+function buildName(): string {
+  try {
+    const hash = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+    const now = new Date();
+    const day = [now.getFullYear(), now.getMonth() + 1, now.getDate()].map((n) => String(n).padStart(2, '0')).join('-');
+    return `${hash} ${day}`;
+  } catch {
+    return 'local';
+  }
+}
 
 // HTTPS with the certificate ci/dev-cert.sh makes, when it exists: from another
 // computer only HTTPS is a secure context, and only a secure context gets the
@@ -67,6 +93,10 @@ function debugSolutions(): Plugin {
 
 export default defineConfig({
   plugins: [debugSolutions()],
+  define: {
+    __WORLD_STAMP__: JSON.stringify(worldStamp()),
+    __BUILD__: JSON.stringify(buildName()),
+  },
   server: {
     host: true,
     port: 5173,

@@ -48,6 +48,7 @@
     "failed": "Python no ha podido arrancar. Recarga la página para intentarlo de nuevo.",
     "reload": "Recargar",
     "load_failed": "No se ha podido cargar el nivel. Recarga la página para intentarlo de nuevo.",
+    "stale_world": "El mundo del juego no coincide con la página: recarga la página (Ctrl+Mayús+R).",
     "sleeping": "z z z",
     "run": "Ejecutar",
     "about": "Sobre este nivel",
@@ -388,6 +389,9 @@
     "numbers": "Números",
     "cells": "Casillas",
     "masks": "Máscaras",
+    "build": "Versión",
+    "page_world": "Mundo de la página",
+    "world": "Mundo en marcha",
     "blocked": "No se pisa",
     "leaf": "No se pisa con su puerta abierta",
     "kinds": {

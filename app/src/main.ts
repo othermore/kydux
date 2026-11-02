@@ -34,6 +34,18 @@ const runtime = new Runtime();
 let screen: Screen | null = null;
 /** The address of the screen shown, so that a hash change to it again is ignored. */
 let shownRoute: string | null = null;
+/** Where the screen shown is, for a stale world's message to take its place. */
+let shownContent: HTMLElement | null = null;
+
+// The page's world, and the world running once it has loaded, on the root element
+// for the `?debug` corner (debug.ts); a world that is not the page's runs no level:
+// the level shown gives way to the message to reload.
+document.documentElement.dataset.pageStamp = __WORLD_STAMP__;
+runtime.onStatus((status) => {
+  const running = runtime.info?.worldStamp;
+  if (running !== undefined) document.documentElement.dataset.worldStamp = running || 'none';
+  if (status === 'stale' && shownContent && shownRoute?.startsWith('level/')) stale(shownContent);
+});
 /** The last address shown that was not the settings, where their Back goes. */
 let beforeSettings = '#start';
 
@@ -208,7 +220,10 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
     ]),
     ...handheldNote(),
     content,
-    element('footer', {}, [element('span', {}, [t('app.version', { version })])]),
+    element('footer', {}, [
+      element('span', {}, [t('app.version', { version })]),
+      element('span', { id: 'build', className: 'build' }, [__BUILD__]),
+    ]),
   );
 }
 
@@ -218,6 +233,17 @@ function show(content: HTMLElement, next: Screen): void {
   screen = next;
   content.replaceChildren(next.node);
   next.mount?.();
+}
+
+/** The world running is not the page's: the page must be reloaded (stamp.ts). */
+function stale(content: HTMLElement): void {
+  screen?.destroy();
+  screen = null;
+  const reload = element('button', { id: 'reload', type: 'button' }, [t('level.reload')]);
+  reload.addEventListener('click', () => location.reload());
+  content.replaceChildren(
+    element('div', { className: 'not-found', id: 'stale-world' }, [element('p', {}, [t('level.stale_world')]), reload]),
+  );
 }
 
 function failed(content: HTMLElement, error: unknown): void {
@@ -331,6 +357,10 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
         import('./engine/scene'),
       ]);
     if (shownRoute !== key) return;
+    if (runtime.status === 'stale') {
+      stale(content);
+      return;
+    }
     // The world, the notebook and the editor's completion all read the level's
     // api: what the course has taught up to here, not only this level (D40).
     loaded.level.api = knownApi(course, id, (loaded.level.api as string[] | undefined) ?? []);
@@ -402,6 +432,7 @@ function route(): void {
     element('p', { className: 'status' }, [t('level.loading')]),
   ]);
   chrome(root, content);
+  shownContent = content;
   if (wanted.name === 'settings') {
     show(content, settingsScreen({ back: beforeSettings }));
     return;

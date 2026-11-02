@@ -33,6 +33,7 @@ app/node_modules/
 app/dist/
 app/public/pyodide/
 app/public/world.zip
+app/public/world-stamp.json
 app/public/api.json
 app/public/reserved.json
 app/public/content/

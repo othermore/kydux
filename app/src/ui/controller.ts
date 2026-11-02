@@ -116,7 +116,8 @@ export class RunController {
     this.speed = parts.speed;
     this.unsubscribe.push(
       this.runtime.onStatus((status) => {
-        if (status === 'failed' && this.outcome?.kind !== 'failed') {
+        // A world that is not the page's runs nothing, as Python that did not start.
+        if ((status === 'failed' || status === 'stale') && this.outcome?.kind !== 'failed') {
           this.outcome = { kind: 'failed' };
         }
         this.changed();
@@ -324,7 +325,7 @@ export class RunController {
 
   private state(): RunState {
     const status = this.runtime.status;
-    if (status === 'failed') return 'failed';
+    if (status === 'failed' || status === 'stale') return 'failed';
     if (!this.scene || status === 'loading' || status === 'restarting') return 'loading';
     if (status === 'running') return 'running';
     if (this.scene.playback.state === 'playing') return 'playing';

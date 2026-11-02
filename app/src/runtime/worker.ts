@@ -20,9 +20,17 @@ async function load(interruptBuffer?: SharedArrayBuffer): Promise<void> {
     loadPyodide: (options: { indexURL: string }) => Promise<PyodideAPI>;
   };
   const py = await module.loadPyodide({ indexURL: `${base}pyodide/` });
-  const world = await fetch(`${base}world.zip`);
+  // The world the page was built with, by its stamp: the address changes with
+  // every world, so that no cached copy is used, and the fetch keeps none.
+  const world = await fetch(`${base}world.zip?v=${__WORLD_STAMP__}`, { cache: 'no-store' });
   if (!world.ok) throw new Error(`world.zip: HTTP ${world.status}`);
   py.unpackArchive(await world.arrayBuffer(), 'zip', { extractDir: '/home/pyodide' });
+  let worldStamp = '';
+  try {
+    worldStamp = (py.FS.readFile('/home/pyodide/stamp.txt', { encoding: 'utf8' }) as string).trim();
+  } catch {
+    // A world packed with no stamp: the page takes it for another than its own.
+  }
   py.runPython('import sys; sys.path.insert(0, "/home/pyodide")');
   if (interruptBuffer) {
     interrupt = new Int32Array(interruptBuffer);
@@ -35,7 +43,7 @@ async function load(interruptBuffer?: SharedArrayBuffer): Promise<void> {
   py.runPython('from kydux_world import sandbox; sandbox.install()');
   const [pythonVersion = '', worldVersion = ''] = versions.split(' ');
   pyodide = py;
-  post({ type: 'ready', pythonVersion, worldVersion });
+  post({ type: 'ready', pythonVersion, worldVersion, worldStamp });
 }
 
 function python(source: string, values: Record<string, unknown>): string {

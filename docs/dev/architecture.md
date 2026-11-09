@@ -2523,3 +2523,16 @@ one overturns stays, marked as superseded.
   the level (D176), and a `while` waiting for it to close ends at the tick limit; the
   chapter's last level uses both its spells. Rules out a spell taught, summed up in the
   story, and never cast, and a spell that spares the child the loop.
+- **D179 — The browser tests run on GitHub at a release, and by hand.** Decided 2026-11-09
+  by the owner, on the designer's proposal, after every run of 2026-11-09 and the one of
+  0.0.2 failed there: GitHub's runner takes 1.8 hours for the 288 browser tests, and six of
+  them, the ones that wait the longest in real time, run out of their time, while every one
+  passes on hija. On GitHub the `check` job (`ci/check.sh`) runs on every push and pull
+  request; the `e2e` job (`ci/check.sh --e2e`) runs on a version's tag (`v*`) and when
+  started by hand (`workflow_dispatch`). The gate stays `ci/check.sh --e2e` on hija, once
+  before a sprint's last commit, each piece checked with `ci/check.sh` and the browser tests
+  it touches (the owner, 2026-11-09). A release tags its version commit, `git tag -a
+  v<version>`, before `ci/push.sh`, which pushes with `--follow-tags`; a tag on a commit it
+  dates again is made again on the commit's new self, with its message, dated now, and a tag
+  on a commit already pushed goes up alone. Rules out two hours of a private repository's
+  minutes on every push, and a red check that says nothing about the code.

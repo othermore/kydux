@@ -1,5 +1,6 @@
 #!/bin/sh
-# Push main to GitHub, inside the hours Kydux is seen working (ci/hours.py).
+# Push main to GitHub, inside the hours Kydux is seen working (ci/hours.py), with
+# the version tags on its commits.
 #
 #   ci/push.sh            now, inside the hours: the commits not yet on GitHub are
 #                         dated inside them, ending now, then pushed
@@ -8,7 +9,9 @@
 #
 # Nothing of Kydux's goes to GitHub by any other way. Only commits not yet on
 # origin/main are dated again, as the very last step before the push: a commit
-# once pushed never changes.
+# once pushed never changes. An annotated tag, a version's (`git tag -a v0.0.4`),
+# goes with the commit it is on (--follow-tags, D179); a tag on a commit dated
+# again is made again on the commit's new self, with its message, dated now.
 
 set -eu
 
@@ -68,11 +71,33 @@ else
 fi
 
 if [ "$count" -eq 0 ]; then
-    echo "==> Nothing to push: origin/main is main."
+    # No commit to push; a version tag made on one already pushed goes up alone.
+    echo "==> No commit to push: origin/main is main."
+    git push --follow-tags origin main
     exit 0
 fi
+# The commits to date again, oldest first, and then their new selves in the same
+# order, so that each tag on one goes onto the other.
+range="$old"
+[ "$base" = 0000000000000000000000000000000000000000 ] || range="$base..$old"
+olds="$(mktemp)"
+news="$(mktemp)"
+trap 'rm -f "$olds" "$news"' EXIT
+git rev-list --reverse "$range" >"$olds"
 new="$("$HOURS" redate "$base" "$old")"
 git update-ref -m "ci/push.sh: dated inside the hours" refs/heads/main "$new" "$old"
 echo "==> $count commit(s) dated inside the hours, $old -> $new"
-git push -u origin main
+if [ "$base" = 0000000000000000000000000000000000000000 ]; then
+    git rev-list --reverse "$new" >"$news"
+else
+    git rev-list --reverse "$base..$new" >"$news"
+fi
+paste -d ' ' "$olds" "$news" | while read -r was is; do
+    for tag in $(git tag --points-at "$was"); do
+        [ "$(git cat-file -t "$tag")" = tag ] || continue
+        git tag -f -a -m "$(git tag -l --format='%(contents)' "$tag")" "$tag" "$is" >/dev/null
+        echo "==> The tag $tag on its commit dated again, $(git rev-parse --short "$is")"
+    done
+done
+git push --follow-tags -u origin main
 echo "==> Pushed main, $(git rev-parse --short HEAD), at $(date '+%H:%M')"

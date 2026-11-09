@@ -278,9 +278,10 @@ kydux/
   asset in a manifest with a licence, the two READMEs in step). All of them
   together: `ci/check.sh`. The Playwright suite, slower, runs before a release
   and when a piece touches the shell.
-- **GitHub Actions** runs `ci/check.sh` and the Playwright suite on every push
-  and builds the release bundles on a tag. Pushes happen only inside the
-  hours, so the runs do too.
+- **GitHub Actions** runs `ci/check.sh` on every push, and the Playwright suite
+  too on a version's tag and when started by hand (D179); it builds the release
+  bundles on a tag. Pushes and tags happen only inside the hours, so the runs
+  do too.
 - **Releases**: `0.1`, `0.2`, ... while the course is incomplete; `1.0` when
   the first course and its challenges are there. A release is a tag, pushed by
   `ci/push.sh`, and GitHub's workflow attaches the bundles. A release is cut
@@ -629,7 +630,7 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     language and never the wizard (D174), the card that waits for the wizard's words
     (D175), a bonus earned by the spell cast (D176), a stop that is no outcome (D177), `osto`
     taught after the `while` in a lesson of its own and needed by the night walk's hole,
-    which never closes (D178).
+    which never closes (D178), and the browser tests run on GitHub at a release (D179).
 5.6 Chapter 4, The broom (lists, functions), in a scene of the broom field
     and the village: flying, the race, an action of the child's own.
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

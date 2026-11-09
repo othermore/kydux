@@ -17,6 +17,9 @@ npm run build
 npm run e2e
 ```
 
+`walkthrough.spec.ts` is not one of them: it plays a whole chapter for the owner to
+read, and only `npm run walkthrough -- <chapter>` runs it (`docs/dev/dev-environment.md`).
+
 ## The loop and its screenshots
 
 `loop.spec.ts` walks the whole game once in each language. It opens the game

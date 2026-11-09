@@ -1673,3 +1673,24 @@ def test_a_nudge_round_a_door_is_not_refused(tmp_path, monkeypatch):
     make_map(tmp_path, monkeypatch, ["....", "....", "....", "...."])
     scene = scene_settings.Settings("door", {"nudged": [{"cells": [[1, 0], [1, 2]], "by": 0.2}]})
     scene.refuse_long_nudges()
+
+
+def test_the_sheet_of_everyone_draws_no_figure_in_a_dark_tunnel():
+    """D135: as the page, so that the sheet does not show figures the child never sees."""
+    scene = sweep.load("the-tunnel")
+    assert (
+        (15, 3) in scene.enchanted
+        and (19, 1) in scene.enchanted
+        and (15, 4) not in scene.enchanted
+    )
+    empty = sweep.Scene(**{**vars(scene), "walked": np.zeros_like(scene.walked)})
+    with_nobody = np.array(sweep.everyone(empty, set()).convert("RGB")).astype(int)
+    drawn = np.array(sweep.everyone(scene, set()).convert("RGB")).astype(int)
+    cell = scene.cell
+
+    def differs(x: int, y: int) -> int:
+        part = np.abs(drawn - with_nobody)[y * cell : (y + 1) * cell, x * cell : (x + 1) * cell]
+        return int(part.sum())
+
+    assert differs(19, 1) == 0
+    assert differs(15, 5) > 0

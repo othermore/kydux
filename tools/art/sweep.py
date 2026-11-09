@@ -112,6 +112,8 @@ class Scene:
     #: Whether Gemini marked its things in magenta (`marks`), which are then whole.
     marked: bool = False
     #: The cells a figure is drawn lower on, and by how much of a cell (D95).
+    #: The cells of a dark tunnel, where the page draws no figure (D135).
+    enchanted: set = field(default_factory=set)
     lowered: dict = field(default_factory=dict)
     #: The cells a figure is drawn sideways on, and by how much of a cell (D105).
     nudged: dict = field(default_factory=dict)
@@ -193,6 +195,14 @@ def load(scene: str) -> Scene:
         found.kept = own.data.get("kept", [])
         found.marked = "marks" in own.data
     found.dark = art.get("dark", [])
+    about = REPO / "content" / "scenes" / scene / "scene.json"
+    if about.is_file():
+        found.enchanted = {
+            (x, y)
+            for x0, y0, x1, y1 in json.loads(about.read_text()).get("enchanted", [])
+            for y in range(y0, y1 + 1)
+            for x in range(x0, x1 + 1)
+        }
     for key in ("lowered", "nudged"):
         for part in art.get(key, []):
             (x0, y0), (x1, y1) = part["cells"]
@@ -763,8 +773,11 @@ def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
     out = Image.fromarray(scene.ground).convert("RGBA")
     frame, foot = figure()
     tall, wide = frame.shape[:2]
+    # As the page: no figure is drawn in a dark tunnel (D135).
     standing = [
-        (feet_at(scene, x, y), (x, y)) for y, x in zip(*np.nonzero(scene.walked), strict=True)
+        (feet_at(scene, x, y), (x, y))
+        for y, x in zip(*np.nonzero(scene.walked), strict=True)
+        if (x, y) not in scene.enchanted
     ]
     drawn: list[tuple[float, Layer | tuple[int, int]]] = [
         (layer.depth, layer) for layer in scene.layers

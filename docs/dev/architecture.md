@@ -2174,7 +2174,8 @@ one overturns stays, marked as superseded.
   take away cleanly, or whose stones are nearly the colour of what lies behind them, an
   arch, is asked of the model flat magenta instead, and takes the outline beside it
   (`--rim`): the difference is then the thing to the pixel. A wall's top, which cannot be
-  taken away, is a box on its two straight outlines. The ground the game draws is the
+  taken away, is a box on its two straight outlines, and an open leaf that would run through
+  a side wall goes behind such a box and behind a torch's cut-out. The ground the game draws is the
   base; what stands or lies in the scene is a cut-out over it at its row; what a figure
   walks behind is a cut-out on its foot's row or `over`. A try whose edit changed what it
   should not, in the mask or beside it, is asked again, three tries at most. A key and a

@@ -372,7 +372,8 @@ row its foot stands on.
 Look at every check picture before committing. Each shows a figure behind
 and in front of a row's things, and `all-<scene>.png` the wizard on every
 cell walked on at once, every door open, as it is when someone stands in
-its doorway, and every passage as dark as the page draws it.
+its doorway, every passage as dark as the page draws it, and no one in a dark tunnel
+(D135).
 `states-<scene>.png` shows each thing with states, a row each: the ground
 round its box and each state drawn on it, at three times the page's size
 (twice for a thing 300 pixels wide or more), with the state's edge in
@@ -427,6 +428,8 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    small thing has an edit of its own (`way-down-torch.md`). The mask stands on the row of
    the thing's foot, `under` where a figure on that row stands under it. A wall's top is a box
    on its two straight outlines (`"mask": "box"`, `"over": true`): a wall cannot be taken away.
+   An open leaf that would run through a side wall goes behind it: the wall is such a box on
+   a row below the leaf's, and a torch there a cut-out on a lower row still (the way down).
 5. **Look.** `trace.py diff` writes `art/raw/game-check/diff-<scene>-<thing>[-<state>].png`,
    the mask's edge in magenta. A leak round the box says to look: an edit that changed what
    it should not, in the mask or beside it, is asked again, three tries at most. Then

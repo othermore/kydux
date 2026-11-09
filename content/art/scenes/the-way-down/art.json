@@ -20,6 +20,12 @@
       "static": true
     },
     {
+      "row": 7,
+      "image": "row-7-static.webp",
+      "top": 664,
+      "static": true
+    },
+    {
       "row": 8,
       "image": "row-8-static.webp",
       "top": 684,

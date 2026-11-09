@@ -94,7 +94,12 @@ export interface PlanPictures {
   /** The ground's pixels a cell, and where the scene's first cell lies in it. */
   cell: number;
   origin: Tile;
-  doors: { url: string; left: number; top: number }[];
+  doors: { url: string; left: number; top: number; depth: number }[];
+  /** What the scene draws among the figures, each with its depth (D151). */
+  rows: { url: string; top: number; depth: number }[];
+  /** The cells a figure and a mark are drawn lower or sideways on (D149). */
+  lowered?: { cells: [Tile, Tile]; by: number }[];
+  nudged?: { cells: [Tile, Tile]; by: number }[];
   /** Each other thing with a picture, its corner in the ground's pixels on its tile. */
   things: { id: string; url: string; left: number; top: number }[];
   figures: {

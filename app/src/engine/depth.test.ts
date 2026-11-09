@@ -4,6 +4,7 @@ import {
   FOOT_IN_CELL,
   figureDepth,
   loweredBy,
+  markDepth,
   nudgedBy,
   overDepth,
   rowDepth,
@@ -60,5 +61,10 @@ describe('the depths of a painted scene (D76, D95)', () => {
     expect(nudgedBy(nudged, [16, 6])).toBe(-0.4);
     expect(nudgedBy(nudged, [16, 7])).toBe(0);
     expect(nudgedBy(undefined, [16, 6])).toBe(0);
+  });
+
+  it("draws a mark over the arch of its own row, and under what stands below it", () => {
+    expect(markDepth(1)).toBeGreaterThan(rowDepth(1, true));
+    expect(markDepth(1)).toBeLessThan(rowDepth(2));
   });
 });

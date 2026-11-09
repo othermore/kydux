@@ -116,6 +116,29 @@ test.describe('the map, opened by its spell (D134)', () => {
     await expect(plan).toHaveCount(0);
   });
 
+  test('in the dark tunnel, the exit is found on the plan and the cell printed (D152)', async ({ page }) => {
+    await open(page, 'the-dark-tunnel');
+    await start(page, 'wizard.cast("orvim")\nprint(wizard.position)');
+    const plan = page.locator('#plan');
+    await expect(plan).toBeVisible({ timeout: 30_000 });
+    await expect(plan).toHaveAttribute('data-marks', '19,1');
+    await expect(plan).toHaveAttribute('data-mark-labels', '(19, 1)');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.printed')).toHaveText('(14, 2)', { timeout: 30_000 });
+  });
+
+  test('the plan writes a mark\'s cell and rules the floor cells (D151)', async ({ page }) => {
+    await open(page, 'the-doors-corridor');
+    await start(page, 'wizard.cast("orvim")');
+    const plan = page.locator('#plan');
+    await expect(plan).toBeVisible({ timeout: 30_000 });
+    await expect(plan).toHaveAttribute('data-mark-labels', '(15, 3)');
+    await expect(plan).toHaveAttribute('data-floor-edges', /^\d{2,}$/);
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    await page.screenshot({ path: `${SHOTS}plan-grid.png` });
+    await page.keyboard.press('Escape');
+  });
+
   test('Escape closes it too, and a run started again closes it', async ({ page }) => {
     await open(page, 'the-doors-corridor');
     await start(page, 'wizard.cast("orvim")');
@@ -247,6 +270,15 @@ test.describe('the storeroom', () => {
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}dark-room-lit.png` });
   });
 
+  test('the dark room is won in its three ways by the two numbers (D153)', async ({ page }) => {
+    await open(page, 'the-dark-room');
+    expect(await run(page, solution('the-dark-room'))).toMatch(/^You did it/);
+    for (const way of waysOf('the-dark-room')) {
+      await page.locator('#way').selectOption(way, { force: true });
+      await expect(page.locator('.outcome-text')).toHaveText(/^You did it/, { timeout: 30_000 });
+    }
+  });
+
   test('the door refuses with no key, and from afar', async ({ page }) => {
     await open(page, 'the-dark-room');
     await run(page, 'wizard.cast("kirra")\nwizard.move_right(5)\nwizard.move_down(2)\nstore_door.open()');
@@ -267,6 +299,15 @@ test.describe('what the page draws of the chapter', () => {
     await start(page, 'wizard.move_down()');
     await expect(scene(page)).toHaveAttribute('data-following', 'true', { timeout: 30_000 });
     await expect(scene(page)).not.toHaveAttribute('data-framed');
+  });
+
+  test('a door of two cells opens from either, and frees them both (D150)', async ({ page }) => {
+    await open(page, 'the-three-doors');
+    await run(page, 'wizard.move_left()\ndoor_1.open()\nwizard.move_up(2)');
+    await expect(scene(page)).toHaveAttribute('data-doors', 'door_1');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '9,10');
+    await run(page, 'door_1.open()\nwizard.move_up(2)');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '10,10');
   });
 
   test('the goals box folds itself when it would cover the wizard at the start', async ({ page }) => {

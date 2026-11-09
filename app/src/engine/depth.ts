@@ -58,6 +58,12 @@ export function coverDepth(row: number): number {
   return rowDepth(row) + 0.0004;
 }
 
+/** The depth of a reach goal's mark on row `row`: over what stands on its row and above,
+ * an arch it lies under among them, so that it is seen; under what stands below it. */
+export function markDepth(row: number): number {
+  return rowDepth(row, true) + 0.0001;
+}
+
 /** The depth of what is drawn over every figure of a scene `rows` rows tall: a wall
  * seen from above (D95). */
 export function overDepth(rows: number): number {

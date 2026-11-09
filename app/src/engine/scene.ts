@@ -101,7 +101,7 @@ import {
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
-import { FOOT_IN_CELL, figureDepth, lightDepth, loweredBy, nudgedBy, sleeperDepth } from './depth';
+import { FOOT_IN_CELL, figureDepth, lightDepth, loweredBy, markDepth, nudgedBy, sleeperDepth } from './depth';
 import { type LightName, type LightState, NIGHT_MS, SceneLight, WHOLE_MORNING } from './light';
 import { Speech } from './speech';
 import { Sway } from './sway';
@@ -561,7 +561,13 @@ class LevelScene extends Phaser.Scene {
         (thing) => thing.kind === 'door' && thing.tile[0] === tile[0] && thing.tile[1] === tile[1],
       );
       const picture = door ? this.things.get(door.id) : undefined;
-      const mark = drawMark(this, centre(tile), this.still, picture ? picture.depth + 0.0002 : 2.9);
+      const [markX, markY] = centre(tile);
+      const { nudged, lowered } = this.art.scene;
+      const placed: [number, number] = [
+        markX + nudgedBy(nudged, tile) * TILE,
+        markY + loweredBy(lowered, tile) * TILE,
+      ];
+      const mark = drawMark(this, placed, this.still, picture ? picture.depth + 0.0002 : markDepth(tile[1]));
       if (door && picture) {
         this.doorMarks.set(door.id, mark);
         this.markBehind(door.id, door.open, false);
@@ -603,7 +609,9 @@ class LevelScene extends Phaser.Scene {
       width: this.map.width * TILE,
       headroom: this.headroom,
       wizard: () => this.wizard,
+      height: this.map.height * TILE,
       wrap: this.options.story ? 6 : 4,
+      figures: () => [this.wizard, ...[...this.actors.values()].map((actor) => actor.sprite)],
     });
     const story = this.options.story;
     this.view = new SceneCamera(this, this.parentNode, {

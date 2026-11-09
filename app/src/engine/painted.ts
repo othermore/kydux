@@ -209,14 +209,18 @@ export function paintScene(scene: Phaser.Scene, art: Art): Phaser.GameObjects.Im
   return art.scene.rows.map((row) => rowImage(scene, art, row, rowKey(row)));
 }
 
+/** Where a row's image is drawn among the figures. */
+function rowLayerDepth(row: SceneArt['rows'][number], rows: number): number {
+  return row.over ? overDepth(rows) : row.cover ? coverDepth(row.row) : rowDepth(row.row, row.under);
+}
+
 /** A row's image, `key`, where the row is drawn among the figures. */
 function rowImage(scene: Phaser.Scene, art: Art, row: SceneArt['rows'][number], key: string): Phaser.GameObjects.Image {
-  const rows = art.scene.size[1];
   return scene.add
     .image(0, row.top * artScale(art), key)
     .setOrigin(0, 0)
     .setScale(artScale(art))
-    .setDepth(row.over ? overDepth(rows) : row.cover ? coverDepth(row.row) : rowDepth(row.row, row.under));
+    .setDepth(rowLayerDepth(row, art.scene.size[1]));
 }
 
 /** The scene at other hours (D126), unseen until the light shows it, by the
@@ -375,7 +379,19 @@ export function planPictures(
     .flatMap(({ id, art: painted, open }) => {
       const thing = scene.things[painted ?? id];
       const state = thing?.states[open ? 'open' : 'closed'];
-      return thing && state ? [{ url: `${scene.base}${state}`, left: thing.left, top: thing.top }] : [];
+      return thing && state
+        ? [
+            {
+              url: `${scene.base}${state}`,
+              left: thing.left,
+              top: thing.top,
+              depth: thingDepth((open ? thing.rows?.open : undefined) ?? thing.row, {
+                under: thing.under,
+                open: open === true,
+              }),
+            },
+          ]
+        : [];
     });
   // A key or a slab's hole in its first state, moved from the cell it is painted on.
   const shownThings = things
@@ -414,6 +430,14 @@ export function planPictures(
     cell: scene.cell,
     origin: scene.origin ?? [0, 0],
     doors: shownDoors,
+    // The same cut-outs as the scene's, each at its depth among the figures (D151).
+    rows: scene.rows.map((row) => ({
+      url: `${scene.base}${row.image}`,
+      top: row.top,
+      depth: rowLayerDepth(row, scene.size[1]),
+    })),
+    ...(scene.lowered ? { lowered: scene.lowered } : {}),
+    ...(scene.nudged ? { nudged: scene.nudged } : {}),
     things: shownThings,
     figures: shownFigures,
   };

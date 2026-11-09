@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PlanView } from '../engine/layout';
-import { cellAt, inked, labelBoxes, planShapes } from './plan';
+import { cellAt, floorEdges, inked, labelBoxes, planLabel, planShapes, tunnelLabelCell } from './plan';
 
 /** A corridor, a closed door across it, a dark room and an enchanted end. */
 const VIEW: PlanView = {
@@ -123,5 +123,44 @@ describe('the plan of a scene (D134, D143)', () => {
   it('keeps a name inside the plan at its edge', () => {
     const [place] = labelBoxes([{ x: 395, y: 100, width: 80, height: 14, reach: 10 }], { width: 400, height: 300 });
     expect(place?.x).toBe(305);
+  });
+});
+
+describe('what the plan writes and rules (D151)', () => {
+  it('a mark says its cell, and a figure its name and its cell', () => {
+    expect(planLabel('', 15, 3)).toBe('(15, 3)');
+    expect(planLabel('Nuri', 2, 5)).toBe('Nuri (2, 5)');
+  });
+
+  it('rules every edge of the floor cells once, and none of the walls alone', () => {
+    const shapes = planShapes({
+      rows: ['###', '#.#', '#.#', '###'],
+      enchanted: [],
+      unlit: [],
+      figures: [],
+      things: [],
+      marks: [],
+    });
+    // Two cells, one above the other, share their edge: seven edges, not eight.
+    expect(floorEdges(shapes)).toHaveLength(7);
+    expect(floorEdges(shapes)).toContainEqual([1, 2, 2, 2]);
+  });
+
+  it("writes the dark tunnel's name away from the mark", () => {
+    const shapes = planShapes({
+      rows: ['#######', '#.....#', '#######'],
+      enchanted: [
+        [1, 1],
+        [2, 1],
+        [3, 1],
+        [4, 1],
+        [5, 1],
+      ],
+      unlit: [],
+      figures: [],
+      things: [],
+      marks: [[5, 1]],
+    });
+    expect(tunnelLabelCell(shapes)).toEqual({ x: 1, y: 1 });
   });
 });

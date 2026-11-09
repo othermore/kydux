@@ -12,13 +12,10 @@ For example, if we are at (5, 7) and the key is at (9, 8): 9 - 5 = 4 steps to th
 ---
 ## Try it
 
-Let's light the room, find the key and print the two numbers.
+The program keeps your wizard's position in a variable, `position`, and then prints its two numbers, its attribute `x` first and its attribute `y` second, each on its own line. This way you can see the two numbers of the cell where you stand!
 
 ```python try
-wizard.cast("kirra")
-key = wizard.find_nearest("key")
-right = key.position.x - wizard.position.x
-down = key.position.y - wizard.position.y
-print(right)
-print(down)
+position = wizard.position
+print(position.x)
+print(position.y)
 ```

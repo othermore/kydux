@@ -14,12 +14,8 @@ The important thing is that those numbers tell us how many steps there are betwe
 So to go from cell (5, 12) to (9, 9), your wizard has to walk four steps right and three up. You only have to count how many steps there are from one number to another.
 
 ---
-## Try it
+## The map's word
 
 The map only works with the word in its corner, *orvim*.
 
 Cast with the wand, it opens the plan of this corridor, with our three figures on it. It stays open until you close it.
-
-```python try
-wizard.cast("orvim")
-```

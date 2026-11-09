@@ -12,13 +12,10 @@ Por ejemplo, si estamos en la (5, 7) y la llave está en la (9, 8): 9 - 5 = 4 pa
 ---
 ## Pruébalo
 
-Vamos a iluminar la sala, encontrar la llave e imprimir los dos números.
+El programa guarda la posición de tu {mago|maga} en una variable, `position`, y luego imprime sus dos números, primero su atributo `x` y después su atributo `y`, cada uno en su propia línea. ¡Así puedes ver los dos números de la casilla donde estás!
 
 ```python try
-wizard.cast("kirra")
-key = wizard.find_nearest("key")
-right = key.position.x - wizard.position.x
-down = key.position.y - wizard.position.y
-print(right)
-print(down)
+position = wizard.position
+print(position.x)
+print(position.y)
 ```

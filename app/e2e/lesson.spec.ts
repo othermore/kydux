@@ -143,9 +143,9 @@ test('a lesson shows who teaches it; a story is told on its scene instead (D67, 
 
 test.describe('a page runs its code (D142)', () => {
   test('a block prints on the page, in the level after the lesson, and can be changed', async ({ page }) => {
+    // Where I am's first page: the wizard's cell, in the dark tunnel.
     await page.goto('/#lesson/where-i-am');
-    await expect(page.locator('.lesson-page')).toBeVisible();
-    while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
+    await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 2');
     await page.locator('.lesson-run button').click();
     await expect(page.locator('.lesson-printed')).toHaveText('(14, 2)', { timeout: 90_000 });
     await expect(page.locator('.lesson-said')).toBeHidden();
@@ -179,37 +179,58 @@ test.describe('a page runs its code (D142)', () => {
     await expect(page.locator('.lesson-printed')).toHaveText('False', { timeout: 30_000 });
   });
 
-  test('the block of if prints the cell, which the condition changes', async ({ page }) => {
+  test('the block of if prints both lines while Dask looks up, and the cell alone once its condition says down (D174)', async ({
+    page,
+  }) => {
     await page.goto('/#lesson/if');
     await page.locator('#lesson-next').click();
+    await expect(page.locator('#lesson-page')).toHaveText('Page 2 of 2');
+    await expect(page.locator('#lesson-next')).toHaveCount(0);
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('(11, 8)', { timeout: 90_000 });
-    await expect(page.locator('.lesson-said')).toContainText('(11, 8)');
-  });
-
-  test('a block that walks says the cell the wizard ended on, always from the start', async ({ page }) => {
-    await page.goto('/#lesson/waiting');
-    await page.locator('#lesson-next').click();
-    await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('(11, 6)', { timeout: 90_000 });
-    await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('(11, 6)', { timeout: 30_000 });
-    // Without waiting, Dask sees the wizard: the page says it.
+    await expect(page.locator('.lesson-printed')).toHaveText('Looking up\nPosition: (11, 6)', { timeout: 90_000 });
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('wizard.move_right(7)');
+    await page.keyboard.insertText('if dask.facing == "down":\n    print("Looking up")\nprint("Position:", wizard.position)');
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('Position: (11, 6)', { timeout: 30_000 });
+  });
+
+  test("the two coordinates print the cell's two numbers (D174)", async ({ page }) => {
+    await page.goto('/#lesson/the-two-coordinates');
+    for (let turn = 0; turn < 2; turn += 1) await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('5\n7', { timeout: 90_000 });
+  });
+
+  test('a program typed that walks says the cell the wizard ended on, always from the start', async ({ page }) => {
+    // No block walks (D174), but the child may type one that does, in If's block.
+    await page.goto('/#lesson/if');
+    await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_down(2)');
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-said')).toContainText('(11, 8)', { timeout: 90_000 });
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-said')).toContainText('(11, 8)', { timeout: 30_000 });
+    // Into Dask's sight, he sees the wizard: the page says it.
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_right(3)');
     await page.locator('.lesson-run button').click();
     await expect(page.locator('.lesson-said')).toContainText('teacher', { timeout: 30_000 });
   });
 
-  test('a block that casts the map opens the plan, closed with its button', async ({ page }) => {
-    await page.goto('/#lesson/the-cells');
-    await expect(page.locator('.lesson-page')).toBeVisible();
-    while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
+  test('a program typed that casts the map opens the plan, closed with its button', async ({ page }) => {
+    await page.goto('/#lesson/if');
+    await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.cast("orvim")');
     await page.locator('.lesson-run button').click();
     const plan = page.locator('#plan');
     await expect(plan).toBeVisible({ timeout: 90_000 });
-    await expect(plan).toHaveAttribute('data-figures', /wizard:1,12/);
+    await expect(plan).toHaveAttribute('data-figures', /wizard:11,6/);
     await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
     await page.locator('#plan-close').click();
     await expect(plan).toHaveCount(0);
@@ -220,7 +241,6 @@ test.describe('a page runs its code (D142)', () => {
     const page = await context.newPage();
     await page.goto('/#lesson/where-i-am');
     await expect(page.locator('.lesson-page')).toBeVisible();
-    while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
     await expect(page.locator('.lesson-run button')).toHaveText('Ejecutar');
     await context.close();
   });

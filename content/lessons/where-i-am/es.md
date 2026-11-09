@@ -12,12 +12,3 @@ print(wizard.position)
 ## Lo que no se ve
 
 A veces no podemos ver algunas cosas en el mapa (quizás hay un encantamiento de ocultación, o quizás son muy pequeñas). Sin embargo, usando el atributo `position`, el programa ve exactamente dónde están las cosas, incluso aunque tú no lo veas en el mapa.
-
----
-## Pruébalo
-
-Vamos a mirar en qué casilla estamos ahora mismo, aquí dentro del túnel.
-
-```python try
-print(wizard.position)
-```

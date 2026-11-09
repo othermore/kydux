@@ -10,15 +10,3 @@ We can use another loop that repeats its lines over and over as long as its expr
 Be careful! If the answer never changes, the loop will never end.
 
 But it is not a disaster: the game will stop a `while` that never ends thanks to the game's tick limit. Just make sure the answer can change!
-
----
-## Try it
-
-Your wizard stays still over and over, while Dask looks to the right. The program writes a line each tick it stays in the loop, and one more when it leaves it.
-
-```python try
-while dask.facing == "right":
-    print("Dask is looking", dask.facing, "so I wait")
-    wizard.wait()
-print("We left the loop because Dask is looking", dask.facing)
-```

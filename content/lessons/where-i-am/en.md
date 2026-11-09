@@ -12,12 +12,3 @@ print(wizard.position)
 ## What cannot be seen
 
 Sometimes we cannot see some things on the map (maybe there is a hiding spell, or maybe they are very small). However, using the `position` attribute, the program sees exactly where things are, even if you do not see them on the map.
-
----
-## Try it
-
-Let us look at exactly which cell we are in right now, here inside the tunnel.
-
-```python try
-print(wizard.position)
-```

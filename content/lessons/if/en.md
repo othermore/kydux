@@ -7,23 +7,12 @@ We write `if`, then our expression, and a colon at the end. Underneath, we move 
 ---
 ## A condition
 
-If Dask looks up, we want to walk down two cells.
+The first line is the condition. The line under it, moved in by four spaces, runs only when the condition is `True`. The last line is not moved in, so it runs always, and prints the word and your wizard's cell. Given two values separated by a comma, `print` writes both, with a space between them.
 
-This code prints your wizard's cell, which only changes if the condition is true.
-
-```python try
-if dask.facing == "up":
-    wizard.move_down(2)
-print(wizard.position)
-```
-
----
-## Try it
-
-Change `"up"` for `"down"` in the code. You will see that the cell stays the same because the condition is no longer true!
+Dask looks up right now, so this program prints both lines. Change `"up"` to `"down"` and run it again, and only the cell is printed, because the condition is no longer `True`.
 
 ```python try
 if dask.facing == "up":
-    wizard.move_down(2)
-print(wizard.position)
+    print("Looking up")
+print("Position:", wizard.position)
 ```

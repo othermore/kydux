@@ -199,11 +199,14 @@ test.describe('the map, opened by its spell (D134)', () => {
     await expect(scene(page)).toHaveAttribute('data-state', 'paused', { timeout: 30_000 });
   });
 
-  test("the first lesson's Try it leads to the level, where it opens the plan", async ({ page }) => {
+  test("the first lesson's last button leads to the level, where the map's word opens the plan", async ({ page }) => {
     await page.goto('/#lesson/the-cells');
     // The lesson drawn before its pages are counted: a slow load is not its last page.
     await expect(page.locator('.lesson-page')).toBeVisible();
     while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
+    // Its third page, the map's word, holds no block (D174), and goes on to the level.
+    await expect(page.locator('.lesson-run')).toHaveCount(0);
+    await expect(page.locator('#lesson-try')).toHaveText('Go on');
     await page.screenshot({ path: `${SHOTS}lesson-the-cells.png` });
     await page.locator('#lesson-try').click();
     await expect(page).toHaveURL(/#level\/the-doors-corridor$/);

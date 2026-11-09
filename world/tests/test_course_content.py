@@ -171,6 +171,10 @@ NOTHING_TO_TRY = {
     "giving-things": 3,
     "keys-and-doors": 2,
     "fendra": 2,
+    "the-cells": 3,
+    "waiting": 1,
+    "while": 2,
+    "kirra-and-osto": 2,
 }
 
 

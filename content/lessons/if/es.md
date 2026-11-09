@@ -7,23 +7,12 @@ Escribimos `if`, luego nuestra expresión, y al final dos puntos. Debajo, metemo
 ---
 ## Una condición
 
-Si Dask mira hacia arriba, queremos caminar dos casillas hacia abajo.
+La primera línea es la condición. La línea de debajo, metida hacia dentro con cuatro espacios, solo se ejecuta cuando la condición es `True`. La última línea no está metida hacia dentro, así que se ejecuta siempre, e imprime la palabra y la casilla de tu {mago|maga}. Al darle a `print` dos valores, separados por una coma, escribe ambos con un espacio entre ellos.
 
-Este código imprime la casilla de tu {mago|maga}, que solo cambia si la condición es verdadera.
-
-```python try
-if dask.facing == "up":
-    wizard.move_down(2)
-print(wizard.position)
-```
-
----
-## Pruébalo
-
-Cambia `"up"` por `"down"` en el código. ¡Verás que la casilla se queda igual porque la condición ya no es verdadera!
+Dask mira hacia arriba ahora mismo, así que este programa imprime ambas líneas. Cambia `"up"` por `"down"` y ejecútalo de nuevo, y solo se imprimirá la casilla, porque la condición ya no es `True`.
 
 ```python try
 if dask.facing == "up":
-    wizard.move_down(2)
-print(wizard.position)
+    print("Mirando hacia arriba")
+print("Posición:", wizard.position)
 ```

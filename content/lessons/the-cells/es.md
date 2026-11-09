@@ -14,12 +14,8 @@ Lo importante es que esos números nos dicen cuántos pasos hay entre dos casill
 Así que para ir desde la casilla (5, 12) hasta la (9, 9), tu {mago|maga} tiene que caminar cuatro pasos a la derecha y tres arriba. Solo tienes que contar cuántos pasos hay de un número a otro.
 
 ---
-## Pruébalo
+## La palabra del mapa
 
 El mapa solo funciona con la palabra que está escrita en su esquina, *orvim*.
 
 Si la lanzas con la varita, se abrirá el plano de este pasillo, con nuestras tres figuras en él, y se mantendrá abierto hasta que lo cierres.
-
-```python try
-wizard.cast("orvim")
-```

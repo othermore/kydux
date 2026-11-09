@@ -14,7 +14,9 @@ no level between; and `osto`, taught and summed up in the story, is needed
 in no level. This sprint answers all of it with no Gemini image and no new
 scene.
 
-The pieces, in this order: 37.1 to 37.8. The rules of the earlier sprints
+The pieces, in this order: 37.1 to 37.9 (37.9 and D179 added on
+2026-11-09 after the build began, with 37.7's rework: section 5's prompt
+says what a builder already at work takes up). The rules of the earlier sprints
 hold: pieces in order, `ci/check.sh --e2e` green and one local commit per
 piece, never a push, never a timer; every word for the player through
 `t()` or a content file, in English and Spanish; Gemini writes every text
@@ -94,6 +96,21 @@ owner's acceptance test, section 4 the hand-over, section 5 the prompt.
   chapter's last level uses both its spells. Rules out a spell taught,
   summed up in the story, and never cast, and a spell that spares the
   child the loop.
+
+- **D179 — The browser tests run on GitHub at a release, and by hand.**
+  Decided 2026-11-09 by the owner, on the designer's proposal, after every
+  run of 2026-11-09 and the one of 0.0.2 failed there: GitHub's runner
+  takes 1.8 hours for the 288 browser tests and six of them, the ones
+  that wait the longest in real time (the night that falls, the painted
+  doors tick by tick, the loop that never ends, Eldra's book, the
+  restart), run out of their time, while every one passes on hija. On
+  GitHub the `check` job runs on every push and pull request as it does;
+  the `e2e` job runs on a version's tag (`v*`) and when started by hand
+  (`workflow_dispatch`). The gate stays `ci/check.sh --e2e` on hija before
+  every commit (sprint rules); a release tags its version commit
+  `v<version>`, and `ci/push.sh` pushes the tags of the commits it pushes.
+  Rules out two hours of a private repository's minutes on every push,
+  and a red check that says nothing about the code.
 
 ## 2. The pieces
 
@@ -270,6 +287,21 @@ card, the night walk's hole held), the commits, the differences from the
 plan with their reasons, the walkthroughs' paths, what is left open, and
 the prompt for the designer's review in English, in a code block.
 
+### 37.9 GitHub runs the browser tests at a release (D179)
+
+`.github/workflows/check.yml`: `on` gains
+`push: tags: ['v*']` and `workflow_dispatch`; the `e2e` job runs only
+when the ref is a tag `v*` or the run was started by hand, the `check`
+job on every push and pull request as now; the header comment says so.
+`ci/push.sh`: pushes with `--follow-tags`, so that an annotated tag on a
+pushed commit goes with it; its comment says so. `docs/dev/dev-environment.md`,
+the release's section: before `ci/push.sh`, `git tag -a v<version> -m
+"Version <version>"` on the version commit, and that the browser tests
+run on GitHub from that tag; the tag `v0.0.3` on f82322b is the owner's to
+make, named in the report. `docs/dev/README.md` where it names the GitHub
+check. No test runs for this piece beyond `ci/check.sh`, and the YAML is
+read back after the edit.
+
 ## 3. What the owner tries
 
 1. *Palabras*, *Cosas que llevar*, *Tu primer hechizo*: two pages each, no
@@ -294,36 +326,45 @@ the prompt for the designer's review in English, in a code block.
 
 ## 4. What the implementer hands over
 
-As 37.8 says.
+As 37.8 says, and the report names the tag the owner makes (37.9).
 
 ## 5. The prompt for CLAUDE-programmer
 
+The first prompt went out with the plan as first committed (c432d8d); the
+builder began on it. This is the one given after the plan changed
+(4dc77fb, D178 and 37.7 reworked; then D179 and 37.9 added).
+
 ```
-You are CLAUDE-programmer on Kydux, a game for children to learn
-Python, at /home/other/Projects/kydux. Another agent, CLAUDE-designer,
-plans each sprint and reviews it; you build what the sprint's document
-says, and only that, and you two never talk: everything goes through
-the owner. Read first, in this order: /home/other/Projects/kydux/
+You are CLAUDE-programmer on Kydux, at /home/other/Projects/kydux, and
+you are already building sprint 37 from docs/dev/sprint-37.md. The plan
+changed after you began; read it again whole, and in particular D178,
+D179, 37.6's bullet on kirra-and-osto, 37.7 and 37.9, and section 3.
+What changed: osto is taught after the while, not before: Luz y
+trampas loses its osto sentence, El agujero que se abre no longer knows
+the spell, and a short new lesson the-portal (El portal que no se
+cierra, Lesson 11, two pages, no block) after the story Las voces
+teaches it before El paseo nocturno, whose hole has period 0 and is
+crossed with osto; and a new piece 37.9 makes GitHub's e2e job run only
+on a version tag or by hand, with ci/push.sh pushing tags and the
+release section of dev-environment.md tagging the version. Go on in
+order from the piece you are on; if 37.6 or 37.7 are already
+committed, bring them to the plan as it now stands in one more commit
+each, saying so. Everything else holds: the first prompt's rules,
 CLAUDE.md, .claude/working-model.md, docs/dev/README.md,
-docs/dev/sprint-37.md (this plan, whole), docs/dev/course.md,
-tools/write/README.md and rules.md, D28, D51, D53, D141, D142, D167,
-D170, D173 and D174 to D178 in docs/dev/architecture.md, and the
-memory notes kydux-two-agents, kydux-sprint-36-state,
-kydux-designer-review-36 and kydux-metaphors-once. Build sprint 37
-whole: pieces 37.1 to 37.8 in order, one local commit each,
-ci/check.sh --e2e green before each, never a push, never a timer (the
-owner pushes with ci/push.sh and releases). Never stop or build into
-the servers on ports 443 and 5173, and never kill a vite, node or
-nginx process of the owner's (CLAUDE.md); use a port of your own for
-any preview and stop it when you are done. No Gemini image in this
-sprint. The code of every block is the plan's, word for word, in both
-languages as the plan says; the words around it come from the briefs
-the plan names, read and corrected, with every kept page word for
-word. The plan decides everything; where it does not, take the
-smallest choice that keeps its intent and say it in the commit; a
-choice that changes what the owner sees is asked first, through the
-owner. Every document and comment in the present. Before git add, read
-git diff of each file and stage only your own hunks; commit promptly.
-Hand over as section 4 asks, as a report in Spanish, and end with the
-prompt for the designer's review in English, in a code block.
+docs/dev/course.md, tools/write/README.md and rules.md, D28, D51, D53,
+D141, D142, D167, D170, D173 and D174 to D179 in
+docs/dev/architecture.md, the memory notes kydux-two-agents,
+kydux-sprint-36-state, kydux-designer-review-36 and
+kydux-metaphors-once; one local commit per piece, ci/check.sh --e2e
+green before each, never a push, never a timer, never a tag (the owner
+tags, pushes with ci/push.sh and releases); never stop or build into
+the servers on ports 443 and 5173, never kill a vite, node or nginx
+process of the owner's; a port of your own for any preview, stopped
+when you are done; no Gemini image; the code of every block the plan's
+word for word, the words around it from the briefs the plan names,
+read and corrected, every kept page word for word; every document and
+comment in the present; before git add, read git diff of each file and
+stage only your own hunks. Hand over as section 4 asks, as a report in
+Spanish, and end with the prompt for the designer's review in English,
+in a code block.
 ```

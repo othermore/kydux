@@ -2,8 +2,9 @@
 // Spanish for a girl and in English for a boy, in every way; the map's plan opened
 // by orvim and the run paused until it is closed (D134); the enchanted tunnel, where
 // no one is seen (D135); a teacher's phases (D137); the dark room over a painting
-// (D52); the slab's hole (D138); each story told to its end; the map's stops in
-// order. Screenshots of every stop go to e2e/shots/chapter-3/, which git ignores, for
+// (D52); the hole that opens in the floor (D167); the goal's mark under an arch and under
+// the wizard (D160, D168); the dark room's key on the plan (D169); each story told to its
+// end; the map's stops in order. Screenshots of every stop go to e2e/shots/chapter-3/, which git ignores, for
 // the owner.
 
 import { mkdirSync, readFileSync } from 'node:fs';
@@ -127,6 +128,18 @@ test.describe('the map, opened by its spell (D134)', () => {
     await expect(page.locator('.printed')).toHaveText('(14, 2)', { timeout: 30_000 });
   });
 
+  test("P8's plan shows the key lying in the dark storeroom (D169)", async ({ page }) => {
+    await open(page, 'the-dark-room');
+    await expect(scene(page)).toHaveAttribute('data-dark', 'true');
+    await start(page, 'wizard.cast("orvim")');
+    const plan = page.locator('#plan');
+    await expect(plan).toBeVisible({ timeout: 30_000 });
+    await expect(plan).toHaveAttribute('data-things', /key:9,7/);
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    await page.screenshot({ path: `${SHOTS}plan-dark-room-key.png` });
+    await page.keyboard.press('Escape');
+  });
+
   test('the plan writes a mark\'s cell and rules the floor cells (D151)', async ({ page }) => {
     await open(page, 'the-doors-corridor');
     await start(page, 'wizard.cast("orvim")');
@@ -247,10 +260,10 @@ test.describe('the storeroom', () => {
   test('the hole shows while it is open, and osto holds it closed (D167), the storeroom dark (D162)', async ({ page }) => {
     await open(page, 'the-opening-hole', '1');
     await expect(scene(page)).toHaveAttribute('data-dark', 'true');
-    await expect(scene(page)).toHaveAttribute('data-slabs', 'hole:in');
+    await expect(scene(page)).toHaveAttribute('data-holes', 'hole:closed');
     await expect(scene(page)).not.toHaveAttribute('data-drawn', /hole:/);
     await start(page, 'wizard.move_right(2)\nwizard.wait(4)');
-    await expect(scene(page)).toHaveAttribute('data-slabs', 'hole:away', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-holes', 'hole:open', { timeout: 30_000 });
     await expect(scene(page)).toHaveAttribute('data-drawn', /hole:3\.\d+,7\.\d+/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hole-open.png` });
     await page.locator('#speed').selectOption('4');
@@ -320,17 +333,20 @@ test.describe('what the page draws of the chapter', () => {
     await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
   });
 
-  test("the goal's mark lies on the floor, its ring seen where an arch or the wizard covers it (D160)", async ({ page }) => {
-    // Under the top arch's band from the start.
+  test("the goal's mark lies on the floor, its thin ring seen where an arch covers it, never over the wizard (D160, D168)", async ({ page }) => {
+    // Under the top arch's band from the start: its silhouette shows over the band.
     await open(page, 'the-three-doors');
     await expect(scene(page)).toHaveAttribute('data-marks-covered', '10,0', { timeout: 10_000 });
     await page.screenshot({ path: `${SHOTS}mark-under-the-arch.png` });
-    // Free at the start, and under the wizard who stands on it at the end.
+    // Free at the start, and under the wizard who stands on it at the end: the wizard
+    // covers it, and no ring is drawn over the figure.
     await open(page, 'the-tunnel-exit');
     await expect(scene(page)).toHaveAttribute('data-marks-covered', '', { timeout: 10_000 });
     await run(page, solution('the-tunnel-exit'));
     await expect(scene(page)).toHaveAttribute('data-wizard', '11,6');
-    await expect(scene(page)).toHaveAttribute('data-marks-covered', '11,6', { timeout: 10_000 });
+    await page.waitForTimeout(500);
+    await expect(scene(page)).toHaveAttribute('data-marks-covered', '');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}mark-under-the-wizard.png` });
   });
 
   test('the key lies small on the middle of its cell, beside the torch (D109, D164)', async ({ page }) => {

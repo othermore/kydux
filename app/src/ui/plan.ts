@@ -4,13 +4,14 @@
 // faint over the walls, every door as the scene shows it at this tick, the figures with
 // their own standing sprites and their names and cells beside them, drawn where the
 // scene draws them and behind the same cut-outs, inked with the ground, every reach mark
-// with the mark's picture lying on the ground under them and its silhouette where they
-// cover it (D160) and its cell written beside it, the hidden ones too, the dark tunnel's
-// cells as a dotted path, the column and row numbers along the four edges, and a cell's
-// own numbers where the pointer rests or a finger taps. A dark room is drawn as any room,
-// since the map knows the castle, and what lies unlit in it stays undrawn (D52, D163);
-// no one in the dark tunnel is drawn (D135). The names and cells are written last, each
-// where it covers no figure, no mark, no other name and, a mark's, no cut-out (D166).
+// with the mark's picture lying on the ground under them, its thin silhouette where a
+// cut-out covers it (D160, D168), and its cell written beside it, the hidden ones too,
+// the dark tunnel's cells as a dotted path, the column and row numbers along the four
+// edges, and a cell's own numbers where the pointer rests or a finger taps. A dark room
+// is drawn as any room, with the things lying in it, the key among them, since the map
+// knows the castle (D163, D169); no one in the dark tunnel is drawn (D135). The names
+// and cells are written last, each where it covers no figure, no mark, no other name
+// and, a mark's, no cut-out (D166).
 // Its button or Escape closes it, and the playback goes on.
 
 import { figureDepth, loweredBy, MARK_DEPTH, nudgedBy } from '../engine/depth';
@@ -26,7 +27,7 @@ export interface PlanShapes {
   /** Every cell, a dark room's as any room's (D163). */
   cells: { x: number; y: number; kind: PlanCell }[];
   doors: { id: string; x: number; y: number; open: boolean; across: boolean }[];
-  /** The things seen: none that lies unlit (D52). */
+  /** The things on the map, a dark room's too (D169). */
   things: { id: string; x: number; y: number }[];
   figures: { id: string; kind: string; x: number; y: number; facing: string }[];
   /** Every reach mark's cell, the hidden ones too. */
@@ -38,7 +39,6 @@ const key = ([x, y]: Tile): string => `${x},${y}`;
 /** What the plan draws for a view of the scene, apart from any canvas. */
 export function planShapes(view: PlanView): PlanShapes {
   const enchanted = new Set(view.enchanted.map(key));
-  const unlit = new Set(view.unlit.map(key));
   const cells: PlanShapes['cells'] = [];
   view.rows.forEach((row, y) => {
     [...row].forEach((char, x) => {
@@ -48,8 +48,6 @@ export function planShapes(view: PlanView): PlanShapes {
     });
   });
   const isWall = (x: number, y: number) => (view.rows[y]?.[x] ?? '#') === '#';
-  const [wx, wy] = view.figures.find((figure) => figure.id === 'wizard')?.tile ?? [-9, -9];
-  const near = ([x, y]: Tile) => Math.abs(x - wx) <= 1 && Math.abs(y - wy) <= 1;
   const doors = view.things
     .filter((thing) => thing.kind === 'door')
     .map(({ id, tile: [x, y], open }) => ({
@@ -62,7 +60,6 @@ export function planShapes(view: PlanView): PlanShapes {
     }));
   const things = view.things
     .filter((thing) => thing.kind !== 'door' && thing.kind !== 'bed')
-    .filter((thing) => !unlit.has(key(thing.tile)) || near(thing.tile))
     .map(({ id, tile: [x, y] }) => ({ id, x, y }));
   const figures = view.figures
     .filter((figure) => !enchanted.has(key(figure.tile)))
@@ -320,6 +317,8 @@ function gutterOf(cell: number): number {
 
 /** How far the mark's outer ink ring lies from its middle, in cells. */
 const GOAL_RING = 0.39;
+/** How thick a mark's silhouette is drawn, in cells: a figure's outline on the scene. */
+const GOAL_LINE = 0.02;
 
 /** The mark of a reach goal, as the scene draws it (painted.drawMark). */
 function drawGoal(ctx: CanvasRenderingContext2D, cx: number, cy: number, cell: number): void {
@@ -339,11 +338,11 @@ function drawGoal(ctx: CanvasRenderingContext2D, cx: number, cy: number, cell: n
   ctx.stroke();
 }
 
-/** A mark's silhouette (D160): its ring in the outline's yellow, for where what is drawn
- * over the mark covers it. */
+/** A mark's silhouette (D160, D168): its ring in the outline's yellow, as thin as a
+ * figure's outline on the scene, for where a cut-out drawn over the mark covers it. */
 function drawGoalLine(ctx: CanvasRenderingContext2D, cx: number, cy: number, cell: number): void {
   ctx.strokeStyle = 'rgb(255 214 51)';
-  ctx.lineWidth = Math.max(2, cell * 0.06);
+  ctx.lineWidth = Math.max(1, cell * GOAL_LINE);
   ctx.beginPath();
   ctx.arc(cx, cy, cell * 0.36, 0, Math.PI * 2);
   ctx.stroke();
@@ -489,7 +488,7 @@ export function drawPlan(
   // The marks on the ground (D160); over them the figures as themselves, each on its
   // cell, its feet as the scene puts them, among the scene's own cut-outs in ink, each by
   // its depth (D151).
-  const layers: { depth: number; mark?: boolean; draw: (target: CanvasRenderingContext2D) => void }[] =
+  const layers: { depth: number; mark?: boolean; figure?: boolean; draw: (target: CanvasRenderingContext2D) => void }[] =
     shapes.marks.map(({ x, y }) => ({
       depth: MARK_DEPTH,
       mark: true,
@@ -499,6 +498,7 @@ export function drawPlan(
     const feet = (feetAt(figure.x, figure.y) - gutter) / cell;
     layers.push({
       depth: figureDepth(feet),
+      figure: true,
       draw: (target) => {
         const sheet = loaded?.figures.get(figure.id);
         const about = pictures?.figures.find((one) => one.id === figure.id);
@@ -543,21 +543,28 @@ export function drawPlan(
   }
   const sorted = [...layers].sort((one, other) => one.depth - other.depth);
   for (const layer of sorted) layer.draw(ctx);
-  // Where what is drawn over a mark covers it, its ring over them (D160).
+  // Where a cut-out drawn over a mark covers it, its ring over the cut-out, thin, and
+  // never over a figure (D160, D168).
   if (shapes.marks.length > 0) {
     const over = alike(ctx);
+    const figures = alike(ctx);
     const line = alike(ctx);
-    if (over && line) {
-      for (const layer of sorted) if (!layer.mark) layer.draw(over);
+    if (over && figures && line) {
+      for (const layer of sorted) {
+        if (layer.figure) layer.draw(figures);
+        else if (!layer.mark) layer.draw(over);
+      }
       for (const { x, y } of shapes.marks) drawGoalLine(line, across(x, y), down(x, y), cell);
       line.save();
       line.setTransform(1, 0, 0, 1, 0, 0);
       line.globalCompositeOperation = 'destination-in';
       line.drawImage(over.canvas, 0, 0);
+      line.globalCompositeOperation = 'destination-out';
+      line.drawImage(figures.canvas, 0, 0);
       line.restore();
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.globalAlpha = 0.9;
+      ctx.globalAlpha = 0.85;
       ctx.drawImage(line.canvas, 0, 0);
       ctx.restore();
     }

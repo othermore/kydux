@@ -15,13 +15,13 @@
 // while the wizard's casting frames play), data-acting (`pickup` or `win` while
 // the wizard's act plays, 14.3), data-opening (the door shown half open
 // as it opens), data-dark (whether the
-// room is still dark, D52), data-slabs ("id:in" or "id:away" joined by ";",
-// each slab as a step taken now would find it, D53, D138), data-held (the slabs
-// osto holds now), data-enchanted (the figures an enchanted region hides, joined
+// room is still dark, D52), data-holes ("id:closed" or "id:open" joined by ";",
+// each hole as a step taken now would find it, D53, D167), data-held (the holes
+// osto holds closed now), data-enchanted (the figures an enchanted region hides, joined
 // by ",", D135), data-zoom (the
 // camera's zoom, D69), data-following (whether the camera follows the wizard),
-// data-marks-covered (the marks something is drawn over now, whose ring shows over
-// it, "x,y" joined by ";", D160),
+// data-marks-covered (the marks a cut-out is drawn over now, whose ring shows over
+// it, "x,y" joined by ";", D160, D168),
 // data-revealed (the things whose outline shows where they lie, D85),
 // data-sleeping (the bed the wizard sleeps in, D84), data-ground (`morning` while
 // a scene painted at night shows its morning ground, `painting` otherwise, D126), data-asleep (each figure
@@ -113,7 +113,7 @@ import { LONG, Playback } from './playback';
 import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
-import { type Hold, slabHeld, slabInPlace } from './slab';
+import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, friendText, sleepingText } from './words';
 
@@ -249,8 +249,8 @@ class LevelScene extends Phaser.Scene {
   private cone!: Phaser.GameObjects.Graphics;
   /** The cells that hide every figure in them (D135). */
   private enchanted = new Set<string>();
-  /** The ring round a slab while osto holds it, by the slab's id (D138). */
-  private rings = new Map<string, Phaser.GameObjects.Arc>();
+  /** The ring round a hole while osto holds it closed, by the hole's id (D167). */
+  private rings = new Map<string, Phaser.GameObjects.Ellipse>();
   /** Who is told when the map opens, and when a run started again closes it (D134). */
   private mapOpened: ((view: PlanView) => void) | null = null;
   private mapClosed: (() => void) | null = null;
@@ -266,7 +266,7 @@ class LevelScene extends Phaser.Scene {
   /** The dark over a painting (D52), soft at its edges and round the wizard. */
   private softDark: Phaser.GameObjects.Image | null = null;
   private darkLifting = false;
-  /** The tick shown, and each slab's holds seen so far (D53, D138). */
+  /** The tick shown, and each hole's holds seen so far (D53, D167). */
   private shownTick = 0;
   private holds = new Map<string, Hold[]>();
   /** Counts the restarts, so that a door's delayed opening from a run before is dropped. */
@@ -522,9 +522,9 @@ class LevelScene extends Phaser.Scene {
         thing.kind === 'door'
           ? this.add.image(...centre(thing.tile), thingKey('door'), thing.open ? 'open' : thing.lock)
           : thing.kind === 'hole'
-            ? this.add.image(...centre(thing.tile), thingKey('slab'), 'in')
+            ? this.add.image(...centre(thing.tile), thingKey('hole'), 'closed')
             : this.add.image(...centre(thing.tile), thingKey(thing.kind));
-      // Doors and slabs are the castle's shape, seen in the dark; what lies on the
+      // Doors and holes are the castle's shape, seen in the dark; what lies on the
       // floor is under it (D52).
       const shape = thing.kind === 'door' || thing.kind === 'hole';
       this.things.set(thing.id, image.setDepth(shape ? 2.8 : 2));
@@ -628,23 +628,26 @@ class LevelScene extends Phaser.Scene {
           }),
           ...[...this.things].flatMap(([id, image]) => {
             const thing = scene.things[this.artOf(id)];
-            // A slab's hole lies on the floor, and hides no one.
+            // A hole lies in the floor, and hides no one.
             const flat = this.map.things.some((one) => one.id === id && one.kind === 'hole');
             return thing && !flat && image.texture.key.startsWith('art-') ? [{ image, row: thing.row }] : [];
           }),
         ]
       : [];
     this.coverings = painted.map(({ image }) => image);
-    // Each mark's silhouette, over what is painted and every figure, under the dark and
-    // the light (D160).
+    // Each mark's silhouette, where a cut-out covers it and no figure does, over what is
+    // painted, under the dark and the light (D160, D168).
     const figures = [this.wizard, ...[...this.actors.values()].map((actor) => actor.sprite)];
     for (const one of this.marks) {
       one.silhouette = new MarkSilhouette(
         this,
         one.mark,
         MARK_RADIUS,
-        [...this.coverings, ...figures],
+        this.coverings,
+        figures,
         overDepth(this.map.height) + 0.25,
+        this.still,
+        this.wizard.scaleX,
       );
     }
     if (this.art && this.wizard.texture.key.startsWith('fig-')) {
@@ -966,7 +969,6 @@ class LevelScene extends Phaser.Scene {
     return {
       rows: this.map.rows,
       enchanted: this.map.enchanted,
-      unlit: this.lit ? [] : this.darkCells(),
       figures,
       things,
       marks: this.map.reaches,
@@ -1087,7 +1089,7 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.sounds = this.playedSounds.join(',');
   }
 
-  /** A slab held by osto: its hold kept, for its state at later ticks (D53, D138). */
+  /** A hole held closed by osto: its hold kept, for its state at later ticks (D53, D167). */
   private hold(event: WorldEvent): void {
     const id = String(event.data.id);
     const held = { from: Number(event.data.from), until: Number(event.data.until) };
@@ -1770,24 +1772,24 @@ class LevelScene extends Phaser.Scene {
         this.cone.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
     }
-    // Each slab as a step taken now would find it, and in place under the wizard: on a
-    // painted scene, its hole seen while it is away, and a ring while osto holds it
-    // (D138).
-    const slabs: string[] = [];
+    // Each hole as a step taken now would find it, and closed under the wizard, on any of
+    // its cells: on a painted scene, its picture seen while it is open, and a ring while
+    // osto holds it closed (D167).
+    const holes: string[] = [];
     const held: string[] = [];
     for (const thing of this.map.things) {
       if (thing.kind !== 'hole') continue;
-      const tile = this.startTile(thing.id, thing.tile);
-      const under = tile[0] === this.wizardTile[0] && tile[1] === this.wizardTile[1];
+      const cells = thing.cells ?? [thing.tile];
+      const under = cells.some(([x, y]) => x === this.wizardTile[0] && y === this.wizardTile[1]);
       const holds = this.holds.get(thing.id) ?? [];
-      const inPlace = under || slabInPlace(thing.period ?? 1, holds, this.shownTick + 1);
+      const closed = under || holeClosed(thing.period ?? 1, holds, this.shownTick + 1);
       const image = this.things.get(thing.id);
-      if (image?.texture.key.startsWith('art-')) image.setVisible(!inPlace);
-      else image?.setFrame(inPlace ? 'in' : 'away');
-      slabs.push(`${thing.id}:${inPlace ? 'in' : 'away'}`);
-      const holding = slabHeld(holds, this.shownTick + 1);
+      if (image?.texture.key.startsWith('art-')) image.setVisible(!closed);
+      else image?.setFrame(closed ? 'closed' : 'open');
+      holes.push(`${thing.id}:${closed ? 'closed' : 'open'}`);
+      const holding = holeHeld(holds, this.shownTick + 1);
       if (holding) held.push(thing.id);
-      this.ringOf(thing.id, tile).setVisible(holding);
+      this.ringOf(thing.id, cells).setVisible(holding);
     }
     // The dark over the dark area (the dark rooms, or the whole map), but the wizard's
     // tile and its eight neighbours (D52, D73).
@@ -1808,7 +1810,7 @@ class LevelScene extends Phaser.Scene {
     }
     const dataset = this.parentNode.dataset;
     dataset.dark = String(!this.lit);
-    dataset.slabs = slabs.join(';');
+    dataset.holes = holes.join(';');
     if (held.length > 0) dataset.held = held.join(',');
     else delete dataset.held;
     dataset.wizard = this.wizardTile.join(',');
@@ -1918,12 +1920,18 @@ class LevelScene extends Phaser.Scene {
     this.lit = true;
   }
 
-  /** The ring round a slab's cell, seen while osto holds it (D138). */
-  private ringOf(id: string, tile: Tile): Phaser.GameObjects.Arc {
+  /** The ring round a hole's cells, one or two side by side, seen while osto holds it
+   * closed (D167). */
+  private ringOf(id: string, cells: readonly Tile[]): Phaser.GameObjects.Ellipse {
     const known = this.rings.get(id);
     if (known) return known;
+    const xs = cells.map(([x]) => x);
+    const ys = cells.map(([, y]) => y);
+    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+    const [cx, cy] = [((x0 + x1 + 1) / 2) * TILE, ((y0 + y1 + 1) / 2) * TILE];
+    const [wide, tall] = [(x1 - x0) * TILE + TILE * 1.24, (y1 - y0) * TILE + TILE * 1.24];
     const ring = this.add
-      .circle(...centre(tile), TILE * 0.62)
+      .ellipse(cx, cy, wide, tall)
       .setStrokeStyle(4, 0xffe066, 0.95)
       .setBlendMode(Phaser.BlendModes.ADD)
       .setDepth(2.9);

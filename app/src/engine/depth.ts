@@ -65,9 +65,9 @@ export function coverDepth(row: number): number {
 }
 
 /** The depth of a goal's mark (D160): on the ground, over the floor's own pictures (a
- * slab's hole, D138), and under every row's things, every thing standing and every
- * figure, so that whatever stands before it or walks over it covers it; the covered
- * part is drawn as its silhouette (silhouette.ts). */
+ * hole, D167), and under every row's things, every thing standing and every figure, so
+ * that whatever stands before it or walks over it covers it; the part a cut-out covers
+ * is drawn as its silhouette (silhouette.ts, D168). */
 export const MARK_DEPTH = 2.9;
 
 /** The depth of what is drawn over every figure of a scene `rows` rows tall: a wall

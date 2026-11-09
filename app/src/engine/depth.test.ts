@@ -69,7 +69,7 @@ describe('the depths of a painted scene (D76, D95)', () => {
     expect(MARK_DEPTH).toBeLessThan(rowDepth(1, true));
     expect(MARK_DEPTH).toBeLessThan(figureDepth(FOOT_IN_CELL - 1));
     expect(MARK_DEPTH).toBeLessThan(thingDepth(0, { lying: true }));
-    // Over the floor's own pictures: a slab's hole is drawn at 2.8.
+    // Over the floor's own pictures: a hole is drawn at 2.8.
     expect(MARK_DEPTH).toBeGreaterThan(2.8);
   });
 

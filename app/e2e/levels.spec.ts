@@ -482,7 +482,7 @@ test.describe('the dark and the holes (D52, D53, D167)', () => {
     await page.goto('/#level/the-opening-hole');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
-    await expect(scene(page)).toHaveAttribute('data-slabs', 'hole:in');
+    await expect(scene(page)).toHaveAttribute('data-holes', 'hole:closed');
     await page.locator('#speed').selectOption('4');
     await run(page, 'wizard.move_right(2)\nwizard.wait()\nprint(hole.open)\nwizard.move_right()');
     await expect(page.locator('.printed')).toHaveText('True');

@@ -18,8 +18,11 @@ export interface ThingLayout {
   tile: Tile;
   /** For a door, how it opens; `none` for anything else. */
   lock: DoorLock;
-  /** For a slab, the ticks it is in place and then away (D53, D138). */
+  /** For a hole, the ticks it is closed and then open (D53, D167). */
   period?: number;
+  /** For a hole, the cells it opens on, one or two side by side, its tile the first
+   * (D167). */
+  cells?: Tile[];
   /** For a door, open from the start: an earlier level of the scene opened it (D65). */
   open: boolean;
   /** The painted thing it is drawn from, when the level names one other than its id
@@ -74,9 +77,8 @@ export interface ActorLayout {
 export interface PlanView {
   /** The world's map: `#` a wall, `=` furniture, anything else floor. */
   rows: readonly string[];
-  /** The enchanted cells (D135), and the cells still dark (D52). */
+  /** The enchanted cells (D135). */
   enchanted: readonly Tile[];
-  unlit: readonly Tile[];
   /** The wizard and every actor in sight, with where each stands and looks. */
   figures: { id: string; kind: string; tile: Tile; facing: string }[];
   /** The things on the map, not those carried. */
@@ -206,11 +208,23 @@ export function layout(level: LevelJson): Layout {
     if (typeof spec.marker === 'string') used.add(spec.marker);
     if (tile) {
       const period = typeof spec.period === 'number' ? { period: spec.period } : {};
+      const celled = spec.kind === 'hole' && Array.isArray(spec.cells) ? spec.cells.map(asTile) : [];
+      const cells = celled.length > 0 ? { cells: celled.filter((cell): cell is Tile => cell !== null) } : {};
       const open = spec.kind === 'door' && spec.open === true;
       const art = typeof spec.art === 'string' ? { art: spec.art } : {};
       const covered = coversOf(spec);
       const covers = covered.length > 0 ? { covers: covered } : {};
-      things.push({ id: String(spec.id), kind: String(spec.kind), tile, lock: lockOf(spec), open, ...period, ...art, ...covers });
+      things.push({
+        id: String(spec.id),
+        kind: String(spec.kind),
+        tile,
+        lock: lockOf(spec),
+        open,
+        ...period,
+        ...cells,
+        ...art,
+        ...covers,
+      });
     }
   }
   const actors: ActorLayout[] = [];

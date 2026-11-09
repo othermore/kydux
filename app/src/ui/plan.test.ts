@@ -17,17 +17,12 @@ import {
   tunnelLabelCell,
 } from './plan';
 
-/** A corridor, a closed door across it, a dark room and an enchanted end. */
+/** A corridor, a closed door across it, a key lying in a dark room and an enchanted end. */
 const VIEW: PlanView = {
   rows: ['#########', '#S..=...#', '#########'],
   enchanted: [
     [6, 1],
     [7, 1],
-  ],
-  unlit: [
-    [3, 1],
-    [4, 1],
-    [5, 1],
   ],
   figures: [
     { id: 'wizard', kind: 'wizard', tile: [1, 1], facing: 'down' },
@@ -55,18 +50,9 @@ describe('the plan of a scene (D134, D143)', () => {
     expect(cells).toHaveLength(27);
   });
 
-  it('leaves out who stands in the enchanted region and what lies unlit (D135, D52)', () => {
+  it('leaves out who stands in the enchanted region (D135)', () => {
     const shapes = planShapes(VIEW);
     expect(shapes.figures.map((figure) => figure.id)).toEqual(['wizard', 'friend']);
-    expect(shapes.things.map((thing) => thing.id)).toEqual(['near_key']);
-  });
-
-  it('draws a thing in the dark near the wizard, as the wizard sees it (D52)', () => {
-    const near: PlanView = {
-      ...VIEW,
-      figures: [{ id: 'wizard', kind: 'wizard', tile: [4, 1], facing: 'down' }],
-    };
-    expect(planShapes(near).things.map((thing) => thing.id)).toEqual(['near_key', 'far_key']);
   });
 
   it('tells a door shut from one open, and which way its bar lies', () => {
@@ -76,7 +62,6 @@ describe('the plan of a scene (D134, D143)', () => {
       ...VIEW,
       rows: ['#.#', '#.#', '#.#'],
       enchanted: [],
-      unlit: [],
       things: [{ id: 'door', kind: 'door', tile: [1, 1], open: true }],
     };
     expect(planShapes(inWall).doors[0]).toMatchObject({ open: true, across: true });
@@ -86,7 +71,7 @@ describe('the plan of a scene (D134, D143)', () => {
     expect(planShapes(VIEW).marks).toEqual([{ x: 7, y: 1 }]);
   });
 
-  it('draws a dark room as the castle\'s plan: its cells and a figure in it, not what lies unlit (D163)', () => {
+  it('draws a dark room as the castle\'s plan: its cells, a figure in it and the things lying in it (D163, D169)', () => {
     const inTheDark: PlanView = {
       ...VIEW,
       figures: [...VIEW.figures, { id: 'mate', kind: 'friend', tile: [5, 1], facing: 'down' }],
@@ -95,7 +80,7 @@ describe('the plan of a scene (D134, D143)', () => {
     const kinds = shapes.cells.filter(({ y, x }) => y === 1 && x >= 3 && x <= 5).map(({ kind }) => kind);
     expect(kinds).toEqual(['floor', 'furniture', 'floor']);
     expect(shapes.figures.map((figure) => figure.id)).toContain('mate');
-    expect(shapes.things.map((thing) => thing.id)).not.toContain('far_key');
+    expect(shapes.things.map((thing) => thing.id)).toEqual(['near_key', 'far_key']);
   });
 
   it('draws a picture in ink: its colour out, its lines darkened, its tones parchment', () => {
@@ -157,7 +142,6 @@ describe('what the plan writes and rules (D151)', () => {
     const shapes = planShapes({
       rows: ['###', '#.#', '#.#', '###'],
       enchanted: [],
-      unlit: [],
       figures: [],
       things: [],
       marks: [],
@@ -177,7 +161,6 @@ describe('what the plan writes and rules (D151)', () => {
         [4, 1],
         [5, 1],
       ],
-      unlit: [],
       figures: [],
       things: [],
       marks: [[5, 1]],
@@ -274,5 +257,40 @@ describe('the plan\'s names cover no figure, no mark, no other name, and a mark\
     const mark = labels.at(-1);
     expect(mark?.said).toBe('(11, 6)');
     for (const one of cutOuts) expect(overlaps(mark?.box ?? one, one)).toBe(false);
+  });
+});
+
+describe('the plan shows the things of a dark room (D169)', () => {
+  const read = (path: string) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
+
+  it("draws the key on P8's plan, lying in the dark storeroom, in each of the level's ways", () => {
+    type Spec = { id: string; kind?: string; at?: [number, number] };
+    const level = read('../../../content/levels/the-dark-room/level.json');
+    const scene = read('../../../content/scenes/the-storeroom/scene.json');
+    const rows = readFileSync(new URL('../../../content/scenes/the-storeroom/map.txt', import.meta.url), 'utf8')
+      .trimEnd()
+      .split('\n');
+    const [x0, y0, x1, y1] = scene.rooms.storeroom as number[];
+    const key = (level.things as Spec[]).find((thing) => thing.id === 'key');
+    const ways = (level.ways as { id: string; things?: Spec[] }[]).map(
+      (way) => way.things?.find((thing) => thing.id === 'key')?.at ?? key?.at,
+    );
+    expect(level.dark).toEqual(['storeroom']);
+    expect(ways).toHaveLength(3);
+    for (const at of ways) {
+      const [x, y] = at ?? [-1, -1];
+      expect(x >= (x0 ?? 0) && x <= (x1 ?? 0) && y >= (y0 ?? 0) && y <= (y1 ?? 0)).toBe(true);
+      const shapes = planShapes({
+        rows,
+        enchanted: [],
+        figures: [{ id: 'wizard', kind: 'wizard', tile: level.start, facing: 'down' }],
+        things: [
+          { id: 'key', kind: 'key', tile: [x, y] },
+          { id: 'store_door', kind: 'door', tile: [10, 10], open: false },
+        ],
+        marks: [],
+      });
+      expect(shapes.things).toEqual([{ id: 'key', x, y }]);
+    }
   });
 });

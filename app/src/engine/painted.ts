@@ -403,7 +403,7 @@ export function planPictures(
           ]
         : [];
     });
-  // A key or a slab's hole in its first state, moved from the cell it is painted on; a
+  // A key or a hole in its first state, moved from the cell it is painted on; a
   // key smaller, on its cell's middle where a figure on it stands (D164).
   const shownThings = things
     .filter((thing) => thing.kind !== 'door' && thing.kind !== 'bed')

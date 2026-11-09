@@ -184,7 +184,6 @@ function lessonRunner(
           {
             rows: map.rows,
             enchanted: map.enchanted,
-            unlit: map.dark ? map.darkArea : [],
             figures,
             things,
             marks: map.reaches,

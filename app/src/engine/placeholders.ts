@@ -73,21 +73,22 @@ function drawFloor(ctx: CanvasRenderingContext2D, x: number): void {
   ctx.strokeRect(x + 0.5, 0.5, TILE - 1, TILE - 1);
 }
 
-/** A slab seen from above: its bands in place, or the hole it leaves when away (D138). */
-function drawSlab(ctx: CanvasRenderingContext2D, x: number, inPlace: boolean): void {
-  ctx.fillStyle = '#14151b';
-  ctx.fillRect(x, 0, TILE, TILE);
-  if (!inPlace) {
-    ctx.strokeStyle = '#3d3f4a';
+/** A hole in the floor seen from above (D167): the floor whole over it, a faint ring where
+ * it opens, while it is closed; a dark round hole while it is open. */
+function drawHole(ctx: CanvasRenderingContext2D, x: number, closed: boolean): void {
+  drawFloor(ctx, x);
+  ctx.beginPath();
+  ctx.arc(x + TILE / 2, TILE / 2, TILE * 0.38, 0, Math.PI * 2);
+  if (closed) {
+    ctx.strokeStyle = '#6f717b';
     ctx.setLineDash([4, 4]);
-    ctx.strokeRect(x + 4.5, 4.5, TILE - 9, TILE - 9);
+    ctx.lineWidth = 1;
+    ctx.stroke();
     ctx.setLineDash([]);
     return;
   }
-  for (let step = 0; step < 4; step += 1) {
-    ctx.fillStyle = step % 2 === 0 ? '#9c6b3f' : '#7a4e2d';
-    ctx.fillRect(x + 4, 4 + step * 10, TILE - 8, 10);
-  }
+  ctx.fillStyle = '#14151b';
+  ctx.fill();
 }
 
 /** A shelf seen from above: a wooden case with books' backs in a row (D46). */
@@ -574,13 +575,13 @@ export function makePlaceholders(
   door.texture.add('open', 0, DOOR_LOCKS.length * TILE, 0, TILE, TILE);
   door.texture.refresh();
 
-  // A slab: its bands in place, a dark hole while it is away (D138).
-  const slab = canvas(scene, thingKey('slab'), TILE * 2, TILE);
-  drawSlab(slab.ctx, 0, true);
-  drawSlab(slab.ctx, TILE, false);
-  slab.texture.add('in', 0, 0, 0, TILE, TILE);
-  slab.texture.add('away', 0, TILE, 0, TILE, TILE);
-  slab.texture.refresh();
+  // A hole: the floor whole while it is closed, a dark hole while it is open (D167).
+  const hole = canvas(scene, thingKey('hole'), TILE * 2, TILE);
+  drawHole(hole.ctx, 0, true);
+  drawHole(hole.ctx, TILE, false);
+  hole.texture.add('closed', 0, 0, 0, TILE, TILE);
+  hole.texture.add('open', 0, TILE, 0, TILE, TILE);
+  hole.texture.refresh();
 
   for (const kind of ['key', 'book', 'wand', 'potion']) {
     const thing = canvas(scene, thingKey(kind), TILE, TILE);

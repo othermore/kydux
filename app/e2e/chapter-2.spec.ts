@@ -1,8 +1,9 @@
 // Chapter 2 as the child plays it (sprint 15): every level won by its solution, in
 // Spanish for a girl and in English for a boy; the dormitory's arch that refuses
 // the wizard, and sleep; the hidden key revealed; the moving key in its three
-// ways; each story told to its end; the map in the chapter's order. Screenshots of
-// every stop go to e2e/shots/chapter-2/, which git ignores, for the owner.
+// ways; the lessons' pages that run plain Python (D170); each story told to its end;
+// the map in the chapter's order. Screenshots of every stop go to e2e/shots/chapter-2/,
+// which git ignores, for the owner.
 
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -478,3 +479,60 @@ for (const scene of ['the-entrance', 'the-dormitory', 'the-library']) {
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}${scene}-zoomed-out.png` });
   });
 }
+
+test.describe('the lessons run plain Python on their pages (D170)', () => {
+  /** A lesson's block on its page, typed again when `code` is given, run; what it printed. */
+  async function printed(page: Page, code?: string): Promise<string> {
+    if (code !== undefined) {
+      await page.locator('.lesson-run .cm-content').click();
+      await page.keyboard.press('ControlOrMeta+A');
+      await page.keyboard.insertText(code);
+    }
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-run')).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    return page.locator('.lesson-printed').innerText();
+  }
+
+  for (const [locale, page3, said, names] of [
+    ['en-US', 'Page 3 of 4', 'Hello', ['age', 'name']],
+    ['es-ES', 'Página 3 de 4', 'Hola', ['edad', 'nombre']],
+  ] as const) {
+    test(`what things know prints a number, a sum and a string, with no wizard (${locale})`, async ({ browser }) => {
+      const context = await browser.newContext({ locale, viewport: { width: 1280, height: 800 } });
+      const page = await context.newPage();
+      await page.goto('/#lesson/what-things-know');
+      await expect(page.locator('.lesson-page')).toBeVisible();
+      await page.locator('#lesson-next').click();
+      await page.locator('#lesson-next').click();
+      await expect(page.locator('#lesson-page')).toHaveText(page3);
+      await expect(page.locator('.lesson-run .cm-content')).not.toContainText('wizard');
+      expect(await printed(page)).toBe(`7\n5\n${said}`);
+      await page.screenshot({ path: `${SHOTS}what-things-know-${locale}.png` });
+      // Changed, it prints what it is changed to.
+      expect(await printed(page, 'print(10 + 20)\nprint("Teku")')).toBe('30\nTeku');
+      // Its last page keeps the door's attribute: Wenna has just opened it.
+      await page.locator('#lesson-next').click();
+      expect(await printed(page)).toBe('False');
+      await context.close();
+    });
+
+    test(`finding things keeps a number and a string in variables, and adds two into a third (${locale})`, async ({
+      browser,
+    }) => {
+      const context = await browser.newContext({ locale, viewport: { width: 1280, height: 800 } });
+      const page = await context.newPage();
+      await page.goto('/#lesson/finding-things');
+      await expect(page.locator('.lesson-page')).toBeVisible();
+      await page.locator('#lesson-next').click();
+      for (const name of names) await expect(page.locator('.lesson-run .cm-content')).toContainText(`${name} =`);
+      await expect(page.locator('.lesson-run .cm-content')).not.toContainText('wizard');
+      expect(await printed(page)).toBe('9\nMarta');
+      await page.screenshot({ path: `${SHOTS}finding-things-variable-${locale}.png` });
+      await page.locator('#lesson-next').click();
+      expect(await printed(page)).toBe('7');
+      await page.screenshot({ path: `${SHOTS}finding-things-sum-${locale}.png` });
+      expect(await printed(page, 'a = 4\nb = 3\ntotal = a - b\nprint(total)')).toBe('1');
+      await context.close();
+    });
+  }
+});

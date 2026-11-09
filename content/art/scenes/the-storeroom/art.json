@@ -9,7 +9,7 @@
     {
       "row": 7,
       "image": "row-7-static-under.webp",
-      "top": 456,
+      "top": 432,
       "static": true,
       "under": true
     },
@@ -25,6 +25,13 @@
       "image": "row-12-static.webp",
       "top": 958,
       "static": true
+    },
+    {
+      "row": 13,
+      "image": "row-13-static-under.webp",
+      "top": 1200,
+      "static": true,
+      "under": true
     }
   ],
   "things": {
@@ -118,21 +125,6 @@
     }
   ],
   "nudged": [
-    {
-      "about": "Touched by store_door's open leaf, the figure drawn away from it (D157).",
-      "cells": [
-        [
-          8,
-          13
-        ],
-        [
-          8,
-          13
-        ]
-      ],
-      "by": -0.3,
-      "leaf": "store_door"
-    },
     {
       "about": "Round the door (D149).",
       "cells": [

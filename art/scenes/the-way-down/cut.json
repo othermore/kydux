@@ -35,16 +35,15 @@
           ]
         },
         "open": {
-          "picture": "way-down-open-half-2.png",
+          "picture": "way-down-open-quarter-2.png",
           "diff": {},
-          "row": 5,
+          "row": 8,
           "box": [
-            8.85,
-            5.15,
-            11.15,
+            8.75,
+            5.1,
+            11.3,
             7.9
-          ],
-          "reach": 1.95
+          ]
         }
       },
       "without": "way-down-base.png",
@@ -52,7 +51,7 @@
         10,
         5
       ],
-      "about": "The double door: shut as painted, open Gemini's edit of the base, each cut by the difference (D148)."
+      "about": "The double door: shut as painted, open Gemini's edit of the whole base with its two leaves turned a quarter against their jambs, each cut by the difference (D148, D165), drawn on row 8, over the hole."
     },
     "arch_door": {
       "box": [
@@ -370,7 +369,7 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The way down\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-way-down.md`, then edited by it: without its grid\n  (`game-way-down-nogrid.md`), the round of the castle painted\n  (`game-way-down-voids.md`).\n- Its base is Gemini's edit without the door (`way-down-base.md`); the door open, its two\n  leaves half open within the doorway, is its edit of the base\n  (`way-down-open-half-2.md`), and each leaf the difference (D148). So are the\n  arches, from `way-down-arches-marked.md`, in which Gemini painted them flat magenta, and\n  the torch beside the hole, from\n  `way-down-torch.md`.\n",
+  "source": "# The way down\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-way-down.md`, then edited by it: without its grid\n  (`game-way-down-nogrid.md`), the round of the castle painted\n  (`game-way-down-voids.md`).\n- Its base is Gemini's edit without the door (`way-down-base.md`); the door open, its two\n  leaves turned a quarter, each against the inner side of its own jamb, is its edit of\n  the whole base (`way-down-open-quarter-2.md`), and the leaves the difference (D148). So are the\n  arches, from `way-down-arches-marked.md`, in which Gemini painted them flat magenta, and\n  the torch beside the hole, from\n  `way-down-torch.md`.\n",
   "kept": [
     [
       8.9,

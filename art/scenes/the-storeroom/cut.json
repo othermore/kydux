@@ -78,7 +78,7 @@
     "corridor_arch": {
       "box": [
         4.3,
-        4.75,
+        4.5,
         5.15,
         8.05
       ],
@@ -86,12 +86,17 @@
       "static": true,
       "solid": true,
       "mask": "difference",
-      "picture": "storeroom-gone.png",
-      "diff": {},
+      "picture": "storeroom-arch-torches-marked.png",
+      "diff": {
+        "threshold": 70,
+        "soft": 70,
+        "speck": 3,
+        "rim": true
+      },
       "states": {
         "standing": "painting"
       },
-      "about": "The arch where the corridor comes in, over whoever walks under it.",
+      "about": "The arch where the corridor comes in, its band and its near jamb over whoever walks under it, cut from Gemini's flat magenta (D148).",
       "under": true
     },
     "key": {
@@ -292,6 +297,60 @@
         "standing": "painting"
       },
       "about": "The lower wall's top, over whoever walks the row behind it (D149)."
+    },
+    "torch_left": {
+      "box": [
+        7.85,
+        12.5,
+        8.6,
+        13.95
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "under": true,
+      "mask": "difference",
+      "picture": [
+        "storeroom-arch-torches-marked.png",
+        "storeroom-torches-marked.png"
+      ],
+      "diff": {
+        "threshold": 70,
+        "soft": 70,
+        "speck": 3,
+        "rim": true
+      },
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The torch on the wall left of the store door, over whoever stands on its row, cut from Gemini's flat magenta, its bracket and handle in one edit and its flame in another (D148)."
+    },
+    "torch_right": {
+      "box": [
+        11.4,
+        12.5,
+        12.2,
+        13.95
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "under": true,
+      "mask": "difference",
+      "picture": [
+        "storeroom-arch-torches-marked.png",
+        "storeroom-torches-marked.png"
+      ],
+      "diff": {
+        "threshold": 70,
+        "soft": 70,
+        "speck": 3,
+        "rim": true
+      },
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The torch on the wall right of the store door, over whoever stands on its row, cut from Gemini's flat magenta, its bracket and handle in one edit and its flame in another (D148)."
     }
   },
   "cuts": [],
@@ -300,7 +359,7 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The storeroom\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-dark-room.md`, then edited by it: without its grid\n  (`game-storeroom-nogrid.md`), the round of the castle painted\n  (`game-storeroom-voids.md`), the hole in the floor (`game-storeroom-hole.md`).\n- Its base is Gemini's edit without the door (`storeroom-base.md`); the door open is its\n  edit of the base (`storeroom-open.md`), and each leaf the difference (D148). So are the\n  arches, from `storeroom-gone.md`.\n",
+  "source": "# The storeroom\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-dark-room.md`, then edited by it: without its grid\n  (`game-storeroom-nogrid.md`), the round of the castle painted\n  (`game-storeroom-voids.md`), the hole in the floor (`game-storeroom-hole.md`).\n- Its base is Gemini's edit without the door (`storeroom-base.md`); the door open is its\n  edit of the base (`storeroom-open.md`), and each leaf the difference (D148). So is the\n  door's arch, from `storeroom-gone.md`; the arch where the corridor comes in and the two\n  torches by the door, from the edits in which Gemini painted them flat magenta\n  (`storeroom-arch-torches-marked.md`, and `storeroom-torches-marked.md` for the\n  torches' flames).\n",
   "lowered": [
     {
       "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
@@ -371,6 +430,18 @@
       4.7,
       5.3,
       8.1
+    ],
+    [
+      7.85,
+      12.5,
+      8.6,
+      13.95
+    ],
+    [
+      11.4,
+      12.5,
+      12.2,
+      13.95
     ]
   ]
 }

@@ -104,12 +104,11 @@ test.describe('past the teacher', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.wait(3)');
     await page.locator('#run').click();
-    await expect(scene(page)).toHaveAttribute('data-actors', /dask:3,7,right/, {
-      timeout: 10_000,
-    });
-    await expect(scene(page)).toHaveAttribute('data-actors', /dask:5,7,right/, {
-      timeout: 10_000,
-    });
+    // Each tick shows for a moment: looked at often, so that none is missed however
+    // long the run takes to start.
+    const actors = () => scene(page).getAttribute('data-actors');
+    await expect.poll(actors, { intervals: [50], timeout: 10_000 }).toMatch(/dask:3,7,right/);
+    await expect.poll(actors, { intervals: [50], timeout: 10_000 }).toMatch(/dask:5,7,right/);
   });
 
   test('walking straight in gets the wizard caught', async ({ page }) => {

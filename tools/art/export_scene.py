@@ -422,7 +422,9 @@ def static_alpha(
     on its outline (D93): where Gemini painted it flat magenta in a picture of the
     scene (`"mask": "marked"`, the picture `marked`, among the edits), its holes, the
     lines Gemini left inside it, filled, unless it is `open_work`; the box less that
-    magenta (`"unmarked"`); a polygon in cells (`"polygon"`, less its
+    magenta (`"unmarked"`); where a picture with it gone or painted flat magenta differs
+    from the painting (`"difference"`, D148), or several such pictures, each of a part;
+    a polygon in cells (`"polygon"`, less its
     `holes`, with its `fixed` parts, and only its own line when `lined`); what
     is pale there and its outline (`"pale"`); or the whole box (`"box"`), not
     moved."""
@@ -430,9 +432,14 @@ def static_alpha(
     if thing["mask"] == "box":
         return inside.astype(np.float32)
     if thing["mask"] == "difference":
-        # What a figure walks behind, by the picture with it gone (D148).
-        gone = np.array(Image.open(edits / thing["picture"]).convert("RGB"))
-        mask = difference_mask(gone, painting, box, thing.get("diff"))
+        # What a figure walks behind, by the picture with it gone or marked (D148); a
+        # thing whose parts two edits marked, each one part, a torch's bracket and its
+        # flame, is the union of their differences.
+        pictures = thing["picture"] if isinstance(thing["picture"], list) else [thing["picture"]]
+        mask = np.zeros(painting.shape[:2], dtype=bool)
+        for picture in pictures:
+            gone = np.array(Image.open(edits / picture).convert("RGB"))
+            mask |= difference_mask(gone, painting, box, thing.get("diff"))
         # Gemini's magenta ends inside the thing's outline, which is the thing's too (D93).
         if (thing.get("diff") or {}).get("rim"):
             mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th)) & inside

@@ -51,7 +51,7 @@
       },
       "under": true,
       "rows": {
-        "open": 5
+        "open": 8
       },
       "rest": "closed",
       "at": [
@@ -85,51 +85,6 @@
     }
   },
   "lowered": [
-    {
-      "about": "Touched by door's open leaf, the figure drawn away from it (D157).",
-      "cells": [
-        [
-          9,
-          6
-        ],
-        [
-          9,
-          6
-        ]
-      ],
-      "by": 0.3,
-      "leaf": "door"
-    },
-    {
-      "about": "Touched by door's open leaf, the figure drawn away from it (D157).",
-      "cells": [
-        [
-          10,
-          6
-        ],
-        [
-          10,
-          6
-        ]
-      ],
-      "by": 0.3,
-      "leaf": "door"
-    },
-    {
-      "about": "Touched by door's open leaf, the figure drawn away from it (D157).",
-      "cells": [
-        [
-          10,
-          7
-        ],
-        [
-          10,
-          7
-        ]
-      ],
-      "by": 0.3,
-      "leaf": "door"
-    },
     {
       "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
       "cells": [

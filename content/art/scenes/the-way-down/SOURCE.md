@@ -8,8 +8,8 @@ later, like the rest of it.
   (`game-way-down-nogrid.md`), the round of the castle painted
   (`game-way-down-voids.md`).
 - Its base is Gemini's edit without the door (`way-down-base.md`); the door open, its two
-  leaves half open within the doorway, is its edit of the base
-  (`way-down-open-half-2.md`), and each leaf the difference (D148). So are the
+  leaves turned a quarter, each against the inner side of its own jamb, is its edit of
+  the whole base (`way-down-open-quarter-2.md`), and the leaves the difference (D148). So are the
   arches, from `way-down-arches-marked.md`, in which Gemini painted them flat magenta, and
   the torch beside the hole, from
   `way-down-torch.md`.

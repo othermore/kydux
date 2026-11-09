@@ -1,0 +1,13 @@
+---
+candidate: game-way-down
+service: gemini
+model: gemini-3-pro-image
+image: ["art/raw/game-way-down/way-down-base.png", "art/raw/game-way-down/way-down-whole.png"]
+aspect_ratio: 4:3
+image_size: 4K
+---
+Edit the first picture, the whole of it. It is a finished painting, seen from above at an angle, of a stone corridor of a castle at night running up and down the picture, and a third of the way down a stone wall crossing it, seen from the front, with an open arched doorway in a stone arch. The arch's stones run down both sides of the doorway as its two jambs, to the floor. Below that wall the corridor goes on between two side walls, which begin right below the jambs. The second picture is the same painting with the doorway closed by its double wooden door; use it only to see what the two leaves look like.
+
+Make one change only to the first picture: paint in the doorway its two leaves, opened wide, each turned a quarter turn toward us on its hinges, as far as it goes without touching the wall. They are the same two leaves as in the second picture, the same planks, the same iron hinges and the same rings, at their full height, each with its part of the arched top. Each leaf hangs on the inner edge of its own jamb and now stands upright against the inner side of that jamb, almost edge-on to us: the left leaf along the left side of the opening, the right leaf along the right side. Seen from where we look, each leaf is a tall narrow strip of planks, strongly foreshortened, with its free edge a little nearer to us and a little lower than its hinged edge. Its foot stands on the floor inside the doorway, both its bottom corners drawn, above the line where the doorway's floor meets the paving in front of the wall: no part of a leaf reaches below that line, onto the floor in front of the wall. Both leaves lie wholly inside the doorway's opening, between the inner edges of the two jambs: the arch's stones and both jambs stay whole and in view, exactly as in the first picture, and no leaf lies over them or over the side walls below. Between the two leaves almost the whole width of the doorway is open, and through it we see the corridor's floor beyond the wall, running out without a break to the floor in front of it. A soft shadow of each leaf lies on the doorway's floor beside it.
+
+Everything else stays exactly as it is, pixel for pixel: the stone arch and its jambs, every wall, stone, paving stone, banner, torch and flame, the other arches, every room and its furniture, in the same place, at the same size, in the same colours and the same light, in the same painted cartoon style. Do not move, redraw, sharpen or restyle anything. No grid, no text, no people.

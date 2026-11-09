@@ -1674,6 +1674,20 @@ def test_trace_makes_a_static_thing_s_mask_from_the_picture_with_it_gone(tmp_pat
     assert alpha[60:140, 70:130].all() and not alpha[:45].any()
 
 
+def test_a_thing_whose_parts_two_edits_marked_is_the_union_of_their_differences(tmp_path):
+    # A torch: one edit marks its bracket, the other its flame (D148).
+    painting = np.full((200, 200, 3), 120, dtype=np.uint8)
+    bracket, flame = painting.copy(), painting.copy()
+    bracket[100:180, 90:110] = (255, 0, 255)
+    flame[30:100, 80:120] = (255, 0, 255)
+    Image.fromarray(bracket).save(tmp_path / "bracket.png")
+    Image.fromarray(flame).save(tmp_path / "flame.png")
+    torch = {"mask": "difference", "picture": ["bracket.png", "flame.png"], "diff": {}}
+    alpha = export_scene.static_alpha(painting, (0, 0, 200, 200), torch, 200, None, None, tmp_path)
+    assert alpha[110:170, 95:105].all() and alpha[40:90, 90:110].all()
+    assert not alpha[:20].any() and not alpha[:, :60].any()
+
+
 def test_a_state_cut_by_difference_is_read_by_the_export(tmp_path, monkeypatch):
     base = np.full((200, 200, 3), 120, dtype=np.uint8)
     shown = a_leaf_on(base)

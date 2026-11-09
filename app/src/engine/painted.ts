@@ -364,17 +364,36 @@ export function figureName(id: string, look: Look): string {
  * it faces. */
 export function planPictures(
   art: Art,
-  doors: { id: string; art?: string; open?: boolean }[],
+  things: { id: string; kind: string; tile: Tile; art?: string; open?: boolean }[],
   figures: { id: string }[],
   look: Look,
 ): PlanPictures {
   const { scene } = art;
   const sheets = art.figures;
-  const shownDoors = doors.flatMap(({ id, art: painted, open }) => {
-    const thing = scene.things[painted ?? id];
-    const state = thing?.states[open ? 'open' : 'closed'];
-    return thing && state ? [{ url: `${scene.base}${state}`, left: thing.left, top: thing.top }] : [];
-  });
+  const shownDoors = things
+    .filter((thing) => thing.kind === 'door')
+    .flatMap(({ id, art: painted, open }) => {
+      const thing = scene.things[painted ?? id];
+      const state = thing?.states[open ? 'open' : 'closed'];
+      return thing && state ? [{ url: `${scene.base}${state}`, left: thing.left, top: thing.top }] : [];
+    });
+  // A key or a slab's hole in its first state, moved from the cell it is painted on.
+  const shownThings = things
+    .filter((thing) => thing.kind !== 'door' && thing.kind !== 'bed')
+    .flatMap(({ id, tile, art: painted }) => {
+      const thing = scene.things[painted ?? id];
+      const state = thing ? Object.values(thing.states)[0] : undefined;
+      if (!thing || !state) return [];
+      const [atX, atY] = thing.at ?? tile;
+      return [
+        {
+          id,
+          url: `${scene.base}${state}`,
+          left: thing.left + (tile[0] - atX) * scene.cell,
+          top: thing.top + (tile[1] - atY) * scene.cell,
+        },
+      ];
+    });
   const shownFigures = sheets
     ? figures.map(({ id }) => {
         const name = figureName(id, look);
@@ -395,6 +414,7 @@ export function planPictures(
     cell: scene.cell,
     origin: scene.origin ?? [0, 0],
     doors: shownDoors,
+    things: shownThings,
     figures: shownFigures,
   };
 }

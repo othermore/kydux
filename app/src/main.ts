@@ -189,7 +189,7 @@ function lessonRunner(
             things,
             marks: map.reaches,
             ...(art
-              ? { pictures: planPictures(art, things.filter((thing) => thing.kind === 'door'), figures, look) }
+              ? { pictures: planPictures(art, things, figures, look) }
               : {}),
           },
           onClose,

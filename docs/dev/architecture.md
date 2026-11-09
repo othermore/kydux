@@ -184,8 +184,8 @@ wizard.move_right(steps=1)   # and move_left, move_up, move_down: a tick per ste
 wizard.say(text)             # a tick; a door beside the wizard whose password it is opens
 wizard.cast(spell, thing=None)  # a tick: with the wand carried, a spell of the level's,
                              # where the wizard stands (D42); zelim breaks a seal beside it;
-                             # fendra is given the thing to bring (D47); orvim, with the
-                             # map carried, opens the scene's plan (D134)
+                             # fendra is given the thing to bring (D47); orvim, wherever the
+                             # map is carried, opens the scene's plan (D134)
 wizard.wait(ticks=1)         # a tick each: stands still while the world moves on
 wizard.pick_up()             # a tick: the thing on the wizard's tile, into wizard.items
 wizard.find_nearest(kind)    # the nearest thing or actor of a kind ("key"...), or None
@@ -1987,8 +1987,10 @@ one overturns stays, marked as superseded.
   owner; supersedes the overlay of D112, whose teaching order stands
   without its third level. The map is a thing of kind `map`, carried from
   the chapter's first level on (`carrying`); `wizard.cast("orvim")` takes
-  a tick, needs the wand and the map (without the map it is refused,
-  `no_map`), and makes the world's event `map`. When the page plays that
+  a tick, needs the wand and the map, works wherever the map is carried, needed
+  or not, whether the level names the spell or not (the owner, 2026-11-07), and
+  makes the world's event `map`; a level that names the spell and has no map refuses
+  it, `no_map`. When the page plays that
   tick it pauses the playback, and once the wand is seen pointed opens a
   window over the page with the scene's plan at that tick, what D143 says it
   is, and the wizard, every actor and every thing with its name and its cell
@@ -2093,7 +2095,8 @@ one overturns stays, marked as superseded.
   each pixel's tone from the mean round it, stretched between the picture's
   darkest and lightest, its lines darkened from what is darker than that mean,
   its colour taken out. Over it, the grid at the scene's cells, every door as the
-  scene shows it at that tick (inked with the ground), the figures with their
+  scene shows it at that tick (inked with the ground), a key or a slab's hole with its
+  own picture, the figures with their
   own standing sprites and their names and cells beside them, every `reach` mark
   with the mark's picture, the hidden ones too, since the plan is where the child
   reads the cell, the dark tunnel's cells as a dotted path labelled
@@ -2136,7 +2139,8 @@ one overturns stays, marked as superseded.
   cells to pass below him when he looks up, and crosses straight when he looks
   down; the corridor is three cells high for it. The two ways end in different
   cells with one `if`, so its reach goal says `on_the_way`, met when the wizard
-  stands on the mark at any tick. *Izquierda o derecha* teaches `if` and `else`, and
+  stands on the mark at any tick; its bonus is to end right on the mark, which asks a
+  second `if` (the owner, 2026-11-07). *Izquierda o derecha* teaches `if` and `else`, and
   the lesson *Si no* comes right before it. Rules out a level where one tick of
   waiting is enough only because Dask has two starts.
 - **D147 — A standing figure stands.** Decided 2026-11-07 by the owner. A figure's

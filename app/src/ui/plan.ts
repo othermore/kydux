@@ -187,6 +187,7 @@ export function inked(pixels: Uint8ClampedArray, width: number, height: number, 
 export interface PlanLoaded {
   ground: HTMLImageElement;
   doors: { image: HTMLImageElement; left: number; top: number }[];
+  things: Map<string, { image: HTMLImageElement; left: number; top: number }>;
   figures: Map<string, HTMLImageElement>;
 }
 
@@ -339,7 +340,16 @@ export function drawPlan(
       ctx.fill();
     }
   }
+  // A thing as itself, or a small square where it has no picture.
   for (const thing of shapes.things) {
+    const shown = loaded?.things.get(thing.id);
+    if (shown && pictures) {
+      const scale = cell / pictures.cell;
+      const [wide, tall] = [shown.image.width * scale, shown.image.height * scale];
+      const [ox, oy] = [gutter + shown.left * scale, gutter + shown.top * scale];
+      ctx.drawImage(shown.image, ox, oy, wide, tall);
+      continue;
+    }
     ctx.fillStyle = css(INK);
     ctx.fillRect(left(thing.x) + cell * 0.37, top(thing.y) + cell * 0.37, cell * 0.26, cell * 0.26);
   }
@@ -409,12 +419,15 @@ function loadImage(url: string): Promise<HTMLImageElement> {
 /** Every picture the plan names, loaded; null when one is missing. */
 async function loadPictures(pictures: PlanPictures): Promise<PlanLoaded | null> {
   try {
-    const [ground, doors, figures] = await Promise.all([
+    const [ground, doors, things, figures] = await Promise.all([
       loadImage(pictures.ground),
       Promise.all(pictures.doors.map(async ({ url, left, top }) => ({ image: await loadImage(url), left, top }))),
+      Promise.all(
+        pictures.things.map(async ({ id, url, left, top }) => [id, { image: await loadImage(url), left, top }] as const),
+      ),
       Promise.all(pictures.figures.map(async ({ id, url }) => [id, await loadImage(url)] as const)),
     ]);
-    return { ground, doors, figures: new Map(figures) };
+    return { ground, doors, things: new Map(things), figures: new Map(figures) };
   } catch {
     return null;
   }

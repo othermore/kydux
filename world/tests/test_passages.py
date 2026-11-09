@@ -188,6 +188,42 @@ def test_orvim_with_no_map_is_refused_and_with_no_wand_the_wand_is_what_is_missi
     assert no_wand.events[-1].data["reason"] == "no_wand"
 
 
+def test_the_map_s_spell_works_wherever_the_map_is_carried_needed_or_not():
+    level = {**MAP, "spells": []}
+    world = World(Level.from_dict(level))
+    world.wizard.cast("orvim")
+    assert world.events[-1].kind == "map"
+    # Another spell the level does not name stays unknown, and with no map so does this one.
+    world = World(Level.from_dict(level))
+    world.wizard.cast("kirra")
+    assert world.events[-1].data["reason"] == "unknown_spell"
+    world = World(Level.from_dict({**level, "carrying": ["wand"]}))
+    world.wizard.cast("orvim")
+    assert world.events[-1].data["reason"] == "unknown_spell"
+
+
+@pytest.mark.parametrize(
+    "item",
+    [
+        item.removeprefix("level:")
+        for item in json.loads(
+            (
+                Path(__file__).resolve().parents[2]
+                / "content"
+                / "chapters"
+                / "03-passages"
+                / "chapter.json"
+            ).read_text(encoding="utf-8")
+        )["items"]
+        if item.startswith("level:")
+    ],
+)
+def test_the_map_opens_in_every_level_of_chapter_3(item):
+    level = Level.from_directory(Path(__file__).resolve().parents[2] / "content" / "levels" / item)
+    result = run_code(level, 'wizard.cast("orvim")')
+    assert any(event.kind == "map" for event in result.events)
+
+
 def test_the_map_is_carried_and_put_in_no_name():
     world = World(Level.from_dict(MAP))
     assert world.wizard.has("map") and world.wizard.find_item("map").kind == "map"
@@ -435,6 +471,24 @@ def test_by_the_statues_is_won_above_or_below_dask_with_one_if():
     assert run_code(real(level), wrong(level, "the_body_not_moved_in")).error.type == (
         "IndentationError"
     )
+
+
+def test_by_the_statues_gives_its_bonus_for_ending_right_on_the_mark_with_a_second_if():
+    """The owner: optional. One `if` wins, walking on past the mark when Dask looks up; a
+    second one, for when he looks down, ends on the mark in both ways."""
+    level = "by-the-statues"
+
+    def bonuses(code: str) -> dict[str, bool]:
+        result = run_code(real(level), code)
+        assert result.status == "won"
+        return {way: [g.met for g in one.goals if g.bonus] == [True] for way, one in result.ways}
+
+    assert bonuses(solution(level)) == {"looking_up": False, "looking_down": True}
+    two = (
+        'if dask.facing == "up":\n    wizard.move_down(2)\nwizard.move_right(4)\n'
+        'if dask.facing == "down":\n    wizard.move_down(2)\nwizard.move_down()\n'
+    )
+    assert bonuses(two) == {"looking_up": True, "looking_down": True}
 
 
 @pytest.mark.parametrize(

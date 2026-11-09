@@ -942,12 +942,7 @@ class LevelScene extends Phaser.Scene {
       marks: this.map.reaches,
       ...(this.art
         ? {
-            pictures: planPictures(
-              this.art,
-              things.filter((thing) => thing.kind === 'door'),
-              figures,
-              this.look,
-            ),
+            pictures: planPictures(this.art, things, figures, this.look),
           }
         : {}),
     };

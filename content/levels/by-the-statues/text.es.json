@@ -2,7 +2,8 @@
   "title": "Junto a las estatuas",
   "goals": [
     "Llega a la marca, a la entrada del pasillo que baja.",
-    "Que Dask no te vea."
+    "Que Dask no te vea.",
+    "Termina justo sobre la marca, con un segundo `if`."
   ],
   "starting_code": "# Si Dask mira hacia arriba, baja dos casillas con `move_down`.\n\n# Camina a la derecha con `move_right`.\n\n# Baja con `move_down`.\n",
   "hints": [

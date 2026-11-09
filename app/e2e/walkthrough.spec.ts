@@ -1,7 +1,7 @@
 // A chapter played from its first stop to its last, as the child plays it, in Spanish,
 // for the owner to read: every story step, every lesson page with its code run, and for
 // each level the start card, the start, the route tick by tick in every way and the won
-// card, and the map's plan where the level has its spell. The pictures go to
+// card, and the map's plan where the map is carried. The pictures go to
 // e2e/shots/walkthrough-<chapter>/, which tools/walkthrough.py makes a document of.
 // Only `npm run walkthrough -- <chapter>` runs it (KYDUX_WALKTHROUGH).
 
@@ -133,7 +133,8 @@ async function level(page: Page, id: string): Promise<void> {
     await page.screenshot({ path: `${OUT}level-${id}-${way}-ganado.png` });
     await route(page, id, way);
   }
-  if ((spec.spells ?? []).includes('orvim')) {
+  // The map opens wherever it is carried.
+  if ((spec.carrying ?? []).includes('map')) {
     await typed(page, `wizard.cast("orvim")\n${solution}`);
     await page.locator('#plan').waitFor({ timeout: 60_000 });
     await page.waitForFunction(() => document.querySelector<HTMLElement>('#plan')?.dataset.drawn, null, {

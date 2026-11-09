@@ -104,6 +104,18 @@ test.describe('the map, opened by its spell (D134)', () => {
     await expect(scene(page)).toHaveAttribute('data-wizard', '2,12', { timeout: 30_000 });
   });
 
+  test('it opens in a level that does not need it, wherever the map is carried', async ({ page }) => {
+    await open(page, 'the-tunnel-exit');
+    await start(page, 'wizard.cast("orvim")');
+    const plan = page.locator('#plan');
+    await expect(plan).toBeVisible({ timeout: 30_000 });
+    await expect(plan).toHaveAttribute('data-figures', /dask:9,12/);
+    await expect(plan).toHaveAttribute('data-marks', '11,5');
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    await page.keyboard.press('Escape');
+    await expect(plan).toHaveCount(0);
+  });
+
   test('Escape closes it too, and a run started again closes it', async ({ page }) => {
     await open(page, 'the-doors-corridor');
     await start(page, 'wizard.cast("orvim")');

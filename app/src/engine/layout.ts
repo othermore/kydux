@@ -95,6 +95,8 @@ export interface PlanPictures {
   cell: number;
   origin: Tile;
   doors: { url: string; left: number; top: number }[];
+  /** Each other thing with a picture, its corner in the ground's pixels on its tile. */
+  things: { id: string; url: string; left: number; top: number }[];
   figures: {
     id: string;
     url: string;
@@ -230,7 +232,9 @@ export function layout(level: LevelJson): Layout {
     .flatMap((goal) => {
       const tile = place(goal);
       return tile ? [tile] : [];
-    });
+    })
+    // Two goals on one mark, a level's and its bonus, are one mark.
+    .filter(([x, y], index, all) => all.findIndex(([ox, oy]) => ox === x && oy === y) === index);
   const shelves: Tile[] = [];
   rows.forEach((row, y) => {
     [...row].forEach((char, x) => {

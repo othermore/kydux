@@ -225,7 +225,7 @@ one being the arch into the next.
 | `level:the-tunnel-exit` | Practice 3 | `wait` alone (D146): Dask comes up the crossing from the same place every time, looking up; wait two ticks for him to go by, then walk to the first statue. | |
 | `lesson:true-or-false` | Lesson 4 | Five pages, each with code to run: attributes that hold a word, `dask.facing`, `wizard.facing`; comparing with `==`, `True` and `False`; comparing attributes, and an attribute with a literal; `not` says the opposite; a program to change (D139). | `teacher.facing`, `wizard.facing` |
 | `lesson:if` | Lesson 5 | A condition: `if` runs its lines, moved in by four spaces, only when its expression is true; a block that goes down two when Dask looks up, and prints the cell. | (Python's `if`) |
-| `level:by-the-statues` | Practice 4 | `if` alone (D146), played two ways: Dask stands between the first two statues looking up or down; against the top wall, go down two to pass below him when he looks up, or cross straight; then into the corridor that goes down. | |
+| `level:by-the-statues` | Practice 4 | `if` alone (D146), played two ways: Dask stands between the first two statues looking up or down; against the top wall, go down two to pass below him when he looks up, or cross straight; then into the corridor that goes down. Bonus: ending right on the mark, with a second `if`. | |
 | `lesson:else` | Lesson 6 | `else`: the lines to run when the condition is false; its block prints which door we take. | (Python's `else`) |
 | `level:left-or-right` | Practice 5 | Played two ways: one of two doors is locked, and no key is anywhere. `if` and `else` with `locked`. | |
 | `level:the-wrong-door` | Fix 1 | The same room another night, played two ways: the friend's program has its `if` and `else` lines the wrong way round. | |
@@ -242,8 +242,8 @@ one being the arch into the next.
 | `story:caught` | Story 4 | Dask steps out of the dark, and lets them go, this once; the chapter's ideas summed up; the secret the three share. | |
 
 The world features chapter 3 needs: the naughty child's map, a thing carried,
-and `orvim`, cast only with it, which opens the plan window and pauses the run
-(D134, D143); a `reach` goal whose mark is not shown, and one met on the way (D146);
+and `orvim`, which works in any level where the map is carried, needed or not,
+opens the plan window and pauses the run (D134, D143); a `reach` goal whose mark is not shown, and one met on the way (D146);
 a dark tunnel that hides every figure in it, on the scene and on the plan, and
 changes nothing in the world (D135, D145); a lesson's page that runs its code in the
 level after it (D142); a door opened from its closed picture (D144); a teacher who may start anywhere on its patrol, and a level

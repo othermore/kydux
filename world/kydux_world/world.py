@@ -452,7 +452,8 @@ class Wizard(Child):
             # Without the wand the wizard does not know the action (D27): nothing to try.
             world.act("blocked", {"at": here, "by": "wizard", "reason": "no_wand", "tried": False})
             return
-        if spell not in world.level.spells:
+        # The map's spell works wherever the map is carried, needed or not.
+        if spell not in world.level.spells and not (spell == "orvim" and self.has("map")):
             refused = {"at": here, "by": "wizard", "reason": "unknown_spell", "tried": True}
             world.act("blocked", {**refused, "spell": spell})
             return

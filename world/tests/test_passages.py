@@ -94,9 +94,38 @@ def test_in_the_dark_the_wizard_sees_the_tiles_around_it():
     assert world.things["key"].position == Position(5, 3)
 
 
-def test_a_dark_level_needs_kirra():
+def test_a_dark_level_needs_kirra_to_collect_or_open_what_lies_in_the_dark():
+    # What the wizard must find in the dark is not seen until kirra lights it (D162).
+    for goal in ({"kind": "collect", "id": "key"}, {"kind": "collect", "of": "key"}):
+        with pytest.raises(LevelError, match="needs kirra"):
+            Level.from_dict({**DARK, "spells": [], "goals": [goal]})
+    door = {"kind": "door", "id": "door", "at": [2, 2]}
     with pytest.raises(LevelError, match="needs kirra"):
-        Level.from_dict({**DARK, "spells": []})
+        Level.from_dict(
+            {**DARK, "spells": [], "things": [door], "goals": [{"kind": "open", "id": "door"}]}
+        )
+
+
+def test_a_dark_level_whose_goals_lie_outside_the_dark_or_are_a_reach_needs_no_kirra():
+    # A reach needs no sight, and a key outside the dark rooms is seen (D162).
+    reach = Level.from_dict(
+        {
+            **DARK,
+            "spells": [],
+            "map": ["#######", "#S....#", "#....E#", "#....K#", "#######"],
+            "goals": [{"kind": "reach", "marker": "E"}],
+        }
+    )
+    assert reach.dark and "kirra" not in reach.spells
+    outside = Level.from_dict(
+        {
+            **DARK,
+            "spells": [],
+            "dark_area": [[1, 1, 3, 3]],
+            "goals": [{"kind": "collect", "id": "key"}],
+        }
+    )
+    assert outside.dark and outside.dark_area
 
 
 #: A hole crossed by a slab in place two ticks and away two, from tick 0.

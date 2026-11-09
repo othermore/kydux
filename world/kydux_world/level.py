@@ -21,7 +21,8 @@ id the child's code knows it by, an actor maybe `asleep` in a bed beside it
 from the start (D49); `spells`, the spells that can be cast (D42); `words`,
 the passwords the level gives the child, each a door's (D80); `api`,
 the names the level teaches (D23); `goals`, some of them bonus goals;
-`tick_limit`; `dark`, a room unlit until `kirra` (D52); `forbidden`, the
+`tick_limit`; `dark`, a room unlit until `kirra` (D52), which the level lists among its
+spells when a `collect` or an `open` goal lies in the dark (D162); `forbidden`, the
 tiles the wizard may not step on and why, which its scene gives (D84);
 `enchanted`, the boxes of cells that hide every figure in them, which its scene
 gives too and only the page reads (D135); and `ways`, the ways the level is
@@ -282,8 +283,6 @@ class Level:
         kind = data.get("kind", "practice")
         if kind not in LEVEL_KINDS:
             raise LevelError(f"{level_id}: a level's kind is one of {', '.join(LEVEL_KINDS)}")
-        if dark and "kirra" not in spells:
-            raise LevelError(f"{level_id}: a dark level needs kirra among its spells")
         area = set()
         for box in _list_of_boxes(data.get("dark_area", []), level_id):
             x0, y0, x1, y1 = box
@@ -299,6 +298,14 @@ class Level:
                     f"{level_id}: the door {thing.id} is sealed by {thing.sealed}, "
                     "which is not a spell here"
                 )
+
+        # What the wizard must find or open in the dark is not seen until kirra lights
+        # it; a reach needs no sight (D162).
+        if dark and "kirra" not in spells and _sought_in_the_dark(goals, things, area):
+            raise LevelError(
+                f"{level_id}: a dark level needs kirra among its spells "
+                "when a collect or an open goal lies in the dark"
+            )
 
         forbidden, forbidden_reason = _forbidden(
             data.get("forbidden"), level_id, walls, len(rows), width
@@ -691,6 +698,30 @@ def _forbidden(
             raise LevelError(f"{level_id}: the forbidden cell {here.x},{here.y} is not floor")
         found.add(here)
     return frozenset(found), reason
+
+
+def _sought_in_the_dark(
+    goals: list[GoalSpec], things: tuple[ThingSpec, ...], area: set[Position]
+) -> bool:
+    """Whether a `collect` or an `open` goal names a thing that lies in the dark: in the
+    dark rooms, or anywhere when the whole map is dark (D162). A door lies in the dark
+    when one of its cells does; a goal for any thing of a kind, when one of them does."""
+
+    def dark(position: Position) -> bool:
+        return not area or position in area
+
+    for goal in goals:
+        if goal.kind not in ("collect", "open"):
+            continue
+        sought = [
+            thing
+            for thing in things
+            if thing.id == goal.params.get("id") or thing.kind == goal.params.get("of")
+        ]
+        for thing in sought:
+            if not thing.carried and any(map(dark, thing.cells or (thing.position,))):
+                return True
+    return False
 
 
 def _list_of_boxes(value: Any, level_id: str) -> list[tuple[int, int, int, int]]:

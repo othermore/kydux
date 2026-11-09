@@ -124,7 +124,7 @@ class Thing(Child):
 
     def _k_unseen(self) -> bool:
         """Whether the thing lies in the dark, out of the wizard's reach (D52): a thing
-        on the floor, not a door or a stair, which are the castle's shape."""
+        on the floor, not a door or a slab, which are the castle's shape."""
         world: World = self._k_world
         return (
             not world.lit
@@ -269,15 +269,15 @@ def steps_between(one: Any, other: Any) -> int | None:
     return abs(here.x - there.x) + abs(here.y - there.y)
 
 
-#: How many ticks `osto` holds a stair in place (D53).
+#: How many ticks `osto` holds a slab in place (D53, D138).
 HOLD_TICKS = 6
 
 
-class Stair(Thing):
-    """A stair across a gap or a doorway, in place for `period` ticks and away for as
-    many, from tick 0 in place, unless `osto` holds it (D53)."""
+class Slab(Thing):
+    """A slab over a hole in the floor, in place for `period` ticks and away for as
+    many, from tick 0 in place, unless `osto` holds it (D53, D138)."""
 
-    _k_role = "stair"
+    _k_role = "slab"
 
     def __init__(self, world: "World", spec: ThingSpec) -> None:
         super().__init__(world, spec)
@@ -292,7 +292,7 @@ class Stair(Thing):
 
     @property
     def in_place(self) -> bool:
-        """True when a step onto the stair, taken now, lands on it: `stair.in_place`"""
+        """True when a step onto the slab, taken now, lands on it: `slab.in_place`"""
         world: World = self._k_world
         return self._k_in_place_at(world.tick + 1)
 
@@ -308,7 +308,7 @@ class Stair(Thing):
 
 
 #: Each kind of thing with a class of its own; any other kind is a Thing.
-THINGS: dict[str, type[Thing]] = {"door": Door, "key": Key, "stair": Stair, "bed": Bed}
+THINGS: dict[str, type[Thing]] = {"door": Door, "key": Key, "slab": Slab, "bed": Bed}
 
 
 def make_thing(world: "World", spec: ThingSpec) -> Thing:

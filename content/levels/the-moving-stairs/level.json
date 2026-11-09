@@ -19,7 +19,7 @@
   ],
   "things": [
     {
-      "kind": "stair",
+      "kind": "slab",
       "id": "stair",
       "at": [
         4,
@@ -50,7 +50,7 @@
     "door.open",
     "door.locked",
     "teacher.facing",
-    "stair.in_place"
+    "slab.in_place"
   ],
   "goals": [
     {

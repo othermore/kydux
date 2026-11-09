@@ -575,7 +575,7 @@ export function makePlaceholders(
   door.texture.refresh();
 
   // A stair: wooden steps in place, a dark gap while it is away (D53).
-  const stair = canvas(scene, thingKey('stair'), TILE * 2, TILE);
+  const stair = canvas(scene, thingKey('slab'), TILE * 2, TILE);
   drawStair(stair.ctx, 0, true);
   drawStair(stair.ctx, TILE, false);
   stair.texture.add('in', 0, 0, 0, TILE, TILE);

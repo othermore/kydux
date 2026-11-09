@@ -40,6 +40,8 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
     }
     case 'no_wand':
       return t('blocked.no_wand');
+    case 'no_map':
+      return t('blocked.no_map');
     case 'unknown_spell':
       return t('blocked.unknown_spell', { spell });
     case 'sealed':

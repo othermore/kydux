@@ -44,7 +44,7 @@ MEMBERS: dict[str, tuple[str, ...]] = {
     "thing": THING_MEMBERS,
     "door": (*THING_MEMBERS, "locked", "sealed", "password", "is_open", "open"),
     "key": THING_MEMBERS,
-    "stair": (*THING_MEMBERS, "in_place"),
+    "slab": (*THING_MEMBERS, "in_place"),
     "bed": (*THING_MEMBERS, "free"),
     "teacher": ("kind", "name", "position", "facing", "distance_to", "can_see"),
     "ghost": ("kind", "name", "position", "facing", "distance_to"),
@@ -54,7 +54,7 @@ MEMBERS: dict[str, tuple[str, ...]] = {
 }
 
 #: The roles that are things, and so have a thing's members.
-THING_ROLES = ("thing", "door", "key", "stair", "bed")
+THING_ROLES = ("thing", "door", "key", "slab", "bed")
 
 
 def role_of(kind: str) -> str:

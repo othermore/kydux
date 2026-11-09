@@ -22,7 +22,7 @@ from typing import Any
 from .actors import Actor, Friend, Teacher, make_actor, sight_tiles
 from .goals import make_goal
 from .level import CARRIED_KINDS, Level, Position
-from .things import Bed, Child, Door, Stair, Thing, make_thing, steps_between
+from .things import Bed, Child, Door, Slab, Thing, make_thing, steps_between
 
 CHILD = "<child>"
 
@@ -147,15 +147,15 @@ class World:
 
     def is_free(self, position: Position) -> bool:
         """Whether the wizard or an actor can walk onto a tile in the next tick: floor,
-        no closed door, no open door's leaf (D125), and no stair that is away (D53)."""
+        no closed door, no open door's leaf (D125), and no slab that is away (D53)."""
         if not (self.level.free(position) and self._not_shut(position)):
             return False
         if self.leaf_over(position) is not None:
             return False
         return all(
-            stair._k_in_place_at(self.tick + 1)
-            for stair in self.things.values()
-            if isinstance(stair, Stair) and stair._k_position == position
+            slab._k_in_place_at(self.tick + 1)
+            for slab in self.things.values()
+            if isinstance(slab, Slab) and slab._k_position == position
         )
 
     def near_wizard(self, position: Position) -> bool:
@@ -388,8 +388,8 @@ class Wizard(Child):
                 by = (
                     "door"
                     if world.door_at(ahead) is not None
-                    else "stair"
-                    if self._k_stair_at(world, ahead)
+                    else "slab"
+                    if self._k_slab_at(world, ahead)
                     else "wall"
                 )
                 world.act("bump", {"at": list(here), "facing": direction.value, "by": by})
@@ -398,9 +398,9 @@ class Wizard(Child):
             world.act("move", {"from": list(here), "to": list(ahead), "facing": direction.value})
 
     @staticmethod
-    def _k_stair_at(world: "World", position: Position) -> bool:
+    def _k_slab_at(world: "World", position: Position) -> bool:
         return any(
-            isinstance(t, Stair) and t._k_position == position for t in world.things.values()
+            isinstance(t, Slab) and t._k_position == position for t in world.things.values()
         )
 
     def move_right(self, steps: int = 1) -> None:
@@ -741,16 +741,24 @@ def _kirra(world: World, here: Position, _thing: Thing | None = None) -> Effect:
 
 
 def _osto(world: World, here: Position, _thing: Thing | None = None) -> Effect:
-    """Holds a stair beside the wizard in place (D53); with none beside, refused."""
+    """Holds a slab beside the wizard in place (D53, D138); with none beside, refused."""
     beside = [
         thing
         for thing in sorted(world.things.values(), key=lambda t: t.name)
-        if isinstance(thing, Stair)
+        if isinstance(thing, Slab)
         and abs(thing._k_position.x - here.x) + abs(thing._k_position.y - here.y) == 1
     ]
     if not beside:
         return Effect(refused="nothing_near")
     return Effect(then=beside[0]._hold)
+
+
+def _orvim(world: World, here: Position, _thing: Thing | None = None) -> Effect:
+    """Opens the naughty child's map on the plan of the scene (D134): the world's `map`
+    event, at which the page pauses and opens the plan; with no map carried, refused."""
+    if not world.wizard.has("map"):
+        return Effect(refused="no_map")
+    return Effect(then=lambda: world.note("world", "map", {"at": list(here)}))
 
 
 #: Each spell's effect, by its name (D42); kydux_world.level.KNOWN_SPELLS lists the
@@ -760,4 +768,5 @@ SPELLS: dict[str, Callable[[World, Position, Thing | None], Effect]] = {
     "fendra": _fendra,
     "kirra": _kirra,
     "osto": _osto,
+    "orvim": _orvim,
 }

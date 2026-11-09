@@ -22,9 +22,10 @@ from the start (D49); `spells`, the spells that can be cast (D42); `words`,
 the passwords the level gives the child, each a door's (D80); `api`,
 the names the level teaches (D23); `goals`, some of them bonus goals;
 `tick_limit`; `dark`, a room unlit until `kirra` (D52); `forbidden`, the
-tiles the wizard may not step on and why, which its scene gives (D84); and
-`ways`, the ways the level is played, each one the same program must win
-(D51). A level may
+tiles the wizard may not step on and why, which its scene gives (D84);
+`enchanted`, the boxes of cells that hide every figure in them, which its scene
+gives too and only the page reads (D135); and `ways`, the ways the level is
+played, each one the same program must win (D51). A level may
 come with goals of its own, in a goals.py beside level.json, whose source
 the loader passes as `goals_source`.
 """
@@ -50,8 +51,8 @@ class LevelError(ValueError):
 WALL, FLOOR, SHELF, START = "#", ".", "=", "S"
 
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
-THING_KINDS = ("key", "door", "book", "wand", "potion", "stair", "bed")
-CARRIED_KINDS = ("key", "book", "wand", "potion")
+THING_KINDS = ("key", "door", "book", "wand", "potion", "slab", "bed", "map")
+CARRIED_KINDS = ("key", "book", "wand", "potion", "map")
 #: The terrains a thing lies up on, out of the hands' reach (D129): a level map's
 #: shelf, a scene's bookcase. A thing on another tile no one walks, a stone or a
 #: pile of books, lies within reach of the tile beside it.
@@ -59,7 +60,7 @@ HIGH_KINDS = ("shelf", "bookcase")
 ACTOR_KINDS = ("teacher", "ghost", "cat", "friend")
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
-KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto")
+KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto", "orvim")
 #: The kinds of level (D56): a screen to solve, a program to repair, a program to
 #: make better, a challenge with no lesson before it.
 LEVEL_KINDS = ("practice", "fix", "improve", "challenge")
@@ -91,7 +92,7 @@ class ThingSpec:
     password: str | None = None
     #: Carried by the wizard from the start, with no tile of its own (D49).
     carried: bool = False
-    #: For a stair, the ticks it is in place and then away, in turn (D53).
+    #: For a slab, the ticks it is in place and then away, in turn (D53, D138).
     period: int | None = None
     #: For a door, open from the start: a door an earlier level of the scene opened (D65).
     open: bool = False
@@ -114,12 +115,15 @@ class ActorSpec:
     id: str
     position: Position
     facing: str
-    #: The tiles the actor walks, from its position, one per tick, back and forth.
+    #: The tiles the actor walks, one per tick, back and forth, its position among them.
     patrol: tuple[Position, ...] = ()
     sight: int = DEFAULT_SIGHT
     #: The bed the actor lies asleep in (D91), or None. A sleeper is placed beside
     #: its bed, where it gets up, and lies on the bed's tile, standing in no one's way.
     asleep: str | None = None
+    #: Where on its patrol the actor starts, and which way along it it walks (D137).
+    patrol_start: int = 0
+    patrol_along: int = 1
 
 
 @dataclass(frozen=True)
@@ -444,8 +448,8 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         )
     period = spec.get("period")
     whole = isinstance(period, int) and not isinstance(period, bool) and period >= 1
-    if (kind == "stair") != (period is not None) or (period is not None and not whole):
-        raise LevelError(f"{shape.level_id}: a stair, and only a stair, has a whole period")
+    if (kind == "slab") != (period is not None) or (period is not None and not whole):
+        raise LevelError(f"{shape.level_id}: a slab, and only a slab, has a whole period")
     opened = spec.get("open", False)
     if not isinstance(opened, bool) or (opened and kind != "door"):
         raise LevelError(f"{shape.level_id}: only a door is open from the start, true or false")
@@ -523,21 +527,14 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
         raise LevelError(f"{shape.level_id}: {actor_id} is a friend, who stands still")
     if not isinstance(waypoints, list):
         raise LevelError(f"{shape.level_id}: {actor_id}'s patrol must be a list of [x, y]")
-    path, here = [position], position
-    for value in waypoints:
-        there = shape.tile(value, f"{actor_id}'s patrol")
-        if there.x != here.x and there.y != here.y:
-            raise LevelError(f"{shape.level_id}: {actor_id}'s patrol goes in straight lines")
-        dx = (there.x > here.x) - (there.x < here.x)
-        dy = (there.y > here.y) - (there.y < here.y)
-        while here != there:
-            here = Position(here.x + dx, here.y + dy)
-            if here in shape.walls or here in shape.shelves:
-                raise LevelError(
-                    f"{shape.level_id}: {actor_id}'s patrol walks through a wall or a shelf"
-                )
-            path.append(here)
+    points = [shape.tile(value, f"{actor_id}'s patrol") for value in waypoints]
+    # The turning points of the path, drawn from the first when it is not the actor's
+    # own tile and there are more; with one point, or from the actor's own tile, the
+    # path starts where the actor stands (D137).
+    elsewhere = len(points) > 1 and points[0] != position
+    path = _patrol_path(shape, actor_id, points if elsewhere else [position, *points])
     facing = spec.get("facing")
+    patrol_start, patrol_along = _patrol_start(shape, actor_id, path, position, facing, elsewhere)
     if facing is None and kind == "friend" and position != shape.start:
         # A friend looks at the wizard (D66).
         facing = _towards(position, shape.start)
@@ -554,7 +551,49 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
         raise LevelError(f"{shape.level_id}: {actor_id} is asleep in a bed, named by its id")
     if asleep is not None and patrol:
         raise LevelError(f"{shape.level_id}: {actor_id} is asleep, and walks no patrol")
-    return ActorSpec(kind, actor_id, position, facing, patrol, sight, asleep)
+    return ActorSpec(
+        kind, actor_id, position, facing, patrol, sight, asleep, patrol_start, patrol_along
+    )
+
+
+def _patrol_path(shape: _Shape, actor_id: str, points: list[Position]) -> list[Position]:
+    """The tiles of a patrol, walked in straight lines through its turning points."""
+    path, here = [points[0]], points[0]
+    for there in points[1:]:
+        if there.x != here.x and there.y != here.y:
+            raise LevelError(f"{shape.level_id}: {actor_id}'s patrol goes in straight lines")
+        dx = (there.x > here.x) - (there.x < here.x)
+        dy = (there.y > here.y) - (there.y < here.y)
+        while here != there:
+            here = Position(here.x + dx, here.y + dy)
+            if here in shape.walls or here in shape.shelves:
+                raise LevelError(
+                    f"{shape.level_id}: {actor_id}'s patrol walks through a wall or a shelf"
+                )
+            path.append(here)
+    return path
+
+
+def _patrol_start(
+    shape: _Shape,
+    actor_id: str,
+    path: list[Position],
+    position: Position,
+    facing: Any,
+    elsewhere: bool,
+) -> tuple[int, int]:
+    """Where on its path an actor starts and which way it walks: from the path's first
+    tile, onward; on a path drawn from a point elsewhere (D137), on the actor's tile,
+    which lies on the path, the way it faces, toward a neighbour there."""
+    if not elsewhere:
+        return 0, 1
+    if position not in path:
+        raise LevelError(f"{shape.level_id}: {actor_id} stands off its patrol")
+    index = path.index(position)
+    for along in (1, -1):
+        if 0 <= index + along < len(path) and _towards(position, path[index + along]) == facing:
+            return index, along
+    raise LevelError(f"{shape.level_id}: {actor_id} must face along its patrol")
 
 
 def _beside(one: Position, other: Position) -> bool:
@@ -746,6 +785,8 @@ class Scene:
     rooms: dict[str, tuple[int, int, int, int]] = field(default_factory=dict)
     #: The tiles the wizard may not step on, with the reason (D84), or None.
     forbidden: dict[str, Any] | None = None
+    #: The boxes of cells that hide every figure in them, x0, y0, x1, y1 (D135).
+    enchanted: tuple[tuple[int, int, int, int], ...] = ()
 
     def walks(self, x: int, y: int) -> bool:
         return bool(self.terrains[self.rows[y][x]]["walk"])
@@ -793,7 +834,27 @@ def read_scene(scenes: Path, scene_id: Any, level_id: Any = None) -> Scene:
     forbidden = about.get("forbidden")
     if forbidden is not None and not isinstance(forbidden, dict):
         raise LevelError(f"{scene_id}: forbidden is a reason and its cells")
-    return Scene(scene_id, rows, terrains, things, tuple(about.get("props", [])), rooms, forbidden)
+    props = tuple(about.get("props", []))
+    enchanted = _enchanted(about.get("enchanted", []), scene_id, rows, terrains)
+    return Scene(scene_id, rows, terrains, things, props, rooms, forbidden, enchanted)
+
+
+def _enchanted(
+    boxes: Any, scene_id: str, rows: tuple[str, ...], terrains: dict[str, dict[str, Any]]
+) -> tuple[tuple[int, int, int, int], ...]:
+    """A scene's enchanted region (D135): boxes of cells, x0, y0, x1, y1, all floor."""
+    if not isinstance(boxes, list) or not all(
+        isinstance(box, list) and len(box) == 4 and all(isinstance(v, int) for v in box)
+        for box in boxes
+    ):
+        raise LevelError(f"{scene_id}: enchanted is a list of [x0, y0, x1, y1]")
+    for x0, y0, x1, y1 in boxes:
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                inside = 0 <= y < len(rows) and 0 <= x < len(rows[y])
+                if not inside or not terrains[rows[y][x]]["walk"]:
+                    raise LevelError(f"{scene_id}: the enchanted cell {x},{y} is not floor")
+    return tuple(tuple(box) for box in boxes)
 
 
 def scene_rows(scenes: Path, data: dict[str, Any]) -> list[str]:
@@ -872,6 +933,8 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
         built["fixed"] = [thing["id"] for thing in scene.things]
     if scene.forbidden is not None:
         built["forbidden"] = scene.forbidden
+    if scene.enchanted:
+        built["enchanted"] = [list(box) for box in scene.enchanted]
     dark = data.get("dark")
     if isinstance(dark, list):
         missing = [room for room in dark if room not in scene.rooms]

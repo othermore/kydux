@@ -99,8 +99,8 @@ class Teacher(Actor):
 
     def __init__(self, world: "World", spec: ActorSpec) -> None:
         super().__init__(world, spec)
-        # Where it is on its patrol, and which way along it it walks.
-        self._set(index=0, along=1)
+        # Where it is on its patrol, and which way along it it walks (D137).
+        self._set(index=spec.patrol_start, along=spec.patrol_along)
 
     def can_see(self, target: Any) -> bool:
         """True when `target` stands straight ahead, near enough, with nothing in between:

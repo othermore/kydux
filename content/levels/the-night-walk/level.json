@@ -41,7 +41,7 @@
       "locked": true
     },
     {
-      "kind": "stair",
+      "kind": "slab",
       "id": "stair",
       "at": [
         18,
@@ -87,7 +87,7 @@
     "door.open",
     "door.locked",
     "teacher.facing",
-    "stair.in_place"
+    "slab.in_place"
   ],
   "goals": [
     {

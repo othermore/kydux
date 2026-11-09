@@ -101,8 +101,9 @@
     "book": "the book",
     "wand": "the wand",
     "potion": "the potion",
-    "stair": "the stair",
-    "bed": "the bed"
+    "slab": "the slab",
+    "bed": "the bed",
+    "map": "the naughty child's map"
   },
   "guide": {
     "next": "Next",
@@ -119,6 +120,7 @@
     "nothing": "There is nothing here to pick up.",
     "unknown_action": "I do not know this action yet.",
     "no_wand": "I do not know this action yet.",
+    "no_map": "That word is written on the map, and I am not carrying the map.",
     "unknown_spell": "I do not know a spell called “{spell}”.",
     "sealed": "I cannot open {thing} by hand: it is sealed, and needs a spell.",
     "password": "I cannot open {thing} by hand: it wants a word.",
@@ -148,16 +150,16 @@
       "move_up": "Walks up, one tile per step. Stops at a wall or a closed door.",
       "move_down": "Walks down, one tile per step. Stops at a wall or a closed door.",
       "say": "Says something out loud.",
-      "wait": "Stands still while the world moves on, one tick at a time.",
+      "wait": "Stands still while the world moves on, one tick at a time; wizard.wait(2) waits two.",
       "pick_up": "Picks up a thing on the wizard's tile or beside it, and carries it. With several in reach, say which: wizard.pick_up(key).",
       "find_nearest": "Finds the nearest thing of a kind, or None when there is none.",
       "find_item": "Finds the thing of a kind the wizard carries, or None when it carries none.",
       "find_all": "Finds every thing of a kind, nearest first.",
       "has": "Tells whether the wizard carries a thing of a kind.",
-      "position": "Where the wizard stands, as x and y.",
+      "position": "The cell the wizard stands on, as x and y, counted from 0 from the left and from the top: print(wizard.position) shows it.",
       "facing": "The way the wizard looks: up, down, left or right.",
       "items": "The things the wizard carries.",
-      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all. The fendra spell is also given the thing to bring: wizard.cast(\"fendra\", book).",
+      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all. The fendra spell is also given the thing to bring: wizard.cast(\"fendra\", book). The orvim spell opens the map, when the wizard carries it: wizard.cast(\"orvim\").",
       "give": "Gives a thing the wizard carries to whoever stands right beside it.",
       "sleep": "Lies down and sleeps in a free bed.",
       "distance_to": "Gives the number of steps from the wizard to an object."
@@ -165,7 +167,7 @@
     "thing": {
       "kind": "What the thing is, like \"key\" or \"book\".",
       "name": "The thing's own name in this level.",
-      "position": "Where the thing lies, or None once the wizard carries it.",
+      "position": "The cell the thing lies on, as x and y, or None once the wizard carries it or while it lies in the dark.",
       "distance_to": "Gives the number of steps from an object to the wizard.",
       "reveal": "Makes a thing glow where it lies, even through whatever hides it, so that you see where it is."
     },
@@ -184,7 +186,7 @@
     "key": {
       "kind": "What it is: \"key\".",
       "name": "The key's own name in this level.",
-      "position": "Where the key lies, or None once the wizard carries it.",
+      "position": "The cell the key lies on, as x and y, or None once the wizard carries it or while it lies in the dark.",
       "distance_to": "Gives the number of steps from an object to the wizard.",
       "reveal": "Shows where a hidden thing lies."
     },
@@ -192,7 +194,7 @@
       "kind": "What they are: \"teacher\".",
       "name": "The teacher's own name in this level.",
       "position": "Where the teacher stands, as x and y.",
-      "facing": "The way the teacher looks: up, down, left or right.",
+      "facing": "The way the teacher looks, as a string: \"up\", \"down\", \"left\" or \"right\", so that a program can ask before each step: dask.facing == \"up\".",
       "can_see": "Tells whether the teacher can see something straight ahead, close enough.",
       "distance_to": "Gives the number of steps from an object to the wizard."
     },
@@ -210,11 +212,11 @@
       "facing": "The way the cat looks: up, down, left or right.",
       "distance_to": "Gives the number of steps from an object to the wizard."
     },
-    "stair": {
-      "kind": "What it is: \"stair\".",
-      "name": "The stair's own name in this level.",
-      "position": "Where the stair is, in x and y.",
-      "in_place": "True when a step onto the stair, taken now, lands on it.",
+    "slab": {
+      "kind": "What it is: \"slab\".",
+      "name": "The slab's own name in this level.",
+      "position": "The cell of the hole the slab covers, in x and y.",
+      "in_place": "True when a step onto the slab, taken now, lands on it, so that a program can wait for it: while not slab.in_place.",
       "distance_to": "Gives the number of steps from an object to the wizard.",
       "reveal": "Shows where a hidden thing lies."
     },
@@ -378,7 +380,8 @@
     "zelim": "breaks the seal of a door beside you.",
     "fendra": "brings to your cell the thing you name, three cells away at most in a straight line.",
     "kirra": "lights the dark room you are in.",
-    "osto": "holds a moving stair beside you still for a while."
+    "osto": "holds in place, for a while, a slab beside you that comes and goes over its hole.",
+    "orvim": "opens the naughty child's map on the plan of the place you are in, every cell with its numbers, if you carry the map."
   },
   "words": {
     "ambrel": "the school's word, which opens its gates."

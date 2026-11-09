@@ -35,15 +35,16 @@
           ]
         },
         "open": {
-          "picture": "way-down-open.png",
+          "picture": "way-down-open-half-2.png",
           "diff": {},
+          "row": 5,
           "box": [
-            8.3,
+            8.85,
             5.15,
-            11.7,
-            7.85
+            11.15,
+            7.9
           ],
-          "row": 6
+          "reach": 1.95
         }
       },
       "without": "way-down-base.png",
@@ -146,38 +147,6 @@
         "standing": "painting"
       },
       "about": "The torch beside the hole, over the hole."
-    },
-    "side_left": {
-      "box": [
-        8.2,
-        6.95,
-        8.83,
-        8.0
-      ],
-      "row": 7,
-      "static": true,
-      "solid": true,
-      "mask": "box",
-      "states": {
-        "standing": "painting"
-      },
-      "about": "The corridor's left wall below the door, over the open leaf, which swings behind it."
-    },
-    "side_right": {
-      "box": [
-        11.23,
-        6.92,
-        11.85,
-        8.0
-      ],
-      "row": 7,
-      "static": true,
-      "solid": true,
-      "mask": "box",
-      "states": {
-        "standing": "painting"
-      },
-      "about": "The corridor's right wall below the door, over the open leaf."
     },
     "slab": {
       "box": [
@@ -401,7 +370,7 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The way down\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-way-down.md`, then edited by it: without its grid\n  (`game-way-down-nogrid.md`), the round of the castle painted\n  (`game-way-down-voids.md`).\n- Its base is Gemini's edit without the door (`way-down-base.md`); the door open is its\n  edit of the base (`way-down-open.md`), and each leaf the difference (D148). So are the\n  arches, from `way-down-arches-marked.md`, in which Gemini painted them flat magenta, and\n  the torch beside the hole, from\n  `way-down-torch.md`.\n",
+  "source": "# The way down\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-way-down.md`, then edited by it: without its grid\n  (`game-way-down-nogrid.md`), the round of the castle painted\n  (`game-way-down-voids.md`).\n- Its base is Gemini's edit without the door (`way-down-base.md`); the door open, its two\n  leaves half open within the doorway, is its edit of the base\n  (`way-down-open-half-2.md`), and each leaf the difference (D148). So are the\n  arches, from `way-down-arches-marked.md`, in which Gemini painted them flat magenta, and\n  the torch beside the hole, from\n  `way-down-torch.md`.\n",
   "kept": [
     [
       8.9,
@@ -432,18 +401,6 @@
       0.0,
       11.1,
       2.0
-    ],
-    [
-      8.15,
-      6.9,
-      8.9,
-      8.0
-    ],
-    [
-      11.18,
-      6.87,
-      11.9,
-      8.0
     ]
   ],
   "nudged": [
@@ -475,7 +432,7 @@
       "by": -0.2
     },
     {
-      "about": "Round the double door.",
+      "about": "Round the double door, half open within its doorway: both columns toward its middle (D149, D158).",
       "cells": [
         [
           9,
@@ -486,7 +443,7 @@
           6
         ]
       ],
-      "by": 0.2
+      "by": 0.3
     },
     {
       "cells": [
@@ -499,7 +456,7 @@
           6
         ]
       ],
-      "by": -0.2
+      "by": -0.3
     },
     {
       "about": "Round the bottom arch.",

@@ -190,7 +190,7 @@
       ]
     },
     "front_door": {
-      "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95), its leaf within the doorway's own shape, the open doorway's fill grown over the arch's inner line (`doorway`, D113); open, swung out of it nearly flat against the front wall on its left, its foot on the corridor floor (D111, door_swung), cut by the polygon traced round the leaf, its hinges and its shadow on the wall (`leaf`, D113), drawn among the rows as the front wall is, the doorway showing the common room's own floor down to its threshold, a board of that floor, on the corridor floor's line (D108, D114); it rests shut, and a story opens and closes it (D103).",
+      "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95), its leaf within the doorway's own shape, the open doorway's fill grown over the arch's inner line (`doorway`, D113); open, swung out of it nearly flat against the front wall on its left, its foot on the corridor floor (D111, door_swung), cut by the polygon traced round the leaf, its hinges and its shadow on the wall (`leaf`, D113), drawn among the rows as the front wall is, the doorway showing the common room's own planks down to the corridor floor's line, taken into the ground from Gemini's picture of the door open (`without`, D108, D148); it rests shut, and a story opens and closes it (D103).",
       "box": [
         9.2,
         12.4,
@@ -200,7 +200,16 @@
       "row": 14,
       "reach": 0.4,
       "solid": true,
-      "without": "dormitory-door-open.png",
+      "without": {
+        "picture": "dormitory-walls.png",
+        "box": [
+          11.45,
+          12.9,
+          13.18,
+          15.3
+        ],
+        "from": "dormitory-front-door-open.png"
+      },
       "states": {
         "closed": "painting",
         "open": {
@@ -1406,7 +1415,7 @@
   },
   "cuts": [],
   "castle": 0,
-  "source": "# The dormitory\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-dormitory-3.md`, with the field as its\n  style's reference; its border and the wands on its trunks edited by it\n  (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).\n- Its corridor's right end mended by Gemini, joined by `tools/art/repaint.py`,\n  the painting kept pixel for pixel elsewhere: the castle's wall closing the\n  corridor off from the battlements, going on from the rooms' front wall\n  (`game-dormitory-corner-2.md`).\n- Its door to the corridor opened without a model (`repaint.py doorways`),\n  its leaf painted with the common room's own floor.\n- Its beds, trunks, bedside tables, armchairs and table, and the beds' quilts\n  and sheets, cut where Gemini painted them flat magenta in pictures of the\n  dormitory (`game-dormitory-marked-*.md`, `game-dormitory-covers-*.md`); its\n  walls by polygons, each edge on its outline.\n- Its morning painted whole by Gemini, given the night painting as it is\n  (`game-dormitory-day.md`): the same rooms a few hours later, the sky and\n  the outside by day, every torch, candle and the fireplace out; laid on the\n  painting by its outlines (`tools/art/repaint.py`), and every image of the\n  scene cut from it a second time with the same masks.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
+  "source": "# The dormitory\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/image-first-dormitory-3.md`, with the field as its\n  style's reference; its border and the wands on its trunks edited by it\n  (`game-dormitory-border.md`), its grid removed (`game-dormitory-nogrid.md`).\n- Its corridor's right end mended by Gemini, joined by `tools/art/repaint.py`,\n  the painting kept pixel for pixel elsewhere: the castle's wall closing the\n  corridor off from the battlements, going on from the rooms' front wall\n  (`game-dormitory-corner-2.md`).\n- Its door to the corridor opened: the doorway's floor, the common room's planks,\n  from Gemini's edit of the painting with the door open\n  (`dormitory-front-door-open.md`), taken within the doorway (D148); the leaf\n  swung against the front wall as a model painted it on the shut leaf turned\n  over (`game-dormitory-door-swung.md`).\n- Its beds, trunks, bedside tables, armchairs and table, and the beds' quilts\n  and sheets, cut where Gemini painted them flat magenta in pictures of the\n  dormitory (`game-dormitory-marked-*.md`, `game-dormitory-covers-*.md`); its\n  walls by polygons, each edge on its outline.\n- Its morning painted whole by Gemini, given the night painting as it is\n  (`game-dormitory-day.md`): the same rooms a few hours later, the sky and\n  the outside by day, every torch, candle and the fireplace out; laid on the\n  painting by its outlines (`tools/art/repaint.py`), and every image of the\n  scene cut from it a second time with the same masks.\n- Its cells marked by hand and exported by `tools/art/export_scene.py`.\n",
   "cut": false,
   "beds": {
     "bed_1": {

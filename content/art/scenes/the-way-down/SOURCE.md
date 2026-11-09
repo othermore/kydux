@@ -7,8 +7,9 @@ later, like the rest of it.
   `tools/art/prompts/scene-way-down.md`, then edited by it: without its grid
   (`game-way-down-nogrid.md`), the round of the castle painted
   (`game-way-down-voids.md`).
-- Its base is Gemini's edit without the door (`way-down-base.md`); the door open is its
-  edit of the base (`way-down-open.md`), and each leaf the difference (D148). So are the
+- Its base is Gemini's edit without the door (`way-down-base.md`); the door open, its two
+  leaves half open within the doorway, is its edit of the base
+  (`way-down-open-half-2.md`), and each leaf the difference (D148). So are the
   arches, from `way-down-arches-marked.md`, in which Gemini painted them flat magenta, and
   the torch beside the hole, from
   `way-down-torch.md`.

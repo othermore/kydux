@@ -368,6 +368,42 @@ test('the map shows chapter 3 in its order', async ({ page }) => {
   await page.locator('.map-chapter').nth(2).screenshot({ path: `${SHOTS}map.png` });
 });
 
+test.describe('a painted door, at every tick (D156)', () => {
+  test.use({ locale: 'en-US' });
+  test.beforeEach(({ page }) => seedWizard(page, PABLO));
+
+  /** Every tick of the run shown, each door drawn with its painted state as it is then:
+   * at the tick it opens, at the run's end, and when the timeline goes back. */
+  async function everyTick(page: Page, doors: string[]): Promise<void> {
+    const timeline = page.locator('#timeline');
+    const last = Number(await timeline.getAttribute('max'));
+    for (const tick of [...Array.from({ length: last + 1 }, (_, t) => t), 0, last]) {
+      await timeline.fill(String(tick));
+      await expect(scene(page)).toHaveAttribute('data-tick', String(tick));
+      await expect
+        .poll(async () => {
+          const open = ((await scene(page).getAttribute('data-doors')) ?? '').split(',');
+          const shown = doors.map((door) => `${door}:art-${door}-${open.includes(door) ? 'open' : 'closed'}`);
+          return (await scene(page).getAttribute('data-door-looks')) === shown.join(';');
+        })
+        .toBe(true);
+    }
+  }
+
+  test('left or right, in both ways, and the three doors', async ({ page }) => {
+    await open(page, 'left-or-right');
+    expect(await run(page, solution('left-or-right'))).toMatch(/^You did it/);
+    for (const way of waysOf('left-or-right')) {
+      await page.locator('#way').selectOption(way, { force: true });
+      await expect(page.locator('.outcome-text')).toHaveText(/^You did it/, { timeout: 30_000 });
+      await everyTick(page, ['left_door', 'right_door']);
+    }
+    await open(page, 'the-three-doors');
+    expect(await run(page, solution('the-three-doors'))).toMatch(/^You did it/);
+    await everyTick(page, ['door_1', 'door_2', 'door_3']);
+  });
+});
+
 for (const [scenery, level] of [
   ['the-tunnel', 'the-doors-corridor'],
   ['the-crossing', 'the-tunnel-exit'],

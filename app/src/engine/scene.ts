@@ -373,14 +373,23 @@ class LevelScene extends Phaser.Scene {
     return this.add.sprite(...centre(tile), placeholder, facing).setOrigin(0.5, 0.6);
   }
 
-  /** A door's look, shut or open: its painted state, or the placeholder's frame. */
+  /** A door's look, shut or open: its painted state, or, on a scene with no painting of
+   * it, the placeholder's frame. A painted door is never drawn with the placeholder's
+   * frame (D156): where its state's picture is not there, it keeps the painted state it
+   * shows, and takes the state's picture once it is loaded. */
   private doorLook(id: string, open: boolean, lock: string, moving = false): void {
     this.markBehind(id, open, moving);
     const image = this.things.get(id);
     if (!image) return;
     const key = this.atHour(`art-${this.artOf(id)}-${open ? 'open' : 'closed'}`);
     if (!this.textures.exists(key)) {
-      image.setFrame(open ? 'open' : lock);
+      if (!this.art?.scene.things[this.artOf(id)]) {
+        image.setFrame(open ? 'open' : lock);
+        return;
+      }
+      this.textures.once(`addtexture-${key}`, () => {
+        if (this.openDoors.has(id) === open) this.doorLook(id, open, lock);
+      });
       return;
     }
     // Open, what is seen through the doorway is under whoever stands in it (D95).
@@ -776,6 +785,12 @@ class LevelScene extends Phaser.Scene {
       .sort()
       .join(';');
     if (this.parentNode.dataset.drawn !== drawn) this.parentNode.dataset.drawn = drawn;
+    // The picture each door is drawn with, for the tests (D156).
+    const looks = [...this.doors.keys()]
+      .map((id) => `${id}:${this.things.get(id)?.texture.key ?? ''}`)
+      .sort()
+      .join(';');
+    if (this.parentNode.dataset.doorLooks !== looks) this.parentNode.dataset.doorLooks = looks;
   }
 
   /** The way of the level being shown (D51), whose places a restart uses; null for

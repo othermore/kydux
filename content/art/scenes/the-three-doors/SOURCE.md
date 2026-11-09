@@ -9,5 +9,7 @@ later, like the rest of it.
   (`game-three-doors-voids.md`).
 - Its base is Gemini's edit of that picture, its walls evenly apart, without the doors
   (`three-doors-base.md`); the doors open are its edit of the base
-  (`three-doors-open.md`), and each leaf the difference (D148). So are the arches, from
+  (`three-doors-open.md`), the doors shut its edit of the first picture, each hung on
+  the jamb it opens on (`three-doors-closed-hinged.md`, the top one
+  `three-doors-closed-hinged-3.md`), and each leaf the difference (D148). So are the arches, from
   `three-doors-arches-marked.md`, in which Gemini painted them flat magenta.

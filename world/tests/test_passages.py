@@ -605,6 +605,17 @@ def test_the_dark_room_s_differences_are_never_below_zero(way, right, down):
     assert run_code(real("the-dark-room").way(way), code).stdout == f"{right} {down}\n"
 
 
+def test_the_storeroom_s_open_leaf_keeps_everyone_off_the_cell_it_stands_on():
+    """The owner, 2026-11-08: the storeroom's door, open, covers (9, 13) as well as
+    (9, 11) and (9, 12) (D125, D157): a step onto it from beside is refused."""
+    level = "the-dark-room"
+    code = solution(level) + "wizard.move_down(4)\nwizard.move_left()\n"
+    for way, one in run_code(real(level), code).ways:
+        blocked = [e.data for e in one.events if e.kind == "blocked"]
+        assert blocked[-1]["at"] == [10, 13] and blocked[-1]["reason"] == "door_leaf", way
+        assert blocked[-1]["facing"] == "left", way
+
+
 def test_a_move_of_no_steps_walks_nothing_where_the_key_lies_on_our_row():
     level = real("the-dark-room").way("same_row")
     result = run_code(level, solution("the-dark-room"))

@@ -23,8 +23,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/runtime/  the worker that holds Pyodide, and the page's side of it
   src/engine/   the scene in Phaser, where everything stands before a run
                 (layout.ts), what an actor sees (sight.ts, the same rule as the
-                world's, tested on tests/fixtures/sight.json), a stair's state at
-                a tick (stairs.ts, the same rule as the world's), the playback, and
+                world's, tested on tests/fixtures/sight.json), a slab's state at
+                a tick (slab.ts, the same rule as the world's), the playback, and
                 the words the scene shows (words.ts, why an action failed);
                 the looks a wizard may have (looks.ts) and the placeholders for a
                 scene without art (placeholders.ts); the camera on the scene, its
@@ -57,6 +57,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (controller.ts), with its goals panel, outcome card, start and
                 win cards (cards.ts), the zoom box over the scene (zoom.ts), the
                 wizard's notebook with its spells and words (notebook.ts, D80),
+                the naughty child's map open on the scene's plan (plan.ts, D134),
+                a level's words with their code shown as code (words.ts, D140),
                 the stars (stars.ts), the screen's guide (guide.ts, D68), and
                 the note on a phone or a tablet that the game is made for a
                 computer (handheld.ts)
@@ -113,7 +115,10 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 map on its grid before it is painted and over a try (D102),
                 margin.py paints a scene on beyond its playable area (D83),
                 repaint.py mends a chosen painting in a few boxes and nowhere
-                else and opens its doorways (D88, D108), trace.py helps to
+                else and opens its doorways (D88, D108), paints what a model
+                left empty, moves a wall or widens a corridor, and lays stones
+                or a picture in a box (void, spaced, tiled, placed: D136),
+                trace.py helps to
                 trace a door's polygons (D113: look, a crop enlarged with a
                 grid and a polygon's points; outline, a first polygon round
                 a leaf; footprint, the doorway's polygon from its fill),
@@ -176,7 +181,8 @@ wizard.move_right(steps=1)   # and move_left, move_up, move_down: a tick per ste
 wizard.say(text)             # a tick; a door beside the wizard whose password it is opens
 wizard.cast(spell, thing=None)  # a tick: with the wand carried, a spell of the level's,
                              # where the wizard stands (D42); zelim breaks a seal beside it;
-                             # fendra is given the thing to bring (D47)
+                             # fendra is given the thing to bring (D47); orvim, with the
+                             # map carried, opens the scene's plan (D134)
 wizard.wait(ticks=1)         # a tick each: stands still while the world moves on
 wizard.pick_up()             # a tick: the thing on the wizard's tile, into wizard.items
 wizard.find_nearest(kind)    # the nearest thing or actor of a kind ("key"...), or None
@@ -215,7 +221,7 @@ teacher.can_see(target)      # the target straight ahead, within its sight (4 ti
 ghost.kind, ghost.name, ghost.position, ghost.facing    # and cat.*: they stand (D48)
 teacher.distance_to(other), ghost.distance_to(other), cat.distance_to(other)
 
-stair.in_place               # whether a step onto it, taken now, lands on it (D53)
+slab.in_place                # whether a step onto it, taken now, lands on it (D53, D138)
 ```
 
 The map's characters: `#` a wall, `.` floor, `=` a shelf (D46), `S` the
@@ -236,7 +242,7 @@ tiles are `[x, y]`.
 | kind | actor | data | the scene |
 |---|---|---|---|
 | `move` | wizard, or an actor | `from`, `to`, `facing` | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132) |
-| `bump` | wizard | `at`, `facing`, `by`: `wall`, `door` or `stair` | nudges the wizard against it |
+| `bump` | wizard | `at`, `facing`, `by`: `wall`, `door` or `slab` | nudges the wizard against it |
 | `say` | wizard | `text` | a bubble over the wizard for three ticks, under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
 | `pick_up` | wizard | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); `data-carried` |
@@ -245,13 +251,15 @@ tiles are `[x, y]`.
 | `cast` | wizard | `spell`, `at` | the wand is pointed and a point of light flies from it, to the thing the spell takes or a tile ahead, and bursts in a ring |
 | `pull` | the thing, in the wizard's tick | `id`, `from`, `to` | once the spell's light reaches it, the thing flies to the wizard's hands, in its `pulled` state when it is painted one, a book glowing (D47), and stays there, held (D127) |
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
-| `hold` | the stair, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | the stair glows, and stays in place for those ticks (D53) |
+| `hold` | the slab, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | a ring round the slab's cell, and it stays in place for those ticks (D53, D138) |
+| `map` | `world`, in the wizard's tick | `at` | the playback pauses, and once the wand is seen pointed the plan's window opens over the page, drawn at that tick; closed, the playback goes on (D134) |
 | `give` | wizard | `id`, `to`, `at` | the wizard turns to the figure that takes the thing, which faces the wizard; then the thing floats from the middle of the wizard's hands to the middle of that figure, where it is drawn, and fades there (D48) |
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
+| `vanish` | in a story, an actor, or the wizard at the story's very end | | the figure fades out of sight (D74) |
 | `appear` | in a story, an actor | `at`; `from`, a cell beside it, when it steps out from behind a thing there | the figure comes into sight on its cell: walking out from `from`, behind what stands there, over the tick (D128), or fading in (D74) |
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
 
@@ -848,14 +856,17 @@ one overturns stays, marked as superseded.
   until `kirra` (which it must list among its spells): until then, a
   thing that can be carried and lies farther than one tile from the
   wizard, in any of the eight directions, has no `position`, and so
-  `find_nearest`, `find_all` and `fendra` pass it by; doors, stairs and
+  `find_nearest`, `find_all` and `fendra` pass it by; doors, slabs and
   actors are the castle's shape, and are seen. `kirra` makes a `light`
   event, the world's, and lights the room for the rest of the run; in a
   lit room it does nothing. A teacher's sight is not darkness's
   business: Dask carries a lantern. What is seen is what is near the
   wizard now, which the code can ask about; rules out a fog that
-  remembers where the wizard has been, which it cannot.
-- **D53 — A stair comes and goes, and `osto` holds it.** Decided
+  remembers where the wizard has been, which it cannot. Over a painting the
+  dark is one soft shape over the dark area, faint enough for the painting's
+  shapes to show, with a soft light round the wizard.
+- **D53 — A stair comes and goes, and `osto` holds it** (its thing is a slab
+  over a hole: D138). Decided
   2026-10-21 (sprint-9.md), built the same day. A thing of kind `stair`,
   with a whole `period`, lies on a floor tile and is in place for
   `period` ticks and away for as many, in place from tick 0. A step onto
@@ -868,7 +879,7 @@ one overturns stays, marked as superseded.
   in place, with the stair's `hold` event (`from`, `until`); with no stair
   beside, it is refused with `nothing_near`. A stair is never locked,
   sealed or opened.
-- **D54 — `not`, `==` and `can_see` belong to the lesson on true and
+- **D54 (`can_see` is not taught: D139) — `not`, `==` and `can_see` belong to the lesson on true and
   false; `wait` to the lesson on `if`.** Decided 2026-10-21 (sprint-9.md),
   built the same day. An expression that is true or false is the idea of
   one lesson: `==` asks whether two values are the same (and is not `=`),
@@ -917,7 +928,7 @@ one overturns stays, marked as superseded.
 - **D57 — Stars say how well, and why.** Decided 2026-10-22 by the owner's
   UAT (sprint-10.md), built the same day. A win earns three stars and
   loses one for each of: a hint shown in the level; the winning run
-  bumping into a wall, a door or a stair; and a bonus goal unmet, or, in a
+  bumping into a wall, a door or a slab; and a bonus goal unmet, or, in a
   level with no bonus goal, a run before the winning one in the same visit
   to the level (the progress also counts every run, `runs`). A win is one
   star at least. `app/src/ui/stars.ts` judges, and the win card lists the
@@ -1016,12 +1027,13 @@ one overturns stays, marked as superseded.
   begins, on the same tile, and what an earlier level opened or took stays
   as the story has it: a door opened is a door `open` from the start, a
   thing picked up is `carrying`; the content tests hold each level on a
-  scene to start where the one before it on the same scene ended. An
-  improve level that plays the level before it again from its start, the
-  program just repaired given to do more (*Eldra's door* after *The moving
-  key*, the owner, 2026-11-01), begins where that level began. Chapter
-  1 is the scene `the-gate`, chapter 2 `the-library`, chapter 3
-  `the-passages` and `the-night-passages`. Rules out one map per level,
+  scene to start where the one before it on the same scene ended. A
+  fix or an improve level that plays the level before it again from its
+  start, the program just repaired given to do more (*Eldra's door* after
+  *The moving key*, the owner, 2026-11-01), or one more program for the same
+  room (*The wrong door* after *Left or right*), begins where that level
+  began. The scenes of each chapter are in the course (`docs/dev/course.md`);
+  chapter 3's are seven small ones (D136). Rules out one map per level,
   which showed the same gate nine times from nine angles.
 - **D66 — A friend stands in the scene.** Decided 2026-10-22 by the owner's
   UAT (sprint-11.md), built the same day. The actor kind `friend` stands
@@ -1681,8 +1693,8 @@ one overturns stays, marked as superseded.
   middle of its cell.** Decided 2026-10-28 by the owner. A thing a level
   places on another cell than the one it is painted on (D85) has the
   middle of what is drawn of it put at the middle of that cell, not the
-  painted offset carried along; on its painted cell it is drawn as
-  painted. A thing laid on a cell no one walks, under a bookcase, is
+  painted offset carried along, and with the cell's nudge (D105), where a
+  figure on it stands; on its painted cell it is drawn as painted. A thing laid on a cell no one walks, under a bookcase, is
   drawn just under that row's things, hidden in them. Rules out a book
   that is in one cell and looks to be in the one above.
 - **D110 — The child sees where a thing is; its numbers wait.** Decided
@@ -1695,7 +1707,8 @@ one overturns stays, marked as superseded.
   after it (D112). Rules out `print(book.position)` as the way to find a
   book.
 - **D112 — The grid is taught before `position`, with the naughty
-  child's map.** Decided 2026-10-29 by the owner. A cell's numbers mean
+  child's map** (its overlay and its third level are superseded by D134, its
+  teaching order stands). Decided 2026-10-29 by the owner. A cell's numbers mean
   nothing until the child has seen them on the scene and counted cells by
   hand. Chapter 3 opens with the naughty child's map, a thing the wizard
   carries, and the spell `orvim`, cast only with the map carried: for a
@@ -1964,3 +1977,87 @@ one overturns stays, marked as superseded.
   counts the run's ticks (`ticks_under`). Rules out a key farther than
   the door, a subtraction that goes below zero, and a bonus the long way
   earns.
+- **D134 — The naughty child's map is a window with the scene's plan,
+  and `orvim` opens it and pauses the run.** Decided 2026-11-05 by the
+  owner; supersedes the overlay of D112, whose teaching order stands
+  without its third level. The map is a thing of kind `map`, carried from
+  the chapter's first level on (`carrying`); `wizard.cast("orvim")` takes
+  a tick, needs the wand and the map (without the map it is refused,
+  `no_map`), and makes the world's event `map`. When the page plays that
+  tick it pauses the playback, and once the wand is seen pointed opens a
+  window over the page with the scene's plan, drawn by the page from the map
+  and the level at that tick: the playable cells of the scene as a grid,
+  floor light and walls dark, furniture hatched, each door at its cell shut
+  or open, every column numbered along the top and the bottom and every row
+  along the left and the right, each floor cell's own numbers small inside
+  it; the wizard, every actor and every thing with its name and its cell
+  beside it, except what lies unlit in a dark room (D52) and anyone in an
+  enchanted region (D135), which is hatched and named. The window is closed
+  by its button or Escape, and the playback goes on from the same tick; a run
+  started again closes it. A lesson's *Try it* leads to the level, where the
+  child's program opens it the same way. The plan is drawn like an old map in
+  ink on parchment, not as a second painting: no Gemini image. Rules out cell
+  numbers drawn over the painting, and a map that costs a picture a scene.
+- **D135 — An enchanted region hides every figure in it, on the scene and
+  on the plan.** Decided 2026-11-05 by the owner, for the tunnel. A scene's
+  settings name the region (`enchanted`, boxes of cells); a figure, the
+  wizard or an actor, standing in it is not drawn, a figure stepping into
+  it fades out over that step and one stepping out fades in, and the plan
+  draws no figure in it. The world is not changed: the wizard walks it
+  as any floor, and `wizard.position` tells where it stands, which is the
+  point of the level played inside it. Rules out a dark picture of the
+  tunnel's inside, and a figure drawn black over the painting.
+- **D136 — Chapter 3 is seven small scenes, one a level or a pair of
+  levels, asked of the model as places and the levels fitted to them.**
+  Decided 2026-11-05 by the owner. A scene is twenty by fifteen cells, one
+  part of the castle's inside at night with its roof lifted off: the
+  corridor or room of the level in the middle, closed doors to dim rooms
+  at its sides that fill the picture and give the corridor sense, no
+  outside, no sky, no frame and no black but inside the tunnel's mouth
+  (`art/README.md`, *What surrounds a scene*). The route of the level is not
+  forced into the picture: the picture is asked as a plain consistent place
+  and the level's cells are read from it; what a level adds, a key, a hole,
+  is an edit in a box. The twenty by fifteen cells are laid over the picture,
+  whatever grid the model painted on it, which its edit takes out. A scene the
+  design needs and no picture holds (the way down) is laid out on the grid first
+  and painted from its layout (D102, D115). Between two scenes the next
+  starts where the last ended, an arch out of one being the arch into the
+  next, and a story is told between them where the tale needs it. Rules
+  out one large painting a chapter, and a stepped diagonal stair, which
+  the model paints isometric every time.
+- **D137 — A teacher may start anywhere on its patrol, and a level's
+  ways set its phase so that no fixed wait wins where a loop is taught.**
+  Decided 2026-11-05. `patrol` lists the turning points of the path. With one
+  point, or with the teacher's own tile first, the path starts where the teacher
+  stands; with two or more and another first, the path is drawn from the first
+  point through the rest, `at` lies on it and the teacher starts there walking
+  the way it faces along the path. A level that teaches waiting with `while`
+  gives the teacher a sight that reaches the crossing cell from every cell of
+  its patrol but the far end, where it turns, so that "it faces this way" and
+  "it sees the crossing" are one thing, and the wizard waits on the cell beside
+  the crossing, off the teacher's row, so that the step after the loop is safe
+  whenever the loop ends; its three ways start the teacher a third of its period
+  apart, so that no number of waits written in the code wins all three, which a
+  test holds. Rules out a loop level a child wins with `wait(5)` found by trial.
+- **D138 — The stair of D53 is a slab over a hole.** Decided 2026-11-05 by
+  the owner, who said a moving stair cannot be drawn in the scene's view.
+  The thing's kind is `slab` in `level.json` and in the child's code
+  (`slab.in_place`), with D53's rule unchanged: in place for `period` ticks
+  and away for as many, from tick 0 in place, a step onto it while away a
+  bump (`by: "slab"`), `osto` holding it from its next tick in place. On a
+  painted scene the slab in place is the painting's own floor and away it
+  is the hole, a picture drawn at the cell the level gives (D85); `osto`'s
+  hold glows round the cell. Rules out a stair that comes and goes and the word
+  *escalón* in any text.
+- **D139 — `can_see` is not taught; a program asks `facing`.** Decided
+  2026-11-05 by the owner: when `can_see` is true the wizard is already
+  caught, so no level can be won by asking it. `teacher.can_see` stays in
+  the world's API for the challenges, in no lesson and in no level's
+  `api` of chapters 1 to 3, which a test holds. The lesson on true and false
+  keeps `==`, `not` and `dask.facing` (D54 otherwise stands).
+- **D140 — A level's words show their code as code.** Decided 2026-11-05
+  (the debt of sprint 29). Every text of a level's `text.<lang>.json`
+  shown on the page, the intro, the outro, what was learned, the goals,
+  the hints and the ways, renders a span between backquotes as inline code,
+  and a word between asterisks, a spell's, in italics, as the lessons' pages
+  do. Rules out a backquote or an asterisk shown to the child.

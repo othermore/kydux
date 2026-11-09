@@ -134,6 +134,18 @@ owner on 2026-10-26, for every scene from the dormitory on:
   and `morning-<scene>.png` among the check pictures, every row and thing
   over it, to look at for a night piece left over the day, and the page
   fades the morning in over the night at the dawn (D124).
+- **What a model leaves unpainted round a place is painted as the castle's
+  inside.** A scene asked as a place (D136) may come with black or pale paper
+  round it. `tools/art/repaint.py` paints what is empty (`void`) in one section:
+  the model is given the picture with that part flat, black, or in a dim colour
+  where it keeps black as a gap and pale paper as the page (`flat`), and asked for
+  the tops of thick walls and dim closed rooms, and what it still leaves is laid
+  with the picture's own stones, mirrored so that they meet (`tiled`). Chapter
+  3's scenes are mended so.
+- **A wall may be moved along its rows, or a corridor made wider, without a
+  model** (`repaint.py spaced`): a wall with its door moved whole and the plain
+  floor beside it stretched, where a loop needs its doors evenly apart, or a level
+  needs a third cell across. Its seams lie on the outlines of what is moved.
 - **Outdoors, the margin is more of the same ground**, woods, rocks and
   fences no one could walk through, as the field's.
 - **A margin painted on later is joined, the painting kept.** For a
@@ -533,8 +545,9 @@ shows it for a moment as the door opens.
 - `art/raw/`: the trials, the raw pictures and the check pictures. Git
   ignores this folder.
 - `art/scenes/<scene>/`: each painted scene's settings, `cut.json`, with
-  its manifest: the field, the entrance hall, the dormitory and the
-  library.
+  its manifest: the field, the entrance hall, the dormitory, the library,
+  and chapter 3's seven: the tunnel, the crossing, the two doors, the three
+  doors, the long round, the storeroom and the way down.
 
 Everything the project makes ships under the GPL, like the code. A picture
 from anywhere else comes in only under a licence that lets it ship with a

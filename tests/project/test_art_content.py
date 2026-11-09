@@ -232,3 +232,25 @@ def test_every_bed_gone_to_has_a_pillow_side():
                     named.add((story["scene"], action["sleep"]))
     assert named
     assert [bed for bed in sorted(named) if not sides.get(bed)] == []
+
+
+def doors_opened_from_their_closed_picture(repo_root=REPO) -> list[tuple[str, str]]:
+    """Every door tools/art/door.py builds, by its scene and its id (D144)."""
+    found = []
+    for path in sorted((repo_root / "art" / "scenes").glob("*/cut.json")):
+        for name, thing in json.loads(path.read_text(encoding="utf-8"))["things"].items():
+            if "door" in thing:
+                found.append((path.parent.name, name))
+    return found
+
+
+@pytest.mark.parametrize(("scene", "door"), doors_opened_from_their_closed_picture())
+def test_an_open_door_is_whole_and_its_box_cuts_nothing_of_it(scene, door):
+    """D144: no leaf cut by its box's corner, which was what the owner found."""
+    folder = REPO / "content" / "art" / "scenes" / scene
+    art = json.loads((folder / "art.json").read_text(encoding="utf-8"))
+    picture = Image.open(folder / art["things"][door]["states"]["open"]).convert("RGBA")
+    alpha = np.array(picture)[..., 3]
+    assert alpha.any()
+    for edge in (alpha[0], alpha[-1], alpha[:, 0], alpha[:, -1]):
+        assert not edge.any(), f"{scene}: {door}'s open picture reaches its box's edge"

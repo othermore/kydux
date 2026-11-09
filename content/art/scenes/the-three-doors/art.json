@@ -15,30 +15,27 @@
     },
     {
       "row": 4,
-      "image": "row-4-static-under.webp",
+      "image": "row-4-static.webp",
       "top": 210,
-      "static": true,
-      "under": true
+      "static": true
     },
     {
       "row": 8,
-      "image": "row-8-static-under.webp",
+      "image": "row-8-static.webp",
       "top": 595,
-      "static": true,
-      "under": true
+      "static": true
     },
     {
       "row": 12,
-      "image": "row-12-static-under.webp",
+      "image": "row-12-static.webp",
       "top": 979,
-      "static": true,
-      "under": true
+      "static": true
     }
   ],
   "things": {
     "door_1": {
       "row": 11,
-      "left": 878,
+      "left": 854,
       "top": 979,
       "states": {
         "closed": "door_1-closed.webp",
@@ -56,7 +53,7 @@
     },
     "door_2": {
       "row": 7,
-      "left": 878,
+      "left": 850,
       "top": 595,
       "states": {
         "closed": "door_2-closed.webp",
@@ -74,7 +71,7 @@
     },
     "door_3": {
       "row": 3,
-      "left": 878,
+      "left": 851,
       "top": 211,
       "states": {
         "closed": "door_3-closed.webp",

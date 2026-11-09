@@ -655,6 +655,16 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         );
         zoom.attach(handle);
         controller.attach(handle);
+        // The goals box folds itself when it would cover the wizard at the start, once
+        // the camera has drawn where the wizard stands.
+        setTimeout(() => {
+          if (destroyed) return;
+          const box = handle.wizardBox();
+          const panel = goals.node.getBoundingClientRect();
+          const covers =
+            box.left < panel.right && panel.left < box.right && box.top < panel.bottom && panel.top < box.bottom;
+          if (covers) goals.fold();
+        }, 400);
       });
       // The start card opens a level the first time it is played.
       progress.setCurrent(`level:${loaded.id}`);

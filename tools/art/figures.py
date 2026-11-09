@@ -7,6 +7,13 @@ that the figures stay the same drawing and only their colours change.
     tools/art/figures.py --cast <boy|girl> <edit.png>
     tools/art/figures.py --pickup <boy|girl> <edit.png>
     tools/art/figures.py --win <boy|girl> <edit.png>
+    tools/art/figures.py --standing <figure> <drawing.png>
+
+A figure's standing frame, in every row of its sheet, has its feet together and its
+weight on both, and a walking frame is made from it (D147). --standing makes a
+figure's sheet again from a drawing of it standing still in the four views: each view
+is cut from the drawing's magenta, as tall as the sheet's figure, its feet on the
+frame's foot line, and each walking row made from it as below (STANDING_DRAWN).
 
 A base sheet is four rows (down, left, right, up) of three frames, as
 content/art/figures/figures.json says. Each opaque pixel is told by its colour
@@ -119,9 +126,9 @@ LEGS = 0.2
 #: (D120: the page sways a floating figure through its frames while it stands).
 FLOATING = {"eldra": (4, 8)}
 FLOATING_SWAY = 3
-#: A row whose standing frame is not the one to keep, and the frame it keeps: Dask's
-#: back has his hands behind it in the first frame, not in the standing one.
-KEPT_FRAME = {"dask": {"up": 0}}
+#: The figures whose sheet is made from a drawing of them standing still (D147), and
+#: the way each view of the drawing faces, from left to right.
+STANDING_DRAWN = {"dask": ("down", "right", "left", "up")}
 #: How much of a floating figure, from the bottom up, is the dress that grows.
 DRESS = 0.4
 
@@ -295,27 +302,24 @@ def walking(
     sheet: Image.Image,
     frame: tuple[int, int],
     floats: tuple[int, int] | None = None,
-    kept: dict[str, int] | None = None,
 ) -> Image.Image:
     """Each walking row (the first four) made from its standing frame, the second of
-    the row unless `kept` names another for its way, on a sheet already steadied:
-    every other frame keeps its own legs, the lowest LEGS of the figure, blended into
-    the kept frame above them over a few rows; or, for a figure that floats, the
-    step frames are the kept frame with its dress, the lowest DRESS of it, stretched
+    the row, on a sheet already steadied: every other frame keeps its own legs, the
+    lowest LEGS of the figure, blended into the standing frame above them over a few
+    rows; or, for a figure that floats, the step frames are the standing frame with its
+    dress, the lowest DRESS of it, stretched
     down by `floats` pixels (the first step's, the last's) and its hem swung
     FLOATING_SWAY pixels, left in the first and right in the last."""
     pixels = np.array(sheet.convert("RGBA")).astype(np.float32)
     fw, fh = frame
     out = pixels.copy()
     for row in range(min(4, pixels.shape[0] // fh)):
-        keep = (kept or {}).get(("down", "left", "right", "up")[row], 1)
-        standing = pixels[row * fh : (row + 1) * fh, keep * fw : (keep + 1) * fw]
+        standing = pixels[row * fh : (row + 1) * fh, fw : 2 * fw]
         opaque = np.where(standing[..., 3] > 128)[0]
         if not opaque.size:
             continue
         top, bottom = int(opaque.min()), int(opaque.max())
-        others = [column for column in range(3) if column != keep]
-        for step, column in enumerate(others):
+        for step, column in enumerate((0, 2)):
             cell = pixels[row * fh : (row + 1) * fh, column * fw : (column + 1) * fw]
             if floats is not None:
                 sway = FLOATING_SWAY if step else -FLOATING_SWAY
@@ -576,6 +580,56 @@ def make_sleep_base(kind: str, edit: Path, like: str | None = None) -> Path:
     return target
 
 
+def drawn_views(drawing: Image.Image) -> list[Image.Image]:
+    """A drawing's figures on flat magenta, from left to right, each cut to its own
+    box with the magenta made transparent: what the columns with nothing drawn part."""
+    rgb = np.array(drawing.convert("RGB")).astype(int)
+    distance = np.abs(rgb - np.array([255, 0, 255])).sum(axis=2)
+    alpha = np.clip((distance - 90) * 3, 0, 255).astype(np.uint8)
+    spill = (rgb[..., 0] > rgb[..., 1] + 40) & (rgb[..., 2] > rgb[..., 1] + 40)
+    rgb[spill, 1] = ((rgb[spill, 0] + rgb[spill, 2]) // 2 * 0.6).astype(int)
+    keyed = Image.fromarray(np.dstack([rgb.astype(np.uint8), alpha]), "RGBA")
+    solid = distance > 150
+    columns = solid.any(axis=0)
+    edges = np.flatnonzero(np.diff(np.concatenate(([0], columns.astype(int), [0]))))
+    views = []
+    for start, end in zip(edges[::2], edges[1::2], strict=True):
+        if end - start < drawing.width // 40:
+            continue
+        rows = np.nonzero(solid[:, start:end].any(axis=1))[0]
+        views.append(keyed.crop((int(start), int(rows[0]), int(end), int(rows[-1]) + 1)))
+    return views
+
+
+def make_standing(name: str, drawing: Path) -> Path:
+    """A figure's sheet made again from a drawing of it standing still (D147): each view
+    is its row's standing frame, as tall as the figure was, its feet on the same line and
+    its middle in the frame's; the sheet's step frames keep their legs (`walking`)."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    fw, fh = tuple(about["frame"])
+    target = FIGURES / f"{name}.webp"
+    sheet = Image.open(target).convert("RGBA")
+    views = drawn_views(Image.open(drawing))
+    order = STANDING_DRAWN[name]
+    if len(views) != len(order):
+        raise SystemExit(f"{drawing}: {len(views)} figures drawn, {len(order)} wanted")
+    ways = about["ways"]
+    old = np.array(sheet)
+    rows = np.nonzero((old[:fh, fw : 2 * fw, 3] > 128).any(axis=1))[0]
+    top, bottom = int(rows[0]), int(rows[-1])
+    scale = (bottom - top + 1) / views[0].height
+    out = sheet.copy()
+    for view, way in zip(views, order, strict=True):
+        small = view.resize((round(view.width * scale), round(view.height * scale)), Image.LANCZOS)
+        y = ways.index(way) * fh + bottom + 1 - small.height
+        x = fw + (fw - small.width) // 2
+        out.paste((0, 0, 0, 0), (fw, ways.index(way) * fh, 2 * fw, (ways.index(way) + 1) * fh))
+        out.alpha_composite(small, (x, y))
+    made = walking(steadied(out, (fw, fh)), (fw, fh))
+    made.save(target, quality=90, method=6)
+    return target
+
+
 def stacked(*sheets: Image.Image) -> Image.Image:
     """The sheets one under the other."""
     sheet = Image.new("RGBA", (sheets[0].width, sum(s.height for s in sheets)), (0, 0, 0, 0))
@@ -675,11 +729,20 @@ def main() -> int:
         "--sleep", nargs=2, metavar=("KIND", "EDIT"), help="make a sleeping base from an edit"
     )
     parser.add_argument(
+        "--standing",
+        nargs=2,
+        metavar=("FIGURE", "DRAWING"),
+        help="make a figure's sheet again from a drawing of it standing still",
+    )
+    parser.add_argument(
         "--like",
         metavar="KIND",
         help="with --sleep, for an edit of other figures: as tall as KIND",
     )
     args = parser.parse_args()
+    if args.standing:
+        print(make_standing(args.standing[0], Path(args.standing[1])).relative_to(REPO))
+        return 0
     if args.sleep_input:
         print(make_sleep_input(args.sleep_input).relative_to(REPO))
         return 0

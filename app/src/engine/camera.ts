@@ -7,7 +7,9 @@
 // story (D74) it is a window that keeps whoever each step is about, with their
 // words, inside it, gliding only when they push past its edge, and never jumping;
 // dragged, it stays where it was dragged until the next step, so that the child
-// can watch someone the story does not follow (D106).
+// can watch someone the story does not follow (D106). At a level's start it shows the
+// wizard and every actor, zooming out as far as it must and no farther, and the run
+// takes it back to the wizard, gliding (sprint 31).
 // It says data-zoom (the zoom, to two decimals), data-following, data-dragged
 // while a drag has let go of it, and data-view and data-bounds (the window and
 // the scene with its margin, in tiles across and down, "w×h") on the scene's
@@ -16,7 +18,7 @@
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
 import type { Tile } from './sight';
-import { steppedZoom, wheeledZoom, ZOOMS } from './zooming';
+import { startFrame, steppedZoom, storyMiddle, wheeledZoom, ZOOMS } from './zooming';
 
 export { ZOOMS };
 
@@ -56,6 +58,8 @@ export class SceneCamera {
   private followed: { x: number; y: number } | null = null;
   /** Whether a drag has let go of what the camera follows, until follow(). */
   private dragged = false;
+  /** Whether it stands where a level's start framed it, off the wizard, until follow(). */
+  private framed = false;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -138,9 +142,38 @@ export class SceneCamera {
       return;
     }
     const wizard = this.parts.wizard();
+    const { scrollX, scrollY } = camera;
     camera.startFollow(wizard, true, 0.2, 0.2);
-    camera.centerOn(wizard.x, wizard.y);
+    // From the frame of a level's start it glides; else it is on the wizard at once.
+    if (this.framed) camera.setScroll(scrollX, scrollY);
+    else camera.centerOn(wizard.x, wizard.y);
+    this.framed = false;
+    delete this.parent.dataset.framed;
     this.parent.dataset.following = 'true';
+  }
+
+  /** At a level's start: the wizard and every actor, `figures` being their tiles and
+   * the wizard's first, in the window, zoomed out as far as it must and no farther. On
+   * the wizard when they all fit round it; else on them, until a run or Find my wizard. */
+  frame([wizard, ...others]: [Tile, ...Tile[]]): void {
+    const camera = this.camera;
+    const scale = this.fit() * TILE;
+    const shown: Tile = [camera.width / scale, camera.height / scale];
+    const { zoom, centre } = startFrame(others, wizard, shown, this.zoom, this.least());
+    if (Math.abs(zoom - this.zoom) > 1e-6) {
+      this.zoom = zoom;
+      this.applyZoom();
+    }
+    if (!centre) {
+      this.framed = false;
+      this.follow();
+      return;
+    }
+    camera.stopFollow();
+    camera.centerOn(centre[0] * TILE, centre[1] * TILE);
+    this.framed = true;
+    this.parent.dataset.framed = 'true';
+    this.parent.dataset.following = 'false';
   }
 
   /** In a story, at each tick: with whoever the step is about, unless a drag has
@@ -163,10 +196,13 @@ export class SceneCamera {
       return;
     }
     const box = this.parts.around(this.focus);
-    // The point followed is the middle of the figure and its words.
-    camera.setFollowOffset(this.focus.x - box.centerX, this.focus.y - box.centerY);
+    // The point followed is the middle of the figure and its words, or, when the two
+    // are taller than the window, what shows the figure whole, its words going past.
+    const viewed = camera.height / camera.zoom;
+    const middle = storyMiddle(box.top, box.bottom, viewed, STORY_EDGE);
+    camera.setFollowOffset(this.focus.x - box.centerX, this.focus.y - middle);
     const width = Math.max(0, camera.width / camera.zoom - box.width - STORY_EDGE * 2);
-    const height = Math.max(0, camera.height / camera.zoom - box.height - STORY_EDGE * 2);
+    const height = Math.max(0, viewed - box.height - STORY_EDGE * 2);
     // Phaser's setDeadzone puts the camera on its target at once while it follows;
     // a dead zone already made is only resized, and the camera stays.
     if (camera.deadzone) camera.deadzone.setSize(width, height);

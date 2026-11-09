@@ -9,8 +9,8 @@ later, like the rest of it.
   dimmed (`game-way-down-nogrid.md`).
 - What lies round the corridors painted by Gemini from
   `game-way-down-voids.md`, joined by `tools/art/repaint.py`.
-- The door's doorway opened by `tools/art/repaint.py doorways`, and its two
-  leaves swung open painted by Gemini (`game-way-down-swung.md`) in boxes,
-  joined by `tools/art/repaint.py`.
+- What it still left navy laid with its own stones (`navy`, `tiled`), no model
+  asked.
+- The door opened by `tools/art/door.py` from the painting itself, no model asked.
 - Its key is the storeroom's, cut there; its hole is the storeroom's hole picture
   from Gemini, laid across the corridor by `tools/art/repaint.py placed`.

@@ -151,6 +151,8 @@ export interface SceneHandle {
   canZoom(step: 1 | -1): boolean;
   /** After a run won, the wizard celebrates; how long it takes, 0 when it does not. */
   celebrate(): number;
+  /** Where the wizard stands on the page, a box in the page's pixels. */
+  wizardBox(): { left: number; top: number; right: number; bottom: number };
   /** Who is told when the map is opened, with the scene's plan at that tick, the run
    * paused until `playback.play()`, and when a run started again closes it (D134). */
   onMap(opened: (view: PlanView) => void, closed: () => void): void;
@@ -776,8 +778,8 @@ class LevelScene extends Phaser.Scene {
     return (this.shownWay ? this.map.ways[this.shownWay]?.[id] : undefined) ?? own;
   }
 
-  /** Everything where it stood before the run. */
-  private restart(): void {
+  /** Everything where it stood before the run; `seeking`, on the way to a tick. */
+  private restart(seeking = false): void {
     this.restarts += 1;
     // A run started again closes the map it opened (D134).
     this.mapClosed?.();
@@ -837,7 +839,29 @@ class LevelScene extends Phaser.Scene {
     this.wizard.setAlpha(1).setVisible(!this.inEnchanted(this.map.start));
     this.parentNode.dataset.tick = '0';
     this.publish();
-    if (this.restarts > 1) this.follow();
+    // A level's start shows the wizard and every actor; a seek stays with the wizard.
+    if (!this.options.story && !seeking) this.frameStart();
+    else if (this.restarts > 1) this.follow();
+  }
+
+  /** The camera at a level's start, on the wizard and every actor seen (camera.ts). */
+  private frameStart(): void {
+    const others = this.map.actors.flatMap((actor) => {
+      const state = this.actors.get(actor.id);
+      return state?.sprite.visible ? [state.tile] : [];
+    });
+    this.view.frame([this.map.start, ...others]);
+  }
+
+  /** Where the wizard stands on the page (SceneHandle). */
+  wizardBox(): { left: number; top: number; right: number; bottom: number } {
+    const box = this.wizard.getBounds();
+    const camera = this.cameras.main;
+    const canvas = this.game.canvas.getBoundingClientRect();
+    const scale = (camera.zoom * canvas.width) / this.game.canvas.width;
+    const left = canvas.left + (box.left - camera.worldView.x) * scale;
+    const top = canvas.top + (box.top - camera.worldView.y) * scale;
+    return { left, top, right: left + box.width * scale, bottom: top + box.height * scale };
   }
 
   private placeWizard(tile: Tile, facing: Facing): void {
@@ -924,7 +948,7 @@ class LevelScene extends Phaser.Scene {
    * with no tweens, no bubbles and no shaking: only where everything ends up. */
   private show(tick: number, events: WorldEvent[], instant: boolean): void {
     if (tick === 0) {
-      this.restart();
+      this.restart(instant);
       return;
     }
     this.parentNode.dataset.tick = String(tick);
@@ -1933,6 +1957,9 @@ export async function startScene(
         },
         canZoom(step) {
           return scene.canZoomBy(step);
+        },
+        wizardBox() {
+          return scene.wizardBox();
         },
         celebrate() {
           return scene.celebrate();

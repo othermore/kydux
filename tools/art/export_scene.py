@@ -1008,6 +1008,9 @@ later, like the rest of it.
   `tools/art/sprites.py` and put together by `tools/art/export_scene.py`,
   Ilda's sized and turned by Wenna's, a figure of her build, and Baro's by
   Dask's.
+- Dask's standing frames are Gemini's drawing of him standing still in the four
+  views (`figure-dask-standing.md`), cut by `tools/art/figures.py --standing`, and
+  his walking frames are made from them.
 - The wizard's girl and Nuri's are Gemini's edits of those sheets
   (`figure-wizard-girl.md`, `figure-nuri-girl.md`), and the wizard's
   casting frames are Gemini's edits of the wizard's two sheets
@@ -1103,12 +1106,13 @@ def figures() -> Path:
                 x = c * width + (width - frame.width) // 2
                 y = r * height + height - FOOT - frame.height
                 sheet.alpha_composite(frame, (x, y))
+        # A figure drawn again standing still has its sheet from that drawing (D147).
+        if name in looks.STANDING_DRAWN:
+            continue
         # Each frame over its row's standing frame, and each walking row made from
         # it, so that the figure walks moving its feet alone (or its dress, floating).
         sheet = looks.steadied(sheet, (width, height))
-        sheet = looks.walking(
-            sheet, (width, height), looks.FLOATING.get(name), looks.KEPT_FRAME.get(name)
-        )
+        sheet = looks.walking(sheet, (width, height), looks.FLOATING.get(name))
         # A base is recoloured into the looks' sheets, which are drawn smaller then;
         # every other figure is drawn smaller here (D98).
         if name in AS_BASES:

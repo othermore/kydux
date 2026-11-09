@@ -238,6 +238,25 @@ test.describe('what the page draws of the chapter', () => {
   test.use({ locale: 'en-US' });
   test.beforeEach(({ page }) => seedWizard(page, PABLO));
 
+  test("a level's start shows Dask, and a run takes the camera back to the wizard", async ({ page }) => {
+    await open(page, 'past-the-teacher');
+    await expect(scene(page)).toHaveAttribute('data-framed', 'true');
+    await expect(scene(page)).toHaveAttribute('data-following', 'false');
+    await expect(scene(page)).toHaveAttribute('data-zoom', '1');
+    await start(page, 'wizard.move_down()');
+    await expect(scene(page)).toHaveAttribute('data-following', 'true', { timeout: 30_000 });
+    await expect(scene(page)).not.toHaveAttribute('data-framed');
+  });
+
+  test('the goals box folds itself when it would cover the wizard at the start', async ({ page }) => {
+    await open(page, 'the-tunnel-exit');
+    await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'true', { timeout: 10_000 });
+    await page.locator('#goals-toggle').click();
+    await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
+    await open(page, 'past-the-teacher');
+    await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
+  });
+
   test('the key lies where a figure on its cell stands, not on the torch (D105, D109)', async ({ page }) => {
     await open(page, 'the-night-walk');
     await expect(scene(page)).toHaveAttribute('data-drawn', /key:10\.0\d,3\.\d+/);

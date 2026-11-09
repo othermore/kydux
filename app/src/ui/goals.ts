@@ -1,6 +1,7 @@
 // The goals panel: the level's goals, each with a mark that is empty, ticked
 // once met, or crossed once failed. Its heading folds it, so that on a small
-// screen it does not hide the scene; it stays folded for the visit (D38).
+// screen it does not hide the scene; it stays folded for the visit (D38). A level whose
+// wizard it would cover at the start folds it too, for that level alone (sprint 31).
 
 import { t } from '../i18n';
 import { element } from './dom';
@@ -12,6 +13,8 @@ export interface GoalsPanel {
   node: HTMLElement;
   set(index: number, mark: GoalMark): void;
   reset(): void;
+  /** Folds it for this level, as when it would cover the wizard at the start. */
+  fold(): void;
 }
 
 function label(mark: GoalMark): string {
@@ -58,16 +61,26 @@ export function goalsPanel(goals: { text: string; bonus?: boolean }[]): GoalsPan
   toggle.setAttribute('aria-controls', 'goals-list');
   toggle.title = t('goals.fold');
   const node = element('section', { className: 'goals' }, [element('h3', {}, [toggle]), list]);
+  let shut = folded;
   const show = () => {
-    list.hidden = folded;
-    node.dataset.folded = String(folded);
-    toggle.setAttribute('aria-expanded', String(!folded));
+    list.hidden = shut;
+    node.dataset.folded = String(shut);
+    toggle.setAttribute('aria-expanded', String(!shut));
   };
   toggle.addEventListener('click', () => {
-    folded = !folded;
+    shut = !shut;
+    folded = shut;
     show();
   });
   show();
   node.setAttribute('aria-live', 'polite');
-  return { node, set, reset };
+  return {
+    node,
+    set,
+    reset,
+    fold() {
+      shut = true;
+      show();
+    },
+  };
 }

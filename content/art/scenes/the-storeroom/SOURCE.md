@@ -13,6 +13,4 @@ later, like the rest of it.
   traced round it.
 - The hole of the slab painted by Gemini from `game-storeroom-hole.md`, and laid
   at its cell's size by `tools/art/repaint.py placed`.
-- The door's doorway opened by `tools/art/repaint.py doorways`, and its leaf
-  swung open painted by Gemini (`game-storeroom-swung.md`) in a box, joined by
-  `tools/art/repaint.py`.
+- The door opened by `tools/art/door.py` from the painting itself, no model asked.

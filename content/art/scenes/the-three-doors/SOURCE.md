@@ -11,6 +11,4 @@ later, like the rest of it.
   what still was black tiled from the picture's own stones (`tiled`).
 - Its three walls moved along their rows by `tools/art/repaint.py spaced`, so
   that the doors lie exactly four cells apart.
-- Each door's doorway opened by `tools/art/repaint.py doorways`, and each leaf
-  swung open painted by Gemini (`game-three-doors-swung-1.md`, `-2`, `-3`) in
-  a box, joined by `tools/art/repaint.py`.
+- Each door opened by `tools/art/door.py` from the painting itself, no model asked.

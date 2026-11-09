@@ -9,7 +9,7 @@
   "things": {
     "left_door": {
       "row": 9,
-      "left": 586,
+      "left": 519,
       "top": 720,
       "states": {
         "closed": "left_door-closed.webp",

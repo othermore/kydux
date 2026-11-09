@@ -10,95 +10,187 @@
   "things": {
     "store_door": {
       "box": [
-        9.0,
+        8.34,
         10.5,
         12.1,
         13.3
       ],
       "row": 12,
       "solid": true,
-      "without": "storeroom-doorway.png",
+      "without": "store_door-doorway.png",
       "states": {
         "closed": "painting",
         "open": {
-          "picture": "storeroom-swung.png",
-          "without": "storeroom-doorway.png",
+          "picture": "store_door-open.png",
+          "without": "store_door-doorway.png",
           "leaf": [
             [
-              10.92,
-              10.6
+              8.798,
+              10.587
             ],
             [
-              11.15,
-              10.66
+              8.823,
+              10.587
             ],
             [
-              11.4,
-              10.8
+              8.931,
+              10.641
             ],
             [
-              11.58,
-              11.02
+              9.035,
+              10.771
             ],
             [
-              11.7,
-              11.3
+              9.106,
+              10.968
             ],
             [
-              11.78,
-              11.7
+              9.119,
+              11.047
             ],
             [
-              11.8,
-              12.3
+              9.119,
+              11.147
             ],
             [
-              11.78,
-              12.72
+              9.148,
+              11.156
             ],
             [
-              11.55,
-              12.82
+              9.194,
+              11.185
             ],
             [
-              11.42,
-              13.05
+              9.219,
+              11.223
             ],
             [
-              10.95,
-              12.84
+              9.231,
+              11.265
             ],
             [
-              10.9,
-              12.5
+              9.231,
+              11.332
             ],
             [
-              10.84,
-              12.5
+              9.219,
+              11.378
             ],
             [
-              10.84,
-              12.16
+              9.194,
+              11.415
             ],
             [
-              10.9,
-              12.16
+              9.156,
+              11.445
             ],
             [
-              10.9,
-              11.3
+              9.119,
+              11.461
             ],
             [
-              10.84,
-              11.3
+              9.119,
+              11.951
             ],
             [
-              10.84,
-              10.98
+              9.11,
+              12.047
             ],
             [
-              10.9,
-              10.98
+              9.115,
+              12.098
+            ],
+            [
+              9.106,
+              12.261
+            ],
+            [
+              9.11,
+              12.311
+            ],
+            [
+              9.102,
+              12.462
+            ],
+            [
+              9.106,
+              12.533
+            ],
+            [
+              9.098,
+              12.667
+            ],
+            [
+              9.098,
+              12.876
+            ],
+            [
+              8.969,
+              12.876
+            ],
+            [
+              8.531,
+              12.796
+            ],
+            [
+              8.515,
+              12.792
+            ],
+            [
+              8.506,
+              12.771
+            ],
+            [
+              8.506,
+              11.599
+            ],
+            [
+              8.456,
+              11.579
+            ],
+            [
+              8.419,
+              11.541
+            ],
+            [
+              8.398,
+              11.495
+            ],
+            [
+              8.394,
+              11.47
+            ],
+            [
+              8.394,
+              11.386
+            ],
+            [
+              8.419,
+              11.311
+            ],
+            [
+              8.46,
+              11.269
+            ],
+            [
+              8.506,
+              11.244
+            ],
+            [
+              8.506,
+              11.014
+            ],
+            [
+              8.531,
+              10.867
+            ],
+            [
+              8.606,
+              10.695
+            ],
+            [
+              8.698,
+              10.603
             ]
           ]
         }
@@ -110,22 +202,22 @@
       "under": true,
       "reach": 0.3,
       "rest": "closed",
-      "about": "The locked door in the storeroom's bottom wall: shut, its leaf within its doorway (`doorway`, D113); open, the leaf at an angle on its hinges at the opening's right edge, cut by the polygon traced round it (`leaf`), its doorway showing the storeroom's floor.",
+      "about": "The locked door in the storeroom's bottom wall: shut, its leaf within its doorway (`doorway`, D113); its doorway showing the floor beyond, tiled from `floor_from`; open, its leaf the closed one's own pixels turned on its hinge, over the jamb (tools/art/door.py, D144).",
       "doorway": [
         [
-          9.973,
+          9.969,
           10.633
         ],
         [
-          10.031,
+          10.044,
           10.633
         ],
         [
-          10.331,
-          10.675
+          10.327,
+          10.666
         ],
         [
-          10.581,
+          10.577,
           10.771
         ],
         [
@@ -134,67 +226,35 @@
         ],
         [
           10.881,
-          11.168
+          11.164
         ],
         [
-          10.91,
-          11.361
+          10.915,
+          11.353
         ],
         [
-          10.91,
-          13.031
+          10.915,
+          11.528
         ],
         [
-          10.752,
-          13.022
+          10.902,
+          12.026
         ],
         [
-          10.652,
-          13.031
+          10.856,
+          12.909
         ],
         [
-          10.452,
-          13.022
+          9.215,
+          12.909
         ],
         [
-          10.352,
-          13.031
+          9.21,
+          12.901
         ],
         [
-          10.152,
-          13.022
-        ],
-        [
-          10.052,
-          13.031
-        ],
-        [
-          9.852,
-          13.022
-        ],
-        [
-          9.752,
-          13.031
-        ],
-        [
-          9.552,
-          13.022
-        ],
-        [
-          9.452,
-          13.031
-        ],
-        [
-          9.252,
-          13.022
-        ],
-        [
-          9.065,
-          13.031
-        ],
-        [
-          9.065,
-          11.361
+          9.156,
+          11.884
         ],
         [
           9.094,
@@ -205,14 +265,85 @@
           10.951
         ],
         [
-          9.394,
+          9.39,
           10.771
         ],
         [
-          9.673,
-          10.675
+          9.669,
+          10.666
         ]
-      ]
+      ],
+      "door": {
+        "hinge": "left",
+        "floor_from": [
+          8.6,
+          8.0,
+          10.6,
+          9.6
+        ],
+        "polygon": [
+          [
+            9.243,
+            12.881
+          ],
+          [
+            9.182,
+            11.826
+          ],
+          [
+            9.143,
+            11.395
+          ],
+          [
+            9.125,
+            11.198
+          ],
+          [
+            9.224,
+            10.981
+          ],
+          [
+            9.421,
+            10.802
+          ],
+          [
+            9.699,
+            10.698
+          ],
+          [
+            10.006,
+            10.663
+          ],
+          [
+            10.3,
+            10.698
+          ],
+          [
+            10.548,
+            10.802
+          ],
+          [
+            10.752,
+            10.981
+          ],
+          [
+            10.851,
+            11.193
+          ],
+          [
+            10.886,
+            11.395
+          ],
+          [
+            10.872,
+            11.988
+          ],
+          [
+            10.826,
+            12.881
+          ]
+        ]
+      }
     },
     "store_arch": {
       "box": [
@@ -225,11 +356,10 @@
       "static": true,
       "solid": true,
       "mask": "polygon",
-      "under": true,
       "states": {
         "standing": "painting"
       },
-      "about": "The stone arch round the door and the wall's top above it, over whoever walks through its doorway.",
+      "about": "The stone arch round the door, over whoever stands in its doorway and under whoever stands before it; the door's own cut-out left to the door.",
       "polygon": [
         [
           8.85,
@@ -525,7 +655,7 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The storeroom\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-dark-room.md`, then edited by it without its grid\n  (`game-storeroom-nogrid.md`).\n- The dark bands round it painted by Gemini from `game-storeroom-voids.md`,\n  joined by `tools/art/repaint.py`, and what still was dark tiled from its\n  own stones (`tiled`).\n- The key taken out by `tools/art/repaint.py fill`, and cut by the polygon\n  traced round it.\n- The hole of the slab painted by Gemini from `game-storeroom-hole.md`, and laid\n  at its cell's size by `tools/art/repaint.py placed`.\n- The door's doorway opened by `tools/art/repaint.py doorways`, and its leaf\n  swung open painted by Gemini (`game-storeroom-swung.md`) in a box, joined by\n  `tools/art/repaint.py`.\n",
+  "source": "# The storeroom\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-dark-room.md`, then edited by it without its grid\n  (`game-storeroom-nogrid.md`).\n- The dark bands round it painted by Gemini from `game-storeroom-voids.md`,\n  joined by `tools/art/repaint.py`, and what still was dark tiled from its\n  own stones (`tiled`).\n- The key taken out by `tools/art/repaint.py fill`, and cut by the polygon\n  traced round it.\n- The hole of the slab painted by Gemini from `game-storeroom-hole.md`, and laid\n  at its cell's size by `tools/art/repaint.py placed`.\n- The door opened by `tools/art/door.py` from the painting itself, no model asked.\n",
   "voids": {
     "about": "The dark bands the model left between the rooms painted as the castle's thick walls and dim rooms (D136): by Gemini 3 Pro Image from tools/art/prompts/game-storeroom-voids.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
     "from": "art/raw/game-storeroom/game-storeroom-nogrid.png",
@@ -587,104 +717,6 @@
     ],
     "sides": 4,
     "painting": "art/raw/game-storeroom/storeroom-nokey.png"
-  },
-  "doorways": {
-    "about": "The door opened by tools/art/repaint.py doorways (D108): its whole leaf painted with the floor of the storeroom beyond, taken from the painting, down to a threshold (D114).",
-    "doors": [
-      {
-        "thing": "store_door",
-        "seeds": [],
-        "shape": [
-          [
-            9.09,
-            12.88
-          ],
-          [
-            9.09,
-            11.4
-          ],
-          [
-            9.12,
-            11.2
-          ],
-          [
-            9.22,
-            10.98
-          ],
-          [
-            9.42,
-            10.8
-          ],
-          [
-            9.7,
-            10.7
-          ],
-          [
-            10.0,
-            10.66
-          ],
-          [
-            10.3,
-            10.7
-          ],
-          [
-            10.55,
-            10.8
-          ],
-          [
-            10.75,
-            10.98
-          ],
-          [
-            10.85,
-            11.2
-          ],
-          [
-            10.88,
-            11.4
-          ],
-          [
-            10.88,
-            12.88
-          ]
-        ],
-        "floor": [
-          8.6,
-          8.0,
-          10.6,
-          9.6
-        ],
-        "painting": "storeroom-doorway.png",
-        "sill": 0.1,
-        "leaf_box": [
-          9.0,
-          10.55,
-          11.0,
-          12.89
-        ]
-      }
-    ]
-  },
-  "swung": {
-    "about": "The door seen open (D111, D116): its leaf swung toward us on hinges at the opening's right edge, standing at an angle, short of the torch, its free edge off the wall and its shadow behind it. Painted by Gemini 3 Pro Image from tools/art/prompts/game-storeroom-swung.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box.",
-    "from": "art/raw/game-storeroom/storeroom-doorway.png",
-    "boxes": [
-      [
-        2604,
-        2497,
-        2880,
-        3178
-      ]
-    ],
-    "fade": 10,
-    "crop": [
-      1860,
-      2300,
-      3060,
-      3260
-    ],
-    "canvas": "art/raw/game-storeroom/storeroom-swung-canvas.png",
-    "painting": "art/raw/game-storeroom/storeroom-swung.png"
   },
   "hole": {
     "about": "The hole in the corridor's floor where the slab comes and goes (D138): painted large and clear by Gemini 3 Pro Image from tools/art/prompts/game-storeroom-hole.md, and laid at the size of its cell by tools/art/repaint.py placed; the painting kept pixel for pixel outside its ellipse. Cut by the polygon traced round it.",

@@ -15,16 +15,15 @@
     },
     {
       "row": 12,
-      "image": "row-12-static-under.webp",
+      "image": "row-12-static.webp",
       "top": 958,
-      "static": true,
-      "under": true
+      "static": true
     }
   ],
   "things": {
     "store_door": {
       "row": 12,
-      "left": 864,
+      "left": 801,
       "top": 1008,
       "states": {
         "closed": "store_door-closed.webp",

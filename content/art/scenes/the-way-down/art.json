@@ -31,6 +31,9 @@
         "open": "door-open.webp"
       },
       "under": true,
+      "rows": {
+        "open": 7
+      },
       "rest": "closed",
       "at": [
         10,

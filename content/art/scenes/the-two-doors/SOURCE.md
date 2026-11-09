@@ -9,6 +9,4 @@ later, like the rest of it.
 - What it left black at the corners painted by Gemini from
   `game-two-doors-voids.md`, joined by `tools/art/repaint.py`, and what still
   was black tiled from stones of the crossing's picture (`tiled`).
-- Each door's doorway opened by `tools/art/repaint.py doorways`, and each leaf
-  swung open painted by Gemini (`game-two-doors-swung-left.md`, `-right`) in
-  a box, joined by `tools/art/repaint.py`.
+- Each door opened by `tools/art/door.py` from the painting itself, no model asked.

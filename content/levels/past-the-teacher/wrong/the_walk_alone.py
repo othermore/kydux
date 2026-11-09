@@ -1,1 +1,1 @@
-wizard.move_down(12)
+wizard.move_down(11)

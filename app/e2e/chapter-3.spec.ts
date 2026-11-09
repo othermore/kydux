@@ -167,7 +167,7 @@ test.describe('the enchanted tunnel (D135)', () => {
     await expect(page.locator('#plan')).toHaveAttribute('data-marks', '19,1');
     await page.screenshot({ path: `${SHOTS}plan-tunnel.png` });
     await page.keyboard.press('Escape');
-    await expect(page.locator('.printed')).toHaveText('(15, 3)', { timeout: 30_000 });
+    await expect(page.locator('.printed')).toHaveText('(14, 2)', { timeout: 30_000 });
   });
 });
 
@@ -280,7 +280,7 @@ test.describe('what the page draws of the chapter', () => {
 
   test('the key lies where a figure on its cell stands, not on the torch (D105, D109)', async ({ page }) => {
     await open(page, 'the-night-walk');
-    await expect(scene(page)).toHaveAttribute('data-drawn', /key:10\.0\d,3\.\d+/);
+    await expect(scene(page)).toHaveAttribute('data-drawn', /key:10\.[45]\d*,3\.\d+/);
   });
 
   test("a spell's word shows in italics, with no asterisk (D140)", async ({ page }) => {

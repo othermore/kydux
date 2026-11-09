@@ -313,7 +313,9 @@ def test_a_level_on_a_scene_starts_where_the_one_before_it_ended(before, after):
     plays the level before it again, from the start, begins where that one began."""
     ended = level_json(before).get("end") or list(walked(before)[-1])
     again = level_json(after).get("kind") in ("fix", "improve") and level_json(before)["start"]
-    assert level_json(after)["start"] in (ended, again)
+    # The dark tunnel starts where the child cannot know (D152).
+    if after != "the-dark-tunnel":
+        assert level_json(after)["start"] in (ended, again)
 
 
 SCENE_LEVELS = sorted(

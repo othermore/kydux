@@ -4,7 +4,7 @@
   "scene": "the-long-round",
   "wizard": [
     10,
-    1
+    2
   ],
   "camera": [
     10,
@@ -16,7 +16,7 @@
       "kind": "friend",
       "at": [
         9,
-        1
+        2
       ],
       "facing": "down"
     },
@@ -25,7 +25,7 @@
       "kind": "friend",
       "at": [
         9,
-        2
+        3
       ],
       "facing": "down"
     }

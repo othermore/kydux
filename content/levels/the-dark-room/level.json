@@ -42,15 +42,15 @@
       "id": "friend",
       "at": [
         5,
-        6
+        8
       ]
     },
     {
       "kind": "friend",
       "id": "mate",
       "at": [
-        3,
-        7
+        4,
+        8
       ]
     }
   ],
@@ -61,10 +61,13 @@
     "wizard.move_down",
     "wizard.cast",
     "wizard.find_nearest",
-    "thing.position",
     "wizard.pick_up",
     "door.open",
-    "door.locked"
+    "door.locked",
+    "thing.position",
+    "position.x",
+    "position.y",
+    "wizard.position"
   ],
   "goals": [
     {
@@ -81,9 +84,47 @@
     },
     {
       "kind": "uses",
-      "member": "find_nearest",
+      "member": "x",
       "bonus": true
     }
   ],
-  "tick_limit": 100
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "same_row",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            9,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lower",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "farther",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            10,
+            8
+          ]
+        }
+      ]
+    }
+  ]
 }

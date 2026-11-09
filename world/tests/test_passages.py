@@ -494,10 +494,10 @@ def test_by_the_statues_gives_its_bonus_for_ending_right_on_the_mark_with_a_seco
 @pytest.mark.parametrize(
     ("level_id", "before", "walk", "most"),
     [
-        ("past-the-teacher", "wizard.move_down(5)\n", "wizard.move_down(7)\n", 12),
+        ("past-the-teacher", "wizard.move_down(4)\n", "wizard.move_down(7)\n", 12),
         (
             "the-night-walk",
-            "wizard.move_down(2)\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\n"
+            "wizard.move_down()\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\n"
             "wizard.move_down(2)\nwhile not slab.in_place:\n    wizard.wait()\n"
             "wizard.move_down(3)\n",
             "wizard.move_down(4)\n",
@@ -554,7 +554,57 @@ def test_the_three_doors_given_program_wins_the_walk_and_fails_its_lines():
 
 def test_a_position_is_printed_as_the_child_reads_it():
     result = run_code(real("the-dark-tunnel"), "print(wizard.position)\n")
-    assert result.stdout == "(15, 3)\n"
+    assert result.stdout == "(14, 2)\n"
+
+
+def test_the_dark_room_is_won_by_the_two_numbers_wherever_the_key_lies():
+    """D153: the key on three cells, always right of and not above the wizard; the
+    same program computes the steps in each, and no count written in the code does."""
+    level = "the-dark-room"
+    assert set(outcomes(level, solution(level)).values()) == {"won"}
+    assert outcomes(level, wrong(level, "the_counts_typed")) == {
+        "same_row": "won",
+        "lower": "incomplete",
+        "farther": "incomplete",
+    }
+    assert set(outcomes(level, wrong(level, "x_and_y_swapped")).values()) == {"incomplete"}
+    assert set(outcomes(level, wrong(level, "opened_from_afar")).values()) == {"incomplete"}
+    assert set(outcomes(level, wrong(level, "no_pick_up")).values()) == {"incomplete"}
+    assert run_code(real(level), wrong(level, "no_kirra")).error.type == "AttributeError"
+
+
+@pytest.mark.parametrize(
+    ("way", "right", "down"), [("same_row", 4, 0), ("lower", 3, 1), ("farther", 5, 1)]
+)
+def test_the_dark_room_s_differences_are_never_below_zero(way, right, down):
+    code = (
+        'wizard.cast("kirra")\nkey = wizard.find_nearest("key")\n'
+        "print(key.position.x - wizard.position.x, key.position.y - wizard.position.y)\n"
+    )
+    assert run_code(real("the-dark-room").way(way), code).stdout == f"{right} {down}\n"
+
+
+def test_a_move_of_no_steps_walks_nothing_where_the_key_lies_on_our_row():
+    level = real("the-dark-room").way("same_row")
+    result = run_code(level, solution("the-dark-room"))
+    assert result.status == "won"
+    assert all(event.data.get("to") != [5, 8] for event in result.events)
+
+
+def test_the_dark_tunnel_starts_where_the_child_cannot_know_and_names_no_cell():
+    """D152: its start is not where the level before ended, and its goal hides the exit."""
+    level = real("the-dark-tunnel")
+    assert level.start != real("the-doors-corridor").goals[0].params.get("at")
+    assert run_code(level, solution("the-dark-tunnel")).status == "won"
+    assert [g.params.get("hidden") for g in level.goals if g.kind == "reach"] == [True]
+    assert "orvim" in level.spells
+
+
+def test_the_slab_cannot_be_walked_round_on_the_corridor_s_lower_row():
+    """D149: the row behind the lower wall is walked, and it stops at the hole's cell."""
+    level = "the-moving-slab"
+    around = "wizard.move_down()\nwizard.move_right(2)\nwizard.move_right(3)\n"
+    assert set(outcomes(level, around).values()) == {"incomplete"}
 
 
 def test_no_level_of_the_first_three_chapters_teaches_can_see():

@@ -647,6 +647,23 @@
         7
       ],
       "about": "The hole the slab comes and goes over (D138): the floor is the slab in place, and this picture its absence, cut by the ellipse traced round it."
+    },
+    "wall_1": {
+      "box": [
+        0.0,
+        8.0,
+        5.42,
+        9.0
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The lower wall's top, over whoever walks the row behind it (D149)."
     }
   },
   "cuts": [],
@@ -739,34 +756,47 @@
   },
   "lowered": [
     {
-      "about": "The corridor's floor is one row high: whoever stands by the wall stands on it.",
+      "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
       "cells": [
         [
           0,
-          6
+          8
         ],
         [
-          1,
-          6
+          5,
+          8
         ]
       ],
-      "by": 0.25
+      "by": -0.3
     }
   ],
   "nudged": [
     {
-      "about": "The door's opening lies half a cell left of its column.",
+      "about": "Round the door (D149).",
+      "cells": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          13
+        ]
+      ],
+      "by": 0.2
+    },
+    {
       "cells": [
         [
           10,
-          10
+          9
         ],
         [
           10,
-          12
+          13
         ]
       ],
-      "by": -0.5
+      "by": -0.2
     }
   ],
   "kept": [
@@ -775,6 +805,18 @@
       9.98,
       11.2,
       13.0
+    ],
+    [
+      -0.05,
+      7.95,
+      5.47,
+      9.0
+    ],
+    [
+      0,
+      7.85,
+      5.5,
+      9.0
     ]
   ]
 }

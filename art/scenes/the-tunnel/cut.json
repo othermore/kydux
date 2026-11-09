@@ -105,6 +105,23 @@
         10
       ],
       "about": "The other door of the corridor's wall, as the first."
+    },
+    "wall_1": {
+      "box": [
+        0.0,
+        13.22,
+        16.7,
+        14.0
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The lower wall's top, over whoever walks the row behind it (D149)."
     }
   },
   "cuts": [],
@@ -249,5 +266,23 @@
     ],
     "fade": 10,
     "painting": "art/raw/game-tunnel/tunnel-unmarked.png"
-  }
+  },
+  "nudged": [],
+  "lowered_rows": [
+    11
+  ],
+  "kept": [
+    [
+      -0.05,
+      13.17,
+      16.75,
+      14.0
+    ],
+    [
+      0,
+      13.0,
+      16.8,
+      14.0
+    ]
+  ]
 }

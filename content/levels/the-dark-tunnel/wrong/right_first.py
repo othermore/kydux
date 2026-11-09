@@ -1,2 +1,2 @@
-wizard.move_right(4)
-wizard.move_up(2)
+wizard.move_right(5)
+wizard.move_up()

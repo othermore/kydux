@@ -5,7 +5,15 @@
     15
   ],
   "ground": "ground.webp",
-  "rows": [],
+  "rows": [
+    {
+      "row": 13,
+      "image": "row-13-static-over.webp",
+      "top": 1269,
+      "static": true,
+      "over": true
+    }
+  ],
   "things": {
     "door_a": {
       "row": 10,
@@ -32,6 +40,22 @@
       ]
     }
   },
+  "lowered": [
+    {
+      "about": "The floor row right under a wall's foot (D149).",
+      "cells": [
+        [
+          0,
+          11
+        ],
+        [
+          19,
+          11
+        ]
+      ],
+      "by": 0.3
+    }
+  ],
   "dark": [
     {
       "columns": [

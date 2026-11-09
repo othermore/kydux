@@ -1,4 +1,4 @@
-wizard.move_down(3)
+wizard.move_down(2)
 door.open()
 wizard.move_down(2)
 while not slab.in_place:

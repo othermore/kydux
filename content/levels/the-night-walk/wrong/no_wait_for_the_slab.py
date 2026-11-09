@@ -1,4 +1,4 @@
-wizard.move_down(2)
+wizard.move_down()
 wizard.pick_up()
 wizard.move_down()
 door.open()

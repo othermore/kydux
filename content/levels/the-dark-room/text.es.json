@@ -4,15 +4,20 @@
     "Recoge la llave.",
     "Abre la puerta.",
     "Llega a la marca.",
-    "Encuentra la llave con `find_nearest`."
+    "Cuenta los pasos con `x`."
   ],
-  "starting_code": "# Ilumina la sala con un hechizo.\n\n# Encuentra la llave e imprime su casilla con `find_nearest`, `position` y `print`.\n\n# Camina hasta ella.\n\n# Recógela con `pick_up`.\n\n# Camina a la casilla sobre la puerta.\n\n# Ábrela con `open`.\n",
+  "starting_code": "# Ilumina la sala con un hechizo.\n\n# Encuentra la llave con `find_nearest`.\n\n# Guarda los pasos a la derecha y abajo en dos variables, con `position.x` y `position.y`.\n\n# Camina hasta ella.\n\n# Recógela con `pick_up`.\n\n# Cuenta de nuevo los pasos hasta la casilla sobre la puerta.\n\n# Camina.\n\n# Ábrela con `open`.\n",
   "hints": [
     "¡Lanza *kirra* primero! Si no lo haces, `find_nearest` no verá nada en la oscuridad.",
-    "Tras iluminar la sala y mirar la casilla de la llave, ¡camina 4 a la derecha y cógela!",
-    "Desde la llave, camina 1 a la derecha y 2 abajo a la casilla sobre `store_door` para abrirla."
+    "Resta la `x` de tu posición de la `x` de la llave para saber cuántos pasos dar a la derecha. ¡Haz lo mismo con la `y` para bajar!",
+    "Para ir a la casilla sobre la puerta, cuenta los pasos hasta `store_door` y resta uno a su `y`."
   ],
-  "intro": "¡El almacén está a oscuras! No podemos encontrar la llave si no podemos verla. Debemos lanzar *kirra* para iluminar la sala, comprobar la casilla de la llave y cogerla. Luego iremos a la puerta cerrada y la abriremos. ¡Se llama `store_door`!",
+  "intro": "¡El almacén está a oscuras! La llave está en un lugar distinto cada noche, así que no podemos saber sus pasos antes de entrar. Debemos iluminar la sala con *kirra*, encontrar la llave, contar los pasos con los dos números y caminar hacia allí para cogerla. ¡Luego contaremos los pasos de la misma manera hasta la casilla sobre la puerta, `store_door`, y la abriremos!",
   "outro": "¡La luz lo ha mostrado todo, y la puerta ya está abierta! Pero, esperad... ¿no oís voces?",
-  "learned": "Ahora sabes que *kirra* ilumina una sala, y entonces las cosas se encuentran y dicen su casilla."
+  "learned": "Ahora sabes que una posición guarda dos números, `x` e `y`, y que sus diferencias dicen los pasos que hay entre dos casillas.",
+  "ways": {
+    "same_row": "La llave en nuestra fila",
+    "lower": "La llave una fila más abajo, cerca",
+    "farther": "La llave una fila más abajo, más lejos"
+  }
 }

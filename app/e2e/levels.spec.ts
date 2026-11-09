@@ -119,7 +119,7 @@ test.describe('past the teacher', () => {
   });
 
   test('waiting while the teacher looks this way, then crossing, wins', async ({ page }) => {
-    const said = await run(page, 'wizard.move_down(5)\nwhile dask.facing == "right":\n    wizard.wait()\nwizard.move_down(7)');
+    const said = await run(page, 'wizard.move_down(4)\nwhile dask.facing == "right":\n    wizard.wait()\nwizard.move_down(7)');
     expect(said).toBe('You did it, Kydux! In every way!');
     await expect(scene(page)).toHaveAttribute('data-wizard', '10,13');
   });

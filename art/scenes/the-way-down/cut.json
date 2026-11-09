@@ -743,6 +743,23 @@
         7
       ],
       "about": "The storeroom's key, cut there, and drawn on the cell the level lays it on (D85, D109)."
+    },
+    "wall_1": {
+      "box": [
+        0.0,
+        11.0,
+        8.8,
+        12.0
+      ],
+      "row": 11,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The lower wall's top, over whoever walks the row behind it (D149)."
     }
   },
   "cuts": [],
@@ -798,6 +815,18 @@
       13.45,
       11.1,
       15.0
+    ],
+    [
+      -0.05,
+      10.95,
+      8.850000000000001,
+      12.0
+    ],
+    [
+      0,
+      10.85,
+      8.9,
+      12.0
     ]
   ],
   "navy": {
@@ -815,5 +844,104 @@
     "shade": 0.82,
     "fade": 6,
     "painting": "art/raw/game-way-down/way-down-whole.png"
-  }
+  },
+  "nudged": [
+    {
+      "about": "Round the top arch (D149).",
+      "cells": [
+        [
+          9,
+          0
+        ],
+        [
+          9,
+          2
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          0
+        ],
+        [
+          10,
+          2
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the double door.",
+      "cells": [
+        [
+          9,
+          4
+        ],
+        [
+          9,
+          6
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          4
+        ],
+        [
+          10,
+          6
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the bottom arch.",
+      "cells": [
+        [
+          9,
+          12
+        ],
+        [
+          9,
+          14
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          12
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "by": -0.2
+    }
+  ],
+  "lowered": [
+    {
+      "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
+      "cells": [
+        [
+          0,
+          11
+        ],
+        [
+          8,
+          11
+        ]
+      ],
+      "by": -0.3
+    }
+  ]
 }

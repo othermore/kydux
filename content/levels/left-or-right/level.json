@@ -4,7 +4,7 @@
   "scene": "the-two-doors",
   "start": [
     10,
-    4
+    5
   ],
   "end": [
     16,
@@ -20,7 +20,7 @@
       "kind": "friend",
       "id": "friend",
       "at": [
-        9,
+        8,
         5
       ]
     },
@@ -29,7 +29,7 @@
       "id": "mate",
       "at": [
         11,
-        5
+        6
       ]
     }
   ],

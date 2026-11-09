@@ -104,7 +104,7 @@ test.describe('a page runs its code (D142)', () => {
     await expect(page.locator('.lesson-page')).toBeVisible();
     while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('(15, 3)', { timeout: 90_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('(14, 2)', { timeout: 90_000 });
     await expect(page.locator('.lesson-said')).toBeHidden();
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');

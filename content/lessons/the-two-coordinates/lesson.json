@@ -1,0 +1,8 @@
+{
+  "id": "the-two-coordinates",
+  "speaker": "friend",
+  "teaches": [
+    "position.x",
+    "position.y"
+  ]
+}

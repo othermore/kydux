@@ -90,7 +90,20 @@
   },
   "nudged": [
     {
-      "about": "The door's opening lies half a cell left of the column walked, its middle on column 10's left line: whoever walks the column walks the opening's middle.",
+      "about": "Round the top arch and the third door (D149).",
+      "cells": [
+        [
+          9,
+          0
+        ],
+        [
+          9,
+          4
+        ]
+      ],
+      "by": 0.2
+    },
+    {
       "cells": [
         [
           10,
@@ -98,10 +111,64 @@
         ],
         [
           10,
+          4
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the second door.",
+      "cells": [
+        [
+          9,
+          6
+        ],
+        [
+          9,
+          8
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          6
+        ],
+        [
+          10,
+          8
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the first door and the bottom arch.",
+      "cells": [
+        [
+          9,
+          10
+        ],
+        [
+          9,
           14
         ]
       ],
-      "by": -0.5
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          10
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "by": -0.2
     }
   ],
   "source": "SOURCE.md"

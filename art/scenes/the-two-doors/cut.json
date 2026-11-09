@@ -657,6 +657,40 @@
           ]
         ]
       }
+    },
+    "wall_1": {
+      "box": [
+        0.0,
+        11.02,
+        9.35,
+        12.0
+      ],
+      "row": 11,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The lower wall's top, over whoever walks the row behind it (D149)."
+    },
+    "wall_2": {
+      "box": [
+        10.7,
+        11.02,
+        20.0,
+        12.0
+      ],
+      "row": 11,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The lower wall's top, over whoever walks the row behind it (D149)."
     }
   },
   "cuts": [],
@@ -708,32 +742,85 @@
   },
   "nudged": [
     {
-      "about": "The left door's opening lies a little left of its column.",
+      "about": "Round the left door, both columns toward its middle (D149).",
       "cells": [
         [
-          7,
-          8
+          6,
+          7
         ],
         [
-          7,
-          9
+          6,
+          10
         ]
       ],
-      "by": -0.4
+      "by": 0.2
     },
     {
-      "about": "The right door's opening lies more than half a cell left of its column.",
+      "cells": [
+        [
+          7,
+          7
+        ],
+        [
+          7,
+          10
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the right door.",
+      "cells": [
+        [
+          12,
+          7
+        ],
+        [
+          12,
+          10
+        ]
+      ],
+      "by": 0.2
+    },
+    {
       "cells": [
         [
           13,
-          8
+          7
         ],
         [
           13,
-          9
+          10
         ]
       ],
-      "by": -0.6
+      "by": -0.2
+    },
+    {
+      "about": "Round the arch in the upper wall.",
+      "cells": [
+        [
+          9,
+          2
+        ],
+        [
+          9,
+          5
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          2
+        ],
+        [
+          10,
+          5
+        ]
+      ],
+      "by": -0.2
     }
   ],
   "kept": [
@@ -748,6 +835,65 @@
       7.5,
       9.3,
       8.1
+    ],
+    [
+      -0.05,
+      10.969999999999999,
+      9.4,
+      12.0
+    ],
+    [
+      10.649999999999999,
+      10.969999999999999,
+      20.05,
+      12.0
+    ],
+    [
+      0,
+      10.85,
+      9.4,
+      12.0
+    ],
+    [
+      10.65,
+      10.85,
+      20,
+      12.0
+    ],
+    [
+      5.9,
+      7.5,
+      8.2,
+      9.0
     ]
+  ],
+  "lowered": [
+    {
+      "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
+      "cells": [
+        [
+          0,
+          11
+        ],
+        [
+          8,
+          11
+        ]
+      ],
+      "by": -0.3
+    },
+    {
+      "cells": [
+        [
+          11,
+          11
+        ],
+        [
+          19,
+          11
+        ]
+      ],
+      "by": -0.3
+    }
   ]
 }

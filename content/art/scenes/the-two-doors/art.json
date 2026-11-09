@@ -5,7 +5,15 @@
     15
   ],
   "ground": "ground.webp",
-  "rows": [],
+  "rows": [
+    {
+      "row": 11,
+      "image": "row-11-static-over.webp",
+      "top": 1058,
+      "static": true,
+      "over": true
+    }
+  ],
   "things": {
     "left_door": {
       "row": 9,
@@ -38,34 +46,116 @@
       ]
     }
   },
-  "nudged": [
+  "lowered": [
     {
-      "about": "The left door's opening lies a little left of its column.",
+      "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
       "cells": [
         [
-          7,
-          8
+          0,
+          11
         ],
         [
-          7,
-          9
+          8,
+          11
         ]
       ],
-      "by": -0.4
+      "by": -0.3
     },
     {
-      "about": "The right door's opening lies more than half a cell left of its column.",
+      "cells": [
+        [
+          11,
+          11
+        ],
+        [
+          19,
+          11
+        ]
+      ],
+      "by": -0.3
+    }
+  ],
+  "nudged": [
+    {
+      "about": "Round the left door, both columns toward its middle (D149).",
+      "cells": [
+        [
+          6,
+          7
+        ],
+        [
+          6,
+          10
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          7,
+          7
+        ],
+        [
+          7,
+          10
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the right door.",
+      "cells": [
+        [
+          12,
+          7
+        ],
+        [
+          12,
+          10
+        ]
+      ],
+      "by": 0.2
+    },
+    {
       "cells": [
         [
           13,
-          8
+          7
         ],
         [
           13,
-          9
+          10
         ]
       ],
-      "by": -0.6
+      "by": -0.2
+    },
+    {
+      "about": "Round the arch in the upper wall.",
+      "cells": [
+        [
+          9,
+          2
+        ],
+        [
+          9,
+          5
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          2
+        ],
+        [
+          10,
+          5
+        ]
+      ],
+      "by": -0.2
     }
   ],
   "source": "SOURCE.md"

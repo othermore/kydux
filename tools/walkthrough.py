@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """A chapter's walkthrough as one document for the owner to read and write on: every
-story step, every lesson page, each level's card, start, route and won card in every
-way, and the check sheets of its scenes, from the pictures e2e/walkthrough.spec.ts
+story step, every lesson page, each level's card, start, route in its first way and won
+card in every way, and the check sheets of its scenes, from the pictures e2e/walkthrough.spec.ts
 takes (`npm run walkthrough -- <chapter>` runs both), with a **Comentarios:** line
 under every picture.
 
@@ -144,6 +144,8 @@ class Document:
             else:
                 self.lines.append("### El recorrido\n")
             frames = sorted(self.shots.glob(f"level-{level_id}-{tag}-tick-*.png"))
+            if way and not frames:
+                self.lines.append("El recorrido tick a tick se ve en la primera manera.\n")
             for frame in frames:
                 tick = int(re.search(r"tick-(\d+)", frame.name).group(1))
                 self.picture(frame.name, f"{title}, {name}, tick {tick}")

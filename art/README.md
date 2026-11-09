@@ -410,12 +410,15 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    it into the opening; a double door's leaves it lays beside the jambs, and a picture of
    those leaves shows it what is asked. The door shut is the painting itself where the base
    keeps its arch; where the base's arch is another, it is an edit of the base too
-   (`two-doors-closed.md`).
+   (`two-doors-closed.md`). Shut and open, a door hangs on the same jamb (D156): its hinges,
+   shut, are on the side its leaf swings on, and a shut picture with its ironwork on the
+   other side is asked again (`two-doors-closed-hinged.md`).
 3. **The cut-outs of a state.** `tools/art/trace.py <scene> diff <door> <picture> --state
    <state> --within X0 Y0 X1 Y1` writes the mask into the state: where the picture differs
    from the base, within the state's own box, read at a narrow smoothing for its edge and a
    wide one for wood nearly the floor's colour, cleaned of the lines the edit moved, its
-   holes closed. The open leaf's shadow comes with it: give the box room for the shadow to
+   holes closed, and what its outline closes in taken in, so that it is opaque inside its
+   outline (D155). The open leaf's shadow comes with it: give the box room for the shadow to
    fade, since a box's straight edge shows on it. A state may reach lower than the thing
    (`reach` in the state) and has its own `row`: an open leaf is drawn on the row of the
    wall's foot or the next, over the arch and before whoever stands behind it.
@@ -428,8 +431,9 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    small thing has an edit of its own (`way-down-torch.md`). The mask stands on the row of
    the thing's foot, `under` where a figure on that row stands under it. A wall's top is a box
    on its two straight outlines (`"mask": "box"`, `"over": true`): a wall cannot be taken away.
-   An open leaf that would run through a side wall goes behind it: the wall is such a box on
-   a row below the leaf's, and a torch there a cut-out on a lower row still (the way down).
+   A leaf that, opened wide, would run into a wall beside its doorway is asked of the model
+   opened less, within the doorway's width (D158): the way down's two leaves half open, each
+   in front of its own half of the doorway.
 5. **Look.** `trace.py diff` writes `art/raw/game-check/diff-<scene>-<thing>[-<state>].png`,
    the mask's edge in magenta. A leak round the box says to look: an edit that changed what
    it should not, in the mask or beside it, is asked again, three tries at most. Then
@@ -437,9 +441,13 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    leaf whole and the same door open as shut, a doorway showing the floor beyond, no line
    of the shut door left on an open one, no figure hidden where nothing stands.
 
-A door whose open leaf hides a cell a figure could stand on names it in `covers`: a leaf cut
-by difference is measured on the rows above its own, where a figure on the cell is drawn; a
-figure on the leaf's own row is drawn before it.
+A door whose open leaf hides a cell a figure could stand on names it in `covers` (D125, D157):
+a leaf cut by difference is measured on every row it reaches. On the rows above its own, where
+a figure is drawn behind it, a cell is covered when the leaf covers a fifth of its lower part;
+on its own row and below, where a figure is drawn before it, only when the leaf fills that part.
+A cell whose figure the upright leaf only touches is walked, the figure drawn 0.3 away from it,
+down below the leaf's row and sideways on it: `export_scene.py` writes those cells into art.json,
+with the door's name (`leaf`), and the content test holds them.
 
 A door of chapters 1 and 2 is painted shut and open (D116): `doorways` and `swung`.
 
@@ -453,13 +461,17 @@ The cells are where the figures walk (D149).
   are drawn toward the opening's middle, 0.2 cell each (`nudged`), so that a figure passes
   clear of the jambs and the two stay apart. A door is as wide as its cells (`cells` in
   `scene.json`, D150).
-- **The floor row right under a wall's foot** is drawn 0.3 cell lower (`lowered_rows`), so
-  that a figure on it stands in the corridor and not on the wall.
+- **The row a wall's foot is painted on is wall** (D154); what stands against the wall, a
+  statue, is on that row, so that a figure on the row below passes before its base. **The
+  first floor row below the wall's foot** is drawn 0.3 cell lower (`lowered_rows`), so that a
+  figure on it stands in the corridor and not on the wall.
 - **The row behind a lower wall's top is walked**, the top cut `over` it. Where the wall stands
   so close that only a hat would show, the row is drawn 0.3 higher (`lowered`, `by` -0.3).
 - **A level starts a cell past an arch**, never in it or on the cell beside its jamb.
 - **A hole keeps its way across**: a cell beside it stays a wall where a child could walk
   round it.
+- **Beside an open leaf**, a cell the leaf only touches is drawn 0.3 away from it (D157), and
+  the cells of a door whose leaves stand half open in it 0.3 toward its middle (D158).
 
 ## What a painting must keep to
 

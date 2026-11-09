@@ -1880,7 +1880,9 @@ one overturns stays, marked as superseded.
   the door opens with the wizard or an actor on one of them, that figure
   steps to the nearest free cell along the row, away from the door, as
   the leaf swings (`shoved`). Rules out a figure drawn behind the leaf of
-  a door it stands beside.
+  a door it stands beside. A leaf cut by difference is measured on every
+  row it reaches, and a cell it only touches is walked with the figure
+  drawn away from it (D157).
 - **D126 — A scene painted at night has a morning picture: its sky, its
   windows and its outside by day.** Decided 2026-10-30 by the owner. A
   scene painted at night that a morning story plays on, or that a night
@@ -2174,8 +2176,8 @@ one overturns stays, marked as superseded.
   take away cleanly, or whose stones are nearly the colour of what lies behind them, an
   arch, is asked of the model flat magenta instead, and takes the outline beside it
   (`--rim`): the difference is then the thing to the pixel. A wall's top, which cannot be
-  taken away, is a box on its two straight outlines, and an open leaf that would run through
-  a side wall goes behind such a box and behind a torch's cut-out. The ground the game draws is the
+  taken away, is a box on its two straight outlines; a leaf opens within its doorway (D158).
+  The ground the game draws is the
   base; what stands or lies in the scene is a cut-out over it at its row; what a figure
   walks behind is a cut-out on its foot's row or `over`. A try whose edit changed what it
   should not, in the mask or beside it, is asked again, three tries at most. A key and a
@@ -2189,8 +2191,10 @@ one overturns stays, marked as superseded.
   the cells of a door or an arch and the cell before and after them, both columns are
   drawn toward the opening's middle, by 0.2 cell each, so that a figure passes clear of
   the jambs and the two columns stay apart. Where an open leaf stands in the doorway, the
-  column beside it moves less (0.1 at the storeroom's door). (c) The floor row right under
-  a wall's foot is drawn 0.3 cell lower (`lowered_rows`). (d) The row at the bottom of a
+  column beside it moves less (0.1 at the storeroom's door), and where a double door's
+  leaves stand half open within it, both move 0.3 (D158). (c) The first floor row below a
+  wall's foot is drawn 0.3 cell lower (`lowered_rows`); the row the foot is painted on is
+  wall (D154). (d) The row at the bottom of a
   corridor where the lower wall's face is painted is walked, the wall's top cut `over` the
   figures on it, and where that wall stands so close that only a hat would show, the row
   is drawn 0.3 higher. (e) A level starts a cell past an arch, never in it or on the cell
@@ -2228,3 +2232,58 @@ one overturns stays, marked as superseded.
   ways with the key on three cells, always right of and not above the wizard, so that the
   differences are never below zero, and the walk to the door is counted the same way. Rules
   out a key whose cell the child reads off the plan and types.
+- **D154 — The row a wall's foot is painted on is not walked; the first floor row below it
+  is.** Decided 2026-11-08 by the owner (*la maga está casi dentro de la pared; bajar todo
+  una fila*). In the crossing, row 5, where the top wall's foot and the statues' bases are
+  painted, is wall, but for the tunnel's arch and Dask's corridor; the gallery's floor is
+  rows 6, 7 and 8, row 6 drawn 0.3 lower (D149 c) and row 8 walked behind the lower wall's
+  top (D149 d). The statues are `u` on row 5, their cut-out on that row, so that a figure
+  on row 6 passes before their bases and is never hidden by them. The same holds for every
+  scene. Rules out a figure whose head lies in the wall.
+- **D155 — A cut-out's mask is opaque inside its outline.** Decided 2026-11-08 by the
+  owner (the wizard seen through the statue's robe). A mask by difference (D148) is 0 or 1
+  at every pixel, its edge softened over one pixel by the page's resampling. Where a
+  thing's colour is nearly the floor's, its thin outline differs even where its inside
+  does not: the lines that differ and touch the mask close those parts in, each as large as
+  the thing's largest hole, with the outline beside them (`closed_in`); a line the edit
+  moved apart from the thing closes nothing in. Rules out a figure seen through a statue, a
+  leaf or a torch.
+- **D156 — A painted door shows its painted state at every tick, hung on the jamb it opens
+  on.** Decided 2026-11-08 by the owner. A door with painted states is never drawn with the
+  placeholder's frame: at the tick it opens, at the run's end and on the timeline, the page
+  draws the state's picture, and where that picture is not loaded it keeps the painted
+  state it shows until it is; a browser test plays *Izquierda o derecha* in both ways and
+  the three doors, every tick, and holds each door's painted picture (`data-door-looks`).
+  A door's shut and open pictures hang it on the same jamb: its hinges, shut, are on the
+  side its leaf swings on (the room of two doors' right door and the three doors, shut,
+  are Gemini's edits with their ironwork on that side). A walkthrough takes its pictures
+  once a door's fade is over, and only of its own run. Rules out a door that changes from
+  one tick to another.
+- **D157 — An open leaf is measured on every row it reaches, and a figure it only touches
+  is drawn away from it.** Decided 2026-11-08 by the owner (*la maga está chocando con la
+  puerta*). A leaf cut by difference (D148) is measured on the rows above its own, where a
+  figure is drawn behind it: a cell whose lower part it covers by more than a fifth is
+  covered (D125); and on its own row and below, where a figure is drawn before it: a cell
+  is covered only where the leaf fills that part (the storeroom's (9, 13)), and a cell
+  whose figure the upright leaf touches (its columns at least 1.25 cells tall; its shadow
+  on the floor touches nothing) is walked, the figure drawn 0.3 away from it, down below
+  the leaf's row and sideways on it. `export_scene.py` writes those into art.json's
+  `lowered` and `nudged`, each with its door's name (`leaf`), before the doorway's own, and
+  the page, the plan and the sweep take the first range that names a cell. Rules out a
+  figure walking through a leaf's foot.
+- **D158 — A leaf opens within its doorway's width.** Decided 2026-11-08 by the owner (*no
+  vale con que aparezcan detrás del muro; deben quedar menos abiertas*). A door whose
+  leaves, opened wide, would run into a wall beside the doorway is asked of the model
+  opened less: the way down's double door has its two leaves half open, each in front of
+  its own half of the doorway, the arch and its jambs whole (`way-down-open-half-2.md`),
+  and the figures passing it drawn 0.3 toward the doorway's middle on its cells and the
+  cell before and after. Leaves that stand in their doorway are drawn on the doorway's row,
+  reaching below it to their feet, so that a figure passing between them is seen. No leaf
+  is hidden behind a wall's box to make room. Rules out a leaf drawn over or behind a side
+  wall.
+- **D159 — The plan draws a cut-out where it is painted.** Decided 2026-11-08 by the owner
+  (the statues higher on the plan than on the scene). The plan (D151) draws every image of
+  the scene, a row's cut-outs, a door's state and a thing, at its painted box
+  (`paintedBox`), as the scene does, never from the cell it stands on; a test holds the
+  crossing's statues and the doors at the boxes art.json gives them. Rules out a thing on
+  the plan a row off the scene.

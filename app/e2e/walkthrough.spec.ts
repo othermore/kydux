@@ -1,7 +1,7 @@
 // A chapter played from its first stop to its last, as the child plays it, in Spanish,
 // for the owner to read: every story step, every lesson page with its code run, and for
-// each level the start card, the start, the route tick by tick in every way and the won
-// card, and the map's plan where the map is carried. The pictures go to
+// each level the start card, the start, the route tick by tick in its first way, the won
+// card of every way, and the map's plan where the map is carried. The pictures go to
 // e2e/shots/walkthrough-<chapter>/, which tools/walkthrough.py makes a document of.
 // Only `npm run walkthrough -- <chapter>` runs it (KYDUX_WALKTHROUGH).
 
@@ -135,14 +135,16 @@ async function level(page: Page, id: string): Promise<void> {
   await typed(page, solution);
   await page.locator('.outcome').waitFor({ timeout: 90_000 });
   await page.waitForTimeout(500);
-  for (const way of ways.length > 0 ? ways : ['unica']) {
+  for (const [index, way] of (ways.length > 0 ? ways : ['unica']).entries()) {
     if (way !== 'unica') {
       await page.locator('#way').selectOption(way, { force: true });
       await expect(page.locator('.outcome-text')).toContainText('Lo has conseguido', { timeout: 90_000 }).catch(() => {});
       await page.waitForTimeout(500);
     }
     await page.screenshot({ path: `${OUT}level-${id}-${way}-ganado.png` });
-    await route(page, id, way);
+    // The route tick by tick of the first way only; every way shows its won card (the
+    // owner, 2026-11-08), so that the document stays short.
+    if (index === 0) await route(page, id, way);
   }
   // The map opens wherever it is carried.
   if ((spec.carrying ?? []).includes('map')) {

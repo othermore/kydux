@@ -515,7 +515,8 @@ a seeded wizard, and writes one document. The browser tests' server must be free
 You should see it end by naming the document,
 `drafts/recorrido-capitulo-3-<date>.es.md`, with its pictures in the folder of the same
 name beside it. Every picture has a **Comentarios:** line under it, and a document
-that is already there is never overwritten, so your comments stay safe.
+that is already there is never overwritten, so your comments stay safe. A level's route
+is shown tick by tick in its first way only. Every other way shows the card it ends on.
 
 The repository's own checks deserve a mention, because they guard the
 project's rules. They refuse a secret in any tracked file. They refuse a

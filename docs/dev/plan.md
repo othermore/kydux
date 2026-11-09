@@ -603,13 +603,16 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     fix), Eldra's books, locked doors and keys, and the wand bank.
 5.5 Chapter 3, The passages (the cells and `position`, conditions, loops),
     in seven small scenes (D136, `sprint-30.md`, as the owner reads it,
-    `sprint-31.md`, and each scene's states Gemini's, `sprint-32.md`): the friend's ten
-    lessons, whose pages run their code (D142), eleven levels (a fix, an improve), the
-    naughty child's map as a window with the scene's plan in ink, drawn as the scene
-    draws it and opened by its spell (D134, D143, D151), the dark tunnel (D135, D145,
-    D152), the patrolling teacher (D137), the crossing's one idea a level (D146), the
-    slab over its hole (D138), the dark room and a position's two numbers (D153), doors of
-    two cells (D150), and the cells where the figures walk (D149).
+    `sprint-31.md`, each scene's states Gemini's, `sprint-32.md`, and the crossing a row
+    lower with its doors as painted, `sprint-33.md`): the friend's ten lessons, whose
+    pages run their code (D142), eleven levels (a fix, an improve), the naughty child's
+    map as a window with the scene's plan in ink, drawn as the scene draws it and opened
+    by its spell (D134, D143, D151, D159), the dark tunnel (D135, D145, D152), the
+    patrolling teacher (D137), the crossing's one idea a level (D146), the slab over its
+    hole in four periods (D138), the dark room and a position's two numbers (D153), doors
+    of two cells (D150), each door painted at every tick and hung on one jamb (D156), its
+    leaf within its doorway (D158), the cells where the figures walk (D149, D154, D157),
+    and masks opaque inside their outlines (D155).
 5.6 Chapter 4, The broom (lists, functions), in a scene of the broom field
     and the village: flying, the race, an action of the child's own.
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

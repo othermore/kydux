@@ -374,9 +374,10 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
     await page.waitForTimeout(150);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-give.png` });
     await expect.poll(book).toEqual({ at: null, carried: false });
-    // Picked up (tick 3) it was carried and no longer drawn before the give began.
+    // Picked up (tick 3) it was carried and no longer drawn before the give began: it
+    // fades out with the pick-up's frames, which end just as tick 3 does.
     const seen = await page.evaluate(() => (window as unknown as { kyduxBook: string[] }).kyduxBook);
-    const taken = seen.indexOf('3:carried:-');
+    const taken = seen.findIndex((state) => state.endsWith(':carried:-'));
     expect(taken, seen.join(' ')).toBeGreaterThan(-1);
     expect(seen.indexOf('5:-:drawn'), seen.join(' ')).toBeGreaterThan(taken);
     await expect(page.locator('.outcome-text')).toContainText('You did it', { timeout: 30_000 });

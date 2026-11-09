@@ -24,7 +24,6 @@ outputs:
   - content/levels/the-night-walk/text.es.json
 context:
   - docs/dev/story.md
-  - drafts/chapter-3/capitulo-3.md
   - content/levels/the-hidden-key/text.es.json
   - content/levels/eldras-door/text.en.json
   - content/levels/eldras-door/text.es.json

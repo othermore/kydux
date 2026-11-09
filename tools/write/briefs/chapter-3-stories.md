@@ -10,7 +10,6 @@ outputs:
   - content/stories/caught/text.es.json
 context:
   - docs/dev/story.md
-  - drafts/chapter-3/capitulo-3.md
   - content/stories/at-the-gate/text.en.json
   - content/stories/the-morning/text.es.json
   - content/stories/the-wand-bank/text.es.json

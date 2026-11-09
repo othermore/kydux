@@ -85,7 +85,12 @@ def test_a_brief_writes_only_into_content_and_the_developers_docs(tmp_path):
 
 
 def test_every_brief_in_the_repository_can_be_read(tmp_path):
+    """Every brief reads on GitHub too, where drafts/ does not exist: no context of
+    a brief names a draft (the designer's design documents stay in drafts/)."""
     for path in sorted((REPO / "tools" / "write" / "briefs").glob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        drafts = [line for line in text.splitlines() if line.strip().startswith("- drafts/")]
+        assert not drafts, f"{path.name} names a draft as context: {drafts}"
         write.prompt(path)
 
 

@@ -22,7 +22,7 @@ from typing import Any
 from .actors import Actor, Friend, Teacher, make_actor, sight_tiles
 from .goals import make_goal
 from .level import CARRIED_KINDS, Level, Position
-from .things import Bed, Child, Door, Slab, Thing, make_thing, steps_between
+from .things import Bed, Child, Door, Hole, Thing, make_thing, steps_between
 
 CHILD = "<child>"
 
@@ -147,16 +147,21 @@ class World:
 
     def is_free(self, position: Position) -> bool:
         """Whether the wizard or an actor can walk onto a tile in the next tick: floor,
-        no closed door, no open door's leaf (D125), and no slab that is away (D53)."""
+        no closed door, no open door's leaf (D125), and no cell of an open hole (D53,
+        D167)."""
         if not (self.level.free(position) and self._not_shut(position)):
             return False
         if self.leaf_over(position) is not None:
             return False
-        return all(
-            slab._k_in_place_at(self.tick + 1)
-            for slab in self.things.values()
-            if isinstance(slab, Slab) and slab._k_position == position
-        )
+        hole = self.hole_at(position)
+        return hole is None or hole._k_closed_at(self.tick + 1)
+
+    def hole_at(self, position: Position) -> Hole | None:
+        """The hole one of whose cells a tile is, or None (D167)."""
+        for thing in self.things.values():
+            if isinstance(thing, Hole) and thing._k_on(position):
+                return thing
+        return None
 
     def near_wizard(self, position: Position) -> bool:
         """Whether a tile is the wizard's or one of its eight neighbours."""
@@ -384,23 +389,18 @@ class Wizard(Child):
                 world.act("blocked", {**refused, "facing": direction.value})
                 return
             if not world.is_free(ahead):
+                hole = world.hole_at(ahead)
                 by = (
                     "door"
                     if world.door_at(ahead) is not None
-                    else "slab"
-                    if self._k_slab_at(world, ahead)
+                    else hole._k_role
+                    if hole is not None
                     else "wall"
                 )
                 world.act("bump", {"at": list(here), "facing": direction.value, "by": by})
                 return
             self._set(position=ahead)
             world.act("move", {"from": list(here), "to": list(ahead), "facing": direction.value})
-
-    @staticmethod
-    def _k_slab_at(world: "World", position: Position) -> bool:
-        return any(
-            isinstance(t, Slab) and t._k_position == position for t in world.things.values()
-        )
 
     def move_right(self, steps: int = 1) -> None:
         """Walk right, one tile per step, stopping at a wall or a closed door:
@@ -741,12 +741,12 @@ def _kirra(world: World, here: Position, _thing: Thing | None = None) -> Effect:
 
 
 def _osto(world: World, here: Position, _thing: Thing | None = None) -> Effect:
-    """Holds a slab beside the wizard in place (D53, D138); with none beside, refused."""
+    """Holds a hole beside the wizard closed, from beside any of its cells (D53, D167);
+    with none beside, refused."""
     beside = [
         thing
         for thing in sorted(world.things.values(), key=lambda t: t.name)
-        if isinstance(thing, Slab)
-        and abs(thing._k_position.x - here.x) + abs(thing._k_position.y - here.y) == 1
+        if isinstance(thing, Hole) and thing._k_beside(here)
     ]
     if not beside:
         return Effect(refused="nothing_near")

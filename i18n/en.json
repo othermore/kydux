@@ -101,6 +101,7 @@
     "book": "the book",
     "wand": "the wand",
     "potion": "the potion",
+    "hole": "the hole",
     "slab": "the slab",
     "bed": "the bed",
     "map": "the naughty child's map"
@@ -217,6 +218,15 @@
       "position": "Where the cat sits, in x and y.",
       "facing": "The way the cat looks: up, down, left or right.",
       "distance_to": "Gives the number of steps from an object to the wizard."
+    },
+    "hole": {
+      "kind": "What it is: \"hole\".",
+      "name": "The hole's own name in this level.",
+      "position": "The cell of the hole, in x and y; on a hole of two cells, the first.",
+      "open": "True while the hole is open in the floor, so that a step onto it, taken now, cannot be taken; a program can wait for it to close: while hole.open.",
+      "closed": "True while the floor covers the hole, so that a step onto it, taken now, is safe; a program can wait for it: while not hole.closed.",
+      "distance_to": "Gives the number of steps from an object to the wizard.",
+      "reveal": "Shows where a hidden thing lies."
     },
     "slab": {
       "kind": "What it is: \"slab\".",

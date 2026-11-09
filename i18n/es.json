@@ -101,6 +101,7 @@
     "book": "el libro",
     "wand": "la varita",
     "potion": "la poción",
+    "hole": "el agujero",
     "slab": "la losa",
     "bed": "la cama",
     "map": "el mapa del niño travieso"
@@ -217,6 +218,15 @@
       "position": "Dónde está sentado el gato, en x e y.",
       "facing": "Hacia dónde mira el gato: up, down, left o right.",
       "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}."
+    },
+    "hole": {
+      "kind": "Lo que es: \"hole\".",
+      "name": "El nombre propio del agujero en este nivel.",
+      "position": "La casilla del agujero, en x e y; si el agujero ocupa dos casillas, la primera.",
+      "open": "True mientras el agujero está abierto en el suelo, así que un paso hacia él, dado ahora, no se puede dar; un programa puede esperar a que se cierre: while hole.open.",
+      "closed": "True mientras el suelo tapa el agujero, así que un paso hacia él, dado ahora, es seguro; un programa puede esperarlo: while not hole.closed.",
+      "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}.",
+      "reveal": "Muestra dónde se encuentra una cosa oculta."
     },
     "slab": {
       "kind": "Lo que es: \"slab\".",

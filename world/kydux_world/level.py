@@ -62,7 +62,11 @@ class LevelError(ValueError):
 WALL, FLOOR, SHELF, START = "#", ".", "=", "S"
 
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
-THING_KINDS = ("key", "door", "book", "wand", "potion", "slab", "bed", "map")
+THING_KINDS = ("key", "door", "book", "wand", "potion", "hole", "slab", "bed", "map")
+#: The kinds that lie on cells of their own, one or two side by side (D150, D167).
+CELLED_KINDS = ("door", "hole", "slab")
+#: The kinds that open and close by a period of ticks (D53, D167).
+TIMED_KINDS = ("hole", "slab")
 CARRIED_KINDS = ("key", "book", "wand", "potion", "map")
 #: The terrains a thing lies up on, out of the hands' reach (D129): a level map's
 #: shelf, a scene's bookcase. A thing on another tile no one walks, a stone or a
@@ -103,7 +107,7 @@ class ThingSpec:
     password: str | None = None
     #: Carried by the wizard from the start, with no tile of its own (D49).
     carried: bool = False
-    #: For a slab, the ticks it is in place and then away, in turn (D53, D138).
+    #: For a hole, the ticks it is closed and then open, in turn (D53, D167).
     period: int | None = None
     #: For a door, open from the start: a door an earlier level of the scene opened (D65).
     open: bool = False
@@ -119,7 +123,8 @@ class ThingSpec:
     #: walks onto while it is open (D125).
     covers: tuple[Position, ...] = ()
     #: For a door, the cells of its doorway, one or two side by side, its position the
-    #: first; shut, it blocks them all (D150).
+    #: first; shut, it blocks them all (D150). For a hole, the cells it opens on, one or
+    #: two side by side, open and closed together (D167).
     cells: tuple[Position, ...] = ()
 
 
@@ -468,8 +473,8 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         )
     period = spec.get("period")
     whole = isinstance(period, int) and not isinstance(period, bool) and period >= 1
-    if (kind == "slab") != (period is not None) or (period is not None and not whole):
-        raise LevelError(f"{shape.level_id}: a slab, and only a slab, has a whole period")
+    if (kind in TIMED_KINDS) != (period is not None) or (period is not None and not whole):
+        raise LevelError(f"{shape.level_id}: a hole, and only a hole, has a whole period")
     opened = spec.get("open", False)
     if not isinstance(opened, bool) or (opened and kind != "door"):
         raise LevelError(f"{shape.level_id}: only a door is open from the start, true or false")
@@ -500,7 +505,7 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         hidden=hidden,
         covers=covers,
         pillow_side=pillow_side,
-        cells=_door_cells(shape, spec, thing_id, position),
+        cells=_cells(shape, spec, thing_id, position),
     )
 
 
@@ -523,17 +528,21 @@ def _pillow_side(shape: _Shape, spec: dict[str, Any], thing_id: str) -> Position
     return cell
 
 
-def _door_cells(
+def _cells(
     shape: _Shape, spec: dict[str, Any], thing_id: str, position: Position
 ) -> tuple[Position, ...]:
-    """A door's `cells`: the one or two cells of its doorway, side by side, floor, the
-    first the door's own position (D150), which its scene names. A door with none has
-    its position alone; no other thing has any."""
+    """A door's or a hole's `cells`: the cells of a doorway (D150) or of a hole (D167),
+    side by side, floor, the first its own position, which its scene or its level
+    names; a hole's are one or two. One with none has its position alone; no other
+    thing has any."""
+    kind = spec.get("kind")
     cells = spec.get("cells")
     if cells is None:
-        return (position,) if spec.get("kind") == "door" else ()
-    if spec.get("kind") != "door" or not isinstance(cells, list) or not cells:
-        raise LevelError(f"{shape.level_id}: only a door has cells, a list of [x, y]")
+        return (position,) if kind in CELLED_KINDS else ()
+    if kind not in CELLED_KINDS or not isinstance(cells, list) or not cells:
+        raise LevelError(f"{shape.level_id}: only a door or a hole has cells, a list of [x, y]")
+    if kind != "door" and len(cells) > 2:
+        raise LevelError(f"{shape.level_id}: the hole {thing_id} lies on one cell or two")
     placed = tuple(shape.tile(cell, f"a cell of {thing_id}") for cell in cells)
     if any(cell in shape.shelves for cell in placed):
         raise LevelError(f"{shape.level_id}: a cell of {thing_id} is a shelf, not floor")

@@ -1,5 +1,5 @@
 """Chapter 3's world: a level played in several ways (D51), dark rooms and kirra
-(D52), slabs that come and go and osto (D53, D138), the map and orvim (D134), the
+(D52), holes that open in the floor and osto (D53, D167), the map and orvim (D134), the
 enchanted region (D135), a teacher started anywhere on its patrol (D137), and a
 door found as any thing."""
 
@@ -128,64 +128,124 @@ def test_a_dark_level_whose_goals_lie_outside_the_dark_or_are_a_reach_needs_no_k
     assert outside.dark and outside.dark_area
 
 
-#: A hole crossed by a slab in place two ticks and away two, from tick 0.
-SLABS = {
-    "id": "slabs",
+#: A hole in the floor, closed two ticks and open two, from tick 0 (D53, D167).
+HOLES = {
+    "id": "holes",
     "map": ["#######", "#S.T.E#", "#######"],
     "spells": ["osto"],
     "carrying": ["wand"],
-    "things": [{"kind": "slab", "id": "slab", "marker": "T", "period": 2}],
+    "things": [{"kind": "hole", "id": "hole", "marker": "T", "period": 2}],
     "goals": [{"kind": "reach", "marker": "E"}],
 }
 
+#: A hole across a corridor two cells wide, on (3, 1) and (3, 2) (D167).
+WIDE_HOLE = {
+    "id": "wide_hole",
+    "map": ["#######", "#S....#", "#.....#", "#######"],
+    "spells": ["osto"],
+    "carrying": ["wand"],
+    "things": [
+        {"kind": "hole", "id": "hole", "at": [3, 1], "cells": [[3, 1], [3, 2]], "period": 2}
+    ],
+    "goals": [{"kind": "reach", "at": [5, 2]}],
+}
 
-def test_a_slab_is_in_place_for_its_period_and_away_for_as_long():
-    slab = World(Level.from_dict(SLABS)).things["slab"]
-    assert [slab._k_in_place_at(t) for t in range(6)] == [True, True, False, False, True, True]
+
+def test_a_hole_is_closed_for_its_period_and_open_for_as_long():
+    hole = World(Level.from_dict(HOLES)).things["hole"]
+    assert [hole._k_closed_at(t) for t in range(6)] == [True, True, False, False, True, True]
 
 
-def test_a_step_onto_a_slab_that_is_away_bumps():
-    world = World(Level.from_dict(SLABS))
+def test_a_hole_is_open_exactly_when_it_is_not_closed():
+    world = World(Level.from_dict(HOLES))
+    hole = world.things["hole"]
+    for _ in range(8):
+        assert hole.open is not hole.closed
+        world.wizard.wait()
+
+
+def test_a_step_onto_an_open_hole_bumps():
+    world = World(Level.from_dict(HOLES))
     world.wizard.move_right()
     world.wizard.wait()
-    assert not world.things["slab"].in_place
+    assert world.things["hole"].open
     world.wizard.move_right()
-    assert world.events[-1].kind == "bump" and world.events[-1].data["by"] == "slab"
+    assert world.events[-1].kind == "bump" and world.events[-1].data["by"] == "hole"
 
 
-def test_waiting_while_the_slab_is_away_gets_the_wizard_across():
-    code = (
-        "wizard.move_right()\nwizard.wait()\nwhile not slab.in_place:\n    wizard.wait()\n"
-        "wizard.move_right(3)\n"
-    )
-    assert run_code(Level.from_dict(SLABS), code).status == "won"
+@pytest.mark.parametrize("loop", ["while not hole.closed:", "while hole.open:"])
+def test_waiting_while_the_hole_is_open_gets_the_wizard_across(loop):
+    code = f"wizard.move_right()\nwizard.wait()\n{loop}\n    wizard.wait()\nwizard.move_right(3)\n"
+    assert run_code(Level.from_dict(HOLES), code).status == "won"
 
 
-def test_osto_holds_the_slab_in_place_from_the_next_tick_it_is_in_place():
-    world = World(Level.from_dict(SLABS))
+def test_osto_holds_the_hole_closed_from_the_next_tick_it_is_closed():
+    world = World(Level.from_dict(HOLES))
     world.wizard.move_right()
     world.wizard.cast("osto")
     hold = world.events[-1]
-    assert (hold.actor, hold.kind) == ("slab", "hold")
-    # Cast in tick 2; the slab is away in tick 3 and back in tick 4.
-    assert hold.data == {"id": "slab", "from": 4, "until": 4 + HOLD_TICKS}
+    assert (hold.actor, hold.kind) == ("hole", "hold")
+    # Cast in tick 2; the hole is open in tick 3 and closed again in tick 4.
+    assert hold.data == {"id": "hole", "from": 4, "until": 4 + HOLD_TICKS}
     world.wizard.wait(2)
-    assert world.things["slab"].in_place
+    assert world.things["hole"].closed
     check_consistency(world)
 
 
-def test_osto_with_no_slab_beside_is_refused():
-    world = World(Level.from_dict(SLABS))
+def test_osto_with_no_hole_beside_is_refused():
+    world = World(Level.from_dict(HOLES))
     world.wizard.cast("osto")
     assert world.events[-1].data["reason"] == "nothing_near"
 
 
-def test_a_slab_has_a_whole_period_and_nothing_else_does():
+@pytest.mark.parametrize("row", [1, 2])
+def test_a_hole_of_two_cells_bumps_on_either_while_open(row):
+    world = World(Level.from_dict(WIDE_HOLE))
+    if row == 2:
+        world.wizard.move_down()
+    world.wizard.move_right()
+    assert world.things["hole"].open
+    world.wizard.move_right()
+    assert world.events[-1].kind == "bump" and world.events[-1].data["by"] == "hole"
+    assert world.wizard.position == (2, row)
+
+
+@pytest.mark.parametrize("row", [1, 2])
+def test_osto_holds_a_hole_of_two_cells_from_beside_either(row):
+    world = World(Level.from_dict(WIDE_HOLE))
+    if row == 2:
+        world.wizard.move_down()
+    world.wizard.move_right()
+    world.wizard.cast("osto")
+    assert world.events[-1].kind == "hold"
+    world.wizard.wait()
+    assert world.things["hole"].closed
+    world.wizard.move_right(3)
+    assert world.wizard.position == (5, row)
+
+
+def test_both_cells_of_a_hole_open_and_close_together():
+    world = World(Level.from_dict(WIDE_HOLE))
+    for _ in range(6):
+        assert world.is_free(Position(3, 1)) == world.is_free(Position(3, 2))
+        world.wizard.wait()
+
+
+def test_a_hole_s_cells_are_one_or_two_side_by_side():
+    hole = {"kind": "hole", "id": "hole", "at": [3, 1], "period": 2}
+    with pytest.raises(LevelError, match="not side by side"):
+        Level.from_dict({**WIDE_HOLE, "things": [{**hole, "cells": [[3, 1], [4, 2]]}]})
+    with pytest.raises(LevelError, match="one cell or two"):
+        three = [[3, 1], [3, 2], [4, 2]]
+        Level.from_dict({**WIDE_HOLE, "things": [{**hole, "cells": three}]})
+
+
+def test_a_hole_has_a_whole_period_and_nothing_else_does():
     with pytest.raises(LevelError, match="whole period"):
-        Level.from_dict({**SLABS, "things": [{"kind": "slab", "id": "s", "marker": "T"}]})
+        Level.from_dict({**HOLES, "things": [{"kind": "hole", "id": "h", "marker": "T"}]})
     with pytest.raises(LevelError, match="whole period"):
         key = {"kind": "key", "id": "k", "marker": "T", "period": 2}
-        Level.from_dict({**SLABS, "things": [key]})
+        Level.from_dict({**HOLES, "things": [key]})
 
 
 #: A corridor the map's spell may be cast in (D134).
@@ -746,9 +806,9 @@ def test_the_loader_refuses_a_door_whose_cells_cannot_be(cells, says):
         Level.from_dict({**WIDE, "things": [door]})
 
 
-def test_only_a_door_has_cells():
+def test_only_a_door_or_a_hole_has_cells():
     key = {"kind": "key", "id": "key", "at": [1, 1], "cells": [[1, 1]]}
-    with pytest.raises(LevelError, match="only a door has cells"):
+    with pytest.raises(LevelError, match="only a door or a hole has cells"):
         Level.from_dict({**WIDE, "things": [*WIDE["things"], key]})
 
 

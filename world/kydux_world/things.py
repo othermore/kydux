@@ -124,7 +124,7 @@ class Thing(Child):
 
     def _k_unseen(self) -> bool:
         """Whether the thing lies in the dark, out of the wizard's reach (D52): a thing
-        on the floor, not a door or a slab, which are the castle's shape."""
+        on the floor, not a door or a hole, which are the castle's shape."""
         world: World = self._k_world
         return (
             not world.lit
@@ -276,46 +276,82 @@ def steps_between(one: Any, other: Any) -> int | None:
     return abs(here.x - there.x) + abs(here.y - there.y)
 
 
-#: How many ticks `osto` holds a slab in place (D53, D138).
+#: How many ticks `osto` holds a hole closed (D53, D167).
 HOLD_TICKS = 6
 
 
-class Slab(Thing):
-    """A slab over a hole in the floor, in place for `period` ticks and away for as
-    many, from tick 0 in place, unless `osto` holds it (D53, D138)."""
+class Hole(Thing):
+    """A hole that opens in the floor, on one cell or two side by side: closed for
+    `period` ticks and open for as many, from tick 0 closed, and closed too while
+    `osto` holds it (D53, D167)."""
 
-    _k_role = "slab"
+    _k_role = "hole"
 
     def __init__(self, world: "World", spec: ThingSpec) -> None:
         super().__init__(world, spec)
         #: The ticks it is held, each a range: from the first, up to the last.
         self._set(holds=())
 
-    def _k_in_place_at(self, tick: int) -> bool:
+    def _k_closed_at(self, tick: int) -> bool:
         period = self._k_spec.period or 1
         if (tick // period) % 2 == 0:
             return True
         return any(start <= tick < end for start, end in self._k_holds)
 
+    def _k_on(self, position: Position) -> bool:
+        """Whether a tile is one of the hole's cells (D167)."""
+        return position in self._k_spec.cells
+
+    def _k_beside(self, position: Position) -> bool:
+        """Whether a tile lies next to a cell of the hole and not on it."""
+        cells = self._k_spec.cells
+        return position not in cells and any(
+            abs(cell.x - position.x) + abs(cell.y - position.y) == 1 for cell in cells
+        )
+
     @property
-    def in_place(self) -> bool:
-        """True when a step onto the slab, taken now, lands on it: `slab.in_place`"""
+    def closed(self) -> bool:
+        """True when the floor covers the hole, so that a step onto it, taken now,
+        lands on the floor: `hole.closed`"""
         world: World = self._k_world
-        return self._k_in_place_at(world.tick + 1)
+        return self._k_closed_at(world.tick + 1)
+
+    @property
+    def open(self) -> bool:
+        """True while the hole is open, so that a step onto it, taken now, would
+        fall in: `hole.open`"""
+        return not self.closed
 
     def _hold(self) -> None:
-        """Held in place for HOLD_TICKS, from the next tick it is in place."""
+        """Held closed for HOLD_TICKS, from the next tick it is closed."""
         world: World = self._k_world
         start = world.tick + 1
-        while not self._k_in_place_at(start):
+        while not self._k_closed_at(start):
             start += 1
         end = start + HOLD_TICKS
         self._set(holds=(*self._k_holds, (start, end)))
         world.note(self.name, "hold", {"id": self.name, "from": start, "until": end})
 
 
+class Slab(Hole):
+    """The hole under the name the levels still give it, `slab.in_place`."""
+
+    _k_role = "slab"
+
+    @property
+    def in_place(self) -> bool:
+        """True when a step onto the slab, taken now, lands on it: `slab.in_place`"""
+        return self.closed
+
+
 #: Each kind of thing with a class of its own; any other kind is a Thing.
-THINGS: dict[str, type[Thing]] = {"door": Door, "key": Key, "slab": Slab, "bed": Bed}
+THINGS: dict[str, type[Thing]] = {
+    "door": Door,
+    "key": Key,
+    "hole": Hole,
+    "slab": Slab,
+    "bed": Bed,
+}
 
 
 def make_thing(world: "World", spec: ThingSpec) -> Thing:

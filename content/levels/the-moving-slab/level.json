@@ -18,6 +18,9 @@
   "spells": [
     "osto"
   ],
+  "dark": [
+    "storeroom"
+  ],
   "things": [
     {
       "kind": "slab",

@@ -244,8 +244,9 @@ test.describe('the storeroom', () => {
   test.use({ locale: 'en-US' });
   test.beforeEach(({ page }) => seedWizard(page, PABLO));
 
-  test("the slab's hole shows while it is away, and osto holds it (D138)", async ({ page }) => {
+  test("the slab's hole shows while it is away, and osto holds it (D138), the storeroom dark (D162)", async ({ page }) => {
     await open(page, 'the-moving-slab', '1');
+    await expect(scene(page)).toHaveAttribute('data-dark', 'true');
     await expect(scene(page)).toHaveAttribute('data-slabs', 'slab:in');
     await expect(scene(page)).not.toHaveAttribute('data-drawn', /slab:/);
     await start(page, 'wizard.move_right(2)\nwizard.wait(4)');

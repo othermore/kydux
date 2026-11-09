@@ -562,6 +562,17 @@ def test_the_slab_s_level_is_won_in_its_four_periods_and_a_fixed_wait_loses_one(
     assert bumps and bumps[0].data["by"] == "slab"
 
 
+def test_the_slab_s_level_plays_with_the_storeroom_dark_and_needs_no_light():
+    """D162: the storeroom is dark in the slab's level, before the level that lights it;
+    the mark beyond the hole lies in the dark, and a reach needs no kirra."""
+    level = real("the-moving-slab")
+    for way, one in (("", level), *level.ways):
+        assert one.dark and Position(5, 7) in one.dark_area, way
+        assert one.markers["E"] in one.dark_area and "kirra" not in one.spells, way
+        assert one.start not in one.dark_area, way
+    assert set(outcomes("the-moving-slab", solution("the-moving-slab")).values()) == {"won"}
+
+
 def test_no_fixed_wait_a_child_finds_by_trial_crosses_the_slab_in_every_period():
     """The owner, 2026-11-08: the periods 3, 4, 5 and 7 share no tick a fixed wait could
     hit in all four below 29, so the loop on `in_place` is what wins."""

@@ -10,9 +10,9 @@
   "things": {
     "door_a": {
       "box": [
-        2.3,
+        2.55,
         8.75,
-        3.75,
+        4.25,
         10.75
       ],
       "row": 10,
@@ -25,11 +25,16 @@
       "states": {
         "closed": {
           "picture": "tunnel-whole.png",
-          "diff": {},
+          "diff": {
+            "threshold": 20,
+            "soft": 9,
+            "holes": 90000,
+            "close": 22
+          },
           "box": [
-            2.3,
-            8.75,
-            3.75,
+            2.78,
+            8.97,
+            4.2,
             10.75
           ]
         }
@@ -53,11 +58,16 @@
       "states": {
         "closed": {
           "picture": "tunnel-whole.png",
-          "diff": {},
+          "diff": {
+            "threshold": 20,
+            "soft": 9,
+            "holes": 90000,
+            "close": 22
+          },
           "box": [
-            10.6,
-            8.75,
-            12.0,
+            10.62,
+            8.97,
+            11.98,
             10.75
           ]
         }

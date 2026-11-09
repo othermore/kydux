@@ -23,7 +23,10 @@
       "states": {
         "closed": {
           "picture": "storeroom-nokey.png",
-          "diff": {},
+          "diff": {
+            "holes": 40000,
+            "close": 12
+          },
           "box": [
             9.15,
             10.4,
@@ -33,15 +36,18 @@
         },
         "open": {
           "picture": "storeroom-open.png",
-          "diff": {},
+          "diff": {
+            "holes": 40000,
+            "close": 14
+          },
           "row": 13,
+          "reach": 1.0,
           "box": [
             8.35,
             10.87,
-            10.15,
+            10.13,
             15.0
-          ],
-          "reach": 1.0
+          ]
         }
       },
       "without": "storeroom-base.png",

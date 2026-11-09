@@ -7,9 +7,9 @@
   "ground": "ground.webp",
   "rows": [
     {
-      "row": 8,
-      "image": "row-8-static.webp",
-      "top": 571,
+      "row": 7,
+      "image": "row-7-static.webp",
+      "top": 475,
       "static": true
     },
     {

@@ -440,29 +440,29 @@ test.describe('chapter 3', () => {
 
 test.describe('a level played two ways (D51)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/#level/the-tunnel-exit');
-    await expect(page.locator('#card-ways li')).toHaveText(['Dask walks away', 'Dask looks this way']);
+    await page.goto('/#level/by-the-statues');
+    await expect(page.locator('#card-ways li')).toHaveText(['Dask looks up', 'Dask looks down']);
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
   });
 
-  test('a program that does not ask wins one way and is caught in the other, which the card names', async ({
+  test('a program that does not look wins one way and is caught in the other, which the card names', async ({
     page,
   }) => {
     await expect(page.locator('#way')).toBeHidden();
-    await run(page, 'wizard.move_right(13)\nwizard.move_down()');
-    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks this way”: The teacher saw you!');
+    await run(page, 'wizard.move_right(4)\nwizard.move_down(3)');
+    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks up”: The teacher saw you!');
     await expect(page.locator('#way')).toBeVisible();
-    await expect(page.locator('#way')).toHaveValue('watching');
-    await page.locator('#way').selectOption('away');
-    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask walks away”', { timeout: 30_000 });
+    await expect(page.locator('#way')).toHaveValue('looking_up');
+    await page.locator('#way').selectOption('looking_down');
+    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks down”', { timeout: 30_000 });
     await expect(page.locator('.outcome-text')).toContainText('Not every way yet');
     await expect(page.locator('.win-card')).toHaveCount(0);
   });
 
   test('with if, the same program wins every way', async ({ page }) => {
-    await run(page, 'if dask.facing == "up":\n    wizard.wait()\nwizard.move_right(13)\nwizard.move_down()');
+    await run(page, 'if dask.facing == "up":\n    wizard.move_down(2)\nwizard.move_right(4)\nwizard.move_down(3)');
     await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux! In every way!');
     await expect(page.locator('.win-card')).toBeVisible();
   });

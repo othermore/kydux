@@ -3,12 +3,12 @@
   "kind": "practice",
   "scene": "the-crossing",
   "start": [
-    15,
-    7
+    11,
+    5
   ],
   "end": [
     15,
-    13
+    8
   ],
   "speaker": "friend",
   "carrying": [
@@ -20,26 +20,26 @@
       "kind": "friend",
       "id": "friend",
       "at": [
-        13,
-        6
+        10,
+        5
       ]
     },
     {
       "kind": "friend",
       "id": "mate",
       "at": [
-        13,
-        7
+        10,
+        6
       ]
     },
     {
       "kind": "teacher",
       "id": "dask",
       "at": [
-        15,
-        10
+        13,
+        6
       ],
-      "facing": "left"
+      "facing": "up"
     }
   ],
   "api": [
@@ -48,12 +48,14 @@
     "wizard.move_up",
     "wizard.move_down",
     "wizard.wait",
-    "teacher.facing"
+    "teacher.facing",
+    "wizard.facing"
   ],
   "goals": [
     {
       "kind": "reach",
-      "marker": "E"
+      "marker": "E",
+      "on_the_way": true
     },
     {
       "kind": "not_seen_by",
@@ -63,20 +65,28 @@
   "tick_limit": 100,
   "ways": [
     {
-      "id": "looking_left",
+      "id": "looking_up",
       "actors": [
         {
           "id": "dask",
-          "facing": "left"
+          "at": [
+            13,
+            6
+          ],
+          "facing": "up"
         }
       ]
     },
     {
-      "id": "looking_right",
+      "id": "looking_down",
       "actors": [
         {
           "id": "dask",
-          "facing": "right"
+          "at": [
+            13,
+            6
+          ],
+          "facing": "down"
         }
       ]
     }

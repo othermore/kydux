@@ -154,19 +154,29 @@ test.describe('Dask, in every way (D51, D137)', () => {
   test.use({ locale: 'en-US' });
   test.beforeEach(({ page }) => seedWizard(page, PABLO));
 
-  test('at the crossing, the walk alone is caught where he looks up', async ({ page }) => {
+  test('at the crossing, Dask comes up from below, and the walk alone is caught (D146)', async ({ page }) => {
     await open(page, 'the-tunnel-exit');
-    await expect(scene(page)).toHaveAttribute('data-actors', /dask:9,5,down/);
-    await run(page, 'wizard.move_right(13)\nwizard.move_down()');
-    await expect(page.locator('#way')).toHaveValue('watching');
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:9,13,up/);
+    await expect(page.locator('#way')).toBeHidden();
+    await run(page, 'wizard.move_right(9)');
     await expect(page.locator('.outcome-text')).toContainText('The teacher saw you');
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:9,6,up/);
   });
 
-  test('a way turns him as well as moves him (D51)', async ({ page }) => {
+  test('two ticks of waiting let him go by (D146)', async ({ page }) => {
+    await open(page, 'the-tunnel-exit');
+    expect(await run(page, 'wizard.wait(2)\nwizard.move_right(9)')).toMatch(/^You did it/);
+    await expect(scene(page)).toHaveAttribute('data-wizard', '11,5');
+  });
+
+  test('a way turns him as well as moves him (D51, D146)', async ({ page }) => {
     await open(page, 'by-the-statues');
-    await run(page, 'wizard.move_down()\nwizard.move_left()\nwizard.move_down(3)\nwizard.move_right()\nwizard.move_down(2)');
-    await expect(page.locator('#way')).toHaveValue('looking_left');
-    await expect(scene(page)).toHaveAttribute('data-actors', /dask:15,10,left/);
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:13,6,up/);
+    await run(page, 'wizard.move_right(4)\nwizard.move_down(3)');
+    await expect(page.locator('#way')).toHaveValue('looking_up');
+    await expect(page.locator('.outcome-text')).toContainText('The teacher saw you');
+    await page.locator('#way').selectOption('looking_down', { force: true });
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:13,6,down/);
   });
 
   for (const id of ['past-the-teacher', 'the-night-walk']) {

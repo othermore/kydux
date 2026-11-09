@@ -390,38 +390,51 @@ def outcomes(level_id, code):
     return dict((way_id, way.status) for way_id, way in result.ways)
 
 
-def test_the_tunnel_exit_keeps_its_table_in_both_ways():
-    assert outcomes("the-tunnel-exit", solution("the-tunnel-exit")) == {
-        "away": "won",
-        "watching": "won",
-    }
-    assert outcomes("the-tunnel-exit", wrong("the-tunnel-exit", "the_walk_alone")) == {
-        "away": "won",
-        "watching": "caught",
-    }
-    assert outcomes("the-tunnel-exit", wrong("the-tunnel-exit", "always_waits")) == {
-        "away": "caught",
-        "watching": "won",
-    }
-    assert outcomes("the-tunnel-exit", wrong("the-tunnel-exit", "waits_two")) == {
-        "away": "caught",
-        "watching": "won",
-    }
+def test_the_tunnel_exit_is_won_by_waiting_two_ticks_for_dask_to_go_by():
+    """D146: Dask starts below the crossing, walking up it, a cell a tick; he sees (9, 5)
+    from (9, 9) to (9, 6), ticks 4 to 7, stands on it at tick 8, and is above it from
+    tick 9, when the wizard reaches it after two ticks of waiting."""
+    level = "the-tunnel-exit"
+    assert run_code(real(level), solution(level)).status == "won"
+    alone = run_code(real(level), wrong(level, "the_walk_alone"))
+    assert (alone.status, alone.ticks) == ("caught", 7)
+    assert run_code(real(level), wrong(level, "waits_one")).status == "caught"
+    assert run_code(real(level), wrong(level, "stops_short")).status == "incomplete"
 
 
-def test_by_the_statues_is_won_down_the_side_dask_does_not_look_at():
+def test_the_tunnel_exit_keeps_dask_s_ticks():
+    world = World(real("the-tunnel-exit"))
+    for tick in range(1, 13):
+        world.wizard.wait()
+        dask = world.actors["dask"]
+        assert (dask.position.x, dask.position.y) == (9, 13 - tick), tick
+        assert dask.facing == "up"
+
+
+def test_by_the_statues_is_won_above_or_below_dask_with_one_if():
+    """D146: Dask stands still between the first two statues; looking up, the wizard goes
+    down two and passes below him, and looking down it crosses straight. The mark is met
+    on the way, three cells before the walk ends in the first way."""
     level = "by-the-statues"
-    assert set(outcomes(level, solution(level)).values()) == {"won"}
-    assert outcomes(level, wrong(level, "the_left_side_always")) == {
-        "looking_left": "caught",
-        "looking_right": "won",
+    won = run_code(real(level), solution(level))
+    assert dict((way, result.status) for way, result in won.ways) == {
+        "looking_up": "won",
+        "looking_down": "won",
     }
-    assert outcomes(level, wrong(level, "the_right_side_always")) == {
-        "looking_left": "won",
-        "looking_right": "caught",
+    ends = dict((way, tuple(result.events[-1].data.get("to", ()))) for way, result in won.ways)
+    assert ends == {"looking_up": (15, 10), "looking_down": (15, 8)}
+    assert outcomes(level, wrong(level, "the_walk_alone")) == {
+        "looking_up": "caught",
+        "looking_down": "won",
     }
-    assert set(outcomes(level, wrong(level, "the_branches_swapped")).values()) == {"caught"}
-    assert set(outcomes(level, wrong(level, "straight_down")).values()) == {"caught"}
+    assert outcomes(level, wrong(level, "down_two_always")) == {
+        "looking_up": "won",
+        "looking_down": "caught",
+    }
+    assert set(outcomes(level, wrong(level, "the_condition_on_down")).values()) == {"caught"}
+    assert run_code(real(level), wrong(level, "the_body_not_moved_in")).error.type == (
+        "IndentationError"
+    )
 
 
 @pytest.mark.parametrize(

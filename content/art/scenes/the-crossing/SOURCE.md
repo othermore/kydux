@@ -14,4 +14,6 @@ later, like the rest of it.
   own stones (`tiled`); `game-crossing-voids-top.md` was asked first and kept
   the paper as the page.
 - A black sliver over the tunnel's arch filled from the pixels round it (`fill`).
+- A third row of floor opened in the corridor of the statues by
+  `tools/art/repaint.py spaced` (`third_row`), its stones the corridor's own.
 - Its statues and its low arch cut by the polygons traced round them.

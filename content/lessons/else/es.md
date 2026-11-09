@@ -19,8 +19,8 @@ Vamos a comprobar hacia dónde está mirando Dask ahora mismo.
 ¡El ordenador imprimirá una cadena u otra, pero nunca las dos!
 
 ```python try
-if dask.facing == "left":
-    print("Dask mira a la izquierda")
+if left_door.locked:
+    print("Vamos por la puerta derecha")
 else:
-    print("Dask no mira a la izquierda")
+    print("Vamos por la puerta izquierda")
 ```

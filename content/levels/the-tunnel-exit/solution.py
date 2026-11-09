@@ -1,4 +1,2 @@
-if dask.facing == "up":
-    wizard.wait()
-wizard.move_right(13)
-wizard.move_down()
+wizard.wait(2)
+wizard.move_right(9)

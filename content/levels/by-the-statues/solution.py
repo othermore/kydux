@@ -1,10 +1,4 @@
-wizard.move_down()
-if dask.facing == "left":
-    wizard.move_right()
-    wizard.move_down(3)
-    wizard.move_left()
-else:
-    wizard.move_left()
-    wizard.move_down(3)
-    wizard.move_right()
-wizard.move_down(2)
+if dask.facing == "up":
+    wizard.move_down(2)
+wizard.move_right(4)
+wizard.move_down(3)

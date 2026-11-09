@@ -1,20 +1,16 @@
 {
   "title": "La salida del túnel",
   "goals": [
-    "Llega a la marca.",
+    "Llega a la marca, junto a la primera estatua.",
     "Que Dask no te vea."
   ],
-  "starting_code": "# Pregunta si Dask mira hacia arriba con `facing`; si es así, espera un tick con `wait`.\n\n# Camina a la derecha hasta el final con `move_right`.\n\n# Baja un paso hasta la marca con `move_down`.\n",
+  "starting_code": "# Espera dos ticks con `wait`, a que Dask pase.\n\n# Camina a la derecha hasta la marca con `move_right`.\n",
   "hints": [
-    "Necesitas una condición para ver hacia dónde mira Dask. ¿Cuál es su atributo para eso?",
-    "Usa `if` con `dask.facing` y `==`, y espera si mira hacia arriba.",
-    "Después del bloque `if`, añade tus pasos sin espacios delante, para que se den siempre."
+    "Dask sube por el pasillo que cruza este. Si cruzamos ya, nos ve.",
+    "Cuenta los ticks: hay que dejarle pasar y solo entonces caminar.",
+    "Después de esperar, son nueve pasos a la derecha."
   ],
-  "intro": "¡Chis! Hemos salido del túnel, pero mira... ¡El profesor Dask patrulla el cruce! La marca está al final, entre la segunda y la tercera estatua. A veces se aleja, y a veces mira hacia este cruce. ¡Podemos preguntar hacia dónde mira para saber si tenemos que esperar antes de cruzar!",
-  "outro": "¡Por poco! Esperar justo cuando miraba hacia aquí nos ha salvado.",
-  "learned": "Ahora sabes que una condición hace algo solo cuando su respuesta es verdadera, y que lo que sirve es saber hacia dónde mira.",
-  "ways": {
-    "away": "Dask se aleja",
-    "watching": "Dask mira hacia aquí"
-  }
+  "intro": "Dask sube por el pasillo que cruza este, mirando hacia arriba. Si cruzamos ahora, nos verá: esperemos a que pase y vayamos hasta la primera estatua.",
+  "outro": "¡Ha pasado de largo sin vernos! Y ahora está ahí delante, junto a las estatuas...",
+  "learned": "Ahora sabes que `wizard.wait()` deja pasar un tick mientras todo lo demás se mueve, y que el número dice cuántos."
 }

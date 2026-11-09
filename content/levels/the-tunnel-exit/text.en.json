@@ -1,20 +1,16 @@
 {
   "title": "The tunnel's exit",
   "goals": [
-    "Reach the mark.",
+    "Reach the mark, by the first statue.",
     "Do not let Dask see you."
   ],
-  "starting_code": "# Ask whether Dask faces up with `facing`; if he does, wait one tick with `wait`.\n\n# Walk to the right until the end with `move_right`.\n\n# Take one step down to the mark with `move_down`.\n",
+  "starting_code": "# Wait two ticks with `wait`, for Dask to go by.\n\n# Walk right to the mark with `move_right`.\n",
   "hints": [
-    "You need a condition to check Dask's facing. What is his attribute for that?",
-    "Use `if` with `dask.facing` and `==`, and wait if he faces up.",
-    "After the `if` block, add your steps with no spaces before them, so they always run."
+    "Dask is coming up the corridor that crosses this one. If we cross now, he sees us.",
+    "Count the ticks: let him go by, and only then walk.",
+    "After waiting, it is nine steps to the right."
   ],
-  "intro": "Shh! We are out of the tunnel, but look... Professor Dask is patrolling the crossing ahead! The mark is at the far end, between the second and the third statue. Sometimes he walks away, and sometimes he looks right at this crossing. We can ask which way he faces to know if we need to wait before crossing!",
-  "outro": "That was close! Waiting exactly when he looks this way saved us.",
-  "learned": "Now you know that a condition does something only when its answer is true, and that what helps is knowing which way he faces.",
-  "ways": {
-    "away": "Dask walks away",
-    "watching": "Dask looks this way"
-  }
+  "intro": "Dask is coming up the corridor that crosses this one, looking up. If we cross now he will see us: let us wait for him to go by and walk to the first statue.",
+  "outro": "He went by without seeing us! And now he is up ahead, by the statues...",
+  "learned": "Now you know that `wizard.wait()` lets a tick go by while everything else moves, and that the number says how many."
 }

@@ -1,20 +1,20 @@
 {
   "title": "By the statues",
   "goals": [
-    "Reach the mark.",
+    "Reach the mark, where the corridor goes down.",
     "Do not let Dask see you."
   ],
-  "starting_code": "wizard.move_down()\n\n# If Dask looks left, pass on the right with `move_right`, `move_down` and `move_left`.\n\n# Else, pass on the left.\n\n# Take the last steps down into the arch.\n",
+  "starting_code": "# If Dask looks up, go down two cells with `move_down`.\n\n# Walk right, past Dask, with `move_right`.\n\n# Go down to the mark with `move_down`.\n",
   "hints": [
-    "Dask stands still, but he might look left or right. Use `if` and `else`!",
-    "If Dask looks left, pass on the right: 1 right, 3 down, 1 left.",
-    "Under `else:`, do the opposite: 1 left, 3 down, 1 right. End with `wizard.move_down(2)`."
+    "Dask looks up or down. If he looks up, we cannot pass above him.",
+    "Look at `dask.facing` with an `if`: the lines inside it have four spaces.",
+    "It is four steps right and then three down."
   ],
-  "intro": "Dask is standing perfectly still in the wide corridor ahead of us! He is looking to one side, but we don't know which side it will be. We need to go down the side he is not looking at, to the mark in the arch at the bottom. An `else` will help us choose!",
-  "outro": "Brilliant! We sneaked right past him, no matter which way he looked.",
-  "learned": "Now you know that `else` gives the other way when the condition is false.",
+  "intro": "Dask stands between the first two statues, looking up or down. We are against the top wall: if he looks up, we go down two and pass below him; if he looks down, we pass straight along. Then into the corridor that goes down between the second and the third statue.",
+  "outro": "We passed right beside him! There is a room this way, I can hear the echo.",
+  "learned": "Now you know that `if` does its lines only when its condition is true.",
   "ways": {
-    "looking_left": "Dask looks left",
-    "looking_right": "Dask looks right"
+    "looking_up": "Dask looks up",
+    "looking_down": "Dask looks down"
   }
 }

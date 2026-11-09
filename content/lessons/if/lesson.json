@@ -1,7 +1,5 @@
 {
   "id": "if",
   "speaker": "friend",
-  "teaches": [
-    "wizard.wait"
-  ]
+  "teaches": []
 }

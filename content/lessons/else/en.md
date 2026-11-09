@@ -19,8 +19,8 @@ Let us check which way Dask is looking right now.
 The computer will print one string or the other, but never both!
 
 ```python try
-if dask.facing == "left":
-    print("Dask looks left")
+if left_door.locked:
+    print("We go by the right door")
 else:
-    print("Dask does not look left")
+    print("We go by the left door")
 ```

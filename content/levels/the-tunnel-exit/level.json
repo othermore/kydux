@@ -4,11 +4,11 @@
   "scene": "the-crossing",
   "start": [
     2,
-    6
+    5
   ],
   "end": [
-    15,
-    7
+    11,
+    5
   ],
   "speaker": "friend",
   "carrying": [
@@ -21,7 +21,7 @@
       "id": "friend",
       "at": [
         2,
-        7
+        6
       ]
     },
     {
@@ -29,7 +29,7 @@
       "id": "mate",
       "at": [
         3,
-        7
+        6
       ]
     },
     {
@@ -37,13 +37,13 @@
       "id": "dask",
       "at": [
         9,
-        5
+        13
       ],
-      "facing": "down",
+      "facing": "up",
       "patrol": [
         [
           9,
-          11
+          1
         ]
       ]
     }
@@ -53,8 +53,7 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
-    "wizard.wait",
-    "teacher.facing"
+    "wizard.wait"
   ],
   "goals": [
     {
@@ -66,33 +65,5 @@
       "id": "dask"
     }
   ],
-  "tick_limit": 100,
-  "ways": [
-    {
-      "id": "away",
-      "actors": [
-        {
-          "id": "dask",
-          "at": [
-            9,
-            5
-          ],
-          "facing": "down"
-        }
-      ]
-    },
-    {
-      "id": "watching",
-      "actors": [
-        {
-          "id": "dask",
-          "at": [
-            9,
-            8
-          ],
-          "facing": "up"
-        }
-      ]
-    }
-  ]
+  "tick_limit": 100
 }

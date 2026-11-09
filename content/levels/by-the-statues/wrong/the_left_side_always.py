@@ -1,5 +1,0 @@
-wizard.move_down()
-wizard.move_left()
-wizard.move_down(3)
-wizard.move_right()
-wizard.move_down(2)

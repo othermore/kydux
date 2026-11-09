@@ -1,272 +1,272 @@
 {
-  "about": "The crossing, chapter 3's second scene (D136): the painting scene-tunnel-exit, its grid removed by Gemini, the corridor beside the statues made three cells wide by moving its wall, the pale paper round it painted as the castle's inside. Pictures named here are in art/raw/, which git ignores.",
+  "about": "The crossing, chapter 3's second scene (D136): the painting scene-tunnel-exit, its grid removed by Gemini, the corridor beside the statues made three cells wide by moving its wall, the pale paper round it painted as the castle's inside, and a third row of floor opened in the corridor of the statues (D146). Pictures named here are in art/raw/, which git ignores.",
   "sources": {
     "folder": "art/raw/game-crossing",
     "edits": "art/raw/game-crossing",
-    "painting": "crossing-clean.png",
+    "painting": "crossing-third-row.png",
     "grid": "grid.json",
-    "ground": "crossing-clean.png"
+    "ground": "crossing-third-row.png"
   },
   "things": {
     "statue_1": {
       "box": [
         11.65,
-        5.95,
+        4.95,
         12.9,
-        8.32
+        7.32
       ],
-      "row": 8,
+      "row": 7,
       "static": true,
       "solid": true,
       "mask": "polygon",
       "states": {
         "standing": "painting"
       },
-      "about": "The first statue, over whoever walks behind it on row 6, its foot on row 8.",
+      "about": "The first statue, over whoever walks behind it on rows 5 and 6, its foot on row 7.",
       "polygon": [
         [
           12.1,
-          6.06
+          5.06
         ],
         [
           12.267,
-          6.186
+          5.186
         ],
         [
           12.483,
-          6.395
+          5.395
         ],
         [
           12.567,
-          6.671
+          5.671
         ],
         [
           12.667,
-          6.437
+          5.437
         ],
         [
           12.75,
-          6.119
+          5.119
         ],
         [
           12.833,
-          6.228
+          5.228
         ],
         [
           12.767,
-          6.52
+          5.52
         ],
         [
           12.767,
-          6.981
+          5.981
         ],
         [
           12.692,
-          7.859
+          6.859
         ],
         [
           12.692,
-          8.261
+          7.261
         ],
         [
           11.733,
-          8.261
+          7.261
         ],
         [
           11.733,
-          7.567
+          6.567
         ],
         [
           11.817,
-          7.483
+          6.483
         ],
         [
           11.767,
-          7.064
+          6.064
         ],
         [
           11.9,
-          6.604
+          5.604
         ],
         [
           11.917,
-          6.395
+          5.395
         ],
         [
           12.042,
-          6.228
+          5.228
         ]
       ]
     },
     "statue_2": {
       "box": [
         14.2,
-        5.95,
+        4.95,
         15.42,
-        8.32
+        7.32
       ],
-      "row": 8,
+      "row": 7,
       "static": true,
       "solid": true,
       "mask": "polygon",
       "states": {
         "standing": "painting"
       },
-      "about": "The second statue, its foot on row 8.",
+      "about": "The second statue, its foot on row 7.",
       "polygon": [
         [
           14.708,
-          6.035
+          5.035
         ],
         [
           14.875,
-          6.228
+          5.228
         ],
         [
           14.983,
-          6.437
+          5.437
         ],
         [
           15.067,
-          6.73
+          5.73
         ],
         [
           15.167,
-          6.437
+          5.437
         ],
         [
           15.25,
-          6.144
+          5.144
         ],
         [
           15.35,
-          6.311
+          5.311
         ],
         [
           15.267,
-          6.646
+          5.646
         ],
         [
           15.267,
-          7.023
+          6.023
         ],
         [
           15.208,
-          7.859
+          6.859
         ],
         [
           15.217,
-          8.261
+          7.261
         ],
         [
           14.267,
-          8.261
+          7.261
         ],
         [
           14.267,
-          7.567
+          6.567
         ],
         [
           14.35,
-          7.441
+          6.441
         ],
         [
           14.292,
-          7.023
+          6.023
         ],
         [
           14.417,
-          6.646
+          5.646
         ],
         [
           14.483,
-          6.437
+          5.437
         ],
         [
           14.6,
-          6.253
+          5.253
         ]
       ]
     },
     "statue_3": {
       "box": [
         16.6,
-        6.1,
+        5.1,
         17.8,
-        8.32
+        7.32
       ],
-      "row": 8,
+      "row": 7,
       "static": true,
       "solid": true,
       "mask": "polygon",
       "states": {
         "standing": "painting"
       },
-      "about": "The third statue, its foot on row 8.",
+      "about": "The third statue, its foot on row 7.",
       "polygon": [
         [
           17.167,
-          6.203
+          5.203
         ],
         [
           17.358,
-          6.395
+          5.395
         ],
         [
           17.433,
-          6.604
+          5.604
         ],
         [
           17.567,
-          6.771
+          5.771
         ],
         [
           17.65,
-          6.186
+          5.186
         ],
         [
           17.733,
-          6.353
+          5.353
         ],
         [
           17.708,
-          6.939
+          5.939
         ],
         [
           17.625,
-          7.859
+          6.859
         ],
         [
           17.583,
-          8.261
+          7.261
         ],
         [
           16.683,
-          8.261
+          7.261
         ],
         [
           16.683,
-          7.567
+          6.567
         ],
         [
           16.792,
-          7.483
+          6.483
         ],
         [
           16.733,
-          6.981
+          5.981
         ],
         [
           16.833,
-          6.688
+          5.688
         ],
         [
           16.975,
-          6.479
+          5.479
         ],
         [
           17.0,
-          6.337
+          5.337
         ]
       ]
     },
@@ -368,7 +368,7 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-tunnel-exit.md`, then edited by it without its\n  grid (`game-crossing-nogrid.md`).\n- The corridor beside the statues made three cells wide by\n  `tools/art/repaint.py spaced`.\n- The pale paper round the castle painted as its inside by Gemini from\n  `game-crossing-voids.md` and `game-crossing-voids-more.md`, joined by\n  `tools/art/repaint.py`, and what still was black tiled from the picture's\n  own stones (`tiled`); `game-crossing-voids-top.md` was asked first and kept\n  the paper as the page.\n- A black sliver over the tunnel's arch filled from the pixels round it (`fill`).\n- Its statues and its low arch cut by the polygons traced round them.\n",
+  "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-tunnel-exit.md`, then edited by it without its\n  grid (`game-crossing-nogrid.md`).\n- The corridor beside the statues made three cells wide by\n  `tools/art/repaint.py spaced`.\n- The pale paper round the castle painted as its inside by Gemini from\n  `game-crossing-voids.md` and `game-crossing-voids-more.md`, joined by\n  `tools/art/repaint.py`, and what still was black tiled from the picture's\n  own stones (`tiled`); `game-crossing-voids-top.md` was asked first and kept\n  the paper as the page.\n- A black sliver over the tunnel's arch filled from the pixels round it (`fill`).\n- A third row of floor opened in the corridor of the statues by\n  `tools/art/repaint.py spaced` (`third_row`), its stones the corridor's own.\n- Its statues and its low arch cut by the polygons traced round them.\n",
   "spaced": {
     "about": "The corridor that goes down beside the statues made three cells wide, as its level asks (Dask in its middle, the wizard down the side he does not look at): between rows 8.28 and 12.62, its right wall, its torch and the room beyond moved a cell to the right, and its plain floor stretched.",
     "from": "art/raw/game-crossing/game-crossing-nogrid.png",
@@ -528,5 +528,82 @@
     ],
     "sides": 4,
     "painting": "art/raw/game-crossing/crossing-clean.png"
+  },
+  "third_row": {
+    "about": "A third row of floor in the corridor of the statues, so that a figure passes below Dask (D146): the rooms above the corridor's top wall compressed by a cell, everything from that wall down to the statues' feet moved up a cell, and the band freed under them laid with the corridor's own stones, mirrored at the seam, by tools/art/repaint.py spaced, no model asked.",
+    "from": "art/raw/game-crossing/crossing-clean.png",
+    "columns": [
+      0,
+      20
+    ],
+    "knots": [
+      [
+        0,
+        0
+      ],
+      [
+        4.75,
+        3.75
+      ],
+      [
+        8.28,
+        7.28
+      ],
+      [
+        8.28,
+        8.28
+      ],
+      [
+        15,
+        15
+      ]
+    ],
+    "band": {
+      "old": 8.28,
+      "from": 7.28,
+      "to": 8.3,
+      "columns": [
+        1.2,
+        19.2
+      ],
+      "plain": [
+        [
+          1.15,
+          2.4,
+          "right"
+        ],
+        [
+          11.7,
+          12.95
+        ],
+        [
+          14.2,
+          15.45
+        ],
+        [
+          16.65,
+          17.85
+        ],
+        [
+          18.55,
+          19.25
+        ]
+      ]
+    },
+    "painting": "art/raw/game-crossing/crossing-third-row.png",
+    "kept": [
+      [
+        0,
+        7.28,
+        1.15,
+        8.3
+      ],
+      [
+        19.25,
+        7.28,
+        20,
+        8.3
+      ]
+    ]
   }
 }

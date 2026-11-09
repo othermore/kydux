@@ -252,7 +252,9 @@ changes nothing in the world (D135, D145); a lesson's page that runs its code in
 level after it (D142); doors of two cells (D150), each state of them Gemini's (D148); the cells where the figures walk (D149); a position's two numbers (D153); a teacher who may start anywhere on its patrol, and a level
 played in several ways, which the same program must win in all of them (D51,
 D137); dark rooms whose things are hidden until lit (D52); a hole that opens in the floor, on one cell or two,
-held closed by `osto` (D53, D167); `find_nearest("door")`; scenes and a friend (D65,
+held closed by `osto` (D53, D167), and one that never closes on its own, crossed only with `osto`
+(D178); a goal met by a spell cast, not by the word `cast` (D176); lesson blocks that try an idea
+of the language, never the wizard (D174); `find_nearest("door")`; scenes and a friend (D65,
 D66); and `teacher.can_see` taught in no level of chapters 1 to 3 (D139).
 
 ## Chapter 4 — The broom (`04-the-broom`)

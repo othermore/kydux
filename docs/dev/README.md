@@ -23,7 +23,9 @@ alone pushes or deploys.
   hand-over and the prompt for the programmer), reviews the sprint once
   it is built, and fixes by itself only what is small and safe.
 - **The programmer** builds what the sprint's document says, in its
-  order, one local commit a piece with `ci/check.sh --e2e` green before
-  each, and ends with a report for the owner and a prompt for the
+  order, one local commit a piece with `ci/check.sh` and the browser
+  tests of the files the piece touches green before each, and the whole
+  `ci/check.sh --e2e` once, before the sprint's last commit (the owner,
+  2026-11-09); it ends with a report for the owner and a prompt for the
   designer: the commits, what differs from the plan and why, what to
   look at with care, what is left open.

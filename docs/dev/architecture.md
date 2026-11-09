@@ -882,7 +882,7 @@ one overturns stays, marked as superseded.
   dark is one soft shape over the dark area, faint enough for the painting's
   shapes to show, with a soft light round the wizard.
 - **D53 — A stair comes and goes, and `osto` holds it** (its thing is a hole
-  that opens in the floor: D167). Decided
+  that opens in the floor: D167; one that never closes on its own: D178). Decided
   2026-10-21 (sprint-9.md), built the same day. A thing of kind `stair`,
   with a whole `period`, lies on a floor tile and is in place for
   `period` ticks and away for as many, in place from tick 0. A step onto
@@ -2097,7 +2097,7 @@ one overturns stays, marked as superseded.
   recall it in parentheses (the owner, 2026-11-07, for the whole course). Content tests
   hold it. Rules out mechanics in the fiction and a lesson that names three ideas on
   one page.
-- **D142 — A lesson page runs its code.** Decided 2026-11-07 (the owner's
+- **D142 — A lesson page runs its code (D174 says what its code tries).** Decided 2026-11-07 (the owner's
   suggestion). Any page of a lesson may carry a block fenced `python try`, one a
   page; the page shows it in an editor with a *Run* button, runs it in the
   world of the first level after the lesson, in that level's first way, at its
@@ -2361,7 +2361,7 @@ one overturns stays, marked as superseded.
   farther out, at the first place that overlaps no figure's body, no mark, no label
   placed before it and, for a mark's, no solid pixel of a cut-out, and they are drawn
   last, over everything. Rules out Nuri's label over Teku's figure on P3's plan.
-- **D167 — The thing in the floor is a hole that opens.** Decided 2026-11-08 by the owner
+- **D167 — The thing in the floor is a hole that opens (D178: one of period 0 never closes on its own).** Decided 2026-11-08 by the owner
   (*el dibujo muestra un agujero redondo que aparece y desaparece; cambiemos los textos; en
   el código `hole.closed` o `hole.open`*). The thing's kind is `hole`, in `level.json` and
   in the child's code: closed for `period` ticks and open for as many, from tick 0 closed,
@@ -2413,7 +2413,7 @@ one overturns stays, marked as superseded.
   the dark tunnel hides its figures (D135). The scene keeps a dark room's things unseen until it
   is lit (D52), and the dark room's level asks the steps to be counted from `position`, since
   the key lies on another cell in each way (D153). Amends D163.
-- **D170 — A lesson that teaches a principle runs plain Python.** Decided 2026-11-08 by the
+- **D170 — A lesson that teaches a principle runs plain Python (D174 takes it to every block).** Decided 2026-11-08 by the
   owner (*son lecciones teóricas; no nos hace falta el mago*). A page that teaches `print`, a
   variable or a sum carries a block without the wizard, run in the world of the level after
   the lesson as any block is (D142), what it prints the answer: in chapter 2, *Lo que saben
@@ -2446,10 +2446,80 @@ one overturns stays, marked as superseded.
   drawn deeper than it, as for a figure (D107): of an open door, nothing. *La entrada*'s
   mark on the castle door's threshold, (8, 6), is the one mark on a door's cell in the
   game. Rules out a mark cut by a door that is no longer there.
-- **D173 — A lesson with nothing worth trying has no block.** Decided 2026-11-09 by the
+- **D173 — A lesson with nothing worth trying has no block (D174 says which).** Decided 2026-11-09 by the
   owner (*probar `wizard.sleep()` donde no hay cama no tiene sentido, es forzado*). A
   lesson's *Try it* exists only where running something teaches something (D142); *Cada
   cosa en su sitio* (`the-right-place`) keeps its two pages of words, with no block and no
   `try` in its lesson.json, and its last button, *Seguir* / *Go on*, leads to the level, as
   *Notas*'s does; a content test holds that a lesson's `try` comes only with a block. Rules
   out a block written to have one.
+- **D174 — A lesson's block tries an idea of the language, not the wizard.** Decided
+  2026-11-09 by the owner (*las pruebas de código dentro de las lecciones son sobre todo
+  para probar conceptos de programación complejos, sin pensar en el mago y demás;
+  puntualmente se puede usar algún atributo del mago si lo necesitamos, pero no tiene
+  sentido usar métodos, waits, etc.*). A block (D142) prints a value, keeps one in a
+  variable, adds, compares, chooses with `if` and `else`, counts with `for`; an attribute
+  of the wizard or of a figure, `position`, `facing`, `locked`, appears where the idea
+  needs a value to look at, and a method that gives something back only on the page that
+  teaches that very thing (*Lo que saben las cosas*' last block keeps the nearest door,
+  `find_nearest("door")`, and prints its `locked`). No block moves the wizard, waits, picks
+  up, casts, gives, opens or reveals: those are the levels'. A page whose words only present
+  its block goes with it (D173), a sentence of it that taught something moving to the page
+  before, and the lesson's last button goes on to the level. Chapter 1's first programs,
+  `move_right()`, two lines, an argument, are the one exception: there the block is the
+  idea itself. In chapter 1, *Palabras*, *Cosas que llevar* and *Tu primer hechizo* have no
+  block; in chapter 2, *Lo que saben las cosas* is one lesson of eight pages before *El
+  libro perdido* (*Encontrar cosas* one with it), and *Dar cosas*, *Llaves y puertas* and *Un
+  hechizo que alcanza* have no block; in chapter 3, *Las casillas*, *Esperar*, *Mientras*,
+  *Luz y trampas* and *El portal que no se cierra* have none, *Si*'s prints whether Dask
+  looks up and the wizard's cell, and *Las dos coordenadas*' prints a position's two
+  numbers. The runner still runs what the child types, a walk or a spell. A content test
+  holds the lessons with nothing to try. Rules out a block written to have one, and a
+  lesson of three pages where two are a button.
+- **D175 — The card waits for the words, and the words last as long as they take to
+  read.** Decided 2026-11-09 by the owner (*si hay un diálogo abierto, debería esperar a que
+  se acabe antes de mostrar el cuadro de fin de pantalla, en general, para todas las
+  pantallas*). A bubble or a thought in a level stays for its reading time, 0.8 seconds and
+  50 thousandths more for each of its characters, in ticks of 400 milliseconds, three at
+  least (`readingTicks`): a greeting three ticks, the threshold's sentence of 58 characters
+  ten. Once a run is over, no tick ends them, and each goes when, on the scene's clock, it is
+  read to its end. The outcome's card of a level appears once no bubble and no thought is on
+  the scene: the controller waits for the scene's `settle(won)`, the longer of the
+  celebration of a run won (14.3) and the words read to their end (`Speech.settle`), after a
+  run refused, failed or lost alike; a sleeper's thought, said for ever, is not waited for.
+  In a story a bubble stays until its step ends. Rules out a card over the reason the wizard
+  stopped, and a sentence gone before it is read.
+- **D176 — A bonus for casting a spell is earned by the spell, not by the word `cast`.**
+  Decided 2026-11-09 by the owner (*si he hecho mal el hechizo no debe marcar el bonus
+  extra*). A goal of kind `cast`, `{"kind": "cast", "spell": "orvim"}`, names a known spell
+  and is met at the tick the world notes a `cast` event of it; a spell refused, unknown or
+  with nothing to act on is a `blocked` event and meets nothing. *El pasillo de las puertas*
+  gives its bonus by it, and *El paseo nocturno* has `osto`'s as a goal. `uses` keeps its
+  place for a member read or called, `closed`, `position`, `x`. Rules out a star for a
+  misspelt spell.
+- **D177 — A stop is not an outcome.** Decided 2026-11-09 by the owner (*si hago stop, no
+  debe decir que se ha superado el nivel, debe parar ahí y no evaluar*). *Parar* pressed
+  while the program runs interrupts it; pressed while the scene plays it out, it leaves the
+  figures where they are. Neither shows a card, judges a goal, gives a star or marks the
+  level done: the run's result says who asked for the interrupt (`interrupted_by`, the
+  child or the clock), the controller ends a run the child stopped with no outcome and its
+  status ready, and the editor keeps the child's code for *Ejecutar* to run again from the
+  start; such a run is not counted among the runs before a win for the first-try star
+  (D57), never having been judged. The one stop that keeps its card is the clock's, a
+  program that did nothing for its seconds, with the words it has. Rules out a win card
+  after a stop.
+- **D178 — A hole that never closes on its own, and `osto` the only way across, taught
+  after the `while`.** Decided 2026-11-09 from the owner's question (*había un sitio donde
+  se sujetaba un agujero en el suelo, pero no veo eso en ningún nivel, ¿por qué?*) and their
+  rule (*no quiero que el niño use osto y evite el while*). `osto` is taught once the
+  `while` is practised: *Luz y trampas* teaches `kirra`, `hole.open` and `hole.closed` and no
+  spell for the hole; *El agujero que se abre* does not know `osto`, which is refused there
+  as an unknown spell; a short lesson of its own, *El portal que no se cierra*
+  (`the-portal`, Lesson 11, no block, D174), after the story *Voces en el muro* and before
+  *El paseo nocturno*, teaches it. A hole with `"period": 0` is open from tick 0 and at every
+  tick, a dark portal that never closes by itself, and is closed only while `osto` holds it,
+  from the next tick, for HOLD_TICKS (D167); the page draws it so (`hole.ts`). *El paseo
+  nocturno*'s hole is one: `osto`, cast from the cell above it, is the way across, a goal of
+  the level (D176), and a `while` waiting for it to close ends at the tick limit; the
+  chapter's last level uses both its spells. Rules out a spell taught, summed up in the
+  story, and never cast, and a spell that spares the child the loop.

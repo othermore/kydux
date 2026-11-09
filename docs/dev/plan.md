@@ -599,14 +599,15 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     levels (seven practices, a fix, an improve) taught by Nuri, the wand
     lent, the first spell, and the story up to the castle (`course.md`).
 5.4 Chapter 2, The library (variables, attributes, finding things), in the
-    scene of the library: Wenna's five lessons, whose pages on `print` and the
-    variable run plain Python (D170), eight levels (an improve, a fix), Eldra's
+    scene of the library: the mate's lesson and Wenna's six, whose pages on `print`
+    and the variable run plain Python (D170) and whose blocks try ideas of the
+    language, never the wizard (D174), eight levels (an improve, a fix), Eldra's
     books, locked doors and keys, and the wand bank.
 5.5 Chapter 3, The passages (the cells and `position`, conditions, loops), in seven
     small scenes (D136, `sprint-30.md`, as the owner reads it, `sprint-31.md`, each
     scene's states Gemini's, `sprint-32.md`, the crossing a row lower with its doors as
     painted, `sprint-33.md`, the marks on the floor, `sprint-34.md`, and the hole that
-    opens, `sprint-35.md`): the friend's ten lessons, whose pages run their code (D142),
+    opens, `sprint-35.md`): the friend's eleven lessons, whose pages run their code (D142),
     eleven levels (a fix, an improve), the naughty child's map as a window with the
     scene's plan in ink, drawn as the scene draws it and opened by its spell (D134,
     D143, D151, D159), the dark tunnel (D135, D145, D152), the patrolling teacher
@@ -623,7 +624,12 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     plan's names covering nothing (D166); and, before its release, the last findings of
     chapters 1 and 2 (`sprint-36.md`): the castle's threshold, where the wizard says why it
     does not go in yet (D171), the mark whole in an open doorway (D172), Ilda's good night
-    to the two, and a lesson with nothing worth trying left without a block (D173).
+    to the two, and a lesson with nothing worth trying left without a block (D173); and,
+    after the owner's whole-game pass (`sprint-37.md`), lesson blocks that try ideas of the
+    language and never the wizard (D174), the card that waits for the wizard's words
+    (D175), a bonus earned by the spell cast (D176), a stop that is no outcome (D177), `osto`
+    taught after the `while` in a lesson of its own and needed by the night walk's hole,
+    which never closes (D178).
 5.6 Chapter 4, The broom (lists, functions), in a scene of the broom field
     and the village: flying, the race, an action of the child's own.
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

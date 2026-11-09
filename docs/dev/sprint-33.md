@@ -7,9 +7,14 @@ high, in the wall's foot, and the statues sit higher on the plan than on
 the scene; a figure shows through a statue; in the room of two doors the
 open door changes from one tick to another, is badly drawn at the tick it
 opens and at the run's end, and the wizard walks into the open leaf; the
-way down's double door, opened wide, runs into the side walls. This sprint
-answers each, with one Gemini image (the double door opened less) and no
-other painting.
+way down's double door, opened wide, runs into the side walls. The owner's
+answers of 2026-11-08 add three things: the slab's level gets the periods 5
+and 7 as two more ways, so that no fixed wait found by trial wins; the common
+room's door of the dormitory, whose floor through the doorway does not match
+the room's, is mended if one edit does it cleanly; and the storeroom's open
+leaf is kept, with (9, 13) not walked while it is open. This sprint asks two
+Gemini images at most (the double door opened less, the common room's door
+open) and no other painting.
 
 The pieces, in this order: 33.1 to 33.6. The rules of the earlier sprints
 hold: pieces in order, `ci/check.sh --e2e` green and one local commit per
@@ -85,6 +90,10 @@ test, section 6 the hand-over, section 7 the prompt.
 | 6, 7, 9, 10 | P5 ticks 6, 9, 13; the other way's tick 8 | The open door changes between ticks: hinges on the other side, opened from the other side, badly drawn, as if old. | 33.3 (D156) |
 | 8 | P5 tick 10 | The wizard walks into the open leaf: that cell drawn a little lower. | 33.1, 33.3 (D157) |
 | 11 | P9 tick 5 | The way down's open doors mix with the wall: open them less, and move the wizard toward the middle. | 33.3 (D158) |
+| 12 | Storeroom contact | The half-open door is fine, but (9, 13) must not be walked while it is open. | 33.3 |
+| 13 | S1, step 5 | The common room's door: the floor through the doorway does not quite match the room's; mend it if it is easy and safe. | 33.3 |
+| 14 | P7 (the owner's answer) | Add the periods 5 and 7 as ways, both primes, so that the common number is much harder to find. | 33.2 |
+| 15 | The walkthrough | Not every way needs its route in the captures, so that the document is shorter. | 33.6 |
 
 ## 3. The crossing's levels
 
@@ -138,6 +147,17 @@ down two always (seen at (13, 8) in `looking_down`), the condition on
 `"down"` (caught in both), the body not moved in. The unit tests of
 `test_passages.py` hold both levels; the texts say the cells (33.5).
 
+**P7 `the-moving-slab`, four ways.** `three` (period 3), `four` (4), `five`
+(5) and `seven` (7), the slab at (3, 7) from tick 0 in place as D53 says.
+The wizard is on (2, 7) at tick 2 and `in_place` tells of the next tick: in
+`three` the slab is away at ticks 3 to 5 and the loop waits three; in the
+other three it is in place at tick 3 and the loop waits none. A fixed wait
+*n* before the step onto the slab, at tick 3 + *n*, wins every way first at
+*n* = 29, beyond what a child finds by trial; a unit test holds that every
+*n* from 0 to 28 loses in some way and that the solution wins all four. The
+ways' names: *Cada tres ticks*, *Cada cuatro ticks*, *Cada cinco ticks*,
+*Cada siete ticks* (33.5).
+
 ## 4. The pieces
 
 ### 33.1 The tools
@@ -162,7 +182,8 @@ down two always (seen at (13, 8) in `looking_down`), the condition on
 rows 6 to 8 floor), `scene.json`, `art.json` (the statues on row 5,
 `lowered` row 6, the nudges round the arches on rows 6 to 8), P3 and P4
 as section 3, their wrong programs and tests, the sweep green. The lesson
-*Esperar*'s count (two ticks, seven cells) in 33.5. No image.
+*Esperar*'s count (two ticks, seven cells) in 33.5. P7's two new ways and
+their test (section 3). No image.
 
 ### 33.3 The doors
 
@@ -180,7 +201,19 @@ as section 3, their wrong programs and tests, the sweep green. The lesson
   looked at.
 - The two doors' leaf foot by D157 (33.1), the figure on the touched cell
   drawn 0.3 lower; the walkthrough's tick 10 looked at.
-- Check: `ci/check.sh --e2e`.
+- The storeroom's `store_door`: its open leaf stays (the owner's answer);
+  `covers` is (9, 11), (9, 12) and (9, 13), and the level test holds that
+  (9, 13) is not walked while the door is open.
+- The common room's door of `the-dormitory` (`front_door`, chapter 2):
+  its open state asked of Gemini as an edit of the dormitory's painting
+  (`dormitory-front-door-open.md`: *the same door open, the common room's
+  floor seen through the doorway continuing the floor round it, nothing
+  else changed*), 1 image (+1 retry); the leaf and the doorway by
+  difference against the painting (D148), the old pictures set aside. If
+  neither try keeps the rest of the painting (the difference leaks beyond
+  the door's box), the door stays as it is and the commit says so: the
+  owner accepts it as it is rather than a risk to chapter 2.
+- Check: `ci/check.sh --e2e`, chapter 2's browser tests among them.
 
 ### 33.4 The plan
 
@@ -195,18 +228,21 @@ Brief `chapter-3-crossing-counts.md`: *La salida del túnel* (start two
 cells past the arch, seven cells to the first statue, two ticks), *Junto
 a las estatuas* (Dask in the middle of the gallery below the first two
 statues; the wizard on the row above him, against the statues' bases),
-*Esperar*'s block (`wizard.move_right(7)`); the course book regenerated.
+*Esperar*'s block (`wizard.move_right(7)`), the slab's two new ways'
+names; the course book regenerated.
 
 ### 33.6 The walkthrough and the documents
 
-`npm run walkthrough -- 03-passages` to a new document; `architecture.md`
+The walkthrough takes the route tick by tick of a level's first way only,
+and the won card of every way, so that the document is shorter (the
+owner, 2026-11-08). `npm run walkthrough -- 03-passages` to a new document; `architecture.md`
 D154 to D159 (D149 c and D125 say where D154 and D157 take over);
 `art/README.md` *Where the cells are* with D154 and D157; `plan.md` 5.5;
 the report in Spanish and the prompt for the review.
 
 ## 5. Gemini images
 
-One image and one retry at most: 80 of the chapter's 100.
+Two images and two retries at most: 82 of the chapter's 100.
 
 ## 6. What the owner tries
 
@@ -221,6 +257,10 @@ One image and one retry at most: 80 of the chapter's 100.
    leaf's foot.
 5. *El paseo nocturno*: the double door opened less, within its doorway,
    the wizard passing its middle.
+6. *La losa que va y viene* in four ways; `wait(5)` loses in one of them.
+7. *La sala oscura* with the door open: no one on (9, 13).
+8. *Después del anochecer*, step 5: the common room's floor through the
+   open door, if the edit fitted.
 
 ## 7. What the implementer hands over
 
@@ -253,9 +293,9 @@ Never stop or build into the servers on ports 443 and 5173, and never
 kill a vite, node or nginx process of the owner's (CLAUDE.md); your own
 preview on 4174 is stopped when you are done. D148 holds: Gemini paints
 every state of a scene and nothing the child sees is painted, moved or
-pasted by a tool. Gemini paints at most one image in this sprint and
-one retry, the way down's double door opened less, within the chapter's
-ceiling of 100. Every text the child reads comes from the brief the
+pasted by a tool. Gemini paints at most two images in this sprint and
+two retries, the way down's double door opened less and the common
+room's door open, within the chapter's ceiling of 100. Every text the child reads comes from the brief the
 plan names; you read and correct every draft before it enters content/.
 The plan decides everything; where it does not, take the smallest
 choice that keeps its intent and say it in the commit; a choice that

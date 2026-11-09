@@ -222,7 +222,7 @@ one being the arch into the next.
 | `lesson:the-cells` | Lesson 1 | The map works with a system of coordinates: a cell is named by two numbers, x from the left and y from the top, both from 0; those numbers say how many steps lie between two cells; `wizard.cast("orvim")` opens the plan of the place. | (the spell `orvim`) |
 | `level:the-doors-corridor` | Practice 1 | No mark on the floor: the plan names the tunnel's mouth, and two straight moves walk there; the figures fade as they enter. Bonus: the map opened with its spell. | |
 | `lesson:where-i-am` | Lesson 2 | Nothing is seen in the dark tunnel, and the wizard still knows its own cell: `wizard.position`, x and y, an attribute; `print` shows it; a thing knows its cell too, `key.position`; the program sees what the map does not show. | `wizard.position`, `thing.position` |
-| `level:the-dark-tunnel` | Practice 2 | Played unseen, inside the tunnel: print the position, count on the plan to the tunnel's other end, walk there; nothing is seen to move. Bonus: `position` looked at. | |
+| `level:the-dark-tunnel` | Practice 2 | Played unseen, from a cell the child has not seen (D152): open the map to find the exit, print the position, count the steps and walk there; nothing is seen to move. Bonus: `position` looked at. | |
 | `lesson:waiting` | Lesson 3 | Waiting: `wizard.wait()` lets a tick go by while everything else moves, `wizard.wait(2)` two; its block walks out across the crossing. | `wizard.wait` |
 | `level:the-tunnel-exit` | Practice 3 | `wait` alone (D146): Dask comes up the crossing from the same place every time, looking up; wait two ticks for him to go by, then walk to the first statue. | |
 | `lesson:true-or-false` | Lesson 4 | Five pages, each with code to run: attributes that hold a word, `dask.facing`, `wizard.facing`; comparing with `==`, `True` and `False`; comparing attributes, and an attribute with a literal; `not` says the opposite; a program to change (D139). | `teacher.facing`, `wizard.facing` |
@@ -238,17 +238,18 @@ one being the arch into the next.
 | `level:past-the-teacher` | Practice 6 | Played three ways, Dask a third of his round apart (D137): wait while he faces right, then cross his corridor; no fixed number of waits wins all three. | |
 | `lesson:kirra-and-osto` | Lesson 9 | *Light and slabs*: `kirra` lights a dark room; a slab comes and goes over a hole, `slab.in_place` says whether a step would land on it, `osto` holds it (D138). | `slab.in_place` (and the spells `kirra`, `osto`) |
 | `level:the-moving-slab` | Practice 7 | Played two ways, periods of three and of four: wait `while not slab.in_place`, then cross. Bonus: the code looks at `in_place`. | |
-| `level:the-dark-room` | Practice 8 | A dark room (D52): `kirra`, the key found and its cell printed, walked to, picked up, the door opened from the cell above it. Bonus: the key found with `find_nearest`. | |
+| `lesson:the-two-coordinates` | Lesson 10 | A position's two numbers are its attributes, `position.x` and `position.y`; the steps between two cells are their differences, kept in two variables; its block lights the room and prints both for the key (D153). | `position.x`, `position.y` |
+| `level:the-dark-room` | Practice 8 | A dark room (D52), played three ways with the key on three cells, right of and not above the wizard (D153): `kirra`, the key found, the steps computed from the two numbers, walked, picked up, the door opened from the cell above it, counted the same way. Bonus: `x` used. | |
 | `story:the-voices` | Story 3 | The room lit; the crack in its right wall; a cold voice from the stone and an older pupil's: tomorrow's brooms; we stop it ourselves, and first, back to bed unseen. | |
 | `level:the-night-walk` | Practice 9 | The chapter together, played three ways: a key and its door, a slab, and Dask on his last corridor. | |
 | `story:caught` | Story 4 | Dask steps out of the dark, and lets them go, this once; the chapter's ideas summed up; the secret the three share. | |
 
 The world features chapter 3 needs: the naughty child's map, a thing carried,
 and `orvim`, which works in any level where the map is carried, needed or not,
-opens the plan window and pauses the run (D134, D143); a `reach` goal whose mark is not shown, and one met on the way (D146);
+opens the plan window and pauses the run (D134, D143, D151); a `reach` goal whose mark is not shown, and one met on the way (D146);
 a dark tunnel that hides every figure in it, on the scene and on the plan, and
 changes nothing in the world (D135, D145); a lesson's page that runs its code in the
-level after it (D142); a door opened from its closed picture (D144); a teacher who may start anywhere on its patrol, and a level
+level after it (D142); doors of two cells (D150), each state of them Gemini's (D148); the cells where the figures walk (D149); a position's two numbers (D153); a teacher who may start anywhere on its patrol, and a level
 played in several ways, which the same program must win in all of them (D51,
 D137); dark rooms whose things are hidden until lit (D52); a slab over a hole,
 held by `osto` (D53, D138); `find_nearest("door")`; scenes and a friend (D65,

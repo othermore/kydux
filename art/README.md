@@ -134,20 +134,17 @@ owner on 2026-10-26, for every scene from the dormitory on:
   and `morning-<scene>.png` among the check pictures, every row and thing
   over it, to look at for a night piece left over the day, and the page
   fades the morning in over the night at the dawn (D124).
-- **What a model leaves unpainted round a place is painted as the castle's
-  inside.** A scene asked as a place (D136) may come with black or pale paper
-  round it. `tools/art/repaint.py` paints what is empty (`void`) in one section:
-  the model is given the picture with that part flat, black, or in a dim colour
-  where it keeps black as a gap and pale paper as the page (`flat`), and asked for
-  the tops of thick walls and dim closed rooms, and what it still leaves is laid
-  with the picture's own stones, mirrored so that they meet (`tiled`). Chapter
-  3's scenes are mended so.
-- **A wall may be moved along its rows, or a corridor made wider, without a
-  model** (`repaint.py spaced`): a wall with its door moved whole and the plain
-  floor beside it stretched, where a loop needs its doors evenly apart, or a level
-  needs a third cell across. Its seams lie on the outlines of what is moved. Two knots
-  on one old row leave a band empty, filled with the stones above it mirrored at the
-  seam (`band`): a corridor made a row higher.
+- **What a model leaves unpainted round a place is painted as the castle's inside.** A
+  scene asked as a place (D136) may come with black or pale paper round it. The model keeps
+  plain black as a gap and pale paper as the page, so it is given the picture with that
+  part flat, in a dim colour, and asked for the tops of thick walls and dim closed rooms;
+  the whole picture it answers is what the scene goes on from (D148). The crossing's base is
+  made so.
+- **A wall stays where the model painted it** (D148). A scene whose walls must lie otherwise
+  is asked from a plan on the grid (D102, the crossing), or its base from a picture with
+  the walls where they must be, which the model paints whole (the three doors). A tool that
+  moves a wall or lays stones (`repaint.py spaced`, `tiled`, `placed`, `fill`) makes no
+  picture of a scene the child sees.
 - **Outdoors, the margin is more of the same ground**, woods, rocks and
   fences no one could walk through, as the field's.
 - **A margin painted on later is joined, the painting kept.** For a
@@ -395,26 +392,71 @@ begins, the floor before the door untouched below it; no outline of the
 closed leaf is left at a doorway's foot. To name a cell when something
 looks wrong, open the game with `?debug` (docs/dev/dev-environment.md).
 
-## A door opens from its closed picture
+## How a scene's states are made
 
-A model asked to paint a door open fails in the same few ways: the edge stays shut,
-the floor behind does not match, the leaf is cut by a corner, an arched door comes
-back a plain plank. So a door of a new scene is opened without a model (D144).
-Trace the closed leaf (`door` in the thing's settings: its `polygon`, on the outer
-edge of the leaf's outline, along the arch's inner line and over the hinges' side,
-but not their plates on the jamb), name where it is hung (`hinge`: `left`, `right`
-or `both`, read from its painted hinges and its ring) and the floor of the room
-behind it (`floor_from`, a plain box, wide enough not to show its mirror), and run
-`tools/art/door.py <scene> <door>`. It writes `<door>-doorway.png`, the painting with
-the polygon filled with that floor at the painting's own size, darker toward the
-lintel, and `<door>-open.png`, the closed leaf's own pixels turned about its hinge to
-the other side of it, over the jamb, `swing` as wide, its far edge lifted, with a dark
-line round it and a soft shadow at its foot; and it sets the thing's `without`,
-`box`, open state and `doorway`. Where an arch stands round the door, it stands on the
-row of the wall's foot, not `under`, so that a leaf on that row lies over it and a
-figure before the wall over both; the open state's `row` says that row. Look at
-`doors-<scene>.png`: the same door open as shut, the doorway the floor beyond. A door
-of chapters 1 and 2 is painted shut and open (D116): `doorways` and `swung`.
+Gemini makes the pictures, so that every state of a scene is consistent with the others;
+nothing the child sees is painted, moved or pasted by a tool (D148).
+
+1. **The base.** One edit of the painting: every door's leaf taken away, each doorway open
+   under its arch, the floor beyond running through it to the floor before it with no bar,
+   no line and no sill (`<scene>-base.md`). It is the ground the game draws (`painting` and
+   `ground` in the scene's `cut.json`), and every other picture is an edit of it.
+2. **The states.** The door open is an edit of the base, given a picture of the door shut
+   to see what it looks like (`<scene>-open.md`): the same door, at its full height, swung
+   toward the viewer on its jamb so that it stands beside the opening, its foot on the floor
+   before the wall with both bottom corners drawn, and a soft shadow, no part of it in the
+   opening. One edit may open every door of the scene. A model given a single door may swing
+   it into the opening; a double door's leaves it lays beside the jambs, and a picture of
+   those leaves shows it what is asked. The door shut is the painting itself where the base
+   keeps its arch; where the base's arch is another, it is an edit of the base too
+   (`two-doors-closed.md`).
+3. **The cut-outs of a state.** `tools/art/trace.py <scene> diff <door> <picture> --state
+   <state> --within X0 Y0 X1 Y1` writes the mask into the state: where the picture differs
+   from the base, within the state's own box, read at a narrow smoothing for its edge and a
+   wide one for wood nearly the floor's colour, cleaned of the lines the edit moved, its
+   holes closed. The open leaf's shadow comes with it: give the box room for the shadow to
+   fade, since a box's straight edge shows on it. A state may reach lower than the thing
+   (`reach` in the state) and has its own `row`: an open leaf is drawn on the row of the
+   wall's foot or the next, over the arch and before whoever stands behind it.
+4. **What a figure walks behind.** An edit of the base with the thing gone gives its mask
+   by the same difference (`crossing-gone.md`, the statues and the arches): the statue
+   between its staff and its head is no part of it. Where the thing is nearly the colour of
+   what is painted behind it, or the edit paints the floor round it again, ask for it flat
+   magenta instead (`way-down-arches-marked.md`), each thing to the edge of its stones, and
+   cut with `--threshold 70 --soft 70 --speck 3 --rim`, which adds the outline beside it. A
+   small thing has an edit of its own (`way-down-torch.md`). The mask stands on the row of
+   the thing's foot, `under` where a figure on that row stands under it. A wall's top is a box
+   on its two straight outlines (`"mask": "box"`, `"over": true`): a wall cannot be taken away.
+5. **Look.** `trace.py diff` writes `art/raw/game-check/diff-<scene>-<thing>[-<state>].png`,
+   the mask's edge in magenta. A leak round the box says to look: an edit that changed what
+   it should not, in the mask or beside it, is asked again, three tries at most. Then
+   `export_scene.py`, the sweep, and the `all-`, `sweep-`, `doors-` and `states-` sheets: a
+   leaf whole and the same door open as shut, a doorway showing the floor beyond, no line
+   of the shut door left on an open one, no figure hidden where nothing stands.
+
+A door whose open leaf hides a cell a figure could stand on names it in `covers`: a leaf cut
+by difference is measured on the rows above its own, where a figure on the cell is drawn; a
+figure on the leaf's own row is drawn before it.
+
+A door of chapters 1 and 2 is painted shut and open (D116): `doorways` and `swung`.
+
+## Where the cells are
+
+The cells are where the figures walk (D149).
+
+- **A corridor two cells wide has both columns walked**, each figure in its own. No column
+  is nudged whole, and the settings refuse a nudge over a whole column or row.
+- **Round a door or an arch**, on its cells and the cell before and after them, both columns
+  are drawn toward the opening's middle, 0.2 cell each (`nudged`), so that a figure passes
+  clear of the jambs and the two stay apart. A door is as wide as its cells (`cells` in
+  `scene.json`, D150).
+- **The floor row right under a wall's foot** is drawn 0.3 cell lower (`lowered_rows`), so
+  that a figure on it stands in the corridor and not on the wall.
+- **The row behind a lower wall's top is walked**, the top cut `over` it. Where the wall stands
+  so close that only a hat would show, the row is drawn 0.3 higher (`lowered`, `by` -0.3).
+- **A level starts a cell past an arch**, never in it or on the cell beside its jamb.
+- **A hole keeps its way across**: a cell beside it stays a wall where a child could walk
+  round it.
 
 ## What a painting must keep to
 

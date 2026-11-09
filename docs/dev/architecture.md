@@ -35,7 +35,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 art with its figures sorted by their feet (scene.ts, painted.ts,
                 D76), a painted thing drawn on the tile its level lays it on,
                 in its middle (shift.ts, D85, D109), a figure drawn on its
-                scene's painted strip (depth.ts, D105), the camera's zoom with
+                scene's painted strip (depth.ts, D105, D149), a speaker's bubble
+                clear of the other figures (bubble.ts), the camera's zoom with
                 the buttons and the wheel (zooming.ts, D106), the goal's
                 beating mark and the sealed doors' glow (D79),
                 the wizard casting, a seal breaking and a door opening (D81),
@@ -57,8 +58,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (controller.ts), with its goals panel, outcome card, start and
                 win cards (cards.ts), the zoom box over the scene (zoom.ts), the
                 wizard's notebook with its spells and words (notebook.ts, D80),
-                the naughty child's map open on the scene's plan, drawn in ink (plan.ts,
-                D134, D143), a lesson's code run on its page (lessonrun.ts, D142),
+                the naughty child's map open on the scene's plan, drawn in ink as the
+                scene draws it (plan.ts, D134, D143, D151), a lesson's code run on its page (lessonrun.ts, D142),
                 a level's words with their code shown as code (words.ts, D140),
                 the stars (stars.ts), the screen's guide (guide.ts, D68), and
                 the note on a phone or a tablet that the game is made for a
@@ -121,10 +122,13 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 else and opens its doorways (D88, D108), paints what a model
                 left empty, moves a wall or widens a corridor, and lays stones
                 or a picture in a box (void, spaced, tiled, placed: D136),
-                door.py opens a door from its closed picture (D144), trace.py helps to
-                trace a door's polygons (D113: look, a crop enlarged with a
-                grid and a polygon's points; outline, a first polygon round
-                a leaf; footprint, the doorway's polygon from its fill),
+                door.py opens a door from its closed picture (D144), none of
+                them on a scene of chapter 3 (D148); trace.py cuts a thing's
+                mask as the difference of two of a scene's pictures (diff,
+                D148) and helps to trace a door's polygons (D113: look, a crop
+                enlarged with a grid and a polygon's points; outline, a first
+                polygon round a leaf; footprint, the doorway's polygon from its
+                fill),
                 export_scene.py makes
                 content/art/ and draws each door's states over the
                 painting at three times their size to check (D113) and
@@ -193,6 +197,7 @@ wizard.find_item(kind)       # the thing of a kind it carries, or None (D123)
 wizard.find_all(kind)        # all of them, nearest first, then in reading order
 wizard.has(kind)             # whether it carries one of that kind
 wizard.position              # Position(x, y), which compares as a tuple
+position.x, position.y       # a position's two numbers, its attributes: key.position.x (D153)
 wizard.facing                # "up", "down", "left" or "right"
 wizard.items                 # the things it carries, from the start those of the
                              # level's carrying (D49)
@@ -212,9 +217,9 @@ thing.reveal()               # a tick: its whole outline drawn where it lies, ov
 bed.free                     # whether no one sleeps in it (D84)
 
 door.locked, door.sealed, door.password, door.is_open
-door.open()                  # a tick: from a tile beside it (D24), with its key when
-                             # locked; else blocked, and always for a sealed door or
-                             # one with a password (D43)
+door.open()                  # a tick: from a tile beside any cell of its doorway (D24,
+                             # D150), with its key when locked; else blocked, and always
+                             # for a sealed door or one with a password (D43)
 
 teacher.kind, teacher.name, teacher.position, teacher.facing
 teacher.can_see(target)      # the target straight ahead, within its sight (4 tiles by
@@ -1639,7 +1644,9 @@ one overturns stays, marked as superseded.
   strip's middle less the cell's; the figure's words, its outline and its
   walks follow the drawing, and the sweep draws it there too. The map
   stays the map. Rules out a figure drawn over the trunks it walks beside
-  and a figure half behind a wall it walks along.
+  and a figure half behind a wall it walks along. In chapter 3 the cells are
+  where the figures walk, and only the cells round a door or an arch are nudged
+  (D149).
 - **D106 — The zoom is the child's to set, finely, in every scene, and
   the words on the scene are always readable.** Decided 2026-10-28 by the
   owner. The zoom box (+, −, Find my wizard) is on a story's scene as on
@@ -1699,8 +1706,8 @@ one overturns stays, marked as superseded.
   middle of what is drawn of it put at the middle of that cell, not the
   painted offset carried along, and with the cell's nudge (D105), where a
   figure on it stands; on its painted cell it is drawn as painted. A thing laid on a cell no one walks, under a bookcase, is
-  drawn just under that row's things, hidden in them. Rules out a book
-  that is in one cell and looks to be in the one above.
+  drawn just under that row's things, hidden in them. The cell's nudge is the one D149 gives it.
+  Rules out a book that is in one cell and looks to be in the one above.
 - **D110 — The child sees where a thing is; its numbers wait.** Decided
   2026-10-28 by the owner. In chapter 2 no text prints or speaks of a
   position: the grid's numbers mean nothing to a child who does not see
@@ -1798,7 +1805,7 @@ one overturns stays, marked as superseded.
   (`doors-<scene>.png`) is looked at there first. Rules out a door painted
   shut alone and opened by an edit, and an open doorway showing the floor
   of the room the viewer stands in.
-  Chapter 3's doors are opened from their closed picture instead (D144).
+  Chapter 3's doors are Gemini's edits of a base without them (D148).
 - **D117 — Figures that go together move together in a story.** Decided
   2026-10-29 by the owner. A story's step stages every figure that moves
   at that moment at once, as the page can play them (D103): three who
@@ -2092,7 +2099,7 @@ one overturns stays, marked as superseded.
   lesson's last page keeps the button that leads to the level, which never
   starts with the block (D63). Rules out a lesson that explains an expression
   and never lets the child print one.
-- **D143 — The plan is the scene's own picture in ink.** Decided 2026-11-07 (the
+- **D143 — The plan is the scene's own picture in ink (D151 says where it draws what).** Decided 2026-11-07 (the
   owner: the plan must show walls, doors and rooms, the figures as themselves,
   the mark as a mark, and match the scene). The plan's window (D134) draws the
   scene's ground picture through an ink-on-parchment filter on the page's side:
@@ -2109,7 +2116,8 @@ one overturns stays, marked as superseded.
   taps. What is unlit in a dark room stays undrawn (D52). No Gemini image. Rules
   out a hatched grid, numbers in every cell, and an old-map painting asked of the
   model, which cannot match the scene cell for cell.
-- **D144 — A door's open state is built from its closed one.** Decided 2026-11-07
+- **D144 — A door's open state is built from its closed one, on no scene the child
+  sees: D148 takes over.** Decided 2026-11-07
   (the owner: a reliable method for doors, which fail every time).
   `tools/art/door.py` makes the open picture of a door from the painting alone:
   the doorway is the closed leaf's traced polygon (D113) filled with the floor
@@ -2152,3 +2160,70 @@ one overturns stays, marked as superseded.
   both; a walking frame is made from it (`figures.py`). Dask's and Wenna's sheets are
   made from drawings of them standing still in the four views (`figures.py
   --standing`). Rules out a figure who stands still with a foot in the air.
+- **D148 — Every state of a scene is painted by Gemini from one base, and every cut-out
+  is the difference between two of its pictures.** Decided 2026-11-08 by the owner (*no
+  debemos pintar ni reconstruir escenarios; Gemini hace las imágenes, así son
+  consistentes*). A scene's base is its painting with nothing in it that comes and goes:
+  no door leaf, each doorway open with the floor beyond running through it. Every other
+  state is an edit of the base asked of the model: the door open, its leaf swung toward
+  the viewer beside the doorway, and the door closed, where the painting's own door fits
+  the arch the base keeps, or else an edit of its own. A cut-out is where that picture
+  differs from the base (`trace.py diff`): the colour distance read at a narrow smoothing
+  for its edge and a wide one for what is nearly the floor's colour, cleaned of the lines
+  an edit moved, its holes closed, kept within the thing's box. A thing the model cannot
+  take away cleanly, or whose stones are nearly the colour of what lies behind them, an
+  arch, is asked of the model flat magenta instead, and takes the outline beside it
+  (`--rim`): the difference is then the thing to the pixel. A wall's top, which cannot be
+  taken away, is a box on its two straight outlines. The ground the game draws is the
+  base; what stands or lies in the scene is a cut-out over it at its row; what a figure
+  walks behind is a cut-out on its foot's row or `over`. A try whose edit changed what it
+  should not, in the mask or beside it, is asked again, three tries at most. A key and a
+  slab's hole stay the pictures they were cut from. Rules out `door.py`'s open leaf,
+  `repaint.py spaced`, `tiled`, `placed` and `fill` on a scene the child sees, and a
+  polygon traced by eye where a difference can be had; those tools stay for the sheets and
+  for chapter 2, which the owner has accepted.
+- **D149 — The cells are where the figures walk.** Decided 2026-11-08 by the owner. (a) A
+  corridor two cells wide has both columns walked, each figure in its own; no column is
+  nudged whole, and the settings refuse a nudge over a whole column or row. (b) Only on
+  the cells of a door or an arch and the cell before and after them, both columns are
+  drawn toward the opening's middle, by 0.2 cell each, so that a figure passes clear of
+  the jambs and the two columns stay apart. Where an open leaf stands in the doorway, the
+  column beside it moves less (0.1 at the storeroom's door). (c) The floor row right under
+  a wall's foot is drawn 0.3 cell lower (`lowered_rows`). (d) The row at the bottom of a
+  corridor where the lower wall's face is painted is walked, the wall's top cut `over` the
+  figures on it, and where that wall stands so close that only a hat would show, the row
+  is drawn 0.3 higher. (e) A level starts a cell past an arch, never in it or on the cell
+  beside its jamb. (f) The plan and the goal's mark draw at the same nudged place as a
+  figure on the cell (D151). A cell beside a hole stays a wall where a child could walk
+  round it, the slab's lesson lost. Rules out a column nudged whole to a corridor's middle,
+  and a figure whose head lies on the wall above it.
+- **D150 — A door is as wide as the cells its leaf closes.** Decided 2026-11-08. A door's
+  `cells` in `scene.json` lists the one or two cells of its doorway; shut, it blocks them
+  all; open, it frees them all, but for those its leaf covers (D125); `open()` is asked
+  from any cell beside any of them; `at` is the first. The plan and the level's things draw
+  one door. A leaf cut by difference is measured on the rows above its own, whose figures
+  it hides, where a figure on the cell is drawn; a figure on its own row is drawn before
+  it. Rules out a doorway two cells wide with one of them a wall.
+- **D151 — The plan draws what the scene draws.** Decided 2026-11-08 by the owner. The plan
+  (D143) draws the figures and the marks at their nudged places, and the figures behind
+  the same cut-outs as the scene, each at the scene's depth and inked with the ground (Dask
+  under the arch he stands in, a figure behind a statue); every reach mark with its cell
+  written beside it, `(15, 3)`, as a figure's name is; and the grid as ink lines on every
+  floor cell's edges, fainter over the walls, so that a child counts cells without numbers
+  in them. A goal's mark is drawn over the arch of its own row, on the scene and on the
+  plan, so that it is seen. Rules out a plan where the grid is read only from the numbers at
+  its edges.
+- **D152 — The dark tunnel's level starts where the child cannot know.** Decided 2026-11-08
+  by the owner. *El túnel oscuro* starts at (14, 2), a cell the child has not seen, not
+  where *El pasillo de las puertas* ended; its goal names no cell: the exit is found on the
+  plan, so the level is played by opening the map (in the lesson's block or in the program)
+  and looking at the wizard's position. Rules out a start the child remembers from the level
+  before.
+- **D153 — The dark room teaches the two numbers of a position.** Decided 2026-11-08 by the
+  owner. A position's two numbers are its attributes `x` and `y` (`key.position.x`); the
+  steps between two cells are the difference of their `x` and of their `y`, kept in two
+  variables; a lesson *Las dos coordenadas* (`lesson:the-two-coordinates`) before *La sala
+  oscura* recalls the system of coordinates and teaches it; the level is played in three
+  ways with the key on three cells, always right of and not above the wizard, so that the
+  differences are never below zero, and the walk to the door is counted the same way. Rules
+  out a key whose cell the child reads off the plan and types.

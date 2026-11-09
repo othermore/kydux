@@ -109,7 +109,7 @@
     "title": "The naughty child's map",
     "legend": "A cell is two numbers: x counts from the left, y from the top, and both start at 0.",
     "close": "Close the map",
-    "enchanted": "enchanted"
+    "tunnel": "dark tunnel"
   },
   "guide": {
     "next": "Next",
@@ -408,7 +408,7 @@
     },
     "blocked": "Not walked on",
     "leaf": "Not walked on while its door is open",
-    "enchanted": "Enchanted: no figure is seen on it",
+    "enchanted": "Dark tunnel: no figure is seen on it",
     "kinds": {
       "wall": "Wall",
       "floor": "Floor",

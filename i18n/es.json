@@ -109,7 +109,7 @@
     "title": "El mapa del niño travieso",
     "legend": "Una casilla son dos números: la x cuenta desde la izquierda, la y desde arriba, y las dos empiezan en 0.",
     "close": "Cerrar el mapa",
-    "enchanted": "encantado"
+    "tunnel": "túnel oscuro"
   },
   "guide": {
     "next": "Siguiente",
@@ -408,7 +408,7 @@
     },
     "blocked": "No se pisa",
     "leaf": "No se pisa con su puerta abierta",
-    "enchanted": "Encantada: aquí no se ve a nadie",
+    "enchanted": "Túnel oscuro: aquí no se ve a nadie",
     "kinds": {
       "wall": "Muro",
       "floor": "Suelo",

@@ -1,13 +1,14 @@
-// The naughty child's map, open (D134): a window over the level with the scene's
-// plan, drawn by the page from the level's map, its things and its figures at the
-// tick shown, like an old map in ink on parchment: walls hatched, floor pale,
-// furniture cross-hatched, a door a bar when shut and a quarter arc when open, every
-// column and row numbered at the edges and each floor cell's numbers small inside
-// it, and the wizard, every figure and every thing with its name and its cell.
-// What lies unlit in a dark room (D52) and anyone in an enchanted region (D135) are
-// left out. Its button or Escape closes it, and the playback goes on.
+// The naughty child's map, open (D134, D143): a window over the level with the scene's
+// own picture drawn in ink on parchment (greys lifted to parchment, lines darkened,
+// colour taken out), the cell grid over it, every door as the scene shows it at this
+// tick, the figures with their own standing sprites and their names and cells beside
+// them, every reach mark with the mark's picture, the hidden ones too, the dark tunnel's
+// cells as a dotted path, the column and row numbers along the four edges, and a cell's
+// own numbers where the pointer rests or a finger taps. What lies unlit in a dark room
+// stays undrawn (D52), and no one in the dark tunnel is drawn (D135). Its button or
+// Escape closes it, and the playback goes on.
 
-import type { PlanView, Tile } from '../engine/layout';
+import type { PlanPictures, PlanView, Tile } from '../engine/layout';
 import { characterName, forWizard, t } from '../i18n';
 import { element } from './dom';
 
@@ -20,6 +21,10 @@ export interface PlanShapes {
   doors: { id: string; x: number; y: number; open: boolean; across: boolean }[];
   things: { id: string; x: number; y: number }[];
   figures: { id: string; kind: string; x: number; y: number; facing: string }[];
+  /** Every reach mark's cell, the hidden ones too. */
+  marks: { x: number; y: number }[];
+  /** The cells of what is still dark, walls and furniture too, which stay undrawn (D52). */
+  unlit: { x: number; y: number }[];
 }
 
 const key = ([x, y]: Tile): string => `${x},${y}`;
@@ -65,7 +70,9 @@ export function planShapes(view: PlanView): PlanShapes {
   const figures = view.figures
     .filter((figure) => !enchanted.has(key(figure.tile)))
     .map(({ id, kind, tile: [x, y], facing }) => ({ id, kind, x, y, facing }));
-  return { columns: view.rows[0]?.length ?? 0, height: view.rows.length, cells, doors, things, figures };
+  const marks = view.marks.map(([x, y]) => ({ x, y }));
+  const dark = view.unlit.map(([x, y]) => ({ x, y }));
+  return { columns: view.rows[0]?.length ?? 0, height: view.rows.length, cells, doors, things, figures, marks, unlit: dark };
 }
 
 /** Where a figure's or a thing's name and cell are written, each clear of those
@@ -109,124 +116,199 @@ export function labelBoxes(
   });
 }
 
-const PARCHMENT = '#ecdcb4';
-const FLOOR = '#f6ecd2';
-const WALL = '#8a7350';
-const INK = '#3f2c1a';
-const DOOR = '#6e3f1b';
-const UNLIT = '#a9a59a';
-const WIZARD = '#a3271d';
-const FRIEND = '#c98a1c';
-const TEACHER = '#27405f';
-/** The gutter round the plan, for its numbers, in cells. */
-const GUTTER = 0.8;
+/** The parchment and the ink, as colours and as their channels. */
+const PARCHMENT: Rgb = [236, 220, 180];
+const INK: Rgb = [63, 44, 26];
+type Rgb = [number, number, number];
+const css = ([r, g, b]: Rgb, alpha = 1): string => `rgb(${r} ${g} ${b} / ${alpha})`;
+/** The gutter round the plan, for its numbers, in pixels at the least and in cells. */
+const GUTTER_LEAST = 28;
+const GUTTER = 0.72;
+/** The numbers along the plan's edges, in pixels. */
+const EDGE_NUMBER = 18;
+/** How far round a pixel the ink filter takes the mean, in cells; how much of the
+ * difference from it is a line; how light the darkest tone of the picture is drawn, and
+ * how far toward the ink a line goes. */
+const INK_REACH = 0.14;
+const INK_LINES = 7;
+const INK_FLOOR = 0.58;
+const INK_LINE = 0.92;
 
-/** Lines at a slant across a cell, cut to it; `both` crosses them. */
-function hatch(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, step: number, both: boolean): void {
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(x, y, size, size);
-  ctx.clip();
-  ctx.beginPath();
-  for (let offset = -size; offset < size; offset += step) {
-    ctx.moveTo(x + offset, y);
-    ctx.lineTo(x + offset + size, y + size);
-    if (both) {
-      ctx.moveTo(x + offset + size, y);
-      ctx.lineTo(x + offset, y + size);
+/** A square mean of `values`, `reach` pixels each way, by rows and then by columns. */
+function meaned(values: Float32Array, width: number, height: number, reach: number): Float32Array {
+  const through = (source: Float32Array, length: number, lines: number, at: (line: number, i: number) => number) => {
+    const out = new Float32Array(source.length);
+    for (let line = 0; line < lines; line += 1) {
+      let sum = 0;
+      for (let i = -reach; i <= reach; i += 1) sum += source[at(line, Math.max(0, Math.min(length - 1, i)))] ?? 0;
+      for (let i = 0; i < length; i += 1) {
+        out[at(line, i)] = sum / (reach * 2 + 1);
+        sum += (source[at(line, Math.min(length - 1, i + reach + 1))] ?? 0) - (source[at(line, Math.max(0, i - reach))] ?? 0);
+      }
     }
-  }
-  ctx.stroke();
-  ctx.restore();
-}
-
-/** The parchment's stains, the same every time, darker at the edges. */
-function parchment(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-  ctx.fillStyle = PARCHMENT;
-  ctx.fillRect(0, 0, width, height);
-  let seed = 7;
-  const next = () => {
-    seed = (seed * 16807) % 2147483647;
-    return seed / 2147483647;
+    return out;
   };
-  for (let i = 0; i < 90; i += 1) {
-    ctx.fillStyle = `rgb(120 90 40 / ${0.015 + next() * 0.03})`;
-    ctx.beginPath();
-    ctx.arc(next() * width, next() * height, 8 + next() * 46, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  const edge = ctx.createRadialGradient(width / 2, height / 2, Math.min(width, height) * 0.45, width / 2, height / 2, Math.max(width, height) * 0.72);
-  edge.addColorStop(0, 'rgb(90 60 20 / 0)');
-  edge.addColorStop(1, 'rgb(90 60 20 / 0.28)');
-  ctx.fillStyle = edge;
-  ctx.fillRect(0, 0, width, height);
+  const across = through(values, width, height, (line, i) => line * width + i);
+  return through(across, height, width, (line, i) => i * width + line);
 }
 
-/** The plan drawn on a canvas's context, `cell` pixels a cell. */
-export function drawPlan(
-  ctx: CanvasRenderingContext2D,
-  shapes: PlanShapes,
-  cell: number,
-  words: { enchanted: string; name: (id: string) => string },
-): void {
-  const gutter = cell * GUTTER;
-  const width = shapes.columns * cell + gutter * 2;
-  const height = shapes.height * cell + gutter * 2;
-  parchment(ctx, width, height);
-  ctx.lineCap = 'round';
-  const left = (x: number) => gutter + x * cell;
-  const top = (y: number) => gutter + y * cell;
-  const small = Math.max(7, cell * 0.2);
-  const kindAt = new Map(shapes.cells.map(({ x, y, kind }) => [`${x},${y}`, kind]));
-  for (const { x, y, kind } of shapes.cells) {
-    ctx.fillStyle = kind === 'wall' ? WALL : kind === 'unlit' ? UNLIT : FLOOR;
-    ctx.fillRect(left(x), top(y), cell, cell);
-    ctx.strokeStyle = INK;
-    if (kind === 'wall') {
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.45;
-      hatch(ctx, left(x), top(y), cell, cell / 3.5, false);
-    } else if (kind === 'furniture') {
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.6;
-      hatch(ctx, left(x), top(y), cell, cell / 4, true);
-    } else if (kind === 'enchanted') {
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.28;
-      hatch(ctx, left(x), top(y), cell, cell / 5, false);
-    }
-    ctx.globalAlpha = 1;
+/** A picture's RGBA pixels drawn in ink on parchment, in place (D143): its tones from
+ * the mean round each pixel, stretched between the picture's darkest and lightest so
+ * that a scene at night reads as well as one by day, its lines darkened from what is
+ * darker than that mean, and its colour taken out. */
+export function inked(pixels: Uint8ClampedArray, width: number, height: number, cell: number): void {
+  const light = new Float32Array(width * height);
+  for (let i = 0; i < light.length; i += 1) {
+    const r = pixels[i * 4] ?? 0;
+    const g = pixels[i * 4 + 1] ?? 0;
+    const b = pixels[i * 4 + 2] ?? 0;
+    light[i] = (0.3 * r + 0.59 * g + 0.11 * b) / 255;
   }
-  // The grid over what is walked on, and the line where a wall begins.
-  for (const { x, y, kind } of shapes.cells) {
-    if (kind === 'wall') continue;
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 0.6;
-    ctx.globalAlpha = 0.45;
-    ctx.strokeRect(left(x) + 0.5, top(y) + 0.5, cell, cell);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = INK;
-    ctx.font = `${small}px Georgia, serif`;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText(`${x},${y}`, left(x) + 2, top(y) + 2);
-    ctx.lineWidth = Math.max(1.5, cell * 0.05);
+  const mean = meaned(light, width, height, Math.max(1, Math.round(cell * INK_REACH)));
+  const sorted = Float32Array.from(mean).sort();
+  const low = sorted[Math.floor(sorted.length * 0.03)] ?? 0;
+  const high = sorted[Math.floor(sorted.length * 0.97)] ?? 1;
+  const span = Math.max(1e-3, high - low);
+  for (let i = 0; i < light.length; i += 1) {
+    const here = mean[i] ?? 0;
+    const line = (light[i] ?? 0) - here;
+    const tone = Math.min(1, Math.max(0, (here - low) / span));
+    const dark = Math.min(1, Math.max(0, -line * INK_LINES));
+    const glow = Math.min(0.08, Math.max(0, line * 1.2));
+    const value = Math.min(1, (INK_FLOOR + (1 - INK_FLOOR) * tone) * (1 - dark * INK_LINE) + glow);
+    for (const channel of [0, 1, 2] as const) {
+      pixels[i * 4 + channel] = (INK[channel] ?? 0) + ((PARCHMENT[channel] ?? 0) - (INK[channel] ?? 0)) * value;
+    }
+    pixels[i * 4 + 3] = 255;
+  }
+}
+
+/** The pictures the plan is drawn from, once loaded. */
+export interface PlanLoaded {
+  ground: HTMLImageElement;
+  doors: { image: HTMLImageElement; left: number; top: number }[];
+  figures: Map<string, HTMLImageElement>;
+}
+
+/** The scene's picture with its doors as they are, in ink, at `cell` pixels a cell;
+ * what lies unlit undrawn, plain parchment. */
+function inkedScene(pictures: PlanPictures, loaded: PlanLoaded, shapes: PlanShapes, cell: number): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(shapes.columns * cell);
+  canvas.height = Math.round(shapes.height * cell);
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) return canvas;
+  const scale = cell / pictures.cell;
+  const [ox, oy] = pictures.origin;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(loaded.ground, -ox * scale, -oy * scale, loaded.ground.width * scale, loaded.ground.height * scale);
+  for (const { image, left, top } of loaded.doors) {
+    ctx.drawImage(image, left * scale, top * scale, image.width * scale, image.height * scale);
+  }
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  inked(data.data, canvas.width, canvas.height, cell);
+  ctx.putImageData(data, 0, 0);
+  ctx.fillStyle = css(PARCHMENT);
+  for (const { x, y } of shapes.unlit) ctx.fillRect(x * cell, y * cell, cell, cell);
+  return canvas;
+}
+
+/** The margin of the plan, in pixels, from its cell. */
+function gutterOf(cell: number): number {
+  return Math.max(GUTTER_LEAST, cell * GUTTER);
+}
+
+/** The mark of a reach goal, as the scene draws it (painted.drawMark). */
+function drawGoal(ctx: CanvasRenderingContext2D, cx: number, cy: number, cell: number): void {
+  ctx.fillStyle = 'rgb(255 224 102 / 0.55)';
+  ctx.beginPath();
+  ctx.arc(cx, cy, cell * 0.32, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#ffc61a';
+  ctx.lineWidth = Math.max(2, cell * 0.06);
+  ctx.beginPath();
+  ctx.arc(cx, cy, cell * 0.36, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = css(INK, 0.7);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(cx, cy, cell * 0.39, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+/** The dark tunnel's cells: a dotted line round them and a dot in each. */
+function drawTunnel(ctx: CanvasRenderingContext2D, shapes: PlanShapes, cell: number, left: (x: number) => number, top: (y: number) => number): void {
+  const inside = new Set(shapes.cells.filter(({ kind }) => kind === 'enchanted').map(({ x, y }) => `${x},${y}`));
+  ctx.strokeStyle = css(INK);
+  ctx.lineWidth = Math.max(1.5, cell * 0.05);
+  ctx.setLineDash([cell * 0.14, cell * 0.14]);
+  for (const key of inside) {
+    const [x = 0, y = 0] = key.split(',').map(Number);
     for (const [dx, dy, x0, y0, x1, y1] of [
       [-1, 0, 0, 0, 0, 1],
       [1, 0, 1, 0, 1, 1],
       [0, -1, 0, 0, 1, 0],
       [0, 1, 0, 1, 1, 1],
     ] as const) {
-      if (kindAt.get(`${x + dx},${y + dy}`) !== 'wall' && kindAt.has(`${x + dx},${y + dy}`)) continue;
+      if (inside.has(`${x + dx},${y + dy}`)) continue;
       ctx.beginPath();
       ctx.moveTo(left(x + x0), top(y + y0));
       ctx.lineTo(left(x + x1), top(y + y1));
       ctx.stroke();
     }
   }
+  ctx.setLineDash([]);
+  ctx.fillStyle = css(INK, 0.75);
+  for (const key of inside) {
+    const [x = 0, y = 0] = key.split(',').map(Number);
+    ctx.beginPath();
+    ctx.arc(left(x) + cell / 2, top(y) + cell / 2, Math.max(1.5, cell * 0.05), 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+/** The plan drawn on a canvas's context, `cell` pixels a cell; `scene`, the scene's
+ * picture in ink, or none while it loads or for a scene without art. */
+export function drawPlan(
+  ctx: CanvasRenderingContext2D,
+  shapes: PlanShapes,
+  cell: number,
+  words: { tunnel: string; name: (id: string) => string },
+  scene: HTMLCanvasElement | null,
+  pictures: PlanPictures | null,
+  loaded: PlanLoaded | null,
+): void {
+  const gutter = gutterOf(cell);
+  const width = shapes.columns * cell + gutter * 2;
+  const height = shapes.height * cell + gutter * 2;
+  ctx.fillStyle = css(PARCHMENT);
+  ctx.fillRect(0, 0, width, height);
+  const left = (x: number) => gutter + x * cell;
+  const top = (y: number) => gutter + y * cell;
+  if (scene) ctx.drawImage(scene, gutter, gutter, shapes.columns * cell, shapes.height * cell);
+  else {
+    for (const { x, y, kind } of shapes.cells) {
+      if (kind !== 'wall') continue;
+      ctx.fillStyle = css(INK, 0.35);
+      ctx.fillRect(left(x), top(y), cell, cell);
+    }
+  }
+  // The grid over the picture, at the scene's cells.
+  ctx.strokeStyle = css(INK, 0.28);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let x = 0; x <= shapes.columns; x += 1) {
+    ctx.moveTo(left(x) + 0.5, top(0));
+    ctx.lineTo(left(x) + 0.5, top(shapes.height));
+  }
+  for (let y = 0; y <= shapes.height; y += 1) {
+    ctx.moveTo(left(0), top(y) + 0.5);
+    ctx.lineTo(left(shapes.columns), top(y) + 0.5);
+  }
+  ctx.stroke();
   // Every column along the top and the bottom, every row along the left and the right.
-  ctx.fillStyle = INK;
-  ctx.font = `bold ${Math.max(9, cell * 0.32)}px Georgia, serif`;
+  ctx.fillStyle = css(INK);
+  ctx.font = `bold ${EDGE_NUMBER}px Georgia, serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   for (let x = 0; x < shapes.columns; x += 1) {
@@ -237,39 +319,37 @@ export function drawPlan(
     ctx.fillText(String(y), gutter / 2, top(y) + cell / 2);
     ctx.fillText(String(y), width - gutter / 2, top(y) + cell / 2);
   }
-  // The doors, a bar on the cell while shut, a quarter arc once open.
-  for (const door of shapes.doors) {
-    const cx = left(door.x) + cell / 2;
-    const cy = top(door.y) + cell / 2;
-    ctx.strokeStyle = DOOR;
-    ctx.fillStyle = DOOR;
-    if (door.open) {
-      ctx.lineWidth = Math.max(1.5, cell * 0.07);
+  drawTunnel(ctx, shapes, cell, left, top);
+  for (const { x, y } of shapes.marks) drawGoal(ctx, left(x) + cell / 2, top(y) + cell / 2, cell);
+  // The figures as themselves, each on its cell, its feet as the scene puts them.
+  for (const figure of shapes.figures) {
+    const sheet = loaded?.figures.get(figure.id);
+    const about = pictures?.figures.find((one) => one.id === figure.id);
+    if (sheet && about) {
+      const scale = cell / about.cell;
+      const [frameWidth, frameHeight] = about.frame;
+      const row = about.rows[figure.facing] ?? 0;
+      const [wide, tall] = [frameWidth * scale, frameHeight * scale];
+      const feet = top(figure.y) + cell * FOOT_ON_THE_PLAN + about.foot * scale;
+      ctx.drawImage(sheet, about.column * frameWidth, row * frameHeight, frameWidth, frameHeight, left(figure.x) + cell / 2 - wide / 2, feet - tall, wide, tall);
+    } else {
+      ctx.fillStyle = css(INK);
       ctx.beginPath();
-      if (door.across) {
-        ctx.moveTo(left(door.x), cy);
-        ctx.lineTo(left(door.x), cy - cell * 0.8);
-        ctx.arc(left(door.x), cy, cell * 0.8, -Math.PI / 2, -0.06);
-      } else {
-        ctx.moveTo(cx, top(door.y));
-        ctx.lineTo(cx + cell * 0.8, top(door.y));
-        ctx.arc(cx, top(door.y), cell * 0.8, 0, Math.PI / 2 - 0.06);
-      }
-      ctx.stroke();
-    } else if (door.across) ctx.fillRect(left(door.x), cy - cell * 0.1, cell, cell * 0.2);
-    else ctx.fillRect(cx - cell * 0.1, top(door.y), cell * 0.2, cell);
+      ctx.arc(left(figure.x) + cell / 2, top(figure.y) + cell / 2, cell * 0.27, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
-  // The enchanted region, named once, in its largest box.
-  const charmed = shapes.cells.filter((one) => one.kind === 'enchanted');
-  const middle = charmed[Math.floor(charmed.length / 2)];
-  // The marks and their words, each clear of the others'.
-  const font = `${Math.max(9, cell * 0.27)}px Georgia, serif`;
+  for (const thing of shapes.things) {
+    ctx.fillStyle = css(INK);
+    ctx.fillRect(left(thing.x) + cell * 0.37, top(thing.y) + cell * 0.37, cell * 0.26, cell * 0.26);
+  }
+  // The names and cells, each clear of the others'; the tunnel's name, once.
+  const font = `${Math.max(11, cell * 0.3)}px Georgia, serif`;
   ctx.font = font;
-  const tall = Math.max(11, cell * 0.34);
+  const tall = Math.max(14, cell * 0.38);
   const named = [
-    ...shapes.figures.map((figure) => ({ ...figure, thing: false })),
-    ...shapes.things.map((thing) => ({ ...thing, kind: 'thing', facing: '', thing: true })),
-    ...shapes.doors.map((door) => ({ id: door.id, kind: 'door', facing: '', x: door.x, y: door.y, thing: true })),
+    ...shapes.figures.map((figure) => ({ id: figure.id, x: figure.x, y: figure.y })),
+    ...shapes.things.map((thing) => ({ id: thing.id, x: thing.x, y: thing.y })),
   ];
   const says = named.map((one) => `${words.name(one.id)} (${one.x}, ${one.y})`);
   const places = labelBoxes(
@@ -278,64 +358,65 @@ export function drawPlan(
       y: top(one.y) + cell / 2,
       width: ctx.measureText(says[index] ?? '').width + 8,
       height: tall,
-      reach: cell * 0.42,
+      reach: cell * 0.5,
     })),
     { width, height },
   );
-  for (const one of named) {
-    const cx = left(one.x) + cell / 2;
-    const cy = top(one.y) + cell / 2;
-    if (one.kind === 'door') continue;
-    if (one.thing) {
-      ctx.fillStyle = INK;
-      ctx.fillRect(cx - cell * 0.13, cy - cell * 0.13, cell * 0.26, cell * 0.26);
-      continue;
-    }
-    ctx.fillStyle = one.id === 'wizard' ? WIZARD : one.kind === 'teacher' ? TEACHER : FRIEND;
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = Math.max(1, cell * 0.03);
-    ctx.beginPath();
-    ctx.arc(cx, cy, cell * 0.27, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    if (one.kind === 'teacher') {
-      const [dx, dy] = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] }[one.facing] ?? [0, 1];
-      const [dx0, dy0] = [dx ?? 0, dy ?? 0];
-      const [tipX, tipY] = [cx + dx0 * cell * 0.62, cy + dy0 * cell * 0.62];
-      ctx.strokeStyle = TEACHER;
-      ctx.lineWidth = Math.max(1.5, cell * 0.07);
-      ctx.beginPath();
-      ctx.moveTo(cx + dx0 * cell * 0.27, cy + dy0 * cell * 0.27);
-      ctx.lineTo(tipX, tipY);
-      ctx.moveTo(tipX, tipY);
-      ctx.lineTo(tipX - dx0 * cell * 0.14 - dy0 * cell * 0.12, tipY - dy0 * cell * 0.14 - dx0 * cell * 0.12);
-      ctx.moveTo(tipX, tipY);
-      ctx.lineTo(tipX - dx0 * cell * 0.14 + dy0 * cell * 0.12, tipY - dy0 * cell * 0.14 + dx0 * cell * 0.12);
-      ctx.stroke();
-    }
-  }
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.font = font;
   named.forEach((_, index) => {
     const place = places[index];
     const said = says[index];
     if (!place || !said) return;
-    ctx.fillStyle = 'rgb(246 236 210 / 0.92)';
+    ctx.fillStyle = css(PARCHMENT, 0.92);
     ctx.fillRect(place.x, place.y, ctx.measureText(said).width + 8, tall);
-    ctx.fillStyle = INK;
+    ctx.fillStyle = css(INK);
     ctx.fillText(said, place.x + 4, place.y + tall / 2);
   });
+  const tunnel = shapes.cells.filter(({ kind }) => kind === 'enchanted');
+  const middle = tunnel[Math.floor(tunnel.length / 2)];
   if (middle) {
-    ctx.font = `italic ${Math.max(10, cell * 0.34)}px Georgia, serif`;
-    const said = words.enchanted;
-    const wide = ctx.measureText(said).width + 8;
+    ctx.font = `italic ${Math.max(11, cell * 0.34)}px Georgia, serif`;
+    const wide = ctx.measureText(words.tunnel).width + 8;
     const x = Math.min(width - wide, Math.max(0, left(middle.x) + cell / 2 - wide / 2));
     const y = top(middle.y) + cell / 2 - tall / 2;
-    ctx.fillStyle = 'rgb(246 236 210 / 0.9)';
+    ctx.fillStyle = css(PARCHMENT, 0.9);
     ctx.fillRect(x, y, wide, tall);
-    ctx.fillStyle = INK;
-    ctx.fillText(said, x + 4, y + tall / 2);
+    ctx.fillStyle = css(INK);
+    ctx.fillText(words.tunnel, x + 4, y + tall / 2);
+  }
+}
+
+/** Where a figure's feet stand in its cell (depth.FOOT_IN_CELL). */
+const FOOT_ON_THE_PLAN = 0.8;
+
+/** The cell at a point of the plan, or null beyond the scene's cells. */
+export function cellAt(x: number, y: number, cell: number, columns: number, rows: number): Tile | null {
+  const gutter = gutterOf(cell);
+  const [column, row] = [Math.floor((x - gutter) / cell), Math.floor((y - gutter) / cell)];
+  return column >= 0 && column < columns && row >= 0 && row < rows ? [column, row] : null;
+}
+
+function loadImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error(`no picture ${url}`));
+    image.src = url;
+  });
+}
+
+/** Every picture the plan names, loaded; null when one is missing. */
+async function loadPictures(pictures: PlanPictures): Promise<PlanLoaded | null> {
+  try {
+    const [ground, doors, figures] = await Promise.all([
+      loadImage(pictures.ground),
+      Promise.all(pictures.doors.map(async ({ url, left, top }) => ({ image: await loadImage(url), left, top }))),
+      Promise.all(pictures.figures.map(async ({ id, url }) => [id, await loadImage(url)] as const)),
+    ]);
+    return { ground, doors, figures: new Map(figures) };
+  } catch {
+    return null;
   }
 }
 
@@ -351,9 +432,12 @@ export function openPlan(view: PlanView, onClose: () => void): PlanWindow {
   const shapes = planShapes(view);
   const canvas = element('canvas', { id: 'plan-canvas', className: 'plan-canvas' });
   const close = element('button', { id: 'plan-close', type: 'button', className: 'big-button' }, [t('plan.close')]);
+  // A cell's own numbers, where the pointer rests or a finger taps.
+  const tip = element('div', { id: 'plan-cell', className: 'plan-cell', hidden: true });
+  const place = element('div', { className: 'plan-place' }, [canvas, tip]);
   const panel = element('div', { className: 'plan-panel' }, [
     element('h3', { className: 'plan-title' }, [t('plan.title')]),
-    canvas,
+    place,
     element('p', { id: 'plan-legend', className: 'plan-legend' }, [t('plan.legend')]),
     close,
   ]);
@@ -364,20 +448,23 @@ export function openPlan(view: PlanView, onClose: () => void): PlanWindow {
   node.dataset.figures = shapes.figures.map(({ id, x, y }) => `${id}:${x},${y}`).join(';');
   node.dataset.things = shapes.things.map(({ id, x, y }) => `${id}:${x},${y}`).join(';');
   node.dataset.doors = shapes.doors.map(({ id, open }) => `${id}:${open ? 'open' : 'shut'}`).join(';');
+  node.dataset.marks = shapes.marks.map(({ x, y }) => `${x},${y}`).join(';');
   node.dataset.floor = String(shapes.cells.filter((one) => one.kind !== 'wall').length);
-  node.dataset.enchanted = String(shapes.cells.filter((one) => one.kind === 'enchanted').length);
+  node.dataset.tunnel = String(shapes.cells.filter((one) => one.kind === 'enchanted').length);
+  let loaded: PlanLoaded | null = null;
+  let cell = 12;
   const draw = () => {
     const free = {
       width: Math.max(160, innerWidth - 24),
       // Its title, its legend and its button take this much.
       height: Math.max(160, innerHeight - 130),
     };
-    const cell = Math.max(
-      12,
-      Math.min(free.width / (shapes.columns + GUTTER * 2), free.height / (shapes.height + GUTTER * 2)),
-    );
-    const width = cell * (shapes.columns + GUTTER * 2);
-    const height = cell * (shapes.height + GUTTER * 2);
+    const fits = (gutter: number) =>
+      Math.min((free.width - gutter * 2) / shapes.columns, (free.height - gutter * 2) / shapes.height);
+    cell = Math.max(12, Math.min(fits(GUTTER_LEAST), fits(fits(GUTTER_LEAST) * GUTTER)));
+    const gutter = gutterOf(cell);
+    const width = cell * shapes.columns + gutter * 2;
+    const height = cell * shapes.height + gutter * 2;
     const ratio = globalThis.devicePixelRatio || 1;
     canvas.width = Math.round(width * ratio);
     canvas.height = Math.round(height * ratio);
@@ -386,14 +473,43 @@ export function openPlan(view: PlanView, onClose: () => void): PlanWindow {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.scale(ratio, ratio);
-    drawPlan(ctx, shapes, cell, {
-      enchanted: t('plan.enchanted'),
-      name: (id) => {
-        if (id === 'wizard') return forWizard('{wizard}');
-        return view.figures.some((figure) => figure.id === id) ? characterName(id) : id;
+    const scene = loaded && view.pictures ? inkedScene(view.pictures, loaded, shapes, Math.round(cell * ratio)) : null;
+    drawPlan(
+      ctx,
+      shapes,
+      cell,
+      {
+        tunnel: t('plan.tunnel'),
+        name: (id) => {
+          if (id === 'wizard') return forWizard('{wizard}');
+          return view.figures.some((figure) => figure.id === id) ? characterName(id) : id;
+        },
       },
-    });
+      scene,
+      view.pictures ?? null,
+      loaded,
+    );
   };
+  const showCell = (event: PointerEvent) => {
+    const box = canvas.getBoundingClientRect();
+    const [x, y] = [event.clientX - box.left, event.clientY - box.top];
+    const found = cellAt(x, y, cell, shapes.columns, shapes.height);
+    tip.hidden = found === null;
+    if (!found) {
+      delete node.dataset.cell;
+      return;
+    }
+    const said = `(${found[0]}, ${found[1]})`;
+    tip.textContent = said;
+    tip.style.left = `${gutterOf(cell) + found[0] * cell + cell / 2}px`;
+    tip.style.top = `${gutterOf(cell) + found[1] * cell}px`;
+    node.dataset.cell = `${found[0]},${found[1]}`;
+  };
+  canvas.addEventListener('pointermove', showCell);
+  canvas.addEventListener('pointerdown', showCell);
+  canvas.addEventListener('pointerleave', (event) => {
+    if (event.pointerType === 'mouse') tip.hidden = true;
+  });
   const onKey = (event: KeyboardEvent) => {
     if (event.key !== 'Escape') return;
     event.preventDefault();
@@ -423,5 +539,14 @@ export function openPlan(view: PlanView, onClose: () => void): PlanWindow {
   document.body.append(node);
   draw();
   close.focus();
+  // The picture in ink once its pictures have come (D143).
+  if (view.pictures) {
+    void loadPictures(view.pictures).then((pictures) => {
+      if (!open) return;
+      loaded = pictures;
+      draw();
+      node.dataset.drawn = String(pictures !== null);
+    });
+  }
   return plan;
 }

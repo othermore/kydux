@@ -8,6 +8,7 @@
 
 import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
+import type { PlanPictures } from './layout';
 import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
 import { coverDepth, type Lowered, type Nudged, nudgedBy, overDepth, rowDepth, thingDepth } from './depth';
@@ -356,6 +357,46 @@ export function figureName(id: string, look: Look): string {
   if (id === 'mate') return friendSheet(dormitoryMate(look.gender).id, look);
   if (id === 'nuri' || id === 'teku') return friendSheet(id, look);
   return id === 'wizard' ? `wizard-${look.id}` : id;
+}
+
+/** The pictures the plan of the scene is drawn from (D143): its ground, each door in
+ * the state it is in now, and each figure's sheet with its standing frame by the way
+ * it faces. */
+export function planPictures(
+  art: Art,
+  doors: { id: string; art?: string; open?: boolean }[],
+  figures: { id: string }[],
+  look: Look,
+): PlanPictures {
+  const { scene } = art;
+  const sheets = art.figures;
+  const shownDoors = doors.flatMap(({ id, art: painted, open }) => {
+    const thing = scene.things[painted ?? id];
+    const state = thing?.states[open ? 'open' : 'closed'];
+    return thing && state ? [{ url: `${scene.base}${state}`, left: thing.left, top: thing.top }] : [];
+  });
+  const shownFigures = sheets
+    ? figures.map(({ id }) => {
+        const name = figureName(id, look);
+        const walk = sheets.sheets?.[name]?.walk ?? sheets.rows?.walk ?? 0;
+        return {
+          id,
+          url: `${sheets.base}${name}.webp`,
+          frame: sheets.frame,
+          cell: sheets.cell,
+          foot: sheets.foot,
+          column: sheets.standing,
+          rows: { down: walk, left: walk + 1, right: walk + 2, up: walk + 3 },
+        };
+      })
+    : [];
+  return {
+    ground: `${scene.base}${scene.ground}`,
+    cell: scene.cell,
+    origin: scene.origin ?? [0, 0],
+    doors: shownDoors,
+    figures: shownFigures,
+  };
 }
 
 /** The lying frame of a figure's sheet (D91), or null for a sheet without one. */

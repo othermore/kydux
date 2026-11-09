@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PlanView } from '../engine/layout';
-import { labelBoxes, planShapes } from './plan';
+import { cellAt, inked, labelBoxes, planShapes } from './plan';
 
 /** A corridor, a closed door across it, a dark room and an enchanted end. */
 const VIEW: PlanView = {
@@ -24,9 +24,10 @@ const VIEW: PlanView = {
     { id: 'near_key', kind: 'key', tile: [2, 1] },
     { id: 'far_key', kind: 'key', tile: [5, 1] },
   ],
+  marks: [[7, 1]],
 };
 
-describe('the plan of a scene (D134)', () => {
+describe('the plan of a scene (D134, D143)', () => {
   it('draws walls, floor, furniture, the enchanted region and the unlit room as they are', () => {
     const { cells, columns, height } = planShapes(VIEW);
     expect([columns, height]).toEqual([9, 3]);
@@ -64,6 +65,50 @@ describe('the plan of a scene (D134)', () => {
       things: [{ id: 'door', kind: 'door', tile: [1, 1], open: true }],
     };
     expect(planShapes(inWall).doors[0]).toMatchObject({ open: true, across: true });
+  });
+
+  it('says every reach mark, the hidden ones too', () => {
+    expect(planShapes(VIEW).marks).toEqual([{ x: 7, y: 1 }]);
+  });
+
+  it('leaves undrawn all that is still dark, walls and furniture too (D52)', () => {
+    expect(planShapes(VIEW).unlit).toEqual([
+      { x: 3, y: 1 },
+      { x: 4, y: 1 },
+      { x: 5, y: 1 },
+    ]);
+  });
+
+  it('draws a picture in ink: its colour out, its lines darkened, its tones parchment', () => {
+    // A plain grey ground, a dark line down it, and a band of colour.
+    const [width, height] = [40, 20];
+    const pixels = new Uint8ClampedArray(width * height * 4);
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const at = (y * width + x) * 4;
+        const line = x === 20;
+        pixels[at] = line ? 20 : 120;
+        pixels[at + 1] = line ? 20 : 120;
+        pixels[at + 2] = line ? 20 : 120;
+        pixels[at + 3] = 255;
+      }
+    }
+    inked(pixels, width, height, 16);
+    const channels = (x: number) => [...pixels.slice((10 * width + x) * 4, (10 * width + x) * 4 + 4)];
+    const [line, ground] = [channels(20), channels(4)];
+    // The line goes toward the ink, the ground stays toward the parchment.
+    expect(line[0]).toBeLessThan(120);
+    expect(ground[0]).toBeGreaterThan(150);
+    // Warm, whatever colour it was: red over green over blue, as the parchment is.
+    expect(ground[0]).toBeGreaterThan(ground[1] ?? 0);
+    expect(ground[1]).toBeGreaterThan(ground[2] ?? 0);
+    expect(ground[3]).toBe(255);
+  });
+
+  it('finds the cell under the pointer, and none in the gutter', () => {
+    expect(cellAt(28 + 45, 28 + 85, 40, 20, 15)).toEqual([1, 2]);
+    expect(cellAt(10, 100, 40, 20, 15)).toBeNull();
+    expect(cellAt(28 + 20 * 40 + 1, 100, 40, 20, 15)).toBeNull();
   });
 
   it('writes each name clear of the others while it can', () => {

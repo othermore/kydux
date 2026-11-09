@@ -88,6 +88,7 @@ import {
   paintGrounds,
   paintScene,
   paintThing,
+  planPictures,
   placeThing,
   type Played,
   playFrames,
@@ -911,30 +912,44 @@ class LevelScene extends Phaser.Scene {
     this.mapClosed = closed;
   }
 
-  /** What the plan is drawn from, at the tick shown (D134). */
+  /** What the plan is drawn from, at the tick shown (D134, D143). */
   private planView(): PlanView {
     const facing = this.wizardFacing();
+    const things = this.map.things
+      .filter((thing) => !this.carried.has(thing.id) && !thing.carried)
+      .map((thing) => ({
+        id: thing.id,
+        kind: thing.kind,
+        tile: this.startTile(thing.id, thing.tile),
+        open: this.openDoors.has(thing.id),
+        ...(thing.art ? { art: thing.art } : {}),
+      }));
+    const figures = [
+      { id: 'wizard', kind: 'wizard', tile: this.wizardTile, facing },
+      ...this.map.actors.flatMap((actor) => {
+        const state = this.actors.get(actor.id);
+        return state && (state.sprite.visible || this.inEnchanted(state.tile))
+          ? [{ id: actor.id, kind: actor.kind, tile: state.tile, facing: state.facing as string }]
+          : [];
+      }),
+    ];
     return {
       rows: this.map.rows,
       enchanted: this.map.enchanted,
       unlit: this.lit ? [] : this.darkCells(),
-      figures: [
-        { id: 'wizard', kind: 'wizard', tile: this.wizardTile, facing },
-        ...this.map.actors.flatMap((actor) => {
-          const state = this.actors.get(actor.id);
-          return state && (state.sprite.visible || this.inEnchanted(state.tile))
-            ? [{ id: actor.id, kind: actor.kind, tile: state.tile, facing: state.facing as string }]
-            : [];
-        }),
-      ],
-      things: this.map.things
-        .filter((thing) => !this.carried.has(thing.id) && !thing.carried)
-        .map((thing) => ({
-          id: thing.id,
-          kind: thing.kind,
-          tile: this.startTile(thing.id, thing.tile),
-          open: this.openDoors.has(thing.id),
-        })),
+      figures,
+      things,
+      marks: this.map.reaches,
+      ...(this.art
+        ? {
+            pictures: planPictures(
+              this.art,
+              things.filter((thing) => thing.kind === 'door'),
+              figures,
+              this.look,
+            ),
+          }
+        : {}),
     };
   }
 

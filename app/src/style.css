@@ -1809,3 +1809,22 @@ a.stop-body:focus-visible {
   font-family: Georgia, serif;
   font-size: 14px;
 }
+
+/* A cell's own numbers on the plan, where the pointer rests (D143). */
+.plan-place {
+  position: relative;
+}
+
+.plan-cell {
+  position: absolute;
+  padding: 2px 8px;
+  border: 1px solid #3f2c1a;
+  border-radius: 3px;
+  background: #f6ecd2;
+  color: #3f2c1a;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-weight: bold;
+  pointer-events: none;
+  transform: translate(-50%, -110%);
+}

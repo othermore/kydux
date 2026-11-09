@@ -90,6 +90,12 @@ test.describe('the map, opened by its spell (D134)', () => {
     await expect(plan).toHaveAttribute('data-figures', /friend:0,12/);
     await expect(plan).toHaveAttribute('data-figures', /mate:0,11/);
     await expect(plan).toHaveAttribute('data-doors', 'door_a:shut;door_b:shut');
+    await expect(plan).toHaveAttribute('data-marks', '15,3');
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    // A cell's own numbers come under the pointer (D143).
+    await page.locator('#plan-canvas').hover({ position: { x: 28 + 1.5 * 40, y: 28 + 12.5 * 40 } });
+    await expect(plan).toHaveAttribute('data-cell', /^\d+,\d+$/);
+    await expect(page.locator('#plan-cell')).toBeVisible();
     await expect(page.locator('#plan-legend')).toContainText('x counts from the left');
     await page.screenshot({ path: `${SHOTS}plan-window.png` });
     await page.locator('#plan-close').click();
@@ -113,6 +119,8 @@ test.describe('the map, opened by its spell (D134)', () => {
 
   test("the first lesson's Try it leads to the level, where it opens the plan", async ({ page }) => {
     await page.goto('/#lesson/the-cells');
+    // The lesson drawn before its pages are counted: a slow load is not its last page.
+    await expect(page.locator('.lesson-page')).toBeVisible();
     while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
     await page.screenshot({ path: `${SHOTS}lesson-the-cells.png` });
     await page.locator('#lesson-try').click();
@@ -143,7 +151,8 @@ test.describe('the enchanted tunnel (D135)', () => {
     await start(page, 'print(wizard.position)\nwizard.cast("orvim")');
     await expect(page.locator('#plan')).toBeVisible({ timeout: 30_000 });
     await expect(page.locator('#plan')).toHaveAttribute('data-figures', '');
-    await expect(page.locator('#plan')).toHaveAttribute('data-enchanted', '10');
+    await expect(page.locator('#plan')).toHaveAttribute('data-tunnel', '10');
+    await expect(page.locator('#plan')).toHaveAttribute('data-marks', '19,1');
     await page.screenshot({ path: `${SHOTS}plan-tunnel.png` });
     await page.keyboard.press('Escape');
     await expect(page.locator('.printed')).toHaveText('(15, 3)', { timeout: 30_000 });
@@ -271,7 +280,7 @@ test.describe('what the page draws of the chapter', () => {
   test('with ?debug the enchanted cells are named in the legend (D135)', async ({ page }) => {
     await page.goto('/?debug#level/the-dark-tunnel');
     await page.locator('#start').click();
-    await expect(page.locator('.debug-legend')).toContainText('Enchanted', { timeout: 90_000 });
+    await expect(page.locator('.debug-legend')).toContainText('Dark tunnel', { timeout: 90_000 });
   });
 });
 

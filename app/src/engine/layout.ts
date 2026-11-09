@@ -81,6 +81,31 @@ export interface PlanView {
   figures: { id: string; kind: string; tile: Tile; facing: string }[];
   /** The things on the map, not those carried. */
   things: { id: string; kind: string; tile: Tile; open?: boolean }[];
+  /** Every reach goal's cell, a hidden one's too (D143). */
+  marks: readonly Tile[];
+  /** The pictures it is drawn from, on a painted scene (D143). */
+  pictures?: PlanPictures;
+}
+
+/** The scene's pictures as the plan draws them (D143): its ground, each door in the
+ * state it is in, its corner in the ground's pixels, and each figure's sheet. */
+export interface PlanPictures {
+  ground: string;
+  /** The ground's pixels a cell, and where the scene's first cell lies in it. */
+  cell: number;
+  origin: Tile;
+  doors: { url: string; left: number; top: number }[];
+  figures: {
+    id: string;
+    url: string;
+    /** The frame's size, the pixels a cell the sheet is drawn at, how far above the
+     * frame's bottom the feet are, the standing frame's column, and each way's row. */
+    frame: Tile;
+    cell: number;
+    foot: number;
+    column: number;
+    rows: Record<string, number>;
+  }[];
 }
 
 export type { Tile };
@@ -116,6 +141,8 @@ export interface Layout {
   wayFacings: Record<string, Record<string, Facing>>;
   /** What the scene shows and the world does not hold, like a flat stone. */
   props: { kind: string; tile: Tile }[];
+  /** Every reach goal's cell, a hidden one's too (D143). */
+  reaches: Tile[];
   /** The cell a sleep goal marks to sleep from (D130), or none. */
   sleepAt?: Tile;
 }
@@ -198,6 +225,12 @@ export function layout(level: LevelJson): Layout {
     if (goal.kind === 'reach' && goal.hidden === true && typeof goal.marker === 'string') used.add(goal.marker);
   }
   const markers = [...letters].filter(([letter]) => !used.has(letter));
+  const reaches = asList(level.goals)
+    .filter((goal) => goal.kind === 'reach')
+    .flatMap((goal) => {
+      const tile = place(goal);
+      return tile ? [tile] : [];
+    });
   const shelves: Tile[] = [];
   rows.forEach((row, y) => {
     [...row].forEach((char, x) => {
@@ -231,6 +264,7 @@ export function layout(level: LevelJson): Layout {
     height: Math.max(1, rows.length),
     start,
     markers,
+    reaches,
     things,
     actors,
     shelves,

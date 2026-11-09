@@ -602,11 +602,12 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     scene of the library: Wenna's five lessons, eight levels (an improve, a
     fix), Eldra's books, locked doors and keys, and the wand bank.
 5.5 Chapter 3, The passages (the cells and `position`, conditions, loops),
-    in seven small scenes (D136, `sprint-30.md`): the friend's eight lessons,
-    eleven levels (a fix, an improve), the naughty child's map as a window
-    with the scene's plan, opened by its spell (D134), the enchanted tunnel
-    (D135), the patrolling teacher (D137), the slab over its hole (D138), the
-    dark room.
+    in seven small scenes (D136, `sprint-30.md`, and as the owner reads it,
+    `sprint-31.md`): the friend's nine lessons, whose pages run their code (D142),
+    eleven levels (a fix, an improve), the naughty child's map as a window with
+    the scene's plan in ink, opened by its spell (D134, D143), the dark tunnel
+    (D135, D145), the patrolling teacher (D137), the crossing's one idea a level
+    (D146), the slab over its hole (D138), the dark room.
 5.6 Chapter 4, The broom (lists, functions), in a scene of the broom field
     and the village: flying, the race, an action of the child's own.
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

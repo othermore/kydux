@@ -57,7 +57,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (controller.ts), with its goals panel, outcome card, start and
                 win cards (cards.ts), the zoom box over the scene (zoom.ts), the
                 wizard's notebook with its spells and words (notebook.ts, D80),
-                the naughty child's map open on the scene's plan (plan.ts, D134),
+                the naughty child's map open on the scene's plan, drawn in ink (plan.ts,
+                D134, D143), a lesson's code run on its page (lessonrun.ts, D142),
                 a level's words with their code shown as code (words.ts, D140),
                 the stars (stars.ts), the screen's guide (guide.ts, D68), and
                 the note on a phone or a tablet that the game is made for a
@@ -77,7 +78,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 it), each level and story on a scene with its world built in, and
                 write the world's table as api.json
   e2e/          the browser tests (Playwright), beside the node_modules they need;
-                the loop's screenshots in e2e/shots/ (D39)
+                the loop's screenshots in e2e/shots/ (D39), and a chapter played whole
+                for the owner (walkthrough.spec.ts, by `npm run walkthrough`)
 world/          kydux_world, the model of the levels, and its tests: level.py reads
                 a level; world.py holds the wizard and the ticks; things.py the
                 read-only base and the things; actors.py the teacher and the sight
@@ -103,7 +105,8 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 with its world built in (scene_maps.py, D65, D74), the course as
                 one document
                 to review (course_book.py) and the comments read back from the
-                reviewed document (doc_comments.py), the writing tool (write/:
+                reviewed document (doc_comments.py), a chapter's walkthrough with a
+                comments line under every picture (walkthrough.py), the writing tool (write/:
                 write.py, the rules every text follows in rules.md, and the
                 briefs in briefs/; Gemini drafts the child's texts into
                 drafts/, which git ignores, D55, through the API or the
@@ -118,7 +121,7 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 else and opens its doorways (D88, D108), paints what a model
                 left empty, moves a wall or widens a corridor, and lays stones
                 or a picture in a box (void, spaced, tiled, placed: D136),
-                trace.py helps to
+                door.py opens a door from its closed picture (D144), trace.py helps to
                 trace a door's polygons (D113: look, a crop enlarged with a
                 grid and a polygon's points; outline, a first polygon round
                 a leaf; footprint, the doorway's polygon from its fill),
@@ -419,8 +422,9 @@ one overturns stays, marked as superseded.
   tick, after the wizard's event, every actor takes its step, a teacher
   who sees the wizard catches it, and the goals are checked; all of a
   tick's events carry its number and the child's line. A `reach` goal is
-  met only by the run's end on its tile: a goal is stopped at, and when
-  the wizard walked over it on the way the result says so
+  met only by the run's end on its tile, unless it says `on_the_way` (D146): a
+  goal is stopped at, and when the wizard walked over it on the way the result
+  says so
   (`walked_over`), and the page tells the child. Asking takes no
   tick. The end of a run, past the tick limit or caught, is a
   `BaseException` the child's `except Exception` lets through, and a world
@@ -1794,6 +1798,7 @@ one overturns stays, marked as superseded.
   (`doors-<scene>.png`) is looked at there first. Rules out a door painted
   shut alone and opened by an edit, and an open doorway showing the floor
   of the room the viewer stands in.
+  Chapter 3's doors are opened from their closed picture instead (D144).
 - **D117 — Figures that go together move together in a story.** Decided
   2026-10-29 by the owner. A story's step stages every figure that moves
   at that moment at once, as the page can play them (D103): three who
@@ -1985,22 +1990,17 @@ one overturns stays, marked as superseded.
   a tick, needs the wand and the map (without the map it is refused,
   `no_map`), and makes the world's event `map`. When the page plays that
   tick it pauses the playback, and once the wand is seen pointed opens a
-  window over the page with the scene's plan, drawn by the page from the map
-  and the level at that tick: the playable cells of the scene as a grid,
-  floor light and walls dark, furniture hatched, each door at its cell shut
-  or open, every column numbered along the top and the bottom and every row
-  along the left and the right, each floor cell's own numbers small inside
-  it; the wizard, every actor and every thing with its name and its cell
-  beside it, except what lies unlit in a dark room (D52) and anyone in an
-  enchanted region (D135), which is hatched and named. The window is closed
-  by its button or Escape, and the playback goes on from the same tick; a run
-  started again closes it. A lesson's *Try it* leads to the level, where the
-  child's program opens it the same way. The plan is drawn like an old map in
-  ink on parchment, not as a second painting: no Gemini image. Rules out cell
-  numbers drawn over the painting, and a map that costs a picture a scene.
+  window over the page with the scene's plan at that tick, what D143 says it
+  is, and the wizard, every actor and every thing with its name and its cell
+  beside it, except what lies unlit in a dark room (D52) and anyone in the dark
+  tunnel (D135, D145). The window is closed by its button or Escape, and the
+  playback goes on from the same tick; a run started again closes it. A lesson's
+  page that casts the spell opens it too (D142). Rules out cell numbers drawn over
+  the painting, and a map that costs a picture a scene.
 - **D135 — An enchanted region hides every figure in it, on the scene and
-  on the plan.** Decided 2026-11-05 by the owner, for the tunnel. A scene's
-  settings name the region (`enchanted`, boxes of cells); a figure, the
+  on the plan.** Decided 2026-11-05 by the owner, for the tunnel, which the child
+  reads of as dark (D145). A scene's settings name the region (`enchanted`, boxes
+  of cells); a figure, the
   wizard or an actor, standing in it is not drawn, a figure stepping into
   it fades out over that step and one stepping out fades in, and the plan
   draws no figure in it. The world is not changed: the wizard walks it
@@ -2061,3 +2061,86 @@ one overturns stays, marked as superseded.
   the hints and the ways, renders a span between backquotes as inline code,
   and a word between asterisks, a spell's, in italics, as the lessons' pages
   do. Rules out a backquote or an asterisk shown to the child.
+- **D141 — The chapter's words speak as the owner does.** Decided 2026-11-07
+  from the owner's corrections to the walkthrough of chapter 3. A text the child
+  reads says what a friend would say, in the order a child needs: the thing
+  first, then the word for it, then an example with numbers, and nothing about
+  how the game is built. A program *looks at* an attribute, *sees* where it
+  stands, *checks* its coordinates; it never *asks*. A cell is named by its two
+  numbers, the first `x` from the left and the second `y` from the top, written
+  `(x, y)`, both from 0, and the lesson calls this a system of coordinates. No
+  text says that a level is played in several ways, that the friend whispers,
+  or that the game waits: the game's doing is shown, not told. The friend's
+  reasons are said, and what the friend does not know is said as a guess; a
+  bonus goal names the spell; an outro tells what the three see next, not what
+  the code did. A content test holds chapter 3's texts to it. Rules out
+  mechanics in the fiction and a lesson that names three ideas on one page.
+- **D142 — A lesson page runs its code.** Decided 2026-11-07 (the owner's
+  suggestion). Any page of a lesson may carry a block fenced `python try`, one a
+  page; the page shows it in an editor with a *Run* button, runs it in the
+  world of the first level after the lesson, in that level's first way, at its
+  start, and writes under the editor what the program printed, the wizard's
+  cell at the end if it moved, or what stopped it in the child's words; no scene
+  is shown, and a program that casts the map's spell opens the plan's window.
+  The child edits the block and runs it again, always from the start. The
+  lesson's last page keeps the button that leads to the level, which never
+  starts with the block (D63). Rules out a lesson that explains an expression
+  and never lets the child print one.
+- **D143 — The plan is the scene's own picture in ink.** Decided 2026-11-07 (the
+  owner: the plan must show walls, doors and rooms, the figures as themselves,
+  the mark as a mark, and match the scene). The plan's window (D134) draws the
+  scene's ground picture through an ink-on-parchment filter on the page's side:
+  each pixel's tone from the mean round it, stretched between the picture's
+  darkest and lightest, its lines darkened from what is darker than that mean,
+  its colour taken out. Over it, the grid at the scene's cells, every door as the
+  scene shows it at that tick (inked with the ground), the figures with their
+  own standing sprites and their names and cells beside them, every `reach` mark
+  with the mark's picture, the hidden ones too, since the plan is where the child
+  reads the cell, the dark tunnel's cells as a dotted path labelled
+  `t('plan.tunnel')`, the column and row numbers along the four edges at 18
+  pixels, and each cell's own numbers only where the pointer rests or a finger
+  taps. What is unlit in a dark room stays undrawn (D52). No Gemini image. Rules
+  out a hatched grid, numbers in every cell, and an old-map painting asked of the
+  model, which cannot match the scene cell for cell.
+- **D144 — A door's open state is built from its closed one.** Decided 2026-11-07
+  (the owner: a reliable method for doors, which fail every time).
+  `tools/art/door.py` makes the open picture of a door from the painting alone:
+  the doorway is the closed leaf's traced polygon (D113) filled with the floor
+  beyond, tiled at the painting's own size from the floor cells `floor_from` names
+  (the room's cells behind the door), darker toward the lintel; the leaf is the
+  closed leaf's own pixels, cut by its polygon, turned about its hinge edge
+  (`hinge: left`, `right`, or `both` for a double door) so that it lies beyond the
+  hinge, its width scaled to `swing` (0.35 by default) and its far edge lifted,
+  drawn whole over the jamb with a dark line round it where the scaling thinned
+  the painting's, never clipped by the door's box, which the tool grows round it,
+  with a soft shadow at its foot; the jambs, the arch and what lies at the foot
+  are the painting's, untouched. The two pictures, closed and open, differ in
+  nothing else, so the leaf's shape, its arch and its bands are the same open as
+  shut. A leaf over a jamb needs the arch under it and figures on the wall's foot
+  row before both: the arch stands on that row, not `under`, and the open state's
+  `row` is that row (or the next, where the arch is `under` on the wall's own
+  row). Rules out asking the model to paint a door open, and a leaf cut by a box's
+  corner.
+- **D145 — The tunnel is dark.** Decided 2026-11-07 by the owner. In every word the
+  child reads the tunnel is a dark tunnel where nothing is seen, and the map does
+  not show the three inside it either; the word *enchanted* (*encantado*) is in no
+  text and in no label. The scene's setting keeps its key `enchanted` (D135), which
+  is code.
+- **D146 — The crossing teaches waiting, then `if`, then `else`, one idea a
+  level.** Decided 2026-11-07 by the owner. *La salida del túnel* teaches `wait`
+  alone: Dask always starts at the same place, walking up the crossing toward the
+  wizard's row, and the wizard waits two ticks for him to pass, then crosses to the
+  first statue; a lesson *Esperar* (`lesson:waiting`) comes before it. *Junto a las
+  estatuas* teaches `if` alone: Dask stands still between the first and the second
+  statue, looking up or down, and the wizard, against the top wall, goes down two
+  cells to pass below him when he looks up, and crosses straight when he looks
+  down; the corridor is three cells high for it. The two ways end in different
+  cells with one `if`, so its reach goal says `on_the_way`, met when the wizard
+  stands on the mark at any tick. *Izquierda o derecha* teaches `if` and `else`, and
+  the lesson *Si no* comes right before it. Rules out a level where one tick of
+  waiting is enough only because Dask has two starts.
+- **D147 — A standing figure stands.** Decided 2026-11-07 by the owner. A figure's
+  standing frame, in every row of its sheet, has its feet together and its weight on
+  both; a walking frame is made from it (`figures.py`). Dask's sheet is made from a
+  drawing of him standing still in the four views (`figures.py --standing`). Rules
+  out a teacher who stands still with a foot in the air.

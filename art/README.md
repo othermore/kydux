@@ -145,7 +145,9 @@ owner on 2026-10-26, for every scene from the dormitory on:
 - **A wall may be moved along its rows, or a corridor made wider, without a
   model** (`repaint.py spaced`): a wall with its door moved whole and the plain
   floor beside it stretched, where a loop needs its doors evenly apart, or a level
-  needs a third cell across. Its seams lie on the outlines of what is moved.
+  needs a third cell across. Its seams lie on the outlines of what is moved. Two knots
+  on one old row leave a band empty, filled with the stones above it mirrored at the
+  seam (`band`): a corridor made a row higher.
 - **Outdoors, the margin is more of the same ground**, woods, rocks and
   fences no one could walk through, as the field's.
 - **A margin painted on later is joined, the painting kept.** For a
@@ -393,6 +395,27 @@ begins, the floor before the door untouched below it; no outline of the
 closed leaf is left at a doorway's foot. To name a cell when something
 looks wrong, open the game with `?debug` (docs/dev/dev-environment.md).
 
+## A door opens from its closed picture
+
+A model asked to paint a door open fails in the same few ways: the edge stays shut,
+the floor behind does not match, the leaf is cut by a corner, an arched door comes
+back a plain plank. So a door of a new scene is opened without a model (D144).
+Trace the closed leaf (`door` in the thing's settings: its `polygon`, on the outer
+edge of the leaf's outline, along the arch's inner line and over the hinges' side,
+but not their plates on the jamb), name where it is hung (`hinge`: `left`, `right`
+or `both`, read from its painted hinges and its ring) and the floor of the room
+behind it (`floor_from`, a plain box, wide enough not to show its mirror), and run
+`tools/art/door.py <scene> <door>`. It writes `<door>-doorway.png`, the painting with
+the polygon filled with that floor at the painting's own size, darker toward the
+lintel, and `<door>-open.png`, the closed leaf's own pixels turned about its hinge to
+the other side of it, over the jamb, `swing` as wide, its far edge lifted, with a dark
+line round it and a soft shadow at its foot; and it sets the thing's `without`,
+`box`, open state and `doorway`. Where an arch stands round the door, it stands on the
+row of the wall's foot, not `under`, so that a leaf on that row lies over it and a
+figure before the wall over both; the open state's `row` says that row. Look at
+`doors-<scene>.png`: the same door open as shut, the doorway the floor beyond. A door
+of chapters 1 and 2 is painted shut and open (D116): `doorways` and `swung`.
+
 ## What a painting must keep to
 
 The cut reads the painting by rules, and a painting that breaks one is cut
@@ -527,6 +550,12 @@ standing frame with only its legs taken from the step's drawing, so that
 a figure walks moving its feet alone, never turning its head or its arms.
 A figure that floats, the ghost, has its dress grow downward in its step
 frames instead. Both are done by `tools/art/figures.py`.
+
+A figure's standing frame, in every row, has its feet together and its weight on
+both (D147): a figure that stands still has no foot in the air. A sheet whose
+standing frames were drawn in a stride is made again from a drawing of the figure
+standing still in the four views (`tools/art/figures.py --standing <figure>
+<drawing>`, its prompt `figure-dask-standing.md`), its step frames keeping their legs.
 
 Each friend comes in two sets of colours (D90), `nuri-a`, `nuri-b`,
 `teku-a` and `teku-b`, recoloured from the friends' bases with the colours

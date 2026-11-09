@@ -504,6 +504,19 @@ screenshot at each step. The screenshots let you see the game without
 playing it. They land in `app/e2e/shots/`, one folder per language, and git
 ignores them. `app/e2e/README.md` says what each one shows.
 
+To read a whole chapter as the child does, with room to write under every
+picture, make its walkthrough. It builds the game, plays the chapter in Spanish for
+a seeded wizard, and writes one document. The browser tests' server must be free:
+
+```sh
+(cd app && npm run walkthrough -- 03-passages)
+```
+
+You should see it end by naming the document,
+`drafts/recorrido-capitulo-3-<date>.es.md`, with its pictures in the folder of the same
+name beside it. Every picture has a **Comentarios:** line under it, and a document
+that is already there is never overwritten, so your comments stay safe.
+
 The repository's own checks deserve a mention, because they guard the
 project's rules. They refuse a secret in any tracked file. They refuse a
 forbidden word in any file, path or commit message. They keep the two

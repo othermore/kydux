@@ -139,6 +139,7 @@
     "not_my_dormitory": "I should not go into the {girls'|boys'} dormitory.",
     "door_leaf": "The open door's leaf is in the way.",
     "not_now_outside": "Now is not a good time to leave the castle.",
+    "not_inside_yet": "Do not go in yet: stay on the threshold, past the door.",
     "no_bed": "There is no bed right beside me.",
     "bed_taken": "This bed belongs to someone else.",
     "not_here": "I am carrying {thing}, so it cannot be shown where it lies."

@@ -139,6 +139,7 @@
     "not_my_dormitory": "No debería entrar en el dormitorio de {las chicas|los chicos}.",
     "door_leaf": "La hoja de la puerta abierta está delante.",
     "not_now_outside": "Ahora mismo no es buen momento para salir del castillo.",
+    "not_inside_yet": "No entres todavía: quédate en el umbral, pasada la puerta.",
     "no_bed": "No hay ninguna cama justo a mi lado.",
     "bed_taken": "Esta cama es de otra persona.",
     "not_here": "Llevo {thing}, así que no se puede mostrar dónde está."

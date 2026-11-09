@@ -38,6 +38,15 @@
       "sight": true
     }
   },
+  "forbidden": {
+    "reason": "not_inside_yet",
+    "cells": [
+      [
+        8,
+        5
+      ]
+    ]
+  },
   "things": [
     {
       "kind": "door",

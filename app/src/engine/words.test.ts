@@ -15,6 +15,17 @@ describe('blockedText', () => {
     expect(blockedText('door_leaf', 'door')).toBe('La hoja de la puerta abierta está delante.');
   });
 
+  it('says where the tale lets the wizard go no farther yet, in the owner\'s words (D171)', () => {
+    initLanguage(english);
+    expect(blockedText('not_inside_yet', null)).toBe(
+      'Do not go in yet: stay on the threshold, past the door.',
+    );
+    initLanguage(spanish);
+    expect(blockedText('not_inside_yet', null)).toBe(
+      'No entres todavía: quédate en el umbral, pasada la puerta.',
+    );
+  });
+
   it('says why an action could not be done, with the thing named', () => {
     initLanguage(english);
     expect(blockedText('far', 'door')).toBe('I cannot reach the door from here.');

@@ -188,3 +188,43 @@ def test_eldras_door_gives_its_bonus_to_the_subtraction_and_not_to_the_return():
     for _, way in back.ways:
         bonus = [goal for goal in way.goals if goal.kind == "ticks_under"]
         assert way.ticks >= 11 and bonus and not bonus[0].met
+
+
+def test_the_way_in_keeps_the_wizard_on_the_threshold_with_its_words():
+    """D171: past the castle's great door, opened on its threshold (8, 6), the hall's
+    cell (8, 5) is forbidden, so that a walk longer than the mark stops on the mark and
+    says why, with no bump; the level is won, with no star lost to a bump."""
+    level = load(CONTENT / "the-way-in")
+    code = 'wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")\nwizard.move_up(3)\n'
+    result = run_code(level, code)
+    assert result.status == "won"
+    last = result.events[-1]
+    assert last.kind == "blocked"
+    assert (last.data["reason"], last.data["at"], last.data["facing"]) == (
+        "not_inside_yet",
+        [8, 6],
+        "up",
+    )
+    assert not [event for event in result.events if event.kind == "bump"]
+    words = {
+        lang: json.loads((ROOT / "i18n" / f"{lang}.json").read_text(encoding="utf-8"))
+        for lang in LANGUAGES
+    }
+    assert words["es"]["blocked"]["not_inside_yet"] == (
+        "No entres todavía: quédate en el umbral, pasada la puerta."
+    )
+    assert words["en"]["blocked"]["not_inside_yet"] == (
+        "Do not go in yet: stay on the threshold, past the door."
+    )
+
+
+@pytest.mark.parametrize("directory", LEVELS, ids=lambda p: p.name)
+def test_a_forbidden_cell_s_reason_has_its_words_in_every_language(directory):
+    """The wizard says why a cell is forbidden (D84, D171): the reason's words are
+    `blocked.<reason>` in every language."""
+    reason = load(directory).forbidden_reason
+    if not reason:
+        return
+    for lang in LANGUAGES:
+        words = json.loads((ROOT / "i18n" / f"{lang}.json").read_text(encoding="utf-8"))
+        assert words["blocked"].get(reason), f"blocked.{reason} in {lang}"

@@ -198,6 +198,30 @@ test.describe('the sealed door (D42, D43)', () => {
   });
 });
 
+test.describe('the way in (D171)', () => {
+  for (const [locale, words] of [
+    ['en-US', 'Do not go in yet: stay on the threshold, past the door.'],
+    ['es-ES', 'No entres todavía: quédate en el umbral, pasada la puerta.'],
+  ] as const) {
+    test(`a walk past the open door stops on its threshold, and the wizard says why, with no bump (${locale})`, async ({
+      browser,
+    }) => {
+      const context = await browser.newContext({ locale });
+      const page = await context.newPage();
+      await page.goto('/#level/the-way-in');
+      await page.locator('#start').click();
+      await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+      await page.locator('#speed').selectOption('4');
+      await run(page, 'wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")\nwizard.move_up(3)');
+      await expect(scene(page)).toHaveAttribute('data-wizard', '8,6');
+      await expect(scene(page)).toHaveAttribute('data-thought', words);
+      // Won, and not a star lost to a bump: the hall's cell refused it, no wall hit it.
+      await expect(page.locator('.win-card #star-reasons li').nth(1)).toHaveAttribute('data-kept', 'true');
+      await context.close();
+    });
+  }
+});
+
 const CHAPTER_2 = levelsOf('02-the-library');
 
 test.describe('chapter 2', () => {

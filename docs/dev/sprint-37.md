@@ -75,16 +75,25 @@ owner's acceptance test, section 4 the hand-over, section 5 the prompt.
   program that did nothing for its seconds, with the words it has. Rules
   out a win card after a stop.
 - **D178 — A hole that never closes on its own, and `osto` the only way
-  across.** Decided 2026-11-09 from the owner's question (*había un sitio
-  donde se sujetaba un agujero en el suelo, pero no veo eso en ningún
-  nivel, ¿por qué?*): D53 and D167 made `osto` a help, never a need, and
-  every solution waits with `while` instead. A hole with `"period": 0` is
-  open from tick 0 and at every tick, a dark portal that never closes by
-  itself, and is closed only while `osto` holds it (HOLD_TICKS, D167).
-  *El paseo nocturno*'s hole is one: `osto`, cast beside it, is the way
-  across, and the chapter's last level uses both its spells. *El agujero
-  que se abre* keeps its hole that opens and closes and its `while`.
-  Rules out a spell taught, summed up in the story, and never cast.
+  across, taught after the `while`.** Decided 2026-11-09 from the owner's
+  question (*había un sitio donde se sujetaba un agujero en el suelo, pero
+  no veo eso en ningún nivel, ¿por qué?*) and their rule (*no quiero que el
+  niño use osto y evite el while*): D53 and D167 made `osto` a help, never
+  a need, every solution waits with `while` instead, and *Luz y trampas*
+  teaches `osto` before *El agujero que se abre*, whose level knows the
+  spell, so a child may hold that hole and never write the `while` the
+  level is for. `osto` is taught once the `while` is practised: *Luz y
+  trampas* teaches `kirra`, `hole.open` and `hole.closed` and no spell for
+  the hole; *El agujero que se abre* does not know `osto`; a short lesson
+  of its own, *El portal que no se cierra* (`the-portal`, Lesson 11, no
+  block, D174), after the story *Las voces* and before *El paseo
+  nocturno*, teaches it. A hole with `"period": 0` is open from tick 0 and
+  at every tick, a dark portal that never closes by itself, and is closed
+  only while `osto` holds it (HOLD_TICKS, D167). *El paseo nocturno*'s
+  hole is one: `osto`, cast beside it, is the way across, and the
+  chapter's last level uses both its spells. Rules out a spell taught,
+  summed up in the story, and never cast, and a spell that spares the
+  child the loop.
 
 ## 2. The pieces
 
@@ -199,10 +208,10 @@ print("Posición:", wizard.position)
   (the English block prints *Looking up* and *Position:*; the colon's
   string carries no trailing space, `print` puts the one space).
 - `while`: page 3 *Pruébalo* and its block removed; two pages remain.
-- `kirra-and-osto`: page 3 *Pruébalo* and its block removed; page 2 gains,
-  after `osto`'s sentence, that some holes never close on their own, a dark
-  portal open night and day, and that with those `osto` is the only way
-  across (D178).
+- `kirra-and-osto`: page 3 *Pruébalo* and its block removed; page 2 loses
+  `osto`'s sentence (the id stays, a slug saved games may hold; the title
+  *Luz y trampas* stands, the hole being the trap); `lesson.json` teaches
+  as it does.
 - `the-two-coordinates`: page 3's block keeps the wizard's position in a
   variable and prints its two numbers, its words saying so:
 
@@ -218,29 +227,41 @@ languages, every other page word for word, the blocks the plan's; read and
 corrected. `course.md`'s rows of chapter 3's lessons; `lesson.spec.ts`,
 `lessons.ts` and the content tests.
 
-### 37.7 *El paseo nocturno* needs `osto` (D178)
+### 37.7 *El portal que no se cierra* and *El paseo nocturno* need `osto` (D178)
 
-`content/levels/the-night-walk/level.json`: the hole's `"period": 0`; the
-goal `{"kind": "cast", "spell": "osto"}` in the goals' place of the hole
-(*Sujeta el agujero con* osto), the bonus `no_bumps` instead of `uses
-closed`; `solution.py`: from the cell above the hole, `wizard.cast("osto")`
-then `move_down(3)`, the rest as it is; the three ways still won by it.
-Brief `chapter-3-night-walk-osto.md`: `intro` (a hole that never closes:
-hold it shut with *osto*), the goals' words, `starting_code`'s comments and
-the hints (`osto` from the cell before the hole, then down 3), both
-languages, the rest word for word; read and corrected. `world/tests`: the
-level won by the solution in its three ways, lost by a `while not
-hole.closed` wait (the tick limit, the hole never closed). The plan window
-and the scene show the hole open from the start, held with its crack of
-light after the spell (35.8), nothing new to draw.
+`content/levels/the-opening-hole/level.json`: `spells` without `osto`
+(`osto` cast there is refused as unknown, as any spell not yet given);
+its solution and its four ways as they are. A lesson `the-portal`,
+*El portal que no se cierra* / *The portal that never closes*, speaker the
+friend, `teaches` the spell `osto`, two pages and no block: the hole of the
+way home is a dark portal that never closes on its own, so no wait ends
+it; *osto*, cast with the wand from a cell beside it, holds the floor shut
+over it for a while, the crack of light showing it is held, and then the
+steps across land; in `chapter.json` after `story:the-voices`, before
+`level:the-night-walk`. `content/levels/the-night-walk/level.json`: the
+hole's `"period": 0`; the goal `{"kind": "cast", "spell": "osto"}` in the
+goals' place of the hole (*Sujeta el agujero con* osto), the bonus
+`no_bumps` instead of `uses closed`; `solution.py`: from the cell above
+the hole, `wizard.cast("osto")` then `move_down(3)`, the rest as it is;
+the three ways still won by it. Brief `chapter-3-the-portal.md`: the new
+lesson in both languages (D141, the metaphor once: *un portal oscuro*,
+then *el agujero*), and *El paseo nocturno*'s `intro` (a hole that never
+closes: hold it shut with *osto*), the goals' words, `starting_code`'s
+comments and the hints (`osto` from the cell before the hole, then down
+3), both languages, the rest word for word; read and corrected.
+`world/tests`: the level won by the solution in its three ways, lost by a
+`while not hole.closed` wait (the tick limit, the hole never closed); *El
+agujero que se abre* refuses `osto`. The plan window and the scene show
+the hole open from the start, held with its crack of light after the
+spell (35.8), nothing new to draw; the lesson's pages need no picture.
 
 ### 37.8 The documents, the walkthroughs and the hand-over
 
 `architecture.md` D174 to D178 (D142, D170 and D173 say where D174 takes
 over; D53 and D167 name the hole of period 0; the goals' table; the
 events' table if `interrupted_by` reaches it); `course.md` (chapter 2's
-lesson rows, chapter 3's rows of the lessons and of *El paseo nocturno*,
-the features list); `plan.md` 5.5. The walkthroughs of the three chapters
+lesson rows, chapter 3's rows of the lessons, the new Lesson 11 and *El
+paseo nocturno*, the features list); `plan.md` 5.5. The walkthroughs of the three chapters
 played again: `npm run walkthrough -- 01-arrival`, `-- 02-the-library`,
 `-- 03-passages`. `ci/check.sh --e2e` green. The report in Spanish with
 pictures of the final commit (the merged lesson's last page, the `if`
@@ -265,9 +286,11 @@ the prompt for the designer's review in English, in a code block.
 6. *Las casillas*, *Dónde estoy*, *Esperar*, *Si*, *Mientras*, *Luz y
    trampas*, *Las dos coordenadas*: the pages and blocks of 37.6; the `if`
    block prints two lines, and one after `"up"` is changed.
-7. *El paseo nocturno*: the hole open all the time; `osto` from the cell
-   above it, then down 3; a `while not hole.closed` wait loses by the tick
-   limit.
+7. *El agujero que se abre*: `wizard.cast("osto")` is refused, the
+   `while` the only way. *El portal que no se cierra*: two pages after
+   *Las voces*. *El paseo nocturno*: the hole open all the time; `osto`
+   from the cell above it, then down 3; a `while not hole.closed` wait
+   loses by the tick limit.
 
 ## 4. What the implementer hands over
 

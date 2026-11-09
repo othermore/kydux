@@ -2372,9 +2372,10 @@ one overturns stays, marked as superseded.
   as a door's, D150, `at` the first; the loader refuses others), open and closed together;
   the way down's lies on (10, 7) and (9, 7), as it is painted, so that no one walks round it,
   and the figures by its half-open door are drawn 0.2 toward the doorway's middle (D149 b).
-  Its picture is the art's state `open` (D148), drawn while it is open, and its ring while
-  `osto` holds it spans its cells; to the art tools a thing with a `closed` state is a door,
-  and a hole's one state has no leaf. The lesson *Luz y trampas* teaches the two waits as one;
+  Its picture is the art's state `open` (D148), drawn while it is open and never under the
+  wizard, who holds it closed standing on either cell (D53); while `osto` holds it, a ring
+  glows round its cells, an oval over both where it has two. To the art tools a thing with a
+  `closed` state is a door, and a hole's one state has no leaf. The lesson *Luz y trampas* teaches the two waits as one;
   the levels' solutions use `while not hole.closed:` and their bonus asks `closed`; *El
   agujero que se abre* (`the-opening-hole`) is played in four ways, *Se abre cada tres ticks*
   to *Se abre cada siete ticks*. In the words the child reads the hole is *un agujero que se

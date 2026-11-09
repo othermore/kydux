@@ -355,6 +355,33 @@ test.describe('what the page draws of the chapter', () => {
     await page.screenshot({ path: `${SHOTS}key-small.png` });
   });
 
+  test("the way down's hole takes (9, 7) as well as (10, 7): closed under the wizard on it, open once off it, a bump while open (D167)", async ({ page }) => {
+    // The friends stand on (9, 2) and (9, 3): the wizard steps into column 9 at the door,
+    // to (9, 6), the cell above the hole's second cell. The hole is closed for five ticks
+    // and open for five, from tick 0 closed.
+    const toTheEdge =
+      'wizard.move_down()\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\nwizard.move_left()\nwizard.move_down(2)\n';
+    const onIt = `${toTheEdge}while not hole.closed:\n    wizard.wait()\nwizard.move_down()\nwizard.wait(6)\n`;
+    await open(page, 'the-night-walk');
+    // On (9, 7) from tick 10, through ticks the hole is open: it stays closed under the
+    // wizard, as it does on its one cell (D53).
+    await run(page, onIt);
+    await expect(scene(page)).toHaveAttribute('data-wizard', '9,7');
+    await expect(scene(page)).toHaveAttribute('data-holes', 'hole:closed');
+    await page.keyboard.press('Escape');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hole-under-the-wizard.png` });
+    // A step off it, to (9, 8), and it is open behind the wizard.
+    await run(page, `${onIt}wizard.move_down()\n`);
+    await expect(scene(page)).toHaveAttribute('data-wizard', '9,8');
+    await expect(scene(page)).toHaveAttribute('data-holes', 'hole:open');
+    await page.keyboard.press('Escape');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hole-open-behind-the-wizard.png` });
+    // A step onto (9, 7) while it is open bumps, and the wizard stays on (9, 6).
+    await run(page, `${toTheEdge}while hole.closed:\n    wizard.wait()\nwizard.move_down()\n`);
+    await expect(scene(page)).toHaveAttribute('data-wizard', '9,6');
+    await expect(scene(page)).toHaveAttribute('data-holes', 'hole:open');
+  });
+
   test("a spell's word shows in italics, with no asterisk (D140)", async ({ page }) => {
     await page.goto('/#level/the-dark-room');
     await expect(page.locator('#card-intro em')).toHaveText('kirra');

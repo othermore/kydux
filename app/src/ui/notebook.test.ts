@@ -56,6 +56,18 @@ describe('the notebook', () => {
     expect(allows(['thing.position'], TABLE, 'wizard', 'position')).toBe(false);
   });
 
+  it("shows a position's two numbers under the wizard's attributes (D153)", () => {
+    const table: ApiTable = {
+      ...TABLE,
+      roles: { ...TABLE.roles, position: [{ name: 'x', kind: 'attribute', example: 'wizard.position.x' }] },
+    };
+    const taught = notebookEntries({ id: 'room', api: ['position.x'] }, table);
+    expect(taught.map(({ object, role, example }) => [object, role, example])).toEqual([
+      ['wizard', 'position', 'wizard.position.x'],
+    ]);
+    expect(notebookEntries({ id: 'room', api: [] }, table)).toEqual([]);
+  });
+
   it('is empty for a level that teaches nothing yet', () => {
     expect(notebookEntries({ id: 'none', api: [] }, TABLE)).toEqual([]);
   });

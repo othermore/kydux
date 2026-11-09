@@ -1526,3 +1526,147 @@ def test_a_band_freed_under_a_seam_is_the_stones_above_it_mirrored():
     # In the plain span the thing is gone: the stones beside it, mirrored in.
     assert laid[:, 60, 1].max() < 1
     assert part[0, 50] == 1 and part[0, 0] == 0
+
+
+def scene_of_pictures(tmp_path, monkeypatch, pictures: dict[str, np.ndarray], things: dict):
+    """A scene of one cell of 200 pixels, its pictures and settings in tmp_path."""
+    for name, pixels in pictures.items():
+        Image.fromarray(pixels).save(tmp_path / name)
+    grid = {"x": {"offset": 0, "spacing": 200}, "y": {"offset": 0, "spacing": 200}}
+    (tmp_path / "grid.json").write_text(json.dumps(grid))
+    data = {
+        "sources": {
+            "folder": str(tmp_path),
+            "edits": str(tmp_path),
+            "painting": "base.png",
+            "grid": "grid.json",
+            "ground": "base.png",
+        },
+        "things": things,
+    }
+    monkeypatch.setattr(scene_settings, "SCENES", tmp_path)
+    (tmp_path / "door").mkdir()
+    (tmp_path / "door" / "cut.json").write_text(json.dumps(data))
+    return scene_settings.Settings("door", data)
+
+
+def a_leaf_on(base: np.ndarray) -> np.ndarray:
+    """The base with a leaf in it, nearly the floor's colour, and with every line of
+    the picture moved a pixel, as a model's edit moves them."""
+    shown = base.copy()
+    shown[50:150, 60:140] = np.clip(base[50:150, 60:140].astype(int) + 18, 0, 255)
+    shown[50:150, 60:66] = 20
+    return shown
+
+
+def test_a_mask_is_the_difference_of_two_pictures_and_leaves_their_moved_lines_out():
+    base = np.full((200, 200, 3), 120, dtype=np.uint8)
+    # A line of the picture, which a model's edit moves a little.
+    base[20:23, 10:190] = 30
+    shown = a_leaf_on(base)
+    shown[20:23] = 120
+    shown[21:24, 10:190] = 30
+    mask = export_scene.difference_mask(shown, base, (0, 0, 200, 200))
+    assert mask[60:140, 70:130].all(), "the leaf is whole, though it is near the floor's colour"
+    assert not mask[15:30].any(), "a moved line is not the thing"
+    assert not mask[:45].any() and not mask[155:].any()
+
+
+def test_a_mask_stays_in_its_box_and_closes_its_small_holes():
+    base = np.full((200, 200, 3), 120, dtype=np.uint8)
+    shown = a_leaf_on(base)
+    # A knot in the leaf painted exactly as the floor.
+    shown[90:100, 80:90] = 120
+    mask = export_scene.difference_mask(shown, base, (0, 0, 100, 200))
+    assert not mask[:, 100:].any()
+    assert mask[92:98, 82:88].all()
+
+
+def test_trace_writes_a_state_s_mask_and_measures_what_leaked(tmp_path, monkeypatch):
+    import trace
+
+    base = np.full((200, 200, 3), 120, dtype=np.uint8)
+    scene = scene_of_pictures(
+        tmp_path,
+        monkeypatch,
+        {"base.png": base, "closed.png": a_leaf_on(base)},
+        {"door": {"box": [0.2, 0.2, 0.8, 0.8], "states": {"open": {"picture": "x", "row": 3}}}},
+    )
+    monkeypatch.setattr(export_scene, "RAW", tmp_path)
+    measured = trace.difference(scene, "door", tmp_path / "closed.png", "closed", None, {})
+    assert measured["leak"] == 0 and measured["pixels"] > 7000
+    written = json.loads((tmp_path / "door" / "cut.json").read_text())["things"]["door"]
+    assert written["states"]["closed"] == {"picture": "closed.png", "diff": {}}
+    # A state opened again keeps the row it is drawn on.
+    trace.difference(scene, "door", tmp_path / "closed.png", "open", None, {"speck": 3})
+    written = json.loads((tmp_path / "door" / "cut.json").read_text())["things"]["door"]
+    assert written["states"]["open"] == {"picture": "closed.png", "diff": {"speck": 3}, "row": 3}
+    assert measured["look"].is_file()
+
+
+def test_trace_makes_a_static_thing_s_mask_from_the_picture_with_it_gone(tmp_path, monkeypatch):
+    import trace
+
+    base = a_leaf_on(np.full((200, 200, 3), 120, dtype=np.uint8))
+    gone = np.full((200, 200, 3), 120, dtype=np.uint8)
+    scene = scene_of_pictures(
+        tmp_path,
+        monkeypatch,
+        {"base.png": base, "gone.png": gone},
+        {"statue": {"box": [0, 0, 1, 1], "static": True, "mask": "polygon", "polygon": [[0, 0]]}},
+    )
+    monkeypatch.setattr(export_scene, "RAW", tmp_path)
+    trace.difference(scene, "statue", tmp_path / "gone.png", None, None, {})
+    written = json.loads((tmp_path / "door" / "cut.json").read_text())["things"]["statue"]
+    assert written["mask"] == "difference" and written["picture"] == "gone.png"
+    assert "polygon" not in written
+    alpha = export_scene.static_alpha(
+        base, (0, 0, 200, 200), written, 200, None, scene.grid, tmp_path
+    )
+    assert alpha[60:140, 70:130].all() and not alpha[:45].any()
+
+
+def test_a_state_cut_by_difference_is_read_by_the_export(tmp_path, monkeypatch):
+    base = np.full((200, 200, 3), 120, dtype=np.uint8)
+    shown = a_leaf_on(base)
+    picture = {"picture": "closed.png", "diff": {}, "box": [0.2, 0.2, 0.5, 0.8]}
+    scene = scene_of_pictures(
+        tmp_path,
+        monkeypatch,
+        {"base.png": base, "closed.png": shown},
+        {"door": {"box": [0, 0, 1, 1], "solid": True, "states": {"closed": picture}}},
+    )
+    pixels, alpha = export_scene.state_alpha(
+        scene, scene.things["door"], picture, base, base, (0, 0, 200, 200), None
+    )
+    assert (pixels == shown).all()
+    assert alpha[60:140, 70:95].all() and not alpha[:, 101:].any()
+
+
+def make_map(tmp_path, monkeypatch, rows: list[str]) -> None:
+    (tmp_path / "content" / "scenes" / "door").mkdir(parents=True)
+    (tmp_path / "content" / "scenes" / "door" / "map.txt").write_text("\n".join(rows) + "\n")
+    monkeypatch.setattr(scene_settings, "REPO", tmp_path)
+
+
+def test_a_lowered_row_is_a_whole_row_lowered_by_a_third_of_a_cell(tmp_path, monkeypatch):
+    make_map(tmp_path, monkeypatch, ["....", "...."])
+    named = {"cells": [[0, 0], [1, 0]], "by": 0.5}
+    scene = scene_settings.Settings("door", {"lowered": [named], "lowered_rows": [1]})
+    assert scene.lowered[0] == named
+    assert scene.lowered[1]["cells"] == [[0, 1], [3, 1]]
+    assert scene.lowered[1]["by"] == scene_settings.LOWERED_ROW == 0.3
+
+
+@pytest.mark.parametrize("cells", [[[1, 0], [1, 1]], [[0, 1], [3, 1]]], ids=["column", "row"])
+def test_a_nudge_over_a_whole_column_or_row_is_refused(tmp_path, monkeypatch, cells):
+    make_map(tmp_path, monkeypatch, ["....", "...."])
+    scene = scene_settings.Settings("door", {"nudged": [{"cells": cells, "by": 0.2}]})
+    with pytest.raises(ValueError, match="whole column or row"):
+        scene.refuse_long_nudges()
+
+
+def test_a_nudge_round_a_door_is_not_refused(tmp_path, monkeypatch):
+    make_map(tmp_path, monkeypatch, ["....", "....", "....", "...."])
+    scene = scene_settings.Settings("door", {"nudged": [{"cells": [[1, 0], [1, 2]], "by": 0.2}]})
+    scene.refuse_long_nudges()

@@ -184,7 +184,7 @@ def test_dir_shows_only_the_child_s_names():
     assert dir(world.things["door"]) == sorted(api.MEMBERS["door"])
 
 
-ROLES = {"wizard": Wizard, "thing": Thing, **THINGS, **ACTORS}
+ROLES = {"wizard": Wizard, "thing": Thing, **THINGS, **ACTORS, "position": Position}
 
 
 @pytest.mark.parametrize(

@@ -86,7 +86,7 @@ def test_things_are_placed_by_marker_or_at():
     level = Level.from_dict(ROOMS)
     assert level.things == (
         ThingSpec("key", "key", Position(5, 1), opens="door"),
-        ThingSpec("door", "door", Position(7, 2), locked=True),
+        ThingSpec("door", "door", Position(7, 2), locked=True, cells=(Position(7, 2),)),
         ThingSpec("book", "book", Position(8, 1)),
     )
     assert level.ids() == ["key", "door", "book", "teacher"]

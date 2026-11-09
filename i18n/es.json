@@ -226,6 +226,10 @@
       "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}.",
       "reveal": "Muestra dónde se encuentra una cosa oculta."
     },
+    "position": {
+      "x": "El primer número de una casilla, su columna: cuántas casillas hay desde la izquierda, contando desde 0.",
+      "y": "El segundo número de una casilla, su fila: cuántas casillas hay desde arriba, contando desde 0."
+    },
     "tab_actions": "Acciones",
     "tab_spells": "Hechizos y palabras",
     "spells": "Hechizos",

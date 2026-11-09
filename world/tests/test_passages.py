@@ -567,3 +567,68 @@ def test_no_level_of_the_first_three_chapters_teaches_can_see():
             kind, _, item_id = item.partition(":")
             if kind == "level":
                 assert "teacher.can_see" not in real(item_id).api, item_id
+
+
+#: A doorway two cells wide across a room (D150), with its door shut.
+WIDE = {
+    "id": "wide_door",
+    "map": ["#########", "#..S....#", "###..####", "#......E#", "#########"],
+    "things": [{"kind": "door", "id": "door", "at": [3, 2], "cells": [[3, 2], [4, 2]]}],
+    "goals": [{"kind": "reach", "marker": "E"}],
+}
+
+
+@pytest.mark.parametrize("walk", ["wizard.move_down()", "wizard.move_right()\nwizard.move_down()"])
+def test_a_shut_door_blocks_every_cell_of_its_doorway(walk):
+    world = World(Level.from_dict(WIDE))
+    result = run_code(Level.from_dict(WIDE), walk)
+    assert world.door_at(Position(3, 2)) is world.door_at(Position(4, 2)) is not None
+    assert result.status == "incomplete"
+    assert any(event["kind"] == "bump" for event in result.to_dict()["events"])
+
+
+@pytest.mark.parametrize("column", [0, 1], ids=["first cell", "second cell"])
+def test_a_door_opens_from_beside_any_cell_and_frees_them_all(column):
+    walk = (
+        f"wizard.move_right({column})\ndoor.open()\n"
+        f"wizard.move_down(2)\nwizard.move_right({4 - column})\n"
+    )
+    result = run_code(Level.from_dict(WIDE), walk)
+    assert result.status == "won"
+
+
+def test_a_door_cannot_be_opened_from_a_cell_of_no_side_of_it():
+    result = run_code(Level.from_dict(WIDE), "wizard.move_left()\ndoor.open()\n")
+    blocked = [e for e in result.to_dict()["events"] if e["kind"] == "blocked"]
+    assert blocked and blocked[0]["data"]["reason"] == "far"
+
+
+@pytest.mark.parametrize(
+    ("cells", "says"),
+    [
+        ([[3, 2], [1, 1]], "not side by side"),
+        ([[3, 2], [2, 2]], "not floor"),
+        ([[4, 2], [3, 2]], "first cell"),
+        ([], "a list of"),
+    ],
+)
+def test_the_loader_refuses_a_door_whose_cells_cannot_be(cells, says):
+    door = {**WIDE["things"][0], "cells": cells}
+    with pytest.raises(LevelError, match=says):
+        Level.from_dict({**WIDE, "things": [door]})
+
+
+def test_only_a_door_has_cells():
+    key = {"kind": "key", "id": "key", "at": [1, 1], "cells": [[1, 1]]}
+    with pytest.raises(LevelError, match="only a door has cells"):
+        Level.from_dict({**WIDE, "things": [*WIDE["things"], key]})
+
+
+def test_a_position_s_two_numbers_are_its_x_and_its_y():
+    level = {
+        "id": "numbers",
+        "map": ["#####", "#S.K#", "#####"],
+        "things": [{"kind": "key", "id": "key", "marker": "K"}],
+    }
+    result = run_code(Level.from_dict(level), "print(key.position.x, key.position.y)\n")
+    assert result.stdout == "3 1\n"

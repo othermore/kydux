@@ -40,12 +40,18 @@ from .api import check_api
 
 
 class Position(NamedTuple):
+    """A cell's two numbers, its attributes `x` and `y`: `key.position.x` (D153)."""
+
     x: int
     y: int
 
     def __repr__(self) -> str:
         """As the child reads it: `print(wizard.position)` shows `(15, 3)`."""
         return f"({self.x}, {self.y})"
+
+
+Position.x.__doc__ = "The cell's first number, its column from the left: `wizard.position.x`"
+Position.y.__doc__ = "The cell's second number, its row from the top: `wizard.position.y`"
 
 
 class LevelError(ValueError):
@@ -111,6 +117,9 @@ class ThingSpec:
     #: For a door, the cells its open leaf lies on beside its doorway, which no one
     #: walks onto while it is open (D125).
     covers: tuple[Position, ...] = ()
+    #: For a door, the cells of its doorway, one or two side by side, its position the
+    #: first; shut, it blocks them all (D150).
+    cells: tuple[Position, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -469,10 +478,11 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         raise LevelError(f"{shape.level_id}: only a thing the wizard carries is hidden")
     covers = _covers(shape, spec, thing_id)
     pillow_side = _pillow_side(shape, spec, thing_id)
+    position = shape.place(spec, thing_id)
     return ThingSpec(
         kind,
         thing_id,
-        shape.place(spec, thing_id),
+        position,
         opens,
         locked,
         sealed,
@@ -483,6 +493,7 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         hidden=hidden,
         covers=covers,
         pillow_side=pillow_side,
+        cells=_door_cells(shape, spec, thing_id, position),
     )
 
 
@@ -503,6 +514,28 @@ def _pillow_side(shape: _Shape, spec: dict[str, Any], thing_id: str) -> Position
     if not inside or cell in shape.walls or cell in shape.shelves:
         raise LevelError(f"{shape.level_id}: {thing_id}'s pillow_side is no floor cell")
     return cell
+
+
+def _door_cells(
+    shape: _Shape, spec: dict[str, Any], thing_id: str, position: Position
+) -> tuple[Position, ...]:
+    """A door's `cells`: the one or two cells of its doorway, side by side, floor, the
+    first the door's own position (D150), which its scene names. A door with none has
+    its position alone; no other thing has any."""
+    cells = spec.get("cells")
+    if cells is None:
+        return (position,) if spec.get("kind") == "door" else ()
+    if spec.get("kind") != "door" or not isinstance(cells, list) or not cells:
+        raise LevelError(f"{shape.level_id}: only a door has cells, a list of [x, y]")
+    placed = tuple(shape.tile(cell, f"a cell of {thing_id}") for cell in cells)
+    if any(cell in shape.shelves for cell in placed):
+        raise LevelError(f"{shape.level_id}: a cell of {thing_id} is a shelf, not floor")
+    if placed[0] != position:
+        raise LevelError(f"{shape.level_id}: {thing_id}'s first cell is not where it is")
+    for one, other in zip(placed, placed[1:], strict=False):
+        if abs(one.x - other.x) + abs(one.y - other.y) != 1:
+            raise LevelError(f"{shape.level_id}: the cells of {thing_id} are not side by side")
+    return placed
 
 
 def _covers(shape: _Shape, spec: dict[str, Any], thing_id: str) -> tuple[Position, ...]:
@@ -891,6 +924,12 @@ def _merged_things(scene: Scene, data: dict[str, Any]) -> list[dict[str, Any]]:
     return [*fixed.values(), *own]
 
 
+def _story_door_cells(thing: dict[str, Any]) -> list[Position]:
+    """The cells of a door's doorway in a story's things, its `at` where it has no
+    `cells` (D150)."""
+    return [Position(*cell) for cell in thing.get("cells", [thing["at"]])]
+
+
 def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
     """level.json made whole on its scene (D65, D73): the map the world reads, its
     letters walls, floor and shelves by what each terrain lets through, with the
@@ -1036,9 +1075,10 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     grid = built["map"]
     height, width = len(grid), len(grid[0])
     shut = {
-        Position(*thing["at"])
+        cell
         for thing in built.get("things", [])
         if thing.get("kind") == "door" and thing.get("open") is not True and "at" in thing
+        for cell in _story_door_cells(thing)
     }
     camera = _story_tile(data.get("camera", list(wizard)), "camera", story_id)
     # A morning story on a scene painted at night opens under the morning's light (D124).
@@ -1120,11 +1160,11 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
             lie_down(actor["id"], actor["asleep"], str(story_id))
 
     doors = {
-        thing["id"]: Position(*thing["at"])
+        thing["id"]: _story_door_cells(thing)
         for thing in built.get("things", [])
         if thing.get("kind") == "door" and "at" in thing
     }
-    opened.update(name for name, at in doors.items() if at not in shut)
+    opened.update(name for name, cells in doors.items() if not shut.intersection(cells))
 
     def shove(door: str, queues: dict[str, list[tuple[str, Any]]], here: str) -> None:
         """Whoever stands on the door's leaf as it opens steps to the nearest free
@@ -1134,7 +1174,7 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                 continue
             if queues.get(who):
                 raise LevelError(f"{here}: {who} is in the way of {door}'s leaf, mid-way")
-            way = -1 if at.x < doors[door].x else 1
+            way = -1 if at.x < doors[door][0].x else 1
             to = None
             for along in (way, -way):
                 tile = Position(at.x + along, at.y)
@@ -1264,20 +1304,20 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                         )
                     where[doer] = value
                 elif kind in ("open", "close"):
-                    if not beside(doer, doors[value]):
+                    if not any(beside(doer, cell) for cell in doors[value]):
                         raise LevelError(f"{here}: {doer} stands beside no {value}")
                     if (value in opened) == (kind == "open"):
                         state = "open" if kind == "open" else "shut"
                         raise LevelError(f"{here}: {value} is {state} already")
                     if kind == "open":
                         opened.add(value)
-                        shut.discard(doors[value])
+                        shut.difference_update(doors[value])
                         shove(value, queues, here)
                     else:
-                        if any(at == doors[value] for at in where.values()):
+                        if any(at in doors[value] for at in where.values()):
                             raise LevelError(f"{here}: someone stands in {value}'s doorway")
                         opened.discard(value)
-                        shut.add(doors[value])
+                        shut.update(doors[value])
         if vanishing:
             where[who] = None
         if who != "voice" and where[who] is None and not vanishing:

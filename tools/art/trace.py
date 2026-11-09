@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Aids for a door's polygons on a scene's pictures, in cells (D113): a leaf's,
-traced by hand, and its doorway's, made from the open doorway's fill.
+"""Aids for a thing's cut-outs on a scene's pictures: its mask as the difference of two
+of them (D148), and a polygon in cells, traced by hand (D113).
 
+    tools/art/trace.py <scene> diff <thing> <picture> [--state <state>] [--within X0 Y0 X1 Y1]
+                                    [--threshold 26] [--soft 13] [--speck 8] [--holes 3000]
     tools/art/trace.py <scene> look <picture> x0 y0 x1 y1 [--scale 3] [--poly <json>]
                                     [--diff <other picture>] [--out <png>]
     tools/art/trace.py <scene> outline <picture> x0 y0 x1 y1 <seed x> <seed y>
@@ -9,6 +11,16 @@ traced by hand, and its doorway's, made from the open doorway's fill.
     tools/art/trace.py <scene> footprint <door thing> [--grow 7] [--tolerance 1.5]
                                     [--out <json>]
     tools/art/trace.py <scene> fit <picture>
+
+`diff` writes a thing's mask into its settings as the difference of `picture` against
+the scene's painting, its base (D148): the colour distance smoothed and thresholded,
+cleaned of specks, closed over its holes, kept within the thing's box (`--within` for
+a part of it). With `--state`, the state of a thing that comes and goes; without it, a
+static thing, cut from the base where `picture`, the base with the thing gone, differs.
+It prints how much the mask covers and the leak, how much of a cell's band round the
+box differs the same way: more than a fringe says the edit changed what it should not,
+and is asked again. It writes art/raw/game-check/diff-<scene>-<thing>[-<state>].png, the
+picture with the mask's edge drawn in magenta, to look at.
 
 `look` writes a crop of the picture, the box given in cells, enlarged `--scale`
 times, with a grid line every tenth of a cell, numbered every half cell; with
@@ -248,6 +260,70 @@ def footprint(
     return edge_in_cells(region, (left, top), settings.grid, tolerance)
 
 
+#: How wide the band round a thing's box the leak is measured on, in cells; and the share
+#: of it that may differ before the picture is asked again.
+LEAK_BAND = 0.5
+LEAK_MOST = 0.03
+
+
+def difference(
+    settings: scene_settings.Settings,
+    name: str,
+    picture: Path,
+    state: str | None,
+    within: tuple[float, float, float, float] | None,
+    options: dict,
+) -> dict:
+    """A thing's mask as the difference of `picture` against the base (D148), written
+    into its settings; what it measured, and the look it wrote."""
+    thing = settings.data["things"][name]
+    grid = settings.grid
+    base = np.array(Image.open(settings.painting).convert("RGB"))
+    shown = np.array(Image.open(picture).convert("RGB"))
+    box = tuple(within or thing["box"])
+    native = export_scene.native_box(grid, box)
+    mask = export_scene.difference_mask(shown, base, native, options)
+    if not mask.any():
+        raise SystemExit(f"{name}: {picture.name} does not differ from the base in its box")
+    spacing = round(grid["x"]["spacing"])
+    band = round(LEAK_BAND * spacing)
+    x0, y0, x1, y1 = native
+    around = (x0 - band, y0 - band, x1 + band, y1 + band)
+    height, width = base.shape[:2]
+    ring = export_scene.in_box((height, width), around) & ~export_scene.in_box(
+        (height, width), native
+    )
+    leaked = export_scene.difference_mask(shown, base, around, options) & ring
+    leak = float(leaked.sum() / max(1, ring.sum()))
+    relative = picture.relative_to(settings.edits).as_posix()
+    own = {key: value for key, value in options.items() if value is not None}
+    if state is None:
+        thing["mask"] = "difference"
+        thing["picture"] = relative
+        thing["diff"] = own
+        thing.pop("polygon", None)
+    else:
+        entry = {"picture": relative, "diff": own}
+        was = thing["states"].get(state)
+        if isinstance(was, dict) and "row" in was:
+            entry["row"] = was["row"]
+        if within:
+            entry["box"] = list(within)
+        thing["states"][state] = entry
+    path = scene_settings.SCENES / settings.id / "cut.json"
+    path.write_text(json.dumps(settings.data, indent=2, ensure_ascii=False) + "\n")
+    out = export_scene.RAW / "game-check"
+    out.mkdir(parents=True, exist_ok=True)
+    suffix = f"-{state}" if state else ""
+    target = out / f"diff-{settings.id}-{name}{suffix}.png"
+    edge = export_scene.edge_of(mask.astype(np.float32))
+    edged = shown.copy()
+    edged[image_first.dilated(edge, 1)] = (255, 0, 255)
+    left, top = max(0, around[0]), max(0, around[1])
+    Image.fromarray(edged[top : around[3], left : around[2]]).save(target)
+    return {"pixels": int(mask.sum()), "leak": leak, "look": target}
+
+
 #: How far a box of a scene's picture at another hour is shifted to lay it on the
 #: painting, in the painting's pixels; how far it may be off and how much of the
 #: painting's outlines it must cover for the picture to fit whole (D126).
@@ -315,8 +391,32 @@ def main(arguments: list[str]) -> int:
     footprinting.add_argument("--out", type=Path)
     fitting = commands.add_parser("fit")
     fitting.add_argument("picture", type=Path)
+    differing = commands.add_parser("diff")
+    differing.add_argument("thing")
+    differing.add_argument("picture", type=Path)
+    differing.add_argument("--state")
+    differing.add_argument("--within", type=float, nargs=4, metavar=("X0", "Y0", "X1", "Y1"))
+    differing.add_argument("--threshold", type=int)
+    differing.add_argument("--soft", type=int)
+    differing.add_argument("--speck", type=int)
+    differing.add_argument("--holes", type=int)
     found = parser.parse_args(arguments)
     settings = scene_settings.settings(found.scene)
+    if found.command == "diff":
+        picture = found.picture if found.picture.is_absolute() else settings.edits / found.picture
+        options = {
+            "threshold": found.threshold,
+            "soft": found.soft,
+            "speck": found.speck,
+            "holes": found.holes,
+        }
+        told = {key: value for key, value in options.items() if value is not None}
+        within = tuple(found.within) if found.within else None
+        measured = difference(settings, found.thing, picture, found.state, within, told)
+        verdict = "asked again" if measured["leak"] > LEAK_MOST else "a fringe at most"
+        print(f"{measured['pixels']} pixels; leak {measured['leak']:.3f} ({verdict})")
+        print(measured["look"])
+        return 0
     if found.command == "fit":
         picture = found.picture if found.picture.is_absolute() else REPO / found.picture
         rows = fit(settings, picture)

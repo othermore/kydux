@@ -15,6 +15,9 @@ REPO = Path(__file__).resolve().parents[2]
 SCENES = REPO / "art" / "scenes"
 #: Where the export puts what it works on, in art/raw/, which git ignores.
 WORK = REPO / "art" / "raw" / "game"
+#: How much lower a figure is drawn on a floor row right under a wall's foot, so that it
+#: stands in the corridor and not on the wall (D149).
+LOWERED_ROW = 0.3
 
 
 @dataclass
@@ -94,10 +97,35 @@ class Settings:
     def marks(self) -> list[str]:
         return [row for row in self.map.read_text().splitlines() if row]
 
+    @property
+    def lowered(self) -> list[dict]:
+        """The cells a figure is drawn lower on: the ranges named, then each row named."""
+        columns = len(self.marks()[0])
+        whole = [
+            {
+                "about": "The floor row right under a wall's foot (D149).",
+                "cells": [[0, row], [columns - 1, row]],
+                "by": LOWERED_ROW,
+            }
+            for row in self.data.get("lowered_rows", [])
+        ]
+        return [*self.data.get("lowered", []), *whole]
+
+    def refuse_long_nudges(self) -> None:
+        """A figure walks its own column; only the cells round a door or an arch are
+        nudged, never a whole column or row (D149)."""
+        marks = self.marks()
+        for part in self.data.get("nudged", []):
+            (x0, y0), (x1, y1) = part["cells"]
+            if y1 - y0 + 1 >= len(marks) or x1 - x0 + 1 >= len(marks[0]):
+                raise ValueError(f"{self.id}: a nudge over a whole column or row: {part['cells']}")
+
 
 def settings(scene_id: str) -> Settings:
     path = SCENES / scene_id / "cut.json"
-    return Settings(scene_id, json.loads(path.read_text(encoding="utf-8")))
+    found = Settings(scene_id, json.loads(path.read_text(encoding="utf-8")))
+    found.refuse_long_nudges()
+    return found
 
 
 def scenes() -> list[str]:

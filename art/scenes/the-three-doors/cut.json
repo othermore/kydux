@@ -1184,22 +1184,6 @@
     "shade": 0.72,
     "painting": "art/raw/game-three-doors/three-doors-whole.png"
   },
-  "nudged": [
-    {
-      "about": "The door's opening lies half a cell left of the column walked, its middle on column 10's left line: whoever walks the column walks the opening's middle.",
-      "cells": [
-        [
-          10,
-          0
-        ],
-        [
-          10,
-          14
-        ]
-      ],
-      "by": -0.5
-    }
-  ],
   "kept": [
     [
       9.0,

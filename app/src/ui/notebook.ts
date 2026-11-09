@@ -69,12 +69,15 @@ export function notebookEntries(level: LevelJson, table: ApiTable, course?: Cour
   const concepts = course?.concepts ?? ['arguments'];
   const entries: NotebookEntry[] = [];
   for (const object of heldObjects(level, table)) {
-    for (const member of table.roles[object.role] ?? []) {
-      if (!allows(api, table, object.role, member.name)) continue;
-      const simple = member.simple !== undefined && !concepts.includes('arguments');
-      // The example names its own object first; the child's is named here.
-      const example = (simple ? (member.simple ?? '') : member.example).replace(/^\w+(?=\.)/, object.name);
-      entries.push({ object: object.name, role: object.role, member, example, simple });
+    // A position's two numbers are shown under the wizard's attributes (D153).
+    for (const role of object.role === 'wizard' ? [object.role, 'position'] : [object.role]) {
+      for (const member of table.roles[role] ?? []) {
+        if (!allows(api, table, role, member.name)) continue;
+        const simple = member.simple !== undefined && !concepts.includes('arguments');
+        // The example names its own object first; the child's is named here.
+        const example = (simple ? (member.simple ?? '') : member.example).replace(/^\w+(?=\.)/, object.name);
+        entries.push({ object: object.name, role, member, example, simple });
+      }
     }
   }
   return entries;

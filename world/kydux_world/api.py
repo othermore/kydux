@@ -51,6 +51,8 @@ MEMBERS: dict[str, tuple[str, ...]] = {
     "cat": ("kind", "name", "position", "facing", "distance_to"),
     # A friend teaches by words, not by code: the child's code has nothing of it (D66).
     "friend": (),
+    # What a position holds: its two numbers, `key.position.x` (D153).
+    "position": ("x", "y"),
 }
 
 #: The roles that are things, and so have a thing's members.
@@ -95,16 +97,18 @@ def table() -> dict[str, list[dict[str, str]]]:
     build time (architecture.md, D30), so that the page needs no Python to show it."""
     from .actors import ACTORS
     from .explain import example
+    from .level import Position
     from .things import THINGS, Thing
     from .world import Wizard
 
-    classes = {"wizard": Wizard, "thing": Thing, **THINGS, **ACTORS}
+    classes = {"wizard": Wizard, "thing": Thing, **THINGS, **ACTORS, "position": Position}
     found: dict[str, list[dict[str, str]]] = {}
     for role, members in MEMBERS.items():
         owner = classes[role]
         found[role] = []
         for member in members:
-            attribute = isinstance(getattr(owner, member), property)
+            found_member = getattr(owner, member)
+            attribute = isinstance(found_member, property) or not callable(found_member)
             shown = _attribute_example(owner, member) if attribute else example(owner, member)
             kind = "attribute" if attribute else "action"
             entry = {"name": member, "kind": kind, "example": shown}

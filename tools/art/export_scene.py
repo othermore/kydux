@@ -128,6 +128,43 @@ def changed(a: np.ndarray, b: np.ndarray, threshold: float = 60) -> np.ndarray:
     return np.array(mask) > 127
 
 
+#: How a thing's mask is read from two of a scene's pictures (D148): the colour distance
+#: over which a pixel differs, smoothed little where a line changed and much where a
+#: plank is coloured nearly as the floor; the pieces thinner than `speck` pixels, the
+#: lines a model's edit moved a little, which are not the thing; and the holes of no more
+#: than `holes` pixels, which are of the thing.
+DIFFERENCE = {"threshold": 26, "soft": 13, "speck": 8, "holes": 3000}
+#: How far each of the two distances is smoothed, in the painting's pixels.
+DIFFERENCE_BLUR = (1.2, 5.0)
+
+
+def difference_mask(
+    shown: np.ndarray, base: np.ndarray, box: tuple[int, int, int, int], own: dict | None = None
+) -> np.ndarray:
+    """A thing's mask as the difference between two of a scene's pictures, in the
+    painting's own pixels, within its box (D148): the colour distance smoothed and
+    thresholded, cleaned of specks and of what is thinner than a thing, its holes closed
+    up to a size, and its pieces kept when they are not scraps."""
+    options = {**DIFFERENCE, **(own or {})}
+    height, width = base.shape[:2]
+    x0, y0, x1, y1 = max(0, box[0]), max(0, box[1]), min(width, box[2]), min(height, box[3])
+    crop = (slice(y0, y1), slice(x0, x1))
+    distance = np.abs(shown[crop].astype(np.int16) - base[crop].astype(np.int16)).sum(axis=2) / 3
+    plain = Image.fromarray(np.clip(distance, 0, 255).astype(np.uint8))
+    sharp, soft = (np.array(plain.filter(ImageFilter.GaussianBlur(r))) for r in DIFFERENCE_BLUR)
+    differs = (sharp > options["threshold"]) | (soft > options["soft"])
+    speck = options["speck"]
+    # What survives the opening is the thing; its corners and its thin parts come back
+    # from what is near it, so that the cleaning rounds nothing off.
+    solid = image_first.dilated(image_first.eroded(differs, speck), speck)
+    mask = differs & image_first.dilated(solid, speck + 2)
+    mask = image_first.filled(mask, options["holes"])
+    mask = kept(mask, options.get("scraps", 0.02))
+    out = np.zeros(base.shape[:2], dtype=bool)
+    out[crop] = mask
+    return out
+
+
 def in_box(shape: tuple[int, int], box: tuple[int, int, int, int]) -> np.ndarray:
     """The pixels of a box, which may reach past the picture's edges."""
     inside = np.zeros(shape, dtype=bool)
@@ -321,6 +358,12 @@ def state_alpha(
         return without, sprite_alpha(painting, without, native, thing, spacing, th)
     if isinstance(picture, dict):
         shown = np.array(Image.open(settings.edits / picture["picture"]).convert("RGB"))
+        if "diff" in picture:
+            # A state cut by the difference against the scene's base (D148), its box
+            # its own where the state lies in a part of the thing's.
+            within = native_box(grid, picture["box"]) if "box" in picture else native
+            mask = difference_mask(shown, painting, within, picture["diff"])
+            return shown, mask.astype(np.float32)
         traced = picture.get("leaf", picture.get("traced"))
         if traced is not None:
             # A double door's two leaves are two polygons, a list of them.
@@ -356,6 +399,10 @@ def static_alpha(
     inside = in_box(painting.shape[:2], box)
     if thing["mask"] == "box":
         return inside.astype(np.float32)
+    if thing["mask"] == "difference":
+        # What a figure walks behind, by the picture with it gone (D148).
+        gone = np.array(Image.open(edits / thing["picture"]).convert("RGB"))
+        return difference_mask(gone, painting, box, thing.get("diff")).astype(np.float32)
     if thing["mask"] == "pale":
         hsv = np.array(Image.fromarray(painting).convert("HSV")).astype(np.float32) / 255
         pale = (hsv[..., 2] > PALE_VALUE) & (hsv[..., 1] < PALE_SATURATION) & inside
@@ -975,7 +1022,7 @@ def scene(settings: Settings) -> Path:
         "things": things,
         **({"beds": beds_of(settings)} if settings.data.get("beds") else {}),
         # The cells a figure is drawn lower on, behind what stands below it (D95).
-        **({"lowered": settings.data["lowered"]} if settings.data.get("lowered") else {}),
+        **({"lowered": settings.lowered} if settings.lowered else {}),
         # The cells a figure is drawn sideways on, on the painted strip (D105).
         **({"nudged": settings.data["nudged"]} if settings.data.get("nudged") else {}),
         # The dark passages a figure is drawn darker in, the deeper it goes (shade.ts).

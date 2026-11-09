@@ -174,6 +174,13 @@ class Door(Thing):
         )
         return f"<door {self._k_spec.id} {state}>"
 
+    def _k_beside(self, position: Position) -> bool:
+        """Whether a tile lies next to a cell of the doorway and not in it (D150)."""
+        cells = self._k_spec.cells
+        return position not in cells and any(
+            abs(cell.x - position.x) + abs(cell.y - position.y) == 1 for cell in cells
+        )
+
     @property
     def sealed(self) -> bool:
         """True while the door is sealed, until its spell is cast beside it: `door.sealed`"""
@@ -223,7 +230,7 @@ class Door(Thing):
         wizard = world.wizard.position
         # `tried` says whether the wizard got to try: from too far, or at a door
         # already open, there is nothing to try, and the scene shows no attempt.
-        if abs(wizard.x - self._k_position.x) + abs(wizard.y - self._k_position.y) != 1:
+        if not self._k_beside(wizard):
             world.act("blocked", {"at": at, "by": self.name, "reason": "far", "tried": False})
         elif self._k_open:
             world.act("blocked", {"at": at, "by": self.name, "reason": "open", "tried": False})

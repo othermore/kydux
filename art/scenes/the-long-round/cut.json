@@ -135,21 +135,5 @@
     ],
     "shade": 0.72,
     "painting": "art/raw/game-long-round/long-round-whole.png"
-  },
-  "nudged": [
-    {
-      "about": "The corridor's middle lies on column 10's left line: whoever walks the column walks its middle.",
-      "cells": [
-        [
-          10,
-          0
-        ],
-        [
-          10,
-          14
-        ]
-      ],
-      "by": -0.45
-    }
-  ]
+  }
 }

@@ -767,22 +767,6 @@
     "canvas": "art/raw/game-way-down/way-down-voids-canvas.png",
     "painting": "art/raw/game-way-down/way-down-voids.png"
   },
-  "nudged": [
-    {
-      "about": "The corridor's middle lies near column 10's left line: whoever walks the column walks its middle.",
-      "cells": [
-        [
-          10,
-          0
-        ],
-        [
-          10,
-          14
-        ]
-      ],
-      "by": -0.45
-    }
-  ],
   "hole": {
     "about": "The hole in the corridor's floor where the slab comes and goes (D138): the storeroom's, Gemini's picture of it, laid across the corridor by tools/art/repaint.py placed, no model asked.",
     "from": "art/raw/game-way-down/way-down-whole.png",

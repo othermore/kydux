@@ -226,6 +226,10 @@
       "distance_to": "Gives the number of steps from an object to the wizard.",
       "reveal": "Shows where a hidden thing lies."
     },
+    "position": {
+      "x": "A cell's first number, its column: how many cells from the left, counting from 0.",
+      "y": "A cell's second number, its row: how many cells from the top, counting from 0."
+    },
     "tab_actions": "Actions",
     "tab_spells": "Spells and words",
     "spells": "Spells",

@@ -185,7 +185,7 @@ class World:
 
     def door_at(self, position: Position) -> Door | None:
         for thing in self.things.values():
-            if isinstance(thing, Door) and thing._k_position == position:
+            if isinstance(thing, Door) and position in thing._k_spec.cells:
                 return thing
         return None
 
@@ -236,8 +236,7 @@ class World:
         for thing in sorted(self.things.values(), key=lambda t: t.name):
             if not isinstance(thing, Door) or thing.is_open:
                 continue
-            where = thing._k_position
-            if abs(where.x - position.x) + abs(where.y - position.y) == 1 and opens(thing):
+            if thing._k_beside(position) and opens(thing):
                 return thing
         return None
 

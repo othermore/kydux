@@ -282,7 +282,9 @@
     "page": "Página {n} de {total}",
     "try": "Probar",
     "go_on": "Seguir",
-    "not_found": "No hay ninguna lección llamada «{id}»."
+    "not_found": "No hay ninguna lección llamada «{id}».",
+    "ended_at": "{El mago|La maga} ha terminado en la casilla ({x}, {y}).",
+    "ended_quiet": "El programa ha terminado, y no ha escrito nada."
   },
   "story": {
     "next": "Siguiente",

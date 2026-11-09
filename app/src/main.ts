@@ -8,6 +8,7 @@ import {
   knownApi,
   knownSpells,
   knownWords,
+  levelAfter,
   loadCourse,
   next,
   parseItem,
@@ -19,11 +20,14 @@ import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from
 import { currentLanguage, fallbackLanguage, forWizard, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
 import { startPlayTime } from './progress/playtime';
 import * as progress from './progress/progress';
+import type { LevelJson } from './runtime/protocol';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
 import { handheldNote } from './ui/handheld';
+import type { LessonRunner } from './ui/lessonrun';
 import type { MapScreenParts } from './ui/map';
 import type { Screen } from './ui/screen';
+import { lookOf } from './engine/looks';
 import { setMuted } from './engine/sfx';
 import { applyLook } from './ui/look';
 import { settingsScreen } from './ui/settings';
@@ -137,13 +141,72 @@ function notFound(content: HTMLElement, kind: 'lesson' | 'story', id: string): v
   );
 }
 
+/** How a lesson's code runs on its page (D142): in the level after it, at its start. */
+function lessonRunner(
+  course: Course,
+  id: string,
+  createEditor: LessonRunner['createEditor'],
+): { runner?: LessonRunner } {
+  const tried = levelAfter(course, `lesson:${id}`);
+  if (!tried) return {};
+  let world: Promise<LevelJson> | null = null;
+  return {
+    runner: {
+      runtime,
+      level: () => (world ??= loadLevel(tried, currentLanguage()).then((loaded) => loaded.level)),
+      createEditor,
+      openPlan: async (level, onClose) => {
+        const [{ layout }, { loadArt, planPictures }, { openPlan }] = await Promise.all([
+          import('./engine/layout'),
+          import('./engine/painted'),
+          import('./ui/plan'),
+        ]);
+        const map = layout(level);
+        const art = await loadArt(level);
+        const figures = [
+          { id: 'wizard', kind: 'wizard', tile: map.start, facing: 'down' },
+          ...map.actors
+            .filter((actor) => !actor.hidden)
+            .map(({ id: actor, kind, tile, facing }) => ({ id: actor, kind, tile, facing: facing as string })),
+        ];
+        const things = map.things
+          .filter((thing) => !thing.carried)
+          .map(({ id: thing, kind, tile, open, art: painted }) => ({
+            id: thing,
+            kind,
+            tile,
+            open,
+            ...(painted ? { art: painted } : {}),
+          }));
+        const wizard = progress.wizard();
+        const look = lookOf(wizard?.look);
+        return openPlan(
+          {
+            rows: map.rows,
+            enchanted: map.enchanted,
+            unlit: map.dark ? map.darkArea : [],
+            figures,
+            things,
+            marks: map.reaches,
+            ...(art
+              ? { pictures: planPictures(art, things.filter((thing) => thing.kind === 'door'), figures, look) }
+              : {}),
+          },
+          onClose,
+        );
+      },
+    },
+  };
+}
+
 /** A lesson (D56): pages read one after another. */
 async function showLesson(content: HTMLElement, id: string, key: string, from?: string): Promise<void> {
   try {
-    const [lesson, course, { lessonScreen }] = await Promise.all([
+    const [lesson, course, { lessonScreen }, { createEditor }] = await Promise.all([
       loadLesson(id, currentLanguage()),
       loadCourse(),
       import('./ui/lesson'),
+      import('./editor/editor'),
     ]);
     if (shownRoute !== key) return;
     show(
@@ -155,6 +218,7 @@ async function showLesson(content: HTMLElement, id: string, key: string, from?: 
         // Read again from a level, the lesson goes back to it (D71).
         ...(from ? { backTo: `#level/${from}` } : {}),
         reload: () => loadLesson(id, currentLanguage()),
+        ...lessonRunner(course, id, createEditor),
       }),
     );
   } catch (error) {

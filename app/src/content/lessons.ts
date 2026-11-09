@@ -1,8 +1,8 @@
 // Loading a lesson: lesson.json and its Markdown in the player's language, from
 // content/lessons/<id>/ (D33, D56). Pages are separated by a line of `---`; a
-// fenced block marked `python try` on the last page is its example, shown as
-// code: the level after it starts with its own program, never with the example
-// (D63).
+// fenced block marked `python try`, on any page, is code the child runs and changes
+// on the page itself (D142); the one on the last page is the lesson's example: the
+// level after it starts with its own program, never with it (D63).
 
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
 
@@ -13,7 +13,7 @@ export interface Lesson {
   title: string;
   /** Each page's Markdown. */
   pages: string[];
-  /** The Try it example, or null when the lesson has none. */
+  /** The last page's block, the example, or null when the lesson has none. */
   tryCode: string | null;
   /** Who teaches the lesson: a character of story.md (D67). */
   speaker?: string;
@@ -27,18 +27,25 @@ export class LessonNotFound extends Error {
 
 const TRY_BLOCK = /```python try\n([\s\S]*?)```/;
 
-/** A lesson's Markdown taken apart: its title, its pages, its Try it. */
+/** A lesson's Markdown taken apart: its title, its pages, the last page's block. */
 export function readLesson(markdown: string): Pick<Lesson, 'title' | 'pages' | 'tryCode'> {
-  const tried = TRY_BLOCK.exec(markdown);
-  const tryCode = tried ? (tried[1] ?? '') : null;
-  // The Try it is shown on its page as code, without the word that marks it.
-  const shown = markdown.replace(TRY_BLOCK, (_whole, code: string) => `\`\`\`python\n${code}\`\`\``);
-  const pages = shown
+  const pages = markdown
     .split(/^---$/m)
     .map((page) => page.trim())
     .filter((page) => page !== '');
+  const tried = TRY_BLOCK.exec(pages[pages.length - 1] ?? '');
+  const tryCode = tried ? (tried[1] ?? '') : null;
   const title = /^#\s+(.+)$/m.exec(pages[0] ?? '')?.[1]?.trim() ?? '';
   return { title, pages, tryCode };
+}
+
+/** A page cut at its blocks: its Markdown, and the code the child runs, in their order. */
+export function pageParts(page: string): ({ markdown: string } | { code: string })[] {
+  const parts = page.split(/```python try\n([\s\S]*?)```/);
+  return parts.flatMap((part, index): ({ markdown: string } | { code: string })[] => {
+    if (index % 2 === 1) return [{ code: part }];
+    return part.trim() === '' ? [] : [{ markdown: part }];
+  });
 }
 
 async function fetched(url: string, kind: 'json' | 'text'): Promise<string | null> {

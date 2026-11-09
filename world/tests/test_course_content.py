@@ -89,7 +89,8 @@ def test_a_lesson_is_in_every_language_with_the_same_pages(path):
         text = markdown.read_text(encoding="utf-8")
         counts[lang] = len(pages(text))
         assert re.match(r"#\s+\S", text), f"{path.name}/{lang}.md does not open with its title"
-        assert len(TRY.findall(text)) <= 1, f"{path.name}/{lang}.md has more than one Try it"
+        for page in pages(text):
+            assert len(TRY.findall(page)) <= 1, f"{path.name}/{lang}.md: a page has two blocks"
     assert len(set(counts.values())) == 1, f"{path.name}: pages differ, {counts}"
 
 
@@ -128,22 +129,24 @@ def test_a_lesson_s_concepts_are_ones_the_game_knows(path):
     [(p, lang, gender) for p in LESSONS for lang in LANGUAGES for gender in ("girl", "boy")],
     ids=lambda v: v.name if isinstance(v, Path) else v,
 )
-def test_a_lesson_s_try_it_runs_in_the_level_after_it(path, lang, gender):
+def test_a_lesson_s_blocks_run_in_the_level_after_it(path, lang, gender):
+    """Each block of a lesson runs on its page, in the world of the level after it (D142)."""
     text = for_wizard((path / f"{lang}.md").read_text(encoding="utf-8"), gender)
     found = TRY.findall(text)
     if not found:
         return
     level = level_after(f"lesson:{path.name}")
-    result = run_code(Level.from_directory(level), found[0])
-    assert result.status != "error", result.error
-    stumbles = [e for e in result.events if e.kind in ("bump", "blocked")]
     lesson = json.loads((path / "lesson.json").read_text(encoding="utf-8"))
-    if lesson.get("try") == "refused":
-        # A lesson on where an action works shows it refused where it does not (D84).
-        assert stumbles, f"{path.name}'s example is refused nothing in {level.name}"
-        return
-    # The example is the level's own: it bumps into nothing and is refused nothing.
-    assert not stumbles, f"{path.name}'s example stumbles in {level.name}: {stumbles[0].data}"
+    for code in found:
+        result = run_code(Level.from_directory(level), code)
+        assert result.status != "error", result.error
+        stumbles = [e for e in result.events if e.kind in ("bump", "blocked")]
+        if lesson.get("try") == "refused":
+            # A lesson on where an action works shows it refused where it does not (D84).
+            assert stumbles, f"{path.name}'s example is refused nothing in {level.name}"
+            continue
+        # The example is the level's own: it bumps into nothing and is refused nothing.
+        assert not stumbles, f"{path.name}'s example stumbles in {level.name}: {stumbles[0].data}"
 
 
 def level_api(item_id: str) -> list[str]:

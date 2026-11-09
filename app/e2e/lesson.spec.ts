@@ -16,8 +16,9 @@ test('a lesson turns its pages, theory first, and Try it opens the level, its ed
   await expect(page.locator('.lesson-page code')).toContainText('wizard.move_right()');
   await page.locator('#lesson-next').click();
   await expect(page.locator('#lesson-page')).toHaveText('Page 3 of 3');
-  await expect(page.locator('.lesson-page pre')).toContainText('wizard.move_right()');
-  await expect(page.locator('.lesson-page pre')).not.toContainText('try');
+  // Its code in an editor, without the word that marks it, to run on the page (D142).
+  await expect(page.locator('.lesson-run .cm-content')).toContainText('wizard.move_right()');
+  await expect(page.locator('.lesson-page')).not.toContainText('python try');
 
   await page.locator('#lesson-try').click();
   await expect(page).toHaveURL(/#level\/the-gate$/);
@@ -45,7 +46,7 @@ for (const [locale, tryIt, goOn] of [
     // button goes on to the next lesson.
     await page.goto('/#lesson/what-things-know');
     await toLastPage();
-    await expect(page.locator('.lesson-page pre')).toHaveCount(1);
+    await expect(page.locator('.lesson-run')).toHaveCount(1);
     await expect(page.locator('#lesson-try')).toHaveText(goOn);
     await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
     await page.locator('#lesson-try').click();
@@ -95,4 +96,65 @@ test('a lesson shows who teaches it; a story is told on its scene instead (D67, 
   await expect(page.locator('.story-screen #scene canvas')).toBeVisible();
   await expect(page.locator('.lesson-screen')).toHaveCount(0);
   await expect(page.locator('#lesson-teacher')).toHaveCount(0);
+});
+
+test.describe('a page runs its code (D142)', () => {
+  test('a block prints on the page, in the level after the lesson, and can be changed', async ({ page }) => {
+    await page.goto('/#lesson/where-i-am');
+    await expect(page.locator('.lesson-page')).toBeVisible();
+    while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('(15, 3)', { timeout: 90_000 });
+    await expect(page.locator('.lesson-said')).toBeHidden();
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('print(wizard.facing)');
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('down', { timeout: 30_000 });
+    // A mistake is told in the child's words.
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('print(dak.facing)');
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-said')).toContainText('dak', { timeout: 30_000 });
+    await expect(page.locator('.lesson-printed')).toBeHidden();
+  });
+
+  test('a block that walks says the cell the wizard ended on, always from the start', async ({ page }) => {
+    await page.goto('/#lesson/waiting');
+    await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-said')).toContainText('(11, 5)', { timeout: 90_000 });
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-said')).toContainText('(11, 5)', { timeout: 30_000 });
+    // Without waiting, Dask sees the wizard: the page says it.
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_right(9)');
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-said')).toContainText('teacher', { timeout: 30_000 });
+  });
+
+  test('a block that casts the map opens the plan, closed with its button', async ({ page }) => {
+    await page.goto('/#lesson/the-cells');
+    await expect(page.locator('.lesson-page')).toBeVisible();
+    while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run button').click();
+    const plan = page.locator('#plan');
+    await expect(plan).toBeVisible({ timeout: 90_000 });
+    await expect(plan).toHaveAttribute('data-figures', /wizard:1,12/);
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    await page.locator('#plan-close').click();
+    await expect(plan).toHaveCount(0);
+  });
+
+  test('its button says Run in Spanish too', async ({ browser }) => {
+    const context = await browser.newContext({ locale: 'es-ES' });
+    const page = await context.newPage();
+    await page.goto('/#lesson/where-i-am');
+    await expect(page.locator('.lesson-page')).toBeVisible();
+    while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
+    await expect(page.locator('.lesson-run button')).toHaveText('Ejecutar');
+    await context.close();
+  });
 });

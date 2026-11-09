@@ -1828,3 +1828,34 @@ a.stop-body:focus-visible {
   pointer-events: none;
   transform: translate(-50%, -110%);
 }
+
+/* A lesson's code, run on its page (D142). */
+.lesson-run {
+  margin: 10px 0;
+}
+
+.lesson-editor {
+  overflow: hidden;
+  border: 1px solid #c9ccd6;
+  border-radius: 6px;
+}
+
+.lesson-run-bar {
+  display: flex;
+  justify-content: flex-start;
+  margin: 6px 0;
+}
+
+.lesson-run-button {
+  padding: 4px 16px;
+  font-size: 15px;
+}
+
+.lesson-printed {
+  margin-top: 4px;
+}
+
+.lesson-said {
+  margin: 6px 0 0;
+  font-size: 15px;
+}

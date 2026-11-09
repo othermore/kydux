@@ -282,7 +282,9 @@
     "page": "Page {n} of {total}",
     "try": "Try it",
     "go_on": "Go on",
-    "not_found": "There is no lesson called “{id}”."
+    "not_found": "There is no lesson called “{id}”.",
+    "ended_at": "The wizard ended on cell ({x}, {y}).",
+    "ended_quiet": "The program ended, and it printed nothing."
   },
   "story": {
     "next": "Next",

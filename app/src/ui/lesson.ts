@@ -3,15 +3,17 @@
 // comes next: Try it, where a level comes next for the example to be tried in;
 // Go on, before another lesson or a story, and for a lesson with no example
 // (D56). Reaching the last page marks it read. A lesson is drawn as its teacher
-// speaking, the figure beside the words (D67).
+// speaking, the figure beside the words (D67). A page's code runs on the page itself,
+// in the lesson's level (lessonrun.ts, D142).
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
-import type { Lesson } from '../content/lessons';
+import { type Lesson, pageParts } from '../content/lessons';
 import { characterName, t } from '../i18n';
 import { drawFigurePreview, friendFigure } from '../engine/placeholders';
 import * as progress from '../progress/progress';
 import { element } from './dom';
+import { type LessonRunner, type RunBlock, runBlock } from './lessonrun';
 import type { Screen } from './screen';
 
 export interface LessonScreenParts {
@@ -24,6 +26,8 @@ export interface LessonScreenParts {
   backTo?: string;
   /** The lesson in the language now set, for a change of language. */
   reload: () => Promise<Lesson>;
+  /** How its code runs on the page, in the level after it; none with no level after it. */
+  runner?: LessonRunner;
 }
 
 export function lessonScreen(parts: LessonScreenParts): Screen {
@@ -59,14 +63,31 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
     location.hash = next ? itemHash(next) : '#map';
   };
 
+  let blocks: RunBlock[] = [];
+
   const draw = () => {
     const last = page === lesson.pages.length - 1;
     if (last) markRead();
     document.title = t('level.page_title', { title: lesson.title });
     const article = element('article', { className: 'lesson-page' });
-    // The lessons are the project's own, with no HTML in them (a content check
-    // refuses it), so marked's output is put in as it is.
-    article.innerHTML = marked.parse(lesson.pages[page] ?? '', { async: false });
+    for (const block of blocks) block.destroy();
+    blocks = [];
+    for (const part of pageParts(lesson.pages[page] ?? '')) {
+      if ('markdown' in part) {
+        // The lessons are the project's own, with no HTML in them (a content check
+        // refuses it), so marked's output is put in as it is.
+        const words = element('div', { className: 'lesson-words' });
+        words.innerHTML = marked.parse(part.markdown, { async: false });
+        article.append(...words.children);
+      } else if (parts.runner) {
+        const block = runBlock(part.code, parts.runner);
+        blocks.push(block);
+        article.append(block.node);
+      } else {
+        const shown = element('pre', {}, [element('code', {}, [part.code])]);
+        article.append(shown);
+      }
+    }
     const back = element('button', { id: 'lesson-back', type: 'button', className: 'quiet-button' }, [
       t('lesson.previous'),
     ]);
@@ -125,6 +146,9 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
       page = Math.min(page, lesson.pages.length - 1);
       draw();
     },
-    destroy: () => {},
+    destroy: () => {
+      for (const block of blocks) block.destroy();
+      blocks = [];
+    },
   };
 }

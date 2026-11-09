@@ -73,11 +73,13 @@ export class Speech {
   }
 
   /** A bubble and a thought gone once they are read to their end, when no tick comes
-   * any more to end them: after a run. */
+   * any more to end them: after a run, called when `settle()`'s time is up. Words said
+   * for ever, a sleeper's thought, stay. The clock is not asked again: a timer of the
+   * scene's fires on its smoothed deltas, and can come a fraction before `time.now`
+   * reaches the end read, when nothing would call this again. */
   expireRead(): void {
-    const now = this.scene.time.now;
-    if (this.bubble && now >= this.bubbleRead) this.clearBubble();
-    if (this.thought && now >= this.thoughtRead) this.clearThought();
+    if (this.bubble && Number.isFinite(this.bubbleRead)) this.clearBubble();
+    if (this.thought && Number.isFinite(this.thoughtRead)) this.clearThought();
   }
 
   /** When words said now for `ticks` ticks are read to their end. */

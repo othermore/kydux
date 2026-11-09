@@ -620,7 +620,10 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     asked of the model on the whole scene (D161), the storeroom dark until the level
     that lights it and drawn on the plan as any room, with its key (D162, D163, D169), a
     key drawn small (D164), the way down's double door a quarter open (D165), and the
-    plan's names covering nothing (D166).
+    plan's names covering nothing (D166); and, before its release, the last findings of
+    chapters 1 and 2 (`sprint-36.md`): the castle's threshold, where the wizard says why it
+    does not go in yet (D171), the mark whole in an open doorway (D172), Ilda's good night
+    to the two, and a lesson with nothing worth trying left without a block (D173).
 5.6 Chapter 4, The broom (lists, functions), in a scene of the broom field
     and the village: flying, the race, an action of the child's own.
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

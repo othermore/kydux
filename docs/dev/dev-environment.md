@@ -506,7 +506,9 @@ ignores them. `app/e2e/README.md` says what each one shows.
 
 To read a whole chapter as the child does, with room to write under every
 picture, make its walkthrough. It builds the game, plays the chapter in Spanish for
-a seeded wizard, and writes one document. The browser tests' server must be free:
+a seeded wizard, and writes one document. The browser tests' server must be free.
+The chapter is named by its folder in `content/chapters/`: `01-arrival`,
+`02-the-library` or `03-passages`. For chapter 3:
 
 ```sh
 (cd app && npm run walkthrough -- 03-passages)
@@ -514,7 +516,7 @@ a seeded wizard, and writes one document. The browser tests' server must be free
 
 You should see it end by naming the document,
 `drafts/recorrido-capitulo-3-<date>.es.md`, with its pictures in the folder of the same
-name beside it. Every picture has a **Comentarios:** line under it, and a document
+name beside it. Each chapter's document has its own number. Every picture has a **Comentarios:** line under it, and a document
 that is already there is never overwritten, so your comments stay safe. A level's route
 is shown tick by tick in its first way only. Every other way shows the card it ends on.
 

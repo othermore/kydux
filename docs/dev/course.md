@@ -125,7 +125,7 @@ password opens it and stays open after; the wand is picked up once, in
 | `level:the-wand` | Practice 5 | Past the gate: the friend's spare wand on the flat stone off the path, lent, picked up from beside the stone. | |
 | `lesson:your-first-spell` | Lesson 7 | A spell's effect depends on where the wizard stands and what is near, and may be nothing; `cast` is the wand's action; `zelim`. | `wizard.cast` |
 | `level:the-sealed-door` | Practice 6 | The wand carried, the sealed gate's rune broken from beside it. | |
-| `level:the-way-in` | Practice 7 | The chapter together: the castle's door, sealed and keyed by the school's word, opened with both. Bonus: fewer than 5 lines. | |
+| `level:the-way-in` | Practice 7 | The chapter together: the castle's door, sealed and keyed by the school's word, opened with both, and the mark on its threshold, whole once the door is open (D172). The hall's cell beyond is forbidden: a longer walk stops on the threshold and the wizard says why, *No entres todavía: quédate en el umbral, pasada la puerta* (D171). Bonus: fewer than 5 lines. | |
 | `story:up-to-the-castle` | Story 3 | At the castle's open door; the friend sums up what was learned; the wand is only lent, and a school wand waits at the wand bank; Ilda waits inside. | |
 
 ## Chapter 2 — The library (`02-the-library`)
@@ -156,7 +156,7 @@ that stays locked.
 | Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
 | `story:the-entrance` | Story 1 | Ilda welcomes the first-years in the entrance hall and takes them to their dormitory. | |
-| `story:the-first-night` | Story 2 | The common room; Ilda goes out by the door as the friend goes to the other dormitory; the mate, waiting in the wizard's, says their name and asks the wizard's, and goes to bed. | |
+| `story:the-first-night` | Story 2 | The common room; Ilda says good night to the two before her, who may meet another classmate, and goes out by the door as the friend goes to the other dormitory; the mate, waiting in the wizard's, says their name and asks the wizard's, and goes to bed. | |
 | `lesson:the-right-place` | Lesson 1 | Taught by the mate: an action may need the right place; `wizard.sleep()` only beside the trunk at a free bed's foot. Two pages and no *Try it*: sleeping where no bed is teaches nothing, and its last button goes on to the level (D173). | `wizard.sleep` |
 | `level:your-bed` | Practice 1 | In one's own dormitory, between the first two beds: a step to the free bed's trunk, and asleep; the other dormitory's doorway refuses the wizard. Bonus: no bumps. | |
 | `story:the-morning` | Story 3 | The mate needs a wand, and the wizard's is lent: out of the door to the library, together. | |

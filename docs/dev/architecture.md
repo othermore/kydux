@@ -1345,7 +1345,7 @@ one overturns stays, marked as superseded.
   line up with.
 
 - **D84 — The castle's entrance hall and the first-year dormitory are
-  scenes, and a scene may forbid the wizard a tile.** Decided 2026-10-26
+  scenes, and a scene may forbid the wizard a tile (D171: where the tale stops the child).** Decided 2026-10-26
   (sprint 15). `the-entrance` holds a story and no level, and nothing in
   it is cut: no one stands behind anything tall. `the-dormitory` holds a
   level and two stories: a common room between the girls' dormitory on
@@ -2301,7 +2301,7 @@ one overturns stays, marked as superseded.
   (`paintedBox`), as the scene does, never from the cell it stands on; a test holds the
   crossing's statues and the doors at the boxes art.json gives them. Rules out a thing on
   the plan a row off the scene.
-- **D160 — The goal's mark lies on the floor (D168 says how its ring is drawn).** Decided 2026-11-08 by the owner (*los
+- **D160 — The goal's mark lies on the floor (D168 says how its ring is drawn, D172 where a door opens on it).** Decided 2026-11-08 by the owner (*los
   círculos de destino deben verse sobre el suelo, tapados por lo que está delante, en
   todos los escenarios de todos los capítulos*). On a painted scene the mark is drawn at
   the ground's depth (`MARK_DEPTH`), under every row's things, every thing standing and
@@ -2422,3 +2422,34 @@ one overturns stays, marked as superseded.
   third and prints it. The variables' names in a block are the child's own words, Spanish in
   the Spanish lesson and English in the English one. Chapter 1's lessons keep their blocks as
   they are. Rules out a theory page with no code to run.
+- **D171 — Where the tale does not let the child go on yet, the wizard says so.** Decided
+  2026-11-09 by the owner (*pasarse de la marca, cuando hay sitio, no es problema; pero hay
+  que pensar bien las barreras cuando no queremos que pasen a la siguiente parte aún*).
+  Walking past the goal's mark is allowed wherever the scene has room. Where the tale does
+  not let the child go on, into the castle before chapter 2, the cells beyond are the
+  scene's `forbidden` cells with a reason of their own (D84), so that the wizard stops
+  before them and says why in the child's words, never a wall it bumps into, with a star
+  lost to the bump. In the field, *La entrada* (`the-way-in`) ends on the castle's open
+  door's threshold, (8, 6), the goal's mark; the hall's cell beyond it, (8, 5), is floor,
+  reached only through the open door, and forbidden with the reason `not_inside_yet`: *No
+  entres todavía: quédate en el umbral, pasada la puerta.* / *Do not go in yet: stay on the
+  threshold, past the door.* (the owner's words). *La puerta sellada*'s walk past its mark
+  ends at the castle's door, shut and seen shut (the owner, 2026-11-09). Rules out a bump
+  where a barrier is meant.
+- **D172 — The goal's mark on a door's cell is whole once the door opens.** Decided
+  2026-11-09 by the owner (*al estar abierta la puerta el círculo debe cambiar para verse
+  entero, la máscara ya no debe afectarle*). While a door is shut, the mark on its cell lies
+  under the door's picture and shows its thin silhouette (D160, D168); once the door shows
+  its open picture, which paints the doorway's floor, the mark is drawn just over that
+  picture (`markDepthIn`), under the figure standing in the doorway and the next rows'
+  things. What covers a mark, its silhouette's masks and `data-marks-covered`, is what is
+  drawn deeper than it, as for a figure (D107): of an open door, nothing. *La entrada*'s
+  mark on the castle door's threshold, (8, 6), is the one mark on a door's cell in the
+  game. Rules out a mark cut by a door that is no longer there.
+- **D173 — A lesson with nothing worth trying has no block.** Decided 2026-11-09 by the
+  owner (*probar `wizard.sleep()` donde no hay cama no tiene sentido, es forzado*). A
+  lesson's *Try it* exists only where running something teaches something (D142); *Cada
+  cosa en su sitio* (`the-right-place`) keeps its two pages of words, with no block and no
+  `try` in its lesson.json, and its last button, *Seguir* / *Go on*, leads to the level, as
+  *Notas*'s does; a content test holds that a lesson's `try` comes only with a block. Rules
+  out a block written to have one.

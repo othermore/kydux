@@ -306,10 +306,10 @@ def scene_pairs() -> list[tuple[str, str]]:
 @pytest.mark.parametrize(("before", "after"), scene_pairs(), ids=lambda v: v)
 def test_a_level_on_a_scene_starts_where_the_one_before_it_ended(before, after):
     """D65: where a level ends the next begins, on the same tile: its end, or, with no
-    end, the tile its solution leaves the wizard on; but an improve level that plays
-    the level before it again, from the start, begins where that one began."""
+    end, the tile its solution leaves the wizard on; but a fix or an improve level that
+    plays the level before it again, from the start, begins where that one began."""
     ended = level_json(before).get("end") or list(walked(before)[-1])
-    again = level_json(after).get("kind") == "improve" and level_json(before)["start"]
+    again = level_json(after).get("kind") in ("fix", "improve") and level_json(before)["start"]
     assert level_json(after)["start"] in (ended, again)
 
 

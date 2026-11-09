@@ -1,23 +1,24 @@
 # Repeat
 
-Walking down these long passages takes a lot of steps. Doing the same instructions many times means writing them many times, and that is a lot of work!
+Doing the same instructions many times means writing them over and over, and that is a lot of work! We can ask the computer to repeat them for us.
 
-We can ask the computer to do the instructions again and again for us. Programmers call this a loop.
+Programmers call this a loop. We write `for step in range(3):` and, moved in by four spaces underneath, the lines we want to run three times.
 
 ---
-## Doing it again
+## The three doors
 
-We write a loop with `for`. We write `for step in range(8):` and, moved in under it, the lines to repeat, eight times.
+Look at the three doors across the corridor, one after another. They are all exactly alike.
 
-The word `step` is just a variable the loop counts with. The computer will run those moved-in lines over and over until it finishes counting.
+To pass them, you would need to write the exact same lines to open a door and walk through it, three times in a row. A loop does that for us! The word `step` is only a name the loop counts with, and the lines inside do not even have to use it.
 
 ---
 ## Try it
 
-Let us make a loop to walk without having to write so many lines. The instructions inside will happen three times in a row!
+Let us make a loop to see how it counts.
+
+Just like the numbers of a cell, the loop starts counting from 0. The instructions inside will run three times, and the computer will print 0, 1, and 2!
 
 ```python try
 for step in range(3):
-    wizard.move_up()
-    wizard.move_right()
+    print(step)
 ```

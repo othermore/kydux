@@ -4,6 +4,7 @@ enchanted region (D135), a teacher started anywhere on its patrol (D137), and a
 door found as any thing."""
 
 import json
+from pathlib import Path
 
 import pytest
 from kydux_world.level import Level, LevelError, Position, on_scene, read_scene
@@ -367,3 +368,135 @@ def test_find_nearest_finds_the_nearest_door_and_it_answers_open():
     assert door.is_open
     wizard.move_up(2)
     assert wizard.find_nearest("door").name in ("near_door", "far_door")
+
+
+CONTENT = Path(__file__).resolve().parents[2] / "content" / "levels"
+
+
+def real(level_id):
+    return Level.from_directory(CONTENT / level_id)
+
+
+def solution(level_id):
+    return (CONTENT / level_id / "solution.py").read_text(encoding="utf-8")
+
+
+def wrong(level_id, name):
+    return (CONTENT / level_id / "wrong" / f"{name}.py").read_text(encoding="utf-8")
+
+
+def outcomes(level_id, code):
+    result = run_code(real(level_id), code)
+    return dict((way_id, way.status) for way_id, way in result.ways)
+
+
+def test_the_tunnel_exit_keeps_its_table_in_both_ways():
+    assert outcomes("the-tunnel-exit", solution("the-tunnel-exit")) == {
+        "away": "won",
+        "watching": "won",
+    }
+    assert outcomes("the-tunnel-exit", wrong("the-tunnel-exit", "the_walk_alone")) == {
+        "away": "won",
+        "watching": "caught",
+    }
+    assert outcomes("the-tunnel-exit", wrong("the-tunnel-exit", "always_waits")) == {
+        "away": "caught",
+        "watching": "won",
+    }
+    assert outcomes("the-tunnel-exit", wrong("the-tunnel-exit", "waits_two")) == {
+        "away": "caught",
+        "watching": "won",
+    }
+
+
+def test_by_the_statues_is_won_down_the_side_dask_does_not_look_at():
+    level = "by-the-statues"
+    assert set(outcomes(level, solution(level)).values()) == {"won"}
+    assert outcomes(level, wrong(level, "the_left_side_always")) == {
+        "looking_left": "caught",
+        "looking_right": "won",
+    }
+    assert outcomes(level, wrong(level, "the_right_side_always")) == {
+        "looking_left": "won",
+        "looking_right": "caught",
+    }
+    assert set(outcomes(level, wrong(level, "the_branches_swapped")).values()) == {"caught"}
+    assert set(outcomes(level, wrong(level, "straight_down")).values()) == {"caught"}
+
+
+@pytest.mark.parametrize(
+    ("level_id", "before", "walk", "most"),
+    [
+        ("past-the-teacher", "wizard.move_down(5)\n", "wizard.move_down(7)\n", 12),
+        (
+            "the-night-walk",
+            "wizard.move_down(2)\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\n"
+            "wizard.move_down(2)\nwhile not slab.in_place:\n    wizard.wait()\n"
+            "wizard.move_down(3)\n",
+            "wizard.move_down(4)\n",
+            16,
+        ),
+    ],
+)
+def test_no_fixed_number_of_waits_wins_every_way_and_the_while_does(level_id, before, walk, most):
+    """D137: a program that waits a number written in the code is caught in some way,
+    for every number; the loop on `facing` wins them all."""
+    for ticks in range(most + 1):
+        wait = f"wizard.wait({ticks})\n" if ticks else ""
+        statuses = outcomes(level_id, before + wait + walk)
+        assert "caught" in statuses.values(), (ticks, statuses)
+    assert set(outcomes(level_id, solution(level_id)).values()) == {"won"}
+
+
+def test_the_slab_s_level_is_won_in_both_periods_and_a_fixed_wait_loses_one():
+    level = "the-moving-slab"
+    assert set(outcomes(level, solution(level)).values()) == {"won"}
+    assert outcomes(level, wrong(level, "waits_three")) == {"three": "won", "four": "incomplete"}
+    walk = run_code(real(level), wrong(level, "the_walk_alone"))
+    bumps = [e for e in walk.events if e.kind == "bump"]
+    assert bumps and bumps[0].data["by"] == "slab"
+
+
+def test_in_the_dark_the_key_is_not_found_until_kirra():
+    result = run_code(real("the-dark-room"), wrong("the-dark-room", "no_kirra"))
+    assert result.status == "error"
+    world = World(real("the-dark-room"))
+    assert world.wizard.find_nearest("key") is None
+    world.wizard.cast("kirra")
+    assert world.wizard.find_nearest("key").position == Position(9, 7)
+
+
+def test_the_three_doors_each_nearest_as_the_wizard_comes_to_it():
+    world = World(real("the-three-doors"))
+    wizard = world.wizard
+    for name, standing in (("door_1", (10, 12)), ("door_2", (10, 8)), ("door_3", (10, 4))):
+        assert wizard.position == Position(*standing)
+        door = wizard.find_nearest("door")
+        assert door.name == name
+        door.open()
+        wizard.move_up(4)
+    assert wizard.position == Position(10, 0)
+
+
+def test_the_three_doors_given_program_wins_the_walk_and_fails_its_lines():
+    result = run_code(real("the-three-doors"), wrong("the-three-doors", "the_given_program"))
+    assert result.status != "won"
+    goals = {goal.kind: goal.met for goal in result.goals}
+    assert goals == {"reach": True, "lines_under": False}
+
+
+def test_a_position_is_printed_as_the_child_reads_it():
+    result = run_code(real("the-dark-tunnel"), "print(wizard.position)\n")
+    assert result.stdout == "(15, 3)\n"
+
+
+def test_no_level_of_the_first_three_chapters_teaches_can_see():
+    """D139: when `can_see` is true the wizard is already caught; it stays for the
+    challenges."""
+    chapters = Path(__file__).resolve().parents[2] / "content" / "chapters"
+    for name in ("01-arrival", "02-the-library", "03-passages"):
+        items = json.loads((chapters / name / "chapter.json").read_text(encoding="utf-8"))["items"]
+        for item in items:
+            kind, _, item_id = item.partition(":")
+            if kind == "level":
+                assert "teacher.can_see" not in real(item_id).api, item_id

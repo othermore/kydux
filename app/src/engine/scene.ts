@@ -1559,6 +1559,11 @@ class LevelScene extends Phaser.Scene {
           play('cast');
         }
         break;
+      case 'vanish':
+        // At the very end of a story, the wizard walks out of sight with the others.
+        if (instant) this.wizard.setVisible(false);
+        else this.tweens.add({ targets: this.wizard, alpha: 0, duration: this.playback.tickDuration * 0.9, onComplete: () => this.wizard.setVisible(false).setAlpha(1) });
+        break;
       case 'give':
         this.unreveal(String(event.data.id));
         this.give(event, instant);

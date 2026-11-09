@@ -1,45 +1,35 @@
 {
   "id": "the-wrong-door",
   "kind": "fix",
-  "scene": "the-passages",
+  "scene": "the-two-doors",
   "start": [
-    8,
-    7
+    10,
+    4
   ],
   "end": [
-    12,
-    9
+    16,
+    10
   ],
   "speaker": "friend",
   "carrying": [
-    "wand"
-  ],
-  "things": [
-    {
-      "kind": "door",
-      "id": "left_door",
-      "at": [
-        6,
-        8
-      ],
-      "locked": true
-    },
-    {
-      "kind": "door",
-      "id": "right_door",
-      "at": [
-        10,
-        8
-      ]
-    }
+    "wand",
+    "map"
   ],
   "actors": [
     {
       "kind": "friend",
       "id": "friend",
       "at": [
-        8,
-        6
+        9,
+        5
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        11,
+        5
       ]
     }
   ],
@@ -48,8 +38,10 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
+    "door.locked",
     "door.open",
-    "door.locked"
+    "wizard.wait",
+    "teacher.facing"
   ],
   "goals": [
     {
@@ -57,23 +49,25 @@
       "marker": "E"
     }
   ],
+  "tick_limit": 100,
   "ways": [
     {
-      "id": "left_locked"
+      "id": "left_locked",
+      "things": [
+        {
+          "id": "left_door",
+          "locked": true
+        }
+      ]
     },
     {
       "id": "right_locked",
       "things": [
-        {
-          "id": "left_door",
-          "locked": false
-        },
         {
           "id": "right_door",
           "locked": true
         }
       ]
     }
-  ],
-  "tick_limit": 100
+  ]
 }

@@ -261,7 +261,17 @@ def test_a_walk_may_end_out_of_sight_and_the_wizard_never_goes():
             steps=[{"who": "nuri", "do": {"walk": [5, 1], "vanish": True}}],
         )
     with pytest.raises(LevelError, match="stays in the story"):
-        staged(actors=[], steps=[{"who": "wizard", "do": {"walk": [3, 1], "vanish": True}}])
+        staged(
+            actors=[],
+            steps=[
+                {"who": "voice", "by": "wizard", "do": {"walk": [3, 1], "vanish": True}},
+                {"who": "voice"},
+            ],
+        )
+    # At the very end of a story, the wizard may walk out of sight.
+    staged(
+        actors=[], steps=[{"who": "voice", "by": "wizard", "do": {"walk": [3, 1], "vanish": True}}]
+    )
 
 
 def test_a_figure_opens_and_closes_a_door_beside_it():

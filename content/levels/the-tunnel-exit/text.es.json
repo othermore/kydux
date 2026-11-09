@@ -1,0 +1,20 @@
+{
+  "title": "La salida del túnel",
+  "goals": [
+    "Llega a la marca.",
+    "Que Dask no te vea."
+  ],
+  "starting_code": "# Pregunta si Dask mira hacia arriba con `facing`; si es así, espera un tick con `wait`.\n\n# Camina a la derecha hasta el final con `move_right`.\n\n# Baja un paso hasta la marca con `move_down`.\n",
+  "hints": [
+    "Necesitas una condición para ver hacia dónde mira Dask. ¿Cuál es su atributo para eso?",
+    "Usa `if` con `dask.facing` y `==`, y espera si mira hacia arriba.",
+    "Después del bloque `if`, añade tu `move_right` sin espacios para que se ejecute siempre."
+  ],
+  "intro": "¡Chist! Salimos del túnel, pero mira... ¡El profesor Dask patrulla el cruce! La marca está al final, junto a la tercera estatua. A veces se aleja, y a veces mira hacia este cruce. ¡Podemos preguntar hacia dónde mira para saber si tenemos que esperar antes de cruzar!",
+  "outro": "¡Por poco! Esperar justo cuando miraba nos salvó.",
+  "learned": "Ahora sabes que una condición hace algo solo cuando su respuesta es verdadera, y que lo que sirve es saber hacia dónde mira.",
+  "ways": {
+    "away": "Dask se aleja",
+    "watching": "Dask mira hacia aquí"
+  }
+}

@@ -1,57 +1,183 @@
 {
   "id": "after-dark",
   "speaker": "friend",
-  "scene": "the-passages",
+  "scene": "the-dormitory",
   "wizard": [
-    2,
-    2
+    18,
+    9
   ],
   "camera": [
-    4,
-    2
+    16,
+    8
   ],
   "actors": [
     {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        18,
+        6
+      ],
+      "facing": "down",
+      "asleep": "bed_1"
+    },
+    {
       "id": "friend",
-      "kind": "friend"
+      "kind": "friend",
+      "facing": "up"
     }
   ],
   "steps": [
     {
-      "who": "voice",
-      "do": {
-        "face": "left"
-      },
-      "by": "wizard"
+      "who": "voice"
     },
     {
-      "who": "friend",
+      "who": "mate",
       "do": {
-        "appear": [
-          1,
-          2
-        ]
+        "wake": true
       }
     },
     {
-      "who": "wizard",
-      "do": null
+      "who": "voice",
+      "by": "wizard",
+      "do": [
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              14,
+              9
+            ],
+            [
+              14,
+              10
+            ],
+            [
+              12,
+              10
+            ],
+            [
+              12,
+              13
+            ]
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              16,
+              6
+            ],
+            [
+              16,
+              9
+            ],
+            [
+              14,
+              9
+            ],
+            [
+              14,
+              10
+            ],
+            [
+              11,
+              10
+            ],
+            [
+              11,
+              13
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "open": "front_door"
+        }
+      ]
     },
     {
       "who": "friend",
-      "do": null
+      "do": [
+        {
+          "appear": [
+            12,
+            15
+          ]
+        },
+        {
+          "walk": [
+            12,
+            14
+          ]
+        }
+      ]
     },
     {
-      "who": "wizard",
-      "do": null
+      "who": "mate"
     },
     {
-      "who": "friend",
-      "do": null
+      "who": "friend"
+    },
+    {
+      "who": "wizard"
     },
     {
       "who": "voice",
-      "do": null
+      "by": "wizard",
+      "do": [
+        {
+          "by": "friend",
+          "walk": [
+            [
+              12,
+              15
+            ],
+            [
+              19,
+              15
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              12,
+              14
+            ],
+            [
+              12,
+              15
+            ],
+            [
+              19,
+              15
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              12,
+              13
+            ],
+            [
+              12,
+              15
+            ],
+            [
+              19,
+              15
+            ]
+          ],
+          "vanish": true
+        }
+      ]
     }
   ]
 }

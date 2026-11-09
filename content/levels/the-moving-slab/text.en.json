@@ -1,0 +1,20 @@
+{
+  "title": "The slab that comes and goes",
+  "goals": [
+    "Reach the mark.",
+    "Ask `in_place`."
+  ],
+  "starting_code": "# Walk to the hole's edge with `move_right`.\n\n# Wait while the slab is not in place, with `while`, `not`, `in_place` and `wait`.\n\n# Walk across.\n",
+  "hints": [
+    "Walk 2 right to stop at the edge. Don't step in the hole!",
+    "Use `while not` with `slab.in_place` to wait until the stone appears.",
+    "Once the `while` finishes, the slab is there, so walk 3 right into the arch!"
+  ],
+  "intro": "Watch your step! There is a hole in the floor three cells ahead... but look, a stone slab comes and goes to cover it! The mark is in the storeroom's arch at the end. We need to wait while the slab is not in place before we cross!",
+  "outro": "Safe across! That slab was tricky, but asking it when it was ready worked.",
+  "learned": "Now you know that `while not` waits for something that is not true yet, and that `slab.in_place` says when.",
+  "ways": {
+    "three": "Every three ticks",
+    "four": "Every four ticks"
+  }
+}

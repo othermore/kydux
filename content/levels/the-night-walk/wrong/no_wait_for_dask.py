@@ -1,10 +1,9 @@
-wizard.cast("kirra")
-wizard.move_right(4)
+wizard.move_down(2)
 wizard.pick_up()
-wizard.move_right()
+wizard.move_down()
 door.open()
-wizard.move_right(2)
-while not stair.in_place:
+wizard.move_down(2)
+while not slab.in_place:
     wizard.wait()
-wizard.move_right(3)
 wizard.move_down(3)
+wizard.move_down(4)

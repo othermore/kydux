@@ -1,0 +1,20 @@
+{
+  "title": "La losa que va y viene",
+  "goals": [
+    "Llega a la marca.",
+    "Pregunta `in_place`."
+  ],
+  "starting_code": "# Camina hasta el borde del agujero con `move_right`.\n\n# Espera mientras la losa no esté en su sitio, con `while`, `not`, `in_place` y `wait`.\n\n# Crúzalo.\n",
+  "hints": [
+    "Camina 2 a la derecha para detenerte en el borde. ¡No pises el agujero!",
+    "Usa `while not` con `slab.in_place` para esperar hasta que la piedra aparezca.",
+    "Una vez que acabe el `while`, la losa estará ahí, ¡así que camina 3 a la derecha hasta el arco!"
+  ],
+  "intro": "¡Cuidado dónde pisas! Hay un agujero en el suelo a tres casillas... pero mira, ¡una losa de piedra va y viene para cubrirlo! La marca está en el arco del almacén al final. ¡Tenemos que esperar mientras la losa no esté en su sitio antes de cruzar!",
+  "outro": "¡A salvo al otro lado! Esa losa era un truco, pero preguntarle cuándo estaba lista funcionó.",
+  "learned": "Ahora sabes que `while not` espera por algo que aún no es verdad, y que `slab.in_place` dice cuándo lo es.",
+  "ways": {
+    "three": "Cada tres ticks",
+    "four": "Cada cuatro ticks"
+  }
+}

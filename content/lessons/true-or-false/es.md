@@ -1,24 +1,23 @@
 # Verdadero o falso
 
-Algunas preguntas solo tienen dos respuestas: sí o no. ¿Está cerrada la puerta? ¿Está Dask mirando hacia aquí? En un programa, a este tipo de pregunta se le llama una expresión.
+Mira por el pasillo. Dask está mirando fijamente a la pared. A veces, las preguntas solo tienen dos respuestas: sí o no. En un programa, a este tipo de pregunta se le llama una expresión.
 
 El ordenador responde a una expresión con `True` o `False`, que significan verdadero y falso.
 
 ---
 ## Comparar cosas
 
-Un atributo puede ser una de estas respuestas, como `door.locked`. También podemos comparar dos valores para ver si son iguales.
+Podemos comparar dos valores para ver si son iguales usando dos signos de igual `==`. ¡Recuerda que un solo `=` nombra un valor, mientras que `==` hace una pregunta!
 
-Usamos dos signos de igual `==` para hacer la pregunta (¡recuerda que un solo `=` nombra un valor!). Por ejemplo, `dask.facing == "left"` pregunta si Dask está mirando a la izquierda. ¡Incluso podemos darle la vuelta a la respuesta usando `not`!
+Por ejemplo, `dask.facing == "left"` pregunta si Dask está mirando a la izquierda. Su atributo guarda una cadena con la dirección hacia la que mira: `"up"`, `"down"`, `"left"`, o `"right"`.
 
 ---
-## Preguntar a los métodos
+## Darle la vuelta a la respuesta
 
-Algunos métodos también responden a estas preguntas. El ordenador puede comprobar `dask.can_see(wizard)` para decirnos si Dask te puede ver.
+Incluso podemos darle la vuelta a la respuesta del ordenador escribiendo `not` antes de la expresión. Si Dask está mirando a la izquierda, `not dask.facing == "left"` responderá `False`.
 
-Vamos a probar a imprimir algunas respuestas para ver qué dice el ordenador. ¡Recuerda hablar bajito!
+Vamos a ver cómo imprimirías una respuesta para ver qué dice el ordenador. ¡Recuerda hablar bajito!
 
-```python try
-print(dask.facing)
-print(dask.can_see(wizard))
+```python
+print(dask.facing == "left")
 ```

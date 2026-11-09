@@ -1,19 +1,19 @@
 {
   "title": "The wrong door",
   "goals": [
-    "Reach the foot of the long stairs."
+    "Reach the mark."
   ],
-  "ways": {
-    "left_locked": "the left door is locked",
-    "right_locked": "the right door is locked"
-  },
-  "starting_code": "# My program chooses the wrong door! Find and fix it so we go through the open one.\nif left_door.locked:\n    wizard.move_left(2)\n    left_door.open()\n    wizard.move_down(2)\n    wizard.move_right(6)\nelse:\n    wizard.move_right(2)\n    right_door.open()\n    wizard.move_down(2)\n    wizard.move_right(2)\n",
+  "starting_code": "if left_door.locked:\n    wizard.move_down(3)\n    wizard.move_left(3)\n    left_door.open()\n    wizard.move_down(3)\n    wizard.move_right(9)\nelse:\n    wizard.move_down(3)\n    wizard.move_right(3)\n    right_door.open()\n    wizard.move_down(3)\n    wizard.move_right(3)\n",
   "hints": [
-    "Look at the `if` condition. When the left door is locked, the program tries to open it!",
-    "Swap the instructions inside the `if` and the `else`.",
-    "When the left door is locked, move to the right door instead."
+    "My program walks right into the locked door! It does the opposite of what it should.",
+    "Look at the `if` and `else` parts. The code under `if` should belong under `else`!",
+    "Swap the lines under `if` with the lines under `else`."
   ],
-  "intro": "Oh no, {wizard}... I tried to write the program for this room, but I keep walking into the locked door. Can you see what I did wrong?",
-  "outro": "Thank you! I put the right instructions in the wrong places. Now we are at the foot of the long stairs.",
-  "learned": "Now you know how to read an `if` and its `else` and find which one does what."
+  "intro": "Oh no! We are in the same room on another night, and my program from last time keeps bumping into the locked door! I think I wrote the branches the wrong way round... Could you fix it?",
+  "outro": "Thank you! I see now how to put the right lines in each branch.",
+  "learned": "Now you know how to read a condition and see which branch runs.",
+  "ways": {
+    "left_locked": "The left door is locked",
+    "right_locked": "The right door is locked"
+  }
 }

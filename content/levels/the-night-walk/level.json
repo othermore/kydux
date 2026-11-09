@@ -1,77 +1,82 @@
 {
   "id": "the-night-walk",
   "kind": "practice",
-  "scene": "the-night-passages",
+  "scene": "the-way-down",
   "start": [
     10,
-    5
+    1
   ],
   "end": [
-    20,
-    8
+    10,
+    13
   ],
   "speaker": "friend",
   "carrying": [
-    "wand"
+    "wand",
+    "map"
   ],
   "spells": [
-    "kirra",
     "osto"
-  ],
-  "dark": [
-    "night-walk"
   ],
   "things": [
     {
       "kind": "key",
       "id": "key",
       "at": [
-        14,
-        5
+        10,
+        3
       ],
       "opens": "door"
     },
     {
-      "kind": "door",
       "id": "door",
-      "at": [
-        16,
-        5
-      ],
       "locked": true
     },
     {
       "kind": "slab",
-      "id": "stair",
+      "id": "slab",
       "at": [
-        18,
-        5
+        10,
+        7
       ],
-      "period": 2
+      "period": 5
     }
   ],
   "actors": [
-    {
-      "kind": "teacher",
-      "id": "dask",
-      "at": [
-        12,
-        7
-      ],
-      "facing": "right",
-      "patrol": [
-        [
-          17,
-          7
-        ]
-      ]
-    },
     {
       "kind": "friend",
       "id": "friend",
       "at": [
         9,
-        5
+        1
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        9,
+        2
+      ]
+    },
+    {
+      "kind": "teacher",
+      "id": "dask",
+      "at": [
+        1,
+        10
+      ],
+      "facing": "right",
+      "sight": 8,
+      "patrol": [
+        [
+          1,
+          10
+        ],
+        [
+          8,
+          10
+        ]
       ]
     }
   ],
@@ -80,10 +85,11 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
-    "wizard.pick_up",
     "wizard.wait",
     "wizard.cast",
+    "wizard.pick_up",
     "wizard.find_nearest",
+    "thing.position",
     "door.open",
     "door.locked",
     "teacher.facing",
@@ -91,13 +97,67 @@
   ],
   "goals": [
     {
+      "kind": "collect",
+      "id": "key"
+    },
+    {
+      "kind": "open",
+      "id": "door"
+    },
+    {
       "kind": "reach",
       "marker": "E"
     },
     {
       "kind": "not_seen_by",
       "id": "dask"
+    },
+    {
+      "kind": "uses",
+      "member": "in_place",
+      "bonus": true
     }
   ],
-  "tick_limit": 200
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "near",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            1,
+            10
+          ],
+          "facing": "right"
+        }
+      ]
+    },
+    {
+      "id": "middle",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            6,
+            10
+          ],
+          "facing": "right"
+        }
+      ]
+    },
+    {
+      "id": "far",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            5,
+            10
+          ],
+          "facing": "left"
+        }
+      ]
+    }
+  ]
 }

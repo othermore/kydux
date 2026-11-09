@@ -1,42 +1,38 @@
 {
   "id": "the-dark-room",
   "kind": "practice",
-  "scene": "the-night-passages",
+  "scene": "the-storeroom",
   "start": [
-    7,
-    2
+    5,
+    7
   ],
   "end": [
     10,
-    5
+    9
   ],
   "speaker": "friend",
   "carrying": [
-    "wand"
+    "wand",
+    "map"
   ],
   "spells": [
     "kirra"
   ],
   "dark": [
-    "dark-room"
+    "storeroom"
   ],
   "things": [
     {
       "kind": "key",
       "id": "key",
       "at": [
-        11,
-        3
+        9,
+        7
       ],
-      "opens": "door"
+      "opens": "store_door"
     },
     {
-      "kind": "door",
-      "id": "door",
-      "at": [
-        10,
-        4
-      ],
+      "id": "store_door",
       "locked": true
     }
   ],
@@ -45,8 +41,16 @@
       "kind": "friend",
       "id": "friend",
       "at": [
-        6,
-        2
+        5,
+        6
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        3,
+        7
       ]
     }
   ],
@@ -55,20 +59,21 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
-    "wizard.pick_up",
-    "wizard.wait",
     "wizard.cast",
     "wizard.find_nearest",
-    "thing.reveal",
+    "thing.position",
+    "wizard.pick_up",
     "door.open",
-    "door.locked",
-    "teacher.facing",
-    "slab.in_place"
+    "door.locked"
   ],
   "goals": [
     {
+      "kind": "collect",
+      "id": "key"
+    },
+    {
       "kind": "open",
-      "id": "door"
+      "id": "store_door"
     },
     {
       "kind": "reach",

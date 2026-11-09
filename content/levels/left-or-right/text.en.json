@@ -1,19 +1,19 @@
 {
   "title": "Left or right",
   "goals": [
-    "Reach the way down."
+    "Reach the mark."
   ],
-  "ways": {
-    "left_locked": "the left door is locked",
-    "right_locked": "the right door is locked"
-  },
-  "starting_code": "# One door is locked, the other is open.\n# Choose the open door to reach the way down.\n",
+  "starting_code": "# Ask with `locked` whether the left door is locked.\n\n# If it is, walk to the right door, open it with `open`, go through and along the corridor.\n\n# Else, do the same by the left door.\n",
   "hints": [
-    "Use `if` to check if the left door is locked.",
-    "If it is, go to the right door and open it.",
-    "Use `else` to go to the left door and open it when it is not locked, then move down to the exit."
+    "We can ask the door if it is locked with `left_door.locked`!",
+    "If the left door is locked, walk 3 down and 3 right to `right_door`, open it, walk 3 down and 3 right to the mark.",
+    "If it's not locked, `else:`, walk 3 down, 3 left to `left_door`, open it, walk 3 down and 9 right!"
   ],
-  "intro": "There are two doors here, {wizard}, but one of them is locked. We need to check one door, and choose the other if it will not open.",
-  "outro": "Brilliant. Knowing what to do when the answer is no is just as important as knowing what to do when it is yes.",
-  "learned": "Now you know how `else` chooses what to do when the answer is no."
+  "intro": "Look, a room with two doors! One of them is locked tonight, and there are no keys around. But we can just ask the left door if it is locked! If it is, we will go through the right door, and if it's not, we'll take the left one. The mark is waiting on the right side of the corridor!",
+  "outro": "You chose perfectly! Asking what things know is a great trick.",
+  "learned": "Now you know that `if` and `else` can ask what a thing knows, and choose the way by it.",
+  "ways": {
+    "left_locked": "The left door is locked",
+    "right_locked": "The right door is locked"
+  }
 }

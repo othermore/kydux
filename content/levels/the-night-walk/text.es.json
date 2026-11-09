@@ -1,15 +1,23 @@
 {
   "title": "El paseo nocturno",
   "goals": [
-    "Llega a la bajada del dormitorio.",
-    "No dejes que Dask te vea."
+    "Recoge la llave.",
+    "Abre la puerta.",
+    "Llega a la marca en el arco de abajo.",
+    "Que Dask no te vea.",
+    "Pregunta `in_place`."
   ],
-  "starting_code": "# Una habitación oscura, una puerta cerrada, una escalera móvil y Dask abajo.\n# Junta todo lo que has aprendido para llegar al dormitorio a salvo.\n",
+  "starting_code": "# Baja hasta la llave.\n\n# Recógela.\n\n# Baja hasta la puerta.\n\n# Ábrela, se llama `door`.\n\n# Baja hasta el borde del agujero.\n\n# Espera por la losa.\n\n# Baja hasta la casilla antes del pasillo de Dask.\n\n# Espera mientras mire a la derecha.\n\n# Baja hasta el arco.\n",
   "hints": [
-    "Ilumina la habitación, recoge la llave y abre la puerta.",
-    "Espera junto al borde hasta que la escalera móvil esté en su lugar.",
-    "Antes de bajar los últimos escalones, espera a que Dask mire hacia otro lado."
+    "Recuerda, la llave está a 2 pasos. Tras abrir la puerta, hay 2 pasos hasta el borde del agujero.",
+    "Tienes que usar `while not` con `slab.in_place` para la losa, y luego `while` con `dask.facing` para Dask.",
+    "Entre la losa y el pasillo de Dask, baja 3. ¡Cuando Dask se gire, baja 4 hasta el arco!"
   ],
-  "intro": "Ya casi estamos, {wizard}. Estamos a punto de llegar al dormitorio. Hay una habitación oscura, una escalera móvil y Dask caminando por abajo. ¡Tenemos que usar todo lo que sabemos!",
-  "outro": "¡Hemos llegado a la bajada al dormitorio! Pero espera... oigo pasos justo detrás de nosotros."
+  "intro": "¡Aquí está el camino a casa! Hay que usar todo junto: coger la llave del suelo, abrir la puerta, cruzar el agujero por la losa y esperar a que Dask se dé la vuelta en el último pasillo. ¡Su farol llega muy lejos! Es un camino largo, pero sé que podemos hacerlo.",
+  "outro": "¡Lo logramos! Ya casi estamos de vuelta en nuestras camas.",
+  "ways": {
+    "near": "Dask empieza cerca",
+    "middle": "Dask empieza lejos",
+    "far": "Dask empieza de vuelta"
+  }
 }

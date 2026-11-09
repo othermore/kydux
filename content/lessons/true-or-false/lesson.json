@@ -2,7 +2,6 @@
   "id": "true-or-false",
   "speaker": "friend",
   "teaches": [
-    "teacher.facing",
-    "teacher.can_see"
+    "teacher.facing"
   ]
 }

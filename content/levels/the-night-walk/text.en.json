@@ -1,15 +1,23 @@
 {
   "title": "The night walk",
   "goals": [
-    "Reach the way down to the dormitory.",
-    "Do not let Dask see you."
+    "Pick up the key.",
+    "Open the door.",
+    "Reach the mark in the bottom arch.",
+    "Do not let Dask see you.",
+    "Ask `in_place`."
   ],
-  "starting_code": "# A dark room, a locked door, a moving stair, and Dask below.\n# Put everything you have learned together to safely reach the dormitory.\n",
+  "starting_code": "# Walk down to the key.\n\n# Pick it up.\n\n# Walk down to the door.\n\n# Open it, it is called `door`.\n\n# Walk down to the hole's edge.\n\n# Wait for the slab.\n\n# Walk down to the cell before Dask's corridor.\n\n# Wait while he faces right.\n\n# Walk down to the arch.\n",
   "hints": [
-    "Light the room, pick up the key, and open the door.",
-    "Wait by the edge until the moving stair is in place.",
-    "Before going down the last steps, wait for Dask to look away."
+    "Remember, the key is 2 steps down. After you open the door, it is 2 steps to the hole's edge.",
+    "You have to use `while not` with `slab.in_place` for the slab, and then `while` with `dask.facing` for Dask!",
+    "Between the slab and Dask's corridor, walk 3 down. After Dask turns away, 4 down to the arch!"
   ],
-  "intro": "This is it, {wizard}. We are almost back to the dormitory. There is a dark room, a moving stair, and Dask walking below. We have to use everything we know.",
-  "outro": "We made it to the way down to the dormitory! But wait... I can hear footsteps right behind us."
+  "intro": "This is it, the way home! We must put everything together: pick up the key on the floor, unlock the door, cross the hole with the slab, and wait for Dask to turn away in the last corridor. His lantern reaches very far! It's one long walk, but I know we can do it.",
+  "outro": "We did it! We are almost back to our warm beds.",
+  "ways": {
+    "near": "Dask starts at the near end",
+    "middle": "Dask starts near his far end",
+    "far": "Dask starts on his way back"
+  }
 }

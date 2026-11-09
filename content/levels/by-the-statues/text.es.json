@@ -1,0 +1,20 @@
+{
+  "title": "Junto a las estatuas",
+  "goals": [
+    "Llega a la marca.",
+    "Que Dask no te vea."
+  ],
+  "starting_code": "wizard.move_down()\n\n# Si Dask mira a la izquierda, baja por su lado derecho con `move_right`, `move_down` y `move_left`.\n\n# Si no, baja por su lado izquierdo.\n\n# Da los últimos pasos hacia abajo hasta el arco.\n",
+  "hints": [
+    "Dask está quieto, pero puede mirar a la izquierda o a la derecha. ¡Usa `if` y `else`!",
+    "Si Dask mira a la izquierda, camina por su derecha: 1 derecha, 3 abajo, 1 izquierda.",
+    "Bajo `else:`, haz lo contrario: 1 izquierda, 3 abajo, 1 derecha. Termina con `wizard.move_down(2)`."
+  ],
+  "intro": "¡Dask está completamente quieto en el pasillo ancho de delante! Mira hacia un lado, pero no sabemos cuál será. Tenemos que bajar por el lado al que no mira, hasta la marca del arco de abajo. ¡Un `else` nos ayudará a elegir!",
+  "outro": "¡Genial! Pasamos justo a su lado, sin importar hacia dónde miraba.",
+  "learned": "Ahora sabes que `else` da el otro camino cuando la condición es falsa.",
+  "ways": {
+    "looking_left": "Dask mira a la izquierda",
+    "looking_right": "Dask mira a la derecha"
+  }
+}

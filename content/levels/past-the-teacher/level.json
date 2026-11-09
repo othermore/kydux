@@ -1,42 +1,55 @@
 {
   "id": "past-the-teacher",
   "kind": "practice",
-  "scene": "the-night-passages",
+  "scene": "the-long-round",
   "start": [
-    2,
-    6
+    10,
+    1
   ],
   "end": [
-    2,
-    4
+    10,
+    13
   ],
   "speaker": "friend",
   "carrying": [
-    "wand"
+    "wand",
+    "map"
   ],
-  "things": [],
   "actors": [
-    {
-      "kind": "teacher",
-      "id": "dask",
-      "at": [
-        7,
-        5
-      ],
-      "facing": "left",
-      "patrol": [
-        [
-          3,
-          5
-        ]
-      ]
-    },
     {
       "kind": "friend",
       "id": "friend",
       "at": [
+        9,
+        1
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        9,
+        2
+      ]
+    },
+    {
+      "kind": "teacher",
+      "id": "dask",
+      "at": [
         2,
         7
+      ],
+      "facing": "right",
+      "sight": 7,
+      "patrol": [
+        [
+          2,
+          7
+        ],
+        [
+          7,
+          7
+        ]
       ]
     }
   ],
@@ -46,8 +59,7 @@
     "wizard.move_up",
     "wizard.move_down",
     "wizard.wait",
-    "teacher.facing",
-    "teacher.can_see"
+    "teacher.facing"
   ],
   "goals": [
     {
@@ -59,5 +71,46 @@
       "id": "dask"
     }
   ],
-  "tick_limit": 60
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "near",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            2,
+            7
+          ],
+          "facing": "right"
+        }
+      ]
+    },
+    {
+      "id": "middle",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            6,
+            7
+          ],
+          "facing": "right"
+        }
+      ]
+    },
+    {
+      "id": "far",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            5,
+            7
+          ],
+          "facing": "left"
+        }
+      ]
+    }
+  ]
 }

@@ -1,0 +1,181 @@
+{
+  "id": "the-voices",
+  "speaker": "friend",
+  "scene": "the-storeroom",
+  "wizard": [
+    10,
+    9
+  ],
+  "camera": [
+    13,
+    7
+  ],
+  "things": [
+    {
+      "id": "store_door",
+      "open": true
+    }
+  ],
+  "actors": [
+    {
+      "id": "friend",
+      "kind": "friend",
+      "at": [
+        9,
+        9
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        11,
+        9
+      ],
+      "facing": "up"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "by": "wizard",
+      "do": [
+        {
+          "by": "mate",
+          "walk": [
+            [
+              11,
+              6
+            ],
+            [
+              12,
+              6
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              10,
+              7
+            ],
+            [
+              13,
+              7
+            ],
+            [
+              13,
+              6
+            ]
+          ]
+        },
+        {
+          "by": "friend",
+          "walk": [
+            [
+              9,
+              7
+            ],
+            [
+              13,
+              7
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "face": "right"
+        },
+        {
+          "by": "friend",
+          "face": "right"
+        },
+        {
+          "by": "mate",
+          "face": "right"
+        }
+      ]
+    },
+    {
+      "who": "voice"
+    },
+    {
+      "who": "voice"
+    },
+    {
+      "who": "mate"
+    },
+    {
+      "who": "friend"
+    },
+    {
+      "who": "wizard"
+    },
+    {
+      "who": "voice",
+      "by": "wizard",
+      "do": [
+        {
+          "by": "mate",
+          "walk": [
+            [
+              11,
+              6
+            ],
+            [
+              10,
+              6
+            ],
+            [
+              10,
+              14
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "friend",
+          "face": "left"
+        },
+        {
+          "by": "friend",
+          "walk": [
+            [
+              10,
+              7
+            ],
+            [
+              10,
+              14
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "wizard",
+          "face": "left"
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              13,
+              7
+            ],
+            [
+              10,
+              7
+            ],
+            [
+              10,
+              14
+            ]
+          ],
+          "vanish": true
+        }
+      ]
+    }
+  ]
+}

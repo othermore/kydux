@@ -1,67 +1,139 @@
 {
   "id": "caught",
   "speaker": "friend",
-  "scene": "the-night-passages",
+  "scene": "the-way-down",
   "wizard": [
-    20,
-    7
+    10,
+    12
   ],
   "camera": [
-    17,
-    6
+    10,
+    12
+  ],
+  "things": [
+    {
+      "id": "door",
+      "open": true
+    }
   ],
   "actors": [
     {
       "id": "friend",
       "kind": "friend",
       "at": [
-        19,
-        7
+        9,
+        12
       ],
-      "facing": "right"
+      "facing": "down"
+    },
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        9,
+        11
+      ],
+      "facing": "down"
     },
     {
       "id": "dask",
-      "kind": "teacher"
+      "kind": "teacher",
+      "facing": "up"
     }
   ],
   "steps": [
     {
-      "who": "voice",
-      "do": null
+      "who": "voice"
     },
     {
       "who": "voice",
+      "by": "dask",
       "do": {
         "appear": [
-          20,
-          8
+          10,
+          13
         ]
-      },
-      "by": "dask"
+      }
     },
     {
-      "who": "dask",
-      "do": null
+      "who": "dask"
     },
     {
-      "who": "friend",
-      "do": null
+      "who": "mate"
     },
     {
-      "who": "voice",
-      "do": {
-        "face": "down"
-      },
-      "by": "wizard"
+      "who": "voice"
     },
     {
-      "who": "dask",
-      "do": null
+      "who": "dask"
     },
     {
       "who": "voice",
-      "do": null
+      "by": "wizard",
+      "do": [
+        {
+          "by": "friend",
+          "walk": [
+            [
+              9,
+              14
+            ],
+            [
+              10,
+              14
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              9,
+              14
+            ],
+            [
+              10,
+              14
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "wizard",
+          "face": "left"
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              9,
+              12
+            ],
+            [
+              9,
+              14
+            ],
+            [
+              10,
+              14
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "dask",
+          "face": "up"
+        },
+        {
+          "by": "dask",
+          "walk": [
+            10,
+            2
+          ],
+          "vanish": true
+        }
+      ]
     }
   ]
 }

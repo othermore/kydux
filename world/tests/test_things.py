@@ -201,7 +201,7 @@ def test_every_name_the_child_may_use_is_a_member_with_a_docstring_and_an_exampl
 
 def test_the_child_s_code_holds_the_level_s_things():
     result = run_code(ROOMS, "print(door.locked, key.kind, book.position)")
-    assert result.stdout == "True key Position(x=6, y=3)\n"
+    assert result.stdout == "True key (6, 3)\n"
 
 
 #: A key on the wizard's right, a book above it, and a potion two tiles left.

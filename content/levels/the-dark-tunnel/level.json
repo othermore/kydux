@@ -1,0 +1,59 @@
+{
+  "id": "the-dark-tunnel",
+  "kind": "practice",
+  "scene": "the-tunnel",
+  "start": [
+    15,
+    3
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand",
+    "map"
+  ],
+  "spells": [
+    "orvim"
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        14,
+        3
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        14,
+        2
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.position",
+    "thing.position"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "at": [
+        19,
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "kind": "uses",
+      "member": "position",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100
+}

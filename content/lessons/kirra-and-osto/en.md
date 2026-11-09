@@ -1,22 +1,22 @@
-# Light and stairs
+# Light and slabs
 
-These night passages are full of secrets. Do you see those dark rooms? We need a new spell to see inside them. The spell *kirra* lights the room you are in, so that what is in the dark shows.
+These night corridors are full of secrets. Do you see that dark room? We need to see what is inside.
 
-There are also moving stairs here! They swing into place for a moment, then swing away again.
+The spell *kirra* lights the room you are in, so that what lies in the dark shows and you can find it.
 
 ---
-## Safe steps
+## The slab that comes and goes
 
-A stair knows whether it is in place with the attribute `stair.in_place`. This says whether a step onto it right now would land.
+In the dark of the night, a hole opens in the floor of one cell. A stone slab covers it for a few ticks and is gone for as many, over and over.
 
-If you stand beside a moving stair, you can cast the spell *osto*. It holds the moving stair still for a while, giving you time to cross safely!
+If we cast the spell *osto* beside the hole, it holds the slab in place for a while. To know if it is safe to step, we ask `slab.in_place`. This way, we can do `while not slab.in_place:` with a wait underneath, and then step safely!
 
 ---
 ## Try it
 
-Let us walk up to a stair and check if it is ready for us to step on. We can print what the stair knows!
+Let us walk two steps along the corridor, right up to the hole for the next level, and check if the slab is ready for us to step on.
 
 ```python try
-wizard.move_up(2)
-print(stair.in_place)
+wizard.move_right(2)
+print(slab.in_place)
 ```

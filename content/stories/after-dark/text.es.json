@@ -1,12 +1,13 @@
 {
   "title": "Después del anochecer",
   "steps": [
-    "Ha caído la noche en el castillo y simplemente no logras conciliar el sueño. De repente, escuchas un golpe muy suave en tu puerta.",
-    "¿Estás {despierto|despierta}, {wizard}?",
-    "Sí, estoy {despierto|despierta}. ¿Qué pasa, {friend}?",
-    "Los alumnos mayores dicen que los pasadizos de piedra cambian al anochecer, y que Dask, un profesor muy estricto, patrulla para asegurarse de que nadie esté fuera de la cama. ¡Quiero ir a ver!",
-    "No lo sé... ¿Qué pasa si Dask nos ve?",
-    "¡Tengo un plan! Miraremos antes de cada paso. Te enseñaré cómo hacer preguntas cuya respuesta solo puede ser verdadera o falsa.",
-    "Juntos, camináis de puntillas por el frío pasillo, en dirección a la galería de la torre de vigilancia. Justo delante, de pie y en silencio junto a la pared, ves una sombra alta: Dask."
+    "Es noche cerrada en el castillo, el fuego se ha apagado y todos duermen; de repente, un golpe muy suave en la puerta de la sala común. Te incorporas en la cama.",
+    "¿Has oído eso?",
+    "{Los dos vais|Las dos vais} de puntillas por la sala común hasta la puerta, y la abres.",
+    "No podía dormir. Mirad lo que estaba doblado dentro del viejo libro que saqué de la biblioteca esta tarde, cuando fui a buscar sobre los pasadizos: el mapa del niño travieso. Tiene todo el castillo, planta por planta en casillas numeradas, dibujado hace años por un alumno que se escapó de noche, y una palabra en la esquina, *orvim*, que hace que funcione. Toma, léelo tú mientras yo vigilo el camino.",
+    "Los alumnos mayores dicen que los pasillos cambian de noche, y que el profesor Dask los patrulla para que nadie esté fuera de la cama.",
+    "Por eso necesitamos el mapa: nos dice dónde está todo. Miraremos antes de cada paso. ¿Venís?",
+    "No sé... Está bien, vamos. Pero si Dask nos ve, volvemos directos a la cama.",
+    "Los tres os coláis en el pasillo; la piedra está fría bajo los pies descalzos; {friend} va delante."
   ]
 }

@@ -1,19 +1,19 @@
 {
   "title": "La puerta equivocada",
   "goals": [
-    "Llega al pie de las escaleras largas."
+    "Llega a la marca."
   ],
-  "ways": {
-    "left_locked": "la puerta izquierda está cerrada",
-    "right_locked": "la puerta derecha está cerrada"
-  },
-  "starting_code": "# ¡Mi programa elige la puerta equivocada! Encuentra el error y arréglalo para pasar por la puerta abierta.\nif left_door.locked:\n    wizard.move_left(2)\n    left_door.open()\n    wizard.move_down(2)\n    wizard.move_right(6)\nelse:\n    wizard.move_right(2)\n    right_door.open()\n    wizard.move_down(2)\n    wizard.move_right(2)\n",
+  "starting_code": "if left_door.locked:\n    wizard.move_down(3)\n    wizard.move_left(3)\n    left_door.open()\n    wizard.move_down(3)\n    wizard.move_right(9)\nelse:\n    wizard.move_down(3)\n    wizard.move_right(3)\n    right_door.open()\n    wizard.move_down(3)\n    wizard.move_right(3)\n",
   "hints": [
-    "Mira la condición `if`. ¡Cuando la puerta izquierda está cerrada (`locked`), el programa intenta abrirla!",
-    "Intercambia las instrucciones dentro del `if` y del `else`.",
-    "Cuando la puerta izquierda esté cerrada, muévete a la puerta derecha en su lugar."
+    "¡Mi programa camina directo a la puerta cerrada! Hace justo lo contrario.",
+    "Fíjate en las partes `if` y `else`. ¡El código bajo `if` debería ir bajo `else`!",
+    "Intercambia las líneas bajo `if` por las que hay bajo `else`."
   ],
-  "intro": "Oh no, {wizard}... Intenté escribir el programa para esta habitación, pero sigo chocando con la puerta cerrada. ¿Puedes ver en qué me equivoqué?",
-  "outro": "¡Gracias! Puse las instrucciones correctas en los lugares equivocados. Ahora estamos al pie de las escaleras largas.",
-  "learned": "Ahora sabes cómo leer un `if` y su `else` y encontrar qué hace cada uno."
+  "intro": "¡Oh, no! Estamos en la misma sala en otra noche, ¡y mi programa de la última vez choca con la puerta cerrada! Creo que escribí las ramas al revés... ¿Podrías arreglarlo?",
+  "outro": "¡Gracias! Ya veo cómo poner las líneas correctas en cada rama.",
+  "learned": "Ahora sabes cómo leer una condición y ver qué rama se ejecuta.",
+  "ways": {
+    "left_locked": "La puerta izquierda está cerrada",
+    "right_locked": "La puerta derecha está cerrada"
+  }
 }

@@ -98,30 +98,30 @@ test.describe('past the teacher', () => {
   test.beforeEach(({ page }) => open(page, 'past-the-teacher'));
 
   test('the teacher walks the corridor', async ({ page }) => {
-    await expect(scene(page)).toHaveAttribute('data-actors', /^dask:7,5,left;/);
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:2,7,right/);
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.wait(3)');
     await page.locator('#run').click();
-    await expect(scene(page)).toHaveAttribute('data-actors', /^dask:6,5,left;/, {
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:3,7,right/, {
       timeout: 10_000,
     });
-    await expect(scene(page)).toHaveAttribute('data-actors', /^dask:4,5,left;/, {
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:5,7,right/, {
       timeout: 10_000,
     });
   });
 
   test('walking straight in gets the wizard caught', async ({ page }) => {
-    const said = await run(page, 'wizard.move_up(2)');
-    expect(said).toBe('The teacher saw you! Try again, and watch which way they look.');
+    const said = await run(page, 'wizard.move_down(12)');
+    expect(said).toContain('The teacher saw you! Try again, and watch which way they look.');
     await expect(page.locator('.goal[data-mark="failed"]')).toHaveCount(1);
   });
 
   test('waiting while the teacher looks this way, then crossing, wins', async ({ page }) => {
-    const said = await run(page, 'while dask.facing == "left":\n    wizard.wait()\nwizard.move_up(2)');
-    expect(said).toBe('You did it, Kydux!');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '2,4');
+    const said = await run(page, 'wizard.move_down(5)\nwhile dask.facing == "right":\n    wizard.wait()\nwizard.move_down(7)');
+    expect(said).toBe('You did it, Kydux! In every way!');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '10,13');
   });
 });
 
@@ -440,8 +440,8 @@ test.describe('chapter 3', () => {
 
 test.describe('a level played two ways (D51)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/#level/the-watch');
-    await expect(page.locator('#card-ways li')).toHaveText(['Dask looks away', 'Dask looks this way']);
+    await page.goto('/#level/the-tunnel-exit');
+    await expect(page.locator('#card-ways li')).toHaveText(['Dask walks away', 'Dask looks this way']);
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
@@ -451,18 +451,18 @@ test.describe('a level played two ways (D51)', () => {
     page,
   }) => {
     await expect(page.locator('#way')).toBeHidden();
-    await run(page, 'wizard.move_down(2)');
+    await run(page, 'wizard.move_right(13)\nwizard.move_down()');
     await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks this way”: The teacher saw you!');
     await expect(page.locator('#way')).toBeVisible();
     await expect(page.locator('#way')).toHaveValue('watching');
     await page.locator('#way').selectOption('away');
-    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks away”', { timeout: 30_000 });
+    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask walks away”', { timeout: 30_000 });
     await expect(page.locator('.outcome-text')).toContainText('Not every way yet');
     await expect(page.locator('.win-card')).toHaveCount(0);
   });
 
   test('with if, the same program wins every way', async ({ page }) => {
-    await run(page, 'if dask.facing == "left":\n    wizard.wait()\nwizard.move_down(2)');
+    await run(page, 'if dask.facing == "up":\n    wizard.wait()\nwizard.move_right(13)\nwizard.move_down()');
     await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux! In every way!');
     await expect(page.locator('.win-card')).toBeVisible();
   });
@@ -480,22 +480,22 @@ test.describe('the dark and the slabs (D52, D53, D138)', () => {
   });
 
   test('a slab comes and goes, and a step onto it while it is away bumps', async ({ page }) => {
-    await page.goto('/#level/the-moving-stairs');
+    await page.goto('/#level/the-moving-slab');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
-    await expect(scene(page)).toHaveAttribute('data-slabs', 'stair:in');
+    await expect(scene(page)).toHaveAttribute('data-slabs', 'slab:in');
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_up(2)\nwizard.move_right()\nwizard.wait()\nprint(stair.in_place)\nwizard.move_right()');
+    await run(page, 'wizard.move_right(2)\nwizard.wait()\nprint(slab.in_place)\nwizard.move_right()');
     await expect(page.locator('.printed')).toHaveText('False');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '3,2');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '2,7');
   });
 
   test('osto beside the slab holds it', async ({ page }) => {
-    await page.goto('/#level/the-moving-stairs');
+    await page.goto('/#level/the-moving-slab');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_up(2)\nwizard.move_right()\nwizard.cast("osto")\nwizard.wait(3)\nprint(stair.in_place)');
+    await run(page, 'wizard.move_right(2)\nwizard.cast("osto")\nwizard.wait(3)\nprint(slab.in_place)');
     await expect(page.locator('.printed')).toHaveText('True');
   });
 });

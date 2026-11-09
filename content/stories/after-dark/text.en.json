@@ -1,12 +1,13 @@
 {
   "title": "After dark",
   "steps": [
-    "Night has fallen over the castle, and you just cannot seem to fall asleep. Suddenly, you hear a very soft knock at your door.",
-    "Are you awake, {wizard}?",
-    "Yes, I am awake. What is it, {friend}?",
-    "The older pupils say the stone passages change after dark, and that Dask, a strict teacher, patrols them so no one is out of bed. I want to go and see!",
-    "I do not know... What happens if Dask sees us?",
-    "I have a plan! We will look before every step. I will show you how to ask questions whose answer is only ever true or false.",
-    "Together, you tiptoe out into the cold passage, heading towards the watchtower's gallery. Just ahead, standing quietly by the wall, you spot a tall shadow: Dask."
+    "Deep night in the castle, the fire out, everyone asleep; a very soft knock at the common room's door. You sit up in bed.",
+    "Did you hear that?",
+    "The two of you tiptoe across the common room to the door, and you open it.",
+    "I could not sleep. Look what was folded inside the old book I took out of the library this afternoon, looking for something about the passages: the naughty child's map, the whole castle floor by floor in numbered cells, drawn years ago by a pupil who slipped out at night, with a word in its corner, *orvim*, that makes it work. Take it, you read it while I watch the way.",
+    "The older pupils say the passages change at night, and Dask patrols them so that no one is out of bed.",
+    "That is why the map: it says where everything is. We look before every step. Are you coming?",
+    "Not sure... all right, let's go. But if Dask sees us, straight back to bed.",
+    "The three of you slip out into the corridor; the stone is cold under your bare feet; {friend} goes first."
   ]
 }

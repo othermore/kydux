@@ -1,20 +1,22 @@
 # Mientras
 
-Un bucle `for` es genial cuando sabes exactamente cuántas veces quieres repetir algo. ¡Pero no podemos saber cuánto tiempo estará Dask mirando hacia aquí!
+Un bucle `for` es genial cuando sabes exactamente cuántas veces quieres repetir algo. Pero necesitamos esperar mientras Dask mire hacia aquí, ¡y no sabemos durante cuántos ticks lo hará!
 
-Podemos usar otro bucle distinto que repite sus líneas mientras una expresión sea `True`. Lo escribimos con `while`.
+Podemos usar otro bucle que repite sus líneas una y otra vez mientras su expresión se mantenga verdadera, y continúa cuando se vuelve falsa. Lo escribimos con la palabra `while`.
 
 ---
-## Esperar un cambio
+## Hasta que cambie
 
-El bucle `while` comprueba la condición, ejecuta las líneas de dentro si es `True`, y luego vuelve a preguntar. Solo se detiene cuando la respuesta es `False`.
+¡Ten cuidado! Si la respuesta no cambia nunca, el bucle no terminará jamás.
 
-¡Ten cuidado! Si la respuesta no cambia nunca, el bucle no terminará jamás. El juego detendrá una ejecución que dure demasiado tiempo, así que asegúrate de que la respuesta pueda cambiar.
+Pero no es ningún desastre: el juego detendrá un `while` que no termina gracias al límite de ticks del juego. ¡Solo asegúrate de que la respuesta pueda cambiar!
 
 ---
 ## Pruébalo
 
-Vamos a escondernos y esperar. ¡Tu {mago|maga} se quedará quiet{o|a} una y otra vez, mientras Dask siga mirando a la izquierda!
+Vamos a escondernos y esperar.
+
+¡Tu {mago|maga} se quedará quiet{o|a} una y otra vez, mientras Dask siga mirando a la izquierda!
 
 ```python try
 while dask.facing == "left":

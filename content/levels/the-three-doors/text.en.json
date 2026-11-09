@@ -1,0 +1,16 @@
+{
+  "title": "The corridor of three doors",
+  "goals": [
+    "Reach the mark in the arch at the top.",
+    "In fewer than 5 lines."
+  ],
+  "starting_code": "door = wizard.find_nearest(\"door\")\ndoor.open()\nwizard.move_up(4)\ndoor = wizard.find_nearest(\"door\")\ndoor.open()\nwizard.move_up(4)\ndoor = wizard.find_nearest(\"door\")\ndoor.open()\nwizard.move_up(4)\n",
+  "hints": [
+    "We can make this much shorter with a loop! Look at the lines that repeat.",
+    "The three lines that repeat can be put inside a `for` loop with `range(3)`.",
+    "Remove all the extra lines and keep just one block of three lines under your `for` loop!"
+  ],
+  "intro": "Look at this straight corridor... there are three doors, exactly alike and the same distance apart! I wrote a program to open them, but it is nine lines long. I bet you can do it in fewer lines with a loop. The mark is in the arch at the top.",
+  "outro": "Wow, only four lines! A loop is so much better.",
+  "learned": "Now you know that a loop repeats its lines, so three doors take four lines, and that `door` is each time the next door."
+}

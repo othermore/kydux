@@ -63,7 +63,7 @@ test('the notebook in Spanish', async ({ browser }) => {
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook h2')).toHaveText('El cuaderno del mago');
   await expect(page.locator('#notebook')).toContainText('Se queda quieto mientras el mundo sigue');
-  await expect(page.locator('#notebook [data-example="dask.can_see(wizard)"]')).toBeVisible();
+  await expect(page.locator('#notebook [data-example="dask.facing"]')).toBeVisible();
   await context.close();
 });
 

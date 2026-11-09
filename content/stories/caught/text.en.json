@@ -1,12 +1,12 @@
 {
   "title": "Caught",
   "steps": [
-    "You are almost there. The familiar way down to the warm dormitory is just ahead.",
-    "Suddenly, Dask steps right out of the dark. You are caught!",
-    "What are two first-year pupils doing out of bed at this hour?",
-    "We were just inspecting the floating stairs, sir! To make sure they do not float away completely!",
-    "Dask looks at you both for a long, quiet moment. Then, you see the smallest smile appear on his face.",
-    "I watched you. You looked before you stepped, you waited, and you lit the dark. Clever work. I will let you go, just this once, {wizard}.",
-    "Safe in bed at last, you think about how much you have grown tonight. Asking questions with expressions and choosing with `if` and `else` kept you safe from Dask. A `for` loop easily climbed the stairs, and a `while` made you wait patiently in the shadows. As you remember casting the *kirra* and *osto* spells, a warm feeling of finally belonging to Arvelia washes over you, and you drift happily to sleep."
+    "Almost there: the way down to the dormitory is just ahead.",
+    "Suddenly Dask steps out of the dark in front of you. Caught.",
+    "What are three first-years doing out of bed at this hour?",
+    "We were only checking the slab that comes and goes, sir! To make sure it did not get lost in the dark!",
+    "Dask looks at the three of you for a long moment in silence. Then the smallest of smiles.",
+    "I have been watching you. You looked before every step, you waited, you lit the dark; very clever work. I shall let you go, just this once, {wizard}.",
+    "He walks away up the corridor, and the three of you go on through the arch. Safe under the blankets, you remember all you learned tonight: you counted the cells and asked where things are with `position`, used a question, an expression, to know whether it was safe, chose your way with `if` and `else`, and got through the dark with the loops `for` and `while` and the spells *kirra* and *osto*. Hugging the secret the three of you now share, you fall asleep at last, the castle feeling like home."
   ]
 }

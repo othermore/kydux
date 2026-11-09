@@ -1,0 +1,50 @@
+{
+  "id": "beyond-the-doors",
+  "speaker": "friend",
+  "scene": "the-long-round",
+  "wizard": [
+    10,
+    1
+  ],
+  "camera": [
+    10,
+    3
+  ],
+  "actors": [
+    {
+      "id": "friend",
+      "kind": "friend",
+      "at": [
+        9,
+        1
+      ],
+      "facing": "down"
+    },
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        9,
+        2
+      ],
+      "facing": "down"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice"
+    },
+    {
+      "who": "friend"
+    },
+    {
+      "who": "mate"
+    },
+    {
+      "who": "wizard"
+    },
+    {
+      "who": "friend"
+    }
+  ]
+}

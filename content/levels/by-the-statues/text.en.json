@@ -1,0 +1,20 @@
+{
+  "title": "By the statues",
+  "goals": [
+    "Reach the mark.",
+    "Do not let Dask see you."
+  ],
+  "starting_code": "wizard.move_down()\n\n# If Dask looks left, go down his right side with `move_right`, `move_down` and `move_left`.\n\n# Else, go down his left side.\n\n# Take the last steps down into the arch.\n",
+  "hints": [
+    "Dask stands still, but he might look left or right. Use `if` and `else`!",
+    "If Dask looks left, walk to his right: 1 right, 3 down, 1 left.",
+    "Under `else:`, do the opposite: 1 left, 3 down, 1 right. End with `wizard.move_down(2)`."
+  ],
+  "intro": "Dask is standing perfectly still in the wide corridor ahead of us! He is looking to one side, but we don't know which side it will be. We need to go down the side he is not looking at, to the mark in the arch at the bottom. An `else` will help us choose!",
+  "outro": "Brilliant! We sneaked right past him, no matter which way he looked.",
+  "learned": "Now you know that `else` gives the other way when the condition is false.",
+  "ways": {
+    "looking_left": "Dask looks left",
+    "looking_right": "Dask looks right"
+  }
+}

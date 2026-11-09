@@ -1,0 +1,55 @@
+{
+  "id": "the-three-doors",
+  "kind": "improve",
+  "scene": "the-three-doors",
+  "start": [
+    10,
+    12
+  ],
+  "end": [
+    10,
+    0
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand",
+    "map"
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        8,
+        12
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        11,
+        12
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.find_nearest",
+    "door.open"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "lines_under",
+      "lines": 5
+    }
+  ],
+  "tick_limit": 100
+}

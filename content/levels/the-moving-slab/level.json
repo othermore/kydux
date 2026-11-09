@@ -1,0 +1,91 @@
+{
+  "id": "the-moving-slab",
+  "kind": "practice",
+  "scene": "the-storeroom",
+  "start": [
+    0,
+    7
+  ],
+  "end": [
+    5,
+    7
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand",
+    "map"
+  ],
+  "spells": [
+    "osto"
+  ],
+  "things": [
+    {
+      "kind": "slab",
+      "id": "slab",
+      "at": [
+        3,
+        7
+      ],
+      "period": 3
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        0,
+        6
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        1,
+        6
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.wait",
+    "wizard.cast",
+    "slab.in_place"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "uses",
+      "member": "in_place",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "three",
+      "things": [
+        {
+          "id": "slab",
+          "period": 3
+        }
+      ]
+    },
+    {
+      "id": "four",
+      "things": [
+        {
+          "id": "slab",
+          "period": 4
+        }
+      ]
+    }
+  ]
+}

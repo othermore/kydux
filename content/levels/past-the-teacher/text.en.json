@@ -1,16 +1,21 @@
 {
   "title": "Past the teacher",
   "goals": [
-    "Cross the corridor.",
+    "Reach the mark in the bottom arch.",
     "Do not let Dask see you."
   ],
-  "starting_code": "# Dask is watching the corridor.\n# Wait as long as he is looking your way, then sneak across.\n",
+  "starting_code": "# Walk down to the cell before the crossing with `move_down`.\n\n# Wait while Dask faces right, with `while`, `facing` and `wait`.\n\n# Walk on down.\n",
   "hints": [
-    "Use a `while` loop to check if Dask is facing left.",
-    "Inside the loop, make your wizard wait.",
-    "When Dask finally turns away, move up past him."
+    "Dask's lantern shines far! Walk 5 down to stop just before the crossing.",
+    "Use `while` with `dask.facing` to wait until he looks away.",
+    "When he turns around, walk 7 down to the arch!"
   ],
-  "intro": "Dask is guarding his long corridor. He looks this way, but we do not know for how long... We have to wait as long as he looks.",
-  "outro": "We sneaked right past him. Waiting as long as something is true is very useful.",
-  "learned": "Now you know how `while` repeats as long as something stays true."
+  "intro": "It's Dask again! His lantern shines a long way down the corridor. We are headed for the mark in the bottom arch, but we must cross his path. We don't know how long he will look this way, so no fixed number of waits will work! We need to walk to the cell right before the crossing and wait while he faces right.",
+  "outro": "We did it! Waiting until he turns is the only way to be safe.",
+  "learned": "Now you know that `while` waits as long as something stays true, however long that is.",
+  "ways": {
+    "near": "Dask starts at the near end",
+    "middle": "Dask starts near his far end",
+    "far": "Dask starts on his way back"
+  }
 }

@@ -1,17 +1,18 @@
 {
-  "title": "La habitación oscura",
+  "title": "La sala oscura",
   "goals": [
+    "Recoge la llave.",
     "Abre la puerta.",
-    "Pasa por ella.",
+    "Llega a la marca.",
     "Encuentra la llave con `find_nearest`."
   ],
-  "starting_code": "# ¡Está demasiado oscuro para ver nada!\n# Ilumina la habitación, encuentra la llave y abre la puerta.\n",
+  "starting_code": "# Ilumina la sala con un hechizo.\n\n# Encuentra la llave e imprime su casilla con `find_nearest`, `position` y `print`.\n\n# Camina hasta ella.\n\n# Recógela con `pick_up`.\n\n# Camina a la casilla sobre la puerta.\n\n# Ábrela con `open`.\n",
   "hints": [
-    "Lanza el hechizo *kirra* con `cast` para iluminar la habitación.",
-    "Usa `find_nearest` para encontrar la llave y guárdala en una variable.",
-    "Muévete hacia la llave, recógela, luego ve a la puerta y ábrela."
+    "¡Lanza `kirra` primero! Si no lo haces, `find_nearest(\"key\")` no verá nada en la oscuridad.",
+    "Tras iluminar la sala y ver la posición de la llave, ¡camina 4 a la derecha y cógela!",
+    "Desde la llave, camina 1 a la derecha y 2 abajo a la casilla sobre `store_door` para abrirla."
   ],
-  "intro": "Está completamente oscuro aquí, {wizard}. Tenemos que iluminar la habitación con un hechizo para encontrar la llave de esa puerta.",
-  "outro": "El hechizo *kirra* funcionó de maravilla. La llave estaba escondida, pero la luz nos mostró exactamente dónde estaba.",
-  "learned": "Ahora sabes cómo *kirra* ilumina la habitación en la que estás."
+  "intro": "¡El almacén está a oscuras! No podemos encontrar la llave si no podemos verla. Debemos lanzar *kirra* para iluminar la sala, ver la casilla de la llave y cogerla. Luego iremos a la puerta cerrada y la abriremos. ¡Se llama `store_door`!",
+  "outro": "¡La luz lo mostró todo! La llave es nuestra y la puerta está abierta.",
+  "learned": "Ahora sabes que *kirra* ilumina una sala, y entonces las cosas se encuentran y dicen su casilla."
 }

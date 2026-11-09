@@ -43,6 +43,10 @@ class Position(NamedTuple):
     x: int
     y: int
 
+    def __repr__(self) -> str:
+        """As the child reads it: `print(wizard.position)` shows `(15, 3)`."""
+        return f"({self.x}, {self.y})"
+
 
 class LevelError(ValueError):
     """A level definition that cannot be played."""
@@ -1011,7 +1015,8 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     `asleep` in a bed, its `at` the bed's pillow_side, where it gets up. No one
     walks onto an open door's leaf, and whoever stands on it as the door opens
     steps aside along the row (D125). The voice does nothing itself; no one
-    speaks or moves out of sight, and no one asleep walks, turns or goes."""
+    speaks or moves out of sight, and no one asleep walks, turns or goes. The wizard
+    stays in sight but for a walk out of sight in the story's last step."""
     story_id = data.get("id")
     if "scene" not in data:
         raise LevelError(f"{story_id}: a story is told on a scene")
@@ -1210,7 +1215,8 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                         queue.append(("move", at))
                 planned[doer] = at
                 if action.get("vanish") is True:
-                    if doer == "wizard":
+                    # The wizard may walk out of sight at the very end of a story.
+                    if doer == "wizard" and number != len(steps):
                         raise LevelError(f"{here}: the wizard stays in the story")
                     planned[doer] = None
                     queue.append(("vanish", None))

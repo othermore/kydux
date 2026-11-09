@@ -1,3 +1,4 @@
-while dask.facing == "left":
+wizard.move_down(5)
+while dask.facing == "right":
     wizard.wait()
-wizard.move_up(2)
+wizard.move_down(7)

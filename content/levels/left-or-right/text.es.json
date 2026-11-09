@@ -1,19 +1,19 @@
 {
   "title": "Izquierda o derecha",
   "goals": [
-    "Llega a la bajada."
+    "Llega a la marca."
   ],
-  "ways": {
-    "left_locked": "la puerta izquierda está cerrada",
-    "right_locked": "la puerta derecha está cerrada"
-  },
-  "starting_code": "# Una puerta está cerrada con llave, la otra está abierta.\n# Elige la puerta abierta para llegar a la bajada.\n",
+  "starting_code": "# Pregunta con `locked` si la puerta izquierda está cerrada.\n\n# Si es así, camina a la puerta derecha, ábrela con `open`, crúzala y avanza por el pasillo.\n\n# Si no, haz lo mismo por la puerta izquierda.\n",
   "hints": [
-    "Usa `if` para comprobar si la puerta izquierda está cerrada (`locked`).",
-    "Si lo está, ve a la puerta derecha y ábrela.",
-    "Usa `else` para ir a la puerta izquierda y abrirla cuando no esté cerrada, y luego baja hacia la salida."
+    "¡Podemos preguntar a la puerta si está cerrada con `left_door.locked`!",
+    "Si la izquierda está cerrada, camina 3 abajo y 3 derecha hasta `right_door`, ábrela, camina 3 abajo y 3 derecha hasta la marca.",
+    "Si no está cerrada, `else:`, camina 3 abajo, 3 izquierda hasta `left_door`, ábrela, camina 3 abajo y ¡9 a la derecha!"
   ],
-  "intro": "Aquí hay dos puertas, {wizard}, pero una de ellas está cerrada con llave. Tenemos que comprobar una puerta y elegir la otra si no se abre.",
-  "outro": "Genial. Saber qué hacer cuando la respuesta es no, es tan importante como saber qué hacer cuando es sí.",
-  "learned": "Ahora sabes cómo `else` elige qué hacer cuando la respuesta es no."
+  "intro": "¡Mira, una sala con dos puertas! Una de ellas está cerrada esta noche, y no hay llaves cerca. ¡Pero podemos preguntarle a la puerta izquierda si está cerrada! Si lo está pasaremos por la puerta derecha, y si no, iremos por la izquierda. ¡La marca nos espera a la derecha en el pasillo!",
+  "outro": "¡Elegiste perfecto! Preguntar a las cosas lo que saben es un gran truco.",
+  "learned": "Ahora sabes que `if` y `else` pueden preguntar lo que una cosa sabe, y elegir el camino por ello.",
+  "ways": {
+    "left_locked": "La puerta izquierda está cerrada",
+    "right_locked": "La puerta derecha está cerrada"
+  }
 }

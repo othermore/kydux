@@ -1,0 +1,58 @@
+{
+  "id": "the-doors-corridor",
+  "kind": "practice",
+  "scene": "the-tunnel",
+  "start": [
+    1,
+    12
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand",
+    "map"
+  ],
+  "spells": [
+    "orvim"
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        0,
+        12
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        0,
+        11
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.cast"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "at": [
+        15,
+        3
+      ],
+      "hidden": true
+    },
+    {
+      "kind": "uses",
+      "member": "cast",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100
+}

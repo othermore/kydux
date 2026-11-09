@@ -1,0 +1,16 @@
+{
+  "title": "El túnel oscuro",
+  "goals": [
+    "Sal por el otro extremo del túnel, la casilla (19, 1).",
+    "Pregunta en qué casilla estás con `position`."
+  ],
+  "starting_code": "# Imprime dónde estás con `position` y `print`.\n\n# Sube hasta la fila de la salida con `move_up`.\n\n# Camina a la derecha hasta el final con `move_right`.\n",
+  "hints": [
+    "¡Usa `print` para saber dónde estás en este lugar oscuro!",
+    "El plano muestra la salida en la (19, 1), pero no nos vemos. Usa `wizard.position`.",
+    "Si resulta que estamos en la (15, 3), hay que dar 2 pasos arriba y 4 a la derecha."
+  ],
+  "intro": "¡Qué oscuro! El túnel está encantado y nadie puede vernos, ni siquiera el mapa. No veremos moverse nada. Pero el mapa dice que el final está en la casilla (19, 1). ¡Podemos preguntarle al programa dónde estamos, contar los pasos y caminar a ciegas!",
+  "outro": "¡Uf, qué miedo! Pero funcionó preguntar, ¡y ya salimos!",
+  "learned": "Ahora sabes por qué un programa pregunta dónde está en vez de mirar."
+}

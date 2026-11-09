@@ -1,0 +1,84 @@
+{
+  "id": "by-the-statues",
+  "kind": "practice",
+  "scene": "the-crossing",
+  "start": [
+    15,
+    7
+  ],
+  "end": [
+    15,
+    13
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand",
+    "map"
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        13,
+        6
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        13,
+        7
+      ]
+    },
+    {
+      "kind": "teacher",
+      "id": "dask",
+      "at": [
+        15,
+        10
+      ],
+      "facing": "left"
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.wait",
+    "teacher.facing"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "not_seen_by",
+      "id": "dask"
+    }
+  ],
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "looking_left",
+      "actors": [
+        {
+          "id": "dask",
+          "facing": "left"
+        }
+      ]
+    },
+    {
+      "id": "looking_right",
+      "actors": [
+        {
+          "id": "dask",
+          "facing": "right"
+        }
+      ]
+    }
+  ]
+}

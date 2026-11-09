@@ -1,0 +1,8 @@
+{
+  "id": "where-i-am",
+  "speaker": "friend",
+  "teaches": [
+    "wizard.position",
+    "thing.position"
+  ]
+}

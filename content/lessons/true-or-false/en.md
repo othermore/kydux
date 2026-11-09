@@ -1,24 +1,23 @@
 # True or false
 
-Some questions have only two answers: yes or no. Is the door locked? Is Dask looking this way? In a program, this kind of question is called an expression.
+Look down the corridor. Dask is staring at the wall. Sometimes, questions only have two answers: yes or no. In a program, this kind of question is called an expression.
 
-The computer answers an expression with `True` or `False`.
+The computer answers an expression with `True` or `False`, which mean yes and no.
 
 ---
 ## Comparing things
 
-An attribute can be one of these answers, like `door.locked`. We can also compare two values to see if they are the same.
+We can compare two values to see if they are the same using two equal signs `==`. Remember that a single `=` names a value, while `==` asks a question!
 
-We use two equals signs `==` to ask the question (remember, one `=` names a value!). For example, `dask.facing == "left"` asks if Dask is looking left. We can even flip the answer using `not`.
+For example, `dask.facing == "left"` asks if Dask is looking to the left. His attribute holds a string with the direction he looks: `"up"`, `"down"`, `"left"`, or `"right"`.
 
 ---
-## Asking methods
+## Flipping the answer
 
-Some methods answer these questions too. The computer can check `dask.can_see(wizard)` to tell us if Dask can see you.
+We can even flip the computer's answer by writing `not` before the expression. If Dask is looking left, `not dask.facing == "left"` will answer `False`.
 
-Let us try printing some answers to see what the computer says. Remember to keep your voice down!
+Let us look at how you would print an answer to see what the computer says. Remember to whisper!
 
-```python try
-print(dask.facing)
-print(dask.can_see(wizard))
+```python
+print(dask.facing == "left")
 ```

@@ -1,5 +1,0 @@
-wizard.cast("kirra")
-wizard.move_right(5)
-door.open()
-wizard.move_right(5)
-wizard.move_down(3)

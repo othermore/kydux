@@ -7,9 +7,9 @@ A tick is a moment of the game in which everything else moves. `wizard.wait()` w
 ---
 ## Try it
 
-Wait two ticks and then walk eight cells to the right. Under it you will read the cell your wizard ended on. And you can change it and try again!
+Wait two ticks and then walk seven cells to the right. Under it you will read the cell your wizard ended on. And you can change it and try again!
 
 ```python try
 wizard.wait(2)
-wizard.move_right(8)
+wizard.move_right(7)
 ```

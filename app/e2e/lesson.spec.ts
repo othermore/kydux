@@ -148,13 +148,13 @@ test.describe('a page runs its code (D142)', () => {
     await page.goto('/#lesson/waiting');
     await page.locator('#lesson-next').click();
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('(12, 6)', { timeout: 90_000 });
+    await expect(page.locator('.lesson-said')).toContainText('(11, 6)', { timeout: 90_000 });
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('(12, 6)', { timeout: 30_000 });
+    await expect(page.locator('.lesson-said')).toContainText('(11, 6)', { timeout: 30_000 });
     // Without waiting, Dask sees the wizard: the page says it.
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('wizard.move_right(8)');
+    await page.keyboard.insertText('wizard.move_right(7)');
     await page.locator('.lesson-run button').click();
     await expect(page.locator('.lesson-said')).toContainText('teacher', { timeout: 30_000 });
   });

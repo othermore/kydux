@@ -9,9 +9,9 @@
   "hints": [
     "We can check which way Dask is looking with `facing`!",
     "If he looks up, move down 2 cells inside the `if`, with four spaces in front.",
-    "After the `if`, with no spaces in front, walk 4 cells right and 3 down."
+    "After the `if`, with no spaces in front, walk four cells to the right and two down."
   ],
-  "intro": "Dask is standing still between the first two statues. We are against the top wall. If he looks up, we must go down two cells and pass below him! If he looks down, we can cross straight. Then we go down into the corridor between the second and third statue, where the mark is.",
+  "intro": "Dask is standing still in the middle of the gallery, below the first two statues. We are on the row above him, by the statues' bases. If he looks up, we must go down two cells and pass below him, behind the low wall! If he looks down, we can cross straight, above him. Then we go down to the mark, at the top of the corridor between the second and the third statue.",
   "outro": "We passed without his seeing us! Let us see where this corridor leads.",
   "learned": "Now you know that `if` runs its lines only when its condition is true, and that what comes after it runs always.",
   "ways": {

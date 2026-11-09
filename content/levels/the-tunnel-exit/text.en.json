@@ -8,7 +8,7 @@
   "hints": [
     "Let Dask go by first, and then we cross!",
     "Count the ticks we must wait for him to go by: two.",
-    "Use `wait` with 2, then `move_right` to walk eight cells to the mark."
+    "Wait two ticks and then walk seven cells to the right, to the mark."
   ],
   "intro": "We are out of the tunnel! But look, another corridor crosses this one, and Dask is coming up it. He is looking up, so if we cross now he will see us! I think we should wait two ticks for him to go by, and then walk to the mark, by the first statue.",
   "outro": "He went by without seeing us! But look, up ahead, among the statues, there is Dask again.",

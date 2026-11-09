@@ -9,9 +9,9 @@
   "hints": [
     "¡Podemos comprobar hacia dónde mira Dask con `facing`!",
     "Si mira hacia arriba, baja 2 casillas dentro del `if`, con cuatro espacios delante.",
-    "Después del `if`, sin espacios delante, camina 4 casillas a la derecha y baja 3."
+    "Después del `if`, sin espacios delante, camina cuatro casillas a la derecha y baja dos."
   ],
-  "intro": "Dask está quieto entre las dos primeras estatuas. Estamos contra la pared de arriba. ¡Si mira hacia arriba, debemos bajar dos casillas y pasar por debajo de él! Si mira hacia abajo, podemos cruzar recto. Luego bajaremos al pasillo entre la segunda y la tercera estatua, donde está la marca.",
+  "intro": "Dask está quieto en medio de la galería, debajo de las dos primeras estatuas. Nosotros estamos en la fila de arriba, junto a las bases de las estatuas. ¡Si mira hacia arriba, debemos bajar dos casillas y pasar por debajo de él, detrás del murete! Si mira hacia abajo, podemos cruzar recto, por arriba. Luego bajaremos hasta la marca, al principio del pasillo entre la segunda y la tercera estatua.",
   "outro": "¡Hemos pasado sin que nos vea! A ver adónde lleva este pasillo.",
   "learned": "Ahora sabes que `if` ejecuta sus líneas solo cuando su condición es cierta, y que lo que viene después se ejecuta siempre.",
   "ways": {

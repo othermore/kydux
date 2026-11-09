@@ -374,3 +374,38 @@ def test_chapter_3_says_nothing_the_owner_took_out_of_it(lang):
         said = text.replace("susurra", "").replace("whispers", "")
         found = OUT_OF_THE_WORDS[lang].search(said)
         assert not found, f"{item}, {lang}: {found.group(0)}"
+
+
+def every_text(lang: str) -> list[tuple[str, str]]:
+    """Every text of the course's stops the child reads, by its item."""
+    found = []
+    for path in sorted((CONTENT / "chapters").glob("*/chapter.json")):
+        for item in json.loads(path.read_text(encoding="utf-8"))["items"]:
+            kind, _, item_id = item.partition(":")
+            folder = {"story": "stories", "level": "levels"}.get(kind)
+            name = f"text.{lang}.json" if folder else f"{lang}.md"
+            found.append(
+                (item, (CONTENT / (folder or "lessons") / item_id / name).read_text("utf-8"))
+            )
+    return found
+
+
+#: Where a metaphor for an idea has no place: past the lesson that first explains it.
+METAPHORS = {
+    "es": re.compile(r"pregunt|bajo (un|su propio|el) nombre", re.I),
+    "en": re.compile(r"\basks?\b|\basking\b|under (a|its own|the) name", re.I),
+}
+#: What says it in the ordinary sense, of no programming idea, or recalls it once in
+#: parentheses, as the owner allows the second time.
+MAY_SAY = {"story:the-letter", "lesson:finding-things", "level:the-lost-book"}
+
+
+@pytest.mark.parametrize("lang", LANGUAGES)
+def test_a_metaphor_stands_only_where_its_idea_is_first_explained(lang):
+    """The owner, 2026-11-07: the easy word the first time, *in programming it is called
+    X*, and then X; the second time it may be recalled in parentheses. *Preguntar* is out."""
+    for item, text in every_text(lang):
+        if item in MAY_SAY:
+            continue
+        found = METAPHORS[lang].search(text)
+        assert not found, f"{item}, {lang}: {found.group(0)}"

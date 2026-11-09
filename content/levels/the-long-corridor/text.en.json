@@ -12,5 +12,5 @@
   ],
   "intro": "Let us walk across the meadow to that little fence pen on the right. We can reach it in just one instruction if we use an argument!",
   "outro": "That was so fast! Arguments save us from typing the same instruction over and over.",
-  "learned": "Now you know what an argument is, and that the move actions have one that says how many steps to take."
+  "learned": "Now you know what an argument is, and that the move methods have one that says how many steps to take."
 }

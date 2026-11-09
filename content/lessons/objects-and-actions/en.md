@@ -7,7 +7,7 @@ An object can do actions, which programmers call methods. Every object has its o
 ---
 ## How to write an instruction
 
-When you write an instruction, you put the object first, then a dot to show that the action belongs to it. Then comes the method, and finally brackets, which tell the computer to do it right now!
+When you write an instruction, you put the object first, then a dot. Then comes the method, which belongs to it, and finally brackets, which tell the computer to do it right now!
 
 There are four move methods, one for each direction, and each takes one step. We write one instruction on each line.
 

@@ -2075,8 +2075,12 @@ one overturns stays, marked as superseded.
   or that the game waits: the game's doing is shown, not told. The friend's
   reasons are said, and what the friend does not know is said as a guess; a
   bonus goal names the spell; an outro tells what the three see next, not what
-  the code did. A content test holds chapter 3's texts to it. Rules out
-  mechanics in the fiction and a lesson that names three ideas on one page.
+  the code did. A metaphor for an idea (*preguntar*, *un nombre*, *lo que sabe*, *una
+  acción*) is used only where the idea is first explained, which says at once that in
+  programming it is called X; from then on the text says X, and the second time may
+  recall it in parentheses (the owner, 2026-11-07, for the whole course). Content tests
+  hold it. Rules out mechanics in the fiction and a lesson that names three ideas on
+  one page.
 - **D142 — A lesson page runs its code.** Decided 2026-11-07 (the owner's
   suggestion). Any page of a lesson may carry a block fenced `python try`, one a
   page; the page shows it in an editor with a *Run* button, runs it in the

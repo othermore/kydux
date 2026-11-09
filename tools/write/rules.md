@@ -18,8 +18,10 @@ game's developers before it enters the game.
   a mistake".
 - Words a child of eight understands. A new idea is named by the child's word
   beside the programmer's word the first time it appears ("an action, which
-  programmers call a method"; "a question, which programmers call an
-  expression"); from then on, the programmer's word alone. Never explain
+  programmers call a method"); from then on, the programmer's word alone: a
+  metaphor is used only where the idea is first explained, and the second time
+  it may be recalled in parentheses, once. Never *ask* or *preguntar* for what
+  a program does: it looks at an attribute and uses a method. Never explain
   again an idea the course has already taught: the brief says what the
   child knows by now, and a text that follows builds on it.
 - Precise about what things are: the computer (the game) runs the program

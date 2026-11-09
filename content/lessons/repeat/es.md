@@ -9,7 +9,7 @@ Los programadores llaman a esto un bucle. Escribimos `for step in range(3):` y, 
 
 Mira las tres puertas que hay por el pasillo, una tras otra. Son exactamente iguales.
 
-Para pasarlas, tendrías que escribir exactamente las mismas líneas para abrir una puerta y atravesarla, tres veces seguidas. ¡Un bucle hace eso por nosotros! La palabra `step` es solo un nombre con el que el bucle cuenta, y las líneas de dentro ni siquiera tienen que usarlo.
+Para pasarlas, tendrías que escribir exactamente las mismas líneas para abrir una puerta y atravesarla, tres veces seguidas. ¡Un bucle hace eso por nosotros! La palabra `step` es solo una variable con la que el bucle cuenta, y las líneas de dentro ni siquiera tienen que usarla.
 
 ---
 ## Pruébalo

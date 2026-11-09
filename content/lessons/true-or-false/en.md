@@ -11,7 +11,7 @@ print(dask.facing)
 ---
 ## Comparing
 
-We can compare two things to see whether they are the same with two equals signs `==`. The answer can only be yes or no, which in programming are called `True` and `False`. This is what we call an expression. Remember that a single `=` gives a value a name, and `==` compares!
+We can compare two things to see whether they are the same with two equals signs `==`. The answer can only be yes or no, which in programming are called `True` and `False`. This is what we call an expression. Remember that a single `=` keeps a value in a variable, and `==` compares!
 
 For example, let us see what happens if we compare numbers.
 

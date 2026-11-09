@@ -4,13 +4,13 @@
     "Dale a Eldra su libro.",
     "En menos de 5 líneas."
   ],
-  "starting_code": "# Pide el libro que llevas en las manos con `find_item` y la palabra \"book\", y guárdalo bajo un nombre.\n\n# Sube un paso hasta la sala y recórrela hacia la derecha hasta Eldra.\n\n# Dale el libro con `give` y el nombre.\n",
+  "starting_code": "# Busca el libro que llevas en las manos con `find_item` y la palabra \"book\", y guárdalo en una variable.\n\n# Sube un paso hasta la sala y recórrela hacia la derecha hasta Eldra.\n\n# Dale el libro con `give` y la variable.\n",
   "hints": [
-    "`find_item` con la palabra \"book\" te da el libro que llevas; guárdalo bajo un nombre.",
+    "`find_item` con la palabra \"book\" te da el libro que llevas; guárdalo en una variable.",
     "Sube un paso y luego camina a la derecha por la sala, hasta que Eldra esté justo a tu lado.",
-    "Usa `give` con el nombre bajo el que guardaste el libro."
+    "Usa `give` con la variable en la que guardaste el libro."
   ],
   "intro": "El libro está en tus manos y Eldra flota al otro extremo de la sala. Llévaselo.",
   "outro": "Eldra vuelve a tener su libro entre las manos y te da las gracias de todo corazón.",
-  "learned": "Ahora sabes que un nombre vive en su propio programa, que `find_item` te da lo que llevas y que `give` entrega una cosa a quien esté a tu lado."
+  "learned": "Ahora sabes que una variable vive en su propio programa, que `find_item` te da lo que llevas y que `give` entrega una cosa a quien esté a tu lado."
 }

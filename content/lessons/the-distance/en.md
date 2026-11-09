@@ -5,14 +5,14 @@ Sometimes a program needs a number it cannot know when it is written.
 Think of a key that is never twice in the same place. It will be a different number of steps away every time you play!
 
 ---
-## Asking for the distance
+## Checking the distance
 
-A thing can say how many steps lie between it and your wizard, along the rows and the columns. You just ask for `key.distance_to(wizard)`.
+A thing can say how many steps lie between it and your wizard, along the rows and the columns. You just use `key.distance_to(wizard)`.
 
 ---
 ## Using a variable
 
-If you keep that number under a name, like `steps = key.distance_to(wizard)`, you can use it as a move's argument: `wizard.move_left(steps)`. You can even use it again to walk back the same way!
+If you keep that number in a variable, like `steps = key.distance_to(wizard)`, you can use it as a move's argument: `wizard.move_left(steps)`. You can even use it again to walk back the same way!
 
 This is exactly what a variable is for: holding a value you do not know when you write the program, or that you need to use more than once.
 

@@ -6,13 +6,13 @@
   ],
   "starting_code": "# This is yesterday's program, but the key has moved!\nkey = wizard.find_nearest(\"key\")\nwizard.move_left(4)\nwizard.pick_up()\n",
   "hints": [
-    "Ask the key for its `distance_to` you and keep that number under a name.",
-    "Put that name inside the brackets of the `move_left` method.",
+    "Use the key's method `distance_to` to learn the steps to you, and keep that number in a variable.",
+    "Put that variable inside the brackets of the `move_left` method.",
     "Then `pick_up` the key where the walk ends."
   ],
-  "intro": "The key to Eldra's little room is never twice in the same place; I think Eldra moves it! Yesterday's program walked four steps, but today the key lies somewhere between two and five steps away. Make your program ask the key how far it is, keep that number under a name, and use it to walk there and pick the key up.",
+  "intro": "The key to Eldra's little room is never twice in the same place; I think Eldra moves it! Yesterday's program walked four steps, but today the key lies somewhere between two and five steps away. Make your program check how far the key is, keep that number in a variable, and use it to walk there and pick the key up.",
   "outro": "The key is in your hand, wherever Eldra left it, and Eldra's door is waiting.",
-  "learned": "Now you know what a variable is for: a number the program cannot know when it is written, kept under a name.",
+  "learned": "Now you know what a variable is for: to keep a number the program cannot know when it is written.",
   "ways": {
     "two": "The key is two steps away",
     "three": "The key is three steps away",

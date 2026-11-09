@@ -11,7 +11,7 @@ print(dask.facing)
 ---
 ## Comparar
 
-Podemos comparar dos cosas para ver si son iguales usando dos signos de igual `==`. La respuesta solo puede ser sí o no, que en programación se llaman `True` y `False`. A esta comprobación la llamamos una expresión. Recuerda que un solo `=` le da un nombre a un valor, ¡y `==` sirve para comparar!
+Podemos comparar dos cosas para ver si son iguales usando dos signos de igual `==`. La respuesta solo puede ser sí o no, que en programación se llaman `True` y `False`. A esta comprobación la llamamos una expresión. Recuerda que un solo `=` guarda un valor en una variable, ¡y `==` sirve para comparar!
 
 Por ejemplo, vamos a ver qué pasa si comparamos números.
 

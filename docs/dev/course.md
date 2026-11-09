@@ -77,7 +77,9 @@ design:
   given by the owner on 2026-11-07.
 - **The words speak as a friend does (D141).** The thing first, then the word
   for it, then an example with numbers. A program looks at an attribute and sees
-  where it stands; it never asks. The game's doing is shown, not told. An outro
+  where it stands; it never asks. A metaphor stands only where its idea is first
+  explained, with its programming word beside it; after that the programming word,
+  recalled once in parentheses at most. The game's doing is shown, not told. An outro
   tells what the three see next. Every page that shows code lets the child run it
   (D142). Rule given by the owner on 2026-11-07.
 
@@ -168,7 +170,7 @@ that stays locked.
 | `level:the-hidden-key` | Practice 4 | The centre door's key lies under the front bookcase, out of sight: found, revealed, picked up from the aisle beside it, the door opened; the starting code guides each step in comments. Bonus: found with `find_nearest`. | |
 | `lesson:the-distance` | Lesson 6 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
 | `level:the-moving-key` | Fix 1 | Eldra's room key lies two to five cells away, in four ways; Wenna's program from yesterday walks four: repaired with `distance_to` kept under a name, it ends with the key in hand. Bonus: no number written. | |
-| `lesson:counting-with-names` | Lesson 7 | A number made from a name: `5 - steps`, `steps + 2`, kept under a name or written in the brackets; `print` shows it (D133). | |
+| `lesson:counting-with-names` | Lesson 7 | A number made from a variable: `5 - steps`, `steps + 2`, kept in a variable or written in the brackets; `print` shows it (D133). | |
 | `level:eldras-door` | Improve 1 | The level played again from the start, the repaired program given whole: the key, then the rest of the five cells to the door, `rest = 5 - steps`, open it, and stand before it. The key lies two to five cells away. Bonus: in fewer than 8 ticks, which only the subtraction earns. | |
 | `lesson:fendra` | Lesson 8 | A spell that reaches: `wizard.cast("fendra", book)` draws the thing it is told, in a straight line three tiles away at most, to the wizard's tile. | (the spell `fendra`) |
 | `level:eldras-room` | Practice 5 | The chapter together: Eldra's other lost book on the bookcase in her little room, among many standing like it, too high for hands: found, revealed, drawn down with *fendra* from the room's doorway, which the spell's line does not pass (D129), picked up, given to her in the aisle; the starting code guides each step in comments. Bonus: revealed with `reveal`. | |

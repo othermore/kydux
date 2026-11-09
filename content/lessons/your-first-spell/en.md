@@ -2,7 +2,7 @@
 
 Spells are cast with a wand, and when they are cast, they do something! A spell is a word of magic, a string, and if you say it without a wand it is only a normal word.
 
-Casting is an action the wand gives your wizard, `wizard.cast("zelim")`. Without the wand, your wizard cannot cast spells!
+Casting is a method the wand gives your wizard, `wizard.cast("zelim")`. Without the wand, your wizard cannot cast spells!
 
 ---
 ## What a spell does

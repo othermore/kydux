@@ -11,5 +11,5 @@
   ],
   "intro": "Escribí un programa para llegar a esa marca, ¡pero creo que algo está mal! Tu {mago|maga} choca contra el montículo de hierba. ¿Puedes encontrar el movimiento equivocado y arreglarlo?",
   "outro": "¡Lo has arreglado! Leer los comentarios ayuda mucho a entender un programa.",
-  "learned": "Ahora sabes qué es un comentario, y que una nota en un programa puede decirte qué hacer."
+  "learned": "Ahora sabes qué es un comentario, y que un comentario en un programa puede decirte qué hacer."
 }

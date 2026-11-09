@@ -12,5 +12,5 @@
   ],
   "intro": "Crucemos el prado hasta ese pequeño corral a la derecha. ¡Podemos llegar en una sola instrucción si usamos un argumento!",
   "outro": "¡Qué rápido! Los argumentos nos ahorran tener que escribir la misma instrucción una y otra vez.",
-  "learned": "Ahora sabes qué es un argumento, y que las acciones de movimiento tienen uno que dice cuántos pasos dar."
+  "learned": "Ahora sabes qué es un argumento, y que los métodos de movimiento tienen uno que dice cuántos pasos dar."
 }

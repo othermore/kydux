@@ -7,7 +7,7 @@ Un objeto puede hacer acciones, que los programadores llaman métodos. Cada obje
 ---
 ## Cómo escribir una instrucción
 
-Cuando escribes una instrucción, primero pones el objeto, y luego un punto para mostrar que la acción le pertenece. Después va el método y, por último, unos paréntesis, ¡que le dicen al ordenador que lo haga ahora mismo!
+Cuando escribes una instrucción, primero pones el objeto, y luego un punto. Después va el método, que le pertenece, y por último unos paréntesis, ¡que le dicen al ordenador que lo haga ahora mismo!
 
 Hay cuatro métodos para moverse, uno para cada dirección, y cada uno da un solo paso. Escribimos una instrucción en cada línea.
 

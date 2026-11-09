@@ -7,7 +7,7 @@ Programmers call this kind of note a comment. A comment is for a person reading 
 ---
 ## How to write a comment
 
-To write a comment, you start the line with the `#` sign. Anything you write after that sign on the same line is part of the note.
+To write a comment, you start the line with the `#` sign. Anything you write after that sign on the same line is part of the comment.
 
 When the computer runs your program and sees a comment, it simply skips it!
 

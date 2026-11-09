@@ -6,15 +6,15 @@
     "Quédate delante de ella.",
     "Ve por el camino más corto: menos de 8 pasos en total."
   ],
-  "starting_code": "key = wizard.find_nearest(\"key\")\nsteps = key.distance_to(wizard)\nwizard.move_left(steps)\nwizard.pick_up()\n\n# Resta de los cinco pasos hasta la puerta los que ya has caminado, y guarda el resto bajo un nombre.\n\n# Camina a la izquierda el resto, hacia la puerta, con `move_left`.\n\n# Ábrela con `open`.\n",
+  "starting_code": "key = wizard.find_nearest(\"key\")\nsteps = key.distance_to(wizard)\nwizard.move_left(steps)\nwizard.pick_up()\n\n# Resta de los cinco pasos hasta la puerta los que ya has caminado, y guarda el resto en una variable.\n\n# Camina a la izquierda el resto, hacia la puerta, con `move_left`.\n\n# Ábrela con `open`.\n",
   "hints": [
     "La puerta está a cinco pasos del inicio: el resto son cinco menos los pasos que ya has caminado, `5 - steps`.",
     "Una puerta solo escucha a quien está justo a su lado: camina hacia ella antes de abrirla.",
-    "Guarda `5 - steps` bajo un nombre, camina a la izquierda esos pasos y luego abre la puerta con `open`."
+    "Guarda `5 - steps` en una variable, camina a la izquierda esos pasos y luego abre la puerta con `open`."
   ],
   "intro": "Pero espera: ¿y si, además de coger la llave, quieres abrir la puerta? ¡Vamos a practicarlo! Intentémoslo otra vez desde el principio, pero esta vez, cuando tengas la llave, ve hasta la puerta y ábrela. La puerta está a cinco pasos de donde empezaste, y ya has caminado algunos de ellos hasta la llave; camina solo el resto. El programa de antes ya está escrito para ti.",
   "outro": "¡La puerta está abierta y tienes la llave en la mano, por el camino más corto! La pequeña habitación de Eldra te espera.",
-  "learned": "Ahora sabes que se puede crear un número a partir de un nombre, como `5 - steps`, y guardarlo bajo su propio nombre o escribirlo directamente en un movimiento.",
+  "learned": "Ahora sabes que se puede crear un número a partir de una variable, como `5 - steps`, y guardarlo en su propia variable o escribirlo directamente en un movimiento.",
   "ways": {
     "two": "La llave está a dos pasos",
     "three": "La llave está a tres pasos",

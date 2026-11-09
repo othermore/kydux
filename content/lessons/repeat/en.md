@@ -9,7 +9,7 @@ Programmers call this a loop. We write `for step in range(3):` and, moved in und
 
 Look at the three doors down the corridor, one after another. They are exactly the same.
 
-To get past them, you would have to write exactly the same lines to open a door and walk through it, three times in a row. A loop does that for us! The word `step` is just a name the loop counts with, and the lines inside do not even have to use it.
+To get past them, you would have to write exactly the same lines to open a door and walk through it, three times in a row. A loop does that for us! The word `step` is just a variable the loop counts with, and the lines inside do not even have to use it.
 
 ---
 ## Try it

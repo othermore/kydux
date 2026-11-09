@@ -5,14 +5,14 @@ A veces un programa necesita un número que no puede conocer cuando se escribe.
 Piensa en una llave que nunca está dos veces en el mismo sitio. ¡Estará a un número diferente de pasos cada vez que juegues!
 
 ---
-## Preguntar la distancia
+## Comprobar la distancia
 
-Una cosa puede decir cuántos pasos hay entre ella y tu {mago|maga}, a lo largo de las filas y las columnas. Solo tienes que pedir `key.distance_to(wizard)`.
+Una cosa puede decir cuántos pasos hay entre ella y tu {mago|maga}, a lo largo de las filas y las columnas. Solo tienes que usar `key.distance_to(wizard)`.
 
 ---
 ## Usar una variable
 
-Si guardas ese número bajo un nombre, como `steps = key.distance_to(wizard)`, puedes usarlo como el argumento de un movimiento: `wizard.move_left(steps)`. ¡Incluso puedes usarlo de nuevo para volver por el mismo camino!
+Si guardas ese número en una variable, como `steps = key.distance_to(wizard)`, puedes usarlo como el argumento de un movimiento: `wizard.move_left(steps)`. ¡Incluso puedes usarlo de nuevo para volver por el mismo camino!
 
 Para esto sirve exactamente una variable: para guardar un valor que no conoces cuando escribes el programa, o que necesitas usar más de una vez.
 

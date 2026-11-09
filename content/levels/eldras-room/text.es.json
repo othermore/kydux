@@ -4,7 +4,7 @@
     "Dale a Eldra su libro.",
     "Haz que el libro brille con `reveal`."
   ],
-  "starting_code": "# Encuentra el libro con `find_nearest` y guárdalo bajo un nombre.\n\n# Haz que brille con `reveal`.\n\n# Da un paso hacia arriba, hasta el umbral de la puerta.\n\n# Lanza fendra con `cast` y el nombre del libro.\n\n# Recógelo con `pick_up`.\n\n# Da un paso hacia abajo para volver junto a Eldra.\n\n# Dáselo con `give`.\n",
+  "starting_code": "# Encuentra el libro con `find_nearest` y guárdalo en una variable.\n\n# Haz que brille con `reveal`.\n\n# Da un paso hacia arriba, hasta el umbral de la puerta.\n\n# Lanza fendra con `cast` y la variable del libro.\n\n# Recógelo con `pick_up`.\n\n# Da un paso hacia abajo para volver junto a Eldra.\n\n# Dáselo con `give`.\n",
   "hints": [
     "Encuentra el libro y haz que brille con `reveal`.",
     "Desde el pasillo, el hechizo no llega al interior de la habitación. ¡Primero da un paso hacia arriba, hasta el umbral!",

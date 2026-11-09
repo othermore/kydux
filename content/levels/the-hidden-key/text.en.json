@@ -6,7 +6,7 @@
     "Go through it.",
     "Find the key with `find_nearest`."
   ],
-  "starting_code": "# Find the key with `find_nearest` and the word \"key\", and keep it under a name.\n\n# Make it glow with `reveal`.\n\n# Go down into the aisle and left along it to beside the key.\n\n# Pick it up with `pick_up`.\n\n# Go back right to the aisle's end, up into the hall, left along it and up to the door.\n\n# Open it with its `open` method.\n\n# Go up through it.\n",
+  "starting_code": "# Find the key with `find_nearest` and the word \"key\", and keep it in a variable.\n\n# Make it glow with `reveal`.\n\n# Go down into the aisle and left along it to beside the key.\n\n# Pick it up with `pick_up`.\n\n# Go back right to the aisle's end, up into the hall, left along it and up to the door.\n\n# Open it with its `open` method.\n\n# Go up through it.\n",
   "hints": [
     "Find the key with `find_nearest` and `reveal` it.",
     "Walk to where it glows: down into the aisle between the two bookcases and left along it; `pick_up` from there, beside it.",

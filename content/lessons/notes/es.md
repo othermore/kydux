@@ -7,7 +7,7 @@ Los programadores llaman a este tipo de nota un comentario. Un comentario es par
 ---
 ## Cómo escribir un comentario
 
-Para escribir un comentario, empiezas la línea con el símbolo `#`. Cualquier cosa que escribas después de ese símbolo en la misma línea es parte de la nota.
+Para escribir un comentario, empiezas la línea con el símbolo `#`. Cualquier cosa que escribas después de ese símbolo en la misma línea es parte del comentario.
 
 Cuando el ordenador ejecuta tu programa y ve un comentario, ¡simplemente se lo salta!
 

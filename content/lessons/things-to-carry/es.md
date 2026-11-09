@@ -10,13 +10,3 @@ Las cosas son objetos, igual que los personajes, tu {mago|maga} entre ellos. Cad
 Cuando hay varias cosas cerca de ti, debes decirle al ordenador exactamente cuál quieres. Esto se hace dando el nombre de la cosa como argumento, como por ejemplo `wizard.pick_up(key)`.
 
 Tengo una varita de repuesto que te puedo prestar, pero para que practiques un poco, la he dejado en esa piedra. ¡Es una piedra plana pasando la verja, al lado del camino!
-
----
-## Pruébalo
-
-Vamos a acercarnos y recoger la varita. ¡Primero nos movemos y luego usamos el método para recogerla!
-
-```python try
-wizard.move_right(3)
-wizard.pick_up()
-```

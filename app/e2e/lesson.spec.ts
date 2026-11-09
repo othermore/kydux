@@ -89,6 +89,23 @@ for (const [locale, title, pageTwo, tryIt, goOn] of [
   });
 }
 
+for (const [lesson, level] of [
+  ['words', 'the-password'],
+  ['things-to-carry', 'the-wand'],
+  ['your-first-spell', 'the-sealed-door'],
+] as const) {
+  test(`${lesson} has two pages and no block, and goes on to ${level} (D174)`, async ({ page }) => {
+    await page.goto(`/#lesson/${lesson}`);
+    await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 2');
+    await page.locator('#lesson-next').click();
+    await expect(page.locator('#lesson-page')).toHaveText('Page 2 of 2');
+    await expect(page.locator('.lesson-run')).toHaveCount(0);
+    await expect(page.locator('#lesson-try')).toHaveText('Go on');
+    await page.locator('#lesson-try').click();
+    await expect(page).toHaveURL(new RegExp(`#level/${level}$`));
+  });
+}
+
 test('a lesson read shows as done on the map, and opens its level', async ({ page }) => {
   await page.goto('/#lesson/what-a-program-is');
   for (let turn = 0; turn < 2; turn += 1) await page.locator('#lesson-next').click();

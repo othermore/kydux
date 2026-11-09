@@ -162,14 +162,25 @@ def test_a_lesson_s_try_says_how_its_block_runs_and_only_a_block_has_one(path):
         assert all(blocks.values()), f"{path.name} says how its block runs and has none"
 
 
-def test_the_right_place_has_two_pages_and_nothing_to_try():
-    """D173: sleeping where no bed is teaches nothing, so *The right place* keeps its two
-    pages of words and no block, and its last button leads to *Your bed*."""
-    path = CONTENT / "lessons" / "the-right-place"
+#: The lessons with nothing worth trying, and so no block, with their pages (D173, D174).
+NOTHING_TO_TRY = {
+    "the-right-place": 2,
+    "words": 2,
+    "things-to-carry": 2,
+    "your-first-spell": 2,
+}
+
+
+@pytest.mark.parametrize(("lesson", "count"), sorted(NOTHING_TO_TRY.items()))
+def test_a_lesson_with_nothing_to_try_has_no_block_and_goes_on_to_its_level(lesson, count):
+    """D173, D174: a lesson whose block would only walk, cast or pick up keeps its pages
+    of words, no block, and its last button leads to the level after it."""
+    path = CONTENT / "lessons" / lesson
     for lang in LANGUAGES:
         text = (path / f"{lang}.md").read_text(encoding="utf-8")
-        assert len(pages(text)) == 2 and not TRY.findall(text), lang
-    assert level_after("lesson:the-right-place") == CONTENT / "levels" / "your-bed"
+        assert len(pages(text)) == count and not TRY.findall(text), lang
+    items = course()
+    assert items[items.index(f"lesson:{lesson}") + 1].startswith("level:")
 
 
 def level_api(item_id: str) -> list[str]:

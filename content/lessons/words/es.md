@@ -10,12 +10,3 @@ Cuando escribimos palabras en un programa, las ponemos entre comillas. A las pal
 Si escribiéramos una palabra sin comillas, el ordenador la leería como un nombre en el programa, como `wizard` o `move_right`. Las comillas le dicen al ordenador que solo son palabras.
 
 En Arvelia, lo que dices se puede escuchar. A veces, decir la cadena correcta hace algo especial, ¡como abrir una puerta que conoce su contraseña!
-
----
-## Pruébalo
-
-Vamos a hacer que tu {mago|maga} hable. ¡Recuerda poner tus palabras dentro de las comillas para que se conviertan en una cadena!
-
-```python try
-wizard.say("¡Hola!")
-```

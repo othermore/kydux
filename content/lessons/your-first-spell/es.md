@@ -10,14 +10,3 @@ Lanzar un hechizo es un método que la varita le da a tu {mago|maga}, `wizard.ca
 Lo que hace un hechizo depende de dónde estés y de lo que tengas cerca, y podría no hacer nada en absoluto.
 
 Nuestro primer hechizo es *zelim*. Este hechizo rompe el sello de una puerta que esté justo a tu lado. Puedes saber cuándo una puerta está sellada porque muestra una runa brillante.
-
----
-## Pruébalo
-
-¡Vamos a lanzar tu primer hechizo! Nos moveremos cerca de una puerta sellada y lanzaremos *zelim* para romper su sello.
-
-```python try
-wizard.move_left(2)
-wizard.move_up(3)
-wizard.cast("zelim")
-```

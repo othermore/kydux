@@ -10,14 +10,3 @@ Casting is a method the wand gives your wizard, `wizard.cast("zelim")`. Without 
 What a spell does depends on where you are and what you have near you, and it may do nothing at all.
 
 Our first spell is *zelim*. This spell breaks the seal of a door right beside you. You can tell when a door is sealed because it shows a glowing rune.
-
----
-## Try it
-
-Let us cast your very first spell! We will move near a sealed door and cast *zelim* to break its seal.
-
-```python try
-wizard.move_left(2)
-wizard.move_up(3)
-wizard.cast("zelim")
-```

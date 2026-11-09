@@ -10,12 +10,3 @@ When we write words in a program, we put them between quotes. Words in quotes ar
 If we wrote a word without quotes, the computer would read it as a name in the program, like `wizard` or `move_right`. Quotes tell the computer that these are just words.
 
 In Arvelia, what you say can be heard. Sometimes, saying the right string does something special, like opening a door that knows its password!
-
----
-## Try it
-
-Let us make your wizard speak. Remember to put your words inside the quotes so they become a string!
-
-```python try
-wizard.say("Hello!")
-```

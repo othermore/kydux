@@ -119,11 +119,11 @@ password opens it and stays open after; the wand is picked up once, in
 | `lesson:how-much` | Lesson 4 | *How far we move*: the number in the brackets, an argument, says how many steps to take. | `concept:arguments` |
 | `level:the-long-corridor` | Practice 3 | Across the meadow to the fence pen: one line with a number. Bonus: fewer than 2 lines. | |
 | `level:the-stairs` | Improve 1 | *Back to the gate*: the friend's program walks back to the gate but bumps into it, to make clean (`no_bumps`). Bonus: fewer than 3 lines. | |
-| `lesson:words` | Lesson 5 | Words in quotes, a string; `say` takes what to say as its argument, as a move takes how much. | `wizard.say`, `concept:strings` |
+| `lesson:words` | Lesson 5 | Words in quotes, a string; `say` takes what to say as its argument, as a move takes how much. Two pages and no *Try it* (D174). | `wizard.say`, `concept:strings` |
 | `level:the-password` | Practice 4 | Back at the gate: its word, said beside it, and through, up the path; the code's comment gives the word. | |
-| `lesson:things-to-carry` | Lesson 6 | Things are objects with names; the wizard picks up what is on its tile or beside it, and says which when there are several (D58). | `wizard.pick_up` |
+| `lesson:things-to-carry` | Lesson 6 | Things are objects with names; the wizard picks up what is on its tile or beside it, and says which when there are several (D58). Two pages and no *Try it* (D174). | `wizard.pick_up` |
 | `level:the-wand` | Practice 5 | Past the gate: the friend's spare wand on the flat stone off the path, lent, picked up from beside the stone. | |
-| `lesson:your-first-spell` | Lesson 7 | A spell's effect depends on where the wizard stands and what is near, and may be nothing; `cast` is the wand's action; `zelim`. | `wizard.cast` |
+| `lesson:your-first-spell` | Lesson 7 | A spell's effect depends on where the wizard stands and what is near, and may be nothing; `cast` is the wand's action; `zelim`. Two pages and no *Try it* (D174). | `wizard.cast` |
 | `level:the-sealed-door` | Practice 6 | The wand carried, the sealed gate's rune broken from beside it. | |
 | `level:the-way-in` | Practice 7 | The chapter together: the castle's door, sealed and keyed by the school's word, opened with both, and the mark on its threshold, whole once the door is open (D172). The hall's cell beyond is forbidden: a longer walk stops on the threshold and the wizard says why, *No entres todavía: quédate en el umbral, pasada la puerta* (D171). Bonus: fewer than 5 lines. | |
 | `story:up-to-the-castle` | Story 3 | At the castle's open door; the friend sums up what was learned; the wand is only lent, and a school wand waits at the wand bank; Ilda waits inside. | |

@@ -100,8 +100,9 @@ export interface PlanPictures {
   /** The cells a figure and a mark are drawn lower or sideways on (D149). */
   lowered?: { cells: [Tile, Tile]; by: number }[];
   nudged?: { cells: [Tile, Tile]; by: number }[];
-  /** Each other thing with a picture, its corner in the ground's pixels on its tile. */
-  things: { id: string; url: string; left: number; top: number }[];
+  /** Each other thing with a picture, its corner in the ground's pixels on its tile; a
+   * key drawn smaller (`scale`), the point in cells its middle lies on (D164). */
+  things: { id: string; url: string; left: number; top: number; scale?: number; centre?: [number, number] }[];
   figures: {
     id: string;
     url: string;

@@ -1,7 +1,21 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { PlanView } from '../engine/layout';
-import { cellAt, floorEdges, inked, labelBoxes, paintedBox, planLabel, planShapes, tunnelLabelCell } from './plan';
+import {
+  cellAt,
+  figureBox,
+  floorEdges,
+  inked,
+  labelBoxes,
+  markBox,
+  type PlanBox,
+  paintedBox,
+  planLabel,
+  planLabels,
+  planPlaces,
+  planShapes,
+  tunnelLabelCell,
+} from './plan';
 
 /** A corridor, a closed door across it, a dark room and an enchanted end. */
 const VIEW: PlanView = {
@@ -29,13 +43,13 @@ const VIEW: PlanView = {
 };
 
 describe('the plan of a scene (D134, D143)', () => {
-  it('draws walls, floor, furniture, the enchanted region and the unlit room as they are', () => {
+  it('draws walls, floor, furniture, the enchanted region and the dark room as they are (D163)', () => {
     const { cells, columns, height } = planShapes(VIEW);
     expect([columns, height]).toEqual([9, 3]);
     const at = (x: number, y: number) => cells.find((cell) => cell.x === x && cell.y === y)?.kind;
     expect(at(0, 0)).toBe('wall');
     expect(at(1, 1)).toBe('floor');
-    expect(at(3, 1)).toBe('unlit');
+    expect(at(3, 1)).toBe('floor');
     expect(at(4, 1)).toBe('furniture');
     expect(at(6, 1)).toBe('enchanted');
     expect(cells).toHaveLength(27);
@@ -72,12 +86,16 @@ describe('the plan of a scene (D134, D143)', () => {
     expect(planShapes(VIEW).marks).toEqual([{ x: 7, y: 1 }]);
   });
 
-  it('leaves undrawn all that is still dark, walls and furniture too (D52)', () => {
-    expect(planShapes(VIEW).unlit).toEqual([
-      { x: 3, y: 1 },
-      { x: 4, y: 1 },
-      { x: 5, y: 1 },
-    ]);
+  it('draws a dark room as the castle\'s plan: its cells and a figure in it, not what lies unlit (D163)', () => {
+    const inTheDark: PlanView = {
+      ...VIEW,
+      figures: [...VIEW.figures, { id: 'mate', kind: 'friend', tile: [5, 1], facing: 'down' }],
+    };
+    const shapes = planShapes(inTheDark);
+    const kinds = shapes.cells.filter(({ y, x }) => y === 1 && x >= 3 && x <= 5).map(({ kind }) => kind);
+    expect(kinds).toEqual(['floor', 'furniture', 'floor']);
+    expect(shapes.figures.map((figure) => figure.id)).toContain('mate');
+    expect(shapes.things.map((thing) => thing.id)).not.toContain('far_key');
   });
 
   it('draws a picture in ink: its colour out, its lines darkened, its tones parchment', () => {
@@ -115,10 +133,12 @@ describe('the plan of a scene (D134, D143)', () => {
   it('writes each name clear of the others while it can', () => {
     const size = { width: 400, height: 300 };
     const anchor = { x: 100, y: 100, width: 80, height: 14, reach: 10 };
-    const [first, second, third] = labelBoxes([anchor, anchor, anchor], size);
+    const [first, second, third, fourth] = labelBoxes([anchor, anchor, anchor, anchor], size);
+    // Right, left, below, above (D166).
     expect(first).toEqual({ x: 110, y: 93 });
     expect(second).toEqual({ x: 10, y: 93 });
-    expect(third).toEqual({ x: 60, y: 76 });
+    expect(third).toEqual({ x: 60, y: 110 });
+    expect(fourth).toEqual({ x: 60, y: 76 });
   });
 
   it('keeps a name inside the plan at its edge', () => {
@@ -194,5 +214,65 @@ describe('the plan draws a cut-out where it is painted (D159)', () => {
       expect(top, id).toBeCloseTo((door.top / art.cell) * cell, 6);
       expect([wide, tall], id).toEqual([cell, 2 * cell]);
     }
+  });
+});
+
+describe('the plan\'s names cover no figure, no mark, no other name, and a mark\'s no cut-out (D166)', () => {
+  const read = (path: string) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
+  const cell = 40;
+  const gutter = 28.8;
+
+  it('on P3\'s plan, Nuri, Teku, the wizard and Dask clear of one another, the mark\'s clear of the statue', () => {
+    const level = read('../../../content/levels/the-tunnel-exit/level.json');
+    const art = read('../../../content/art/scenes/the-crossing/art.json');
+    const cut = read('../../../art/scenes/the-crossing/cut.json');
+    const figures = [
+      { id: 'wizard', kind: 'wizard', x: level.start[0], y: level.start[1], facing: 'down' },
+      ...level.actors.map((actor: { id: string; kind: string; at: [number, number] }) => ({
+        id: actor.id,
+        kind: actor.kind,
+        x: actor.at[0],
+        y: actor.at[1],
+        facing: 'down',
+      })),
+    ];
+    const marks = [{ x: level.end[0], y: level.end[1] }];
+    // The scene's cut-outs, each at its painted box on the plan (D159).
+    const cutOuts: PlanBox[] = Object.values(cut.things as Record<string, { box: number[]; static?: boolean }>)
+      .filter((thing) => thing.static)
+      .map(({ box: [x0 = 0, y0 = 0, x1 = 0, y1 = 0] }) => ({
+        x: gutter + x0 * cell,
+        y: gutter + y0 * cell,
+        width: (x1 - x0) * cell,
+        height: (y1 - y0) * cell,
+      }));
+    const overlaps = (one: PlanBox, other: PlanBox) =>
+      one.x < other.x + other.width &&
+      other.x < one.x + one.width &&
+      one.y < other.y + other.height &&
+      other.y < one.y + one.height;
+    const names: Record<string, string> = { wizard: 'Marta', friend: 'Nuri', mate: 'Teku', dask: 'Dask' };
+    const labels = planLabels(
+      { figures, things: [], marks },
+      cell,
+      gutter,
+      { nudged: art.nudged, lowered: art.lowered },
+      (id) => names[id] ?? id,
+      (text) => text.length * 7,
+      { width: 20 * cell + gutter * 2, height: 15 * cell + gutter * 2 },
+      (box) => cutOuts.some((one) => overlaps(box, one)),
+    );
+    const { across, down, feet } = planPlaces(cell, gutter, { nudged: art.nudged, lowered: art.lowered });
+    const bodies = figures.map((figure) => figureBox(across(figure.x, figure.y), feet(figure.x, figure.y), cell));
+    const rings = marks.map((mark) => markBox(across(mark.x, mark.y), down(mark.x, mark.y), cell));
+    expect(labels).toHaveLength(figures.length + marks.length);
+    labels.forEach(({ box, said }, index) => {
+      for (const other of labels.slice(index + 1)) expect(overlaps(box, other.box), `${said} / ${other.said}`).toBe(false);
+      for (const body of bodies) expect(overlaps(box, body), said).toBe(false);
+      for (const ring of rings) expect(overlaps(box, ring), said).toBe(false);
+    });
+    const mark = labels.at(-1);
+    expect(mark?.said).toBe('(11, 6)');
+    for (const one of cutOuts) expect(overlaps(mark?.box ?? one, one)).toBe(false);
   });
 });

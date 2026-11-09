@@ -82,3 +82,32 @@ export function coveredShare(figure: Placed, front: Placed[], solidOf: (key: str
   }
   return counted === 0 ? 0 : covered / counted;
 }
+
+/** How many points of a mark's ring are looked at. */
+const RING_POINTS = 48;
+
+/** The covered share of a goal's mark lying on the ground (D160), from 0 to 1: of the
+ * points round its ring, `radius` from its middle, those on which a solid pixel of one
+ * of the images or figures drawn over it falls. */
+export function ringCoveredShare(
+  [cx, cy]: [number, number],
+  radius: number,
+  over: Placed[],
+  solidOf: (key: string) => Solid | null,
+): number {
+  const near = over.flatMap((image) => {
+    const bounds = boundsOf(image);
+    const meets =
+      bounds.right > cx - radius && bounds.left < cx + radius && bounds.bottom > cy - radius && bounds.top < cy + radius;
+    const solid = meets ? solidOf(image.texture.key) : null;
+    return solid ? [{ image, solid }] : [];
+  });
+  if (near.length === 0) return 0;
+  let covered = 0;
+  for (let point = 0; point < RING_POINTS; point += 1) {
+    const angle = (point / RING_POINTS) * Math.PI * 2;
+    const [x, y] = [cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius];
+    if (near.some(({ image, solid }) => solidAt(image, solid, x, y))) covered += 1;
+  }
+  return covered / RING_POINTS;
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { coveredShare, inFront, type Placed, type Solid } from './cover';
+import { coveredShare, inFront, type Placed, ringCoveredShare, type Solid } from './cover';
 
 /** A texture `width`×`height`, solid where `solid` says. */
 function texture(width: number, height: number, solid: (x: number, y: number) => boolean): Solid {
@@ -68,3 +68,28 @@ describe('inFront (D107)', () => {
   });
 });
 
+
+describe('ringCoveredShare (D160)', () => {
+  // A mark of radius 10 lying at 100,100: its ring from 90 to 110 each way.
+  it('is none where nothing is drawn over the ring', () => {
+    expect(ringCoveredShare([100, 100], 10, [], solidOf)).toBe(0);
+    expect(ringCoveredShare([100, 100], 10, [placed('wall', 200, 200, 100, 100)], solidOf)).toBe(0);
+  });
+
+  it('is the share of the ring an image covers: an arch over its top half', () => {
+    // A wall from 0 to 100 down: the ring's top half, with its two side points.
+    const share = ringCoveredShare([100, 100], 10, [placed('wall', 50, 0, 100, 100)], solidOf);
+    expect(share).toBeGreaterThan(0.45);
+    expect(share).toBeLessThan(0.6);
+  });
+
+  it('counts a figure standing on it by its own pixels', () => {
+    // A figure drawn 10 wide over the ring's middle covers its top and its bottom only:
+    // a third of it.
+    const share = ringCoveredShare([100, 100], 10, [placed('figure', 95, 90, 20, 40, 0.5)], solidOf);
+    expect(share).toBeGreaterThan(0.3);
+    expect(share).toBeLessThan(0.4);
+    // A crown solid only in its top half covers nothing below it.
+    expect(ringCoveredShare([100, 100], 10, [placed('crown', 50, 5, 100, 100)], solidOf)).toBe(0);
+  });
+});

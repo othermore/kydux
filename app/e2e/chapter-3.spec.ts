@@ -319,9 +319,23 @@ test.describe('what the page draws of the chapter', () => {
     await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
   });
 
-  test('the key lies where a figure on its cell stands, not on the torch (D105, D109)', async ({ page }) => {
+  test("the goal's mark lies on the floor, its ring seen where an arch or the wizard covers it (D160)", async ({ page }) => {
+    // Under the top arch's band from the start.
+    await open(page, 'the-three-doors');
+    await expect(scene(page)).toHaveAttribute('data-marks-covered', '10,0', { timeout: 10_000 });
+    await page.screenshot({ path: `${SHOTS}mark-under-the-arch.png` });
+    // Free at the start, and under the wizard who stands on it at the end.
+    await open(page, 'the-tunnel-exit');
+    await expect(scene(page)).toHaveAttribute('data-marks-covered', '', { timeout: 10_000 });
+    await run(page, solution('the-tunnel-exit'));
+    await expect(scene(page)).toHaveAttribute('data-wizard', '11,6');
+    await expect(scene(page)).toHaveAttribute('data-marks-covered', '11,6', { timeout: 10_000 });
+  });
+
+  test('the key lies small on the middle of its cell, beside the torch (D109, D164)', async ({ page }) => {
     await open(page, 'the-night-walk');
-    await expect(scene(page)).toHaveAttribute('data-drawn', /key:10\.[45]\d*,3\.\d+/);
+    await expect(scene(page)).toHaveAttribute('data-drawn', /key:10\.50,3\.50/);
+    await page.screenshot({ path: `${SHOTS}key-small.png` });
   });
 
   test("a spell's word shows in italics, with no asterisk (D140)", async ({ page }) => {

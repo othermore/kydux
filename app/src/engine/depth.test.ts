@@ -4,7 +4,7 @@ import {
   FOOT_IN_CELL,
   figureDepth,
   loweredBy,
-  markDepth,
+  MARK_DEPTH,
   nudgedBy,
   overDepth,
   rowDepth,
@@ -63,8 +63,19 @@ describe('the depths of a painted scene (D76, D95)', () => {
     expect(nudgedBy(undefined, [16, 6])).toBe(0);
   });
 
-  it("draws a mark over the arch of its own row, and under what stands below it", () => {
-    expect(markDepth(1)).toBeGreaterThan(rowDepth(1, true));
-    expect(markDepth(1)).toBeLessThan(rowDepth(2));
+  it('lays the goal\'s mark on the ground, under every row, thing and figure (D160)', () => {
+    // Under the arch of its own row, the figure standing on it and the row above's things.
+    expect(MARK_DEPTH).toBeLessThan(rowDepth(0));
+    expect(MARK_DEPTH).toBeLessThan(rowDepth(1, true));
+    expect(MARK_DEPTH).toBeLessThan(figureDepth(FOOT_IN_CELL - 1));
+    expect(MARK_DEPTH).toBeLessThan(thingDepth(0, { lying: true }));
+    // Over the floor's own pictures: a slab's hole is drawn at 2.8.
+    expect(MARK_DEPTH).toBeGreaterThan(2.8);
+  });
+
+  it('lays a key under its row\'s things, a torch on its row over it, a figure above under it (D164)', () => {
+    expect(thingDepth(7, { lying: true })).toBeLessThan(rowDepth(7));
+    expect(thingDepth(7, { lying: true })).toBeGreaterThan(figureDepth(6 + FOOT_IN_CELL));
+    expect(thingDepth(7, { lying: true })).toBeLessThan(figureDepth(7 + FOOT_IN_CELL));
   });
 });

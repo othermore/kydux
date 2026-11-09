@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { drawnShift, shiftBy } from './shift';
+import { centredCorner, drawnShift, KEY_SCALE, shiftBy } from './shift';
 
 describe('shiftBy', () => {
   it('is the cells between the painted cell and the level tile (D85)', () => {
@@ -33,3 +33,20 @@ describe('drawnShift (D109)', () => {
   });
 });
 
+
+describe('a key drawn small (D164)', () => {
+  it('is drawn at 0.65 of its painted size, narrower than a figure', () => {
+    // The chapter 3 key is painted 82 pixels wide in cells of 96; a figure's body is 59.
+    expect(KEY_SCALE).toBe(0.65);
+    expect(82 * KEY_SCALE).toBeLessThan(59);
+  });
+
+  it('is centred on its cell, with the cell\'s nudge, wherever it is painted', () => {
+    // A key whose drawn middle lies 0.5, 0.45 cells from its picture's corner, on 10,3.
+    const [x, y] = centredCorner([10, 3], [0.5, 0.45], KEY_SCALE);
+    expect(x + 0.5 * KEY_SCALE).toBeCloseTo(10.5);
+    expect(y + 0.45 * KEY_SCALE).toBeCloseTo(3.5);
+    const [nudged] = centredCorner([10, 4], [0.5, 0.45], KEY_SCALE, -0.3);
+    expect(nudged + 0.5 * KEY_SCALE).toBeCloseTo(10.2);
+  });
+});

@@ -26,3 +26,15 @@ export function drawnShift(
   if (!paintedAt || (paintedAt[0] === tile[0] && paintedAt[1] === tile[1])) return [0, 0];
   return [tile[0] + 0.5 + nudge - middle[0], tile[1] + 0.5 - middle[1]];
 }
+
+/** How much smaller than painted a key is drawn on a painted scene (D164), so that it
+ * is narrower than a figure. */
+export const KEY_SCALE = 0.65;
+
+/** Where, in cells, the corner of a picture drawn `scale` of its painted size goes, so
+ * that the middle of what is drawn of it, `middle` from its corner in cells at its
+ * painted size, lies on the tile's middle with the tile's nudge (D109, D164): a key,
+ * drawn smaller, is centred on its cell wherever it is painted. */
+export function centredCorner(tile: Tile, middle: [number, number], scale: number, nudge = 0): [number, number] {
+  return [tile[0] + 0.5 + nudge - middle[0] * scale, tile[1] + 0.5 - middle[1] * scale];
+}

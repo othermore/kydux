@@ -3,7 +3,8 @@
 // or an arch over the figure standing in its doorway, a door swung open on the
 // row of the wall it lies against (D111), a thing lying inside furniture under it, a wall seen from above over every figure, and a figure drawn lower on
 // a cell the scene lowers, its legs behind what stands below it, or sideways on a
-// cell the scene nudges, on the painted strip (D105). Kept apart from painted.ts so
+// cell the scene nudges, on the painted strip (D105); the goal's mark lies on the
+// ground, under all of them (D160). Kept apart from painted.ts so
 // that it is tested without Phaser.
 
 import type { Tile } from './sight';
@@ -31,20 +32,25 @@ export function rowDepth(row: number, under = false): number {
 /** How a painted thing is drawn among the rows, besides its row: `under`, a door
  * or a gate over the figure in its doorway while it is shut (D95); `inside`, a
  * thing lying on a cell no one walks, inside the furniture there, under that
- * row's things. */
+ * row's things; `lying`, a key on the floor, under its row's things too, so that a
+ * torch standing on its row is over it (D164). */
 export interface ThingDrawn {
   under?: boolean;
   open?: boolean;
   inside?: boolean;
+  lying?: boolean;
 }
 
 /** The depth of a painted thing standing on row `row`, just over its row's image
  * and under the figure standing on the row: a door or a gate marked `under` is over
  * the figure in its doorway while it is shut; open, what is seen through it is
- * under that figure, and its arch over them (D95); a thing `inside` furniture is
- * just under its row's image. */
-export function thingDepth(row: number, { under = false, open = false, inside = false }: ThingDrawn = {}): number {
-  if (inside) return rowDepth(row) - 0.00001;
+ * under that figure, and its arch over them (D95); a thing `inside` furniture, or a
+ * key `lying` on the floor, is just under its row's image (D164). */
+export function thingDepth(
+  row: number,
+  { under = false, open = false, inside = false, lying = false }: ThingDrawn = {},
+): number {
+  if (inside || lying) return rowDepth(row) - 0.00001;
   return rowDepth(row, under && !open) + 0.00001;
 }
 
@@ -58,11 +64,11 @@ export function coverDepth(row: number): number {
   return rowDepth(row) + 0.0004;
 }
 
-/** The depth of a reach goal's mark on row `row`: over what stands on its row and above,
- * an arch it lies under among them, so that it is seen; under what stands below it. */
-export function markDepth(row: number): number {
-  return rowDepth(row, true) + 0.0001;
-}
+/** The depth of a goal's mark (D160): on the ground, over the floor's own pictures (a
+ * slab's hole, D138), and under every row's things, every thing standing and every
+ * figure, so that whatever stands before it or walks over it covers it; the covered
+ * part is drawn as its silhouette (silhouette.ts). */
+export const MARK_DEPTH = 2.9;
 
 /** The depth of what is drawn over every figure of a scene `rows` rows tall: a wall
  * seen from above (D95). */

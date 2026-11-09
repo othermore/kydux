@@ -12,10 +12,13 @@
 // How much is covered is counted by cover.ts. A thing revealed (D85) glows
 // (D107): its own shape filled with the line's yellow, half seen and beating,
 // over whatever covers it, so that it is found among things like it too and a
-// thin key reads as a key, not as a line through it.
+// thin key reads as a key, not as a line through it. The goal's mark lies on the
+// ground under every cut-out and figure (D160), and where one of them covers it its
+// ring is drawn over them in the same yellow, masked by copies of them all, so that
+// the mark is read whole.
 
 import Phaser from 'phaser';
-import { coveredShare, HIDDEN_SHARE, inFront, type Solid } from './cover';
+import { coveredShare, HIDDEN_SHARE, inFront, ringCoveredShare, type Solid } from './cover';
 
 /** The outline's colour, and how thick it is in the sheet's pixels. */
 const COLOUR = [255, 214, 51] as const;
@@ -193,6 +196,86 @@ export class Silhouette {
   destroy(): void {
     this.scene.tweens.killTweensOf(this.line);
     this.line.destroy();
+    this.mask.destroy();
+  }
+}
+
+/** What a mark's silhouette is masked by: an image or a figure's sprite, and its copy. */
+interface Over {
+  source: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
+  copy: Phaser.GameObjects.Image;
+}
+
+/** How much of a mark's ring must be covered for it to count as covered, for the tests. */
+const MARK_COVERED = 0.02;
+
+/** The goal's mark where something hides it (D160): the mark lies on the ground, under
+ * every cut-out and every figure, and where one of them covers it its ring is drawn over
+ * them in the outline's yellow, only there, beating with the mark, so that the mark is
+ * read whole, lying on the floor behind what stands before it. */
+export class MarkSilhouette {
+  private readonly ring: Phaser.GameObjects.Container;
+  private readonly beat: Phaser.GameObjects.Container | null;
+  private readonly mask: Phaser.GameObjects.Container;
+  private readonly overs: Over[] = [];
+  /** Whether something covers the mark now. */
+  covered = false;
+
+  /** The silhouette of `mark`, a ring `radius` round its middle, drawn at `depth`
+   * where one of `over` covers it: the painted images and the figures. */
+  constructor(
+    private readonly scene: Phaser.Scene,
+    private readonly mark: Phaser.GameObjects.Container,
+    private readonly radius: number,
+    over: (Phaser.GameObjects.Image | Phaser.GameObjects.Sprite)[],
+    depth: number,
+  ) {
+    const line = scene.add.circle(0, 0, radius).setStrokeStyle(THICK + 1, Phaser.Display.Color.GetColor(...COLOUR), 1);
+    this.ring = scene.add.container(mark.x, mark.y, [line]).setDepth(depth);
+    // The mark's beat, its size and its alpha, which the ring follows.
+    const first = mark.list[0];
+    this.beat = first instanceof Phaser.GameObjects.Container ? first : null;
+    const mask = new Phaser.GameObjects.Container(scene, 0, 0);
+    this.mask = mask;
+    for (const source of over) {
+      const copy = new Phaser.GameObjects.Image(scene, source.x, source.y, source.texture.key, source.frame.name);
+      mask.add(copy);
+      this.overs.push({ source, copy });
+    }
+    this.ring.enableFilters();
+    this.ring.filters?.external.addMask(mask, false, scene.cameras.main);
+  }
+
+  /** Every frame: the mask of what is drawn over the mark now, where it is and in its
+   * frame, the ring beating with the mark, and whether anything covers it. */
+  update(): void {
+    const seen: (Phaser.GameObjects.Image | Phaser.GameObjects.Sprite)[] = [];
+    for (const { source, copy } of this.overs) {
+      if (copy.texture.key !== source.texture.key) copy.setTexture(source.texture.key, source.frame.name);
+      else if (copy.frame.name !== source.frame.name) copy.setFrame(source.frame.name);
+      const shown = source.visible && source.alpha > 0.05;
+      copy
+        .setPosition(source.x, source.y)
+        .setOrigin(source.originX, source.originY)
+        .setScale(source.scaleX, source.scaleY)
+        .setVisible(shown);
+      if (shown) seen.push(source);
+    }
+    const scale = this.beat?.scaleX ?? 1;
+    this.ring
+      .setPosition(this.mark.x, this.mark.y)
+      .setScale(scale)
+      .setAlpha(0.9 * (this.beat?.alpha ?? 1) * this.mark.alpha)
+      .setVisible(this.mark.visible);
+    const share = this.mark.visible
+      ? ringCoveredShare([this.mark.x, this.mark.y], this.radius * scale, seen, (key) => solidOf(this.scene, key))
+      : 0;
+    this.covered = share > MARK_COVERED;
+  }
+
+  /** The ring taken away, with its mask. */
+  destroy(): void {
+    this.ring.destroy();
     this.mask.destroy();
   }
 }

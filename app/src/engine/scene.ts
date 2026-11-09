@@ -20,7 +20,8 @@
 // osto holds now), data-enchanted (the figures an enchanted region hides, joined
 // by ",", D135), data-zoom (the
 // camera's zoom, D69), data-following (whether the camera follows the wizard),
-// data-marks-hidden (the doors whose doorway's mark waits for them to open, D79),
+// data-marks-covered (the marks something is drawn over now, whose ring shows over
+// it, "x,y" joined by ";", D160),
 // data-revealed (the things whose outline shows where they lie, D85),
 // data-sleeping (the bed the wizard sleeps in, D84), data-ground (`morning` while
 // a scene painted at night shows its morning ground, `painting` otherwise, D126), data-asleep (each figure
@@ -80,6 +81,7 @@ import {
   drawGlow,
   drawGrid,
   drawMark,
+  MARK_RADIUS,
   drawSleepMark,
   facingOf,
   figureName,
@@ -101,12 +103,12 @@ import {
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
-import { FOOT_IN_CELL, figureDepth, lightDepth, loweredBy, markDepth, nudgedBy, sleeperDepth } from './depth';
+import { FOOT_IN_CELL, figureDepth, lightDepth, loweredBy, MARK_DEPTH, nudgedBy, overDepth, sleeperDepth } from './depth';
 import { type LightName, type LightState, NIGHT_MS, SceneLight, WHOLE_MORNING } from './light';
 import { Speech } from './speech';
 import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
-import { Silhouette } from './silhouette';
+import { MarkSilhouette, Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
 import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
@@ -222,8 +224,9 @@ class LevelScene extends Phaser.Scene {
   private coverings: Phaser.GameObjects.Image[] = [];
   /** The things revealed (D85), each with its outline, until it is picked up. */
   private readonly revealed = new Map<string, Silhouette>();
-  /** The goal's mark in a door's doorway, by the door: shown once it is open (D79). */
-  private doorMarks = new Map<string, Phaser.GameObjects.Container>();
+  /** The goals' marks on a painted scene, by their cell, each lying on the ground with
+   * its silhouette where something covers it (D160). */
+  private marks: { tile: Tile; mark: Phaser.GameObjects.Container; silhouette: MarkSilhouette | null }[] = [];
   private carried = new Set<string>();
   /** The things a spell has brought to the wizard's hands in the run shown, held
    * there until picked up (D127), each with where it lies on its tile's floor. */
@@ -378,7 +381,6 @@ class LevelScene extends Phaser.Scene {
    * frame (D156): where its state's picture is not there, it keeps the painted state it
    * shows, and takes the state's picture once it is loaded. */
   private doorLook(id: string, open: boolean, lock: string, moving = false): void {
-    this.markBehind(id, open, moving);
     const image = this.things.get(id);
     if (!image) return;
     const key = this.atHour(`art-${this.artOf(id)}-${open ? 'open' : 'closed'}`);
@@ -436,21 +438,6 @@ class LevelScene extends Phaser.Scene {
     if (!this.art?.scene.hours?.morning || (this.shownDay ?? 0) < 1) return key;
     const morning = hourKey(key, 'morning');
     return this.textures.exists(morning) ? morning : key;
-  }
-
-  /** The mark in a door's doorway: hidden while the door is closed, faded in as it
-   * opens (D79). The doors it is hidden behind are on data-marks-hidden. */
-  private markBehind(id: string, open: boolean, moving: boolean): void {
-    const mark = this.doorMarks.get(id);
-    if (!mark) return;
-    this.tweens.killTweensOf(mark);
-    mark.setVisible(open).setAlpha(1);
-    if (open && moving && !this.still) {
-      mark.setAlpha(0);
-      this.tweens.add({ targets: mark, alpha: 1, duration: this.playback.tickDuration * 0.6 });
-    }
-    const hidden = [...this.doorMarks].filter(([, shown]) => !shown.visible).map(([door]) => door);
-    this.parentNode.dataset.marksHidden = hidden.join(',');
   }
 
   /** Whether the player asks for less motion: the pulses then stand still. */
@@ -560,32 +547,28 @@ class LevelScene extends Phaser.Scene {
     }
     for (const [letter, tile] of this.map.markers) {
       // A marker, like the way out, shows in the dark: it is the castle's shape. On a
-      // painted scene the goal's mark is a ring that pulses, over the ground, or, in a
-      // door's doorway, over its picture once the door is open (D79).
+      // painted scene the goal's mark is a ring that pulses, lying on the ground where a
+      // figure on its cell stands, under whatever stands before it or walks over it,
+      // even a shut door, with its silhouette where it is covered (D160).
       if (!this.art) {
         this.add.image(...centre(tile), markerKey(letter)).setDepth(2.8);
         continue;
       }
-      const door = this.map.things.find(
-        (thing) => thing.kind === 'door' && thing.tile[0] === tile[0] && thing.tile[1] === tile[1],
-      );
-      const picture = door ? this.things.get(door.id) : undefined;
       const [markX, markY] = centre(tile);
       const { nudged, lowered } = this.art.scene;
       const placed: [number, number] = [
         markX + nudgedBy(nudged, tile) * TILE,
         markY + loweredBy(lowered, tile) * TILE,
       ];
-      const mark = drawMark(this, placed, this.still, picture ? picture.depth + 0.0002 : markDepth(tile[1]));
-      if (door && picture) {
-        this.doorMarks.set(door.id, mark);
-        this.markBehind(door.id, door.open, false);
-      }
+      this.marks.push({ tile, mark: drawMark(this, placed, this.still, MARK_DEPTH), silhouette: null });
     }
     // The cell a sleep goal is met from, marked as a reach goal's is, with a sign of
-    // sleep in its ring (D130).
+    // sleep in its ring (D130), on the ground as it is (D160).
     const sleepAt = this.map.sleepAt;
-    if (sleepAt) drawSleepMark(this, centre(sleepAt), this.still, 2.9);
+    if (sleepAt) {
+      const mark = drawSleepMark(this, centre(sleepAt), this.still, MARK_DEPTH);
+      if (this.art) this.marks.push({ tile: sleepAt, mark, silhouette: null });
+    }
     const marked = [...this.map.markers.map(([, tile]) => tile), ...(sleepAt ? [sleepAt] : [])];
     this.parentNode.dataset.marks = marked.map((tile) => tile.join(',')).join(';');
     for (const actor of this.map.actors) {
@@ -652,6 +635,18 @@ class LevelScene extends Phaser.Scene {
         ]
       : [];
     this.coverings = painted.map(({ image }) => image);
+    // Each mark's silhouette, over what is painted and every figure, under the dark and
+    // the light (D160).
+    const figures = [this.wizard, ...[...this.actors.values()].map((actor) => actor.sprite)];
+    for (const one of this.marks) {
+      one.silhouette = new MarkSilhouette(
+        this,
+        one.mark,
+        MARK_RADIUS,
+        [...this.coverings, ...figures],
+        overDepth(this.map.height) + 0.25,
+      );
+    }
     if (this.art && this.wizard.texture.key.startsWith('fig-')) {
       this.silhouette = new Silhouette(this, this.wizard, this.coverings, this.still);
       this.parentNode.dataset.silhouette = 'true';
@@ -772,6 +767,14 @@ class LevelScene extends Phaser.Scene {
       else delete this.parentNode.dataset.outlined;
     }
     for (const outline of this.revealed.values()) outline.update();
+    if (this.marks.length > 0) {
+      for (const { silhouette } of this.marks) silhouette?.update();
+      const covered = this.marks
+        .filter(({ silhouette }) => silhouette?.covered)
+        .map(({ tile }) => tile.join(','))
+        .join(';');
+      if (this.parentNode.dataset.marksCovered !== covered) this.parentNode.dataset.marksCovered = covered;
+    }
     this.debug?.update(this.cameras.main);
     if (this.art) this.publishDrawn();
   }
@@ -835,7 +838,11 @@ class LevelScene extends Phaser.Scene {
       const tile = this.startTile(thing.id, thing.tile);
       const painted = this.art?.scene.things[this.artOf(thing.id)];
       if (this.art && painted) {
-        placeThing(image, this.art, this.artOf(thing.id), tile, { open: thing.open, inside: this.inside(tile) });
+        placeThing(image, this.art, this.artOf(thing.id), tile, {
+          open: thing.open,
+          inside: this.inside(tile),
+          lying: thing.kind === 'key',
+        });
         // Back in the state it lies in, a book the spell took at the run before.
         if (thing.kind !== 'door') image.setTexture(`art-${this.artOf(thing.id)}-${Object.keys(painted.states)[0]}`);
       } else image.setPosition(...centre(tile));
@@ -1232,7 +1239,10 @@ class LevelScene extends Phaser.Scene {
         ? {
             x: image.x + (to[0] - from[0]) * TILE,
             y: image.y + (to[1] - from[1]) * TILE,
-            depth: thingDepthOn(this.art, this.artOf(id), to, { inside: this.inside(to) }),
+            depth: thingDepthOn(this.art, this.artOf(id), to, {
+              inside: this.inside(to),
+              lying: this.map.things.some((thing) => thing.id === id && thing.kind === 'key'),
+            }),
           }
         : { x: centre(to)[0], y: centre(to)[1], depth: image.depth };
     this.inHands.set(id, floor);

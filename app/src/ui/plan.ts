@@ -4,30 +4,33 @@
 // faint over the walls, every door as the scene shows it at this tick, the figures with
 // their own standing sprites and their names and cells beside them, drawn where the
 // scene draws them and behind the same cut-outs, inked with the ground, every reach mark
-// with the mark's picture and its cell written beside it, the hidden ones too, the dark
-// tunnel's cells as a dotted path, the column and row numbers along the four edges, and
-// a cell's own numbers where the pointer rests or a finger taps. What lies unlit in a
-// dark room stays undrawn (D52), and no one in the dark tunnel is drawn (D135). Its
-// button or Escape closes it, and the playback goes on.
+// with the mark's picture lying on the ground under them and its silhouette where they
+// cover it (D160) and its cell written beside it, the hidden ones too, the dark tunnel's
+// cells as a dotted path, the column and row numbers along the four edges, and a cell's
+// own numbers where the pointer rests or a finger taps. A dark room is drawn as any room,
+// since the map knows the castle, and what lies unlit in it stays undrawn (D52, D163);
+// no one in the dark tunnel is drawn (D135). The names and cells are written last, each
+// where it covers no figure, no mark, no other name and, a mark's, no cut-out (D166).
+// Its button or Escape closes it, and the playback goes on.
 
-import { figureDepth, loweredBy, markDepth, nudgedBy } from '../engine/depth';
+import { figureDepth, loweredBy, MARK_DEPTH, nudgedBy } from '../engine/depth';
 import type { PlanPictures, PlanView, Tile } from '../engine/layout';
 import { characterName, forWizard, t } from '../i18n';
 import { element } from './dom';
 
-export type PlanCell = 'wall' | 'floor' | 'furniture' | 'enchanted' | 'unlit';
+export type PlanCell = 'wall' | 'floor' | 'furniture' | 'enchanted';
 
 export interface PlanShapes {
   columns: number;
   height: number;
+  /** Every cell, a dark room's as any room's (D163). */
   cells: { x: number; y: number; kind: PlanCell }[];
   doors: { id: string; x: number; y: number; open: boolean; across: boolean }[];
+  /** The things seen: none that lies unlit (D52). */
   things: { id: string; x: number; y: number }[];
   figures: { id: string; kind: string; x: number; y: number; facing: string }[];
   /** Every reach mark's cell, the hidden ones too. */
   marks: { x: number; y: number }[];
-  /** The cells of what is still dark, walls and furniture too, which stay undrawn (D52). */
-  unlit: { x: number; y: number }[];
 }
 
 const key = ([x, y]: Tile): string => `${x},${y}`;
@@ -40,16 +43,7 @@ export function planShapes(view: PlanView): PlanShapes {
   view.rows.forEach((row, y) => {
     [...row].forEach((char, x) => {
       const here = `${x},${y}`;
-      const kind: PlanCell =
-        char === '#'
-          ? 'wall'
-          : char === '='
-            ? 'furniture'
-            : enchanted.has(here)
-              ? 'enchanted'
-              : unlit.has(here)
-                ? 'unlit'
-                : 'floor';
+      const kind: PlanCell = char === '#' ? 'wall' : char === '=' ? 'furniture' : enchanted.has(here) ? 'enchanted' : 'floor';
       cells.push({ x, y, kind });
     });
   });
@@ -74,40 +68,51 @@ export function planShapes(view: PlanView): PlanShapes {
     .filter((figure) => !enchanted.has(key(figure.tile)))
     .map(({ id, kind, tile: [x, y], facing }) => ({ id, kind, x, y, facing }));
   const marks = view.marks.map(([x, y]) => ({ x, y }));
-  const dark = view.unlit.map(([x, y]) => ({ x, y }));
-  return { columns: view.rows[0]?.length ?? 0, height: view.rows.length, cells, doors, things, figures, marks, unlit: dark };
+  return { columns: view.rows[0]?.length ?? 0, height: view.rows.length, cells, doors, things, figures, marks };
 }
 
-/** Where a figure's or a thing's name and cell are written, each clear of those
- * written before it where one of four places is: right, left, above or below. */
+/** A box on the plan, in its pixels. */
+export interface PlanBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+const overlaps = (one: PlanBox, other: PlanBox): boolean =>
+  one.x < other.x + other.width &&
+  other.x < one.x + one.width &&
+  one.y < other.y + other.height &&
+  other.y < one.y + one.height;
+
+/** How far out a name is looked for, in its reach, when no place beside its owner is clear. */
+const FARTHER = [1, 1.5, 2, 2.5, 3];
+
+/** Where each name and cell is written (D166): right of its owner, left, below or above,
+ * the first place inside the plan that overlaps none of `obstacles` (the figures and the
+ * marks), no name written before it and nothing its own `avoid` says (a mark's, the
+ * cut-outs); farther out, half a reach at a time, when none beside it is clear. */
 export function labelBoxes(
-  anchors: { x: number; y: number; width: number; height: number; reach: number }[],
+  anchors: { x: number; y: number; width: number; height: number; reach: number; avoid?: (box: PlanBox) => boolean }[],
   size: { width: number; height: number },
+  obstacles: PlanBox[] = [],
 ): { x: number; y: number }[] {
-  const taken: { x: number; y: number; width: number; height: number }[] = [];
-  const clear = (box: { x: number; y: number; width: number; height: number }) =>
-    box.x >= 0 &&
-    box.y >= 0 &&
-    box.x + box.width <= size.width &&
-    box.y + box.height <= size.height &&
-    !taken.some(
-      (other) =>
-        box.x < other.x + other.width &&
-        other.x < box.x + box.width &&
-        box.y < other.y + other.height &&
-        other.y < box.y + box.height,
-    );
-  return anchors.map(({ x, y, width, height, reach }) => {
-    const places = [
-      { x: x + reach, y: y - height / 2 },
-      { x: x - reach - width, y: y - height / 2 },
-      { x: x - width / 2, y: y - reach - height },
-      { x: x - width / 2, y: y + reach },
-      { x: x + reach, y: y - reach - height },
-      { x: x + reach, y: y + reach },
-      { x: x - reach - width, y: y - reach - height },
-      { x: x - reach - width, y: y + reach },
-    ];
+  const taken: PlanBox[] = [];
+  return anchors.map(({ x, y, width, height, reach, avoid }) => {
+    const clear = (box: PlanBox) =>
+      box.x >= 0 &&
+      box.y >= 0 &&
+      box.x + box.width <= size.width &&
+      box.y + box.height <= size.height &&
+      !taken.some((other) => overlaps(box, other)) &&
+      !obstacles.some((other) => overlaps(box, other)) &&
+      !avoid?.(box);
+    const places = FARTHER.flatMap((far) => [
+      { x: x + reach * far, y: y - height / 2 },
+      { x: x - reach * far - width, y: y - height / 2 },
+      { x: x - width / 2, y: y + reach * far },
+      { x: x - width / 2, y: y - reach * far - height },
+    ]);
     const box = places.map((place) => ({ ...place, width, height })).find(clear) ?? {
       x: Math.max(0, Math.min(places[0]?.x ?? 0, size.width - width)),
       y: Math.max(0, Math.min(places[0]?.y ?? 0, size.height - height)),
@@ -117,6 +122,80 @@ export function labelBoxes(
     taken.push(box);
     return { x: box.x, y: box.y };
   });
+}
+
+/** What a figure covers on the plan, `cell` pixels a cell, its feet at `feet` pixels
+ * down and its middle at `middle` across: its body, narrower than its frame, a cell and
+ * a tenth tall above its feet (D166). */
+export function figureBox(middle: number, feet: number, cell: number): PlanBox {
+  return { x: middle - cell * 0.31, y: feet - cell * 1.1, width: cell * 0.62, height: cell * 1.1 };
+}
+
+/** What a mark covers on the plan: its ring, round its middle. */
+export function markBox(middle: number, down: number, cell: number): PlanBox {
+  const radius = cell * GOAL_RING;
+  return { x: middle - radius, y: down - radius, width: radius * 2, height: radius * 2 };
+}
+
+/** Where a figure, a thing and a mark of the plan stand, `cell` pixels a cell inside a
+ * gutter of `gutter`: across and down to the middle of their cell, nudged and lowered
+ * as on the scene (D149, D151), and a figure's feet. */
+export function planPlaces(
+  cell: number,
+  gutter: number,
+  pictures: Pick<PlanPictures, 'lowered' | 'nudged'> | null,
+): { across: (x: number, y: number) => number; down: (x: number, y: number) => number; feet: (x: number, y: number) => number } {
+  const lowered = pictures?.lowered;
+  const nudged = pictures?.nudged;
+  return {
+    across: (x, y) => gutter + x * cell + cell * (0.5 + nudgedBy(nudged, [x, y])),
+    down: (x, y) => gutter + y * cell + cell * (0.5 + loweredBy(lowered, [x, y])),
+    feet: (x, y) => gutter + cell * (y + FOOT_ON_THE_PLAN + loweredBy(lowered, [x, y])),
+  };
+}
+
+/** Each name and cell written on the plan and where (D151, D166): the figures', the
+ * things' and the marks', clear of the figures, the marks and one another, a mark's of
+ * the cut-outs too (`cutOut`, whether a box of the plan touches one). */
+export function planLabels(
+  shapes: Pick<PlanShapes, 'figures' | 'things' | 'marks'>,
+  cell: number,
+  gutter: number,
+  pictures: Pick<PlanPictures, 'lowered' | 'nudged'> | null,
+  name: (id: string) => string,
+  measure: (text: string) => number,
+  size: { width: number; height: number },
+  cutOut: (box: PlanBox) => boolean = () => false,
+): { said: string; box: PlanBox }[] {
+  const { across, down, feet } = planPlaces(cell, gutter, pictures);
+  const tall = Math.max(14, cell * 0.38);
+  const named = [
+    ...shapes.figures.map((figure) => ({ id: figure.id, x: figure.x, y: figure.y, mark: false })),
+    ...shapes.things.map((thing) => ({ id: thing.id, x: thing.x, y: thing.y, mark: false })),
+    // A mark says its cell, as a figure's name does (D151).
+    ...shapes.marks.map((mark) => ({ id: '', x: mark.x, y: mark.y, mark: true })),
+  ];
+  const says = named.map((one) => planLabel(one.id && name(one.id), one.x, one.y));
+  const obstacles = [
+    ...shapes.figures.map((figure) => figureBox(across(figure.x, figure.y), feet(figure.x, figure.y), cell)),
+    ...shapes.marks.map((mark) => markBox(across(mark.x, mark.y), down(mark.x, mark.y), cell)),
+  ];
+  const places = labelBoxes(
+    named.map((one, index) => ({
+      x: across(one.x, one.y),
+      y: down(one.x, one.y),
+      width: measure(says[index] ?? '') + 8,
+      height: tall,
+      reach: cell * 0.5,
+      ...(one.mark ? { avoid: cutOut } : {}),
+    })),
+    size,
+    obstacles,
+  );
+  return named.map((_, index) => ({
+    said: says[index] ?? '',
+    box: { x: places[index]?.x ?? 0, y: places[index]?.y ?? 0, width: measure(says[index] ?? '') + 8, height: tall },
+  }));
 }
 
 /** The parchment and the ink, as colours and as their channels. */
@@ -209,12 +288,12 @@ export interface PlanLoaded {
   ground: HTMLImageElement;
   doors: { image: HTMLImageElement; left: number; top: number; depth: number }[];
   rows: { image: HTMLImageElement; top: number; depth: number }[];
-  things: Map<string, { image: HTMLImageElement; left: number; top: number }>;
+  things: Map<string, { image: HTMLImageElement; left: number; top: number; scale?: number; centre?: [number, number] }>;
   figures: Map<string, HTMLImageElement>;
 }
 
-/** The scene's picture with its doors as they are, in ink, at `cell` pixels a cell;
- * what lies unlit undrawn, plain parchment. */
+/** The scene's picture with its doors as they are, in ink, at `cell` pixels a cell; a
+ * dark room drawn as any room (D163). */
 function inkedScene(pictures: PlanPictures, loaded: PlanLoaded, shapes: PlanShapes, cell: number): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(shapes.columns * cell);
@@ -231,8 +310,6 @@ function inkedScene(pictures: PlanPictures, loaded: PlanLoaded, shapes: PlanShap
   const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
   inked(data.data, canvas.width, canvas.height, cell);
   ctx.putImageData(data, 0, 0);
-  ctx.fillStyle = css(PARCHMENT);
-  for (const { x, y } of shapes.unlit) ctx.fillRect(x * cell, y * cell, cell, cell);
   return canvas;
 }
 
@@ -240,6 +317,9 @@ function inkedScene(pictures: PlanPictures, loaded: PlanLoaded, shapes: PlanShap
 function gutterOf(cell: number): number {
   return Math.max(GUTTER_LEAST, cell * GUTTER);
 }
+
+/** How far the mark's outer ink ring lies from its middle, in cells. */
+const GOAL_RING = 0.39;
 
 /** The mark of a reach goal, as the scene draws it (painted.drawMark). */
 function drawGoal(ctx: CanvasRenderingContext2D, cx: number, cy: number, cell: number): void {
@@ -255,8 +335,28 @@ function drawGoal(ctx: CanvasRenderingContext2D, cx: number, cy: number, cell: n
   ctx.strokeStyle = css(INK, 0.7);
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.arc(cx, cy, cell * 0.39, 0, Math.PI * 2);
+  ctx.arc(cx, cy, cell * GOAL_RING, 0, Math.PI * 2);
   ctx.stroke();
+}
+
+/** A mark's silhouette (D160): its ring in the outline's yellow, for where what is drawn
+ * over the mark covers it. */
+function drawGoalLine(ctx: CanvasRenderingContext2D, cx: number, cy: number, cell: number): void {
+  ctx.strokeStyle = 'rgb(255 214 51)';
+  ctx.lineWidth = Math.max(2, cell * 0.06);
+  ctx.beginPath();
+  ctx.arc(cx, cy, cell * 0.36, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+/** A canvas as big as `ctx`'s, drawn with the same transform. */
+function alike(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D | null {
+  const canvas = document.createElement('canvas');
+  canvas.width = ctx.canvas.width;
+  canvas.height = ctx.canvas.height;
+  const other = canvas.getContext('2d');
+  other?.setTransform(ctx.getTransform());
+  return other;
 }
 
 /** The dark tunnel's cells: a dotted line round them and a dot in each. */
@@ -352,12 +452,10 @@ export function drawPlan(
     ctx.fillText(String(y), width - gutter / 2, top(y) + cell / 2);
   }
   drawTunnel(ctx, shapes, cell, left, top);
-  const lowered = pictures?.lowered;
-  const nudged = pictures?.nudged;
   // A figure and a mark stand where the scene draws them (D149, D151).
-  const across = (x: number, y: number) => left(x) + cell * (0.5 + nudgedBy(nudged, [x, y]));
-  const down = (x: number, y: number) => top(y) + cell * loweredBy(lowered, [x, y]);
-  // A thing as itself, or a small square where it has no picture.
+  const { across, down, feet: feetAt } = planPlaces(cell, gutter, pictures);
+  // A thing as itself, or a small square where it has no picture; a key smaller, its
+  // middle on its cell's (D164).
   for (const thing of shapes.things) {
     const shown = loaded?.things.get(thing.id);
     if (shown && pictures) {
@@ -369,23 +467,39 @@ export function drawPlan(
         pictures.cell,
         cell,
       );
+      if (shown.scale && shown.centre) {
+        const [mx, my] = opaqueMiddle(shown.image);
+        const scale = (cell / pictures.cell) * shown.scale;
+        const [cx, cy] = shown.centre;
+        ctx.drawImage(
+          shown.image,
+          gutter + cx * cell - mx * scale,
+          gutter + cy * cell - my * scale,
+          shown.image.width * scale,
+          shown.image.height * scale,
+        );
+        continue;
+      }
       ctx.drawImage(shown.image, gutter + ox, gutter + oy, wide, tall);
       continue;
     }
     ctx.fillStyle = css(INK);
     ctx.fillRect(left(thing.x) + cell * 0.37, top(thing.y) + cell * 0.37, cell * 0.26, cell * 0.26);
   }
-  // The figures as themselves, each on its cell, its feet as the scene puts them, among
-  // the scene's own cut-outs in ink, each by its depth (D151).
-  const layers: { depth: number; draw: () => void }[] = shapes.marks.map(({ x, y }) => ({
-    depth: markDepth(y),
-    draw: () => drawGoal(ctx, across(x, y), down(x, y) + cell / 2, cell),
-  }));
+  // The marks on the ground (D160); over them the figures as themselves, each on its
+  // cell, its feet as the scene puts them, among the scene's own cut-outs in ink, each by
+  // its depth (D151).
+  const layers: { depth: number; mark?: boolean; draw: (target: CanvasRenderingContext2D) => void }[] =
+    shapes.marks.map(({ x, y }) => ({
+      depth: MARK_DEPTH,
+      mark: true,
+      draw: (target) => drawGoal(target, across(x, y), down(x, y), cell),
+    }));
   for (const figure of shapes.figures) {
-    const feet = figure.y + FOOT_ON_THE_PLAN + loweredBy(lowered, [figure.x, figure.y]);
+    const feet = (feetAt(figure.x, figure.y) - gutter) / cell;
     layers.push({
       depth: figureDepth(feet),
-      draw: () => {
+      draw: (target) => {
         const sheet = loaded?.figures.get(figure.id);
         const about = pictures?.figures.find((one) => one.id === figure.id);
         const middle = across(figure.x, figure.y);
@@ -395,7 +509,7 @@ export function drawPlan(
           const row = about.rows[figure.facing] ?? 0;
           const [wide, tall] = [frameWidth * scale, frameHeight * scale];
           const bottom = gutter + feet * cell + about.foot * scale;
-          ctx.drawImage(
+          target.drawImage(
             sheet,
             about.column * frameWidth,
             row * frameHeight,
@@ -407,55 +521,71 @@ export function drawPlan(
             tall,
           );
         } else {
-          ctx.fillStyle = css(INK);
-          ctx.beginPath();
-          ctx.arc(middle, down(figure.x, figure.y) + cell / 2, cell * 0.27, 0, Math.PI * 2);
-          ctx.fill();
+          target.fillStyle = css(INK);
+          target.beginPath();
+          target.arc(middle, down(figure.x, figure.y), cell * 0.27, 0, Math.PI * 2);
+          target.fill();
         }
       },
     });
   }
+  // The cut-outs, kept to tell where a mark's name may be written (D166).
+  const cutOuts: HTMLCanvasElement[] = [];
   if (scene && pictures && loaded) {
-    const cutOut = (image: HTMLImageElement, x: number, y: number) => () => {
+    const cutOut = (image: HTMLImageElement, x: number, y: number) => {
       const inkedHere = inkedCutOut(scene, image, x, y, pictures.cell, shapes.columns);
-      ctx.drawImage(inkedHere, gutter, gutter, shapes.columns * cell, shapes.height * cell);
+      cutOuts.push(inkedHere);
+      return (target: CanvasRenderingContext2D) =>
+        target.drawImage(inkedHere, gutter, gutter, shapes.columns * cell, shapes.height * cell);
     };
     for (const { image, top: y, depth } of loaded.rows) layers.push({ depth, draw: cutOut(image, 0, y) });
     for (const { image, left: x, top: y, depth } of loaded.doors) layers.push({ depth, draw: cutOut(image, x, y) });
   }
-  for (const layer of [...layers].sort((one, other) => one.depth - other.depth)) layer.draw();
-  // The names and cells, each clear of the others'; the tunnel's name, once.
+  const sorted = [...layers].sort((one, other) => one.depth - other.depth);
+  for (const layer of sorted) layer.draw(ctx);
+  // Where what is drawn over a mark covers it, its ring over them (D160).
+  if (shapes.marks.length > 0) {
+    const over = alike(ctx);
+    const line = alike(ctx);
+    if (over && line) {
+      for (const layer of sorted) if (!layer.mark) layer.draw(over);
+      for (const { x, y } of shapes.marks) drawGoalLine(line, across(x, y), down(x, y), cell);
+      line.save();
+      line.setTransform(1, 0, 0, 1, 0, 0);
+      line.globalCompositeOperation = 'destination-in';
+      line.drawImage(over.canvas, 0, 0);
+      line.restore();
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(line.canvas, 0, 0);
+      ctx.restore();
+    }
+  }
+  // The names and cells, last, over everything, each clear of the figures, the marks and
+  // the others', a mark's of the cut-outs too (D166); the tunnel's name, once.
   const font = `${Math.max(11, cell * 0.3)}px Georgia, serif`;
   ctx.font = font;
   const tall = Math.max(14, cell * 0.38);
-  const named = [
-    ...shapes.figures.map((figure) => ({ id: figure.id, x: figure.x, y: figure.y })),
-    ...shapes.things.map((thing) => ({ id: thing.id, x: thing.x, y: thing.y })),
-    // A mark says its cell, as a figure's name does (D151).
-    ...shapes.marks.map((mark) => ({ id: '', x: mark.x, y: mark.y })),
-  ];
-  const says = named.map((one) => planLabel(one.id && words.name(one.id), one.x, one.y));
-  const places = labelBoxes(
-    named.map((one, index) => ({
-      x: across(one.x, one.y),
-      y: down(one.x, one.y) + cell / 2,
-      width: ctx.measureText(says[index] ?? '').width + 8,
-      height: tall,
-      reach: cell * 0.5,
-    })),
+  const labels = planLabels(
+    shapes,
+    cell,
+    gutter,
+    pictures,
+    words.name,
+    (text) => ctx.measureText(text).width,
     { width, height },
+    cutOuts.length > 0 ? touchesCutOut(cutOuts, gutter, cell, shapes.columns) : undefined,
   );
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  named.forEach((_, index) => {
-    const place = places[index];
-    const said = says[index];
-    if (!place || !said) return;
+  for (const { said, box } of labels) {
+    if (!said) continue;
     ctx.fillStyle = css(PARCHMENT, 0.92);
-    ctx.fillRect(place.x, place.y, ctx.measureText(said).width + 8, tall);
+    ctx.fillRect(box.x, box.y, box.width, box.height);
     ctx.fillStyle = css(INK);
-    ctx.fillText(said, place.x + 4, place.y + tall / 2);
-  });
+    ctx.fillText(said, box.x + 4, box.y + box.height / 2);
+  }
   const middle = tunnelLabelCell(shapes);
   if (middle) {
     ctx.font = `italic ${Math.max(11, cell * 0.34)}px Georgia, serif`;
@@ -532,6 +662,61 @@ function inkedCutOut(
   return canvas;
 }
 
+/** Whether a box of the plan, in its pixels, touches what a cut-out draws (D166): its
+ * pixels read once, from the cut-outs' canvases, the inked scene's size each. */
+function touchesCutOut(
+  cutOuts: HTMLCanvasElement[],
+  gutter: number,
+  cell: number,
+  columns: number,
+): (box: PlanBox) => boolean {
+  const first = cutOuts[0];
+  if (!first) return () => false;
+  const { width, height } = first;
+  const solid = new Uint8Array(width * height);
+  for (const canvas of cutOuts) {
+    const pixels = canvas.getContext('2d', { willReadFrequently: true })?.getImageData(0, 0, width, height).data;
+    if (!pixels) continue;
+    for (let index = 0; index < solid.length; index += 1) if ((pixels[index * 4 + 3] ?? 0) > 127) solid[index] = 1;
+  }
+  // The inked scene's pixels a plan's pixel.
+  const ratio = width / (columns * cell);
+  return (box) => {
+    const [x0, y0] = [Math.max(0, Math.floor((box.x - gutter) * ratio)), Math.max(0, Math.floor((box.y - gutter) * ratio))];
+    const [x1, y1] = [
+      Math.min(width, Math.ceil((box.x + box.width - gutter) * ratio)),
+      Math.min(height, Math.ceil((box.y + box.height - gutter) * ratio)),
+    ];
+    for (let y = y0; y < y1; y += 1) for (let x = x0; x < x1; x += 1) if (solid[y * width + x]) return true;
+    return false;
+  };
+}
+
+/** The middle of what a picture draws, its solid pixels', in its own pixels. */
+const middles = new WeakMap<HTMLImageElement, [number, number]>();
+function opaqueMiddle(image: HTMLImageElement): [number, number] {
+  const known = middles.get(image);
+  if (known) return known;
+  let middle: [number, number] = [image.width / 2, image.height / 2];
+  const canvas = document.createElement('canvas');
+  [canvas.width, canvas.height] = [image.width, image.height];
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (context && image.width > 0 && image.height > 0) {
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, image.width, image.height).data;
+    let [x0, y0, x1, y1] = [image.width, image.height, -1, -1];
+    for (let y = 0; y < image.height; y += 1) {
+      for (let x = 0; x < image.width; x += 1) {
+        if ((pixels[(y * image.width + x) * 4 + 3] ?? 0) <= 127) continue;
+        [x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)];
+      }
+    }
+    if (x1 >= 0) middle = [(x0 + x1 + 1) / 2, (y0 + y1 + 1) / 2];
+  }
+  middles.set(image, middle);
+  return middle;
+}
+
 /** The cell at a point of the plan, or null beyond the scene's cells. */
 export function cellAt(x: number, y: number, cell: number, columns: number, rows: number): Tile | null {
   const gutter = gutterOf(cell);
@@ -558,7 +743,10 @@ async function loadPictures(pictures: PlanPictures): Promise<PlanLoaded | null> 
       ),
       Promise.all(pictures.rows.map(async ({ url, top, depth }) => ({ image: await loadImage(url), top, depth }))),
       Promise.all(
-        pictures.things.map(async ({ id, url, left, top }) => [id, { image: await loadImage(url), left, top }] as const),
+        pictures.things.map(
+          async ({ id, url, left, top, scale, centre }) =>
+            [id, { image: await loadImage(url), left, top, ...(scale && centre ? { scale, centre } : {}) }] as const,
+        ),
       ),
       Promise.all(pictures.figures.map(async ({ id, url }) => [id, await loadImage(url)] as const)),
     ]);

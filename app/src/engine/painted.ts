@@ -13,7 +13,7 @@ import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
 import { coverDepth, type Lowered, type Nudged, nudgedBy, overDepth, rowDepth, thingDepth } from './depth';
 import type { Dark } from './shade';
-import { drawnShift, shiftBy } from './shift';
+import { centredCorner, drawnShift, KEY_SCALE, shiftBy } from './shift';
 import type { Tile } from './sight';
 
 /** A scene painted in one picture (D76): its ground, its raised things cut out by
@@ -277,15 +277,21 @@ function middleOf(scene: Phaser.Scene, key: string): [number, number] {
 /** Where a painted thing's picture is drawn for a tile, its corner in the scene's
  * pixels (D85): as painted on its own cell; on another, its middle on the tile's
  * middle, nudged as a figure on it is (D105, D109), read from the picture of the state
- * it is first painted in. */
-function drawnAt(scene: Phaser.Scene, art: Art, id: string, tile: Tile): [number, number] {
+ * it is first painted in; a key, drawn smaller (`smaller`, D164), on the tile's middle
+ * wherever it lies. */
+function drawnAt(scene: Phaser.Scene, art: Art, id: string, tile: Tile, smaller = 1): [number, number] {
   const painted = art.scene.things[id];
   if (!painted) return [0, 0];
   const scale = artScale(art);
   const first = `art-${id}-${Object.keys(painted.states)[0]}`;
   const [mx, my] = scene.textures.exists(first) ? middleOf(scene, first) : [0, 0];
+  const nudge = nudgedBy(art.scene.nudged, tile);
+  if (smaller !== 1) {
+    const [x, y] = centredCorner(tile, [(mx * scale) / TILE, (my * scale) / TILE], smaller, nudge);
+    return [x * TILE, y * TILE];
+  }
   const middle: [number, number] = [((painted.left + mx) * scale) / TILE, ((painted.top + my) * scale) / TILE];
-  const [dx, dy] = drawnShift(painted.at, tile, middle, nudgedBy(art.scene.nudged, tile));
+  const [dx, dy] = drawnShift(painted.at, tile, middle, nudge);
   return [painted.left * scale + dx * TILE, painted.top * scale + dy * TILE];
 }
 
@@ -303,19 +309,21 @@ export function drawnMiddle(image: Phaser.GameObjects.Image): [number, number] {
   return [(image.x + mx * image.scaleX) / TILE, (image.y + my * image.scaleY) / TILE];
 }
 
-/** How a thing on a tile is drawn among the rows: a door as open or shut, and
- * `inside` the furniture of a cell no one walks on, under it. */
+/** How a thing on a tile is drawn among the rows: a door as open or shut, `inside`
+ * the furniture of a cell no one walks on, under it, and a key `lying` on the floor,
+ * drawn smaller and under its row's things (D164). */
 export interface ThingPlaced {
   open?: boolean;
   inside?: boolean;
+  lying?: boolean;
 }
 
-function depthOn(art: Art, id: string, tile: Tile, { open = false, inside = false }: ThingPlaced): number {
+function depthOn(art: Art, id: string, tile: Tile, { open = false, inside = false, lying = false }: ThingPlaced): number {
   const painted = art.scene.things[id];
   if (!painted) return 3;
   // A door swung open lies on the wall beside its doorway, among the rows as it is (D111).
   const row = (open ? painted.rows?.open : undefined) ?? painted.row;
-  return thingDepth(row + shiftOf(art, id, tile)[1], { under: painted.under, open, inside });
+  return thingDepth(row + shiftOf(art, id, tile)[1], { under: painted.under, open, inside, lying });
 }
 
 /** A painted thing in its state, among the rows by its foot (D76), drawn on the
@@ -331,18 +339,20 @@ export function paintThing(
   if (!painted) return null;
   const state = thing.kind === 'door' ? (thing.open ? 'open' : 'closed') : Object.keys(painted.states)[0];
   const open = thing.kind === 'door' && thing.open === true;
+  const lying = thing.kind === 'key';
+  const smaller = lying ? KEY_SCALE : 1;
   return scene.add
-    .image(...drawnAt(scene, art, id, thing.tile), `art-${id}-${state}`)
+    .image(...drawnAt(scene, art, id, thing.tile, smaller), `art-${id}-${state}`)
     .setOrigin(0, 0)
-    .setScale(artScale(art))
-    .setDepth(depthOn(art, id, thing.tile, { open, inside }));
+    .setScale(artScale(art) * smaller)
+    .setDepth(depthOn(art, id, thing.tile, { open, inside, lying }));
 }
 
 /** A painted thing's image put where it is drawn on a tile (D85, D109), for a
  * restart, and among the rows as it is drawn there. */
 export function placeThing(image: Phaser.GameObjects.Image, art: Art, id: string, tile: Tile, placed: ThingPlaced = {}): void {
   if (!art.scene.things[id]) return;
-  image.setPosition(...drawnAt(image.scene, art, id, tile));
+  image.setPosition(...drawnAt(image.scene, art, id, tile, placed.lying ? KEY_SCALE : 1));
   image.setDepth(depthOn(art, id, tile, placed));
 }
 
@@ -393,20 +403,26 @@ export function planPictures(
           ]
         : [];
     });
-  // A key or a slab's hole in its first state, moved from the cell it is painted on.
+  // A key or a slab's hole in its first state, moved from the cell it is painted on; a
+  // key smaller, on its cell's middle where a figure on it stands (D164).
   const shownThings = things
     .filter((thing) => thing.kind !== 'door' && thing.kind !== 'bed')
-    .flatMap(({ id, tile, art: painted }) => {
+    .flatMap(({ id, kind, tile, art: painted }) => {
       const thing = scene.things[painted ?? id];
       const state = thing ? Object.values(thing.states)[0] : undefined;
       if (!thing || !state) return [];
       const [atX, atY] = thing.at ?? tile;
+      const key =
+        kind === 'key'
+          ? { scale: KEY_SCALE, centre: [tile[0] + 0.5 + nudgedBy(scene.nudged, tile), tile[1] + 0.5] as [number, number] }
+          : {};
       return [
         {
           id,
           url: `${scene.base}${state}`,
           left: thing.left + (tile[0] - atX) * scene.cell,
           top: thing.top + (tile[1] - atY) * scene.cell,
+          ...key,
         },
       ];
     });
@@ -614,10 +630,13 @@ function mix(from: number, to: number, t: number): number {
   return channel(16) | channel(8) | channel(0);
 }
 
+/** How far a goal's mark's ring lies from its middle (D79). */
+export const MARK_RADIUS = TILE * 0.36;
+
 /** The goal's mark (D79): a bright ring with a soft disc in it, centred on a point
- * at `depth`, over the ground and under what stands in front; it beats in size,
- * alpha and colour unless `still`. The mark is returned, for the page to hide it
- * and fade it in, which its beat inside does not touch. */
+ * at `depth`, on the ground under what stands in front (D160); it beats in size,
+ * alpha and colour unless `still`. The mark is returned, its beat the container in
+ * it, which its silhouette follows (silhouette.ts). */
 export function drawMark(
   scene: Phaser.Scene,
   [x, y]: [number, number],
@@ -625,7 +644,7 @@ export function drawMark(
   depth: number,
 ): Phaser.GameObjects.Container {
   const disc = scene.add.circle(0, 0, TILE * 0.32, 0xffe066, 0.35);
-  const ring = scene.add.circle(0, 0, TILE * 0.36).setStrokeStyle(3, 0xffc61a, 1);
+  const ring = scene.add.circle(0, 0, MARK_RADIUS).setStrokeStyle(3, 0xffc61a, 1);
   const beat = scene.add.container(0, 0, [disc, ring]);
   const mark = scene.add.container(x, y, [beat]).setDepth(depth);
   if (still) return mark;

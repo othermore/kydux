@@ -123,12 +123,12 @@ test('a spell is cast with the wand, the seal breaks, a door opens through its h
   await expect(scene).toHaveAttribute('data-doors', /gate/, { timeout: 10_000 });
 
   // The castle's door hears no word while its seal holds: said first, it is not
-  // heard; the spell, then the word, open it. The mark in its doorway shows only
-  // once it is open.
+  // heard; the spell, then the word, open it. The mark in its doorway lies on the
+  // ground under the shut door, its ring drawn over the door (D160).
   await page.goto('/#level/the-way-in');
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
-  await expect(scene).toHaveAttribute('data-marks-hidden', 'castle_door');
+  await expect(scene).toHaveAttribute('data-marks-covered', '8,6');
   await page.locator('#speed').selectOption('4');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
@@ -136,13 +136,11 @@ test('a spell is cast with the wand, the seal breaks, a door opens through its h
   await page.locator('#run').click();
   await expect(page.locator('.outcome')).toBeVisible({ timeout: 30_000 });
   await expect(scene).not.toHaveAttribute('data-doors', /castle_door/);
-  await expect(scene).toHaveAttribute('data-marks-hidden', 'castle_door');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText('wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")');
   await page.locator('#run').click();
   await expect(scene).toHaveAttribute('data-doors', /castle_door/, { timeout: 30_000 });
-  await expect(scene).toHaveAttribute('data-marks-hidden', '');
 });
 
 test('with ?debug the scene shows its cells, for a tester to name one', async ({ page }) => {

@@ -24,6 +24,32 @@ function setUp(n = 3) {
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 
+describe('a pause asked for by a tick (D134)', () => {
+  it('sets no timer, so that playing on steps only once', () => {
+    const scheduled: (() => void)[] = [];
+    const playback = new Playback({
+      tickMs: 100,
+      schedule: (callback) => scheduled.push(callback),
+      cancel: () => {},
+    });
+    const shown: number[] = [];
+    playback.onTick((tick) => {
+      shown.push(tick);
+      if (tick === 1) playback.pause();
+    });
+    playback.load([
+      { tick: 1, actor: 'world', kind: 'map', data: {}, line: 1 },
+      { tick: 2, actor: 'wizard', kind: 'wait', data: {}, line: 2 },
+    ]);
+    playback.play();
+    expect(playback.state).toBe('paused');
+    expect(scheduled).toHaveLength(0);
+    playback.play();
+    expect(shown).toEqual([0, 1, 2]);
+    expect(scheduled).toHaveLength(1);
+  });
+});
+
 describe('Playback', () => {
   it('starts idle at tick 0, telling the listeners', () => {
     const { playback, ticks } = setUp();

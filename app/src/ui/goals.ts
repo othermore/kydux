@@ -4,6 +4,7 @@
 
 import { t } from '../i18n';
 import { element } from './dom';
+import { withCode } from './words';
 
 export type GoalMark = 'open' | 'met' | 'failed';
 
@@ -31,8 +32,8 @@ export function goalsPanel(goals: { text: string; bonus?: boolean }[]): GoalsPan
   const items = goals.map((goal) => {
     const mark = element('span', { className: 'goal-mark' });
     const words = goal.bonus
-      ? [element('strong', { className: 'goal-bonus' }, [t('goals.bonus')]), ' ', goal.text]
-      : [goal.text];
+      ? [element('strong', { className: 'goal-bonus' }, [t('goals.bonus')]), ' ', ...withCode(goal.text)]
+      : withCode(goal.text);
     const item = element('li', { className: 'goal' }, [mark, element('span', {}, words)]);
     if (goal.bonus) item.dataset.bonus = 'true';
     return { item, mark };

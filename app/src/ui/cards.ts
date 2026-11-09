@@ -6,6 +6,7 @@ import { t } from '../i18n';
 import { MAX_STARS } from '../progress/store';
 import { element } from './dom';
 import type { Verdict } from './stars';
+import { withCode } from './words';
 
 export interface Card {
   node: HTMLElement;
@@ -69,7 +70,7 @@ function saidBy(said: Said, id: string): HTMLElement {
   return element('p', { id, className: 'card-said' }, [
     element('strong', {}, [said.speaker]),
     ' ',
-    said.text,
+    ...withCode(said.text),
   ]);
 }
 
@@ -94,7 +95,7 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
     'ul',
     { className: 'start-goals' },
     text.goals.map((goal) =>
-      element('li', {}, goal.bonus ? [element('strong', {}, [t('goals.bonus')]), ' ', goal.text] : [goal.text]),
+      element('li', {}, goal.bonus ? [element('strong', {}, [t('goals.bonus')]), ' ', ...withCode(goal.text)] : withCode(goal.text)),
     ),
   );
   const card = overlay(
@@ -114,7 +115,7 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
               element(
                 'ul',
                 {},
-                text.ways.map((words) => element('li', {}, [words])),
+                text.ways.map((words) => element('li', {}, withCode(words))),
               ),
             ]),
           ]
@@ -198,7 +199,7 @@ export function winCard({ verdict, kept, next, onAgain, onNext, said, learned }:
         ? [
             element('div', { className: 'card-story' }, [
               ...(said ? [saidBy(said, 'card-outro')] : []),
-              ...(learned ? [element('p', { id: 'card-learned', className: 'card-learned' }, [learned])] : []),
+              ...(learned ? [element('p', { id: 'card-learned', className: 'card-learned' }, withCode(learned))] : []),
             ]),
           ]
         : []),

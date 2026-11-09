@@ -15,8 +15,10 @@
 // while the wizard's casting frames play), data-acting (`pickup` or `win` while
 // the wizard's act plays, 14.3), data-opening (the door shown half open
 // as it opens), data-dark (whether the
-// room is still dark, D52), data-stairs ("id:in" or "id:away" joined by ";",
-// each stair as a step taken now would find it, D53), data-zoom (the
+// room is still dark, D52), data-slabs ("id:in" or "id:away" joined by ";",
+// each slab as a step taken now would find it, D53, D138), data-held (the slabs
+// osto holds now), data-enchanted (the figures an enchanted region hides, joined
+// by ",", D135), data-zoom (the
 // camera's zoom, D69), data-following (whether the camera follows the wizard),
 // data-marks-hidden (the doors whose doorway's mark waits for them to open, D79),
 // data-revealed (the things whose outline shows where they lie, D85),
@@ -47,7 +49,7 @@
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
-import { type Layout, layout, towards } from './layout';
+import { type Layout, layout, type PlanView, towards } from './layout';
 import { DEFAULT_LOOK, type Look } from './looks';
 import {
   actorKey,
@@ -108,7 +110,7 @@ import { LONG, Playback } from './playback';
 import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
-import { type Hold, stairInPlace } from './stairs';
+import { type Hold, slabHeld, slabInPlace } from './slab';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, friendText, sleepingText } from './words';
 
@@ -149,6 +151,9 @@ export interface SceneHandle {
   canZoom(step: 1 | -1): boolean;
   /** After a run won, the wizard celebrates; how long it takes, 0 when it does not. */
   celebrate(): number;
+  /** Who is told when the map is opened, with the scene's plan at that tick, the run
+   * paused until `playback.play()`, and when a run started again closes it (D134). */
+  onMap(opened: (view: PlanView) => void, closed: () => void): void;
   destroy(): void;
 }
 
@@ -172,6 +177,14 @@ const SOUNDS_KEPT = 16;
 /** How long the wizard is seen turned to who takes a thing before it goes, against a
  * tick (D48). */
 const GIVE_TURN = 0.2;
+/** How dark a dark room is drawn over a painting, whose shapes show faintly under it,
+ * and over a scene without art (D52); and how long its light takes to lift, against
+ * a tick. */
+const DARK_PAINTED = 0.82;
+const DARK_PLAIN = 0.97;
+const LIGHT_LIFT = 0.6;
+/** The kinds of thing that lie on the floor and go unseen in the dark (D52). */
+const LYING_KINDS: readonly string[] = ['key', 'book', 'wand', 'potion'];
 
 const DELTA: Record<Facing, Tile> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
@@ -225,6 +238,13 @@ class LevelScene extends Phaser.Scene {
    * as sleepers, and not by where they are on the way. */
   private readonly hopping = new Set<Phaser.GameObjects.Sprite>();
   private cone!: Phaser.GameObjects.Graphics;
+  /** The cells that hide every figure in them (D135). */
+  private enchanted = new Set<string>();
+  /** The ring round a slab while osto holds it, by the slab's id (D138). */
+  private rings = new Map<string, Phaser.GameObjects.Arc>();
+  /** Who is told when the map opens, and when a run started again closes it (D134). */
+  private mapOpened: ((view: PlanView) => void) | null = null;
+  private mapClosed: (() => void) | null = null;
   /** The words said, in bubbles and thoughts (speech.ts), and the camera (camera.ts). */
   private speech!: Speech;
   private view!: SceneCamera;
@@ -234,7 +254,7 @@ class LevelScene extends Phaser.Scene {
   /** Whether the room is lit (D52), and the dark drawn over its floor while not. */
   private lit = true;
   private darkness!: Phaser.GameObjects.Graphics;
-  /** The tick shown, and each stair's holds seen so far (D53). */
+  /** The tick shown, and each slab's holds seen so far (D53, D138). */
   private shownTick = 0;
   private holds = new Map<string, Hold[]>();
   /** Counts the restarts, so that a door's delayed opening from a run before is dropped. */
@@ -480,7 +500,9 @@ class LevelScene extends Phaser.Scene {
       }
     }
     this.cone = this.add.graphics().setDepth(1);
-    this.darkness = this.add.graphics().setDepth(2.5);
+    this.enchanted = new Set(this.map.enchanted.map(([x, y]) => `${x},${y}`));
+    // Over a painting, the dark lies over its rows and its figures too (D52).
+    this.darkness = this.add.graphics().setDepth(this.art ? lightDepth(this.map.height) - 0.5 : 2.5);
     for (const thing of this.map.things) {
       // A bed is the scene's: the painting draws it, and nothing is drawn for it (D84).
       if (thing.kind === 'bed') continue;
@@ -496,7 +518,7 @@ class LevelScene extends Phaser.Scene {
           : thing.kind === 'slab'
             ? this.add.image(...centre(thing.tile), thingKey('slab'), 'in')
             : this.add.image(...centre(thing.tile), thingKey(thing.kind));
-      // Doors and stairs are the castle's shape, seen in the dark; what lies on the
+      // Doors and slabs are the castle's shape, seen in the dark; what lies on the
       // floor is under it (D52).
       const shape = thing.kind === 'door' || thing.kind === 'slab';
       this.things.set(thing.id, image.setDepth(shape ? 2.8 : 2));
@@ -596,7 +618,9 @@ class LevelScene extends Phaser.Scene {
           }),
           ...[...this.things].flatMap(([id, image]) => {
             const thing = scene.things[this.artOf(id)];
-            return thing && image.texture.key.startsWith('art-') ? [{ image, row: thing.row }] : [];
+            // A slab's hole lies on the floor, and hides no one.
+            const flat = this.map.things.some((one) => one.id === id && one.kind === 'slab');
+            return thing && !flat && image.texture.key.startsWith('art-') ? [{ image, row: thing.row }] : [];
           }),
         ]
       : [];
@@ -705,7 +729,7 @@ class LevelScene extends Phaser.Scene {
           const [head, feet] = shadeAt(dark, [sprite.x / TILE, sprite.y / TILE]);
           if (feet > 0) {
             sprite.setTint(tintOf(head), tintOf(head), tintOf(feet), tintOf(feet));
-            shaded.push(`${id}:${feet.toFixed(2)}`);
+            if (sprite.visible) shaded.push(`${id}:${feet.toFixed(2)}`);
           } else sprite.clearTint();
         }
         if (shaded.length) this.parentNode.dataset.shade = shaded.join(',');
@@ -714,7 +738,7 @@ class LevelScene extends Phaser.Scene {
     }
     this.speech.update();
     if (this.silhouette) {
-      this.silhouette.off = this.asleep.get(this.wizard)?.lying === true;
+      this.silhouette.off = this.asleep.get(this.wizard)?.lying === true || this.inEnchanted(this.wizardTile);
       this.silhouette.held = this.held;
       this.silhouette.update();
       if (this.silhouette.shown) this.parentNode.dataset.outlined = 'true';
@@ -748,6 +772,8 @@ class LevelScene extends Phaser.Scene {
   /** Everything where it stood before the run. */
   private restart(): void {
     this.restarts += 1;
+    // A run started again closes the map it opened (D134).
+    this.mapClosed?.();
     for (const id of [...this.revealed.keys()]) this.unreveal(id);
     this.asleep.clear();
     this.hopping.clear();
@@ -791,15 +817,17 @@ class LevelScene extends Phaser.Scene {
       if (!state) continue;
       this.tweens.killTweensOf(state.sprite);
       state.tile = this.startTile(actor.id, actor.tile);
-      state.facing = actor.facing;
-      state.sprite.setPosition(...this.figureAt(state.tile)).setAlpha(1).setVisible(!actor.hidden).setAngle(0);
-      this.face(state.sprite, actor.facing);
+      state.facing = (this.shownWay ? this.map.wayFacings[this.shownWay]?.[actor.id] : undefined) ?? actor.facing;
+      const hidden = actor.hidden || this.inEnchanted(state.tile);
+      state.sprite.setPosition(...this.figureAt(state.tile)).setAlpha(1).setVisible(!hidden).setAngle(0);
+      this.face(state.sprite, state.facing);
       if (actor.asleep) this.layDown(state.sprite, actor.id, actor.asleep, true);
       const sway = this.sways.get(state.sprite);
       if (actor.hidden || actor.asleep) sway?.stop();
       else sway?.start();
     }
     this.placeWizard(this.map.start, 'down');
+    this.wizard.setAlpha(1).setVisible(!this.inEnchanted(this.map.start));
     this.parentNode.dataset.tick = '0';
     this.publish();
     if (this.restarts > 1) this.follow();
@@ -810,6 +838,79 @@ class LevelScene extends Phaser.Scene {
     this.wizard.setPosition(...this.figureAt(tile));
     this.face(this.wizard, facing);
     this.wizardTile = tile;
+  }
+
+  /** Whether a tile hides who stands on it (D135). */
+  private inEnchanted([x, y]: Tile): boolean {
+    return this.enchanted.has(`${x},${y}`);
+  }
+
+  /** A figure stepping into an enchanted region fades out over the step, one stepping
+   * out of it fades in, and one walking in it stays unseen (D135). */
+  private enchantedStep(sprite: Phaser.GameObjects.Sprite, from: Tile, to: Tile, duration: number, instant: boolean): void {
+    if (this.enchanted.size === 0) return;
+    const [before, after] = [this.inEnchanted(from), this.inEnchanted(to)];
+    if (instant || before === after) {
+      sprite.setAlpha(1).setVisible(!after);
+      return;
+    }
+    sprite.setVisible(true).setAlpha(after ? 1 : 0);
+    this.tweens.add({
+      targets: sprite,
+      alpha: after ? 0 : 1,
+      duration,
+      onComplete: () => sprite.setVisible(!after).setAlpha(1),
+    });
+  }
+
+  /** The map opened by its spell (D134): the run pauses at this tick, and once the
+   * wand is seen pointed the page opens the plan as the scene is now. */
+  private openMap(): void {
+    if (!this.mapOpened) return;
+    this.playback.pause();
+    const run = this.restarts;
+    this.time.delayedCall(this.playback.tickDuration * LONG * 0.95, () => {
+      if (run === this.restarts) this.mapOpened?.(this.planView());
+    });
+  }
+
+  /** Tells who opens the map, and who closes it when a run starts again (D134). */
+  listenForMap(opened: (view: PlanView) => void, closed: () => void): void {
+    this.mapOpened = opened;
+    this.mapClosed = closed;
+  }
+
+  /** What the plan is drawn from, at the tick shown (D134). */
+  private planView(): PlanView {
+    const facing = this.wizardFacing();
+    return {
+      rows: this.map.rows,
+      enchanted: this.map.enchanted,
+      unlit: this.lit ? [] : this.darkCells(),
+      figures: [
+        { id: 'wizard', kind: 'wizard', tile: this.wizardTile, facing },
+        ...this.map.actors.flatMap((actor) => {
+          const state = this.actors.get(actor.id);
+          return state && (state.sprite.visible || this.inEnchanted(state.tile))
+            ? [{ id: actor.id, kind: actor.kind, tile: state.tile, facing: state.facing as string }]
+            : [];
+        }),
+      ],
+      things: this.map.things
+        .filter((thing) => !this.carried.has(thing.id) && !thing.carried)
+        .map((thing) => ({
+          id: thing.id,
+          kind: thing.kind,
+          tile: this.startTile(thing.id, thing.tile),
+          open: this.openDoors.has(thing.id),
+        })),
+    };
+  }
+
+  /** The cells of the dark area (D52, D73). */
+  private darkCells(): Tile[] {
+    if (this.map.darkArea.length > 0) return this.map.darkArea;
+    return this.map.rows.flatMap((row, y) => [...row].map((_, x): Tile => [x, y]));
   }
 
   /** A tick's events drawn; `instant` for a tick replayed by a seek, drawn at once
@@ -841,9 +942,11 @@ class LevelScene extends Phaser.Scene {
       else if (event.kind === 'pull') this.pull(event, instant);
       // A door's leaf, opening, moves whoever stands where it comes to lie (D125).
       else if (event.kind === 'shoved') this.shove(event, instant);
-      else if (event.kind === 'light') this.lit = true;
+      else if (event.kind === 'light') this.liftDark(instant);
       else if (event.kind === 'hold') this.hold(event);
-      else this.showActor(event, instant);
+      else if (event.kind === 'map') {
+        if (!instant) this.openMap();
+      } else this.showActor(event, instant);
     }
     if (this.options.story) {
       this.frameStory(events);
@@ -913,7 +1016,7 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.sounds = this.playedSounds.join(',');
   }
 
-  /** A stair held by osto: its hold kept, for the stair's state at later ticks (D53). */
+  /** A slab held by osto: its hold kept, for its state at later ticks (D53, D138). */
   private hold(event: WorldEvent): void {
     const id = String(event.data.id);
     const held = { from: Number(event.data.from), until: Number(event.data.until) };
@@ -1356,6 +1459,7 @@ class LevelScene extends Phaser.Scene {
         if (!from || !to) return;
         if (instant) {
           this.placeWizard(to, facing ?? 'down');
+          this.enchantedStep(this.wizard, from, to, 0, true);
           break;
         }
         this.stopCast();
@@ -1363,6 +1467,7 @@ class LevelScene extends Phaser.Scene {
         this.wizardTile = to;
         const [x, y] = this.figureAt(to);
         this.walk(this.wizard, facing ?? 'down', x, y, duration);
+        this.enchantedStep(this.wizard, from, to, duration, false);
         this.step('wizard');
         break;
       }
@@ -1494,11 +1599,13 @@ class LevelScene extends Phaser.Scene {
         if (instant) {
           actor.sprite.setPosition(...this.figureAt(to));
           this.face(actor.sprite, facing);
+          this.enchantedStep(actor.sprite, from, to, 0, true);
           break;
         }
         actor.sprite.setPosition(...this.figureAt(from));
         const [x, y] = this.figureAt(to);
         this.walk(actor.sprite, facing, x, y, this.playback.tickDuration * 0.9);
+        this.enchantedStep(actor.sprite, from, to, this.playback.tickDuration * 0.9, false);
         this.step(event.actor);
         break;
       }
@@ -1584,34 +1691,56 @@ class LevelScene extends Phaser.Scene {
         this.cone.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
     }
-    // Each stair as a step taken now would find it, and in place under the wizard.
-    const stairs: string[] = [];
+    // Each slab as a step taken now would find it, and in place under the wizard: on a
+    // painted scene, its hole seen while it is away, and a ring while osto holds it
+    // (D138).
+    const slabs: string[] = [];
+    const held: string[] = [];
     for (const thing of this.map.things) {
       if (thing.kind !== 'slab') continue;
-      const under = thing.tile[0] === this.wizardTile[0] && thing.tile[1] === this.wizardTile[1];
-      const inPlace =
-        under || stairInPlace(thing.period ?? 1, this.holds.get(thing.id) ?? [], this.shownTick + 1);
-      this.things.get(thing.id)?.setFrame(inPlace ? 'in' : 'away');
-      stairs.push(`${thing.id}:${inPlace ? 'in' : 'away'}`);
+      const tile = this.startTile(thing.id, thing.tile);
+      const under = tile[0] === this.wizardTile[0] && tile[1] === this.wizardTile[1];
+      const holds = this.holds.get(thing.id) ?? [];
+      const inPlace = under || slabInPlace(thing.period ?? 1, holds, this.shownTick + 1);
+      const image = this.things.get(thing.id);
+      if (image?.texture.key.startsWith('art-')) image.setVisible(!inPlace);
+      else image?.setFrame(inPlace ? 'in' : 'away');
+      slabs.push(`${thing.id}:${inPlace ? 'in' : 'away'}`);
+      const holding = slabHeld(holds, this.shownTick + 1);
+      if (holding) held.push(thing.id);
+      this.ringOf(thing.id, tile).setVisible(holding);
     }
-    // The dark over every floor tile of the dark area (the dark rooms, or the whole
-    // map) but the wizard's and its eight neighbours (D52, D73).
+    // The dark over the dark area (the dark rooms, or the whole map), but the wizard's
+    // tile and its eight neighbours (D52, D73).
     this.darkness.clear();
-    if (!this.lit) {
-      this.darkness.fillStyle(0x07080c, 0.97);
+    if (!this.lit) this.drawDark(this.darkness);
+    // What lies on the floor of a painted dark room is not seen until it is lit or the
+    // wizard is beside it (D52).
+    if (this.art && this.map.dark) {
       const area = this.map.darkArea.length > 0 ? new Set(this.map.darkArea.map(([x, y]) => `${x},${y}`)) : null;
-      this.map.rows.forEach((row, y) => {
-        [...row].forEach((char, x) => {
-          const near = Math.abs(x - this.wizardTile[0]) <= 1 && Math.abs(y - this.wizardTile[1]) <= 1;
-          const inside = !area || area.has(`${x},${y}`);
-          if (char !== '#' && inside && !near) this.darkness.fillRect(x * TILE, y * TILE, TILE, TILE);
-        });
-      });
+      for (const thing of this.map.things) {
+        const image = this.things.get(thing.id);
+        if (!image || !LYING_KINDS.includes(thing.kind) || this.carried.has(thing.id)) continue;
+        const [x, y] = this.startTile(thing.id, thing.tile);
+        const near = Math.abs(x - this.wizardTile[0]) <= 1 && Math.abs(y - this.wizardTile[1]) <= 1;
+        image.setVisible(this.lit || near || (area !== null && !area.has(`${x},${y}`)));
+      }
     }
     const dataset = this.parentNode.dataset;
     dataset.dark = String(!this.lit);
-    dataset.stairs = stairs.join(';');
+    dataset.slabs = slabs.join(';');
+    if (held.length > 0) dataset.held = held.join(',');
+    else delete dataset.held;
     dataset.wizard = this.wizardTile.join(',');
+    // Who an enchanted region hides now (D135).
+    if (this.enchanted.size > 0) {
+      const hidden = [
+        ...(this.inEnchanted(this.wizardTile) ? ['wizard'] : []),
+        ...[...this.actors].filter(([, a]) => this.inEnchanted(a.tile)).map(([id]) => id),
+      ];
+      if (hidden.length > 0) dataset.enchanted = hidden.join(',');
+      else delete dataset.enchanted;
+    }
     // An actor out of sight is left out (D74).
     dataset.actors = [...this.actors]
       .filter(([, a]) => a.sprite.visible)
@@ -1624,6 +1753,50 @@ class LevelScene extends Phaser.Scene {
     if (this.shoved.size > 0) dataset.shoved = [...this.shoved].sort().join(',');
     else delete dataset.shoved;
     this.publishDrawn();
+  }
+
+  /** The dark drawn on a graphics object (D52): on a painted scene over every cell of
+   * the dark area, faint enough for the painting's shapes to show; else over its floor. */
+  private drawDark(graphics: Phaser.GameObjects.Graphics): void {
+    graphics.fillStyle(0x07080c, this.art ? DARK_PAINTED : DARK_PLAIN);
+    const area = this.map.darkArea.length > 0 ? new Set(this.map.darkArea.map(([x, y]) => `${x},${y}`)) : null;
+    this.map.rows.forEach((row, y) => {
+      [...row].forEach((char, x) => {
+        const near = Math.abs(x - this.wizardTile[0]) <= 1 && Math.abs(y - this.wizardTile[1]) <= 1;
+        const inside = !area || area.has(`${x},${y}`);
+        if ((this.art || char !== '#') && inside && !near) graphics.fillRect(x * TILE, y * TILE, TILE, TILE);
+      });
+    });
+  }
+
+  /** The light lifting the dark (D52): at once on a seek or a scene without art; else
+   * the dark as it was fades out over a part of the tick. */
+  private liftDark(instant: boolean): void {
+    if (!instant && this.art && !this.still) {
+      const fading = this.add.graphics().setDepth(this.darkness.depth);
+      this.drawDark(fading);
+      this.tweens.add({
+        targets: fading,
+        alpha: 0,
+        duration: this.playback.tickDuration * LIGHT_LIFT,
+        onComplete: () => fading.destroy(),
+      });
+    }
+    this.lit = true;
+  }
+
+  /** The ring round a slab's cell, seen while osto holds it (D138). */
+  private ringOf(id: string, tile: Tile): Phaser.GameObjects.Arc {
+    const known = this.rings.get(id);
+    if (known) return known;
+    const ring = this.add
+      .circle(...centre(tile), TILE * 0.62)
+      .setStrokeStyle(4, 0xffe066, 0.95)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth(2.9);
+    if (!this.still) this.tweens.add({ targets: ring, alpha: 0.55, duration: 500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    this.rings.set(id, ring);
+    return ring;
   }
 
   private nudge(target: Phaser.GameObjects.Sprite, facing: Facing, ms: number): void {
@@ -1697,6 +1870,9 @@ export async function startScene(
         },
         celebrate() {
           return scene.celebrate();
+        },
+        onMap(opened, closed) {
+          scene.listenForMap(opened, closed);
         },
         destroy() {
           resized.disconnect();

@@ -156,6 +156,8 @@ export class Playback {
     }
     this.current += 1;
     for (const listener of this.tickListeners) listener(this.current, events, false);
+    // A listener may have paused it, for the map's window (D134): play() goes on.
+    if (this.currentState !== 'playing') return;
     this.timer = this.schedule(() => {
       this.timer = null;
       if (this.currentState === 'playing') this.next();

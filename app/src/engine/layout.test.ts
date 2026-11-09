@@ -1,6 +1,33 @@
 import { describe, expect, it } from 'vitest';
 import { layout } from './layout';
 
+describe('what a level of chapter 3 tells the page', () => {
+  const on = {
+    map: ['S.E'],
+    goals: [{ kind: 'reach', marker: 'E', hidden: true }],
+    enchanted: [[1, 0, 2, 0]],
+    actors: [{ kind: 'teacher', id: 'dask', at: [1, 0], facing: 'left' }],
+    ways: [{ id: 'one' }, { id: 'two', actors: [{ id: 'dask', at: [2, 0], facing: 'right' }] }],
+  };
+
+  it('draws no mark for a hidden reach (D134)', () => {
+    expect(layout({ map: ['S.E'], goals: [{ kind: 'reach', marker: 'E' }] }).markers).toEqual([['E', [2, 0]]]);
+    expect(layout(on).markers).toEqual([]);
+  });
+
+  it('gives the enchanted cells (D135)', () => {
+    expect(layout(on).enchanted).toEqual([
+      [1, 0],
+      [2, 0],
+    ]);
+  });
+
+  it('gives where a way puts an actor and which way it turns it (D51, D137)', () => {
+    expect(layout(on).ways.two).toEqual({ dask: [2, 0] });
+    expect(layout(on).wayFacings.two).toEqual({ dask: 'right' });
+  });
+});
+
 describe('layout', () => {
   it('says how each door opens (D43)', () => {
     const map = layout({

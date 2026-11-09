@@ -468,7 +468,7 @@ test.describe('a level played two ways (D51)', () => {
   });
 });
 
-test.describe('the dark and the stairs (D52, D53)', () => {
+test.describe('the dark and the slabs (D52, D53, D138)', () => {
   test('a dark room is covered until kirra lights it', async ({ page }) => {
     await page.goto('/#level/the-dark-room');
     await page.locator('#start').click();
@@ -479,18 +479,18 @@ test.describe('the dark and the stairs (D52, D53)', () => {
     await expect(scene(page)).toHaveAttribute('data-dark', 'false');
   });
 
-  test('a stair comes and goes, and a step onto it while it is away bumps', async ({ page }) => {
+  test('a slab comes and goes, and a step onto it while it is away bumps', async ({ page }) => {
     await page.goto('/#level/the-moving-stairs');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
-    await expect(scene(page)).toHaveAttribute('data-stairs', 'stair:in');
+    await expect(scene(page)).toHaveAttribute('data-slabs', 'stair:in');
     await page.locator('#speed').selectOption('4');
     await run(page, 'wizard.move_up(2)\nwizard.move_right()\nwizard.wait()\nprint(stair.in_place)\nwizard.move_right()');
     await expect(page.locator('.printed')).toHaveText('False');
     await expect(scene(page)).toHaveAttribute('data-wizard', '3,2');
   });
 
-  test('osto beside the stair holds it', async ({ page }) => {
+  test('osto beside the slab holds it', async ({ page }) => {
     await page.goto('/#level/the-moving-stairs');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });

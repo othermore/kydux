@@ -26,7 +26,9 @@ import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
 import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
-import { type Outcome, type OutcomeCard, outcomeCard, withCode } from './outcome';
+import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
+import { openPlan, type PlanWindow } from './plan';
+import { withCode } from './words';
 import type { Screen } from './screen';
 
 const SPEEDS: Speed[] = [1, 2, 4];
@@ -615,6 +617,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   setPageTitle();
 
   let scene: SceneHandle | null = null;
+  let planShown: PlanWindow | null = null;
   let destroyed = false;
   let mounted = false;
 
@@ -631,6 +634,25 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           return;
         }
         scene = handle;
+        // The map opened by its spell (D134): the run waits until it is closed, and a
+        // run started again closes it.
+        handle.onMap(
+          (view) => {
+            planShown?.dismiss();
+            sceneParent.dataset.planOpen = 'true';
+            planShown = openPlan(view, () => {
+              planShown = null;
+              delete sceneParent.dataset.planOpen;
+              controller.resume();
+              editor.focus();
+            });
+          },
+          () => {
+            planShown?.dismiss();
+            planShown = null;
+            delete sceneParent.dataset.planOpen;
+          },
+        );
         zoom.attach(handle);
         controller.attach(handle);
       });
@@ -664,6 +686,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     },
     destroy() {
       destroyed = true;
+      planShown?.dismiss();
       shownCard?.close();
       guide?.node.remove();
       mapShown?.destroy();

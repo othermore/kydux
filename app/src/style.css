@@ -1765,3 +1765,47 @@ a.stop-body:focus-visible {
   padding: 0 10px;
   font-size: 14px;
 }
+
+/* The naughty child's map, open: a window over the whole page (D134). */
+.plan-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(31 35 48 / 70%);
+}
+
+.plan-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 8px 12px 10px;
+  border-radius: 8px;
+  background: #d9c595;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 45%);
+}
+
+.plan-title {
+  margin: 0;
+  color: #3f2c1a;
+  font-family: Georgia, serif;
+  font-size: 20px;
+}
+
+.plan-canvas {
+  display: block;
+  border: 2px solid #3f2c1a;
+  border-radius: 3px;
+}
+
+.plan-legend {
+  margin: 0;
+  color: #3f2c1a;
+  font-family: Georgia, serif;
+  font-size: 14px;
+}

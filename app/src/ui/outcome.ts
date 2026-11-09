@@ -5,6 +5,7 @@ import { blockedText } from '../engine/words';
 import { t } from '../i18n';
 import type { ErrorInfo, Explanation } from '../runtime/protocol';
 import { element } from './dom';
+import { withCode } from './words';
 
 /** What a run came to. For a level played in several ways (D51), `way` is the id
  * of the way the card speaks of; `won` is every way won, and `way_won` one way won
@@ -108,14 +109,6 @@ function outcomeWords(outcome: Outcome): string {
     case 'failed':
       return t('level.failed');
   }
-}
-
-/** The text with what is between backticks as code: `move_right` is a name to type. */
-export function withCode(said: string): (string | HTMLElement)[] {
-  return said
-    .split('`')
-    .map((part, index) => (index % 2 === 1 ? element('code', {}, [part]) : part))
-    .filter((part) => part !== '');
 }
 
 export interface OutcomeCard {

@@ -105,6 +105,12 @@
     "bed": "the bed",
     "map": "the naughty child's map"
   },
+  "plan": {
+    "title": "The naughty child's map",
+    "legend": "A cell is two numbers: x counts from the left, y from the top, and both start at 0.",
+    "close": "Close the map",
+    "enchanted": "enchanted"
+  },
   "guide": {
     "next": "Next",
     "skip": "Skip",

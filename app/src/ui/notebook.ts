@@ -8,7 +8,7 @@
 import type { LevelJson, CourseGiven } from '../runtime/protocol';
 import { t } from '../i18n';
 import { element } from './dom';
-import { withCode } from './outcome';
+import { withCode } from './words';
 
 /** The spells cast on a thing the child names (kydux_world.world.AIMED). */
 const AIMED = new Set(['fendra']);

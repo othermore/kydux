@@ -18,7 +18,7 @@ export interface ThingLayout {
   tile: Tile;
   /** For a door, how it opens; `none` for anything else. */
   lock: DoorLock;
-  /** For a stair, the ticks it is in place and then away (D53). */
+  /** For a slab, the ticks it is in place and then away (D53, D138). */
   period?: number;
   /** For a door, open from the start: an earlier level of the scene opened it (D65). */
   open: boolean;
@@ -70,6 +70,21 @@ export interface ActorLayout {
   asleep?: string;
 }
 
+/** What the plan of the scene is drawn from at a tick (D134). */
+export interface PlanView {
+  /** The world's map: `#` a wall, `=` furniture, anything else floor. */
+  rows: readonly string[];
+  /** The enchanted cells (D135), and the cells still dark (D52). */
+  enchanted: readonly Tile[];
+  unlit: readonly Tile[];
+  /** The wizard and every actor in sight, with where each stands and looks. */
+  figures: { id: string; kind: string; tile: Tile; facing: string }[];
+  /** The things on the map, not those carried. */
+  things: { id: string; kind: string; tile: Tile; open?: boolean }[];
+}
+
+export type { Tile };
+
 export interface Layout {
   rows: string[];
   width: number;
@@ -87,6 +102,8 @@ export interface Layout {
    * rooms of the scene, or none for the whole map (D73). */
   dark: boolean;
   darkArea: Tile[];
+  /** The cells that hide every figure in them (D135). */
+  enchanted: Tile[];
   /** Each tile's kind of terrain (D73): the scene's, or wall, floor and shelf. */
   terrain: string[][];
   /** Each tile's letter in the scene's map.txt (D73), or in the level's own map. */
@@ -95,6 +112,8 @@ export interface Layout {
    * actors it moves, by the way's id then the thing's: what a restart for that way
    * places (D85). */
   ways: Record<string, Record<string, Tile>>;
+  /** And which way each way turns the actors it names (D51). */
+  wayFacings: Record<string, Record<string, Facing>>;
   /** What the scene shows and the world does not hold, like a flat stone. */
   props: { kind: string; tile: Tile }[];
   /** The cell a sleep goal marks to sleep from (D130), or none. */
@@ -174,6 +193,10 @@ export function layout(level: LevelJson): Layout {
     const asleep = typeof spec.asleep === 'string' ? { asleep: spec.asleep } : {};
     actors.push({ id: String(spec.id), kind: String(spec.kind), tile, facing, sight, hidden: spec.hidden === true, ...asleep });
   }
+  // A reach goal may be hidden: the cell is said in words, and no mark drawn (D134).
+  for (const goal of asList(level.goals)) {
+    if (goal.kind === 'reach' && goal.hidden === true && typeof goal.marker === 'string') used.add(goal.marker);
+  }
   const markers = [...letters].filter(([letter]) => !used.has(letter));
   const shelves: Tile[] = [];
   rows.forEach((row, y) => {
@@ -190,13 +213,17 @@ export function layout(level: LevelJson): Layout {
     }
   }
   const ways: Record<string, Record<string, Tile>> = {};
+  const wayFacings: Record<string, Record<string, Facing>> = {};
   for (const way of asList(level.ways)) {
     const moved: Record<string, Tile> = {};
+    const turned: Record<string, Facing> = {};
     for (const spec of [...asList(way.things), ...asList(way.actors)]) {
       const tile = place(spec);
       if (tile) moved[String(spec.id)] = tile;
+      if (typeof spec.facing === 'string') turned[String(spec.id)] = spec.facing as Facing;
     }
     ways[String(way.id)] = moved;
+    wayFacings[String(way.id)] = turned;
   }
   return {
     rows,
@@ -209,13 +236,10 @@ export function layout(level: LevelJson): Layout {
     shelves,
     carrying,
     ways,
+    wayFacings,
     dark: level.dark === true,
-    darkArea: asList(level.dark_area as unknown).flatMap((box) => {
-      const [x0, y0, x1, y1] = (box as unknown as number[]).map(Number);
-      const tiles: Tile[] = [];
-      for (let y = y0 ?? 0; y <= (y1 ?? -1); y += 1) for (let x = x0 ?? 0; x <= (x1 ?? -1); x += 1) tiles.push([x, y]);
-      return tiles;
-    }),
+    darkArea: boxedCells(level.dark_area),
+    enchanted: boxedCells(level.enchanted),
     terrain: terrainOf(level, rows),
     letters: Array.isArray(level.terrain) ? (level.terrain as string[]) : rows,
     props: asList(level.props).flatMap((prop) => {
@@ -224,6 +248,16 @@ export function layout(level: LevelJson): Layout {
     }),
     ...sleepAtOf(level),
   };
+}
+
+/** The cells of a list of boxes, each x0, y0, x1, y1. */
+function boxedCells(boxes: unknown): Tile[] {
+  return asList(boxes).flatMap((box) => {
+    const [x0, y0, x1, y1] = (box as unknown as number[]).map(Number);
+    const tiles: Tile[] = [];
+    for (let y = y0 ?? 0; y <= (y1 ?? -1); y += 1) for (let x = x0 ?? 0; x <= (x1 ?? -1); x += 1) tiles.push([x, y]);
+    return tiles;
+  });
 }
 
 /** The cell a level's sleep goal marks to sleep from (D130), when it names one. */

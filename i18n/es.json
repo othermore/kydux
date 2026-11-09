@@ -105,6 +105,12 @@
     "bed": "la cama",
     "map": "el mapa del niño travieso"
   },
+  "plan": {
+    "title": "El mapa del niño travieso",
+    "legend": "Una casilla son dos números: la x cuenta desde la izquierda, la y desde arriba, y las dos empiezan en 0.",
+    "close": "Cerrar el mapa",
+    "enchanted": "encantado"
+  },
   "guide": {
     "next": "Siguiente",
     "skip": "Saltar",

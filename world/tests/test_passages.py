@@ -451,10 +451,10 @@ def test_the_tunnel_exit_keeps_dask_s_ticks():
 
 def test_by_the_statues_is_won_above_or_below_dask_with_one_if():
     """D146, D154: Dask stands still on the gallery's middle row, between the first two
-    statues and below them; looking up, the wizard goes down two and passes below him,
-    behind the lower wall's top, and looking down it crosses straight above him, before
-    the statues' bases. The mark is met on the way, two cells before the walk ends in the
-    first way."""
+    statues, which stand on that row too; looking up, the wizard goes down two and passes
+    below him, behind the lower wall's top, and looking down it crosses straight above
+    him, behind the statues. The mark is met on the way, two cells before the walk ends in
+    the first way."""
     level = "by-the-statues"
     won = run_code(real(level), solution(level))
     assert dict((way, result.status) for way, result in won.ways) == {

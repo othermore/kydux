@@ -170,14 +170,14 @@ describe('the plan draws a cut-out where it is painted (D159)', () => {
   const read = (path: string) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
   const cell = 40;
 
-  it("draws the crossing's statues at their painted box, on the row of the wall they stand against", () => {
+  it("draws the crossing's statues at their painted box, on the gallery's middle row", () => {
     const art = read('../../../content/art/scenes/the-crossing/art.json');
     const cut = read('../../../art/scenes/the-crossing/cut.json');
     const statues = Object.entries(cut.things as Record<string, { box: number[]; row: number }>).filter(([id]) =>
       id.startsWith('statue_'),
     );
-    expect(statues.map(([, thing]) => thing.row)).toEqual([5, 5, 5]);
-    const row = art.rows.find((one: { row: number; static?: boolean }) => one.row === 5 && one.static);
+    expect(statues.map(([, thing]) => thing.row)).toEqual([7, 7, 7]);
+    const row = art.rows.find((one: { row: number; static?: boolean }) => one.row === 7 && one.static);
     const [left, top] = paintedBox(0, row.top, 1, 1, art.cell, cell);
     // The row's image begins where the highest statue is painted, and the plan draws it
     // there, in cells as on the scene, not from the cell the statues stand on.

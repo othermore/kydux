@@ -461,10 +461,10 @@ The cells are where the figures walk (D149).
   are drawn toward the opening's middle, 0.2 cell each (`nudged`), so that a figure passes
   clear of the jambs and the two stay apart. A door is as wide as its cells (`cells` in
   `scene.json`, D150).
-- **The row a wall's foot is painted on is wall** (D154); what stands against the wall, a
-  statue, is on that row, so that a figure on the row below passes before its base. **The
-  first floor row below the wall's foot** is drawn 0.3 cell lower (`lowered_rows`), so that a
-  figure on it stands in the corridor and not on the wall.
+- **The row a wall's foot is painted on is wall** (D154). **The first floor row below the
+  wall's foot** is drawn 0.3 cell lower (`lowered_rows`), so that a figure on it stands in
+  the corridor and not on the wall. What stands out on the floor, a statue, is on the row of
+  its base, and a figure on the row behind it walks behind it.
 - **The row behind a lower wall's top is walked**, the top cut `over` it. Where the wall stands
   so close that only a hat would show, the row is drawn 0.3 higher (`lowered`, `by` -0.3).
 - **A level starts a cell past an arch**, never in it or on the cell beside its jamb.

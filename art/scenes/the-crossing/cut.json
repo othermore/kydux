@@ -3,70 +3,70 @@
   "sources": {
     "folder": "art/raw/game-crossing",
     "edits": "art/raw/game-crossing",
-    "painting": "crossing-base-2.png",
+    "painting": "crossing-statues-middle-3.png",
     "grid": "grid.json",
-    "ground": "crossing-base-2.png"
+    "ground": "crossing-statues-middle-3.png"
   },
   "things": {
     "statue_1": {
       "box": [
-        12.05,
-        4.4,
-        13.05,
-        6.95
+        11.95,
+        5.15,
+        13.2,
+        8.0
       ],
-      "row": 5,
+      "row": 7,
       "static": true,
       "solid": true,
       "mask": "difference",
-      "picture": "crossing-gone.png",
+      "picture": "crossing-no-statues.png",
       "diff": {
         "holes": 14000
       },
       "states": {
         "standing": "painting"
       },
-      "about": "The first statue, against the gallery's top wall, its picture on row 5, which is wall (D154): a figure on row 6 passes before its base."
+      "about": "The first statue, in the middle of the gallery (D154): its foot on row 7, the gallery's middle row, over whoever walks behind it on row 6."
     },
     "statue_2": {
       "box": [
-        13.95,
-        4.4,
-        14.97,
-        6.95
+        13.9,
+        5.15,
+        15.15,
+        8.0
       ],
-      "row": 5,
+      "row": 7,
       "static": true,
       "solid": true,
       "mask": "difference",
-      "picture": "crossing-gone.png",
+      "picture": "crossing-no-statues.png",
       "diff": {
         "holes": 14000
       },
       "states": {
         "standing": "painting"
       },
-      "about": "The second statue, on row 5."
+      "about": "The second statue, its foot on row 7."
     },
     "statue_3": {
       "box": [
-        17.03,
-        4.4,
-        18.12,
-        6.95
+        16.95,
+        5.15,
+        18.2,
+        8.0
       ],
-      "row": 5,
+      "row": 7,
       "static": true,
       "solid": true,
       "mask": "difference",
-      "picture": "crossing-gone.png",
+      "picture": "crossing-no-statues.png",
       "diff": {
         "holes": 14000
       },
       "states": {
         "standing": "painting"
       },
-      "about": "The third statue, on row 5."
+      "about": "The third statue, its foot on row 7."
     },
     "arch_top": {
       "box": [
@@ -100,8 +100,13 @@
       "static": true,
       "solid": true,
       "mask": "difference",
-      "picture": "crossing-gone.png",
-      "diff": {},
+      "picture": "crossing-arches-marked.png",
+      "diff": {
+        "threshold": 70,
+        "soft": 70,
+        "speck": 3,
+        "rim": true
+      },
       "states": {
         "standing": "painting"
       },
@@ -184,7 +189,7 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from its plan on the grid\n  (`tools/art/prompts/crossing-painted-3.md`), then edited by it without its grid\n  (`crossing-base.md`) and with its walls' gaps painted (`crossing-base-2.md`): the\n  scene's base (D148).\n- Its statues and its arches cut by the difference against the picture without them,\n  also Gemini's (`crossing-gone.md`); the lower wall's tops by the polygons traced on\n  their outlines.\n",
+  "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from its plan on the grid\n  (`tools/art/prompts/crossing-painted-3.md`), then edited by it without its grid\n  (`crossing-base.md`) and with its walls' gaps painted (`crossing-base-2.md`).\n- Its three statues standing in the middle of the gallery, painted by Gemini on that\n  picture with the statues taken out of it from its picture without them\n  (`crossing-gone.md`), given a picture of where each stands and one of the statues\n  alone (`crossing-statues-middle-3.md`): the scene's painting. The statues are cut by\n  the difference against the picture they were painted on, the arches against\n  Gemini's picture without them (`crossing-gone.md`) (D148); the lower wall's tops are\n  boxes on their outlines.\n",
   "lowered_rows": [
     6
   ],
@@ -301,12 +306,6 @@
       8.1,
       19.1,
       9.0
-    ],
-    [
-      14.0,
-      5.0,
-      15.0,
-      6.95
     ]
   ]
 }

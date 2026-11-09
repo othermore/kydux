@@ -11,7 +11,7 @@
     "Si mira hacia arriba, baja 2 casillas dentro del `if`, con cuatro espacios delante.",
     "Después del `if`, sin espacios delante, camina cuatro casillas a la derecha y baja dos."
   ],
-  "intro": "Dask está quieto en medio de la galería, debajo de las dos primeras estatuas. Nosotros estamos en la fila de arriba, junto a las bases de las estatuas. ¡Si mira hacia arriba, debemos bajar dos casillas y pasar por debajo de él, detrás del murete! Si mira hacia abajo, podemos cruzar recto, por arriba. Luego bajaremos hasta la marca, al principio del pasillo entre la segunda y la tercera estatua.",
+  "intro": "Dask está quieto en medio de la galería, entre las dos primeras estatuas. Nosotros estamos en la fila de arriba. ¡Si mira hacia arriba, debemos bajar dos casillas y pasar por debajo de él, detrás del murete! Si mira hacia abajo, podemos cruzar recto por la fila de arriba, detrás de él y de las estatuas. Luego bajaremos hasta la marca, al principio del pasillo entre la segunda y la tercera estatua.",
   "outro": "¡Hemos pasado sin que nos vea! A ver adónde lleva este pasillo.",
   "learned": "Ahora sabes que `if` ejecuta sus líneas solo cuando su condición es cierta, y que lo que viene después se ejecuta siempre.",
   "ways": {

@@ -1,0 +1,145 @@
+{
+  "about": "The corridor of doors and the tunnel's mouth, chapter 3's first scene (D136): the painting scene-tunnel-corridor, its grid removed by Gemini, the black round it painted as the castle's inside. Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-tunnel",
+    "edits": "art/raw/game-tunnel",
+    "painting": "tunnel-voids.png",
+    "grid": "grid.json",
+    "ground": "tunnel-voids.png"
+  },
+  "things": {
+    "door_a": {
+      "box": [
+        2.7,
+        8.8,
+        4.3,
+        10.7
+      ],
+      "row": 10,
+      "solid": true,
+      "without": "tunnel-voids.png",
+      "states": {
+        "closed": "painting"
+      },
+      "doorway": [
+        [
+          2.8,
+          10.62
+        ],
+        [
+          2.8,
+          9.4
+        ],
+        [
+          3.0,
+          9.1
+        ],
+        [
+          3.5,
+          8.95
+        ],
+        [
+          4.0,
+          9.1
+        ],
+        [
+          4.2,
+          9.4
+        ],
+        [
+          4.2,
+          10.62
+        ]
+      ],
+      "at": [
+        3,
+        10
+      ],
+      "about": "A door of the corridor's wall, shut, locked, and never opened: the plan names it, and the painting draws it."
+    },
+    "door_b": {
+      "box": [
+        10.5,
+        8.8,
+        12.1,
+        10.7
+      ],
+      "row": 10,
+      "solid": true,
+      "without": "tunnel-voids.png",
+      "states": {
+        "closed": "painting"
+      },
+      "doorway": [
+        [
+          10.6,
+          10.62
+        ],
+        [
+          10.6,
+          9.4
+        ],
+        [
+          10.8,
+          9.1
+        ],
+        [
+          11.3,
+          8.95
+        ],
+        [
+          11.8,
+          9.1
+        ],
+        [
+          12.0,
+          9.4
+        ],
+        [
+          12.0,
+          10.62
+        ]
+      ],
+      "at": [
+        11,
+        10
+      ],
+      "about": "The other door of the corridor's wall, as the first."
+    }
+  },
+  "cuts": [],
+  "castle": 0,
+  "thresholds": {
+    "outline": 100
+  },
+  "cut": false,
+  "source": "# The corridor of doors and the tunnel\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-tunnel-corridor.md`, then edited by it without its\n  grid (`game-tunnel-nogrid.md`).\n- What it left black round the corridor painted by Gemini from\n  `game-tunnel-voids.md`, joined by `tools/art/repaint.py`.\n",
+  "voids": {
+    "about": "What the model left black round the corridor painted as the castle's inside, dim rooms and thick walls (D136), the tunnel's mouth kept dark: painted by Gemini 3 Pro Image from tools/art/prompts/game-tunnel-voids.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
+    "from": "art/raw/game-tunnel/game-tunnel-nogrid.png",
+    "void": "black",
+    "leave": [
+      [
+        3360,
+        240,
+        3984,
+        870
+      ]
+    ],
+    "fade": 10,
+    "canvas": "art/raw/game-tunnel/tunnel-voids-canvas.png",
+    "painting": "art/raw/game-tunnel/tunnel-voids.png"
+  },
+  "dark": [
+    {
+      "about": "The tunnel's mouth: a figure going in darkens, before it fades (D100, D135).",
+      "columns": [
+        14,
+        15
+      ],
+      "from": 4.8,
+      "to": 3.8,
+      "most": 0.88
+    }
+  ]
+}

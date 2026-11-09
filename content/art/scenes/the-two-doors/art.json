@@ -1,0 +1,72 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [],
+  "things": {
+    "left_door": {
+      "row": 9,
+      "left": 586,
+      "top": 720,
+      "states": {
+        "closed": "left_door-closed.webp",
+        "open": "left_door-open.webp"
+      },
+      "under": true,
+      "rest": "closed",
+      "at": [
+        7,
+        8
+      ]
+    },
+    "right_door": {
+      "row": 9,
+      "left": 1046,
+      "top": 720,
+      "states": {
+        "closed": "right_door-closed.webp",
+        "open": "right_door-open.webp"
+      },
+      "under": true,
+      "rest": "closed",
+      "at": [
+        13,
+        8
+      ]
+    }
+  },
+  "nudged": [
+    {
+      "about": "The left door's opening lies a little left of its column.",
+      "cells": [
+        [
+          7,
+          8
+        ],
+        [
+          7,
+          9
+        ]
+      ],
+      "by": -0.4
+    },
+    {
+      "about": "The right door's opening lies more than half a cell left of its column.",
+      "cells": [
+        [
+          13,
+          8
+        ],
+        [
+          13,
+          9
+        ]
+      ],
+      "by": -0.6
+    }
+  ],
+  "source": "SOURCE.md"
+}

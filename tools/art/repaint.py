@@ -7,15 +7,23 @@
     tools/art/repaint.py <scene> fill [--section <name>]
     tools/art/repaint.py <scene> marks
     tools/art/repaint.py <scene> doorways
+    tools/art/repaint.py <scene> spaced
+    tools/art/repaint.py <scene> tiled --section <name>
+    tools/art/repaint.py <scene> placed --section <name>
 
 What to mend is the scene's settings' `repaint` (art/scenes/<scene>/cut.json,
 D82): the painting it starts from (`from`), how many pixels it grows by below
-(`grow`), the boxes of it, in its pixels, a model paints again (`boxes`), and
+(`grow`), the boxes of it, in its pixels, a model paints again (`boxes`),
 polygons where a box will not follow an edge (`areas`, each a list of [x, y]
-pixels), each faded in over FADE pixels round it or `fade`, the part of the
+pixels), and what is not painted at all (`void`, `black` or `paper`: what the
+model left of that colour, wider than a line, under `below`, joined to the
+picture's edge when it says `outside`, but for the boxes it is to stay in,
+`leave`), each faded in over FADE pixels round it or `fade`, the part of the
 canvas the model is given (`crop`, x0, y0, x1, y1, so that what is to be kept is
 large in its picture and hard to paint over), and where the canvas and the
-mended painting go.
+mended painting go. A model keeps pale paper as the page it is painted on, and
+may keep black as a gap: `flat` shows what it is to paint in that colour, [r, g,
+b], on the canvas.
 
 `canvas` writes the picture the model is given: the painting, grown below by its
 own bottom row stretched down, with the boxes and the grown band blurred, so that
@@ -51,6 +59,18 @@ A section that takes a door out of a doorway (`opened`) has the dark of the
 doorway the door hid made magenta in each of its `also` pictures, flooded from
 the opening's magenta, so that a wall cut round its openings leaves it out.
 
+`tiled` mends what is not painted without a model (a section with `void` and
+`texture`): it lays there a part of a picture (`texture`, the picture and its box
+x0, y0, x1, y1, in pixels), mirrored at each side so that it meets itself, made
+darker by `shade`, faded in over `fade` pixels: the tops of thick walls in the
+narrow gaps a model leaves black whatever it is asked.
+
+`placed` lays a part of a model's picture on the painting, scaled, without a
+model asked again (a section with `picture` and its box `part`, in the picture's
+pixels, and `at`, the box it goes to, in cells): what lies inside the ellipse of
+that box, faded in over `fade` pixels: a hole the model painted large and clear,
+drawn at the size of its cell.
+
 `fill` mends without a model: each box, a narrow upright strip, is painted row
 by row from the pixels just left and right of it, blended across, so that what
 lies under a thin thing (the entrance lamp's chain over a plain floor, the foot
@@ -59,11 +79,23 @@ as wide as tall, on a floor whose light changes both ways, is painted from all
 four sides (`sides` 4). A model given such a strip blurred painted the chain
 again.
 
+`spaced` moves the walls of a painting along its rows without a model (the scene's
+`spaced`): between two `columns`, in cells, a row of the picture is taken from
+where the `knots` say, each [old row, new row], in cells; what lies between two
+knots moved by as much is moved whole, a wall with its door, and what lies between
+the others is stretched, plain floor: three doors painted unevenly made even (the
+owner, 2026-11-05). Each side blends into the painting beside it over SEAM pixels.
+With `rows`, in cells, in place of `columns`, it moves the columns between those
+rows, by knots of old and new columns, the same way: a corridor made a cell wider,
+its wall and the room beyond moved whole and its plain floor stretched.
+
 `doorways` opens each door of the scene's settings' `doorways` without a model
 (D108): the door's leaf is found in the painting from bands of seeds across it
 (`seeds`, each x0, x1 and y in cells), within the box it is looked for in
 (`leaf_box`, in cells; the thing's box by default), flooded up to the black line that bounds
-it, its planks' lighter lines crossed, and filled row by row; and the whole
+it, its planks' lighter lines crossed, and filled row by row, or traced by hand
+(`shape`, a polygon in cells) where iron bands or an open outline stop or spill the
+flood; and the whole
 leaf, from the arch down to its foot and from one jamb to the other, is painted
 with the floor of the room beyond (`floor`, a box in cells of the painting
 itself, a plain part of that room's floor), stretched to it, DOORWAY_SHADE
@@ -129,6 +161,14 @@ import scene_settings  # noqa: E402
 REPO = HERE.parents[1]
 #: How wide the fade is round a box the model paints, in the painting's pixels.
 FADE = 40
+#: How wide a wall moved along its rows blends into the painting beside it.
+SEAM = 10
+#: What is not painted: the black a model left, or its pale paper, as the brightest
+#: channel or the darkest; and how wide a piece must be not to be a line, at a
+#: quarter of the size.
+VOID_BLACK = 26
+VOID_PAPER = 200
+VOID_OPENED = 7
 #: How much smaller the laying is searched at, and the blur of what is to be painted.
 SMALL = 8
 BLUR = 60
@@ -166,10 +206,61 @@ def settings_of(scene: str, section: str = "repaint") -> dict:
     return found
 
 
+def from_the_edge(empty: np.ndarray) -> np.ndarray:
+    """What of a mask is joined to the picture's edge through the mask itself: what lies
+    round the place, and not the dark corners of the rooms inside its walls."""
+    reached = np.zeros_like(empty)
+    reached[0, :], reached[-1, :], reached[:, 0], reached[:, -1] = (
+        empty[0, :],
+        empty[-1, :],
+        empty[:, 0],
+        empty[:, -1],
+    )
+    # Downward and upward sweeps, each row taking what its neighbour reached, and running
+    # along the row through what is empty, until nothing more is reached.
+    while True:
+        before = int(reached.sum())
+        for rows in (range(1, empty.shape[0]), range(empty.shape[0] - 2, -1, -1)):
+            for y in rows:
+                near = y - 1 if rows.step > 0 else y + 1
+                row = reached[y] | (reached[near] & empty[y])
+                # Each run of the row's empty pixels with one reached is reached whole.
+                edges = np.flatnonzero(np.diff(np.concatenate(([0], empty[y].astype(int), [0]))))
+                for start, end in zip(edges[::2], edges[1::2], strict=True):
+                    if row[start:end].any():
+                        row[start:end] = True
+                reached[y] = row
+        if int(reached.sum()) == before:
+            return reached
+
+
+def void_of(repaint: dict) -> np.ndarray:
+    """What a model left unpainted in a section's picture (`void`): black, or pale
+    paper, in pieces wider than a line, less the boxes it stays in (`leave`, in pixels)."""
+    # A model may leave a void a shade off what it was: it is found where it was first.
+    picture = np.array(Image.open(REPO / repaint.get("void_in", repaint["from"])).convert("RGB"))
+    if repaint["void"] == "black":
+        empty = picture.max(axis=2) < repaint.get("below", VOID_BLACK)
+    else:
+        empty = picture.min(axis=2) > VOID_PAPER
+    for x0, y0, x1, y1 in repaint.get("leave", []):
+        empty[y0:y1, x0:x1] = False
+    if repaint.get("outside"):
+        empty = from_the_edge(empty)
+    height, width = empty.shape
+    small = Image.fromarray(empty.astype(np.uint8) * 255).resize((width // 4, height // 4))
+    opened_up = small.filter(ImageFilter.MinFilter(VOID_OPENED)).filter(
+        ImageFilter.MaxFilter(VOID_OPENED + 2)
+    )
+    # Its pixels at the picture's size, up to what is empty and a little over the line.
+    grown_up = np.array(opened_up.resize((width, height), Image.BILINEAR)) > 127
+    return grown_up
+
+
 def painted_part(shape: tuple[int, int], repaint: dict) -> np.ndarray:
     """How much of each pixel the model paints: 1 in a box (`boxes`, x0, y0, x1, y1),
-    a polygon (`areas`, a list of [x, y]) or the grown band, 0 a fade beyond them
-    (`fade` pixels, FADE unless the section says)."""
+    a polygon (`areas`, a list of [x, y]), what is not painted (`void`) or the grown
+    band, 0 a fade beyond them (`fade` pixels, FADE unless the section says)."""
     height, width = shape
     grow, fade = repaint.get("grow", 0), repaint.get("fade", FADE)
     yy, xx = np.arange(height)[:, None], np.arange(width)[None, :]
@@ -179,11 +270,15 @@ def painted_part(shape: tuple[int, int], repaint: dict) -> np.ndarray:
         dx = np.maximum(np.maximum(x0 - xx, xx - x1), 0)
         dy = np.maximum(np.maximum(y0 - yy, yy - y1), 0)
         kept = np.minimum(kept, np.clip(np.hypot(dx, dy) / fade, 0, 1))
-    if repaint.get("areas"):
+    if repaint.get("areas") or repaint.get("void"):
         inside = Image.new("L", (width, height), 0)
         draw = ImageDraw.Draw(inside)
-        for area in repaint["areas"]:
+        for area in repaint.get("areas", []):
             draw.polygon([tuple(point) for point in area], fill=255)
+        if repaint.get("void"):
+            part = void_of(repaint)
+            inside = Image.fromarray((np.array(inside) > 0) | part).convert("L")
+            inside = Image.fromarray((np.array(inside) > 0).astype(np.uint8) * 255)
         # Grown a pixel at a time, each ring a step further from the polygon.
         ring = np.array(inside) > 0
         kept = np.minimum(kept, np.where(ring, 0.0, 1.0))
@@ -210,6 +305,8 @@ def canvas(scene: str, section: str = "repaint") -> Path:
         if repaint.get("plain")
         else np.array(Image.fromarray(painting).filter(ImageFilter.GaussianBlur(BLUR)))
     )
+    if repaint.get("flat"):
+        blurred = np.full_like(painting, repaint["flat"])
     part = painted_part(painting.shape[:2], repaint)[..., None]
     out = (painting * (1 - part) + blurred * part).astype(np.uint8)
     x0, y0, x1, y1 = repaint["crop"]
@@ -419,6 +516,107 @@ def filled(picture: np.ndarray, boxes: list, sides: int = 2) -> np.ndarray:
     return picture.clip(0, 255).astype(np.uint8)
 
 
+def spaced_rows(knots: list[tuple[int, int]], height: int) -> np.ndarray:
+    """For each row of the new picture, the row of the old it is taken from, between
+    the knots ([old, new], in pixels); outside them, the row itself."""
+    rows = np.arange(height, dtype=np.float32)
+    old, new = zip(*knots, strict=True)
+    inside = (rows >= new[0]) & (rows <= new[-1])
+    rows[inside] = np.interp(rows[inside], new, old)
+    return rows
+
+
+def spaced(scene: str) -> Path:
+    settings = scene_settings.settings(scene)
+    section = settings.data["spaced"]
+    picture = np.array(Image.open(REPO / section["from"]).convert("RGB")).astype(np.float32)
+    gx, gy = settings.grid["x"], settings.grid["y"]
+    # By columns, the same as by rows on the picture turned over its diagonal.
+    across = "rows" in section
+    along, side = (gx, gy) if across else (gy, gx)
+    if across:
+        picture = picture.transpose(1, 0, 2)
+    knots = [
+        (
+            round(along["offset"] + old * along["spacing"]),
+            round(along["offset"] + new * along["spacing"]),
+        )
+        for old, new in section["knots"]
+    ]
+    rows = spaced_rows(knots, picture.shape[0])
+    low = np.floor(rows).astype(int)
+    high = np.minimum(low + 1, picture.shape[0] - 1)
+    share = (rows - low)[:, None, None]
+    moved = picture[low] * (1 - share) + picture[high] * share
+    first, last = section["rows"] if across else section["columns"]
+    x0, x1 = (
+        round(side["offset"] + first * side["spacing"]),
+        round(side["offset"] + last * side["spacing"]),
+    )
+    # All of the moved picture between them, blending into the painting beside.
+    weight = np.clip(
+        np.minimum(np.arange(picture.shape[1]) - x0, x1 - np.arange(picture.shape[1])) / SEAM, 0, 1
+    )[None, :, None]
+    out = picture * (1 - weight) + moved * weight
+    if across:
+        out = out.transpose(1, 0, 2)
+    target = REPO / section["painting"]
+    Image.fromarray(out.clip(0, 255).astype(np.uint8)).save(target)
+    return target
+
+
+def tiled_over(shape: tuple[int, int], tile: np.ndarray) -> np.ndarray:
+    """A picture of `shape` covered with `tile`, mirrored at each side so that it meets
+    itself with no seam."""
+    both = np.concatenate([tile, tile[:, ::-1]], axis=1)
+    both = np.concatenate([both, both[::-1]], axis=0)
+    rows = np.arange(shape[0]) % both.shape[0]
+    columns = np.arange(shape[1]) % both.shape[1]
+    return both[rows][:, columns]
+
+
+def tiled(scene: str, section: str) -> Path:
+    repaint = settings_of(scene, section)
+    picture = np.array(Image.open(REPO / repaint["from"]).convert("RGB")).astype(np.float32)
+    name, x0, y0, x1, y1 = repaint["texture"]
+    source = np.array(Image.open(REPO / name).convert("RGB")).astype(np.float32)
+    laid_over = tiled_over(picture.shape[:2], source[y0:y1, x0:x1]) * repaint.get("shade", 1.0)
+    part = painted_part(picture.shape[:2], repaint)[..., None]
+    out = picture * (1 - part) + laid_over * part
+    target = REPO / repaint["painting"]
+    Image.fromarray(out.clip(0, 255).astype(np.uint8)).save(target)
+    return target
+
+
+def ellipse_part(width: int, height: int, fade: int) -> np.ndarray:
+    """How much of a box the ellipse in it takes: 1 inside, 0 outside, a fade between."""
+    ys = (np.arange(height) + 0.5 - height / 2) / (height / 2)
+    xs = (np.arange(width) + 0.5 - width / 2) / (width / 2)
+    radius = np.sqrt(ys[:, None] ** 2 + xs[None, :] ** 2)
+    edge = max(1, fade) / (min(width, height) / 2)
+    return np.clip((1 - radius) / edge, 0, 1)
+
+
+def placed(scene: str, section: str) -> Path:
+    settings = scene_settings.settings(scene)
+    repaint = settings.data[section]
+    picture = Image.open(REPO / repaint["from"]).convert("RGB")
+    painting = np.array(picture).astype(np.float32)
+    gx, gy = settings.grid["x"], settings.grid["y"]
+    x0, y0, x1, y1 = repaint["at"]
+    left, top = round(gx["offset"] + x0 * gx["spacing"]), round(gy["offset"] + y0 * gy["spacing"])
+    width = round((x1 - x0) * gx["spacing"])
+    height = round((y1 - y0) * gy["spacing"])
+    part = Image.open(REPO / repaint["picture"]).convert("RGB").crop(tuple(repaint["part"]))
+    shown = np.array(part.resize((width, height), Image.LANCZOS)).astype(np.float32)
+    alpha = ellipse_part(width, height, repaint.get("fade", 6))[..., None]
+    here = painting[top : top + height, left : left + width]
+    painting[top : top + height, left : left + width] = here * (1 - alpha) + shown * alpha
+    target = REPO / repaint["painting"]
+    Image.fromarray(painting.clip(0, 255).astype(np.uint8)).save(target)
+    return target
+
+
 def fill(scene: str, section: str = "repaint") -> Path:
     repaint = settings_of(scene, section)
     target = REPO / repaint["painting"]
@@ -603,6 +801,13 @@ def leaf_of(crop: np.ndarray, bands: list[tuple[int, int, int]]) -> np.ndarray:
     return image_first.filled(leaf, leaf.size)
 
 
+def polygon_in(shape: tuple[int, int], box: tuple[int, int, int, int], points: list) -> np.ndarray:
+    """A polygon of the picture's pixels as a mask of a crop of it from `box`."""
+    mask = Image.new("L", (shape[1], shape[0]), 0)
+    ImageDraw.Draw(mask).polygon([(x - box[0], y - box[1]) for x, y in points], fill=255)
+    return np.array(mask) > 0
+
+
 def doorways(scene: str) -> list[Path]:
     settings = scene_settings.settings(scene)
     painting = np.array(Image.open(settings.painting).convert("RGB"))
@@ -632,7 +837,13 @@ def doorways(scene: str) -> list[Path]:
             (px(left) - box[0], px(right) - box[0], py(across) - box[1])
             for left, right, across in door["seeds"]
         ]
-        shut = leaf_of(crop, bands)
+        # The leaf's shape traced by hand (`shape`, in cells), where bands of iron or an
+        # open outline keep a flood from filling it; else flooded from its seeds.
+        shut = (
+            polygon_in(crop.shape[:2], box, [(px(x), py(y)) for x, y in door["shape"]])
+            if "shape" in door
+            else leaf_of(crop, bands)
+        )
         # Down to the floor's own line under the box, looked for `sill` cells below it.
         below = round(door.get("sill", 0.0) * gy["spacing"])
         tall = np.pad(painting, ((0, below), (0, 0), (0, 0)), mode="edge")
@@ -1016,17 +1227,24 @@ def main(arguments: list[str]) -> int:
         at = arguments.index("--section")
         section = arguments[at + 1]
         arguments = arguments[:at] + arguments[at + 2 :]
-    if len(arguments) < 2 or arguments[1] not in ("canvas", "join", "fill", "marks", "doorways"):
+    verbs = ("canvas", "join", "fill", "marks", "doorways", "spaced", "tiled", "placed")
+    if len(arguments) < 2 or arguments[1] not in verbs:
         print(
             "usage: repaint.py <scene> canvas | join <picture> | fill | marks | doorways"
-            " [--section <name>]"
+            " | spaced | tiled | placed [--section <name>]"
         )
         return 2
     if arguments[1] in ("marks", "doorways"):
         for path in (marks if arguments[1] == "marks" else doorways)(arguments[0]):
             print(path.relative_to(REPO))
         return 0
-    if arguments[1] == "canvas":
+    if arguments[1] == "spaced":
+        print(spaced(arguments[0]).relative_to(REPO))
+    elif arguments[1] == "tiled":
+        print(tiled(arguments[0], section).relative_to(REPO))
+    elif arguments[1] == "placed":
+        print(placed(arguments[0], section).relative_to(REPO))
+    elif arguments[1] == "canvas":
         print(canvas(arguments[0], section).relative_to(REPO))
     elif arguments[1] == "fill":
         print(fill(arguments[0], section).relative_to(REPO))

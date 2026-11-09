@@ -1,0 +1,837 @@
+{
+  "about": "The way down, chapter 3's seventh scene (D136), the only one laid out on the grid before it was painted (D102): the painting scene-way-down, chosen under its layout, its grid removed by Gemini, what lies round it painted as the castle's inside. Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-way-down",
+    "edits": "art/raw/game-way-down",
+    "painting": "way-down-voids.png",
+    "grid": "grid.json",
+    "ground": "way-down-voids.png"
+  },
+  "things": {
+    "door": {
+      "box": [
+        8.3,
+        5.1,
+        11.75,
+        7.45
+      ],
+      "row": 6,
+      "solid": true,
+      "without": "way-down-doorway.png",
+      "states": {
+        "closed": "painting",
+        "open": {
+          "picture": "way-down-swung.png",
+          "without": "way-down-doorway.png",
+          "leaf": [
+            [
+              [
+                8.346,
+                5.418
+              ],
+              [
+                8.513,
+                5.324
+              ],
+              [
+                8.773,
+                5.324
+              ],
+              [
+                8.981,
+                5.481
+              ],
+              [
+                9.096,
+                5.742
+              ],
+              [
+                9.096,
+                5.91
+              ],
+              [
+                9.169,
+                5.91
+              ],
+              [
+                9.169,
+                6.172
+              ],
+              [
+                9.117,
+                6.172
+              ],
+              [
+                9.117,
+                6.674
+              ],
+              [
+                9.169,
+                6.674
+              ],
+              [
+                9.169,
+                6.957
+              ],
+              [
+                9.117,
+                6.957
+              ],
+              [
+                9.117,
+                7.135
+              ],
+              [
+                8.981,
+                7.261
+              ],
+              [
+                8.773,
+                7.392
+              ],
+              [
+                8.523,
+                7.392
+              ],
+              [
+                8.408,
+                7.261
+              ],
+              [
+                8.346,
+                6.371
+              ]
+            ],
+            [
+              [
+                11.7,
+                5.418
+              ],
+              [
+                11.533,
+                5.324
+              ],
+              [
+                11.273,
+                5.324
+              ],
+              [
+                11.065,
+                5.481
+              ],
+              [
+                10.971,
+                5.742
+              ],
+              [
+                10.971,
+                5.926
+              ],
+              [
+                10.908,
+                5.926
+              ],
+              [
+                10.908,
+                6.172
+              ],
+              [
+                10.96,
+                6.172
+              ],
+              [
+                10.96,
+                6.674
+              ],
+              [
+                10.908,
+                6.674
+              ],
+              [
+                10.908,
+                6.947
+              ],
+              [
+                10.96,
+                6.947
+              ],
+              [
+                10.96,
+                7.135
+              ],
+              [
+                11.117,
+                7.261
+              ],
+              [
+                11.325,
+                7.392
+              ],
+              [
+                11.585,
+                7.392
+              ],
+              [
+                11.679,
+                7.261
+              ],
+              [
+                11.721,
+                6.371
+              ]
+            ]
+          ]
+        }
+      },
+      "at": [
+        10,
+        5
+      ],
+      "under": true,
+      "reach": 0.45,
+      "rest": "closed",
+      "about": "The double door across the corridor: shut, its leaves within their doorway (`doorway`, D113); open, each leaf at an angle on its hinges at the opening's edge, cut by the polygons traced round them (`leaf`), its doorway showing the corridor's floor beyond down to a threshold (doorways, D108, D114).",
+      "doorway": [
+        [
+          10.031,
+          5.334
+        ],
+        [
+          10.352,
+          5.351
+        ],
+        [
+          10.59,
+          5.443
+        ],
+        [
+          10.806,
+          5.589
+        ],
+        [
+          10.923,
+          5.778
+        ],
+        [
+          10.973,
+          5.966
+        ],
+        [
+          10.973,
+          7.138
+        ],
+        [
+          10.677,
+          7.134
+        ],
+        [
+          10.652,
+          7.142
+        ],
+        [
+          10.552,
+          7.142
+        ],
+        [
+          10.377,
+          7.134
+        ],
+        [
+          10.352,
+          7.142
+        ],
+        [
+          10.252,
+          7.142
+        ],
+        [
+          10.077,
+          7.134
+        ],
+        [
+          10.052,
+          7.142
+        ],
+        [
+          9.952,
+          7.142
+        ],
+        [
+          9.777,
+          7.134
+        ],
+        [
+          9.752,
+          7.142
+        ],
+        [
+          9.652,
+          7.142
+        ],
+        [
+          9.477,
+          7.134
+        ],
+        [
+          9.452,
+          7.142
+        ],
+        [
+          9.352,
+          7.142
+        ],
+        [
+          9.173,
+          7.134
+        ],
+        [
+          9.173,
+          5.966
+        ],
+        [
+          9.215,
+          5.795
+        ],
+        [
+          9.327,
+          5.598
+        ],
+        [
+          9.531,
+          5.443
+        ],
+        [
+          9.773,
+          5.351
+        ]
+      ]
+    },
+    "arch_low": {
+      "box": [
+        8.92,
+        13.45,
+        11.1,
+        15.0
+      ],
+      "row": 14,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "under": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The arch at the corridor's foot, over whoever walks under it.",
+      "polygon": [
+        [
+          8.97,
+          14.98
+        ],
+        [
+          8.97,
+          14.1
+        ],
+        [
+          9.1,
+          13.85
+        ],
+        [
+          9.4,
+          13.62
+        ],
+        [
+          10.0,
+          13.52
+        ],
+        [
+          10.6,
+          13.62
+        ],
+        [
+          10.9,
+          13.85
+        ],
+        [
+          11.04,
+          14.1
+        ],
+        [
+          11.04,
+          14.98
+        ],
+        [
+          10.81,
+          14.98
+        ],
+        [
+          10.81,
+          14.3
+        ],
+        [
+          10.6,
+          14.05
+        ],
+        [
+          10.0,
+          13.95
+        ],
+        [
+          9.45,
+          14.05
+        ],
+        [
+          9.28,
+          14.3
+        ],
+        [
+          9.28,
+          14.98
+        ]
+      ]
+    },
+    "arch_door": {
+      "box": [
+        8.9,
+        5.0,
+        11.2,
+        7.2
+      ],
+      "row": 6,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "under": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The stone arch round the door, over whoever walks through its doorway.",
+      "polygon": [
+        [
+          9.0,
+          7.1
+        ],
+        [
+          9.0,
+          6.1
+        ],
+        [
+          9.05,
+          5.8
+        ],
+        [
+          9.2,
+          5.55
+        ],
+        [
+          9.45,
+          5.35
+        ],
+        [
+          9.75,
+          5.22
+        ],
+        [
+          10.06,
+          5.18
+        ],
+        [
+          10.37,
+          5.22
+        ],
+        [
+          10.67,
+          5.35
+        ],
+        [
+          10.92,
+          5.55
+        ],
+        [
+          11.07,
+          5.8
+        ],
+        [
+          11.12,
+          6.1
+        ],
+        [
+          11.12,
+          7.1
+        ]
+      ]
+    },
+    "slab": {
+      "box": [
+        8.98,
+        6.98,
+        11.12,
+        8.02
+      ],
+      "row": 7,
+      "solid": false,
+      "without": "way-down-voids.png",
+      "states": {
+        "hole": {
+          "picture": "way-down-hole.png",
+          "traced": [
+            [
+              11.08,
+              7.5
+            ],
+            [
+              11.03,
+              7.648
+            ],
+            [
+              10.883,
+              7.782
+            ],
+            [
+              10.655,
+              7.888
+            ],
+            [
+              10.368,
+              7.957
+            ],
+            [
+              10.05,
+              7.98
+            ],
+            [
+              9.732,
+              7.957
+            ],
+            [
+              9.445,
+              7.888
+            ],
+            [
+              9.217,
+              7.782
+            ],
+            [
+              9.07,
+              7.648
+            ],
+            [
+              9.02,
+              7.5
+            ],
+            [
+              9.07,
+              7.352
+            ],
+            [
+              9.217,
+              7.218
+            ],
+            [
+              9.445,
+              7.112
+            ],
+            [
+              9.732,
+              7.043
+            ],
+            [
+              10.05,
+              7.02
+            ],
+            [
+              10.368,
+              7.043
+            ],
+            [
+              10.655,
+              7.112
+            ],
+            [
+              10.883,
+              7.218
+            ],
+            [
+              11.03,
+              7.352
+            ]
+          ]
+        }
+      },
+      "at": [
+        10,
+        7
+      ],
+      "about": "The hole the slab comes and goes over (D138), across the whole corridor."
+    },
+    "key": {
+      "box": [
+        9.5,
+        7.05,
+        10.5,
+        7.95
+      ],
+      "row": 7,
+      "solid": false,
+      "without": "way-down-voids.png",
+      "states": {
+        "lying": {
+          "picture": "../game-storeroom/storeroom-whole.png",
+          "traced": [
+            [
+              10.228,
+              7.142
+            ],
+            [
+              10.384,
+              7.177
+            ],
+            [
+              10.436,
+              7.288
+            ],
+            [
+              10.419,
+              7.41
+            ],
+            [
+              10.315,
+              7.48
+            ],
+            [
+              10.176,
+              7.463
+            ],
+            [
+              9.985,
+              7.585
+            ],
+            [
+              9.967,
+              7.714
+            ],
+            [
+              9.863,
+              7.742
+            ],
+            [
+              9.828,
+              7.864
+            ],
+            [
+              9.776,
+              7.874
+            ],
+            [
+              9.707,
+              7.777
+            ],
+            [
+              9.62,
+              7.794
+            ],
+            [
+              9.585,
+              7.735
+            ],
+            [
+              9.638,
+              7.689
+            ],
+            [
+              10.002,
+              7.421
+            ],
+            [
+              10.026,
+              7.323
+            ],
+            [
+              10.072,
+              7.201
+            ]
+          ]
+        }
+      },
+      "at": [
+        10,
+        7
+      ],
+      "about": "The storeroom's key, cut there, and drawn on the cell the level lays it on (D85, D109)."
+    }
+  },
+  "cuts": [],
+  "castle": 0,
+  "thresholds": {
+    "outline": 100
+  },
+  "cut": false,
+  "source": "# The way down\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Laid out on the grid by `tools/art/layout.py`, painted by Gemini 3 Pro Image\n  (`gemini-3-pro-image`) from `tools/art/prompts/scene-way-down.md` on that\n  layout, then edited by it without its grid and with the arch at the top\n  dimmed (`game-way-down-nogrid.md`).\n- What lies round the corridors painted by Gemini from\n  `game-way-down-voids.md`, joined by `tools/art/repaint.py`.\n- The door's doorway opened by `tools/art/repaint.py doorways`, and its two\n  leaves swung open painted by Gemini (`game-way-down-swung.md`) in boxes,\n  joined by `tools/art/repaint.py`.\n- Its key is the storeroom's, cut there; its hole is the storeroom's hole picture\n  from Gemini, laid across the corridor by `tools/art/repaint.py placed`.\n",
+  "voids": {
+    "about": "What lies round the corridors and rooms, flat and dark as the model left it, painted as the castle's solid stone and dim rooms (D136): by Gemini 3 Pro Image from tools/art/prompts/game-way-down-voids.md on the canvas this makes, shown flat in a dim colour, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
+    "from": "art/raw/game-way-down/game-way-down-nogrid.png",
+    "void": "black",
+    "below": 62,
+    "outside": true,
+    "flat": [
+      86,
+      78,
+      92
+    ],
+    "fade": 10,
+    "canvas": "art/raw/game-way-down/way-down-voids-canvas.png",
+    "painting": "art/raw/game-way-down/way-down-voids.png"
+  },
+  "doorways": {
+    "about": "The door opened by tools/art/repaint.py doorways (D108): its two leaves painted with the floor of the corridor beyond, taken from the painting, down to a threshold (D114).",
+    "doors": [
+      {
+        "thing": "door",
+        "seeds": [],
+        "shape": [
+          [
+            9.2,
+            7.0
+          ],
+          [
+            9.2,
+            6.0
+          ],
+          [
+            9.24,
+            5.82
+          ],
+          [
+            9.36,
+            5.62
+          ],
+          [
+            9.56,
+            5.47
+          ],
+          [
+            9.8,
+            5.38
+          ],
+          [
+            10.06,
+            5.36
+          ],
+          [
+            10.32,
+            5.38
+          ],
+          [
+            10.56,
+            5.47
+          ],
+          [
+            10.78,
+            5.62
+          ],
+          [
+            10.9,
+            5.82
+          ],
+          [
+            10.94,
+            6.0
+          ],
+          [
+            10.94,
+            7.0
+          ]
+        ],
+        "floor": [
+          9.4,
+          3.5,
+          10.65,
+          4.6
+        ],
+        "painting": "way-down-doorway.png",
+        "sill": 0.1,
+        "leaf_box": [
+          9.1,
+          5.25,
+          11.05,
+          7.0
+        ]
+      }
+    ]
+  },
+  "swung": {
+    "about": "The door seen open (D111, D116): its two leaves swung toward us on hinges at the opening's edges, each at an angle over the arch's stones. Painted by Gemini 3 Pro Image from tools/art/prompts/game-way-down-swung.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the boxes.",
+    "from": "art/raw/game-way-down/way-down-doorway.png",
+    "boxes": [
+      [
+        1992,
+        1219,
+        2220,
+        1756
+      ],
+      [
+        2616,
+        1219,
+        2820,
+        1756
+      ]
+    ],
+    "fade": 10,
+    "crop": [
+      1700,
+      1000,
+      3000,
+      2040
+    ],
+    "canvas": "art/raw/game-way-down/way-down-swung-canvas.png",
+    "painting": "art/raw/game-way-down/way-down-swung.png"
+  },
+  "nudged": [
+    {
+      "about": "The corridor's middle lies near column 10's left line: whoever walks the column walks its middle.",
+      "cells": [
+        [
+          10,
+          0
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "by": -0.45
+    }
+  ],
+  "hole": {
+    "about": "The hole in the corridor's floor where the slab comes and goes (D138): the storeroom's, Gemini's picture of it, laid across the corridor by tools/art/repaint.py placed, no model asked.",
+    "from": "art/raw/game-way-down/way-down-doorway.png",
+    "picture": "art/raw/game-storeroom/game-storeroom-hole.png",
+    "part": [
+      1130,
+      1650,
+      3790,
+      3420
+    ],
+    "at": [
+      9.02,
+      7.02,
+      11.08,
+      7.98
+    ],
+    "fade": 8,
+    "painting": "art/raw/game-way-down/way-down-hole.png"
+  },
+  "kept": [
+    [
+      8.9,
+      5.0,
+      11.2,
+      7.2
+    ],
+    [
+      8.92,
+      13.45,
+      11.1,
+      15.0
+    ]
+  ]
+}

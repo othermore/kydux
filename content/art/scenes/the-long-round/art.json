@@ -1,0 +1,35 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 13,
+      "image": "row-13-static-under.webp",
+      "top": 1243,
+      "static": true,
+      "under": true
+    }
+  ],
+  "things": {},
+  "nudged": [
+    {
+      "about": "The corridor's middle lies on column 10's left line: whoever walks the column walks its middle.",
+      "cells": [
+        [
+          10,
+          0
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "by": -0.45
+    }
+  ],
+  "source": "SOURCE.md"
+}

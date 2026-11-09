@@ -1,0 +1,155 @@
+{
+  "about": "The long round, chapter 3's fifth scene (D136): the painting scene-long-round, its grid removed by Gemini, the black round its rooms painted as the castle's inside. Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-long-round",
+    "edits": "art/raw/game-long-round",
+    "painting": "long-round-whole.png",
+    "grid": "grid.json",
+    "ground": "long-round-whole.png"
+  },
+  "things": {
+    "arch_low": {
+      "box": [
+        9.03,
+        12.95,
+        11.0,
+        14.0
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "under": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The arch at the corridor's foot, over whoever walks under it.",
+      "polygon": [
+        [
+          9.08,
+          14.0
+        ],
+        [
+          9.08,
+          13.85
+        ],
+        [
+          9.18,
+          13.5
+        ],
+        [
+          9.45,
+          13.2
+        ],
+        [
+          9.99,
+          13.01
+        ],
+        [
+          10.5,
+          13.2
+        ],
+        [
+          10.8,
+          13.5
+        ],
+        [
+          10.95,
+          13.85
+        ],
+        [
+          10.95,
+          14.0
+        ],
+        [
+          10.7,
+          14.0
+        ],
+        [
+          10.55,
+          13.7
+        ],
+        [
+          10.3,
+          13.5
+        ],
+        [
+          9.99,
+          13.43
+        ],
+        [
+          9.7,
+          13.5
+        ],
+        [
+          9.45,
+          13.7
+        ],
+        [
+          9.33,
+          14.0
+        ]
+      ]
+    }
+  },
+  "cuts": [],
+  "castle": 0,
+  "thresholds": {
+    "outline": 100
+  },
+  "cut": false,
+  "source": "# The long round\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-long-round.md`, then edited by it without its\n  grid (`game-long-round-nogrid.md`).\n- What it left black painted by Gemini from `game-long-round-voids.md` and\n  `game-long-round-voids-more.md`, joined by `tools/art/repaint.py`, and what\n  still was black tiled from stones of the crossing's picture (`tiled`).\n",
+  "voids": {
+    "about": "What the model left black between the rooms and the corridors painted as the castle's inside, thick walls and dim rooms (D136): by Gemini 3 Pro Image from tools/art/prompts/game-long-round-voids.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
+    "from": "art/raw/game-long-round/game-long-round-nogrid.png",
+    "void": "black",
+    "fade": 10,
+    "canvas": "art/raw/game-long-round/long-round-voids-canvas.png",
+    "painting": "art/raw/game-long-round/long-round-voids.png"
+  },
+  "voids_more": {
+    "about": "What the model left black of the voids, shown it flat in a dim colour, since it keeps black as a gap: by Gemini 3 Pro Image from tools/art/prompts/game-long-round-voids-more.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
+    "from": "art/raw/game-long-round/long-round-voids.png",
+    "void": "black",
+    "flat": [
+      86,
+      78,
+      92
+    ],
+    "fade": 10,
+    "canvas": "art/raw/game-long-round/long-round-voids-more-canvas.png",
+    "painting": "art/raw/game-long-round/long-round-mended.png"
+  },
+  "tiled": {
+    "about": "What the model still left black, the tops of thick walls in stone blocks, taken from the picture's own stones by tools/art/repaint.py tiled, no model asked.",
+    "from": "art/raw/game-long-round/long-round-mended.png",
+    "void": "black",
+    "below": 44,
+    "fade": 6,
+    "texture": [
+      "art/raw/game-crossing/crossing-mended.png",
+      100,
+      60,
+      900,
+      1000
+    ],
+    "shade": 0.72,
+    "painting": "art/raw/game-long-round/long-round-whole.png"
+  },
+  "nudged": [
+    {
+      "about": "The corridor's middle lies on column 10's left line: whoever walks the column walks its middle.",
+      "cells": [
+        [
+          10,
+          0
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "by": -0.45
+    }
+  ]
+}

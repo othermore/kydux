@@ -1,0 +1,98 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 7,
+      "image": "row-7-static-under.webp",
+      "top": 456,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 12,
+      "image": "row-12-static-under.webp",
+      "top": 958,
+      "static": true,
+      "under": true
+    }
+  ],
+  "things": {
+    "store_door": {
+      "row": 12,
+      "left": 864,
+      "top": 1008,
+      "states": {
+        "closed": "store_door-closed.webp",
+        "open": "store_door-open.webp"
+      },
+      "under": true,
+      "rest": "closed",
+      "at": [
+        10,
+        10
+      ]
+    },
+    "key": {
+      "row": 7,
+      "left": 912,
+      "top": 677,
+      "states": {
+        "lying": "key-lying.webp"
+      },
+      "at": [
+        10,
+        7
+      ]
+    },
+    "slab": {
+      "row": 7,
+      "left": 269,
+      "top": 670,
+      "states": {
+        "hole": "slab-hole.webp"
+      },
+      "at": [
+        3,
+        7
+      ]
+    }
+  },
+  "lowered": [
+    {
+      "about": "The corridor's floor is one row high: whoever stands by the wall stands on it.",
+      "cells": [
+        [
+          0,
+          6
+        ],
+        [
+          1,
+          6
+        ]
+      ],
+      "by": 0.25
+    }
+  ],
+  "nudged": [
+    {
+      "about": "The door's opening lies half a cell left of its column.",
+      "cells": [
+        [
+          10,
+          10
+        ],
+        [
+          10,
+          12
+        ]
+      ],
+      "by": -0.5
+    }
+  ],
+  "source": "SOURCE.md"
+}

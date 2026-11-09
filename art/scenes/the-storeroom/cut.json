@@ -1,0 +1,748 @@
+{
+  "about": "The storeroom, chapter 3's sixth scene (D136): the painting scene-dark-room, its grid removed by Gemini, the dark bands round it painted as the castle's inside, its key cut out for the game to draw (D85), its door open, and a hole in its corridor (D138). Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-storeroom",
+    "edits": "art/raw/game-storeroom",
+    "painting": "storeroom-nokey.png",
+    "grid": "grid.json",
+    "ground": "storeroom-nokey.png"
+  },
+  "things": {
+    "store_door": {
+      "box": [
+        9.0,
+        10.5,
+        12.1,
+        13.3
+      ],
+      "row": 12,
+      "solid": true,
+      "without": "storeroom-doorway.png",
+      "states": {
+        "closed": "painting",
+        "open": {
+          "picture": "storeroom-swung.png",
+          "without": "storeroom-doorway.png",
+          "leaf": [
+            [
+              10.92,
+              10.6
+            ],
+            [
+              11.15,
+              10.66
+            ],
+            [
+              11.4,
+              10.8
+            ],
+            [
+              11.58,
+              11.02
+            ],
+            [
+              11.7,
+              11.3
+            ],
+            [
+              11.78,
+              11.7
+            ],
+            [
+              11.8,
+              12.3
+            ],
+            [
+              11.78,
+              12.72
+            ],
+            [
+              11.55,
+              12.82
+            ],
+            [
+              11.42,
+              13.05
+            ],
+            [
+              10.95,
+              12.84
+            ],
+            [
+              10.9,
+              12.5
+            ],
+            [
+              10.84,
+              12.5
+            ],
+            [
+              10.84,
+              12.16
+            ],
+            [
+              10.9,
+              12.16
+            ],
+            [
+              10.9,
+              11.3
+            ],
+            [
+              10.84,
+              11.3
+            ],
+            [
+              10.84,
+              10.98
+            ],
+            [
+              10.9,
+              10.98
+            ]
+          ]
+        }
+      },
+      "at": [
+        10,
+        10
+      ],
+      "under": true,
+      "reach": 0.3,
+      "rest": "closed",
+      "about": "The locked door in the storeroom's bottom wall: shut, its leaf within its doorway (`doorway`, D113); open, the leaf at an angle on its hinges at the opening's right edge, cut by the polygon traced round it (`leaf`), its doorway showing the storeroom's floor.",
+      "doorway": [
+        [
+          9.973,
+          10.633
+        ],
+        [
+          10.031,
+          10.633
+        ],
+        [
+          10.331,
+          10.675
+        ],
+        [
+          10.581,
+          10.771
+        ],
+        [
+          10.781,
+          10.951
+        ],
+        [
+          10.881,
+          11.168
+        ],
+        [
+          10.91,
+          11.361
+        ],
+        [
+          10.91,
+          13.031
+        ],
+        [
+          10.752,
+          13.022
+        ],
+        [
+          10.652,
+          13.031
+        ],
+        [
+          10.452,
+          13.022
+        ],
+        [
+          10.352,
+          13.031
+        ],
+        [
+          10.152,
+          13.022
+        ],
+        [
+          10.052,
+          13.031
+        ],
+        [
+          9.852,
+          13.022
+        ],
+        [
+          9.752,
+          13.031
+        ],
+        [
+          9.552,
+          13.022
+        ],
+        [
+          9.452,
+          13.031
+        ],
+        [
+          9.252,
+          13.022
+        ],
+        [
+          9.065,
+          13.031
+        ],
+        [
+          9.065,
+          11.361
+        ],
+        [
+          9.094,
+          11.168
+        ],
+        [
+          9.194,
+          10.951
+        ],
+        [
+          9.394,
+          10.771
+        ],
+        [
+          9.673,
+          10.675
+        ]
+      ]
+    },
+    "store_arch": {
+      "box": [
+        8.8,
+        9.98,
+        11.2,
+        13.0
+      ],
+      "row": 12,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "under": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The stone arch round the door and the wall's top above it, over whoever walks through its doorway.",
+      "polygon": [
+        [
+          8.85,
+          12.92
+        ],
+        [
+          8.85,
+          11.3
+        ],
+        [
+          8.95,
+          10.95
+        ],
+        [
+          9.15,
+          10.6
+        ],
+        [
+          8.85,
+          10.5
+        ],
+        [
+          8.85,
+          10.02
+        ],
+        [
+          11.15,
+          10.02
+        ],
+        [
+          11.15,
+          10.5
+        ],
+        [
+          10.85,
+          10.6
+        ],
+        [
+          11.05,
+          10.95
+        ],
+        [
+          11.15,
+          11.3
+        ],
+        [
+          11.15,
+          12.92
+        ]
+      ]
+    },
+    "corridor_arch": {
+      "box": [
+        4.3,
+        4.75,
+        5.2,
+        8.05
+      ],
+      "row": 7,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "under": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The near side of the storeroom's arch, over whoever walks through it along row 7.",
+      "polygon": [
+        [
+          4.4,
+          8.02
+        ],
+        [
+          4.38,
+          6.4
+        ],
+        [
+          4.45,
+          5.8
+        ],
+        [
+          4.62,
+          5.2
+        ],
+        [
+          4.85,
+          4.85
+        ],
+        [
+          5.1,
+          4.8
+        ],
+        [
+          5.12,
+          5.5
+        ],
+        [
+          5.1,
+          6.3
+        ],
+        [
+          5.12,
+          8.02
+        ]
+      ]
+    },
+    "key": {
+      "box": [
+        9.5,
+        7.05,
+        10.5,
+        7.95
+      ],
+      "row": 7,
+      "solid": false,
+      "without": "storeroom-nokey.png",
+      "states": {
+        "lying": {
+          "picture": "storeroom-whole.png",
+          "traced": [
+            [
+              10.228,
+              7.142
+            ],
+            [
+              10.384,
+              7.177
+            ],
+            [
+              10.436,
+              7.288
+            ],
+            [
+              10.419,
+              7.41
+            ],
+            [
+              10.315,
+              7.48
+            ],
+            [
+              10.176,
+              7.463
+            ],
+            [
+              9.985,
+              7.585
+            ],
+            [
+              9.967,
+              7.714
+            ],
+            [
+              9.863,
+              7.742
+            ],
+            [
+              9.828,
+              7.864
+            ],
+            [
+              9.776,
+              7.874
+            ],
+            [
+              9.707,
+              7.777
+            ],
+            [
+              9.62,
+              7.794
+            ],
+            [
+              9.585,
+              7.735
+            ],
+            [
+              9.638,
+              7.689
+            ],
+            [
+              10.002,
+              7.421
+            ],
+            [
+              10.026,
+              7.323
+            ],
+            [
+              10.072,
+              7.201
+            ]
+          ]
+        }
+      },
+      "at": [
+        10,
+        7
+      ],
+      "about": "The key, cut by the polygon traced round it, and drawn on the cell the level lays it on (D85, D109)."
+    },
+    "slab": {
+      "box": [
+        2.8,
+        6.98,
+        4.2,
+        8.02
+      ],
+      "row": 7,
+      "solid": false,
+      "without": "storeroom-nokey.png",
+      "states": {
+        "hole": {
+          "picture": "storeroom-hole.png",
+          "traced": [
+            [
+              4.14,
+              7.5
+            ],
+            [
+              4.091,
+              7.684
+            ],
+            [
+              3.953,
+              7.839
+            ],
+            [
+              3.745,
+              7.943
+            ],
+            [
+              3.5,
+              7.98
+            ],
+            [
+              3.255,
+              7.943
+            ],
+            [
+              3.047,
+              7.839
+            ],
+            [
+              2.909,
+              7.684
+            ],
+            [
+              2.86,
+              7.5
+            ],
+            [
+              2.909,
+              7.316
+            ],
+            [
+              3.047,
+              7.161
+            ],
+            [
+              3.255,
+              7.057
+            ],
+            [
+              3.5,
+              7.02
+            ],
+            [
+              3.745,
+              7.057
+            ],
+            [
+              3.953,
+              7.161
+            ],
+            [
+              4.091,
+              7.316
+            ]
+          ]
+        }
+      },
+      "at": [
+        3,
+        7
+      ],
+      "about": "The hole the slab comes and goes over (D138): the floor is the slab in place, and this picture its absence, cut by the ellipse traced round it."
+    }
+  },
+  "cuts": [],
+  "castle": 0,
+  "thresholds": {
+    "outline": 100
+  },
+  "cut": false,
+  "source": "# The storeroom\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-dark-room.md`, then edited by it without its grid\n  (`game-storeroom-nogrid.md`).\n- The dark bands round it painted by Gemini from `game-storeroom-voids.md`,\n  joined by `tools/art/repaint.py`, and what still was dark tiled from its\n  own stones (`tiled`).\n- The key taken out by `tools/art/repaint.py fill`, and cut by the polygon\n  traced round it.\n- The hole of the slab painted by Gemini from `game-storeroom-hole.md`, and laid\n  at its cell's size by `tools/art/repaint.py placed`.\n- The door's doorway opened by `tools/art/repaint.py doorways`, and its leaf\n  swung open painted by Gemini (`game-storeroom-swung.md`) in a box, joined by\n  `tools/art/repaint.py`.\n",
+  "voids": {
+    "about": "The dark bands the model left between the rooms painted as the castle's thick walls and dim rooms (D136): by Gemini 3 Pro Image from tools/art/prompts/game-storeroom-voids.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
+    "from": "art/raw/game-storeroom/game-storeroom-nogrid.png",
+    "void": "black",
+    "below": 48,
+    "fade": 10,
+    "canvas": "art/raw/game-storeroom/storeroom-voids-canvas.png",
+    "painting": "art/raw/game-storeroom/storeroom-voids.png",
+    "leave": [
+      [
+        2400,
+        2700,
+        2650,
+        3000
+      ]
+    ]
+  },
+  "tiled": {
+    "about": "What the model still left black, the tops of thick walls in stone blocks, taken from the picture's own stones by tools/art/repaint.py tiled, no model asked.",
+    "from": "art/raw/game-storeroom/storeroom-voids.png",
+    "void": "black",
+    "below": 48,
+    "fade": 8,
+    "texture": [
+      "art/raw/game-storeroom/storeroom-voids.png",
+      1560,
+      300,
+      2250,
+      690
+    ],
+    "shade": 0.7,
+    "painting": "art/raw/game-storeroom/storeroom-whole.png",
+    "void_in": "art/raw/game-storeroom/game-storeroom-nogrid.png",
+    "leave": [
+      [
+        2400,
+        2700,
+        2650,
+        3000
+      ],
+      [
+        4060,
+        1060,
+        4800,
+        2030
+      ]
+    ]
+  },
+  "nokey": {
+    "about": "The key taken out of the painting, for the game to draw it where the level lays it (D85): the floor under it filled from all four sides by tools/art/repaint.py (fill), no model asked.",
+    "from": "art/raw/game-storeroom/storeroom-whole.png",
+    "boxes": [
+      [
+        2280,
+        1673,
+        2532,
+        1899
+      ]
+    ],
+    "sides": 4,
+    "painting": "art/raw/game-storeroom/storeroom-nokey.png"
+  },
+  "doorways": {
+    "about": "The door opened by tools/art/repaint.py doorways (D108): its whole leaf painted with the floor of the storeroom beyond, taken from the painting, down to a threshold (D114).",
+    "doors": [
+      {
+        "thing": "store_door",
+        "seeds": [],
+        "shape": [
+          [
+            9.09,
+            12.88
+          ],
+          [
+            9.09,
+            11.4
+          ],
+          [
+            9.12,
+            11.2
+          ],
+          [
+            9.22,
+            10.98
+          ],
+          [
+            9.42,
+            10.8
+          ],
+          [
+            9.7,
+            10.7
+          ],
+          [
+            10.0,
+            10.66
+          ],
+          [
+            10.3,
+            10.7
+          ],
+          [
+            10.55,
+            10.8
+          ],
+          [
+            10.75,
+            10.98
+          ],
+          [
+            10.85,
+            11.2
+          ],
+          [
+            10.88,
+            11.4
+          ],
+          [
+            10.88,
+            12.88
+          ]
+        ],
+        "floor": [
+          8.6,
+          8.0,
+          10.6,
+          9.6
+        ],
+        "painting": "storeroom-doorway.png",
+        "sill": 0.1,
+        "leaf_box": [
+          9.0,
+          10.55,
+          11.0,
+          12.89
+        ]
+      }
+    ]
+  },
+  "swung": {
+    "about": "The door seen open (D111, D116): its leaf swung toward us on hinges at the opening's right edge, standing at an angle, short of the torch, its free edge off the wall and its shadow behind it. Painted by Gemini 3 Pro Image from tools/art/prompts/game-storeroom-swung.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box.",
+    "from": "art/raw/game-storeroom/storeroom-doorway.png",
+    "boxes": [
+      [
+        2604,
+        2497,
+        2880,
+        3178
+      ]
+    ],
+    "fade": 10,
+    "crop": [
+      1860,
+      2300,
+      3060,
+      3260
+    ],
+    "canvas": "art/raw/game-storeroom/storeroom-swung-canvas.png",
+    "painting": "art/raw/game-storeroom/storeroom-swung.png"
+  },
+  "hole": {
+    "about": "The hole in the corridor's floor where the slab comes and goes (D138): painted large and clear by Gemini 3 Pro Image from tools/art/prompts/game-storeroom-hole.md, and laid at the size of its cell by tools/art/repaint.py placed; the painting kept pixel for pixel outside its ellipse. Cut by the polygon traced round it.",
+    "from": "art/raw/game-storeroom/storeroom-doorway.png",
+    "picture": "art/raw/game-storeroom/game-storeroom-hole.png",
+    "part": [
+      1130,
+      1650,
+      3790,
+      3420
+    ],
+    "at": [
+      2.86,
+      7.02,
+      4.14,
+      7.98
+    ],
+    "fade": 8,
+    "painting": "art/raw/game-storeroom/storeroom-hole.png"
+  },
+  "lowered": [
+    {
+      "about": "The corridor's floor is one row high: whoever stands by the wall stands on it.",
+      "cells": [
+        [
+          0,
+          6
+        ],
+        [
+          1,
+          6
+        ]
+      ],
+      "by": 0.25
+    }
+  ],
+  "nudged": [
+    {
+      "about": "The door's opening lies half a cell left of its column.",
+      "cells": [
+        [
+          10,
+          10
+        ],
+        [
+          10,
+          12
+        ]
+      ],
+      "by": -0.5
+    }
+  ],
+  "kept": [
+    [
+      8.8,
+      9.98,
+      11.2,
+      13.0
+    ]
+  ]
+}

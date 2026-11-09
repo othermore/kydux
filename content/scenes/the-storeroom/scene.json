@@ -1,0 +1,35 @@
+{
+  "terrains": {
+    "u": {
+      "kind": "furniture",
+      "walk": false,
+      "sight": true
+    }
+  },
+  "rooms": {
+    "storeroom": [
+      5,
+      2,
+      13,
+      9
+    ]
+  },
+  "things": [
+    {
+      "kind": "door",
+      "id": "store_door",
+      "at": [
+        10,
+        10
+      ],
+      "covers": {
+        "open": [
+          [
+            11,
+            12
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [],
+  "things": {
+    "door_a": {
+      "row": 10,
+      "left": 259,
+      "top": 845,
+      "states": {
+        "closed": "door_a-closed.webp"
+      },
+      "at": [
+        3,
+        10
+      ]
+    },
+    "door_b": {
+      "row": 10,
+      "left": 1008,
+      "top": 845,
+      "states": {
+        "closed": "door_b-closed.webp"
+      },
+      "at": [
+        11,
+        10
+      ]
+    }
+  },
+  "dark": [
+    {
+      "columns": [
+        14,
+        15
+      ],
+      "from": 4.8,
+      "to": 3.8,
+      "most": 0.88
+    }
+  ],
+  "source": "SOURCE.md"
+}

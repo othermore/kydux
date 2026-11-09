@@ -1,0 +1,18 @@
+{
+  "terrains": {
+    "u": {
+      "kind": "furniture",
+      "walk": false,
+      "sight": true
+    }
+  },
+  "enchanted": [
+    [
+      0,
+      6,
+      1,
+      6
+    ]
+  ],
+  "things": []
+}

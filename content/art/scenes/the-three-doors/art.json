@@ -1,0 +1,111 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 1,
+      "image": "row-1-static-under.webp",
+      "top": 0,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 4,
+      "image": "row-4-static-under.webp",
+      "top": 210,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 8,
+      "image": "row-8-static-under.webp",
+      "top": 595,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 12,
+      "image": "row-12-static-under.webp",
+      "top": 979,
+      "static": true,
+      "under": true
+    }
+  ],
+  "things": {
+    "door_1": {
+      "row": 11,
+      "left": 878,
+      "top": 979,
+      "states": {
+        "closed": "door_1-closed.webp",
+        "open": "door_1-open.webp"
+      },
+      "under": true,
+      "rows": {
+        "open": 12
+      },
+      "rest": "closed",
+      "at": [
+        10,
+        11
+      ]
+    },
+    "door_2": {
+      "row": 7,
+      "left": 878,
+      "top": 595,
+      "states": {
+        "closed": "door_2-closed.webp",
+        "open": "door_2-open.webp"
+      },
+      "under": true,
+      "rows": {
+        "open": 8
+      },
+      "rest": "closed",
+      "at": [
+        10,
+        7
+      ]
+    },
+    "door_3": {
+      "row": 3,
+      "left": 878,
+      "top": 211,
+      "states": {
+        "closed": "door_3-closed.webp",
+        "open": "door_3-open.webp"
+      },
+      "under": true,
+      "rows": {
+        "open": 4
+      },
+      "rest": "closed",
+      "at": [
+        10,
+        3
+      ]
+    }
+  },
+  "nudged": [
+    {
+      "about": "The door's opening lies half a cell left of the column walked, its middle on column 10's left line: whoever walks the column walks the opening's middle.",
+      "cells": [
+        [
+          10,
+          0
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "by": -0.5
+    }
+  ],
+  "source": "SOURCE.md"
+}

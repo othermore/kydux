@@ -1,0 +1,43 @@
+{
+  "terrains": {
+    "u": {
+      "kind": "furniture",
+      "walk": false,
+      "sight": true
+    }
+  },
+  "enchanted": [
+    [
+      14,
+      1,
+      15,
+      3
+    ],
+    [
+      16,
+      1,
+      19,
+      1
+    ]
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "door_a",
+      "at": [
+        3,
+        10
+      ],
+      "locked": true
+    },
+    {
+      "kind": "door",
+      "id": "door_b",
+      "at": [
+        11,
+        10
+      ],
+      "locked": true
+    }
+  ]
+}

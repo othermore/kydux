@@ -323,7 +323,10 @@ def state_alpha(
         shown = np.array(Image.open(settings.edits / picture["picture"]).convert("RGB"))
         traced = picture.get("leaf", picture.get("traced"))
         if traced is not None:
-            return shown, soft_area(painting.shape[:2], grid, traced)
+            # A double door's two leaves are two polygons, a list of them.
+            parts = traced if isinstance(traced[0][0], list) else [traced]
+            areas = [soft_area(painting.shape[:2], grid, part) for part in parts]
+            return shown, np.maximum.reduce(areas)
         # A state cut from a picture against its own edit without it: a book
         # glowing as the spell takes it.
         apart = np.array(Image.open(settings.edits / picture["without"]).convert("RGB"))

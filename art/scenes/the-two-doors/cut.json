@@ -1,0 +1,682 @@
+{
+  "about": "The room of two doors, chapter 3's third scene (D136): the painting scene-two-doors, its grid removed by Gemini, the black at its corners painted as the castle's inside. Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-two-doors",
+    "edits": "art/raw/game-two-doors",
+    "painting": "two-doors-whole.png",
+    "grid": "grid.json",
+    "ground": "two-doors-whole.png"
+  },
+  "things": {
+    "left_door": {
+      "box": [
+        6.1,
+        7.5,
+        9.1,
+        10.45
+      ],
+      "row": 9,
+      "solid": true,
+      "without": "two-doors-left-doorway.png",
+      "states": {
+        "closed": "painting",
+        "open": {
+          "picture": "two-doors-swung-left.png",
+          "without": "two-doors-left-doorway.png",
+          "leaf": [
+            [
+              8.113,
+              8.341
+            ],
+            [
+              8.175,
+              8.174
+            ],
+            [
+              8.3,
+              8.007
+            ],
+            [
+              8.488,
+              7.881
+            ],
+            [
+              8.696,
+              7.839
+            ],
+            [
+              8.946,
+              7.852
+            ],
+            [
+              9.154,
+              7.944
+            ],
+            [
+              9.25,
+              8.019
+            ],
+            [
+              9.238,
+              8.237
+            ],
+            [
+              9.175,
+              9.074
+            ],
+            [
+              9.133,
+              9.91
+            ],
+            [
+              9.113,
+              10.496
+            ],
+            [
+              8.779,
+              10.488
+            ],
+            [
+              8.508,
+              10.362
+            ],
+            [
+              8.3,
+              10.203
+            ],
+            [
+              8.113,
+              10.036
+            ],
+            [
+              8.113,
+              9.618
+            ],
+            [
+              8.05,
+              9.618
+            ],
+            [
+              8.05,
+              9.408
+            ],
+            [
+              8.113,
+              9.408
+            ],
+            [
+              8.113,
+              8.78
+            ],
+            [
+              8.05,
+              8.78
+            ],
+            [
+              8.05,
+              8.467
+            ],
+            [
+              8.113,
+              8.467
+            ]
+          ]
+        }
+      },
+      "at": [
+        7,
+        8
+      ],
+      "under": true,
+      "reach": 0.55,
+      "rest": "closed",
+      "about": "The left door in the bottom wall: shut, its leaf within its doorway (`doorway`, D113); open, the leaf at an angle on its hinges at the opening's right edge, cut by the polygon traced round it (`leaf`), its doorway showing the room's floor down to a threshold (doorways, D108, D114).",
+      "doorway": [
+        [
+          6.973,
+          7.661
+        ],
+        [
+          7.031,
+          7.661
+        ],
+        [
+          7.277,
+          7.695
+        ],
+        [
+          7.523,
+          7.791
+        ],
+        [
+          7.802,
+          8.021
+        ],
+        [
+          7.969,
+          8.247
+        ],
+        [
+          8.023,
+          8.406
+        ],
+        [
+          8.023,
+          9.955
+        ],
+        [
+          6.173,
+          9.955
+        ],
+        [
+          6.173,
+          8.389
+        ],
+        [
+          6.19,
+          8.209
+        ],
+        [
+          6.29,
+          7.992
+        ],
+        [
+          6.506,
+          7.791
+        ],
+        [
+          6.752,
+          7.695
+        ]
+      ]
+    },
+    "right_door": {
+      "box": [
+        10.9,
+        7.5,
+        13.9,
+        10.45
+      ],
+      "row": 9,
+      "solid": true,
+      "without": "two-doors-right-doorway.png",
+      "states": {
+        "closed": "painting",
+        "open": {
+          "picture": "two-doors-swung-right.png",
+          "without": "two-doors-right-doorway.png",
+          "leaf": [
+            [
+              10.846,
+              10.496
+            ],
+            [
+              10.858,
+              8.655
+            ],
+            [
+              10.958,
+              8.195
+            ],
+            [
+              11.125,
+              7.818
+            ],
+            [
+              11.325,
+              7.576
+            ],
+            [
+              11.513,
+              7.546
+            ],
+            [
+              11.7,
+              7.609
+            ],
+            [
+              11.846,
+              7.756
+            ],
+            [
+              11.95,
+              7.944
+            ],
+            [
+              12.0,
+              8.237
+            ],
+            [
+              12.0,
+              8.341
+            ],
+            [
+              12.067,
+              8.341
+            ],
+            [
+              12.067,
+              8.689
+            ],
+            [
+              12.0,
+              8.689
+            ],
+            [
+              12.0,
+              9.4
+            ],
+            [
+              12.067,
+              9.4
+            ],
+            [
+              12.067,
+              9.722
+            ],
+            [
+              12.0,
+              9.722
+            ],
+            [
+              12.0,
+              9.994
+            ],
+            [
+              11.617,
+              10.287
+            ],
+            [
+              11.325,
+              10.475
+            ],
+            [
+              11.075,
+              10.496
+            ]
+          ]
+        }
+      },
+      "at": [
+        13,
+        8
+      ],
+      "under": true,
+      "reach": 0.55,
+      "rest": "closed",
+      "about": "The right door in the bottom wall, as the left one, its leaf at an angle on its hinges at the opening's left edge.",
+      "doorway": [
+        [
+          12.877,
+          7.661
+        ],
+        [
+          12.935,
+          7.661
+        ],
+        [
+          13.352,
+          7.77
+        ],
+        [
+          13.615,
+          7.962
+        ],
+        [
+          13.794,
+          8.214
+        ],
+        [
+          13.815,
+          8.394
+        ],
+        [
+          13.815,
+          9.971
+        ],
+        [
+          13.677,
+          9.971
+        ],
+        [
+          13.652,
+          9.98
+        ],
+        [
+          13.369,
+          9.976
+        ],
+        [
+          13.344,
+          9.984
+        ],
+        [
+          13.085,
+          9.976
+        ],
+        [
+          13.06,
+          9.984
+        ],
+        [
+          12.777,
+          9.98
+        ],
+        [
+          12.752,
+          9.988
+        ],
+        [
+          12.469,
+          9.984
+        ],
+        [
+          12.44,
+          9.992
+        ],
+        [
+          12.181,
+          9.984
+        ],
+        [
+          12.156,
+          9.992
+        ],
+        [
+          11.994,
+          9.992
+        ],
+        [
+          11.994,
+          8.394
+        ],
+        [
+          12.019,
+          8.163
+        ],
+        [
+          12.19,
+          7.942
+        ],
+        [
+          12.452,
+          7.774
+        ]
+      ]
+    }
+  },
+  "cuts": [],
+  "castle": 0,
+  "thresholds": {
+    "outline": 100
+  },
+  "cut": false,
+  "source": "# The room of two doors\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-two-doors.md`, then edited by it without its\n  grid (`game-two-doors-nogrid.md`).\n- What it left black at the corners painted by Gemini from\n  `game-two-doors-voids.md`, joined by `tools/art/repaint.py`, and what still\n  was black tiled from stones of the crossing's picture (`tiled`).\n- Each door's doorway opened by `tools/art/repaint.py doorways`, and each leaf\n  swung open painted by Gemini (`game-two-doors-swung-left.md`, `-right`) in\n  a box, joined by `tools/art/repaint.py`.\n",
+  "voids": {
+    "about": "What the model left black at the top corners and the bottom corners painted as the castle's inside (D136), the stair's dark well kept: by Gemini 3 Pro Image from tools/art/prompts/game-two-doors-voids.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
+    "from": "art/raw/game-two-doors/game-two-doors-nogrid.png",
+    "void": "black",
+    "leave": [
+      [
+        2100,
+        3200,
+        2700,
+        3584
+      ]
+    ],
+    "fade": 10,
+    "canvas": "art/raw/game-two-doors/two-doors-voids-canvas.png",
+    "painting": "art/raw/game-two-doors/two-doors-voids.png"
+  },
+  "tiled": {
+    "about": "What the model still left black, the tops of thick walls in stone blocks, taken from the picture's own stones by tools/art/repaint.py tiled, no model asked.",
+    "from": "art/raw/game-two-doors/two-doors-voids.png",
+    "void": "black",
+    "below": 24,
+    "leave": [
+      [
+        2100,
+        3200,
+        2700,
+        3584
+      ]
+    ],
+    "fade": 6,
+    "texture": [
+      "art/raw/game-crossing/crossing-mended.png",
+      100,
+      60,
+      900,
+      1000
+    ],
+    "shade": 0.75,
+    "painting": "art/raw/game-two-doors/two-doors-whole.png"
+  },
+  "doorways": {
+    "about": "Each door opened by tools/art/repaint.py doorways (D108): its whole leaf painted with the floor of the room beyond, taken from the painting, down to a threshold (D114).",
+    "doors": [
+      {
+        "thing": "left_door",
+        "seeds": [],
+        "shape": [
+          [
+            6.202,
+            9.924
+          ],
+          [
+            6.202,
+            8.436
+          ],
+          [
+            6.217,
+            8.239
+          ],
+          [
+            6.315,
+            8.017
+          ],
+          [
+            6.535,
+            7.82
+          ],
+          [
+            6.78,
+            7.722
+          ],
+          [
+            7.0,
+            7.687
+          ],
+          [
+            7.246,
+            7.722
+          ],
+          [
+            7.491,
+            7.82
+          ],
+          [
+            7.761,
+            8.042
+          ],
+          [
+            7.932,
+            8.264
+          ],
+          [
+            7.991,
+            8.436
+          ],
+          [
+            7.991,
+            9.924
+          ]
+        ],
+        "floor": [
+          6.3,
+          6.0,
+          7.7,
+          7.3
+        ],
+        "painting": "two-doors-left-doorway.png",
+        "sill": 0.1,
+        "leaf_box": [
+          6.1,
+          7.6,
+          8.1,
+          9.93
+        ]
+      },
+      {
+        "thing": "right_door",
+        "seeds": [],
+        "shape": [
+          [
+            12.02,
+            9.938
+          ],
+          [
+            12.02,
+            8.436
+          ],
+          [
+            12.045,
+            8.19
+          ],
+          [
+            12.217,
+            7.968
+          ],
+          [
+            12.486,
+            7.796
+          ],
+          [
+            12.903,
+            7.687
+          ],
+          [
+            13.32,
+            7.796
+          ],
+          [
+            13.589,
+            7.993
+          ],
+          [
+            13.761,
+            8.239
+          ],
+          [
+            13.785,
+            8.436
+          ],
+          [
+            13.785,
+            9.938
+          ]
+        ],
+        "floor": [
+          12.2,
+          6.0,
+          13.6,
+          7.3
+        ],
+        "painting": "two-doors-right-doorway.png",
+        "sill": 0.1,
+        "leaf_box": [
+          11.95,
+          7.6,
+          13.9,
+          9.94
+        ]
+      }
+    ]
+  },
+  "swung_left": {
+    "about": "The left door seen open (D111, D116): its leaf swung toward us on hinges at the opening's edge, standing at an angle on the plain wall between the doors, its free edge off the wall and its shadow behind it. Painted by Gemini 3 Pro Image from tools/art/prompts/game-two-doors-swung-left.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box.",
+    "from": "art/raw/game-two-doors/two-doors-left-doorway.png",
+    "boxes": [
+      [
+        1910,
+        1804,
+        2280,
+        2497
+      ]
+    ],
+    "fade": 10,
+    "crop": [
+      1250,
+      1500,
+      2650,
+      2600
+    ],
+    "canvas": "art/raw/game-two-doors/two-doors-swung-left-canvas.png",
+    "painting": "art/raw/game-two-doors/two-doors-swung-left.png"
+  },
+  "swung_right": {
+    "about": "The right door seen open (D111, D116): its leaf swung toward us on hinges at the opening's edge, standing at an angle on the plain wall between the doors, its free edge off the wall and its shadow behind it. Painted by Gemini 3 Pro Image from tools/art/prompts/game-two-doors-swung-right.md on the canvas this makes, from the painting with its doorway open, and joined by tools/art/repaint.py, the picture kept pixel for pixel outside the box.",
+    "from": "art/raw/game-two-doors/two-doors-right-doorway.png",
+    "boxes": [
+      [
+        2520,
+        1804,
+        2892,
+        2497
+      ]
+    ],
+    "fade": 10,
+    "crop": [
+      2150,
+      1500,
+      3550,
+      2600
+    ],
+    "canvas": "art/raw/game-two-doors/two-doors-swung-right-canvas.png",
+    "painting": "art/raw/game-two-doors/two-doors-swung-right.png"
+  },
+  "nudged": [
+    {
+      "about": "The left door's opening lies a little left of its column.",
+      "cells": [
+        [
+          7,
+          8
+        ],
+        [
+          7,
+          9
+        ]
+      ],
+      "by": -0.4
+    },
+    {
+      "about": "The right door's opening lies more than half a cell left of its column.",
+      "cells": [
+        [
+          13,
+          8
+        ],
+        [
+          13,
+          9
+        ]
+      ],
+      "by": -0.6
+    }
+  ],
+  "kept": [
+    [
+      10.8,
+      7.5,
+      12.1,
+      8.1
+    ],
+    [
+      8.0,
+      7.5,
+      9.3,
+      8.1
+    ]
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 8,
+      "image": "row-8-static.webp",
+      "top": 571,
+      "static": true
+    },
+    {
+      "row": 13,
+      "image": "row-13-static-under.webp",
+      "top": 1210,
+      "static": true,
+      "under": true
+    }
+  ],
+  "things": {},
+  "nudged": [
+    {
+      "about": "The arch at the foot of the corridor lies left of its column.",
+      "cells": [
+        [
+          15,
+          13
+        ],
+        [
+          15,
+          13
+        ]
+      ],
+      "by": -0.45
+    }
+  ],
+  "dark": [
+    {
+      "columns": [
+        14,
+        15
+      ],
+      "from": 12.8,
+      "to": 13.8,
+      "most": 0.6
+    }
+  ],
+  "source": "SOURCE.md"
+}

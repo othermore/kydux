@@ -715,6 +715,60 @@ def test_a_picture_drawn_again_is_moved_part_by_part_onto_the_painting():
     assert (moved[100:140, 60:66].max(axis=2) < 80).mean() > 0.9
 
 
+def test_a_wall_moved_along_its_rows_moves_whole_and_the_floor_stretches():
+    import repaint
+
+    # A wall of rows 20 to 30 moved up by 6, the floor above it squeezed and below stretched.
+    rows = repaint.spaced_rows([(0, 0), (20, 14), (30, 24), (60, 60)], 80)
+    assert rows[14] == 20 and rows[24] == 30
+    assert all(rows[new] == new + 6 for new in range(14, 25))
+    assert rows[7] == 10
+    assert rows[70] == 70
+
+
+def test_a_tile_laid_over_a_picture_meets_itself_with_no_seam():
+    import repaint
+
+    tile = np.arange(12, dtype=np.float32).reshape(2, 2, 3)
+    laid = repaint.tiled_over((6, 6), tile)
+    assert laid.shape == (6, 6, 3)
+    assert (laid[0, 1] == laid[0, 2]).all() and (laid[1, 0] == laid[2, 0]).all()
+
+
+def test_what_is_placed_is_the_ellipse_of_its_box():
+    import repaint
+
+    part = repaint.ellipse_part(40, 20, 2)
+    assert part[10, 20] == 1 and part[0, 0] == 0 and part[10, 0] < 0.5
+
+
+def test_what_lies_round_a_place_is_joined_to_the_edge_and_a_dark_room_is_not():
+    import repaint
+
+    empty = np.ones((40, 40), dtype=bool)
+    empty[10:30, 10:30] = False
+    empty[15:25, 15:25] = True
+    reached = repaint.from_the_edge(empty)
+    assert reached[0, 0] and reached[35, 5] and not reached[20, 20] and not reached[12, 12]
+
+
+def test_what_a_model_left_black_is_a_void_but_a_line_is_not(tmp_path, monkeypatch):
+    import repaint
+
+    picture = np.full((400, 600, 3), 90, dtype=np.uint8)
+    picture[:, 100:106] = 0
+    picture[100:300, 300:500] = 2
+    picture[120:160, 320:360] = 2
+    monkeypatch.setattr(repaint, "REPO", tmp_path)
+    Image.fromarray(picture).save(tmp_path / "picture.png")
+    empty = repaint.void_of({"from": "picture.png", "void": "black"})
+    assert empty[200, 400] and not empty[200, 103] and not empty[50, 400]
+    left = repaint.void_of(
+        {"from": "picture.png", "void": "black", "leave": [[300, 100, 500, 300]]}
+    )
+    assert not left[200, 400]
+
+
 def test_a_fill_from_four_sides_follows_a_light_that_changes_both_ways():
     import repaint
 

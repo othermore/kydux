@@ -1,0 +1,518 @@
+{
+  "about": "The crossing, chapter 3's second scene (D136): the painting scene-tunnel-exit, its grid removed by Gemini, the corridor beside the statues made three cells wide by moving its wall, the pale paper round it painted as the castle's inside. Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-crossing",
+    "edits": "art/raw/game-crossing",
+    "painting": "crossing-whole.png",
+    "grid": "grid.json",
+    "ground": "crossing-whole.png"
+  },
+  "things": {
+    "statue_1": {
+      "box": [
+        11.65,
+        5.95,
+        12.9,
+        8.32
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The first statue, over whoever walks behind it on row 6, its foot on row 8.",
+      "polygon": [
+        [
+          12.1,
+          6.06
+        ],
+        [
+          12.267,
+          6.186
+        ],
+        [
+          12.483,
+          6.395
+        ],
+        [
+          12.567,
+          6.671
+        ],
+        [
+          12.667,
+          6.437
+        ],
+        [
+          12.75,
+          6.119
+        ],
+        [
+          12.833,
+          6.228
+        ],
+        [
+          12.767,
+          6.52
+        ],
+        [
+          12.767,
+          6.981
+        ],
+        [
+          12.692,
+          7.859
+        ],
+        [
+          12.692,
+          8.261
+        ],
+        [
+          11.733,
+          8.261
+        ],
+        [
+          11.733,
+          7.567
+        ],
+        [
+          11.817,
+          7.483
+        ],
+        [
+          11.767,
+          7.064
+        ],
+        [
+          11.9,
+          6.604
+        ],
+        [
+          11.917,
+          6.395
+        ],
+        [
+          12.042,
+          6.228
+        ]
+      ]
+    },
+    "statue_2": {
+      "box": [
+        14.2,
+        5.95,
+        15.42,
+        8.32
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The second statue, its foot on row 8.",
+      "polygon": [
+        [
+          14.708,
+          6.035
+        ],
+        [
+          14.875,
+          6.228
+        ],
+        [
+          14.983,
+          6.437
+        ],
+        [
+          15.067,
+          6.73
+        ],
+        [
+          15.167,
+          6.437
+        ],
+        [
+          15.25,
+          6.144
+        ],
+        [
+          15.35,
+          6.311
+        ],
+        [
+          15.267,
+          6.646
+        ],
+        [
+          15.267,
+          7.023
+        ],
+        [
+          15.208,
+          7.859
+        ],
+        [
+          15.217,
+          8.261
+        ],
+        [
+          14.267,
+          8.261
+        ],
+        [
+          14.267,
+          7.567
+        ],
+        [
+          14.35,
+          7.441
+        ],
+        [
+          14.292,
+          7.023
+        ],
+        [
+          14.417,
+          6.646
+        ],
+        [
+          14.483,
+          6.437
+        ],
+        [
+          14.6,
+          6.253
+        ]
+      ]
+    },
+    "statue_3": {
+      "box": [
+        16.6,
+        6.1,
+        17.8,
+        8.32
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The third statue, its foot on row 8.",
+      "polygon": [
+        [
+          17.167,
+          6.203
+        ],
+        [
+          17.358,
+          6.395
+        ],
+        [
+          17.433,
+          6.604
+        ],
+        [
+          17.567,
+          6.771
+        ],
+        [
+          17.65,
+          6.186
+        ],
+        [
+          17.733,
+          6.353
+        ],
+        [
+          17.708,
+          6.939
+        ],
+        [
+          17.625,
+          7.859
+        ],
+        [
+          17.583,
+          8.261
+        ],
+        [
+          16.683,
+          8.261
+        ],
+        [
+          16.683,
+          7.567
+        ],
+        [
+          16.792,
+          7.483
+        ],
+        [
+          16.733,
+          6.981
+        ],
+        [
+          16.833,
+          6.688
+        ],
+        [
+          16.975,
+          6.479
+        ],
+        [
+          17.0,
+          6.337
+        ]
+      ]
+    },
+    "arch_low": {
+      "box": [
+        13.95,
+        12.6,
+        16.05,
+        14.0
+      ],
+      "row": 13,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "under": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The arch at the foot of the wide corridor, over whoever walks under it.",
+      "polygon": [
+        [
+          14.0,
+          14.0
+        ],
+        [
+          14.0,
+          13.6
+        ],
+        [
+          14.15,
+          13.2
+        ],
+        [
+          14.5,
+          12.85
+        ],
+        [
+          15.0,
+          12.7
+        ],
+        [
+          15.5,
+          12.85
+        ],
+        [
+          15.85,
+          13.2
+        ],
+        [
+          16.0,
+          13.6
+        ],
+        [
+          16.0,
+          14.0
+        ],
+        [
+          15.75,
+          14.0
+        ],
+        [
+          15.75,
+          13.7
+        ],
+        [
+          15.6,
+          13.4
+        ],
+        [
+          15.3,
+          13.2
+        ],
+        [
+          15.0,
+          13.15
+        ],
+        [
+          14.7,
+          13.2
+        ],
+        [
+          14.4,
+          13.4
+        ],
+        [
+          14.25,
+          13.7
+        ],
+        [
+          14.25,
+          14.0
+        ]
+      ]
+    }
+  },
+  "cuts": [],
+  "castle": 0,
+  "thresholds": {
+    "outline": 100
+  },
+  "cut": false,
+  "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-tunnel-exit.md`, then edited by it without its\n  grid (`game-crossing-nogrid.md`).\n- The corridor beside the statues made three cells wide by\n  `tools/art/repaint.py spaced`.\n- The pale paper round the castle painted as its inside by Gemini from\n  `game-crossing-voids.md` and `game-crossing-voids-more.md`, joined by\n  `tools/art/repaint.py`, and what still was black tiled from the picture's\n  own stones (`tiled`); `game-crossing-voids-top.md` was asked first and kept\n  the paper as the page.\n- Its statues and its low arch cut by the polygons traced round them.\n",
+  "spaced": {
+    "about": "The corridor that goes down beside the statues made three cells wide, as its level asks (Dask in its middle, the wizard down the side he does not look at): between rows 8.28 and 12.62, its right wall, its torch and the room beyond moved a cell to the right, and its plain floor stretched.",
+    "from": "art/raw/game-crossing/game-crossing-nogrid.png",
+    "rows": [
+      8.28,
+      12.62
+    ],
+    "knots": [
+      [
+        0,
+        0
+      ],
+      [
+        14.35,
+        14.35
+      ],
+      [
+        15.55,
+        16.55
+      ],
+      [
+        19.5,
+        20.5
+      ]
+    ],
+    "painting": "art/raw/game-crossing/crossing-wide.png"
+  },
+  "voids": {
+    "about": "The pale paper round the castle painted as the castle's inside (D136), and the widened corridor's right wall closed at its foot, down to the bottom arch's wall: by Gemini 3 Pro Image from tools/art/prompts/game-crossing-voids.md on the canvas this makes, the paper shown flat black, since the model kept it as the page (game-crossing-voids-top.md), and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
+    "from": "art/raw/game-crossing/crossing-wide.png",
+    "void": "paper",
+    "boxes": [
+      [
+        3840,
+        2880,
+        4340,
+        3250
+      ]
+    ],
+    "fade": 10,
+    "canvas": "art/raw/game-crossing/crossing-voids-canvas.png",
+    "painting": "art/raw/game-crossing/crossing-voids.png",
+    "flat": [
+      0,
+      0,
+      0
+    ]
+  },
+  "voids_more": {
+    "about": "What the model left black of the voids, shown it flat in a dim colour, since it keeps black as a gap: by Gemini 3 Pro Image from tools/art/prompts/game-crossing-voids-more.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
+    "from": "art/raw/game-crossing/crossing-voids.png",
+    "void": "black",
+    "flat": [
+      86,
+      78,
+      92
+    ],
+    "leave": [
+      [
+        230,
+        1300,
+        560,
+        1800
+      ],
+      [
+        2050,
+        100,
+        2560,
+        620
+      ],
+      [
+        3150,
+        3000,
+        3750,
+        3584
+      ],
+      [
+        1950,
+        2950,
+        2620,
+        3584
+      ]
+    ],
+    "fade": 10,
+    "canvas": "art/raw/game-crossing/crossing-voids-more-canvas.png",
+    "painting": "art/raw/game-crossing/crossing-mended.png"
+  },
+  "tiled": {
+    "about": "What the model still left black, the tops of thick walls in stone blocks, taken from the picture's own stones by tools/art/repaint.py tiled, no model asked.",
+    "from": "art/raw/game-crossing/crossing-mended.png",
+    "void": "black",
+    "leave": [
+      [
+        230,
+        1300,
+        560,
+        1800
+      ]
+    ],
+    "fade": 6,
+    "texture": [
+      "art/raw/game-crossing/crossing-mended.png",
+      100,
+      60,
+      900,
+      1000
+    ],
+    "shade": 0.9,
+    "painting": "art/raw/game-crossing/crossing-whole.png"
+  },
+  "nudged": [
+    {
+      "about": "The arch at the foot of the corridor lies left of its column.",
+      "cells": [
+        [
+          15,
+          13
+        ],
+        [
+          15,
+          13
+        ]
+      ],
+      "by": -0.45
+    }
+  ],
+  "dark": [
+    {
+      "about": "Under the arch at the foot of the wide corridor (D100).",
+      "columns": [
+        14,
+        15
+      ],
+      "from": 12.8,
+      "to": 13.8,
+      "most": 0.6
+    }
+  ],
+  "kept": [
+    [
+      13.9,
+      12.5,
+      16.1,
+      14.1
+    ]
+  ]
+}

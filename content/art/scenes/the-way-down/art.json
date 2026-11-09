@@ -1,0 +1,82 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 6,
+      "image": "row-6-static-under.webp",
+      "top": 480,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 14,
+      "image": "row-14-static-under.webp",
+      "top": 1291,
+      "static": true,
+      "under": true
+    }
+  ],
+  "things": {
+    "door": {
+      "row": 6,
+      "left": 797,
+      "top": 490,
+      "states": {
+        "closed": "door-closed.webp",
+        "open": "door-open.webp"
+      },
+      "under": true,
+      "rest": "closed",
+      "at": [
+        10,
+        5
+      ]
+    },
+    "slab": {
+      "row": 7,
+      "left": 862,
+      "top": 670,
+      "states": {
+        "hole": "slab-hole.webp"
+      },
+      "at": [
+        10,
+        7
+      ]
+    },
+    "key": {
+      "row": 7,
+      "left": 912,
+      "top": 677,
+      "states": {
+        "lying": "key-lying.webp"
+      },
+      "at": [
+        10,
+        7
+      ]
+    }
+  },
+  "nudged": [
+    {
+      "about": "The corridor's middle lies near column 10's left line: whoever walks the column walks its middle.",
+      "cells": [
+        [
+          10,
+          0
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "by": -0.45
+    }
+  ],
+  "source": "SOURCE.md"
+}

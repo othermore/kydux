@@ -30,7 +30,9 @@ a child can count steps. A painting must still read well under it.
 
 The game draws over the painting what changes with the play: the goal's
 mark, a round ring that beats in size and colour, and the glow of a
-sealed door's rune while the seal holds. Neither is painted.
+sealed door's rune while the seal holds. Neither is painted. The mark lies
+on the floor, under whatever stands before it or walks over it, and its
+ring is seen over what covers it (D160).
 
 ## How a scene is made
 
@@ -402,8 +404,10 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    under its arch, the floor beyond running through it to the floor before it with no bar,
    no line and no sill (`<scene>-base.md`). It is the ground the game draws (`painting` and
    `ground` in the scene's `cut.json`), and every other picture is an edit of it.
-2. **The states.** The door open is an edit of the base, given a picture of the door shut
-   to see what it looks like (`<scene>-open.md`): the same door, at its full height, swung
+2. **The states.** The door open is an edit of the base, asked on the whole picture of the
+   scene, never on a crop, so that the floor seen through the doorway continues the floor on
+   both sides (D161); it is given a picture of the door shut to see what it looks like
+   (`<scene>-open.md`): the same door, at its full height, swung
    toward the viewer on its jamb so that it stands beside the opening, its foot on the floor
    before the wall with both bottom corners drawn, and a soft shadow, no part of it in the
    opening. One edit may open every door of the scene. A model given a single door may swing
@@ -432,8 +436,15 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    the thing's foot, `under` where a figure on that row stands under it. A wall's top is a box
    on its two straight outlines (`"mask": "box"`, `"over": true`): a wall cannot be taken away.
    A leaf that, opened wide, would run into a wall beside its doorway is asked of the model
-   opened less, within the doorway's width (D158): the way down's two leaves half open, each
-   in front of its own half of the doorway.
+   opened within the doorway's width (D158): the way down's two leaves turned a quarter, each
+   against the inner side of its own jamb (D165). A leaf turned toward the viewer comes out in
+   front of its wall by its width: where its foot reaches a row with something on its floor,
+   a hole, the leaf is drawn on a row below it, over it. A thing whose parts two edits
+   marked, one part each (a torch's bracket in one and its flame in the other), is the union
+   of their differences (`"picture"` a list). A flame has no dark outline: the sweep takes
+   it for ground let in, and `kept` names its box.
+   Where the model painted again what lies round a leaf, so that the difference takes it in,
+   the leaf is the polygon traced on its outline (`traced`), as Eldra's book is.
 5. **Look.** `trace.py diff` writes `art/raw/game-check/diff-<scene>-<thing>[-<state>].png`,
    the mask's edge in magenta. A leak round the box says to look: an edit that changed what
    it should not, in the mask or beside it, is asked again, three tries at most. Then
@@ -459,7 +470,8 @@ The cells are where the figures walk (D149).
   is nudged whole, and the settings refuse a nudge over a whole column or row.
 - **Round a door or an arch**, on its cells and the cell before and after them, both columns
   are drawn toward the opening's middle, 0.2 cell each (`nudged`), so that a figure passes
-  clear of the jambs and the two stay apart. A door is as wide as its cells (`cells` in
+  clear of the jambs and the two stay apart; round the long round's two arches 0.3, more
+  centred and not quite between the cells (the owner). A door is as wide as its cells (`cells` in
   `scene.json`, D150).
 - **The row a wall's foot is painted on is wall** (D154). **The first floor row below the
   wall's foot** is drawn 0.3 cell lower (`lowered_rows`), so that a figure on it stands in

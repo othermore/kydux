@@ -38,11 +38,13 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 scene's painted strip (depth.ts, D105, D149), a speaker's bubble
                 clear of the other figures (bubble.ts), the camera's zoom with
                 the buttons and the wheel (zooming.ts, D106), the goal's
-                beating mark and the sealed doors' glow (D79),
+                beating mark on the ground and the sealed doors' glow (D79,
+                D160), a key drawn small (D164),
                 the wizard casting, a seal breaking and a door opening (D81),
                 the wizard's outline where something painted hides more than
-                a quarter of it, and a revealed thing's glow wherever
-                something covers it (silhouette.ts, cover.ts, D85, D107),
+                a quarter of it, a revealed thing's glow wherever
+                something covers it, and the goal's ring where something is
+                drawn over it (silhouette.ts, cover.ts, D85, D107, D160),
                 the wizard asleep
                 (D84), the night that falls once it sleeps and the morning
                 after it, and a morning story's light (light.ts, D124), the
@@ -862,7 +864,8 @@ one overturns stays, marked as superseded.
   words, `ways` in `text.<lang>.json`.
 - **D52 — A dark room hides what lies on its floor.** Decided 2026-10-21
   (sprint-9.md), built the same day. A level with `"dark": true` is unlit
-  until `kirra` (which it must list among its spells): until then, a
+  until `kirra` (which it lists among its spells when it must find or open
+  something in the dark, D162): until then, a
   thing that can be carried and lies farther than one tile from the
   wizard, in any of the eight directions, has no `position`, and so
   `find_nearest`, `find_all` and `fendra` pass it by; doors, slabs and
@@ -1243,10 +1246,9 @@ one overturns stays, marked as superseded.
   cells no cut-out covers, and nothing painted stands on a cell walked on;
   `tests/project/test_art_content.py` holds every painted scene and its
   levels to both, reading the scene's art. The page draws the goal's mark
-  as a ring that beats in size, alpha and colour, under the cut-outs; in a
-  door's doorway it is drawn over the door's picture and shown only once
-  the door is open, fading in as it opens, since a mark seen through a
-  closed door looks wrong. Over each sealed
+  as a ring that beats in size, alpha and colour, lying on the ground under
+  the cut-outs and the figures, a shut door's too, its ring seen over what
+  covers it (D160). Over each sealed
   door, while its seal holds, a glowing rune: its sign drawn by the page
   unless the painting draws one (`rune` in `art.json`); both are still for
   a reader who asks for less motion. A painting is asked for things that
@@ -1707,6 +1709,7 @@ one overturns stays, marked as superseded.
   painted offset carried along, and with the cell's nudge (D105), where a
   figure on it stands; on its painted cell it is drawn as painted. A thing laid on a cell no one walks, under a bookcase, is
   drawn just under that row's things, hidden in them. The cell's nudge is the one D149 gives it.
+  A key is drawn at 0.65 of its painted size, centred on its cell wherever it lies (D164).
   Rules out a book that is in one cell and looks to be in the one above.
 - **D110 — The child sees where a thing is; its numbers wait.** Decided
   2026-10-28 by the owner. In chapter 2 no text prints or speaks of a
@@ -2192,7 +2195,8 @@ one overturns stays, marked as superseded.
   drawn toward the opening's middle, by 0.2 cell each, so that a figure passes clear of
   the jambs and the two columns stay apart. Where an open leaf stands in the doorway, the
   column beside it moves less (0.1 at the storeroom's door), and where a double door's
-  leaves stand half open within it, both move 0.3 (D158). (c) The first floor row below a
+  leaves stand within it, both move 0.3 (D158), and so do the two columns round the long
+  round's arches (the owner, sprint 34). (c) The first floor row below a
   wall's foot is drawn 0.3 cell lower (`lowered_rows`); the row the foot is painted on is
   wall (D154). (d) The row at the bottom of a
   corridor where the lower wall's face is painted is walked, the wall's top cut `over` the
@@ -2215,9 +2219,10 @@ one overturns stays, marked as superseded.
   under the arch he stands in, a figure behind a statue); every reach mark with its cell
   written beside it, `(15, 3)`, as a figure's name is; and the grid as ink lines on every
   floor cell's edges, fainter over the walls, so that a child counts cells without numbers
-  in them. A goal's mark is drawn over the arch of its own row, on the scene and on the
-  plan, so that it is seen. Rules out a plan where the grid is read only from the numbers at
-  its edges.
+  in them. A goal's mark lies on the ground, on the scene and on the plan, its ring seen
+  over what covers it (D160); a dark room is drawn as any room (D163); the names cover
+  nothing (D166). Rules out a plan where the grid is read only from the numbers at its
+  edges.
 - **D152 — The dark tunnel's level starts where the child cannot know.** Decided 2026-11-08
   by the owner. *El túnel oscuro* starts at (14, 2), a cell the child has not seen, not
   where *El pasillo de las puertas* ended; its goal names no cell: the exit is found on the
@@ -2280,16 +2285,75 @@ one overturns stays, marked as superseded.
 - **D158 — A leaf opens within its doorway's width.** Decided 2026-11-08 by the owner (*no
   vale con que aparezcan detrás del muro; deben quedar menos abiertas*). A door whose
   leaves, opened wide, would run into a wall beside the doorway is asked of the model
-  opened less: the way down's double door has its two leaves half open, each in front of
-  its own half of the doorway, the arch and its jambs whole (`way-down-open-half-2.md`),
-  and the figures passing it drawn 0.3 toward the doorway's middle on its cells and the
-  cell before and after. Leaves that stand in their doorway are drawn on the doorway's row,
-  reaching below it to their feet, so that a figure passing between them is seen. No leaf
-  is hidden behind a wall's box to make room. Rules out a leaf drawn over or behind a side
-  wall.
+  opened within the doorway's width: the way down's double door has its two leaves turned
+  a quarter, each against the inner side of its own jamb, the arch and its jambs whole
+  (D165), and the figures passing it drawn 0.3 toward the doorway's middle on its cells
+  and the cell before and after. Leaves that stand in their doorway are drawn on a row at
+  or below their feet, so that a figure passing between them is seen. No leaf is hidden
+  behind a wall's box to make room. Rules out a leaf drawn over or behind a side wall.
 - **D159 — The plan draws a cut-out where it is painted.** Decided 2026-11-08 by the owner
   (the statues higher on the plan than on the scene). The plan (D151) draws every image of
   the scene, a row's cut-outs, a door's state and a thing, at its painted box
   (`paintedBox`), as the scene does, never from the cell it stands on; a test holds the
   crossing's statues and the doors at the boxes art.json gives them. Rules out a thing on
   the plan a row off the scene.
+- **D160 — The goal's mark lies on the floor.** Decided 2026-11-08 by the owner (*los
+  círculos de destino deben verse sobre el suelo, tapados por lo que está delante, en
+  todos los escenarios de todos los capítulos*). On a painted scene the mark is drawn at
+  the ground's depth (`MARK_DEPTH`), under every row's things, every thing standing and
+  every figure, in every scene of every chapter: a figure walking over it, a cut-out
+  before it (a statue, an arch's band, a door's leaf shut or open, a wall's top) covers
+  it. Where one of them covers it, the mark's ring is drawn over them in the outline's
+  yellow, masked by copies of what is drawn over it, beating with the mark, over every
+  figure and under the dark and the light (`MarkSilhouette`), so that the mark is read
+  whole, as a figure is by its outline (D107); the page says which marks are covered
+  (`data-marks-covered`). The plan draws its marks under its figures and cut-outs, and
+  their ring over what covers them. Rules out a mark that floats over an arch, over a
+  shut door or over the wizard's feet.
+- **D161 — A door's open state is asked of the model as the whole scene.** Decided
+  2026-11-08 by the owner (*pedir a Gemini la imagen completa con la puerta abierta, y eso
+  debería hacer que el suelo tuviese continuidad*), for every scene: the edit that opens a
+  door is asked on the whole picture of the scene, never on a crop, so that the floor seen
+  through the doorway continues the floor on both sides; the leaf and the doorway are the
+  difference against the base (D148), or, where the model painted what lies round the
+  leaf again and the difference takes it in, the polygon traced on the leaf's outline
+  (`traced`, art/README.md). The way down's double door is so (D165). The dormitory's
+  common room door keeps the leaf and the doorway it has, the owner's choice once its
+  door was asked whole (2026-11-08). Rules out a doorway whose floor stops at a crop's
+  edge.
+- **D162 — A dark room is dark in every level played before it is lit.** Decided
+  2026-11-08 by the owner (*en este nivel la sala debería estar a oscuras, porque si no ya
+  la ha visto el niño*). *La losa que va y viene* plays with the storeroom dark (`dark:
+  ["storeroom"]`), its mark on (5, 7) in the dark, seen faintly as the castle's shape
+  (D52), and no light to cast. A dark level lists `kirra` among its spells only when a
+  `collect` or an `open` goal names a thing that lies in the dark (its dark rooms, or the
+  whole map), since a `reach` needs no sight (`level.py`). Rules out a room seen lit a
+  level before the level that lights it.
+- **D163 — The plan shows a dark room as the castle's plan.** Decided 2026-11-08 by the
+  owner (*en el mapa la oscuridad no se debería ver como un parche blanco*). The plan
+  (D151) draws a dark room's picture as any room's, since the map knows the castle; only
+  the things that lie unlit in it are not drawn (the key stays the level's secret), and a
+  figure in it is drawn. Rules out a white patch on the plan.
+- **D164 — A key is drawn small, and a torch stands over it.** Decided 2026-11-08 by the
+  owner (*la llave se ve por encima de la antorcha, y es muy grande*). A key's picture on
+  a painted scene, in every chapter, is drawn at 0.65 of its painted size (`KEY_SCALE`),
+  the middle of what is drawn of it on its cell's middle with the cell's nudge wherever
+  it lies (D109), and just under its row's things (`lying`), so that a torch's cut-out on
+  its row is over it; the plan draws it so. The way down's key on (10, 3) ends short of
+  the wall torch beside it, which is the ground's. Rules out a key wider than a figure.
+- **D165 — A double door opens a quarter turn against its jambs, drawn over the hole
+  before it.** Decided 2026-11-08 by the owner (*las hojas a 90 o 95 grados, lo justo para
+  no dar con el muro; por encima del agujero, no por debajo*). The way down's two leaves
+  are Gemini's edit of the whole base (`way-down-open-quarter-2.md`), each turned a
+  quarter toward the viewer and standing against the inner side of its own jamb, the
+  arch whole between them. A leaf turned toward the viewer comes out in front of the wall
+  by its width, so their feet reach the hole's row (about 7.7); they are drawn on row 8,
+  over the hole and over the torch beside it, and a figure passes between them on the
+  doorway's cells (D158). Rules out leaves that barely open and leaves drawn under the
+  hole.
+- **D166 — A label on the plan covers no figure and no other label, and the mark's label
+  no cut-out.** Decided 2026-11-08. The plan's labels (a figure's name and cell, a mark's
+  cell) are placed by a search, right, left, below and above of their owner and then
+  farther out, at the first place that overlaps no figure's body, no mark, no label
+  placed before it and, for a mark's, no solid pixel of a cut-out, and they are drawn
+  last, over everything. Rules out Nuri's label over Teku's figure on P3's plan.

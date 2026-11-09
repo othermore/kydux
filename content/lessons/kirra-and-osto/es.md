@@ -7,9 +7,9 @@ El hechizo *kirra* ilumina la habitación en la que estás, para que se muestre 
 ---
 ## La losa que va y viene
 
-En la oscuridad de la noche, se abre un agujero en el suelo de una casilla. Una losa de piedra lo cubre durante unos pocos ticks y desaparece por otros tantos, una y otra vez.
+En la oscuridad de la noche, se abre un agujero en el suelo de una casilla. Una losa cubre el agujero durante unos pocos ticks y desaparece por otros tantos, una y otra vez.
 
-Si lanzamos el hechizo *osto* junto al agujero, sujeta la losa en su sitio durante un rato. Para saber si es seguro pisarla, preguntamos `slab.in_place`. ¡Así podemos hacer `while not slab.in_place:` con una espera debajo, y luego dar el paso de forma segura!
+Si lanzamos el hechizo *osto* junto al agujero, sujeta la losa en su sitio durante un rato. Para saber si es seguro pisarla, miramos `slab.in_place`. ¡Así podemos hacer `while not slab.in_place:` con una espera debajo, y luego dar el paso de forma segura!
 
 ---
 ## Pruébalo

@@ -1,6 +1,6 @@
 # Si no
 
-Cuando haces una pregunta con `if`, sabes qué hacer si la respuesta es `True`. Pero, ¿y si la respuesta es no? A lo mejor quieres hacer otra cosa en su lugar.
+Cuando comprobamos algo con `if`, sabemos qué hacer si la respuesta es `True`. Pero, ¿y si la respuesta es no? A lo mejor queremos hacer otra cosa en su lugar.
 
 Usamos la palabra `else` para decir qué pasa cuando la condición es `False`, y escribimos las líneas que el ordenador debe ejecutar entonces.
 
@@ -14,9 +14,9 @@ Cuando el ordenador lee esto, una de las dos partes siempre se ejecutará. ¡Si 
 ---
 ## Pruébalo
 
-Vamos a comprobar hacia dónde está mirando Dask ahora mismo.
+Por ejemplo, si la puerta izquierda está cerrada con llave, vamos por la derecha; si no, por la izquierda.
 
-¡El ordenador imprimirá una cadena u otra, pero nunca las dos!
+Ahora mismo la puerta izquierda está cerrada con llave, ¡así que el programa escribirá el primer mensaje!
 
 ```python try
 if left_door.locked:

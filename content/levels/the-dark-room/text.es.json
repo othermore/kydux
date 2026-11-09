@@ -8,11 +8,11 @@
   ],
   "starting_code": "# Ilumina la sala con un hechizo.\n\n# Encuentra la llave e imprime su casilla con `find_nearest`, `position` y `print`.\n\n# Camina hasta ella.\n\n# Recógela con `pick_up`.\n\n# Camina a la casilla sobre la puerta.\n\n# Ábrela con `open`.\n",
   "hints": [
-    "¡Lanza `kirra` primero! Si no lo haces, `find_nearest(\"key\")` no verá nada en la oscuridad.",
-    "Tras iluminar la sala y ver la casilla de la llave, ¡camina 4 a la derecha y cógela!",
+    "¡Lanza *kirra* primero! Si no lo haces, `find_nearest` no verá nada en la oscuridad.",
+    "Tras iluminar la sala y mirar la casilla de la llave, ¡camina 4 a la derecha y cógela!",
     "Desde la llave, camina 1 a la derecha y 2 abajo a la casilla sobre `store_door` para abrirla."
   ],
-  "intro": "¡El almacén está a oscuras! No podemos encontrar la llave si no podemos verla. Debemos lanzar *kirra* para iluminar la sala, ver la casilla de la llave y cogerla. Luego iremos a la puerta cerrada y la abriremos. ¡Se llama `store_door`!",
-  "outro": "¡La luz lo ha mostrado todo! La llave es nuestra y la puerta está abierta.",
+  "intro": "¡El almacén está a oscuras! No podemos encontrar la llave si no podemos verla. Debemos lanzar *kirra* para iluminar la sala, comprobar la casilla de la llave y cogerla. Luego iremos a la puerta cerrada y la abriremos. ¡Se llama `store_door`!",
+  "outro": "¡La luz lo ha mostrado todo, y la puerta ya está abierta! Pero, esperad... ¿no oís voces?",
   "learned": "Ahora sabes que *kirra* ilumina una sala, y entonces las cosas se encuentran y dicen su casilla."
 }

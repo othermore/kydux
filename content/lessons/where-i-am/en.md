@@ -1,20 +1,22 @@
 # Where I am
 
-We are inside the enchanted tunnel now. In here, no one is seen, neither on the scene nor on the plan! But a program can ask where it is anyway.
+We cannot see anything here, but that does not stop us from knowing where we are. With the naughty child's map, your wizard always knows which cell they are on. You can see it by opening the map, but if you need to see it inside the program, you can use `wizard.position`. `position` is an attribute of `wizard`, and it holds two numbers together, like `(15, 3)`.
 
-Your wizard knows exactly which cell they stand in. To ask, we use `wizard.position`. It is an attribute that holds the two numbers together, like `(15, 3)`. A thing knows its cell too, like `key.position`!
+We can also see the position of an object or thing that is on the scene. For example, if we have a key, `key`, we can see its position using `key.position`.
+
+```python try
+print(wizard.position)
+```
 
 ---
-## Why we ask
+## What cannot be seen
 
-A program cannot look at the floor, and in a dark or enchanted place there is nothing to see anyway.
-
-The position tells the program exactly where your wizard is. From there, you just have to count to where you want to go!
+Sometimes we cannot see some things on the map (maybe there is a hiding spell, or maybe they are very small). However, using the `position` attribute, the program sees exactly where things are, even if you do not see them on the map.
 
 ---
 ## Try it
 
-Let us ask exactly which cell we are in right now, here inside the tunnel.
+Let us look at exactly which cell we are in right now, here inside the tunnel.
 
 ```python try
 print(wizard.position)

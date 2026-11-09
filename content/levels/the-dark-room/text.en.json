@@ -6,13 +6,13 @@
     "Reach the mark.",
     "Find the key with `find_nearest`."
   ],
-  "starting_code": "# Light the room with a spell.\n\n# Find the key and print its cell with `find_nearest`, `position` and `print`.\n\n# Walk to it.\n\n# Pick it up with `pick_up`.\n\n# Walk to the cell above the door.\n\n# Open it with `open`.\n",
+  "starting_code": "# Light up the room with a spell.\n\n# Find the key and print its cell with `find_nearest`, `position` and `print`.\n\n# Walk to it.\n\n# Pick it up with `pick_up`.\n\n# Walk to the cell above the door.\n\n# Open it with `open`.\n",
   "hints": [
-    "Cast `kirra` first! If you don't, `find_nearest(\"key\")` won't see anything in the dark.",
-    "After lighting the room and finding the key's cell, walk 4 right to it, and pick it up!",
+    "Cast *kirra* first! If you do not, `find_nearest` will see nothing in the dark.",
+    "After lighting the room and checking the key's cell, walk 4 right and pick it up!",
     "From the key, walk 1 right and 2 down to the cell above `store_door` to open it."
   ],
-  "intro": "The storeroom is completely dark! We cannot find the key if we cannot see it. We must cast *kirra* to light the room, find the key's cell, and get it. Then we can go to the locked door and open it. It's called `store_door`!",
-  "outro": "The light revealed everything! The key is ours and the door is open.",
-  "learned": "Now you know that *kirra* lights a room, and then things can be found and say their cell."
+  "intro": "The storeroom is dark! We cannot find the key if we cannot see it. We must cast *kirra* to light up the room, check the key's cell and pick it up. Then we will go to the locked door and open it. It is called `store_door`!",
+  "outro": "The light showed everything, and the door is open! But wait... can you hear voices?",
+  "learned": "Now you know that *kirra* lights up a room, and then things are found and tell their cell."
 }

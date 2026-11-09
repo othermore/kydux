@@ -85,10 +85,11 @@ game's developers before it enters the game.
 - A lesson is Markdown: the first page opens with a `#` title; pages are
   separated by a line with only `---`; `##` for a page's heading; bold,
   italic, lists, `inline code` and fenced ```python code; no HTML. A
-  lesson's last page ends with exactly one block fenced ```python try, the
-  lesson's example, shown on that page, unless the brief says the lesson
-  has none. The level after the lesson never starts with it: the child
-  writes their own program.
+  page may hold one block fenced ```python try: code the child runs and
+  changes on the page itself, in the world of the level after the lesson. A
+  lesson's last page ends with exactly one, the lesson's example, unless the
+  brief says the lesson has none. The level after the lesson never starts
+  with it: the child writes their own program.
 - A story is played on the game's scene, step by step, and is JSON: its
   `title` and its `steps`, one text a step, as many as the brief lists.
   A step is said by the voice, the narrator, in a band under the scene,

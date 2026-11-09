@@ -1,21 +1,21 @@
 {
   "title": "Past the teacher",
   "goals": [
-    "Reach the mark in the bottom arch.",
+    "Reach the mark in the arch below.",
     "Do not let Dask see you."
   ],
-  "starting_code": "# Walk down to the cell before the crossing with `move_down`.\n\n# Wait while Dask faces right, with `while`, `facing` and `wait`.\n\n# Walk on down.\n",
+  "starting_code": "# Walk down to the cell before the crossing with `move_down`.\n\n# Wait while Dask is facing right, with `while`, `facing` and `wait`.\n\n# Keep walking down.\n",
   "hints": [
-    "Dask's lantern shines far! Walk 5 down to stop just before the crossing.",
-    "Use `while` with `dask.facing` to wait until he looks away.",
-    "When he turns around, walk 7 down to the arch!"
+    "Dask's lantern shines very far! Walk down 5 cells to stop just before the crossing.",
+    "Use `while` with `dask.facing` to wait while he looks right.",
+    "When he turns around, walk down 7 cells to the arch!"
   ],
-  "intro": "It's Dask again! His lantern shines a long way down the corridor. We are headed for the mark in the bottom arch, but we must cross his path. We don't know how long he will look this way, so no fixed number of waits will work! We need to walk to the cell right before the crossing and wait while he faces right.",
-  "outro": "We did it! Waiting until he turns is the only way to be safe.",
-  "learned": "Now you know that `while` waits as long as something stays true, however long that is.",
+  "intro": "It is Dask again! His lantern lights up almost the whole corridor. We need to reach the mark in the arch below, but we must cross his path. We do not know how long he will look this way, so we will wait while he looks right. We should walk down to the cell before the crossing and wait.",
+  "outro": "We got past! Beyond this arch there is a corridor with a hole in its floor.",
+  "learned": "Now you know that `while` waits while something remains true, no matter how long.",
   "ways": {
-    "near": "Dask has just begun his round",
-    "middle": "Dask has nearly ended his round",
-    "far": "Dask is on his way back"
+    "near": "Dask has just started his round",
+    "middle": "Dask is about to end his round",
+    "far": "Dask is already walking back"
   }
 }

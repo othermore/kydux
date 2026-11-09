@@ -1,6 +1,6 @@
 # Repetir
 
-Hacer las mismas instrucciones muchas veces significa tener que escribirlas una y otra vez, ¡y eso es mucho trabajo! Podemos pedirle al ordenador que las repita por nosotros.
+Hacer las mismas instrucciones muchas veces significa tener que escribirlas una y otra vez, ¡y eso es mucho trabajo! Podemos decirle al ordenador que las repita por nosotros.
 
 Los programadores llaman a esto un bucle. Escribimos `for step in range(3):` y, metidas debajo con cuatro espacios, las líneas que queremos ejecutar tres veces.
 

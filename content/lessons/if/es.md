@@ -5,20 +5,25 @@ Saber la respuesta a una expresión está muy bien, ¡pero hacer algo solo cuand
 Escribimos `if`, luego nuestra expresión, y al final dos puntos. Debajo, metemos nuestras líneas hacia dentro dejando cuatro espacios. El ordenador solo ejecutará estas líneas con espacios si la respuesta es `True`.
 
 ---
-## Esperar nuestro momento
+## Una condición
 
-A veces Dask mira hacia aquí, y a veces mira hacia otro lado. Si está mirando, tenemos que esperar.
+Si Dask mira hacia arriba, queremos caminar dos casillas hacia abajo.
 
-El método `wizard.wait()` hace que tu {mago|maga} se quede quiet{o|a} durante un tick, que es un momento del juego, mientras todo lo demás se mueve. ¡Y con `wizard.wait(2)` espera dos ticks!
+Este código imprime la casilla de tu {mago|maga}, que solo cambia si la condición es verdadera.
+
+```python try
+if dask.facing == "up":
+    wizard.move_down(2)
+print(wizard.position)
+```
 
 ---
 ## Pruébalo
 
-Vamos a escribir una condición para escondernos de él. Como los niveles se pueden jugar de varias formas, Dask podría hacer cosas distintas.
-
-¡Esta instrucción de esperar solo se ejecutará si está mirando hacia arriba, hacia nosotros!
+Cambia `"up"` por `"down"` en el código. ¡Verás que la casilla se queda igual porque la condición ya no es verdadera!
 
 ```python try
 if dask.facing == "up":
-    wizard.wait()
+    wizard.move_down(2)
+print(wizard.position)
 ```

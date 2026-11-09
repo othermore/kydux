@@ -340,3 +340,37 @@ def test_a_lesson_says_who_teaches_it(path):
     assert speaker in ("friend", "mate") or speaker in characters, (
         f"{path.name} names no teacher of the story's"
     )
+
+
+#: What chapter 3 no longer says to a child (D141, D145), in the Spanish and the English.
+OUT_OF_THE_WORDS = {
+    "es": re.compile(r"pregunt|encantad|bajito|varias (formas|maneras)", re.I),
+    "en": re.compile(r"\benchanted\b|\bwhisper|several ways|\basks?\b|\bquestion\b", re.I),
+}
+
+
+def chapter_3_texts(lang: str) -> list[tuple[str, str]]:
+    """Every text of chapter 3's stops that the child reads, by its item."""
+    items = json.loads((CONTENT / "chapters" / "03-passages" / "chapter.json").read_text())[
+        "items"
+    ]
+    found = []
+    for item in items:
+        kind, _, item_id = item.partition(":")
+        if kind == "lesson":
+            text = (CONTENT / "lessons" / item_id / f"{lang}.md").read_text(encoding="utf-8")
+        else:
+            folder = "stories" if kind == "story" else "levels"
+            text = (CONTENT / folder / item_id / f"text.{lang}.json").read_text(encoding="utf-8")
+        found.append((item, text))
+    return found
+
+
+@pytest.mark.parametrize("lang", LANGUAGES)
+def test_chapter_3_says_nothing_the_owner_took_out_of_it(lang):
+    """A program looks and sees, it never asks; the tunnel is dark; the game's doing is
+    shown, not told (D141, D145). The cold voice alone whispers."""
+    for item, text in chapter_3_texts(lang):
+        said = text.replace("susurra", "").replace("whispers", "")
+        found = OUT_OF_THE_WORDS[lang].search(said)
+        assert not found, f"{item}, {lang}: {found.group(0)}"

@@ -1,20 +1,22 @@
 # Dónde estoy
 
-Ya estamos dentro del túnel encantado. ¡Aquí no se ve a nadie, ni en la escena ni en el plano! Pero un programa puede preguntar dónde está de todos modos.
+Aquí no se ve nada, pero eso no nos impide saber dónde estamos. Como tiene el mapa del niño travieso, tu {mago|maga} siempre sabe en qué casilla está. Puedes verlo abriendo el mapa, pero si necesitas verlo dentro del programa, puedes usar `wizard.position`. `position` es un atributo de `wizard`, y guarda dos números juntos, como `(15, 3)`.
 
-Tu {mago|maga} sabe perfectamente en qué casilla está. Para preguntarlo, usamos `wizard.position`. Es un atributo que guarda los dos números juntos, como `(15, 3)`. ¡Una cosa también sabe su casilla, como `key.position`!
+También podemos ver la posición de algún objeto o cosa que haya en el escenario. Por ejemplo, si tenemos una llave, `key`, podemos ver su posición usando `key.position`.
+
+```python try
+print(wizard.position)
+```
 
 ---
-## Por qué preguntar
+## Lo que no se ve
 
-Un programa no puede mirar al suelo, y en un lugar oscuro o encantado tampoco hay nada que ver.
-
-La posición le dice al programa exactamente dónde está tu {mago|maga}. ¡Y desde ahí, solo tienes que contar hasta donde quieres llegar!
+A veces no podemos ver algunas cosas en el mapa (quizás hay un encantamiento de ocultación, o quizás son muy pequeñas). Sin embargo, usando el atributo `position`, el programa ve exactamente dónde están las cosas, incluso aunque tú no lo veas en el mapa.
 
 ---
 ## Pruébalo
 
-Vamos a preguntar en qué casilla estamos exactamente ahora mismo, aquí dentro del túnel.
+Vamos a mirar en qué casilla estamos ahora mismo, aquí dentro del túnel.
 
 ```python try
 print(wizard.position)

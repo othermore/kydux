@@ -1,26 +1,26 @@
 # Else
 
-When you ask a question with `if`, you know what to do if the answer is `True`. But what if the answer is no? You might want to do something else instead.
+When we check something with `if`, we know what to do if the answer is `True`. But what if the answer is no? We might want to do something else instead.
 
 We use the word `else` to say what happens when the condition is `False`, and we write the lines that the computer must run then.
 
 ---
 ## Making a choice
 
-The `else` is put in the same place as its `if`, with no spaces before it, and it has its own colon. Then, we move its lines in with four spaces underneath.
+The `else` goes in the same place as its `if`, with no spaces in front, and it has its own colon. Then, we move its lines in with four spaces underneath.
 
-When the computer reads this, one of the two parts will always run. If the condition is true it runs the first part, and if it is false it runs the second!
+When the computer reads this, one of the two parts will always run. If the condition is true it runs the first one, and if it is false it runs the second one!
 
 ---
 ## Try it
 
-Let us check which way Dask is looking right now.
+For example, if the left door is locked, we go through the right one; if not, through the left.
 
-The computer will print one string or the other, but never both!
+Right now the left door is locked, so the program will print the first message!
 
 ```python try
 if left_door.locked:
-    print("We go by the right door")
+    print("We go through the right door")
 else:
-    print("We go by the left door")
+    print("We go through the left door")
 ```

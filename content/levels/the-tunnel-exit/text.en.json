@@ -4,13 +4,13 @@
     "Reach the mark, by the first statue.",
     "Do not let Dask see you."
   ],
-  "starting_code": "# Wait two ticks with `wait`, for Dask to go by.\n\n# Walk right to the mark with `move_right`.\n",
+  "starting_code": "# Wait for Dask to go by with `wait`.\n\n# Walk right to the mark with `move_right`.\n",
   "hints": [
-    "Dask is coming up the corridor that crosses this one. If we cross now, he sees us.",
-    "Count the ticks: let him go by, and only then walk.",
-    "After waiting, it is nine steps to the right."
+    "Let Dask go by first, and then we cross!",
+    "Count the ticks we must wait for him to go by: two.",
+    "Use `wait` with 2, then `move_right` to walk nine cells to the mark."
   ],
-  "intro": "Dask is coming up the corridor that crosses this one, looking up. If we cross now he will see us: let us wait for him to go by and walk to the first statue.",
-  "outro": "He went by without seeing us! And now he is up ahead, by the statues...",
-  "learned": "Now you know that `wizard.wait()` lets a tick go by while everything else moves, and that the number says how many."
+  "intro": "We are out of the tunnel! But look, another corridor crosses this one, and Dask is coming up it. He is looking up, so if we cross now he will see us! I think we should wait two ticks for him to go by, and then walk to the mark, by the first statue.",
+  "outro": "He went by without seeing us! But look, up ahead, among the statues, there is Dask again.",
+  "learned": "Now you know that `wizard.wait()` lets a tick go by while everything else moves, and that its number says how many."
 }

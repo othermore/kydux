@@ -1,6 +1,6 @@
 # Mientras
 
-Un bucle `for` es genial cuando sabes exactamente cuántas veces quieres repetir algo. Pero necesitamos esperar mientras Dask mire hacia aquí, ¡y no sabemos durante cuántos ticks lo hará!
+Un bucle `for` es genial cuando sabes exactamente cuántas veces quieres repetir algo. Pero necesitamos esperar mientras Dask mire hacia la derecha, ¡y no sabemos durante cuántos ticks lo hará!
 
 Podemos usar otro bucle que repite sus líneas una y otra vez mientras su expresión se mantenga verdadera, y continúa cuando se vuelve falsa. Lo escribimos con la palabra `while`.
 
@@ -14,11 +14,10 @@ Pero no es ningún desastre: el juego detendrá un `while` que no termina gracia
 ---
 ## Pruébalo
 
-Vamos a escondernos y esperar.
-
-¡Tu {mago|maga} se quedará quiet{o|a} una y otra vez, mientras Dask siga mirando a la izquierda!
+Tu {mago|maga} se quedará quiet{o|a} una y otra vez, mientras Dask mire hacia la derecha. ¡Y cuando se gire, el programa escribirá hacia dónde mira!
 
 ```python try
-while dask.facing == "left":
+while dask.facing == "right":
     wizard.wait()
+print(dask.facing)
 ```

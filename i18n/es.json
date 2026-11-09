@@ -200,7 +200,7 @@
       "kind": "Qué es: \"teacher\".",
       "name": "El nombre del profesor en este nivel.",
       "position": "Dónde está el profesor, en x e y.",
-      "facing": "Hacia dónde mira el profesor, como una cadena: \"up\", \"down\", \"left\" o \"right\", para que un programa pueda preguntarlo antes de cada paso: dask.facing == \"up\".",
+      "facing": "Hacia dónde mira el profesor, como una cadena: \"up\", \"down\", \"left\" o \"right\", para que un programa pueda mirarlo antes de cada paso: dask.facing == \"up\".",
       "can_see": "Dice si el profesor puede ver algo que tiene delante, lo bastante cerca.",
       "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}."
     },

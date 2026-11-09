@@ -200,7 +200,7 @@
       "kind": "What they are: \"teacher\".",
       "name": "The teacher's own name in this level.",
       "position": "Where the teacher stands, as x and y.",
-      "facing": "The way the teacher looks, as a string: \"up\", \"down\", \"left\" or \"right\", so that a program can ask before each step: dask.facing == \"up\".",
+      "facing": "The way the teacher looks, as a string: \"up\", \"down\", \"left\" or \"right\", so that a program can look before each step: dask.facing == \"up\".",
       "can_see": "Tells whether the teacher can see something straight ahead, close enough.",
       "distance_to": "Gives the number of steps from an object to the wizard."
     },

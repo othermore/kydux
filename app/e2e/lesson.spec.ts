@@ -120,6 +120,30 @@ test.describe('a page runs its code (D142)', () => {
     await expect(page.locator('.lesson-printed')).toBeHidden();
   });
 
+  test("true-or-false's first page prints Dask's facing, and its next ones compare", async ({ page }) => {
+    await page.goto('/#lesson/true-or-false');
+    await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 5');
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('up', { timeout: 90_000 });
+    await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('True\nFalse', { timeout: 30_000 });
+    await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('False\nTrue', { timeout: 30_000 });
+    await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('False', { timeout: 30_000 });
+  });
+
+  test('the block of if prints the cell, which the condition changes', async ({ page }) => {
+    await page.goto('/#lesson/if');
+    await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('(11, 7)', { timeout: 90_000 });
+    await expect(page.locator('.lesson-said')).toContainText('(11, 7)');
+  });
+
   test('a block that walks says the cell the wizard ended on, always from the start', async ({ page }) => {
     await page.goto('/#lesson/waiting');
     await page.locator('#lesson-next').click();

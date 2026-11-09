@@ -4,15 +4,15 @@
     "Llega a la marca, a la entrada del pasillo que baja.",
     "Que Dask no te vea."
   ],
-  "starting_code": "# Si Dask mira hacia arriba, baja dos casillas con `move_down`.\n\n# Camina a la derecha, más allá de Dask, con `move_right`.\n\n# Baja hasta la marca con `move_down`.\n",
+  "starting_code": "# Si Dask mira hacia arriba, baja dos casillas con `move_down`.\n\n# Camina a la derecha con `move_right`.\n\n# Baja con `move_down`.\n",
   "hints": [
-    "Dask mira hacia arriba o hacia abajo. Si mira arriba, no podemos pasar por arriba.",
-    "Mira `dask.facing` con un `if`: las líneas de dentro llevan cuatro espacios.",
-    "Son cuatro pasos a la derecha y luego tres hacia abajo."
+    "¡Podemos comprobar hacia dónde mira Dask con `facing`!",
+    "Si mira hacia arriba, baja 2 casillas dentro del `if`, con cuatro espacios delante.",
+    "Después del `if`, sin espacios delante, camina 4 casillas a la derecha y baja 3."
   ],
-  "intro": "Dask está entre las dos primeras estatuas, mirando hacia arriba o hacia abajo. Estamos pegados a la pared de arriba: si mira arriba, bajamos dos y pasamos por debajo de él; si mira abajo, pasamos directamente. Luego, al pasillo que baja entre la segunda y la tercera estatua.",
-  "outro": "¡Hemos pasado justo a su lado! Por aquí hay una sala, oigo el eco.",
-  "learned": "Ahora sabes que `if` hace sus líneas solo cuando su condición es verdadera.",
+  "intro": "Dask está quieto entre las dos primeras estatuas. Estamos contra la pared de arriba. ¡Si mira hacia arriba, debemos bajar dos casillas y pasar por debajo de él! Si mira hacia abajo, podemos cruzar recto. Luego bajaremos al pasillo entre la segunda y la tercera estatua, donde está la marca.",
+  "outro": "¡Hemos pasado sin que nos vea! A ver adónde lleva este pasillo.",
+  "learned": "Ahora sabes que `if` ejecuta sus líneas solo cuando su condición es cierta, y que lo que viene después se ejecuta siempre.",
   "ways": {
     "looking_up": "Dask mira hacia arriba",
     "looking_down": "Dask mira hacia abajo"

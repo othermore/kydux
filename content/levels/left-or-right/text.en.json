@@ -3,15 +3,15 @@
   "goals": [
     "Reach the mark."
   ],
-  "starting_code": "# Ask with `locked` whether the left door is locked.\n\n# If it is, walk to the right door, open it with `open`, go through and along the corridor.\n\n# Else, do the same by the left door.\n",
+  "starting_code": "# Look with `locked` whether the left door is locked.\n\n# If it is, walk to the right door, open it with `open`, go through and along the corridor.\n\n# Else do the same by the left door.\n",
   "hints": [
-    "We can ask the door if it is locked with `left_door.locked`!",
-    "If the left door is locked, walk 3 down and 3 right to `right_door`, open it, walk 3 down and 3 right to the mark.",
-    "If it's not locked, `else:`, walk 3 down, 3 left to `left_door`, open it, walk 3 down and 9 right!"
+    "We can look at what the door knows: `left_door.locked`!",
+    "If the left is locked, walk 3 down and 3 right to `right_door`, open it, walk 3 down and 3 right to the mark.",
+    "If it is not, `else:`, walk 3 down, 3 left to `left_door`, open it, walk 3 down and 9 right!"
   ],
-  "intro": "Look, a room with two doors! One of them is locked tonight, and there are no keys around. But we can just ask the left door if it is locked! If it is, we will go through the right door, and if it's not, we'll take the left one. The mark is waiting along the corridor, on the right!",
-  "outro": "You chose perfectly! Asking what things know is a great trick.",
-  "learned": "Now you know that `if` and `else` can ask what a thing knows, and choose the way by it.",
+  "intro": "Look, a room with two doors! One of them is locked tonight, and there are no keys anywhere. But we can look at what the left door knows, `left_door.locked`! If it is locked, we will go through the right door, and if not, through the left one. The mark waits for us in the corridor, to the right!",
+  "outro": "We are on the other side! I think these doors change every night, and I have a program for when we come back that does not work at all...",
+  "learned": "Now you know that `if` and `else` can look at what a thing knows, and choose the way by it.",
   "ways": {
     "left_locked": "The left door is locked",
     "right_locked": "The right door is locked"

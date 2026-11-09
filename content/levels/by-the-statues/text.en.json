@@ -4,15 +4,15 @@
     "Reach the mark, where the corridor goes down.",
     "Do not let Dask see you."
   ],
-  "starting_code": "# If Dask looks up, go down two cells with `move_down`.\n\n# Walk right, past Dask, with `move_right`.\n\n# Go down to the mark with `move_down`.\n",
+  "starting_code": "# If Dask looks up, walk down two cells with `move_down`.\n\n# Walk right with `move_right`.\n\n# Walk down with `move_down`.\n",
   "hints": [
-    "Dask looks up or down. If he looks up, we cannot pass above him.",
-    "Look at `dask.facing` with an `if`: the lines inside it have four spaces.",
-    "It is four steps right and then three down."
+    "We can check which way Dask is looking with `facing`!",
+    "If he looks up, move down 2 cells inside the `if`, with four spaces in front.",
+    "After the `if`, with no spaces in front, walk 4 cells right and 3 down."
   ],
-  "intro": "Dask stands between the first two statues, looking up or down. We are against the top wall: if he looks up, we go down two and pass below him; if he looks down, we pass straight along. Then into the corridor that goes down between the second and the third statue.",
-  "outro": "We passed right beside him! There is a room this way, I can hear the echo.",
-  "learned": "Now you know that `if` does its lines only when its condition is true.",
+  "intro": "Dask is standing still between the first two statues. We are against the top wall. If he looks up, we must go down two cells and pass below him! If he looks down, we can cross straight. Then we go down into the corridor between the second and third statue, where the mark is.",
+  "outro": "We passed without his seeing us! Let us see where this corridor leads.",
+  "learned": "Now you know that `if` runs its lines only when its condition is true, and that what comes after it runs always.",
   "ways": {
     "looking_up": "Dask looks up",
     "looking_down": "Dask looks down"

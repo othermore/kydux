@@ -2,15 +2,15 @@
   "title": "The dark tunnel",
   "goals": [
     "Walk out at the tunnel's other end, cell (19, 1).",
-    "Ask where you stand with `position`."
+    "Check which cell you are on with `position`."
   ],
-  "starting_code": "# Print where you stand with `position` and `print`.\n\n# Walk up to the exit's row with `move_up`.\n\n# Walk right to the end with `move_right`.\n",
+  "starting_code": "# Print where the wizard stands with `position` and `print`.\n\n# Walk up to the exit's row with `move_up`.\n\n# Walk right to the end with `move_right`.\n",
   "hints": [
-    "Use `print` to see where you are in this dark place!",
-    "The plan shows the exit at (19, 1), but we cannot see ourselves. Use `wizard.position`.",
-    "If we are at (15, 3), we need to go 2 steps up and 4 steps right."
+    "Use `print` to check where you are in this dark place!",
+    "The plan shows the exit at (19, 1), but we cannot see ourselves. Check `wizard.position`.",
+    "If it turns out we are on (15, 3), we need to take 2 steps up and 4 right."
   ],
-  "intro": "It's so dark! The tunnel is enchanted, and neither our eyes nor the map can see us. We won't see anything move. But the map says the other end is at cell (19, 1). We can ask the program where we stand, count the steps, and walk blind!",
-  "outro": "Phew, that was spooky! But asking the program worked, and we are out.",
-  "learned": "Now you know why a program asks where it is instead of looking."
+  "intro": "So dark! Nothing is seen in this tunnel... and for some reason, not even the map shows us. What we do see on the map is the tunnel's exit, on cell (19, 1). We can check where the wizard is, count the steps and walk blindly!",
+  "outro": "We looked at where we were and walked out blind! Look, there is light up ahead.",
+  "learned": "Now you know that a program sees its position even where nothing is seen."
 }

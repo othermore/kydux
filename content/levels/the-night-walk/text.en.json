@@ -3,21 +3,21 @@
   "goals": [
     "Pick up the key.",
     "Open the door.",
-    "Reach the mark in the bottom arch.",
+    "Reach the mark in the arch below.",
     "Do not let Dask see you.",
-    "Ask `in_place`."
+    "Check `in_place`."
   ],
-  "starting_code": "# Walk down to the key.\n\n# Pick it up.\n\n# Walk down to the door.\n\n# Open it, it is called `door`.\n\n# Walk down to the hole's edge.\n\n# Wait for the slab.\n\n# Walk down to the cell before Dask's corridor.\n\n# Wait while he faces right.\n\n# Walk down to the arch.\n",
+  "starting_code": "# Walk down to the key.\n\n# Pick it up.\n\n# Walk down to the door.\n\n# Open it, it is called `door`.\n\n# Walk down to the hole's edge.\n\n# Wait for the slab.\n\n# Walk down to the cell before Dask's corridor.\n\n# Wait while he looks right.\n\n# Walk down to the arch.\n",
   "hints": [
-    "Remember, the key is 2 steps down. After you open the door, it is 2 steps to the hole's edge.",
-    "You have to use `while not` with `slab.in_place` for the slab, and then `while` with `dask.facing` for Dask!",
-    "From the hole's edge, walk 3 down, to the cell before Dask's corridor. After Dask turns away, 4 down to the arch!"
+    "Remember, the key is 2 steps away. After opening the door, there are 2 steps to the hole's edge.",
+    "You must use `while not` with `slab.in_place` for the slab, and then `while` with `dask.facing` for Dask.",
+    "From the hole's edge, walk down 3, to the cell before Dask's corridor. When Dask turns, walk down 4 to the arch!"
   ],
-  "intro": "This is it, the way home! We must put everything together: pick up the key on the floor, unlock the door, cross the hole with the slab, and wait for Dask to turn away in the last corridor. His lantern reaches very far! It's one long walk, but I know we can do it.",
-  "outro": "We did it! We are almost back to our warm beds.",
+  "intro": "This is the way home! We must use everything together: pick up the key from the floor, open the door, cross the hole over the slab, and wait for Dask to turn around in the last corridor. His lantern shines very far! It is a long walk, but I know we can do it.",
+  "outro": "We made it! We are almost back in our beds.",
   "ways": {
-    "near": "Dask has just begun his round",
-    "middle": "Dask has nearly ended his round",
-    "far": "Dask is on his way back"
+    "near": "Dask has just started his round",
+    "middle": "Dask is about to end his round",
+    "far": "Dask is already walking back"
   }
 }

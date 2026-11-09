@@ -5,20 +5,25 @@ Knowing the answer to an expression is great, but doing something only when the 
 We write `if`, then our expression, and a colon at the end. Underneath, we move our lines in by leaving four spaces. The computer will only run these spaced lines if the answer is `True`.
 
 ---
-## Waiting for our moment
+## A condition
 
-Sometimes Dask looks our way, and sometimes he looks away. If he is looking, we have to wait.
+If Dask looks up, we want to walk down two cells.
 
-The method `wizard.wait()` makes your wizard stand still for a tick, a moment of the game, while everything else moves. And with `wizard.wait(2)`, they wait for two ticks!
+This code prints your wizard's cell, which only changes if the condition is true.
+
+```python try
+if dask.facing == "up":
+    wizard.move_down(2)
+print(wizard.position)
+```
 
 ---
 ## Try it
 
-We will write a condition to hide from him. Since levels can be played in several ways, Dask might do different things.
-
-This wait instruction will only run if he is looking up, our way!
+Change `"up"` for `"down"` in the code. You will see that the cell stays the same because the condition is no longer true!
 
 ```python try
 if dask.facing == "up":
-    wizard.wait()
+    wizard.move_down(2)
+print(wizard.position)
 ```

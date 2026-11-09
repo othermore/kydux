@@ -75,6 +75,40 @@ for (const [wizard, locale, won] of [
   });
 }
 
+test.describe('a stop is not an outcome (D177)', () => {
+  test.use({ locale: 'en-US' });
+  test.beforeEach(({ page }) => seedWizard(page, PABLO));
+
+  test('a playback stopped halfway shows no card and no star, and the level is still to do', async ({ page }) => {
+    await open(page, 'the-doors-corridor', '1');
+    await start(page, solution('the-doors-corridor'));
+    await expect
+      .poll(async () => Number(await scene(page).getAttribute('data-tick')), { timeout: 60_000 })
+      .toBeGreaterThanOrEqual(5);
+    await page.locator('#stop').click();
+    const stoppedAt = await scene(page).getAttribute('data-wizard');
+    await page.waitForTimeout(2_000);
+    await expect(page.locator('.outcome')).toBeHidden();
+    await expect(page.locator('.win-card')).toHaveCount(0);
+    await expect(page.locator('#run')).toBeEnabled();
+    // The wizard stays where the playback was stopped.
+    await expect(scene(page)).toHaveAttribute('data-wizard', stoppedAt ?? '');
+    await page.screenshot({ path: `${SHOTS}stopped-playback.png` });
+    await page.goto('/#map');
+    await expect(page.locator('.stop[data-item="level:the-doors-corridor"]')).not.toHaveAttribute(
+      'data-state',
+      'done',
+    );
+    // Back to the level, run again whole: the card says it is won. The level's start
+    // card was seen already in this visit, and is not shown again.
+    await page.goto('/#level/the-doors-corridor');
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('4');
+    expect(await run(page, solution('the-doors-corridor'))).toMatch(/^You did it/);
+    await expect(page.locator('.win-card')).toBeVisible();
+  });
+});
+
 test.describe('the map, opened by its spell (D134)', () => {
   test.use({ locale: 'en-US' });
   test.beforeEach(({ page }) => seedWizard(page, PABLO));

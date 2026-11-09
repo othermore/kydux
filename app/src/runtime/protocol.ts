@@ -86,6 +86,9 @@ export interface WorldResult {
 /** One way's result, by the way's id. */
 export type WayResult = Omit<WorldResult, 'way' | 'ways'> & { id: string };
 
+/** Who stopped a run: the child, with Stop, or the clock, after its seconds (D177). */
+export type InterruptedBy = 'child' | 'clock';
+
 export interface RunResult {
   status: 'ok' | 'error' | 'interrupted';
   stdout: string;
@@ -93,6 +96,8 @@ export interface RunResult {
   error?: ErrorInfo | null;
   durationMs: number;
   world?: WorldResult;
+  /** For a run interrupted, who asked for it (D177). */
+  interrupted_by?: InterruptedBy;
 }
 
 export interface RuntimeInfo {

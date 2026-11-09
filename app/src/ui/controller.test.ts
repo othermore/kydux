@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LoadedLevel } from '../content/levels';
 import { Playback } from '../engine/playback';
-import type { RunResult, WorldEvent, WorldResult } from '../runtime/protocol';
+import type { InterruptedBy, RunResult, WorldEvent, WorldResult } from '../runtime/protocol';
 import type { RuntimeStatus } from '../runtime/runtime';
 import { RunController, type RunSnapshot, type RuntimeLike, type SceneLike } from './controller';
 
@@ -9,6 +9,7 @@ class FakeRuntime implements RuntimeLike {
   status: RuntimeStatus = 'ready';
   readonly wallClockMs = 5000;
   interrupted = 0;
+  interruptedBy: InterruptedBy | undefined = undefined;
   pending: ((result: RunResult) => void) | null = null;
   private listeners: ((s: RuntimeStatus) => void)[] = [];
 
@@ -22,8 +23,9 @@ class FakeRuntime implements RuntimeLike {
     });
   }
 
-  interrupt(): void {
+  interrupt(by: InterruptedBy = 'child'): void {
     this.interrupted += 1;
+    this.interruptedBy ??= by;
   }
 
   onStatus(listener: (s: RuntimeStatus) => void): () => void {
@@ -39,8 +41,9 @@ class FakeRuntime implements RuntimeLike {
     for (const listener of this.listeners) listener(status);
   }
 
-  answer(world: WorldResult | undefined, status: RunResult['status'] = 'ok'): void {
-    this.pending?.({ status, stdout: world?.stdout ?? '', stderr: '', durationMs: 1, world });
+  answer(world: WorldResult | undefined, status: RunResult['status'] = 'ok', by?: InterruptedBy): void {
+    const stopped = status === 'interrupted' ? { interrupted_by: by ?? this.interruptedBy ?? 'clock' } : {};
+    this.pending?.({ status, stdout: world?.stdout ?? '', stderr: '', durationMs: 1, world, ...stopped });
   }
 }
 
@@ -154,13 +157,52 @@ describe('RunController', () => {
     expect(last().errorLine).toBe(1);
   });
 
-  it('tells a run stopped by ending the worker as interrupted', async () => {
+  it('tells a run the clock stopped, by ending the worker, as interrupted (D177)', async () => {
     const { runtime, controller, last } = setUp();
     controller.run('while True: pass');
+    runtime.answer(undefined, 'interrupted', 'clock');
+    await vi.waitFor(() => expect(last().outcome).toEqual({ kind: 'interrupted', seconds: 5 }));
+    expect(last().state).toBe('done');
+  });
+
+  it('ends a run the child stops while it runs with no outcome, ready to run again (D177)', async () => {
+    const { runtime, scene, controller, last } = setUp();
+    controller.run('while True: wizard.move_right()');
     controller.stop();
     expect(runtime.interrupted).toBe(1);
-    runtime.answer(undefined, 'interrupted');
-    await vi.waitFor(() => expect(last().outcome).toEqual({ kind: 'interrupted', seconds: 5 }));
+    expect(runtime.interruptedBy).toBe('child');
+    runtime.answer({ ...world('interrupted', moves(3), null) }, 'interrupted');
+    await vi.waitFor(() => expect(last().state).toBe('ready'));
+    expect(last().outcome).toBeNull();
+    expect(last().world).toBeNull();
+    expect(last().goals).toEqual(['open']);
+    expect(last().canRun).toBe(true);
+    expect(last().canSeek).toBe(false);
+    // Nothing of the run is played: the scene stays where the level starts.
+    expect(scene.playback.length).toBe(0);
+  });
+
+  it('ends a playback the child stops where it is, with no outcome and no goal (D177)', async () => {
+    const { runtime, scene, controller, last } = setUp();
+    controller.run('wizard.move_right(6)');
+    runtime.answer(world('won', moves(6), 6));
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 2);
+    controller.stop();
+    expect(runtime.interrupted).toBe(0);
+    expect(last().state).toBe('ready');
+    expect(last().outcome).toBeNull();
+    expect(last().goals).toEqual(['open']);
+    // The figures stay where the playback was.
+    expect(scene.playback.tick).toBe(3);
+    vi.advanceTimersByTime(400 * 10);
+    expect(last().outcome).toBeNull();
+    // Run again, whole: won.
+    controller.run('wizard.move_right(6)');
+    runtime.answer(world('won', moves(6), 6));
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 6);
+    expect(last().outcome).toEqual({ kind: 'won' });
   });
 
   it('keeps the first action that could not be done, as data', async () => {

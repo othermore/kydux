@@ -136,9 +136,31 @@ describe('Runtime', () => {
       id: worker.lastRun().id,
       result: { status: 'interrupted', stdout: '', stderr: '', durationMs: 5000 },
     });
-    await expect(result).resolves.toMatchObject({ status: 'interrupted' });
+    await expect(result).resolves.toMatchObject({ status: 'interrupted', interrupted_by: 'clock' });
     expect(worker.terminated).toBe(false);
     expect(workers).toHaveLength(1);
+  });
+
+  it('says the child stopped a run stopped with Stop, in place or by ending the worker (D177)', async () => {
+    const isolated = setUp(true);
+    isolated.workers[0]!.ready();
+    const inPlace = isolated.runtime.run('while True: pass');
+    await vi.waitFor(() => expect(isolated.runtime.status).toBe('running'));
+    isolated.runtime.interrupt();
+    const worker = isolated.workers[0]!;
+    worker.answer({
+      type: 'result',
+      id: worker.lastRun().id,
+      result: { status: 'interrupted', stdout: '', stderr: '', durationMs: 100 },
+    });
+    await expect(inPlace).resolves.toMatchObject({ status: 'interrupted', interrupted_by: 'child' });
+
+    const ended = setUp(false);
+    ended.workers[0]!.ready();
+    const stopped = ended.runtime.run('while True: pass');
+    await vi.waitFor(() => expect(ended.runtime.status).toBe('running'));
+    ended.runtime.interrupt();
+    await expect(stopped).resolves.toMatchObject({ status: 'interrupted', interrupted_by: 'child' });
   });
 
   it('ends the worker when an interrupt in place is not heard', async () => {
@@ -147,7 +169,7 @@ describe('Runtime', () => {
     const result = runtime.run('import time; time.sleep(60)');
     await vi.waitFor(() => expect(runtime.status).toBe('running'));
     vi.advanceTimersByTime(5000 + 2000);
-    await expect(result).resolves.toMatchObject({ status: 'interrupted' });
+    await expect(result).resolves.toMatchObject({ status: 'interrupted', interrupted_by: 'clock' });
     expect(workers[0]!.terminated).toBe(true);
     expect(workers).toHaveLength(2);
   });

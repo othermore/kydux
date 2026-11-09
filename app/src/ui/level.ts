@@ -386,12 +386,16 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     );
 
   // A run, counted in the progress and in this visit: the first-try star asks
-  // whether this visit's first run won (D57).
+  // whether this visit's first run won (D57). A run that ended with no card, stopped by
+  // the child, is not judged, and does not count here (D177).
   let runsHere = 0;
+  let judged = true;
   const runCode = () => {
     if (!controller.snapshot.canRun) return;
     progress.countRun(loaded.id);
+    if (!judged) runsHere -= 1;
     runsHere += 1;
+    judged = false;
     controller.run(editor.getDoc());
   };
 
@@ -449,6 +453,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     if (force || snapshot.outcome !== shownOutcome) {
       if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed, wayName);
       else card.hide();
+      if (!force && snapshot.outcome) judged = true;
       // A run's end has its sound (the settings may silence it).
       if (!force && snapshot.outcome) play(snapshot.outcome.kind === 'won' ? 'win' : 'fail');
       if (snapshot.outcome && snapshot.outcome.kind !== 'won' && snapshot.outcome.kind !== 'failed') {

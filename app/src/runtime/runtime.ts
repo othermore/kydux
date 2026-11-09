@@ -4,6 +4,7 @@
 
 import type {
   FromWorker,
+  InterruptedBy,
   LevelJson,
   RunResult,
   RuntimeInfo,
@@ -115,7 +116,8 @@ interface Pending {
   reject: (error: Error) => void;
   timer: ReturnType<typeof setTimeout>;
   started: number;
-  interrupted: boolean;
+  /** Who asked for the run to stop, once someone has (D177). */
+  interruptedBy: InterruptedBy | null;
 }
 
 export class Runtime {
@@ -182,8 +184,8 @@ export class Runtime {
         new Promise<RunResult>((resolve, reject) => {
           this.reserved = false;
           const id = this.nextId++;
-          const timer = setTimeout(() => this.interrupt(), this.wallClockMs);
-          this.pending = { id, resolve, reject, timer, started: Date.now(), interrupted: false };
+          const timer = setTimeout(() => this.interrupt('clock'), this.wallClockMs);
+          this.pending = { id, resolve, reject, timer, started: Date.now(), interruptedBy: null };
           this.setStatus('running');
           this.worker.postMessage(level ? { type: 'run', id, code, level } : { type: 'run', id, code });
         }),
@@ -194,17 +196,19 @@ export class Runtime {
     );
   }
 
-  /** Stops the run going on, if any. */
-  interrupt(): void {
+  /** Stops the run going on, if any, asked by the child (Stop) or by the clock; the
+   * run's result says who asked first (D177). */
+  interrupt(by: InterruptedBy = 'child'): void {
     const pending = this.pending;
     if (!pending) return;
+    const first = pending.interruptedBy === null;
+    if (first) pending.interruptedBy = by;
     // In place first; if Python has not stopped after a grace, as when it waits
     // in something that does not check for interrupts, the worker is ended.
-    if (this.interruptBuffer && !pending.interrupted) {
-      pending.interrupted = true;
+    if (this.interruptBuffer && first) {
       Atomics.store(new Int32Array(this.interruptBuffer), 0, SIGINT);
       clearTimeout(pending.timer);
-      pending.timer = setTimeout(() => this.interrupt(), INTERRUPT_GRACE_MS);
+      pending.timer = setTimeout(() => this.interrupt(by), INTERRUPT_GRACE_MS);
       return;
     }
     this.finish({
@@ -285,7 +289,8 @@ export class Runtime {
     if (!pending) return;
     this.clearPending();
     this.setStatus('ready');
-    pending.resolve(result);
+    const by = pending.interruptedBy;
+    pending.resolve(result.status === 'interrupted' && by ? { ...result, interrupted_by: by } : result);
   }
 
   /** The run going on could not be run: its promise rejects, and Python is ready again. */

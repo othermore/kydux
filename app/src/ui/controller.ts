@@ -5,7 +5,7 @@
 
 import type { LoadedLevel } from '../content/levels';
 import type { Playback, Speed } from '../engine/playback';
-import type { LevelJson, RunResult, WayResult, WorldResult } from '../runtime/protocol';
+import type { InterruptedBy, LevelJson, RunResult, WayResult, WorldResult } from '../runtime/protocol';
 import type { RuntimeStatus } from '../runtime/runtime';
 import type { GoalMark } from './goals';
 import type { Outcome } from './outcome';
@@ -57,7 +57,7 @@ export interface RuntimeLike {
   readonly status: RuntimeStatus;
   readonly wallClockMs: number;
   run(code: string, level?: LevelJson): Promise<RunResult>;
-  interrupt(): void;
+  interrupt(by?: InterruptedBy): void;
   onStatus(listener: (status: RuntimeStatus) => void): () => void;
 }
 
@@ -107,6 +107,8 @@ export class RunController {
   private generation = 0;
   /** Whether the scene is showing the level starting again (D75). */
   private restarting = false;
+  /** Whether the child stopped this run with Stop: it ends with no outcome (D177). */
+  private stopped = false;
   private listeners: ((snapshot: RunSnapshot) => void)[] = [];
   private unsubscribe: (() => void)[] = [];
 
@@ -184,7 +186,7 @@ export class RunController {
     const placed = () =>
       ran.then(
         (result) => {
-          if (generation === this.generation) this.take(result);
+          if (generation === this.generation && !this.stoppedBy(result)) this.take(result);
         },
         () => undefined,
       );
@@ -192,6 +194,10 @@ export class RunController {
     Promise.all([ran, shown]).then(
       ([result]) => {
         if (generation !== this.generation) return;
+        if (this.stoppedBy(result)) {
+          this.halt();
+          return;
+        }
         if (!result.world) {
           this.world = emptyWorld(result.status === 'interrupted' ? 'interrupted' : 'error', result);
           this.finish();
@@ -224,8 +230,11 @@ export class RunController {
     this.play(way);
   }
 
+  /** Stop, pressed by the child: the program interrupted, or the playback ended where
+   * it is, with no outcome either way (D177). */
   stop(): void {
-    if (this.runtime.status === 'running') this.runtime.interrupt();
+    this.stopped = true;
+    if (this.runtime.status === 'running') this.runtime.interrupt('child');
     else this.scene?.playback.stop();
   }
 
@@ -342,9 +351,32 @@ export class RunController {
     );
   }
 
+  /** Whether a run's answer is of a run the child stopped: Stop pressed while it ran,
+   * whatever it came back with, or a run interrupted by the child (D177). */
+  private stoppedBy(result: RunResult): boolean {
+    return this.stopped || result.interrupted_by === 'child';
+  }
+
+  /** A run the child stopped ends here: no outcome, no goal met or failed, nothing to
+   * seek, and the scene left as it is, ready to run again from the start (D177). */
+  private halt(): void {
+    this.result = null;
+    this.world = null;
+    this.shownWay = null;
+    this.outcome = this.runtime.status === 'failed' ? { kind: 'failed' } : null;
+    this.runningLine = null;
+    this.errorLine = null;
+    this.changed();
+  }
+
   /** The run played out: a run won is celebrated first, its outcome after it, unless
-   * another run or a restart came meanwhile. */
+   * another run or a restart came meanwhile; a playback the child stopped finishes
+   * nothing (D177). */
   private done(scene: SceneLike): void {
+    if (this.stopped) {
+      this.halt();
+      return;
+    }
     const wait = this.world?.status === 'won' ? (scene.celebrate?.() ?? 0) : 0;
     if (wait <= 0) {
       this.finish();
@@ -368,6 +400,7 @@ export class RunController {
   }
 
   private clear(): void {
+    this.stopped = false;
     this.result = null;
     this.world = null;
     this.shownWay = null;

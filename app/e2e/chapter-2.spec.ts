@@ -494,8 +494,8 @@ test.describe('the lessons run plain Python on their pages (D170)', () => {
   }
 
   for (const [locale, page3, said, names] of [
-    ['en-US', 'Page 3 of 4', 'Hello', ['age', 'name']],
-    ['es-ES', 'Página 3 de 4', 'Hola', ['edad', 'nombre']],
+    ['en-US', 'Page 3 of 8', 'Hello', ['age', 'name']],
+    ['es-ES', 'Página 3 de 8', 'Hola', ['edad', 'nombre']],
   ] as const) {
     test(`what things know prints a number, a sum and a string, with no wizard (${locale})`, async ({ browser }) => {
       const context = await browser.newContext({ locale, viewport: { width: 1280, height: 800 } });
@@ -510,27 +510,30 @@ test.describe('the lessons run plain Python on their pages (D170)', () => {
       await page.screenshot({ path: `${SHOTS}what-things-know-${locale}.png` });
       // Changed, it prints what it is changed to.
       expect(await printed(page, 'print(10 + 20)\nprint("Teku")')).toBe('30\nTeku');
-      // Its last page keeps the door's attribute: Wenna has just opened it.
-      await page.locator('#lesson-next').click();
+      // Its last page, the eighth, keeps the nearest door, the one Wenna has just opened,
+      // and prints its attribute: it is not locked (D174).
+      for (let turn = 0; turn < 5; turn += 1) await page.locator('#lesson-next').click();
+      await expect(page.locator('#lesson-next')).toHaveCount(0);
       expect(await printed(page)).toBe('False');
       await context.close();
     });
 
-    test(`finding things keeps a number and a string in variables, and adds two into a third (${locale})`, async ({
+    test(`what things know keeps a number and a string in variables, and adds two into a third (${locale})`, async ({
       browser,
     }) => {
       const context = await browser.newContext({ locale, viewport: { width: 1280, height: 800 } });
       const page = await context.newPage();
-      await page.goto('/#lesson/finding-things');
+      await page.goto('/#lesson/what-things-know');
       await expect(page.locator('.lesson-page')).toBeVisible();
-      await page.locator('#lesson-next').click();
+      // Its fifth page is the variable's, its sixth the sum's.
+      for (let turn = 0; turn < 4; turn += 1) await page.locator('#lesson-next').click();
       for (const name of names) await expect(page.locator('.lesson-run .cm-content')).toContainText(`${name} =`);
       await expect(page.locator('.lesson-run .cm-content')).not.toContainText('wizard');
       expect(await printed(page)).toBe('9\nMarta');
-      await page.screenshot({ path: `${SHOTS}finding-things-variable-${locale}.png` });
+      await page.screenshot({ path: `${SHOTS}what-things-know-variable-${locale}.png` });
       await page.locator('#lesson-next').click();
       expect(await printed(page)).toBe('7');
-      await page.screenshot({ path: `${SHOTS}finding-things-sum-${locale}.png` });
+      await page.screenshot({ path: `${SHOTS}what-things-know-sum-${locale}.png` });
       expect(await printed(page, 'a = 4\nb = 3\ntotal = a - b\nprint(total)')).toBe('1');
       await context.close();
     });

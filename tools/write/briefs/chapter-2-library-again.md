@@ -12,8 +12,6 @@ context:
   - content/stories/at-the-library/text.es.json
   - content/levels/the-lost-book/text.en.json
   - content/levels/the-lost-book/text.es.json
-  - content/lessons/finding-things/en.md
-  - content/lessons/finding-things/es.md
   - content/lessons/keys-and-doors/en.md
 ---
 ## What changes, and why

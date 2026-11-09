@@ -168,6 +168,9 @@ NOTHING_TO_TRY = {
     "words": 2,
     "things-to-carry": 2,
     "your-first-spell": 2,
+    "giving-things": 3,
+    "keys-and-doors": 2,
+    "fendra": 2,
 }
 
 
@@ -433,7 +436,7 @@ METAPHORS = {
 }
 #: What says it in the ordinary sense, of no programming idea, or recalls it once in
 #: parentheses, as the owner allows the second time.
-MAY_SAY = {"story:the-letter", "lesson:finding-things", "level:the-lost-book"}
+MAY_SAY = {"story:the-letter", "level:the-lost-book"}
 
 
 @pytest.mark.parametrize("lang", LANGUAGES)

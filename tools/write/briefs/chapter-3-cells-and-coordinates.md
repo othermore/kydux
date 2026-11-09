@@ -23,7 +23,6 @@ context:
   - content/lessons/the-cells/es.md
   - content/lessons/where-i-am/es.md
   - content/lessons/counting-with-names/es.md
-  - content/lessons/finding-things/es.md
   - content/lessons/kirra-and-osto/es.md
   - content/lessons/while/es.md
   - content/lessons/while/en.md

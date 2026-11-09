@@ -13,16 +13,4 @@ It cannot reach past a doorway, either: a thing inside a room is reached from th
 
 If the thing you name is out of its reach, nothing comes, and your wizard will say so.
 
----
-## Try it
-
-Eldra's book stands among many others on the bookcase in her little room, too high for your hands. First, we will find it and keep it in a variable. Then we will step up into the doorway and cast *fendra* at it!
-
 Remember that a spell moves things, but your hands carry them. You must pick the thing up once it has come down to you.
-
-```python try
-book = wizard.find_nearest("book")
-wizard.move_up()
-wizard.cast("fendra", book)
-wizard.pick_up()
-```

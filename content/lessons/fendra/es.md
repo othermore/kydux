@@ -13,16 +13,4 @@ Tampoco llega más allá de una puerta: una cosa que está dentro de una habitac
 
 Si la cosa que pides está fuera de su alcance, no vendrá nada, y tu {mago|maga} lo dirá.
 
----
-## Pruébalo
-
-El libro de Eldra se encuentra entre muchos otros en la estantería de su pequeña habitación, demasiado alto para tus manos. Primero, lo encontraremos y lo guardaremos en una variable. ¡Luego daremos un paso hacia arriba hasta el umbral y le lanzaremos *fendra*!
-
 Recuerda que un hechizo mueve las cosas, pero tus manos las llevan. Debes recoger la cosa una vez que haya bajado hasta ti.
-
-```python try
-book = wizard.find_nearest("book")
-wizard.move_up()
-wizard.cast("fendra", book)
-wizard.pick_up()
-```

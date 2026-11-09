@@ -4,6 +4,8 @@
   "teaches": [
     "wizard.items",
     "door.locked",
-    "concept:print"
+    "concept:print",
+    "wizard.find_nearest",
+    "thing.reveal"
   ]
 }

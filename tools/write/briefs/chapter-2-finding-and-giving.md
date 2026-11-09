@@ -12,8 +12,6 @@ context:
   - content/lessons/the-right-place/es.md
   - content/lessons/what-things-know/en.md
   - content/lessons/what-things-know/es.md
-  - content/lessons/finding-things/en.md
-  - content/lessons/finding-things/es.md
   - content/lessons/keys-and-doors/en.md
   - content/lessons/keys-and-doors/es.md
 ---

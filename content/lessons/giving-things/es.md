@@ -17,15 +17,3 @@ Funciona igual que `find_nearest`, pero `find_nearest` busca en el suelo, ¡mien
 Una vez que guardas una cosa en una variable, puedes entregársela a quien esté justo al lado de tu {mago|maga}.
 
 Simplemente usas el método `wizard.give(book)`, poniendo la variable que la guarda dentro de los paréntesis para decir exactamente qué quieres dar. Si no hay nadie junto a tu {mago|maga}, te lo dirá y se quedará con la cosa.
-
----
-## Pruébalo
-
-El libro está en tus manos y Eldra espera al otro extremo de la sala, lejos de ti. Todavía no hay nadie a tu lado.
-
-¡Vamos a buscar el libro e intentar darlo aquí mismo, solo para ver qué dice tu {mago|maga}! Luego, en el nivel, caminarás hacia Eldra primero.
-
-```python try
-book = wizard.find_item("book")
-wizard.give(book)
-```

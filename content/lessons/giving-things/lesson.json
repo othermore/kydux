@@ -4,6 +4,5 @@
   "teaches": [
     "wizard.find_item",
     "wizard.give"
-  ],
-  "try": "refused"
+  ]
 }

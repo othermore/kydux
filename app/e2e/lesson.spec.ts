@@ -42,18 +42,20 @@ for (const [locale, tryIt, goOn] of [
       await expect(page.locator('.lesson-page')).toBeVisible();
       while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
     };
-    // What things know comes before Finding things: its example is shown, and its
-    // button goes on to the next lesson.
-    await page.goto('/#lesson/what-things-know');
+    // True or false comes before If: its example is shown, and its button goes on to
+    // the next lesson.
+    await page.goto('/#lesson/true-or-false');
     await toLastPage();
     await expect(page.locator('.lesson-run')).toHaveCount(1);
     await expect(page.locator('#lesson-try')).toHaveText(goOn);
     await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
     await page.locator('#lesson-try').click();
-    await expect(page).toHaveURL(/#lesson\/finding-things$/);
-    // Finding things comes before The lost book: one Try button, on its last page, the
-    // sixth.
-    for (let turn = 0; turn < 5; turn += 1) {
+    await expect(page).toHaveURL(/#lesson\/if$/);
+    // What things know comes before The lost book: one Try button, on its last page, the
+    // eighth.
+    await page.goto('/#lesson/what-things-know');
+    await expect(page.locator('.lesson-page')).toBeVisible();
+    for (let turn = 0; turn < 7; turn += 1) {
       await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
       await page.locator('#lesson-next').click();
     }

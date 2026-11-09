@@ -12,8 +12,6 @@ context:
   - docs/dev/story.md
   - docs/dev/course.md
   - content/lessons/what-things-know/en.md
-  - content/lessons/finding-things/en.md
-  - content/lessons/finding-things/es.md
   - content/lessons/giving-things/en.md
   - content/lessons/giving-things/es.md
   - content/lessons/keys-and-doors/en.md

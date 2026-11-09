@@ -17,15 +17,3 @@ It works just as `find_nearest` does, but `find_nearest` looks on the floor, whi
 Once a thing is kept in a variable, it can be handed to whoever stands right beside your wizard.
 
 You just use the method `wizard.give(book)`, putting the variable that keeps it inside the brackets to say exactly what to give. If nobody stands beside your wizard, your wizard will say so and keep the thing.
-
----
-## Try it
-
-The book is in your hands, and Eldra waits at the other end of the hall, far from you. Nobody stands beside you yet.
-
-Let us find the book and try to give it right here, just to see what your wizard says! Then, in the level, you will walk to Eldra first.
-
-```python try
-book = wizard.find_item("book")
-wizard.give(book)
-```

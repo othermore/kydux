@@ -9,7 +9,6 @@ outputs:
   - content/levels/the-high-shelf/words.json
 context:
   - docs/dev/story.md
-  - content/lessons/finding-things/en.md
   - content/lessons/keys-and-doors/en.md
   - content/lessons/keys-and-doors/es.md
   - content/lessons/the-distance/en.md

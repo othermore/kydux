@@ -3,7 +3,7 @@
   "kind": "practice",
   "scene": "the-crossing",
   "start": [
-    2,
+    3,
     5
   ],
   "end": [
@@ -20,7 +20,7 @@
       "kind": "friend",
       "id": "friend",
       "at": [
-        2,
+        3,
         6
       ]
     },
@@ -28,7 +28,7 @@
       "kind": "friend",
       "id": "mate",
       "at": [
-        3,
+        4,
         6
       ]
     },
@@ -37,7 +37,7 @@
       "id": "dask",
       "at": [
         9,
-        13
+        12
       ],
       "facing": "up",
       "patrol": [

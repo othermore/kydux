@@ -7,9 +7,9 @@ Un tick es un momento del juego en el que todo lo demás se mueve. ¡`wizard.wai
 ---
 ## Pruébalo
 
-Espera dos ticks y luego camina nueve casillas hacia la derecha. Debajo leerás la casilla en la que ha terminado tu {mago|maga}. ¡Y puedes cambiarlo y probar de nuevo!
+Espera dos ticks y luego camina ocho casillas hacia la derecha. Debajo leerás la casilla en la que ha terminado tu {mago|maga}. ¡Y puedes cambiarlo y probar de nuevo!
 
 ```python try
 wizard.wait(2)
-wizard.move_right(9)
+wizard.move_right(8)
 ```

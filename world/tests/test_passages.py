@@ -428,22 +428,22 @@ def outcomes(level_id, code):
 
 def test_the_tunnel_exit_is_won_by_waiting_two_ticks_for_dask_to_go_by():
     """D146: Dask starts below the crossing, walking up it, a cell a tick; he sees (9, 5)
-    from (9, 9) to (9, 6), ticks 4 to 7, stands on it at tick 8, and is above it from
-    tick 9, when the wizard reaches it after two ticks of waiting."""
+    from (9, 9) to (9, 6), ticks 3 to 6, stands on it at tick 7, and is above it from
+    tick 8, when the wizard reaches it after two ticks of waiting."""
     level = "the-tunnel-exit"
     assert run_code(real(level), solution(level)).status == "won"
     alone = run_code(real(level), wrong(level, "the_walk_alone"))
-    assert (alone.status, alone.ticks) == ("caught", 7)
+    assert (alone.status, alone.ticks) == ("caught", 6)
     assert run_code(real(level), wrong(level, "waits_one")).status == "caught"
     assert run_code(real(level), wrong(level, "stops_short")).status == "incomplete"
 
 
 def test_the_tunnel_exit_keeps_dask_s_ticks():
     world = World(real("the-tunnel-exit"))
-    for tick in range(1, 13):
+    for tick in range(1, 12):
         world.wizard.wait()
         dask = world.actors["dask"]
-        assert (dask.position.x, dask.position.y) == (9, 13 - tick), tick
+        assert (dask.position.x, dask.position.y) == (9, 12 - tick), tick
         assert dask.facing == "up"
 
 

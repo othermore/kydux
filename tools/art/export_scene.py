@@ -152,7 +152,11 @@ def difference_mask(
     distance = np.abs(shown[crop].astype(np.int16) - base[crop].astype(np.int16)).sum(axis=2) / 3
     plain = Image.fromarray(np.clip(distance, 0, 255).astype(np.uint8))
     sharp, soft = (np.array(plain.filter(ImageFilter.GaussianBlur(r))) for r in DIFFERENCE_BLUR)
-    differs = (sharp > options["threshold"]) | (soft > options["soft"])
+    region = (sharp > options["threshold"]) | (soft > options["soft"])
+    # Inside, the wide smoothing says what is the thing, a plank nearly the floor's colour;
+    # at its edge, the narrow one, so that no floor comes with it.
+    edge = image_first.eroded(region, round(DIFFERENCE_BLUR[1]) + 1)
+    differs = edge | (region & (sharp > options["soft"]))
     speck = options["speck"]
     # What survives the opening is the thing; its corners and its thin parts come back
     # from what is near it, so that the cleaning rounds nothing off.

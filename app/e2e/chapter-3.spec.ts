@@ -109,7 +109,7 @@ test.describe('the map, opened by its spell (D134)', () => {
     await start(page, 'wizard.cast("orvim")');
     const plan = page.locator('#plan');
     await expect(plan).toBeVisible({ timeout: 30_000 });
-    await expect(plan).toHaveAttribute('data-figures', /dask:9,12/);
+    await expect(plan).toHaveAttribute('data-figures', /dask:9,11/);
     await expect(plan).toHaveAttribute('data-marks', '11,5');
     await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
     await page.keyboard.press('Escape');
@@ -177,16 +177,16 @@ test.describe('Dask, in every way (D51, D137)', () => {
 
   test('at the crossing, Dask comes up from below, and the walk alone is caught (D146)', async ({ page }) => {
     await open(page, 'the-tunnel-exit');
-    await expect(scene(page)).toHaveAttribute('data-actors', /dask:9,13,up/);
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:9,12,up/);
     await expect(page.locator('#way')).toBeHidden();
-    await run(page, 'wizard.move_right(9)');
+    await run(page, 'wizard.move_right(8)');
     await expect(page.locator('.outcome-text')).toContainText('The teacher saw you');
     await expect(scene(page)).toHaveAttribute('data-actors', /dask:9,6,up/);
   });
 
   test('two ticks of waiting let him go by (D146)', async ({ page }) => {
     await open(page, 'the-tunnel-exit');
-    expect(await run(page, 'wizard.wait(2)\nwizard.move_right(9)')).toMatch(/^You did it/);
+    expect(await run(page, 'wizard.wait(2)\nwizard.move_right(8)')).toMatch(/^You did it/);
     await expect(scene(page)).toHaveAttribute('data-wizard', '11,5');
   });
 

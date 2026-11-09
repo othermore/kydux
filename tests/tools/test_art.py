@@ -319,8 +319,8 @@ def test_every_scene_s_settings_name_its_pictures_and_its_things():
             assert len(thing["box"]) == 4 and isinstance(thing["row"], int)
             # A static thing is cut against an edit without it, or by its mask (D89):
             # Gemini's magenta round it or round what it is cut round, a polygon,
-            # its pale stone or its box.
-            masks = ("marked", "unmarked", "polygon", "pale", "box")
+            # its pale stone, its box, or the difference from a picture with it gone (D148).
+            masks = ("marked", "unmarked", "polygon", "pale", "box", "difference")
             assert thing["states"] and ("without" in thing or thing.get("mask") in masks)
         assert settings.map.is_file(), name
 

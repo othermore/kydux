@@ -18,9 +18,10 @@ cleaned of specks, closed over its holes, kept within the thing's box (`--within
 a part of it). With `--state`, the state of a thing that comes and goes; without it, a
 static thing, cut from the base where `picture`, the base with the thing gone, differs.
 It prints how much the mask covers and the leak, how much of a cell's band round the
-box differs the same way: more than a fringe says the edit changed what it should not,
-and is asked again. It writes art/raw/game-check/diff-<scene>-<thing>[-<state>].png, the
-picture with the mask's edge drawn in magenta, to look at.
+box differs the same way: more than a fringe says to look at the picture, and where the
+edit changed what it should not, in the mask or beside it, it is asked again. It writes
+art/raw/game-check/diff-<scene>-<thing>[-<state>].png, the picture with the mask's edge
+drawn in magenta, to look at.
 
 `look` writes a crop of the picture, the box given in cells, enlarged `--scale`
 times, with a grid line every tenth of a cell, numbered every half cell; with
@@ -317,7 +318,8 @@ def difference(
     suffix = f"-{state}" if state else ""
     target = out / f"diff-{settings.id}-{name}{suffix}.png"
     edge = export_scene.edge_of(mask.astype(np.float32))
-    edged = shown.copy()
+    # A static thing is drawn from the base, a state from its own picture.
+    edged = (base if state is None else shown).copy()
     edged[image_first.dilated(edge, 1)] = (255, 0, 255)
     left, top = max(0, around[0]), max(0, around[1])
     Image.fromarray(edged[top : around[3], left : around[2]]).save(target)
@@ -413,7 +415,7 @@ def main(arguments: list[str]) -> int:
         told = {key: value for key, value in options.items() if value is not None}
         within = tuple(found.within) if found.within else None
         measured = difference(settings, found.thing, picture, found.state, within, told)
-        verdict = "asked again" if measured["leak"] > LEAK_MOST else "a fringe at most"
+        verdict = "look at the picture" if measured["leak"] > LEAK_MOST else "a fringe at most"
         print(f"{measured['pixels']} pixels; leak {measured['leak']:.3f} ({verdict})")
         print(measured["look"])
         return 0

@@ -1,365 +1,181 @@
 {
-  "about": "The crossing, chapter 3's second scene (D136): the painting scene-tunnel-exit, its grid removed by Gemini, the corridor beside the statues made three cells wide by moving its wall, the pale paper round it painted as the castle's inside, and a third row of floor opened in the corridor of the statues (D146). Pictures named here are in art/raw/, which git ignores.",
+  "about": "The crossing, chapter 3's second scene (D136): Gemini's painting of the place from its plan, its base and its cut-outs by difference (D148). Pictures named here are in art/raw/, which git ignores.",
   "sources": {
     "folder": "art/raw/game-crossing",
     "edits": "art/raw/game-crossing",
-    "painting": "crossing-third-row.png",
+    "painting": "crossing-base-2.png",
     "grid": "grid.json",
-    "ground": "crossing-third-row.png"
+    "ground": "crossing-base-2.png"
   },
   "things": {
     "statue_1": {
       "box": [
-        11.65,
-        4.95,
-        12.9,
-        7.32
+        12.05,
+        4.4,
+        13.05,
+        6.95
       ],
-      "row": 7,
+      "row": 6,
       "static": true,
       "solid": true,
-      "mask": "polygon",
+      "mask": "difference",
+      "picture": "crossing-gone.png",
+      "diff": {
+        "holes": 14000
+      },
       "states": {
         "standing": "painting"
       },
-      "about": "The first statue, over whoever walks behind it on rows 5 and 6, its foot on row 7.",
-      "polygon": [
-        [
-          12.1,
-          5.06
-        ],
-        [
-          12.267,
-          5.186
-        ],
-        [
-          12.483,
-          5.395
-        ],
-        [
-          12.567,
-          5.671
-        ],
-        [
-          12.667,
-          5.437
-        ],
-        [
-          12.75,
-          5.119
-        ],
-        [
-          12.833,
-          5.228
-        ],
-        [
-          12.767,
-          5.52
-        ],
-        [
-          12.767,
-          5.981
-        ],
-        [
-          12.692,
-          6.859
-        ],
-        [
-          12.692,
-          7.261
-        ],
-        [
-          11.733,
-          7.261
-        ],
-        [
-          11.733,
-          6.567
-        ],
-        [
-          11.817,
-          6.483
-        ],
-        [
-          11.767,
-          6.064
-        ],
-        [
-          11.9,
-          5.604
-        ],
-        [
-          11.917,
-          5.395
-        ],
-        [
-          12.042,
-          5.228
-        ]
-      ]
+      "about": "The first statue, over whoever walks behind it on row 5, its foot on row 6."
     },
     "statue_2": {
       "box": [
-        14.2,
-        4.95,
-        15.42,
-        7.32
+        13.95,
+        4.4,
+        14.97,
+        6.95
       ],
-      "row": 7,
+      "row": 6,
       "static": true,
       "solid": true,
-      "mask": "polygon",
+      "mask": "difference",
+      "picture": "crossing-gone.png",
+      "diff": {
+        "holes": 14000
+      },
       "states": {
         "standing": "painting"
       },
-      "about": "The second statue, its foot on row 7.",
-      "polygon": [
-        [
-          14.708,
-          5.035
-        ],
-        [
-          14.875,
-          5.228
-        ],
-        [
-          14.983,
-          5.437
-        ],
-        [
-          15.067,
-          5.73
-        ],
-        [
-          15.167,
-          5.437
-        ],
-        [
-          15.25,
-          5.144
-        ],
-        [
-          15.35,
-          5.311
-        ],
-        [
-          15.267,
-          5.646
-        ],
-        [
-          15.267,
-          6.023
-        ],
-        [
-          15.208,
-          6.859
-        ],
-        [
-          15.217,
-          7.261
-        ],
-        [
-          14.267,
-          7.261
-        ],
-        [
-          14.267,
-          6.567
-        ],
-        [
-          14.35,
-          6.441
-        ],
-        [
-          14.292,
-          6.023
-        ],
-        [
-          14.417,
-          5.646
-        ],
-        [
-          14.483,
-          5.437
-        ],
-        [
-          14.6,
-          5.253
-        ]
-      ]
+      "about": "The second statue, its foot on row 6."
     },
     "statue_3": {
       "box": [
-        16.6,
-        5.1,
-        17.8,
-        7.32
+        17.03,
+        4.4,
+        18.12,
+        6.95
       ],
-      "row": 7,
+      "row": 6,
       "static": true,
       "solid": true,
-      "mask": "polygon",
+      "mask": "difference",
+      "picture": "crossing-gone.png",
+      "diff": {
+        "holes": 14000
+      },
       "states": {
         "standing": "painting"
       },
-      "about": "The third statue, its foot on row 7.",
-      "polygon": [
-        [
-          17.167,
-          5.203
-        ],
-        [
-          17.358,
-          5.395
-        ],
-        [
-          17.433,
-          5.604
-        ],
-        [
-          17.567,
-          5.771
-        ],
-        [
-          17.65,
-          5.186
-        ],
-        [
-          17.733,
-          5.353
-        ],
-        [
-          17.708,
-          5.939
-        ],
-        [
-          17.625,
-          6.859
-        ],
-        [
-          17.583,
-          7.261
-        ],
-        [
-          16.683,
-          7.261
-        ],
-        [
-          16.683,
-          6.567
-        ],
-        [
-          16.792,
-          6.483
-        ],
-        [
-          16.733,
-          5.981
-        ],
-        [
-          16.833,
-          5.688
-        ],
-        [
-          16.975,
-          5.479
-        ],
-        [
-          17.0,
-          5.337
-        ]
-      ]
+      "about": "The third statue, its foot on row 6."
+    },
+    "arch_top": {
+      "box": [
+        7.85,
+        0.0,
+        10.15,
+        2.25
+      ],
+      "row": 1,
+      "static": true,
+      "solid": true,
+      "mask": "difference",
+      "picture": "crossing-gone.png",
+      "diff": {
+        "holes": 14000
+      },
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The arch at the top of Dask's corridor, over whoever walks under it.",
+      "under": true
+    },
+    "arch_mid": {
+      "box": [
+        7.85,
+        9.6,
+        10.15,
+        11.65
+      ],
+      "row": 11,
+      "static": true,
+      "solid": true,
+      "mask": "difference",
+      "picture": "crossing-gone.png",
+      "diff": {},
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The arch in Dask's corridor below the crossing, its foot on row 11."
     },
     "arch_low": {
       "box": [
-        13.95,
-        12.6,
-        16.05,
+        13.8,
+        12.5,
+        16.25,
         14.0
       ],
       "row": 13,
       "static": true,
       "solid": true,
-      "mask": "polygon",
-      "under": true,
+      "mask": "difference",
+      "picture": "crossing-gone.png",
+      "diff": {},
       "states": {
         "standing": "painting"
       },
       "about": "The arch at the foot of the wide corridor, over whoever walks under it.",
-      "polygon": [
-        [
-          14.0,
-          14.0
-        ],
-        [
-          14.0,
-          13.6
-        ],
-        [
-          14.15,
-          13.2
-        ],
-        [
-          14.5,
-          12.85
-        ],
-        [
-          15.0,
-          12.7
-        ],
-        [
-          15.5,
-          12.85
-        ],
-        [
-          15.85,
-          13.2
-        ],
-        [
-          16.0,
-          13.6
-        ],
-        [
-          16.0,
-          14.0
-        ],
-        [
-          15.75,
-          14.0
-        ],
-        [
-          15.75,
-          13.7
-        ],
-        [
-          15.6,
-          13.4
-        ],
-        [
-          15.3,
-          13.2
-        ],
-        [
-          15.0,
-          13.15
-        ],
-        [
-          14.7,
-          13.2
-        ],
-        [
-          14.4,
-          13.4
-        ],
-        [
-          14.25,
-          13.7
-        ],
-        [
-          14.25,
-          14.0
-        ]
-      ]
+      "under": true
+    },
+    "wall_left": {
+      "box": [
+        0.0,
+        8.2,
+        7.96,
+        9.0
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The lower wall's top, left of Dask's corridor, over whoever walks row 8 behind it (D149)."
+    },
+    "wall_middle": {
+      "box": [
+        10.05,
+        8.2,
+        13.97,
+        9.0
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The lower wall's top, between the two corridors."
+    },
+    "wall_right": {
+      "box": [
+        17.05,
+        8.2,
+        19.05,
+        9.0
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The lower wall's top, right of the wide corridor."
     }
   },
   "cuts": [],
@@ -368,131 +184,91 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-tunnel-exit.md`, then edited by it without its\n  grid (`game-crossing-nogrid.md`).\n- The corridor beside the statues made three cells wide by\n  `tools/art/repaint.py spaced`.\n- The pale paper round the castle painted as its inside by Gemini from\n  `game-crossing-voids.md` and `game-crossing-voids-more.md`, joined by\n  `tools/art/repaint.py`, and what still was black tiled from the picture's\n  own stones (`tiled`); `game-crossing-voids-top.md` was asked first and kept\n  the paper as the page.\n- A black sliver over the tunnel's arch filled from the pixels round it (`fill`).\n- A third row of floor opened in the corridor of the statues by\n  `tools/art/repaint.py spaced` (`third_row`), its stones the corridor's own.\n- Its statues and its low arch cut by the polygons traced round them.\n",
-  "spaced": {
-    "about": "The corridor that goes down beside the statues made three cells wide, as its level asks (Dask in its middle, the wizard down the side he does not look at): between rows 8.28 and 12.62, its right wall, its torch and the room beyond moved a cell to the right, and its plain floor stretched.",
-    "from": "art/raw/game-crossing/game-crossing-nogrid.png",
-    "rows": [
-      8.28,
-      12.62
-    ],
-    "knots": [
-      [
-        0,
-        0
-      ],
-      [
-        14.35,
-        14.35
-      ],
-      [
-        15.55,
-        16.55
-      ],
-      [
-        19.5,
-        20.5
-      ]
-    ],
-    "painting": "art/raw/game-crossing/crossing-wide.png"
-  },
-  "voids": {
-    "about": "The pale paper round the castle painted as the castle's inside (D136), and the widened corridor's right wall closed at its foot, down to the bottom arch's wall: by Gemini 3 Pro Image from tools/art/prompts/game-crossing-voids.md on the canvas this makes, the paper shown flat black, since the model kept it as the page (game-crossing-voids-top.md), and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
-    "from": "art/raw/game-crossing/crossing-wide.png",
-    "void": "paper",
-    "boxes": [
-      [
-        3840,
-        2880,
-        4340,
-        3250
-      ]
-    ],
-    "fade": 10,
-    "canvas": "art/raw/game-crossing/crossing-voids-canvas.png",
-    "painting": "art/raw/game-crossing/crossing-voids.png",
-    "flat": [
-      0,
-      0,
-      0
-    ]
-  },
-  "voids_more": {
-    "about": "What the model left black of the voids, shown it flat in a dim colour, since it keeps black as a gap: by Gemini 3 Pro Image from tools/art/prompts/game-crossing-voids-more.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
-    "from": "art/raw/game-crossing/crossing-voids.png",
-    "void": "black",
-    "flat": [
-      86,
-      78,
-      92
-    ],
-    "leave": [
-      [
-        230,
-        1300,
-        560,
-        1800
-      ],
-      [
-        2050,
-        100,
-        2560,
-        620
-      ],
-      [
-        3150,
-        3000,
-        3750,
-        3584
-      ],
-      [
-        1950,
-        2950,
-        2620,
-        3584
-      ]
-    ],
-    "fade": 10,
-    "canvas": "art/raw/game-crossing/crossing-voids-more-canvas.png",
-    "painting": "art/raw/game-crossing/crossing-mended.png"
-  },
-  "tiled": {
-    "about": "What the model still left black, the tops of thick walls in stone blocks, taken from the picture's own stones by tools/art/repaint.py tiled, no model asked.",
-    "from": "art/raw/game-crossing/crossing-mended.png",
-    "void": "black",
-    "leave": [
-      [
-        230,
-        1300,
-        560,
-        1800
-      ]
-    ],
-    "fade": 6,
-    "texture": [
-      "art/raw/game-crossing/crossing-mended.png",
-      100,
-      60,
-      900,
-      1000
-    ],
-    "shade": 0.9,
-    "painting": "art/raw/game-crossing/crossing-whole.png"
-  },
+  "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from its plan on the grid\n  (`tools/art/prompts/crossing-painted-3.md`), then edited by it without its grid\n  (`crossing-base.md`) and with its walls' gaps painted (`crossing-base-2.md`): the\n  scene's base (D148).\n- Its statues and its arches cut by the difference against the picture without them,\n  also Gemini's (`crossing-gone.md`); the lower wall's tops by the polygons traced on\n  their outlines.\n",
+  "lowered_rows": [
+    5
+  ],
   "nudged": [
     {
-      "about": "The arch at the foot of the corridor lies left of its column.",
+      "about": "Round the top arch, whose opening lies between the two columns (D149).",
+      "cells": [
+        [
+          8,
+          1
+        ],
+        [
+          8,
+          2
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          9,
+          1
+        ],
+        [
+          9,
+          2
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the arch below the crossing.",
+      "cells": [
+        [
+          8,
+          9
+        ],
+        [
+          8,
+          12
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          12
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the arch at the foot of the wide corridor.",
+      "cells": [
+        [
+          14,
+          12
+        ],
+        [
+          14,
+          14
+        ]
+      ],
+      "by": 0.2
+    },
+    {
       "cells": [
         [
           15,
-          13
+          12
         ],
         [
           15,
-          13
+          14
         ]
       ],
-      "by": -0.45
+      "by": -0.2
     }
   ],
   "dark": [
@@ -509,101 +285,28 @@
   ],
   "kept": [
     [
-      13.9,
-      12.5,
-      16.1,
-      14.1
+      7.0,
+      8.1,
+      8.05,
+      9.0
+    ],
+    [
+      10.0,
+      8.1,
+      14.05,
+      9.0
+    ],
+    [
+      17.0,
+      8.1,
+      19.1,
+      9.0
+    ],
+    [
+      14.0,
+      5.0,
+      15.0,
+      6.95
     ]
-  ],
-  "sliver": {
-    "about": "A black sliver over the tunnel's arch, filled from the pixels beside it by tools/art/repaint.py fill, no model asked.",
-    "from": "art/raw/game-crossing/crossing-whole.png",
-    "boxes": [
-      [
-        228,
-        1295,
-        360,
-        1343
-      ]
-    ],
-    "sides": 4,
-    "painting": "art/raw/game-crossing/crossing-clean.png"
-  },
-  "third_row": {
-    "about": "A third row of floor in the corridor of the statues, so that a figure passes below Dask (D146): the rooms above the corridor's top wall compressed by a cell, everything from that wall down to the statues' feet moved up a cell, and the band freed under them laid with the corridor's own stones, mirrored at the seam, by tools/art/repaint.py spaced, no model asked.",
-    "from": "art/raw/game-crossing/crossing-clean.png",
-    "columns": [
-      0,
-      20
-    ],
-    "knots": [
-      [
-        0,
-        0
-      ],
-      [
-        4.75,
-        3.75
-      ],
-      [
-        8.28,
-        7.28
-      ],
-      [
-        8.28,
-        8.28
-      ],
-      [
-        15,
-        15
-      ]
-    ],
-    "band": {
-      "old": 8.28,
-      "from": 7.28,
-      "to": 8.3,
-      "columns": [
-        1.2,
-        19.2
-      ],
-      "plain": [
-        [
-          1.15,
-          2.4,
-          "right"
-        ],
-        [
-          11.7,
-          12.95
-        ],
-        [
-          14.2,
-          15.45
-        ],
-        [
-          16.65,
-          17.85
-        ],
-        [
-          18.55,
-          19.25
-        ]
-      ]
-    },
-    "painting": "art/raw/game-crossing/crossing-third-row.png",
-    "kept": [
-      [
-        0,
-        7.28,
-        1.15,
-        8.3
-      ],
-      [
-        19.25,
-        7.28,
-        20,
-        8.3
-      ]
-    ]
-  }
+  ]
 }

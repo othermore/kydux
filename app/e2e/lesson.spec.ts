@@ -154,7 +154,7 @@ test.describe('a page runs its code (D142)', () => {
     // Without waiting, Dask sees the wizard: the page says it.
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('wizard.move_right(9)');
+    await page.keyboard.insertText('wizard.move_right(8)');
     await page.locator('.lesson-run button').click();
     await expect(page.locator('.lesson-said')).toContainText('teacher', { timeout: 30_000 });
   });

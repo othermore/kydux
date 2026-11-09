@@ -6,7 +6,7 @@
   ],
   "starting_code": "# Walk down to the cell before the crossing with `move_down`.\n\n# Wait while Dask is facing right, with `while`, `facing` and `wait`.\n\n# Keep walking down.\n",
   "hints": [
-    "Dask's lantern shines very far! Walk down 5 cells to stop just before the crossing.",
+    "Dask's lantern shines very far! Walk down 4 cells to stop just before the crossing.",
     "Use `while` with `dask.facing` to wait while he looks right.",
     "When he turns around, walk down 7 cells to the arch!"
   ],

@@ -9,7 +9,7 @@
   ],
   "starting_code": "# Walk down to the key.\n\n# Pick it up.\n\n# Walk down to the door.\n\n# Open it, it is called `door`.\n\n# Walk down to the hole's edge.\n\n# Wait for the slab.\n\n# Walk down to the cell before Dask's corridor.\n\n# Wait while he looks right.\n\n# Walk down to the arch.\n",
   "hints": [
-    "Remember, the key is 2 steps away. After opening the door, there are 2 steps to the hole's edge.",
+    "Remember, the key is 1 step away. After opening the door, there are 2 steps to the hole's edge.",
     "You must use `while not` with `slab.in_place` for the slab, and then `while` with `dask.facing` for Dask.",
     "From the hole's edge, walk down 3, to the cell before Dask's corridor. When Dask turns, walk down 4 to the arch!"
   ],

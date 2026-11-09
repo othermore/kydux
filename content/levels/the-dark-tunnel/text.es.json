@@ -1,16 +1,16 @@
 {
   "title": "El túnel oscuro",
   "goals": [
-    "Sal por el otro extremo del túnel, la casilla (19, 1).",
+    "Sal por la salida del túnel: búscala en el mapa.",
     "Comprueba en qué casilla estás con `position`."
   ],
-  "starting_code": "# Imprime dónde estás con `position` y `print`.\n\n# Sube hasta la fila de la salida con `move_up`.\n\n# Camina a la derecha hasta el final con `move_right`.\n",
+  "starting_code": "# Abre el mapa con su hechizo y busca la salida.\n\n# Imprime dónde estás con `position` y `print`.\n\n# Sube hasta la fila de la salida con `move_up`.\n\n# Camina a la derecha hasta la salida con `move_right`.\n",
   "hints": [
-    "¡Usa `print` para mirar dónde estás en este lugar oscuro!",
-    "El plano muestra la salida en la (19, 1), pero no nos vemos. Comprueba `wizard.position`.",
-    "Si resulta que estamos en la (15, 3), hay que dar 2 pasos arriba y 4 a la derecha."
+    "¡Lanza *orvim* para ver la salida en el mapa!",
+    "El mapa no nos muestra. ¡Comprueba `wizard.position` con `print`!",
+    "Mira tu casilla y la casilla de la salida, y cuenta cuántos pasos hay que dar hacia arriba y hacia la derecha."
   ],
-  "intro": "¡Qué oscuro! En este túnel no se ve nada... y por algún motivo, ni siquiera el mapa nos muestra. Lo que sí vemos en el mapa es la salida del túnel, en la casilla (19, 1). ¡Podemos mirar dónde está {el mago|la maga}, contar los pasos y caminar a ciegas!",
+  "intro": "¡Qué oscuro! En este túnel no se ve nada... Y por algún motivo, ni siquiera el mapa nos muestra lo que hay dentro del túnel. Pero sí que vemos la salida del túnel (busca la posición en el mapa). ¡Podemos mirar dónde está {el mago|la maga}, contar los pasos y caminar a ciegas!",
   "outro": "¡Hemos mirado dónde estábamos y hemos salido a ciegas! Mira, ahí delante hay luz.",
   "learned": "Ahora sabes que un programa ve su posición incluso donde no se ve nada."
 }

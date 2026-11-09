@@ -9,7 +9,7 @@
   ],
   "starting_code": "# Baja hasta la llave.\n\n# Recógela.\n\n# Baja hasta la puerta.\n\n# Ábrela, se llama `door`.\n\n# Baja hasta el borde del agujero.\n\n# Espera a la losa.\n\n# Baja hasta la casilla antes del pasillo de Dask.\n\n# Espera mientras mire a la derecha.\n\n# Baja hasta el arco.\n",
   "hints": [
-    "Recuerda, la llave está a 2 pasos. Tras abrir la puerta, hay 2 pasos hasta el borde del agujero.",
+    "Recuerda, la llave está a 1 paso. Tras abrir la puerta, hay 2 pasos hasta el borde del agujero.",
     "Tienes que usar `while not` con `slab.in_place` para la losa, y luego `while` con `dask.facing` para Dask.",
     "Desde el borde del agujero, baja 3, hasta la casilla antes del pasillo de Dask. ¡Cuando Dask se gire, baja 4 hasta el arco!"
   ],

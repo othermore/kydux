@@ -1,16 +1,16 @@
 {
   "title": "The dark tunnel",
   "goals": [
-    "Walk out at the tunnel's other end, cell (19, 1).",
+    "Walk out at the tunnel's exit: look for it on the map.",
     "Check which cell you are on with `position`."
   ],
-  "starting_code": "# Print where the wizard stands with `position` and `print`.\n\n# Walk up to the exit's row with `move_up`.\n\n# Walk right to the end with `move_right`.\n",
+  "starting_code": "# Open the map with its spell and look for the exit.\n\n# Print where you are with `position` and `print`.\n\n# Walk up to the exit's row with `move_up`.\n\n# Walk to the right to the exit with `move_right`.\n",
   "hints": [
-    "Use `print` to check where you are in this dark place!",
-    "The plan shows the exit at (19, 1), but we cannot see ourselves. Check `wizard.position`.",
-    "If it turns out we are on (15, 3), we need to take 2 steps up and 4 right."
+    "Cast *orvim* to see the exit on the map!",
+    "The map does not show us. Check `wizard.position` with `print`!",
+    "Look at your cell and the exit's cell, and count how many steps to walk up and right."
   ],
-  "intro": "So dark! Nothing is seen in this tunnel... and for some reason, not even the map shows us. What we do see on the map is the tunnel's exit, on cell (19, 1). We can check where the wizard is, count the steps and walk blindly!",
+  "intro": "So dark! Nothing is seen in this tunnel... And for some reason, not even the map shows what is inside the tunnel. But we do see the tunnel's exit (look for its position on the map). We can check where the wizard is, count the steps and walk blindly!",
   "outro": "We looked at where we were and walked out blind! Look, there is light up ahead.",
   "learned": "Now you know that a program sees its position even where nothing is seen."
 }

@@ -6,7 +6,7 @@
   ],
   "starting_code": "# Baja hasta la casilla antes del cruce con `move_down`.\n\n# Espera mientras Dask mire a la derecha, con `while`, `facing` y `wait`.\n\n# Sigue bajando.\n",
   "hints": [
-    "¡El farol de Dask llega muy lejos! Baja 5 casillas para detenerte justo antes del cruce.",
+    "¡El farol de Dask llega muy lejos! Baja 4 casillas para detenerte justo antes del cruce.",
     "Usa `while` con `dask.facing` para esperar mientras mire a la derecha.",
     "¡Cuando se dé la vuelta, baja 7 casillas hasta el arco!"
   ],

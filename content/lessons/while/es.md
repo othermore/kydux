@@ -14,10 +14,11 @@ Pero no es ningún desastre: el juego detendrá un `while` que no termina gracia
 ---
 ## Pruébalo
 
-Tu {mago|maga} se quedará quiet{o|a} una y otra vez, mientras Dask mire hacia la derecha. ¡Y cuando se gire, el programa escribirá hacia dónde mira!
+Tu {mago|maga} se quedará quiet{o|a} una y otra vez, mientras Dask mire hacia la derecha. El programa escribe una línea cada tick que permanece en el bucle, y una más cuando sale de él.
 
 ```python try
 while dask.facing == "right":
+    print("Dask mira hacia", dask.facing, "así que espero")
     wizard.wait()
-print(dask.facing)
+print("Hemos salido del bucle porque Dask mira hacia", dask.facing)
 ```

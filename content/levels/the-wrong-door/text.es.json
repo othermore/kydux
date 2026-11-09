@@ -9,9 +9,9 @@
     "Fíjate en las partes `if` y `else`. ¡Las líneas bajo `if` deberían ir bajo `else`!",
     "Intercambia las líneas bajo `if` por las que hay bajo `else`."
   ],
-  "intro": "¡Oh, no! He escrito un programa para cuando volvamos por esta sala, ¡y va directo a la puerta cerrada con llave! Creo que he puesto las ramas al revés... ¿Puedes arreglarlo?",
+  "intro": "¡Oh, no! He escrito un programa para cuando volvamos por esta sala, ¡y va directo a la puerta cerrada con llave! Creo que he puesto las líneas del `if` donde iban las del `else`... ¿Puedes arreglarlo?",
   "outro": "¡Gracias! Ahora podremos volver por aquí cualquier noche. Mira, al fondo hay un pasillo con tres puertas seguidas.",
-  "learned": "Ahora sabes cómo leer una condición y ver qué rama se ejecuta.",
+  "learned": "Ahora sabes cómo leer una condición y ver qué líneas se ejecutan.",
   "ways": {
     "left_locked": "La puerta izquierda está cerrada con llave",
     "right_locked": "La puerta derecha está cerrada con llave"

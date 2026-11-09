@@ -14,10 +14,11 @@ But it is not a disaster: the game will stop a `while` that never ends thanks to
 ---
 ## Try it
 
-Your wizard stays still over and over, while Dask looks to the right. And when he turns, the program will print which way he looks!
+Your wizard stays still over and over, while Dask looks to the right. The program writes a line each tick it stays in the loop, and one more when it leaves it.
 
 ```python try
 while dask.facing == "right":
+    print("Dask is looking", dask.facing, "so I wait")
     wizard.wait()
-print(dask.facing)
+print("We left the loop because Dask is looking", dask.facing)
 ```

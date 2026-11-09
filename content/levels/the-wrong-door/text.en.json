@@ -9,9 +9,9 @@
     "Look at the `if` and `else` parts. The lines under `if` should go under `else`!",
     "Swap the lines under `if` with the ones under `else`."
   ],
-  "intro": "Oh no! I wrote a program for when we come back through this room, and it goes straight to the locked door! I think I put the branches the wrong way round... Can you fix it?",
+  "intro": "Oh no! I wrote a program for when we come back through this room, and it goes straight to the locked door! I think I put the `if` lines where the `else` ones went... Can you fix it?",
   "outro": "Thank you! Now we can come back this way any night. Look, further on there is a corridor with three doors in a row.",
-  "learned": "Now you know how to read a condition and see which branch runs.",
+  "learned": "Now you know how to read a condition and see which lines run.",
   "ways": {
     "left_locked": "The left door is locked",
     "right_locked": "The right door is locked"

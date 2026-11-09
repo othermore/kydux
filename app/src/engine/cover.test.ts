@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { coveredShare, inFront, type Placed, ringCoveredShare, type Solid } from './cover';
+import { MARK_DEPTH, markDepthIn, rowDepth, thingDepth } from './depth';
 
 /** A texture `width`×`height`, solid where `solid` says. */
 function texture(width: number, height: number, solid: (x: number, y: number) => boolean): Solid {
@@ -91,5 +92,36 @@ describe('ringCoveredShare (D160)', () => {
     expect(share).toBeLessThan(0.4);
     // A crown solid only in its top half covers nothing below it.
     expect(ringCoveredShare([100, 100], 10, [placed('crown', 50, 5, 100, 100)], solidOf)).toBe(0);
+  });
+});
+
+describe('the covering of a mark in a doorway (D172)', () => {
+  // A door on row 6 whose picture, shut or open, is solid all over the mark's ring: the shut
+  // leaf, or the doorway's floor seen through it.
+  const door = (open: boolean) => ({
+    ...placed('wall', 50, 50, 100, 100),
+    depth: thingDepth(6, { under: true, open }),
+    visible: true,
+    alpha: 1,
+  });
+
+  it('is the shut door\'s while it is shut, the mark on the ground under it', () => {
+    const over = inFront({ depth: MARK_DEPTH }, [door(false)]);
+    expect(ringCoveredShare([100, 100], 10, over, solidOf)).toBe(1);
+  });
+
+  it('is none of the door\'s once it opens, the mark lying over its open picture', () => {
+    const open = door(true);
+    const over = inFront({ depth: markDepthIn(open.depth) }, [open]);
+    expect(over).toEqual([]);
+    expect(ringCoveredShare([100, 100], 10, over, solidOf)).toBe(0);
+  });
+
+  it('is still what stands before the doorway: the next row\'s things cover it', () => {
+    const open = door(true);
+    const before = { ...placed('crown', 50, 50, 100, 100), depth: rowDepth(7), visible: true, alpha: 1 };
+    const over = inFront({ depth: markDepthIn(open.depth) }, [open, before]);
+    expect(over).toEqual([before]);
+    expect(ringCoveredShare([100, 100], 10, over, solidOf)).toBeGreaterThan(0.4);
   });
 });

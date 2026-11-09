@@ -143,6 +143,33 @@ test('a spell is cast with the wand, the seal breaks, a door opens through its h
   await expect(scene).toHaveAttribute('data-doors', /castle_door/, { timeout: 30_000 });
 });
 
+for (const locale of ['en-US', 'es-ES']) {
+  test(`the mark in the castle's doorway is covered while the door is shut, and whole once it opens (D172, ${locale})`, async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({ locale, viewport: { width: 1280, height: 800 } });
+    const page = await context.newPage();
+    await seedWizard(page);
+    const scene = page.locator('#scene');
+    await page.goto('/#level/the-way-in');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    // Shut, the door's picture is over the mark, its ring drawn thin over the door.
+    await expect(scene).toHaveAttribute('data-marks-covered', '8,6');
+    await page.locator('#speed').selectOption('4');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")');
+    await page.locator('#run').click();
+    await expect(scene).toHaveAttribute('data-doors', /castle_door/, { timeout: 30_000 });
+    // Open, the mark lies whole on the doorway's floor: nothing of the door covers it.
+    await expect(scene).toHaveAttribute('data-marks-covered', '', { timeout: 10_000 });
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-marks-covered', '');
+    await context.close();
+  });
+}
+
 test('with ?debug the scene shows its cells, for a tester to name one', async ({ page }) => {
   await seedWizard(page);
   await page.goto('/?debug#level/the-sealed-door');

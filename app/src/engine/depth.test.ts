@@ -5,6 +5,7 @@ import {
   figureDepth,
   loweredBy,
   MARK_DEPTH,
+  markDepthIn,
   nudgedBy,
   overDepth,
   rowDepth,
@@ -71,6 +72,19 @@ describe('the depths of a painted scene (D76, D95)', () => {
     expect(MARK_DEPTH).toBeLessThan(thingDepth(0, { lying: true }));
     // Over the floor's own pictures: a hole is drawn at 2.8.
     expect(MARK_DEPTH).toBeGreaterThan(2.8);
+  });
+
+  it('lays the mark in an open doorway over the door\'s open picture, under who stands there (D172)', () => {
+    const open = thingDepth(6, { under: true, open: true });
+    const inDoorway = markDepthIn(open);
+    // Over the open picture, the doorway's floor, and its row's own image.
+    expect(inDoorway).toBeGreaterThan(open);
+    expect(inDoorway).toBeGreaterThan(rowDepth(6));
+    // Under the figure standing in the doorway, and the next row's things.
+    expect(inDoorway).toBeLessThan(figureDepth(6 + FOOT_IN_CELL));
+    expect(inDoorway).toBeLessThan(rowDepth(7));
+    // A shut door's picture is over the figure in its doorway, and over the mark too.
+    expect(thingDepth(6, { under: true })).toBeGreaterThan(inDoorway);
   });
 
   it('lays a key under its row\'s things, a torch on its row over it, a figure above under it (D164)', () => {

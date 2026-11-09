@@ -21,7 +21,8 @@
 // by ",", D135), data-zoom (the
 // camera's zoom, D69), data-following (whether the camera follows the wizard),
 // data-marks-covered (the marks a cut-out is drawn over now, whose ring shows over
-// it, "x,y" joined by ";", D160, D168),
+// it, "x,y" joined by ";", D160, D168; a mark in an open doorway lies over its door's
+// open picture, D172),
 // data-revealed (the things whose outline shows where they lie, D85),
 // data-sleeping (the bed the wizard sleeps in, D84), data-ground (`morning` while
 // a scene painted at night shows its morning ground, `painting` otherwise, D126), data-asleep (each figure
@@ -103,7 +104,17 @@ import {
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
-import { FOOT_IN_CELL, figureDepth, lightDepth, loweredBy, MARK_DEPTH, nudgedBy, overDepth, sleeperDepth } from './depth';
+import {
+  FOOT_IN_CELL,
+  figureDepth,
+  lightDepth,
+  loweredBy,
+  MARK_DEPTH,
+  markDepthIn,
+  nudgedBy,
+  overDepth,
+  sleeperDepth,
+} from './depth';
 import { type LightName, type LightState, NIGHT_MS, SceneLight, WHOLE_MORNING } from './light';
 import { Speech } from './speech';
 import { Sway } from './sway';
@@ -771,7 +782,10 @@ class LevelScene extends Phaser.Scene {
     }
     for (const outline of this.revealed.values()) outline.update();
     if (this.marks.length > 0) {
-      for (const { silhouette } of this.marks) silhouette?.update();
+      for (const { tile, mark, silhouette } of this.marks) {
+        mark.setDepth(this.markDepth(tile));
+        silhouette?.update();
+      }
       const covered = this.marks
         .filter(({ silhouette }) => silhouette?.covered)
         .map(({ tile }) => tile.join(','))
@@ -780,6 +794,19 @@ class LevelScene extends Phaser.Scene {
     }
     this.debug?.update(this.cameras.main);
     if (this.art) this.publishDrawn();
+  }
+
+  /** The depth of the goal's mark on `tile`: on the ground (D160), or, where a door open
+   * on the cell shows its open picture, which paints the doorway's floor, just over that
+   * picture, so that the shut leaf's picture, gone, cuts nothing of it (D172). */
+  private markDepth(tile: Tile): number {
+    for (const thing of this.map.things) {
+      if (thing.kind !== 'door' || !this.openDoors.has(thing.id)) continue;
+      if (!(thing.cells ?? [thing.tile]).some(([x, y]) => x === tile[0] && y === tile[1])) continue;
+      const image = this.things.get(thing.id);
+      if (image?.texture.key === this.atHour(`art-${this.artOf(thing.id)}-open`)) return markDepthIn(image.depth);
+    }
+    return MARK_DEPTH;
   }
 
   /** Where each painted thing seen is drawn, its middle in cells (D109), in

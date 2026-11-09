@@ -466,14 +466,17 @@ function copiesOf(
   return { mask, overs };
 }
 
-/** Each copy where its source is now, in its frame, seen when its source is; the sources
- * seen. */
-function follow(overs: Over[]): (Phaser.GameObjects.Image | Phaser.GameObjects.Sprite)[] {
+/** Each copy where its source is now, in its frame, seen when its source is seen and,
+ * where `over` is given, drawn over the mark; the sources so seen. */
+function follow(
+  overs: Over[],
+  over: (source: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite) => boolean = () => true,
+): (Phaser.GameObjects.Image | Phaser.GameObjects.Sprite)[] {
   const seen: (Phaser.GameObjects.Image | Phaser.GameObjects.Sprite)[] = [];
   for (const { source, copy } of overs) {
     if (copy.texture.key !== source.texture.key) copy.setTexture(source.texture.key, source.frame.name);
     else if (copy.frame.name !== source.frame.name) copy.setFrame(source.frame.name);
-    const shown = source.visible && source.alpha > 0.05;
+    const shown = source.visible && source.alpha > 0.05 && over(source);
     copy
       .setPosition(source.x, source.y)
       .setOrigin(source.originX, source.originY)
@@ -485,11 +488,12 @@ function follow(overs: Over[]): (Phaser.GameObjects.Image | Phaser.GameObjects.S
 }
 
 /** The goal's mark where a cut-out of the scene hides it (D160, D168): the mark lies on
- * the ground, under every cut-out and every figure. Where a cut-out covers it, its ring is
- * drawn over the cut-out as a figure's outline is drawn behind one (D107): a line as thin
- * as the figures', in their yellow, fading away and coming back with their beat, only
- * there. Where a figure stands over it, the figure covers it and nothing is drawn over the
- * figure. */
+ * the ground, under every cut-out and every figure; in an open doorway, on the floor its
+ * door's open picture paints, over that picture (D172). Where a cut-out covers it, its
+ * ring is drawn over the cut-out as a figure's outline is drawn behind one (D107): a line
+ * as thin as the figures', in their yellow, fading away and coming back with their beat,
+ * only there. Where a figure stands over it, the figure covers it and nothing is drawn
+ * over the figure. */
 export class MarkSilhouette {
   private readonly ring: Phaser.GameObjects.Container;
   private readonly line: Phaser.GameObjects.Arc;
@@ -526,11 +530,13 @@ export class MarkSilhouette {
     else scene.tweens.add({ targets: this.line, alpha: { from: 1, to: 0 }, duration: BEAT_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   }
 
-  /** Every frame: the masks of the cut-outs and the figures as they are drawn now, the
-   * ring with the mark, and whether a cut-out covers it. */
+  /** Every frame: the masks of the cut-outs and the figures drawn over the mark now, the
+   * ring with the mark, and whether a cut-out covers it. Only what is deeper than the mark
+   * is over it: an open door's picture lies under a mark in its doorway (D172). */
   update(): void {
-    const seen = follow(this.cutOuts.overs);
-    follow(this.figures.overs);
+    const over = (source: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite) => source.depth > this.mark.depth;
+    const seen = follow(this.cutOuts.overs, over);
+    follow(this.figures.overs, over);
     const scale = this.beat?.scaleX ?? 1;
     this.ring
       .setPosition(this.mark.x, this.mark.y)

@@ -70,6 +70,14 @@ export function coverDepth(row: number): number {
  * is drawn as its silhouette (silhouette.ts, D168). */
 export const MARK_DEPTH = 2.9;
 
+/** The depth of a goal's mark lying in an open doorway (D172), its door's open picture
+ * drawn at `doorway`: just over that picture, which paints the doorway's floor the mark
+ * lies on, so that no part of the door's picture covers it, and still under the figure
+ * standing in the doorway and every row's things before it. */
+export function markDepthIn(doorway: number): number {
+  return doorway + 0.000005;
+}
+
 /** The depth of what is drawn over every figure of a scene `rows` rows tall: a wall
  * seen from above (D95). */
 export function overDepth(rows: number): number {

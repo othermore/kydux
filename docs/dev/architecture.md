@@ -2145,6 +2145,6 @@ one overturns stays, marked as superseded.
   waiting is enough only because Dask has two starts.
 - **D147 — A standing figure stands.** Decided 2026-11-07 by the owner. A figure's
   standing frame, in every row of its sheet, has its feet together and its weight on
-  both; a walking frame is made from it (`figures.py`). Dask's sheet is made from a
-  drawing of him standing still in the four views (`figures.py --standing`). Rules
-  out a teacher who stands still with a foot in the air.
+  both; a walking frame is made from it (`figures.py`). Dask's and Wenna's sheets are
+  made from drawings of them standing still in the four views (`figures.py
+  --standing`). Rules out a figure who stands still with a foot in the air.

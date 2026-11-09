@@ -127,8 +127,13 @@ LEGS = 0.2
 FLOATING = {"eldra": (4, 8)}
 FLOATING_SWAY = 3
 #: The figures whose sheet is made from a drawing of them standing still (D147), and
-#: the way each view of the drawing faces, from left to right.
-STANDING_DRAWN = {"dask": ("down", "right", "left", "up")}
+#: the way each view of the drawing faces, from left to right; a view named `-left`
+#: faces right in the drawing and is turned over for the row that faces left, where
+#: the model drew the same side twice.
+STANDING_DRAWN = {
+    "dask": ("down", "right", "left", "up"),
+    "wenna": ("down", "right", "-left", "up"),
+}
 #: How much of a floating figure, from the bottom up, is the dress that grows.
 DRESS = 0.4
 
@@ -619,8 +624,11 @@ def make_standing(name: str, drawing: Path) -> Path:
     top, bottom = int(rows[0]), int(rows[-1])
     scale = (bottom - top + 1) / views[0].height
     out = sheet.copy()
-    for view, way in zip(views, order, strict=True):
+    for view, named in zip(views, order, strict=True):
+        way = named.lstrip("-")
         small = view.resize((round(view.width * scale), round(view.height * scale)), Image.LANCZOS)
+        if named.startswith("-"):
+            small = small.transpose(Image.FLIP_LEFT_RIGHT)
         y = ways.index(way) * fh + bottom + 1 - small.height
         x = fw + (fw - small.width) // 2
         out.paste((0, 0, 0, 0), (fw, ways.index(way) * fh, 2 * fw, (ways.index(way) + 1) * fh))

@@ -10,9 +10,9 @@ later, like the rest of it.
   `tools/art/sprites.py` and put together by `tools/art/export_scene.py`,
   Ilda's sized and turned by Wenna's, a figure of her build, and Baro's by
   Dask's.
-- Dask's standing frames are Gemini's drawing of him standing still in the four
-  views (`figure-dask-standing.md`), cut by `tools/art/figures.py --standing`, and
-  his walking frames are made from them.
+- Dask's and Wenna's standing frames are Gemini's drawings of them standing still in
+  the four views (`figure-dask-standing.md`, `figure-wenna-standing.md`), cut by
+  `tools/art/figures.py --standing`, and their walking frames are made from them.
 - The wizard's girl and Nuri's are Gemini's edits of those sheets
   (`figure-wizard-girl.md`, `figure-nuri-girl.md`), and the wizard's
   casting frames are Gemini's edits of the wizard's two sheets

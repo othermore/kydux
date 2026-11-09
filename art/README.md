@@ -555,7 +555,8 @@ A figure's standing frame, in every row, has its feet together and its weight on
 both (D147): a figure that stands still has no foot in the air. A sheet whose
 standing frames were drawn in a stride is made again from a drawing of the figure
 standing still in the four views (`tools/art/figures.py --standing <figure>
-<drawing>`, its prompt `figure-dask-standing.md`), its step frames keeping their legs.
+<drawing>`, its prompts `figure-dask-standing.md` and `figure-wenna-standing.md`), its
+step frames keeping their legs.
 
 Each friend comes in two sets of colours (D90), `nuri-a`, `nuri-b`,
 `teku-a` and `teku-b`, recoloured from the friends' bases with the colours

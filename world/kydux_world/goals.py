@@ -9,7 +9,8 @@ The kinds: reach (the run ends with the wizard on a marker's tile, or on
 one at x and y; passing over it on the way does not count, unless the goal says
 `"on_the_way": true`, for a level whose ways end in different cells), collect (a thing by
 id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
-say (a text, word for word), give (a thing by id, to an actor by id), no_bumps
+say (a text, word for word), give (a thing by id, to an actor by id), cast (a
+spell cast, not a word refused: `{"kind": "cast", "spell": "osto"}`, D176), no_bumps
 (the wizard bumps into nothing; failed at the first bump),
 not_seen_by (an actor; failed when it catches the wizard), ticks_under (the
 run ends in fewer ticks than that, so that the shorter of two winning programs
@@ -29,7 +30,7 @@ import types
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Protocol
 
-from .level import GoalSpec, Level, LevelError, Position
+from .level import KNOWN_SPELLS, GoalSpec, Level, LevelError, Position
 
 if TYPE_CHECKING:
     from .world import World
@@ -261,6 +262,24 @@ class UsesGoal:
         )
 
 
+class CastGoal:
+    """Met once the wizard has cast a spell, at the tick of its `cast` event (D176):
+    `{"kind": "cast", "spell": "orvim"}`. A spell refused, unknown or cast where it
+    can do nothing is a `blocked` event, and meets nothing."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        spell = spec.params.get("spell")
+        if spell not in KNOWN_SPELLS:
+            raise LevelError(f"{level.id}: the cast goal names {spell}, no spell")
+        self.spell = spell
+
+    def check(self, world: "World") -> bool:
+        return any(
+            e.actor == "wizard" and e.kind == "cast" and e.data.get("spell") == self.spell
+            for e in world.events
+        )
+
+
 class GiveGoal:
     """Met once the wizard has given a thing to an actor (D48):
     `{"kind": "give", "id": "book", "to": "eldra"}`."""
@@ -308,6 +327,7 @@ GOALS: dict[str, type] = {
     "open": OpenGoal,
     "say": SayGoal,
     "give": GiveGoal,
+    "cast": CastGoal,
     "sleep": SleepGoal,
     "no_bumps": NoBumpsGoal,
     "not_seen_by": NotSeenByGoal,

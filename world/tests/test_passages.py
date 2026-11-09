@@ -248,6 +248,71 @@ def test_a_hole_has_a_whole_period_and_nothing_else_does():
         Level.from_dict({**HOLES, "things": [key]})
 
 
+#: A hole that never closes on its own, a dark portal open at every tick (D178).
+PORTAL = {**HOLES, "things": [{"kind": "hole", "id": "hole", "marker": "T", "period": 0}]}
+
+
+def test_a_hole_of_period_0_is_open_at_every_tick_until_osto_holds_it():
+    """D178: open at ticks 0 to 20; held closed from the tick after osto, for
+    HOLD_TICKS; open again after."""
+    world = World(Level.from_dict(PORTAL))
+    hole = world.things["hole"]
+    assert not any(hole._k_closed_at(tick) for tick in range(21))
+    world.wizard.move_right()
+    world.wizard.cast("osto")
+    hold = world.events[-1]
+    # Cast in tick 2, held from tick 3.
+    assert (hold.kind, hold.data) == ("hold", {"id": "hole", "from": 3, "until": 3 + HOLD_TICKS})
+    assert [hole._k_closed_at(tick) for tick in (2, 3, 2 + HOLD_TICKS, 3 + HOLD_TICKS)] == [
+        False,
+        True,
+        True,
+        False,
+    ]
+    check_consistency(world)
+
+
+def test_a_step_onto_a_hole_of_period_0_bumps_and_lands_while_it_is_held():
+    world = World(Level.from_dict(PORTAL))
+    world.wizard.move_right()
+    world.wizard.wait(5)
+    world.wizard.move_right()
+    assert world.events[-1].kind == "bump" and world.events[-1].data["by"] == "hole"
+    world.wizard.cast("osto")
+    world.wizard.move_right(3)
+    assert world.wizard.position == (5, 1)
+    assert (
+        run_code(
+            Level.from_dict(PORTAL),
+            'wizard.move_right()\nwizard.cast("osto")\nwizard.move_right(3)\n',
+        ).status
+        == "won"
+    )
+
+
+def test_waiting_for_a_hole_of_period_0_to_close_never_ends():
+    """No wait gets across a hole that never closes on its own: the run ends at its
+    tick limit."""
+    code = "wizard.move_right()\nwhile not hole.closed:\n    wizard.wait()\nwizard.move_right(3)\n"
+    assert run_code(Level.from_dict({**PORTAL, "tick_limit": 30}), code).status == "too_many_ticks"
+
+
+def test_a_cast_goal_is_met_by_the_spell_cast_and_not_by_a_word_refused():
+    """D176: *The doors' corridor*'s bonus is the map's spell cast; a misspelt spell is
+    refused, and the run is won without it."""
+    level = real("the-doors-corridor")
+    walk = "wizard.move_right(14)\nwizard.move_up(9)\n"
+    for spell, bonus in (("orvin", False), ("orvim", True)):
+        result = run_code(level, f'wizard.cast("{spell}")\n{walk}')
+        assert result.status == "won"
+        (cast,) = [goal for goal in result.goals if goal.kind == "cast"]
+        assert (cast.bonus, cast.met) == (True, bonus), spell
+    with pytest.raises(LevelError, match="no spell"):
+        World(
+            Level.from_dict({**MAP, "goals": [*MAP["goals"], {"kind": "cast", "spell": "abra"}]})
+        )
+
+
 #: A corridor the map's spell may be cast in (D134).
 MAP = {
     "id": "the_map",

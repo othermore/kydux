@@ -49,8 +49,8 @@
       "hidden": true
     },
     {
-      "kind": "uses",
-      "member": "cast",
+      "kind": "cast",
+      "spell": "orvim",
       "bonus": true
     }
   ],

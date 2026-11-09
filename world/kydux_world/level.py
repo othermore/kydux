@@ -469,8 +469,9 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
             f"{shape.level_id}: the door {thing_id} is locked, and so neither sealed "
             "nor keyed by a word"
         )
+    # A hole's period is whole, or 0 for a hole that never closes on its own (D178).
     period = spec.get("period")
-    whole = isinstance(period, int) and not isinstance(period, bool) and period >= 1
+    whole = isinstance(period, int) and not isinstance(period, bool) and period >= 0
     if (kind == "hole") != (period is not None) or (period is not None and not whole):
         raise LevelError(f"{shape.level_id}: a hole, and only a hole, has a whole period")
     opened = spec.get("open", False)

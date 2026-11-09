@@ -157,7 +157,7 @@ content/
     wrong/*.py                            each must not win (the naive mistakes)
 ```
 
-Goals are declared (`reach`, `collect`, `open`, `say`, `give`, `no_bumps`,
+Goals are declared (`reach`, `collect`, `open`, `say`, `give`, `cast`, `no_bumps`,
 `not_seen_by`, `ticks_under`, `lines_under`, `numbers_under`, `uses`) and a level may add `goals.py` for one of its own. The lesson's
 Markdown, with no HTML in it, may hold one fenced block marked `python try`,
 its example; the level after it starts with its own program (D33, D63). Within a chapter, every item is

@@ -283,7 +283,8 @@ HOLD_TICKS = 6
 class Hole(Thing):
     """A hole that opens in the floor, on one cell or two side by side: closed for
     `period` ticks and open for as many, from tick 0 closed, and closed too while
-    `osto` holds it (D53, D167)."""
+    `osto` holds it (D53, D167); with `period` 0, open at every tick, a dark portal
+    that never closes on its own, closed only while `osto` holds it (D178)."""
 
     _k_role = "hole"
 
@@ -293,8 +294,8 @@ class Hole(Thing):
         self._set(holds=())
 
     def _k_closed_at(self, tick: int) -> bool:
-        period = self._k_spec.period or 1
-        if (tick // period) % 2 == 0:
+        period = self._k_spec.period
+        if period and (tick // period) % 2 == 0:
             return True
         return any(start <= tick < end for start, end in self._k_holds)
 
@@ -323,10 +324,11 @@ class Hole(Thing):
         return not self.closed
 
     def _hold(self) -> None:
-        """Held closed for HOLD_TICKS, from the next tick it is closed."""
+        """Held closed for HOLD_TICKS, from the next tick it is closed; a hole that
+        never closes on its own, from the next tick (D178)."""
         world: World = self._k_world
         start = world.tick + 1
-        while not self._k_closed_at(start):
+        while self._k_spec.period and not self._k_closed_at(start):
             start += 1
         end = start + HOLD_TICKS
         self._set(holds=(*self._k_holds, (start, end)))

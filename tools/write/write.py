@@ -100,6 +100,8 @@ def prompt(brief: Path) -> tuple[str, list[str]]:
     return "\n\n".join(parts), fields["outputs"]
 
 
+#: How long an answer may be, in tokens: a brief of eleven levels in two languages is long.
+MAX_OUTPUT = 60000
 #: The keys tried in turn while the model is busy: the first, and a second if there is one.
 KEY_NAMES = ("GEMINI_API_KEY", "GEMINI_API_KEY_2")
 
@@ -142,7 +144,9 @@ def gemini(text: str) -> str:
             answer = client.models.generate_content(
                 model=MODEL,
                 contents=text,
-                config=types.GenerateContentConfig(response_mime_type="application/json"),
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json", max_output_tokens=MAX_OUTPUT
+                ),
             )
             return answer.text or ""
         except (errors.ServerError, errors.ClientError) as busy:

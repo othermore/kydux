@@ -1,179 +1,250 @@
 ---
 outputs:
-  - content/levels/the-watchtower/text.en.json
-  - content/levels/the-watchtower/text.es.json
-  - content/levels/the-watch/text.en.json
-  - content/levels/the-watch/text.es.json
+  - content/levels/the-doors-corridor/text.en.json
+  - content/levels/the-doors-corridor/text.es.json
+  - content/levels/the-dark-tunnel/text.en.json
+  - content/levels/the-dark-tunnel/text.es.json
+  - content/levels/the-tunnel-exit/text.en.json
+  - content/levels/the-tunnel-exit/text.es.json
+  - content/levels/by-the-statues/text.en.json
+  - content/levels/by-the-statues/text.es.json
   - content/levels/left-or-right/text.en.json
   - content/levels/left-or-right/text.es.json
   - content/levels/the-wrong-door/text.en.json
   - content/levels/the-wrong-door/text.es.json
-  - content/levels/the-long-stairs/text.en.json
-  - content/levels/the-long-stairs/text.es.json
+  - content/levels/the-three-doors/text.en.json
+  - content/levels/the-three-doors/text.es.json
   - content/levels/past-the-teacher/text.en.json
   - content/levels/past-the-teacher/text.es.json
-  - content/levels/the-moving-stairs/text.en.json
-  - content/levels/the-moving-stairs/text.es.json
+  - content/levels/the-moving-slab/text.en.json
+  - content/levels/the-moving-slab/text.es.json
   - content/levels/the-dark-room/text.en.json
   - content/levels/the-dark-room/text.es.json
   - content/levels/the-night-walk/text.en.json
   - content/levels/the-night-walk/text.es.json
 context:
   - docs/dev/story.md
-  - content/stories/after-dark/text.en.json
-  - content/stories/the-top-of-the-stairs/text.en.json
-  - content/stories/caught/text.en.json
-  - content/lessons/true-or-false/en.md
-  - content/lessons/if/en.md
-  - content/lessons/else/en.md
-  - content/lessons/repeat/en.md
-  - content/lessons/while/en.md
-  - content/lessons/kirra-and-osto/en.md
+  - drafts/chapter-3/capitulo-3.md
+  - content/levels/the-hidden-key/text.es.json
+  - content/levels/eldras-door/text.en.json
+  - content/levels/eldras-door/text.es.json
 ---
-Write the texts of chapter 3's nine levels, in English and Spanish. The
-chapter's stories and lessons are given, and the last level of chapter 2
-for its voice. Each level comes right after the lesson it practises, in
-the order below, and the levels are where the story moves on between the
-lessons. The friend speaks in every level, whispering at night, in the voice of
-the lessons. The friend is of the other gender (Nuri for a boy wizard, Teku for a girl wizard): write the friend's name as `{friend}` and the friend's own gendered words in double braces, as the rules say.
+Write the texts of chapter 3's eleven levels, in English and Spanish. The owner's
+design document is given in full: its section 3 says what each level is about, and
+its section 4 how the friend's lessons sound. Where this brief and the design differ
+on a cell or a number, this brief wins: its cells are the final ones. Two of chapter
+2's levels are given for their voice.
 
-## Where it happens
+## Where it happens, and who speaks
 
-At night, in two scenes. The passages: the watchtower's gallery, where
-Dask stands by the wall; below it Dask's round, a corridor he walks to
-and fro; two rooms with two doors each, one on the left and one on the
-right, of which one is locked; and the long stairs, climbing step by step
-up and to the right. The night passages, above the long stairs: Dask's
-long corridor; a passage with a moving stair that swings into place and
-away again; a dark room with a key and a locked door; and the night walk,
-a dark corridor with a key, a locked door and another moving stair, with
-Dask walking his lower round, to the way down to the dormitory. Dask is
-strict, never cruel; being seen by him only means trying again.
+At night in the castle's passages, the three out of bed. `{friend}`, the friend met
+at the gate, speaks every intro and outro, whispering; `{mate}`, the dormitory mate,
+is beside them and may be mentioned. Dask is a strict teacher who walks the
+corridors with a lantern. Keep the story moving a little from level to level. There
+is a naughty child's map in the wizard's hands all along. Write `{friend}`, `{mate}`,
+`{wizard}` and the gender braces as rules.md says.
 
-## Each file
+## Each level's file
 
 A JSON object with exactly these keys:
 
-- `title`: the level's name, short.
-- `goals`: a list of strings, as many as the level's goals below and in
-  their order, each a short sentence. A bonus goal's sentence is plain:
-  the game writes *Bonus:* before it.
-- `starting_code`: the program the level starts with, one string, `\n`
-  between lines and at the end. It holds exactly the code lines given
-  below, in order, with their spaces; where the level allows comments,
-  comment lines (`# ...`, in the child's language) may say what to do,
-  never how.
-- `hints`: two or three, from the gentlest to the one that nearly says it.
-  Each level below gives its solution, so that the hints are true to it
-  (which way, how many steps, which line is wrong); the solution is for
-  you, and never appears in a text. A hint never is, quotes or spells out
-  a line of the solution, not even the first or the shortest: it points
-  at the idea, the direction or the method by its name alone (`wait`,
-  `in_place`), and lets the child write the line.
-- `intro`: what the friend whispers before the level, one to three sentences:
-  where they are and what is wanted, so that the child knows why.
-- `outro`: what the friend whispers after a win, one or two sentences that
-  move the story on to what comes next.
-- `learned`: one sentence, "Now you know …" / "Ahora sabes …", that says
-  what the idea is and what the child can do with it now (as in "now you
-  know what an argument is, and that the move actions have one that says
-  how far"). Only where the level has it, below.
-- `ways`: only where the level is played in more than one way, an object
-  with one short phrase for each way's id, saying how that way is dealt
-  ("Dask looks away"); the game shows it when a run of that way is played.
+- `title`: the level's name, given below in both languages.
+- `goals`: a list of strings, as many as the level's goals below and in their order,
+  each a short sentence. A bonus goal's sentence is plain: the game writes *Bonus:*
+  before it.
+- `starting_code`: the program the level starts with, one string, `\n` between lines
+  and at the end, as each level below says. A practice's comments (`# ...`, in the
+  child's language), one a step, say in the child's words what to do and name the
+  method of the step in backquotes, and never give the numbers or the program.
+- `hints`: three, from the gentlest, on the idea, to the one that nearly says it all.
+  A hint never is, quotes or spells out a line of the solution, not even the first or
+  the shortest, and never quotes the `if`, `while` or `for` line of it: it points at
+  the idea, the direction or the method by its name alone, and may give numbers.
+- `intro`: what `{friend}` says before the level, one to three sentences, whispering:
+  the situation, and the cells this brief names, never the solution.
+- `outro`: what `{friend}` says after a win, one or two sentences that move the story
+  on to what comes next.
+- `learned`: one sentence, "Now you know …" / "Ahora sabes …", that says what the idea
+  is and what the child can do with it now. Every level has it but the last,
+  `the-night-walk`, which the chapter's closing story sums up.
+- `ways`: only for a level played in several ways: an object from each way's id to its
+  words, a few words each, as below.
+
+Text between backquotes is shown as code everywhere, in intros, goals and learned too.
 
 ## What the child knows by now
 
-The texts never explain again what a lesson has taught; they use its
-words. Before every level the child knows chapters 1 and 2: programs,
-objects and methods, comments, arguments, strings and `say`, `pick_up`,
-spells cast with the wand (`zelim`, `fendra`), variables, attributes and
-`print`, `find_nearest`, `give`, doors and keys. In chapter 3, before each
-level:
-
-- the-watchtower: also expressions, `True` and `False`, `==`, `not`,
-  `dask.facing` and `dask.can_see(wizard)`.
-- the-watch: also `if` and `wizard.wait()`, and levels played in ways.
-- left-or-right and the-wrong-door: also `else`.
-- the-long-stairs: also `for` loops.
-- past-the-teacher: also `while`.
-- the-moving-stairs, the-dark-room, the-night-walk: also *kirra*, *osto*
-  and `stair.in_place`.
+All of chapters 1 and 2 (programs, methods, comments, arguments, strings, spells,
+attributes and `print`, `find_nearest` under a name, `None`, `door.open()` beside a
+door, a level played in several ways). In chapter 3, in order, the lessons before each
+level: *The cells* (a cell is two numbers, x from the left and y from the top, both
+from 0; `wizard.cast("orvim")` opens the plan); *Where I am* (`wizard.position`,
+`key.position`); *True or false* (`==`, `not`, `dask.facing`); *If* (`if`,
+`wizard.wait()`, a tick); *Else*; *Repeat* (`for step in range(3):`); *While*; *Light
+and slabs* (*kirra*, `slab.in_place`, *osto*). Never explain them again.
 
 ## The levels
 
-1. `the-watchtower` — Practice 1, after *True or false*. Dask stands in
-   the gallery, staring at the wall; ask which way he faces and whether he
-   can see you, then walk past him along the gallery. Goals: walk along
-   the gallery; do not let Dask see you; bonus: ask whether Dask can see
-   you. Starting code: comments allowed. Learned: what an expression is,
-   and how to ask one whose answer is `True` or `False`.
-   Solution: `print(dask.facing); print(dask.can_see(wizard)); wizard.move_right(6)`.
+A *way* is one of the versions of a level that the same program must win. *The
+solution* is for you, so that the hints are true; it never appears in a text.
 
-2. `the-watch` — Practice 2, after *If*. Dask walks his round on the
-   corridor below; cross it to the room beyond without being seen, waiting
-   only if he looks your way. Played in two ways, `away` (Dask looks away)
-   and `watching` (Dask looks this way). Goals: cross to the room below;
-   do not let Dask see you. Starting code: comments allowed. Learned: what
-   a condition is, and how `if` does something only when the answer is
-   yes.
-   Solution: `if dask.facing == "left":;     wizard.wait(); wizard.move_down(2)`.
+1. `the-doors-corridor`, *The corridor of doors* / *El pasillo de las puertas*. Practice
+   1. A long corridor of closed doors with dim rooms behind them, turning up at its far
+   end to the arch of a tunnel. The three stand at its left end, on cell (1, 12). There
+   is no mark on the floor: the map says the tunnel's mouth is cell (15, 3). Count what
+   changes in each number and walk there in two straight moves; going in, they fade
+   from sight: the tunnel is enchanted. Goals: walk to the tunnel's mouth, cell (15, 3)
+   (say the cell); bonus: open the map with its word. Starting code: two comments, one a
+   move, naming `move_right` and `move_up`. Solution: `wizard.move_right(14)`,
+   `wizard.move_up(9)`. Learned: how to read two cells on the plan and count what
+   changes in each number.
 
-3. `left-or-right` — Practice 3, after *Else*. A room with a door on the
-   left and one on the right, one of them locked; choose the open one.
-   The doors are `left_door` and `right_door`. Played in two ways,
-   `left_locked` and `right_locked`. Goals: reach the way down. Starting
-   code: comments allowed. Learned: how `else` chooses what to do when
-   the answer is no.
-   Solution: `if left_door.locked:;     wizard.move_right(2);     right_door.open();     wizard.move_down(2);     wizard.move_left(2); else:;     wizard.move_left(2);     left_door.open();     wizard.move_down(2);     wizard.move_right(2); wizard.move_down()`.
+2. `the-dark-tunnel`, *The dark tunnel* / *El túnel oscuro*. Practice 2. Inside the
+   enchanted tunnel, where no one is seen, on the scene or on the plan: nothing will
+   be seen to move. Its other end is cell (19, 1), at the top right. Ask the program
+   where you stand, count, walk blind. Goals: walk out at the tunnel's other end, cell
+   (19, 1) (say the cell); bonus: ask where you stand with `position`. Starting code: a
+   comment to print where the wizard stands, naming `position` and `print`, and two for
+   the moves, `move_up` and `move_right`. Solution: `print(wizard.position)`,
+   `wizard.move_up(2)`, `wizard.move_right(4)`. Learned: why a program asks where it is
+   instead of looking.
 
-4. `the-wrong-door` — Fix 1. The friend's program for the next room of two doors
-   goes to the locked one: its `if` and `else` do each other's work.
-   Played in two ways, `left_locked` and `right_locked`. Goals: reach the
-   foot of the long stairs. Starting code, exactly, after a first comment
-   line saying the friend's program chooses the wrong door and asking the child
-   to find and fix it:
-   `if left_door.locked:`, then moved in four spaces `wizard.move_left(2)`,
-   `left_door.open()`, `wizard.move_down(2)`, `wizard.move_right(6)`;
-   `else:`, then moved in `wizard.move_right(2)`, `right_door.open()`,
-   `wizard.move_down(2)`, `wizard.move_right(2)`. Learned: how to read an
-   `if` and its `else` and find which one does what.
-   Solution: `if left_door.locked:;     wizard.move_right(2);     right_door.open();     wizard.move_down(2);     wizard.move_right(2); else:;     wizard.move_left(2);     left_door.open();     wizard.move_down(2);     wizard.move_right(6)`.
+3. `the-tunnel-exit`, *The tunnel's exit* / *La salida del túnel*. Practice 3. Out of
+   the tunnel, into a corridor that a second corridor crosses, the one Dask walks up
+   and down. The mark is at its far end, by the third statue. Played two ways: `away`,
+   Dask walks away down the crossing corridor; `watching`, Dask looks up at the crossing,
+   this way, and turns after a moment. Goals: reach the mark; do not let Dask see you.
+   Starting code: a comment to ask with `facing` whether Dask looks this way, `"up"`,
+   and if so to wait one tick with `wait`, and a comment for the walk, `move_right`.
+   Solution: `if dask.facing == "up":`, `wizard.wait()` moved in, then
+   `wizard.move_right(13)`. Ways: `away` "Dask walks away", `watching` "Dask looks this
+   way". Learned: that a condition does something only when its answer is true, and that
+   what helps is knowing which way he faces.
 
-5. `the-long-stairs` — Improve 1, after *Repeat*. The friend's program climbs
-   the long stairs in sixteen lines, up and right eight times; a loop
-   says it in three. Goals: climb to the top; in fewer than 4 lines.
-   Starting code, exactly: a comment saying the program works in sixteen
-   lines and to make it shorter with a loop; then `wizard.move_up()` and
-   `wizard.move_right()`, one after the other, eight times each,
-   alternating. Learned: what a loop is, and how `for` repeats lines for
-   you.
-   Solution: `for step in range(8):;     wizard.move_up();     wizard.move_right()`.
+4. `by-the-statues`, *By the statues* / *Junto a las estatuas*. Practice 4. Dask stands
+   still in the middle of the wide corridor that goes down beside the statues, three
+   cells wide, looking to one side. Played two ways: `looking_left`, `looking_right`. Go
+   down the side he does not look at, to the mark in the arch at the bottom. Goals:
+   reach the mark; do not let Dask see you. Starting code: the line
+   `wizard.move_down(2)` given, then comments: if Dask looks left, go down his right side
+   with `move_right`, `move_down` and `move_left`; else (`else`) down his left side; and
+   the last steps down into the arch. Solution: `wizard.move_down(2)`; `if dask.facing
+   == "left":` with `wizard.move_right()`, `wizard.move_down(3)`, `wizard.move_left()`
+   moved in; `else:` with `wizard.move_left()`, `wizard.move_down(3)`,
+   `wizard.move_right()` moved in; `wizard.move_down(2)`. Ways: `looking_left` "Dask looks
+   left", `looking_right` "Dask looks right". Learned: that `else` gives the other way
+   when the condition is false.
 
-6. `past-the-teacher` — Practice 4, after *While*. In the night passages,
-   Dask stands in his long corridor looking your way; wait as long as he
-   looks, then cross. Goals: cross the corridor; do not let Dask see you.
-   Starting code: comments allowed. Learned: how `while` repeats as long
-   as something stays true.
-   Solution: `while dask.facing == "left":;     wizard.wait(); wizard.move_up(2)`.
+5. `left-or-right`, *Left or right* / *Izquierda o derecha*. Practice 5. A room with two
+   doors in its bottom wall, `left_door` and `right_door`. One is locked, and it changes
+   from night to night; there is no key anywhere. Beyond them a corridor runs along,
+   with the mark at its right. Played two ways: `left_locked`, `right_locked`. Goals:
+   reach the mark. Starting code: comments: ask with `locked` whether the left door is
+   locked; if it is, walk to the right door, `move_down` and `move_right`, open it with
+   `open`, go through and along the corridor; else the same by the left door. Solution:
+   `if left_door.locked:`, moved in: `wizard.move_down(3)`, `wizard.move_right(3)`,
+   `right_door.open()`, `wizard.move_down(3)`, `wizard.move_right(3)`; `else:`, moved in:
+   `wizard.move_down(3)`, `wizard.move_left(3)`, `left_door.open()`, `wizard.move_down(3)`,
+   `wizard.move_right(9)`. Ways: `left_locked` "The left door is locked", `right_locked`
+   "The right door is locked". Learned: that `if` and `else` can ask what a thing knows,
+   and choose the way by it.
 
-7. `the-moving-stairs` — Practice 5, after *Light and stairs*. A gap, and
-   a stair that swings into place and away; wait for it, then cross.
-   Goals: cross the gap; bonus: ask the stair whether it is in place.
-   Starting code: comments allowed. Learned: how to wait for a moving
-   stair with `stair.in_place`, and that *osto* can hold it still.
-   Solution: `wizard.move_up(2); wizard.move_right(); while not stair.in_place:;     wizard.wait(); wizard.move_right(4)`.
+6. `the-wrong-door`, *The wrong door* / *La puerta equivocada*. Fix 1. The same room on
+   another night. `{friend}`'s own program from the last time has its two branches the
+   wrong way round: it walks to the locked door in both ways. Goals: reach the mark.
+   Starting code: exactly this program, with nothing else, comments included:
 
-8. `the-dark-room` — Practice 6. A dark room: light it with *kirra*, find
-   the key, and open the locked door. Goals: open the door; go through it;
-   bonus: find the key with `find_nearest`. Starting code: comments
-   allowed. Learned: how *kirra* lights the room you are in.
-   Solution: `wizard.cast("kirra"); key = wizard.find_nearest("key"); print(key.position); wizard.move_right(4); wizard.move_down(); wizard.pick_up(); wizard.move_left(); door.open(); wizard.move_down(2)`.
+   ```
+   if left_door.locked:
+       wizard.move_down(3)
+       wizard.move_left(3)
+       left_door.open()
+       wizard.move_down(3)
+       wizard.move_right(9)
+   else:
+       wizard.move_down(3)
+       wizard.move_right(3)
+       right_door.open()
+       wizard.move_down(3)
+       wizard.move_right(3)
+   ```
 
-9. `the-night-walk` — Practice 7, the chapter's last. Everything together
-   on the way to the dormitory: a dark corridor with a key and a locked
-   door, a moving stair, and Dask below. Goals: reach the way down to the
-   dormitory; do not let Dask see you. Starting code: comments allowed,
-   saying what waits, never how. No `learned` key: the closing story
-   looks back.
-   Solution: `wizard.cast("kirra"); key = wizard.find_nearest("key"); wizard.move_right(4); wizard.pick_up(); wizard.move_right(); door.open(); wizard.move_right(2); while not stair.in_place:;     wizard.wait(); wizard.move_right(3); wizard.move_down(); while dask.facing == "right":;     wizard.wait(); wizard.move_down(2)`.
+   Hints: the first says the program goes to the locked door in both ways, the second
+   which lines belong under `if` and which under `else`. Ways as the last level.
+   Learned: how to read a condition and see which branch runs.
+
+7. `the-three-doors`, *The corridor of three doors* / *El pasillo de las tres puertas*.
+   Improve 1. A straight corridor closed by three doors alike, four cells apart.
+   `{friend}`'s program opens them in nine lines. Goals: reach the mark in the arch at
+   the top; in fewer than 5 lines. Starting code: exactly these nine lines:
+
+   ```
+   door = wizard.find_nearest("door")
+   door.open()
+   wizard.move_up(4)
+   door = wizard.find_nearest("door")
+   door.open()
+   wizard.move_up(4)
+   door = wizard.find_nearest("door")
+   door.open()
+   wizard.move_up(4)
+   ```
+
+   Solution: `for step in range(3):` with the first three lines moved in. Learned: that a
+   loop repeats its lines, so three doors take four lines, and that `door` is each time
+   the next door.
+
+8. `past-the-teacher`, *Past the teacher* / *Pasar al profesor*. Practice 6. The long
+   corridor of Dask's round, on row 7, crossed by the corridor you walk down, column 10.
+   His lantern reaches a long way: while he faces right he sees the crossing from nearly
+   anywhere on his round. Played three ways, each starting him at another point of his
+   round, so that no number written in the code wins them all. Stop on (10, 6), the cell
+   before the crossing, which he never sees. Goals: reach the mark in the bottom arch;
+   do not let Dask see you. Starting code: comments: walk down to the cell before the
+   crossing with `move_down`; wait while Dask faces right, with `while`, `facing` and
+   `wait`; walk on down. Solution: `wizard.move_down(5)`; `while dask.facing == "right":`
+   with `wizard.wait()` moved in; `wizard.move_down(7)`. Ways: `near` "Dask starts at the
+   near end", `middle` "Dask starts near his far end", `far` "Dask starts on his way
+   back". Learned: that `while` waits as long as something stays true, however long
+   that is.
+
+9. `the-moving-slab`, *The slab that comes and goes* / *La losa que va y viene*.
+   Practice 7. A corridor with a hole in its floor, three cells ahead, and a stone slab
+   that covers it for a few ticks and is gone for as many. The storeroom's arch is at
+   the corridor's end, with the mark inside it. Played two ways: `three`, the slab comes
+   and goes every three ticks; `four`, every four. Goals: reach the mark; bonus: ask
+   `in_place`. Starting code: comments: walk the two steps to the hole's edge,
+   `move_right`; wait while the slab is not in place, with `while`, `not`, `in_place` and
+   `wait`; walk across. Solution: `wizard.move_right(2)`; `while not slab.in_place:` with
+   `wizard.wait()` moved in; `wizard.move_right(3)`. Ways: `three` "Every three ticks",
+   `four` "Every four ticks". Learned: that `while not` waits for something that is not
+   true yet, and that `slab.in_place` says when.
+
+10. `the-dark-room`, *The dark room* / *La sala oscura*. Practice 8. Inside the
+    storeroom's arch, the room dark. In the dark `find_nearest("key")` finds nothing,
+    since the key lies far from you, and the next line fails: the first hint says so.
+    *kirra* lights the room; then find the key, print its cell, walk to it, pick it up,
+    and walk to the cell above the locked door, the mark, and open it from there. The
+    door is `store_door`. Goals: pick up the key; open the door; reach the mark; bonus:
+    find the key with `find_nearest`. Starting code: comments, one a step: the light,
+    finding the key and printing its cell (`find_nearest`, `position`, `print`), the walk
+    to it, `pick_up`, the walk to the cell above the door, `open`. Solution:
+    `wizard.cast("kirra")`, `key = wizard.find_nearest("key")`, `print(key.position)`,
+    `wizard.move_right(4)`, `wizard.pick_up()`, `wizard.move_right()`,
+    `wizard.move_down(2)`, `store_door.open()`. Learned: that *kirra* lights a room, and
+    then things can be found and say their cell.
+
+11. `the-night-walk`, *The night walk* / *El paseo nocturno*. Practice 9. Under the
+    storeroom, on the way home, the chapter together: a key on the floor ahead, a locked
+    door, a hole with its slab, and Dask's last corridor, which comes in from the left and
+    ends at yours, his lantern reaching far. Played three ways, each starting him at
+    another point of his round. Goals: pick up the key; open the door; reach the mark
+    in the bottom arch; do not let Dask see you; bonus: ask `in_place`. Starting code:
+    comments, one a step, in order: down to the key, pick it up, down to the door, open
+    it (`door`), down to the hole's edge, wait for the slab, down to the cell before
+    Dask's corridor, wait while he faces right, down to the arch. Solution:
+    `wizard.move_down(2)`, `wizard.pick_up()`, `wizard.move_down()`, `door.open()`,
+    `wizard.move_down(2)`, `while not slab.in_place:` with `wizard.wait()` moved in,
+    `wizard.move_down(3)`, `while dask.facing == "right":` with `wizard.wait()` moved in,
+    `wizard.move_down(4)`. Ways: `near`, `middle`, `far`, as in *Past the teacher*. No
+    `learned`.

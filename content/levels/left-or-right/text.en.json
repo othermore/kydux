@@ -9,7 +9,7 @@
     "If the left door is locked, walk 3 down and 3 right to `right_door`, open it, walk 3 down and 3 right to the mark.",
     "If it's not locked, `else:`, walk 3 down, 3 left to `left_door`, open it, walk 3 down and 9 right!"
   ],
-  "intro": "Look, a room with two doors! One of them is locked tonight, and there are no keys around. But we can just ask the left door if it is locked! If it is, we will go through the right door, and if it's not, we'll take the left one. The mark is waiting on the right side of the corridor!",
+  "intro": "Look, a room with two doors! One of them is locked tonight, and there are no keys around. But we can just ask the left door if it is locked! If it is, we will go through the right door, and if it's not, we'll take the left one. The mark is waiting along the corridor, on the right!",
   "outro": "You chose perfectly! Asking what things know is a great trick.",
   "learned": "Now you know that `if` and `else` can ask what a thing knows, and choose the way by it.",
   "ways": {

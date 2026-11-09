@@ -5,8 +5,8 @@
     "De repente, Dask sale de la oscuridad frente a vosotros. Atrapados.",
     "¿Qué hacen tres alumnos de primer año fuera de la cama a estas horas?",
     "¡Solo estábamos inspeccionando la losa que va y viene, señor! ¡Para asegurarnos de que no se perdiera en la oscuridad!",
-    "Dask os mira a los tres durante un largo momento en silencio. Entonces, asoma la más pequeña de las sonrisas.",
-    "Os he estado observando. Mirasteis antes de dar un paso, esperasteis, iluminasteis la oscuridad; un trabajo muy astuto. Os dejaré ir, solo por esta vez, {wizard}.",
-    "Dask se aleja por el pasillo, y los tres pasáis por el arco. A salvo bajo las mantas, recuerdas todo lo que habéis aprendido esta noche: habéis contado las casillas y preguntado dónde están las cosas con `position`, usado una pregunta, una expresión, para saber si era seguro, elegido el camino con `if` y `else`, y superado la oscuridad con los bucles `for` y `while` y los hechizos *kirra* y *osto*. Abrazando el secreto que ahora compartís los tres, te quedas {dormido|dormida} por fin, sintiendo el castillo como tu hogar."
+    "Dask os mira a los tres en silencio durante un largo momento. Entonces asoma en su cara la más pequeña de las sonrisas.",
+    "Os he estado observando. Habéis mirado antes de cada paso, habéis esperado, habéis iluminado la oscuridad: un trabajo muy astuto. Os dejaré ir, solo por esta vez, {wizard}.",
+    "Dask se aleja por el pasillo, y los tres pasáis por el arco. Ya bajo las mantas, recuerdas lo que habéis aprendido esta noche. Habéis contado las casillas y preguntado dónde están las cosas con `position`. Habéis usado una pregunta, una expresión, para saber si era seguro, y habéis elegido el camino con `if` y `else`. Habéis repetido los pasos con el bucle `for` y habéis esperado con el bucle `while`. Y sabéis dos hechizos más: *kirra*, que ilumina lo oscuro, y *osto*, que sujeta lo que se mueve. Con el secreto que ahora compartís los tres, te quedas {dormido|dormida} por fin. El castillo ya es tu hogar."
   ]
 }

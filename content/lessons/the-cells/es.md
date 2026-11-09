@@ -9,7 +9,7 @@ Una casilla se nombra con dos números: la equis cuenta desde la izquierda, y la
 
 Un paso a la derecha suma uno a la equis, y un paso hacia abajo suma uno a la ye. ¡Hacia la izquierda y hacia arriba se resta uno!
 
-Así que, para ir desde la casilla `(5, 16)` hasta la `(9, 13)`, tu {mago|maga} tiene que caminar cuatro pasos a la derecha y tres hacia arriba. Solo tienes que contar cuánto cambia cada número.
+Así que, para ir desde la casilla `(5, 12)` hasta la `(9, 9)`, tu {mago|maga} tiene que caminar cuatro pasos a la derecha y tres hacia arriba. Solo tienes que contar cuánto cambia cada número.
 
 ---
 ## Pruébalo

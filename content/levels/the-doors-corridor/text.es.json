@@ -10,7 +10,7 @@
     "De 1 a 15 hay catorce pasos a la derecha. ¡De 12 a 3 hay nueve pasos hacia arriba!",
     "Usa `move_right` con 14, y luego `move_up` con 9."
   ],
-  "intro": "Mira cuántas puertas... ¡{mate} dice que el túnel está al final de este pasillo! Estamos en la casilla (1, 12) y el mapa dice que la boca del túnel es la (15, 3). Como no hay marca en el suelo, ¡cuenta cuántos pasos cambian en cada número!",
-  "outro": "¡Lo logramos! La magia del túnel nos difumina, pero ya estamos dentro.",
+  "intro": "Mira cuántas puertas... ¡{mate} dice que el túnel está al final de este pasillo! Estamos en la casilla (1, 12) y el mapa dice que la boca del túnel es la (15, 3). Como no hay marca en el suelo, ¡cuenta cuánto cambia cada número!",
+  "outro": "¡Lo hemos conseguido! La magia del túnel nos borra de la vista, pero ya estamos dentro.",
   "learned": "Ahora sabes cómo leer dos casillas en el plano y contar cuánto cambia cada número."
 }

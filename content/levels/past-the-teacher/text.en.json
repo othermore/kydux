@@ -14,8 +14,8 @@
   "outro": "We did it! Waiting until he turns is the only way to be safe.",
   "learned": "Now you know that `while` waits as long as something stays true, however long that is.",
   "ways": {
-    "near": "Dask starts at the near end",
-    "middle": "Dask starts near his far end",
-    "far": "Dask starts on his way back"
+    "near": "Dask has just begun his round",
+    "middle": "Dask has nearly ended his round",
+    "far": "Dask is on his way back"
   }
 }

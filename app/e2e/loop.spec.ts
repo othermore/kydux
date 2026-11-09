@@ -88,7 +88,7 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await storyNext(page);
     await expect(storySaid(page)).toContainText(words.greeting);
     // The story's last step: the friend turns to teaching.
-    await storyNext(page, 3);
+    await storyNext(page, 5);
     await shoot(page, 'nuri-teaches');
     await page.locator('#story-go-on').click();
 

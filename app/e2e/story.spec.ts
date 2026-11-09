@@ -52,7 +52,7 @@ test('Enter and Space go on; Go on ends the story, read, at what comes next', as
   await page.locator('#story-title').click();
   await page.keyboard.press(' ');
   await expect(page.locator('#story-step')).toHaveText(/^3 /);
-  await storyNext(page, 4);
+  await storyNext(page, 6);
   await expect(page.locator('#story-next')).toHaveText('Next');
   await storyNext(page);
   await expect(page.locator('#story-go-on')).toHaveText('Go on');

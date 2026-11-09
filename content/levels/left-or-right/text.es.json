@@ -3,17 +3,17 @@
   "goals": [
     "Llega a la marca."
   ],
-  "starting_code": "# Pregunta con `locked` si la puerta izquierda está cerrada.\n\n# Si es así, camina a la puerta derecha, ábrela con `open`, crúzala y avanza por el pasillo.\n\n# Si no, haz lo mismo por la puerta izquierda.\n",
+  "starting_code": "# Pregunta con `locked` si la puerta izquierda está cerrada con llave.\n\n# Si es así, camina a la puerta derecha, ábrela con `open`, crúzala y avanza por el pasillo.\n\n# Si no, haz lo mismo por la puerta izquierda.\n",
   "hints": [
-    "¡Podemos preguntar a la puerta si está cerrada con `left_door.locked`!",
+    "¡Podemos preguntar a la puerta si está cerrada con llave: `left_door.locked`!",
     "Si la izquierda está cerrada, camina 3 abajo y 3 derecha hasta `right_door`, ábrela, camina 3 abajo y 3 derecha hasta la marca.",
-    "Si no está cerrada, `else:`, camina 3 abajo, 3 izquierda hasta `left_door`, ábrela, camina 3 abajo y ¡9 a la derecha!"
+    "Si no lo está, `else:`, camina 3 abajo, 3 izquierda hasta `left_door`, ábrela, camina 3 abajo y ¡9 a la derecha!"
   ],
-  "intro": "¡Mira, una sala con dos puertas! Una de ellas está cerrada esta noche, y no hay llaves cerca. ¡Pero podemos preguntarle a la puerta izquierda si está cerrada! Si lo está pasaremos por la puerta derecha, y si no, iremos por la izquierda. ¡La marca nos espera a la derecha en el pasillo!",
-  "outro": "¡Elegiste perfecto! Preguntar a las cosas lo que saben es un gran truco.",
+  "intro": "¡Mira, una sala con dos puertas! Una de ellas está cerrada con llave esta noche, y no hay llaves cerca. ¡Pero podemos preguntarle a la puerta izquierda si lo está! Si lo está, pasaremos por la puerta derecha, y si no, iremos por la izquierda. ¡La marca nos espera en el pasillo, a la derecha!",
+  "outro": "¡Has elegido muy bien! Preguntar a las cosas lo que saben es un gran truco.",
   "learned": "Ahora sabes que `if` y `else` pueden preguntar lo que una cosa sabe, y elegir el camino por ello.",
   "ways": {
-    "left_locked": "La puerta izquierda está cerrada",
-    "right_locked": "La puerta derecha está cerrada"
+    "left_locked": "La puerta izquierda está cerrada con llave",
+    "right_locked": "La puerta derecha está cerrada con llave"
   }
 }

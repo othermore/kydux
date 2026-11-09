@@ -11,6 +11,6 @@
     "Si resulta que estamos en la (15, 3), hay que dar 2 pasos arriba y 4 a la derecha."
   ],
   "intro": "¡Qué oscuro! El túnel está encantado y nadie puede vernos, ni siquiera el mapa. No veremos moverse nada. Pero el mapa dice que el final está en la casilla (19, 1). ¡Podemos preguntarle al programa dónde estamos, contar los pasos y caminar a ciegas!",
-  "outro": "¡Uf, qué miedo! Pero funcionó preguntar, ¡y ya salimos!",
+  "outro": "¡Uf, qué miedo! Pero preguntar ha funcionado, ¡y ya estamos fuera!",
   "learned": "Ahora sabes por qué un programa pregunta dónde está en vez de mirar."
 }

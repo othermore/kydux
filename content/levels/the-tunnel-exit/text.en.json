@@ -8,9 +8,9 @@
   "hints": [
     "You need a condition to check Dask's facing. What is his attribute for that?",
     "Use `if` with `dask.facing` and `==`, and wait if he faces up.",
-    "After the `if` block, add your `move_right` without spaces so it always runs."
+    "After the `if` block, add your steps with no spaces before them, so they always run."
   ],
-  "intro": "Shh! We are out of the tunnel, but look... Professor Dask is patrolling the crossing ahead! The mark is at the far end, by the third statue. Sometimes he walks away, and sometimes he looks right at this crossing. We can ask which way he faces to know if we need to wait before crossing!",
+  "intro": "Shh! We are out of the tunnel, but look... Professor Dask is patrolling the crossing ahead! The mark is at the far end, between the second and the third statue. Sometimes he walks away, and sometimes he looks right at this crossing. We can ask which way he faces to know if we need to wait before crossing!",
   "outro": "That was close! Waiting exactly when he looks this way saved us.",
   "learned": "Now you know that a condition does something only when its answer is true, and that what helps is knowing which way he faces.",
   "ways": {

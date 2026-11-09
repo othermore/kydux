@@ -10,7 +10,7 @@
     "From 1 to 15 is fourteen steps to the right. From 12 to 3 is nine steps up!",
     "Use `move_right` with 14, and then `move_up` with 9."
   ],
-  "intro": "Look at all these doors... {mate} says the tunnel is at the end of this corridor! We are standing on cell (1, 12). The map says the tunnel's mouth is cell (15, 3). There's no mark to guide us, so count how many steps we need for each number!",
-  "outro": "We did it! The magic of the tunnel is making us fade, but we are inside.",
+  "intro": "Look at all these doors... {mate} says the tunnel is at the end of this corridor! We are standing on cell (1, 12). The map says the tunnel's mouth is cell (15, 3). There's no mark to guide us, so count how much each number changes!",
+  "outro": "We did it! The magic of the tunnel hides us from sight, but we are inside.",
   "learned": "Now you know how to read two cells on the plan and count what changes in each number."
 }

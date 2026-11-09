@@ -11,6 +11,6 @@
     "¡Borra las líneas que sobran y deja solo un bloque de tres líneas dentro del `for`!"
   ],
   "intro": "Mira este pasillo recto... ¡hay tres puertas exactamente iguales y a la misma distancia! He escrito un programa para abrirlas, pero tiene nueve líneas. Apuesto a que puedes hacerlo en menos líneas con un bucle. La marca está en el arco de arriba.",
-  "outro": "¡Guau, solo cuatro líneas! Un bucle es mucho mejor.",
+  "outro": "¡Hala, solo cuatro líneas! Un bucle es mucho mejor.",
   "learned": "Ahora sabes que un bucle repite sus líneas, así que tres puertas ocupan cuatro líneas, y que `door` es cada vez la puerta siguiente."
 }

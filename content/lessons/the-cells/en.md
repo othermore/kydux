@@ -9,7 +9,7 @@ A cell is named by two numbers: the x counts from the left, and the y counts fro
 
 A step to the right adds one to the x, and a step down adds one to the y. Left and up subtract one!
 
-So, to go from cell `(5, 16)` to cell `(9, 13)`, your wizard has to walk four steps right and three steps up. You just have to count what changes in each number.
+So, to go from cell `(5, 12)` to cell `(9, 9)`, your wizard has to walk four steps right and three steps up. You just have to count what changes in each number.
 
 ---
 ## Try it

@@ -8,10 +8,10 @@
   "hints": [
     "Necesitas una condición para ver hacia dónde mira Dask. ¿Cuál es su atributo para eso?",
     "Usa `if` con `dask.facing` y `==`, y espera si mira hacia arriba.",
-    "Después del bloque `if`, añade tu `move_right` sin espacios para que se ejecute siempre."
+    "Después del bloque `if`, añade tus pasos sin espacios delante, para que se den siempre."
   ],
-  "intro": "¡Chist! Salimos del túnel, pero mira... ¡El profesor Dask patrulla el cruce! La marca está al final, junto a la tercera estatua. A veces se aleja, y a veces mira hacia este cruce. ¡Podemos preguntar hacia dónde mira para saber si tenemos que esperar antes de cruzar!",
-  "outro": "¡Por poco! Esperar justo cuando miraba nos salvó.",
+  "intro": "¡Chis! Hemos salido del túnel, pero mira... ¡El profesor Dask patrulla el cruce! La marca está al final, entre la segunda y la tercera estatua. A veces se aleja, y a veces mira hacia este cruce. ¡Podemos preguntar hacia dónde mira para saber si tenemos que esperar antes de cruzar!",
+  "outro": "¡Por poco! Esperar justo cuando miraba hacia aquí nos ha salvado.",
   "learned": "Ahora sabes que una condición hace algo solo cuando su respuesta es verdadera, y que lo que sirve es saber hacia dónde mira.",
   "ways": {
     "away": "Dask se aleja",

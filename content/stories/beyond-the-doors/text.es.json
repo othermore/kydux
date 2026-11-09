@@ -1,10 +1,10 @@
 {
   "title": "Al otro lado de las puertas",
   "steps": [
-    "A través de las tres puertas por fin; aquí las piedras son más antiguas y oscuras; justo delante, un largo pasillo cruza el vuestro.",
+    "Por fin habéis cruzado las tres puertas. Aquí las piedras son más antiguas y oscuras. Justo delante, un largo pasillo cruza el vuestro.",
     "¡Estoy muy {{orgulloso|orgullosa}}! El bucle nos ha pasado por las tres puertas de una vez.",
     "Escuchad, hay pasos ahí abajo: Dask hace su ronda por ese pasillo, y se queda mirando hacia aquí un buen rato.",
     "¿Cómo vamos a cruzar si no sabemos cuánto tiempo va a mirar?",
-    "Esperaremos exactamente el mismo tiempo que él mire: un programa puede hacer eso."
+    "Pues esperaremos justo el tiempo que él mire. Un programa puede hacer eso."
   ]
 }

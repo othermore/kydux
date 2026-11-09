@@ -11,13 +11,13 @@
   "hints": [
     "Remember, the key is 2 steps down. After you open the door, it is 2 steps to the hole's edge.",
     "You have to use `while not` with `slab.in_place` for the slab, and then `while` with `dask.facing` for Dask!",
-    "Between the slab and Dask's corridor, walk 3 down. After Dask turns away, 4 down to the arch!"
+    "From the hole's edge, walk 3 down, to the cell before Dask's corridor. After Dask turns away, 4 down to the arch!"
   ],
   "intro": "This is it, the way home! We must put everything together: pick up the key on the floor, unlock the door, cross the hole with the slab, and wait for Dask to turn away in the last corridor. His lantern reaches very far! It's one long walk, but I know we can do it.",
   "outro": "We did it! We are almost back to our warm beds.",
   "ways": {
-    "near": "Dask starts at the near end",
-    "middle": "Dask starts near his far end",
-    "far": "Dask starts on his way back"
+    "near": "Dask has just begun his round",
+    "middle": "Dask has nearly ended his round",
+    "far": "Dask is on his way back"
   }
 }

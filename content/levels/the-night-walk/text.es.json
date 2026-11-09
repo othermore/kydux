@@ -11,13 +11,13 @@
   "hints": [
     "Recuerda, la llave está a 2 pasos. Tras abrir la puerta, hay 2 pasos hasta el borde del agujero.",
     "Tienes que usar `while not` con `slab.in_place` para la losa, y luego `while` con `dask.facing` para Dask.",
-    "Entre la losa y el pasillo de Dask, baja 3. ¡Cuando Dask se gire, baja 4 hasta el arco!"
+    "Desde el borde del agujero, baja 3, hasta la casilla antes del pasillo de Dask. ¡Cuando Dask se gire, baja 4 hasta el arco!"
   ],
   "intro": "¡Aquí está el camino a casa! Hay que usar todo junto: coger la llave del suelo, abrir la puerta, cruzar el agujero por la losa y esperar a que Dask se dé la vuelta en el último pasillo. ¡Su farol llega muy lejos! Es un camino largo, pero sé que podemos hacerlo.",
-  "outro": "¡Lo logramos! Ya casi estamos de vuelta en nuestras camas.",
+  "outro": "¡Lo hemos conseguido! Ya casi estamos de vuelta en nuestras camas.",
   "ways": {
-    "near": "Dask empieza cerca",
-    "middle": "Dask empieza lejos",
-    "far": "Dask empieza de vuelta"
+    "near": "Dask acaba de empezar su ronda",
+    "middle": "Dask está a punto de acabar su ronda",
+    "far": "Dask ya vuelve atrás"
   }
 }

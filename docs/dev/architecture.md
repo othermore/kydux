@@ -2235,14 +2235,17 @@ one overturns stays, marked as superseded.
 - **D154 — The row a wall's foot is painted on is not walked; the first floor row below it
   is.** Decided 2026-11-08 by the owner (*la maga está casi dentro de la pared; bajar todo
   una fila*). In the crossing, row 5, where the top wall's foot is painted, is wall, but
-  for the tunnel's arch and Dask's corridor; the gallery's floor is rows 6, 7 and 8, row 6
-  drawn 0.3 lower (D149 c) and row 8 walked behind the lower wall's top (D149 d). The three
-  statues stand out in the middle of the gallery, `u` on row 7, their cut-out on that row
-  (the owner: *las estatuas deben estar en el centro del pasillo*), so that Dask stands
-  between two of them and a figure passes behind him on row 6, behind the statues, or below
-  him on row 8; Gemini painted them there on the painting with them taken out
-  (`crossing-statues-middle-3.md`). The same holds for every scene. Rules out a figure whose
-  head lies in the wall.
+  for the tunnel's arch and Dask's corridor; the gallery's floor is rows 6, 7 and 8, and
+  row 8 is walked behind the lower wall's top (D149 d). The three statues stand out in the
+  middle of the gallery, `u` on row 7, their cut-out on that row (the owner: *las estatuas
+  deben estar en el centro del pasillo*), so that Dask stands between two of them and a
+  figure passes behind him on row 6, behind the statues, or below him on row 8; Gemini
+  painted them there on the painting with them taken out (`crossing-statues-middle-3.md`).
+  Row 6 is drawn where it is, not lowered (D149 c): lowered, a figure on it stood in the
+  statues' bases (the owner). The same holds for every scene: the row of a wall's foot is
+  not walked, and the row below it is lowered only where nothing stands out on the row
+  below that. Rules out a figure whose head lies in the wall, or whose feet lie in a
+  statue's base.
 - **D155 — A cut-out's mask is opaque inside its outline.** Decided 2026-11-08 by the
   owner (the wizard seen through the statue's robe). A mask by difference (D148) is 0 or 1
   at every pixel, its edge softened over one pixel by the page's resampling. Where a

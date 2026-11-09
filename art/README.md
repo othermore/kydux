@@ -464,7 +464,8 @@ The cells are where the figures walk (D149).
 - **The row a wall's foot is painted on is wall** (D154). **The first floor row below the
   wall's foot** is drawn 0.3 cell lower (`lowered_rows`), so that a figure on it stands in
   the corridor and not on the wall. What stands out on the floor, a statue, is on the row of
-  its base, and a figure on the row behind it walks behind it.
+  its base, and a figure on the row behind it walks behind it; that row is not lowered, so
+  that the figure's feet do not lie in the statue's base (the crossing).
 - **The row behind a lower wall's top is walked**, the top cut `over` it. Where the wall stands
   so close that only a hat would show, the row is drawn 0.3 higher (`lowered`, `by` -0.3).
 - **A level starts a cell past an arch**, never in it or on the cell beside its jamb.

@@ -41,22 +41,6 @@
     }
   ],
   "things": {},
-  "lowered": [
-    {
-      "about": "The floor row right under a wall's foot (D149).",
-      "cells": [
-        [
-          0,
-          6
-        ],
-        [
-          19,
-          6
-        ]
-      ],
-      "by": 0.3
-    }
-  ],
   "nudged": [
     {
       "about": "Round the top arch, whose opening lies between the two columns (D149).",

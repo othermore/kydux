@@ -189,6 +189,21 @@ export function inked(pixels: Uint8ClampedArray, width: number, height: number, 
   }
 }
 
+/** Where an image of the scene is drawn on the plan, `cell` pixels a cell (D159): at its
+ * painted box, `left` and `top` in the scene's own pixels, `pictureCell` of them a cell,
+ * as the scene draws it, never from the cell a thing stands on. */
+export function paintedBox(
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  pictureCell: number,
+  cell: number,
+): [number, number, number, number] {
+  const scale = cell / pictureCell;
+  return [left * scale, top * scale, width * scale, height * scale];
+}
+
 /** The pictures the plan is drawn from, once loaded. */
 export interface PlanLoaded {
   ground: HTMLImageElement;
@@ -211,7 +226,7 @@ function inkedScene(pictures: PlanPictures, loaded: PlanLoaded, shapes: PlanShap
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(loaded.ground, -ox * scale, -oy * scale, loaded.ground.width * scale, loaded.ground.height * scale);
   for (const { image, left, top } of loaded.doors) {
-    ctx.drawImage(image, left * scale, top * scale, image.width * scale, image.height * scale);
+    ctx.drawImage(image, ...paintedBox(left, top, image.width, image.height, pictures.cell, cell));
   }
   const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
   inked(data.data, canvas.width, canvas.height, cell);
@@ -346,10 +361,15 @@ export function drawPlan(
   for (const thing of shapes.things) {
     const shown = loaded?.things.get(thing.id);
     if (shown && pictures) {
-      const scale = cell / pictures.cell;
-      const [wide, tall] = [shown.image.width * scale, shown.image.height * scale];
-      const [ox, oy] = [gutter + shown.left * scale, gutter + shown.top * scale];
-      ctx.drawImage(shown.image, ox, oy, wide, tall);
+      const [ox, oy, wide, tall] = paintedBox(
+        shown.left,
+        shown.top,
+        shown.image.width,
+        shown.image.height,
+        pictures.cell,
+        cell,
+      );
+      ctx.drawImage(shown.image, gutter + ox, gutter + oy, wide, tall);
       continue;
     }
     ctx.fillStyle = css(INK);
@@ -506,8 +526,7 @@ function inkedCutOut(
   canvas.height = scene.height;
   const ctx = canvas.getContext('2d');
   if (!ctx) return canvas;
-  const scale = scene.width / (columns * pictureCell);
-  ctx.drawImage(image, x * scale, y * scale, image.width * scale, image.height * scale);
+  ctx.drawImage(image, ...paintedBox(x, y, image.width, image.height, pictureCell, scene.width / columns));
   ctx.globalCompositeOperation = 'source-in';
   ctx.drawImage(scene, 0, 0);
   return canvas;

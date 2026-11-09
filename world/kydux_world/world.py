@@ -389,12 +389,11 @@ class Wizard(Child):
                 world.act("blocked", {**refused, "facing": direction.value})
                 return
             if not world.is_free(ahead):
-                hole = world.hole_at(ahead)
                 by = (
                     "door"
                     if world.door_at(ahead) is not None
-                    else hole._k_role
-                    if hole is not None
+                    else "hole"
+                    if world.hole_at(ahead) is not None
                     else "wall"
                 )
                 world.act("bump", {"at": list(here), "facing": direction.value, "by": by})

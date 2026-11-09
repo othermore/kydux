@@ -521,12 +521,12 @@ class LevelScene extends Phaser.Scene {
       const image =
         thing.kind === 'door'
           ? this.add.image(...centre(thing.tile), thingKey('door'), thing.open ? 'open' : thing.lock)
-          : thing.kind === 'slab'
+          : thing.kind === 'hole'
             ? this.add.image(...centre(thing.tile), thingKey('slab'), 'in')
             : this.add.image(...centre(thing.tile), thingKey(thing.kind));
       // Doors and slabs are the castle's shape, seen in the dark; what lies on the
       // floor is under it (D52).
-      const shape = thing.kind === 'door' || thing.kind === 'slab';
+      const shape = thing.kind === 'door' || thing.kind === 'hole';
       this.things.set(thing.id, image.setDepth(shape ? 2.8 : 2));
       if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
     }
@@ -629,7 +629,7 @@ class LevelScene extends Phaser.Scene {
           ...[...this.things].flatMap(([id, image]) => {
             const thing = scene.things[this.artOf(id)];
             // A slab's hole lies on the floor, and hides no one.
-            const flat = this.map.things.some((one) => one.id === id && one.kind === 'slab');
+            const flat = this.map.things.some((one) => one.id === id && one.kind === 'hole');
             return thing && !flat && image.texture.key.startsWith('art-') ? [{ image, row: thing.row }] : [];
           }),
         ]
@@ -1776,7 +1776,7 @@ class LevelScene extends Phaser.Scene {
     const slabs: string[] = [];
     const held: string[] = [];
     for (const thing of this.map.things) {
-      if (thing.kind !== 'slab') continue;
+      if (thing.kind !== 'hole') continue;
       const tile = this.startTile(thing.id, thing.tile);
       const under = tile[0] === this.wizardTile[0] && tile[1] === this.wizardTile[1];
       const holds = this.holds.get(thing.id) ?? [];

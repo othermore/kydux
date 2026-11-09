@@ -2,6 +2,7 @@
   "id": "kirra-and-osto",
   "speaker": "friend",
   "teaches": [
-    "slab.in_place"
+    "hole.open",
+    "hole.closed"
   ]
 }

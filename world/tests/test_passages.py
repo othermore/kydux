@@ -591,7 +591,7 @@ def test_by_the_statues_gives_its_bonus_for_ending_right_on_the_mark_with_a_seco
         (
             "the-night-walk",
             "wizard.move_down()\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\n"
-            "wizard.move_down(2)\nwhile not slab.in_place:\n    wizard.wait()\n"
+            "wizard.move_down(2)\nwhile not hole.closed:\n    wizard.wait()\n"
             "wizard.move_down(3)\n",
             "wizard.move_down(4)\n",
             16,
@@ -608,8 +608,8 @@ def test_no_fixed_number_of_waits_wins_every_way_and_the_while_does(level_id, be
     assert set(outcomes(level_id, solution(level_id)).values()) == {"won"}
 
 
-def test_the_slab_s_level_is_won_in_its_four_periods_and_a_fixed_wait_loses_one():
-    level = "the-moving-slab"
+def test_the_hole_s_level_is_won_in_its_four_periods_and_a_fixed_wait_loses_one():
+    level = "the-opening-hole"
     assert set(outcomes(level, solution(level)).values()) == {"won"}
     assert outcomes(level, wrong(level, "waits_three")) == {
         "three": "won",
@@ -619,30 +619,72 @@ def test_the_slab_s_level_is_won_in_its_four_periods_and_a_fixed_wait_loses_one(
     }
     walk = run_code(real(level), wrong(level, "the_walk_alone"))
     bumps = [e for e in walk.events if e.kind == "bump"]
-    assert bumps and bumps[0].data["by"] == "slab"
+    assert bumps and bumps[0].data["by"] == "hole"
 
 
-def test_the_slab_s_level_plays_with_the_storeroom_dark_and_needs_no_light():
-    """D162: the storeroom is dark in the slab's level, before the level that lights it;
+def test_the_hole_s_level_is_won_waiting_while_it_is_open_as_well():
+    """D167: `while hole.open:` and `while not hole.closed:` are the same wait; the
+    solution uses the second, and a program with the first wins the four ways too, with
+    its bonus unmet, since the bonus asks `closed`."""
+    level = "the-opening-hole"
+    code = solution(level).replace("while not hole.closed:", "while hole.open:")
+    assert "while hole.open:" in code
+    result = run_code(real(level), code)
+    assert result.status == "won"
+    for way, one in result.ways:
+        assert [g.met for g in one.goals if g.bonus] == [False], way
+    for way, one in run_code(real(level), solution(level)).ways:
+        assert [g.met for g in one.goals if g.bonus] == [True], way
+
+
+def test_the_hole_s_level_plays_with_the_storeroom_dark_and_needs_no_light():
+    """D162: the storeroom is dark in the hole's level, before the level that lights it;
     the mark beyond the hole lies in the dark, and a reach needs no kirra."""
-    level = real("the-moving-slab")
+    level = real("the-opening-hole")
     for way, one in (("", level), *level.ways):
         assert one.dark and Position(5, 7) in one.dark_area, way
         assert one.markers["E"] in one.dark_area and "kirra" not in one.spells, way
         assert one.start not in one.dark_area, way
-    assert set(outcomes("the-moving-slab", solution("the-moving-slab")).values()) == {"won"}
+    assert set(outcomes("the-opening-hole", solution("the-opening-hole")).values()) == {"won"}
 
 
-def test_no_fixed_wait_a_child_finds_by_trial_crosses_the_slab_in_every_period():
+def test_no_fixed_wait_a_child_finds_by_trial_crosses_the_hole_in_every_period():
     """The owner, 2026-11-08: the periods 3, 4, 5 and 7 share no tick a fixed wait could
-    hit in all four below 29, so the loop on `in_place` is what wins."""
-    level = "the-moving-slab"
+    hit in all four below 29, so the loop on `closed` is what wins."""
+    level = "the-opening-hole"
     for ticks in range(29):
         wait = f"wizard.wait({ticks})\n" if ticks else ""
         statuses = outcomes(level, f"wizard.move_right(2)\n{wait}wizard.move_right(3)\n")
         assert set(statuses.values()) != {"won"}, ticks
     code = "wizard.move_right(2)\nwizard.wait(29)\nwizard.move_right(3)\n"
     assert set(outcomes(level, code).values()) == {"won"}
+
+
+def test_the_way_down_s_hole_takes_both_cells_of_the_corridor():
+    """D167: the way down's hole lies on (10, 7) and (9, 7), as it is painted, so that no
+    one walks round it: a program that walks down column 9 bumps on it while it is open,
+    and crosses once it is closed."""
+    level = real("the-night-walk")
+    hole = next(thing for thing in level.things if thing.id == "hole")
+    assert set(hole.cells) == {Position(9, 7), Position(10, 7)}
+    # The friends stand on (9, 2) and (9, 3): the wizard steps into column 9 at the door.
+    to_the_edge = (
+        "wizard.move_down()\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\n"
+        "wizard.move_left()\nwizard.move_down(2)\n"
+    )
+    wait_open = "while hole.closed:\n    wizard.wait()\n"
+    walked = run_code(level, to_the_edge + wait_open + "wizard.move_down()\n")
+    bumps = [e.data for e in walked.events if e.kind == "bump"]
+    assert bumps == [{"at": [9, 6], "facing": "down", "by": "hole"}]
+    crossed = run_code(
+        level, to_the_edge + "while not hole.closed:\n    wizard.wait()\nwizard.move_down(3)\n"
+    )
+    walks = [e.data["to"] for e in crossed.events if e.kind == "move" and e.actor == "wizard"]
+    assert walks[-3:] == [
+        [9, 7],
+        [9, 8],
+        [9, 9],
+    ]
 
 
 def test_in_the_dark_the_key_is_not_found_until_kirra():
@@ -732,10 +774,10 @@ def test_the_dark_tunnel_starts_where_the_child_cannot_know_and_names_no_cell():
     assert "orvim" in level.spells
 
 
-def test_the_slab_cannot_be_walked_round_on_the_corridor_s_lower_row():
+def test_the_hole_cannot_be_walked_round_on_the_corridor_s_lower_row():
     """D149: the row behind the lower wall is walked, and it stops at the hole's cell. The
     friends stand on (0, 8) and (1, 8), so the wizard goes down at the hole's edge."""
-    level = "the-moving-slab"
+    level = "the-opening-hole"
     around = "wizard.move_right(2)\nwizard.move_down()\nwizard.move_right(3)\n"
     result = run_code(real(level), around)
     for way, one in result.ways:

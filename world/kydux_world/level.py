@@ -62,11 +62,9 @@ class LevelError(ValueError):
 WALL, FLOOR, SHELF, START = "#", ".", "=", "S"
 
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
-THING_KINDS = ("key", "door", "book", "wand", "potion", "hole", "slab", "bed", "map")
+THING_KINDS = ("key", "door", "book", "wand", "potion", "hole", "bed", "map")
 #: The kinds that lie on cells of their own, one or two side by side (D150, D167).
-CELLED_KINDS = ("door", "hole", "slab")
-#: The kinds that open and close by a period of ticks (D53, D167).
-TIMED_KINDS = ("hole", "slab")
+CELLED_KINDS = ("door", "hole")
 CARRIED_KINDS = ("key", "book", "wand", "potion", "map")
 #: The terrains a thing lies up on, out of the hands' reach (D129): a level map's
 #: shelf, a scene's bookcase. A thing on another tile no one walks, a stone or a
@@ -473,7 +471,7 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         )
     period = spec.get("period")
     whole = isinstance(period, int) and not isinstance(period, bool) and period >= 1
-    if (kind in TIMED_KINDS) != (period is not None) or (period is not None and not whole):
+    if (kind == "hole") != (period is not None) or (period is not None and not whole):
         raise LevelError(f"{shape.level_id}: a hole, and only a hole, has a whole period")
     opened = spec.get("open", False)
     if not isinstance(opened, bool) or (opened and kind != "door"):

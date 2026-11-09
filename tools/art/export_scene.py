@@ -1319,7 +1319,7 @@ def leaf_measures(scene_id: str, folder: Path | None = None) -> dict[str, dict[s
     found = {}
     for name, thing in art["things"].items():
         picture = thing["states"].get("open")
-        if picture is None:
+        if picture is None or not sweep.is_door(thing):
             continue
         row = thing.get("rows", {}).get("open", thing["row"])
         doorway = doorways.get(name, [thing.get("at")])

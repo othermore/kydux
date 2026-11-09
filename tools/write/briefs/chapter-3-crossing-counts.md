@@ -6,8 +6,8 @@ outputs:
   - content/levels/by-the-statues/text.es.json
   - content/lessons/waiting/en.md
   - content/lessons/waiting/es.md
-  - content/levels/the-moving-slab/text.en.json
-  - content/levels/the-moving-slab/text.es.json
+  - content/levels/the-opening-hole/text.en.json
+  - content/levels/the-opening-hole/text.es.json
 context:
   - docs/dev/story.md
   - content/lessons/waiting/es.md
@@ -17,8 +17,8 @@ context:
   - content/levels/the-tunnel-exit/text.en.json
   - content/levels/by-the-statues/text.es.json
   - content/levels/by-the-statues/text.en.json
-  - content/levels/the-moving-slab/text.es.json
-  - content/levels/the-moving-slab/text.en.json
+  - content/levels/the-opening-hole/text.es.json
+  - content/levels/the-opening-hole/text.en.json
 ---
 Correct the counts of a few texts of chapter 3, in English and Spanish. The place they are
 told in, the crossing, has moved its walked cells a row lower: the gallery where the tunnel

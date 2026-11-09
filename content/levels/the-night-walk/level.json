@@ -33,11 +33,21 @@
       "locked": true
     },
     {
-      "kind": "slab",
-      "id": "slab",
+      "kind": "hole",
+      "id": "hole",
       "at": [
         10,
         7
+      ],
+      "cells": [
+        [
+          10,
+          7
+        ],
+        [
+          9,
+          7
+        ]
       ],
       "period": 5
     }
@@ -93,7 +103,8 @@
     "door.open",
     "door.locked",
     "teacher.facing",
-    "slab.in_place"
+    "hole.open",
+    "hole.closed"
   ],
   "goals": [
     {
@@ -114,7 +125,7 @@
     },
     {
       "kind": "uses",
-      "member": "in_place",
+      "member": "closed",
       "bonus": true
     }
   ],

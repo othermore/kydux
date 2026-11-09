@@ -244,18 +244,18 @@ test.describe('the storeroom', () => {
   test.use({ locale: 'en-US' });
   test.beforeEach(({ page }) => seedWizard(page, PABLO));
 
-  test("the slab's hole shows while it is away, and osto holds it (D138), the storeroom dark (D162)", async ({ page }) => {
-    await open(page, 'the-moving-slab', '1');
+  test('the hole shows while it is open, and osto holds it closed (D167), the storeroom dark (D162)', async ({ page }) => {
+    await open(page, 'the-opening-hole', '1');
     await expect(scene(page)).toHaveAttribute('data-dark', 'true');
-    await expect(scene(page)).toHaveAttribute('data-slabs', 'slab:in');
-    await expect(scene(page)).not.toHaveAttribute('data-drawn', /slab:/);
+    await expect(scene(page)).toHaveAttribute('data-slabs', 'hole:in');
+    await expect(scene(page)).not.toHaveAttribute('data-drawn', /hole:/);
     await start(page, 'wizard.move_right(2)\nwizard.wait(4)');
-    await expect(scene(page)).toHaveAttribute('data-slabs', 'slab:away', { timeout: 30_000 });
-    await expect(scene(page)).toHaveAttribute('data-drawn', /slab:3\.\d+,7\.\d+/);
-    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}slab-hole.png` });
+    await expect(scene(page)).toHaveAttribute('data-slabs', 'hole:away', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-drawn', /hole:3\.\d+,7\.\d+/);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hole-open.png` });
     await page.locator('#speed').selectOption('4');
-    await start(page, 'wizard.move_right(2)\nwizard.cast("osto")\nwizard.wait(4)\nprint(slab.in_place)');
-    await expect(scene(page)).toHaveAttribute('data-held', 'slab', { timeout: 30_000 });
+    await start(page, 'wizard.move_right(2)\nwizard.cast("osto")\nwizard.wait(4)\nprint(hole.closed)');
+    await expect(scene(page)).toHaveAttribute('data-held', 'hole', { timeout: 30_000 });
     await expect(page.locator('.printed')).toHaveText('True', { timeout: 30_000 });
   });
 
@@ -425,7 +425,7 @@ for (const [scenery, level] of [
   ['the-two-doors', 'left-or-right'],
   ['the-three-doors', 'the-three-doors'],
   ['the-long-round', 'past-the-teacher'],
-  ['the-storeroom', 'the-moving-slab'],
+  ['the-storeroom', 'the-opening-hole'],
   ['the-way-down', 'the-night-walk'],
 ] as const) {
   test(`${scenery} zoomed out`, async ({ page }) => {

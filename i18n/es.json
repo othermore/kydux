@@ -102,7 +102,6 @@
     "wand": "la varita",
     "potion": "la poción",
     "hole": "el agujero",
-    "slab": "la losa",
     "bed": "la cama",
     "map": "el mapa del niño travieso"
   },
@@ -225,14 +224,6 @@
       "position": "La casilla del agujero, en x e y; si el agujero ocupa dos casillas, la primera.",
       "open": "True mientras el agujero está abierto en el suelo, así que un paso hacia él, dado ahora, no se puede dar; un programa puede esperar a que se cierre: while hole.open.",
       "closed": "True mientras el suelo tapa el agujero, así que un paso hacia él, dado ahora, es seguro; un programa puede esperarlo: while not hole.closed.",
-      "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}.",
-      "reveal": "Muestra dónde se encuentra una cosa oculta."
-    },
-    "slab": {
-      "kind": "Lo que es: \"slab\".",
-      "name": "El nombre propio de la losa en este nivel.",
-      "position": "La casilla del agujero que cubre la losa, en x e y.",
-      "in_place": "True cuando un paso hacia la losa, dado ahora, cae sobre ella, para que un programa pueda esperarla: while not slab.in_place.",
       "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}.",
       "reveal": "Muestra dónde se encuentra una cosa oculta."
     },
@@ -402,7 +393,7 @@
     "zelim": "rompe el sello de una puerta que tienes al lado.",
     "fendra": "atrae a tu casilla la cosa que nombres, a tres casillas de distancia como máximo en línea recta.",
     "kirra": "ilumina la sala oscura en la que estás.",
-    "osto": "sujeta un rato en su sitio una losa que tienes al lado y que va y viene sobre su agujero.",
+    "osto": "mantiene cerrado un rato un agujero que tienes al lado y que se abre en el suelo.",
     "orvim": "abre el mapa del niño travieso por el plano del sitio en el que estás, cada casilla con sus números, si llevas el mapa."
   },
   "words": {

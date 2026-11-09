@@ -467,7 +467,7 @@ test.describe('a level played two ways (D51)', () => {
   });
 });
 
-test.describe('the dark and the slabs (D52, D53, D138)', () => {
+test.describe('the dark and the holes (D52, D53, D167)', () => {
   test('a dark room is covered until kirra lights it', async ({ page }) => {
     await page.goto('/#level/the-dark-room');
     await page.locator('#start').click();
@@ -478,23 +478,23 @@ test.describe('the dark and the slabs (D52, D53, D138)', () => {
     await expect(scene(page)).toHaveAttribute('data-dark', 'false');
   });
 
-  test('a slab comes and goes, and a step onto it while it is away bumps', async ({ page }) => {
-    await page.goto('/#level/the-moving-slab');
+  test('a hole opens and closes, and a step onto it while it is open bumps', async ({ page }) => {
+    await page.goto('/#level/the-opening-hole');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
-    await expect(scene(page)).toHaveAttribute('data-slabs', 'slab:in');
+    await expect(scene(page)).toHaveAttribute('data-slabs', 'hole:in');
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_right(2)\nwizard.wait()\nprint(slab.in_place)\nwizard.move_right()');
-    await expect(page.locator('.printed')).toHaveText('False');
+    await run(page, 'wizard.move_right(2)\nwizard.wait()\nprint(hole.open)\nwizard.move_right()');
+    await expect(page.locator('.printed')).toHaveText('True');
     await expect(scene(page)).toHaveAttribute('data-wizard', '2,7');
   });
 
-  test('osto beside the slab holds it', async ({ page }) => {
-    await page.goto('/#level/the-moving-slab');
+  test('osto beside the hole holds it closed', async ({ page }) => {
+    await page.goto('/#level/the-opening-hole');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_right(2)\nwizard.cast("osto")\nwizard.wait(3)\nprint(slab.in_place)');
+    await run(page, 'wizard.move_right(2)\nwizard.cast("osto")\nwizard.wait(3)\nprint(hole.closed)');
     await expect(page.locator('.printed')).toHaveText('True');
   });
 });

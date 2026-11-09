@@ -333,25 +333,8 @@ class Hole(Thing):
         world.note(self.name, "hold", {"id": self.name, "from": start, "until": end})
 
 
-class Slab(Hole):
-    """The hole under the name the levels still give it, `slab.in_place`."""
-
-    _k_role = "slab"
-
-    @property
-    def in_place(self) -> bool:
-        """True when a step onto the slab, taken now, lands on it: `slab.in_place`"""
-        return self.closed
-
-
 #: Each kind of thing with a class of its own; any other kind is a Thing.
-THINGS: dict[str, type[Thing]] = {
-    "door": Door,
-    "key": Key,
-    "hole": Hole,
-    "slab": Slab,
-    "bed": Bed,
-}
+THINGS: dict[str, type[Thing]] = {"door": Door, "key": Key, "hole": Hole, "bed": Bed}
 
 
 def make_thing(world: "World", spec: ThingSpec) -> Thing:

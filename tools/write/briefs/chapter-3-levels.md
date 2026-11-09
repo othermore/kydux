@@ -16,8 +16,8 @@ outputs:
   - content/levels/the-three-doors/text.es.json
   - content/levels/past-the-teacher/text.en.json
   - content/levels/past-the-teacher/text.es.json
-  - content/levels/the-moving-slab/text.en.json
-  - content/levels/the-moving-slab/text.es.json
+  - content/levels/the-opening-hole/text.en.json
+  - content/levels/the-opening-hole/text.es.json
   - content/levels/the-dark-room/text.en.json
   - content/levels/the-dark-room/text.es.json
   - content/levels/the-night-walk/text.en.json

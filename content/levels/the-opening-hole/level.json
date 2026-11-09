@@ -1,5 +1,5 @@
 {
-  "id": "the-moving-slab",
+  "id": "the-opening-hole",
   "kind": "practice",
   "scene": "the-storeroom",
   "start": [
@@ -23,8 +23,8 @@
   ],
   "things": [
     {
-      "kind": "slab",
-      "id": "slab",
+      "kind": "hole",
+      "id": "hole",
       "at": [
         3,
         7
@@ -57,7 +57,8 @@
     "wizard.move_down",
     "wizard.wait",
     "wizard.cast",
-    "slab.in_place"
+    "hole.open",
+    "hole.closed"
   ],
   "goals": [
     {
@@ -66,7 +67,7 @@
     },
     {
       "kind": "uses",
-      "member": "in_place",
+      "member": "closed",
       "bonus": true
     }
   ],
@@ -76,7 +77,7 @@
       "id": "three",
       "things": [
         {
-          "id": "slab",
+          "id": "hole",
           "period": 3
         }
       ]
@@ -85,7 +86,7 @@
       "id": "four",
       "things": [
         {
-          "id": "slab",
+          "id": "hole",
           "period": 4
         }
       ]
@@ -94,7 +95,7 @@
       "id": "five",
       "things": [
         {
-          "id": "slab",
+          "id": "hole",
           "period": 5
         }
       ]
@@ -103,7 +104,7 @@
       "id": "seven",
       "things": [
         {
-          "id": "slab",
+          "id": "hole",
           "period": 7
         }
       ]

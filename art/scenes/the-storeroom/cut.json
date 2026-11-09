@@ -194,7 +194,7 @@
       ],
       "about": "The key, cut by the polygon traced round it, and drawn on the cell the level lays it on (D85, D109)."
     },
-    "slab": {
+    "hole": {
       "box": [
         2.8,
         6.98,
@@ -205,7 +205,7 @@
       "solid": false,
       "without": "storeroom-base.png",
       "states": {
-        "hole": {
+        "open": {
           "picture": "storeroom-hole.png",
           "traced": [
             [
@@ -279,7 +279,7 @@
         3,
         7
       ],
-      "about": "The hole the slab comes and goes over (D138): the floor is the slab in place, and this picture its absence, cut by the ellipse traced round it."
+      "about": "The hole that opens in the floor (D167): the floor is the hole closed, and this picture the hole open, cut by the ellipse traced round it."
     },
     "wall_1": {
       "box": [

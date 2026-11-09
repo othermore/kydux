@@ -65,12 +65,12 @@
         7
       ]
     },
-    "slab": {
+    "hole": {
       "row": 7,
       "left": 269,
       "top": 670,
       "states": {
-        "hole": "slab-hole.webp"
+        "open": "hole-open.webp"
       },
       "at": [
         3,

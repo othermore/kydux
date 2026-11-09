@@ -102,7 +102,6 @@
     "wand": "the wand",
     "potion": "the potion",
     "hole": "the hole",
-    "slab": "the slab",
     "bed": "the bed",
     "map": "the naughty child's map"
   },
@@ -225,14 +224,6 @@
       "position": "The cell of the hole, in x and y; on a hole of two cells, the first.",
       "open": "True while the hole is open in the floor, so that a step onto it, taken now, cannot be taken; a program can wait for it to close: while hole.open.",
       "closed": "True while the floor covers the hole, so that a step onto it, taken now, is safe; a program can wait for it: while not hole.closed.",
-      "distance_to": "Gives the number of steps from an object to the wizard.",
-      "reveal": "Shows where a hidden thing lies."
-    },
-    "slab": {
-      "kind": "What it is: \"slab\".",
-      "name": "The slab's own name in this level.",
-      "position": "The cell of the hole the slab covers, in x and y.",
-      "in_place": "True when a step onto the slab, taken now, lands on it, so that a program can wait for it: while not slab.in_place.",
       "distance_to": "Gives the number of steps from an object to the wizard.",
       "reveal": "Shows where a hidden thing lies."
     },
@@ -402,7 +393,7 @@
     "zelim": "breaks the seal of a door beside you.",
     "fendra": "brings to your cell the thing you name, three cells away at most in a straight line.",
     "kirra": "lights the dark room you are in.",
-    "osto": "holds in place, for a while, a slab beside you that comes and goes over its hole.",
+    "osto": "holds closed, for a while, a hole beside you that opens in the floor.",
     "orvim": "opens the naughty child's map on the plan of the place you are in, every cell with its numbers, if you carry the map."
   },
   "words": {

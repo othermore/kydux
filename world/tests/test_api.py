@@ -60,3 +60,12 @@ def test_the_table_for_the_page_has_every_member_with_its_kind_and_example():
     # An action that needs its argument, or has none, has no simpler example (D60).
     assert "simple" not in wizard["say"] and "simple" not in wizard["pick_up"]
     assert wizard["position"]["kind"] == "attribute"
+
+
+def test_a_hole_is_looked_at_by_open_and_closed_and_no_slab_is_left():
+    """D167: the thing in the floor is a hole, `hole.open` and `hole.closed`; neither a
+    `slab` role nor an `in_place` member is anywhere in the table."""
+    assert api.MEMBERS["hole"] == (*api.THING_MEMBERS, "open", "closed")
+    assert "hole" in api.THING_ROLES
+    assert "slab" not in api.MEMBERS and "slab" not in api.THING_ROLES
+    assert all("in_place" not in members for members in api.MEMBERS.values())

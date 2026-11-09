@@ -526,13 +526,54 @@ def spaced_rows(knots: list[tuple[int, int]], height: int) -> np.ndarray:
     return rows
 
 
-def spaced(scene: str) -> Path:
+def mirrored_band(
+    picture: np.ndarray, band: dict, seam: tuple[int, int], px, py
+) -> tuple[np.ndarray, np.ndarray]:
+    """What a band freed under a seam holds (a spaced section's `band`): the picture's
+    own stones above the seam, mirrored at it, so that they meet with no line and in
+    the same light; in each of its `plain` spans, x0 and x1 in cells, where something
+    stands on those stones, the stones beside it mirrored too. Returns the band's
+    pixels, as tall as it is, and how much of each pixel it takes."""
+    old_seam, new_seam = seam
+    new_end = py(band["to"])
+    height = new_end - new_seam
+    rows = old_seam - 1 - np.arange(height)
+    laid = picture[rows]
+    for x0, x1, *side in band.get("plain", []):
+        a, b = px(x0), px(x1)
+        columns = np.arange(a, b)
+        # Mirrored at its left edge, or at its right where it says so (`right`).
+        source = 2 * b - 1 - columns if side == ["right"] else np.maximum(0, 2 * a - 1 - columns)
+        source = np.minimum(source, picture.shape[1] - 1)
+        weight = np.clip(np.minimum(columns - a, b - 1 - columns) / SEAM, 0, 1)[None, :, None]
+        if side == ["right"]:
+            # Up to the band's own edge, and only below the seam, where the light
+            # above it has come down: what it replaces is far from what it must meet.
+            weight = np.clip((b - 1 - columns) / SEAM, 0, 1)[None, :, None]
+            weight = weight * np.clip(np.arange(height) / (10 * SEAM), 0, 1)[:, None, None]
+        laid[:, a:b] = laid[:, a:b] * (1 - weight) + laid[:, source] * weight
+    left, right = (px(v) for v in band["columns"])
+    columns = np.arange(picture.shape[1])
+    across = np.clip(np.minimum(columns - left, right - columns) / SEAM, 0, 1)
+    # The seam under the stones fades into what lies below the band.
+    down = np.clip((new_end - new_seam - np.arange(height)) / SEAM, 0, 1)
+    return laid, across[None, :] * down[:, None]
+
+
+def spaced(scene: str, section: str = "spaced") -> Path:
     settings = scene_settings.settings(scene)
-    section = settings.data["spaced"]
-    picture = np.array(Image.open(REPO / section["from"]).convert("RGB")).astype(np.float32)
+    found = settings.data[section]
+    picture = np.array(Image.open(REPO / found["from"]).convert("RGB")).astype(np.float32)
     gx, gy = settings.grid["x"], settings.grid["y"]
+
+    def px(x: float) -> int:
+        return round(gx["offset"] + x * gx["spacing"])
+
+    def py(y: float) -> int:
+        return round(gy["offset"] + y * gy["spacing"])
+
     # By columns, the same as by rows on the picture turned over its diagonal.
-    across = "rows" in section
+    across = "rows" in found
     along, side = (gx, gy) if across else (gy, gx)
     if across:
         picture = picture.transpose(1, 0, 2)
@@ -541,14 +582,14 @@ def spaced(scene: str) -> Path:
             round(along["offset"] + old * along["spacing"]),
             round(along["offset"] + new * along["spacing"]),
         )
-        for old, new in section["knots"]
+        for old, new in found["knots"]
     ]
     rows = spaced_rows(knots, picture.shape[0])
     low = np.floor(rows).astype(int)
     high = np.minimum(low + 1, picture.shape[0] - 1)
     share = (rows - low)[:, None, None]
     moved = picture[low] * (1 - share) + picture[high] * share
-    first, last = section["rows"] if across else section["columns"]
+    first, last = found["rows"] if across else found["columns"]
     x0, x1 = (
         round(side["offset"] + first * side["spacing"]),
         round(side["offset"] + last * side["spacing"]),
@@ -558,9 +599,24 @@ def spaced(scene: str) -> Path:
         np.minimum(np.arange(picture.shape[1]) - x0, x1 - np.arange(picture.shape[1])) / SEAM, 0, 1
     )[None, :, None]
     out = picture * (1 - weight) + moved * weight
+    # What is left where a knot leaves a band empty: the stones above it, mirrored.
+    if "band" in found:
+        band = found["band"]
+        seam = (py(band["old"]), py(band["from"]))
+        laid, part = mirrored_band(picture, band, seam, px, py)
+        here = out[seam[1] : seam[1] + laid.shape[0]]
+        here[:] = here * (1 - part[..., None]) + laid * part[..., None]
+    # Boxes in cells that stay as they were, each faded in over SEAM pixels.
+    for bx0, by0, bx1, by1 in found.get("kept", []):
+        yy, xx = np.arange(out.shape[0])[:, None], np.arange(out.shape[1])[None, :]
+        off = np.maximum(
+            np.maximum(px(bx0) - xx, xx - px(bx1)), np.maximum(py(by0) - yy, yy - py(by1))
+        )
+        stay = np.clip(1 - off / SEAM, 0, 1)[..., None]
+        out = out * (1 - stay) + picture * stay
     if across:
         out = out.transpose(1, 0, 2)
-    target = REPO / section["painting"]
+    target = REPO / found["painting"]
     Image.fromarray(out.clip(0, 255).astype(np.uint8)).save(target)
     return target
 
@@ -1239,7 +1295,9 @@ def main(arguments: list[str]) -> int:
             print(path.relative_to(REPO))
         return 0
     if arguments[1] == "spaced":
-        print(spaced(arguments[0]).relative_to(REPO))
+        print(
+            spaced(arguments[0], "spaced" if section == "repaint" else section).relative_to(REPO)
+        )
     elif arguments[1] == "tiled":
         print(tiled(arguments[0], section).relative_to(REPO))
     elif arguments[1] == "placed":

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { defaultProgress } from '../progress/store';
-import { type Course, courseStart, itemHash, knownApi, next, parseItem, previous, stopState } from './course';
+import { type Course, courseStart, itemHash, knownApi, levelAfter, next, parseItem, previous, stopState } from './course';
 
 const COURSE: Course = {
   chapters: [
@@ -22,6 +22,16 @@ describe('the course', () => {
     expect(next(COURSE, 'level:02-d')).toBeNull();
     expect(previous(COURSE, 'level:01-b')).toBe('lesson:01-a');
     expect(previous(COURSE, 'lesson:01-a')).toBeNull();
+  });
+
+  it('tries a lesson in the first level after it, past a lesson between them (D142)', () => {
+    const course: Course = {
+      chapters: [{ id: '01', items: ['lesson:a', 'lesson:b', 'level:c', 'lesson:d'] }],
+    };
+    expect(levelAfter(course, 'lesson:a')).toBe('c');
+    expect(levelAfter(course, 'lesson:b')).toBe('c');
+    expect(levelAfter(course, 'lesson:d')).toBeNull();
+    expect(levelAfter(course, 'lesson:unknown')).toBeNull();
   });
 
   it('opens the first item, and the one after each done item (D34)', () => {

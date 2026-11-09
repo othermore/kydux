@@ -13,6 +13,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools" / "art"))
 import cut  # noqa: E402
+import door  # noqa: E402
 import generate  # noqa: E402
 import sprites  # noqa: E402
 
@@ -1420,3 +1421,108 @@ def test_marks_writes_the_untouched_copy_of_a_picture_the_doorways_are_laid_into
     repaint.marks("marked")
     assert (np.array(Image.open(marked).convert("RGB"))[15, 15] == (255, 0, 255)).all()
     assert repaint.untouched_copy(marked).read_bytes() == marked.read_bytes()
+
+
+def plain_door() -> tuple[np.ndarray, dict, dict]:
+    """A wall with a floor above it and a red leaf in it, a cell ten pixels wide."""
+    painting = np.full((300, 300, 3), (150, 150, 160), dtype=np.uint8)
+    painting[20:100, 120:200] = (40, 80, 200)
+    painting[120:280, 120:200] = (200, 30, 30)
+    grid = {"x": {"offset": 0, "spacing": 10}, "y": {"offset": 0, "spacing": 10}}
+    settings = {
+        "polygon": [[12, 12], [20, 12], [20, 28], [12, 28]],
+        "hinge": "left",
+        "floor_from": [12, 2, 20, 10],
+    }
+    return painting, grid, settings
+
+
+def red(picture: np.ndarray) -> np.ndarray:
+    return (picture[..., 0] > 150) & (picture[..., 1] < 90) & (picture[..., 2] < 90)
+
+
+def test_a_door_opened_shows_the_floor_beyond_in_its_doorway():
+    painting, grid, settings = plain_door()
+    opened = door.open_door(painting, grid, settings)
+    inside = opened.doorway[121:279, 121:199].astype(int)
+    # Every pixel there is the floor's, darker toward the lintel and the room's own
+    # light at the foot, and nothing of the leaf is left.
+    assert not red(opened.doorway).any()
+    assert (inside[..., 2] > inside[..., 0]).all()
+    assert inside[-1, 0, 2] > 195
+    assert inside[0, 0, 2] < 200 * (1 - door.LINTEL_SHADE) + 6
+    # Round the doorway the painting is untouched.
+    outside = ~export_scene.native_area(painting.shape[:2], grid, settings["polygon"])
+    outside &= ~image_first.dilated(~outside, 2)
+    assert (opened.doorway[outside] == painting[outside]).all()
+
+
+@pytest.mark.parametrize(
+    ("hinge", "beyond"),
+    [("left", lambda xs: xs.max() < 120), ("right", lambda xs: xs.min() >= 200)],
+)
+def test_a_door_s_leaf_swings_whole_beyond_its_hinge(hinge, beyond):
+    painting, grid, settings = plain_door()
+    opened = door.open_door(painting, grid, {**settings, "hinge": hinge})
+    ys, xs = np.nonzero(red(opened.open))
+    # Beyond the hinge, over the jamb, its far edge out of the doorway, at its width.
+    assert beyond(xs)
+    assert xs.max() - xs.min() + 1 == pytest.approx(80 * door.SWING, abs=2)
+    # No pixel of the leaf is lost: as tall as it was, its area scaled by the swing.
+    assert ys.max() - ys.min() + 1 >= 160
+    assert red(opened.open).sum() == pytest.approx(80 * 160 * door.SWING, rel=0.06)
+    # All of it within the shape its state is cut by.
+    alpha = export_scene.soft_area(painting.shape[:2], grid, opened.leaves[0])
+    assert (alpha[red(opened.open)] > 0).all()
+    # The two pictures differ in nothing else, the shape's edge within a pixel or two
+    # of what it goes round.
+    differs = np.any(opened.open != opened.doorway, axis=2)
+    assert image_first.dilated(alpha > 0, 2)[differs].all()
+
+
+def test_a_door_s_far_edge_is_lifted_and_its_hinge_edge_stays():
+    painting, grid, settings = plain_door()
+    opened = door.open_door(painting, grid, settings)
+    leaf = red(opened.open)
+    columns = np.nonzero(leaf.any(axis=0))[0]
+    far, near = np.nonzero(leaf[:, columns[1]])[0], np.nonzero(leaf[:, columns[-2]])[0]
+    assert far.min() < near.min() < 124
+    assert near.max() >= 276 and far.max() < near.max()
+    # The hinge edge lies on the doorway's side, where the leaf hung.
+    assert columns[-1] == pytest.approx(119, abs=2)
+
+
+def test_a_double_door_swings_a_leaf_each_side_of_its_seam():
+    painting, grid, settings = plain_door()
+    opened = door.open_door(painting, grid, {**settings, "hinge": "both"})
+    assert len(opened.leaves) == 2
+    ys, xs = np.nonzero(red(opened.open))
+    left, right = xs[xs < 120], xs[xs >= 200]
+    assert len(left) and len(right) and len(left) + len(right) == len(xs)
+    assert left.max() - left.min() + 1 == pytest.approx(40 * door.SWING, abs=2)
+    assert right.max() - right.min() + 1 == pytest.approx(40 * door.SWING, abs=2)
+
+
+def test_a_door_s_box_is_grown_round_its_leaf_and_never_cuts_it():
+    box = door.grown_box([12, 12, 20, 28], [[[9, 11.5], [12, 11.5], [12, 28.5], [9, 28]]])
+    assert box == [8.95, 11.45, 20, 28.55]
+
+
+def test_a_band_freed_under_a_seam_is_the_stones_above_it_mirrored():
+    import repaint
+
+    # Each row its own colour: the stones above row 50, a thing on them at 40 to 80.
+    picture = np.zeros((100, 100, 3), dtype=np.float32)
+    picture[:, :, 0] = np.arange(100)[:, None]
+    picture[:, 40:80, 1] = 200
+
+    def plain(value: float) -> int:
+        return round(value)
+
+    band = {"from": 40, "to": 50, "columns": [0, 100], "plain": [[40, 80]]}
+    laid, part = repaint.mirrored_band(picture, band, (50, 40), plain, plain)
+    # The first row of the band is the row just above the seam, the next the one above it.
+    assert laid[0, 10, 0] == 49 and laid[1, 10, 0] == 48
+    # In the plain span the thing is gone: the stones beside it, mirrored in.
+    assert laid[:, 60, 1].max() < 1
+    assert part[0, 50] == 1 and part[0, 0] == 0

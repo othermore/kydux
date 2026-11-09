@@ -24,6 +24,26 @@ def test_reach_is_not_met_by_walking_over_the_tile_and_on():
     assert world.met_at == {}
 
 
+def test_a_reach_goal_on_the_way_is_met_by_walking_over_the_tile():
+    level = Level.from_dict(
+        {
+            "id": "on_the_way",
+            "map": ["S..D."],
+            "goals": [{"kind": "reach", "marker": "D", "on_the_way": True}],
+        }
+    )
+    world = World(level)
+    world.wizard.move_right(4)
+    world.finish()
+    assert world.met_at == {0: 3}
+    passed = run_code(level, "wizard.move_right(4)")
+    assert (passed.status, passed.goals[0].met, passed.goals[0].walked_over) == (
+        "won",
+        True,
+        False,
+    )
+
+
 def test_reach_by_coordinates():
     level = Level.from_dict(
         {"id": "at", "map": ["S..."], "goals": [{"kind": "reach", "at": [2, 0]}]}

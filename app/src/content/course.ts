@@ -77,6 +77,16 @@ export function next(course: Course, item: string): string | null {
   return index >= 0 && index + 1 < all.length ? (all[index + 1] ?? null) : null;
 }
 
+/** The level a lesson's code runs in: the first level after it in the course, past any
+ * lesson between them, or null (D142). */
+export function levelAfter(course: Course, item: string): string | null {
+  const all = items(course);
+  const index = all.indexOf(item);
+  if (index < 0) return null;
+  const later = all.slice(index + 1).find((other) => parseItem(other)?.kind === 'level');
+  return later ? (parseItem(later)?.id ?? null) : null;
+}
+
 /** What the child may use in a level: what the course has taught up to it, or,
  * for a level outside the course, the level's own `api`. */
 export function knownApi(course: Course, levelId: string, own: readonly string[]): string[] {

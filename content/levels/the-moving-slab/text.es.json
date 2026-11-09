@@ -15,6 +15,8 @@
   "learned": "Ahora sabes que `while not` espera a algo que aún no es verdad, y que `slab.in_place` dice cuándo lo es.",
   "ways": {
     "three": "Cada tres ticks",
-    "four": "Cada cuatro ticks"
+    "four": "Cada cuatro ticks",
+    "five": "Cada cinco ticks",
+    "seven": "Cada siete ticks"
   }
 }

@@ -1,1 +1,1 @@
-wizard.move_right(8)
+wizard.move_right(7)

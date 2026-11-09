@@ -1,2 +1,2 @@
 wizard.wait(2)
-wizard.move_right(7)
+wizard.move_right(6)

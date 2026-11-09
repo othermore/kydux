@@ -140,17 +140,17 @@ test.describe('a page runs its code (D142)', () => {
     await page.goto('/#lesson/if');
     await page.locator('#lesson-next').click();
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('(11, 7)', { timeout: 90_000 });
-    await expect(page.locator('.lesson-said')).toContainText('(11, 7)');
+    await expect(page.locator('.lesson-printed')).toHaveText('(11, 8)', { timeout: 90_000 });
+    await expect(page.locator('.lesson-said')).toContainText('(11, 8)');
   });
 
   test('a block that walks says the cell the wizard ended on, always from the start', async ({ page }) => {
     await page.goto('/#lesson/waiting');
     await page.locator('#lesson-next').click();
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('(11, 5)', { timeout: 90_000 });
+    await expect(page.locator('.lesson-said')).toContainText('(12, 6)', { timeout: 90_000 });
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('(11, 5)', { timeout: 30_000 });
+    await expect(page.locator('.lesson-said')).toContainText('(12, 6)', { timeout: 30_000 });
     // Without waiting, Dask sees the wizard: the page says it.
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');

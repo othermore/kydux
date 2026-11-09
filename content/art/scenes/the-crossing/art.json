@@ -14,8 +14,8 @@
       "under": true
     },
     {
-      "row": 6,
-      "image": "row-6-static.webp",
+      "row": 5,
+      "image": "row-5-static.webp",
       "top": 422,
       "static": true
     },
@@ -47,11 +47,11 @@
       "cells": [
         [
           0,
-          5
+          6
         ],
         [
           19,
-          5
+          6
         ]
       ],
       "by": 0.3

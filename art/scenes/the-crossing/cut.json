@@ -15,7 +15,7 @@
         13.05,
         6.95
       ],
-      "row": 6,
+      "row": 5,
       "static": true,
       "solid": true,
       "mask": "difference",
@@ -26,7 +26,7 @@
       "states": {
         "standing": "painting"
       },
-      "about": "The first statue, over whoever walks behind it on row 5, its foot on row 6."
+      "about": "The first statue, against the gallery's top wall, its picture on row 5, which is wall (D154): a figure on row 6 passes before its base."
     },
     "statue_2": {
       "box": [
@@ -35,7 +35,7 @@
         14.97,
         6.95
       ],
-      "row": 6,
+      "row": 5,
       "static": true,
       "solid": true,
       "mask": "difference",
@@ -46,7 +46,7 @@
       "states": {
         "standing": "painting"
       },
-      "about": "The second statue, its foot on row 6."
+      "about": "The second statue, on row 5."
     },
     "statue_3": {
       "box": [
@@ -55,7 +55,7 @@
         18.12,
         6.95
       ],
-      "row": 6,
+      "row": 5,
       "static": true,
       "solid": true,
       "mask": "difference",
@@ -66,7 +66,7 @@
       "states": {
         "standing": "painting"
       },
-      "about": "The third statue, its foot on row 6."
+      "about": "The third statue, on row 5."
     },
     "arch_top": {
       "box": [
@@ -186,7 +186,7 @@
   "cut": false,
   "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from its plan on the grid\n  (`tools/art/prompts/crossing-painted-3.md`), then edited by it without its grid\n  (`crossing-base.md`) and with its walls' gaps painted (`crossing-base-2.md`): the\n  scene's base (D148).\n- Its statues and its arches cut by the difference against the picture without them,\n  also Gemini's (`crossing-gone.md`); the lower wall's tops by the polygons traced on\n  their outlines.\n",
   "lowered_rows": [
-    5
+    6
   ],
   "nudged": [
     {

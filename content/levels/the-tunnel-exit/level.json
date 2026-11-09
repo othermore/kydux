@@ -3,12 +3,12 @@
   "kind": "practice",
   "scene": "the-crossing",
   "start": [
-    3,
-    5
+    4,
+    6
   ],
   "end": [
     11,
-    5
+    6
   ],
   "speaker": "friend",
   "carrying": [
@@ -21,7 +21,7 @@
       "id": "friend",
       "at": [
         3,
-        6
+        7
       ]
     },
     {
@@ -29,7 +29,7 @@
       "id": "mate",
       "at": [
         4,
-        6
+        7
       ]
     },
     {

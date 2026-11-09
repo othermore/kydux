@@ -451,7 +451,7 @@ test.describe('a level played two ways (D51)', () => {
     page,
   }) => {
     await expect(page.locator('#way')).toBeHidden();
-    await run(page, 'wizard.move_right(4)\nwizard.move_down(3)');
+    await run(page, 'wizard.move_right(4)\nwizard.move_down(2)');
     await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks up”: The teacher saw you!');
     await expect(page.locator('#way')).toBeVisible();
     await expect(page.locator('#way')).toHaveValue('looking_up');
@@ -462,7 +462,7 @@ test.describe('a level played two ways (D51)', () => {
   });
 
   test('with if, the same program wins every way', async ({ page }) => {
-    await run(page, 'if dask.facing == "up":\n    wizard.move_down(2)\nwizard.move_right(4)\nwizard.move_down(3)');
+    await run(page, 'if dask.facing == "up":\n    wizard.move_down(2)\nwizard.move_right(4)\nwizard.move_down(2)');
     await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux! In every way!');
     await expect(page.locator('.win-card')).toBeVisible();
   });

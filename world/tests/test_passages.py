@@ -427,14 +427,16 @@ def outcomes(level_id, code):
 
 
 def test_the_tunnel_exit_is_won_by_waiting_two_ticks_for_dask_to_go_by():
-    """D146: Dask starts below the crossing, walking up it, a cell a tick; he sees (9, 5)
-    from (9, 9) to (9, 6), ticks 3 to 6, stands on it at tick 7, and is above it from
-    tick 8, when the wizard reaches it after two ticks of waiting."""
+    """D146, D154: Dask starts below the crossing, walking up it, a cell a tick; he sees
+    (9, 6), the gallery's first floor row, from (9, 10) to (9, 7), ticks 2 to 5, stands
+    on it at tick 6, and is above it from tick 7, when the wizard reaches it from (4, 6)
+    after two ticks of waiting and five steps."""
     level = "the-tunnel-exit"
     assert run_code(real(level), solution(level)).status == "won"
     alone = run_code(real(level), wrong(level, "the_walk_alone"))
-    assert (alone.status, alone.ticks) == ("caught", 6)
-    assert run_code(real(level), wrong(level, "waits_one")).status == "caught"
+    assert (alone.status, alone.ticks) == ("caught", 5)
+    one = run_code(real(level), wrong(level, "waits_one"))
+    assert (one.status, one.ticks) == ("caught", 6)
     assert run_code(real(level), wrong(level, "stops_short")).status == "incomplete"
 
 
@@ -448,9 +450,11 @@ def test_the_tunnel_exit_keeps_dask_s_ticks():
 
 
 def test_by_the_statues_is_won_above_or_below_dask_with_one_if():
-    """D146: Dask stands still between the first two statues; looking up, the wizard goes
-    down two and passes below him, and looking down it crosses straight. The mark is met
-    on the way, three cells before the walk ends in the first way."""
+    """D146, D154: Dask stands still on the gallery's middle row, between the first two
+    statues and below them; looking up, the wizard goes down two and passes below him,
+    behind the lower wall's top, and looking down it crosses straight above him, before
+    the statues' bases. The mark is met on the way, two cells before the walk ends in the
+    first way."""
     level = "by-the-statues"
     won = run_code(real(level), solution(level))
     assert dict((way, result.status) for way, result in won.ways) == {
@@ -486,7 +490,7 @@ def test_by_the_statues_gives_its_bonus_for_ending_right_on_the_mark_with_a_seco
     assert bonuses(solution(level)) == {"looking_up": False, "looking_down": True}
     two = (
         'if dask.facing == "up":\n    wizard.move_down(2)\nwizard.move_right(4)\n'
-        'if dask.facing == "down":\n    wizard.move_down(2)\nwizard.move_down()\n'
+        'if dask.facing == "down":\n    wizard.move_down(2)\n'
     )
     assert bonuses(two) == {"looking_up": True, "looking_down": True}
 
@@ -515,13 +519,30 @@ def test_no_fixed_number_of_waits_wins_every_way_and_the_while_does(level_id, be
     assert set(outcomes(level_id, solution(level_id)).values()) == {"won"}
 
 
-def test_the_slab_s_level_is_won_in_both_periods_and_a_fixed_wait_loses_one():
+def test_the_slab_s_level_is_won_in_its_four_periods_and_a_fixed_wait_loses_one():
     level = "the-moving-slab"
     assert set(outcomes(level, solution(level)).values()) == {"won"}
-    assert outcomes(level, wrong(level, "waits_three")) == {"three": "won", "four": "incomplete"}
+    assert outcomes(level, wrong(level, "waits_three")) == {
+        "three": "won",
+        "four": "incomplete",
+        "five": "incomplete",
+        "seven": "won",
+    }
     walk = run_code(real(level), wrong(level, "the_walk_alone"))
     bumps = [e for e in walk.events if e.kind == "bump"]
     assert bumps and bumps[0].data["by"] == "slab"
+
+
+def test_no_fixed_wait_a_child_finds_by_trial_crosses_the_slab_in_every_period():
+    """The owner, 2026-11-08: the periods 3, 4, 5 and 7 share no tick a fixed wait could
+    hit in all four below 29, so the loop on `in_place` is what wins."""
+    level = "the-moving-slab"
+    for ticks in range(29):
+        wait = f"wizard.wait({ticks})\n" if ticks else ""
+        statuses = outcomes(level, f"wizard.move_right(2)\n{wait}wizard.move_right(3)\n")
+        assert set(statuses.values()) != {"won"}, ticks
+    code = "wizard.move_right(2)\nwizard.wait(29)\nwizard.move_right(3)\n"
+    assert set(outcomes(level, code).values()) == {"won"}
 
 
 def test_in_the_dark_the_key_is_not_found_until_kirra():
@@ -601,10 +622,16 @@ def test_the_dark_tunnel_starts_where_the_child_cannot_know_and_names_no_cell():
 
 
 def test_the_slab_cannot_be_walked_round_on_the_corridor_s_lower_row():
-    """D149: the row behind the lower wall is walked, and it stops at the hole's cell."""
+    """D149: the row behind the lower wall is walked, and it stops at the hole's cell. The
+    friends stand on (0, 8) and (1, 8), so the wizard goes down at the hole's edge."""
     level = "the-moving-slab"
-    around = "wizard.move_down()\nwizard.move_right(2)\nwizard.move_right(3)\n"
-    assert set(outcomes(level, around).values()) == {"incomplete"}
+    around = "wizard.move_right(2)\nwizard.move_down()\nwizard.move_right(3)\n"
+    result = run_code(real(level), around)
+    for way, one in result.ways:
+        assert one.status == "incomplete", way
+        moves = [tuple(e.data["to"]) for e in one.events if e.kind == "move"]
+        assert moves[-1] == (2, 8), way
+        assert [e.data["at"] for e in one.events if e.kind == "bump"] == [[2, 8]], way
 
 
 def test_no_level_of_the_first_three_chapters_teaches_can_see():

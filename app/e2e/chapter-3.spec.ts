@@ -110,7 +110,7 @@ test.describe('the map, opened by its spell (D134)', () => {
     const plan = page.locator('#plan');
     await expect(plan).toBeVisible({ timeout: 30_000 });
     await expect(plan).toHaveAttribute('data-figures', /dask:9,11/);
-    await expect(plan).toHaveAttribute('data-marks', '11,5');
+    await expect(plan).toHaveAttribute('data-marks', '11,6');
     await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
     await page.keyboard.press('Escape');
     await expect(plan).toHaveCount(0);
@@ -202,25 +202,25 @@ test.describe('Dask, in every way (D51, D137)', () => {
     await open(page, 'the-tunnel-exit');
     await expect(scene(page)).toHaveAttribute('data-actors', /dask:9,12,up/);
     await expect(page.locator('#way')).toBeHidden();
-    await run(page, 'wizard.move_right(8)');
+    await run(page, 'wizard.move_right(7)');
     await expect(page.locator('.outcome-text')).toContainText('The teacher saw you');
-    await expect(scene(page)).toHaveAttribute('data-actors', /dask:9,6,up/);
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:9,7,up/);
   });
 
   test('two ticks of waiting let him go by (D146)', async ({ page }) => {
     await open(page, 'the-tunnel-exit');
-    expect(await run(page, 'wizard.wait(2)\nwizard.move_right(8)')).toMatch(/^You did it/);
-    await expect(scene(page)).toHaveAttribute('data-wizard', '11,5');
+    expect(await run(page, 'wizard.wait(2)\nwizard.move_right(7)')).toMatch(/^You did it/);
+    await expect(scene(page)).toHaveAttribute('data-wizard', '11,6');
   });
 
   test('a way turns him as well as moves him (D51, D146)', async ({ page }) => {
     await open(page, 'by-the-statues');
-    await expect(scene(page)).toHaveAttribute('data-actors', /dask:13,6,up/);
-    await run(page, 'wizard.move_right(4)\nwizard.move_down(3)');
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:13,7,up/);
+    await run(page, 'wizard.move_right(4)\nwizard.move_down(2)');
     await expect(page.locator('#way')).toHaveValue('looking_up');
     await expect(page.locator('.outcome-text')).toContainText('The teacher saw you');
     await page.locator('#way').selectOption('looking_down', { force: true });
-    await expect(scene(page)).toHaveAttribute('data-actors', /dask:13,6,down/);
+    await expect(scene(page)).toHaveAttribute('data-actors', /dask:13,7,down/);
   });
 
   for (const id of ['past-the-teacher', 'the-night-walk']) {

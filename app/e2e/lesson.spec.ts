@@ -66,6 +66,29 @@ for (const [locale, tryIt, goOn] of [
   });
 }
 
+for (const [locale, title, pageTwo, tryIt, goOn] of [
+  ['en-US', 'The right place', 'Page 2 of 2', 'Try it', 'Go on'],
+  ['es-ES', 'Cada cosa en su sitio', 'Página 2 de 2', 'Probar', 'Seguir'],
+] as const) {
+  test(`a lesson with nothing worth trying has two pages and no block, and goes on to its level (D173, ${locale})`, async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({ locale });
+    const page = await context.newPage();
+    await page.goto('/#lesson/the-right-place');
+    await expect(page.locator('.lesson-page h1')).toHaveText(title);
+    await page.locator('#lesson-next').click();
+    await expect(page.locator('#lesson-page')).toHaveText(pageTwo);
+    await expect(page.locator('#lesson-next')).toHaveCount(0);
+    await expect(page.locator('.lesson-run')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
+    await expect(page.locator('#lesson-try')).toHaveText(goOn);
+    await page.locator('#lesson-try').click();
+    await expect(page).toHaveURL(/#level\/your-bed$/);
+    await context.close();
+  });
+}
+
 test('a lesson read shows as done on the map, and opens its level', async ({ page }) => {
   await page.goto('/#lesson/what-a-program-is');
   for (let turn = 0; turn < 2; turn += 1) await page.locator('#lesson-next').click();

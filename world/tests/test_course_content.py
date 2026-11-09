@@ -149,6 +149,29 @@ def test_a_lesson_s_blocks_run_in_the_level_after_it(path, lang, gender):
         assert not stumbles, f"{path.name}'s example stumbles in {level.name}: {stumbles[0].data}"
 
 
+@pytest.mark.parametrize("path", LESSONS, ids=lambda p: p.name)
+def test_a_lesson_s_try_says_how_its_block_runs_and_only_a_block_has_one(path):
+    """`try` says how a lesson's block runs (refused, D84); a lesson with nothing worth
+    trying has no block and no `try` (D173)."""
+    lesson = json.loads((path / "lesson.json").read_text(encoding="utf-8"))
+    blocks = {
+        lang: TRY.findall((path / f"{lang}.md").read_text(encoding="utf-8")) for lang in LANGUAGES
+    }
+    if "try" in lesson:
+        assert lesson["try"] == "refused", f"{path.name}: try is refused or absent"
+        assert all(blocks.values()), f"{path.name} says how its block runs and has none"
+
+
+def test_the_right_place_has_two_pages_and_nothing_to_try():
+    """D173: sleeping where no bed is teaches nothing, so *The right place* keeps its two
+    pages of words and no block, and its last button leads to *Your bed*."""
+    path = CONTENT / "lessons" / "the-right-place"
+    for lang in LANGUAGES:
+        text = (path / f"{lang}.md").read_text(encoding="utf-8")
+        assert len(pages(text)) == 2 and not TRY.findall(text), lang
+    assert level_after("lesson:the-right-place") == CONTENT / "levels" / "your-bed"
+
+
 def level_api(item_id: str) -> list[str]:
     return list(Level.from_directory(CONTENT / "levels" / item_id).api)
 

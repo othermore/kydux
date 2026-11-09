@@ -73,6 +73,36 @@
   },
   "lowered": [
     {
+      "about": "Touched by store_door's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          8,
+          14
+        ],
+        [
+          8,
+          14
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "store_door"
+    },
+    {
+      "about": "Touched by store_door's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          9,
+          14
+        ],
+        [
+          9,
+          14
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "store_door"
+    },
+    {
       "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
       "cells": [
         [
@@ -88,6 +118,21 @@
     }
   ],
   "nudged": [
+    {
+      "about": "Touched by store_door's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          8,
+          13
+        ],
+        [
+          8,
+          13
+        ]
+      ],
+      "by": -0.3,
+      "leaf": "store_door"
+    },
     {
       "about": "Round the door (D149).",
       "cells": [

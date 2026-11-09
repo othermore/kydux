@@ -146,7 +146,9 @@ def difference_mask(
     """A thing's mask as the difference between two of a scene's pictures, in the
     painting's own pixels, within its box (D148): the colour distance smoothed and
     thresholded, cleaned of specks and of what is thinner than a thing, its holes closed
-    up to a size, and its pieces kept when they are not scraps."""
+    up to a size, what its outline closes in taken in (D155), and its pieces kept when
+    they are not scraps. It is 0 or 1 at every pixel; the page's resampling softens its
+    edge over one pixel."""
     options = {**DIFFERENCE, **(own or {})}
     height, width = base.shape[:2]
     x0, y0, x1, y1 = max(0, box[0]), max(0, box[1]), min(width, box[2]), min(height, box[3])
@@ -170,10 +172,27 @@ def difference_mask(
         reach = options["close"]
         mask = image_first.eroded(image_first.dilated(mask, reach), reach)
     mask = image_first.filled(mask, options["holes"])
+    mask = closed_in(mask, differs, options["holes"], speck)
     mask = kept(mask, options.get("scraps", 0.02))
     out = np.zeros(base.shape[:2], dtype=bool)
     out[crop] = mask
     return out
+
+
+def closed_in(mask: np.ndarray, differs: np.ndarray, holes: int, speck: int) -> np.ndarray:
+    """A mask with what its thing's outline closes in (D155): the thin lines that differ
+    and touch the mask, its own outline where the cleaning took it, close the parts whose
+    colour is nearly the floor's, a statue's robe by a wall; each part they close, no
+    larger than `holes`, is the thing's, with the outline beside it. A line the edit
+    moved apart from the thing closes nothing in."""
+    pieces = image_first.labels(differs | mask)
+    ours = np.unique(pieces[mask & (pieces > 0)])
+    outlined = np.isin(pieces, ours) & (pieces > 0)
+    enclosed = image_first.filled(outlined, holes) & ~outlined
+    if not enclosed.any():
+        return mask
+    lined = outlined & image_first.dilated(enclosed, speck + 2)
+    return image_first.filled(mask | enclosed | lined, holes)
 
 
 def in_box(shape: tuple[int, int], box: tuple[int, int, int, int]) -> np.ndarray:
@@ -1057,6 +1076,14 @@ def scene(settings: Settings) -> Path:
         "source": "SOURCE.md",
     }
     (out / "art.json").write_text(json.dumps(art, indent=2) + "\n")
+    # The cells an open leaf only touches, measured on the pictures just written, the
+    # figure drawn away from it; first, so that they are taken before the doorway's
+    # own nudge of the same cell (D157).
+    touched = leaf_nudges(settings.id, out)
+    for key in ("lowered", "nudged"):
+        if touched[key]:
+            art[key] = [*touched[key], *art.get(key, [])]
+    (out / "art.json").write_text(json.dumps(art, indent=2) + "\n")
     (out / "SOURCE.md").write_text(settings.data["source"])
     return out / "art.json"
 
@@ -1238,19 +1265,34 @@ def main(arguments: list[str]) -> int:
 #: LEAF_SHARE of its lower part, from LEAF_BAND of the cell down, its sides
 #: (LEAF_SIDE each) left out: where a figure standing there has its legs and feet,
 #: as tests/project/test_art_content.py says something of the painting stands on a
-#: cell.
+#: cell. On the leaf's own row and below, where a figure is drawn before the leaf, it
+#: lies under the leaf only when the leaf fills more than LEAF_ON of that part: the
+#: figure would stand in the wood (D157).
 LEAF_BAND = 0.45
 LEAF_SIDE = 0.2
 LEAF_SHARE = 0.2
+LEAF_ON = 0.9
+#: A cell an open leaf only touches (D157): the upright leaf, its columns at least
+#: LEAF_UPRIGHT cells tall (its shadow on the floor is lower), over more than
+#: LEAF_TOUCH of the figure's body, from LEAF_HEAD above the cell's top to its foot,
+#: its sides left out. A figure there is drawn LEAF_AWAY of a cell from the leaf: down
+#: below the leaf's row, sideways on it and above.
+LEAF_UPRIGHT = 1.25
+LEAF_TOUCH = 0.1
+LEAF_HEAD = 0.25
+LEAF_AWAY = 0.3
 
 
-def leaf_cells(scene_id: str, folder: Path | None = None) -> dict[str, list[list[int]]]:
-    """For each door of the exported scene with an open state, the cells walked on of
-    that state's row, its own doorway left out, that its open leaf lies on (D125),
-    measured on its exported picture where a figure on the cell is drawn (D149), in
-    reading order. A leaf cut by difference (D148), its shadow in its picture, is measured
-    on the rows above its own, whose figures it hides; a figure on its own row is drawn
-    before it."""
+def leaf_measures(scene_id: str, folder: Path | None = None) -> dict[str, dict[str, list]]:
+    """For each door of the exported scene with an open state, the cells walked on round
+    its open leaf, its own doorway left out, measured on its exported picture where a
+    figure on the cell is drawn (D149): `covers`, those it lies on (D125), in reading
+    order; and `touches`, those whose figure it only touches, each with the way the
+    figure is drawn away from it, `[x, y, "down" | "left" | "right"]` (D157). A leaf cut by
+    difference (D148), its shadow in its picture, is measured on the rows above its own,
+    whose figures it hides, and on its own and below, where it stands before the
+    figures behind it and a figure in front of it may touch it. The nudges the leaves
+    themselves give (`leaf` in art.json) are not counted: they follow from this."""
     folder = folder or REPO / "content" / "art" / "scenes" / scene_id
     art = json.loads((folder / "art.json").read_text())
     cell = art["cell"]
@@ -1262,6 +1304,7 @@ def leaf_cells(scene_id: str, folder: Path | None = None) -> dict[str, list[list
     nudges = {
         (x, y): part["by"]
         for part in reversed(art.get("nudged", []))
+        if "leaf" not in part
         for y in range(part["cells"][0][1], part["cells"][1][1] + 1)
         for x in range(part["cells"][0][0], part["cells"][1][0] + 1)
     }
@@ -1274,14 +1317,20 @@ def leaf_cells(scene_id: str, folder: Path | None = None) -> dict[str, list[list
         row = thing.get("rows", {}).get("open", thing["row"])
         doorway = doorways.get(name, [thing.get("at")])
         alpha = np.array(Image.open(folder / picture).convert("RGBA"))[..., 3] > 128
+        upright = alpha & (alpha.sum(axis=0) >= LEAF_UPRIGHT * cell)[None, :]
         left, top = thing["left"], thing["top"]
         side = int(cell * LEAF_SIDE)
         open_state = settings_of.get(name, {}).get("states", {}).get("open")
         by_difference = isinstance(open_state, dict) and "diff" in open_state
-        rows_of_leaf = range(max(0, top // cell), row) if by_difference else [row]
-        cells = []
+        last = (top + alpha.shape[0] - 1) // cell
+        rows_of_leaf = range(max(0, top // cell), last + 1) if by_difference else [row]
+        covers, touches = [], []
         for here in rows_of_leaf:
+            if here >= walked.shape[0]:
+                continue
             y0, y1 = here * cell + int(cell * LEAF_BAND) - top, (here + 1) * cell - top
+            b0 = here * cell - int(cell * LEAF_HEAD) - top
+            b1 = round((here + sweep.FOOT_IN_CELL) * cell) - top
             for x in range(walked.shape[1]):
                 if not walked[here, x] or [x, here] in doorway:
                     continue
@@ -1289,10 +1338,43 @@ def leaf_cells(scene_id: str, folder: Path | None = None) -> dict[str, list[list
                 x0, x1 = x * cell + side + shift - left, (x + 1) * cell - side + shift - left
                 band = alpha[max(0, y0) : max(0, y1), max(0, x0) : max(0, x1)]
                 share = band.sum() / ((y1 - y0) * (x1 - x0))
-                if share > LEAF_SHARE:
-                    cells.append([x, here])
-        found[name] = cells
+                if share > (LEAF_SHARE if here < row or not by_difference else LEAF_ON):
+                    covers.append([x, here])
+                    continue
+                if not by_difference:
+                    continue
+                body = upright[max(0, b0) : max(0, b1), max(0, x0) : max(0, x1)]
+                if body.sum() <= LEAF_TOUCH * (b1 - b0) * (x1 - x0):
+                    continue
+                if here > row:
+                    touches.append([x, here, "down"])
+                else:
+                    # Away from the side the leaf lies on, toward the doorway's middle.
+                    middle = (x0 + x1) / 2 - max(0, x0)
+                    toward = np.nonzero(body.any(axis=0))[0].mean()
+                    touches.append([x, here, "left" if toward > middle else "right"])
+        found[name] = {"covers": covers, "touches": touches}
     return found
+
+
+def leaf_cells(scene_id: str, folder: Path | None = None) -> dict[str, list[list[int]]]:
+    """For each door of the exported scene with an open state, the cells walked on that
+    its open leaf lies on (D125), as `leaf_measures` finds them."""
+    return {name: found["covers"] for name, found in leaf_measures(scene_id, folder).items()}
+
+
+def leaf_nudges(scene_id: str, folder: Path | None = None) -> dict[str, list[dict]]:
+    """The cells each open leaf only touches, as art.json's `lowered` and `nudged` name
+    them (D157): a figure there drawn LEAF_AWAY of a cell from the leaf, down or
+    sideways, each range one cell, with the door's name in `leaf`."""
+    out: dict[str, list[dict]] = {"lowered": [], "nudged": []}
+    for name, found in leaf_measures(scene_id, folder).items():
+        for x, y, way in found["touches"]:
+            key = "lowered" if way == "down" else "nudged"
+            by = -LEAF_AWAY if way == "left" else LEAF_AWAY
+            about = f"Touched by {name}'s open leaf, the figure drawn away from it (D157)."
+            out[key].append({"about": about, "cells": [[x, y], [x, y]], "by": by, "leaf": name})
+    return out
 
 
 #: The sheets a story's figure may be drawn from: the friend and the dormitory mate

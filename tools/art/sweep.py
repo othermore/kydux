@@ -208,7 +208,8 @@ def load(scene: str) -> Scene:
             (x0, y0), (x1, y1) = part["cells"]
             for y in range(y0, y1 + 1):
                 for x in range(x0, x1 + 1):
-                    getattr(found, key)[(x, y)] = part["by"]
+                    # The first range that names a cell is taken, as on the page.
+                    getattr(found, key).setdefault((x, y), part["by"])
     for row in art["rows"]:
         rgba = np.array(Image.open(folder / row["image"]).convert("RGBA"))
         kind = next((k for k in ("over", "under", "cover", "hangs") if row.get(k)), "")

@@ -66,6 +66,36 @@
   },
   "lowered": [
     {
+      "about": "Touched by left_door's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          5,
+          10
+        ],
+        [
+          5,
+          10
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "left_door"
+    },
+    {
+      "about": "Touched by right_door's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          14,
+          10
+        ],
+        [
+          14,
+          10
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "right_door"
+    },
+    {
       "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
       "cells": [
         [

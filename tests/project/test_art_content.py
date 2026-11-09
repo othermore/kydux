@@ -150,6 +150,23 @@ def test_the_cells_an_open_leaf_lies_on_are_the_cells_its_scene_names(scene):
     assert {door: cells for door, cells in measured.items() if cells} == named, scene
 
 
+def test_a_cell_an_open_leaf_only_touches_is_walked_with_the_figure_drawn_away():
+    """D157: in the room of two doors, each leaf swung open toward the viewer stands with
+    its foot on the corridor's row; the cell beside that foot, where the wizard walks
+    from the doorway along the corridor, is not covered: a figure there is drawn 0.3 of
+    a cell lower, clear of the leaf."""
+    art = json.loads((CONTENT / "art" / "scenes" / "the-two-doors" / "art.json").read_text())
+    measured = export_scene.leaf_measures("the-two-doors")
+    for door, cell in (("left_door", [5, 10]), ("right_door", [14, 10])):
+        assert cell not in measured[door]["covers"], door
+        assert [*cell, "down"] in measured[door]["touches"], door
+        lowered = [part for part in art["lowered"] if part["cells"] == [cell, cell]]
+        assert lowered and lowered[0]["by"] == 0.3 and lowered[0]["leaf"] == door
+    # The first range that names a cell is the one the page takes: the leaf's.
+    first = next(part for part in art["lowered"] if part["cells"][0] == [14, 10])
+    assert first.get("leaf") == "right_door"
+
+
 def test_a_scene_a_morning_story_is_told_on_has_its_morning_ground():
     """A story under the morning light draws its scene's morning ground: the sky,
     the windows and the outside by day, and, where the scene is painted whole by

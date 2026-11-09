@@ -1585,6 +1585,51 @@ def test_a_mask_stays_in_its_box_and_closes_its_small_holes():
     assert mask[92:98, 82:88].all()
 
 
+def test_a_mask_is_whole_inside_its_thing_s_outline(tmp_path, monkeypatch):
+    """D155: a statue whose robe is nearly the wall's colour, its outline a thin dark
+    line, is opaque inside that outline, at the painting's size and at the page's."""
+    rng = np.random.default_rng(3)
+    base = (120 + rng.integers(-3, 4, (200, 200, 3))).astype(np.uint8)
+    shown = base.copy()
+    # The robe, six levels lighter than the wall; its outline, three pixels of dark;
+    # and its face, the one part that differs strongly.
+    shown[40:110, 60:120] = np.clip(base[40:110, 60:120].astype(int) + 6, 0, 255)
+    shown[40:43, 60:120] = shown[107:110, 60:120] = 30
+    shown[40:110, 60:63] = shown[40:110, 117:120] = 30
+    shown[45:62, 66:114] = 60
+    mask = export_scene.difference_mask(shown, base, (0, 0, 200, 200))
+    assert mask[40:110, 60:120].all(), "nothing inside the outline is left out"
+    assert not mask[:35].any() and not mask[115:].any() and not mask[:, :55].any()
+    picture = {"picture": "statue.png", "diff": {}}
+    scene = scene_of_pictures(
+        tmp_path,
+        monkeypatch,
+        {"base.png": base, "statue.png": shown},
+        {"statue": {"box": [0, 0, 1, 1], "solid": True, "states": {"standing": picture}}},
+    )
+    pixels, alpha = export_scene.state_alpha(
+        scene, scene.things["statue"], picture, base, base, (0, 0, 200, 200), None
+    )
+    assert set(np.unique(alpha)) <= {0.0, 1.0}
+    rgba = np.dstack([pixels, (alpha * 255).astype(np.uint8)])
+    small = export_scene.aligned_rgba(rgba, scene.grid, 1, 1)[..., 3]
+    # At the page's size, the thing's inside is opaque; only its edge is soft.
+    cell = export_scene.CELL
+    rows = slice(round(0.23 * cell), round(0.53 * cell))
+    assert small[rows, round(0.32 * cell) : round(0.58 * cell)].min() == 255
+
+
+def test_a_line_the_edit_moved_apart_from_the_thing_closes_nothing_in():
+    """D155: what the thing's outline closes in is the thing's; a frame of lines the
+    edit moved, apart from it, takes nothing into its mask."""
+    base = np.full((200, 200, 3), 120, dtype=np.uint8)
+    shown = a_leaf_on(base)
+    shown[20:23, 150:190] = shown[60:63, 150:190] = 30
+    shown[20:63, 150:153] = shown[20:63, 187:190] = 30
+    mask = export_scene.difference_mask(shown, base, (0, 0, 200, 200))
+    assert not mask[:, 145:].any()
+
+
 def test_trace_writes_a_state_s_mask_and_measures_what_leaked(tmp_path, monkeypatch):
     import trace
 

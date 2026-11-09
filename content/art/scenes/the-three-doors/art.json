@@ -96,6 +96,51 @@
   },
   "nudged": [
     {
+      "about": "Touched by door_1's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          11,
+          12
+        ],
+        [
+          11,
+          12
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_1"
+    },
+    {
+      "about": "Touched by door_2's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          11,
+          8
+        ],
+        [
+          11,
+          8
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_2"
+    },
+    {
+      "about": "Touched by door_3's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          11,
+          4
+        ],
+        [
+          11,
+          4
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_3"
+    },
+    {
       "about": "Round the top arch and the third door (D149).",
       "cells": [
         [
@@ -177,5 +222,37 @@
       "by": -0.2
     }
   ],
-  "source": "SOURCE.md"
+  "source": "SOURCE.md",
+  "lowered": [
+    {
+      "about": "Touched by door_2's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          10,
+          9
+        ],
+        [
+          10,
+          9
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_2"
+    },
+    {
+      "about": "Touched by door_3's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          10,
+          5
+        ],
+        [
+          10,
+          5
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_3"
+    }
+  ]
 }

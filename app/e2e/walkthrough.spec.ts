@@ -5,7 +5,7 @@
 // e2e/shots/walkthrough-<chapter>/, which tools/walkthrough.py makes a document of.
 // Only `npm run walkthrough -- <chapter>` runs it (KYDUX_WALKTHROUGH).
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
@@ -96,6 +96,17 @@ async function route(page: Page, id: string, way: string): Promise<void> {
       })
       .catch(() => {});
     await page.waitForTimeout(350);
+    // No picture is taken through a door's fade: the door as it is at the tick.
+    await page
+      .waitForFunction(
+        () => {
+          const scene = document.querySelector<HTMLElement>('#scene');
+          return !scene?.dataset.fading && !scene?.dataset.opening;
+        },
+        null,
+        { timeout: 10_000 },
+      )
+      .catch(() => {});
     await page.locator('.scene-frame').screenshot({ path: `${OUT}level-${id}-${way}-tick-${pad(tick)}.png` });
   }
 }
@@ -147,6 +158,9 @@ async function level(page: Page, id: string): Promise<void> {
 }
 
 test('the chapter from its first stop to its last', async ({ page }) => {
+  // A run's pictures only: a picture of an earlier run, of a tick this one does not
+  // take, would be put in the document as if it were of this one.
+  rmSync(OUT, { recursive: true, force: true });
   mkdirSync(OUT, { recursive: true });
   const about = JSON.parse(readFileSync(`${CONTENT}chapters/${chapter}/chapter.json`, 'utf8'));
   await seedWizard(page, MARTA);

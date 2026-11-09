@@ -101,6 +101,7 @@ import {
   sleepFrame,
   thingDepthOn,
 } from './painted';
+import { readingTicks } from './bubble';
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
@@ -130,8 +131,6 @@ import { blockedText, friendText, sleepingText } from './words';
 
 /** How long one tick lasts at speed 1. */
 export const TICK_MS = 400;
-/** How many ticks a word said stays over the wizard. */
-const SAY_TICKS = 3;
 
 /** How long the scene takes to fade out and in when the level starts again, and how
  * long it stays out (D75). */
@@ -163,8 +162,10 @@ export interface SceneHandle {
   zoom(step: 1 | -1): boolean;
   /** Whether the camera can zoom one step in (1) or out (-1). */
   canZoom(step: 1 | -1): boolean;
-  /** After a run won, the wizard celebrates; how long it takes, 0 when it does not. */
-  celebrate(): number;
+  /** A run played out: the wizard celebrates it when it is `won` (14.3); how long the
+   * page waits before its card, the celebration and the words on the scene read to
+   * their end, the longer of them (D175). */
+  settle(won: boolean): number;
   /** Where the wizard stands on the page, a box in the page's pixels. */
   wizardBox(): { left: number; top: number; right: number; bottom: number };
   /** Who is told when the map is opened, with the scene's plan at that tick, the run
@@ -476,9 +477,10 @@ class LevelScene extends Phaser.Scene {
     else breakSeal(this, glow, this.playback.tickDuration * 0.8);
   }
 
-  /** How many ticks a word said stays: in a story, until the next step. */
-  private get sayTicks(): number {
-    return this.options.story ? Number.POSITIVE_INFINITY : SAY_TICKS;
+  /** How many ticks words said stay: in a level, as long as they take to read (D175);
+   * in a story, until the next step. */
+  private sayTicks(text: string): number {
+    return this.options.story ? Number.POSITIVE_INFINITY : readingTicks(text, TICK_MS);
   }
 
   create(): void {
@@ -615,6 +617,7 @@ class LevelScene extends Phaser.Scene {
       height: this.map.height * TILE,
       wrap: this.options.story ? 6 : 4,
       figures: () => [this.wizard, ...[...this.actors.values()].map((actor) => actor.sprite)],
+      tickMs: TICK_MS,
     });
     const story = this.options.story;
     this.view = new SceneCamera(this, this.parentNode, {
@@ -674,8 +677,9 @@ class LevelScene extends Phaser.Scene {
       this.parentNode.dataset.state = state;
       // A run brings the camera back to the wizard.
       if (state === 'playing') this.follow();
-      // A word said near the end of the run would stay for ever: it fades.
-      if (state === 'done' && !this.options.story) this.time.delayedCall(this.playback.tickDuration * SAY_TICKS, () => this.speech.clearBubble());
+      // Words said near the end of the run, with no tick to end them, go once they are
+      // read (D175).
+      if (state === 'done' && !this.options.story) this.time.delayedCall(this.speech.settle(), () => this.speech.expireRead());
     });
     this.restart();
     this.parentNode.dataset.state = this.playback.state;
@@ -1037,7 +1041,10 @@ class LevelScene extends Phaser.Scene {
       else if (event.kind === 'unsealed') this.unseal(String(event.data.id), instant);
       // A word said to a door while its seal holds: the wizard thinks why nothing happened.
       else if (event.kind === 'unheard') {
-        if (!instant) this.speech.think(blockedText('unheard', 'door'), tick, this.sayTicks);
+        if (!instant) {
+          const unheard = blockedText('unheard', 'door');
+          this.speech.think(unheard, tick, this.sayTicks(unheard));
+        }
       }
       else if (event.kind === 'pull') this.pull(event, instant);
       // A door's leaf, opening, moves whoever stands where it comes to lie (D125).
@@ -1422,10 +1429,16 @@ class LevelScene extends Phaser.Scene {
     return timers;
   }
 
-  /** After a run won, the wizard celebrates (14.3): how long it takes, for the page
-   * to wait for it before the win card; 0 when it does not, in a story, on a scene
-   * without art, or for a reader who asks for less motion. */
-  celebrate(): number {
+  /** A run played out (D175): the wizard celebrates it when it is won, and how long the
+   * page waits before the card is the longer of that and the words on the scene read
+   * to their end. */
+  settle(won: boolean): number {
+    return Math.max(won ? this.celebrate() : 0, this.speech.settle());
+  }
+
+  /** After a run won, the wizard celebrates (14.3): how long it takes; 0 when it does
+   * not, in a story, on a scene without art, or for a reader who asks for less motion. */
+  private celebrate(): number {
     if (this.options.story) return 0;
     // A wizard asleep is not woken to celebrate: the night falls once it lies in its
     // bed, it sleeps, and the morning comes (D124); the card waits for all of it.
@@ -1581,12 +1594,16 @@ class LevelScene extends Phaser.Scene {
         if (!instant) this.nudge(this.wizard, facing ?? 'down', duration);
         if (!instant) play('bump');
         // A friend in the way: the wizard thinks who (D66).
-        if (!instant && event.data.by === 'friend') this.speech.think(friendText(String(event.data.id)), tick, this.sayTicks);
+        if (!instant && event.data.by === 'friend') {
+          const who = friendText(String(event.data.id));
+          this.speech.think(who, tick, this.sayTicks(who));
+        }
         break;
       }
       case 'say':
         if (!instant) {
-          this.speech.say(String(event.data.text ?? ''), tick, this.sayTicks, this.wizard, 'wizard');
+          const said = String(event.data.text ?? '');
+          this.speech.say(said, tick, this.sayTicks(said), this.wizard, 'wizard');
           play('say');
         }
         break;
@@ -1684,7 +1701,8 @@ class LevelScene extends Phaser.Scene {
           ...(typeof event.data.spell === 'string' ? { spell: event.data.spell } : {}),
           ...(Array.isArray(event.data.things) ? { things: event.data.things.map(String) } : {}),
         };
-        this.speech.think(blockedText(String(event.data.reason), thing?.kind ?? null, detail), tick, this.sayTicks);
+        const why = blockedText(String(event.data.reason), thing?.kind ?? null, detail);
+        this.speech.think(why, tick, this.sayTicks(why));
         if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
         break;
       }
@@ -1733,7 +1751,8 @@ class LevelScene extends Phaser.Scene {
       // A story's actor speaks, comes into sight and goes (D74).
       case 'say':
         if (!instant) {
-          this.speech.say(String(event.data.text ?? ''), this.shownTick, this.sayTicks, actor.sprite, event.actor);
+          const said = String(event.data.text ?? '');
+          this.speech.say(said, this.shownTick, this.sayTicks(said), actor.sprite, event.actor);
           play('say');
         }
         break;
@@ -2040,8 +2059,8 @@ export async function startScene(
         wizardBox() {
           return scene.wizardBox();
         },
-        celebrate() {
-          return scene.celebrate();
+        settle(won) {
+          return scene.settle(won);
         },
         onMap(opened, closed) {
           scene.listenForMap(opened, closed);

@@ -70,9 +70,10 @@ export interface SceneLike {
    * and waits for it while nothing is seen, then fades in, and resolves once it is
    * shown (D75, D121); a scene without it is only reset. */
   restartShow?(ready?: () => Promise<void>): Promise<void>;
-  /** The wizard celebrating a run won: how long it takes, for the outcome to wait
-   * for it (14.3); a scene without it shows the outcome at once. */
-  celebrate?(): number;
+  /** A run played out, the wizard celebrating it when it is `won` (14.3): how long the
+   * outcome waits, for the celebration and for the words on the scene to be read to
+   * their end (D175); a scene without it shows the outcome at once. */
+  settle?(won: boolean): number;
 }
 
 const DEFAULT_TICK_LIMIT = 1000;
@@ -369,15 +370,15 @@ export class RunController {
     this.changed();
   }
 
-  /** The run played out: a run won is celebrated first, its outcome after it, unless
-   * another run or a restart came meanwhile; a playback the child stopped finishes
-   * nothing (D177). */
+  /** The run played out: a run won is celebrated first, and any run's last words are
+   * read to their end, its outcome after them, unless another run or a restart came
+   * meanwhile (D175); a playback the child stopped finishes nothing (D177). */
   private done(scene: SceneLike): void {
     if (this.stopped) {
       this.halt();
       return;
     }
-    const wait = this.world?.status === 'won' ? (scene.celebrate?.() ?? 0) : 0;
+    const wait = scene.settle?.(this.world?.status === 'won') ?? 0;
     if (wait <= 0) {
       this.finish();
       return;

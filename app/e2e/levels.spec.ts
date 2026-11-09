@@ -212,14 +212,60 @@ test.describe('the way in (D171)', () => {
       await page.locator('#start').click();
       await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
       await page.locator('#speed').selectOption('4');
-      await run(page, 'wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")\nwizard.move_up(3)');
+      await page.locator('.cm-content').click();
+      await page.keyboard.press('ControlOrMeta+A');
+      await page.keyboard.insertText('wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")\nwizard.move_up(3)');
+      await page.locator('#run').click();
+      await expect(scene(page)).toHaveAttribute('data-thought', words, { timeout: 30_000 });
       await expect(scene(page)).toHaveAttribute('data-wizard', '8,6');
-      await expect(scene(page)).toHaveAttribute('data-thought', words);
       // Won, and not a star lost to a bump: the hall's cell refused it, no wall hit it.
-      await expect(page.locator('.win-card #star-reasons li').nth(1)).toHaveAttribute('data-kept', 'true');
+      await expect(page.locator('.win-card #star-reasons li').nth(1)).toHaveAttribute('data-kept', 'true', {
+        timeout: 30_000,
+      });
       await context.close();
     });
   }
+});
+
+test.describe('the card waits for the words (D175)', () => {
+  test("the threshold's words stay until they are read, and the card comes after them", async ({ page }) => {
+    await page.goto('/#level/the-way-in');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('4');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")\nwizard.move_up(5)');
+    await page.locator('#run').click();
+    const words = 'Do not go in yet: stay on the threshold, past the door.';
+    await expect(scene(page)).toHaveAttribute('data-thought', words, { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    // The run is over and its words are still being read: no card over them.
+    await page.waitForTimeout(1_500);
+    await expect(scene(page)).toHaveAttribute('data-thought', words);
+    await expect(page.locator('.win-card')).toHaveCount(0);
+    await expect(page.locator('.outcome')).toBeHidden();
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s37-words-before-the-card.png` });
+    // Once they are read, they go, and the card comes.
+    await expect(page.locator('.win-card')).toBeVisible({ timeout: 15_000 });
+    await expect(scene(page)).not.toHaveAttribute('data-thought', /./);
+  });
+
+  test('a run won with a word said at its end shows its card once the word is gone', async ({ page }) => {
+    await page.goto('/#level/the-password');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await page.locator('#speed').selectOption('4');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.say("ambrel")\nwizard.move_up(6)\nwizard.say("Here I am, at last!")');
+    await page.locator('#run').click();
+    await expect(scene(page)).toHaveAttribute('data-bubble', 'Here I am, at last!', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(page.locator('.win-card')).toHaveCount(0);
+    await expect(page.locator('.win-card')).toBeVisible({ timeout: 15_000 });
+    await expect(scene(page)).not.toHaveAttribute('data-bubble', /./);
+  });
 });
 
 const CHAPTER_2 = levelsOf('02-the-library');

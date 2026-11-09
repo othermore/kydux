@@ -1,7 +1,8 @@
 // How wide a speaker's bubble is and where it goes: at most a third of the scene's
 // width, taller as it needs; above them, or below where above it would cover someone
-// else and below it would not, or above and to one side of whoever it would cover. Kept
-// apart from speech.ts so that it is tested without Phaser.
+// else and below it would not, or above and to one side of whoever it would cover; and
+// how long words stay said, as long as they take to read (D175). Kept apart from
+// speech.ts so that it is tested without Phaser.
 
 /** The tiles a bubble's words wrap at: what the page asks, at most a third of the scene. */
 export function bubbleWrap(wrap: number, columns: number): number {
@@ -41,4 +42,24 @@ export function bubbleShift(above: Box, figures: readonly Box[], sceneWidth: num
   };
   const ways = [right, left].filter(clear).sort((one, other) => Math.abs(one) - Math.abs(other));
   return ways[0] ?? 0;
+}
+
+/** How long words take to read, in milliseconds (D175): 0.8 seconds, and 50
+ * thousandths more for each of their characters. */
+export function readingMs(text: string): number {
+  return 800 + 50 * [...text].length;
+}
+
+/** How many ticks of `tickMs` words said in a level stay: their reading time, three
+ * ticks at least (D175). */
+export function readingTicks(text: string, tickMs: number): number {
+  return Math.max(3, Math.ceil(readingMs(text) / tickMs));
+}
+
+/** The milliseconds from `now` until the last of the words on the scene is gone, each
+ * said until a time; 0 when none is on. Words said for ever, a sleeper's thought, are
+ * not read to an end, and do not count. */
+export function settleMs(untils: readonly number[], now: number): number {
+  const ends = untils.filter((until) => Number.isFinite(until));
+  return ends.length === 0 ? 0 : Math.max(0, ...ends.map((until) => until - now));
 }

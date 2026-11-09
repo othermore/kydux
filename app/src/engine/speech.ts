@@ -1,15 +1,16 @@
 // The words said on the scene: a bubble with a tail over whoever says them, and
 // the wizard's thoughts in a grey cloud when an action could not be done (D28).
-// Each stays some ticks, follows who it is over as they walk, sits below them
-// when there is no room above, and is never held past the scene's sides. Its
-// words are never smaller on the screen than at zoom 1 (D106): zoomed out, they
-// are drawn larger. The scene's parent says what is said: data-bubble and
+// Each stays as many ticks as its words take to read (D175), and once the run is
+// over, until that time has passed; it follows who it is over as they walk, sits
+// below them when there is no room above, and is never held past the scene's
+// sides. Its words are never smaller on the screen than at zoom 1 (D106): zoomed
+// out, they are drawn larger. The scene's parent says what is said: data-bubble and
 // data-speaker, data-thought, and data-words-scale.
 
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
 import { wordsScale } from './zooming';
-import { type Box, bubbleBelow, bubbleShift, bubbleWrap } from './bubble';
+import { type Box, bubbleBelow, bubbleShift, bubbleWrap, settleMs } from './bubble';
 
 /** How far a bubble's drawn box and tail reach beyond its words, at most: a
  * container's bounds are its words' alone. */
@@ -28,13 +29,18 @@ export interface SpeechParts {
   wrap: number;
   /** Every other figure on the scene, which a bubble keeps clear of where it can. */
   figures: () => Phaser.GameObjects.Sprite[];
+  /** How long a tick lasts at speed 1: words said for some ticks are read for as long. */
+  tickMs: number;
 }
 
 export class Speech {
   private bubble: Phaser.GameObjects.Container | null = null;
   private bubbleUntil = 0;
+  /** When, on the scene's clock, the bubble's words are read to their end. */
+  private bubbleRead = 0;
   private thought: Phaser.GameObjects.Container | null = null;
   private thoughtUntil = 0;
+  private thoughtRead = 0;
   /** Where a bubble or a thought sits: its width, and whether it is below who it is over. */
   private place = { width: 0, below: false, shift: 0 };
   /** Who a bubble or a thought is over: the wizard, or an actor who speaks. */
@@ -57,6 +63,26 @@ export class Speech {
   expire(tick: number, instant: boolean): void {
     if (this.bubble && (instant || tick >= this.bubbleUntil)) this.clearBubble();
     if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
+  }
+
+  /** The milliseconds until the last of the words on the scene is read to its end and
+   * gone, 0 when none is on (D175): what the card waits for. */
+  settle(): number {
+    const read = [...(this.bubble ? [this.bubbleRead] : []), ...(this.thought ? [this.thoughtRead] : [])];
+    return settleMs(read, this.scene.time.now);
+  }
+
+  /** A bubble and a thought gone once they are read to their end, when no tick comes
+   * any more to end them: after a run. */
+  expireRead(): void {
+    const now = this.scene.time.now;
+    if (this.bubble && now >= this.bubbleRead) this.clearBubble();
+    if (this.thought && now >= this.thoughtRead) this.clearThought();
+  }
+
+  /** When words said now for `ticks` ticks are read to their end. */
+  private readAt(ticks: number): number {
+    return this.scene.time.now + ticks * this.parts.tickMs;
   }
 
   /** The camera's zoom, the scene's pixels to the screen's: the words drawn larger
@@ -139,6 +165,7 @@ export class Speech {
     this.place = { width, below, shift: 0 };
     this.thought = this.scene.add.container(...this.anchor(), [cloud, words]).setDepth(11).setScale(this.scale);
     this.thoughtUntil = tick + ticks;
+    this.thoughtRead = this.readAt(ticks);
     this.parent.dataset.thought = text.replaceAll('`', '');
   }
 
@@ -234,6 +261,7 @@ export class Speech {
     words.setY(top + pad);
     this.bubble = this.scene.add.container(x, y, [box, words]).setDepth(10).setScale(this.scale);
     this.bubbleUntil = tick + ticks;
+    this.bubbleRead = this.readAt(ticks);
     this.parent.dataset.bubble = plain;
     this.parent.dataset.speaker = who;
   }

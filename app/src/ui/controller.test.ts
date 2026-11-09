@@ -251,8 +251,8 @@ describe('RunController', () => {
 
   it('lets the wizard celebrate a run won before it says so', async () => {
     const { runtime, scene, controller, last } = setUp();
-    const celebrating = scene as FakeScene & { celebrate(): number };
-    celebrating.celebrate = () => 600;
+    const celebrating = scene as FakeScene & { settle(won: boolean): number };
+    celebrating.settle = (won) => (won ? 600 : 0);
     controller.run('wizard.move_right(2)');
     runtime.answer(world('won', moves(2), 2));
     await vi.waitFor(() => expect(last().state).toBe('playing'));
@@ -264,8 +264,8 @@ describe('RunController', () => {
 
   it('drops a celebration cut short by a new run', async () => {
     const { runtime, scene, controller, last } = setUp();
-    const celebrating = scene as FakeScene & { celebrate(): number };
-    celebrating.celebrate = () => 600;
+    const celebrating = scene as FakeScene & { settle(won: boolean): number };
+    celebrating.settle = (won) => (won ? 600 : 0);
     controller.run('wizard.move_right(2)');
     runtime.answer(world('won', moves(2), 2));
     await vi.waitFor(() => expect(last().state).toBe('playing'));
@@ -273,6 +273,27 @@ describe('RunController', () => {
     controller.run('wizard.move_right()');
     vi.advanceTimersByTime(600);
     expect(last().outcome).toBeNull();
+  });
+
+  it('waits for the last words of a run not won before its card, as long as they take to read (D175)', async () => {
+    const { runtime, scene, controller, last } = setUp();
+    const asked: boolean[] = [];
+    const speaking = scene as FakeScene & { settle(won: boolean): number };
+    speaking.settle = (won) => {
+      asked.push(won);
+      return 3700;
+    };
+    controller.run('wizard.move_right(2)');
+    runtime.answer(world('incomplete', moves(2), null));
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    // The playback ends: the scene is asked how long to wait, the run not won.
+    while (asked.length === 0) vi.advanceTimersByTime(10);
+    expect(asked).toEqual([false]);
+    expect(last().outcome).toBeNull();
+    vi.advanceTimersByTime(3690);
+    expect(last().outcome).toBeNull();
+    vi.advanceTimersByTime(20);
+    expect(last().outcome).toMatchObject({ kind: 'incomplete' });
   });
 
   it('says a goal walked over and not stopped at', async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type Box, bubbleBelow, bubbleShift, bubbleWrap } from './bubble';
+import { type Box, bubbleBelow, bubbleShift, bubbleWrap, readingMs, readingTicks, settleMs } from './bubble';
 
 const box = (left: number, top: number, right: number, bottom: number): Box => ({ left, top, right, bottom });
 
@@ -39,5 +39,26 @@ describe('a speaker\'s bubble', () => {
 
   it('stays where it is when no side clears everyone', () => {
     expect(bubbleShift(box(0, 0, 200, 80), [box(90, 10, 110, 70)], 200)).toBe(0);
+  });
+});
+
+describe('the words read to their end (D175)', () => {
+  it('stay 0.8 seconds and 50 thousandths for each character, three ticks at least', () => {
+    expect(readingMs('Hola')).toBe(1000);
+    expect(readingTicks('Hola', 400)).toBe(3);
+    // The threshold's sentence, 58 characters: 3.7 seconds, ten ticks of 400.
+    const sentence = 'No entres todavía: quédate en el umbral, pasada la puerta.';
+    expect([...sentence]).toHaveLength(58);
+    expect(readingMs(sentence)).toBe(3700);
+    expect(readingTicks(sentence, 400)).toBeGreaterThanOrEqual(9);
+    expect(readingTicks(sentence, 400)).toBeLessThanOrEqual(10);
+  });
+
+  it('settle when the last of them is read, at once with none, and never for ever', () => {
+    expect(settleMs([], 1000)).toBe(0);
+    expect(settleMs([1500, 4700], 1000)).toBe(3700);
+    expect(settleMs([900], 1000)).toBe(0);
+    expect(settleMs([Number.POSITIVE_INFINITY], 1000)).toBe(0);
+    expect(settleMs([Number.POSITIVE_INFINITY, 2200], 1000)).toBe(1200);
   });
 });

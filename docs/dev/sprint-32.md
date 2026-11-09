@@ -20,8 +20,8 @@ piece, never a push, never a timer; every word for the player through
 `t()` or a content file, in English and Spanish; Gemini writes every text
 the child reads from a brief, the owner's own words fixed; documents and
 comments in the present; no content edited while a browser run is going.
-Section 5 is the Gemini budget, which goes past the chapter's seventy and
-needs the owner's yes; section 6 the owner's acceptance test; section 7 the
+Section 5 is the Gemini budget, which goes past the chapter's seventy with
+the owner's yes (the ceiling is 100, 2026-11-08); section 6 the owner's acceptance test; section 7 the
 hand-over; section 8 the prompt.
 
 ## 1. Decisions taken here
@@ -347,9 +347,8 @@ for the review, as section 7.
 ## 6. Gemini images
 
 Fifty-two of the chapter's seventy are spent. This sprint asks **24**
-images (section 5: 6 + 18) and allows 8 retries: **32 at most, to 84 of a
-new ceiling of 85 for the chapter**, which the owner sets by passing this
-sprint's prompt. Each image is named in its commit; at the ceiling the
+images (section 5: 6 + 18) and allows 8 retries: **32 at most, to 84 of
+the chapter's ceiling of 100**, which the owner set on 2026-11-08. Each image is named in its commit; at the ceiling the
 implementer stops and says so.
 
 ## 7. What the owner tries
@@ -400,9 +399,9 @@ preview on 4174 is stopped when you are done. The owner's rule of this
 sprint: Gemini paints every state of a scene from one base and every
 mask is the difference between two of its pictures (D148); no tool
 paints, moves or pastes anything the child sees. Gemini paints at most
-32 images in this sprint, each named in its commit, to a ceiling of 85
-for the chapter, which the owner has set by giving you this prompt; at
-the ceiling you stop and say so. Every text the child reads comes from
+32 images in this sprint, each named in its commit, within the
+chapter's ceiling of 100, which the owner set on 2026-11-08; at 32 you
+stop and say so. Every text the child reads comes from
 the brief the plan names, the owner's own words word for word; you read
 and correct every draft before it enters content/. The plan decides
 everything; where it does not, take the smallest choice that keeps its
@@ -413,7 +412,7 @@ your own hunks; commit promptly. Hand over as section 7 asks: a report
 in Spanish with only pictures of the final commit (every door closed and
 open, the crossing, the plan of three scenes, a contact sheet), the
 commits, the differences from the plan with their reasons, the images
-spent against 85, the walkthrough document's path, what is left open,
+spent against 100, the walkthrough document's path, what is left open,
 and end with the prompt for the designer's review in English, in a code
 block.
 ```

@@ -559,12 +559,16 @@ test.describe('the dark and the holes (D52, D53, D167)', () => {
     await expect(scene(page)).toHaveAttribute('data-wizard', '2,7');
   });
 
-  test('osto beside the hole holds it closed', async ({ page }) => {
-    await page.goto('/#level/the-opening-hole');
+  test('osto beside the hole that never closes holds it closed (D178)', async ({ page }) => {
+    await page.goto('/#level/the-night-walk');
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'wizard.move_right(2)\nwizard.cast("osto")\nwizard.wait(3)\nprint(hole.closed)');
-    await expect(page.locator('.printed')).toHaveText('True');
+    await run(
+      page,
+      'wizard.move_down()\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\nwizard.move_down(2)\n' +
+        'print(hole.closed)\nwizard.cast("osto")\nprint(hole.closed)',
+    );
+    await expect(page.locator('.printed')).toHaveText('False\nTrue');
   });
 });

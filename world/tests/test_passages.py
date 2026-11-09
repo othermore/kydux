@@ -656,8 +656,7 @@ def test_by_the_statues_gives_its_bonus_for_ending_right_on_the_mark_with_a_seco
         (
             "the-night-walk",
             "wizard.move_down()\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\n"
-            "wizard.move_down(2)\nwhile not hole.closed:\n    wizard.wait()\n"
-            "wizard.move_down(3)\n",
+            'wizard.move_down(2)\nwizard.cast("osto")\nwizard.move_down(3)\n',
             "wizard.move_down(4)\n",
             16,
         ),
@@ -727,8 +726,8 @@ def test_no_fixed_wait_a_child_finds_by_trial_crosses_the_hole_in_every_period()
 
 def test_the_way_down_s_hole_takes_both_cells_of_the_corridor():
     """D167: the way down's hole lies on (10, 7) and (9, 7), as it is painted, so that no
-    one walks round it: a program that walks down column 9 bumps on it while it is open,
-    and crosses once it is closed."""
+    one walks round it: a program that walks down column 9 bumps on it, open as it always
+    is (D178), and crosses it held by osto."""
     level = real("the-night-walk")
     hole = next(thing for thing in level.things if thing.id == "hole")
     assert set(hole.cells) == {Position(9, 7), Position(10, 7)}
@@ -741,9 +740,7 @@ def test_the_way_down_s_hole_takes_both_cells_of_the_corridor():
     walked = run_code(level, to_the_edge + wait_open + "wizard.move_down()\n")
     bumps = [e.data for e in walked.events if e.kind == "bump"]
     assert bumps == [{"at": [9, 6], "facing": "down", "by": "hole"}]
-    crossed = run_code(
-        level, to_the_edge + "while not hole.closed:\n    wizard.wait()\nwizard.move_down(3)\n"
-    )
+    crossed = run_code(level, to_the_edge + 'wizard.cast("osto")\nwizard.move_down(3)\n')
     walks = [e.data["to"] for e in crossed.events if e.kind == "move" and e.actor == "wizard"]
     assert walks[-3:] == [
         [9, 7],
@@ -927,3 +924,31 @@ def test_a_position_s_two_numbers_are_its_x_and_its_y():
     }
     result = run_code(Level.from_dict(level), "print(key.position.x, key.position.y)\n")
     assert result.stdout == "3 1\n"
+
+
+def test_the_night_walk_is_crossed_with_osto_in_its_three_ways():
+    """D178: the way home's hole never closes on its own; osto from the cell above it is
+    the way across, and a while that waits for it to close ends at the tick limit."""
+    level = real("the-night-walk")
+    (hole,) = [thing for thing in level.things if thing.kind == "hole"]
+    assert hole.period == 0
+    won = run_code(level, solution("the-night-walk"))
+    assert won.status == "won"
+    assert [way_id for way_id, way in won.ways if way.status == "won"] == ["near", "middle", "far"]
+    for _, way in won.ways:
+        assert all(goal.met for goal in way.goals if goal.kind in ("cast", "no_bumps"))
+    waiting = solution("the-night-walk").replace(
+        'wizard.cast("osto")\n', "while not hole.closed:\n    wizard.wait()\n"
+    )
+    assert run_code(level, waiting).status == "too_many_ticks"
+
+
+def test_the_opening_hole_does_not_know_osto():
+    """D178: the hole that opens and closes is crossed with a while; osto is not yet a
+    spell there, and is refused as unknown."""
+    level = real("the-opening-hole")
+    assert "osto" not in level.spells
+    result = run_code(level, 'wizard.move_right(2)\nwizard.cast("osto")\n')
+    refused = [event for event in result.events if event.kind == "blocked"]
+    assert refused and refused[0].data["reason"] == "unknown_spell"
+    assert run_code(level, solution("the-opening-hole")).status == "won"

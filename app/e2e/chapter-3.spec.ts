@@ -294,7 +294,9 @@ test.describe('the storeroom', () => {
   test.use({ locale: 'en-US' });
   test.beforeEach(({ page }) => seedWizard(page, PABLO));
 
-  test('the hole shows while it is open, and osto holds it closed (D167), the storeroom dark (D162)', async ({ page }) => {
+  test('the hole shows while it is open, the storeroom dark (D162), and osto is no spell there yet (D178)', async ({
+    page,
+  }) => {
     await open(page, 'the-opening-hole', '1');
     await expect(scene(page)).toHaveAttribute('data-dark', 'true');
     await expect(scene(page)).toHaveAttribute('data-holes', 'hole:closed');
@@ -304,7 +306,20 @@ test.describe('the storeroom', () => {
     await expect(scene(page)).toHaveAttribute('data-drawn', /hole:3\.\d+,7\.\d+/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hole-open.png` });
     await page.locator('#speed').selectOption('4');
-    await start(page, 'wizard.move_right(2)\nwizard.cast("osto")\nwizard.wait(4)\nprint(hole.closed)');
+    await start(page, 'wizard.move_right(2)\nwizard.cast("osto")');
+    await expect(scene(page)).toHaveAttribute('data-thought', 'I do not know a spell called “osto”.', {
+      timeout: 30_000,
+    });
+    await expect(scene(page)).not.toHaveAttribute('data-held', /hole/);
+  });
+
+  test("the way home's hole is open from the start, and osto holds it closed with its crack of light (D167, D178)", async ({
+    page,
+  }) => {
+    await open(page, 'the-night-walk');
+    await expect(scene(page)).toHaveAttribute('data-holes', 'hole:open');
+    const toTheEdge = 'wizard.move_down()\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\nwizard.move_down(2)\n';
+    await start(page, `${toTheEdge}wizard.cast("osto")\nprint(hole.closed)`);
     await expect(scene(page)).toHaveAttribute('data-held', 'hole', { timeout: 30_000 });
     await expect(page.locator('.printed')).toHaveText('True', { timeout: 30_000 });
     // Held, its floor is whole, with a crack of light round it (D167).
@@ -397,14 +412,14 @@ test.describe('what the page draws of the chapter', () => {
 
   test("the way down's hole takes (9, 7) as well as (10, 7): closed under the wizard on it, open once off it, a bump while open (D167)", async ({ page }) => {
     // The friends stand on (9, 2) and (9, 3): the wizard steps into column 9 at the door,
-    // to (9, 6), the cell above the hole's second cell. The hole is closed for five ticks
-    // and open for five, from tick 0 closed.
+    // to (9, 6), the cell above the hole's second cell. The hole never closes on its own
+    // (D178): osto holds it while the wizard steps on, and the hold ends there.
     const toTheEdge =
       'wizard.move_down()\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\nwizard.move_left()\nwizard.move_down(2)\n';
-    const onIt = `${toTheEdge}while not hole.closed:\n    wizard.wait()\nwizard.move_down()\nwizard.wait(6)\n`;
+    const onIt = `${toTheEdge}wizard.cast("osto")\nwizard.move_down()\nwizard.wait(6)\n`;
     await open(page, 'the-night-walk');
-    // On (9, 7) from tick 10, through ticks the hole is open: it stays closed under the
-    // wizard, as it does on its one cell (D53).
+    // On (9, 7) once the hold is over, the hole open: it stays closed under the wizard, as
+    // it does on its one cell (D53).
     await run(page, onIt);
     await expect(scene(page)).toHaveAttribute('data-wizard', '9,7');
     await expect(scene(page)).toHaveAttribute('data-holes', 'hole:closed');

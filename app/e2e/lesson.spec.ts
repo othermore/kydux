@@ -95,6 +95,7 @@ for (const [lesson, level] of [
   ['words', 'the-password'],
   ['things-to-carry', 'the-wand'],
   ['your-first-spell', 'the-sealed-door'],
+  ['the-portal', 'the-night-walk'],
 ] as const) {
   test(`${lesson} has two pages and no block, and goes on to ${level} (D174)`, async ({ page }) => {
     await page.goto(`/#lesson/${lesson}`);

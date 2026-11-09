@@ -49,7 +49,7 @@
           7
         ]
       ],
-      "period": 5
+      "period": 0
     }
   ],
   "actors": [
@@ -116,6 +116,10 @@
       "id": "door"
     },
     {
+      "kind": "cast",
+      "spell": "osto"
+    },
+    {
       "kind": "reach",
       "marker": "E"
     },
@@ -124,8 +128,7 @@
       "id": "dask"
     },
     {
-      "kind": "uses",
-      "member": "closed",
+      "kind": "no_bumps",
       "bonus": true
     }
   ],

@@ -175,6 +175,7 @@ NOTHING_TO_TRY = {
     "waiting": 1,
     "while": 2,
     "kirra-and-osto": 2,
+    "the-portal": 2,
 }
 
 

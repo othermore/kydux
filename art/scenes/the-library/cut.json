@@ -848,6 +848,7 @@
       "about": "Eldra's old red book, standing upright among the others on the middle shelf of the bookcase in her little room (room_books), which fendra brings down from the room's doorway (D129). Cut by the polygon traced round it on its outline (`traced`), so that nothing of the books beside it comes with it; its picture without it is the painting with its own box taken from the bookcase without it (room_books_without), the gap where it stood."
     },
     "wenna_door": {
+      "kind": "door",
       "box": [
         6.6,
         15.3,
@@ -1188,6 +1189,7 @@
       "reach": 0.05
     },
     "centre_door": {
+      "kind": "door",
       "box": [
         6.6,
         7.25,
@@ -1532,6 +1534,7 @@
       "reach": 0.2
     },
     "room_door": {
+      "kind": "door",
       "box": [
         1.0,
         4.7,

@@ -35,6 +35,7 @@
         "closed": "left_door-closed.webp",
         "open": "left_door-open.webp"
       },
+      "kind": "door",
       "under": true,
       "rows": {
         "open": 9
@@ -53,6 +54,7 @@
         "closed": "right_door-closed.webp",
         "open": "right_door-open.webp"
       },
+      "kind": "door",
       "under": true,
       "rows": {
         "open": 9

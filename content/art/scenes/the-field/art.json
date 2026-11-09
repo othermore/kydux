@@ -156,6 +156,7 @@
         "ajar": "gate-ajar.webp",
         "open": "gate-open.webp"
       },
+      "kind": "door",
       "under": true
     },
     "seal_gate": {
@@ -166,6 +167,7 @@
         "closed": "seal_gate-closed.webp",
         "open": "seal_gate-open.webp"
       },
+      "kind": "door",
       "under": true,
       "rune": "painted"
     },
@@ -177,6 +179,7 @@
         "closed": "castle_door-closed.webp",
         "open": "castle_door-open.webp"
       },
+      "kind": "door",
       "under": true
     },
     "wand": {

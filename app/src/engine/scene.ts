@@ -108,7 +108,7 @@ import { type LightName, type LightState, NIGHT_MS, SceneLight, WHOLE_MORNING } 
 import { Speech } from './speech';
 import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
-import { MarkSilhouette, Silhouette } from './silhouette';
+import { heldOutline, MarkSilhouette, Silhouette } from './silhouette';
 import { LONG, Playback } from './playback';
 import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
@@ -249,8 +249,8 @@ class LevelScene extends Phaser.Scene {
   private cone!: Phaser.GameObjects.Graphics;
   /** The cells that hide every figure in them (D135). */
   private enchanted = new Set<string>();
-  /** The ring round a hole while osto holds it closed, by the hole's id (D167). */
-  private rings = new Map<string, Phaser.GameObjects.Ellipse>();
+  /** The crack of light round a hole while osto holds it closed, by its id (D167). */
+  private heldOutlines = new Map<string, Phaser.GameObjects.Container>();
   /** Who is told when the map opens, and when a run started again closes it (D134). */
   private mapOpened: ((view: PlanView) => void) | null = null;
   private mapClosed: (() => void) | null = null;
@@ -1773,8 +1773,8 @@ class LevelScene extends Phaser.Scene {
       }
     }
     // Each hole as a step taken now would find it, and closed under the wizard, on any of
-    // its cells: on a painted scene, its picture seen while it is open, and a ring while
-    // osto holds it closed (D167).
+    // its cells: on a painted scene, its picture seen while it is open, and a crack of
+    // light round it over the closed floor while osto holds it closed (D167).
     const holes: string[] = [];
     const held: string[] = [];
     for (const thing of this.map.things) {
@@ -1784,12 +1784,18 @@ class LevelScene extends Phaser.Scene {
       const holds = this.holds.get(thing.id) ?? [];
       const closed = under || holeClosed(thing.period ?? 1, holds, this.shownTick + 1);
       const image = this.things.get(thing.id);
-      if (image?.texture.key.startsWith('art-')) image.setVisible(!closed);
-      else image?.setFrame(closed ? 'closed' : 'open');
+      if (image?.texture.key.startsWith('art-')) {
+        // Its picture by the state's name: open, or closed where it has a closed picture;
+        // with none, the floor of the ground shows (D167).
+        const shown = `art-${this.artOf(thing.id)}-${closed ? 'closed' : 'open'}`;
+        const drawn = this.textures.exists(shown);
+        if (drawn && image.texture.key !== shown) image.setTexture(shown);
+        image.setVisible(drawn);
+      } else image?.setFrame(closed ? 'closed' : 'open');
       holes.push(`${thing.id}:${closed ? 'closed' : 'open'}`);
       const holding = holeHeld(holds, this.shownTick + 1);
       if (holding) held.push(thing.id);
-      this.ringOf(thing.id, cells).setVisible(holding);
+      this.heldOutlineOf(thing.id)?.setVisible(holding);
     }
     // The dark over the dark area (the dark rooms, or the whole map), but the wizard's
     // tile and its eight neighbours (D52, D73).
@@ -1920,24 +1926,19 @@ class LevelScene extends Phaser.Scene {
     this.lit = true;
   }
 
-  /** The ring round a hole's cells, one or two side by side, seen while osto holds it
-   * closed (D167). */
-  private ringOf(id: string, cells: readonly Tile[]): Phaser.GameObjects.Ellipse {
-    const known = this.rings.get(id);
+  /** The crack of light round a hole, seen while osto holds it closed (D167): the floor
+   * shows whole, and the crack follows the hole's open picture, on one cell or two; on a
+   * placeholder scene, the placeholder's round hole. */
+  private heldOutlineOf(id: string): Phaser.GameObjects.Container | null {
+    const known = this.heldOutlines.get(id);
     if (known) return known;
-    const xs = cells.map(([x]) => x);
-    const ys = cells.map(([, y]) => y);
-    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
-    const [cx, cy] = [((x0 + x1 + 1) / 2) * TILE, ((y0 + y1 + 1) / 2) * TILE];
-    const [wide, tall] = [(x1 - x0) * TILE + TILE * 1.24, (y1 - y0) * TILE + TILE * 1.24];
-    const ring = this.add
-      .ellipse(cx, cy, wide, tall)
-      .setStrokeStyle(4, 0xffe066, 0.95)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setDepth(2.9);
-    if (!this.still) this.tweens.add({ targets: ring, alpha: 0.55, duration: 500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-    this.rings.set(id, ring);
-    return ring;
+    const image = this.things.get(id);
+    if (!image) return null;
+    const key = image.texture.key.startsWith('art-') ? `art-${this.artOf(id)}-open` : thingKey('hole-shape');
+    if (!this.textures.exists(key)) return null;
+    const outline = heldOutline(this, image, key, this.still);
+    this.heldOutlines.set(id, outline);
+    return outline;
   }
 
   private nudge(target: Phaser.GameObjects.Sprite, facing: Facing, ms: number): void {

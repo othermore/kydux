@@ -18,6 +18,12 @@ WORK = REPO / "art" / "raw" / "game"
 #: How much lower a figure is drawn on a floor row right under a wall's foot, so that it
 #: stands in the corridor and not on the wall (D149).
 LOWERED_ROW = 0.3
+#: The kinds of thing that open and close: a door and a hole (D167). Either may have
+#: an `open` state and a `closed` one; what each is follows from its kind, never from
+#: the states it happens to have.
+KINDS = ("door", "hole")
+#: The states that only a thing of one of KINDS has.
+OPENING_STATES = ("open", "closed", "ajar")
 
 
 @dataclass
@@ -27,7 +33,8 @@ class Settings:
     y1), the row its foot stands on, whether it is solid, the edit without it, and
     its states, each the picture showing it, against that edit (`painting` for the
     painting itself, None for nothing drawn), with `hull`, `reach`, `largest`,
-    `whole_box` and `rune` where it needs them. A patch of the ground is a box in
+    `whole_box` and `rune` where it needs them, and its `kind`, `door` or `hole`, when it
+    opens and closes (D167). A patch of the ground is a box in
     the page's pixels (x0, y0, x1, y1), filled from the band of the same height
     right above it, faded into it: where an edit without a thing left a trace of it.
     What the cut is told of the painting where it asks it (D93, D94): `grounds`,
@@ -111,6 +118,18 @@ class Settings:
         ]
         return [*self.data.get("lowered", []), *whole]
 
+    def refuse_unkinded(self) -> None:
+        """A thing that opens and closes says whether it is a door or a hole (`kind`),
+        and only such a thing has a kind (D167)."""
+        for name, thing in self.things.items():
+            kind = thing.get("kind")
+            if kind is not None and kind not in KINDS:
+                raise ValueError(f"{self.id}: {name} is of no kind that opens: {kind}")
+            if kind is None and set(thing.get("states") or {}) & set(OPENING_STATES):
+                raise ValueError(
+                    f"{self.id}: {name} opens and closes but names no kind, door or hole"
+                )
+
     def refuse_long_nudges(self) -> None:
         """A figure walks its own column; only the cells round a door or an arch are
         nudged, never a whole column or row (D149)."""
@@ -125,6 +144,7 @@ def settings(scene_id: str) -> Settings:
     path = SCENES / scene_id / "cut.json"
     found = Settings(scene_id, json.loads(path.read_text(encoding="utf-8")))
     found.refuse_long_nudges()
+    found.refuse_unkinded()
     return found
 
 

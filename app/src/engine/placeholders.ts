@@ -582,6 +582,13 @@ export function makePlaceholders(
   hole.texture.add('closed', 0, 0, 0, TILE, TILE);
   hole.texture.add('open', 0, TILE, 0, TILE, TILE);
   hole.texture.refresh();
+  // Its shape alone, round which the crack of light shows while osto holds it (D167).
+  const shape = canvas(scene, thingKey('hole-shape'), TILE, TILE);
+  shape.ctx.fillStyle = '#000';
+  shape.ctx.beginPath();
+  shape.ctx.arc(TILE / 2, TILE / 2, TILE * 0.38, 0, Math.PI * 2);
+  shape.ctx.fill();
+  shape.texture.refresh();
 
   for (const kind of ['key', 'book', 'wand', 'potion']) {
     const thing = canvas(scene, thingKey(kind), TILE, TILE);

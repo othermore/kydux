@@ -43,6 +43,7 @@
         "closed": "store_door-closed.webp",
         "open": "store_door-open.webp"
       },
+      "kind": "door",
       "under": true,
       "rows": {
         "open": 13
@@ -72,6 +73,7 @@
       "states": {
         "open": "hole-open.webp"
       },
+      "kind": "hole",
       "at": [
         3,
         7

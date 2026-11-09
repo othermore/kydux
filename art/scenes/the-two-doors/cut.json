@@ -9,6 +9,7 @@
   },
   "things": {
     "left_door": {
+      "kind": "door",
       "box": [
         5.3,
         6.95,
@@ -51,6 +52,7 @@
       "about": "The left door: closed and open are Gemini's edits of the base, each cut by the difference (D148)."
     },
     "right_door": {
+      "kind": "door",
       "box": [
         11.4,
         6.95,

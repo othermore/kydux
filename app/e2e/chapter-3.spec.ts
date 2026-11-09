@@ -270,6 +270,9 @@ test.describe('the storeroom', () => {
     await start(page, 'wizard.move_right(2)\nwizard.cast("osto")\nwizard.wait(4)\nprint(hole.closed)');
     await expect(scene(page)).toHaveAttribute('data-held', 'hole', { timeout: 30_000 });
     await expect(page.locator('.printed')).toHaveText('True', { timeout: 30_000 });
+    // Held, its floor is whole, with a crack of light round it (D167).
+    await expect(scene(page)).not.toHaveAttribute('data-drawn', /hole:/);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hole-held.png` });
   });
 
   test('the room is dark until kirra, and the key is not seen (D52)', async ({ page }) => {

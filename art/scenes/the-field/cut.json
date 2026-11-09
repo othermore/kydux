@@ -9,6 +9,7 @@
   },
   "things": {
     "gate": {
+      "kind": "door",
       "about": "Half open between closed and open, as the page shows it opening (13.9).",
       "box": [
         6.95,
@@ -28,6 +29,7 @@
       "opening": 3.6
     },
     "seal_gate": {
+      "kind": "door",
       "about": "Down to its threshold, a little into the row below, drawn under whoever stands there; its mask filled from edge to edge in every row, since the wood near its latch is the colour of the sand behind. The painting draws this door's rune; the page draws one on the others (D79).",
       "box": [
         7.45,
@@ -66,6 +68,7 @@
       "under": true
     },
     "castle_door": {
+      "kind": "door",
       "about": "Open onto the lit hall; the dark doorway is the picture without the door, which the states are cut against.",
       "box": [
         7.45,

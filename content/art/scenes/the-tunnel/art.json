@@ -22,6 +22,7 @@
       "states": {
         "closed": "door_a-closed.webp"
       },
+      "kind": "door",
       "at": [
         3,
         10
@@ -34,6 +35,7 @@
       "states": {
         "closed": "door_b-closed.webp"
       },
+      "kind": "door",
       "at": [
         11,
         10

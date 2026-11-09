@@ -132,6 +132,7 @@
         "closed": "front_door-closed.webp",
         "open": "front_door-open.webp"
       },
+      "kind": "door",
       "hours": {
         "morning": {
           "closed": "front_door-closed-morning.webp",

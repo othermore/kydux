@@ -78,6 +78,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import figures as looks  # noqa: E402
 import image_first  # noqa: E402
+import scene_settings  # noqa: E402
 import sprites  # noqa: E402
 import sweep  # noqa: E402
 from scene_settings import Settings, scenes, settings  # noqa: E402
@@ -968,6 +969,9 @@ def scene(settings: Settings) -> Path:
                 at_hour[hour][state] = f"{name}-{state}-{hour}.webp"
                 webp(state_sprite(pixels, alpha, *shape), out / at_hour[hour][state])
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
+        # A door or a hole, which opens and closes (D167).
+        if "kind" in thing:
+            things[name]["kind"] = thing["kind"]
         if hours:
             things[name]["hours"] = at_hour
         if thing.get("under"):
@@ -1502,7 +1506,12 @@ def checks(settings: Settings, out: Path = RAW / "game-check") -> list[Path]:
         level = json.loads(path.read_text())
         if level.get("scene") == settings.id and "start" in level:
             starts.append((sweep.LOOK, *level["start"]))
-    opened = {name: "open" for name, thing in settings.things.items() if "open" in thing["states"]}
+    # Every door and hole drawn open, by its kind (D167).
+    opened = {
+        name: "open"
+        for name, thing in settings.things.items()
+        if thing.get("kind") in scene_settings.KINDS and "open" in thing["states"]
+    }
     out.mkdir(parents=True, exist_ok=True)
     written = []
     cell = CELL

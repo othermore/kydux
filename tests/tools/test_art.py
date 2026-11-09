@@ -325,6 +325,40 @@ def test_every_scene_s_settings_name_its_pictures_and_its_things():
         assert settings.map.is_file(), name
 
 
+def test_a_thing_that_opens_and_closes_is_a_door_or_a_hole_by_its_kind():
+    """D167: what a thing is follows from its kind, never from its states: a door and a
+    hole may each have an open and a closed state, and a thing that opens names its kind."""
+    door = {"kind": "door", "states": {"closed": "door-closed.webp"}}
+    hole = {"kind": "hole", "states": {"closed": "a.webp", "open": "b.webp"}}
+    assert sweep.is_door(door) and not sweep.is_door(hole)
+    assert not sweep.is_door({"states": {"closed": "a.webp", "open": "b.webp"}})
+    sources = {"folder": "x", "edits": "x", "painting": "p", "grid": "g", "ground": "p"}
+
+    def settings(**thing: object) -> scene_settings.Settings:
+        thing = {"box": [0, 0, 1, 1], "row": 0, **thing}
+        return scene_settings.Settings("kinds", {"sources": sources, "things": {"it": thing}})
+
+    settings(kind="hole", states={"open": "painting", "closed": None}).refuse_unkinded()
+    settings(kind="door", states={"closed": "painting"}).refuse_unkinded()
+    settings(states={"lying": "painting"}).refuse_unkinded()
+    with pytest.raises(ValueError, match="names no kind, door or hole"):
+        settings(states={"open": "painting"}).refuse_unkinded()
+    with pytest.raises(ValueError, match="of no kind that opens"):
+        settings(kind="chest", states={"open": "painting"}).refuse_unkinded()
+
+
+def test_every_exported_door_and_hole_carries_its_kind():
+    """art.json says the kind its scene's settings give each door and hole (D167)."""
+    for name in export_scene.scenes():
+        art = sweep.CONTENT / "art" / "scenes" / name / "art.json"
+        if not art.is_file():
+            continue
+        exported = json.loads(art.read_text())["things"]
+        for thing_name, thing in scene_settings.settings(name).things.items():
+            if thing_name in exported:
+                assert exported[thing_name].get("kind") == thing.get("kind"), (name, thing_name)
+
+
 def test_the_strongest_differences_from_the_ground_are_kept_in_the_mask():
     # A pixel a hundred levels from its ground on every channel: tripled in its own
     # bytes it would wrap round below the threshold and be lost.
@@ -1042,7 +1076,11 @@ def test_a_picture_at_another_hour_is_measured_box_by_box_on_the_painting(tmp_pa
         },
         "things": {
             "wall": {"box": [0.3, 0.5, 1.8, 2.0], "static": True},
-            "door": {"box": [2.3, 0.6, 3.7, 1.6], "states": {"closed": "painting"}},
+            "door": {
+                "kind": "door",
+                "box": [2.3, 0.6, 3.7, 1.6],
+                "states": {"closed": "painting"},
+            },
             "key": {"box": [0.3, 2.3, 0.7, 2.7], "states": {"lying": "painting"}},
         },
     }

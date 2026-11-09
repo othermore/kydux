@@ -54,10 +54,12 @@ export interface SceneArt {
   }[];
   /** Each thing that opens or is picked up: its row, its corner in the painting's
    * pixels, its states' images, and `at`, the cell it is painted on, when a level
-   * may place it on another (D85). */
+   * may place it on another (D85); a door or a hole says so in `kind`, and either may
+   * have an `open` state and a `closed` one (D167). */
   things: Record<
     string,
     {
+      kind?: 'door' | 'hole';
       row: number;
       left: number;
       top: number;
@@ -337,7 +339,16 @@ export function paintThing(
   const id = thing.art ?? thing.id;
   const painted = art.scene.things[id];
   if (!painted) return null;
-  const state = thing.kind === 'door' ? (thing.open ? 'open' : 'closed') : Object.keys(painted.states)[0];
+  // A door in its state, a hole drawn open (the scene shows it while it is open, or its
+  // closed picture where it has one, D167), anything else in its first state.
+  const state =
+    thing.kind === 'door'
+      ? thing.open
+        ? 'open'
+        : 'closed'
+      : thing.kind === 'hole'
+        ? 'open'
+        : Object.keys(painted.states)[0];
   const open = thing.kind === 'door' && thing.open === true;
   const lying = thing.kind === 'key';
   const smaller = lying ? KEY_SCALE : 1;
@@ -403,13 +414,13 @@ export function planPictures(
           ]
         : [];
     });
-  // A key or a hole in its first state, moved from the cell it is painted on; a
-  // key smaller, on its cell's middle where a figure on it stands (D164).
+  // A hole open and a key in its first state, moved from the cell it is painted on; a
+  // key smaller, on its cell's middle where a figure on it stands (D164, D167).
   const shownThings = things
     .filter((thing) => thing.kind !== 'door' && thing.kind !== 'bed')
     .flatMap(({ id, kind, tile, art: painted }) => {
       const thing = scene.things[painted ?? id];
-      const state = thing ? Object.values(thing.states)[0] : undefined;
+      const state = thing ? (kind === 'hole' ? thing.states.open : Object.values(thing.states)[0]) : undefined;
       if (!thing || !state) return [];
       const [atX, atY] = thing.at ?? tile;
       const key =

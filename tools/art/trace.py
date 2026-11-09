@@ -353,7 +353,7 @@ def fit(settings: scene_settings.Settings, picture: Path) -> list[dict]:
     found = []
     for name, thing in settings.things.items():
         states = thing.get("states", {})
-        if not (thing.get("static") or "closed" in states):
+        if not (thing.get("static") or (thing.get("kind") == "door" and states)):
             continue
         x0, y0, x1, y1 = export_scene.native_box(settings.grid, thing["box"])
         x0, y0 = max(reach, x0), max(reach, y0)

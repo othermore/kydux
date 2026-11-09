@@ -57,7 +57,7 @@ A chapter's scene is one painting. Its map is read from the painting.
 5. Write the scene's settings, `art/scenes/<scene>/cut.json`, the field's
    as the model: where its pictures are in `art/raw/`, each thing that
    opens or is picked up (its box in cells, its row, its states and the
-   edit without it), the rows of the walls' tops (`cuts`), the row above
+   edit without it, and its `kind`, `door` or `hole`, when it opens), the rows of the walls' tops (`cuts`), the row above
    which the painting stays ground (`castle`), the patches of the ground,
    and the colours the painting is read by (`thresholds`), when its light
    is not the field's.
@@ -452,11 +452,16 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    leaf whole and the same door open as shut, a doorway showing the floor beyond, no line
    of the shut door left on an open one, no figure hidden where nothing stands.
 
-A hole that opens in the floor (D167) has one state, `open`: Gemini's picture of it open, cut
-by the ellipse traced round it (`traced`), drawn while it is open; closed, it is the ground's
-floor. A thing with a `closed` state is a door to the tools; a hole's `open` has no leaf, so no
-`covers` and no nudges are measured for it. The way down's hole is painted across the
-corridor's two cells, and the level lays it on both (`cells`).
+A thing that opens and closes says what it is in its settings, `"kind": "door"` or
+`"kind": "hole"` (D167), and the export writes it into art.json; the tools and the page tell a
+door from a hole by it, never by the states it has, and a settings file that leaves it out of a
+thing with an `open`, `closed` or `ajar` state is refused. Either kind may have an `open` state
+and a `closed` one. A door's open state is its leaf, whose `covers` and nudges are measured; a
+hole's lies in the floor and has none. The holes of chapter 3 have one state, `open`: Gemini's
+picture of the hole open, cut by the ellipse traced round it (`traced`), drawn while it is open;
+closed, the page shows the hole's `closed` picture where it has one, and here, with none, the
+ground's floor. The way down's hole is painted across the corridor's two cells, and the level
+lays it on both (`cells`).
 
 A door whose open leaf hides a cell a figure could stand on names it in `covers` (D125, D157):
 a leaf cut by difference is measured on every row it reaches. On the rows above its own, where

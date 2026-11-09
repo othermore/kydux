@@ -9,6 +9,7 @@
   },
   "things": {
     "door_1": {
+      "kind": "door",
       "box": [
         9.2,
         10.0,
@@ -51,6 +52,7 @@
       "about": "Door 1: shut as painted, open Gemini's edit of the base, each cut by the difference (D148)."
     },
     "door_2": {
+      "kind": "door",
       "box": [
         9.2,
         6.0,
@@ -93,6 +95,7 @@
       "about": "Door 2: shut as painted, open Gemini's edit of the base, each cut by the difference (D148)."
     },
     "door_3": {
+      "kind": "door",
       "box": [
         9.2,
         2.0,

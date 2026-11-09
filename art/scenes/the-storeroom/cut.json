@@ -9,6 +9,7 @@
   },
   "things": {
     "store_door": {
+      "kind": "door",
       "box": [
         8.3,
         10.0,
@@ -195,6 +196,7 @@
       "about": "The key, cut by the polygon traced round it, and drawn on the cell the level lays it on (D85, D109)."
     },
     "hole": {
+      "kind": "hole",
       "box": [
         2.8,
         6.98,

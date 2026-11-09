@@ -177,6 +177,7 @@
         "closed": "wenna_door-closed.webp",
         "open": "wenna_door-open.webp"
       },
+      "kind": "door",
       "under": true,
       "rows": {
         "open": 17
@@ -195,6 +196,7 @@
         "closed": "centre_door-closed.webp",
         "open": "centre_door-open.webp"
       },
+      "kind": "door",
       "under": true,
       "rows": {
         "open": 9
@@ -213,6 +215,7 @@
         "closed": "room_door-closed.webp",
         "open": "room_door-open.webp"
       },
+      "kind": "door",
       "under": true,
       "rows": {
         "open": 6

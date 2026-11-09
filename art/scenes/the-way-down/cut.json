@@ -9,6 +9,7 @@
   },
   "things": {
     "door": {
+      "kind": "door",
       "box": [
         8.25,
         5.0,
@@ -148,6 +149,7 @@
       "about": "The torch beside the hole, over the hole."
     },
     "hole": {
+      "kind": "hole",
       "box": [
         8.98,
         6.98,

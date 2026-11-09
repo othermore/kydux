@@ -9,6 +9,7 @@
   },
   "things": {
     "door_a": {
+      "kind": "door",
       "box": [
         2.55,
         8.75,
@@ -42,6 +43,7 @@
       "about": "A door that never opens, cut by the difference from the base (D148)."
     },
     "door_b": {
+      "kind": "door",
       "box": [
         10.6,
         8.75,

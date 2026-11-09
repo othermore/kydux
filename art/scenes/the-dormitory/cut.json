@@ -190,6 +190,7 @@
       ]
     },
     "front_door": {
+      "kind": "door",
       "about": "The door from the common room to the corridor, in the front wall seen from the front (D104): its doorway the cells 12,13 and 12,14, shut over whoever stands in it (D95), its leaf within the doorway's own shape, the open doorway's fill grown over the arch's inner line (`doorway`, D113); open, swung out of it nearly flat against the front wall on its left, its foot on the corridor floor (D111, door_swung), cut by the polygon traced round the leaf, its hinges and its shadow on the wall (`leaf`, D113), drawn among the rows as the front wall is, the doorway showing the common room's own planks down to the corridor floor's line, taken into the ground from Gemini's picture of the door open (`without`, D108, D148); it rests shut, and a story opens and closes it (D103).",
       "box": [
         9.2,

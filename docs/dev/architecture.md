@@ -44,8 +44,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the wizard's outline where something painted hides more than
                 a quarter of it, a revealed thing's glow wherever
                 something covers it, and the goal's ring, as thin as a figure's
-                outline, where a cut-out is drawn over it (silhouette.ts,
-                cover.ts, D85, D107, D160, D168),
+                outline, where a cut-out is drawn over it, and the crack of
+                light round a hole osto holds closed (silhouette.ts, cover.ts,
+                D85, D107, D160, D167, D168),
                 the wizard asleep
                 (D84), the night that falls once it sleeps and the morning
                 after it, and a morning story's light (light.ts, D124), the
@@ -264,7 +265,7 @@ tiles are `[x, y]`.
 | `cast` | wizard | `spell`, `at` | the wand is pointed and a point of light flies from it, to the thing the spell takes or a tile ahead, and bursts in a ring |
 | `pull` | the thing, in the wizard's tick | `id`, `from`, `to` | once the spell's light reaches it, the thing flies to the wizard's hands, in its `pulled` state when it is painted one, a book glowing (D47), and stays there, held (D127) |
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
-| `hold` | the hole, in the wizard's tick | `id`, `from`, `until`: the ticks it is held closed | a ring round the hole's cells, and it stays closed for those ticks (D53, D167) |
+| `hold` | the hole, in the wizard's tick | `id`, `from`, `until`: the ticks it is held closed | it stays closed for those ticks, its floor whole and a crack of light round it (D53, D167) |
 | `map` | `world`, in the wizard's tick | `at` | the playback pauses, and once the wand is seen pointed the plan's window opens over the page, drawn at that tick; closed, the playback goes on (D134) |
 | `give` | wizard | `id`, `to`, `at` | the wizard turns to the figure that takes the thing, which faces the wizard; then the thing floats from the middle of the wizard's hands to the middle of that figure, where it is drawn, and fades there (D48) |
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
@@ -2361,28 +2362,40 @@ one overturns stays, marked as superseded.
   placed before it and, for a mark's, no solid pixel of a cut-out, and they are drawn
   last, over everything. Rules out Nuri's label over Teku's figure on P3's plan.
 - **D167 — The thing in the floor is a hole that opens.** Decided 2026-11-08 by the owner
-  (*el dibujo muestra un agujero redondo que aparece y desaparece; cambiemos los textos; en el
-  código `hole.closed` o `hole.open`*). The thing's kind is `hole`, in `level.json` and in the
-  child's code: closed for `period` ticks and open for as many, from tick 0 closed, and closed
-  while `osto` holds it (D53's rule). `hole.closed` is true while the floor covers it and
-  `hole.open` is its opposite, both looking at the next tick, so that `while not hole.closed:`
-  and `while hole.open:` are one wait after which a step lands; a step onto an open hole
-  bumps (`by: "hole"`); `osto`, cast beside any of its cells, holds it closed from the next
-  tick it is closed, for `HOLD_TICKS`. A hole lies on one cell or two side by side (`cells`,
-  as a door's, D150, `at` the first; the loader refuses others), open and closed together;
-  the way down's lies on (10, 7) and (9, 7), as it is painted, so that no one walks round it,
-  and the figures by its half-open door are drawn 0.2 toward the doorway's middle (D149 b).
-  Its picture is the art's state `open` (D148), drawn while it is open and never under the
-  wizard, who holds it closed standing on either cell (D53); while `osto` holds it, a ring
-  glows round its cells, an oval over both where it has two. To the art tools a thing with a
-  `closed` state is a door, and a hole's one state has no leaf. The lesson *Luz y trampas* teaches the two waits as one;
-  the levels' solutions use `while not hole.closed:` and their bonus asks `closed`; *El
-  agujero que se abre* (`the-opening-hole`) is played in four ways, *Se abre cada tres ticks*
-  to *Se abre cada siete ticks*. In the words the child reads the hole is *un agujero que se
-  abre en el suelo*, *una trampa mágica, o un portal oscuro* where it is first told, and
-  *otro de esos agujeros* afterwards; no text says *losa*, nor that anything goes and comes,
-  which a content test holds. Supersedes D138 and D53's names. Rules out a slab in any text
-  and `in_place` in any code.
+  (*el dibujo muestra un agujero redondo que aparece y desaparece; cambiemos los textos; en
+  el código `hole.closed` o `hole.open`*). The thing's kind is `hole`, in `level.json` and
+  in the child's code: closed for `period` ticks and open for as many, from tick 0 closed,
+  and closed while `osto` holds it (D53's rule). `hole.closed` is true while the floor
+  covers it and `hole.open` is its opposite, both looking at the next tick, so that `while
+  not hole.closed:` and `while hole.open:` are one wait after which a step lands; a step
+  onto an open hole bumps (`by: "hole"`); `osto`, cast beside any of its cells, holds it
+  closed from the next tick it is closed, for `HOLD_TICKS`. A hole lies on one cell or two
+  side by side (`cells`, as a door's, D150, `at` the first; the loader refuses others), open
+  and closed together; the way down's lies on (10, 7) and (9, 7), as it is painted, so that
+  no one walks round it, and the figures by its half-open door are drawn 0.2 toward the
+  doorway's middle (D149 b). Its picture is the art's state `open` (D148), drawn while it is
+  open and never under the wizard, who holds it closed standing on either cell (D53); while
+  `osto` holds it closed, the floor shows whole, and where the hole's open picture meets it
+  a crack of light, a pale line nearly white at its middle, wider and narrower along its
+  way, between two dark lines, and many dark cracks running from it out into the floor and
+  in over the hole, each a zigzag that is never straight, most of them splitting into
+  branches and some branches again, drawn by the page from the hole's picture, the same
+  every time for the same hole; the crack is dark from edge to edge and stays, with its
+  cracks, and the light alone fades away over it and comes back with a figure's outline's
+  beat (D107), dark where it has faded; what is held is so read in the hole's own shape, on
+  one cell or two (the owner, 2026-11-09). A door and a hole name their kind in the scene's
+  settings and in art.json (`kind`), and the art tools and the page tell them apart by it,
+  never by the states they have: either may have an `open` state and a `closed` one, a
+  door's open state is its leaf and a hole's has none, and a closed hole shows its `closed`
+  picture where it has one, else the floor (the owner, 2026-11-09). The lesson *Luz y
+  trampas* teaches the two waits as one; the levels' solutions use `while not hole.closed:`
+  and their bonus asks `closed`; *El agujero que se abre* (`the-opening-hole`) is played in
+  four ways, *Se abre cada tres ticks* to *Se abre cada siete ticks*. In the words the child
+  reads the hole is *un agujero que se abre en el suelo*, *una trampa mágica, o un portal
+  oscuro* where it is first told, and *otro de esos agujeros* afterwards; no text says
+  *losa*, nor that anything goes and comes, which a content test holds. Supersedes D138 and
+  D53's names. Rules out a slab in any text, `in_place` in any code, and a door told from a
+  hole by the states it has.
 - **D168 — The mark's silhouette is a figure's, and only over the scene's cut-outs.** Decided
   2026-11-08 by the owner (*el círculo que se ve por encima debería ser muy fino y latente,
   como la silueta de los personajes, y solo sobre los objetos del escenario, no sobre los

@@ -16,7 +16,11 @@
 // ground under every cut-out and figure (D160), and where a cut-out of the scene covers
 // it its ring is drawn over the cut-out as the figures' line is, as thin, as bright and
 // beating as it, masked by copies of the cut-outs and never over a figure (D168), so
-// that the mark is read whole.
+// that the mark is read whole. A hole that osto holds closed shows its floor whole, and
+// round it a crack of light between two dark lines, wider and narrower along its way,
+// with dark cracks running from it out into the floor and in over the hole; the dark lines
+// stay and the light beats as a figure's outline does, so that what is held is read in the
+// hole's own shape (D167).
 
 import Phaser from 'phaser';
 import { coveredShare, HIDDEN_SHARE, inFront, ringCoveredShare, type Solid } from './cover';
@@ -109,6 +113,244 @@ function outlineSheet(scene: Phaser.Scene, sheet: string, key: string, filled = 
     const frame = source.get(name);
     outlines?.add(name, 0, frame.cutX, frame.cutY, frame.cutWidth, frame.cutHeight);
   }
+}
+
+/** How deep a held hole's crack is drawn: on the floor, over the hole's own picture (2.8)
+ * and under the goal's mark and everything that stands. */
+const HELD_DEPTH = 2.85;
+/** The crack of light round a held hole, in its picture's pixels: the light at its
+ * narrowest and its widest along the crack, its middle on the row of pixels just outside
+ * the hole's edge, and each dark edge beside it. */
+const CRACK_NARROWEST = 1;
+const CRACK_WIDEST = 3;
+const CRACK_DARK = 2;
+/** The light's colour, nearly white at the crack's middle and a pale yellow at its
+ * edges, and the dark edges' colour. */
+const CRACK_GLOW = [255, 238, 165] as const;
+const CRACK_LIGHT = [255, 253, 236] as const;
+const CRACK_EDGE = [24, 18, 12] as const;
+/** The dark cracks that run from the crack of light out into the floor and in over the
+ * hole, in its picture's pixels: one every so many pixels of the hole's edge, as few and
+ * as many as these, each this short and this long, and how wide at its root. */
+const CRACKS_EVERY = 14;
+const CRACKS_FEWEST = 16;
+const CRACKS_MOST = 48;
+const CRACK_SHORTEST = 7;
+const CRACK_LONGEST = 22;
+const CRACK_ROOT = 2.4;
+/** How far a held hole's crack picture reaches beyond the hole's on every side. */
+const CRACK_PAD = Math.ceil(CRACK_WIDEST / 2 + CRACK_DARK) + 2 + CRACK_LONGEST;
+
+/** Numbers from 0 to 1 that are the same for the same seed (mulberry32). */
+function seeded(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** A seed from a name, so that a hole's cracks are drawn the same every time. */
+function seedOf(name: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < name.length; index += 1) hash = Math.imul(hash ^ name.charCodeAt(index), 16777619);
+  return hash >>> 0;
+}
+
+/** How often a crack splits, a branch of a crack, and a branch of a branch: never more. */
+const CRACK_SPLITS = [0.65, 0.4] as const;
+
+/** A dark crack from (x, y) along `angle`, `length` long: never a straight line, but a
+ * zigzag of short steps, each turned the other way from the one before by a third of a
+ * right angle or more, round a way that wanders a little; thinner toward its tip. Most
+ * cracks split along their way into a branch, and a branch may split again, as cracks
+ * in stone do (CRACK_SPLITS). */
+function drawCrack(
+  context: CanvasRenderingContext2D,
+  random: () => number,
+  [x, y]: [number, number],
+  angle: number,
+  length: number,
+  root: number,
+  depth = 0,
+): void {
+  const points: [number, number][] = [[x, y]];
+  let [px, py, heading, left] = [x, y, angle, length];
+  let side = random() < 0.5 ? -1 : 1;
+  while (left > 0) {
+    const step = Math.min(left, 1.5 + random() * 2);
+    heading += (random() - 0.5) * 0.3;
+    const toward = heading + side * (0.35 + random() * 0.45);
+    px += Math.cos(toward) * step;
+    py += Math.sin(toward) * step;
+    points.push([px, py]);
+    left -= step;
+    side = -side;
+  }
+  context.strokeStyle = `rgb(${CRACK_EDGE.join(' ')} / 0.9)`;
+  context.lineCap = 'round';
+  for (let index = 1; index < points.length; index += 1) {
+    const [from, to] = [points[index - 1], points[index]];
+    if (!from || !to) continue;
+    context.lineWidth = Math.max(0.6, root * (1 - (index - 1) / points.length));
+    context.beginPath();
+    context.moveTo(...from);
+    context.lineTo(...to);
+    context.stroke();
+  }
+  const splits = CRACK_SPLITS[depth] ?? 0;
+  const from = points[Math.floor(points.length * (0.3 + random() * 0.4))];
+  if (from && points.length > 2 && random() < splits) {
+    const side = random() < 0.5 ? -1 : 1;
+    const toward = angle + side * (0.45 + random() * 0.5);
+    drawCrack(context, random, from, toward, length * (0.45 + random() * 0.2), root * 0.65, depth + 1);
+  }
+}
+
+/** The crack of light round a hole held closed (D167), from the hole's picture `sheet`,
+ * as two textures, `pad` pixels wider on every side than the picture: `<key>-light`, a
+ * line of light where the picture meets the floor, as if the light of the hole came up
+ * through the crack round the floor that closes it, wider and narrower along the crack
+ * by the angle round the hole's middle; and `<key>-dark`, the crack itself, dark under
+ * the light and on either side of it, and the dark cracks that run from it out into the
+ * floor and in over the hole, the same every time for the same hole. */
+function crackSheet(scene: Phaser.Scene, sheet: string, key: string, pad: number): void {
+  if (scene.textures.exists(`${key}-light`)) return;
+  const image = scene.textures.get(sheet).getSourceImage() as HTMLImageElement | HTMLCanvasElement;
+  const [width, height] = [image.width + pad * 2, image.height + pad * 2];
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (!context) return;
+  context.drawImage(image, pad, pad);
+  const pixels = context.getImageData(0, 0, width, height).data;
+  const solid = new Uint8Array(width * height);
+  let [sumX, sumY, count] = [0, 0, 0];
+  for (let index = 0; index < solid.length; index += 1) {
+    if ((pixels[index * 4 + 3] ?? 0) <= 127) continue;
+    solid[index] = 1;
+    sumX += index % width;
+    sumY += Math.floor(index / width);
+    count += 1;
+  }
+  const [middleX, middleY] = count > 0 ? [sumX / count, sumY / count] : [width / 2, height / 2];
+  const reach = Math.ceil(CRACK_WIDEST / 2 + CRACK_DARK) + 1;
+  const lit = context.createImageData(width, height);
+  const dark = context.createImageData(width, height);
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const inside = solid[y * width + x];
+      // The distance to the nearest pixel on the boundary's other side, within reach.
+      let nearest = Infinity;
+      for (let dy = -reach; dy <= reach; dy += 1) {
+        for (let dx = -reach; dx <= reach; dx += 1) {
+          const [nx, ny] = [x + dx, y + dy];
+          if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+          if (solid[ny * width + nx] === inside) continue;
+          nearest = Math.min(nearest, dx * dx + dy * dy);
+        }
+      }
+      if (nearest === Infinity) continue;
+      // How far from the crack's middle, the row of pixels just outside the hole's edge.
+      const beyond = inside ? -(Math.sqrt(nearest) - 0.5) : Math.sqrt(nearest) - 0.5;
+      const across = Math.abs(beyond - 0.5);
+      const angle = Math.atan2(y - middleY, x - middleX);
+      const wide = Math.min(1, Math.max(0, 0.5 + 0.3 * Math.sin(3 * angle + 1.3) + 0.25 * Math.sin(7 * angle + 0.4)));
+      const half = (CRACK_NARROWEST + (CRACK_WIDEST - CRACK_NARROWEST) * wide) / 2;
+      const at = (y * width + x) * 4;
+      // The crack is dark from one edge to the other, so that it shows dark where its light
+      // has faded; the light lies over its middle.
+      if (across <= half + CRACK_DARK) {
+        for (let channel = 0; channel < 3; channel += 1) dark.data[at + channel] = CRACK_EDGE[channel] ?? 0;
+        dark.data[at + 3] = across <= half ? 255 : 230;
+      }
+      if (across <= half) {
+        // Nearly white at the crack's middle, a pale yellow toward its edges.
+        const light = 1 - across / half;
+        for (let channel = 0; channel < 3; channel += 1) {
+          const [edge, middle] = [CRACK_GLOW[channel] ?? 0, CRACK_LIGHT[channel] ?? 0];
+          lit.data[at + channel] = Math.round(edge + (middle - edge) * light);
+        }
+        lit.data[at + 3] = 255;
+      }
+    }
+  }
+  context.putImageData(lit, 0, 0);
+  scene.textures.addCanvas(`${key}-light`, canvas);
+  const darkCanvas = document.createElement('canvas');
+  darkCanvas.width = width;
+  darkCanvas.height = height;
+  const darkContext = darkCanvas.getContext('2d');
+  if (!darkContext) return;
+  darkContext.putImageData(dark, 0, 0);
+  // The dark cracks, from points spread round the hole's edge, each along the edge's
+  // outward or inward way there; the light is drawn over their roots.
+  const edge: { x: number; y: number; angle: number }[] = [];
+  for (let y = 1; y < height - 1; y += 1) {
+    for (let x = 1; x < width - 1; x += 1) {
+      const index = y * width + x;
+      if (!solid[index] || (solid[index - 1] && solid[index + 1] && solid[index - width] && solid[index + width])) continue;
+      edge.push({ x, y, angle: Math.atan2(y - middleY, x - middleX) });
+    }
+  }
+  if (edge.length > 0) {
+    edge.sort((one, other) => one.angle - other.angle);
+    const random = seeded(seedOf(sheet));
+    const count = Math.min(CRACKS_MOST, Math.max(CRACKS_FEWEST, Math.round(edge.length / CRACKS_EVERY)));
+    for (let crack = 0; crack < count; crack += 1) {
+      const at = edge[Math.floor(((crack + random() * 0.8) / count) * edge.length) % edge.length];
+      if (!at) continue;
+      // Outward, the way the floor round it lies: the sum of the ways to its open pixels.
+      let [outX, outY] = [0, 0];
+      for (let dy = -2; dy <= 2; dy += 1) {
+        for (let dx = -2; dx <= 2; dx += 1) {
+          if (!solid[(at.y + dy) * width + at.x + dx]) [outX, outY] = [outX + dx, outY + dy];
+        }
+      }
+      const outward = Math.atan2(outY, outX);
+      const inward = random() < 0.4;
+      const length = CRACK_SHORTEST + random() * (CRACK_LONGEST - CRACK_SHORTEST) * (inward ? 0.7 : 1);
+      const angle = outward + (inward ? Math.PI : 0) + (random() - 0.5) * 0.8;
+      drawCrack(darkContext, random, [at.x + 0.5, at.y + 0.5], angle, length, CRACK_ROOT);
+    }
+  }
+  scene.textures.addCanvas(`${key}-dark`, darkCanvas);
+}
+
+/** A hole that osto holds closed (D167): the floor shows whole, and where the hole's
+ * picture `key` would meet it, a crack of light, wider and narrower along its way, between
+ * two dark lines, with dark cracks running from it, drawn where `image` draws the hole, so
+ * that what is held is read in the hole's own shape. The dark lines and cracks stay; the
+ * light alone fades away and comes back with the figures' beat. The scene shows it while
+ * the hole is held. */
+export function heldOutline(
+  scene: Phaser.Scene,
+  image: Phaser.GameObjects.Image,
+  key: string,
+  still: boolean,
+): Phaser.GameObjects.Container {
+  const pad = CRACK_PAD;
+  const crackKey = `${key}-crack`;
+  crackSheet(scene, key, crackKey, pad);
+  // Its pictures are `pad` pixels wider on every side: drawn so that the hole's lines up.
+  const [x, y] = [
+    image.x + pad * image.scaleX * (2 * image.originX - 1),
+    image.y + pad * image.scaleY * (2 * image.originY - 1),
+  ];
+  const [dark, light] = [`${crackKey}-dark`, `${crackKey}-light`].map((part) =>
+    new Phaser.GameObjects.Image(scene, x, y, part)
+      .setOrigin(image.originX, image.originY)
+      .setScale(image.scaleX, image.scaleY),
+  );
+  const held = scene.add.container(0, 0, [dark, light].filter((part) => part !== undefined)).setDepth(HELD_DEPTH);
+  held.setVisible(false);
+  if (still) light?.setAlpha(0.85);
+  else scene.tweens.add({ targets: light, alpha: { from: 1, to: 0 }, duration: BEAT_MS, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+  return held;
 }
 
 /** A painted image, and its copy in the mask. */

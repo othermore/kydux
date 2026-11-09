@@ -97,9 +97,9 @@ class Layer:
 
 
 def is_door(thing: dict) -> bool:
-    """Whether an exported thing is a door: it has a closed state, beside its open
-    one. A hole's one picture is its open state (D167), and no leaf."""
-    return "closed" in thing["states"]
+    """Whether an exported thing is a door, by its kind (D167): a door's open state is
+    its leaf swung, a hole's open state lies in the floor and has no leaf."""
+    return thing.get("kind") == "door"
 
 
 @dataclass
@@ -245,8 +245,10 @@ def load(scene: str) -> Scene:
         # on from, only when it is open, and what is seen through it is then under
         # them, its arch over them (D95); a door swung open lies on the wall beside
         # its doorway, among the rows by the row that state gives (D111).
+        # A door or a hole is drawn open; anything else in its first state.
         door = is_door(thing)
-        state = "open" if door and "open" in thing["states"] else next(iter(thing["states"]))
+        opens = thing.get("kind") in scene_settings.KINDS and "open" in thing["states"]
+        state = "open" if opens else next(iter(thing["states"]))
         rgba = np.array(Image.open(folder / thing["states"][state]).convert("RGBA"))
         # A thing is drawn just after its row's image (painted.ts).
         under = thing.get("under", False) and not (door and state == "open")

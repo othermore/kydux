@@ -234,23 +234,60 @@ def test_every_bed_gone_to_has_a_pillow_side():
     assert [bed for bed in sorted(named) if not sides.get(bed)] == []
 
 
-def doors_opened_from_their_closed_picture(repo_root=REPO) -> list[tuple[str, str]]:
-    """Every door tools/art/door.py builds, by its scene and its id (D144)."""
+def doors_opened_by_difference(repo_root=REPO) -> list[tuple[str, str]]:
+    """Every door whose open state is Gemini's picture, cut by difference (D148)."""
     found = []
     for path in sorted((repo_root / "art" / "scenes").glob("*/cut.json")):
         for name, thing in json.loads(path.read_text(encoding="utf-8"))["things"].items():
-            if "door" in thing:
+            opened = thing.get("states", {}).get("open")
+            if isinstance(opened, dict) and "diff" in opened:
                 found.append((path.parent.name, name))
     return found
 
 
-@pytest.mark.parametrize(("scene", "door"), doors_opened_from_their_closed_picture())
+@pytest.mark.parametrize(("scene", "door"), doors_opened_by_difference())
 def test_an_open_door_is_whole_and_its_box_cuts_nothing_of_it(scene, door):
-    """D144: no leaf cut by its box's corner, which was what the owner found."""
+    """No leaf cut by its picture's sides or its top; only its shadow, at the foot, may
+    run on to what lies below."""
     folder = REPO / "content" / "art" / "scenes" / scene
     art = json.loads((folder / "art.json").read_text(encoding="utf-8"))
     picture = Image.open(folder / art["things"][door]["states"]["open"]).convert("RGBA")
     alpha = np.array(picture)[..., 3]
     assert alpha.any()
-    for edge in (alpha[0], alpha[-1], alpha[:, 0], alpha[:, -1]):
+    for edge in (alpha[0], alpha[:, 0], alpha[:, -1]):
         assert not edge.any(), f"{scene}: {door}'s open picture reaches its box's edge"
+
+
+def test_a_scene_of_chapter_3_has_no_nudge_along_a_whole_walk():
+    """D149: a figure walks its own column; only the cells round a door or an arch are
+    drawn toward the opening's middle."""
+    for scene in (
+        "the-tunnel",
+        "the-crossing",
+        "the-two-doors",
+        "the-three-doors",
+        "the-long-round",
+        "the-storeroom",
+        "the-way-down",
+    ):
+        art = json.loads((CONTENT / "art" / "scenes" / scene / "art.json").read_text())
+        for part in art.get("nudged", []):
+            (x0, y0), (x1, y1) = part["cells"]
+            assert (x1 - x0, y1 - y0) < (1, 6), f"{scene}: {part['cells']}"
+
+
+def test_every_door_of_two_cells_stands_on_floor_side_by_side():
+    """D150: the scene names every cell of a doorway, and they are walked when open."""
+    named = {
+        "the-two-doors": {"left_door", "right_door"},
+        "the-three-doors": {"door_1", "door_2", "door_3"},
+        "the-storeroom": {"store_door"},
+        "the-way-down": {"door"},
+    }
+    for scene, doors in named.items():
+        spec = json.loads((CONTENT / "scenes" / scene / "scene.json").read_text())
+        floor = walked(scene)
+        for thing in spec["things"]:
+            if thing["id"] in doors:
+                assert len(thing["cells"]) == 2
+                assert all(tuple(cell) in floor for cell in thing["cells"])

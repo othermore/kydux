@@ -7,11 +7,23 @@
   "ground": "ground.webp",
   "rows": [
     {
-      "row": 6,
-      "image": "row-6-static-under.webp",
-      "top": 480,
+      "row": 1,
+      "image": "row-1-static-under.webp",
+      "top": 0,
       "static": true,
       "under": true
+    },
+    {
+      "row": 6,
+      "image": "row-6-static.webp",
+      "top": 470,
+      "static": true
+    },
+    {
+      "row": 8,
+      "image": "row-8-static.webp",
+      "top": 684,
+      "static": true
     },
     {
       "row": 11,
@@ -23,7 +35,7 @@
     {
       "row": 14,
       "image": "row-14-static-under.webp",
-      "top": 1291,
+      "top": 1286,
       "static": true,
       "under": true
     }
@@ -31,15 +43,15 @@
   "things": {
     "door": {
       "row": 6,
-      "left": 797,
-      "top": 490,
+      "left": 792,
+      "top": 480,
       "states": {
         "closed": "door-closed.webp",
         "open": "door-open.webp"
       },
       "under": true,
       "rows": {
-        "open": 7
+        "open": 6
       },
       "rest": "closed",
       "at": [

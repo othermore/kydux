@@ -7,6 +7,18 @@
   "ground": "ground.webp",
   "rows": [
     {
+      "row": 4,
+      "image": "row-4-static.webp",
+      "top": 221,
+      "static": true
+    },
+    {
+      "row": 9,
+      "image": "row-9-static.webp",
+      "top": 672,
+      "static": true
+    },
+    {
       "row": 11,
       "image": "row-11-static-over.webp",
       "top": 1058,
@@ -17,13 +29,16 @@
   "things": {
     "left_door": {
       "row": 9,
-      "left": 519,
-      "top": 720,
+      "left": 509,
+      "top": 667,
       "states": {
         "closed": "left_door-closed.webp",
         "open": "left_door-open.webp"
       },
       "under": true,
+      "rows": {
+        "open": 9
+      },
       "rest": "closed",
       "at": [
         7,
@@ -32,13 +47,16 @@
     },
     "right_door": {
       "row": 9,
-      "left": 1046,
-      "top": 720,
+      "left": 1094,
+      "top": 667,
       "states": {
         "closed": "right_door-closed.webp",
         "open": "right_door-open.webp"
       },
       "under": true,
+      "rows": {
+        "open": 9
+      },
       "rest": "closed",
       "at": [
         13,

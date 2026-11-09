@@ -3,660 +3,148 @@
   "sources": {
     "folder": "art/raw/game-two-doors",
     "edits": "art/raw/game-two-doors",
-    "painting": "two-doors-whole.png",
+    "painting": "two-doors-base.png",
     "grid": "grid.json",
-    "ground": "two-doors-whole.png"
+    "ground": "two-doors-base.png"
   },
   "things": {
     "left_door": {
       "box": [
-        5.41,
-        7.5,
-        9.1,
-        10.45
+        5.3,
+        6.95,
+        8.5,
+        11.0
       ],
       "row": 9,
       "solid": true,
-      "without": "left_door-doorway.png",
+      "under": true,
+      "reach": 0.95,
+      "rest": "closed",
       "states": {
-        "closed": "painting",
+        "closed": {
+          "picture": "two-doors-closed.png",
+          "diff": {},
+          "box": [
+            6.1,
+            7.4,
+            8.1,
+            10.0
+          ]
+        },
         "open": {
-          "picture": "left_door-open.png",
-          "without": "left_door-doorway.png",
-          "leaf": [
-            [
-              5.902,
-              7.615
-            ],
-            [
-              5.94,
-              7.615
-            ],
-            [
-              6.019,
-              7.665
-            ],
-            [
-              6.11,
-              7.791
-            ],
-            [
-              6.185,
-              7.996
-            ],
-            [
-              6.202,
-              8.101
-            ],
-            [
-              6.202,
-              8.507
-            ],
-            [
-              6.265,
-              8.527
-            ],
-            [
-              6.294,
-              8.561
-            ],
-            [
-              6.31,
-              8.615
-            ],
-            [
-              6.302,
-              8.695
-            ],
-            [
-              6.285,
-              8.728
-            ],
-            [
-              6.202,
-              8.837
-            ],
-            [
-              6.19,
-              8.921
-            ],
-            [
-              6.194,
-              8.963
-            ],
-            [
-              6.185,
-              9.118
-            ],
-            [
-              6.19,
-              9.189
-            ],
-            [
-              6.181,
-              9.323
-            ],
-            [
-              6.185,
-              9.406
-            ],
-            [
-              6.177,
-              9.54
-            ],
-            [
-              6.181,
-              9.624
-            ],
-            [
-              6.173,
-              9.758
-            ],
-            [
-              6.173,
-              9.93
-            ],
-            [
-              6.073,
-              9.925
-            ],
-            [
-              5.681,
-              9.846
-            ],
-            [
-              5.66,
-              9.846
-            ],
-            [
-              5.64,
-              9.858
-            ],
-            [
-              5.598,
-              9.867
-            ],
-            [
-              5.56,
-              9.863
-            ],
-            [
-              5.523,
-              9.846
-            ],
-            [
-              5.494,
-              9.817
-            ],
-            [
-              5.477,
-              9.783
-            ],
-            [
-              5.465,
-              9.729
-            ],
-            [
-              5.46,
-              8.766
-            ],
-            [
-              5.473,
-              8.691
-            ],
-            [
-              5.494,
-              8.64
-            ],
-            [
-              5.535,
-              8.599
-            ],
-            [
-              5.581,
-              8.574
-            ],
-            [
-              5.581,
-              8.134
-            ],
-            [
-              5.64,
-              7.929
-            ],
-            [
-              5.735,
-              7.724
-            ],
-            [
-              5.827,
-              7.632
-            ]
+          "picture": "two-doors-open.png",
+          "diff": {},
+          "row": 9,
+          "box": [
+            5.3,
+            7.9,
+            7.75,
+            10.95
           ]
         }
       },
+      "without": "two-doors-base.png",
       "at": [
         7,
         8
       ],
-      "under": true,
-      "reach": 0.55,
-      "rest": "closed",
-      "about": "The left door in the bottom wall: shut, its leaf within its doorway (`doorway`, D113); its doorway showing the floor beyond, tiled from `floor_from`; open, its leaf the closed one's own pixels turned on its hinge, over the jamb (tools/art/door.py, D144).",
-      "doorway": [
-        [
-          6.965,
-          7.653
-        ],
-        [
-          7.035,
-          7.653
-        ],
-        [
-          7.277,
-          7.686
-        ],
-        [
-          7.527,
-          7.791
-        ],
-        [
-          7.798,
-          8.013
-        ],
-        [
-          7.969,
-          8.239
-        ],
-        [
-          8.019,
-          8.398
-        ],
-        [
-          8.023,
-          9.95
-        ],
-        [
-          6.319,
-          9.959
-        ],
-        [
-          6.26,
-          8.933
-        ],
-        [
-          6.177,
-          8.582
-        ],
-        [
-          6.177,
-          8.368
-        ],
-        [
-          6.19,
-          8.197
-        ],
-        [
-          6.285,
-          7.979
-        ],
-        [
-          6.494,
-          7.795
-        ],
-        [
-          6.744,
-          7.69
-        ]
-      ],
-      "door": {
-        "hinge": "left",
-        "floor_from": [
-          6.0,
-          5.0,
-          9.2,
-          7.35
-        ],
-        "polygon": [
-          [
-            6.348,
-            9.929
-          ],
-          [
-            6.291,
-            8.914
-          ],
-          [
-            6.207,
-            8.547
-          ],
-          [
-            6.207,
-            8.429
-          ],
-          [
-            6.218,
-            8.233
-          ],
-          [
-            6.317,
-            8.01
-          ],
-          [
-            6.533,
-            7.819
-          ],
-          [
-            6.78,
-            7.72
-          ],
-          [
-            7.0,
-            7.683
-          ],
-          [
-            7.246,
-            7.717
-          ],
-          [
-            7.494,
-            7.819
-          ],
-          [
-            7.762,
-            8.037
-          ],
-          [
-            7.936,
-            8.264
-          ],
-          [
-            7.991,
-            8.435
-          ],
-          [
-            7.996,
-            9.921
-          ]
-        ]
-      }
+      "about": "The left door: closed and open are Gemini's edits of the base, each cut by the difference (D148)."
     },
     "right_door": {
       "box": [
-        10.9,
-        7.5,
-        13.9,
-        10.45
+        11.4,
+        6.95,
+        14.6,
+        11.0
       ],
       "row": 9,
       "solid": true,
-      "without": "right_door-doorway.png",
+      "under": true,
+      "reach": 0.95,
+      "rest": "closed",
       "states": {
-        "closed": "painting",
+        "closed": {
+          "picture": "two-doors-closed.png",
+          "diff": {},
+          "box": [
+            12.0,
+            7.4,
+            13.95,
+            10.0
+          ]
+        },
         "open": {
-          "picture": "right_door-open.png",
-          "without": "right_door-doorway.png",
-          "leaf": [
-            [
-              11.66,
-              7.607
-            ],
-            [
-              11.71,
-              7.607
-            ],
-            [
-              11.777,
-              7.644
-            ],
-            [
-              11.865,
-              7.741
-            ],
-            [
-              11.952,
-              7.933
-            ],
-            [
-              12.002,
-              8.134
-            ],
-            [
-              12.006,
-              9.662
-            ],
-            [
-              12.09,
-              9.821
-            ],
-            [
-              12.119,
-              9.909
-            ],
-            [
-              12.123,
-              10.013
-            ],
-            [
-              12.106,
-              10.072
-            ],
-            [
-              12.081,
-              10.11
-            ],
-            [
-              12.035,
-              10.143
-            ],
-            [
-              11.956,
-              10.164
-            ],
-            [
-              11.44,
-              10.164
-            ],
-            [
-              11.36,
-              10.143
-            ],
-            [
-              11.315,
-              10.11
-            ],
-            [
-              11.29,
-              10.072
-            ],
-            [
-              11.269,
-              9.997
-            ],
-            [
-              11.265,
-              8.837
-            ],
-            [
-              11.277,
-              8.753
-            ],
-            [
-              11.298,
-              8.707
-            ],
-            [
-              11.327,
-              8.678
-            ],
-            [
-              11.385,
-              8.657
-            ],
-            [
-              11.385,
-              8.055
-            ],
-            [
-              11.435,
-              7.87
-            ],
-            [
-              11.485,
-              7.749
-            ],
-            [
-              11.531,
-              7.678
-            ],
-            [
-              11.585,
-              7.632
-            ],
-            [
-              11.61,
-              7.615
-            ]
+          "picture": "two-doors-open.png",
+          "diff": {},
+          "row": 9,
+          "box": [
+            12.35,
+            7.9,
+            14.6,
+            10.95
           ]
         }
       },
+      "without": "two-doors-base.png",
       "at": [
         13,
         8
       ],
-      "under": true,
-      "reach": 0.55,
-      "rest": "closed",
-      "about": "The right door in the bottom wall, as the left one.",
-      "doorway": [
-        [
-          12.86,
-          7.653
-        ],
-        [
-          12.969,
-          7.653
-        ],
-        [
-          13.148,
-          7.674
-        ],
-        [
-          13.36,
-          7.749
-        ],
-        [
-          13.502,
-          7.837
-        ],
-        [
-          13.635,
-          7.967
-        ],
-        [
-          13.735,
-          8.088
-        ],
-        [
-          13.802,
-          8.209
-        ],
-        [
-          13.827,
-          8.377
-        ],
-        [
-          13.819,
-          9.051
-        ],
-        [
-          13.744,
-          9.963
-        ],
-        [
-          11.981,
-          9.963
-        ],
-        [
-          11.981,
-          8.62
-        ],
-        [
-          11.99,
-          8.385
-        ],
-        [
-          12.006,
-          8.235
-        ],
-        [
-          12.06,
-          8.105
-        ],
-        [
-          12.177,
-          7.946
-        ],
-        [
-          12.344,
-          7.816
-        ],
-        [
-          12.469,
-          7.741
-        ],
-        [
-          12.673,
-          7.678
-        ]
+      "about": "The right door."
+    },
+    "left_arch": {
+      "box": [
+        5.75,
+        7.0,
+        8.15,
+        10.0
       ],
-      "door": {
-        "hinge": "left",
-        "floor_from": [
-          9.2,
-          5.0,
-          12.8,
-          7.35
-        ],
-        "polygon": [
-          [
-            12.013,
-            9.933
-          ],
-          [
-            12.013,
-            8.663
-          ],
-          [
-            12.02,
-            8.43
-          ],
-          [
-            12.038,
-            8.267
-          ],
-          [
-            12.089,
-            8.14
-          ],
-          [
-            12.212,
-            7.972
-          ],
-          [
-            12.379,
-            7.844
-          ],
-          [
-            12.494,
-            7.774
-          ],
-          [
-            12.703,
-            7.709
-          ],
-          [
-            12.911,
-            7.681
-          ],
-          [
-            13.119,
-            7.705
-          ],
-          [
-            13.328,
-            7.779
-          ],
-          [
-            13.471,
-            7.867
-          ],
-          [
-            13.587,
-            7.977
-          ],
-          [
-            13.703,
-            8.116
-          ],
-          [
-            13.772,
-            8.24
-          ],
-          [
-            13.8,
-            8.43
-          ],
-          [
-            13.791,
-            8.988
-          ],
-          [
-            13.717,
-            9.933
-          ]
-        ]
-      }
+      "row": 9,
+      "static": true,
+      "solid": true,
+      "mask": "difference",
+      "picture": "two-doors-gone.png",
+      "diff": {},
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The left door's arch, over whoever walks under it."
+    },
+    "right_arch": {
+      "box": [
+        11.85,
+        7.0,
+        14.4,
+        10.0
+      ],
+      "row": 9,
+      "static": true,
+      "solid": true,
+      "mask": "difference",
+      "picture": "two-doors-gone.png",
+      "diff": {},
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The right door's arch."
+    },
+    "arch_top": {
+      "box": [
+        8.85,
+        2.3,
+        11.15,
+        3.6
+      ],
+      "row": 4,
+      "static": true,
+      "solid": true,
+      "mask": "difference",
+      "picture": "two-doors-gone.png",
+      "diff": {},
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The arch in the upper wall, over whoever walks in it."
     },
     "wall_1": {
       "box": [
@@ -699,47 +187,7 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The room of two doors\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-two-doors.md`, then edited by it without its\n  grid (`game-two-doors-nogrid.md`).\n- What it left black at the corners painted by Gemini from\n  `game-two-doors-voids.md`, joined by `tools/art/repaint.py`, and what still\n  was black tiled from stones of the crossing's picture (`tiled`).\n- Each door opened by `tools/art/door.py` from the painting itself, no model asked.\n",
-  "voids": {
-    "about": "What the model left black at the top corners and the bottom corners painted as the castle's inside (D136), the stair's dark well kept: by Gemini 3 Pro Image from tools/art/prompts/game-two-doors-voids.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
-    "from": "art/raw/game-two-doors/game-two-doors-nogrid.png",
-    "void": "black",
-    "leave": [
-      [
-        2100,
-        3200,
-        2700,
-        3584
-      ]
-    ],
-    "fade": 10,
-    "canvas": "art/raw/game-two-doors/two-doors-voids-canvas.png",
-    "painting": "art/raw/game-two-doors/two-doors-voids.png"
-  },
-  "tiled": {
-    "about": "What the model still left black, the tops of thick walls in stone blocks, taken from the picture's own stones by tools/art/repaint.py tiled, no model asked.",
-    "from": "art/raw/game-two-doors/two-doors-voids.png",
-    "void": "black",
-    "below": 24,
-    "leave": [
-      [
-        2100,
-        3200,
-        2700,
-        3584
-      ]
-    ],
-    "fade": 6,
-    "texture": [
-      "art/raw/game-crossing/crossing-mended.png",
-      100,
-      60,
-      900,
-      1000
-    ],
-    "shade": 0.75,
-    "painting": "art/raw/game-two-doors/two-doors-whole.png"
-  },
+  "source": "# The room of two doors\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-two-doors.md`, then edited by it: without its grid\n  (`game-two-doors-nogrid.md`), the round of the castle painted\n  (`game-two-doors-voids.md`).\n- Its base is Gemini's edit without the doors (`two-doors-base.md`); the doors shut\n  (`two-doors-closed.md`) and open (`two-doors-open.md`) are Gemini's edits of it, and\n  each leaf the difference (D148). So are the arches, from `two-doors-gone.md`.\n",
   "nudged": [
     {
       "about": "Round the left door, both columns toward its middle (D149).",
@@ -865,6 +313,18 @@
       7.5,
       8.2,
       9.0
+    ],
+    [
+      11.8,
+      6.9,
+      14.4,
+      8.0
+    ],
+    [
+      8.9,
+      2.3,
+      11.1,
+      3.7
     ]
   ],
   "lowered": [

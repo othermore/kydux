@@ -17,8 +17,8 @@
   "things": {
     "door_a": {
       "row": 10,
-      "left": 259,
-      "top": 845,
+      "left": 221,
+      "top": 840,
       "states": {
         "closed": "door_a-closed.webp"
       },
@@ -29,8 +29,8 @@
     },
     "door_b": {
       "row": 10,
-      "left": 1008,
-      "top": 845,
+      "left": 1018,
+      "top": 840,
       "states": {
         "closed": "door_b-closed.webp"
       },

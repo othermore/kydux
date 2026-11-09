@@ -2,8 +2,10 @@
 """Aids for a thing's cut-outs on a scene's pictures: its mask as the difference of two
 of them (D148), and a polygon in cells, traced by hand (D113).
 
-    tools/art/trace.py <scene> diff <thing> <picture> [--state <state>] [--within X0 Y0 X1 Y1]
+    tools/art/trace.py <scene> diff <thing> <picture> [--state <state>]
+                                    [--within X0 Y0 X1 Y1]
                                     [--threshold 26] [--soft 13] [--speck 8] [--holes 3000]
+                                    [--close 0] [--rim]
     tools/art/trace.py <scene> look <picture> x0 y0 x1 y1 [--scale 3] [--poly <json>]
                                     [--diff <other picture>] [--out <png>]
     tools/art/trace.py <scene> outline <picture> x0 y0 x1 y1 <seed x> <seed y>
@@ -16,7 +18,9 @@ of them (D148), and a polygon in cells, traced by hand (D113).
 the scene's painting, its base (D148): the colour distance smoothed and thresholded,
 cleaned of specks, closed over its holes, kept within the thing's box (`--within` for
 a part of it). With `--state`, the state of a thing that comes and goes; without it, a
-static thing, cut from the base where `picture`, the base with the thing gone, differs.
+static thing, cut from the base where `picture`, the base with the thing gone or painted
+flat magenta, differs; with magenta, `--threshold 70 --soft 70 --rim`, so that only the
+magenta counts and the thing keeps the outline beside it.
 It prints how much the mask covers and the leak, how much of a cell's band round the
 box differs the same way: more than a fringe says to look at the picture, and where the
 edit changed what it should not, in the mask or beside it, it is asked again. It writes
@@ -306,8 +310,8 @@ def difference(
     else:
         entry = {"picture": relative, "diff": own}
         was = thing["states"].get(state)
-        if isinstance(was, dict) and "row" in was:
-            entry["row"] = was["row"]
+        if isinstance(was, dict):
+            entry.update({key: was[key] for key in ("row", "reach") if key in was})
         if within:
             entry["box"] = list(within)
         thing["states"][state] = entry
@@ -402,6 +406,8 @@ def main(arguments: list[str]) -> int:
     differing.add_argument("--soft", type=int)
     differing.add_argument("--speck", type=int)
     differing.add_argument("--holes", type=int)
+    differing.add_argument("--close", type=int)
+    differing.add_argument("--rim", action="store_true", default=None)
     found = parser.parse_args(arguments)
     settings = scene_settings.settings(found.scene)
     if found.command == "diff":
@@ -411,6 +417,8 @@ def main(arguments: list[str]) -> int:
             "soft": found.soft,
             "speck": found.speck,
             "holes": found.holes,
+            "close": found.close,
+            "rim": found.rim,
         }
         told = {key: value for key, value in options.items() if value is not None}
         within = tuple(found.within) if found.within else None

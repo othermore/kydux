@@ -131,9 +131,11 @@ def changed(a: np.ndarray, b: np.ndarray, threshold: float = 60) -> np.ndarray:
 #: How a thing's mask is read from two of a scene's pictures (D148): the colour distance
 #: over which a pixel differs, smoothed little where a line changed and much where a
 #: plank is coloured nearly as the floor; the pieces thinner than `speck` pixels, the
-#: lines a model's edit moved a little, which are not the thing; and the holes of no more
-#: than `holes` pixels, which are of the thing.
-DIFFERENCE = {"threshold": 26, "soft": 13, "speck": 8, "holes": 3000}
+#: lines a model's edit moved a little, which are not the thing; the holes of no more
+#: than `holes` pixels, which are of the thing; and how far gaps in it are closed. A
+#: static thing that Gemini painted flat magenta is cut with a high threshold, and takes
+#: the outline beside it (`rim`).
+DIFFERENCE = {"threshold": 26, "soft": 13, "speck": 8, "holes": 3000, "close": 0}
 #: How far each of the two distances is smoothed, in the painting's pixels.
 DIFFERENCE_BLUR = (1.2, 5.0)
 
@@ -162,6 +164,11 @@ def difference_mask(
     # from what is near it, so that the cleaning rounds nothing off.
     solid = image_first.dilated(image_first.eroded(differs, speck), speck)
     mask = differs & image_first.dilated(solid, speck + 2)
+    # A stone painted nearly the floor's colour leaves a gap in an arch's ring: `close`
+    # closes the gaps of up to twice its pixels, which the arch's opening is far wider than.
+    if options.get("close"):
+        reach = options["close"]
+        mask = image_first.eroded(image_first.dilated(mask, reach), reach)
     mask = image_first.filled(mask, options["holes"])
     mask = kept(mask, options.get("scraps", 0.02))
     out = np.zeros(base.shape[:2], dtype=bool)
@@ -406,7 +413,11 @@ def static_alpha(
     if thing["mask"] == "difference":
         # What a figure walks behind, by the picture with it gone (D148).
         gone = np.array(Image.open(edits / thing["picture"]).convert("RGB"))
-        return difference_mask(gone, painting, box, thing.get("diff")).astype(np.float32)
+        mask = difference_mask(gone, painting, box, thing.get("diff"))
+        # Gemini's magenta ends inside the thing's outline, which is the thing's too (D93).
+        if (thing.get("diff") or {}).get("rim"):
+            mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th)) & inside
+        return mask.astype(np.float32)
     if thing["mask"] == "pale":
         hsv = np.array(Image.fromarray(painting).convert("HSV")).astype(np.float32) / 255
         pale = (hsv[..., 2] > PALE_VALUE) & (hsv[..., 1] < PALE_SATURATION) & inside
@@ -913,6 +924,9 @@ def scene(settings: Settings) -> Path:
                 continue
             shown, alpha = state_alpha(settings, thing, picture, painting, without, native, th)
             reach = thing.get("reach", 0.0)
+            # A state may reach lower than the thing, its leaf's foot and its shadow.
+            if isinstance(picture, dict):
+                reach = picture.get("reach", reach)
             # A state on a row of its own ends at that row's bottom edge (D111).
             row = picture.get("row", thing["row"]) if isinstance(picture, dict) else thing["row"]
             # Drawn smaller than painted, the thing in every state or in one (`scale`).
@@ -1233,33 +1247,50 @@ LEAF_SHARE = 0.2
 def leaf_cells(scene_id: str, folder: Path | None = None) -> dict[str, list[list[int]]]:
     """For each door of the exported scene with an open state, the cells walked on of
     that state's row, its own doorway left out, that its open leaf lies on (D125),
-    measured on its exported picture, in reading order."""
+    measured on its exported picture where a figure on the cell is drawn (D149), in
+    reading order. A leaf cut by difference (D148), its shadow in its picture, is measured
+    on the rows above its own, whose figures it hides; a figure on its own row is drawn
+    before it."""
     folder = folder or REPO / "content" / "art" / "scenes" / scene_id
     art = json.loads((folder / "art.json").read_text())
     cell = art["cell"]
     walked = sweep.walks(scene_id)
     about = json.loads((REPO / "content" / "scenes" / scene_id / "scene.json").read_text())
-    doorways = {thing["id"]: thing.get("at") for thing in about.get("things", [])}
+    doorways = {
+        thing["id"]: thing.get("cells", [thing.get("at")]) for thing in about.get("things", [])
+    }
+    nudges = {
+        (x, y): part["by"]
+        for part in reversed(art.get("nudged", []))
+        for y in range(part["cells"][0][1], part["cells"][1][1] + 1)
+        for x in range(part["cells"][0][0], part["cells"][1][0] + 1)
+    }
+    settings_of = settings(scene_id).things if scene_id in scenes() else {}
     found = {}
     for name, thing in art["things"].items():
         picture = thing["states"].get("open")
         if picture is None:
             continue
         row = thing.get("rows", {}).get("open", thing["row"])
-        doorway = thing.get("at", doorways.get(name))
+        doorway = doorways.get(name, [thing.get("at")])
         alpha = np.array(Image.open(folder / picture).convert("RGBA"))[..., 3] > 128
         left, top = thing["left"], thing["top"]
         side = int(cell * LEAF_SIDE)
-        y0, y1 = row * cell + int(cell * LEAF_BAND) - top, (row + 1) * cell - top
+        open_state = settings_of.get(name, {}).get("states", {}).get("open")
+        by_difference = isinstance(open_state, dict) and "diff" in open_state
+        rows_of_leaf = range(max(0, top // cell), row) if by_difference else [row]
         cells = []
-        for x in range(walked.shape[1]):
-            if not walked[row, x] or [x, row] == doorway:
-                continue
-            x0, x1 = x * cell + side - left, (x + 1) * cell - side - left
-            band = alpha[max(0, y0) : max(0, y1), max(0, x0) : max(0, x1)]
-            share = band.sum() / ((y1 - y0) * (x1 - x0))
-            if share > LEAF_SHARE:
-                cells.append([x, row])
+        for here in rows_of_leaf:
+            y0, y1 = here * cell + int(cell * LEAF_BAND) - top, (here + 1) * cell - top
+            for x in range(walked.shape[1]):
+                if not walked[here, x] or [x, here] in doorway:
+                    continue
+                shift = round(nudges.get((x, here), 0.0) * cell)
+                x0, x1 = x * cell + side + shift - left, (x + 1) * cell - side + shift - left
+                band = alpha[max(0, y0) : max(0, y1), max(0, x0) : max(0, x1)]
+                share = band.sum() / ((y1 - y0) * (x1 - x0))
+                if share > LEAF_SHARE:
+                    cells.append([x, here])
         found[name] = cells
     return found
 

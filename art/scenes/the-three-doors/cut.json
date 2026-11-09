@@ -3,1096 +3,252 @@
   "sources": {
     "folder": "art/raw/game-three-doors",
     "edits": "art/raw/game-three-doors",
-    "painting": "three-doors-whole.png",
+    "painting": "three-doors-base.png",
     "grid": "grid.json",
-    "ground": "three-doors-whole.png"
+    "ground": "three-doors-base.png"
   },
   "things": {
     "door_1": {
       "box": [
-        8.9,
-        10.2,
-        11.4,
-        12.75
+        9.2,
+        10.0,
+        11.7,
+        13.299999999999999
       ],
       "row": 11,
       "solid": true,
-      "without": "door_1-doorway.png",
+      "under": true,
+      "reach": 0.38,
+      "rest": "closed",
       "states": {
-        "closed": "painting",
+        "closed": {
+          "picture": "three-doors-whole.png",
+          "diff": {},
+          "box": [
+            9.3,
+            10.299999999999999,
+            10.7,
+            12.299999999999999
+          ]
+        },
         "open": {
-          "picture": "door_1-open.png",
-          "without": "door_1-doorway.png",
-          "leaf": [
-            [
-              9.256,
-              10.633
-            ],
-            [
-              9.281,
-              10.633
-            ],
-            [
-              9.298,
-              10.641
-            ],
-            [
-              9.34,
-              10.67
-            ],
-            [
-              9.36,
-              10.7
-            ],
-            [
-              9.406,
-              10.788
-            ],
-            [
-              9.456,
-              10.955
-            ],
-            [
-              9.456,
-              12.139
-            ],
-            [
-              9.49,
-              12.156
-            ],
-            [
-              9.531,
-              12.19
-            ],
-            [
-              9.556,
-              12.231
-            ],
-            [
-              9.569,
-              12.269
-            ],
-            [
-              9.569,
-              12.361
-            ],
-            [
-              9.556,
-              12.399
-            ],
-            [
-              9.531,
-              12.437
-            ],
-            [
-              9.485,
-              12.47
-            ],
-            [
-              9.406,
-              12.491
-            ],
-            [
-              9.198,
-              12.495
-            ],
-            [
-              9.098,
-              12.487
-            ],
-            [
-              9.044,
-              12.47
-            ],
-            [
-              8.998,
-              12.437
-            ],
-            [
-              8.973,
-              12.399
-            ],
-            [
-              8.952,
-              12.324
-            ],
-            [
-              8.952,
-              12.231
-            ],
-            [
-              8.973,
-              12.156
-            ],
-            [
-              9.01,
-              12.11
-            ],
-            [
-              9.069,
-              12.081
-            ],
-            [
-              9.069,
-              10.888
-            ],
-            [
-              9.09,
-              10.808
-            ],
-            [
-              9.144,
-              10.704
-            ],
-            [
-              9.194,
-              10.654
-            ]
+          "picture": "three-doors-open.png",
+          "diff": {},
+          "box": [
+            9.5,
+            10.1,
+            11.65,
+            13.25
           ],
           "row": 12
         }
       },
+      "without": "three-doors-base.png",
       "at": [
         10,
         11
       ],
-      "under": true,
-      "reach": 0.38,
-      "rest": "closed",
-      "about": "Door 1, from the bottom, across the corridor: shut, its leaf within its doorway (`doorway`, D113); its doorway showing the floor beyond, tiled from `floor_from`; open, its leaf the closed one's own pixels turned on its hinge, over the jamb (tools/art/door.py, D144).",
-      "doorway": [
-        [
-          9.952,
-          10.662
-        ],
-        [
-          10.048,
-          10.662
-        ],
-        [
-          10.194,
-          10.687
-        ],
-        [
-          10.36,
-          10.758
-        ],
-        [
-          10.494,
-          10.863
-        ],
-        [
-          10.585,
-          11.001
-        ],
-        [
-          10.61,
-          11.068
-        ],
-        [
-          10.61,
-          12.29
-        ],
-        [
-          9.431,
-          12.29
-        ],
-        [
-          9.431,
-          11.064
-        ],
-        [
-          9.465,
-          10.98
-        ],
-        [
-          9.515,
-          10.909
-        ],
-        [
-          9.648,
-          10.771
-        ],
-        [
-          9.794,
-          10.691
-        ]
-      ],
-      "door": {
-        "hinge": "left",
-        "row": 12,
-        "floor_from": [
-          8.3,
-          8.4,
-          11.2,
-          10.2
-        ],
-        "polygon": [
-          [
-            9.46,
-            12.26
-          ],
-          [
-            9.46,
-            11.1
-          ],
-          [
-            9.49,
-            11.02
-          ],
-          [
-            9.56,
-            10.92
-          ],
-          [
-            9.68,
-            10.8
-          ],
-          [
-            9.83,
-            10.72
-          ],
-          [
-            10.0,
-            10.69
-          ],
-          [
-            10.17,
-            10.72
-          ],
-          [
-            10.33,
-            10.79
-          ],
-          [
-            10.46,
-            10.89
-          ],
-          [
-            10.55,
-            11.02
-          ],
-          [
-            10.58,
-            11.1
-          ],
-          [
-            10.58,
-            12.26
-          ]
-        ]
-      }
-    },
-    "arch_1": {
-      "box": [
-        9.1,
-        10.2,
-        10.83,
-        12.35
-      ],
-      "row": 12,
-      "static": true,
-      "solid": true,
-      "mask": "polygon",
-      "states": {
-        "standing": "painting"
-      },
-      "about": "The stone arch round the door, its dome and its sides, over whoever stands in its doorway and under whoever stands before it; the door's own cut-out left to the door.",
-      "polygon": [
-        [
-          9.15,
-          12.3
-        ],
-        [
-          9.15,
-          11.0
-        ],
-        [
-          9.21,
-          10.78
-        ],
-        [
-          9.4,
-          10.5
-        ],
-        [
-          9.65,
-          10.33
-        ],
-        [
-          9.96,
-          10.28
-        ],
-        [
-          10.28,
-          10.33
-        ],
-        [
-          10.53,
-          10.5
-        ],
-        [
-          10.72,
-          10.78
-        ],
-        [
-          10.78,
-          11.0
-        ],
-        [
-          10.78,
-          12.3
-        ]
-      ]
+      "about": "Door 1: shut as painted, open Gemini's edit of the base, each cut by the difference (D148)."
     },
     "door_2": {
       "box": [
-        8.85,
-        6.2,
-        11.4,
-        8.75
+        9.2,
+        6.0,
+        11.7,
+        9.3
       ],
       "row": 7,
       "solid": true,
-      "without": "door_2-doorway.png",
+      "under": true,
+      "reach": 0.38,
+      "rest": "closed",
       "states": {
-        "closed": "painting",
+        "closed": {
+          "picture": "three-doors-whole.png",
+          "diff": {},
+          "box": [
+            9.3,
+            6.3,
+            10.7,
+            8.3
+          ]
+        },
         "open": {
-          "picture": "door_2-open.png",
-          "without": "door_2-doorway.png",
-          "leaf": [
-            [
-              9.194,
-              6.594
-            ],
-            [
-              9.244,
-              6.598
-            ],
-            [
-              9.285,
-              6.627
-            ],
-            [
-              9.344,
-              6.682
-            ],
-            [
-              9.394,
-              6.799
-            ],
-            [
-              9.427,
-              6.92
-            ],
-            [
-              9.427,
-              8.075
-            ],
-            [
-              9.51,
-              8.184
-            ],
-            [
-              9.54,
-              8.26
-            ],
-            [
-              9.54,
-              8.373
-            ],
-            [
-              9.527,
-              8.41
-            ],
-            [
-              9.502,
-              8.448
-            ],
-            [
-              9.456,
-              8.481
-            ],
-            [
-              9.377,
-              8.502
-            ],
-            [
-              9.144,
-              8.507
-            ],
-            [
-              9.044,
-              8.498
-            ],
-            [
-              8.99,
-              8.481
-            ],
-            [
-              8.944,
-              8.448
-            ],
-            [
-              8.919,
-              8.41
-            ],
-            [
-              8.898,
-              8.335
-            ],
-            [
-              8.898,
-              7.841
-            ],
-            [
-              8.915,
-              7.778
-            ],
-            [
-              8.94,
-              7.741
-            ],
-            [
-              8.96,
-              7.724
-            ],
-            [
-              9.015,
-              7.703
-            ],
-            [
-              9.015,
-              6.824
-            ],
-            [
-              9.044,
-              6.728
-            ],
-            [
-              9.09,
-              6.644
-            ],
-            [
-              9.144,
-              6.611
-            ]
+          "picture": "three-doors-open.png",
+          "diff": {},
+          "box": [
+            9.5,
+            6.1000000000000005,
+            11.65,
+            9.25
           ],
           "row": 8
         }
       },
+      "without": "three-doors-base.png",
       "at": [
         10,
         7
       ],
-      "under": true,
-      "reach": 0.38,
-      "rest": "closed",
-      "about": "Door 2, from the bottom, across the corridor: shut, its leaf within its doorway (`doorway`, D113); its doorway showing the floor beyond, tiled from `floor_from`; open, its leaf the closed one's own pixels turned on its hinge, over the jamb (tools/art/door.py, D144).",
-      "doorway": [
-        [
-          9.981,
-          6.623
-        ],
-        [
-          10.077,
-          6.623
-        ],
-        [
-          10.256,
-          6.657
-        ],
-        [
-          10.377,
-          6.694
-        ],
-        [
-          10.502,
-          6.782
-        ],
-        [
-          10.594,
-          6.895
-        ],
-        [
-          10.631,
-          6.966
-        ],
-        [
-          10.644,
-          7.046
-        ],
-        [
-          10.635,
-          8.301
-        ],
-        [
-          9.402,
-          8.301
-        ],
-        [
-          9.402,
-          7.063
-        ],
-        [
-          9.431,
-          6.945
-        ],
-        [
-          9.552,
-          6.795
-        ],
-        [
-          9.69,
-          6.69
-        ],
-        [
-          9.827,
-          6.652
-        ]
-      ],
-      "door": {
-        "hinge": "left",
-        "row": 8,
-        "floor_from": [
-          8.3,
-          4.75,
-          11.2,
-          6.1
-        ],
-        "polygon": [
-          [
-            9.431,
-            8.272
-          ],
-          [
-            9.431,
-            7.1
-          ],
-          [
-            9.462,
-            6.977
-          ],
-          [
-            9.57,
-            6.837
-          ],
-          [
-            9.728,
-            6.716
-          ],
-          [
-            9.871,
-            6.681
-          ],
-          [
-            10.029,
-            6.651
-          ],
-          [
-            10.219,
-            6.686
-          ],
-          [
-            10.341,
-            6.721
-          ],
-          [
-            10.462,
-            6.802
-          ],
-          [
-            10.566,
-            6.93
-          ],
-          [
-            10.603,
-            7.0
-          ],
-          [
-            10.617,
-            7.1
-          ],
-          [
-            10.606,
-            8.272
-          ]
-        ]
-      }
-    },
-    "arch_2": {
-      "box": [
-        9.07,
-        6.2,
-        10.87,
-        8.39
-      ],
-      "row": 8,
-      "static": true,
-      "solid": true,
-      "mask": "polygon",
-      "states": {
-        "standing": "painting"
-      },
-      "about": "The stone arch round the door, its dome and its sides, over whoever stands in its doorway and under whoever stands before it; the door's own cut-out left to the door.",
-      "polygon": [
-        [
-          9.12,
-          8.34
-        ],
-        [
-          9.12,
-          7.0
-        ],
-        [
-          9.18,
-          6.78
-        ],
-        [
-          9.37,
-          6.5
-        ],
-        [
-          9.62,
-          6.33
-        ],
-        [
-          9.97,
-          6.28
-        ],
-        [
-          10.32,
-          6.33
-        ],
-        [
-          10.57,
-          6.5
-        ],
-        [
-          10.76,
-          6.78
-        ],
-        [
-          10.82,
-          7.0
-        ],
-        [
-          10.82,
-          8.34
-        ]
-      ]
+      "about": "Door 2: shut as painted, open Gemini's edit of the base, each cut by the difference (D148)."
     },
     "door_3": {
       "box": [
-        8.86,
-        2.2,
-        11.4,
-        4.75
+        9.2,
+        2.0,
+        11.7,
+        5.300000000000001
       ],
       "row": 3,
       "solid": true,
-      "without": "door_3-doorway.png",
+      "under": true,
+      "reach": 0.38,
+      "rest": "closed",
       "states": {
-        "closed": "painting",
+        "closed": {
+          "picture": "three-doors-whole.png",
+          "diff": {},
+          "box": [
+            9.3,
+            2.3000000000000003,
+            10.7,
+            4.300000000000001
+          ]
+        },
         "open": {
-          "picture": "door_3-open.png",
-          "without": "door_3-doorway.png",
-          "leaf": [
-            [
-              9.219,
-              2.543
-            ],
-            [
-              9.256,
-              2.547
-            ],
-            [
-              9.34,
-              2.639
-            ],
-            [
-              9.41,
-              2.798
-            ],
-            [
-              9.427,
-              2.856
-            ],
-            [
-              9.427,
-              4.133
-            ],
-            [
-              9.46,
-              4.15
-            ],
-            [
-              9.502,
-              4.183
-            ],
-            [
-              9.527,
-              4.225
-            ],
-            [
-              9.54,
-              4.263
-            ],
-            [
-              9.54,
-              4.355
-            ],
-            [
-              9.527,
-              4.392
-            ],
-            [
-              9.502,
-              4.43
-            ],
-            [
-              9.456,
-              4.464
-            ],
-            [
-              9.377,
-              4.485
-            ],
-            [
-              9.152,
-              4.489
-            ],
-            [
-              9.052,
-              4.48
-            ],
-            [
-              8.998,
-              4.464
-            ],
-            [
-              8.952,
-              4.43
-            ],
-            [
-              8.927,
-              4.392
-            ],
-            [
-              8.906,
-              4.317
-            ],
-            [
-              8.906,
-              4.221
-            ],
-            [
-              8.927,
-              4.146
-            ],
-            [
-              8.965,
-              4.099
-            ],
-            [
-              9.023,
-              4.07
-            ],
-            [
-              9.023,
-              2.798
-            ],
-            [
-              9.04,
-              2.739
-            ],
-            [
-              9.119,
-              2.61
-            ]
+          "picture": "three-doors-open.png",
+          "diff": {},
+          "box": [
+            9.5,
+            2.1,
+            11.65,
+            5.25
           ],
           "row": 4
         }
       },
+      "without": "three-doors-base.png",
       "at": [
         10,
         3
       ],
-      "under": true,
-      "reach": 0.38,
-      "rest": "closed",
-      "about": "Door 3, from the bottom, across the corridor: shut, its leaf within its doorway (`doorway`, D113); its doorway showing the floor beyond, tiled from `floor_from`; open, its leaf the closed one's own pixels turned on its hinge, over the jamb (tools/art/door.py, D144).",
-      "doorway": [
-        [
-          9.94,
-          2.572
-        ],
-        [
-          10.019,
-          2.572
-        ],
-        [
-          10.285,
-          2.651
-        ],
-        [
-          10.527,
-          2.806
-        ],
-        [
-          10.59,
-          2.919
-        ],
-        [
-          10.619,
-          3.062
-        ],
-        [
-          10.619,
-          4.279
-        ],
-        [
-          9.402,
-          4.279
-        ],
-        [
-          9.402,
-          3.053
-        ],
-        [
-          9.427,
-          2.928
-        ],
-        [
-          9.477,
-          2.815
-        ],
-        [
-          9.677,
-          2.664
-        ],
-        [
-          9.702,
-          2.647
-        ]
+      "about": "Door 3: shut as painted, open Gemini's edit of the base, each cut by the difference (D148)."
+    },
+    "arch_1": {
+      "box": [
+        9.0,
+        10.1,
+        10.95,
+        12.3
       ],
-      "door": {
-        "hinge": "left",
-        "row": 4,
-        "floor_from": [
-          8.3,
-          4.75,
-          11.2,
-          6.1
-        ],
-        "polygon": [
-          [
-            9.43,
-            4.25
-          ],
-          [
-            9.43,
-            3.1
-          ],
-          [
-            9.46,
-            2.95
-          ],
-          [
-            9.51,
-            2.84
-          ],
-          [
-            9.73,
-            2.68
-          ],
-          [
-            9.98,
-            2.6
-          ],
-          [
-            10.25,
-            2.68
-          ],
-          [
-            10.5,
-            2.84
-          ],
-          [
-            10.56,
-            2.95
-          ],
-          [
-            10.59,
-            3.1
-          ],
-          [
-            10.59,
-            4.25
-          ]
-        ]
-      }
+      "row": 12,
+      "static": true,
+      "solid": true,
+      "mask": "difference",
+      "picture": "three-doors-arches-marked.png",
+      "diff": {
+        "threshold": 70,
+        "soft": 70,
+        "speck": 3,
+        "rim": true
+      },
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The first door's arch, over whoever walks under it."
+    },
+    "arch_2": {
+      "box": [
+        9.0,
+        6.1,
+        10.95,
+        8.3
+      ],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "difference",
+      "picture": "three-doors-arches-marked.png",
+      "diff": {
+        "threshold": 70,
+        "soft": 70,
+        "speck": 3,
+        "rim": true
+      },
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The second door's arch."
     },
     "arch_3": {
       "box": [
-        9.07,
-        2.19,
-        10.85,
-        4.39
+        9.0,
+        2.1,
+        10.95,
+        4.300000000000001
       ],
       "row": 4,
       "static": true,
       "solid": true,
-      "mask": "polygon",
+      "mask": "difference",
+      "picture": "three-doors-arches-marked.png",
+      "diff": {
+        "threshold": 70,
+        "soft": 70,
+        "speck": 3,
+        "rim": true
+      },
       "states": {
         "standing": "painting"
       },
-      "about": "The stone arch round the door, its dome and its sides, over whoever stands in its doorway and under whoever stands before it; the door's own cut-out left to the door.",
-      "polygon": [
-        [
-          9.12,
-          4.34
-        ],
-        [
-          9.12,
-          2.99
-        ],
-        [
-          9.18,
-          2.77
-        ],
-        [
-          9.37,
-          2.49
-        ],
-        [
-          9.62,
-          2.32
-        ],
-        [
-          9.96,
-          2.27
-        ],
-        [
-          10.3,
-          2.32
-        ],
-        [
-          10.55,
-          2.49
-        ],
-        [
-          10.74,
-          2.77
-        ],
-        [
-          10.8,
-          2.99
-        ],
-        [
-          10.8,
-          4.34
-        ]
-      ]
+      "about": "The third door's arch."
     },
     "top_arch": {
       "box": [
-        9.0,
+        8.95,
         0.0,
         11.05,
-        2.0
+        2.05
       ],
       "row": 1,
       "static": true,
       "solid": true,
-      "mask": "polygon",
+      "mask": "difference",
+      "picture": "three-doors-arches-marked.png",
+      "diff": {
+        "threshold": 70,
+        "soft": 70,
+        "speck": 3,
+        "rim": true
+      },
       "states": {
         "standing": "painting"
       },
-      "under": true,
-      "about": "The stone arch at the top, over whoever walks under it.",
-      "polygon": [
-        [
-          9.1,
-          1.95
-        ],
-        [
-          9.1,
-          0.75
-        ],
-        [
-          9.2,
-          0.45
-        ],
-        [
-          9.45,
-          0.18
-        ],
-        [
-          9.75,
-          0.05
-        ],
-        [
-          10.0,
-          0.03
-        ],
-        [
-          10.25,
-          0.05
-        ],
-        [
-          10.55,
-          0.18
-        ],
-        [
-          10.8,
-          0.45
-        ],
-        [
-          10.9,
-          0.75
-        ],
-        [
-          10.9,
-          1.95
-        ],
-        [
-          10.72,
-          1.95
-        ],
-        [
-          10.72,
-          0.9
-        ],
-        [
-          10.6,
-          0.55
-        ],
-        [
-          10.3,
-          0.33
-        ],
-        [
-          10.0,
-          0.28
-        ],
-        [
-          9.7,
-          0.33
-        ],
-        [
-          9.4,
-          0.55
-        ],
-        [
-          9.28,
-          0.9
-        ],
-        [
-          9.28,
-          1.95
-        ]
-      ]
+      "about": "The arch at the top, over whoever walks under it.",
+      "under": true
+    },
+    "low_arch": {
+      "box": [
+        8.9,
+        12.95,
+        11.1,
+        15.0
+      ],
+      "row": 14,
+      "static": true,
+      "solid": true,
+      "mask": "difference",
+      "picture": "three-doors-arches-marked.png",
+      "diff": {
+        "threshold": 70,
+        "soft": 70,
+        "speck": 3,
+        "rim": true
+      },
+      "states": {
+        "standing": "painting"
+      },
+      "about": "The arch at the bottom, over whoever walks behind it."
     }
   },
   "cuts": [],
@@ -1101,89 +257,7 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The corridor of three doors\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-four-doors.md`, then edited by it without its\n  grid (`game-three-doors-nogrid.md`).\n- What it left black along the top and in the bottom corners painted by Gemini\n  from `game-three-doors-voids.md`, joined by `tools/art/repaint.py`, and\n  what still was black tiled from the picture's own stones (`tiled`).\n- Its three walls moved along their rows by `tools/art/repaint.py spaced`, so\n  that the doors lie exactly four cells apart.\n- Each door opened by `tools/art/door.py` from the painting itself, no model asked.\n",
-  "voids": {
-    "about": "What the model left black along the top edge and in the bottom corners painted as the castle's inside (D136), the top arch's dark kept: by Gemini 3 Pro Image from tools/art/prompts/game-three-doors-voids.md on the canvas this makes, and joined by tools/art/repaint.py, the painting kept pixel for pixel elsewhere.",
-    "from": "art/raw/game-three-doors/game-three-doors-nogrid.png",
-    "void": "black",
-    "leave": [
-      [
-        2100,
-        100,
-        2750,
-        500
-      ]
-    ],
-    "fade": 10,
-    "canvas": "art/raw/game-three-doors/three-doors-voids-canvas.png",
-    "painting": "art/raw/game-three-doors/three-doors-voids.png"
-  },
-  "spaced": {
-    "about": "The three walls across the corridor, each with its door, moved along their rows so that their feet lie exactly four cells apart, at 12.3, 8.3 and 4.3 (the owner, 2026-11-05: a loop of move_up(4) walks them), the plain floor between them stretched or squeezed.",
-    "from": "art/raw/game-three-doors/three-doors-voids.png",
-    "columns": [
-      7.08,
-      12.93
-    ],
-    "knots": [
-      [
-        1.91,
-        1.91
-      ],
-      [
-        2.94,
-        2.29
-      ],
-      [
-        4.95,
-        4.3
-      ],
-      [
-        6.13,
-        6.33
-      ],
-      [
-        8.1,
-        8.3
-      ],
-      [
-        10.39,
-        10.35
-      ],
-      [
-        12.34,
-        12.3
-      ],
-      [
-        13.16,
-        13.16
-      ]
-    ],
-    "painting": "art/raw/game-three-doors/three-doors-spaced.png"
-  },
-  "tiled": {
-    "about": "What the model still left black, the tops of thick walls in stone blocks, taken from the picture's own stones by tools/art/repaint.py tiled, no model asked.",
-    "from": "art/raw/game-three-doors/three-doors-spaced.png",
-    "void": "black",
-    "leave": [
-      [
-        2100,
-        100,
-        2750,
-        500
-      ]
-    ],
-    "fade": 6,
-    "texture": [
-      "art/raw/game-crossing/crossing-mended.png",
-      100,
-      60,
-      900,
-      1000
-    ],
-    "shade": 0.72,
-    "painting": "art/raw/game-three-doors/three-doors-whole.png"
-  },
+  "source": "# The three doors\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-four-doors.md`, then edited by it: without its grid\n  (`game-three-doors-nogrid.md`), the round of the castle painted\n  (`game-three-doors-voids.md`).\n- Its base is Gemini's edit of that picture, its walls evenly apart, without the doors\n  (`three-doors-base.md`); the doors open are its edit of the base\n  (`three-doors-open.md`), and each leaf the difference (D148). So are the arches, from\n  `three-doors-arches-marked.md`, in which Gemini painted them flat magenta.\n",
   "kept": [
     [
       9.0,
@@ -1208,6 +282,12 @@
       10.2,
       10.85,
       12.4
+    ],
+    [
+      8.8,
+      12.9,
+      11.2,
+      15.0
     ]
   ],
   "nudged": [

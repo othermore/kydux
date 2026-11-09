@@ -30,13 +30,16 @@
   "things": {
     "store_door": {
       "row": 12,
-      "left": 801,
-      "top": 1008,
+      "left": 797,
+      "top": 960,
       "states": {
         "closed": "store_door-closed.webp",
         "open": "store_door-open.webp"
       },
       "under": true,
+      "rows": {
+        "open": 13
+      },
       "rest": "closed",
       "at": [
         10,
@@ -110,7 +113,8 @@
           13
         ]
       ],
-      "by": -0.2
+      "by": -0.1,
+      "about": "Column 10 a little toward the door's middle, clear of its open leaf."
     }
   ],
   "source": "SOURCE.md"

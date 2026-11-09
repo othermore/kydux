@@ -1227,12 +1227,15 @@ def test_an_exported_scene_keeps_its_contract_and_nothing_reaches_below_its_row(
     for name, thing in art["things"].items():
         # A thing may reach into the row below by what its settings allow it (a
         # door's threshold), and no further; a state drawn on a row of its own, a
-        # door swung open against its wall (D111), no further than that row.
+        # door swung open against its wall (D111), no further than that row and its reach.
         reach = things[name].get("reach", 0.0)
         for state, picture in thing["states"].items():
             image = Image.open(folder / picture)
             row = thing.get("rows", {}).get(state, thing["row"])
-            assert thing["top"] + image.height <= round((row + 1 + reach) * cell), name
+            own = things[name]["states"][state]
+            # A state may reach lower than the thing, a leaf's foot and its shadow.
+            lower = own.get("reach", reach) if isinstance(own, dict) else reach
+            assert thing["top"] + image.height <= round((row + 1 + lower) * cell), name
     assert (folder / art["source"]).is_file()
 
 

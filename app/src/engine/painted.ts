@@ -10,7 +10,7 @@ import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
 import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
-import { coverDepth, type Lowered, type Nudged, overDepth, rowDepth, thingDepth } from './depth';
+import { coverDepth, type Lowered, type Nudged, nudgedBy, overDepth, rowDepth, thingDepth } from './depth';
 import type { Dark } from './shade';
 import { drawnShift, shiftBy } from './shift';
 import type { Tile } from './sight';
@@ -271,7 +271,8 @@ function middleOf(scene: Phaser.Scene, key: string): [number, number] {
 
 /** Where a painted thing's picture is drawn for a tile, its corner in the scene's
  * pixels (D85): as painted on its own cell; on another, its middle on the tile's
- * middle (D109), read from the picture of the state it is first painted in. */
+ * middle, nudged as a figure on it is (D105, D109), read from the picture of the state
+ * it is first painted in. */
 function drawnAt(scene: Phaser.Scene, art: Art, id: string, tile: Tile): [number, number] {
   const painted = art.scene.things[id];
   if (!painted) return [0, 0];
@@ -279,7 +280,7 @@ function drawnAt(scene: Phaser.Scene, art: Art, id: string, tile: Tile): [number
   const first = `art-${id}-${Object.keys(painted.states)[0]}`;
   const [mx, my] = scene.textures.exists(first) ? middleOf(scene, first) : [0, 0];
   const middle: [number, number] = [((painted.left + mx) * scale) / TILE, ((painted.top + my) * scale) / TILE];
-  const [dx, dy] = drawnShift(painted.at, tile, middle);
+  const [dx, dy] = drawnShift(painted.at, tile, middle, nudgedBy(art.scene.nudged, tile));
   return [painted.left * scale + dx * TILE, painted.top * scale + dy * TILE];
 }
 

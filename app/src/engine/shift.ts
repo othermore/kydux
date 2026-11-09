@@ -15,8 +15,14 @@ export function shiftBy(paintedAt: Tile | undefined, tile: Tile): Tile {
 
 /** How far, in cells, a painted thing's picture is drawn from where it is painted:
  * none on its painted cell; on another, so far that the middle of what is drawn of
- * it, `middle`, in the scene's cells, is the tile's middle (D109). */
-export function drawnShift(paintedAt: Tile | undefined, tile: Tile, middle: [number, number]): [number, number] {
+ * it, `middle`, in the scene's cells, is the tile's middle, with the tile's nudge, so
+ * that it lies where a figure on that tile stands (D105, D109). */
+export function drawnShift(
+  paintedAt: Tile | undefined,
+  tile: Tile,
+  middle: [number, number],
+  nudge = 0,
+): [number, number] {
   if (!paintedAt || (paintedAt[0] === tile[0] && paintedAt[1] === tile[1])) return [0, 0];
-  return [tile[0] + 0.5 - middle[0], tile[1] + 0.5 - middle[1]];
+  return [tile[0] + 0.5 + nudge - middle[0], tile[1] + 0.5 - middle[1]];
 }

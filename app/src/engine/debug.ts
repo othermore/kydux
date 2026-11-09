@@ -43,6 +43,8 @@ const KIND_COLOURS: Record<string, number> = {
 const OTHER = 0xff66cc;
 /** The cross on a cell an open door's leaf lies on (D125). */
 const LEAF = 0xff9f1a;
+/** The cross on an enchanted cell, floor where no figure is seen (D135). */
+const ENCHANTED = 0xb56bff;
 
 
 function kept(): Record<DebugLayer, boolean> {
@@ -148,6 +150,11 @@ export class DebugView {
           cells.lineBetween((x + 1) * TILE - 6, y * TILE + 6, x * TILE + 6, (y + 1) * TILE - 6);
         }
       }
+    }
+    cells.lineStyle(3, ENCHANTED, 0.95);
+    for (const [x, y] of this.map.enchanted) {
+      cells.lineBetween(x * TILE + 6, y * TILE + 6, (x + 1) * TILE - 6, (y + 1) * TILE - 6);
+      cells.lineBetween((x + 1) * TILE - 6, y * TILE + 6, x * TILE + 6, (y + 1) * TILE - 6);
     }
     cells.lineStyle(1, 0xffffff, 0.45);
     for (let x = x0; x <= x1; x += 1) cells.lineBetween(x * TILE, y0 * TILE, x * TILE, y1 * TILE);
@@ -283,6 +290,7 @@ export class DebugView {
     }
     entry('', debugWord('blocked'), true);
     if (this.map.things.some((thing) => (thing.covers ?? []).length > 0)) entry(hex(LEAF), debugWord('leaf'));
+    if (this.map.enchanted.length > 0) entry(hex(ENCHANTED), debugWord('enchanted'), true);
     return legend;
   }
 

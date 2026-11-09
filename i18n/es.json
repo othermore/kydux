@@ -408,6 +408,7 @@
     },
     "blocked": "No se pisa",
     "leaf": "No se pisa con su puerta abierta",
+    "enchanted": "Encantada: aquí no se ve a nadie",
     "kinds": {
       "wall": "Muro",
       "floor": "Suelo",

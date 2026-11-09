@@ -181,6 +181,9 @@ const GIVE_TURN = 0.2;
  * and over a scene without art (D52); and how long its light takes to lift, against
  * a tick. */
 const DARK_PAINTED = 0.82;
+/** A cell's width on the small canvas the dark over a painting is drawn on. */
+const DARK_CELL = 24;
+const DARK_KEY = 'dark-soft';
 const DARK_PLAIN = 0.97;
 const LIGHT_LIFT = 0.6;
 /** The kinds of thing that lie on the floor and go unseen in the dark (D52). */
@@ -254,6 +257,9 @@ class LevelScene extends Phaser.Scene {
   /** Whether the room is lit (D52), and the dark drawn over its floor while not. */
   private lit = true;
   private darkness!: Phaser.GameObjects.Graphics;
+  /** The dark over a painting (D52), soft at its edges and round the wizard. */
+  private softDark: Phaser.GameObjects.Image | null = null;
+  private darkLifting = false;
   /** The tick shown, and each slab's holds seen so far (D53, D138). */
   private shownTick = 0;
   private holds = new Map<string, Hold[]>();
@@ -503,6 +509,7 @@ class LevelScene extends Phaser.Scene {
     this.enchanted = new Set(this.map.enchanted.map(([x, y]) => `${x},${y}`));
     // Over a painting, the dark lies over its rows and its figures too (D52).
     this.darkness = this.add.graphics().setDepth(this.art ? lightDepth(this.map.height) - 0.5 : 2.5);
+    this.softDark = null;
     for (const thing of this.map.things) {
       // A bed is the scene's: the painting draws it, and nothing is drawn for it (D84).
       if (thing.kind === 'bed') continue;
@@ -1718,7 +1725,8 @@ class LevelScene extends Phaser.Scene {
     // The dark over the dark area (the dark rooms, or the whole map), but the wizard's
     // tile and its eight neighbours (D52, D73).
     this.darkness.clear();
-    if (!this.lit) this.drawDark(this.darkness);
+    if (this.art) this.paintDark();
+    else if (!this.lit) this.drawDark();
     // What lies on the floor of a painted dark room is not seen until it is lit or the
     // wizard is beside it (D52).
     if (this.art && this.map.dark) {
@@ -1760,16 +1768,66 @@ class LevelScene extends Phaser.Scene {
     this.publishDrawn();
   }
 
-  /** The dark drawn on a graphics object (D52): on a painted scene over every cell of
-   * the dark area, faint enough for the painting's shapes to show; else over its floor. */
-  private drawDark(graphics: Phaser.GameObjects.Graphics): void {
-    graphics.fillStyle(0x07080c, this.art ? DARK_PAINTED : DARK_PLAIN);
+  /** The dark over a painting (D52): the cells of the dark area as one shape, faint
+   * enough for the painting's shapes to show, soft at its edges, with a soft light round
+   * the wizard. Drawn on a small canvas and shown large. */
+  private paintDark(): void {
+    if (!this.map.dark) return;
+    if (this.lit) {
+      if (!this.darkLifting) this.softDark?.setVisible(false);
+      return;
+    }
+    const [width, height] = [this.map.width * DARK_CELL, this.map.height * DARK_CELL];
+    if (!this.softDark) {
+      if (this.textures.exists(DARK_KEY)) this.textures.remove(DARK_KEY);
+      this.textures.createCanvas(DARK_KEY, width, height);
+      this.softDark = this.add
+        .image(0, 0, DARK_KEY)
+        .setOrigin(0, 0)
+        .setScale(TILE / DARK_CELL)
+        .setDepth(this.darkness.depth);
+    }
+    const texture = this.textures.get(DARK_KEY) as Phaser.Textures.CanvasTexture;
+    const ctx = texture.getContext();
+    ctx.clearRect(0, 0, width, height);
+    // Only the shape's shadow is drawn, so that it has no hard edge: the shape itself
+    // lies off the canvas.
+    const away = width + height;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.shadowColor = '#07080c';
+    ctx.shadowBlur = DARK_CELL * 0.6;
+    ctx.shadowOffsetX = away;
+    ctx.fillStyle = '#07080c';
+    ctx.beginPath();
+    for (const [x, y] of this.darkCells()) ctx.rect(x * DARK_CELL - away, y * DARK_CELL, DARK_CELL, DARK_CELL);
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    const [cx, cy] = [(this.wizardTile[0] + 0.5) * DARK_CELL, (this.wizardTile[1] + 0.5) * DARK_CELL];
+    const light = ctx.createRadialGradient(cx, cy, DARK_CELL * 1.1, cx, cy, DARK_CELL * 2.1);
+    light.addColorStop(0, 'rgba(0, 0, 0, 1)');
+    light.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = light;
+    ctx.fillRect(cx - DARK_CELL * 2.2, cy - DARK_CELL * 2.2, DARK_CELL * 4.4, DARK_CELL * 4.4);
+    ctx.globalCompositeOperation = 'source-over';
+    texture.refresh();
+    this.tweens.killTweensOf(this.softDark);
+    this.darkLifting = false;
+    this.softDark.setVisible(true).setAlpha(DARK_PAINTED);
+  }
+
+  /** The dark over the floor of a scene with no painting (D52). */
+  private drawDark(): void {
+    const graphics = this.darkness;
+    graphics.fillStyle(0x07080c, DARK_PLAIN);
     const area = this.map.darkArea.length > 0 ? new Set(this.map.darkArea.map(([x, y]) => `${x},${y}`)) : null;
     this.map.rows.forEach((row, y) => {
       [...row].forEach((char, x) => {
         const near = Math.abs(x - this.wizardTile[0]) <= 1 && Math.abs(y - this.wizardTile[1]) <= 1;
         const inside = !area || area.has(`${x},${y}`);
-        if ((this.art || char !== '#') && inside && !near) graphics.fillRect(x * TILE, y * TILE, TILE, TILE);
+        if (char !== '#' && inside && !near) graphics.fillRect(x * TILE, y * TILE, TILE, TILE);
       });
     });
   }
@@ -1777,14 +1835,17 @@ class LevelScene extends Phaser.Scene {
   /** The light lifting the dark (D52): at once on a seek or a scene without art; else
    * the dark as it was fades out over a part of the tick. */
   private liftDark(instant: boolean): void {
-    if (!instant && this.art && !this.still) {
-      const fading = this.add.graphics().setDepth(this.darkness.depth);
-      this.drawDark(fading);
+    if (!instant && this.softDark && !this.still) {
+      this.darkLifting = true;
+      const fading = this.softDark;
       this.tweens.add({
         targets: fading,
         alpha: 0,
         duration: this.playback.tickDuration * LIGHT_LIFT,
-        onComplete: () => fading.destroy(),
+        onComplete: () => {
+          this.darkLifting = false;
+          fading.setVisible(false);
+        },
       });
     }
     this.lit = true;

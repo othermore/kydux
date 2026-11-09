@@ -13,4 +13,5 @@ later, like the rest of it.
   `tools/art/repaint.py`, and what still was black tiled from the picture's
   own stones (`tiled`); `game-crossing-voids-top.md` was asked first and kept
   the paper as the page.
+- A black sliver over the tunnel's arch filled from the pixels round it (`fill`).
 - Its statues and its low arch cut by the polygons traced round them.

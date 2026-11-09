@@ -3,9 +3,9 @@
   "sources": {
     "folder": "art/raw/game-crossing",
     "edits": "art/raw/game-crossing",
-    "painting": "crossing-whole.png",
+    "painting": "crossing-clean.png",
     "grid": "grid.json",
-    "ground": "crossing-whole.png"
+    "ground": "crossing-clean.png"
   },
   "things": {
     "statue_1": {
@@ -368,7 +368,7 @@
     "outline": 100
   },
   "cut": false,
-  "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-tunnel-exit.md`, then edited by it without its\n  grid (`game-crossing-nogrid.md`).\n- The corridor beside the statues made three cells wide by\n  `tools/art/repaint.py spaced`.\n- The pale paper round the castle painted as its inside by Gemini from\n  `game-crossing-voids.md` and `game-crossing-voids-more.md`, joined by\n  `tools/art/repaint.py`, and what still was black tiled from the picture's\n  own stones (`tiled`); `game-crossing-voids-top.md` was asked first and kept\n  the paper as the page.\n- Its statues and its low arch cut by the polygons traced round them.\n",
+  "source": "# The crossing\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-tunnel-exit.md`, then edited by it without its\n  grid (`game-crossing-nogrid.md`).\n- The corridor beside the statues made three cells wide by\n  `tools/art/repaint.py spaced`.\n- The pale paper round the castle painted as its inside by Gemini from\n  `game-crossing-voids.md` and `game-crossing-voids-more.md`, joined by\n  `tools/art/repaint.py`, and what still was black tiled from the picture's\n  own stones (`tiled`); `game-crossing-voids-top.md` was asked first and kept\n  the paper as the page.\n- A black sliver over the tunnel's arch filled from the pixels round it (`fill`).\n- Its statues and its low arch cut by the polygons traced round them.\n",
   "spaced": {
     "about": "The corridor that goes down beside the statues made three cells wide, as its level asks (Dask in its middle, the wizard down the side he does not look at): between rows 8.28 and 12.62, its right wall, its torch and the room beyond moved a cell to the right, and its plain floor stretched.",
     "from": "art/raw/game-crossing/game-crossing-nogrid.png",
@@ -514,5 +514,19 @@
       16.1,
       14.1
     ]
-  ]
+  ],
+  "sliver": {
+    "about": "A black sliver over the tunnel's arch, filled from the pixels beside it by tools/art/repaint.py fill, no model asked.",
+    "from": "art/raw/game-crossing/crossing-whole.png",
+    "boxes": [
+      [
+        228,
+        1295,
+        360,
+        1343
+      ]
+    ],
+    "sides": 4,
+    "painting": "art/raw/game-crossing/crossing-clean.png"
+  }
 }

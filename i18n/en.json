@@ -408,6 +408,7 @@
     },
     "blocked": "Not walked on",
     "leaf": "Not walked on while its door is open",
+    "enchanted": "Enchanted: no figure is seen on it",
     "kinds": {
       "wall": "Wall",
       "floor": "Floor",

@@ -23,8 +23,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
   src/runtime/  the worker that holds Pyodide, and the page's side of it
   src/engine/   the scene in Phaser, where everything stands before a run
                 (layout.ts), what an actor sees (sight.ts, the same rule as the
-                world's, tested on tests/fixtures/sight.json), a slab's state at
-                a tick (slab.ts, the same rule as the world's), the playback, and
+                world's, tested on tests/fixtures/sight.json), a hole's state at
+                a tick (hole.ts, the same rule as the world's), the playback, and
                 the words the scene shows (words.ts, why an action failed);
                 the looks a wizard may have (looks.ts) and the placeholders for a
                 scene without art (placeholders.ts); the camera on the scene, its
@@ -43,8 +43,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the wizard casting, a seal breaking and a door opening (D81),
                 the wizard's outline where something painted hides more than
                 a quarter of it, a revealed thing's glow wherever
-                something covers it, and the goal's ring where something is
-                drawn over it (silhouette.ts, cover.ts, D85, D107, D160),
+                something covers it, and the goal's ring, as thin as a figure's
+                outline, where a cut-out is drawn over it (silhouette.ts,
+                cover.ts, D85, D107, D160, D168),
                 the wizard asleep
                 (D84), the night that falls once it sleeps and the morning
                 after it, and a morning story's light (light.ts, D124), the
@@ -231,7 +232,9 @@ teacher.can_see(target)      # the target straight ahead, within its sight (4 ti
 ghost.kind, ghost.name, ghost.position, ghost.facing    # and cat.*: they stand (D48)
 teacher.distance_to(other), ghost.distance_to(other), cat.distance_to(other)
 
-slab.in_place                # whether a step onto it, taken now, lands on it (D53, D138)
+hole.open                    # whether a step onto it, taken now, would find it open (D53, D167)
+hole.closed                  # whether a step onto it, taken now, lands on the floor; hole.open's
+                             # opposite, so `while hole.open:` is `while not hole.closed:`
 ```
 
 The map's characters: `#` a wall, `.` floor, `=` a shelf (D46), `S` the
@@ -252,7 +255,7 @@ tiles are `[x, y]`.
 | kind | actor | data | the scene |
 |---|---|---|---|
 | `move` | wizard, or an actor | `from`, `to`, `facing` | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132) |
-| `bump` | wizard | `at`, `facing`, `by`: `wall`, `door` or `slab` | nudges the wizard against it |
+| `bump` | wizard | `at`, `facing`, `by`: `wall`, `door` or `hole` | nudges the wizard against it |
 | `say` | wizard | `text` | a bubble over the wizard for three ticks, under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
 | `pick_up` | wizard | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); `data-carried` |
@@ -261,7 +264,7 @@ tiles are `[x, y]`.
 | `cast` | wizard | `spell`, `at` | the wand is pointed and a point of light flies from it, to the thing the spell takes or a tile ahead, and bursts in a ring |
 | `pull` | the thing, in the wizard's tick | `id`, `from`, `to` | once the spell's light reaches it, the thing flies to the wizard's hands, in its `pulled` state when it is painted one, a book glowing (D47), and stays there, held (D127) |
 | `light` | `world`, in the wizard's tick | `at` | the dark is lifted (D52) |
-| `hold` | the slab, in the wizard's tick | `id`, `from`, `until`: the ticks it is held | a ring round the slab's cell, and it stays in place for those ticks (D53, D138) |
+| `hold` | the hole, in the wizard's tick | `id`, `from`, `until`: the ticks it is held closed | a ring round the hole's cells, and it stays closed for those ticks (D53, D167) |
 | `map` | `world`, in the wizard's tick | `at` | the playback pauses, and once the wand is seen pointed the plan's window opens over the page, drawn at that tick; closed, the playback goes on (D134) |
 | `give` | wizard | `id`, `to`, `at` | the wizard turns to the figure that takes the thing, which faces the wizard; then the thing floats from the middle of the wizard's hands to the middle of that figure, where it is drawn, and fades there (D48) |
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
@@ -868,7 +871,7 @@ one overturns stays, marked as superseded.
   something in the dark, D162): until then, a
   thing that can be carried and lies farther than one tile from the
   wizard, in any of the eight directions, has no `position`, and so
-  `find_nearest`, `find_all` and `fendra` pass it by; doors, slabs and
+  `find_nearest`, `find_all` and `fendra` pass it by; doors, holes and
   actors are the castle's shape, and are seen. `kirra` makes a `light`
   event, the world's, and lights the room for the rest of the run; in a
   lit room it does nothing. A teacher's sight is not darkness's
@@ -877,8 +880,8 @@ one overturns stays, marked as superseded.
   remembers where the wizard has been, which it cannot. Over a painting the
   dark is one soft shape over the dark area, faint enough for the painting's
   shapes to show, with a soft light round the wizard.
-- **D53 — A stair comes and goes, and `osto` holds it** (its thing is a slab
-  over a hole: D138). Decided
+- **D53 — A stair comes and goes, and `osto` holds it** (its thing is a hole
+  that opens in the floor: D167). Decided
   2026-10-21 (sprint-9.md), built the same day. A thing of kind `stair`,
   with a whole `period`, lies on a floor tile and is in place for
   `period` ticks and away for as many, in place from tick 0. A step onto
@@ -940,7 +943,7 @@ one overturns stays, marked as superseded.
 - **D57 — Stars say how well, and why.** Decided 2026-10-22 by the owner's
   UAT (sprint-10.md), built the same day. A win earns three stars and
   loses one for each of: a hint shown in the level; the winning run
-  bumping into a wall, a door or a slab; and a bonus goal unmet, or, in a
+  bumping into a wall, a door or a hole; and a bonus goal unmet, or, in a
   level with no bonus goal, a run before the winning one in the same visit
   to the level (the progress also counts every run, `runs`). A win is one
   star at least. `app/src/ui/stars.ts` judges, and the win card lists the
@@ -2053,7 +2056,7 @@ one overturns stays, marked as superseded.
   whenever the loop ends; its three ways start the teacher a third of its period
   apart, so that no number of waits written in the code wins all three, which a
   test holds. Rules out a loop level a child wins with `wait(5)` found by trial.
-- **D138 — The stair of D53 is a slab over a hole.** Decided 2026-11-05 by
+- **D138 — The stair of D53 is a slab over a hole (D167 takes over).** Decided 2026-11-05 by
   the owner, who said a moving stair cannot be drawn in the scene's view.
   The thing's kind is `slab` in `level.json` and in the child's code
   (`slab.in_place`), with D53's rule unchanged: in place for `period` ticks
@@ -2111,7 +2114,7 @@ one overturns stays, marked as superseded.
   each pixel's tone from the mean round it, stretched between the picture's
   darkest and lightest, its lines darkened from what is darker than that mean,
   its colour taken out. Over it, the grid at the scene's cells, every door as the
-  scene shows it at that tick (inked with the ground), a key or a slab's hole with its
+  scene shows it at that tick (inked with the ground), a key or a hole with its
   own picture, the figures with their
   own standing sprites and their names and cells beside them, every `reach` mark
   with the mark's picture, the hidden ones too, since the plan is where the child
@@ -2184,7 +2187,7 @@ one overturns stays, marked as superseded.
   base; what stands or lies in the scene is a cut-out over it at its row; what a figure
   walks behind is a cut-out on its foot's row or `over`. A try whose edit changed what it
   should not, in the mask or beside it, is asked again, three tries at most. A key and a
-  slab's hole stay the pictures they were cut from. Rules out `door.py`'s open leaf,
+  hole stay the pictures they were cut from. Rules out `door.py`'s open leaf,
   `repaint.py spaced`, `tiled`, `placed` and `fill` on a scene the child sees, and a
   polygon traced by eye where a difference can be had; those tools stay for the sheets and
   for chapter 2, which the owner has accepted.
@@ -2194,9 +2197,9 @@ one overturns stays, marked as superseded.
   the cells of a door or an arch and the cell before and after them, both columns are
   drawn toward the opening's middle, by 0.2 cell each, so that a figure passes clear of
   the jambs and the two columns stay apart. Where an open leaf stands in the doorway, the
-  column beside it moves less (0.1 at the storeroom's door), and where a double door's
-  leaves stand within it, both move 0.3 (D158), and so do the two columns round the long
-  round's arches (the owner, sprint 34). (c) The first floor row below a
+  column beside it moves less (0.1 at the storeroom's door); the two columns round the long
+  round's arches move 0.3 (the owner, sprint 34), and round the way down's double door, its
+  leaves a quarter open against its jambs, 0.2 (the owner, D167). (c) The first floor row below a
   wall's foot is drawn 0.3 cell lower (`lowered_rows`); the row the foot is painted on is
   wall (D154). (d) The row at the bottom of a
   corridor where the lower wall's face is painted is walked, the wall's top cut `over` the
@@ -2204,7 +2207,7 @@ one overturns stays, marked as superseded.
   is drawn 0.3 higher. (e) A level starts a cell past an arch, never in it or on the cell
   beside its jamb. (f) The plan and the goal's mark draw at the same nudged place as a
   figure on the cell (D151). A cell beside a hole stays a wall where a child could walk
-  round it, the slab's lesson lost. Rules out a column nudged whole to a corridor's middle,
+  round it, the hole's lesson lost. Rules out a column nudged whole to a corridor's middle,
   and a figure whose head lies on the wall above it.
 - **D150 — A door is as wide as the cells its leaf closes.** Decided 2026-11-08. A door's
   `cells` in `scene.json` lists the one or two cells of its doorway; shut, it blocks them
@@ -2287,8 +2290,8 @@ one overturns stays, marked as superseded.
   leaves, opened wide, would run into a wall beside the doorway is asked of the model
   opened within the doorway's width: the way down's double door has its two leaves turned
   a quarter, each against the inner side of its own jamb, the arch and its jambs whole
-  (D165), and the figures passing it drawn 0.3 toward the doorway's middle on its cells
-  and the cell before and after. Leaves that stand in their doorway are drawn on a row at
+  (D165), and the figures passing it drawn 0.2 toward the doorway's middle on its cells
+  and the cell before and after (D149 b, D167). Leaves that stand in their doorway are drawn on a row at
   or below their feet, so that a figure passing between them is seen. No leaf is hidden
   behind a wall's box to make room. Rules out a leaf drawn over or behind a side wall.
 - **D159 — The plan draws a cut-out where it is painted.** Decided 2026-11-08 by the owner
@@ -2297,7 +2300,7 @@ one overturns stays, marked as superseded.
   (`paintedBox`), as the scene does, never from the cell it stands on; a test holds the
   crossing's statues and the doors at the boxes art.json gives them. Rules out a thing on
   the plan a row off the scene.
-- **D160 — The goal's mark lies on the floor.** Decided 2026-11-08 by the owner (*los
+- **D160 — The goal's mark lies on the floor (D168 says how its ring is drawn).** Decided 2026-11-08 by the owner (*los
   círculos de destino deben verse sobre el suelo, tapados por lo que está delante, en
   todos los escenarios de todos los capítulos*). On a painted scene the mark is drawn at
   the ground's depth (`MARK_DEPTH`), under every row's things, every thing standing and
@@ -2323,13 +2326,13 @@ one overturns stays, marked as superseded.
   edge.
 - **D162 — A dark room is dark in every level played before it is lit.** Decided
   2026-11-08 by the owner (*en este nivel la sala debería estar a oscuras, porque si no ya
-  la ha visto el niño*). *La losa que va y viene* plays with the storeroom dark (`dark:
+  la ha visto el niño*). *El agujero que se abre* plays with the storeroom dark (`dark:
   ["storeroom"]`), its mark on (5, 7) in the dark, seen faintly as the castle's shape
   (D52), and no light to cast. A dark level lists `kirra` among its spells only when a
   `collect` or an `open` goal names a thing that lies in the dark (its dark rooms, or the
   whole map), since a `reach` needs no sight (`level.py`). Rules out a room seen lit a
   level before the level that lights it.
-- **D163 — The plan shows a dark room as the castle's plan.** Decided 2026-11-08 by the
+- **D163 — The plan shows a dark room as the castle's plan (D169: the things in it too).** Decided 2026-11-08 by the
   owner (*en el mapa la oscuridad no se debería ver como un parche blanco*). The plan
   (D151) draws a dark room's picture as any room's, since the map knows the castle; only
   the things that lie unlit in it are not drawn (the key stays the level's secret), and a
@@ -2357,3 +2360,51 @@ one overturns stays, marked as superseded.
   farther out, at the first place that overlaps no figure's body, no mark, no label
   placed before it and, for a mark's, no solid pixel of a cut-out, and they are drawn
   last, over everything. Rules out Nuri's label over Teku's figure on P3's plan.
+- **D167 — The thing in the floor is a hole that opens.** Decided 2026-11-08 by the owner
+  (*el dibujo muestra un agujero redondo que aparece y desaparece; cambiemos los textos; en el
+  código `hole.closed` o `hole.open`*). The thing's kind is `hole`, in `level.json` and in the
+  child's code: closed for `period` ticks and open for as many, from tick 0 closed, and closed
+  while `osto` holds it (D53's rule). `hole.closed` is true while the floor covers it and
+  `hole.open` is its opposite, both looking at the next tick, so that `while not hole.closed:`
+  and `while hole.open:` are one wait after which a step lands; a step onto an open hole
+  bumps (`by: "hole"`); `osto`, cast beside any of its cells, holds it closed from the next
+  tick it is closed, for `HOLD_TICKS`. A hole lies on one cell or two side by side (`cells`,
+  as a door's, D150, `at` the first; the loader refuses others), open and closed together;
+  the way down's lies on (10, 7) and (9, 7), as it is painted, so that no one walks round it,
+  and the figures by its half-open door are drawn 0.2 toward the doorway's middle (D149 b).
+  Its picture is the art's state `open` (D148), drawn while it is open, and its ring while
+  `osto` holds it spans its cells; to the art tools a thing with a `closed` state is a door,
+  and a hole's one state has no leaf. The lesson *Luz y trampas* teaches the two waits as one;
+  the levels' solutions use `while not hole.closed:` and their bonus asks `closed`; *El
+  agujero que se abre* (`the-opening-hole`) is played in four ways, *Se abre cada tres ticks*
+  to *Se abre cada siete ticks*. In the words the child reads the hole is *un agujero que se
+  abre en el suelo*, *una trampa mágica, o un portal oscuro* where it is first told, and
+  *otro de esos agujeros* afterwards; no text says *losa*, nor that anything goes and comes,
+  which a content test holds. Supersedes D138 and D53's names. Rules out a slab in any text
+  and `in_place` in any code.
+- **D168 — The mark's silhouette is a figure's, and only over the scene's cut-outs.** Decided
+  2026-11-08 by the owner (*el círculo que se ve por encima debería ser muy fino y latente,
+  como la silueta de los personajes, y solo sobre los objetos del escenario, no sobre los
+  personajes*). Where a cut-out of the scene covers the goal's mark, the covered part of its
+  ring is drawn as a figure's outline is behind a cut-out (D107): a line as thick as the
+  figures' (`THICK` at the figure's scale), in their yellow, fading away and coming back with
+  their beat, masked by copies of the cut-outs and, inverted, by copies of the figures
+  (`MarkSilhouette`); where a figure stands over the mark, the figure covers it and nothing
+  is drawn over the figure. The plan draws it so, thin, over its cut-outs and never over a
+  figure. `data-marks-covered` names the marks a cut-out covers. Amends D160. Rules out a ring
+  over the wizard's feet, and one thicker or brighter than a figure's outline.
+- **D169 — The plan shows the things of a dark room.** Decided 2026-11-08 by the owner (*la
+  llave debería salir en el mapa del niño travieso*). The plan draws a dark room's picture and
+  the things lying in it, the key among them, lit or not, since the map knows the castle; only
+  the dark tunnel hides its figures (D135). The scene keeps a dark room's things unseen until it
+  is lit (D52), and the dark room's level asks the steps to be counted from `position`, since
+  the key lies on another cell in each way (D153). Amends D163.
+- **D170 — A lesson that teaches a principle runs plain Python.** Decided 2026-11-08 by the
+  owner (*son lecciones teóricas; no nos hace falta el mago*). A page that teaches `print`, a
+  variable or a sum carries a block without the wizard, run in the world of the level after
+  the lesson as any block is (D142), what it prints the answer: in chapter 2, *Lo que saben
+  las cosas*, page 3, prints a number, a sum and a string; *Encontrar cosas*, page 2, keeps a
+  number and a string in variables and prints them, and page 3 adds two variables into a
+  third and prints it. The variables' names in a block are the child's own words, Spanish in
+  the Spanish lesson and English in the English one. Chapter 1's lessons keep their blocks as
+  they are. Rules out a theory page with no code to run.

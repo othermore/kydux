@@ -599,25 +599,28 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     levels (seven practices, a fix, an improve) taught by Nuri, the wand
     lent, the first spell, and the story up to the castle (`course.md`).
 5.4 Chapter 2, The library (variables, attributes, finding things), in the
-    scene of the library: Wenna's five lessons, eight levels (an improve, a
-    fix), Eldra's books, locked doors and keys, and the wand bank.
-5.5 Chapter 3, The passages (the cells and `position`, conditions, loops),
-    in seven small scenes (D136, `sprint-30.md`, as the owner reads it,
-    `sprint-31.md`, each scene's states Gemini's, `sprint-32.md`, the crossing a row
-    lower with its doors as painted, `sprint-33.md`, and the marks on the floor,
-    `sprint-34.md`): the friend's ten lessons, whose
-    pages run their code (D142), eleven levels (a fix, an improve), the naughty child's
-    map as a window with the scene's plan in ink, drawn as the scene draws it and opened
-    by its spell (D134, D143, D151, D159), the dark tunnel (D135, D145, D152), the
-    patrolling teacher (D137), the crossing's one idea a level (D146), the slab over its
-    hole in four periods (D138), the dark room and a position's two numbers (D153), doors
-    of two cells (D150), each door painted at every tick and hung on one jamb (D156), its
-    leaf within its doorway (D158), the cells where the figures walk (D149, D154, D157),
-    masks opaque inside their outlines (D155), the goal's mark lying on the floor with its
-    ring seen over what covers it, in every chapter (D160), a door's open state asked of
-    the model on the whole scene (D161), the storeroom dark until the level that lights it
-    and drawn on the plan as any room (D162, D163), a key drawn small (D164), the way
-    down's double door a quarter open (D165), and the plan's names covering nothing (D166).
+    scene of the library: Wenna's five lessons, whose pages on `print` and the
+    variable run plain Python (D170), eight levels (an improve, a fix), Eldra's
+    books, locked doors and keys, and the wand bank.
+5.5 Chapter 3, The passages (the cells and `position`, conditions, loops), in seven
+    small scenes (D136, `sprint-30.md`, as the owner reads it, `sprint-31.md`, each
+    scene's states Gemini's, `sprint-32.md`, the crossing a row lower with its doors as
+    painted, `sprint-33.md`, the marks on the floor, `sprint-34.md`, and the hole that
+    opens, `sprint-35.md`): the friend's ten lessons, whose pages run their code (D142),
+    eleven levels (a fix, an improve), the naughty child's map as a window with the
+    scene's plan in ink, drawn as the scene draws it and opened by its spell (D134,
+    D143, D151, D159), the dark tunnel (D135, D145, D152), the patrolling teacher
+    (D137), the crossing's one idea a level (D146), the hole that opens in the floor, in
+    four periods, on one cell or two (D167), the dark room and a position's two numbers
+    (D153), doors of two cells (D150), each door painted at every tick and hung on one
+    jamb (D156), its leaf within its doorway (D158), the cells where the figures walk
+    (D149, D154, D157), masks opaque inside their outlines (D155), the goal's mark lying
+    on the floor with its ring seen as thin as a figure's outline over the cut-outs that
+    cover it, never over a figure, in every chapter (D160, D168), a door's open state
+    asked of the model on the whole scene (D161), the storeroom dark until the level
+    that lights it and drawn on the plan as any room, with its key (D162, D163, D169), a
+    key drawn small (D164), the way down's double door a quarter open (D165), and the
+    plan's names covering nothing (D166).
 5.6 Chapter 4, The broom (lists, functions), in a scene of the broom field
     and the village: flying, the race, an action of the child's own.
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

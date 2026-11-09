@@ -452,6 +452,12 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    leaf whole and the same door open as shut, a doorway showing the floor beyond, no line
    of the shut door left on an open one, no figure hidden where nothing stands.
 
+A hole that opens in the floor (D167) has one state, `open`: Gemini's picture of it open, cut
+by the ellipse traced round it (`traced`), drawn while it is open; closed, it is the ground's
+floor. A thing with a `closed` state is a door to the tools; a hole's `open` has no leaf, so no
+`covers` and no nudges are measured for it. The way down's hole is painted across the
+corridor's two cells, and the level lays it on both (`cells`).
+
 A door whose open leaf hides a cell a figure could stand on names it in `covers` (D125, D157):
 a leaf cut by difference is measured on every row it reaches. On the rows above its own, where
 a figure is drawn behind it, a cell is covered when the leaf covers a fifth of its lower part;

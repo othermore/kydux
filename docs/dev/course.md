@@ -161,8 +161,8 @@ that stays locked.
 | `level:your-bed` | Practice 1 | In one's own dormitory, between the first two beds: a step to the free bed's trunk, and asleep; the other dormitory's doorway refuses the wizard. Bonus: no bumps. | |
 | `story:the-morning` | Story 3 | The mate needs a wand, and the wizard's is lent: out of the door to the library, together. | |
 | `story:at-the-library` | Story 4 | Wenna receives them, walks to the shut door into the main library and opens it for them: the other doors on their way they open themselves. | |
-| `lesson:what-things-know` | Lesson 2 | An attribute: what an object knows about itself, read without brackets; `print` shows it. | `wizard.items`, `door.locked`, `concept:print` |
-| `lesson:finding-things` | Lesson 3 | An action can give something back: `find_nearest` gives the nearest thing of a kind, kept under a name, a variable; `reveal` makes it glow where it lies, through whatever hides it (D110). | `wizard.find_nearest`, `thing.reveal` (and Python's `=`) |
+| `lesson:what-things-know` | Lesson 2 | An attribute: what an object knows about itself, read without brackets; `print` shows any value, a number, a sum or a string, run on the page in plain Python, with no wizard (D170), and then an attribute, `door.locked`. | `wizard.items`, `door.locked`, `concept:print` |
+| `lesson:finding-things` | Lesson 3 | An action can give something back: `find_nearest` gives the nearest thing of a kind. A variable, a name that holds a value, a number or a string, printed; two variables added into a third, printed: both run on the page in plain Python (D170). The thing `find_nearest` gives back kept in a variable; `reveal` makes it glow where it lies, through whatever hides it (D110). | `wizard.find_nearest`, `thing.reveal` (and Python's `=`) |
 | `level:the-lost-book` | Practice 2 | Eldra's book, by the pile of books in the corner, half behind it (1,13): found, made to glow, picked up from the hall's end just above it; the starting code guides each step in comments. Bonus: made to glow with `reveal`. | |
 | `lesson:giving-things` | Lesson 4 | Each level is a new program, so a name kept in the last one is gone: `find_item` gives the thing of a kind the wizard carries, as `find_nearest` gives the nearest on the map; a thing kept under a name is given to whoever stands beside the wizard with `give`. | `wizard.find_item`, `wizard.give` |
 | `level:the-book-returned` | Practice 3 | The book in hand from the start, at the hall's left end above the pile: asked for with `find_item`, carried along the hall to its other end and given to Eldra; the starting code guides each step in comments. Bonus: in fewer than 5 lines. | |
@@ -211,7 +211,7 @@ three cells high with its statues, the corridor Dask walks across it, and the
 corridor three cells wide that goes down beside the statues; `the-two-doors`, a room with two doors in its bottom wall;
 `the-three-doors`, a straight corridor closed by three doors alike;
 `the-long-round`, Dask's long corridor crossed by the way down;
-`the-storeroom`, a corridor with a hole and its slab, the dark storeroom and
+`the-storeroom`, a corridor with a hole that opens in its floor, the dark storeroom and
 the crack in its wall; and `the-way-down`, laid out on the grid before it is
 painted (D102). The next scene starts where the last ended, the arch out of
 one being the arch into the next.
@@ -236,12 +236,12 @@ one being the arch into the next.
 | `story:beyond-the-doors` | Story 2 | Through the three doors; the stones older here; the friend proud of the loop; Dask's steps below, looking this way a long while; how do we cross if we do not know how long he looks? | |
 | `lesson:while` | Lesson 8 | `while` repeats its lines as long as its expression is true; a `while` that never ends is stopped by the tick limit. | (Python's `while`) |
 | `level:past-the-teacher` | Practice 6 | Played three ways, Dask a third of his round apart (D137): wait while he faces right, then cross his corridor; no fixed number of waits wins all three. | |
-| `lesson:kirra-and-osto` | Lesson 9 | *Light and slabs*: `kirra` lights a dark room; a slab comes and goes over a hole, `slab.in_place` says whether a step would land on it, `osto` holds it (D138). | `slab.in_place` (and the spells `kirra`, `osto`) |
-| `level:the-moving-slab` | Practice 7 | Played four ways, periods of three, four, five and seven, so that no fixed wait a child finds by trial crosses in all of them (the first is 29): wait `while not slab.in_place`, then cross, into the storeroom still dark (D162). Bonus: the code looks at `in_place`. | |
+| `lesson:kirra-and-osto` | Lesson 9 | *Light and traps*: `kirra` lights a dark room; a hole that opens in the floor, a magic trap or a dark portal, is open and closed in turn: `hole.open` and `hole.closed` say which, the one the other's opposite, so `while hole.open:` and `while not hole.closed:` are one wait; `osto` holds it closed (D167). | `hole.open`, `hole.closed` (and the spells `kirra`, `osto`) |
+| `level:the-opening-hole` | Practice 7 | *The hole that opens*, played four ways, the hole opening every three, four, five and seven ticks, so that no fixed wait a child finds by trial crosses in all of them (the first is 29): wait `while not hole.closed` (or `while hole.open`), then cross, into the storeroom still dark (D162). Bonus: the code looks at `closed`. | |
 | `lesson:the-two-coordinates` | Lesson 10 | A position's two numbers are its attributes, `position.x` and `position.y`; the steps between two cells are their differences, kept in two variables; its block lights the room and prints both for the key (D153). | `position.x`, `position.y` |
 | `level:the-dark-room` | Practice 8 | A dark room (D52), played three ways with the key on three cells, right of and not above the wizard (D153): `kirra`, the key found, the steps computed from the two numbers, walked, picked up, the door opened from the cell above it, counted the same way. Bonus: `x` used. | |
 | `story:the-voices` | Story 3 | The room lit; the crack in its right wall; a cold voice from the stone and an older pupil's: tomorrow's brooms; we stop it ourselves, and first, back to bed unseen. | |
-| `level:the-night-walk` | Practice 9 | The chapter together, played three ways: a key and its door, a slab, and Dask on his last corridor. | |
+| `level:the-night-walk` | Practice 9 | The chapter together, played three ways: a key and its door, another of those holes, across the corridor's two cells (D167), and Dask on his last corridor. | |
 | `story:caught` | Story 4 | Dask steps out of the dark, and lets them go, this once; the chapter's ideas summed up; the secret the three share. | |
 
 The world features chapter 3 needs: the naughty child's map, a thing carried,
@@ -251,8 +251,8 @@ a dark tunnel that hides every figure in it, on the scene and on the plan, and
 changes nothing in the world (D135, D145); a lesson's page that runs its code in the
 level after it (D142); doors of two cells (D150), each state of them Gemini's (D148); the cells where the figures walk (D149); a position's two numbers (D153); a teacher who may start anywhere on its patrol, and a level
 played in several ways, which the same program must win in all of them (D51,
-D137); dark rooms whose things are hidden until lit (D52); a slab over a hole,
-held by `osto` (D53, D138); `find_nearest("door")`; scenes and a friend (D65,
+D137); dark rooms whose things are hidden until lit (D52); a hole that opens in the floor, on one cell or two,
+held closed by `osto` (D53, D167); `find_nearest("door")`; scenes and a friend (D65,
 D66); and `teacher.can_see` taught in no level of chapters 1 to 3 (D139).
 
 ## Chapter 4 — The broom (`04-the-broom`)

@@ -16,6 +16,17 @@ We just write `door.locked` or `wizard.items`.
 
 To see it, we use `print`. It is Python's own way to show a value, right under the editor where you write your code.
 
+`print` shows any value, not only an attribute. It shows a number, like 7. It shows a sum: Python works it out first and writes the result. And it shows a string, the words in quotes, which appears without the quotes. Each `print` writes its own line. Try changing the numbers or the word, and run it again!
+
+```python try
+print(7)
+print(2 + 3)
+print("Hello")
+```
+
+---
+## Try it
+
 The door I just opened for you is a perfect one to check. Let us look at its attribute!
 
 ```python try

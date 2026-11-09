@@ -51,8 +51,9 @@ for (const [locale, tryIt, goOn] of [
     await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
     await page.locator('#lesson-try').click();
     await expect(page).toHaveURL(/#lesson\/finding-things$/);
-    // Finding things comes before The lost book: one Try button, on its last page.
-    for (let turn = 0; turn < 3; turn += 1) {
+    // Finding things comes before The lost book: one Try button, on its last page, the
+    // sixth.
+    for (let turn = 0; turn < 5; turn += 1) {
       await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
       await page.locator('#lesson-next').click();
     }

@@ -5,15 +5,15 @@
     "Open the door.",
     "Reach the mark in the arch below.",
     "Do not let Dask see you.",
-    "Check `in_place`."
+    "Check `closed`."
   ],
-  "starting_code": "# Walk down to the key.\n\n# Pick it up.\n\n# Walk down to the door.\n\n# Open it, it is called `door`.\n\n# Walk down to the hole's edge.\n\n# Wait for the slab.\n\n# Walk down to the cell before Dask's corridor.\n\n# Wait while he looks right.\n\n# Walk down to the arch.\n",
+  "starting_code": "# Walk down to the key.\n\n# Pick it up.\n\n# Walk down to the door.\n\n# Open it, it is called `door`.\n\n# Walk down to the hole's edge.\n\n# Wait while the hole is open.\n\n# Walk down to the cell before Dask's corridor.\n\n# Wait while he looks right.\n\n# Walk down to the arch.\n",
   "hints": [
     "Remember, the key is 1 step away. After opening the door, there are 2 steps to the hole's edge.",
-    "You must use `while not` with `slab.in_place` for the slab, and then `while` with `dask.facing` for Dask.",
+    "You must use `while not` with `hole.closed` for the hole (or `while hole.open`), and then `while` with `dask.facing` for Dask.",
     "From the hole's edge, walk down 3, to the cell before Dask's corridor. When Dask turns, walk down 4 to the arch!"
   ],
-  "intro": "This is the way home! We must use everything together: pick up the key from the floor, open the door, cross the hole over the slab, and wait for Dask to turn around in the last corridor. His lantern shines very far! It is a long walk, but I know we can do it.",
+  "intro": "This is the way home! We must use everything together: pick up the key from the floor, open the door, cross another of those holes once it closes, and wait for Dask to turn around in the last corridor. His lantern shines very far! It is a long walk, but I know we can do it.",
   "outro": "We made it! We are almost back in our beds.",
   "ways": {
     "near": "Dask has just started his round",

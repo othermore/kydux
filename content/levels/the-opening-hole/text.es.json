@@ -1,22 +1,22 @@
 {
-  "title": "La losa que va y viene",
+  "title": "El agujero que se abre",
   "goals": [
     "Llega a la marca.",
-    "Comprueba `in_place`."
+    "Comprueba `closed`."
   ],
-  "starting_code": "# Camina hasta el borde del agujero con `move_right`.\n\n# Espera mientras la losa no esté en su sitio, con `while`, `not`, `in_place` y `wait`.\n\n# Crúzalo.\n",
+  "starting_code": "# Camina hasta el borde del agujero con `move_right`.\n\n# Espera mientras el agujero esté abierto, con `while` y `wait`.\n\n# Crúzalo.\n",
   "hints": [
     "Camina 2 a la derecha para detenerte en el borde. ¡No pises el agujero!",
-    "Usa `while not` con `slab.in_place` para esperar mientras la losa no esté ahí.",
-    "Una vez que acabe el bucle `while`, la losa estará ahí, ¡así que camina 3 a la derecha hasta el arco!"
+    "Usa `while not` con `hole.closed`, y una espera debajo, para esperar mientras no esté cerrado. También puedes usar `while` con `hole.open`, que es lo mismo.",
+    "Cuando acabe el bucle `while`, el agujero estará cerrado, ¡así que camina 3 a la derecha hasta el arco!"
   ],
-  "intro": "¡Cuidado dónde pisas! Hay un agujero en el suelo a tres casillas... pero mira, ¡una losa va y viene para cubrirlo! La marca está en el arco del almacén al final. ¡Tenemos que esperar mientras la losa no esté en su sitio antes de cruzar!",
+  "intro": "¡Cuidado dónde pisas! A tres casillas hay uno de esos agujeros que se abren en el suelo. La marca está al otro lado, en el arco del almacén. ¡Esperaremos mientras esté abierto, y luego cruzaremos!",
   "outro": "¡A salvo al otro lado! Estamos en la puerta de un almacén oscuro.",
-  "learned": "Ahora sabes que `while not` espera a algo que aún no es verdad, y que `slab.in_place` dice cuándo lo es.",
+  "learned": "Ahora sabes que `while not` espera a algo que aún no es verdad, y que `hole.closed` dice cuándo lo es; `hole.open` dice lo contrario.",
   "ways": {
-    "three": "Cada tres ticks",
-    "four": "Cada cuatro ticks",
-    "five": "Cada cinco ticks",
-    "seven": "Cada siete ticks"
+    "three": "Se abre cada tres ticks",
+    "four": "Se abre cada cuatro ticks",
+    "five": "Se abre cada cinco ticks",
+    "seven": "Se abre cada siete ticks"
   }
 }

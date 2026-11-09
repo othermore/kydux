@@ -411,3 +411,24 @@ def test_a_metaphor_stands_only_where_its_idea_is_first_explained(lang):
             continue
         found = METAPHORS[lang].search(text)
         assert not found, f"{item}, {lang}: {found.group(0)}"
+
+
+#: The thing in the floor is a hole that opens, never a slab, and nothing goes and comes
+#: (D167), in every text of the course and in the game's own words.
+NO_SLAB = {
+    "es": re.compile(r"\blosas?\b|va y viene|van y vienen", re.I),
+    "en": re.compile(r"\bslabs?\b|comes? and go(es)?\b", re.I),
+}
+
+
+@pytest.mark.parametrize("lang", LANGUAGES)
+def test_the_hole_is_never_a_slab(lang):
+    """The owner, 2026-11-08: the picture shows a round hole that opens in the floor, so
+    every text speaks of a hole, a magic trap or a dark portal the first time (D167)."""
+    words = (ROOT / "i18n" / f"{lang}.json").read_text(encoding="utf-8")
+    for item, text in [*every_text(lang), (f"i18n/{lang}.json", words)]:
+        found = NO_SLAB[lang].search(text)
+        assert not found, f"{item}, {lang}: {found.group(0)}"
+    lesson = (CONTENT / "lessons" / "kirra-and-osto" / f"{lang}.md").read_text(encoding="utf-8")
+    first = {"es": "una trampa mágica, o un portal oscuro", "en": "a magic trap, or a dark portal"}
+    assert first[lang] in lesson

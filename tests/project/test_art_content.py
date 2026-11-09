@@ -308,3 +308,37 @@ def test_every_door_of_two_cells_stands_on_floor_side_by_side():
             if thing["id"] in doors:
                 assert len(thing["cells"]) == 2
                 assert all(tuple(cell) in floor for cell in thing["cells"])
+
+
+def test_the_storeroom_walls_the_cells_the_owner_named_and_its_torches_stand_over_them():
+    """The owner, 2026-11-08 (sprint 34): no figure stands on (3, 8), (4, 8), (5, 8), (8, 13),
+    (12, 13) or (12, 14); a figure on (4, 7) is behind the arch's band, and one on (11, 13)
+    behind the torch beside the store door: both are drawn over whoever stands on their
+    row (`under`)."""
+    floor = walked("the-storeroom")
+    for cell in ((3, 8), (4, 8), (5, 8), (8, 13), (12, 13), (12, 14)):
+        assert cell not in floor, cell
+    assert {(4, 7), (11, 13)} <= floor
+    art = json.loads((CONTENT / "art" / "scenes" / "the-storeroom" / "art.json").read_text())
+    assert {7, 13} <= {row["row"] for row in art["rows"] if row.get("under")}
+
+
+def test_no_one_walks_onto_the_dormitory_s_cell_under_its_open_leaf():
+    """The owner, 2026-11-08: (10, 15) is not walked while the common room's door is open,
+    and (9, 15), which the leaf stands over, neither (D125)."""
+    spec = json.loads((CONTENT / "scenes" / "the-dormitory" / "scene.json").read_text())
+    door = next(thing for thing in spec["things"] if thing["id"] == "front_door")
+    assert [10, 15] in door["covers"]["open"] and [9, 15] in door["covers"]["open"]
+
+
+def test_the_long_round_draws_its_figures_well_toward_the_middle_of_its_arches():
+    """The owner, 2026-11-08 (sprint 34): round both arches the two columns are drawn 0.3
+    of a cell toward the arch's middle, clear of its jambs, not quite between the cells."""
+    art = json.loads((CONTENT / "art" / "scenes" / "the-long-round" / "art.json").read_text())
+    nudged = {tuple(map(tuple, part["cells"])): part["by"] for part in art["nudged"]}
+    assert nudged == {
+        ((9, 0), (9, 2)): 0.3,
+        ((10, 0), (10, 2)): -0.3,
+        ((9, 12), (9, 14)): 0.3,
+        ((10, 12), (10, 14)): -0.3,
+    }

@@ -16,9 +16,9 @@ The method `wizard.wait()` makes your wizard stand still for a tick, a moment of
 
 We will write a condition to hide from him. Since levels can be played in several ways, Dask might do different things.
 
-This wait instruction will only run if he is looking to the left!
+This wait instruction will only run if he is looking up, our way!
 
 ```python try
-if dask.facing == "left":
+if dask.facing == "up":
     wizard.wait()
 ```

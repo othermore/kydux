@@ -1,6 +1,6 @@
 # True or false
 
-Look down the corridor. Dask is staring at the wall. Sometimes, questions only have two answers: yes or no. In a program, this kind of question is called an expression.
+Look down the corridor. Dask walks his round ahead of us, and looks one way or another. Sometimes, questions only have two answers: yes or no. In a program, this kind of question is called an expression.
 
 The computer answers an expression with `True` or `False`, which mean yes and no.
 

@@ -1,6 +1,6 @@
 # Verdadero o falso
 
-Mira por el pasillo. Dask está mirando fijamente a la pared. A veces, las preguntas solo tienen dos respuestas: sí o no. En un programa, a este tipo de pregunta se le llama una expresión.
+Mira por el pasillo. Dask hace su ronda ahí delante, y mira hacia un lado o hacia otro. A veces, las preguntas solo tienen dos respuestas: sí o no. En un programa, a este tipo de pregunta se le llama una expresión.
 
 El ordenador responde a una expresión con `True` o `False`, que significan verdadero y falso.
 

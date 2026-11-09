@@ -16,9 +16,9 @@ El método `wizard.wait()` hace que tu {mago|maga} se quede quiet{o|a} durante u
 
 Vamos a escribir una condición para escondernos de él. Como los niveles se pueden jugar de varias formas, Dask podría hacer cosas distintas.
 
-¡Esta instrucción de esperar solo se ejecutará si está mirando a la izquierda!
+¡Esta instrucción de esperar solo se ejecutará si está mirando hacia arriba, hacia nosotros!
 
 ```python try
-if dask.facing == "left":
+if dask.facing == "up":
     wizard.wait()
 ```

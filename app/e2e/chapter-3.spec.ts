@@ -389,10 +389,16 @@ test.describe('what the page draws of the chapter', () => {
   });
 
   test("the goal's mark lies on the floor, its thin ring seen where an arch covers it, never over the wizard (D160, D168)", async ({ page }) => {
-    // Under the top arch's band from the start: its silhouette shows over the band.
+    // In the top arch's opening, behind its stones: its silhouette shows over the stones,
+    // the arch's cut-out being its stones and not the opening's dark (D181), from the
+    // start to the end of the solution, the wizard standing on it.
     await open(page, 'the-three-doors');
     await expect(scene(page)).toHaveAttribute('data-marks-covered', '10,0', { timeout: 10_000 });
     await page.screenshot({ path: `${SHOTS}mark-under-the-arch.png` });
+    await run(page, solution('the-three-doors'));
+    await expect(scene(page)).toHaveAttribute('data-wizard', '10,0');
+    await expect(scene(page)).toHaveAttribute('data-marks-covered', '10,0');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}mark-under-the-arch-won.png` });
     // Free at the start, and under the wizard who stands on it at the end: the wizard
     // covers it, and no ring is drawn over the figure.
     await open(page, 'the-tunnel-exit');

@@ -227,8 +227,9 @@
       "states": {
         "standing": "painting"
       },
-      "about": "The arch at the top, over whoever walks under it.",
-      "under": true
+      "about": "The arch at the top, over whoever walks under it: its stones and their own line (`lined`), not the dark of its opening beside them (D181).",
+      "under": true,
+      "lined": true
     },
     "low_arch": {
       "box": [

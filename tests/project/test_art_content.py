@@ -342,3 +342,25 @@ def test_the_long_round_draws_its_figures_well_toward_the_middle_of_its_arches()
         ((9, 12), (9, 14)): 0.3,
         ((10, 12), (10, 14)): -0.3,
     }
+
+
+def test_the_three_doors_top_arch_is_its_stones_and_not_its_opening():
+    """D181: the goal's mark on (10, 0) lies in the top arch's opening, and its ring is
+    covered only where the arch's stones are painted over it. The arch's cut-out is its
+    stones and their own line (`lined`), not the dark of the opening beside them: from the
+    mark's middle down, along its column, the opening is the ground's."""
+    folder = CONTENT / "art" / "scenes" / "the-three-doors"
+    art = json.loads((folder / "art.json").read_text(encoding="utf-8"))
+    cell = art["cell"]
+    row = next(row for row in art["rows"] if row["row"] == 1)
+    alpha = np.array(Image.open(folder / row["image"]).convert("RGBA"))[..., 3]
+    # Column 10 is drawn toward the arch's middle from (10, 0) to (10, 4) (D149).
+    nudge = next(
+        part["by"]
+        for part in art["nudged"]
+        if part["cells"][0][0] <= 10 <= part["cells"][1][0]
+        and part["cells"][0][1] <= 0 <= part["cells"][1][1]
+    )
+    x = round((10.5 + nudge) * cell)
+    middle = round(0.5 * cell) - row["top"]
+    assert (alpha[middle : middle + round(0.25 * cell), x] <= 127).all()

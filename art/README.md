@@ -431,7 +431,9 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    between its staff and its head is no part of it. Where the thing is nearly the colour of
    what is painted behind it, or the edit paints the floor round it again, ask for it flat
    magenta instead (`way-down-arches-marked.md`), each thing to the edge of its stones, and
-   cut with `--threshold 70 --soft 70 --speck 3 --rim`, which adds the outline beside it. A
+   cut with `--threshold 70 --soft 70 --speck 3 --rim`, which adds the outline beside it. An
+   arch round a dark opening takes only its own line (`"lined": true`), since the opening's
+   dark beside its stones would be taken for outline (the three doors' top arch, D181). A
    small thing has an edit of its own (`way-down-torch.md`). The mask stands on the row of
    the thing's foot, `under` where a figure on that row stands under it. A wall's top is a box
    on its two straight outlines (`"mask": "box"`, `"over": true`): a wall cannot be taken away.

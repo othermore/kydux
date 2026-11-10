@@ -442,8 +442,12 @@ def static_alpha(
             gone = np.array(Image.open(edits / picture).convert("RGB"))
             mask |= difference_mask(gone, painting, box, thing.get("diff"))
         # Gemini's magenta ends inside the thing's outline, which is the thing's too (D93).
+        # An arch round a dark opening takes only its own line (`lined`): the opening's
+        # dark beside its stones is no outline, and a mark seen there is not under it
+        # (D181).
         if (thing.get("diff") or {}).get("rim"):
-            mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th)) & inside
+            rim = image_first.lined if thing.get("lined") else image_first.rimmed
+            mask = rim(mask, painting, cell, image_first.thresholds(th)) & inside
         return mask.astype(np.float32)
     if thing["mask"] == "pale":
         hsv = np.array(Image.fromarray(painting).convert("HSV")).astype(np.float32) / 255

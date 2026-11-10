@@ -630,7 +630,10 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     language and never the wizard (D174), the card that waits for the wizard's words
     (D175), a bonus earned by the spell cast (D176), a stop that is no outcome (D177), `osto`
     taught after the `while` in a lesson of its own and needed by the night walk's hole,
-    which never closes (D178), and the browser tests run on GitHub at a release (D179).
+    which never closes (D178), and the browser tests run on GitHub at a release (D179); and,
+    after the owner's next pass (`sprint-38.md`), a lesson block's walk told in steps,
+    never a cell (D180), and a mark covered only by what is painted over it, the three
+    doors' top arch cut to its stones (D181).
 5.6 Chapter 4, The broom (lists, functions), in a scene of the broom field
     and the village: flying, the race, an action of the child's own.
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

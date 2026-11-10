@@ -2097,12 +2097,12 @@ one overturns stays, marked as superseded.
   recall it in parentheses (the owner, 2026-11-07, for the whole course). Content tests
   hold it. Rules out mechanics in the fiction and a lesson that names three ideas on
   one page.
-- **D142 — A lesson page runs its code (D174 says what its code tries).** Decided 2026-11-07 (the owner's
+- **D142 — A lesson page runs its code (D174 says what its code tries, D180 how a walk is told).** Decided 2026-11-07 (the owner's
   suggestion). Any page of a lesson may carry a block fenced `python try`, one a
   page; the page shows it in an editor with a *Run* button, runs it in the
   world of the first level after the lesson, in that level's first way, at its
-  start, and writes under the editor what the program printed, the wizard's
-  cell at the end if it moved, or what stopped it in the child's words; no scene
+  start, and writes under the editor what the program printed, how far the
+  wizard walked if it moved, or what stopped it in the child's words; no scene
   is shown, and a program that casts the map's spell opens the plan's window.
   The child edits the block and runs it again, always from the start. The
   lesson's last page keeps the button that leads to the level, which never
@@ -2301,7 +2301,7 @@ one overturns stays, marked as superseded.
   (`paintedBox`), as the scene does, never from the cell it stands on; a test holds the
   crossing's statues and the doors at the boxes art.json gives them. Rules out a thing on
   the plan a row off the scene.
-- **D160 — The goal's mark lies on the floor (D168 says how its ring is drawn, D172 where a door opens on it).** Decided 2026-11-08 by the owner (*los
+- **D160 — The goal's mark lies on the floor (D168 says how its ring is drawn, D172 where a door opens on it, D181 what covers it).** Decided 2026-11-08 by the owner (*los
   círculos de destino deben verse sobre el suelo, tapados por lo que está delante, en
   todos los escenarios de todos los capítulos*). On a painted scene the mark is drawn at
   the ground's depth (`MARK_DEPTH`), under every row's things, every thing standing and
@@ -2536,3 +2536,40 @@ one overturns stays, marked as superseded.
   dates again is made again on the commit's new self, with its message, dated now, and a tag
   on a commit already pushed goes up alone. Rules out two hours of a private repository's
   minutes on every push, and a red check that says nothing about the code.
+- **D180 — A lesson's block that walked says the walk, not the cell.** Decided 2026-11-10 by
+  the owner (*no tiene sentido poner coordenadas si no sabes dónde empieza el mago; debería
+  tomarse la posición inicial, ejecutar los movimientos y tomar la posición final, y mostrar
+  "el mago se movió tres pasos a la derecha" o "dos pasos hacia abajo y uno a la
+  izquierda"*). Under a block's editor (D142), when something moved the wizard, a step of its
+  own or a door that shoved it, the page says how far it went: the difference between its
+  cell before anything moved it, where the world starts it in the first way (D51), and its
+  cell at the end, each axis in its direction (`runSaid`'s `moved`, `walkText` in
+  `lessonrun.ts`). The steps down or up come first, and the sideways ones after them
+  without the word for a step: *{El mago|La maga} se ha movido 2 pasos hacia abajo y 1 a la
+  izquierda.* / *The wizard has moved 2 steps down and 1 to the left.*; one axis alone,
+  *... 3 pasos a la derecha* / *... 3 steps to the right*; one step, *1 paso* / *1 step*; a
+  walk that ends where it began, *{El mago|La maga} ha vuelto a donde empezó.* / *The wizard
+  has come back to the start.* (the order, the second part's words and the English are the
+  owner's choices of the same day). The numbers are digits. The cell's numbers are never
+  said: a child who has not met the grid (chapter 3) has no use for them, and one who has
+  prints `wizard.position`. Everything else under the editor stays: what was printed, the
+  reason a step was refused, the quiet end. Rules out *ha terminado en la casilla (4, 5)*
+  under *Qué es un programa*.
+- **D181 — A mark is covered only by what is painted over it.** Decided 2026-11-10 from the
+  owner's finding (*la máscara donde está el círculo de destino no está ajustada al borde de
+  la puerta, y hace que el círculo cambie a silueta lejos del arco de piedra*) and answer
+  (*no es problema que el círculo esté detrás del arco, solo era problema que la máscara no
+  encajaba con el arco*). The goal's mark's ring (D160, D168) shows its silhouette only
+  where a cut-out's paint lies over the mark, where the eye sees what covers it; what
+  covers counts a cut-out's pixels of alpha over a half (`ringCoveredShare`). A cut-out
+  Gemini marked flat magenta takes the outline beside it (D148, `rimmed`), which reads dark
+  pixels as ink: round a dark opening it would take the opening's dark beside the stones for
+  outline and spread into it, a band the colour of the ground. An arch round a dark opening
+  is `lined` in its settings instead, its stones and their own line (`image_first.lined`).
+  In *El pasillo de las tres puertas* the top arch is so: the mark on (10, 0), in its
+  opening, lies behind its stones, the silhouette of its ring over them and nowhere over
+  the opening, from the start to the end; the scene's other arches, round doorways that are
+  not dark, keep their rim. The other marks of chapter 3 covered at a level's start,
+  *Pasar al profesor*'s and *El paseo nocturno*'s on (10, 13) and *El agujero que se
+  abre*'s on (5, 7), lie behind an arch's or a jamb's stones. Rules out a silhouette where
+  the eye sees floor or an opening.

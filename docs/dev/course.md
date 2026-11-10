@@ -249,7 +249,7 @@ and `orvim`, which works in any level where the map is carried, needed or not,
 opens the plan window and pauses the run (D134, D143, D151); a `reach` goal whose mark is not shown, and one met on the way (D146);
 a dark tunnel that hides every figure in it, on the scene and on the plan, and
 changes nothing in the world (D135, D145); a lesson's page that runs its code in the
-level after it (D142); doors of two cells (D150), each state of them Gemini's (D148); the cells where the figures walk (D149); a position's two numbers (D153); a teacher who may start anywhere on its patrol, and a level
+level after it and tells how far the wizard walked, never its cell (D142, D180); doors of two cells (D150), each state of them Gemini's (D148); the cells where the figures walk (D149); a position's two numbers (D153); a teacher who may start anywhere on its patrol, and a level
 played in several ways, which the same program must win in all of them (D51,
 D137); dark rooms whose things are hidden until lit (D52); a hole that opens in the floor, on one cell or two,
 held closed by `osto` (D53, D167), and one that never closes on its own, crossed only with `osto`

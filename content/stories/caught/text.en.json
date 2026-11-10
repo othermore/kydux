@@ -7,6 +7,8 @@
     "We were only keeping an eye on that hole that opens in the floor, sir! To check that it closes properly at night!",
     "Dask looks at the three of you for a long moment in silence. Then the smallest of smiles comes to his face.",
     "I have been watching you. You looked before every step, you waited, you lit the dark: very clever work. I shall let you go, just this once, {wizard}.",
+    "And what are you doing here, sir? And why have you not stopped those portals from opening in the floor? A pupil could have an accident!",
+    "Er... well... let us do this: I shall tell no one I saw you tonight, but leave those holes to me, and say nothing either.",
     "He walks away up the corridor, and the three of you go on through the arch. Safe under the blankets, you remember what you learned tonight. You counted the cells and looked at where things are with `position`. You waited with `wait`. You used an expression, something the computer checks, to see whether it was safe, and you chose your way with `if` and `else`. You repeated your steps with the loop `for` and you waited with the loop `while`. And you know two more spells: *kirra*, which lights the dark, and *osto*, which holds a hole closed. With the secret the three of you now share, you fall asleep at last. The castle is home now."
   ]
 }

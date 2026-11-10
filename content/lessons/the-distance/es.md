@@ -17,9 +17,9 @@ Si guardas ese número en una variable, como `steps = key.distance_to(wizard)`, 
 Para esto sirve exactamente una variable: para guardar un valor que no conoces cuando escribes el programa, o que necesitas usar más de una vez.
 
 ---
-## Muchas formas de jugar
+## Buscar la solución que funciona siempre
 
-En este juego, un nivel se puede jugar de varias maneras, una tras otra, con la llave en un lugar diferente en cada una. ¡Un mismo programa debe ganarlas todas!
+En este juego, algunas cosas cambian cada vez que se ejecuta un nivel. Por ejemplo, la llave puede aparecer en un lugar diferente. ¡Un mismo programa debe estar preparado para funcionar en todos los casos!
 
 Vamos a ver a qué distancia está la llave esta vez.
 

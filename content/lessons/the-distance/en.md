@@ -17,9 +17,9 @@ If you keep that number in a variable, like `steps = key.distance_to(wizard)`, y
 This is exactly what a variable is for: holding a value you do not know when you write the program, or that you need to use more than once.
 
 ---
-## Many ways to play
+## Finding the answer that always works
 
-In this game, a level can be played in several ways, one after the other, with the key in a different place in each one. One program must win them all!
+In this game, some things change each time a level is run. For example, the key may appear in a different place. One program must be ready to work in every case!
 
 Let us see how far the key is this time.
 

@@ -289,8 +289,20 @@
     "try": "Try it",
     "go_on": "Go on",
     "not_found": "There is no lesson called “{id}”.",
-    "ended_at": "The wizard ended on cell ({x}, {y}).",
-    "ended_quiet": "The program ended, and it printed nothing."
+    "ended_quiet": "The program ended, and it printed nothing.",
+    "moved": "The wizard has moved {steps}.",
+    "steps_right": "{n} steps to the right",
+    "steps_right_one": "1 step to the right",
+    "steps_left": "{n} steps to the left",
+    "steps_left_one": "1 step to the left",
+    "steps_down": "{n} steps down",
+    "steps_down_one": "1 step down",
+    "steps_up": "{n} steps up",
+    "steps_up_one": "1 step up",
+    "steps_right_after": "{n} to the right",
+    "steps_left_after": "{n} to the left",
+    "steps_and": "{first} and {second}",
+    "returned": "The wizard has come back to the start."
   },
   "story": {
     "next": "Next",

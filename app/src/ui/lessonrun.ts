@@ -1,9 +1,9 @@
 // A lesson's page runs its code (D142): a block of it is an editor with Run under it,
 // which runs it in the world of the lesson's level, at that level's start, and writes
-// under the editor what it printed, the cell the wizard ended on if it moved, or what
-// went wrong in the child's words; no scene is shown. The child changes it and runs it
-// again, always from the start. A program that opens the map opens the plan's window
-// (D134).
+// under the editor what it printed, how far the wizard walked if it moved (D180), or
+// what went wrong in the child's words; no scene is shown. The child changes it and
+// runs it again, always from the start. A program that opens the map opens the plan's
+// window (D134).
 
 import { forWizard, t } from '../i18n';
 import type { LevelJson, RunResult, WorldResult } from '../runtime/protocol';
@@ -12,11 +12,17 @@ import { element } from './dom';
 import { outcomeText } from './outcome';
 import type { PlanWindow } from './plan';
 
+/** How far the wizard walked, in cells: to the right and down, negative for left and up. */
+export interface Moved {
+  right: number;
+  down: number;
+}
+
 /** What a run of a block says under it. */
 export interface RunSaid {
   printed: string;
-  /** The cell the wizard ended on, when it moved. */
-  ended: [number, number] | null;
+  /** From the wizard's cell at the start to its cell at the end, when it moved (D180). */
+  moved: Moved | null;
   /** What stopped it or refused it, in the child's words; or that it said nothing. */
   note: string | null;
 }
@@ -26,22 +32,61 @@ function firstWay(world: WorldResult): WorldResult {
   return world.ways?.[0] ?? world;
 }
 
-/** The last cell of the wizard's steps, or null when it took none. */
-function endOf(world: WorldResult): [number, number] | null {
-  const last = [...world.events].reverse().find((event) => event.actor === 'wizard' && event.kind === 'move');
-  const to = last?.data.to;
-  return Array.isArray(to) ? [Number(to[0]), Number(to[1])] : null;
+/** A cell of an event's data, or null. */
+function cellOf(value: unknown): [number, number] | null {
+  return Array.isArray(value) ? [Number(value[0]), Number(value[1])] : null;
+}
+
+/** How far the wizard walked: from the cell it was on before anything moved it, where
+ * the world starts it, to the cell of the last thing that moved it, a step of its own or
+ * a door that shoved it; null when nothing did. */
+function movedOf(world: WorldResult): Moved | null {
+  const moves = world.events.filter(
+    (event) =>
+      (event.actor === 'wizard' && event.kind === 'move') ||
+      (event.kind === 'shoved' && event.data.id === 'wizard'),
+  );
+  const from = cellOf(moves[0]?.data.from);
+  const to = cellOf(moves[moves.length - 1]?.data.to);
+  return from && to ? { right: to[0] - from[0], down: to[1] - from[1] } : null;
+}
+
+/** The steps along one way: how many, and the one-step form for a single one. */
+function stepsDown(down: number): string {
+  if (down > 0) return down === 1 ? t('lesson.steps_down_one') : t('lesson.steps_down', { n: down });
+  return down === -1 ? t('lesson.steps_up_one') : t('lesson.steps_up', { n: -down });
+}
+
+function stepsRight(right: number): string {
+  if (right > 0) return right === 1 ? t('lesson.steps_right_one') : t('lesson.steps_right', { n: right });
+  return right === -1 ? t('lesson.steps_left_one') : t('lesson.steps_left', { n: -right });
+}
+
+/** The sideways steps after the steps down or up, which have said the word for a step. */
+function stepsRightAfter(right: number): string {
+  return right > 0 ? t('lesson.steps_right_after', { n: right }) : t('lesson.steps_left_after', { n: -right });
+}
+
+/** The walk in words (D180): how far the wizard moved each way, down or up first, or
+ * that it came back to where it began. Never the cell's numbers. */
+export function walkText(moved: Moved): string {
+  if (moved.right === 0 && moved.down === 0) return t('lesson.returned');
+  let steps: string;
+  if (moved.down === 0) steps = stepsRight(moved.right);
+  else if (moved.right === 0) steps = stepsDown(moved.down);
+  else steps = t('lesson.steps_and', { first: stepsDown(moved.down), second: stepsRightAfter(moved.right) });
+  return t('lesson.moved', { steps });
 }
 
 /** The words for a run's result. */
 export function runSaid(result: RunResult, level: LevelJson, kinds: (id: unknown) => string | null): RunSaid {
   if (!result.world) {
     const error = result.error ?? { type: 'Error', message: result.stderr };
-    return { printed: result.stdout, ended: null, note: outcomeText({ kind: 'error', error }) };
+    return { printed: result.stdout, moved: null, note: outcomeText({ kind: 'error', error }) };
   }
   const world = firstWay(result.world);
   const printed = world.stdout;
-  const ended = endOf(world);
+  const moved = movedOf(world);
   const blocked = world.events.find((event) => event.actor === 'wizard' && event.kind === 'blocked');
   let note: string | null = null;
   if (world.status === 'error' && world.error) note = outcomeText({ kind: 'error', error: world.error });
@@ -63,10 +108,10 @@ export function runSaid(result: RunResult, level: LevelJson, kinds: (id: unknown
       .split('\n')
       .slice(1)
       .join('\n');
-  } else if (printed === '' && ended === null && !world.events.some((event) => event.kind === 'map')) {
+  } else if (printed === '' && moved === null && !world.events.some((event) => event.kind === 'map')) {
     note = t('lesson.ended_quiet');
   }
-  return { printed, ended, note };
+  return { printed, moved, note };
 }
 
 /** How a lesson's page runs its code: in the level it is tried in, with what it needs. */
@@ -122,7 +167,7 @@ export function runBlock(code: string, runner: LessonRunner): RunBlock {
       printed.textContent = answer.printed.replace(/\n$/, '');
       printed.hidden = answer.printed === '';
       const lines = [
-        ...(answer.ended ? [t('lesson.ended_at', { x: answer.ended[0], y: answer.ended[1] })] : []),
+        ...(answer.moved ? [walkText(answer.moved)] : []),
         ...(answer.note ? [answer.note] : []),
       ];
       said.textContent = forWizard(lines.join(' '));

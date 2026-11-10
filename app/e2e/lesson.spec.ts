@@ -203,7 +203,9 @@ test.describe('a page runs its code (D142)', () => {
     await expect(page.locator('.lesson-printed')).toHaveText('5\n7', { timeout: 90_000 });
   });
 
-  test('a program typed that walks says the cell the wizard ended on, always from the start', async ({ page }) => {
+  test('a program typed that walks says its steps, never a cell, always from the start (D180)', async ({
+    page,
+  }) => {
     // No block walks (D174), but the child may type one that does, in If's block.
     await page.goto('/#lesson/if');
     await page.locator('#lesson-next').click();
@@ -211,9 +213,17 @@ test.describe('a page runs its code (D142)', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.move_down(2)');
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('(11, 8)', { timeout: 90_000 });
+    const said = page.locator('.lesson-said');
+    await expect(said).toHaveText('The wizard has moved 2 steps down.', { timeout: 90_000 });
+    // Again from the start: the same two steps, not four.
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('(11, 8)', { timeout: 30_000 });
+    await expect(said).toHaveText('The wizard has moved 2 steps down.', { timeout: 30_000 });
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_down(2)\nwizard.move_left()');
+    await page.locator('.lesson-run button').click();
+    await expect(said).toHaveText('The wizard has moved 2 steps down and 1 to the left.', { timeout: 30_000 });
+    await expect(said).not.toContainText('(');
     // Into Dask's sight, he sees the wizard: the page says it.
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
@@ -235,6 +245,25 @@ test.describe('a page runs its code (D142)', () => {
     await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
     await page.locator('#plan-close').click();
     await expect(plan).toHaveCount(0);
+  });
+
+  test('a walk is said in Spanish too, and a walk back says it came back (D180)', async ({ browser }) => {
+    const context = await browser.newContext({ locale: 'es-ES' });
+    const page = await context.newPage();
+    await page.goto('/#lesson/if');
+    await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_down(2)');
+    await page.locator('.lesson-run button').click();
+    const said = page.locator('.lesson-said');
+    await expect(said).toHaveText('El mago se ha movido 2 pasos hacia abajo.', { timeout: 90_000 });
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_down()\nwizard.move_up()');
+    await page.locator('.lesson-run button').click();
+    await expect(said).toHaveText('El mago ha vuelto a donde empezó.', { timeout: 30_000 });
+    await context.close();
   });
 
   test('its button says Run in Spanish too', async ({ browser }) => {

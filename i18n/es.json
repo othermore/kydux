@@ -289,8 +289,20 @@
     "try": "Probar",
     "go_on": "Seguir",
     "not_found": "No hay ninguna lección llamada «{id}».",
-    "ended_at": "{El mago|La maga} ha terminado en la casilla ({x}, {y}).",
-    "ended_quiet": "El programa ha terminado, y no ha escrito nada."
+    "ended_quiet": "El programa ha terminado, y no ha escrito nada.",
+    "moved": "{El mago|La maga} se ha movido {steps}.",
+    "steps_right": "{n} pasos a la derecha",
+    "steps_right_one": "1 paso a la derecha",
+    "steps_left": "{n} pasos a la izquierda",
+    "steps_left_one": "1 paso a la izquierda",
+    "steps_down": "{n} pasos hacia abajo",
+    "steps_down_one": "1 paso hacia abajo",
+    "steps_up": "{n} pasos hacia arriba",
+    "steps_up_one": "1 paso hacia arriba",
+    "steps_right_after": "{n} a la derecha",
+    "steps_left_after": "{n} a la izquierda",
+    "steps_and": "{first} y {second}",
+    "returned": "{El mago|La maga} ha vuelto a donde empezó."
   },
   "story": {
     "next": "Siguiente",

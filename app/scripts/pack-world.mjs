@@ -135,7 +135,7 @@ const chapters = existsSync(chaptersDir)
       .sort()
       .map((name) => {
         const chapter = JSON.parse(readFileSync(join(chaptersDir, name, 'chapter.json'), 'utf8'));
-        return { id: chapter.id, items: chapter.items };
+        return { id: chapter.id, items: chapter.items, ...(chapter.music ? { music: chapter.music } : {}) };
       })
   : [];
 // What the child knows on reaching each level (D40): every name taught by that
@@ -220,10 +220,18 @@ for (const chapter of chapters) {
   }));
   titles[`chapter:${chapter.id}`] = words;
 }
+// The themes there are (D192), for the page under ?debug that plays any of them.
+const musicDir = join(repo, 'content', 'music');
+const themes = existsSync(musicDir)
+  ? readdirSync(musicDir)
+      .filter((name) => name.endsWith('.json'))
+      .map((name) => name.slice(0, -'.json'.length))
+      .sort()
+  : [];
 writeFileSync(
   join(content, 'course.json'),
   `${JSON.stringify(
-    { chapters, known, spells_known: spellsKnown, words_known: wordsKnown, concepts, numbers, titles, opening },
+    { chapters, themes, known, spells_known: spellsKnown, words_known: wordsKnown, concepts, numbers, titles, opening },
     null,
     2,
   )}\n`,

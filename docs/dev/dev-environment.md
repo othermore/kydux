@@ -803,11 +803,25 @@ The broom's picture has a strip of lawn under it, so it takes `--lawn`
 too; a thing painted standing on a lawn, like the ring, takes it alone.
 Its size in cells and its foot are in `content/art/things/things.json`.
 
-The music is asked for the same way, from `tools/sound/prompts/`:
+The music is the game's own, written as notes. Each chapter's theme is a
+score in `tools/sound/compose.py`: its melodies a bar at a time, and its
+harmony a chord a bar. After changing it, this writes the themes again into
+`content/music/`:
 
 ```sh
-.venv/bin/python tools/sound/generate.py tools/sound/prompts/arrival-theme.md
+.venv/bin/python tools/sound/compose.py
 ```
+
+It prints each file it wrote. To hear a theme alone, open the game with
+`?debug` at `#music`, and press its Full or Quiet button:
+
+```
+https://localhost:5173/?debug#music
+```
+
+The page's music starts only after a click or a key on the page, since a
+browser plays no sound before one. `content/music/README.md` says the
+file's form.
 
 The sound effects need no files: the game makes them as it plays, and the
 settings can turn them off.

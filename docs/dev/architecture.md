@@ -57,7 +57,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the low and the high ones, the rings' order and the masks
                 (debug.ts, opened with ?debug), and the sound effects, made as
                 the game plays (sfx.ts), with the flight's wind, which lasts
-                while a figure flies (sound.ts, D185)
+                while a figure flies (sound.ts, D185), and the chapters' music,
+                played from its notes (music.ts, D192)
   src/editor/   the child's editor, CodeMirror
   src/ui/       the screens: start with the saved games (start.ts), the
                 wizard's creator (wizard.ts), the map, also over a level (map.ts),
@@ -72,7 +73,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 a level's words with their code shown as code (words.ts, D140),
                 the stars (stars.ts), the screen's guide (guide.ts, D68), and
                 the note on a phone or a tablet that the game is made for a
-                computer (handheld.ts)
+                computer (handheld.ts), and under ?debug the page that plays
+                any of the music's themes (themes.ts, #music, D192)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events (stories.ts), the guide's words (guide.ts), and the
@@ -107,7 +109,7 @@ content/        the levels, each with level.json, its words in text.<lang>.json,
                 <lang>.md; the stories (stories/), each with story.json, its
                 staging, and text.<lang>.json, D74; the chapters, each with
                 chapter.json and text.<lang>.json; the screen's guide's words
-                (guide/, D68)
+                (guide/, D68); the music's themes, each its notes (music/, D192)
 i18n/           en.json, es.json: the app's words, the same keys in each
 docs/dev/       the plan, the sprints, this log, the guide; the story (story.md)
                 and the course (course.md) that the content is written from
@@ -148,8 +150,9 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 the cut, figures.py
                 makes the figures' sheets from the base sheets in art/figures/,
                 recoloured for each look, and trials/ the scripts of the art
-                trials, contact.py and demo.py among them; D72, D76) and the
-                music's
+                trials, contact.py and demo.py among them; D72, D76), the
+                music's score, written out as the themes' notes
+                (sound/compose.py, D192), and a model's music asked for a trial
                 (sound/generate.py)
 tests/tools/    the writing and art tools' tests, with the services faked
 tests/project/  the repository's own checks
@@ -1172,8 +1175,8 @@ one overturns stays, marked as superseded.
   | Gemini, a style frame of the whole scene | The look the owner wants, not on a grid | About 10 cents |
   | Gemini, the whole scene painted from requirements, the map read from it | The look of the frame, on a grid that can be marked | About 10 cents a picture, an edit per thing that changes |
 
-  The music comes from Lyria (`lyria-3-clip-preview`, `tools/sound/
-  generate.py`); the effects are made as the game plays (`app/src/engine/
+  The music is the game's own, written as notes and played by the page
+  (D192); the effects are made as the game plays (`app/src/engine/
   sfx.ts`), and the settings mute them. Rules out scenes built from tiles
   for the levels, and the isometric view for the levels: it may serve the
   course's map.
@@ -2738,3 +2741,36 @@ one overturns stays, marked as superseded.
   tick, stays as it is. `retries` stays 1. `ci/push.sh --tags` refuses a tag whose commit
   does not carry the tag's version. Rules out a release whose tag run is red by the
   runner's speed.
+- **D192 — Every chapter has a score of its own, made by the game from notes.** Decided
+  2026-11-10 by the owner (*cada capítulo debe tener una banda sonora apropiada, ajustada a
+  la hora del día, el ambiente, si es exterior o interior, si es de noche y en secreto*). A
+  theme is a file `content/music/<id>.json`: its tempo, its metre, its voices, and its
+  sections of notes (pitch, start, length, loudness), which follow one another in their
+  `order` and loop without a seam, no note ringing past its section's end; its `full`
+  arrangement plays every voice, its `quiet` one fewer, at 0.7 of the loudness. The
+  page plays it with Web Audio (`engine/music.ts`): voices of six kinds, a celesta's bell,
+  a bowed string pad, a plucked string, a harp, a flute and a soft drum, each an
+  oscillator or two with an envelope, through a reverb whose impulse is decaying noise; the
+  notes are scheduled a third of a second ahead on the audio clock; no sound file is
+  loaded. A chapter's `chapter.json` names its theme (`music`), which the course carries; a
+  story, the map and the start screen play their chapter's theme `full`, a lesson and a
+  level `quiet`, the map and the start screen in the chapter the child is in; the
+  settings and the creator leave what plays. A change of arrangement or of theme fades
+  over two seconds. The music starts at the first gesture on the page, as a browser asks,
+  goes on across screens without a break, and is still while the tab is hidden. The
+  settings have the music's volume beside the sounds' switch, a slider from none to full
+  in five steps (`music`, 0.6 at first, kept with the settings); at none no theme plays.
+  The root element says what plays (`data-music`: `waiting`, `playing`, `off`;
+  `data-music-theme`, `data-music-arrangement`), and `?debug#music` plays any theme alone.
+  The themes are original, written for this game as a score in `tools/sound/compose.py`,
+  each melody a bar at a time and each section's harmony a chord a bar from which the
+  accompaniments are made, and shipped under the GPL as the code is: *Arrival* (dusk,
+  outdoors, a gentle waltz in three in F, a celesta over strings, a flute in its middle
+  part), *The library* (indoors, evening, harp arpeggios in E flat and a curious flute,
+  then the celesta in C minor), *The passages* (night, a secret: sparse pizzicato in D
+  minor, low strings, a tiptoeing celesta and a flute's long notes, slow), *The broom*
+  (morning, a flight: bright and quick in six in D, a flute over strings and a harp) and
+  *The familiar* (the tower: a slow chorale in C that opens out, the flute taking its top
+  line). A test holds every chapter to a theme, every theme to its rules, and the files to
+  what the score makes. Rules out loaded music files and a score that names or quotes any
+  work under copyright.

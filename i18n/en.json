@@ -361,6 +361,9 @@
     "sound": "Sound",
     "sound_on": "On",
     "sound_off": "Off",
+    "music": "Music",
+    "music_none": "No music",
+    "music_level": "{n} of 5",
     "pixels": "{n} pixels",
     "back": "Back",
     "keys": "Keys",
@@ -500,7 +503,13 @@
       "lawn": "Lawn not walked on",
       "furniture": "Furniture"
     },
-    "low": "Low: flown over, not walked on"
+    "low": "Low: flown over, not walked on",
+    "music": {
+      "title": "The music's themes",
+      "full": "Full",
+      "quiet": "Quiet",
+      "playing": "Playing: {theme}, {arrangement}"
+    }
   },
   "race": {
     "reading": "Ilda reads the programs: you, {mine} lines; {name}, {theirs}.",

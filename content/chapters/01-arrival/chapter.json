@@ -1,5 +1,6 @@
 {
   "id": "01-arrival",
+  "music": "arrival",
   "items": [
     "story:the-letter",
     "story:at-the-gate",

@@ -1,9 +1,10 @@
-// The settings: the language, the playback speed, the editor's text size and
-// whether the game's sounds play.
+// The settings: the language, the playback speed, the editor's text size,
+// whether the game's sounds play, and how loud the music is (D192).
 // Each change is saved in the progress document and applies at once; Back
 // returns to the screen the child came from.
 
 import type { Speed } from '../engine/playback';
+import { music } from '../engine/music';
 import { setMuted } from '../engine/sfx';
 import { currentLanguage, languages, setLanguage, t } from '../i18n';
 import * as progress from '../progress/progress';
@@ -12,6 +13,8 @@ import { applyLook, FONT_SIZES } from './look';
 import type { Screen } from './screen';
 
 const SPEEDS: Speed[] = [1, 2, 4];
+/** The music's volume moves in five steps from none to full. */
+const MUSIC_STEPS = 5;
 /** The keys the game answers to, each with its words in settings.key.<name>. */
 const KEYS = ['run', 'notebook', 'indent', 'leave', 'close', 'split'] as const;
 
@@ -34,6 +37,36 @@ function choice(
   }
   select.addEventListener('change', () => onChange(select.value));
   return element('label', { className: 'setting' }, [element('span', {}, [label]), select]);
+}
+
+/** The music's volume, a slider from none to full in five steps, which says its step. */
+function musicSlider(volume: number): HTMLElement {
+  const slider = element('input', {
+    id: 'settings-music',
+    type: 'range',
+    min: '0',
+    max: String(MUSIC_STEPS),
+    step: '1',
+    value: String(Math.round(volume * MUSIC_STEPS)),
+  });
+  const said = element('span', { className: 'setting-value', id: 'settings-music-said' });
+  const say = () => {
+    const step = Number(slider.value);
+    said.textContent = step === 0 ? t('settings.music_none') : t('settings.music_level', { n: step });
+    slider.setAttribute('aria-valuetext', said.textContent);
+  };
+  say();
+  slider.addEventListener('input', () => {
+    const value = Number(slider.value) / MUSIC_STEPS;
+    progress.setSetting('music', value);
+    music.setVolume(value);
+    say();
+  });
+  return element('label', { className: 'setting setting-music' }, [
+    element('span', {}, [t('settings.music')]),
+    slider,
+    said,
+  ]);
 }
 
 export function settingsScreen(parts: SettingsScreenParts): Screen {
@@ -81,6 +114,7 @@ export function settingsScreen(parts: SettingsScreenParts): Screen {
             setMuted(value !== 'on');
           },
         ),
+        musicSlider(now.music),
       ]),
       element('p', { className: 'settings-sample', id: 'settings-sample' }, ['wizard.move_right(3)']),
       element('section', { className: 'settings-keys', id: 'settings-keys' }, [

@@ -361,6 +361,9 @@
     "sound": "Sonido",
     "sound_on": "Activado",
     "sound_off": "Desactivado",
+    "music": "Música",
+    "music_none": "Sin música",
+    "music_level": "{n} de 5",
     "pixels": "{n} píxeles",
     "back": "Volver",
     "keys": "Teclas",
@@ -500,7 +503,13 @@
       "lawn": "Césped que no se pisa",
       "furniture": "Muebles"
     },
-    "low": "Bajo: se cruza volando, no se pisa"
+    "low": "Bajo: se cruza volando, no se pisa",
+    "music": {
+      "title": "Los temas de la música",
+      "full": "Entero",
+      "quiet": "Suave",
+      "playing": "Suena: {theme}, {arrangement}"
+    }
   },
   "race": {
     "reading": "Ilda lee los programas: tú, {mine} líneas; {name}, {theirs}.",

@@ -12,6 +12,7 @@ import {
   loadCourse,
   next,
   parseItem,
+  themeOf,
 } from './content/course';
 import { loadGuideText } from './content/guide';
 import { LessonNotFound, loadLesson } from './content/lessons';
@@ -27,11 +28,14 @@ import { handheldNote } from './ui/handheld';
 import type { LessonRunner } from './ui/lessonrun';
 import type { MapScreenParts } from './ui/map';
 import type { Screen } from './ui/screen';
+import { debugging } from './engine/debugging';
 import { lookOf } from './engine/looks';
+import { listenForMusic, music } from './engine/music';
 import { setMuted } from './engine/sfx';
 import { applyLook } from './ui/look';
 import { settingsScreen } from './ui/settings';
 import { startScreen } from './ui/start';
+import { themesScreen } from './ui/themes';
 import { wizardScreen } from './ui/wizard';
 
 const runtime = new Runtime();
@@ -58,6 +62,7 @@ type Route =
   | { name: 'map' }
   | { name: 'settings' }
   | { name: 'wizard' }
+  | { name: 'music' }
   | { name: 'level'; id: string }
   | { name: 'lesson'; id: string; from?: string }
   | { name: 'story'; id: string };
@@ -77,6 +82,7 @@ function parseRoute(hash: string): Route {
   if (hash === '#map') return { name: 'map' };
   if (hash === '#settings') return { name: 'settings' };
   if (hash === '#wizard') return { name: 'wizard' };
+  if (hash === '#music' && debugging()) return { name: 'music' };
   return { name: 'start' };
 }
 
@@ -477,6 +483,26 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
 
 let root: HTMLElement | null = null;
 
+/** The music a screen plays (D192): a story, the map and the start screen their
+ * chapter's theme whole, a lesson and a level the same theme quietly; the map and the
+ * start screen are in the chapter the child is in. The settings, the creator and the
+ * page of themes leave the music as it is, or start the first chapter's. */
+function playMusicFor(wanted: Route): void {
+  if (wanted.name === 'music') return;
+  if ((wanted.name === 'settings' || wanted.name === 'wizard') && music.state.theme) return;
+  const item =
+    wanted.name === 'level' || wanted.name === 'lesson' || wanted.name === 'story'
+      ? `${wanted.name}:${wanted.id}`
+      : progress.load().current;
+  const arrangement = wanted.name === 'level' || wanted.name === 'lesson' ? 'quiet' : 'full';
+  void loadCourse()
+    .then((course) => {
+      const theme = themeOf(course, item);
+      if (theme) music.play(theme, arrangement);
+    })
+    .catch(() => {});
+}
+
 function route(): void {
   if (!root) return;
   const wanted = parseRoute(location.hash);
@@ -489,6 +515,7 @@ function route(): void {
   // The words speak of the wizard as the progress document has it now (D37).
   speakOf(progress.wizard());
   if (wanted.name !== 'settings') beforeSettings = location.hash || '#start';
+  playMusicFor(wanted);
   screen?.destroy();
   screen = null;
   const content = element('main', { className: 'content' }, [
@@ -498,6 +525,10 @@ function route(): void {
   shownContent = content;
   if (wanted.name === 'settings') {
     show(content, settingsScreen({ back: beforeSettings }));
+    return;
+  }
+  if (wanted.name === 'music') {
+    void loadCourse().then((course) => show(content, themesScreen(course.themes ?? [])));
     return;
   }
   if (wanted.name === 'wizard') {
@@ -546,6 +577,8 @@ if (root) {
   initLanguage();
   applyLook(progress.settings());
   setMuted(!progress.settings().sound);
+  music.setVolume(progress.settings().music);
+  listenForMusic();
   window.addEventListener('hashchange', route);
   // Play time (D70, playtime.ts): counted while a level, a lesson or a story is
   // on screen and the child is at the page.

@@ -7,6 +7,8 @@ import type { Progress } from '../progress/store';
 export interface Chapter {
   id: string;
   items: string[];
+  /** The chapter's theme, content/music/<id>.json (D192). */
+  music?: string;
 }
 
 /** An item's kind, its number within its chapter and kind (D56), and its chapter's
@@ -30,6 +32,8 @@ export interface Course {
    * it and by the levels before it (D80). */
   spells_known?: Record<string, string[]>;
   words_known?: Record<string, string[]>;
+  /** The themes in content/music/, by id, for the page that plays any of them (D192). */
+  themes?: string[];
   /** Each item's title, and each chapter's as `chapter:<id>`, by language (12.6). */
   titles?: Record<string, Record<string, string>>;
   /** The game's opening, chapter 1's first story, before the creator (D61, D78). */
@@ -45,6 +49,13 @@ export function parseItem(item: string): { kind: ItemKind; id: string } | null {
 }
 
 /** The address that opens an item. */
+/** The theme a screen plays (D192): the chapter's that holds `item`, or the first
+ * chapter's when no chapter holds it or names a theme. */
+export function themeOf(course: Course, item: string | null | undefined): string | undefined {
+  const chapter = item ? course.chapters.find((one) => one.items.includes(item)) : undefined;
+  return chapter?.music ?? course.chapters[0]?.music;
+}
+
 export function itemHash(item: string): string {
   const parsed = parseItem(item);
   return parsed ? `#${parsed.kind}/${parsed.id}` : '#map';

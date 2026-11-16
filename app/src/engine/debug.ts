@@ -15,6 +15,7 @@ import Phaser from 'phaser';
 import type { Layout } from './layout';
 import { FOOT_IN_CELL } from './depth';
 import { TILE } from './placeholders';
+import { t } from '../i18n';
 import { debugWord } from './words';
 import { EFFECTS, play, STEPS } from './sfx';
 
@@ -56,6 +57,8 @@ const OTHER = 0xff66cc;
 const LEAF = 0xff9f1a;
 /** The cross on an enchanted cell, floor where no figure is seen (D135). */
 const ENCHANTED = 0xb56bff;
+/** The outline round each zone's cells, where its things are found from (D196). */
+const ZONE_COLOURS = [0xffb000, 0x2fbf71, 0xb08cff, 0x00bcd4];
 /** The cross on a low cell, which a flight crosses and a walk does not (D186). */
 const LOW = 0x1f6fff;
 
@@ -170,6 +173,12 @@ export class DebugView {
       cells.lineBetween(x * TILE + 6, y * TILE + 6, (x + 1) * TILE - 6, (y + 1) * TILE - 6);
       cells.lineBetween((x + 1) * TILE - 6, y * TILE + 6, x * TILE + 6, (y + 1) * TILE - 6);
     }
+    // Each zone's cells framed in its colour, inset, so that two zones side by side
+    // show their edge (D196).
+    this.map.zones.forEach((zone, index) => {
+      cells.lineStyle(3, ZONE_COLOURS[index % ZONE_COLOURS.length] ?? 0xffb000, 0.95);
+      for (const [x, y] of zone.cells) cells.strokeRect(x * TILE + 10, y * TILE + 10, TILE - 20, TILE - 20);
+    });
     cells.lineStyle(1, 0xffffff, 0.45);
     for (let x = x0; x <= x1; x += 1) cells.lineBetween(x * TILE, y0 * TILE, x * TILE, y1 * TILE);
     for (let y = y0; y <= y1; y += 1) cells.lineBetween(x0 * TILE, y * TILE, x1 * TILE, y * TILE);
@@ -319,6 +328,10 @@ export class DebugView {
     if (this.map.low.length > 0) entry(hex(LOW), debugWord('low'), true);
     if (this.map.things.some((thing) => (thing.covers ?? []).length > 0)) entry(hex(LEAF), debugWord('leaf'));
     if (this.map.enchanted.length > 0) entry(hex(ENCHANTED), debugWord('enchanted'), true);
+    this.map.zones.forEach((zone, index) => {
+      const colour = ZONE_COLOURS[index % ZONE_COLOURS.length] ?? 0xffb000;
+      entry(hex(colour), `${debugWord('zone')}: ${t(`plan.zone.${zone.name}`)}`);
+    });
     return legend;
   }
 

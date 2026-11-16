@@ -111,6 +111,7 @@ import {
 import { characterName, t } from '../i18n';
 import { readingTicks } from './bubble';
 import { SceneCamera, VIEW_TILES } from './camera';
+import type { StoryFraming } from './zooming';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
 import {
@@ -138,7 +139,7 @@ import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, bumpText, friendText, sleepingText } from './words';
 import { bobOf, FLOWN, FLY_LIFT, flyFrame } from './flight';
-import { drawnFromSprite, spriteFoot, spriteKey, spriteScale, type ThingSprite } from './things';
+import { drawnFromSprite, spriteFoot, spriteKey, spriteName, spriteOrigin, spriteScale, type ThingSprite } from './things';
 import { Wind } from './sound';
 
 /** How long one tick lasts at speed 1. */
@@ -171,6 +172,8 @@ export interface SceneHandle {
   restartShow(ready?: () => Promise<void>): Promise<void>;
   /** The camera back on the wizard, following it (12.6). */
   follow(): void;
+  /** In a story, the place a step frames, or none (D199, camera.ts). */
+  place(framing: StoryFraming | null): void;
   /** Zooms the camera one step in (1) or out (-1); false when it can go no further. */
   zoom(step: 1 | -1): boolean;
   /** Whether the camera can zoom one step in (1) or out (-1). */
@@ -510,9 +513,10 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** A sprite's thing put on its tile, its foot there, among the figures by its row:
-   * a broom lying under whoever stands on its cell, a ring standing (D182). */
+   * a broom lying under whoever stands on its cell, a ring standing (D182), a broom
+   * hanging from its peg at the rack's row, behind whoever stands under it (D195). */
   private placeSprite(image: Phaser.GameObjects.Image, sprite: ThingSprite, tile: Tile): void {
-    const [originX, originY] = sprite.origin ?? [0.5, 1];
+    const [originX, originY] = spriteOrigin(sprite);
     image
       .setPosition(...spriteFoot(sprite, tile))
       .setOrigin(originX, originY)
@@ -570,9 +574,10 @@ class LevelScene extends Phaser.Scene {
       }
       // A thing of a kind with a sprite of its own, a broom or a ring, on a painted scene
       // with no cut-out of it (D182); one hidden in the straw unseen until found (D184).
-      const sprite = this.art?.sprites?.[thing.kind];
-      if (this.art && sprite && drawnFromSprite(this.art.sprites, thing.kind, false) && this.textures.exists(spriteKey(thing.kind))) {
-        const image = this.add.image(0, 0, spriteKey(thing.kind));
+      const named = spriteName(this.art?.sprites ?? null, thing.kind, thing.hung === true);
+      const sprite = this.art?.sprites?.[named];
+      if (this.art && sprite && drawnFromSprite(this.art.sprites, named, false) && this.textures.exists(spriteKey(named))) {
+        const image = this.add.image(0, 0, spriteKey(named));
         this.sprites.set(thing.id, sprite);
         this.placeSprite(image, sprite, thing.tile);
         this.things.set(thing.id, image.setVisible(!thing.hidden));
@@ -737,6 +742,11 @@ class LevelScene extends Phaser.Scene {
    * last step was about (camera.ts). */
   follow(): void {
     this.view.follow();
+  }
+
+  /** In a story, the place a step frames, or none (D199, camera.ts). */
+  place(framing: StoryFraming | null): void {
+    this.view.place(framing);
   }
 
   /** In a story, the camera is with whoever the tick is about (D74): who speaks,
@@ -1067,6 +1077,7 @@ class LevelScene extends Phaser.Scene {
     return {
       rows: this.map.rows,
       enchanted: this.map.enchanted,
+      zones: this.map.zones,
       figures,
       things,
       marks: this.map.reaches,
@@ -1245,7 +1256,9 @@ class LevelScene extends Phaser.Scene {
         const thing = this.map.things.find((one) => one.id === id);
         if (!image?.visible || !thing) return [];
         const [x, y] = [image.x / TILE, image.y / TILE];
-        return [`${id}:${thing.kind}:${Math.floor(x)},${Math.ceil(y) - 1}`];
+        // A hung broom by its hung sprite's name, on its peg's cell (D195).
+        const name = spriteName(this.art?.sprites ?? null, thing.kind, thing.hung === true);
+        return [`${id}:${name}:${Math.floor(x)},${thing.hung ? thing.tile[1] : Math.ceil(y) - 1}`];
       })
       .sort()
       .join(';');
@@ -2345,6 +2358,9 @@ export async function startScene(
         },
         follow() {
           scene.follow();
+        },
+        place(framing) {
+          scene.place(framing);
         },
         zoom(step) {
           return scene.zoomBy(step);

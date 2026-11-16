@@ -294,3 +294,19 @@ describe('the plan shows the things of a dark room (D169)', () => {
     }
   });
 });
+
+describe("the plan's zones (D196)", () => {
+  it('hatches each zone and writes its name on its first cell', () => {
+    const shapes = planShapes({
+      ...VIEW,
+      zones: [
+        { name: 'wall', cells: [[2, 1], [1, 1], [3, 1]] },
+        { name: 'none', cells: [] },
+      ],
+    });
+    expect(shapes.zones).toEqual([
+      { name: 'wall', cells: [{ x: 2, y: 1 }, { x: 1, y: 1 }, { x: 3, y: 1 }], label: { x: 1, y: 1 } },
+    ]);
+    expect(planShapes(VIEW).zones).toEqual([]);
+  });
+});

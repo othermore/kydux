@@ -32,6 +32,9 @@ export interface PlanShapes {
   figures: { id: string; kind: string; x: number; y: number; facing: string }[];
   /** Every reach mark's cell, the hidden ones too. */
   marks: { x: number; y: number }[];
+  /** The level's zones (D196): each its name, its cells and the cell its name is
+   * written on, the first of its top row. */
+  zones: { name: string; cells: { x: number; y: number }[]; label: { x: number; y: number } }[];
 }
 
 const key = ([x, y]: Tile): string => `${x},${y}`;
@@ -74,7 +77,14 @@ export function planShapes(view: PlanView): PlanShapes {
     .filter((figure) => !enchanted.has(key(figure.tile)))
     .map(({ id, kind, tile: [x, y], facing }) => ({ id, kind, x, y, facing }));
   const marks = view.marks.map(([x, y]) => ({ x, y }));
-  return { columns: view.rows[0]?.length ?? 0, height: view.rows.length, cells, doors, things, figures, marks };
+  const zones = (view.zones ?? [])
+    .filter((zone) => zone.cells.length > 0)
+    .map(({ name, cells: tiles }) => {
+      const zoneCells = tiles.map(([x, y]) => ({ x, y }));
+      const label = [...zoneCells].sort((a, b) => a.y - b.y || a.x - b.x)[0] as { x: number; y: number };
+      return { name, cells: zoneCells, label };
+    });
+  return { columns: view.rows[0]?.length ?? 0, height: view.rows.length, cells, doors, things, figures, marks, zones };
 }
 
 /** A box on the plan, in its pixels. */
@@ -404,7 +414,7 @@ export function drawPlan(
   ctx: CanvasRenderingContext2D,
   shapes: PlanShapes,
   cell: number,
-  words: { tunnel: string; name: (id: string) => string },
+  words: { tunnel: string; name: (id: string) => string; zone?: (name: string) => string },
   scene: HTMLCanvasElement | null,
   pictures: PlanPictures | null,
   loaded: PlanLoaded | null,
@@ -431,6 +441,11 @@ export function drawPlan(
       if (kind !== 'low' && kind !== 'wall') continue;
       hatch(ctx, left(x), top(y), cell, kind === 'low' ? css(INK, 0.22) : css(INK, 0.5), kind === 'low' ? 4 : 7);
     }
+  }
+  // Where things are found from (D196): each zone's cells hatched lightly, the other
+  // way from the low cells', its name written on its first cell.
+  for (const zone of shapes.zones) {
+    for (const { x, y } of zone.cells) hatch(ctx, left(x), top(y), cell, css(INK, 0.16), 6, true);
   }
   // The grid over the picture, at the scene's cells: faint over the walls, firm on every
   // floor cell's edges, so that a child counts cells without numbers in them (D151).
@@ -610,6 +625,17 @@ export function drawPlan(
     ctx.fillStyle = css(INK);
     ctx.fillText(said, box.x + 4, box.y + box.height / 2);
   }
+  for (const zone of shapes.zones) {
+    const said = words.zone ? words.zone(zone.name) : zone.name;
+    ctx.font = `italic ${Math.max(11, cell * 0.3)}px Georgia, serif`;
+    const wide = ctx.measureText(said).width + 8;
+    const x = Math.min(width - wide, left(zone.label.x) + 2);
+    const y = top(zone.label.y) + 2;
+    ctx.fillStyle = css(PARCHMENT, 0.85);
+    ctx.fillRect(x, y, wide, tall);
+    ctx.fillStyle = css(INK);
+    ctx.fillText(said, x + 4, y + tall / 2);
+  }
   const middle = tunnelLabelCell(shapes);
   if (middle) {
     ctx.font = `italic ${Math.max(11, cell * 0.34)}px Georgia, serif`;
@@ -633,7 +659,15 @@ export function planLabel(name: string, x: number, y: number): string {
 }
 
 /** A cell hatched with lines across it, `lines` of them, in a colour. */
-function hatch(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, colour: string, lines: number): void {
+function hatch(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  colour: string,
+  lines: number,
+  backward = false,
+): void {
   ctx.save();
   ctx.beginPath();
   ctx.rect(x, y, size, size);
@@ -643,8 +677,9 @@ function hatch(ctx: CanvasRenderingContext2D, x: number, y: number, size: number
   ctx.beginPath();
   for (let index = -lines; index <= lines; index += 1) {
     const offset = (index / lines) * size;
-    ctx.moveTo(x + offset, y + size);
-    ctx.lineTo(x + offset + size, y);
+    // Up to the right, or, `backward`, down to the right.
+    ctx.moveTo(x + offset, backward ? y : y + size);
+    ctx.lineTo(x + offset + size, backward ? y + size : y);
   }
   ctx.stroke();
   ctx.restore();
@@ -831,6 +866,7 @@ export function openPlan(view: PlanView, onClose: () => void): PlanWindow {
   node.dataset.floorEdges = String(floorEdges(shapes).length);
   node.dataset.floor = String(shapes.cells.filter((one) => one.kind !== 'wall').length);
   node.dataset.tunnel = String(shapes.cells.filter((one) => one.kind === 'enchanted').length);
+  node.dataset.zones = shapes.zones.map(({ name, cells }) => `${name}:${cells.length}`).join(';');
   let loaded: PlanLoaded | null = null;
   let cell = 12;
   const draw = () => {
@@ -860,6 +896,7 @@ export function openPlan(view: PlanView, onClose: () => void): PlanWindow {
       cell,
       {
         tunnel: t('plan.tunnel'),
+        zone: (name: string) => t(`plan.zone.${name}`),
         name: (id) => {
           if (id === 'wizard') return forWizard('{wizard}');
           return view.figures.some((figure) => figure.id === id) ? characterName(id) : id;

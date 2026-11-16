@@ -10,6 +10,8 @@
 // can watch someone the story does not follow (D106). At a level's start it shows the
 // wizard and every actor, zooming out as far as it must and no farther, and the run
 // takes it back to the wizard, gliding (sprint 31).
+// A story step may frame a place (D199): a box of cells shown whole, or the scene's
+// width, held until a later step frames another or none.
 // It says data-zoom (the zoom, to two decimals), data-following, data-dragged
 // while a drag has let go of it, and data-view and data-bounds (the window and
 // the scene with its margin, in tiles across and down, "w×h") on the scene's
@@ -18,7 +20,7 @@
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
 import type { Tile } from './sight';
-import { startFrame, steppedZoom, storyMiddle, wheeledZoom, ZOOMS } from './zooming';
+import { boxFrame, type StoryFraming, startFrame, steppedZoom, storyMiddle, wheeledZoom, ZOOMS } from './zooming';
 
 export { ZOOMS };
 
@@ -60,6 +62,8 @@ export class SceneCamera {
   private dragged = false;
   /** Whether it stands where a level's start framed it, off the wizard, until follow(). */
   private framed = false;
+  /** In a story, the place a step frames (D199), held until a step frames none. */
+  private placed: StoryFraming | null = null;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -127,6 +131,10 @@ export class SceneCamera {
     const story = this.parts.story;
     this.dragged = false;
     delete this.parent.dataset.dragged;
+    if (story && this.placed) {
+      this.showPlaced(this.placed);
+      return;
+    }
     if (story) {
       const target = this.focus ?? story;
       if (target !== this.followed) {
@@ -176,10 +184,43 @@ export class SceneCamera {
     this.parent.dataset.following = 'false';
   }
 
+  /** In a story, a step's framing (D199): a box of cells shown whole and centred, or
+   * the scene's width on the window's middle, kept until a step frames none; null lets
+   * the camera follow whoever the steps are about again. data-camera-fit says it. */
+  place(framing: StoryFraming | null): void {
+    this.placed = framing;
+    if (!framing) {
+      delete this.parent.dataset.cameraFit;
+      this.follow();
+      return;
+    }
+    this.parent.dataset.cameraFit = 'fit' in framing ? framing.fit.join(',') : 'wide';
+    this.showPlaced(framing);
+  }
+
+  private showPlaced(framing: StoryFraming): void {
+    const camera = this.camera;
+    const scale = this.fit() * TILE;
+    const shown: Tile = [camera.width / scale, camera.height / scale];
+    const middle = camera.midPoint.y / TILE;
+    const box: [number, number, number, number] =
+      'fit' in framing ? framing.fit : [0, Math.floor(middle), this.parts.columns - 1, Math.floor(middle)];
+    const { zoom, centre } = boxFrame(box, shown, this.least());
+    camera.stopFollow();
+    camera.deadzone = null;
+    this.followed = null;
+    if (Math.abs(zoom - this.zoom) > 1e-6) {
+      this.zoom = zoom;
+      this.applyZoom();
+    }
+    camera.centerOn(centre[0] * TILE, 'fit' in framing ? centre[1] * TILE : middle * TILE);
+    this.parent.dataset.following = 'false';
+  }
+
   /** In a story, at each tick: with whoever the step is about, unless a drag has
    * let go of them, until the next step. */
   keep(): void {
-    if (!this.dragged) this.follow();
+    if (!this.dragged && !this.placed) this.follow();
   }
 
   /** In a story, the camera's window: a dead zone the size of the view less the

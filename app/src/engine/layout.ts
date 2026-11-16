@@ -37,6 +37,8 @@ export interface ThingLayout {
   /** Lying where it is not seen, a broom in the straw: drawn from a sprite only once
    * found (D184), or a painted key under a bookcase, seen once revealed (D85). */
   hidden?: boolean;
+  /** A broom hanging on a peg of the rack (D195), drawn from its kind's hung sprite. */
+  hung?: boolean;
 }
 
 /** A race against a racer, by Ilda's count (D189): the racer's id, the lines Ilda
@@ -92,6 +94,8 @@ export interface PlanView {
   rows: readonly string[];
   /** The enchanted cells (D135). */
   enchanted: readonly Tile[];
+  /** The level's zones (D196), each hatched lightly and named. */
+  zones?: readonly { name: string; cells: Tile[] }[];
   /** The wizard and every actor in sight, with where each stands and looks. */
   figures: { id: string; kind: string; tile: Tile; facing: string }[];
   /** The things on the map, not those carried. */
@@ -152,6 +156,9 @@ export interface Layout {
   darkArea: Tile[];
   /** The cells that hide every figure in them (D135). */
   enchanted: Tile[];
+  /** The level's zones, each its name and cells: a thing of a zone is found only from
+   * within it (D196). */
+  zones: { name: string; cells: Tile[] }[];
   /** Each tile's kind of terrain (D73): the scene's, or wall, floor and shelf. */
   terrain: string[][];
   /** Each tile's letter in the scene's map.txt (D73), or in the level's own map. */
@@ -238,6 +245,7 @@ export function layout(level: LevelJson): Layout {
       const covered = coversOf(spec);
       const covers = covered.length > 0 ? { covers: covered } : {};
       const hidden = spec.hidden === true ? { hidden: true } : {};
+      const hung = spec.hung === true ? { hung: true } : {};
       things.push({
         id: String(spec.id),
         kind: String(spec.kind),
@@ -249,6 +257,7 @@ export function layout(level: LevelJson): Layout {
         ...art,
         ...covers,
         ...hidden,
+        ...hung,
       });
     }
   }
@@ -331,6 +340,10 @@ export function layout(level: LevelJson): Layout {
     dark: level.dark === true,
     darkArea: boxedCells(level.dark_area),
     enchanted: boxedCells(level.enchanted),
+    zones: Object.entries((level.zones ?? {}) as Record<string, unknown>).map(([name, boxes]) => ({
+      name,
+      cells: boxedCells(boxes),
+    })),
     terrain: terrainOf(level, rows),
     letters: Array.isArray(level.terrain) ? (level.terrain as string[]) : rows,
     props: asList(level.props).flatMap((prop) => {

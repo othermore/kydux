@@ -12,9 +12,10 @@
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
-import { type Story, type StoryPart, storyEvents } from '../content/stories';
+import { type Story, type StoryPart, type StoryStep, storyEvents } from '../content/stories';
 import { lookOf } from '../engine/looks';
 import type { SceneHandle, SceneOptions } from '../engine/scene';
+import type { StoryFraming } from '../engine/zooming';
 import { characterName, forWizard, t } from '../i18n';
 import type { LevelJson } from '../runtime/protocol';
 import * as progress from '../progress/progress';
@@ -40,6 +41,17 @@ export interface StoryScreenParts {
   ) => Promise<SceneHandle>;
   /** The story in the language now set, for a change of language. */
   reload: () => Promise<Story>;
+}
+
+/** The place framed at a step (D199): the last step's framing from the part's first
+ * step to it, or none. */
+export function framingAt(steps: readonly StoryStep[], first: number, step: number): StoryFraming | null {
+  for (let index = step; index >= first; index -= 1) {
+    const camera = steps[index]?.camera;
+    if (camera?.fit) return { fit: [camera.fit[0][0], camera.fit[0][1], camera.fit[1][0], camera.fit[1][1]] };
+    if (camera?.wide) return { wide: true };
+  }
+  return null;
 }
 
 export function storyScreen(parts: StoryScreenParts): Screen {
@@ -181,8 +193,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     });
     const span = spans[step - (part?.step ?? 0)];
     if (!span) return;
-    // A step played again brings back a camera a drag let go of (D106).
+    // A step played again brings back a camera a drag let go of (D106); the place the
+    // last step of this part to frame one framed is held (D199).
     scene.follow();
+    scene.place(framingAt(story.steps, part?.step ?? 0, step));
     scene.playback.load(events.filter((event) => event.tick <= span.last));
     scene.playback.seek(span.first - 1);
     scene.playback.play();

@@ -72,3 +72,20 @@ export function storyMiddle(top: number, bottom: number, height: number, room: n
   if (bottom - top + room * 2 <= height) return (top + bottom) / 2;
   return bottom + room - height / 2;
 }
+
+/** A story step's framing (D199): a box of cells, [x0, y0, x1, y1] both included, or
+ * the scene's whole width. */
+export type StoryFraming = { fit: [number, number, number, number] } | { wide: true };
+
+/** The zoom and the point, in tiles, that show a box of cells whole, centred: zoomed
+ * out as far as it must and no farther than 1, nor further than `least`. `shown` is the
+ * window at zoom 1, in tiles across and down. */
+export function boxFrame(
+  [x0, y0, x1, y1]: [number, number, number, number],
+  shown: [number, number],
+  least: number,
+): { zoom: number; centre: [number, number] } {
+  const [width, height] = [x1 - x0 + 1, y1 - y0 + 1];
+  const zoom = Math.max(least, Math.min(1, shown[0] / width, shown[1] / height));
+  return { zoom, centre: [x0 + width / 2, y0 + height / 2] };
+}

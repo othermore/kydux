@@ -2850,7 +2850,12 @@ one overturns stays, marked as superseded.
   the rack's cell under its peg, (x, 5) in the shed, a cell no one walks on; `untie()`
   works from the cell under it, (x, 6), as a door opens from beside it, and is refused
   `too_far` from anywhere else (`under` in `level.py`). A broom on the floor is untied
-  on its own cell, as before. Rules out brooms "in a row on the floor".
+  on its own cell, as before. The page draws a hung broom from its kind's hung sprite,
+  `broom-hung` in `things.json`, which hangs from its top (`anchor: "top"`, its origin
+  the picture's top middle) on the peg's point in the cell (`foot`), at its row's depth,
+  behind a figure standing under it (`engine/things.ts`); `data-sprite-things` names it
+  `broom-hung`. Rules out brooms "in a row on the floor", and a hung broom drawn off
+  its peg.
 - **D196 — What `find_all` and `find_nearest` find depends on where the wizard
   stands.** Decided 2026-11-11 by the owner (*find_all depende de dónde estés: junto a
   la pared, solo encontrarás las escobas colgadas; cerca de la paja, las que están
@@ -2861,5 +2866,19 @@ one overturns stays, marked as superseded.
   anywhere; with nothing found, `find_nearest` gives `None` and `find_all` an empty
   list. A thing's zone is one of the level's, and holds the cell the thing is found
   from: its own, or, for a hung broom, the cell under it. The level handed to the page
-  carries its zones. Rules out a `find_all` that sees through walls into every corner
-  of a place.
+  carries its zones: the plan window hatches each zone's cells lightly, the other way
+  from the low cells', and writes its name on its first cell (`plan.zone.<name>`:
+  *junto a la pared*, *en la paja*); `?debug` frames each zone's cells in a colour of
+  its own and names it in the legend. Rules out a `find_all` that sees through walls
+  into every corner of a place.
+- **D199 — A story step may frame a place.** Decided 2026-11-11 by the owner (*al
+  entrar al cobertizo la cámara se centrase en el cobertizo, para que se vea entero*).
+  A step's `camera` may be `{"fit": [[x0, y0], [x1, y1]]}`: the page zooms out as far as
+  it must, and no further than its zoom of 1, to show that box of cells whole, centred
+  on it (`boxFrame`, `SceneCamera.place`); or `{"wide": true}`: the scene's playable
+  width, on the window's middle (the wide fields). The framing holds, the camera
+  following no one, until a later step of the same part frames another, and the story's
+  steps without one keep it (`framingAt`); a part told on another scene starts with
+  none. The world checks the box against the scene. The scene's parent says it in
+  `data-camera-fit` (`x0,y0,x1,y1` or `wide`). Rules out a story where a place is seen
+  in pieces.

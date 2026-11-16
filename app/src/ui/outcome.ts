@@ -57,6 +57,10 @@ export function explanationText(explanation: Explanation): string {
         return t('error.arguments', p);
       case 'no_knot':
         return t('error.no_knot', p);
+      case 'index_range':
+        return t('error.index_range', p);
+      case 'index_range_unknown':
+        return t('error.index_range_unknown', p);
       case 'no_such_module':
         return t('error.no_such_module', p);
       default:

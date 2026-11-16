@@ -94,7 +94,9 @@
     "line": " (línea {line})",
     "unknown_action": "`{object}` no conoce ninguna acción llamada `{name}`.",
     "no_new_attribute": "No puedes darle a `{object}` algo nuevo llamado `{name}`. Lo que `{object}` puede hacer está en su cuaderno.",
-    "no_knot": "Esta escoba no tiene nudo, así que no hay nada que desatar, y el programa se para aquí. Antes de desatar una escoba, mira si tiene nudo."
+    "no_knot": "Esta escoba no tiene nudo, así que no hay nada que desatar, y el programa se para aquí. Antes de desatar una escoba, mira si tiene nudo.",
+    "index_range": "La lista no tiene tantos: tiene {count}, y pediste el {asked}.º",
+    "index_range_unknown": "La lista no tiene tantos elementos como pides."
   },
   "things": {
     "door": "la puerta",
@@ -112,7 +114,11 @@
     "title": "El mapa del niño travieso",
     "legend": "Una casilla son dos números: la x cuenta desde la izquierda, la y desde arriba, y las dos empiezan en 0.",
     "close": "Cerrar el mapa",
-    "tunnel": "túnel oscuro"
+    "tunnel": "túnel oscuro",
+    "zone": {
+      "wall": "junto a la pared",
+      "straw": "en la paja"
+    }
   },
   "guide": {
     "next": "Siguiente",
@@ -509,7 +515,8 @@
       "full": "Entero",
       "quiet": "Suave",
       "playing": "Suena: {theme}, {arrangement}"
-    }
+    },
+    "zone": "Zona"
   },
   "race": {
     "reading": "Ilda lee los programas: tú, {mine} líneas; {name}, {theirs}.",

@@ -51,3 +51,6 @@ blocked.high.
 about.story_
 about.lesson_
 about.level_
+
+# The plan window and ?debug name each zone of a level by `plan.zone.${name}` (D196).
+plan.zone.

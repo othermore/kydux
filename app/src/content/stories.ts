@@ -40,6 +40,8 @@ export interface StoryStep {
    * the speaker when it is not given. */
   by?: string;
   text: string;
+  /** The place the step frames (D199): a box of cells, or the scene's width. */
+  camera?: { fit?: [[number, number], [number, number]]; wide?: boolean };
 }
 
 /** A part of a story told on another scene (39.4): from its first step on, the

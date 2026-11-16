@@ -4,7 +4,9 @@
 // size in cells and where its foot stands in its cell; a thing on a painted scene
 // with no cut-out of its own is drawn from it at its cell, its foot there, among the
 // figures by its row, scaled by the scene's cell as a figure is, the same on every
-// scene. A thing hidden in the straw is drawn only once found (D184).
+// scene. A thing hidden in the straw is drawn only once found (D184). A broom that
+// hangs on a peg (D195) is drawn from its kind's hung sprite, `broom-hung`, its top on
+// the peg's point and at the rack's depth, behind a figure standing under it.
 
 import { TILE } from './placeholders';
 import type { Tile } from './sight';
@@ -23,6 +25,9 @@ export interface ThingSprite {
   /** Whether it lies flat on the floor, under whoever stands on its cell, as a broom
    * does; a thing that stands, a ring, is drawn among the figures by its row. */
   lying?: boolean;
+  /** `top` for a thing that hangs from its top, a broom on a peg (D195): its origin is
+   * the top middle unless it says, and `foot` is then the peg's point in the cell. */
+  anchor?: 'top';
 }
 
 export type ThingSprites = Record<string, ThingSprite>;
@@ -30,6 +35,19 @@ export type ThingSprites = Record<string, ThingSprite>;
 /** The texture a kind's sprite is loaded as. */
 export function spriteKey(kind: string): string {
   return `sprite-${kind}`;
+}
+
+/** The sprite a thing is drawn from, by name: its kind's, or for a hung broom its
+ * kind's hung one when things.json lists it (D195). */
+export function spriteName(sprites: ThingSprites | null, kind: string, hung = false): string {
+  const name = `${kind}-hung`; // i18n-ignore: a sprite's name in things.json
+  return hung && sprites !== null && name in sprites ? name : kind;
+}
+
+/** Where in its picture a sprite is held: its origin, the bottom middle unless it hangs
+ * from its top or says otherwise. */
+export function spriteOrigin(sprite: ThingSprite): [number, number] {
+  return sprite.origin ?? (sprite.anchor === 'top' ? [0.5, 0] : [0.5, 1]);
 }
 
 /** Where a sprite's foot is drawn on a tile, in the scene's pixels. */

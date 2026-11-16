@@ -24,7 +24,7 @@ Los cuatro espacios antes de una línea son la forma que tiene Python de saber q
 
 La tecla Tab pone cuatro espacios a la vez para meter una línea hacia dentro, y está a la izquierda del teclado, encima de la tecla de bloqueo de mayúsculas, a menudo dibujada con dos flechas. La tecla de borrar, la que tiene una flecha larga hacia la izquierda, pulsada en los espacios antes de una línea, quita los cuatro de golpe: una pulsación saca la línea. Cuatro pulsaciones de la barra espaciadora son lo mismo para Python; con Tab, simplemente, se hace antes.
 
-Ejecuta el código de abajo, y se imprime una línea, la de fuera. Pon el cursor al principio de la última línea, pulsa Tab y ejecútalo de nuevo: no se imprime nada, porque la línea ahora está dentro del `if` y Dask no mira hacia abajo. Pulsa la tecla de borrar ahí, y la línea sale otra vez y se vuelve a imprimir.
+Ejecuta el código de abajo, y se imprime una línea, la de fuera. Pon el cursor al principio de la última línea, pulsa Tab y ejecútalo de nuevo: no se imprime nada, porque la línea ahora está dentro del `if` y Dask no mira hacia abajo. Pulsa la tecla de borrar ahí y ejecútalo una vez más: la línea ha salido del `if`, y se vuelve a imprimir.
 
 ```python try
 if dask.facing == "down":

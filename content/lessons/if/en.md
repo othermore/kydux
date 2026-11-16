@@ -24,7 +24,7 @@ The four spaces before a line are how Python knows that the line is inside the `
 
 The Tab key puts four spaces at once to move a line in, and is at the keyboard's left, above the Caps Lock key, often drawn with two arrows. The Backspace key, the one with the long arrow that points left, pressed in the spaces before a line, takes the four away at once: one press brings the line out. Four presses of the space bar are the same for Python; Tab is only quicker.
 
-Run the code below, and one line is printed, the one outside. Put the cursor at the start of the last line, press Tab, and run it again: nothing is printed, because the line is now inside the `if` and Dask does not look down. Press Backspace there, and the line is out again and is printed again.
+Run the code below, and one line is printed, the one outside. Put the cursor at the start of the last line, press Tab, and run it again: nothing is printed, because the line is now inside the `if` and Dask does not look down. Press Backspace there and run it once more: the line is out of the `if` again, and it is printed again.
 
 ```python try
 if dask.facing == "down":

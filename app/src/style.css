@@ -2657,7 +2657,8 @@ a.stop-body:focus-visible {
 }
 
 /* The room between the sheet's drawing and its fold (welcome-letter.webp): the words
-   stand on the fold, in a column and a size the page fits to it (fitWords). */
+   stand on the fold, in a column and a size the page fits to it (fitWords). Nothing is
+   cut: a hand's letter may reach past the column's edge, as the loop of an f does. */
 .story-letter-words {
   position: absolute;
   inset: 69.5% 9% 9.6%;
@@ -2665,7 +2666,6 @@ a.stop-body:focus-visible {
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  overflow: hidden;
   color: #4a2c22;
   font-family: 'Caveat', cursive;
   font-weight: 500;

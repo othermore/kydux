@@ -1,6 +1,9 @@
 // The tips' pictures (D221): each tip's thing in the game's own page, in each language,
 // cut to 16:9 round what it tells, made 640 by 360 and written as a webp of less than
-// 40 KB into content/tips/<lang>/<key>.webp. Run on demand, when the page changes:
+// 40 KB into content/tips/<lang>/<key>.webp. Each is taken where a child of chapter 1,
+// who waits for the first scenes, has been: the notebook, its spells and a click in
+// the-sealed-door, the level after the first spell's lesson; the lesson in how-much.
+// Run on demand, when the page changes:
 //
 //   KYDUX_TIP_PICTURES=1 npx playwright test e2e/tips-pictures.spec.ts
 //
@@ -91,7 +94,7 @@ for (const [lang, locale, wizard] of [
     test.beforeEach(({ page }) => seedWizard(page, wizard));
 
     test('the notebook: its actions, its spells, an action clicked into the program', async ({ page }) => {
-      await openLevel(page, 'the-rings');
+      await openLevel(page, 'the-sealed-door');
       await page.locator('#notebook-open').click();
       const notebook = page.locator('#notebook');
       await expect(notebook).toBeVisible();
@@ -154,11 +157,15 @@ for (const [lang, locale, wizard] of [
     });
 
     test('a lesson whose example is run on its page, and the map', async ({ page }) => {
-      await page.goto('/#lesson/checking-each');
+      // how-much's third page holds its block, a walk that prints nothing: the page
+      // says what the walk did.
+      await page.goto('/#lesson/how-much');
+      await page.locator('#lesson-next').click();
+      await page.locator('#lesson-next').click();
       const run = page.locator('.lesson-run-button').first();
       await run.click();
       const block = page.locator('.lesson-run').first();
-      await expect(block.locator('.lesson-printed')).toBeVisible({ timeout: 90_000 });
+      await expect(block.locator('.lesson-said')).toBeVisible({ timeout: 90_000 });
       await picture(page, lang, 'lesson', [block]);
       await page.goto('/#map');
       await expect(page.locator('.map-screen')).toBeVisible();

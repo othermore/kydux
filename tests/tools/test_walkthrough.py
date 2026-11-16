@@ -38,7 +38,7 @@ def small_repo(tmp_path: Path) -> Path:
                 "goals": ["Llega."],
                 "intro": "Mira, {friend}.",
                 "outro": "Ya.",
-                "ways": {"w": "Una manera"},
+                "changes": "La llave cambia de sitio cada vez.",
             }
         )
     )
@@ -63,7 +63,11 @@ def test_the_document_says_each_stop_with_a_comments_line_under_each_picture(tmp
     assert path.name == "recorrido-capitulo-3-2026-11-07.es.md"
     text = path.read_text(encoding="utf-8")
     assert "Hola, Marta, cansada." in text and "Mira, Teku." in text
-    assert "### Manera: Una manera (`w`)" in text
+    # A way under its id, which the child never sees, after what the card says (D204).
+    assert "**Lo que cambia cada vez:** La llave cambia de sitio cada vez." in text
+    assert "el niño nunca ve estos nombres" in text
+    assert "### Disposición `w`" in text
+    assert "manera" not in text.lower()
     assert text.count("![") == 7 and text.count("**Comentarios:**") == 7 + 1
     assert (path.parent / path.name.removesuffix(".es.md") / "story-s-01.png").is_file()
 

@@ -30,8 +30,7 @@
     "caught": "The teacher saw you! Try again, and watch which way they look.",
     "printed": "Your code printed:",
     "blocked": "On line {line}: {reason}",
-    "way": "In the way “{name}”:",
-    "all_ways": "In every way!",
+    "changed": "This time it was different.",
     "way_won": "The wizard gets through this way. Not every way yet: choose another one to see it."
   },
   "level": {
@@ -72,7 +71,7 @@
     "notebook_key": "Open or close the notebook: Alt+N",
     "carrying": "You carry {things}.",
     "way_label": "Way",
-    "ways": "This level is played {n} ways. One program must get through them all:",
+    "changes_tail": "Your program has to work every time.",
     "kind_fix": "This program does not work yet. Find what is wrong, and fix it.",
     "kind_improve": "This program works, but it can be better. Make it better.",
     "continue": "Continue",

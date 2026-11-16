@@ -166,6 +166,8 @@ export interface SceneHandle {
   /** A run's events to play; `way` names the way of the level they are of (D51),
    * whose places the restart uses. */
   load(result: WorldResult, way?: string | null): void;
+  /** The level's first way on the scene again, as it opens (D204). */
+  firstWay(): void;
   reset(): void;
   /** Shows the level starting again: the scene fades, everything is put back,
    * `ready` is called and awaited while nothing is seen, and it comes back;
@@ -2359,6 +2361,9 @@ export async function startScene(
         load(result: WorldResult, way = null) {
           scene.shownWay = way;
           playback.load(result.events);
+        },
+        firstWay() {
+          scene.shownWay = null;
         },
         reset() {
           playback.reset();

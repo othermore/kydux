@@ -15,7 +15,9 @@ Fails, printing file:line: message for each, on:
     without words.<name>, or either for one that is not (D80);
   - a level, content/levels/<id>/, without a text.<lang>.json for every language
     in i18n/, or with texts whose keys differ, or with a different number of goals
-    than its level.json, or a different number of hints in each language;
+    than its level.json, or a different number of hints in each language; a level
+    played in several ways without `changes` in each text, what may differ at each
+    run, or with `ways`, names of its ways, which the child is never told (D204);
   - a choice for the wizard, {boy's words|girl's words}, with other than one bar,
     in any text for the player; and in Spanish, `mago` or `maga` outside a choice,
     so that no text speaks of a girl as a boy by oversight (D37);
@@ -92,9 +94,8 @@ def check_levels(languages: list[str]) -> list[str]:
         return findings
     for directory in sorted(p for p in LEVELS.iterdir() if (p / "level.json").is_file()):
         name = directory.relative_to(REPO).as_posix()
-        goals = len(
-            json.loads((directory / "level.json").read_text(encoding="utf-8")).get("goals", [])
-        )
+        level = json.loads((directory / "level.json").read_text(encoding="utf-8"))
+        goals = len(level.get("goals", []))
         texts = {}
         for lang in languages:
             path = directory / f"text.{lang}.json"
@@ -111,6 +112,11 @@ def check_levels(languages: list[str]) -> list[str]:
                 findings.append(
                     f"{name}/text.{lang}.json: {goals} goals in level.json, not as many here"
                 )
+            # The child is told what may differ at each run, never of ways (D204).
+            if level.get("ways") and not text.get("changes"):
+                findings.append(f"{name}/text.{lang}.json: played in ways, and no changes")
+            if any(key == "ways" or key.startswith("ways.") for key in text):
+                findings.append(f"{name}/text.{lang}.json: names its ways (D204)")
         hints = {lang: len(text.get("hints", [])) for lang, text in texts.items()}
         if len(set(hints.values())) > 1:
             findings.append(f"{name}: a different number of hints in each language, {hints}")

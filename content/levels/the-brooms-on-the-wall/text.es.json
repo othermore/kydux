@@ -14,9 +14,5 @@
   "intro": "Las escobas de la paja las dejamos para luego. Primero vamos a ocuparnos de las colgadas. Tenemos que caminar junto a la pared y desatar cada una.",
   "outro": "¡Lo conseguimos! Las escobas de la pared están a salvo.",
   "learned": "Ahora sabes que un `for` sobre una lista ejecuta sus líneas una vez para cada escoba, de modo que un solo programa funciona sin importar cuántas haya.",
-  "ways": {
-    "two": "dos escobas en la pared",
-    "three": "tres escobas",
-    "four": "cuatro escobas"
-  }
+  "changes": "El número de escobas de la pared y los ganchos de los que cuelgan cambian cada vez."
 }

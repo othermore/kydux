@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """A chapter's walkthrough as one document for the owner to read and write on: every
 story step, every lesson page, each level's card, start, route in its first way and won
-card in every way, and the check sheets of its scenes, from the pictures e2e/walkthrough.spec.ts
-takes (`npm run walkthrough -- <chapter>` runs both), with a **Comentarios:** line
-under every picture.
+card in every way, each way under its id, which the child never sees (D204), and the
+check sheets of its scenes, from the pictures e2e/walkthrough.spec.ts takes (`npm run
+walkthrough -- <chapter>` runs both), with a **Comentarios:** line under every picture.
 
     tools/walkthrough.py 03-passages
 
@@ -135,17 +135,24 @@ class Document:
         self.lines.append("### El programa que lo resuelve\n")
         solution = (folder / "solution.py").read_text(encoding="utf-8").rstrip()
         self.lines.append(f"```python\n{solution}\n```\n")
-        names = text.get("ways", {})
-        for way in about.get("ways") or [None]:
+        ways = about.get("ways") or []
+        if ways:
+            # What the start card says of the ways, and what only this document names (D204).
+            self.lines.append(f"**Lo que cambia cada vez:** {spoken(text.get('changes', ''))}\n")
+            self.lines.append(
+                "El nivel se juega en varias disposiciones, cada una con su nombre interno; "
+                "el niño nunca ve estos nombres.\n"
+            )
+        for way in ways or [None]:
             tag = way["id"] if way else "unica"
-            name = names.get(tag, tag) if way else "recorrido"
+            name = tag if way else "recorrido"
             if way:
-                self.lines.append(f"### Manera: {name} (`{tag}`)\n")
+                self.lines.append(f"### Disposición `{tag}`\n")
             else:
                 self.lines.append("### El recorrido\n")
             frames = sorted(self.shots.glob(f"level-{level_id}-{tag}-tick-*.png"))
             if way and not frames:
-                self.lines.append("El recorrido tick a tick se ve en la primera manera.\n")
+                self.lines.append("El recorrido tick a tick se ve en la primera disposición.\n")
             for frame in frames:
                 tick = int(re.search(r"tick-(\d+)", frame.name).group(1))
                 self.picture(frame.name, f"{title}, {name}, tick {tick}")

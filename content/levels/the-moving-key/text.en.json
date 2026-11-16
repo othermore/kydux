@@ -13,10 +13,5 @@
   "intro": "The key to Eldra's little room is never twice in the same place; I think Eldra moves it! Yesterday's program walked four steps, but today the key lies somewhere between two and five steps away. Make your program check how far the key is, keep that number in a variable, and use it to walk there and pick the key up.",
   "outro": "The key is in your hand, wherever Eldra left it, and Eldra's door is waiting.",
   "learned": "Now you know what a variable is for: to keep a number the program cannot know when it is written.",
-  "ways": {
-    "two": "The key is two steps away",
-    "three": "The key is three steps away",
-    "four": "The key is four steps away",
-    "five": "The key is five steps away"
-  }
+  "changes": "The key is a different distance away each time."
 }

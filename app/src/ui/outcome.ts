@@ -7,9 +7,9 @@ import type { ErrorInfo, Explanation } from '../runtime/protocol';
 import { element } from './dom';
 import { withCode } from './words';
 
-/** What a run came to. For a level played in several ways (D51), `way` is the id
- * of the way the card speaks of; `won` is every way won, and `way_won` one way won
- * while another is not. */
+/** What a run came to. For a level played in several ways (D51), `won` is every way
+ * won, and `way_won` a way won while another is not, which only ?debug's way shows;
+ * `changed` says the run's way is not the one on the screen before it (D204). */
 export type Outcome = (
   | { kind: 'won' }
   | { kind: 'way_won' }
@@ -28,7 +28,7 @@ export type Outcome = (
   | { kind: 'caught' }
   | { kind: 'error'; error: ErrorInfo }
   | { kind: 'failed' }
-) & { way?: string };
+) & { changed?: boolean };
 
 /** An error explained by the world, in the child's words (D22). */
 export function explanationText(explanation: Explanation): string {
@@ -70,12 +70,11 @@ export function explanationText(explanation: Explanation): string {
   return 'suggestion' in p ? `${said} ${t('error.suggestion', p)}` : said;
 }
 
-/** What the card says; `wayName` gives a way's words, from the level's text. */
-export function outcomeText(outcome: Outcome, wayName: (id: string) => string = (id) => id): string {
+/** What the card says: first, when the run's way is not the one on the screen before
+ * it, that this time it was different (D204). */
+export function outcomeText(outcome: Outcome): string {
   const said = outcomeWords(outcome);
-  if (outcome.way === undefined) return said;
-  if (outcome.kind === 'won') return `${said} ${t('outcome.all_ways')}`;
-  return `${t('outcome.way', { name: wayName(outcome.way) })} ${said}`;
+  return outcome.changed ? `${t('outcome.changed')} ${said}` : said;
 }
 
 function outcomeWords(outcome: Outcome): string {
@@ -139,9 +138,9 @@ export function raceCount(goals: { kind: string; params: Record<string, unknown>
 
 export interface OutcomeCard {
   node: HTMLElement;
-  /** Says what the run came to, and what the child's code printed, if anything;
-   * `wayName` gives a way's words; in a race, Ilda's count under it (D189). */
-  show(outcome: Outcome, printed?: string, wayName?: (id: string) => string, race?: string | null): void;
+  /** Says what the run came to, and what the child's code printed, if anything; in a
+   * race, Ilda's count under it (D189). */
+  show(outcome: Outcome, printed?: string, race?: string | null): void;
   hide(): void;
   /** What the card says now, or null while it is hidden. */
   readonly current: Outcome | null;
@@ -167,10 +166,10 @@ export function outcomeCard(): OutcomeCard {
   let current: Outcome | null = null;
   return {
     node,
-    show(outcome, printed = lastPrinted, wayName = (id) => id, race = null) {
+    show(outcome, printed = lastPrinted, race = null) {
       current = outcome;
       lastPrinted = printed;
-      text.replaceChildren(...withCode(outcomeText(outcome, wayName)));
+      text.replaceChildren(...withCode(outcomeText(outcome)));
       raced.textContent = race ?? '';
       raced.hidden = !race;
       printedLabel.textContent = t('outcome.printed');

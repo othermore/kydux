@@ -14,9 +14,5 @@
   "intro": "Ya hemos terminado con las escobas que estaban colgadas. ¡Las demás están tiradas por la paja! Desde donde estás, si usas `find_all` las encontrarás ordenadas empezando por la más cercana, y te puedes ir moviendo abajo y a la izquierda para ir desatando todas. Puedes calcular cuántos pasos tienes que andar desde donde estás en cada momento hasta la siguiente escoba, y así pasar por todas.",
   "outro": "¡Terminamos con la paja! Has calculado cada distancia perfectamente.",
   "learned": "Ahora sabes que dentro del bucle un programa trabaja con la escoba de esa vuelta, así que las mismas cuentas funcionan para todas.",
-  "ways": {
-    "four": "cuatro escobas",
-    "four_low": "cuatro escobas, más abajo",
-    "four_mid": "cuatro escobas, en medio"
-  }
+  "changes": "El número de escobas del suelo y dónde están cambian cada vez, así que la siguiente puede estar a cualquier lado."
 }

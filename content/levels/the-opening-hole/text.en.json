@@ -13,10 +13,5 @@
   "intro": "Careful where you step! Three cells away there is one of those holes that open in the floor. The mark is on the other side, in the storeroom's arch. We will wait while it is open, and then cross!",
   "outro": "Safe on the other side! We are at the door of a dark storeroom.",
   "learned": "Now you know that `while not` waits for something that is not yet true, and that `hole.closed` says when it is; `hole.open` says the opposite.",
-  "ways": {
-    "three": "Opens every three ticks",
-    "four": "Opens every four ticks",
-    "five": "Opens every five ticks",
-    "seven": "Opens every seven ticks"
-  }
+  "changes": "The hole opens after a different number of ticks each time."
 }

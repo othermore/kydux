@@ -138,7 +138,12 @@ async function level(page: Page, id: string): Promise<void> {
   const spec = JSON.parse(readFileSync(`${CONTENT}levels/${id}/level.json`, 'utf8'));
   const solution = readFileSync(`${CONTENT}levels/${id}/solution.py`, 'utf8');
   const ways: string[] = (spec.ways ?? []).map((way: { id: string }) => way.id);
-  await page.goto(`/#level/${id}`);
+  // The child never sees a level's ways (D204): only ?debug draws their select. A level
+  // with ways is opened so, with the tester's panel and buttons kept out of the pictures.
+  await page.goto(ways.length > 0 ? `/?debug#level/${id}` : `/#level/${id}`);
+  if (ways.length > 0) {
+    await page.addStyleTag({ content: '.debug-box, .debug-legend, #debug-solution, .way { display: none !important; }' });
+  }
   await page.locator('#start').waitFor({ timeout: ciTimes(90_000) });
   await page.waitForTimeout(ciTimes(400));
   await page.screenshot({ path: `${OUT}level-${id}-00-tarjeta.png` });

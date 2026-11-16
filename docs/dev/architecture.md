@@ -902,13 +902,12 @@ one overturns stays, marked as superseded.
   way's result, and `status` won only when every way is. Rules out a
   random way per run: a child must see that one program handles every
   case, and a test must be able to say so. The page keeps every way's
-  world and shows one: the first not won, with a `#way` select, after a
-  run, to play back any other; the goals, the timeline and the card follow
-  the way shown, and the card names it. The card says *won* only when
-  every way is: a way won while another is not is its own outcome,
-  `way_won`, so that the progress document never counts a level won by
-  looking at its one good way. The start card lists the ways in their
-  words, `ways` in `text.<lang>.json`.
+  world and shows one: the first not won; the goals, the timeline and the
+  card follow the way shown. The card says *won* only when every way is: a
+  way won while another is not is its own outcome, `way_won`, so that the
+  progress document never counts a level won by looking at its one good
+  way. What the child is told of it is D204's: what may differ at each run,
+  never the ways.
 - **D52 — A dark room hides what lies on its floor.** Decided 2026-10-21
   (sprint-9.md), built the same day. A level with `"dark": true` is unlit
   until `kirra` (which it lists among its spells when it must find or open
@@ -3007,3 +3006,26 @@ one overturns stays, marked as superseded.
   familiar*'s `choir`, is a voice apart from the pad, written louder. Rules out a pad
   whose notes stop and start, a pad that covers the tune, and a theme chosen from its
   score without being heard.
+- **D204 — The child is told what may differ at each run, never of ways.** Decided
+  2026-11-12 by the owner (*No hay que hablar de las maneras en ningún lugar de ningún
+  capítulo. Eso es una cuestión de como está programado nuestro mundo, pero el usuario no
+  debe saberlo*). D51 is the world's mechanism. A level with ways has in each
+  `text.<lang>.json` a `changes`, one sentence in the child's words of what may be
+  different at each run (*La llave está cada vez a una distancia distinta de la
+  puerta.*); the start card shows it with the same words on every such level under it,
+  `level.changes_tail` (*Tu programa tiene que valer siempre.*), and no count or list of
+  ways (`changesLines` in `ui/cards.ts`). No `text.<lang>.json` names a way, and
+  `tools/i18n_check.py` refuses a level with ways and no `changes`, or with `ways`. The
+  level opens on its first way; a run shows the first way it does not win, and the scene
+  keeps it until the next run or until the level starts over, when it is on its first way
+  again (`firstWay`). When the way a run shows is not the one on the screen before it, the
+  outcome's card starts with `outcome.changed` (*Esta vez era distinto.*), then says what
+  it says of any run (`RunController`'s `onScreenWay`). A run that wins every way has the
+  won card of any level. Only `?debug` draws the `#way` select, with the ways' ids, and
+  only there is `outcome.way_won` said. The walkthrough and the course book, read by the
+  owner and by developers, head each way with its id and say once that the child never
+  sees these names. A content test holds every text the child reads, and every word of
+  `i18n/` but `level.way_label` and `outcome.way_won`, to `manera` and `way` only in the
+  innocent uses it lists (*de la misma manera*, *which way Dask looks*). Rules out the
+  word for this in any text the child reads, a count or a list of ways on a card, a
+  select of ways outside `?debug`, and the won card's *¡De todas las maneras!*.

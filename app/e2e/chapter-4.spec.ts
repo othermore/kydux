@@ -15,7 +15,7 @@
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
-import { MARTA, type SeededWizard, seedWizard, storyNext } from './helpers';
+import { gotoTesting, MARTA, type SeededWizard, seedWizard, storyNext } from './helpers';
 import { ciTimes } from './support';
 
 const SHOTS = fileURLToPath(new URL('./shots/chapter-4/', import.meta.url));
@@ -37,7 +37,9 @@ const scene = (page: Page) => page.locator('#scene');
 
 /** A level opened and ready to run, at a speed. */
 async function open(page: Page, id: string, speed = '4'): Promise<void> {
-  await page.goto(`/#level/${id}`);
+  // A level with ways is opened under ?debug, whose select alone shows them (D204).
+  if (waysOf(id).length > 0) await gotoTesting(page, `#level/${id}`);
+  else await page.goto(`/#level/${id}`);
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('#speed').selectOption(speed);
@@ -202,11 +204,12 @@ test.describe('the shed', () => {
     }
   });
 
-  test('two brooms untied by hand win the way of two and lose the longer ones (D51)', async ({ page }) => {
+  test('two brooms untied by hand win the way of two and lose the longer ones, which the card says changed (D51, D204)', async ({ page }) => {
     await open(page, 'the-brooms-on-the-wall');
     await run(page, wrong('the-brooms-on-the-wall', 'two_written_out'));
     await expect(page.locator('.outcome')).not.toHaveAttribute('data-kind', 'won');
     await expect(page.locator('#way')).toHaveValue('three');
+    await expect(page.locator('.outcome-text')).toContainText(/^Esta vez era distinto\. /);
   });
 
   test("the wall's program stops at the first broom, which has no knot, and the if mends it (D183)", async ({ page }) => {

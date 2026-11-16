@@ -30,8 +30,7 @@
     "caught": "¡Te ha visto el profesor! Inténtalo otra vez, y fíjate hacia dónde mira.",
     "printed": "Tu código ha escrito:",
     "blocked": "En la línea {line}: {reason}",
-    "way": "En la manera «{name}»:",
-    "all_ways": "¡De todas las maneras!",
+    "changed": "Esta vez era distinto.",
     "way_won": "{El mago|La maga} pasa de esta manera. Todavía no de todas: elige otra para verla."
   },
   "level": {
@@ -72,7 +71,7 @@
     "notebook_key": "Abre o cierra el cuaderno: Alt+N",
     "carrying": "Llevas {things}.",
     "way_label": "Manera",
-    "ways": "Este nivel se juega de {n} maneras. Un solo programa tiene que superarlas todas:",
+    "changes_tail": "Tu programa tiene que valer siempre.",
     "kind_fix": "Este programa todavía no funciona. Encuentra qué falla, y arréglalo.",
     "kind_improve": "Este programa funciona, pero puede ser mejor. Mejóralo.",
     "continue": "Continuar",

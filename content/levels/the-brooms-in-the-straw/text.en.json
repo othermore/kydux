@@ -14,9 +14,5 @@
   "intro": "We're done with the brooms that were hanging. The rest are scattered in the straw! From where you are, if you use `find_all` you'll find them in order, starting with the nearest, and you can keep moving down and to the left to untie them all. You can work out how many steps you have to walk from where you are at each moment to the next broom, and so go through them all.",
   "outro": "All done with the straw! You calculated every distance perfectly.",
   "learned": "Now you know that inside the loop a program works with that turn's broom, so the same sums work for every one.",
-  "ways": {
-    "four": "four brooms",
-    "four_low": "four brooms, lower down",
-    "four_mid": "four brooms, in between"
-  }
+  "changes": "The number of brooms on the floor and where they lie change each time, so the next one may be on any side."
 }

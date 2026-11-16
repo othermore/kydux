@@ -55,10 +55,17 @@ export interface StartCardText {
   carrying?: string;
   /** Whether the card is opened again, with ?, so that its button says Continue. */
   again?: boolean;
-  /** The words for each way the level is played, when it has ways (D51). */
-  ways?: string[];
+  /** What may differ at each run, in the child's words, when the level has ways (D204). */
+  changes?: string;
   /** Plays the screen's guide again (D68): offered on the card opened with ?. */
   onGuide?: () => void;
+}
+
+/** What a level's start card says of its ways (D204): what may differ at each run and
+ * that the program has to work every time; nothing for a level played one way. No count
+ * of ways and no list of them. */
+export function changesLines(changes: string | undefined): string[] {
+  return changes ? [changes, t('level.changes_tail')] : [];
 }
 
 /** A character's words on a card (D45): the name, and what they say. */
@@ -112,16 +119,14 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
       element('p', {}, [t('goals.title')]),
       list,
       ...(text.carrying ? [element('p', { id: 'card-carrying', className: 'card-carrying' }, [text.carrying])] : []),
-      ...(text.ways && text.ways.length > 0
+      // What may differ at each run, and that the program has to work every time (D204).
+      ...(text.changes
         ? [
-            element('div', { id: 'card-ways', className: 'card-ways' }, [
-              element('p', {}, [t('level.ways', { n: text.ways.length })]),
-              element(
-                'ul',
-                {},
-                text.ways.map((words) => element('li', {}, withCode(words))),
-              ),
-            ]),
+            element(
+              'div',
+              { id: 'card-changes', className: 'card-changes' },
+              changesLines(text.changes).map((line) => element('p', {}, withCode(line))),
+            ),
           ]
         : []),
       text.onGuide

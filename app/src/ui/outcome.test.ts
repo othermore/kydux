@@ -77,14 +77,14 @@ describe('an error explained', () => {
     ).toBe('Python says: ValueError: bad');
   });
 
-  it('names the way a card speaks of, and says a win is every way (D51)', () => {
+  it('says first that this time it was different when the way changed, and names no way (D204)', () => {
     initLanguage({ languages: ['en'], storage: null });
-    const name = (id: string) => (id === 'away' ? 'Dask looks away' : id);
-    expect(outcomeText({ kind: 'caught', way: 'away' }, name)).toBe(
-      'In the way “Dask looks away”: The teacher saw you! Try again, and watch which way they look.',
-    );
-    expect(outcomeText({ kind: 'won', way: 'away' }, name)).toBe('You did it, Kydux! In every way!');
-    expect(outcomeText({ kind: 'way_won', way: 'away' }, name)).toContain('Not every way yet');
+    const caught = 'The teacher saw you! Try again, and watch which way they look.';
+    expect(outcomeText({ kind: 'caught', changed: true })).toBe(`This time it was different. ${caught}`);
+    expect(outcomeText({ kind: 'caught' })).toBe(caught);
+    expect(outcomeText({ kind: 'won' })).toBe('You did it, Kydux!');
+    // Only ?debug's select shows a way won while another is not.
+    expect(outcomeText({ kind: 'way_won' })).toContain('Not every way yet');
   });
 });
 

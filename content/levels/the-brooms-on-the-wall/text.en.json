@@ -14,9 +14,5 @@
   "intro": "We'll leave the brooms in the straw for later. Let's take care of the hanging ones first. We need to walk along the wall and untie each one.",
   "outro": "We did it! The brooms on the wall are safe.",
   "learned": "Now you know that a `for` over a list runs its lines once for each broom, so that one program works however many there are.",
-  "ways": {
-    "two": "two brooms on the wall",
-    "three": "three brooms",
-    "four": "four brooms"
-  }
+  "changes": "The number of brooms on the wall and the pegs they hang from change each time."
 }

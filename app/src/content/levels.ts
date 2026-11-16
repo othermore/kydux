@@ -17,8 +17,8 @@ export interface LevelText {
   outro?: string;
   /** What the child now knows, said on the win card (D62). */
   learned?: string;
-  /** The words for each of the level's ways (D51), by the way's id. */
-  ways?: Record<string, string>;
+  /** What may differ at each run of a level with ways, in the child's words (D204). */
+  changes?: string;
 }
 
 export interface LoadedLevel {
@@ -69,9 +69,7 @@ function madeForWizard(text: LevelText): LevelText {
     ...(text.intro !== undefined ? { intro: forWizard(text.intro) } : {}),
     ...(text.outro !== undefined ? { outro: forWizard(text.outro) } : {}),
     ...(text.learned !== undefined ? { learned: forWizard(text.learned) } : {}),
-    ...(text.ways
-      ? { ways: Object.fromEntries(Object.entries(text.ways).map(([id, words]) => [id, forWizard(words)])) }
-      : {}),
+    ...(text.changes !== undefined ? { changes: forWizard(text.changes) } : {}),
   };
 }
 

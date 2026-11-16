@@ -13,9 +13,5 @@
   "intro": "But how many are there? And how do we find them? Remember that from here you can find the ones in the straw, and by the wall the hanging ones.",
   "outro": "That's all of them! Now we can start untying the rest.",
   "learned": "Now you know that `find_all` gives a list of what you find from where you stand, and that you can add the `len` of two lists.",
-  "ways": {
-    "six": "six brooms",
-    "seven": "seven brooms",
-    "eight": "eight brooms"
-  }
+  "changes": "The number of brooms on the floor changes each time, and some are hidden in the straw."
 }

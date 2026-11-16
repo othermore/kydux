@@ -27,7 +27,7 @@ export interface RunSnapshot {
    * and after a restart. */
   world: WorldResult | null;
   /** The ids of the last run's ways (D51), empty for a level played one way, and the
-   * way shown. */
+   * way shown, for ?debug's select (D204). */
   ways: string[];
   way: string | null;
   /** What the card says, or null while it is hidden. */
@@ -70,6 +70,8 @@ export interface SceneLike {
    * and waits for it while nothing is seen, then fades in, and resolves once it is
    * shown (D75, D121); a scene without it is only reset. */
   restartShow?(ready?: () => Promise<void>): Promise<void>;
+  /** The level's first way on the scene again, as it opens (D204). */
+  firstWay?(): void;
   /** A run played out, the wizard celebrating it when it is `won` (14.3): how long the
    * outcome waits, for the celebration and for the words on the scene to be read to
    * their end (D175); a scene without it shows the outcome at once. */
@@ -99,6 +101,11 @@ export class RunController {
   /** The world shown: the result's own, or one of its ways'. */
   private world: WorldResult | null = null;
   private shownWay: string | null = null;
+  /** The way on the screen before a run: the level's first until a run shows another,
+   * and again once the level starts over (D204); null for the first. */
+  private onScreenWay: string | null = null;
+  /** Whether the last run's way is not the one that was on the screen before it. */
+  private wayChanged = false;
   private outcome: Outcome | null = null;
   private runningLine: number | null = null;
   private errorLine: number | null = null;
@@ -218,12 +225,15 @@ export class RunController {
     this.changed();
   }
 
-  /** Plays back one way of the last run (D51), the goals and the card following it. */
+  /** Plays back one way of the last run (D51), the goals and the card following it:
+   * ?debug's select (D204). */
   showWay(id: string): void {
     const way = this.result?.ways?.find((entry) => entry.id === id);
     if (!way || !this.scene) return;
     if (this.scene.playback.state === 'playing') this.scene.playback.stop();
     this.shownWay = id;
+    this.onScreenWay = id;
+    this.wayChanged = false;
     this.outcome = null;
     this.errorLine = null;
     this.tick = 0;
@@ -241,6 +251,9 @@ export class RunController {
 
   restart(): void {
     this.generation += 1;
+    // Started over, the level is on its first way again (D204).
+    this.onScreenWay = null;
+    this.scene?.firstWay?.();
     if (this.scene) void this.startAgain(this.scene, this.generation, () => Promise.resolve());
     this.clear();
     this.changed();
@@ -282,6 +295,10 @@ export class RunController {
     this.result = world;
     const shown = world.ways?.find((way) => way.id === world.way);
     this.shownWay = shown?.id ?? null;
+    // Told when the way the run shows is not the one on the screen before it (D204).
+    const before = this.onScreenWay ?? world.ways?.[0]?.id ?? null;
+    this.wayChanged = shown !== undefined && shown.id !== before;
+    if (shown) this.onScreenWay = shown.id;
     this.load(shown ?? world);
   }
 
@@ -411,15 +428,14 @@ export class RunController {
     this.tick = 0;
   }
 
-  /** The outcome of the world shown; with ways, said of its way (D51): `won` only when
-   * every way is, `way_won` for a way won while another is not. */
+  /** The outcome of the world shown; with ways (D51), `won` only when every way is,
+   * `way_won` for a way won while another is not (?debug's select), and a run whose way
+   * is not the one on the screen before it `changed` (D204). */
   private outcomeOf(world: WorldResult): Outcome {
     const said = this.outcomeOfOne(world);
     if (this.shownWay === null) return said;
-    if (said.kind === 'won' && this.result?.status !== 'won') {
-      return { kind: 'way_won', way: this.shownWay };
-    }
-    return { ...said, way: this.shownWay };
+    if (said.kind === 'won') return this.result?.status === 'won' ? said : { kind: 'way_won' };
+    return this.wayChanged ? { ...said, changed: true } : said;
   }
 
   private outcomeOfOne(world: WorldResult): Outcome {

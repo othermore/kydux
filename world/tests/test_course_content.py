@@ -493,3 +493,107 @@ def test_the_hole_is_never_a_slab(lang):
     lesson = (CONTENT / "lessons" / "kirra-and-osto" / f"{lang}.md").read_text(encoding="utf-8")
     first = {"es": "una trampa mágica, o un portal oscuro", "en": "a magic trap, or a dark portal"}
     assert first[lang] in lesson
+
+
+# The child is told what may differ at each run, never of ways (D204).
+
+
+#: Every text the child reads: the levels', the stories', the guide's, the lessons'
+#: pages, and the page's own words in i18n/.
+def child_texts() -> list[tuple[str, str]]:
+    found = []
+
+    def strings(value, where):
+        if isinstance(value, str):
+            found.append((where, value))
+        elif isinstance(value, dict):
+            for key, inner in value.items():
+                strings(inner, f"{where}.{key}")
+        elif isinstance(value, list):
+            for index, inner in enumerate(value):
+                strings(inner, f"{where}[{index}]")
+
+    for path in sorted(CONTENT.glob("*/*/text.*.json")) + sorted(
+        CONTENT.glob("guide/text.*.json")
+    ):
+        strings(json.loads(path.read_text(encoding="utf-8")), path.relative_to(CONTENT).as_posix())
+    for path in sorted(CONTENT.glob("lessons/*/*.md")):
+        found.append((path.relative_to(CONTENT).as_posix(), path.read_text(encoding="utf-8")))
+    for path in sorted((ROOT / "i18n").glob("*.json")):
+        catalog = json.loads(path.read_text(encoding="utf-8"))
+        # Only ?debug's select of ways and its won way say the word (D204).
+        for key in ("way_label",):
+            catalog["level"].pop(key)
+        catalog["outcome"].pop("way_won")
+        strings(catalog, f"i18n/{path.name}")
+    return found
+
+
+#: The word in any of its innocent uses, each as the texts have it: a direction, a road,
+#: a manner of doing something, never a level's arrangements.
+INNOCENT_WAYS = [
+    "watch which way they look",
+    "come back this way",
+    "This way you can see",
+    "Python's own way",
+    "two ways to wait",
+    "This is the way home",
+    "back the same way",
+    "the shortest way",
+    "check which way Dask",
+    "in any of the four ways",
+    "The way in",
+    "somewhere on the way",
+    "Both ways will",
+    "a long way",
+    "in a good way",
+    "look this way",
+    "which way Dask looks",
+    "look the same way",
+    "on the way home",
+    "another way to cross",
+    "When is each way handy",
+    "goes the right way",
+    "choose the way by it",
+    "the same way to the cell",
+    "The way goes on",
+    "along the way",
+    "on your way",
+    "the way down",
+    "chose your way",
+    "this way the flying",
+    "looks this way",
+    "find our way",
+    "know the way",
+    "is in my way",
+    "is in the way",
+    "That way cannot",
+    "The way the",
+    "de la misma manera",
+    "Hay una manera de encontrar",
+    "a way to find all the things",
+]
+WAY_WORD = re.compile(r"\b(ways?|maneras?)\b", re.IGNORECASE)
+
+
+def test_no_text_the_child_reads_tells_of_a_level_s_ways():
+    """D204: `manera` and `way` only in their innocent uses, which the list names."""
+    for where, text in child_texts():
+        for found in WAY_WORD.finditer(text):
+            near = text[max(0, found.start() - 30) : found.end() + 30]
+            assert any(innocent in near for innocent in INNOCENT_WAYS), f"{where}: …{near}…"
+
+
+@pytest.mark.parametrize(
+    "path", sorted(CONTENT.glob("levels/*/level.json")), ids=lambda p: p.parent.name
+)
+def test_a_level_with_ways_says_what_may_differ_and_never_names_them(path):
+    """D204: `changes` in every language where the level has ways; `ways` nowhere."""
+    ways = json.loads(path.read_text(encoding="utf-8")).get("ways")
+    for lang in LANGUAGES:
+        text = json.loads((path.parent / f"text.{lang}.json").read_text(encoding="utf-8"))
+        assert "ways" not in text
+        if ways:
+            assert isinstance(text.get("changes"), str) and text["changes"].strip()
+        else:
+            assert "changes" not in text

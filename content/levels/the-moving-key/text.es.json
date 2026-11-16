@@ -13,10 +13,5 @@
   "intro": "¡La llave de la pequeña habitación de Eldra nunca está dos veces en el mismo sitio; creo que Eldra la mueve! El programa de ayer daba cuatro pasos, pero hoy la llave está a dos, tres, cuatro o cinco pasos. Haz que tu programa compruebe a qué distancia está la llave, guarda ese número en una variable, y úsalo para caminar hasta allí y recoger la llave.",
   "outro": "¡Tienes la llave en la mano, dondequiera que Eldra la haya dejado, y la puerta de Eldra te espera!",
   "learned": "Ahora sabes para qué sirve una variable: para guardar un número que el programa no puede saber cuando se escribe.",
-  "ways": {
-    "two": "La llave está a dos pasos",
-    "three": "La llave está a tres pasos",
-    "four": "La llave está a cuatro pasos",
-    "five": "La llave está a cinco pasos"
-  }
+  "changes": "La llave está cada vez a una distancia distinta."
 }

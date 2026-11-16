@@ -123,21 +123,21 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   let goals: GoalsPanel = goalsPanel(goalTexts());
   goalsSlot.append(goals.node);
   const status = element('p', { id: 'status', className: 'status' });
-  // A level played in several ways (D51): its ways' ids, their words, and the
-  // select that plays back the way the child picks, after a run.
-  const levelWays = ((loaded.level.ways as { id: string }[] | undefined) ?? []).map((way) => way.id);
-  const wayName = (id: string) => text.ways?.[id] ?? id;
+  // A level played in several ways (D51): the child is told only what may differ at
+  // each run (D204); under ?debug, after a run, a select of the ways' ids plays back
+  // the way the tester picks.
+  const testing = debugging();
   const waySelect = element('select', { id: 'way' });
   const wayLabel = labelled(element('span', { className: 'way-label' }), () => t('level.way_label'));
   const wayBox = element('label', { className: 'way', hidden: true }, [wayLabel, ' ', waySelect]);
   waySelect.addEventListener('change', () => controller.showWay(waySelect.value));
   let shownWays = '';
   const renderWays = (snapshot: RunSnapshot, force: boolean) => {
-    wayBox.hidden = snapshot.ways.length === 0;
+    wayBox.hidden = !testing || snapshot.ways.length === 0;
     const key = snapshot.ways.join(',');
     if (force || key !== shownWays) {
       waySelect.replaceChildren(
-        ...snapshot.ways.map((id) => element('option', { value: id }, [wayName(id)])),
+        ...snapshot.ways.map((id) => element('option', { value: id }, [id])),
       );
       shownWays = key;
     }
@@ -227,7 +227,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       heading,
       sceneFrame,
       timeline,
-      wayBox,
+      ...(testing ? [wayBox] : []),
       status,
     ]),
     handle,
@@ -362,7 +362,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           goals: goalTexts(),
           said: said(text.intro),
           carrying: carrying(),
-          ways: levelWays.map(wayName),
+          changes: text.changes,
           onGuide: parts.loadGuide && (asked || startAgain) ? showGuide : undefined,
         },
         () => {
@@ -453,7 +453,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     snapshot.goals.forEach((mark, index) => goals.set(index, mark));
     renderWays(snapshot, force);
     if (force || snapshot.outcome !== shownOutcome) {
-      if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed, wayName, raceCount(snapshot.world?.goals));
+      if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed, raceCount(snapshot.world?.goals));
       else card.hide();
       if (!force && snapshot.outcome) judged = true;
       // A run's end has its sound (the settings may silence it).

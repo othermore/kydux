@@ -12,8 +12,5 @@
   "intro": "¡Mira, una sala con dos puertas! Una de ellas está cerrada con llave esta noche, y no hay llaves en ningún sitio. ¡Pero podemos mirar el atributo `locked` de la puerta izquierda, `left_door.locked`! Si está cerrada, pasaremos por la puerta derecha, y si no, por la izquierda. ¡La marca nos espera en el pasillo, a la derecha!",
   "outro": "¡Ya estamos al otro lado! Creo que estas puertas cambian cada noche, y tengo un programa para cuando volvamos que no funciona nada bien...",
   "learned": "Ahora sabes que `if` y `else` pueden mirar un atributo, como `locked`, y elegir el camino por él.",
-  "ways": {
-    "left_locked": "La puerta izquierda está cerrada con llave",
-    "right_locked": "La puerta derecha está cerrada con llave"
-  }
+  "changes": "La puerta que está cerrada con llave cambia cada vez."
 }

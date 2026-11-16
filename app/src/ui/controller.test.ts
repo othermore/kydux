@@ -49,11 +49,16 @@ class FakeRuntime implements RuntimeLike {
 
 class FakeScene implements SceneLike {
   readonly playback = new Playback({ tickMs: 400 });
+  /** How many times the level was put back on its first way (D204). */
+  firstWays = 0;
   load(world: WorldResult): void {
     this.playback.load(world.events);
   }
   reset(): void {
     this.playback.reset();
+  }
+  firstWay(): void {
+    this.firstWays += 1;
   }
 }
 
@@ -362,7 +367,7 @@ describe('RunController with ways (D51)', () => {
     return { ...locked, status: 'incomplete', way: 'locked', ways: [open, locked] };
   }
 
-  it('shows the first way not won, said of its way, and lists the ways', async () => {
+  it('shows the first way not won, and says this time it was different, the first being on the screen', async () => {
     const { runtime, controller, last } = setUp();
     controller.run('wizard.move_right(6)');
     runtime.answer(twoWays());
@@ -370,8 +375,36 @@ describe('RunController with ways (D51)', () => {
     expect(last().ways).toEqual(['open', 'locked']);
     expect(last().way).toBe('locked');
     vi.advanceTimersByTime(400 * 2);
-    expect(last().outcome).toMatchObject({ kind: 'incomplete', way: 'locked' });
+    expect(last().outcome).toEqual({ kind: 'incomplete', met: 0, total: 1, changed: true });
     expect(last().goals).toEqual(['open']);
+  });
+
+  it('says nothing of a change when the run shows the way already on the screen (D204)', async () => {
+    const { runtime, controller, last } = setUp();
+    controller.run('wizard.move_right(6)');
+    runtime.answer(twoWays());
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 2);
+    controller.run('wizard.move_right(6)');
+    runtime.answer(twoWays());
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 2);
+    expect(last().outcome).toEqual({ kind: 'incomplete', met: 0, total: 1 });
+  });
+
+  it('is on the first way again once the level starts over (D204)', async () => {
+    const { runtime, scene, controller, last } = setUp();
+    controller.run('wizard.move_right(6)');
+    runtime.answer(twoWays());
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 2);
+    controller.restart();
+    expect(scene.firstWays).toBe(1);
+    controller.run('wizard.move_right(6)');
+    runtime.answer(twoWays());
+    await vi.waitFor(() => expect(last().state).toBe('playing'));
+    vi.advanceTimersByTime(400 * 2);
+    expect(last().outcome).toMatchObject({ changed: true });
   });
 
   it('plays back another way, its goals and its card, and a won way is not a win', async () => {
@@ -385,10 +418,10 @@ describe('RunController with ways (D51)', () => {
     expect(last().outcome).toBeNull();
     vi.advanceTimersByTime(400 * 6);
     expect(last().goals).toEqual(['met']);
-    expect(last().outcome).toEqual({ kind: 'way_won', way: 'open' });
+    expect(last().outcome).toEqual({ kind: 'way_won' });
   });
 
-  it('wins only when every way is won, and says so', async () => {
+  it('wins only when every way is won, and says nothing of ways', async () => {
     const { runtime, controller, last } = setUp();
     controller.run('wizard.move_right(6)');
     const open = { ...world('won', moves(6), 6), id: 'open' };
@@ -396,7 +429,7 @@ describe('RunController with ways (D51)', () => {
     runtime.answer({ ...open, status: 'won', way: 'open', ways: [open, also] });
     await vi.waitFor(() => expect(last().state).toBe('playing'));
     vi.advanceTimersByTime(400 * 6);
-    expect(last().outcome).toEqual({ kind: 'won', way: 'open' });
+    expect(last().outcome).toEqual({ kind: 'won' });
   });
 });
 

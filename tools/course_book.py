@@ -55,7 +55,8 @@ WORDS = {
         "empty": "(vacío)",
         "hints": "Pistas",
         "solution": "Solución",
-        "ways": "Se juega de varias maneras",
+        "changes": "Lo que cambia cada vez",
+        "ways": "Disposiciones (nombres internos, que el niño nunca ve)",
         "outro": "Al ganar",
         "learned": "Lo aprendido",
         "page": "Página",
@@ -102,7 +103,8 @@ WORDS = {
         "empty": "(empty)",
         "hints": "Hints",
         "solution": "Solution",
-        "ways": "Played in several ways",
+        "changes": "What changes each time",
+        "ways": "Arrangements (inner names, which the child never sees)",
         "outro": "On a win",
         "learned": "What was learned",
         "page": "Page",
@@ -220,8 +222,10 @@ def level_section(
         bonus = f"{w['bonus']}: " if spec.get("bonus") else ""
         lines.append(f"- {bonus}{say(goal)}")
     lines.append("")
-    if text.get("ways"):
-        lines += [f"**{w['ways']}**: " + "; ".join(say(v) for v in text["ways"].values()), ""]
+    if level.get("ways"):
+        # What the start card says, and the ways' ids, which only this book names (D204).
+        lines += [f"**{w['changes']}**: {say(text.get('changes', ''))}", ""]
+        lines += [f"**{w['ways']}**: " + ", ".join(f"`{way['id']}`" for way in level["ways"]), ""]
     code = say(text.get("starting_code", ""))
     lines += [f"**{w['starting']}**", ""]
     lines += [f"```python\n{code}```" if code.strip() else w["empty"], ""]

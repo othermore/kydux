@@ -20,6 +20,13 @@ export const MARTA: SeededWizard = { name: 'Marta', gender: 'girl', look: 'teal'
 /** Gives the page a progress document holding a wizard (D36) before the game
  * loads, unless the game has kept its games already (D70): the game makes the
  * document its first saved game, and a reload keeps what the game wrote. */
+/** A page opened under ?debug, which draws the select of a level's ways that the child
+ * never sees (D204), with the tester's panel and buttons kept out of the pictures. */
+export async function gotoTesting(page: Page, hash: string): Promise<void> {
+  await page.goto(`/?debug${hash}`);
+  await page.addStyleTag({ content: '.debug-box, .debug-legend, #debug-solution { display: none !important; }' });
+}
+
 export async function seedWizard(target: Page | BrowserContext, wizard: SeededWizard = MARTA): Promise<void> {
   const document = JSON.stringify({ version: 1, wizard });
   await target.addInitScript((kept) => {

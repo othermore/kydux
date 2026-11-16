@@ -13,9 +13,5 @@
   "intro": "¡Es Dask otra vez! Su farol alumbra casi todo el pasillo. Tenemos que llegar a la marca en el arco de abajo, pero hay que cruzar su camino. No sabemos cuánto tiempo mirará hacia aquí, así que esperaremos mientras mire a la derecha. Deberíamos bajar hasta la casilla antes del cruce y esperar.",
   "outro": "¡Ya hemos pasado! Detrás de este arco hay un pasillo con un agujero en el suelo.",
   "learned": "Ahora sabes que `while` espera mientras algo siga siendo verdad, sin importar cuánto.",
-  "ways": {
-    "near": "Dask acaba de empezar su ronda",
-    "middle": "Dask está a punto de acabar su ronda",
-    "far": "Dask ya vuelve atrás"
-  }
+  "changes": "El lugar por donde va Dask en su ronda cambia cada vez."
 }

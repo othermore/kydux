@@ -1731,18 +1731,15 @@ a.stop-body:focus-visible {
   font-size: 15px;
 }
 
-.card-ways {
+/* What may differ at each run of a level, and that the program has to work every time
+   (D204), on its start card. */
+.card-changes {
   margin: -4px 0 14px;
   text-align: left;
 }
 
-.card-ways p {
+.card-changes p {
   margin: 0 0 4px;
-}
-
-.card-ways ul {
-  margin: 0;
-  padding-left: 20px;
 }
 
 /* An item's number and kind (D56), a level's task, and the win card's reasons

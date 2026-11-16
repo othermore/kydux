@@ -345,16 +345,21 @@ test.describe('in the library (D85, D86, D51)', () => {
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-book-glow.png` });
   });
 
-  test('the moving key: the given program fails a way, distance_to wins all four (D133)', async ({ page }) => {
+  test('the moving key: the given program fails, distance_to wins every time (D133, D204)', async ({ page }) => {
     await page.goto('/#level/the-moving-key');
-    // The key two, three, four or five steps away, never past the door.
-    await expect(page.locator('#card-ways li')).toHaveCount(4);
+    // The key two, three, four or five steps away, never past the door: the card says it
+    // is at a different distance each time, and names no way.
+    await expect(page.locator('#card-changes p')).toHaveText([
+      'The key is a different distance away each time.',
+      'Your program has to work every time.',
+    ]);
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
     const given = JSON.parse(readFileSync(`${CONTENT}levels/the-moving-key/text.en.json`, 'utf8')).starting_code;
-    expect(await run(page, given)).toContain('In the way “The key is two steps away”');
-    expect(await run(page, solution('the-moving-key'))).toContain('In every way!');
+    expect(await run(page, given)).not.toMatch(/^You did it/);
+    await expect(page.locator('#way')).toHaveCount(0);
+    expect(await run(page, solution('the-moving-key'))).toMatch(/^You did it, Marta!$/);
   });
 
   test("Eldra's door: the rest of the walk wins every way with the bonus, the return without it (D133)", async ({
@@ -374,10 +379,10 @@ test.describe('in the library (D85, D86, D51)', () => {
       'wizard.move_left(5)',
       'door.open()',
     ].join('\n');
-    expect(await run(page, back)).toContain('In every way!');
+    expect(await run(page, back)).toMatch(/^You did it/);
     await expect(bonus).toHaveAttribute('data-kept', 'false');
     await page.locator('#again').click();
-    expect(await run(page, solution('eldras-door'))).toContain('In every way!');
+    expect(await run(page, solution('eldras-door'))).toMatch(/^You did it/);
     await expect(bonus).toHaveAttribute('data-kept', 'true');
   });
 });

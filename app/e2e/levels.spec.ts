@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
-import { skipGuide, levelText } from './helpers';
+import { gotoTesting, skipGuide, levelText } from './helpers';
 import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
@@ -120,7 +120,7 @@ test.describe('past the teacher', () => {
 
   test('waiting while the teacher looks this way, then crossing, wins', async ({ page }) => {
     const said = await run(page, 'wizard.move_down(4)\nwhile dask.facing == "right":\n    wizard.wait()\nwizard.move_down(7)');
-    expect(said).toBe('You did it, Kydux! In every way!');
+    expect(said).toBe('You did it, Kydux!');
     await expect(scene(page)).toHaveAttribute('data-wizard', '10,13');
   });
 });
@@ -508,32 +508,52 @@ test.describe('chapter 3', () => {
   }
 });
 
-test.describe('a level played two ways (D51)', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#level/by-the-statues');
-    await expect(page.locator('#card-ways li')).toHaveText(['Dask looks up', 'Dask looks down']);
+test.describe('a level played two ways, which the child never sees (D51, D204)', () => {
+  /** The level opened, its start card read and closed. */
+  async function begin(page: Page): Promise<void> {
+    // The card says what may differ at each run, and names no way.
+    await expect(page.locator('#card-changes p')).toHaveText([
+      'Where Dask is looking changes each time.',
+      'Your program has to work every time.',
+    ]);
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
-  });
+  }
 
-  test('a program that does not look wins one way and is caught in the other, which the card names', async ({
+  test('a program caught where Dask looks down says this time it was different, and shows no select', async ({
     page,
   }) => {
-    await expect(page.locator('#way')).toBeHidden();
+    await page.goto('/#level/by-the-statues');
+    await begin(page);
+    // Dask looks up as the level opens; looking down, a walk down first is seen.
+    await run(page, 'wizard.move_down(2)\nwizard.move_right(4)\nwizard.move_down(2)');
+    await expect(page.locator('.outcome-text')).toContainText('This time it was different. The teacher saw you!');
+    await expect(page.locator('#way')).toHaveCount(0);
+    // Run again: the same way is on the screen, and nothing is said of a change.
+    await run(page, 'wizard.move_down(2)\nwizard.move_right(4)\nwizard.move_down(2)');
+    await expect(page.locator('.outcome-text')).not.toContainText('different');
+  });
+
+  test("under ?debug, a select of the ways' ids plays back a way won while another is not", async ({ page }) => {
+    await gotoTesting(page, '#level/by-the-statues');
+    await begin(page);
     await run(page, 'wizard.move_right(4)\nwizard.move_down(2)');
-    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks up”: The teacher saw you!');
+    // Dask looks up in the first way, which is on the screen: nothing changed.
+    await expect(page.locator('.outcome-text')).toHaveText(/^The teacher saw you!/);
     await expect(page.locator('#way')).toBeVisible();
     await expect(page.locator('#way')).toHaveValue('looking_up');
+    await expect(page.locator('#way option')).toHaveText(['looking_up', 'looking_down']);
     await page.locator('#way').selectOption('looking_down');
-    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks down”', { timeout: ciTimes(30_000) });
-    await expect(page.locator('.outcome-text')).toContainText('Not every way yet');
+    await expect(page.locator('.outcome-text')).toContainText('Not every way yet', { timeout: ciTimes(30_000) });
     await expect(page.locator('.win-card')).toHaveCount(0);
   });
 
-  test('with if, the same program wins every way', async ({ page }) => {
+  test('with if, the same program wins every time, and the card says nothing of ways', async ({ page }) => {
+    await page.goto('/#level/by-the-statues');
+    await begin(page);
     await run(page, 'if dask.facing == "up":\n    wizard.move_down(2)\nwizard.move_right(4)\nwizard.move_down(2)');
-    await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux! In every way!');
+    await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux!');
     await expect(page.locator('.win-card')).toBeVisible();
   });
 });

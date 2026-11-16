@@ -13,9 +13,5 @@
   "intro": "Pero ¿cuántas son? Y ¿cómo las encontramos? Recuerda que desde aquí puedes encontrar las que están en la paja, y junto a la pared las que están colgadas.",
   "outro": "¡Esas son todas! Ahora podemos empezar a desatar el resto.",
   "learned": "Ahora sabes que `find_all` da una lista de lo que encuentras desde donde estás, y que el `len` de dos listas se puede sumar.",
-  "ways": {
-    "six": "seis escobas",
-    "seven": "siete escobas",
-    "eight": "ocho escobas"
-  }
+  "changes": "El número de escobas del suelo cambia cada vez, y algunas están escondidas en la paja."
 }

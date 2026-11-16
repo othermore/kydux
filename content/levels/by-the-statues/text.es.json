@@ -14,8 +14,5 @@
   "intro": "Dask está quieto en medio de la galería, entre las dos primeras estatuas. Nosotros estamos en la fila de arriba. ¡Si mira hacia arriba, debemos bajar dos casillas y pasar por debajo de él, detrás del murete! Si mira hacia abajo, podemos cruzar recto por la fila de arriba, detrás de él y de las estatuas. Luego bajaremos hasta la marca, al principio del pasillo entre la segunda y la tercera estatua.",
   "outro": "¡Hemos pasado sin que nos vea! A ver adónde lleva este pasillo.",
   "learned": "Ahora sabes que `if` ejecuta sus líneas solo cuando su condición es cierta, y que lo que viene después se ejecuta siempre.",
-  "ways": {
-    "looking_up": "Dask mira hacia arriba",
-    "looking_down": "Dask mira hacia abajo"
-  }
+  "changes": "Hacia dónde mira Dask cambia cada vez."
 }

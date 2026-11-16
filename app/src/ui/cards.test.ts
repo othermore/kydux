@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { WorldEvent, WorldGoal, WorldResult } from '../runtime/protocol';
+import { initLanguage } from '../i18n';
+import { changesLines } from './cards';
 import { judge } from './stars';
 
 function goal(met: boolean, bonus = false): WorldGoal {
@@ -39,5 +41,19 @@ describe('judge (D57)', () => {
   it('gives a win one star at least, and a run that did not win none', () => {
     expect(judge({ world: world('won', [goal(true)], [BUMP]), hintsShown: 3, misses: 5 }).earned).toBe(1);
     expect(judge({ world: world('incomplete', [goal(false)]), hintsShown: 0, misses: 0 }).earned).toBe(0);
+  });
+});
+
+describe("a start card's words on what may differ at each run (D204)", () => {
+  it('says what may differ and that the program has to work every time, and nothing of ways', () => {
+    initLanguage({ languages: ['es'], storage: null });
+    expect(changesLines('El número de escobas cambia cada vez.')).toEqual([
+      'El número de escobas cambia cada vez.',
+      'Tu programa tiene que valer siempre.',
+    ]);
+  });
+
+  it('says nothing for a level played one way', () => {
+    expect(changesLines(undefined)).toEqual([]);
   });
 });

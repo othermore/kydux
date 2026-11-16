@@ -16,9 +16,5 @@
   ],
   "intro": "¡Aquí está el camino a casa! Hay que usar todo junto: coger la llave del suelo, abrir la puerta, sujetar ese agujero con *osto* porque nunca se cierra solo y esperar a que Dask se dé la vuelta en el último pasillo. ¡Su farol llega muy lejos! Es un camino largo, pero sé que podemos hacerlo.",
   "outro": "¡Lo hemos conseguido! Ya casi estamos de vuelta en nuestras camas.",
-  "ways": {
-    "near": "Dask acaba de empezar su ronda",
-    "middle": "Dask está a punto de acabar su ronda",
-    "far": "Dask ya vuelve atrás"
-  }
+  "changes": "El lugar por donde va Dask en su ronda cambia cada vez."
 }

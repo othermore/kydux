@@ -15,9 +15,5 @@
   "intro": "¡El almacén está a oscuras! La llave está en un lugar distinto cada noche, así que no podemos saber sus pasos antes de entrar. Debemos iluminar la sala con *kirra*, encontrar la llave, contar los pasos con los dos números y caminar hacia allí para cogerla. ¡Luego contaremos los pasos de la misma manera hasta la casilla sobre la puerta, `store_door`, y la abriremos!",
   "outro": "¡La luz lo ha mostrado todo, y la puerta ya está abierta! Pero, esperad... ¿no oís voces?",
   "learned": "Ahora sabes que una posición guarda dos números, `x` e `y`, y que sus diferencias dicen los pasos que hay entre dos casillas.",
-  "ways": {
-    "same_row": "La llave en nuestra fila",
-    "lower": "La llave una fila más abajo, cerca",
-    "farther": "La llave una fila más abajo, más lejos"
-  }
+  "changes": "La llave está en un lugar distinto del almacén cada vez."
 }

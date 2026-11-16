@@ -3,7 +3,8 @@
 A goal is a class made from its spec and the level, with `check(world)`,
 true once the goal is met, and optionally `failed(world)`, true once it can
 no longer be met. The world remembers the first tick each was met or failed
-at. A bonus goal (`"bonus": true`) is not needed to win.
+at. A bonus goal (`"bonus": true`) is not needed to win, and one that fails
+does not lose the level (D233).
 
 The kinds: reach (the run ends with the wizard on a marker's tile, or on
 one at x and y; passing over it on the way does not count, unless the goal says
@@ -341,8 +342,8 @@ class TicksUnderGoal:
         self.count = count
 
     def check(self, world: "World") -> bool:
-        # Judged only once the run is over, never failed on the way: a goal failed
-        # loses the run (World.won), and a longer program still wins.
+        # Judged only once the run is over, never failed on the way: a longer program
+        # still wins, without its star.
         return world.finished and world.tick < self.count
 
 

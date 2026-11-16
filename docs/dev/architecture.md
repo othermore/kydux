@@ -909,8 +909,8 @@ one overturns stays, marked as superseded.
   without the idea still wins, and the extra star says the idea was
   used. A goal read from the run, `ticks_under` (D133), is met when the run
   ends in fewer ticks than its count; it is judged only at the run's end
-  and never fails on the way, since a goal failed loses the run, and a
-  longer program that wins still wins, without the star.
+  and never fails on the way: a longer program that wins still wins,
+  without the star.
 - **D51 — A level may be played in several ways, and the program must win
   them all.** Decided 2026-10-21 (sprint-9.md), built the same day.
   `level.json`'s `ways` is a list of two or more, each with an `id`, a
@@ -3528,3 +3528,8 @@ one overturns stays, marked as superseded.
   are (`throughRing` in `app/src/engine/flight.ts`). The scene says which flying figure is
   in a ring's cell and on which side (`data-ring-sides`: `wizard:behind`, `zarek:front`).
   Rules out a figure drawn over a ring it flies through, its feet on the ring's lower rim.
+- **D233 — A bonus goal that fails loses its star and not the level.** Decided 2026-11-14
+  by the designer, building sprint 46. A run wins when every goal that is needed is met and
+  none of them has failed (`World.won`); a bonus goal that fails, as `no_bumps` at the
+  first bump in *Tu cama* and *El paseo nocturno*, is shown failed in the goals box and
+  costs the star of the bonus, no more. Rules out a level lost with every needed goal met.

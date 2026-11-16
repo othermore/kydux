@@ -274,3 +274,11 @@ def test_no_bumps_is_failed_at_the_first_bump_and_met_by_a_clean_run():
     assert bumped.goals[1].failed and bumped.status != "won"
     clean = run_code(level, "wizard.move_right(4)\n")
     assert clean.goals[1].met and not clean.goals[1].failed
+
+
+def test_a_bonus_goal_that_fails_loses_its_star_and_not_the_level():
+    """D233: a bump fails the bonus `no_bumps`, and the run still wins."""
+    level = rooms({"kind": "reach", "marker": "E"}, {"kind": "no_bumps", "bonus": True})
+    bumped = run_code(level, "wizard.move_up()\n" + SOLVES_ROOMS)
+    assert bumped.status == "won"
+    assert [(g.met, g.failed) for g in bumped.goals] == [(True, False), (False, True)]

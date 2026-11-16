@@ -417,10 +417,10 @@ class World:
         self._check_goals()
 
     def won(self) -> bool:
-        """Every goal that is not a bonus met, and none failed."""
-        return not self.failed_at and all(
-            index in self.met_at for index, spec in enumerate(self.level.goals) if not spec.bonus
-        )
+        """Every goal that is not a bonus met, and none of them failed: a bonus goal
+        that fails loses its star and not the level (D233)."""
+        needed = [index for index, spec in enumerate(self.level.goals) if not spec.bonus]
+        return all(index in self.met_at and index not in self.failed_at for index in needed)
 
     def note(self, actor: str, kind: str, data: dict[str, Any]) -> None:
         """An event in the tick going on, of an actor's or the world's."""

@@ -3,7 +3,8 @@
 // with an example to click and a sentence in the child's language (D30).
 // Nothing not taught yet is shown, and no object that is not in the level.
 // A second tab, once the course has given any, lists the spells and the words
-// (passwords) known up to here, each with what it does (D80).
+// (passwords) known up to here, each with what it does (D80). Python's own words
+// the course has taught, `len` and `def` with its arguments, follow the objects (D60).
 
 import type { LevelJson, CourseGiven } from '../runtime/protocol';
 import { t } from '../i18n';
@@ -81,6 +82,20 @@ export function notebookEntries(level: LevelJson, table: ApiTable, course?: Cour
     }
   }
   return entries;
+}
+
+/** Python's own words the notebook says once a lesson has taught them (D60): each the
+ * concept a lesson teaches and its example. */
+const PYTHON: readonly { word: string; example: string }[] = [
+  { word: 'len', example: 'len(brooms)' },
+  { word: 'def', example: 'def two_rings():' },
+  { word: 'def_arguments', example: 'def rings(times):' },
+];
+
+/** Python's words taught up to the level (`concepts`, D60), in the notebook's order. */
+export function pythonWords(course?: CourseGiven): { word: string; example: string }[] {
+  const concepts = course?.concepts ?? [];
+  return PYTHON.filter((entry) => concepts.includes(entry.word));
 }
 
 /** The spells and the words the second tab lists (D80): the spells known up to the
@@ -168,6 +183,29 @@ export function notebookPanel(
           element('h3', {}, [element('code', {}, [object.name])]),
           ...group('action', t('notebook.actions')),
           ...group('attribute', t('notebook.attributes')),
+        ]),
+      );
+    }
+    const python = pythonWords(course);
+    if (python.length) {
+      sections.push(
+        element('section', { className: 'notebook-object notebook-python' }, [
+          element('h3', {}, [t('notebook.python')]),
+          element(
+            'ul',
+            {},
+            python.map((entry) => {
+              const example = element('button', { type: 'button', className: 'example' }, [
+                element('code', {}, [entry.example]),
+              ]);
+              example.dataset.example = entry.example;
+              example.addEventListener('click', () => onExample(entry.example));
+              return element('li', {}, [
+                example,
+                element('span', { className: 'description' }, withCode(t(`notebook_python.${entry.word}`))),
+              ]);
+            }),
+          ),
         ]),
       );
     }

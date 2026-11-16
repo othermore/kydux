@@ -772,6 +772,13 @@ the edit back on the base's grid:
 .venv/bin/python tools/art/figures.py --fly boy art/raw/figures/figure-fly-boy.png
 ```
 
+It also clears the magenta left round the figure. The flying bases can be
+cleared again on their own, without an edit:
+
+```sh
+.venv/bin/python tools/art/figures.py --clean-fly
+```
+
 A figure with no base, like Zarek or Rinlo, is made from a drawing of it
 standing still in four views, down, right, left and up. Gemini draws it
 from `tools/art/prompts/figure-zarek-standing.md`. This cuts the views into
@@ -786,6 +793,14 @@ views, `figure-zarek-fly.md`:
 
 ```sh
 .venv/bin/python tools/art/figures.py --drawn-fly zarek art/raw/figures/figure-zarek-fly.png
+```
+
+One view of the flying rows can be drawn again on its own. Gemini draws
+it from a prompt of its own, such as `figure-zarek-fly-down.md`. This puts
+it in place of that view, at the height the row has:
+
+```sh
+.venv/bin/python tools/art/figures.py --drawn-fly-view zarek down art/raw/figures/figure-zarek-fly-down.png
 ```
 
 Run `--check` after either, and look at the figure's sheet at the end of

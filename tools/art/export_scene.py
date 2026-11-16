@@ -444,10 +444,18 @@ def static_alpha(
         # Gemini's magenta ends inside the thing's outline, which is the thing's too (D93).
         # An arch round a dark opening takes only its own line (`lined`): the opening's
         # dark beside its stones is no outline, and a mark seen there is not under it
-        # (D181).
+        # (D181). An arch in a wall of stones takes the line at the ends of each of its
+        # parts (`"lined": "parts"`): the side of its opening too, and not the wall's
+        # joint that runs beside its outer side.
         if (thing.get("diff") or {}).get("rim"):
-            rim = image_first.lined if thing.get("lined") else image_first.rimmed
-            mask = rim(mask, painting, cell, image_first.thresholds(th)) & inside
+            lined = thing.get("lined")
+            if lined:
+                mask = image_first.lined(
+                    mask, painting, cell, image_first.thresholds(th), parts=lined == "parts"
+                )
+            else:
+                mask = image_first.rimmed(mask, painting, cell, image_first.thresholds(th))
+            mask &= inside
         return mask.astype(np.float32)
     if thing["mask"] == "pale":
         hsv = np.array(Image.fromarray(painting).convert("HSV")).astype(np.float32) / 255

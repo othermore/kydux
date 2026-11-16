@@ -2,6 +2,7 @@
   "id": "lists",
   "speaker": "friend",
   "teaches": [
-    "wizard.find_all"
+    "wizard.find_all",
+    "concept:len"
   ]
 }

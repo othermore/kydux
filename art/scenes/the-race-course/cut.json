@@ -7,7 +7,274 @@
     "grid": "grid.json",
     "ground": "game-race-course-nogrid.png"
   },
-  "things": {},
+  "things": {
+    "pole_start": {
+      "about": "The pole of the course's far end and its blue pennant, standing on (31, 5): over whoever flies over the fence or stands on the lawn behind it.",
+      "box": [
+        31.3,
+        2.05,
+        32.95,
+        5.5
+      ],
+      "row": 5,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "polygon": [
+        [
+          31.43,
+          2.2
+        ],
+        [
+          31.52,
+          2.14
+        ],
+        [
+          31.58,
+          2.22
+        ],
+        [
+          32.0,
+          2.3
+        ],
+        [
+          32.4,
+          2.48
+        ],
+        [
+          32.76,
+          2.6
+        ],
+        [
+          32.4,
+          2.73
+        ],
+        [
+          32.05,
+          2.83
+        ],
+        [
+          31.6,
+          2.84
+        ],
+        [
+          31.56,
+          4.7
+        ],
+        [
+          31.62,
+          4.75
+        ],
+        [
+          31.62,
+          5.38
+        ],
+        [
+          31.5,
+          5.45
+        ],
+        [
+          31.38,
+          5.38
+        ],
+        [
+          31.38,
+          4.75
+        ],
+        [
+          31.43,
+          4.7
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "pole_finish": {
+      "about": "The pole of the finish line and its red pennant, standing on (31, 14): over whoever stands on the lawn behind it, the pennant over a figure on rows 10 and 11 at its right.",
+      "box": [
+        31.3,
+        10.4,
+        33.0,
+        15.0
+      ],
+      "row": 14,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "polygon": [
+        [
+          31.47,
+          10.55
+        ],
+        [
+          31.55,
+          10.49
+        ],
+        [
+          31.62,
+          10.58
+        ],
+        [
+          32.1,
+          10.72
+        ],
+        [
+          32.5,
+          10.88
+        ],
+        [
+          32.8,
+          10.98
+        ],
+        [
+          32.45,
+          11.1
+        ],
+        [
+          32.1,
+          11.22
+        ],
+        [
+          31.63,
+          11.22
+        ],
+        [
+          31.6,
+          14.18
+        ],
+        [
+          31.67,
+          14.24
+        ],
+        [
+          31.67,
+          14.98
+        ],
+        [
+          31.53,
+          15.04
+        ],
+        [
+          31.4,
+          14.98
+        ],
+        [
+          31.4,
+          14.24
+        ],
+        [
+          31.47,
+          14.18
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      }
+    },
+    "stand": {
+      "about": "The stand of the bottom rows, its pennants, its side rails and its back plank, on its back row, 15: over whoever stands on the lawn behind it, under whoever flies over its cells (D186).",
+      "box": [
+        16.8,
+        14.65,
+        26.0,
+        16.0
+      ],
+      "row": 15,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "polygon": [
+        [
+          16.92,
+          14.77
+        ],
+        [
+          17.0,
+          14.75
+        ],
+        [
+          17.4,
+          14.8
+        ],
+        [
+          17.84,
+          14.89
+        ],
+        [
+          17.45,
+          15.08
+        ],
+        [
+          17.08,
+          15.21
+        ],
+        [
+          17.62,
+          15.03
+        ],
+        [
+          17.76,
+          15.1
+        ],
+        [
+          17.92,
+          15.43
+        ],
+        [
+          24.04,
+          15.43
+        ],
+        [
+          24.12,
+          15.05
+        ],
+        [
+          24.24,
+          15.06
+        ],
+        [
+          24.97,
+          14.77
+        ],
+        [
+          25.05,
+          14.75
+        ],
+        [
+          25.45,
+          14.8
+        ],
+        [
+          25.83,
+          14.89
+        ],
+        [
+          25.45,
+          15.08
+        ],
+        [
+          25.08,
+          15.21
+        ],
+        [
+          24.78,
+          17.2
+        ],
+        [
+          17.05,
+          17.2
+        ],
+        [
+          16.9,
+          14.85
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      }
+    }
+  },
   "cuts": [],
   "castle": 0,
   "cut": false,

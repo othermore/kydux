@@ -62,7 +62,9 @@ A figure with no sheet before it, a pupil a year older (DRAWN: Zarek, Rinlo), is
 from a drawing of it standing still in the four views (--drawn), each view as tall as
 DRAWN says, its walking rows its standing frame three times; and its flying rows from a
 drawing of it riding the broom in the same four views (--drawn-fly), scaled as its
-standing views, bobbing as the wizard's. figures.json says its rows in `sheets`.
+standing views, bobbing as the wizard's; one view may be drawn again alone
+(--drawn-fly-view), as tall as the one it replaces. figures.json says its rows in
+`sheets`.
 
 Each look's portrait (--portraits, D194) is its gender's base bust (PORTRAIT_BASES, cut
 from Gemini's portrait of the base sheet's figure) with each part in the look's colour:
@@ -659,9 +661,18 @@ def bobbing(level: Image.Image, frame: tuple[int, int]) -> Image.Image:
     return row
 
 
+#: How far in a flying base's magenta rim is cleared, in pixels, and what counts as the
+#: magenta's shade: green short of red and blue by FLY_MARGIN, red or blue at least
+#: FLY_BRIGHT, so that the figure's dark outline stays (sprites.off_magenta_rim).
+FLY_RIM = 2
+FLY_MARGIN = 40
+FLY_BRIGHT = 110
+
+
 def make_fly_base(gender: str, edit: Path) -> Path:
     """The flying base of a gender, from Gemini's edit of its walking base (D188): each
-    row's middle figure put back on the base's grid, then bobbing."""
+    row's middle figure put back on the base's grid, then bobbing; the shades of the
+    magenta it was painted on that stay round it cleared FLY_RIM pixels in."""
     about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
     frame = tuple(about["frame"])
     fw, fh = frame
@@ -672,6 +683,18 @@ def make_fly_base(gender: str, edit: Path) -> Path:
     ]
     target = BASE_DIR / FLY_BASES[gender]
     stacked(*rows).save(target, quality=90, method=6)
+    return clean_fly_base(gender)
+
+
+def clean_fly_base(gender: str) -> Path:
+    """A flying base with the shades of the magenta it was painted on that stay round
+    it cleared FLY_RIM pixels in (sprites.off_magenta_rim), in place (--clean-fly)."""
+    import sprites  # noqa: PLC0415 - the cut's tools, only for the bases
+
+    target = BASE_DIR / FLY_BASES[gender]
+    base = np.array(Image.open(target).convert("RGBA"))
+    cleaned = sprites.off_magenta_rim(base, margin=FLY_MARGIN, depth=FLY_RIM, bright=FLY_BRIGHT)
+    Image.fromarray(cleaned).save(target, quality=90, method=6)
     return target
 
 
@@ -749,6 +772,25 @@ def make_drawn_fly(name: str, drawing: Path) -> Path:
     stacked(*(bobbing(cell, frame) for cell in cells)).save(
         BASE_DIR / f"{name}-fly.webp", quality=90, method=6
     )
+    return drawn_sheet(name)
+
+
+def make_drawn_fly_view(name: str, way: str, drawing: Path) -> Path:
+    """One view of a drawn figure's flying rows drawn again (--drawn-fly-view): the
+    figure of a drawing of that view alone, as tall in its frame as the view it
+    replaces, bobbing, in its row of the flying base; its sheet made."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    frame = tuple(about["frame"])
+    fw, fh = frame
+    row = about["ways"].index(way)
+    base = Image.open(BASE_DIR / f"{name}-fly.webp").convert("RGBA")
+    level = np.array(base.crop((0, row * fh, fw, (row + 1) * fh)))[..., 3] > 0
+    filled = np.flatnonzero(level.any(axis=1))
+    tall = int(filled.max() - filled.min()) + 1
+    (view,) = drawn_views(Image.open(drawing))
+    cell = alone(framed(view, tall / view.height, about))
+    base.paste(bobbing(cell, frame), (0, row * fh))
+    base.save(BASE_DIR / f"{name}-fly.webp", quality=90, method=6)
     return drawn_sheet(name)
 
 
@@ -862,7 +904,8 @@ def portrait_parts(
 ) -> dict[str, np.ndarray]:
     """Each part's mask in a bust (D194), which parts_of cannot read since a bust's hat
     brim lies below its band: the cloth's large pieces are the robe where they reach the
-    bust's foot and the hat elsewhere; the band is the gold beside the hat, the stars the
+    bust's foot and the hat elsewhere; the band is the gold beside the hat and the darker
+    gold joined to its densest rows, its curve and its shading with it; the stars the
     gold on the robe; the skin is light and warm; the hair the large warm dark pieces, its
     thin lines, the face's outline, left out."""
     alpha = bust[..., 3] > 0
@@ -878,7 +921,23 @@ def portrait_parts(
     hat = np.isin(pieces, [n for n in large if n not in robe_pieces])
     gold = alpha & (hue >= 30) & (hue <= 65) & (sat >= 0.4) & (val >= 0.45)
     near_robe = _grown(robe, 4)
-    band = gold & _grown(hat, 24) & ~near_robe
+    # The band: the gold beside the hat, and the darker, greyer gold joined to its densest
+    # rows, its shaded edges and its curve down at the sides with it.
+    near_hat = gold & _grown(hat, 24) & ~near_robe
+    counts = near_hat.sum(axis=1)
+    band = np.zeros_like(gold)
+    if counts.max() > 0:
+        top = bottom = int(counts.argmax())
+        while top > 0 and counts[top - 1] >= counts.max() / 2:
+            top -= 1
+        while bottom < len(counts) - 1 and counts[bottom + 1] >= counts.max() / 2:
+            bottom += 1
+        seeds = np.zeros_like(gold)
+        seeds[top : bottom + 1] = near_hat[top : bottom + 1]
+        loose = alpha & (hue >= 20) & (hue <= 70) & (sat > 0.25) & (val > 0.2)
+        loose &= _grown(hat, 30) & ~hat & ~near_robe
+        pieces, _ = _pieces(loose)
+        band = np.isin(pieces, np.unique(pieces[seeds & loose])) & (pieces > 0)
     stars = gold & near_robe & ~band
     skin = alpha & ((hue <= 30) | (hue >= 330)) & (sat > 0.1) & (sat < 0.75) & (val > 0.55)
     skin &= ~band & ~stars
@@ -1041,6 +1100,15 @@ def main() -> int:
         "--fly", nargs=2, metavar=("GENDER", "EDIT"), help="make a flying base from an edit"
     )
     parser.add_argument(
+        "--clean-fly", action="store_true", help="clear the flying bases' magenta rim"
+    )
+    parser.add_argument(
+        "--drawn-fly-view",
+        nargs=3,
+        metavar=("FIGURE", "WAY", "DRAWING"),
+        help="draw one view of a drawn figure's flying rows again",
+    )
+    parser.add_argument(
         "--drawn", nargs=2, metavar=("FIGURE", "DRAWING"), help="make a figure from a drawing"
     )
     parser.add_argument(
@@ -1063,6 +1131,14 @@ def main() -> int:
         return 0
     if args.drawn:
         print(make_drawn(args.drawn[0], Path(args.drawn[1])).relative_to(REPO))
+        return 0
+    if args.drawn_fly_view:
+        name, way, drawing = args.drawn_fly_view
+        print(make_drawn_fly_view(name, way, Path(drawing)).relative_to(REPO))
+        return 0
+    if args.clean_fly:
+        for gender in FLY_BASES:
+            print(clean_fly_base(gender).relative_to(REPO))
         return 0
     if args.portraits:
         for path in make_portraits():

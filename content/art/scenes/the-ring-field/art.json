@@ -5,7 +5,14 @@
     18
   ],
   "ground": "ground.webp",
-  "rows": [],
+  "rows": [
+    {
+      "row": 11,
+      "image": "row-11-static.webp",
+      "top": 365,
+      "static": true
+    }
+  ],
   "things": {},
   "source": "SOURCE.md"
 }

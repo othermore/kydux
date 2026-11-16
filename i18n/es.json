@@ -191,9 +191,9 @@
       "say": "Dice algo en voz alta.",
       "wait": "Se queda quiet{o|a} mientras el mundo sigue, un tick cada vez; wizard.wait(2) espera dos.",
       "pick_up": "Coge una cosa de la casilla {del mago|de la maga} o de una de al lado, y la lleva. Si hay varias, di cuál: wizard.pick_up(key).",
-      "find_nearest": "Encuentra la cosa más cercana de un tipo, o None si no hay ninguna.",
+      "find_nearest": "Encuentra la cosa más cercana de un tipo, o None si no hay ninguna. Donde un sitio tiene partes, como la pared y la paja del cobertizo, solo busca en la parte donde está {el mago|la maga}.",
       "find_item": "Encuentra la cosa de un tipo que lleva {el mago|la maga}, o None si no lleva ninguna.",
-      "find_all": "Encuentra todas las cosas de un tipo y las da en una lista, de la más cercana a la más lejana, aunque algo las tape: brooms = wizard.find_all(\"broom\"); len(brooms) dice cuántas hay.",
+      "find_all": "Encuentra todas las cosas de un tipo y las da en una lista, de la más cercana a la más lejana, aunque algo las tape: brooms = wizard.find_all(\"broom\"); len(brooms) dice cuántas hay. Donde un sitio tiene partes, como la pared y la paja del cobertizo, solo busca en la parte donde está {el mago|la maga}.",
       "has": "Dice si {el mago|la maga} lleva una cosa de un tipo.",
       "position": "La casilla en la que está {el mago|la maga}, en x e y, contando desde 0 desde la izquierda y desde arriba: print(wizard.position) la muestra.",
       "facing": "Hacia dónde mira {el mago|la maga}: up, down, left o right.",
@@ -269,6 +269,7 @@
     "tab_spells": "Hechizos y palabras",
     "spells": "Hechizos",
     "words": "Palabras",
+    "python": "Python",
     "bed": {
       "kind": "Qué es: \"bed\".",
       "name": "El nombre de la cama en este nivel.",
@@ -438,6 +439,11 @@
       "move_down": "Da un paso hacia abajo.",
       "wait": "Se queda quiet{o|a} un tick, mientras el mundo sigue."
     }
+  },
+  "notebook_python": {
+    "len": "Da cuántos valores tiene una lista: len(brooms) es el número de escobas de la lista brooms.",
+    "def": "Da un nombre a las líneas que van metidas debajo, una función. Se ejecutan cada vez que se escribe el nombre con paréntesis: two_rings().",
+    "def_arguments": "Los nombres entre los paréntesis del def son los argumentos de la función: al llamarla se les dan sus valores en el mismo orden, rings(3)."
   },
   "kinds": {
     "lesson": "Lección {n}",

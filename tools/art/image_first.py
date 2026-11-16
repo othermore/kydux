@@ -460,14 +460,19 @@ def _pieces(mask: np.ndarray) -> list[list[tuple[int, int]]]:
 LINE_WIDTH = 0.03
 
 
-def lined(mask: np.ndarray, painting: np.ndarray, cell: int, th: dict = THRESHOLDS) -> np.ndarray:
+def lined(
+    mask: np.ndarray, painting: np.ndarray, cell: int, th: dict = THRESHOLDS, parts: bool = False
+) -> np.ndarray:
     """A mask Gemini painted inside its thing's outline with only its own outline
     added: at each end of each of its rows and columns, the gap there and the first
     outline beyond it, if one lies within SNAP_REACH, no wider than LINE_WIDTH, and
     a pixel of the line's soft edge; and the lines inside it, between two of its
     parts, no wider than two LINE_WIDTH. The next line beyond, another thing's,
     stays out even where the two touch: a bed's quilt takes its sheet's edge, and
-    the pillow's outline beside it is the bed's (D97)."""
+    the pillow's outline beside it is the bed's (D97). With `parts`, each part of a
+    row or a column has its ends lined: an arch's two sides take the line on the
+    opening's side too, and a wall's joint running beside the outer one stays the
+    wall's."""
     dark = dark_lines(painting, th)
     reach = max(1, round(SNAP_REACH * cell))
     widest = max(1, round(LINE_WIDTH * cell))
@@ -478,7 +483,12 @@ def lined(mask: np.ndarray, painting: np.ndarray, cell: int, th: dict = THRESHOL
         length = ours.shape[1]
         for i in np.nonzero(ours.any(axis=1))[0]:
             xs = np.nonzero(ours[i])[0]
-            for end, step in ((xs[0], -1), (xs[-1], 1)):
+            ends = [(xs[0], -1), (xs[-1], 1)]
+            if parts:
+                # Where a part ends and the next begins further on, both ends count.
+                breaks = np.nonzero(np.diff(xs) > 1)[0]
+                ends += [(xs[b], 1) for b in breaks] + [(xs[b + 1], -1) for b in breaks]
+            for end, step in ends:
                 # The pixels beyond this end, outward, as far as its line may lie.
                 ahead = end + step * np.arange(1, reach + widest + 2)
                 ahead = ahead[(ahead >= 0) & (ahead < length)]

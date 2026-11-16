@@ -27,10 +27,12 @@ later, like the rest of it.
 - Every wizard's sheet has four flying rows last (D188), riding the broom the way it
   faces: Gemini's edit of the walking base of its gender (`figure-fly-boy.md`,
   `figure-fly-girl.md`), each row's figure level, a little up and a little down, put
-  on its grid by `tools/art/figures.py --fly` and recoloured with the rest.
+  on its grid by `tools/art/figures.py --fly`, the magenta round it cleared two pixels
+  in, and recoloured with the rest.
 - `zarek.webp` and `rinlo.webp`, two pupils a year older, are Gemini's drawings of them
   standing still in the four views (`figure-zarek-standing.md`,
   `figure-rinlo-standing.md`), drawn with the pupils' and the teachers' figures as
   their reference, cut by `tools/art/figures.py --drawn` at a height between the
   children's and the grown-ups'; Zarek's flying rows are Gemini's edit of his drawing
-  riding a broom (`figure-zarek-fly.md`), cut by `--drawn-fly`.
+  riding a broom (`figure-zarek-fly.md`), cut by `--drawn-fly`, his down view a drawing
+  of its own (`figure-zarek-fly-down.md`), put in its row by `--drawn-fly-view`.

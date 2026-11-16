@@ -107,6 +107,7 @@
         "speck": 3,
         "rim": true
       },
+      "lined": "parts",
       "states": {
         "standing": "painting"
       },

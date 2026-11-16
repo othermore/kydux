@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type ApiTable, allows, heldObjects, notebookEntries, spellsAndWords } from './notebook';
+import { type ApiTable, allows, heldObjects, notebookEntries, pythonWords, spellsAndWords } from './notebook';
 
 const TABLE: ApiTable = {
   roles: {
@@ -81,5 +81,15 @@ describe('the notebook', () => {
     });
     expect(spellsAndWords({ ...level, api: ['wizard.say'] }, course)).toEqual({ spells: [], words: ['ambrel'] });
     expect(spellsAndWords({ id: 'none', api: ['wizard.cast'] })).toEqual({ spells: [], words: [] });
+  });
+
+  it("says Python's own words once a lesson has taught them, in the notebook's order (D60)", () => {
+    expect(pythonWords()).toEqual([]);
+    expect(pythonWords({ knownWords: [], concepts: ['arguments', 'len'] })).toEqual([
+      { word: 'len', example: 'len(brooms)' },
+    ]);
+    expect(
+      pythonWords({ knownWords: [], concepts: ['def_arguments', 'def', 'len'] }).map((entry) => entry.word),
+    ).toEqual(['len', 'def', 'def_arguments']);
   });
 });

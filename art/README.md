@@ -435,7 +435,10 @@ nothing the child sees is painted, moved or pasted by a tool (D148).
    magenta instead (`way-down-arches-marked.md`), each thing to the edge of its stones, and
    cut with `--threshold 70 --soft 70 --speck 3 --rim`, which adds the outline beside it. An
    arch round a dark opening takes only its own line (`"lined": true`), since the opening's
-   dark beside its stones would be taken for outline (the three doors' top arch, D181). A
+   dark beside its stones would be taken for outline (the three doors' top arch, D181); an
+   arch in a wall of stones takes the line at the ends of each of its parts
+   (`"lined": "parts"`), the side of its opening too, and leaves the wall's joint that runs
+   beside its outer side to the wall (the way down's and the crossing's arches). A
    small thing has an edit of its own (`way-down-torch.md`). The mask stands on the row of
    the thing's foot, `under` where a figure on that row stands under it. A wall's top is a box
    on its two straight outlines (`"mask": "box"`, `"over": true`): a wall cannot be taken away.
@@ -666,7 +669,9 @@ rows' order: the figure sitting on its broom, legs together, the handle ahead an
 twigs behind, three frames a row, level, a little up and a little down, for the bobbing.
 They are made from Gemini's edit of the walking base of each gender
 (`figure-fly-<gender>.md`) and recoloured into the eight looks as the casting rows are.
-The page lifts a flying figure half a cell above its cell, with a soft shadow on the
+The shades of the magenta the edit was painted on that stay round the figure are cleared
+two pixels in (`sprites.off_magenta_rim`, only where a pixel is bright and leans to
+magenta), so that no look's robe shows a pink fringe in flight. The page lifts a flying figure half a cell above its cell, with a soft shadow on the
 ground.
 
 ### Figures drawn whole
@@ -678,7 +683,9 @@ the reference for the style and the proportions (`figure-zarek-standing.md`,
 frame three times (`tools/art/figures.py --drawn`). Each view is a little taller in its
 frame than a first-year's, between the children's and the grown-ups'. Zarek, who races,
 has flying rows from Gemini's drawing of him riding the broom in the same four views
-(`figure-zarek-fly.md`, `--drawn-fly`).
+(`figure-zarek-fly.md`, `--drawn-fly`); a view drawn again on its own, his down view
+with the handle ahead and the twigs behind (`figure-zarek-fly-down.md`), takes the place
+of that view in his flying rows at the height the row had (`--drawn-fly-view`).
 
 ### Portraits
 

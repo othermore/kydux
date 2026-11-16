@@ -32,6 +32,10 @@ characters.
 # to the world's table.
 notebook_simple.
 
+# The notebook says Python's own words the course has taught, `len` and `def`, by
+# `notebook_python.${word}` (D60).
+notebook_python.
+
 # An item's number names its kind by `kinds.${kind}` (D56), a level's task by
 # `level.kind_${kind}`, and a star's reason by `stars.${key}` (D57).
 kinds.

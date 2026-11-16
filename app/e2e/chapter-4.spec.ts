@@ -2,7 +2,8 @@
 // girl and in English for a boy, in every way; the broom at the wizard's feet and the
 // brooms hung on their pegs (D195, D197); the brooms counted from the straw and from the
 // wall, the straw's unseen until found (D184, D196); a loop needed where the ways differ
-// (D51); the shed framed whole as the story walks in (D199); the knot's error
+// (D51); the shed framed whole as the story walks in, the finish told wide (D199);
+// Python's own words in the notebook as the lessons teach them (D60); the knot's error
 // and its fix (D183); water refused to a walk and crossed by a flight three times as
 // fast, with the wind's sound (D185, D186); the loop round the rings flown into the
 // trees and the function that wins (D190); the race by Ilda's count, its band and its
@@ -162,6 +163,29 @@ test.describe('the first flight', () => {
   });
 });
 
+test.describe('the notebook of chapter 4', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("Python's own words come as the lessons teach them: len, then def and its arguments (D60)", async ({ page }) => {
+    for (const [id, shown] of [
+      ['the-broom-at-your-feet', []],
+      ['the-shed', ['len(brooms)']],
+      ['the-rings', ['len(brooms)', 'def two_rings():']],
+      ['the-race', ['len(brooms)', 'def two_rings():', 'def rings(times):']],
+    ] as const) {
+      await open(page, id);
+      await page.locator('#notebook-open').click();
+      const python = page.locator('#notebook .notebook-python [data-example]');
+      if (shown.length === 0) await expect(python).toHaveCount(0);
+      else await expect(python).toHaveText([...shown]);
+    }
+    await expect(page.locator('#notebook .notebook-python')).toContainText('son los argumentos de la función');
+    await page.locator('#notebook [data-example="def rings(times):"]').click();
+    await expect(page.locator('.cm-content')).toContainText('def rings(times):');
+  });
+});
+
 test.describe('the rings and the race', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
@@ -206,6 +230,8 @@ test.describe('the stories', () => {
       await page.goto(`/#story/${id}`);
       await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
       await page.screenshot({ path: `${SHOTS}story-${id}-1.png` });
+      // The finish is told on the whole width of the race course (D199).
+      if (id === 'the-finish') await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', 'wide');
       let step = 1;
       while ((await page.locator('#story-next').count()) > 0) {
         await storyNext(page);
@@ -220,6 +246,7 @@ test.describe('the stories', () => {
           await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_6:broom-hung:6,5/);
           await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_0:broom:9,8/);
         }
+        if (id === 'the-finish') await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', 'wide');
       }
       await expect(page.locator('#story-go-on')).toBeVisible();
     });

@@ -20,7 +20,7 @@ CHAPTERS = sorted(p for p in (CONTENT / "chapters").iterdir() if (p / "chapter.j
 LESSONS = sorted(p for p in (CONTENT / "lessons").iterdir() if (p / "lesson.json").is_file())
 STORIES = sorted(p for p in (CONTENT / "stories").glob("*") if (p / "story.json").is_file())
 #: The concepts a lesson may teach, beside the API's names (D60).
-CONCEPTS = {"arguments", "comments", "print", "strings"}
+CONCEPTS = {"arguments", "comments", "def", "def_arguments", "len", "print", "strings"}
 TRY = re.compile(r"```python try\n(.*?)```", re.S)
 FENCED = re.compile(r"```.*?```", re.S)
 INLINE = re.compile(r"`[^`\n]*`")
@@ -250,7 +250,8 @@ def rewritten(chapter_path: Path) -> bool:
 
 def concepts_used(code: str) -> set[str]:
     """The concepts a piece of code needs known (D60): a comment, an action given
-    something in its brackets, a string, print."""
+    something in its brackets, a string, print, len, a function of its own (def) and
+    its arguments."""
     import ast
     import io
     import tokenize
@@ -263,8 +264,12 @@ def concepts_used(code: str) -> set[str]:
         if isinstance(node, ast.Call):
             if isinstance(node.func, ast.Attribute) and (node.args or node.keywords):
                 used.add("arguments")
-            if isinstance(node.func, ast.Name) and node.func.id == "print":
-                used.add("print")
+            if isinstance(node.func, ast.Name) and node.func.id in ("print", "len"):
+                used.add(node.func.id)
+        if isinstance(node, ast.FunctionDef):
+            used.add("def")
+            if node.args.args:
+                used.add("def_arguments")
         if isinstance(node, ast.Constant) and isinstance(node.value, str):
             used.add("strings")
     return used
@@ -289,8 +294,9 @@ def levels_with_concepts() -> list[tuple[Path, str, set[str]]]:
     ("directory", "item", "known"), levels_with_concepts(), ids=lambda v: getattr(v, "name", "")
 )
 def test_a_level_s_code_needs_only_the_concepts_taught_before_it(directory, item, known):
-    """A level's starting code and solution use no comment, argument, string or print
-    that a lesson before it has not explained (D60)."""
+    """A level's starting code and solution use no comment, argument, string, print,
+    len, function of their own (def) or arguments of one that a lesson before it has
+    not explained (D60)."""
     codes = {"solution": (directory / "solution.py").read_text(encoding="utf-8")}
     for lang in LANGUAGES:
         text = json.loads((directory / f"text.{lang}.json").read_text(encoding="utf-8"))

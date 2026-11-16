@@ -48,6 +48,9 @@
     {
       "who": "voice",
       "by": "wizard",
+      "camera": {
+        "wide": true
+      },
       "do": [
         {
           "by": "wizard",

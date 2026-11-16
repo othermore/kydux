@@ -240,16 +240,20 @@ def off_lawn(image: Array) -> Array:
     return out
 
 
-def off_magenta_rim(image: Array, margin: int = 20, depth: int | None = None) -> Array:
+def off_magenta_rim(
+    image: Array, margin: int = 20, depth: int | None = None, bright: int = 0
+) -> Array:
     """A keyed thing with its magenta rim taken out (D182): a pixel whose green falls
     short of its red and its blue by more than `margin` is magenta's, an edge or a
     shadow painted on it, and is cleared when it is reached from the clear pixels
     through others like it, at most `depth` pixels in when it is given, so that a
-    crimson or a purple cloth beside the magenta keeps all but its rim; such a pixel
-    inside the thing keeps its colour."""
+    crimson or a purple cloth beside the magenta keeps all but its rim; with `bright`,
+    only a pixel whose red or blue reaches it, so that a dark purple outline stays; such
+    a pixel inside the thing keeps its colour."""
     rgb = image[..., :3].astype(np.int16)
     clear = image[..., 3] == 0
     tinted = np.minimum(rgb[..., 0], rgb[..., 2]) - rgb[..., 1] > margin
+    tinted &= np.maximum(rgb[..., 0], rgb[..., 2]) >= bright
     passable = clear | tinted
     reached = clear.copy()
     steps = 0

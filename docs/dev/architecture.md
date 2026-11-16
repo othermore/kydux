@@ -994,9 +994,12 @@ one overturns stays, marked as superseded.
   Decided 2026-10-22 by the owner's UAT (sprint-10.md), built the same
   day. `teaches` in `lesson.json` may name a concept beside the API's
   names: `concept:arguments`, `concept:comments`, `concept:print`,
-  `concept:strings`. `pack-world.mjs` writes the concepts known at each
-  level into `course.json`'s `concepts`, and the page gives them to the
-  level as `concepts`. `api.table()` gives an action that can go without
+  `concept:strings`, `concept:len`, `concept:def`, `concept:def_arguments`.
+  `pack-world.mjs` writes the concepts known at each level into
+  `course.json`'s `concepts`, and the page gives them to the level as
+  `concepts`. The notebook says Python's own words once taught, `len`, `def`
+  and a `def`'s arguments, each with its example, after the objects
+  (`notebook_python.<word>`). `api.table()` gives an action that can go without
   its argument a `simple` example (`wizard.move_right()`), with its words
   in `notebook_simple.<role>.<member>`; the notebook and the completion
   show the simple ones until `arguments` is known. A level outside the

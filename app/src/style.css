@@ -1141,6 +1141,25 @@ footer .build {
   opacity: 0.75;
 }
 
+/* Under a finished chapter's card, its stars' total and the button that unfolds it or
+   folds it again (D200). */
+.chapter-line {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin: -2px 4px 10px;
+}
+
+.chapter-stars {
+  color: var(--muted);
+}
+
+.chapter-stars::before {
+  content: '★ ';
+  color: var(--gold);
+}
+
 .stops {
   margin: 0;
   padding: 0 0 0 24px;

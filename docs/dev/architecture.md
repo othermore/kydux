@@ -2913,3 +2913,15 @@ one overturns stays, marked as superseded.
   brooms:`, and `for i in range(len(brooms)):` with `brooms[i]`, the index counting the
   turns, with when each way is handy. Rules out a child who meets `[0]` for the first
   time in a challenge.
+- **D200 — The map folds by chapter.** Decided 2026-11-11 by the designer under the
+  owner's rule for the look (D193: clean, nothing crowded). The map shows each chapter
+  as its card. The chapter the wizard is in stands open, its stops listed
+  (`chapterStandings`: the first chapter neither finished nor locked, or the last one
+  reached once every one is finished), and so does the chapter of the stop being
+  played. A finished chapter is folded under its card, with its stars' total
+  (`map.stars_total`) and *Abrir* (`map.unfold`), which unfolds it, *Plegar*
+  (`map.fold`) folding it again. A locked chapter is folded and greyed, its first stop
+  named and the rest hidden. Under `?debug` every chapter stands open. A chapter's fold
+  is remembered while the page lives, not kept. A chapter's section says
+  `data-folded`, `data-finished` and `data-current`. Rules out a map that scrolls
+  through every stop of every chapter to reach today's.

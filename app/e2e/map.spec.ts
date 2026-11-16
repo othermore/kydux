@@ -1,10 +1,14 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
-import { seedWizard } from './helpers';
+import { MARTA, seedWizard } from './helpers';
 import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
 
 const stop = (page: Page, item: string) => page.locator(`.stop[data-item="${item}"]`);
+const CONTENT = fileURLToPath(new URL('../../content/', import.meta.url));
+const SHOTS = fileURLToPath(new URL('./shots/', import.meta.url));
 
 test('the map shows the course in order: the first stop open, the rest locked', async ({ page }) => {
   await page.goto('/#map');
@@ -158,4 +162,47 @@ test('opened by itself, the map opens at the item last opened, marked (D122)', a
   await page.locator('#map-link').click();
   await expect(here).toHaveAttribute('data-item', 'lesson:the-distance');
   await expect(here).toBeInViewport();
+});
+
+test("a finished chapter folds under its card with its stars; Open unfolds it, a locked one shows how it begins (D200)", async ({
+  page,
+}) => {
+  // A saved game with every stop of chapter 1 done, each level won with two stars.
+  const items: string[] = JSON.parse(readFileSync(`${CONTENT}chapters/01-arrival/chapter.json`, 'utf8')).items;
+  const done: Record<string, Record<string, object>> = { story: {}, lesson: {}, level: {} };
+  for (const item of items) {
+    const [kind, id] = item.split(':') as [string, string];
+    done[kind]![id] = kind === 'level' ? { won: true, stars: 2 } : { read: true };
+  }
+  const levels = items.filter((item) => item.startsWith('level:')).length;
+  await page.addInitScript(
+    (kept) => localStorage.setItem('kydux.progress', kept),
+    JSON.stringify({ version: 1, wizard: MARTA, stories: done.story, lessons: done.lesson, levels: done.level }),
+  );
+  await page.goto('/#map');
+  const chapter = (n: number) => page.locator('.map-chapter').nth(n);
+  await expect(chapter(0)).toHaveAttribute('data-finished', 'true');
+  await expect(chapter(0)).toHaveAttribute('data-folded', 'true');
+  await expect(chapter(0).locator('.stops')).toBeHidden();
+  await expect(chapter(0).locator('.chapter-stars')).toHaveText(`${2 * levels} of ${3 * levels} stars`);
+  await expect(chapter(1)).toHaveAttribute('data-current', 'true');
+  await expect(chapter(1)).not.toHaveAttribute('data-folded', /./);
+  await expect(chapter(1).locator('.stop').first()).toBeVisible();
+  // A locked chapter: greyed, its first stop named and shown, the rest hidden.
+  await expect(chapter(2)).toHaveAttribute('data-locked', 'true');
+  await expect(chapter(2)).toHaveAttribute('data-folded', 'true');
+  await expect(chapter(2).locator('.stop').first()).toBeVisible();
+  await expect(chapter(2).locator('.stop').first()).not.toHaveAttribute('data-unnamed', /./);
+  await expect(chapter(2).locator('.stop').nth(1)).toBeHidden();
+  await expect(chapter(2).locator('.chapter-fold')).toHaveCount(0);
+  await page.screenshot({ path: `${SHOTS}map-folded.png`, fullPage: true });
+  await chapter(0).locator('.chapter-fold').click();
+  await expect(chapter(0)).not.toHaveAttribute('data-folded', /./);
+  await expect(chapter(0).locator('.stop').first()).toBeVisible();
+  await expect(chapter(0).locator('.chapter-fold')).toHaveText('Fold');
+  await page.screenshot({ path: `${SHOTS}map-unfolded.png`, fullPage: true });
+  // Unfolded it stays while the page lives: back to the start and to the map again.
+  await page.locator('#map-back').click();
+  await page.locator('#map-link').click();
+  await expect(chapter(0)).not.toHaveAttribute('data-folded', /./);
 });

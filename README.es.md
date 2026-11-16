@@ -72,7 +72,10 @@ Te quedas con las tres si no necesitas pistas, no chocas nunca contra una
 pared y cumples el objetivo extra, o ganas al primer intento cuando no lo
 hay. Jugar otra vez un nivel nunca te quita estrellas. *Siguiente* te lleva
 más allá. El mapa enseña el curso
-entero: lo que ya has hecho, lo que está abierto y lo que sigue cerrado.
+entero: lo que ya has hecho, lo que está abierto y lo que sigue cerrado. Cada
+capítulo es una tarjeta. El capítulo en el que estás está abierto. Un capítulo que
+ya has terminado está plegado, con sus estrellas, y *Abrir* lo despliega. Un
+capítulo que sigue cerrado sale en gris, y solo enseña cómo empieza.
 
 El juego guarda tu partida en el navegador mientras juegas. Guarda varias
 partidas, una por personaje: *Cargar una partida*, en la pantalla de

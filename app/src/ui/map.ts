@@ -6,8 +6,13 @@
 // back to it; choosing a stop from there goes through the level's own question.
 // In the tester's mode (?debug) every stop opens and is named, for a tester to
 // go straight to any of them.
+// Each chapter is its card (D200): the current one open, with its stops; a finished
+// one folded under its card, with its stars' total and a button that unfolds it; a
+// locked one folded and greyed, its first stop named. What the child unfolds or folds
+// stays so while the page lives. The chapter of the stop being played stands open, and
+// under ?debug every chapter does.
 
-import { type Course, itemHash, parseItem, stopState } from '../content/course';
+import { type Course, chapterStandings, itemHash, parseItem, stopState } from '../content/course';
 import { debugging } from '../engine/debugging';
 import { t } from '../i18n';
 import { MAX_STARS, type Progress } from '../progress/store';
@@ -28,6 +33,9 @@ export interface MapScreenParts {
   overlay?: { onClose: () => void; onGo: (hash: string) => void };
 }
 
+/** The chapters the child unfolded (true) or folded (false), while the page lives. */
+const chosen = new Map<string, boolean>();
+
 function stateWords(state: string): string {
   switch (state) {
     case 'done':
@@ -46,12 +54,16 @@ export function mapScreen(parts: MapScreenParts): Screen {
     // Only the first locked stop is named: what lies further on is a surprise.
     let lockedSeen = 0;
     const testing = debugging();
-    const chapters = course.chapters.map((chapter) => {
-      const stops = chapter.items.map((item) => {
+    const standings = chapterStandings(course, progress, MAX_STARS);
+    const chapters = course.chapters.map((chapter, index) => {
+      const standing = standings[index];
+      const locked = standing?.locked === true;
+      const stops = chapter.items.map((item, at) => {
         const parsed = parseItem(item);
         const state = stopState(course, item, progress);
         if (state === 'locked') lockedSeen += 1;
-        const unnamed = state === 'locked' && lockedSeen > 1 && !testing;
+        // A locked chapter's first stop is named, what the chapter opens with (D200).
+        const unnamed = state === 'locked' && lockedSeen > 1 && !testing && !(locked && at === 0);
         const closed = state === 'locked' && !testing;
         const title = unnamed ? '?' : (parts.titles.get(item) ?? parsed?.id ?? item);
         const stars = parsed?.kind === 'level' ? (progress.levels[parsed.id]?.stars ?? 0) : 0;
@@ -97,9 +109,52 @@ export function mapScreen(parts: MapScreenParts): Screen {
         element('h2', {}, [parts.chapterTitles.get(chapter.id) ?? chapter.id]),
       ]);
       card.style.backgroundImage = `url('${import.meta.env.BASE_URL}content/art/chapters/${chapter.id}/card.webp')`;
-      const section = element('section', { className: 'map-chapter' }, [card, element('ol', { className: 'stops' }, stops)]);
-      const first = chapter.items[0];
-      if (first && stopState(course, first, progress) === 'locked') section.dataset.locked = 'true';
+      const list = element('ol', { className: 'stops' }, stops);
+      const holdsHere = parts.here !== undefined && chapter.items.includes(parts.here);
+      const current = standing?.current === true || holdsHere;
+      // A chapter folds when it is finished or locked, unless it is the one being played,
+      // the tester sees every one, or the child chose otherwise.
+      const foldable = !current && (standing?.finished === true || (locked && testing));
+      let folded = !current && !testing && (standing?.finished === true || locked);
+      if (foldable) folded = !(chosen.get(chapter.id) ?? !folded);
+      const line: HTMLElement[] = [];
+      if (standing?.finished) {
+        line.push(
+          element('span', { className: 'chapter-stars' }, [
+            t('map.stars_total', { stars: standing.stars, most: standing.starsMost }),
+          ]),
+        );
+      }
+      const toggle = foldable ? element('button', { type: 'button', className: 'quiet-button chapter-fold' }) : null;
+      if (toggle) line.push(toggle);
+      const section = element('section', { className: 'map-chapter' }, [
+        card,
+        ...(line.length ? [element('div', { className: 'chapter-line' }, line)] : []),
+        list,
+      ]);
+      section.dataset.chapter = chapter.id;
+      if (locked) section.dataset.locked = 'true';
+      if (standing?.finished) section.dataset.finished = 'true';
+      if (current) section.dataset.current = 'true';
+      // Folded, a finished chapter shows none of its stops, a locked one its first.
+      const fold = (shut: boolean) => {
+        if (shut) section.dataset.folded = 'true';
+        else delete section.dataset.folded;
+        list.hidden = shut && !locked;
+        stops.forEach((stop, at) => {
+          stop.hidden = shut && locked && at > 0;
+        });
+        if (toggle) {
+          toggle.textContent = shut ? t('map.unfold') : t('map.fold');
+          toggle.setAttribute('aria-expanded', String(!shut));
+        }
+      };
+      fold(folded);
+      toggle?.addEventListener('click', () => {
+        folded = !folded;
+        chosen.set(chapter.id, !folded);
+        fold(folded);
+      });
       return section;
     });
     const back = parts.overlay

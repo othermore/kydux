@@ -150,3 +150,38 @@ export function stopState(course: Course, item: string, progress: Progress): Sto
   if (before === null || isDone(before, progress, course)) return 'open';
   return 'locked';
 }
+
+/** How a chapter stands on the map (D200): finished, every stop done; locked, its first
+ * stop locked; the current one, the first neither finished nor locked, or the last not
+ * locked when every reached one is finished. */
+export interface ChapterStanding {
+  id: string;
+  finished: boolean;
+  locked: boolean;
+  current: boolean;
+  /** Its levels' stars and the most they could hold, for a finished chapter's line. */
+  stars: number;
+  starsMost: number;
+}
+
+export function chapterStandings(course: Course, progress: Progress, maxStars: number): ChapterStanding[] {
+  const standings = course.chapters.map((chapter) => {
+    const levels = chapter.items
+      .map(parseItem)
+      .filter((parsed): parsed is { kind: ItemKind; id: string } => parsed?.kind === 'level');
+    const first = chapter.items[0];
+    return {
+      id: chapter.id,
+      finished: chapter.items.length > 0 && chapter.items.every((item) => isDone(item, progress, course)),
+      locked: first !== undefined && stopState(course, first, progress) === 'locked',
+      current: false,
+      stars: levels.reduce((sum, level) => sum + (progress.levels[level.id]?.stars ?? 0), 0),
+      starsMost: levels.length * maxStars,
+    };
+  });
+  const current =
+    standings.find((standing) => !standing.finished && !standing.locked) ??
+    standings.filter((standing) => !standing.locked).at(-1);
+  if (current) current.current = true;
+  return standings;
+}

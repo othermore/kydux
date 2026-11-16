@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { defaultProgress } from '../progress/store';
-import { type Course, courseStart, itemHash, knownApi, levelAfter, next, parseItem, previous, stopState } from './course';
+import {
+  type Course,
+  chapterStandings,
+  courseStart,
+  itemHash,
+  knownApi,
+  levelAfter,
+  next,
+  parseItem,
+  previous,
+  stopState,
+} from './course';
 
 const COURSE: Course = {
   chapters: [
@@ -78,5 +89,48 @@ describe('the opening in chapter 1 (D78)', () => {
     expect(stopState(course, 'story:the-letter', progress)).toBe('done');
     expect(stopState(course, 'story:at-the-gate', progress)).toBe('open');
     expect(stopState(course, 'story:at-the-gate', defaultProgress())).toBe('locked');
+  });
+});
+
+describe("the map's chapters (D200)", () => {
+  const course: Course = {
+    chapters: [
+      { id: '01', items: ['lesson:a', 'level:b', 'level:c'] },
+      { id: '02', items: ['lesson:d', 'level:e'] },
+      { id: '03', items: ['level:f'] },
+    ],
+  };
+  const standing = (progress = defaultProgress()) =>
+    chapterStandings(course, progress, 3).map(({ id, finished, locked, current }) => ({ id, finished, locked, current }));
+
+  it('stands the first chapter current and the rest locked before anything is done', () => {
+    expect(standing()).toEqual([
+      { id: '01', finished: false, locked: false, current: true },
+      { id: '02', finished: false, locked: true, current: false },
+      { id: '03', finished: false, locked: true, current: false },
+    ]);
+  });
+
+  it("finishes a chapter whose every stop is done, counts its stars, and moves on to the next", () => {
+    const progress = {
+      ...defaultProgress(),
+      lessons: { a: { read: true } },
+      levels: { b: { won: true, stars: 3 }, c: { won: true, stars: 2 } },
+    };
+    expect(standing(progress)).toEqual([
+      { id: '01', finished: true, locked: false, current: false },
+      { id: '02', finished: false, locked: false, current: true },
+      { id: '03', finished: false, locked: true, current: false },
+    ]);
+    expect(chapterStandings(course, progress, 3)[0]).toMatchObject({ stars: 5, starsMost: 6 });
+  });
+
+  it('keeps the last chapter current once every one is finished', () => {
+    const progress = {
+      ...defaultProgress(),
+      lessons: { a: { read: true }, d: { read: true } },
+      levels: { b: { won: true }, c: { won: true }, e: { won: true }, f: { won: true } },
+    };
+    expect(standing(progress).map((chapter) => chapter.current)).toEqual([false, false, true]);
   });
 });

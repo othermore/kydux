@@ -64,7 +64,9 @@ Win the level, and the game gives you up to three stars, and says why.
 You keep all three if you need no hint, never bump into a wall, and meet
 the bonus goal, or win at the first try when there is none. Playing a
 level again never takes stars away. *Next* takes you on. The map shows the whole course:
-what you have done, what is open, and what is still locked.
+what you have done, what is open, and what is still locked. Each chapter is a card.
+The one you are in is open. A chapter you have finished is folded, with its stars,
+and *Open* unfolds it. A chapter still locked is greyed, and shows only how it begins.
 
 The game saves your game in the browser as you play. It keeps several
 games, one for each wizard: *Load a game*, on the start screen, lists them,

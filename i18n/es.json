@@ -328,6 +328,9 @@
     "done": "hecho",
     "open": "abierto",
     "locked": "todavía cerrado",
+    "unfold": "Abrir",
+    "fold": "Plegar",
+    "stars_total": "{stars} de {most} estrellas",
     "open_map": "Mapa",
     "title_page": "Kydux — el mapa"
   },

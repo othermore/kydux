@@ -57,6 +57,8 @@ export function explanationText(explanation: Explanation): string {
         return t('error.arguments', p);
       case 'no_knot':
         return t('error.no_knot', p);
+      case 'no_landing':
+        return t('error.no_landing', p);
       case 'index_range':
         return t('error.index_range', p);
       case 'index_range_unknown':

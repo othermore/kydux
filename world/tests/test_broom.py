@@ -202,13 +202,90 @@ def test_a_flight_bumps_on_a_high_cell():
     assert world.events[-1].data["by"] == "high"
 
 
-def test_the_cast_goal_may_ask_for_the_spell_from_a_few_cells():
-    goal = {"kind": "cast", "spell": "drevo", "from": [[2, 1]], "bonus": True}
+def test_drevo_cast_in_the_air_lands_on_a_cell_walked_on_and_the_moves_walk_again():
+    """D215: a tick, the broom's `land` marked as the wizard's own cast, and the move
+    after it walks, so that the water is refused to it."""
+    world = World(lake())
+    world.wizard.move_right(2)
+    world.wizard.cast("drevo")
+    world.wizard.move_right(4)
+    tick = world.tick
+    world.wizard.cast("drevo")
+    assert world.tick == tick + 1
+    assert not world.wizard.flying
+    assert (world.events[-1].actor, world.events[-1].kind, world.events[-1].data) == (
+        "broom",
+        "land",
+        {"id": "wizard", "at": [6, 1], "cast": True},
+    )
+    world.wizard.move_left()
+    assert (world.events[-1].kind, world.events[-1].data["reason"]) == ("blocked", "no_walk")
+
+
+def test_drevo_cast_over_the_water_is_refused_and_the_wizard_stays_in_the_air():
+    """D215: refused with the cell's kind, the program stopped, no landing."""
+    code = (
+        "wizard.move_right(2)\nwizard.cast('drevo')\nwizard.move_right(2)\nwizard.cast('drevo')\n"
+    )
+    result = run_code(lake(), code)
+    assert result.status == "error" and result.error.explanation["kind"] == "no_landing"
+    refused = [e for e in result.events if e.kind == "blocked"][-1]
+    assert (refused.data["reason"], refused.data["kind"], refused.data["tried"]) == (
+        "no_landing",
+        "low",
+        True,
+    )
+    assert not [e for e in result.events if e.kind == "land"]
+    world = World(lake())
+    world.wizard.move_right(2)
+    world.wizard.cast("drevo")
+    world.wizard.move_right(2)
+    with pytest.raises(Refused):
+        world.wizard.cast("drevo")
+    assert world.wizard.flying and world.wizard.position == Position(4, 1)
+
+
+def test_drevo_cast_on_a_ring_s_cell_is_refused_as_no_cell_to_land_on():
+    world = World(Level.from_dict(FIELD))
+    world.wizard.cast("drevo")
+    world.wizard.move_right()
+    world.wizard.move_down()
+    assert world.wizard.position == Position(1, 2)
+    with pytest.raises(Refused):
+        world.wizard.cast("drevo")
+    assert world.events[-1].data["kind"] == "ring"
+    assert world.wizard.flying
+
+
+def test_a_program_ending_over_the_water_leaves_the_wizard_in_the_air():
+    """D215: the broom sets down by itself only where the ground can be stood on."""
+    world = World(lake())
+    world.wizard.move_right(2)
+    world.wizard.cast("drevo")
+    world.wizard.move_right(2)
+    world.finish()
+    assert world.wizard.flying
+    assert not [e for e in world.events if e.kind == "land"]
+
+
+def test_the_land_goal_is_met_by_the_wizard_s_own_cast_and_not_by_the_program_s_end():
+    goal = {"kind": "land", "marker": "E", "bonus": True}
     level = lake(goals=[*LAKE["goals"], goal])
-    early = run_code(level, "wizard.cast('drevo')\nwizard.move_right(8)\n")
-    assert early.status == "won" and not early.goals[1].met
-    late = run_code(level, "wizard.move_right(2)\nwizard.cast('drevo')\nwizard.move_right(6)\n")
-    assert late.goals[1].met
+    flown = "wizard.move_right(2)\nwizard.cast('drevo')\nwizard.move_right(6)\n"
+    ended = run_code(level, flown)
+    assert ended.status == "won" and not ended.goals[1].met
+    landed = run_code(level, flown + "wizard.cast('drevo')\n")
+    assert landed.status == "won" and landed.goals[1].met
+    # Landed short of the stone, and walked on to it: not a landing on it.
+    short = "wizard.move_right(2)\nwizard.cast('drevo')\nwizard.move_right(4)\n"
+    walked = run_code(level, short + "wizard.cast('drevo')\nwizard.move_right(2)\n")
+    assert walked.status == "won" and not walked.goals[1].met
+
+
+def test_the_cast_goal_names_no_cells():
+    goal = {"kind": "cast", "spell": "drevo", "from": [[2, 1]]}
+    with pytest.raises(LevelError, match="names no cells"):
+        World(lake(goals=[*LAKE["goals"], goal]))
 
 
 #: A field with two rings on row 2, flown through downward then upward.

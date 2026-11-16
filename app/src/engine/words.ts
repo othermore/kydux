@@ -107,6 +107,8 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
       return t('blocked.no_broom');
     case 'no_knot':
       return t('blocked.no_knot');
+    case 'no_landing':
+      return t('blocked.no_landing');
     default:
       return t('blocked.unknown_action');
   }

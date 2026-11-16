@@ -313,8 +313,8 @@ each level says (D182).
 | `lesson:checking-each` | Lesson 5 | *An if inside the loop*: an `if` inside a `for`, its lines moved in by eight spaces, so that each turn does one thing or another by the value of that turn. One page; its block prints which name of a list is a cat. | `broom.knotted` |
 | `level:the-check` | Fix 1 | Every broom hung back on its peg, five or six, on other pegs each time, two or three still knotted: the wall's program, given whole, walks from the row's right end by the distance and stops at the first broom with no knot, wherever it hangs, *this broom has no knot*; untie only `if broom.knotted:`. Goals: no broom knotted, and the run ends with no error; no cell to end on. The intro is the owner's. Bonus: `knotted` used. | |
 | `story:the-flying-lesson` | Story 2 | At the lake's edge: Ilda arrives with the class; the friend pockets the black thread; Zarek flies in, circles and lands, boasting; Ilda names the word and the first exercise. | |
-| `lesson:drevo` | Lesson 6 | Ilda's: the word `drevo`, cast with the wand and a broom carried, lifts the broom; from then on the moves fly, over water, hedges and fences, three times as fast, never through a tree's crown; the broom sets down where the program ends. One page and no *Try it*: the spell is cast in the level (D174). | (the spell `drevo`) |
-| `level:the-first-flight` | Practice 5 | Walk to the jetty's end, the word, and fly over the water to the white stone; a walk into the water is refused, *water is not walked on*. Bonus: `drevo` cast from the jetty. | |
+| `lesson:drevo` | Lesson 6 | Ilda's: the word `drevo`, cast with the wand and a broom carried, lifts the broom; from then on the moves fly, over water, hedges and fences, three times as fast, never through a wall or a tree; cast again in the air, it sets the broom down where the ground can be stood on, and over the water the program stops; at the program's end the broom sets down by itself (D215). One page and no *Try it*: the spell is cast in the level (D174). | (the spell `drevo`) |
+| `level:the-first-flight` | Practice 5 | Walk to the jetty's end, the word, and fly over the water to the white stone; a walk into the water is refused, *water is not walked on*, and `drevo` cast again over the water is refused, the program stopped and the wizard still in the air (D215). Goal: reach the stone. Bonus: land on it with `drevo` before the program ends (`land`). | |
 | `lesson:an-action-of-your-own` | Lesson 7 | `def` gives some lines a name, and the programmers call it a function; the name with brackets runs them, wherever it is written and as often; a loop repeats what is the same and follows on, a function serves wherever it is wanted, with other lines between, and reads as what it does. Two pages; its block defines a greeting and calls it twice with another line between. | `concept:def` |
 | `level:the-rings` | Improve 1 | Three pairs of rings flown through in order, under the trees between the first two pairs and over the pond between the last two: the given program writes the pair out three times, 21 lines; with the pair as a function, fewer than 18 (D190). A `for` round the pair flies into the trees. | |
 | `lesson:arguments-of-your-own` | Lesson 8 | Names between the `def`'s brackets are the function's arguments; a call gives them values, in the same order, as `move_right(3)` is given its 3, and inside the function the names are worth them. One page; its block greets two names with one function. | `concept:def_arguments` |
@@ -334,7 +334,8 @@ flown through vertically and in order, with the rings missed counted (D187); the
 wizard's flying rows and the figures of Zarek and Rinlo (D188); a racer with a
 fixed path and the race scored by Ilda's count, its start delayed a tick a line and
 five ticks a ring missed, and the goal of crossing the finish first (D189); a goal
-that the run ends with no error; a cast goal made from a set of cells; a story that
+that the run ends with no error; a landing by `drevo` cast in the air, and the goal of
+landing on a cell (D215); a story that
 changes scene; and the wide scenes, forty-two cells by eighteen, which the camera
 follows.
 

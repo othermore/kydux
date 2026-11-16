@@ -2,7 +2,7 @@
   "title": "Los aros",
   "goals": [
     "Pasa por los seis aros en orden.",
-    "Aterriza en la piedra blanca.",
+    "Llega a la piedra blanca.",
     "En menos de 18 líneas."
   ],
   "starting_code": "# La pareja de aros está escrita tres veces. ¡Dale un nombre!\nwizard.cast(\"drevo\")\nwizard.move_right(1)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(6)\nwizard.move_right(9)\nwizard.move_up(6)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(11)\nwizard.move_down(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\n",

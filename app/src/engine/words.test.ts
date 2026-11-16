@@ -77,6 +77,8 @@ describe('what a flight cannot cross, and a walk what a flight can (D186, D187)'
     expect(bumpText('ring', null)).toMatch(/^¡Choco con el aro!/);
     expect(blockedText('too_far', 'broom')).toBe('Para desatar la escoba tengo que estar de pie sobre ella.');
     expect(blockedText('no_knot', 'broom')).toBe('Esta escoba no tiene nudo: no hay nada que desatar.');
+    // drevo cast over the water (D215).
+    expect(blockedText('no_landing', null, { kind: 'water' })).toBe('No hay dónde posar la escoba.');
     initLanguage({ languages: ['en'], storage: null });
   });
 });

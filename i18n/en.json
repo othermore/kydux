@@ -93,6 +93,7 @@
     "unknown_action": "`{object}` does not know an action called `{name}`.",
     "no_new_attribute": "You cannot give `{object}` a new `{name}`. What `{object}` can do is in its notebook.",
     "no_knot": "This broom has no knot, so there is nothing to untie, and the program stops here. Before untying a broom, look whether it has a knot.",
+    "no_landing": "There is nowhere to set the broom down here, so the program stops here, still in the air. Land where there is ground.",
     "index_range": "The list doesn't have that many: it has {count}, and you wanted number {asked}.",
     "index_range_unknown": "The list doesn't have as many as you asked for."
   },
@@ -173,7 +174,8 @@
     "ring": "I bumped into the ring! It is flown through from above or from below.",
     "too_far": "To untie {thing} I must stand on it.",
     "no_broom": "With no broom, drevo has nothing to lift.",
-    "no_knot": "This broom has no knot: there is nothing to untie."
+    "no_knot": "This broom has no knot: there is nothing to untie.",
+    "no_landing": "There is nowhere to set the broom down."
   },
   "notebook": {
     "title": "The wizard's notebook",
@@ -197,11 +199,11 @@
       "position": "The cell the wizard stands on, as x and y, counted from 0 from the left and from the top: print(wizard.position) shows it.",
       "facing": "The way the wizard looks: up, down, left or right.",
       "items": "The things the wizard carries, in a list; len(wizard.items) says how many.",
-      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all. The fendra spell is also given the thing to bring: wizard.cast(\"fendra\", book). The orvim spell opens the map, when the wizard carries it: wizard.cast(\"orvim\"). The drevo spell lifts the broom, when the wizard carries it: wizard.cast(\"drevo\").",
+      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all. The fendra spell is also given the thing to bring: wizard.cast(\"fendra\", book). The orvim spell opens the map, when the wizard carries it: wizard.cast(\"orvim\"). The drevo spell lifts the broom, when the wizard carries it, and sets it down again when cast in the air: wizard.cast(\"drevo\").",
       "give": "Gives a thing the wizard carries to whoever stands right beside it.",
       "sleep": "Lies down and sleeps in a free bed.",
       "distance_to": "Gives the number of steps from the wizard to an object.",
-      "flying": "True while the wizard flies on the broom, from drevo until the program ends."
+      "flying": "True while the wizard flies on the broom, from the moment drevo lifts it until it lands."
     },
     "thing": {
       "kind": "What the thing is, like \"key\" or \"book\".",
@@ -469,7 +471,7 @@
     "kirra": "lights the dark room you are in.",
     "osto": "holds closed, for a while, a hole beside you that opens in the floor.",
     "orvim": "opens the naughty child's map on the plan of the place you are in, every cell with its numbers, if you carry the map.",
-    "drevo": "lifts the broom you carry into the air: from then on your moves fly, three times as fast, over water, hedges and fences, but not through the crowns of trees or walls; the broom sets down where the program ends."
+    "drevo": "lifts the broom you carry into the air: from then on your moves fly, three times as fast, over water, hedges and fences, but not through the crowns of trees or walls; cast it again in the air and the broom sets down, if the ground under it can be stood on; at the program's end the broom sets down by itself wherever there is ground."
   },
   "words": {
     "ambrel": "the school's word, which opens its gates."

@@ -6,7 +6,8 @@
 // Python's own words in the notebook as the lessons teach them (D60); the knot's error
 // and its fix (D183); water refused to a walk and crossed by a flight three times as
 // fast, with the wind's sound (D185, D186); the loop round the rings flown into the
-// trees and the function that wins (D190); the race by Ilda's count, its band and its
+// trees and the function that wins (D190); drevo cast in the air lands, or is refused
+// over the water, the wizard left flying (D215); the race by Ilda's count, its band and its
 // card (D189); each story told to its end, the first on two scenes; the map's stops in
 // order; the shed's levels framed whole, their pegs clear of the page's panels (D201);
 // the shed's lying brooms in sight on the boards and hidden under the straw (D202); the
@@ -334,6 +335,42 @@ test.describe('the first flight', () => {
     const walked = (at(7) - at(2)) / 5;
     const flown = (at(14) - at(10)) / 4;
     expect(flown).toBeLessThan(walked / 2.5);
+  });
+});
+
+test.describe('drevo lands (D215)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test('the stone reached wins; the extra is to land on it with drevo before the program ends', async ({ page }) => {
+    await open(page, 'the-first-flight');
+    const extra = page.locator('.win-card #star-reasons li', { hasText: 'El objetivo extra cumplido' });
+    expect(await run(page, 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.move_right(5)')).toMatch(
+      /^¡Lo has conseguido/,
+    );
+    await expect(extra).toHaveAttribute('data-kept', 'false');
+    await page.locator('#again').click();
+    expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
+    await expect(extra).toHaveAttribute('data-kept', 'true');
+    await expect(scene(page)).toHaveAttribute('data-flying', '');
+    await page.locator('#again').click();
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}landed-on-the-stone.png` });
+  });
+
+  test('cast over the water, it is refused with the bump, the program stops, and the wizard stays in the air', async ({
+    page,
+  }) => {
+    await open(page, 'the-first-flight');
+    await start(page, wrong('the-first-flight', 'landed_on_the_water'));
+    await expect(scene(page)).toHaveAttribute('data-thought', 'No hay dónde posar la escoba.', {
+      timeout: ciTimes(60_000),
+    });
+    await expect(scene(page)).toHaveAttribute('data-sounds', /bump/);
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
+    await expect(page.locator('.outcome-text')).toContainText('Aquí no hay dónde posar la escoba');
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '11,7');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}no-landing-over-the-water.png` });
   });
 });
 

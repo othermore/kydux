@@ -116,6 +116,10 @@ describe("Ilda's count after a race (D189)", () => {
   it('explains a broom with no knot in the child\'s words (D183)', () => {
     initLanguage(spanish);
     expect(explanationText({ kind: 'no_knot', params: { thing: 'broom_1' } })).toMatch(/^Esta escoba no tiene nudo/);
+    // drevo cast in the air over a cell no one walks on (D215).
+    expect(explanationText({ kind: 'no_landing', params: { thing: 'wizard' } })).toMatch(
+      /^Aquí no hay dónde posar la escoba, así que el programa se para aquí, todavía en el aire\./,
+    );
     // A list asked for one it has not (D198).
     expect(explanationText({ kind: 'index_range', params: { count: 3, asked: 4 } })).toBe(
       'La lista no tiene tantos: tiene 3, y pediste el 4.º',

@@ -1,16 +1,16 @@
 {
   "title": "The first flight",
   "goals": [
-    "Land on the white stone.",
-    "Cast *drevo* from the jetty."
+    "Reach the white stone.",
+    "Land on the white stone before the program ends."
   ],
   "starting_code": "# Walk to the end of the jetty with `move_right`.\n\n# Cast the word that lifts the broom with `cast`.\n\n# Fly to the stone with `move_right`.\n",
   "hints": [
     "It is 8 steps to the end of the jetty. Walk there first!",
     "Use `cast` with the word *drevo* to lift the broom when you reach the end of the jetty.",
-    "Walking, the water cannot be crossed: the broom must already be in the air before you cross, and then `move_right` reaches the stone."
+    "Fly to the stone with `move_right`, which is 5 steps away. If you cast *drevo* again on the stone, you will land there."
   ],
-  "intro": "Let's see how you do! Walk to the end of the jetty, which is eight steps away. There, cast *drevo* with your wand, and fly without stopping to the white stone on the other side, five steps from the jetty.",
-  "outro": "A perfect landing! Did you feel how fast the broom goes over the water?",
-  "learned": "Now you know that a spell can change how the wizard moves: flying, the same moves cross what walking cannot, and much faster."
+  "intro": "Let's see how you do! Walk to the end of the jetty. There, cast *drevo* and fly to the white stone on the other bank.",
+  "outro": "You have reached the white stone! Did you notice how fast the broom goes over the water?",
+  "learned": "Now you know that a spell can change how the wizard moves: flying, you cross where you cannot walking, and much faster. And you also know that the same spell can be used for several things, for example to take flight and to land."
 }

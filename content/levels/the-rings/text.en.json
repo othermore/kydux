@@ -2,7 +2,7 @@
   "title": "The rings",
   "goals": [
     "Fly through the six rings in order.",
-    "Land on the white stone.",
+    "Reach the white stone.",
     "In fewer than 18 lines."
   ],
   "starting_code": "# The pair of rings is written three times. Give it a name!\nwizard.cast(\"drevo\")\nwizard.move_right(1)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(6)\nwizard.move_right(9)\nwizard.move_up(6)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(11)\nwizard.move_down(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\n",

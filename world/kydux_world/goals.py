@@ -13,7 +13,8 @@ say (a text, word for word, or the number of things of a kind in the way played:
 `{"kind": "say", "count_of": "broom"}`, D184, those hung or not with `"hung": true` or
 `false`, D205), give (a thing by id, to an actor by
 id), cast (a spell cast, not a word refused: `{"kind": "cast", "spell": "osto"}`,
-D176, maybe from one of a few cells, `"from": [[x, y], ...]`), no_bumps
+D176), land (the wizard's own drevo sets the broom down on a marker's tile or on one
+at x and y, D215; the broom's setting down at the program's end does not count), no_bumps
 (the wizard bumps into nothing; failed at the first bump), untied (no broom knotted,
 or none of those named in `ids` or of a `zone`; failed at the run's end with one
 still knotted, D183, D202), no_error (the run ends
@@ -429,22 +430,37 @@ class CastGoal:
         if spell not in KNOWN_SPELLS:
             raise LevelError(f"{level.id}: the cast goal names {spell}, no spell")
         self.spell = spell
-        # With `from`, the cells the spell must be cast on (the jetty's, D185).
-        cells = spec.params.get("from")
-        if cells is not None and not (
-            isinstance(cells, list)
-            and cells
-            and all(isinstance(cell, list) and len(cell) == 2 for cell in cells)
-        ):
-            raise LevelError(f"{level.id}: the cast goal's from is a list of [x, y]")
-        self.cells = None if cells is None else [list(cell) for cell in cells]
+        if "from" in spec.params:
+            raise LevelError(f"{level.id}: the cast goal names no cells (D215)")
 
     def check(self, world: "World") -> bool:
         return any(
-            e.actor == "wizard"
-            and e.kind == "cast"
-            and e.data.get("spell") == self.spell
-            and (self.cells is None or e.data.get("at") in self.cells)
+            e.actor == "wizard" and e.kind == "cast" and e.data.get("spell") == self.spell
+            for e in world.events
+        )
+
+
+class LandGoal:
+    """Met at the tick the wizard's own drevo sets the broom down on a tile, a marker's
+    or one at x and y (D215): `{"kind": "land", "marker": "E"}`. The broom's setting
+    down by itself at the program's end meets nothing."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        if "marker" in spec.params:
+            self.target = level.markers[spec.params["marker"]]
+        elif "at" in spec.params:
+            x, y = spec.params["at"]
+            self.target = Position(int(x), int(y))
+            if not level.inside(self.target):
+                raise LevelError(f"{level.id}: the land goal's tile is off the map")
+        else:
+            raise LevelError(f"{level.id}: a land goal needs a marker or at")
+
+    def check(self, world: "World") -> bool:
+        return any(
+            e.kind == "land"
+            and e.data.get("cast") is True
+            and e.data.get("at") == list(self.target)
             for e in world.events
         )
 
@@ -497,6 +513,7 @@ GOALS: dict[str, type] = {
     "say": SayGoal,
     "give": GiveGoal,
     "cast": CastGoal,
+    "land": LandGoal,
     "sleep": SleepGoal,
     "no_bumps": NoBumpsGoal,
     "untied": UntiedGoal,

@@ -224,6 +224,11 @@ class World:
         hole = self.hole_at(position)
         return hole is None or hole._k_closed_at(self.tick + 1)
 
+    def landable(self, position: Position) -> bool:
+        """Whether a broom in the air may set down on a tile: one a walk may step on
+        now, and no ring's (D215)."""
+        return self.is_free(position) and self.ring_at(position) is None
+
     def hole_at(self, position: Position) -> Hole | None:
         """The hole one of whose cells a tile is, or None (D167)."""
         for thing in self.things.values():
@@ -370,21 +375,24 @@ class World:
             self.over = Caught(self.caught_by)
             raise self.over
 
-    def refuse(self, by: str, reason: str, at: list[int]) -> None:
+    def refuse(self, by: str, reason: str, at: list[int], **detail: object) -> None:
         """The wizard tries what cannot be done, and the program stops with an error in
-        the child's words (D183): the try is seen, a tick, and raises."""
-        self.act("blocked", {"at": at, "by": by, "reason": reason, "tried": True})
+        the child's words (D183): the try is seen, a tick, and raises; `detail` says
+        more of it to the page, as the kind of a cell (D215)."""
+        self.act("blocked", {"at": at, "by": by, "reason": reason, "tried": True, **detail})
         self.error = reason
         raise Refused(reason, by)
 
     def finish(self, ended: bool = True) -> None:
         """The child's code has ended, `ended` when it came to its end with the world
-        still running: a broom in the air sets down where it is (D185), a race is flown
+        still running: a broom in the air sets down where it is, over a cell that is
+        walked on, and stays in the air over any other (D185, D215); a race is flown
         out until the racer crosses the finish, unless the wizard stands on its last
         cell (D189); then the goals that are met only then are checked."""
-        if self.over is None and self.wizard._k_flying:
+        here = self.wizard._k_position
+        if self.over is None and self.wizard._k_flying and self.landable(here):
             self.wizard._set(flying=False)
-            self.note("broom", "land", {"id": "wizard", "at": list(self.wizard.position)})
+            self.note("broom", "land", {"id": "wizard", "at": list(here)})
         race = self.level.race
         if ended and self.over is None and race is not None:
             last = race.path[race.path.index(race.finish)]
@@ -961,12 +969,24 @@ def _orvim(world: World, here: Position, _thing: Thing | None = None) -> Effect:
 
 def _drevo(world: World, here: Position, _thing: Thing | None = None) -> Effect:
     """Lifts the broom the wizard carries into the air (D185): from then on every move
-    flies, over the low cells and through the rings, until the program ends and the
-    broom sets down; with no broom carried, refused; in the air already, nothing."""
+    flies, over the low cells and through the rings; with no broom carried, refused.
+    Cast in the air, it sets the broom down on the wizard's cell, the moves after it
+    walking (D215); over a cell no one walks on, the landing is refused and the
+    program stops, the wizard still in the air."""
     if not world.wizard.has("broom"):
         return Effect(refused="no_broom")
     if world.wizard._k_flying:
-        return Effect()
+        if not world.landable(here):
+            kind = (
+                "ring" if world.ring_at(here) is not None else world.level.kinds.get(here, "low")
+            )
+            world.refuse("wizard", "no_landing", list(here), kind=kind, spell="drevo")
+
+        def land() -> None:
+            world.wizard._set(flying=False)
+            world.note("broom", "land", {"id": "wizard", "at": list(here), "cast": True})
+
+        return Effect(then=land)
 
     def lift() -> None:
         world.wizard._set(flying=True)

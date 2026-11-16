@@ -680,7 +680,9 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     the painted line (D229), the content and Python's files kept for good under
     addresses that change with them (D230), the page's sound asleep while nothing
     sounds (D231), and a figure flown through a ring's hole, behind it or in front of it
-    by the way it flew (D232).
+    by the way it flew (D232); and, in `sprint-46.md`, a bonus goal that fails losing its
+    star and not the level (D233), and the race judged at its end, Ilda saying the
+    penalties and the winner on a band at the scene's foot (D234).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

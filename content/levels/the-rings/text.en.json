@@ -11,7 +11,7 @@
     "Give those four lines a name with `def` and put the four moves inside it.",
     "Call your new function in the three places, in place of the lines it holds."
   ],
-  "intro": "In broom races, rings are always flown like this: the first of a pair is flown through from below upward, and the second from above downward. A ring crossed in the wrong direction does not count! Here is my program for the ring field. It flies through three pairs of rings. Between the first pair and the second there is a clump of trees to go round by above; between the second and the third you have to fly over a pond. The program is 19 lines long! It is the four lines of a pair, written three times. If you make a function for the pair and call it in the three places, it will be much shorter.",
+  "intro": "Let's keep practicing! Rings are very good for learning to control your turns. The first ring of a pair is flown from below upward, and the second from above downward. A ring crossed in the wrong direction does not count! Here is my program for the ring field. It flies through three pairs of rings, going round some trees by the top between the first two, and over a pond between the last two. It is 19 lines long! That is the four lines of a pair written three times. If you make a function for the pair and call it in the three places, it will be much shorter.",
   "outro": "Very well done! A shorter program is much easier to read, and it flies just as smoothly.",
   "learned": "Now you know that `def` gives some lines a name, and that the name with brackets runs them wherever and as often as it is written."
 }

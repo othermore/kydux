@@ -11,7 +11,7 @@
     "Dale a esas cuatro líneas un nombre con `def` y pon los cuatro movimientos dentro.",
     "Llama a tu nueva función en los tres sitios, en lugar de las líneas que contiene."
   ],
-  "intro": "En las carreras de escobas, los aros siempre se pasan así: el primero de una pareja se cruza desde abajo hacia arriba, y el segundo desde arriba hacia abajo. ¡Un aro que se cruza al revés no cuenta! Este es mi programa para el campo de aros. Pasa por tres parejas de aros. Entre la primera y la segunda hay un grupo de árboles que hay que rodear por arriba; entre la segunda y la tercera hay que volar sobre un estanque. ¡El programa tiene 19 líneas! Son las cuatro líneas de una pareja, escritas tres veces. Si haces una función para la pareja y la llamas en los tres sitios, será mucho más corto.",
+  "intro": "¡Sigamos practicando! Los aros son una forma muy buena de aprender a controlar los giros. El primer aro de una pareja se cruza desde abajo hacia arriba, y el segundo desde arriba hacia abajo. ¡Un aro cruzado al revés no cuenta! Este es mi programa para el campo de aros. Pasa por tres parejas de aros, rodeando unos árboles por arriba entre las dos primeras, y volando sobre un estanque entre las dos últimas. ¡Tiene 19 líneas! Son las cuatro líneas de una pareja escritas tres veces. Si haces una función para la pareja y la llamas en los tres sitios, será mucho más corto.",
   "outro": "¡Muy bien hecho! Un programa más corto es mucho más fácil de leer, y vuela igual de suave.",
   "learned": "Ahora sabes que `def` da un nombre a unas líneas, y que escribir el nombre con paréntesis las ejecuta en cualquier sitio y tantas veces como haga falta."
 }

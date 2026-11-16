@@ -2,7 +2,8 @@
 // tested without Phaser: the buttons step through ZOOMS, the wheel turns the zoom
 // a little at a time between the same limits, and the words said on the scene are
 // drawn larger as it zooms out, never smaller on the screen than at zoom 1. Here too is
-// what the camera shows at a level's start, and where a story's window keeps who speaks.
+// what the camera shows at a level's start, where a story's window keeps who speaks, and
+// when a level's framing of a place holds (D201).
 
 /** The zooms the buttons step through, from the whole scene to a close look. */
 export const ZOOMS = [0.5, 0.75, 1, 1.5, 2] as const;
@@ -88,4 +89,39 @@ export function boxFrame(
   const [width, height] = [x1 - x0 + 1, y1 - y0 + 1];
   const zoom = Math.max(least, Math.min(1, shown[0] / width, shown[1] / height));
   return { zoom, centre: [x0 + width / 2, y0 + height / 2] };
+}
+
+/** A level's framing of a place (D201): the box of cells its start shows whole, held
+ * through a run while the wizard stays inside it, let go once the wizard leaves it or
+ * the child drags the camera or finds the wizard, and held again at the next start. */
+export class LevelFraming {
+  private held: [number, number, number, number] | null = null;
+
+  constructor(readonly box: [number, number, number, number] | null) {}
+
+  /** The level's start, or its start over: the box held again, if the level has one. */
+  start(): [number, number, number, number] | null {
+    this.held = this.box;
+    return this.held;
+  }
+
+  /** The box held now, or null. */
+  get holding(): [number, number, number, number] | null {
+    return this.held;
+  }
+
+  /** As a run starts and at each of its ticks, the wizard at a cell: whether the camera
+   * keeps the box; once the wizard is outside it, the box is let go and the camera goes
+   * to the wizard. */
+  keeps([x, y]: [number, number]): boolean {
+    const box = this.held;
+    if (box && x >= box[0] && x <= box[2] && y >= box[1] && y <= box[3]) return true;
+    this.held = null;
+    return false;
+  }
+
+  /** A drag of the camera, or Find my wizard: the box let go until the next start. */
+  letGo(): void {
+    this.held = null;
+  }
 }

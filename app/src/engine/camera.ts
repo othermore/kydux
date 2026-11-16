@@ -11,7 +11,10 @@
 // wizard and every actor, zooming out as far as it must and no farther, and the run
 // takes it back to the wizard, gliding (sprint 31).
 // A story step may frame a place (D199): a box of cells shown whole, or the scene's
-// width, held until a later step frames another or none.
+// width, held until a later step frames another or none. A level may frame one too
+// (D201): its start shows the box whole, and a run keeps it while the wizard is inside
+// it; a drag or Find my wizard lets it go until the next start. data-camera-fit says
+// the box held.
 // It says data-zoom (the zoom, to two decimals), data-following, data-dragged
 // while a drag has let go of it, and data-view and data-bounds (the window and
 // the scene with its margin, in tiles across and down, "w×h") on the scene's
@@ -20,7 +23,16 @@
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
 import type { Tile } from './sight';
-import { boxFrame, type StoryFraming, startFrame, steppedZoom, storyMiddle, wheeledZoom, ZOOMS } from './zooming';
+import {
+  boxFrame,
+  LevelFraming,
+  type StoryFraming,
+  startFrame,
+  steppedZoom,
+  storyMiddle,
+  wheeledZoom,
+  ZOOMS,
+} from './zooming';
 
 export { ZOOMS };
 
@@ -43,6 +55,8 @@ export interface CameraParts {
   painted: boolean;
   /** In a story, the point the camera is on before any step. */
   story: { x: number; y: number } | null;
+  /** In a level, the box of cells its start shows whole (D201), or null. */
+  levelBox: [number, number, number, number] | null;
   wizard: () => Phaser.GameObjects.Sprite;
   /** A figure with its words, for the story's window to keep in view. */
   around: (figure: Phaser.GameObjects.Sprite) => Phaser.Geom.Rectangle;
@@ -64,12 +78,16 @@ export class SceneCamera {
   private framed = false;
   /** In a story, the place a step frames (D199), held until a step frames none. */
   private placed: StoryFraming | null = null;
+  /** In a level, the place its start frames (D201), and whether it is held. */
+  private readonly levelFraming: LevelFraming;
 
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly parent: HTMLElement,
     private readonly parts: CameraParts,
-  ) {}
+  ) {
+    this.levelFraming = new LevelFraming(parts.story ? null : parts.levelBox);
+  }
 
   private get camera(): Phaser.Cameras.Scene2D.Camera {
     return this.scene.cameras.main;
@@ -90,6 +108,8 @@ export class SceneCamera {
       camera.setSize(size.width, size.height);
       this.applyZoom();
       if (this.parts.story) this.fitWindow();
+      const box = this.levelFraming.holding;
+      if (box) this.showBox(box);
     });
     if (this.parts.story) camera.centerOn(this.parts.story.x, this.parts.story.y);
     this.follow();
@@ -116,6 +136,7 @@ export class SceneCamera {
       if (dx === 0 && dy === 0) return;
       camera.stopFollow();
       this.followed = null;
+      this.letGoOfBox();
       this.parent.dataset.following = 'false';
       this.parent.dataset.dragged = 'true';
       this.dragged = true;
@@ -149,6 +170,7 @@ export class SceneCamera {
       this.parent.dataset.following = String(this.focus !== null);
       return;
     }
+    this.letGoOfBox();
     const wizard = this.parts.wizard();
     const { scrollX, scrollY } = camera;
     camera.startFollow(wizard, true, 0.2, 0.2);
@@ -160,10 +182,16 @@ export class SceneCamera {
     this.parent.dataset.following = 'true';
   }
 
-  /** At a level's start: the wizard and every actor, `figures` being their tiles and
-   * the wizard's first, in the window, zoomed out as far as it must and no farther. On
-   * the wizard when they all fit round it; else on them, until a run or Find my wizard. */
+  /** At a level's start: the place the level frames, whole (D201); or the wizard and
+   * every actor, `figures` being their tiles and the wizard's first, in the window,
+   * zoomed out as far as it must and no farther. On the wizard when they all fit round
+   * it; else on them, until a run or Find my wizard. */
   frame([wizard, ...others]: [Tile, ...Tile[]]): void {
+    const box = this.levelFraming.start();
+    if (box) {
+      this.showBox(box);
+      return;
+    }
     const camera = this.camera;
     const scale = this.fit() * TILE;
     const shown: Tile = [camera.width / scale, camera.height / scale];
@@ -184,6 +212,20 @@ export class SceneCamera {
     this.parent.dataset.following = 'false';
   }
 
+  /** As a run starts, the wizard at a cell: in a level, the place its start framed is
+   * kept while the wizard stands inside it (D201); else the camera goes to the wizard,
+   * or in a story to whoever the steps are about. */
+  runs(at: Tile): void {
+    if (this.levelFraming.holding && this.levelFraming.keeps(at)) return;
+    this.follow();
+  }
+
+  /** At each tick of a level's run: the place framed is let go, and the camera glides
+   * to the wizard, once the wizard leaves it (D201). */
+  hold(at: Tile): void {
+    if (this.levelFraming.holding && !this.levelFraming.keeps(at)) this.follow();
+  }
+
   /** In a story, a step's framing (D199): a box of cells shown whole and centred, or
    * the scene's width on the window's middle, kept until a step frames none; null lets
    * the camera follow whoever the steps are about again. data-camera-fit says it. */
@@ -198,13 +240,39 @@ export class SceneCamera {
     this.showPlaced(framing);
   }
 
-  /** In a story, the top and the bottom, in the scene's pixels, of what a step's
-   * framing shows (D199); null where the camera follows whoever the steps are about. */
+  /** The top and the bottom, in the scene's pixels, of what a story step's framing
+   * shows (D199), or a level's while it is held (D201); null where the camera follows
+   * the wizard or whoever the steps are about. */
   shown(): [number, number] | null {
-    if (!this.placed) return null;
+    if (!this.placed && !this.levelFraming.holding) return null;
     const camera = this.camera;
     const top = camera.scrollY + (camera.height / 2) * (1 - 1 / camera.zoom);
     return [top, top + camera.height / camera.zoom];
+  }
+
+  /** A level's place shown whole and centred (D201), off the wizard until a run takes
+   * the wizard out of it, a drag or Find my wizard. */
+  private showBox(box: [number, number, number, number]): void {
+    const camera = this.camera;
+    const scale = this.fit() * TILE;
+    const { zoom, centre } = boxFrame(box, [camera.width / scale, camera.height / scale], this.least());
+    camera.stopFollow();
+    if (Math.abs(zoom - this.zoom) > 1e-6) {
+      this.zoom = zoom;
+      this.applyZoom();
+    }
+    camera.centerOn(centre[0] * TILE, centre[1] * TILE);
+    this.framed = true;
+    this.parent.dataset.framed = 'true';
+    this.parent.dataset.following = 'false';
+    this.parent.dataset.cameraFit = box.join(',');
+  }
+
+  /** A level's place let go (D201): the camera is the child's or the wizard's again. */
+  private letGoOfBox(): void {
+    if (this.parts.story) return;
+    this.levelFraming.letGo();
+    delete this.parent.dataset.cameraFit;
   }
 
   private showPlaced(framing: StoryFraming): void {

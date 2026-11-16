@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { startFrame, steppedZoom, storyMiddle, wheeledZoom, wordsScale } from './zooming';
+import { LevelFraming, startFrame, steppedZoom, storyMiddle, wheeledZoom, wordsScale } from './zooming';
 
 describe('the zoom (D106)', () => {
   it('steps the buttons through the zooms, from wherever the wheel left it', () => {
@@ -52,5 +52,42 @@ describe('the zoom (D106)', () => {
     expect(storyMiddle(100, 300, 500, 48)).toBe(200);
     // Words and figure taller than the window: the figure's feet stay in it.
     expect(storyMiddle(100, 700, 500, 48)).toBe(498);
+  });
+});
+
+describe("a level's framing of a place (D201)", () => {
+  const shed: [number, number, number, number] = [3, 0, 16, 10];
+
+  it('holds the box through a run while the wizard stays inside it', () => {
+    const framing = new LevelFraming(shed);
+    expect(framing.start()).toEqual(shed);
+    for (const cell of [[9, 8], [9, 6], [6, 6], [13, 6]] as [number, number][]) {
+      expect(framing.keeps(cell)).toBe(true);
+    }
+    expect(framing.holding).toEqual(shed);
+  });
+
+  it('lets the box go once the wizard leaves it, and holds it again at the next start', () => {
+    const framing = new LevelFraming(shed);
+    framing.start();
+    expect(framing.keeps([9, 11])).toBe(false);
+    expect(framing.holding).toBeNull();
+    expect(framing.keeps([9, 8])).toBe(false);
+    expect(framing.start()).toEqual(shed);
+  });
+
+  it('is let go by a drag or Find my wizard until the next start', () => {
+    const framing = new LevelFraming(shed);
+    framing.start();
+    framing.letGo();
+    expect(framing.keeps([9, 8])).toBe(false);
+    framing.start();
+    expect(framing.keeps([9, 8])).toBe(true);
+  });
+
+  it('holds nothing in a level with no box', () => {
+    const framing = new LevelFraming(null);
+    expect(framing.start()).toBeNull();
+    expect(framing.keeps([9, 8])).toBe(false);
   });
 });

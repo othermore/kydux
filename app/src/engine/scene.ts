@@ -39,11 +39,12 @@
 // untied, D183), data-flying (the figures in the air, joined by ",", D185),
 // data-wind (`on` while a flight's wind blows), data-through (the rings flown
 // through, in order, joined by ","), data-circling (who circles before the
-// finish now) and data-race-band (what the start band says, D189).
+// finish now), data-race-band (what the start band says, D189) and data-world (what
+// the camera shows, in cells: "left,top,width,height").
 //
 // The camera is a window on the scene (D69, camera.ts): it follows the wizard,
 // the player zooms it and drags it to look around, and a run or a restart brings
-// it back to the wizard. The words said are in bubbles and the wizard's thoughts
+// it back to the wizard, or to the place a level frames (D201). The words said are in bubbles and the wizard's thoughts
 // in clouds (speech.ts).
 //
 // A painted scene (D76) is drawn by painted.ts: its ground and rows, its things'
@@ -679,6 +680,7 @@ class LevelScene extends Phaser.Scene {
       margin: marginOf(this.art),
       painted: this.art !== null,
       story: story ? { x: centre(story.camera)[0], y: centre(story.camera)[1] } : null,
+      levelBox: this.map.camera,
       wizard: () => this.wizard,
       around: (figure) => this.speech.around(figure),
       zoomed: (cameraZoom) => this.speech.setZoom(cameraZoom),
@@ -728,8 +730,9 @@ class LevelScene extends Phaser.Scene {
     this.playback.onTick((tick, events, instant) => this.show(tick, events, instant));
     this.playback.onState((state) => {
       this.parentNode.dataset.state = state;
-      // A run brings the camera back to the wizard.
-      if (state === 'playing') this.follow();
+      // A run brings the camera back to the wizard, but where the level frames a place
+      // the wizard stands in (D201).
+      if (state === 'playing') this.view.runs(this.wizardTile);
       // Words said near the end of the run, with no tick to end them, go once they are
       // read (D175).
       if (state === 'done' && !this.options.story) this.time.delayedCall(this.speech.settle(), () => this.speech.expireRead());
@@ -805,6 +808,10 @@ class LevelScene extends Phaser.Scene {
   /** A word said follows who says it while they walk. */
   override update(): void {
     this.drawLight();
+    // What the camera shows, in cells: its left, its top, its width and its height.
+    const view = this.cameras.main.worldView;
+    const world = [view.x, view.y, view.width, view.height].map((v) => (v / TILE).toFixed(2)).join(',');
+    if (this.parentNode.dataset.world !== world) this.parentNode.dataset.world = world;
     if (this.flyers.size > 0 || this.parentNode.dataset.flying) this.flyFrames();
     // On a painted scene the figures go behind what stands in front of them (D76).
     if (this.art) {
@@ -982,12 +989,14 @@ class LevelScene extends Phaser.Scene {
     }
     this.parentNode.dataset.tick = '0';
     this.publish();
-    // A level's start shows the wizard and every actor; a seek stays with the wizard.
+    // A level's start shows the place it frames (D201), or the wizard and every actor;
+    // a seek stays with the wizard, or in the place framed while the wizard is in it.
     if (!this.options.story && !seeking) this.frameStart();
-    else if (this.restarts > 1) this.follow();
+    else if (this.restarts > 1) this.view.runs(this.map.start);
   }
 
-  /** The camera at a level's start, on the wizard and every actor seen (camera.ts). */
+  /** The camera at a level's start: the place the level frames, or the wizard and every
+   * actor seen (camera.ts). */
   private frameStart(): void {
     const others = this.map.actors.flatMap((actor) => {
       const state = this.actors.get(actor.id);
@@ -1148,7 +1157,7 @@ class LevelScene extends Phaser.Scene {
     if (this.options.story) {
       this.frameStory(events);
       this.view.keep();
-    }
+    } else this.view.hold(this.wizardTile);
     this.publish();
   }
 

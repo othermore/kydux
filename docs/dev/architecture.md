@@ -28,7 +28,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the words the scene shows (words.ts, why an action failed);
                 the looks a wizard may have (looks.ts) and the placeholders for a
                 scene without art (placeholders.ts); the camera on the scene, its
-                zoom, its drag and a story's window (camera.ts, D69, D74), the
+                zoom, its drag, a story's window and the place a story step or
+                a level frames (camera.ts, D69, D74, D199, D201), the
                 words said in bubbles and the wizard's thoughts (speech.ts), the
                 playback of a run's events (playback.ts, its long ticks for
                 what the wizard's hands do), a painted scene drawn from its
@@ -37,7 +38,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 in its middle (shift.ts, D85, D109), a figure drawn on its
                 scene's painted strip (depth.ts, D105, D149), a speaker's bubble
                 clear of the other figures (bubble.ts), the camera's zoom with
-                the buttons and the wheel (zooming.ts, D106), the goal's
+                the buttons and the wheel, and when a level's framing holds
+                (zooming.ts, D106, D201), the goal's
                 beating mark on the ground and the sealed doors' glow (D79,
                 D160), a key drawn small (D164),
                 the wizard casting, a seal breaking and a door opening (D81),
@@ -2927,3 +2929,22 @@ one overturns stays, marked as superseded.
   is remembered while the page lives, not kept. A chapter's section says
   `data-folded`, `data-finished` and `data-current`. Rules out a map that scrolls
   through every stop of every chapter to reach today's.
+- **D201 — A level may frame a place.** Decided 2026-11-11 by the designer, from the
+  walkthrough's pictures of the shed's levels, where the start's view sat low on the
+  figures in the straw and the goals' panel lay over the pegs. A level's `level.json`
+  may say `"camera": {"fit": [[x0, y0], [x1, y1]]}`, as a story's step does (D199):
+  at the level's start, and again at each start over, the page shows that box of cells
+  whole, zoomed out as far as it must and no further than its zoom of 1, centred on it
+  (`SceneCamera.frame`, `boxFrame`). A run keeps it while the wizard stands inside the
+  box (`LevelFraming`, `SceneCamera.runs` and `hold`); once the wizard leaves it, or the
+  child drags the camera or presses *Find my wizard*, it is let go and the camera is the
+  wizard's, until the next start frames the place again. Zoom, drag and *Find my
+  wizard* work as everywhere. While the place is held a bubble stays inside what it
+  shows (`bubbleRoom`). The world reads the box (`_level_camera`): on the scene, not
+  turned round, and holding the start, every marker and every thing of the level in
+  each of its ways. The scene's parent says the box held in `data-camera-fit`, and what
+  the camera shows, in cells, in `data-world`. The shed's five levels frame
+  `[[3, 0], [16, 10]]`: the roof's row, the eight pegs, the straw and the door's
+  threshold in view, and no peg under the goals' panel or the zoom's buttons at 1280
+  by 800. A level with no `camera` starts as it does without one. Rules out a level
+  whose things lie under the page's own panels as it opens, and a shed seen in pieces.

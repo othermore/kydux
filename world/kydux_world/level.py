@@ -28,7 +28,9 @@ the names the level teaches (D23); `goals`, some of them bonus goals;
 spells when a `collect` or an `open` goal lies in the dark (D162); `forbidden`, the
 tiles the wizard may not step on and why, which its scene gives (D84);
 `enchanted`, the boxes of cells that hide every figure in them, which its scene
-gives too and only the page reads (D135); and `ways`, the ways the level is
+gives too and only the page reads (D135); `camera`, a box of cells the page
+shows whole at the level's start (D201), which holds the start, every marker and
+every thing; and `ways`, the ways the level is
 played, each one the same program must win (D51). A level may
 come with goals of its own, in a goals.py beside level.json, whose source
 the loader passes as `goals_source`.
@@ -403,6 +405,7 @@ class Level:
             zones=zones,
         )
         check_api(level)
+        _level_camera(data.get("camera"), level)
         return level
 
     def way(self, way_id: str) -> "Level":
@@ -613,10 +616,13 @@ def _check_zones(
             raise LevelError(f"{level_id}: {thing.id} lies outside its zone {thing.zone}")
 
 
-def _step_camera(value: Any, here: str, width: int, height: int) -> None:
+def _step_camera(
+    value: Any, here: str, width: int, height: int, whose: str = "a step's camera"
+) -> None:
     """A story step's camera (D199): `{"fit": [[x0, y0], [x1, y1]]}`, a box of cells the
-    page shows whole, or `{"wide": true}`, the scene's playable width."""
-    if value == {"wide": True}:
+    page shows whole, or `{"wide": true}`, the scene's playable width; a level's
+    (D201), only the box."""
+    if value == {"wide": True} and whose == "a step's camera":
         return
     box = value.get("fit") if isinstance(value, dict) and set(value) == {"fit"} else None
     corners = (
@@ -629,10 +635,29 @@ def _step_camera(value: Any, here: str, width: int, height: int) -> None:
         else None
     )
     if corners is None:
-        raise LevelError(f'{here}: a step\'s camera is {{"fit": [[x0, y0], [x1, y1]]}} or wide')
+        wide = " or wide" if whose == "a step's camera" else ""
+        raise LevelError(f'{here}: {whose} is {{"fit": [[x0, y0], [x1, y1]]}}{wide}')
     (x0, y0), (x1, y1) = corners
     if not (0 <= x0 <= x1 < width and 0 <= y0 <= y1 < height):
         raise LevelError(f"{here}: the camera's box is off the scene or turned round")
+
+
+def _level_camera(value: Any, level: "Level") -> None:
+    """A level's camera (D201): `{"fit": [[x0, y0], [x1, y1]]}`, a box of cells the
+    page shows whole at the level's start, on the scene and holding the start, every
+    marker and every thing, in the way being read."""
+    if value is None:
+        return
+    _step_camera(value, level.id, level.width, level.height, "a level's camera")
+    (x0, y0), (x1, y1) = value["fit"]
+    held = [
+        ("the start", level.start),
+        *((f"the marker {letter}", at) for letter, at in sorted(level.markers.items())),
+        *((thing.id, thing.position) for thing in level.things),
+    ]
+    for what, at in held:
+        if not (x0 <= at.x <= x1 and y0 <= at.y <= y1):
+            raise LevelError(f"{level.id}: the camera's box leaves out {what}, at {at.x},{at.y}")
 
 
 def under(position: Position) -> Position:

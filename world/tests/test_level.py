@@ -171,3 +171,41 @@ def _with(**change):
 def test_things_actors_and_api_that_cannot_be_played_say_why(data, says):
     with pytest.raises(LevelError, match=says):
         Level.from_dict(data)
+
+
+#: A room wider than a box of it, a key in its second row and a door's marker.
+WIDE = {
+    "id": "wide",
+    "map": ["#########", "#S..D...#", "#.......#", "#########"],
+    "things": [{"kind": "key", "id": "key", "at": [2, 2]}],
+    "goals": [{"kind": "reach", "marker": "D"}],
+}
+
+
+def test_a_level_may_frame_a_place_holding_its_start_markers_and_things():
+    """D201: the box is read and checked; the page draws from level.json."""
+    Level.from_dict({**WIDE, "camera": {"fit": [[0, 0], [5, 3]]}})
+
+
+@pytest.mark.parametrize(
+    ("camera", "says"),
+    [
+        ({"fit": [[0, 0], [9, 3]]}, "off the scene"),
+        ({"fit": [[5, 3], [0, 0]]}, "turned round"),
+        ({"wide": True}, "a level's camera is"),
+        ({"fit": [[0, 0]]}, "a level's camera is"),
+        ({"fit": [[2, 0], [6, 3]]}, "leaves out the start"),
+        ({"fit": [[0, 0], [3, 3]]}, "leaves out the marker D"),
+        ({"fit": [[0, 0], [5, 1]]}, "leaves out key"),
+    ],
+)
+def test_a_level_s_camera_off_the_scene_or_leaving_something_out_is_refused(camera, says):
+    with pytest.raises(LevelError, match=says):
+        Level.from_dict({**WIDE, "camera": camera})
+
+
+def test_a_level_s_camera_holds_every_way_s_things():
+    ways = [{"id": "near"}, {"id": "far", "things": [{"id": "key", "at": [7, 2]}]}]
+    with pytest.raises(LevelError, match="leaves out key, at 7,2"):
+        Level.from_dict({**WIDE, "camera": {"fit": [[0, 0], [5, 3]]}, "ways": ways})
+    Level.from_dict({**WIDE, "camera": {"fit": [[0, 0], [8, 3]]}, "ways": ways})

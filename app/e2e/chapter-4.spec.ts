@@ -80,9 +80,68 @@ for (const [wizard, locale, won] of [
   });
 }
 
+/** A cell's box on the page, from what the camera shows (data-world) and the canvas. */
+async function cellOnPage(page: Page, [x, y]: [number, number]): Promise<{ x: number; y: number; width: number; height: number }> {
+  const canvas = await page.locator('#scene canvas').boundingBox();
+  const world = (await scene(page).getAttribute('data-world'))?.split(',').map(Number) ?? [];
+  const [left = 0, top = 0, wide = 1, high = 1] = world;
+  if (!canvas) throw new Error('no canvas');
+  const across = canvas.width / wide;
+  const down = canvas.height / high;
+  return { x: canvas.x + (x - left) * across, y: canvas.y + (y - top) * down, width: across, height: down };
+}
+
+type PageBox = { x: number; y: number; width: number; height: number };
+const meets = (one: PageBox, other: PageBox) =>
+  one.x < other.x + other.width && other.x < one.x + one.width && one.y < other.y + other.height && other.y < one.y + one.height;
+const within = (one: PageBox, other: PageBox) =>
+  one.x >= other.x - 0.5 && one.y >= other.y - 0.5 && one.x + one.width <= other.x + other.width + 0.5 && one.y + one.height <= other.y + other.height + 0.5;
+
 test.describe('the shed', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  for (const id of ['the-broom-at-your-feet', 'the-shed', 'the-brooms-on-the-wall', 'the-brooms-in-the-straw', 'the-check']) {
+    test(`${id} opens on the shed whole, its pegs clear of the goals and the buttons (D201)`, async ({ page }) => {
+      await open(page, id);
+      await expect(scene(page)).toHaveAttribute('data-camera-fit', '3,0,16,10');
+      await expect(scene(page)).not.toHaveAttribute('data-restarting', /./);
+      const panel = await page.locator('.goals').boundingBox();
+      const buttons = await page.locator('.zoom-box').boundingBox();
+      const canvas = await page.locator('#scene canvas').boundingBox();
+      if (!panel || !buttons || !canvas) throw new Error('no panel, buttons or canvas');
+      for (let x = 6; x <= 13; x += 1) {
+        for (const y of [4, 5]) {
+          const cell = await cellOnPage(page, [x, y]);
+          expect(meets(cell, panel), `cell ${x},${y} under the goals`).toBe(false);
+          expect(meets(cell, buttons), `cell ${x},${y} under the buttons`).toBe(false);
+        }
+      }
+      // The roof's row and the door's threshold inside the canvas.
+      for (const cell of [[4, 3], [15, 3], [9, 10], [10, 10]] as [number, number][]) {
+        expect(within(await cellOnPage(page, cell), canvas), `cell ${cell} in view`).toBe(true);
+      }
+      await page.screenshot({ path: `${SHOTS}framed-${id}.png` });
+    });
+  }
+
+  test('a run keeps the shed framed while the wizard is in it; a drag lets it go, and the next start frames it again (D201)', async ({ page }) => {
+    await open(page, 'the-brooms-on-the-wall');
+    expect(await run(page, solution('the-brooms-on-the-wall'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute('data-camera-fit', '3,0,16,10');
+    await expect(scene(page)).toHaveAttribute('data-following', 'false');
+    await page.locator('#again').click();
+    const canvas = await page.locator('#scene canvas').boundingBox();
+    if (!canvas) throw new Error('no canvas');
+    const [x, y] = [canvas.x + canvas.width / 2, canvas.y + canvas.height / 2];
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x - 120, y - 80, { steps: 6 });
+    await page.mouse.up();
+    await expect(scene(page)).not.toHaveAttribute('data-camera-fit', /./);
+    await page.locator('#restart').click();
+    await expect(scene(page)).toHaveAttribute('data-camera-fit', '3,0,16,10');
+  });
 
   test('the broom at your feet is found and untied in two lines, the hung ones drawn on their pegs (D195, D197)', async ({ page }) => {
     await open(page, 'the-broom-at-your-feet');

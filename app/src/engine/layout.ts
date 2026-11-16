@@ -159,6 +159,8 @@ export interface Layout {
   /** The level's zones, each its name and cells: a thing of a zone is found only from
    * within it (D196). */
   zones: { name: string; cells: Tile[] }[];
+  /** The box of cells, x0, y0, x1, y1, a level's start shows whole (D201), or null. */
+  camera: [number, number, number, number] | null;
   /** Each tile's kind of terrain (D73): the scene's, or wall, floor and shelf. */
   terrain: string[][];
   /** Each tile's letter in the scene's map.txt (D73), or in the level's own map. */
@@ -344,6 +346,7 @@ export function layout(level: LevelJson): Layout {
       name,
       cells: boxedCells(boxes),
     })),
+    camera: levelCamera(level.camera),
     terrain: terrainOf(level, rows),
     letters: Array.isArray(level.terrain) ? (level.terrain as string[]) : rows,
     props: asList(level.props).flatMap((prop) => {
@@ -389,6 +392,14 @@ function boxedCells(boxes: unknown): Tile[] {
     for (let y = y0 ?? 0; y <= (y1 ?? -1); y += 1) for (let x = x0 ?? 0; x <= (x1 ?? -1); x += 1) tiles.push([x, y]);
     return tiles;
   });
+}
+
+/** A level's camera (D201), `{"fit": [[x0, y0], [x1, y1]]}`, as its box; anything else,
+ * a story's point among them, is none. */
+function levelCamera(value: unknown): [number, number, number, number] | null {
+  if (typeof value !== 'object' || value === null || !('fit' in value)) return null;
+  const [from, to] = Array.isArray(value.fit) ? value.fit.map(asTile) : [];
+  return from && to ? [from[0], from[1], to[0], to[1]] : null;
 }
 
 /** The cell a level's sleep goal marks to sleep from (D130), when it names one. */

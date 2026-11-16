@@ -533,6 +533,22 @@ ends on:
 (cd app && npm run walkthrough -- 04-the-broom --all-ways the-shed,the-check)
 ```
 
+### Sweeping every level
+
+A spec measures every level of the game at once, for the designer and for you
+to read: how tall each start card is, and whether it scrolls, in both
+languages, at 1024 by 700, 1280 by 800 and 1366 by 650. It is skipped unless it
+is asked for. Build first, then run it from `app/`:
+
+```sh
+npm run build
+KYDUX_SWEEPS=1 npx playwright test e2e/sweeps.spec.ts
+```
+
+It takes about ten minutes. It writes its table to
+`app/e2e/shots/sweeps/start-cards.md`. A card that scrolls says by how many
+pixels.
+
 ### Measuring how long the game takes to load
 
 The game runs in the browser, but every file comes from the server first. A

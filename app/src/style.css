@@ -934,12 +934,27 @@ footer .build {
   z-index: 7;
 }
 
+/* The start card over the whole window (D228): the dim over the whole page takes no
+   click, so that a button of the page beside the card works under it (D222); the card's
+   room is the window's height less 12 px above and below. Under the map over a level and
+   the screen's guide. */
+.card-overlay.over-window {
+  position: fixed;
+  padding: 12px 0;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.over-window .card {
+  pointer-events: auto;
+}
+
 .card {
   max-width: min(440px, 90%);
-  /* A long card scrolls inside the scene's frame rather than leave it. */
+  /* A long card scrolls inside its room rather than leave it. */
   max-height: calc(100% - 16px);
   overflow-y: auto;
-  padding: 20px 24px;
+  padding: 14px 22px;
   border-radius: var(--radius-large);
   background: var(--paper);
   box-shadow: var(--shadow-lifted);
@@ -978,6 +993,28 @@ footer .build {
   margin: 4px 0 16px;
   padding-left: 20px;
   text-align: left;
+}
+
+/* The start card: up to 760 px wide, its text 17 px where the page's is 18, its title
+   21 px, its margins tight (D228). */
+.card.start-card {
+  width: min(760px, 94vw);
+  max-width: none;
+  max-height: 100%;
+  font-size: 17px;
+}
+
+.start-card h3 {
+  margin: 0 0 4px;
+  font-size: 21px;
+}
+
+.start-card .card-said {
+  margin: 4px 0 8px;
+}
+
+.start-card .start-goals {
+  margin: 2px 0 10px;
 }
 
 .card button {

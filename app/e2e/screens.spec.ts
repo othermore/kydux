@@ -33,8 +33,9 @@ for (const [width, height] of [
     await page.setViewportSize({ width, height });
     await page.goto('/#level/the-hidden-key');
     const view: Box = { x: 0, y: 0, width, height };
-    // The start card fits inside the scene's frame.
-    expect(inside(await box(page, '.start-card'), await box(page, '.scene-frame'))).toBe(true);
+    // The start card lies over the whole window, inside it, and does not scroll (D228).
+    expect(inside(await box(page, '.start-card'), view)).toBe(true);
+    expect(await page.locator('.start-card').evaluate((card) => card.scrollHeight - card.clientHeight)).toBeLessThanOrEqual(0);
     await page.locator('#start').click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
     for (const selector of ['.scene-frame', '.cm-editor', '#run', '.goals', '#speed', '#level-settings']) {

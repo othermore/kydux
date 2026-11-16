@@ -2,10 +2,12 @@ import { expect, type Page, test } from '@playwright/test';
 
 test.use({ locale: 'en-US' });
 
-async function openTheCorridor(page: Page): Promise<void> {
-  await page.goto('/#level/the-long-corridor');
-  const start = page.locator('#start');
-  if (await start.isVisible().catch(() => false)) await start.click();
+/** The level opened, its start card waited for and closed: the card lies over the
+ * whole window (D228), the handle between the panes under it. */
+async function openTheCorridor(page: Page, address = '/#level/the-long-corridor'): Promise<void> {
+  await page.goto(address);
+  await page.locator('#start').click();
+  await expect(page.locator('.card-overlay')).toHaveCount(0);
   await expect(page.locator('.cm-editor')).toBeVisible();
 }
 
@@ -140,10 +142,7 @@ test("the code is set in the bundled Inconsolata at 16 where nothing is chosen, 
 test("under ?debug the settings offer the three letters; each sets the editor's face, width and size at once, and stays after a reload (D223)", async ({
   page,
 }) => {
-  await page.goto('/?debug#level/the-long-corridor');
-  const start = page.locator('#start');
-  if (await start.isVisible().catch(() => false)) await start.click();
-  await expect(page.locator('.cm-editor')).toBeVisible();
+  await openTheCorridor(page, '/?debug#level/the-long-corridor');
   await page.locator('#level-settings').click();
   await expect(page).toHaveURL(/\?debug#settings$/);
   const choice = page.locator('#settings-code-font');

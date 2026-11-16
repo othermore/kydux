@@ -1,7 +1,7 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
-import { skipGuide, levelText } from './helpers';
+import { levelText, seedWizard, skipGuide } from './helpers';
 import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
@@ -129,6 +129,19 @@ test('? opens the start card over the notebook, and it says Continue', async ({ 
   expect(atPoint).toBe('start');
 });
 
+/** A point of `inner` that `over` does not cover, or its middle. */
+async function beside(page: Page, inner: string, over: string): Promise<{ x: number; y: number }> {
+  const a = await page.locator(inner).first().boundingBox();
+  const b = await page.locator(over).first().boundingBox();
+  if (!a) throw new Error(`${inner} is not shown`);
+  for (const [fx, fy] of [[0.97, 0.97], [0.97, 0.03], [0.03, 0.97], [0.03, 0.03], [0.5, 0.97], [0.97, 0.5]]) {
+    const x = a.x + a.width * (fx ?? 0.5);
+    const y = a.y + a.height * (fy ?? 0.5);
+    if (!b || x < b.x || x > b.x + b.width || y < b.y || y > b.y + b.height) return { x, y };
+  }
+  return { x: a.x + a.width / 2, y: a.y + a.height / 2 };
+}
+
 test.describe('a card in a window 600 px high (D222)', () => {
   test.use({ viewport: { width: 1280, height: 600 } });
 
@@ -145,9 +158,12 @@ test.describe('a card in a window 600 px high (D222)', () => {
     });
 
   test('the start card and the win card show their title when they open, however tall', async ({ page }) => {
+    // A window short enough for the start card, over the whole window (D228), to scroll.
+    await page.setViewportSize({ width: 1280, height: 380 });
     await page.goto('/#level/the-brooms-in-the-straw');
     await expect(page.locator('.start-card')).toBeVisible();
     await expect.poll(() => top(page, '.start-card')).toEqual({ scroll: 0, titleShown: true, taller: true });
+    await page.setViewportSize({ width: 1280, height: 600 });
     await page.locator('#start').click();
     await ready(page);
     await page.locator('#speed').selectOption('4');
@@ -186,13 +202,89 @@ test.describe('a card in a window 600 px high (D222)', () => {
     await page.locator('#speed').selectOption('2');
     await expect(card).toBeHidden();
     await expect(page.locator('#speed')).toHaveValue('2');
-    // The editor and the card itself close nothing; ? closes the card it opened.
+    // The editor beside the card, under its dim, and the card itself close nothing; ?
+    // closes the card it opened.
     await page.locator('#about').click();
     await expect(card).toBeVisible();
-    await page.locator('.cm-content').click();
+    const point = await beside(page, '.cm-content', '.start-card');
+    await page.mouse.click(point.x, point.y);
     await card.locator('h3').click();
     await expect(card).toBeVisible();
     await page.locator('#about').click();
     await expect(card).toBeHidden();
+  });
+});
+
+/** The levels of the course, in its order. */
+function courseLevels(): string[] {
+  const chapters = fileURLToPath(new URL('../../content/chapters/', import.meta.url));
+  return readdirSync(chapters)
+    .sort()
+    .flatMap((folder) => JSON.parse(readFileSync(`${chapters}${folder}/chapter.json`, 'utf8')).items as string[])
+    .filter((item) => item.startsWith('level:'))
+    .map((item) => item.slice('level:'.length));
+}
+
+test.describe('the start card over the whole window (D228)', () => {
+  test.use({ viewport: { width: 1024, height: 700 } });
+
+  for (const locale of ['es-ES', 'en-US']) {
+    test(`at 1024 by 700, no start card of the game scrolls, and each lies inside the window (${locale})`, async ({
+      browser,
+    }) => {
+      test.setTimeout(ciTimes(600_000));
+      const context = await browser.newContext({ locale, viewport: { width: 1024, height: 700 } });
+      const page = await context.newPage();
+      await seedWizard(page);
+      await page.goto('/#start');
+      const levels = courseLevels();
+      expect(levels.length).toBeGreaterThan(30);
+      const scrolled: string[] = [];
+      for (const id of levels) {
+        await page.evaluate((hash) => {
+          location.hash = hash;
+        }, `#level/${id}`);
+        const card = page.locator('.start-card');
+        await expect(card).toBeVisible({ timeout: ciTimes(30_000) });
+        const measured = await card.evaluate((node) => {
+          const box = node.getBoundingClientRect();
+          return {
+            over: node.scrollHeight - node.clientHeight,
+            inside: box.top >= 0 && box.left >= 0 && box.bottom <= innerHeight && box.right <= innerWidth,
+          };
+        });
+        if (measured.over > 0 || !measured.inside) scrolled.push(`${id}: ${JSON.stringify(measured)}`);
+      }
+      expect(scrolled).toEqual([]);
+      await context.close();
+    });
+  }
+
+  test('the start card is 760 px wide at most, its text 17 px, over a dim that takes no click', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/#level/the-rings');
+    const card = page.locator('.start-card');
+    await expect(card).toBeVisible();
+    await expect(card).toHaveCSS('width', '760px');
+    await expect(card).toHaveCSS('font-size', '17px');
+    await expect(card.locator('h3')).toHaveCSS('font-size', '21px');
+    await expect(page.locator('.card-overlay.over-window')).toHaveCSS('pointer-events', 'none');
+    await expect(page.locator('.card-overlay.over-window')).toHaveCSS('position', 'fixed');
+    await page.screenshot({ path: 'e2e/shots/cards/start-card-the-rings.png' });
+  });
+
+  test("the win cards of the check and of the race do not scroll at 1280 by 800", async ({ page }) => {
+    test.setTimeout(ciTimes(300_000));
+    await page.setViewportSize({ width: 1280, height: 800 });
+    for (const id of ['the-check', 'the-race']) {
+      await page.goto(`/?debug#level/${id}`);
+      await page.locator('#start').click();
+      await ready(page);
+      await page.locator('#speed').selectOption('4');
+      await run(page, readFileSync(fileURLToPath(new URL(`../../content/levels/${id}/solution.py`, import.meta.url)), 'utf8'));
+      const win = page.locator('.win-card');
+      await expect(win).toBeVisible({ timeout: ciTimes(120_000) });
+      expect(await win.evaluate((node) => node.scrollHeight - node.clientHeight), id).toBeLessThanOrEqual(0);
+    }
   });
 });

@@ -1,6 +1,6 @@
-// The cards that open and close a level, over its scene. The start card shows
-// the level's goals before the child begins; the win card shows the stars a
-// winning run earned and leads to the next level.
+// The cards that open and close a level. The start card shows the level's goals
+// before the child begins, over the whole window (D228); the win card shows the stars
+// a winning run earned and leads to the next level, over the scene.
 
 import { t } from '../i18n';
 import { MAX_STARS } from '../progress/store';
@@ -11,6 +11,9 @@ import { withCode } from './words';
 
 export interface Card {
   node: HTMLElement;
+  /** Where the card lies: over the whole window, the start card (D228), or over the
+   * scene, inside its frame. */
+  readonly over: 'window' | 'scene';
   readonly open: boolean;
   close(): void;
 }
@@ -25,12 +28,19 @@ function takeKeyboard(node: HTMLElement, button: HTMLElement): void {
   });
 }
 
-/** A card over the scene: a dialog the child closes with its button or Escape. */
-function overlay(className: string, children: (Node | string)[], onClose: () => void): Card {
+/** A card over the scene, or over the whole window: a dialog the child closes with its
+ * button or Escape. Over the window its dim takes no click, so that a button of the
+ * page beside the card works under it (D222, D228). */
+function overlay(
+  className: string,
+  children: (Node | string)[],
+  onClose: () => void,
+  over: Card['over'] = 'scene',
+): Card {
   const panel = element('div', { className: `card ${className}` }, children);
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-modal', 'false');
-  const node = element('div', { className: 'card-overlay' }, [panel]);
+  const node = element('div', { className: over === 'window' ? 'card-overlay over-window' : 'card-overlay' }, [panel]);
   let open = true;
   const onKey = (event: KeyboardEvent) => {
     if (event.key === 'Escape') card.close();
@@ -38,6 +48,7 @@ function overlay(className: string, children: (Node | string)[], onClose: () => 
   document.addEventListener('keydown', onKey);
   const card: Card = {
     node,
+    over,
     get open() {
       return open;
     },
@@ -144,6 +155,7 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
         : start,
     ],
     onClose,
+    'window',
   );
   start.addEventListener('click', () => card.close());
   takeKeyboard(card.node, start);

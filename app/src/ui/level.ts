@@ -296,12 +296,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     }
   };
 
-  // The cards over the scene: the start card, and the win card after a won run.
+  // The cards: the start card over the whole window (D228), in the screen's own node so
+  // that it leaves with the screen; the win card over the scene, inside its frame.
   let shownCard: Card | null = null;
   const showCard = (card: Card) => {
     shownCard?.close();
     shownCard = card;
-    sceneFrame.append(card.node);
+    (card.over === 'window' ? node : sceneFrame).append(card.node);
   };
   // The level's story, said by its speaker (D45): a name of the story's, through i18n.
   const speaker = typeof loaded.level.speaker === 'string' ? loaded.level.speaker : null;

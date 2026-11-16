@@ -10,6 +10,7 @@
     tools/art/repaint.py <scene> spaced
     tools/art/repaint.py <scene> tiled --section <name>
     tools/art/repaint.py <scene> placed --section <name>
+    tools/art/repaint.py <scene> pegs
 
 What to mend is the scene's settings' `repaint` (art/scenes/<scene>/cut.json,
 D82): the painting it starts from (`from`), how many pixels it grows by below
@@ -70,6 +71,17 @@ model asked again (a section with `picture` and its box `part`, in the picture's
 pixels, and `at`, the box it goes to, in cells): what lies inside the ellipse of
 that box, faded in over `fade` pixels: a hole the model painted large and clear,
 drawn at the size of its cell.
+
+`pegs` lays a rack's pegs one a cell (D195), without a model: the painted pegs
+(`painted`, boxes in pixels) are filled from the four sides round each, as `fill`
+fills a box; the rack's board (`board`, its box) is drawn out at each end by `grow`
+pixels: each end's piece (`ends`, `left` and `right`, its columns, and `edge`, the
+points of its outline down the end) moved out, only what lies inside the outline, and
+the gap filled with a stretch of the board near that end with no peg (`left_middle`,
+`right_middle`, columns); and the
+painting's own peg
+(`peg`, its box) is laid on the middle of each cell from the first column of `cells`
+to the last, at its own height, inside an ellipse faded over `fade` pixels.
 
 `fill` mends without a model: each box, a narrow upright strip, is painted row
 by row from the pixels just left and right of it, blended across, so that what
@@ -669,6 +681,48 @@ def placed(scene: str, section: str) -> Path:
     here = painting[top : top + height, left : left + width]
     painting[top : top + height, left : left + width] = here * (1 - alpha) + shown * alpha
     target = REPO / repaint["painting"]
+    Image.fromarray(painting.clip(0, 255).astype(np.uint8)).save(target)
+    return target
+
+
+def pegs(scene: str, section: str = "pegs") -> Path:
+    """The rack's pegs one a cell (D195): the painted ones filled from their sides, the
+    board drawn out at its ends, and the painting's peg laid on each cell's middle."""
+    settings = scene_settings.settings(scene)
+    rack = settings.data[section]
+    original = np.array(Image.open(REPO / rack["from"]).convert("RGB"))
+    painting = filled(original, rack["painted"], sides=4).astype(np.float32)
+    _, y0, _, y1 = rack["board"]
+    ends = rack["ends"]
+    grow = ends["grow"]
+    rows = np.arange(y0, y1)
+    for side, shift in (("left", -grow), ("right", grow)):
+        # A stretch of board near the end, whose outlines lie at the end's own height.
+        m0 = ends[f"{side}_middle"][0]
+        middle = painting[y0:y1, m0 : m0 + grow].copy()
+        c0, c1 = ends[side]
+        piece = painting[y0:y1, c0:c1].copy()
+        edge = np.array(ends[f"{side}_edge"], dtype=np.float32)
+        across = np.interp(rows, edge[:, 1], edge[:, 0])[:, None]
+        columns = np.arange(c0, c1)[None, :]
+        # What lies inside the board's outline, the outline with it, faded over two pixels.
+        inside = columns - across if side == "left" else across - columns
+        alpha = np.clip((inside + 5) / 2, 0, 1)[..., None]
+        target = painting[y0:y1, c0 + shift : c1 + shift]
+        painting[y0:y1, c0 + shift : c1 + shift] = target * (1 - alpha) + piece * alpha
+        gap = slice(c1 - grow, c1) if side == "left" else slice(c0, c0 + grow)
+        painting[y0:y1, gap] = middle
+    px0, py0, px1, py1 = rack["peg"]
+    peg = original[py0:py1, px0:px1].astype(np.float32)
+    width, height = px1 - px0, py1 - py0
+    alpha = ellipse_part(width, height, rack.get("fade", 3))[..., None]
+    gx = settings.grid["x"]
+    first, last = rack["cells"]
+    for column in range(first, last + 1):
+        left = round(gx["offset"] + (column + 0.5) * gx["spacing"] - width / 2)
+        here = painting[py0:py1, left : left + width]
+        painting[py0:py1, left : left + width] = here * (1 - alpha) + peg * alpha
+    target = REPO / rack["painting"]
     Image.fromarray(painting.clip(0, 255).astype(np.uint8)).save(target)
     return target
 
@@ -1283,11 +1337,11 @@ def main(arguments: list[str]) -> int:
         at = arguments.index("--section")
         section = arguments[at + 1]
         arguments = arguments[:at] + arguments[at + 2 :]
-    verbs = ("canvas", "join", "fill", "marks", "doorways", "spaced", "tiled", "placed")
+    verbs = ("canvas", "join", "fill", "marks", "doorways", "spaced", "tiled", "placed", "pegs")
     if len(arguments) < 2 or arguments[1] not in verbs:
         print(
             "usage: repaint.py <scene> canvas | join <picture> | fill | marks | doorways"
-            " | spaced | tiled | placed [--section <name>]"
+            " | spaced | tiled | placed | pegs [--section <name>]"
         )
         return 2
     if arguments[1] in ("marks", "doorways"):
@@ -1302,6 +1356,8 @@ def main(arguments: list[str]) -> int:
         print(tiled(arguments[0], section).relative_to(REPO))
     elif arguments[1] == "placed":
         print(placed(arguments[0], section).relative_to(REPO))
+    elif arguments[1] == "pegs":
+        print(pegs(arguments[0], "pegs" if section == "repaint" else section).relative_to(REPO))
     elif arguments[1] == "canvas":
         print(canvas(arguments[0], section).relative_to(REPO))
     elif arguments[1] == "fill":

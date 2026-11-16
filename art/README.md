@@ -694,12 +694,20 @@ friends' portraits wear their first colours.
 ## Sprites of things
 
 A kind of thing may be drawn from a picture of its own, the same on every scene
-(D182): the broom and the ring. Each is `content/art/things/<kind>.webp`, listed in
+(D182): the broom, lying or hung on a peg (`broom-hung`, D195), and the ring. Each is `content/art/things/<kind>.webp`, listed in
 `things.json` with its size in cells, the point of the picture that stands on its
 cell's lower edge (`foot`), and whether it lies flat (`lying`, drawn under whoever
 stands on it). A thing on a painted scene with no cut-out of its own is drawn from its
 kind's sprite at its cell, among the figures by its row; a broom hidden in the straw only
-once a program finds it (D184).
+once a program finds it (D184). A sprite that hangs says `anchor: "top"`: its `origin`
+is the point of the picture held, the hung broom's own peg, and its `foot` the point of
+the cell it is held at, the shed's peg, above the cell when the peg is.
+
+The shed's rack has a peg in the middle of each cell from column 6 to 13 (D195), laid
+by `tools/art/repaint.py the-broom-shed pegs` from the scene's `pegs` settings: the
+twelve pegs Gemini painted are filled from round them, the rack's board is drawn out
+at its ends, and the painting's own peg is laid on each cell's middle at its height.
+The scene is exported from that painting.
 
 A sprite is cut from a box of a picture by `tools/art/sprites.py sprite`:
 

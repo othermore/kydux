@@ -1,13 +1,41 @@
 {
   "broom": {
     "image": "broom.webp",
-    "size": [1.0, 0.39],
-    "foot": [0.5, 0.82],
+    "size": [
+      1.0,
+      0.39
+    ],
+    "foot": [
+      0.5,
+      0.82
+    ],
     "lying": true
   },
   "ring": {
     "image": "ring.webp",
-    "size": [1.4, 2.0],
-    "foot": [0.5, 0.88]
+    "size": [
+      1.4,
+      2.0
+    ],
+    "foot": [
+      0.5,
+      0.88
+    ]
+  },
+  "broom-hung": {
+    "image": "broom-hung.webp",
+    "size": [
+      0.264,
+      1.35
+    ],
+    "foot": [
+      0.5,
+      -0.354
+    ],
+    "origin": [
+      0.41,
+      0.068
+    ],
+    "anchor": "top"
   }
 }

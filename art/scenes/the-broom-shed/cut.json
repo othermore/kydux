@@ -3,9 +3,9 @@
   "sources": {
     "folder": "art/raw/game-broom-shed",
     "edits": "art/raw/game-broom-shed",
-    "painting": "game-broom-shed-nogrid.png",
+    "painting": "game-broom-shed-pegs.png",
     "grid": "grid.json",
-    "ground": "game-broom-shed-nogrid.png"
+    "ground": "game-broom-shed-pegs.png"
   },
   "things": {
     "front_wall": {
@@ -46,5 +46,152 @@
   "cuts": [],
   "castle": 0,
   "cut": false,
-  "source": "# The broom shed\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-broom-shed.md`, with the style of\n  `art/raw/image-first/field-2k.png`, then edited by it: without its grid\n  (`game-broom-shed-nogrid.md`).\n"
+  "source": "# The broom shed\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-broom-shed.md`, with the style of\n  `art/raw/image-first/field-2k.png`, then edited by it: without its grid\n  (`game-broom-shed-nogrid.md`).\n",
+  "pegs": {
+    "about": "The rack's pegs one a cell, columns 6 to 13 (D195): the painting's twelve filled from their sides, the board drawn out 40 pixels at each end, each end's piece moved out within its outline so that the first and the last peg hang on it, and the painting's first peg laid on each cell's middle at its own height. A hung broom hangs from the peg's point, things.json's broom-hung.",
+    "from": "art/raw/game-broom-shed/game-broom-shed-nogrid.png",
+    "painting": "art/raw/game-broom-shed/game-broom-shed-pegs.png",
+    "painted": [
+      [
+        1599,
+        1062,
+        1651,
+        1162
+      ],
+      [
+        1740,
+        1062,
+        1792,
+        1162
+      ],
+      [
+        1882,
+        1062,
+        1934,
+        1162
+      ],
+      [
+        2023,
+        1062,
+        2075,
+        1162
+      ],
+      [
+        2165,
+        1062,
+        2217,
+        1162
+      ],
+      [
+        2306,
+        1062,
+        2358,
+        1162
+      ],
+      [
+        2447,
+        1062,
+        2499,
+        1162
+      ],
+      [
+        2589,
+        1062,
+        2641,
+        1162
+      ],
+      [
+        2730,
+        1062,
+        2782,
+        1162
+      ],
+      [
+        2872,
+        1062,
+        2924,
+        1162
+      ],
+      [
+        3013,
+        1062,
+        3065,
+        1162
+      ],
+      [
+        3154,
+        1062,
+        3206,
+        1162
+      ]
+    ],
+    "board": [
+      1500,
+      1029,
+      3300,
+      1107
+    ],
+    "ends": {
+      "left": [
+        1540,
+        1612
+      ],
+      "left_edge": [
+        [
+          1556,
+          1027
+        ],
+        [
+          1551,
+          1044
+        ],
+        [
+          1550,
+          1065
+        ],
+        [
+          1569,
+          1106
+        ]
+      ],
+      "right": [
+        3194,
+        3262
+      ],
+      "right_edge": [
+        [
+          3253,
+          1027
+        ],
+        [
+          3251,
+          1072
+        ],
+        [
+          3232,
+          1106
+        ]
+      ],
+      "grow": 40,
+      "left_middle": [
+        1680,
+        1720
+      ],
+      "right_middle": [
+        3100,
+        3140
+      ]
+    },
+    "peg": [
+      1601,
+      1064,
+      1649,
+      1160
+    ],
+    "cells": [
+      6,
+      13
+    ],
+    "fade": 3
+  }
 }

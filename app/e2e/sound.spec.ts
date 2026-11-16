@@ -26,6 +26,37 @@ test('a step, a bump and a win each have their sound', async ({ page }) => {
   await expect(scene).toHaveAttribute('data-sound', 'win', { timeout: ciTimes(30_000) });
 });
 
+test('with the music off, the sound context sleeps after a run, and wakes for the next run before its first step (D231)', async ({
+  page,
+}) => {
+  await seedWizard(page);
+  await page.goto('/#settings');
+  await page.locator('#settings-music').fill('0');
+  await expect(page.locator('html')).toHaveAttribute('data-music', 'off');
+  // Nothing has sounded yet: the root says nothing of the context.
+  await expect(page.locator('html')).not.toHaveAttribute('data-audio', /./);
+  await page.evaluate(() => {
+    location.hash = '#level/the-long-corridor';
+  });
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
+  await page.locator('#speed').selectOption('4');
+  const root = page.locator('html');
+  const scene = page.locator('#scene');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_up()');
+  await page.locator('#run').click();
+  await expect(scene).toHaveAttribute('data-sound', 'fail', { timeout: ciTimes(30_000) });
+  await expect(root).toHaveAttribute('data-audio', 'asleep', { timeout: ciTimes(10_000) });
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_right(3)');
+  await page.locator('#run').click();
+  await expect(scene).toHaveAttribute('data-sounds', /step/, { timeout: ciTimes(30_000) });
+  await expect(root).toHaveAttribute('data-audio', 'awake');
+});
+
 test('the settings turn the sound off, and it stays off', async ({ page }) => {
   await page.goto('/#settings');
   const sound = page.locator('#settings-sound');

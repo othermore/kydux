@@ -2,9 +2,10 @@
 // effects are (sfx.ts): the wind of a flight (D185), a soft continuous rush of
 // filtered noise that starts as the broom lifts, swells a little with each flown
 // step and fades as it sets down. The steps' taps are not heard while flying.
-// The settings' switch silences it with the effects.
+// The settings' switch silences it with the effects. While it blows, it keeps the
+// sound context awake (D231).
 
-import { audio, isMuted, noise } from './sfx';
+import { audio, isMuted, keepAwake, noise, wake } from './sfx';
 
 /** How loud the wind is while a figure flies, how much louder at a flown step's
  * height, and how long it takes to come and to go, in seconds. */
@@ -29,7 +30,7 @@ export class Wind {
     this.blowing = true;
     const ctx = isMuted() ? null : audio();
     if (!ctx) return;
-    if (ctx.state === 'suspended') void ctx.resume();
+    keepAwake(this, true);
     const now = ctx.currentTime;
     const source = noise(ctx, 2);
     source.loop = true;
@@ -68,6 +69,9 @@ export class Wind {
     const [source, gain] = [this.source, this.gain];
     [this.source, this.gain, this.filter] = [null, null, null];
     if (!source || !gain || !ctx) return;
+    // The fade is a sound's end, which the context stays awake for.
+    wake(ctx, (now ? 0.02 : WIND_FADE) + 0.05);
+    keepAwake(this, false);
     const end = ctx.currentTime + (now ? 0.02 : WIND_FADE);
     gain.gain.cancelScheduledValues(ctx.currentTime);
     gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), ctx.currentTime);

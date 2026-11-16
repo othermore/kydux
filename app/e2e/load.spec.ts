@@ -295,7 +295,9 @@ for (const network of ['fast', 'slow'] as const) {
   }
 }
 
-test("the processor's time on the map, ten seconds with its theme playing and ten with none", async ({ browser }) => {
+test("the processor's time at rest, ten seconds: on the map with its theme playing and with none, and in a level after a run with the music off (D231)", async ({
+  browser,
+}) => {
   test.setTimeout(300_000);
   const context = await freshContext(browser);
   const page = await context.newPage();
@@ -307,18 +309,21 @@ test("the processor's time on the map, ten seconds with its theme playing and te
     const of = (name: string) => metrics.find((metric) => metric.name === name)?.value ?? 0;
     return { process: of('ProcessTime'), main: of('TaskDuration') };
   };
-  const tenSeconds = async (what: string, settle = 2000) => {
-    await page.goto('/#map');
-    await expect(page.locator('.map-screen')).toBeVisible({ timeout: 120_000 });
-    // A key pressed: a browser plays sound only after one.
-    await page.keyboard.press('Shift');
+  const tenSeconds = async (what: string, settle = 2000, where = 'map') => {
+    if (where === 'map') {
+      await page.goto('/#map');
+      await expect(page.locator('.map-screen')).toBeVisible({ timeout: 120_000 });
+      // A key pressed: a browser plays sound only after one.
+      await page.keyboard.press('Shift');
+    }
     await page.waitForTimeout(settle);
     const music = (await page.locator('html').getAttribute('data-music')) ?? 'none';
+    const audio = (await page.locator('html').getAttribute('data-audio')) ?? 'never';
     const before = await busy();
     await page.waitForTimeout(10_000);
     const after = await busy();
     keep({
-      screen: `map, 10 s, ${what}, music ${music}`,
+      screen: `${where}, 10 s, ${what}, music ${music}, context ${audio}`,
       cache: 'full',
       network: 'fast',
       files: 0,
@@ -342,6 +347,20 @@ test("the processor's time on the map, ten seconds with its theme playing and te
     await slider.fill('0');
     // The music fades out, and only then is its way to the speakers taken off.
     await tenSeconds('turned off', 10_000);
+    // The same page loaded again, the music off: nothing has sounded.
+    await page.reload();
+    await tenSeconds('nothing sounded', 2000);
+    // A level with the music off: a run's sounds, then rest.
+    await page.goto('/#level/the-long-corridor');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: 120_000 });
+    await tenSeconds('before any run', 2000, 'level');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_right(2)\nwizard.move_up()');
+    await page.locator('#run').click();
+    await expect(page.locator('#scene')).toHaveAttribute('data-sound', 'fail', { timeout: 60_000 });
+    await tenSeconds('after a run', 5000, 'level');
   }
   await context.close();
 });

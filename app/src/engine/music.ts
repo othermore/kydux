@@ -11,13 +11,14 @@
 // audio clock, through a reverb made of decaying noise, under the music's volume in the
 // settings; a change of loudness or of theme fades over two seconds. The music starts at
 // the first gesture on the page, as a browser asks, and is still while the tab is
-// hidden. A voice's volume may be set by hand while its theme plays (D203).
+// hidden. A voice's volume may be set by hand while its theme plays (D203). While a
+// theme plays or fades, the music keeps the sound context awake (D231, sfx.ts).
 //
 // The root element says what plays, for the tests: data-music (`waiting` for the
 // first gesture, `playing`, `off` with the volume at none), data-music-theme and
 // data-music-heard (`story` or `level`).
 
-import { audio, noise } from './sfx';
+import { audio, keepAwake, noise, setHidden as setAudioHidden, wake } from './sfx';
 import { contentUrl } from '../content/address';
 
 /** The kinds of voice the page sounds. */
@@ -496,15 +497,14 @@ class Music {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   /** The music's way to the speakers, its reverb with it: taken off while no theme
-   * plays, so that the audio thread does not work on silence (the sound effects share
-   * the context and keep it running). */
+   * plays, so that the audio thread does not work on silence while a sound effect keeps
+   * the context awake. */
   private chain: AudioNode[] = [];
   private connected = false;
   private playing: Playing | null = null;
   private wanted: { id: string; heard: Heard } | null = null;
   private volume = 0.6;
   private unlocked = false;
-  private hidden = false;
   private timer: ReturnType<typeof setInterval> | null = null;
   /** The theme being fetched, so that a later wish wins over an earlier one. */
   private asking = 0;
@@ -562,12 +562,10 @@ class Music {
     this.publish();
   }
 
-  /** The tab hidden or shown: the music waits while no one sees the page. */
+  /** The tab hidden or shown: the music waits while no one sees the page, and the
+   * context wakes when it shows only if something is to sound (sfx.ts). */
   setHidden(hidden: boolean): void {
-    this.hidden = hidden;
-    if (!this.ctx) return;
-    if (hidden && this.playing) void this.ctx.suspend();
-    if (!hidden && this.unlocked) void this.ctx.resume();
+    setAudioHidden(hidden);
   }
 
   private level(): number {
@@ -580,7 +578,7 @@ class Music {
     const ctx = this.ctx ?? audio();
     if (!ctx) return;
     this.setUp(ctx);
-    if (ctx.state === 'suspended' && !this.hidden) void ctx.resume();
+    wake(ctx);
     if (this.playing?.theme.id === wanted.id) {
       if (this.playing.heard !== wanted.heard) this.hear(this.playing, wanted.heard);
       return;
@@ -596,6 +594,8 @@ class Music {
     this.fadeOut(this.playing);
     this.connect();
     this.playing = this.begin(ctx, theme, wanted.heard);
+    this.ticking(true);
+    keepAwake(this, true);
     this.publish();
   }
 
@@ -611,7 +611,16 @@ class Music {
     this.master = master;
     this.chain = [master, reverb, wet];
     this.connect();
-    this.timer = setInterval(() => this.schedule(), EVERY * 1000);
+  }
+
+  /** The timer that schedules the next moments' notes: it runs while a theme plays or
+   * fades, and is stopped with the context's sleep (D231). */
+  private ticking(on: boolean): void {
+    if (on && !this.timer) this.timer = setInterval(() => this.schedule(), EVERY * 1000);
+    if (!on && this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   }
 
   private begin(ctx: AudioContext, theme: Theme, heard: Heard): Playing {
@@ -658,9 +667,13 @@ class Music {
   private stop(): void {
     this.fadeOut(this.playing);
     this.playing = null;
-    // Once the fade has ended and nothing plays, the way to the speakers is taken off.
+    // Once the fade has ended and nothing plays, the way to the speakers is taken off,
+    // and the music lets the context sleep.
     setTimeout(() => {
-      if (!this.playing) this.disconnect();
+      if (this.playing) return;
+      this.disconnect();
+      this.ticking(false);
+      keepAwake(this, false);
     }, (FADE + AHEAD + 2) * 1000);
   }
 
@@ -714,7 +727,7 @@ class Music {
 
   /** For the tests: the timer stopped. */
   dispose(): void {
-    if (this.timer) clearInterval(this.timer);
+    this.ticking(false);
   }
 }
 

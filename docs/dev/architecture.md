@@ -58,9 +58,10 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 one's time (flight.ts, D185), the tester's view of the cells,
                 the low and the high ones, the rings' order and the masks
                 (debug.ts, opened with ?debug), and the sound effects, made as
-                the game plays (sfx.ts), with the flight's wind, which lasts
-                while a figure flies (sound.ts, D185), and the chapters' music,
-                played from its notes (music.ts, D192)
+                the game plays on the page's one sound context, which sleeps
+                while nothing sounds (sfx.ts, D231), with the flight's wind,
+                which lasts while a figure flies (sound.ts, D185), and the
+                chapters' music, played from its notes (music.ts, D192)
   src/editor/   the child's editor, CodeMirror, a wrapped line's part hanging
                 under the line's own indentation (D223)
   src/fonts/    the two faces of the code's letter, bundled, each with its
@@ -2807,12 +2808,14 @@ one overturns stays, marked as superseded.
   start screen in the chapter the child is in; the settings and the creator leave what
   plays. A change of loudness or of theme fades over two seconds. The music starts at the
   first gesture on the page, as a browser asks, goes on across screens without a break,
-  and is still while the tab is hidden. The settings have the music's volume beside the
-  sounds' switch, a slider from none to full in five steps (`music`, 0.6 at first, kept
-  with the settings); at none no theme plays. The root element says what plays
-  (`data-music`: `waiting`, `playing`, `off`; `data-music-theme`; `data-music-heard`,
-  `story` or `level`), and `?debug#music` plays any theme alone, its voices to hand
-  (D203). The themes are original, written for this game as a score in
+  and is still while the tab is hidden. While a theme plays or fades it keeps the page's
+  one sound context awake, which otherwise sleeps three seconds after the last sound
+  (D231, `data-audio`: `asleep`, `awake`); Phaser makes no context of its own. The
+  settings have the music's volume beside the sounds' switch, a slider from none to full
+  in five steps (`music`, 0.6 at first, kept with the settings); at none no theme plays.
+  The root element says what plays (`data-music`: `waiting`, `playing`, `off`;
+  `data-music-theme`; `data-music-heard`, `story` or `level`), and `?debug#music` plays
+  any theme alone, its voices to hand (D203). The themes are original, written for this game as a score in
   `tools/sound/compose.py`, each melody a bar at a time and each section's harmony a chord
   a bar from which the accompaniments are made, and shipped under the GPL as the code is:
   *Arrival* (dusk, outdoors, glad: a march in four in G, a celesta's skipping tune over a

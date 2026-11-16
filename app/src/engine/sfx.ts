@@ -2,6 +2,14 @@
 // numbers for a small synthesizer, an oscillator or noise whose pitch slides
 // and whose loudness rises and falls, so that no sound file is loaded and the
 // same effect always sounds the same. The settings can silence them.
+//
+// The page's one audio context sleeps while nothing sounds (D231): it is awake while a
+// theme plays or fades (music.ts), while the wind blows (sound.ts), and until three
+// seconds after the last effect's end; then it is suspended, and its audio thread does
+// no work. Whatever is about to sound wakes it first, and schedules on its clock, which
+// stands still while it sleeps, so that the sound is whole. A hidden page's context is
+// suspended; shown again, it wakes only if something is to sound. The root element
+// says the state, data-audio: `asleep` or `awake`, nothing before the first sound.
 
 /** What an effect is made of: its wave, its pitch from start to end in hertz (for
  * noise, the lowpass filter's cutoff), its length in seconds, and how loud it is
@@ -68,6 +76,17 @@ export type EffectName = keyof typeof EFFECTS;
 
 let context: AudioContext | null = null;
 let muted = false;
+
+/** How long the context stays awake after the last sound's end, in seconds (D231). */
+export const AWAKE_AFTER = 3;
+/** What keeps the context awake for as long as it lasts: the music while a theme plays
+ * or fades, the wind while it blows. */
+const keepers = new Set<object>();
+/** When the last sound scheduled ends, on the page's clock, in milliseconds. */
+let soundsEnd = 0;
+let sleeper: ReturnType<typeof setTimeout> | null = null;
+let hidden = false;
+let said = false;
 /** The last effect played, for the tests: the page's data-sound says it. */
 let played: (name: EffectName) => void = () => {};
 
@@ -96,6 +115,72 @@ export function audio(): AudioContext | null {
     context = null;
   }
   return context;
+}
+
+function say(state: 'asleep' | 'awake'): void {
+  said = true;
+  const root = globalThis.document?.documentElement;
+  if (root) root.dataset.audio = state;
+}
+
+/** The context put to sleep once nothing keeps it awake and the last sound's end is
+ * AWAKE_AFTER seconds behind; the timer is set again by every sound. */
+function settle(): void {
+  if (sleeper) clearTimeout(sleeper);
+  sleeper = null;
+  if (!context || keepers.size > 0) return;
+  const wait = soundsEnd + AWAKE_AFTER * 1000 - Date.now();
+  sleeper = setTimeout(
+    () => {
+      sleeper = null;
+      if (!context || keepers.size > 0) return;
+      if (Date.now() < soundsEnd + AWAKE_AFTER * 1000) {
+        settle();
+        return;
+      }
+      if (context.state === 'running') void context.suspend();
+      say('asleep');
+    },
+    Math.max(0, wait),
+  );
+}
+
+/** The context woken before something sounds on it, for `seconds` at least: nothing
+ * wakes it while the page is hidden. */
+export function wake(ctx: AudioContext, seconds = 0): void {
+  soundsEnd = Math.max(soundsEnd, Date.now() + seconds * 1000);
+  if (!hidden) {
+    if (ctx.state === 'suspended') void ctx.resume();
+    say('awake');
+  }
+  settle();
+}
+
+/** Something that sounds for as long as it lasts keeps the context awake, or lets it
+ * go: the music, the wind. */
+export function keepAwake(who: object, awake: boolean): void {
+  if (awake) keepers.add(who);
+  else keepers.delete(who);
+  if (awake && context) wake(context);
+  else settle();
+}
+
+/** The page hidden or shown: hidden, the context is suspended; shown, it wakes only if
+ * something is to sound, a keeper or a sound not yet ended. */
+export function setHidden(value: boolean): void {
+  hidden = value;
+  if (!context) return;
+  if (hidden) {
+    if (context.state === 'running') void context.suspend();
+    if (said) say('asleep');
+  } else if (keepers.size > 0 || Date.now() < soundsEnd) {
+    wake(context);
+  }
+}
+
+/** How long an effect lasts, its notes after it with it, in seconds. */
+export function lasts(effect: Effect): number {
+  return effect.seconds + (effect.then ? lasts(effect.then) : 0);
 }
 
 export function noise(ctx: AudioContext, seconds: number): AudioBufferSourceNode {
@@ -151,6 +236,7 @@ export function play(name: EffectName, pitch = 1): void {
   if (muted) return;
   const ctx = audio();
   if (!ctx) return;
-  if (ctx.state === 'suspended') void ctx.resume();
-  sound(ctx, pitch === 1 ? EFFECTS[name] : pitched(EFFECTS[name], pitch), ctx.currentTime);
+  const effect = pitch === 1 ? EFFECTS[name] : pitched(EFFECTS[name], pitch);
+  wake(ctx, lasts(effect));
+  sound(ctx, effect, ctx.currentTime);
 }

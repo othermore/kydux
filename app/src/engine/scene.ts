@@ -2470,6 +2470,10 @@ export async function startScene(
       backgroundColor: '#1f2330',
       banner: false,
       scale: { mode: Phaser.Scale.RESIZE },
+      // Every sound is the page's own, on sfx.ts's one context, which sleeps while
+      // nothing sounds (D231): Phaser makes no context of its own, which would run
+      // from the first click to the level's end.
+      audio: { noAudio: true },
       scene,
     });
   });

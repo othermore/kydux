@@ -26,11 +26,10 @@ const move = (tick: number, flying: boolean, actor = 'wizard'): PlaybackEvent =>
 });
 
 describe('flying (D185)', () => {
-  it("draws a flying figure in its flying row's level frame, by the way it faces (D235)", () => {
-    expect(flyFrame(12, 'down')).toBe(36);
-    expect(flyFrame(12, 'left')).toBe(39);
-    expect(flyFrame(12, 'right')).toBe(42);
-    expect(flyFrame(12, 'up')).toBe(45);
+  it("draws a flying figure in its flying row's level frame, by the way it faces (D235, D241)", () => {
+    // The wizards' flying rows start at 14, Zarek's at 4.
+    expect((['down', 'left', 'right', 'up'] as const).map((way) => flyFrame(14, way))).toEqual([42, 45, 48, 51]);
+    expect((['down', 'left', 'right', 'up'] as const).map((way) => flyFrame(4, way))).toEqual([12, 15, 18, 21]);
     expect(flyFrame(undefined, 'down')).toBeNull();
   });
 

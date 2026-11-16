@@ -399,6 +399,78 @@ test.describe('the first flight', () => {
   });
 });
 
+/** The frame the wizard is drawn in, read on thirty frames of the screen in a row. */
+async function framesInARow(page: Page): Promise<string[]> {
+  return page.evaluate(
+    () =>
+      new Promise<string[]>((resolve) => {
+        const node = document.querySelector('#scene') as HTMLElement;
+        const seen: string[] = [];
+        const look = () => {
+          seen.push(node.dataset.wizardFrame ?? '');
+          if (seen.length < 30) requestAnimationFrame(look);
+          else resolve(seen);
+        };
+        requestAnimationFrame(look);
+      }),
+  );
+}
+
+/** A program run until the wizard is in the air facing `way`, its frame then read. */
+async function hoveringFrames(page: Page, code: string, way: string): Promise<string[]> {
+  await start(page, code);
+  await page.waitForFunction(
+    (facing) => {
+      const node = document.querySelector<HTMLElement>('#scene')?.dataset;
+      return node?.flying === 'wizard' && node.wizardFacing === facing && node.state === 'playing';
+    },
+    way,
+    { timeout: ciTimes(60_000) },
+  );
+  return framesInARow(page);
+}
+
+for (const wizard of [PABLO, MARTA]) {
+  test.describe(`the way ${wizard.name} faces in the air (D241)`, () => {
+    test.use({ locale: 'es-ES' });
+    test.beforeEach(({ page }) => seedWizard(page, wizard));
+
+    test('one frame, facing right, while it hovers: never turned by the frame it is drawn in', async ({ page }) => {
+      await open(page, 'the-first-flight', '1');
+      const frames = await hoveringFrames(page, 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.move_right(2)\nwizard.wait(60)\n', 'right');
+      expect(new Set(frames)).toEqual(new Set(['48']));
+      await expect(scene(page)).toHaveAttribute('data-wizard-facing', 'right');
+      await page.locator('.scene-frame').screenshot({ path: `${SHOTS}${wizard.name}-air-right.png` });
+    });
+
+    for (const [code, way, frame] of [
+      ['wizard.cast("drevo")\nwizard.move_right(1)\nwizard.move_up(1)\nwizard.wait(60)\n', 'up', '51'],
+      ['wizard.cast("drevo")\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(1)\nwizard.wait(60)\n', 'down', '42'],
+      ['wizard.cast("drevo")\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_left(1)\nwizard.wait(60)\n', 'left', '45'],
+    ] as const) {
+      test(`one frame, facing ${way}, in Los aros`, async ({ page }) => {
+        await open(page, 'the-rings', '1');
+        expect(new Set(await hoveringFrames(page, code, way))).toEqual(new Set([frame]));
+        await page.locator('.scene-frame').screenshot({ path: `${SHOTS}${wizard.name}-air-${way}.png` });
+      });
+    }
+  });
+}
+
+test.describe('the way a landing leaves the wizard facing (D241)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("El primer vuelo's own program: landed facing right, in its standing frame", async ({ page }) => {
+    await open(page, 'the-first-flight');
+    expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute('data-flying', '');
+    await expect(scene(page)).toHaveAttribute('data-wizard-facing', 'right');
+    // Facing right, the standing frame of its row: 2 * 3 + 1.
+    await expect(scene(page)).toHaveAttribute('data-wizard-frame', '7');
+  });
+});
+
 /** A flight that hovers: the wizard walks to the broom, lifts and waits in the air for
  * sixty ticks, eight seconds at speed 1 (D235, D236). */
 const HOVERING = 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.wait(60)\n';

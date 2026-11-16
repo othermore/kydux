@@ -36,7 +36,9 @@
 // cells under an open door's leaf, debug.ts), data-sprite-things (each thing drawn
 // from its kind's sprite, "id:kind:x,y" joined by ";", D182), data-found (the
 // hidden things found and seen, joined by ",", D184), data-untied (the brooms
-// untied, D183), data-flying (the figures in the air, joined by ",", D185),
+// untied, D183), data-wizard-facing (the way the wizard faces, as the scene keeps it,
+// D241), data-wizard-frame (the name of the frame the wizard is drawn in), data-flying
+// (the figures in the air, joined by ",", D185),
 // data-hover (the hover's clock, in whole milliseconds, which stands while the
 // program does not play, D235), data-wind (`on` while a flight's wind blows: while
 // the program plays and the wizard is in the air, D236), data-wind-swells (the wind's
@@ -95,7 +97,6 @@ import {
   drawMark,
   MARK_RADIUS,
   drawSleepMark,
-  facingOf,
   figureName,
   flyRowOf,
   hourKey,
@@ -360,6 +361,8 @@ class LevelScene extends Phaser.Scene {
     { shadow: Phaser.GameObjects.Ellipse; way: 'up' | 'down'; past: number; raise: number }
   >();
   private readonly wind = new Wind();
+  /** The way each figure faces (D241), kept by its sprite. */
+  private readonly ways = new Map<Phaser.GameObjects.Sprite, Facing>();
   /** The way of the wizard's last flown move, none after a lift, a landing or a
    * restart, and the swells of the wind this run, counted with the ticks shown, so the
    * same when the slider plays them again (D236). */
@@ -420,6 +423,7 @@ class LevelScene extends Phaser.Scene {
    * figure keeps the way it last faced upward or downward, which says on which side of a
    * ring's plane it is in the ring's cell (D232). */
   private face(sprite: Phaser.GameObjects.Sprite, facing: Facing, step = this.art?.figures?.standing ?? 1): void {
+    this.ways.set(sprite, facing);
     const flying = this.flyers.get(sprite);
     if (flying && (facing === 'up' || facing === 'down')) flying.way = facing;
     if (sprite.texture.key.startsWith('fig-')) sprite.setFrame(SHEET_ROW[facing] * 3 + step);
@@ -457,8 +461,18 @@ class LevelScene extends Phaser.Scene {
     if (id === 'wizard' || id === 'friend') {
       this.parentNode.dataset[id === 'wizard' ? 'wizardFigure' : 'friendFigure'] = drawn ? name : 'placeholder';
     }
-    if (figures && drawn) return drawFigure(this, figures, name, this.figureAt(tile), facing);
-    return this.add.sprite(...centre(tile), placeholder, facing).setOrigin(0.5, 0.6);
+    const sprite =
+      figures && drawn
+        ? drawFigure(this, figures, name, this.figureAt(tile), facing)
+        : this.add.sprite(...centre(tile), placeholder, facing).setOrigin(0.5, 0.6);
+    this.ways.set(sprite, facing);
+    return sprite;
+  }
+
+  /** The way a figure faces, as the scene keeps it (D241): set where it is placed and
+   * where it is turned, never read back from the frame it shows; down where none is. */
+  private wayOf(sprite: Phaser.GameObjects.Sprite): Facing {
+    return this.ways.get(sprite) ?? 'down';
   }
 
   /** A door's look, shut or open: its painted state, or, on a scene with no painting of
@@ -875,6 +889,12 @@ class LevelScene extends Phaser.Scene {
     const world = [view.x, view.y, view.width, view.height].map((v) => (v / TILE).toFixed(2)).join(',');
     if (this.parentNode.dataset.world !== world) this.parentNode.dataset.world = world;
     if (this.flyers.size > 0 || this.parentNode.dataset.flying) this.flyFrames();
+    // The wizard's way as the scene keeps it, and the frame it is drawn in (D241).
+    const dataset = this.parentNode.dataset;
+    const facing = this.wizardFacing();
+    if (dataset.wizardFacing !== facing) dataset.wizardFacing = facing;
+    const frame = String(this.wizard.frame.name);
+    if (dataset.wizardFrame !== frame) dataset.wizardFrame = frame;
     // On a painted scene the figures go behind what stands in front of them (D76).
     if (this.art) {
       if (!this.asleep.get(this.wizard)?.lying && !this.hopping.has(this.wizard)) {
@@ -1321,7 +1341,7 @@ class LevelScene extends Phaser.Scene {
     const shadow = this.add
       .ellipse(sprite.x, sprite.y, TILE * 0.55, TILE * 0.18, 0x000000, 0.22)
       .setDepth(sprite.depth - 0.0004);
-    const facing = sprite === this.wizard ? this.wizardFacing() : facingOf(sprite);
+    const facing = this.wayOf(sprite);
     this.flyers.set(sprite, { shadow, way: facing === 'down' ? 'down' : 'up', past: 0, raise: 0 });
     if (sprite !== this.wizard) return;
     this.lastFlownWay = null;
@@ -1357,7 +1377,7 @@ class LevelScene extends Phaser.Scene {
     flying.shadow.destroy();
     this.flyers.delete(sprite);
     this.restOrigin(sprite);
-    const facing = sprite === this.wizard ? this.wizardFacing() : facingOf(sprite);
+    const facing = this.wayOf(sprite);
     this.face(sprite, facing);
     if (sprite !== this.wizard) return;
     this.lastFlownWay = null;
@@ -1394,7 +1414,7 @@ class LevelScene extends Phaser.Scene {
       const id = sprite === this.wizard ? 'wizard' : this.idOf(sprite);
       const figures = this.art?.figures;
       const name = sprite.texture.key.replace(/^fig-/, '');
-      const facing = sprite === this.wizard ? this.wizardFacing() : facingOf(sprite);
+      const facing = this.wayOf(sprite);
       const frame = figures && sprite.texture.key.startsWith('fig-') ? flyFrame(flyRowOf(figures, name), facing) : null;
       if (frame !== null && sprite.texture.frameTotal - 1 > frame) sprite.setFrame(frame);
       const ring = throughRing([sprite.x / TILE, sprite.y / TILE], this.ringTiles, way, this.art ? FOOT_IN_CELL : 0.5);
@@ -1874,7 +1894,7 @@ class LevelScene extends Phaser.Scene {
     this.stopCast();
     const figures = this.art?.figures;
     if (!figures || this.still && part !== 'cast') return null;
-    const timers = playFrames(this, this.wizard, figures, part, duration);
+    const timers = playFrames(this, this.wizard, figures, part, duration, this.wizardFacing());
     if (!timers) return null;
     if (part === 'cast') this.parentNode.dataset.casting = 'true';
     else this.parentNode.dataset.acting = part;
@@ -1978,10 +1998,9 @@ class LevelScene extends Phaser.Scene {
     delete this.parentNode.dataset.acting;
   }
 
-  /** The way the wizard faces, read from its figure. */
+  /** The way the wizard faces, as the scene keeps it (D241). */
   private wizardFacing(): Facing {
-    if (this.wizard.texture.key.startsWith('fig-')) return facingOf(this.wizard);
-    return isFacing(this.wizard.frame.name) ? this.wizard.frame.name : 'down';
+    return this.wayOf(this.wizard);
   }
 
   /** A spell cast (D42, D81): a point of light leaves the wand's tip once the wand

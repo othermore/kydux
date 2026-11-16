@@ -3,7 +3,8 @@
 // figures from their sheets, the pencil grid, the goal's beating mark and the
 // sealed doors' glow (D79); and what moves when a spell is cast (D81): the
 // wizard's casting frames, a door passing through its states, a seal breaking.
-// scene.ts holds what changes as a run plays and calls these to draw; a scene
+// scene.ts holds what changes as a run plays and calls these to draw, the way each
+// figure faces among it (D241): nothing here reads a way back from a frame; a scene
 // without art is drawn by placeholders.ts.
 
 import Phaser from 'phaser';
@@ -163,7 +164,6 @@ export async function loadArt(level: LevelJson): Promise<Art | null> {
 /** The rows of a figure's sheet, by the way it faces: four rows of walking frames,
  * and on the wizard's, four rows of casting frames after them, in the same order. */
 export const SHEET_ROW: Record<Facing, number> = { down: 0, left: 1, right: 2, up: 3 };
-const FACING_OF_ROW: readonly Facing[] = ['down', 'left', 'right', 'up'];
 /** How much a painted scene's pixels are scaled to the scene's tiles. */
 export function artScale(art: Art): number {
   return TILE / art.scene.cell;
@@ -520,29 +520,23 @@ export function drawFigure(
   return sprite;
 }
 
-/** The way a figure drawn from its sheet faces, read from the frame it shows. */
-export function facingOf(sprite: Phaser.GameObjects.Sprite): Facing {
-  const frame = Number(sprite.frame.name);
-  return FACING_OF_ROW[Math.floor((Number.isFinite(frame) ? frame : 0) / 3) % 4] ?? 'down';
-}
-
 /** The wizard playing a part of its sheet, the way it faces: casting, the wand
  * raised, pointed and lowered; picking up, bending, both hands at the ground in
  * front of its feet and half up again; or, facing down, celebrating, the arms up,
  * a jump and down; then standing again, the way it faced. The middle frame lasts longest: the wand pointed while its light
  * flies, the hand at the ground while the thing goes. Gives the timers that step
  * the frames, for the scene to drop if the level starts again meanwhile; null
- * for a sheet without that part. */
+ * for a sheet without that part. `facing` is the way the scene keeps for it (D241). */
 export function playFrames(
   scene: Phaser.Scene,
   sprite: Phaser.GameObjects.Sprite,
   figures: FigureArt,
   part: Played,
   duration: number,
+  facing: Facing,
 ): Phaser.Time.TimerEvent[] | null {
   const first = figures.rows?.[part];
   if (first === undefined || !sprite.texture.key.startsWith('fig-')) return null;
-  const facing = facingOf(sprite);
   // Casting and picking up have a row for each way; celebrating, one facing down.
   const row = part === 'win' ? first : first + SHEET_ROW[facing];
   // A sheet's frames, and Phaser's whole-image frame besides them.

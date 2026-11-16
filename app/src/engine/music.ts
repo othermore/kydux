@@ -2,25 +2,25 @@
 // by the page with Web Audio, as the effects are (sfx.ts): no sound file is loaded. A
 // theme is content/music/<id>.json: its tempo, its metre, its voices, each of a kind
 // the page knows how to sound (a celesta's bell, a bowed string pad, a plucked string,
-// a harp, a flute, a soft drum), and its sections of notes, which follow one another
-// and loop without a seam; its `full` arrangement plays every voice it names, its
-// `quiet` one fewer, a little lower. A story and the map play `full`, a lesson and a
-// level `quiet`. The bowed pad is the body under the other voices (D203): low in the
+// a harp, a flute, a piano's struck tone, a soft drum), and its sections of notes, which
+// follow one another and loop without a seam. A theme has one set of voices (D210): a
+// story and the map play every one at its written loudness, a lesson and a level every
+// one, lower. The bowed pad is the body under the other voices (D203): low in the
 // mix, and one unbroken sound, each of its lines sliding from a note to the next
 // without a breath between them. The notes are scheduled a little ahead on the audio
 // clock, through a reverb made of decaying noise, under the music's volume in the
-// settings; a change of arrangement or of theme fades over two seconds. The music
+// settings; a change of loudness or of theme fades over two seconds. The music
 // starts at the first gesture on the page, as a browser asks, and is still while the
 // tab is hidden. A voice's volume may be set by hand while its theme plays (D203).
 //
 // The root element says what plays, for the tests: data-music (`waiting` for the
 // first gesture, `playing`, `off` with the volume at none), data-music-theme and
-// data-music-arrangement.
+// data-music-heard (`story` or `level`).
 
 import { audio, noise } from './sfx';
 
 /** The kinds of voice the page sounds. */
-export const VOICE_KINDS = ['celesta', 'strings', 'pluck', 'harp', 'flute', 'drum'] as const;
+export const VOICE_KINDS = ['celesta', 'strings', 'pluck', 'harp', 'flute', 'piano', 'drum'] as const;
 export type VoiceKind = (typeof VOICE_KINDS)[number];
 
 /** A note: its pitch (a MIDI number, 60 the middle C), its start and its length in
@@ -40,7 +40,9 @@ export interface Section {
   notes: Record<string, Note[]>;
 }
 
-export type Arrangement = 'full' | 'quiet';
+/** Where a theme is heard (D210): in a story, on the map and the start screen, at its
+ * written loudness; in a lesson and a level, every voice lower. */
+export type Heard = 'story' | 'level';
 
 export interface Theme {
   id: string;
@@ -48,8 +50,6 @@ export interface Theme {
   tempo: number;
   metre: [beats: number, unit: number];
   voices: Record<string, Voice>;
-  /** The voices each arrangement plays. */
-  arrangements: Record<Arrangement, string[]>;
   sections: Section[];
   /** The sections in the order they are played, by id; every section once, in the
    * file's order, when it is not given. */
@@ -74,9 +74,9 @@ export interface Loop {
 /** How loud the music is at its fullest: a note of the tune about as loud as a step, the
  * effects above it (0.2 for a cast). */
 const LEVEL = 0.5;
-/** The quiet arrangement's share of the full one's loudness. */
-const QUIET = 0.7;
-/** How long a change of arrangement or of theme takes, in seconds. */
+/** A lesson's and a level's share of a story's loudness (D210). */
+const LOWER = 0.7;
+/** How long a change of loudness or of theme takes, in seconds. */
 export const FADE = 2;
 /** How far ahead of the audio clock the notes are scheduled, and how often, in seconds. */
 const AHEAD = 0.3;
@@ -148,22 +148,17 @@ export function frequency(pitch: number): number {
   return 440 * 2 ** ((pitch - 69) / 12);
 }
 
-/** Each voice's loudness in an arrangement: its own where the arrangement plays it,
- * none where it does not, the quiet arrangement's a little lower. A voice in `mixed`
- * has the volume given there in the place of its own, whether the arrangement plays
- * it or not: the page of themes sets it by hand (D203). */
-export function arranged(
+/** Each voice's loudness where the theme is heard: its own in a story, every one lower
+ * in a lesson and a level (D210). A voice in `mixed` has the volume given there in the
+ * place of its own, none to silence it: the page of themes sets it by hand (D203). */
+export function voiceLevels(
   theme: Theme,
-  arrangement: Arrangement,
+  heard: Heard,
   mixed: Readonly<Record<string, number>> = {},
 ): Record<string, number> {
-  const playing = new Set(theme.arrangements[arrangement]);
-  const share = arrangement === 'quiet' ? QUIET : 1;
+  const share = heard === 'level' ? LOWER : 1;
   return Object.fromEntries(
-    Object.entries(theme.voices).map(([name, voice]) => {
-      const volume = mixed[name] ?? (playing.has(name) ? voice.volume : 0);
-      return [name, volume * share];
-    }),
+    Object.entries(theme.voices).map(([name, voice]) => [name, (mixed[name] ?? voice.volume) * share]),
   );
 }
 
@@ -198,12 +193,7 @@ export function readTheme(value: unknown): Theme {
   for (const [name, voice] of Object.entries(theme.voices ?? {})) {
     if (!VOICE_KINDS.includes(voice.kind)) throw new Error(`${theme.id}: ${name} is of no kind the page sounds`);
   }
-  for (const arrangement of ['full', 'quiet'] as const) {
-    const names = theme.arrangements?.[arrangement];
-    if (!Array.isArray(names) || names.some((name) => !(name in theme.voices))) {
-      throw new Error(`${theme.id}: its ${arrangement} arrangement names its own voices`);
-    }
-  }
+  if ('arrangements' in theme) throw new Error(`${theme.id}: a theme has one set of voices, no arrangements (D210)`);
   if (!Array.isArray(theme.sections) || theme.sections.length === 0) throw new Error(`${theme.id}: it has sections`);
   return theme;
 }
@@ -317,9 +307,15 @@ function bowed(ctx: AudioContext, lines: Line[], pitch: number, at: number, seco
   line.pitch = pitch;
 }
 
+/** How long a piano's note rings, in seconds, by its pitch alone: a struck tone dies
+ * away by itself, however long the note is written (D209); a low one rings longer. */
+export function pianoRing(pitch: number): number {
+  return Math.min(3.2, Math.max(0.8, 2 * 2 ** ((60 - pitch) / 24)));
+}
+
 /** One note of a voice that is struck, plucked or blown, from `at` for `seconds`, into
- * `out`. */
-function sound(
+ * `out`; the time its sound ends. */
+export function sound(
   ctx: AudioContext,
   kind: Exclude<VoiceKind, 'strings'>,
   pitch: number,
@@ -327,14 +323,16 @@ function sound(
   seconds: number,
   loudness: number,
   out: AudioNode,
-): void {
+): number {
   const hertz = frequency(pitch);
   const gain = ctx.createGain();
   gain.connect(out);
+  let ends = at;
   switch (kind) {
     case 'celesta': {
       // A bell: a pure tone and its fourth partial, struck and dying away.
       const end = envelope(gain, at, loudness * 0.5, 0.004, 0, Math.max(1.4, seconds));
+      ends = end;
       oscillator(ctx, 'sine', hertz, at, end).connect(gain);
       const shine = ctx.createGain();
       shine.gain.setValueAtTime(0.18, at);
@@ -351,6 +349,7 @@ function sound(
       filter.connect(gain);
       const end = envelope(gain, at, loudness * 0.45, 0.003, 0, Math.min(0.6, Math.max(0.25, seconds)));
       oscillator(ctx, 'triangle', hertz, at, end).connect(filter);
+      ends = end;
       break;
     }
     case 'harp': {
@@ -362,6 +361,24 @@ function sound(
       filter.connect(gain);
       const end = envelope(gain, at, loudness * 0.4, 0.004, 0, Math.max(1.6, seconds));
       oscillator(ctx, 'triangle', hertz, at, end).connect(filter);
+      ends = end;
+      break;
+    }
+    case 'piano': {
+      // A piano: a struck tone, bright at the hammer's blow and mellowing as it dies
+      // away by itself, its second partial a little out of tune with the first.
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(Math.min(9000, hertz * 9), at);
+      filter.frequency.exponentialRampToValueAtTime(Math.min(4000, hertz * 2.5), at + 0.4);
+      filter.connect(gain);
+      const end = envelope(gain, at, loudness * 0.42, 0.003, 0, pianoRing(pitch));
+      oscillator(ctx, 'triangle', hertz, at, end).connect(filter);
+      const second = ctx.createGain();
+      second.gain.setValueAtTime(0.22, at);
+      second.gain.exponentialRampToValueAtTime(0.001, at + Math.min(1, pianoRing(pitch)));
+      oscillator(ctx, 'sine', hertz * 2.003, at, end).connect(second).connect(filter);
+      ends = end;
       break;
     }
     case 'flute': {
@@ -384,6 +401,7 @@ function sound(
       breath.connect(band).connect(breathGain).connect(gain);
       breath.start(at);
       breath.stop(at + Math.min(0.2, seconds));
+      ends = end;
       break;
     }
     case 'drum': {
@@ -402,9 +420,11 @@ function sound(
       brush.connect(filter).connect(brushGain).connect(gain);
       brush.start(at);
       brush.stop(at + 0.1);
+      ends = end;
       break;
     }
   }
+  return ends;
 }
 
 /** A theme as it plays: where its beat 0 lies on the audio clock, how far its notes
@@ -415,7 +435,7 @@ interface Playing {
   zero: number;
   /** The audio clock's time up to which the notes are scheduled. */
   scheduled: number;
-  arrangement: Arrangement;
+  heard: Heard;
   out: GainNode;
   voices: Map<string, GainNode>;
   /** The lines of each bowed pad, by the voice's name. */
@@ -427,7 +447,7 @@ class Music {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private playing: Playing | null = null;
-  private wanted: { id: string; arrangement: Arrangement } | null = null;
+  private wanted: { id: string; heard: Heard } | null = null;
   private volume = 0.6;
   private unlocked = false;
   private hidden = false;
@@ -448,11 +468,12 @@ class Music {
     this.publish();
   }
 
-  /** The theme to play, in an arrangement: from now, or from the first gesture. Another
-   * theme, or another arrangement, plays as its file says, with no voice set by hand. */
-  play(id: string, arrangement: Arrangement): void {
-    if (this.wanted?.id !== id || this.wanted.arrangement !== arrangement) this.mixed = {};
-    this.wanted = { id, arrangement };
+  /** The theme to play, heard as a story or a level hears it: from now, or from the
+   * first gesture. Another theme, or the same heard elsewhere, plays as its file says,
+   * with no voice set by hand. */
+  play(id: string, heard: Heard): void {
+    if (this.wanted?.id !== id || this.wanted.heard !== heard) this.mixed = {};
+    this.wanted = { id, heard };
     void this.start();
     this.publish();
   }
@@ -464,7 +485,7 @@ class Music {
     else this.mixed[voice] = Math.min(1, Math.max(0, volume));
     const playing = this.playing;
     if (!playing || !this.ctx || playing.theme.id !== this.wanted?.id) return;
-    const level = arranged(playing.theme, playing.arrangement, this.mixed)[voice];
+    const level = voiceLevels(playing.theme, playing.heard, this.mixed)[voice];
     playing.voices.get(voice)?.gain.setTargetAtTime(level ?? 0, this.ctx.currentTime, 0.05);
   }
 
@@ -474,9 +495,9 @@ class Music {
   }
 
   /** What the page asked to play, and whether it plays. */
-  get state(): { music: string; theme?: string; arrangement?: Arrangement } {
+  get state(): { music: string; theme?: string; heard?: Heard } {
     const music = this.volume === 0 ? 'off' : !this.unlocked ? 'waiting' : this.playing ? 'playing' : 'still';
-    return { music, theme: this.wanted?.id, arrangement: this.wanted?.arrangement };
+    return { music, theme: this.wanted?.id, heard: this.wanted?.heard };
   }
 
   /** The first gesture on the page: the browser lets sound start. */
@@ -507,7 +528,7 @@ class Music {
     this.setUp(ctx);
     if (ctx.state === 'suspended' && !this.hidden) void ctx.resume();
     if (this.playing?.theme.id === wanted.id) {
-      if (this.playing.arrangement !== wanted.arrangement) this.arrange(this.playing, wanted.arrangement);
+      if (this.playing.heard !== wanted.heard) this.hear(this.playing, wanted.heard);
       return;
     }
     const asked = (this.asking += 1);
@@ -519,7 +540,7 @@ class Music {
     }
     if (asked !== this.asking || this.wanted !== wanted || this.volume === 0) return;
     this.fadeOut(this.playing);
-    this.playing = this.begin(ctx, theme, wanted.arrangement);
+    this.playing = this.begin(ctx, theme, wanted.heard);
     this.publish();
   }
 
@@ -538,13 +559,13 @@ class Music {
     this.timer = setInterval(() => this.schedule(), EVERY * 1000);
   }
 
-  private begin(ctx: AudioContext, theme: Theme, arrangement: Arrangement): Playing {
+  private begin(ctx: AudioContext, theme: Theme, heard: Heard): Playing {
     const out = ctx.createGain();
     const now = ctx.currentTime;
     out.gain.setValueAtTime(0.0001, now);
     out.gain.exponentialRampToValueAtTime(1, now + FADE);
     out.connect(this.master as GainNode);
-    const levels = arranged(theme, arrangement, this.mixed);
+    const levels = voiceLevels(theme, heard, this.mixed);
     const voices = new Map<string, GainNode>();
     for (const name of Object.keys(theme.voices)) {
       const gain = ctx.createGain();
@@ -552,16 +573,17 @@ class Music {
       gain.connect(out);
       voices.set(name, gain);
     }
-    return { theme, loop: loopOf(theme), zero: now + 0.1, scheduled: now + 0.1, arrangement, out, voices, lines: new Map() };
+    return { theme, loop: loopOf(theme), zero: now + 0.1, scheduled: now + 0.1, heard, out, voices, lines: new Map() };
   }
 
-  private arrange(playing: Playing, arrangement: Arrangement): void {
+  /** The theme that plays heard elsewhere: every voice fades to its loudness there. */
+  private hear(playing: Playing, heard: Heard): void {
     const ctx = this.ctx as AudioContext;
-    const levels = arranged(playing.theme, arrangement, this.mixed);
+    const levels = voiceLevels(playing.theme, heard, this.mixed);
     for (const [name, gain] of playing.voices) {
       gain.gain.setTargetAtTime(levels[name] ?? 0, ctx.currentTime, FADE / 4);
     }
-    playing.arrangement = arrangement;
+    playing.heard = heard;
     this.publish();
   }
 
@@ -583,8 +605,8 @@ class Music {
     this.playing = null;
   }
 
-  /** The notes of the next moments, on the audio clock: the voices the arrangement
-   * silences are scheduled too, so that a change of arrangement fades them in. */
+  /** The notes of the next moments, on the audio clock: a voice silenced by hand is
+   * scheduled too, so that it sounds again at once when it is let. */
   private schedule(): void {
     const ctx = this.ctx;
     const playing = this.playing;
@@ -610,10 +632,10 @@ class Music {
 
   private publish(): void {
     const root = document.documentElement.dataset;
-    const { music, theme, arrangement } = this.state;
+    const { music, theme, heard } = this.state;
     root.music = music;
     if (theme) root.musicTheme = theme;
-    if (arrangement) root.musicArrangement = arrangement;
+    if (heard) root.musicHeard = heard;
   }
 
   /** For the tests: the timer stopped. */

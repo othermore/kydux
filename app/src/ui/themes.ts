@@ -1,11 +1,12 @@
 // The page under ?debug that plays any of the music's themes (D192), `#music`: each
-// theme in content/music/, in its full and its quiet arrangement, to be heard alone.
+// theme in content/music/, as a story plays it and as a level plays it, lower (D210),
+// to be heard alone.
 // Over the list are the voices of the theme that plays (D203), each with a box that
 // silences it or lets it sound and a slider for its volume, set by hand while the theme
 // plays, and a line that says what is set apart from the theme's file, to be told to
 // who writes it.
 
-import { type Arrangement, music, type Theme, themeNamed } from '../engine/music';
+import { type Heard, music, type Theme, themeNamed } from '../engine/music';
 import { t } from '../i18n';
 import { element } from './dom';
 import type { Screen } from './screen';
@@ -16,16 +17,16 @@ interface Mixed {
   volume: number;
 }
 
-/** The theme whose voices the page shows, in the arrangement it plays. */
+/** The theme whose voices the page shows, and where it is heard. */
 interface Shown {
   theme: Theme;
-  arrangement: Arrangement;
+  heard: Heard;
   voices: Map<string, Mixed>;
 }
 
-/** A voice as the theme's file has it in an arrangement. */
-function written(theme: Theme, arrangement: Arrangement, name: string): Mixed {
-  return { on: theme.arrangements[arrangement].includes(name), volume: theme.voices[name]?.volume ?? 0 };
+/** A voice as the theme's file has it: sounding, at its volume. */
+function written(theme: Theme, name: string): Mixed {
+  return { on: true, volume: theme.voices[name]?.volume ?? 0 };
 }
 
 /** What is set apart from the theme's file, as `strings 0.30, flute off`; '' when
@@ -33,7 +34,7 @@ function written(theme: Theme, arrangement: Arrangement, name: string): Mixed {
 function mixSaid(shown: Shown, off: string): string {
   const parts: string[] = [];
   for (const [name, mixed] of shown.voices) {
-    const file = written(shown.theme, shown.arrangement, name);
+    const file = written(shown.theme, name);
     if (mixed.on !== file.on) parts.push(mixed.on ? `${name} ${mixed.volume.toFixed(2)}` : `${name} ${off}`);
     else if (mixed.on && mixed.volume !== file.volume) parts.push(`${name} ${mixed.volume.toFixed(2)}`);
   }
@@ -47,8 +48,8 @@ export function themesScreen(themes: string[]): Screen {
 
   const draw = () => {
     const said = element('p', { id: 'themes-playing', className: 'status' });
-    const { theme: playing, arrangement } = music.state;
-    said.textContent = playing ? t('debug.music.playing', { theme: playing, arrangement: arrangement ?? '' }) : '';
+    const { theme: playing, heard } = music.state;
+    said.textContent = playing ? t('debug.music.playing', { theme: playing, heard: heard ? t(`debug.music.${heard}`) : '' }) : '';
     node.replaceChildren(
       element('h2', {}, [t('debug.music.title')]),
       said,
@@ -60,10 +61,10 @@ export function themesScreen(themes: string[]): Screen {
           element('li', {}, [
             element('code', {}, [theme]),
             ' ',
-            ...(['full', 'quiet'] as const).map((each) => {
+            ...(['story', 'level'] as const).map((each) => {
               const button = element('button', { type: 'button' }, [t(`debug.music.${each}`)]);
               button.dataset.theme = theme;
-              button.dataset.arrangement = each;
+              button.dataset.heard = each;
               button.addEventListener('click', () => play(theme, each));
               return button;
             }),
@@ -73,18 +74,18 @@ export function themesScreen(themes: string[]): Screen {
     );
   };
 
-  const play = (theme: string, arrangement: Arrangement) => {
+  const play = (theme: string, heard: Heard) => {
     music.unlock();
     music.unmix();
-    music.play(theme, arrangement);
+    music.play(theme, heard);
     shown = null;
     draw();
     const mine = (asked += 1);
     void themeNamed(theme)
       .then((found) => {
         if (mine !== asked) return;
-        const voices = new Map(Object.keys(found.voices).map((name) => [name, written(found, arrangement, name)]));
-        shown = { theme: found, arrangement, voices };
+        const voices = new Map(Object.keys(found.voices).map((name) => [name, written(found, name)]));
+        shown = { theme: found, heard, voices };
         draw();
       })
       .catch(() => {});
@@ -95,7 +96,7 @@ export function themesScreen(themes: string[]): Screen {
     const told = element('p', { id: 'themes-mix', className: 'status' });
     const tell = () => {
       const mix = mixSaid(now, t('debug.music.off')) || t('debug.music.unchanged');
-      told.textContent = `${now.theme.id} (${t(`debug.music.${now.arrangement}`)}): ${mix}`;
+      told.textContent = `${now.theme.id}: ${mix}`;
     };
     const rows = [...now.voices].map(([name, mixed]) => {
       const box = element('input', { type: 'checkbox', checked: mixed.on });
@@ -107,7 +108,7 @@ export function themesScreen(themes: string[]): Screen {
         mixed.on = box.checked;
         mixed.volume = Number(slider.value);
         volume.textContent = mixed.volume.toFixed(2);
-        const file = written(now.theme, now.arrangement, name);
+        const file = written(now.theme, name);
         const asWritten = mixed.on === file.on && (!mixed.on || mixed.volume === file.volume);
         music.mix(name, asWritten ? null : mixed.on ? mixed.volume : 0);
         tell();
@@ -121,7 +122,7 @@ export function themesScreen(themes: string[]): Screen {
       ]);
     });
     const reset = element('button', { type: 'button', id: 'themes-reset' }, [t('debug.music.reset')]);
-    reset.addEventListener('click', () => play(now.theme.id, now.arrangement));
+    reset.addEventListener('click', () => play(now.theme.id, now.heard));
     tell();
     return [
       element('h3', {}, [t('debug.music.voices')]),

@@ -521,9 +521,9 @@
     "low": "Bajo: se cruza volando, no se pisa",
     "music": {
       "title": "Los temas de la música",
-      "full": "Entero",
-      "quiet": "Suave",
-      "playing": "Suena: {theme}, {arrangement}",
+      "story": "Como en una historia",
+      "level": "Como en un nivel, más bajo",
+      "playing": "Suena: {theme}, {heard}",
       "voices": "Sus instrumentos",
       "reset": "Como está escrito",
       "off": "apagado",

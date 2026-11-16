@@ -492,9 +492,10 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
 let root: HTMLElement | null = null;
 
 /** The music a screen plays (D192): a story, the map and the start screen their
- * chapter's theme whole, a lesson and a level the same theme quietly; the map and the
- * start screen are in the chapter the child is in. The settings, the creator and the
- * page of themes leave the music as it is, or start the first chapter's. */
+ * chapter's theme at its loudness, a lesson and a level every voice of it lower (D210);
+ * the map and the start screen are in the chapter the child is in. The settings, the
+ * creator and the page of themes leave the music as it is, or start the first
+ * chapter's. */
 function playMusicFor(wanted: Route): void {
   if (wanted.name === 'music') return;
   if ((wanted.name === 'settings' || wanted.name === 'wizard') && music.state.theme) return;
@@ -502,11 +503,11 @@ function playMusicFor(wanted: Route): void {
     wanted.name === 'level' || wanted.name === 'lesson' || wanted.name === 'story'
       ? `${wanted.name}:${wanted.id}`
       : progress.load().current;
-  const arrangement = wanted.name === 'level' || wanted.name === 'lesson' ? 'quiet' : 'full';
+  const heard = wanted.name === 'level' || wanted.name === 'lesson' ? 'level' : 'story';
   void loadCourse()
     .then((course) => {
       const theme = themeOf(course, item);
-      if (theme) music.play(theme, arrangement);
+      if (theme) music.play(theme, heard);
     })
     .catch(() => {});
 }

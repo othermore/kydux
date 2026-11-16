@@ -2762,38 +2762,39 @@ one overturns stays, marked as superseded.
 - **D192 — Every chapter has a score of its own, made by the game from notes.** Decided
   2026-11-10 by the owner (*cada capítulo debe tener una banda sonora apropiada, ajustada a
   la hora del día, el ambiente, si es exterior o interior, si es de noche y en secreto*). A
-  theme is a file `content/music/<id>.json`: its tempo, its metre, its voices, and its
-  sections of notes (pitch, start, length, loudness), which follow one another in their
-  `order` and loop without a seam, no note ringing past its section's end; its `full`
-  arrangement plays every voice, its `quiet` one fewer, at 0.7 of the loudness. The
-  page plays it with Web Audio (`engine/music.ts`): voices of six kinds, a celesta's bell,
-  a bowed string pad, a plucked string, a harp, a flute and a soft drum, each an
-  oscillator or two with an envelope, the pad on lines that sound on from a note to the
-  next (D203), through a reverb whose impulse is decaying noise; the
-  notes are scheduled a third of a second ahead on the audio clock; no sound file is
-  loaded. A chapter's `chapter.json` names its theme (`music`), which the course carries; a
-  story, the map and the start screen play their chapter's theme `full`, a lesson and a
-  level `quiet`, the map and the start screen in the chapter the child is in; the
-  settings and the creator leave what plays. A change of arrangement or of theme fades
-  over two seconds. The music starts at the first gesture on the page, as a browser asks,
-  goes on across screens without a break, and is still while the tab is hidden. The
-  settings have the music's volume beside the sounds' switch, a slider from none to full
-  in five steps (`music`, 0.6 at first, kept with the settings); at none no theme plays.
-  The root element says what plays (`data-music`: `waiting`, `playing`, `off`;
-  `data-music-theme`, `data-music-arrangement`), and `?debug#music` plays any theme alone,
-  its voices to hand (D203).
-  The themes are original, written for this game as a score in `tools/sound/compose.py`,
-  each melody a bar at a time and each section's harmony a chord a bar from which the
-  accompaniments are made, and shipped under the GPL as the code is: *Arrival* (dusk,
-  outdoors, a gentle waltz in three in F, a celesta over strings, a flute in its middle
-  part), *The library* (indoors, evening, harp arpeggios in E flat and a curious flute,
-  then the celesta in C minor), *The passages* (night, a secret: sparse pizzicato in D
-  minor, low strings, a tiptoeing celesta and a flute's long notes, slow), *The broom*
-  (morning, a flight: bright and quick in six in D, a flute over strings and a harp) and
-  *The familiar* (the tower: a slow chorale in C that opens out, the flute taking its top
-  line). A test holds every chapter to a theme, every theme to its rules, and the files to
-  what the score makes. Rules out loaded music files and a score that names or quotes any
-  work under copyright.
+  theme is a file `content/music/<id>.json`: its tempo, its metre, its one set of voices
+  (D210), and its sections of notes (pitch, start, length, loudness), which follow one
+  another in their `order` and loop without a seam, no note ringing past its section's
+  end. The page plays it with Web Audio (`engine/music.ts`): voices of seven kinds, a
+  celesta's bell, a bowed string pad, a plucked string, a harp, a flute, a piano's struck
+  tone (D209) and a soft drum, each an oscillator or two with an envelope, the pad on
+  lines that sound on from a note to the next (D203), through a reverb whose impulse is
+  decaying noise; the notes are scheduled a third of a second ahead on the audio clock;
+  no sound file is loaded. A chapter's `chapter.json` names its theme (`music`), which the
+  course carries; a story, the map and the start screen play their chapter's theme at its
+  written loudness, a lesson and a level every voice of it at 0.7 (D210), the map and the
+  start screen in the chapter the child is in; the settings and the creator leave what
+  plays. A change of loudness or of theme fades over two seconds. The music starts at the
+  first gesture on the page, as a browser asks, goes on across screens without a break,
+  and is still while the tab is hidden. The settings have the music's volume beside the
+  sounds' switch, a slider from none to full in five steps (`music`, 0.6 at first, kept
+  with the settings); at none no theme plays. The root element says what plays
+  (`data-music`: `waiting`, `playing`, `off`; `data-music-theme`; `data-music-heard`,
+  `story` or `level`), and `?debug#music` plays any theme alone, its voices to hand
+  (D203). The themes are original, written for this game as a score in
+  `tools/sound/compose.py`, each melody a bar at a time and each section's harmony a chord
+  a bar from which the accompaniments are made, and shipped under the GPL as the code is:
+  *Arrival* (dusk, outdoors, glad: a march in four in G, a celesta's skipping tune over a
+  plucked bass, a flute's answer, a drum), *The library* (indoors, evening, calm: slow in
+  four in A minor, a piano's phrases and the celesta's answers taking turns over a harp
+  that climbs), *The passages* (night, a secret, eerie: very slow in E with its lowered
+  second, a low pad, a tritone against it, single notes far apart, an echo, a far
+  drum), *The broom* (a race: fast in four in E minor, a piano's short climbing cells over
+  a low voice that runs in eighth notes, the drum on every beat) and *The familiar* (the
+  tower: a slow chorale in C that opens out, the flute taking its top line). A test holds
+  every chapter to a theme, every theme to its rules, and the files to what the score
+  makes. Rules out loaded music files and a score that names or quotes any work under
+  copyright.
 - **D193 — The page's look, and a welcome page.** Decided 2026-11-10 by the owner (*una
   página inicial de bienvenida que explique y venda qué es Kydux; el arte de todas las
   páginas: fondos, botones, cajas; limpio y fácil de usar para un niño, un poco más
@@ -2981,8 +2982,7 @@ one overturns stays, marked as superseded.
   bales (D207). The content's tests hold every level, every way and every story step in
   the shed to this (`test_broom.py`). Rules out a hidden broom on the boards, and a broom
   in sight on the straw.
-- **D203 — The pad is low and unbroken, and a chapter's theme is chosen by ear among
-  three.** Decided 2026-11-12 by the owner (*debería tener mucho menos volumen en general,
+- **D203 — The pad is low and unbroken, and a chapter's theme is chosen by ear.** Decided 2026-11-12 by the owner (*debería tener mucho menos volumen en general,
   para que las notas más agudas y punteadas se noten más y esto solo rellene y dé cuerpo
   al sonido, y además debería ser continuado*; *para cada capítulo 3 canciones distintas
   para que pueda elegir, una más animada, otra más tranquila y la otra el punto medio*;
@@ -2996,15 +2996,12 @@ one overturns stays, marked as superseded.
   away. A chord held into the next is so one sound that changes its notes, across a
   section's end and the loop's too. On `?debug#music`, over the list, the theme playing
   shows its voices, each with a box that silences it or lets it sound and a slider for its
-  volume, from 0 to 1; a voice set by hand sounds at that volume whether the arrangement
-  plays it or not (`music.mix`), until another theme or arrangement is asked or *As
-  written* is pressed, and a line says what is set apart from the theme's file, as
-  `the-broom-lively (Full): flute 0.50, strings off`, to be told to who writes the score.
-  Beside the theme of each chapter in play stand three candidates in that chapter's
-  manner, `<theme>-lively`, `<theme>-even` and `<theme>-calm`: *Arrival* glad, *The
-  library* calm, *The passages* eerie, *The broom* lively, each at its three paces
-  (content/music/README.md). The owner chooses among them by ear; a chapter names its
-  theme, never a candidate. A voice of the `strings` kind that carries a tune, as *The
+  volume, from 0 to 1; a voice set by hand sounds at that volume (`music.mix`), until
+  another theme, or the same as a story or a level hears it, is asked or *As written* is
+  pressed, and a line says what is set apart from the theme's file, as `the-broom: tune
+  0.50, strings off`, to be told to who writes the score. The owner chooses a chapter's
+  theme by ear among candidates written in its manner (D209); a chapter names its theme,
+  never a candidate. A voice of the `strings` kind that carries a tune, as *The
   familiar*'s `choir`, is a voice apart from the pad, written louder. Rules out a pad
   whose notes stop and start, a pad that covers the tune, and a theme chosen from its
   score without being heard.
@@ -3146,3 +3143,43 @@ one overturns stays, marked as superseded.
   begins and how wide a cell is (`data-grid`). Rules out a sheet or a debug picture
   without the cells' borders, and a sheet that writes a number elsewhere in its cell than
   the game does.
+- **D209 — The themes chosen by ear, and the struck voice.** Decided 2026-11-12 by the
+  owner, by ear on the mixer (D203): *The arrival: lively full. The broom: lively full,
+  pero suena demasiado "celta", me gustaría que sonase algo más animado, con movimiento,
+  que recuerde a una carrera y no a un "paseo por el campo" como suena ahora. Menos
+  alegría y más tensión y sorpresa. The familiar: solo hay una opción y no me gusta pero
+  esperemos a ver ese capítulo antes de decidir. The library: Calm full, pero en lugar de
+  una flauta con sonidos largos me gustaría un piano o similar, con algunas notas un poco
+  más rápidas, y que se alterne con la celesta. The passages: esta no me gusta, quiero que
+  sea algo más tétrico, con más misterio.* A theme chosen takes the theme's id and its
+  candidates leave the tree. *Arrival* is the lively candidate. *The library* is the calm
+  one with a piano in the flute's place, its phrases with runs of three or four eighth
+  notes and no note held longer than a bar, the piano and the celesta taking turns on the
+  tune, never both at once. *The broom* is a race: in E minor, in four, at 160 beats a
+  minute, over a low voice that never stops running in eighth notes, the drum on every
+  beat and a chord pushed off the beat before each bar; its tune of short cells that
+  climb by step and break off, and every few bars a surprise, a bar with no tune, a leap
+  of register, a raised seventh left hanging; its loop ends in the air. *The passages* is
+  eerie: very slow, in E with its lowered second, a low pad that barely moves, a tritone
+  held against it, single notes of the celesta and the harp far apart, a note repeated
+  fading as an echo, a low drum now and then as a far door, no tune one could whistle.
+  The broom and the passages have a second, `the-broom-b` and `the-passages-b`, for the
+  owner's ear: the broom's with another tune and other surprises, the passages' with less
+  in it. *The familiar* waits until its chapter is seen. The page sounds one more kind of
+  voice, `piano`: a struck tone, bright at the hammer's blow, that starts at once and dies
+  away by itself in a time of its pitch, however long the note is written (`pianoRing`).
+  Rules out a chosen chapter with candidates left beside its theme, and a held flute
+  where the owner asked for struck notes.
+- **D210 — A theme has one set of voices.** Decided 2026-11-12 by the owner, who chose
+  every theme in its whole form and asked what the other was: *cuando se quitan algunos
+  instrumentos la canción cambia mucho, solo tendría sentido si se quitasen los
+  instrumentos de relleno y se dejase la voz principal, pero creo que no es el caso*. A
+  theme's file names its voices and no arrangements; the page refuses one that has them.
+  A story, the map and the start screen play the theme at its written loudness; a lesson
+  and a level play the same voices, every one, at 0.7 of it (`voiceLevels`). The player
+  is given no choice of voices. The mixer on `?debug#music` has two buttons a theme, as a
+  story hears it and as a level hears it, lower, and its line names the theme and what is
+  set apart from the file, with no word for an arrangement. When the owner chooses a
+  theme on the mixer, they say the theme and the voices they turned off, if any, with the
+  mixer's line; a voice turned off leaves the theme everywhere. Rules out a level's music
+  without its tune, and two forms of a theme that differ in their instruments.

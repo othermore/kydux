@@ -521,9 +521,9 @@
     "low": "Low: flown over, not walked on",
     "music": {
       "title": "The music's themes",
-      "full": "Full",
-      "quiet": "Quiet",
-      "playing": "Playing: {theme}, {arrangement}",
+      "story": "As in a story",
+      "level": "As in a level, lower",
+      "playing": "Playing: {theme}, {heard}",
       "voices": "Its voices",
       "reset": "As written",
       "off": "off",

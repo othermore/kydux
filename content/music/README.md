@@ -2,41 +2,28 @@
 
 Every chapter has a theme of its own (D192), which the page plays with Web Audio
 (`app/src/engine/music.ts`). No sound file is loaded: a theme is the notes, and the page
-sounds them. A chapter names its theme in its `chapter.json` (`"music"`). A story, the
-map and the start screen play the theme whole (`full`); a lesson and a level play it
-quietly (`quiet`), with fewer voices and a little lower.
+sounds them. A chapter names its theme in its `chapter.json` (`"music"`). A theme has one
+set of voices (D210): a story, the map and the start screen play every one at its
+written loudness; a lesson and a level play every one too, lower.
 
 The themes are Kydux's own, written for the game, and ship under the GNU GPL, version 3
 or later, like the rest of it. They quote no other work.
 
 | Theme | Chapter | Its manner |
 |---|---|---|
-| `arrival` | 1, Arrival | dusk, outdoors: a gentle waltz in three, a celesta over strings, a flute in its middle part |
-| `the-library` | 2, The library | indoors, evening: harp arpeggios, a curious flute, then the celesta |
-| `the-passages` | 3, The passages | night, a secret: sparse pizzicato in D minor, low strings, a tiptoeing celesta, a flute's long notes |
-| `the-broom` | 4, The broom | morning, outdoors, a flight: bright and quick in six, a flute over strings and a harp |
+| `arrival` | 1, Arrival | dusk, outdoors, glad: a march in four in G, a celesta's skipping tune over a plucked bass and its chords, a flute's answer in its middle part, a drum |
+| `the-library` | 2, The library | indoors, evening, calm: slow in four in A minor, a piano's phrases with quick notes among the long ones and the celesta's answers, taking turns on the tune, over a harp that climbs and a low pad |
+| `the-passages` | 3, The passages | night, a secret, eerie: very slow in E with its lowered second, a low pad that barely moves, a tritone held against it, single notes of the celesta and the harp far apart, an echo, a far drum; no tune |
+| `the-broom` | 4, The broom | a race, tense: fast in four in E minor, a piano's short cells that climb and break off over a low voice running in eighth notes, the drum on every beat, a chord pushed off the beat; a bar with no tune, a leap, a raised seventh left hanging |
 | `the-familiar` | 5, The familiar | the tower: a slow chorale that opens out, a flute and a harp joining it |
 
-## The candidates
+Beside two of them is a second, for the owner's ear (D209); a chapter names its theme,
+never a second:
 
-Beside the theme of each chapter in play are three candidates (D203), for the owner to
-choose among by ear: a lively one, an even one and a calm one, each in its chapter's
-manner. A chapter names its theme, never a candidate.
-
-| Candidate | Its manner |
+| Second | Its manner |
 |---|---|
-| `arrival-lively` | glad, a march in four in G: a celesta's tune over a plucked bass and its chords, a flute in its middle part, a drum |
-| `arrival-even` | glad, rolling in six in F: a flute over a harp, the celesta in its middle part |
-| `arrival-calm` | glad and slow, a waltz in D: a celesta's long notes over a harp, a flute in its middle part |
-| `the-library-lively` | calm but curious, in four in B flat: a flute that skips over pizzicato, the celesta in its middle part |
-| `the-library-even` | calm, a music box in three in E flat: the celesta over a harp, a flute in its middle part |
-| `the-library-calm` | calm and still, slow in four in A minor: a flute's long notes over a harp that climbs, a celesta's bells |
-| `the-passages-lively` | eerie, a creeping waltz in E minor: a celesta that steps round its notes by half steps over pizzicato, a flute's long notes in its middle part |
-| `the-passages-even` | eerie, in four in A minor: a low flute that creeps over a harp's turning figure, the celesta's few steps in its middle part |
-| `the-passages-calm` | eerie and bare, very slow in B minor: low strings, a far celesta, a flute's long notes, a drum now and then |
-| `the-broom-lively` | lively, a gallop in four in A: a flute's quick notes over a plucked bass and its chords, a drum, a celesta that runs while the flute soars |
-| `the-broom-even` | lively, a flight in six in G: a flute's long notes and leaps over a rolling harp, the celesta's tune in its middle part |
-| `the-broom-calm` | lively at rest, a glide, a waltz in B flat: a flute's long lines over a harp's wide chords, a celesta's bells |
+| `the-broom-b` | the same race with another tune: cells that climb by half steps too, a leap of two octaves down, a bar where the drum stops, a chord of F in its second section |
+| `the-passages-b` | the same night with less in it: the pad and its tritone, fewer notes far apart, one echo, the far drum once a section |
 
 ## The file
 
@@ -48,10 +35,11 @@ A theme is `<id>.json`:
 - `metre`: `[beats in a bar, unit]`, as `[3, 4]` or `[6, 8]`.
 - `voices`: each voice by name, with its `kind` and its `volume` from 0 to 1. The kinds
   are `celesta` (a bell), `strings` (a bowed pad), `pluck` (a plucked string,
-  pizzicato), `harp`, `flute` and `drum` (a soft drum). The pad is the body under the
+  pizzicato), `harp`, `flute`, `piano` (a struck tone that dies away by itself, however
+  long its note is written) and `drum` (a soft drum). The pad is the body under the
   other voices (D203): it sounds low, and a chord of it held into the next is one
-  unbroken sound that changes its notes.
-- `arrangements`: the voices `full` plays, every one, and the fewer `quiet` plays.
+  unbroken sound that changes its notes. A theme has no other set of voices: the page
+  refuses a file with `arrangements` (D210).
 - `sections`: each with its `id`, its number of `bars`, and its `notes` by voice. A note
   is `[pitch, start, length, loudness]`: its pitch as a MIDI number (60 is the middle C),
   its start and its length in beats from the section's start, and its loudness from 0 to
@@ -73,8 +61,8 @@ A test holds the files to what the score makes, and every theme to its rules.
 
 ## How a theme is heard alone
 
-Open the game with `?debug`, at `#music`: every theme is listed, each with a button
-for its full and its quiet arrangement.
+Open the game with `?debug`, at `#music`: every theme is listed, each with two buttons,
+one to hear it as a story plays it and one as a level plays it, lower.
 
 ```
 https://localhost:5173/?debug#music
@@ -86,7 +74,7 @@ theme plays. *As written* puts every voice back as the theme's file has it. The 
 under them says what is set apart from the file, ready to be copied:
 
 ```
-the-broom-lively (Full): flute 0.50, strings off
+the-broom: tune 0.50, strings off
 ```
 
 A theme new in `content/music/` is listed once the development server is started again,

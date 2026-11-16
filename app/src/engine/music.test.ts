@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { arranged, frequency, lineFor, loopOf, notesBetween, readTheme, type Theme, timed } from './music';
+import {
+  frequency,
+  lineFor,
+  loopOf,
+  notesBetween,
+  pianoRing,
+  readTheme,
+  sound,
+  type Theme,
+  timed,
+  voiceLevels,
+} from './music';
 
 /** A theme of two sections of one bar of 3/4 each, the second played twice. */
 function waltz(tempo: number): Theme {
@@ -11,7 +22,6 @@ function waltz(tempo: number): Theme {
       tune: { kind: 'celesta', volume: 0.8 },
       bass: { kind: 'pluck', volume: 0.5 },
     },
-    arrangements: { full: ['tune', 'bass'], quiet: ['bass'] },
     sections: [
       { id: 'a', bars: 1, notes: { tune: [[72, 0, 1, 0.6], [74, 1, 1, 0.6], [76, 2, 1, 0.6]], bass: [[41, 0, 3, 0.5]] } },
       { id: 'b', bars: 1, notes: { tune: [[77, 0, 3, 0.6]] } },
@@ -55,22 +65,37 @@ describe('the music (D192)', () => {
     }
   });
 
-  it('plays every voice in full and the quiet ones a little lower', () => {
+  it('plays every voice a story plays in a level too, each at 0.7 of its loudness (D210)', () => {
     const theme = waltz(120);
-    expect(arranged(theme, 'full')).toEqual({ tune: 0.8, bass: 0.5 });
-    const quiet = arranged(theme, 'quiet');
-    expect(quiet.tune).toBe(0);
-    expect(quiet.bass).toBeGreaterThan(0);
-    expect(quiet.bass).toBeLessThan(0.5);
+    const story = voiceLevels(theme, 'story');
+    expect(story).toEqual({ tune: 0.8, bass: 0.5 });
+    const level = voiceLevels(theme, 'level');
+    expect(Object.keys(level)).toEqual(Object.keys(story));
+    for (const [name, loudness] of Object.entries(story)) expect(level[name]).toBeCloseTo(loudness * 0.7);
   });
 
-  it('gives a voice set by hand its volume, whether the arrangement plays it or not (D203)', () => {
+  it('gives a voice set by hand its volume, none to silence it (D203)', () => {
     const theme = waltz(120);
-    expect(arranged(theme, 'full', { tune: 0.2 })).toEqual({ tune: 0.2, bass: 0.5 });
-    expect(arranged(theme, 'full', { bass: 0 })).toEqual({ tune: 0.8, bass: 0 });
-    const quiet = arranged(theme, 'quiet', { tune: 0.5 });
-    expect(quiet.tune).toBeGreaterThan(0);
-    expect(quiet.tune).toBeLessThan(0.5);
+    expect(voiceLevels(theme, 'story', { tune: 0.2 })).toEqual({ tune: 0.2, bass: 0.5 });
+    expect(voiceLevels(theme, 'story', { bass: 0 })).toEqual({ tune: 0.8, bass: 0 });
+    expect(voiceLevels(theme, 'level', { tune: 0.5 }).tune).toBeCloseTo(0.35);
+  });
+
+  it('refuses a theme with arrangements: a theme has one set of voices (D210)', () => {
+    expect(() => readTheme({ ...waltz(120), arrangements: { full: ['tune'], quiet: [] } })).toThrow(/one set of voices/);
+  });
+
+  it("ends a piano's note by itself, however long it is written, a low one later (D209)", () => {
+    const ctx = fakeContext();
+    const out = ctx.createGain() as unknown as AudioNode;
+    const short = sound(ctx, 'piano', 60, 1, 0.25, 0.5, out);
+    const long = sound(ctx, 'piano', 60, 1, 8, 0.5, out);
+    expect(short).toBe(long);
+    expect(short - 1).toBeCloseTo(0.003 + pianoRing(60));
+    expect(short - 1).toBeLessThan(8);
+    expect(pianoRing(48)).toBeGreaterThan(pianoRing(72));
+    // A celesta's bell rings as long as its note is written, when that is longer.
+    expect(sound(ctx, 'celesta', 60, 1, 8, 0.5, out)).toBeGreaterThan(sound(ctx, 'celesta', 60, 1, 0.25, 0.5, out));
   });
 
   it("leads a pad's note onto the line whose note is over, the nearest in pitch (D203)", () => {
@@ -97,3 +122,19 @@ describe('the music (D192)', () => {
     expect(frequency(81)).toBe(880);
   });
 });
+
+/** An audio context that only takes the calls a struck note makes, and sounds nothing. */
+function fakeContext(): AudioContext {
+  const param = () => ({
+    setValueAtTime: () => undefined,
+    exponentialRampToValueAtTime: () => undefined,
+    linearRampToValueAtTime: () => undefined,
+    setTargetAtTime: () => undefined,
+  });
+  const node = () => ({ connect: (target: unknown) => target });
+  return {
+    createGain: () => ({ ...node(), gain: param() }),
+    createBiquadFilter: () => ({ ...node(), type: '', frequency: param() }),
+    createOscillator: () => ({ ...node(), type: '', frequency: param(), start: () => undefined, stop: () => undefined }),
+  } as unknown as AudioContext;
+}

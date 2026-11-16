@@ -14,7 +14,7 @@ say (a text, word for word, or the number of things of a kind in the way played:
 id), cast (a spell cast, not a word refused: `{"kind": "cast", "spell": "osto"}`,
 D176, maybe from one of a few cells, `"from": [[x, y], ...]`), no_bumps
 (the wizard bumps into nothing; failed at the first bump), untied (no broom knotted,
-or none of those named in `ids` or lying in a `zone`; failed at the run's end with one
+or none of those named in `ids` or of a `zone`; failed at the run's end with one
 still knotted, D183, D202), no_error (the run ends
 without an error, nor the world refusing the program; failed at the first),
 through_in_order (the rings named, flown through in that order: `{"kind":

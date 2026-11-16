@@ -44,8 +44,8 @@
 //
 // The camera is a window on the scene (D69, camera.ts): it follows the wizard,
 // the player zooms it and drags it to look around, and a run or a restart brings
-// it back to the wizard, or to the place a level frames (D201). The words said are in bubbles and the wizard's thoughts
-// in clouds (speech.ts).
+// it back to the wizard, or to the place a level frames (D201). The words said are
+// in bubbles and the wizard's thoughts in clouds (speech.ts).
 //
 // A painted scene (D76) is drawn by painted.ts: its ground and rows, its things'
 // states, the figures' sheets, the grid, the goal's mark and the sealed doors'

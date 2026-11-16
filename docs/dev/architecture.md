@@ -2657,11 +2657,12 @@ one overturns stays, marked as superseded.
   them, and `len`, which the sandbox lets through among the builtins. A hidden thing found
   makes the world's `found` event, in the tick of the call or before the first tick, and
   the page draws it from then on: the brooms under the straw are not seen until a program
-  looks for them, and those on the bare boards are seen from the start (D202). `wizard.say` takes a number as it takes a word and says its digits; a
-  list is refused. The goal `say` takes `"count_of": "<kind>"` in place of `"text"`: met
-  when the wizard says the number of things of that kind the way played has. The
-  notebook's words for `find_all` and `items` show `len`. Rules out counting brooms by
-  eye, and a `say` goal written once per way.
+  looks for them, and those on the bare boards are seen from the start (D202).
+  `wizard.say` takes a number as it takes a word and says its digits; a list is refused.
+  The goal `say` takes `"count_of": "<kind>"` in place of `"text"`: met when the wizard
+  says the number of things of that kind the way played has. The notebook's words for
+  `find_all` and `items` show `len`. Rules out counting brooms by eye, and a `say` goal
+  written once per way.
 - **D185 — Flying: `drevo` lifts the broom, the moves fly, and a flown cell takes a third
   of a walked one.** Decided 2026-11-10 by the owner (*cuando se vuela se debe mover por
   lo menos 3x*). `wizard.cast("drevo")` needs the wand and a broom carried (refused
@@ -2966,7 +2967,7 @@ one overturns stays, marked as superseded.
   on one of those five cells is `hidden` until a program finds it (D184); one on the
   boards is seen from the start; none lies on (13, 7), half under the straw, nor on row
   6, the wall's zone. The knotted lying brooms are four, `broom_1` and `broom_2` on the
-  boards and `broom_3` and `broom_4` under the straw, laid on other cells in each way of
+  boards and `broom_3` and `broom_4` under the straw, laid otherwise in each way of
   *El cobertizo* and *Las escobas de la paja*, whose programs look for them; the story's
   step 4, *La escoba a tus pies* and *Las escobas de la pared* show the two on the
   boards, with `broom_0` by the door. In *Las escobas de la pared* the two stay knotted

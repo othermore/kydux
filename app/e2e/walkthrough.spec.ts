@@ -1,8 +1,9 @@
 // A chapter played from its first stop to its last, as the child plays it, in Spanish,
 // for the owner to read: every story step, every lesson page with its code run, and for
-// each level the start card, the start, the route tick by tick in its first way, the won
-// card of every way, and the map's plan where the map is carried. The pictures go to
-// e2e/shots/walkthrough-<chapter>/, which tools/walkthrough.py makes a document of.
+// each level the start card, the start, the won card, the route tick by tick in its first
+// way, every other way at its end, and the map's plan where the map is carried. The
+// pictures go to e2e/shots/walkthrough-<chapter>/, which tools/walkthrough.py makes a
+// document of.
 // Only `npm run walkthrough -- <chapter>` runs it (KYDUX_WALKTHROUGH).
 
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -135,15 +136,19 @@ async function level(page: Page, id: string): Promise<void> {
   await page.screenshot({ path: `${OUT}level-${id}-01-inicio.png` });
   await typed(page, solution);
   await page.locator('.outcome').waitFor({ timeout: ciTimes(90_000) });
-  await page.waitForTimeout(ciTimes(500));
+  // The win card's stars are drawn in one after another: the picture waits for the last.
+  await page.waitForTimeout(ciTimes(1_500));
   for (const [index, way] of (ways.length > 0 ? ways : ['unica']).entries()) {
-    if (way !== 'unica') {
+    // Choosing a way plays it from its start: its picture is of its end, with its goals
+    // met, so it waits for the playback to begin and then to be done.
+    if (way !== 'unica' && (await page.locator('#way').inputValue()) !== way) {
       await page.locator('#way').selectOption(way, { force: true });
-      await expect(page.locator('.outcome-text')).toContainText('Lo has conseguido', { timeout: ciTimes(90_000) }).catch(() => {});
+      await page.locator('#scene[data-state="playing"]').waitFor({ timeout: ciTimes(2_000) }).catch(() => {});
+      await page.locator('#scene[data-state="done"]').waitFor({ timeout: ciTimes(90_000) });
       await page.waitForTimeout(ciTimes(500));
     }
     await page.screenshot({ path: `${OUT}level-${id}-${way}-ganado.png` });
-    // The route tick by tick of the first way only; every way shows its won card (the
+    // The route tick by tick of the first way only; every other way shows its end (the
     // owner, 2026-11-08), so that the document stays short.
     if (index === 0) await route(page, id, way);
   }

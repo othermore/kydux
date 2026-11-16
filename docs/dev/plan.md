@@ -602,7 +602,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     to one idea at a time, as above.
 5.3 Chapter 1, Arrival (methods, sequences, comments, arguments, strings),
     in the scene of the gate: the opening, its first two steps told over the
-    castle's painting (D251), the story at the gate, seven lessons, nine
+    castle's painting (D251), the first with the letter held before the castle
+    (D257), the story at the gate, seven lessons, nine
     levels (seven practices, a fix, an improve) taught by Nuri, the first
     one's start card the only one to offer the screen's guide again (D248),
     the wand lent, the first spell, and the story up to the castle

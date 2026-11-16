@@ -15,7 +15,8 @@
     {
       "who": "voice",
       "do": null,
-      "still": true
+      "still": true,
+      "letter": true
     },
     {
       "who": "voice",

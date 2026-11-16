@@ -372,3 +372,39 @@ def test_the_openings_first_steps_may_be_told_over_its_still():
 def test_a_step_over_the_still_is_refused_where_it_does_not_belong(change, steps, reason):
     with pytest.raises(LevelError, match=reason):
         staged(**change, steps=steps)
+
+
+def test_the_openings_first_step_may_hold_the_letter_before_its_still():
+    """D257: `letter` on the first steps over the still, in a row."""
+    steps = [
+        {"who": "voice", "do": None, "still": True, "letter": True},
+        {"who": "voice", "do": None, "still": True},
+        {"who": "voice", "do": {"appear": [5, 1]}, "by": "nuri"},
+    ]
+    story = staged(opening=True, steps=steps)
+    assert [step.get("letter") for step in story["steps"]] == [True, None, None]
+
+
+@pytest.mark.parametrize(
+    ("steps", "reason"),
+    [
+        ([{"who": "voice", "do": None, "still": True, "letter": "yes"}], "letter is true"),
+        (
+            [
+                {"who": "voice", "do": None, "still": True},
+                {"who": "voice", "do": None, "letter": True},
+            ],
+            "only on a step told over the still",
+        ),
+        (
+            [
+                {"who": "voice", "do": None, "still": True},
+                {"who": "voice", "do": None, "still": True, "letter": True},
+            ],
+            "the first, in a row",
+        ),
+    ],
+)
+def test_a_step_holding_the_letter_is_refused_where_it_does_not_belong(steps, reason):
+    with pytest.raises(LevelError, match=reason):
+        staged(opening=True, steps=steps)

@@ -369,7 +369,10 @@
     "step": "{n} de {total}",
     "not_found": "No hay ninguna historia llamada «{id}».",
     "again": "Otra vez",
-    "skip": "Saltar al final"
+    "skip": "Saltar al final",
+    "letter_title": "Carta de Admisión",
+    "letter_words": "Por la presente, le informamos de su admisión en la escuela de magia de Arvelia. Deberá personarse en diez días para iniciar su formación",
+    "letter_alt": "La carta de admisión: el castillo de Arvelia dibujado a tinta, con un sello de lacre."
   },
   "settings": {
     "title": "Ajustes",

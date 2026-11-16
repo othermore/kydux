@@ -103,7 +103,8 @@ level would fail without the idea.
 ## Chapter 1 — Arrival (`01-arrival`)
 
 It opens with the game's opening, `story:the-letter`: the letter of
-admission, the journey, the shut gate at dusk (D61, D78). The chapter is
+admission, held before the painting of the castle (D257), the castle
+itself (D251), the journey, the shut gate at dusk (D61, D78). The chapter is
 the game's tutorial, taught at the gate and on the road up by the friend
 of the other gender, Nuri for a boy wizard and Teku for a girl wizard
 (D77), in the friend's voice; the friend lends the wizard a spare wand. The ideas: a program, an action or
@@ -121,7 +122,7 @@ password opens it and stays open after; the wand is picked up once, in
 
 | Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
-| `story:the-letter` | Story 1 | The letter of admission, told in the past at the gate; the journey; the shut gate; then the creator. | |
+| `story:the-letter` | Story 1 | The letter of admission that came weeks before, told in the past and held before the painted castle, its words written by hand on it (D257); the castle, this very one (D251); the journey, told as the wizard walks up to the gate; the shut gate; then the creator. | |
 | `story:at-the-gate` | Story 2 | The shut gate; the friend arrives and offers to teach; the method: try, watch, try again. | |
 | `lesson:what-a-program-is` | Lesson 1 | A program is a list of instructions, run from the top down; your program tells your wizard, you, what to do; the round mark is where the wizard must get to. | `wizard.move_right` |
 | `level:the-gate` | Practice 1 | One instruction, to the mark before the gate. Its code starts empty. | |

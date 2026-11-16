@@ -68,8 +68,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 chapters' music, played from its notes (music.ts, D192)
   src/editor/   the child's editor, CodeMirror, a wrapped line's part hanging
                 under the line's own indentation (D223)
-  src/fonts/    the code's letter, Inconsolata, bundled, with its SOURCE.md
-                and licence (D238)
+  src/fonts/    the code's letter, Inconsolata (D238), and the hand the
+                letter of admission is written in, Caveat (D257), bundled,
+                each with its SOURCE.md and licence
   src/ui/       the screens: start with the saved games (start.ts), the
                 wizard's creator (wizard.ts), the map, also over a level (map.ts),
                 a lesson with its teacher (lesson.ts), a story told on its scene
@@ -1256,10 +1257,11 @@ one overturns stays, marked as superseded.
   staging, checked against the scene by
   `kydux_world.level.story_on_scene`, and `text.<lang>.json` the title and
   one text a step; *Next*, Enter and Space go on, *Back* replays the step
-  before, *Go on* ends it. The game's opening tells the castle and the
-  letter over the welcome's painting (`still` on its first two steps, D251),
-  then the journey and the gate on the scene, before the creator. Rules out
-  the story told as pages of a book.
+  before, *Go on* ends it. The game's opening tells the letter that came,
+  held before the castle (`letter` on its first step, D257), and the castle
+  over the welcome's painting (`still` on its first two steps, D251), then
+  the journey and the gate on the scene, before the creator. Rules out the
+  story told as pages of a book.
 - **D75 — Every run starts the level again, and says so.** Decided
   2026-10-23 (sprint 12, 12.5). *Run* and *Restart* fade the scene out,
   put everything back, show a spinner, quickly, and fade it in; a run
@@ -3622,9 +3624,9 @@ one overturns stays, marked as superseded.
   (*de fuente dejemos por defecto inconsolata a 16, que está bien*), the pick D223 waits
   for. The editor and every piece of code the page shows are set in Inconsolata
   (`app/src/fonts/inconsolata/`), and a new child's editor is at 16. No other face is
-  bundled and nothing chooses a face: the settings hold the editor's size alone. A game
-  kept while another candidate was tried is read with its editor at 16. Rules out a letter
-  chosen in the settings.
+  bundled for code and nothing chooses a face: the settings hold the editor's size
+  alone. A game kept while another candidate was tried is read with its editor at 16.
+  Rules out a letter chosen in the settings.
 - **D239 — A tip's picture is 960 by 540, and shown as large as the window lets.** Decided
   2026-11-15 by the owner (*las capturas de los tips estaría bien que se viesen un poco más
   grandes, son un poco pequeñas*). Each tip's picture (D221) is taken from the game's own
@@ -3813,9 +3815,9 @@ one overturns stays, marked as superseded.
   step the scene comes in over it with the fade of D214; *Back* to such a step shows the
   still again. The reader stays on the painting as long as they like, since a story goes
   on at *Next*. `story:the-letter` tells its first two steps over the welcome's painting:
-  the castle of Arvelia, and the letter that came with that very drawing; the journey and
-  the gate are told on the scene. Rules out a painting seen only while something loads,
-  and a timer that holds it.
+  the letter that came, held before the castle (D257), and the castle of Arvelia, this
+  very one; the journey and the gate are told on the scene. Rules out a painting seen only
+  while something loads, and a timer that holds it.
 - **D252 — A wind starts from nothing, and its mix is the owner's.** Decided 2026-11-16 by
   the owner (*hay un sonido fuerte en los sonidos (tanto de un paso como de varios) justo al
   principio, que suena casi como el disparo de una escopeta. Ese hay que quitarlo o
@@ -3894,3 +3896,40 @@ one overturns stays, marked as superseded.
   outside the course shows every entry. Rules out a child paging back through the
   lessons for a colon or a bracket, an entry shown before its lesson, and a click that
   puts into the child's program a name its level does not hold.
+- **D257 — The opening's first step is told over the letter, held before the castle.**
+  Decided 2026-11-16 by the owner (*en la primera imagen se viese la imagen del castillo
+  pero por delante tapando el castillo se viese la carta con el castillo dibujado a
+  trazos/lineas (y debajo unas letras de admitido a la escuela de magia de Arvelia), y en
+  la segunda imagen se viese el castillo, con la carta ya apartada para que se vea detrás
+  el castillo "de verdad"*; and of its words, *preferiría una letra como manuscrita y un
+  poco más pequeña, y que diga "Por la presente, le informamos de su admisión en la
+  escuela de magia de Arvelia. Deberá personarse en diez días para iniciar su
+  formación..." Pueden ser varias lineas y salir cortadas por abajo, como si la carta
+  estuviese doblada por la mitad [...] Y no debe sobreponerse a la imagen del sello*;
+  *no puedes poner los puntos suspensivos y debes hacer que el texto encaje con el
+  espacio que hay, como si lo que hay justo debajo no entrase pero hubiese más carta.
+  Puedes poner primero "Carta de Admisión" y debajo ya el texto*). A step told over a
+  story's still may hold the story's letter before it (`"letter": true` in
+  `story.json`): the first steps over the still, in a row. The letter is one picture
+  with nothing around it (`app/public/about/welcome-letter.webp`): a sheet of parchment
+  folded in half and seen from the front, its fold along the bottom, on its upper part
+  the castle of the painting drawn in ink lines, the same castle seen from the same
+  side, and a wax seal at its top right. Between the drawing and the fold the game
+  writes the letter's words by hand, in Caveat (`app/src/fonts/caveat/`), from
+  translated strings and never painted: a heading (`story.letter_title`) and the
+  letter's first words (`story.letter_words`), with no full stop at their end. The page
+  fits them to that room, clear of the drawing and the seal: as large as they fit, in a
+  column a little narrower where that fills the last line, which is then spread to the
+  column's edge and stands on the fold, as if the letter went on behind it. While the
+  step shown holds it, the letter lies over the painted castle and covers it whole,
+  turned a little as a sheet held in a hand is, the lake and the village in sight round
+  it, placed on the painting whatever part of it the frame shows; at the first step
+  without it the letter is lowered out of the picture, over its lower edge, and the
+  painted castle is there; *Back* raises it again. The painting, the letter and its hand
+  come into sight together, and with motion reduced the letter is there or gone at once.
+  The frame says where it is in `data-letter` (`front`, `aside`). `story:the-letter`
+  holds it at its first step, which tells of the letter that came and the great castle
+  drawn on it; the second step, over the painting alone, says it is this very castle.
+  Rules out a letter the child is only told of, a drawing and a castle that do not
+  match, words painted into the art or written over the seal, and words cut short with
+  an ellipsis.

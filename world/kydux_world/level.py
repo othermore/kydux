@@ -1486,7 +1486,8 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     speaks or moves out of sight, and no one asleep walks, turns or goes. The wizard
     stays in sight but for a walk out of sight in the story's last step. A story with
     a still, the opening, may tell its first steps in a row over the still (`still`,
-    D251), each of the voice and doing nothing."""
+    D251), each of the voice and doing nothing; the first of them, in a row, may hold
+    the story's letter before the still (`letter`, D257)."""
     story_id = data.get("id")
     if "scene" not in data:
         raise LevelError(f"{story_id}: a story is told on a scene")
@@ -1636,8 +1637,10 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
         raise LevelError(f"{story_id}: a story has its steps")
-    # Whether the steps so far are all told over the story's still (D251).
+    # Whether the steps so far are all told over the story's still (D251), and all hold
+    # its letter before it (D257).
     over_still = True
+    holding_letter = True
     for number, step in enumerate(steps, 1):
         here = f"{story_id}, step {number}"
         if not isinstance(step, dict):
@@ -1658,6 +1661,15 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                 raise LevelError(f"{here}: a step over the still is the voice's, and does nothing")
         else:
             over_still = False
+        if "letter" in step:
+            if step["letter"] is not True:
+                raise LevelError(f"{here}: letter is true, or not given")
+            if step.get("still") is not True:
+                raise LevelError(f"{here}: the letter is held only on a step told over the still")
+            if not holding_letter:
+                raise LevelError(f"{here}: the steps that hold the letter are the first, in a row")
+        else:
+            holding_letter = False
         if "by" in step and doing is None:
             raise LevelError(f"{here}: by names who does the action, and there is none")
         if "camera" in step:

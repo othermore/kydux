@@ -369,7 +369,10 @@
     "step": "{n} of {total}",
     "not_found": "There is no story called “{id}”.",
     "again": "Again",
-    "skip": "Skip to the end"
+    "skip": "Skip to the end",
+    "letter_title": "Letter of Admission",
+    "letter_words": "We hereby inform you of your admission to the school of magic of Arvelia. You are to present yourself within ten days to begin your training",
+    "letter_alt": "The letter of admission: the castle of Arvelia drawn in ink, with a wax seal."
   },
   "settings": {
     "title": "Settings",

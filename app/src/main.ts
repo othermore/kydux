@@ -268,9 +268,17 @@ async function showStory(content: HTMLElement, id: string, key: string): Promise
         label: itemLabel(course, `story:${id}`),
         startScene: (...args) => sceneCode.then(({ startScene }) => startScene(...args)),
         // The opening is read over the welcome's painting of the castle until its scene
-        // is there (D61, D214).
+        // is there (D61, D214), its first step with the letter before it (D257).
         ...(story.opening
-          ? { still: { src: `${import.meta.env.BASE_URL}about/welcome-castle.webp`, alt: t('about.hero_alt') } }
+          ? {
+              still: { src: `${import.meta.env.BASE_URL}about/welcome-castle.webp`, alt: t('about.hero_alt') },
+              letter: {
+                src: `${import.meta.env.BASE_URL}about/welcome-letter.webp`,
+                title: () => t('story.letter_title'),
+                words: () => t('story.letter_words'),
+                alt: () => t('story.letter_alt'),
+              },
+            }
           : {}),
         reload: () => loadStory(id, currentLanguage()),
       }),

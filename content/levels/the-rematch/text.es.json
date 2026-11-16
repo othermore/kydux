@@ -4,7 +4,7 @@
     "Pasa por los ocho aros en orden: en cada pareja, el primero hacia arriba y el segundo hacia abajo.",
     "Cruza la meta antes que Zarek."
   ],
-  "starting_code": "# Este es el programa que ganó la carrera, y Zarek ha movido los aros.\ndef two_rings(to_second, to_next):\n    wizard.move_up(2)\n    wizard.move_right(to_second)\n    wizard.move_down(2)\n    wizard.move_right(to_next)\n\nwizard.cast(\"drevo\")\nwizard.move_right(1)\ntwo_rings(2, 4)\ntwo_rings(3, 5)\ntwo_rings(2, 4)\ntwo_rings(3, 1)\n",
+  "starting_code": "# Este es el programa que ganó la carrera, y Zarek ha movido los aros.\ndef two_rings(to_second, to_next):\n    wizard.move_up(2)\n    wizard.move_right(to_second)\n    wizard.move_down(2)\n    wizard.move_right(to_next)\n\nwizard.cast(\"drevo\")\nwizard.move_right(1)\ntwo_rings(2, 4)\ntwo_rings(3, 5)\ntwo_rings(2, 4)\ntwo_rings(3, 2)\n",
   "hints": [
     "Fíjate bien en los aros. ¡Ya no están en el mismo sitio!",
     "No añadas ninguna línea nueva, solo tienes que cambiar los números.",

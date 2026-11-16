@@ -1126,36 +1126,38 @@ def test_in_the_shed_a_lying_broom_is_hidden_on_the_straw_and_seen_on_the_boards
         assert hidden == (cell in STRAW), f"{where}: the broom on {cell}"
 
 
-def test_the_race_and_the_rematch_have_zarek_cross_at_sixty_in_his_lane():
+def test_the_race_and_the_rematch_have_zarek_cross_at_sixty_one_in_his_lane():
     race, rematch = content_level("the-race"), content_level("the-rematch")
     for level in (race, rematch):
-        assert (level.race.lines, len(level.race.path), level.race.tick) == (18, 41, 60)
-        # The wizard's lane on top, its finish clear of the flag's pole; Zarek's below.
+        assert (level.race.lines, len(level.race.path), level.race.tick) == (18, 42, 61)
+        # The wizard's lane on top, Zarek's below; both land past the painted line, in
+        # column 32, Zarek clear of the lower flag's pole (D229).
         assert {cell.y for cell in level.race.path} <= {10, 11, 12}
-        assert level.race.path[-1] == Position(31, 12)
-        assert level.race.finish == level.start._replace(x=31) == Position(31, 8)
+        assert level.race.path[-1] == Position(32, 12)
+        assert level.race.finish == level.start._replace(x=32) == Position(32, 8)
+        assert level.markers.get("E", level.race.finish) == Position(32, 8)
 
 
-def test_the_race_s_solution_crosses_at_fifty_three_and_eighteen_lines_tie_at_sixty():
+def test_the_race_s_solution_crosses_at_fifty_four_and_eighteen_lines_tie_at_sixty_one():
     folder = CONTENT / "the-race"
     won = run_code(content_level("the-race"), (folder / "solution.py").read_text())
-    assert won.status == "won" and won.goals[1].params["tick"] == 53
+    assert won.status == "won" and won.goals[1].params["tick"] == 54
     tied = run_code(
         content_level("the-race"), (folder / "wrong" / "eighteen_lines.py").read_text()
     )
-    assert tied.goals[1].params["tick"] == 60 and tied.goals[1].params["tie"]
+    assert tied.goals[1].params["tick"] == 61 and tied.goals[1].params["tie"]
     assert tied.goals[1].failed
 
 
-def test_the_rematch_is_won_at_fifty_three_and_the_race_s_program_crosses_at_eighty_eight():
+def test_the_rematch_is_won_at_fifty_four_and_the_race_s_program_crosses_at_eighty_nine():
     folder = CONTENT / "the-rematch"
     won = run_code(content_level("the-rematch"), (folder / "solution.py").read_text())
-    assert won.status == "won" and won.goals[1].params["tick"] == 53
+    assert won.status == "won" and won.goals[1].params["tick"] == 54
     given = run_code(
         content_level("the-rematch"), (folder / "wrong" / "the_race_s_program.py").read_text()
     )
     assert len(given.goals[0].params["missed"]) == 7
-    assert given.goals[1].params["tick"] == 88 and given.goals[1].failed
+    assert given.goals[1].params["tick"] == 89 and given.goals[1].failed
 
 
 def test_the_rematch_is_chapter_4_s_second_fix_and_the_rings_its_one_improve():
@@ -1179,7 +1181,7 @@ def test_the_finish_lands_the_wizard_on_its_finish_and_zarek_in_his_lane_the_cla
     data = json.loads((CONTENT.parent / "stories" / "the-finish" / "story.json").read_text())
     story_on_scenes(data, lambda name: read_scene(CONTENT.parent / "scenes", name))
     race = content_level("the-race").race
-    assert data["wizard"] == list(race.finish) == [31, 8]
+    assert data["wizard"] == list(race.finish) == [32, 8]
     first = data["steps"][0]
     assert first["camera"] == {"wide": True}
     flown = [do for do in first["do"] if do.get("by") == "zarek"]

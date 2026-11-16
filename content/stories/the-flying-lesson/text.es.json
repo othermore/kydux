@@ -1,10 +1,11 @@
 {
   "title": "La clase de vuelo",
   "steps": [
-    "Habéis desatado hasta la última cuando se oyen voces en el campo. Ilda llega con la clase, y nadie sabe nada. {friend} se guarda rápidamente el hilo negro en el bolsillo.",
-    "¡Buenos días, madrugadores! Cada uno coge una escoba del cobertizo. {wizard}, esa es tuya por hoy: cuídala bien.",
+    "Habéis desatado hasta la última cuando se oyen voces en el campo: ¡Ilda viene con el resto de alumnos! Por suerte, habéis evitado un accidente, aunque todavía no podéis contar nada a nadie. {friend} se guarda rápidamente los hilos negros en el bolsillo para que no os pillen.",
+    "¡Buenos días, madrugadores! Que cada uno coja una escoba y me siga al campo de entrenamiento.",
+    "Veo que todos tenéis vuestra escoba. Los alumnos de segundo año deben recordar que sus compañeros de primero todavía no han usado la escoba nunca, así que debéis ayudarles.",
     "¡Mirad, los de primero llevan la escoba como si fuera un paraguas! Yo el año pasado crucé el lago el primer día.",
-    "Zarek, al final de la fila. La escoba se levanta con una palabra mágica, *drevo*, y volando se cruza lo que andando no se puede, como el agua y los setos. Primer ejercicio: caminad hasta el final del embarcadero, lanzad la palabra allí, y volad sin parar hasta la piedra blanca de la otra orilla.",
+    "Zarek, silencio y a la fila con los demás. Os recuerdo que la escoba se levanta con una palabra mágica, *drevo*. Podéis volar por encima del agua y los setos, que no podríais cruzar andando. En el primer ejercicio deberéis caminar hasta el final del embarcadero, levantar la escoba con la palabra mágica y volar hasta la piedra blanca de la otra orilla.",
     "{¡Yo primero, quiero volar ya!|No me fío nada de un palo que vuela.}",
     "Te toca. El agua brilla delante, y la piedra blanca espera al otro lado. Respira hondo, sujeta bien tu escoba, y veamos qué puede hacer."
   ]

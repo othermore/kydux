@@ -1,92 +1,259 @@
 {
   "id": "the-flying-lesson",
   "speaker": "ilda",
-  "scene": "the-lake-edge",
+  "scene": "the-broom-shed",
   "wizard": [
-    1,
+    8,
     7
   ],
   "camera": [
-    3,
-    6
+    9,
+    9
   ],
   "actors": [
     {
       "id": "friend",
       "kind": "friend",
       "at": [
-        0,
-        6
+        7,
+        7
       ],
-      "facing": "right"
+      "facing": "down"
     },
     {
       "id": "mate",
       "kind": "friend",
       "at": [
-        0,
-        8
+        11,
+        7
       ],
-      "facing": "right"
+      "facing": "down"
     },
     {
       "id": "ilda",
       "kind": "teacher",
-      "facing": "right"
+      "facing": "up"
     },
     {
       "id": "classmate_boy",
       "kind": "friend",
-      "facing": "right"
+      "facing": "up"
     },
     {
       "id": "classmate_girl",
       "kind": "friend",
-      "facing": "right"
+      "facing": "up"
+    }
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_6",
+      "at": [
+        6,
+        4
+      ],
+      "hung": true
     },
     {
-      "id": "zarek",
-      "kind": "racer",
-      "facing": "down"
+      "kind": "broom",
+      "id": "broom_7",
+      "at": [
+        7,
+        4
+      ],
+      "hung": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_8",
+      "at": [
+        8,
+        4
+      ],
+      "hung": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_9",
+      "at": [
+        9,
+        4
+      ],
+      "hung": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_10",
+      "at": [
+        10,
+        4
+      ],
+      "hung": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_11",
+      "at": [
+        11,
+        4
+      ],
+      "hung": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_12",
+      "at": [
+        12,
+        4
+      ],
+      "hung": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_13",
+      "at": [
+        13,
+        4
+      ],
+      "hung": true
     }
   ],
   "steps": [
     {
-      "who": "voice"
+      "who": "voice",
+      "camera": {
+        "fit": [
+          [
+            3,
+            3
+          ],
+          [
+            16,
+            14
+          ]
+        ]
+      }
     },
     {
       "who": "ilda",
       "do": [
         {
           "appear": [
-            0,
-            5
+            9,
+            14
           ]
         },
         {
           "walk": [
-            1,
-            5
+            9,
+            7
           ]
         },
         {
-          "face": "down"
+          "face": "up"
         },
         {
           "by": "classmate_boy",
           "appear": [
-            0,
-            4
+            10,
+            13
+          ]
+        },
+        {
+          "by": "classmate_boy",
+          "walk": [
+            10,
+            12
           ]
         },
         {
           "by": "classmate_girl",
           "appear": [
-            0,
-            3
+            10,
+            14
+          ]
+        },
+        {
+          "by": "classmate_girl",
+          "walk": [
+            [
+              9,
+              14
+            ],
+            [
+              9,
+              12
+            ]
           ]
         }
       ]
+    },
+    {
+      "who": "ilda",
+      "scene": {
+        "scene": "the-lake-edge",
+        "wizard": [
+          1,
+          7
+        ],
+        "camera": [
+          3,
+          6
+        ],
+        "actors": [
+          {
+            "id": "friend",
+            "kind": "friend",
+            "at": [
+              0,
+              6
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "mate",
+            "kind": "friend",
+            "at": [
+              0,
+              8
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "ilda",
+            "kind": "teacher",
+            "at": [
+              1,
+              5
+            ],
+            "facing": "down"
+          },
+          {
+            "id": "classmate_boy",
+            "kind": "friend",
+            "at": [
+              0,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "classmate_girl",
+            "kind": "friend",
+            "at": [
+              0,
+              3
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zarek",
+            "kind": "racer",
+            "facing": "down"
+          }
+        ]
+      }
     },
     {
       "who": "zarek",

@@ -463,6 +463,13 @@ test.describe('the stories', () => {
       await page.goto(`/#story/${id}`);
       await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
       await page.screenshot({ path: `${SHOTS}story-${id}-1.png` });
+      // The flying lesson opens in the shed, every peg with its broom, the floor and the
+      // path to the door framed (sprint 43, 2.7).
+      if (id === 'the-flying-lesson') {
+        await expect(page.locator('#scene')).toHaveAttribute('data-story-part', '0');
+        await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', '3,3,16,14');
+        await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_13:broom-hung:13,4/);
+      }
       // The finish is told on the whole width of the race course (D199).
       if (id === 'the-finish') await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', 'wide');
       let step = 1;
@@ -480,6 +487,13 @@ test.describe('the stories', () => {
           await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_0:broom:9,8/);
           // The three have walked in by the step's end: the scene's own playback is done.
           await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '9,8');
+        }
+        // Ilda comes into the shed, the class outside on the path; then the lake.
+        if (id === 'the-flying-lesson' && step === 2) {
+          await expect(page.locator('#scene')).toHaveAttribute('data-story-part', '0');
+        }
+        if (id === 'the-flying-lesson' && step >= 3) {
+          await expect(page.locator('#scene')).toHaveAttribute('data-story-part', '1');
         }
         if (id === 'the-finish') await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', 'wide');
       }

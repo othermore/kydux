@@ -487,8 +487,20 @@
       "bank": "Ribera",
       "stone": "Piedra",
       "other": "Otro",
-      "margin": "Margen, pintado fuera de la escena"
-    }
+      "margin": "Margen, pintado fuera de la escena",
+      "water": "Agua",
+      "reeds": "Juncos",
+      "hedge": "Seto",
+      "bench": "Banco",
+      "chest": "Baúl",
+      "stand": "Grada",
+      "jetty": "Embarcadero",
+      "pole": "Poste",
+      "gate": "Cancela",
+      "lawn": "Césped que no se pisa",
+      "furniture": "Muebles"
+    },
+    "low": "Bajo: se cruza volando, no se pisa"
   },
   "race": {
     "reading": "Ilda lee los programas: tú, {mine} líneas; {name}, {theirs}.",

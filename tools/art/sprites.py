@@ -24,10 +24,11 @@ from one frame to the next. `textures` writes each square of a grid of
 textures, made seamless: the square blended with itself shifted by half, so
 that it repeats without a seam. `sprite` cuts one thing of a kind drawn by the
 game from its own picture (D182) out of a box of a picture: on flat magenta,
-keyed out as a sheet is; with `--lawn`, a thing painted standing on a lawn, the
-ring on its post, the lawn and its shadows taken out by their colour, green over
-red, and only the thing's own piece kept, its holes the lawn seen through it;
-trimmed, `height` pixels tall, written as a webp.
+keyed out as a sheet is, and its rim of magenta's shades, a shadow or an edge
+painted on the magenta, cleared from the outside in; with `--lawn`, a thing
+painted standing on a lawn, the ring on its post, the lawn and its shadows taken
+out by their colour, green over red, and only the thing's own piece kept, its
+holes the lawn seen through it; trimmed, `height` pixels tall, written as a webp.
 """
 
 import argparse
@@ -236,6 +237,31 @@ def off_lawn(image: Array) -> Array:
     return out
 
 
+def off_magenta_rim(image: Array, margin: int = 20) -> Array:
+    """A keyed thing with its magenta rim taken out (D182): a pixel whose green falls
+    short of its red and its blue by more than `margin` is magenta's, an edge or a
+    shadow painted on it, and is cleared when it is reached from the clear pixels
+    through others like it; such a pixel inside the thing keeps its colour."""
+    rgb = image[..., :3].astype(np.int16)
+    clear = image[..., 3] == 0
+    tinted = np.minimum(rgb[..., 0], rgb[..., 2]) - rgb[..., 1] > margin
+    passable = clear | tinted
+    reached = clear.copy()
+    while True:
+        grown = reached.copy()
+        grown[1:] |= reached[:-1]
+        grown[:-1] |= reached[1:]
+        grown[:, 1:] |= reached[:, :-1]
+        grown[:, :-1] |= reached[:, 1:]
+        grown &= passable
+        if np.array_equal(grown, reached):
+            break
+        reached = grown
+    out = image.copy()
+    out[..., 3] = np.where(reached, 0, out[..., 3])
+    return out
+
+
 def _groups(mask: Array) -> Array:
     """Each group of a mask's pixels that touch side by side, numbered from 1."""
     labelled = np.zeros(mask.shape, dtype=np.int32)
@@ -262,7 +288,7 @@ def sprite(path: Path, out: Path, box: tuple[int, int, int, int], height: int, l
     image = cut.load(path)
     left, top, right, bottom = box
     piece = image[top:bottom, left:right]
-    keyed = soft_key(piece)
+    keyed = off_magenta_rim(soft_key(piece))
     if lawn:
         keyed = off_lawn(keyed)
     trimmed = cut.trim(keyed)

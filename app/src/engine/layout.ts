@@ -176,6 +176,8 @@ export interface Layout {
   low: Tile[];
   /** The race the level is (D189), or none. */
   race?: RaceLayout;
+  /** The rings the level asks flown through, in their order (D187). */
+  rings: string[];
 }
 
 const DEFAULT_SIGHT = 4;
@@ -338,6 +340,9 @@ export function layout(level: LevelJson): Layout {
     ...sleepAtOf(level),
     low,
     ...raceOf(level),
+    rings: asList(level.goals)
+      .filter((goal) => goal.kind === 'through_in_order')
+      .flatMap((goal) => (Array.isArray(goal.ids) ? goal.ids.map(String) : [])),
   };
 }
 

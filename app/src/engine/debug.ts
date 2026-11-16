@@ -39,12 +39,25 @@ const KIND_COLOURS: Record<string, number> = {
   bank: 0xa0703c,
   stone: 0x6fa8ff,
   margin: 0x4a3f5c,
+  water: 0x3fa9f5,
+  reeds: 0x7fb069,
+  hedge: 0x2f8f4f,
+  bench: 0xb08050,
+  chest: 0x9b6b3a,
+  stand: 0xc0905a,
+  jetty: 0xc8a070,
+  pole: 0x705030,
+  gate: 0x805a30,
+  lawn: 0x8fcf6f,
+  furniture: 0xb5838d,
 };
 const OTHER = 0xff66cc;
 /** The cross on a cell an open door's leaf lies on (D125). */
 const LEAF = 0xff9f1a;
 /** The cross on an enchanted cell, floor where no figure is seen (D135). */
 const ENCHANTED = 0xb56bff;
+/** The cross on a low cell, which a flight crosses and a walk does not (D186). */
+const LOW = 0x1f6fff;
 
 
 function kept(): Record<DebugLayer, boolean> {
@@ -144,8 +157,9 @@ export class DebugView {
         const kind = this.kindAt(x, y);
         cells.fillStyle(KIND_COLOURS[kind] ?? OTHER, 0.38).fillRect(x * TILE, y * TILE, TILE, TILE);
         const char = kind === 'margin' ? '#' : (this.map.rows[y]?.[x] ?? '#');
-        if (char === '#' || char === '=') {
-          cells.lineStyle(2, 0xff2a2a, 0.75);
+        if (char === '#' || char === '=' || char === '~') {
+          // Red where no one walks or flies, blue where a flight crosses (D186).
+          cells.lineStyle(2, char === '~' ? LOW : 0xff2a2a, 0.75);
           cells.lineBetween(x * TILE + 6, y * TILE + 6, (x + 1) * TILE - 6, (y + 1) * TILE - 6);
           cells.lineBetween((x + 1) * TILE - 6, y * TILE + 6, x * TILE + 6, (y + 1) * TILE - 6);
         }
@@ -159,6 +173,19 @@ export class DebugView {
     cells.lineStyle(1, 0xffffff, 0.45);
     for (let x = x0; x <= x1; x += 1) cells.lineBetween(x * TILE, y0 * TILE, x * TILE, y1 * TILE);
     for (let y = y0; y <= y1; y += 1) cells.lineBetween(x0 * TILE, y * TILE, x1 * TILE, y * TILE);
+    // Each ring's turn, in the order the level asks them flown through (D187).
+    this.map.rings.forEach((id, index) => {
+      const ring = this.map.things.find((thing) => thing.id === id);
+      if (!ring) return;
+      const [x, y] = ring.tile;
+      cells.fillStyle(0x1f1f3a, 0.85).fillCircle((x + 0.5) * TILE, (y + 0.5) * TILE, TILE * 0.22);
+      this.scene.add
+        .text((x + 0.5) * TILE, (y + 0.5) * TILE, String(index + 1), { fontSize: `${Math.round(TILE * 0.3)}px`, color: '#ffffff' })
+        .setOrigin(0.5)
+        .setDepth(DEPTH + 0.01)
+        .setVisible(false)
+        .setName('debug-ring');
+    });
     return cells;
   }
 
@@ -289,6 +316,7 @@ export class DebugView {
       entry(hex(KIND_COLOURS[kind] ?? OTHER), shown ? `${shown} · ${words}` : words);
     }
     entry('', debugWord('blocked'), true);
+    if (this.map.low.length > 0) entry(hex(LOW), debugWord('low'), true);
     if (this.map.things.some((thing) => (thing.covers ?? []).length > 0)) entry(hex(LEAF), debugWord('leaf'));
     if (this.map.enchanted.length > 0) entry(hex(ENCHANTED), debugWord('enchanted'), true);
     return legend;
@@ -298,6 +326,9 @@ export class DebugView {
   private apply(): void {
     this.cells.setVisible(this.shown.cells);
     this.leaves.setVisible(this.shown.cells);
+    for (const number of this.scene.children.getAll('name', 'debug-ring')) {
+      (number as Phaser.GameObjects.Text).setVisible(this.shown.cells);
+    }
     this.legend.hidden = !this.shown.cells;
     for (const { mask } of this.masks) mask.setVisible(this.shown.masks);
     this.numbers.hidden = !this.shown.numbers;

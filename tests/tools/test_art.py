@@ -196,6 +196,17 @@ def test_a_soft_key_makes_the_magenta_clear_and_takes_its_tint_off_an_edge():
     assert keyed[0, 2, 3] == 255
 
 
+def test_a_magenta_rim_reached_from_the_clear_is_taken_out_and_a_tint_inside_is_kept():
+    image = np.zeros((1, 6, 4), dtype=np.uint8)
+    image[0, 1] = (175, 70, 112, 255)  # a shadow painted on the magenta
+    image[0, 2] = (140, 90, 50, 255)  # the thing's brown
+    image[0, 3] = (150, 60, 120, 255)  # a tint inside the thing
+    image[0, 4] = (140, 90, 50, 255)
+    out = sprites.off_magenta_rim(image)
+    assert out[0, 1, 3] == 0
+    assert list(out[0, 2:5, 3]) == [255, 255, 255]
+
+
 def test_a_thin_line_across_a_sheet_is_taken_out_and_a_wide_figure_is_not():
     image = np.zeros((40, 40, 4), dtype=np.uint8)
     image[10:12, :, 3] = 255  # a baseline alone

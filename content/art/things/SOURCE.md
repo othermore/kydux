@@ -9,5 +9,6 @@ its foot stands in its cell (D182).
   of its painting of a small ring field (`tools/art/prompts/scene-ring-field-2.md`),
   both by Gemini 3 Pro Image (`gemini-3-pro-image`).
 - `broom.webp`: a broom lying on the floor, painted alone on flat magenta by
-  Gemini 3 Pro Image from `tools/art/prompts/sprite-broom.md`, keyed out by
-  `tools/art/sprites.py sprite`.
+  Gemini 3 Pro Image from `tools/art/prompts/sprite-broom.md`, keyed out, its
+  magenta rim and the lawn strip under it taken out, by
+  `tools/art/sprites.py sprite --lawn`.

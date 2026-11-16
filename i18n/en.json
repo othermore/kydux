@@ -487,8 +487,20 @@
       "bank": "Bank",
       "stone": "Stone",
       "other": "Other",
-      "margin": "Margin, painted beyond the scene"
-    }
+      "margin": "Margin, painted beyond the scene",
+      "water": "Water",
+      "reeds": "Reeds",
+      "hedge": "Hedge",
+      "bench": "Bench",
+      "chest": "Chest",
+      "stand": "Stand",
+      "jetty": "Jetty",
+      "pole": "Pole",
+      "gate": "Gate",
+      "lawn": "Lawn not walked on",
+      "furniture": "Furniture"
+    },
+    "low": "Low: flown over, not walked on"
   },
   "race": {
     "reading": "Ilda reads the programs: you, {mine} lines; {name}, {theirs}.",

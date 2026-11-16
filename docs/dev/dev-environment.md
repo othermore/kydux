@@ -745,7 +745,9 @@ those of `app/src/engine/looks.ts`. This writes every sheet into
 ```
 
 With `--check`, it also writes `art/raw/figures-check.png`, every sheet
-side by side. Look at it after changing a look's colours or a base.
+side by side, then the figures drawn whole (Zarek, Rinlo) and the things'
+sprites (a broom, a ring). Look at it after changing a look's colours or a
+base.
 
 A wizard's sheet also has four rows of casting frames, below its walking
 ones. They come from a casting base for each gender, in `art/figures/`.

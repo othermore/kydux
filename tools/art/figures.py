@@ -41,9 +41,10 @@ the figure stands (D120); figures.json lists them (`floating`).
 Writes content/art/figures/wizard-<look>.webp for every look and the friends'
 sheets named in FRIENDS, from the bases in art/figures/ (BASES), and their list in
 figures.json; --check writes art/raw/figures-check.png, every sheet side by
-side, to look at. A wizard's sheet has four more rows after its walking ones,
-the same ways in the same order: casting, the wand raised, pointed with its
-light and lowered, recoloured from the casting base of its gender (CAST_BASES);
+side with the drawn figures and the things' sprites, to look at. A wizard's
+sheet has four more rows after its walking ones, the same ways in the same
+order: casting, the wand raised, pointed with its light and lowered,
+recoloured from the casting base of its gender (CAST_BASES);
 four more, picking up the way it faces, bending, at the ground with both hands
 in front of its feet and half up again (PICKUP_BASES); one facing down,
 celebrating (WIN_BASES); and one asleep (SLEEP_BASES, D91), which the friends'
@@ -893,9 +894,14 @@ def make(check: bool = False) -> list[Path]:
             about["sheets"][name] = DRAWN_ROWS if flying else {"walk": 0}
     (FIGURES / "figures.json").write_text(json.dumps(about, indent=2) + "\n", encoding="utf-8")
     if check:
-        sheets = [Image.open(p).convert("RGBA") for p in written]
+        # Every sheet written, then the drawn figures' and the things' sprites (D182).
+        shown = [*written, *(FIGURES / f"{name}.webp" for name in DRAWN)]
+        shown += sorted((REPO / "content" / "art" / "things").glob("*.webp"))
+        sheets = [Image.open(p).convert("RGBA") for p in shown if p.is_file()]
         strip = Image.new(
-            "RGBA", (sum(s.width for s in sheets), sheets[0].height), (235, 235, 225, 255)
+            "RGBA",
+            (sum(s.width for s in sheets), max(s.height for s in sheets)),
+            (235, 235, 225, 255),
         )
         x = 0
         for sheet in sheets:

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type ApiTable, allows, heldObjects, notebookEntries, notebookTabs, PYTHON, pythonEntries, spellsAndWords } from './notebook';
+import { type ApiTable, allows, heldObjects, notebookEntries, notebookTabs, PYTHON, pythonBlocks, spellsAndWords } from './notebook';
 import en from '../../../i18n/en.json';
 import es from '../../../i18n/es.json';
 
@@ -85,28 +85,46 @@ describe('the notebook', () => {
     expect(spellsAndWords({ id: 'none', api: ['wizard.cast'] })).toEqual({ spells: [], words: [] });
   });
 
-  it("lists Python's words a level's concepts hold, in the table's order, and every one outside the course (D256)", () => {
-    expect(pythonEntries({ knownWords: [], concepts: ['arguments'] })).toEqual([]);
-    expect(pythonEntries({ knownWords: [], concepts: ['arguments', 'comments'] })).toEqual([{ concept: 'comments', shown: '#' }]);
-    expect(
-      pythonEntries({ knownWords: [], concepts: ['def', 'lists', 'comments', 'len', 'if'] }).map((entry) => entry.concept),
-    ).toEqual(['comments', 'if', 'lists', 'len', 'def']);
-    expect(pythonEntries()).toHaveLength(17);
+  it("lists Python's words a level's concepts hold, block by block in the table's order, and every one outside the course (D256)", () => {
+    const shown = (concepts?: string[]) =>
+      pythonBlocks(concepts && { knownWords: [], concepts }).map((block) => block.map((entry) => entry.concept));
+    // A comment, a string, an argument, `print` and `len` are concepts with no entry.
+    expect(shown(['comments', 'arguments', 'strings', 'print', 'len'])).toEqual([]);
+    expect(shown(['def', 'lists', 'comments', 'len', 'if'])).toEqual([['if'], ['lists'], ['def']]);
+    // A block's entries stand side by side once each is taught.
+    expect(shown(['if', 'else', 'for_range'])).toEqual([['if', 'else'], ['for_range']]);
+    expect(shown(['for_range', 'while', 'for_each', 'def', 'def_arguments'])).toEqual([
+      ['for_range', 'for_each'],
+      ['while'],
+      ['def', 'def_arguments'],
+    ]);
+    // The comparisons are one entry: `==` alone, then `==`, `<` and `>` together.
+    expect(pythonBlocks({ knownWords: [], concepts: ['equal', 'not'] })).toEqual([
+      [{ concept: 'equal', shown: '==' }],
+      [{ concept: 'not', shown: 'not' }],
+    ]);
+    expect(pythonBlocks({ knownWords: [], concepts: ['equal', 'not', 'less_greater'] })).toEqual([
+      [{ concept: 'less_greater', shown: '==  <  >' }],
+      [{ concept: 'not', shown: 'not' }],
+    ]);
+    expect(pythonBlocks()).toHaveLength(9);
+    expect(pythonBlocks().flat()).toHaveLength(12);
   });
 
   it('has the tabs that have something in them, in their order (D256)', () => {
     const walking = { api: ['wizard.move_right'] };
     const casting = { api: ['wizard.move_right', 'wizard.cast'], spells: ['zelim'] };
     expect(notebookTabs(walking, { knownWords: [], concepts: [] })).toEqual(['actions']);
-    expect(notebookTabs(walking, { knownWords: [], concepts: ['comments'] })).toEqual(['actions', 'python']);
+    expect(notebookTabs(walking, { knownWords: [], concepts: ['comments', 'strings', 'print'] })).toEqual(['actions']);
+    expect(notebookTabs(walking, { knownWords: [], concepts: ['variables'] })).toEqual(['actions', 'python']);
     expect(notebookTabs(casting, { knownWords: [], concepts: [] })).toEqual(['actions', 'spells']);
-    expect(notebookTabs(casting, { knownWords: [], concepts: ['comments'] })).toEqual(['actions', 'python', 'spells']);
+    expect(notebookTabs(casting, { knownWords: [], concepts: ['variables'] })).toEqual(['actions', 'python', 'spells']);
   });
 
   it("has a line and an example for every word of the page, in every language (D256)", () => {
     for (const words of [en, es] as Record<string, unknown>[]) {
       const page = words.notebook_python as Record<string, { does?: string; example?: string }>;
-      expect(Object.keys(page)).toEqual(PYTHON.map((entry) => entry.concept));
+      expect(Object.keys(page)).toEqual(PYTHON.flatMap((block) => block.entries.map((entry) => entry.concept)));
       for (const entry of Object.values(page)) {
         expect(entry.does?.trim()).toBeTruthy();
         expect(entry.example?.trim()).toBeTruthy();

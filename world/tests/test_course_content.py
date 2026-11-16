@@ -21,7 +21,7 @@ CHAPTERS = sorted(p for p in (CONTENT / "chapters").iterdir() if (p / "chapter.j
 LESSONS = sorted(p for p in (CONTENT / "lessons").iterdir() if (p / "lesson.json").is_file())
 STORIES = sorted(p for p in (CONTENT / "stories").glob("*") if (p / "story.json").is_file())
 #: The concepts a lesson may teach, beside the API's names (D60): Python's words and
-#: signs, each shown on the notebook's page of Python but `arguments` (D256).
+#: signs.
 CONCEPTS = {
     "arguments",
     "arithmetic",
@@ -472,10 +472,16 @@ def taught_once_marked() -> dict[str, set[str]]:
     return known_at
 
 
-def test_the_page_of_python_has_a_line_and_an_example_for_each_concept_but_arguments():
-    """D256: notebook_python holds every concept but `arguments`; each example, in every
-    language, is whole Python with as many lines in each, and needs only what is known
-    once the lesson that marks its concept has been read."""
+#: The concepts with no entry on the notebook's page of Python (D256): an argument is
+#: said with each action; a comment, a string and `print` are on the screen in the
+#: programs; `len` is said in the list's entry.
+OFF_THE_PAGE = {"arguments", "comments", "len", "print", "strings"}
+
+
+def test_the_page_of_python_has_a_line_and_an_example_for_each_concept_it_shows():
+    """D256: notebook_python holds every concept but those off the page; each example, in
+    every language, is whole Python with as many lines in each, and needs only what is
+    known once the lesson that marks its concept has been read."""
     import ast
 
     pages = {
@@ -486,9 +492,8 @@ def test_the_page_of_python_has_a_line_and_an_example_for_each_concept_but_argum
     }
     known_at = taught_once_marked()
     for lang, page in pages.items():
-        assert set(page) == CONCEPTS - {"arguments"}, (
-            f"{lang}: {set(page) ^ (CONCEPTS - {'arguments'})}"
-        )
+        shown = CONCEPTS - OFF_THE_PAGE
+        assert set(page) == shown, f"{lang}: {set(page) ^ shown}"
         for concept, entry in page.items():
             assert entry["does"].strip(), f"{lang}: {concept} says nothing"
             example = entry["example"]

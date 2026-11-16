@@ -3875,27 +3875,39 @@ one overturns stays, marked as superseded.
   owner's, chosen by ear. Rules out a sound of the landing's own laid over the wind, a hum
   or an effect, which draws the ear more than a landing asks; a landing that starts from
   silence; and a landing cut short by the run's end.
-- **D256 — The notebook has a page of Python.** Decided 2026-11-16 by the owner
-  (*quiero añadir al cuaderno una sección más donde estén los elementos que se hayan ido
-  enseñando ya de sintaxis: for, if, while, comparaciones, listas.... simplemente una
-  linea recordando lo que hace cada uno, y un ejemplo. Eso ayuda al niño a ver la
-  sintaxis para escribir los programas*). Once a lesson has taught any of them, the
-  notebook has a tab *Python*, between the actions and the spells and words: every word
-  and sign of Python the course has taught up to the level, in the order the course
-  teaches them, each as it is typed (`if`, `==`, `[ ]`), with one line that says what it
-  does and an example of one to five lines (`notebook_python.<concept>.does` and
-  `.example`). A lesson marks each in `teaches` (`concept:<name>`, D60): a comment, a
-  string, `print`, a variable, a sum and a subtraction, `==`, `not`, `if`, `else`, `for`
-  with `range`, `while`, a list and its index, `len`, `for` over a list, `<` and `>`,
-  `def` and a `def`'s arguments. A tab is there once it has something, and the bar of
-  tabs once there are two, so that a tab never moves: *Python* comes second from the
-  level after the lesson on comments. The examples are read, not put into the editor:
-  they name things of other programs; the actions' examples still put their line in.
-  An example needs only what is taught when its own concept is, and the test that holds
-  a level's code to the concepts taught before it holds the examples too. A level
-  outside the course shows every entry. Rules out a child paging back through the
-  lessons for a colon or a bracket, an entry shown before its lesson, and a click that
-  puts into the child's program a name its level does not hold.
+- **D256 — The notebook has a page of Python.** Decided 2026-11-16 by the owner (*quiero
+  añadir al cuaderno una sección más donde estén los elementos que se hayan ido enseñando ya
+  de sintaxis: for, if, while, comparaciones, listas.... simplemente una linea recordando lo
+  que hace cada uno, y un ejemplo. Eso ayuda al niño a ver la sintaxis para escribir los
+  programas*; and of its length, *la sección nueva tiene que ser más corta, podemos poner un
+  poco menos de tamaño de letra. Los comentarios no hace falta ponerlos, ni las comillas*,
+  *algunas cosas se pueden poner en dos columnas en el mismo bloque. Por ejemplo el for in y
+  el for in range() pueden ponerse uno al lado del otro, y el def y el def con parámetros
+  también [...] Y el == el < y el > se pueden poner todos juntos*, *puedes quitar el print y
+  poner [] y len juntos*). Once a lesson has taught any of them, the notebook has a tab
+  *Python*, between the actions and the spells and words: the words and signs of Python the
+  course has taught up to the level, each as it is typed (`if`, `=`, `[ ]`), with one line
+  that says what it does and an example of one to five lines
+  (`notebook_python.<concept>.does` and `.example`). A lesson marks each in `teaches`
+  (`concept:<name>`, D60): a variable, a sum and a subtraction, `==`, `not`, `if`, `else`,
+  `for` with `range`, `while`, a list and its index, `for` over a list, `<` and `>`, `def`
+  and a `def`'s arguments. A comment, a string, `print` and `len` are marked too, for the
+  check of what a program may use, and have no entry of their own: the programs on the
+  screen show the first three, and a list's entry says `len` with it, the number of its
+  elements. The page is short, to be taken in at a glance. Its letter is smaller than the
+  panel's, and each word stands on the row of its line. The entries go in blocks, in the
+  order the course teaches each block's first: `if` and `else`, the two `for` and the two
+  `def` stand side by side once both of a pair are taught, and the comparisons are one
+  entry, `==` alone and then `==`, `<` and `>` together, with one line and one example for
+  the three. A tab is there once it has something, and the bar of tabs once there are two:
+  *Python* comes second from the level after the lesson that teaches a variable. The
+  examples are read, not put into the editor: they name things of other programs; the
+  actions' examples still put their line in. An example needs only what is taught when its
+  own concept is, and the test that holds a level's code to the concepts taught before it
+  holds the examples too. A level outside the course shows every entry. Rules out a child
+  paging back through the lessons for a colon or a bracket, an entry shown before its
+  lesson, a click that puts into the child's program a name its level does not hold, and a
+  list so long that a word is not found in it.
 - **D257 — The opening's first step is told over the letter, held before the castle.**
   Decided 2026-11-16 by the owner (*en la primera imagen se viese la imagen del castillo
   pero por delante tapando el castillo se viese la carta con el castillo dibujado a

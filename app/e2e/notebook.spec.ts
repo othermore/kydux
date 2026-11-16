@@ -95,7 +95,7 @@ test('a level\'s notebook has nothing the course has not taught yet', async ({ p
   await expect(notebook.locator('[data-example="dask.facing"]')).toHaveCount(0);
 });
 
-test('the notebook\'s second tab has the spells and the words given so far (D80)', async ({ page }) => {
+test('the notebook\'s tab of spells has the spells and the words given so far (D80)', async ({ page }) => {
   // Before any spell or word: no such tab.
   await open(page, 'the-long-corridor');
   await page.locator('#notebook-open').click();
@@ -138,11 +138,11 @@ test('the spells and words in Spanish', async ({ browser }) => {
 });
 
 test.describe("the notebook's page of Python (D256)", () => {
-  const PYTHON = [
-    'comments', 'strings', 'print', 'variables', 'arithmetic', 'equal', 'not', 'if', 'else',
-    'for_range', 'while', 'lists', 'len', 'for_each', 'less_greater', 'def', 'def_arguments',
-  ];
-  const entries = (page: Page) => page.locator('#notebook .notebook-syntax > li');
+  const blocks = (page: Page) => page.locator('#notebook .notebook-syntax > li');
+  const shown = (page: Page) =>
+    blocks(page).evaluateAll((items) =>
+      items.map((item) => [...item.querySelectorAll<HTMLElement>('.syntax-entry')].map((entry) => entry.dataset.concept)),
+    );
 
   test("the course's first level has no bar of tabs", async ({ page }) => {
     await open(page, 'the-gate');
@@ -151,31 +151,47 @@ test.describe("the notebook's page of Python (D256)", () => {
     await expect(page.locator('#notebook .notebook-tabs')).toHaveCount(0);
   });
 
-  test('Fixing the program: two tabs, Python second with the comment alone, its example read and not put in the editor', async ({
-    page,
-  }) => {
-    await open(page, 'the-dark-note');
-    const before = await page.locator('.cm-content').textContent();
+  test('a comment and a string taught give no tab Python (the password)', async ({ page }) => {
+    await open(page, 'the-password');
     await page.locator('#notebook-open').click();
     await expect(page.locator('#notebook .notebook-tab')).toHaveCount(2);
+    await expect(page.locator('#notebook-tab-python')).toHaveCount(0);
+  });
+
+  test('The lost book: Python second with the variable and the sums, an example read and not put in the editor', async ({
+    page,
+  }) => {
+    await open(page, 'the-lost-book');
+    const before = await page.locator('.cm-content').textContent();
+    await page.locator('#notebook-open').click();
+    await expect(page.locator('#notebook .notebook-tab')).toHaveCount(3);
     await expect(page.locator('#notebook .notebook-tab').nth(1)).toHaveAttribute('id', 'notebook-tab-python');
     await expect(page.locator('#notebook-tab-python')).toHaveText('Python');
     await page.locator('#notebook-tab-python').click();
     await expect(page.locator('#notebook')).toHaveAttribute('data-tab', 'python');
-    await expect(entries(page)).toHaveCount(1);
-    const comment = page.locator('#notebook li[data-concept="comments"]');
-    await expect(comment.locator('.syntax-word')).toHaveText('#');
-    await expect(comment.locator('.description')).not.toBeEmpty();
-    expect((await comment.locator('pre.syntax-example').textContent())?.split('\n')).toEqual([
-      '# Towards the door',
-      'wizard.move_right()',
+    expect(await shown(page)).toEqual([['variables'], ['arithmetic']]);
+    const sums = page.locator('#notebook [data-concept="arithmetic"]');
+    await expect(sums.locator('.syntax-word')).toHaveText('+  -');
+    await expect(sums.locator('.description')).not.toBeEmpty();
+    expect((await sums.locator('pre.syntax-example').textContent())?.split('\n')).toEqual([
+      'total = 4 + 3',
+      'rest = total - 2',
     ]);
-    await expect(comment.locator('button')).toHaveCount(0);
-    await comment.locator('pre.syntax-example').click();
+    await expect(sums.locator('button')).toHaveCount(0);
+    await sums.locator('pre.syntax-example').click();
     await expect(page.locator('.cm-content')).toHaveText(before ?? '');
   });
 
-  test("chapter 4's last level has the seventeen, in the order taught, and the spells and words third", async ({
+  test('By the statues: the comparison is `==` alone, and `if` stands alone in its block', async ({ page }) => {
+    await open(page, 'by-the-statues');
+    await page.locator('#notebook-open').click();
+    await page.locator('#notebook-tab-python').click();
+    expect(await shown(page)).toEqual([['variables'], ['arithmetic'], ['equal'], ['not'], ['if']]);
+    await expect(page.locator('#notebook [data-concept="equal"] .syntax-word')).toHaveText('==');
+    await expect(page.locator('#notebook .side-by-side')).toHaveCount(0);
+  });
+
+  test("chapter 4's last level has every block, the pairs side by side, and the spells and words third", async ({
     page,
   }) => {
     // The smallest screen the game is made for (D38).
@@ -185,9 +201,32 @@ test.describe("the notebook's page of Python (D256)", () => {
     await expect(page.locator('#notebook .notebook-tab')).toHaveCount(3);
     await expect(page.locator('#notebook .notebook-tab').nth(2)).toHaveAttribute('id', 'notebook-tab-spells');
     await page.locator('#notebook-tab-python').click();
-    await expect(entries(page)).toHaveCount(17);
-    expect(await entries(page).evaluateAll((items) => items.map((item) => (item as HTMLElement).dataset.concept))).toEqual(PYTHON);
-    // No example is wider than the panel, at the narrowest the game is played.
+    expect(await shown(page)).toEqual([
+      ['variables'],
+      ['arithmetic'],
+      ['less_greater'],
+      ['not'],
+      ['if', 'else'],
+      ['for_range', 'for_each'],
+      ['while'],
+      ['lists'],
+      ['def', 'def_arguments'],
+    ]);
+    // The comparisons are one entry, with the three signs, and a list's says `len` too.
+    await expect(page.locator('#notebook [data-concept="less_greater"] .syntax-word')).toHaveText('==  <  >');
+    await expect(page.locator('#notebook [data-concept="lists"] .syntax-word')).toHaveText('[ ]  len()');
+    // A pair stands side by side: the second entry to the right of the first, at its height.
+    for (const [left, right] of [
+      ['if', 'else'],
+      ['for_range', 'for_each'],
+      ['def', 'def_arguments'],
+    ]) {
+      const first = (await page.locator(`#notebook [data-concept="${left}"]`).boundingBox())!;
+      const second = (await page.locator(`#notebook [data-concept="${right}"]`).boundingBox())!;
+      expect(second.x).toBeGreaterThan(first.x + first.width - 1);
+      expect(Math.abs(second.y - first.y)).toBeLessThan(2);
+    }
+    // No example is wider than its box, at the narrowest the game is played.
     const wide = await page
       .locator('#notebook pre.syntax-example')
       .evaluateAll((boxes) => boxes.filter((box) => box.scrollWidth > box.clientWidth + 1).length);

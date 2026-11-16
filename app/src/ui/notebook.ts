@@ -6,7 +6,7 @@
 // them in the order taught, each as it is typed, with a line and an example to read
 // (D60, D256); a tab of the spells and the words (passwords) known up to here, each
 // with what it does, follows once the course has given any (D80). The bar of tabs
-// shows once there are two, so that a tab never moves.
+// shows once there are two.
 
 import type { LevelJson, CourseGiven } from '../runtime/protocol';
 import { t } from '../i18n';
@@ -86,35 +86,62 @@ export function notebookEntries(level: LevelJson, table: ApiTable, course?: Cour
   return entries;
 }
 
-/** The page of Python (D256): each word or sign of Python a lesson teaches, by the
- * concept it marks (D60), and how it is typed, in the order the course teaches them.
- * Its line and its example are `notebook_python.<concept>.does` and `.example`. */
-export const PYTHON: readonly { concept: string; shown: string }[] = [
-  { concept: 'comments', shown: '#' },
-  { concept: 'strings', shown: '" "' },
-  { concept: 'print', shown: 'print()' },
-  { concept: 'variables', shown: '=' },
-  { concept: 'arithmetic', shown: '+  -' },
-  { concept: 'equal', shown: '==' },
-  { concept: 'not', shown: 'not' },
-  { concept: 'if', shown: 'if' },
-  { concept: 'else', shown: 'else' },
-  { concept: 'for_range', shown: 'for … in range()' },
-  { concept: 'while', shown: 'while' },
-  { concept: 'lists', shown: '[ ]' },
-  { concept: 'len', shown: 'len()' },
-  { concept: 'for_each', shown: 'for … in …' },
-  { concept: 'less_greater', shown: '<  >' },
-  { concept: 'def', shown: 'def' },
-  { concept: 'def_arguments', shown: 'def …(…)' },
+/** A word or sign of Python on the notebook's page (D256): the concept a lesson marks
+ * (D60) and how it is typed. Its line and its example are
+ * `notebook_python.<concept>.does` and `.example`. */
+export interface PythonEntry {
+  concept: string;
+  shown: string;
+}
+
+/** The page of Python (D256), block by block, in the order the course teaches each
+ * block's first entry. A block's entries stand side by side, as the two `for` and the
+ * two `def` do; in a `joined` block the last entry taught stands for them all, as `<`
+ * and `>` join `==` in one entry of comparisons. A list's entry says `len` too, taught
+ * with it. A comment, a string and `print` have no entry: the programs on the screen
+ * show them. */
+export const PYTHON: readonly { entries: readonly PythonEntry[]; joined?: boolean }[] = [
+  { entries: [{ concept: 'variables', shown: '=' }] },
+  { entries: [{ concept: 'arithmetic', shown: '+  -' }] },
+  {
+    entries: [
+      { concept: 'equal', shown: '==' },
+      { concept: 'less_greater', shown: '==  <  >' },
+    ],
+    joined: true,
+  },
+  { entries: [{ concept: 'not', shown: 'not' }] },
+  {
+    entries: [
+      { concept: 'if', shown: 'if' },
+      { concept: 'else', shown: 'else' },
+    ],
+  },
+  {
+    entries: [
+      { concept: 'for_range', shown: 'for … in range()' },
+      { concept: 'for_each', shown: 'for … in …' },
+    ],
+  },
+  { entries: [{ concept: 'while', shown: 'while' }] },
+  { entries: [{ concept: 'lists', shown: '[ ]  len()' }] },
+  {
+    entries: [
+      { concept: 'def', shown: 'def' },
+      { concept: 'def_arguments', shown: 'def …(…)' },
+    ],
+  },
 ];
 
-/** The page of Python's entries at a level: the table's that its concepts hold, in the
- * table's order; every one for a level outside the course, which knows them all (D60,
- * D256). */
-export function pythonEntries(course?: CourseGiven): { concept: string; shown: string }[] {
+/** The page of Python's blocks at a level: of each block, the entries its concepts hold,
+ * the last of them alone in a joined block; a block with none is left out. Every entry
+ * for a level outside the course, which knows them all (D60, D256). */
+export function pythonBlocks(course?: CourseGiven): PythonEntry[][] {
   const concepts = course?.concepts;
-  return concepts ? PYTHON.filter((entry) => concepts.includes(entry.concept)) : [...PYTHON];
+  return PYTHON.map((block) => {
+    const known = concepts ? block.entries.filter((entry) => concepts.includes(entry.concept)) : [...block.entries];
+    return block.joined ? known.slice(-1) : known;
+  }).filter((entries) => entries.length > 0);
 }
 
 /** The notebook's tabs, in their order (D80, D256): what the objects can do, Python's
@@ -127,12 +154,12 @@ export function notebookTabs(level: LevelJson, course?: CourseGiven): NotebookTa
   const { spells, words } = spellsAndWords(level, course);
   return [
     'actions',
-    ...(pythonEntries(course).length > 0 ? ['python' as const] : []),
+    ...(pythonBlocks(course).length > 0 ? ['python' as const] : []),
     ...(spells.length > 0 || words.length > 0 ? ['spells' as const] : []),
   ];
 }
 
-/** The spells and the words the second tab lists (D80): the spells known up to the
+/** The spells and the words the tab of spells lists (D80): the spells known up to the
  * level once the wizard can cast, and the words given once the wizard can speak. */
 export function spellsAndWords(level: LevelJson, course?: CourseGiven): { spells: string[]; words: string[] } {
   const api = (level.api as string[] | undefined) ?? [];
@@ -223,22 +250,29 @@ export function notebookPanel(
     }
     const actions = sections.length ? sections : [element('p', {}, [t('notebook.nothing')])];
     // Python's words (D256): each as it is typed, its line, and its example to read, which
-    // is no button: it names things of other programs.
+    // is no button: it names things of other programs. A block's entries stand side by
+    // side.
     const python = element('section', { className: 'notebook-python' }, [
       element(
         'ul',
         { className: 'notebook-syntax' },
-        pythonEntries(course).map((entry) => {
-          const item = element('li', {}, [
-            element('code', { className: 'syntax-word' }, [entry.shown]),
-            element('span', { className: 'description' }, withCode(t(`notebook_python.${entry.concept}.does`))),
-            element('pre', { className: 'syntax-example' }, [
-              element('code', {}, [t(`notebook_python.${entry.concept}.example`)]),
-            ]),
-          ]);
-          item.dataset.concept = entry.concept;
-          return item;
-        }),
+        pythonBlocks(course).map((entries) =>
+          element(
+            'li',
+            { className: entries.length > 1 ? 'syntax-block side-by-side' : 'syntax-block' },
+            entries.map((entry) => {
+              const item = element('div', { className: 'syntax-entry' }, [
+                element('code', { className: 'syntax-word' }, [entry.shown]),
+                element('span', { className: 'description' }, withCode(t(`notebook_python.${entry.concept}.does`))),
+                element('pre', { className: 'syntax-example' }, [
+                  element('code', {}, [t(`notebook_python.${entry.concept}.example`)]),
+                ]),
+              ]);
+              item.dataset.concept = entry.concept;
+              return item;
+            }),
+          ),
+        ),
       ),
     ]);
     const header = element('header', {}, [element('h2', { id: 'notebook-title' }, [t('notebook.title')]), close]);

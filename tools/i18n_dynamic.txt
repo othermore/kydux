@@ -10,7 +10,7 @@ language.
 notebook.
 things.
 
-# The notebook's second tab says each spell by `spells.${name}` and each word by
+# The notebook's tab of spells says each spell by `spells.${name}` and each word by
 # `words.${name}` (D80); tools/i18n_check.py holds those keys to the world's spells
 # and the levels' words.
 spells.

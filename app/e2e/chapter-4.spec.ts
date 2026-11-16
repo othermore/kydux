@@ -946,21 +946,22 @@ test.describe('the notebook of chapter 4', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
-  test("Python's page gains len, then def and its arguments as the lessons teach them (D60, D256)", async ({ page }) => {
+  test("Python's page gains the list with len, then def and its arguments as the lessons teach them (D60, D256)", async ({ page }) => {
     for (const [id, has, lacks] of [
-      ['the-broom-at-your-feet', ['while'], ['lists', 'len', 'def']],
-      ['the-shed', ['lists', 'len'], ['for_each', 'def']],
-      ['the-rings', ['len', 'for_each', 'less_greater', 'def'], ['def_arguments']],
+      ['the-broom-at-your-feet', ['while'], ['lists', 'def']],
+      ['the-shed', ['lists'], ['for_each', 'def']],
+      ['the-rings', ['lists', 'for_each', 'less_greater', 'def'], ['equal', 'def_arguments']],
       ['the-race', ['def', 'def_arguments'], []],
     ] as const) {
       await open(page, id);
       await page.locator('#notebook-open').click();
       await page.locator('#notebook-tab-python').click();
       const syntax = page.locator('#notebook .notebook-syntax');
-      for (const concept of has) await expect(syntax.locator(`li[data-concept="${concept}"]`)).toHaveCount(1);
-      for (const concept of lacks) await expect(syntax.locator(`li[data-concept="${concept}"]`)).toHaveCount(0);
+      for (const concept of has) await expect(syntax.locator(`[data-concept="${concept}"]`)).toHaveCount(1);
+      for (const concept of lacks) await expect(syntax.locator(`[data-concept="${concept}"]`)).toHaveCount(0);
     }
-    await expect(page.locator('#notebook li[data-concept="def_arguments"]')).toContainText('def saludar(nombre):');
+    await expect(page.locator('#notebook [data-concept="lists"]')).toContainText('print(len(nombres))');
+    await expect(page.locator('#notebook [data-concept="def_arguments"]')).toContainText('def saludar(nombre):');
     await page.locator('#notebook').screenshot({ path: `${SHOTS}notebook-python.png` });
   });
 });

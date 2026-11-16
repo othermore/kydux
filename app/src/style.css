@@ -908,25 +908,50 @@ footer .build {
   font-size: 15px;
 }
 
-/* The page of Python (D256): each word or sign as it is typed, a little larger than its
-   line, the line, and the example to read in the editor's own letter, its lines kept, on
-   the colour of the panel's code; an example wider than the panel scrolls in its box. */
-.notebook-syntax li {
-  margin: 10px 0 12px;
+/* The page of Python (D256), kept short: each word or sign as it is typed, on the colour
+   of the open tab, so that the eye finds where each entry begins; its line follows on the
+   same row, and under them the example to read, in the editor's own letter, its lines
+   kept, on the colour of the panel's code. A block's entries stand side by side, in
+   columns of one width; an example wider than its column scrolls in its box. */
+.notebook-syntax .syntax-block {
+  margin: 8px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.notebook-syntax .side-by-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+}
+
+.notebook-syntax .syntax-entry {
+  min-width: 0;
 }
 
 .notebook .syntax-word {
-  font: 600 17px var(--mono);
+  margin-right: 6px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--gold-soft);
+  font: 700 15px/1.35 var(--mono);
+  white-space: nowrap;
+}
+
+.notebook-syntax .description {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
 }
 
 .notebook .syntax-example {
-  margin: 4px 0 0;
-  padding: 4px 8px;
+  margin: 3px 0 0;
+  padding: 3px 8px;
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--panel);
-  font: 15px/1.35 var(--mono);
+  font: 14px/1.3 var(--mono);
   white-space: pre;
 }
 

@@ -8,6 +8,9 @@ its foot stands in its cell (D182).
   from Gemini's edit without the grid (`tools/art/prompts/ring-field-2-nogrid.md`)
   of its painting of a small ring field (`tools/art/prompts/scene-ring-field-2.md`),
   both by Gemini 3 Pro Image (`gemini-3-pro-image`).
+- `ring-red.webp`, `ring-blue.webp`, `ring-yellow.webp`, `ring-purple.webp`: the
+  ring with its hoop painted in a pair's colour (D219), its rope and its post as they
+  are, by `tools/art/ring_colours.py` from `ring.webp`; a ring is drawn by its colour.
 - `broom-hung.webp`: the same broom hanging straight down by a loop of cord from a
   peg, the peg painted with it, on flat magenta, by Gemini 3 Pro Image from
   `tools/art/prompts/sprite-broom-hung.md` (the lying broom and the shed's rack given

@@ -1,17 +1,17 @@
 {
   "title": "The rings",
   "goals": [
-    "Fly through the six rings in order.",
+    "Fly through the six rings in order: in each pair, the first upward and the second downward.",
     "Reach the white stone.",
-    "In fewer than 18 lines."
+    "In fewer than 16 lines."
   ],
-  "starting_code": "# The pair of rings is written three times. Give it a name!\nwizard.cast(\"drevo\")\nwizard.move_right(1)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(6)\nwizard.move_right(9)\nwizard.move_up(6)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(11)\nwizard.move_down(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\n",
+  "starting_code": "# The pair of rings is written three times. Give it a name!\nwizard.cast(\"drevo\")\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(6)\nwizard.move_right(8)\nwizard.move_down(6)\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_right(11)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\n",
   "hints": [
-    "Look for the four lines that fly through a pair of rings: down, right, up, right.",
+    "Look for the four lines that fly through a pair of rings: up, right, down and right.",
     "Give those four lines a name with `def` and put the four moves inside it.",
-    "Replace the repeating lines with a call to your new function in the three places."
+    "Call your new function in the three places, in place of the lines it holds."
   ],
-  "intro": "Here is my program for the long ring field! It flies through three pairs of rings. Between the first and second pair there is a clump of tall trees to pass below; between the second and third, a pond to pass above. The program is 21 lines long! Make it shorter with a function for the pair, called in the three places.",
+  "intro": "In broom races, rings are always flown like this: the first of a pair is flown through from below upward, and the second from above downward. A ring crossed in the wrong direction does not count! Here is my program for the ring field. It flies through three pairs of rings. Between the first pair and the second there is a clump of trees to go round by above; between the second and the third you have to fly over a pond. The program is 19 lines long! It is the four lines of a pair, written three times. If you make a function for the pair and call it in the three places, it will be much shorter.",
   "outro": "Very well done! A shorter program is much easier to read, and it flies just as smoothly.",
   "learned": "Now you know that `def` gives some lines a name, and that the name with brackets runs them wherever and as often as it is written."
 }

@@ -4,7 +4,7 @@
     "Fly through the eight rings in order.",
     "Cross the finish before Zarek."
   ],
-  "starting_code": "# This is the program that won the race, and Zarek has moved the rings.\ndef two_rings(first, second):\n    wizard.move_down(2)\n    wizard.move_right(first)\n    wizard.move_up(2)\n    wizard.move_right(second)\n\nwizard.cast(\"drevo\")\nwizard.move_right(2)\ntwo_rings(3, 2)\ntwo_rings(3, 2)\ntwo_rings(2, 3)\ntwo_rings(2, 2)\n",
+  "starting_code": "# This is the program that won the race, and Zarek has moved the rings.\ndef two_rings(first, second):\n    wizard.move_up(2)\n    wizard.move_right(first)\n    wizard.move_down(2)\n    wizard.move_right(second)\n\nwizard.cast(\"drevo\")\nwizard.move_right(2)\ntwo_rings(3, 2)\ntwo_rings(3, 2)\ntwo_rings(2, 3)\ntwo_rings(2, 2)\n",
   "hints": [
     "Look at the rings closely. They are no longer in the same places!",
     "Do not add any new lines, or your program will take off too late. Just change the numbers.",

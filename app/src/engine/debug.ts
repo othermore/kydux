@@ -183,14 +183,16 @@ export class DebugView {
     cells.lineStyle(1, 0xffffff, 0.45);
     for (let x = x0; x <= x1; x += 1) cells.lineBetween(x * TILE, y0 * TILE, x * TILE, y1 * TILE);
     for (let y = y0; y <= y1; y += 1) cells.lineBetween(x0 * TILE, y * TILE, x1 * TILE, y * TILE);
-    // Each ring's turn, in the order the level asks them flown through (D187).
+    // Each ring's turn, in the order the level asks them flown through (D187), with an
+    // arrow for the way it is flown (D219).
     this.map.rings.forEach((id, index) => {
       const ring = this.map.things.find((thing) => thing.id === id);
       if (!ring) return;
       const [x, y] = ring.tile;
+      const arrow = ring.way === 'up' ? '↑' : ring.way === 'down' ? '↓' : '';
       cells.fillStyle(0x1f1f3a, 0.85).fillCircle((x + 0.5) * TILE, (y + 0.5) * TILE, TILE * 0.22);
       this.scene.add
-        .text((x + 0.5) * TILE, (y + 0.5) * TILE, String(index + 1), { fontSize: `${Math.round(TILE * 0.3)}px`, color: '#ffffff' })
+        .text((x + 0.5) * TILE, (y + 0.5) * TILE, `${index + 1}${arrow}`, { fontSize: `${Math.round(TILE * 0.3)}px`, color: '#ffffff' })
         .setOrigin(0.5)
         .setDepth(DEPTH + 0.01)
         .setVisible(false)

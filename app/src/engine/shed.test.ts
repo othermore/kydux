@@ -39,9 +39,9 @@ describe("the shed's brooms and zones", () => {
   });
 
   it('draws a hung broom from its hung sprite, held by its top on the peg (D195)', () => {
-    expect(spriteName(SPRITES, 'broom', true)).toBe('broom-hung');
-    expect(spriteName(SPRITES, 'broom', false)).toBe('broom');
-    expect(spriteName({ broom: SPRITES.broom as ThingSprites[string] }, 'broom', true)).toBe('broom');
+    expect(spriteName(SPRITES, { kind: 'broom', hung: true })).toBe('broom-hung');
+    expect(spriteName(SPRITES, { kind: 'broom', hung: false })).toBe('broom');
+    expect(spriteName({ broom: SPRITES.broom as ThingSprites[string] }, { kind: 'broom', hung: true })).toBe('broom');
     const hung = SPRITES['broom-hung'] as ThingSprites[string];
     expect(spriteOrigin(hung)).toEqual([0.5, 0]);
     expect(spriteOrigin(SPRITES.broom as ThingSprites[string])).toEqual([0.5, 1]);

@@ -139,7 +139,7 @@ import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
-import { blockedText, bumpText, friendText, sleepingText } from './words';
+import { blockedText, bumpText, friendText, ringWayText, sleepingText } from './words';
 import { bobOf, FLOWN, FLY_LIFT, flyFrame } from './flight';
 import { drawnFromSprite, spriteFoot, spriteKey, spriteName, spriteOrigin, spriteScale, type ThingSprite } from './things';
 import { Wind } from './sound';
@@ -580,7 +580,7 @@ class LevelScene extends Phaser.Scene {
       }
       // A thing of a kind with a sprite of its own, a broom or a ring, on a painted scene
       // with no cut-out of it (D182); one hidden in the straw unseen until found (D184).
-      const named = spriteName(this.art?.sprites ?? null, thing.kind, thing.hung === true);
+      const named = spriteName(this.art?.sprites ?? null, thing);
       const sprite = this.art?.sprites?.[named];
       if (this.art && sprite && drawnFromSprite(this.art.sprites, named, false) && this.textures.exists(spriteKey(named))) {
         const image = this.add.image(0, 0, spriteKey(named));
@@ -1156,8 +1156,9 @@ class LevelScene extends Phaser.Scene {
       }
       // A hidden thing found, seen from now on (D184).
       else if (event.kind === 'found') this.showFound(event, instant);
-      // A ring flown through (D187).
+      // A ring flown through (D187), or flown against its way (D219).
       else if (event.kind === 'through') this.flownThrough(String(event.data.id), instant);
+      else if (event.kind === 'wrong_way') this.flownAgainst(event, tick, instant);
       // A broom lifted or set down, the wizard's or a racer's (D185, D189).
       else if (event.kind === 'fly' || event.kind === 'land') {
         const sprite = this.spriteOf(String(event.data.id ?? event.actor));
@@ -1209,6 +1210,17 @@ class LevelScene extends Phaser.Scene {
       .setBlendMode(Phaser.BlendModes.ADD)
       .setAlpha(0.8);
     this.tweens.add({ targets: glow, alpha: 0, duration: this.playback.tickDuration * 1.2, onComplete: () => glow.destroy() });
+  }
+
+  /** A ring flown against its way (D219): it shakes, the wizard thinks which way it
+   * is flown, with the bump's sound, and the program goes on. */
+  private flownAgainst(event: WorldEvent, tick: number, instant: boolean): void {
+    const image = this.things.get(String(event.data.id));
+    if (instant || this.still) return;
+    if (image) this.shake(image, this.playback.tickDuration);
+    this.playSound('bump');
+    const why = ringWayText(String(event.data.way));
+    this.speech.think(why, tick, this.sayTicks(why));
   }
 
   /** A figure lifted on its broom (D185): drawn from its flying rows, half a cell up,
@@ -1279,7 +1291,7 @@ class LevelScene extends Phaser.Scene {
         if (!image?.visible || !thing) return [];
         const [x, y] = [image.x / TILE, image.y / TILE];
         // A hung broom by its hung sprite's name, on its peg's cell (D195).
-        const name = spriteName(this.art?.sprites ?? null, thing.kind, thing.hung === true);
+        const name = spriteName(this.art?.sprites ?? null, thing);
         return [`${id}:${name}:${Math.floor(x)},${thing.hung ? thing.tile[1] : Math.ceil(y) - 1}`];
       })
       .sort()

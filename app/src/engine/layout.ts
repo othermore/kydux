@@ -39,6 +39,10 @@ export interface ThingLayout {
   hidden?: boolean;
   /** A broom hanging on a peg of the rack (D195), drawn from its kind's hung sprite. */
   hung?: boolean;
+  /** For a ring, the way it is flown through and its pair's colour, which it is drawn
+   * in (D219). */
+  way?: 'up' | 'down';
+  colour?: string;
 }
 
 /** A race against a racer, by Ilda's count (D189): the racer's id, the lines Ilda
@@ -252,6 +256,8 @@ export function layout(level: LevelJson): Layout {
       const covers = covered.length > 0 ? { covers: covered } : {};
       const hidden = spec.hidden === true ? { hidden: true } : {};
       const hung = spec.hung === true ? { hung: true } : {};
+      const way: { way?: 'up' | 'down' } = spec.way === 'up' || spec.way === 'down' ? { way: spec.way } : {};
+      const colour = typeof spec.colour === 'string' ? { colour: spec.colour } : {};
       things.push({
         id: String(spec.id),
         kind: String(spec.kind),
@@ -264,6 +270,8 @@ export function layout(level: LevelJson): Layout {
         ...covers,
         ...hidden,
         ...hung,
+        ...way,
+        ...colour,
       });
     }
   }

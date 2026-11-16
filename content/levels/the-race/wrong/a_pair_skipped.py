@@ -1,7 +1,7 @@
 def two_rings(first, second):
-    wizard.move_down(2)
-    wizard.move_right(first)
     wizard.move_up(2)
+    wizard.move_right(first)
+    wizard.move_down(2)
     wizard.move_right(second)
 
 wizard.cast("drevo")

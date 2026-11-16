@@ -449,8 +449,9 @@ class Wizard(Child):
     _k_role = "wizard"
 
     def __init__(self, world: World) -> None:
-        # `ring`: the ring whose cell the wizard flew into, and the way it was going, so
-        # that flying on the same way out of it goes through the ring (D187).
+        # `ring`: the ring whose cell the wizard flew into, the way it was going and the
+        # cell it flew in from, so that flying on the same way out of it goes through the
+        # ring, along its way or against it (D187, D219).
         self._set(
             world=world, position=world.level.start, facing=Direction.DOWN, flying=False, ring=None
         )
@@ -552,7 +553,8 @@ class Wizard(Child):
                         world.act("circle", {"at": list(here), "ring": ring_id})
                         world.penalty += 1
             through = self._k_through(direction)
-            self._set(position=ahead, ring=(ring.name, direction) if ring is not None else None)
+            entered = (ring.name, direction, here) if ring is not None else None
+            self._set(position=ahead, ring=entered)
             step = {"from": list(here), "to": list(ahead), "facing": direction.value}
             world.act(
                 "move",
@@ -560,24 +562,36 @@ class Wizard(Child):
                 then=partial(self._k_moved, through, here, ahead),
             )
 
-    def _k_moved(self, through: str | None, here: Position, ahead: Position) -> None:
+    def _k_moved(
+        self, through: tuple[str, Position] | None, here: Position, ahead: Position
+    ) -> None:
         """In a move's tick, before the goals are looked at: the ring flown through
-        (D187), and a race's finish crossed (D189)."""
+        along its way, or against it (D187, D219), and a race's finish crossed (D189)."""
         world: World = self._k_world
         if through is not None:
-            world.note(through, "through", {"id": through, "at": list(here)})
+            name, came_from = through
+            way = world.things[name]._k_spec.way
+            moved = "up" if ahead.y < here.y else "down"
+            if way == moved:
+                world.note(
+                    name, "through", {"id": name, "at": list(here), "from": list(came_from)}
+                )
+            else:
+                # Against its way: the ring is not flown through, and counts as missed.
+                wrong = {"id": name, "at": list(here), "way": way, "from": list(came_from)}
+                world.note(name, "wrong_way", wrong)
         race = world.level.race
         if race is not None and ahead == race.finish and world.crossed_at is None:
             world.crossed_at = world.tick
 
-    def _k_through(self, direction: Direction) -> str | None:
+    def _k_through(self, direction: Direction) -> tuple[str, Position] | None:
         """The ring whose cell the wizard leaves the way it flew in, so flying through
-        it (D187), or None."""
+        it (D187), with the cell it flew in from; or None."""
         entered = self._k_ring
         if entered is None:
             return None
-        name, way = entered
-        return name if way == direction else None
+        name, way, came_from = entered
+        return (name, came_from) if way == direction else None
 
     def move_right(self, steps: int = 1) -> None:
         """Walk right, one tile per step, stopping at a wall or a closed door:

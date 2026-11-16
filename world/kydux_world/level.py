@@ -77,6 +77,11 @@ CARRIED_KINDS = ("key", "book", "wand", "potion", "map", "broom")
 #: pile of books, lies within reach of the tile beside it.
 HIGH_KINDS = ("shelf", "bookcase")
 ACTOR_KINDS = ("teacher", "ghost", "cat", "friend", "racer")
+#: A ring's way, the way it is flown through: `up`, from the row under it to the row
+#: over it, or `down` (D219).
+RING_WAYS = ("up", "down")
+#: A pair of rings' colours (D219).
+RING_COLOURS = ("red", "blue", "yellow", "purple")
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
 KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto", "orvim", "drevo")
@@ -137,6 +142,10 @@ class ThingSpec:
     hung: bool = False
     #: The level's zone it is found from, or None for a thing found from anywhere (D196).
     zone: str | None = None
+    #: For a ring, the way it is flown through, `up` or `down`, and its pair's colour
+    #: (D219).
+    way: str | None = None
+    colour: str | None = None
 
 
 @dataclass(frozen=True)
@@ -408,6 +417,7 @@ class Level:
         )
         check_api(level)
         _level_camera(data.get("camera"), level)
+        _check_rings(level)
         return level
 
     def way(self, way_id: str) -> "Level":
@@ -563,6 +573,14 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
     zone = spec.get("zone")
     if zone is not None and not (isinstance(zone, str) and zone):
         raise LevelError(f"{shape.level_id}: {thing_id}'s zone is a zone's name")
+    way, colour = spec.get("way"), spec.get("colour")
+    if kind == "ring" and (way not in RING_WAYS or colour not in RING_COLOURS):
+        raise LevelError(
+            f"{shape.level_id}: the ring {thing_id} is flown {' or '.join(RING_WAYS)}, "
+            f"and is {', '.join(RING_COLOURS)}"
+        )
+    if kind != "ring" and ("way" in spec or "colour" in spec):
+        raise LevelError(f"{shape.level_id}: only a ring has a way and a colour")
     covers = _covers(shape, spec, thing_id)
     pillow_side = _pillow_side(shape, spec, thing_id)
     position = shape.place(spec, thing_id)
@@ -584,6 +602,8 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         knotted=knotted,
         hung=hung,
         zone=zone,
+        way=way,
+        colour=colour,
     )
 
 
@@ -976,6 +996,42 @@ def _carrying(data: dict[str, Any], level_id: str, start: Position) -> tuple[Thi
     if len(set(kinds)) != len(kinds):
         raise LevelError(f"{level_id}: carrying names a kind twice")
     return tuple(ThingSpec(kind, kind, start, carried=True) for kind in kinds)
+
+
+def check_pairs(level_id: str, rings: list[ThingSpec], start: Position, who: str) -> None:
+    """D219: rings flown in order go in pairs, taken two by two: the first `up` and
+    the second `down`, on one row, the second to the right of the first, of one colour,
+    and a pair of another colour than the pair before; `who` starts on the row under the
+    first."""
+    if len(rings) % 2:
+        raise LevelError(f"{level_id}: the rings go in pairs, and {rings[-1].id} has none")
+    for index in range(0, len(rings), 2):
+        first, second = rings[index], rings[index + 1]
+        if first.way != "up" or second.way != "down":
+            raise LevelError(
+                f"{level_id}: in a pair the first ring is flown up and the second down, "
+                f"not {first.id} {first.way} and {second.id} {second.way}"
+            )
+        if first.position.y != second.position.y or second.position.x <= first.position.x:
+            raise LevelError(f"{level_id}: {second.id} stands on {first.id}'s row, to its right")
+        if first.colour != second.colour:
+            raise LevelError(f"{level_id}: {first.id} and {second.id} are a pair of one colour")
+        if index and first.colour == rings[index - 1].colour:
+            raise LevelError(
+                f"{level_id}: {first.id}'s pair is of another colour than the pair before"
+            )
+    if rings and start.y != rings[0].position.y + 1:
+        raise LevelError(f"{level_id}: {who} starts on the row under {rings[0].id}")
+
+
+def _check_rings(level: "Level") -> None:
+    """The rings a `through_in_order` goal names go in pairs, the wizard starting under
+    the first (D219)."""
+    rings = {thing.id: thing for thing in level.things if thing.kind == "ring"}
+    for goal in level.goals:
+        ids = goal.params.get("ids") if goal.kind == "through_in_order" else None
+        if isinstance(ids, list) and all(ring in rings for ring in ids):
+            check_pairs(level.id, [rings[ring] for ring in ids], level.start, "the wizard")
 
 
 def _race(value: Any, shape: _Shape, actors: tuple[ActorSpec, ...]) -> Race | None:

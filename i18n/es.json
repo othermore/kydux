@@ -171,11 +171,15 @@
       "gate": "La cancela no se pasa, ni volando.",
       "other": "Por ahí no se pasa, ni volando."
     },
-    "ring": "¡Choco con el aro! Se pasa por dentro, de arriba abajo o de abajo arriba.",
+    "ring": "¡He chocado con el aro! Los aros se cruzan desde abajo o desde arriba.",
     "too_far": "Para quitarle el nudo a {thing} tengo que estar de pie sobre ella.",
     "no_broom": "Sin escoba, drevo no tiene nada que levantar.",
     "no_knot": "Esta escoba no tiene nudo: no hay nada que desatar.",
-    "no_landing": "No hay dónde posar la escoba."
+    "no_landing": "No hay dónde posar la escoba.",
+    "ring_way": {
+      "up": "Este aro se cruza hacia arriba, desde abajo. ¡Así no cuenta!",
+      "down": "Este aro se cruza hacia abajo, desde arriba. ¡Así no cuenta!"
+    }
   },
   "notebook": {
     "title": "El cuaderno {del mago|de la maga}",
@@ -446,8 +450,8 @@
   },
   "notebook_python": {
     "len": "Da cuántos valores tiene una lista: len(brooms) es el número de escobas de la lista brooms.",
-    "def": "Da un nombre a las líneas que van metidas debajo, una función. Se ejecutan cada vez que se escribe el nombre con paréntesis: two_rings().",
-    "def_arguments": "Los nombres entre los paréntesis del def son los argumentos de la función: al llamarla se les dan sus valores en el mismo orden, rings(3)."
+    "def": "Da un nombre a las líneas que van metidas debajo, una función. Se ejecutan cada vez que se escribe el nombre con paréntesis: quick_fly().",
+    "def_arguments": "Los nombres entre los paréntesis del def son los argumentos de la función: al llamarla se les dan sus valores en el mismo orden, two_rings(2, 4)."
   },
   "kinds": {
     "lesson": "Lección {n}",

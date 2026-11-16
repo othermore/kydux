@@ -6,7 +6,8 @@
 // figures by its row, scaled by the scene's cell as a figure is, the same on every
 // scene. A thing hidden in the straw is drawn only once found (D184). A broom that
 // hangs on a peg (D195) is drawn from its kind's hung sprite, `broom-hung`, its top on
-// the peg's point and at the rack's depth, behind a figure standing under it.
+// the peg's point and at the rack's depth, behind a figure standing under it. A ring
+// is drawn from its colour's sprite, `ring-red` (D219).
 
 import { TILE } from './placeholders';
 import type { Tile } from './sight';
@@ -37,11 +38,18 @@ export function spriteKey(kind: string): string {
   return `sprite-${kind}`;
 }
 
-/** The sprite a thing is drawn from, by name: its kind's, or for a hung broom its
- * kind's hung one when things.json lists it (D195). */
-export function spriteName(sprites: ThingSprites | null, kind: string, hung = false): string {
-  const name = `${kind}-hung`; // i18n-ignore: a sprite's name in things.json
-  return hung && sprites !== null && name in sprites ? name : kind;
+/** What of a thing chooses its sprite: its kind, whether it hangs, its colour. */
+export interface Sprited {
+  kind: string;
+  hung?: boolean;
+  colour?: string;
+}
+
+/** The sprite a thing is drawn from, by name: its kind's; for a hung broom its kind's
+ * hung one (D195), and for a ring its colour's (D219), when things.json lists it. */
+export function spriteName(sprites: ThingSprites | null, { kind, hung, colour }: Sprited): string {
+  const own = hung ? `${kind}-hung` : colour ? `${kind}-${colour}` : null; // i18n-ignore: things.json's names
+  return own !== null && sprites !== null && own in sprites ? own : kind;
 }
 
 /** Where in its picture a sprite is held: its origin, the bottom middle unless it hangs

@@ -88,8 +88,8 @@ export function notebookEntries(level: LevelJson, table: ApiTable, course?: Cour
  * concept a lesson teaches and its example. */
 const PYTHON: readonly { word: string; example: string }[] = [
   { word: 'len', example: 'len(brooms)' },
-  { word: 'def', example: 'def two_rings():' },
-  { word: 'def_arguments', example: 'def rings(times):' },
+  { word: 'def', example: 'def quick_fly():' },
+  { word: 'def_arguments', example: 'def two_rings(to_second, to_next):' },
 ];
 
 /** Python's words taught up to the level (`concepts`, D60), in the notebook's order. */

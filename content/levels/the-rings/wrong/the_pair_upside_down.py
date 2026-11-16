@@ -1,0 +1,18 @@
+def two_rings():
+    wizard.move_down(2)
+    wizard.move_right(2)
+    wizard.move_up(2)
+    wizard.move_right(2)
+
+wizard.cast("drevo")
+wizard.move_up(2)
+wizard.move_right(1)
+two_rings()
+wizard.move_up(4)
+wizard.move_right(8)
+wizard.move_down(4)
+wizard.move_right(1)
+two_rings()
+wizard.move_right(11)
+two_rings()
+wizard.move_down(2)

@@ -439,8 +439,8 @@ test.describe('the notebook of chapter 4', () => {
     for (const [id, shown] of [
       ['the-broom-at-your-feet', []],
       ['the-shed', ['len(brooms)']],
-      ['the-rings', ['len(brooms)', 'def two_rings():']],
-      ['the-race', ['len(brooms)', 'def two_rings():', 'def rings(times):']],
+      ['the-rings', ['len(brooms)', 'def quick_fly():']],
+      ['the-race', ['len(brooms)', 'def quick_fly():', 'def two_rings(to_second, to_next):']],
     ] as const) {
       await open(page, id);
       await page.locator('#notebook-open').click();
@@ -450,8 +450,8 @@ test.describe('the notebook of chapter 4', () => {
     }
     await expect(page.locator('#notebook .notebook-python')).toContainText('son los argumentos de la función');
     await page.locator('#notebook').screenshot({ path: `${SHOTS}notebook-python.png` });
-    await page.locator('#notebook [data-example="def rings(times):"]').click();
-    await expect(page.locator('.cm-content')).toContainText('def rings(times):');
+    await page.locator('#notebook [data-example="def two_rings(to_second, to_next):"]').click();
+    await expect(page.locator('.cm-content')).toContainText('def two_rings(to_second, to_next):');
   });
 });
 
@@ -465,7 +465,23 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).toHaveAttribute('data-thought', /copas/, { timeout: ciTimes(90_000) });
     await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
     expect(await run(page, solution('the-rings'))).toMatch(/^¡Lo has conseguido/);
-    await expect(scene(page)).toHaveAttribute('data-through', 'ring_1,ring_2,ring_3,ring_3,ring_4,ring_5,ring_6');
+    await expect(scene(page)).toHaveAttribute('data-through', 'ring_1,ring_2,ring_3,ring_4,ring_5,ring_6');
+  });
+
+  test('a pair flown down and then up is seen and said: each ring shakes, the wizard thinks its way (D219)', async ({ page }) => {
+    await open(page, 'the-rings', '1');
+    await start(page, wrong('the-rings', 'the_pair_upside_down'));
+    await expect(scene(page)).toHaveAttribute('data-thought', 'Este aro se cruza hacia arriba, desde abajo. ¡Así no cuenta!', {
+      timeout: ciTimes(90_000),
+    });
+    await expect(scene(page)).toHaveAttribute('data-sounds', /bump/);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}rings-wrong-way.png` });
+    await expect(scene(page)).toHaveAttribute('data-thought', 'Este aro se cruza hacia abajo, desde arriba. ¡Así no cuenta!', {
+      timeout: ciTimes(30_000),
+    });
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(120_000) });
+    await expect(page.locator('.win-card')).toHaveCount(0);
+    await expect(scene(page)).not.toHaveAttribute('data-through', /ring/);
   });
 
   test('Ilda reads the programs on the band; eighteen lines cross after Zarek, the function before him (D189)', async ({ page }) => {

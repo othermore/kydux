@@ -249,7 +249,7 @@ def test_drevo_cast_on_a_ring_s_cell_is_refused_as_no_cell_to_land_on():
     world = World(Level.from_dict(FIELD))
     world.wizard.cast("drevo")
     world.wizard.move_right()
-    world.wizard.move_down()
+    world.wizard.move_up()
     assert world.wizard.position == Position(1, 2)
     with pytest.raises(Refused):
         world.wizard.cast("drevo")
@@ -288,25 +288,26 @@ def test_the_cast_goal_names_no_cells():
         World(lake(goals=[*LAKE["goals"], goal]))
 
 
-#: A field with two rings on row 2, flown through downward then upward.
+#: A field with a pair of rings on row 2, the first flown upward and the second
+#: downward (D219), the wizard on the row under them.
 FIELD = {
     "id": "field",
-    "map": ["..........", "S.........", "..........", "..........", ".........."],
+    "map": ["..........", "..........", "..........", "S.........", ".........."],
     "carrying": ["wand", "broom"],
     "spells": ["drevo"],
     "things": [
-        {"kind": "ring", "id": "ring_1", "at": [1, 2]},
-        {"kind": "ring", "id": "ring_2", "at": [3, 2]},
+        {"kind": "ring", "id": "ring_1", "at": [1, 2], "way": "up", "colour": "red"},
+        {"kind": "ring", "id": "ring_2", "at": [3, 2], "way": "down", "colour": "red"},
     ],
     "goals": [{"kind": "through_in_order", "ids": ["ring_1", "ring_2"]}],
 }
 PAIR = (
-    "wizard.cast('drevo')\nwizard.move_right()\nwizard.move_down(2)\n"
-    "wizard.move_right(2)\nwizard.move_up(2)\n"
+    "wizard.cast('drevo')\nwizard.move_right()\nwizard.move_up(2)\n"
+    "wizard.move_right(2)\nwizard.move_down(2)\n"
 )
 
 
-def test_rings_flown_through_down_then_up_meet_the_goal_in_order():
+def test_rings_flown_through_up_then_down_meet_the_goal_in_order():
     result = run_code(Level.from_dict(FIELD), PAIR)
     assert result.status == "won"
     through = [e.data["id"] for e in result.events if e.kind == "through"]
@@ -316,7 +317,7 @@ def test_rings_flown_through_down_then_up_meet_the_goal_in_order():
 
 def test_a_ring_is_walked_into_and_flown_into_sideways_as_a_wall():
     world = World(Level.from_dict(FIELD))
-    world.wizard.move_down()
+    world.wizard.move_up()
     world.wizard.move_right()
     assert (world.events[-1].kind, world.events[-1].data["by"]) == ("bump", "ring")
     world.wizard.cast("drevo")
@@ -325,31 +326,123 @@ def test_a_ring_is_walked_into_and_flown_into_sideways_as_a_wall():
 
 
 def test_a_ring_passed_over_is_missed_and_the_goal_fails_at_the_end():
-    code = "wizard.cast('drevo')\nwizard.move_right(3)\nwizard.move_down(2)\n"
+    code = "wizard.cast('drevo')\nwizard.move_up(2)\nwizard.move_right(3)\nwizard.move_down(2)\n"
     result = run_code(Level.from_dict(FIELD), code)
     assert result.goals[0].failed
     assert result.goals[0].params["missed"] == ["ring_1"]
 
 
-#: The race, on an open course: rings on row 8 at the race's columns; Zarek at
-#: (10, 5) with fourteen lines, his lift and forty cells to the finish (31, 7), one of
-#: them a flourish, a tick circling in place: his flight is forty-one ticks.
+def test_a_ring_flown_against_its_way_is_not_flown_through_and_is_missed():
+    """D219: down through the first ring of the pair and up through the second."""
+    code = (
+        "wizard.cast('drevo')\nwizard.move_up(2)\nwizard.move_right()\nwizard.move_down(2)\n"
+        "wizard.move_right(2)\nwizard.move_up(2)\n"
+    )
+    result = run_code(Level.from_dict(FIELD), code)
+    assert not [e for e in result.events if e.kind == "through"]
+    wrong = [(e.actor, e.data) for e in result.events if e.kind == "wrong_way"]
+    assert wrong == [
+        ("ring_1", {"id": "ring_1", "at": [1, 2], "way": "up", "from": [1, 1]}),
+        ("ring_2", {"id": "ring_2", "at": [3, 2], "way": "down", "from": [3, 3]}),
+    ]
+    assert result.goals[0].failed
+    assert result.goals[0].params["missed"] == ["ring_1", "ring_2"]
+    # The moves are made: the wizard ends over the second ring.
+    assert result.events[-1].data.get("to", [3, 1]) == [3, 1]
+
+
+def test_a_ring_flown_again_along_its_way_in_its_turn_counts():
+    code = (
+        "wizard.cast('drevo')\nwizard.move_up(2)\nwizard.move_right()\nwizard.move_down(2)\n"
+        "wizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\n"
+    )
+    result = run_code(Level.from_dict(FIELD), code)
+    assert [e.kind for e in result.events if e.kind in ("through", "wrong_way")] == [
+        "wrong_way",
+        "through",
+        "through",
+    ]
+    assert result.status == "won"
+
+
+def rings(*specs, start=(0, 3)):
+    """A field of rings on rows 1 and 2, each `(x, y, way, colour)`, all named by the
+    goal in their order; the wizard at `start`."""
+    rows = ["." * 12 for _ in range(5)]
+    x, y = start
+    rows[y] = rows[y][:x] + "S" + rows[y][x + 1 :]
+    things = [
+        {"kind": "ring", "id": f"ring_{n}", "at": [rx, ry], "way": way, "colour": colour}
+        for n, (rx, ry, way, colour) in enumerate(specs, 1)
+    ]
+    goal = {"kind": "through_in_order", "ids": [thing["id"] for thing in things]}
+    return {"id": "rings", "map": rows, "carrying": ["wand", "broom"], "spells": ["drevo"],
+            "things": things, "goals": [goal]}  # fmt: skip
+
+
+@pytest.mark.parametrize(
+    ("level", "says"),
+    [
+        (rings((1, 2, "up", "red")), "go in pairs"),
+        (rings((1, 2, "down", "red"), (3, 2, "up", "red")), "first ring is flown up"),
+        (rings((1, 2, "up", "red"), (3, 2, "up", "red")), "first ring is flown up"),
+        (rings((1, 2, "up", "red"), (3, 1, "down", "red")), "on ring_1's row"),
+        (rings((3, 2, "up", "red"), (1, 2, "down", "red")), "to its right"),
+        (rings((1, 2, "up", "red"), (3, 2, "down", "blue")), "a pair of one colour"),
+        (
+            rings(
+                (1, 2, "up", "red"),
+                (3, 2, "down", "red"),
+                (5, 2, "up", "red"),
+                (7, 2, "down", "red"),
+            ),  # fmt: skip
+            "another colour than the pair before",
+        ),
+        (rings((1, 2, "up", "red"), (3, 2, "down", "red"), start=(0, 4)), "row under ring_1"),
+        (rings((1, 2, "up", "green"), (3, 2, "down", "green")), "is red, blue, yellow, purple"),
+    ],
+)
+def test_a_level_whose_rings_are_not_in_pairs_by_d219_does_not_load(level, says):
+    with pytest.raises(LevelError, match=says):
+        Level.from_dict(level)
+
+
+def test_a_ring_has_a_way_and_a_colour_and_nothing_else_does():
+    level = rings((1, 2, "up", "red"), (3, 2, "down", "red"))
+    del level["things"][0]["way"]
+    with pytest.raises(LevelError, match="is flown up or down"):
+        Level.from_dict(level)
+    level = rings((1, 2, "up", "red"), (3, 2, "down", "red"))
+    level["things"].append({"kind": "broom", "id": "broom", "at": [5, 3], "colour": "red"})
+    with pytest.raises(LevelError, match="only a ring has a way and a colour"):
+        Level.from_dict(level)
+    good = Level.from_dict(rings((1, 2, "up", "red"), (3, 2, "down", "red"),
+                                 (5, 2, "up", "blue"), (8, 2, "down", "blue")))  # fmt: skip
+    assert [(t.way, t.colour) for t in good.things if t.kind == "ring"] == [
+        ("up", "red"), ("down", "red"), ("up", "blue"), ("down", "blue"),
+    ]  # fmt: skip
+
+
+#: The race, on an open course: rings on row 8 at the race's columns, in pairs flown up
+#: then down (D219), the wizard on row 9 under them; Zarek at (10, 5) with fourteen
+#: lines, his lift and forty cells to the finish (31, 9), one of them a flourish, a
+#: tick circling in place: his flight is forty-one ticks.
 RACE_RINGS = (12, 15, 17, 20, 22, 24, 27, 29)
 ZAREK_PATH = [
     [12, 5], [12, 6], [15, 6], [15, 4], [17, 4], [17, 6], [20, 6], [20, 4], [22, 4],
-    [22, 6], [24, 6], [24, 4], [27, 4], [27, 6], [29, 6], [29, 4], [31, 4], [31, 4],
-    [31, 7],
+    [22, 6], [24, 6], [24, 4], [27, 4], [27, 6], [29, 6], [29, 5], [31, 5], [31, 5],
+    [31, 9],
 ]  # fmt: skip
 #: The rematch: his lift and thirty-seven cells, no flourish: thirty-eight ticks.
 SHARPER_PATH = [
     [12, 5], [12, 6], [15, 6], [15, 4], [17, 4], [17, 6], [20, 6], [20, 4], [22, 4],
-    [22, 6], [24, 6], [24, 4], [27, 4], [27, 6], [29, 6], [29, 5], [31, 5], [31, 7],
+    [22, 6], [24, 6], [24, 4], [27, 4], [27, 6], [29, 6], [31, 6], [31, 9],
 ]  # fmt: skip
 
 
 def race(rings=RACE_RINGS, lines=14, path=ZAREK_PATH):
     rows = ["." * 42 for _ in range(18)]
-    rows[7] = "." * 10 + "S" + "." * 31
+    rows[9] = "." * 10 + "S" + "." * 31
     return Level.from_dict(
         {
             "id": "race",
@@ -358,10 +451,17 @@ def race(rings=RACE_RINGS, lines=14, path=ZAREK_PATH):
             "spells": ["drevo"],
             "tick_limit": 120,
             "things": [
-                {"kind": "ring", "id": f"ring_{n}", "at": [x, 8]} for n, x in enumerate(rings, 1)
+                {
+                    "kind": "ring",
+                    "id": f"ring_{n}",
+                    "at": [x, 8],
+                    "way": "up" if n % 2 else "down",
+                    "colour": ("red", "blue", "yellow", "purple")[(n - 1) // 2],
+                }
+                for n, x in enumerate(rings, 1)
             ],
             "actors": [{"kind": "racer", "id": "zarek", "at": [10, 5], "facing": "right"}],
-            "race": {"against": "zarek", "lines": lines, "path": path, "finish": [31, 7]},
+            "race": {"against": "zarek", "lines": lines, "path": path, "finish": [31, 9]},
             "goals": [
                 {"kind": "through_in_order", "ids": [f"ring_{n}" for n in range(1, 9)]},
                 {"kind": "before", "racer": "zarek"},
@@ -371,9 +471,9 @@ def race(rings=RACE_RINGS, lines=14, path=ZAREK_PATH):
 
 
 WITH_ARGUMENTS = """def two_rings(first, second):
-    wizard.move_down(2)
-    wizard.move_right(first)
     wizard.move_up(2)
+    wizard.move_right(first)
+    wizard.move_down(2)
     wizard.move_right(second)
 
 wizard.cast("drevo")
@@ -389,9 +489,9 @@ def written_out(gaps):
     lines = ['wizard.cast("drevo")', "wizard.move_right(2)"]
     for first, second in gaps:
         lines += [
-            "wizard.move_down(2)",
-            f"wizard.move_right({first})",
             "wizard.move_up(2)",
+            f"wizard.move_right({first})",
+            "wizard.move_down(2)",
             f"wizard.move_right({second})",
         ]
     return "\n".join(lines) + "\n"
@@ -406,12 +506,12 @@ def test_zarek_lifts_after_his_lines_and_crosses_the_finish_at_fifty_five():
     zarek = [e for e in result.events if e.actor == "zarek"]
     assert [(e.kind, e.tick) for e in zarek if e.kind in ("fly", "circle", "land")] == [
         ("fly", 15),
-        ("circle", 52),
+        ("circle", 51),
         ("land", 55),
     ]
     moves = [e for e in zarek if e.kind == "move"]
     assert moves[0].tick == 16
-    assert (moves[-1].tick, moves[-1].data["to"]) == (55, [31, 7])
+    assert (moves[-1].tick, moves[-1].data["to"]) == (55, [31, 9])
 
 
 def test_ilda_reads_the_program_a_tick_a_line_and_the_function_wins_at_forty_nine():

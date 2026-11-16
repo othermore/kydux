@@ -171,11 +171,15 @@
       "gate": "The gate cannot be flown through.",
       "other": "That way cannot be flown through."
     },
-    "ring": "I bumped into the ring! It is flown through from above or from below.",
+    "ring": "I bumped into the ring! Rings are flown through from below or from above.",
     "too_far": "To take the knot off {thing} I must stand on it.",
     "no_broom": "With no broom, drevo has nothing to lift.",
     "no_knot": "This broom has no knot: there is nothing to untie.",
-    "no_landing": "There is nowhere to set the broom down."
+    "no_landing": "There is nowhere to set the broom down.",
+    "ring_way": {
+      "up": "This ring is flown upward, from below. Like this, it doesn't count!",
+      "down": "This ring is flown downward, from above. Like this, it doesn't count!"
+    }
   },
   "notebook": {
     "title": "The wizard's notebook",
@@ -446,8 +450,8 @@
   },
   "notebook_python": {
     "len": "Gives how many values a list has: len(brooms) is the number of brooms in the list brooms.",
-    "def": "Gives a name to the lines moved in under it, a function. They run each time the name is written with brackets: two_rings().",
-    "def_arguments": "The names in the brackets of def are the function's arguments: the call gives them their values in the same order, rings(3)."
+    "def": "Gives a name to the lines moved in under it, a function. They run each time the name is written with brackets: quick_fly().",
+    "def_arguments": "The names in the brackets of def are the function's arguments: the call gives them their values in the same order, two_rings(2, 4)."
   },
   "kinds": {
     "lesson": "Lesson {n}",

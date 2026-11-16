@@ -4,7 +4,7 @@
   "scene": "the-ring-field",
   "start": [
     4,
-    7
+    9
   ],
   "end": [
     37,
@@ -25,7 +25,9 @@
       "at": [
         5,
         8
-      ]
+      ],
+      "way": "up",
+      "colour": "red"
     },
     {
       "kind": "ring",
@@ -33,7 +35,9 @@
       "at": [
         7,
         8
-      ]
+      ],
+      "way": "down",
+      "colour": "red"
     },
     {
       "kind": "ring",
@@ -41,7 +45,9 @@
       "at": [
         18,
         8
-      ]
+      ],
+      "way": "up",
+      "colour": "blue"
     },
     {
       "kind": "ring",
@@ -49,7 +55,9 @@
       "at": [
         20,
         8
-      ]
+      ],
+      "way": "down",
+      "colour": "blue"
     },
     {
       "kind": "ring",
@@ -57,7 +65,9 @@
       "at": [
         33,
         8
-      ]
+      ],
+      "way": "up",
+      "colour": "yellow"
     },
     {
       "kind": "ring",
@@ -65,7 +75,9 @@
       "at": [
         35,
         8
-      ]
+      ],
+      "way": "down",
+      "colour": "yellow"
     }
   ],
   "actors": [
@@ -74,7 +86,7 @@
       "id": "ilda",
       "at": [
         3,
-        7
+        9
       ],
       "facing": "right",
       "sight": 0
@@ -84,7 +96,7 @@
       "id": "friend",
       "at": [
         3,
-        6
+        8
       ]
     },
     {
@@ -92,7 +104,7 @@
       "id": "mate",
       "at": [
         3,
-        8
+        10
       ]
     }
   ],
@@ -121,7 +133,7 @@
     },
     {
       "kind": "lines_under",
-      "lines": 18
+      "lines": 16
     }
   ],
   "tick_limit": 100

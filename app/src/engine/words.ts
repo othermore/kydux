@@ -33,6 +33,12 @@ export function bumpText(by: string, kind: string | null): string {
   return t(`blocked.high.${kind && HIGH_KINDS.includes(kind) ? kind : 'other'}`);
 }
 
+/** What the wizard thinks of a ring flown against its way (D219): the way it is
+ * flown. */
+export function ringWayText(way: string): string {
+  return way === 'down' ? t('blocked.ring_way.down') : t('blocked.ring_way.up');
+}
+
 /** Why an action could not be done, from a `blocked` event's reason, its thing's
  * kind, and its detail. */
 /** The wizard's thought while asleep, in the night (D124). */

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { initLanguage } from '../i18n';
-import { blockedText, bumpText } from './words';
+import { blockedText, bumpText, ringWayText } from './words';
 
 const english = { languages: ['en'], storage: null };
 const spanish = { languages: ['es'], storage: null };
@@ -74,7 +74,10 @@ describe('what a flight cannot cross, and a walk what a flight can (D186, D187)'
     expect(blockedText('no_walk', null, { kind: 'lava' })).toBe('Por aquí no se anda: solo se pasa volando.');
     expect(bumpText('high', 'tree')).toBe('Las copas de los árboles no se pasan: hay que rodearlas.');
     expect(bumpText('high', null)).toBe('Por ahí no se pasa, ni volando.');
-    expect(bumpText('ring', null)).toMatch(/^¡Choco con el aro!/);
+    expect(bumpText('ring', null)).toMatch(/^¡He chocado con el aro!/);
+    // A ring flown against its way (D219).
+    expect(ringWayText('up')).toBe('Este aro se cruza hacia arriba, desde abajo. ¡Así no cuenta!');
+    expect(ringWayText('down')).toBe('Este aro se cruza hacia abajo, desde arriba. ¡Así no cuenta!');
     expect(blockedText('too_far', 'broom')).toBe('Para quitarle el nudo a la escoba tengo que estar de pie sobre ella.');
     expect(blockedText('no_knot', 'broom')).toBe('Esta escoba no tiene nudo: no hay nada que desatar.');
     // drevo cast over the water (D215).

@@ -16,6 +16,7 @@ import cut  # noqa: E402
 import door  # noqa: E402
 import figures  # noqa: E402
 import generate  # noqa: E402
+import ring_colours  # noqa: E402
 import sprites  # noqa: E402
 
 MAGENTA = (255, 0, 255, 255)
@@ -1884,3 +1885,48 @@ def test_a_bust_s_hat_is_its_cloth_above_the_face_and_its_robe_the_cloth_at_its_
     assert parts["robe"][50, 5] and not parts["robe"][17, 20]
     assert parts["band"][14, 20] and parts["band"][48, 18]
     assert parts["skin"][28, 20] and not parts["skin"][14, 20]
+
+
+def test_the_ring_s_hoop_is_painted_in_its_colour_and_its_rope_and_post_are_kept():
+    """D219: the hoop's wood takes the colour, its light and shade kept; the rope's
+    strands, the wood's darker turns under the rope painted; the post as it is."""
+    import colorsys
+
+    ring = Image.new("RGBA", ring_colours.SIZE, (0, 0, 0, 0))
+    lit, shaded = (211, 152, 87, 255), (150, 100, 60, 255)
+    rope, under_rope = (240, 190, 120, 255), (137, 94, 76, 255)
+    post = (180, 125, 78, 255)
+    for at, colour in [
+        ((10, 60), lit),
+        ((12, 140), shaded),
+        ((104, 20), rope),
+        ((100, 26), under_rope),
+        ((105, 250), post),
+    ]:
+        ring.putpixel(at, colour)
+    for name, paint in ring_colours.COLOURS.items():
+        out = ring_colours.paint(ring, paint)
+        hue = colorsys.rgb_to_hsv(*(c / 255 for c in paint))[0]
+        for at in ((10, 60), (12, 140), (100, 26)):
+            got = colorsys.rgb_to_hsv(*(c / 255 for c in out.getpixel(at)[:3]))[0]
+            assert min(abs(got - hue), 1 - abs(got - hue)) < 0.02, (name, at)
+        value = [
+            colorsys.rgb_to_hsv(*(c / 255 for c in out.getpixel(at)[:3]))[2]
+            for at in ((10, 60), (12, 140))
+        ]
+        assert value[0] > value[1], name
+        assert out.getpixel((104, 20)) == rope
+        assert out.getpixel((105, 250)) == post
+        assert out.getpixel((0, 0)) == (0, 0, 0, 0)
+    with pytest.raises(ValueError, match="210 by 300"):
+        ring_colours.paint(Image.new("RGBA", (10, 10)), ring_colours.COLOURS["red"])
+
+
+def test_the_four_rings_are_painted_from_the_ring_and_listed_with_its_size():
+    things = Path(__file__).resolve().parents[2] / "content" / "art" / "things"
+    listed = json.loads((things / "things.json").read_text(encoding="utf-8"))
+    for name in ring_colours.COLOURS:
+        sprite = listed[f"ring-{name}"]
+        assert sprite["image"] == f"ring-{name}.webp"
+        assert (sprite["size"], sprite["foot"]) == (listed["ring"]["size"], listed["ring"]["foot"])
+        assert Image.open(things / sprite["image"]).size == ring_colours.SIZE

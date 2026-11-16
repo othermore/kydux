@@ -662,7 +662,12 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     (D206), a thing drawn by the game moved sideways on its cell (D207), the review's
     sheets with the grid (D208), the themes chosen by ear with a struck piano (D209), one
     set of voices a theme (D210), the row under the pegs walked (D211), and the straw
-    walked by the coordinates after the lesson *less-or-greater* (D212).
+    walked by the coordinates after the lesson *less-or-greater* (D212); and, in
+    `sprint-43.md`, something to read while a screen loads, a story's words before its
+    scene and a tip for a child who has begun (D214), `drevo` cast in the air that lands
+    (D215), the walkthrough in one arrangement (D216), the shed from the easy to the
+    hard, the check on the wall's own brooms and one broom before all of them (D217),
+    and a long program given as comments, one for each instruction (D218).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

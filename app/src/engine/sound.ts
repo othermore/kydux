@@ -11,6 +11,9 @@
 // alone; and the rest, a very faint air while the wizard hovers and no gust sounds. The
 // mix as it is written is the owner's, set by ear. The settings' switch silences the
 // wind with the effects. While it sounds it keeps the sound context awake (D231).
+// Nothing is read back from a node (D252): the wind keeps the points it last gave the
+// sound's clock for each param it plans, and the rest's curves, and counts from them the
+// level a gust taken on, a drop and the rest start from (levelAt, curveAt).
 //
 //   noise (2 s, looped) ─┬→ bandpass (Q 1.1) → lowpass → gust ──────→ air ─────┐
 //                        ├→ bandpass (Q 12) → whistle level ────────→ whistle ─┼→ out → speakers
@@ -44,6 +47,48 @@ const REST_RISE = 0.2;
 export interface GustPoint {
   at: number;
   level: number;
+}
+
+/** The value of a list of points at a moment, on the straight line between the two
+ * points round it, as the sound's clock draws a ramp: the first point's before it, the
+ * last point's after it; 0 for a list with no point (D252). */
+export function levelAt(points: readonly GustPoint[], at: number): number {
+  const first = points[0];
+  if (!first) return 0;
+  if (at <= first.at) return first.level;
+  for (let index = 1; index < points.length; index += 1) {
+    const after = points[index] as GustPoint;
+    if (at > after.at) continue;
+    const before = points[index - 1] as GustPoint;
+    const span = after.at - before.at;
+    return span <= 0 ? after.level : before.level + ((after.level - before.level) * (at - before.at)) / span;
+  }
+  return (points[points.length - 1] as GustPoint).level;
+}
+
+/** A level that goes toward its targets, as setTargetAtTime draws it: from `from` at
+ * `at`, then toward each target from its own moment, `level + (start − level) ·
+ * e^(−t/constant)`, each starting from where the one before has come. */
+export interface Curve {
+  from: number;
+  at: number;
+  targets: readonly { level: number; at: number; constant: number }[];
+}
+
+/** A curve's value at a moment (D252): held at `from` until its first target starts. */
+export function curveAt(curve: Curve, at: number): number {
+  let value = curve.from;
+  let since = curve.at;
+  let toward: Curve['targets'][number] | null = null;
+  const went = (start: number, target: Curve['targets'][number], seconds: number) =>
+    target.level + (start - target.level) * Math.exp(-Math.max(0, seconds) / target.constant);
+  for (const target of curve.targets) {
+    if (at < target.at) break;
+    if (toward) value = went(value, toward, target.at - since);
+    since = target.at;
+    toward = target;
+  }
+  return toward ? went(value, toward, at - since) : value;
 }
 
 /** A gust planned for a command of `seconds` (D243): its level in time, from 0 and back
@@ -123,21 +168,25 @@ export interface WindGraph {
   out: GainNode;
 }
 
-/** A param set at once. Its value read back is this one from the call on; a value only
- * scheduled reads as the node's default, 1 for a gain, until the sound's clock has
- * rendered it, and a ramp that starts from what is read would start from there. */
+/** A param set at once, to a value the wind has counted: assigned, so that the node has
+ * it before the sound's clock renders it, and scheduled, so that what follows on the
+ * clock starts from it. Its value is never read back (D252): a value only scheduled reads
+ * as the node's default, 1 for a gain, until the clock has rendered it, and what a param
+ * answers while a plan plays differs from one browser to another. */
 function setNow(param: AudioParam, value: number, now: number): void {
   param.value = value;
   param.setValueAtTime(value, now);
 }
 
-/** A param moved from where it is now: its scheduled values after now dropped, and its
- * value now held, so that what follows starts from it. */
-function fromNow(param: AudioParam, now: number): void {
-  const value = param.value;
+/** A param's plan started again at `now`, from the value the wind counts it has: its
+ * scheduled values after now dropped and that value held. */
+function holdAt(param: AudioParam, value: number, now: number): void {
   param.cancelScheduledValues(now);
-  param.setValueAtTime(value, now);
+  setNow(param, value, now);
 }
+
+/** The params a gust plans, by name. */
+type Planned = 'gust' | 'air' | 'whistle' | 'whistleLevel';
 
 /** The air band's middle, the whistle's middle and the whistle's level for a gust's
  * level. */
@@ -163,6 +212,11 @@ export class Wind {
   private resting = false;
   /** The timer that takes the sound away once nothing of it is heard. */
   private quiet: ReturnType<typeof setTimeout> | null = null;
+  /** The points last given to the sound's clock for each param a gust plans, in the
+   * clock's own seconds, and the rest's level's curve (D252): what the wind counts its
+   * levels from. Empty while no sound is made. */
+  private planned: Record<Planned, GustPoint[]> = { gust: [], air: [], whistle: [], whistleLevel: [] };
+  private restCurve: Curve | null = null;
 
   constructor(private readonly random: () => number = Math.random) {}
 
@@ -173,7 +227,7 @@ export class Wind {
   }
 
   /** A gust for a command of `seconds`, given whole to the sound's clock; one that
-   * sounds is taken on from its level now. */
+   * sounds is taken on from the level counted now from its points (D252). */
   gust(seconds: number): void {
     const plan = gustPlan(seconds, this.random);
     const last = plan[plan.length - 1] as GustPoint;
@@ -183,13 +237,23 @@ export class Wind {
     if (!graph || !ctx) return;
     wake(ctx, last.at + 0.05);
     const now = ctx.currentTime;
-    const params = [graph.gust.gain, graph.airBand.frequency, graph.whistleBand.frequency, graph.whistleLevel.gain];
-    for (const param of params) fromNow(param, now);
-    for (const { at, level } of plan.slice(1)) {
-      graph.gust.gain.linearRampToValueAtTime(level, now + at);
-      graph.airBand.frequency.linearRampToValueAtTime(airHertz(level), now + at);
-      graph.whistleBand.frequency.linearRampToValueAtTime(whistleHertz(level), now + at);
-      graph.whistleLevel.gain.linearRampToValueAtTime(whistleLevel(level), now + at);
+    // Each param from the level counted now, then the plan's points through the function
+    // that gives each: the line the clock draws, kept.
+    const lines: [Planned, AudioParam, (level: number) => number][] = [
+      ['gust', graph.gust.gain, (level) => level],
+      ['air', graph.airBand.frequency, airHertz],
+      ['whistle', graph.whistleBand.frequency, whistleHertz],
+      ['whistleLevel', graph.whistleLevel.gain, whistleLevel],
+    ];
+    for (const [name, param, of] of lines) {
+      const start = this.levelOf(name, now);
+      holdAt(param, start, now);
+      const points: GustPoint[] = [{ at: now, level: start }];
+      for (const { at, level } of plan.slice(1)) {
+        param.linearRampToValueAtTime(of(level), now + at);
+        points.push({ at: now + at, level: of(level) });
+      }
+      this.planned[name] = points;
     }
     this.restLevel(graph, now);
     this.settle();
@@ -206,16 +270,27 @@ export class Wind {
     if (this.graph && ctx) this.restLevel(this.graph, ctx.currentTime);
   }
 
-  /** The gust dropped, faded to nothing in `seconds`, 0.05 at a bump. The rest, while it
-   * is asked for, is heard after it. */
+  /** The gust dropped, faded to nothing in `seconds`, 0.05 at a bump, from the level
+   * counted now (D252). The rest, while it is asked for, is heard after it. */
   drop(seconds: number): void {
     this.gustEnds = Math.min(this.gustEnds, Date.now() + seconds * 1000);
     const ctx = audio();
     if (this.graph && ctx) {
       const now = ctx.currentTime;
-      for (const param of [this.graph.gust.gain, this.graph.whistleLevel.gain]) {
-        fromNow(param, now);
-        param.linearRampToValueAtTime(0, now + Math.max(0.01, seconds));
+      const end = now + Math.max(0.01, seconds);
+      // The gust's level and the whistle's go from where they are counted to be to 0;
+      // the bands keep their lines.
+      for (const [name, param] of [
+        ['gust', this.graph.gust.gain],
+        ['whistleLevel', this.graph.whistleLevel.gain],
+      ] as const) {
+        const start = this.levelOf(name, now);
+        holdAt(param, start, now);
+        param.linearRampToValueAtTime(0, end);
+        this.planned[name] = [
+          { at: now, level: start },
+          { at: end, level: 0 },
+        ];
       }
       this.restLevel(this.graph, now);
     }
@@ -242,14 +317,34 @@ export class Wind {
     this.settle();
   }
 
-  /** The rest's level from now on: none while a gust sounds or it is not asked for, and
-   * while it is asked for, there again when the gust has fallen. */
+  /** The rest's level from now on, from the value its last curve has now (D252): none
+   * while a gust sounds or it is not asked for, and while it is asked for, there again
+   * when the gust has fallen. */
   private restLevel(graph: WindGraph, now: number): void {
     const level = graph.restLevel.gain;
     const gust = Math.max(0, this.gustEnds - Date.now()) / 1000;
-    fromNow(level, now);
-    if (!this.resting || gust > 0) level.setTargetAtTime(0, now, REST_FALL);
-    if (this.resting) level.setTargetAtTime(REST_LEVEL, now + gust, REST_RISE);
+    // From the value its last curve has now (D252), toward its targets.
+    const from = this.restCurve ? curveAt(this.restCurve, now) : 0;
+    holdAt(level, from, now);
+    const targets: Curve['targets'][number][] = [];
+    if (!this.resting || gust > 0) targets.push({ level: 0, at: now, constant: REST_FALL });
+    if (this.resting) targets.push({ level: REST_LEVEL, at: now + gust, constant: REST_RISE });
+    for (const target of targets) level.setTargetAtTime(target.level, target.at, target.constant);
+    this.restCurve = { from, at: now, targets };
+  }
+
+  /** What the wind keeps of its plans, let go: no sound, nothing counted. */
+  private forget(): void {
+    this.planned = { gust: [], air: [], whistle: [], whistleLevel: [] };
+    this.restCurve = null;
+  }
+
+  /** A planned param's level at a moment, counted from the points it was last given;
+   * with none, a gain's 0 and a band's low end, as the nodes are made. */
+  private levelOf(name: Planned, at: number): number {
+    const points = this.planned[name];
+    if (points.length > 0) return levelAt(points, at);
+    return name === 'air' ? AIR_LOW_HERTZ : name === 'whistle' ? WHISTLE_LOW_HERTZ : 0;
   }
 
   /** The wind's nodes, made where they are not; none where no sound is made. */
@@ -287,6 +382,8 @@ export class Wind {
     source.connect(restBand).connect(restLevelNode).connect(rest).connect(out);
     out.connect(ctx.destination);
     source.start(now);
+    // A new sound starts from its nodes as made: nothing planned, nothing kept.
+    this.forget();
     this.graph = {
       source,
       airBand,
@@ -316,6 +413,7 @@ export class Wind {
         if (this.blowing || (this.resting && mixOf('rest') > 0) || !this.graph) return;
         const graph = this.graph;
         this.graph = null;
+        this.forget();
         graph.source.stop();
         graph.out.disconnect();
         keepAwake(this, false);

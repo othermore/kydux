@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GUST_HIGH, GUST_LOW, gustPlan, whistleLevel } from './sound';
+import { curveAt, GUST_HIGH, GUST_LOW, gustPlan, levelAt, whistleLevel } from './sound';
 
 /** A random that gives the same numbers every time, from a seed. */
 function seeded(seed: number): () => number {
@@ -55,5 +55,52 @@ describe('a gust for each flown command (D243)', () => {
     expect(whistleLevel(GUST_HIGH)).toBeCloseTo(GUST_HIGH / 4);
     expect(whistleLevel(GUST_LOW)).toBeCloseTo(GUST_HIGH / 16);
     expect(whistleLevel(0)).toBe(0);
+  });
+});
+
+describe('the level counted from the points given to the clock (D252)', () => {
+  const points = [
+    { at: 1, level: 0 },
+    { at: 1.5, level: 0.04 },
+    { at: 2, level: 0.02 },
+  ];
+
+  it('is on the straight line between the two points round a moment', () => {
+    expect(levelAt(points, 1.25)).toBeCloseTo(0.02, 10);
+    expect(levelAt(points, 1.75)).toBeCloseTo(0.03, 10);
+  });
+
+  it("is a point's own level on it, the first's before it and the last's after it", () => {
+    expect(levelAt(points, 1.5)).toBe(0.04);
+    expect(levelAt(points, 0.2)).toBe(0);
+    expect(levelAt(points, 9)).toBe(0.02);
+  });
+
+  it('is 0 for a list with no point', () => {
+    expect(levelAt([], 1)).toBe(0);
+  });
+});
+
+describe("the rest's curve, by setTargetAtTime's own rule (D252)", () => {
+  it('is its start at its start, and two thirds of the way after one time constant', () => {
+    const curve = { from: 0.006, at: 1, targets: [{ level: 0, at: 1, constant: 0.05 }] };
+    expect(curveAt(curve, 1)).toBe(0.006);
+    expect(curveAt(curve, 1.05)).toBeCloseTo(0.006 * Math.exp(-1), 12);
+  });
+
+  it('holds its start until its first target begins, and goes on toward a second from where the first has come', () => {
+    const curve = {
+      from: 0.004,
+      at: 1,
+      targets: [
+        { level: 0, at: 1, constant: 0.05 },
+        { level: 0.006, at: 1.5, constant: 0.2 },
+      ],
+    };
+    const atSecond = 0.004 * Math.exp(-0.5 / 0.05);
+    expect(curveAt(curve, 1.5)).toBeCloseTo(atSecond, 12);
+    expect(curveAt(curve, 1.7)).toBeCloseTo(0.006 + (atSecond - 0.006) * Math.exp(-1), 12);
+    const later = { from: 0.002, at: 1, targets: [{ level: 0.006, at: 2, constant: 0.2 }] };
+    expect(curveAt(later, 1.5)).toBe(0.002);
   });
 });

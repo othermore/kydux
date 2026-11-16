@@ -36,6 +36,28 @@ describe('flying (D185)', () => {
     expect(lengthOf([circling])).toBe(FLOWN);
   });
 
+  it('plays every tick of a level where the wizard can fly in a third, the hands as anywhere (D225)', () => {
+    expect(lengthOf([move(1, false)], FLOWN)).toBe(FLOWN);
+    expect(lengthOf([], FLOWN)).toBe(FLOWN);
+    expect(lengthOf([], 1)).toBe(1);
+    expect(lengthOf([{ ...move(1, false), kind: 'cast', data: {} }], FLOWN)).toBe(LONG);
+    let waited = 0;
+    const playback = new Playback({
+      tickMs: 300,
+      pace: FLOWN,
+      schedule: (_callback, ms) => {
+        waited = ms;
+        return null;
+      },
+    });
+    playback.load([move(1, false), { ...move(2, false), kind: 'wait', data: {} }]);
+    playback.play();
+    expect(waited).toBeCloseTo(100);
+    // A walked step's three ticks are all played, the two with no event too.
+    playback.load([move(1, false), { ...move(4, true), data: { flying: true } }]);
+    expect(playback.length).toBe(4);
+  });
+
   it('plays what was found before the first tick with the first tick', () => {
     const playback = new Playback({ tickMs: 400, schedule: () => null });
     const seen: [number, string[]][] = [];

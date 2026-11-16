@@ -117,13 +117,13 @@ describe('chapter 4 in the layout', () => {
     expect(shaped.things[0]?.hidden).toBe(true);
   });
 
-  it('reads the low cells, the hidden things and the race with its path walked out (D184, D186, D189)', () => {
+  it('reads the low cells, the hidden things and the race with its path walked out (D184, D186, D189, D220)', () => {
     const level = {
       id: 'race',
       map: ['S.~..', '.....'],
       things: [{ kind: 'broom', id: 'broom_1', at: [1, 1], hidden: true }],
       actors: [{ kind: 'racer', id: 'zarek', at: [0, 1] }],
-      race: { against: 'zarek', lines: 3, path: [[2, 1], [2, 1], [4, 1], [4, 0]], finish: [4, 0] },
+      race: { against: 'zarek', lines: 3, path: [[2, 1], [4, 1], [4, 0]], rings: [], finish: [4, 0] },
     };
     const shaped = layout(level);
     expect(shaped.low).toEqual([[2, 0]]);
@@ -132,7 +132,7 @@ describe('chapter 4 in the layout', () => {
     expect(shaped.race).toEqual({
       against: 'zarek',
       lines: 3,
-      path: [[1, 1], [2, 1], [2, 1], [3, 1], [4, 1], [4, 0]],
+      path: [[1, 1], [2, 1], [3, 1], [4, 1], [4, 0]],
       finish: [4, 0],
     });
   });

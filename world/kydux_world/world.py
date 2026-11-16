@@ -350,16 +350,28 @@ class World:
         data: dict[str, Any],
         then: Callable[[], None] | None = None,
         line: int | None | object = CHILD,
+        ticks: int = 1,
     ) -> None:
         """One tick of the wizard's: its event, what it does to the world (`then`, as a
-        door opening to a spell), every actor's step, who sees it, the goals. Its line
-        is the child's code's running now, or the one given (Ilda's reading, D189)."""
+        door opening to a spell), every actor's step, who sees it, the goals; or `ticks`
+        of them, the event in the first. Its line is the child's code's running now, or
+        the one given (Ilda's reading, D189)."""
         self.ready()
         self.tick += 1
         self._line = child_line() if line is CHILD else line  # type: ignore[assignment]
         self.events.append(Event(self.tick, "wizard", kind, data, self._line))
         if then is not None:
             then()
+        self._tick_goes_on()
+        # A walked step where the wizard can fly lasts three ticks (D225): the others go
+        # by with no event of the wizard's, each with every actor's step.
+        for _ in range(ticks - 1):
+            self.ready()
+            self.tick += 1
+            self._tick_goes_on()
+
+    def _tick_goes_on(self) -> None:
+        """The rest of a tick: every actor's step, who sees the wizard, the goals."""
         for actor in self.actors.values():
             actor._step()
         for actor in self.actors.values():
@@ -387,19 +399,17 @@ class World:
         """The child's code has ended, `ended` when it came to its end with the world
         still running: a broom in the air sets down where it is, over a cell that is
         walked on, and stays in the air over any other (D185, D215); a race is flown
-        out until the racer crosses the finish, unless the wizard stands on its last
-        cell (D189); then the goals that are met only then are checked."""
+        out until the racer crosses the finish (D189); then the goals that are met only
+        then are checked."""
         here = self.wizard._k_position
         if self.over is None and self.wizard._k_flying and self.landable(here):
             self.wizard._set(flying=False)
             self.note("broom", "land", {"id": "wizard", "at": list(here)})
         race = self.level.race
         if ended and self.over is None and race is not None:
-            last = race.path[race.path.index(race.finish)]
-            end = race.tick - 1 if last == self.wizard.position else race.tick
             at = list(self.wizard.position)
             try:
-                while self.tick < min(end, self.level.tick_limit):
+                while self.tick < min(race.tick, self.level.tick_limit):
                     self.act("wait", {"at": at, "after": True}, line=None)
             except RunOver:
                 pass
@@ -556,17 +566,23 @@ class Wizard(Child):
             entered = (ring.name, direction, here) if ring is not None else None
             self._set(position=ahead, ring=entered)
             step = {"from": list(here), "to": list(ahead), "facing": direction.value}
+            # A walked step where the wizard can fly takes three ticks, a flown one one
+            # (D225).
+            ticks = 1 if flying else world.level.walk_ticks
+            if flying:
+                step["flying"] = True
+            elif ticks > 1:
+                step["ticks"] = ticks
             world.act(
-                "move",
-                {**step, "flying": True} if flying else step,
-                then=partial(self._k_moved, through, here, ahead),
+                "move", step, then=partial(self._k_moved, through, here, ahead, ticks), ticks=ticks
             )
 
     def _k_moved(
-        self, through: tuple[str, Position] | None, here: Position, ahead: Position
+        self, through: tuple[str, Position] | None, here: Position, ahead: Position, ticks: int
     ) -> None:
-        """In a move's tick, before the goals are looked at: the ring flown through
-        along its way, or against it (D187, D219), and a race's finish crossed (D189)."""
+        """In a move's first tick, before the goals are looked at: the ring flown through
+        along its way, or against it (D187, D219), and a race's finish crossed (D189), at
+        the move's last tick (D225)."""
         world: World = self._k_world
         if through is not None:
             name, came_from = through
@@ -582,7 +598,7 @@ class Wizard(Child):
                 world.note(name, "wrong_way", wrong)
         race = world.level.race
         if race is not None and ahead == race.finish and world.crossed_at is None:
-            world.crossed_at = world.tick
+            world.crossed_at = world.tick + ticks - 1
 
     def _k_through(self, direction: Direction) -> tuple[str, Position] | None:
         """The ring whose cell the wizard leaves the way it flew in, so flying through

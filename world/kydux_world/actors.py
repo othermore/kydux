@@ -154,7 +154,8 @@ class Friend(Actor):
 class Racer(Actor):
     """A racer, Zarek (D189): stands on the start until Ilda has read its program, a
     tick a line, lifts its broom in the next, then flies the race's path, a cell a
-    tick, circling in place where the path stays on a cell, and lands on its last."""
+    tick, through his own rings, each lit as he leaves it (D220), and lands on its last
+    cell."""
 
     _k_role = "racer"
 
@@ -170,13 +171,16 @@ class Racer(Actor):
         if not 1 <= index <= len(race.path):
             return
         there = race.path[index - 1]
-        if there == here:
-            world.note(self.name, "circle", {"at": list(here)})
-        else:
-            facing = towards(here, there)
-            self._set(position=there, facing=facing)
-            moved = {"from": list(here), "to": list(there), "facing": facing, "flying": True}
-            world.note(self.name, "move", moved)
+        came = getattr(self, "_k_came", None)
+        for ring in race.rings:
+            # Leaving one of his rings: flown through by its way, as the race holds.
+            if came is not None and world.things[ring]._k_spec.position == here:
+                through = {"id": ring, "at": list(here), "from": list(came), "by": self.name}
+                world.note(ring, "through", through)
+        facing = towards(here, there)
+        self._set(position=there, facing=facing, came=here)
+        moved = {"from": list(here), "to": list(there), "facing": facing, "flying": True}
+        world.note(self.name, "move", moved)
         if index == len(race.path):
             world.note(self.name, "land", {"id": self.name, "at": list(there)})
 

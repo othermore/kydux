@@ -2,7 +2,9 @@
 // each step plays every event of one tick, the wizard's and the actors'. A tick
 // in which the wizard does something with its hands, casting, picking up or
 // untying, lasts LONG of a tick, so that it is seen through before the next step;
-// a tick in which every move is flown lasts a third of one (D185). What happens
+// a tick in which every move is flown lasts a third of one (D185), and in a level
+// where the wizard can fly every tick does, a walked step there taking three (D225),
+// so that a walk is seen as anywhere else and a flight three times as fast. What happens
 // before the first tick, a hidden thing found by the first line (D184), is played
 // with the first tick. It knows nothing of Phaser: the scene listens to it and
 // draws.
@@ -19,10 +21,11 @@ export { FLOWN } from './flight';
 /** The wizard's events that take a long tick. */
 const HANDS = new Set(['cast', 'pick_up', 'untie']);
 /** How long a tick's events take, against a tick: LONG for the wizard's hands, a
- * third for a flight (D185). */
-export function lengthOf(events: PlaybackEvent[]): number {
+ * third for a flight (D185), and `pace` for any other: a third where the wizard can
+ * fly (D225), one elsewhere. */
+export function lengthOf(events: PlaybackEvent[], pace = 1): number {
   if (events.some((event) => event.actor === 'wizard' && HANDS.has(event.kind))) return LONG;
-  return flownTick(events) ? FLOWN : 1;
+  return flownTick(events) ? FLOWN : pace;
 }
 
 export type PlaybackState = 'idle' | 'playing' | 'paused' | 'done';
@@ -31,6 +34,9 @@ export type Speed = 1 | 2 | 4;
 export interface PlaybackOptions {
   /** How long one tick lasts at speed 1, in milliseconds. */
   tickMs: number;
+  /** How long a tick with nothing flown or done by hand lasts, against tickMs: FLOWN in
+   * a level where the wizard can fly (D225), 1 elsewhere. */
+  pace?: number;
   schedule?: (callback: () => void, ms: number) => unknown;
   cancel?: (handle: unknown) => void;
 }
@@ -42,6 +48,7 @@ type StateListener = (state: PlaybackState) => void;
 
 export class Playback {
   readonly tickMs: number;
+  readonly pace: number;
   private readonly schedule: (callback: () => void, ms: number) => unknown;
   private readonly cancel: (handle: unknown) => void;
   /** The run's events, one list for each tick, in order. */
@@ -55,6 +62,7 @@ export class Playback {
 
   constructor(options: PlaybackOptions) {
     this.tickMs = options.tickMs;
+    this.pace = options.pace ?? 1;
     this.schedule = options.schedule ?? ((callback, ms) => setTimeout(callback, ms));
     this.cancel =
       options.cancel ?? ((handle) => clearTimeout(handle as ReturnType<typeof setTimeout>));
@@ -83,14 +91,16 @@ export class Playback {
   }
 
   /** New events to play, from tick 0; what happened before the first tick is played
-   * with it. */
+   * with it. A tick with no event, the second and third of a walked step where the
+   * wizard can fly (D225), is played too, empty, as long as any. */
   load(events: PlaybackEvent[]): void {
     const byTick = new Map<number, PlaybackEvent[]>();
     for (const event of events) {
       const tick = Math.max(event.tick, 1);
       byTick.set(tick, [...(byTick.get(tick) ?? []), event]);
     }
-    this.ticks = [...byTick.keys()].sort((a, b) => a - b).map((tick) => byTick.get(tick) ?? []);
+    const last = Math.max(0, ...byTick.keys());
+    this.ticks = Array.from({ length: last }, (_, index) => byTick.get(index + 1) ?? []);
     this.reset();
   }
 
@@ -172,7 +182,7 @@ export class Playback {
     this.timer = this.schedule(() => {
       this.timer = null;
       if (this.currentState === 'playing') this.next();
-    }, this.tickDuration * lengthOf(events));
+    }, this.tickDuration * lengthOf(events, this.pace));
   }
 
   private clearTimer(): void {

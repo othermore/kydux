@@ -257,10 +257,11 @@ class ThroughInOrderGoal:
 
 
 class BeforeGoal:
-    """Met when the wizard crosses the race's finish at a tick lower than the racer's;
-    a tie is the racer's (D189): `{"kind": "before", "racer": "zarek"}`. The page is
-    shown Ilda's count: the lines read, the flight, the ticks served for the rings
-    missed, the tick crossed at, and the racer's lines and tick."""
+    """Met when the wizard crosses the race's finish at a tick lower than the racer's
+    (D189); at the same tick it is a tie, not met, and the race is flown again (D220):
+    `{"kind": "before", "racer": "zarek"}`. The page is shown Ilda's count: the lines
+    read, the flight, the ticks served for the rings missed, the tick crossed at, the
+    racer's lines and tick, and whether it is a tie."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
         race = level.race
@@ -286,6 +287,7 @@ class BeforeGoal:
             "tick": tick,
             "racer_lines": self.race.lines,
             "racer_tick": self.race.tick,
+            "tie": tick == self.race.tick,
         }
 
 

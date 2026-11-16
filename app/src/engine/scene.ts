@@ -1157,7 +1157,8 @@ class LevelScene extends Phaser.Scene {
       // A hidden thing found, seen from now on (D184).
       else if (event.kind === 'found') this.showFound(event, instant);
       // A ring flown through (D187), or flown against its way (D219).
-      else if (event.kind === 'through') this.flownThrough(String(event.data.id), instant);
+      else if (event.kind === 'through')
+        this.flownThrough(String(event.data.id), instant, typeof event.data.by !== 'string');
       else if (event.kind === 'wrong_way') this.flownAgainst(event, tick, instant);
       // A broom lifted or set down, the wizard's or a racer's (D185, D189).
       else if (event.kind === 'fly' || event.kind === 'land') {
@@ -1196,9 +1197,10 @@ class LevelScene extends Phaser.Scene {
     }
   }
 
-  /** A ring flown through (D187): kept in order, and seen to glow for a moment. */
-  private flownThrough(id: string, instant: boolean): void {
-    this.through.push(id);
+  /** A ring flown through (D187): kept in order, the wizard's, and seen to glow for a
+   * moment, a racer's too (D220). */
+  private flownThrough(id: string, instant: boolean, wizard: boolean): void {
+    if (wizard) this.through.push(id);
     const image = this.things.get(id);
     if (!image || instant || this.still) return;
     const glow = this.add
@@ -2371,7 +2373,9 @@ export async function startScene(
   options: SceneOptions = {},
 ): Promise<SceneHandle> {
   const map = layout(level);
-  const playback = new Playback({ tickMs: TICK_MS });
+  // Where the wizard can fly, every tick plays in a third of the time (D225).
+  const flies = Array.isArray(level.spells) && level.spells.includes('drevo');
+  const playback = new Playback({ tickMs: TICK_MS, pace: flies ? FLOWN : 1 });
   // A painted scene's art, when it has some (D76); a scene without is drawn with placeholders.
   const art = await loadArt(level).catch(() => null);
 

@@ -73,11 +73,13 @@ class WorldError(Exception):
 
 
 def check_consistency(world: World) -> None:
-    """The run's events hold together: every tick of the wizard's once, its steps one
-    after the other from the start to where it stands, and every goal's tick a tick of
-    the run. Raises WorldError when they do not (D20)."""
+    """The run's events hold together: every tick of the wizard's once, a walked step
+    that lasts several ticks (D225) taking them all, its steps one after the other from
+    the start to where it stands, and every goal's tick a tick of the run. Raises
+    WorldError when they do not (D20)."""
     own = [e for e in world.events if e.actor == "wizard"]
-    if [e.tick for e in own] != list(range(1, world.tick + 1)):
+    taken = [tick for e in own for tick in range(e.tick, e.tick + e.data.get("ticks", 1))]
+    if taken != list(range(1, world.tick + 1)):
         raise WorldError("the wizard's ticks do not follow one another")
     here = list(world.level.start)
     for event in world.events:

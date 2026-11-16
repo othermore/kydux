@@ -546,7 +546,8 @@
     "reading": "Ilda lee los programas: tú, {mine} líneas; {name}, {theirs}.",
     "left": "Despegas en {mine}; {name}, en {theirs}.",
     "count": "La cuenta de Ilda: tus líneas ({lines}) + tu vuelo ({flight}) + la penalización ({penalty}) = tick {tick}. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
-    "count_unfinished": "La cuenta de Ilda: no has cruzado la meta. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}."
+    "count_unfinished": "La cuenta de Ilda: no has cruzado la meta. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
+    "tie": "¡Es un empate! La carrera se repite."
   },
   "about": {
     "link": "Qué es Kydux",

@@ -82,6 +82,9 @@ ACTOR_KINDS = ("teacher", "ghost", "cat", "friend", "racer")
 RING_WAYS = ("up", "down")
 #: A pair of rings' colours (D219).
 RING_COLOURS = ("red", "blue", "yellow", "purple")
+#: The ticks a walked step takes in a level where the wizard can fly, its spells
+#: holding drevo; a flown step takes one, and a step elsewhere one (D225).
+WALK_TICKS_FLYING = 3
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
 KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto", "orvim", "drevo")
@@ -167,23 +170,27 @@ class ActorSpec:
 
 @dataclass(frozen=True)
 class Race:
-    """A race against a racer, scored by Ilda's count (D189): once Ilda has read the
-    racer's `lines`, a tick a line, its flight starts, as the wizard's does with
-    drevo, with a tick for the lift, then its `path`, a cell a tick, a cell the same
-    as the one before a tick circling in place (a flourish); it crosses the finish at
-    the tick its path reaches it. The wizard takes off at the tick of the program's
-    own lines, and serves five ticks before the finish for each ring it missed."""
+    """A race against a racer, scored by Ilda's count (D189), each racer in a lane of
+    their own (D220): once Ilda has read the racer's `lines`, a tick a line, its flight
+    starts, as the wizard's does with drevo, with a tick for the lift, then its `path`,
+    a cell a tick, through its `rings`; it crosses the finish line at its path's last
+    cell, on the finish's column. The wizard takes off at the tick of the program's own
+    lines, crosses at its own `finish`, and serves five ticks before it for each ring it
+    missed."""
 
     against: str
     lines: int
     #: The cells the racer flies into, one a tick, after its lift.
     path: tuple[Position, ...]
+    #: The wizard's finish, on the finish line.
     finish: Position
+    #: The racer's own rings, in the order he flies them (D220).
+    rings: tuple[str, ...] = ()
 
     @property
     def tick(self) -> int:
-        """The tick the racer crosses the finish: its lines, its lift, its path to it."""
-        return self.lines + 1 + self.path.index(self.finish) + 1
+        """The tick the racer crosses the finish: its lines, its lift, its path."""
+        return self.lines + 1 + len(self.path)
 
 
 @dataclass(frozen=True)
@@ -411,7 +418,7 @@ class Level:
             forbidden=forbidden,
             forbidden_reasons=forbidden_reasons,
             low=frozenset(low),
-            race=_race(data.get("race"), shape, actors),
+            race=_race(data.get("race"), shape, actors, things),
             kinds=_kinds(data),
             zones=zones,
         )
@@ -455,6 +462,12 @@ class Level:
     def flies(self, position: Position) -> bool:
         """A tile a flight crosses: one to walk on, or a low cell (D186)."""
         return self.free(position) or position in self.low
+
+    @property
+    def walk_ticks(self) -> int:
+        """The ticks a walked step takes: three where the wizard can fly, its spells
+        holding drevo, so that a flight is three times as fast; one elsewhere (D225)."""
+        return WALK_TICKS_FLYING if "drevo" in self.spells else 1
 
     def clear(self, position: Position) -> bool:
         """Inside the map and not a wall: a tile sight passes, shelves too (D46)."""
@@ -1026,25 +1039,42 @@ def check_pairs(level_id: str, rings: list[ThingSpec], start: Position, who: str
 
 def _check_rings(level: "Level") -> None:
     """The rings a `through_in_order` goal names go in pairs, the wizard starting under
-    the first (D219)."""
+    the first (D219), and none of them is a racer's (D220)."""
     rings = {thing.id: thing for thing in level.things if thing.kind == "ring"}
     for goal in level.goals:
         ids = goal.params.get("ids") if goal.kind == "through_in_order" else None
         if isinstance(ids, list) and all(ring in rings for ring in ids):
             check_pairs(level.id, [rings[ring] for ring in ids], level.start, "the wizard")
+            shared = set(ids) & set(level.race.rings if level.race else ())
+            if shared:
+                raise LevelError(
+                    f"{level.id}: {', '.join(sorted(shared))} is the racer's, not the wizard's"
+                )
 
 
-def _race(value: Any, shape: _Shape, actors: tuple[ActorSpec, ...]) -> Race | None:
-    """A level's race (D189): `{"against": <a racer's id>, "lines": <its program's
-    lines>, "path": [[x, y], ...], "finish": [x, y]}`, the path's turning points from
-    where the racer stands, flown in straight lines over cells a flight crosses, a
-    point the same as the one before a tick circling there, the finish one of its
-    cells."""
+def _race(
+    value: Any, shape: _Shape, actors: tuple[ActorSpec, ...], things: tuple[ThingSpec, ...]
+) -> Race | None:
+    """A level's race (D189, D220): `{"against": <a racer's id>, "lines": <its program's
+    lines>, "path": [[x, y], ...], "rings": [<ring id>, ...], "finish": [x, y]}`, the
+    path's turning points from where the racer stands, flown in straight lines over
+    cells a flight crosses, no point twice running; `rings` his own, in pairs by D219,
+    his start on the row under the first; `finish` the wizard's. The path flies each of
+    his rings in its turn and by its way, enters no other ring, stays in his lane, from
+    the row under his rings to the row over them, and ends on the finish's column."""
     if value is None:
         return None
     level_id = shape.level_id
-    if not isinstance(value, dict) or set(value) != {"against", "lines", "path", "finish"}:
-        raise LevelError(f"{level_id}: a race names its racer, its lines, its path and its finish")
+    if not isinstance(value, dict) or set(value) != {
+        "against",
+        "lines",
+        "path",
+        "rings",
+        "finish",
+    }:
+        raise LevelError(
+            f"{level_id}: a race names its racer, its lines, its path, his rings and the finish"
+        )
     racers = {actor.id: actor for actor in actors if actor.kind == "racer"}
     racer = racers.get(value["against"])
     if racer is None:
@@ -1059,8 +1089,9 @@ def _race(value: Any, shape: _Shape, actors: tuple[ActorSpec, ...]) -> Race | No
     for point in points:
         there = shape.tile(point, f"{racer.id}'s path")
         if there == here:
-            path.append(here)
-            continue
+            raise LevelError(
+                f"{level_id}: {racer.id}'s path names {there.x},{there.y} twice running"
+            )
         if there.x != here.x and there.y != here.y:
             raise LevelError(f"{level_id}: {racer.id}'s path goes in straight lines")
         dx = (there.x > here.x) - (there.x < here.x)
@@ -1071,9 +1102,49 @@ def _race(value: Any, shape: _Shape, actors: tuple[ActorSpec, ...]) -> Race | No
                 raise LevelError(f"{level_id}: {racer.id}'s path flies into a wall")
             path.append(here)
     finish = shape.tile(value["finish"], "the race's finish")
-    if finish not in path:
-        raise LevelError(f"{level_id}: {racer.id}'s path never crosses the finish")
-    return Race(racer.id, lines, tuple(path), finish)
+    rings = {thing.id: thing for thing in things if thing.kind == "ring"}
+    own = value["rings"]
+    if not isinstance(own, list) or not own or not all(ring in rings for ring in own):
+        raise LevelError(f"{level_id}: {racer.id}'s rings are rings of the level")
+    check_pairs(level_id, [rings[ring] for ring in own], racer.position, racer.id)
+    _check_racer_s_flight(level_id, racer, path, [rings[ring] for ring in own], rings, finish)
+    return Race(racer.id, lines, tuple(path), finish, tuple(own))
+
+
+def _check_racer_s_flight(
+    level_id: str,
+    racer: ActorSpec,
+    path: list[Position],
+    own: list[ThingSpec],
+    rings: dict[str, ThingSpec],
+    finish: Position,
+) -> None:
+    """D220: the racer flies each of his rings in its turn and by its way, enters no
+    other ring, keeps to his lane and ends on the finish's column."""
+    rows = {ring.position.y for ring in own}
+    lane = range(min(rows) - 1, max(rows) + 2)
+    cells = [racer.position, *path]
+    at = {ring.position: ring for ring in rings.values()}
+    flown = []
+    for index, here in enumerate(cells[1:], 1):
+        if here.y not in lane:
+            raise LevelError(f"{level_id}: {racer.id}'s path leaves his lane at {here.x},{here.y}")
+        ring = at.get(here)
+        if ring is None:
+            continue
+        came, going = cells[index - 1], cells[index + 1] if index + 1 < len(cells) else None
+        upward = going is not None and came.x == here.x == going.x and came.y > here.y > going.y
+        downward = going is not None and came.x == here.x == going.x and came.y < here.y < going.y
+        if not (upward and ring.way == "up" or downward and ring.way == "down"):
+            raise LevelError(f"{level_id}: {racer.id}'s path flies {ring.id} not by its way")
+        flown.append(ring.id)
+    if flown != [ring.id for ring in own]:
+        raise LevelError(
+            f"{level_id}: {racer.id}'s path flies {', '.join(flown) or 'no ring'}, "
+            f"not his rings in their order"
+        )
+    if path[-1].x != finish.x:
+        raise LevelError(f"{level_id}: {racer.id}'s path ends off the finish's column")
 
 
 def _kinds(data: dict[str, Any]) -> dict[Position, str]:

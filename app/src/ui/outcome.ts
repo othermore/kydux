@@ -120,8 +120,8 @@ function outcomeWords(outcome: Outcome): string {
 }
 
 /** Ilda's count after a race (D189), from the `before` goal's params: the wizard's
- * lines, flight and penalty to the tick it crossed at, and the racer's; null for a
- * level that is no race. */
+ * lines, flight and penalty to the tick it crossed at, and the racer's, and at equal
+ * ticks that it is a tie (D220); null for a level that is no race. */
 export function raceCount(goals: { kind: string; params: Record<string, unknown> }[] | undefined): string | null {
   const before = goals?.find((goal) => goal.kind === 'before');
   if (!before) return null;
@@ -136,7 +136,9 @@ export function raceCount(goals: { kind: string; params: Record<string, unknown>
     racer_flight: Number(p.racer_tick) - Number(p.racer_lines),
     racer_tick: Number(p.racer_tick),
   };
-  return p.tick === null || p.tick === undefined ? t('race.count_unfinished', said) : t('race.count', said);
+  if (p.tick === null || p.tick === undefined) return t('race.count_unfinished', said);
+  // Equal ticks: a tie, and the race is flown again (D220).
+  return p.tie === true ? `${t('race.count', said)} ${t('race.tie')}` : t('race.count', said);
 }
 
 export interface OutcomeCard {

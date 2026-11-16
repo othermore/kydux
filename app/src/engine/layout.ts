@@ -381,8 +381,8 @@ export function layout(level: LevelJson): Layout {
   };
 }
 
-/** A level's race (D189), its path's turning points walked out into the cells flown,
- * a point the same as the one before a cell circled, as kydux_world reads it. */
+/** A level's race (D189, D220), its path's turning points walked out into the cells
+ * flown, as kydux_world reads it. */
 function raceOf(level: LevelJson): { race?: RaceLayout } {
   const race = isRecord(level.race) ? level.race : null;
   const finish = race ? asTile(race.finish) : null;
@@ -394,7 +394,6 @@ function raceOf(level: LevelJson): { race?: RaceLayout } {
   for (const point of asList(race.path)) {
     const there = asTile(point);
     if (!there) continue;
-    if (there[0] === here[0] && there[1] === here[1]) path.push(there);
     while (there[0] !== here[0] || there[1] !== here[1]) {
       here = [here[0] + Math.sign(there[0] - here[0]), here[1] + Math.sign(there[1] - here[1])];
       path.push(here);

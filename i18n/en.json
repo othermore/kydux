@@ -546,7 +546,8 @@
     "reading": "Ilda reads the programs: you, {mine} lines; {name}, {theirs}.",
     "left": "You take off in {mine}; {name}, in {theirs}.",
     "count": "Ilda's count: your lines ({lines}) + your flight ({flight}) + the penalty ({penalty}) = tick {tick}. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
-    "count_unfinished": "Ilda's count: you did not cross the finish. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}."
+    "count_unfinished": "Ilda's count: you did not cross the finish. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
+    "tie": "It's a tie! The race is flown again."
   },
   "about": {
     "link": "About",

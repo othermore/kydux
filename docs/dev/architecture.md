@@ -302,7 +302,7 @@ tiles are `[x, y]`.
 
 | kind | actor | data | the scene |
 |---|---|---|---|
-| `move` | wizard, or an actor | `from`, `to`, `facing` | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132) |
+| `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; `ticks`, a walked step of the wizard's where it can fly, three (D225) | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132) |
 | `bump` | wizard | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it; the thought names a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side |
 | `say` | wizard | `text` | a bubble over the wizard for three ticks, under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
@@ -2685,11 +2685,12 @@ one overturns stays, marked as superseded.
   and the rings' cells (D187), and bumps on the high ones as a walk bumps on a wall. When
   the program ends over a cell that is walked on, the broom sets down where it is (the
   event `land`); the wizard's own landing, and an end over a cell that is not walked on,
-  are D215. The world counts a flown cell as one tick, like a walked one, so that
-  counting stays the
-  child's; the page plays a tick whose every move is flown in a third of a tick
-  (`FLOWN`, `engine/flight.ts`), at every speed, so that a flight is three times as fast
-  to the eye and the long flights of the rings and the race pass quickly. While flying,
+  are D215. The world counts a flown cell as one tick, and where the wizard can fly a
+  walked one as three (D225), so that a flight is three times as fast in the count too;
+  the page plays a tick whose every move is flown in a third of a tick (`FLOWN`,
+  `engine/flight.ts`), at every speed, and in a level where the wizard can fly every
+  tick, so that a flight is three times as fast to the eye, a walk is seen as anywhere
+  else, and the long flights of the rings and the race pass quickly. While flying,
   the figure is drawn from its flying rows (D188), lifted half a cell above its cell,
   its origin moved so that its depth stays its cell's, with a soft shadow on the ground,
   bobbing over the rows' three frames; a sheet with no flying rows bobs a little
@@ -3394,3 +3395,19 @@ one overturns stays, marked as superseded.
   de la paja*, *escondidas en la paja*): no sentence ends, does, finishes or makes *la
   paja*. `tools/write/rules.md` carries both rules. Rules out *desatar una escoba*,
   *escobas desatadas* and *terminamos con la paja*.
+- **D225 — Where the wizard can fly, a walked step takes three ticks.** Decided
+  2026-11-14 by the owner, during sprint 44, on the race's numbers (*si recto andando
+  cruza en el 62 y volando en el 64, quiere decir que volando no estás acelerando x3 la
+  velocidad (o al menos, no en términos de ticks) y eso hay que arreglarlo*; *la
+  solución sería que en el campo (o en niveles en los que se pueda volar) andar cueste
+  3 ticks por casilla pero volar 1 tick por casilla, y por defecto la velocidad de todo
+  se acelere a 3X*). In a level whose spells hold `drevo`, a walked step takes three
+  ticks (`Level.walk_ticks`, `WALK_TICKS_FLYING`): its event `move`, with `ticks`, in the
+  first, and two with no event of the wizard's, every actor stepping in each; a flown
+  step takes one, and every other action one, as elsewhere. Ilda's count reads the
+  ticks as they are: a walk to the finish past every ring is far behind a flight. The
+  page plays every tick of such a level in a third of a tick (`Playback`'s `pace`,
+  `FLOWN`), the hands' ticks as long as anywhere (LONG), so that a walked step is seen
+  as long as anywhere else and a flown one a third of it. Everywhere else a walked step
+  takes one tick. Rules out a flight of three cells a tick, which would make a flight
+  of one or two cells cost a whole tick, and a walk as fast as a flight.

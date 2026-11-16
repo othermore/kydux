@@ -1,17 +1,17 @@
 {
   "title": "La carrera",
   "goals": [
-    "Pasa por los ocho aros en orden.",
+    "Pasa por los ocho aros en orden: en cada pareja, el primero hacia arriba y el segundo hacia abajo.",
     "Cruza la meta antes que Zarek.",
     "En menos de 12 líneas."
   ],
-  "starting_code": "# Una función con dos argumentos para una pareja con `def`.\n\n# La palabra con `cast`.\n\n# La salida con `move_right`.\n\n# Llama a tu función para cada una de las cuatro parejas.\n",
+  "starting_code": "# Define la función two_rings con dos argumentos:\n\n    # Muévete hacia arriba dos casillas\n    \n    # Muévete a la derecha hasta el segundo aro\n    \n    # Muévete hacia abajo dos casillas\n    \n    # Muévete a la derecha hasta el siguiente aro\n    \n# Lanza la palabra mágica con cast\n\n# Muévete a la derecha hasta el primer aro\n\n# Llama a two_rings para la primera pareja\n\n# Llama a two_rings para la segunda pareja\n\n# Llama a two_rings para la tercera pareja\n\n# Llama a two_rings para la cuarta pareja\n\n",
   "hints": [
-    "¡El zigzag es el mismo, pero las distancias cambian! Dale a tu función dos argumentos.",
-    "Dentro de la función, usa esos argumentos para las distancias de los dos `move_right`.",
-    "Cuenta las casillas entre aro y aro: cada pareja tiene sus dos distancias, y son los argumentos de cada llamada."
+    "El zigzag de la función `two_rings(to_second, to_next)` es el mismo en las cuatro parejas: arriba 2, derecha `to_second`, abajo 2, derecha `to_next`.",
+    "Como las cuatro parejas están a distancias distintas, dale a tu función esos dos argumentos para que sirva en todas.",
+    "En cada llamada, cuenta las casillas de un aro al siguiente: esos son los dos números que le das a la función."
   ],
-  "intro": "¡A ver quién cruza la meta antes! Zarek tiene un programa de 14 líneas. Antes de la salida leeré los dos programas, un tick por línea, ¡así que un programa largo despega tarde! Cada aro saltado cuesta cinco ticks antes de cruzar la meta, y en caso de empate gana Zarek. El programa de Zarek es rápido, pero el tuyo puede ser más corto con una función con argumentos para las cuatro parejas.",
-  "outro": "¡Has ganado! Un programa corto despega antes, y en la pista de carreras cada tick cuenta.",
-  "learned": "Ahora sabes que una función propia recibe argumentos entre sus paréntesis, con un nombre cada uno que usa dentro, así que la misma función sirve para tramos distintos, y un programa corto despega antes."
+  "intro": "¡Hagamos una carrera! ¡Pero no basta con llegar el primero! Hay penalizaciones si haces un programa muy largo o si te saltas los aros. Por cada línea que tengas en tu programa, te haré esperar un turno antes de salir, y por cada aro que te saltes, haré que esperes cinco turnos antes de cruzar la meta. En caso de empate, se repite la carrera. El programa de Zarek tiene 18 líneas, si consigues hacerlo más corto, será más fácil ganar a Zarek. Intenta hacerlo con una función con argumentos: la función puede pasar dos aros, y con los argumentos le dices cómo de lejos está el siguiente aro.",
+  "outro": "¡Has ganado! A veces, es mejor tener un programa corto, y en la pista de carreras cada tick cuenta.",
+  "learned": "Ahora sabes que los argumentos de una función hacen que sirva para parejas a distintas distancias, y que un programa corto despega antes."
 }

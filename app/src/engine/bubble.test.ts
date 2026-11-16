@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  AFTER_BUMP_MS,
   type Box,
   bubbleBelow,
   bubbleMiddle,
@@ -10,7 +11,9 @@ import {
   readingMs,
   readingTicks,
   settleMs,
+  wordsOver,
 } from './bubble';
+import { FLY_LIFT, RING_RAISE } from './flight';
 
 const box = (left: number, top: number, right: number, bottom: number): Box => ({ left, top, right, bottom });
 
@@ -113,5 +116,20 @@ describe('the words read to their end (D175)', () => {
     expect(settleMs([900], 1000)).toBe(0);
     expect(settleMs([Number.POSITIVE_INFINITY], 1000)).toBe(0);
     expect(settleMs([Number.POSITIVE_INFINITY, 2200], 1000)).toBe(1200);
+  });
+});
+
+describe('words over a figure in the air (D237)', () => {
+  // The scene's headroom: a figure's height, 1.02 cells, and 4 pixels, at 48 a cell.
+  const headroom = 48 * 1.02 + 4;
+
+  it('puts the words 1.10 cells over the feet on the ground, 1.60 in the air and 1.95 in a ring', () => {
+    expect(wordsOver(headroom, 0, 48).toFixed(2)).toBe('1.10');
+    expect(wordsOver(headroom, FLY_LIFT * 48, 48).toFixed(2)).toBe('1.60');
+    expect(wordsOver(headroom, (FLY_LIFT + RING_RAISE) * 48, 48).toFixed(2)).toBe('1.95');
+  });
+
+  it('shows a thought about a bump half a second after it', () => {
+    expect(AFTER_BUMP_MS).toBe(500);
   });
 });

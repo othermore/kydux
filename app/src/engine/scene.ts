@@ -115,7 +115,7 @@ import {
 } from './painted';
 import { contentUrl } from '../content/address';
 import { characterName, t } from '../i18n';
-import { readingMs, readingTicks } from './bubble';
+import { AFTER_BUMP_MS, readingMs, readingTicks } from './bubble';
 import { SceneCamera, VIEW_TILES } from './camera';
 import type { StoryFraming } from './zooming';
 import { DebugView, type PaintedImage } from './debug';
@@ -711,6 +711,10 @@ class LevelScene extends Phaser.Scene {
     this.speech = new Speech(this, this.parentNode, {
       width: this.map.width * TILE,
       headroom: this.headroom,
+      lifted: (figure) => {
+        const flying = this.flyers.get(figure);
+        return flying ? (FLY_LIFT + flying.raise) * TILE : 0;
+      },
       wizard: () => this.wizard,
       height: this.map.height * TILE,
       wrap: this.options.story ? 6 : 4,
@@ -1285,8 +1289,9 @@ class LevelScene extends Phaser.Scene {
     if (instant || this.still) return;
     if (image) this.shake(image, this.playback.tickDuration);
     this.playSound('bump');
+    // Thought of after the bump is seen (D237).
     const why = ringWayText(String(event.data.way));
-    this.speech.think(why, tick, this.sayTicks(why));
+    this.speech.think(why, tick, this.sayTicks(why), AFTER_BUMP_MS);
   }
 
   /** A figure lifted on its broom (D185): drawn from its flying rows, half a cell up,
@@ -2050,10 +2055,10 @@ class LevelScene extends Phaser.Scene {
         // crown or a wall in a flight's way, what it is (D186, D187).
         if (!instant && event.data.by === 'friend') {
           const who = friendText(String(event.data.id));
-          this.speech.think(who, tick, this.sayTicks(who));
+          this.speech.think(who, tick, this.sayTicks(who), AFTER_BUMP_MS);
         } else if (!instant && (event.data.by === 'high' || event.data.by === 'ring')) {
           const why = bumpText(String(event.data.by), typeof event.data.kind === 'string' ? event.data.kind : null);
-          this.speech.think(why, tick, this.sayTicks(why));
+          this.speech.think(why, tick, this.sayTicks(why), AFTER_BUMP_MS);
         }
         break;
       }
@@ -2160,12 +2165,14 @@ class LevelScene extends Phaser.Scene {
           ...(typeof event.data.kind === 'string' ? { kind: event.data.kind } : {}),
         };
         const why = blockedText(String(event.data.reason), thing?.kind ?? null, detail);
-        this.speech.think(why, tick, this.sayTicks(why));
-        if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
         // drevo cast over a cell no one walks on, and a turn inside a ring that rubs its
         // rim: each sounds as a bump does, and the wizard stays in the air (D215, D226);
-        // the rim nudges the wizard the way it turned, as a bump does.
-        if (event.data.reason === 'no_landing' || event.data.reason === 'ring_rim') this.playSound('bump');
+        // the rim nudges the wizard the way it turned, as a bump does; the thought comes
+        // after the bump is seen (D237). Any other refusal is thought at once.
+        const bumped = event.data.reason === 'no_landing' || event.data.reason === 'ring_rim';
+        this.speech.think(why, tick, this.sayTicks(why), bumped ? AFTER_BUMP_MS : 0);
+        if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
+        if (bumped) this.playSound('bump');
         if (event.data.reason === 'ring_rim') this.nudge(this.wizard, facing ?? 'right', duration);
         break;
       }

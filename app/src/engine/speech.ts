@@ -6,8 +6,13 @@
 // sides. Under a place a story step frames (D199) the camera does not follow the
 // words: there a bubble keeps inside what the frame shows. Its words are never
 // smaller on the screen than at zoom 1 (D106): zoomed out, they are drawn larger.
+// A thought about a bump shows half a second after it (D237): kept until then, the card
+// waiting for it as for words that are up, and dropped by a restart, the slider or any
+// other words. Words over a figure in the air are over it as it is drawn, higher by its
+// flight's lift and a ring's raise; words under it stay under the place of its feet.
 // The scene's parent says what is said: data-bubble and data-speaker, data-thought,
-// and data-words-scale.
+// data-words-scale, and data-words-over (how far over the place of the feet of who they
+// are over the words' foot is, in cells, or `below`).
 
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
@@ -21,6 +26,7 @@ import {
   bubbleTip,
   bubbleWrap,
   settleMs,
+  wordsOver,
 } from './bubble';
 
 /** How far a bubble's drawn box and tail reach beyond its words, at most: a
@@ -34,6 +40,10 @@ export interface SpeechParts {
   height: number;
   /** How far above a figure's feet a word said over it goes. */
   headroom: number;
+  /** How far above the place of its feet on the ground a figure is drawn, in the scene's
+   * pixels: a flying figure's lift and a ring's raise, without the hover; 0 on the
+   * ground (D237). */
+  lifted: (figure: Phaser.GameObjects.Sprite) => number;
   /** Who a thought is over, and a bubble when no one else says it. */
   wizard: () => Phaser.GameObjects.Sprite;
   /** How wide a bubble's words are, in tiles, at most a third of the scene (bubble.ts). */
@@ -58,6 +68,11 @@ export class Speech {
   private thought: Phaser.GameObjects.Container | null = null;
   private thoughtUntil = 0;
   private thoughtRead = 0;
+  /** A thought said to show later (D237): its words, its ticks, when it shows on the
+   * scene's clock, and the timer that shows it. */
+  private pending: { text: string; ticks: number; due: number; timer: Phaser.Time.TimerEvent } | null = null;
+  /** The last tick `expire` was told of, from which a thought shown later lasts. */
+  private lastTick = 0;
   /** Where a bubble or a thought sits: its width, and whether it is below who it is over. */
   private place = { width: 0, below: false, shift: 0 };
   /** Who a bubble or a thought is over: the wizard, or an actor who speaks. */
@@ -78,6 +93,9 @@ export class Speech {
 
   /** A bubble and a thought gone once their ticks are over, or at once. */
   expire(tick: number, instant: boolean): void {
+    this.lastTick = tick;
+    // A thought still to come is not shown under the slider or after a restart.
+    if (instant) this.dropPending();
     if (this.bubble && (instant || tick >= this.bubbleUntil)) this.clearBubble();
     if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
   }
@@ -85,7 +103,11 @@ export class Speech {
   /** The milliseconds until the last of the words on the scene is read to its end and
    * gone, 0 when none is on (D175): what the card waits for. */
   settle(): number {
-    const read = [...(this.bubble ? [this.bubbleRead] : []), ...(this.thought ? [this.thoughtRead] : [])];
+    const read = [
+      ...(this.bubble ? [this.bubbleRead] : []),
+      ...(this.thought ? [this.thoughtRead] : []),
+      ...(this.pending ? [this.pending.due + this.pending.ticks * this.parts.tickMs] : []),
+    ];
     return settleMs(read, this.scene.time.now);
   }
 
@@ -118,6 +140,20 @@ export class Speech {
     const [x, y] = this.anchor();
     this.bubble?.setPosition(x, y);
     this.thought?.setPosition(x, y);
+    this.publishOver();
+  }
+
+  /** How far over the place of the feet of who they are over the words' foot is, for
+   * the tests (data-words-over): in cells, `below`, or nothing with no words on. */
+  private publishOver(): void {
+    const dataset = this.parent.dataset;
+    let over: string | undefined;
+    if (this.bubble || this.thought) {
+      const who = this.speaker ?? this.parts.wizard();
+      over = this.place.below ? 'below' : wordsOver(this.parts.headroom, this.parts.lifted(who), TILE).toFixed(2);
+    }
+    if (over === undefined) delete dataset.wordsOver;
+    else if (dataset.wordsOver !== over) dataset.wordsOver = over;
   }
 
   /** The bubble's box and tail with the figure, for the camera to keep in view: the
@@ -144,7 +180,7 @@ export class Speech {
     const half = (this.place.width / 2 + 4) * this.scale;
     const sides = bubbleRoom(this.parts.width, this.parts.shownSides());
     const x = bubbleMiddle(over.x + this.place.shift, half, sides);
-    return [x, over.y + (this.place.below ? 22 : -this.parts.headroom)];
+    return [x, over.y + (this.place.below ? 22 : -this.parts.headroom - this.parts.lifted(over))];
   }
 
   /** The top and the bottom a bubble stays between, in the scene's pixels: the scene's
@@ -155,13 +191,35 @@ export class Speech {
 
   /** Whether a bubble this tall fits over who speaks, inside the scene. */
   private roomAbove(height: number): boolean {
-    const top = (this.speaker ?? this.parts.wizard()).y - this.parts.headroom - (height + 14) * this.scale;
+    const over = this.speaker ?? this.parts.wizard();
+    const top = over.y - this.parts.headroom - this.parts.lifted(over) - (height + 14) * this.scale;
     return top >= this.room[0] + 2;
   }
 
   /** A thought over the wizard: grey and rounded, with two small circles under it,
-   * for `ticks` ticks from `tick`. */
-  think(text: string, tick: number, ticks: number): void {
+   * for `ticks` ticks from `tick`; with `afterMs`, shown that many milliseconds later,
+   * for `ticks` ticks from the last tick shown then (D237). */
+  think(text: string, tick: number, ticks: number, afterMs = 0): void {
+    this.dropPending();
+    if (afterMs > 0) {
+      const timer = this.scene.time.delayedCall(afterMs, () => {
+        this.pending = null;
+        this.showThought(text, this.lastTick, ticks);
+      });
+      this.pending = { text, ticks, due: this.scene.time.now + afterMs, timer };
+      return;
+    }
+    this.showThought(text, tick, ticks);
+  }
+
+  /** A thought not yet shown dropped, its timer with it. */
+  private dropPending(): void {
+    this.pending?.timer.remove(false);
+    this.pending = null;
+  }
+
+  /** The thought drawn now, for `ticks` ticks from `tick`. */
+  private showThought(text: string, tick: number, ticks: number): void {
     this.clearThought();
     this.clearBubble();
     this.speaker = null;
@@ -194,6 +252,7 @@ export class Speech {
     this.thoughtUntil = tick + ticks;
     this.thoughtRead = this.readAt(ticks);
     this.parent.dataset.thought = text.replaceAll('`', '');
+    this.publishOver();
   }
 
   /** Words said in a bubble over the wizard, or over the actor who says them, for
@@ -221,15 +280,19 @@ export class Speech {
     // else still above, moved to the side of whoever it would cover.
     this.speaker = over;
     const scale = this.scale;
+    // Each other figure as it is drawn, higher when it flies (D237).
     const figures = this.parts
       .figures()
       .filter((figure) => figure !== over && figure.visible)
-      .map(({ x: fx, y: fy, displayWidth, displayHeight }) => ({
-        left: fx - displayWidth / 4,
-        right: fx + displayWidth / 4,
-        top: fy - displayHeight * 0.8,
-        bottom: fy,
-      }));
+      .map((figure) => {
+        const drawnAt = figure.y - this.parts.lifted(figure);
+        return {
+          left: figure.x - figure.displayWidth / 4,
+          right: figure.x + figure.displayWidth / 4,
+          top: drawnAt - figure.displayHeight * 0.8,
+          bottom: drawnAt,
+        };
+      });
     const belowFits = () => over.y + 22 + (height + tail) * scale <= this.room[1];
     const sides = (from: number, to: number): Box => {
       this.place = { width, below: false, shift: 0 };
@@ -242,7 +305,7 @@ export class Speech {
       };
     };
     const aboveBox = () => {
-      const bottom = over.y - this.parts.headroom - tail * scale;
+      const bottom = over.y - this.parts.headroom - this.parts.lifted(over) - tail * scale;
       return sides(bottom - height * scale, bottom);
     };
     const belowBox = () => {
@@ -291,13 +354,16 @@ export class Speech {
     this.bubbleRead = this.readAt(ticks);
     this.parent.dataset.bubble = plain;
     this.parent.dataset.speaker = who;
+    this.publishOver();
   }
 
-  /** The thought gone, if there is one. */
+  /** The thought gone, if there is one, and one still to come with it. */
   clearThought(): void {
+    this.dropPending();
     this.thought?.destroy();
     this.thought = null;
     delete this.parent.dataset.thought;
+    this.publishOver();
   }
 
   /** The bubble gone, if there is one. */
@@ -306,5 +372,6 @@ export class Speech {
     this.bubble = null;
     delete this.parent.dataset.bubble;
     delete this.parent.dataset.speaker;
+    this.publishOver();
   }
 }

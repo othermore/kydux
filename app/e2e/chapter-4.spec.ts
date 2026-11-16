@@ -634,6 +634,41 @@ test.describe('the rings and the race', () => {
     await page.screenshot({ path: `${SHOTS}ring-rim-card.png` });
   });
 
+  test("the rim's thought comes half a second after the bump, over the hat, and the card once it is read (D237)", async ({
+    page,
+  }) => {
+    await open(page, 'the-rings', '1');
+    await page.evaluate(() => {
+      const node = document.querySelector('#scene') as HTMLElement;
+      const seen: Record<string, number> = {};
+      (window as unknown as { bumpSeen: Record<string, number> }).bumpSeen = seen;
+      new MutationObserver(() => {
+        if (seen.bump === undefined && /bump/.test(node.dataset.sounds ?? '')) seen.bump = performance.now();
+        if (seen.thought === undefined && node.dataset.thought) seen.thought = performance.now();
+        const card = document.querySelector<HTMLElement>('.outcome');
+        if (seen.card === undefined && card && !card.hidden && card.getClientRects().length > 0) seen.card = performance.now();
+      }).observe(document.body, { attributes: true, childList: true, subtree: true });
+    });
+    await start(page, wrong('the-rings', 'turned_inside_the_ring'));
+    await expect(scene(page)).toHaveAttribute('data-sounds', /bump/, { timeout: ciTimes(60_000) });
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}ring-rim-bump.png` });
+    await expect(scene(page)).toHaveAttribute('data-thought', 'Oh, giré demasiado pronto y rocé el aro.', {
+      timeout: ciTimes(10_000),
+    });
+    // Over the hat, or under the feet where the window leaves no room above.
+    const over = await scene(page).getAttribute('data-words-over');
+    test.info().annotations.push({ type: 'words-over', description: String(over) });
+    expect(['1.95', 'below']).toContain(over);
+    await page.waitForTimeout(500);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}ring-rim-thought.png` });
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
+    const seen = await page.evaluate(() => (window as unknown as { bumpSeen: Record<string, number> }).bumpSeen);
+    const [bump, thought, card] = [seen.bump as number, seen.thought as number, seen.card as number];
+    expect(thought - bump).toBeGreaterThan(350);
+    expect(thought - bump).toBeLessThan(1500);
+    expect(card).toBeGreaterThan(thought);
+  });
+
   test("flown down into a ring, the wizard rubs its rim in front of it, in its hole (D226, D232)", async ({ page }) => {
     await open(page, 'the-rings', '1');
     await start(

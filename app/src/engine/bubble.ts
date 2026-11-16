@@ -1,8 +1,20 @@
 // How wide a speaker's bubble is and where it goes: at most a third of the scene's
 // width, taller as it needs; above them, or below where above it would cover someone
 // else and below it would not, or above and to one side of whoever it would cover; and
-// how long words stay said, as long as they take to read (D175). Kept apart from
-// speech.ts so that it is tested without Phaser.
+// how long words stay said, as long as they take to read (D175); a thought about a bump
+// comes half a second after it, and words over a figure in the air are over it as it is
+// drawn (D237). Kept apart from speech.ts so that it is tested without Phaser.
+
+/** How long after a bump the wizard's thought about it shows, in milliseconds (D237):
+ * the bump is seen, and then read of. */
+export const AFTER_BUMP_MS = 500;
+
+/** How far over the place of a figure's feet on the ground the foot of the words over it
+ * is, in cells (D237): its headroom, a figure's height, and how high it is drawn above
+ * that place, flying, both in the scene's pixels of `tile` a cell. */
+export function wordsOver(headroom: number, lifted: number, tile: number): number {
+  return (headroom + lifted) / tile;
+}
 
 /** The tiles a bubble's words wrap at: what the page asks, at most a third of the scene. */
 export function bubbleWrap(wrap: number, columns: number): number {

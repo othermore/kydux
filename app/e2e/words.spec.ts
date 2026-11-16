@@ -64,3 +64,55 @@ test('with no wizard yet, a story says the word for one', async ({ page }) => {
   await storyNext(page, 4);
   await expect(storySaid(page)).toContainText('I am Kydux.');
 });
+
+/** When the bump's sound (data-sound, the last sound played) and the thought first come,
+ * on the page's clock (D237). */
+async function watchBump(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const node = document.querySelector('#scene') as HTMLElement;
+    const seen: Record<string, number> = {};
+    (window as unknown as { bumpSeen: Record<string, number> }).bumpSeen = seen;
+    new MutationObserver(() => {
+      if (seen.bump === undefined && node.dataset.sound === 'bump') seen.bump = performance.now();
+      if (seen.thought === undefined && node.dataset.thought) seen.thought = performance.now();
+    }).observe(node, { attributes: true, attributeFilter: ['data-sound', 'data-thought'] });
+  });
+}
+
+const bumpSeen = (page: Page) =>
+  page.evaluate(() => (window as unknown as { bumpSeen: Record<string, number> }).bumpSeen);
+
+async function openTheLongCorridor(page: Page): Promise<void> {
+  await seedWizard(page, MARTA);
+  await page.goto('/#level/the-long-corridor');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+}
+
+test.describe('a thought about a bump (D237)', () => {
+  test.use({ locale: 'es-ES' });
+
+  test('comes after the bump into a friend, over the head of a wizard on the ground', async ({ page }) => {
+    await openTheLongCorridor(page);
+    await page.keyboard.insertText('wizard.move_up()');
+    await watchBump(page);
+    await page.locator('#run').click();
+    await expect(page.locator('#scene')).toHaveAttribute('data-thought', /./, { timeout: ciTimes(30_000) });
+    const { bump, thought } = await bumpSeen(page);
+    expect((thought as number) - (bump as number)).toBeGreaterThan(350);
+    expect((thought as number) - (bump as number)).toBeLessThan(1500);
+    await expect(page.locator('#scene')).toHaveAttribute('data-words-over', '1.10');
+  });
+
+  test('is not shown when the slider is moved across the bump within its half second', async ({ page }) => {
+    await openTheLongCorridor(page);
+    await page.keyboard.insertText('wizard.move_up()\nwizard.move_right(4)');
+    await page.locator('#run').click();
+    await expect(page.locator('#scene')).toHaveAttribute('data-sound', 'bump', { timeout: ciTimes(30_000) });
+    await page.locator('#timeline').fill('0');
+    await page.waitForTimeout(1200);
+    await expect(page.locator('#scene')).not.toHaveAttribute('data-thought', /./);
+  });
+});

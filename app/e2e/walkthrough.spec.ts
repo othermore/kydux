@@ -87,6 +87,20 @@ function ticksToShow(last: number): number[] {
   return [...ticks].sort((a, b) => a - b);
 }
 
+/** Shows a route's last tick: moving the timeline closes the won card over the scene. */
+async function atEnd(page: Page): Promise<void> {
+  const timeline = page.locator('#timeline');
+  const last = await timeline.getAttribute('max');
+  await timeline.fill(String(last));
+  await page
+    .waitForFunction((t) => document.querySelector('#scene')?.getAttribute('data-tick') === t, last, {
+      timeout: ciTimes(10_000),
+    })
+    .catch(() => {});
+  await page.locator('.win-card').waitFor({ state: 'detached', timeout: ciTimes(2_000) }).catch(() => {});
+  await page.waitForTimeout(ciTimes(500));
+}
+
 async function route(page: Page, id: string, way: string): Promise<void> {
   const timeline = page.locator('#timeline');
   const last = Number(await timeline.getAttribute('max'));
@@ -139,13 +153,15 @@ async function level(page: Page, id: string): Promise<void> {
   // The win card's stars are drawn in one after another: the picture waits for the last.
   await page.waitForTimeout(ciTimes(1_500));
   for (const [index, way] of (ways.length > 0 ? ways : ['unica']).entries()) {
-    // Choosing a way plays it from its start: its picture is of its end, with its goals
-    // met, so it waits for the playback to begin and then to be done.
+    // The first way's picture is the won card. Choosing another way plays it from its
+    // start and opens the card again at its end, over the scene: its picture is the scene
+    // at its last tick, with its goals met and no card over it.
     if (way !== 'unica' && (await page.locator('#way').inputValue()) !== way) {
       await page.locator('#way').selectOption(way, { force: true });
       await page.locator('#scene[data-state="playing"]').waitFor({ timeout: ciTimes(2_000) }).catch(() => {});
       await page.locator('#scene[data-state="done"]').waitFor({ timeout: ciTimes(90_000) });
-      await page.waitForTimeout(ciTimes(500));
+      await page.locator('.win-card').waitFor({ timeout: ciTimes(8_000) }).catch(() => {});
+      await atEnd(page);
     }
     await page.screenshot({ path: `${OUT}level-${id}-${way}-ganado.png` });
     // The route tick by tick of the first way only; every other way shows its end (the

@@ -7,7 +7,9 @@
 // over LIFT_MS (D244). In a ring's cell a flying figure flies through the ring's hole
 // (D232): drawn higher, its feet and broom above the ring's lower rim, and its feet past
 // the ring's plane the way it last flew, upward behind the ring, downward in front of
-// it. Kept apart from scene.ts so that it is tested without Phaser.
+// it. Flown steps that follow one another are one glide at an even speed, with no rest
+// at the cells it passes (D259). Kept apart from scene.ts so that it is tested without
+// Phaser.
 
 import { FOOT_IN_CELL } from './depth';
 import type { Facing, Tile } from './sight';
@@ -102,4 +104,45 @@ export function turned(before: Facing | null, now: Facing): boolean {
 export function flownTick(events: { kind: string; data: Record<string, unknown> }[]): boolean {
   const moves = events.filter((event) => event.kind === 'move');
   return moves.length > 0 && moves.every((event) => event.data.flying === true);
+}
+
+/** A figure gliding over a run of flown steps (D259): the points it passes, the first
+ * where it starts and one at each step's cell, with the way it faces on its way to each;
+ * when, in milliseconds from its start, it reaches each (`ends`, one a step); and the
+ * tick of its first step. */
+export interface Glide {
+  points: readonly { x: number; y: number; facing: Facing }[];
+  ends: readonly number[];
+  tick: number;
+}
+
+/** Where a gliding figure is `elapsed` milliseconds into its glide, and on its way to
+ * which point (an index of `points`, from 1): on a straight line from each point to the
+ * next at the pace of its step, with no rest at a point it passes, and on its last
+ * point from its end on (`done`). */
+export function glideAt(glide: Glide, elapsed: number): { x: number; y: number; to: number; done: boolean } {
+  const { points, ends } = glide;
+  const last = points[points.length - 1];
+  if (!last) return { x: 0, y: 0, to: 0, done: true };
+  let begun = 0;
+  for (let index = 0; index < ends.length; index += 1) {
+    const end = ends[index] as number;
+    const from = points[index];
+    const to = points[index + 1];
+    if (!from || !to) break;
+    if (elapsed < end) {
+      const share = end > begun ? Math.max(0, (elapsed - begun) / (end - begun)) : 1;
+      return { x: from.x + (to.x - from.x) * share, y: from.y + (to.y - from.y) * share, to: index + 1, done: false };
+    }
+    begun = end;
+  }
+  return { x: last.x, y: last.y, to: points.length - 1, done: true };
+}
+
+/** A glide cut at the step of `tick`, the tick shown at a pause or a stop: the figure
+ * goes on to that step's cell and stands there (D259). Unchanged where it ends before. */
+export function glideTo(glide: Glide, tick: number): Glide {
+  const steps = Math.max(1, tick - glide.tick + 1);
+  if (steps >= glide.ends.length) return glide;
+  return { ...glide, points: glide.points.slice(0, steps + 1), ends: glide.ends.slice(0, steps) };
 }

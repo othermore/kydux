@@ -4,6 +4,9 @@ import {
   FLY_LIFT,
   flownTick,
   flyFrame,
+  type Glide,
+  glideAt,
+  glideTo,
   HOVER_CELLS,
   HOVER_MS,
   hoverOf,
@@ -15,7 +18,7 @@ import {
   throughRing,
   turned,
 } from './flight';
-import { FLOWN, LONG, lengthOf, Playback, type PlaybackEvent } from './playback';
+import { FLOWN, flownRun, LONG, lengthOf, Playback, type PlaybackEvent } from './playback';
 import { spriteFoot, spriteScale, type ThingSprite } from './things';
 import { TILE } from './placeholders';
 
@@ -161,5 +164,109 @@ describe("a ring's cell flown through (D232)", () => {
     const halfway = throughRing([5.5, 8.5 + FOOT_IN_CELL], rings, 'up');
     expect(halfway.raise).toBeCloseTo(RING_RAISE / 2);
     expect(halfway.past).toBeCloseTo(-RING_PAST / 2);
+  });
+});
+
+describe('a flight glides (D259)', () => {
+  /** A glide over four flown cells, right, right, up, right, a cell 32 pixels and a
+   * step 100 ms, from tick 5. */
+  const glide: Glide = {
+    points: [
+      { x: 0, y: 0, facing: 'right' },
+      { x: 32, y: 0, facing: 'right' },
+      { x: 64, y: 0, facing: 'right' },
+      { x: 64, y: -32, facing: 'up' },
+      { x: 96, y: -32, facing: 'right' },
+    ],
+    ends: [100, 200, 300, 400],
+    tick: 5,
+  };
+  const path = (ms: number) => {
+    const { x, y } = glideAt(glide, ms);
+    return x - y;
+  };
+
+  it('crosses its cells on a straight line in time, with no flat part between them', () => {
+    // The way gone, along the path, grows by the same length in the same time.
+    for (let ms = 0; ms < 400; ms += 5) {
+      expect(path(ms + 5) - path(ms)).toBeCloseTo(1.6, 6);
+    }
+    // At a cell it passes, it is neither held nor sped up.
+    expect(glideAt(glide, 199)).toMatchObject({ to: 2, done: false });
+    expect(glideAt(glide, 201)).toMatchObject({ to: 3, done: false });
+    expect(path(201) - path(199)).toBeCloseTo(path(101) - path(99), 6);
+  });
+
+  it('faces the way it flies to its next cell, and ends on its last', () => {
+    expect(glide.points[glideAt(glide, 250).to]?.facing).toBe('up');
+    expect(glideAt(glide, 400)).toEqual({ x: 96, y: -32, to: 4, done: true });
+    expect(glideAt(glide, 1000)).toEqual({ x: 96, y: -32, to: 4, done: true });
+    expect(glideAt(glide, -20)).toMatchObject({ x: 0, y: 0, done: false });
+  });
+
+  it('cut at the tick shown, goes on to that tick\'s cell and stands there', () => {
+    const cut = glideTo(glide, 6);
+    expect(cut.points).toHaveLength(3);
+    expect(cut.ends).toEqual([100, 200]);
+    expect(glideAt(cut, 300)).toEqual({ x: 64, y: 0, to: 2, done: true });
+    expect(glideTo(glide, 9)).toBe(glide);
+  });
+
+  it("reads a figure's run of flown steps ahead: on while it flies on, to a stand, a bump or a cast", () => {
+    const step = (tick: number, from: number, to: number, actor = 'wizard'): PlaybackEvent => ({
+      tick,
+      actor,
+      kind: 'move',
+      data: { from: [from, 0], to: [to, 0], facing: 'right', flying: true },
+      line: 1,
+    });
+    const ticks: PlaybackEvent[][] = [
+      [step(1, 0, 1), step(1, 4, 5, 'zarek')],
+      [step(2, 1, 2), step(2, 5, 6, 'zarek')],
+      [step(3, 2, 3)],
+      [{ ...step(4, 3, 3), kind: 'cast', data: { word: 'drevo' } }],
+      [step(5, 3, 4)],
+    ];
+    expect(flownRun(ticks, 0, 'wizard', FLOWN).map(({ event }) => event.tick)).toEqual([1, 2, 3]);
+    expect(flownRun(ticks, 0, 'zarek', FLOWN).map(({ event }) => event.tick)).toEqual([1, 2]);
+    expect(flownRun(ticks, 0, 'wizard', FLOWN).map(({ length }) => length)).toEqual([FLOWN, FLOWN, FLOWN]);
+    expect(flownRun(ticks, 3, 'wizard', FLOWN)).toEqual([]);
+    // A step that does not go on from where the last ended ends the run.
+    expect(flownRun([[step(1, 0, 1)], [step(2, 5, 6)]], 0, 'wizard').map(({ event }) => event.tick)).toEqual([1]);
+    // A walked step is no flight.
+    expect(flownRun([[{ ...step(1, 0, 1), data: { from: [0, 0], to: [1, 0] } }]], 0, 'wizard')).toEqual([]);
+  });
+
+  it('keeps its ticks on one clock: a timer that fires late makes the next one shorter', () => {
+    let now = 0;
+    const waits: number[] = [];
+    const fired: (() => void)[] = [];
+    const playback = new Playback({
+      tickMs: 300,
+      pace: FLOWN,
+      now: () => now,
+      schedule: (callback, ms) => {
+        waits.push(ms);
+        fired.push(callback);
+        return null;
+      },
+    });
+    playback.load([move(1, true), move(2, true), move(3, true), move(4, true)]);
+    playback.play();
+    expect(waits[0]).toBeCloseTo(100);
+    // The first timer fires 7 ms late, the second 3 ms: each tick is still due on the
+    // clock, every 100 ms from the play's start.
+    now = 107;
+    fired[0]?.();
+    expect(waits[1]).toBeCloseTo(93);
+    // The tick shown began when it was due, which is when a glide over it starts.
+    expect(playback.startedAt).toBeCloseTo(100);
+    now = 203;
+    fired[1]?.();
+    expect(waits[2]).toBeCloseTo(97);
+    // A timer more than a tick late starts the clock again from then.
+    now = 600;
+    fired[2]?.();
+    expect(waits[3]).toBeCloseTo(100);
   });
 });

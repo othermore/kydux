@@ -314,7 +314,7 @@ tiles are `[x, y]`.
 
 | kind | actor | data | the scene |
 |---|---|---|---|
-| `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; for a flown step of the wizard's, `step`, from 1, and `steps`, its place in its command and the command's count (D243); `ticks`, a walked step of the wizard's where it can fly, three (D225) | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132); a flown move has no tap: the wizard's command is one gust, started at its first step for the command's whole length, or at a later step where none sounds (D243) |
+| `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; for a flown step of the wizard's, `step`, from 1, and `steps`, its place in its command and the command's count (D243); `ticks`, a walked step of the wizard's where it can fly, three (D225) | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132); a flown move has no tap: the wizard's command is one gust, started at its first step for the command's whole length, or at a later step where none sounds (D243); flown moves of a figure's that follow one another are one glide at an even speed, read ahead from the ticks, with no rest at the cells it passes (D259), and `data-flyers-at` says where each flying figure is as each frame is drawn |
 | `bump` | wizard | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it, and in the air ends the gust at once (D243); the thought names a friend, a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side, half a second after the bump (D237), over the head or, with no room there, beside it (D245) |
 | `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above or the goals box would cover it (D240) |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
@@ -337,7 +337,7 @@ tiles are `[x, y]`.
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
 | `found` | `world`, in the tick of `find_all` or `find_nearest` | `ids`, the hidden things found; `at`, their cells | each comes into sight from the straw and is drawn from now on; one found before the first tick is shown with it; `data-found` (D184) |
 | `untie` | wizard | `id`, `at` | the wizard bends over the broom, a long tick, and its thread is gone; `data-untied` (D183) |
-| `fly` | `broom`, in the wizard's tick of drevo, or a racer in its own | `id`, the figure; `at` | the figure rises half a cell over 0.3 s at the playback's speed, the wizard with the sound of air that rises (`lift`, D244), drawn in its flying row's level frame, and hovers slowly whenever it is seen, after Stop too (D235, D242); a lift starts no wind, each flown command being a gust (`move`, D243); every move after it is flown in a third of a walked step's time (`move`'s `flying`); `data-flying`, `data-hover`, `data-rise` (D185) |
+| `fly` | `broom`, in the wizard's tick of drevo, or a racer in its own | `id`, the figure; `at` | the figure rises half a cell over 0.3 s at the playback's speed, the wizard with the sound of air that rises (`lift`, D244), drawn in its flying row's level frame, and hovers slowly whenever it is seen, after Stop too (D235, D242); a lift starts no wind, each flown command being a gust (`move`, D243); every move after it is flown in a third of a walked step's time (`move`'s `flying`), the moves that follow one another as one glide (D259); `data-flying`, `data-hover`, `data-rise` (D185) |
 | `land` | `broom`, after the run's last tick, or a racer at its path's end | `id`, `at` | the figure sets down on its cell over 0.3 s, in its flying frame until its feet are there, then standing the way it flew (D241); the wizard with the wind switched off, its rest, which rose as the landing neared, sinking in pitch and loudness to nothing (`Wind.land`, `set_down` among `data-sounds`, `data-landing`, D253, D255), the same where the world lands it at a program's end (D244); a gust that sounds falls as it was planned (D185, D243) |
 | `through` | the ring, in the move of the wizard or of a racer | `id`, `at`, the cell flown from; `by`, the racer | the ring glows as the figure passes along its way; the wizard's are counted in `data-through`, in order (D187, D219, D220) |
 | `wrong_way` | the ring, in the wizard's move | `id`, `at`, `way`, the cell flown from | the ring shakes, with the bump's sound, and half a second after it the wizard thinks the way it is flown (D237), over its head or beside it (D245); the ring counts as missed (D219) |
@@ -2716,7 +2716,8 @@ one overturns stays, marked as superseded.
   the page plays a tick whose every move is flown in a third of a tick (`FLOWN`,
   `engine/flight.ts`), at every speed, and in a level where the wizard can fly every
   tick, so that a flight is three times as fast to the eye, a walk is seen as anywhere
-  else, and the long flights of the rings and the race pass quickly. While flying,
+  else, and the long flights of the rings and the race pass quickly; flown steps that
+  follow one another are one glide at an even speed (D259). While flying,
   the figure is drawn from its flying rows (D188), lifted half a cell above its cell,
   its origin moved so that its depth stays its cell's, with a soft shadow on the ground,
   and it hovers as D235 says; it rises to there and sets down from there as D244 says.
@@ -3962,3 +3963,17 @@ one overturns stays, marked as superseded.
   before the guide, a guide over a scene not drawn, a step about the goals with no goals
   in sight, and a wait of its own length in place of the page's own word that the scene
   and the box are shown.
+- **D259 — A flight glides: flown steps that follow one another are one move at an even
+  speed.** Decided 2026-11-16 from the owner's comment (*la escoba se mueve a trompicones…
+  como si fuese frenándose y acelerando*). A figure in the air that flies one cell after
+  another, the wizard or a racer, crosses them without a rest between: from the first cell
+  of a run of flown steps to its last, through the turns of its way and from one command
+  to the next, its place on the screen advances by the same length in the same time, and
+  it stands only where the program has it stand (a tick with no move, a bump, a landing,
+  the run's end). The camera that follows it adds no shake of its own. A flown cell still
+  takes a third of a walked one (D185); the trace, the ticks and the count are the world's
+  and are untouched, as are the gust (D243), the lift and the landing (D244), the hover
+  (D235, D242) and a walked step, which keeps its rest between steps under its frames and
+  its tap. Paused, stopped, moved by the timeline or shown at once, the figure is on its
+  cell as today. Rules out a move per cell shorter than its tick, a move per cell that
+  eases in and out, and a flight made slower to hide the rests.

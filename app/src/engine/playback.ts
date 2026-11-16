@@ -6,9 +6,12 @@
 // where the wizard can fly every tick does, a walked step there taking three (D225),
 // so that a walk is seen as anywhere else and a flight three times as fast. What happens
 // before the first tick, a hidden thing found by the first line (D184), is played
-// with the first tick. It says how long it is to the first tick ahead that holds an
-// event asked for (timeTo, D255). It knows nothing of Phaser: the scene listens to it and
-// draws.
+// with the first tick. Its ticks keep one clock: each is due when the ones before it have
+// lasted their length from the play's start, however late a timer fires, so that a
+// figure gliding over its flown steps meets them on time (D259). It says how long it is
+// to the first tick ahead that holds an event asked for (timeTo, D255), and a figure's
+// run of flown steps from the tick shown (flownRun, D259). It knows nothing of Phaser:
+// the scene listens to it and draws.
 
 import type { WorldEvent } from '../runtime/protocol';
 import { FLOWN, flownTick } from './flight';
@@ -48,6 +51,38 @@ export function ticksTo(
   return null;
 }
 
+/** A step of a figure's run of flown steps (D259): its move, and how long its tick
+ * lasts, against a tick. */
+export interface FlownStep {
+  event: PlaybackEvent;
+  length: number;
+}
+
+/** A figure's run of flown steps from the tick at `from` (an index of `ticks`) on (D259):
+ * that tick's flown move of `who`'s, then each next tick's while it holds one that goes
+ * on from where the last ended, each with its tick's length as it is played (lengthOf,
+ * with the pace). It ends at a tick where the figure does not fly on: it stands, bumps,
+ * casts, lands, or the run ends. Empty where the tick at `from` holds no flown move of
+ * the figure's. */
+export function flownRun(
+  ticks: readonly PlaybackEvent[][],
+  from: number,
+  who: string,
+  pace = 1,
+): FlownStep[] {
+  const run: FlownStep[] = [];
+  for (let index = from; index < ticks.length; index += 1) {
+    const events = ticks[index] ?? [];
+    const own = events.filter((event) => event.actor === who);
+    const move = own.find((event) => event.kind === 'move');
+    if (!move || move.data.flying !== true || own.some((event) => event.kind === 'bump')) break;
+    const last = run[run.length - 1];
+    if (last && String(move.data.from) !== String(last.event.data.to)) break;
+    run.push({ event: move, length: lengthOf(events, pace) });
+  }
+  return run;
+}
+
 export type PlaybackState = 'idle' | 'playing' | 'paused' | 'done';
 export type Speed = 1 | 2 | 4;
 
@@ -59,6 +94,8 @@ export interface PlaybackOptions {
   pace?: number;
   schedule?: (callback: () => void, ms: number) => unknown;
   cancel?: (handle: unknown) => void;
+  /** The clock the ticks are due by, in milliseconds. */
+  now?: () => number;
 }
 
 /** Called with tick 0 and no events at a reset, then with each tick and its events;
@@ -71,6 +108,11 @@ export class Playback {
   readonly pace: number;
   private readonly schedule: (callback: () => void, ms: number) => unknown;
   private readonly cancel: (handle: unknown) => void;
+  private readonly now: () => number;
+  /** When the tick that plays ends, by the clock: the next one is due then. */
+  private due: number | null = null;
+  /** When the tick shown began, by the clock: when it was due (D259). */
+  private began = 0;
   /** The run's events, one list for each tick, in order. */
   private ticks: PlaybackEvent[][] = [];
   private current = 0;
@@ -86,6 +128,7 @@ export class Playback {
     this.schedule = options.schedule ?? ((callback, ms) => setTimeout(callback, ms));
     this.cancel =
       options.cancel ?? ((handle) => clearTimeout(handle as ReturnType<typeof setTimeout>));
+    this.now = options.now ?? (() => performance.now());
   }
 
   get tick(): number {
@@ -131,6 +174,7 @@ export class Playback {
       return;
     }
     this.setState('playing');
+    this.due = null;
     this.next();
   }
 
@@ -178,6 +222,17 @@ export class Playback {
     return ticks === null ? null : ticks * this.tickDuration;
   }
 
+  /** When the tick shown began by the clock the ticks are due by: when it was due,
+   * however late its timer fired (D259). */
+  get startedAt(): number {
+    return this.began;
+  }
+
+  /** A figure's run of flown steps from the tick shown on, read ahead (D259). */
+  flownRun(who: string): FlownStep[] {
+    return flownRun(this.ticks, Math.max(0, this.current - 1), who, this.pace);
+  }
+
   /** From the next tick on. */
   setSpeed(multiplier: Speed): void {
     this.multiplier = multiplier;
@@ -204,18 +259,29 @@ export class Playback {
       return;
     }
     this.current += 1;
+    // This tick is due when the one before it ended, or now at a play's start; a timer
+    // that fired more than a tick late starts the clock again from now.
+    const now = this.now();
+    const length = this.tickDuration * lengthOf(events, this.pace);
+    const start = this.due !== null && this.due + length > now ? this.due : now;
+    this.due = start + length;
+    this.began = start;
     for (const listener of this.tickListeners) listener(this.current, events, false);
     // A listener may have paused it, for the map's window (D134): play() goes on.
     if (this.currentState !== 'playing') return;
-    this.timer = this.schedule(() => {
-      this.timer = null;
-      if (this.currentState === 'playing') this.next();
-    }, this.tickDuration * lengthOf(events, this.pace));
+    this.timer = this.schedule(
+      () => {
+        this.timer = null;
+        if (this.currentState === 'playing') this.next();
+      },
+      Math.max(0, this.due - now),
+    );
   }
 
   private clearTimer(): void {
     if (this.timer !== null) this.cancel(this.timer);
     this.timer = null;
+    this.due = null;
   }
 
   private setState(state: PlaybackState): void {

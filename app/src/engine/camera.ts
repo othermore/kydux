@@ -9,7 +9,10 @@
 // dragged, it stays where it was dragged until the next step, so that the child
 // can watch someone the story does not follow (D106). At a level's start it shows the
 // wizard and every actor, zooming out as far as it must and no farther, and the run
-// takes it back to the wizard, gliding (sprint 31).
+// takes it back to the wizard, gliding (sprint 31). While the wizard glides in the air,
+// a camera that follows it moves with it at once, keeping the lag it had as the glide
+// began, so that it catches up no lag at a turn and the figure does not swing on the
+// screen; once the wizard stands, it catches up again (D259).
 // A story step may frame a place (D199): a box of cells shown whole, or the scene's
 // width, held until a later step frames another or none. A level may frame one too
 // (D201): its start shows the box whole, and a run keeps it while the wizard is inside
@@ -38,6 +41,8 @@ export { ZOOMS };
 
 /** The most of a scene the camera shows at zoom 1, in tiles across and down. */
 export const VIEW_TILES: Tile = [15, 9];
+/** How much of the way to the wizard a following camera goes each frame: its lag. */
+const LAG = 0.2;
 /** How far, in pixels, the pointer moves before a press is a drag of the camera. */
 const DRAG_THRESHOLD = 6;
 /** In a story, the room, in the scene's pixels, the camera's window keeps between
@@ -80,6 +85,8 @@ export class SceneCamera {
   private placed: StoryFraming | null = null;
   /** In a level, the place its start frames (D201), and whether it is held. */
   private readonly levelFraming: LevelFraming;
+  /** Whether the wizard glides in the air, the camera moving with it at once (D259). */
+  private gliding = false;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -173,7 +180,7 @@ export class SceneCamera {
     this.letGoOfBox();
     const wizard = this.parts.wizard();
     const { scrollX, scrollY } = camera;
-    camera.startFollow(wizard, true, 0.2, 0.2);
+    camera.startFollow(wizard, true, LAG, LAG);
     // From the frame of a level's start it glides; else it is on the wizard at once.
     if (this.framed) camera.setScroll(scrollX, scrollY);
     else camera.centerOn(wizard.x, wizard.y);
@@ -224,6 +231,27 @@ export class SceneCamera {
    * to the wizard, once the wizard leaves it (D201). */
   hold(at: Tile): void {
     if (this.levelFraming.holding && !this.levelFraming.keeps(at)) this.follow();
+  }
+
+  /** Each frame, whether the wizard glides in the air (D259): as it begins to, a camera
+   * that follows it moves with it at once from then on, the lag it has kept as it is;
+   * as it stands, the camera catches up with it again. */
+  glide(on: boolean): void {
+    if (this.parts.story || on === this.gliding) return;
+    this.gliding = on;
+    if (this.parent.dataset.following !== 'true') return;
+    const camera = this.camera;
+    if (on) {
+      const wizard = this.parts.wizard();
+      camera.setFollowOffset(
+        wizard.x - camera.scrollX - camera.width * camera.originX,
+        wizard.y - camera.scrollY - camera.height * camera.originY,
+      );
+      camera.setLerp(1, 1);
+    } else {
+      camera.setFollowOffset(0, 0);
+      camera.setLerp(LAG, LAG);
+    }
   }
 
   /** In a story, a step's framing (D199): a box of cells shown whole and centred, or

@@ -49,8 +49,10 @@
 // while the wind rises to the wizard's landing, `down` while it is switched off, muted or
 // not, D255), data-through (the
 // rings flown through, in order, joined by ","), data-race-band (what Ilda's band says while she
-// reads the programs, D189), data-race-verdict (her verdict of the race, D234) and
-// data-world (what the camera shows, in cells: "left,top,width,height").
+// reads the programs, D189), data-race-verdict (her verdict of the race, D234),
+// data-flyers-at (where each flying figure is as each frame is drawn: its feet in the
+// scene's pixels and on the canvas, the camera counted, "id:x,y,x,y" joined by ";",
+// D259) and data-world (what the camera shows, in cells: "left,top,width,height").
 //
 // The camera is a window on the scene (D69, camera.ts): it follows the wizard,
 // the player zooms it and drags it to look around, and a run or a restart brings
@@ -150,7 +152,21 @@ import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, bumpText, friendText, raceVerdict, ringWayText, sleepingText } from './words';
-import { FLOWN, FLY_LIFT, flyFrame, hoverOf, hoverPhase, LIFT_MS, RING_PAST, RING_RAISE, riseOf, throughRing } from './flight';
+import {
+  FLOWN,
+  FLY_LIFT,
+  flyFrame,
+  type Glide,
+  glideAt,
+  glideTo,
+  hoverOf,
+  hoverPhase,
+  LIFT_MS,
+  RING_PAST,
+  RING_RAISE,
+  riseOf,
+  throughRing,
+} from './flight';
 import { drawnFromSprite, spriteFoot, spriteKey, spriteName, spriteOrigin, spriteScale, type ThingSprite } from './things';
 import { LAND_NEAR, Wind } from './sound';
 
@@ -375,6 +391,12 @@ class LevelScene extends Phaser.Scene {
   private rings: Tile[] | null = null;
   /** The figures in the air (D185), and those setting down from it (D244). */
   private readonly flyers = new Map<Phaser.GameObjects.Sprite, Flyer>();
+  /** The figures gliding over their runs of flown steps (D259): each glide, the cells of
+   * its steps, when it started by the page's clock, and the tick's length it was made for. */
+  private readonly glides = new Map<
+    Phaser.GameObjects.Sprite,
+    { glide: Glide; cells: string[]; since: number; tickMs: number }
+  >();
   private readonly wind = new Wind();
   /** The way each figure faces (D241), kept by its sprite. */
   private readonly ways = new Map<Phaser.GameObjects.Sprite, Facing>();
@@ -826,9 +848,15 @@ class LevelScene extends Phaser.Scene {
       // Words said near the end of the run, with no tick to end them, go once they are
       // read (D175).
       if (state === 'done' && !this.options.story) this.time.delayedCall(this.speech.settle(), () => this.speech.expireRead());
-      // Stop, a pause and the run's end silence a gust (D242, D243).
-      if (state !== 'playing') this.wind.stop(WIND_STOP);
+      // Stop, a pause and the run's end silence a gust (D242, D243), and end each glide
+      // on the cell of the tick shown (D259).
+      if (state !== 'playing') {
+        this.wind.stop(WIND_STOP);
+        this.cutGlides();
+      }
     });
+    // Where the flying figures are drawn, once each frame is drawn (D259).
+    this.events.on(Phaser.Scenes.Events.RENDER, () => this.publishFlyers());
     this.restart();
     this.parentNode.dataset.state = this.playback.state;
     this.ready();
@@ -908,6 +936,9 @@ class LevelScene extends Phaser.Scene {
     const view = this.cameras.main.worldView;
     const world = [view.x, view.y, view.width, view.height].map((v) => (v / TILE).toFixed(2)).join(',');
     if (this.parentNode.dataset.world !== world) this.parentNode.dataset.world = world;
+    if (this.glides.size > 0) this.moveGlides();
+    // The camera moves with the wizard at once while it glides (D259).
+    this.view.glide(this.glides.has(this.wizard));
     if (this.flyers.size > 0 || this.parentNode.dataset.flying) this.flyFrames();
     // The wind (D243): whether a gust sounds, and the rest asked for while the wizard is in
     // the air with the program playing.
@@ -1168,6 +1199,7 @@ class LevelScene extends Phaser.Scene {
 
   private placeWizard(tile: Tile, facing: Facing): void {
     this.tweens.killTweensOf(this.wizard);
+    this.glides.delete(this.wizard);
     this.wizard.setPosition(...this.figureAt(tile));
     this.face(this.wizard, facing);
     this.wizardTile = tile;
@@ -1264,12 +1296,15 @@ class LevelScene extends Phaser.Scene {
   /** A tick's events drawn; `instant` for a tick replayed by a seek, drawn at once
    * with no tweens, no bubbles and no shaking: only where everything ends up. */
   private show(tick: number, events: WorldEvent[], instant: boolean): void {
+    // A tick shown at once, or the start drawn again, puts every figure on its cell.
+    if (instant || tick === 0) this.glides.clear();
     if (tick === 0) {
       this.restart(instant);
       return;
     }
     this.parentNode.dataset.tick = String(tick);
     this.shownTick = tick;
+    this.endGlides(tick);
     this.speech.expire(tick, instant);
     // A spell's light flies to the thing it takes, which waits for it (D127).
     const pulled = events.find((event) => event.kind === 'pull');
@@ -1309,7 +1344,7 @@ class LevelScene extends Phaser.Scene {
         const sprite = this.spriteOf(String(event.data.id ?? event.actor));
         if (sprite && event.kind === 'fly') this.lift(sprite, instant);
         if (sprite && event.kind === 'land') this.land(sprite, instant);
-      } else this.showActor(event, instant);
+      } else this.showActor(tick, event, instant);
     }
     this.raceBand(tick, events, instant);
     this.nearLanding(instant);
@@ -1550,6 +1585,90 @@ class LevelScene extends Phaser.Scene {
       .filter(Boolean);
     const said = flying.sort().join(',');
     if (this.parentNode.dataset.flying !== said) this.parentNode.dataset.flying = said;
+  }
+
+  /** A flown step of a figure's as it plays (D259): taken up by the glide under way
+   * that planned it, or the start of a glide over the figure's run of flown steps, read
+   * ahead from the ticks, each step at its tick's length: from where the figure is, if a
+   * glide is under way, else from the step's first cell. */
+  private glideStep(sprite: Phaser.GameObjects.Sprite, who: string, tick: number, from: Tile, to: Tile): void {
+    const under = this.glides.get(sprite);
+    const tickMs = this.playback.tickDuration;
+    if (under && under.tickMs === tickMs && under.cells[tick - under.glide.tick] === String(to)) return;
+    this.tweens.killTweensOf(sprite);
+    // The run read ahead begins with this step; were it not to, the step alone.
+    const read = this.playback.flownRun(who).map(({ event, length }) => ({
+      cell: tileOf(event.data.to),
+      facing: isFacing(event.data.facing) ? event.data.facing : this.wayOf(sprite),
+      length,
+    }));
+    const steps = String(read[0]?.cell) === String(to) ? read : [{ cell: to, facing: this.wayOf(sprite), length: FLOWN }];
+    const [x0, y0] = under ? [sprite.x, sprite.y] : this.figureAt(from);
+    const points: { x: number; y: number; facing: Facing }[] = [{ x: x0, y: y0, facing: this.wayOf(sprite) }];
+    const cells: string[] = [];
+    const ends: number[] = [];
+    let elapsed = 0;
+    for (const { cell, facing, length } of steps) {
+      if (!cell) break;
+      const [x, y] = this.figureAt(cell);
+      points.push({ x, y, facing });
+      cells.push(String(cell));
+      elapsed += length * tickMs;
+      ends.push(elapsed);
+    }
+    if (!under) sprite.setPosition(x0, y0);
+    // It starts when its tick began by the playback's clock, so that it meets the ticks.
+    const since = Math.min(this.playback.startedAt, performance.now());
+    this.glides.set(sprite, { glide: { points, ends, tick }, cells, since, tickMs });
+  }
+
+  /** Each gliding figure, each frame: where its glide has it by the page's clock, facing
+   * the way it flies to its next point; on its last point once its glide ends (D259). */
+  private moveGlides(): void {
+    const now = this.game.loop.now;
+    for (const [sprite, gliding] of this.glides) {
+      const at = glideAt(gliding.glide, now - gliding.since);
+      sprite.setPosition(at.x, at.y);
+      const facing = gliding.glide.points[at.to]?.facing;
+      if (facing && this.wayOf(sprite) !== facing) this.face(sprite, facing);
+      if (at.done) this.glides.delete(sprite);
+    }
+  }
+
+  /** A tick past a figure's run of flown steps finds it on the run's last cell (D259). */
+  private endGlides(tick: number): void {
+    for (const [sprite, gliding] of this.glides) {
+      if (tick < gliding.glide.tick + gliding.glide.ends.length) continue;
+      const last = gliding.glide.points[gliding.glide.points.length - 1];
+      if (last) sprite.setPosition(last.x, last.y);
+      this.glides.delete(sprite);
+    }
+  }
+
+  /** Paused or stopped, each gliding figure goes on to the cell of the tick shown and
+   * stands there, as the tick has it (D259). */
+  private cutGlides(): void {
+    for (const gliding of this.glides.values()) gliding.glide = glideTo(gliding.glide, this.playback.tick);
+  }
+
+  /** Where each flying figure is as the frame is drawn (data-flyers-at, D259): its feet
+   * in the scene's pixels, and on the canvas, the camera counted, for the test that holds
+   * a flight even on the screen. */
+  private publishFlyers(): void {
+    const dataset = this.parentNode.dataset;
+    if (this.flyers.size === 0) {
+      if (dataset.flyersAt !== undefined) delete dataset.flyersAt;
+      return;
+    }
+    const camera = this.cameras.main;
+    const view = camera.worldView;
+    dataset.flyersAt = [...this.flyers.keys()]
+      .map((sprite) => {
+        const id = sprite === this.wizard ? 'wizard' : this.idOf(sprite);
+        const screen = [(sprite.x - view.x) * camera.zoom, (sprite.y - view.y) * camera.zoom];
+        return `${id}:${[sprite.x, sprite.y, ...screen].map((value) => value.toFixed(2)).join(',')}`;
+      })
+      .join(';');
   }
 
   /** What the tests read of chapter 4's things (D182 to D187): the sprites drawn, the
@@ -2189,13 +2308,20 @@ class LevelScene extends Phaser.Scene {
           break;
         }
         this.stopCast();
+        // A flown step takes a third of a walked one, with no step's tap (D185), and
+        // glides on from the step before with no rest (D259).
+        if (flown) {
+          this.glideStep(this.wizard, 'wizard', tick, from, to);
+          this.wizardTile = to;
+          this.enchantedStep(this.wizard, from, to, duration * FLOWN, false);
+          break;
+        }
         this.placeWizard(from, facing ?? 'down');
         this.wizardTile = to;
         const [x, y] = this.figureAt(to);
-        // A flown step takes a third of a walked one, with no step's tap (D185).
-        this.walk(this.wizard, facing ?? 'down', x, y, flown ? duration * FLOWN : duration);
+        this.walk(this.wizard, facing ?? 'down', x, y, duration);
         this.enchantedStep(this.wizard, from, to, duration, false);
-        if (!flown) this.step('wizard');
+        this.step('wizard');
         break;
       }
       case 'untie': {
@@ -2347,7 +2473,7 @@ class LevelScene extends Phaser.Scene {
     }
   }
 
-  private showActor(event: WorldEvent, instant: boolean): void {
+  private showActor(tick: number, event: WorldEvent, instant: boolean): void {
     const actor = this.actors.get(event.actor);
     if (!actor) return;
     const facing = isFacing(event.data.facing) ? event.data.facing : actor.facing;
@@ -2356,9 +2482,18 @@ class LevelScene extends Phaser.Scene {
         const from = tileOf(event.data.from);
         const to = tileOf(event.data.to);
         if (!from || !to) return;
-        this.tweens.killTweensOf(actor.sprite);
         actor.tile = to;
         actor.facing = facing;
+        // A racer's flown step, a third of a walked one, and no tap (D185, D189), gliding
+        // on from the step before with no rest (D259).
+        const flown = event.data.flying === true;
+        if (flown && !instant) {
+          this.glideStep(actor.sprite, event.actor, tick, from, to);
+          this.enchantedStep(actor.sprite, from, to, this.playback.tickDuration * FLOWN, false);
+          break;
+        }
+        this.tweens.killTweensOf(actor.sprite);
+        this.glides.delete(actor.sprite);
         if (instant) {
           actor.sprite.setPosition(...this.figureAt(to));
           this.face(actor.sprite, facing);
@@ -2367,12 +2502,10 @@ class LevelScene extends Phaser.Scene {
         }
         actor.sprite.setPosition(...this.figureAt(from));
         const [x, y] = this.figureAt(to);
-        // A racer's flown step, a third of a walked one, and no tap (D185, D189).
-        const flown = event.data.flying === true;
-        const length = this.playback.tickDuration * 0.9 * (flown ? FLOWN : 1);
+        const length = this.playback.tickDuration * 0.9;
         this.walk(actor.sprite, facing, x, y, length);
         this.enchantedStep(actor.sprite, from, to, length, false);
-        if (!flown) this.step(event.actor);
+        this.step(event.actor);
         break;
       }
       case 'turn':

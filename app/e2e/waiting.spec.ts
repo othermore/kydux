@@ -38,9 +38,47 @@ test.describe('a tip while a screen loads', () => {
     expect(tips.map((said) => said.replace(/\{([^|}]*)\|([^}]*)\}/g, '$2'))).toContain(await tip.textContent());
     const picture = page.locator('.waiting-tip-picture');
     await expect(picture).toHaveAttribute('src', /content\/tips\/es\/[a-z]+\.webp\?v=[0-9a-f]{12}$/);
-    await expect.poll(() => picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(640);
+    await expect.poll(() => picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(960);
     // No button: the screen opens by itself.
     await expect(page.locator('#waiting button')).toHaveCount(0);
+  }
+
+  // The tallest tip of each language, the zoom's, three lines of words: the picture as
+  // large as the window lets, and the view never scrolled (D239).
+  for (const [lang, locale] of [
+    ['es', 'es-ES'],
+    ['en', 'en-US'],
+  ] as const) {
+    for (const [width, height, least] of [
+      [1280, 800, 720],
+      [1024, 700, 480],
+      [390, 844, 0],
+    ] as const) {
+      test.describe(`in ${lang} at ${width} by ${height}`, () => {
+        test.use({ locale, viewport: { width, height } });
+
+        test('the tallest tip: its picture large, the page not scrolled (D239)', async ({ page }) => {
+          await seedWizard(page, MARTA, { tips: true });
+          // The tip before the zoom's was the last shown: the zoom's comes next.
+          await page.addInitScript(() => localStorage.setItem('kydux.tip', '6'));
+          await page.goto('/#level/the-moving-key');
+          await expect(page.locator('#waiting')).toHaveAttribute('data-tip', 'zoom', { timeout: ciTimes(1_500) });
+          const picture = page.locator('.waiting-tip-picture');
+          await expect.poll(() => picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(960);
+          const drawn = (await picture.boundingBox())?.width ?? 0;
+          if (least > 0) expect(drawn).toBeGreaterThanOrEqual(least);
+          else {
+            const room = await page
+              .locator('.waiting-tip-box')
+              .evaluate((box) => box.clientWidth - Number.parseFloat(getComputedStyle(box).paddingLeft) * 2);
+            expect(Math.abs(drawn - room)).toBeLessThan(2);
+          }
+          const scrolls = await page.evaluate(() => (document.scrollingElement?.scrollHeight ?? 0) - window.innerHeight);
+          expect(scrolls).toBeLessThanOrEqual(0);
+          if (lang === 'es' && least > 0) await page.screenshot({ path: `${SHOTS}tip-${width}x${height}.png` });
+        });
+      });
+    }
   }
 
   test("the visit's first wait shows a tip with its picture at once, and the level opens by itself (D221)", async ({

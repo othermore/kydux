@@ -2402,6 +2402,13 @@ a.stop-body:focus-visible {
   text-align: center;
 }
 
+/* Where a tip is up, the view starts nearer the top and ends nearer the foot, so that
+   its picture can be large. */
+.waiting[data-tip] {
+  padding-top: 24px;
+  padding-bottom: 16px;
+}
+
 /* A tip: its picture over its words (D221), on one card; the picture keeps its room
    while it comes, so that the words do not jump. */
 .waiting-tip-box {
@@ -2409,7 +2416,7 @@ a.stop-body:focus-visible {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  max-width: min(640px, 100%);
+  max-width: min(880px, 100%);
   margin: 12px 0 0;
   padding: 16px 22px;
   border: 1px solid var(--border);
@@ -2422,9 +2429,13 @@ a.stop-body:focus-visible {
   display: none;
 }
 
+/* As large as the window lets (D239): the box's width, 800 px at most, and never so
+   large that the page scrolls: its width also follows the window's height, less the
+   rest of the page at its tallest tip, three lines of words, measured at 391 px: the
+   header, the mark and Loading…, the card's paddings, gap and words, the view's foot
+   and the footer. */
 .waiting-tip-picture {
-  width: 100%;
-  max-width: 560px;
+  width: min(100%, 800px, calc((100vh - 392px) * 16 / 9));
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: contain;

@@ -183,7 +183,7 @@ export function fetchNextTip(): Promise<unknown> {
 export function waitingView(tips: boolean, due = false): Waiting {
   const words = element('p', { id: 'waiting-tip', className: 'waiting-tip' });
   words.setAttribute('aria-live', 'polite');
-  const picture = element('img', { className: 'waiting-tip-picture', alt: '', width: 640, height: 360 });
+  const picture = element('img', { className: 'waiting-tip-picture', alt: '', width: 960, height: 540 });
   const tip = element('figure', { className: 'waiting-tip-box', hidden: true }, [picture, words]);
   const node = element('div', { id: 'waiting', className: 'waiting' }, [
     markSvg(64),

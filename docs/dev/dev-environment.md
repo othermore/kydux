@@ -955,16 +955,19 @@ each language, made from the game's own page. They live in
 `content/tips/<lang>/<tip>.webp`. When the page changes where a tip points,
 make them again, so that they show the page as it is.
 
-A spec of the browser tests makes them. It opens the page, cuts the part each
-tip tells, and writes the twenty small pictures. It is skipped unless it is
-asked for by name. Run it from `app/`:
+A spec of the browser tests makes them. It opens the page at 1280 by 800, cuts
+the part each tip tells, takes it at twice the page's pixels, and writes the
+twenty pictures. It is skipped unless it is asked for by name. Run it from
+`app/`:
 
 ```sh
 KYDUX_TIP_PICTURES=1 npx playwright test e2e/tips-pictures.spec.ts
 ```
 
-It should say that 8 tests passed. Each picture is 640 by 360 pixels and
-weighs less than 40 KB. Look at them before you commit them: open
+It should say that 8 tests passed. Each picture is 960 by 540 pixels and
+weighs less than 90 KB. The waiting view shows it up to 800 pixels wide, and
+smaller where the window is too low for it. Look at them before you commit
+them: open
 `content/tips/es/` in a file viewer. The content test then checks that every
 tip has its picture in every language:
 

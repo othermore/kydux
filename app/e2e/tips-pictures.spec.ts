@@ -1,6 +1,6 @@
-// The tips' pictures (D221): each tip's thing in the game's own page, in each language,
-// cut to 16:9 round what it tells, made 640 by 360 and written as a webp of less than
-// 40 KB into content/tips/<lang>/<key>.webp. Each is taken where a child of chapter 1,
+// The tips' pictures (D221, D239): each tip's thing in the game's own page, in each
+// language, cut to 16:9 round what it tells, taken at twice the page's pixels, made 960
+// by 540 and written as a webp of less than 90 KB into content/tips/<lang>/<key>.webp. Each is taken where a child of chapter 1,
 // who waits for the first scenes, has been: the notebook, its spells and a click in
 // the-sealed-door, the level after the first spell's lesson; the lesson in how-much.
 // Run on demand, when the page changes:
@@ -16,13 +16,15 @@ import { MARTA, type SeededWizard, seedWizard } from './helpers';
 
 const CONTENT = fileURLToPath(new URL('../../content/tips/', import.meta.url));
 const PABLO: SeededWizard = { name: 'Pablo', gender: 'boy', look: 'amber' };
-/** The picture's size, and the most it may weigh. */
-const WIDTH = 640;
-const HEIGHT = 360;
-const MOST_BYTES = 40_000;
+/** The picture's size, and the most it may weigh (D239). */
+const WIDTH = 960;
+const HEIGHT = 540;
+const MOST_BYTES = 90_000;
 
 test.skip(!process.env.KYDUX_TIP_PICTURES, 'run on demand, to make the tips’ pictures');
-test.use({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
+// The page at 1280 by 800, taken at twice its pixels: a crop in the page's pixels has
+// twice as many in its picture.
+test.use({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 2 });
 
 /** The smallest box of 16:9 round `boxes`, with a margin, kept inside the window. */
 function framed(boxes: { x: number; y: number; width: number; height: number }[], margin = 24) {

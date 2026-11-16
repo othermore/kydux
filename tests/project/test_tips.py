@@ -1,5 +1,6 @@
 """The tips shown while a screen loads (D221): every tip has its picture in every
-language, small, made by app/e2e/tips-pictures.spec.ts from the game's own page."""
+language, 960 by 540 and light (D239), made by app/e2e/tips-pictures.spec.ts from the
+game's own page."""
 
 import json
 from pathlib import Path
@@ -9,8 +10,8 @@ from PIL import Image
 REPO = Path(__file__).resolve().parents[2]
 TIPS = REPO / "content" / "tips"
 #: The pictures' size, and the most one weighs.
-SIZE = (640, 360)
-MOST_BYTES = 40_000
+SIZE = (960, 540)
+MOST_BYTES = 90_000
 
 
 def languages() -> dict[str, dict]:

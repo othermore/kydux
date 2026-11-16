@@ -334,10 +334,9 @@ class LevelScene extends Phaser.Scene {
   private readonly through: string[] = [];
   /** The rings' cells, which a flying figure flies through (D232). */
   private rings: Tile[] | null = null;
-  /** The figures in the air (D185): when their flight began, on the scene's clock,
-   * and their shadow on the ground. */
-  /** Each flying figure: since when it flies, its shadow, the way it last flew upward
-   * or downward, and how far its feet are past a ring's plane in a ring's cell (D232). */
+  /** The figures in the air (D185): when their flight began, on the scene's clock, and
+   * their shadow on the ground; the way each last flew upward or downward, and how far
+   * its feet are past a ring's plane in a ring's cell (D232). */
   private readonly flyers = new Map<
     Phaser.GameObjects.Sprite,
     { since: number; shadow: Phaser.GameObjects.Ellipse; way: 'up' | 'down'; past: number }

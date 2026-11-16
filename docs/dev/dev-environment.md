@@ -1058,11 +1058,14 @@ copies the game first:
 ci/deploy.sh --site
 ```
 
-A build and a site of different days work together: an old site keeps
-nothing for good, and an old build asks for no address the new site
-keeps. To check that it worked,
-ask for one file of the content with the stamp from a phone off the wifi,
-or from the machine itself with the name and password of a friend:
+A build and a site of different days work together. An old site keeps
+only the game's code for good, so it answers a new build's addresses as it
+answers any other. An old build asks for no address that the new site
+keeps.
+
+To check that it worked, ask for one file of the content with the stamp in
+its address. This command does it from the machine itself. Put a friend's
+name in place of `<name>`; it asks for their password:
 
 ```sh
 curl -sI -u <name> "https://kydux.kidux.org/content/course.json?v=$(sed 's/.*"stamp":"\([0-9a-f]*\)".*/\1/' /srv/kydux/world-stamp.json)" | grep -i cache-control

@@ -15,7 +15,8 @@ bare `except:` cannot carry the run on.
 A level that is a race (D189) starts with Ilda reading the program, a tick a
 line, before the wizard's first action, and ends with the race flown out and
 judged by her count (D234); a wizard in the air when the program ends sets down
-where it is (D185).
+where it is (D185). A flown step says which step of its command it is, and of how
+many (D243).
 """
 
 import sys
@@ -527,7 +528,7 @@ class Wizard(Child):
 
     def _move(self, direction: Direction, steps: int) -> None:
         world: World = self._k_world
-        for _ in range(steps):
+        for number in range(steps):
             world.ready()
             self._set(facing=direction)
             dx, dy = direction.delta
@@ -602,7 +603,9 @@ class Wizard(Child):
             # (D225).
             ticks = 1 if flying else world.level.walk_ticks
             if flying:
-                step["flying"] = True
+                # Which step of its command a flown one is, and of how many, for the page
+                # to give the command's wind its whole length (D243).
+                step.update({"flying": True, "step": number + 1, "steps": steps})
             elif ticks > 1:
                 step["ticks"] = ticks
             world.act(

@@ -5,13 +5,15 @@
 // silences it or lets it sound and a slider for its volume, set by hand while the theme
 // plays, and a line that says what is set apart from the theme's file, to be told to
 // who writes it.
-// Under the list is the broom's wind (D236): four buttons play it at rest, flying on,
-// in a turn and in a whole flight, and its two voices, the air and the tones, each have
-// a box and a slider from 0 to 3, with a line that says the mix, to be told to who sets
-// its numbers. The mix is never kept: each voice is on and at 1 when the page loads.
+// Under the list is the broom's wind (D243): six buttons play a one-cell move, a move of
+// eight cells, a zigzag, a lift, a landing and a whole flight, and its three voices, the
+// air, the whistle and the rest, each have a box and a slider from 0 to 3, with a line
+// that says the mix, to be told to who sets its numbers. The mix is never kept: each
+// voice is as written when the page loads, the rest off.
 
 import { type Heard, music, type Theme, themeNamed } from '../engine/music';
-import { mixWind, Wind, type WindVoice, windMix } from '../engine/sound';
+import { play as playEffect } from '../engine/sfx';
+import { mixWind, WIND_WRITTEN, Wind, type WindVoice, windMix } from '../engine/sound';
 import { t } from '../i18n';
 import { element } from './dom';
 import type { Screen } from './screen';
@@ -46,37 +48,52 @@ function mixSaid(shown: Shown, off: string): string {
   return parts.join(', ');
 }
 
-/** How long a flown move of the wind's samples takes, as a flown cell at speed 1 in a
- * level where the wizard flies (D225), in milliseconds. */
+/** How long a flown cell of the wind's samples takes, as a flown cell at speed 1 in a
+ * level where the wizard flies (D225), in milliseconds; and how long a lift or a
+ * landing takes (D244). */
 const MOVE_MS = 133;
+const LIFT_PAUSE_MS = 300;
 
-/** The wind's samples: when each flown move, swell and the end come, in milliseconds
- * from the start. */
-type WindSample = 'rest' | 'on' | 'turn' | 'flight';
-function windPlan(sample: WindSample): { moves: number[]; swells: number[]; end: number } {
-  const every = (from: number, to: number) => Array.from({ length: Math.ceil((to - from) / MOVE_MS) }, (_, i) => from + i * MOVE_MS);
-  if (sample === 'rest') return { moves: [], swells: [], end: 4000 };
-  if (sample === 'on') return { moves: every(0, 4000), swells: [], end: 4000 };
-  if (sample === 'turn') return { moves: every(0, 4000), swells: [1500], end: 4000 };
-  // A lift, twelve moves, a turn, eight moves, a turn, twelve moves, a landing.
-  const moves = every(0, 32 * MOVE_MS);
-  return { moves, swells: [0, 12 * MOVE_MS, 20 * MOVE_MS], end: 32 * MOVE_MS };
+/** The wind's samples (D243): a one-cell move, a move of eight cells, a zigzag of eight
+ * one-cell moves, a lift, a landing, and a whole flight. */
+type WindSample = 'one' | 'eight' | 'zigzag' | 'lift' | 'landing' | 'flight';
+const WIND_SAMPLES: readonly WindSample[] = ['one', 'eight', 'zigzag', 'lift', 'landing', 'flight'];
+
+/** What a sample plays, in order: gusts of so many cells, the lift's and the landing's
+ * sounds, and when each comes, in milliseconds from the start. */
+type Played = { at: number; cells: number } | { at: number; effect: 'lift' | 'set_down' };
+function windPlan(sample: WindSample): Played[] {
+  if (sample === 'one') return [{ at: 0, cells: 1 }];
+  if (sample === 'eight') return [{ at: 0, cells: 8 }];
+  if (sample === 'zigzag') return Array.from({ length: 8 }, (_, i) => ({ at: i * MOVE_MS, cells: 1 }));
+  if (sample === 'lift') return [{ at: 0, effect: 'lift' }];
+  if (sample === 'landing') return [{ at: 0, effect: 'set_down' }];
+  // A lift, a move of one, the four moves of a pair of rings, a move of eight, a landing.
+  const played: Played[] = [{ at: 0, effect: 'lift' }];
+  let at = LIFT_PAUSE_MS;
+  for (const cells of [1, 2, 2, 2, 2, 8]) {
+    played.push({ at, cells });
+    at += cells * MOVE_MS;
+  }
+  played.push({ at, effect: 'set_down' });
+  return played;
 }
 
-/** What the wind's mix is apart from its own, as `air 1.40, tones off`; '' when both
- * voices are as written. */
+/** What the wind's mix is apart from as it is written, as `air 1.40, whistle off, rest
+ * 1.00`; '' when every voice is as written. */
 function windSaid(off: string): string {
   return (Object.keys(windMix) as WindVoice[])
     .flatMap((voice) => {
       const { on, volume } = windMix[voice];
-      if (!on) return [`${voice} ${off}`];
-      return volume === 1 ? [] : [`${voice} ${volume.toFixed(2)}`];
+      const written = WIND_WRITTEN[voice];
+      if (!on) return written.on ? [`${voice} ${off}`] : [];
+      return on !== written.on || volume !== written.volume ? [`${voice} ${volume.toFixed(2)}`] : [];
     })
     .join(', ');
 }
 
-/** The broom's wind, its four samples and its mixer (D236): drawn again in a new
- * language, and silent once the page is left. */
+/** The broom's wind, its six samples and its mixer of three voices (D243): drawn again
+ * in a new language, and silent once the page is left. */
 function windPanel(): { node: HTMLElement; draw: () => void; destroy: () => void } {
   const node = element('section', { className: 'themes-wind' });
   const wind = new Wind();
@@ -84,13 +101,12 @@ function windPanel(): { node: HTMLElement; draw: () => void; destroy: () => void
   const play = (sample: WindSample) => {
     for (const timer of timers) clearTimeout(timer);
     wind.stop(0.02);
-    const { moves, swells, end } = windPlan(sample);
-    wind.start();
-    timers = [
-      ...moves.map((at) => setTimeout(() => wind.fly(MOVE_MS / 1000), at)),
-      ...swells.map((at) => setTimeout(() => wind.swell(), at)),
-      setTimeout(() => wind.stop(0.6), end),
-    ];
+    timers = windPlan(sample).map((played) =>
+      setTimeout(() => {
+        if ('effect' in played) playEffect(played.effect);
+        else wind.gust((played.cells * MOVE_MS) / 1000);
+      }, played.at),
+    );
   };
   const draw = () => {
     const told = element('p', { id: 'wind-mix', className: 'status' });
@@ -119,10 +135,10 @@ function windPanel(): { node: HTMLElement; draw: () => void; destroy: () => void
     });
     const reset = element('button', { type: 'button', id: 'wind-reset' }, [t('debug.music.reset')]);
     reset.addEventListener('click', () => {
-      for (const voice of Object.keys(windMix) as WindVoice[]) mixWind(voice, true, 1);
+      for (const voice of Object.keys(windMix) as WindVoice[]) mixWind(voice, WIND_WRITTEN[voice].on, WIND_WRITTEN[voice].volume);
       draw();
     });
-    const buttons = (['rest', 'on', 'turn', 'flight'] as const).map((sample) => {
+    const buttons = WIND_SAMPLES.map((sample) => {
       const button = element('button', { type: 'button' }, [t(`debug.music.wind_${sample}`)]);
       button.dataset.wind = sample;
       button.addEventListener('click', () => play(sample));

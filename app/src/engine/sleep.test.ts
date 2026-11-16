@@ -105,15 +105,15 @@ describe('the sound context asleep while nothing sounds (D231)', () => {
     expect(root.dataset.audio).toBe('awake');
   });
 
-  it('never sleeps while the wind blows, and sleeps after its fade', async () => {
+  it('never sleeps while a gust sounds, and sleeps after its fall', async () => {
     const { Wind } = await import('./sound');
-    const wind = new Wind();
-    wind.start();
-    vi.advanceTimersByTime(60_000);
+    const wind = new Wind(() => 0.5);
+    // A gust of two seconds, its fall 0.575 s after it.
+    wind.gust(2);
+    vi.advanceTimersByTime(2500);
     expect(sleeps()).toBe(0);
-    // A landing's fade, 0.6 s, then the three seconds after a sound's end.
-    wind.stop(0.6);
-    vi.advanceTimersByTime(3500);
+    // Then the three seconds after a sound's end.
+    vi.advanceTimersByTime(3000);
     expect(sleeps()).toBe(0);
     vi.advanceTimersByTime(1000);
     expect(sleeps()).toBe(1);
@@ -146,9 +146,9 @@ describe('the sound context asleep while nothing sounds (D231)', () => {
     setHidden(false);
     expect(asked).toEqual([]);
     const { Wind } = await import('./sound');
-    const wind = new Wind();
+    const wind = new Wind(() => 0.5);
     setHidden(true);
-    wind.start();
+    wind.gust(2);
     expect(asked).not.toContain('resume');
     setHidden(false);
     expect(asked).toContain('resume');
@@ -209,49 +209,56 @@ class RecordingContext {
   createBufferSource = () => recordedNode({});
 }
 
-describe("the broom's wind (D236)", () => {
+describe("the broom's wind, a gust for each flown command (D243)", () => {
   const blowing = async () => {
     vi.stubGlobal('AudioContext', RecordingContext);
     const sound = await import('./sound');
-    const wind = new sound.Wind();
-    wind.start();
+    const wind = new sound.Wind(() => 0.5);
+    wind.gust(2);
     const graph = wind.graph;
     if (!graph) throw new Error('no wind');
     const param = (node: unknown, name = 'gain') => (node as Record<string, RecordedParam>)[name] as RecordedParam;
     return { sound, wind, graph, param };
   };
 
-  it('holds its level at a flown move and lets it fall after, and never swells there', async () => {
-    const { sound, wind, graph, param } = await blowing();
-    const [level, swell] = [param(graph.level), param(graph.swell)];
+  it('gives a gust whole to the sound clock: its level, the air band and the whistle, from 0 back to 0', async () => {
+    const { graph, param } = await blowing();
+    const level = param(graph.gust).calls.filter(([kind]) => kind === 'linear');
+    expect(level.length).toBeGreaterThan(5);
+    expect(level[level.length - 1]?.[1]).toBe(0);
+    expect(param(graph.airBand, 'frequency').calls.filter(([kind]) => kind === 'linear')).toHaveLength(level.length);
+    expect(param(graph.whistleBand, 'frequency').calls.filter(([kind]) => kind === 'linear')).toHaveLength(level.length);
+    expect(param(graph.whistleLevel).calls.filter(([kind]) => kind === 'linear')).toHaveLength(level.length);
+  });
+
+  it('takes a sounding gust on from its level now, with no second voice', async () => {
+    const { wind, graph, param } = await blowing();
+    const level = param(graph.gust);
     level.calls = [];
-    swell.calls = [];
-    wind.fly(0.133);
-    expect(level.calls).toContainEqual(['target', sound.LEVEL_FLYING, 1, 0.08]);
-    const fall = level.calls.find(([kind, value]) => kind === 'target' && value === sound.LEVEL_HOVER);
-    expect(fall?.[2]).toBeCloseTo(1 + 0.133 + 0.2);
-    expect(swell.calls).toEqual([]);
+    wind.gust(0.133);
+    expect(wind.graph).toBe(graph);
+    expect(level.calls[0]?.[0]).toBe('cancel');
+    expect(level.calls[1]?.[0]).toBe('set');
   });
 
-  it('swells the air, its band and the tones, up in 0.45 s and back from there', async () => {
-    const { sound, wind, graph, param } = await blowing();
-    const [swell, band, shimmer] = [param(graph.swell), param(graph.band, 'frequency'), param(graph.shimmer)];
-    for (const each of [swell, band, shimmer]) each.calls = [];
-    wind.swell();
-    expect(swell.calls).toContainEqual(['linear', sound.SWELL_HEIGHT, 1.45]);
-    expect(swell.calls).toContainEqual(['target', 1, 1.45, 0.37]);
-    expect(band.calls).toContainEqual(['linear', 760, 1.45]);
-    expect(band.calls).toContainEqual(['target', 380, 1.45, 0.37]);
-    expect(shimmer.calls).toContainEqual(['linear', 0.004, 1.45]);
-    expect(shimmer.calls).toContainEqual(['target', 0, 1.45, 0.37]);
+  it('fades to nothing when stopped, in the time it is given', async () => {
+    const { wind, graph, param } = await blowing();
+    const level = param(graph.gust);
+    level.calls = [];
+    wind.stop(0.15);
+    expect(level.calls).toContainEqual(['linear', 0, 1.15]);
+    expect(wind.blowing).toBe(true);
+    vi.advanceTimersByTime(200);
+    expect(wind.blowing).toBe(false);
   });
 
-  it('sets a voice turned off at once to none in the mix, the other as it is', async () => {
+  it('sets a voice turned off or on at once in the mix: the rest off as written', async () => {
     const { sound, graph, param } = await blowing();
-    sound.mixWind('tones', false, 1);
-    expect(param(graph.tones).value).toBe(0);
+    expect(param(graph.rest).value).toBe(0);
+    sound.mixWind('whistle', false, 1);
+    expect(param(graph.whistle).value).toBe(0);
     expect(param(graph.air).value).toBe(1);
-    sound.mixWind('air', true, 2.5);
-    expect(param(graph.air).value).toBe(2.5);
+    sound.mixWind('rest', true, 1);
+    expect(param(graph.rest).value).toBe(1);
   });
 });

@@ -5,9 +5,9 @@
 // air that rises and air that falls (D244). The settings can silence them.
 //
 // The page's one audio context sleeps while nothing sounds (D231): it is awake while a
-// theme plays or fades (music.ts), while the wind blows (sound.ts), and until three
-// seconds after the last effect's end; then it is suspended, and its audio thread does
-// no work. Whatever is about to sound wakes it first, and schedules on its clock, which
+// theme plays or fades (music.ts), while a gust of the wind sounds (sound.ts), and until
+// three seconds after the last effect's end; then it is suspended, and its audio thread
+// does no work. Whatever is about to sound wakes it first, and schedules on its clock, which
 // stands still while it sleeps, so that the sound is whole. A hidden page's context is
 // suspended; shown again, it wakes only if something is to sound. The root element
 // says the state, data-audio: `asleep` or `awake`, nothing before the first sound.

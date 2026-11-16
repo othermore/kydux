@@ -46,7 +46,9 @@ export type WorldStatus =
   | 'interrupted'
   | 'caught';
 
-/** One tick of a run (kydux_world.world.Event.to_dict). */
+/** One tick of a run (kydux_world.world.Event.to_dict). Its data is the event's, as
+ * architecture.md's table of events says: a flown `move` of the wizard's, for one,
+ * says which step of its command it is and of how many (`step`, `steps`, D243). */
 export interface WorldEvent {
   tick: number;
   actor: string;

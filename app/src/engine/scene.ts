@@ -41,11 +41,10 @@
 // (the figures in the air, joined by ",", from their fly to their land, D185), data-rise
 // (the wizard's rise, 0 on its cell to 1 at its flight's height, while it flies, D244),
 // data-hover (the hover's clock, in whole milliseconds, which always runs but under
-// reduced motion, D235, D242), data-wind (`on` while a flight's wind blows: while
-// the program plays and the wizard is in the air, D236), data-wind-swells (the wind's
-// swells this run, at the lift and at each turn, counted with the ticks shown),
-// data-through (the rings flown
-// through, in order, joined by ","), data-race-band (what Ilda's band says while she
+// reduced motion, D235, D242), data-wind (`on` while a gust of the wizard's sounds,
+// from its start to its fall's end, muted or not, D243), data-wind-gusts (the gusts this
+// run, one for each flown command, counted with the ticks shown), data-through (the
+// rings flown through, in order, joined by ","), data-race-band (what Ilda's band says while she
 // reads the programs, D189), data-race-verdict (her verdict of the race, D234) and
 // data-world (what the camera shows, in cells: "left,top,width,height").
 //
@@ -147,7 +146,7 @@ import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, bumpText, friendText, raceVerdict, ringWayText, sleepingText } from './words';
-import { FLOWN, FLY_LIFT, flyFrame, hoverOf, hoverPhase, LIFT_MS, RING_PAST, RING_RAISE, riseOf, throughRing, turned } from './flight';
+import { FLOWN, FLY_LIFT, flyFrame, hoverOf, hoverPhase, LIFT_MS, RING_PAST, RING_RAISE, riseOf, throughRing } from './flight';
 import { drawnFromSprite, spriteFoot, spriteKey, spriteName, spriteOrigin, spriteScale, type ThingSprite } from './things';
 import { Wind } from './sound';
 
@@ -170,10 +169,10 @@ interface Flyer {
   length: number;
 }
 
-/** How fast the wind fades, in seconds (D236): when the program stops playing, at a
- * landing, and at a restart. */
+/** How fast a gust fades, in seconds (D243): when the program stops playing, at a bump
+ * in the air, and at a restart. */
 const WIND_STOP = 0.15;
-const WIND_LAND = 0.6;
+const WIND_BUMP = 0.05;
 const WIND_CUT = 0.02;
 /** Who judges a race and speaks in its band (D189, D234). */
 const RACE_JUDGE = 'ilda';
@@ -375,13 +374,11 @@ class LevelScene extends Phaser.Scene {
   private readonly wind = new Wind();
   /** The way each figure faces (D241), kept by its sprite. */
   private readonly ways = new Map<Phaser.GameObjects.Sprite, Facing>();
-  /** The way of the wizard's last flown move, none after a lift, a landing or a
-   * restart, and the swells of the wind this run, counted with the ticks shown, so the
-   * same when the slider plays them again (D236). */
-  private lastFlownWay: Facing | null = null;
-  private windSwells = 0;
-  /** Whether the tick shown is drawn at once, as the slider shows it. */
-  private shownInstant = false;
+  /** The gusts of this run, one for each flown command, counted with the ticks shown, so
+   * the same when the slider plays them again, and muted or not (D243). */
+  private windGusts = 0;
+  /** Whether the wind's rest is asked for: the wizard in the air, the program playing. */
+  private resting = false;
   /** The hover's clock, in milliseconds (D235, D242): it always runs, but under reduced
    * motion; nothing else moves it. */
   private hoverMs = 0;
@@ -819,7 +816,8 @@ class LevelScene extends Phaser.Scene {
       // Words said near the end of the run, with no tick to end them, go once they are
       // read (D175).
       if (state === 'done' && !this.options.story) this.time.delayedCall(this.speech.settle(), () => this.speech.expireRead());
-      this.blowWind();
+      // Stop, a pause and the run's end silence a gust (D242, D243).
+      if (state !== 'playing') this.wind.stop(WIND_STOP);
     });
     this.restart();
     this.parentNode.dataset.state = this.playback.state;
@@ -901,6 +899,15 @@ class LevelScene extends Phaser.Scene {
     const world = [view.x, view.y, view.width, view.height].map((v) => (v / TILE).toFixed(2)).join(',');
     if (this.parentNode.dataset.world !== world) this.parentNode.dataset.world = world;
     if (this.flyers.size > 0 || this.parentNode.dataset.flying) this.flyFrames();
+    // The wind (D243): whether a gust sounds, and the rest asked for while the wizard is in
+    // the air with the program playing.
+    const wind = this.wind.blowing ? 'on' : 'off';
+    if (this.parentNode.dataset.wind !== wind) this.parentNode.dataset.wind = wind;
+    const resting = this.inAir(this.wizard) && this.playback.state === 'playing';
+    if (resting !== this.resting) {
+      this.resting = resting;
+      this.wind.rest(resting);
+    }
     // The wizard's way as the scene keeps it, and the frame it is drawn in (D241).
     const dataset = this.parentNode.dataset;
     const facing = this.wizardFacing();
@@ -1009,8 +1016,7 @@ class LevelScene extends Phaser.Scene {
     this.through.length = 0;
     for (const sprite of [...this.flyers.keys()]) this.land(sprite, true);
     this.wind.stop(WIND_CUT);
-    this.lastFlownWay = null;
-    this.countSwells(0);
+    this.countGusts(0);
     this.raceBand(0, [], true);
     for (const id of [...this.revealed.keys()]) this.unreveal(id);
     this.asleep.clear();
@@ -1237,15 +1243,12 @@ class LevelScene extends Phaser.Scene {
   /** A tick's events drawn; `instant` for a tick replayed by a seek, drawn at once
    * with no tweens, no bubbles and no shaking: only where everything ends up. */
   private show(tick: number, events: WorldEvent[], instant: boolean): void {
-    this.shownInstant = instant;
     if (tick === 0) {
       this.restart(instant);
       return;
     }
     this.parentNode.dataset.tick = String(tick);
     this.shownTick = tick;
-    // A tick played goes on with the wind where a paused flight goes on (D236).
-    this.blowWind();
     this.speech.expire(tick, instant);
     // A spell's light flies to the thing it takes, which waits for it (D127).
     const pulled = events.find((event) => event.kind === 'pull');
@@ -1365,48 +1368,42 @@ class LevelScene extends Phaser.Scene {
       this.flyers.set(sprite, made);
       this.riseTo(made, 1, atOnce);
     }
-    if (sprite !== this.wizard) return;
-    this.lastFlownWay = null;
-    this.countSwells(this.windSwells + 1);
-    if (!instant) {
-      this.playSound('lift');
-      this.playedSounds.push('wind');
-      this.parentNode.dataset.sounds = this.playedSounds.join(',');
-    }
-    this.blowWind();
-    if (!instant && this.wind.blowing) this.wind.swell();
+    if (sprite === this.wizard && !instant) this.playSound('lift');
   }
 
-  /** The wind blows while the playback plays and the wizard is in the air, in a tick
-   * not drawn at once; else it fades in `fade` seconds (D236). */
-  private blowWind(fade = WIND_STOP): void {
-    const blows = this.playback.state === 'playing' && this.inAir(this.wizard) && !this.shownInstant;
-    if (blows) this.wind.start();
-    else if (this.wind.blowing) this.wind.stop(fade);
-    const wind = this.wind.blowing ? 'on' : 'off';
-    if (this.parentNode.dataset.wind !== wind) this.parentNode.dataset.wind = wind;
+  /** The gusts of this run, as the scene says them (data-wind-gusts, D243). */
+  private countGusts(gusts: number): void {
+    this.windGusts = gusts;
+    this.parentNode.dataset.windGusts = String(gusts);
   }
 
-  /** The wind's swells of this run, as the scene says them (data-wind-swells). */
-  private countSwells(swells: number): void {
-    this.windSwells = swells;
-    this.parentNode.dataset.windSwells = String(swells);
+  /** A flown move of the wizard's (D243): its command's first step starts a gust for the
+   * command's whole length, the steps it says at the tick's length; a later step starts
+   * one for the steps still to fly where none sounds, a flight that goes on after a
+   * pause. Counted at each command, shown at once or not. */
+  private gust(event: WorldEvent, instant: boolean): void {
+    const step = Number(event.data.step ?? 1);
+    const steps = Number(event.data.steps ?? 1);
+    if (step === 1) this.countGusts(this.windGusts + 1);
+    if (instant || this.playback.state !== 'playing') return;
+    if (step > 1 && this.wind.blowing) return;
+    this.wind.gust(((steps - step + 1) * this.playback.tickDuration * FLOWN) / 1000);
+    this.playedSounds.push('wind');
+    if (this.playedSounds.length > SOUNDS_KEPT) this.playedSounds.shift();
+    this.parentNode.dataset.sounds = this.playedSounds.join(',');
   }
 
   /** A figure set down where it is (D185, D244): it comes down from where it is over
    * LIFT_MS, in its flying frame, and stands facing the way it flew once its feet are on
    * its cell (touchDown), or at once where it is shown at once. For the wizard, air that
-   * falls is heard, whoever ordered the landing, and the wind fades. */
+   * falls is heard, whoever ordered the landing; a gust that sounds falls as planned. */
   private land(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
     const flying = this.flyers.get(sprite);
     if (!flying) return;
     if (instant || this.still) this.touchDown(sprite);
     else if (flying.to === 1) this.riseTo(flying, 0, false);
     else return;
-    if (sprite !== this.wizard) return;
-    if (!instant) this.playSound('set_down');
-    this.lastFlownWay = null;
-    this.blowWind(instant ? WIND_CUT : WIND_LAND);
+    if (sprite === this.wizard && !instant) this.playSound('set_down');
   }
 
   /** A flyer's rise sent toward `to` from where it is, over LIFT_MS at the playback's
@@ -1419,7 +1416,7 @@ class LevelScene extends Phaser.Scene {
     if (atOnce) flying.rise = to;
   }
 
-  /** A figure whose feet are on its cell: its shadow gone, no longer a flyer, standing
+  /** A figure whose feet are on its cell: its shadow gone, out of the flyers, standing
    * facing the way it flew (D241). */
   private touchDown(sprite: Phaser.GameObjects.Sprite): void {
     const flying = this.flyers.get(sprite);
@@ -1517,8 +1514,6 @@ class LevelScene extends Phaser.Scene {
       .filter(Boolean);
     const said = flying.sort().join(',');
     if (this.parentNode.dataset.flying !== said) this.parentNode.dataset.flying = said;
-    const wind = this.wind.blowing ? 'on' : 'off';
-    if (this.parentNode.dataset.wind !== wind) this.parentNode.dataset.wind = wind;
   }
 
   /** What the tests read of chapter 4's things (D182 to D187): the sprites drawn, the
@@ -2131,19 +2126,9 @@ class LevelScene extends Phaser.Scene {
         const from = tileOf(event.data.from);
         const to = tileOf(event.data.to);
         if (!from || !to) return;
-        // A flown move holds the wind at its flying level; a turn swells it, and is
-        // counted with the ticks shown (D236).
+        // A flown command is a gust (D243).
         const flown = event.data.flying === true;
-        if (flown) {
-          const way = facing ?? 'down';
-          const turn = turned(this.lastFlownWay, way);
-          this.lastFlownWay = way;
-          if (turn) this.countSwells(this.windSwells + 1);
-          if (!instant && this.wind.blowing) {
-            this.wind.fly((duration * FLOWN) / 1000);
-            if (turn) this.wind.swell();
-          }
-        }
+        if (flown) this.gust(event, instant);
         if (instant) {
           this.placeWizard(to, facing ?? 'down');
           this.enchantedStep(this.wizard, from, to, 0, true);
@@ -2175,6 +2160,8 @@ class LevelScene extends Phaser.Scene {
         this.placeWizard(at, facing ?? 'down');
         if (!instant) this.nudge(this.wizard, facing ?? 'down', duration);
         if (!instant) play('bump');
+        // A bump in the air ends the gust at once (D243).
+        if (!instant && this.inAir(this.wizard)) this.wind.stop(WIND_BUMP);
         // A friend in the way: the wizard thinks who (D66); a ring's side, a tree's
         // crown or a wall in a flight's way, what it is (D186, D187).
         if (!instant && event.data.by === 'friend') {
@@ -2297,6 +2284,8 @@ class LevelScene extends Phaser.Scene {
         this.speech.think(why, tick, this.sayTicks(why), bumped ? AFTER_BUMP_MS : 0);
         if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
         if (bumped) this.playSound('bump');
+        // Stopped in the air, the gust ends at once (D243).
+        if (bumped) this.wind.stop(WIND_BUMP);
         if (event.data.reason === 'ring_rim') this.nudge(this.wizard, facing ?? 'right', duration);
         break;
       }

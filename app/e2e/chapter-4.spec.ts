@@ -645,70 +645,71 @@ test.describe('the hover (D235, D242)', () => {
   });
 });
 
-test.describe('the wind (D236)', () => {
+/** Every value data-wind takes, in order, from now (D243). */
+async function watchWind(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const node = document.querySelector('#scene') as HTMLElement;
+    const seen: string[] = [];
+    (window as unknown as { winds: string[] }).winds = seen;
+    new MutationObserver((records) => {
+      for (const record of records) seen.push(record.oldValue ?? '');
+    }).observe(node, { attributes: true, attributeFilter: ['data-wind'], attributeOldValue: true });
+  });
+}
+
+const windsSeen = async (page: Page) => {
+  const seen = await page.evaluate(() => [
+    ...(window as unknown as { winds: string[] }).winds,
+    (document.querySelector('#scene') as HTMLElement).dataset.wind ?? '',
+  ]);
+  return seen.filter((value, index) => index === 0 || value !== seen[index - 1]);
+};
+
+/** Up one cell and down one, six times, in the air: twelve one-cell commands. */
+const ZIGZAG = 'wizard.cast("drevo")\nfor i in range(6):\n    wizard.move_up(1)\n    wizard.move_down(1)\n';
+
+test.describe('the wind, a gust for each flown command (D243)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
-  test("blows only while the program plays in the air: off after Stop and under the slider, on again after Play", async ({
-    page,
-  }) => {
-    await open(page, 'the-first-flight', '1');
-    await start(page, HOVERING);
-    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard', { timeout: ciTimes(60_000) });
-    await expect(scene(page)).toHaveAttribute('data-wind', 'on');
-    await page.locator('#stop').click();
-    await page.waitForTimeout(500);
-    await expect(scene(page)).toHaveAttribute('data-wind', 'off');
-    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
-
-    await page.locator('#run').click();
-    await page.waitForFunction(
-      () => {
-        const node = document.querySelector<HTMLElement>('#scene')?.dataset;
-        return node?.state === 'playing' && Number(node.tick) >= 30 && node.flying === 'wizard';
-      },
-      undefined,
-      { timeout: ciTimes(60_000) },
-    );
-    await expect(scene(page)).toHaveAttribute('data-wind', 'on');
-    await page.locator('#timeline').fill(String(Number(await scene(page).getAttribute('data-tick')) - 2));
-    await expect(scene(page)).toHaveAttribute('data-state', 'paused');
-    await expect(scene(page)).toHaveAttribute('data-wind', 'off');
-    await page.locator('#stop').click();
-    await expect(scene(page)).toHaveAttribute('data-wind', 'on');
+  test("Los aros' own program: a gust for each of its eighteen flown commands, heard", async ({ page }) => {
+    await open(page, 'the-rings');
+    expect(await run(page, solution('the-rings'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute('data-wind-gusts', '18');
+    await expect(scene(page)).toHaveAttribute('data-sounds', /wind/);
   });
 
-  test('swells at the lift alone in a straight flight, and at the lift and at each turn in Los aros', async ({ page }) => {
-    await open(page, 'the-first-flight');
-    expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
-    await expect(scene(page)).toHaveAttribute('data-wind-swells', '1');
+  test('a flown move is a gust, and a wait in the air is silent', async ({ page }) => {
+    await open(page, 'the-first-flight', '1');
+    await watchWind(page);
+    await start(page, HOVERING);
+    // The lift is tick 25, the two flown cells 26 and 27; the wait from 28.
+    await page.waitForFunction(() => Number(document.querySelector<HTMLElement>('#scene')?.dataset.tick) >= 28, undefined, {
+      timeout: ciTimes(60_000),
+    });
+    expect(await windsSeen(page)).toContain('on');
+    await page.waitForTimeout(2000);
+    await expect(scene(page)).toHaveAttribute('data-wind', 'off');
+    await expect(scene(page)).toHaveAttribute('data-state', 'playing');
+    await expect(scene(page)).toHaveAttribute('data-wind-gusts', '1');
+  });
 
-    await page.locator('#again').click();
-    await open(page, 'the-rings');
-    // Every cell the wizard is on, in order, to count the turns of its flight.
-    await page.evaluate(() => {
-      const node = document.querySelector('#scene') as HTMLElement;
-      const cells: string[] = [];
-      (window as unknown as { cells: string[] }).cells = cells;
-      new MutationObserver((records) => {
-        for (const record of records) cells.push(record.oldValue ?? '');
-      }).observe(node, { attributes: true, attributeFilter: ['data-wizard'], attributeOldValue: true });
-    });
-    expect(await run(page, solution('the-rings'))).toMatch(/^¡Lo has conseguido/);
-    const cells = await page.evaluate(() => [
-      ...(window as unknown as { cells: string[] }).cells,
-      (document.querySelector('#scene') as HTMLElement).dataset.wizard ?? '',
-    ]);
-    // Its solution casts first: every move is flown.
-    const visited = cells.filter((cell, index) => cell !== '' && cell !== cells[index - 1]).map((cell) => cell.split(',').map(Number));
-    const start = visited.findIndex(([x, y]) => x === 4 && y === 9);
-    const ways = visited.slice(start + 1).map(([x, y], index) => {
-      const [px, py] = visited[start + index] as number[];
-      return `${Math.sign((x as number) - (px as number))},${Math.sign((y as number) - (py as number))}`;
-    });
-    const turns = ways.filter((way, index) => index > 0 && way !== ways[index - 1]).length;
-    expect(turns).toBeGreaterThan(10);
-    await expect(scene(page)).toHaveAttribute('data-wind-swells', String(turns + 1));
+  test('a zigzag of twelve one-cell moves is twelve gusts heard as one wind that changes', async ({ page }) => {
+    await open(page, 'the-rings', '1');
+    await watchWind(page);
+    await start(page, ZIGZAG);
+    await expect(scene(page)).toHaveAttribute('data-wind-gusts', '12', { timeout: ciTimes(60_000) });
+    await expect(scene(page)).toHaveAttribute('data-wind', 'off', { timeout: ciTimes(10_000) });
+    // From off, on once, and off once at the end: never off between the first and the last.
+    expect((await windsSeen(page)).filter((value) => value !== '')).toEqual(['off', 'on', 'off']);
+  });
+
+  test('with the sound off in the settings the gusts are counted the same', async ({ page }) => {
+    await page.goto('/#settings');
+    await page.locator('#settings-sound').selectOption('off');
+    await open(page, 'the-rings', '1');
+    await start(page, ZIGZAG);
+    await expect(scene(page)).toHaveAttribute('data-wind-gusts', '12', { timeout: ciTimes(60_000) });
   });
 });
 

@@ -537,13 +537,16 @@
       "off": "apagado",
       "unchanged": "todos los instrumentos como están escritos",
       "wind_title": "El viento de la escoba",
-      "wind_rest": "En reposo",
-      "wind_on": "Volando recto",
-      "wind_turn": "Un giro",
+      "wind_one": "Un movimiento de una casilla",
+      "wind_eight": "Un movimiento de ocho casillas",
+      "wind_zigzag": "Un zigzag",
+      "wind_lift": "Un despegue",
+      "wind_landing": "Un aterrizaje",
       "wind_flight": "Un vuelo entero",
-      "wind_air": "el aire",
-      "wind_tones": "los dos tonos agudos",
-      "wind_unchanged": "las dos voces como están escritas"
+      "wind_air": "el aire de una racha",
+      "wind_whistle": "el silbido en sus picos",
+      "wind_rest": "un aire muy suave mientras flota",
+      "wind_unchanged": "todas las voces como están escritas"
     },
     "zone": "Zona"
   },

@@ -317,6 +317,27 @@ def test_rings_flown_through_up_then_down_meet_the_goal_in_order():
     assert result.goals[0].params["missed"] == []
 
 
+def test_a_flown_step_says_its_place_in_its_command_and_a_walked_one_none():
+    # D243: the page gives each flown command's wind its whole length.
+    world = World(Level.from_dict(FIELD))
+    world.wizard.move_right(2)
+    walked = [e.data for e in world.events if e.kind == "move"]
+    assert all("step" not in data and "steps" not in data for data in walked)
+    world.wizard.cast("drevo")
+    world.wizard.move_right(3)
+    flown = [e.data for e in world.events if e.kind == "move"][len(walked) :]
+    assert [(data["step"], data["steps"]) for data in flown] == [(1, 3), (2, 3), (3, 3)]
+
+
+def test_a_flown_command_cut_by_a_bump_says_the_steps_it_flew():
+    world = World(Level.from_dict(FIELD))
+    world.wizard.cast("drevo")
+    world.wizard.move_up(5)
+    flown = [e.data for e in world.events if e.kind == "move"]
+    assert [(data["step"], data["steps"]) for data in flown] == [(1, 5), (2, 5), (3, 5)]
+    assert world.events[-1].kind == "bump"
+
+
 def test_a_ring_is_walked_into_and_flown_into_sideways_as_a_wall():
     world = World(Level.from_dict(FIELD))
     world.wizard.move_up()

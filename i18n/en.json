@@ -537,13 +537,16 @@
       "off": "off",
       "unchanged": "every voice as written",
       "wind_title": "The broom's wind",
-      "wind_rest": "At rest",
-      "wind_on": "Flying on",
-      "wind_turn": "A turn",
+      "wind_one": "A one-cell move",
+      "wind_eight": "A move of eight cells",
+      "wind_zigzag": "A zigzag",
+      "wind_lift": "A lift",
+      "wind_landing": "A landing",
       "wind_flight": "A whole flight",
-      "wind_air": "the air",
-      "wind_tones": "the two high tones",
-      "wind_unchanged": "both voices as written"
+      "wind_air": "the air of a gust",
+      "wind_whistle": "the whistle at its peaks",
+      "wind_rest": "a faint air while it hovers",
+      "wind_unchanged": "every voice as written"
     },
     "zone": "Zone"
   },

@@ -77,16 +77,22 @@ test('a theme playing on #music shows its voices, each to turn off and to set by
   await expect(page.locator('.themes-mixer input[type="checkbox"][data-voice="strings"]')).toBeChecked();
 });
 
-test("with ?debug, #music plays the broom's wind four ways, and its mixer says a voice turned off (D236)", async ({ page }) => {
+test("with ?debug, #music plays the broom's wind six ways, and its mixer of three voices says each one changed (D243)", async ({
+  page,
+}) => {
   await page.goto('/?debug#music');
-  const samples = page.locator('.themes-wind button[data-wind]');
-  await expect(samples).toHaveCount(4);
-  await expect(page.locator('.themes-wind input[type="checkbox"][data-wind-voice]')).toHaveCount(2);
-  await expect(page.locator('.themes-wind input[type="range"][data-wind-voice]')).toHaveCount(2);
-  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: both voices as written");
+  await expect(page.locator('.themes-wind button[data-wind]')).toHaveCount(6);
+  for (const voice of ['air', 'whistle', 'rest']) {
+    await expect(page.locator(`.themes-wind input[type="checkbox"][data-wind-voice="${voice}"]`)).toHaveCount(1);
+    await expect(page.locator(`.themes-wind input[type="range"][data-wind-voice="${voice}"]`)).toHaveCount(1);
+  }
+  await expect(page.locator('.themes-wind input[type="checkbox"][data-wind-voice="rest"]')).not.toBeChecked();
+  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: every voice as written");
   await page.locator('.themes-wind button[data-wind="flight"]').click();
-  await page.locator('.themes-wind input[type="checkbox"][data-wind-voice="tones"]').uncheck();
-  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: tones off");
+  await page.locator('.themes-wind input[type="checkbox"][data-wind-voice="whistle"]').uncheck();
+  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: whistle off");
+  await page.locator('.themes-wind input[type="checkbox"][data-wind-voice="rest"]').check();
+  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: whistle off, rest 1.00");
   await page.locator('#wind-reset').click();
-  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: both voices as written");
+  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: every voice as written");
 });

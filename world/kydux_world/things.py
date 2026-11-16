@@ -12,7 +12,7 @@ line behind the browser's sandbox, not a wall.
 from typing import TYPE_CHECKING, Any
 
 from . import api
-from .level import CARRIED_KINDS, Position, ThingSpec
+from .level import CARRIED_KINDS, Position, ThingSpec, under
 
 if TYPE_CHECKING:
     from .world import World
@@ -337,7 +337,8 @@ class Hole(Thing):
 
 class Broom(Thing):
     """A broom, carried from the first flight on, which a black thread knotted in its
-    twigs would make buck in the air (D183): untied by the wizard standing on it."""
+    twigs would make buck in the air (D183): untied by the wizard standing on it, or,
+    hung on a peg of the rack, standing under it (D195)."""
 
     _k_role = "broom"
 
@@ -355,12 +356,16 @@ class Broom(Thing):
         return self._k_knotted
 
     def untie(self) -> None:
-        """Untie the knot in the broom's twigs, standing on the broom: `broom.untie()`"""
+        """Untie the knot in the broom's twigs, standing on the broom, or under it when it
+        hangs: `broom.untie()`"""
         world: World = self._k_world
         world.ready()
         here = world.wizard._k_position
-        if self._k_carried or self._k_position != here:
-            # Untied by hand, as a thing is picked up: on its own cell (D183).
+        spec = self._k_spec
+        reach = under(self._k_position) if spec.hung and self._k_position is not None else None
+        if self._k_carried or (reach or self._k_position) != here:
+            # Untied by hand, as a thing is picked up: on its own cell (D183), or from the
+            # cell under its peg, as a door opens from beside it (D195).
             refused = {"at": list(here), "by": self.name, "reason": "too_far", "tried": False}
             world.act("blocked", refused)
             return

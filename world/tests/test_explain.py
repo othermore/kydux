@@ -85,6 +85,15 @@ def explained(code):
         ("import js", "no_such_module", {"name": "js"}, 1),
         ("import spellbook", "no_such_module", {"name": "spellbook"}, 1),
         ("print(1 / 0)", "other", {"type": "ZeroDivisionError", "message": "division by zero"}, 1),
+        # A list asked for one it has not (D198): how many it has, and which was asked.
+        (
+            'names = ["Teku", "Nuri", "Bimo"]\nprint(names[3])',
+            "index_range",
+            {"count": 3, "asked": 4},
+            2,
+        ),
+        ("names = []\nn = 0\nwizard.say(names[n])", "index_range", {"count": 0, "asked": 1}, 3),
+        ('names = ["Teku"]\nprint(names[-3])', "index_range_unknown", {}, 2),
     ],
 )
 def test_each_error_is_explained(code, kind, params, line):
@@ -127,3 +136,14 @@ def test_giving_the_wizard_a_method_of_one_s_own_is_told_apart_from_changing_one
         "params": {"object": "wizard", "name": "caminar_derecha"},
     }
     assert line == 4
+
+
+def test_a_lesson_s_run_explains_an_index_past_the_list_s_end_too():
+    from kydux_world.run import run_script
+
+    result = run_script('names = ["Teku", "Nuri", "Bimo"]\nprint(names[0])\nprint(names[3])')
+    assert result["stdout"] == "Teku\n"
+    assert result["error"]["explanation"] == {
+        "kind": "index_range",
+        "params": {"count": 3, "asked": 4},
+    }

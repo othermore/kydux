@@ -17,7 +17,7 @@ from typing import Any
 from . import api
 from .level import Level
 from .things import Child, ReadOnly
-from .world import ActionArguments, Refused
+from .world import CHILD, ActionArguments, Refused
 
 
 @dataclass
@@ -79,7 +79,67 @@ _CALL = re.compile(r"^(\w+)\.(\w+)\(\)")
 _UNCLOSED = re.compile(r"'(.)' was never closed")
 
 
-def explain(error: BaseException, level: Level) -> Explanation:
+def index_explanation(error: IndexError, code: str | None) -> Explanation:
+    """A list asked for an element it has not (D198): how many it has and which one was
+    asked for, counted from 1, when the line asks for it by a name and a number;
+    without them, that it has not so many."""
+    asked = _asked_index(error, code)
+    if asked is None:
+        return Explanation("index_range_unknown")
+    count, index = asked
+    return Explanation("index_range", {"count": count, "asked": index + 1})
+
+
+#: What an index or a list may be written as for the explanation to read it: names,
+#: numbers, and sums and differences of them; nothing that does anything when read.
+_PLAIN = (ast.Name, ast.Constant, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.USub, ast.Load)
+
+
+def _asked_index(error: IndexError, code: str | None) -> tuple[int, int] | None:
+    """The length of the list and the index the failing line of the child's code asked
+    for, read in the variables the line had, or None."""
+    if code is None:
+        return None
+    frame = None
+    trace = error.__traceback__
+    while trace is not None:
+        if trace.tb_frame.f_code.co_filename == CHILD:
+            frame, line = trace.tb_frame, trace.tb_lineno
+        trace = trace.tb_next
+    lines = code.splitlines()
+    if frame is None or not 0 < line <= len(lines):
+        return None
+    text = lines[line - 1].strip().rstrip(":")
+    for start in ("for ", "if ", "elif ", "while ", "return "):
+        if text.startswith(start):
+            text = (
+                text[len(start) :].split(" in ", 1)[-1] if start == "for " else text[len(start) :]
+            )
+    try:
+        tree = ast.parse(text, mode="exec")
+    except SyntaxError:
+        return None
+    names = {**frame.f_globals, **frame.f_locals}
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Subscript) and isinstance(node.value, ast.Name)):
+            continue
+        if not all(isinstance(part, _PLAIN) for part in ast.walk(node.slice)):
+            continue
+        listed = names.get(node.value.id)
+        try:
+            index = eval(
+                compile(ast.Expression(node.slice), CHILD, "eval"), {"__builtins__": {}}, names
+            )
+        except Exception:
+            continue
+        if isinstance(listed, list) and isinstance(index, int) and index >= len(listed) >= 0:
+            return len(listed), index
+    return None
+
+
+def explain(error: BaseException, level: Level, code: str | None = None) -> Explanation:
+    if isinstance(error, IndexError):
+        return index_explanation(error, code)
     if isinstance(error, NotCalled):
         return Explanation(
             "not_called", {"object": error.owner, "name": error.action, "example": error.example}

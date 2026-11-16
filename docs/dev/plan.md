@@ -159,7 +159,7 @@ content/
 
 Goals are declared (`reach`, `collect`, `open`, `say`, `give`, `cast`, `no_bumps`,
 `not_seen_by`, `ticks_under`, `lines_under`, `numbers_under`, `uses`; and for chapter 4
-`say` with `count_of`, `cast` with `from`, `untied`, `no_error`, `through_in_order` and
+`say` with `count_of`, `cast` with `from`, `untied` (with `ids` for the brooms it counts), `no_error`, `through_in_order` and
 `before`, D183 to D189) and a level may add `goals.py` for one of its own. The lesson's
 Markdown, with no HTML in it, may hold one fenced block marked `python try`,
 its example; the level after it starts with its own program (D33, D63). Within a chapter, every item is

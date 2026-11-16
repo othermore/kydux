@@ -211,7 +211,8 @@ wizard.cast(spell, thing=None)  # a tick: with the wand carried, a spell of the 
                              # broom carried, lifts it, and every move after it flies (D185)
 wizard.wait(ticks=1)         # a tick each: stands still while the world moves on
 wizard.pick_up()             # a tick: the thing on the wizard's tile, into wizard.items
-wizard.find_nearest(kind)    # the nearest thing or actor of a kind ("key"...), or None
+wizard.find_nearest(kind)    # the nearest thing or actor of a kind ("key"...), or None;
+                             # a thing of a zone only from within it (D196)
 wizard.find_item(kind)       # the thing of a kind it carries, or None (D123)
 wizard.find_all(kind)        # all of them, nearest first, then in reading order, as a
                              # list; hidden ones found as find_nearest finds them (D184)
@@ -240,7 +241,8 @@ thing.reveal()               # a tick: its whole outline drawn where it lies, ov
 bed.free                     # whether no one sleeps in it (D84)
 
 broom.knotted                # whether the black thread is tied in its twigs (D183)
-broom.untie()                # a tick: from the broom's own cell, else refused (too_far);
+broom.untie()                # a tick: from the broom's own cell, or the cell under it when
+                             # it hangs on a peg (D195), else refused (too_far);
                              # an error that stops the program on a broom with no knot
                              # (no_knot, D183)
 
@@ -2841,3 +2843,23 @@ one overturns stays, marked as superseded.
   names the file shown). The pixel figures the page drew for these places are gone. A
   test holds every character a text makes speak, and every look, to a portrait. Rules out
   the pixel busts, and a portrait that does not match the figure's colours.
+- **D195 — A broom hangs on a peg, and is untied from the cell under it.** Decided
+  2026-11-11 by the owner (*habrá que poner las escobas colgadas; hay que hacer la
+  imagen de una escoba colgada y ver cómo se posicionan para que encajen en el gancho
+  perfectamente*). A hanging broom is a thing of kind `broom` with `"hung": true`, on
+  the rack's cell under its peg, (x, 5) in the shed, a cell no one walks on; `untie()`
+  works from the cell under it, (x, 6), as a door opens from beside it, and is refused
+  `too_far` from anywhere else (`under` in `level.py`). A broom on the floor is untied
+  on its own cell, as before. Rules out brooms "in a row on the floor".
+- **D196 — What `find_all` and `find_nearest` find depends on where the wizard
+  stands.** Decided 2026-11-11 by the owner (*find_all depende de dónde estés: junto a
+  la pared, solo encontrarás las escobas colgadas; cerca de la paja, las que están
+  tiradas bajo la paja*). A level may name `zones`, `{"<name>": [[x0, y0, x1, y1],
+  ...]}`, each a list of boxes of cells (`Level.zones`); a thing may name its `zone`. A
+  thing with a zone is found by `find_all` and `find_nearest` only while the wizard
+  stands in that zone (`_nearby`); a thing without one, and every actor, is found from
+  anywhere; with nothing found, `find_nearest` gives `None` and `find_all` an empty
+  list. A thing's zone is one of the level's, and holds the cell the thing is found
+  from: its own, or, for a hung broom, the cell under it. The level handed to the page
+  carries its zones. Rules out a `find_all` that sees through walls into every corner
+  of a place.

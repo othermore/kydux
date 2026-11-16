@@ -667,3 +667,103 @@ def test_in_the_rings_a_loop_round_the_pair_flies_into_the_trees():
     )
     bumps = [e.data for e in result.events if e.kind == "bump"]
     assert bumps and bumps[0]["by"] == "high" and bumps[0]["kind"] == "tree"
+
+
+#: A rack along the top: brooms hang on its pegs (row 1, shelves) over the row the wizard
+#: stands on under them (row 2), the wall's zone; the straw below (rows 3 and 4).
+RACK = {
+    "id": "rack",
+    "map": ["##########", "#========#", "#........#", "#........#", "#...S....#", "##########"],
+    "zones": {"wall": [[1, 2, 8, 2]], "straw": [[1, 3, 8, 4]]},
+    "things": [
+        {
+            "kind": "broom",
+            "id": "hung_1",
+            "at": [2, 1],
+            "hung": True,
+            "zone": "wall",
+            "knotted": True,
+        },
+        {
+            "kind": "broom",
+            "id": "hung_2",
+            "at": [3, 1],
+            "hung": True,
+            "zone": "wall",
+            "knotted": True,
+        },
+        {"kind": "broom", "id": "fallen_1", "at": [6, 3], "zone": "straw", "knotted": True},
+        {"kind": "broom", "id": "fallen_2", "at": [2, 4], "zone": "straw", "knotted": True},
+    ],
+    "goals": [{"kind": "untied", "ids": ["hung_1"]}],
+    "api": ["wizard.move_up", "wizard.find_all", "broom.untie", "broom.knotted"],
+}
+
+
+def rack(**change):
+    return Level.from_dict({**RACK, **change})
+
+
+def test_a_hung_broom_is_untied_from_the_cell_under_it_and_refused_from_beside(tmp_path):
+    world = World(rack())
+    world.wizard.move_up(2)
+    world.wizard.move_left(2)
+    world.things["hung_1"].untie()
+    assert not world.things["hung_1"].knotted
+    assert world.events[-1].data == {"id": "hung_1", "at": [2, 2]}
+    world.things["hung_2"].untie()
+    assert world.events[-1].data["reason"] == "too_far"
+    assert world.things["hung_2"].knotted
+
+
+def test_find_all_finds_only_what_lies_in_the_zone_the_wizard_stands_in():
+    world = World(rack())
+    assert [b.name for b in world.wizard.find_all("broom")] == ["fallen_2", "fallen_1"]
+    assert world.wizard.find_nearest("broom").name == "fallen_2"
+    world.wizard.move_up(2)
+    assert [b.name for b in world.wizard.find_all("broom")] == ["hung_2", "hung_1"]
+    world.wizard.move_left(2)
+    assert [b.name for b in world.wizard.find_all("broom")] == ["hung_1", "hung_2"]
+
+
+def test_a_thing_with_no_zone_is_found_from_anywhere_and_one_with_a_zone_only_from_it():
+    things = [*RACK["things"], {"kind": "key", "id": "key", "at": [8, 2]}]
+    world = World(rack(things=things, zones={"wall": [[1, 2, 7, 2]], "straw": [[1, 3, 7, 4]]}))
+    world.wizard.move_right(4)
+    assert world.wizard.position == (8, 4)
+    assert world.wizard.find_all("broom") == []
+    assert world.wizard.find_nearest("broom") is None
+    assert world.wizard.find_nearest("key").name == "key"
+
+
+def test_the_untied_goal_counts_only_the_brooms_it_names():
+    solved = "wizard.move_up(2)\nwizard.move_left(2)\nhung_1.untie()\n"
+    assert run_code(rack(), solved).status == "won"
+    assert run_code(rack(goals=[{"kind": "untied"}]), solved).status != "won"
+    with pytest.raises(LevelError, match="ids name brooms"):
+        World(rack(goals=[{"kind": "untied", "ids": ["nothing"]}]))
+
+
+def test_a_thing_s_zone_is_the_level_s_and_holds_where_it_is_found_from():
+    with pytest.raises(LevelError, match="not the level's"):
+        rack(zones={"wall": [[1, 2, 8, 2]]})
+    moved = [{**RACK["things"][0], "at": [2, 1], "zone": "straw"}, *RACK["things"][1:]]
+    with pytest.raises(LevelError, match="outside its zone"):
+        rack(things=moved)
+    with pytest.raises(LevelError, match="only a broom hangs"):
+        rack(things=[*RACK["things"], {"kind": "key", "id": "key", "at": [5, 3], "hung": True}])
+
+
+def test_a_story_step_frames_a_box_of_cells_or_the_scene_s_width():
+    from kydux_world.level import _step_camera
+
+    _step_camera({"fit": [[3, 3], [16, 10]]}, "story", 20, 15)
+    _step_camera({"wide": True}, "story", 20, 15)
+    for wrong in (
+        {"fit": [[3, 3], [26, 10]]},
+        {"fit": [[16, 3], [3, 10]]},
+        {"wide": False},
+        [3, 3],
+    ):
+        with pytest.raises(LevelError):
+            _step_camera(wrong, "story", 20, 15)

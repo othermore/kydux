@@ -14,7 +14,7 @@ import traceback
 from dataclasses import asdict, dataclass, field, replace
 from typing import Any, Literal
 
-from .explain import NotCalled, check_called, explain
+from .explain import NotCalled, check_called, explain, index_explanation
 from .goals import GoalResult
 from .level import Level
 from .sandbox import child_builtins
@@ -52,9 +52,19 @@ def python_name(error: BaseException) -> str:
     return type(error).__name__
 
 
-def error_info(error: BaseException, level: Level | None = None) -> ErrorInfo:
+def error_info(
+    error: BaseException, level: Level | None = None, code: str | None = None
+) -> ErrorInfo:
+    """An error as the page shows it: Python's own words and their explanation in the
+    child's; a run with no level, a lesson's, explains an index past a list's end
+    only (D198)."""
     message = error.msg if isinstance(error, SyntaxError) else str(error)
-    explanation = explain(error, level).to_dict() if level is not None else None
+    if level is not None:
+        explanation = explain(error, level, code).to_dict()
+    elif isinstance(error, IndexError):
+        explanation = index_explanation(error, code).to_dict()
+    else:
+        explanation = None
     return ErrorInfo(python_name(error), message, child_line(error), explanation)
 
 
@@ -108,7 +118,7 @@ def run_script(code: str) -> dict:
     except KeyboardInterrupt:
         status = "interrupted"
     except BaseException as caught:  # the child's code may raise anything, exit() too
-        status, error = "error", error_info(caught)
+        status, error = "error", error_info(caught, code=code)
     return {
         "status": status,
         "stdout": stdout.getvalue(),
@@ -187,7 +197,7 @@ def _run_one(level: Level, code: str) -> RunResult:
             namespace = {"__name__": "__main__", "__builtins__": child_builtins()}
             exec(compiled, {**namespace, **world.namespace()})
     except (SyntaxError, NotCalled) as caught:
-        status, error = "error", error_info(caught, level)
+        status, error = "error", error_info(caught, level, code)
     except TooManyTicks:
         status = "too_many_ticks"
     except Caught:
@@ -195,7 +205,7 @@ def _run_one(level: Level, code: str) -> RunResult:
     except KeyboardInterrupt:
         status = "interrupted"
     except BaseException as caught:  # the child's code may raise anything, exit() too
-        status, error = "error", error_info(caught, level)
+        status, error = "error", error_info(caught, level, code)
     else:
         status = "incomplete"
     if world.over is not None and status in ("incomplete", "error"):

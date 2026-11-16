@@ -166,12 +166,20 @@ class SayGoal:
 
 
 class UntiedGoal:
-    """Met once no broom of the level is knotted; failed at the run's end when one still
-    is (D183): `{"kind": "untied"}`."""
+    """Met once no broom it counts is knotted; failed at the run's end when one still is
+    (D183): `{"kind": "untied"}` counts every broom of the level, and
+    `{"kind": "untied", "ids": ["broom_0"]}` the brooms named."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
-        if not any(thing.kind == "broom" for thing in level.things):
+        brooms = {thing.id for thing in level.things if thing.kind == "broom"}
+        if not brooms:
             raise LevelError(f"{level.id}: an untied goal needs a broom")
+        ids = spec.params.get("ids")
+        if ids is not None and (
+            not isinstance(ids, list) or not ids or not all(i in brooms for i in ids)
+        ):
+            raise LevelError(f"{level.id}: an untied goal's ids name brooms of the level")
+        self.ids = set(ids) if ids is not None else None
 
     def check(self, world: "World") -> bool:
         return not self._knotted(world)
@@ -179,9 +187,12 @@ class UntiedGoal:
     def failed(self, world: "World") -> bool:
         return world.finished and self._knotted(world)
 
-    @staticmethod
-    def _knotted(world: "World") -> bool:
-        return any(getattr(thing, "_k_knotted", False) for thing in world.things.values())
+    def _knotted(self, world: "World") -> bool:
+        return any(
+            getattr(thing, "_k_knotted", False)
+            for name, thing in world.things.items()
+            if self.ids is None or name in self.ids
+        )
 
 
 class NoErrorGoal:

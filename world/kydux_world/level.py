@@ -129,6 +129,11 @@ class ThingSpec:
     cells: tuple[Position, ...] = ()
     #: For a broom, whether the black thread is knotted in its twigs (D183).
     knotted: bool = False
+    #: For a broom, whether it hangs on a peg of the rack, its cell the rack's under
+    #: the peg; it is untied from the cell under it (D195).
+    hung: bool = False
+    #: The level's zone it is found from, or None for a thing found from anywhere (D196).
+    zone: str | None = None
 
 
 @dataclass(frozen=True)
@@ -210,6 +215,9 @@ class Level:
     #: On a scene, the kind of each cell's terrain no one walks on, `water`, `tree`,
     #: `wall`..., which the wizard thinks of when it cannot go there (D186).
     kinds: dict[Position, str] = field(default_factory=dict)
+    #: The level's zones by name, each its cells: a thing of a zone is found only from
+    #: within it (D196).
+    zones: dict[str, frozenset[Position]] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Level":
@@ -268,7 +276,9 @@ class Level:
             starts[0],
             frozenset(low),
         )
+        zones = _zones(data.get("zones", {}), level_id)
         things = tuple(_thing(shape, spec) for spec in _list(data, "things", level_id))
+        _check_zones(level_id, things, zones)
         things += _carrying(data, level_id, starts[0])
         actors = tuple(_actor(shape, spec) for spec in _list(data, "actors", level_id))
         _check_ids(level_id, things, actors)
@@ -390,6 +400,7 @@ class Level:
             low=frozenset(low),
             race=_race(data.get("race"), shape, actors),
             kinds=_kinds(data),
+            zones=zones,
         )
         check_api(level)
         return level
@@ -541,6 +552,12 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
     knotted = spec.get("knotted", False)
     if not isinstance(knotted, bool) or ("knotted" in spec and kind != "broom"):
         raise LevelError(f"{shape.level_id}: only a broom is knotted, true or false")
+    hung = spec.get("hung", False)
+    if not isinstance(hung, bool) or ("hung" in spec and kind != "broom"):
+        raise LevelError(f"{shape.level_id}: only a broom hangs, true or false")
+    zone = spec.get("zone")
+    if zone is not None and not (isinstance(zone, str) and zone):
+        raise LevelError(f"{shape.level_id}: {thing_id}'s zone is a zone's name")
     covers = _covers(shape, spec, thing_id)
     pillow_side = _pillow_side(shape, spec, thing_id)
     position = shape.place(spec, thing_id)
@@ -560,7 +577,67 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         pillow_side=pillow_side,
         cells=_cells(shape, spec, thing_id, position),
         knotted=knotted,
+        hung=hung,
+        zone=zone,
     )
+
+
+def _zones(value: Any, level_id: str) -> dict[str, frozenset[Position]]:
+    """A level's zones (D196): `{"<name>": [[x0, y0, x1, y1], ...]}`, each a list of
+    boxes of cells."""
+    if not isinstance(value, dict):
+        raise LevelError(f"{level_id}: zones are named, each a list of [x0, y0, x1, y1]")
+    zones = {}
+    for name, boxes in value.items():
+        cells = set()
+        for x0, y0, x1, y1 in _list_of_boxes(boxes, level_id, "a zone"):
+            cells.update(Position(x, y) for x in range(x0, x1 + 1) for y in range(y0, y1 + 1))
+        if not cells:
+            raise LevelError(f"{level_id}: the zone {name} has no cell")
+        zones[name] = frozenset(cells)
+    return zones
+
+
+def _check_zones(
+    level_id: str, things: tuple[ThingSpec, ...], zones: dict[str, frozenset[Position]]
+) -> None:
+    """A thing's zone is one of the level's, and the thing is found from where it lies,
+    or a hung broom from the cell under it (D195, D196)."""
+    for thing in things:
+        if thing.zone is None:
+            continue
+        if thing.zone not in zones:
+            raise LevelError(f"{level_id}: {thing.id}'s zone {thing.zone} is not the level's")
+        reached = under(thing.position) if thing.hung else thing.position
+        if reached not in zones[thing.zone]:
+            raise LevelError(f"{level_id}: {thing.id} lies outside its zone {thing.zone}")
+
+
+def _step_camera(value: Any, here: str, width: int, height: int) -> None:
+    """A story step's camera (D199): `{"fit": [[x0, y0], [x1, y1]]}`, a box of cells the
+    page shows whole, or `{"wide": true}`, the scene's playable width."""
+    if value == {"wide": True}:
+        return
+    box = value.get("fit") if isinstance(value, dict) and set(value) == {"fit"} else None
+    corners = (
+        box
+        if isinstance(box, list)
+        and len(box) == 2
+        and all(
+            isinstance(c, list) and len(c) == 2 and all(isinstance(v, int) for v in c) for c in box
+        )
+        else None
+    )
+    if corners is None:
+        raise LevelError(f'{here}: a step\'s camera is {{"fit": [[x0, y0], [x1, y1]]}} or wide')
+    (x0, y0), (x1, y1) = corners
+    if not (0 <= x0 <= x1 < width and 0 <= y0 <= y1 < height):
+        raise LevelError(f"{here}: the camera's box is off the scene or turned round")
+
+
+def under(position: Position) -> Position:
+    """The cell under another: where a hung broom is untied from (D195)."""
+    return Position(position.x, position.y + 1)
 
 
 def _pillow_side(shape: _Shape, spec: dict[str, Any], thing_id: str) -> Position | None:
@@ -788,12 +865,14 @@ def _sought_in_the_dark(
     return False
 
 
-def _list_of_boxes(value: Any, level_id: str) -> list[tuple[int, int, int, int]]:
+def _list_of_boxes(
+    value: Any, level_id: str, what: str = "dark_area"
+) -> list[tuple[int, int, int, int]]:
     if not isinstance(value, list) or not all(
         isinstance(box, list) and len(box) == 4 and all(isinstance(v, int) for v in box)
         for box in value
     ):
-        raise LevelError(f"{level_id}: dark_area is a list of [x0, y0, x1, y1]")
+        raise LevelError(f"{level_id}: {what} is a list of [x0, y0, x1, y1]")
     return [tuple(box) for box in value]
 
 
@@ -1402,6 +1481,8 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
             raise LevelError(f"{here}: {who} is no one in the story")
         if "by" in step and doing is None:
             raise LevelError(f"{here}: by names who does the action, and there is none")
+        if "camera" in step:
+            _step_camera(step["camera"], here, width, height)
         actions = _story_actions(doing, here)
         # Each figure's part of the step, its actions one after another as single
         # events (a walk is a move a tile), with where each leaves it; the figures

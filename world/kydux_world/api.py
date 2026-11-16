@@ -40,15 +40,18 @@ MEMBERS: dict[str, tuple[str, ...]] = {
         "position",
         "facing",
         "items",
+        "flying",
     ),
     "thing": THING_MEMBERS,
     "door": (*THING_MEMBERS, "locked", "sealed", "password", "is_open", "open"),
     "key": THING_MEMBERS,
     "hole": (*THING_MEMBERS, "open", "closed"),
     "bed": (*THING_MEMBERS, "free"),
+    "broom": (*THING_MEMBERS, "knotted", "untie"),
     "teacher": ("kind", "name", "position", "facing", "distance_to", "can_see"),
     "ghost": ("kind", "name", "position", "facing", "distance_to"),
     "cat": ("kind", "name", "position", "facing", "distance_to"),
+    "racer": ("kind", "name", "position", "facing", "distance_to"),
     # A friend teaches by words, not by code: the child's code has nothing of it (D66).
     "friend": (),
     # What a position holds: its two numbers, `key.position.x` (D153).
@@ -56,7 +59,7 @@ MEMBERS: dict[str, tuple[str, ...]] = {
 }
 
 #: The roles that are things, and so have a thing's members.
-THING_ROLES = ("thing", "door", "key", "hole", "bed")
+THING_ROLES = ("thing", "door", "key", "hole", "bed", "broom")
 
 
 def role_of(kind: str) -> str:

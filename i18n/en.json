@@ -103,7 +103,9 @@
     "potion": "the potion",
     "hole": "the hole",
     "bed": "the bed",
-    "map": "the naughty child's map"
+    "map": "the naughty child's map",
+    "broom": "the broom",
+    "ring": "the ring"
   },
   "plan": {
     "title": "The naughty child's map",
@@ -161,15 +163,16 @@
       "pick_up": "Picks up a thing on the wizard's tile or beside it, and carries it. With several in reach, say which: wizard.pick_up(key).",
       "find_nearest": "Finds the nearest thing of a kind, or None when there is none.",
       "find_item": "Finds the thing of a kind the wizard carries, or None when it carries none.",
-      "find_all": "Finds every thing of a kind, nearest first.",
+      "find_all": "Finds every thing of a kind and gives them in a list, nearest first, even where something covers them: brooms = wizard.find_all(\"broom\"); len(brooms) says how many.",
       "has": "Tells whether the wizard carries a thing of a kind.",
       "position": "The cell the wizard stands on, as x and y, counted from 0 from the left and from the top: print(wizard.position) shows it.",
       "facing": "The way the wizard looks: up, down, left or right.",
-      "items": "The things the wizard carries.",
-      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all. The fendra spell is also given the thing to bring: wizard.cast(\"fendra\", book). The orvim spell opens the map, when the wizard carries it: wizard.cast(\"orvim\").",
+      "items": "The things the wizard carries, in a list; len(wizard.items) says how many.",
+      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all. The fendra spell is also given the thing to bring: wizard.cast(\"fendra\", book). The orvim spell opens the map, when the wizard carries it: wizard.cast(\"orvim\"). The drevo spell lifts the broom, when the wizard carries it: wizard.cast(\"drevo\").",
       "give": "Gives a thing the wizard carries to whoever stands right beside it.",
       "sleep": "Lies down and sleeps in a free bed.",
-      "distance_to": "Gives the number of steps from the wizard to an object."
+      "distance_to": "Gives the number of steps from the wizard to an object.",
+      "flying": "True while the wizard flies on the broom, from drevo until the program ends."
     },
     "thing": {
       "kind": "What the thing is, like \"key\" or \"book\".",
@@ -243,6 +246,22 @@
       "free": "True when no one sleeps in the bed.",
       "distance_to": "Gives the number of steps from an object to the wizard.",
       "reveal": "Shows where a hidden thing lies."
+    },
+    "broom": {
+      "kind": "What it is: \"broom\".",
+      "name": "The broom's own name in this level.",
+      "position": "The cell the broom lies on, as x and y, or None once the wizard carries it.",
+      "distance_to": "Gives the number of steps from an object to the wizard.",
+      "reveal": "Makes a thing glow where it lies, even through whatever hides it, so that you see where it is.",
+      "knotted": "True while the black thread is knotted in the broom's twigs: if broom.knotted:",
+      "untie": "Unties the knot in the broom. The wizard must stand on it, and the broom must have a knot: if it has none, that is an error."
+    },
+    "racer": {
+      "kind": "What they are: \"racer\".",
+      "name": "The name of who races you in this level.",
+      "position": "Where the one racing you is, as x and y.",
+      "facing": "The way the one racing you looks: \"up\", \"down\", \"left\" or \"right\".",
+      "distance_to": "Gives the number of steps from an object to the wizard."
     }
   },
   "start": {
@@ -407,7 +426,8 @@
     "fendra": "brings to your cell the thing you name, three cells away at most in a straight line.",
     "kirra": "lights the dark room you are in.",
     "osto": "holds closed, for a while, a hole beside you that opens in the floor.",
-    "orvim": "opens the naughty child's map on the plan of the place you are in, every cell with its numbers, if you carry the map."
+    "orvim": "opens the naughty child's map on the plan of the place you are in, every cell with its numbers, if you carry the map.",
+    "drevo": "lifts the broom you carry into the air: from then on your moves fly, three times as fast, over water, hedges and fences, but not through the crowns of trees or walls; the broom sets down where the program ends."
   },
   "words": {
     "ambrel": "the school's word, which opens its gates."

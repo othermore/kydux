@@ -17,7 +17,7 @@ from typing import Any
 from . import api
 from .level import Level
 from .things import Child, ReadOnly
-from .world import ActionArguments
+from .world import ActionArguments, Refused
 
 
 @dataclass
@@ -84,6 +84,9 @@ def explain(error: BaseException, level: Level) -> Explanation:
         return Explanation(
             "not_called", {"object": error.owner, "name": error.action, "example": error.example}
         )
+    if isinstance(error, Refused):
+        # The world refused the program, as untying a broom with no knot (D183).
+        return Explanation(error.reason, {"thing": error.by})
     if isinstance(error, ReadOnly):
         kind = "read_only" if error.exists else "no_new_attribute"
         return Explanation(kind, {"object": error.owner, "name": error.attribute})

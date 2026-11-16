@@ -335,8 +335,56 @@ class Hole(Thing):
         world.note(self.name, "hold", {"id": self.name, "from": start, "until": end})
 
 
+class Broom(Thing):
+    """A broom, carried from the first flight on, which a black thread knotted in its
+    twigs would make buck in the air (D183): untied by the wizard standing on it."""
+
+    _k_role = "broom"
+
+    def __init__(self, world: "World", spec: ThingSpec) -> None:
+        super().__init__(world, spec)
+        self._set(knotted=spec.knotted)
+
+    def __repr__(self) -> str:
+        knot = ", knotted" if self._k_knotted else ""
+        return super().__repr__()[:-1] + knot + ">"
+
+    @property
+    def knotted(self) -> bool:
+        """True while the black thread is knotted in the broom's twigs: `broom.knotted`"""
+        return self._k_knotted
+
+    def untie(self) -> None:
+        """Untie the knot in the broom's twigs, standing on the broom: `broom.untie()`"""
+        world: World = self._k_world
+        world.ready()
+        here = world.wizard._k_position
+        if self._k_carried or self._k_position != here:
+            # Untied by hand, as a thing is picked up: on its own cell (D183).
+            refused = {"at": list(here), "by": self.name, "reason": "too_far", "tried": False}
+            world.act("blocked", refused)
+            return
+        if not self._k_knotted:
+            # Nothing to untie: an error, which stops the program (D183).
+            world.refuse(self.name, "no_knot", list(here))
+        self._set(knotted=False)
+        world.act("untie", {"id": self.name, "at": list(here)})
+
+
+class Ring(Thing):
+    """A ring standing on a cell no one walks on, flown through from the row above it
+    to the row below or the reverse (D187); to the child's code, a thing as any."""
+
+
 #: Each kind of thing with a class of its own; any other kind is a Thing.
-THINGS: dict[str, type[Thing]] = {"door": Door, "key": Key, "hole": Hole, "bed": Bed}
+THINGS: dict[str, type[Thing]] = {
+    "door": Door,
+    "key": Key,
+    "hole": Hole,
+    "bed": Bed,
+    "broom": Broom,
+    "ring": Ring,
+}
 
 
 def make_thing(world: "World", spec: ThingSpec) -> Thing:

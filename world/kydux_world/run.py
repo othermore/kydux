@@ -182,6 +182,7 @@ def _run_one(level: Level, code: str) -> RunResult:
     try:
         compiled = compile(code, CHILD, "exec")
         check_called(compile(code, CHILD, "exec", flags=ast.PyCF_ONLY_AST), world.namespace())
+        world.begin()
         with contextlib.redirect_stdout(stdout):
             namespace = {"__name__": "__main__", "__builtins__": child_builtins()}
             exec(compiled, {**namespace, **world.namespace()})
@@ -201,7 +202,9 @@ def _run_one(level: Level, code: str) -> RunResult:
         # The child's code caught the end of the run and went on: the end stands.
         status = "caught" if isinstance(world.over, Caught) else "too_many_ticks"
         error = None
-    world.finish()
+    if error is not None and world.error is None:
+        world.error = error.type
+    world.finish(ended=status == "incomplete")
     if status == "incomplete" and world.won():
         status = "won"
     try:
@@ -211,7 +214,7 @@ def _run_one(level: Level, code: str) -> RunResult:
     goals = [
         GoalResult(
             spec.kind,
-            dict(spec.params),
+            GoalResult.shown(world.goals[index], spec, world),
             index in world.met_at,
             world.met_at.get(index),
             index in world.failed_at,

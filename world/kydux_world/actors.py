@@ -1,5 +1,5 @@
 """The actors: who moves in the world besides the wizard, or stands in it: the
-teacher, the ghost, the cat, and a friend who teaches (D66).
+teacher, the ghost, the cat, a friend who teaches (D66), and a racer (D189).
 
 An actor takes its step in every tick, after the wizard has done its thing
 (architecture.md, D21). The teacher walks its patrol one tile per tick,
@@ -151,8 +151,44 @@ class Friend(Actor):
     _k_role = "friend"
 
 
+class Racer(Actor):
+    """A racer, Zarek (D189): stands on the start until Ilda has read its program, a
+    tick a line, lifts its broom in the next, then flies the race's path, a cell a
+    tick, circling in place where the path stays on a cell, and lands on its last."""
+
+    _k_role = "racer"
+
+    def _step(self) -> None:
+        world: World = self._k_world
+        race = world.level.race
+        if race is None or race.against != self.name:
+            return
+        index = world.tick - race.lines - 1
+        here = self._k_position
+        if index == 0:
+            world.note(self.name, "fly", {"id": self.name, "at": list(here)})
+        if not 1 <= index <= len(race.path):
+            return
+        there = race.path[index - 1]
+        if there == here:
+            world.note(self.name, "circle", {"at": list(here)})
+        else:
+            facing = towards(here, there)
+            self._set(position=there, facing=facing)
+            moved = {"from": list(here), "to": list(there), "facing": facing, "flying": True}
+            world.note(self.name, "move", moved)
+        if index == len(race.path):
+            world.note(self.name, "land", {"id": self.name, "at": list(there)})
+
+
 #: Each actor kind's class, by the kind's name in level.json.
-ACTORS: dict[str, type[Actor]] = {"teacher": Teacher, "ghost": Ghost, "cat": Cat, "friend": Friend}
+ACTORS: dict[str, type[Actor]] = {
+    "teacher": Teacher,
+    "ghost": Ghost,
+    "cat": Cat,
+    "friend": Friend,
+    "racer": Racer,
+}
 
 
 def make_actor(world: "World", spec: ActorSpec) -> Actor:

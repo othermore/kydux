@@ -2,9 +2,11 @@
 
 A level is read from its level.json. The map is rows of characters: `#` a
 wall, `.` floor, `=` a shelf (no one walks on it, a thing may lie on it, and
-sight passes over it, D46), `S` where the wizard starts, and any other
-letter a floor tile that things, actors and goals may name by that letter (a
-marker), like `D` for a door. Positions are (x, y) from the top-left corner,
+sight passes over it, D46), `~` a low cell (water, a hedge, a bench: no one
+walks on it, a flight crosses it and sight passes over it, D186), `S` where the
+wizard starts, and any other letter a floor tile that things, actors and goals
+may name by that letter (a marker), like `D` for a door. A wall is high: a
+flight bumps on it as a walk does. Positions are (x, y) from the top-left corner,
 x to the right and y down.
 
 A level that is a part of a chapter's scene (D65) names it in `scene` instead
@@ -21,7 +23,8 @@ id the child's code knows it by, an actor maybe `asleep` in a bed beside it
 from the start (D49); `spells`, the spells that can be cast (D42); `words`,
 the passwords the level gives the child, each a door's (D80); `api`,
 the names the level teaches (D23); `goals`, some of them bonus goals;
-`tick_limit`; `dark`, a room unlit until `kirra` (D52), which the level lists among its
+`tick_limit`; `race`, a race against a racer scored by Ilda's count (D189);
+`dark`, a room unlit until `kirra` (D52), which the level lists among its
 spells when a `collect` or an `open` goal lies in the dark (D162); `forbidden`, the
 tiles the wizard may not step on and why, which its scene gives (D84);
 `enchanted`, the boxes of cells that hide every figure in them, which its scene
@@ -59,21 +62,21 @@ class LevelError(ValueError):
     """A level definition that cannot be played."""
 
 
-WALL, FLOOR, SHELF, START = "#", ".", "=", "S"
+WALL, FLOOR, SHELF, LOW, START = "#", ".", "=", "~", "S"
 
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
-THING_KINDS = ("key", "door", "book", "wand", "potion", "hole", "bed", "map")
+THING_KINDS = ("key", "door", "book", "wand", "potion", "hole", "bed", "map", "broom", "ring")
 #: The kinds that lie on cells of their own, one or two side by side (D150, D167).
 CELLED_KINDS = ("door", "hole")
-CARRIED_KINDS = ("key", "book", "wand", "potion", "map")
+CARRIED_KINDS = ("key", "book", "wand", "potion", "map", "broom")
 #: The terrains a thing lies up on, out of the hands' reach (D129): a level map's
 #: shelf, a scene's bookcase. A thing on another tile no one walks, a stone or a
 #: pile of books, lies within reach of the tile beside it.
 HIGH_KINDS = ("shelf", "bookcase")
-ACTOR_KINDS = ("teacher", "ghost", "cat", "friend")
+ACTOR_KINDS = ("teacher", "ghost", "cat", "friend", "racer")
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
-KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto", "orvim")
+KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto", "orvim", "drevo")
 #: The kinds of level (D56): a screen to solve, a program to repair, a program to
 #: make better, a challenge with no lesson before it.
 LEVEL_KINDS = ("practice", "fix", "improve", "challenge")
@@ -124,6 +127,8 @@ class ThingSpec:
     #: first; shut, it blocks them all (D150). For a hole, the cells it opens on, one or
     #: two side by side, open and closed together (D167).
     cells: tuple[Position, ...] = ()
+    #: For a broom, whether the black thread is knotted in its twigs (D183).
+    knotted: bool = False
 
 
 @dataclass(frozen=True)
@@ -144,12 +149,35 @@ class ActorSpec:
 
 
 @dataclass(frozen=True)
+class Race:
+    """A race against a racer, scored by Ilda's count (D189): once Ilda has read the
+    racer's `lines`, a tick a line, its flight starts, as the wizard's does with
+    drevo, with a tick for the lift, then its `path`, a cell a tick, a cell the same
+    as the one before a tick circling in place (a flourish); it crosses the finish at
+    the tick its path reaches it. The wizard takes off at the tick of the program's
+    own lines, and serves five ticks before the finish for each ring it missed."""
+
+    against: str
+    lines: int
+    #: The cells the racer flies into, one a tick, after its lift.
+    path: tuple[Position, ...]
+    finish: Position
+
+    @property
+    def tick(self) -> int:
+        """The tick the racer crosses the finish: its lines, its lift, its path to it."""
+        return self.lines + 1 + self.path.index(self.finish) + 1
+
+
+@dataclass(frozen=True)
 class Level:
     id: str
     width: int = 1
     height: int = 1
     walls: frozenset[Position] = frozenset()
     shelves: frozenset[Position] = frozenset()
+    #: The low cells, which a flight crosses and a walk does not (D186).
+    low: frozenset[Position] = frozenset()
     #: The shelves a thing lies up on, out of the hands' reach (HIGH_KINDS, D129).
     high: frozenset[Position] = frozenset()
     start: Position = Position(0, 0)
@@ -177,6 +205,11 @@ class Level:
     #: dormitory's arch (D84).
     forbidden: frozenset[Position] = frozenset()
     forbidden_reason: str = ""
+    #: The race the level is, or None (D189).
+    race: Race | None = None
+    #: On a scene, the kind of each cell's terrain no one walks on, `water`, `tree`,
+    #: `wall`..., which the wizard thinks of when it cannot go there (D186).
+    kinds: dict[Position, str] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Level":
@@ -202,7 +235,7 @@ class Level:
         if width == 0 or any(len(row) != width for row in rows):
             raise LevelError(f"{level_id}: the map's rows must all be as long as the first")
 
-        walls, shelves, starts, markers = set(), set(), [], {}
+        walls, shelves, low, starts, markers = set(), set(), set(), [], {}
         for y, row in enumerate(rows):
             for x, char in enumerate(row):
                 here = Position(x, y)
@@ -210,6 +243,8 @@ class Level:
                     walls.add(here)
                 elif char == SHELF:
                     shelves.add(here)
+                elif char == LOW:
+                    low.add(here)
                 elif char == START:
                     starts.append(here)
                 elif char == FLOOR:
@@ -224,7 +259,14 @@ class Level:
             raise LevelError(f"{level_id}: the map needs exactly one S, and has {len(starts)}")
 
         shape = _Shape(
-            level_id, width, len(rows), frozenset(walls), frozenset(shelves), markers, starts[0]
+            level_id,
+            width,
+            len(rows),
+            frozenset(walls),
+            frozenset(shelves) | frozenset(low),
+            markers,
+            starts[0],
+            frozenset(low),
         )
         things = tuple(_thing(shape, spec) for spec in _list(data, "things", level_id))
         things += _carrying(data, level_id, starts[0])
@@ -345,6 +387,9 @@ class Level:
             kind=kind,
             forbidden=forbidden,
             forbidden_reason=forbidden_reason,
+            low=frozenset(low),
+            race=_race(data.get("race"), shape, actors),
+            kinds=_kinds(data),
         )
         check_api(level)
         return level
@@ -377,9 +422,13 @@ class Level:
         return 0 <= position.x < self.width and 0 <= position.y < self.height
 
     def free(self, position: Position) -> bool:
-        """Inside the map, and neither a wall nor a shelf: a tile to walk on. Doors are
-        the world's to say."""
-        return self.clear(position) and position not in self.shelves
+        """Inside the map, and neither a wall, a shelf nor a low cell: a tile to walk on.
+        Doors are the world's to say."""
+        return self.clear(position) and position not in self.shelves and position not in self.low
+
+    def flies(self, position: Position) -> bool:
+        """A tile a flight crosses: one to walk on, or a low cell (D186)."""
+        return self.free(position) or position in self.low
 
     def clear(self, position: Position) -> bool:
         """Inside the map and not a wall: a tile sight passes, shelves too (D46)."""
@@ -396,9 +445,11 @@ class _Shape:
     width: int
     height: int
     walls: frozenset[Position]
+    #: The cells no one walks on and sight passes: shelves, and low cells (D186).
     shelves: frozenset[Position]
     markers: dict[str, Position]
     start: Position
+    low: frozenset[Position] = frozenset()
 
     def place(self, spec: dict[str, Any], what: str, walks: bool = False) -> Position:
         """Where a thing lies, or, with `walks`, where an actor stands: not on a shelf."""
@@ -487,6 +538,9 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
     hidden = spec.get("hidden", False)
     if not isinstance(hidden, bool) or (hidden and kind not in CARRIED_KINDS):
         raise LevelError(f"{shape.level_id}: only a thing the wizard carries is hidden")
+    knotted = spec.get("knotted", False)
+    if not isinstance(knotted, bool) or ("knotted" in spec and kind != "broom"):
+        raise LevelError(f"{shape.level_id}: only a broom is knotted, true or false")
     covers = _covers(shape, spec, thing_id)
     pillow_side = _pillow_side(shape, spec, thing_id)
     position = shape.place(spec, thing_id)
@@ -505,6 +559,7 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         covers=covers,
         pillow_side=pillow_side,
         cells=_cells(shape, spec, thing_id, position),
+        knotted=knotted,
     )
 
 
@@ -594,9 +649,10 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
         facing = _towards(path[0], path[1]) if len(path) > 1 else "down"
     if facing not in FACINGS:
         raise LevelError(f"{shape.level_id}: {actor_id} faces up, down, left or right")
+    # A teacher who only stands by, Ilda on the field, sees nothing: sight 0.
     sight = spec.get("sight", DEFAULT_SIGHT)
-    if not isinstance(sight, int) or isinstance(sight, bool) or sight < 1:
-        raise LevelError(f"{shape.level_id}: {actor_id}'s sight must be a whole number, 1 or more")
+    if not isinstance(sight, int) or isinstance(sight, bool) or sight < 0:
+        raise LevelError(f"{shape.level_id}: {actor_id}'s sight must be a whole number, 0 or more")
     patrol = tuple(path) if len(path) > 1 else ()
     asleep = spec.get("asleep")
     if asleep is not None and not isinstance(asleep, str):
@@ -801,6 +857,64 @@ def _carrying(data: dict[str, Any], level_id: str, start: Position) -> tuple[Thi
     return tuple(ThingSpec(kind, kind, start, carried=True) for kind in kinds)
 
 
+def _race(value: Any, shape: _Shape, actors: tuple[ActorSpec, ...]) -> Race | None:
+    """A level's race (D189): `{"against": <a racer's id>, "lines": <its program's
+    lines>, "path": [[x, y], ...], "finish": [x, y]}`, the path's turning points from
+    where the racer stands, flown in straight lines over cells a flight crosses, a
+    point the same as the one before a tick circling there, the finish one of its
+    cells."""
+    if value is None:
+        return None
+    level_id = shape.level_id
+    if not isinstance(value, dict) or set(value) != {"against", "lines", "path", "finish"}:
+        raise LevelError(f"{level_id}: a race names its racer, its lines, its path and its finish")
+    racers = {actor.id: actor for actor in actors if actor.kind == "racer"}
+    racer = racers.get(value["against"])
+    if racer is None:
+        raise LevelError(f"{level_id}: the race is against {value['against']}, no racer here")
+    lines = value["lines"]
+    if isinstance(lines, bool) or not isinstance(lines, int) or lines < 1:
+        raise LevelError(f"{level_id}: a racer's lines are a whole number, 1 or more")
+    points = value["path"]
+    if not isinstance(points, list) or not points:
+        raise LevelError(f"{level_id}: a race's path is a list of [x, y]")
+    path, here = [], racer.position
+    for point in points:
+        there = shape.tile(point, f"{racer.id}'s path")
+        if there == here:
+            path.append(here)
+            continue
+        if there.x != here.x and there.y != here.y:
+            raise LevelError(f"{level_id}: {racer.id}'s path goes in straight lines")
+        dx = (there.x > here.x) - (there.x < here.x)
+        dy = (there.y > here.y) - (there.y < here.y)
+        while here != there:
+            here = Position(here.x + dx, here.y + dy)
+            if here in shape.walls or (here in shape.shelves and here not in shape.low):
+                raise LevelError(f"{level_id}: {racer.id}'s path flies into a wall")
+            path.append(here)
+    finish = shape.tile(value["finish"], "the race's finish")
+    if finish not in path:
+        raise LevelError(f"{level_id}: {racer.id}'s path never crosses the finish")
+    return Race(racer.id, lines, tuple(path), finish)
+
+
+def _kinds(data: dict[str, Any]) -> dict[Position, str]:
+    """On a scene, the kind of each cell's terrain no one walks on (on_scene gives the
+    scene's letters, `terrain`, and their kinds, `terrains`, and its walked letters,
+    `walked`): what the wizard thinks of where it cannot go (D186)."""
+    rows, kinds = data.get("terrain"), data.get("terrains")
+    if not isinstance(rows, list) or not isinstance(kinds, dict):
+        return {}
+    walked = set(data.get("walked", []))
+    return {
+        Position(x, y): kinds[letter]
+        for y, row in enumerate(rows)
+        for x, letter in enumerate(row)
+        if letter not in walked and letter in kinds
+    }
+
+
 def _high(data: dict[str, Any], shelves: frozenset[Position]) -> frozenset[Position]:
     """The shelves a thing lies up on (D129): on a scene, those whose terrain is of
     HIGH_KINDS (on_scene gives the scene's letters, `terrain`, and their kinds,
@@ -840,11 +954,12 @@ def _check_ids(
 
 
 #: What a scene's letters are when it gives no table of its own (D65): wall,
-#: floor and shelf, as in a level's map.
+#: floor, shelf and a low cell, as in a level's map.
 DEFAULT_TERRAINS = {
-    WALL: {"kind": "wall", "walk": False, "sight": False},
-    FLOOR: {"kind": "floor", "walk": True, "sight": True},
-    SHELF: {"kind": "shelf", "walk": False, "sight": True},
+    WALL: {"kind": "wall", "walk": False, "sight": False, "fly": False},
+    FLOOR: {"kind": "floor", "walk": True, "sight": True, "fly": True},
+    SHELF: {"kind": "shelf", "walk": False, "sight": True, "fly": False},
+    LOW: {"kind": "low", "walk": False, "sight": True, "fly": True},
 }
 
 
@@ -890,10 +1005,13 @@ def read_scene(scenes: Path, scene_id: Any, level_id: Any = None) -> Scene:
             raise LevelError(f"{scene_id}: a terrain is one letter, not S or E, with its kind")
         if not isinstance(terrain.get("kind"), str):
             raise LevelError(f"{scene_id}: the terrain {letter} needs its kind")
+        walk = bool(terrain.get("walk", False))
         terrains[letter] = {
             "kind": terrain["kind"],
-            "walk": bool(terrain.get("walk", False)),
-            "sight": bool(terrain.get("sight", terrain.get("walk", False))),
+            "walk": walk,
+            "sight": bool(terrain.get("sight", walk)),
+            # Floor flies; a terrain no one walks on flies only when it says so (D186).
+            "fly": walk or bool(terrain.get("fly", False)),
         }
     unknown = sorted({char for row in rows for char in row} - set(terrains))
     if unknown:
@@ -985,7 +1103,12 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
         line = []
         for char in row:
             terrain = scene.terrains[char]
-            line.append(FLOOR if terrain["walk"] else SHELF if terrain["sight"] else WALL)
+            if terrain["walk"]:
+                line.append(FLOOR)
+            elif terrain.get("fly"):
+                line.append(LOW)
+            else:
+                line.append(SHELF if terrain["sight"] else WALL)
         grid.append(line)
     for key, letter in (("start", START), ("end", "E")):
         if key not in data:
@@ -1007,6 +1130,9 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
     built["map"] = ["".join(row) for row in grid]
     built["terrain"] = list(scene.rows)
     built["terrains"] = {letter: terrain["kind"] for letter, terrain in scene.terrains.items()}
+    built["walked"] = sorted(
+        letter for letter, terrain in scene.terrains.items() if terrain["walk"]
+    )
     if scene.props:
         built["props"] = list(scene.props)
     if scene.things or data.get("things"):

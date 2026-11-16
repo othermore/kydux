@@ -161,7 +161,7 @@ def _with(**change):
             "through a wall",
         ),
         (_with(actors=[{"kind": "teacher", "id": "t", "marker": "T", "facing": "n"}]), "faces"),
-        (_with(actors=[{"kind": "teacher", "id": "t", "marker": "T", "sight": 0}]), "sight"),
+        (_with(actors=[{"kind": "teacher", "id": "t", "marker": "T", "sight": -1}]), "sight"),
         (_with(api=["wizard.fly"]), "which no object has"),
         (_with(api="wizard.move_right"), "a list of names"),
         (_with(goals=[{"kind": "lines_under", "lines": 3, "bonus": True}]), "not a bonus"),

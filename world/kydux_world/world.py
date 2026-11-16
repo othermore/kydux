@@ -11,18 +11,23 @@ A run ends early when the wizard is caught or past the tick limit. Both are
 raised as BaseExceptions, which the child's `except Exception` does not
 catch; and a world that has ended refuses every further action, so that a
 bare `except:` cannot carry the run on.
+
+A level that is a race (D189) starts with Ilda reading the program, a tick a
+line, before the wizard's first action, and ends with the race flown out; a
+wizard in the air when the program ends sets down where it is (D185).
 """
 
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
+from functools import partial
 from typing import Any
 
 from .actors import Actor, Friend, Teacher, make_actor, sight_tiles
-from .goals import make_goal
+from .goals import code_lines, make_goal
 from .level import CARRIED_KINDS, Level, Position
-from .things import Bed, Child, Door, Hole, Thing, make_thing, steps_between
+from .things import Bed, Child, Door, Hole, Ring, Thing, make_thing, steps_between
 
 CHILD = "<child>"
 
@@ -77,6 +82,17 @@ class Caught(RunOver):
         self.by = by
 
 
+class Refused(Exception):
+    """An action the world cannot do with what it is given, which stops the child's
+    program as any error does and is explained in the child's words (D22): untying a
+    broom with no knot (`no_knot`, D183). Its words name the thing, `by`."""
+
+    def __init__(self, reason: str, by: str) -> None:
+        super().__init__(f"{by}: {reason}")
+        self.reason = reason
+        self.by = by
+
+
 class ActionArguments(TypeError):
     """An action given what it cannot take; `example`, how to call it, when its
     docstring's first example is not the one the child needs."""
@@ -103,6 +119,8 @@ DELTAS = ((0, -1), (-1, 0), (1, 0), (0, 1))
 #: How far the wizard walks to the cell under a bed's pillow to go to bed, at most
 #: (D130).
 PILLOW_WALK = 8
+#: The ticks a ring missed costs in a race, served before the finish (D189).
+RING_PENALTY = 5
 
 
 def _direction(here: Position, there: Position) -> Direction:
@@ -136,7 +154,56 @@ class World:
         self.met_at: dict[int, int] = {}
         self.failed_at: dict[int, int] = {}
         self._line: int | None = None
+        #: The reason an error stopped the program, or the world refused it, once one
+        #: did: what the `no_error` goal fails at.
+        self.error: str | None = None
+        #: In a race (D189): the lines Ilda read, the tick the wizard crossed the finish
+        #: at, and the ticks it served for the rings it missed.
+        self.read_lines = 0
+        self.crossed_at: int | None = None
+        self.penalty = 0
+        #: The hidden things the wizard has found, by id (D184).
+        self.found: set[str] = set()
         self._check_goals()
+
+    def begin(self) -> None:
+        """The run's start, before the wizard's first action: in a race, Ilda reads
+        the program, a tick a line, the line she reads lit, while the wizard stands on
+        the start and the racer waits for its own lines (D189)."""
+        if self.level.race is None:
+            return
+        counted = [
+            number
+            for number, line in enumerate(self.code.splitlines(), 1)
+            if line.strip() and not line.strip().startswith("#")
+        ]
+        self.read_lines = code_lines(self.code)
+        at = list(self.wizard.position)
+        for count, number in enumerate(counted, 1):
+            self.act("read", {"at": at, "count": count, "lines": self.read_lines}, line=number)
+
+    def rings(self) -> list[str]:
+        """The rings the wizard must fly through, in order: the `through_in_order`
+        goal's (D187)."""
+        for spec in self.level.goals:
+            if spec.kind == "through_in_order":
+                return list(spec.params.get("ids", []))
+        return []
+
+    def missed(self) -> list[str]:
+        """The rings not flown through in their order (D187): a ring is flown through in
+        its turn when it comes after the last one flown through; one passed over to
+        fly through a later one is missed, and so is one flown through out of its
+        turn, and one not flown through yet."""
+        order = self.rings()
+        done, passed = -1, set()
+        for event in self.events:
+            if event.kind == "through" and event.data.get("id") in order:
+                index = order.index(event.data["id"])
+                if index > done:
+                    done = index
+                    passed.add(event.data["id"])
+        return [ring for ring in order if ring not in passed]
 
     def namespace(self) -> dict[str, Child]:
         """What the child's code holds: the wizard, and the level's things and actors by
@@ -145,11 +212,12 @@ class World:
         things = {name: thing for name, thing in self.things.items() if not thing._k_spec.carried}
         return {"wizard": self.wizard, **things, **self.actors}
 
-    def is_free(self, position: Position) -> bool:
+    def is_free(self, position: Position, flying: bool = False) -> bool:
         """Whether the wizard or an actor can walk onto a tile in the next tick: floor,
         no closed door, no open door's leaf (D125), and no cell of an open hole (D53,
-        D167)."""
-        if not (self.level.free(position) and self._not_shut(position)):
+        D167); or, `flying`, fly into it, a low cell too (D186)."""
+        ground = self.level.flies(position) if flying else self.level.free(position)
+        if not (ground and self._not_shut(position)):
             return False
         if self.leaf_over(position) is not None:
             return False
@@ -182,10 +250,19 @@ class World:
         return door is None or door.is_open
 
     def friend_at(self, position: Position) -> str | None:
-        """The id of the friend standing on a tile, or None (D66)."""
+        """The id of the friend standing on a tile, or None (D66): a friend, or a teacher
+        who only stands by and watches for no one, as Ilda on the field (sight 0)."""
         for actor in self.actors.values():
-            if isinstance(actor, Friend) and actor.position == position:
+            standing = isinstance(actor, Teacher) and not actor._k_spec.sight
+            if (isinstance(actor, Friend) or standing) and actor.position == position:
                 return actor.name
+        return None
+
+    def ring_at(self, position: Position) -> Ring | None:
+        """The ring standing on a tile, or None (D187)."""
+        for thing in self.things.values():
+            if isinstance(thing, Ring) and thing._k_position == position:
+                return thing
         return None
 
     def door_at(self, position: Position) -> Door | None:
@@ -262,12 +339,19 @@ class World:
             self.over = TooManyTicks(self.level.tick_limit)
             raise self.over
 
-    def act(self, kind: str, data: dict[str, Any], then: Callable[[], None] | None = None) -> None:
+    def act(
+        self,
+        kind: str,
+        data: dict[str, Any],
+        then: Callable[[], None] | None = None,
+        line: int | None | object = CHILD,
+    ) -> None:
         """One tick of the wizard's: its event, what it does to the world (`then`, as a
-        door opening to a spell), every actor's step, who sees it, the goals."""
+        door opening to a spell), every actor's step, who sees it, the goals. Its line
+        is the child's code's running now, or the one given (Ilda's reading, D189)."""
         self.ready()
         self.tick += 1
-        self._line = child_line()
+        self._line = child_line() if line is CHILD else line  # type: ignore[assignment]
         self.events.append(Event(self.tick, "wizard", kind, data, self._line))
         if then is not None:
             then()
@@ -286,8 +370,31 @@ class World:
             self.over = Caught(self.caught_by)
             raise self.over
 
-    def finish(self) -> None:
-        """The child's code has ended: the goals that are met only then are checked."""
+    def refuse(self, by: str, reason: str, at: list[int]) -> None:
+        """The wizard tries what cannot be done, and the program stops with an error in
+        the child's words (D183): the try is seen, a tick, and raises."""
+        self.act("blocked", {"at": at, "by": by, "reason": reason, "tried": True})
+        self.error = reason
+        raise Refused(reason, by)
+
+    def finish(self, ended: bool = True) -> None:
+        """The child's code has ended, `ended` when it came to its end with the world
+        still running: a broom in the air sets down where it is (D185), a race is flown
+        out until the racer crosses the finish, unless the wizard stands on its last
+        cell (D189); then the goals that are met only then are checked."""
+        if self.over is None and self.wizard._k_flying:
+            self.wizard._set(flying=False)
+            self.note("broom", "land", {"id": "wizard", "at": list(self.wizard.position)})
+        race = self.level.race
+        if ended and self.over is None and race is not None:
+            last = race.path[race.path.index(race.finish)]
+            end = race.tick - 1 if last == self.wizard.position else race.tick
+            at = list(self.wizard.position)
+            try:
+                while self.tick < min(end, self.level.tick_limit):
+                    self.act("wait", {"at": at, "after": True}, line=None)
+            except RunOver:
+                pass
         self.finished = True
         self._check_goals()
 
@@ -334,7 +441,11 @@ class Wizard(Child):
     _k_role = "wizard"
 
     def __init__(self, world: World) -> None:
-        self._set(world=world, position=world.level.start, facing=Direction.DOWN)
+        # `ring`: the ring whose cell the wizard flew into, and the way it was going, so
+        # that flying on the same way out of it goes through the ring (D187).
+        self._set(
+            world=world, position=world.level.start, facing=Direction.DOWN, flying=False, ring=None
+        )
 
     def __repr__(self) -> str:
         here = self._k_position
@@ -355,6 +466,11 @@ class Wizard(Child):
         """The things the wizard carries, as a list: `wizard.items`"""
         return self._k_world.carried()
 
+    @property
+    def flying(self) -> bool:
+        """True while the wizard flies on its broom, from drevo on: `wizard.flying`"""
+        return self._k_flying
+
     def _move(self, direction: Direction, steps: int) -> None:
         world: World = self._k_world
         for _ in range(steps):
@@ -363,6 +479,7 @@ class Wizard(Child):
             dx, dy = direction.delta
             here = self._k_position
             ahead = Position(here.x + dx, here.y + dy)
+            flying = self._k_flying
             friend = world.friend_at(ahead)
             if friend is not None:
                 # A friend stands in the way: the wizard walks round (D66).
@@ -388,18 +505,71 @@ class Wizard(Child):
                 }
                 world.act("blocked", {**refused, "facing": direction.value})
                 return
-            if not world.is_free(ahead):
+            if not flying and ahead in world.level.low:
+                # Water, a hedge, a bench: a flight crosses it, a walk does not (D186).
+                kind = world.level.kinds.get(ahead, "low")
+                refused = {"at": list(here), "by": "wizard", "reason": "no_walk", "tried": False}
+                world.act("blocked", {**refused, "facing": direction.value, "kind": kind})
+                return
+            ring = world.ring_at(ahead)
+            if ring is not None and not (flying and direction in (Direction.UP, Direction.DOWN)):
+                # A ring is flown through from above or below, never walked into nor flown
+                # into from its side (D187).
+                world.act(
+                    "bump",
+                    {"at": list(here), "facing": direction.value, "by": "ring", "id": ring.name},
+                )
+                return
+            if not world.is_free(ahead, flying):
                 by = (
                     "door"
                     if world.door_at(ahead) is not None
                     else "hole"
                     if world.hole_at(ahead) is not None
+                    else "high"
+                    if flying
                     else "wall"
                 )
-                world.act("bump", {"at": list(here), "facing": direction.value, "by": by})
+                bumped = {"at": list(here), "facing": direction.value, "by": by}
+                if ahead in world.level.kinds:
+                    bumped["kind"] = world.level.kinds[ahead]
+                world.act("bump", bumped)
                 return
-            self._set(position=ahead)
-            world.act("move", {"from": list(here), "to": list(ahead), "facing": direction.value})
+            race = world.level.race
+            if race is not None and ahead == race.finish and world.crossed_at is None:
+                # Five ticks before the finish for each ring missed, circling (D189).
+                missed = world.missed()
+                for ring_id in missed:
+                    for _ in range(RING_PENALTY):
+                        world.act("circle", {"at": list(here), "ring": ring_id})
+                        world.penalty += 1
+            through = self._k_through(direction)
+            self._set(position=ahead, ring=(ring.name, direction) if ring is not None else None)
+            step = {"from": list(here), "to": list(ahead), "facing": direction.value}
+            world.act(
+                "move",
+                {**step, "flying": True} if flying else step,
+                then=partial(self._k_moved, through, here, ahead),
+            )
+
+    def _k_moved(self, through: str | None, here: Position, ahead: Position) -> None:
+        """In a move's tick, before the goals are looked at: the ring flown through
+        (D187), and a race's finish crossed (D189)."""
+        world: World = self._k_world
+        if through is not None:
+            world.note(through, "through", {"id": through, "at": list(here)})
+        race = world.level.race
+        if race is not None and ahead == race.finish and world.crossed_at is None:
+            world.crossed_at = world.tick
+
+    def _k_through(self, direction: Direction) -> str | None:
+        """The ring whose cell the wizard leaves the way it flew in, so flying through
+        it (D187), or None."""
+        entered = self._k_ring
+        if entered is None:
+            return None
+        name, way = entered
+        return name if way == direction else None
 
     def move_right(self, steps: int = 1) -> None:
         """Walk right, one tile per step, stopping at a wall or a closed door:
@@ -422,8 +592,10 @@ class Wizard(Child):
         self._move(Direction.DOWN, _steps("move_down", steps))
 
     def say(self, text: object) -> None:
-        """Say something out loud; a door beside the wizard opens to its password:
-        `wizard.say("Hello!")`"""
+        """Say something out loud, a word or a number; a door beside the wizard opens to
+        its password: `wizard.say("Hello!")`, `wizard.say(6)`"""
+        if not isinstance(text, str | int | float):
+            raise ActionArguments("say", "say() takes a word or a number", 'wizard.say("Hello!")')
         world: World = self._k_world
         said = str(text)
         world.ready()
@@ -572,6 +744,7 @@ class Wizard(Child):
         """The nearest thing of a kind, or None when there is none:
         `wizard.find_nearest("key")`"""
         nearby = self._nearby(kind)
+        self._k_found(nearby[:1])
         return nearby[0] if nearby else None
 
     def find_item(self, kind: str) -> Thing | None:
@@ -581,8 +754,26 @@ class Wizard(Child):
         return sorted(carried, key=lambda item: item.name)[0] if carried else None
 
     def find_all(self, kind: str) -> list[Child]:
-        """Every thing of a kind, nearest first, as a list: `wizard.find_all("book")`"""
-        return self._nearby(kind)
+        """Every thing of a kind, nearest first, as a list: `wizard.find_all("broom")`"""
+        nearby = self._nearby(kind)
+        self._k_found(nearby)
+        return nearby
+
+    def _k_found(self, found: list[Child]) -> None:
+        """What the wizard finds that lay hidden, a broom in the straw, is seen from then
+        on: the world's `found` event, in the tick going on, since finding takes none
+        (D184)."""
+        world: World = self._k_world
+        hidden = [
+            thing
+            for thing in found
+            if isinstance(thing, Thing) and thing._k_spec.hidden and thing.name not in world.found
+        ]
+        if not hidden:
+            return
+        world.found.update(thing.name for thing in hidden)
+        cells = [list(thing._k_position) for thing in hidden]
+        world.note("world", "found", {"ids": [thing.name for thing in hidden], "at": cells})
 
     def sleep(self) -> None:
         """Lie down in a free bed beside the wizard, and sleep: `wizard.sleep()`"""
@@ -760,6 +951,22 @@ def _orvim(world: World, here: Position, _thing: Thing | None = None) -> Effect:
     return Effect(then=lambda: world.note("world", "map", {"at": list(here)}))
 
 
+def _drevo(world: World, here: Position, _thing: Thing | None = None) -> Effect:
+    """Lifts the broom the wizard carries into the air (D185): from then on every move
+    flies, over the low cells and through the rings, until the program ends and the
+    broom sets down; with no broom carried, refused; in the air already, nothing."""
+    if not world.wizard.has("broom"):
+        return Effect(refused="no_broom")
+    if world.wizard._k_flying:
+        return Effect()
+
+    def lift() -> None:
+        world.wizard._set(flying=True)
+        world.note("broom", "fly", {"id": "wizard", "at": list(here)})
+
+    return Effect(then=lift)
+
+
 #: Each spell's effect, by its name (D42); kydux_world.level.KNOWN_SPELLS lists the
 #: same names, so that a level can be checked without the world.
 SPELLS: dict[str, Callable[[World, Position, Thing | None], Effect]] = {
@@ -768,4 +975,5 @@ SPELLS: dict[str, Callable[[World, Position, Thing | None], Effect]] = {
     "kirra": _kirra,
     "osto": _osto,
     "orvim": _orvim,
+    "drevo": _drevo,
 }

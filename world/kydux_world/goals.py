@@ -9,9 +9,17 @@ The kinds: reach (the run ends with the wizard on a marker's tile, or on
 one at x and y; passing over it on the way does not count, unless the goal says
 `"on_the_way": true`, for a level whose ways end in different cells), collect (a thing by
 id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
-say (a text, word for word), give (a thing by id, to an actor by id), cast (a
-spell cast, not a word refused: `{"kind": "cast", "spell": "osto"}`, D176), no_bumps
-(the wizard bumps into nothing; failed at the first bump),
+say (a text, word for word, or the number of things of a kind in the way played:
+`{"kind": "say", "count_of": "broom"}`, D184), give (a thing by id, to an actor by
+id), cast (a spell cast, not a word refused: `{"kind": "cast", "spell": "osto"}`,
+D176, maybe from one of a few cells, `"from": [[x, y], ...]`), no_bumps
+(the wizard bumps into nothing; failed at the first bump), untied (no broom knotted;
+failed at the run's end with one still knotted, D183), no_error (the run ends
+without an error, nor the world refusing the program; failed at the first),
+through_in_order (the rings named, flown through in that order: `{"kind":
+"through_in_order", "ids": ["ring_1", ...]}`, D187), before (the wizard crosses a
+race's finish at a tick lower than the racer's: `{"kind": "before", "racer":
+"zarek"}`, D189),
 not_seen_by (an actor; failed when it catches the wizard), ticks_under (the
 run ends in fewer ticks than that, so that the shorter of two winning programs
 earns it, D133), and three read from the code before the run: lines_under
@@ -51,6 +59,13 @@ class GoalResult:
     bonus: bool = False
     #: A reach goal not met that the wizard walked over on the way.
     walked_over: bool = False
+
+    @staticmethod
+    def shown(goal: "Goal", spec: GoalSpec, world: "World") -> dict[str, Any]:
+        """A goal's params for the page: its spec's, and what the goal adds from the
+        run (its `shown`): the rings missed, a race's count."""
+        more = getattr(goal, "shown", None)
+        return {**spec.params, **(more(world) if more is not None else {})}
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -131,12 +146,16 @@ class OpenGoal:
 
 
 class SayGoal:
-    """Met once the wizard has said a text, word for word."""
+    """Met once the wizard has said a text, word for word; or, with `count_of`, the
+    number of things of a kind the way played has (D184)."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
         text = spec.params.get("text")
+        kind = spec.params.get("count_of")
+        if isinstance(kind, str) and text is None:
+            text = str(sum(1 for thing in level.things if thing.kind == kind))
         if not isinstance(text, str):
-            raise LevelError(f"{level.id}: a say goal needs a text")
+            raise LevelError(f"{level.id}: a say goal needs a text, or count_of a kind")
         self.text = text
 
     def check(self, world: "World") -> bool:
@@ -144,6 +163,97 @@ class SayGoal:
             e.actor == "wizard" and e.kind == "say" and e.data.get("text") == self.text
             for e in world.events
         )
+
+
+class UntiedGoal:
+    """Met once no broom of the level is knotted; failed at the run's end when one still
+    is (D183): `{"kind": "untied"}`."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        if not any(thing.kind == "broom" for thing in level.things):
+            raise LevelError(f"{level.id}: an untied goal needs a broom")
+
+    def check(self, world: "World") -> bool:
+        return not self._knotted(world)
+
+    def failed(self, world: "World") -> bool:
+        return world.finished and self._knotted(world)
+
+    @staticmethod
+    def _knotted(world: "World") -> bool:
+        return any(getattr(thing, "_k_knotted", False) for thing in world.things.values())
+
+
+class NoErrorGoal:
+    """Met at the end of a run with no error in it; failed at the first, an error of the
+    child's code or the world refusing what it asked, untying a broom with no knot:
+    `{"kind": "no_error"}` (D183)."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        pass
+
+    def check(self, world: "World") -> bool:
+        return world.finished and world.error is None
+
+    def failed(self, world: "World") -> bool:
+        return world.error is not None
+
+
+class ThroughInOrderGoal:
+    """Met once every ring named is flown through, each after the one before it in the
+    list (D187); the page is shown the rings missed: passed over, flown through out of
+    their turn, or not flown through by the run's end. Failed at the run's end."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        ids = spec.params.get("ids")
+        rings = {thing.id for thing in level.things if thing.kind == "ring"}
+        if not isinstance(ids, list) or not ids or not all(ring in rings for ring in ids):
+            raise LevelError(f"{level.id}: a through_in_order goal names rings of the level")
+        if len(set(ids)) != len(ids):
+            raise LevelError(f"{level.id}: a through_in_order goal names a ring twice")
+        self.ids = ids
+
+    def check(self, world: "World") -> bool:
+        return not world.missed()
+
+    def failed(self, world: "World") -> bool:
+        return world.finished and bool(world.missed())
+
+    def shown(self, world: "World") -> dict[str, Any]:
+        return {"missed": world.missed()}
+
+
+class BeforeGoal:
+    """Met when the wizard crosses the race's finish at a tick lower than the racer's;
+    a tie is the racer's (D189): `{"kind": "before", "racer": "zarek"}`. The page is
+    shown Ilda's count: the lines read, the flight, the ticks served for the rings
+    missed, the tick crossed at, and the racer's lines and tick."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        race = level.race
+        if race is None or spec.params.get("racer") != race.against:
+            raise LevelError(f"{level.id}: a before goal names the racer of the level's race")
+        self.race = race
+
+    def check(self, world: "World") -> bool:
+        return world.crossed_at is not None and world.crossed_at < self.race.tick
+
+    def failed(self, world: "World") -> bool:
+        if world.crossed_at is not None:
+            return world.crossed_at >= self.race.tick
+        return world.tick >= self.race.tick or world.finished
+
+    def shown(self, world: "World") -> dict[str, Any]:
+        tick = world.crossed_at
+        flight = None if tick is None else tick - world.read_lines - world.penalty
+        return {
+            "lines": world.read_lines,
+            "flight": flight,
+            "penalty": world.penalty,
+            "tick": tick,
+            "racer_lines": self.race.lines,
+            "racer_tick": self.race.tick,
+        }
 
 
 class NotSeenByGoal:
@@ -272,10 +382,22 @@ class CastGoal:
         if spell not in KNOWN_SPELLS:
             raise LevelError(f"{level.id}: the cast goal names {spell}, no spell")
         self.spell = spell
+        # With `from`, the cells the spell must be cast on (the jetty's, D185).
+        cells = spec.params.get("from")
+        if cells is not None and not (
+            isinstance(cells, list)
+            and cells
+            and all(isinstance(cell, list) and len(cell) == 2 for cell in cells)
+        ):
+            raise LevelError(f"{level.id}: the cast goal's from is a list of [x, y]")
+        self.cells = None if cells is None else [list(cell) for cell in cells]
 
     def check(self, world: "World") -> bool:
         return any(
-            e.actor == "wizard" and e.kind == "cast" and e.data.get("spell") == self.spell
+            e.actor == "wizard"
+            and e.kind == "cast"
+            and e.data.get("spell") == self.spell
+            and (self.cells is None or e.data.get("at") in self.cells)
             for e in world.events
         )
 
@@ -330,6 +452,10 @@ GOALS: dict[str, type] = {
     "cast": CastGoal,
     "sleep": SleepGoal,
     "no_bumps": NoBumpsGoal,
+    "untied": UntiedGoal,
+    "no_error": NoErrorGoal,
+    "through_in_order": ThroughInOrderGoal,
+    "before": BeforeGoal,
     "not_seen_by": NotSeenByGoal,
     "lines_under": LinesUnderGoal,
     "ticks_under": TicksUnderGoal,

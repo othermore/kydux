@@ -47,10 +47,6 @@
     9,
     8
   ],
-  "end": [
-    8,
-    5
-  ],
   "actors": [
     {
       "kind": "friend",
@@ -116,6 +112,50 @@
     },
     {
       "kind": "broom",
+      "id": "broom_10",
+      "at": [
+        10,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_11",
+      "at": [
+        11,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_12",
+      "at": [
+        12,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_13",
+      "at": [
+        13,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
       "id": "broom_1",
       "at": [
         7,
@@ -141,18 +181,13 @@
     "wizard.move_up",
     "wizard.move_down",
     "wizard.find_all",
-    "broom.untie"
+    "broom.untie",
+    "thing.distance_to"
   ],
   "goals": [
     {
       "kind": "untied",
       "zone": "wall"
-    },
-    {
-      "kind": "reach",
-      "marker": "E",
-      "hidden": true,
-      "on_the_way": true
     },
     {
       "kind": "uses",
@@ -162,8 +197,33 @@
   ],
   "ways": [
     {
-      "id": "two",
+      "id": "a",
       "things": [
+        {
+          "id": "broom_7",
+          "gone": true
+        },
+        {
+          "id": "broom_8",
+          "gone": true
+        },
+        {
+          "id": "broom_11",
+          "gone": true
+        },
+        {
+          "id": "broom_13",
+          "gone": true
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "things": [
+        {
+          "id": "broom_6",
+          "gone": true
+        },
         {
           "id": "broom_8",
           "gone": true
@@ -171,20 +231,33 @@
         {
           "id": "broom_9",
           "gone": true
-        }
-      ]
-    },
-    {
-      "id": "three",
-      "things": [
+        },
         {
-          "id": "broom_9",
+          "id": "broom_10",
+          "gone": true
+        },
+        {
+          "id": "broom_12",
           "gone": true
         }
       ]
     },
     {
-      "id": "four"
+      "id": "c",
+      "things": [
+        {
+          "id": "broom_7",
+          "gone": true
+        },
+        {
+          "id": "broom_10",
+          "gone": true
+        },
+        {
+          "id": "broom_11",
+          "gone": true
+        }
+      ]
     }
   ]
 }

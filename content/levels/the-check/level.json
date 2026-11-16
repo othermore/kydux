@@ -44,19 +44,15 @@
   },
   "tick_limit": 100,
   "start": [
-    6,
+    9,
     8
-  ],
-  "end": [
-    11,
-    5
   ],
   "actors": [
     {
       "kind": "friend",
       "id": "friend",
       "at": [
-        7,
+        8,
         8
       ]
     },
@@ -64,8 +60,8 @@
       "kind": "friend",
       "id": "mate",
       "at": [
-        7,
-        7
+        10,
+        8
       ]
     }
   ],
@@ -158,17 +154,12 @@
     "wizard.move_down",
     "wizard.find_all",
     "broom.untie",
-    "broom.knotted"
+    "broom.knotted",
+    "thing.distance_to"
   ],
   "goals": [
     {
       "kind": "untied"
-    },
-    {
-      "kind": "reach",
-      "marker": "E",
-      "hidden": true,
-      "on_the_way": true
     },
     {
       "kind": "no_error"
@@ -181,65 +172,77 @@
   ],
   "ways": [
     {
-      "id": "five",
+      "id": "a",
       "things": [
         {
-          "id": "broom_11",
-          "gone": true
-        },
-        {
-          "id": "broom_12",
-          "gone": true
-        },
-        {
-          "id": "broom_13",
-          "gone": true
-        },
-        {
-          "id": "broom_8",
+          "id": "broom_6",
           "knotted": true
         },
         {
-          "id": "broom_10",
-          "knotted": true
-        }
-      ]
-    },
-    {
-      "id": "six",
-      "things": [
-        {
-          "id": "broom_12",
+          "id": "broom_7",
           "gone": true
         },
         {
-          "id": "broom_13",
+          "id": "broom_9",
           "gone": true
-        },
-        {
-          "id": "broom_8",
-          "knotted": true
         },
         {
           "id": "broom_11",
           "knotted": true
+        },
+        {
+          "id": "broom_12",
+          "gone": true
         }
       ]
     },
     {
-      "id": "seven",
+      "id": "b",
       "things": [
-        {
-          "id": "broom_13",
-          "gone": true
-        },
         {
           "id": "broom_7",
           "knotted": true
         },
         {
+          "id": "broom_9",
+          "knotted": true
+        },
+        {
+          "id": "broom_10",
+          "gone": true
+        },
+        {
+          "id": "broom_12",
+          "knotted": true
+        },
+        {
+          "id": "broom_13",
+          "gone": true
+        }
+      ]
+    },
+    {
+      "id": "c",
+      "things": [
+        {
+          "id": "broom_6",
+          "gone": true
+        },
+        {
+          "id": "broom_8",
+          "gone": true
+        },
+        {
+          "id": "broom_9",
+          "knotted": true
+        },
+        {
           "id": "broom_10",
           "knotted": true
+        },
+        {
+          "id": "broom_11",
+          "gone": true
         },
         {
           "id": "broom_12",

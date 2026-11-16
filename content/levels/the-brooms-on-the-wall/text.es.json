@@ -2,17 +2,16 @@
   "title": "Las escobas de la pared",
   "goals": [
     "No dejes ninguna escoba colgada con nudo.",
-    "Camina junto a la pared al menos hasta la casilla (8, 5).",
     "Usa `for`."
   ],
-  "starting_code": "# Camina hacia arriba hasta la pared con `move_up`.\n# Ve a la izquierda hasta debajo del primer gancho con `move_left`.\n# Encuentra las escobas colgadas con `find_all`.\n# Para cada escoba de la lista:\n#     desátala con `untie`\n#     y da un paso a la derecha con `move_right`.\n",
+  "starting_code": "# Sube hasta la fila de debajo de los ganchos.\n# Ve a un extremo de esa fila.\n# Encuentra las escobas colgadas con `find_all`.\n# Para cada escoba de la lista:\n#     mira a qué distancia está con `distance_to`,\n#     camina esos pasos\n#     y desátala.\n",
   "hints": [
-    "Muévete 2 pasos hacia arriba y 3 a la izquierda para colocarte debajo del primer gancho.",
-    "Usa `find_all` para obtener la lista de las escobas colgadas, y luego empieza un bucle `for` para recorrerlas.",
-    "Dentro del bucle, ¡recuerda dejar espacios antes de `untie` y `move_right` para que el ordenador sepa que van dentro del bucle!"
+    "Sube hasta la pared y ve a un extremo. Como `find_all` da primero la más cercana, desde un extremo caminas siempre hacia el mismo lado.",
+    "Usa un bucle `for` para recorrer la lista. En cada vuelta, averigua a qué distancia está la escoba con `distance_to`.",
+    "¡Una escoba que cuelga justo encima de ti está a 0 pasos! Guarda la distancia en una variable, camina esos pasos y quítale el nudo."
   ],
-  "intro": "Las escobas de la paja las dejamos para luego. Primero vamos a ocuparnos de las colgadas. Tenemos que caminar junto a la pared y desatar cada una.",
+  "intro": "Las escobas de la paja las dejamos para luego. Primero vamos a ocuparnos de las colgadas. Tenemos que caminar junto a la pared y desatar cada una. Cuelgan de ganchos diferentes cada vez, con huecos entre ellas. Si vas primero a un extremo de la pared, `find_all` te las da empezando por la más cercana, y solo tienes que caminar hacia un lado. ¿Recuerdas `distance_to`, de la biblioteca? Te dice a cuántos pasos de ti está una cosa.",
   "outro": "¡Lo conseguimos! Las escobas de la pared están a salvo.",
-  "learned": "Ahora sabes que un `for` sobre una lista ejecuta sus líneas una vez para cada escoba, de modo que un solo programa funciona sin importar cuántas haya.",
+  "learned": "Ahora sabes que un bucle `for` te deja desatar cada escoba, y que `distance_to` te dice cuántos pasos caminar hasta la siguiente.",
   "changes": "El número de escobas de la pared y los ganchos de los que cuelgan cambian cada vez."
 }

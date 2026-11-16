@@ -2,17 +2,16 @@
   "title": "The brooms in the straw",
   "goals": [
     "Leave no broom knotted.",
-    "End on cell (6, 8).",
     "Use `x`."
   ],
-  "starting_code": "# Find all the brooms with `find_all`.\n# For each broom of the list:\n#     count the steps left with `position.x`\n#     and the steps down with `position.y`;\n#     move left with `move_left`\n#     and down with `move_down`;\n#     and untie it with `untie`.\n",
+  "starting_code": "# Find the brooms on the floor with `find_all`.\n# For each broom of the list:\n#     compare your `x` with the broom's `x` to choose left or right;\n#     take the smaller from the greater to know the steps, and walk them;\n#     do the same with `y` to go up or down;\n#     and untie it.\n",
   "hints": [
-    "Use a `for` loop to go through the brooms you find. Everything else goes inside the loop!",
-    "You get the distance by subtracting positions: `x` for the steps left and `y` for the steps down.",
-    "The steps left are your `x` minus the broom's `x`, and the steps down are the broom's `y` minus your `y`. Then use those numbers to walk to it and untie it!"
+    "Use a `for` loop. For each broom, compare its `x` with yours to see if it is to the left or to the right.",
+    "Remember our lesson: a smaller `x` means it is to the left, and a smaller `y` means it is higher up!",
+    "To find the steps, always take the smaller number from the greater one, as in the lesson. Then use `untie()`!"
   ],
-  "intro": "We're done with the brooms that were hanging. The rest are scattered in the straw! From where you are, if you use `find_all` you'll find them in order, starting with the nearest, and you can keep moving down and to the left to untie them all. You can work out how many steps you have to walk from where you are at each moment to the next broom, and so go through them all.",
+  "intro": "We're done with the brooms that were hanging. The rest are scattered in the straw! From where you are, if you use `find_all` you'll find them in order, starting with the nearest, but the next one may be on any side of you. You can work out how many steps you have to walk from where you are at each moment to the next broom, and so go through them all: compare its `x` and its `y` with yours to know where to walk, and take the smaller number from the greater for the steps.",
   "outro": "All done with the straw! You calculated every distance perfectly.",
-  "learned": "Now you know that inside the loop a program works with that turn's broom, so the same sums work for every one.",
+  "learned": "Now you know that you can use `if` and `<` inside a loop to compare coordinates and find the right number of steps to any side.",
   "changes": "The number of brooms on the floor and where they lie change each time, so the next one may be on any side."
 }

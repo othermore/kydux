@@ -2,17 +2,16 @@
   "title": "Las escobas de la paja",
   "goals": [
     "No dejes ninguna escoba con nudo.",
-    "Termina en la casilla (6, 8).",
     "Usa `x`."
   ],
-  "starting_code": "# Encuentra todas las escobas con `find_all`.\n# Para cada escoba de la lista:\n#     cuenta los pasos a la izquierda con `position.x`\n#     y los pasos hacia abajo con `position.y`;\n#     muévete a la izquierda con `move_left`\n#     y hacia abajo con `move_down`;\n#     y desátala con `untie`.\n",
+  "starting_code": "# Encuentra las escobas del suelo con `find_all`.\n# Para cada escoba de la lista:\n#     compara tu `x` con la `x` de la escoba para elegir izquierda o derecha;\n#     resta el menor del mayor para saber los pasos, y camínalos;\n#     haz lo mismo con la `y` para ir arriba o abajo;\n#     y desátala.\n",
   "hints": [
-    "Usa un bucle `for` para recorrer las escobas que encuentres. ¡Todo lo demás va dentro del bucle!",
-    "La distancia se calcula restando posiciones: la `x` para los pasos a la izquierda y la `y` para los pasos hacia abajo.",
-    "Los pasos a la izquierda son tu `x` menos la `x` de la escoba, y los pasos hacia abajo, la `y` de la escoba menos tu `y`. ¡Luego usa esos números para caminar hasta ella y desatarla!"
+    "Usa un bucle `for`. Para cada escoba, compara su `x` con la tuya para saber si está a la izquierda o a la derecha.",
+    "Recuerda la lección: ¡una `x` menor significa que está a la izquierda, y una `y` menor significa que está más arriba!",
+    "Para saber los pasos, resta siempre el número menor del mayor, como en la lección. ¡Luego usa `untie()`!"
   ],
-  "intro": "Ya hemos terminado con las escobas que estaban colgadas. ¡Las demás están tiradas por la paja! Desde donde estás, si usas `find_all` las encontrarás ordenadas empezando por la más cercana, y te puedes ir moviendo abajo y a la izquierda para ir desatando todas. Puedes calcular cuántos pasos tienes que andar desde donde estás en cada momento hasta la siguiente escoba, y así pasar por todas.",
+  "intro": "Ya hemos terminado con las escobas que estaban colgadas. ¡Las demás están tiradas por la paja! Desde donde estás, si usas `find_all` las encontrarás ordenadas empezando por la más cercana, pero la siguiente puede estar a cualquier lado de ti. Puedes calcular cuántos pasos tienes que andar desde donde estás en cada momento hasta la siguiente escoba, y así pasar por todas: compara su `x` y su `y` con las tuyas para saber hacia dónde caminar, y resta el número menor del mayor para saber los pasos.",
   "outro": "¡Terminamos con la paja! Has calculado cada distancia perfectamente.",
-  "learned": "Ahora sabes que dentro del bucle un programa trabaja con la escoba de esa vuelta, así que las mismas cuentas funcionan para todas.",
+  "learned": "Ahora sabes que puedes usar `if` y `<` dentro de un bucle para comparar coordenadas y encontrar los pasos exactos hacia cualquier lado.",
   "changes": "El número de escobas del suelo y dónde están cambian cada vez, así que la siguiente puede estar a cualquier lado."
 }

@@ -2654,8 +2654,8 @@ one overturns stays, marked as superseded.
   knot, and an `untie` from afar.
 - **D184 — `find_all`, `len` and a count said.** Decided 2026-11-10. The lesson on lists
   teaches `wizard.find_all(kind)`, which gives every thing of a kind as a Python list,
-  nearest first, ties by row and then column, hidden ones found as `find_nearest` finds
-  them, and `len`, which the sandbox lets through among the builtins. A hidden thing found
+  nearest first, a hung thing as near as the cell under it (D206), ties by row and then
+  column, hidden ones found as `find_nearest` finds them, and `len`, which the sandbox lets through among the builtins. A hidden thing found
   makes the world's `found` event, in the tick of the call or before the first tick, and
   the page draws it from then on: the brooms under the straw are not seen until a program
   looks for them, and those on the bare boards are seen from the start (D202).
@@ -3086,3 +3086,41 @@ one overturns stays, marked as superseded.
   and names zones only in a level that has two. Rules out a wall or an actor placed to
   keep the wizard from a part of a scene, and a goal that fails without a word when the
   wizard goes where the level does not want it.
+- **D206 — A walk is asked for by what it does, and a hung thing is as far as the cell it
+  is reached from.** Decided 2026-11-12 by the owner (*no me gusta lo de caminar hasta la
+  casilla 8,6. No creo que eso importe. Lo que importa es recorrer todas las escobas*;
+  and *hay que irse a un extremo y iterar por las escobas, moviendose la cantidad
+  definida con la funcion que te da la distancia a un objeto y, cuando estás al lado,
+  desatándola*). A level has a `reach` goal only where being on that cell is what the
+  level is about: a landing, a door's threshold, a bed's side. A level whose things must
+  all be dealt with has its goal on the things, and the walk follows from where they
+  are: in the shed, the wall's levels and the straw's have no `reach` goal and no `end`.
+  `distance_to` between the wizard and a hung thing counts the steps to the cell under
+  it, where the wizard stands to untie it (D195, D211): a broom hung over the wizard's
+  cell is 0 steps away, the next peg's 1 (`Thing._k_reached_from`). `find_all` and
+  `find_nearest` order by that same distance. A hung thing's `position` is its peg's
+  cell. In *Las escobas de la pared* the brooms hang on other pegs each time, with gaps,
+  and the program goes first to one end of the row under the pegs, so that the list,
+  nearest first, is the order of a walk in one direction; for each broom it walks its
+  `distance_to` and unties it. Rules out a hung broom one step further than the walk to
+  it, a level that asks to end on a cell to prove a walk, and pegs filled in a row from
+  one end so that a step of one a broom solves the level.
+- **D212 — A walk to a thing that may lie on any side compares before it subtracts.**
+  Decided 2026-11-12 by the owner (*tendra que ser capaz de moverse en las 4 direcciones
+  [...] De modo que hay que ver qué número es más grande para hacer movimientos a la
+  izquierda o la derecha. Para que el niño sepa hacer eso habría que explicarle las
+  comparaciones menor y mayor y recordárselo y hacerle un poco entender cómo se comportan
+  los números en las coordenadas*). `find_all` gives the floor's brooms nearest first
+  from where the list is made, and the next one may lie to the left or to the right of
+  the wizard, higher or lower. A move takes a whole number of steps, 0 or more, and the
+  world refuses a negative one (`error.arguments`). So the program asks first which of
+  the two numbers is the smaller, and then takes the smaller from the greater. The lesson
+  `less-or-greater` comes before *Las escobas de la paja* and teaches `<` and `>` and how
+  the coordinates' numbers behave: `x` grows to the right and `y` grows downwards, so a
+  thing with a smaller `x` is to the left and one with a smaller `y` is higher up. In
+  every arrangement of the straw's level the walk goes at least once left, right, up and
+  down, and no two brooms are equally far from the start. The course compares by size
+  with `<` and `>` only, from that lesson on: no `<=`, `>=`, `!=`, `abs`, `min` or `max`
+  until a level needs one (`test_course_content.py`). Rules out a level whose things lie
+  so that a program walks only two ways to them, a move that takes a negative number as
+  a walk the other way, and a level that needs a comparison before its lesson.

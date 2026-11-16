@@ -9,7 +9,9 @@
 // trees and the function that wins (D190); the race by Ilda's count, its band and its
 // card (D189); each story told to its end, the first on two scenes; the map's stops in
 // order; the shed's levels framed whole, their pegs clear of the page's panels (D201);
-// the shed's lying brooms in sight on the boards and hidden under the straw (D202).
+// the shed's lying brooms in sight on the boards and hidden under the straw (D202); the
+// wall walked by the distance from the row's end (D206); the straw's negative move
+// refused (D212).
 // Screenshots of every stop go to e2e/shots/chapter-4/, which git ignores, for the owner.
 
 import { mkdirSync, readFileSync } from 'node:fs';
@@ -28,10 +30,10 @@ const LEVELS = ITEMS.filter((item) => item.startsWith('level:')).map((item) => i
 const STORIES = ITEMS.filter((item) => item.startsWith('story:')).map((item) => item.slice('story:'.length));
 const solution = (id: string) => readFileSync(`${CONTENT}levels/${id}/solution.py`, 'utf8');
 const wrong = (id: string, name: string) => readFileSync(`${CONTENT}levels/${id}/wrong/${name}.py`, 'utf8');
-/** A level's lying brooms in a way, from its level.json: those in sight and those hidden
- * until a program finds them (D184, D202). */
-function lyingOf(id: string, way: string): { seen: string[]; hidden: string[] } {
-  type Thing = { id: string; kind?: string; hung?: boolean; hidden?: boolean; gone?: boolean };
+type Thing = { id: string; kind?: string; hung?: boolean; hidden?: boolean; gone?: boolean };
+
+/** A level's things in a way, from its level.json. */
+function thingsOf(id: string, way: string): Thing[] {
   const spec = JSON.parse(readFileSync(`${CONTENT}levels/${id}/level.json`, 'utf8'));
   const things = new Map<string, Thing>((spec.things as Thing[]).map((thing) => [thing.id, { ...thing }]));
   const changes: Thing[] = (spec.ways ?? []).find((one: { id: string }) => one.id === way)?.things ?? [];
@@ -39,7 +41,19 @@ function lyingOf(id: string, way: string): { seen: string[]; hidden: string[] } 
     if (change.gone) things.delete(change.id);
     else things.set(change.id, { ...things.get(change.id), ...change } as Thing);
   }
-  const lying = [...things.values()].filter((thing) => thing.kind === 'broom' && !thing.hung);
+  return [...things.values()];
+}
+
+/** A level's hung brooms in a way, by id. */
+const hungOf = (id: string, way: string): string[] =>
+  thingsOf(id, way)
+    .filter((thing) => thing.kind === 'broom' && thing.hung)
+    .map((thing) => thing.id);
+
+/** A level's lying brooms in a way, from its level.json: those in sight and those hidden
+ * until a program finds them (D184, D202). */
+function lyingOf(id: string, way: string): { seen: string[]; hidden: string[] } {
+  const lying = thingsOf(id, way).filter((thing) => thing.kind === 'broom' && !thing.hung);
   return {
     seen: lying.filter((thing) => !thing.hidden).map((thing) => thing.id),
     hidden: lying.filter((thing) => thing.hidden).map((thing) => thing.id),
@@ -238,12 +252,41 @@ test.describe('the shed', () => {
     }
   });
 
-  test('two brooms untied by hand win the way of two and lose the longer ones, which the card says changed (D51, D204)', async ({ page }) => {
+  test("on the wall the program walks from the row's end to each broom by its distance and unties it, each time (D206)", async ({
+    page,
+  }) => {
     await open(page, 'the-brooms-on-the-wall');
-    await run(page, wrong('the-brooms-on-the-wall', 'two_written_out'));
+    expect(await run(page, solution('the-brooms-on-the-wall'))).toMatch(/^¡Lo has conseguido/);
+    // Each way played back to its end: its hung brooms untied, the two on the boards left.
+    for (const way of waysOf('the-brooms-on-the-wall')) {
+      await page.locator('#way').selectOption(way, { force: true });
+      await expect(page.locator('#way')).toHaveValue(way);
+      await expect(page.locator('#again')).toBeHidden();
+      await expect(page.locator('#again')).toBeVisible({ timeout: ciTimes(60_000) });
+      await expect(page.locator('.outcome-text')).toContainText('Lo has conseguido');
+      await expect(scene(page)).toHaveAttribute('data-untied', hungOf('the-brooms-on-the-wall', way).sort().join(','));
+      await page.locator('#again').click();
+      await page.locator('.scene-frame').screenshot({ path: `${SHOTS}wall-untied-${way}.png` });
+    }
+  });
+
+  test('the steps written out win one arrangement and lose the others, which the card says changed (D51, D204)', async ({
+    page,
+  }) => {
+    await open(page, 'the-brooms-on-the-wall');
+    await run(page, wrong('the-brooms-on-the-wall', 'the_steps_written_out'));
     await expect(page.locator('.outcome')).not.toHaveAttribute('data-kind', 'won');
-    await expect(page.locator('#way')).toHaveValue('three');
+    await expect(page.locator('#way')).toHaveValue('b');
     await expect(page.locator('.outcome-text')).toContainText(/^Esta vez era distinto\. /);
+  });
+
+  test('in the straw a walk only left and down is refused at the first broom to the right, in the game\'s words (D212)', async ({
+    page,
+  }) => {
+    await open(page, 'the-brooms-in-the-straw');
+    expect(await run(page, wrong('the-brooms-in-the-straw', 'left_and_down_only'))).toMatch(/move_left no se usa así/);
+    await expect(scene(page)).toHaveAttribute('data-wizard', '10,6');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}straw-refused.png` });
   });
 
   test("the wall's program stops at the first broom, which has no knot, and the if mends it (D183)", async ({ page }) => {

@@ -4,6 +4,7 @@ in (D196), a story step's framing (D199), flying with drevo over the low cells (
 D186), the rings flown through in order (D187), the race scored by Ilda's count (D189),
 and the child's own functions."""
 
+import itertools
 import json
 from pathlib import Path
 
@@ -569,41 +570,98 @@ def found_from(level, moves=()):
     return [tuple(broom.position) for broom in world.wizard.find_all("broom")]
 
 
-@pytest.mark.parametrize(
-    ("way", "steps"),
-    [("four", [1, 4, 6, 7]), ("four_low", [1, 3, 5, 7]), ("four_mid", [2, 4, 6, 7])],
-)
-def test_in_the_straw_each_broom_lies_left_of_or_under_the_one_before_and_none_above(way, steps):
-    """D202: from the start, (12, 7), four brooms at growing distances, the last on (6, 8)."""
-    found = found_from(content_level("the-brooms-in-the-straw").way(way))
-    assert len(found) == 4 and found[-1] == (6, 8)
-    assert [abs(x - 12) + abs(y - 7) for x, y in found] == steps
-    for before, after in zip([(12, 7), *found], found, strict=False):
-        assert after != before and after[0] <= before[0] and after[1] >= before[1]
+#: The wall's pegs with a broom, by way, nearest first from the row's right end, (13, 5)
+#: (plan 2.3), and the steps of each walk to the next.
+WALL_PEGS = {
+    "a": ([12, 10, 9, 6], [1, 2, 1, 3]),
+    "b": ([13, 11, 7], [0, 2, 4]),
+    "c": ([13, 12, 9, 8, 6], [0, 1, 3, 1, 2]),
+}
 
 
-@pytest.mark.parametrize(("way", "count"), [("two", 2), ("three", 3), ("four", 4)])
-def test_on_the_wall_find_all_gives_the_hung_brooms_left_to_right(way, count):
+def walked_by_distance(world, knotted_only=False):
+    """The wall's program from the row's right end: the steps of each walk to the next
+    broom, by its distance (D206)."""
+    world.wizard.move_up(3)
+    world.wizard.move_right(4)
+    steps = []
+    for broom in world.wizard.find_all("broom"):
+        steps.append(broom.distance_to(world.wizard))
+        world.wizard.move_left(steps[-1])
+        if broom.knotted or not knotted_only:
+            broom.untie()
+    return steps
+
+
+@pytest.mark.parametrize("way", sorted(WALL_PEGS))
+def test_on_the_wall_the_pegs_come_nearest_first_from_the_end_and_each_walk_is_its_distance(way):
     level = content_level("the-brooms-on-the-wall").way(way)
+    pegs, steps = WALL_PEGS[way]
     # From the door, the two brooms lying on the boards, left for later (D202).
     assert found_from(level) == [(7, 7), (11, 7)]
-    # From the row under the pegs, the hung ones, each on its peg's cell (D211).
-    found = found_from(level, [("move_up", 3), ("move_left", 3)])
-    assert found == [(column, 4) for column in range(6, 6 + count)]
+    # From the row's end, the hung ones, each on its peg's cell (D211), nearest first.
+    assert found_from(level, [("move_up", 3), ("move_right", 4)]) == [(p, 4) for p in pegs]
+    world = World(level)
+    assert walked_by_distance(world) == steps
+    assert not any(world.things[f"broom_{p}"].knotted for p in pegs)
 
 
-@pytest.mark.parametrize(
-    ("way", "count", "knots"), [("five", 5, 2), ("six", 6, 2), ("seven", 7, 3)]
-)
-def test_in_the_check_the_hung_brooms_go_left_to_right_and_the_first_has_no_knot(
-    way, count, knots
-):
-    world = World(content_level("the-check").way(way))
+#: The check's pegs with a broom and those still knotted, by way (plan 2.3), and which of
+#: the list's brooms is the first with no knot.
+CHECK_PEGS = {
+    "a": ([13, 11, 10, 8, 6], [11, 6], 0),
+    "b": ([12, 11, 9, 8, 7, 6], [12, 9, 7], 1),
+    "c": ([13, 12, 10, 9, 7], [12, 10, 9], 0),
+}
+
+
+@pytest.mark.parametrize("way", sorted(CHECK_PEGS))
+def test_in_the_check_the_given_program_stops_at_the_first_broom_with_no_knot(way):
+    pegs, knots, first = CHECK_PEGS[way]
+    level = content_level("the-check").way(way)
+    world = World(level)
     world.wizard.move_up(3)
+    world.wizard.move_right(4)
     brooms = world.wizard.find_all("broom")
-    assert len(brooms) == count and sum(broom.knotted for broom in brooms) == knots
-    assert not brooms[0].knotted
-    assert [tuple(broom.position) for broom in brooms] == [(c, 4) for c in range(6, 6 + count)]
+    assert [tuple(broom.position) for broom in brooms] == [(p, 4) for p in pegs]
+    assert [broom.knotted for broom in brooms] == [p in knots for p in pegs]
+    assert [broom.knotted for broom in brooms].index(False) == first
+    # With the knot looked at first, each broom is reached by its distance and untied.
+    world = World(level)
+    walked_by_distance(world, knotted_only=True)
+    assert not any(world.things[f"broom_{p}"].knotted for p in pegs)
+
+
+#: The straw's brooms by way (plan 2.4): the list as find_all gives it from the start,
+#: (10, 6), and the walk from each to the next, columns to the right and rows down.
+STRAW_WALKS = {
+    "a": ([(11, 7), (7, 6), (8, 8), (13, 8)], [(1, 1), (-4, -1), (1, 2), (5, 0)]),
+    "b": (
+        [(9, 7), (13, 6), (6, 6), (7, 8), (6, 8)],
+        [(-1, 1), (4, -1), (-7, 0), (1, 2), (-1, 0)],
+    ),
+    "c": ([(10, 8), (7, 6), (12, 8)], [(0, 2), (-3, -2), (5, 2)]),
+}
+
+
+@pytest.mark.parametrize("way", sorted(STRAW_WALKS))
+def test_in_the_straw_the_walks_go_to_every_side_and_no_two_brooms_are_as_far(way):
+    """D212: in every way the walk goes left, right, up and down at least once, the
+    brooms lie at distances all different from the start, and the friend and the mate
+    stand by the wall, off every walk of rows 6 to 8."""
+    level = content_level("the-brooms-in-the-straw").way(way)
+    order, walks = STRAW_WALKS[way]
+    assert level.start == (10, 6)
+    found = found_from(level)
+    assert found == order
+    cells = [(10, 6), *found]
+    assert [(b[0] - a[0], b[1] - a[1]) for a, b in itertools.pairwise(cells)] == walks
+    assert any(x < 0 for x, _ in walks) and any(x > 0 for x, _ in walks)
+    assert any(y < 0 for _, y in walks) and any(y > 0 for _, y in walks)
+    distances = [abs(x - 10) + abs(y - 6) for x, y in found]
+    assert len(set(distances)) == len(distances)
+    assert all(not 6 <= actor.position.y <= 8 for actor in level.actors)
+    assert (5, 8) not in found
 
 
 #: El cobertizo's floor by way (plan 2.2): the brooms in sight, the hidden ones.
@@ -784,6 +842,35 @@ def test_a_hung_broom_is_untied_only_from_the_cell_just_under_its_peg():
     world.wizard.move_up(1)
     world.things["hung_1"].untie()
     assert not world.things["hung_1"].knotted
+
+
+def test_a_hung_broom_is_as_far_as_the_cell_under_its_peg_and_keeps_its_peg_s_position():
+    """D206: 0 steps from the cell under it, 1 from the next one along, either way
+    round; its position is its peg's cell."""
+    world = World(rack())
+    world.wizard.move_up(2)
+    world.wizard.move_left(2)
+    hung_1, hung_2 = world.things["hung_1"], world.things["hung_2"]
+    assert world.wizard.position == (2, 2) and hung_1.position == (2, 1)
+    assert hung_1.distance_to(world.wizard) == 0 == world.wizard.distance_to(hung_1)
+    assert hung_2.distance_to(world.wizard) == 1 == world.wizard.distance_to(hung_2)
+    assert hung_1.distance_to(hung_2) == 1
+    # A lying broom counts to its own cell.
+    assert world.things["fallen_2"].distance_to(world.wizard) == 2
+
+
+def test_find_all_and_find_nearest_order_a_hung_broom_by_the_cell_under_its_peg():
+    """D206: from (4, 2) a broom hung over (5, 2) is 1 step away, as near as one lying
+    on (4, 3), and comes first, its row being higher; counted to its peg it would be 2
+    steps away and come after."""
+    things = [
+        {"kind": "broom", "id": "hung", "at": [5, 1], "hung": True},
+        {"kind": "broom", "id": "lying", "at": [4, 3]},
+    ]
+    world = World(rack(zones={}, things=things, goals=[{"kind": "untied"}]))
+    world.wizard.move_up(2)
+    assert [b.name for b in world.wizard.find_all("broom")] == ["hung", "lying"]
+    assert world.wizard.find_nearest("broom").name == "hung"
 
 
 def test_find_all_finds_only_what_lies_in_the_zone_the_wizard_stands_in():

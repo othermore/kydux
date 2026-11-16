@@ -122,6 +122,14 @@ class Thing(Child):
             return world.wizard._k_position
         return None if self._k_unseen() else self._k_position
 
+    def _k_reached_from(self) -> Position | None:
+        """The cell the thing is reached from, which its distance counts to: where it is,
+        or the cell under its peg for a hung broom (D206)."""
+        where = self._k_where()
+        if where is not None and self._k_spec.hung and where == self._k_position:
+            return under(where)
+        return where
+
     def _k_unseen(self) -> bool:
         """Whether the thing lies in the dark, out of the wizard's reach (D52): a thing
         on the floor, not a door or a hole, which are the castle's shape."""
@@ -262,18 +270,26 @@ class Bed(Thing):
 
 def steps_between(one: Any, other: Any) -> int | None:
     """The steps between two of the child's objects along the rows and the columns
-    (D86), or None when either is unseen. Anything else is refused, as an action's
-    wrong argument is."""
+    (D86), to the cell under a hung broom (D206), or None when either is unseen.
+    Anything else is refused, as an action's wrong argument is."""
     from .world import ActionArguments
 
     if not isinstance(other, Child) or not hasattr(other, "_k_where"):
         raise ActionArguments(
             "distance_to", "distance_to() takes the wizard, a thing or someone, by its name"
         )
-    here, there = one._k_where(), other._k_where()
+    here, there = _reached_from(one), _reached_from(other)
     if here is None or there is None:
         return None
     return abs(here.x - there.x) + abs(here.y - there.y)
+
+
+def _reached_from(child: Any) -> Position | None:
+    """Where a distance counts from or to: a thing's cell it is reached from (D206), an
+    actor's or the wizard's own cell."""
+    if isinstance(child, Thing):
+        return child._k_reached_from()
+    return child._k_where()
 
 
 #: How many ticks `osto` holds a hole closed (D53, D167).

@@ -731,16 +731,19 @@ class Wizard(Child):
 
     def _nearby(self, kind: object) -> list[Child]:
         """The things and actors of a kind the wizard finds where it stands, nearest
-        first: a thing of a zone only from within it (D196)."""
+        first, a hung broom as near as the cell under it (D206): a thing of a zone only
+        from within it (D196)."""
         world: World = self._k_world
         here = self._k_position
         found: list[tuple[int, int, int, Child]] = []
         for item in [*world.things.values(), *world.actors.values()]:
-            where = item.position
             zone = item._k_spec.zone if isinstance(item, Thing) else None
             if zone is not None and here not in world.level.zones.get(zone, ()):
                 continue
-            if item.kind == kind and where is not None:
+            if item.kind != kind or item.position is None:
+                continue
+            where = item._k_reached_from() if isinstance(item, Thing) else item.position
+            if where is not None:
                 distance = abs(where.x - here.x) + abs(where.y - here.y)
                 found.append((distance, where.y, where.x, item))
         return [item for *_, item in sorted(found, key=lambda f: f[:3])]

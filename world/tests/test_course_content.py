@@ -4,6 +4,7 @@ every story is staged on its scene and said in every language (D74), what
 a lesson explains is taught by the level after it, its Try it runs there, and in a
 chapter with lessons, a level teaches nothing a lesson before it has not explained."""
 
+import ast
 import json
 import re
 from pathlib import Path
@@ -192,6 +193,76 @@ def test_a_lesson_with_nothing_to_try_has_no_block_and_goes_on_to_its_level(less
     assert items[items.index(f"lesson:{lesson}") + 1].startswith("level:")
 
 
+#: What each block of the lesson less-or-greater prints, by language, as its pages say
+#: (D212): the four answers; the broom to the left; left by three.
+LESS_OR_GREATER_PRINTS = {
+    "es": ["True\nFalse\nTrue\nFalse\n", "True\n", "izquierda 3\n"],
+    "en": ["True\nFalse\nTrue\nFalse\n", "True\n", "left 3\n"],
+}
+
+
+@pytest.mark.parametrize("lang", LANGUAGES)
+def test_the_lesson_less_or_greater_s_blocks_print_what_its_pages_say(lang):
+    path = CONTENT / "lessons" / "less-or-greater"
+    blocks = TRY.findall(for_wizard((path / f"{lang}.md").read_text(encoding="utf-8"), "girl"))
+    level = Level.from_directory(level_after("lesson:less-or-greater"))
+    assert [run_code(level, code).stdout for code in blocks] == LESS_OR_GREATER_PRINTS[lang]
+
+
+def compared(code: str) -> set[str]:
+    """The comparisons by size and the calls of abs, min and max in a program (D212)."""
+    tree = ast.parse(code)
+    signs = {
+        type(op).__name__
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Compare)
+        for op in node.ops
+    }
+    calls = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    return (signs & {"Lt", "Gt", "LtE", "GtE", "NotEq"}) | (calls & {"abs", "min", "max"})
+
+
+def taught_code(item: str) -> list[tuple[str, str]]:
+    """The code an item of the course shows the child or solves with: a level's solution,
+    its other solutions and its starting code in each language; a lesson's blocks."""
+    kind, _, item_id = item.partition(":")
+    if kind == "lesson":
+        path = CONTENT / "lessons" / item_id
+        return [
+            (f"{item} {lang}", code)
+            for lang in LANGUAGES
+            for code in TRY.findall((path / f"{lang}.md").read_text(encoding="utf-8"))
+        ]
+    if kind != "level":
+        return []
+    path = CONTENT / "levels" / item_id
+    found = [(f"{item} solution", (path / "solution.py").read_text(encoding="utf-8"))]
+    found += [
+        (f"{item} {other.name}", other.read_text(encoding="utf-8"))
+        for other in path.glob("solutions/*.py")
+    ]
+    for lang in LANGUAGES:
+        text = json.loads((path / f"text.{lang}.json").read_text(encoding="utf-8"))
+        found.append((f"{item} starting code {lang}", text.get("starting_code") or ""))
+    return found
+
+
+def test_the_course_compares_by_size_only_with_less_and_greater_and_after_their_lesson():
+    """D212: `<` and `>` come with the lesson less-or-greater and not before it; `<=`,
+    `>=`, `!=`, `abs`, `min` and `max` in no lesson and no level."""
+    items = course()
+    lesson = items.index("lesson:less-or-greater")
+    for index, item in enumerate(items):
+        for where, code in taught_code(item):
+            found = compared(code)
+            assert found <= {"Lt", "Gt"}, f"{where}: {sorted(found)}"
+            assert index >= lesson or not found, f"{where} compares before its lesson"
+
+
 def level_api(item_id: str) -> list[str]:
     return list(Level.from_directory(CONTENT / "levels" / item_id).api)
 
@@ -367,16 +438,23 @@ def test_a_level_on_a_scene_starts_where_the_one_before_it_ended(before, after):
     ways = [
         list(walked(before, way)[-1]) for way in range(len(level_json(before).get("ways", [])))
     ]
-    # The dark tunnel starts where the child cannot know (D152); two of the shed's levels
-    # start where the friend says, the door and the straw's top right.
-    if after not in ("the-dark-tunnel", *STARTS_SAID):
+    # The dark tunnel starts where the child cannot know (D152); three of the shed's
+    # levels start where the plan puts them.
+    if after in STARTS_SAID:
+        assert level_json(after)["start"] == STARTS_SAID[after]
+    elif after != "the-dark-tunnel":
         assert level_json(after)["start"] in (ended, again, *ways)
 
 
-#: The levels that start where their intro says rather than where the one before ended:
-#: the wall's, back at the shed's door, and the straw's, come down from the wall to the
-#: straw's top right.
-STARTS_SAID = {"the-brooms-on-the-wall": [9, 8], "the-brooms-in-the-straw": [12, 7]}
+#: The shed's levels that start where the plan puts them rather than where the one before
+#: ended: the wall's at the shed's door; the straw's on the floor's first row, where a
+#: find_all gives the floor's brooms; and the check, which plays the wall's program
+#: again, where the wall's began.
+STARTS_SAID = {
+    "the-brooms-on-the-wall": [9, 8],
+    "the-brooms-in-the-straw": [10, 6],
+    "the-check": [9, 8],
+}
 
 
 SCENE_LEVELS = sorted(

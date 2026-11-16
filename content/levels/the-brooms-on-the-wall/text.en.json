@@ -2,17 +2,16 @@
   "title": "The brooms on the wall",
   "goals": [
     "Leave no hanging broom knotted.",
-    "Walk along the wall at least as far as cell (8, 5).",
     "Use `for`."
   ],
-  "starting_code": "# Walk up to the wall with `move_up`.\n# Go left to under the first peg with `move_left`.\n# Find the hanging brooms with `find_all`.\n# For each broom of the list:\n#     untie it with `untie`\n#     and take a step right with `move_right`.\n",
+  "starting_code": "# Walk up to the row under the pegs.\n# Walk to one end of that row.\n# Find the hanging brooms with `find_all`.\n# For each broom of the list:\n#     find out how far it is with `distance_to`,\n#     walk that many steps\n#     and untie it.\n",
   "hints": [
-    "Move 2 steps up and 3 left to stand under the first peg.",
-    "Use `find_all` to get a list of the hanging brooms, then start a `for` loop to go through them.",
-    "Inside the loop, remember to leave spaces before `untie` and `move_right` so the computer knows they go inside the loop!"
+    "Walk up to the wall and to one end of it. Since `find_all` gives the nearest first, from an end you always walk in the same direction.",
+    "Use a `for` loop to go through the list. In each turn, find out how far the broom is with `distance_to`.",
+    "A broom hanging right above you is 0 steps away! Keep the distance in a variable, walk that many steps and take the knot off."
   ],
-  "intro": "We'll leave the brooms in the straw for later. Let's take care of the hanging ones first. We need to walk along the wall and untie each one.",
+  "intro": "We'll leave the brooms in the straw for later. Let's take care of the hanging ones first. We need to walk along the wall and untie each one. They hang on different pegs each time, with gaps between them. If you go to one end of the wall first, `find_all` gives them to you starting with the nearest, and you only have to walk in one direction. Remember `distance_to`, from the library? It tells you how many steps away from you a thing is.",
   "outro": "We did it! The brooms on the wall are safe.",
-  "learned": "Now you know that a `for` over a list runs its lines once for each broom, so that one program works however many there are.",
+  "learned": "Now you know that a `for` loop lets you untie each broom, and that `distance_to` tells you how many steps to walk to the next one.",
   "changes": "The number of brooms on the wall and the pegs they hang from change each time."
 }

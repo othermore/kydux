@@ -202,6 +202,40 @@ test.describe('a page runs its code (D142)', () => {
     await expect(page.locator('.lesson-printed')).toHaveText('Position: (11, 6)', { timeout: ciTimes(30_000) });
   });
 
+  test('less-or-greater compares, tells left from right, and takes the smaller from the greater (D212)', async ({
+    page,
+  }) => {
+    await page.goto('/#lesson/less-or-greater');
+    await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 3');
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('True\nFalse\nTrue\nFalse', { timeout: ciTimes(90_000) });
+    await page.locator('#lesson-next').click();
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('True', { timeout: ciTimes(30_000) });
+    await page.locator('.lesson-run .cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('my_x = 9\nbroom_x = 12\nprint(broom_x < my_x)');
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('False', { timeout: ciTimes(30_000) });
+    await page.locator('#lesson-next').click();
+    // The game's own words for a negative move, as the child reads them.
+    await expect(page.locator('.lesson-page')).toContainText('move_left is not used like that. Try it like this: wizard.move_left(3).');
+    await page.locator('.lesson-run button').click();
+    await expect(page.locator('.lesson-printed')).toHaveText('left 3', { timeout: ciTimes(30_000) });
+    for (const [broom, printed] of [
+      ['12', 'right 3'],
+      ['9', 'right 0'],
+    ] as const) {
+      await page.locator('.lesson-run .cm-content').click();
+      await page.keyboard.press('ControlOrMeta+A');
+      await page.keyboard.insertText(
+        `my_x = 9\nbroom_x = ${broom}\nif broom_x < my_x:\n    print("left", my_x - broom_x)\nelse:\n    print("right", broom_x - my_x)`,
+      );
+      await page.locator('.lesson-run button').click();
+      await expect(page.locator('.lesson-printed')).toHaveText(printed, { timeout: ciTimes(30_000) });
+    }
+  });
+
   test("the two coordinates print the cell's two numbers (D174)", async ({ page }) => {
     await page.goto('/#lesson/the-two-coordinates');
     for (let turn = 0; turn < 2; turn += 1) await page.locator('#lesson-next').click();

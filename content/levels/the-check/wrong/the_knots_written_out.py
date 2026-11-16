@@ -1,0 +1,6 @@
+wizard.move_up(3)
+wizard.move_right(2)
+brooms = wizard.find_all("broom")
+brooms[0].untie()
+wizard.move_left(5)
+brooms[4].untie()

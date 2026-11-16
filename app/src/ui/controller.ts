@@ -1,10 +1,14 @@
 // The run of a level, apart from the DOM (D29): what state a run is in, what
 // each button does, and what the screen should show, as a snapshot the level
 // screen renders. It holds no words: an outcome is data, said by the card in
-// the language of the moment, so that a change of language needs no new run.
+// the language of the moment, so that a change of language needs no new run. A run's
+// end sounds when its playback has played its last tick, `win` for a run won and
+// `fail` for any other, while the card still waits for the words (D247); a run with no
+// playback sounds with its card, and a run stopped has no sound.
 
 import type { LoadedLevel } from '../content/levels';
 import type { Playback, Speed } from '../engine/playback';
+import { play } from '../engine/sfx';
 import type { InterruptedBy, LevelJson, RunResult, WayResult, WorldResult } from '../runtime/protocol';
 import type { RuntimeStatus } from '../runtime/runtime';
 import type { GoalMark } from './goals';
@@ -32,6 +36,9 @@ export interface RunSnapshot {
   way: string | null;
   /** What the card says, or null while it is hidden. */
   outcome: Outcome | null;
+  /** Whether the run's end has sounded, when its playback ended (D247): the card then
+   * shows with no sound. */
+  sounded: boolean;
   /** What the child's code printed in the last run. */
   printed: string;
   runningLine: number | null;
@@ -117,6 +124,8 @@ export class RunController {
   private restarting = false;
   /** Whether the child stopped this run with Stop: it ends with no outcome (D177). */
   private stopped = false;
+  /** Whether this run's end has sounded, when its playback ended (D247). */
+  private sounded = false;
   private listeners: ((snapshot: RunSnapshot) => void)[] = [];
   private unsubscribe: (() => void)[] = [];
 
@@ -178,6 +187,7 @@ export class RunController {
         state !== 'running' &&
         !this.restarting,
       restarting: this.restarting,
+      sounded: this.sounded,
     };
   }
 
@@ -395,6 +405,12 @@ export class RunController {
       this.halt();
       return;
     }
+    // The run's end sounds now, as its last tick is played; the card waits (D247). A
+    // playback cut short by a new run has played no end.
+    if (this.world && scene.playback.tick >= scene.playback.length) {
+      play(this.outcomeOf(this.world).kind === 'won' ? 'win' : 'fail');
+      this.sounded = true;
+    }
     const wait = scene.settle?.(this.world?.status === 'won') ?? 0;
     if (wait <= 0) {
       this.finish();
@@ -419,6 +435,7 @@ export class RunController {
 
   private clear(): void {
     this.stopped = false;
+    this.sounded = false;
     this.result = null;
     this.world = null;
     this.shownWay = null;

@@ -471,6 +471,84 @@ test.describe('the way a landing leaves the wizard facing (D241)', () => {
   });
 });
 
+/** Every sound named (data-sound, set at each sound), when the playback ends and when a
+ * card first shows, on the page's clock (D247). */
+async function watchEnd(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const node = document.querySelector('#scene') as HTMLElement;
+    const seen = { sounds: [] as { sound: string; at: number }[], done: 0, card: 0, verdict: false };
+    (window as unknown as { ending: typeof seen }).ending = seen;
+    new MutationObserver((records) => {
+      for (const record of records) {
+        if (record.attributeName === 'data-sound') seen.sounds.push({ sound: node.dataset.sound ?? '', at: performance.now() });
+        if (record.attributeName === 'data-state' && node.dataset.state === 'done' && !seen.done) seen.done = performance.now();
+      }
+    }).observe(node, { attributes: true, attributeFilter: ['data-sound', 'data-state'] });
+    new MutationObserver(() => {
+      const card = document.querySelector<HTMLElement>('.outcome');
+      if (!seen.card && card && !card.hidden && card.getClientRects().length > 0) seen.card = performance.now();
+    }).observe(document.body, { attributes: true, childList: true, subtree: true });
+  });
+}
+
+type Ending = { sounds: { sound: string; at: number }[]; done: number; card: number };
+const ending = (page: Page) => page.evaluate(() => (window as unknown as { ending: Ending }).ending);
+
+test.describe("the sound of a run's end (D247)", () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("Los aros, the rim: fail as the playback ends, before the card, and once", async ({ page }) => {
+    await open(page, 'the-rings', '1');
+    await watchEnd(page);
+    await start(page, wrong('the-rings', 'turned_inside_the_ring'));
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(60_000) });
+    await page.waitForTimeout(500);
+    const { sounds, done, card } = await ending(page);
+    const fails = sounds.filter(({ sound }) => sound === 'fail');
+    expect(fails).toHaveLength(1);
+    const fail = fails[0]?.at ?? 0;
+    expect(fail - done).toBeLessThan(500);
+    expect(fail).toBeLessThan(card);
+  });
+
+  test('La carrera, eighteen lines: fail while Ilda says her verdict, with no card yet', async ({ page }) => {
+    await open(page, 'the-race', '4');
+    await watchEnd(page);
+    await start(page, wrong('the-race', 'eighteen_lines'));
+    await expect(scene(page)).toHaveAttribute('data-race-verdict', /./, { timeout: ciTimes(120_000) });
+    await expect(scene(page)).toHaveAttribute('data-sound', 'fail', { timeout: ciTimes(2_000) });
+    const { card } = await ending(page);
+    expect(card).toBe(0);
+  });
+
+  test("El primer vuelo's own program: win before the card", async ({ page }) => {
+    await open(page, 'the-first-flight');
+    await watchEnd(page);
+    await start(page, solution('the-first-flight'));
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(60_000) });
+    const { sounds, card } = await ending(page);
+    const wins = sounds.filter(({ sound }) => sound === 'win');
+    expect(wins).toHaveLength(1);
+    expect(wins[0]?.at ?? 0).toBeLessThan(card);
+  });
+
+  test('a program with an error in its first line sounds fail with its card, and Stop sounds nothing', async ({ page }) => {
+    await open(page, 'the-first-flight');
+    await watchEnd(page);
+    await start(page, 'wizard.move_right(\n');
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(60_000) });
+    await expect(scene(page)).toHaveAttribute('data-sound', 'fail');
+    const before = (await ending(page)).sounds.length;
+    await start(page, 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.wait(60)\n');
+    await expect(scene(page)).toHaveAttribute('data-state', 'playing', { timeout: ciTimes(60_000) });
+    await page.locator('#stop').click();
+    await page.waitForTimeout(800);
+    const after = (await ending(page)).sounds.slice(before).map(({ sound }) => sound);
+    expect(after.filter((sound) => sound === 'win' || sound === 'fail')).toEqual([]);
+  });
+});
+
 /** Every value the wizard's rise takes, in order, the attribute gone written as ''; and
  * the sounds named, as they stand at the end (D244). */
 async function watchRise(page: Page): Promise<void> {

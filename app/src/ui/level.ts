@@ -2,7 +2,8 @@
 // beside it with a handle between the two, Run, Stop, Restart and the speed,
 // and the card saying how a run went. It is a view of a RunController (D29):
 // it makes the DOM once, renders every snapshot the controller gives, and
-// each button calls the controller.
+// each button calls the controller. The card comes with no sound where the run's end
+// sounded as its playback ended, and with its sound where there was no playback (D247).
 
 import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
@@ -485,8 +486,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed);
       else card.hide();
       if (!force && snapshot.outcome) judged = true;
-      // A run's end has its sound (the settings may silence it).
-      if (!force && snapshot.outcome) play(snapshot.outcome.kind === 'won' ? 'win' : 'fail');
+      // A run's end has its sound (the settings may silence it): played by the controller
+      // as the playback ended, or here for an outcome that had no playback (D247).
+      if (!force && snapshot.outcome && !snapshot.sounded) play(snapshot.outcome.kind === 'won' ? 'win' : 'fail');
       if (snapshot.outcome && snapshot.outcome.kind !== 'won' && snapshot.outcome.kind !== 'failed') {
         if (!hintsOffered && !force) progress.markTried(loaded.id);
         hintsOffered = true;

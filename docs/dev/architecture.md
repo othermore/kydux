@@ -3361,18 +3361,27 @@ one overturns stays, marked as superseded.
   the keyboard without bringing itself into view. A click on any button of the page
   outside the start card closes the card, and the button does what it does. Rules out a
   card opened at its end, and a start card left over the scene while the program runs.
-- **D223 — The code is set in Noto Sans Mono, a little narrow, at 16, and a comment is
-  never broken by hand.** Decided 2026-11-14 by the owner (*la fuente del código podría
-  ser un pelín más pequeña; algún tipo de letra que sea un poco más estrecha, pero que
-  mantenga el monotipo y se vea bien para programar*; *evitar que sean de varias líneas y
-  dejar que el propio visualizador lo lleve a la siguiente línea*). The editor and every
-  piece of code the page shows use Noto Sans Mono (SIL Open Font License 1.1), bundled
-  with the game, at seven eighths of its width; the editor's sizes are 14, 16, 20 and 24,
-  and 16 is the one a new child gets. A comment of a starting code is one `#` line for
-  each sentence, written to fit a line where it can; the editor wraps a line that does not
-  fit, and the wrapped part hangs under the line's own indentation. Rules out a font
-  fetched from elsewhere, a comment cut into several `#` lines to fit a width, and a
-  wrapped line that starts at the editor's edge.
+- **D223 — The code's letter is one of three, tried in the page under `?debug`, and a
+  comment is never broken by hand.** Decided 2026-11-14 by the owner (*la fuente del
+  código podría ser un pelín más pequeña; algún tipo de letra que sea un poco más
+  estrecha, pero que mantenga el monotipo y se vea bien para programar*; *me gusta la
+  inconsolata a 16, pero creo que también podríamos poner la semicondensada a 14 o la
+  condensada a 14. Quiero ver cómo quedan con esas tres, idealmente como pruebas reales en
+  debug mode sobre la UI*; *evitar que sean de varias líneas y dejar que el propio
+  visualizador lo lleve a la siguiente línea*). The editor and every piece of code the
+  page shows are set in one of three candidates, each a face, a width and the editor's
+  size a new child gets: Inconsolata at 16, Noto Sans Mono at seven eighths of its width
+  at 14, and Noto Sans Mono at three quarters of its width at 14. Both faces come under
+  the SIL Open Font License 1.1 and are bundled with the game. Inconsolata at 16 is the
+  one in use where nothing is chosen. Under `?debug` the settings offer the three; the one
+  picked shows at once, sets the editor's size to its own and is kept with the settings,
+  so that the whole game is read in it. The editor's sizes are 14, 16, 20 and 24. The
+  candidate the owner picks becomes the code's only letter by a decision of its own. A
+  comment of a starting code is one `#` line for each sentence, written to fit a line
+  where it can; the editor wraps a line that does not fit, and the wrapped part hangs
+  under the line's own indentation. Rules out a font fetched from elsewhere, a letter
+  chosen from a sheet and not from the page, a comment cut into several `#` lines to fit a
+  width, and a wrapped line that starts at the editor's edge.
 - **D224 — What is untied is the knot.** Decided 2026-11-14 by the owner (*lo que se
   desata es el nudo, no la escoba*; *hay que tener cuidado con la paja*). The texts untie
   or take off a broom's knot, or its thread, and never untie a broom; `untie` stays the

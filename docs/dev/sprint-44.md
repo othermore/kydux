@@ -34,7 +34,9 @@ What the owner asks, in short:
    step and every other text are brought to it.
 8. The starting code's comments are not broken by hand: each fits a
    line where it can, and where it cannot the editor carries it to the
-   next. The code's letter is a point smaller and a little narrower.
+   next. The code's letter is one of three the owner tries in the real
+   page under `?debug`: Inconsolata at 16, and Noto Sans Mono a little
+   narrow and narrow at 14.
 9. The waiting view has no button: when loading ends and the tip has
    been read, the tip goes and the screen shows by itself. A tip is
    shown at least at the first load and whenever the place's picture
@@ -120,21 +122,32 @@ of events with them.
   closes the card, and the button does what it does. Rules out a card
   opened at its end, and a start card left over the scene while the
   program runs.
-- **D223 — The code is set in Noto Sans Mono, a little narrow, at 16,
-  and a comment is never broken by hand.** Decided 2026-11-14 by the
-  owner (*la fuente del código podría ser un pelín más pequeña; algún
-  tipo de letra que sea un poco más estrecha, pero que mantenga el
-  monotipo y se vea bien para programar*; *evitar que sean de varias
+- **D223 — The code's letter is one of three, tried in the page under
+  `?debug`, and a comment is never broken by hand.** Decided 2026-11-14
+  by the owner (*la fuente del código podría ser un pelín más pequeña;
+  algún tipo de letra que sea un poco más estrecha, pero que mantenga el
+  monotipo y se vea bien para programar*; *me gusta la inconsolata a 16,
+  pero creo que también podríamos poner la semicondensada a 14 o la
+  condensada a 14. Quiero ver cómo quedan con esas tres, idealmente como
+  pruebas reales en debug mode sobre la UI*; *evitar que sean de varias
   líneas y dejar que el propio visualizador lo lleve a la siguiente
-  línea*). The editor and every piece of code the page shows use Noto
-  Sans Mono (SIL Open Font License 1.1), bundled with the game, at
-  seven eighths of its width; the editor's sizes are 14, 16, 20 and 24,
-  and 16 is the one a new child gets. A comment of a starting code is
-  one `#` line for each sentence, written to fit a line where it can;
-  the editor wraps a line that does not fit, and the wrapped part
-  hangs under the line's own indentation. Rules out a font fetched
-  from elsewhere, a comment cut into several `#` lines to fit a width,
-  and a wrapped line that starts at the editor's edge.
+  línea*). The editor and every piece of code the page shows are set in
+  one of three candidates, each a face, a width and the editor's size a
+  new child gets: Inconsolata at 16, Noto Sans Mono at seven eighths of
+  its width at 14, and Noto Sans Mono at three quarters of its width at
+  14. Both faces come under the SIL Open Font License 1.1 and are
+  bundled with the game. Inconsolata at 16 is the one in use where
+  nothing is chosen. Under `?debug` the settings offer the three; the
+  one picked shows at once, sets the editor's size to its own and is
+  kept with the settings, so that the whole game is read in it. The
+  editor's sizes are 14, 16, 20 and 24. The candidate the owner picks
+  becomes the code's only letter by a decision of its own. A comment of
+  a starting code is one `#` line for each sentence, written to fit a
+  line where it can; the editor wraps a line that does not fit, and the
+  wrapped part hangs under the line's own indentation. Rules out a font
+  fetched from elsewhere, a letter chosen from a sheet and not from the
+  page, a comment cut into several `#` lines to fit a width, and a
+  wrapped line that starts at the editor's edge.
 - **D224 — What is untied is the knot.** Decided 2026-11-14 by the
   owner (*lo que se desata es el nudo, no la escoba*; *hay que tener
   cuidado con la paja*). The texts untie or take off a broom's knot, or
@@ -189,22 +202,53 @@ found.
 
 ### 2.2 The code's letter and the comments (D223)
 
-**The font.** Noto Sans Mono, the variable file of the Latin range
+**The three candidates.** Each is a face, a width and the size a new
+child gets in the editor:
+
+| Candidate | Face | Width | Size |
+|---|---|---|---|
+| `inconsolata-16` | Inconsolata | its own | 16 |
+| `noto-semi-14` | Noto Sans Mono | seven eighths (`87.5%`) | 14 |
+| `noto-condensed-14` | Noto Sans Mono | three quarters (`75%`) | 14 |
+
+Both faces are bundled with the game, each file with its origin,
+author and licence next to it: Inconsolata, the variable file of the
+Latin range (`inconsolata-latin-wght-normal.woff2` of the package
+`@fontsource-variable/inconsolata` 5.3.0, 34 KB; *Copyright 2006 The
+Inconsolata Project Authors*, SIL Open Font License 1.1), and Noto
+Sans Mono, the variable file of the Latin range
 (`noto-sans-mono-latin-wdth-normal.woff2` of the package
 `@fontsource-variable/noto-sans-mono`, 56 KB, its width from 62.5 % to
 100 %; *Copyright 2022 The Noto Project Authors*, SIL Open Font
-License 1.1), is bundled with the game: the file, its origin, author
-and licence next to it. One `@font-face` names it, `--mono` starts
-with it and keeps today's families after it, and the width is seven
-eighths (`font-stretch: 87.5%`) wherever `--mono` is used. Family and
-width are set in one place, so that another width is one line: the
-designer's sheet `drafts/sprint-44-fuentes.png` compares ten faces in
-a 440 px column, where today's DejaVu Sans Mono at 17 fits 42
-characters, this one at 16 fits 48, and its condensed width fits 55.
+License 1.1). One `@font-face` names each. `--mono` starts with the
+candidate's face and keeps today's families after it, and
+`--mono-stretch` is its width, used as `font-stretch` wherever `--mono`
+is. A setting `codeFont` holds the candidate's name; it is kept with
+the settings, `inconsolata-16` is its value where nothing is chosen,
+and a saved value that is none of the three reads as that one. The
+three are one table in one place of the page's code, so that the
+owner's pick is one line.
+
+**The trial, in the real page.** Under `?debug` the settings carry one
+more choice, `settings-code-font`, its words through the i18n layer
+under `debug.font.*` (*Letra del código*: *Inconsolata, 16*; *Noto Sans
+Mono semicondensada, 14*; *Noto Sans Mono condensada, 14*). Picking a
+candidate sets `codeFont` and the editor's size to the candidate's, and
+the page shows it at once, with no reload; the size stays the child's
+to change after. Without `?debug` the choice is not offered, and the
+candidate kept still dresses the code. So the owner opens any level
+with `?debug`, picks one, and plays the game in it: the editor, the
+lessons' code, the notebook, the cards. The designer's sheet
+`drafts/sprint-44-fuentes.png` compares ten faces in a 440 px column;
+it is where the three come from, and the page is where they are
+judged. When the owner has picked, the pick is entered as a decision
+of its own, and the other candidates, the face not used and the choice
+under `?debug` leave the game.
 
 **The size.** `FONT_SIZES` is `[14, 16, 20, 24]`, and
-`DEFAULT_SETTINGS.fontSize` is 16. A saved size that is not one of
-the sizes reads as 16.
+`DEFAULT_SETTINGS.fontSize` is 16, the size of the candidate in use
+where nothing is chosen. A saved size that is not one of the sizes
+reads as 16.
 
 **Wrapped lines.** The editor wraps (it does today). A line's wrapped
 part starts under the line's first character that is not a space, so
@@ -657,23 +701,32 @@ comments of 2.2 are in it line by line.
 
 ### 3.2 The code's letter and the comments (D223, 2.2)
 
-- **Page.** The font's file with its origin, author and licence;
-  `@font-face`, `--mono` and the width in one place; `FONT_SIZES`,
-  `DEFAULT_SETTINGS.fontSize` and the reading of a saved size; the
-  hanging indent of wrapped lines in the editor.
+- **Page.** The two faces' files, each with its origin, author and
+  licence; the `@font-face`s, the table of the three candidates,
+  `--mono` and `--mono-stretch`; the setting `codeFont` and its
+  reading; the choice `settings-code-font` under `?debug` and its
+  words in both languages; `FONT_SIZES`, `DEFAULT_SETTINGS.fontSize`
+  and the reading of a saved size; the hanging indent of wrapped lines
+  in the editor.
 - **Content.** The starting codes of `the-nearest-broom` and
   `the-brooms-in-the-straw` as 2.2 gives them, in both languages; any
   other comment cut by hand, joined.
 - **Documents.** `docs/dev/architecture.md` where it tells of the
-  page's look; a `SOURCE.md` next to the font, as the art has, with
-  the licence's text.
+  page's look and of what `?debug` offers; a `SOURCE.md` next to each
+  face, as the art has, with the licence's text.
 - **Tests.** The test of D218 on one `#` line a sentence; a browser
-  test that the editor's font is the bundled one and no request leaves
-  the page's origin, and that a wrapped comment of an `if`'s body
-  starts under its `#`; the settings' sizes.
+  test that the editor's font is the bundled Inconsolata at 16 where
+  nothing is chosen and no request leaves the page's origin; that
+  under `?debug` the settings offer the three candidates, each sets
+  the editor's face, width and size at once and stays after a reload,
+  and that without `?debug` the choice is not offered; that a wrapped
+  comment of an `if`'s body starts under its `#`; the settings' sizes;
+  the store's test of `codeFont` and of a saved size.
 - **Check.** `ci/check.sh`; `level.spec.ts`, `settings.spec.ts`,
   `chapter-4.spec.ts`. A sheet of the straw's starting code in
-  the real page at 1280 and at 1024 wide goes in the report.
+  the real page at 1280 and at 1024 wide, in each of the three
+  candidates, with the characters a line of the editor holds in each,
+  goes in the report.
 
 ### 3.3 Cards (D222, 2.3)
 
@@ -777,8 +830,10 @@ whole `ci/check.sh --e2e`, in a copy, with Playwright's own server on
 - the page of the changed texts before and now, as 2.12;
 - the contact sheets of the ring field and the race course, and the
   race course's picture whole, with the way its start line was made;
-- the sheet of the code's letter in the real page (3.2), and the ten
-  tips with their pictures in Spanish;
+- the sheets of the three candidates of the code's letter in the real
+  page (3.2), with the address that opens a level under `?debug` and
+  where the choice is, for the owner to try them; and the ten tips
+  with their pictures in Spanish;
 - the report in Spanish: what was built piece by piece; every choice
   the plan left and how it was taken; every cell of 2.5 to 2.7 that
   moved; what Gemini's drafts needed corrected; what the rereading of
@@ -804,7 +859,7 @@ you built last), drafts/recorrido-capitulo-4-2026-11-13.es-comments.md
 (the owner's ten comments, in their words), and the memory notes
 kydux-two-agents, kydux-sprint-43-state, kydux-designer-review-43,
 kydux-designer-sprint-44-plan and kydux-checks-per-piece. The
-designer's commits after yours (989846d to the plan's own) fix three
+designer's commits after yours (989846d to the plan's last) fix three
 texts and enter this plan and its decisions (D219 to D224, with D187,
 D189, D190, D214 and D218 brought to them): read them with
 git log -p 989846d..HEAD before you start.
@@ -836,7 +891,10 @@ The eleven things the owner will look for:
 (7) no broom untied, only knots; no sentence that does or ends "la
     paja";
 (8) comments never cut by hand, wrapped lines hanging under their
-    own indentation, Noto Sans Mono a little narrow at 16;
+    own indentation; three candidates for the code's letter to try in
+    the real page, chosen in the settings under ?debug: Inconsolata
+    at 16 (the one in use where nothing is chosen), Noto Sans Mono
+    semi-condensed at 14 and condensed at 14;
 (9) no button on the waiting view; a tip with its picture at the
     first load and at every new scene, the screen opening by itself
     when the tip has had its reading time;

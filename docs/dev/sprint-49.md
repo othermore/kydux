@@ -1,4 +1,4 @@
-# Sprint 49 — A start card at every opening, a wait that moves, the keys that move a line in, the rings told as the next practice, the castle's painting read at the opening, and one wind for a stretch of flight
+# Sprint 49 — A start card at every opening, a wait that moves, the keys that move a line in, the rings told as the next practice, the castle's painting read at the opening, and a wind counted from its own plan
 
 On 2026-11-16 the owner played sprint 48 and wrote what they saw and
 heard, in their words:
@@ -87,6 +87,47 @@ The designer looked for the cause of each before planning it.
   painting only while its scene loads (D214), and the scene loads
   at once.
 
+The same day, with the shot gone, the owner listened again on the
+debug page, moved the wind's sliders, and answered:
+
+> El vuelo suena bien así: El viento de la escoba: air 1.10, rest
+> 0.50 -- Pero el sonido de descender se parece mucho al de
+> ascender. El de descender debería ser un poco más pausado, como si
+> se "apagase" el sonido.
+>
+> Ante una puerta cerrada veo bien lo del pensamiento como está por
+> ahora. Y me parece bien que las pruebas de github que se pasan de
+> tiempo se dejen para lanzar a mano pero no se lancen
+
+And of the game's mark:
+
+> podemos cambiar el logotipo de kydux que es un gorro de mago y una
+> varita para que sean igual pero la varita de madera en vez de
+> negra, y el gorro marrón oscuro en vez de negro (el gorro puede
+> ser negro también si queda mejor, pero la varita tiene que ser de
+> madera)
+
+Of the trials shown: *me gusta la opción D de los logos*, the hat
+in ink.
+
+What follows from the answer, all of it done by the designer in
+commits of its own before the programmer starts:
+
+- **The wind stays a gust for each flown command**, as it is built
+  and as the owner now hears it. Its mix as written is the
+  owner's: the air at 1.1, the whistle at 1, the rest on at 0.5
+  (`WIND_WRITTEN`, D252). This plan asked first for one wind for
+  a whole stretch of flight; that is out (2.8). What stays for the
+  programmer is small: the wind's level counted from its own plan
+  and never read back from a node (2.6).
+- **The landing goes out** (D253): no swell, lower and softer
+  than the lift, twice as long (`set_down`, `engine/sfx.ts`).
+- **The thought at a locked door** stays as it is.
+- **The browser tests on GitHub** run only when started by hand
+  (D179, `.github/workflows/check.yml`).
+- **The mark's wand is wood** (D254, `ui/mark.ts`,
+  `favicon.svg`).
+
 What this sprint holds:
 
 1. A level's start card opens every time the level opens, and
@@ -99,9 +140,9 @@ What this sprint holds:
    why the rings.
 5. The opening's first two steps are told over the painting of
    the castle (D251).
-6. The flown commands that follow one another are one wind: it
-   rises once, changes at the turns and falls at the end, and its
-   level is never read back from a node (D252).
+6. The wind's level is counted from its own plan and never read
+   back from a node; by ear the wind is the one the owner has
+   approved (D252).
 
 The rules of the earlier sprints hold: pieces in order, one local
 commit each, `ci/check.sh` and the browser specs a piece touches green
@@ -113,8 +154,9 @@ the child reads is Gemini's or the owner's own.
 ## 1. Decisions taken here
 
 All are entered in `docs/dev/architecture.md` with this plan, where
-they are told whole; D243 is brought to D252, D68 to D248, and D61,
-D214 name D249 and D251.
+they are told whole; D243 names D252, D68 is brought to D248, and
+D61, D214 name D249 and D251. D253 and D254 are the designer's,
+built with their entry; D179 is brought to the owner's answer.
 
 - **D248 — The start card opens a level every time, and the guide
   is offered on the first level alone.** The owner's (*no se
@@ -137,14 +179,19 @@ D214 name D249 and D251.
   con un texto propio*). A story's first steps may be told over
   its still; the reader goes on at *Next*. Rules out a painting
   seen only while something loads, and a timer that holds it.
-- **D252 — One wind for a stretch of flight: it rises once,
-  changes at the turns, and falls at the end.** The owner's (*la
-  clave es que coincidan un poco con el principio y el final de
-  los movimientos (cambios de dirección), pero no siempre tiene que
-  haber un "golpe de viento" por paso volado*). The level is
-  counted from the wind's own plan. Rules out a bang at a start, a
-  new rise for every flown command, and a level read back from a
-  node.
+- **D252 — A wind starts from nothing, and its mix is the
+  owner's.** The owner's (*suena casi como el disparo de una
+  escopeta. Ese hay que quitarlo*; *El vuelo suena bien así: … air
+  1.10, rest 0.50*). The level is counted from the wind's own
+  plan. Rules out a bang at a start, a level read back from a
+  node, and a written mix that is not the owner's.
+- **D253 — The landing goes out.** The owner's (*debería ser un
+  poco más pausado, como si se "apagase" el sonido*). Built by the
+  designer. Rules out a landing that is the lift played
+  backwards.
+- **D254 — The mark's wand is wood.** The owner's (*la varita
+  tiene que ser de madera*; *me gusta la opción D*). Built by the
+  designer. Rules out a wand in ink.
 
 ## 2. What is asked
 
@@ -409,129 +456,77 @@ No step is longer than the longest of the five is now.
 **The documents.** `architecture.md` where it tells a story's
 steps; the headers of `story.ts` and `stories.ts`.
 
-### 2.6 One wind for a stretch of flight (D252)
+### 2.6 The wind counted from its own plan (D252)
 
-**The sound**, `engine/sound.ts`. The voices, the bands, the mix
-and `REST_LEVEL` stay. What changes is the level's plan and who
-keeps it.
+The owner has approved the wind by ear. Nothing that is heard
+changes: the gusts' plans (`gustPlan`), every number, the voices,
+the bands, the mix and the rest's two curves stay as they are.
+What changes is where a gust that is taken on, a drop and the
+rest find the level they start from.
 
-- **A stretch.** The wind keeps, while it sounds: when the stretch
-  began, on the page's clock; its strength, drawn once between
-  `GUST_LOW` and `GUST_HIGH`; its targets, the points `{ at,
-  level }` its level goes through, in seconds from the stretch's
-  start, joined by straight lines; when the last flown command
-  ends; when its last swell was; and the points last given to the
-  sound's clock.
-- `levelAt(points, at)`, exported and pure: the level of a list of
-  points at a moment; the first point's before it, the last
-  point's after it.
-- `Wind.gust(seconds, turned)` returns what it did: `rise`,
-  `swell` or `carry`.
-  - The level now is `levelAt` of the points last given, at now;
-    0 with none.
-  - **A rise**: no stretch, or the level now under three tenths of
-    the stretch's strength. A new stretch: its strength drawn; its
-    targets the level now at 0 and a first level, between 0.6 and
-    0.9 of the strength, at a time drawn between 0.18 and 0.3
-    seconds.
-  - **A swell**: the wind sounds, `turned` is true and the last
-    swell or rise was 0.35 seconds ago or more. A target is put in
-    at a time drawn between 0.15 and 0.25 seconds from now, at a
-    level drawn between 0.5 of the strength and the strength; if
-    it is nearer than 0.2 of the strength to the level now, it is
-    put 0.2 of the strength above it, or below it where above
-    would pass the strength. The targets the stretch had between
-    now and 0.35 seconds after the swell's go.
-  - **A carry**: anything else. The targets stay as they are.
-  - Then, in the three: the command's end is now plus `seconds`;
-    the targets are drawn on, each 0.35 to 0.7 seconds after the
-    one before and between 0.5 of the strength and the strength,
-    until the last one is at the command's end or after it. One
-    target is so always ahead, and a command carried goes on along
-    the same line.
-  - What is given to the sound's clock, from now: the level now;
-    the targets up to the command's end; the line's level at the
-    command's end; that level held for 0.12 seconds; and a fall to
-    0 in a time drawn between 0.5 and 0.8 seconds. The band's
-    middle and the whistle follow each point as they do
-    (`airHertz`, `whistleHertz`, `whistleLevel`).
-  - No two points given are nearer than 0.1 seconds, but in a
-    drop.
-- **Nothing is read back.** `fromNow` goes. Every plan starts with
-  `setNow(param, value, now)` after `cancelScheduledValues(now)`,
-  the value counted with `levelAt`; the bands' and the whistle's
-  from the same level. `drop(seconds)` gives the level now and a
-  line to 0, and ends the stretch: the flown command after it is a
-  rise.
-- **The rest** is planned in points too, and counted the same
-  way: to 0 in 0.1 seconds when a command is flown; from the end
-  of the wind's fall, to `REST_LEVEL` in 0.4 seconds while it is
-  asked for. `setTargetAtTime` goes from it. In the mix as it is
-  written, `rest` is on (`WIND_WRITTEN`).
-- `Wind.blowing` is true from a rise to the fall's end, as it is,
-  by the page's own count where no sound is made; and `gust`
-  answers `rise`, `swell` or `carry` the same, muted or not.
+**Why.** Each of them reads its start from the node
+(`fromNow`: `param.value`). The bang at a start came from such a
+reading (a gain only scheduled reads as its default), and what a
+param answers while its plan plays is not the same in every
+browser. A level counted by the wind itself is the same
+everywhere, and a test can hold it.
 
-**The scene**, `engine/scene.ts`.
+**The sound**, `engine/sound.ts`.
 
-- `gust(event, instant)` keeps the way of the last flown command
-  of the wizard's (from the move's `from` and `to`), emptied at a
-  restart and whenever the wind is stopped or dropped. `turned` is
-  true where the command's way is not that one. A later step of a
-  command that goes on after a pause, with no wind sounding, calls
-  it as now, not turned.
-- The scene counts what `gust` answers, beside `data-wind-gusts`:
-  `data-wind-rises` and `data-wind-swells`, emptied at a restart.
-
-**The debug page**, `ui/themes.ts`. A sample's moves say whether
-each turns. Seven buttons: the six there are, and *straight*,
-four moves of two cells the same way, 266 ms apart. The zigzag's
-moves all turn; the whole flight's four moves of a pair of rings
-turn, its others do not. The labels are the programmer's, in both
-languages.
+- `levelAt(points, at)`, exported and pure: the value of a list
+  of points `{ at, level }` at a moment, on the straight line
+  between the two points round it; the first point's before it,
+  the last point's after it.
+- The wind keeps, for each param it plans (the gust's gain, the
+  air band's middle, the whistle's middle, the whistle's level),
+  the points last given to the sound's clock, in the clock's own
+  seconds. The points of a band and of the whistle are the gust's
+  points through the function that gives each (`airHertz`,
+  `whistleHertz`, `whistleLevel`): the line the clock draws.
+- **Nothing is read back.** `fromNow` goes. Every plan starts
+  with `cancelScheduledValues(now)` and `setNow(param, value,
+  now)`, the value counted with `levelAt` from the points kept; 0
+  for a gain and the band's low end with none kept.
+  - `gust(seconds)`: the plan is `gustPlan`'s, as it is. A gust
+    that sounds is taken on from the level counted.
+  - `drop(seconds)`: the gust's gain and the whistle's level go
+    from the value counted to 0, and those two points are kept;
+    the bands keep theirs.
+- **The rest** keeps its curves (`setTargetAtTime`, `REST_FALL`,
+  `REST_RISE`). The wind keeps what it last gave the rest's
+  level: the value it started from, when, and its one or two
+  targets with their times; and counts the level now with the
+  curve's own rule, `target + (from − target) · e^(−t/τ)`, in a
+  pure function with a test. `restLevel` starts from that value.
+- Where no sound is made, nothing is kept and nothing is counted,
+  as now; `blowing` and the scene's counts are as they are.
 
 **Tests.**
 
 - Vitest, `sound.test.ts`, with a fixed `random`:
-  - `levelAt`: between two points, before the first, after the
-    last.
-  - a rise starts at 0 and reaches its first level in 0.18 to 0.3
-    seconds; no level of any plan is over `GUST_HIGH`;
-  - with nothing after it, the plan holds 0.12 seconds after the
-    command's end and falls to 0 in 0.5 to 0.8 seconds;
-  - a command carried: the plan starts at the level counted at
-    that moment, and at every moment up to the first command's end
-    the level is the one the stretch already had;
-  - eight commands of 0.133 seconds, each called as the one before
-    ends, none turned: one rise and seven carries, the level never
-    0 between the first and the last, and not the same at the end
-    of all eight;
-  - a turn puts a target 0.15 to 0.25 seconds ahead, 0.2 of the
-    strength or more from the level then; a second turn 0.133
-    seconds later puts none; one 0.4 seconds later does;
-  - a drop, and the command after it is a rise.
+  - `levelAt`: between two points, on a point, before the first,
+    after the last, and of an empty list where the programmer
+    gives it a meaning;
+  - the rest's rule: at its start, after one `τ`, and with a
+    second target that starts later.
 - Vitest, `sleep.test.ts`, the nodes' stand-in: a param's `value`
   reads a number nothing sets, 99, and no call the wind makes
-  carries 99; a second `gust` holds, after its cancel, the level
-  counted from the plan; the first gust of a new sound holds 0, as
-  the test there says.
-- Browser, `music.spec.ts`: seven buttons, and `rest`'s box
-  ticked as the page opens.
-- Browser, `chapter-4.spec.ts`:
-  - a straight flight, in a level of the chapter where eight cells
-    one way are free in the air (the programmer's choice): the lift
-    and then four moves of two cells the same way: four gusts
-    counted, one rise, no swell, and `data-wind` never read `off`
-    between the first move and the last;
-  - the zigzag's test there is: twelve gusts, the wind never off,
-    and now one swell at least and fewer than eleven;
-  - *Los aros*' own program: 18 gusts as now; rises and swells
-    together fewer than 18;
-  - sound muted in the settings: the three counts the same.
+  carries 99;
+  - the first gust of a new sound holds 0, as the test there
+    says;
+  - a second `gust`, with the clock moved into the first, holds
+    after its cancel the level counted from the first's plan at
+    that moment, and the bands and the whistle theirs;
+  - a `drop` in a gust holds the level counted and goes to 0, and
+    the gust after it starts from the drop's line;
+  - the rest after a gust starts from the value its curve has at
+    that moment.
+- Browser: the specs of the wind in `chapter-4.spec.ts` and
+  `music.spec.ts` are green with no change: *Los aros*' eighteen
+  gusts, the zigzag's twelve, six samples, the mix as written.
 
-**The documents.** The headers of `sound.ts`, `scene.ts` and
-`themes.ts`; `architecture.md`'s line of the page's attributes
-where it names `data-wind-gusts`.
+**The documents.** The header of `sound.ts` and the comments of
+`setNow` and of the wind's calls.
 
 ### 2.7 What the owner will try
 
@@ -570,12 +565,17 @@ where it names `data-wind-gusts`.
 
 **The wind**:
 
-7. `?debug#music`, *El viento de la escoba*: each button. No bang
-   at any start. The straight flight is one wind with no jump at
-   its joins; the zigzag changes now and then, not at every step.
-8. *Los aros*' own program, run: the wind rises as the flight
-   starts, changes with the turns, and falls when the wizard
-   stops.
+7. `?debug#music`, *El viento de la escoba*: the page opens with
+   the owner's mix (air 1.10, whistle 1.00, rest 0.50) and says
+   that every voice is as written. Each button sounds as it did
+   when the owner approved it, with no bang at any start.
+8. *Los aros*' own program, run: the wind as the owner knows it,
+   and the rest under it while the wizard hovers.
+
+Two more are the designer's and are there to be tried before the
+sprint is built: the landing, on the debug page's two buttons and
+at the end of *El primer vuelo*; and the mark, in the header and
+on the browser's tab.
 
 ### 2.8 What is left out, and why
 
@@ -592,12 +592,19 @@ where it names `data-wind-gusts`.
   moved in are the `if`'s, and the keys are told once.
 - **A timer on the painting.** The reader goes on at *Next*, as in
   every story.
-- **The wind's last numbers.** The designer cannot hear it. The
-  plan's numbers are a setting to be heard; the owner says what
-  they hear, and the numbers follow in a small commit.
+- **One wind for a whole stretch of flight**, which rises once
+  and changes at the turns. This plan asked it from the owner's
+  first comment. Then the owner heard the wind with the shot gone
+  and their own mix, and says the flight sounds well as it is. A
+  sound the owner has approved is not remade. If they ask for
+  fewer puffs in a zigzag later, it is a piece of its own.
+- **A change of any number of the wind.** They are the owner's.
 - **A wind for Zarek**, as in sprint 48.
-- **A thought at a locked door, and the browser tests on GitHub**:
-  they wait on the owner, as in sprint 48.
+- **A thought at a locked door**: the owner has looked, and it
+  stays as it is.
+- **The browser tests on GitHub**: started by hand alone (D179),
+  in the designer's commit. Nothing under `.github/` is the
+  programmer's.
 
 ## 3. The pieces
 
@@ -627,10 +634,11 @@ The lesson's third page by Gemini, in both languages, the tests,
 
 The intro by Gemini, in both languages, the sweep.
 
-### 3.6 One wind for a stretch of flight (D252, 2.6)
+### 3.6 The wind counted from its own plan (D252, 2.6)
 
-The stretch, `levelAt`, the rest in points, the scene's counts,
-the debug page's seventh sample, the tests and the documents.
+`levelAt`, the points kept, the rest's rule, `fromNow` gone, the
+stand-in that reads 99, the tests. No number, plan or mix
+changed.
 
 ### 3.7 The whole check, the hand-over and the report
 
@@ -650,13 +658,13 @@ committed:
   the wait at its start, with a tip up, and with the bar filling;
   the opening's steps 1, 2 and 3; the lesson's third page, and its
   block after Tab; *Los aros*' card at 1024×700; a drawing of the
-  level in time of the straight flight, of the zigzag and of *Los
-  aros*' own program, from the plan's own functions, with the
-  commands' starts marked on it; the tip picture's widths before
-  and after; what was built piece by piece; every choice the plan
-  left and how it was taken; Gemini's drafts and what was
-  corrected in each; and the owner's eight steps of 2.7, written
-  to be followed.
+  level in time of a zigzag's twelve gusts, counted with `levelAt`
+  from the points the wind kept, with the commands' starts marked
+  on it: each gust starts where the one before was; the tip
+  picture's widths before and after; what was built piece by
+  piece; every choice the plan left and how it was taken; Gemini's
+  drafts and what was corrected in each; and the owner's eight
+  steps of 2.7, written to be followed.
 
 ## 4. Gemini
 
@@ -698,21 +706,26 @@ docs/dev/sprint-49.md (this plan, whole), docs/dev/sprint-48.md (what
 was built last), and the memory notes kydux-two-agents,
 kydux-sprint-48-state, kydux-designer-review-48,
 kydux-designer-uat-sprint-48, kydux-designer-sprint-49-plan and
-kydux-checks-per-piece. The decisions D248 to D252 are entered in
-architecture.md as built, with D243 and D68 brought to them; the code
-is yours to bring to them. The designer's commit before the plan
-(setNow in engine/sound.ts) has already taken the bang out of a
-wind's start: read it and its test in sleep.test.ts before piece 3.6.
+kydux-checks-per-piece. The decisions D248 to D254 are entered in
+architecture.md as built. D248 to D251 and the counting of D252 are
+yours to build. The rest is built already, in the designer's commits
+after sprint 48: the bang taken out of a wind's start (setNow in
+engine/sound.ts, with its test in sleep.test.ts), the wind's mix as
+the owner set it by ear, the landing that goes out (D253), the
+browser tests on GitHub started by hand alone (D179), and the mark's
+wand of wood (D254). Read those commits before piece 3.6, and change
+nothing of them.
 
 Build sprint 49 whole: pieces 3.1 to 3.7 in order, one local commit
 each; before each commit ci/check.sh and the browser specs the piece
 touches green, and the whole ci/check.sh --e2e once before the last
-commit, in a copy with Playwright's own server on 4173; never a push,
-never a timer, never a deploy: nothing is released until the owner is
-happy with chapter 4. Never stop or build into the servers on ports
-443 and 5173, and stop your own preview when you are done. No image
-is asked of Gemini. Three texts are: write the three briefs of
-section 4, run them, read and correct the drafts; the key stays in
+commit, in a copy with Playwright's own server on 4173 and the app
+built anew in that copy before the run; never a push, never a timer,
+never a deploy: nothing is released until the owner is happy with
+chapter 4. Never stop or build into the servers on ports 443 and
+5173, and stop your own preview when you are done. No image is asked
+of Gemini. Three texts are: write the three briefs of section 4, run
+them, read and correct the drafts; the key stays in
 ~/.config/kydux/secrets.env and never enters a file of the tree, a
 commit, a log or the report. Nothing under .github/ changes.
 
@@ -737,23 +750,22 @@ What the owner will look for:
 (5) Los aros' card opening with the practice that goes on and why
     the rings, from the owner's words; the card no taller than
     615 px in the sweep;
-(6) one wind for the flown commands that follow one another: a
-    rise from nothing at the first, never under 0.18 s; no change
-    at the join of two commands flown the same way; a new level at
-    a turn, not more often than every 0.35 s; a slow wander
-    between; a hold of 0.12 s and a fall after the last; the
-    level counted from the wind's own plan (levelAt), no param's
-    value ever read back; the rest planned the same way and on in
-    the written mix; a seventh sample, the straight flight, under
-    ?debug#music.
+(6) the wind exactly as it sounds now, a gust for each flown
+    command with the owner's mix: the owner has approved it by
+    ear. Under it, one change that is not heard: the level that a
+    gust taken on, a drop and the rest start from is counted from
+    the points the wind last gave the clock (levelAt, and the
+    rest's curve by its own rule), and no param's value is ever
+    read back; fromNow goes; the tests' stand-in reads 99 and no
+    call carries 99.
 
 The plan decides everything; where it does not, take the smallest
 choice that keeps its intent and say it in the commit. The wind's
-numbers are a setting the owner will hear: build them as written.
-The debug page's labels are yours, in both languages. Never edit
-content while a browser run is going. Every document and comment in
-the present. Before git add, read git diff of each file and stage
-only your own hunks; commit promptly.
+plans, numbers and mix are the owner's: change none, and add no
+sample to the debug page. Never edit content while a browser run is
+going. Every document and comment in the present. Before git add,
+read git diff of each file and stage only your own hunks; commit
+promptly.
 
 Hand over, in drafts/ and never committed: the walkthroughs of
 chapters 3 and 4 made again, and the report in Spanish as 3.7 asks,

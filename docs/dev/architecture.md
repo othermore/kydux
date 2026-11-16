@@ -725,8 +725,9 @@ one overturns stays, marked as superseded.
   700 pixels, a tablet held sideways with its browser's bars, to any size:
   at 1024 × 700, 1280 × 720 and 1920 × 1080 the scene, the editor with
   eight lines or more, Run, the goals, the speed and the gear are in view
-  with no scrolling, the start card and the notebook fit inside the
-  scene's frame, and the heading wraps rather than overlap
+  with no scrolling, the notebook fits inside the scene's frame and the
+  start card inside the window, between the scene's sides (D228), and the
+  heading wraps rather than overlap
   (`app/e2e/screens.spec.ts`). Under 800 pixels the panes stack, for a
   phone, which the game does not promise but does not break on. The goals
   panel's heading folds it, since at 1024 the open panel covers the scene's
@@ -2753,17 +2754,18 @@ one overturns stays, marked as superseded.
   start; the racer lifts his broom the tick after his own `lines`, as the wizard does with
   drevo, and flies his `path` from there, its turning points flown in straight lines, a
   cell a tick, and he crosses the finish line at the tick he reaches his path's last
-  cell. A ring the wizard missed (D187)
+  cell, which lies, as the wizard's `finish` does, past the painted line (D229). A ring
+  the wizard missed (D187)
   costs five ticks before the finish line, served circling over the cell before it. The
   goal `before` (`{"kind": "before", "racer": "zarek"}`) is met when the wizard crosses
   the finish at a tick lower than the racer's; equal ticks are a tie, which is nobody's:
   the goal is not met and the race is flown again (D220). A band over the scene says Ilda
   reading (*Ilda lee los programas: tú, 11 líneas; Zarek, 18*) and the ticks to each
   take-off; the win and the outcome cards say her count from the goal's `params`: *tus
-  líneas (11) + tu vuelo (42) + la penalización (0) = tick 53. Zarek: 18 + 42 = tick 60*.
-  In *La carrera* the program without a function, 18 lines, ties with him at 60; in *La
+  líneas (11) + tu vuelo (43) + la penalización (0) = tick 54. Zarek: 18 + 43 = tick 61*.
+  In *La carrera* the program without a function, 18 lines, ties with him at 61; in *La
   revancha* the race's program, its numbers unchanged, misses seven rings and crosses at
-  88. Rules out a race won by a long program that arrives first, and a penalty the child
+  89. Rules out a race won by a long program that arrives first, and a penalty the child
   cannot see.
 - **D190 — A function is taught where a loop cannot serve.** Decided 2026-11-10 by the
   owner (*hace que la función sea útil*). The rings' level repeats the pair of rings three
@@ -3349,7 +3351,8 @@ one overturns stays, marked as superseded.
   between them. The racer's lane holds his own rings, at the wizard's columns and in the
   wizard's colours, and the level's `race` names them in order; he starts on the row under
   them, at the wizard's column, flies every one of them by D219 and crosses the finish
-  line at the last cell of his path, in his lane. A level whose racer misses a ring of his
+  line at the last cell of his path, in his lane, past the painted line (D229). A level
+  whose racer misses a ring of his
   own, or leaves his lane, does not load. Ilda's count stays as D189 gives it; equal ticks
   are a tie, the goal `before` is not met and the outcome says that the race is flown
   again. Rules out a racer who flies where there are no rings, two racers through the same
@@ -3370,7 +3373,8 @@ one overturns stays, marked as superseded.
   Decided 2026-11-14 by the owner (*el scroll de ese cuadro debería estar arriba y que
   haya que bajar para leerlo y cerrarlo*; *si se hace clic en cualquier botón de la
   página, incluido ejecutar y similar, el cuadro de objetivos se debería ocultar*). A card
-  taller than its room scrolls, and shows its first line when it opens: its button takes
+  taller than its room (D228) scrolls, and shows its first line when it opens: its button
+  takes
   the keyboard without bringing itself into view. A click on any button of the page
   outside the start card closes the card, and the button does what it does. Rules out a
   card opened at its end, and a start card left over the scene while the program runs.
@@ -3435,10 +3439,52 @@ one overturns stays, marked as superseded.
   ends inside a ring leaves the wizard in the air there. Rules out a ring left by its side
   in silence, missed and paid for only at a race's end, and a rim that bumps while the
   program goes on.
-- **D227 — The goals box folds at a level's start where it covers the wizard or a ring.**
-  Decided 2026-11-14. Once the camera has drawn the level's start, the page compares the
-  goals box with the wizard's box and with each ring's (`SceneHandle.wizardBox`,
-  `ringBoxes`); where it meets one, the box folds for that level alone, and the child
-  opens it with its heading. The start card gives the goals whole before, the rings' rule
-  among them (D219). Rules out a ring half hidden under the goals where the child must fly
-  through it, and a box that moves about the page from level to level.
+- **D227 — The goals box is open at a level's start.** Decided 2026-11-14 by the owner
+  (*el niño tiene que leer eso cuando inicia el nivel, si la pliegas le obligas a
+  desplegarla primero*). The box opens unfolded in every level, over whatever of the scene
+  lies under it, a ring too, and the child folds it with its heading. One case folds it by
+  itself: where it would cover the wizard at the start, once the camera has drawn where
+  the wizard stands (`SceneHandle.wizardBox`), since a child who cannot see their wizard
+  does not know where they stand. Rules out a box folded to show a ring or any other thing
+  of the scene, and a box that moves about the page from level to level.
+- **D228 — A card has the window's height for its room, and the start card is wide.**
+  Decided 2026-11-14 by the designer, from the owner's ask (*hay algo que podamos hacer
+  para que haya que hacer menos scroll en esas cajas? Cuando el texto es largo se tapa la
+  mitad y hay que hacer scroll*). A card lies over the scene, centred on it. A card taller
+  than the scene grows over the level's heading above it and the bar under it, as far as
+  the window's top and bottom less a margin of 12 px; it stays between the scene's sides,
+  never over the editor or its buttons, and the dim stays on the scene. The start card is
+  up to 680 px wide, 94% of the scene's width at most, with tight margins; the other cards
+  keep their widths. At 1280 × 800 no start card and no win card of the game scrolls, in
+  either language, and a browser test holds it: a text that outgrows the window fails the
+  check. In a shorter window a card still too tall scrolls, by D222. Rules out a card held
+  inside the scene's frame, a card over the editor, and smaller letters to make a text
+  fit.
+- **D229 — The race's finish is the cell past the painted line.** Decided 2026-11-14 by
+  the owner (*se puede hacer que tanto él como el mago aterricen pasada la meta; añade la
+  misma distancia a todos, así que no cambia nada, solo hay que cambiar la celda
+  objetivo*). The race course paints its line and the line's poles at the middle of
+  column 31. A race's `finish` and the last cell of its racer's path are in column 32,
+  (32,8) and (32,12): each racer crosses there and lands there, the racer clear of the
+  lower flag's pole. A missed ring's circles (D189) are flown over the cell before the
+  finish, the line's own. Rules out a racer landed on the line, half hidden by the pole,
+  and a finish further for one racer than for the other.
+- **D230 — What an address names with its version is kept for good.** Decided 2026-11-14
+  by the owner, on the designer's proposal. The page asks for every file under `content/`
+  with the world's stamp in its address (`?v=<stamp>`), from one function, and for
+  Python's own files in a folder named by Pyodide's version (`pyodide/<version>/`). The
+  stamp is made from the world's Python and from every file shipped under `content/`, so
+  a build that changes any of them changes every such address. The friends' server
+  (`deploy/nginx-kydux.conf`) keeps for good a file of `/content/` asked for with a stamp
+  and every file of a version's folder, as it keeps `/assets/`; the page itself,
+  `world.zip` and a file asked for with no stamp are asked again on each load. Rules out
+  a trip to the server for each file that has not changed, and a file kept for good under
+  an address that a later build fills with something else.
+- **D231 — The page's sound sleeps while nothing sounds.** Decided 2026-11-14 by the
+  owner, on the designer's proposal. The page's one sound context is suspended once no
+  theme plays or fades, no wind blows and the last sound ended three seconds ago, and
+  whatever sounds next resumes it first; the context's clock stands still meanwhile, so a
+  sound scheduled on it is whole. The root element says the state (`data-audio`: `asleep`,
+  `awake`). The music is still while the tab is hidden (D192), and a tab shown again wakes
+  the context only where something is to sound. Rules out a sound engine at work behind a
+  page that makes no sound.

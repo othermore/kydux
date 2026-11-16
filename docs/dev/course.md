@@ -83,6 +83,19 @@ design:
   tells what the three see next. Every page that shows code lets the child run it
   (D142). Rule given by the owner on 2026-11-07.
 
+- **A function is taught where a loop cannot serve.** The same lines come
+  again with something different between them, so that a `for` cannot repeat
+  them and the function is called from several places; its arguments are
+  taught where the same move comes in different lengths, so that a function
+  without them cannot serve either. A `def` whose only reason is a lines goal a
+  `for` would meet is never the way a function is introduced (D190). Rule given
+  by the owner on 2026-11-10.
+- **A race is won by a count the child sees.** Ilda reads each program before
+  the start, a tick a line, and every ring missed costs five ticks before the
+  finish, so that a shorter program takes off sooner and the child sees why it
+  won or lost: the start band shows the lines read, and the card the count
+  (D189). Rule given by the owner on 2026-11-10.
+
 Each later chapter's design is checked against this before its texts are
 briefed: every lesson names the level that needs it, and what in that
 level would fail without the idea.
@@ -259,34 +272,67 @@ D66); and `teacher.can_see` taught in no level of chapters 1 to 3 (D139).
 
 ## Chapter 4 — The broom (`04-the-broom`)
 
-On the broom field, against Zarek. The ideas: lists, a loop over a list,
-an action of one's own, with and without arguments; flying.
+By morning, outdoors, the first chapter in daylight since the arrival: the shed where
+the class's brooms are kept, the lake's edge, the long ring field and the race
+course behind the castle. The three go down before breakfast to undo what the voice
+in the walls asked an older pupil to do to the brooms; then Ilda gives the flying
+lesson, Zarek boasts, the wizard races him twice, and an older pupil is seen
+muttering by the gate. The ideas, one a lesson, each where its level cannot be won
+without it: a list, because the brooms lie hidden in the straw and their number
+changes from one way to another; a loop over a list, because the same is done to
+each broom and no fixed number of turns wins every way; an `if` inside the loop,
+because untying a broom with no knot is an error; flying, because water is not
+walked on; an action of the child's own, a function, because the same two rings
+come three times with a different manoeuvre between them, which a loop cannot
+repeat; and its arguments, because in the race the move is the same and each
+stretch is of another length. The wizard carries the school wand throughout, and
+the broom from the first flight on.
 
-| # | Item | The idea, or what it practises | API it unlocks |
+Its scenes are four, each by morning with its margins the grounds (lawn, hedges,
+trees, the lake, the castle's wall), never sky: `the-broom-shed`, the shed with
+its roof lifted off, its inside three rows of boards between the bench and the
+hay; `the-lake-edge`, an arm of the lake from top to bottom, a jetty, and the white
+stone on the far bank; and two wide ones, forty-two cells by eighteen, which the
+camera follows: `the-ring-field`, the long training lawn with a clump of trees and a
+pond, and `the-race-course`, the chalk course between its start and its finish.
+The brooms and the rings are drawn by the game from a sprite of their kind, where
+each level says (D182).
+
+| Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
-| T18 | `lesson:lists` | A list keeps several values in order, in square brackets: `wizard.items`, `wizard.find_all("ring")`. | `wizard.find_all`, `wizard.has` |
-| L24 | `level:the-shed` | Find every broom part on the floor. | |
-| T19 | `lesson:for-each` | `for ring in rings:` does its lines once for each value of a list. | |
-| L25 | `level:the-rings` | Fly through every ring, in order. | |
-| T20 | `lesson:drevo` | The spell `drevo` lifts the broom; flying crosses what walking cannot. | `wizard.fly` |
-| L26 | `level:the-first-flight` | Over the lake's edge. | |
-| T21 | `lesson:an-action-of-your-own` | A function: `def` gives a name to some lines, to use them again. | (Python's `def`) |
-| L27 | `level:the-loop-the-loop` | The same figure flown four times, as one function. | |
-| T22 | `lesson:arguments-of-your-own` | A function can take arguments, as the wizard's actions do. | |
-| L28 | `level:the-race` | The race against Zarek, which a clear program wins. | |
+| `story:the-morning-after` | Story 1 | The dormitory by morning: what the three heard through the crack, and why they tell no one; down to the shed before breakfast; the shed in disorder, brooms in a row and in the straw; the black knotted thread in a broom's twigs; how many are there? The story changes scene, from the dormitory to the shed. | |
+| `lesson:lists` | Lesson 1 | A variable may keep several values at once, in order, in square brackets: a list; `print` shows it whole, `len` says how many it holds; `wizard.find_all("broom")` gives every broom of the place as a list, nearest first, and shows them even where something covers them. Two pages; its block prints a list of three names and its length (D174). | `wizard.find_all`, `len` |
+| `level:the-shed` | Practice 1 | How many brooms? Six, eight or nine by the way played (D51), hidden in the straw until found: find them all, print the list, say how many. A number typed wins one way only. Bonus: `print` used. | |
+| `lesson:for-each` | Lesson 2 | `for broom in brooms:` runs its lines once for each value of a list, `broom` the next one each time: chapter 3's `for`, going through things instead of counting. One page; its block prints each name of a list. | (Python's `for` over a list) |
+| `level:the-brooms-in-a-row` | Practice 2 | Three, four or five knotted brooms in a row on the floor: walk to the first, then for each broom of the list untie it and step right. Three untyings written out win the shortest way only. Bonus: `for` used. | `broom.untie` |
+| `level:the-brooms-in-the-straw` | Practice 3 | Three or four brooms scattered in the straw, each left of and not above the one before: in the loop, the steps left and down from the wizard's cell to the broom's, from their two numbers (D153), walked, and the broom untied. Bonus: `x` used. | |
+| `lesson:checking-each` | Lesson 3 | *An if inside the loop*: an `if` inside a `for`, its lines moved in by eight spaces, so that each turn does one thing or another by the value of that turn. One page; its block prints which name of a list is a cat. | |
+| `level:the-check` | Fix 1 | Every broom gathered for a last look, six, eight or nine, two or three still knotted: the friend's program, the last level's turned right and up, stops at the first broom with no knot, *this broom has no knot*; untie only `if broom.knotted:`. Goals: no broom knotted, and the run ends with no error. Bonus: `knotted` used. | `broom.knotted` |
+| `story:the-flying-lesson` | Story 2 | At the lake's edge: Ilda arrives with the class; the friend pockets the black thread; Zarek flies in, circles and lands, boasting; Ilda names the word and the first exercise. | |
+| `lesson:drevo` | Lesson 4 | Ilda's: the word `drevo`, cast with the wand and a broom carried, lifts the broom; from then on the moves fly, over water, hedges and fences, three times as fast, never through a tree's crown; the broom sets down where the program ends. One page and no *Try it*: the spell is cast in the level (D174). | (the spell `drevo`) |
+| `level:the-first-flight` | Practice 4 | Walk to the jetty's end, the word, and fly over the water to the white stone; a walk into the water is refused, *water is not walked on*. Bonus: `drevo` cast from the jetty. | |
+| `lesson:an-action-of-your-own` | Lesson 5 | `def` gives some lines a name, and the programmers call it a function; the name with brackets runs them, wherever it is written and as often; a loop repeats what is the same and follows on, a function serves wherever it is wanted, with other lines between, and reads as what it does. Two pages; its block defines a greeting and calls it twice with another line between. | (Python's `def`) |
+| `level:the-rings` | Improve 1 | Three pairs of rings flown through in order, under the trees between the first two pairs and over the pond between the last two: the given program writes the pair out three times, 21 lines; with the pair as a function, fewer than 18 (D190). A `for` round the pair flies into the trees. | |
+| `lesson:arguments-of-your-own` | Lesson 6 | Names between the `def`'s brackets are the function's arguments; a call gives them values, in the same order, as `move_right(3)` is given its 3, and inside the function the names are worth them. One page; its block greets two names with one function. | |
+| `level:the-race` | Practice 5 | Eight rings at different distances and the finish, before Zarek, by Ilda's count: a tick a line before the take-off, the flight, five ticks a ring missed (D189). The program without a function crosses one tick after him; a function with two arguments crosses first. Bonus: fewer than 12 lines. | |
+| `level:the-rematch` | Improve 2 | The rings moved and Zarek sharper: the race's program flies into a ring's side; the same function with new numbers wins by one tick, and a line more ties, which is Zarek's. | |
+| `story:the-finish` | Story 3 | Zarek lands and concedes; Ilda, who found a black thread in the shed's straw, gives the wizard the broom; an older pupil by the gate muttering what gives him away, the one from the crack, unnamed; the voice still a mystery; what the chapter taught. | |
 
-The world features chapter 4 needs: the broom and `wizard.fly`; tiles to
-fly over and not walk on; a goal of reaching several tiles in order
-(`reach_in_order`); an actor with a fixed path to race (Zarek), and a
-goal of arriving before it.
-
-Its scene: the broom field behind the castle, its rings and its race
-course, and the village's street to the wand shop. Its rewrite: an
-opening story, the broom field and the village's wand shop; a closing one, the race won, Zarek a friendly rival, and a wand of
-the wizard's own. A fix level follows `for-each`: a loop whose line is not
-moved in, so it runs once. `the-loop-the-loop` is an improve level:
-the program given writes the figure four times, and the child makes it
-one function.
+The world features chapter 4 needs: things of a kind drawn from a sprite of their
+own on any scene, the broom lying and the ring standing (D182); the broom, a thing
+carried from the first flight on, knotted and untied (`broom.knotted`,
+`broom.untie()`, `no_knot`), and the goal of no broom knotted (D183); `find_all`
+over hidden things, `len`, a number said, and a goal that the number said is the
+count of a kind in the way played (D184); flying, `drevo`, every move flown, a flown
+step played three times as fast with the wind's sound (D185); cells that a flight
+crosses and a walk does not, `low`, and cells neither does, `high` (D186); rings,
+flown through vertically and in order, with the rings missed counted (D187); the
+wizard's flying rows and the new figures, Zarek and Rinlo (D188); a racer with a
+fixed path and the race scored by Ilda's count, its start delayed a tick a line and
+five ticks a ring missed, and the goal of crossing the finish first (D189); a goal
+that the run ends with no error; a cast goal made from a set of cells; a story that
+changes scene; and the wide scenes, forty-two cells by eighteen, which the camera
+follows.
 
 ## Chapter 5 — The familiar (`05-the-familiar`)
 
@@ -327,7 +373,7 @@ stairs* (moving tiles and functions), *Zarek's revenge* (the race again),
 
 ## The count
 
-Thirty-two lessons and thirty-six levels, thirty-eight with the fix
-levels of chapters 4 and 5, then ten challenges. The draft
+Thirty-four lessons and thirty-nine levels, forty-one with the fix and
+improve levels of chapter 5, then ten challenges. The draft
 asked for 10 to 20 lessons; one idea per lesson, each with its theory,
 asks for more, and each is short: a few pages.

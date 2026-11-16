@@ -79,7 +79,14 @@ export function onPlayed(listener: (name: EffectName) => void): void {
   played = listener;
 }
 
-function audio(): AudioContext | null {
+/** Whether the sounds are off, for a sound that goes on (sound.ts). */
+export function isMuted(): boolean {
+  return muted;
+}
+
+/** The page's one audio context, made the first time a sound asks for it; null
+ * where the browser has none. */
+export function audio(): AudioContext | null {
   if (context) return context;
   const Audio = globalThis.AudioContext ?? (globalThis as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!Audio) return null;
@@ -91,7 +98,7 @@ function audio(): AudioContext | null {
   return context;
 }
 
-function noise(ctx: AudioContext, seconds: number): AudioBufferSourceNode {
+export function noise(ctx: AudioContext, seconds: number): AudioBufferSourceNode {
   const buffer = ctx.createBuffer(1, Math.max(1, Math.floor(ctx.sampleRate * seconds)), ctx.sampleRate);
   const data = buffer.getChannelData(0);
   // The same noise every time: a small pseudo-random sequence, not Math.random.

@@ -558,6 +558,13 @@ export function makePlaceholders(
     });
     friend.texture.refresh();
   }
+  // A racer, a pupil a year older (D189): drawn as a grown-up where there is no sheet.
+  const racer = canvas(scene, actorKey('racer'), WIZARD_WIDTH * FACINGS.length, WIZARD_HEIGHT);
+  FACINGS.forEach((facing, index) => {
+    drawFigure(racer.ctx, index * WIZARD_WIDTH, facing, TEACHER);
+    racer.texture.add(facing, 0, index * WIZARD_WIDTH, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
+  });
+  racer.texture.refresh();
   const cat = canvas(scene, actorKey('cat'), WIZARD_WIDTH * FACINGS.length, WIZARD_HEIGHT);
   FACINGS.forEach((facing, index) => {
     drawCat(cat.ctx, index * WIZARD_WIDTH, facing);
@@ -590,7 +597,7 @@ export function makePlaceholders(
   shape.ctx.fill();
   shape.texture.refresh();
 
-  for (const kind of ['key', 'book', 'wand', 'potion']) {
+  for (const kind of ['key', 'book', 'wand', 'potion', 'broom', 'ring']) {
     const thing = canvas(scene, thingKey(kind), TILE, TILE);
     drawThing(thing.ctx, 0, kind);
     thing.texture.refresh();

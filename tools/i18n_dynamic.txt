@@ -40,3 +40,8 @@ stars.
 
 # The debug view's panel and legend (app/src/engine/debug.ts): debugWord(key).
 debug.
+
+# A walk refused on a low cell says its terrain by `blocked.no_walk.${kind}`, and a
+# flight's bump on a high one by `blocked.high.${kind}` (D186, engine/words.ts).
+blocked.no_walk.
+blocked.high.

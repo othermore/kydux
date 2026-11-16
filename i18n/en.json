@@ -93,7 +93,8 @@
     "other": "Python says: {type}: {message}",
     "line": " (line {line})",
     "unknown_action": "`{object}` does not know an action called `{name}`.",
-    "no_new_attribute": "You cannot give `{object}` a new `{name}`. What `{object}` can do is in its notebook."
+    "no_new_attribute": "You cannot give `{object}` a new `{name}`. What `{object}` can do is in its notebook.",
+    "no_knot": "This broom has no knot, so there is nothing to untie, and the program stops here. Before untying a broom, look whether it has a knot."
   },
   "things": {
     "door": "the door",
@@ -144,7 +145,30 @@
     "not_inside_yet": "Do not go in yet: stay on the threshold, past the door.",
     "no_bed": "There is no bed right beside me.",
     "bed_taken": "This bed belongs to someone else.",
-    "not_here": "I am carrying {thing}, so it cannot be shown where it lies."
+    "not_here": "I am carrying {thing}, so it cannot be shown where it lies.",
+    "no_walk": {
+      "water": "Water is not walked on: here you can only fly across.",
+      "reeds": "Reeds are not walked on: here you can only fly across.",
+      "hedge": "The hedge is not walked on: you can only fly over it.",
+      "fence": "The fence is not walked on: you can only fly over it.",
+      "bench": "The bench is not walked on: you can only fly over it.",
+      "chest": "The chest is not walked on: you can only fly over it.",
+      "stand": "The stand is not walked on: you can only fly over it.",
+      "low": "This is not walked on: you can only fly across."
+    },
+    "high": {
+      "tree": "The trees' crowns cannot be flown through: go round them.",
+      "wall": "The wall cannot be flown through.",
+      "shed": "The shed cannot be flown through.",
+      "rock": "The rocks cannot be flown through.",
+      "pole": "The pole cannot be flown through: go round it.",
+      "gate": "The gate cannot be flown through.",
+      "other": "That way cannot be flown through."
+    },
+    "ring": "I bumped into the ring! It is flown through from above or from below.",
+    "too_far": "To untie {thing} I must stand on it.",
+    "no_broom": "With no broom, drevo has nothing to lift.",
+    "no_knot": "This broom has no knot: there is nothing to untie."
   },
   "notebook": {
     "title": "The wizard's notebook",
@@ -464,5 +488,11 @@
       "other": "Other",
       "margin": "Margin, painted beyond the scene"
     }
+  },
+  "race": {
+    "reading": "Ilda reads the programs: you, {mine} lines; {name}, {theirs}.",
+    "left": "You take off in {mine}; {name}, in {theirs}.",
+    "count": "Ilda's count: your lines ({lines}) + your flight ({flight}) + the penalty ({penalty}) = tick {tick}. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
+    "count_unfinished": "Ilda's count: you did not cross the finish. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}."
   }
 }

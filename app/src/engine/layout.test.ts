@@ -103,3 +103,25 @@ describe('layout', () => {
     ]);
   });
 });
+
+describe('chapter 4 in the layout', () => {
+  it('reads the low cells, the hidden things and the race with its path walked out (D184, D186, D189)', () => {
+    const level = {
+      id: 'race',
+      map: ['S.~..', '.....'],
+      things: [{ kind: 'broom', id: 'broom_1', at: [1, 1], hidden: true }],
+      actors: [{ kind: 'racer', id: 'zarek', at: [0, 1] }],
+      race: { against: 'zarek', lines: 3, path: [[2, 1], [2, 1], [4, 1], [4, 0]], finish: [4, 0] },
+    };
+    const shaped = layout(level);
+    expect(shaped.low).toEqual([[2, 0]]);
+    expect(shaped.terrain[0]?.[2]).toBe('low');
+    expect(shaped.things[0]?.hidden).toBe(true);
+    expect(shaped.race).toEqual({
+      against: 'zarek',
+      lines: 3,
+      path: [[1, 1], [2, 1], [2, 1], [3, 1], [4, 1], [4, 0]],
+      finish: [4, 0],
+    });
+  });
+});

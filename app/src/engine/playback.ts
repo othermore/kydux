@@ -1,21 +1,28 @@
 // The playback of a run's events, tick by tick, at a speed the child chooses:
 // each step plays every event of one tick, the wizard's and the actors'. A tick
-// in which the wizard does something with its hands, casting or picking up,
-// lasts LONG of a tick, so that it is seen through before the next step. It
-// knows nothing of Phaser: the scene listens to it and draws.
+// in which the wizard does something with its hands, casting, picking up or
+// untying, lasts LONG of a tick, so that it is seen through before the next step;
+// a tick in which every move is flown lasts a third of one (D185). What happens
+// before the first tick, a hidden thing found by the first line (D184), is played
+// with the first tick. It knows nothing of Phaser: the scene listens to it and
+// draws.
 
 import type { WorldEvent } from '../runtime/protocol';
+import { FLOWN, flownTick } from './flight';
 
 /** What the playback plays: the world's events, one tick each. */
 export type PlaybackEvent = WorldEvent;
 
 /** How long a tick lasts in which the wizard casts or picks up, against a tick. */
 export const LONG = 1.6;
+export { FLOWN } from './flight';
 /** The wizard's events that take a long tick. */
-const HANDS = new Set(['cast', 'pick_up']);
-/** How long a tick's events take, against a tick (LONG for the wizard's hands). */
+const HANDS = new Set(['cast', 'pick_up', 'untie']);
+/** How long a tick's events take, against a tick: LONG for the wizard's hands, a
+ * third for a flight (D185). */
 export function lengthOf(events: PlaybackEvent[]): number {
-  return events.some((event) => event.actor === 'wizard' && HANDS.has(event.kind)) ? LONG : 1;
+  if (events.some((event) => event.actor === 'wizard' && HANDS.has(event.kind))) return LONG;
+  return flownTick(events) ? FLOWN : 1;
 }
 
 export type PlaybackState = 'idle' | 'playing' | 'paused' | 'done';
@@ -75,10 +82,14 @@ export class Playback {
     return this.tickMs / this.multiplier;
   }
 
-  /** New events to play, from tick 0. */
+  /** New events to play, from tick 0; what happened before the first tick is played
+   * with it. */
   load(events: PlaybackEvent[]): void {
     const byTick = new Map<number, PlaybackEvent[]>();
-    for (const event of events) byTick.set(event.tick, [...(byTick.get(event.tick) ?? []), event]);
+    for (const event of events) {
+      const tick = Math.max(event.tick, 1);
+      byTick.set(tick, [...(byTick.get(tick) ?? []), event]);
+    }
     this.ticks = [...byTick.keys()].sort((a, b) => a - b).map((tick) => byTick.get(tick) ?? []);
     this.reset();
   }

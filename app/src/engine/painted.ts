@@ -15,6 +15,7 @@ import { coverDepth, type Lowered, type Nudged, nudgedBy, overDepth, rowDepth, t
 import type { Dark } from './shade';
 import { centredCorner, drawnShift, KEY_SCALE, shiftBy } from './shift';
 import type { Tile } from './sight';
+import { spriteKey, type ThingSprites } from './things';
 
 /** A scene painted in one picture (D76): its ground, its raised things cut out by
  * the row their foot stands on, and the things that change, each in its states;
@@ -113,10 +114,10 @@ export interface FigureArt {
   /** The first row of each part of a wizard's sheet, by its name: the walking, the
    * casting and the picking-up rows (four each, down, left, right and up), the
    * celebrating one, facing down, and the lying one, asleep (D91). */
-  rows?: { walk: number; cast: number; pickup?: number; win?: number; sleep?: number };
+  rows?: { walk: number; cast: number; pickup?: number; win?: number; sleep?: number; fly?: number };
   /** The rows of a sheet laid out otherwise than a wizard's, by its name: a
-   * friend's walking rows and its lying one (D91). */
-  sheets?: Record<string, { walk: number; sleep?: number }>;
+   * friend's walking rows and its lying one (D91), a racer's flying ones (D188). */
+  sheets?: Record<string, { walk: number; sleep?: number; fly?: number }>;
 }
 
 /** A part of a wizard's sheet played as frames: casting or picking up the way the
@@ -126,6 +127,10 @@ export type Played = 'cast' | 'pickup' | 'win';
 export interface Art {
   scene: SceneArt;
   figures: FigureArt | null;
+  /** The kinds of thing drawn from a sprite of their own (D182), with where their
+   * pictures are. */
+  sprites: ThingSprites | null;
+  spritesBase?: string;
 }
 
 /** The art of a level or a story on a painted scene, or null on a scene without. */
@@ -141,7 +146,13 @@ export async function loadArt(level: LevelJson): Promise<Art | null> {
   const scene = await json<Omit<SceneArt, 'base'>>(`${base}art.json`);
   if (!scene) return null;
   const figures = await json<Omit<FigureArt, 'base'>>(`${root}figures/figures.json`);
-  return { scene: { ...scene, base }, figures: figures ? { ...figures, base: `${root}figures/` } : null };
+  const sprites = await json<ThingSprites>(`${root}things/things.json`);
+  return {
+    scene: { ...scene, base },
+    figures: figures ? { ...figures, base: `${root}figures/` } : null,
+    sprites,
+    spritesBase: `${root}things/`,
+  };
 }
 
 /** The rows of a figure's sheet, by the way it faces: four rows of walking frames,
@@ -171,8 +182,11 @@ export function hourKey(key: string, hour: string): string {
   return `${key}-${hour}`;
 }
 
-/** Loads the painting's images and the figures' sheets. */
-export function preloadArt(scene: Phaser.Scene, { scene: painted, figures }: Art): void {
+/** Loads the painting's images, the things' sprites and the figures' sheets. */
+export function preloadArt(scene: Phaser.Scene, { scene: painted, figures, sprites, spritesBase }: Art): void {
+  for (const [kind, sprite] of Object.entries(sprites ?? {})) {
+    scene.load.image(spriteKey(kind), `${spritesBase ?? ''}${sprite.image}`);
+  }
   scene.load.image('art-ground', painted.base + painted.ground);
   for (const [hour, image] of Object.entries(groundsOf(painted))) scene.load.image(`art-ground-${hour}`, painted.base + image);
   for (const row of painted.rows) {
@@ -468,6 +482,11 @@ export function planPictures(
     things: shownThings,
     figures: shownFigures,
   };
+}
+
+/** The first of a figure's flying rows (D188), or undefined for a sheet without them. */
+export function flyRowOf(figures: FigureArt, name: string): number | undefined {
+  return figures.sheets?.[name]?.fly ?? (name.startsWith('wizard-') ? figures.rows?.fly : undefined);
 }
 
 /** The lying frame of a figure's sheet (D91), or null for a sheet without one. */

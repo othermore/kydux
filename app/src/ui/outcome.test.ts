@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { initLanguage } from '../i18n';
-import { explanationText, outcomeText } from './outcome';
+import { explanationText, outcomeText, raceCount } from './outcome';
 
 const english = { languages: ['en'], storage: null };
 const spanish = { languages: ['es'], storage: null };
@@ -85,5 +85,34 @@ describe('an error explained', () => {
     );
     expect(outcomeText({ kind: 'won', way: 'away' }, name)).toBe('You did it, Kydux! In every way!');
     expect(outcomeText({ kind: 'way_won', way: 'away' }, name)).toContain('Not every way yet');
+  });
+});
+
+describe("Ilda's count after a race (D189)", () => {
+  const before = (tick: number | null) => [
+    { kind: 'through_in_order', params: { missed: [] } },
+    {
+      kind: 'before',
+      params: { racer: 'zarek', lines: 11, flight: 38, penalty: 0, tick, racer_lines: 14, racer_tick: 55 },
+    },
+  ];
+
+  it('says the lines, the flight and the penalty that make the tick, and the racer\'s', () => {
+    initLanguage(spanish);
+    expect(raceCount(before(49))).toBe(
+      'La cuenta de Ilda: tus líneas (11) + tu vuelo (38) + la penalización (0) = tick 49. Zarek: 14 + 41 = tick 55.',
+    );
+    initLanguage(english);
+    expect(raceCount(before(null))).toBe("Ilda's count: you did not cross the finish. Zarek: 14 + 41 = tick 55.");
+  });
+
+  it('says nothing for a level that is no race', () => {
+    expect(raceCount([{ kind: 'reach', params: {} }])).toBeNull();
+    expect(raceCount(undefined)).toBeNull();
+  });
+
+  it('explains a broom with no knot in the child\'s words (D183)', () => {
+    initLanguage(spanish);
+    expect(explanationText({ kind: 'no_knot', params: { thing: 'broom_1' } })).toMatch(/^Esta escoba no tiene nudo/);
   });
 });

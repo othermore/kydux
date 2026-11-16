@@ -29,7 +29,7 @@ def with_art(built: dict, scene_id: str, content: Path) -> dict:
 
 def scene_maps(content: Path = CONTENT) -> dict[str, dict[str, dict]]:
     sys.path.insert(0, str(REPO / "world"))
-    from kydux_world.level import Level, on_scene, read_scene, story_on_scene
+    from kydux_world.level import Level, on_scene, read_scene, story_on_scenes
 
     levels = {}
     for path in sorted((content / "levels").glob("*/level.json")):
@@ -46,10 +46,13 @@ def scene_maps(content: Path = CONTENT) -> dict[str, dict[str, dict]]:
     stories = {}
     for path in sorted((content / "stories").glob("*/story.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
-        story = story_on_scene(
-            data, read_scene(content / "scenes", data.get("scene"), data.get("id"))
+        story = story_on_scenes(
+            data, lambda scene, data=data: read_scene(content / "scenes", scene, data.get("id"))
         )
         story["world"] = with_art(story["world"], data["scene"], content)
+        # A story told on several scenes in turn has each part's world on its own (39.4).
+        for part in story.get("parts", []):
+            part["world"] = with_art(part["world"], part["scene"], content)
         stories[data["id"]] = story
     return {"levels": levels, "stories": stories}
 

@@ -33,7 +33,13 @@
 // (present while it shows), data-shade (each figure in a dark passage and how dark
 // its feet are drawn, "id:shade" joined by ",", shade.ts) and data-debug with
 // data-debug-layers and data-debug-leaves (the tester's view, its layers and the
-// cells under an open door's leaf, debug.ts).
+// cells under an open door's leaf, debug.ts), data-sprite-things (each thing drawn
+// from its kind's sprite, "id:kind:x,y" joined by ";", D182), data-found (the
+// hidden things found and seen, joined by ",", D184), data-untied (the brooms
+// untied, D183), data-flying (the figures in the air, joined by ",", D185),
+// data-wind (`on` while a flight's wind blows), data-through (the rings flown
+// through, in order, joined by ","), data-circling (who circles before the
+// finish now) and data-race-band (what the start band says, D189).
 //
 // The camera is a window on the scene (D69, camera.ts): it follows the wizard,
 // the player zooms it and drags it to look around, and a run or a restart brings
@@ -86,6 +92,7 @@ import {
   drawSleepMark,
   facingOf,
   figureName,
+  flyRowOf,
   hourKey,
   loadArt,
   paintGrounds,
@@ -101,6 +108,7 @@ import {
   sleepFrame,
   thingDepthOn,
 } from './painted';
+import { characterName, t } from '../i18n';
 import { readingTicks } from './bubble';
 import { SceneCamera, VIEW_TILES } from './camera';
 import { DebugView, type PaintedImage } from './debug';
@@ -115,6 +123,7 @@ import {
   nudgedBy,
   overDepth,
   sleeperDepth,
+  thingDepth,
 } from './depth';
 import { type LightName, type LightState, NIGHT_MS, SceneLight, WHOLE_MORNING } from './light';
 import { Speech } from './speech';
@@ -127,7 +136,10 @@ import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
-import { blockedText, friendText, sleepingText } from './words';
+import { blockedText, bumpText, friendText, sleepingText } from './words';
+import { bobOf, FLOWN, FLY_LIFT, flyFrame } from './flight';
+import { drawnFromSprite, spriteFoot, spriteKey, spriteScale, type ThingSprite } from './things';
+import { Wind } from './sound';
 
 /** How long one tick lasts at speed 1. */
 export const TICK_MS = 400;
@@ -139,8 +151,9 @@ const RESTART_HOLD_MS = 160;
 
 /** How a scene is played: a level's run, or a story's steps (D74). */
 export interface SceneOptions {
-  /** A story: the camera starts on this tile (camera.ts), and the words stay said. */
-  story?: { camera: Tile; light?: LightName };
+  /** A story: the camera starts on this tile (camera.ts), and the words stay said;
+   * `flying`, who is in the air on a broom from the start (D185). */
+  story?: { camera: Tile; light?: LightName; flying?: string[] };
 }
 
 export { type Art, type FigureArt, loadArt, type SceneArt } from './painted';
@@ -301,6 +314,19 @@ class LevelScene extends Phaser.Scene {
    * that lets the night fall then. */
   private lyingUntil = 0;
   private nightFall: Phaser.Time.TimerEvent | null = null;
+  /** The things drawn from their kind's sprite (D182), by id, and the hidden ones
+   * found so far (D184). */
+  private readonly sprites = new Map<string, ThingSprite>();
+  private readonly found = new Set<string>();
+  /** The brooms untied, and the rings flown through, in the run shown (D183, D187). */
+  private readonly untied = new Set<string>();
+  private readonly through: string[] = [];
+  /** The figures in the air (D185): when their flight began, on the scene's clock,
+   * and their shadow on the ground. */
+  private readonly flyers = new Map<Phaser.GameObjects.Sprite, { since: number; shadow: Phaser.GameObjects.Ellipse }>();
+  private readonly wind = new Wind();
+  /** Who circles before the finish now (D189), for the tests. */
+  private circling: string | null = null;
 
   constructor(
     private readonly map: Layout,
@@ -483,6 +509,17 @@ class LevelScene extends Phaser.Scene {
     return this.options.story ? Number.POSITIVE_INFINITY : readingTicks(text, TICK_MS);
   }
 
+  /** A sprite's thing put on its tile, its foot there, among the figures by its row:
+   * a broom lying under whoever stands on its cell, a ring standing (D182). */
+  private placeSprite(image: Phaser.GameObjects.Image, sprite: ThingSprite, tile: Tile): void {
+    const [originX, originY] = sprite.origin ?? [0.5, 1];
+    image
+      .setPosition(...spriteFoot(sprite, tile))
+      .setOrigin(originX, originY)
+      .setScale(spriteScale(sprite, image.height))
+      .setDepth(thingDepth(tile[1], { lying: sprite.lying === true }));
+  }
+
   create(): void {
     makePlaceholders(
       this,
@@ -529,6 +566,16 @@ class LevelScene extends Phaser.Scene {
       if (painted) {
         this.things.set(thing.id, painted);
         if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
+        continue;
+      }
+      // A thing of a kind with a sprite of its own, a broom or a ring, on a painted scene
+      // with no cut-out of it (D182); one hidden in the straw unseen until found (D184).
+      const sprite = this.art?.sprites?.[thing.kind];
+      if (this.art && sprite && drawnFromSprite(this.art.sprites, thing.kind, false) && this.textures.exists(spriteKey(thing.kind))) {
+        const image = this.add.image(0, 0, spriteKey(thing.kind));
+        this.sprites.set(thing.id, sprite);
+        this.placeSprite(image, sprite, thing.tile);
+        this.things.set(thing.id, image.setVisible(!thing.hidden));
         continue;
       }
       const image =
@@ -747,6 +794,7 @@ class LevelScene extends Phaser.Scene {
   /** A word said follows who says it while they walk. */
   override update(): void {
     this.drawLight();
+    if (this.flyers.size > 0 || this.parentNode.dataset.flying) this.flyFrames();
     // On a painted scene the figures go behind what stands in front of them (D76).
     if (this.art) {
       if (!this.asleep.get(this.wizard)?.lying && !this.hopping.has(this.wizard)) {
@@ -844,6 +892,13 @@ class LevelScene extends Phaser.Scene {
     this.restarts += 1;
     // A run started again closes the map it opened (D134).
     this.mapClosed?.();
+    this.found.clear();
+    this.untied.clear();
+    this.through.length = 0;
+    this.circling = null;
+    for (const sprite of [...this.flyers.keys()]) this.land(sprite, true);
+    this.wind.stop(true);
+    this.raceBand(0, []);
     for (const id of [...this.revealed.keys()]) this.unreveal(id);
     this.asleep.clear();
     this.hopping.clear();
@@ -879,9 +934,13 @@ class LevelScene extends Phaser.Scene {
         });
         // Back in the state it lies in, a book the spell took at the run before.
         if (thing.kind !== 'door') image.setTexture(`art-${this.artOf(thing.id)}-${Object.keys(painted.states)[0]}`);
+      } else if (this.sprites.has(thing.id)) {
+        this.placeSprite(image, this.sprites.get(thing.id) as ThingSprite, tile);
       } else image.setPosition(...centre(tile));
-      // A thing in the wizard's hands from the start is seen only once given (D123).
-      image.setVisible(!thing.carried).setAlpha(1);
+      // A thing in the wizard's hands from the start is seen only once given (D123); one
+      // drawn from a sprite and hidden, once found (D184).
+      const unseen = thing.hidden === true && this.sprites.has(thing.id);
+      image.setVisible(!thing.carried && !unseen).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
       this.glows.get(thing.id)?.setVisible(!thing.open);
       if (thing.open) this.openDoors.add(thing.id);
@@ -902,6 +961,11 @@ class LevelScene extends Phaser.Scene {
     }
     this.placeWizard(this.map.start, 'down');
     this.wizard.setAlpha(1).setVisible(!this.inEnchanted(this.map.start));
+    // In a story, who is in the air from the start (D185).
+    for (const id of this.options.story?.flying ?? []) {
+      const sprite = this.spriteOf(id);
+      if (sprite) this.lift(sprite, true);
+    }
     this.parentNode.dataset.tick = '0';
     this.publish();
     // A level's start shows the wizard and every actor; a seek stays with the wizard.
@@ -1053,14 +1117,209 @@ class LevelScene extends Phaser.Scene {
       else if (event.kind === 'hold') this.hold(event);
       else if (event.kind === 'map') {
         if (!instant) this.openMap();
+      }
+      // A hidden thing found, seen from now on (D184).
+      else if (event.kind === 'found') this.showFound(event, instant);
+      // A ring flown through (D187).
+      else if (event.kind === 'through') this.flownThrough(String(event.data.id), instant);
+      // A broom lifted or set down, the wizard's or a racer's (D185, D189).
+      else if (event.kind === 'fly' || event.kind === 'land') {
+        const sprite = this.spriteOf(String(event.data.id ?? event.actor));
+        if (sprite && event.kind === 'fly') this.lift(sprite, instant);
+        if (sprite && event.kind === 'land') this.land(sprite, instant);
       } else this.showActor(event, instant);
     }
+    this.raceBand(tick, events);
     if (this.options.story) {
       this.frameStory(events);
       this.view.keep();
     }
     this.publish();
   }
+
+  /** The wizard's figure, or an actor's, by its id. */
+  private spriteOf(id: string): Phaser.GameObjects.Sprite | null {
+    return id === 'wizard' ? this.wizard : (this.actors.get(id)?.sprite ?? null);
+  }
+
+  /** Hidden things found (D184): each seen from now on, coming into sight. */
+  private showFound(event: WorldEvent, instant: boolean): void {
+    const ids = Array.isArray(event.data.ids) ? event.data.ids.map(String) : [];
+    for (const id of ids) {
+      this.found.add(id);
+      const image = this.things.get(id);
+      if (!image || this.carried.has(id)) continue;
+      this.tweens.killTweensOf(image);
+      if (instant) {
+        image.setVisible(true).setAlpha(1);
+        continue;
+      }
+      image.setVisible(true).setAlpha(0);
+      this.tweens.add({ targets: image, alpha: 1, duration: this.playback.tickDuration * 0.8 });
+    }
+  }
+
+  /** A ring flown through (D187): kept in order, and seen to glow for a moment. */
+  private flownThrough(id: string, instant: boolean): void {
+    this.through.push(id);
+    const image = this.things.get(id);
+    if (!image || instant || this.still) return;
+    const glow = this.add
+      .image(image.x, image.y, image.texture.key)
+      .setOrigin(image.originX, image.originY)
+      .setScale(image.scaleX)
+      .setDepth(image.depth + 0.00001)
+      .setTint(0xfff3bf)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setAlpha(0.8);
+    this.tweens.add({ targets: glow, alpha: 0, duration: this.playback.tickDuration * 1.2, onComplete: () => glow.destroy() });
+  }
+
+  /** A figure lifted on its broom (D185): drawn from its flying rows, half a cell up,
+   * its shadow on the ground; the wind blows for the wizard. */
+  private lift(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
+    if (this.flyers.has(sprite)) return;
+    const shadow = this.add
+      .ellipse(sprite.x, sprite.y, TILE * 0.55, TILE * 0.18, 0x000000, 0.22)
+      .setDepth(sprite.depth - 0.0004);
+    this.flyers.set(sprite, { since: this.time.now, shadow });
+    if (sprite === this.wizard && !instant) {
+      this.wind.start();
+      this.playedSounds.push('wind');
+      this.parentNode.dataset.sounds = this.playedSounds.join(',');
+    }
+  }
+
+  /** A figure set down where it is (D185): its feet on its cell, standing, the wind gone. */
+  private land(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
+    const flying = this.flyers.get(sprite);
+    if (!flying) return;
+    flying.shadow.destroy();
+    this.flyers.delete(sprite);
+    this.restOrigin(sprite);
+    const facing = sprite === this.wizard ? this.wizardFacing() : facingOf(sprite);
+    this.face(sprite, facing);
+    if (sprite === this.wizard) this.wind.stop(instant);
+  }
+
+  /** A figure's origin back at its feet, as it stands. */
+  private restOrigin(sprite: Phaser.GameObjects.Sprite): void {
+    const figures = this.art?.figures;
+    if (figures && sprite.texture.key.startsWith('fig-')) sprite.setOrigin(0.5, 1 - figures.foot / figures.frame[1]);
+    else sprite.setOrigin(0.5, 0.6);
+  }
+
+  /** Each flying figure, each frame: its flying frame by the way it faces, bobbing,
+   * drawn half a cell above its feet, and its shadow on the ground under it (D185). */
+  private flyFrames(): void {
+    for (const [sprite, { since, shadow }] of this.flyers) {
+      const figures = this.art?.figures;
+      const name = sprite.texture.key.replace(/^fig-/, '');
+      const facing = sprite === this.wizard ? this.wizardFacing() : facingOf(sprite);
+      const frame = figures && sprite.texture.key.startsWith('fig-') ? flyFrame(flyRowOf(figures, name), facing, this.time.now - since) : null;
+      if (frame !== null && sprite.texture.frameTotal - 1 > frame) sprite.setFrame(frame);
+      const bob = frame === null ? bobOf(this.time.now - since) : 0;
+      const lift = (FLY_LIFT + bob) * TILE;
+      const height = sprite.frame.height || sprite.height;
+      const base = figures && sprite.texture.key.startsWith('fig-') ? 1 - figures.foot / figures.frame[1] : 0.6;
+      sprite.setOrigin(0.5, base + lift / (height * sprite.scaleY));
+      shadow.setPosition(sprite.x, sprite.y - TILE * 0.05).setDepth(sprite.depth - 0.0004).setVisible(sprite.visible);
+    }
+    const flying = [...this.flyers.keys()].map((sprite) => (sprite === this.wizard ? 'wizard' : this.idOf(sprite))).filter(Boolean);
+    const said = flying.sort().join(',');
+    if (this.parentNode.dataset.flying !== said) this.parentNode.dataset.flying = said;
+    const wind = this.wind.blowing ? 'on' : 'off';
+    if (this.parentNode.dataset.wind !== wind) this.parentNode.dataset.wind = wind;
+  }
+
+  /** What the tests read of chapter 4's things (D182 to D187): the sprites drawn, the
+   * hidden things found, the brooms untied, the rings flown through, who circles. */
+  private publishThings(): void {
+    const node = this.parentNode.dataset;
+    const drawn = [...this.sprites.keys()]
+      .flatMap((id) => {
+        const image = this.things.get(id);
+        const thing = this.map.things.find((one) => one.id === id);
+        if (!image?.visible || !thing) return [];
+        const [x, y] = [image.x / TILE, image.y / TILE];
+        return [`${id}:${thing.kind}:${Math.floor(x)},${Math.ceil(y) - 1}`];
+      })
+      .sort()
+      .join(';');
+    if (node.spriteThings !== drawn) node.spriteThings = drawn;
+    const found = [...this.found].sort().join(',');
+    if (node.found !== found) node.found = found;
+    const untied = [...this.untied].sort().join(',');
+    if (node.untied !== untied) node.untied = untied;
+    const through = this.through.join(',');
+    if (node.through !== through) node.through = through;
+    if (this.circling) node.circling = this.circling;
+    else delete node.circling;
+  }
+
+  /** The id of an actor's figure. */
+  private idOf(sprite: Phaser.GameObjects.Sprite): string {
+    for (const [id, actor] of this.actors) if (actor.sprite === sprite) return id;
+    return '';
+  }
+
+  /** A figure circling over its cell for a tick (D189): the wizard serving a ring
+   * missed before the finish, a racer's flourish. */
+  private circle(sprite: Phaser.GameObjects.Sprite, at: Tile, who: string, instant: boolean): void {
+    if (instant) return;
+    const [x, y] = this.figureAt(at);
+    const radius = TILE * 0.35;
+    const counter = { turn: 0 };
+    this.tweens.killTweensOf(sprite);
+    this.circling = who;
+    this.tweens.add({
+      targets: counter,
+      turn: 1,
+      duration: this.playback.tickDuration * FLOWN * 0.95,
+      onUpdate: () => {
+        const angle = counter.turn * Math.PI * 2;
+        sprite.setPosition(x + Math.sin(angle) * radius, y - (1 - Math.cos(angle)) * radius * 0.6);
+      },
+      onComplete: () => {
+        sprite.setPosition(x, y);
+        if (this.circling === who) this.circling = null;
+      },
+    });
+  }
+
+  /** The band over the scene while Ilda reads the programs before a race (D189): the
+   * lines read of each, ticking down, until both have taken off. */
+  private raceBand(tick: number, events: WorldEvent[]): void {
+    const race = this.map.race;
+    let band = this.parentNode.querySelector<HTMLElement>('.race-band');
+    if (!race) return;
+    if (!band) {
+      band = document.createElement('div');
+      band.className = 'race-band';
+      band.hidden = true;
+      this.parentNode.append(band);
+    }
+    const read = events.find((event) => event.kind === 'read');
+    if (tick === 0) this.readLines = 0;
+    if (read) this.readLines = Number(read.data.lines);
+    const mine = this.readLines;
+    const name = characterName(race.against);
+    const showing = tick > 0 && (read !== undefined || tick <= race.lines);
+    band.hidden = !showing;
+    const said = showing
+      ? `${t('race.reading', { mine, name, theirs: race.lines })} ${t('race.left', {
+          mine: Math.max(mine - tick, 0),
+          name,
+          theirs: Math.max(race.lines - tick, 0),
+        })}`
+      : '';
+    band.textContent = said;
+    if (said) this.parentNode.dataset.raceBand = said;
+    else delete this.parentNode.dataset.raceBand;
+  }
+
+  /** The lines Ilda reads of the wizard's program in the run shown (D189). */
+  private readLines = 0;
 
   /** A figure on an opening door's leaf walks aside to its tile along the row, in
    * the door's tick, the wizard as any other (D125). */
@@ -1582,9 +1841,28 @@ class LevelScene extends Phaser.Scene {
         this.placeWizard(from, facing ?? 'down');
         this.wizardTile = to;
         const [x, y] = this.figureAt(to);
-        this.walk(this.wizard, facing ?? 'down', x, y, duration);
+        // A flown step takes a third of a walked one, with the wind's swell and no
+        // step's tap (D185).
+        const flown = event.data.flying === true;
+        this.walk(this.wizard, facing ?? 'down', x, y, flown ? duration * FLOWN : duration);
         this.enchantedStep(this.wizard, from, to, duration, false);
-        this.step('wizard');
+        if (flown) this.wind.swell((duration * FLOWN) / 1000);
+        else this.step('wizard');
+        break;
+      }
+      case 'circle': {
+        const at = tileOf(event.data.at);
+        if (at) this.circle(this.wizard, at, 'wizard', instant);
+        break;
+      }
+      case 'untie': {
+        // The wizard bends over the broom and unties its knot (D183).
+        const id = String(event.data.id);
+        this.untied.add(id);
+        if (!instant) {
+          this.playPart('pickup', this.playback.tickDuration * LONG * 0.95);
+          play('pick_up');
+        }
         break;
       }
       case 'bump': {
@@ -1593,10 +1871,14 @@ class LevelScene extends Phaser.Scene {
         this.placeWizard(at, facing ?? 'down');
         if (!instant) this.nudge(this.wizard, facing ?? 'down', duration);
         if (!instant) play('bump');
-        // A friend in the way: the wizard thinks who (D66).
+        // A friend in the way: the wizard thinks who (D66); a ring's side, a tree's
+        // crown or a wall in a flight's way, what it is (D186, D187).
         if (!instant && event.data.by === 'friend') {
           const who = friendText(String(event.data.id));
           this.speech.think(who, tick, this.sayTicks(who));
+        } else if (!instant && (event.data.by === 'high' || event.data.by === 'ring')) {
+          const why = bumpText(String(event.data.by), typeof event.data.kind === 'string' ? event.data.kind : null);
+          this.speech.think(why, tick, this.sayTicks(why));
         }
         break;
       }
@@ -1700,6 +1982,7 @@ class LevelScene extends Phaser.Scene {
         const detail = {
           ...(typeof event.data.spell === 'string' ? { spell: event.data.spell } : {}),
           ...(Array.isArray(event.data.things) ? { things: event.data.things.map(String) } : {}),
+          ...(typeof event.data.kind === 'string' ? { kind: event.data.kind } : {}),
         };
         const why = blockedText(String(event.data.reason), thing?.kind ?? null, detail);
         this.speech.think(why, tick, this.sayTicks(why));
@@ -1730,9 +2013,18 @@ class LevelScene extends Phaser.Scene {
         }
         actor.sprite.setPosition(...this.figureAt(from));
         const [x, y] = this.figureAt(to);
-        this.walk(actor.sprite, facing, x, y, this.playback.tickDuration * 0.9);
-        this.enchantedStep(actor.sprite, from, to, this.playback.tickDuration * 0.9, false);
-        this.step(event.actor);
+        // A racer's flown step, a third of a walked one, and no tap (D185, D189).
+        const flown = event.data.flying === true;
+        const length = this.playback.tickDuration * 0.9 * (flown ? FLOWN : 1);
+        this.walk(actor.sprite, facing, x, y, length);
+        this.enchantedStep(actor.sprite, from, to, length, false);
+        if (!flown) this.step(event.actor);
+        break;
+      }
+      case 'circle': {
+        // A racer's flourish (D189).
+        const at = tileOf(event.data.at);
+        if (at) this.circle(actor.sprite, at, event.actor, instant);
         break;
       }
       case 'turn':
@@ -1811,6 +2103,7 @@ class LevelScene extends Phaser.Scene {
 
   /** The attributes the tests read, and the sight cones drawn again. */
   private publish(): void {
+    this.publishThings();
     this.cone.clear();
     for (const [id, actor] of this.actors) {
       this.cone.fillStyle(id === this.seenBy ? 0xe03131 : 0xffd43b, id === this.seenBy ? 0.45 : 0.28);

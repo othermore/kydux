@@ -16,6 +16,21 @@ function thingWords(kind: string): string {
 export interface BlockedDetail {
   spell?: string;
   things?: string[];
+  /** The kind of a cell's terrain no one walks on, water or a hedge (D186). */
+  kind?: string;
+}
+
+/** The terrains a walk is refused on that the wizard names (D186); any other is a low
+ * cell, said as such. */
+const LOW_KINDS = ['water', 'reeds', 'hedge', 'fence', 'bench', 'chest', 'stand', 'hay'];
+/** The terrains a flight bumps on that the wizard names (D186). */
+const HIGH_KINDS = ['tree', 'wall', 'shed', 'rock', 'pole', 'gate'];
+
+/** Why the wizard bumped while flying (D186, D187): a ring flown into from its side,
+ * or a tree's crown, a wall, a pole in the flight's way, by its kind. */
+export function bumpText(by: string, kind: string | null): string {
+  if (by === 'ring') return t('blocked.ring');
+  return t(`blocked.high.${kind && HIGH_KINDS.includes(kind) ? kind : 'other'}`);
 }
 
 /** Why an action could not be done, from a `blocked` event's reason, its thing's
@@ -82,6 +97,14 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
       return t('blocked.bed_taken');
     case 'not_here':
       return t('blocked.not_here', { thing });
+    case 'no_walk':
+      return t(`blocked.no_walk.${detail.kind && LOW_KINDS.includes(detail.kind) ? detail.kind : 'low'}`);
+    case 'too_far':
+      return t('blocked.too_far', { thing });
+    case 'no_broom':
+      return t('blocked.no_broom');
+    case 'no_knot':
+      return t('blocked.no_knot');
     default:
       return t('blocked.unknown_action');
   }

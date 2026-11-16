@@ -222,10 +222,10 @@ def test_a_level_teaches_only_what_a_lesson_before_it_explained(path):
 def test_a_story_is_staged_on_its_scene_and_said_in_every_language(path):
     """A story (D74) is a staging that fits its scene, and in every language its
     title and one text for each step, with no HTML."""
-    from kydux_world.level import read_scene, story_on_scene
+    from kydux_world.level import read_scene, story_on_scenes
 
     story = json.loads((path / "story.json").read_text(encoding="utf-8"))
-    story_on_scene(story, read_scene(CONTENT / "scenes", story.get("scene"), story["id"]))
+    story_on_scenes(story, lambda scene: read_scene(CONTENT / "scenes", scene, story["id"]))
     for lang in LANGUAGES:
         text = json.loads((path / f"text.{lang}.json").read_text(encoding="utf-8"))
         assert text.get("title"), f"{path.name}/text.{lang}.json has no title"

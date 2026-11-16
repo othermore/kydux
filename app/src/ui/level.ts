@@ -26,7 +26,7 @@ import { element } from './dom';
 import { type GoalsPanel, goalsPanel } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
 import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
-import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
+import { type Outcome, type OutcomeCard, outcomeCard, raceCount } from './outcome';
 import { openPlan, type PlanWindow } from './plan';
 import { withCode } from './words';
 import type { Screen } from './screen';
@@ -370,7 +370,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       ),
     );
   };
-  const showWin = (verdict: Verdict, kept: number) =>
+  const showWin = (verdict: Verdict, kept: number, race: string | null) =>
     showCard(
       winCard({
         verdict,
@@ -382,6 +382,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         },
         said: said(text.outro),
         learned: text.learned,
+        race,
       }),
     );
 
@@ -449,7 +450,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     snapshot.goals.forEach((mark, index) => goals.set(index, mark));
     renderWays(snapshot, force);
     if (force || snapshot.outcome !== shownOutcome) {
-      if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed, wayName);
+      if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed, wayName, raceCount(snapshot.world?.goals));
       else card.hide();
       if (!force && snapshot.outcome) judged = true;
       // A run's end has its sound (the settings may silence it).
@@ -466,7 +467,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         progress.markWon(loaded.id, verdict.earned);
         // Continue, on the start screen, goes to what comes after.
         if (parts.next) progress.setCurrent(parts.next);
-        showWin(verdict, kept);
+        showWin(verdict, kept, raceCount(snapshot.world.goals));
       } else if (!force && shownCard?.node.querySelector('.win-card')) {
         shownCard.close();
       }

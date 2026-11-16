@@ -19,7 +19,7 @@ import type { PlanPictures, PlanView, Tile } from '../engine/layout';
 import { characterName, forWizard, t } from '../i18n';
 import { element } from './dom';
 
-export type PlanCell = 'wall' | 'floor' | 'furniture' | 'enchanted';
+export type PlanCell = 'wall' | 'floor' | 'furniture' | 'enchanted' | 'low';
 
 export interface PlanShapes {
   columns: number;
@@ -43,7 +43,16 @@ export function planShapes(view: PlanView): PlanShapes {
   view.rows.forEach((row, y) => {
     [...row].forEach((char, x) => {
       const here = `${x},${y}`;
-      const kind: PlanCell = char === '#' ? 'wall' : char === '=' ? 'furniture' : enchanted.has(here) ? 'enchanted' : 'floor';
+      const kind: PlanCell =
+        char === '#'
+          ? 'wall'
+          : char === '='
+            ? 'furniture'
+            : char === '~'
+              ? 'low'
+              : enchanted.has(here)
+                ? 'enchanted'
+                : 'floor';
       cells.push({ x, y, kind });
     });
   });
@@ -415,6 +424,14 @@ export function drawPlan(
       ctx.fillRect(left(x), top(y), cell, cell);
     }
   }
+  // Where a flight goes (D186): a low cell, which a flight crosses and a walk does not,
+  // hatched lightly; on such a scene, a high one, which neither does, darkly.
+  if (shapes.cells.some(({ kind }) => kind === 'low')) {
+    for (const { x, y, kind } of shapes.cells) {
+      if (kind !== 'low' && kind !== 'wall') continue;
+      hatch(ctx, left(x), top(y), cell, kind === 'low' ? css(INK, 0.22) : css(INK, 0.5), kind === 'low' ? 4 : 7);
+    }
+  }
   // The grid over the picture, at the scene's cells: faint over the walls, firm on every
   // floor cell's edges, so that a child counts cells without numbers in them (D151).
   ctx.lineWidth = 1;
@@ -613,6 +630,24 @@ const FOOT_ON_THE_PLAN = 0.8;
  * cell, `(15, 3)`. */
 export function planLabel(name: string, x: number, y: number): string {
   return name ? `${name} (${x}, ${y})` : `(${x}, ${y})`;
+}
+
+/** A cell hatched with lines across it, `lines` of them, in a colour. */
+function hatch(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, colour: string, lines: number): void {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, size, size);
+  ctx.clip();
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let index = -lines; index <= lines; index += 1) {
+    const offset = (index / lines) * size;
+    ctx.moveTo(x + offset, y + size);
+    ctx.lineTo(x + offset + size, y);
+  }
+  ctx.stroke();
+  ctx.restore();
 }
 
 /** The edges of every cell that is not a wall, each once, as [x0, y0, x1, y1] in cells. */

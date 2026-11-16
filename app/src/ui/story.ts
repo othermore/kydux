@@ -6,11 +6,13 @@
 // once more, as R does, on a step that has some; Skip goes to the last step,
 // every figure where the story leaves it, for a child who has read it before. On
 // the last step Go on leads to what comes next; reaching it marks the story read,
-// as reading a story to its end does.
+// as reading a story to its end does. A story told on several scenes in turn (the
+// morning after, from the dormitory to the shed) starts each part's scene as its
+// first step comes.
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
-import { type Story, storyEvents } from '../content/stories';
+import { type Story, type StoryPart, storyEvents } from '../content/stories';
 import { lookOf } from '../engine/looks';
 import type { SceneHandle, SceneOptions } from '../engine/scene';
 import { characterName, forWizard, t } from '../i18n';
@@ -44,6 +46,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   let step = 0;
   let scene: SceneHandle | null = null;
   let destroyed = false;
+  /** The part of the story the scene shows (0, the story's own scene), and the one
+   * being started, while it loads. */
+  let shownPart = -1;
+  let loadingPart = -1;
 
   const sceneParent = element('div', { id: 'scene', className: 'scene' });
   // The camera's zoom, as on a level's scene (D106).
@@ -107,12 +113,66 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     if (last()) progress.markStoryRead(story.id);
   };
 
+  /** The parts of the story by their first step: its own first, then each told on
+   * another scene. */
+  const partsOf = (): StoryPart[] => [
+    {
+      step: 0,
+      world: story.world,
+      camera: story.camera,
+      ...(story.light ? { light: story.light } : {}),
+      ...(story.flying ? { flying: story.flying } : {}),
+    },
+    ...(story.parts ?? []),
+  ];
+  const partAt = (index: number) => partsOf().filter((part) => part.step <= index).length - 1;
+
+  /** The scene of a part started, the one before it gone, and the step played on it. */
+  const startPart = (index: number) => {
+    const part = partsOf()[index];
+    if (!part || loadingPart === index) return;
+    loadingPart = index;
+    scene?.destroy();
+    scene = null;
+    const look = lookOf(progress.wizard()?.look);
+    const options = {
+      story: {
+        camera: part.camera,
+        ...(part.light ? { light: part.light } : {}),
+        ...(part.flying ? { flying: part.flying } : {}),
+      },
+    };
+    void parts.startScene(sceneParent, part.world, look, options).then((handle) => {
+      if (destroyed || loadingPart !== index) {
+        handle.destroy();
+        return;
+      }
+      scene = handle;
+      shownPart = index;
+      loadingPart = -1;
+      sceneParent.dataset.storyPart = String(index);
+      zoom.attach(handle);
+      play();
+    });
+  };
+
   /** The scene as the step before left it, then this step played. */
   const play = () => {
     words();
+    const index = partAt(step);
+    if (index !== shownPart) {
+      startPart(index);
+      return;
+    }
     if (!scene) return;
-    const { events, spans } = storyEvents(story);
-    const span = spans[step];
+    const part = partsOf()[index];
+    const end = partsOf()[index + 1]?.step ?? story.steps.length;
+    const { events, spans } = storyEvents({
+      steps: story.steps.slice(part?.step ?? 0, end),
+      world: part?.world ?? story.world,
+      flying: part?.flying ?? [],
+    });
+    const span = spans[step - (part?.step ?? 0)];
     if (!span) return;
     // A step played again brings back a camera a drag let go of (D106).
     scene.follow();
@@ -157,18 +217,9 @@ export function storyScreen(parts: StoryScreenParts): Screen {
       // The opening is before the course: Continue does not come back to it.
       if (!story.opening) progress.setCurrent(`story:${story.id}`);
       document.addEventListener('keydown', onKey);
-      words();
-      // The wizard the child made, or the first look before there is one.
-      const look = lookOf(progress.wizard()?.look);
-      void parts.startScene(sceneParent, story.world, look, { story: { camera: story.camera, ...(story.light ? { light: story.light } : {}) } }).then((handle) => {
-        if (destroyed) {
-          handle.destroy();
-          return;
-        }
-        scene = handle;
-        zoom.attach(handle);
-        play();
-      });
+      // The scene of the story's first part, with the wizard the child made, or the
+      // first look before there is one.
+      play();
       forward.focus();
     },
     async relabel() {

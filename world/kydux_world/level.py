@@ -1153,7 +1153,18 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
     return built
 
 
-STORY_DOINGS = ("walk", "face", "appear", "vanish", "sleep", "wake", "open", "close")
+STORY_DOINGS = (
+    "walk",
+    "fly",
+    "land",
+    "face",
+    "appear",
+    "vanish",
+    "sleep",
+    "wake",
+    "open",
+    "close",
+)
 #: The lights a story may be told under, besides its scene's own (D124).
 STORY_LIGHTS = ("morning",)
 
@@ -1173,6 +1184,9 @@ def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
             continue
         # An appearing from behind a thing beside the cell (D128).
         if kinds == {"appear", "from"}:
+            continue
+        # A figure that comes into sight in the air, on its broom (D185).
+        if kinds == {"appear", "flying"} and action.get("flying") is True:
             continue
         if len(kinds) != 1 or not kinds <= set(STORY_DOINGS):
             raise LevelError(f"{here}: do is one of {', '.join(STORY_DOINGS)}")
@@ -1252,13 +1266,11 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     if not (0 <= camera.x < width and 0 <= camera.y < height):
         raise LevelError(f"{story_id}: the camera's tile {camera.x},{camera.y} is off the scene")
 
-    def walked(tile: Position) -> bool:
-        return (
-            0 <= tile.y < height
-            and 0 <= tile.x < width
-            and grid[tile.y][tile.x] != WALL
-            and (grid[tile.y][tile.x] != SHELF)
-        )
+    def walked(tile: Position, flying: bool = False) -> bool:
+        """A tile a figure stands on, or, `flying`, flies over: a low cell too (D186)."""
+        inside = 0 <= tile.y < height and 0 <= tile.x < width
+        char = grid[tile.y][tile.x] if inside else WALL
+        return char not in (WALL, SHELF) and (flying or char != LOW)
 
     # Where each figure stands, or None while out of sight.
     where: dict[str, Position | None] = {"wizard": wizard}
@@ -1271,7 +1283,8 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         where[actor_id] = (
             _story_tile(actor["at"], f"{actor_id}'s at", story_id) if "at" in actor else None
         )
-        if where[actor_id] is not None and not walked(where[actor_id]):
+        flying = actor_id in data.get("flying", [])
+        if where[actor_id] is not None and not walked(where[actor_id], flying):
             raise LevelError(f"{story_id}: {actor_id} stands on no floor")
 
     # The cells each door's open leaf lies on (D125), and the doors open now; no
@@ -1286,9 +1299,19 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     def under_leaf(tile: Position) -> bool:
         return any(tile in leaves[door] for door in opened)
 
+    # Who is in the air on a broom (D185): those the staging says, and whoever flies.
+    aloft = set(data.get("flying", []))
+    if not aloft <= set(where):
+        raise LevelError(f"{story_id}: flying names someone not in the story")
+
     def free(tile: Position, mover: str) -> bool:
         taken = any(at == tile for who, at in where.items() if who != mover)
-        return walked(tile) and tile not in shut and not under_leaf(tile) and not taken
+        return (
+            walked(tile, mover in aloft)
+            and tile not in shut
+            and not under_leaf(tile)
+            and not taken
+        )
 
     beds = {
         thing["id"]: Position(*thing["at"])
@@ -1403,13 +1426,20 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                     if grid[behind.y][behind.x] == WALL:
                         raise LevelError(f"{here}: {doer} comes out of a wall")
                 planned[doer] = tile
+                if action.get("flying") is True:
+                    queue.append(("lift", None))
                 queue.append(("appear", tile))
                 continue
             if planned[doer] is None:
                 raise LevelError(f"{here}: {doer} is out of sight")
-            if "walk" in action:
+            if "land" in action:
+                queue.append(("land", None))
+                continue
+            if "fly" in action or "walk" in action:
+                if "fly" in action:
+                    queue.append(("lift", None))
                 at = planned[doer]
-                for to in _waypoints(action["walk"], here):
+                for to in _waypoints(action.get("walk", action.get("fly")), here):
                     if (to.x != at.x) == (to.y != at.y):
                         raise LevelError(
                             f"{here}: {doer} walks in a straight line, to another tile"
@@ -1447,7 +1477,16 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                 if not queue:
                     continue
                 kind, value = queue.pop(0)
-                if kind == "appear":
+                if kind == "lift":
+                    aloft.add(doer)
+                elif kind == "land":
+                    at = where[doer]
+                    if doer not in aloft or at is None or not walked(at):
+                        raise LevelError(
+                            f"{here}: {doer} lands where no one stands, or is not flying"
+                        )
+                    aloft.discard(doer)
+                elif kind == "appear":
                     if not free(value, doer):
                         raise LevelError(f"{here}: {doer} appears on a tile not free")
                     where[doer] = value
@@ -1507,4 +1546,58 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     story = {key: value for key, value in data.items() if key not in staging}
     story["camera"] = list(camera)
     story["world"] = built
+    return story
+
+
+#: What a step that changes the story's scene gives of the new one (a story's own
+#: staging, for the steps from it on).
+PART_STAGING = ("scene", "wizard", "actors", "things", "camera", "light", "flying")
+
+
+def story_on_scenes(data: dict[str, Any], scene_of: Any) -> dict[str, Any]:
+    """A story told on one scene, or on several in turn (the morning after, from the
+    dormitory to the shed): a step with a `scene`, the new scene's staging, starts a
+    part of the story told there, each part checked on its scene as a story is
+    (story_on_scene), its figures where the staging puts them. The story made whole
+    is the first part's, with every step, and `parts`, each later part's first step
+    and the world, camera and light it is told in. `scene_of` gives a scene by id."""
+    story_id = data.get("id")
+    steps = data.get("steps")
+    if not isinstance(steps, list) or not steps:
+        raise LevelError(f"{story_id}: a story has its steps")
+    starts = [0] + [
+        index for index, step in enumerate(steps) if isinstance(step, dict) and "scene" in step
+    ]
+    if starts[1:2] == [0]:
+        raise LevelError(f"{story_id}: the first step is told on the story's own scene")
+    parts = []
+    for number, first in enumerate(starts):
+        end = starts[number + 1] if number + 1 < len(starts) else len(steps)
+        own = [{k: v for k, v in step.items() if k != "scene"} for step in steps[first:end]]
+        if number == 0:
+            staging = {k: v for k, v in data.items() if k != "steps"}
+        else:
+            staging = steps[first]["scene"]
+            if not isinstance(staging, dict) or set(staging) - set(PART_STAGING):
+                raise LevelError(
+                    f"{story_id}, step {first + 1}: a scene's staging is one of "
+                    f"{', '.join(PART_STAGING)}"
+                )
+            staging = {"id": story_id, **staging}
+        built = story_on_scene({**staging, "steps": own}, scene_of(staging.get("scene")))
+        parts.append((first, built))
+    story = dict(parts[0][1])
+    story["steps"] = [{k: v for k, v in step.items() if k != "scene"} for step in steps]
+    if len(parts) > 1:
+        story["parts"] = [
+            {
+                "step": first,
+                "scene": steps[first]["scene"]["scene"],
+                "world": built["world"],
+                "camera": built["camera"],
+                **({"light": built["light"]} if "light" in built else {}),
+                **({"flying": built["flying"]} if "flying" in built else {}),
+            }
+            for first, built in parts[1:]
+        ]
     return story

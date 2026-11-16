@@ -2,7 +2,7 @@
 // is data; the card says it in the language of the moment.
 
 import { blockedText } from '../engine/words';
-import { t } from '../i18n';
+import { characterName, t } from '../i18n';
 import type { ErrorInfo, Explanation } from '../runtime/protocol';
 import { element } from './dom';
 import { withCode } from './words';
@@ -55,6 +55,8 @@ export function explanationText(explanation: Explanation): string {
         return t('error.syntax', p);
       case 'arguments':
         return t('error.arguments', p);
+      case 'no_knot':
+        return t('error.no_knot', p);
       case 'no_such_module':
         return t('error.no_such_module', p);
       default:
@@ -111,11 +113,31 @@ function outcomeWords(outcome: Outcome): string {
   }
 }
 
+/** Ilda's count after a race (D189), from the `before` goal's params: the wizard's
+ * lines, flight and penalty to the tick it crossed at, and the racer's; null for a
+ * level that is no race. */
+export function raceCount(goals: { kind: string; params: Record<string, unknown> }[] | undefined): string | null {
+  const before = goals?.find((goal) => goal.kind === 'before');
+  if (!before) return null;
+  const p = before.params;
+  const said = {
+    lines: Number(p.lines),
+    flight: Number(p.flight),
+    penalty: Number(p.penalty),
+    tick: Number(p.tick),
+    name: characterName(String(p.racer)),
+    racer_lines: Number(p.racer_lines),
+    racer_flight: Number(p.racer_tick) - Number(p.racer_lines),
+    racer_tick: Number(p.racer_tick),
+  };
+  return p.tick === null || p.tick === undefined ? t('race.count_unfinished', said) : t('race.count', said);
+}
+
 export interface OutcomeCard {
   node: HTMLElement;
   /** Says what the run came to, and what the child's code printed, if anything;
-   * `wayName` gives a way's words. */
-  show(outcome: Outcome, printed?: string, wayName?: (id: string) => string): void;
+   * `wayName` gives a way's words; in a race, Ilda's count under it (D189). */
+  show(outcome: Outcome, printed?: string, wayName?: (id: string) => string, race?: string | null): void;
   hide(): void;
   /** What the card says now, or null while it is hidden. */
   readonly current: Outcome | null;
@@ -126,11 +148,13 @@ export function outcomeCard(): OutcomeCard {
   // Python that could not start needs the page loaded again.
   const reload = element('button', { id: 'reload', type: 'button', hidden: true });
   reload.addEventListener('click', () => location.reload());
+  const raced = element('p', { id: 'outcome-race', className: 'card-race', hidden: true });
   const printedLabel = element('p', { className: 'printed-label' });
   const printedText = element('pre', { className: 'printed' });
   const printedBox = element('div', { hidden: true }, [printedLabel, printedText]);
   const node = element('section', { className: 'outcome', hidden: true }, [
     text,
+    raced,
     printedBox,
     reload,
   ]);
@@ -139,10 +163,12 @@ export function outcomeCard(): OutcomeCard {
   let current: Outcome | null = null;
   return {
     node,
-    show(outcome, printed = lastPrinted, wayName = (id) => id) {
+    show(outcome, printed = lastPrinted, wayName = (id) => id, race = null) {
       current = outcome;
       lastPrinted = printed;
       text.replaceChildren(...withCode(outcomeText(outcome, wayName)));
+      raced.textContent = race ?? '';
+      raced.hidden = !race;
       printedLabel.textContent = t('outcome.printed');
       printedText.textContent = printed.replace(/\n$/, '');
       printedBox.hidden = printed === '';

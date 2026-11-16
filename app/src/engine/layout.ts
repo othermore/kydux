@@ -34,6 +34,19 @@ export interface ThingLayout {
   /** For a door, the cells its open leaf lies on, which no one walks onto while it
    * is open (D125). */
   covers?: Tile[];
+  /** Lying where it is not seen, a broom in the straw: drawn from a sprite only once
+   * found (D184), or a painted key under a bookcase, seen once revealed (D85). */
+  hidden?: boolean;
+}
+
+/** A race against a racer, by Ilda's count (D189): the racer's id, the lines Ilda
+ * reads of its program, the cells it flies after its lift, a cell the same as the one
+ * before a tick circling, and the finish. */
+export interface RaceLayout {
+  against: string;
+  lines: number;
+  path: Tile[];
+  finish: Tile;
 }
 
 /** The kinds a level's wizard carries from the start (D49): each entry of
@@ -155,6 +168,10 @@ export interface Layout {
   reaches: Tile[];
   /** The cell a sleep goal marks to sleep from (D130), or none. */
   sleepAt?: Tile;
+  /** The cells a flight crosses and a walk does not (D186), `~` on the map. */
+  low: Tile[];
+  /** The race the level is (D189), or none. */
+  race?: RaceLayout;
 }
 
 const DEFAULT_SIGHT = 4;
@@ -183,7 +200,7 @@ function terrainOf(level: LevelJson, rows: string[]): string[][] {
     [...row].map((char, x) => {
       const letter = letters?.[y]?.[x];
       if (letter && kinds[letter]) return kinds[letter];
-      return char === '#' ? 'wall' : char === '=' ? 'shelf' : 'floor';
+      return char === '#' ? 'wall' : char === '=' ? 'shelf' : char === '~' ? 'low' : 'floor';
     }),
   );
 }
@@ -214,6 +231,7 @@ export function layout(level: LevelJson): Layout {
       const art = typeof spec.art === 'string' ? { art: spec.art } : {};
       const covered = coversOf(spec);
       const covers = covered.length > 0 ? { covers: covered } : {};
+      const hidden = spec.hidden === true ? { hidden: true } : {};
       things.push({
         id: String(spec.id),
         kind: String(spec.kind),
@@ -224,6 +242,7 @@ export function layout(level: LevelJson): Layout {
         ...cells,
         ...art,
         ...covers,
+        ...hidden,
       });
     }
   }
@@ -256,9 +275,11 @@ export function layout(level: LevelJson): Layout {
     // Two goals on one mark, a level's and its bonus, are one mark.
     .filter(([x, y], index, all) => all.findIndex(([ox, oy]) => ox === x && oy === y) === index);
   const shelves: Tile[] = [];
+  const low: Tile[] = [];
   rows.forEach((row, y) => {
     [...row].forEach((char, x) => {
       if (char === '=') shelves.push([x, y]);
+      if (char === '~') low.push([x, y]);
     });
   });
   const carrying = carriedKinds(level);
@@ -305,7 +326,31 @@ export function layout(level: LevelJson): Layout {
       return tile ? [{ kind: String(prop.kind), tile }] : [];
     }),
     ...sleepAtOf(level),
+    low,
+    ...raceOf(level),
   };
+}
+
+/** A level's race (D189), its path's turning points walked out into the cells flown,
+ * a point the same as the one before a cell circled, as kydux_world reads it. */
+function raceOf(level: LevelJson): { race?: RaceLayout } {
+  const race = isRecord(level.race) ? level.race : null;
+  const finish = race ? asTile(race.finish) : null;
+  if (!race || !finish) return {};
+  const racer = asList(level.actors).find((actor) => actor.id === race.against);
+  let here = racer ? asTile(racer.at) : null;
+  if (!here) return {};
+  const path: Tile[] = [];
+  for (const point of asList(race.path)) {
+    const there = asTile(point);
+    if (!there) continue;
+    if (there[0] === here[0] && there[1] === here[1]) path.push(there);
+    while (there[0] !== here[0] || there[1] !== here[1]) {
+      here = [here[0] + Math.sign(there[0] - here[0]), here[1] + Math.sign(there[1] - here[1])];
+      path.push(here);
+    }
+  }
+  return { race: { against: String(race.against), lines: Number(race.lines), path, finish } };
 }
 
 /** The cells of a list of boxes, each x0, y0, x1, y1. */

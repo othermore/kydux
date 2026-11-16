@@ -7,7 +7,7 @@ import json
 
 import pytest
 from kydux_world.goals import code_lines
-from kydux_world.level import Level, LevelError, Position, read_scene
+from kydux_world.level import Level, LevelError, Position, Scene, read_scene, story_on_scenes
 from kydux_world.run import run_code
 from kydux_world.world import ActionArguments, Refused, World
 
@@ -502,3 +502,87 @@ def test_in_the_check_find_all_gives_each_broom_right_of_and_not_below_the_one_b
     assert distances == sorted(distances)
     for before, after in zip([(6, 8), *found], found, strict=False):
         assert after[0] >= before[0] and after[1] <= before[1]
+
+
+#: The lake's edge in small, for a story: grass, water (low) and trees (high).
+STORY_TERRAINS = {
+    "g": {"kind": "grass", "walk": True, "sight": True, "fly": True},
+    "w": {"kind": "water", "walk": False, "sight": True, "fly": True},
+    "T": {"kind": "tree", "walk": False, "sight": False, "fly": False},
+}
+LAKE_SCENE = Scene("lake", ("TTTTTT", "gggggg", "ggwwgg", "gggggg"), STORY_TERRAINS)
+SHED_SCENE = Scene("shed", ("gggg", "gggg"), STORY_TERRAINS)
+
+
+def told(steps, **change):
+    data = {
+        "id": "a-flight",
+        "scene": "lake",
+        "wizard": [0, 3],
+        "camera": [2, 2],
+        "actors": [{"id": "zarek", "kind": "racer"}],
+        "steps": steps,
+        **change,
+    }
+    return story_on_scenes(data, {"lake": LAKE_SCENE, "shed": SHED_SCENE}.get)
+
+
+def test_a_story_s_figure_flies_over_the_water_and_lands():
+    told(
+        [
+            {"who": "voice", "do": {"appear": [1, 1], "flying": True}, "by": "zarek"},
+            {"who": "zarek", "do": [{"fly": [[3, 1], [3, 2], [4, 2]]}, {"land": True}]},
+        ]
+    )
+
+
+def test_a_story_s_walk_over_the_water_is_stopped_there():
+    with pytest.raises(LevelError, match="walk is stopped at 2,2"):
+        told([{"who": "wizard", "do": {"walk": [[0, 2], [3, 2]]}}])
+
+
+def test_a_figure_lands_only_on_a_cell_walked_on():
+    with pytest.raises(LevelError, match="lands where no one stands"):
+        told(
+            [
+                {"who": "voice", "do": {"appear": [1, 1], "flying": True}, "by": "zarek"},
+                {"who": "zarek", "do": [{"fly": [[2, 1], [2, 2]]}, {"land": True}]},
+            ]
+        )
+
+
+def test_a_story_told_on_two_scenes_has_each_part_s_world():
+    story = told(
+        [
+            {"who": "voice", "do": None},
+            {
+                "who": "voice",
+                "scene": {"scene": "shed", "wizard": [0, 1], "camera": [1, 1], "actors": []},
+                "do": {"walk": [3, 1]},
+                "by": "wizard",
+            },
+            {"who": "wizard", "do": {"face": "up"}},
+        ],
+        actors=[],
+    )
+    assert len(story["steps"]) == 3
+    assert "scene" not in story["steps"][1]
+    (part,) = story["parts"]
+    assert (part["step"], part["scene"], part["camera"]) == (1, "shed", [1, 1])
+    assert part["world"]["map"][1] == "S..."
+
+
+def test_a_part_s_steps_are_checked_on_its_own_scene():
+    with pytest.raises(LevelError, match="stopped"):
+        told(
+            [
+                {"who": "voice", "do": None},
+                {
+                    "who": "voice",
+                    "scene": {"scene": "shed", "wizard": [0, 1], "camera": [1, 1]},
+                    "do": {"walk": [[0, 0], [0, -1]]},
+                    "by": "wizard",
+                },
+            ],
+            actors=[],
+        )

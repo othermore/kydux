@@ -18,8 +18,10 @@ import type { LevelJson, WorldEvent } from '../runtime/protocol';
  * (D91); opening or closing a door. */
 export type Action = { by?: string } & (
   | { walk: Tile | Tile[]; vanish?: true }
+  | { fly: Tile | Tile[] }
+  | { land: true }
   | { face: Facing }
-  | { appear: Tile; from?: Tile }
+  | { appear: Tile; from?: Tile; flying?: true }
   | { vanish: true }
   | { sleep: string }
   | { wake: true }
@@ -40,6 +42,16 @@ export interface StoryStep {
   text: string;
 }
 
+/** A part of a story told on another scene (39.4): from its first step on, the
+ * story goes on in this world, with this camera, light and figures in the air. */
+export interface StoryPart {
+  step: number;
+  world: LevelJson;
+  camera: Tile;
+  light?: 'morning';
+  flying?: string[];
+}
+
 export interface Story {
   id: string;
   title: string;
@@ -50,6 +62,10 @@ export interface Story {
   camera: Tile;
   /** The light the story is told under, besides its scene's own (D124). */
   light?: 'morning';
+  /** Who is in the air on a broom when the story starts (D185). */
+  flying?: string[];
+  /** The parts told on another scene, in order (39.4). */
+  parts?: StoryPart[];
   /** The game's opening, before the course (D61). */
   opening?: boolean;
   /** Who tells the story, for the map and the characters' names (D67). */
@@ -68,6 +84,8 @@ interface StoryJson {
   world: LevelJson;
   camera: Tile;
   light?: string;
+  flying?: string[];
+  parts?: StoryPart[];
   opening?: boolean;
   speaker?: string;
 }
@@ -96,6 +114,8 @@ export async function loadStory(id: string, lang: Language): Promise<Story> {
     world: staging.world,
     camera: staging.camera,
     ...(staging.light === 'morning' ? { light: 'morning' as const } : {}),
+    ...(Array.isArray(staging.flying) ? { flying: staging.flying.map(String) } : {}),
+    ...(Array.isArray(staging.parts) ? { parts: staging.parts } : {}),
     ...(staging.opening === true ? { opening: true } : {}),
     ...(typeof staging.speaker === 'string' ? { speaker: staging.speaker } : {}),
   };
@@ -120,11 +140,13 @@ function waypoints(walk: Tile | Tile[]): Tile[] {
  * next, in the order the figures are first named. An event of a figure other
  * than the step's `by`, or its speaker, says `aside`, for the camera to keep
  * with the one the step is about. */
-export function storyEvents(story: Pick<Story, 'steps' | 'world'>): {
+export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   events: WorldEvent[];
   spans: { first: number; last: number }[];
 } {
   const where = new Map<string, Tile>();
+  // Who is in the air, the staging's at first (D185).
+  const aloft = new Set<string>(story.flying ?? []);
   const start = (story.world.map as string[] | undefined) ?? [];
   start.forEach((row, y) => {
     const x = row.indexOf('S');
@@ -214,23 +236,37 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world'>): {
       const queue = queues.get(doer) ?? [];
       queues.set(doer, queue);
       const aside = doer !== about ? { aside: true } : {};
-      if ('walk' in action) {
-        let [x, y] = where.get(doer) ?? waypoints(action.walk)[0] ?? [0, 0];
-        for (const [tx, ty] of waypoints(action.walk)) {
+      if ('walk' in action || 'fly' in action) {
+        // A flight lifts the broom first, once, and every step of it is flown (D185).
+        const route = 'fly' in action ? action.fly : action.walk;
+        const flown = 'fly' in action ? { flying: true } : {};
+        if ('fly' in action && !aloft.has(doer)) {
+          aloft.add(doer);
+          queue.push({ kind: 'fly', data: { id: doer, ...aside } });
+        }
+        let [x, y] = where.get(doer) ?? waypoints(route)[0] ?? [0, 0];
+        for (const [tx, ty] of waypoints(route)) {
           const way: Facing = tx > x ? 'right' : tx < x ? 'left' : ty > y ? 'down' : 'up';
           while (x !== tx || y !== ty) {
             const from: Tile = [x, y];
             x += Math.sign(tx - x);
             y += Math.sign(ty - y);
-            queue.push({ kind: 'move', data: { from, to: [x, y], facing: way, ...aside } });
+            queue.push({ kind: 'move', data: { from, to: [x, y], facing: way, ...flown, ...aside } });
           }
         }
         where.set(doer, [x, y]);
-        if (action.vanish) queue.push({ kind: 'vanish', data: { ...aside } });
+        if ('walk' in action && action.vanish) queue.push({ kind: 'vanish', data: { ...aside } });
+      } else if ('land' in action) {
+        aloft.delete(doer);
+        queue.push({ kind: 'land', data: { id: doer, ...aside } });
       } else if ('face' in action) {
         queue.push({ kind: 'turn', data: { facing: action.face, ...aside } });
       } else if ('appear' in action) {
         const from = action.from ? { from: action.from } : {};
+        if (action.flying && !aloft.has(doer)) {
+          aloft.add(doer);
+          queue.push({ kind: 'fly', data: { id: doer, ...aside } });
+        }
         queue.push({ kind: 'appear', data: { at: action.appear, ...from, ...aside } });
         where.set(doer, action.appear);
       } else if ('vanish' in action) {

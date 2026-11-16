@@ -93,7 +93,8 @@
     "other": "Python dice: {type}: {message}",
     "line": " (línea {line})",
     "unknown_action": "`{object}` no conoce ninguna acción llamada `{name}`.",
-    "no_new_attribute": "No puedes darle a `{object}` algo nuevo llamado `{name}`. Lo que `{object}` puede hacer está en su cuaderno."
+    "no_new_attribute": "No puedes darle a `{object}` algo nuevo llamado `{name}`. Lo que `{object}` puede hacer está en su cuaderno.",
+    "no_knot": "Esta escoba no tiene nudo, así que no hay nada que desatar, y el programa se para aquí. Antes de desatar una escoba, mira si tiene nudo."
   },
   "things": {
     "door": "la puerta",
@@ -144,7 +145,30 @@
     "not_inside_yet": "No entres todavía: quédate en el umbral, pasada la puerta.",
     "no_bed": "No hay ninguna cama justo a mi lado.",
     "bed_taken": "Esta cama es de otra persona.",
-    "not_here": "Llevo {thing}, así que no se puede mostrar dónde está."
+    "not_here": "Llevo {thing}, así que no se puede mostrar dónde está.",
+    "no_walk": {
+      "water": "El agua no se pisa: por aquí solo se pasa volando.",
+      "reeds": "Los juncos no se pisan: por aquí solo se pasa volando.",
+      "hedge": "El seto no se pisa: por encima solo se pasa volando.",
+      "fence": "La valla no se pisa: por encima solo se pasa volando.",
+      "bench": "El banco no se pisa: por encima solo se pasa volando.",
+      "chest": "El baúl no se pisa: por encima solo se pasa volando.",
+      "stand": "La grada no se pisa: por encima solo se pasa volando.",
+      "low": "Por aquí no se anda: solo se pasa volando."
+    },
+    "high": {
+      "tree": "Las copas de los árboles no se pasan: hay que rodearlas.",
+      "wall": "El muro no se pasa, ni volando.",
+      "shed": "El cobertizo no se pasa, ni volando.",
+      "rock": "Las rocas no se pasan, ni volando.",
+      "pole": "El poste no se pasa: hay que rodearlo.",
+      "gate": "La cancela no se pasa, ni volando.",
+      "other": "Por ahí no se pasa, ni volando."
+    },
+    "ring": "¡Choco con el aro! Se pasa por dentro, de arriba abajo o de abajo arriba.",
+    "too_far": "Para desatar {thing} tengo que estar de pie sobre ella.",
+    "no_broom": "Sin escoba, drevo no tiene nada que levantar.",
+    "no_knot": "Esta escoba no tiene nudo: no hay nada que desatar."
   },
   "notebook": {
     "title": "El cuaderno {del mago|de la maga}",
@@ -464,5 +488,11 @@
       "other": "Otro",
       "margin": "Margen, pintado fuera de la escena"
     }
+  },
+  "race": {
+    "reading": "Ilda lee los programas: tú, {mine} líneas; {name}, {theirs}.",
+    "left": "Despegas en {mine}; {name}, en {theirs}.",
+    "count": "La cuenta de Ilda: tus líneas ({lines}) + tu vuelo ({flight}) + la penalización ({penalty}) = tick {tick}. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
+    "count_unfinished": "La cuenta de Ilda: no has cruzado la meta. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}."
   }
 }

@@ -682,7 +682,12 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     sounds (D231), and a figure flown through a ring's hole, behind it or in front of it
     by the way it flew (D232); and, in `sprint-46.md`, a bonus goal that fails losing its
     star and not the level (D233), and the race judged at its end, Ilda saying what
-    each one took, the penalty and the winner on a band at the scene's foot (D234).
+    each one took, the penalty and the winner on a band at the scene's foot (D234); and,
+    in `sprint-47.md`, a flying figure hovering slowly and only while the program plays
+    (D235), the broom's wind as soft air that swells at a turn, heard only while the
+    program plays (D236), a thought about a bump half a second after it and words over a
+    flying figure as it is drawn (D237), Inconsolata at 16 the code's only letter (D238),
+    and the tips' pictures at 960 by 540, shown as large as the window lets (D239).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

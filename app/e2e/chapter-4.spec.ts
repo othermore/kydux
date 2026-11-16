@@ -479,6 +479,8 @@ test.describe('the rings and the race', () => {
       timeout: ciTimes(60_000),
     });
     await expect(scene(page)).toHaveAttribute('data-sounds', /bump/);
+    // Flown up into the ring, the wizard is past its plane, behind it, in its hole (D232).
+    await expect(scene(page)).toHaveAttribute('data-ring-sides', 'wizard:behind');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}ring-rim.png` });
     await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
     await expect(page.locator('.outcome-text')).toContainText('rozó el borde');
@@ -486,6 +488,20 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
     await expect(scene(page)).toHaveAttribute('data-wizard', '5,8');
     await page.screenshot({ path: `${SHOTS}ring-rim-card.png` });
+  });
+
+  test("flown down into a ring, the wizard rubs its rim in front of it, in its hole (D226, D232)", async ({ page }) => {
+    await open(page, 'the-rings', '1');
+    await start(
+      page,
+      'wizard.cast("drevo")\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(1)\nwizard.move_right(1)\n',
+    );
+    await expect(scene(page)).toHaveAttribute('data-thought', 'Oh, giré demasiado pronto y rocé el aro.', {
+      timeout: ciTimes(60_000),
+    });
+    await expect(scene(page)).toHaveAttribute('data-wizard', '7,8');
+    await expect(scene(page)).toHaveAttribute('data-ring-sides', 'wizard:front');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}ring-rim-front.png` });
   });
 
   test('a pair flown down and then up is seen and said: each ring shakes, the wizard thinks its way (D219)', async ({ page }) => {

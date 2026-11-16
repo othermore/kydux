@@ -140,7 +140,7 @@ import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, bumpText, friendText, ringWayText, sleepingText } from './words';
-import { bobOf, FLOWN, FLY_LIFT, flyFrame } from './flight';
+import { bobOf, FLOWN, FLY_LIFT, flyFrame, RING_PAST, throughRing } from './flight';
 import { drawnFromSprite, spriteFoot, spriteKey, spriteName, spriteOrigin, spriteScale, type ThingSprite } from './things';
 import { Wind } from './sound';
 
@@ -332,9 +332,16 @@ class LevelScene extends Phaser.Scene {
   /** The brooms untied, and the rings flown through, in the run shown (D183, D187). */
   private readonly untied = new Set<string>();
   private readonly through: string[] = [];
+  /** The rings' cells, which a flying figure flies through (D232). */
+  private rings: Tile[] | null = null;
   /** The figures in the air (D185): when their flight began, on the scene's clock,
    * and their shadow on the ground. */
-  private readonly flyers = new Map<Phaser.GameObjects.Sprite, { since: number; shadow: Phaser.GameObjects.Ellipse }>();
+  /** Each flying figure: since when it flies, its shadow, the way it last flew upward
+   * or downward, and how far its feet are past a ring's plane in a ring's cell (D232). */
+  private readonly flyers = new Map<
+    Phaser.GameObjects.Sprite,
+    { since: number; shadow: Phaser.GameObjects.Ellipse; way: 'up' | 'down'; past: number }
+  >();
   private readonly wind = new Wind();
   /** Who circles before the finish now (D189), for the tests. */
   private circling: string | null = null;
@@ -384,8 +391,12 @@ class LevelScene extends Phaser.Scene {
     ];
   }
 
-  /** A figure turned to face a way: its sheet's frame, or the placeholder's. */
+  /** A figure turned to face a way: its sheet's frame, or the placeholder's. A flying
+   * figure keeps the way it last faced upward or downward, which says on which side of a
+   * ring's plane it is in the ring's cell (D232). */
   private face(sprite: Phaser.GameObjects.Sprite, facing: Facing, step = this.art?.figures?.standing ?? 1): void {
+    const flying = this.flyers.get(sprite);
+    if (flying && (facing === 'up' || facing === 'down')) flying.way = facing;
     if (sprite.texture.key.startsWith('fig-')) sprite.setFrame(SHEET_ROW[facing] * 3 + step);
     else sprite.setFrame(facing);
   }
@@ -832,11 +843,11 @@ class LevelScene extends Phaser.Scene {
     // On a painted scene the figures go behind what stands in front of them (D76).
     if (this.art) {
       if (!this.asleep.get(this.wizard)?.lying && !this.hopping.has(this.wizard)) {
-        this.wizard.setDepth(figureDepth(this.wizard.y / TILE) + 0.0005);
+        this.wizard.setDepth(figureDepth(this.wizard.y / TILE + this.pastOf(this.wizard)) + 0.0005);
       }
       for (const actor of this.actors.values()) {
         if (!this.asleep.get(actor.sprite)?.lying && !this.hopping.has(actor.sprite)) {
-          actor.sprite.setDepth(figureDepth(actor.sprite.y / TILE));
+          actor.sprite.setDepth(figureDepth(actor.sprite.y / TILE + this.pastOf(actor.sprite)));
         }
       }
       // A figure walking into a dark passage is drawn darker, head first.
@@ -1257,7 +1268,8 @@ class LevelScene extends Phaser.Scene {
     const shadow = this.add
       .ellipse(sprite.x, sprite.y, TILE * 0.55, TILE * 0.18, 0x000000, 0.22)
       .setDepth(sprite.depth - 0.0004);
-    this.flyers.set(sprite, { since: this.time.now, shadow });
+    const facing = sprite === this.wizard ? this.wizardFacing() : facingOf(sprite);
+    this.flyers.set(sprite, { since: this.time.now, shadow, way: facing === 'down' ? 'down' : 'up', past: 0 });
     if (sprite === this.wizard && !instant) {
       this.wind.start();
       this.playedSounds.push('wind');
@@ -1277,6 +1289,18 @@ class LevelScene extends Phaser.Scene {
     if (sprite === this.wizard) this.wind.stop(instant);
   }
 
+  /** The rings' cells, read once from the level's things. */
+  private get ringTiles(): Tile[] {
+    this.rings ??= this.map.things.filter((thing) => thing.kind === 'ring').map((thing) => thing.tile);
+    return this.rings;
+  }
+
+  /** How far a flying figure's feet are past a ring's plane, in cells, for its depth
+   * among the ring and the others (D232); none for a figure not flying. */
+  private pastOf(sprite: Phaser.GameObjects.Sprite): number {
+    return this.flyers.get(sprite)?.past ?? 0;
+  }
+
   /** A figure's origin back at its feet, as it stands. */
   private restOrigin(sprite: Phaser.GameObjects.Sprite): void {
     const figures = this.art?.figures;
@@ -1285,21 +1309,35 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** Each flying figure, each frame: its flying frame by the way it faces, bobbing,
-   * drawn half a cell above its feet, and its shadow on the ground under it (D185). */
+   * drawn half a cell above its feet, and its shadow on the ground under it (D185); in a
+   * ring's cell drawn higher, in the ring's hole, and its feet and shadow past the ring's
+   * plane the way it flew (D232). */
   private flyFrames(): void {
-    for (const [sprite, { since, shadow }] of this.flyers) {
+    const sides: string[] = [];
+    for (const [sprite, flying] of this.flyers) {
+      const { since, shadow, way } = flying;
       const figures = this.art?.figures;
       const name = sprite.texture.key.replace(/^fig-/, '');
       const facing = sprite === this.wizard ? this.wizardFacing() : facingOf(sprite);
       const frame = figures && sprite.texture.key.startsWith('fig-') ? flyFrame(flyRowOf(figures, name), facing, this.time.now - since) : null;
       if (frame !== null && sprite.texture.frameTotal - 1 > frame) sprite.setFrame(frame);
       const bob = frame === null ? bobOf(this.time.now - since) : 0;
-      const lift = (FLY_LIFT + bob) * TILE;
+      const ring = throughRing([sprite.x / TILE, sprite.y / TILE], this.ringTiles, way, this.art ? FOOT_IN_CELL : 0.5);
+      flying.past = ring.past;
+      if (Math.abs(ring.past) >= RING_PAST / 2) sides.push(`${sprite === this.wizard ? 'wizard' : this.idOf(sprite)}:${ring.past < 0 ? 'behind' : 'front'}`);
+      const lift = (FLY_LIFT + bob + ring.raise) * TILE;
       const height = sprite.frame.height || sprite.height;
       const base = figures && sprite.texture.key.startsWith('fig-') ? 1 - figures.foot / figures.frame[1] : 0.6;
       sprite.setOrigin(0.5, base + lift / (height * sprite.scaleY));
-      shadow.setPosition(sprite.x, sprite.y - TILE * 0.05).setDepth(sprite.depth - 0.0004).setVisible(sprite.visible);
+      shadow
+        .setPosition(sprite.x, sprite.y + (ring.past - 0.05) * TILE)
+        .setDepth(sprite.depth - 0.0004)
+        .setVisible(sprite.visible);
     }
+    // Which flying figures are in a ring's cell, behind the ring or in front of it.
+    const sided = sides.sort().join(',');
+    if (sided) this.parentNode.dataset.ringSides = sided;
+    else delete this.parentNode.dataset.ringSides;
     const flying = [...this.flyers.keys()].map((sprite) => (sprite === this.wizard ? 'wizard' : this.idOf(sprite))).filter(Boolean);
     const said = flying.sort().join(',');
     if (this.parentNode.dataset.flying !== said) this.parentNode.dataset.flying = said;

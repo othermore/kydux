@@ -55,7 +55,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 drawn from a sprite of its kind, a broom or a ring, and a hidden
                 one once found (things.ts, D182, D184), a figure flying on its
                 broom, lifted and bobbing, a flown step in a third of a walked
-                one's time (flight.ts, D185), the tester's view of the cells,
+                one's time, and through a ring's hole, on the side of the ring
+                it flew to (flight.ts, D185, D232), the tester's view of the cells,
                 the low and the high ones, the rings' order and the masks
                 (debug.ts, opened with ?debug), and the sound effects, made as
                 the game plays on the page's one sound context, which sleeps
@@ -2728,7 +2729,8 @@ one overturns stays, marked as superseded.
   through it against its way makes the event `wrong_way` and lights nothing; a horizontal
   move into its cell while flying bumps (*chocas con el aro*), a horizontal move out of it
   is refused and stops the program (D226), and a walk into it bumps as into furniture.
-  The goal `through_in_order` (`{"kind": "through_in_order", "ids": ["ring_1", ...]}`) is
+  A figure in its cell is drawn in its hole, behind it when flown up and in front of it
+  when flown down (D232). The goal `through_in_order` (`{"kind": "through_in_order", "ids": ["ring_1", ...]}`) is
   met when every ring named is flown through, each after the one before it in the list; a ring passed over, flown against its way, or flown through out
   of its turn, counts as missed, and the goal's `missed` lists the rings not flown through
   in order, for the race (D189). `?debug` numbers the rings in their order, each with an
@@ -3509,3 +3511,15 @@ one overturns stays, marked as superseded.
   `awake`). The music is still while the tab is hidden (D192), and a tab shown again wakes
   the context only where something is to sound. Rules out a sound engine at work behind a
   page that makes no sound.
+- **D232 — A figure flies through a ring's hole.** Decided 2026-11-14 by the owner. In a
+  ring's cell a flying figure is drawn higher, by `RING_RAISE` (0.35 of a cell), so that
+  its feet and its broom are in the ring's hole, above its lower rim; and its feet are past
+  the ring's plane by `RING_PAST` (0.2 of a cell) the way it last flew upward or
+  downward: flown up into the cell, behind the ring, and flown down into it, in front of
+  it, its depth and its shadow following its feet as every figure's do (D76). Both grow
+  from none a cell above or below the ring's cell to their whole in it, so that the figure
+  climbs into the hole and out of it; they are the scene's alone, and the world, the moves
+  and the cells are as they are (`throughRing` in `app/src/engine/flight.ts`). The scene
+  says which flying figure is in a ring's cell and on which side (`data-ring-sides`:
+  `wizard:behind`, `zarek:front`). Rules out a figure drawn over a ring it flies through,
+  its feet on the ring's lower rim.

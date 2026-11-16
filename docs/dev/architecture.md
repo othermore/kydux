@@ -2670,9 +2670,10 @@ one overturns stays, marked as superseded.
   `no_broom`), takes a tick, makes the event `fly` and puts the wizard in the air
   (`wizard.flying`); from then on every `move_*` flies: it crosses the low cells (D186)
   and the rings' cells (D187), and bumps on the high ones as a walk bumps on a wall. When
-  the program ends the broom sets down where it is (the event `land`). The goal `cast`
-  may name the cells it is cast from (`"from": [[x, y], ...]`), the jetty's end. The
-  world counts a flown cell as one tick, like a walked one, so that counting stays the
+  the program ends over a cell that is walked on, the broom sets down where it is (the
+  event `land`); the wizard's own landing, and an end over a cell that is not walked on,
+  are D215. The world counts a flown cell as one tick, like a walked one, so that
+  counting stays the
   child's; the page plays a tick whose every move is flown in a third of a tick
   (`FLOWN`, `engine/flight.ts`), at every speed, so that a flight is three times as fast
   to the eye and the long flights of the rings and the race pass quickly. While flying,
@@ -2816,9 +2817,10 @@ one overturns stays, marked as superseded.
   (`ui/mark.ts`, the tab's icon `favicon.svg` the same), and the link to the welcome page.
   The welcome page (`#about`, `ui/about.ts`) opens on a painting of Arvelia on its hill
   above the lake at dusk, the village at its foot (Gemini, `welcome-castle.md`), with the
-  promise and its big button over it; then what Kydux is, for whom (eight to twelve), how
-  it is played (a story, a lesson and a level, each with a picture of the game in the
-  page's language, `app/public/about/<lang>/`), that it is free software of the Kidux
+  promise and its big button over it; then what Kydux is, for whom (from eight years
+  on), how it is played (the game, the story and the lessons, in that order, each with a
+  picture of the game in the page's language, `app/public/about/<lang>/`), that it is
+  free software of the Kidux
   family in English and Spanish, and the button again; its words are under `about` in
   the i18n files. A first visit, with no wizard, no saved game and no address, opens on
   it (the owner, 2026-11-11: *si nunca ha jugado y acaba de llegar, prefiero que haya una
@@ -3026,9 +3028,11 @@ one overturns stays, marked as superseded.
   *Todavía no: …*; then the card says what it says of any run (`RunController`'s
   `onScreenWay`, `outcomeText` in `ui/outcome.ts`). A run that wins every way has the
   won card of any level. Only `?debug` draws the `#way` select, with the ways' ids, and
-  only there is `outcome.way_won` said. The walkthrough and the course book, read by the
-  owner and by developers, head each way with its id and say once that the child never
-  sees these names. A content test holds every text the child reads, and every word of
+  only there is `outcome.way_won` said. The course book, read by developers, heads each
+  way with its id and says once that the child never sees these names; the walkthrough,
+  read by the
+  owner, shows a level in its first way (D216), and heads each way so where it shows
+  several. A content test holds every text the child reads, and every word of
   `i18n/` but `level.way_label` and `outcome.way_won`, to `manera` and `way` only in the
   innocent uses it lists (*de la misma manera*, *which way Dask looks*). Rules out the
   word for this in any text the child reads, a count or a list of ways on a card, a
@@ -3117,7 +3121,8 @@ one overturns stays, marked as superseded.
   the wizard, higher or lower. A move takes a whole number of steps, 0 or more, and the
   world refuses a negative one (`error.arguments`). So the program asks first which of
   the two numbers is the smaller, and then takes the smaller from the greater. The lesson
-  `less-or-greater` comes before *Las escobas de la paja* and teaches `<` and `>` and how
+  `less-or-greater` comes before the two levels of the straw (D217) and teaches `<` and
+  `>` and how
   the coordinates' numbers behave: `x` grows to the right and `y` grows downwards, so a
   thing with a smaller `x` is to the left and one with a smaller `y` is higher up. In
   every arrangement of the straw's level the walk goes at least once left, right, up and
@@ -3207,3 +3212,92 @@ one overturns stays, marked as superseded.
   button says *a menos volumen*, *quieter*: *más bajo* is read as a lower tone. Rules out a
   theme that is the refused one with a voice less, a note taken from another work, the horn
   or the tune over the clock, and a level's music as loud as a story's to the ear.
+- **D214 — While a screen loads there is something to read: a story's words first, and a
+  tip for a child who has begun.** Decided 2026-11-13 by the owner (*A veces tarda un poco
+  en cargar python, sobre todo la primera vez. Estaría bien, mientras eso se carga,
+  mostrar algo*). Python loads in its worker from the moment the page opens, behind
+  everything, and no screen waits for it: a story and a lesson's pages need none, and a
+  level shows as soon as its own files are there, its status line saying *Preparando
+  Python…* (`level.loading`) until a run can start. What a screen waits for is its own
+  code, texts and pictures, and while it waits the page shows the waiting view
+  (`ui/waiting.ts`): Kydux's mark and *Cargando…* (`waiting.loading`). A story's words
+  come first: its screen needs the story's file, the course and `ui/story`, and the
+  scene's code and pictures arrive behind it; the voice's words of the first step are read
+  at once and the steps that do nothing on the scene are read on, while a figure's bubble
+  and a step's actions wait for the scene. The music starts as soon as the theme's file is
+  there. The game's opening (D61) shows the welcome's painting of the castle where its
+  scene will be (*la imagen inicial del castillo y el texto inicial sobre la carta*), and
+  the scene takes its place with a short fade. A child who has begun, with a wizard made
+  or a game saved, reads a tip when a wait is longer than the grace of 2 seconds, and a
+  new one every 10 seconds (*un tip cada 10 segundos*); when the screen is ready it waits
+  until the tip up has had its 10 seconds (*se espera a que haya dado tiempo a leer el
+  último tip*), and the button *Seguir* (`waiting.go`) under the tip opens the screen at
+  once. A wait shorter than the grace shows no tip and holds nothing. The tips are the
+  page's words (`tips.*`, the same keys in every language), each true of the page as it
+  is; they are shown in order from where the last wait stopped, kept in `localStorage`,
+  and none comes back until all have been seen. Once its first screen shows, the page
+  fetches in idle time the code the other screens need, so that a later screen waits only
+  for its own files. The browser tests turn the tips off with a key of `localStorage` that
+  no setting shows. Rules out a screen that waits for Python, *Preparando Python…* said of
+  anything that is not Python, a tip that flashes by on a quick load, a hold the child
+  cannot end, and a tip that is not true.
+- **D215 — `drevo` cast in the air lands.** Decided 2026-11-13 by the owner (*si se lanza
+  drevo mientras vuelas, deberías aterrizar (o fallar si aterrizas sobre una casilla no
+  transitable y que termine el programa por fallo). Es como chocar (y debe sonar el mismo
+  ruido) pero para el programa (te deja volando donde estabas, para que no te ahogues ni
+  nada similar)*). `wizard.cast("drevo")` while `wizard.flying` sets the broom down on the
+  wizard's cell: a tick, the event `land` marked as the wizard's own (`"cast": true`),
+  `flying` false, and the moves after it walk. Over a cell that is not walked on, a low
+  one (D186) or a ring's (D187), the landing is refused (`world.refuse`, reason
+  `no_landing`, with the cell's kind): the page plays the bump's sound, the program stops
+  with an error in the child's words (`error.no_landing`, and `blocked.no_landing` in the
+  wizard's bubble), and the wizard stays in the air where it was. When a program ends in
+  the air over a cell that is walked on, the broom sets down by itself (D185); over a cell
+  that is not walked on it stays in the air, and the figure is left flying on the screen.
+  `wizard.flying` is true from the lift until a landing. A goal of kind `land`, `{"kind":
+  "land", "marker": "E"}` or `"at": [x, y]`, is met at the tick the wizard's own cast sets
+  it down on that cell; the broom's own setting down at a program's end does not meet it.
+  *El primer vuelo* asks to reach the white stone, and its extra is to land on it before
+  the program ends (*el objetivo de esta partida debería ser "llegar a la piedra blanca" y
+  no aterrizar, y el extra debería ser aterriza en la piedra blanca antes de que el
+  programa termine*). The goal `cast` names a spell and no cells. Rules out a second
+  `drevo` that does nothing, a landing on water, a wizard standing on water after a
+  program's end, and a level that asks for a landing the program's end gives by itself.
+- **D216 — The walkthrough shows a level in one arrangement.** Decided 2026-11-13 by the
+  owner (*No quiero que me pongas varias maneras en cada revisión de cada ejercicio, para
+  el próximo sprint pon solo una manera salvo que veas que es muy importante ver todas las
+  maneras*). `tools/walkthrough.py` and its browser spec show a level with ways in its
+  first way: its card, its start, its route tick by tick and its won card, with no heading
+  for the way. The lines of what changes each time and of what the card says when this
+  time is different stay under the card. The option `--all-ways <level ids>` shows the
+  named levels in every way, each under its id (D204), and the report that hands the
+  walkthrough over says which levels and why. Rules out a walkthrough three times as long
+  as what the owner has to read.
+- **D217 — The shed goes from the easy to the hard: the `if` inside the `for` before the
+  comparisons, and one broom before all of them.** Decided 2026-11-13 by the owner (*Esta
+  lección y el arreglo de la revisión son más sencillos que el programa anterior, y además
+  se tienen que usar antes de usar un if dentro de un for. Así que tiene sentido moverlos
+  más arriba*; *para hacer más progresivo todo esto, el nivel anterior lo vamos a dividir
+  en dos*). Chapter 4's order in the shed: the wall's brooms; the lesson `checking-each`
+  and *La revisión*, which goes over the brooms the wall's level hangs, some still knotted
+  (*quizás tenían dos o quizás se nos escaparon al intentar desatarlas*); the lesson
+  `less-or-greater`; `the-nearest-broom`, one broom of the floor, the nearest, found with
+  `find_nearest` and reached with two `if` and `else` and no loop; then *Las escobas de la
+  paja*, every broom of the floor, the same walk inside a `for`. In every arrangement of
+  `the-nearest-broom` the nearest broom lies in sight on the bare boards, the others under
+  the straw at least a step farther, and over its arrangements the walk goes left, right,
+  up and down. A level that puts two ideas together comes after a level for each of them.
+  Rules out an `if` inside a `for` first met in the chapter's hardest program, and a check
+  of brooms that nobody saw hung.
+- **D218 — A program that is long for the child is given as comments, one for each
+  instruction.** Decided 2026-11-13 by the owner (*debemos darlo un poco más masticado. La
+  idea sería dar un comentario para cada instrucción*; *¡Incluso te he dejado los espacios
+  para que sepas lo que va dentro de los for y los if!*). The starting code of such a
+  level says in its first lines that the comments are there and what to do with them; then
+  one comment for each instruction, in the order of the program, in plain words that name
+  the function to use. A comment that belongs inside a block is indented as the block is,
+  and the empty line under each comment carries the indentation of the line to write, so
+  that the child sees what goes inside each `for` and each `if`. The comments hold no line
+  of code. The two levels of the straw have them, and a test of the content holds their
+  form. Rules out a starting code with half the program written, and comments that tell
+  the idea and leave the order of the lines to the child in a level that long.

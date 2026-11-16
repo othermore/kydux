@@ -1256,9 +1256,10 @@ one overturns stays, marked as superseded.
   staging, checked against the scene by
   `kydux_world.level.story_on_scene`, and `text.<lang>.json` the title and
   one text a step; *Next*, Enter and Space go on, *Back* replays the step
-  before, *Go on* ends it. The game's opening tells the letter in the past,
-  at the gate, before the creator. Rules out the story told as pages of a
-  book.
+  before, *Go on* ends it. The game's opening tells the castle and the
+  letter over the welcome's painting (`still` on its first two steps, D251),
+  then the journey and the gate on the scene, before the creator. Rules out
+  the story told as pages of a book.
 - **D75 — Every run starts the level again, and says so.** Decided
   2026-10-23 (sprint 12, 12.5). *Run* and *Restart* fade the scene out,
   put everything back, show a spinner, quickly, and fade it in; a run

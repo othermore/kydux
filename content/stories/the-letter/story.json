@@ -14,11 +14,13 @@
   "steps": [
     {
       "who": "voice",
-      "do": null
+      "do": null,
+      "still": true
     },
     {
       "who": "voice",
-      "do": null
+      "do": null,
+      "still": true
     },
     {
       "who": "voice",

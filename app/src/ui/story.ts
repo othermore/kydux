@@ -12,7 +12,10 @@
 // voice's words are read at once and steps that do nothing on the scene are gone on
 // from, while the scene's place shows the story's still (the opening's, the welcome's
 // painting of the castle) or the page's paper with Kydux's mark; a step's actions play
-// when the scene comes, which fades in over the still.
+// when the scene comes, which fades in over the still. The opening's first steps are
+// told over its still, the scene there behind it (`still`, D251): Next to the first step
+// without it brings the scene in, and Back to one with it shows the still again at once;
+// the frame says which in data-still.
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
@@ -73,6 +76,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
    * being started, while it loads. */
   let shownPart = -1;
   let loadingPart = -1;
+  /** Whether the story's first scene has come, and the fade of the scene in over the
+   * still under way. */
+  let came = false;
+  let fading: ReturnType<typeof setTimeout> | null = null;
 
   const sceneParent = element('div', { id: 'scene', className: 'scene story-scene-waiting' });
   // The camera's zoom, as on a level's scene (D106).
@@ -188,22 +195,42 @@ export function storyScreen(parts: StoryScreenParts): Screen {
       loadingPart = -1;
       sceneParent.dataset.storyPart = String(index);
       zoom.attach(handle);
-      // The first scene comes in over the still, which then leaves.
-      if (sceneParent.classList.contains('story-scene-waiting')) {
-        sceneParent.classList.remove('story-scene-waiting');
-        setTimeout(() => {
-          still.hidden = true;
-        }, FADE_IN);
-      }
+      came = true;
       play();
     })
       // A scene whose code did not arrive: the page says so (main.ts).
       .catch(() => {});
   };
 
+  /** What the scene's place shows (D251): the still while the first scene has not come
+   * or the step is told over it, the still at once, the scene behind it and the zoom box
+   * hidden; else the scene, come in over the still, which then leaves. */
+  const showPlace = () => {
+    const onStill = !came || story.steps[step]?.still === true;
+    frame.dataset.still = onStill ? 'on' : 'off';
+    if (fading !== null) clearTimeout(fading);
+    fading = null;
+    zoom.node.hidden = onStill;
+    if (onStill) {
+      still.hidden = false;
+      sceneParent.classList.add('story-scene-waiting');
+      return;
+    }
+    if (!sceneParent.classList.contains('story-scene-waiting')) {
+      still.hidden = true;
+      return;
+    }
+    sceneParent.classList.remove('story-scene-waiting');
+    fading = setTimeout(() => {
+      fading = null;
+      still.hidden = true;
+    }, FADE_IN);
+  };
+
   /** The scene as the step before left it, then this step played. */
   const play = () => {
     words();
+    showPlace();
     const index = partAt(step);
     if (index !== shownPart) {
       startPart(index);
@@ -276,6 +303,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     },
     destroy() {
       destroyed = true;
+      if (fading !== null) clearTimeout(fading);
       document.removeEventListener('keydown', onKey);
       scene?.destroy();
       scene = null;

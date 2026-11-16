@@ -2550,7 +2550,9 @@ a.stop-body:focus-visible {
   transition: opacity 0.5s ease;
 }
 
+/* Gone at once to the still, at a step told over it (D251); in over it in the fade. */
 .story-frame .scene.story-scene-waiting {
   opacity: 0;
+  transition: none;
 }
 

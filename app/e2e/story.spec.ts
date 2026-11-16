@@ -2,7 +2,7 @@
 // in a bubble over it, each step's action played before its words, Back and
 // Next, Enter and Space, and Go on to what comes next, the story read.
 
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { seedWizard, storyNext, storySaid } from './helpers';
 import { ciTimes } from './support';
 
@@ -102,4 +102,55 @@ test('Again plays a step once more, as R does; Skip goes to the end (14.4)', asy
   await expect(page.locator('#story-go-on')).toBeVisible();
   await expect(page.locator('#story-skip')).toBeHidden();
   await expect(page.locator('#story-step')).toHaveText(/^(\d+) of \1$/);
+});
+
+test.describe('the opening told over the painting of the castle (D251)', () => {
+  test.use({ locale: 'es-ES' });
+
+  /** The scene's opacity, as drawn now. */
+  const opacity = (page: Page) => page.locator('#scene').evaluate((node) => Number(getComputedStyle(node).opacity));
+
+  test('its first two steps over the still, the scene from the third; Back shows the still again; Skip on the scene', async ({
+    page,
+  }) => {
+    await page.goto('/#story/the-letter');
+    const frame = page.locator('.story-frame');
+    const still = page.locator('#story-still');
+    const zoom = page.locator('.story-frame .zoom-box');
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+    for (const step of [1, 2]) {
+      await expect(frame).toHaveAttribute('data-still', 'on');
+      await expect(still).toBeVisible();
+      expect(await opacity(page)).toBe(0);
+      await expect(zoom).toBeHidden();
+      await page.screenshot({ path: `e2e/shots/story/opening-${step}.png` });
+      await storyNext(page);
+    }
+    // The third step: the scene comes in over the still, which then leaves.
+    await expect(frame).toHaveAttribute('data-still', 'off');
+    await expect.poll(() => opacity(page)).toBe(1);
+    await expect(still).toBeHidden();
+    await expect(zoom).toBeVisible();
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: 'e2e/shots/story/opening-3.png' });
+    // Back: the still again, at once.
+    await page.locator('#story-back').click();
+    await expect(frame).toHaveAttribute('data-still', 'on');
+    await expect(still).toBeVisible();
+    expect(await opacity(page)).toBe(0);
+    // From the first step, Skip: the last step, on the scene.
+    await page.locator('#story-back').click();
+    await expect(page.locator('#story-back')).toBeDisabled();
+    await page.locator('#story-skip').click();
+    await expect(page.locator('#story-go-on')).toBeVisible();
+    await expect(frame).toHaveAttribute('data-still', 'off');
+    await expect.poll(() => opacity(page)).toBe(1);
+  });
+
+  test("a chapter's story shows no still once its scene has come", async ({ page }) => {
+    await page.goto('/#story/at-the-gate');
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+    await expect(page.locator('.story-frame')).toHaveAttribute('data-still', 'off');
+    await expect(page.locator('#story-still')).toBeHidden({ timeout: ciTimes(2_000) });
+  });
 });

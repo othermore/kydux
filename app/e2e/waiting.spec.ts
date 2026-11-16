@@ -244,8 +244,11 @@ test('a newcomer reads the letter over the castle, with the music, while the fie
   await page.locator('#story-next').click();
   await expect(page.locator('#story-voice')).toHaveText(LETTER[1] as string);
   await expect(page.locator('#story-still')).toBeVisible();
-  // The scene comes in, and the still leaves.
+  // The scene comes, behind the still: the second step is told over it (D251).
   await expect(page.locator('#scene')).not.toHaveAttribute('data-state', 'loading', { timeout: ciTimes(30_000) });
+  await expect(page.locator('#story-still')).toBeVisible();
+  // At the third step the scene comes in, and the still leaves.
+  await page.locator('#story-next').click();
   await expect(page.locator('#story-still')).toBeHidden({ timeout: ciTimes(5_000) });
 });
 

@@ -337,3 +337,38 @@ def test_a_figure_may_step_out_from_behind_a_thing_on_a_cell_beside_it():
         story_on_scene({**data, "actors": actors, "steps": [off]}, strip)
     with pytest.raises(LevelError, match="do is one of"):
         staged(steps=[{"who": "nuri", "do": {"walk": [2, 1], "from": [2, 2]}}])
+
+
+def test_the_openings_first_steps_may_be_told_over_its_still():
+    """D251: `still` on the first steps in a row, of the voice, doing nothing, in a story
+    that has a still (the opening)."""
+    steps = [
+        {"who": "voice", "do": None, "still": True},
+        {"who": "voice", "do": None, "still": True},
+        {"who": "voice", "do": {"appear": [5, 1]}, "by": "nuri"},
+    ]
+    story = staged(opening=True, steps=steps)
+    assert [step.get("still") for step in story["steps"]] == [True, True, None]
+
+
+@pytest.mark.parametrize(
+    ("change", "steps", "reason"),
+    [
+        ({}, [{"who": "voice", "do": None, "still": True}], "only in a story that has one"),
+        (
+            {"opening": True},
+            [{"who": "voice", "do": None}, {"who": "voice", "do": None, "still": True}],
+            "the first, in a row",
+        ),
+        (
+            {"opening": True},
+            [{"who": "voice", "do": {"appear": [5, 1]}, "by": "nuri", "still": True}],
+            "does nothing",
+        ),
+        ({"opening": True}, [{"who": "wizard", "do": None, "still": True}], "the voice's"),
+        ({"opening": True}, [{"who": "voice", "do": None, "still": "yes"}], "still is true"),
+    ],
+)
+def test_a_step_over_the_still_is_refused_where_it_does_not_belong(change, steps, reason):
+    with pytest.raises(LevelError, match=reason):
+        staged(**change, steps=steps)

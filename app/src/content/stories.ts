@@ -4,7 +4,7 @@
 // steps: each step's actions played as the world's events would be, the figures'
 // at once (D103), then its words said in a bubble, or by the voice under the
 // scene; a door's leaf, opening, moves whoever stands where it comes to lie
-// (D125).
+// (D125). The opening's first steps may be told over its still (`still`, D251).
 
 import type { Facing, Tile } from '../engine/sight';
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
@@ -43,6 +43,9 @@ export interface StoryStep {
   text: string;
   /** The place the step frames (D199): a box of cells, or the scene's width. */
   camera?: { fit?: [[number, number], [number, number]]; wide?: boolean };
+  /** Told over the story's still, the scene behind it (D251): the opening's first steps,
+   * the voice's, doing nothing. */
+  still?: boolean;
 }
 
 /** A part of a story told on another scene (39.4): from its first step on, the

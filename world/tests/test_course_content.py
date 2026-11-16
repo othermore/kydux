@@ -779,3 +779,12 @@ def test_a_long_program_is_given_as_comments_one_for_each_instruction(level, lan
         if name == "find_nearest" and level == "the-brooms-in-the-straw":
             continue
         assert any(name in line for line in comments), f"{level} {lang}: no comment names {name}"
+
+
+def test_the_opening_tells_its_first_two_steps_over_its_still():
+    """D251: the castle and the letter over the welcome's painting, the journey on."""
+    path = CONTENT / "stories" / "the-letter" / "story.json"
+    story = json.loads(path.read_text(encoding="utf-8"))
+    assert story["opening"] is True
+    stills = [step.get("still", False) for step in story["steps"]]
+    assert stills == [True, True, False, False, False]

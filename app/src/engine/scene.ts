@@ -36,8 +36,10 @@
 // cells under an open door's leaf, debug.ts), data-sprite-things (each thing drawn
 // from its kind's sprite, "id:kind:x,y" joined by ";", D182), data-found (the
 // hidden things found and seen, joined by ",", D184), data-untied (the brooms
-// untied, D183), data-wizard-facing (the way the wizard faces, as the scene keeps it,
-// D241), data-wizard-frame (the name of the frame the wizard is drawn in), data-flying
+// untied, D183), data-thought-box (the thought's cloud on the page,
+// "left,top,right,bottom", D245), data-wizard-facing (the way the wizard faces, as the
+// scene keeps it, D241), data-wizard-frame (the name of the frame the wizard is drawn
+// in), data-flying
 // (the figures in the air, joined by ",", from their fly to their land, D185), data-rise
 // (the wizard's rise, 0 on its cell to 1 at its flight's height, while it flies, D244),
 // data-hover (the hover's clock, in whole milliseconds, which always runs but under
@@ -751,6 +753,12 @@ class LevelScene extends Phaser.Scene {
       tickMs: this.tickMs,
       shown: () => this.view.shown(),
       shownSides: () => this.view.shownSides(),
+      // The window's view of the scene, which a thought stays inside (D245).
+      view: () => {
+        const view = this.cameras.main.worldView;
+        return { left: view.x, top: view.y, right: view.right, bottom: view.bottom };
+      },
+      facing: (figure) => this.wayOf(figure),
       cover: () => this.coverOnScene(),
     });
     const story = this.options.story;
@@ -903,6 +911,12 @@ class LevelScene extends Phaser.Scene {
     // the air with the program playing.
     const wind = this.wind.blowing ? 'on' : 'off';
     if (this.parentNode.dataset.wind !== wind) this.parentNode.dataset.wind = wind;
+    // The thought's cloud on the page, for the tests to hold it clear of the goals box.
+    const cloud = this.speech.thoughtBox();
+    const onPage = cloud && this.onPage(new Phaser.Geom.Rectangle(cloud.left, cloud.top, cloud.right - cloud.left, cloud.bottom - cloud.top));
+    const said = onPage ? [onPage.left, onPage.top, onPage.right, onPage.bottom].map(Math.round).join(',') : undefined;
+    if (said === undefined) delete this.parentNode.dataset.thoughtBox;
+    else if (this.parentNode.dataset.thoughtBox !== said) this.parentNode.dataset.thoughtBox = said;
     const resting = this.inAir(this.wizard) && this.playback.state === 'playing';
     if (resting !== this.resting) {
       this.resting = resting;

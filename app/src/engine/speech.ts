@@ -12,9 +12,13 @@
 // flight's lift and a ring's raise; words under it stay under the place of its feet.
 // Where the goals box, which lies on the page over the scene, would cover words over
 // someone, they go under them, as where there is no room above (D240).
-// The scene's parent says what is said: data-bubble and data-speaker, data-thought,
-// data-words-scale, and data-words-over (how far over the place of the feet of who they
-// are over the words' foot is, in cells, or `below`).
+// A thought with no room above goes beside the head, raised or lower, its dots going to
+// the head, and under the feet only where neither side has room (D245, thoughtPlace); its
+// place is chosen when it shows and kept while it is up. A bubble of words said keeps
+// its own places. The scene's parent says what is said: data-bubble and data-speaker,
+// data-thought, data-words-scale, data-words-place (`above`, `left`, `right`, `below`)
+// and data-words-over (how far over the place of the feet of who they are over the
+// words' foot is, in cells, or `below`).
 
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
@@ -29,6 +33,8 @@ import {
   bubbleWrap,
   roomTop,
   settleMs,
+  type ThoughtSide,
+  thoughtPlace,
   wordsOver,
 } from './bubble';
 
@@ -64,6 +70,11 @@ export interface SpeechParts {
   /** What of the page lies over the scene, the goals box, as a box in the scene's pixels,
    * under which no words over someone are put (D240); null where nothing does. */
   cover: () => Box | null;
+  /** What of the scene the window shows, in the scene's pixels, which a thought stays
+   * inside (D245). */
+  view: () => Box;
+  /** The way a figure faces, as the scene keeps it (D241): a thought goes behind it. */
+  facing: (figure: Phaser.GameObjects.Sprite) => 'up' | 'down' | 'left' | 'right';
 }
 
 export class Speech {
@@ -80,7 +91,16 @@ export class Speech {
   /** The last tick `expire` was told of, from which a thought shown later lasts. */
   private lastTick = 0;
   /** Where a bubble or a thought sits: its width, and whether it is below who it is over. */
-  private place = { width: 0, below: false, shift: 0 };
+  private place: { width: number; below: boolean; shift: number; side: ThoughtSide; bottom: number } = {
+    width: 0,
+    below: false,
+    shift: 0,
+    side: 'above',
+    bottom: 0,
+  };
+  /** The thought's cloud as drawn, its box against the point it hangs from (the head's
+   * top beside it, the anchor over or under it), in the scene's pixels. */
+  private cloud: Box | null = null;
   /** Who a bubble or a thought is over: the wizard, or an actor who speaks. */
   private speaker: Phaser.GameObjects.Sprite | null = null;
   /** How much larger the words are drawn than the scene's pixels (wordsScale). */
@@ -154,12 +174,18 @@ export class Speech {
   private publishOver(): void {
     const dataset = this.parent.dataset;
     let over: string | undefined;
+    let place: string | undefined;
     if (this.bubble || this.thought) {
       const who = this.speaker ?? this.parts.wizard();
-      over = this.place.below ? 'below' : wordsOver(this.parts.headroom, this.parts.lifted(who), TILE).toFixed(2);
+      place = this.place.side;
+      if (this.place.below) over = 'below';
+      else if (place === 'left' || place === 'right') over = ((who.y - this.headOf(who).top - this.place.bottom) / TILE).toFixed(2);
+      else over = wordsOver(this.parts.headroom, this.parts.lifted(who), TILE).toFixed(2);
     }
     if (over === undefined) delete dataset.wordsOver;
     else if (dataset.wordsOver !== over) dataset.wordsOver = over;
+    if (place === undefined) delete dataset.wordsPlace;
+    else if (dataset.wordsPlace !== place) dataset.wordsPlace = place;
   }
 
   /** The bubble's box and tail with the figure, for the camera to keep in view: the
@@ -183,6 +209,8 @@ export class Speech {
    * sides, nor past those of what a framing shows of it. */
   private anchor(): [number, number] {
     const over = this.speaker ?? this.parts.wizard();
+    // Beside the head, the thought follows the head's top as it is drawn (D245).
+    if (this.place.side === 'left' || this.place.side === 'right') return [over.x, this.headOf(over).top];
     const half = (this.place.width / 2 + 4) * this.scale;
     const sides = bubbleRoom(this.parts.width, this.parts.shownSides());
     const x = bubbleMiddle(over.x + this.place.shift, half, sides);
@@ -193,6 +221,25 @@ export class Speech {
    * own, or what a story step's framing shows of it. */
   private get room(): [number, number] {
     return bubbleRoom(this.parts.height, this.parts.shown());
+  }
+
+  /** A figure's head as it is drawn (D245): its middle across, its top, a figure's
+   * height over the place of its feet and lifted as it flies, and its two sides. */
+  private headOf(figure: Phaser.GameObjects.Sprite): { middle: number; top: number; left: number; right: number } {
+    const top = figure.y - this.parts.lifted(figure) - (this.parts.headroom - 4);
+    const half = figure.displayWidth / 4;
+    return { middle: figure.x, top, left: figure.x - half, right: figure.x + half };
+  }
+
+  /** The heads of every other figure in sight, as drawn, which a thought does not cover. */
+  private headsBut(figure: Phaser.GameObjects.Sprite): Box[] {
+    return this.parts
+      .figures()
+      .filter((other) => other !== figure && other.visible)
+      .map((other) => {
+        const { top, left, right } = this.headOf(other);
+        return { left, right, top, bottom: top + TILE / 2 };
+      });
   }
 
   /** Whether words this tall and this wide fit over who they are over: inside the scene,
@@ -245,18 +292,54 @@ export class Speech {
     const pad = 8;
     const width = words.width + pad * 2;
     const height = words.height + pad * 2;
-    // Above the wizard, the two small circles lead down to it; below, up to it.
-    const below = !this.roomAbove(height, width);
-    const sign = below ? 1 : -1;
-    const top = below ? 14 : -height - 14;
+    const over = this.parts.wizard();
+    const head = this.headOf(over);
+    // Where it goes (D245): over the head, beside it, raised or lower, or under the feet.
+    const placing = thoughtPlace({
+      width: width * this.scale,
+      height: height * this.scale,
+      head,
+      feet: over.y,
+      facing: this.parts.facing(over),
+      view: this.parts.view(),
+      cover: this.parts.cover(),
+      heads: this.headsBut(over),
+    });
     const cloud = this.scene.add.graphics();
     cloud.fillStyle(0xe9ecef, 0.97).lineStyle(2, 0x868e96, 1);
-    cloud.fillRoundedRect(-width / 2, top, width, height, 12);
-    cloud.strokeRoundedRect(-width / 2, top, width, height, 12);
-    cloud.fillCircle(-6, sign * 8, 4).strokeCircle(-6, sign * 8, 4);
-    cloud.fillCircle(-12, sign * 1, 2.5).strokeCircle(-12, sign * 1, 2.5);
-    words.setOrigin(0.5, below ? 0 : 1).setY(below ? 14 + pad : -14 - pad);
-    this.place = { width, below, shift: 0 };
+    if (placing.place === 'above' || placing.place === 'below') {
+      // Above the wizard, the two small circles lead down to it; below, up to it.
+      const below = placing.place === 'below';
+      const sign = below ? 1 : -1;
+      const top = below ? 14 : -height - 14;
+      cloud.fillRoundedRect(-width / 2, top, width, height, 12);
+      cloud.strokeRoundedRect(-width / 2, top, width, height, 12);
+      cloud.fillCircle(-6, sign * 8, 4).strokeCircle(-6, sign * 8, 4);
+      cloud.fillCircle(-12, sign * 1, 2.5).strokeCircle(-12, sign * 1, 2.5);
+      words.setOrigin(0.5, below ? 0 : 1).setY(below ? 14 + pad : -14 - pad);
+      this.place = { width, below, shift: 0, side: placing.place, bottom: 0 };
+      const scaled = (n: number) => n * this.scale;
+      this.cloud = { left: scaled(-width / 2), right: scaled(width / 2), top: scaled(top), bottom: scaled(top + height) };
+    } else {
+      // Beside the head: the cloud and its dots where the place says, drawn from the
+      // head's top in the container's own pixels; the dots going to the head.
+      const at = (x: number, y: number): [number, number] => [(x - head.middle) / this.scale, (y - head.top) / this.scale];
+      const [left, top] = at(placing.cloud.left, placing.cloud.top);
+      cloud.fillRoundedRect(left, top, width, height, 12);
+      cloud.strokeRoundedRect(left, top, width, height, 12);
+      for (const dot of placing.dots) {
+        const [x, y] = at(dot.x, dot.y);
+        cloud.fillCircle(x, y, dot.radius / this.scale).strokeCircle(x, y, dot.radius / this.scale);
+      }
+      words.setOrigin(0.5, 0).setPosition(left + width / 2, top + pad);
+      this.place = { width, below: false, shift: 0, side: placing.place, bottom: placing.cloud.bottom - head.top };
+      this.cloud = {
+        left: placing.cloud.left - head.middle,
+        right: placing.cloud.right - head.middle,
+        top: placing.cloud.top - head.top,
+        bottom: placing.cloud.bottom - head.top,
+      };
+    }
     this.thought = this.scene.add.container(...this.anchor(), [cloud, words]).setDepth(11).setScale(this.scale);
     this.thoughtUntil = tick + ticks;
     this.thoughtRead = this.readAt(ticks);
@@ -304,7 +387,7 @@ export class Speech {
       });
     const belowFits = () => over.y + 22 + (height + tail) * scale <= this.room[1];
     const sides = (from: number, to: number): Box => {
-      this.place = { width, below: false, shift: 0 };
+      this.place = { width, below: false, shift: 0, side: 'above', bottom: 0 };
       const [middle] = this.anchor();
       return {
         left: middle - (width / 2) * scale,
@@ -336,7 +419,7 @@ export class Speech {
     }
     const shift = below ? 0 : bubbleShift(aboveBox(), figures, this.parts.width);
     const top = below ? tail : -height - tail;
-    this.place = { width, below, shift };
+    this.place = { width, below, shift, side: below ? 'below' : 'above', bottom: 0 };
     const [x, y] = this.anchor();
     // The tail's tip is at the anchor, over who speaks, even where the box is held
     // in from a side or moved off someone.
@@ -364,6 +447,14 @@ export class Speech {
     this.parent.dataset.bubble = plain;
     this.parent.dataset.speaker = who;
     this.publishOver();
+  }
+
+  /** The thought's cloud where it is drawn now, in the scene's pixels; null with no
+   * thought up (data-thought-box, D245). */
+  thoughtBox(): Box | null {
+    if (!this.thought || !this.cloud) return null;
+    const [x, y] = [this.thought.x, this.thought.y];
+    return { left: x + this.cloud.left, right: x + this.cloud.right, top: y + this.cloud.top, bottom: y + this.cloud.bottom };
   }
 
   /** The thought gone, if there is one, and one still to come with it. */

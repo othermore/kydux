@@ -12,6 +12,8 @@ import {
   readingTicks,
   roomTop,
   settleMs,
+  type ThoughtRoom,
+  thoughtPlace,
   wordsOver,
 } from './bubble';
 import { FLY_LIFT, RING_RAISE } from './flight';
@@ -158,5 +160,75 @@ describe('words under the goals box (D240)', () => {
 
   it('keeps it where the box lies under the words, off the scene', () => {
     expect(roomTop(0, 100, 200, 300, { left: 0, top: 600, right: 400, bottom: 700 })).toBe(0);
+  });
+});
+
+describe('a thought beside the head where there is no room above (D245)', () => {
+  // A view of 800 by 500; a cloud of 120 by 50; a head 24 wide, its top at 200.
+  const view = box(0, 0, 800, 500);
+  const room = (change: Partial<ThoughtRoom> = {}): ThoughtRoom => ({
+    width: 120,
+    height: 50,
+    head: { middle: 400, top: 200, left: 388, right: 412 },
+    feet: 260,
+    facing: 'right',
+    view,
+    cover: null,
+    heads: [],
+    ...change,
+  });
+  const atTop = (top: number, middle = 400) => ({ middle, top, left: middle - 12, right: middle + 12 });
+  const near = (placing: ReturnType<typeof thoughtPlace>, x: number, y: number) =>
+    Math.hypot(placing.dots[1].x - x, placing.dots[1].y - y);
+
+  it('goes over the head where there is room', () => {
+    expect(thoughtPlace(room()).place).toBe('above');
+  });
+
+  it('goes beside the head, raised, behind a figure that faces right or left', () => {
+    // A head at 60: over it the cloud would start at -8; beside it, raised, at 10.
+    const right = thoughtPlace(room({ head: atTop(60) }));
+    expect(right.place).toBe('left');
+    expect(right.cloud.bottom).toBe(60);
+    expect(thoughtPlace(room({ head: atTop(60), facing: 'left' })).place).toBe('right');
+  });
+
+  it('goes toward the middle of the view for a figure that faces up or down', () => {
+    expect(thoughtPlace(room({ head: atTop(60, 200), facing: 'up' })).place).toBe('right');
+    expect(thoughtPlace(room({ head: atTop(60, 600), facing: 'down' })).place).toBe('left');
+  });
+
+  it('takes the other side where another head is on the first', () => {
+    const placing = thoughtPlace(room({ head: atTop(60), heads: [box(250, 20, 290, 50)] }));
+    expect(placing.place).toBe('right');
+  });
+
+  it('slides down beside the head, on the first side, where neither side has room raised', () => {
+    // The view's top at 20: a raised cloud, from 10 to 60, has none.
+    const placing = thoughtPlace(room({ head: atTop(60), view: box(0, 20, 800, 500) }));
+    expect(placing.place).toBe('left');
+    expect(placing.cloud.top).toBe(24);
+    expect(placing.cloud.top).toBeLessThanOrEqual(60);
+  });
+
+  it('goes under the feet where neither side has room', () => {
+    const placing = thoughtPlace(room({ head: atTop(20), view: box(0, 0, 440, 500), heads: [box(260, 0, 380, 80)] }));
+    expect(placing.place).toBe('below');
+  });
+
+  it('puts the dots between the cloud and the head, the last by the head', () => {
+    for (const placing of [
+      thoughtPlace(room({ head: atTop(60) })),
+      thoughtPlace(room({ head: atTop(60), facing: 'left' })),
+      thoughtPlace(room({ head: atTop(60), view: box(0, 20, 800, 500) })),
+    ]) {
+      const side = placing.place === 'left' ? 388 : 412;
+      const edge = placing.place === 'left' ? placing.cloud.right : placing.cloud.left;
+      for (const dot of placing.dots) {
+        expect(Math.min(edge, side) <= dot.x && dot.x <= Math.max(edge, side)).toBe(true);
+      }
+      expect(near(placing, side, placing.dots[1].y)).toBeLessThan(6);
+      expect(placing.dots[0].radius).toBeGreaterThan(placing.dots[1].radius);
+    }
   });
 });

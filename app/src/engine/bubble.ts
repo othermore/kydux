@@ -4,7 +4,10 @@
 // how long words stay said, as long as they take to read (D175); a thought about a bump
 // comes half a second after it, and words over a figure in the air are over it as it is
 // drawn (D237); words go under who they are over where the goals box would cover them
-// above (D240). Kept apart from speech.ts so that it is tested without Phaser.
+// above (D240); and a thought with no room above goes beside the head, raised or
+// lower, its dots going to the head, and under the feet only where neither side has
+// room (D245, thoughtPlace). Kept apart from speech.ts so that it is tested without
+// Phaser.
 
 /** How long after a bump the wizard's thought about it shows, in milliseconds (D237):
  * the bump is seen, and then read of. */
@@ -105,4 +108,111 @@ export function readingTicks(text: string, tickMs: number): number {
 export function settleMs(untils: readonly number[], now: number): number {
   const ends = untils.filter((until) => Number.isFinite(until));
   return ends.length === 0 ? 0 : Math.max(0, ...ends.map((until) => until - now));
+}
+
+/** Where a thought goes (D245): over the head, beside it on the left or on the right,
+ * or under the place of the feet. */
+export type ThoughtSide = 'above' | 'left' | 'right' | 'below';
+
+/** A thought's place: where it goes, its cloud's box, and the middles and sizes of its
+ * two dots, the larger nearer the cloud, all in the scene's pixels. */
+export interface ThoughtPlacing {
+  place: ThoughtSide;
+  cloud: Box;
+  dots: [{ x: number; y: number; radius: number }, { x: number; y: number; radius: number }];
+}
+
+/** What a thought's place is chosen from (D245), in the scene's pixels: the cloud's size
+ * as drawn; the head of who thinks as it is drawn (its middle across, its top, its two
+ * sides) and the place of its feet on the ground; the way it faces; what of the scene
+ * the window shows, and what of the page lies over it (D240); and the other figures'
+ * heads, which no cloud covers. */
+export interface ThoughtRoom {
+  width: number;
+  height: number;
+  head: { middle: number; top: number; left: number; right: number };
+  feet: number;
+  facing: 'up' | 'down' | 'left' | 'right';
+  view: Box;
+  cover: Box | null;
+  heads: readonly Box[];
+}
+
+/** How far a cloud over the head stands above it, and beside it, from it; how clear of
+ * the view's edges any cloud stays; and how far under the feet a cloud goes. */
+const OVER_HEAD = 18;
+const BESIDE_HEAD = 16;
+const CLEAR = 4;
+const UNDER_FEET = 36;
+/** The dots' sizes, and where along the way from the cloud to the head each lies. */
+const DOTS = [
+  { radius: 4, along: 0.35 },
+  { radius: 2.5, along: 0.8 },
+] as const;
+
+/** The two dots on the way from a point of the cloud to a point of the head. */
+function dotsBetween(from: { x: number; y: number }, to: { x: number; y: number }): ThoughtPlacing['dots'] {
+  const [near, far] = DOTS.map(({ radius, along }) => ({
+    x: from.x + (to.x - from.x) * along,
+    y: from.y + (to.y - from.y) * along,
+    radius,
+  }));
+  return [near as ThoughtPlacing['dots'][0], far as ThoughtPlacing['dots'][1]];
+}
+
+/** Where a thought goes (D245), the first of these with room: over the head; beside it,
+ * raised, its foot level with the head's top, on the first side and then the other;
+ * beside it, slid down by the least that gives it room, its top no lower than the head's,
+ * on the first side and then the other; under the feet. The first side is the one behind
+ * a figure that faces left or right, else the one toward the middle of the view. A place
+ * has room where the cloud is inside the view, CLEAR off its edges, and covers neither
+ * what lies over the scene nor another head. */
+export function thoughtPlace(room: ThoughtRoom): ThoughtPlacing {
+  const { width, height, head, view } = room;
+  const fits = (cloud: Box) =>
+    cloud.left >= view.left + CLEAR &&
+    cloud.right <= view.right - CLEAR &&
+    cloud.top >= view.top + CLEAR &&
+    cloud.bottom <= view.bottom - CLEAR &&
+    !(room.cover && meets(cloud, room.cover)) &&
+    !room.heads.some((other) => meets(cloud, other));
+  // Over the head, held inside the view's sides as words are (bubbleMiddle).
+  const middle = bubbleMiddle(head.middle, width / 2 + CLEAR, [view.left, view.right]);
+  const above = { left: middle - width / 2, right: middle + width / 2, top: head.top - OVER_HEAD - height, bottom: head.top - OVER_HEAD };
+  if (fits(above)) {
+    const at = { x: head.middle, y: head.top };
+    return { place: 'above', cloud: above, dots: dotsBetween({ x: head.middle - 6, y: above.bottom }, at) };
+  }
+  const behind = room.facing === 'right' ? 'left' : room.facing === 'left' ? 'right' : null;
+  const toMiddle = head.middle < (view.left + view.right) / 2 ? 'right' : 'left';
+  const first = behind ?? toMiddle;
+  const sides: ('left' | 'right')[] = [first, first === 'left' ? 'right' : 'left'];
+  const besideAt = (side: 'left' | 'right', top: number): Box =>
+    side === 'right'
+      ? { left: head.right + BESIDE_HEAD, right: head.right + BESIDE_HEAD + width, top, bottom: top + height }
+      : { left: head.left - BESIDE_HEAD - width, right: head.left - BESIDE_HEAD, top, bottom: top + height };
+  // The point of the head the dots go to: its near side, a little under its top.
+  const aim = (side: 'left' | 'right') => ({ x: side === 'right' ? head.right : head.left, y: head.top + 8 });
+  for (const side of sides) {
+    const cloud = besideAt(side, head.top - height);
+    if (fits(cloud)) {
+      const corner = { x: side === 'right' ? cloud.left : cloud.right, y: cloud.bottom };
+      return { place: side, cloud, dots: dotsBetween(corner, aim(side)) };
+    }
+  }
+  for (const side of sides) {
+    for (let down = 1; down <= height; down += 1) {
+      const cloud = besideAt(side, head.top - height + down);
+      if (!fits(cloud)) continue;
+      const target = aim(side);
+      const nearX = side === 'right' ? cloud.left : cloud.right;
+      // From the near side at the head's height, or from the near top corner where the
+      // cloud is wholly under the head's top.
+      const from = cloud.top >= head.top ? { x: nearX, y: cloud.top } : { x: nearX, y: Math.min(Math.max(target.y, cloud.top + 6), cloud.bottom - 6) };
+      return { place: side, cloud, dots: dotsBetween(from, target) };
+    }
+  }
+  const top = room.feet + UNDER_FEET;
+  const below = { left: middle - width / 2, right: middle + width / 2, top, bottom: top + height };
+  return { place: 'below', cloud: below, dots: dotsBetween({ x: head.middle - 6, y: top }, { x: head.middle, y: room.feet + 22 }) };
 }

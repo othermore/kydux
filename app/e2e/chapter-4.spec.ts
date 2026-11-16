@@ -804,7 +804,7 @@ test.describe('the rings and the race', () => {
     await page.screenshot({ path: `${SHOTS}ring-rim-card.png` });
   });
 
-  test("the rim's thought comes half a second after the bump, under the goals box, and the card once it is read (D237, D240)", async ({
+  test("the rim's thought comes half a second after the bump, beside the head clear of the goals box, and the card once it is read (D237, D240, D245)", async ({
     page,
   }) => {
     await open(page, 'the-rings', '1');
@@ -825,10 +825,17 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).toHaveAttribute('data-thought', 'Oh, giré demasiado pronto y rocé el aro.', {
       timeout: ciTimes(10_000),
     });
-    // Under the feet: over the hat the goals box, open along the top, would cover it (D240).
+    // Beside the head: over the hat the goals box, open along the top, would cover it
+    // (D240, D245).
     await expect(page.locator('.goals')).toHaveAttribute('data-shape', 'strip');
     await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
-    await expect(scene(page)).toHaveAttribute('data-words-over', 'below');
+    await expect(scene(page)).toHaveAttribute('data-words-place', /^(left|right)$/);
+    await expect(scene(page)).toHaveAttribute('data-words-over', /^-?\d+\.\d\d$/);
+    const [left, top, right, bottom] = ((await scene(page).getAttribute('data-thought-box')) ?? '').split(',').map(Number);
+    const goals = await page.locator('.goals').boundingBox();
+    const clear =
+      !goals || (right as number) <= goals.x || (left as number) >= goals.x + goals.width || (bottom as number) <= goals.y || (top as number) >= goals.y + goals.height;
+    expect(clear).toBe(true);
     await page.waitForTimeout(500);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}ring-rim-thought.png` });
     await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
@@ -847,6 +854,7 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).toHaveAttribute('data-thought', 'Oh, giré demasiado pronto y rocé el aro.', {
       timeout: ciTimes(60_000),
     });
+    await expect(scene(page)).toHaveAttribute('data-words-place', 'above');
     await expect(scene(page)).toHaveAttribute('data-words-over', '1.95');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}ring-rim-thought-folded.png` });
   });

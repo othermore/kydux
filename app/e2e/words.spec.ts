@@ -94,7 +94,9 @@ async function openTheLongCorridor(page: Page): Promise<void> {
 test.describe('a thought about a bump (D237)', () => {
   test.use({ locale: 'es-ES' });
 
-  test('comes after the bump into a friend, over the head of a wizard on the ground', async ({ page }) => {
+  test("comes after the bump into a friend, beside the head of a wizard on the ground, clear of the friend's (D245)", async ({
+    page,
+  }) => {
     await openTheLongCorridor(page);
     await page.keyboard.insertText('wizard.move_up()');
     await watchBump(page);
@@ -103,7 +105,10 @@ test.describe('a thought about a bump (D237)', () => {
     const { bump, thought } = await bumpSeen(page);
     expect((thought as number) - (bump as number)).toBeGreaterThan(350);
     expect((thought as number) - (bump as number)).toBeLessThan(1500);
-    await expect(page.locator('#scene')).toHaveAttribute('data-words-over', '1.10');
+    // The friend stands right over the wizard: a cloud over the head would cover theirs.
+    await expect(page.locator('#scene')).toHaveAttribute('data-words-place', /^(left|right)$/);
+    await expect(page.locator('#scene')).toHaveAttribute('data-words-over', /^\d+\.\d\d$/);
+    await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/words/friend-bump-thought.png' });
   });
 
   test('is not shown when the slider is moved across the bump within its half second', async ({ page }) => {

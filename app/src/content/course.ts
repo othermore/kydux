@@ -38,6 +38,9 @@ export interface Course {
   titles?: Record<string, Record<string, string>>;
   /** The game's opening, chapter 1's first story, before the creator (D61, D78). */
   opening?: string | null;
+  /** The scene each level and each story is played on, by item, so that the page knows
+   * a screen's scene before it fetches it (D221); a story's first. */
+  scenes?: Record<string, string>;
 }
 
 export type ItemKind = 'story' | 'lesson' | 'level';

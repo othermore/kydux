@@ -578,8 +578,7 @@
     "kidux_url": "https://kidux.org"
   },
   "waiting": {
-    "loading": "Loading…",
-    "go": "Go on"
+    "loading": "Loading…"
   },
   "tips": {
     "notebook": "Open the notebook to see all the instructions you can use in your program.",

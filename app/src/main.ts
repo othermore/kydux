@@ -30,7 +30,7 @@ import type { LessonRunner } from './ui/lessonrun';
 import type { MapScreenParts } from './ui/map';
 import { aboutScreen } from './ui/about';
 import type { Screen } from './ui/screen';
-import { type Wait, waitingView } from './ui/waiting';
+import { fetchNextTip, type Wait, waitingView } from './ui/waiting';
 import { debugging } from './engine/debugging';
 import { lookOf } from './engine/looks';
 import { listenForMusic, music } from './engine/music';
@@ -315,17 +315,32 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
   );
 }
 
-/** The wait of the screen being loaded, with its tips (D214). */
-let waiting: { content: HTMLElement; wait: Wait } | null = null;
+/** The wait of the screen being loaded, with its tips (D214), and the scene of that
+ * screen, or null for one with none (a lesson, the map, the settings). */
+let waiting: { content: HTMLElement; wait: Wait; scene: string | null } | null = null;
+/** The scene last shown in this visit, and whether a wait has been shown yet (D221). */
+let lastScene: string | null = null;
+let waitedBefore = false;
+/** The course once loaded, so that a route knows a screen's scene before it fetches
+ * anything of it (D221). */
+let courseKnown: Course | null = null;
+
+/** The scene a level or a story is played on, by the course file (D221). */
+function sceneOfRoute(course: Course | null, wanted: Route): string | null {
+  if (!course || (wanted.name !== 'level' && wanted.name !== 'story')) return null;
+  return course.scenes?.[`${wanted.name}:${wanted.id}`] ?? null;
+}
 
 /** Puts a screen in the page in place of the one before: at once, or, where a tip is
- * up while it loaded, once the tip has been read (D214). */
+ * up while it loaded, once the tip has had its reading time (D214, D221). */
 function show(content: HTMLElement, next: Screen): void {
+  const scene = waiting?.content === content ? waiting.scene : null;
   const open = () => {
     screen?.destroy();
     screen = next;
     content.replaceChildren(next.node);
     next.mount?.();
+    if (scene) lastScene = scene;
     warmUp();
   };
   const held = waiting?.content === content ? waiting.wait : null;
@@ -349,6 +364,8 @@ function warmUp(): void {
     () => import('./ui/level'),
     () => import('./editor/editor'),
     () => import('./ui/map'),
+    // The next tip's picture, for the next wait (D221).
+    () => fetchNextTip(),
   ];
   const fetchNext = () => {
     const part = parts.shift();
@@ -593,11 +610,27 @@ function route(): void {
   screen?.destroy();
   screen = null;
   // While the screen loads, the waiting view, with a tip for a child who has begun
-  // (D214); a wait dropped by a new route opens nothing.
+  // (D214): at once at the visit's first wait and at a scene other than the last shown
+  // (D221); a wait dropped by a new route opens nothing.
   waiting?.wait.dispose();
-  const view = waitingView(!newcomer());
+  const scene = sceneOfRoute(courseKnown, wanted);
+  const view = waitingView(!newcomer(), !waitedBefore || (scene !== null && scene !== lastScene));
+  waitedBefore = true;
   const content = element('main', { className: 'content' }, [view.node]);
-  waiting = { content, wait: view.wait };
+  const waited = { content, wait: view.wait, scene };
+  waiting = waited;
+  if (!courseKnown && (wanted.name === 'level' || wanted.name === 'story')) {
+    // The course not known yet: the scene, and whether a tip is due, once it comes.
+    void loadCourse()
+      .then((course) => {
+        courseKnown = course;
+        const known = sceneOfRoute(course, wanted);
+        if (waiting !== waited) return;
+        waited.scene = known;
+        if (known !== null && known !== lastScene) waited.wait.due();
+      })
+      .catch(() => {});
+  }
   chrome(root, content);
   shownContent = content;
   if (wanted.name === 'settings') {

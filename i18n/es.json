@@ -578,8 +578,7 @@
     "kidux_url": "https://kidux.org/es/"
   },
   "waiting": {
-    "loading": "Cargando…",
-    "go": "Seguir"
+    "loading": "Cargando…"
   },
   "tips": {
     "notebook": "Abre el cuaderno para ver todas las instrucciones que puedes utilizar en tu programa.",

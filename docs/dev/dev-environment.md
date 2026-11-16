@@ -879,6 +879,30 @@ file's form.
 The sound effects need no files: the game makes them as it plays, and the
 settings can turn them off.
 
+### The tips' pictures
+
+Each tip shown while a screen loads has a picture of the thing it tells, in
+each language, made from the game's own page. They live in
+`content/tips/<lang>/<tip>.webp`. When the page changes where a tip points,
+make them again, so that they show the page as it is.
+
+A spec of the browser tests makes them. It opens the page, cuts the part each
+tip tells, and writes the twenty small pictures. It is skipped unless it is
+asked for by name. Run it from `app/`:
+
+```sh
+KYDUX_TIP_PICTURES=1 npx playwright test e2e/tips-pictures.spec.ts
+```
+
+It should say that 8 tests passed. Each picture is 640 by 360 pixels and
+weighs less than 40 KB. Look at them before you commit them: open
+`content/tips/es/` in a file viewer. The content test then checks that every
+tip has its picture in every language:
+
+```sh
+.venv/bin/python -m pytest -q tests/project
+```
+
 ## 11. The commands that need `sudo`, for opening the game to friends
 
 Each step of "Opening the game to friends" (section 5) that changes the

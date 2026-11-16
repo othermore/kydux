@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GRACE, LAST_TIP, nextTip, TIP_TIME, TIPS, Wait } from './waiting';
+import { GRACE, LAST_TIP, nextTip, readFor, TIP_TIME, TIPS, Wait } from './waiting';
 
 /** A browser's storage, in memory. */
 function kept(): Pick<Storage, 'getItem' | 'setItem'> & { data: Map<string, string> } {
@@ -13,20 +13,20 @@ function kept(): Pick<Storage, 'getItem' | 'setItem'> & { data: Map<string, stri
 
 const KEYS = ['a', 'b', 'c'];
 
-function waiting(tips = true, storage = kept()) {
+function waiting(tips = true, storage = kept(), more: { due?: boolean; reading?: number } = {}) {
   const shown: string[] = [];
-  const offered: number[] = [];
   const wait = new Wait({
     tips,
     storage,
     keys: KEYS,
+    due: more.due,
+    reading: () => more.reading ?? 6000,
     onTip: (key) => shown.push(key),
-    onOffer: () => offered.push(Date.now()),
   });
-  return { wait, shown, offered, storage };
+  return { wait, shown, storage };
 }
 
-describe('the wait while a screen loads (D214)', () => {
+describe('the wait while a screen loads (D214, D221)', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
@@ -54,39 +54,71 @@ describe('the wait while a screen loads (D214)', () => {
     expect(shown).toEqual(['a', 'b', 'c', 'a']);
   });
 
-  it('holds a ready screen until its tip has been up ten seconds, offering Go on', () => {
-    const { wait, shown, offered } = waiting();
+  it('shows a tip at once when one is due: the first wait of a visit, or a new scene', () => {
+    const { wait, shown } = waiting(true, kept(), { due: true });
+    vi.advanceTimersByTime(0);
+    expect(shown).toEqual(['a']);
+    // A screen ready at once still waits for the tip's reading time, and opens by itself.
+    const open = vi.fn();
+    wait.ready(open);
+    vi.advanceTimersByTime(6000 - 1);
+    expect(open).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(open).toHaveBeenCalledOnce();
+  });
+
+  it('shows a tip at once when the scene, known later, is a new one', () => {
+    const { wait, shown } = waiting();
+    vi.advanceTimersByTime(500);
+    wait.due();
+    expect(shown).toEqual(['a']);
+    // Due again, with a tip up: no other comes before its time.
+    wait.due();
+    expect(shown).toEqual(['a']);
+  });
+
+  it('keeps the grace for a screen of the same scene, or of none, and is quick there', () => {
+    const { wait, shown } = waiting(true, kept(), { due: false });
+    vi.advanceTimersByTime(800);
+    const open = vi.fn();
+    wait.ready(open);
+    expect(open).toHaveBeenCalledOnce();
+    expect(shown).toEqual([]);
+  });
+
+  it("holds a ready screen for the tip's reading time, never more than ten seconds, and has no button", () => {
+    const { wait, shown } = waiting(true, kept(), { reading: 7000 });
     vi.advanceTimersByTime(GRACE + 3000);
     const open = vi.fn();
     wait.ready(open);
     expect(open).not.toHaveBeenCalled();
-    expect(offered).toHaveLength(1);
-    vi.advanceTimersByTime(TIP_TIME - 3000 - 1);
+    vi.advanceTimersByTime(4000 - 1);
     expect(open).not.toHaveBeenCalled();
     vi.advanceTimersByTime(1);
     expect(open).toHaveBeenCalledOnce();
     // No other tip came while the screen waited for this one to be read.
     expect(shown).toEqual(['a']);
-  });
-
-  it('opens a ready screen at once when Go on is pressed, and only once', () => {
-    const { wait } = waiting();
-    vi.advanceTimersByTime(GRACE);
-    const open = vi.fn();
-    wait.ready(open);
-    wait.go();
-    expect(open).toHaveBeenCalledOnce();
+    expect('go' in wait).toBe(false);
+    const long = waiting(true, kept(), { reading: 30_000, due: true });
+    vi.advanceTimersByTime(0);
+    const late = vi.fn();
+    long.wait.ready(late);
     vi.advanceTimersByTime(TIP_TIME);
-    expect(open).toHaveBeenCalledOnce();
+    expect(late).toHaveBeenCalledOnce();
+    expect(readFor(30_000)).toBe(TIP_TIME);
+    expect(readFor(5_050)).toBe(5_050);
   });
 
-  it('shows a child who has not begun no tip, however long the wait', () => {
-    const { wait, shown } = waiting(false);
-    vi.advanceTimersByTime(TIP_TIME * 5);
-    expect(shown).toEqual([]);
-    const open = vi.fn();
-    wait.ready(open);
-    expect(open).toHaveBeenCalledOnce();
+  it('shows a child who has not begun no tip, however long the wait, due or not', () => {
+    for (const due of [false, true]) {
+      const { wait, shown } = waiting(false, kept(), { due });
+      vi.advanceTimersByTime(TIP_TIME * 5);
+      wait.due();
+      expect(shown).toEqual([]);
+      const open = vi.fn();
+      wait.ready(open);
+      expect(open).toHaveBeenCalledOnce();
+    }
   });
 
   it('goes on from the tip after the last one shown, kept in the browser', () => {
@@ -110,7 +142,6 @@ describe('the wait while a screen loads (D214)', () => {
     wait.ready(open);
     wait.dispose();
     vi.advanceTimersByTime(TIP_TIME);
-    wait.go();
     expect(open).not.toHaveBeenCalled();
   });
 });

@@ -1,21 +1,23 @@
-// What a screen shows while it loads (D214): Kydux's mark and "Loading…", and, for a
-// child who has begun, a tip about the game. No screen waits for Python, which loads in
-// its worker from the moment the page opens; a screen waits for its own code, texts
-// and pictures. A wait shorter than the grace shows no tip and holds nothing; after
-// the grace a tip comes up, and the next one every TIP_TIME. When the screen is ready
-// with a tip up, Go on appears under it, and the screen opens when the tip has been up
-// TIP_TIME or at the button, whichever comes first. The tips are shown in their order,
-// from the one after the last shown, which the browser keeps; after the last comes the
-// first. The browser tests turn them off with a key no setting shows, read once as the
-// page opens.
+// What a screen shows while it loads (D214, D221): Kydux's mark and "Loading…", and,
+// for a child who has begun, a tip about the game with its picture. No screen waits
+// for Python, which loads in its worker from the moment the page opens; a screen waits
+// for its own code, texts and pictures. A tip is due at once at the visit's first wait
+// and at a screen of a scene other than the one last shown; any other wait shows no
+// tip inside the grace and holds nothing, and after it a tip comes up. The next tip
+// comes every TIP_TIME. When the screen is ready with a tip up, it opens by itself once
+// the tip has had its reading time (D175), never more than TIP_TIME; there is no
+// button. The tips are shown in their order, from the one after the last shown, which
+// the browser keeps; after the last comes the first. The browser tests turn them off
+// with a key no setting shows, read once as the page opens.
 
-import { t } from '../i18n';
+import { readingMs } from '../engine/bubble';
+import { currentLanguage, t } from '../i18n';
 import { element } from './dom';
 import { markSvg } from './mark';
 
 /** How long a wait shows no tip, in milliseconds. */
 export const GRACE = 2000;
-/** How long a tip is up before the next, and before a ready screen opens under it. */
+/** How long a tip is up before the next, and the most a ready screen waits under it. */
 export const TIP_TIME = 10_000;
 /** The tips, by their key under `tips.`, in the order they are shown. */
 export const TIPS = ['notebook', 'spells', 'click', 'dot', 'hint', 'keys', 'timeline', 'zoom', 'lesson', 'map'] as const;
@@ -52,13 +54,21 @@ export interface WaitOptions {
   /** Whether this child may read tips: one who has begun (a wizard made or a game
    * saved), and the tips not turned off. */
   tips: boolean;
+  /** Whether a tip is due at once, with no grace (D221). */
+  due?: boolean;
   storage?: Kept | null;
   /** The tips' keys, the page's own unless a test gives others. */
   keys?: readonly string[];
   /** A tip comes up, by its key. */
   onTip?: (key: string) => void;
-  /** The screen is ready under a tip: Go on is offered. */
-  onOffer?: () => void;
+  /** How long a tip takes to read, in milliseconds (D175); TIP_TIME unless given. */
+  reading?: (key: string) => number;
+}
+
+/** How long a ready screen waits under a tip up: the tip's reading time, never more
+ * than TIP_TIME (D221). */
+export function readFor(ms: number): number {
+  return Math.min(TIP_TIME, Math.max(0, ms));
 }
 
 /** One wait for a screen, its clock and its tips. */
@@ -66,6 +76,7 @@ export class Wait {
   private readonly storage: Kept | null;
   private readonly keys: readonly string[];
   private shownAt: number | null = null;
+  private readMs = TIP_TIME;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private opened = false;
   private open: (() => void) | null = null;
@@ -73,7 +84,14 @@ export class Wait {
   constructor(private readonly options: WaitOptions) {
     this.storage = options.storage === undefined ? browserStorage() : options.storage;
     this.keys = options.keys ?? TIPS;
-    if (options.tips && this.keys.length > 0) this.timer = setTimeout(() => this.tip(), GRACE);
+    if (options.tips && this.keys.length > 0) this.timer = setTimeout(() => this.tip(), options.due ? 0 : GRACE);
+  }
+
+  /** A tip is due now (D221): the screen's scene is known to be a new one. */
+  due(): void {
+    if (this.opened || this.shownAt !== null || !this.options.tips || this.keys.length === 0) return;
+    this.clear();
+    this.tip();
   }
 
   /** Whether a tip is up. */
@@ -81,7 +99,8 @@ export class Wait {
     return this.shownAt !== null;
   }
 
-  /** The screen is ready: `open` it now, or when the tip up has been read. */
+  /** The screen is ready: `open` it now, or, a tip up, by itself once the tip has
+   * had its reading time. */
   ready(open: () => void): void {
     this.open = open;
     if (this.shownAt === null) {
@@ -90,13 +109,7 @@ export class Wait {
     }
     // A tip is up: no other comes; the screen waits for this one to be read.
     this.clear();
-    this.options.onOffer?.();
-    this.timer = setTimeout(() => this.finish(), Math.max(0, this.shownAt + TIP_TIME - Date.now()));
-  }
-
-  /** Go on, pressed: the ready screen opens at once. */
-  go(): void {
-    this.finish();
+    this.timer = setTimeout(() => this.finish(), Math.max(0, this.shownAt + this.readMs - Date.now()));
   }
 
   /** The wait dropped: its timers stopped, nothing opened. */
@@ -113,7 +126,9 @@ export class Wait {
       // A browser that keeps nothing shows the tips from the first each time.
     }
     this.shownAt = Date.now();
-    this.options.onTip?.(this.keys[index] ?? '');
+    const key = this.keys[index] ?? '';
+    this.readMs = readFor(this.options.reading?.(key) ?? TIP_TIME);
+    this.options.onTip?.(key);
     this.timer = setTimeout(() => this.tip(), TIP_TIME);
   }
 
@@ -150,32 +165,40 @@ export function tipNodes(text: string): (Node | string)[] {
     );
 }
 
-/** The waiting view: the mark, Loading…, and the tip's place with Go on under it. */
-export function waitingView(tips: boolean): Waiting {
-  const tip = element('p', { id: 'waiting-tip', className: 'waiting-tip', hidden: true });
-  tip.setAttribute('aria-live', 'polite');
-  const go = element('button', { id: 'waiting-go', type: 'button', className: 'big-button', hidden: true }, [
-    t('waiting.go'),
-  ]);
+/** A tip's picture (D221), in the page's language: content/tips/<lang>/<key>.webp. */
+export function tipPicture(key: string, language = currentLanguage()): string {
+  return `${import.meta.env.BASE_URL}content/tips/${language}/${key}.webp`;
+}
+
+/** The next tip's picture fetched ahead, in idle time, so that it is there when the
+ * tip comes up (D221). */
+export function fetchNextTip(): Promise<unknown> {
+  const key = TIPS[nextTip(browserStorage(), TIPS.length)] ?? TIPS[0];
+  return fetch(tipPicture(key)).catch(() => {});
+}
+
+/** The waiting view: the mark, Loading…, and the tip's place, its picture over its
+ * words, the picture's room kept while it comes. */
+export function waitingView(tips: boolean, due = false): Waiting {
+  const words = element('p', { id: 'waiting-tip', className: 'waiting-tip' });
+  words.setAttribute('aria-live', 'polite');
+  const picture = element('img', { className: 'waiting-tip-picture', alt: '', width: 640, height: 360 });
+  const tip = element('figure', { className: 'waiting-tip-box', hidden: true }, [picture, words]);
   const node = element('div', { id: 'waiting', className: 'waiting' }, [
     markSvg(64),
     element('p', { className: 'status waiting-loading' }, [t('waiting.loading')]),
     tip,
-    go,
   ]);
   const wait = new Wait({
     tips: tips && !turnedOff,
+    due,
+    reading: (key) => readingMs(t(`tips.${key}`).replace(/[*`]/g, '')),
     onTip: (key) => {
-      tip.replaceChildren(...tipNodes(t(`tips.${key}`)));
+      picture.src = tipPicture(key);
+      words.replaceChildren(...tipNodes(t(`tips.${key}`)));
       tip.hidden = false;
       node.dataset.tip = key;
     },
-    onOffer: () => {
-      go.hidden = false;
-      node.dataset.ready = 'true';
-      go.focus();
-    },
   });
-  go.addEventListener('click', () => wait.go());
   return { node, wait };
 }

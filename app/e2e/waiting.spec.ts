@@ -1,8 +1,9 @@
-// While a screen loads there is something to read (D214): a child who has begun reads a
-// tip when a wait is longer than the grace, and the screen, once ready, waits for the
-// tip or for Go on; a newcomer reads the letter over the castle's painting, with the
-// music playing, while the field loads; and a level shows while Python is still loading,
-// its card read and its program written.
+// While a screen loads there is something to read (D214, D221): a child who has begun
+// reads a tip with its picture at the visit's first wait and at a scene other than the
+// last shown, at once, and the screen opens by itself once the tip has been read; a
+// screen of the same scene that loads quickly shows none; a newcomer reads the letter
+// over the castle's painting, with the music playing, while the field loads; and a level
+// shows while Python is still loading, its card read and its program written.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -29,32 +30,65 @@ test.describe('a tip while a screen loads', () => {
   // The tips on, as for a child, where every other spec turns them off.
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test('a long wait shows a tip, and the level, once there, waits for Go on (D214)', async ({ page }) => {
-    await seedWizard(page, MARTA, { tips: true });
-    await delay(page, '**/content/levels/the-moving-key/level.json', ciTimes(5_000));
-    await page.goto('/#level/the-moving-key');
-    await expect(page.locator('#waiting .waiting-loading')).toHaveText('Cargando…');
+  /** The tip up: its words among the page's tips, its picture in the language, loaded. */
+  async function tipShown(page: Page): Promise<void> {
     const tip = page.locator('#waiting-tip');
-    await expect(tip).toBeVisible({ timeout: ciTimes(6_000) });
+    await expect(tip).toBeVisible({ timeout: ciTimes(1_500) });
     const tips = Object.values(ES.tips as Record<string, string>).map((said) => said.replace(/\*/g, ''));
     expect(tips.map((said) => said.replace(/\{([^|}]*)\|([^}]*)\}/g, '$2'))).toContain(await tip.textContent());
-    await page.screenshot({ path: `${SHOTS}tip.png` });
-    // The level's files are there: Go on, and the tip stays to be read.
-    const go = page.locator('#waiting-go');
-    await expect(go).toBeVisible({ timeout: ciTimes(15_000) });
-    await expect(go).toHaveText('Seguir');
-    await expect(go).toBeFocused();
-    await expect(page.locator('#start')).toHaveCount(0);
-    await page.screenshot({ path: `${SHOTS}go-on.png` });
-    await go.click();
-    await expect(page.locator('#start')).toBeVisible();
-  });
+    const picture = page.locator('.waiting-tip-picture');
+    await expect(picture).toHaveAttribute('src', /content\/tips\/es\/[a-z]+\.webp$/);
+    await expect.poll(() => picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(640);
+    // No button: the screen opens by itself.
+    await expect(page.locator('#waiting button')).toHaveCount(0);
+  }
 
-  test('a quick load shows no tip and holds nothing', async ({ page }) => {
+  test("the visit's first wait shows a tip with its picture at once, and the level opens by itself (D221)", async ({
+    page,
+  }) => {
     await seedWizard(page, MARTA, { tips: true });
     await page.goto('/#level/the-moving-key');
-    await expect(page.locator('#start')).toBeVisible({ timeout: ciTimes(10_000) });
+    await expect(page.locator('#waiting .waiting-loading')).toHaveText('Cargando…');
+    await tipShown(page);
+    await page.screenshot({ path: `${SHOTS}tip.png` });
+    // The level's files come quickly; the tip stays its reading time, then the level.
+    await expect(page.locator('#start')).toHaveCount(0);
+    await expect(page.locator('#start')).toBeVisible({ timeout: ciTimes(11_000) });
     await expect(page.locator('#waiting')).toHaveCount(0);
+  });
+
+  test('a level of the same scene loads with no tip, and one of another scene with a tip first (D221)', async ({
+    page,
+  }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    await page.goto('/#level/the-moving-key');
+    await expect(page.locator('#start')).toBeVisible({ timeout: ciTimes(15_000) });
+    // The library again: a quick load, no tip, nothing held.
+    await page.evaluate(() => {
+      location.hash = '#level/the-hidden-key';
+    });
+    await expect(page.locator('#start')).toBeVisible({ timeout: ciTimes(10_000) });
+    await expect(page.locator('#level-number')).toHaveCount(1);
+    expect(await page.locator('#waiting-tip').count()).toBe(0);
+    // The two doors: a new scene, a tip at once, then the level by itself.
+    await page.evaluate(() => {
+      location.hash = '#level/the-wrong-door';
+    });
+    await tipShown(page);
+    await page.screenshot({ path: `${SHOTS}tip-new-scene.png` });
+    await expect(page.locator('.level-title')).toHaveText(/./, { timeout: ciTimes(11_000) });
+    await expect(page.locator('#waiting')).toHaveCount(0);
+  });
+
+  test('a lesson, of no scene, keeps the grace: a quick load shows no tip', async ({ page }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    await page.goto('/#level/the-moving-key');
+    await expect(page.locator('#start')).toBeVisible({ timeout: ciTimes(15_000) });
+    await page.evaluate(() => {
+      location.hash = '#lesson/the-distance';
+    });
+    await expect(page.locator('.lesson-screen, .lesson').first()).toBeVisible({ timeout: ciTimes(10_000) });
+    expect(await page.locator('#waiting-tip').count()).toBe(0);
   });
 });
 

@@ -639,8 +639,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
 5.6 Chapter 4, The broom (lists, a loop over a list, an `if` inside it, flying,
     functions and their arguments), in four scenes behind the castle by morning
     (`sprint-39.md`): the broom shed, the lake's edge, and the long ring field and the
-    race course, forty-two cells wide, which the camera follows; the friend's five
-    lessons and Ilda's one, eight levels (a fix, two improves), the brooms knotted with
+    race course, forty-two cells wide, which the camera follows; the friend's six
+    lessons and Ilda's one, nine levels (a fix, two improves), the brooms knotted with
     a black thread and untied (D183), found all at once and counted (D184), things
     drawn from a sprite of their kind (D182), flying with `drevo` three times as fast
     with the wind's sound (D185), cells a flight crosses and a walk does not (D186),
@@ -648,7 +648,12 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     the race scored by Ilda's count (D189), and a function taught where a loop cannot
     serve (D190); and, in the same sprint, the browser tests' time on GitHub (D191), a
     score of its own for every chapter (D192), the page's look with a welcome page
-    (D193), and portraits of every character and every look (D194).
+    (D193), and portraits of every character and every look (D194); and, after the
+    owner's reading of the chapter (`sprint-40.md`), the shed's brooms hung on a peg a
+    cell (D195), found by where the wizard stands, by the wall or in the straw (D196),
+    the broom taught first with a practice of one `untie` (D197), a list's element by
+    its index and both ways of a loop over a list (D198), a story's step that frames a
+    place (D199), and the map folded by chapter (D200).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

@@ -181,6 +181,7 @@ test.describe('the notebook of chapter 4', () => {
       else await expect(python).toHaveText([...shown]);
     }
     await expect(page.locator('#notebook .notebook-python')).toContainText('son los argumentos de la función');
+    await page.locator('#notebook').screenshot({ path: `${SHOTS}notebook-python.png` });
     await page.locator('#notebook [data-example="def rings(times):"]').click();
     await expect(page.locator('.cm-content')).toContainText('def rings(times):');
   });
@@ -245,6 +246,8 @@ test.describe('the stories', () => {
           await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', '3,3,16,10');
           await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_6:broom-hung:6,5/);
           await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_0:broom:9,8/);
+          // The three have walked in by the step's end: the scene's own playback is done.
+          await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '9,8');
         }
         if (id === 'the-finish') await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', 'wide');
       }

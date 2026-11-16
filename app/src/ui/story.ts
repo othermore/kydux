@@ -153,6 +153,9 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     loadingPart = index;
     scene?.destroy();
     scene = null;
+    // The scene that is gone said its playback was done; until this part's own plays,
+    // the page says it is loading, so that nothing waiting for `done` reads the old one.
+    sceneParent.dataset.state = 'loading';
     const look = lookOf(progress.wizard()?.look);
     const options = {
       story: {

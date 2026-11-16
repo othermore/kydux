@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { type BrowserContext, expect, type Page } from '@playwright/test';
 
-/** The screen's guide skipped (D68): the first level opens it after its start card,
- * the first time it is played. */
+/** The screen's guide skipped (D68): the first level opens it before its start card,
+ * the first time it is played (D258). */
 export async function skipGuide(page: Page): Promise<void> {
   await page.locator('#guide-skip').click();
   await expect(page.locator('.guide')).toHaveCount(0);

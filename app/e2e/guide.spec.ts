@@ -137,6 +137,27 @@ test('while the scene is not drawn there is no guide and no card; drawn, the gui
   await expect(page.locator('.start-card')).toHaveCount(0);
 });
 
+test("the guide's words not read: no guide, the card opens and the level plays; the guide is still to be seen (D258)", async ({
+  page,
+}) => {
+  await page.route('**/content/guide/**', (route) => route.abort());
+  await page.goto('/#level/the-gate');
+  await expectFirstCard(page);
+  await expect(page.locator('.guide')).toHaveCount(0);
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_up(1)\n');
+  await page.locator('#run').click();
+  await expect(page.locator('#scene')).not.toHaveAttribute('data-tick', '0', { timeout: 30_000 });
+  // Its words read at the next opening, the guide comes first.
+  await page.unroute('**/content/guide/**');
+  await page.reload();
+  await expect(page.locator('.guide')).toHaveAttribute('data-step', 'scene', { timeout: 30_000 });
+  await expect(page.locator('.start-card')).toHaveCount(0);
+});
+
 test('the guide is in the child\'s language', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'es-ES' });
   const page = await context.newPage();

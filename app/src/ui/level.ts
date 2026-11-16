@@ -354,10 +354,17 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       if (notebook.open !== open) notebook.toggle();
       notebookButton.setAttribute('aria-expanded', String(notebook.open));
     };
-    const words = parts.loadGuide();
+    // Words that cannot be read leave the level with no guide, which is still to be seen:
+    // the card it was asked from stays, and where none is open what comes after it opens.
+    const words = parts.loadGuide().catch(() => null);
     const open = () =>
       void words.then((text) => {
         if (destroyed || guide) return;
+        if (!text) {
+          guiding = false;
+          if (!startShown()) after();
+          return;
+        }
         if (startShown()) shownCard?.close();
         guide = openGuide(document.body, text, {
           onStep: (key) => {
@@ -416,6 +423,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     if (shownCard?.open && shownCard.over === 'window') return;
     foldTimer = setTimeout(() => {
       foldTimer = null;
+      // The guide or a card opened meanwhile: the fold waits for its close (D258).
+      if (guiding || (shownCard?.open && shownCard.over === 'window')) return;
       foldPending = false;
       if (destroyed || goals.touched) return;
       goals.fold();

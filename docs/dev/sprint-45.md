@@ -1,4 +1,4 @@
-# Sprint 45 — A turn inside a ring stops the program, the finish past its line, cards as tall as the window, the server's cache and the sound asleep
+# Sprint 45 — A turn inside a ring stops the program, the finish past its line, the start card over the whole window, a goals box of two shapes, the server's cache and the sound asleep
 
 On 2026-11-14 the owner asked how the race counts a ring, and the
 answer showed a hole in the rule: a wizard that flies one step into a
@@ -28,6 +28,25 @@ each thing the same day:
 > la meta. Añade la misma distancia a todos así que no cambia nada,
 > solo hay que cambiar la celda objetivo.
 
+The first of those answers spoke of the start card and not of the
+goals box, as the owner said once the plan was written; and they
+settled both:
+
+> Vale, estaba confundiendo el panel de objetivos con el del inicio
+> del nivel. El de objetivos veo bien plegarlo solo si tapa algo,
+> pero dejémoslo desplegado 3 segundos para que el niño sea
+> consciente. Y intentemos hacer más ancho o que entre más texto en
+> el panel de la carrera (en el panel de la carrera no, en el panel
+> de inicio del nivel).
+>
+> Y el de objetivos también veo bien tener dos tamaños o formatos,
+> uno vertical y uno apaisado, y elegir automáticamente el que no
+> tape nada, y si ambos tapan algo, pues plegarlo a los 3 s.
+>
+> Me gusta la idea de sacar las cajas de inicio de nivel del mapa y
+> que ocupe toda la pantalla. Se puede hacer algo más ancha y reducir
+> un punto el tamaño de la fuente.
+
 What this sprint holds:
 
 1. Inside a ring, a move to the left or to the right rubs the ring's
@@ -38,11 +57,14 @@ What this sprint holds:
    wizard and for Zarek: both land beyond it, and Zarek stands clear
    of the flag's pole. Every count is one tick more for both, so no
    race changes its end (D229).
-3. A card has the window's height for its room, not the scene's, and
-   the start card is wider: at 1280 by 800 no start card of the game
-   scrolls, where 25 of the 37 scroll today (D228).
-4. The goals box opens unfolded, as the owner asks: it is never folded
-   for a ring (D227). Nothing is built for it but a test.
+3. The start card leaves the scene and lies over the whole window,
+   wider, its letters a point smaller: no start card of the game
+   scrolls on any screen the game is made for, where 25 of the 37
+   scroll today at 1280 by 800 (D228).
+4. The goals box has two shapes, a list and a strip, and the page
+   takes the one that covers nothing of the level. Where both cover
+   something, the box stays open three seconds and then folds by
+   itself (D227).
 5. The server keeps for good what the game's addresses name with a
    version: every file of `content/` and Python's own files (D230).
 6. The page's sound sleeps while nothing sounds (D231).
@@ -62,7 +84,8 @@ right.
 ## 1. Decisions taken here
 
 All are entered in `docs/dev/architecture.md` with this plan; D187 and
-D219 are brought to D226, D189 and D220 to D229, D38 and D222 to D228.
+D219 are brought to D226, D189 and D220 to D229, D38 to D227 and
+D228, D222 to D228.
 
 - **D226 — A turn inside a ring rubs its rim, and the program stops.**
   The owner's, 2026-11-14, in the words above. While the wizard is in
@@ -79,30 +102,39 @@ D219 are brought to D226, D189 and D220 to D229, D38 and D222 to D228.
   nothing and leaves the ring not flown. Rules out a ring left by its
   side in silence, and a rim that only bumps while the program goes
   on.
-- **D227 — The goals box is open at a level's start.** The owner's,
-  2026-11-14 (*el niño tiene que leer eso cuando inicia el nivel, si
-  la pliegas le obligas a desplegarla primero*). The box opens
-  unfolded in every level, over whatever of the scene lies under it,
-  a ring too; the child folds it with its heading. One case folds it
-  by itself: where it would cover the wizard at the start, since a
-  child who cannot see their wizard does not know where they stand.
-  Rules out a box folded to show a ring or any other thing of the
-  scene, and a box that moves about the page from level to level.
-- **D228 — A card has the window's height for its room, and the start
-  card is wide.** The designer's, 2026-11-14, from the owner's ask
-  (*hay algo que podamos hacer para que haya que hacer menos scroll
-  en esas cajas? Cuando el texto es largo se tapa la mitad y hay que
-  hacer scroll*). A card lies over the scene, centred on it. A card
-  taller than the scene grows over the level's heading above it and
-  the bar under it, as far as the window's top and bottom less a
-  margin of 12 px; it stays between the scene's sides, never over the
-  editor or its buttons. The start card is up to 680 px wide, 94% of
-  the scene's width at most, with tight margins; the other cards keep
-  their widths. At 1280 by 800 no start card and no win card of the
-  game scrolls, in either language: a text that outgrows that fails
-  the check. In a shorter window a card that is still too tall
-  scrolls, by D222. Rules out a card held inside the scene's frame, a
-  card over the editor, and smaller letters to make a text fit.
+- **D227 — The goals box has two shapes, and folds by itself only
+  after three seconds.** The owner's, 2026-11-14, in the words above.
+  The box has a list, its goals one under another in a narrow column
+  at the scene's top left corner, and a strip, its heading and its
+  goals one after another along the scene's top. Once the camera has
+  drawn the level's start, the page takes the first of the two, the
+  list before the strip, that covers nothing of the level: the
+  wizard, a figure, a thing of the level in sight, the end's mark.
+  The box is first shown in the shape taken. Where both cover
+  something, the box opens as the list and, three seconds after the
+  child can see it, the page folds it, for that level alone. The
+  child's click on the heading decides from then on, and before the
+  three seconds end it keeps the page from folding. The shape is
+  taken once in a level's visit. What the scene's picture holds of
+  its own, a wall, a bed, a statue, does not count. Rules out a box
+  folded as a level opens, a box left open over the wizard or a thing
+  of the level, and a box that changes its shape while the child
+  plays.
+- **D228 — The start card lies over the whole window.** The owner's,
+  2026-11-14, in the words above. The start card is centred in the
+  window, over a dim that covers the whole page, with the window's
+  height less 12 px above and below for its room. It is up to 760 px
+  wide, 94% of the window's width at most; its text is 17 px where
+  the page's is 18, its title 21 px, and its margins are tight. The
+  dim takes no click: a button of the page that the card does not
+  cover works under it and closes the card (D222). At 1024 by 700,
+  the smallest screen the game is made for (D38), and on any larger
+  one, no start card of the game scrolls, in either language: a text
+  that outgrows that fails the check. In a smaller window a card
+  still too tall scrolls, by D222. The win card and the outcome's
+  cards stay over the scene, inside its frame, beside the child's
+  program. Rules out a start card held inside the scene's frame, and
+  a text left to scroll on a screen the game is made for.
 - **D229 — The race's finish is the cell past the painted line.** The
   owner's, 2026-11-14 (*se puede hacer que tanto él como el mago
   aterricen pasada la meta; añade la misma distancia a todos, así que
@@ -303,7 +335,7 @@ walkthrough's specs where they name column 31. `docs/dev/course.md`'s
 rows of the two levels and of the story say the new numbers. A
 fixture that only needs two equal ticks may keep its own.
 
-### 2.3 Cards as tall as the window (D228)
+### 2.3 The start card over the whole window (D228)
 
 **What is wrong.** A card is held inside the scene's frame
 (`.card-overlay` is laid in `.scene-frame`, which clips), 440 px wide
@@ -316,81 +348,161 @@ there, in Spanish:
   carrera* 882, *Las escobas de la pared* 869.
 - 1 win card scrolls, *La revisión*'s, by 5 px.
 
-Wider alone is not enough: a card of 640 px inside the frame leaves
-13 scrolling. The window has the room: 776 px at 1280 by 800.
+Wider alone, inside the frame, is not enough: a card of 640 px
+leaves 13 scrolling. The window has the room.
 
 **What is asked.**
 
-- A card's room is the window's height less 12 px above and below. It
-  is centred on the scene; a card shorter than the scene looks as it
-  does today. A taller one grows over the level's heading and over
-  the bar under the scene, and is kept inside the window. It lies
-  between the scene's left and right sides in every window: never
-  over the editor, its buttons or the notebook's button.
-- The dim stays on the scene, as it is.
-- The start card is `min(680px, 94%)` of the scene's width, and its
-  margins are tight: the card's padding 14 px 22 px, 4 px under its
-  title, `.card-said` 4 px above and 8 px under, `.start-goals` 2 px
-  above and 10 px under. The letter's size and the line's height
-  stay. The win card (440 px; the race's 600 px) and the outcome
-  cards keep their widths and margins, and gain the room.
-- D222 holds whole: a card opens at its top, its button takes the
-  keyboard without scrolling, Escape and its own button close it, and
-  any button of the page outside the start card closes it. The `?`
-  button and the others of the heading may lie under a tall card;
-  that is accepted.
-- How it is laid is the programmer's: the overlay in an element that
-  spans the scene's column, or fixed to the window and given the
-  frame's sides, kept right when the window is resized and when the
-  panes stack under 800 px.
+- The start card is laid over the whole window, not over the scene:
+  centred in the window, the dim over the whole page. Its room is the
+  window's height less 12 px above and below. It is the same card
+  opened with a level and opened again with `?`.
+- It is `min(760px, 94%)` of the window's width. Its text is 17 px
+  where the page's is 18, and its title 21 px where a card's is 22;
+  the line's height stays. Its margins are tight: the card's padding
+  14 px 22 px, 4 px under its title, `.card-said` 4 px above and 8 px
+  under, `.start-goals` 2 px above and 10 px under.
+- The dim takes no click. A button of the page that the card does
+  not cover works under the dim, closes the card and does what it
+  does, as D222 asks; the buttons the card covers wait for it to
+  close. D222 holds whole: the card opens at its top, its button
+  takes the keyboard without scrolling, Escape and its own button
+  close it.
+- The win card (440 px; the race's 600 px) and the outcome's cards
+  stay where they are, over the scene and inside its frame, beside
+  the child's program, with their widths and their letters. Every
+  card takes the padding 14 px 22 px, which gives *La revisión*'s win
+  card the 5 px it lacks (517 px in 512 today).
+- How it is laid is the programmer's: fixed to the window, in an
+  element of the level's screen that leaves with it, kept right when
+  the window is resized and when the panes stack under 800 px.
 
 What it gives, measured by the designer with the card free of the
-frame, 680 px wide, with those margins:
+frame, 760 px wide, 17 px, with those margins, the 37 levels in each
+language:
 
-| start card | today, text in 544 px | asked, card's height | fits in 776 (1280 by 800) | in 626 (1366 by 650) |
-|---|---|---|---|---|
-| *La revisión* | 989 | 749 | yes | scrolls 123 px |
-| *Los aros* | 948 | 681 | yes | scrolls 55 px |
-| *La carrera* | 882 | 646 | yes | scrolls 20 px |
-| *La puerta de Eldra* | 908 | 641 | yes | scrolls 15 px |
-| *El paseo nocturno* | 788 | 633 | yes | scrolls 7 px |
-| *Las escobas de la pared* | 869 | 633 | yes | scrolls 7 px |
-| *La llave que se mueve* | 800 | 614 | yes | yes |
-| every other | 842 or less | 606 or less (three measured; the rest are shorter today) | yes | yes |
+| start card | today, text in 544 px | asked, card's height |
+|---|---|---|
+| *La revisión* | 989 | 615 |
+| *Los aros* | 948 | 601 |
+| *La puerta de Eldra* | 908 | 590 |
+| *El paseo nocturno* | 788 | 582 |
+| *La carrera* | 882 | 568 |
+| *Junto a las estatuas* | 842 | 556 |
+| *La sala oscura* | 815 | 556 |
+| *Las escobas de la pared* | 869 | 556 |
+| *La llave que se mueve* | 800 | 539 |
+| every other | less | 531 or less |
 
-In English the ten longest are as tall or shorter. At 1366 by 650,
-the window of a browser on a laptop 768 px high, almost every card
-scrolls today, most by half; six would, by little.
+In English the tallest is 615 px too. The room is 776 px at 1280 by
+800, 696 at 1280 by 720, 676 at 1024 by 700 and 626 at 1366 by 650,
+the window of a browser on a laptop 768 px high: every start card
+fits in the four. At 720 px of width two would scroll in the last;
+at 18 px and 760 px, three.
 
 **Tests.**
 
-- A browser test at 1280 by 800 opens every level of the game in each
-  language and holds that its start card does not scroll
-  (`scrollHeight` no more than `clientHeight`), that the card lies
-  inside the window, and that its sides are inside the scene's. It is
-  one page that goes from level to level, and it is the guard of
-  D228: a text that outgrows the window fails it.
+- A browser test at 1024 by 700, the smallest screen of D38, opens
+  every level of the game in each language and holds that its start
+  card does not scroll (`scrollHeight` no more than `clientHeight`)
+  and lies inside the window. It is one page that goes from level to
+  level, and it is the guard of D228: a text that outgrows the window
+  fails it.
 - The win card of *La revisión* and of *La carrera* at 1280 by 800
   does not scroll.
+- With the start card open, *Ejecutar* clicked under the dim closes
+  the card and runs the program.
 - D222's tests (`app/e2e/cards.spec.ts`) hold; the one that needs a
   card taller than its room takes a window short enough for one.
-  `app/e2e/screens.spec.ts` holds the start card inside the window
-  and between the scene's sides, at its three sizes.
+  `app/e2e/screens.spec.ts` holds the start card inside the window,
+  at its three sizes.
 - A sweep on demand, as `tips-pictures.spec.ts` is on demand: every
   start card's height and what it scrolls by, in both languages, at
-  1280 by 800 and at 1366 by 650, written as a table. The report
-  holds the table.
+  1024 by 700, 1280 by 800 and 1366 by 650, written as a table. The
+  report holds the table.
 
-### 2.4 The goals box (D227)
+### 2.4 The goals box's two shapes (D227)
 
-Nothing is built. `app/src/ui/level.ts` folds the box where it would
-cover the wizard at the start and nowhere else, and it stays so. In
-*Los aros* and in *La carrera* the open box lies over the top half of
-the first red pair until the camera follows the wizard; that is the
-price of D227 and it is accepted.
+**What is wrong.** The goals box is one shape, up to 60% of the
+scene's width at its top left corner. In *Los aros* and in *La
+carrera* it lies over the top half of the first red pair, the pair
+the child's first lines fly to. The page folds it only where it
+covers the wizard, 400 ms after the level opens, before a child has
+read it.
 
-One test, in `app/e2e/chapter-4.spec.ts`: `the-rings` and `the-race`
-open with the goals box unfolded.
+**What is asked.**
+
+- **Two shapes**, the same words and the same marks in both, the
+  heading folding both:
+  - the **list**: the goals one under another, as today, in a column
+    at the scene's top left corner, as wide as its longest goal and
+    at most 300 px and 40% of the scene's width;
+  - the **strip**: along the scene's top, from its left, the heading
+    and then the goals one after another along the line, a goal on
+    the line's rest where it fits whole and on the next where it does
+    not; as wide as its words, and at most the scene's width less the
+    box's margins.
+- **What may not be covered**: the wizard, every other figure of the
+  level, every thing of the level that is in sight at its start (a
+  ring, a broom, a key, a book, the wand, a door the level names, a
+  hole), and the end's mark. Each by its drawn rectangle on the page,
+  as the wizard's is today (`SceneHandle.wizardBox`); the scene's
+  handle gives them all (`SceneHandle.levelBoxes`). A thing that is
+  hidden, and what the scene's picture holds of its own (a wall, a
+  bed, a shelf, a statue), do not count. A shape covers something
+  when its rectangle meets one of those.
+- **The choice**, once the camera has drawn the level's start, where
+  the fold is decided today: the list if it covers nothing; if it
+  does, the strip if it covers nothing; if both do, the list, to be
+  folded. The box is not shown before the choice, so that it never
+  changes shape before the child's eyes. It is one function with no
+  page in it, the two shapes' rectangles and the level's boxes in,
+  the shape and whether to fold out.
+- **The fold after three seconds**, where both cover something. The
+  three seconds start when the child can see the box: the scene
+  drawn, the start card closed and the screen's guide over,
+  whichever is last. Then the page folds the box for that level
+  alone, as `fold()` does today. A click of the child on the heading
+  before that keeps the page from folding; after it, the heading
+  opens and folds the box as ever. The program run in those three
+  seconds changes nothing.
+- **Once in a visit.** The shape is taken when the level opens. A
+  start over, a change of the window's size and a change of language
+  keep it; the strip's width follows the scene's. While a program
+  runs and the camera follows the wizard, things pass under the box
+  as they do today.
+- The box says its shape in `data-shape` (`list`, `strip`), beside
+  `data-folded`, for the tests.
+- The fold of the child (D38: folded by the heading, it stays so for
+  the visit) is as it is: a box the child has folded opens folded.
+
+**What is expected.** In *Los aros* and in *La carrera* at 1280 by
+800 the list would lie over the first pair, and the strip, about
+110 px high, ends above the rings, which start 137 px under the
+scene's top: the box opens as the strip and stays open. If the
+measure says otherwise there, the box folds at three seconds, and
+the report says it. Most levels inside the castle keep the list, on
+the wall of the scene's top.
+
+**Tests.**
+
+- The function, with its cases: nothing under the list; something
+  under the list and nothing under the strip; something under both.
+- A sweep on demand: every level, in Spanish, at 1024 by 700 and at
+  1280 by 800: the shape taken, or folded, and what each shape
+  covered. The report holds the table, and the designer reads it.
+- Browser tests on three levels the sweep names, one of each case:
+  the list taken and still open after four seconds; the strip taken
+  and still open after four seconds, nothing of the level under it;
+  the box open two seconds after the start card closes and folded
+  within four, then opened by its heading and left open. A fourth:
+  the heading clicked twice inside the three seconds, and the box
+  still open after four.
+- `the-rings` and `the-race` at 1280 by 800: four seconds after the
+  start card closes, no ring and no figure lies under the box.
+- `app/e2e/chapter-3.spec.ts`'s test of the fold in `the-tunnel-exit`
+  is brought to the rule; the shed's pegs stay clear of the box
+  (`app/e2e/chapter-4.spec.ts`, D201).
 
 ### 2.5 The server's cache (D230)
 
@@ -572,6 +684,10 @@ with its count, *Antes:* (53 against 60) and *Ahora:* (54 against
 - **A card in two columns, or shorter texts**: what is left to do if
   a card still scrolls in the owner's window. It waits for what the
   owner sees.
+- **The win card and the outcome's cards over the whole window**:
+  not asked; they stay beside the child's program.
+- **A goals box that changes shape as the camera moves**: the shape
+  is the level's start's.
 - **Words said on the scene kept clear of the open goals box.**
 - **The circles of a missed ring a cell before the line** (2.2).
 
@@ -610,21 +726,31 @@ with its count, *Antes:* (53 against 60) and *Ahora:* (54 against
    the race won lands the same.
 7. The story after it: everyone meets past the line.
 
-**The cards:**
+**The start card:**
 
 8. *Los aros*, *La carrera* and *La revisión* opened from the map, or
-   their `?` button: the start card is wide, goes over the level's
-   title and under the scene, and shows its text whole, with no
-   scroll, in a window of 800 px of height or more. In a shorter
-   window it scrolls less than it did.
-9. Any button outside the card still closes it.
-10. In *Los aros* the goals box is open at the start.
+   their `?` button: the start card lies over the whole page, wider
+   than it was, its letters a little smaller, and shows its text
+   whole, with no scroll. So does every other level's.
+9. With the card open, *Ejecutar* clicked beside it: the card closes
+   and the program runs.
+
+**The goals box:**
+
+10. *Los aros*, the start card closed: the goals box is a low strip
+    along the scene's top, and the first red pair is seen whole under
+    it. It stays open.
+11. A level the report names, where the list covers nothing: the
+    box is the list at the scene's corner, narrower than it was.
+12. A level the report names, where both shapes would cover
+    something: the box is open for three seconds and then folds by
+    itself. A click on *Objetivos* opens it, and it stays open.
 
 **The rest:**
 
-11. The tips' page of the hand-over: the notebook, the spells, the
+13. The tips' page of the hand-over: the notebook, the spells, the
     click and the lesson are chapter 1's.
-12. The report's two tables: the trips to the server before and
+14. The report's two tables: the trips to the server before and
     after, and the processor's time with the sound asleep. Nothing of
     the cache is seen on the owner's own server on 5173. On the
     friends' server it works after the next deploy, with one command
@@ -648,28 +774,36 @@ code in both languages, the story staged again, the tests and
 story's last step are looked at in the browser before the commit:
 both racers past the line, Zarek clear of the pole and of the flag.
 
-### 3.3 Cards as tall as the window, and the goals box's test (D228, D227, 2.3, 2.4)
+### 3.3 The start card over the whole window (D228, 2.3)
 
-The card's room and place, the start card's width and margins, the
-tests, the sweep on demand with its table kept for the report, the
-comments of `cards.ts`, `level.ts` and `style.css` in the present.
+The start card's place, width, letters and margins, the dim that
+takes no click, every card's padding, the tests, the sweep on demand
+with its table kept for the report, the comments of `cards.ts`,
+`level.ts` and `style.css` in the present.
 
-### 3.4 The server's cache (D230, 2.5)
+### 3.4 The goals box's two shapes (D227, 2.4)
+
+The scene's boxes, the two shapes, the choice's function with its
+tests, the fold after three seconds, the browser tests, the sweep on
+demand with its table kept for the report, `goals.ts`'s heading
+comment in the present.
+
+### 3.5 The server's cache (D230, 2.5)
 
 The function and its eleven places, Pyodide's folder, the server's
 file, `load.spec.ts`'s server, the tests, the measure run again, the
 documents.
 
-### 3.5 The sound asleep (D231, 2.6)
+### 3.6 The sound asleep (D231, 2.6)
 
 The sleep's one place, the root's attribute, the tests, the measure.
 
-### 3.6 The tips' pictures (2.7)
+### 3.7 The tips' pictures (2.7)
 
 The spec taking the four tips in chapter 1, the eight pictures made
 again and looked at, the documents that name where they are taken.
 
-### 3.7 The whole check, the hand-over and the report
+### 3.8 The whole check, the hand-over and the report
 
 `docs/dev/plan.md` names this sprint's decisions in its chapter 4.
 The whole `ci/check.sh --e2e`, in a copy, with Playwright's own
@@ -685,12 +819,14 @@ server on 4173. Then, in `drafts/`, never committed:
   rubbed in *Los aros*, with the thought and the card; the race won,
   both racers landed past the line, with its card; the story's
   meeting past the line; the start cards of *La revisión*, *Los
-  aros* and *La carrera* at 1280 by 800, whole, and one of them at
-  1366 by 650; the table of the cards' sweep; the load's table
-  beside sprint 44's; the processor's table; what was built piece by
-  piece; every choice the plan left and how it was taken; what
-  Gemini's drafts needed corrected; and the owner's twelve steps of
-  2.10, written to be followed.
+  aros* and *La carrera* at 1280 by 800, whole over the page, and
+  one of them at 1366 by 650; the table of the cards' sweep; the
+  goals box as the list, as the strip and folded after its three
+  seconds, a level each, *Los aros* among them; the table of the
+  box's sweep; the load's table beside sprint 44's; the processor's
+  table; what was built piece by piece; every choice the plan left
+  and how it was taken; what Gemini's drafts needed corrected; and
+  the owner's fourteen steps of 2.10, written to be followed.
 
 ## 4. Gemini images
 
@@ -713,7 +849,7 @@ brought to them): read them with git log -p 8e10cc4..HEAD before you
 start. The decisions are written as built; the code is yours to bring
 to them.
 
-Build sprint 45 whole: pieces 3.1 to 3.7 in order, one local commit
+Build sprint 45 whole: pieces 3.1 to 3.8 in order, one local commit
 each; before each commit ci/check.sh and the browser specs the piece
 touches green, and the whole ci/check.sh --e2e once before the last
 commit, in a copy with Playwright's own server on 4173; never a push,
@@ -736,12 +872,17 @@ What the owner will look for:
     clear of the pole; the race is won at tick 54 against 61, the 18
     lines tie at 61, and no outcome of any program changes; the
     story of the finish staged on the same cells;
-(3) a card with the window's height for its room and a start card up
-    to 680 px wide: at 1280 by 800 no start card and no win card of
-    the game scrolls, in either language, and a test holds it; the
-    card never over the editor; D222 whole;
-(4) the goals box open at the start of Los aros and La carrera;
-    nothing is folded for a ring;
+(3) the start card out of the scene, over the whole window: up to
+    760 px wide, its text 17 px, the dim over the whole page and
+    taking no click; at 1024 by 700 and larger no start card of the
+    game scrolls, in either language, and a test holds it; the win
+    card and the outcome's cards stay on the scene; D222 whole;
+(4) the goals box in two shapes, a list and a strip: the page takes
+    the one that covers nothing of the level (the wizard, a figure,
+    a thing in sight, the end's mark), never changing shape before
+    the child's eyes; where both cover something the box is open
+    three seconds and then folds by itself; in Los aros and La
+    carrera the first pair is seen whole;
 (5) every file of content/ asked for with the world's stamp and
     Python's files from a folder of their version, and the server's
     file keeping both for good; the load measured again beside
@@ -762,7 +903,7 @@ only your own hunks; commit promptly.
 
 Hand over, in drafts/ and never committed: chapter 4's walkthrough
 made again, the page of the texts, the ten tips with their pictures,
-and the report in Spanish as 3.7 asks, with the owner's twelve steps
+and the report in Spanish as 3.8 asks, with the owner's fourteen steps
 of 2.10. Write your memory note kydux-sprint-45-state, and end with
 the prompt for the designer's review in English, in a code block.
 ```

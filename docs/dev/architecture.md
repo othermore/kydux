@@ -726,12 +726,13 @@ one overturns stays, marked as superseded.
   at 1024 × 700, 1280 × 720 and 1920 × 1080 the scene, the editor with
   eight lines or more, Run, the goals, the speed and the gear are in view
   with no scrolling, the notebook fits inside the scene's frame and the
-  start card inside the window, between the scene's sides (D228), and the
+  start card inside the window, where it does not scroll (D228), and the
   heading wraps rather than overlap
   (`app/e2e/screens.spec.ts`). Under 800 pixels the panes stack, for a
   phone, which the game does not promise but does not break on. The goals
   panel's heading folds it, since at 1024 the open panel covers the scene's
-  first row, the wizard's start; it stays folded for the visit. The keys: Tab and
+  first row, the wizard's start; it stays folded for the visit. The page takes the
+  box's shape and may fold it by itself (D227). The keys: Tab and
   Shift+Tab indent, Escape then Tab leaves the editor, Ctrl+Enter (Cmd on
   a Mac) runs in the editor, and on the whole level screen Alt+R runs and
   Alt+N opens the notebook. Those two are read by the key's place
@@ -3439,27 +3440,41 @@ one overturns stays, marked as superseded.
   ends inside a ring leaves the wizard in the air there. Rules out a ring left by its side
   in silence, missed and paid for only at a race's end, and a rim that bumps while the
   program goes on.
-- **D227 — The goals box is open at a level's start.** Decided 2026-11-14 by the owner
-  (*el niño tiene que leer eso cuando inicia el nivel, si la pliegas le obligas a
-  desplegarla primero*). The box opens unfolded in every level, over whatever of the scene
-  lies under it, a ring too, and the child folds it with its heading. One case folds it by
-  itself: where it would cover the wizard at the start, once the camera has drawn where
-  the wizard stands (`SceneHandle.wizardBox`), since a child who cannot see their wizard
-  does not know where they stand. Rules out a box folded to show a ring or any other thing
-  of the scene, and a box that moves about the page from level to level.
-- **D228 — A card has the window's height for its room, and the start card is wide.**
-  Decided 2026-11-14 by the designer, from the owner's ask (*hay algo que podamos hacer
-  para que haya que hacer menos scroll en esas cajas? Cuando el texto es largo se tapa la
-  mitad y hay que hacer scroll*). A card lies over the scene, centred on it. A card taller
-  than the scene grows over the level's heading above it and the bar under it, as far as
-  the window's top and bottom less a margin of 12 px; it stays between the scene's sides,
-  never over the editor or its buttons, and the dim stays on the scene. The start card is
-  up to 680 px wide, 94% of the scene's width at most, with tight margins; the other cards
-  keep their widths. At 1280 × 800 no start card and no win card of the game scrolls, in
-  either language, and a browser test holds it: a text that outgrows the window fails the
-  check. In a shorter window a card still too tall scrolls, by D222. Rules out a card held
-  inside the scene's frame, a card over the editor, and smaller letters to make a text
-  fit.
+- **D227 — The goals box has two shapes, and folds by itself only after three seconds.**
+  Decided 2026-11-14 by the owner (*el de objetivos veo bien plegarlo solo si tapa algo,
+  pero dejémoslo desplegado 3 segundos para que el niño sea consciente*; *tener dos tamaños
+  o formatos, uno vertical y uno apaisado, y elegir automáticamente el que no tape nada, y
+  si ambos tapan algo, pues plegarlo a los 3 s*). The box has a list, its goals one under
+  another in a column at the scene's top left corner, at most 300 px and 40% of the
+  scene's width, and a strip, its heading and its goals one after another along the
+  scene's top. Once the camera has drawn the level's start, the page takes the first of
+  the two, the list before the strip, that covers nothing of the level: the wizard, a
+  figure, a thing of the level in sight or the end's mark, each by its drawn rectangle on
+  the page (`SceneHandle.levelBoxes`). The box is first shown in the shape taken, which it
+  says in `data-shape`. Where both cover something, the box opens as the list and, three
+  seconds after the child can see it (the scene drawn, the start card closed, the screen's
+  guide over), the page folds it, for that level alone. The child's click on the heading
+  decides from then on, and before the three seconds end it keeps the page from folding.
+  The shape is taken once in a level's visit: a start over, the window's size and the
+  language keep it. A hidden thing, and what the scene's picture holds of its own (a wall,
+  a bed, a statue), do not count. Rules out a box folded as a level opens, a box left open
+  over the wizard or a thing of the level, and a box that changes its shape while the
+  child plays.
+- **D228 — The start card lies over the whole window.** Decided 2026-11-14 by the owner
+  (*hay algo que podamos hacer para que haya que hacer menos scroll en esas cajas? Cuando
+  el texto es largo se tapa la mitad y hay que hacer scroll*; *me gusta la idea de sacar
+  las cajas de inicio de nivel del mapa y que ocupe toda la pantalla; se puede hacer algo
+  más ancha y reducir un punto el tamaño de la fuente*). The start card is centred in the
+  window, over a dim that covers the whole page, with the window's height less 12 px above
+  and below for its room. It is up to 760 px wide, 94% of the window's width at most; its
+  text is 17 px where the page's is 18, its title 21 px, and its margins are tight. The
+  dim takes no click: a button of the page that the card does not cover works under it and
+  closes the card (D222). At 1024 × 700, the smallest screen the game is made for (D38),
+  and on any larger one, no start card of the game scrolls, in either language, and a
+  browser test holds it: a text that outgrows that fails the check. In a smaller window a
+  card still too tall scrolls, by D222. The win card and the outcome's cards lie over the
+  scene, inside its frame, beside the child's program. Rules out a start card held inside
+  the scene's frame, and a text left to scroll on a screen the game is made for.
 - **D229 — The race's finish is the cell past the painted line.** Decided 2026-11-14 by
   the owner (*se puede hacer que tanto él como el mago aterricen pasada la meta; añade la
   misma distancia a todos, así que no cambia nada, solo hay que cambiar la celda

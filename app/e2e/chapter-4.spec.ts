@@ -471,36 +471,37 @@ test.describe('the way a landing leaves the wizard facing (D241)', () => {
   });
 });
 
-/** A flight that hovers: the wizard walks to the broom, lifts and waits in the air for
- * sixty ticks, eight seconds at speed 1 (D235, D236). */
-const HOVERING = 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.wait(60)\n';
+/** A flight that hovers: the wizard walks to the broom, lifts, flies two cells and waits
+ * in the air for sixty ticks, eight seconds at speed 1 (D235, D236, D242). */
+const HOVERING = 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.move_right(2)\nwizard.wait(60)\n';
 
 /** The hover's clock, as the scene says it (D235). */
 const hoverOf = async (page: Page) => Number(await scene(page).getAttribute('data-hover'));
 
-test.describe('the hover (D235)', () => {
+test.describe('the hover (D235, D242)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
-  test('a flight hovers while the program plays, and stands still after Stop, under the slider and until Play', async ({
-    page,
-  }) => {
+  /** The hover's clock read twice, 400 ms apart: it grows. */
+  const grows = async (page: Page) => {
+    const before = await hoverOf(page);
+    await page.waitForTimeout(400);
+    expect(await hoverOf(page)).toBeGreaterThan(before);
+  };
+
+  test('a flight hovers while the program plays, after Stop, and paused under the slider (D242)', async ({ page }) => {
     await open(page, 'the-first-flight', '1');
     await start(page, HOVERING);
     await expect(scene(page)).toHaveAttribute('data-flying', 'wizard', { timeout: ciTimes(60_000) });
-    const playing = await hoverOf(page);
-    await page.waitForTimeout(400);
-    expect(await hoverOf(page)).toBeGreaterThan(playing);
+    await grows(page);
 
     await page.locator('#stop').click();
     await expect(scene(page)).toHaveAttribute('data-state', 'done');
     await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
-    const stopped = await hoverOf(page);
-    await page.waitForTimeout(500);
-    expect(await hoverOf(page)).toBe(stopped);
+    await grows(page);
 
     // A stopped run is over and its slider is off: the run again, and while it plays in
-    // the air, the slider back to a tick of the flight, a pause, and the flight still.
+    // the air, the slider back to a tick of the flight.
     await page.locator('#run').click();
     // In the air again: the walk is 24 ticks and the lift the 25th.
     await page.waitForFunction(
@@ -516,15 +517,31 @@ test.describe('the hover (D235)', () => {
     await timeline.fill(String(Number(await scene(page).getAttribute('data-tick')) - 2));
     await expect(scene(page)).toHaveAttribute('data-state', 'paused');
     await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
-    const paused = await hoverOf(page);
-    await page.waitForTimeout(500);
-    expect(await hoverOf(page)).toBe(paused);
+    await grows(page);
+  });
 
+  test("a run that ends in the air hovers after its end (D242)", async ({ page }) => {
+    await open(page, 'the-rings', '1');
+    await start(page, wrong('the-rings', 'turned_inside_the_ring'));
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(60_000) });
+    await expect(scene(page)).toHaveAttribute('data-state', 'done');
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
+    await grows(page);
+  });
+
+  test('Stop in the middle of a long flown move silences the wind at once (D242)', async ({ page }) => {
+    await open(page, 'the-first-flight', '1');
+    await start(page, 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.move_right(5)\nwizard.wait(30)\n');
+    await page.waitForFunction(
+      () => {
+        const node = document.querySelector<HTMLElement>('#scene')?.dataset;
+        return node?.flying === 'wizard' && node.wind === 'on' && Number(node.wizard?.split(',')[0]) >= 10;
+      },
+      undefined,
+      { timeout: ciTimes(60_000) },
+    );
     await page.locator('#stop').click();
-    await expect(scene(page)).toHaveAttribute('data-state', 'playing');
-    const again = await hoverOf(page);
-    await page.waitForTimeout(400);
-    expect(await hoverOf(page)).toBeGreaterThan(again);
+    await expect(scene(page)).toHaveAttribute('data-wind', 'off', { timeout: 300 });
   });
 
   test('in a story the hover runs while the words are read', async ({ page }) => {

@@ -39,8 +39,8 @@
 // untied, D183), data-wizard-facing (the way the wizard faces, as the scene keeps it,
 // D241), data-wizard-frame (the name of the frame the wizard is drawn in), data-flying
 // (the figures in the air, joined by ",", D185),
-// data-hover (the hover's clock, in whole milliseconds, which stands while the
-// program does not play, D235), data-wind (`on` while a flight's wind blows: while
+// data-hover (the hover's clock, in whole milliseconds, which always runs but under
+// reduced motion, D235, D242), data-wind (`on` while a flight's wind blows: while
 // the program plays and the wizard is in the air, D236), data-wind-swells (the wind's
 // swells this run, at the lift and at each turn, counted with the ticks shown),
 // data-through (the rings flown
@@ -370,8 +370,8 @@ class LevelScene extends Phaser.Scene {
   private windSwells = 0;
   /** Whether the tick shown is drawn at once, as the slider shows it. */
   private shownInstant = false;
-  /** The hover's clock, in milliseconds (D235): it runs while the playback plays, and
-   * in a story always; nothing else moves it. */
+  /** The hover's clock, in milliseconds (D235, D242): it always runs, but under reduced
+   * motion; nothing else moves it. */
   private hoverMs = 0;
 
   constructor(
@@ -879,8 +879,8 @@ class LevelScene extends Phaser.Scene {
 
   /** A word said follows who says it while they walk. */
   override update(_time: number, delta: number): void {
-    // The hover's clock runs while the program plays, and in a story always (D235).
-    if (!this.still && (this.playback.state === 'playing' || this.options.story)) this.hoverMs += delta;
+    // The hover's clock always runs, but under reduced motion (D235, D242).
+    if (!this.still) this.hoverMs += delta;
     const hover = String(Math.round(this.hoverMs));
     if (this.parentNode.dataset.hover !== hover) this.parentNode.dataset.hover = hover;
     this.drawLight();

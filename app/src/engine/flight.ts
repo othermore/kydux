@@ -1,11 +1,12 @@
 // Flying (D185): a figure on its broom is drawn from its sheet's flying rows, one a
 // way it faces, in the row's level frame, lifted half a cell above its cell with a soft
 // shadow on the ground; the page moves it slowly up and down, a hover on a clock that
-// runs only while the program plays (D235); a flown step takes a third of a walked
-// one's time, at every speed, so that a flight is three times as fast to the eye. In a ring's cell a flying figure flies through the
-// ring's hole (D232): drawn higher, its feet and broom above the ring's lower rim, and
-// its feet past the ring's plane the way it last flew, upward behind the ring, downward
-// in front of it. Kept apart from scene.ts so that it is tested without Phaser.
+// always runs, after Stop too, but under reduced motion (D235, D242); a flown step takes
+// a third of a walked one's time, at every speed, so that a flight is three times as
+// fast to the eye. In a ring's cell a flying figure flies through the ring's hole
+// (D232): drawn higher, its feet and broom above the ring's lower rim, and its feet past
+// the ring's plane the way it last flew, upward behind the ring, downward in front of
+// it. Kept apart from scene.ts so that it is tested without Phaser.
 
 import { FOOT_IN_CELL } from './depth';
 import type { Facing, Tile } from './sight';

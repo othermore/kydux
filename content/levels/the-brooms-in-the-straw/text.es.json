@@ -7,7 +7,7 @@
   ],
   "starting_code": "# Encuentra todas las escobas con `find_all`.\n\n# Para cada escoba:\n\n# Cuenta los pasos a la izquierda con `position.x`.\n\n# Cuenta los pasos hacia abajo con `position.y`.\n\n# Muévete a la izquierda con `move_left`.\n\n# Muévete hacia abajo con `move_down`.\n\n# Desátala con `untie`.\n",
   "hints": [
-    "¡Usa un bucle `for` para repasar las escobas que encuentres. Todo lo demás va dentro del bucle!",
+    "Usa un bucle `for` para repasar las escobas que encuentres. ¡Todo lo demás va dentro del bucle!",
     "Para saber cuántos pasos dar a la izquierda, resta la posición `x` de la escoba de la posición `x` de {wizard}.",
     "¡Haz lo mismo con la `y` para los pasos hacia abajo! Luego usa esos números para caminar hasta la escoba y desatarla."
   ],

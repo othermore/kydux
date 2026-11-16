@@ -10,7 +10,7 @@
     "Puedes ver la lista entera si pones tu variable dentro de `print`.",
     "¡Para contar las escobas, usa `len` con tu lista dentro, y pon todo eso dentro de `say`!"
   ],
-  "intro": "¡{mate} y yo hemos buscado por todas partes! Alguien ha entrado en el cobertizo y ha revuelto las escobas. Están tiradas entre la paja y necesitamos saber cuántas hay. ¡Si falta alguna, es que alguien se la ha llevado! ¿Puedes encontrarlas todas y decirnos el número?",
+  "intro": "Antes de nada: ¿cuántas hay? Alguien ha revuelto el cobertizo y las escobas están tiradas entre la paja, que casi las tapa. ¡Si falta alguna, es que alguien se la ha llevado! Encuéntralas todas y dinos el número.",
   "outro": "¡Así que esas son todas las que hay! Ahora debemos revisarlas con cuidado. Creo que alguien las ha tocado.",
   "learned": "Ahora sabes qué es una lista, que `len` dice cuántos valores tiene, y que `find_all` da todas las cosas de una clase como una lista, aunque no se vean.",
   "ways": {

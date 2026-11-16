@@ -11,7 +11,7 @@
     "Find the brooms and keep the list in a variable. Then, use a `for` loop to go through them.",
     "Inside the loop, remember to leave four spaces before the lines! Untie the broom you are on, then take one step right to the next one."
   ],
-  "intro": "Look! Whoever was here left some of the brooms in a row on the floor, starting two cells up and three to the left. I checked one and found a black thread knotted in its twigs! It's a dark enchantment that will make the broom buck in the air and throw its rider. We must untie them all! Since we don't know exactly how many are in the row, a loop over a list is the safest way to fix them.",
+  "intro": "Look! Whoever was here left some of the brooms in a row on the floor, starting two cells up and three to the left. Every one has the black thread knotted in its twigs. We must untie them all! Since we don't know exactly how many are in the row, a loop over a list is the safest way to fix them.",
   "outro": "That's the row sorted! No enchanted knots left here.",
   "learned": "Now you know that a `for` over a list runs its lines once for each value, and that only a loop unties every broom when nobody knows how many there are.",
   "ways": {

@@ -30,7 +30,7 @@ import type { LessonRunner } from './ui/lessonrun';
 import type { MapScreenParts } from './ui/map';
 import { aboutScreen } from './ui/about';
 import type { Screen } from './ui/screen';
-import { fetchNextTip, type Wait, waitingView } from './ui/waiting';
+import { askNextTip, type Wait, waitingView } from './ui/waiting';
 import { debugging } from './engine/debugging';
 import { lookOf } from './engine/looks';
 import { listenForMusic, music } from './engine/music';
@@ -365,8 +365,6 @@ function warmUp(): void {
     () => import('./ui/level'),
     () => import('./editor/editor'),
     () => import('./ui/map'),
-    // The next tip's picture, for the next wait (D221).
-    () => fetchNextTip(),
   ];
   const fetchNext = () => {
     const part = parts.shift();
@@ -723,5 +721,8 @@ if (root) {
     }
     void screen?.relabel();
   });
+  // The picture of the tip due next, asked for before the first screen loads, for a
+  // child who will read tips (D246).
+  if (!newcomer()) askNextTip();
   route();
 }

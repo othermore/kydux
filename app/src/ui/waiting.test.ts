@@ -146,6 +146,85 @@ describe('the wait while a screen loads (D214, D221)', () => {
   });
 });
 
+describe('a tip with its picture (D246)', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  /** A wait whose pictures come when the test says, each resolved by its key. */
+  function withPictures(storage = kept()) {
+    const shown: [string, unknown][] = [];
+    const asked: string[] = [];
+    const comes = new Map<string, (picture: HTMLImageElement | null) => void>();
+    const wait = new Wait({
+      tips: true,
+      due: true,
+      storage,
+      keys: KEYS,
+      reading: () => 6000,
+      onTip: (key, picture) => shown.push([key, picture]),
+      picture: (key) => {
+        asked.push(key);
+        return new Promise((resolve) => comes.set(key, resolve));
+      },
+    });
+    const come = async (key: string, picture: HTMLImageElement | null) => {
+      comes.get(key)?.(picture);
+      await vi.advanceTimersByTimeAsync(0);
+    };
+    return { wait, shown, asked, come, storage };
+  }
+  const picture = { src: 'a.webp' } as HTMLImageElement;
+
+  it('puts a tip due up only when its picture has come, and counts its reading time from then', async () => {
+    const { wait, shown, asked, come } = withPictures();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(asked).toEqual(['a']);
+    expect(shown).toEqual([]);
+    await come('a', picture);
+    expect(shown).toEqual([['a', picture]]);
+    // The picture of the tip after it, asked for as it comes up.
+    expect(asked).toEqual(['a', 'b']);
+    const open = vi.fn();
+    wait.ready(open);
+    await vi.advanceTimersByTimeAsync(6000 - 1);
+    expect(open).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(open).toHaveBeenCalledOnce();
+  });
+
+  it('opens a screen ready before the picture with no tip, and keeps that tip the next one due', async () => {
+    const storage = kept();
+    const first = withPictures(storage);
+    await vi.advanceTimersByTimeAsync(500);
+    const open = vi.fn();
+    first.wait.ready(open);
+    expect(open).toHaveBeenCalledOnce();
+    await first.come('a', picture);
+    expect(first.shown).toEqual([]);
+    expect(storage.data.has(LAST_TIP)).toBe(false);
+    const second = withPictures(storage);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(second.asked).toEqual(['a']);
+  });
+
+  it('puts the words up alone where the picture fails', async () => {
+    const { shown, come } = withPictures();
+    await vi.advanceTimersByTimeAsync(0);
+    await come('a', null);
+    expect(shown).toEqual([['a', null]]);
+  });
+
+  it('keeps the tip up while the next one waits for its picture', async () => {
+    const { shown, come } = withPictures();
+    await vi.advanceTimersByTimeAsync(0);
+    await come('a', picture);
+    await vi.advanceTimersByTimeAsync(TIP_TIME + 2000);
+    expect(shown.map(([key]) => key)).toEqual(['a']);
+    await come('b', picture);
+    expect(shown.map(([key]) => key)).toEqual(['a', 'b']);
+  });
+});
+
 describe('the tips (D214)', () => {
   const catalogs = import.meta.glob<{ tips: Record<string, string> }>('../../../i18n/*.json', {
     eager: true,

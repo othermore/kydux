@@ -86,7 +86,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (portraits.ts, D194), the welcome page (about.ts, #about, D193),
                 Kydux's mark in the header (mark.ts), what a screen shows while
                 it loads, the mark, Loading… and a tip with its picture and its
-                clock (waiting.ts, D214, D221), and under ?debug the page
+                clock, the tip put up once its picture is loaded and decoded
+                (waiting.ts, D214, D221, D246), and under ?debug the page
                 that plays any of the music's themes, each voice of the one
                 playing to turn off or set by hand (themes.ts, #music, D192, D203).
                 main.ts shows a screen: it shows the waiting view at once, a tip
@@ -96,7 +97,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 code to show its words), puts the screen in when it is ready or,
                 with a tip up, by itself once the tip has had its reading time,
                 and once the first screen shows fetches the other screens' code
-                and the next tip's picture in idle time (D214, D221)
+                in idle time; it asks for the next tip's picture as the page
+                opens, before the first screen loads (D214, D221, D246)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events (stories.ts), the guide's words (guide.ts), and the

@@ -81,6 +81,40 @@ test.describe('a tip while a screen loads', () => {
     }
   }
 
+  test('a tip comes up only with its picture loaded, asked for once (D246)', async ({ page }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    // The pictures on their way for 3 s, and the scene's code for longer.
+    await delay(page, '**/content/tips/**', 3000);
+    await delay(page, '**/assets/scene-*.js', ciTimes(10_000));
+    const asked: string[] = [];
+    page.on('request', (request) => {
+      if (/\/content\/tips\//.test(request.url())) asked.push(new URL(request.url()).pathname);
+    });
+    // Not waiting for the page's load, which a picture asked for holds back.
+    await page.goto('/#level/the-moving-key', { waitUntil: 'commit' });
+    const box = page.locator('.waiting-tip-box');
+    await expect(page.locator('#waiting .waiting-loading')).toBeVisible();
+    await expect(page.locator('#waiting')).not.toHaveAttribute('data-tip', /./);
+    await expect(box).toBeHidden();
+    await expect(page.locator('#waiting')).toHaveAttribute('data-tip', /./, { timeout: ciTimes(8_000) });
+    const key = await page.locator('#waiting').getAttribute('data-tip');
+    const picture = box.locator('img.waiting-tip-picture');
+    expect(await picture.evaluate((image) => (image as HTMLImageElement).complete)).toBe(true);
+    expect(await picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(960);
+    expect(asked.filter((path) => path.endsWith(`/${key}.webp`))).toHaveLength(1);
+    await page.screenshot({ path: `${SHOTS}tip-with-its-picture.png` });
+  });
+
+  test("a tip whose picture is refused comes up with its words alone, and no picture's room (D246)", async ({ page }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    await page.route('**/content/tips/**', (route) => route.abort());
+    await delay(page, '**/assets/scene-*.js', ciTimes(6_000));
+    await page.goto('/#level/the-moving-key');
+    await expect(page.locator('#waiting')).toHaveAttribute('data-tip', /./, { timeout: ciTimes(5_000) });
+    await expect(page.locator('#waiting-tip')).toBeVisible();
+    await expect(page.locator('.waiting-tip-box img')).toHaveCount(0);
+  });
+
   test("the visit's first wait shows a tip with its picture at once, and the level opens by itself (D221)", async ({
     page,
   }) => {

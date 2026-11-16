@@ -7,8 +7,13 @@
 // comes every TIP_TIME. When the screen is ready with a tip up, it opens by itself once
 // the tip has had its reading time (D175), never more than TIP_TIME; there is no
 // button. The tips are shown in their order, from the one after the last shown, which
-// the browser keeps; after the last comes the first. The browser tests turn them off
-// with a key no setting shows, read once as the page opens.
+// the browser keeps; after the last comes the first. A tip comes up with its picture
+// (D246): the picture is loaded and decoded first, as an element, and the view shows
+// that element under no second request; a tip due waits for it, a screen ready meanwhile
+// opens with no tip and that tip stays the next one, and a picture that fails shows the
+// words alone. The page asks for the next tip's picture as it opens (main.ts), and, as
+// each tip comes up, for the one after it. The browser tests turn the tips off with a
+// key no setting shows, read once as the page opens.
 
 import { readingMs } from '../engine/bubble';
 import { currentLanguage, t } from '../i18n';
@@ -60,8 +65,11 @@ export interface WaitOptions {
   storage?: Kept | null;
   /** The tips' keys, the page's own unless a test gives others. */
   keys?: readonly string[];
-  /** A tip comes up, by its key. */
-  onTip?: (key: string) => void;
+  /** A tip comes up, by its key, with its picture loaded, or null where it failed. */
+  onTip?: (key: string, picture: HTMLImageElement | null) => void;
+  /** A tip's picture loaded and decoded, or null where it fails (D246); the tip comes up
+   * when it comes. A wait given none puts its tips up at once, with no picture. */
+  picture?: (key: string) => Promise<HTMLImageElement | null>;
   /** How long a tip takes to read, in milliseconds (D175); TIP_TIME unless given. */
   reading?: (key: string) => number;
 }
@@ -81,6 +89,8 @@ export class Wait {
   private timer: ReturnType<typeof setTimeout> | null = null;
   private opened = false;
   private open: (() => void) | null = null;
+  /** The tip whose picture is awaited, put up when it comes (D246). */
+  private awaited: string | null = null;
 
   constructor(private readonly options: WaitOptions) {
     this.storage = options.storage === undefined ? browserStorage() : options.storage;
@@ -116,11 +126,31 @@ export class Wait {
   /** The wait dropped: its timers stopped, nothing opened. */
   dispose(): void {
     this.opened = true;
+    this.awaited = null;
     this.clear();
   }
 
+  /** The next tip, put up once its picture has come (D246); the one up, if any, stays
+   * meanwhile. */
   private tip(): void {
     const index = nextTip(this.storage, this.keys.length);
+    const key = this.keys[index] ?? '';
+    const picture = this.options.picture;
+    if (!picture) {
+      this.putUp(index, null);
+      return;
+    }
+    this.awaited = key;
+    void picture(key).then((loaded) => {
+      if (this.opened || this.awaited !== key) return;
+      this.awaited = null;
+      this.putUp(index, loaded);
+    });
+  }
+
+  /** A tip up, its picture with it: its number kept, its reading time from now, the
+   * picture of the one after it asked for, and the next due in TIP_TIME. */
+  private putUp(index: number, picture: HTMLImageElement | null): void {
     try {
       this.storage?.setItem(LAST_TIP, String(index));
     } catch {
@@ -129,13 +159,17 @@ export class Wait {
     this.shownAt = Date.now();
     const key = this.keys[index] ?? '';
     this.readMs = readFor(this.options.reading?.(key) ?? TIP_TIME);
-    this.options.onTip?.(key);
+    this.options.onTip?.(key, picture);
+    const after = this.keys[(index + 1) % this.keys.length];
+    if (after !== undefined) void this.options.picture?.(after);
     this.timer = setTimeout(() => this.tip(), TIP_TIME);
   }
 
   private finish(): void {
     if (this.opened || !this.open) return;
     this.opened = true;
+    // A tip whose picture has not come is not put up, and its number is not kept.
+    this.awaited = null;
     this.clear();
     this.open();
   }
@@ -171,20 +205,41 @@ export function tipPicture(key: string, language = currentLanguage()): string {
   return contentUrl(`tips/${language}/${key}.webp`);
 }
 
-/** The next tip's picture fetched ahead, in idle time, so that it is there when the
- * tip comes up (D221). */
-export function fetchNextTip(): Promise<unknown> {
-  const key = TIPS[nextTip(browserStorage(), TIPS.length)] ?? TIPS[0];
-  return fetch(tipPicture(key)).catch(() => {});
+/** The pictures asked for, by their address: each asked for once (D246). */
+const pictures = new Map<string, Promise<HTMLImageElement | null>>();
+
+/** A tip's picture loaded and decoded, as the element the view shows; null where it
+ * fails (D246). */
+export function tipPictureLoaded(key: string, language = currentLanguage()): Promise<HTMLImageElement | null> {
+  const address = tipPicture(key, language);
+  let loaded = pictures.get(address);
+  if (!loaded) {
+    const image = new Image(960, 540);
+    image.alt = '';
+    image.className = 'waiting-tip-picture';
+    image.src = address;
+    loaded = image.decode().then(
+      () => image,
+      () => null,
+    );
+    pictures.set(address, loaded);
+  }
+  return loaded;
 }
 
-/** The waiting view: the mark, Loading…, and the tip's place, its picture over its
- * words, the picture's room kept while it comes. */
+/** The picture of the tip due next asked for ahead, as the page opens (D246). */
+export function askNextTip(): void {
+  if (turnedOff) return;
+  const key = TIPS[nextTip(browserStorage(), TIPS.length)] ?? TIPS[0];
+  void tipPictureLoaded(key);
+}
+
+/** The waiting view: the mark, Loading…, and the tip's place, hidden until a tip comes
+ * up with its picture loaded, then the picture over its words (D246). */
 export function waitingView(tips: boolean, due = false): Waiting {
   const words = element('p', { id: 'waiting-tip', className: 'waiting-tip' });
   words.setAttribute('aria-live', 'polite');
-  const picture = element('img', { className: 'waiting-tip-picture', alt: '', width: 960, height: 540 });
-  const tip = element('figure', { className: 'waiting-tip-box', hidden: true }, [picture, words]);
+  const tip = element('figure', { className: 'waiting-tip-box', hidden: true }, [words]);
   const node = element('div', { id: 'waiting', className: 'waiting' }, [
     markSvg(64),
     element('p', { className: 'status waiting-loading' }, [t('waiting.loading')]),
@@ -194,9 +249,12 @@ export function waitingView(tips: boolean, due = false): Waiting {
     tips: tips && !turnedOff,
     due,
     reading: (key) => readingMs(t(`tips.${key}`).replace(/[*`]/g, '')),
-    onTip: (key) => {
-      picture.src = tipPicture(key);
+    picture: (key) => tipPictureLoaded(key),
+    // The loaded picture over the words, in the same frame; the words alone where it
+    // failed, with no room kept for it.
+    onTip: (key, picture) => {
       words.replaceChildren(...tipNodes(t(`tips.${key}`)));
+      tip.replaceChildren(...(picture ? [picture] : []), words);
       tip.hidden = false;
       node.dataset.tip = key;
     },

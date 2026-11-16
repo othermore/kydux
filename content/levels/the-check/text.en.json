@@ -16,8 +16,8 @@
   "outro": "Phew! Every broom is safe now. And just in time, I can hear the class coming!",
   "learned": "Now you know that an `if` inside a `for` decides at each turn, and that a method that needs something is used after looking at the attribute that says it.",
   "ways": {
+    "five": "five brooms, two knotted",
     "six": "six brooms, two knotted",
-    "seven": "seven brooms, three knotted",
-    "eight": "eight brooms, two knotted"
+    "seven": "seven brooms, three knotted"
   }
 }

@@ -16,8 +16,8 @@
   "outro": "¡Uf! Todas las escobas están a salvo. ¡Y justo a tiempo, oigo que viene la clase!",
   "learned": "Ahora sabes que un `if` dentro de un `for` decide en cada vuelta, y que un método que necesita algo se usa después de mirar el atributo que lo dice.",
   "ways": {
+    "five": "cinco escobas, dos con nudo",
     "six": "seis escobas, dos con nudo",
-    "seven": "siete escobas, tres con nudo",
-    "eight": "ocho escobas, dos con nudo"
+    "seven": "siete escobas, tres con nudo"
   }
 }

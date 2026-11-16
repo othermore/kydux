@@ -163,6 +163,31 @@
   ],
   "ways": [
     {
+      "id": "five",
+      "things": [
+        {
+          "id": "broom_11",
+          "gone": true
+        },
+        {
+          "id": "broom_12",
+          "gone": true
+        },
+        {
+          "id": "broom_13",
+          "gone": true
+        },
+        {
+          "id": "broom_8",
+          "knotted": true
+        },
+        {
+          "id": "broom_10",
+          "knotted": true
+        }
+      ]
+    },
+    {
       "id": "six",
       "things": [
         {
@@ -200,19 +225,6 @@
         },
         {
           "id": "broom_12",
-          "knotted": true
-        }
-      ]
-    },
-    {
-      "id": "eight",
-      "things": [
-        {
-          "id": "broom_9",
-          "knotted": true
-        },
-        {
-          "id": "broom_13",
           "knotted": true
         }
       ]

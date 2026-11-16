@@ -1,7 +1,8 @@
-"""Chapter 4's world: the broom knotted and untied (D183), every thing of a kind found
-and counted (D184), flying with drevo over the low cells (D185, D186), the rings
-flown through in order (D187), the race scored by Ilda's count (D189), and the
-child's own functions."""
+"""Chapter 4's world: the broom knotted and untied (D183), on the floor or hung on a peg
+(D195), every thing of a kind found and counted (D184) from the zone the wizard stands
+in (D196), a story step's framing (D199), flying with drevo over the low cells (D185,
+D186), the rings flown through in order (D187), the race scored by Ilda's count (D189),
+and the child's own functions."""
 
 import json
 from pathlib import Path
@@ -453,56 +454,18 @@ def test_refused_is_an_error_the_child_s_except_may_catch():
     assert issubclass(Refused, Exception)
 
 
-#: The shed's inside, rows 6 to 8 and columns 6 to 13, for the orders of the plan's
-#: ways (3.3); the levels' own cells are held by their content tests.
-STRAW_WAYS = {
-    "three": [(10, 7), (8, 7), (6, 8)],
-    "four": [(10, 7), (9, 8), (7, 8), (6, 8)],
-    "four_high": [(10, 6), (9, 7), (7, 7), (6, 8)],
-}
-CHECK_EIGHT = [(7, 8), (7, 7), (8, 7), (9, 7), (10, 6), (11, 6), (12, 6), (13, 6)]
-CHECK_WAYS = {
-    "six": [(7, 8), (8, 7), (9, 7), (10, 6), (12, 6), (13, 6)],
-    "eight": CHECK_EIGHT,
-    "nine": sorted(
-        [*CHECK_EIGHT, (9, 6)], key=lambda c: (abs(c[0] - 6) + abs(c[1] - 8), c[1], c[0])
-    ),
-}
-
-
-def inside(start, cells):
-    rows = ["#" * 20 for _ in range(15)]
-    for y in (6, 7, 8):
-        rows[y] = "#" * 6 + "." * 8 + "#" * 6
-    row = list(rows[start[1]])
-    row[start[0]] = "S"
-    rows[start[1]] = "".join(row)
+def test_find_all_orders_by_steps_across_rows_and_columns_and_ties_by_row_then_column():
+    """Nearest first by the steps walked, whatever order the level names its things in;
+    of two as near, the one on the higher row first, and on a row the one further left."""
+    rows = ["#######", "#.....#", "#..S..#", "#.....#", "#######"]
+    cells = [(3, 1), (2, 2), (4, 2), (3, 3), (2, 1), (4, 1), (1, 3)]
     things = [
-        {"kind": "broom", "id": f"broom_{n}", "at": list(cell)} for n, cell in enumerate(cells, 1)
+        {"kind": "broom", "id": f"broom_{n}", "at": list(cell)}
+        for n, cell in enumerate(cells[::-1], 1)
     ]
-    return World(Level.from_dict({"id": "inside", "map": rows, "things": things}))
-
-
-@pytest.mark.parametrize("way", sorted(STRAW_WAYS))
-def test_in_the_straw_find_all_gives_each_broom_left_of_and_not_above_the_one_before(way):
-    cells = STRAW_WAYS[way]
-    world = inside((11, 6), cells[::-1])
+    world = World(Level.from_dict({"id": "inside", "map": rows, "things": things}))
     found = [tuple(broom.position) for broom in world.wizard.find_all("broom")]
     assert found == cells
-    for before, after in zip([(11, 6), *found], found, strict=False):
-        assert after[0] < before[0] and after[1] >= before[1]
-
-
-@pytest.mark.parametrize("way", sorted(CHECK_WAYS))
-def test_in_the_check_find_all_gives_each_broom_right_of_and_not_below_the_one_before(way):
-    cells = CHECK_WAYS[way]
-    world = inside((6, 8), cells[::-1])
-    found = [tuple(broom.position) for broom in world.wizard.find_all("broom")]
-    assert found == cells
-    distances = [abs(x - 6) + abs(y - 8) for x, y in found]
-    assert distances == sorted(distances)
-    for before, after in zip([(6, 8), *found], found, strict=False):
-        assert after[0] >= before[0] and after[1] <= before[1]
 
 
 #: The lake's edge in small, for a story: grass, water (low) and trees (high).
@@ -589,18 +552,13 @@ def test_a_part_s_steps_are_checked_on_its_own_scene():
         )
 
 
-# The levels of chapter 4 as they are in content/ (39.6): their ways' orders and the
+# The levels of chapter 4 as they are in content/: their ways' orders and the
 # race's tick tables, on their scenes.
 CONTENT = Path(__file__).resolve().parents[2] / "content" / "levels"
 
 
 def content_level(name):
     return Level.from_directory(CONTENT / name)
-
-
-def cells_found(level):
-    world = World(level)
-    return [tuple(broom.position) for broom in world.wizard.find_all("broom")]
 
 
 def found_from(level, moves=()):
@@ -628,7 +586,7 @@ def test_on_the_wall_find_all_gives_the_hung_brooms_left_to_right(way, count):
 
 
 @pytest.mark.parametrize(
-    ("way", "count", "knots"), [("six", 6, 2), ("seven", 7, 3), ("eight", 8, 2)]
+    ("way", "count", "knots"), [("five", 5, 2), ("six", 6, 2), ("seven", 7, 3)]
 )
 def test_in_the_check_the_hung_brooms_go_left_to_right_and_the_first_has_no_knot(
     way, count, knots

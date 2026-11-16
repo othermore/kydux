@@ -1,8 +1,9 @@
 """Every level in content/ can be played, and keeps to what it teaches.
 
-Its solution wins and calls nothing outside the level's api (D23); it has
-three wrong answers or more, none of which wins; a text in every language,
-whose starting code runs without an error, as a girl's wizard and a boy's see it.
+Its solution wins, stumbling on nothing in any way, and calls nothing outside the
+level's api (D23); it has three wrong answers or more, none of which wins; a text
+in every language, whose starting code runs without an error, as a girl's wizard
+and a boy's see it.
 """
 
 import ast
@@ -64,6 +65,18 @@ def test_the_level_says_what_it_teaches(directory):
 def test_the_solution_wins(directory):
     result = run_code(load(directory), (directory / "solution.py").read_text(encoding="utf-8"))
     assert result.status == "won", result.error
+
+
+@pytest.mark.parametrize("directory", LEVELS, ids=lambda p: p.name)
+def test_the_solution_stumbles_on_nothing_in_any_way(directory):
+    """The level's own program bumps into nothing and is refused nothing, whichever way
+    the level comes: its card keeps the star of a run with no bump."""
+    level = load(directory)
+    code = (directory / "solution.py").read_text(encoding="utf-8")
+    for way in [way_id for way_id, _ in level.ways] or [None]:
+        result = run_code(level.way(way) if way else level, code)
+        stumbles = [e for e in result.events if e.kind in ("bump", "blocked")]
+        assert not stumbles, f"{directory.name}, way {way}: {stumbles[0].data}"
 
 
 @pytest.mark.parametrize("directory", LEVELS, ids=lambda p: p.name)

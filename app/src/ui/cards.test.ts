@@ -38,6 +38,14 @@ describe('judge (D57)', () => {
     expect(judge({ world: world('won', [goal(true), goal(false, true)]), hintsShown: 0, misses: 0 }).earned).toBe(2);
   });
 
+  it('asks for every bonus goal for that one star when the level has several, and says so', () => {
+    const all = judge({ world: world('won', [goal(true), goal(true, true), goal(true, true)]), hintsShown: 0, misses: 0 });
+    expect(all.reasons[2]).toEqual({ key: 'bonuses', kept: true });
+    const one = judge({ world: world('won', [goal(true), goal(true, true), goal(false, true)]), hintsShown: 0, misses: 0 });
+    expect(one.reasons[2]).toEqual({ key: 'bonuses', kept: false });
+    expect(one.earned).toBe(2);
+  });
+
   it('gives a win one star at least, and a run that did not win none', () => {
     expect(judge({ world: world('won', [goal(true)], [BUMP]), hintsShown: 3, misses: 5 }).earned).toBe(1);
     expect(judge({ world: world('incomplete', [goal(false)]), hintsShown: 0, misses: 0 }).earned).toBe(0);

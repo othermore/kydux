@@ -72,6 +72,6 @@ export function bobOf(ms: number): number {
 /** How long a tick of the playback lasts, against a tick, by what its figures do in
  * it: a flown tick, every move in it flown and none walked, a third (D185). */
 export function flownTick(events: { kind: string; data: Record<string, unknown> }[]): boolean {
-  const moves = events.filter((event) => event.kind === 'move' || event.kind === 'circle');
-  return moves.length > 0 && moves.every((event) => event.kind === 'circle' || event.data.flying === true);
+  const moves = events.filter((event) => event.kind === 'move');
+  return moves.length > 0 && moves.every((event) => event.data.flying === true);
 }

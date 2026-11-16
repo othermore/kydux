@@ -468,6 +468,7 @@
     "no_hints": "Sin pedir pistas",
     "clean": "Sin chocar con nada",
     "bonus": "El objetivo extra cumplido",
+    "bonuses": "Los objetivos extra cumplidos",
     "first_try": "A la primera",
     "kept": "Te quedas con las {n} estrellas que ya tenías."
   },
@@ -547,9 +548,14 @@
   "race": {
     "reading": "Ilda lee los programas: tú, {mine} líneas; {name}, {theirs}.",
     "left": "Despegas en {mine}; {name}, en {theirs}.",
-    "count": "La cuenta de Ilda: tus líneas ({lines}) + tu vuelo ({flight}) + la penalización ({penalty}) = tick {tick}. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
-    "count_unfinished": "La cuenta de Ilda: no has cruzado la meta. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
-    "tie": "¡Es un empate! La carrera se repite."
+    "count": "La cuenta de Ilda: tus líneas ({lines}) + tu vuelo ({flight}) + la penalización ({penalty}) = {tick} ticks. {name}: {racer_lines} + {racer_flight} = {racer_tick} ticks.",
+    "count_unfinished": "La cuenta de Ilda: no has cruzado la meta. {name}: {racer_lines} + {racer_flight} = {racer_tick} ticks.",
+    "tie": "¡Es un empate! La carrera se repite.",
+    "judged_clean": "Has pasado por todos los aros. Tu cuenta: {tick} ticks. La de {name}: {racer_tick}.",
+    "judged_missed": "Aros saltados: {missed}. Penalización: {penalty} ticks. Tu cuenta: {tick} ticks. La de {name}: {racer_tick}.",
+    "judged_unfinished": "No has cruzado la meta, así que gana {name}.",
+    "wins_wizard": "¡Has ganado, {wizard}!",
+    "wins_racer": "Esta vez ha ganado {name}."
   },
   "about": {
     "link": "Qué es Kydux",

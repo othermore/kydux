@@ -1,14 +1,15 @@
 // How many stars a win earns, and why (D57): three for a clean win, one lost
 // for each of a hint shown, a bump into a wall or a door in the winning run,
 // and a bonus goal unmet, or, in a level with no bonus, a run before this one
-// that did not win. A win is always at least one star.
+// that did not win. A level with several bonus goals asks for them all for
+// that one star, and says so. A win is always at least one star.
 
 import { MAX_STARS } from '../progress/store';
 import type { WorldResult } from '../runtime/protocol';
 
 /** One of the three things a star is for, and whether the win kept it. */
 export interface StarReason {
-  key: 'no_hints' | 'clean' | 'bonus' | 'first_try';
+  key: 'no_hints' | 'clean' | 'bonus' | 'bonuses' | 'first_try';
   kept: boolean;
 }
 
@@ -34,7 +35,7 @@ export function judge({ world, hintsShown, misses }: StarsInput): Verdict {
     { key: 'no_hints', kept: hintsShown === 0 },
     { key: 'clean', kept: !bumped },
     bonus.length > 0
-      ? { key: 'bonus', kept: bonus.every((goal) => goal.met) }
+      ? { key: bonus.length > 1 ? 'bonuses' : 'bonus', kept: bonus.every((goal) => goal.met) }
       : { key: 'first_try', kept: misses === 0 },
   ];
   const lost = reasons.filter((reason) => !reason.kept).length;

@@ -7,8 +7,8 @@
 // and its fix (D183); water refused to a walk and crossed by a flight three times as
 // fast, with the wind's sound (D185, D186); the loop round the rings flown into the
 // trees and the function that wins (D190); drevo cast in the air lands, or is refused
-// over the water, the wizard left flying (D215); the race by Ilda's count, its band and its
-// card (D189); each story told to its end, the first on two scenes; the map's stops in
+// over the water, the wizard left flying (D215); the race by Ilda's count, her band at
+// the scene's foot while she reads and when she judges, and its card (D189, D234); each story told to its end, the first on two scenes; the map's stops in
 // order; the shed's levels framed whole, their pegs clear of the page's panels (D201);
 // the shed's lying brooms in sight on the boards and hidden under the straw (D202); the
 // wall walked by the distance from the row's end (D206); the straw's negative move
@@ -524,13 +524,33 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).not.toHaveAttribute('data-through', /ring/);
   });
 
-  test('Ilda reads the programs on the band; the function crosses at 54, the same flight in 18 lines ties at 61 (D189, D220, D229)', async ({ page }) => {
+  test('Ilda reads the programs on her band and judges the race at its end; the function counts 54, the same flight in 18 lines ties at 61 (D189, D220, D229, D234)', async ({ page }) => {
     await open(page, 'the-race', '2');
     await start(page, solution('the-race'));
     await expect(scene(page)).toHaveAttribute('data-race-band', /11 líneas; Zarek, 18/, { timeout: ciTimes(60_000) });
+    // The band is seen: Ilda's portrait and her words, at the scene's foot and inside it.
+    const band = page.locator('.race-band');
+    await expect(band).toBeVisible();
+    await expect(band.locator('img[data-portrait="ilda"]')).toBeVisible();
+    const [frame, box] = [await page.locator('.scene-frame').boundingBox(), await band.boundingBox()];
+    if (!frame || !box) throw new Error('the band or the scene has no box');
+    expect(box.x).toBeGreaterThanOrEqual(frame.x);
+    expect(box.x + box.width).toBeLessThanOrEqual(frame.x + frame.width);
+    expect(box.y).toBeGreaterThan(frame.y + frame.height / 2);
+    expect(box.y + box.height).toBeLessThanOrEqual(frame.y + frame.height);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}race-band.png` });
-    await expect(page.locator('#card-race')).toContainText('tick 54', { timeout: ciTimes(120_000) });
-    await expect(page.locator('#card-race')).toContainText('Zarek: 18 + 43 = tick 61');
+    // The race flown out, Ilda says her verdict on the band, and the card waits for it
+    // to be read (D234, D175).
+    await expect(scene(page)).toHaveAttribute(
+      'data-race-verdict',
+      'Has pasado por todos los aros. Tu cuenta: 54 ticks. La de Zarek: 61. ¡Has ganado, Marta!',
+      { timeout: ciTimes(120_000) },
+    );
+    await expect(band.locator('strong')).toHaveText('¡Has ganado, Marta!');
+    await expect(page.locator('.win-card')).toHaveCount(0);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}race-verdict.png` });
+    await expect(page.locator('#card-race')).toContainText('= 54 ticks', { timeout: ciTimes(120_000) });
+    await expect(page.locator('#card-race')).toContainText('Zarek: 18 + 43 = 61 ticks');
     // Both land past the painted line, Zarek clear of the pole (D229).
     await expect(scene(page)).toHaveAttribute('data-wizard', '32,8');
     await expect(scene(page)).toHaveAttribute('data-actors', /zarek:32,12/);
@@ -543,17 +563,37 @@ test.describe('the rings and the race', () => {
     await page.locator('#again').click();
     await page.locator('#speed').selectOption('4');
     await run(page, wrong('the-race', 'eighteen_lines'));
-    await expect(page.locator('#outcome-race')).toContainText('tick 61. Zarek: 18 + 43 = tick 61. ¡Es un empate! La carrera se repite.');
+    await expect(page.locator('#outcome-race')).toContainText('= 61 ticks. Zarek: 18 + 43 = 61 ticks. ¡Es un empate! La carrera se repite.');
+    await expect(scene(page)).toHaveAttribute('data-race-verdict', /La de Zarek: 61\. ¡Es un empate! La carrera se repite\.$/);
     await expect(page.locator('.win-card')).toHaveCount(0);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}race-tie.png` });
+  });
+
+  test('a ring missed stops nobody before the finish: Ilda adds its penalty at the end and names the winner (D234)', async ({ page }) => {
+    await open(page, 'the-race', '2');
+    // Two pairs skipped: the wizard crosses the finish well before Zarek, in the air
+    // all the way, and loses by Ilda's count.
+    await start(page, wrong('the-race', 'two_pairs_skipped'));
+    const missed = 'Aros saltados: 4. Penalización: 20 ticks. Tu cuenta: 65 ticks. La de Zarek: 61. Esta vez ha ganado Zarek.';
+    await expect(scene(page)).toHaveAttribute('data-race-verdict', missed, { timeout: ciTimes(120_000) });
+    await expect(scene(page)).toHaveAttribute('data-wizard', '32,8');
+    await expect(page.locator('.outcome')).toBeHidden();
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}race-verdict-missed.png` });
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
+    await expect(page.locator('.win-card')).toHaveCount(0);
+    await expect(page.locator('#outcome-race')).toContainText('la penalización (20) = 65 ticks');
+    // The verdict stays on the band until the run starts again.
+    await expect(scene(page)).toHaveAttribute('data-race-verdict', missed);
+    await page.screenshot({ path: `${SHOTS}race-missed-card.png` });
   });
 
   test("in the rematch the race's program misses seven rings, and the numbers mended win at 54", async ({ page }) => {
     await open(page, 'the-rematch');
     expect(await run(page, wrong('the-rematch', 'the_race_s_program'))).not.toMatch(/^¡Lo has conseguido/);
-    await expect(page.locator('#outcome-race')).toContainText('tick 89');
+    await expect(page.locator('#outcome-race')).toContainText('la penalización (35) = 89 ticks');
+    await expect(scene(page)).toHaveAttribute('data-race-verdict', /^Aros saltados: 7\. Penalización: 35 ticks\./);
     expect(await run(page, solution('the-rematch'))).toMatch(/^¡Lo has conseguido/);
-    await expect(page.locator('#card-race')).toContainText('tick 54');
+    await expect(page.locator('#card-race')).toContainText('= 54 ticks');
   });
 });
 

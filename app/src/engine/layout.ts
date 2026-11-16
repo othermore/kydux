@@ -46,8 +46,7 @@ export interface ThingLayout {
 }
 
 /** A race against a racer, by Ilda's count (D189): the racer's id, the lines Ilda
- * reads of its program, the cells it flies after its lift, a cell the same as the one
- * before a tick circling, and the finish. */
+ * reads of its program, the cells it flies after its lift, and the finish. */
 export interface RaceLayout {
   against: string;
   lines: number;

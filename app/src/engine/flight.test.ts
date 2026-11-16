@@ -33,8 +33,6 @@ describe('flying (D185)', () => {
     expect(lengthOf([move(1, true)])).toBe(FLOWN);
     expect(lengthOf([move(1, false)])).toBe(1);
     expect(lengthOf([{ ...move(1, false), kind: 'untie', data: {} }])).toBe(LONG);
-    const circling: PlaybackEvent = { tick: 1, actor: 'wizard', kind: 'circle', data: { at: [3, 4] }, line: null };
-    expect(lengthOf([circling])).toBe(FLOWN);
   });
 
   it('plays every tick of a level where the wizard can fly in a third, the hands as anywhere (D225)', () => {

@@ -468,6 +468,7 @@
     "no_hints": "Solved without a hint",
     "clean": "Without bumping into anything",
     "bonus": "The extra goal met",
+    "bonuses": "The extra goals met",
     "first_try": "At the first try",
     "kept": "You keep the {n} stars you had."
   },
@@ -547,9 +548,14 @@
   "race": {
     "reading": "Ilda reads the programs: you, {mine} lines; {name}, {theirs}.",
     "left": "You take off in {mine}; {name}, in {theirs}.",
-    "count": "Ilda's count: your lines ({lines}) + your flight ({flight}) + the penalty ({penalty}) = tick {tick}. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
-    "count_unfinished": "Ilda's count: you did not cross the finish. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
-    "tie": "It's a tie! The race is flown again."
+    "count": "Ilda's count: your lines ({lines}) + your flight ({flight}) + the penalty ({penalty}) = {tick} ticks. {name}: {racer_lines} + {racer_flight} = {racer_tick} ticks.",
+    "count_unfinished": "Ilda's count: you did not cross the finish. {name}: {racer_lines} + {racer_flight} = {racer_tick} ticks.",
+    "tie": "It's a tie! The race is flown again.",
+    "judged_clean": "You flew through every ring. Your count: {tick} ticks. {name}'s count: {racer_tick}.",
+    "judged_missed": "Rings missed: {missed}. Penalty: {penalty} ticks. Your count: {tick} ticks. {name}'s count: {racer_tick}.",
+    "judged_unfinished": "You did not reach the finish line, so {name} wins.",
+    "wins_wizard": "You won, {wizard}!",
+    "wins_racer": "{name} wins this time."
   },
   "about": {
     "link": "About",

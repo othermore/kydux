@@ -38,9 +38,9 @@
 // hidden things found and seen, joined by ",", D184), data-untied (the brooms
 // untied, D183), data-flying (the figures in the air, joined by ",", D185),
 // data-wind (`on` while a flight's wind blows), data-through (the rings flown
-// through, in order, joined by ","), data-circling (who circles before the
-// finish now), data-race-band (what the start band says, D189) and data-world (what
-// the camera shows, in cells: "left,top,width,height").
+// through, in order, joined by ","), data-race-band (what Ilda's band says while she
+// reads the programs, D189), data-race-verdict (her verdict of the race, D234) and
+// data-world (what the camera shows, in cells: "left,top,width,height").
 //
 // The camera is a window on the scene (D69, camera.ts): it follows the wizard,
 // the player zooms it and drags it to look around, and a run or a restart brings
@@ -109,8 +109,9 @@ import {
   sleepFrame,
   thingDepthOn,
 } from './painted';
+import { contentUrl } from '../content/address';
 import { characterName, t } from '../i18n';
-import { readingTicks } from './bubble';
+import { readingMs, readingTicks } from './bubble';
 import { SceneCamera, VIEW_TILES } from './camera';
 import type { StoryFraming } from './zooming';
 import { DebugView, type PaintedImage } from './debug';
@@ -139,7 +140,7 @@ import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
-import { blockedText, bumpText, friendText, ringWayText, sleepingText } from './words';
+import { blockedText, bumpText, friendText, raceVerdict, ringWayText, sleepingText } from './words';
 import { bobOf, FLOWN, FLY_LIFT, flyFrame, RING_PAST, throughRing } from './flight';
 import { drawnFromSprite, spriteFoot, spriteKey, spriteName, spriteOrigin, spriteScale, type ThingSprite } from './things';
 import { Wind } from './sound';
@@ -147,6 +148,8 @@ import { Wind } from './sound';
 /** How long one tick lasts at speed 1. */
 export const TICK_MS = 400;
 
+/** Who judges a race and speaks in its band (D189, D234). */
+const RACE_JUDGE = 'ilda';
 /** How long the scene takes to fade out and in when the level starts again, and how
  * long it stays out (D75). */
 const RESTART_FADE_MS = 120;
@@ -342,8 +345,6 @@ class LevelScene extends Phaser.Scene {
     { since: number; shadow: Phaser.GameObjects.Ellipse; way: 'up' | 'down'; past: number }
   >();
   private readonly wind = new Wind();
-  /** Who circles before the finish now (D189), for the tests. */
-  private circling: string | null = null;
 
   constructor(
     private readonly map: Layout,
@@ -939,10 +940,9 @@ class LevelScene extends Phaser.Scene {
     this.found.clear();
     this.untied.clear();
     this.through.length = 0;
-    this.circling = null;
     for (const sprite of [...this.flyers.keys()]) this.land(sprite, true);
     this.wind.stop(true);
-    this.raceBand(0, []);
+    this.raceBand(0, [], true);
     for (const id of [...this.revealed.keys()]) this.unreveal(id);
     this.asleep.clear();
     this.hopping.clear();
@@ -1202,7 +1202,7 @@ class LevelScene extends Phaser.Scene {
         if (sprite && event.kind === 'land') this.land(sprite, instant);
       } else this.showActor(event, instant);
     }
-    this.raceBand(tick, events);
+    this.raceBand(tick, events, instant);
     if (this.options.story) {
       this.frameStory(events);
       this.view.keep();
@@ -1345,7 +1345,7 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** What the tests read of chapter 4's things (D182 to D187): the sprites drawn, the
-   * hidden things found, the brooms untied, the rings flown through, who circles. */
+   * hidden things found, the brooms untied, the rings flown through. */
   private publishThings(): void {
     const node = this.parentNode.dataset;
     const drawn = [...this.sprites.keys()]
@@ -1367,8 +1367,6 @@ class LevelScene extends Phaser.Scene {
     if (node.untied !== untied) node.untied = untied;
     const through = this.through.join(',');
     if (node.through !== through) node.through = through;
-    if (this.circling) node.circling = this.circling;
-    else delete node.circling;
   }
 
   /** The id of an actor's figure. */
@@ -1377,60 +1375,66 @@ class LevelScene extends Phaser.Scene {
     return '';
   }
 
-  /** A figure circling over its cell for a tick (D189): the wizard serving a ring
-   * missed before the finish, a racer's flourish. */
-  private circle(sprite: Phaser.GameObjects.Sprite, at: Tile, who: string, instant: boolean): void {
-    if (instant) return;
-    const [x, y] = this.figureAt(at);
-    const radius = TILE * 0.35;
-    const counter = { turn: 0 };
-    this.tweens.killTweensOf(sprite);
-    this.circling = who;
-    this.tweens.add({
-      targets: counter,
-      turn: 1,
-      duration: this.playback.tickDuration * FLOWN * 0.95,
-      onUpdate: () => {
-        const angle = counter.turn * Math.PI * 2;
-        sprite.setPosition(x + Math.sin(angle) * radius, y - (1 - Math.cos(angle)) * radius * 0.6);
-      },
-      onComplete: () => {
-        sprite.setPosition(x, y);
-        if (this.circling === who) this.circling = null;
-      },
-    });
-  }
-
-  /** The band over the scene while Ilda reads the programs before a race (D189): the
-   * lines read of each, ticking down, until both have taken off. */
-  private raceBand(tick: number, events: WorldEvent[]): void {
+  /** Ilda's band at the scene's foot in a race (D189, D234): her portrait and her
+   * words. While she reads the programs, the lines read of each, ticking down, until
+   * both have taken off; from the race's `judged` event, her verdict, its last
+   * sentence in bold, which stays until the run starts again. */
+  private raceBand(tick: number, events: WorldEvent[], instant: boolean): void {
     const race = this.map.race;
-    let band = this.parentNode.querySelector<HTMLElement>('.race-band');
     if (!race) return;
+    let band = this.parentNode.querySelector<HTMLElement>('.race-band');
     if (!band) {
       band = document.createElement('div');
       band.className = 'race-band';
       band.hidden = true;
+      const picture = document.createElement('img');
+      picture.className = 'portrait small';
+      picture.src = contentUrl(`art/portraits/${RACE_JUDGE}.webp`);
+      picture.alt = '';
+      picture.dataset.portrait = RACE_JUDGE;
+      const words = document.createElement('p');
+      words.append(document.createElement('span'), document.createElement('strong'));
+      band.append(picture, words);
       this.parentNode.append(band);
     }
+    if (tick === 0) {
+      this.readLines = 0;
+      this.verdict = null;
+      this.verdictRead = 0;
+    }
     const read = events.find((event) => event.kind === 'read');
-    if (tick === 0) this.readLines = 0;
     if (read) this.readLines = Number(read.data.lines);
+    const judged = events.find((event) => event.kind === 'judged');
+    if (judged) {
+      this.verdict = raceVerdict(judged.data);
+      const whole = `${this.verdict.count} ${this.verdict.winner}`.trim();
+      this.verdictRead = instant ? 0 : this.time.now + readingMs(whole);
+    }
     const mine = this.readLines;
     const name = characterName(race.against);
-    const showing = tick > 0 && (read !== undefined || tick <= race.lines);
-    band.hidden = !showing;
-    const said = showing
+    const reading = !this.verdict && tick > 0 && (read !== undefined || tick <= race.lines);
+    const said = reading
       ? `${t('race.reading', { mine, name, theirs: race.lines })} ${t('race.left', {
           mine: Math.max(mine - tick, 0),
           name,
           theirs: Math.max(race.lines - tick, 0),
         })}`
       : '';
-    band.textContent = said;
+    const verdict = this.verdict ? `${this.verdict.count} ${this.verdict.winner}`.trim() : '';
+    band.hidden = !said && !verdict;
+    const [plain, strong] = [band.querySelector('span'), band.querySelector('strong')];
+    if (plain) plain.textContent = this.verdict ? `${this.verdict.count} ` : said;
+    if (strong) strong.textContent = this.verdict?.winner ?? '';
     if (said) this.parentNode.dataset.raceBand = said;
     else delete this.parentNode.dataset.raceBand;
+    if (verdict) this.parentNode.dataset.raceVerdict = verdict;
+    else delete this.parentNode.dataset.raceVerdict;
   }
+
+  /** Ilda's verdict in the run shown, and when it is read to its end, by the scene's
+   * clock (D234). */
+  private verdict: { count: string; winner: string } | null = null;
+  private verdictRead = 0;
 
   /** The lines Ilda reads of the wizard's program in the run shown (D189). */
   private readLines = 0;
@@ -1803,10 +1807,11 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** A run played out (D175): the wizard celebrates it when it is won, and how long the
-   * page waits before the card is the longer of that and the words on the scene read
-   * to their end. */
+   * page waits before the card is the longest of that, the words on the scene read to
+   * their end, and Ilda's verdict of a race read to its end (D234). */
   settle(won: boolean): number {
-    return Math.max(won ? this.celebrate() : 0, this.speech.settle());
+    const verdict = Math.max(0, this.verdictRead - this.time.now);
+    return Math.max(won ? this.celebrate() : 0, this.speech.settle(), verdict);
   }
 
   /** After a run won, the wizard celebrates (14.3): how long it takes; 0 when it does
@@ -1962,11 +1967,6 @@ class LevelScene extends Phaser.Scene {
         this.enchantedStep(this.wizard, from, to, duration, false);
         if (flown) this.wind.swell((duration * FLOWN) / 1000);
         else this.step('wizard');
-        break;
-      }
-      case 'circle': {
-        const at = tileOf(event.data.at);
-        if (at) this.circle(this.wizard, at, 'wizard', instant);
         break;
       }
       case 'untie': {
@@ -2138,12 +2138,6 @@ class LevelScene extends Phaser.Scene {
         this.walk(actor.sprite, facing, x, y, length);
         this.enchantedStep(actor.sprite, from, to, length, false);
         if (!flown) this.step(event.actor);
-        break;
-      }
-      case 'circle': {
-        // A racer's flourish (D189).
-        const at = tileOf(event.data.at);
-        if (at) this.circle(actor.sprite, at, event.actor, instant);
         break;
       }
       case 'turn':

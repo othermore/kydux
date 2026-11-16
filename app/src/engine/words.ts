@@ -122,6 +122,29 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
   }
 }
 
+/** Ilda's verdict of a race, from its `judged` event (D234), in two parts. `count`:
+ * the rings missed with their penalty, or that every ring was flown through, and the
+ * two counts; that the finish was not crossed when it was not. `winner`: who has won,
+ * or that it is a tie; empty when the finish was not crossed, which `count` says with
+ * its winner. */
+export function raceVerdict(data: Record<string, unknown>): { count: string; winner: string } {
+  const name = characterName(String(data.racer));
+  if (data.tick === null || data.tick === undefined) {
+    return { count: t('race.judged_unfinished', { name }), winner: '' };
+  }
+  const said = {
+    name,
+    missed: Number(data.missed),
+    penalty: Number(data.penalty),
+    tick: Number(data.tick),
+    racer_tick: Number(data.racer_tick),
+  };
+  const count = said.missed > 0 ? t('race.judged_missed', said) : t('race.judged_clean', said);
+  if (data.winner === 'wizard') return { count, winner: t('race.wins_wizard') };
+  if (data.winner === null || data.winner === undefined) return { count, winner: t('race.tie') };
+  return { count, winner: t('race.wins_racer', { name }) };
+}
+
 /** Who stands in the wizard's way: a friend, by the name the story gives them (D66, D77). */
 export function friendText(id: string): string {
   return t('blocked.friend', { name: characterName(id) });

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { initLanguage } from '../i18n';
-import { blockedText, bumpText, ringWayText } from './words';
+import { blockedText, bumpText, raceVerdict, ringWayText } from './words';
 
 const english = { languages: ['en'], storage: null };
 const spanish = { languages: ['es'], storage: null };
@@ -85,5 +85,54 @@ describe('what a flight cannot cross, and a walk what a flight can (D186, D187)'
     // A turn inside a ring rubs its rim: the owner's words (D226).
     expect(blockedText('ring_rim', 'ring')).toBe('Oh, giré demasiado pronto y rocé el aro.');
     initLanguage({ languages: ['en'], storage: null });
+  });
+});
+
+describe('Ilda\'s verdict of a race (D234)', () => {
+  const judged = (missed: number, tick: number | null, winner: string | null) => ({
+    at: [36, 8],
+    lines: 11,
+    flight: tick === null ? null : 43,
+    missed,
+    penalty: missed * 5,
+    tick,
+    racer: 'zarek',
+    racer_lines: 18,
+    racer_tick: 61,
+    winner,
+  });
+
+  it('says the two counts and the winner when every ring was flown through', () => {
+    initLanguage(spanish);
+    expect(raceVerdict(judged(0, 54, 'wizard'))).toEqual({
+      count: 'Has pasado por todos los aros. Tu cuenta: 54 ticks. La de Zarek: 61.',
+      winner: '¡Has ganado, Kydux!',
+    });
+    initLanguage(english);
+    expect(raceVerdict(judged(0, 54, 'wizard')).count).toBe(
+      "You flew through every ring. Your count: 54 ticks. Zarek's count: 61.",
+    );
+  });
+
+  it('says the rings missed and their penalty before the counts, and that the racer has won', () => {
+    initLanguage(spanish);
+    expect(raceVerdict(judged(4, 74, 'zarek'))).toEqual({
+      count: 'Aros saltados: 4. Penalización: 20 ticks. Tu cuenta: 74 ticks. La de Zarek: 61.',
+      winner: 'Esta vez ha ganado Zarek.',
+    });
+    initLanguage(english);
+    expect(raceVerdict(judged(4, 74, 'zarek'))).toEqual({
+      count: "Rings missed: 4. Penalty: 20 ticks. Your count: 74 ticks. Zarek's count: 61.",
+      winner: 'Zarek wins this time.',
+    });
+  });
+
+  it('says a tie at equal counts, and that the racer wins a race not finished', () => {
+    initLanguage(spanish);
+    expect(raceVerdict(judged(0, 61, null)).winner).toBe('¡Es un empate! La carrera se repite.');
+    expect(raceVerdict(judged(8, null, 'zarek'))).toEqual({
+      count: 'No has cruzado la meta, así que gana Zarek.',
+      winner: '',
+    });
   });
 });

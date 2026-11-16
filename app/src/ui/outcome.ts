@@ -122,8 +122,8 @@ function outcomeWords(outcome: Outcome): string {
 }
 
 /** Ilda's count after a race (D189), from the `before` goal's params: the wizard's
- * lines, flight and penalty to the tick it crossed at, and the racer's, and at equal
- * ticks that it is a tie (D220); null for a level that is no race. */
+ * lines, flight and penalty and the ticks they add up to (D234), and the racer's, and
+ * at equal ticks that it is a tie (D220); null for a level that is no race. */
 export function raceCount(goals: { kind: string; params: Record<string, unknown> }[] | undefined): string | null {
   const before = goals?.find((goal) => goal.kind === 'before');
   if (!before) return null;

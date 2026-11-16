@@ -1,6 +1,8 @@
-// Chapter 4 as the child plays it (sprint 39): every level won by its solution, in
-// Spanish for a girl and in English for a boy, in every way; the brooms in the straw
-// unseen until found (D184); a loop needed where the ways differ (D51); the knot's error
+// Chapter 4 as the child plays it: every level won by its solution, in Spanish for a
+// girl and in English for a boy, in every way; the broom at the wizard's feet and the
+// brooms hung on their pegs (D195, D197); the brooms counted from the straw and from the
+// wall, the straw's unseen until found (D184, D196); a loop needed where the ways differ
+// (D51); the shed framed whole as the story walks in (D199); the knot's error
 // and its fix (D183); water refused to a walk and crossed by a flight three times as
 // fast, with the wind's sound (D185, D186); the loop round the rings flown into the
 // trees and the function that wins (D190); the race by Ilda's count, its band and its
@@ -81,23 +83,38 @@ test.describe('the shed', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
-  test('the brooms in the straw are not seen until find_all finds them (D184)', async ({ page }) => {
+  test('the broom at your feet is found and untied in two lines, the hung ones drawn on their pegs (D195, D197)', async ({ page }) => {
+    await open(page, 'the-broom-at-your-feet');
+    // The four hung brooms on the pegs of columns 6 to 9, the one at the feet on the floor.
+    await expect(scene(page)).toHaveAttribute(
+      'data-sprite-things',
+      'broom_0:broom:9,8;broom_6:broom-hung:6,5;broom_7:broom-hung:7,5;broom_8:broom-hung:8,5;broom_9:broom-hung:9,5',
+    );
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}shed-pegs.png` });
+    expect(await run(page, solution('the-broom-at-your-feet'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute('data-untied', 'broom_0');
+  });
+
+  test('the brooms are counted from the straw and from the wall; one find_all loses (D196)', async ({ page }) => {
     await open(page, 'the-shed');
-    await expect(scene(page)).toHaveAttribute('data-sprite-things', '');
-    await run(page, solution('the-shed'));
+    // Only the hung ones are seen before a program looks in the straw.
+    await expect(scene(page)).toHaveAttribute('data-sprite-things', /^broom_6:broom-hung:6,5;broom_7/);
+    await expect(scene(page)).not.toHaveAttribute('data-sprite-things', /broom_1:/);
+    expect(await run(page, wrong('the-shed', 'one_find_all_from_the_door'))).not.toMatch(/^¡Lo has conseguido/);
+    expect(await run(page, solution('the-shed'))).toMatch(/^¡Lo has conseguido/);
     await expect(scene(page)).toHaveAttribute('data-found', /broom_1/);
-    await expect(scene(page)).toHaveAttribute('data-sprite-things', /broom_1:broom:7,8/);
+    await expect(scene(page)).toHaveAttribute('data-sprite-things', /broom_1:broom:10,7/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}shed-found.png` });
   });
 
-  test('three brooms untied by hand win the way of three and lose the longer ones (D51)', async ({ page }) => {
-    await open(page, 'the-brooms-in-a-row');
-    await run(page, wrong('the-brooms-in-a-row', 'three_written_out'));
+  test('two brooms untied by hand win the way of two and lose the longer ones (D51)', async ({ page }) => {
+    await open(page, 'the-brooms-on-the-wall');
+    await run(page, wrong('the-brooms-on-the-wall', 'two_written_out'));
     await expect(page.locator('.outcome')).not.toHaveAttribute('data-kind', 'won');
-    await expect(page.locator('#way')).toHaveValue('four');
+    await expect(page.locator('#way')).toHaveValue('three');
   });
 
-  test('the friend\'s program stops at a broom with no knot, and the if mends it (D183)', async ({ page }) => {
+  test("the wall's program stops at the first broom, which has no knot, and the if mends it (D183)", async ({ page }) => {
     await open(page, 'the-check');
     expect(await run(page, wrong('the-check', 'the_given_program'))).toMatch(/no tiene nudo/);
     await page.screenshot({ path: `${SHOTS}check-no-knot.png` });
@@ -195,10 +212,13 @@ test.describe('the stories', () => {
         step += 1;
         await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
         await page.screenshot({ path: `${SHOTS}story-${id}-${step}.png` });
-        // The morning after goes on in the shed from its fourth step.
-        if (id === 'the-morning-after' && step === 4) {
+        // The morning after goes on in the shed from its fourth step, the shed framed
+        // whole (D199), four brooms on the pegs and four on the floor (D195).
+        if (id === 'the-morning-after' && step >= 4) {
           await expect(page.locator('#scene')).toHaveAttribute('data-story-part', '1');
-          await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_1:broom/);
+          await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', '3,3,16,10');
+          await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_6:broom-hung:6,5/);
+          await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_0:broom:9,8/);
         }
       }
       await expect(page.locator('#story-go-on')).toBeVisible();
@@ -209,6 +229,16 @@ test.describe('the stories', () => {
 test.describe('the debug view of chapter 4', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("with ?debug, the shed's zones are framed and named (D196)", async ({ page }) => {
+    await page.goto('/?debug#level/the-shed');
+    await page.locator('#start').click();
+    await expect(scene(page)).toHaveAttribute('data-debug', 'true', { timeout: ciTimes(90_000) });
+    await page.locator('#debug-cells').click();
+    await expect(page.locator('.debug-legend')).toContainText('Zona: junto a la pared');
+    await expect(page.locator('.debug-legend')).toContainText('Zona: en la paja');
+    await page.screenshot({ path: `${SHOTS}debug-the-shed.png` });
+  });
 
   for (const id of ['the-first-flight', 'the-rings']) {
     test(`with ?debug, ${id}'s low cells are named and its rings numbered`, async ({ page }) => {

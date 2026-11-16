@@ -5,18 +5,18 @@
     "Termina en la casilla (6, 8).",
     "Usa `x`."
   ],
-  "starting_code": "# Encuentra todas las escobas con `find_all`.\n\n# Para cada escoba:\n\n# Cuenta los pasos a la izquierda con `position.x`.\n\n# Cuenta los pasos hacia abajo con `position.y`.\n\n# Muévete a la izquierda con `move_left`.\n\n# Muévete hacia abajo con `move_down`.\n\n# Desátala con `untie`.\n",
+  "starting_code": "# Encuentra todas las escobas con `find_all`.\n# Para cada escoba de la lista:\n#     cuenta los pasos a la izquierda con `position.x`\n#     y los pasos hacia abajo con `position.y`;\n#     muévete a la izquierda con `move_left`\n#     y hacia abajo con `move_down`;\n#     y desátala con `untie`.\n",
   "hints": [
     "Usa un bucle `for` para repasar las escobas que encuentres. ¡Todo lo demás va dentro del bucle!",
-    "Para saber cuántos pasos dar a la izquierda, resta la posición `x` de la escoba de la posición `x` de {wizard}.",
-    "¡Haz lo mismo con la `y` para los pasos hacia abajo! Luego usa esos números para caminar hasta la escoba y desatarla."
+    "Para saber cuántos pasos dar a la izquierda, resta la `x` de la escoba de la `x` de tu posición.",
+    "Para los pasos hacia abajo, resta tu `y` de la `y` de la escoba. ¡Luego usa esos números para caminar hasta ella y desatarla!"
   ],
-  "intro": "{mate} ha apilado las escobas de la fila junto al banco. ¡Las demás están tiradas por la paja! Cada una está a la izquierda de la anterior, y nunca más arriba. La última de todas siempre está en la casilla (6, 8). Para cada escoba, debemos contar cuántas casillas a la izquierda y cuántas abajo hay desde donde estás, caminar hasta allí, y desatarla. No pasa nada si está en la misma fila: un movimiento de cero pasos simplemente no hace nada.",
-  "outro": "¡Las tenemos! Has caminado hasta cada una perfectamente.",
+  "intro": "Ya hemos terminado con las escobas que estaban colgadas. ¡Las demás están tiradas por la paja! Desde donde estás, si usas `find_all` las encontrarás ordenadas empezando por la más cercana, y te puedes ir moviendo abajo y a la izquierda para ir desatando todas. Puedes calcular cuántos pasos tienes que andar desde donde estás en cada momento hasta la siguiente escoba, y así pasar por todas.",
+  "outro": "¡Terminamos con la paja! Has calculado cada distancia perfectamente.",
   "learned": "Ahora sabes que dentro del bucle un programa trabaja con la escoba de esa vuelta, así que las mismas cuentas sirven para todas.",
   "ways": {
     "three": "tres escobas en la paja",
-    "four": "cuatro escobas",
-    "four_high": "cuatro escobas, una en la fila de arriba"
+    "three_low": "tres escobas, más abajo",
+    "three_mid": "tres escobas, en medio"
   }
 }

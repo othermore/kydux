@@ -1,0 +1,22 @@
+{
+  "title": "The brooms on the wall",
+  "goals": [
+    "Leave no broom knotted.",
+    "Walk along the wall at least as far as cell (8, 6).",
+    "Use `for`."
+  ],
+  "starting_code": "# Walk up to the wall with `move_up`.\n# Go left to under the first peg with `move_left`.\n# Find the hung brooms with `find_all`.\n# For each broom of the list:\n#     untie it with `untie`\n#     and take a step right with `move_right`.\n",
+  "hints": [
+    "Move 2 steps up and 3 left to stand under the first peg.",
+    "Use `find_all` to get a list of the hung brooms, then start a `for` loop to go through them.",
+    "Inside the loop, remember to leave spaces before `untie` and `move_right` so the program knows they belong to each turn!"
+  ],
+  "intro": "I've set the brooms in the straw aside for later. Let's take care of the hung ones first. We need to walk along the wall and untie each one.",
+  "outro": "We did it! The brooms on the wall are safe.",
+  "learned": "Now you know that a `for` over a list runs its lines once for each broom, so that one program serves however many there are.",
+  "ways": {
+    "two": "two brooms on the wall",
+    "three": "three brooms",
+    "four": "four brooms"
+  }
+}

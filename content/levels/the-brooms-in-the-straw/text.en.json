@@ -5,18 +5,18 @@
     "End on cell (6, 8).",
     "Use `x`."
   ],
-  "starting_code": "# Find all the brooms with `find_all`.\n\n# For each broom:\n\n# Count the steps left with `position.x`.\n\n# Count the steps down with `position.y`.\n\n# Move left with `move_left`.\n\n# Move down with `move_down`.\n\n# Untie it with `untie`.\n",
+  "starting_code": "# Find all the brooms with `find_all`.\n# For each broom of the list:\n#     count the steps left with `position.x`\n#     and the steps down with `position.y`;\n#     move left with `move_left`\n#     and down with `move_down`;\n#     and untie it with `untie`.\n",
   "hints": [
     "Use a `for` loop to go through the brooms you find. Everything else goes inside the loop!",
-    "To find how many steps left to take, subtract the broom's `x` position from {wizard}'s `x` position.",
-    "Do the same with `y` to find the steps down. Then use those numbers to walk to the broom and untie it!"
+    "To know how many steps to take left, subtract the broom's `x` from your own `x`.",
+    "For the steps down, subtract your `y` from the broom's `y`. Then use those numbers to walk to it and untie it!"
   ],
-  "intro": "{mate} has stacked the brooms from the row by the bench. The rest are scattered in the straw! Each one is to the left of the last, and never above it. The very last one is always on cell (6, 8). For each broom, we need to count how many cells left and how many down it is from where you stand, walk there, and untie it. Don't worry if it's on the same row: a move of zero steps simply does nothing.",
-  "outro": "We got them! You moved to each one perfectly.",
+  "intro": "We're done with the brooms that were hanging. The rest are scattered in the straw! From where you are, if you use `find_all` you'll find them in order, starting with the nearest, and you can keep moving down and to the left to untie them all. You can work out how many steps you have to walk from where you are at each moment to the next broom, and so go through them all.",
+  "outro": "All done with the straw! You calculated every distance perfectly.",
   "learned": "Now you know that inside the loop a program works with that turn's broom, so the same counts serve for every one.",
   "ways": {
     "three": "three brooms in the straw",
-    "four": "four brooms",
-    "four_high": "four brooms, one on the row above"
+    "three_low": "three brooms, lower down",
+    "three_mid": "three brooms, in between"
   }
 }

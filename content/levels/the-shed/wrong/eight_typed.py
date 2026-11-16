@@ -1,0 +1,1 @@
+wizard.say("8")

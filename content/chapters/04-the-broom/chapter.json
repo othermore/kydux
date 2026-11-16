@@ -3,10 +3,12 @@
   "music": "the-broom",
   "items": [
     "story:the-morning-after",
+    "lesson:the-broom",
+    "level:the-broom-at-your-feet",
     "lesson:lists",
     "level:the-shed",
     "lesson:for-each",
-    "level:the-brooms-in-a-row",
+    "level:the-brooms-on-the-wall",
     "level:the-brooms-in-the-straw",
     "lesson:checking-each",
     "level:the-check",

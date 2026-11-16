@@ -1,0 +1,123 @@
+{
+  "id": "the-broom-at-your-feet",
+  "kind": "practice",
+  "scene": "the-broom-shed",
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "zones": {
+    "wall": [
+      [
+        6,
+        6,
+        13,
+        6
+      ]
+    ],
+    "straw": [
+      [
+        6,
+        7,
+        13,
+        8
+      ]
+    ]
+  },
+  "tick_limit": 100,
+  "start": [
+    9,
+    8
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        8,
+        8
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        10,
+        8
+      ]
+    }
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_0",
+      "at": [
+        9,
+        8
+      ],
+      "zone": "straw",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_6",
+      "at": [
+        6,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_7",
+      "at": [
+        7,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_8",
+      "at": [
+        8,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_9",
+      "at": [
+        9,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    }
+  ],
+  "api": [
+    "wizard.find_nearest",
+    "broom.untie"
+  ],
+  "goals": [
+    {
+      "kind": "untied",
+      "ids": [
+        "broom_0"
+      ]
+    },
+    {
+      "kind": "uses",
+      "member": "find_nearest",
+      "bonus": true
+    }
+  ]
+}

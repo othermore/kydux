@@ -1,21 +1,21 @@
 {
   "title": "The shed",
   "goals": [
-    "Say how many brooms there are.",
-    "Print the list."
+    "Say how many brooms there are in all, with `say`.",
+    "Print a list with `print`."
   ],
-  "starting_code": "# Find all the brooms with `find_all`.\n\n# Print the list with `print`.\n\n# Say how many there are with `say` and `len`.\n",
+  "starting_code": "# Find the brooms down here with `find_all`.\n# Walk up to the wall with `move_up`.\n# Find the hung ones with `find_all`.\n# Say how many there are in all with `say` and `len`.\n",
   "hints": [
-    "We need to find all the brooms first, even the ones hiding in the straw! Use `find_all` and keep them in a variable.",
-    "You can look at the whole list by putting your variable inside `print`.",
-    "To count the brooms, use `len` with your list inside, and put all of that inside `say`!"
+    "Use `find_all` from where you are to get the first list, and save it in a variable.",
+    "After walking to the wall, use `find_all` again and save that new list in another variable.",
+    "You can add the `len` of the first list and the `len` of the second list together, right inside `say`!"
   ],
-  "intro": "First things first: how many are there? Someone has turned the shed upside down, and the brooms lie scattered in the straw, which nearly hides them. If any are missing, someone took them! Find them all and tell us the number.",
-  "outro": "So that's how many there are! Now we need to check them carefully. I think someone tampered with them.",
-  "learned": "Now you know what a list is, that `len` says how many values it has, and that `find_all` gives every thing of a kind as a list, even hidden ones.",
+  "intro": "But how many are there? And how do we find them? Remember that from here you can find the ones in the straw, and by the wall the hung ones.",
+  "outro": "That's all of them! Now we can start untying the rest.",
+  "learned": "Now you know that `find_all` gives a list of what you find where you stand, and that two lists' `len` add up.",
   "ways": {
     "six": "six brooms",
-    "eight": "eight brooms",
-    "nine": "nine brooms"
+    "seven": "seven brooms",
+    "eight": "eight brooms"
   }
 }

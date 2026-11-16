@@ -2,22 +2,22 @@
   "title": "La revisión",
   "goals": [
     "No dejes ninguna escoba con nudo.",
-    "Termina en la última escoba, (13, 6).",
+    "Camina junto a la pared al menos hasta la casilla (11, 6).",
     "El programa termina sin error.",
     "Usa `knotted`."
   ],
-  "starting_code": "# ¡Este es el programa que revisa cada escoba, pero se para en la primera!\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    right = broom.position.x - wizard.position.x\n    up = wizard.position.y - broom.position.y\n    wizard.move_right(right)\n    wizard.move_up(up)\n    broom.untie()\n",
+  "starting_code": "# ¡El programa que usamos para la pared se para en la primera escoba!\nwizard.move_up(2)\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    broom.untie()\n    wizard.move_right()\n",
   "hints": [
     "El programa intenta desatar todas las escobas, ¡pero desatar una escoba sin nudo es un error!",
     "Solo queremos desatar una escoba si realmente tiene un nudo. Mira su atributo para ver si está anudada antes de usar el método.",
-    "¡Pon un `if` dentro del bucle para mirar `knotted`, justo antes de desatar, y no olvides añadir espacios antes del método para que esté dentro del `if`!"
+    "¡Pon un `if` dentro del bucle para mirar `broom.knotted`, justo antes de desatar, y no olvides añadir espacios antes del método para que esté dentro del `if`!"
   ],
-  "intro": "{mate} ha dejado todas las escobas en el suelo, desde el rincón hasta la paca, para darles un último repaso. ¡Algunas se nos escaparon y siguen con nudo! He cogido el último programa y lo he cambiado para que vaya hacia la derecha y hacia arriba a revisarlas todas. ¡Pero se para en la primera escoba, porque esa no tiene nudo, y desatar una escoba sin nudo es un error! La última escoba está en (13, 6).",
+  "intro": "{mate} ha dejado todas las escobas ordenadas, colgadas en sus ganchos en la pared. Se ha dado cuenta de que algunas todavía tienen un nudo encantado. ¡Algunas se nos escaparon, así que hay que repasarlas! He puesto el programa que usamos para recorrer las escobas en la pared, para ir una por una desatando el nudo. ¡Pero se para en la primera escoba, porque esa no tiene nudo, y desatar una escoba sin nudo es un error! ¿Puedes arreglar el programa con un `if`? Para ver si una escoba tiene nudo, se puede usar su atributo `knotted`.",
   "outro": "¡Uf! Todas las escobas están a salvo. ¡Y justo a tiempo, oigo que viene la clase!",
   "learned": "Ahora sabes que un `if` dentro de un `for` decide en cada vuelta, y que un método que necesita algo se usa después de mirar el atributo que lo dice.",
   "ways": {
     "six": "seis escobas, dos con nudo",
-    "eight": "ocho escobas, dos con nudo",
-    "nine": "nueve escobas, tres con nudo"
+    "seven": "siete escobas, tres con nudo",
+    "eight": "ocho escobas, dos con nudo"
   }
 }

@@ -95,7 +95,7 @@
     "unknown_action": "`{object}` does not know an action called `{name}`.",
     "no_new_attribute": "You cannot give `{object}` a new `{name}`. What `{object}` can do is in its notebook.",
     "no_knot": "This broom has no knot, so there is nothing to untie, and the program stops here. Before untying a broom, look whether it has a knot.",
-    "index_range": "The list doesn't have that many: it has {count}, and you asked for number {asked}.",
+    "index_range": "The list doesn't have that many: it has {count}, and you wanted number {asked}.",
     "index_range_unknown": "The list doesn't have as many as you asked for."
   },
   "things": {

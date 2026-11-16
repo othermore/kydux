@@ -1,65 +1,37 @@
 {
-  "id": "the-brooms-in-a-row",
+  "id": "the-brooms-on-the-wall",
   "kind": "practice",
   "scene": "the-broom-shed",
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "zones": {
+    "wall": [
+      [
+        6,
+        6,
+        13,
+        6
+      ]
+    ],
+    "straw": [
+      [
+        6,
+        7,
+        13,
+        8
+      ]
+    ]
+  },
+  "tick_limit": 100,
   "start": [
     9,
     8
   ],
   "end": [
-    9,
+    8,
     6
-  ],
-  "speaker": "friend",
-  "carrying": [
-    "wand"
-  ],
-  "things": [
-    {
-      "kind": "broom",
-      "id": "broom_1",
-      "at": [
-        6,
-        6
-      ],
-      "knotted": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_2",
-      "at": [
-        7,
-        6
-      ],
-      "knotted": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_3",
-      "at": [
-        8,
-        6
-      ],
-      "knotted": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_4",
-      "at": [
-        9,
-        6
-      ],
-      "knotted": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_5",
-      "at": [
-        10,
-        6
-      ],
-      "knotted": true
-    }
   ],
   "actors": [
     {
@@ -77,6 +49,52 @@
         10,
         8
       ]
+    }
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_6",
+      "at": [
+        6,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_7",
+      "at": [
+        7,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_8",
+      "at": [
+        8,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_9",
+      "at": [
+        9,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
     }
   ],
   "api": [
@@ -103,32 +121,31 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
   "ways": [
+    {
+      "id": "two",
+      "things": [
+        {
+          "id": "broom_8",
+          "gone": true
+        },
+        {
+          "id": "broom_9",
+          "gone": true
+        }
+      ]
+    },
     {
       "id": "three",
       "things": [
         {
-          "id": "broom_4",
-          "gone": true
-        },
-        {
-          "id": "broom_5",
+          "id": "broom_9",
           "gone": true
         }
       ]
     },
     {
-      "id": "four",
-      "things": [
-        {
-          "id": "broom_5",
-          "gone": true
-        }
-      ]
-    },
-    {
-      "id": "five"
+      "id": "four"
     }
   ]
 }

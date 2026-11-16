@@ -1,21 +1,21 @@
 {
   "title": "El cobertizo",
   "goals": [
-    "Di cuántas escobas hay.",
-    "Imprime la lista."
+    "Di cuántas escobas hay en total, con `say`.",
+    "Imprime una lista con `print`."
   ],
-  "starting_code": "# Encuentra todas las escobas con `find_all`.\n\n# Imprime la lista con `print`.\n\n# Di cuántas hay con `say` y `len`.\n",
+  "starting_code": "# Encuentra las escobas de aquí abajo con `find_all`.\n# Camina hacia arriba hasta la pared con `move_up`.\n# Encuentra las colgadas con `find_all`.\n# Di cuántas hay en total con `say` y `len`.\n",
   "hints": [
-    "¡Primero debemos encontrar todas las escobas, incluso las escondidas en la paja! Usa `find_all` y guárdalas en una variable.",
-    "Puedes ver la lista entera si pones tu variable dentro de `print`.",
-    "¡Para contar las escobas, usa `len` con tu lista dentro, y pon todo eso dentro de `say`!"
+    "Usa `find_all` desde donde estás para obtener la primera lista, y guárdala en una variable.",
+    "Después de caminar hasta la pared, vuelve a usar `find_all` y guarda esa nueva lista en otra variable.",
+    "¡Puedes sumar el `len` de la primera lista y el `len` de la segunda, directamente dentro de `say`!"
   ],
-  "intro": "Antes de nada: ¿cuántas hay? Alguien ha revuelto el cobertizo y las escobas están tiradas entre la paja, que casi las tapa. ¡Si falta alguna, es que alguien se la ha llevado! Encuéntralas todas y dinos el número.",
-  "outro": "¡Así que esas son todas las que hay! Ahora debemos revisarlas con cuidado. Creo que alguien las ha tocado.",
-  "learned": "Ahora sabes qué es una lista, que `len` dice cuántos valores tiene, y que `find_all` da todas las cosas de una clase como una lista, aunque no se vean.",
+  "intro": "Pero ¿cuántas son? Y ¿cómo las encontramos? Recuerda que desde aquí puedes encontrar las que están en la paja, y junto a la pared las que están colgadas.",
+  "outro": "¡Esas son todas! Ahora podemos empezar a desatar el resto.",
+  "learned": "Ahora sabes que `find_all` da una lista de lo que encuentras donde estás, y que el `len` de dos listas se puede sumar.",
   "ways": {
     "six": "seis escobas",
-    "eight": "ocho escobas",
-    "nine": "nueve escobas"
+    "seven": "siete escobas",
+    "eight": "ocho escobas"
   }
 }

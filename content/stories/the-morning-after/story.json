@@ -169,58 +169,70 @@
         "things": [
           {
             "kind": "broom",
-            "id": "broom_1",
+            "id": "broom_6",
             "at": [
               6,
-              6
+              5
+            ],
+            "hung": true
+          },
+          {
+            "kind": "broom",
+            "id": "broom_7",
+            "at": [
+              7,
+              5
+            ],
+            "hung": true
+          },
+          {
+            "kind": "broom",
+            "id": "broom_8",
+            "at": [
+              8,
+              5
+            ],
+            "hung": true
+          },
+          {
+            "kind": "broom",
+            "id": "broom_9",
+            "at": [
+              9,
+              5
+            ],
+            "hung": true
+          },
+          {
+            "kind": "broom",
+            "id": "broom_0",
+            "at": [
+              9,
+              8
+            ]
+          },
+          {
+            "kind": "broom",
+            "id": "broom_1",
+            "at": [
+              7,
+              7
             ]
           },
           {
             "kind": "broom",
             "id": "broom_2",
             "at": [
-              7,
-              6
+              12,
+              7
             ]
           },
           {
             "kind": "broom",
             "id": "broom_3",
             "at": [
-              8,
-              6
-            ]
-          },
-          {
-            "kind": "broom",
-            "id": "broom_4",
-            "at": [
-              8,
-              7
-            ]
-          },
-          {
-            "kind": "broom",
-            "id": "broom_5",
-            "at": [
-              11,
-              7
-            ]
-          },
-          {
-            "kind": "broom",
-            "id": "broom_6",
-            "at": [
-              12,
+              6,
               8
-            ]
-          },
-          {
-            "kind": "broom",
-            "id": "broom_7",
-            "at": [
-              13,
-              6
             ]
           }
         ]
@@ -253,16 +265,31 @@
             8
           ]
         }
-      ]
+      ],
+      "camera": {
+        "fit": [
+          [
+            3,
+            3
+          ],
+          [
+            16,
+            10
+          ]
+        ]
+      }
     },
     {
       "who": "friend",
       "do": {
-        "face": "up"
+        "face": "right"
       }
     },
     {
-      "who": "friend"
+      "who": "friend",
+      "do": {
+        "face": "down"
+      }
     }
   ]
 }

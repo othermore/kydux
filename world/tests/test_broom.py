@@ -603,33 +603,52 @@ def cells_found(level):
     return [tuple(broom.position) for broom in world.wizard.find_all("broom")]
 
 
-@pytest.mark.parametrize("way", ["three", "four", "four_high"])
+def found_from(level, moves=()):
+    """The cells of the brooms find_all gives after the moves, nearest first (D196)."""
+    world = World(level)
+    for move, steps in moves:
+        getattr(world.wizard, move)(steps)
+    return [tuple(broom.position) for broom in world.wizard.find_all("broom")]
+
+
+@pytest.mark.parametrize("way", ["three", "three_low", "three_mid"])
 def test_in_the_straw_each_broom_lies_left_of_and_not_above_the_one_before(way):
-    level = content_level("the-brooms-in-the-straw").way(way)
-    found = cells_found(level)
-    assert found[-1] == (6, 8)
-    for before, after in zip([(11, 6), *found], found, strict=False):
+    found = found_from(content_level("the-brooms-in-the-straw").way(way))
+    assert len(found) == 3 and found[-1] == (6, 8)
+    for before, after in zip([(12, 7), *found], found, strict=False):
         assert after[0] < before[0] and after[1] >= before[1]
 
 
+@pytest.mark.parametrize(("way", "count"), [("two", 2), ("three", 3), ("four", 4)])
+def test_on_the_wall_find_all_gives_the_hung_brooms_left_to_right(way, count):
+    level = content_level("the-brooms-on-the-wall").way(way)
+    assert found_from(level) == []
+    found = found_from(level, [("move_up", 2), ("move_left", 3)])
+    assert found == [(column, 5) for column in range(6, 6 + count)]
+
+
 @pytest.mark.parametrize(
-    ("way", "count", "knots"), [("six", 6, 2), ("eight", 8, 2), ("nine", 9, 3)]
+    ("way", "count", "knots"), [("six", 6, 2), ("seven", 7, 3), ("eight", 8, 2)]
 )
-def test_in_the_check_each_broom_lies_right_of_and_not_below_the_one_before(way, count, knots):
-    level = content_level("the-check").way(way)
-    world = World(level)
+def test_in_the_check_the_hung_brooms_go_left_to_right_and_the_first_has_no_knot(
+    way, count, knots
+):
+    world = World(content_level("the-check").way(way))
+    world.wizard.move_up(2)
     brooms = world.wizard.find_all("broom")
     assert len(brooms) == count and sum(broom.knotted for broom in brooms) == knots
     assert not brooms[0].knotted
-    found = [tuple(broom.position) for broom in brooms]
-    assert found[-1] == (13, 6)
-    for before, after in zip([(6, 8), *found], found, strict=False):
-        assert after[0] >= before[0] and after[1] <= before[1]
+    assert [tuple(broom.position) for broom in brooms] == [(c, 5) for c in range(6, 6 + count)]
 
 
-@pytest.mark.parametrize(("way", "count"), [("six", 6), ("eight", 8), ("nine", 9)])
-def test_the_shed_has_six_eight_or_nine_brooms_by_the_way(way, count):
-    assert len(cells_found(content_level("the-shed").way(way))) == count
+@pytest.mark.parametrize(("way", "hung"), [("six", 2), ("seven", 3), ("eight", 4)])
+def test_the_shed_counts_four_in_the_straw_from_the_door_and_the_hung_ones_from_the_wall(
+    way, hung
+):
+    level = content_level("the-shed").way(way)
+    assert len(found_from(level)) == 4
+    assert all(cell[1] in (7, 8) for cell in found_from(level))
+    assert len(found_from(level, [("move_up", 2)])) == hung
 
 
 def test_the_race_and_the_rematch_have_zarek_cross_at_fifty_five_and_fifty():

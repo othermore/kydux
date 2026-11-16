@@ -2,112 +2,39 @@
   "id": "the-shed",
   "kind": "practice",
   "scene": "the-broom-shed",
-  "start": [
-    9,
-    8
-  ],
   "speaker": "friend",
   "carrying": [
     "wand"
   ],
-  "things": [
-    {
-      "kind": "broom",
-      "id": "broom_1",
-      "at": [
-        7,
-        8
-      ],
-      "knotted": true,
-      "hidden": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_2",
-      "at": [
-        7,
-        7
-      ],
-      "knotted": true,
-      "hidden": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_3",
-      "at": [
-        8,
-        7
-      ],
-      "knotted": true,
-      "hidden": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_4",
-      "at": [
-        9,
-        7
-      ],
-      "knotted": true,
-      "hidden": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_5",
-      "at": [
-        9,
-        6
-      ],
-      "knotted": true,
-      "hidden": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_6",
-      "at": [
-        10,
-        6
-      ],
-      "knotted": true,
-      "hidden": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_7",
-      "at": [
-        11,
-        6
-      ],
-      "knotted": true,
-      "hidden": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_8",
-      "at": [
-        12,
-        6
-      ],
-      "knotted": true,
-      "hidden": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_9",
-      "at": [
+  "zones": {
+    "wall": [
+      [
+        6,
+        6,
         13,
         6
-      ],
-      "knotted": true,
-      "hidden": true
-    }
+      ]
+    ],
+    "straw": [
+      [
+        6,
+        7,
+        13,
+        8
+      ]
+    ]
+  },
+  "tick_limit": 100,
+  "start": [
+    9,
+    8
   ],
   "actors": [
     {
       "kind": "friend",
       "id": "friend",
       "at": [
-        8,
+        10,
         8
       ]
     },
@@ -115,12 +42,105 @@
       "kind": "friend",
       "id": "mate",
       "at": [
-        10,
-        8
+        8,
+        7
       ]
     }
   ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_6",
+      "at": [
+        6,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_7",
+      "at": [
+        7,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_8",
+      "at": [
+        8,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_9",
+      "at": [
+        9,
+        5
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_0",
+      "at": [
+        9,
+        8
+      ],
+      "zone": "straw",
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        10,
+        7
+      ],
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        8,
+        8
+      ],
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_3",
+      "at": [
+        6,
+        8
+      ],
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
+    }
+  ],
   "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
     "wizard.find_all",
     "wizard.say"
   ],
@@ -135,36 +155,31 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
   "ways": [
     {
       "id": "six",
       "things": [
         {
-          "id": "broom_2",
+          "id": "broom_8",
           "gone": true
         },
         {
-          "id": "broom_5",
-          "gone": true
-        },
-        {
-          "id": "broom_7",
+          "id": "broom_9",
           "gone": true
         }
       ]
     },
     {
-      "id": "eight",
+      "id": "seven",
       "things": [
         {
-          "id": "broom_5",
+          "id": "broom_9",
           "gone": true
         }
       ]
     },
     {
-      "id": "nine"
+      "id": "eight"
     }
   ]
 }

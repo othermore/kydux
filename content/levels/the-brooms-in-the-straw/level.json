@@ -2,19 +2,96 @@
   "id": "the-brooms-in-the-straw",
   "kind": "practice",
   "scene": "the-broom-shed",
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "zones": {
+    "wall": [
+      [
+        6,
+        6,
+        13,
+        6
+      ]
+    ],
+    "straw": [
+      [
+        6,
+        7,
+        13,
+        8
+      ]
+    ]
+  },
+  "tick_limit": 100,
   "start": [
-    11,
-    6
+    12,
+    7
   ],
   "end": [
     6,
     8
   ],
-  "speaker": "friend",
-  "carrying": [
-    "wand"
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        12,
+        8
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        13,
+        7
+      ]
+    }
   ],
   "things": [
+    {
+      "kind": "broom",
+      "id": "broom_6",
+      "at": [
+        6,
+        5
+      ],
+      "hung": true,
+      "zone": "wall"
+    },
+    {
+      "kind": "broom",
+      "id": "broom_7",
+      "at": [
+        7,
+        5
+      ],
+      "hung": true,
+      "zone": "wall"
+    },
+    {
+      "kind": "broom",
+      "id": "broom_8",
+      "at": [
+        8,
+        5
+      ],
+      "hung": true,
+      "zone": "wall"
+    },
+    {
+      "kind": "broom",
+      "id": "broom_9",
+      "at": [
+        9,
+        5
+      ],
+      "hung": true,
+      "zone": "wall"
+    },
     {
       "kind": "broom",
       "id": "broom_1",
@@ -22,16 +99,20 @@
         10,
         7
       ],
-      "knotted": true
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
     },
     {
       "kind": "broom",
       "id": "broom_2",
       "at": [
         8,
-        7
+        8
       ],
-      "knotted": true
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
     },
     {
       "kind": "broom",
@@ -40,34 +121,9 @@
         6,
         8
       ],
-      "knotted": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_4",
-      "at": [
-        6,
-        8
-      ],
-      "knotted": true
-    }
-  ],
-  "actors": [
-    {
-      "kind": "friend",
-      "id": "friend",
-      "at": [
-        12,
-        6
-      ]
-    },
-    {
-      "kind": "friend",
-      "id": "mate",
-      "at": [
-        12,
-        7
-      ]
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
     }
   ],
   "api": [
@@ -97,58 +153,37 @@
       "bonus": true
     }
   ],
-  "tick_limit": 100,
   "ways": [
     {
-      "id": "three",
-      "things": [
-        {
-          "id": "broom_4",
-          "gone": true
-        }
-      ]
+      "id": "three"
     },
     {
-      "id": "four",
-      "things": [
-        {
-          "id": "broom_2",
-          "at": [
-            9,
-            8
-          ]
-        },
-        {
-          "id": "broom_3",
-          "at": [
-            7,
-            8
-          ]
-        }
-      ]
-    },
-    {
-      "id": "four_high",
+      "id": "three_low",
       "things": [
         {
           "id": "broom_1",
           "at": [
-            10,
-            6
+            11,
+            8
           ]
         },
         {
           "id": "broom_2",
           "at": [
             9,
-            7
+            8
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": "three_mid",
+      "things": [
         {
-          "id": "broom_3",
+          "id": "broom_2",
           "at": [
-            7,
-            7
+            9,
+            8
           ]
         }
       ]

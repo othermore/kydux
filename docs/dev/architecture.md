@@ -2886,3 +2886,27 @@ one overturns stays, marked as superseded.
   none. The world checks the box against the scene. The scene's parent says it in
   `data-camera-fit` (`x0,y0,x1,y1` or `wide`). Rules out a story where a place is seen
   in pieces.
+- **D197 — The broom is taught before the lists, with a practice of one `untie`.**
+  Decided 2026-11-11 by the owner (*una primera práctica sencilla: una escoba justo a tus
+  pies, búscala con find_nearest y quítale el nudo con untie*). The lesson `the-broom`,
+  *La escoba y su nudo*, comes first in chapter 4, after the story: the broom is an object,
+  `knotted` says whether the black thread is tied in it, `untie()` takes it off from the
+  broom's cell or from under it where it hangs, and `find_nearest` finds it, as it found a
+  key; its second page is D196's rule, with the shed's two places as the example. Two
+  pages and no block (D174). The practice `the-broom-at-your-feet` follows: one broom by
+  the door, at the wizard's feet, one `find_nearest` and one `untie`; its `untied` goal
+  names that broom alone (`ids`), the hung ones above it being for the eye. The lesson
+  unlocks `broom.untie`; `broom.knotted` is unlocked by *An if inside the loop*, where it
+  is used. Rules out `untie` used in a level before it is explained.
+- **D198 — The lists' lesson teaches one element by its index; the loop's lesson shows
+  both ways.** Decided 2026-11-11 by the owner. `lists` has a third page, *Uno de la
+  lista*: `nombres[0]` is the first, counting from 0 as the cells do, `nombres[2]` the
+  third; asking for one the list does not have, `nombres[3]` in a list of three, is an
+  error the world explains in the child's words, `index_range` with the list's length and
+  the place asked for counted from 1 (*La lista no tiene tantos: tiene 3, y pediste el
+  4.º*), read from the failing line's names and numbers, or `index_range_unknown` when the
+  line does not say it so plainly; a lesson's run explains it too. Its block prints the
+  first and the last. `for-each` has two pages, each with its block: `for broom in
+  brooms:`, and `for i in range(len(brooms)):` with `brooms[i]`, the index counting the
+  turns, with when each way is handy. Rules out a child who meets `[0]` for the first
+  time in a challenge.

@@ -1,1 +1,0 @@
-wizard.say("6")

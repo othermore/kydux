@@ -1,0 +1,12 @@
+# La escoba y su nudo
+
+Una escoba es un objeto, igual que las llaves o las puertas. Cuando un programa la guarda en un nombre, `broom`, puede mirar su atributo `broom.knotted`. Este atributo es `True` mientras el hilo negro sigue anudado y `False` una vez que se lo quitas.
+
+También puedes usar su método `broom.untie()`, que desata el nudo, pero solo funciona cuando tu {mago|maga} está encima de la escoba, o, si la escoba cuelga de un gancho, justo debajo de ella.
+
+Para encontrar la escoba, `wizard.find_nearest("broom")` te da la más cercana, igual que nos daba una llave en la biblioteca.
+
+---
+## Lo que encuentras depende de dónde estés
+
+No siempre puedes encontrar todo: a veces, desde donde estás, solo encuentras algunas cosas. Por ejemplo, en este cobertizo, si estás junto a la pared en la que se cuelgan las escobas, solo encontrarás las escobas colgadas, y si estás en la paja, encontrarás las que están tiradas en el suelo.

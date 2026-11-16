@@ -548,14 +548,14 @@
   "race": {
     "reading": "Ilda reads the programs: you, {mine} lines; {name}, {theirs}.",
     "left": "You take off in {mine}; {name}, in {theirs}.",
-    "count": "Ilda's count: your lines ({lines}) + your flight ({flight}) + the penalty ({penalty}) = {tick} ticks. {name}: {racer_lines} + {racer_flight} = {racer_tick} ticks.",
-    "count_unfinished": "Ilda's count: you did not cross the finish. {name}: {racer_lines} + {racer_flight} = {racer_tick} ticks.",
-    "tie": "It's a tie! The race is flown again.",
-    "judged_clean": "You flew through every ring. Your count: {tick} ticks. {name}'s count: {racer_tick}.",
-    "judged_missed": "Rings missed: {missed}. Penalty: {penalty} ticks. Your count: {tick} ticks. {name}'s count: {racer_tick}.",
-    "judged_unfinished": "You did not reach the finish line, so {name} wins.",
-    "wins_wizard": "You won, {wizard}!",
-    "wins_racer": "{name} wins this time."
+    "judged_wizard": "{wizard} took {own} ticks and {name} took {theirs}, and therefore {wizard} has won.",
+    "judged_racer": "{wizard} took {own} ticks and {name} took {theirs}, and therefore {name} has won.",
+    "judged_tie": "{wizard} took {own} ticks and {name} took {theirs}. It is a tie! The race is flown again.",
+    "judged_penalty_racer": "{wizard} took {own} ticks and {name} took {theirs}. But {wizard} had a penalty of {penalty} ticks, and therefore {name} has won.",
+    "judged_penalty_wizard": "{wizard} took {own} ticks and {name} took {theirs}. {wizard} had a penalty of {penalty} ticks, but has won even so.",
+    "judged_penalty_tie": "{wizard} took {own} ticks and {name} took {theirs}. But {wizard} had a penalty of {penalty} ticks, so with it they are tied. The race is flown again.",
+    "judged_slower": "{wizard} took {own} ticks and {name} took {theirs}. In addition, {wizard} had a penalty of {penalty} ticks, and therefore {name} has won.",
+    "judged_unfinished": "{wizard} did not cross the finish, and therefore {name} has won."
   },
   "about": {
     "link": "About",

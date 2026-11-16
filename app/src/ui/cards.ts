@@ -174,14 +174,12 @@ export interface WinCardParts {
   /** What the level's speaker says after it (D45), and what the child now knows (D62). */
   said?: Said;
   learned?: string;
-  /** In a race, Ilda's count (D189). */
-  race?: string | null;
 }
 
 /** You did it, the stars and why, what the speaker says, what the child learned,
  * Play again, and Next; after the course's last item, the word that there is no
  * next yet and the way to the map. */
-export function winCard({ verdict, kept, next, onAgain, onNext, said, learned, race }: WinCardParts): Card {
+export function winCard({ verdict, kept, next, onAgain, onNext, said, learned }: WinCardParts): Card {
   const earned = Math.max(verdict.earned, kept);
   // The stars are the card's event: big, each drawn in after the one before with a
   // little bounce; the earned ones gold, the others an outline (12.5).
@@ -221,12 +219,10 @@ export function winCard({ verdict, kept, next, onAgain, onNext, said, learned, r
         element('a', { id: 'to-map', className: 'quiet-button', href: '#map' }, [t('map.open_map')]),
       ]);
   const card = overlay(
-    // A race's card carries Ilda's count too, and is laid out wider to fit the scene.
-    race ? 'win-card win-card-race' : 'win-card',
+    'win-card',
     [
       element('h3', {}, [t('outcome.won')]),
       shown,
-      ...(race ? [element('p', { id: 'card-race', className: 'card-race' }, [race])] : []),
       reasons,
       ...keeping,
       // The story's word and what was learned, smaller, under the stars and their reasons.

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { initLanguage } from '../i18n';
-import { explanationText, outcomeText, raceCount } from './outcome';
+import { explanationText, outcomeText } from './outcome';
 
 const english = { languages: ['en'], storage: null };
 const spanish = { languages: ['es'], storage: null };
@@ -90,45 +90,7 @@ describe('an error explained', () => {
   });
 });
 
-describe("Ilda's count after a race (D189)", () => {
-  const before = (tick: number | null) => [
-    { kind: 'through_in_order', params: { missed: [] } },
-    {
-      kind: 'before',
-      params: { racer: 'zarek', lines: 11, flight: 38, penalty: 0, tick, racer_lines: 14, racer_tick: 55 },
-    },
-  ];
-
-  it('says the lines, the flight and the penalty and the ticks they add up to, and the racer\'s', () => {
-    initLanguage(spanish);
-    expect(raceCount(before(49))).toBe(
-      'La cuenta de Ilda: tus líneas (11) + tu vuelo (38) + la penalización (0) = 49 ticks. Zarek: 14 + 41 = 55 ticks.',
-    );
-    initLanguage(english);
-    expect(raceCount(before(null))).toBe("Ilda's count: you did not cross the finish. Zarek: 14 + 41 = 55 ticks.");
-  });
-
-  it('says at equal ticks that it is a tie and the race is flown again (D220)', () => {
-    initLanguage(spanish);
-    const tied = [
-      { kind: 'through_in_order', params: { missed: [] } },
-      {
-        kind: 'before',
-        params: { racer: 'zarek', lines: 18, flight: 42, penalty: 0, tick: 60, racer_lines: 18, racer_tick: 60, tie: true },
-      },
-    ];
-    expect(raceCount(tied)).toBe(
-      'La cuenta de Ilda: tus líneas (18) + tu vuelo (42) + la penalización (0) = 60 ticks. Zarek: 18 + 42 = 60 ticks. ¡Es un empate! La carrera se repite.',
-    );
-    initLanguage(english);
-    expect(raceCount(tied)).toMatch(/= 60 ticks\. It's a tie! The race is flown again\.$/);
-  });
-
-  it('says nothing for a level that is no race', () => {
-    expect(raceCount([{ kind: 'reach', params: {} }])).toBeNull();
-    expect(raceCount(undefined)).toBeNull();
-  });
-
+describe('what the world explains, in the child\'s words', () => {
   it('explains a broom with no knot in the child\'s words (D183)', () => {
     initLanguage(spanish);
     expect(explanationText({ kind: 'no_knot', params: { thing: 'broom_1' } })).toMatch(/^Esta escoba no tiene nudo/);

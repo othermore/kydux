@@ -1377,8 +1377,8 @@ class LevelScene extends Phaser.Scene {
 
   /** Ilda's band at the scene's foot in a race (D189, D234): her portrait and her
    * words. While she reads the programs, the lines read of each, ticking down, until
-   * both have taken off; from the race's `judged` event, her verdict, its last
-   * sentence in bold, which stays until the run starts again. */
+   * both have taken off; from the race's `judged` event, her verdict, which stays
+   * until the run starts again. */
   private raceBand(tick: number, events: WorldEvent[], instant: boolean): void {
     const race = this.map.race;
     if (!race) return;
@@ -1392,9 +1392,7 @@ class LevelScene extends Phaser.Scene {
       picture.src = contentUrl(`art/portraits/${RACE_JUDGE}.webp`);
       picture.alt = '';
       picture.dataset.portrait = RACE_JUDGE;
-      const words = document.createElement('p');
-      words.append(document.createElement('span'), document.createElement('strong'));
-      band.append(picture, words);
+      band.append(picture, document.createElement('p'));
       this.parentNode.append(band);
     }
     if (tick === 0) {
@@ -1407,8 +1405,7 @@ class LevelScene extends Phaser.Scene {
     const judged = events.find((event) => event.kind === 'judged');
     if (judged) {
       this.verdict = raceVerdict(judged.data);
-      const whole = `${this.verdict.count} ${this.verdict.winner}`.trim();
-      this.verdictRead = instant ? 0 : this.time.now + readingMs(whole);
+      this.verdictRead = instant ? 0 : this.time.now + readingMs(this.verdict);
     }
     const mine = this.readLines;
     const name = characterName(race.against);
@@ -1420,11 +1417,10 @@ class LevelScene extends Phaser.Scene {
           theirs: Math.max(race.lines - tick, 0),
         })}`
       : '';
-    const verdict = this.verdict ? `${this.verdict.count} ${this.verdict.winner}`.trim() : '';
+    const verdict = this.verdict ?? '';
     band.hidden = !said && !verdict;
-    const [plain, strong] = [band.querySelector('span'), band.querySelector('strong')];
-    if (plain) plain.textContent = this.verdict ? `${this.verdict.count} ` : said;
-    if (strong) strong.textContent = this.verdict?.winner ?? '';
+    const words = band.querySelector('p');
+    if (words) words.textContent = verdict || said;
     if (said) this.parentNode.dataset.raceBand = said;
     else delete this.parentNode.dataset.raceBand;
     if (verdict) this.parentNode.dataset.raceVerdict = verdict;
@@ -1433,7 +1429,7 @@ class LevelScene extends Phaser.Scene {
 
   /** Ilda's verdict in the run shown, and when it is read to its end, by the scene's
    * clock (D234). */
-  private verdict: { count: string; winner: string } | null = null;
+  private verdict: string | null = null;
   private verdictRead = 0;
 
   /** The lines Ilda reads of the wizard's program in the run shown (D189). */

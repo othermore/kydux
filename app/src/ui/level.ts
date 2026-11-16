@@ -26,7 +26,7 @@ import { element } from './dom';
 import { type GoalsPanel, type GoalsShape, goalsPanel, takeShape } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
 import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
-import { type Outcome, type OutcomeCard, outcomeCard, raceCount } from './outcome';
+import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
 import { openPlan, type PlanWindow } from './plan';
 import { portraitOf } from './portraits';
 import { withCode } from './words';
@@ -403,7 +403,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       foldedByPage = true;
     }, FOLD_AFTER);
   };
-  const showWin = (verdict: Verdict, kept: number, race: string | null) =>
+  const showWin = (verdict: Verdict, kept: number) =>
     showCard(
       winCard({
         verdict,
@@ -415,7 +415,6 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         },
         said: said(text.outro),
         learned: text.learned,
-        race,
       }),
     );
 
@@ -483,7 +482,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     snapshot.goals.forEach((mark, index) => goals.set(index, mark));
     renderWays(snapshot, force);
     if (force || snapshot.outcome !== shownOutcome) {
-      if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed, raceCount(snapshot.world?.goals));
+      if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed);
       else card.hide();
       if (!force && snapshot.outcome) judged = true;
       // A run's end has its sound (the settings may silence it).
@@ -500,7 +499,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         progress.markWon(loaded.id, verdict.earned);
         // Continue, on the start screen, goes to what comes after.
         if (parts.next) progress.setCurrent(parts.next);
-        showWin(verdict, kept, raceCount(snapshot.world.goals));
+        showWin(verdict, kept);
       } else if (!force && shownCard?.node.querySelector('.win-card')) {
         shownCard.close();
       }

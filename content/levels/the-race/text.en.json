@@ -11,7 +11,7 @@
     "Since the four pairs are at different distances, give your function those two arguments so it serves for all of them.",
     "For each call, count the cells from one ring to the next: those are the two numbers you give the function."
   ],
-  "intro": "Let's have a race! But it is not enough to cross the finish line first! There are penalties if you make a very long program or if you skip rings. For every line in your program, I will make you wait one turn before leaving, and for every ring you skip, I will add five turns to your count at the end of the race. In case of a tie, the race is flown again. Zarek's program has 18 lines; if you manage to make yours shorter, it will be easier to beat Zarek. Try to do it with a function with arguments: the function can pass two rings, and with the arguments you tell it how far away the next ring is.",
+  "intro": "Let's have a race! But it is not enough to cross the finish line first! There are penalties if you make a very long program or if you skip rings. For every line in your program, I will make you wait one tick before leaving, and for every ring you skip, there will be a penalty of five ticks. In case of a tie, the race is flown again. Zarek's program has 18 lines; if you manage to make yours shorter, it will be easier to beat Zarek. Try to do it with a function with arguments: the function can pass two rings, and with the arguments you tell it how far away the next ring is.",
   "outro": "You won! Sometimes, it is better to have a short program, and on the race course every tick counts.",
   "learned": "Now you know that a function's arguments let one function serve for pairs at different distances, and that a short program takes off sooner."
 }

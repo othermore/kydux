@@ -122,27 +122,25 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
   }
 }
 
-/** Ilda's verdict of a race, from its `judged` event (D234), in two parts. `count`:
- * the rings missed with their penalty, or that every ring was flown through, and the
- * two counts; that the finish was not crossed when it was not. `winner`: who has won,
- * or that it is a tie; empty when the finish was not crossed, which `count` says with
- * its winner. */
-export function raceVerdict(data: Record<string, unknown>): { count: string; winner: string } {
+/** Ilda's verdict of a race, from its `judged` event (D234): the ticks each racer took
+ * to cross the finish, the wizard's penalty when it has one, and who has won, or that
+ * it is a tie and the race is flown again; that the finish was not crossed when it was
+ * not. */
+export function raceVerdict(data: Record<string, unknown>): string {
   const name = characterName(String(data.racer));
-  if (data.tick === null || data.tick === undefined) {
-    return { count: t('race.judged_unfinished', { name }), winner: '' };
+  if (data.tick === null || data.tick === undefined) return t('race.judged_unfinished', { name });
+  const penalty = Number(data.penalty);
+  // What the wizard took is its count without the penalty: its lines and its flight.
+  const said = { name, own: Number(data.tick) - penalty, theirs: Number(data.racer_tick), penalty };
+  const tie = data.winner === null || data.winner === undefined;
+  if (penalty === 0) {
+    if (data.winner === 'wizard') return t('race.judged_wizard', said);
+    return tie ? t('race.judged_tie', said) : t('race.judged_racer', said);
   }
-  const said = {
-    name,
-    missed: Number(data.missed),
-    penalty: Number(data.penalty),
-    tick: Number(data.tick),
-    racer_tick: Number(data.racer_tick),
-  };
-  const count = said.missed > 0 ? t('race.judged_missed', said) : t('race.judged_clean', said);
-  if (data.winner === 'wizard') return { count, winner: t('race.wins_wizard') };
-  if (data.winner === null || data.winner === undefined) return { count, winner: t('race.tie') };
-  return { count, winner: t('race.wins_racer', { name }) };
+  if (data.winner === 'wizard') return t('race.judged_penalty_wizard', said);
+  if (tie) return t('race.judged_penalty_tie', said);
+  // Slower even before the penalty, which is then one thing more and not the reason.
+  return said.own > said.theirs ? t('race.judged_slower', said) : t('race.judged_penalty_racer', said);
 }
 
 /** Who stands in the wizard's way: a friend, by the name the story gives them (D66, D77). */

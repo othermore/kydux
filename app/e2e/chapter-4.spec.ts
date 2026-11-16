@@ -543,28 +543,34 @@ test.describe('the rings and the race', () => {
     // to be read (D234, D175).
     await expect(scene(page)).toHaveAttribute(
       'data-race-verdict',
-      'Has pasado por todos los aros. Tu cuenta: 54 ticks. La de Zarek: 61. ¡Has ganado, Marta!',
+      'Marta ha tardado 54 ticks y Zarek ha tardado 61, y por tanto ha ganado Marta.',
       { timeout: ciTimes(120_000) },
     );
-    await expect(band.locator('strong')).toHaveText('¡Has ganado, Marta!');
+    await expect(band.locator('p')).toHaveText('Marta ha tardado 54 ticks y Zarek ha tardado 61, y por tanto ha ganado Marta.');
     await expect(page.locator('.win-card')).toHaveCount(0);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}race-verdict.png` });
-    await expect(page.locator('#card-race')).toContainText('= 54 ticks', { timeout: ciTimes(120_000) });
-    await expect(page.locator('#card-race')).toContainText('Zarek: 18 + 43 = 61 ticks');
+    // The card that follows says the numbers no more: they are Ilda's to say.
+    await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(120_000) });
+    await expect(page.locator('.win-card')).not.toContainText('61');
     // Both land past the painted line, Zarek clear of the pole (D229).
     await expect(scene(page)).toHaveAttribute('data-wizard', '32,8');
     await expect(scene(page)).toHaveAttribute('data-actors', /zarek:32,12/);
     // Only the wizard's rings are counted; Zarek's light as he passes, his own.
     await expect(scene(page)).toHaveAttribute('data-through', 'ring_1,ring_2,ring_3,ring_4,ring_5,ring_6,ring_7,ring_8');
-    // The card with the count, the words and what was learned is seen whole, unscrolled.
+    // The card with the stars, the words and what was learned is seen whole, unscrolled.
     const card = page.locator('.win-card');
     expect(await card.evaluate((node) => node.scrollHeight - node.clientHeight)).toBe(0);
-    await page.screenshot({ path: `${SHOTS}race-count-card.png` });
+    // The stars are drawn in one after another: the picture waits for the last.
+    await page.waitForTimeout(ciTimes(1500));
+    await page.screenshot({ path: `${SHOTS}race-won-card.png` });
     await page.locator('#again').click();
     await page.locator('#speed').selectOption('4');
     await run(page, wrong('the-race', 'eighteen_lines'));
-    await expect(page.locator('#outcome-race')).toContainText('= 61 ticks. Zarek: 18 + 43 = 61 ticks. ¡Es un empate! La carrera se repite.');
-    await expect(scene(page)).toHaveAttribute('data-race-verdict', /La de Zarek: 61\. ¡Es un empate! La carrera se repite\.$/);
+    await expect(scene(page)).toHaveAttribute(
+      'data-race-verdict',
+      'Marta ha tardado 61 ticks y Zarek ha tardado 61. ¡Es un empate! La carrera se repite.',
+    );
+    await expect(page.locator('.outcome')).not.toContainText('61');
     await expect(page.locator('.win-card')).toHaveCount(0);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}race-tie.png` });
   });
@@ -574,26 +580,49 @@ test.describe('the rings and the race', () => {
     // Two pairs skipped: the wizard crosses the finish well before Zarek, in the air
     // all the way, and loses by Ilda's count.
     await start(page, wrong('the-race', 'two_pairs_skipped'));
-    const missed = 'Aros saltados: 4. Penalización: 20 ticks. Tu cuenta: 65 ticks. La de Zarek: 61. Esta vez ha ganado Zarek.';
+    const missed =
+      'Marta ha tardado 45 ticks y Zarek ha tardado 61. Pero Marta ha tenido una penalización de 20 ticks, y por tanto ha ganado Zarek.';
     await expect(scene(page)).toHaveAttribute('data-race-verdict', missed, { timeout: ciTimes(120_000) });
     await expect(scene(page)).toHaveAttribute('data-wizard', '32,8');
     await expect(page.locator('.outcome')).toBeHidden();
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}race-verdict-missed.png` });
     await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
     await expect(page.locator('.win-card')).toHaveCount(0);
-    await expect(page.locator('#outcome-race')).toContainText('la penalización (20) = 65 ticks');
+    await expect(page.locator('.outcome')).not.toContainText('61');
     // The verdict stays on the band until the run starts again.
     await expect(scene(page)).toHaveAttribute('data-race-verdict', missed);
     await page.screenshot({ path: `${SHOTS}race-missed-card.png` });
   });
 
+  test("one pair skipped still wins by Ilda's count, and the extra goals' star is lost (D233, D234)", async ({ page }) => {
+    await open(page, 'the-race');
+    // The third pair flown past: 11 lines and 39 cells are 50 ticks, and with 10 of
+    // penalty 60, under Zarek's 61.
+    const code = solution('the-race').replace('two_rings(2, 4)\ntwo_rings(3, 2)', 'wizard.move_right(6)\ntwo_rings(3, 2)');
+    expect(code).toContain('wizard.move_right(6)');
+    expect(await run(page, code)).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute(
+      'data-race-verdict',
+      'Marta ha tardado 50 ticks y Zarek ha tardado 61. Marta ha tenido una penalización de 10 ticks, pero aun así ha ganado.',
+    );
+    // The rings are an extra goal: missed, they cost the third star and its reason says so.
+    const reason = page.locator('#star-reasons li', { hasText: 'Los objetivos extra cumplidos' });
+    await expect(reason).toHaveAttribute('data-kept', 'false');
+    await expect(page.locator('.win-card .star.earned')).toHaveCount(2);
+    // The stars are drawn in one after another: the picture waits for the last.
+    await page.waitForTimeout(ciTimes(1500));
+    await page.screenshot({ path: `${SHOTS}race-pair-skipped-card.png` });
+  });
+
   test("in the rematch the race's program misses seven rings, and the numbers mended win at 54", async ({ page }) => {
     await open(page, 'the-rematch');
     expect(await run(page, wrong('the-rematch', 'the_race_s_program'))).not.toMatch(/^¡Lo has conseguido/);
-    await expect(page.locator('#outcome-race')).toContainText('la penalización (35) = 89 ticks');
-    await expect(scene(page)).toHaveAttribute('data-race-verdict', /^Aros saltados: 7\. Penalización: 35 ticks\./);
+    await expect(scene(page)).toHaveAttribute(
+      'data-race-verdict',
+      /^Marta ha tardado 54 ticks y Zarek ha tardado \d+\. Pero Marta ha tenido una penalización de 35 ticks, y por tanto ha ganado Zarek\.$/,
+    );
     expect(await run(page, solution('the-rematch'))).toMatch(/^¡Lo has conseguido/);
-    await expect(page.locator('#card-race')).toContainText('= 54 ticks');
+    await expect(scene(page)).toHaveAttribute('data-race-verdict', /^Marta ha tardado 54 ticks .* y por tanto ha ganado Marta\.$/);
   });
 });
 

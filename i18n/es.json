@@ -548,14 +548,14 @@
   "race": {
     "reading": "Ilda lee los programas: tú, {mine} líneas; {name}, {theirs}.",
     "left": "Despegas en {mine}; {name}, en {theirs}.",
-    "count": "La cuenta de Ilda: tus líneas ({lines}) + tu vuelo ({flight}) + la penalización ({penalty}) = {tick} ticks. {name}: {racer_lines} + {racer_flight} = {racer_tick} ticks.",
-    "count_unfinished": "La cuenta de Ilda: no has cruzado la meta. {name}: {racer_lines} + {racer_flight} = {racer_tick} ticks.",
-    "tie": "¡Es un empate! La carrera se repite.",
-    "judged_clean": "Has pasado por todos los aros. Tu cuenta: {tick} ticks. La de {name}: {racer_tick}.",
-    "judged_missed": "Aros saltados: {missed}. Penalización: {penalty} ticks. Tu cuenta: {tick} ticks. La de {name}: {racer_tick}.",
-    "judged_unfinished": "No has cruzado la meta, así que gana {name}.",
-    "wins_wizard": "¡Has ganado, {wizard}!",
-    "wins_racer": "Esta vez ha ganado {name}."
+    "judged_wizard": "{wizard} ha tardado {own} ticks y {name} ha tardado {theirs}, y por tanto ha ganado {wizard}.",
+    "judged_racer": "{wizard} ha tardado {own} ticks y {name} ha tardado {theirs}, y por tanto ha ganado {name}.",
+    "judged_tie": "{wizard} ha tardado {own} ticks y {name} ha tardado {theirs}. ¡Es un empate! La carrera se repite.",
+    "judged_penalty_racer": "{wizard} ha tardado {own} ticks y {name} ha tardado {theirs}. Pero {wizard} ha tenido una penalización de {penalty} ticks, y por tanto ha ganado {name}.",
+    "judged_penalty_wizard": "{wizard} ha tardado {own} ticks y {name} ha tardado {theirs}. {wizard} ha tenido una penalización de {penalty} ticks, pero aun así ha ganado.",
+    "judged_penalty_tie": "{wizard} ha tardado {own} ticks y {name} ha tardado {theirs}. Pero {wizard} ha tenido una penalización de {penalty} ticks, y con ella hay un empate. La carrera se repite.",
+    "judged_slower": "{wizard} ha tardado {own} ticks y {name} ha tardado {theirs}. Además, {wizard} ha tenido una penalización de {penalty} ticks, y por tanto ha ganado {name}.",
+    "judged_unfinished": "{wizard} no ha cruzado la meta, y por tanto ha ganado {name}."
   },
   "about": {
     "link": "Qué es Kydux",

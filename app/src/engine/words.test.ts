@@ -89,50 +89,58 @@ describe('what a flight cannot cross, and a walk what a flight can (D186, D187)'
 });
 
 describe('Ilda\'s verdict of a race (D234)', () => {
-  const judged = (missed: number, tick: number | null, winner: string | null) => ({
+  // The wizard's 11 lines, and a flight of `flight` ticks; Zarek's count is 61.
+  const judged = (flight: number | null, missed: number, winner: string | null) => ({
     at: [36, 8],
     lines: 11,
-    flight: tick === null ? null : 43,
+    flight,
     missed,
     penalty: missed * 5,
-    tick,
+    tick: flight === null ? null : 11 + flight + missed * 5,
     racer: 'zarek',
     racer_lines: 18,
     racer_tick: 61,
     winner,
   });
+  const took = (own: number) => `Kydux ha tardado ${own} ticks y Zarek ha tardado 61`;
 
-  it('says the two counts and the winner when every ring was flown through', () => {
+  it('says what each one took and therefore who has won, with no penalty', () => {
     initLanguage(spanish);
-    expect(raceVerdict(judged(0, 54, 'wizard'))).toEqual({
-      count: 'Has pasado por todos los aros. Tu cuenta: 54 ticks. La de Zarek: 61.',
-      winner: '¡Has ganado, Kydux!',
-    });
+    expect(raceVerdict(judged(43, 0, 'wizard'))).toBe(`${took(54)}, y por tanto ha ganado Kydux.`);
+    expect(raceVerdict(judged(52, 0, 'zarek'))).toBe(`${took(63)}, y por tanto ha ganado Zarek.`);
+    expect(raceVerdict(judged(50, 0, null))).toBe(`${took(61)}. ¡Es un empate! La carrera se repite.`);
     initLanguage(english);
-    expect(raceVerdict(judged(0, 54, 'wizard')).count).toBe(
-      "You flew through every ring. Your count: 54 ticks. Zarek's count: 61.",
+    expect(raceVerdict(judged(43, 0, 'wizard'))).toBe(
+      'Kydux took 54 ticks and Zarek took 61, and therefore Kydux has won.',
     );
   });
 
-  it('says the rings missed and their penalty before the counts, and that the racer has won', () => {
+  it('says the penalty after what each one took, and who has won with it', () => {
     initLanguage(spanish);
-    expect(raceVerdict(judged(4, 74, 'zarek'))).toEqual({
-      count: 'Aros saltados: 4. Penalización: 20 ticks. Tu cuenta: 74 ticks. La de Zarek: 61.',
-      winner: 'Esta vez ha ganado Zarek.',
-    });
+    // What the wizard took is its count without the penalty.
+    expect(raceVerdict(judged(35, 4, 'zarek'))).toBe(
+      `${took(46)}. Pero Kydux ha tenido una penalización de 20 ticks, y por tanto ha ganado Zarek.`,
+    );
+    expect(raceVerdict(judged(39, 2, 'wizard'))).toBe(
+      `${took(50)}. Kydux ha tenido una penalización de 10 ticks, pero aun así ha ganado.`,
+    );
+    expect(raceVerdict(judged(40, 2, null))).toBe(
+      `${took(51)}. Pero Kydux ha tenido una penalización de 10 ticks, y con ella hay un empate. La carrera se repite.`,
+    );
+    // Slower before the penalty: it is one thing more, not the reason.
+    expect(raceVerdict(judged(52, 1, 'zarek'))).toBe(
+      `${took(63)}. Además, Kydux ha tenido una penalización de 5 ticks, y por tanto ha ganado Zarek.`,
+    );
+    // The same before the penalty: the penalty is the reason.
+    expect(raceVerdict(judged(50, 1, 'zarek'))).toMatch(/^Kydux ha tardado 61 ticks y Zarek ha tardado 61\. Pero Kydux/);
     initLanguage(english);
-    expect(raceVerdict(judged(4, 74, 'zarek'))).toEqual({
-      count: "Rings missed: 4. Penalty: 20 ticks. Your count: 74 ticks. Zarek's count: 61.",
-      winner: 'Zarek wins this time.',
-    });
+    expect(raceVerdict(judged(35, 4, 'zarek'))).toBe(
+      'Kydux took 46 ticks and Zarek took 61. But Kydux had a penalty of 20 ticks, and therefore Zarek has won.',
+    );
   });
 
-  it('says a tie at equal counts, and that the racer wins a race not finished', () => {
+  it('says that the racer has won a race the wizard did not finish, with no numbers', () => {
     initLanguage(spanish);
-    expect(raceVerdict(judged(0, 61, null)).winner).toBe('¡Es un empate! La carrera se repite.');
-    expect(raceVerdict(judged(8, null, 'zarek'))).toEqual({
-      count: 'No has cruzado la meta, así que gana Zarek.',
-      winner: '',
-    });
+    expect(raceVerdict(judged(null, 8, 'zarek'))).toBe('Kydux no ha cruzado la meta, y por tanto ha ganado Zarek.');
   });
 });

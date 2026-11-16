@@ -20,11 +20,15 @@ print("Posición:", wizard.position)
 ---
 ## Meter líneas hacia dentro
 
-Los cuatro espacios antes de una línea son la forma que tiene Python de saber que la línea está dentro del `if`. Nadie tiene que contarlos: en este editor, al pulsar Intro al final de una línea que acaba con dos puntos, la siguiente línea empieza ya metida hacia dentro, y las que van después se quedan dentro.
+Los cuatro espacios antes de una línea son la forma que tiene Python de saber que la línea está dentro del `if`.
 
-La tecla Tab pone cuatro espacios a la vez para meter una línea hacia dentro, y está a la izquierda del teclado, encima de la tecla de bloqueo de mayúsculas, a menudo dibujada con dos flechas. La tecla de borrar, la que tiene una flecha larga hacia la izquierda, pulsada en los espacios antes de una línea, quita los cuatro de golpe: una pulsación saca la línea. Cuatro pulsaciones de la barra espaciadora son lo mismo para Python; con Tab, simplemente, se hace antes.
+La tecla Tab pone cuatro espacios a la vez para meter una línea hacia dentro, y que así no tengas que escribir los cuatro espacios tú. Es una tecla a la izquierda del teclado, encima de la tecla de bloqueo de mayúsculas. A veces tiene dibujadas una o dos flechas hacia los lados.
 
-Ejecuta el código de abajo, y se imprime una línea, la de fuera. Pon el cursor al principio de la última línea, pulsa Tab y ejecútalo de nuevo: no se imprime nada, porque la línea ahora está dentro del `if` y Dask no mira hacia abajo. Pulsa la tecla de borrar ahí y ejecútalo una vez más: la línea ha salido del `if`, y se vuelve a imprimir.
+Una vez que estás escribiendo dentro del `if`, cada vez que pulsas Intro se añaden los espacios solos, para seguir dentro.
+
+La tecla de borrar, que está encima del Intro y suele tener una flecha hacia la izquierda, borra los cuatro espacios, para volver a escribir fuera del `if`.
+
+Puedes probarlo {tú mismo|tú misma}. Prueba a poner el cursor al principio de la última línea y pulsar Tab. Verás que la línea se mueve dentro del `if`, y si lo ejecutas ya no se imprimirá. Si borras los espacios y vuelves a ejecutar, la línea sí se imprimirá.
 
 ```python try
 if dask.facing == "down":

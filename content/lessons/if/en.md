@@ -20,11 +20,15 @@ print("Position:", wizard.position)
 ---
 ## Moving lines in
 
-The four spaces before a line are how Python knows that the line is inside the `if`. Nobody has to count them: in this editor, pressing Enter at the end of a line that ends with a colon starts the next line already moved in, and the lines after it stay in.
+The four spaces before a line are how Python knows that the line is inside the `if`.
 
-The Tab key puts four spaces at once to move a line in, and is at the keyboard's left, above the Caps Lock key, often drawn with two arrows. The Backspace key, the one with the long arrow that points left, pressed in the spaces before a line, takes the four away at once: one press brings the line out. Four presses of the space bar are the same for Python; Tab is only quicker.
+The Tab key puts four spaces at once to move a line in, so that you do not have to type the four spaces yourself. It is a key at the keyboard's left, above the Caps Lock key. Sometimes it has one or two arrows drawn on it that point to the sides.
 
-Run the code below, and one line is printed, the one outside. Put the cursor at the start of the last line, press Tab, and run it again: nothing is printed, because the line is now inside the `if` and Dask does not look down. Press Backspace there and run it once more: the line is out of the `if` again, and it is printed again.
+Once you are writing inside the `if`, every time you press Enter the spaces are added for you, to stay inside.
+
+The Backspace key, which is above Enter and often has an arrow that points left, deletes the four spaces, to write outside the `if` again.
+
+You can try it yourself. Put the cursor at the start of the last line and press Tab. You will see that the line moves inside the `if`, and if you run it, it will not be printed any more. If you delete the spaces and run it again, the line will be printed.
 
 ```python try
 if dask.facing == "down":

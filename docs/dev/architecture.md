@@ -3794,13 +3794,14 @@ one overturns stays, marked as superseded.
   espacios seguidos. Quizás haga falta una página para poner todo eso*). The first lesson
   whose code has lines inside another, `lesson:if` (chapter 3), has a page of its own for
   it, after the one that shows the condition: the four spaces tell Python that a line is
-  inside; Enter after the colon starts the next line already moved in; the Tab key puts
-  four spaces; the delete key in a line's leading spaces takes four away at once; four
-  presses of the space bar count the same. Its block is tried with those keys: a line
-  taken in and brought out, and the output read each time (D174). The child reads *moved
-  in*, the course's words, and no new technical word. Shift+Tab stays in the settings'
-  list of keys. Rules out a child who counts spaces one by one, or who never learns why a
-  line moved.
+  inside; the Tab key puts the four at once, so that nobody types them one by one, and
+  the page says where the key is and what is drawn on it; Enter, while writing inside the
+  `if`, starts the next line already moved in; the delete key takes the four away at
+  once, to write outside again. Its block is tried with those keys: a line taken in and
+  brought out, and the output read each time (D174). The page's words are the owner's own
+  (D141). The child reads *moved in*, the course's words, and no new technical word.
+  Shift+Tab stays in the settings' list of keys. Rules out a child who counts spaces one
+  by one, or who never learns why a line moved.
 - **D251 — The opening's first steps are told over the painting of the castle.** Decided
   2026-11-16 by the owner (*al empezar la historia se muestra una imagen del castillo
   junto al lago. Hasta ahora no la había visto porque el nivel carga enseguida. Hay que

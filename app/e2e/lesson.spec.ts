@@ -111,7 +111,8 @@ for (const [lesson, level] of [
 }
 
 test.describe('a page taller than the window', () => {
-  test.use({ viewport: { width: 1280, height: 800 } });
+  // A low window, which the page with the most to read does not fit in.
+  test.use({ viewport: { width: 1280, height: 600 } });
 
   test('is read from its top, its button holding the focus below', async ({ page }) => {
     await page.goto('/#lesson/if');

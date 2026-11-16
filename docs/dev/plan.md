@@ -667,7 +667,13 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     scene and a tip for a child who has begun (D214), `drevo` cast in the air that lands
     (D215), the walkthrough in one arrangement (D216), the shed from the easy to the
     hard, the check on the wall's own brooms and one broom before all of them (D217),
-    and a long program given as comments, one for each instruction (D218).
+    and a long program given as comments, one for each instruction (D218); and, in
+    `sprint-44.md`, a ring flown one way, rings in pairs of a colour (D219), the race in
+    two lanes with a tie flown again (D220), a tip with its picture at every new scene,
+    the screen opening by itself (D221), a card opened at its top and the start card
+    closed by any button (D222), the code's letter one of three tried under `?debug`,
+    a comment never broken by hand (D223), the knot untied and never the broom (D224),
+    and a walked step three ticks where the wizard can fly (D225).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

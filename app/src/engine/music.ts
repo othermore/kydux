@@ -85,7 +85,7 @@ export interface Loop {
  * effects above it (0.2 for a cast). */
 const LEVEL = 0.5;
 /** A lesson's and a level's share of a story's loudness (D210). */
-const LOWER = 0.7;
+const LOWER = 0.4;
 /** How long a change of loudness or of theme takes, in seconds. */
 export const FADE = 2;
 /** How far ahead of the audio clock the notes are scheduled, and how often, in seconds. */

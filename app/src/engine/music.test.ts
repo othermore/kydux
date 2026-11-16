@@ -65,20 +65,20 @@ describe('the music (D192)', () => {
     }
   });
 
-  it('plays every voice a story plays in a level too, each at 0.7 of its loudness (D210)', () => {
+  it('plays every voice a story plays in a level too, each at 0.4 of its loudness (D210)', () => {
     const theme = waltz(120);
     const story = voiceLevels(theme, 'story');
     expect(story).toEqual({ tune: 0.8, bass: 0.5 });
     const level = voiceLevels(theme, 'level');
     expect(Object.keys(level)).toEqual(Object.keys(story));
-    for (const [name, loudness] of Object.entries(story)) expect(level[name]).toBeCloseTo(loudness * 0.7);
+    for (const [name, loudness] of Object.entries(story)) expect(level[name]).toBeCloseTo(loudness * 0.4);
   });
 
   it('gives a voice set by hand its volume, none to silence it (D203)', () => {
     const theme = waltz(120);
     expect(voiceLevels(theme, 'story', { tune: 0.2 })).toEqual({ tune: 0.2, bass: 0.5 });
     expect(voiceLevels(theme, 'story', { bass: 0 })).toEqual({ tune: 0.8, bass: 0 });
-    expect(voiceLevels(theme, 'level', { tune: 0.5 }).tune).toBeCloseTo(0.35);
+    expect(voiceLevels(theme, 'level', { tune: 0.5 }).tune).toBeCloseTo(0.2);
   });
 
   it('refuses a theme with arrangements: a theme has one set of voices (D210)', () => {

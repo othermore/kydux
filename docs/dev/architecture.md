@@ -2773,7 +2773,7 @@ one overturns stays, marked as superseded.
   scheduled a third of a second ahead on the audio clock; no sound file is loaded. A
   chapter's `chapter.json` names its theme (`music`), which the
   course carries; a story, the map and the start screen play their chapter's theme at its
-  written loudness, a lesson and a level every voice of it at 0.7 (D210), the map and the
+  written loudness, a lesson and a level every voice of it at 0.4 (D210), the map and the
   start screen in the chapter the child is in; the settings and the creator leave what
   plays. A change of loudness or of theme fades over two seconds. The music starts at the
   first gesture on the page, as a browser asks, goes on across screens without a break,
@@ -2787,15 +2787,15 @@ one overturns stays, marked as superseded.
   a bar from which the accompaniments are made, and shipped under the GPL as the code is:
   *Arrival* (dusk, outdoors, glad: a march in four in G, a celesta's skipping tune over a
   plucked bass, a flute's answer, a drum), *The library* (indoors, evening, calm: slow in
-  four in A minor, a piano's phrases and the celesta's answers taking turns over a harp
-  that climbs), *The passages* (night, a secret, eerie: very slow in E with its lowered
-  second, a low pad, a tritone against it, single notes far apart, an echo, a far
-  drum), *The broom* (a race: fast in four in E minor, a piano's short climbing cells over
-  a low voice that runs in eighth notes, the drum on every beat) and *The familiar* (the
-  tower: a slow chorale in C that opens out, the flute taking its top line). A test holds
-  every chapter to a theme, every theme to its rules, and the files to what the score
-  makes. Rules out loaded music files and a score that names or quotes any work under
-  copyright.
+  four in A minor, a piano's phrases and the celesta's answers taking turns over a harp that
+  climbs), *The passages* (night, a secret, time running: in four in A minor with its
+  lowered second, a string plucked on every eighth note as a clock over a piano's low notes,
+  a horn's long notes and a piano's tune far under them), *The broom* (a race: fast in four
+  in E minor, a piano's short climbing cells over a low voice that runs in eighth notes, the
+  drum on every beat) and *The familiar* (the tower: a slow chorale in C that opens out, the
+  flute taking its top line). A test holds every chapter to a theme, every theme to its
+  rules, and the files to what the score makes. Rules out loaded music files and a score
+  that names or quotes any work under copyright.
 - **D193 — The page's look, and a welcome page.** Decided 2026-11-10 by the owner (*una
   página inicial de bienvenida que explique y venda qué es Kydux; el arte de todas las
   páginas: fondos, botones, cajas; limpio y fácil de usar para un niño, un poco más
@@ -3165,11 +3165,8 @@ one overturns stays, marked as superseded.
   beat and a chord pushed off the beat before each bar; its tune of short cells that
   climb by step and break off, and every few bars a surprise, a bar with no tune, a leap
   of register, a raised seventh left hanging; its loop ends in the air. *The passages* is
-  eerie: very slow, in E with its lowered second, a low pad that barely moves, a tritone
-  held against it, single notes of the celesta and the harp far apart, a note repeated
-  fading as an echo, a low drum now and then as a far door, no tune one could whistle.
-  The broom's theme is the owner's choice; the passages' waits for it, with three
-  candidates beside it (D213). *The familiar* waits until its chapter is seen. The page
+  the theme of D213, a clock that ticks at night. The broom's theme and the passages' are
+  the owner's choice by ear (D213). *The familiar* waits until its chapter is seen. The page
   sounds one more kind of voice, `piano`: a struck tone, bright at the hammer's blow, that
   starts at once and dies away by itself in a time of its pitch, however long the note is
   written (`pianoRing`).
@@ -3181,37 +3178,32 @@ one overturns stays, marked as superseded.
   instrumentos de relleno y se dejase la voz principal, pero creo que no es el caso*. A
   theme's file names its voices and no arrangements; the page refuses one that has them.
   A story, the map and the start screen play the theme at its written loudness; a lesson
-  and a level play the same voices, every one, at 0.7 of it (`voiceLevels`). The player
+  and a level play the same voices, every one, at 0.4 of it (`voiceLevels`, D213). The player
   is given no choice of voices. The mixer on `?debug#music` has two buttons a theme, as a
   story hears it and as a level hears it, lower, and its line names the theme and what is
   set apart from the file, with no word for an arrangement. When the owner chooses a
   theme on the mixer, they say the theme and the voices they turned off, if any, with the
   mixer's line; a voice turned off leaves the theme everywhere. Rules out a level's music
   without its tune, and two forms of a theme that differ in their instruments.
-- **D213 — The broom's theme is chosen, and the passages have three candidates in other
-  manners.** Decided 2026-11-13 by the owner, by ear on the mixer (*Para la música me
-  gusta the broom (la versión sin -b). La de the passages no me gusta. Sin la celesta
-  creo que me gustaría más, pero quiero escuchar otras cosas completamente distintas*),
-  who asked for the manner of a march played while someone steals into a guarded place.
-  `the-broom` is its chapter's theme and stands alone. `the-passages` is its chapter's
-  theme until the owner chooses, and beside it stand three candidates, each with a pulse
-  to walk to and none with a celesta. `the-passages-march` is a guard's round, in E minor
-  with its lowered second at 104 beats a minute: a plucked low figure that creeps, a
-  snare played softly with a roll every fourth bar, a timpani on the bar, chords plucked
-  off the beat, and a horn that calls in the first section, has the tune in the second
-  and holds long notes over the third, where the march steps lightly.
-  `the-passages-tiptoe` is someone young where they should not be, in D minor with the
-  chord a half step over it at 92: a plucked bass that walks up each chord and down, a
-  flute's short phrases with a breath between them, a harp's note over the bar, and the
-  eighth bar of each section held in silence over a soft drum. `the-passages-watch` is
-  time running, in A minor with its lowered second at 116: a string plucked on every
-  eighth note as a clock, a piano's low notes three, three and two, a horn's long notes
-  that rise a half step and wait, a piano's tune in the second section. The one chosen
-  takes the id `the-passages` and the others leave the tree (D209). The page sounds two
-  more kinds of voice: `brass`, a horn, a saw whose filter opens as the note is blown,
-  held for the note's length; and `snare`, a short rattle of noise over a skin's tone, a
-  tap whatever pitch and length are written. Every theme is the game's own notes and
-  quotes no other work's. A lesson and a level play a theme quieter and in no other way
-  (D210), and the mixer's second button says *a menos volumen*, *quieter*: *más bajo* is
-  read as a lower tone. Rules out a candidate that is the refused theme with a voice
-  less, and a note taken from another work.
+- **D213 — The broom's theme and the passages' are chosen by ear, the passages' in another
+  manner.** Decided 2026-11-13 by the owner, by ear on the mixer (*Para la música me gusta
+  the broom (la versión sin -b). La de the passages no me gusta. Sin la celesta creo que me
+  gustaría más, pero quiero escuchar otras cosas completamente distintas*), who asked for
+  the manner of a march played while someone steals into a guarded place and, of three
+  candidates in it, each with a pulse to walk to and none with a celesta, took the watch
+  with its horn and its tune turned down (*usemos: the-passages-watch: tune 0.20, horn
+  0.15*). `the-broom` is its chapter's theme and stands alone. `the-passages` is time
+  running while nobody must hear, in A minor with its lowered second at 116 beats a minute:
+  a string plucked on every eighth note as a clock, a piano's low notes three, three and two
+  under it, a timpani on the bar, a snare's roll at the end of each half of a section, and
+  far under them a horn's long notes that rise a half step and wait, at a volume of 0.15,
+  and a piano's tune in the second section, at 0.2. No candidate stands beside it (D209).
+  The page sounds two more kinds of voice: `brass`, a horn, a saw whose filter opens as the
+  note is blown, held for the note's length; and `snare`, a short rattle of noise over a
+  skin's tone, a tap whatever pitch and length are written. Every theme is the game's own
+  notes and quotes no other work's. A lesson and a level play a theme quieter and in no
+  other way (D210), at 0.4 of a story's loudness, which the ear tells from it at once (*la
+  diferencia de volumen entre normal y más bajo debe ser más clara*), and the mixer's second
+  button says *a menos volumen*, *quieter*: *más bajo* is read as a lower tone. Rules out a
+  theme that is the refused one with a voice less, a note taken from another work, the horn
+  or the tune over the clock, and a level's music as loud as a story's to the ear.

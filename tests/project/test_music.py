@@ -1,8 +1,7 @@
 """The music's themes (D192): each chapter names one, each parses, and each loops on a
 bar, with no note ringing over a section's end; the files are what the score in
-tools/sound/compose.py makes. A theme has one set of voices and no arrangements (D210).
-Beside the passages' theme are three candidates in other manners, for the owner's ear
-(D213)."""
+tools/sound/compose.py makes. A theme has one set of voices and no arrangements (D210),
+and no candidate stands beside a chapter's theme (D209)."""
 
 import importlib.util
 import json
@@ -27,16 +26,10 @@ def compose():
 
 
 CHAPTER_THEMES = ("arrival", "the-library", "the-passages", "the-broom", "the-familiar")
-CANDIDATES = ("the-passages-march", "the-passages-tiptoe", "the-passages-watch")
 
 
-def test_there_are_the_chapters_themes_and_the_passages_candidates():
-    assert {path.stem for path in THEMES} == {*CHAPTER_THEMES, *CANDIDATES}
-
-
-@pytest.mark.parametrize("path", CHAPTERS, ids=lambda p: p.parent.name)
-def test_no_chapter_names_a_candidate(path):
-    assert json.loads(path.read_text(encoding="utf-8")).get("music") not in CANDIDATES
+def test_there_are_the_chapters_themes_and_no_other():
+    assert {path.stem for path in THEMES} == set(CHAPTER_THEMES)
 
 
 @pytest.mark.parametrize("path", CHAPTERS, ids=lambda p: p.parent.name)
@@ -125,61 +118,23 @@ def test_the_broom_runs_fast_in_four_over_a_low_voice_that_never_stops():
     assert max(start + long for _, start, long, _ in last["notes"]["tune"]) == end
 
 
-def test_the_passages_are_slow_low_and_sparse_with_no_tune():
-    """D209: slow; the pad low; the celesta's and the harp's notes far apart, but for an
-    echo's repeated note."""
+def test_the_passages_tick_on_every_eighth_note_under_a_far_horn_and_tune():
+    """D213: in four at a walk's pace, with no celesta; the plucked clock never stops,
+    the piano's low notes come three, three and two, and the horn and the piano's tune
+    are the quietest voices, under the clock."""
     theme = loaded("the-passages")
-    assert theme["tempo"] <= 60
+    assert 100 <= theme["tempo"] <= 126 and theme["metre"] == [4, 4]
+    voices = theme["voices"]
+    assert "celesta" not in {voice["kind"] for voice in voices.values()}
+    assert voices["horn"]["kind"] == "brass" and voices["snare"]["kind"] == "snare"
+    far = max(voices["horn"]["volume"], voices["tune"]["volume"])
+    assert all(
+        far < voice["volume"] for name, voice in voices.items() if name not in ("horn", "tune")
+    )
     for section in theme["sections"]:
-        assert max(note[0] for note in section["notes"]["pad"]) <= 52
-        for voice in ("celesta", "harp"):
-            notes = sorted(section["notes"].get(voice, []), key=lambda note: note[1])
-            for one, other in zip(notes, notes[1:], strict=False):
-                assert other[1] - one[1] >= 1.5 or other[0] == one[0], (voice, one, other)
-
-
-def bars_with(section: dict, voice: str) -> set[int]:
-    return set(by_bar(section["notes"].get(voice, []), 4))
-
-
-@pytest.mark.parametrize("name", CANDIDATES)
-def test_a_candidate_of_the_passages_walks_in_four_with_no_celesta(name):
-    """D213: another manner than the slow night's: in four at a walk's pace or a march's,
-    a low voice in every bar but one where all holds its breath, a voice that has a tune,
-    and no celesta."""
-    theme = loaded(name)
-    assert 80 <= theme["tempo"] <= 126 and theme["metre"] == [4, 4]
-    kinds = {voice["kind"] for voice in theme["voices"].values()}
-    assert "celesta" not in kinds and kinds & {"flute", "brass", "piano"}
-    for section in theme["sections"]:
-        assert len(bars_with(section, "bass")) >= section["bars"] - 1, section["id"]
-
-
-def test_the_march_has_its_snare_and_its_horn():
-    """D213: the snare in every bar, marching or rolling, and the horn in every section."""
-    theme = loaded("the-passages-march")
-    assert theme["voices"]["snare"]["kind"] == "snare"
-    assert theme["voices"]["horn"]["kind"] == "brass"
-    for section in theme["sections"]:
-        assert section["notes"]["horn"]
-        marched = len(bars_with(section, "snare"))
-        assert marched == section["bars"] or section["id"] == "c" and marched == 4
-
-
-def test_the_tiptoe_holds_its_breath_for_a_bar():
-    """D213: in the eighth bar of each section nothing plucked and no flute, a soft drum."""
-    for section in loaded("the-passages-tiptoe")["sections"]:
-        for voice in ("flute", "bass", "chords", "harp"):
-            assert 7 not in bars_with(section, voice), (section["id"], voice)
-        assert 7 in bars_with(section, "drum")
-
-
-def test_the_watch_ticks_on_every_eighth_note():
-    """D213: the plucked clock never stops, and the piano's low notes come three, three
-    and two."""
-    for section in loaded("the-passages-watch")["sections"]:
         length = section["bars"] * 4
         assert sorted(note[1] for note in section["notes"]["tick"]) == [
             i / 2 for i in range(length * 2)
         ]
         assert {note[1] % 4 for note in section["notes"]["bass"]} == {0.0, 1.5, 3.0}
+        assert section["notes"]["horn"]

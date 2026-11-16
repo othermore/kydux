@@ -13,20 +13,9 @@ or later, like the rest of it. They quote no other work.
 |---|---|---|
 | `arrival` | 1, Arrival | dusk, outdoors, glad: a march in four in G, a celesta's skipping tune over a plucked bass and its chords, a flute's answer in its middle part, a drum |
 | `the-library` | 2, The library | indoors, evening, calm: slow in four in A minor, a piano's phrases with quick notes among the long ones and the celesta's answers, taking turns on the tune, over a harp that climbs and a low pad |
-| `the-passages` | 3, The passages | night, a secret, eerie: very slow in E with its lowered second, a low pad that barely moves, a tritone held against it, single notes of the celesta and the harp far apart, an echo, a far drum; no tune |
+| `the-passages` | 3, The passages | night, a secret, time running while nobody must hear: in four in A minor with its lowered second, a string plucked on every eighth note as a clock, a piano's low notes three, three and two, a timpani on the bar, a horn's long notes that rise a half step and wait, far off, a piano's tune in the second section kept under the clock, a snare's roll at the end of each half |
 | `the-broom` | 4, The broom | a race, tense: fast in four in E minor, a piano's short cells that climb and break off over a low voice running in eighth notes, the drum on every beat, a chord pushed off the beat; a bar with no tune, a leap, a raised seventh left hanging |
 | `the-familiar` | 5, The familiar | the tower: a slow chorale that opens out, a flute and a harp joining it |
-
-Beside the passages' theme are three candidates, for the owner's ear (D213): the same
-night in other manners, each with a pulse to walk to and none with the celesta. A
-chapter names its theme, never a candidate; the one chosen takes the id `the-passages`
-and the others leave this folder.
-
-| Candidate | Its manner |
-|---|---|
-| `the-passages-march` | a guard's round: a march in E minor with its lowered second, a plucked low figure that creeps, a snare played softly with a roll every fourth bar, a timpani on the bar, chords plucked off the beat, and a horn that calls, then has the tune, then holds long notes while the march steps lightly |
-| `the-passages-tiptoe` | someone young where they should not be: in D minor with the chord a half step over it, a plucked bass that walks up each chord and down, a chord plucked off the beat, a flute's short phrases with a breath between them, a harp's note over the bar, and a bar where all holds its breath but a soft drum |
-| `the-passages-watch` | time running while nobody must hear: in A minor with its lowered second, a string plucked on every eighth note as a clock, a piano's low notes three, three and two, a timpani on the bar, a horn's long notes that rise a half step and wait, a piano's tune in the second section, a snare's roll at the end of each half |
 
 ## The file
 

@@ -3948,32 +3948,43 @@ one overturns stays, marked as superseded.
   Rules out a letter the child is only told of, a drawing and a castle that do not
   match, words painted into the art or written over the seal, and words cut short with
   an ellipsis.
-- **D258 — In the first level the screen's guide comes first, and the start card after
-  it.** Decided 2026-11-16 by the owner (*hay que poner el tutorial primero y luego pasar
-  a la tarjeta que dice lo que tenemos que hacer en ese nivel*): a child who reads the
-  card and then the guide's eight steps has forgotten the card. The first time the first
-  level opens, no start card opens with the page. The guide (D68) opens by itself once the
-  scene has drawn the level's start and the goals box has taken its shape and is shown
-  (D227), so that every step outlines a part that is there. Ended or skipped, it gives way
-  to the start card (D248), and the level starts from the card's *Empezar*. The guide once
-  seen, the card opens with the page as in every level. *Enséñame la pantalla* on the card
-  closes the card, shows the guide, waiting the same way on a page still loading, and
-  opens the card again after it. Nothing is run while the guide is awaited or shown, and
-  the goals box does not fold until the card after it is closed. Rules out a card read
-  before the guide, a guide over a scene not drawn, a step about the goals with no goals
-  in sight, and a wait of its own length in place of the page's own word that the scene
-  and the box are shown.
+- **D258 — In the first level the screen's guide comes first, and the start card after it.**
+  Decided 2026-11-16 by the owner (*hay que poner el tutorial primero y luego pasar a la
+  tarjeta que dice lo que tenemos que hacer en ese nivel*): a child who reads the card and
+  then the guide's eight steps has forgotten the card. The first time the first level opens,
+  no start card opens with the page. The guide (D68) opens by itself once the scene has
+  drawn the level's start and the goals box has taken its shape and is shown (D227), so that
+  every step outlines a part that is there. Ended or skipped, it gives way to the start card
+  (D248), and the level starts from the card's *Empezar*. The guide once seen, the card
+  opens with the page as in every level. *Enséñame la pantalla* on the card closes the card,
+  shows the guide, waiting the same way on a page still loading, and opens the card again
+  after it. Nothing is run while the guide is awaited or shown, and the goals box does not
+  fold until the card after it is closed. Where the guide's words cannot be read, the card
+  opens with no guide, and the guide is still to be seen. Rules out a card read before the
+  guide, a guide over a scene not drawn, a step about the goals with no goals in sight, and
+  a wait of its own length in place of the page's own word that the scene and the box are
+  shown.
 - **D259 — A flight glides: flown steps that follow one another are one move at an even
   speed.** Decided 2026-11-16 from the owner's comment (*la escoba se mueve a trompicones…
   como si fuese frenándose y acelerando*). A figure in the air that flies one cell after
   another, the wizard or a racer, crosses them without a rest between: from the first cell
-  of a run of flown steps to its last, through the turns of its way and from one command
-  to the next, its place on the screen advances by the same length in the same time, and
-  it stands only where the program has it stand (a tick with no move, a bump, a landing,
-  the run's end). The camera that follows it adds no shake of its own. A flown cell still
-  takes a third of a walked one (D185); the trace, the ticks and the count are the world's
-  and are untouched, as are the gust (D243), the lift and the landing (D244), the hover
-  (D235, D242) and a walked step, which keeps its rest between steps under its frames and
-  its tap. Paused, stopped, moved by the timeline or shown at once, the figure is on its
-  cell as today. Rules out a move per cell shorter than its tick, a move per cell that
-  eases in and out, and a flight made slower to hide the rests.
+  of a run of flown steps to its last, through the turns of its way and from one command to
+  the next, its place on the screen advances by the same length in the same time, and it
+  stands only where the program has it stand (a tick with no move, a bump, a landing, the
+  run's end). The camera that follows it adds no shake of its own. A flown cell takes a
+  third of a walked one (D185); the trace, the ticks and the count are the world's and are
+  untouched, as are the gust (D243), the lift and the landing (D244), the hover (D235, D242)
+  and a walked step, which keeps its rest between steps under its frames and its tap.
+  Paused, stopped, moved by the timeline or shown at once, the figure is on its cell. It is
+  built from the ticks: `engine/flight.ts` holds a glide, the points a figure passes and
+  when it reaches each; the playback keeps its ticks on one clock, a tick due when the one
+  before it ended and the tick after a late timer following sooner, and reads a figure's run
+  of flown steps ahead; the scene puts each gliding figure where its glide has it by the
+  page's clock, each frame; and a camera that follows the wizard moves with it at once while
+  it glides (`SceneCamera.glide`), from where *Encuentra a mi mago* brings it back too. A
+  page held up for longer than a quarter of a second (`HELD`) starts the ticks' clock again
+  from there, and the glide's with it. A figure is never drawn farther ahead of the tick
+  shown than that, nor back from where it was drawn, and its glide lasts until the tick of
+  its last step is shown, so that at every speed the broom flies its way once and the rings,
+  the gusts and the count stay with it. Rules out a move per cell shorter than its tick, a
+  move per cell that eases in and out, and a flight made slower to hide the rests.

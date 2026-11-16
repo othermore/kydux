@@ -6,11 +6,14 @@ check sheets of its scenes, from the pictures e2e/walkthrough.spec.ts takes (`np
 walkthrough -- <chapter>` runs both), with a **Comentarios:** line under every picture.
 
     tools/walkthrough.py 03-passages
+    tools/walkthrough.py --levels eldras-door the-moving-key left-or-right
 
 It writes drafts/recorrido-capitulo-<n>-<date>.es.md and its pictures in the folder of
-the same name beside it, in Spanish, for the seeded wizard. A file already there may
-have the owner's comments in it, so it is never overwritten: the next one has a number
-after its date.
+the same name beside it, in Spanish, for the seeded wizard. With --levels it writes
+those levels alone, in the course's order, each under its chapter and with its number
+there, from its chapter's pictures, to drafts/recorrido-niveles-cambiados-<date>.es.md.
+A file already there may have the owner's comments in it, so it is never overwritten:
+the next one has a number after its date.
 """
 
 import datetime
@@ -45,10 +48,10 @@ def spoken(text: str) -> str:
     return text.replace("{wizard}", "Marta").replace("{friend}", "Teku").replace("{mate}", "Nuri")
 
 
-def free_path(drafts: Path, number: int, day: str) -> Path:
-    """Where the document goes: a name nothing has, since the owner may have written in
-    one that is there."""
-    stem = f"recorrido-capitulo-{number}-{day}"
+def free_path(drafts: Path, number: int | str, day: str) -> Path:
+    """Where the document goes, a chapter's by its number or one named: a name nothing
+    has, since the owner may have written in one that is there."""
+    stem = f"recorrido-capitulo-{number}-{day}" if isinstance(number, int) else f"{number}-{day}"
     path = drafts / f"{stem}.es.md"
     turn = 2
     while path.exists():
@@ -239,7 +242,62 @@ def write_document(chapter: str, repo: Path = REPO, day: str | None = None) -> P
     return target
 
 
+def write_levels(levels: list[str], repo: Path = REPO, day: str | None = None) -> Path:
+    """Some levels alone, in the course's order, each under its chapter's heading, with
+    its kind's number in its chapter and its chapter's pictures (sprint 42, 2.9)."""
+    content = repo / "content"
+    chapters = sorted(p.parent for p in (content / "chapters").glob("*/chapter.json"))
+    day = day or datetime.date.today().isoformat()
+    drafts = repo / "drafts"
+    drafts.mkdir(exist_ok=True)
+    target = free_path(drafts, "recorrido-niveles-cambiados", day)
+    pictures = drafts / target.name.removesuffix(".es.md")
+    document = Document(content, Path(), pictures)
+    document.lines += [
+        "# Los niveles cuyos textos cambian, de principio a fin\n",
+        f"Capturas del juego construido{built_from(repo)}, jugado por Marta en español, a 1280 "
+        f"por 800: los {len(levels)} niveles, en el orden del curso, cada uno como lo enseña "
+        "el recorrido de su capítulo. Debajo de cada captura hay una línea **Comentarios:** "
+        "para que escribas lo que ves mal.\n",
+        "---\n",
+    ]
+    found = []
+    for folder in chapters:
+        items = json.loads((folder / "chapter.json").read_text(encoding="utf-8"))["items"]
+        shown = False
+        kinds: dict[str, int] = {}
+        for item in items:
+            kind, _, item_id = item.partition(":")
+            if kind != "level":
+                continue
+            about = json.loads(
+                (content / "levels" / item_id / "level.json").read_text(encoding="utf-8")
+            )
+            name = KINDS.get(about.get("kind", "practice"), about.get("kind", ""))
+            if item_id in levels:
+                if not shown:
+                    title = json.loads((folder / "text.es.json").read_text(encoding="utf-8"))
+                    number = int(folder.name.split("-")[0])
+                    document.lines.append(f"# Capítulo {number}, {title['title']}\n")
+                    shown = True
+                document.shots = repo / "app" / "e2e" / "shots" / f"walkthrough-{folder.name}"
+                document.kinds = dict(kinds)
+                document.level(item_id)
+                document.lines.append("---\n")
+                found.append(item_id)
+            kinds[name] = kinds.get(name, 0) + 1
+    missing = sorted(set(levels) - set(found))
+    if missing:
+        raise ValueError(f"no level {', '.join(missing)} in the course")
+    target.write_text("\n".join(document.lines), encoding="utf-8")
+    print(f"{target}: {document.missing} pictures missing")
+    return target
+
+
 def main(arguments: list[str]) -> int:
+    if len(arguments) >= 2 and arguments[0] == "--levels":
+        write_levels(arguments[1:])
+        return 0
     if len(arguments) != 1:
         print(__doc__)
         return 2

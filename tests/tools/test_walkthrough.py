@@ -1,6 +1,6 @@
 """The walkthrough's document (tools/walkthrough.py): it says each stop in Marta's words,
-with a comments line under every picture, and never overwrites a file the owner may have
-written in."""
+with a comments line under every picture, never overwrites a file the owner may have
+written in, and shows some levels alone, each under its chapter with its number there."""
 
 import json
 import sys
@@ -79,3 +79,22 @@ def test_a_document_the_owner_may_have_written_in_is_never_overwritten(tmp_path)
     second = walkthrough.write_document("03-test", repo, day="2026-11-07")
     assert second != first and second.name == "recorrido-capitulo-3-2026-11-07-2.es.md"
     assert "lo que el dueño ha escrito" in first.read_text(encoding="utf-8")
+
+
+def test_some_levels_alone_each_under_its_chapter_with_its_number_and_pictures(tmp_path):
+    repo = small_repo(tmp_path)
+    chapter = repo / "content" / "chapters" / "03-test" / "chapter.json"
+    chapter.write_text(json.dumps({"items": ["level:u", "story:s", "level:v"]}))
+    level = repo / "content" / "levels" / "u"
+    level.mkdir()
+    (level / "level.json").write_text(json.dumps({"scene": "a-scene", "start": [0, 0]}))
+    (level / "solution.py").write_text("wizard.wait()\n")
+    (level / "text.es.json").write_text(json.dumps({"title": "Otro", "goals": ["Ve."]}))
+    path = walkthrough.write_levels(["v"], repo, day="2026-11-12")
+    assert path.name == "recorrido-niveles-cambiados-2026-11-12.es.md"
+    text = path.read_text(encoding="utf-8")
+    # The second practice of its chapter, under its chapter's heading; the first not shown.
+    assert "# Capítulo 3, Prueba" in text and "## Práctica 2: Nivel (`level:v`)" in text
+    assert "Otro" not in text and "Hola" not in text
+    assert "### Disposición `w`" in text and text.count("![") == 4
+    assert (path.parent / path.stem.removesuffix(".es") / "level-v-w-ganado.png").is_file()

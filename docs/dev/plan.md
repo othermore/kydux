@@ -655,7 +655,14 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     its index and both ways of a loop over a list (D198), a story's step that frames a
     place (D199), and the map folded by chapter (D200); and, in `sprint-41.md`, a level
     that frames a place, the shed's five levels seen whole (D201), and the shed's lying
-    brooms in sight on the boards or hidden under the straw (D202).
+    brooms in sight on the boards or hidden under the straw (D202); and, in
+    `sprint-42.md`, the child told what may differ at each run and never of ways (D204),
+    a level's own forbidden cells and *El cobertizo* counting only the floor (D205), the
+    wall walked by the distance from one end, a hung thing as far as the cell under it
+    (D206), a thing drawn by the game moved sideways on its cell (D207), the review's
+    sheets with the grid (D208), the themes chosen by ear with a struck piano (D209), one
+    set of voices a theme (D210), the row under the pegs walked (D211), and the straw
+    walked by the coordinates after the lesson *less-or-greater* (D212).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

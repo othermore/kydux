@@ -60,3 +60,7 @@ about.level_
 plan.zone.
 # The tips a child who has begun reads while a screen loads, by key (ui/waiting.ts).
 tips.
+
+# Under ?debug, the settings name each candidate of the code's letter by
+# `debug.font.${name}` (D223).
+debug.font.

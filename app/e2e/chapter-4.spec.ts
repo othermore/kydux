@@ -299,7 +299,11 @@ test.describe('the shed', () => {
     }) => {
       await open(page, id);
       const lines = await page.locator('.cm-content .cm-line').allTextContents();
-      expect(lines[0]).toBe('# Para que sea un poco más fácil, he escrito comentarios');
+      // The owner's words, one line a sentence (D223).
+      expect(lines[0]).toBe(
+        '# Para que sea un poco más fácil, he escrito comentarios y te he dejado huecos para que, debajo de cada comentario, escribas el código que hace lo que dice el comentario.',
+      );
+      expect(lines[1]).toMatch(/^# ¡Incluso te he dejado los espacios para que sepas lo que va dentro de los (for y los )?if!$/);
       const left = lines.findIndex((line) => line.trim() === '# Deberás usar move_left');
       expect(left).toBeGreaterThan(0);
       expect(lines[left + 1]).toBe(deepest);
@@ -307,6 +311,41 @@ test.describe('the shed', () => {
       await page.screenshot({ path: `${SHOTS}${id}-comments.png` });
     });
   }
+
+  test("a comment of the loop's body that wraps goes on under its #, not at the editor's edge (D223)", async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await open(page, 'the-brooms-in-the-straw');
+    const comment = page
+      .locator('.cm-content .cm-line')
+      .filter({ hasText: '# Si la x de la escoba es menor que la tuya, está a tu izquierda:' });
+    const lefts = await comment.evaluate((line) => {
+      const range = document.createRange();
+      range.selectNodeContents(line);
+      const boxes = [...range.getClientRects()].filter((box) => box.width > 0);
+      // Where the # stands: the first box after the line's leading spaces.
+      const hash = document.createRange();
+      const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const at = node.textContent?.indexOf('#') ?? -1;
+        if (at < 0) continue;
+        hash.setStart(node, at);
+        hash.setEnd(node, at + 1);
+        break;
+      }
+      const rows = [...new Set(boxes.map((box) => Math.round(box.top)))].sort((a, b) => a - b);
+      const lastRow = boxes.filter((box) => Math.round(box.top) === rows[rows.length - 1]);
+      return {
+        rows: rows.length,
+        hash: hash.getBoundingClientRect().left,
+        wrapped: Math.min(...lastRow.map((box) => box.left)),
+        edge: line.getBoundingClientRect().left,
+      };
+    });
+    expect(lefts.rows).toBeGreaterThan(1);
+    expect(Math.abs(lefts.wrapped - lefts.hash)).toBeLessThan(1.5);
+    expect(lefts.wrapped - lefts.edge).toBeGreaterThan(20);
+    await page.locator('.cm-editor').screenshot({ path: `${SHOTS}straw-comment-wrapped.png` });
+  });
 
   test("the wall's program stops at the first broom, which has no knot, and the if mends it (D183)", async ({ page }) => {
     await open(page, 'the-check');

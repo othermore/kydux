@@ -1,12 +1,11 @@
 // The settings that change how the game looks (D35): the scene's share of the
-// level screen's width, and the editor's text size. Both are CSS variables on
-// the page's root, so that a screen drawn later finds them already set.
+// level screen's width, the editor's text size, and the code's letter (D223). Each is
+// a CSS variable on the page's root, so that a screen drawn later finds it already set.
 
-import { DEFAULT_SETTINGS, SPLIT_MAX, SPLIT_MIN, type Settings } from '../progress/store';
+import { DEFAULT_SETTINGS, FONT_SIZES, SPLIT_MAX, SPLIT_MIN, type Settings } from '../progress/store';
+import { CODE_FONTS } from './codefont';
 
-export { SPLIT_MAX, SPLIT_MIN };
-/** The editor's text sizes offered, in pixels. */
-export const FONT_SIZES = [14, 17, 20, 24] as const;
+export { FONT_SIZES, SPLIT_MAX, SPLIT_MIN };
 
 /** A share kept between SPLIT_MIN and SPLIT_MAX; anything not a number is the default. */
 export function clampSplit(value: number): number {
@@ -24,7 +23,12 @@ export function setSplit(share: number): void {
   document.documentElement.style.setProperty('--split', String(clampSplit(share)));
 }
 
-export function applyLook(settings: Pick<Settings, 'split' | 'fontSize'>): void {
+export function applyLook(settings: Pick<Settings, 'split' | 'fontSize' | 'codeFont'>): void {
   setSplit(settings.split);
-  document.documentElement.style.setProperty('--editor-font-size', `${settings.fontSize}px`);
+  const root = document.documentElement.style;
+  root.setProperty('--editor-font-size', `${settings.fontSize}px`);
+  // --mono starts with this face and keeps the families after it (style.css).
+  const font = CODE_FONTS[settings.codeFont];
+  root.setProperty('--mono-face', font.face);
+  root.setProperty('--mono-stretch', font.stretch);
 }

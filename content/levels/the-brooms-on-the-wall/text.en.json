@@ -4,7 +4,7 @@
     "Leave no hanging broom knotted.",
     "Use `for`."
   ],
-  "starting_code": "# Walk up to the row under the pegs.\n# Walk to one end of that row.\n# Find the hanging brooms with `find_all`.\n# For each broom of the list:\n#     find out how far it is with `distance_to`,\n#     walk that many steps\n#     and take its knot off.\n",
+  "starting_code": "# Walk up to the row under the pegs.\n# Walk to one end of that row.\n# Find the hanging brooms with `find_all`.\n# For each broom of the list:\n#     find out how far it is with `distance_to`, walk that many steps and take its knot off.\n",
   "hints": [
     "Walk up to the wall and to one end of it. Since `find_all` gives the nearest first, from an end you always walk in the same direction.",
     "Use a `for` loop to go through the list. In each turn, find out how far the broom is with `distance_to`.",

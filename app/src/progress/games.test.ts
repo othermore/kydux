@@ -69,9 +69,10 @@ describe('GamesStore (D70)', () => {
 
   it('a new game keeps the machine\'s language and settings', () => {
     progress.setWizard(ANA);
-    progress.setSetting('fontSize', 22);
+    progress.setSetting('fontSize', 20);
+    progress.setSetting('codeFont', 'noto-semi-14');
     progress.newGame();
-    expect(progress.settings().fontSize).toBe(22);
+    expect(progress.settings()).toMatchObject({ fontSize: 20, codeFont: 'noto-semi-14' });
   });
 
   it('counts play time to the game being played, and deletes a game', () => {

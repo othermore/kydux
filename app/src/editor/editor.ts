@@ -1,6 +1,7 @@
 // The child's editor: CodeMirror with Python, four spaces to an indent, the
 // line being played lit, and the line of an error marked, each also in the
-// gutter.
+// gutter. A line too long for the editor wraps, and its wrapped part hangs under
+// the line's first character that is not a space (D223).
 
 import {
   autocompletion,
@@ -29,6 +30,8 @@ import {
   highlightActiveLineGutter,
   keymap,
   lineNumbers,
+  ViewPlugin,
+  type ViewUpdate,
 } from '@codemirror/view';
 
 export interface Editor {
@@ -94,6 +97,64 @@ function markedLine(kind: 'running' | 'error') {
   return { set, field, extension: [field, decorations] as Extension, markers };
 }
 
+/** How many columns a line's leading spaces take, a tab to the next stop of four. */
+export function leadingColumns(text: string): number {
+  let columns = 0;
+  for (const character of text) {
+    if (character === ' ') columns += 1;
+    else if (character === '\t') columns += 4 - (columns % 4);
+    else break;
+  }
+  return columns;
+}
+
+/** One decoration for each depth: the line moved right by its leading columns, and
+ * its first part moved back, so that only what wraps starts under the line's text. */
+const hangs = new Map<number, Decoration>();
+function hang(columns: number): Decoration {
+  let decoration = hangs.get(columns);
+  if (!decoration) {
+    decoration = Decoration.line({
+      attributes: { style: `padding-left: calc(${columns}ch + 6px); text-indent: -${columns}ch` },
+    });
+    hangs.set(columns, decoration);
+  }
+  return decoration;
+}
+
+function hanging(view: EditorView): DecorationSet {
+  const ranges = [];
+  for (const { from, to } of view.visibleRanges) {
+    for (let at = from; at <= to; ) {
+      const line = view.state.doc.lineAt(at);
+      const columns = leadingColumns(line.text);
+      if (columns > 0) ranges.push(hang(columns).range(line.from));
+      at = line.to + 1;
+    }
+  }
+  return Decoration.set(ranges);
+}
+
+/** The code's letter (D223): the page's --mono at its width, over CodeMirror's own
+ * monospace, which a rule of the stylesheet cannot outweigh. */
+const letter = EditorView.theme({
+  '.cm-scroller': { fontFamily: 'var(--mono)', fontStretch: 'var(--mono-stretch)' },
+});
+
+/** The hanging indent of wrapped lines, for every line, code and comment alike. */
+const hangingIndent = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet;
+    constructor(view: EditorView) {
+      this.decorations = hanging(view);
+    }
+    update(update: ViewUpdate) {
+      if (update.docChanged || update.viewportChanged) this.decorations = hanging(update.view);
+    }
+  },
+  { decorations: (plugin) => plugin.decorations },
+);
+
 export function createEditor(parent: HTMLElement, options: EditorOptions): Editor {
   const running = markedLine('running');
   const error = markedLine('error');
@@ -130,8 +191,10 @@ export function createEditor(parent: HTMLElement, options: EditorOptions): Edito
         bracketMatching(),
         closeBrackets(),
         highlightActiveLine(),
-        // A long line goes on below, with no line number of its own.
+        // A long line goes on below, with no line number of its own, under its text.
         EditorView.lineWrapping,
+        hangingIndent,
+        letter,
         python(),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         indentUnit.of('    '),

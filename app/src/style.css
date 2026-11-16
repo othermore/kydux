@@ -1,5 +1,27 @@
 /* The page's look (D193): one set of tokens, its colours taken from the paintings, and
    the components every screen is made of. */
+
+/* The faces of the code's letter, bundled with the game (src/fonts/, D223). */
+@font-face {
+  font-family: 'Inconsolata';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('./fonts/inconsolata/inconsolata-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Noto Sans Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  font-stretch: 62.5% 100%;
+  src: url('./fonts/noto-sans-mono/noto-sans-mono-latin-wdth-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 :root {
   /* The palette: parchment for the page, paper for what lies on it, ink for the words,
      moss green for what is done, a warm gold for what is chosen, a sky blue for links,
@@ -36,7 +58,12 @@
   /* Type: the interface's, the story's serif, and code's. */
   --font-ui: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-story: Georgia, 'DejaVu Serif', serif;
-  --mono: ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
+  /* Code's letter (D223): --mono-face and --mono-stretch are the candidate's
+     (ui/codefont.ts, set on the root by ui/look.ts), and --mono-stretch goes with
+     --mono wherever it is used. */
+  --mono-face: 'Inconsolata';
+  --mono-stretch: 100%;
+  --mono: var(--mono-face), ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
   /* The grain of the parchment, drawn by code: a fine noise, faint and warm. */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.3 0 0 0 0 0.14 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   /* What the screens call them. */
@@ -275,6 +302,7 @@ footer {
 footer .build {
   margin-right: auto;
   font-family: var(--mono);
+  font-stretch: var(--mono-stretch);
 }
 
 .buttons {
@@ -306,6 +334,7 @@ footer .build {
   background: #20232c;
   color: #e9ecf2;
   font: 15px/1.45 var(--mono);
+  font-stretch: var(--mono-stretch);
   white-space: pre-wrap;
 }
 
@@ -320,17 +349,12 @@ footer .build {
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--panel);
-  font-size: var(--editor-font-size, 17px);
+  font-size: var(--editor-font-size, 16px);
 }
 
 .cm-editor.cm-focused {
   outline: 2px solid var(--focus);
   outline-offset: -1px;
-}
-
-.cm-scroller {
-  font-family: var(--mono);
-  line-height: 1.5;
 }
 
 .cm-gutters {
@@ -489,6 +513,7 @@ footer .build {
   border-radius: 4px;
   background: rgb(0 0 0 / 7%);
   font-family: var(--mono);
+  font-stretch: var(--mono-stretch);
   font-size: 0.95em;
 }
 
@@ -507,6 +532,7 @@ footer .build {
   background: #20232c;
   color: #e9ecf2;
   font: 14px/1.4 var(--mono);
+  font-stretch: var(--mono-stretch);
   white-space: pre-wrap;
 }
 
@@ -515,6 +541,7 @@ footer .build {
   border-radius: 4px;
   background: rgb(0 0 0 / 7%);
   font-family: var(--mono);
+  font-stretch: var(--mono-stretch);
   font-size: 0.95em;
 }
 
@@ -670,6 +697,7 @@ footer .build {
   border-radius: 6px;
   background: var(--panel);
   font-family: var(--mono);
+  font-stretch: var(--mono-stretch);
   font-size: 11px;
 }
 
@@ -814,6 +842,7 @@ footer .build {
   background: var(--panel);
   cursor: pointer;
   font: 15px var(--mono);
+  font-stretch: var(--mono-stretch);
 }
 
 .notebook .example:hover,
@@ -1363,6 +1392,7 @@ a.stop-body:focus-visible {
   border-radius: 4px;
   background: rgb(0 0 0 / 6%);
   font-family: var(--mono);
+  font-stretch: var(--mono-stretch);
   font-size: 0.92em;
 }
 
@@ -1505,6 +1535,7 @@ a.stop-body:focus-visible {
 .themes-volume {
   min-width: 3em;
   font-family: var(--mono);
+  font-stretch: var(--mono-stretch);
 }
 
 .settings-sample {
@@ -1514,7 +1545,8 @@ a.stop-body:focus-visible {
   border-radius: 6px;
   background: var(--panel);
   font-family: var(--mono);
-  font-size: var(--editor-font-size, 17px);
+  font-stretch: var(--mono-stretch);
+  font-size: var(--editor-font-size, 16px);
 }
 
 /* A portrait (D194): a bust on a round of paper, the size its place asks. */
@@ -1709,6 +1741,7 @@ a.stop-body:focus-visible {
 
 .settings-keys dt {
   font-family: var(--mono);
+  font-stretch: var(--mono-stretch);
   font-weight: 600;
 }
 
@@ -2051,6 +2084,7 @@ a.stop-body:focus-visible {
   border-radius: 4px;
   background: rgb(0 0 0 / 6%);
   font-family: var(--mono);
+  font-stretch: var(--mono-stretch);
   font-size: 0.92em;
 }
 

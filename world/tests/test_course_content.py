@@ -722,6 +722,24 @@ def test_the_shed_goes_from_the_easy_to_the_hard():
     assert items[start : start + len(SHED_ORDER)] == SHED_ORDER
 
 
+#: A comment line that a sentence goes on from: it does not end as a sentence or a
+#: clause does, and the next line is a comment too.
+GOES_ON = re.compile(r"[^.:!?]$")
+
+
+@pytest.mark.parametrize(
+    "path", sorted(CONTENT.glob("levels/*/text.*.json")), ids=lambda p: f"{p.parent.name}-{p.stem}"
+)
+def test_a_comment_of_a_starting_code_is_one_line_a_sentence(path):
+    """D223: no sentence of a comment is cut into several `#` lines to fit a width; the
+    editor wraps a line that does not fit."""
+    lines = json.loads(path.read_text(encoding="utf-8")).get("starting_code", "").split("\n")
+    for line, after in zip(lines, lines[1:], strict=False):
+        said, next_said = line.strip().removeprefix("#").strip(), after.strip()
+        if line.strip().startswith("#") and said and next_said.startswith("#"):
+            assert not GOES_ON.search(said), f"{path.parent.name}: {line!r} goes on in {after!r}"
+
+
 @pytest.mark.parametrize("level", ["the-nearest-broom", "the-brooms-in-the-straw"])
 @pytest.mark.parametrize("lang", LANGUAGES)
 def test_a_long_program_is_given_as_comments_one_for_each_instruction(level, lang):

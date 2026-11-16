@@ -3,6 +3,7 @@
 // behind the same interface. Nothing else in the game keeps progress anywhere.
 
 import { isLook } from '../engine/looks';
+import { CODE_FONTS, type CodeFont, DEFAULT_CODE_FONT, isCodeFont } from '../ui/codefont';
 
 /** The document's shape this version of the game writes. A document of another
  * version, or none, is read as the defaults. */
@@ -10,8 +11,10 @@ export const PROGRESS_VERSION = 1;
 
 export interface Settings {
   speed: 1 | 2 | 4;
-  /** The editor's text size, in pixels. */
+  /** The editor's text size, in pixels: one of FONT_SIZES. */
   fontSize: number;
+  /** The code's letter, one of the candidates of D223. */
+  codeFont: CodeFont;
   /** The scene's share of the level screen's width, from 0.35 to 0.75. */
   split: number;
   /** Whether the game's sounds play. */
@@ -66,7 +69,17 @@ export interface Progress {
 export const SPLIT_MIN = 0.35;
 export const SPLIT_MAX = 0.75;
 
-export const DEFAULT_SETTINGS: Settings = { speed: 1, fontSize: 17, split: 0.6, sound: true, music: 0.6 };
+/** The editor's text sizes offered, in pixels (D223). */
+export const FONT_SIZES = [14, 16, 20, 24] as const;
+
+export const DEFAULT_SETTINGS: Settings = {
+  speed: 1,
+  fontSize: CODE_FONTS[DEFAULT_CODE_FONT].size,
+  codeFont: DEFAULT_CODE_FONT,
+  split: 0.6,
+  sound: true,
+  music: 0.6,
+};
 /** The most stars a level gives; the map draws that many. */
 export const MAX_STARS = 3;
 /** An item of the course that can be the one last opened: a lesson, a level or a
@@ -140,13 +153,12 @@ export function readProgress(value: unknown): Progress | null {
   if (typeof value.language === 'string') progress.language = value.language;
   progress.wizard = readWizard(value.wizard, isLook);
   if (isObject(value.settings)) {
-    const { speed, fontSize, split, sound, music } = value.settings;
+    const { speed, fontSize, codeFont, split, sound, music } = value.settings;
     if (typeof sound === 'boolean') progress.settings.sound = sound;
     if (typeof music === 'number' && music >= 0 && music <= 1) progress.settings.music = music;
     if (speed === 1 || speed === 2 || speed === 4) progress.settings.speed = speed;
-    if (typeof fontSize === 'number' && fontSize >= 10 && fontSize <= 40) {
-      progress.settings.fontSize = fontSize;
-    }
+    if ((FONT_SIZES as readonly unknown[]).includes(fontSize)) progress.settings.fontSize = fontSize as number;
+    if (isCodeFont(codeFont)) progress.settings.codeFont = codeFont;
     if (typeof split === 'number' && split >= SPLIT_MIN && split <= SPLIT_MAX) {
       progress.settings.split = split;
     }

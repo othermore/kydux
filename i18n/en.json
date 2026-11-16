@@ -530,7 +530,13 @@
       "off": "off",
       "unchanged": "every voice as written"
     },
-    "zone": "Zone"
+    "zone": "Zone",
+    "font": {
+      "title": "Code font",
+      "inconsolata-16": "Inconsolata, 16",
+      "noto-semi-14": "Noto Sans Mono semi-condensed, 14",
+      "noto-condensed-14": "Noto Sans Mono condensed, 14"
+    }
   },
   "race": {
     "reading": "Ilda reads the programs: you, {mine} lines; {name}, {theirs}.",

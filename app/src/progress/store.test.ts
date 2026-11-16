@@ -66,12 +66,32 @@ describe('LocalProgressStore', () => {
       }),
     );
     const read = new LocalProgressStore(storage).load();
-    expect(read.settings).toEqual({ speed: 1, fontSize: 17, split: 0.5, sound: true, music: 0.6 });
+    expect(read.settings).toEqual({
+      speed: 1,
+      fontSize: 16,
+      codeFont: 'inconsolata-16',
+      split: 0.5,
+      sound: true,
+      music: 0.6,
+    });
     expect(read.levels.a).toEqual({ stars: 2 });
     expect(read.levels.b).toEqual({});
     expect(read.levels.c).toEqual({});
     expect(read.started).toEqual(['a']);
     expect(read.current).toBeNull();
+  });
+
+  it("reads the code's letter and the editor's size, and either not offered as its default (D223)", () => {
+    const read = (settings: object) => readProgress({ version: PROGRESS_VERSION, settings })?.settings;
+    expect(read({})).toMatchObject({ codeFont: 'inconsolata-16', fontSize: 16 });
+    expect(read({ codeFont: 'noto-semi-14', fontSize: 14 })).toMatchObject({ codeFont: 'noto-semi-14', fontSize: 14 });
+    expect(read({ codeFont: 'noto-condensed-14', fontSize: 24 })).toMatchObject({
+      codeFont: 'noto-condensed-14',
+      fontSize: 24,
+    });
+    // A letter that is none of the three, and sizes that are not offered.
+    expect(read({ codeFont: 'comic-12', fontSize: 17 })).toMatchObject({ codeFont: 'inconsolata-16', fontSize: 16 });
+    expect(read({ codeFont: 'toString', fontSize: 15 })).toMatchObject({ codeFont: 'inconsolata-16', fontSize: 16 });
   });
 
   it('keeps a story as the item last opened, as a lesson and a level (D122)', () => {

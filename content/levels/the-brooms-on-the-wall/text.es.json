@@ -4,7 +4,7 @@
     "No dejes ninguna escoba colgada con nudo.",
     "Usa `for`."
   ],
-  "starting_code": "# Sube hasta la fila de debajo de los ganchos.\n# Ve a un extremo de esa fila.\n# Encuentra las escobas colgadas con `find_all`.\n# Para cada escoba de la lista:\n#     mira a qué distancia está con `distance_to`,\n#     camina esos pasos\n#     y quítale el nudo.\n",
+  "starting_code": "# Sube hasta la fila de debajo de los ganchos.\n# Ve a un extremo de esa fila.\n# Encuentra las escobas colgadas con `find_all`.\n# Para cada escoba de la lista:\n#     mira a qué distancia está con `distance_to`, camina esos pasos y quítale el nudo.\n",
   "hints": [
     "Sube hasta la pared y ve a un extremo. Como `find_all` da primero la más cercana, desde un extremo caminas siempre hacia el mismo lado.",
     "Usa un bucle `for` para recorrer la lista. En cada vuelta, averigua a qué distancia está la escoba con `distance_to`.",

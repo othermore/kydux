@@ -323,8 +323,9 @@ tiles are `[x, y]`.
 | `untie` | wizard | `id`, `at` | the wizard bends over the broom, a long tick, and its thread is gone; `data-untied` (D183) |
 | `fly` | `broom`, in the wizard's tick of drevo, or a racer in its own | `id`, the figure; `at` | the figure lifts half a cell, drawn from its flying rows, and the wind starts; every move after it is flown in a third of a walked step's time (`move`'s `flying`); `data-flying`, `data-wind` (D185) |
 | `land` | `broom`, after the run's last tick, or a racer at its path's end | `id`, `at` | the figure sets down on its cell and the wind fades (D185) |
-| `through` | the ring, in the wizard's move | `id`, `at`, the cell flown from | the ring glows as the wizard passes; `data-through`, in order (D187) |
-| `circle` | wizard, before a race's finish, or a racer | `at`; `ring`, the ring missed (the wizard's) | the figure flies a loop over its cell for the tick: the wizard's five ticks for each ring missed, the racer's flourish; `data-circling` (D189) |
+| `through` | the ring, in the move of the wizard or of a racer | `id`, `at`, the cell flown from; `by`, the racer | the ring glows as the figure passes along its way; the wizard's are counted in `data-through`, in order (D187, D219, D220) |
+| `wrong_way` | the ring, in the wizard's move | `id`, `at`, `way`, the cell flown from | the ring shakes and the wizard thinks the way it is flown, with the bump's sound; the ring counts as missed (D219) |
+| `circle` | wizard, before a race's finish | `at`; `ring`, the ring missed | the wizard flies a loop over its cell for the tick, five ticks for each ring missed; `data-circling` (D189) |
 | `read` | wizard, before the first action of a race | `at`, `count`, `lines` | the band over the scene says Ilda reading the two programs and the ticks to each take-off, the line read lit in the editor; `data-race-band` (D189) |
 
 A run's status is `won`, `incomplete`, `error`, `too_many_ticks`,
@@ -2703,16 +2704,18 @@ one overturns stays, marked as superseded.
   window hatches a low cell lightly and a high one darkly; `?debug` crosses a low cell in
   blue and a cell no one walks on or flies over in red, and the legend names the low ones.
   Rules out one "blocked" kind for everything a wizard does not walk on.
-- **D187 — The ring: flown through in order.** Decided 2026-11-10. `ring` is a kind of
-  thing drawn from its sprite (D182), standing on a cell no one walks on; the wizard flies
-  through it by crossing its cell in a vertical move, from the row above to the row below
-  or the reverse, which makes the ring's event `through` and lights it; a horizontal move
-  into its cell while flying bumps (*chocas con el aro*), and a walk into it bumps as into
-  furniture. The goal `through_in_order` (`{"kind": "through_in_order", "ids": ["ring_1",
-  ...]}`) is met when every ring named is flown through, each after the one before it in
-  the list; a ring passed over, or flown through out of its turn, counts as missed, and
-  the goal's `missed` lists the rings not flown through in order, for the race (D189).
-  `?debug` numbers the rings in their order. Rules out a ring the wizard walks under.
+- **D187 — The ring: flown through in order, each along its way.** Decided 2026-11-10.
+  `ring` is a kind of thing drawn from its sprite (D182), standing on a cell no one walks
+  on; the wizard flies through it by crossing its cell in a vertical move along the ring's
+  way (D219), which makes the ring's event `through` and lights it; a vertical move
+  through it against its way makes the event `wrong_way` and lights nothing; a horizontal
+  move into its cell while flying bumps (*chocas con el aro*), and a walk into it bumps as
+  into furniture. The goal `through_in_order` (`{"kind": "through_in_order", "ids":
+  ["ring_1", ...]}`) is met when every ring named is flown through, each after the one
+  before it in the list; a ring passed over, flown against its way, or flown through out
+  of its turn, counts as missed, and the goal's `missed` lists the rings not flown through
+  in order, for the race (D189). `?debug` numbers the rings in their order, each with an
+  arrow for its way. Rules out a ring the wizard walks under.
 - **D188 — Flying figures, Zarek and Rinlo.** Decided 2026-11-10 by the owner (*van a ser
   nuevas hojas de sprites*). The wizard's sheets have four flying rows after the sleeping
   one (`rows.fly`, one a way, three frames: level, a little up, a little down, for the
@@ -2731,33 +2734,35 @@ one overturns stays, marked as superseded.
   frames.
 - **D189 — The race: Ilda's count.** Decided 2026-11-10 by the owner (*ticks + líneas +
   aros saltados*), made visible as the owner asked to see it rather than read it. A race
-  level names a racer (`"race": {"against": "zarek", "lines": 14, "path": [...],
-  "finish": [x, y]}`), an actor of kind `racer`. Before the start Ilda reads both
+  level names a racer (`"race": {"against": "zarek", "lines": 18, "path": [...],
+  "rings": [...], "finish": [x, y]}`), an actor of kind `racer`, who flies in a lane of
+  his own through rings of his own (D220). Before the start Ilda reads both
   programs, a tick a line (the lines `lines_under` counts: neither blank nor a comment),
   the line read lit in the editor (the event `read`), while the wizard stands on the
   start; the racer lifts his broom the tick after his own `lines`, as the wizard does with
   drevo, and flies his `path` from there, its turning points flown in straight lines, a
-  cell a tick; a point the same as the one before is a tick circling in place (a
-  flourish, the event `circle`), which lets his flight's ticks be any number, and he
-  crosses the finish at the tick his path reaches it. A ring the wizard missed (D187)
+  cell a tick, and he crosses the finish line at the tick he reaches his path's last
+  cell. A ring the wizard missed (D187)
   costs five ticks before the finish line, served circling over the cell before it. The
   goal `before` (`{"kind": "before", "racer": "zarek"}`) is met when the wizard crosses
-  the finish at a tick lower than the racer's; a tie is the racer's. A band over the scene
-  says Ilda reading (*Ilda lee los programas: tú, 11 líneas; Zarek, 14*) and the ticks to
-  each take-off; the win and the outcome cards say her count from the goal's `params`:
-  *tus líneas (11) + tu vuelo (38) + la penalización (0) = tick 49. Zarek: 14 + 41 = tick
-  55*. In *La carrera* the program without a function, 18 lines, crosses at 56 against
-  his 55; in *La revancha* Zarek's 12 lines cross at 50, and the race's function, its
-  arguments unchanged, misses three rings. Rules out a race won by a long program that
-  arrives first, and a penalty the child cannot see.
+  the finish at a tick lower than the racer's; equal ticks are a tie, which is nobody's:
+  the goal is not met and the race is flown again (D220). A band over the scene says Ilda
+  reading (*Ilda lee los programas: tú, 11 líneas; Zarek, 18*) and the ticks to each
+  take-off; the win and the outcome cards say her count from the goal's `params`: *tus
+  líneas (11) + tu vuelo (42) + la penalización (0) = tick 53. Zarek: 18 + 42 = tick 60*.
+  In *La carrera* the program without a function, 18 lines, ties with him at 60; in *La
+  revancha* the race's program, its numbers unchanged, misses seven rings and crosses at
+  88. Rules out a race won by a long program that arrives first, and a penalty the child
+  cannot see.
 - **D190 — A function is taught where a loop cannot serve.** Decided 2026-11-10 by the
   owner (*hace que la función sea útil*). The rings' level repeats the pair of rings three
-  times with a different manoeuvre between each pair (under the trees, over the pond), so
+  times with a different manoeuvre between each pair (round the trees, over the pond), so
   that a `for` cannot cover the repetition and `def two_rings()` is called from three
   places: a loop round the pair flies into the trees' crowns. The race's pairs differ in
-  their gaps, so that arguments are the only way to keep one function, and Ilda's count
-  makes the program without a function lose by one tick (D189); the rematch moves the
-  rings and sharpens Zarek, so that only the arguments change and no line may be spared.
+  their distances, so that arguments are the only way to keep one function, and Ilda's
+  count makes the program without a function tie with Zarek, which wins nothing (D189);
+  the rematch moves the rings and gives the race's program to repair, so that only its
+  numbers change.
   Rules out a `def` whose only reason is a lines goal a `for` would meet.
 - **D191 — The browser tests on GitHub run with three times the time.** Decided
   2026-11-10 from the tag run of v0.0.5, which lost three tests by time alone (D179).
@@ -3236,18 +3241,19 @@ one overturns stays, marked as superseded.
   scene will be (*la imagen inicial del castillo y el texto inicial sobre la carta*), and
   the scene takes its place with a short fade. A child who has begun, with a wizard made
   or a game saved, reads a tip when a wait is longer than the grace of 2 seconds, and a
-  new one every 10 seconds (*un tip cada 10 segundos*); when the screen is ready it waits
-  until the tip up has had its 10 seconds (*se espera a que haya dado tiempo a leer el
-  último tip*), and the button *Seguir* (`waiting.go`) under the tip opens the screen at
-  once. A wait shorter than the grace shows no tip and holds nothing. The tips are the
+  new one every 10 seconds (*un tip cada 10 segundos*); the first wait of a visit and the
+  wait for a new scene show their tip at once (D221). When the screen is ready it waits
+  until the tip up has had its reading time (*se espera a que haya dado tiempo a leer el
+  último tip*), and then shows by itself (D221). A wait shorter than the grace, with no
+  tip due at once, shows no tip and holds nothing. The tips are the
   page's words (`tips.*`, the same keys in every language), each true of the page as it
   is; they are shown in order from where the last wait stopped, kept in `localStorage`,
   and none comes back until all have been seen. Once its first screen shows, the page
   fetches in idle time the code the other screens need, so that a later screen waits only
   for its own files. The browser tests turn the tips off with a key of `localStorage` that
   no setting shows. Rules out a screen that waits for Python, *Preparando Python…* said of
-  anything that is not Python, a tip that flashes by on a quick load, a hold the child
-  cannot end, and a tip that is not true.
+  anything that is not Python, a tip that flashes by on a quick load, and a tip that is not
+  true.
 - **D215 — `drevo` cast in the air lands.** Decided 2026-11-13 by the owner (*si se lanza
   drevo mientras vuelas, deberías aterrizar (o fallar si aterrizas sobre una casilla no
   transitable y que termine el programa por fallo). Es como chocar (y debe sonar el mismo
@@ -3302,9 +3308,75 @@ one overturns stays, marked as superseded.
   para que sepas lo que va dentro de los for y los if!*). The starting code of such a
   level says in its first lines that the comments are there and what to do with them; then
   one comment for each instruction, in the order of the program, in plain words that name
-  the function to use. A comment that belongs inside a block is indented as the block is,
+  the function to use. A comment is one `#` line for each sentence, never cut to fit a
+  width (D223). A comment that belongs inside a block is indented as the block is,
   and the empty line under each comment carries the indentation of the line to write, so
   that the child sees what goes inside each `for` and each `if`. The comments hold no line
   of code. The two levels of the straw have them, and a test of the content holds their
   form. Rules out a starting code with half the program written, and comments that tell
   the idea and leave the order of the lines to the child in a level that long.
+- **D219 — A ring is flown one way, and rings come in pairs of a colour.** Decided
+  2026-11-14 by the owner (*los pares de aros siempre se pasan el primero desde abajo
+  hacia arriba y el segundo desde arriba hacia abajo*; *así se ve siempre que los aros van
+  de dos en dos*; *cada pareja fuese de un color*). A ring carries its `way`, `up` or
+  `down`, and its `colour`. Flown through its cell in a vertical move along its way, it
+  lights and counts (`through`); flown through against its way it does not: the ring
+  shakes, the wizard says which way it is flown, the event is `wrong_way` and the ring
+  counts as missed. A horizontal move into it bumps. The rings a goal or a race
+  names go in pairs: the first of a pair `up`, the second `down`, the two on one row and
+  of one colour, the next pair of another colour; a level that does not hold this does not
+  load. The wizard starts on the row under the rings. Ilda tells the rule as the rule of
+  broom races where rings are first met, in *Los aros*, and the goal's line repeats it in
+  every level with rings. Rules out a pair flown down and then up, a ring that counts
+  whichever way it is crossed, a ring alone, and two pairs side by side of one colour.
+- **D220 — The race is flown in two lanes, each racer through rings of their own, and a
+  tie is flown again.** Decided 2026-11-14 by the owner (*necesitamos que haya dos filas
+  de aros iguales, para que cada uno empiece en su fila y no se choquen*; *en caso de
+  empate, se repite la carrera*). The race course has two lanes of three rows, a free row
+  between them. The racer's lane holds his own rings, at the wizard's columns and in the
+  wizard's colours, and the level's `race` names them in order; he starts on the row under
+  them, at the wizard's column, flies every one of them by D219 and crosses the finish
+  line at the last cell of his path, in his lane. A level whose racer misses a ring of his
+  own, or leaves his lane, does not load. Ilda's count stays as D189 gives it; equal ticks
+  are a tie, the goal `before` is not met and the outcome says that the race is flown
+  again. Rules out a racer who flies where there are no rings, two racers through the same
+  ring, a racer's flourish to spend ticks, and a tie that is anybody's win.
+- **D221 — A tip with its picture at the first load and at every new scene, and the screen
+  opens by itself.** Decided 2026-11-14 by the owner (*no debes poner el botón de seguir,
+  sino que automáticamente se debe eliminar el tip y mostrar la siguiente pantalla*; *al
+  menos se muestra uno en la primera carga y en la carga de cada escenario*; *cada tip
+  debería tener una imagen o captura de pantalla*). The waiting view has no button. For a
+  child who has begun, a tip is up from the wait's first moment at the first wait of a
+  visit and at every screen whose scene is not the scene last shown; any other wait keeps
+  D214's grace. When the screen is ready the tip stays until it has had its reading time
+  by D175, counted from the moment it was put up and never more than ten seconds, and the
+  screen then shows by itself. Every tip has a picture, made from the game's own page in
+  each language, over its words. Rules out a button to go on, a tip that flashes by, a
+  new place opened with no tip, and a tip told in words alone.
+- **D222 — A card opens at its top, and the start card closes at any button of the page.**
+  Decided 2026-11-14 by the owner (*el scroll de ese cuadro debería estar arriba y que
+  haya que bajar para leerlo y cerrarlo*; *si se hace clic en cualquier botón de la
+  página, incluido ejecutar y similar, el cuadro de objetivos se debería ocultar*). A card
+  taller than its room scrolls, and shows its first line when it opens: its button takes
+  the keyboard without bringing itself into view. A click on any button of the page
+  outside the start card closes the card, and the button does what it does. Rules out a
+  card opened at its end, and a start card left over the scene while the program runs.
+- **D223 — The code is set in Noto Sans Mono, a little narrow, at 16, and a comment is
+  never broken by hand.** Decided 2026-11-14 by the owner (*la fuente del código podría
+  ser un pelín más pequeña; algún tipo de letra que sea un poco más estrecha, pero que
+  mantenga el monotipo y se vea bien para programar*; *evitar que sean de varias líneas y
+  dejar que el propio visualizador lo lleve a la siguiente línea*). The editor and every
+  piece of code the page shows use Noto Sans Mono (SIL Open Font License 1.1), bundled
+  with the game, at seven eighths of its width; the editor's sizes are 14, 16, 20 and 24,
+  and 16 is the one a new child gets. A comment of a starting code is one `#` line for
+  each sentence, written to fit a line where it can; the editor wraps a line that does not
+  fit, and the wrapped part hangs under the line's own indentation. Rules out a font
+  fetched from elsewhere, a comment cut into several `#` lines to fit a width, and a
+  wrapped line that starts at the editor's edge.
+- **D224 — What is untied is the knot.** Decided 2026-11-14 by the owner (*lo que se
+  desata es el nudo, no la escoba*; *hay que tener cuidado con la paja*). The texts untie
+  or take off a broom's knot, or its thread, and never untie a broom; `untie` stays the
+  method's name. *Paja* names only the straw the brooms lie in, on or under (*las escobas
+  de la paja*, *escondidas en la paja*): no sentence ends, does, finishes or makes *la
+  paja*. `tools/write/rules.md` carries both rules. Rules out *desatar una escoba*,
+  *escobas desatadas* and *terminamos con la paja*.

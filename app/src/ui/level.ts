@@ -2,8 +2,9 @@
 // beside it with a handle between the two, Run, Stop, Restart and the speed,
 // and the card saying how a run went. It is a view of a RunController (D29):
 // it makes the DOM once, renders every snapshot the controller gives, and
-// each button calls the controller. The card comes with no sound where the run's end
-// sounded as its playback ended, and with its sound where there was no playback (D247).
+// each button calls the controller. The start card opens the level every time its
+// screen opens (D248). The card comes with no sound where the run's end sounded as its
+// playback ended, and with its sound where there was no playback (D247).
 
 import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
@@ -65,10 +66,10 @@ export interface LevelScreenParts {
   openMap?: () => Promise<(overlay: { onClose: () => void; onGo: (hash: string) => void }) => Screen>;
   /** The address of the last lesson before the level, read again from here (D71). */
   lesson?: string;
-  /** The screen's guide's words (D68), and whether this level opens the guide the
-   * first time it is played: the course's first level. */
+  /** The screen's guide's words (D68), given to the course's first level alone: its
+   * start card opens the guide when closed the first time, and once the guide has been
+   * seen offers it again (D248). */
   loadGuide?: () => Promise<GuideText>;
-  guideFirst?: boolean;
 }
 
 export function levelScreen(parts: LevelScreenParts): LevelScreen {
@@ -327,8 +328,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     carried.length > 0
       ? t('level.carrying', { things: carried.map((kind) => t(`things.${kind}`)).join(', ') })
       : undefined;
-  // The start card says Start the first time it opens, and Continue when the child
-  // opens it again with ?, or when it is drawn again in another language.
+  // The start card says Start the first time it opens in this screen, and Continue when
+  // the child opens it again with ?, or when it is drawn again in another language.
   let startOpened = false;
   let startAgain = false;
   // The screen's guide (D68), with the notebook opened for its step about it.
@@ -363,7 +364,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       });
     });
   };
-  const showStart = (redraw = false, asked = false) => {
+  const showStart = (redraw = false) => {
     if (!redraw) startAgain = startOpened;
     startOpened = true;
     showCard(
@@ -377,11 +378,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           said: said(text.intro),
           carrying: carrying(),
           changes: text.changes,
-          onGuide: parts.loadGuide && (asked || startAgain) ? showGuide : undefined,
+          // Show me the screen, on the first level's card once the guide has been seen
+          // (D248).
+          onGuide: parts.loadGuide && progress.guided() ? showGuide : undefined,
         },
         () => {
           // The first level opens the guide once its start card is closed, the first time.
-          if (parts.guideFirst && !progress.guided()) {
+          if (parts.loadGuide && !progress.guided()) {
             guiding = true;
             showGuide();
           } else editor.focus();
@@ -521,7 +524,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const startShown = () => Boolean(shownCard?.open && shownCard.node.querySelector('.start-card'));
   about.addEventListener('click', () => {
     if (startShown()) shownCard?.close();
-    else showStart(false, true);
+    else showStart();
   });
   // While the start card is open, a click on any other button of the page closes it,
   // and the button does what it does: Run runs, Hint hints, the notebook opens, the
@@ -728,12 +731,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           seeGoals();
         }, 400);
       });
-      // The start card opens a level the first time it is played.
+      // The start card opens the level every time its screen opens (D248).
       progress.setCurrent(`level:${loaded.id}`);
-      if (!progress.hasStarted(loaded.id)) {
-        progress.markStarted(loaded.id);
-        showStart();
-      }
+      showStart();
     },
     async relabel() {
       const before = text;

@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
-import { levelText, seedWizard, skipGuide } from './helpers';
+import { levelText, seedWizard, shown, skipGuide } from './helpers';
 import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
@@ -18,9 +18,7 @@ async function run(page: Page, code: string): Promise<void> {
   await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
 }
 
-test('the start card opens a level the first time in a visit, and ? brings it back', async ({
-  page,
-}) => {
+test('the start card opens a level every time it opens, and ? brings it back (D248)', async ({ page }) => {
   await page.goto('/#level/the-hidden-key');
   const card = page.locator('.start-card');
   await expect(card).toBeVisible();
@@ -30,13 +28,49 @@ test('the start card opens a level the first time in a visit, and ? brings it ba
   await expect(card).toBeHidden();
 
   await page.reload();
+  await expect(card).toBeVisible();
+  await expect(card.locator('h3')).toHaveText(levelText('the-hidden-key', 'en').title);
+  await page.locator('#start').click();
+  await expect(card).toBeHidden();
   await ready(page);
-  await expect(page.locator('.start-card')).toBeHidden();
 
   await page.locator('#about').click();
   await expect(page.locator('.start-card')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('.start-card')).toBeHidden();
+});
+
+test.describe('the start card at every opening (D248)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page));
+
+  test("La revisión opened again from the map opens on its card, with its intro's words", async ({ page }) => {
+    // A sentence of the intro with no friend's name in it.
+    const words = shown(levelText('the-check', 'es').intro ?? '').split('. ')[1] as string;
+    await page.goto('/#level/the-check');
+    const card = page.locator('.start-card');
+    await expect(card).toContainText(words);
+    await page.locator('#start').click();
+    await expect(card).toBeHidden();
+    await page.goto('/?debug#map');
+    await page.locator('.stop[data-item="level:the-check"] a').click();
+    await expect(page).toHaveURL(/#level\/the-check$/);
+    await expect(card).toBeVisible();
+    await expect(card).toContainText(words);
+    await expect(card.locator('#show-screen')).toHaveCount(0);
+  });
+
+  test('a level won and opened again opens on its card', async ({ page }) => {
+    await page.goto('/#level/the-hidden-key');
+    await page.locator('#start').click();
+    await ready(page);
+    await page.locator('#speed').selectOption('4');
+    await run(page, readFileSync(fileURLToPath(new URL('../../content/levels/the-hidden-key/solution.py', import.meta.url)), 'utf8'));
+    await expect(page.locator('.win-card')).toBeVisible();
+    await page.reload();
+    await expect(page.locator('.start-card')).toBeVisible();
+    await expect(page.locator('.start-card h3')).toHaveText(levelText('the-hidden-key', 'es').title);
+  });
 });
 
 test('a won run shows its stars, and Next opens what comes next in the course', async ({ page }) => {

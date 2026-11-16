@@ -198,9 +198,10 @@ shows the part the camera follows (D69).
 - `ProgressStore` (TypeScript interface, D31): `load()`, `save(progress)`,
   with `progress` = `{version, language, wizard: {name, gender, look},
   settings: {speed, fontSize, split}, lessons: {id: {read}}, levels: {id:
-  {won, stars, code, hints, tried}}, started, current}`: `wizard` what the
-  child made (D36), `started` the levels whose start card was seen,
-  `current` the item last opened, where *Continue* goes. Each saved game is
+  {won, stars, code, hints, tried}}, current}`: `wizard` what the child
+  made (D36), `current` the item last opened, where *Continue* goes. The
+  game keeps no list of the start cards seen: a level's card opens every
+  time the level opens (D248). Each saved game is
   one such document (D70): `GamesStore` keeps them in `localStorage` under
   `kydux.game.<id>`, with their list under `kydux.games` (IndexedDB when it
   outgrows it); *Export* and *Import*, on the start screen, move a game as

@@ -79,6 +79,8 @@ test('the handle dragged moves the panes, the share stays after a reload, and a 
   expect(after).toBeLessThan(before - 100);
 
   await page.reload();
+  // The level opens on its start card again (D248).
+  await page.locator('#start').click();
   await expect(page.locator('.cm-editor')).toBeVisible();
   await expect.poll(() => stageWidth(page)).toBeCloseTo(after, -1);
 

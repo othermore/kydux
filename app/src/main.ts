@@ -534,7 +534,6 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
         table,
         createEditor,
         startScene,
-        loadGuide: () => loadGuideText(currentLanguage()),
         openMap: async () => {
           const [parts, { mapScreen }] = await Promise.all([mapParts(), import('./ui/map')]);
           return (overlay) => mapScreen({ ...parts, here: `level:${id}`, overlay });
@@ -543,7 +542,10 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
           const before = lessonBefore(course, id);
           return before ? `#lesson/${before}/from/${id}` : undefined;
         })(),
-        guideFirst: items(course).find((item) => item.startsWith('level:')) === `level:${id}`,
+        // The screen's guide, on the course's first level alone (D68, D248).
+        ...(items(course).find((item) => item.startsWith('level:')) === `level:${id}`
+          ? { loadGuide: () => loadGuideText(currentLanguage()) }
+          : {}),
       }),
     );
   } catch (error) {

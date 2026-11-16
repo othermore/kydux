@@ -78,7 +78,8 @@ export interface StartCardText {
   again?: boolean;
   /** What may differ at each run, in the child's words, when the level has ways (D204). */
   changes?: string;
-  /** Plays the screen's guide again (D68): offered on the card opened with ?. */
+  /** Plays the screen's guide again (D68): offered on the course's first level's card,
+   * once the guide has been seen (D248). */
   onGuide?: () => void;
 }
 

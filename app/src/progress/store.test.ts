@@ -76,8 +76,18 @@ describe('LocalProgressStore', () => {
     expect(read.levels.a).toEqual({ stars: 2 });
     expect(read.levels.b).toEqual({});
     expect(read.levels.c).toEqual({});
-    expect(read.started).toEqual(['a']);
     expect(read.current).toBeNull();
+  });
+
+  it('reads a game that kept the start cards seen, and saves it back with no such list (D248)', () => {
+    const storage = memoryStorage();
+    storage.setItem('kydux.progress', JSON.stringify({ version: PROGRESS_VERSION, levels: { a: { won: true } }, started: ['a'] }));
+    const store = new LocalProgressStore(storage);
+    const read = store.load();
+    expect(read.levels.a).toEqual({ won: true });
+    expect('started' in read).toBe(false);
+    store.save(read);
+    expect(JSON.parse(storage.getItem('kydux.progress') ?? '{}')).not.toHaveProperty('started');
   });
 
   it("reads the editor's size, 16 where none is kept or one not offered (D238)", () => {
@@ -140,11 +150,7 @@ describe('the helpers', () => {
     expect(progress.levelProgress('a')).toEqual({ won: true, stars: 3, code: 'wizard.move_right(6)\n' });
   });
 
-  it('remember the start cards seen, the hints shown and the settings', () => {
-    expect(progress.hasStarted('a')).toBe(false);
-    progress.markStarted('a');
-    progress.markStarted('a');
-    expect(progress.load().started).toEqual(['a']);
+  it('remember the hints shown and the settings', () => {
     progress.setHints('a', 2);
     progress.markTried('a');
     expect(progress.levelProgress('a')).toEqual({ hints: 2, tried: true });

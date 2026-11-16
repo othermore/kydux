@@ -117,16 +117,6 @@ export function setHints(id: string, shown: number): void {
   });
 }
 
-export function hasStarted(id: string): boolean {
-  return store.load().started.includes(id);
-}
-
-export function markStarted(id: string): void {
-  change((progress) => {
-    if (!progress.started.includes(id)) progress.started.push(id);
-  });
-}
-
 /** A run started in a level (D57). */
 export function countRun(id: string): void {
   editLevel(id, (level) => {

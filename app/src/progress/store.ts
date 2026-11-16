@@ -56,8 +56,6 @@ export interface Progress {
   /** Whether the screen's guide has been shown, done or skipped (D68). */
   guided: boolean;
   levels: Record<string, LevelProgress>;
-  /** The levels whose start card has been seen. */
-  started: string[];
   /** The item of the course last opened: `level:<id>` or `lesson:<id>`. */
   current: string | null;
 }
@@ -97,7 +95,6 @@ export function defaultProgress(): Progress {
     stories: {},
     guided: false,
     levels: {},
-    started: [],
     current: null,
   };
 }
@@ -182,9 +179,6 @@ export function readProgress(value: unknown): Progress | null {
       if (isCount(level.runs)) kept.runs = level.runs;
       progress.levels[id] = kept;
     }
-  }
-  if (Array.isArray(value.started)) {
-    progress.started = value.started.filter((id): id is string => typeof id === 'string');
   }
   if (typeof value.current === 'string' && ITEM.test(value.current)) progress.current = value.current;
   progress.guided = value.guided === true;

@@ -100,6 +100,7 @@ export function levelText(id: string, lang: 'en' | 'es'): {
   goals: string[];
   starting_code: string;
   hints: string[];
+  intro?: string;
   outro?: string;
 } {
   const path = fileURLToPath(new URL(`../../content/levels/${id}/text.${lang}.json`, import.meta.url));

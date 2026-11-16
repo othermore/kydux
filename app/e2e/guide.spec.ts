@@ -1,6 +1,7 @@
 // The screen's guide (D68): the first level opens it once, after its start card;
 // it shows each part of the screen in turn, the notebook's panel and its button
-// together with an arrow to each, and the ? card plays it again.
+// together with an arrow to each, and that level's card, once the guide has been seen,
+// plays it again; no other level's card does (D248).
 
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
@@ -11,8 +12,13 @@ const STEPS = ['scene', 'goals', 'editor', 'run', 'notebook', 'hint', 'about', '
 /** How many parts of the screen each step shows. */
 const SHOWN: Record<string, number> = { run: 2, notebook: 2, method: 0 };
 
-test('the first level shows the screen once, step by step; ? shows it again', async ({ page }) => {
+test("the first level shows the screen once, step by step; its card offers it again, and no other level's does (D248)", async ({
+  page,
+}) => {
   await page.goto('/#level/the-gate');
+  // The first time, the card has no Show me the screen: closing it opens the guide.
+  await expect(page.locator('.start-card')).toBeVisible();
+  await expect(page.locator('#show-screen')).toHaveCount(0);
   await page.locator('#start').click();
   const guide = page.locator('.guide');
   await expect(guide).toBeVisible();
@@ -34,17 +40,31 @@ test('the first level shows the screen once, step by step; ? shows it again', as
   }
   await expect(guide).toHaveCount(0);
 
-  // Once seen, it does not open again by itself.
+  // Once seen, it does not open again by itself; the card, open at every opening, offers
+  // it, and the button opens it.
   await page.reload();
-  await expect(page.locator('#run')).toBeVisible();
+  await expect(page.locator('.start-card')).toBeVisible();
   await expect(guide).toHaveCount(0);
-
-  // The ? card offers it again; Skip closes it.
-  await page.locator('#about').click();
   await page.locator('#show-screen').click();
   await expect(guide).toHaveAttribute('data-step', 'scene');
   await page.locator('#guide-skip').click();
   await expect(guide).toHaveCount(0);
+
+  // The card opened again with ? offers it too.
+  await page.locator('#about').click();
+  await expect(page.locator('#show-screen')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.start-card')).toBeHidden();
+
+  // Another level's card has no such button, opened by itself or with ?.
+  await page.goto('/#level/the-long-corridor');
+  await expect(page.locator('.start-card')).toBeVisible();
+  await expect(page.locator('#show-screen')).toHaveCount(0);
+  await page.locator('#start').click();
+  await expect(guide).toHaveCount(0);
+  await page.locator('#about').click();
+  await expect(page.locator('.start-card')).toBeVisible();
+  await expect(page.locator('#show-screen')).toHaveCount(0);
 });
 
 test('the guide is in the child\'s language', async ({ browser }) => {

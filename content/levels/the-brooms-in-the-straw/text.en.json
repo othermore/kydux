@@ -4,14 +4,14 @@
     "Leave no broom knotted.",
     "Use `x`."
   ],
-  "starting_code": "# Find the brooms on the floor with `find_all`.\n# For each broom of the list:\n#     compare your `x` with the broom's `x` to choose left or right;\n#     take the smaller from the greater to know the steps, and walk them;\n#     do the same with `y` to go up or down;\n#     and untie it.\n",
+  "starting_code": "# To make it a little easier, I have written comments\n# and left you gaps so that, under each comment,\n# you write the code that does what the comment says.\n# I have even left the spaces for you so\n# that you know what goes inside the loops and the ifs!\n\n# Find all the brooms with find_all\n\n# Now make a loop to go through all the brooms\n\n    # First we move to the left or to the right.\n    # If the broom's x position is smaller than yours, the broom is to your left:\n    \n        # You will have to use move_left\n        \n    # If not, the broom is to your right:\n    \n        # You will have to use move_right\n        \n    # Then we move up or down.\n    # If the broom's y position is smaller than yours, the broom is up:\n    \n        # You will have to use move_up\n        \n    # If not, the broom is below you:\n    \n        # You will have to use move_down\n        \n    # Once we have reached the broom, we can untie it with broom.untie\n    \n",
   "hints": [
-    "Use a `for` loop. For each broom, compare its `x` with yours to see if it is to the left or to the right.",
-    "Remember our lesson: a smaller `x` means it is to the left, and a smaller `y` means it is higher up!",
-    "To find the steps, always take the smaller number from the greater one, as in the lesson. Then use `untie()`!"
+    "The loop goes over the list that `find_all` gives, and everything you do for one broom goes inside it.",
+    "Inside the loop you have to do the same two comparisons as in the previous level.",
+    "The `broom.untie()` method goes inside the loop, after walking to both sides."
   ],
-  "intro": "We're done with the brooms that were hanging. The rest are scattered in the straw! From where you are, if you use `find_all` you'll find them in order, starting with the nearest, but the next one may be on any side of you. You can work out how many steps you have to walk from where you are at each moment to the next broom, and so go through them all: compare its `x` and its `y` with yours to know where to walk, and take the smaller number from the greater for the steps.",
-  "outro": "All done with the straw! You calculated every distance perfectly.",
+  "intro": "All right, you've got it! But let's try to do it for every broom on the floor, instead of going one by one. The `find_all` function gives them to you starting with the nearest, but each one can be on any side of where your wizard is at that moment. The program's comments will guide you step by step, one for each instruction.",
+  "outro": "We're done with the straw! All the brooms are safe and tidy.",
   "learned": "Now you know that you can use `if` and `<` inside a loop to compare coordinates and find the right number of steps to any side.",
   "changes": "The number of brooms on the floor and where they lie change each time, so the next one may be on any side.",
   "changed": "This time, the brooms on the floor are in other places."

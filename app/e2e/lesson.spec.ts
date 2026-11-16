@@ -219,7 +219,9 @@ test.describe('a page runs its code (D142)', () => {
     await expect(page.locator('.lesson-printed')).toHaveText('False', { timeout: ciTimes(30_000) });
     await page.locator('#lesson-next').click();
     // The game's own words for a negative move, as the child reads them.
-    await expect(page.locator('.lesson-page')).toContainText('move_left is not used like that. Try it like this: wizard.move_left(3).');
+    await expect(page.locator('.lesson-page')).toContainText(
+      'the game does not accept it and tells you that move_left is not used like that.',
+    );
     await page.locator('.lesson-run button').click();
     await expect(page.locator('.lesson-printed')).toHaveText('left 3', { timeout: ciTimes(30_000) });
     for (const [broom, printed] of [

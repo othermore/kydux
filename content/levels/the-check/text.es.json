@@ -1,7 +1,7 @@
 {
   "title": "La revisión",
   "goals": [
-    "No dejes ninguna escoba con nudo.",
+    "No dejes ninguna escoba colgada con nudo.",
     "El programa termina sin error.",
     "Usa `knotted`."
   ],
@@ -11,9 +11,9 @@
     "Solo queremos desatar una escoba si realmente tiene un nudo. Mira su atributo para ver si está anudada antes de usar el método.",
     "¡Pon un `if` dentro del bucle para mirar `broom.knotted`, justo antes de desatar, y no olvides añadir cuatro espacios más antes del método para que esté dentro del `if`!"
   ],
-  "intro": "{mate} ha dejado todas las escobas ordenadas, colgadas en sus ganchos en la pared. Se ha dado cuenta de que algunas todavía tienen un nudo encantado. ¡Algunas se nos escaparon, así que hay que repasarlas! He puesto el programa que usamos para recorrer las escobas en la pared, para ir una por una desatando el nudo. ¡Pero se para en la primera escoba sin nudo, cuelgue donde cuelgue, porque desatar una escoba sin nudo es un error! ¿Puedes arreglar el programa con un `if`? Para ver si una escoba tiene nudo, se puede usar su atributo `knotted`.",
-  "outro": "¡Uf! Todas las escobas están a salvo. ¡Y justo a tiempo, oigo que viene la clase!",
+  "intro": "{mate} se ha dado cuenta de que algunas escobas todavía tienen un nudo encantado. Quizás tenían dos, o quizás se nos escaparon al intentar desatarlas, así que hay que repasarlas. He puesto el programa que usamos para recorrer las escobas en la pared, para ir una por una desatando el nudo. ¡Pero se para en la primera escoba sin nudo, cuelgue donde cuelgue, porque desatar una escoba sin nudo es un error! ¿Puedes arreglar el programa con un `if`? Para ver si una escoba tiene nudo, se puede usar su atributo `knotted`.",
+  "outro": "¡Todas las escobas de la pared están desatadas! Ahora tenemos que ocuparnos de las que están tiradas por la paja, que son las siguientes.",
   "learned": "Ahora sabes que un `if` dentro de un `for` decide en cada vuelta, y que antes de usar `untie()` puedes mirar `knotted` para saber si hay nudo.",
-  "changes": "El número de escobas de la pared, los ganchos de los que cuelgan y cuáles tienen todavía un nudo cambian cada vez.",
+  "changes": "Las escobas de la pared y cuáles tienen todavía un nudo cambian cada vez.",
   "changed": "Esta vez, hay otras escobas con nudo."
 }

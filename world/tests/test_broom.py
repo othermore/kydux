@@ -683,19 +683,31 @@ def test_on_the_wall_the_pegs_come_nearest_first_from_the_end_and_each_walk_is_i
     assert not any(world.things[f"broom_{p}"].knotted for p in pegs)
 
 
-#: The check's pegs with a broom and those still knotted, by way (plan 2.3), and which of
-#: the list's brooms is the first with no knot.
+#: The check's pegs with a broom, nearest first from the row's right end, and those still
+#: knotted, by way (sprint 43, 2.5): the wall's own brooms; and which of the list's
+#: brooms is the first with no knot, where the given program stops.
 CHECK_PEGS = {
-    "a": ([13, 11, 10, 8, 6], [11, 6], 0),
-    "b": ([12, 11, 9, 8, 7, 6], [12, 9, 7], 1),
-    "c": ([13, 12, 10, 9, 7], [12, 10, 9], 0),
+    "a": ([12, 10, 9, 6], [6, 10], 0),
+    "b": ([13, 11, 7], [11], 0),
+    "c": ([13, 12, 9, 8, 6], [8, 9, 13], 1),
 }
 
 
 @pytest.mark.parametrize("way", sorted(CHECK_PEGS))
-def test_in_the_check_the_given_program_stops_at_the_first_broom_with_no_knot(way):
+def test_in_the_check_the_wall_s_own_brooms_and_the_given_program_stops_at_one_with_no_knot(
+    way,
+):
+    """D217, 2.5: each way hangs what the wall's way of the same id hangs, the two of the
+    floor still knotted where they lie there; the wall's program stops in every way."""
     pegs, knots, first = CHECK_PEGS[way]
     level = content_level("the-check").way(way)
+    wall = content_level("the-brooms-on-the-wall").way(way)
+    hung = sorted(tuple(t.position) for t in level.things if t.kind == "broom" and t.hung)
+    assert hung == sorted(tuple(t.position) for t in wall.things if t.kind == "broom" and t.hung)
+    lying = {
+        (tuple(t.position), t.knotted) for t in level.things if t.kind == "broom" and not t.hung
+    }
+    assert lying == {((7, 7), True), ((11, 7), True)}
     world = World(level)
     world.wizard.move_up(3)
     world.wizard.move_right(4)
@@ -707,6 +719,54 @@ def test_in_the_check_the_given_program_stops_at_the_first_broom_with_no_knot(wa
     world = World(level)
     walked_by_distance(world, knotted_only=True)
     assert not any(world.things[f"broom_{p}"].knotted for p in pegs)
+
+
+#: The nearest broom's level by way (2.6): the broom find_nearest gives from (9, 7), its
+#: walk (columns to the right, rows down), and the others, each farther.
+NEAREST = {
+    "a": ((11, 6), (2, -1), [(6, 6), (6, 8), (13, 8)]),
+    "b": ((7, 8), (-2, 1), [(6, 6), (12, 8), (13, 6)]),
+    "c": ((8, 6), (-1, -1), [(6, 8), (12, 8), (13, 6)]),
+}
+
+
+@pytest.mark.parametrize("way", sorted(NEAREST))
+def test_the_nearest_broom_lies_on_the_boards_and_the_others_farther_under_the_straw(way):
+    """D217, 2.6: broom_0 is found by find_nearest from the start, seen on the boards; the
+    others lie on the straw's cells, hidden, each at least a step farther."""
+    level = content_level("the-nearest-broom").way(way)
+    assert level.start == (9, 7)
+    cell, walk, others = NEAREST[way]
+    world = World(level)
+    nearest = world.wizard.find_nearest("broom")
+    assert nearest.name == "broom_0" and tuple(nearest.position) == cell
+    assert (cell[0] - 9, cell[1] - 7) == walk
+    lying = {tuple(t.position): t for t in level.things if t.kind == "broom" and not t.hung}
+    assert set(lying) == {cell, *others}
+    assert not lying[cell].hidden and all(lying[o].hidden for o in others)
+    assert all(o in STRAW for o in others) and cell not in STRAW
+    near = abs(walk[0]) + abs(walk[1])
+    assert all(abs(x - 9) + abs(y - 7) >= near + 1 for x, y in others)
+    # No friend's figure, drawn with its soles in row 6 (D211), over a broom.
+    for actor in level.actors:
+        assert actor.position.y == 5
+        assert (actor.position.x, 6) not in lying
+
+
+def test_the_nearest_broom_s_walks_go_every_way_round():
+    """2.6: a program that walks the same two ways wins at most one arrangement; one
+    that decides only left or right, or only up or down, loses one."""
+    walks = [walk for _, walk, _ in NEAREST.values()]
+    assert {x < 0 for x, _ in walks} == {True, False}
+    assert {y < 0 for _, y in walks} == {True, False}
+    for sideways in (-1, 1):
+        for upwards in (-1, 1):
+            same = [
+                w
+                for w in walks
+                if (w[0] > 0) - (w[0] < 0) == sideways and (w[1] > 0) - (w[1] < 0) == upwards
+            ]
+            assert len(same) <= 1
 
 
 #: The straw's brooms by way (plan 2.4): the list as find_all gives it from the start,

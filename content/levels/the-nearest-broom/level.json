@@ -1,0 +1,249 @@
+{
+  "id": "the-nearest-broom",
+  "kind": "practice",
+  "scene": "the-broom-shed",
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "zones": {
+    "wall": [
+      [
+        6,
+        5,
+        13,
+        5
+      ]
+    ],
+    "straw": [
+      [
+        6,
+        6,
+        13,
+        8
+      ],
+      [
+        5,
+        8,
+        5,
+        8
+      ]
+    ]
+  },
+  "camera": {
+    "fit": [
+      [
+        3,
+        0
+      ],
+      [
+        16,
+        10
+      ]
+    ]
+  },
+  "tick_limit": 100,
+  "start": [
+    9,
+    7
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        7,
+        5
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        12,
+        5
+      ]
+    }
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_6",
+      "at": [
+        6,
+        4
+      ],
+      "hung": true,
+      "zone": "wall"
+    },
+    {
+      "kind": "broom",
+      "id": "broom_9",
+      "at": [
+        9,
+        4
+      ],
+      "hung": true,
+      "zone": "wall"
+    },
+    {
+      "kind": "broom",
+      "id": "broom_10",
+      "at": [
+        10,
+        4
+      ],
+      "hung": true,
+      "zone": "wall"
+    },
+    {
+      "kind": "broom",
+      "id": "broom_12",
+      "at": [
+        12,
+        4
+      ],
+      "hung": true,
+      "zone": "wall"
+    },
+    {
+      "kind": "broom",
+      "id": "broom_0",
+      "at": [
+        11,
+        6
+      ],
+      "zone": "straw",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        6,
+        6
+      ],
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        6,
+        8
+      ],
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_3",
+      "at": [
+        13,
+        8
+      ],
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
+    }
+  ],
+  "api": [
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.move_left",
+    "wizard.move_right",
+    "wizard.find_nearest",
+    "broom.untie",
+    "thing.position",
+    "wizard.position",
+    "position.x",
+    "position.y"
+  ],
+  "goals": [
+    {
+      "kind": "untied",
+      "ids": [
+        "broom_0"
+      ]
+    },
+    {
+      "kind": "uses",
+      "member": "x",
+      "bonus": true
+    }
+  ],
+  "ways": [
+    {
+      "id": "a"
+    },
+    {
+      "id": "b",
+      "things": [
+        {
+          "id": "broom_0",
+          "at": [
+            7,
+            8
+          ],
+          "hidden": false
+        },
+        {
+          "id": "broom_2",
+          "at": [
+            12,
+            8
+          ],
+          "hidden": true
+        },
+        {
+          "id": "broom_3",
+          "at": [
+            13,
+            6
+          ],
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "c",
+      "things": [
+        {
+          "id": "broom_0",
+          "at": [
+            8,
+            6
+          ],
+          "hidden": false
+        },
+        {
+          "id": "broom_1",
+          "at": [
+            6,
+            8
+          ],
+          "hidden": true
+        },
+        {
+          "id": "broom_2",
+          "at": [
+            12,
+            8
+          ],
+          "hidden": true
+        },
+        {
+          "id": "broom_3",
+          "at": [
+            13,
+            6
+          ],
+          "hidden": true
+        }
+      ]
+    }
+  ]
+}

@@ -29,9 +29,9 @@ print(escoba_x < mi_x)
 ---
 ## Qué resta hacemos
 
-Un movimiento da 0 pasos o más. Si le das un número negativo, como en `wizard.move_left(-3)`, el juego no lo acepta y te dice: *`move_left` no se usa así. Prueba de esta forma: `wizard.move_left(3)`.*
+Con las funciones `move_`, como `move_left()`, te puedes mover 0 o más pasos. Si le das un número negativo, como en `wizard.move_left(-3)`, el juego no lo acepta y te dice que `move_left` no se usa así.
 
-Así que el programa mira primero y resta después, siempre el menor del mayor, con el `if` y el `else` que ya conoces. Las líneas del `else` se ejecutan cuando la condición del `if` es `False`.
+Así que para movernos a una posición desde donde estamos, hace falta primero ver si nos tenemos que mover a la izquierda o a la derecha. Así podemos calcular el número mayor menos el número menor, y que nos salga un número de pasos que es positivo. Lo podemos hacer con el `if` y el `else` que ya conoces.
 
 ```python try
 mi_x = 9

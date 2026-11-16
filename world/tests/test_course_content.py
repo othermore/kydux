@@ -447,11 +447,12 @@ def test_a_level_on_a_scene_starts_where_the_one_before_it_ended(before, after):
 
 
 #: The shed's levels that start where the plan puts them rather than where the one before
-#: ended: the wall's at the shed's door; the straw's on the floor's first row, where a
-#: find_all gives the floor's brooms; and the check, which plays the wall's program
-#: again, where the wall's began.
+#: ended: the wall's at the shed's door; the nearest broom's in the middle of the floor;
+#: the straw's on the floor's first row, where a find_all gives the floor's brooms; and
+#: the check, which plays the wall's program again, where the wall's began.
 STARTS_SAID = {
     "the-brooms-on-the-wall": [9, 8],
+    "the-nearest-broom": [9, 7],
     "the-brooms-in-the-straw": [10, 6],
     "the-check": [9, 8],
 }
@@ -675,3 +676,63 @@ def test_a_level_with_ways_says_what_may_differ_and_never_names_them(path):
             assert isinstance(text.get("changes"), str) and text["changes"].strip()
         else:
             assert "changes" not in text
+
+
+#: The shed's order (D217, sprint 43's 2.4): the if inside the for and the check right
+#: after the wall, then the comparisons, one broom, and all of them.
+SHED_ORDER = [
+    "level:the-brooms-on-the-wall",
+    "lesson:checking-each",
+    "level:the-check",
+    "lesson:less-or-greater",
+    "level:the-nearest-broom",
+    "level:the-brooms-in-the-straw",
+    "story:the-flying-lesson",
+]
+
+
+def test_the_shed_goes_from_the_easy_to_the_hard():
+    items = course()
+    start = items.index(SHED_ORDER[0])
+    assert items[start : start + len(SHED_ORDER)] == SHED_ORDER
+
+
+@pytest.mark.parametrize("level", ["the-nearest-broom", "the-brooms-in-the-straw"])
+@pytest.mark.parametrize("lang", LANGUAGES)
+def test_a_long_program_is_given_as_comments_one_for_each_instruction(level, lang):
+    """D218: every line of the starting code is empty, spaces or a comment; an indented
+    comment, or the comments that go on from it, is followed by a line of spaces at
+    least as deep, where the line it asks for is written; no line of code."""
+    text = json.loads(
+        (CONTENT / "levels" / level / f"text.{lang}.json").read_text(encoding="utf-8")
+    )
+    lines = text["starting_code"].split("\n")
+    assert lines[-1] == ""
+    lines = lines[:-1]
+    for number, line in enumerate(lines):
+        assert line.strip() == "" or line.lstrip().startswith("#"), f"{level} {lang}: {line!r}"
+        depth = len(line) - len(line.lstrip())
+        if line.strip().startswith("#") and depth > 0:
+            # Under the comment, or under the comments that go on from it, the room.
+            below = next(
+                (later for later in lines[number + 1 :] if not later.strip().startswith("#")), None
+            )
+            assert below is not None and below.strip() == "" and len(below) >= depth, (
+                f"{level} {lang}: no room under {line!r}"
+            )
+    comments = [line for line in lines if line.strip().startswith("#")]
+    names = (
+        "find_nearest",
+        "find_all",
+        "move_left",
+        "move_right",
+        "move_up",
+        "move_down",
+        "broom.untie",
+    )
+    for name in names:
+        if name == "find_all" and level == "the-nearest-broom":
+            continue
+        if name == "find_nearest" and level == "the-brooms-in-the-straw":
+            continue
+        assert any(name in line for line in comments), f"{level} {lang}: no comment names {name}"

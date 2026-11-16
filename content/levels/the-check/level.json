@@ -145,6 +145,26 @@
       ],
       "hung": true,
       "zone": "wall"
+    },
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        7,
+        7
+      ],
+      "zone": "straw",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        11,
+        7
+      ],
+      "zone": "straw",
+      "knotted": true
     }
   ],
   "api": [
@@ -159,7 +179,8 @@
   ],
   "goals": [
     {
-      "kind": "untied"
+      "kind": "untied",
+      "zone": "wall"
     },
     {
       "kind": "no_error"
@@ -175,54 +196,33 @@
       "id": "a",
       "things": [
         {
-          "id": "broom_6",
-          "knotted": true
-        },
-        {
           "id": "broom_7",
           "gone": true
         },
         {
-          "id": "broom_9",
+          "id": "broom_8",
           "gone": true
         },
         {
           "id": "broom_11",
+          "gone": true
+        },
+        {
+          "id": "broom_13",
+          "gone": true
+        },
+        {
+          "id": "broom_6",
           "knotted": true
         },
         {
-          "id": "broom_12",
-          "gone": true
+          "id": "broom_10",
+          "knotted": true
         }
       ]
     },
     {
       "id": "b",
-      "things": [
-        {
-          "id": "broom_7",
-          "knotted": true
-        },
-        {
-          "id": "broom_9",
-          "knotted": true
-        },
-        {
-          "id": "broom_10",
-          "gone": true
-        },
-        {
-          "id": "broom_12",
-          "knotted": true
-        },
-        {
-          "id": "broom_13",
-          "gone": true
-        }
-      ]
-    },
-    {
-      "id": "c",
       "things": [
         {
           "id": "broom_6",
@@ -234,18 +234,47 @@
         },
         {
           "id": "broom_9",
-          "knotted": true
+          "gone": true
         },
         {
           "id": "broom_10",
+          "gone": true
+        },
+        {
+          "id": "broom_12",
+          "gone": true
+        },
+        {
+          "id": "broom_11",
           "knotted": true
+        }
+      ]
+    },
+    {
+      "id": "c",
+      "things": [
+        {
+          "id": "broom_7",
+          "gone": true
+        },
+        {
+          "id": "broom_10",
+          "gone": true
         },
         {
           "id": "broom_11",
           "gone": true
         },
         {
-          "id": "broom_12",
+          "id": "broom_8",
+          "knotted": true
+        },
+        {
+          "id": "broom_9",
+          "knotted": true
+        },
+        {
+          "id": "broom_13",
           "knotted": true
         }
       ]

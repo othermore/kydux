@@ -1,6 +1,6 @@
 # Las listas
 
-Pero ¿cuántas son? Y ¿cómo las encontramos? Hay una manera de encontrar todas las cosas del mismo tipo. Os la enseñaré.
+Tenemos que revisar todas las escobas, pero ¿cuántas son? Y ¿cómo las encontramos? Hay una manera de encontrar todas las cosas del mismo tipo. Os la enseñaré.
 
 A veces queremos que una variable guarde varios valores a la vez, todos en orden. Los ponemos entre corchetes y los separamos por comas, así: `nombres = ["Teku", "Nuri", "Bimo"]`. Si le dices al ordenador que imprima con `print(nombres)`, ¡enseña todo el grupo!
 

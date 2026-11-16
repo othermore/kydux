@@ -1,6 +1,6 @@
 # Lists
 
-But how many are there? And how do we find them? There's a way to find all the things of the same kind. I'll show you.
+We have to check all the brooms, but how many are there? And how do we find them? There's a way to find all the things of the same kind. I'll show you.
 
 Sometimes we want a variable to keep several values at once, all in order. We put them inside square brackets and separate them with commas, like this: `names = ["Teku", "Nuri", "Bimo"]`. If you tell the computer to `print(names)`, it shows the whole group!
 

@@ -29,9 +29,9 @@ print(broom_x < my_x)
 ---
 ## Which subtraction
 
-A move takes 0 steps or more. If you give it a negative number, as in `wizard.move_left(-3)`, the game refuses it and tells you: *`move_left` is not used like that. Try it like this: `wizard.move_left(3)`.*
+With the `move_` functions, like `move_left()`, you can move 0 or more steps. If you give it a negative number, like in `wizard.move_left(-3)`, the game does not accept it and tells you that `move_left` is not used like that.
 
-So the program looks first and subtracts after, always the smaller number from the greater one, using the `if` and `else` you already know. The lines of the `else` run when the `if`'s condition is `False`.
+So to move to a position from where we are, we first need to see whether we have to move left or right. Then we can work out the greater number less the smaller number, and get a number of steps that is positive. We can do it with the `if` and the `else` you already know.
 
 ```python try
 my_x = 9

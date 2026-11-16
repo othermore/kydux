@@ -146,7 +146,7 @@ test.describe('the shed', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
-  for (const id of ['the-broom-at-your-feet', 'the-shed', 'the-brooms-on-the-wall', 'the-brooms-in-the-straw', 'the-check']) {
+  for (const id of ['the-broom-at-your-feet', 'the-shed', 'the-brooms-on-the-wall', 'the-check', 'the-nearest-broom', 'the-brooms-in-the-straw']) {
     test(`${id} opens on the shed whole, its pegs clear of the goals and the buttons (D201)`, async ({ page }) => {
       await open(page, id);
       await expect(scene(page)).toHaveAttribute('data-camera-fit', '3,0,16,10');
@@ -289,6 +289,24 @@ test.describe('the shed', () => {
     await expect(scene(page)).toHaveAttribute('data-wizard', '10,6');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}straw-refused.png` });
   });
+
+  for (const [id, deepest] of [
+    ['the-nearest-broom', '    '],
+    ['the-brooms-in-the-straw', '        '],
+  ] as const) {
+    test(`${id} starts from the owner's comments, the line under each with the spaces of the line to write (D218)`, async ({
+      page,
+    }) => {
+      await open(page, id);
+      const lines = await page.locator('.cm-content .cm-line').allTextContents();
+      expect(lines[0]).toBe('# Para que sea un poco más fácil, he escrito comentarios');
+      const left = lines.findIndex((line) => line.trim() === '# Deberás usar move_left');
+      expect(left).toBeGreaterThan(0);
+      expect(lines[left + 1]).toBe(deepest);
+      expect(lines.filter((line) => line.trim() !== '' && !line.trim().startsWith('#'))).toEqual([]);
+      await page.screenshot({ path: `${SHOTS}${id}-comments.png` });
+    });
+  }
 
   test("the wall's program stops at the first broom, which has no knot, and the if mends it (D183)", async ({ page }) => {
     await open(page, 'the-check');

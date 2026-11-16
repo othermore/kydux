@@ -599,9 +599,12 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     their goals; the challenges after it. The order of the draft, refined
     to one idea at a time, as above.
 5.3 Chapter 1, Arrival (methods, sequences, comments, arguments, strings),
-    in the scene of the gate: the story at the gate, seven lessons, nine
-    levels (seven practices, a fix, an improve) taught by Nuri, the wand
-    lent, the first spell, and the story up to the castle (`course.md`).
+    in the scene of the gate: the opening, its first two steps told over the
+    castle's painting (D251), the story at the gate, seven lessons, nine
+    levels (seven practices, a fix, an improve) taught by Nuri, the first
+    one's start card the only one to offer the screen's guide again (D248),
+    the wand lent, the first spell, and the story up to the castle
+    (`course.md`).
 5.4 Chapter 2, The library (variables, attributes, finding things), in the
     scene of the library: the mate's lesson and Wenna's six, whose pages on `print`
     and the variable run plain Python (D170) and whose blocks try ideas of the
@@ -612,6 +615,7 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     scene's states Gemini's, `sprint-32.md`, the crossing a row lower with its doors as
     painted, `sprint-33.md`, the marks on the floor, `sprint-34.md`, and the hole that
     opens, `sprint-35.md`): the friend's eleven lessons, whose pages run their code (D142),
+    the lesson *if* with a page on the keys that move a line in (D250),
     eleven levels (a fix, an improve), the naughty child's map as a window with the
     scene's plan in ink, drawn as the scene draws it and opened by its spell (D134,
     D143, D151, D159), the dark tunnel (D135, D145, D152), the patrolling teacher
@@ -665,7 +669,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     set of voices a theme (D210), the row under the pegs walked (D211), and the straw
     walked by the coordinates after the lesson *less-or-greater* (D212); and, in
     `sprint-43.md`, something to read while a screen loads, a story's words before its
-    scene and a tip for a child who has begun (D214), `drevo` cast in the air that lands
+    scene and a tip for a child who has begun (D214; Loading… large beside the mark and
+    a bar that moves, D249), `drevo` cast in the air that lands
     (D215), the walkthrough in one arrangement (D216), the shed from the easy to the
     hard, the check on the wall's own brooms and one broom before all of them (D217),
     and a long program given as comments, one for each instruction (D218); and, in
@@ -677,7 +682,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     and a walked step three ticks where the wizard can fly (D225); and, in
     `sprint-45.md`, a turn inside a ring that rubs its rim and stops the program (D226),
     the goals box as a list or a strip, folded by itself only after three seconds
-    (D227), the start card over the whole window (D228), the race's finish a cell past
+    (D227), the start card over the whole window (D228; opened every time its level
+    opens, D248), the race's finish a cell past
     the painted line (D229), the content and Python's files kept for good under
     addresses that change with them (D230), the page's sound asleep while nothing
     sounds (D231), and a figure flown through a ring's hole, behind it or in front of it
@@ -686,7 +692,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     each one took, the penalty and the winner on a band at the scene's foot (D234); and,
     in `sprint-47.md`, a flying figure hovering slowly (D235; whenever it is seen,
     D242), the broom's wind heard only while the program plays (D236; a gust for each
-    flown command, D243), a thought about a bump half a second after it and words
+    flown command, D243, its levels counted from its own plan and its mix the owner's,
+    D252), a thought about a bump half a second after it and words
     over a flying figure as it is drawn (D237), Inconsolata at 16 the code's only letter
     (D238), the tips' pictures at 960 by 540, shown as large as the window lets (D239;
     each coming up with its tip, D246), and words put under a figure where the goals
@@ -694,8 +701,9 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     in `sprint-48.md`, the way each figure faces kept by the scene and never read from a
     frame (D241), a figure in the air hovering whenever it is seen, after Stop too
     (D242), the broom's wind as a gust for each flown command (D243), a lift and a
-    landing seen and heard, whoever orders them (D244; the landing heard as the wind
-    that rises as the ground nears and is switched off, D255), a thought with no room above
+    landing seen and heard, whoever orders them (D244; the landing turned down and never
+    struck, D253, heard as the wind that rises as the ground nears and is switched off,
+    D255), a thought with no room above
     beside the head (D245), a tip that comes up with its picture (D246), and a run's
     end that sounds when the run ends (D247).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

@@ -49,10 +49,15 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 D85, D107, D160, D167, D168),
                 the wizard asleep
                 (D84), the night that falls once it sleeps and the morning
-                after it, and a morning story's light (light.ts, D124), the
-                tester's view of the cells and the masks
+                after it, and a morning story's light (light.ts, D124), a thing
+                drawn from a sprite of its kind, a broom or a ring, and a hidden
+                one once found (things.ts, D182, D184), a figure flying on its
+                broom, lifted and bobbing, a flown step in a third of a walked
+                one's time (flight.ts, D185), the tester's view of the cells,
+                the low and the high ones, the rings' order and the masks
                 (debug.ts, opened with ?debug), and the sound effects, made as
-                the game plays (sfx.ts)
+                the game plays (sfx.ts), with the flight's wind, which lasts
+                while a figure flies (sound.ts, D185)
   src/editor/   the child's editor, CodeMirror
   src/ui/       the screens: start with the saved games (start.ts), the
                 wizard's creator (wizard.ts), the map, also over a level (map.ts),
@@ -88,7 +93,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
 world/          kydux_world, the model of the levels, and its tests: level.py reads
                 a level; world.py holds the wizard and the ticks; things.py the
                 read-only base and the things; actors.py the teacher and the sight
-                rule, the ghost, the cat and the friend; goals.py the goals; api.py
+                rule, the ghost, the cat, the friend and the racer (D189);
+                goals.py the goals; api.py
                 the names a level may teach;
                 explain.py errors in the child's words; run.py runs the child's code;
                 sandbox.py keeps it from Pyodide's bridge to JavaScript
@@ -189,16 +195,19 @@ notebook shows. A level lists in its `api` which of them it teaches
 ```python
 wizard.move_right(steps=1)   # and move_left, move_up, move_down: a tick per step;
                              # stops at a wall or a closed door
-wizard.say(text)             # a tick; a door beside the wizard whose password it is opens
+wizard.say(text)             # a tick; a door beside the wizard whose password it is opens;
+                             # a number is said as its digits (D184)
 wizard.cast(spell, thing=None)  # a tick: with the wand carried, a spell of the level's,
                              # where the wizard stands (D42); zelim breaks a seal beside it;
                              # fendra is given the thing to bring (D47); orvim, wherever the
-                             # map is carried, opens the scene's plan (D134)
+                             # map is carried, opens the scene's plan (D134); drevo, with a
+                             # broom carried, lifts it, and every move after it flies (D185)
 wizard.wait(ticks=1)         # a tick each: stands still while the world moves on
 wizard.pick_up()             # a tick: the thing on the wizard's tile, into wizard.items
 wizard.find_nearest(kind)    # the nearest thing or actor of a kind ("key"...), or None
 wizard.find_item(kind)       # the thing of a kind it carries, or None (D123)
-wizard.find_all(kind)        # all of them, nearest first, then in reading order
+wizard.find_all(kind)        # all of them, nearest first, then in reading order, as a
+                             # list; hidden ones found as find_nearest finds them (D184)
 wizard.has(kind)             # whether it carries one of that kind
 wizard.position              # Position(x, y), which compares as a tuple
 position.x, position.y       # a position's two numbers, its attributes: key.position.x (D153)
@@ -210,6 +219,9 @@ wizard.sleep()               # a tick: lies down in a free bed beside it; refuse
                              # no bed beside (no_bed) or a taken one (bed_taken) (D84)
 wizard.distance_to(other)    # the steps to a thing or an actor along the rows and the
                              # columns; asks, so no tick (D86)
+wizard.flying                # whether it flies on its broom, from drevo to the run's end (D185)
+len(things)                  # how many things a list holds, a builtin the sandbox lets
+                             # through (D184)
 
 thing.kind, thing.name       # a key, a book, a wand, a potion, a door, a bed: by its id
 thing.position               # where it lies; None once carried
@@ -219,6 +231,11 @@ thing.reveal()               # a tick: its whole outline drawn where it lies, ov
                              # what covers it; refused once carried (not_here) (D85)
 
 bed.free                     # whether no one sleeps in it (D84)
+
+broom.knotted                # whether the black thread is tied in its twigs (D183)
+broom.untie()                # a tick: from the broom's own cell, else refused (too_far);
+                             # an error that stops the program on a broom with no knot
+                             # (no_knot, D183)
 
 door.locked, door.sealed, door.password, door.is_open
 door.open()                  # a tick: from a tile beside any cell of its doorway (D24,
@@ -238,8 +255,13 @@ hole.closed                  # whether a step onto it, taken now, lands on the f
                              # opposite, so `while hole.open:` is `while not hole.closed:`
 ```
 
-The map's characters: `#` a wall, `.` floor, `=` a shelf (D46), `S` the
-wizard's start, any other letter a floor tile named by it (a marker).
+The map's characters: `#` a wall, `.` floor, `=` a shelf (D46), `~` a low
+cell, which a flight crosses and a walk does not (D186), `S` the wizard's
+start, any other letter a floor tile named by it (a marker). A scene's map
+names its own terrains in its scene.json, each with its `kind` and whether
+it is walked on (`walk`), seen across (`sight`) and flown over (`fly`): a
+low terrain, water or a hedge, is flown over and not walked on; a high one,
+a tree or a wall, neither (D186).
 
 The child's code holds `wizard` and every thing and actor of the level by
 its id. Everything it holds is read-only to it (D20). Its errors are
@@ -256,7 +278,7 @@ tiles are `[x, y]`.
 | kind | actor | data | the scene |
 |---|---|---|---|
 | `move` | wizard, or an actor | `from`, `to`, `facing` | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132) |
-| `bump` | wizard | `at`, `facing`, `by`: `wall`, `door` or `hole` | nudges the wizard against it |
+| `bump` | wizard | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it; the thought names a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side |
 | `say` | wizard | `text` | a bubble over the wizard for three ticks, under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
 | `pick_up` | wizard | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); `data-carried` |
@@ -271,11 +293,18 @@ tiles are `[x, y]`.
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud; when `tried`, the door or the wizard shakes (D28) |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `vanish` | in a story, an actor, or the wizard at the story's very end | | the figure fades out of sight (D74) |
 | `appear` | in a story, an actor | `at`; `from`, a cell beside it, when it steps out from behind a thing there | the figure comes into sight on its cell: walking out from `from`, behind what stands there, over the tick (D128), or fading in (D74) |
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
+| `found` | `world`, in the tick of `find_all` or `find_nearest` | `ids`, the hidden things found; `at`, their cells | each comes into sight from the straw and is drawn from now on; one found before the first tick is shown with it; `data-found` (D184) |
+| `untie` | wizard | `id`, `at` | the wizard bends over the broom, a long tick, and its thread is gone; `data-untied` (D183) |
+| `fly` | `broom`, in the wizard's tick of drevo, or a racer in its own | `id`, the figure; `at` | the figure lifts half a cell, drawn from its flying rows, and the wind starts; every move after it is flown in a third of a walked step's time (`move`'s `flying`); `data-flying`, `data-wind` (D185) |
+| `land` | `broom`, after the run's last tick, or a racer at its path's end | `id`, `at` | the figure sets down on its cell and the wind fades (D185) |
+| `through` | the ring, in the wizard's move | `id`, `at`, the cell flown from | the ring glows as the wizard passes; `data-through`, in order (D187) |
+| `circle` | wizard, before a race's finish, or a racer | `at`; `ring`, the ring missed (the wizard's) | the figure flies a loop over its cell for the tick: the wizard's five ticks for each ring missed, the racer's flourish; `data-circling` (D189) |
+| `read` | wizard, before the first action of a race | `at`, `count`, `lines` | the band over the scene says Ilda reading the two programs and the ticks to each take-off, the line read lit in the editor; `data-race-band` (D189) |
 
 A run's status is `won`, `incomplete`, `error`, `too_many_ticks`,
 `interrupted` or `caught`; its goals say for each whether it was met or
@@ -2573,3 +2602,139 @@ one overturns stays, marked as superseded.
   *Pasar al profesor*'s and *El paseo nocturno*'s on (10, 13) and *El agujero que se
   abre*'s on (5, 7), lie behind an arch's or a jamb's stones. Rules out a silhouette where
   the eye sees floor or an opening.
+- **D182 — A thing may be drawn from a sprite of its kind, on any scene.** Decided
+  2026-11-10 by the owner (*los aros los dibuja el juego*), after Gemini ignored the
+  columns asked for in three race courses. A kind of thing may have a picture of its own,
+  `content/art/things/<kind>.webp`, listed in `content/art/things/things.json` with its
+  size in cells (`size`, width and height), the point of the picture that stands on its
+  cell's lower edge (`foot`), and whether it lies flat (`lying`, drawn under whoever
+  stands on it); its source is in `SOURCE.md`. A thing on a painted scene with no cut-out
+  of its own, whose kind has a sprite, is drawn from that sprite at its cell, among the
+  figures by its row, scaled by the scene's cell as a figure is, the same on every scene
+  (`engine/things.ts`, `data-sprite-things`). A sprite is cut from a picture by
+  `tools/art/sprites.py sprite`: one painted alone on flat magenta is keyed out, and its
+  rim of magenta's shades, a shadow or an edge painted on the magenta, cleared from the
+  outside in; one painted standing on a lawn (`--lawn`) is freed of the lawn by its
+  colour, and only its largest piece is kept. The broom is such a kind, painted alone,
+  and the ring, cut from Gemini's painting of a small ring field. Rules out a picture of
+  each broom and each ring painted into each scene, and a scene asked again for every
+  arrangement of them.
+- **D183 — The broom is a thing, knotted and untied.** Decided 2026-11-10 by the owner.
+  `broom` is a kind of thing, found by `find_all` and `find_nearest`, carried
+  (`carrying`) from the first flight on, with the attribute `knotted` (true while the
+  black thread is tied in its twigs) and the method `untie()`. Untying works only from
+  the broom's own cell, as `pick_up` does, and is refused `too_far` from anywhere else; on
+  a broom that is not knotted it is an error that ends the run (`no_knot`, *esta escoba no
+  tiene nudo*), after a `blocked` event the wizard thinks: the precondition that teaches
+  the `if` in the loop. Untying takes a tick and makes the event `untie`, the wizard
+  bending over the broom. A level gives a broom's knot in `level.json` (`"knotted":
+  true`, false by default) and may change it by way (D51). The goal `untied` is met when
+  no broom in the level is knotted, and failed at the run's end otherwise; the goal
+  `no_error` is failed by an error, so that the friend's program that stops on a broom
+  with no knot loses even where it untied the others. Rules out a counter-spell for the
+  knot, and an `untie` from afar.
+- **D184 — `find_all`, `len` and a count said.** Decided 2026-11-10. The lesson on lists
+  teaches `wizard.find_all(kind)`, which gives every thing of a kind as a Python list,
+  nearest first, ties by row and then column, hidden ones found as `find_nearest` finds
+  them, and `len`, which the sandbox lets through among the builtins. A hidden thing found
+  makes the world's `found` event, in the tick of the call or before the first tick, and
+  the page draws it from then on: the brooms in the straw are not seen until a program
+  looks for them. `wizard.say` takes a number as it takes a word and says its digits; a
+  list is refused. The goal `say` takes `"count_of": "<kind>"` in place of `"text"`: met
+  when the wizard says the number of things of that kind the way played has. The
+  notebook's words for `find_all` and `items` show `len`. Rules out counting brooms by
+  eye, and a `say` goal written once per way.
+- **D185 — Flying: `drevo` lifts the broom, the moves fly, and a flown cell takes a third
+  of a walked one.** Decided 2026-11-10 by the owner (*cuando se vuela se debe mover por
+  lo menos 3x*). `wizard.cast("drevo")` needs the wand and a broom carried (refused
+  `no_broom`), takes a tick, makes the event `fly` and puts the wizard in the air
+  (`wizard.flying`); from then on every `move_*` flies: it crosses the low cells (D186)
+  and the rings' cells (D187), and bumps on the high ones as a walk bumps on a wall. When
+  the program ends the broom sets down where it is (the event `land`). The goal `cast`
+  may name the cells it is cast from (`"from": [[x, y], ...]`), the jetty's end. The
+  world counts a flown cell as one tick, like a walked one, so that counting stays the
+  child's; the page plays a tick whose every move is flown in a third of a tick
+  (`FLOWN`, `engine/flight.ts`), at every speed, so that a flight is three times as fast
+  to the eye and the long flights of the rings and the race pass quickly. While flying,
+  the figure is drawn from its flying rows (D188), lifted half a cell above its cell,
+  its origin moved so that its depth stays its cell's, with a soft shadow on the ground,
+  bobbing over the rows' three frames; a sheet with no flying rows bobs a little
+  instead. The steps' taps are not heard in the air; the flight's sound is a wind
+  synthesised as the steps are (the owner's choice: no sample), filtered noise that
+  starts at the lift, swells a little with each flown step and fades at the landing
+  (`engine/sound.ts`, `wind` among `data-sounds`). Rules out a `fly_right` family of
+  methods, and a flight as slow as a walk.
+- **D186 — Low and high: what a flight crosses.** Decided 2026-11-10. A scene's terrains
+  say whether a flight crosses them (`fly`, false unless given; a terrain walked on is
+  flown over): a low terrain is flown over and not walked on (water, reeds, a hedge, a
+  fence, a bench, a chest, a stand), a high one neither (a tree, a wall, the shed, a rock,
+  a tall pole, a gate). A plain map writes a low cell `~`. A walk into a low cell is
+  refused with the cell's kind (`no_walk`; *el agua no se pisa: por aquí solo se pasa
+  volando*, `blocked.no_walk.<kind>`); a flight into a high cell bumps (`by: high`; *las
+  copas de los árboles no se pasan: hay que rodearlas*, `blocked.high.<kind>`). The plan
+  window hatches a low cell lightly and a high one darkly; `?debug` crosses a low cell in
+  blue and a cell no one walks on or flies over in red, and the legend names the low ones.
+  Rules out one "blocked" kind for everything a wizard does not walk on.
+- **D187 — The ring: flown through in order.** Decided 2026-11-10. `ring` is a kind of
+  thing drawn from its sprite (D182), standing on a cell no one walks on; the wizard flies
+  through it by crossing its cell in a vertical move, from the row above to the row below
+  or the reverse, which makes the ring's event `through` and lights it; a horizontal move
+  into its cell while flying bumps (*chocas con el aro*), and a walk into it bumps as into
+  furniture. The goal `through_in_order` (`{"kind": "through_in_order", "ids": ["ring_1",
+  ...]}`) is met when every ring named is flown through, each after the one before it in
+  the list; a ring passed over, or flown through out of its turn, counts as missed, and
+  the goal's `missed` lists the rings not flown through in order, for the race (D189).
+  `?debug` numbers the rings in their order. Rules out a ring the wizard walks under.
+- **D188 — Flying figures, Zarek and Rinlo.** Decided 2026-11-10 by the owner (*van a ser
+  nuevas hojas de sprites*). The wizard's sheets have four flying rows after the sleeping
+  one (`rows.fly`, one a way, three frames: level, a little up, a little down, for the
+  bobbing), made from Gemini's edit of the walking base of each gender (the figure
+  sitting on a broom, legs together, the handle ahead and the twigs behind,
+  `tools/art/prompts/figure-fly-<gender>.md`) and recoloured into the eight looks as the
+  casting rows are. Zarek and Rinlo, pupils a year older, are drawn whole by Gemini from
+  the cast's own figures as a reference, standing in the four views
+  (`figure-zarek-standing.md`, `figure-rinlo-standing.md`), each view a little taller in
+  its frame than a first-year's, between the children's and the grown-ups' (`DRAWN`,
+  `figures.py --drawn`); their walking rows are the standing frame three times. Zarek has
+  flying rows from Gemini's drawing of him riding the broom in the same views
+  (`figure-zarek-fly.md`, `--drawn-fly`); Rinlo stands only. `figures.json`'s `sheets`
+  says each one's rows. Ilda's sheet stands. Rules out a wizard flying in its walking
+  frames.
+- **D189 — The race: Ilda's count.** Decided 2026-11-10 by the owner (*ticks + líneas +
+  aros saltados*), made visible as the owner asked to see it rather than read it. A race
+  level names a racer (`"race": {"against": "zarek", "lines": 14, "path": [...],
+  "finish": [x, y]}`), an actor of kind `racer`. Before the start Ilda reads both
+  programs, a tick a line (the lines `lines_under` counts: neither blank nor a comment),
+  the line read lit in the editor (the event `read`), while the wizard stands on the
+  start; the racer lifts his broom the tick after his own `lines`, as the wizard does with
+  drevo, and flies his `path` from there, its turning points flown in straight lines, a
+  cell a tick; a point the same as the one before is a tick circling in place (a
+  flourish, the event `circle`), which lets his flight's ticks be any number, and he
+  crosses the finish at the tick his path reaches it. A ring the wizard missed (D187)
+  costs five ticks before the finish line, served circling over the cell before it. The
+  goal `before` (`{"kind": "before", "racer": "zarek"}`) is met when the wizard crosses
+  the finish at a tick lower than the racer's; a tie is the racer's. A band over the scene
+  says Ilda reading (*Ilda lee los programas: tú, 11 líneas; Zarek, 14*) and the ticks to
+  each take-off; the win and the outcome cards say her count from the goal's `params`:
+  *tus líneas (11) + tu vuelo (38) + la penalización (0) = tick 49. Zarek: 14 + 41 = tick
+  55*. In *La carrera* the program without a function, 18 lines, crosses at 56 against
+  his 55; in *La revancha* Zarek's 12 lines cross at 50, and the race's function, its
+  arguments unchanged, misses three rings. Rules out a race won by a long program that
+  arrives first, and a penalty the child cannot see.
+- **D190 — A function is taught where a loop cannot serve.** Decided 2026-11-10 by the
+  owner (*hace que la función sea útil*). The rings' level repeats the pair of rings three
+  times with a different manoeuvre between each pair (under the trees, over the pond), so
+  that a `for` cannot cover the repetition and `def two_rings()` is called from three
+  places: a loop round the pair flies into the trees' crowns. The race's pairs differ in
+  their gaps, so that arguments are the only way to keep one function, and Ilda's count
+  makes the program without a function lose by one tick (D189); the rematch moves the
+  rings and sharpens Zarek, so that only the arguments change and no line may be spared.
+  Rules out a `def` whose only reason is a lines goal a `for` would meet.
+- **D191 — The browser tests on GitHub run with three times the time.** Decided
+  2026-11-10 from the tag run of v0.0.5, which lost three tests by time alone (D179).
+  Under `CI`, Playwright's test timeout is 360 s and its expect timeout 45 s
+  (`app/playwright.config.ts`), and the specs' own waits are three times theirs through
+  one helper, `ciTimes` in `app/e2e/support.ts`; a wait of under 400 ms, a sample within a
+  tick, stays as it is. `retries` stays 1. `ci/push.sh --tags` refuses a tag whose commit
+  does not carry the tag's version. Rules out a release whose tag run is red by the
+  runner's speed.

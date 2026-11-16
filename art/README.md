@@ -481,6 +481,13 @@ A door of chapters 1 and 2 is painted shut and open (D116): `doorways` and `swun
 
 The cells are where the figures walk (D149).
 
+- **A scene's grid is even, its cells square.** The grounds of chapter 4 read a uniform
+  grid over Gemini's picture, whatever its painted guide drew: the shed, the lake's edge
+  and the ring field 20 cells by 15, each cell 240 pixels wide and 238.93 tall; the race
+  course, a wide picture of 21:9, 42 cells by 18, each the picture's height over 18
+  (149.33 pixels), its columns centred, 32 pixels left over at each side (the
+  `grid.json` the scene's settings name, in its folder of `art/raw/`).
+
 - **A corridor two cells wide has both columns walked**, each figure in its own. No column
   is nudged whole, and the settings refuse a nudge over a whole column or row.
 - **Round a door or an arch**, on its cells and the cell before and after them, both columns
@@ -652,6 +659,50 @@ A door that opens may have a half-open state, between its closed and its
 open ones. It is an edit of the painting like the others, and the game
 shows it for a moment as the door opens.
 
+### Flying
+
+A wizard's sheet has four flying rows after its lying row (D188), in the walking
+rows' order: the figure sitting on its broom, legs together, the handle ahead and the
+twigs behind, three frames a row, level, a little up and a little down, for the bobbing.
+They are made from Gemini's edit of the walking base of each gender
+(`figure-fly-<gender>.md`) and recoloured into the eight looks as the casting rows are.
+The page lifts a flying figure half a cell above its cell, with a soft shadow on the
+ground.
+
+### Figures drawn whole
+
+Zarek and Rinlo, pupils a year older, have no base: each is drawn by Gemini standing
+still in the four views, down, right, left and up, with the cast's own figures given as
+the reference for the style and the proportions (`figure-zarek-standing.md`,
+`figure-rinlo-standing.md`), and cut into a sheet whose walking rows are the standing
+frame three times (`tools/art/figures.py --drawn`). Each view is a little taller in its
+frame than a first-year's, between the children's and the grown-ups'. Zarek, who races,
+has flying rows from Gemini's drawing of him riding the broom in the same four views
+(`figure-zarek-fly.md`, `--drawn-fly`).
+
+## Sprites of things
+
+A kind of thing may be drawn from a picture of its own, the same on every scene
+(D182): the broom and the ring. Each is `content/art/things/<kind>.webp`, listed in
+`things.json` with its size in cells, the point of the picture that stands on its
+cell's lower edge (`foot`), and whether it lies flat (`lying`, drawn under whoever
+stands on it). A thing on a painted scene with no cut-out of its own is drawn from its
+kind's sprite at its cell, among the figures by its row; a broom hidden in the straw only
+once a program finds it (D184).
+
+A sprite is cut from a box of a picture by `tools/art/sprites.py sprite`:
+
+- **Painted alone on flat magenta** (the broom, `sprite-broom.md`): the magenta keyed
+  out, and its rim of magenta's shades, a shadow or an edge painted on it, cleared from the
+  outside in, so that no pink line shows round the thing.
+- **Painted standing on a lawn** (the ring, from Gemini's painting of a small ring field,
+  `ring-field-2-nogrid.md`), with `--lawn`: the lawn and its shadows taken out by their
+  colour, green over red, and only the thing's own piece kept, its holes the lawn seen
+  through it.
+
+`tools/art/figures.py --check` puts the sprites at the end of its sheet,
+`art/raw/figures-check.png`, after the figures.
+
 ## Where things are kept
 
 - `content/art/`: what the game draws. Each folder has a `SOURCE.md` that
@@ -661,8 +712,11 @@ shows it for a moment as the door opens.
   ignores this folder.
 - `art/scenes/<scene>/`: each painted scene's settings, `cut.json`, with
   its manifest: the field, the entrance hall, the dormitory, the library,
-  and chapter 3's seven: the tunnel, the crossing, the two doors, the three
-  doors, the long round, the storeroom and the way down.
+  chapter 3's seven: the tunnel, the crossing, the two doors, the three
+  doors, the long round, the storeroom and the way down, and chapter 4's
+  four: the broom shed, the lake's edge, the ring field and the race
+  course.
+- `content/art/things/`: the sprites of things (D182), with `things.json`.
 
 Everything the project makes ships under the GPL, like the code. A picture
 from anywhere else comes in only under a licence that lets it ship with a

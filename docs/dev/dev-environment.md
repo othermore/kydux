@@ -762,6 +762,47 @@ This puts the edit back on the base's grid:
 It prints the base it wrote. Run `tools/art/figures.py --check` after it,
 so that every look gets the new frames.
 
+The four flying rows come the same way, from a flying base for each gender.
+Gemini draws the walking base riding a broom, from
+`tools/art/prompts/figure-fly-boy.md` or `figure-fly-girl.md`. This puts
+the edit back on the base's grid:
+
+```sh
+.venv/bin/python tools/art/figures.py --fly boy art/raw/figures/figure-fly-boy.png
+```
+
+A figure with no base, like Zarek or Rinlo, is made from a drawing of it
+standing still in four views, down, right, left and up. Gemini draws it
+from `tools/art/prompts/figure-zarek-standing.md`. This cuts the views into
+the figure's sheet in `content/art/figures/`:
+
+```sh
+.venv/bin/python tools/art/figures.py --drawn zarek art/raw/figures/figure-zarek-standing.png
+```
+
+Its flying rows come from a drawing of it riding the broom in the same
+views, `figure-zarek-fly.md`:
+
+```sh
+.venv/bin/python tools/art/figures.py --drawn-fly zarek art/raw/figures/figure-zarek-fly.png
+```
+
+Run `--check` after either, and look at the figure's sheet at the end of
+`figures-check.png`.
+
+A thing drawn the same on every scene, a broom or a ring, is a sprite in
+`content/art/things/`. It is cut from a box of a picture, given as its
+corners in pixels, and scaled to a height in pixels. A thing painted alone
+on flat magenta is cut like this:
+
+```sh
+.venv/bin/python tools/art/sprites.py sprite art/raw/sprite-broom/sprite-broom.png --out content/art/things/broom.webp --box 150,150,2700,1180 --height 140 --lawn
+```
+
+The broom's picture has a strip of lawn under it, so it takes `--lawn`
+too; a thing painted standing on a lawn, like the ring, takes it alone.
+Its size in cells and its foot are in `content/art/things/things.json`.
+
 The music is asked for the same way, from `tools/sound/prompts/`:
 
 ```sh

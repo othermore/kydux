@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """A chapter's walkthrough as one document for the owner to read and write on: every
-story step, every lesson page, each level's card, start, route in its first way and won
-card in every way, each way under its id, which the child never sees (D204), and the
-check sheets of its scenes, from the pictures e2e/walkthrough.spec.ts takes (`npm run
-walkthrough -- <chapter>` runs both), with a **Comentarios:** line under every picture.
+story step, every lesson page, each level's card, start, route tick by tick and won card
+in its first way (D216), and the check sheets of its scenes, from the pictures
+e2e/walkthrough.spec.ts takes (`npm run walkthrough -- <chapter>` runs both), with a
+**Comentarios:** line under every picture. A level with ways says under its card what
+changes each time and what its card says when this time is different; with --all-ways,
+the levels named show every way, each under its id, which the child never sees (D204).
 
     tools/walkthrough.py 03-passages
+    tools/walkthrough.py 04-the-broom --all-ways the-shed,the-check
     tools/walkthrough.py --levels eldras-door the-moving-key left-or-right
 
 It writes drafts/recorrido-capitulo-<n>-<date>.es.md and its pictures in the folder of
@@ -63,8 +66,12 @@ def free_path(drafts: Path, number: int | str, day: str) -> Path:
 class Document:
     """The document being written, from the content and the pictures in `shots`."""
 
-    def __init__(self, content: Path, shots: Path, pictures: Path) -> None:
+    def __init__(
+        self, content: Path, shots: Path, pictures: Path, all_ways: frozenset[str] = frozenset()
+    ) -> None:
         self.content, self.shots, self.pictures = content, shots, pictures
+        #: The levels shown in every way; every other level in its first (D216).
+        self.all_ways = all_ways
         self.lines: list[str] = []
         self.counts = {"story": 0, "lesson": 0}
         self.kinds: dict[str, int] = {}
@@ -139,26 +146,28 @@ class Document:
         solution = (folder / "solution.py").read_text(encoding="utf-8").rstrip()
         self.lines.append(f"```python\n{solution}\n```\n")
         ways = about.get("ways") or []
+        every = bool(ways) and level_id in self.all_ways
         if ways:
-            # What the start card says of the ways, what a run's card says first when the
-            # scene is another, and what only this document names (D204).
+            # What the start card says of what changes, and what a run's card says first
+            # when the scene is another (D204); a level is shown in its first way (D216).
             self.lines.append(f"**Lo que cambia cada vez:** {spoken(text.get('changes', ''))}\n")
             self.lines.append(
                 f"**Lo que dice cuando esta vez es distinto:** {spoken(text.get('changed', ''))}\n"
             )
+        if every:
             self.lines.append(
-                "El nivel se juega en varias disposiciones, cada una con su nombre interno; "
+                "Aquí se ve en todas sus disposiciones, cada una con su nombre interno; "
                 "el niño nunca ve estos nombres.\n"
             )
-        for way in ways or [None]:
+        for way in (ways if every else ways[:1]) or [None]:
             tag = way["id"] if way else "unica"
-            name = tag if way else "recorrido"
-            if way:
+            name = tag if every else "recorrido"
+            if every:
                 self.lines.append(f"### Disposición `{tag}`\n")
             else:
                 self.lines.append("### El recorrido\n")
             frames = sorted(self.shots.glob(f"level-{level_id}-{tag}-tick-*.png"))
-            if way and not frames:
+            if every and not frames:
                 self.lines.append("El recorrido tick a tick se ve en la primera disposición.\n")
             for frame in frames:
                 tick = int(re.search(r"tick-(\d+)", frame.name).group(1))
@@ -214,7 +223,9 @@ def built_from(repo: Path) -> str:
     return f" (commit {done.stdout.strip()})" if done.returncode == 0 else ""
 
 
-def write_document(chapter: str, repo: Path = REPO, day: str | None = None) -> Path:
+def write_document(
+    chapter: str, repo: Path = REPO, day: str | None = None, all_ways: frozenset[str] = frozenset()
+) -> Path:
     content = repo / "content"
     shots = repo / "app" / "e2e" / "shots" / f"walkthrough-{chapter}"
     folder = content / "chapters" / chapter
@@ -225,7 +236,7 @@ def write_document(chapter: str, repo: Path = REPO, day: str | None = None) -> P
     drafts = repo / "drafts"
     drafts.mkdir(exist_ok=True)
     target = free_path(drafts, number, day)
-    document = Document(content, shots, drafts / target.name.removesuffix(".es.md"))
+    document = Document(content, shots, drafts / target.name.removesuffix(".es.md"), all_ways)
     document.lines += [
         f"# Capítulo {number}, {title}: todo el capítulo de principio a fin\n",
         f"Capturas del juego construido{built_from(repo)}, jugado por Marta en español, a 1280 "
@@ -246,7 +257,12 @@ def write_document(chapter: str, repo: Path = REPO, day: str | None = None) -> P
     return target
 
 
-def write_levels(levels: list[str], repo: Path = REPO, day: str | None = None) -> Path:
+def write_levels(
+    levels: list[str],
+    repo: Path = REPO,
+    day: str | None = None,
+    all_ways: frozenset[str] = frozenset(),
+) -> Path:
     """Some levels alone, in the course's order, each under its chapter's heading, with
     its kind's number in its chapter and its chapter's pictures (sprint 42, 2.9)."""
     content = repo / "content"
@@ -256,7 +272,7 @@ def write_levels(levels: list[str], repo: Path = REPO, day: str | None = None) -
     drafts.mkdir(exist_ok=True)
     target = free_path(drafts, "recorrido-niveles-cambiados", day)
     pictures = drafts / target.name.removesuffix(".es.md")
-    document = Document(content, Path(), pictures)
+    document = Document(content, Path(), pictures, all_ways)
     document.lines += [
         "# Los niveles cuyos textos cambian, de principio a fin\n",
         f"Capturas del juego construido{built_from(repo)}, jugado por Marta en español, a 1280 "
@@ -299,13 +315,21 @@ def write_levels(levels: list[str], repo: Path = REPO, day: str | None = None) -
 
 
 def main(arguments: list[str]) -> int:
+    all_ways: frozenset[str] = frozenset()
+    if "--all-ways" in arguments:
+        at = arguments.index("--all-ways")
+        if at + 1 >= len(arguments):
+            print(__doc__)
+            return 2
+        all_ways = frozenset(name for name in arguments[at + 1].split(",") if name)
+        arguments = arguments[:at] + arguments[at + 2 :]
     if len(arguments) >= 2 and arguments[0] == "--levels":
-        write_levels(arguments[1:])
+        write_levels(arguments[1:], all_ways=all_ways)
         return 0
     if len(arguments) != 1:
         print(__doc__)
         return 2
-    write_document(arguments[0])
+    write_document(arguments[0], all_ways=all_ways)
     return 0
 
 

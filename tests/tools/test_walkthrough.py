@@ -64,12 +64,13 @@ def test_the_document_says_each_stop_with_a_comments_line_under_each_picture(tmp
     assert path.name == "recorrido-capitulo-3-2026-11-07.es.md"
     text = path.read_text(encoding="utf-8")
     assert "Hola, Marta, cansada." in text and "Mira, Teku." in text
-    # A way under its id, which the child never sees, after what the card says (D204).
+    # What the card says changes and what it says when this time is different, and the
+    # level in its first way with no heading for the way (D204, D216).
     assert "**Lo que cambia cada vez:** La llave cambia de sitio cada vez." in text
     different = "Esta vez, la llave está en otro sitio."
     assert f"**Lo que dice cuando esta vez es distinto:** {different}" in text
-    assert "el niño nunca ve estos nombres" in text
-    assert "### Disposición `w`" in text
+    assert "Disposición" not in text and "nombres" not in text
+    assert "### El recorrido" in text
     assert "manera" not in text.lower()
     assert text.count("![") == 7 and text.count("**Comentarios:**") == 7 + 1
     assert (path.parent / path.name.removesuffix(".es.md") / "story-s-01.png").is_file()
@@ -99,5 +100,23 @@ def test_some_levels_alone_each_under_its_chapter_with_its_number_and_pictures(t
     # The second practice of its chapter, under its chapter's heading; the first not shown.
     assert "# Capítulo 3, Prueba" in text and "## Práctica 2: Nivel (`level:v`)" in text
     assert "Otro" not in text and "Hola" not in text
-    assert "### Disposición `w`" in text and text.count("![") == 4
+    assert "### El recorrido" in text and text.count("![") == 4
     assert (path.parent / path.stem.removesuffix(".es") / "level-v-w-ganado.png").is_file()
+
+
+def test_a_level_named_shows_every_way_each_under_its_id(tmp_path):
+    """D216: --all-ways names the levels shown in every way, each under its id (D204)."""
+    repo = small_repo(tmp_path)
+    level = repo / "content" / "levels" / "v" / "level.json"
+    level.write_text(
+        json.dumps({"scene": "a-scene", "start": [1, 2], "ways": [{"id": "w"}, {"id": "x"}]})
+    )
+    shots = repo / "app" / "e2e" / "shots" / "walkthrough-03-test"
+    (shots / "level-v-x-ganado.png").write_bytes(b"png")
+    one = walkthrough.write_document("03-test", repo, day="2026-11-13").read_text(encoding="utf-8")
+    assert "Disposición" not in one and "level-v-x-ganado.png" not in one
+    every = walkthrough.write_document(
+        "03-test", repo, day="2026-11-13", all_ways=frozenset({"v"})
+    ).read_text(encoding="utf-8")
+    assert "### Disposición `w`" in every and "### Disposición `x`" in every
+    assert "level-v-x-ganado.png" in every and "el niño nunca ve estos nombres" in every

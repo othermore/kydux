@@ -1,7 +1,8 @@
 // A chapter played from its first stop to its last, as the child plays it, in Spanish,
 // for the owner to read: every story step, every lesson page with its code run, and for
-// each level the start card, the start, the won card, the route tick by tick in its first
-// way, every other way at its end, and the map's plan where the map is carried. The
+// each level the start card, the start, the won card and the route tick by tick in its
+// first way (D216), every other way at its end for the levels KYDUX_ALL_WAYS names, and
+// the map's plan where the map is carried. The
 // pictures go to e2e/shots/walkthrough-<chapter>/, which tools/walkthrough.py makes a
 // document of.
 // Only `npm run walkthrough -- <chapter>` runs it (KYDUX_WALKTHROUGH).
@@ -13,6 +14,8 @@ import { MARTA, seedWizard } from './helpers';
 import { ciTimes } from './support';
 
 const chapter = process.env.KYDUX_WALKTHROUGH ?? '';
+/** The levels shown in every way; every other level in its first (D216). */
+const allWays = (process.env.KYDUX_ALL_WAYS ?? '').split(',').filter((id) => id !== '');
 const CONTENT = fileURLToPath(new URL('../../content/', import.meta.url));
 const OUT = fileURLToPath(new URL(`./shots/walkthrough-${chapter}/`, import.meta.url));
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -21,9 +24,11 @@ test.use({ viewport: { width: 1280, height: 800 }, locale: 'es-ES', deviceScaleF
 test.setTimeout(30 * 60_000);
 test.skip(chapter === '', 'only npm run walkthrough -- <chapter> plays it');
 
-/** A step played out: the scene done, or as it is if the step has no act. */
+/** A step played out: the scene done, or as it is if the step has no act, and come in
+ * over the still it is shown over while it loads (D214). */
 async function settled(page: Page, ms = 30_000): Promise<void> {
   await page.locator('#scene[data-state="done"]').waitFor({ timeout: ms }).catch(() => {});
+  await page.locator('#story-still').waitFor({ state: 'hidden', timeout: ciTimes(5_000) }).catch(() => {});
   await page.waitForTimeout(ciTimes(400));
 }
 
@@ -157,7 +162,8 @@ async function level(page: Page, id: string): Promise<void> {
   await page.locator('.outcome').waitFor({ timeout: ciTimes(90_000) });
   // The win card's stars are drawn in one after another: the picture waits for the last.
   await page.waitForTimeout(ciTimes(1_500));
-  for (const [index, way] of (ways.length > 0 ? ways : ['unica']).entries()) {
+  const shown = ways.length === 0 ? ['unica'] : allWays.includes(id) ? ways : ways.slice(0, 1);
+  for (const [index, way] of shown.entries()) {
     // The first way's picture is the won card. Choosing another way plays it from its
     // start and opens the card again at its end, over the scene: its picture is the scene
     // at its last tick, with its goals met and no card over it.
@@ -169,8 +175,9 @@ async function level(page: Page, id: string): Promise<void> {
       await atEnd(page);
     }
     await page.screenshot({ path: `${OUT}level-${id}-${way}-ganado.png` });
-    // The route tick by tick of the first way only; every other way shows its end (the
-    // owner, 2026-11-08), so that the document stays short.
+    // The route tick by tick of the first way only; a level named to show every way
+    // shows each other at its end (the owner, 2026-11-08, 2026-11-13), so that the
+    // document stays short.
     if (index === 0) await route(page, id, way);
   }
   // The map opens wherever it is carried.

@@ -510,7 +510,7 @@ To read a whole chapter as the child does, with room to write under every
 picture, make its walkthrough. It builds the game, plays the chapter in Spanish for
 a seeded wizard, and writes one document. The browser tests' server must be free.
 The chapter is named by its folder in `content/chapters/`: `01-arrival`,
-`02-the-library` or `03-passages`. For chapter 3:
+`02-the-library`, `03-passages` or `04-the-broom`. For chapter 3:
 
 ```sh
 (cd app && npm run walkthrough -- 03-passages)
@@ -518,9 +518,20 @@ The chapter is named by its folder in `content/chapters/`: `01-arrival`,
 
 You should see it end by naming the document,
 `drafts/recorrido-capitulo-3-<date>.es.md`, with its pictures in the folder of the same
-name beside it. Each chapter's document has its own number. Every picture has a **Comentarios:** line under it, and a document
-that is already there is never overwritten, so your comments stay safe. A level's route
-is shown tick by tick in its first way only. Every other way shows the card it ends on.
+name beside it. Each chapter's document has its own number. Every picture has a
+**Comentarios:** line under it, and a document that is already there is never
+overwritten, so your comments stay safe.
+
+A level that is laid out differently at each run is shown in one arrangement, its
+first: its card, its start, its route tick by tick and its won card (D216). Under its
+card the document says what changes each time, and what the card says when this time
+is different. To see some levels in every arrangement, name them after `--all-ways`,
+separated by commas. Each arrangement then has its own heading, and shows the card it
+ends on:
+
+```sh
+(cd app && npm run walkthrough -- 04-the-broom --all-ways the-shed,the-check)
+```
 
 The repository's own checks deserve a mention, because they guard the
 project's rules. They refuse a secret in any tracked file. They refuse a

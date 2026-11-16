@@ -1055,7 +1055,8 @@ one overturns stays, marked as superseded.
   and it is in no chapter): the letter of admission, the journey, the shut
   gate at dusk, and no mechanics. A first visit, with no wizard, no saved game
   and no address, opens on the welcome page (D193), whose *Start playing*
-  begins it. Its *Go on* leads
+  begins it. Its first steps are told over the painting of the castle
+  (D251). Its *Go on* leads
   to the creator, or, once a wizard exists, to the course's first item; it
   is never the place *Continue* returns to. The start screen's big button
   begins the story while there is no wizard, and *New game* begins it
@@ -1148,8 +1149,9 @@ one overturns stays, marked as superseded.
   time it is played (`progress.guided`): `app/src/ui/guide.ts` dims the
   screen but one part at a time, with a card beside it and an arrow to it,
   *Next* and *Skip*: the scene, the goals, the editor, *Run*, the notebook
-  (opened for its step), *Hint* and *?*, and the way to learn. The card
-  opened with *?* offers *Show me the screen*. The guide's words are
+  (opened for its step), *Hint* and *?*, and the way to learn. That level's
+  start card, once the guide has been seen, offers *Show me the screen*, and
+  no other level's card does (D248). The guide's words are
   Gemini's, `content/guide/text.<lang>.json`, and the i18n check holds them
   to the same steps in every language.
 - **D69 — The camera: a window on the scene.** Decided 2026-10-22 by the
@@ -3263,14 +3265,16 @@ one overturns stays, marked as superseded.
   level shows as soon as its own files are there, its status line saying *Preparando
   Python…* (`level.loading`) until a run can start. What a screen waits for is its own
   code, texts and pictures, and while it waits the page shows the waiting view
-  (`ui/waiting.ts`): Kydux's mark and *Cargando…* (`waiting.loading`). A story's words
+  (`ui/waiting.ts`): Kydux's mark beside *Cargando…* (`waiting.loading`) and a bar that
+  moves (D249). A story's words
   come first: its screen needs the story's file, the course and `ui/story`, and the
   scene's code and pictures arrive behind it; the voice's words of the first step are read
   at once and the steps that do nothing on the scene are read on, while a figure's bubble
   and a step's actions wait for the scene. The music starts as soon as the theme's file is
   there. The game's opening (D61) shows the welcome's painting of the castle where its
   scene will be (*la imagen inicial del castillo y el texto inicial sobre la carta*), and
-  the scene takes its place with a short fade. A child who has begun, with a wizard made
+  its first steps are told over it (D251); the scene takes its place with a short fade. A
+  child who has begun, with a wizard made
   or a game saved, reads a tip when a wait is longer than the grace of 2 seconds, and a
   new one every 10 seconds (*un tip cada 10 segundos*); the first wait of a visit and the
   wait for a new scene show their tip at once (D221). When the screen is ready it waits
@@ -3660,35 +3664,29 @@ one overturns stays, marked as superseded.
   figure shown at another tick by the slider goes on from where the rise and fall is, with
   no jump. The wind stops with the program (D236). Under reduced motion there is no hover.
   Rules out a flight frozen in the air.
-- **D243 — The broom's wind is a gust for each flown command.** Decided 2026-11-15 by the
-  owner (*suena como un sonido agudo como de un aspirador que estuviese muy bajito o muy
-  lejos … No puede ser un sonido continuo, sino que debe ser un sonido variable, como el
-  sonido del viento … cada comando move mientras estás en la escoba debería generar un
-  sonido mientras dura el movimiento, que tenga algún tipo de principio y final y evolución
-  a lo largo del sonido … Cuando está parado debe sonar muy muy bajo el viento, o ni
-  siquiera sonar, y en movimiento el viento debe sonar como "más a rachas", no continuo*).
-  No sound lasts the flight long, and a wizard in the air that does not move makes none.
-  Each `move_*` command flown sounds as one gust (`Wind.gust`, `engine/sound.ts`): noise
-  through a band, which rises as the command starts, changes all through it and falls after
-  its last cell. Its level wanders between targets drawn at random, a new one every eighth
-  to a third of a second, and the band's pitch follows the level, higher as it is louder, as
-  wind does; a faint narrow high band, the whistle, comes with the level's peaks. How high a
-  gust peaks, where in the command, and how it wanders are drawn at random for each, so that
-  no two are alike. A gust's length is its command's: the world says in every flown `move`
-  which step of its command it is, and of how many (`step`, `steps`), and the page counts
-  the cells still to fly at the tick's length. A one-cell command is a short puff. A command
-  that starts while a gust still sounds takes that gust on, raised to a peak of its own, and
-  no second gust is laid over it: a zigzag of short moves is heard as one wind that changes.
-  A bump ends the gust at once; Stop, a pause and the run's end fade it in 0.15 seconds
-  (D236). The wind's voices have a mix (`windMix`): `air`, the gust; `whistle`; and `rest`,
-  a very faint air while the wizard hovers, silent unless the mix gives it a level: it
-  falls under a gust and comes back when the gust has fallen or is ended by a bump. Under
-  `?debug`, `#music` plays a one-cell move, a long move, a zigzag, a lift, a landing and a
-  whole flight, which hovers a while before its last move so that the rest is heard, with a
-  box and a slider for each voice and a line that says the mix, as the themes' mixer does
-  (D203). The scene says whether a gust sounds and how many the run has had (`data-wind`,
-  `data-wind-gusts`), muted or not. Rules out a sound that lasts while the
-  broom is in the air, a steady tone, a gust for every cell, and two gusts alike.
+- **D243 — The broom's wind is wind: noise that rises, changes and falls (D252 says when).**
+  Decided 2026-11-15 by the owner (*suena como un sonido agudo como de un aspirador que
+  estuviese muy bajito o muy lejos … No puede ser un sonido continuo, sino que debe ser un
+  sonido variable, como el sonido del viento … que tenga algún tipo de principio y final y
+  evolución a lo largo del sonido … Cuando está parado debe sonar muy muy bajo el viento, o
+  ni siquiera sonar, y en movimiento el viento debe sonar como "más a rachas", no
+  continuo*). No sound of one level lasts the flight long, and a wizard in the air that
+  does not move makes no gust. The wind (`Wind`, `engine/sound.ts`) is noise through a
+  band. Its level wanders between targets drawn at random, and the band's pitch follows the
+  level, higher as it is louder, as wind does; a faint narrow high band, the whistle, comes
+  with the level's peaks. How strong a wind blows and how it wanders are drawn at random,
+  so that no two flights sound alike. When it rises, when it changes and when it falls
+  follow the flown commands (D252). A bump ends it at once; Stop, a pause and the run's end
+  fade it in 0.15 seconds (D236). The wind's voices have a mix (`windMix`): `air`, the
+  wind itself; `whistle`; and `rest`, a very faint air while the wizard hovers with the
+  program playing, which falls under the wind and comes back when the wind has fallen or is
+  ended by a bump. Under `?debug`, `#music` plays a one-cell move, a long move, a zigzag, a
+  straight flight in four commands, a lift, a landing and a whole flight, which hovers a
+  while before its last move so that the rest is heard, with a box and a slider for each
+  voice and a line that says the mix, as the themes' mixer does (D203). The scene says
+  whether the wind sounds and how many flown commands the run has had (`data-wind`,
+  `data-wind-gusts`), muted or not. Rules out a sound of one level that lasts while the
+  broom is in the air, a steady tone, and two flights alike.
 - **D244 — A lift and a landing are seen and heard, whoever orders them.** Decided
   2026-11-15 by the owner (*quizás el hechizo de montar y desmontar pueden ser otros dos
   sonidos que sean como de ascender y descender*; *En la carrera, si no hay un "drevo" al
@@ -3752,3 +3750,77 @@ one overturns stays, marked as superseded.
   the words and the celebration as it does (D175), and comes with no sound. A program
   stopped has none. An outcome with no playback, a program that cannot start, sounds with
   its card. Rules out a sound that comes seconds after what it tells of.
+- **D248 — The start card opens a level every time, and the guide is offered on the first
+  level alone.** Decided 2026-11-16 by the owner (*hay veces que la tarjeta inicial de un
+  nivel no se está mostrando: por ejemplo cuando se carga capitulo 4 arreglo 1, no se
+  muestra en ningún momento el cuadro de que nos hemos dejado algunos nudos pendientes.
+  Además ahi aparece un botón "Enseñame la pantalla" que creo que no hace falta tenerlo,
+  eso solo hay que mostrarlo en el primer capítulo al principio del todo*). A level's
+  start card opens every time the level's screen opens: from the map, from *Next*, by its
+  address, at a reload, played before or not. A level opens on its starting code (D131),
+  and the card is what says what that code is for. The game keeps no list of the cards
+  seen. *?* opens the card again, saying *Continue*, and any button of the page closes it
+  (D222). The screen's guide (D68) belongs to the course's first level: closing its card
+  opens the guide the first time, and from then on that card, and no other, offers *Show
+  me the screen*. Rules out a level opened with no word of what it asks, and the guide's
+  button on a card of any other level.
+- **D249 — The wait says that it loads: large words and a bar that moves.** Decided
+  2026-11-16 by the owner (*En la página de carga (los tips) se debe ver más grande el
+  cargando, y debe haber alguna animación que haga ver que se está cargando (o un
+  progreso)*). The waiting view (D214, D221) shows Kydux's mark and *Cargando…* in one
+  row, the words at 28 px in the ink's colour, and under them a bar. While the screen
+  loads, a band sweeps along the bar, since nothing says how much is left. When the
+  screen is ready and a tip holds it until it is read (D221), the bar fills over the time
+  left: full, the screen opens. Under reduced motion the band stands still and fades in
+  and out slowly, and the bar fills the same. The row takes less height than the mark
+  over the words did, and a tip's picture is as large as the window lets (D239). Rules out a wait in which
+  nothing moves, and a small grey line as its only word.
+- **D250 — The first lines moved in teach the keys that move them.** Decided 2026-11-16 by
+  the owner (*Cuando se enseñe el primer "anidamiento" (if o for o while) hay que explicar
+  el tabulador (la tecla tabulador del teclado) y los 4 espacios, y decir que en nuestro
+  editor el tabulador se usa para poner cuatro espacios y que borrar también borra cuatro
+  espacios seguidos. Quizás haga falta una página para poner todo eso*). The first lesson
+  whose code has lines inside another, `lesson:if` (chapter 3), has a page of its own for
+  it, after the one that shows the condition: the four spaces tell Python that a line is
+  inside; Enter after the colon starts the next line already moved in; the Tab key puts
+  four spaces; the delete key in a line's leading spaces takes four away at once; four
+  presses of the space bar count the same. Its block is tried with those keys: a line
+  taken in and brought out, and the output read each time (D174). The child reads *moved
+  in*, the course's words, and no new technical word. Shift+Tab stays in the settings'
+  list of keys. Rules out a child who counts spaces one by one, or who never learns why a
+  line moved.
+- **D251 — The opening's first steps are told over the painting of the castle.** Decided
+  2026-11-16 by the owner (*al empezar la historia se muestra una imagen del castillo
+  junto al lago. Hasta ahora no la había visto porque el nivel carga enseguida. Hay que
+  dejar esa imagen ahí al menos unos segundos para que se vea.... Quizás con un texto
+  propio que sea "Este es el castillo de Arvelia, la escuela para magos y magas..."*). A
+  story's first steps may be told over its still (`"still": true` in `story.json`): steps
+  of the voice that do nothing on the scene. While the step shown is one of them, the
+  scene's place shows the still, though the scene is loaded under it; at the first other
+  step the scene comes in over it with the fade of D214; *Back* to such a step shows the
+  still again. The reader stays on the painting as long as they like, since a story goes
+  on at *Next*. `story:the-letter` tells its first two steps over the welcome's painting:
+  the castle of Arvelia, and the letter that came with that very drawing; the journey and
+  the gate are told on the scene. Rules out a painting seen only while something loads,
+  and a timer that holds it.
+- **D252 — One wind for a stretch of flight: it rises once, changes at the turns, and
+  falls at the end.** Decided 2026-11-16 by the owner (*hay un sonido fuerte en los sonidos
+  (tanto de un paso como de varios) justo al principio, que suena casi como el disparo de
+  una escopeta. Ese hay que quitarlo o suavizarlo mucho … aunque está bien que haya un
+  primer sonido de despegar claro. El añadir "rest" mejora algo el sonido … Me gustan los
+  cambios aleatorios, la clave es que coincidan un poco con el principio y el final de los
+  movimientos (cambios de dirección), pero no siempre tiene que haber un "golpe de viento"
+  por paso volado*). The flown commands that follow one another are one wind (D243). It
+  rises, from nothing and in no less than 0.18 seconds, at the first flown command after a
+  silence; the clear sound of a start is the lift's own (D244). A command flown the same
+  way as the one before carries the wind on, with no change at the join. A command that
+  turns draws a new level, reached in 0.15 to 0.25 seconds, so that a change of the wind
+  comes with a change of the flight; not more often than every 0.35 seconds, so that a
+  zigzag of short moves is a wind that changes now and then and not a puff for each step.
+  Between the turns the level wanders slowly, a new target every 0.35 to 0.7 seconds.
+  After the last cell of a command the wind holds for 0.12 seconds, for the next command
+  to take it on, and then falls in 0.5 to 0.8 seconds. The wind's level at any moment is
+  counted from its own plan (`levelAt`) and nothing reads it back from the sound's nodes,
+  where a value only scheduled reads as another: a wind that starts, starts from nothing.
+  The rest (D243) is on in the mix as it is written. Rules out a bang at a start, a new
+  rise for every flown command, and a level read back from a node.

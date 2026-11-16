@@ -38,7 +38,8 @@
 // hidden things found and seen, joined by ",", D184), data-untied (the brooms
 // untied, D183), data-wizard-facing (the way the wizard faces, as the scene keeps it,
 // D241), data-wizard-frame (the name of the frame the wizard is drawn in), data-flying
-// (the figures in the air, joined by ",", D185),
+// (the figures in the air, joined by ",", from their fly to their land, D185), data-rise
+// (the wizard's rise, 0 on its cell to 1 at its flight's height, while it flies, D244),
 // data-hover (the hover's clock, in whole milliseconds, which always runs but under
 // reduced motion, D235, D242), data-wind (`on` while a flight's wind blows: while
 // the program plays and the wizard is in the air, D236), data-wind-swells (the wind's
@@ -146,12 +147,28 @@ import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, bumpText, friendText, raceVerdict, ringWayText, sleepingText } from './words';
-import { FLOWN, FLY_LIFT, flyFrame, hoverOf, hoverPhase, RING_PAST, RING_RAISE, throughRing, turned } from './flight';
+import { FLOWN, FLY_LIFT, flyFrame, hoverOf, hoverPhase, LIFT_MS, RING_PAST, RING_RAISE, riseOf, throughRing, turned } from './flight';
 import { drawnFromSprite, spriteFoot, spriteKey, spriteName, spriteOrigin, spriteScale, type ThingSprite } from './things';
 import { Wind } from './sound';
 
 /** How long one tick lasts at speed 1. */
 export const TICK_MS = 400;
+
+/** A figure in the air: its shadow, the way it last flew up or down and how far its feet
+ * are past a ring's plane and raised in a ring's cell (D232); how far it has risen, 0 on
+ * its cell to 1 at its height, and the rise under way: from where, to where (1 lifting,
+ * 0 setting down), since when on the scene's clock and for how long (D244). */
+interface Flyer {
+  shadow: Phaser.GameObjects.Ellipse;
+  way: 'up' | 'down';
+  past: number;
+  raise: number;
+  rise: number;
+  from: number;
+  to: 0 | 1;
+  since: number;
+  length: number;
+}
 
 /** How fast the wind fades, in seconds (D236): when the program stops playing, at a
  * landing, and at a restart. */
@@ -353,13 +370,8 @@ class LevelScene extends Phaser.Scene {
   private readonly through: string[] = [];
   /** The rings' cells, which a flying figure flies through (D232). */
   private rings: Tile[] | null = null;
-  /** The figures in the air (D185): when their flight began, on the scene's clock, and
-   * their shadow on the ground; the way each last flew upward or downward, and how far
-   * its feet are past a ring's plane in a ring's cell (D232). */
-  private readonly flyers = new Map<
-    Phaser.GameObjects.Sprite,
-    { shadow: Phaser.GameObjects.Ellipse; way: 'up' | 'down'; past: number; raise: number }
-  >();
+  /** The figures in the air (D185), and those setting down from it (D244). */
+  private readonly flyers = new Map<Phaser.GameObjects.Sprite, Flyer>();
   private readonly wind = new Wind();
   /** The way each figure faces (D241), kept by its sprite. */
   private readonly ways = new Map<Phaser.GameObjects.Sprite, Facing>();
@@ -733,7 +745,7 @@ class LevelScene extends Phaser.Scene {
       headroom: this.headroom,
       lifted: (figure) => {
         const flying = this.flyers.get(figure);
-        return flying ? (FLY_LIFT + flying.raise) * TILE : 0;
+        return flying ? (FLY_LIFT + flying.raise) * TILE * flying.rise : 0;
       },
       wizard: () => this.wizard,
       height: this.map.height * TILE,
@@ -1334,19 +1346,30 @@ class LevelScene extends Phaser.Scene {
     this.speech.think(why, tick, this.sayTicks(why), AFTER_BUMP_MS);
   }
 
-  /** A figure lifted on its broom (D185): drawn from its flying rows, half a cell up,
-   * its shadow on the ground; for the wizard, the wind blows and swells (D236). */
+  /** A figure lifted on its broom (D185): drawn from its flying rows, its shadow on the
+   * ground, rising to half a cell up over LIFT_MS at the playback's speed, or there at
+   * once where it is shown at once (D244); one setting down rises again from where it
+   * is. For the wizard, air that rises is heard, and the wind blows and swells (D236). */
   private lift(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
-    if (this.flyers.has(sprite)) return;
-    const shadow = this.add
-      .ellipse(sprite.x, sprite.y, TILE * 0.55, TILE * 0.18, 0x000000, 0.22)
-      .setDepth(sprite.depth - 0.0004);
-    const facing = this.wayOf(sprite);
-    this.flyers.set(sprite, { shadow, way: facing === 'down' ? 'down' : 'up', past: 0, raise: 0 });
+    const atOnce = instant || this.still;
+    const flying = this.flyers.get(sprite);
+    if (flying) {
+      if (flying.to === 1) return;
+      this.riseTo(flying, 1, atOnce);
+    } else {
+      const shadow = this.add
+        .ellipse(sprite.x, sprite.y, TILE * 0.55, TILE * 0.18, 0x000000, 0.22)
+        .setDepth(sprite.depth - 0.0004);
+      const facing = this.wayOf(sprite);
+      const made: Flyer = { shadow, way: facing === 'down' ? 'down' : 'up', past: 0, raise: 0, rise: 0, from: 0, to: 1, since: 0, length: 0 };
+      this.flyers.set(sprite, made);
+      this.riseTo(made, 1, atOnce);
+    }
     if (sprite !== this.wizard) return;
     this.lastFlownWay = null;
     this.countSwells(this.windSwells + 1);
     if (!instant) {
+      this.playSound('lift');
       this.playedSounds.push('wind');
       this.parentNode.dataset.sounds = this.playedSounds.join(',');
     }
@@ -1357,7 +1380,7 @@ class LevelScene extends Phaser.Scene {
   /** The wind blows while the playback plays and the wizard is in the air, in a tick
    * not drawn at once; else it fades in `fade` seconds (D236). */
   private blowWind(fade = WIND_STOP): void {
-    const blows = this.playback.state === 'playing' && this.flyers.has(this.wizard) && !this.shownInstant;
+    const blows = this.playback.state === 'playing' && this.inAir(this.wizard) && !this.shownInstant;
     if (blows) this.wind.start();
     else if (this.wind.blowing) this.wind.stop(fade);
     const wind = this.wind.blowing ? 'on' : 'off';
@@ -1370,18 +1393,55 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.windSwells = String(swells);
   }
 
-  /** A figure set down where it is (D185): its feet on its cell, standing, the wind gone. */
+  /** A figure set down where it is (D185, D244): it comes down from where it is over
+   * LIFT_MS, in its flying frame, and stands facing the way it flew once its feet are on
+   * its cell (touchDown), or at once where it is shown at once. For the wizard, air that
+   * falls is heard, whoever ordered the landing, and the wind fades. */
   private land(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
+    const flying = this.flyers.get(sprite);
+    if (!flying) return;
+    if (instant || this.still) this.touchDown(sprite);
+    else if (flying.to === 1) this.riseTo(flying, 0, false);
+    else return;
+    if (sprite !== this.wizard) return;
+    if (!instant) this.playSound('set_down');
+    this.lastFlownWay = null;
+    this.blowWind(instant ? WIND_CUT : WIND_LAND);
+  }
+
+  /** A flyer's rise sent toward `to` from where it is, over LIFT_MS at the playback's
+   * speed, or there at once (D244). */
+  private riseTo(flying: Flyer, to: 0 | 1, atOnce: boolean): void {
+    flying.from = atOnce ? to : flying.rise;
+    flying.to = to;
+    flying.since = this.time.now;
+    flying.length = atOnce ? 0 : (LIFT_MS * this.playback.tickDuration) / TICK_MS;
+    if (atOnce) flying.rise = to;
+  }
+
+  /** A figure whose feet are on its cell: its shadow gone, no longer a flyer, standing
+   * facing the way it flew (D241). */
+  private touchDown(sprite: Phaser.GameObjects.Sprite): void {
     const flying = this.flyers.get(sprite);
     if (!flying) return;
     flying.shadow.destroy();
     this.flyers.delete(sprite);
     this.restOrigin(sprite);
-    const facing = this.wayOf(sprite);
-    this.face(sprite, facing);
-    if (sprite !== this.wizard) return;
-    this.lastFlownWay = null;
-    this.blowWind(instant ? WIND_CUT : WIND_LAND);
+    this.face(sprite, this.wayOf(sprite));
+  }
+
+  /** Whether a figure is in the air: a flyer not setting down, from its fly to its land,
+   * as the world has it. */
+  private inAir(sprite: Phaser.GameObjects.Sprite): boolean {
+    return this.flyers.get(sprite)?.to === 1;
+  }
+
+  /** How long the wizard's set-down has still to go, in milliseconds; 0 where it is not
+   * setting down. */
+  private settingDown(): number {
+    const flying = this.flyers.get(this.wizard);
+    if (!flying || flying.to !== 0) return 0;
+    return Math.max(0, flying.length - (this.time.now - flying.since));
   }
 
   /** The rings' cells, read once from the level's things. */
@@ -1409,8 +1469,15 @@ class LevelScene extends Phaser.Scene {
    * plane the way it flew (D232). */
   private flyFrames(): void {
     const sides: string[] = [];
+    const down: Phaser.GameObjects.Sprite[] = [];
     for (const [sprite, flying] of this.flyers) {
       const { shadow, way } = flying;
+      // The rise under way (D244): a set-down ended puts the figure on its cell.
+      flying.rise = flying.from + (flying.to - flying.from) * riseOf(this.time.now - flying.since, flying.length);
+      if (flying.to === 0 && flying.rise <= 0) {
+        down.push(sprite);
+        continue;
+      }
       const id = sprite === this.wizard ? 'wizard' : this.idOf(sprite);
       const figures = this.art?.figures;
       const name = sprite.texture.key.replace(/^fig-/, '');
@@ -1424,20 +1491,30 @@ class LevelScene extends Phaser.Scene {
       // The hover, whole outside a ring's cell and none at its middle, whose hole is
       // tight (D232, D235).
       const hover = hoverOf(this.hoverMs, hoverPhase(id)) * (1 - ring.raise / RING_RAISE);
-      const lift = (FLY_LIFT + ring.raise + hover) * TILE;
+      const lift = (FLY_LIFT + ring.raise + hover) * flying.rise * TILE;
       const height = sprite.frame.height || sprite.height;
       const base = figures && sprite.texture.key.startsWith('fig-') ? 1 - figures.foot / figures.frame[1] : 0.6;
       sprite.setOrigin(0.5, base + lift / (height * sprite.scaleY));
+      // The shadow as faint as the figure is low.
       shadow
         .setPosition(sprite.x, sprite.y + (ring.past - 0.05) * TILE)
         .setDepth(sprite.depth - 0.0004)
+        .setAlpha(flying.rise)
         .setVisible(sprite.visible);
     }
+    for (const sprite of down) this.touchDown(sprite);
+    const rise = this.flyers.get(this.wizard)?.rise;
+    if (rise === undefined) delete this.parentNode.dataset.rise;
+    else if (this.parentNode.dataset.rise !== rise.toFixed(2)) this.parentNode.dataset.rise = rise.toFixed(2);
     // Which flying figures are in a ring's cell, behind the ring or in front of it.
     const sided = sides.sort().join(',');
     if (sided) this.parentNode.dataset.ringSides = sided;
     else delete this.parentNode.dataset.ringSides;
-    const flying = [...this.flyers.keys()].map((sprite) => (sprite === this.wizard ? 'wizard' : this.idOf(sprite))).filter(Boolean);
+    // In the air from its fly to its land, as the world has it (D244).
+    const flying = [...this.flyers.keys()]
+      .filter((sprite) => this.inAir(sprite))
+      .map((sprite) => (sprite === this.wizard ? 'wizard' : this.idOf(sprite)))
+      .filter(Boolean);
     const said = flying.sort().join(',');
     if (this.parentNode.dataset.flying !== said) this.parentNode.dataset.flying = said;
     const wind = this.wind.blowing ? 'on' : 'off';
@@ -1907,7 +1984,15 @@ class LevelScene extends Phaser.Scene {
    * their end, and Ilda's verdict of a race read to its end (D234). */
   settle(won: boolean): number {
     const verdict = Math.max(0, this.verdictRead - this.time.now);
-    return Math.max(won ? this.celebrate() : 0, this.speech.settle(), verdict);
+    // A set-down under way is waited for, and a run won is celebrated once the wizard's
+    // feet are on its cell (D244).
+    const down = this.settingDown();
+    let party = 0;
+    if (won && down > 0) {
+      this.time.delayedCall(down, () => this.celebrate());
+      party = down + this.playback.tickDuration * 2;
+    } else if (won) party = this.celebrate();
+    return Math.max(party, down, this.speech.settle(), verdict);
   }
 
   /** After a run won, the wizard celebrates (14.3): how long it takes; 0 when it does

@@ -8,6 +8,8 @@ import {
   HOVER_MS,
   hoverOf,
   hoverPhase,
+  LIFT_MS,
+  riseOf,
   RING_PAST,
   RING_RAISE,
   throughRing,
@@ -31,6 +33,18 @@ describe('flying (D185)', () => {
     expect((['down', 'left', 'right', 'up'] as const).map((way) => flyFrame(14, way))).toEqual([42, 45, 48, 51]);
     expect((['down', 'left', 'right', 'up'] as const).map((way) => flyFrame(4, way))).toEqual([12, 15, 18, 21]);
     expect(flyFrame(undefined, 'down')).toBeNull();
+  });
+
+  it('rises over LIFT_MS, eased at both ends and never falling (D244)', () => {
+    expect(riseOf(0, LIFT_MS)).toBe(0);
+    expect(riseOf(LIFT_MS, LIFT_MS)).toBe(1);
+    expect(riseOf(LIFT_MS * 2, LIFT_MS)).toBe(1);
+    expect(riseOf(LIFT_MS / 2, LIFT_MS)).toBeGreaterThan(0);
+    expect(riseOf(LIFT_MS / 2, LIFT_MS)).toBeLessThan(1);
+    const steps = Array.from({ length: 31 }, (_, i) => riseOf((i * LIFT_MS) / 30, LIFT_MS));
+    expect(steps.every((rise, i) => i === 0 || rise >= (steps[i - 1] as number))).toBe(true);
+    // Eased: slower at its ends than in its middle.
+    expect(riseOf(LIFT_MS / 10, LIFT_MS)).toBeLessThan(0.1);
   });
 
   it('hovers slowly: up its whole a quarter of the way, back after a rise and fall (D235)', () => {

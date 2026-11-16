@@ -471,6 +471,86 @@ test.describe('the way a landing leaves the wizard facing (D241)', () => {
   });
 });
 
+/** Every value the wizard's rise takes, in order, the attribute gone written as ''; and
+ * the sounds named, as they stand at the end (D244). */
+async function watchRise(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const node = document.querySelector('#scene') as HTMLElement;
+    const seen: string[] = [];
+    (window as unknown as { rises: string[] }).rises = seen;
+    new MutationObserver((records) => {
+      for (const record of records) seen.push(record.oldValue ?? '');
+    }).observe(node, { attributes: true, attributeFilter: ['data-rise'], attributeOldValue: true });
+  });
+}
+
+/** The rise's values seen, the one now last; consecutive repeats once. */
+async function risesSeen(page: Page): Promise<string[]> {
+  const seen = await page.evaluate(() => [
+    ...(window as unknown as { rises: string[] }).rises,
+    (document.querySelector('#scene') as HTMLElement).dataset.rise ?? '',
+  ]);
+  return seen.filter((value, index) => index === 0 || value !== seen[index - 1]);
+}
+
+const below1 = (value: string) => value !== '' && Number(value) < 1;
+
+test.describe('the lift and the landing (D244)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("El primer vuelo: the lift rises with air that rises, and the landing cast sets down with air that falls", async ({
+    page,
+  }) => {
+    await open(page, 'the-first-flight', '1');
+    await watchRise(page);
+    expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
+    const rises = await risesSeen(page);
+    // From the ground ('') up through less than 1 to 1, and down through less than 1 to ''.
+    const top = rises.indexOf('1.00');
+    expect(top).toBeGreaterThan(0);
+    expect(rises.slice(0, top).some(below1)).toBe(true);
+    expect(rises.slice(top).some(below1)).toBe(true);
+    expect(rises[rises.length - 1]).toBe('');
+    await expect(scene(page)).toHaveAttribute('data-sounds', /lift/);
+    await expect(scene(page)).toHaveAttribute('data-sounds', /set_down/);
+  });
+
+  test("La carrera: the landing the world makes at the program's end sets down and sounds, and Zarek's does not", async ({
+    page,
+  }) => {
+    await open(page, 'the-race', '4');
+    await watchRise(page);
+    await start(page, solution('the-race'));
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(120_000) });
+    const rises = await risesSeen(page);
+    const top = rises.lastIndexOf('1.00');
+    expect(rises.slice(top).some(below1)).toBe(true);
+    expect(rises[rises.length - 1]).toBe('');
+    const sounds = ((await scene(page).getAttribute('data-sounds')) ?? '').split(',');
+    expect(sounds.filter((sound) => sound === 'set_down')).toHaveLength(1);
+  });
+
+  test('the slider on a tick of a flight puts the wizard at its height at once, with no sound', async ({ page }) => {
+    await open(page, 'the-first-flight');
+    expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
+    const lifts = ((await scene(page).getAttribute('data-sounds')) ?? '').split(',').filter((s) => s === 'lift').length;
+    // The lift is tick 25; the flown cells follow.
+    await page.locator('#timeline').fill('27');
+    await expect(scene(page)).toHaveAttribute('data-rise', '1.00', { timeout: 1000 });
+    const after = ((await scene(page).getAttribute('data-sounds')) ?? '').split(',').filter((s) => s === 'lift').length;
+    expect(after).toBe(lifts);
+  });
+
+  test('under reduced motion the wizard is up or down at once, never between', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await open(page, 'the-first-flight', '1');
+    await watchRise(page);
+    expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
+    expect((await risesSeen(page)).filter(below1)).toEqual([]);
+  });
+});
+
 /** A flight that hovers: the wizard walks to the broom, lifts, flies two cells and waits
  * in the air for sixty ticks, eight seconds at speed 1 (D235, D236, D242). */
 const HOVERING = 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.move_right(2)\nwizard.wait(60)\n';

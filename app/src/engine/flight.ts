@@ -3,7 +3,8 @@
 // shadow on the ground; the page moves it slowly up and down, a hover on a clock that
 // always runs, after Stop too, but under reduced motion (D235, D242); a flown step takes
 // a third of a walked one's time, at every speed, so that a flight is three times as
-// fast to the eye. In a ring's cell a flying figure flies through the ring's hole
+// fast to the eye. A figure rises to its height at a lift and sets down at a landing,
+// over LIFT_MS (D244). In a ring's cell a flying figure flies through the ring's hole
 // (D232): drawn higher, its feet and broom above the ring's lower rim, and its feet past
 // the ring's plane the way it last flew, upward behind the ring, downward in front of
 // it. Kept apart from scene.ts so that it is tested without Phaser.
@@ -15,6 +16,16 @@ import type { Facing, Tile } from './sight';
 export const FLY_LIFT = 0.5;
 /** How long a flown step takes, against a walked one. */
 export const FLOWN = 1 / 3;
+/** How long a figure takes to rise to its flight's height, and to set down from it, in
+ * milliseconds at speed 1 (D244). */
+export const LIFT_MS = 300;
+
+/** How far a figure has risen, from 0 on its cell to 1 at its flight's height, `elapsed`
+ * milliseconds into a rise of `length`: eased at both ends, never falling (D244). */
+export function riseOf(elapsed: number, length: number): number {
+  const t = length > 0 ? Math.min(1, Math.max(0, elapsed / length)) : 1;
+  return t * t * (3 - 2 * t);
+}
 /** How long a flying figure's hover takes to rise and fall once, in milliseconds of
  * the hover's clock (D235). */
 export const HOVER_MS = 2400;

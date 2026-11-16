@@ -281,7 +281,7 @@ kydux/
   together: `ci/check.sh`. The Playwright suite, slower, runs before a release
   and when a piece touches the shell.
 - **GitHub Actions** runs `ci/check.sh` on every push, and the Playwright suite
-  too on a version's tag and when started by hand (D179); it builds the release
+  too only when started by hand (D179); it builds the release
   bundles on a tag. Pushes and tags happen only inside the hours, so the runs
   do too.
 - **Releases**: `0.1`, `0.2`, ... while the course is incomplete; `1.0` when

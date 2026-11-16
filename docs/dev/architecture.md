@@ -2603,19 +2603,21 @@ one overturns stays, marked as superseded.
   the level (D176), and a `while` waiting for it to close ends at the tick limit; the
   chapter's last level uses both its spells. Rules out a spell taught, summed up in the
   story, and never cast, and a spell that spares the child the loop.
-- **D179 — The browser tests run on GitHub at a release, and by hand.** Decided 2026-11-09
-  by the owner, on the designer's proposal, after every run of 2026-11-09 and the one of
-  0.0.2 failed there: GitHub's runner takes 1.8 hours for the 288 browser tests, and six of
-  them, the ones that wait the longest in real time, run out of their time, while every one
-  passes on hija. On GitHub the `check` job (`ci/check.sh`) runs on every push and pull
-  request; the `e2e` job (`ci/check.sh --e2e`) runs on a version's tag (`v*`) and when
-  started by hand (`workflow_dispatch`). The gate stays `ci/check.sh --e2e` on hija, once
-  before a sprint's last commit, each piece checked with `ci/check.sh` and the browser tests
-  it touches (the owner, 2026-11-09). A release tags its version commit, `git tag -a
-  v<version>`, before `ci/push.sh`, which pushes with `--follow-tags`; a tag on a commit it
-  dates again is made again on the commit's new self, with its message, dated now, and a tag
-  on a commit already pushed goes up alone. Rules out two hours of a private repository's
-  minutes on every push, and a red check that says nothing about the code.
+- **D179 — The browser tests run on GitHub only when started by hand.** Decided 2026-11-09
+  and 2026-11-16 by the owner, on the designer's proposal (*me parece bien que las pruebas
+  de github que se pasan de tiempo se dejen para lanzar a mano pero no se lancen*):
+  GitHub's runner takes hours for the browser tests, and the ones that wait the longest in
+  real time run out of their time there, with three times the time too (D191), while every
+  one passes on hija. On GitHub the `check` job (`ci/check.sh`) runs on every push, tag
+  and pull request; the `e2e` job (`ci/check.sh --e2e`) runs only when the workflow is
+  started by hand (`workflow_dispatch`), and never by a push or a tag. The gate is
+  `ci/check.sh --e2e` on hija, once before a sprint's last commit, each piece checked with
+  `ci/check.sh` and the browser tests it touches (the owner, 2026-11-09). A release tags
+  its version commit, `git tag -a v<version>`, before `ci/push.sh`, which pushes with
+  `--follow-tags`; a tag on a commit it dates again is made again on the commit's new self,
+  with its message, dated now, and a tag on a commit already pushed goes up alone. Rules
+  out hours of a private repository's minutes on a push or a release, and a red check that
+  says nothing about the code.
 - **D180 — A lesson's block that walked says the walk, not the cell.** Decided 2026-11-10 by
   the owner (*no tiene sentido poner coordenadas si no sabes dónde empieza el mago; debería
   tomarse la posición inicial, ejecutar los movimientos y tomar la posición final, y mostrar
@@ -2799,8 +2801,8 @@ one overturns stays, marked as superseded.
   (`app/playwright.config.ts`), and the specs' own waits are three times theirs through
   one helper, `ciTimes` in `app/e2e/support.ts`; a wait of under 400 ms, a sample within a
   tick, stays as it is. `retries` stays 1. `ci/push.sh --tags` refuses a tag whose commit
-  does not carry the tag's version. Rules out a release whose tag run is red by the
-  runner's speed.
+  does not carry the tag's version. Rules out a run on GitHub that is red by the
+  runner's speed alone where time can mend it.
 - **D192 — Every chapter has a score of its own, made by the game from notes.** Decided
   2026-11-10 by the owner (*cada capítulo debe tener una banda sonora apropiada, ajustada a
   la hora del día, el ambiente, si es exterior o interior, si es de noche y en secreto*). A

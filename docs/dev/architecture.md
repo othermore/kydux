@@ -2705,12 +2705,10 @@ one overturns stays, marked as superseded.
   else, and the long flights of the rings and the race pass quickly. While flying,
   the figure is drawn from its flying rows (D188), lifted half a cell above its cell,
   its origin moved so that its depth stays its cell's, with a soft shadow on the ground,
-  bobbing over the rows' three frames; a sheet with no flying rows bobs a little
-  instead. The steps' taps are not heard in the air; the flight's sound is a wind
-  synthesised as the steps are (the owner's choice: no sample), filtered noise that
-  starts at the lift, swells a little with each flown step and fades at the landing
-  (`engine/sound.ts`, `wind` among `data-sounds`). Rules out a `fly_right` family of
-  methods, and a flight as slow as a walk.
+  and it hovers as D235 says. The steps' taps are not heard in the air; the flight's
+  sound is a wind synthesised as the steps are (the owner's choice: no sample), the wind
+  of D236 (`engine/sound.ts`, `wind` among `data-sounds`). Rules out a `fly_right` family
+  of methods, and a flight as slow as a walk.
 - **D186 — Low and high: what a flight crosses.** Decided 2026-11-10. A scene's terrains
   say whether a flight crosses them (`fly`, false unless given; a terrain walked on is
   flown over): a low terrain is flown over and not walked on (water, reeds, a hedge, a
@@ -2739,8 +2737,8 @@ one overturns stays, marked as superseded.
   wizard walks under.
 - **D188 — Flying figures, Zarek and Rinlo.** Decided 2026-11-10 by the owner (*van a ser
   nuevas hojas de sprites*). The wizard's sheets have four flying rows after the sleeping
-  one (`rows.fly`, one a way, three frames: level, a little up, a little down, for the
-  bobbing), made from Gemini's edit of the walking base of each gender (the figure
+  one (`rows.fly`, one a way, three frames, the first of them level and the one the page
+  draws, D235), made from Gemini's edit of the walking base of each gender (the figure
   sitting on a broom, legs together, the handle ahead and the twigs behind,
   `tools/art/prompts/figure-fly-<gender>.md`) and recoloured into the eight looks as the
   casting rows are. Zarek and Rinlo, pupils a year older, are drawn whole by Gemini from
@@ -3391,27 +3389,20 @@ one overturns stays, marked as superseded.
   the keyboard without bringing itself into view. A click on any button of the page
   outside the start card closes the card, and the button does what it does. Rules out a
   card opened at its end, and a start card left over the scene while the program runs.
-- **D223 — The code's letter is one of three, tried in the page under `?debug`, and a
-  comment is never broken by hand.** Decided 2026-11-14 by the owner (*la fuente del
-  código podría ser un pelín más pequeña; algún tipo de letra que sea un poco más
-  estrecha, pero que mantenga el monotipo y se vea bien para programar*; *me gusta la
-  inconsolata a 16, pero creo que también podríamos poner la semicondensada a 14 o la
-  condensada a 14. Quiero ver cómo quedan con esas tres, idealmente como pruebas reales en
-  debug mode sobre la UI*; *evitar que sean de varias líneas y dejar que el propio
-  visualizador lo lleve a la siguiente línea*). The editor and every piece of code the
-  page shows are set in one of three candidates, each a face, a width and the editor's
-  size a new child gets: Inconsolata at 16, Noto Sans Mono at seven eighths of its width
-  at 14, and Noto Sans Mono at three quarters of its width at 14. Both faces come under
-  the SIL Open Font License 1.1 and are bundled with the game. Inconsolata at 16 is the
-  one in use where nothing is chosen. Under `?debug` the settings offer the three; the one
-  picked shows at once, sets the editor's size to its own and is kept with the settings,
-  so that the whole game is read in it. The editor's sizes are 14, 16, 20 and 24. The
-  candidate the owner picks becomes the code's only letter by a decision of its own. A
-  comment of a starting code is one `#` line for each sentence, written to fit a line
-  where it can; the editor wraps a line that does not fit, and the wrapped part hangs
-  under the line's own indentation. Rules out a font fetched from elsewhere, a letter
-  chosen from a sheet and not from the page, a comment cut into several `#` lines to fit a
-  width, and a wrapped line that starts at the editor's edge.
+- **D223 — The code's letter is chosen in the page itself, and a comment is never broken
+  by hand.** Decided 2026-11-14 by the owner (*la fuente del código podría ser un pelín más
+  pequeña; algún tipo de letra que sea un poco más estrecha, pero que mantenga el monotipo
+  y se vea bien para programar*; *quiero ver cómo quedan con esas tres, idealmente como
+  pruebas reales en debug mode sobre la UI*; *evitar que sean de varias líneas y dejar que
+  el propio visualizador lo lleve a la siguiente línea*). The code's letter is a narrow
+  monospaced face, bundled with the game under the SIL Open Font License 1.1, and the one
+  the owner picked with the game's own page before their eyes: D238 names it. The
+  editor's sizes are 14, 16, 20 and 24. A comment of a starting code is one `#` line for
+  each sentence, written to fit a line where it can; the editor wraps a line that does
+  not fit, and the wrapped part hangs under the line's own indentation. Rules out a font
+  fetched from elsewhere, a letter chosen from a sheet and not from the page, a comment
+  cut into several `#` lines to fit a width, and a wrapped line that starts at the
+  editor's edge.
 - **D224 — What is untied is the knot.** Decided 2026-11-14 by the owner (*lo que se
   desata es el nudo, no la escoba*; *hay que tener cuidado con la paja*). The texts untie
   or take off a broom's knot, or its thread, and never untie a broom; `untie` stays the
@@ -3563,3 +3554,75 @@ one overturns stays, marked as superseded.
   says so (`stars.bonuses`). Rules out a wizard held before the line, a penalty served
   before it is said, a winner Ilda names who loses the level, and the count said twice,
   by Ilda and by a card.
+- **D235 — A flying figure hovers slowly, moved by the page, and only while the program
+  plays.** Decided 2026-11-15 by the owner (*cuando se para con parar … se debe parar las
+  animaciones. Ahora mismo se queda vibrando el que está volando. Al ir para atrás con la
+  barra deslizadora de abajo también se ven las escobas vibrando muy rápido. Debería
+  quedarse detenido*; *cuando va volando y queramos que se pare (por ejemplo si hacemos
+  wizard.wait(5)) debe verse moviéndose oscilando un poco arriba y abajo, pero mucho más
+  despacio*). A flying figure is drawn in its flying row's level frame (`flyFrame`), and
+  the page moves it up and down by a sine: `HOVER_MS`, 2.4 seconds, a rise and fall, and
+  `HOVER_CELLS`, 0.05 of a cell, each way (`hoverOf`, `engine/flight.ts`). Every figure
+  has a place of its own in the rise and fall (`hoverPhase`: the wizard at its start, any
+  other by its id), so that two racers do not rise together; and the hover fades to none
+  in a ring's cell, whose hole is tight (D232). A figure whose sheet has no flying rows
+  hovers the same, in its standing frame. The hover has a clock of its own, which runs
+  while the playback plays and, in a story, always: a program stopped, paused, ended or
+  moved with the slider shows the flight still, where the clock stands, and a restart
+  does not move it (`data-hover`, the clock's milliseconds). Under reduced motion there
+  is no hover. One picture moved by the page stays one picture: frames drawn apart and
+  then scaled come out as different pictures, and shimmer in turn. Rules out a hover made
+  of drawn frames, a hover on the scene's own clock, and a figure that moves in the
+  picture of a tick.
+- **D236 — The broom's wind is soft air that swells at a turn, and is heard only while the
+  program plays.** Decided 2026-11-15 by the owner (*el sonido de la escoba no me gusta,
+  suena como si fuese el sonido de barrer o de algún tipo de ventilador, debería sonar como
+  algo mágico que vuela. Mucho más suave y más recordando al sonido del viento. Lo ideal es
+  que sonase de forma intermitente, por ejemplo cuando se hacen los giros que se
+  intensifique como si se acercase el sonido y luego se volviese a alejar*; *se debe parar
+  el sonido del juego (no la música)*). The wind is noise through a narrow low band that
+  wanders slowly, with no hiss: almost silent while the broom hovers, and a little louder,
+  at one even level, while it flies on (`Wind.fly`). At the lift and at every turn, a flown
+  move of the wizard whose way is not the way of its flown move before (`turned`,
+  `engine/flight.ts`), it swells (`Wind.swell`): louder and higher for half a second and
+  back over a second, as something that comes near and goes away, with two faint high
+  tones a fifth apart in the swell. No flown cell makes a sound of its own. The wind blows
+  while the playback plays and the wizard is in the air, and at nothing else: it fades at
+  once when the playback stops, pauses or ends, starts again when a paused flight goes on,
+  and the music is not touched (`data-wind`; `data-wind-swells`, the swells of the run).
+  Its two voices, the air and the tones, have a mix (`windMix`), and under `?debug`,
+  `#music` plays the wind at rest, flying on, in a turn and in a whole flight, with a box
+  and a slider for each voice and a line that says the mix, as the themes' mixer does
+  (D203). Rules out a wind as loud all the flight long, a swell at every cell, and a wind
+  over a program that does not play.
+- **D237 — A thought about a bump comes after the bump, and words over a flying figure are
+  over it as it is drawn.** Decided 2026-11-15 by the owner (*el mensaje de giré demasiado
+  pronto tiene que salir un poco después del choque, no a la vez, y debe estar más arriba,
+  para no tapar al personaje*). Every thought the wizard thinks with the bump's sound (a
+  friend in the way, a high cell, a ring's side, a ring flown against its way, a ring's
+  rim, `drevo` over a cell that is not walked on) shows `AFTER_BUMP_MS`, half a second,
+  after the bump: the child sees the bump and then reads of it. Its reading time (D175)
+  counts from when it shows, and the run's end waits for a thought that is still to come
+  as for one that is up. A restart, the slider, and any other word drop a thought not
+  yet shown. A thought or a bubble over a figure in the air is placed over the figure as
+  it is drawn: higher than over one on the ground by the flight's lift and by a ring's
+  raise (D232), so that it covers neither head nor hat; words under a figure stay under
+  the place of its feet on the ground. The scene says how far over that place the words'
+  foot is, in cells (`data-words-over`: 1.10 on the ground, 1.60 in the air, 1.95 in a
+  ring's cell; `below`). A refusal with no bump, a locked door or a thing out of reach,
+  thinks at once. Rules out a thought in the bump's own frame, and words laid on a flying
+  figure.
+- **D238 — Inconsolata at 16 is the code's only letter.** Decided 2026-11-15 by the owner
+  (*de fuente dejemos por defecto inconsolata a 16, que está bien*), the pick D223 waits
+  for. The editor and every piece of code the page shows are set in Inconsolata
+  (`app/src/fonts/inconsolata/`), and a new child's editor is at 16. No other face is
+  bundled and nothing chooses a face: the settings hold the editor's size alone. A game
+  kept while another candidate was tried is read with its editor at 16. Rules out a letter
+  chosen in the settings.
+- **D239 — A tip's picture is 960 by 540, and shown as large as the window lets.** Decided
+  2026-11-15 by the owner (*las capturas de los tips estaría bien que se viesen un poco más
+  grandes, son un poco pequeñas*). Each tip's picture (D221) is taken from the game's own
+  page at twice its pixels and kept 960 by 540, a webp of less than 90 KB. The waiting view
+  shows it up to 800 pixels wide, and never so large that the view scrolls: its width also
+  follows the window's height. Rules out a picture enlarged beyond its own pixels, and a
+  tip the child scrolls to read.

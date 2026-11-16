@@ -98,8 +98,9 @@ export interface PlanView {
   zones?: readonly { name: string; cells: Tile[] }[];
   /** The wizard and every actor in sight, with where each stands and looks. */
   figures: { id: string; kind: string; tile: Tile; facing: string }[];
-  /** The things on the map, not those carried. */
-  things: { id: string; kind: string; tile: Tile; open?: boolean }[];
+  /** The things on the map, not those carried; a thing drawn from a sprite with how far
+   * sideways the scene draws it on its cell (D207). */
+  things: { id: string; kind: string; tile: Tile; open?: boolean; shift?: number }[];
   /** Every reach goal's cell, a hidden one's too (D143). */
   marks: readonly Tile[];
   /** The pictures it is drawn from, on a painted scene (D143). */
@@ -174,6 +175,9 @@ export interface Layout {
   /** The things each way takes away, by the way's id: six brooms in one, nine in
    * another (D184); the first way's are gone before any run. */
   wayGone: Record<string, string[]>;
+  /** Whether a way hides or shows a thing the level's own things do not, by the way's id
+   * then the thing's: a broom moved onto the straw or off it (D202). */
+  wayHidden: Record<string, Record<string, boolean>>;
   firstWay: string | null;
   /** What the scene shows and the world does not hold, like a flat stone. */
   props: { kind: string; tile: Tile }[];
@@ -310,12 +314,18 @@ export function layout(level: LevelJson): Layout {
   const ways: Record<string, Record<string, Tile>> = {};
   const wayFacings: Record<string, Record<string, Facing>> = {};
   const wayGone: Record<string, string[]> = {};
+  const wayHidden: Record<string, Record<string, boolean>> = {};
   for (const way of asList(level.ways)) {
     const moved: Record<string, Tile> = {};
     const turned: Record<string, Facing> = {};
     wayGone[String(way.id)] = asList(way.things)
       .filter((spec) => spec.gone === true)
       .map((spec) => String(spec.id));
+    wayHidden[String(way.id)] = Object.fromEntries(
+      asList(way.things)
+        .filter((spec) => typeof spec.hidden === 'boolean')
+        .map((spec) => [String(spec.id), spec.hidden === true]),
+    );
     for (const spec of [...asList(way.things), ...asList(way.actors)]) {
       const tile = place(spec);
       if (tile) moved[String(spec.id)] = tile;
@@ -338,6 +348,7 @@ export function layout(level: LevelJson): Layout {
     ways,
     wayFacings,
     wayGone,
+    wayHidden,
     firstWay: asList(level.ways)[0] ? String(asList(level.ways)[0]?.id) : null,
     dark: level.dark === true,
     darkArea: boxedCells(level.dark_area),

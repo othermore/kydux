@@ -109,6 +109,16 @@ export function nudgedBy(nudged: Nudged | undefined, tile: Tile): number {
   return byOf(nudged, tile);
 }
 
+/** The cells a scene draws a thing from a sprite sideways on, clear of painted
+ * furniture (D207): the same ranges as a nudge's, which moves no figure. */
+export type Shifted = Lowered;
+
+/** How far sideways, as a part of a cell, a thing drawn from a sprite is drawn on a
+ * tile (D207). */
+export function shiftedBy(shifted: Shifted | undefined, tile: Tile): number {
+  return byOf(shifted, tile);
+}
+
 function byOf(ranges: Lowered | undefined, [x, y]: Tile): number {
   const range = ranges?.find(({ cells: [[x0, y0], [x1, y1]] }) => x >= x0 && x <= x1 && y >= y0 && y <= y1);
   return range?.by ?? 0;

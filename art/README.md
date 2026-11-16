@@ -710,7 +710,17 @@ stands on it). A thing on a painted scene with no cut-out of its own is drawn fr
 kind's sprite at its cell, among the figures by its row; a broom hidden in the straw only
 once a program finds it (D184). A sprite that hangs says `anchor: "top"`: its `origin`
 is the point of the picture held, the hung broom's own peg, and its `foot` the point of
-the cell it is held at, the shed's peg, above the cell when the peg is.
+the cell it is held at, the shed's peg, on the peg's own cell, (x, 4) (D211). A scene's
+`shifted` cells draw a sprite sideways by a part of a cell, clear of painted furniture,
+and move no figure (D207): the shed's brooms by the standing bales, (13, 6) and (13, 8),
+by -0.3.
+
+In the shed, the row under the pegs is walked (D211): its figures are drawn 0.25 lower,
+(6, 5) is nudged half a cell to the right and (13, 5) a little to the left, and the barrel
+is a cut-out of row 5, traced on the painting, over the hung brooms and under the
+figures; the front row is drawn 0.2 lower behind the front wall's top, and the lintel
+over the door is traced down to its lower outline. `tests/tools/test_shed_cells.py`
+checks them on the scene as the page draws it.
 
 The shed's rack has a peg in the middle of each cell from column 6 to 13 (D195), laid
 by `tools/art/repaint.py the-broom-shed pegs` from the scene's `pegs` settings: the

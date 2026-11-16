@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { framingAt } from '../ui/story';
+import { FOOT_IN_CELL, figureDepth, shiftedBy, thingDepth } from './depth';
 import { layout } from './layout';
 import { TILE } from './placeholders';
 import { spriteFoot, spriteName, spriteOrigin, type ThingSprites } from './things';
@@ -14,6 +16,28 @@ const SPRITES: ThingSprites = {
 };
 
 describe("the shed's brooms and zones", () => {
+  it("hangs a broom from its peg's cell, its picture where the painted peg is (D195, D211)", () => {
+    const things = JSON.parse(
+      readFileSync(new URL('../../../content/art/things/things.json', import.meta.url), 'utf8'),
+    ) as ThingSprites;
+    const hung = things['broom-hung'] as ThingSprites[string];
+    // On (x, 4), the peg's cell, its top on the painted peg's point at y 4.646.
+    const [, y] = spriteFoot(hung, [6, 4]);
+    expect(y / TILE).toBeCloseTo(4.646, 3);
+  });
+
+  it('draws a figure of the row under the pegs, lowered, over the broom hung above it (D211)', () => {
+    const lowered = 0.25;
+    expect(figureDepth(5 + FOOT_IN_CELL + lowered)).toBeGreaterThan(thingDepth(4));
+  });
+
+  it('moves a broom on a shifted cell sideways, and nowhere else (D207)', () => {
+    const shifted = [{ cells: [[13, 6], [13, 6]] as [[number, number], [number, number]], by: -0.3 }];
+    expect(shiftedBy(shifted, [13, 6])).toBe(-0.3);
+    expect(shiftedBy(shifted, [12, 6])).toBe(0);
+    expect(shiftedBy(undefined, [13, 6])).toBe(0);
+  });
+
   it('draws a hung broom from its hung sprite, held by its top on the peg (D195)', () => {
     expect(spriteName(SPRITES, 'broom', true)).toBe('broom-hung');
     expect(spriteName(SPRITES, 'broom', false)).toBe('broom');

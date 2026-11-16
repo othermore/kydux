@@ -105,6 +105,18 @@ describe('layout', () => {
 });
 
 describe('chapter 4 in the layout', () => {
+  it('hides or shows a broom by the way that moves it onto the straw or off it (D202)', () => {
+    const level = {
+      id: 'shed',
+      map: ['S....'],
+      things: [{ kind: 'broom', id: 'broom_3', at: [1, 0], hidden: true }],
+      ways: [{ id: 'a' }, { id: 'b', things: [{ id: 'broom_3', at: [3, 0], hidden: false }] }],
+    };
+    const shaped = layout(level);
+    expect(shaped.wayHidden).toEqual({ a: {}, b: { broom_3: false } });
+    expect(shaped.things[0]?.hidden).toBe(true);
+  });
+
   it('reads the low cells, the hidden things and the race with its path walked out (D184, D186, D189)', () => {
     const level = {
       id: 'race',

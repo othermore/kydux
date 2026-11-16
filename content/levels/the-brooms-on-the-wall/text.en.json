@@ -2,7 +2,7 @@
   "title": "The brooms on the wall",
   "goals": [
     "Leave no hanging broom knotted.",
-    "Walk along the wall at least as far as cell (8, 6).",
+    "Walk along the wall at least as far as cell (8, 5).",
     "Use `for`."
   ],
   "starting_code": "# Walk up to the wall with `move_up`.\n# Go left to under the first peg with `move_left`.\n# Find the hanging brooms with `find_all`.\n# For each broom of the list:\n#     untie it with `untie`\n#     and take a step right with `move_right`.\n",

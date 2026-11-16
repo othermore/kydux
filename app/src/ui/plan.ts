@@ -28,7 +28,8 @@ export interface PlanShapes {
   cells: { x: number; y: number; kind: PlanCell }[];
   doors: { id: string; x: number; y: number; open: boolean; across: boolean }[];
   /** The things on the map, a dark room's too (D169). */
-  things: { id: string; x: number; y: number }[];
+  /** Each thing, with how far sideways the scene draws it on its cell (D207). */
+  things: { id: string; x: number; y: number; shift?: number }[];
   figures: { id: string; kind: string; x: number; y: number; facing: string }[];
   /** Every reach mark's cell, the hidden ones too. */
   marks: { x: number; y: number }[];
@@ -72,7 +73,7 @@ export function planShapes(view: PlanView): PlanShapes {
     }));
   const things = view.things
     .filter((thing) => thing.kind !== 'door' && thing.kind !== 'bed')
-    .map(({ id, tile: [x, y] }) => ({ id, x, y }));
+    .map(({ id, tile: [x, y], shift }) => ({ id, x, y, ...(shift ? { shift } : {}) }));
   const figures = view.figures
     .filter((figure) => !enchanted.has(key(figure.tile)))
     .map(({ id, kind, tile: [x, y], facing }) => ({ id, kind, x, y, facing }));
@@ -515,7 +516,9 @@ export function drawPlan(
       continue;
     }
     ctx.fillStyle = css(INK);
-    ctx.fillRect(left(thing.x) + cell * 0.37, top(thing.y) + cell * 0.37, cell * 0.26, cell * 0.26);
+    // Moved sideways as the scene draws it, clear of painted furniture (D207).
+    const shift = (thing.shift ?? 0) * cell;
+    ctx.fillRect(left(thing.x) + shift + cell * 0.37, top(thing.y) + cell * 0.37, cell * 0.26, cell * 0.26);
   }
   // The marks on the ground (D160); over them the figures as themselves, each on its
   // cell, its feet as the scene puts them, among the scene's own cut-outs in ink, each by

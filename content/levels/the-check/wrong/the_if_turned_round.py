@@ -1,4 +1,4 @@
-wizard.move_up(2)
+wizard.move_up(3)
 brooms = wizard.find_all("broom")
 for broom in brooms:
     if not broom.knotted:

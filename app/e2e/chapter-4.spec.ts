@@ -28,6 +28,33 @@ const LEVELS = ITEMS.filter((item) => item.startsWith('level:')).map((item) => i
 const STORIES = ITEMS.filter((item) => item.startsWith('story:')).map((item) => item.slice('story:'.length));
 const solution = (id: string) => readFileSync(`${CONTENT}levels/${id}/solution.py`, 'utf8');
 const wrong = (id: string, name: string) => readFileSync(`${CONTENT}levels/${id}/wrong/${name}.py`, 'utf8');
+/** A level's lying brooms in a way, from its level.json: those in sight and those hidden
+ * until a program finds them (D184, D202). */
+function lyingOf(id: string, way: string): { seen: string[]; hidden: string[] } {
+  type Thing = { id: string; kind?: string; hung?: boolean; hidden?: boolean; gone?: boolean };
+  const spec = JSON.parse(readFileSync(`${CONTENT}levels/${id}/level.json`, 'utf8'));
+  const things = new Map<string, Thing>((spec.things as Thing[]).map((thing) => [thing.id, { ...thing }]));
+  const changes: Thing[] = (spec.ways ?? []).find((one: { id: string }) => one.id === way)?.things ?? [];
+  for (const change of changes) {
+    if (change.gone) things.delete(change.id);
+    else things.set(change.id, { ...things.get(change.id), ...change } as Thing);
+  }
+  const lying = [...things.values()].filter((thing) => thing.kind === 'broom' && !thing.hung);
+  return {
+    seen: lying.filter((thing) => !thing.hidden).map((thing) => thing.id),
+    hidden: lying.filter((thing) => thing.hidden).map((thing) => thing.id),
+  };
+}
+
+/** The lying brooms the scene draws now. */
+async function lyingDrawn(page: Page): Promise<string[]> {
+  const drawn = (await scene(page).getAttribute('data-sprite-things')) ?? '';
+  return drawn
+    .split(';')
+    .filter((entry) => entry.includes(':broom:'))
+    .map((entry) => entry.split(':')[0] as string);
+}
+
 const waysOf = (id: string): string[] =>
   (JSON.parse(readFileSync(`${CONTENT}levels/${id}/level.json`, 'utf8')).ways ?? []).map((way: { id: string }) => way.id);
 
@@ -153,7 +180,7 @@ test.describe('the shed', () => {
     await expect(scene(page)).toHaveAttribute(
       'data-sprite-things',
       'broom_0:broom:9,8;broom_1:broom:7,7;broom_2:broom:11,7;' +
-        'broom_6:broom-hung:6,5;broom_7:broom-hung:7,5;broom_8:broom-hung:8,5;broom_9:broom-hung:9,5',
+        'broom_6:broom-hung:6,4;broom_7:broom-hung:7,4;broom_8:broom-hung:8,4;broom_9:broom-hung:9,4',
     );
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}shed-pegs.png` });
     expect(await run(page, solution('the-broom-at-your-feet'))).toMatch(/^¡Lo has conseguido/);
@@ -162,12 +189,10 @@ test.describe('the shed', () => {
 
   test('the brooms are counted from the straw and from the wall; one find_all loses (D196, D202)', async ({ page }) => {
     await open(page, 'the-shed');
-    // The hung one and the three lying on the boards are seen; the two under the straw
-    // only once a program looks there.
-    await expect(scene(page)).toHaveAttribute(
-      'data-sprite-things',
-      'broom_0:broom:9,8;broom_1:broom:7,7;broom_2:broom:11,7;broom_6:broom-hung:6,5',
-    );
+    // The brooms lying on the boards are seen; those under the straw only once a program
+    // looks there.
+    const first = lyingOf('the-shed', waysOf('the-shed')[0] as string);
+    await expect.poll(() => lyingDrawn(page)).toEqual(first.seen.sort());
     expect(await run(page, wrong('the-shed', 'one_find_all_from_the_door'))).not.toMatch(/^¡Lo has conseguido/);
     expect(await run(page, solution('the-shed'))).toMatch(/^¡Lo has conseguido/);
     // Each way played back to its end, its won card closed to see the scene.
@@ -178,18 +203,17 @@ test.describe('the shed', () => {
       await expect(page.locator('#again')).toBeVisible({ timeout: ciTimes(60_000) });
       await expect(page.locator('.outcome-text')).toContainText('Lo has conseguido');
       await page.locator('#again').click();
-      await expect(scene(page)).toHaveAttribute('data-found', /broom_3.*broom_4|broom_4.*broom_3/);
-      await expect(scene(page)).toHaveAttribute('data-sprite-things', /broom_3:broom:.*broom_4:broom:/);
+      const { seen, hidden } = lyingOf('the-shed', way);
+      await expect.poll(() => lyingDrawn(page)).toEqual([...seen, ...hidden].sort());
       await page.locator('.scene-frame').screenshot({ path: `${SHOTS}shed-found-${way}.png` });
     }
   });
 
-  test('in the straw two brooms lie in sight at the start, and find_all uncovers the other two (D202)', async ({ page }) => {
+  test('in the straw the brooms on the boards lie in sight at the start, and find_all uncovers the others (D202)', async ({ page }) => {
     await open(page, 'the-brooms-in-the-straw');
-    const lying = async () =>
-      ((await scene(page).getAttribute('data-sprite-things')) ?? '').split(';').filter((entry) => entry.includes(':broom:')).length;
-    await expect.poll(lying).toBe(2);
-    await expect(scene(page)).toHaveAttribute('data-sprite-things', /^broom_1:broom:11,7;broom_2:broom:8,7;broom_6:/);
+    const first = lyingOf('the-brooms-in-the-straw', waysOf('the-brooms-in-the-straw')[0] as string);
+    expect(first.hidden.length).toBeGreaterThan(0);
+    await expect.poll(() => lyingDrawn(page)).toEqual(first.seen.sort());
     expect(await run(page, solution('the-brooms-in-the-straw'))).toMatch(/^¡Lo has conseguido/);
     // Each way played back to its end, its won card closed to see the scene.
     for (const way of waysOf('the-brooms-in-the-straw')) {
@@ -199,7 +223,8 @@ test.describe('the shed', () => {
       await expect(page.locator('#again')).toBeVisible({ timeout: ciTimes(60_000) });
       await expect(page.locator('.outcome-text')).toContainText('Lo has conseguido');
       await page.locator('#again').click();
-      await expect.poll(lying).toBe(4);
+      const { seen, hidden } = lyingOf('the-brooms-in-the-straw', way);
+      await expect.poll(() => lyingDrawn(page)).toEqual([...seen, ...hidden].sort());
       await page.locator('.scene-frame').screenshot({ path: `${SHOTS}straw-found-${way}.png` });
     }
   });
@@ -344,7 +369,7 @@ test.describe('the stories', () => {
         if (id === 'the-morning-after' && step >= 4) {
           await expect(page.locator('#scene')).toHaveAttribute('data-story-part', '1');
           await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', '3,3,16,10');
-          await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_6:broom-hung:6,5/);
+          await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_6:broom-hung:6,4/);
           await expect(page.locator('#scene')).toHaveAttribute('data-sprite-things', /broom_0:broom:9,8/);
           // The three have walked in by the step's end: the scene's own playback is done.
           await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '9,8');

@@ -2,7 +2,7 @@
   "title": "Las escobas de la pared",
   "goals": [
     "No dejes ninguna escoba colgada con nudo.",
-    "Camina junto a la pared al menos hasta la casilla (8, 6).",
+    "Camina junto a la pared al menos hasta la casilla (8, 5).",
     "Usa `for`."
   ],
   "starting_code": "# Camina hacia arriba hasta la pared con `move_up`.\n# Ve a la izquierda hasta debajo del primer gancho con `move_left`.\n# Encuentra las escobas colgadas con `find_all`.\n# Para cada escoba de la lista:\n#     desátala con `untie`\n#     y da un paso a la derecha con `move_right`.\n",

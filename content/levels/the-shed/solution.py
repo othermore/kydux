@@ -1,6 +1,6 @@
 fallen = wizard.find_all("broom")
 print(fallen)
-wizard.move_up(2)
+wizard.move_up(3)
 hung = wizard.find_all("broom")
 print(hung)
 wizard.say(len(fallen) + len(hung))

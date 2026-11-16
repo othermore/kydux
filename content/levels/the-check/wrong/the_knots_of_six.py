@@ -1,4 +1,4 @@
-wizard.move_up(2)
+wizard.move_up(3)
 wizard.move_right(2)
 broom_8.untie()
 wizard.move_right(3)

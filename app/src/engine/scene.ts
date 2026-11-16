@@ -124,6 +124,7 @@ import {
   markDepthIn,
   nudgedBy,
   overDepth,
+  shiftedBy,
   sleeperDepth,
   thingDepth,
 } from './depth';
@@ -520,8 +521,10 @@ class LevelScene extends Phaser.Scene {
    * hanging from its peg at the rack's row, behind whoever stands under it (D195). */
   private placeSprite(image: Phaser.GameObjects.Image, sprite: ThingSprite, tile: Tile): void {
     const [originX, originY] = spriteOrigin(sprite);
+    // Moved sideways on a cell by painted furniture beside it (D207).
+    const [footX, footY] = spriteFoot(sprite, tile);
     image
-      .setPosition(...spriteFoot(sprite, tile))
+      .setPosition(footX + shiftedBy(this.art?.scene.shifted, tile) * TILE, footY)
       .setOrigin(originX, originY)
       .setScale(spriteScale(sprite, image.height))
       .setDepth(thingDepth(tile[1], { lying: sprite.lying === true }));
@@ -957,12 +960,13 @@ class LevelScene extends Phaser.Scene {
       } else if (this.sprites.has(thing.id)) {
         this.placeSprite(image, this.sprites.get(thing.id) as ThingSprite, tile);
       } else image.setPosition(...centre(tile));
-      // A thing in the wizard's hands from the start is seen only once given (D123); one
-      // drawn from a sprite and hidden, once found (D184).
-      const unseen = thing.hidden === true && this.sprites.has(thing.id);
       // A thing the way shown takes away, or the first way before any run (D184).
       const way = this.shownWay ?? this.map.firstWay;
       const gone = way !== null && (this.map.wayGone[way] ?? []).includes(thing.id);
+      // A thing in the wizard's hands from the start is seen only once given (D123); one
+      // drawn from a sprite and hidden, in the way shown, once found (D184, D202).
+      const hidden = (way !== null ? this.map.wayHidden[way]?.[thing.id] : undefined) ?? thing.hidden === true;
+      const unseen = hidden && this.sprites.has(thing.id);
       image.setVisible(!thing.carried && !unseen && !gone).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
       this.glows.get(thing.id)?.setVisible(!thing.open);
@@ -1070,13 +1074,19 @@ class LevelScene extends Phaser.Scene {
     const facing = this.wizardFacing();
     const things = this.map.things
       .filter((thing) => !this.carried.has(thing.id) && !thing.carried)
-      .map((thing) => ({
-        id: thing.id,
-        kind: thing.kind,
-        tile: this.startTile(thing.id, thing.tile),
-        open: this.openDoors.has(thing.id),
-        ...(thing.art ? { art: thing.art } : {}),
-      }));
+      .map((thing) => {
+        const tile = this.startTile(thing.id, thing.tile);
+        // A thing drawn from a sprite, moved sideways as the scene draws it (D207).
+        const shift = this.sprites.has(thing.id) ? shiftedBy(this.art?.scene.shifted, tile) : 0;
+        return {
+          id: thing.id,
+          kind: thing.kind,
+          tile,
+          open: this.openDoors.has(thing.id),
+          ...(thing.art ? { art: thing.art } : {}),
+          ...(shift ? { shift } : {}),
+        };
+      });
     const figures = [
       { id: 'wizard', kind: 'wizard', tile: this.wizardTile, facing },
       ...this.map.actors.flatMap((actor) => {

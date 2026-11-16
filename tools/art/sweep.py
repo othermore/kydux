@@ -123,6 +123,9 @@ class Scene:
     lowered: dict = field(default_factory=dict)
     #: The cells a figure is drawn sideways on, and by how much of a cell (D105).
     nudged: dict = field(default_factory=dict)
+    #: The cells a thing drawn from a sprite is drawn sideways on, and by how much of a
+    #: cell, not a figure (D207).
+    shifted: dict = field(default_factory=dict)
     #: The dark passages a figure is drawn darker in, the deeper it goes (shade.ts).
     dark: list = field(default_factory=list)
 
@@ -209,7 +212,7 @@ def load(scene: str) -> Scene:
             for y in range(y0, y1 + 1)
             for x in range(x0, x1 + 1)
         }
-    for key in ("lowered", "nudged"):
+    for key in ("lowered", "nudged", "shifted"):
         for part in art.get(key, []):
             (x0, y0), (x1, y1) = part["cells"]
             for y in range(y0, y1 + 1):

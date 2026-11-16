@@ -1085,6 +1085,9 @@ def scene(settings: Settings) -> Path:
         **({"lowered": settings.lowered} if settings.lowered else {}),
         # The cells a figure is drawn sideways on, on the painted strip (D105).
         **({"nudged": settings.data["nudged"]} if settings.data.get("nudged") else {}),
+        # The cells a thing the game draws from a sprite is drawn sideways on, clear of
+        # painted furniture (D207); not a figure.
+        **({"shifted": settings.data["shifted"]} if settings.data.get("shifted") else {}),
         # The dark passages a figure is drawn darker in, the deeper it goes (shade.ts).
         **(
             {

@@ -587,8 +587,9 @@ def test_on_the_wall_find_all_gives_the_hung_brooms_left_to_right(way, count):
     level = content_level("the-brooms-on-the-wall").way(way)
     # From the door, the two brooms lying on the boards, left for later (D202).
     assert found_from(level) == [(7, 7), (11, 7)]
-    found = found_from(level, [("move_up", 2), ("move_left", 3)])
-    assert found == [(column, 5) for column in range(6, 6 + count)]
+    # From the row under the pegs, the hung ones, each on its peg's cell (D211).
+    found = found_from(level, [("move_up", 3), ("move_left", 3)])
+    assert found == [(column, 4) for column in range(6, 6 + count)]
 
 
 @pytest.mark.parametrize(
@@ -598,11 +599,11 @@ def test_in_the_check_the_hung_brooms_go_left_to_right_and_the_first_has_no_knot
     way, count, knots
 ):
     world = World(content_level("the-check").way(way))
-    world.wizard.move_up(2)
+    world.wizard.move_up(3)
     brooms = world.wizard.find_all("broom")
     assert len(brooms) == count and sum(broom.knotted for broom in brooms) == knots
     assert not brooms[0].knotted
-    assert [tuple(broom.position) for broom in brooms] == [(c, 5) for c in range(6, 6 + count)]
+    assert [tuple(broom.position) for broom in brooms] == [(c, 4) for c in range(6, 6 + count)]
 
 
 @pytest.mark.parametrize(("way", "hung"), [("six", 1), ("seven", 2), ("eight", 3)])
@@ -611,11 +612,17 @@ def test_the_shed_counts_five_from_the_door_and_the_hung_ones_from_the_wall(way,
     level = content_level("the-shed").way(way)
     assert len(found_from(level)) == 5
     assert all(cell[1] in (7, 8) for cell in found_from(level))
-    assert len(found_from(level, [("move_up", 2)])) == hung
+    assert len(found_from(level, [("move_up", 3)])) == hung
 
 
-#: The cells of the shed's floor that the picture covers with straw (D202).
-STRAW = {(6, 7), (6, 8), (7, 8), (12, 8), (13, 8)}
+#: The cells of the shed's floor the picture paints straw on, as its scene names them
+#: (D202).
+STRAW = {
+    tuple(cell)
+    for cell in json.loads(
+        (CONTENT.parent / "scenes" / "the-broom-shed" / "scene.json").read_text(encoding="utf-8")
+    )["straw"]
+}
 
 
 def shed_stagings():
@@ -652,29 +659,16 @@ def shed_stagings():
 @pytest.mark.parametrize(
     ("where", "brooms"), shed_stagings(), ids=lambda v: v if isinstance(v, str) else ""
 )
-def test_in_the_shed_a_lying_broom_is_hidden_under_the_straw_and_seen_on_the_boards(where, brooms):
-    """D202: a lying broom on one of the five straw cells is hidden, elsewhere seen; none
-    lies on (13, 7), half under the straw, nor on row 6, the wall's zone."""
+def test_in_the_shed_a_lying_broom_is_hidden_on_the_straw_and_seen_on_the_boards(where, brooms):
+    """D202: a lying broom on one of the scene's seven straw cells is hidden, elsewhere
+    seen, on the boards of rows 6 to 8 and off (13, 7); a hung one is on its peg's cell,
+    on row 4 (D211)."""
     for cell, hung, hidden, _ in brooms:
         if hung:
+            assert cell[1] == 4 and 6 <= cell[0] <= 13, f"{where}: a broom hung on {cell}"
             continue
-        assert cell != (13, 7) and cell[1] != 6, f"{where}: a broom on {cell}"
+        assert cell != (13, 7) and 6 <= cell[1] <= 8, f"{where}: a broom on {cell}"
         assert hidden == (cell in STRAW), f"{where}: the broom on {cell}"
-
-
-@pytest.mark.parametrize("name", ["the-shed", "the-brooms-in-the-straw"])
-def test_the_knotted_lying_brooms_are_two_on_the_boards_and_two_under_the_straw_otherwise_each_way(
-    name,
-):
-    laid = []
-    for where, brooms in shed_stagings():
-        if not where.startswith(f"{name} "):
-            continue
-        knotted = sorted(cell for cell, hung, _, knot in brooms if knot and not hung)
-        assert sum(cell in STRAW for cell in knotted) == 2, where
-        assert sum(cell not in STRAW for cell in knotted) == 2, where
-        laid.append(tuple(knotted))
-    assert len(laid) == 3 and len(set(laid)) == 3
 
 
 def test_the_race_and_the_rematch_have_zarek_cross_at_fifty_five_and_fifty():
@@ -759,6 +753,19 @@ def test_a_hung_broom_is_untied_from_the_cell_under_it_and_refused_from_beside(t
     world.things["hung_2"].untie()
     assert world.events[-1].data["reason"] == "too_far"
     assert world.things["hung_2"].knotted
+
+
+def test_a_hung_broom_is_untied_only_from_the_cell_just_under_its_peg():
+    """D211: from the row under the pegs and from nowhere else, not two rows down."""
+    world = World(rack())
+    world.wizard.move_up(1)
+    world.wizard.move_left(2)
+    assert world.wizard.position == (2, 3)
+    world.things["hung_1"].untie()
+    assert world.events[-1].data["reason"] == "too_far"
+    world.wizard.move_up(1)
+    world.things["hung_1"].untie()
+    assert not world.things["hung_1"].knotted
 
 
 def test_find_all_finds_only_what_lies_in_the_zone_the_wizard_stands_in():

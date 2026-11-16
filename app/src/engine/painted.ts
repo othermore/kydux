@@ -11,7 +11,7 @@ import type { LevelJson } from '../runtime/protocol';
 import type { PlanPictures } from './layout';
 import { dormitoryMate, friendSets, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
-import { coverDepth, type Lowered, type Nudged, nudgedBy, overDepth, rowDepth, thingDepth } from './depth';
+import { coverDepth, type Lowered, type Nudged, nudgedBy, overDepth, rowDepth, type Shifted, thingDepth } from './depth';
 import type { Dark } from './shade';
 import { centredCorner, drawnShift, KEY_SCALE, shiftBy } from './shift';
 import type { Tile } from './sight';
@@ -86,6 +86,9 @@ export interface SceneArt {
   /** The cells a figure is drawn sideways on, by a part of a cell, to stand on the
    * painted strip where it is off its cells' middle (D105). */
   nudged?: Nudged;
+  /** The cells a thing drawn from a sprite is drawn sideways on, clear of painted
+   * furniture, by a part of a cell; a figure is not moved by it (D207). */
+  shifted?: Shifted;
   /** Where a pupil asleep in each bed lies (D91): its head's point on the pillow, in
    * cells; the way the pillow lies from the quilt; and the row of the quilt, a
    * static thing drawn over the sleeper. */

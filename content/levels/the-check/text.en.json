@@ -2,11 +2,11 @@
   "title": "The check",
   "goals": [
     "Leave no broom knotted.",
-    "Walk along the wall at least as far as cell (11, 6).",
+    "Walk along the wall at least as far as cell (11, 5).",
     "The program ends with no error.",
     "Use `knotted`."
   ],
-  "starting_code": "# The program we used for the wall stops at the first broom!\nwizard.move_up(2)\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    broom.untie()\n    wizard.move_right()\n",
+  "starting_code": "# The program we used for the wall stops at the first broom!\nwizard.move_up(3)\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    broom.untie()\n    wizard.move_right()\n",
   "hints": [
     "The program tries to untie every broom, but untying a broom with no knot is an error!",
     "We only want to untie a broom if it actually has a knot. Look at its attribute to see if it's knotted before using the method.",

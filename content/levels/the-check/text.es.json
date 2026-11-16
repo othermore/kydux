@@ -2,11 +2,11 @@
   "title": "La revisión",
   "goals": [
     "No dejes ninguna escoba con nudo.",
-    "Camina junto a la pared al menos hasta la casilla (11, 6).",
+    "Camina junto a la pared al menos hasta la casilla (11, 5).",
     "El programa termina sin error.",
     "Usa `knotted`."
   ],
-  "starting_code": "# ¡El programa que usamos para la pared se para en la primera escoba!\nwizard.move_up(2)\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    broom.untie()\n    wizard.move_right()\n",
+  "starting_code": "# ¡El programa que usamos para la pared se para en la primera escoba!\nwizard.move_up(3)\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    broom.untie()\n    wizard.move_right()\n",
   "hints": [
     "El programa intenta desatar todas las escobas, ¡pero desatar una escoba sin nudo es un error!",
     "Solo queremos desatar una escoba si realmente tiene un nudo. Mira su atributo para ver si está anudada antes de usar el método.",

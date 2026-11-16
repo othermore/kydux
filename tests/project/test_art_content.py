@@ -61,12 +61,17 @@ def walked(scene: str) -> set[tuple[int, int]]:
     return {(x, y) for y, row in enumerate(rows) for x, char in enumerate(row) if char in walks}
 
 
+#: The walked cells something painted stands on, by the owner's word: in the shed, the
+#: barrel's cell, where a figure stands nudged to its right, in front of it (D211).
+STANDS_ON = {"the-broom-shed": {(6, 5)}}
+
+
 @pytest.mark.parametrize("scene", SCENES)
 def test_nothing_of_the_painting_stands_on_a_cell_walked_on(scene):
     art, masks = rows_of(scene)
     standing = [
         cell
-        for cell in sorted(walked(scene))
+        for cell in sorted(walked(scene) - STANDS_ON.get(scene, set()))
         if cell[1] in masks and part(masks[cell[1]], art["cell"], *cell, 0.45, 1.0) > STANDS
     ]
     assert not standing, f"{scene}: something of the painting stands on {standing}"

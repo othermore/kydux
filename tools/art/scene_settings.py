@@ -132,12 +132,16 @@ class Settings:
 
     def refuse_long_nudges(self) -> None:
         """A figure walks its own column; only the cells round a door or an arch are
-        nudged, never a whole column or row (D149)."""
+        nudged, never a whole column or row (D149); and a thing the game draws is shifted
+        on a few cells by painted furniture, never a whole column or row (D207)."""
         marks = self.marks()
-        for part in self.data.get("nudged", []):
-            (x0, y0), (x1, y1) = part["cells"]
-            if y1 - y0 + 1 >= len(marks) or x1 - x0 + 1 >= len(marks[0]):
-                raise ValueError(f"{self.id}: a nudge over a whole column or row: {part['cells']}")
+        for key, what in (("nudged", "nudge"), ("shifted", "shift")):
+            for part in self.data.get(key, []):
+                (x0, y0), (x1, y1) = part["cells"]
+                if y1 - y0 + 1 >= len(marks) or x1 - x0 + 1 >= len(marks[0]):
+                    raise ValueError(
+                        f"{self.id}: a {what} over a whole column or row: {part['cells']}"
+                    )
 
 
 def settings(scene_id: str) -> Settings:

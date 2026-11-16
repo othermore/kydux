@@ -2249,7 +2249,7 @@ one overturns stays, marked as superseded.
   round's arches move 0.3 (the owner, sprint 34), and round the way down's double door, its
   leaves a quarter open against its jambs, 0.2 (the owner, D167). (c) The first floor row below a
   wall's foot is drawn 0.3 cell lower (`lowered_rows`); the row the foot is painted on is
-  wall (D154). (d) The row at the bottom of a
+  wall (D154), but for the shed's row under the pegs, walked and drawn 0.25 lower (D211). (d) The row at the bottom of a
   corridor where the lower wall's face is painted is walked, the wall's top cut `over` the
   figures on it, and where that wall stands so close that only a hat would show, the row
   is drawn 0.3 higher. (e) A level starts a cell past an arch, never in it or on the cell
@@ -2300,8 +2300,9 @@ one overturns stays, marked as superseded.
   Row 6 is drawn where it is, not lowered (D149 c): lowered, a figure on it stood in the
   statues' bases (the owner). The same holds for every scene: the row of a wall's foot is
   not walked, and the row below it is lowered only where nothing stands out on the row
-  below that. Rules out a figure whose head lies in the wall, or whose feet lie in a
-  statue's base.
+  below that. The one exception is the owner's: in the shed the row under the pegs is
+  walked, its figures drawn lower against the back wall (D211). Rules out a figure whose
+  head lies in the wall, or whose feet lie in a statue's base.
 - **D155 — A cut-out's mask is opaque inside its outline.** Decided 2026-11-08 by the
   owner (the wizard seen through the statue's robe). A mask by difference (D148) is 0 or 1
   at every pixel, its edge softened over one pixel by the page's resampling. Where a
@@ -2860,15 +2861,17 @@ one overturns stays, marked as superseded.
   perfectamente*). The shed's rack holds eight pegs, one in the middle of each cell from
   column 6 to 13, laid by the tool from the painting's own peg (`repaint.py pegs`,
   which fills the painting's pegs over and draws the board out to the rack's ends).
-  A hanging broom is a thing of kind `broom` with `"hung": true`, on
-  the rack's cell under its peg, (x, 5) in the shed, a cell no one walks on; `untie()`
-  works from the cell under it, (x, 6), as a door opens from beside it, and is refused
-  `too_far` from anywhere else (`under` in `level.py`). A broom on the floor is untied
-  on its own cell (D183). The page draws a hung broom from its kind's hung sprite,
-  `broom-hung` in `things.json` (Gemini's broom hanging by a loop of cord from a peg),
-  which hangs from its top (`anchor: "top"`): its `origin` is the sprite's own peg, laid
-  over the scene's peg's point (`foot`, above its cell), at its row's depth,
-  behind a figure standing under it (`engine/things.ts`); `data-sprite-things` names it
+  A hanging broom is a thing of kind `broom` with `"hung": true`, on its peg's cell,
+  (x, 4) in the shed, furniture no one walks on; `untie()` works from the cell under it,
+  (x, 5), the row under the pegs, which is walked (D211), as a door opens from beside
+  it, and is refused `too_far` from anywhere else (`under` in `level.py`). A broom on the
+  floor is untied on its own cell (D183). The page draws a hung broom from its kind's
+  hung sprite, `broom-hung` in `things.json` (Gemini's broom hanging by a loop of cord
+  from a peg), which hangs from its top (`anchor: "top"`): its `origin` is the sprite's
+  own peg, laid over the scene's peg's point (`foot`, given from the peg's cell), at its
+  row's depth, behind a figure standing under it (`engine/things.ts`); the barrel at the
+  rack's left end, a cut-out of row 5, is drawn over the brush of a broom hung on peg 6,
+  whose cord and handle show over its top (D211). `data-sprite-things` names it
   `broom-hung`. Rules out brooms "in a row on the floor", and a hung broom drawn off
   its peg.
 - **D196 — What `find_all` and `find_nearest` find depends on where the wizard
@@ -2884,9 +2887,10 @@ one overturns stays, marked as superseded.
   carries its zones: the plan window hatches each zone's cells lightly, the other way
   from the low cells', and writes its name on its first cell (`plan.zone.<name>`:
   *junto a la pared*, *en la paja*); `?debug` frames each zone's cells in a colour of
-  its own and names it in the legend. In the shed the floor's zone keeps the name
-  `straw`, *en la paja*, though some of its brooms lie on the bare boards (D202): it is
-  the floor away from the wall. Rules out a `find_all` that sees through walls into
+  its own and names it in the legend. In the shed the zone `wall` is the row under the
+  pegs, row 5, from which the hung brooms are found and untied, and the zone `straw` is
+  the floor away from the wall, rows 6 to 8 and (5, 8) (D211); it keeps its name, *en la
+  paja*, though most of its brooms lie on the bare boards (D202). Rules out a `find_all` that sees through walls into
   every corner of a place.
 - **D197 — The broom is taught before the lists, with a practice of one `untie`.**
   Decided 2026-11-11 by the owner (*una primera práctica sencilla: una escoba justo a tus
@@ -2960,25 +2964,20 @@ one overturns stays, marked as superseded.
   threshold in view, and no peg under the goals' panel or the zoom's buttons at 1280
   by 800. A level with no `camera` starts as it does without one. Rules out a level
   whose things lie under the page's own panels as it opens, and a shed seen in pieces.
-- **D202 — In the shed a lying broom is in sight on the boards or hidden under the
-  straw.** Decided 2026-11-11 by the owner (*Hay que colocar algunas a la vista (donde no
-  hay paja) y otras escondidas (donde sí hay paja) para que tenga sentido el find_all
-  pero tenga sentido la historia de "están desordenadas o tiradas por el suelo" que
-  decimos*). On the shed's picture the floor's zone, rows 7 and 8, has straw on (6, 7),
-  (6, 8), (7, 8), (12, 8) and (13, 8) and bare boards on its other cells. A lying broom
-  on one of those five cells is `hidden` until a program finds it (D184); one on the
-  boards is seen from the start; none lies on (13, 7), half under the straw, nor on row
-  6, the wall's zone. The knotted lying brooms are four, `broom_1` and `broom_2` on the
-  boards and `broom_3` and `broom_4` under the straw, laid otherwise in each way of
-  *El cobertizo* and *Las escobas de la paja*, whose programs look for them; the story's
-  step 4, *La escoba a tus pies* and *Las escobas de la pared* show the two on the
-  boards, with `broom_0` by the door. In *Las escobas de la pared* the two stay knotted
-  while the wall's are untied: its goal is `{"kind": "untied", "zone": "wall"}`, which
-  counts the brooms of that zone in the way played (an `untied` goal takes `ids` or
-  `zone`, never both, and refuses a zone with no broom). The content tests hold every
-  level and story step staged in the shed to it. Rules out a broom that appears from bare
-  boards, a floor left empty after the story has shown brooms lying on it, and a count
-  made by eye.
+- **D202 — The lying brooms: in sight on the boards, hidden on the straw's seven
+  cells.** Decided 2026-11-12 from the owner's list (*las escobas que están en la paja
+  solo pueden estar en las casillas: (6,6), (7,6), (5,8), (6,8), (12,8), (13,8), (13,6)*),
+  after their rule of 2026-11-11 (*Hay que colocar algunas a la vista (donde no hay paja)
+  y otras escondidas (donde sí hay paja)*). The shed's `scene.json` names its straw cells,
+  `"straw": [[6, 6], [7, 6], [13, 6], [5, 8], [6, 8], [12, 8], [13, 8]]`, the cells the
+  picture paints straw on. A lying broom on a straw cell is `hidden` until a program finds
+  it (D184); a hidden broom lies nowhere else. A lying broom in sight lies on the boards of
+  rows 6 to 8, off the straw cells and off (13, 7). (5, 8) is floor: a broom on it is
+  untied from its own cell (D183), and a figure on it stands in front of the bench. The
+  brooms on (13, 6) and (13, 8) are drawn a little to the left, clear of the standing
+  bales (D207). The content's tests hold every level, every way and every story step in
+  the shed to this (`test_broom.py`). Rules out a hidden broom on the boards, and a broom
+  in sight on the straw.
 - **D203 — The pad is low and unbroken, and a chapter's theme is chosen by ear among
   three.** Decided 2026-11-12 by the owner (*debería tener mucho menos volumen en general,
   para que las notas más agudas y punteadas se noten más y esto solo rellene y dé cuerpo
@@ -3029,3 +3028,41 @@ one overturns stays, marked as superseded.
   innocent uses it lists (*de la misma manera*, *which way Dask looks*). Rules out the
   word for this in any text the child reads, a count or a list of ways on a card, a
   select of ways outside `?debug`, and the won card's *¡De todas las maneras!*.
+- **D207 — A thing drawn by the game may be moved sideways on its cell.** Decided
+  2026-11-12 by the owner (*hay que desplazarlas un poco hacia la izquierda para que no se
+  metan en la paca de paja*). A scene's `cut.json` may carry `"shifted": [{"about": "...",
+  "cells": [[x0, y0], [x1, y1]], "by": <cells>}]`, which the export writes into
+  `art.json`: a thing the game draws from a sprite on one of those cells is drawn that far
+  sideways (`shiftedBy` in `engine/depth.ts`, `placeSprite`), and so is its square on the
+  plan. It is the things' own setting: a figure on the cell is not moved by it (its move
+  is the cell's nudge, D105), and a thing is not moved by a cell's nudge. The world knows
+  nothing of it. The settings refuse a shift over a whole column or row, as they refuse a
+  nudge. In the shed, (13, 6) and (13, 8) move by -0.3, so that a lying broom's sprite
+  ends left of the standing bales. Rules out a sprite drawn into painted furniture, and a
+  figure moved to make room for a broom.
+- **D211 — In the shed the row under the pegs is walked, and a hung broom is reached from
+  it.** Decided 2026-11-12 by the owner (*La fila 5 debe ser pisable/transitable pero con
+  la posición bajada (y la casilla de la izquierda de esa fila, la del barril, con la
+  posición desplazada a la derecha para caer justo entre esa casilla y la de su derecha).
+  Y la fila 5 es desde la que se accede a las escobas colgadas, y desde donde se hace todo
+  (el find para las escobas colgadas y te vas moviendo)*; and, on its picture, *Hay que
+  bajar la posición del niño un poco más, de modo que la planta de sus pies esté en la
+  casilla de abajo pero sus tobillos estén en su casilla. Y el niño también debe verse
+  por delante del barril en la casilla 6,5*). The shed's back wall's foot is painted at
+  0.6 of row 5, and the boards show under it. Row 5 is floor from column 6 to 13, and the
+  pegs' cells above it, (6, 4) to (13, 4), are furniture. A figure on row 5 is drawn 0.25
+  lower (`lowered`): its soles just past the cell's lower border, in row 6, its ankles in
+  its own cell, its body over the wall's face. (6, 5) is nudged 0.5 to the right, so that
+  a figure on it stands on the border between columns 6 and 7, and (13, 5) 0.05 to the
+  left, clear of the standing bales. The barrel is a cut-out of the scene, traced on the
+  painting, static on row 5 at its row's depth: drawn after the hung brooms of row 4 and
+  before every figure of rows 5 and 6. A hung broom is on its peg's cell, (x, 4), and is
+  untied, found and measured from the cell under it, (x, 5) (D195, D196); a figure on
+  (x, 5) stands in front of the broom and hides what of it lies behind. The shed's zones
+  are `wall`, row 5, `[[6, 5, 13, 5]]`, and `straw`, the floor away from the wall,
+  `[[6, 6, 13, 8], [5, 8, 5, 8]]`. Row 8 is drawn 0.2 lower, so that the front wall's top
+  hides a figure's shoes and hem, and the lintel over the door is traced on the painting
+  down to its lower outline, so that a figure in the doorway is behind the whole lintel.
+  `tests/tools/test_shed_cells.py` holds these on the scene as the page draws it.
+  Rules out a hung broom untied from two rows under its peg, a figure of row 5 with its
+  feet on the wall's face, and a figure of row 5 behind the barrel or behind a hung broom.

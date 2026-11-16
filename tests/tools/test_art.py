@@ -1805,6 +1805,15 @@ def test_a_nudge_over_a_whole_column_or_row_is_refused(tmp_path, monkeypatch, ce
         scene.refuse_long_nudges()
 
 
+@pytest.mark.parametrize("cells", [[[1, 0], [1, 1]], [[0, 1], [3, 1]]], ids=["column", "row"])
+def test_a_shift_over_a_whole_column_or_row_is_refused(tmp_path, monkeypatch, cells):
+    """D207: a sprite moved clear of painted furniture on a few cells, never a line."""
+    make_map(tmp_path, monkeypatch, ["....", "...."])
+    scene = scene_settings.Settings("door", {"shifted": [{"cells": cells, "by": -0.3}]})
+    with pytest.raises(ValueError, match="shift over a whole column or row"):
+        scene.refuse_long_nudges()
+
+
 def test_a_nudge_round_a_door_is_not_refused(tmp_path, monkeypatch):
     make_map(tmp_path, monkeypatch, ["....", "....", "....", "...."])
     scene = scene_settings.Settings("door", {"nudged": [{"cells": [[1, 0], [1, 2]], "by": 0.2}]})

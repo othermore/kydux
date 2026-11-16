@@ -10,16 +10,22 @@
     "wall": [
       [
         6,
-        6,
+        5,
         13,
-        6
+        5
       ]
     ],
     "straw": [
       [
         6,
-        7,
+        6,
         13,
+        8
+      ],
+      [
+        5,
+        8,
+        5,
         8
       ]
     ]
@@ -65,7 +71,7 @@
       "id": "broom_6",
       "at": [
         6,
-        5
+        4
       ],
       "hung": true,
       "zone": "wall",
@@ -76,7 +82,7 @@
       "id": "broom_7",
       "at": [
         7,
-        5
+        4
       ],
       "hung": true,
       "zone": "wall",
@@ -87,7 +93,7 @@
       "id": "broom_8",
       "at": [
         8,
-        5
+        4
       ],
       "hung": true,
       "zone": "wall",
@@ -207,7 +213,7 @@
             6,
             7
           ],
-          "hidden": true
+          "hidden": false
         },
         {
           "id": "broom_4",
@@ -236,7 +242,7 @@
             7,
             8
           ],
-          "hidden": true
+          "hidden": false
         }
       ]
     }

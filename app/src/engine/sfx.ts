@@ -2,7 +2,7 @@
 // numbers for a small synthesizer, an oscillator or noise whose pitch slides
 // and whose loudness rises and falls, so that no sound file is loaded and the
 // same effect always sounds the same. Among them are the wizard's lift and landing,
-// air that rises and air that falls (D244). The settings can silence them.
+// air that rises and air that goes out (D244, D253). The settings can silence them.
 //
 // The page's one audio context sleeps while nothing sounds (D231): it is awake while a
 // theme plays or fades (music.ts), while a gust of the wind sounds (sound.ts), and until
@@ -71,10 +71,13 @@ export const EFFECTS = {
     },
   },
   fail: { wave: 'sawtooth', from: 300, to: 150, seconds: 0.3, volume: 0.12 },
-  // The wizard's lift and landing (D244): air that rises, noise whose band sweeps up,
-  // and air that falls, swept down; each comes up over its first fifth and dies away.
+  // The wizard's lift (D244): air that rises, noise whose band sweeps up; it comes up
+  // over its first fifth and dies away.
   lift: { wave: 'noise', from: 300, to: 1100, seconds: 0.6, volume: 0.12, attack: 0.12 },
-  set_down: { wave: 'noise', from: 900, to: 220, seconds: 0.6, volume: 0.12, attack: 0.12 },
+  // The landing (D253): air that goes out. It does not swell: it is there at once, lower
+  // and softer than the lift, and fades for twice as long while its band sinks, as a
+  // sound that is turned down to nothing.
+  set_down: { wave: 'noise', from: 650, to: 130, seconds: 1.2, volume: 0.1, attack: 0.04 },
 } satisfies Record<string, Effect>;
 
 export type EffectName = keyof typeof EFFECTS;

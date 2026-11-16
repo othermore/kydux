@@ -24,3 +24,16 @@ describe("every figure's steps (D132)", () => {
     expect(lower.seconds).toBe(EFFECTS.step.seconds);
   });
 });
+
+describe("the wizard's lift and landing (D244, D253)", () => {
+  it('lifts with air that swells and rises, and lands with air that goes out: longer, softer, lower, with no swell', () => {
+    const { lift, set_down: landing } = EFFECTS;
+    expect(lift.to).toBeGreaterThan(lift.from);
+    expect(landing.to).toBeLessThan(landing.from);
+    expect(landing.seconds).toBeGreaterThanOrEqual(lift.seconds * 1.5);
+    expect(landing.volume).toBeLessThan(lift.volume);
+    expect(landing.attack).toBeLessThan(lift.attack / 2);
+    expect(landing.from).toBeLessThan(lift.to);
+    expect(landing.to).toBeLessThan(lift.from);
+  });
+});

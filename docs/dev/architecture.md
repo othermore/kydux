@@ -3703,9 +3703,9 @@ one overturns stays, marked as superseded.
   and a step walked at once as a landing that ends walking. In the set-down the figure keeps
   its flying frame until its feet are on its cell, and then stands facing the way it flew
   (D241), with no frame of the cast that set it down. For the wizard a lift sounds as air
-  that rises (`lift`) and a landing as air that falls (`set_down`), noise swept up and swept
-  down over about 0.6 seconds (`engine/sfx.ts`), beside the spell's own sound when a spell
-  is cast. The landing the world makes at a program's end (D185), with no spell cast, is
+  that rises (`lift`) and a landing as air that goes out (`set_down`), two sounds of noise
+  told apart by ear (D253, `engine/sfx.ts`), beside the spell's own sound when a spell is
+  cast. The landing the world makes at a program's end (D185), with no spell cast, is
   seen and heard as the one the wizard casts (D215), and the run's card waits for it (D175).
   Another figure's lift and landing are seen and not heard. Shown at once, under the slider
   or at a restart, and under reduced motion, the figure is where it ends, with no rise.
@@ -3822,3 +3822,13 @@ one overturns stays, marked as superseded.
   written (`WIND_WRITTEN`) is the one the owner set by ear: the air at 1.1, the whistle at
   1, and the rest on at 0.5. Rules out a bang at a start, a level read back from a node, and
   a mix as written that is not the one the owner chose.
+- **D253 — The landing goes out.** Decided 2026-11-16 by the owner (*el sonido de descender
+  se parece mucho al de ascender. El de descender debería ser un poco más pausado, como si
+  se "apagase" el sonido*). The lift and the landing (D244) are told apart by ear. The lift
+  swells: it comes up over its first fifth, its band rising, and is gone in 0.6 seconds. The
+  landing (`set_down`) does not swell: it is there at once, lower and softer than the lift,
+  and fades for twice as long, 1.2 seconds, while its band sinks from under the lift's top
+  to under its bottom, as a sound that is turned down to nothing. A unit test holds what
+  tells them apart: the landing longer by half at least, softer, with no swell, and lower.
+  The numbers are a setting for the owner's ear. Rules out a landing that is the lift played
+  backwards.

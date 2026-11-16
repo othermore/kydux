@@ -2560,7 +2560,8 @@ one overturns stays, marked as superseded.
   card of a level appears once no bubble and no thought is on the scene: the controller
   waits for the scene's `settle(won)`, the longer of the celebration of a run won (14.3)
   and the words read to their end (`Speech.settle`), after a run refused, failed or lost
-  alike; a sleeper's thought, said for ever, is not waited for. In a story a bubble stays
+  alike; a sleeper's thought, said for ever, is not waited for. The run's own sound, won
+  or not, plays before that wait, when the run ends (D247). In a story a bubble stays
   until its step ends. Rules out a card over the reason the wizard stopped, and a sentence
   gone before it is read.
 - **D176 — A bonus for casting a spell is earned by the spell, not by the word `cast`.**
@@ -2706,9 +2707,10 @@ one overturns stays, marked as superseded.
   else, and the long flights of the rings and the race pass quickly. While flying,
   the figure is drawn from its flying rows (D188), lifted half a cell above its cell,
   its origin moved so that its depth stays its cell's, with a soft shadow on the ground,
-  and it hovers as D235 says. The steps' taps are not heard in the air; the flight's
-  sound is a wind synthesised as the steps are (the owner's choice: no sample), the wind
-  of D236 (`engine/sound.ts`, `wind` among `data-sounds`). Rules out a `fly_right` family
+  and it hovers as D235 says; it rises to there and sets down from there as D244 says.
+  The steps' taps are not heard in the air; the flight's sound is a wind synthesised as
+  the steps are (the owner's choice: no sample), a gust for each flown command (D236,
+  D243; `engine/sound.ts`, `wind` among `data-sounds`). Rules out a `fly_right` family
   of methods, and a flight as slow as a walk.
 - **D186 — Low and high: what a flight crosses.** Decided 2026-11-10. A scene's terrains
   say whether a flight crosses them (`fly`, false unless given; a terrain walked on is
@@ -3291,8 +3293,9 @@ one overturns stays, marked as superseded.
   `no_landing`, with the cell's kind): the page plays the bump's sound, the program stops
   with an error in the child's words (`error.no_landing`, and `blocked.no_landing` in the
   wizard's bubble), and the wizard stays in the air where it was. When a program ends in
-  the air over a cell that is walked on, the broom sets down by itself (D185); over a cell
-  that is not walked on it stays in the air, and the figure is left flying on the screen.
+  the air over a cell that is walked on, the broom sets down by itself (D185), seen and
+  heard as a landing the wizard casts (D244); over a cell that is not walked on it stays
+  in the air, and the figure is left flying on the screen.
   `wizard.flying` is true from the lift until a landing. A goal of kind `land`, `{"kind":
   "land", "marker": "E"}` or `"at": [x, y]`, is met at the tick the wizard's own cast sets
   it down on that cell; the broom's own setting down at a program's end does not meet it.
@@ -3379,8 +3382,9 @@ one overturns stays, marked as superseded.
   D214's grace. When the screen is ready the tip stays until it has had its reading time
   by D175, counted from the moment it was put up and never more than ten seconds, and the
   screen then shows by itself. Every tip has a picture, made from the game's own page in
-  each language, over its words. Rules out a button to go on, a tip that flashes by, a
-  new place opened with no tip, and a tip told in words alone.
+  each language, over its words, and comes up with it loaded (D246). Rules out a button
+  to go on, a tip that flashes by, a new place opened with no tip, and a tip told in words
+  alone.
 - **D222 — A card opens at its top, and the start card closes at any button of the page.**
   Decided 2026-11-14 by the owner (*el scroll de ese cuadro debería estar arriba y que
   haya que bajar para leerlo y cerrarlo*; *si se hace clic en cualquier botón de la
@@ -3555,47 +3559,35 @@ one overturns stays, marked as superseded.
   says so (`stars.bonuses`). Rules out a wizard held before the line, a penalty served
   before it is said, a winner Ilda names who loses the level, and the count said twice,
   by Ilda and by a card.
-- **D235 — A flying figure hovers slowly, moved by the page, and only while the program
-  plays.** Decided 2026-11-15 by the owner (*cuando se para con parar … se debe parar las
-  animaciones. Ahora mismo se queda vibrando el que está volando. Al ir para atrás con la
-  barra deslizadora de abajo también se ven las escobas vibrando muy rápido. Debería
-  quedarse detenido*; *cuando va volando y queramos que se pare (por ejemplo si hacemos
-  wizard.wait(5)) debe verse moviéndose oscilando un poco arriba y abajo, pero mucho más
-  despacio*). A flying figure is drawn in its flying row's level frame (`flyFrame`), and
-  the page moves it up and down by a sine: `HOVER_MS`, 2.4 seconds, a rise and fall, and
-  `HOVER_CELLS`, 0.05 of a cell, each way (`hoverOf`, `engine/flight.ts`). Every figure
-  has a place of its own in the rise and fall (`hoverPhase`: the wizard at its start, any
-  other by its id), so that two racers do not rise together; and the hover fades to none
-  in a ring's cell, whose hole is tight (D232). A figure whose sheet has no flying rows
-  hovers the same, in its standing frame. The hover has a clock of its own, which runs
-  while the playback plays and, in a story, always: a program stopped, paused, ended or
-  moved with the slider shows the flight still, where the clock stands, and a restart
-  does not move it (`data-hover`, the clock's milliseconds). Under reduced motion there
-  is no hover. One picture moved by the page stays one picture: frames drawn apart and
-  then scaled come out as different pictures, and shimmer in turn. Rules out a hover made
-  of drawn frames, a hover on the scene's own clock, and a figure that moves in the
-  picture of a tick.
-- **D236 — The broom's wind is soft air that swells at a turn, and is heard only while the
+- **D235 — A flying figure hovers slowly, moved by the page.** Decided 2026-11-15 by the
+  owner (*Ahora mismo se queda vibrando el que está volando. Al ir para atrás con la barra
+  deslizadora de abajo también se ven las escobas vibrando muy rápido*; *cuando va volando y
+  queramos que se pare (por ejemplo si hacemos wizard.wait(5)) debe verse moviéndose
+  oscilando un poco arriba y abajo, pero mucho más despacio*). A flying figure is drawn in
+  its flying row's level frame (`flyFrame`), and the page moves it up and down by a sine:
+  `HOVER_MS`, 2.4 seconds, a rise and fall, and `HOVER_CELLS`, 0.05 of a cell, each way
+  (`hoverOf`, `engine/flight.ts`). Every figure has a place of its own in the rise and fall
+  (`hoverPhase`: the wizard at its start, any other by its id), so that two racers do not
+  rise together; and the hover fades to none in a ring's cell, whose hole is tight (D232). A
+  figure whose sheet has no flying rows hovers the same, in its standing frame. The hover
+  has a clock of its own, which always runs and never starts again (D242): a restart, the
+  slider and a new run do not move it, so that the rise and fall goes on from where it is
+  (`data-hover`, the clock's milliseconds). Under reduced motion there is no hover. One
+  picture moved by the page stays one picture: frames drawn apart and then scaled come out
+  as different pictures, and shimmer in turn. Rules out a hover made of drawn frames, a
+  hover that starts again with the run, and a figure that moves in the picture of a tick.
+- **D236 — The broom's wind is soft air, the wizard's alone, and is heard only while the
   program plays.** Decided 2026-11-15 by the owner (*el sonido de la escoba no me gusta,
   suena como si fuese el sonido de barrer o de algún tipo de ventilador, debería sonar como
   algo mágico que vuela. Mucho más suave y más recordando al sonido del viento. Lo ideal es
-  que sonase de forma intermitente, por ejemplo cuando se hacen los giros que se
-  intensifique como si se acercase el sonido y luego se volviese a alejar*; *se debe parar
-  el sonido del juego (no la música)*). The wind is noise through a narrow low band that
-  wanders slowly, with no hiss: almost silent while the broom hovers, and a little louder,
-  at one even level, while it flies on (`Wind.fly`). At the lift and at every turn, a flown
-  move of the wizard whose way is not the way of its flown move before (`turned`,
-  `engine/flight.ts`), it swells (`Wind.swell`): louder and higher for half a second and
-  back over a second, as something that comes near and goes away, with two faint high
-  tones a fifth apart in the swell. No flown cell makes a sound of its own. The wind blows
-  while the playback plays and the wizard is in the air, and at nothing else: it fades at
-  once when the playback stops, pauses or ends, starts again when a paused flight goes on,
-  and the music is not touched (`data-wind`; `data-wind-swells`, the swells of the run).
-  Its two voices, the air and the tones, have a mix (`windMix`), and under `?debug`,
-  `#music` plays the wind at rest, flying on, in a turn and in a whole flight, with a box
-  and a slider for each voice and a line that says the mix, as the themes' mixer does
-  (D203). Rules out a wind as loud all the flight long, a swell at every cell, and a wind
-  over a program that does not play.
+  que sonase de forma intermitente*; *se debe parar el sonido del juego (no la música)*).
+  The flight's sound is wind: noise through a band, made as the game plays, with no hiss, no
+  beat of the cells and no steady tone. It is the wizard's: no other figure in the air
+  sounds. It is heard while the playback plays and at nothing else: it fades at once when
+  the playback stops, pauses or ends, and the music is not touched (`data-wind`). What the
+  wind is made of, a gust for each flown command, is D243; the air of a lift and of a
+  landing is D244. Rules out a wind over a program that does not play, and a wind for every
+  figure in the air.
 - **D237 — A thought about a bump comes after the bump, and words over a flying figure are
   over it as it is drawn.** Decided 2026-11-15 by the owner (*el mensaje de giré demasiado
   pronto tiene que salir un poco después del choque, no a la vez, y debe estar más arriba,
@@ -3607,8 +3599,9 @@ one overturns stays, marked as superseded.
   as for one that is up. A restart, the slider, and any other word drop a thought not
   yet shown. A thought or a bubble over a figure in the air is placed over the figure as
   it is drawn: higher than over one on the ground by the flight's lift and by a ring's
-  raise (D232), so that it covers neither head nor hat; words under a figure stay under
-  the place of its feet on the ground. The scene says how far over that place the words'
+  raise (D232), so that it covers neither head nor hat; a bubble under a figure stays under
+  the place of its feet on the ground, and a thought with no room above goes beside the
+  head (D245). The scene says how far over that place the words'
   foot is, in cells (`data-words-over`: 1.10 on the ground, 1.60 in the air, 1.95 in a
   ring's cell; `below`). A refusal with no bump, a locked door or a thing out of reach,
   thinks at once. Rules out a thought in the bump's own frame, and words laid on a flying
@@ -3627,14 +3620,129 @@ one overturns stays, marked as superseded.
   shows it up to 800 pixels wide, and never so large that the view scrolls: its width also
   follows the window's height. Rules out a picture enlarged beyond its own pixels, and a
   tip the child scrolls to read.
-- **D240 — Words on the scene go under who they are over where the goals box would cover
-  them above.** Decided 2026-11-15, in the review of sprint 47. The goals box lies on the
-  page over the scene and takes its shape at the level's start, from where the level's
-  figures and things are then (D227); words come later, over a figure that may be high in
-  the window, as a thought over a wizard in a ring (D237), and the box, open along the
-  top, would cover their top line. The scene asks the page where the box is, as it is
-  drawn, open or folded, and counts its foot as the top of the room the words have where
-  they would be under it: with no room left above, the words go under who they are over,
-  by the rule of a window's edge. Folded, the box covers a corner alone and the words stay
-  above. Rules out folding the box under the child's eyes, which hides the goals' marks
-  while the run is read, and sliding the words down over the figure.
+- **D240 — Words on the scene are not put above a figure where the goals box would cover
+  them.** Decided 2026-11-15, in the review of sprint 47. The goals box lies on the page
+  over the scene and takes its shape at the level's start, from where the level's figures
+  and things are then (D227); words come later, over a figure that may be high in the
+  window, as a thought over a wizard in a ring (D237), and the box, open along the top,
+  would cover their top line. The scene asks the page where the box is, as it is drawn, open
+  or folded, and counts its foot as the top of the room the words have where they would be
+  under it: with no room left above, a bubble goes under who says it, by the rule of a
+  window's edge, and a thought goes beside the head (D245). Folded, the box covers a corner
+  alone and the words stay above. Rules out folding the box under the child's eyes, which
+  hides the goals' marks while the run is read, and sliding the words down over the figure.
+- **D241 — The scene keeps the way each figure faces, and never reads it back from a
+  frame.** Decided 2026-11-15, from the owner's (*El mago de color naranja sigue vibrando. Y
+  cuando lo paro … en algunos puntos la del mago queda borrosa (congelada pero como
+  duplicada o triplicada). Algo hay raro. Como si estuviese todo el tiempo cambiando de
+  mirar al frente a mirar a los lados*). The scene keeps the way each figure faces from the
+  moment it is placed, and sets it where it turns the figure (`face`, the one place a figure
+  is faced). Whatever asks which way a figure faces is told the way kept: its flying frame,
+  its landing, the side of a ring's plane it is on, the rows of a cast and where its light
+  flies, a bump's nudge. No frame's number is turned back into a way: a sheet's rows are in
+  no order a division could read, the wizard's flying rows being 14 to 17, after the rows of
+  its acts, where a division by four reads row 14 as facing right and row 16 as facing down,
+  and a figure in the air, whose frame is set every frame from the way it faces, would be
+  drawn turning between two ways sixty times a second. The scene says the wizard's way and
+  its frame as drawn (`data-wizard-facing`, `data-wizard-frame`). Rules out a way read from
+  a frame's number, and a rule that holds only while every sheet keeps its rows in fours.
+- **D242 — A figure in the air hovers whenever it is seen, and Stop silences its wind.**
+  Decided 2026-11-15 by the owner (*no me gusta que queden completamente congelados, he
+  cambiado de opinión. Parar detendrá el programa, pero mantendrá la animación de volar en
+  el sitio en el que esté, como wait. Al parar, el sonido puede dejar de sonar, porque ya no
+  se está moviendo*). The hover's clock (D235) always runs: a figure in the air rises and
+  falls as slowly while the program plays, once it is stopped, in a pause, after a run that
+  ends in the air and under the slider, as Eldra sways (D120) and a goal's mark beats with
+  the program stopped. Stop holds the program and the figure's place, not its hover; a
+  figure shown at another tick by the slider goes on from where the rise and fall is, with
+  no jump. The wind stops with the program (D236). Under reduced motion there is no hover.
+  Rules out a flight frozen in the air.
+- **D243 — The broom's wind is a gust for each flown command.** Decided 2026-11-15 by the
+  owner (*suena como un sonido agudo como de un aspirador que estuviese muy bajito o muy
+  lejos … No puede ser un sonido continuo, sino que debe ser un sonido variable, como el
+  sonido del viento … cada comando move mientras estás en la escoba debería generar un
+  sonido mientras dura el movimiento, que tenga algún tipo de principio y final y evolución
+  a lo largo del sonido … Cuando está parado debe sonar muy muy bajo el viento, o ni
+  siquiera sonar, y en movimiento el viento debe sonar como "más a rachas", no continuo*).
+  No sound lasts the flight long, and a wizard in the air that does not move makes none.
+  Each `move_*` command flown sounds as one gust (`Wind.gust`, `engine/sound.ts`): noise
+  through a band, which rises as the command starts, changes all through it and falls after
+  its last cell. Its level wanders between targets drawn at random, a new one every eighth
+  to a third of a second, and the band's pitch follows the level, higher as it is louder, as
+  wind does; a faint narrow high band, the whistle, comes with the level's peaks. How high a
+  gust peaks, where in the command, and how it wanders are drawn at random for each, so that
+  no two are alike. A gust's length is its command's: the world says in every flown `move`
+  which step of its command it is, and of how many (`step`, `steps`), and the page counts
+  the cells still to fly at the tick's length. A one-cell command is a short puff. A command
+  that starts while a gust still sounds takes that gust on, raised to a peak of its own, and
+  no second gust is laid over it: a zigzag of short moves is heard as one wind that changes.
+  A bump ends the gust at once; Stop, a pause and the run's end fade it in 0.15 seconds
+  (D236). The wind's voices have a mix (`windMix`): `air`, the gust; `whistle`; and `rest`,
+  a very faint air while the wizard hovers, silent unless the mix gives it a level. Under
+  `?debug`, `#music` plays a one-cell move, a long move, a zigzag, a lift, a landing and a
+  whole flight, with a box and a slider for each voice and a line that says the mix, as the
+  themes' mixer does (D203). The scene says whether a gust sounds and how many the run has
+  had (`data-wind`, `data-wind-gusts`), muted or not. Rules out a sound that lasts while the
+  broom is in the air, a steady tone, a gust for every cell, and two gusts alike.
+- **D244 — A lift and a landing are seen and heard, whoever orders them.** Decided
+  2026-11-15 by the owner (*quizás el hechizo de montar y desmontar pueden ser otros dos
+  sonidos que sean como de ascender y descender*; *En la carrera, si no hay un "drevo" al
+  final, el mago aterriza sin la animación de aterrizar y sin su sonido*). At the event
+  `fly` a figure rises from its cell to its flight's height, and at `land` it sets down from
+  there, over `LIFT_MS`, 0.3 seconds at the playback's speed, its shadow coming and going
+  with it. The ticks that follow play meanwhile: a move flown at once is seen as a take-off,
+  and a step walked at once as a landing that ends walking. In the set-down the figure keeps
+  its flying frame until its feet are on its cell, and then stands facing the way it flew
+  (D241). For the wizard a lift sounds as air that rises (`lift`) and a landing as air that
+  falls (`set_down`), noise swept up and swept down over about 0.6 seconds
+  (`engine/sfx.ts`), beside the spell's own sound when a spell is cast. The landing the
+  world makes at a program's end (D185), with no spell cast, is seen and heard as the one
+  the wizard casts (D215), and the run's card waits for it (D175). Another figure's lift and
+  landing are seen and not heard. Shown at once, under the slider or at a restart, and under
+  reduced motion, the figure is where it ends, with no rise. Rules out a figure that changes
+  its height in one frame, and a landing that differs by who ordered it.
+- **D245 — A thought with no room above goes beside the head.** Decided 2026-11-15 by the
+  owner (*La burbuja de pensamiento cuando está abajo no queda bien, porque queda muy lejos
+  del personaje (y debería aparecer como desde su cabeza). Lo que se puede hacer es ponerla
+  más cerca del personaje, pero a un lado... y que le salgan los puntos de la burbuja desde
+  la esquina inferior en diagonal a la cabeza del personaje. Así hay tres posiciones para
+  colocarla: encima del personaje, a la izquierda del personaje un poco elevada, o a la
+  derecha del personaje un poco elevada. Incluso puede estar a la izquierda o derecha del
+  personaje y no estar elevada nada, y que los puntos de la burbuja salgan desde el lado o
+  incluso desde la esquina superior, pero que parezcan salir desde la cabeza*). A thought
+  has its places in this order (`thoughtPlace`, `engine/bubble.ts`): above the figure
+  (D237); beside it and raised, the cloud's foot level with the top of the head and its near
+  bottom corner a little off the head, the cloud's two dots going down in a diagonal from
+  that corner to the head; beside it and lower, the cloud slid down as little as gives it
+  room, its top no lower than the top of the head, the dots going to the head from its near
+  side or from its near top corner; and under the figure only where neither side has room.
+  Room is the scene as the window shows it, clear of the goals box (D240) and of the other
+  figures' heads. Of the two sides, the one behind a figure that faces left or right (D241),
+  so that what it bumped on stays seen; else the one toward the scene's middle; and the
+  other side where that one has no room. The place is chosen when the thought shows and kept
+  while it is up; the thought follows the figure, and beside a figure in the air it is
+  beside the head as it is drawn (D237). The scene says the place (`data-words-place`:
+  `above`, `left`, `right`, `below`). A bubble of words said keeps its own places (D240).
+  Rules out a thought far from the head it comes from, and dots that point at no one.
+- **D246 — A tip comes up with its picture.** Decided 2026-11-15 by the owner (*Las imágenes
+  de los tips están mejor, pero ahora tardan en cargar y no queda bien porque a veces se
+  carga el tip sin la imagen. Podemos pre-cargarlo antes de mostrar el tip*). A tip's words
+  and its picture come up together: the picture is loaded and decoded first, and the element
+  the view shows is the one that was loaded, with no second request. The page asks for the
+  picture of the tip due next as it opens, not in idle time, and, as each tip comes up, for
+  the picture of the one after it. A tip due whose picture has not come waits for it, the
+  view as in the grace (D214); a screen ready meanwhile opens with no tip, and that tip
+  stays the next one due. A picture that fails shows the tip's words alone, with no empty
+  room over them. The pictures keep their size (D239). Rules out words over an empty frame,
+  a screen held for a picture, and a smaller picture stretched.
+- **D247 — A run's end sounds when the run ends.** Decided 2026-11-15 by the owner (*cuando
+  acaba la carrera y salen las puntuaciones, pasan unos 5-10 segundos y luego suena el
+  sonido de fallar el objetivo. Ese sonido debería sonar antes, aunque esperemos para
+  mostrar bien los resultados y no cerremos el diálogo de la profesora. Pasa igual cuando se
+  choca con el aro … debería sonar cuando se falla, aunque todavía esté saliendo el
+  mensaje*). The sound of a run failed, refused or lost (`fail`) and the sound of a run won
+  (`win`) play when the playback has played its last tick: as a race's verdict comes up, in
+  the tick after a bump that ends the program, as the celebration starts. The card waits for
+  the words and the celebration as it does (D175), and comes with no sound. A program
+  stopped has none. An outcome with no playback, a program that cannot start, sounds with
+  its card. Rules out a sound that comes seconds after what it tells of.

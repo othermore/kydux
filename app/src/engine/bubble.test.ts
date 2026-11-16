@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type Box, bubbleBelow, bubbleShift, bubbleWrap, readingMs, readingTicks, settleMs } from './bubble';
+import { type Box, bubbleBelow, bubbleRoom, bubbleShift, bubbleWrap, readingMs, readingTicks, settleMs } from './bubble';
 
 const box = (left: number, top: number, right: number, bottom: number): Box => ({ left, top, right, bottom });
 
@@ -8,6 +8,14 @@ describe('a speaker\'s bubble', () => {
     expect(bubbleWrap(6, 12)).toBe(4);
     expect(bubbleWrap(6, 25)).toBe(6);
     expect(bubbleWrap(4, 20)).toBe(4);
+  });
+
+  it('stays inside the scene, and inside what a story step frames of it (D199)', () => {
+    expect(bubbleRoom(768, null)).toEqual([0, 768]);
+    // The shed framed on rows 3 to 10 of sixteen: no bubble under the frame's bottom.
+    expect(bubbleRoom(768, [120, 560])).toEqual([120, 560]);
+    // A frame wider than the scene shows its margin: the scene's own sides hold.
+    expect(bubbleRoom(576, [-40, 620])).toEqual([0, 576]);
   });
 
   const above = box(100, 0, 300, 80);

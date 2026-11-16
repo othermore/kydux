@@ -3,14 +3,15 @@
 // Each stays as many ticks as its words take to read (D175), and once the run is
 // over, until that time has passed; it follows who it is over as they walk, sits
 // below them when there is no room above, and is never held past the scene's
-// sides. Its words are never smaller on the screen than at zoom 1 (D106): zoomed
+// sides. Under a place a story step frames (D199) the camera does not follow the
+// words: there a bubble keeps inside what the frame shows. Its words are never smaller on the screen than at zoom 1 (D106): zoomed
 // out, they are drawn larger. The scene's parent says what is said: data-bubble and
 // data-speaker, data-thought, and data-words-scale.
 
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
 import { wordsScale } from './zooming';
-import { type Box, bubbleBelow, bubbleShift, bubbleWrap, settleMs } from './bubble';
+import { type Box, bubbleBelow, bubbleRoom, bubbleShift, bubbleWrap, settleMs } from './bubble';
 
 /** How far a bubble's drawn box and tail reach beyond its words, at most: a
  * container's bounds are its words' alone. */
@@ -31,6 +32,9 @@ export interface SpeechParts {
   figures: () => Phaser.GameObjects.Sprite[];
   /** How long a tick lasts at speed 1: words said for some ticks are read for as long. */
   tickMs: number;
+  /** In a story, the top and the bottom, in the scene's pixels, of what a step's framing
+   * shows (D199), which a bubble stays between; null where the camera follows who speaks. */
+  shown: () => [number, number] | null;
 }
 
 export class Speech {
@@ -129,9 +133,16 @@ export class Speech {
     return [x, over.y + (this.place.below ? 22 : -this.parts.headroom)];
   }
 
+  /** The top and the bottom a bubble stays between, in the scene's pixels: the scene's
+   * own, or what a story step's framing shows of it. */
+  private get room(): [number, number] {
+    return bubbleRoom(this.parts.height, this.parts.shown());
+  }
+
   /** Whether a bubble this tall fits over who speaks, inside the scene. */
   private roomAbove(height: number): boolean {
-    return (this.speaker ?? this.parts.wizard()).y - this.parts.headroom - (height + 14) * this.scale >= 2;
+    const top = (this.speaker ?? this.parts.wizard()).y - this.parts.headroom - (height + 14) * this.scale;
+    return top >= this.room[0] + 2;
   }
 
   /** A thought over the wizard: grey and rounded, with two small circles under it,
@@ -205,7 +216,7 @@ export class Speech {
         top: fy - displayHeight * 0.8,
         bottom: fy,
       }));
-    const belowFits = () => over.y + 22 + (height + tail) * scale <= this.parts.height;
+    const belowFits = () => over.y + 22 + (height + tail) * scale <= this.room[1];
     const sides = (from: number, to: number): Box => {
       this.place = { width, below: false, shift: 0 };
       const [middle] = this.anchor();

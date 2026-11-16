@@ -2886,9 +2886,11 @@ one overturns stays, marked as superseded.
   width, on the window's middle (the wide fields). The framing holds, the camera
   following no one, until a later step of the same part frames another, and the story's
   steps without one keep it (`framingAt`); a part told on another scene starts with
-  none. The world checks the box against the scene. The scene's parent says it in
-  `data-camera-fit` (`x0,y0,x1,y1` or `wide`). Rules out a story where a place is seen
-  in pieces.
+  none. The world checks the box against the scene. A bubble said under a framing
+  stays inside what the framing shows of the scene (`bubbleRoom`,
+  `SceneCamera.shown`), since the camera does not follow the words. The scene's parent
+  says it in `data-camera-fit` (`x0,y0,x1,y1` or `wide`). Rules out a story where a
+  place is seen in pieces.
 - **D197 — The broom is taught before the lists, with a practice of one `untie`.**
   Decided 2026-11-11 by the owner (*una primera práctica sencilla: una escoba justo a tus
   pies, búscala con find_nearest y quítale el nudo con untie*). The lesson `the-broom`,

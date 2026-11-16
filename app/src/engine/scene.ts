@@ -670,6 +670,7 @@ class LevelScene extends Phaser.Scene {
       wrap: this.options.story ? 6 : 4,
       figures: () => [this.wizard, ...[...this.actors.values()].map((actor) => actor.sprite)],
       tickMs: TICK_MS,
+      shown: () => this.view.shown(),
     });
     const story = this.options.story;
     this.view = new SceneCamera(this, this.parentNode, {

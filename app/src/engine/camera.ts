@@ -198,6 +198,15 @@ export class SceneCamera {
     this.showPlaced(framing);
   }
 
+  /** In a story, the top and the bottom, in the scene's pixels, of what a step's
+   * framing shows (D199); null where the camera follows whoever the steps are about. */
+  shown(): [number, number] | null {
+    if (!this.placed) return null;
+    const camera = this.camera;
+    const top = camera.scrollY + (camera.height / 2) * (1 - 1 / camera.zoom);
+    return [top, top + camera.height / camera.zoom];
+  }
+
   private showPlaced(framing: StoryFraming): void {
     const camera = this.camera;
     const scale = this.fit() * TILE;

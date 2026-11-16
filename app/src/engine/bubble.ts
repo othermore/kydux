@@ -21,6 +21,13 @@ function meets(one: Box, other: Box): boolean {
   return one.left < other.right && other.left < one.right && one.top < other.bottom && other.top < one.bottom;
 }
 
+/** The top and the bottom a bubble stays between, in the scene's pixels: the scene's
+ * own, or what a story step's framing shows of it (D199), where the camera does not
+ * follow the words. */
+export function bubbleRoom(sceneHeight: number, shown: readonly [number, number] | null): [number, number] {
+  return shown ? [Math.max(0, shown[0]), Math.min(sceneHeight, shown[1])] : [0, sceneHeight];
+}
+
 /** Whether a bubble goes below who speaks: where above there is no room, or where above
  * it would cover another figure and below it covers none. */
 export function bubbleBelow(above: Box, below: Box, figures: readonly Box[], roomAbove: boolean): boolean {

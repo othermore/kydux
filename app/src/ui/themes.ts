@@ -8,8 +8,9 @@
 // Under the list is the broom's wind (D243): six buttons play a one-cell move, a move of
 // eight cells, a zigzag, a lift, a landing and a whole flight, and its three voices, the
 // air, the whistle and the rest, each have a box and a slider from 0 to 3, with a line
-// that says the mix, to be told to who sets its numbers. The mix is never kept: each
-// voice is as written when the page loads, the rest off.
+// that says the mix, to be told to who sets its numbers. The whole flight hovers a while
+// between two of its moves, where the rest is heard when its box is on. The mix is never
+// kept: each voice is as written when the page loads, the rest off.
 
 import { type Heard, music, type Theme, themeNamed } from '../engine/music';
 import { play as playEffect } from '../engine/sfx';
@@ -53,6 +54,9 @@ function mixSaid(shown: Shown, off: string): string {
  * landing takes (D244). */
 const MOVE_MS = 133;
 const LIFT_PAUSE_MS = 300;
+/** How long the whole flight hovers before its last move, in milliseconds: the gust
+ * before it has fallen in 0.7 seconds at most, and the rest is heard after it. */
+const HOVER_MS = 2200;
 
 /** The wind's samples (D243): a one-cell move, a move of eight cells, a zigzag of eight
  * one-cell moves, a lift, a landing, and a whole flight. */
@@ -68,10 +72,12 @@ function windPlan(sample: WindSample): Played[] {
   if (sample === 'zigzag') return Array.from({ length: 8 }, (_, i) => ({ at: i * MOVE_MS, cells: 1 }));
   if (sample === 'lift') return [{ at: 0, effect: 'lift' }];
   if (sample === 'landing') return [{ at: 0, effect: 'set_down' }];
-  // A lift, a move of one, the four moves of a pair of rings, a move of eight, a landing.
+  // A lift, a move of one, the four moves of a pair of rings, a hover, a move of eight,
+  // a landing.
   const played: Played[] = [{ at: 0, effect: 'lift' }];
   let at = LIFT_PAUSE_MS;
   for (const cells of [1, 2, 2, 2, 2, 8]) {
+    if (cells === 8) at += HOVER_MS;
     played.push({ at, cells });
     at += cells * MOVE_MS;
   }
@@ -103,8 +109,12 @@ function windPanel(): { node: HTMLElement; draw: () => void; destroy: () => void
     wind.stop(0.02);
     timers = windPlan(sample).map((played) =>
       setTimeout(() => {
-        if ('effect' in played) playEffect(played.effect);
-        else wind.gust((played.cells * MOVE_MS) / 1000);
+        if ('effect' in played) {
+          playEffect(played.effect);
+          // The whole flight is in the air from its lift to its landing, as a level's
+          // wizard is: the rest is asked for meanwhile.
+          if (sample === 'flight') wind.rest(played.effect === 'lift');
+        } else wind.gust((played.cells * MOVE_MS) / 1000);
       }, played.at),
     );
   };

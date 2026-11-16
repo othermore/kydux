@@ -3681,11 +3681,13 @@ one overturns stays, marked as superseded.
   no second gust is laid over it: a zigzag of short moves is heard as one wind that changes.
   A bump ends the gust at once; Stop, a pause and the run's end fade it in 0.15 seconds
   (D236). The wind's voices have a mix (`windMix`): `air`, the gust; `whistle`; and `rest`,
-  a very faint air while the wizard hovers, silent unless the mix gives it a level. Under
+  a very faint air while the wizard hovers, silent unless the mix gives it a level: it
+  falls under a gust and comes back when the gust has fallen or is ended by a bump. Under
   `?debug`, `#music` plays a one-cell move, a long move, a zigzag, a lift, a landing and a
-  whole flight, with a box and a slider for each voice and a line that says the mix, as the
-  themes' mixer does (D203). The scene says whether a gust sounds and how many the run has
-  had (`data-wind`, `data-wind-gusts`), muted or not. Rules out a sound that lasts while the
+  whole flight, which hovers a while before its last move so that the rest is heard, with a
+  box and a slider for each voice and a line that says the mix, as the themes' mixer does
+  (D203). The scene says whether a gust sounds and how many the run has had (`data-wind`,
+  `data-wind-gusts`), muted or not. Rules out a sound that lasts while the
   broom is in the air, a steady tone, a gust for every cell, and two gusts alike.
 - **D244 — A lift and a landing are seen and heard, whoever orders them.** Decided
   2026-11-15 by the owner (*quizás el hechizo de montar y desmontar pueden ser otros dos

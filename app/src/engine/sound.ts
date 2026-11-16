@@ -8,9 +8,9 @@
 // One loop of noise feeds three voices, each through its mix (windMix, set by the page
 // of themes under ?debug, D203): the air, a band whose pitch follows the gust's level,
 // higher as it is louder; the whistle, a narrow high band heard at the gust's peaks
-// alone; and the rest, a very faint air while the wizard hovers, off unless its mix is
-// on. The settings' switch silences it with the effects. While it sounds it keeps the
-// sound context awake (D231).
+// alone; and the rest, a very faint air while the wizard hovers and no gust sounds, off
+// unless its mix is on. The settings' switch silences it with the effects. While it
+// sounds it keeps the sound context awake (D231).
 //
 //   noise (2 s, looped) ─┬→ bandpass (Q 1.1) → lowpass → gust ──────→ air ─────┐
 //                        ├→ bandpass (Q 12) → whistle level ────────→ whistle ─┼→ out → speakers
@@ -27,14 +27,18 @@ const AIR_Q = 1.1;
 const AIR_LOW_HERTZ = 320;
 const AIR_HIGH_HERTZ = 1000;
 const AIR_LOWPASS = 2400;
-/** The whistle's narrow band and its middle with the level; its gain is a quarter of
- * the level's square. */
+/** The whistle's narrow band and its middle with the level; its gain grows as the
+ * square of the level, to a quarter of GUST_HIGH at GUST_HIGH, and is a quarter of that
+ * at GUST_LOW: it is heard at the peaks alone. */
 const WHISTLE_Q = 12;
 const WHISTLE_LOW_HERTZ = 1700;
 const WHISTLE_HIGH_HERTZ = 2600;
-/** The rest: a band at 300 Hz, at this level while the wizard hovers. */
+/** The rest: a band at 300 Hz, at this level while the wizard hovers; the time constants,
+ * in seconds, of its fall when a gust starts or the wind stops, and of its coming. */
 const REST_HERTZ = 300;
-const REST_LEVEL = 0.006;
+export const REST_LEVEL = 0.006;
+const REST_FALL = 0.05;
+const REST_RISE = 0.2;
 
 /** A point of a gust's level in time: `at` seconds from its start. */
 export interface GustPoint {
@@ -135,12 +139,12 @@ function airHertz(level: number): number {
 function whistleHertz(level: number): number {
   return WHISTLE_LOW_HERTZ + (Math.min(level, GUST_HIGH) / GUST_HIGH) * (WHISTLE_HIGH_HERTZ - WHISTLE_LOW_HERTZ);
 }
-function whistleLevel(level: number): number {
-  return (level * level) / 4;
+export function whistleLevel(level: number): number {
+  return (level / GUST_HIGH) ** 2 * (GUST_HIGH / 4);
 }
 
 /** A flight's wind: a gust for each flown command, the rest while the wizard hovers,
- * stopped. */
+ * a gust dropped, all of it stopped. */
 export class Wind {
   /** Its nodes while it sounds, for the calls and the tests; null while it does not, or
    * where no sound is made. */
@@ -194,20 +198,27 @@ export class Wind {
     if (this.graph && ctx) this.restLevel(this.graph, ctx.currentTime);
   }
 
-  /** The gust dropped, faded to nothing in `seconds`: 0.05 at a bump, 0.15 when the
-   * program stops playing, 0.02 at a restart. */
-  stop(seconds: number): void {
+  /** The gust dropped, faded to nothing in `seconds`, 0.05 at a bump. The rest, while it
+   * is asked for, is heard after it. */
+  drop(seconds: number): void {
     this.gustEnds = Math.min(this.gustEnds, Date.now() + seconds * 1000);
-    this.resting = false;
     const ctx = audio();
     if (this.graph && ctx) {
       const now = ctx.currentTime;
-      for (const param of [this.graph.gust.gain, this.graph.whistleLevel.gain, this.graph.restLevel.gain]) {
+      for (const param of [this.graph.gust.gain, this.graph.whistleLevel.gain]) {
         fromNow(param, now);
         param.linearRampToValueAtTime(0, now + Math.max(0.01, seconds));
       }
+      this.restLevel(this.graph, now);
     }
     this.settle();
+  }
+
+  /** All of it stopped: the gust dropped in `seconds`, 0.15 when the program stops
+   * playing and 0.02 at a restart, and the rest asked for no more. */
+  stop(seconds: number): void {
+    this.resting = false;
+    this.drop(seconds);
   }
 
   /** The mix's gains as windMix has them, at once. */
@@ -223,10 +234,14 @@ export class Wind {
     this.settle();
   }
 
-  /** The rest's level: on while asked and no gust sounds. */
+  /** The rest's level from now on: none while a gust sounds or it is not asked for, and
+   * while it is asked for, there again when the gust has fallen. */
   private restLevel(graph: WindGraph, now: number): void {
-    const level = this.resting && !this.blowing ? REST_LEVEL : 0;
-    graph.restLevel.gain.setTargetAtTime(level, now, 0.2);
+    const level = graph.restLevel.gain;
+    const gust = Math.max(0, this.gustEnds - Date.now()) / 1000;
+    fromNow(level, now);
+    if (!this.resting || gust > 0) level.setTargetAtTime(0, now, REST_FALL);
+    if (this.resting) level.setTargetAtTime(REST_LEVEL, now + gust, REST_RISE);
   }
 
   /** The wind's nodes, made where they are not; none where no sound is made. */
@@ -285,6 +300,7 @@ export class Wind {
     if (this.quiet) clearTimeout(this.quiet);
     this.quiet = null;
     const heard = this.resting && mixOf('rest') > 0;
+    if (!this.graph && !this.resting) winds.delete(this);
     if (heard || !this.graph) return;
     this.quiet = setTimeout(
       () => {

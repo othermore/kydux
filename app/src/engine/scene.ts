@@ -2191,7 +2191,7 @@ class LevelScene extends Phaser.Scene {
         if (!instant) this.nudge(this.wizard, facing ?? 'down', duration);
         if (!instant) play('bump');
         // A bump in the air ends the gust at once (D243).
-        if (!instant && this.inAir(this.wizard)) this.wind.stop(WIND_BUMP);
+        if (!instant && this.inAir(this.wizard)) this.wind.drop(WIND_BUMP);
         // A friend in the way: the wizard thinks who (D66); a ring's side, a tree's
         // crown or a wall in a flight's way, what it is (D186, D187).
         if (!instant && event.data.by === 'friend') {
@@ -2315,7 +2315,7 @@ class LevelScene extends Phaser.Scene {
         if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
         if (bumped) this.playSound('bump');
         // Stopped in the air, the gust ends at once (D243).
-        if (bumped) this.wind.stop(WIND_BUMP);
+        if (bumped) this.wind.drop(WIND_BUMP);
         if (event.data.reason === 'ring_rim') this.nudge(this.wizard, facing ?? 'right', duration);
         break;
       }

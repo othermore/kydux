@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GUST_HIGH, gustPlan } from './sound';
+import { GUST_HIGH, GUST_LOW, gustPlan, whistleLevel } from './sound';
 
 /** A random that gives the same numbers every time, from a seed. */
 function seeded(seed: number): () => number {
@@ -49,5 +49,11 @@ describe('a gust for each flown command (D243)', () => {
 
   it('is never the same twice', () => {
     expect(gustPlan(2, seeded(1))).not.toEqual(gustPlan(2, seeded(2)));
+  });
+
+  it('whistles at its peaks alone: a quarter of the highest level there, a quarter of that at the lowest peak', () => {
+    expect(whistleLevel(GUST_HIGH)).toBeCloseTo(GUST_HIGH / 4);
+    expect(whistleLevel(GUST_LOW)).toBeCloseTo(GUST_HIGH / 16);
+    expect(whistleLevel(0)).toBe(0);
   });
 });

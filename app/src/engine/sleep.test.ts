@@ -252,6 +252,51 @@ describe("the broom's wind, a gust for each flown command (D243)", () => {
     expect(wind.blowing).toBe(false);
   });
 
+  it('brings the rest back when the gust has fallen, while the wizard hovers', async () => {
+    const { sound, wind, graph, param } = await blowing();
+    const plan = sound.gustPlan(2, () => 0.5);
+    const falls = (plan[plan.length - 1] as { at: number }).at;
+    const rest = param(graph.restLevel);
+    rest.calls = [];
+    wind.rest(true);
+    const targets = rest.calls.filter(([kind]) => kind === 'target');
+    expect(targets).toHaveLength(2);
+    expect(targets[0]).toEqual(['target', 0, 1, 0.05]);
+    expect(targets[1]?.[1]).toBe(sound.REST_LEVEL);
+    expect(targets[1]?.[2]).toBeCloseTo(1 + falls, 6);
+    // With no gust, it comes at once.
+    vi.advanceTimersByTime(falls * 1000 + 1);
+    rest.calls = [];
+    wind.rest(true);
+    expect(rest.calls.filter(([kind]) => kind === 'target')).toEqual([['target', sound.REST_LEVEL, 1, 0.2]]);
+  });
+
+  it('keeps the rest asked for when a gust is dropped at a bump, and not when all stops', async () => {
+    const { sound, wind, graph, param } = await blowing();
+    const rest = param(graph.restLevel);
+    wind.rest(true);
+    rest.calls = [];
+    wind.drop(0.05);
+    expect(param(graph.gust).calls).toContainEqual(['linear', 0, 1.05]);
+    const after = rest.calls.filter(([kind]) => kind === 'target');
+    expect(after[after.length - 1]?.[1]).toBe(sound.REST_LEVEL);
+    expect(after[after.length - 1]?.[2]).toBeCloseTo(1.05, 6);
+    rest.calls = [];
+    wind.stop(0.15);
+    expect(rest.calls.filter(([kind]) => kind === 'target')).toEqual([['target', 0, 1, 0.05]]);
+  });
+
+  it('is taken away once stopped, the rest on in the mix or not', async () => {
+    const { sound, wind } = await blowing();
+    sound.mixWind('rest', true, 1);
+    wind.rest(true);
+    vi.advanceTimersByTime(5000);
+    expect(wind.graph).not.toBeNull();
+    wind.stop(0.15);
+    vi.advanceTimersByTime(400);
+    expect(wind.graph).toBeNull();
+  });
+
   it('sets a voice turned off or on at once in the mix: the rest off as written', async () => {
     const { sound, graph, param } = await blowing();
     expect(param(graph.rest).value).toBe(0);

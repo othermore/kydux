@@ -1,4 +1,4 @@
-# Sprint 52 — The guide after the scene, and a flight at an even speed
+# Sprint 52 — The guide before the card, and a flight at an even speed
 
 On 2026-11-16, playing the game whole after sprint 51, the owner
 gave three comments, in their words:
@@ -16,25 +16,36 @@ gave three comments, in their words:
 > a derecha mientras avanza a la derecha, como si fuese frenandose
 > y acelerando. Eso queda raro.
 
+The designer read the first as a goals box that fails to show,
+and the owner set it right the same day, and gave Zarek's line
+anew:
+
+> El problema no es que no salga la tarjeta del nivel en la
+> practica 1, es que sale antes del tutorial, luego ves el
+> tutorial y se te ha olvidado el nivel. Hay que poner el tutorial
+> primero y luego pasar a la tarjeta que dice lo que tenemos que
+> hacer en ese nivel.
+>
+> La frase de zarek vamos a cambiarla de nuevo. Quiero que diga:
+> No puede ser. Estoy seguro de que has hecho trampas, Kydux.
+> ¡Pienso devolvertela!
+
 What is there today, comment by comment.
 
-**The guide.** The first level's start card opens as soon as the
-page is built, before the scene has loaded its pictures. A child
-who presses *Empezar* at once gets the screen's guide (D68) over a
-dark scene: its first step outlines a scene with nothing in it,
-and its second, *Objetivos del nivel*, an empty place, for the
-goals box takes its shape and is shown only once the scene has
-drawn the level's start (D227). The guide ended, the box is still
-missing until the scene arrives. On a fast load none of it shows:
-with the scene there before *Empezar*, the box is in its place
-during the guide and after it, in every window size tried, with
-*Siguiente* to the end or with *Saltar*. The designer could not
-make the box stay away for good; the slow load is the one way
-found to see a guide and no goals box.
+**The guide.** The first level's start card opens with the page
+and tells the level: what Teku says, and the goal. *Empezar*
+closes it and, the first time, opens the screen's guide (D68),
+eight steps about the parts of the screen. At their end the child
+is before the level with the card's words eight steps behind.
+There is a second fault under it: the card opens before the scene
+has loaded its pictures, so on a slow load the guide opens over a
+dark scene and its second step, *Objetivos del nivel*, outlines an
+empty place, for the goals box is shown only once the scene has
+drawn the level's start (D227).
 
 **Zarek.** In the race's last story, `story:the-finish`, Zarek
 grants the wizard a clean flight and a shorter program than his.
-The owner wants him envious still.
+The owner wants him envious still: he cries foul.
 
 **The flight.** The scene draws every step of a figure as a move
 of its own, nine tenths of its tick long and at an even speed,
@@ -49,8 +60,8 @@ that is held back and let go again as it advances.
 
 **What this sprint holds:**
 
-1. The screen's guide opens once the scene and the goals box are
-   on the screen (2.1, D258).
+1. In the first level the screen's guide comes first, over the
+   scene drawn, and the start card after it (2.1, D258).
 2. A flight glides at an even speed from its first cell to its
    last, the wizard's and the racers' (2.2, D259).
 3. Zarek's line, in the owner's words. It is entered by the
@@ -63,23 +74,27 @@ It is built after sprint 51, on the designer's last commit.
 Their words are here; the programmer enters them in
 `docs/dev/architecture.md` as it builds each.
 
-- **D258 — The screen's guide opens once the screen it shows is
-  there.** Decided 2026-11-16 from the owner's comment (*si se
-  enciende el tutorial inicial que te enseña la pantalla, luego
-  no se carga el panel que te dice lo que hay que hacer*). The
-  guide of the first level (D68) opens when its start card is
-  closed, the scene has drawn the level's start and the goals box
-  has taken its shape and is shown (D227), whichever comes last.
-  A card closed before the scene is there leaves the page as it
-  loads, with no guide over it, and the guide opens by itself
-  when the two are there; the box does not fold while the guide
-  is awaited or shown. The same holds for *Enséñame la pantalla*
-  (D248) pressed on the card of a page still loading. A guide
-  that is open never outlines an empty place: each step that
-  names a part of the screen finds it drawn. Rules out a guide
-  over a dark scene, a step about the goals with no goals in
-  sight, and a wait of its own length in place of the page's own
-  word that the scene and the box are shown.
+- **D258 — In the first level the screen's guide comes first, and
+  the start card after it.** Decided 2026-11-16 by the owner (*hay
+  que poner el tutorial primero y luego pasar a la tarjeta que
+  dice lo que tenemos que hacer en ese nivel*): a child who reads
+  the card and then the guide's eight steps has forgotten the
+  card. The first time the first level opens, no start card opens
+  with the page. The guide (D68) opens by itself once the scene
+  has drawn the level's start and the goals box has taken its
+  shape and is shown (D227), so that every step outlines a part
+  that is there. Ended or skipped, it gives way to the start card
+  (D248), and the level starts from the card's *Empezar*. The
+  guide once seen, the card opens with the page as in every
+  level. *Enséñame la pantalla* on the card closes the card,
+  shows the guide, waiting the same way on a page still loading,
+  and opens the card again after it. Nothing is run while the
+  guide is awaited or shown, and the goals box does not fold
+  until the card after it is closed. Rules out a card read before
+  the guide, a guide over a scene not drawn, a step about the
+  goals with no goals in sight, and a wait of its own length in
+  place of the page's own word that the scene and the box are
+  shown.
 
 - **D259 — A flight glides: flown steps that follow one another
   are one move at an even speed.** Decided 2026-11-16 from the
@@ -104,41 +119,57 @@ Their words are here; the programmer enters them in
 
 ## 2. What is asked
 
-### 2.1 The guide after the scene (D258)
+### 2.1 The guide first, the card after (D258)
 
 Where it is. `app/src/ui/level.ts`: `showStart()` is called at the
 end of the page's load, before the scene's handle is attached; the
-card's close calls `showGuide()` at once when the guide has not
-been seen, and `showGuide()` opens `openGuide(...)` whatever the
-scene's state. The goals box is measured and revealed 400 ms after
+card's close calls `showGuide()` when the guide has not been seen,
+and `showGuide()` opens `openGuide(...)` whatever the scene's
+state; the guide's `onClose` marks it seen and gives the focus to
+the editor. The goals box is measured and revealed 400 ms after
 the handle is attached (`takeShape`, `goals.reveal()`), and until
-then it is not seen. `app/src/ui/guide.ts` holds the steps and
-their targets; `app/e2e/guide.spec.ts` its tests.
+then it is not seen. `app/src/ui/cards.ts`: `showScreen(onGuide,
+close)` closes the card and plays the guide. `app/src/ui/guide.ts`
+holds the steps and their targets; `app/e2e/guide.spec.ts` its
+tests.
 
 What is built.
 
-- The guide opens when three things are true: the card is closed,
-  the scene's handle is attached and has drawn, the goals box is
-  revealed. `guiding` is true from the card's close, so the box's
-  three seconds (D227) start at the guide's end as today.
-- While it waits, the page is the page as it loads: no veil, no
-  outline, nothing new to read. The editor may take the focus;
-  what the child types stays.
-- A level left before the guide opened opens no guide (the page's
-  `destroyed`), and the guide stays unseen (`progress.guided()`
-  false) for the next visit.
-- *Enséñame la pantalla* on the start card, and the card opened
-  again with `?`, go by the same wait.
+- The first level, the guide not yet seen: the page opens with no
+  start card. The guide opens when the scene's handle is attached
+  and has drawn and the goals box is revealed. While it waits the
+  page is the page as it loads: no veil, no outline, nothing new
+  to read, and nothing can be run.
+- The guide's end, by its last *Siguiente* or by *Saltar*, marks
+  it seen and opens the start card, the card of a first opening,
+  with *Empezar*. The card's close gives the focus to the editor
+  and starts the goals box's three seconds (D227), as today.
+- The guide seen: the card opens with the page, as in every
+  level.
+- *Enséñame la pantalla* (D248): the card closes, the guide plays
+  under the same wait, and the card opens again after it, as a
+  card opened again (*Continuar*).
+- A level left before the guide opened opens no guide, and the
+  guide stays unseen for the next visit.
+- The guide's own words and steps do not change.
 
 Tests, in `guide.spec.ts`:
 
+- a new game at the gate: the guide opens with no start card on
+  the page; at its second step the goals box is visible and holds
+  the goal's words; after its last step the start card is open
+  with Teku's words and the goal; *Empezar* closes it, and the
+  goals box is visible, not folded, `data-revealed` true;
+- the same with *Saltar* at the first step: the card opens;
 - the pictures and the world held back by the test (a route that
-  delays them), *Empezar* pressed at once: no `.guide` while the
-  scene is not drawn; released, the guide opens, and at its second
-  step the goals box is visible and holds the goal's words;
-- the same guide gone through to its end: the goals box visible,
-  not folded, and `data-revealed` true;
-- the fast load as today, unchanged.
+  delays them): no `.guide` and no card while the scene is not
+  drawn; released, the guide opens;
+- the gate opened again, the guide seen: the card with the page,
+  and no guide;
+- *Enséñame la pantalla*: the guide, and the card again after it.
+
+The specs that open the gate in a new game and press *Empezar*
+first are brought to the new order.
 
 ### 2.2 A flight at an even speed (D259)
 
@@ -201,26 +232,29 @@ Tests.
 
 Entered by the designer in `content/stories/the-finish/`, step 2:
 
-| | Spanish | English |
-|---|---|---|
-| Zarek | Vale, vale. Solo has tenido suerte. La próxima vez no te dejaré ganar. | All right, all right. You just got lucky. Next time I won't let you win. |
+- Spanish: *No puede ser. Estoy seguro de que has hecho trampas,
+  {wizard}. ¡Pienso devolvértela!*
+- English: *It can't be. I'm sure you cheated, {wizard}. I'll get
+  you back for this!*
 
-*Solo has tenido suerte* is the owner's; the praise of the shorter
-program goes with the praise of the flight, for the same reason.
-The briefs under `tools/write/briefs/` keep what Gemini was asked
-then. Nothing is left to build.
+The Spanish is the owner's, with the wizard's own name where the
+owner, who plays with the default one, wrote *Kydux*. The briefs
+under `tools/write/briefs/` keep what Gemini was asked then.
+Nothing is left to build.
 
 ### 2.4 What the owner will try
 
-1. A new game, up to the gate. *Empezar* pressed as soon as the
-   card shows: the guide waits for the scene, and opens over the
-   scene drawn. Its second step outlines the goals box, with
-   *Camina hasta la verja* in it.
-2. The guide to its end, or *Saltar*: the goals box is there.
-3. Chapter 4, the first flight and the rings: the broom crosses
+1. A new game, up to the gate: the guide comes first, over the
+   scene drawn, with no card before it. Its second step outlines
+   the goals box, with *Camina hasta la verja* in it.
+2. The guide to its end, or *Saltar*: the level's card opens, with
+   what Teku says and the goal, and *Empezar* starts the level.
+3. The gate opened again: the card at once, no guide. *Enséñame
+   la pantalla* on it: the guide, and the card again.
+4. Chapter 4, the first flight and the rings: the broom crosses
    the cells at one speed, with no pull and no push.
-4. The race: Zarek's broom and the wizard's both glide.
-5. The race's last story: Zarek says *Solo has tenido suerte*.
+5. The race: Zarek's broom and the wizard's both glide.
+6. The race's last story: Zarek says the wizard cheated.
 
 ### 2.5 What is left out, and why
 
@@ -231,20 +265,24 @@ then. Nothing is left to build.
   a sprint of its own.
 - **The story page's words on a change of language** (four words
   keep the old one, sprint 51's review): small, and not asked.
-- **Another cause of the missing goals box.** If the owner sees
-  it missing again after this sprint, with the scene drawn, the
-  window's size and what was pressed are asked for then.
+- **A sign that the scene is loading**, for the moment the first
+  level waits with no card: the page's own *Preparando Python…*
+  is what there is. If the wait reads as a page that hangs, the
+  report says so and a later sprint gives it a sign.
 
 ## 3. The pieces
 
 One local commit each, in order.
 
-### 3.1 The guide after the scene (D258, 2.1)
+### 3.1 The guide first, the card after (D258, 2.1)
 
-The wait in `level.ts`, the tests of 2.1 in `guide.spec.ts`; D258
-entered, and D68, D227 and D248 brought to it where they say when
-the guide opens. `ci/check.sh` and `guide.spec.ts`, with
-`start.spec.ts`, `cards.spec.ts` and `level.spec.ts`, green.
+The order and the wait in `level.ts` (and `cards.ts` where
+*Enséñame la pantalla* asks), the tests of 2.1 in `guide.spec.ts`,
+the other specs brought to the order; D258 entered, and D68, D227
+and D248 brought to it where they say when the guide and the card
+open. `ci/check.sh` and `guide.spec.ts`, with `start.spec.ts`,
+`cards.spec.ts`, `level.spec.ts` and every spec that plays a new
+game through the gate, green.
 
 ### 3.2 The measure, then the glide (D259, 2.2)
 
@@ -257,10 +295,11 @@ to it. `ci/check.sh`, `chapter-4.spec.ts`, `sound.spec.ts` and
 ### 3.3 The whole check and the report
 
 `ci/check.sh --e2e` whole, once, in a copy. The report in
-Spanish, in `drafts/`, with the five steps of 2.4; the measure's
+Spanish, in `drafts/`, with the six steps of 2.4; the measure's
 numbers before and after, in a small table and in plain words;
-pictures of the current commit: the guide's second step over the
-scene with the goals box outlined, and the page after the guide.
+pictures of the current commit: the guide's first step with no
+card, its second with the goals box outlined, and the card that
+opens after it.
 The memory note `kydux-sprint-52-state`, and the prompt for the
 designer's review.
 
@@ -290,21 +329,24 @@ owner's. Build it on the last commit of main as you find it.
 
 Read: docs/dev/sprint-52.md (this plan, whole), D68, D227, D248,
 D185 and D243 in docs/dev/architecture.md, app/src/ui/level.ts
-(showStart, showGuide, the goals box's reveal), app/src/ui/guide.ts
-with app/e2e/guide.spec.ts, app/src/engine/scene.ts (walk, the
-wizard's and a racer's move), app/src/engine/playback.ts,
-app/src/engine/flight.ts, app/src/engine/camera.ts, and the memory
-notes kydux-checks-per-piece, kydux-report-images-current and
+(showStart, showGuide, the goals box's reveal), app/src/ui/cards.ts
+(showScreen), app/src/ui/guide.ts with app/e2e/guide.spec.ts,
+app/src/engine/scene.ts (walk, the wizard's and a racer's move),
+app/src/engine/playback.ts, app/src/engine/flight.ts,
+app/src/engine/camera.ts, and the memory notes
+kydux-checks-per-piece, kydux-report-images-current and
 kydux-no-co-authored-by.
 
-1. The guide (D258). In the gate, the first level, the owner saw
-the screen's guide and then no goals box. What reproduces: the
-start card opens before the scene has loaded; Empezar pressed at
-once opens the guide over a dark scene, its second step outlines
-an empty place, and the box is missing until the scene arrives.
-The guide must open only once the card is closed, the scene has
-drawn the level's start and the goals box is shown. Tests with a
-held-back load.
+1. The guide (D258). In the gate, the first level, the start card
+tells the level and then the screen's guide plays: after its eight
+steps the child has forgotten the card. The owner wants the guide
+first and the card after it. The first time, no card opens with
+the page; the guide opens by itself once the scene has drawn the
+level's start and the goals box is shown (today it can open over a
+dark scene, its second step round an empty place); ended or
+skipped, it gives way to the start card, and Empezar starts the
+level. The guide once seen, the card opens with the page as today.
+Enséñame la pantalla: the guide, then the card again.
 
 2. The flight (D259). The owner sees the broom advance by fits and
 starts, as if braking and speeding up. Every step is a move of its
@@ -316,8 +358,8 @@ follow one another one glide at an even speed, the wizard's and
 the racers'; the measure stays as a test. If the measure shows
 another cause too, name it and mend it.
 
-3. Zarek's line in the finish is changed already by the designer
-(Solo has tenido suerte). Leave it.
+3. Zarek's line in the finish is changed already by the designer,
+in the owner's words (he says the wizard cheated). Leave it.
 
 Build pieces 3.1 to 3.3 in order, one local commit each; before
 each commit ci/check.sh and the browser specs the piece touches
@@ -329,10 +371,12 @@ your own preview when you are done. Nothing under .github/
 changes. Nothing is asked of Gemini.
 
 What the owner will look for:
-(1) a new game, Empezar pressed as soon as the gate's card shows:
-    the guide opens over the scene drawn, never over a dark one;
-(2) the guide's second step outlines the goals box with its goal
-    in it, and after the guide, ended or skipped, the box is there;
+(1) a new game, at the gate: the guide first, with no card before
+    it, over the scene drawn, never over a dark one; its second
+    step outlines the goals box with its goal in it;
+(2) the guide ended or skipped: the level's card opens, and
+    Empezar starts the level; the gate opened again: the card at
+    once and no guide;
 (3) in the first flight and the rings the broom crosses the cells
     at one speed, with no pull and no push;
 (4) in the race both brooms glide, and the one ahead in the count
@@ -341,8 +385,9 @@ What the owner will look for:
     the gust, the lift, the landing, the hover.
 
 The plan gives the decisions' words: enter them as they are. Where
-it does not decide (how the page says the scene has drawn, how the
-glide is made, the bound of the browser test), take the smallest
+it does not decide (how the page says the scene has drawn, what
+keeps Run from running while the guide is awaited, how the glide
+is made, the bound of the browser test), take the smallest
 choice that keeps its intent and say it in the commit. Do not
 build what section 2.5 leaves out. Never edit content while a
 browser run is going. Every document and comment in the present.
@@ -353,7 +398,7 @@ docs/dev/sprint-52.md and the finish's two text files are the
 designer's and are committed already; leave them as they are.
 
 Hand over, in drafts/ and never committed: the report in Spanish
-as 3.3 asks, with the owner's five steps of 2.4, the measure's
+as 3.3 asks, with the owner's six steps of 2.4, the measure's
 numbers before and after, and the pictures. Write your memory note
 kydux-sprint-52-state, and end with the prompt for the designer's
 review in English, in a code block.

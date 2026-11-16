@@ -318,6 +318,11 @@
       "racer": "zarek"
     },
     {
+      "kind": "lines_under",
+      "lines": 12,
+      "bonus": true
+    },
+    {
       "kind": "through_in_order",
       "ids": [
         "ring_1",
@@ -329,11 +334,6 @@
         "ring_7",
         "ring_8"
       ],
-      "bonus": true
-    },
-    {
-      "kind": "lines_under",
-      "lines": 12,
       "bonus": true
     }
   ],

@@ -440,7 +440,8 @@ def test_in_the_race_a_turn_inside_a_ring_stops_it_before_it_is_flown_out():
     assert result.status == "error"
     assert (result.events[-1].tick, result.events[-1].data["reason"]) == (8, "ring_rim")
     assert not [e for e in result.events if e.kind == "judged"]
-    assert result.goals[0].failed and result.goals[1].failed
+    goals = {goal.kind: goal for goal in result.goals}
+    assert goals["before"].failed and goals["through_in_order"].failed
 
 
 def test_no_program_of_the_ring_levels_rubs_a_rim_but_the_one_written_to():
@@ -1242,15 +1243,14 @@ def test_in_the_two_races_a_pair_skipped_still_wins_and_two_pairs_lose():
     }
     for name, (pair, straight, wrong) in programs.items():
         folder, level = CONTENT / name, content_level(name)
-        assert [(spec.kind, spec.bonus) for spec in level.goals[:2]] == [
-            ("before", False),
-            ("through_in_order", True),
-        ]
+        assert (level.goals[0].kind, level.goals[0].bonus) == ("before", False)
+        assert [spec.bonus for spec in level.goals if spec.kind == "through_in_order"] == [True]
         solution = (folder / "solution.py").read_text()
         assert solution.count(pair) == 1
         one = run_code(level, solution.replace(pair, straight))
         assert (one.status, one.goals[0].params["tick"]) == ("won", 60)
-        assert one.goals[1].failed and len(one.goals[1].params["missed"]) == 2
+        rings = next(goal for goal in one.goals if goal.kind == "through_in_order")
+        assert rings.failed and len(rings.params["missed"]) == 2
         assert one.events[-1].data["winner"] == "wizard"
         two = run_code(level, (folder / "wrong" / wrong).read_text())
         assert (two.status, two.goals[0].params["penalty"]) == ("incomplete", 20)

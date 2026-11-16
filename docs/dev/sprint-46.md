@@ -179,3 +179,14 @@ cards with the owner's two changes, from the brief
 `sprint-46-the-verdict-told.md`. The designer's one correction: the
 sentence of the wizard that wins with a penalty does not say its name
 twice.
+
+### 4.5 The goals' order in *the-race*
+
+The race's goals are told in this order: winning the race, the lines'
+extra goal, the rings' extra goal. The two short goals share the strip's
+first line and the rings' long goal has the next two, so the goals box
+stays a strip that covers no ring and no figure, open through the race
+(D227). With the rings' goal second, each goal has a line of its own, the
+strip grows a line and covers the top rings, and the box falls back to
+the list, folded at three seconds. `screens.spec.ts` keeps the strip
+asked of `the-rings` and of `the-race`.

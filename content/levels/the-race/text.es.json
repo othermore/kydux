@@ -2,8 +2,8 @@
   "title": "La carrera",
   "goals": [
     "Gana la carrera contra Zarek.",
-    "Pasa por los ocho aros en orden: en cada pareja, el primero hacia arriba y el segundo hacia abajo.",
-    "En menos de 12 líneas."
+    "En menos de 12 líneas.",
+    "Pasa por los ocho aros en orden: en cada pareja, el primero hacia arriba y el segundo hacia abajo."
   ],
   "starting_code": "# Define la función two_rings con dos argumentos:\n\n    # Muévete hacia arriba dos casillas\n    \n    # Muévete a la derecha hasta el segundo aro\n    \n    # Muévete hacia abajo dos casillas\n    \n    # Muévete a la derecha hasta el siguiente aro\n    \n# Lanza la palabra mágica con cast\n\n# Muévete a la derecha hasta el primer aro\n\n# Llama a two_rings para la primera pareja\n\n# Llama a two_rings para la segunda pareja\n\n# Llama a two_rings para la tercera pareja\n\n# Llama a two_rings para la cuarta pareja\n\n",
   "hints": [

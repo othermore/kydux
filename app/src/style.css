@@ -1263,11 +1263,6 @@ a.stop-body:focus-visible {
   text-align: center;
 }
 
-.lesson-figure {
-  width: 126px;
-  height: 154px;
-  image-rendering: pixelated;
-}
 
 .lesson-teacher figcaption {
   font-weight: 700;
@@ -1461,25 +1456,62 @@ a.stop-body:focus-visible {
   font-size: var(--editor-font-size, 17px);
 }
 
-/* The wizard: its figure drawn small and shown big, in true pixels (D36). */
-
-.figure {
-  image-rendering: pixelated;
+/* A portrait (D194): a bust on a round of paper, the size its place asks. */
+.portrait {
+  display: block;
+  flex: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, var(--paper) 0 55%, var(--parchment-deep) 100%);
+  object-fit: cover;
+  object-position: center bottom;
 }
 
-.figure.small {
-  width: 108px;
-  height: 132px;
+.portrait.small {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
+  vertical-align: middle;
+  border: 1px solid var(--ink-line);
 }
 
-.figure.medium {
-  width: 72px;
-  height: 88px;
+.portrait.medium {
+  width: 96px;
+  height: 96px;
+  border: 2px solid var(--ink-line);
 }
 
-.figure.big {
-  width: 144px;
-  height: 176px;
+.portrait.large {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 6px;
+  border: 2px solid var(--ink-line);
+  box-shadow: var(--shadow);
+}
+
+.portrait.big {
+  width: 220px;
+  height: 220px;
+  border: 3px solid var(--gold);
+  box-shadow: var(--shadow);
+}
+
+/* The creator's looks: a portrait each, a little smaller. */
+#wizard-looks .portrait.small {
+  width: 84px;
+  height: 84px;
+  margin: 0;
+}
+
+/* Who speaks in a story's bubble, in the band. */
+.story-speaker {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink-soft);
 }
 
 .start-greeting {

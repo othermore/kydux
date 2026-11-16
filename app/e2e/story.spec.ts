@@ -32,7 +32,9 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
   await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up');
   await expect(scene).toHaveAttribute('data-speaker', 'friend');
   await expect(scene).toHaveAttribute('data-bubble', /Hi there! I am Teku, a first-year pupil/);
-  await expect(page.locator('#story-voice')).toHaveText('');
+  // The band says no words of the voice: it shows who speaks, Teku's portrait and name (D194).
+  await expect(page.locator('#story-speaker')).toHaveText('Teku');
+  await expect(page.locator('#story-speaker img')).toHaveAttribute('data-portrait', 'teku');
   await expect(storySaid(page)).toContainText('Teku: Hi there! I am Teku, a first-year pupil');
   // The bubble stays until the next step.
   await page.waitForTimeout(ciTimes(1500));

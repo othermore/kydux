@@ -8,6 +8,7 @@ being reduced to true pixels as cut.py does for pixel art.
     tools/art/sprites.py textures <sheet.png> --out <folder> --names grass,dirt,... --size 192
     tools/art/sprites.py sprite <picture.png> --out <thing.webp> --box x0,y0,x1,y1 --height 256
         [--lawn]
+    tools/art/sprites.py portrait <bust.png> --out <portrait.webp>
 
 A sheet is drawn on flat magenta. The magenta is keyed out softly: a pixel near
 it is transparent, one at the edge of a figure partly so, with the magenta's
@@ -29,6 +30,8 @@ painted on the magenta, cleared from the outside in; with `--lawn`, a thing
 painted standing on a lawn, the ring on its post, the lawn and its shadows taken
 out by their colour, green over red, and only the thing's own piece kept, its
 holes the lawn seen through it; trimmed, `height` pixels tall, written as a webp.
+`portrait` cuts a character's bust painted on flat magenta (D194) into a square of 512
+pixels, centred, the cut of its chest on the bottom edge.
 """
 
 import argparse
@@ -237,17 +240,21 @@ def off_lawn(image: Array) -> Array:
     return out
 
 
-def off_magenta_rim(image: Array, margin: int = 20) -> Array:
+def off_magenta_rim(image: Array, margin: int = 20, depth: int | None = None) -> Array:
     """A keyed thing with its magenta rim taken out (D182): a pixel whose green falls
     short of its red and its blue by more than `margin` is magenta's, an edge or a
     shadow painted on it, and is cleared when it is reached from the clear pixels
-    through others like it; such a pixel inside the thing keeps its colour."""
+    through others like it, at most `depth` pixels in when it is given, so that a
+    crimson or a purple cloth beside the magenta keeps all but its rim; such a pixel
+    inside the thing keeps its colour."""
     rgb = image[..., :3].astype(np.int16)
     clear = image[..., 3] == 0
     tinted = np.minimum(rgb[..., 0], rgb[..., 2]) - rgb[..., 1] > margin
     passable = clear | tinted
     reached = clear.copy()
-    while True:
+    steps = 0
+    while depth is None or steps < depth:
+        steps += 1
         grown = reached.copy()
         grown[1:] |= reached[:-1]
         grown[:-1] |= reached[1:]
@@ -282,6 +289,28 @@ def _groups(mask: Array) -> Array:
     return labelled
 
 
+#: A portrait's side, in pixels (D194).
+PORTRAIT = 512
+
+
+def portrait(path: Path, out: Path, size: int = PORTRAIT) -> Path:
+    """A portrait bust painted on flat magenta (D194): keyed out, its magenta rim
+    cleared, only its largest piece kept, trimmed, and scaled into a square of `size`
+    pixels, centred, the cut of its chest on the bottom edge; written as a webp."""
+    keyed = off_magenta_rim(soft_key(cut.load(path)), depth=4)
+    labelled = _groups(keyed[..., 3] > 0)
+    sizes = np.bincount(labelled.ravel())
+    sizes[0] = 0
+    keyed[..., 3] = np.where(labelled == int(sizes.argmax()), keyed[..., 3], 0)
+    trimmed = cut.trim(keyed)
+    picture = scaled(trimmed, min(size / trimmed.shape[0], size / trimmed.shape[1]))
+    square = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    square.alpha_composite(picture, ((size - picture.width) // 2, size - picture.height))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    square.save(out, quality=90, method=6)
+    return out
+
+
 def sprite(path: Path, out: Path, box: tuple[int, int, int, int], height: int, lawn: bool) -> Path:
     """One thing cut from a box of a picture, keyed off magenta or off a lawn, trimmed,
     `height` pixels tall, written to `out` (a webp keeps its transparency)."""
@@ -300,7 +329,7 @@ def sprite(path: Path, out: Path, box: tuple[int, int, int, int], height: int, l
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Painted pieces cut from a sheet.")
-    parser.add_argument("kind", choices=("figures", "things", "textures", "sprite"))
+    parser.add_argument("kind", choices=("figures", "things", "textures", "sprite", "portrait"))
     parser.add_argument("sheet", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--name", default="figure")
@@ -313,6 +342,9 @@ def main() -> int:
     parser.add_argument("--box", default="", help="a sprite's box in the picture, x0,y0,x1,y1")
     parser.add_argument("--lawn", action="store_true", help="a sprite painted on a lawn")
     args = parser.parse_args()
+    if args.kind == "portrait":
+        print(portrait(args.sheet, args.out))
+        return 0
     if args.kind == "sprite":
         box = tuple(int(v) for v in args.box.split(","))
         if len(box) != 4:

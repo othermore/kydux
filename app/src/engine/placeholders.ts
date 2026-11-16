@@ -304,30 +304,6 @@ function drawWizard(ctx: CanvasRenderingContext2D, x: number, facing: Facing, lo
   drawFigure(ctx, x, facing, wizardFigure(look));
 }
 
-/** A look's wizard facing the viewer, on a canvas of its own: for a screen
- * outside the scene, like the creator. The canvas is WIZARD_WIDTH by
- * WIZARD_HEIGHT; CSS makes it bigger, pixelated. */
-export function drawLookPreview(target: HTMLCanvasElement, look: Look): void {
-  target.width = WIZARD_WIDTH;
-  target.height = WIZARD_HEIGHT;
-  const ctx = target.getContext('2d');
-  if (!ctx) return;
-  ctx.clearRect(0, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
-  drawWizard(ctx, 0, 'down', look);
-}
-
-/** A figure facing the viewer, on a canvas of its own: a character beside a
- * lesson (D67). The canvas is WIZARD_WIDTH by WIZARD_HEIGHT; CSS makes it
- * bigger, pixelated. */
-export function drawFigurePreview(target: HTMLCanvasElement, figure: Figure): void {
-  target.width = WIZARD_WIDTH;
-  target.height = WIZARD_HEIGHT;
-  const ctx = target.getContext('2d');
-  if (!ctx) return;
-  ctx.clearRect(0, 0, WIZARD_WIDTH, WIZARD_HEIGHT);
-  drawFigure(ctx, 0, 'down', figure);
-}
-
 /** Long hair: past the hat's brim at the sides, and from behind over the robe. */
 function drawLongHair(ctx: CanvasRenderingContext2D, cx: number, facing: Facing, hair: string): void {
   ctx.fillStyle = hair;

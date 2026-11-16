@@ -134,7 +134,12 @@ test('a lesson shows who teaches it; a story is told on its scene instead (D67, 
   await page.goto('/#lesson/what-a-program-is');
   await expect(page.locator('.lesson-screen')).toHaveClass(/taught/);
   await expect(page.locator('#lesson-teacher figcaption')).toHaveText('Nuri');
-  await expect(page.locator('#lesson-teacher canvas')).toBeVisible();
+  // The teacher's portrait, the friend as the wizard's gender makes them (D194).
+  await expect(page.locator('#lesson-teacher img.portrait')).toHaveAttribute('data-portrait', 'nuri');
+  await expect(page.locator('#lesson-teacher img.portrait')).toBeVisible();
+  await expect
+    .poll(() => page.locator('#lesson-teacher img.portrait').evaluate((img: HTMLImageElement) => img.naturalWidth))
+    .toBe(512);
   await page.goto('/#lesson/what-things-know');
   await expect(page.locator('#lesson-teacher figcaption')).toHaveText('Wenna');
   await page.goto('/#story/at-the-gate');

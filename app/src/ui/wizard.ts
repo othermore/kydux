@@ -2,12 +2,12 @@
 // game's. Done keeps the wizard in the progress document and goes on; when a
 // wizard exists already, the screen opens with it, and Back leaves it as it was.
 
-import { drawLookPreview } from '../engine/placeholders';
-import { lookOf, looksFor } from '../engine/looks';
+import { looksFor } from '../engine/looks';
 import { t } from '../i18n';
 import * as progress from '../progress/progress';
 import { isNameCharacter, NAME_MAX, type Wizard, wizardName } from '../progress/store';
 import { element } from './dom';
+import { portrait } from './portraits';
 import type { Screen } from './screen';
 
 export interface WizardScreenParts {
@@ -62,10 +62,9 @@ function radioGroup<T extends string>(
   return group;
 }
 
-function figure(lookId: string, className: string): HTMLCanvasElement {
-  const canvas = element('canvas', { className: `figure ${className}` });
-  drawLookPreview(canvas, lookOf(lookId));
-  return canvas;
+/** A look's portrait (D194). */
+function figure(lookId: string, className: string): HTMLImageElement {
+  return portrait(`wizard-${lookId}`, className);
 }
 
 export function wizardScreen(parts: WizardScreenParts): Screen {
@@ -109,6 +108,10 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
     ]);
     const preview = figure(look ?? '', 'big');
     preview.hidden = look === null;
+    // A look chosen shows its portrait at once, large beside the name.
+    preview.addEventListener('load', () => {
+      preview.hidden = look === null;
+    });
     const takenWords = element('p', { id: 'wizard-name-taken', className: 'wizard-rule', hidden: true }, [
       t('wizard.name_taken'),
     ]);
@@ -169,7 +172,9 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
           look,
           (value) => {
             look = value;
-            drawLookPreview(preview, lookOf(look));
+            preview.src = figure(look, 'big').src;
+            preview.dataset.portrait = `wizard-${look}`;
+            preview.hidden = false;
             ready();
           },
         )

@@ -4,11 +4,8 @@ import { finishStory, seedWizard, storyNext, storySaid } from './helpers';
 test.use({ locale: 'en-US' });
 
 /** The colour of a pixel of the robe in a figure's canvas, as #rrggbb. */
-const robeColour = (page: Page, selector: string) =>
-  page.locator(selector).evaluate((canvas: HTMLCanvasElement) => {
-    const [r, g, b] = canvas.getContext('2d')?.getImageData(18, 36, 1, 1).data ?? [];
-    return `#${[r, g, b].map((c) => (c ?? 0).toString(16).padStart(2, '0')).join('')}`;
-  });
+/** The look a portrait shows (D194), by its file: the look's own. */
+const portraitShown = (page: Page, selector: string) => page.locator(selector).getAttribute('data-portrait');
 
 async function makeWizard(page: Page, name: string, gender: 'girl' | 'boy', look: number): Promise<void> {
   await page.locator('#wizard-name').fill(name);
@@ -49,7 +46,8 @@ test('the creator, and Done opens the first lesson by name', async ({ page }) =>
   await expect(page.locator('#wizard-done')).toBeEnabled();
   await page.locator('#wizard-looks .radio').nth(2).click();
   await expect(page.locator('#wizard-looks .radio').nth(2)).toHaveAttribute('aria-checked', 'true');
-  expect(await robeColour(page, '#wizard-preview')).toBe('#3b8fd6');
+  expect(await portraitShown(page, '#wizard-preview')).toBe('wizard-sky');
+  await expect(page.locator('#wizard-preview')).toBeVisible();
   await expect(page.locator('#wizard-preview-name')).toHaveText('Ana');
 
   await page.locator('#wizard-done').click();
@@ -62,14 +60,14 @@ test('the creator, and Done opens the first lesson by name', async ({ page }) =>
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Ana');
   await expect(page.locator('#continue')).toHaveText('Continue: At the gate');
   await expect(page.locator('#change-wizard')).toBeVisible();
-  expect(await robeColour(page, '#start-figure')).toBe('#3b8fd6');
+  expect(await portraitShown(page, '#start-figure')).toBe('wizard-sky');
 });
 
 test('a name of the game\'s own is refused, and a boy\'s looks are a boy\'s', async ({ page }) => {
   await page.goto('/#wizard');
   await page.locator('#wizard-gender [data-value="boy"]').click();
   await expect(page.locator('#wizard-looks .radio')).toHaveCount(4);
-  expect(await robeColour(page, '#wizard-preview')).toBe('#d9822b');
+  expect(await portraitShown(page, '#wizard-preview')).toBe('wizard-amber');
   for (const name of ['Dask', 'zelim', 'Wizard']) {
     await page.locator('#wizard-name').fill(name);
     await expect(page.locator('#wizard-name-taken')).toBeVisible();
@@ -157,4 +155,21 @@ test('the wizard goes with exported progress to another browser', async ({ page,
   await elsewhere.locator('#import-file').setInputFiles(file as string);
   await expect(elsewhere.locator('.start-screen h2')).toHaveText('Hello, Marta');
   await other.close();
+});
+
+test("the creator shows each gender's four looks as their portraits, eight in all (D194)", async ({ page }) => {
+  await page.goto('/#wizard');
+  const shown: string[] = [];
+  for (const gender of ['girl', 'boy'] as const) {
+    await page.locator(`#wizard-gender [data-value="${gender}"]`).click();
+    const portraits = page.locator('#wizard-looks .radio img.portrait');
+    await expect(portraits).toHaveCount(4);
+    for (const portrait of await portraits.all()) {
+      await expect.poll(() => portrait.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(512);
+      shown.push((await portrait.getAttribute('data-portrait')) ?? '');
+    }
+  }
+  expect(new Set(shown).size).toBe(8);
+  await page.locator('#wizard-looks .radio').nth(1).click();
+  await expect(page.locator('#wizard-preview')).toHaveAttribute('data-portrait', shown[5] ?? '');
 });

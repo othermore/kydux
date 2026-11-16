@@ -1859,3 +1859,19 @@ def test_a_flying_frame_bobs_up_and_down_and_keeps_only_its_figure():
     tops = [np.nonzero(row[:, 20 * i : 20 * (i + 1), 3].any(axis=1))[0][0] for i in range(3)]
     assert tops == [10, 10 - figures.FLY_BOB, 10 + figures.FLY_BOB]
     assert not row[0:2, 0:2, 3].any()
+
+
+def test_a_bust_s_hat_is_its_cloth_above_the_face_and_its_robe_the_cloth_at_its_foot():
+    blue, gold, skin = (40, 90, 150, 255), (220, 160, 50, 255), (233, 180, 140, 255)
+    bust = np.zeros((60, 40, 4), dtype=np.uint8)
+    bust[2:13, 10:30] = blue  # the hat's cone
+    bust[13:16, 4:36] = gold  # its band
+    bust[16:19, 0:40] = blue  # its brim, below the band
+    bust[20:36, 10:30] = skin  # the face
+    bust[40:60, 0:40] = blue  # the robe, down to the bust's foot
+    bust[48:50, 18:20] = gold  # a star on it
+    parts = figures.portrait_parts(bust)
+    assert parts["hat"][5, 20] and parts["hat"][17, 20]
+    assert parts["robe"][50, 5] and not parts["robe"][17, 20]
+    assert parts["band"][14, 20] and parts["band"][48, 18]
+    assert parts["skin"][28, 20] and not parts["skin"][14, 20]

@@ -5,6 +5,7 @@
 import { t } from '../i18n';
 import { MAX_STARS } from '../progress/store';
 import { element } from './dom';
+import { portrait } from './portraits';
 import type { Verdict } from './stars';
 import { withCode } from './words';
 
@@ -64,10 +65,13 @@ export interface StartCardText {
 export interface Said {
   speaker: string;
   text: string;
+  /** Whose portrait is beside the name (D194), when they have one. */
+  portrait?: string | null;
 }
 
 function saidBy(said: Said, id: string): HTMLElement {
   return element('p', { id, className: 'card-said' }, [
+    ...(said.portrait ? [portrait(said.portrait, 'small')] : []),
     element('strong', {}, [said.speaker]),
     ' ',
     ...withCode(said.text),

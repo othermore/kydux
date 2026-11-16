@@ -73,7 +73,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 a level's words with their code shown as code (words.ts, D140),
                 the stars (stars.ts), the screen's guide (guide.ts, D68), and
                 the note on a phone or a tablet that the game is made for a
-                computer (handheld.ts), the welcome page (about.ts, #about, D193),
+                computer (handheld.ts), the characters' and the looks' portraits
+                (portraits.ts, D194), the welcome page (about.ts, #about, D193),
                 Kydux's mark in the header (mark.ts), and under ?debug the page
                 that plays any of the music's themes (themes.ts, #music, D192)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
@@ -2807,3 +2808,29 @@ one overturns stays, marked as superseded.
   `tools/art/chapter_cards.py` into `content/art/chapters/<id>/card.webp`, the title
   over it on a dark veil; a chapter whose first stop is locked is greyed. Rules out a
   page that looks like a form, and decoration that gets in a child's way.
+- **D194 — Portraits of every character and of every look.** Decided 2026-11-10 by the
+  owner (*imágenes buenas para todos los personajes, para las lecciones cuando hablan y
+  para la selección del personaje*). A portrait is a bust, head and shoulders, in
+  three-quarter view looking a little to the left, painted as the figures are: Gemini
+  paints it on flat magenta from the character's front frame in its sheet, so that the
+  face, the hair and the clothes match (Ilda, Dask, Wenna, Baro, Eldra, Nuri and Teku in
+  their first colours, Zarek, Rinlo), or from the cast's figures for the style where the
+  character has no sheet (Orla, Bimo), `tools/art/prompts/portrait-<id>.md`; `tools/art/
+  sprites.py portrait` keys it out, clears its magenta rim, keeps its largest piece and
+  scales it into a square of 512 pixels, the cut of its chest on the bottom edge,
+  `content/art/portraits/<id>.webp`. The wizard's portraits are one base bust a gender,
+  painted from the base sheet's figure in the base sheet's colours (`art/figures/
+  portrait-wizard-<gender>.webp`), recoloured into each look by `figures.py --portraits`
+  (`wizard-<look>.webp`, one a look, a look being a gender's): a bust's parts are read by
+  `portrait_parts`, since a hat's brim lies below its band: the cloth's large pieces are
+  the robe where they reach the bust's foot and the hat elsewhere, the band the gold
+  beside the hat, the stars the gold on the robe, the skin light and warm, the hair the
+  large warm dark pieces without the thin lines of the outline. A lesson's page shows its
+  teacher's portrait where the figure stood, with the name under it; a card's speaker and
+  a story's speaker, while a figure speaks in its bubble, show a small portrait beside the
+  name (the friend and the mate as the wizard's gender makes them); the creator shows the
+  gender's four looks as portraits and the chosen one large beside the name, and the
+  start screen the wizard's and each saved game's (`ui/portraits.ts`; `data-portrait`
+  names the file shown). The pixel figures the page drew for these places are gone. A
+  test holds every character a text makes speak, and every look, to a portrait. Rules out
+  the pixel busts, and a portrait that does not match the figure's colours.

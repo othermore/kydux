@@ -790,6 +790,23 @@ views, `figure-zarek-fly.md`:
 Run `--check` after either, and look at the figure's sheet at the end of
 `figures-check.png`.
 
+A character's portrait is a bust Gemini paints on flat magenta, from
+`tools/art/prompts/portrait-<id>.md`. This cuts it into a square of 512
+pixels:
+
+```sh
+.venv/bin/python tools/art/sprites.py portrait art/raw/portraits/portrait-ilda.png --out content/art/portraits/ilda.webp
+```
+
+The wizard's looks have their portraits made from the two base busts in
+`art/figures/`, recoloured for each look:
+
+```sh
+.venv/bin/python tools/art/figures.py --portraits
+```
+
+It prints each portrait it wrote, `content/art/portraits/wizard-<look>.webp`.
+
 A thing drawn the same on every scene, a broom or a ring, is a sprite in
 `content/art/things/`. It is cut from a box of a picture, given as its
 corners in pixels, and scaled to a height in pixels. A thing painted alone

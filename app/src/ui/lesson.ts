@@ -10,9 +10,9 @@ import { marked } from 'marked';
 import { itemHash } from '../content/course';
 import { type Lesson, pageParts } from '../content/lessons';
 import { characterName, t } from '../i18n';
-import { drawFigurePreview, friendFigure } from '../engine/placeholders';
 import * as progress from '../progress/progress';
 import { element } from './dom';
+import { portrait, portraitOf } from './portraits';
 import { type LessonRunner, type RunBlock, runBlock } from './lessonrun';
 import type { Screen } from './screen';
 
@@ -35,14 +35,14 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
   let page = 0;
   const node = element('div', { className: 'lesson-screen taught' });
 
-  // The teacher beside a lesson's words: the character's figure, with the name (D67).
+  // The teacher beside a lesson's words: the character's portrait, with the name (D67,
+  // D194).
   const teacher = () => {
     const speaker = lesson.speaker;
-    if (!speaker) return null;
-    const figure = element('canvas', { className: 'lesson-figure' });
-    drawFigurePreview(figure, friendFigure(speaker, progress.wizard()?.gender ?? 'girl'));
+    const id = speaker ? portraitOf(speaker, progress.wizard()?.look) : null;
+    if (!speaker || !id) return null;
     return element('figure', { id: 'lesson-teacher', className: 'lesson-teacher' }, [
-      figure,
+      portrait(id, 'large'),
       element('figcaption', {}, [characterName(speaker)]),
     ]);
   };

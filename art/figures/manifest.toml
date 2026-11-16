@@ -1,4 +1,4 @@
-# The base sheets every look and friend is recoloured from (tools/art/figures.py): the walking sheets, and the wizard's casting, picking-up and celebrating frames.
+# The base sheets every look and friend is recoloured from (tools/art/figures.py): the walking sheets, the wizard's casting, picking-up and celebrating frames, and the wizard's base busts for the looks' portraits.
 
 ["wizard-base-boy.webp"]
 source = "generated: gemini-3-pro-image, tools/art/prompts/demo-wizard.md; cut by tools/art/sprites.py"
@@ -92,5 +92,15 @@ licence = "GPL-3.0-or-later"
 
 ["rinlo-standing.webp"]
 source = "generated: gemini-3-pro-image, a drawing of Rinlo standing in the four views, tools/art/prompts/figure-rinlo-standing.md; each view put on its grid by tools/art/figures.py --drawn"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["portrait-wizard-boy.webp"]
+source = "generated: gemini-3-pro-image, from the front frame of wizard-base-boy.webp, tools/art/prompts/portrait-wizard-boy.md; cut by tools/art/sprites.py portrait"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["portrait-wizard-girl.webp"]
+source = "generated: gemini-3-pro-image, from the front frame of wizard-base-girl.webp, tools/art/prompts/portrait-wizard-girl.md; cut by tools/art/sprites.py portrait"
 author = "Kydux contributors"
 licence = "GPL-3.0-or-later"

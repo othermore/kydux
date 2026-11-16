@@ -28,6 +28,7 @@ import { clampSplit, setSplit, splitAt } from './look';
 import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
 import { type Outcome, type OutcomeCard, outcomeCard, raceCount } from './outcome';
 import { openPlan, type PlanWindow } from './plan';
+import { portraitOf } from './portraits';
 import { withCode } from './words';
 import type { Screen } from './screen';
 
@@ -305,7 +306,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   // The level's story, said by its speaker (D45): a name of the story's, through i18n.
   const speaker = typeof loaded.level.speaker === 'string' ? loaded.level.speaker : null;
   const said = (words: string | undefined) =>
-    speaker && words ? { speaker: characterName(speaker), text: words } : undefined;
+    speaker && words
+      ? { speaker: characterName(speaker), text: words, portrait: portraitOf(speaker, progress.wizard()?.look) }
+      : undefined;
   // What the wizard holds from the start (D49), said with each thing's name.
   const carried = carriedKinds(loaded.level);
   const carrying = () =>

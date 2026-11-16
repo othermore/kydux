@@ -41,7 +41,7 @@ the figure stands (D120); figures.json lists them (`floating`).
 Writes content/art/figures/wizard-<look>.webp for every look and the friends'
 sheets named in FRIENDS, from the bases in art/figures/ (BASES), and their list in
 figures.json; --check writes art/raw/figures-check.png, every sheet side by
-side with the drawn figures and the things' sprites, to look at. A wizard's
+side with the drawn figures, the things' sprites and the portraits, to look at. A wizard's
 sheet has four more rows after its walking ones, the same ways in the same
 order: casting, the wand raised, pointed with its light and lowered,
 recoloured from the casting base of its gender (CAST_BASES);
@@ -63,6 +63,10 @@ from a drawing of it standing still in the four views (--drawn), each view as ta
 DRAWN says, its walking rows its standing frame three times; and its flying rows from a
 drawing of it riding the broom in the same four views (--drawn-fly), scaled as its
 standing views, bobbing as the wizard's. figures.json says its rows in `sheets`.
+
+Each look's portrait (--portraits, D194) is its gender's base bust (PORTRAIT_BASES, cut
+from Gemini's portrait of the base sheet's figure) with each part in the look's colour:
+a bust's parts are read by portrait_parts, since its hat's brim lies below its band.
 """
 
 import argparse
@@ -822,6 +826,98 @@ def stacked(*sheets: Image.Image) -> Image.Image:
     return sheet
 
 
+#: The wizard's base busts (D194), one a gender, cut from Gemini's portrait of the base
+#: sheet's figure, in the base sheet's colours; and where the looks' portraits go.
+PORTRAIT_BASES = {"boy": "portrait-wizard-boy.webp", "girl": "portrait-wizard-girl.webp"}
+PORTRAITS = REPO / "content" / "art" / "portraits"
+
+
+def _grown(mask: np.ndarray, radius: int) -> np.ndarray:
+    """The mask grown by `radius` pixels, round."""
+    out = mask.copy()
+    for dy in range(-radius, radius + 1):
+        for dx in range(-radius, radius + 1):
+            if dy * dy + dx * dx <= radius * radius:
+                out |= np.roll(np.roll(mask, dy, 0), dx, 1)
+    return out
+
+
+def _shrunk(mask: np.ndarray, radius: int) -> np.ndarray:
+    """The mask shrunk by `radius` pixels, round: what is thinner goes."""
+    return ~_grown(~mask, radius)
+
+
+def _pieces(mask: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """The mask's pieces numbered from 1, and each piece's size."""
+    import sprites  # noqa: PLC0415 - the cut's tools, only for the portraits
+
+    labelled = sprites._groups(mask)
+    sizes = np.bincount(labelled.ravel())
+    sizes[0] = 0
+    return labelled, sizes
+
+
+def portrait_parts(
+    bust: np.ndarray, cloth_hues: tuple[int, int] = (190, 260)
+) -> dict[str, np.ndarray]:
+    """Each part's mask in a bust (D194), which parts_of cannot read since a bust's hat
+    brim lies below its band: the cloth's large pieces are the robe where they reach the
+    bust's foot and the hat elsewhere; the band is the gold beside the hat, the stars the
+    gold on the robe; the skin is light and warm; the hair the large warm dark pieces, its
+    thin lines, the face's outline, left out."""
+    alpha = bust[..., 3] > 0
+    hsv = _hsv(bust[..., :3].astype(float))
+    hue, sat, val = hsv[..., 0] * 360, hsv[..., 1], hsv[..., 2]
+    low, high = cloth_hues
+    cloth = alpha & (hue >= low) & (hue <= high) & (sat > 0.25) & (val > 0.1)
+    pieces, sizes = _pieces(cloth)
+    large = np.nonzero(sizes > sizes.max() * 0.08)[0]
+    foot = bust.shape[0] - 6
+    robe_pieces = [n for n in large if np.nonzero(pieces == n)[0].max() >= foot]
+    robe = np.isin(pieces, robe_pieces)
+    hat = np.isin(pieces, [n for n in large if n not in robe_pieces])
+    gold = alpha & (hue >= 30) & (hue <= 65) & (sat >= 0.4) & (val >= 0.45)
+    near_robe = _grown(robe, 4)
+    band = gold & _grown(hat, 24) & ~near_robe
+    stars = gold & near_robe & ~band
+    skin = alpha & ((hue <= 30) | (hue >= 330)) & (sat > 0.1) & (sat < 0.75) & (val > 0.55)
+    skin &= ~band & ~stars
+    dark = alpha & ((hue <= 50) | (hue >= 330)) & (sat > 0.2) & (val > 0.1) & (val <= 0.6)
+    dark &= ~skin & ~band
+    cores, core_sizes = _pieces(_shrunk(dark, 3))
+    core = np.isin(cores, np.nonzero(core_sizes >= dark.size * 0.003)[0])
+    hair = _grown(core, 3) & dark
+    return {"hat": hat, "robe": robe, "band": band | stars, "skin": skin, "hair": hair}
+
+
+def make_portraits() -> list[Path]:
+    """Each look's portrait (D194), content/art/portraits/wizard-<look>.webp: its
+    gender's base bust with each part in the look's colour, its shading kept."""
+    written = []
+    busts = {
+        gender: np.array(Image.open(BASE_DIR / name).convert("RGBA"))
+        for gender, name in PORTRAIT_BASES.items()
+    }
+    parts = {gender: portrait_parts(bust) for gender, bust in busts.items()}
+    PORTRAITS.mkdir(parents=True, exist_ok=True)
+    for look_id, look in looks().items():
+        bust = busts[look["gender"]]
+        hsv = _hsv(bust[..., :3].astype(float))
+        out = bust.copy()
+        for part, mask in parts[look["gender"]].items():
+            if not mask.any():
+                continue
+            h, s, v = _target(look[part])
+            middle = float(np.median(hsv[..., 2][mask])) or 1.0
+            values = np.clip(hsv[..., 2][mask] / middle * v, 0, 1)
+            rgb = np.array([colorsys.hsv_to_rgb(h, s, value) for value in values]) * 255
+            out[..., :3][mask] = rgb.round().astype(np.uint8)
+        target = PORTRAITS / f"wizard-{look_id}.webp"
+        Image.fromarray(out).save(target, quality=90, method=6)
+        written.append(target)
+    return written
+
+
 def make(check: bool = False) -> list[Path]:
     about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
     frame = tuple(about["frame"])
@@ -894,9 +990,11 @@ def make(check: bool = False) -> list[Path]:
             about["sheets"][name] = DRAWN_ROWS if flying else {"walk": 0}
     (FIGURES / "figures.json").write_text(json.dumps(about, indent=2) + "\n", encoding="utf-8")
     if check:
-        # Every sheet written, then the drawn figures' and the things' sprites (D182).
+        # Every sheet written, then the drawn figures' and the things' sprites (D182),
+        # and the portraits (D194).
         shown = [*written, *(FIGURES / f"{name}.webp" for name in DRAWN)]
         shown += sorted((REPO / "content" / "art" / "things").glob("*.webp"))
+        shown += sorted(PORTRAITS.glob("*.webp"))
         sheets = [Image.open(p).convert("RGBA") for p in shown if p.is_file()]
         strip = Image.new(
             "RGBA",
@@ -915,6 +1013,9 @@ def make(check: bool = False) -> list[Path]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="The characters' sheets in every look.")
     parser.add_argument("--check", action="store_true", help="also write a sheet to look at")
+    parser.add_argument(
+        "--portraits", action="store_true", help="make each look's portrait from the base busts"
+    )
     parser.add_argument(
         "--cast", nargs=2, metavar=("GENDER", "EDIT"), help="make a casting base from an edit"
     )
@@ -962,6 +1063,10 @@ def main() -> int:
         return 0
     if args.drawn:
         print(make_drawn(args.drawn[0], Path(args.drawn[1])).relative_to(REPO))
+        return 0
+    if args.portraits:
+        for path in make_portraits():
+            print(path.relative_to(REPO))
         return 0
     if args.drawn_fly:
         print(make_drawn_fly(args.drawn_fly[0], Path(args.drawn_fly[1])).relative_to(REPO))

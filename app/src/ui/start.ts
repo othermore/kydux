@@ -4,14 +4,13 @@
 // played or deleted from there; New game begins the story again for a new
 // wizard; a game can be kept as a file and given back as one more game.
 
-import { lookOf } from '../engine/looks';
-import { drawLookPreview } from '../engine/placeholders';
 import { t } from '../i18n';
 import * as progress from '../progress/progress';
 import type { SavedGame } from '../progress/games';
 import { exportProgress, importProgress, type Wizard } from '../progress/store';
 import { welcomeSection } from './about';
 import { element } from './dom';
+import { portrait } from './portraits';
 import type { Screen } from './screen';
 
 export interface StartScreenParts {
@@ -55,8 +54,7 @@ function gamesList(saved: SavedGame[], parts: StartScreenParts, redraw: () => vo
   const current = progress.currentGame();
   const rows = saved.map((game) => {
     const wizard = game.progress.wizard as Wizard;
-    const figure = element('canvas', { className: 'figure small' });
-    drawLookPreview(figure, lookOf(wizard.look));
+    const figure = portrait(`wizard-${wizard.look}`, 'small');
     const play = element('button', { type: 'button', className: 'play' }, [t('start.play')]);
     play.addEventListener('click', () => {
       progress.chooseGame(game.id);
@@ -153,8 +151,8 @@ export function startScreen(parts: StartScreenParts): Screen {
     });
     const greeting: HTMLElement[] = [element('h2', {}, [wizard ? t('start.hello') : t('start.welcome')])];
     if (wizard) {
-      const shown = element('canvas', { id: 'start-figure', className: 'figure medium' });
-      drawLookPreview(shown, lookOf(wizard.look));
+      const shown = portrait(`wizard-${wizard.look}`, 'medium');
+      shown.id = 'start-figure';
       greeting.unshift(shown);
     }
     const actions: HTMLElement[] = [go, ...(wizard ? [map] : []), ...(saved.length > 0 ? [load] : []), fresh, settings];

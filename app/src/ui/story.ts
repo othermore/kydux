@@ -19,6 +19,7 @@ import { characterName, forWizard, t } from '../i18n';
 import type { LevelJson } from '../runtime/protocol';
 import * as progress from '../progress/progress';
 import { element } from './dom';
+import { portrait, portraitOf } from './portraits';
 import type { Screen } from './screen';
 import { zoomBox } from './zoom';
 
@@ -58,6 +59,8 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   const voice = element('div', { id: 'story-voice', className: 'story-voice' });
   // What a figure says, for a screen reader, which cannot read the bubble.
   const heard = element('p', { id: 'story-heard', className: 'visually-hidden', ariaLive: 'polite' });
+  // Who speaks in a bubble: their portrait and name in the band, which is silent then.
+  const speaking = element('div', { id: 'story-speaker', className: 'story-speaker' });
   const back = element('button', { id: 'story-back', type: 'button', className: 'quiet-button' }, [
     t('lesson.previous'),
   ]);
@@ -103,6 +106,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     const said = current && !byVoice ? current : null;
     const who = said?.who === 'wizard' ? forWizard('{wizard}') : said ? characterName(said.who) : '';
     heard.textContent = said ? `${who}: ${said.text.replace(/[`*_]/g, '')}` : '';
+    // While a figure speaks in its bubble, the band shows who it is (D194).
+    const face = said ? portraitOf(said.who, progress.wizard()?.look) : null;
+    speaking.replaceChildren(...(face ? [portrait(face, 'small'), element('span', {}, [who])] : []));
+    if (face) voice.append(speaking);
     back.disabled = step === 0;
     // Again only where the step does something; Skip until the last step.
     again.hidden = !current?.do;

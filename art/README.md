@@ -680,6 +680,17 @@ frame than a first-year's, between the children's and the grown-ups'. Zarek, who
 has flying rows from Gemini's drawing of him riding the broom in the same four views
 (`figure-zarek-fly.md`, `--drawn-fly`).
 
+### Portraits
+
+Every character has a portrait (D194), a bust in three-quarter view looking a little to
+the left, painted as the figures are and asked of Gemini on flat magenta from the
+character's front frame in its sheet, so that it matches the figure
+(`portrait-<id>.md`); `tools/art/sprites.py portrait` cuts it into a square of 512
+pixels in `content/art/portraits/`. The wizard's looks have theirs recoloured from one
+base bust a gender (`art/figures/portrait-wizard-<gender>.webp`) by
+`tools/art/figures.py --portraits`, so that a look's portrait wears its colours. The
+friends' portraits wear their first colours.
+
 ## Sprites of things
 
 A kind of thing may be drawn from a picture of its own, the same on every scene

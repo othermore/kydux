@@ -69,3 +69,28 @@ licence = "GPL-3.0-or-later"
 source = "generated: gemini-3-pro-image, an edit of a sheet of friend-base-girl.webp's standing frame made by tools/art/figures.py --sleep-input, tools/art/prompts/figure-sleep-friend-girl.md; its lying frame put on its grid by tools/art/figures.py --sleep"
 author = "Kydux contributors"
 licence = "GPL-3.0-or-later"
+
+["wizard-fly-boy.webp"]
+source = "generated: gemini-3-pro-image, an edit of wizard-base-boy.webp's sheet riding a broom, tools/art/prompts/figure-fly-boy.md; each row's middle figure put on its grid, level, up and down, by tools/art/figures.py --fly"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["wizard-fly-girl.webp"]
+source = "generated: gemini-3-pro-image, an edit of wizard-base-girl.webp's sheet riding a broom, tools/art/prompts/figure-fly-girl.md; each row's middle figure put on its grid, level, up and down, by tools/art/figures.py --fly"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["zarek-standing.webp"]
+source = "generated: gemini-3-pro-image, a drawing of Zarek standing in the four views, tools/art/prompts/figure-zarek-standing.md; each view put on its grid by tools/art/figures.py --drawn"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["zarek-fly.webp"]
+source = "generated: gemini-3-pro-image, an edit of Zarek's standing drawing riding a broom, tools/art/prompts/figure-zarek-fly.md; each view put on its grid, level, up and down, by tools/art/figures.py --drawn-fly"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["rinlo-standing.webp"]
+source = "generated: gemini-3-pro-image, a drawing of Rinlo standing in the four views, tools/art/prompts/figure-rinlo-standing.md; each view put on its grid by tools/art/figures.py --drawn"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"

@@ -6,6 +6,8 @@ being reduced to true pixels as cut.py does for pixel art.
     tools/art/sprites.py figures <sheet.png> --out <folder> --name nuri --height 64 --side 0,1f,2f
     tools/art/sprites.py things <sheet.png> --out <folder> --names gate,... --height 64,...
     tools/art/sprites.py textures <sheet.png> --out <folder> --names grass,dirt,... --size 192
+    tools/art/sprites.py sprite <picture.png> --out <thing.webp> --box x0,y0,x1,y1 --height 256
+        [--lawn]
 
 A sheet is drawn on flat magenta. The magenta is keyed out softly: a pixel near
 it is transparent, one at the edge of a figure partly so, with the magenta's
@@ -20,7 +22,12 @@ model that drew the side row facing right is mirrored back with --flip-side.
 Every frame is scaled by the same factor, so that the figure keeps its size
 from one frame to the next. `textures` writes each square of a grid of
 textures, made seamless: the square blended with itself shifted by half, so
-that it repeats without a seam.
+that it repeats without a seam. `sprite` cuts one thing of a kind drawn by the
+game from its own picture (D182) out of a box of a picture: on flat magenta,
+keyed out as a sheet is; with `--lawn`, a thing painted standing on a lawn, the
+ring on its post, the lawn and its shadows taken out by their colour, green over
+red, and only the thing's own piece kept, its holes the lawn seen through it;
+trimmed, `height` pixels tall, written as a webp.
 """
 
 import argparse
@@ -207,9 +214,67 @@ def textures(
     return written
 
 
+def off_lawn(image: Array) -> Array:
+    """A thing painted on a lawn with the lawn taken out (D182): a pixel about as green
+    as it is red, or greener, and far greener than blue, the lawn's yellow stripes, its
+    green ones and their shadows, is the lawn's, and so is what is already clear; the
+    thing is the largest group of the other pixels."""
+    rgb = image[..., :3].astype(np.int16)
+    lawn = (rgb[..., 1] >= rgb[..., 0] - 12) & (rgb[..., 1] > rgb[..., 2] + 40)
+    if image.shape[2] == 4:
+        lawn |= image[..., 3] < 128
+    labelled = _groups(~lawn)
+    sizes = np.bincount(labelled.ravel())
+    sizes[0] = 0
+    keep = labelled == int(sizes.argmax())
+    out = (
+        image.copy()
+        if image.shape[2] == 4
+        else np.dstack([image, np.full(image.shape[:2], 255, np.uint8)])
+    )
+    out[..., 3] = np.where(keep, out[..., 3], 0)
+    return out
+
+
+def _groups(mask: Array) -> Array:
+    """Each group of a mask's pixels that touch side by side, numbered from 1."""
+    labelled = np.zeros(mask.shape, dtype=np.int32)
+    count = 0
+    height, width = mask.shape
+    for y, x in zip(*np.nonzero(mask), strict=True):
+        if labelled[y, x]:
+            continue
+        count += 1
+        stack = [(y, x)]
+        labelled[y, x] = count
+        while stack:
+            cy, cx = stack.pop()
+            for ny, nx in ((cy - 1, cx), (cy + 1, cx), (cy, cx - 1), (cy, cx + 1)):
+                if 0 <= ny < height and 0 <= nx < width and mask[ny, nx] and not labelled[ny, nx]:
+                    labelled[ny, nx] = count
+                    stack.append((ny, nx))
+    return labelled
+
+
+def sprite(path: Path, out: Path, box: tuple[int, int, int, int], height: int, lawn: bool) -> Path:
+    """One thing cut from a box of a picture, keyed off magenta or off a lawn, trimmed,
+    `height` pixels tall, written to `out` (a webp keeps its transparency)."""
+    image = cut.load(path)
+    left, top, right, bottom = box
+    piece = image[top:bottom, left:right]
+    keyed = soft_key(piece)
+    if lawn:
+        keyed = off_lawn(keyed)
+    trimmed = cut.trim(keyed)
+    picture = scaled(trimmed, height / trimmed.shape[0])
+    out.parent.mkdir(parents=True, exist_ok=True)
+    picture.save(out, lossless=True) if out.suffix == ".webp" else picture.save(out)
+    return out
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Painted pieces cut from a sheet.")
-    parser.add_argument("kind", choices=("figures", "things", "textures"))
+    parser.add_argument("kind", choices=("figures", "things", "textures", "sprite"))
     parser.add_argument("sheet", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--name", default="figure")
@@ -219,7 +284,16 @@ def main() -> int:
     parser.add_argument("--flip-side", action="store_true")
     parser.add_argument("--side", default="", help="the side row's frames, as 0,1f,2f")
     parser.add_argument("--regular", default="", help="textures cropped to their period")
+    parser.add_argument("--box", default="", help="a sprite's box in the picture, x0,y0,x1,y1")
+    parser.add_argument("--lawn", action="store_true", help="a sprite painted on a lawn")
     args = parser.parse_args()
+    if args.kind == "sprite":
+        box = tuple(int(v) for v in args.box.split(","))
+        if len(box) != 4:
+            parser.error("a sprite needs its --box, x0,y0,x1,y1")
+        written_one = sprite(args.sheet, args.out, box, int(args.height), args.lawn)  # type: ignore[arg-type]
+        print(written_one)
+        return 0
     names = [n.strip() for n in args.names.split(",") if n.strip()]
     if args.kind == "figures":
         written = figures(

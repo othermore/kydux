@@ -1,0 +1,47 @@
+{
+  "terrains": {
+    "T": {
+      "kind": "tree",
+      "walk": false,
+      "sight": false
+    },
+    "b": {
+      "kind": "hedge",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    },
+    "c": {
+      "kind": "chest",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    },
+    "g": {
+      "kind": "grass",
+      "walk": true
+    },
+    "h": {
+      "kind": "hedge",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    },
+    "n": {
+      "kind": "bench",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    },
+    "o": {
+      "kind": "stone",
+      "walk": true
+    },
+    "w": {
+      "kind": "water",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    }
+  }
+}

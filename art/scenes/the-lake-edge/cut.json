@@ -1,0 +1,15 @@
+{
+  "about": "The lake's edge, chapter 4's second scene: an arm of the lake across the field by morning, a jetty and the white stone, painted as a place (scene-lake-edge) and read on a 20 by 15 grid. Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-lake-edge",
+    "edits": "art/raw/game-lake-edge",
+    "painting": "game-lake-edge-nogrid.png",
+    "grid": "grid.json",
+    "ground": "game-lake-edge-nogrid.png"
+  },
+  "things": {},
+  "cuts": [],
+  "castle": 0,
+  "cut": false,
+  "source": "# The lake's edge\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-lake-edge.md`, with the style of\n  `art/raw/image-first/field-2k.png`, then edited by it: without its grid\n  (`game-lake-edge-nogrid.md`).\n"
+}

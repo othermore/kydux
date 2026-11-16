@@ -1,0 +1,15 @@
+{
+  "about": "The long ring field, chapter 4's third scene: the training lawn by morning, 42 cells by 18 over Gemini's 21:9 picture (the cell its height over 18, the columns centred), painted as a place (scene-ring-field-wide). The rings are sprites (D182). Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-ring-field",
+    "edits": "art/raw/game-ring-field",
+    "painting": "game-ring-field-nogrid-2.png",
+    "grid": "grid.json",
+    "ground": "game-ring-field-nogrid-2.png"
+  },
+  "things": {},
+  "cuts": [],
+  "castle": 0,
+  "cut": false,
+  "source": "# The long ring field\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-ring-field-wide.md`, with the style of\n  `art/raw/image-first/field-2k.png`, then edited by it: without its grid\n  (`game-ring-field-nogrid-2.md`). The first edit without the grid took the chalk start line with the grid; the second keeps it.\n"
+}

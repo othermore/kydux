@@ -1,0 +1,13 @@
+{
+  "broom": {
+    "image": "broom.webp",
+    "size": [1.0, 0.39],
+    "foot": [0.5, 0.82],
+    "lying": true
+  },
+  "ring": {
+    "image": "ring.webp",
+    "size": [1.4, 2.0],
+    "foot": [0.5, 0.88]
+  }
+}

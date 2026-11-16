@@ -1,0 +1,9 @@
+---
+candidate: game-race-course
+service: gemini
+model: gemini-3-pro-image
+image: art/raw/scene-race-base-wide/scene-race-base-wide.png
+aspect_ratio: 21:9
+image_size: 4K
+---
+Edit this picture: remove the thin pale grid lines that are painted over it, everywhere, and paint what is under them, so that the lawn, the paths, the water, the hedges, the trees, the walls, the wood and every thing in it look as if the lines had never been drawn. Change nothing else at all: every tree, hedge, wall, plank, stone, bench, post, reed and shadow, and the colours and the light of the morning, stay exactly where they are, with exactly the same shapes and sizes, pixel for pixel. The same picture, only without the grid.

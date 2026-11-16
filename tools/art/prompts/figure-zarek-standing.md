@@ -1,0 +1,9 @@
+---
+candidate: figures
+service: gemini
+model: gemini-3-pro-image
+image: art/raw/figures/cast-reference.png
+aspect_ratio: 16:9
+image_size: 2K
+---
+The image given shows four characters of a children's game about a school of magic, in its style: two first-year pupils, a woman teacher and a man teacher. Draw a new pupil in exactly that style and with exactly their proportions, chibi: a very big head, about two fifths of the whole figure's height, on a small, short body with short legs, like the figures shown: Zarek, a boy a year older, as tall as halfway between the pupils and the teachers shown and slimmer, quick and proud, with a confident grin, short spiky black hair, light brown skin, a pointed wizard's hat of deep crimson with a silver band, and a long deep crimson school robe sprinkled with small silver stars, and brown boots. Draw four figures of him in one row, evenly spaced, each alone, with wide empty gaps between them, on a flat pure magenta (#FF00FF) background. First figure: facing the viewer. Second figure: facing to the left, seen from the side. Third figure: facing to the right, seen from the side. Fourth figure: his back to the viewer. In every figure he stands with his feet together, side by side, both flat on the ground and his weight on both, no step, no foot forward and no foot in the air; his arms at his sides. Every figure the same size, full body with the feet, standing on the same baseline; seen in the game's three-quarter top-down view, as in the image given, with the same big head and small body as the figures shown. No shadows, no ground, no broom, no text, no numbers, no grid lines, no frames. Style: painted cartoon 2D game art, exactly the style of the image given: bold dark outlines, warm saturated colours, soft painted shading, chunky readable shapes.

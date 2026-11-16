@@ -8,6 +8,9 @@ that the figures stay the same drawing and only their colours change.
     tools/art/figures.py --pickup <boy|girl> <edit.png>
     tools/art/figures.py --win <boy|girl> <edit.png>
     tools/art/figures.py --standing <figure> <drawing.png>
+    tools/art/figures.py --fly <boy|girl> <edit.png>
+    tools/art/figures.py --drawn <figure> <drawing.png>
+    tools/art/figures.py --drawn-fly <figure> <drawing.png>
 
 A figure's standing frame, in every row of its sheet, has its feet together and its
 weight on both, and a walking frame is made from it (D147). --standing makes a
@@ -50,7 +53,15 @@ bases from Gemini's edits of the walking base (tools/art/prompts/figure-cast-
 <gender>.md, figure-pickup-<gender>.md); --win from an edit of a sheet of the
 standing frame (figure-act-<gender>.md); --sleep from an edit of the standing
 sheet --sleep-input makes (figure-sleep-<kind>.md); each is put back on the
-base's grid.
+base's grid. Last, four rows flying (D188), riding the broom the way it faces, from
+Gemini's edit of the walking base (--fly, figure-fly-<gender>.md): each row's middle
+figure, level, then a little up and a little down, for the bobbing (FLY_BASES).
+
+A figure with no sheet before it, a pupil a year older (DRAWN: Zarek, Rinlo), is made
+from a drawing of it standing still in the four views (--drawn), each view as tall as
+DRAWN says, its walking rows its standing frame three times; and its flying rows from a
+drawing of it riding the broom in the same four views (--drawn-fly), scaled as its
+standing views, bobbing as the wizard's. figures.json says its rows in `sheets`.
 """
 
 import argparse
@@ -101,7 +112,21 @@ SLEEP_BASES = {
 #: walking, casting and picking-up rows four each (down, left, right, up), then
 #: the celebrating one, then the sleeping one. A friend's sheet has its walking
 #: rows and its sleeping row after them (`sheets`, FRIEND_ROWS).
-ROWS = {"walk": 0, "cast": 4, "pickup": 8, "win": 12, "sleep": 13}
+ROWS = {"walk": 0, "cast": 4, "pickup": 8, "win": 12, "sleep": 13, "fly": 14}
+#: The wizard flying, by gender (D188): four rows, the ways' order, of three frames,
+#: level, a little up and a little down.
+FLY_BASES = {"boy": "wizard-fly-boy.webp", "girl": "wizard-fly-girl.webp"}
+#: How far a flying frame bobs up and down, in pixels.
+FLY_BOB = 3
+#: The figures made from a drawing of them standing (--drawn): how tall each is in its
+#: frame, in pixels, between the children's and the grown-ups', and the way each view
+#: of its drawings faces, from left to right. A pupil a year older (D188).
+DRAWN = {
+    "zarek": (106, ("down", "right", "left", "up")),
+    "rinlo": (106, ("down", "right", "left", "up")),
+}
+#: A drawn figure's rows (figures.json's `sheets`): walking, and flying when it flies.
+DRAWN_ROWS = {"walk": 0, "fly": 4}
 FRIEND_ROWS = {"walk": 0, "sleep": 4}
 #: How tall the figure is, at most, in each picking-up frame, against its standing
 #: height: bending, at the ground, half up again. A frame the edit draws taller
@@ -585,9 +610,147 @@ def make_sleep_base(kind: str, edit: Path, like: str | None = None) -> Path:
     return target
 
 
-def drawn_views(drawing: Image.Image) -> list[Image.Image]:
+def alone(cell: Image.Image) -> Image.Image:
+    """A frame with only its figure: the largest group of its drawn pixels, touching
+    side by side or corner to corner, without the bits of a neighbouring figure an edit
+    or a drawing left at its edge."""
+    pixels = np.array(cell.convert("RGBA"))
+    drawn = pixels[..., 3] > 24
+    seen = np.zeros(drawn.shape, dtype=np.int32)
+    groups = []
+    for y, x in zip(*np.nonzero(drawn), strict=True):
+        if seen[y, x]:
+            continue
+        number = len(groups) + 1
+        seen[y, x] = number
+        stack, size = [(y, x)], 0
+        while stack:
+            cy, cx = stack.pop()
+            size += 1
+            for ny in (cy - 1, cy, cy + 1):
+                for nx in (cx - 1, cx, cx + 1):
+                    inside = 0 <= ny < drawn.shape[0] and 0 <= nx < drawn.shape[1]
+                    if inside and drawn[ny, nx] and not seen[ny, nx]:
+                        seen[ny, nx] = number
+                        stack.append((ny, nx))
+        groups.append(size)
+    if not groups:
+        return cell
+    keep = seen == int(np.argmax(groups)) + 1
+    pixels[~keep] = 0
+    return Image.fromarray(pixels, "RGBA")
+
+
+def bobbing(level: Image.Image, frame: tuple[int, int]) -> Image.Image:
+    """A row of three flying frames from its level one (D188): level, FLY_BOB pixels up
+    and FLY_BOB pixels down."""
+    fw, fh = frame
+    level = alone(level)
+    row = Image.new("RGBA", (fw * 3, fh), (0, 0, 0, 0))
+    for index, dy in enumerate((0, -FLY_BOB, FLY_BOB)):
+        moved = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+        moved.alpha_composite(level, (0, dy) if dy >= 0 else (0, 0), (0, max(0, -dy), fw, fh))
+        row.alpha_composite(moved, (index * fw, 0))
+    return row
+
+
+def make_fly_base(gender: str, edit: Path) -> Path:
+    """The flying base of a gender, from Gemini's edit of its walking base (D188): each
+    row's middle figure put back on the base's grid, then bobbing."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    frame = tuple(about["frame"])
+    fw, fh = frame
+    base = Image.open(BASE_DIR / BASES[gender][0])
+    edited = from_edit(Image.open(edit), base, frame)
+    rows = [
+        bobbing(edited.crop((fw, row * fh, 2 * fw, (row + 1) * fh)), frame) for row in range(4)
+    ]
+    target = BASE_DIR / FLY_BASES[gender]
+    stacked(*rows).save(target, quality=90, method=6)
+    return target
+
+
+def framed(view: Image.Image, scale: float, about: dict) -> Image.Image:
+    """A drawn view in its frame, `scale` times its size, its feet on the frame's foot
+    line and its middle in the frame's middle; what is wider than the frame cut at its
+    sides."""
+    fw, fh = tuple(about["frame"])
+    small = view.resize((round(view.width * scale), round(view.height * scale)), Image.LANCZOS)
+    if small.width > fw:
+        side = (small.width - fw) // 2
+        small = small.crop((side, 0, side + fw, small.height))
+    cell = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+    cell.alpha_composite(small, ((fw - small.width) // 2, fh - about["foot"] - small.height))
+    return cell
+
+
+def drawn_rows(
+    name: str, drawing: Path, scale: float | None = None
+) -> tuple[list[Image.Image], float]:
+    """A drawing's four views in their frames, in the ways' order, the first as tall as
+    DRAWN says unless a scale is given; and the scale."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    tall, order = DRAWN[name]
+    views = drawn_views(Image.open(drawing))
+    if len(views) != len(order):
+        # Views drawn so close that a broom touches the next: the drawing in as many
+        # equal parts as it has views, each its figure's.
+        views = drawn_views(Image.open(drawing), len(order))
+    if len(views) != len(order):
+        raise SystemExit(f"{drawing}: {len(views)} figures drawn, {len(order)} wanted")
+    scale = scale or tall / views[0].height
+    by_way = {
+        named.lstrip("-"): alone(framed(view, scale, about))
+        for view, named in zip(views, order, strict=True)
+    }
+    return [by_way[way] for way in about["ways"]], scale
+
+
+def drawn_sheet(name: str) -> Path:
+    """A drawn figure's sheet: its walking rows, and its flying rows when it has them."""
+    parts = [Image.open(BASE_DIR / f"{name}-standing.webp").convert("RGBA")]
+    if (BASE_DIR / f"{name}-fly.webp").is_file():
+        parts.append(Image.open(BASE_DIR / f"{name}-fly.webp").convert("RGBA"))
+    target = FIGURES / f"{name}.webp"
+    stacked(*parts).save(target, quality=90, method=6)
+    return target
+
+
+def make_drawn(name: str, drawing: Path) -> Path:
+    """A figure's walking rows from a drawing of it standing still in the four views
+    (DRAWN), its standing frame three times a row, kept with the scale they were drawn
+    at; its sheet made."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    fw, fh = tuple(about["frame"])
+    cells, scale = drawn_rows(name, drawing)
+    rows = []
+    for cell in cells:
+        row = Image.new("RGBA", (fw * 3, fh), (0, 0, 0, 0))
+        for index in range(3):
+            row.alpha_composite(cell, (index * fw, 0))
+        rows.append(row)
+    stacked(*rows).save(BASE_DIR / f"{name}-standing.webp", quality=90, method=6)
+    (RAW / "figures" / f"{name}-scale.txt").write_text(f"{scale}\n", encoding="utf-8")
+    return drawn_sheet(name)
+
+
+def make_drawn_fly(name: str, drawing: Path) -> Path:
+    """A drawn figure's flying rows (D188), from a drawing of it riding the broom in the
+    four views, at the scale of its standing drawing, each bobbing; its sheet made."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    frame = tuple(about["frame"])
+    scale = float((RAW / "figures" / f"{name}-scale.txt").read_text(encoding="utf-8"))
+    cells, _ = drawn_rows(name, drawing, scale)
+    stacked(*(bobbing(cell, frame) for cell in cells)).save(
+        BASE_DIR / f"{name}-fly.webp", quality=90, method=6
+    )
+    return drawn_sheet(name)
+
+
+def drawn_views(drawing: Image.Image, parts: int = 0) -> list[Image.Image]:
     """A drawing's figures on flat magenta, from left to right, each cut to its own
-    box with the magenta made transparent: what the columns with nothing drawn part."""
+    box with the magenta made transparent: what the columns with nothing drawn part,
+    or, given `parts`, the drawing's equal parts across."""
     rgb = np.array(drawing.convert("RGB")).astype(int)
     distance = np.abs(rgb - np.array([255, 0, 255])).sum(axis=2)
     alpha = np.clip((distance - 90) * 3, 0, 255).astype(np.uint8)
@@ -597,6 +760,16 @@ def drawn_views(drawing: Image.Image) -> list[Image.Image]:
     solid = distance > 150
     columns = solid.any(axis=0)
     edges = np.flatnonzero(np.diff(np.concatenate(([0], columns.astype(int), [0]))))
+    if parts:
+        width = drawing.width / parts
+        edges = []
+        for index in range(parts):
+            inside = np.flatnonzero(columns[round(index * width) : round((index + 1) * width)])
+            edges += [
+                round(index * width) + int(inside[0]),
+                round(index * width) + int(inside[-1]) + 1,
+            ]
+        edges = np.array(edges)
     views = []
     for start, end in zip(edges[::2], edges[1::2], strict=True):
         if end - start < drawing.width // 40:
@@ -665,6 +838,11 @@ def make(check: bool = False) -> list[Path]:
         for key, name in SLEEP_BASES.items()
         if (BASE_DIR / name).is_file()
     }
+    flies = {
+        key: Image.open(BASE_DIR / name).convert("RGBA")
+        for key, name in FLY_BASES.items()
+        if (BASE_DIR / name).is_file()
+    }
     written = []
     for look_id, look in looks().items():
         base, hues = bases[look["gender"]]
@@ -675,6 +853,11 @@ def make(check: bool = False) -> list[Path]:
             recolour_sheet(pickups[look["gender"]], frame, colours, hues),
             recolour_sheet(wins[look["gender"]], frame, colours, hues),
             recolour_sheet(sleeps[look["gender"]], frame, colours, hues),
+            *(
+                [recolour_sheet(flies[look["gender"]], frame, colours, hues)]
+                if look["gender"] in flies
+                else []
+            ),
         )
         target = FIGURES / f"wizard-{look_id}.webp"
         sized(sheet, frame, about["foot"]).save(target, quality=90, method=6)
@@ -703,6 +886,11 @@ def make(check: bool = False) -> list[Path]:
     about["sheets"] = {
         f"{name}-{set_name}": FRIEND_ROWS for name in FRIENDS for set_name in sets[name]
     }
+    # A drawn figure says its rows, the flying ones where it has them (D188).
+    for name in DRAWN:
+        if (FIGURES / f"{name}.webp").is_file():
+            flying = (BASE_DIR / f"{name}-fly.webp").is_file()
+            about["sheets"][name] = DRAWN_ROWS if flying else {"walk": 0}
     (FIGURES / "figures.json").write_text(json.dumps(about, indent=2) + "\n", encoding="utf-8")
     if check:
         sheets = [Image.open(p).convert("RGBA") for p in written]
@@ -743,6 +931,18 @@ def main() -> int:
         help="make a figure's sheet again from a drawing of it standing still",
     )
     parser.add_argument(
+        "--fly", nargs=2, metavar=("GENDER", "EDIT"), help="make a flying base from an edit"
+    )
+    parser.add_argument(
+        "--drawn", nargs=2, metavar=("FIGURE", "DRAWING"), help="make a figure from a drawing"
+    )
+    parser.add_argument(
+        "--drawn-fly",
+        nargs=2,
+        metavar=("FIGURE", "DRAWING"),
+        help="make a drawn figure's flying rows from a drawing of it on its broom",
+    )
+    parser.add_argument(
         "--like",
         metavar="KIND",
         help="with --sleep, for an edit of other figures: as tall as KIND",
@@ -750,6 +950,15 @@ def main() -> int:
     args = parser.parse_args()
     if args.standing:
         print(make_standing(args.standing[0], Path(args.standing[1])).relative_to(REPO))
+        return 0
+    if args.fly:
+        print(make_fly_base(args.fly[0], Path(args.fly[1])).relative_to(REPO))
+        return 0
+    if args.drawn:
+        print(make_drawn(args.drawn[0], Path(args.drawn[1])).relative_to(REPO))
+        return 0
+    if args.drawn_fly:
+        print(make_drawn_fly(args.drawn_fly[0], Path(args.drawn_fly[1])).relative_to(REPO))
         return 0
     if args.sleep_input:
         print(make_sleep_input(args.sleep_input).relative_to(REPO))

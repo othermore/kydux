@@ -14,6 +14,7 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools" / "art"))
 import cut  # noqa: E402
 import door  # noqa: E402
+import figures  # noqa: E402
 import generate  # noqa: E402
 import sprites  # noqa: E402
 
@@ -738,13 +739,18 @@ def test_every_figure_passes_under_the_doors_it_walks_through():
     # figure that walks through.
     names = json.loads((FIGURES / "figures.json").read_text())["figures"]
     children = [n for n in names if n.startswith(("wizard-", "nuri-", "teku-")) or n == "eldra"]
-    grown = [n for n in names if n not in children]
+    # The pupils a year older, taller than the first-years and shorter than the
+    # grown-ups (D188).
+    older = [n for n in names if n in ("zarek", "rinlo")]
+    grown = [n for n in names if n not in children and n not in older]
     child = max(standing_height(n) for n in children)
     adult = max(standing_height(n) for n in grown)
     assert child <= 1.15 and adult <= 1.31
     # Eldra, a ghost, keeps to her nook and never walks through a door.
     walker = max(standing_height(n) for n in children if n != "eldra")
     assert min(standing_height(n) for n in grown) > walker + 0.05
+    for name in older:
+        assert walker < standing_height(name) < min(standing_height(n) for n in grown), name
     for scene in export_scene.scenes():
         for name, thing in export_scene.settings(scene).things.items():
             if "opening" in thing:
@@ -1310,17 +1316,22 @@ def test_the_exported_figures_are_sheets_of_four_ways_and_three_frames():
     width, height = data["frame"]
     assert data["ways"] == ["down", "left", "right", "up"] and data["frames"] == 3
     # A wizard's sheet has its four casting rows after its four walking ones, its
-    # four picking-up rows, its celebrating one and its sleeping one, where
-    # figures.json's rows say; a friend's has its walking rows and its sleeping
-    # one, where its `sheets` say (D91).
+    # four picking-up rows, its celebrating one, its sleeping one and its four flying
+    # ones, where figures.json's rows say; a friend's has its walking rows and its
+    # sleeping one, where its `sheets` say (D91), and a pupil a year older its walking
+    # rows and, when it flies, its flying ones (D188).
     named = data["rows"]
-    assert named == {"walk": 0, "cast": 4, "pickup": 8, "win": 12, "sleep": 13}
-    wizard_rows = max(named.values()) + 1
+    assert named == {"walk": 0, "cast": 4, "pickup": 8, "win": 12, "sleep": 13, "fly": 14}
+    wizard_rows = max(named.values()) + 4
     sheets = data.get("sheets", {})
     for name in data["figures"]:
         sheet = Image.open(FIGURES / f"{name}.webp")
         if name in sheets:
-            rows = max(sheets[name].values()) + 1
+            # A part of four rows, one a way, or of one.
+            rows = max(
+                start + (1 if part in ("sleep", "win") else 4)
+                for part, start in sheets[name].items()
+            )
         else:
             rows = wizard_rows if name.startswith("wizard-") else 4
         assert sheet.size == (3 * width, rows * height), name
@@ -1808,3 +1819,32 @@ def test_the_sheet_of_everyone_draws_no_figure_in_a_dark_tunnel():
 
     assert differs(19, 1) == 0
     assert differs(15, 5) > 0
+
+
+def test_a_sprite_painted_on_a_lawn_keeps_only_its_own_piece(tmp_path):
+    # A ring of wood on a striped lawn, its hole the lawn, and a stone apart from it.
+    picture = np.zeros((60, 60, 3), dtype=np.uint8)
+    picture[:30] = (190, 196, 80)  # a light stripe, about as red as green
+    picture[30:] = (110, 150, 50)  # a dark one
+    yy, xx = np.mgrid[:60, :60]
+    distance = np.hypot(yy - 30, xx - 25)
+    picture[(distance < 15) & (distance > 9)] = (150, 95, 50)
+    picture[50:56, 50:56] = (120, 120, 125)
+    Image.fromarray(picture).save(tmp_path / "ring.png")
+    out = sprites.sprite(tmp_path / "ring.png", tmp_path / "ring.webp", (0, 0, 60, 60), 30, True)
+    alpha = np.array(Image.open(out).convert("RGBA"))[..., 3]
+    assert alpha.shape[0] == 30
+    assert alpha[15, alpha.shape[1] // 2] == 0  # the hole is the lawn's
+    assert alpha.max() == 255 and alpha.mean() < 160
+
+
+def test_a_flying_frame_bobs_up_and_down_and_keeps_only_its_figure():
+    frame = (20, 30)
+    cell = Image.new("RGBA", frame, (0, 0, 0, 0))
+    cell.paste((200, 0, 0, 255), (5, 10, 15, 25))
+    cell.paste((0, 0, 200, 255), (0, 0, 2, 2))  # a bit of the next figure
+    row = np.array(figures.bobbing(cell, frame))
+    assert row.shape[:2] == (30, 60)
+    tops = [np.nonzero(row[:, 20 * i : 20 * (i + 1), 3].any(axis=1))[0][0] for i in range(3)]
+    assert tops == [10, 10 - figures.FLY_BOB, 10 + figures.FLY_BOB]
+    assert not row[0:2, 0:2, 3].any()

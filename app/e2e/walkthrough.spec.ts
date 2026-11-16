@@ -9,6 +9,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
+import { ciTimes } from './support';
 
 const chapter = process.env.KYDUX_WALKTHROUGH ?? '';
 const CONTENT = fileURLToPath(new URL('../../content/', import.meta.url));
@@ -22,12 +23,12 @@ test.skip(chapter === '', 'only npm run walkthrough -- <chapter> plays it');
 /** A step played out: the scene done, or as it is if the step has no act. */
 async function settled(page: Page, ms = 30_000): Promise<void> {
   await page.locator('#scene[data-state="done"]').waitFor({ timeout: ms }).catch(() => {});
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(ciTimes(400));
 }
 
 async function story(page: Page, id: string): Promise<void> {
   await page.goto(`/#story/${id}`);
-  await page.locator('#scene').waitFor({ timeout: 90_000 });
+  await page.locator('#scene').waitFor({ timeout: ciTimes(90_000) });
   await settled(page, 90_000);
   let step = 1;
   await page.screenshot({ path: `${OUT}story-${id}-${pad(step)}.png` });
@@ -37,7 +38,7 @@ async function story(page: Page, id: string): Promise<void> {
     await page.waitForFunction(
       (shown) => document.querySelector('#story-step')?.textContent !== shown,
       before,
-      { timeout: 30_000 },
+      { timeout: ciTimes(30_000) },
     );
     await settled(page);
     step += 1;
@@ -51,12 +52,12 @@ async function lessonPage(page: Page, id: string, number: number): Promise<void>
   const run = page.locator('.lesson-run-button');
   if ((await run.count()) > 0) {
     await run.click();
-    await page.locator('.lesson-run[data-state="done"]').waitFor({ timeout: 120_000 });
+    await page.locator('.lesson-run[data-state="done"]').waitFor({ timeout: ciTimes(120_000) });
     const plan = page.locator('#plan');
     if ((await plan.count()) > 0) {
       await plan.locator('#plan-canvas').waitFor();
       await page.waitForFunction(() => document.querySelector<HTMLElement>('#plan')?.dataset.drawn, null, {
-        timeout: 30_000,
+        timeout: ciTimes(30_000),
       });
       await page.screenshot({ path: `${OUT}lesson-${id}-${pad(number)}-plano.png` });
       await page.locator('#plan-close').click();
@@ -67,7 +68,7 @@ async function lessonPage(page: Page, id: string, number: number): Promise<void>
 
 async function lesson(page: Page, id: string): Promise<void> {
   await page.goto(`/#lesson/${id}`);
-  await page.locator('.lesson-page').waitFor({ timeout: 60_000 });
+  await page.locator('.lesson-page').waitFor({ timeout: ciTimes(60_000) });
   let number = 1;
   await lessonPage(page, id, number);
   while ((await page.locator('#lesson-next').count()) > 0) {
@@ -92,7 +93,7 @@ async function route(page: Page, id: string, way: string): Promise<void> {
     await timeline.fill(String(tick));
     await page
       .waitForFunction((t) => document.querySelector('#scene')?.getAttribute('data-tick') === String(t), tick, {
-        timeout: 10_000,
+        timeout: ciTimes(10_000),
       })
       .catch(() => {});
     await page.waitForTimeout(350);
@@ -104,7 +105,7 @@ async function route(page: Page, id: string, way: string): Promise<void> {
           return !scene?.dataset.fading && !scene?.dataset.opening;
         },
         null,
-        { timeout: 10_000 },
+        { timeout: ciTimes(10_000) },
       )
       .catch(() => {});
     await page.locator('.scene-frame').screenshot({ path: `${OUT}level-${id}-${way}-tick-${pad(tick)}.png` });
@@ -123,23 +124,23 @@ async function level(page: Page, id: string): Promise<void> {
   const solution = readFileSync(`${CONTENT}levels/${id}/solution.py`, 'utf8');
   const ways: string[] = (spec.ways ?? []).map((way: { id: string }) => way.id);
   await page.goto(`/#level/${id}`);
-  await page.locator('#start').waitFor({ timeout: 90_000 });
-  await page.waitForTimeout(400);
+  await page.locator('#start').waitFor({ timeout: ciTimes(90_000) });
+  await page.waitForTimeout(ciTimes(400));
   await page.screenshot({ path: `${OUT}level-${id}-00-tarjeta.png` });
   await page.locator('#start').click();
-  await page.locator('#guide-skip').click({ timeout: 2_000 }).catch(() => {});
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await page.locator('#guide-skip').click({ timeout: ciTimes(2_000) }).catch(() => {});
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('#speed').selectOption('4');
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(ciTimes(800));
   await page.screenshot({ path: `${OUT}level-${id}-01-inicio.png` });
   await typed(page, solution);
-  await page.locator('.outcome').waitFor({ timeout: 90_000 });
-  await page.waitForTimeout(500);
+  await page.locator('.outcome').waitFor({ timeout: ciTimes(90_000) });
+  await page.waitForTimeout(ciTimes(500));
   for (const [index, way] of (ways.length > 0 ? ways : ['unica']).entries()) {
     if (way !== 'unica') {
       await page.locator('#way').selectOption(way, { force: true });
-      await expect(page.locator('.outcome-text')).toContainText('Lo has conseguido', { timeout: 90_000 }).catch(() => {});
-      await page.waitForTimeout(500);
+      await expect(page.locator('.outcome-text')).toContainText('Lo has conseguido', { timeout: ciTimes(90_000) }).catch(() => {});
+      await page.waitForTimeout(ciTimes(500));
     }
     await page.screenshot({ path: `${OUT}level-${id}-${way}-ganado.png` });
     // The route tick by tick of the first way only; every way shows its won card (the
@@ -149,13 +150,13 @@ async function level(page: Page, id: string): Promise<void> {
   // The map opens wherever it is carried.
   if ((spec.carrying ?? []).includes('map')) {
     await typed(page, `wizard.cast("orvim")\n${solution}`);
-    await page.locator('#plan').waitFor({ timeout: 60_000 });
+    await page.locator('#plan').waitFor({ timeout: ciTimes(60_000) });
     await page.waitForFunction(() => document.querySelector<HTMLElement>('#plan')?.dataset.drawn, null, {
-      timeout: 30_000,
+      timeout: ciTimes(30_000),
     });
     await page.screenshot({ path: `${OUT}level-${id}-plano.png` });
     await page.keyboard.press('Escape');
-    await page.locator('.outcome').waitFor({ timeout: 90_000 });
+    await page.locator('.outcome').waitFor({ timeout: ciTimes(90_000) });
   }
 }
 

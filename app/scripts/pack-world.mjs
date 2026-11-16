@@ -1,7 +1,8 @@
 // Pack kydux_world into public/world.zip, which the worker unpacks into Pyodide's
 // file system, and copy the levels into public/content/ for the page to fetch:
 // what the game needs of a level, never its solution or its wrong answers,
-// which are the tests' and would otherwise ship with the game.
+// which are the tests'. The solutions go apart, for the tester's button under
+// ?debug alone (public/__debug/solution/).
 //
 // The content is made in a folder of its own, then brought into public/content/
 // file by file: a file unchanged is left alone, a file changed is written over,
@@ -288,6 +289,20 @@ function bring(from, to) {
   }
 }
 bring(content, join(publicDir, 'content'));
+
+// The tester's button, under ?debug (src/ui/level.ts), writes a level's solution in
+// the editor: each level's solution.py as public/__debug/solution/<level>, apart
+// from the content the game reads and from the packed world.
+const solutions = mkdtempSync(join(tmpdir(), 'kydux-solutions-'));
+process.on('exit', () => rmSync(solutions, { recursive: true, force: true }));
+const levelsDir = join(repo, 'content', 'levels');
+if (existsSync(levelsDir)) {
+  for (const id of readdirSync(levelsDir)) {
+    const solution = join(levelsDir, id, 'solution.py');
+    if (existsSync(solution)) writeFileSync(join(solutions, id), readFileSync(solution));
+  }
+}
+bring(solutions, join(publicDir, '__debug', 'solution'));
 
 // The world and the content packed with it, stamped; the zip written last, with
 // its stamp, beside the stamp the page is built with.

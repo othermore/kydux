@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
 import { skipGuide, levelText } from './helpers';
+import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
 
@@ -10,7 +11,7 @@ mkdirSync(SHOTS, { recursive: true });
 
 async function open(page: Page, id: string): Promise<void> {
   await page.goto(`/#level/${id}`);
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('#speed').selectOption('4');
 }
 
@@ -19,7 +20,7 @@ async function run(page: Page, code: string): Promise<string> {
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText(code);
   await page.locator('#run').click();
-  await expect(page.locator('.outcome')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
   return page.locator('.outcome-text').innerText();
 }
 
@@ -51,7 +52,7 @@ test.describe('the hidden key', () => {
     await expect(scene(page)).not.toHaveAttribute('data-shaking', /.*/);
     await expect(page.locator('.outcome-text')).toHaveText(
       'Not yet: 0 of 3 goals met. Try again.\nOn line 1: I cannot reach the door from here.',
-      { timeout: 30_000 },
+      { timeout: ciTimes(30_000) },
     );
   });
 
@@ -63,7 +64,7 @@ test.describe('the hidden key', () => {
     await page.locator('#run').click();
     // The shake is short: looked for often, before the thought, which stays.
     await expect
-      .poll(() => scene(page).getAttribute('data-shaking'), { intervals: [50], timeout: 15_000 })
+      .poll(() => scene(page).getAttribute('data-shaking'), { intervals: [50], timeout: ciTimes(15_000) })
       .toBe('true');
     await expect(scene(page)).toHaveAttribute(
       'data-thought',
@@ -71,7 +72,7 @@ test.describe('the hidden key', () => {
     );
     await expect(page.locator('.outcome-text')).toContainText(
       'On line 3: I cannot open the door: it is locked',
-      { timeout: 30_000 },
+      { timeout: ciTimes(30_000) },
     );
   });
 
@@ -107,8 +108,8 @@ test.describe('past the teacher', () => {
     // Each tick shows for a moment: looked at often, so that none is missed however
     // long the run takes to start.
     const actors = () => scene(page).getAttribute('data-actors');
-    await expect.poll(actors, { intervals: [50], timeout: 10_000 }).toMatch(/dask:3,7,right/);
-    await expect.poll(actors, { intervals: [50], timeout: 10_000 }).toMatch(/dask:5,7,right/);
+    await expect.poll(actors, { intervals: [50], timeout: ciTimes(10_000) }).toMatch(/dask:3,7,right/);
+    await expect.poll(actors, { intervals: [50], timeout: ciTimes(10_000) }).toMatch(/dask:5,7,right/);
   });
 
   test('walking straight in gets the wizard caught', async ({ page }) => {
@@ -152,7 +153,7 @@ test.describe('chapter 1', () => {
       await page.goto(`/#level/${id}`);
       await page.locator('#start').click();
       if (id === 'the-gate') await skipGuide(page);
-      await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+      await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
       await page.locator('#speed').selectOption('4');
       expect(await run(page, code)).toMatch(/^You did it/);
     });
@@ -163,7 +164,7 @@ test.describe('the sealed door (D42, D43)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#level/the-sealed-door');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   });
 
   test('the wand is carried from the level before, and the gate behind is open', async ({ page }) => {
@@ -210,17 +211,17 @@ test.describe('the way in (D171)', () => {
       const page = await context.newPage();
       await page.goto('/#level/the-way-in');
       await page.locator('#start').click();
-      await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+      await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
       await page.locator('#speed').selectOption('4');
       await page.locator('.cm-content').click();
       await page.keyboard.press('ControlOrMeta+A');
       await page.keyboard.insertText('wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")\nwizard.move_up(3)');
       await page.locator('#run').click();
-      await expect(scene(page)).toHaveAttribute('data-thought', words, { timeout: 30_000 });
+      await expect(scene(page)).toHaveAttribute('data-thought', words, { timeout: ciTimes(30_000) });
       await expect(scene(page)).toHaveAttribute('data-wizard', '8,6');
       // Won, and not a star lost to a bump: the hall's cell refused it, no wall hit it.
       await expect(page.locator('.win-card #star-reasons li').nth(1)).toHaveAttribute('data-kept', 'true', {
-        timeout: 30_000,
+        timeout: ciTimes(30_000),
       });
       await context.close();
     });
@@ -231,39 +232,39 @@ test.describe('the card waits for the words (D175)', () => {
   test("the threshold's words stay until they are read, and the card comes after them", async ({ page }) => {
     await page.goto('/#level/the-way-in');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.move_up(2)\nwizard.cast("zelim")\nwizard.say("ambrel")\nwizard.move_up(5)');
     await page.locator('#run').click();
     const words = 'Do not go in yet: stay on the threshold, past the door.';
-    await expect(scene(page)).toHaveAttribute('data-thought', words, { timeout: 30_000 });
-    await expect(scene(page)).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-thought', words, { timeout: ciTimes(30_000) });
+    await expect(scene(page)).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
     // The run is over and its words are still being read: no card over them.
-    await page.waitForTimeout(1_500);
+    await page.waitForTimeout(ciTimes(1_500));
     await expect(scene(page)).toHaveAttribute('data-thought', words);
     await expect(page.locator('.win-card')).toHaveCount(0);
     await expect(page.locator('.outcome')).toBeHidden();
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s37-words-before-the-card.png` });
     // Once they are read, they go, and the card comes.
-    await expect(page.locator('.win-card')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(15_000) });
     await expect(scene(page)).not.toHaveAttribute('data-thought', /./);
   });
 
   test('a run won with a word said at its end shows its card once the word is gone', async ({ page }) => {
     await page.goto('/#level/the-password');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.say("ambrel")\nwizard.move_up(6)\nwizard.say("Here I am, at last!")');
     await page.locator('#run').click();
-    await expect(scene(page)).toHaveAttribute('data-bubble', 'Here I am, at last!', { timeout: 30_000 });
-    await expect(scene(page)).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-bubble', 'Here I am, at last!', { timeout: ciTimes(30_000) });
+    await expect(scene(page)).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
     await expect(page.locator('.win-card')).toHaveCount(0);
-    await expect(page.locator('.win-card')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(15_000) });
     await expect(scene(page)).not.toHaveAttribute('data-bubble', /./);
   });
 });
@@ -275,7 +276,7 @@ test.describe('chapter 2', () => {
     test(`${id} is won by its solution`, async ({ page }) => {
       await page.goto(`/#level/${id}`);
       await page.locator('#start').click();
-      await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+      await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
       await page.locator('#speed').selectOption('4');
       expect(await run(page, code)).toMatch(/^You did it/);
     });
@@ -287,7 +288,7 @@ test.describe('chapter 2', () => {
     await page.goto('/#level/the-lost-book');
     await expect(page.locator('#card-intro')).toContainText('Eldra');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     // Laid by the pile of books, the book is drawn in its cell's middle (D109).
     await expect(scene(page)).toHaveAttribute('data-drawn', /old_book:1\.50,13\.50/);
     await page.locator('#speed').selectOption('4');
@@ -299,7 +300,7 @@ test.describe('chapter 2', () => {
   test('the book in hand is asked for with find_item, unseen until it is given (D123)', async ({ page }) => {
     await page.goto('/#level/the-book-returned');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await expect(scene(page)).toHaveAttribute('data-carried', 'book,wand');
     await expect(scene(page)).not.toHaveAttribute('data-drawn', /book:/);
     await page.locator('#speed').selectOption('4');
@@ -312,7 +313,7 @@ test.describe('chapter 2', () => {
   test('giving with no one beside the wizard says so', async ({ page }) => {
     await page.goto('/#level/the-book-returned');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
     await run(page, 'book = wizard.find_item("book")\nwizard.give(book)');
     await expect(page.locator('.outcome-text')).toContainText('There is no one beside me to give it to.');
@@ -323,7 +324,7 @@ test.describe('chapter 2', () => {
  * and where it goes, in cells, and a screenshot half-way. */
 async function watchGive(page: Page, shot: string): Promise<{ from: [number, number]; to: [number, number] }> {
   await page.waitForFunction(() => document.querySelector('#scene')?.hasAttribute('data-given'), null, {
-    timeout: 60_000,
+    timeout: ciTimes(60_000),
     polling: 'raf',
   });
   await page.waitForTimeout(200);
@@ -338,7 +339,7 @@ test.describe('a thing given goes to who takes it (D48)', () => {
   test('in The book returned, the book rises from the wizard to Eldra above', async ({ page }) => {
     await page.goto('/#level/the-book-returned');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
@@ -355,7 +356,7 @@ test.describe('a thing given goes to who takes it (D48)', () => {
   test("in Eldra's room, the book goes sideways to Eldra beside the wizard", async ({ page }) => {
     await page.goto('/#level/eldras-room');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
@@ -374,7 +375,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
     await page.goto('/#level/eldras-room');
     await expect(page.locator('#card-carrying')).toHaveText('You carry the wand.');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   });
 
   test('the wizard holds the wand from the start', async ({ page }) => {
@@ -418,7 +419,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
     // Half a tick into the cast (tick 2), the light is on its way and the book on its
     // shelf: the tick's start waited for frame by frame, as an expect's polls come late.
     await page.waitForFunction(() => document.querySelector('#scene')?.getAttribute('data-tick') === '2', null, {
-      timeout: 60_000,
+      timeout: ciTimes(60_000),
       polling: 'raf',
     });
     await page.waitForTimeout(170);
@@ -449,7 +450,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
     const taken = seen.findIndex((state) => state.endsWith(':carried:-'));
     expect(taken, seen.join(' ')).toBeGreaterThan(-1);
     expect(seen.indexOf('5:-:drawn'), seen.join(' ')).toBeGreaterThan(taken);
-    await expect(page.locator('.outcome-text')).toContainText('You did it', { timeout: 30_000 });
+    await expect(page.locator('.outcome-text')).toContainText('You did it', { timeout: ciTimes(30_000) });
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-eldras-room-win.png` });
   });
 
@@ -461,7 +462,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
     await expect(scene(page)).toHaveAttribute(
       'data-thought',
       'I can see the book up there, but it is too high to reach by hand.',
-      { timeout: 30_000 },
+      { timeout: ciTimes(30_000) },
     );
   });
 
@@ -471,7 +472,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
     await page.keyboard.insertText('book = wizard.find_nearest("book")\nwizard.cast("fendra", book)');
     await page.locator('#run').click();
     await expect(scene(page)).toHaveAttribute('data-thought', 'The spell cannot reach the book from here.', {
-      timeout: 15_000,
+      timeout: ciTimes(15_000),
     });
   });
 
@@ -486,8 +487,8 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('book = wizard.find_nearest("book")\nbook.reveal()\nwizard.wait(4)');
     await page.locator('#run').click();
-    await expect(scene(page)).toHaveAttribute('data-revealed', 'eldras_book', { timeout: 30_000 });
-    await page.waitForTimeout(400);
+    await expect(scene(page)).toHaveAttribute('data-revealed', 'eldras_book', { timeout: ciTimes(30_000) });
+    await page.waitForTimeout(ciTimes(400));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}revealed-book.png` });
   });
 });
@@ -499,7 +500,7 @@ test.describe('chapter 3', () => {
     test(`${id} is won by its solution`, async ({ page }) => {
       await page.goto(`/#level/${id}`);
       await page.locator('#start').click();
-      await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+      await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
       await page.locator('#speed').selectOption('4');
       // The editor closes no bracket of its own here: the code is typed as it is.
       expect(await run(page, code)).toMatch(/^You did it/);
@@ -512,7 +513,7 @@ test.describe('a level played two ways (D51)', () => {
     await page.goto('/#level/by-the-statues');
     await expect(page.locator('#card-ways li')).toHaveText(['Dask looks up', 'Dask looks down']);
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
   });
 
@@ -525,7 +526,7 @@ test.describe('a level played two ways (D51)', () => {
     await expect(page.locator('#way')).toBeVisible();
     await expect(page.locator('#way')).toHaveValue('looking_up');
     await page.locator('#way').selectOption('looking_down');
-    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks down”', { timeout: 30_000 });
+    await expect(page.locator('.outcome-text')).toContainText('In the way “Dask looks down”', { timeout: ciTimes(30_000) });
     await expect(page.locator('.outcome-text')).toContainText('Not every way yet');
     await expect(page.locator('.win-card')).toHaveCount(0);
   });
@@ -541,7 +542,7 @@ test.describe('the dark and the holes (D52, D53, D167)', () => {
   test('a dark room is covered until kirra lights it', async ({ page }) => {
     await page.goto('/#level/the-dark-room');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await expect(scene(page)).toHaveAttribute('data-dark', 'true');
     await page.locator('#speed').selectOption('4');
     await run(page, 'wizard.cast("kirra")');
@@ -551,7 +552,7 @@ test.describe('the dark and the holes (D52, D53, D167)', () => {
   test('a hole opens and closes, and a step onto it while it is open bumps', async ({ page }) => {
     await page.goto('/#level/the-opening-hole');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await expect(scene(page)).toHaveAttribute('data-holes', 'hole:closed');
     await page.locator('#speed').selectOption('4');
     await run(page, 'wizard.move_right(2)\nwizard.wait()\nprint(hole.open)\nwizard.move_right()');
@@ -562,7 +563,7 @@ test.describe('the dark and the holes (D52, D53, D167)', () => {
   test('osto beside the hole that never closes holds it closed (D178)', async ({ page }) => {
     await page.goto('/#level/the-night-walk');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
     await run(
       page,

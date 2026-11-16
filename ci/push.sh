@@ -6,12 +6,17 @@
 #                         dated inside them, ending now, then pushed
 #   ci/push.sh --later    the same at the next moment the hours allow, by a timer of
 #                         the user's systemd
+#   ci/push.sh --tags     only the check of the version tags it would push, below
 #
 # Nothing of Kydux's goes to GitHub by any other way. Only commits not yet on
 # origin/main are dated again, as the very last step before the push: a commit
 # once pushed never changes. An annotated tag, a version's (`git tag -a v0.0.4`),
 # goes with the commit it is on (--follow-tags, D179); a tag on a commit dated
 # again is made again on the commit's new self, with its message, dated now.
+#
+# Before anything, at any hour, it refuses a version tag `v<x>` it would push
+# whose commit's app/package.json does not say version <x>: the version commit
+# comes first, and the tag goes on it.
 
 set -eu
 
@@ -19,16 +24,54 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 HOURS="$REPO_ROOT/ci/hours.py"
 LATER=""
+TAGS=""
 for argument in "$@"; do
     case "$argument" in
         --later) LATER=yes ;;
-        *) echo "usage: $0 [--later]" >&2; exit 2 ;;
+        --tags) TAGS=yes ;;
+        *) echo "usage: $0 [--later | --tags]" >&2; exit 2 ;;
     esac
 done
+
+# The version a commit's app/package.json says, or nothing when it has none.
+version_at() {
+    git show "$1:app/package.json" 2>/dev/null |
+        python3 -c 'import json, sys; print(json.load(sys.stdin).get("version", ""))' 2>/dev/null || true
+}
+
+# Every annotated version tag on a commit of main that origin has not yet: the
+# tags --follow-tags takes up. Each must be on the commit of its own version.
+check_tags() {
+    remote="$(git ls-remote --tags origin 2>/dev/null | awk '{print $2}')" || remote=""
+    wrong=""
+    for tag in $(git tag --merged HEAD -l 'v*'); do
+        [ "$(git cat-file -t "$tag")" = tag ] || continue
+        if printf '%s\n' "$remote" | grep -qx "refs/tags/$tag"; then
+            continue
+        fi
+        commit="$(git rev-parse --short "$tag^{commit}")"
+        said="$(version_at "$tag^{commit}")"
+        if [ "$said" != "${tag#v}" ]; then
+            echo "$0: the tag $tag is on $commit, whose app/package.json says version" \
+                "${said:-none}, not ${tag#v}" >&2
+            wrong=yes
+        fi
+    done
+    if [ -n "$wrong" ]; then
+        echo "    Make the version commit first, then move the tag onto it:" >&2
+        echo "    git tag -f -a <tag> -m \"Version <x>\" <the version commit>" >&2
+        return 1
+    fi
+}
 
 if [ "$(git rev-parse --abbrev-ref HEAD)" != main ]; then
     echo "$0: only main is pushed, and this is $(git rev-parse --abbrev-ref HEAD)" >&2
     exit 2
+fi
+check_tags || exit 2
+if [ -n "$TAGS" ]; then
+    echo "==> The version tags to push are each on their version's commit."
+    exit 0
 fi
 if [ -n "$(git status --porcelain)" ]; then
     echo "$0: the tree has changes not committed:" >&2

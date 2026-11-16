@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
 
@@ -148,19 +149,19 @@ test.describe('a page runs its code (D142)', () => {
     await page.goto('/#lesson/where-i-am');
     await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 2');
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('(14, 2)', { timeout: 90_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('(14, 2)', { timeout: ciTimes(90_000) });
     await expect(page.locator('.lesson-said')).toBeHidden();
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('print(wizard.facing)');
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('down', { timeout: 30_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('down', { timeout: ciTimes(30_000) });
     // A mistake is told in the child's words.
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('print(dak.facing)');
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('dak', { timeout: 30_000 });
+    await expect(page.locator('.lesson-said')).toContainText('dak', { timeout: ciTimes(30_000) });
     await expect(page.locator('.lesson-printed')).toBeHidden();
   });
 
@@ -168,16 +169,16 @@ test.describe('a page runs its code (D142)', () => {
     await page.goto('/#lesson/true-or-false');
     await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 5');
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('up', { timeout: 90_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('up', { timeout: ciTimes(90_000) });
     await page.locator('#lesson-next').click();
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('True\nFalse', { timeout: 30_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('True\nFalse', { timeout: ciTimes(30_000) });
     await page.locator('#lesson-next').click();
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('False\nTrue', { timeout: 30_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('False\nTrue', { timeout: ciTimes(30_000) });
     await page.locator('#lesson-next').click();
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('False', { timeout: 30_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('False', { timeout: ciTimes(30_000) });
   });
 
   test('the block of if prints both lines while Dask looks up, and the cell alone once its condition says down (D174)', async ({
@@ -188,19 +189,19 @@ test.describe('a page runs its code (D142)', () => {
     await expect(page.locator('#lesson-page')).toHaveText('Page 2 of 2');
     await expect(page.locator('#lesson-next')).toHaveCount(0);
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('Looking up\nPosition: (11, 6)', { timeout: 90_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('Looking up\nPosition: (11, 6)', { timeout: ciTimes(90_000) });
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('if dask.facing == "down":\n    print("Looking up")\nprint("Position:", wizard.position)');
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('Position: (11, 6)', { timeout: 30_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('Position: (11, 6)', { timeout: ciTimes(30_000) });
   });
 
   test("the two coordinates print the cell's two numbers (D174)", async ({ page }) => {
     await page.goto('/#lesson/the-two-coordinates');
     for (let turn = 0; turn < 2; turn += 1) await page.locator('#lesson-next').click();
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-printed')).toHaveText('5\n7', { timeout: 90_000 });
+    await expect(page.locator('.lesson-printed')).toHaveText('5\n7', { timeout: ciTimes(90_000) });
   });
 
   test('a program typed that walks says its steps, never a cell, always from the start (D180)', async ({
@@ -214,22 +215,22 @@ test.describe('a page runs its code (D142)', () => {
     await page.keyboard.insertText('wizard.move_down(2)');
     await page.locator('.lesson-run button').click();
     const said = page.locator('.lesson-said');
-    await expect(said).toHaveText('The wizard has moved 2 steps down.', { timeout: 90_000 });
+    await expect(said).toHaveText('The wizard has moved 2 steps down.', { timeout: ciTimes(90_000) });
     // Again from the start: the same two steps, not four.
     await page.locator('.lesson-run button').click();
-    await expect(said).toHaveText('The wizard has moved 2 steps down.', { timeout: 30_000 });
+    await expect(said).toHaveText('The wizard has moved 2 steps down.', { timeout: ciTimes(30_000) });
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.move_down(2)\nwizard.move_left()');
     await page.locator('.lesson-run button').click();
-    await expect(said).toHaveText('The wizard has moved 2 steps down and 1 to the left.', { timeout: 30_000 });
+    await expect(said).toHaveText('The wizard has moved 2 steps down and 1 to the left.', { timeout: ciTimes(30_000) });
     await expect(said).not.toContainText('(');
     // Into Dask's sight, he sees the wizard: the page says it.
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.move_right(3)');
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-said')).toContainText('teacher', { timeout: 30_000 });
+    await expect(page.locator('.lesson-said')).toContainText('teacher', { timeout: ciTimes(30_000) });
   });
 
   test('a program typed that casts the map opens the plan, closed with its button', async ({ page }) => {
@@ -240,9 +241,9 @@ test.describe('a page runs its code (D142)', () => {
     await page.keyboard.insertText('wizard.cast("orvim")');
     await page.locator('.lesson-run button').click();
     const plan = page.locator('#plan');
-    await expect(plan).toBeVisible({ timeout: 90_000 });
+    await expect(plan).toBeVisible({ timeout: ciTimes(90_000) });
     await expect(plan).toHaveAttribute('data-figures', /wizard:11,6/);
-    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: ciTimes(30_000) });
     await page.locator('#plan-close').click();
     await expect(plan).toHaveCount(0);
   });
@@ -257,12 +258,12 @@ test.describe('a page runs its code (D142)', () => {
     await page.keyboard.insertText('wizard.move_down(2)');
     await page.locator('.lesson-run button').click();
     const said = page.locator('.lesson-said');
-    await expect(said).toHaveText('El mago se ha movido 2 pasos hacia abajo.', { timeout: 90_000 });
+    await expect(said).toHaveText('El mago se ha movido 2 pasos hacia abajo.', { timeout: ciTimes(90_000) });
     await page.locator('.lesson-run .cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.move_down()\nwizard.move_up()');
     await page.locator('.lesson-run button').click();
-    await expect(said).toHaveText('El mago ha vuelto a donde empezó.', { timeout: 30_000 });
+    await expect(said).toHaveText('El mago ha vuelto a donde empezó.', { timeout: ciTimes(30_000) });
     await context.close();
   });
 

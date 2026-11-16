@@ -359,7 +359,9 @@ row its foot stands on.
   in the sweep). Every mask but a box's, and one its thing says not to (`snap: false`),
   is moved onto its outline (`image_first.snapped`); a mask drawn inside the outline, Gemini's
   magenta, has the outline added and nothing taken away
-  (`image_first.rimmed`). A painting whose outlines are not black, a night
+  (`image_first.rimmed`), but for a wall's joint that meets the outline: in each ring of
+  pixels round the thing, a run shorter than six pixels is a joint crossing it, not the
+  thing's line (`min_run`). A painting whose outlines are not black, a night
   scene or a brown-lined room, gives its outline's darkness in `cut.json`
   (`thresholds`, `outline`).
 - **A thing is one thing, on the row of its foot** (D94). Where a thing is

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { levelText, seedWizard } from './helpers';
+import { ciTimes } from './support';
 
 const STAIRS = levelText('the-stairs', 'en').title;
 
@@ -11,13 +12,13 @@ test.beforeEach(async ({ page }) => seedWizard(page));
 
 async function winTheCorridor(page: Page): Promise<void> {
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('#speed').selectOption('4');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText('wizard.move_right(8)');
   await page.locator('#run').click();
-  await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(30_000) });
 }
 
 test('the start screen opens the game, and Continue opens the first lesson', async ({

@@ -69,8 +69,8 @@ const isolation = {
 };
 
 // The tester's button that writes a level's solution (src/ui/level.ts) asks
-// /__debug/solution/<level> of the development server, which reads it from
-// content/. Only `npm run dev` has it: the solutions never go into a build.
+// /__debug/solution/<level>: a build serves the file pack-world.mjs wrote there,
+// and the development server reads it from content/ as it is now.
 function debugSolutions(): Plugin {
   return {
     name: 'kydux-debug-solutions',

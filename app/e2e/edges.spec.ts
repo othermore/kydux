@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
 
@@ -22,7 +23,7 @@ test('Python that cannot start says so, with a way to reload', async ({ page }) 
   await page.goto('/#level/the-long-corridor');
   await expect(page.locator('.outcome-text')).toHaveText(
     'Python could not start. Reload the page to try again.',
-    { timeout: 60_000 },
+    { timeout: ciTimes(60_000) },
   );
   await expect(page.locator('#reload')).toBeVisible();
   await expect(page.locator('#run')).toBeDisabled();
@@ -30,15 +31,15 @@ test('Python that cannot start says so, with a way to reload', async ({ page }) 
 
 test('a Run during the playback starts the new run from the start', async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await setCode(page, 'wizard.move_right(8)');
   await page.locator('#run').click();
   // Under way: past its first steps, not yet at its end.
-  await expect(page.locator('#scene')).toHaveAttribute('data-tick', /^[2-7]$/, { timeout: 10_000 });
+  await expect(page.locator('#scene')).toHaveAttribute('data-tick', /^[2-7]$/, { timeout: ciTimes(10_000) });
   await setCode(page, 'wizard.move_right(2)');
   await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText('Not yet: 0 of 1 goals met. Try again.', {
-    timeout: 30_000,
+    timeout: ciTimes(30_000),
   });
   await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '6,25');
 });
@@ -52,26 +53,26 @@ test('without isolation, a loop that never ends is stopped by starting Python ag
   );
   await page.goto('/#level/the-long-corridor');
   await expect(page.locator('html')).toHaveAttribute('data-isolated', 'false');
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await setCode(page, 'while True:\n    pass');
   await page.locator('#run').click();
   await expect(page.locator('.outcome-text')).toHaveText(
     'Your program was stopped: it ran for more than 5 seconds without doing anything.',
-    { timeout: 15_000 },
+    { timeout: ciTimes(15_000) },
   );
   await expect(page.locator('#status')).toHaveText('Starting Python again…');
   await expect(page.locator('#run')).toBeDisabled();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 60_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(60_000) });
   await setCode(page, 'wizard.move_right(8)');
   await page.locator('#run').click();
-  await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux!', { timeout: 30_000 });
+  await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux!', { timeout: ciTimes(30_000) });
 });
 
 test('the scene follows the size of the window', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/#level/the-long-corridor');
   const canvas = page.locator('#scene canvas');
-  await expect(canvas).toBeVisible({ timeout: 30_000 });
+  await expect(canvas).toBeVisible({ timeout: ciTimes(30_000) });
   const wide = (await canvas.boundingBox())?.width ?? 0;
   await page.setViewportSize({ width: 900, height: 700 });
   await expect.poll(async () => (await canvas.boundingBox())?.width ?? 0).toBeLessThan(wide);
@@ -79,7 +80,7 @@ test('the scene follows the size of the window', async ({ page }) => {
 
 test('the page may reach no other server, and the game still runs', async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   const blocked = await page.evaluate(
     () =>
       new Promise<string>((resolve) => {
@@ -92,18 +93,18 @@ test('the page may reach no other server, and the game still runs', async ({ pag
   expect(blocked).toBe('connect-src');
   await setCode(page, 'wizard.move_right(8)');
   await page.locator('#run').click();
-  await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux!', { timeout: 30_000 });
+  await expect(page.locator('.outcome-text')).toHaveText('You did it, Kydux!', { timeout: ciTimes(30_000) });
 });
 
 test("the child's code cannot reach JavaScript", async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   for (const code of ['import js', 'from pyodide.ffi import to_js', 'import sys\nprint(sys.modules["js"])']) {
     await setCode(page, code);
     await page.locator('#run').click();
     await expect(page.locator('.outcome-text')).toHaveText(
       /^(There is no book called (js|pyodide\.ffi) in the school's library|Python says: KeyError)/,
-      { timeout: 30_000 },
+      { timeout: ciTimes(30_000) },
     );
   }
 });

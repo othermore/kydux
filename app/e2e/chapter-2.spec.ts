@@ -9,6 +9,7 @@ import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, type SeededWizard, seedWizard, storyNext } from './helpers';
+import { ciTimes } from './support';
 
 const SHOTS = fileURLToPath(new URL('./shots/chapter-2/', import.meta.url));
 mkdirSync(SHOTS, { recursive: true });
@@ -26,7 +27,7 @@ test.use({ viewport: { width: 1280, height: 800 } });
 async function open(page: Page, id: string): Promise<void> {
   await page.goto(`/#level/${id}`);
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('#speed').selectOption('4');
 }
 
@@ -36,7 +37,7 @@ async function run(page: Page, code: string): Promise<string> {
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText(code);
   await page.locator('#run').click();
-  await expect(page.locator('.outcome')).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(60_000) });
   return page.locator('.outcome-text').innerText();
 }
 
@@ -97,13 +98,13 @@ test.describe('in the dormitory (D84)', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText(solution('your-bed'));
     await page.locator('#run').click();
-    await expect(page.locator('#scene')).toHaveAttribute('data-sleeping', 'bed_2', { timeout: 60_000 });
+    await expect(page.locator('#scene')).toHaveAttribute('data-sleeping', 'bed_2', { timeout: ciTimes(60_000) });
     await expect(page.locator('#scene')).toHaveAttribute('data-asleep', /wizard:bed_2:lying/);
     // Asleep under the quilt, the wizard is not outlined as hidden.
     await expect(page.locator('#scene')).not.toHaveAttribute('data-outlined', 'true');
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(ciTimes(400));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep.png` });
-    await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(30_000) });
   });
 
   test('the cell to sleep from is marked, and the wizard walks to the cell under the pillow, then hops in (D130)', async ({
@@ -130,7 +131,7 @@ test.describe('in the dormitory (D84)', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText(solution('your-bed'));
     await page.locator('#run').click();
-    await expect(scene).toHaveAttribute('data-asleep', /wizard:bed_2:lying/, { timeout: 60_000 });
+    await expect(scene).toHaveAttribute('data-asleep', /wizard:bed_2:lying/, { timeout: ciTimes(60_000) });
     const seen = await page.evaluate(() => (window as unknown as { kyduxSeen: [string, number][] }).kyduxSeen);
     // Down one cell, right two along the floor before the bed to the cell under the
     // pillow, a tick of 400 ms each at speed 1, then into the bed.
@@ -163,7 +164,7 @@ test.describe('in the dormitory (D84)', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText(solution('your-bed'));
     await page.locator('#run').click();
-    await expect(scene).toHaveAttribute('data-light', 'night', { timeout: 60_000 });
+    await expect(scene).toHaveAttribute('data-light', 'night', { timeout: ciTimes(60_000) });
     // The sleeper is seen asleep in the night, with no card over it.
     await expect(page.locator('.win-card')).toHaveCount(0);
     await expect(scene).toHaveAttribute('data-thought', 'z z z');
@@ -171,10 +172,10 @@ test.describe('in the dormitory (D84)', () => {
     await page.screenshot({ path: `${SHOTS}night.png` });
     // At the dawn the whole scene turns to day as the night lifts, its torches,
     // candles and fire out, and no light is laid over the morning (D126).
-    await expect(scene).toHaveAttribute('data-ground', 'morning', { timeout: 15_000 });
+    await expect(scene).toHaveAttribute('data-ground', 'morning', { timeout: ciTimes(15_000) });
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-morning-after-dawn.png` });
-    await expect(scene).toHaveAttribute('data-light', 'morning', { timeout: 15_000 });
-    await expect(page.locator('.win-card')).toBeVisible({ timeout: 15_000 });
+    await expect(scene).toHaveAttribute('data-light', 'morning', { timeout: ciTimes(15_000) });
+    await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(15_000) });
     await expect(scene).not.toHaveAttribute('data-thought', 'z z z');
     await page.screenshot({ path: `${SHOTS}morning-light.png` });
     expect(await page.evaluate(() => (window as unknown as { kyduxLights: string[] }).kyduxLights)).toEqual([
@@ -211,16 +212,16 @@ test.describe('in the dormitory (D84)', () => {
       }).observe(node, { attributes: true, attributeFilter: ['data-actors'] });
     });
     for (let step = 1; step < 9; step += 1) {
-      await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+      await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
       await storyNext(page);
     }
     // The mate half-way along the floor before bed_1, to the cell under its pillow.
     await page.waitForFunction(() => /mate:17,6/.test(document.querySelector('#scene')?.getAttribute('data-actors') ?? ''), null, {
-      timeout: 60_000,
+      timeout: ciTimes(60_000),
       polling: 'raf',
     });
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s27-mate-walk.png` });
-    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
     await expect(scene).toHaveAttribute('data-asleep', 'friend:bed_6:lying,mate:bed_1:lying');
     // Each walked round to the floor under its bed's pillow, and crossed no bed (D130).
     const walks = await page.evaluate(() => (window as unknown as { kyduxWalks: Record<string, string[]> }).kyduxWalks);
@@ -229,7 +230,7 @@ test.describe('in the dormitory (D84)', () => {
     expect(walks.mate!.filter((cell) => /^(1[7-9]|20),5$/.test(cell)), JSON.stringify(walks)).toEqual([]);
     // The first night is told on the night painting as it is (D124).
     await expect(scene).toHaveAttribute('data-light', 'none');
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(ciTimes(400));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-friend.png` });
   });
 
@@ -237,17 +238,17 @@ test.describe('in the dormitory (D84)', () => {
     await seedWizard(page, MARTA);
     await page.goto('/?debug#story/the-first-night');
     const scene = page.locator('#scene');
-    await expect(scene).toHaveAttribute('data-debug', 'true', { timeout: 90_000 });
+    await expect(scene).toHaveAttribute('data-debug', 'true', { timeout: ciTimes(90_000) });
     if ((await scene.getAttribute('data-debug-layers'))?.includes('cells') !== true) await page.locator('#debug-cells').click();
     for (let step = 1; step < 5; step += 1) {
-      await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+      await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
       await storyNext(page);
     }
     // Step 5: Ilda opens the door, steps out and shuts it; while it is open, the
     // cells its leaf lies on are not walked.
-    await expect(scene).toHaveAttribute('data-debug-leaves', '9,15;10,15', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-debug-leaves', '9,15;10,15', { timeout: ciTimes(30_000) });
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}door-leaf-debug.png` });
-    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
     await expect(scene).not.toHaveAttribute('data-debug-leaves', /./);
     await expect(scene).not.toHaveAttribute('data-shoved', /./);
   });
@@ -260,7 +261,7 @@ test.describe('in the dormitory (D84)', () => {
     // first step (D126).
     await expect(scene).toHaveAttribute('data-light', 'morning');
     await expect(scene).toHaveAttribute('data-ground', 'morning');
-    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
     await expect(scene).toHaveAttribute('data-asleep', 'mate:bed_1:lying');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}asleep-mate.png` });
     // Zoomed out, the windows with the morning sky in them, the fire and the
@@ -268,7 +269,7 @@ test.describe('in the dormitory (D84)', () => {
     while ((await page.locator('#zoom-out').count()) > 0 && (await page.locator('#zoom-out').isEnabled())) {
       await page.locator('#zoom-out').click();
     }
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(ciTimes(600));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-morning-story.png` });
     await storyNext(page);
     await expect(scene).not.toHaveAttribute('data-asleep', /mate/);
@@ -277,7 +278,7 @@ test.describe('in the dormitory (D84)', () => {
     // The two leave together (D103): the wizard opens the door, both go out, the
     // mate shuts it behind them.
     await storyNext(page, 3);
-    await expect(scene).toHaveAttribute('data-actors', /mate:13,12/, { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-actors', /mate:13,12/, { timeout: ciTimes(30_000) });
     await expect(scene).toHaveAttribute('data-wizard', '12,12');
     // Every fade of the door's pictures, as it comes: which picture, at which depth.
     await scene.evaluate((node) => {
@@ -289,8 +290,8 @@ test.describe('in the dormitory (D84)', () => {
       }).observe(node, { attributes: true, attributeFilter: ['data-fading'] });
     });
     await storyNext(page);
-    await expect(scene).toHaveAttribute('data-wizard', '11,15', { timeout: 30_000 });
-    await expect(scene).toHaveAttribute('data-actors', /mate:12,15/, { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-wizard', '11,15', { timeout: ciTimes(30_000) });
+    await expect(scene).toHaveAttribute('data-actors', /mate:12,15/, { timeout: ciTimes(30_000) });
     await expect(scene).not.toHaveAttribute('data-doors', /front_door/);
     // Opened and shut, each picture of the hour fades at its own depth: the open leaf,
     // swung against the row below, out above the shut door's depth (28.2).
@@ -301,10 +302,10 @@ test.describe('in the dormitory (D84)', () => {
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}morning-out.png` });
     // Back and Again keep the morning's light.
     await page.locator('#story-back').click();
-    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
     await expect(scene).toHaveAttribute('data-light', 'morning');
     await page.locator('#story-again').click();
-    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
     await expect(scene).toHaveAttribute('data-light', 'morning');
     await expect(scene).toHaveAttribute('data-ground', 'morning');
   });
@@ -324,10 +325,10 @@ test.describe('in the library (D85, D86, D51)', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('key = wizard.find_nearest("key")\nkey.reveal()\nwizard.wait(4)');
     await page.locator('#run').click();
-    await expect(page.locator('#scene')).toHaveAttribute('data-revealed', 'key', { timeout: 30_000 });
+    await expect(page.locator('#scene')).toHaveAttribute('data-revealed', 'key', { timeout: ciTimes(30_000) });
     await page.screenshot({ path: `${SHOTS}revealed.png` });
     // The glow is the key's own shape, traced on its outline, with no line of the floor.
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(ciTimes(400));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-key-glow.png` });
   });
 
@@ -338,9 +339,9 @@ test.describe('in the library (D85, D86, D51)', () => {
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('book = wizard.find_nearest("book")\nbook.reveal()\nwizard.move_up(2)\nwizard.move_right(4)\nwizard.move_up(4)\nwizard.move_left(6)');
     await page.locator('#run').click();
-    await expect(page.locator('#scene')).toHaveAttribute('data-revealed', 'old_book', { timeout: 30_000 });
-    await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: 60_000 });
-    await page.waitForTimeout(400);
+    await expect(page.locator('#scene')).toHaveAttribute('data-revealed', 'old_book', { timeout: ciTimes(30_000) });
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+    await page.waitForTimeout(ciTimes(400));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-book-glow.png` });
   });
 
@@ -349,7 +350,7 @@ test.describe('in the library (D85, D86, D51)', () => {
     // The key two, three, four or five steps away, never past the door.
     await expect(page.locator('#card-ways li')).toHaveCount(4);
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
     const given = JSON.parse(readFileSync(`${CONTENT}levels/the-moving-key/text.en.json`, 'utf8')).starting_code;
     expect(await run(page, given)).toContain('In the way “The key is two steps away”');
@@ -361,7 +362,7 @@ test.describe('in the library (D85, D86, D51)', () => {
   }) => {
     await page.goto('/#level/eldras-door');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
     const bonus = page.locator('#star-reasons li', { hasText: 'The extra goal met' });
     const back = [
@@ -390,10 +391,10 @@ test.describe('in the entrance (D100)', () => {
     await seedWizard(page, MARTA);
     await page.goto('/#story/the-entrance');
     const scene = page.locator('#scene');
-    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
     await expect(scene).not.toHaveAttribute('data-shade', /./);
     await storyNext(page, 5);
-    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
     await expect(scene).toHaveAttribute('data-shade', /^ilda:0\.\d\d$/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}into-the-arch.png` });
     // The two children follow her side by side, at once (D103), under the
@@ -402,11 +403,11 @@ test.describe('in the entrance (D100)', () => {
     // A cell walked through for a tick, waited for frame by frame: an expect's polls
     // may come either side of it.
     await page.waitForFunction(() => document.querySelector('#scene')?.getAttribute('data-wizard') === '20,13', null, {
-      timeout: 30_000,
+      timeout: ciTimes(30_000),
       polling: 'raf',
     });
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-lamp.png` });
-    await expect(scene).toHaveAttribute('data-wizard', '20,8', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-wizard', '20,8', { timeout: ciTimes(30_000) });
     await expect(scene).toHaveAttribute('data-actors', /friend:19,8/);
   });
 });
@@ -418,17 +419,17 @@ test.describe('at the wand bank (D128)', () => {
     await seedWizard(page, MARTA);
     await page.goto('/#story/the-wand-bank');
     const scene = page.locator('#scene');
-    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
     await expect(scene).not.toHaveAttribute('data-actors', /friend:/);
     await storyNext(page, 4);
     // Step 5: in sight from the step's start, on 10,5, drawn stepping out from 9,5.
     await page.waitForFunction(() => /friend:10,5/.test(document.querySelector('#scene')?.getAttribute('data-actors') ?? ''), null, {
       polling: 'raf',
-      timeout: 30_000,
+      timeout: ciTimes(30_000),
     });
     await page.waitForTimeout(60);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s25-friend-steps-out.png` });
-    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
     await expect(scene).toHaveAttribute('data-actors', /friend:10,5,down/);
   });
 });
@@ -440,7 +441,7 @@ test.describe('the stories', () => {
     test(`${id} is told to its end`, async ({ page }) => {
       await seedWizard(page, MARTA);
       await page.goto(`/#story/${id}`);
-      await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+      await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
       await page.screenshot({ path: `${SHOTS}story-${id}-1.png` });
       let step = 1;
       while ((await page.locator('#story-next').count()) > 0) {
@@ -470,12 +471,12 @@ for (const scene of ['the-entrance', 'the-dormitory', 'the-library']) {
     const id = scene === 'the-entrance' ? 'story/the-entrance' : scene === 'the-dormitory' ? 'level/your-bed' : 'level/the-lost-book';
     await page.goto(`/#${id}`);
     if (id.startsWith('level')) await page.locator('#start').click();
-    await expect(page.locator('#scene')).toHaveAttribute('data-state', /./, { timeout: 90_000 });
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', /./, { timeout: ciTimes(90_000) });
     // A story's camera is the story's; a level's zooms out as far as it goes.
     while ((await page.locator('#zoom-out').count()) > 0 && (await page.locator('#zoom-out').isEnabled())) {
       await page.locator('#zoom-out').click();
     }
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(ciTimes(400));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}${scene}-zoomed-out.png` });
   });
 }
@@ -489,7 +490,7 @@ test.describe('the lessons run plain Python on their pages (D170)', () => {
       await page.keyboard.insertText(code);
     }
     await page.locator('.lesson-run button').click();
-    await expect(page.locator('.lesson-run')).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    await expect(page.locator('.lesson-run')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
     return page.locator('.lesson-printed').innerText();
   }
 

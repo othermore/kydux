@@ -8,6 +8,7 @@ import { mkdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
 import { skipGuide, storyNext, storySaid } from './helpers';
+import { ciTimes } from './support';
 
 const SHOTS = fileURLToPath(new URL('./shots/', import.meta.url));
 
@@ -45,7 +46,7 @@ async function type(page: Page, code: string): Promise<void> {
 
 for (const [lang, words] of Object.entries(WORDS)) {
   test(`the whole loop, in ${lang}`, async ({ browser }) => {
-    test.setTimeout(240_000);
+    test.setTimeout(ciTimes(240_000));
     const folder = `${SHOTS}${lang}/`;
     rmSync(folder, { recursive: true, force: true });
     mkdirSync(folder, { recursive: true });
@@ -112,14 +113,14 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await skipGuide(page);
     await expect(page.locator('.cm-content')).toHaveText('');
     await expect(page.locator('#scene')).toHaveAttribute('data-look', 'teal');
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
     await shoot(page, 'level');
 
     // A wrong run: the wizard walks into the wall, and the card says why.
     await type(page, 'wizard.move_up()');
     await page.locator('#run').click();
-    await expect(page.locator('.outcome')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
     await expect(page.locator('#hint')).toBeEnabled();
     await shoot(page, 'wrong-run');
 
@@ -131,7 +132,7 @@ for (const [lang, words] of Object.entries(WORDS)) {
     // The winning run, and the win card that names the wizard.
     await type(page, 'wizard.move_right()');
     await page.locator('#run').click();
-    await expect(page.locator('.win-card h3')).toHaveText(words.won, { timeout: 30_000 });
+    await expect(page.locator('.win-card h3')).toHaveText(words.won, { timeout: ciTimes(30_000) });
     // The stars are drawn in one after another: the photograph waits for the last.
     await expect(page.locator('.win-card .star').nth(2)).toHaveCSS('opacity', '1');
     await shoot(page, 'win');

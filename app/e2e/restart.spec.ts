@@ -3,6 +3,7 @@
 
 import { expect, test } from '@playwright/test';
 import { seedWizard, skipGuide } from './helpers';
+import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
 
@@ -11,7 +12,7 @@ test('a run shows the level starting again before it plays, and Restart does too
   await page.goto('/#level/the-gate');
   await page.locator('#start').click();
   await skipGuide(page);
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   const note = page.locator('#restart-note');
   await expect(note).toBeHidden();
   await page.locator('.cm-content').click();
@@ -23,7 +24,7 @@ test('a run shows the level starting again before it plays, and Restart does too
   await expect(note).toHaveText('');
   await expect(note).toHaveAttribute('aria-label', 'Starting the level again…');
   await expect(page.locator('#scene')).toHaveAttribute('data-restarting', 'true');
-  await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(30_000) });
   await expect(note).toBeHidden();
 
   // The stars: one span each, the earned ones marked so.

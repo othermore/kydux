@@ -525,6 +525,23 @@ def test_a_quilt_takes_its_sheet_s_line_and_not_the_pillow_s_beside_it():
     assert not edged[:10].any() and not edged[91:].any()
 
 
+def test_a_rim_takes_the_outline_and_not_a_wall_s_joint_that_meets_it():
+    # A block marked magenta inside its outline, four pixels thick; a joint of the
+    # wall beside it, two pixels thick, runs off the outline to the left.
+    picture = np.full((120, 120, 3), (200, 190, 175), dtype=np.uint8)
+    ink = (20, 15, 25)
+    picture[30:90, 30:90] = ink
+    picture[34:86, 34:86] = (150, 110, 80)
+    picture[58:60, 16:30] = ink  # the joint
+    marked = np.zeros((120, 120), dtype=bool)
+    marked[35:85, 35:85] = True
+    edged = image_first.rimmed(marked, picture, 192)
+    assert edged[30:90, 30:90].all()
+    assert not edged[58:60, 16:28].any()
+    # With no run asked of it, the joint comes in as before.
+    assert image_first.rimmed(marked, picture, 192, min_run=0)[58:60, 20:30].all()
+
+
 def test_a_wall_s_part_with_no_outline_beyond_it_is_kept_as_drawn():
     # A light stone block on a floor of its own colour, outlined but on its top.
     painting = np.full((192, 192, 3), (225, 215, 200), dtype=np.uint8)

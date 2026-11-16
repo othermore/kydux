@@ -1,12 +1,13 @@
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
+import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
 
 async function open(page: Page, id: string): Promise<void> {
   await page.goto(`/#level/${id}`);
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
 }
 
 test('the notebook lists what the level teaches, and a click puts an example in the editor', async ({

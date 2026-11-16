@@ -11,6 +11,7 @@ import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, type SeededWizard, seedWizard, storyNext } from './helpers';
+import { ciTimes } from './support';
 
 const SHOTS = fileURLToPath(new URL('./shots/chapter-3/', import.meta.url));
 mkdirSync(SHOTS, { recursive: true });
@@ -32,7 +33,7 @@ const scene = (page: Page) => page.locator('#scene');
 async function open(page: Page, id: string, speed = '4'): Promise<void> {
   await page.goto(`/#level/${id}`);
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('#speed').selectOption(speed);
 }
 
@@ -47,7 +48,7 @@ async function start(page: Page, code: string): Promise<void> {
 /** The child's code typed and run; the card's words once it ends. */
 async function run(page: Page, code: string): Promise<string> {
   await start(page, code);
-  await expect(page.locator('.outcome')).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(60_000) });
   return page.locator('.outcome-text').innerText();
 }
 
@@ -68,7 +69,7 @@ for (const [wizard, locale, won] of [
         await page.screenshot({ path: `${SHOTS}${wizard.name}-${id}-won.png` });
         for (const way of waysOf(id)) {
           await page.locator('#way').selectOption(way, { force: true });
-          await expect(page.locator('.outcome-text')).toHaveText(won, { timeout: 30_000 });
+          await expect(page.locator('.outcome-text')).toHaveText(won, { timeout: ciTimes(30_000) });
         }
       });
     }
@@ -83,11 +84,11 @@ test.describe('a stop is not an outcome (D177)', () => {
     await open(page, 'the-doors-corridor', '1');
     await start(page, solution('the-doors-corridor'));
     await expect
-      .poll(async () => Number(await scene(page).getAttribute('data-tick')), { timeout: 60_000 })
+      .poll(async () => Number(await scene(page).getAttribute('data-tick')), { timeout: ciTimes(60_000) })
       .toBeGreaterThanOrEqual(5);
     await page.locator('#stop').click();
     const stoppedAt = await scene(page).getAttribute('data-wizard');
-    await page.waitForTimeout(2_000);
+    await page.waitForTimeout(ciTimes(2_000));
     await expect(page.locator('.outcome')).toBeHidden();
     await expect(page.locator('.win-card')).toHaveCount(0);
     await expect(page.locator('#run')).toBeEnabled();
@@ -102,7 +103,7 @@ test.describe('a stop is not an outcome (D177)', () => {
     // Back to the level, run again whole: the card says it is won. The level's start
     // card was seen already in this visit, and is not shown again.
     await page.goto('/#level/the-doors-corridor');
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
     expect(await run(page, solution('the-doors-corridor'))).toMatch(/^You did it/);
     await expect(page.locator('.win-card')).toBeVisible();
@@ -117,7 +118,7 @@ test.describe('the map, opened by its spell (D134)', () => {
     await open(page, 'the-doors-corridor', '1');
     await start(page, 'wizard.cast("orvim")\nwizard.move_right()');
     const plan = page.locator('#plan');
-    await expect(plan).toBeVisible({ timeout: 30_000 });
+    await expect(plan).toBeVisible({ timeout: ciTimes(30_000) });
     await expect(scene(page)).toHaveAttribute('data-plan-open', 'true');
     await expect(scene(page)).toHaveAttribute('data-state', 'paused');
     await expect(scene(page)).toHaveAttribute('data-tick', '1');
@@ -126,7 +127,7 @@ test.describe('the map, opened by its spell (D134)', () => {
     await expect(plan).toHaveAttribute('data-figures', /mate:0,11/);
     await expect(plan).toHaveAttribute('data-doors', 'door_a:shut;door_b:shut');
     await expect(plan).toHaveAttribute('data-marks', '15,3');
-    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: ciTimes(30_000) });
     // A cell's own numbers come under the pointer (D143).
     await page.locator('#plan-canvas').hover({ position: { x: 28 + 1.5 * 40, y: 28 + 12.5 * 40 } });
     await expect(plan).toHaveAttribute('data-cell', /^\d+,\d+$/);
@@ -136,17 +137,17 @@ test.describe('the map, opened by its spell (D134)', () => {
     await page.locator('#plan-close').click();
     await expect(plan).toHaveCount(0);
     await expect(scene(page)).not.toHaveAttribute('data-plan-open');
-    await expect(scene(page)).toHaveAttribute('data-wizard', '2,12', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-wizard', '2,12', { timeout: ciTimes(30_000) });
   });
 
   test('it opens in a level that does not need it, wherever the map is carried', async ({ page }) => {
     await open(page, 'the-tunnel-exit');
     await start(page, 'wizard.cast("orvim")');
     const plan = page.locator('#plan');
-    await expect(plan).toBeVisible({ timeout: 30_000 });
+    await expect(plan).toBeVisible({ timeout: ciTimes(30_000) });
     await expect(plan).toHaveAttribute('data-figures', /dask:9,11/);
     await expect(plan).toHaveAttribute('data-marks', '11,6');
-    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: ciTimes(30_000) });
     await page.keyboard.press('Escape');
     await expect(plan).toHaveCount(0);
   });
@@ -155,11 +156,11 @@ test.describe('the map, opened by its spell (D134)', () => {
     await open(page, 'the-dark-tunnel');
     await start(page, 'wizard.cast("orvim")\nprint(wizard.position)');
     const plan = page.locator('#plan');
-    await expect(plan).toBeVisible({ timeout: 30_000 });
+    await expect(plan).toBeVisible({ timeout: ciTimes(30_000) });
     await expect(plan).toHaveAttribute('data-marks', '19,1');
     await expect(plan).toHaveAttribute('data-mark-labels', '(19, 1)');
     await page.keyboard.press('Escape');
-    await expect(page.locator('.printed')).toHaveText('(14, 2)', { timeout: 30_000 });
+    await expect(page.locator('.printed')).toHaveText('(14, 2)', { timeout: ciTimes(30_000) });
   });
 
   test("P8's plan shows the key lying in the dark storeroom (D169)", async ({ page }) => {
@@ -167,9 +168,9 @@ test.describe('the map, opened by its spell (D134)', () => {
     await expect(scene(page)).toHaveAttribute('data-dark', 'true');
     await start(page, 'wizard.cast("orvim")');
     const plan = page.locator('#plan');
-    await expect(plan).toBeVisible({ timeout: 30_000 });
+    await expect(plan).toBeVisible({ timeout: ciTimes(30_000) });
     await expect(plan).toHaveAttribute('data-things', /key:9,7/);
-    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: ciTimes(30_000) });
     await page.screenshot({ path: `${SHOTS}plan-dark-room-key.png` });
     await page.keyboard.press('Escape');
   });
@@ -178,10 +179,10 @@ test.describe('the map, opened by its spell (D134)', () => {
     await open(page, 'the-doors-corridor');
     await start(page, 'wizard.cast("orvim")');
     const plan = page.locator('#plan');
-    await expect(plan).toBeVisible({ timeout: 30_000 });
+    await expect(plan).toBeVisible({ timeout: ciTimes(30_000) });
     await expect(plan).toHaveAttribute('data-mark-labels', '(15, 3)');
     await expect(plan).toHaveAttribute('data-floor-edges', /^\d{2,}$/);
-    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: 30_000 });
+    await expect(plan).toHaveAttribute('data-drawn', 'true', { timeout: ciTimes(30_000) });
     await page.screenshot({ path: `${SHOTS}plan-grid.png` });
     await page.keyboard.press('Escape');
   });
@@ -189,14 +190,14 @@ test.describe('the map, opened by its spell (D134)', () => {
   test('Escape closes it too, and a run started again closes it', async ({ page }) => {
     await open(page, 'the-doors-corridor');
     await start(page, 'wizard.cast("orvim")');
-    await expect(page.locator('#plan')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('#plan')).toBeVisible({ timeout: ciTimes(30_000) });
     await page.keyboard.press('Escape');
     await expect(page.locator('#plan')).toHaveCount(0);
-    await expect(scene(page)).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
     await start(page, 'wizard.cast("orvim")');
-    await expect(page.locator('#plan')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('#plan')).toBeVisible({ timeout: ciTimes(30_000) });
     await page.keyboard.press('Alt+KeyR');
-    await expect(scene(page)).toHaveAttribute('data-state', 'paused', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-state', 'paused', { timeout: ciTimes(30_000) });
   });
 
   test("the first lesson's last button leads to the level, where the map's word opens the plan", async ({ page }) => {
@@ -211,9 +212,9 @@ test.describe('the map, opened by its spell (D134)', () => {
     await page.locator('#lesson-try').click();
     await expect(page).toHaveURL(/#level\/the-doors-corridor$/);
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await start(page, 'wizard.cast("orvim")');
-    await expect(page.locator('#plan')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('#plan')).toBeVisible({ timeout: ciTimes(30_000) });
     await expect(scene(page)).toHaveAttribute('data-plan-open', 'true');
   });
 });
@@ -234,13 +235,13 @@ test.describe('the enchanted tunnel (D135)', () => {
     await open(page, 'the-dark-tunnel');
     await expect(scene(page)).toHaveAttribute('data-enchanted', 'wizard,friend,mate');
     await start(page, 'print(wizard.position)\nwizard.cast("orvim")');
-    await expect(page.locator('#plan')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('#plan')).toBeVisible({ timeout: ciTimes(30_000) });
     await expect(page.locator('#plan')).toHaveAttribute('data-figures', '');
     await expect(page.locator('#plan')).toHaveAttribute('data-tunnel', '10');
     await expect(page.locator('#plan')).toHaveAttribute('data-marks', '19,1');
     await page.screenshot({ path: `${SHOTS}plan-tunnel.png` });
     await page.keyboard.press('Escape');
-    await expect(page.locator('.printed')).toHaveText('(14, 2)', { timeout: 30_000 });
+    await expect(page.locator('.printed')).toHaveText('(14, 2)', { timeout: ciTimes(30_000) });
   });
 });
 
@@ -284,7 +285,7 @@ test.describe('Dask, in every way (D51, D137)', () => {
       expect(await run(page, solution(id))).toMatch(/^You did it/);
       for (const way of waysOf(id)) {
         await page.locator('#way').selectOption(way, { force: true });
-        await expect(page.locator('.outcome-text')).toHaveText(/^You did it/, { timeout: 30_000 });
+        await expect(page.locator('.outcome-text')).toHaveText(/^You did it/, { timeout: ciTimes(30_000) });
       }
     });
   }
@@ -302,13 +303,13 @@ test.describe('the storeroom', () => {
     await expect(scene(page)).toHaveAttribute('data-holes', 'hole:closed');
     await expect(scene(page)).not.toHaveAttribute('data-drawn', /hole:/);
     await start(page, 'wizard.move_right(2)\nwizard.wait(4)');
-    await expect(scene(page)).toHaveAttribute('data-holes', 'hole:open', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-holes', 'hole:open', { timeout: ciTimes(30_000) });
     await expect(scene(page)).toHaveAttribute('data-drawn', /hole:3\.\d+,7\.\d+/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hole-open.png` });
     await page.locator('#speed').selectOption('4');
     await start(page, 'wizard.move_right(2)\nwizard.cast("osto")');
     await expect(scene(page)).toHaveAttribute('data-thought', 'I do not know a spell called “osto”.', {
-      timeout: 30_000,
+      timeout: ciTimes(30_000),
     });
     await expect(scene(page)).not.toHaveAttribute('data-held', /hole/);
   });
@@ -320,8 +321,8 @@ test.describe('the storeroom', () => {
     await expect(scene(page)).toHaveAttribute('data-holes', 'hole:open');
     const toTheEdge = 'wizard.move_down()\nwizard.pick_up()\nwizard.move_down()\ndoor.open()\nwizard.move_down(2)\n';
     await start(page, `${toTheEdge}wizard.cast("osto")\nprint(hole.closed)`);
-    await expect(scene(page)).toHaveAttribute('data-held', 'hole', { timeout: 30_000 });
-    await expect(page.locator('.printed')).toHaveText('True', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-held', 'hole', { timeout: ciTimes(30_000) });
+    await expect(page.locator('.printed')).toHaveText('True', { timeout: ciTimes(30_000) });
     // Held, its floor is whole, with a crack of light round it (D167).
     await expect(scene(page)).not.toHaveAttribute('data-drawn', /hole:/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hole-held.png` });
@@ -335,7 +336,7 @@ test.describe('the storeroom', () => {
     await run(page, 'wizard.cast("kirra")');
     await expect(scene(page)).toHaveAttribute('data-dark', 'false');
     await expect(scene(page)).toHaveAttribute('data-drawn', /key:9\.\d+,7\.\d+/);
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(ciTimes(500));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}dark-room-lit.png` });
   });
 
@@ -344,7 +345,7 @@ test.describe('the storeroom', () => {
     expect(await run(page, solution('the-dark-room'))).toMatch(/^You did it/);
     for (const way of waysOf('the-dark-room')) {
       await page.locator('#way').selectOption(way, { force: true });
-      await expect(page.locator('.outcome-text')).toHaveText(/^You did it/, { timeout: 30_000 });
+      await expect(page.locator('.outcome-text')).toHaveText(/^You did it/, { timeout: ciTimes(30_000) });
     }
   });
 
@@ -366,7 +367,7 @@ test.describe('what the page draws of the chapter', () => {
     await expect(scene(page)).toHaveAttribute('data-following', 'false');
     await expect(scene(page)).toHaveAttribute('data-zoom', '1');
     await start(page, 'wizard.move_down()');
-    await expect(scene(page)).toHaveAttribute('data-following', 'true', { timeout: 30_000 });
+    await expect(scene(page)).toHaveAttribute('data-following', 'true', { timeout: ciTimes(30_000) });
     await expect(scene(page)).not.toHaveAttribute('data-framed');
   });
 
@@ -381,7 +382,7 @@ test.describe('what the page draws of the chapter', () => {
 
   test('the goals box folds itself when it would cover the wizard at the start', async ({ page }) => {
     await open(page, 'the-tunnel-exit');
-    await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'true', { timeout: 10_000 });
+    await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'true', { timeout: ciTimes(10_000) });
     await page.locator('#goals-toggle').click();
     await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
     await open(page, 'past-the-teacher');
@@ -393,19 +394,24 @@ test.describe('what the page draws of the chapter', () => {
     // the arch's cut-out being its stones and not the opening's dark (D181), from the
     // start to the end of the solution, the wizard standing on it.
     await open(page, 'the-three-doors');
-    await expect(scene(page)).toHaveAttribute('data-marks-covered', '10,0', { timeout: 10_000 });
+    await expect(scene(page)).toHaveAttribute('data-marks-covered', '10,0', { timeout: ciTimes(10_000) });
     await page.screenshot({ path: `${SHOTS}mark-under-the-arch.png` });
     await run(page, solution('the-three-doors'));
     await expect(scene(page)).toHaveAttribute('data-wizard', '10,0');
     await expect(scene(page)).toHaveAttribute('data-marks-covered', '10,0');
+    // The win card's words show their code as code, no backquote left (D140).
+    const learned = page.locator('#card-learned');
+    await expect(learned.locator('code')).toHaveText('door');
+    await expect(learned).not.toContainText('`');
+    await expect(page.locator('#card-outro')).not.toContainText('`');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}mark-under-the-arch-won.png` });
     // Free at the start, and under the wizard who stands on it at the end: the wizard
     // covers it, and no ring is drawn over the figure.
     await open(page, 'the-tunnel-exit');
-    await expect(scene(page)).toHaveAttribute('data-marks-covered', '', { timeout: 10_000 });
+    await expect(scene(page)).toHaveAttribute('data-marks-covered', '', { timeout: ciTimes(10_000) });
     await run(page, solution('the-tunnel-exit'));
     await expect(scene(page)).toHaveAttribute('data-wizard', '11,6');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(ciTimes(500));
     await expect(scene(page)).toHaveAttribute('data-marks-covered', '');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}mark-under-the-wizard.png` });
   });
@@ -452,7 +458,7 @@ test.describe('what the page draws of the chapter', () => {
   test('with ?debug the enchanted cells are named in the legend (D135)', async ({ page }) => {
     await page.goto('/?debug#level/the-dark-tunnel');
     await page.locator('#start').click();
-    await expect(page.locator('.debug-legend')).toContainText('Dark tunnel', { timeout: 90_000 });
+    await expect(page.locator('.debug-legend')).toContainText('Dark tunnel', { timeout: ciTimes(90_000) });
   });
 });
 
@@ -463,7 +469,7 @@ test.describe('the stories', () => {
     test(`${id} is told to its end`, async ({ page }) => {
       await seedWizard(page, MARTA);
       await page.goto(`/#story/${id}`);
-      await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+      await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
       await page.screenshot({ path: `${SHOTS}story-${id}-1.png` });
       let step = 1;
       while ((await page.locator('#story-next').count()) > 0) {
@@ -514,7 +520,7 @@ test.describe('a painted door, at every tick (D156)', () => {
     expect(await run(page, solution('left-or-right'))).toMatch(/^You did it/);
     for (const way of waysOf('left-or-right')) {
       await page.locator('#way').selectOption(way, { force: true });
-      await expect(page.locator('.outcome-text')).toHaveText(/^You did it/, { timeout: 30_000 });
+      await expect(page.locator('.outcome-text')).toHaveText(/^You did it/, { timeout: ciTimes(30_000) });
       await everyTick(page, ['left_door', 'right_door']);
     }
     await open(page, 'the-three-doors');
@@ -536,11 +542,11 @@ for (const [scenery, level] of [
     await seedWizard(page, MARTA);
     await page.goto(`/#level/${level}`);
     await page.locator('#start').click();
-    await expect(page.locator('#scene')).toHaveAttribute('data-state', /./, { timeout: 90_000 });
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', /./, { timeout: ciTimes(90_000) });
     while ((await page.locator('#zoom-out').count()) > 0 && (await page.locator('#zoom-out').isEnabled())) {
       await page.locator('#zoom-out').click();
     }
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(ciTimes(400));
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}${scenery}-zoomed-out.png` });
   });
 }

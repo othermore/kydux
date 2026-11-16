@@ -283,9 +283,10 @@ Two more things help you test quickly in this mode:
 
 - **Write the solution** is a button under the editor, beside the
   notebook. It replaces the code with the level's solution, so that a run
-  shows the level solved. It is there only on the development server
-  (`npm run dev`). The solutions never go into a build, so the game served
-  to friends has no such button.
+  shows the level solved. It is there whenever the address has `?debug`, on
+  the development server and on a build alike. A build keeps the solutions
+  apart from the game, under `__debug/solution/`, and only this button asks
+  for them.
 
 ### A story on its scene
 

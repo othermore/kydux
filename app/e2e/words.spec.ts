@@ -1,5 +1,6 @@
 import { type Browser, expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard, skipGuide, storyNext, storySaid } from './helpers';
+import { ciTimes } from './support';
 
 /** A page whose progress document already holds a wizard (D36). */
 async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'boy'): Promise<Page> {
@@ -12,11 +13,11 @@ async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'bo
 async function winTheGate(page: Page): Promise<void> {
   await page.locator('#start').click();
   await skipGuide(page);
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('.cm-content').click();
   await page.keyboard.insertText('wizard.move_right()');
   await page.locator('#run').click();
-  await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(30_000) });
 }
 
 test('the words speak of a girl as a girl: the notebook and a level\'s outro', async ({ browser }) => {

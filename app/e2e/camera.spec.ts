@@ -6,6 +6,7 @@
 // frame: the field, painted with a margin, is zoomed on.
 
 import { expect, test } from '@playwright/test';
+import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
 
@@ -13,7 +14,7 @@ test('the camera zooms, is dragged, and comes back to the wizard on a run', asyn
   // The field and its margin are larger than the camera's window, zoomed out too.
   await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   const scene = page.locator('#scene');
   await expect(scene).toHaveAttribute('data-zoom', '1');
   await expect(scene).toHaveAttribute('data-following', 'true');
@@ -57,7 +58,7 @@ test('the camera never zooms out past a scene that does not fill the frame', asy
   await page.setViewportSize({ width: 1000, height: 1000 });
   await page.goto('/#level/the-three-doors');
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await expect(page.locator('#scene')).toHaveAttribute('data-zoom', '1');
   await expect(page.locator('#zoom-out')).toBeDisabled();
 });
@@ -70,7 +71,7 @@ test('on a window wider than a painted scene, the camera zooms in until the pain
   await page.setViewportSize({ width: 1900, height: 650 });
   await page.goto('/#story/at-the-library');
   const scene = page.locator('#scene');
-  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
   await expect(scene).toHaveAttribute('data-bounds', '21.00×24.00');
   const [width, height] = ((await scene.getAttribute('data-view')) ?? '').split('×').map(Number);
   expect(width).toBeLessThanOrEqual(21.01);
@@ -84,7 +85,7 @@ test('a shaky press does not let go of the wizard; Find my wizard brings the cam
 }) => {
   await page.goto('/#level/the-three-doors');
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   const scene = page.locator('#scene');
   const box = await scene.locator('canvas').boundingBox();
   if (!box) throw new Error('the scene has no canvas');
@@ -120,7 +121,7 @@ test('a story has the zoom box, opens at zoom 1, and its words keep their size z
 }) => {
   await page.goto('/#story/the-first-night');
   const scene = page.locator('#scene');
-  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
   await expect(page.locator('#zoom-in')).toBeVisible();
   await expect(scene).toHaveAttribute('data-zoom', '1');
   await page.locator('#zoom-in').click();
@@ -140,7 +141,7 @@ test('a story has the zoom box, opens at zoom 1, and its words keep their size z
 test('in a story, the camera stays where it is dragged until the next step (D106)', async ({ page }) => {
   await page.goto('/#story/the-first-night');
   const scene = page.locator('#scene');
-  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
   await page.locator('#story-title').click();
   // Ilda's long walk out by the door, as the camera stays with the wizard.
   for (let step = 0; step < 4; step += 1) await page.locator('#story-next').click();
@@ -154,11 +155,11 @@ test('in a story, the camera stays where it is dragged until the next step (D106
   await page.mouse.up();
   await expect(scene).toHaveAttribute('data-dragged', 'true');
   // Ticks go on, and the camera stays dragged.
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(ciTimes(2000));
   await expect(scene).toHaveAttribute('data-dragged', 'true');
   await expect(page.locator('#find-wizard')).toBeVisible();
   // The next step brings it back.
-  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 30_000 });
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
   await page.locator('#story-next').click();
   await expect(scene).not.toHaveAttribute('data-dragged', /./);
 });

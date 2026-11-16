@@ -164,11 +164,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const notebookButton = labelled(element('button', { id: 'notebook-open', type: 'button' }), () =>
     t('notebook.open'),
   );
-  // On the development server in the tester's mode, a button writes the level's
-  // solution in the editor; the solutions never ship (pack-world.mjs), so the
-  // server reads them from content/ (vite.config.ts).
+  // In the tester's mode, a button writes the level's solution in the editor: the
+  // solution packed apart for it (pack-world.mjs), or on the development server
+  // read from content/ (vite.config.ts).
   const solution =
-    import.meta.env.DEV && debugging()
+    debugging()
       ? [labelled(element('button', { id: 'debug-solution', type: 'button' }), () => t('debug.solution'))]
       : [];
   const notebook = notebookPanel(
@@ -425,12 +425,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     renderHints();
   });
   renderHints();
-  if (import.meta.env.DEV) {
-    solution[0]?.addEventListener('click', async () => {
-      const response = await fetch(`${import.meta.env.BASE_URL}__debug/solution/${loaded.id}`);
-      if (response.ok) editor.setDoc(await response.text());
-    });
-  }
+  solution[0]?.addEventListener('click', async () => {
+    const response = await fetch(`${import.meta.env.BASE_URL}__debug/solution/${loaded.id}`);
+    if (response.ok) editor.setDoc(await response.text());
+  });
 
   // What was last drawn, so that the card and the editor's marks change only
   // when the controller's do.

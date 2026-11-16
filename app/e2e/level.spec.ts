@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { levelText } from './helpers';
+import { ciTimes } from './support';
 
 const LONG = { en: levelText('the-long-corridor', 'en'), es: levelText('the-long-corridor', 'es') };
 
@@ -10,13 +11,13 @@ async function setCode(page: Page, code: string): Promise<void> {
   await page.keyboard.insertText(code);
 }
 
-async function waitReady(page: Page, timeout = 90_000): Promise<void> {
+async function waitReady(page: Page, timeout = ciTimes(90_000)): Promise<void> {
   await expect(page.locator('#run')).toBeEnabled({ timeout });
 }
 
 async function run(page: Page): Promise<void> {
   await page.locator('#run').click();
-  await expect(page.locator('.outcome')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
 }
 
 const scene = (page: Page) => page.locator('#scene');
@@ -54,7 +55,7 @@ test.describe('in English', () => {
     await setCode(page, 'wizard.move_right(8)');
     await page.locator('#run').click();
     await expect(page.locator('.cm-kydux-running-line')).toHaveCount(1);
-    await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'met', { timeout: 10_000 });
+    await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'met', { timeout: ciTimes(10_000) });
     await expect(outcome(page)).toHaveText('You did it, Kydux!');
     await expect(scene(page)).toHaveAttribute('data-wizard', '12,25');
     await expect(scene(page)).toHaveAttribute('data-state', 'done');
@@ -109,7 +110,7 @@ test.describe('in English', () => {
   test('Ctrl-Enter runs the program from the editor', async ({ page }) => {
     await setCode(page, 'wizard.move_right(8)');
     await page.keyboard.press('ControlOrMeta+Enter');
-    await expect(outcome(page)).toHaveText('You did it, Kydux!', { timeout: 30_000 });
+    await expect(outcome(page)).toHaveText('You did it, Kydux!', { timeout: ciTimes(30_000) });
   });
 });
 
@@ -132,7 +133,7 @@ test('in Spanish, and switching to English keeps the code typed', async ({ brows
   await setCode(page, 'wizard.move_right(2)');
   await page.locator('#run').click();
   await expect(outcome(page)).toHaveText('Not yet: 0 of 1 goals met. Try again.', {
-    timeout: 30_000,
+    timeout: ciTimes(30_000),
   });
   await page.locator('#language').selectOption('es');
   await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(2)');

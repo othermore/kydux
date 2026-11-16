@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { seedWizard } from './helpers';
+import { ciTimes } from './support';
 
 test.use({ locale: 'es-ES' });
 test.beforeEach(async ({ page }) => seedWizard(page));
@@ -90,7 +91,7 @@ test.describe('the keys', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#level/the-long-corridor');
     await page.locator('#start').click();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText('wizard.move_right(6)');
@@ -106,13 +107,13 @@ test.describe('the keys', () => {
 
   test('Ctrl+Enter in the editor runs the code', async ({ page }) => {
     await page.keyboard.press('ControlOrMeta+Enter');
-    await expect(page.locator('#scene')).toHaveAttribute('data-state', /playing|done/, { timeout: 30_000 });
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', /playing|done/, { timeout: ciTimes(30_000) });
   });
 
   test('Alt+R runs the code from anywhere on the screen, and types nothing', async ({ page }) => {
     await page.locator('.level-title').click();
     await page.keyboard.press('Alt+KeyR');
-    await expect(page.locator('#scene')).toHaveAttribute('data-state', /playing|done/, { timeout: 30_000 });
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', /playing|done/, { timeout: ciTimes(30_000) });
     await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(6)');
   });
 

@@ -1,10 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 import { levelText, shown } from './helpers';
+import { ciTimes } from './support';
 
 async function open(page: Page, id: string): Promise<void> {
   await page.goto(`/#level/${id}`);
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('#speed').selectOption('4');
 }
 
@@ -13,7 +14,7 @@ async function run(page: Page, code: string): Promise<void> {
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText(code);
   await page.locator('#run').click();
-  await expect(page.locator('.outcome')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
 }
 
 test.describe('in English', () => {
@@ -42,7 +43,7 @@ test.describe('in English', () => {
     await run(page, 'wizard.move_right()');
     await page.locator('#hint').click();
     await page.reload();
-    await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await expect(page.locator('.hint')).toHaveCount(1);
     await expect(page.locator('#hint')).toBeEnabled();
   });

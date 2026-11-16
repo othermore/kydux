@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { seedWizard } from './helpers';
+import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
 
@@ -32,20 +33,20 @@ test('the map shows the course in order: the first stop open, the rest locked', 
 test('a level won and opened again from the map starts from its starting code (D131)', async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   const starting = await page.locator('.cm-content').innerText();
   await page.locator('#speed').selectOption('4');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText('wizard.move_right(8)');
   await page.locator('#run').click();
-  await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(30_000) });
   // Play again keeps the program the child typed, while the screen is open.
   await page.locator('#again').click();
   await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(8)');
   await page.locator('#level-map').click();
   await stop(page, 'level:the-long-corridor').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await expect(page.locator('.cm-content')).toHaveText(starting);
   expect(starting).not.toContain('move_right(8)');
 });
@@ -53,13 +54,13 @@ test('a level won and opened again from the map starts from its starting code (D
 test('a won level is done with its stars, and opens the next stop', async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('#speed').selectOption('4');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText('wizard.move_right(8)');
   await page.locator('#run').click();
-  await expect(page.locator('.win-card')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(30_000) });
   await page.locator('#level-map').click();
   const won = stop(page, 'level:the-long-corridor');
   await expect(won).toHaveAttribute('data-state', 'done');
@@ -81,7 +82,7 @@ test('the map in Spanish', async ({ browser }) => {
 test('from a level, the map opens over it, says where you are, and closes back to it (D71)', async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText('wizard.move_right(2)');
@@ -122,10 +123,19 @@ test('with ?debug every stop opens and is named, for a tester to go straight to 
   await expect(page.locator('.stop:not(:has(a))')).toHaveCount(0);
   await last.locator('a').click();
   await expect(page).toHaveURL(/#level\/the-tunnel-exit$/);
-  // The button that writes the solution is the development server's alone:
-  // the solutions never ship.
+  // The button that writes the solution is there in the build too, under ?debug,
+  // and writes the level's solution into the editor.
   await page.locator('#start').click();
-  await expect(page.locator('#run')).toBeVisible({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeVisible({ timeout: ciTimes(90_000) });
+  await page.locator('#debug-solution').click();
+  await expect(page.locator('.cm-content')).toContainText('wizard.wait(2)');
+});
+
+test('without ?debug no level has the button that writes the solution', async ({ page }) => {
+  await seedWizard(page);
+  await page.goto('/#level/the-tunnel-exit');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeVisible({ timeout: ciTimes(90_000) });
   await expect(page.locator('#debug-solution')).toHaveCount(0);
 });
 

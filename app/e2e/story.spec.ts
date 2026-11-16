@@ -4,6 +4,7 @@
 
 import { expect, test } from '@playwright/test';
 import { seedWizard, storyNext, storySaid } from './helpers';
+import { ciTimes } from './support';
 
 test.beforeEach(async ({ page }) => {
   await seedWizard(page);
@@ -34,7 +35,7 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
   await expect(page.locator('#story-voice')).toHaveText('');
   await expect(storySaid(page)).toContainText('Teku: Hi there! I am Teku, a first-year pupil');
   // The bubble stays until the next step.
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(ciTimes(1500));
   await expect(scene).toHaveAttribute('data-speaker', 'friend');
 
   // Back shows the step before as it was: the friend back at the path's end.
@@ -73,7 +74,7 @@ test('Ilda goes out by the door and shuts it as the friend goes to the other dor
   await expect(scene).toHaveAttribute('data-actors', /ilda:12,11/);
   await storyNext(page);
   // Ilda's walk is the longest: she is gone once it ends, the door shut behind her.
-  await expect(scene).not.toHaveAttribute('data-actors', /ilda/, { timeout: 30_000 });
+  await expect(scene).not.toHaveAttribute('data-actors', /ilda/, { timeout: ciTimes(30_000) });
   await expect(scene).toHaveAttribute('data-actors', /friend:8,8/);
   await expect(scene).not.toHaveAttribute('data-doors', /front_door/);
 });
@@ -81,19 +82,19 @@ test('Ilda goes out by the door and shuts it as the friend goes to the other dor
 test('Again plays a step once more, as R does; Skip goes to the end (14.4)', async ({ page }) => {
   await page.goto('/#story/at-the-gate');
   const scene = page.locator('#scene');
-  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
   // The step where the friend walks up the path.
   await storyNext(page, 3);
-  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: 10_000 });
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: ciTimes(10_000) });
   await expect(page.locator('#story-again')).toBeVisible();
   await page.locator('#story-again').click();
   // The walk again: the friend sets out from the path's end, then comes up.
   await expect(scene).toHaveAttribute('data-state', 'playing');
-  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: 10_000 });
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: ciTimes(10_000) });
   await page.locator('#story-title').click();
   await page.keyboard.press('r');
   await expect(scene).toHaveAttribute('data-state', 'playing');
-  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: 10_000 });
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: ciTimes(10_000) });
   // Skip: the last step, read.
   await page.locator('#story-skip').click();
   await expect(page.locator('#story-go-on')).toBeVisible();

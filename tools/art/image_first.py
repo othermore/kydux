@@ -362,12 +362,26 @@ def snapped(
     return flooded(edged, edged | (dark & ~outside), band)
 
 
-def rimmed(mask: np.ndarray, painting: np.ndarray, cell: int, th: dict = THRESHOLDS) -> np.ndarray:
+#: The shortest run, in pixels, of a rim's outline along its thing's edge: a wall's
+#: joint that meets the outline crosses each ring round the thing in a run as short
+#: as the joint is thick, and is no outline of the thing's.
+RIM_MIN_RUN = 6
+
+
+def rimmed(
+    mask: np.ndarray,
+    painting: np.ndarray,
+    cell: int,
+    th: dict = THRESHOLDS,
+    min_run: int = RIM_MIN_RUN,
+) -> np.ndarray:
     """A mask Gemini painted inside its thing's outline (its magenta, D93) with the
     outline added and nothing taken away: the dark pixels within SNAP_REACH of it,
     what lies between them and it, and the outline they run on into, as far as
     SNAP_BAND. The floor seen through open work, which the mask leaves out, stays
-    out."""
+    out. What it adds runs along the thing's edge: in each ring of pixels at one
+    distance from the mask, a run shorter than `min_run` is a wall's joint crossing
+    it, and goes, with whatever it alone joined to the thing (`trimmed_rim`)."""
     dark = dark_lines(painting, th)
     band = max(2, round(SNAP_BAND * cell))
     reach = max(1, round(SNAP_REACH * cell))
@@ -375,7 +389,70 @@ def rimmed(mask: np.ndarray, painting: np.ndarray, cell: int, th: dict = THRESHO
     lines = near & dark
     edged = mask | lines | (near & eroded(dilated(mask | lines, 2), 2))
     outside = outside_of(edged, dark, band)
-    return flooded(edged, edged | (dark & ~outside), band)
+    rim = flooded(edged, edged | (dark & ~outside), band)
+    return trimmed_rim(mask, rim, band + reach, min_run) if min_run > 1 else rim
+
+
+def trimmed_rim(mask: np.ndarray, rim: np.ndarray, depth: int, min_run: int) -> np.ndarray:
+    """A rim less the joints that cross it: what the rim adds to the mask, ring by
+    ring of the pixels one, two... `depth` pixels from it (as far as a square
+    reaches), keeps each run of a ring, its pixels touching corner to corner, of
+    `min_run` pixels or more; what is left joined to the mask through what is kept
+    stays."""
+    added = rim & ~mask
+    if not added.any() or not mask.any():
+        return rim
+    # Within the box of what is added, and a pixel round it.
+    ys, xs = np.nonzero(added | (dilated(mask, 1) & dilated(added, 1)))
+    y0, y1 = max(ys.min() - 1, 0), ys.max() + 2
+    x0, x1 = max(xs.min() - 1, 0), xs.max() + 2
+    ours, extra = mask[y0:y1, x0:x1], added[y0:y1, x0:x1]
+    # Each added pixel's distance from the mask, in rings a pixel apart.
+    distance = np.zeros(ours.shape, dtype=np.int32)
+    reached = ours.copy()
+    for ring in range(1, depth + 2):
+        grown = dilated(reached, 1)
+        distance[grown & ~reached] = ring
+        reached = grown
+        if not (extra & ~reached).any():
+            break
+    kept = np.zeros_like(extra)
+    for ring in np.unique(distance[extra]):
+        for run in _pieces(extra & (distance == ring)):
+            if len(run) >= min_run:
+                kept[tuple(np.array(run).T)] = True
+    # Only what reaches the mask through what is kept, corner to corner.
+    joined = ours | kept
+    seeds = ours.copy()
+    while True:
+        grown = dilated(seeds, 1) & joined
+        if (grown == seeds).all():
+            break
+        seeds = grown
+    out = mask.copy()
+    out[y0:y1, x0:x1] |= seeds & kept
+    return out
+
+
+def _pieces(mask: np.ndarray) -> list[list[tuple[int, int]]]:
+    """The groups of a sparse mask's pixels that touch, corner to corner, each as its
+    pixels' (row, column)."""
+    left = {(int(y), int(x)) for y, x in zip(*np.nonzero(mask), strict=True)}
+    pieces = []
+    while left:
+        first = left.pop()
+        piece, todo = [first], [first]
+        while todo:
+            y, x = todo.pop()
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    other = (y + dy, x + dx)
+                    if other in left:
+                        left.remove(other)
+                        piece.append(other)
+                        todo.append(other)
+        pieces.append(piece)
+    return pieces
 
 
 #: How wide an outline a thing takes beside its magenta, at most, in parts of a

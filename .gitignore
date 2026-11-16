@@ -37,6 +37,7 @@ app/public/world-stamp.json
 app/public/api.json
 app/public/reserved.json
 app/public/content/
+app/public/__debug/
 app/test-results/
 app/playwright-report/
 # The loop suite's screenshots, for the reviewer's eyes (D39).

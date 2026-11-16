@@ -2,11 +2,12 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
 import { skipGuide, levelText } from './helpers';
+import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
 
 async function ready(page: Page): Promise<void> {
-  await expect(page.locator('#run')).toBeEnabled({ timeout: 90_000 });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
 }
 
 async function run(page: Page, code: string): Promise<void> {
@@ -14,7 +15,7 @@ async function run(page: Page, code: string): Promise<void> {
   await page.keyboard.press('ControlOrMeta+A');
   await page.keyboard.insertText(code);
   await page.locator('#run').click();
-  await expect(page.locator('.outcome')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
 }
 
 test('the start card opens a level the first time in a visit, and ? brings it back', async ({

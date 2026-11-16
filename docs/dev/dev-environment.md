@@ -533,6 +533,35 @@ ends on:
 (cd app && npm run walkthrough -- 04-the-broom --all-ways the-shed,the-check)
 ```
 
+### Measuring how long the game takes to load
+
+The game runs in the browser, but every file comes from the server first. A
+spec measures what each screen costs: how many files, how many trips to the
+server, how many bytes, and how long until the screen shows and until
+Python's files are there. It serves a build the way the server on the
+internet does (`deploy/nginx-kydux.conf`): the files under `assets/` are kept
+by the browser for good, and every other file is asked for again on each
+load, with a short answer when it has not changed. It measures each screen
+with an empty cache and a full one, on a fast network and on a slow one
+(400 ms a trip, 1 Mbit/s).
+
+It needs a build, and it is skipped unless it is asked for. Build first, then
+run it from `app/`:
+
+```sh
+npm run build
+KYDUX_LOAD=dist npx playwright test e2e/load.spec.ts
+```
+
+It takes about twenty minutes, most of it on the slow network. Each measure
+is added, as it is made, to `app/e2e/shots/load/dist.jsonl`, one line a
+screen. To measure an older build, build it in a folder of its own and give
+that folder, with a name for its file and the screens it had:
+
+```sh
+KYDUX_LOAD=/tmp/kydux-old/app/dist KYDUX_LOAD_NAME=before KYDUX_LOAD_SCREENS="start,story 1,level 1" npx playwright test e2e/load.spec.ts
+```
+
 The repository's own checks deserve a mention, because they guard the
 project's rules. They refuse a secret in any tracked file. They refuse a
 forbidden word in any file, path or commit message. They keep the two

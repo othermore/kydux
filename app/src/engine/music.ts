@@ -494,6 +494,11 @@ interface Playing {
 class Music {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
+  /** The music's way to the speakers, its reverb with it: taken off while no theme
+   * plays, so that the audio thread does not work on silence (the sound effects share
+   * the context and keep it running). */
+  private chain: AudioNode[] = [];
+  private connected = false;
   private playing: Playing | null = null;
   private wanted: { id: string; heard: Heard } | null = null;
   private volume = 0.6;
@@ -588,6 +593,7 @@ class Music {
     }
     if (asked !== this.asking || this.wanted !== wanted || this.volume === 0) return;
     this.fadeOut(this.playing);
+    this.connect();
     this.playing = this.begin(ctx, theme, wanted.heard);
     this.publish();
   }
@@ -601,9 +607,9 @@ class Music {
     reverb.buffer = impulse(ctx);
     const wet = ctx.createGain();
     wet.gain.setValueAtTime(WET, ctx.currentTime);
-    master.connect(ctx.destination);
-    master.connect(reverb).connect(wet).connect(ctx.destination);
     this.master = master;
+    this.chain = [master, reverb, wet];
+    this.connect();
     this.timer = setInterval(() => this.schedule(), EVERY * 1000);
   }
 
@@ -651,6 +657,25 @@ class Music {
   private stop(): void {
     this.fadeOut(this.playing);
     this.playing = null;
+    // Once the fade has ended and nothing plays, the way to the speakers is taken off.
+    setTimeout(() => {
+      if (!this.playing) this.disconnect();
+    }, (FADE + AHEAD + 2) * 1000);
+  }
+
+  /** The music's way to the speakers: the master, dry and through the reverb. */
+  private connect(): void {
+    const [master, reverb, wet] = this.chain;
+    if (this.connected || !this.ctx || !master || !reverb || !wet) return;
+    master.connect(this.ctx.destination);
+    master.connect(reverb).connect(wet).connect(this.ctx.destination);
+    this.connected = true;
+  }
+
+  private disconnect(): void {
+    if (!this.connected) return;
+    for (const node of this.chain) node.disconnect();
+    this.connected = false;
   }
 
   /** The notes of the next moments, on the audio clock: a voice silenced by hand is

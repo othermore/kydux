@@ -16,13 +16,18 @@ function post(message: FromWorker): void {
 }
 
 async function load(interruptBuffer?: SharedArrayBuffer): Promise<void> {
+  // The world the page was built with, by its stamp: the address changes with every
+  // world, so that no copy of another world is used; the browser keeps this one and
+  // asks the server again each time, which answers 304 while it has not changed. It
+  // is fetched while Python loads, not after.
+  const fetched = fetch(`${base}world.zip?v=${__WORLD_STAMP__}`, { cache: 'no-cache' });
+  // Its failure is said where it is awaited, not as a promise no one waited for.
+  fetched.catch(() => undefined);
   const module = (await import(/* @vite-ignore */ `${base}pyodide/pyodide.mjs`)) as {
     loadPyodide: (options: { indexURL: string }) => Promise<PyodideAPI>;
   };
   const py = await module.loadPyodide({ indexURL: `${base}pyodide/` });
-  // The world the page was built with, by its stamp: the address changes with
-  // every world, so that no cached copy is used, and the fetch keeps none.
-  const world = await fetch(`${base}world.zip?v=${__WORLD_STAMP__}`, { cache: 'no-store' });
+  const world = await fetched;
   if (!world.ok) throw new Error(`world.zip: HTTP ${world.status}`);
   py.unpackArchive(await world.arrayBuffer(), 'zip', { extractDir: '/home/pyodide' });
   let worldStamp = '';

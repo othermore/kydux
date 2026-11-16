@@ -2720,10 +2720,10 @@ one overturns stays, marked as superseded.
   on; the wizard flies through it by crossing its cell in a vertical move along the ring's
   way (D219), which makes the ring's event `through` and lights it; a vertical move
   through it against its way makes the event `wrong_way` and lights nothing; a horizontal
-  move into its cell while flying bumps (*chocas con el aro*), and a walk into it bumps as
-  into furniture. The goal `through_in_order` (`{"kind": "through_in_order", "ids":
-  ["ring_1", ...]}`) is met when every ring named is flown through, each after the one
-  before it in the list; a ring passed over, flown against its way, or flown through out
+  move into its cell while flying bumps (*chocas con el aro*), a horizontal move out of it
+  is refused and stops the program (D226), and a walk into it bumps as into furniture.
+  The goal `through_in_order` (`{"kind": "through_in_order", "ids": ["ring_1", ...]}`) is
+  met when every ring named is flown through, each after the one before it in the list; a ring passed over, flown against its way, or flown through out
   of its turn, counts as missed, and the goal's `missed` lists the rings not flown through
   in order, for the race (D189). `?debug` numbers the rings in their order, each with an
   arrow for its way. Rules out a ring the wizard walks under.
@@ -3334,12 +3334,13 @@ one overturns stays, marked as superseded.
   `down`, and its `colour`. Flown through its cell in a vertical move along its way, it
   lights and counts (`through`); flown through against its way it does not: the ring
   shakes, the wizard says which way it is flown, the event is `wrong_way` and the ring
-  counts as missed. A horizontal move into it bumps. The rings a goal or a race
-  names go in pairs: the first of a pair `up`, the second `down`, the two on one row and
-  of one colour, the next pair of another colour; a level that does not hold this does not
-  load. The wizard starts on the row under the rings. Ilda tells the rule as the rule of
-  broom races where rings are first met, in *Los aros*, and the goal's line repeats it in
-  every level with rings. Rules out a pair flown down and then up, a ring that counts
+  counts as missed. A horizontal move into it bumps, and one out of it rubs its rim and
+  stops the program (D226). The rings a goal or a race names go in pairs: the first of a
+  pair `up`, the second `down`, the two on one row and of one colour, the next pair of
+  another colour; a level that does not hold this does not load. The wizard starts on the
+  row under the rings. Ilda tells the rule as the rule of broom races where rings are
+  first met, in *Los aros*, and the goal's line repeats it in every level with rings.
+  Rules out a pair flown down and then up, a ring that counts
   whichever way it is crossed, a ring alone, and two pairs side by side of one colour.
 - **D220 — The race is flown in two lanes, each racer through rings of their own, and a
   tie is flown again.** Decided 2026-11-14 by the owner (*necesitamos que haya dos filas
@@ -3417,3 +3418,27 @@ one overturns stays, marked as superseded.
   as long as anywhere else and a flown one a third of it. Everywhere else a walked step
   takes one tick. Rules out a flight of three cells a tick, which would make a flight
   of one or two cells cost a whole tick, and a walk as fast as a flight.
+- **D226 — A turn inside a ring rubs its rim, and the program stops.** Decided
+  2026-11-14 by the owner (*si se está dentro del aro y se intenta salir hacia un lado
+  (no hacia arriba o hacia abajo), se choca con el borde del aro*; *un pensamiento/sonido
+  de choque que pare el programa y que diga "Oh, giré demasiado pronto y rocé el aro"*).
+  While the wizard is in a ring's cell, flown into from below or from above, a move to the
+  left or to the right is refused as `drevo` over the water is (D215): the event
+  `blocked`, `by` the ring, `reason: ring_rim`, with `facing`; the run ends in an error at
+  that line, the wizard still in the ring's cell and in the air; the ring makes no event
+  and counts as not flown through, and a race is not flown out. The scene turns the wizard
+  that way and nudges it, shakes the ring and plays the bump's sound; the wizard thinks
+  the owner's words, *Oh, giré demasiado pronto y rocé el aro.*, and the card says why the
+  program stopped. A vertical move goes on: along the same way and out by the ring's far
+  side, which is the ring flown (`through`, or `wrong_way` against its way), or back out
+  by the side it came in, which says nothing and leaves the ring not flown. A program that
+  ends inside a ring leaves the wizard in the air there. Rules out a ring left by its side
+  in silence, missed and paid for only at a race's end, and a rim that bumps while the
+  program goes on.
+- **D227 — The goals box folds at a level's start where it covers the wizard or a ring.**
+  Decided 2026-11-14. Once the camera has drawn the level's start, the page compares the
+  goals box with the wizard's box and with each ring's (`SceneHandle.wizardBox`,
+  `ringBoxes`); where it meets one, the box folds for that level alone, and the child
+  opens it with its heading. The start card gives the goals whole before, the rings' rule
+  among them (D219). Rules out a ring half hidden under the goals where the child must fly
+  through it, and a box that moves about the page from level to level.

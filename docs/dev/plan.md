@@ -653,7 +653,9 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     wizard stands, by the wall or in the straw (D196),
     the broom taught first with a practice of one `untie` (D197), a list's element by
     its index and both ways of a loop over a list (D198), a story's step that frames a
-    place (D199), and the map folded by chapter (D200).
+    place (D199), and the map folded by chapter (D200); and, in `sprint-41.md`, a level
+    that frames a place, the shed's five levels seen whole (D201), and the shed's lying
+    brooms in sight on the boards or hidden under the straw (D202).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

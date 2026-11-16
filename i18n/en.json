@@ -535,7 +535,15 @@
       "voices": "Its voices",
       "reset": "As written",
       "off": "off",
-      "unchanged": "every voice as written"
+      "unchanged": "every voice as written",
+      "wind_title": "The broom's wind",
+      "wind_rest": "At rest",
+      "wind_on": "Flying on",
+      "wind_turn": "A turn",
+      "wind_flight": "A whole flight",
+      "wind_air": "the air",
+      "wind_tones": "the two high tones",
+      "wind_unchanged": "both voices as written"
     },
     "zone": "Zone",
     "font": {

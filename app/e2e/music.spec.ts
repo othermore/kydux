@@ -76,3 +76,17 @@ test('a theme playing on #music shows its voices, each to turn off and to set by
   await expect(page.locator('#themes-mix')).toHaveText('the-broom: every voice as written');
   await expect(page.locator('.themes-mixer input[type="checkbox"][data-voice="strings"]')).toBeChecked();
 });
+
+test("with ?debug, #music plays the broom's wind four ways, and its mixer says a voice turned off (D236)", async ({ page }) => {
+  await page.goto('/?debug#music');
+  const samples = page.locator('.themes-wind button[data-wind]');
+  await expect(samples).toHaveCount(4);
+  await expect(page.locator('.themes-wind input[type="checkbox"][data-wind-voice]')).toHaveCount(2);
+  await expect(page.locator('.themes-wind input[type="range"][data-wind-voice]')).toHaveCount(2);
+  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: both voices as written");
+  await page.locator('.themes-wind button[data-wind="flight"]').click();
+  await page.locator('.themes-wind input[type="checkbox"][data-wind-voice="tones"]').uncheck();
+  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: tones off");
+  await page.locator('#wind-reset').click();
+  await expect(page.locator('#wind-mix')).toHaveText("The broom's wind: both voices as written");
+});

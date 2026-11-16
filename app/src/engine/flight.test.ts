@@ -11,6 +11,7 @@ import {
   RING_PAST,
   RING_RAISE,
   throughRing,
+  turned,
 } from './flight';
 import { FLOWN, LONG, lengthOf, Playback, type PlaybackEvent } from './playback';
 import { spriteFoot, spriteScale, type ThingSprite } from './things';
@@ -40,6 +41,13 @@ describe('flying (D185)', () => {
     expect(hoverOf(HOVER_MS / 4, wizard)).toBeCloseTo(HOVER_CELLS);
     expect(hoverOf((HOVER_MS * 3) / 4, wizard)).toBeCloseTo(-HOVER_CELLS);
     expect(hoverOf(HOVER_MS, wizard)).toBeCloseTo(0);
+  });
+
+  it('tells a turn: a flown move whose way is not the way of the one before, when there was one (D236)', () => {
+    expect(turned(null, 'up')).toBe(false);
+    expect(turned('up', 'up')).toBe(false);
+    expect(turned('up', 'right')).toBe(true);
+    expect(turned('right', 'down')).toBe(true);
   });
 
   it('gives every other figure a place of its own in the hover, so that two racers do not rise together', () => {

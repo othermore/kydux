@@ -535,7 +535,15 @@
       "voices": "Sus instrumentos",
       "reset": "Como está escrito",
       "off": "apagado",
-      "unchanged": "todos los instrumentos como están escritos"
+      "unchanged": "todos los instrumentos como están escritos",
+      "wind_title": "El viento de la escoba",
+      "wind_rest": "En reposo",
+      "wind_on": "Volando recto",
+      "wind_turn": "Un giro",
+      "wind_flight": "Un vuelo entero",
+      "wind_air": "el aire",
+      "wind_tones": "los dos tonos agudos",
+      "wind_unchanged": "las dos voces como están escritas"
     },
     "zone": "Zona",
     "font": {

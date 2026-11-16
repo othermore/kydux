@@ -311,7 +311,7 @@ tiles are `[x, y]`.
 
 | kind | actor | data | the scene |
 |---|---|---|---|
-| `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; `ticks`, a walked step of the wizard's where it can fly, three (D225) | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132) |
+| `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; `ticks`, a walked step of the wizard's where it can fly, three (D225) | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132); a flown move has no tap: the wizard's holds the wind at its flying level, and one whose way is not its flown move's before swells it (D236) |
 | `bump` | wizard | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it; the thought names a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side |
 | `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
@@ -334,8 +334,8 @@ tiles are `[x, y]`.
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
 | `found` | `world`, in the tick of `find_all` or `find_nearest` | `ids`, the hidden things found; `at`, their cells | each comes into sight from the straw and is drawn from now on; one found before the first tick is shown with it; `data-found` (D184) |
 | `untie` | wizard | `id`, `at` | the wizard bends over the broom, a long tick, and its thread is gone; `data-untied` (D183) |
-| `fly` | `broom`, in the wizard's tick of drevo, or a racer in its own | `id`, the figure; `at` | the figure lifts half a cell, drawn in its flying row's level frame, and hovers slowly while the program plays (D235); the wind starts; every move after it is flown in a third of a walked step's time (`move`'s `flying`); `data-flying`, `data-hover`, `data-wind` (D185) |
-| `land` | `broom`, after the run's last tick, or a racer at its path's end | `id`, `at` | the figure sets down on its cell and the wind fades (D185) |
+| `fly` | `broom`, in the wizard's tick of drevo, or a racer in its own | `id`, the figure; `at` | the figure lifts half a cell, drawn in its flying row's level frame, and hovers slowly while the program plays (D235); for the wizard the wind blows while the program plays and swells (D236); every move after it is flown in a third of a walked step's time (`move`'s `flying`); `data-flying`, `data-hover`, `data-wind`, `data-wind-swells` (D185) |
+| `land` | `broom`, after the run's last tick, or a racer at its path's end | `id`, `at` | the figure sets down on its cell and the wizard's wind fades in 0.6 s (D185, D236) |
 | `through` | the ring, in the move of the wizard or of a racer | `id`, `at`, the cell flown from; `by`, the racer | the ring glows as the figure passes along its way; the wizard's are counted in `data-through`, in order (D187, D219, D220) |
 | `wrong_way` | the ring, in the wizard's move | `id`, `at`, `way`, the cell flown from | the ring shakes and the wizard thinks the way it is flown, with the bump's sound; the ring counts as missed (D219) |
 | `read` | wizard, before the first action of a race | `at`, `count`, `lines` | the band at the scene's foot says Ilda reading the two programs and the ticks to each take-off, the line read lit in the editor; `data-race-band` (D189) |

@@ -1592,25 +1592,35 @@ a.stop-body:focus-visible {
 }
 
 /* The voices of the theme that plays (D203): a box, a name, a slider and its volume. */
-.themes-mixer {
+.themes-mixer,
+.wind-mixer {
   display: grid;
   gap: 8px;
   padding: 0;
   list-style: none;
 }
 
-.themes-mixer li {
+.themes-mixer li,
+.wind-mixer li {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-.themes-mixer label {
+.themes-mixer label,
+.wind-mixer label {
   min-width: 14em;
 }
 
-.themes-mixer input[type='range'] {
+.themes-mixer input[type='range'],
+.wind-mixer input[type='range'] {
   flex: 1;
+}
+
+.themes-wind-samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .themes-volume {

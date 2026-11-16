@@ -476,6 +476,73 @@ test.describe('the hover (D235)', () => {
   });
 });
 
+test.describe('the wind (D236)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("blows only while the program plays in the air: off after Stop and under the slider, on again after Play", async ({
+    page,
+  }) => {
+    await open(page, 'the-first-flight', '1');
+    await start(page, HOVERING);
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard', { timeout: ciTimes(60_000) });
+    await expect(scene(page)).toHaveAttribute('data-wind', 'on');
+    await page.locator('#stop').click();
+    await page.waitForTimeout(500);
+    await expect(scene(page)).toHaveAttribute('data-wind', 'off');
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
+
+    await page.locator('#run').click();
+    await page.waitForFunction(
+      () => {
+        const node = document.querySelector<HTMLElement>('#scene')?.dataset;
+        return node?.state === 'playing' && Number(node.tick) >= 30 && node.flying === 'wizard';
+      },
+      undefined,
+      { timeout: ciTimes(60_000) },
+    );
+    await expect(scene(page)).toHaveAttribute('data-wind', 'on');
+    await page.locator('#timeline').fill(String(Number(await scene(page).getAttribute('data-tick')) - 2));
+    await expect(scene(page)).toHaveAttribute('data-state', 'paused');
+    await expect(scene(page)).toHaveAttribute('data-wind', 'off');
+    await page.locator('#stop').click();
+    await expect(scene(page)).toHaveAttribute('data-wind', 'on');
+  });
+
+  test('swells at the lift alone in a straight flight, and at the lift and at each turn in Los aros', async ({ page }) => {
+    await open(page, 'the-first-flight');
+    expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute('data-wind-swells', '1');
+
+    await page.locator('#again').click();
+    await open(page, 'the-rings');
+    // Every cell the wizard is on, in order, to count the turns of its flight.
+    await page.evaluate(() => {
+      const node = document.querySelector('#scene') as HTMLElement;
+      const cells: string[] = [];
+      (window as unknown as { cells: string[] }).cells = cells;
+      new MutationObserver((records) => {
+        for (const record of records) cells.push(record.oldValue ?? '');
+      }).observe(node, { attributes: true, attributeFilter: ['data-wizard'], attributeOldValue: true });
+    });
+    expect(await run(page, solution('the-rings'))).toMatch(/^¡Lo has conseguido/);
+    const cells = await page.evaluate(() => [
+      ...(window as unknown as { cells: string[] }).cells,
+      (document.querySelector('#scene') as HTMLElement).dataset.wizard ?? '',
+    ]);
+    // Its solution casts first: every move is flown.
+    const visited = cells.filter((cell, index) => cell !== '' && cell !== cells[index - 1]).map((cell) => cell.split(',').map(Number));
+    const start = visited.findIndex(([x, y]) => x === 4 && y === 9);
+    const ways = visited.slice(start + 1).map(([x, y], index) => {
+      const [px, py] = visited[start + index] as number[];
+      return `${Math.sign((x as number) - (px as number))},${Math.sign((y as number) - (py as number))}`;
+    });
+    const turns = ways.filter((way, index) => index > 0 && way !== ways[index - 1]).length;
+    expect(turns).toBeGreaterThan(10);
+    await expect(scene(page)).toHaveAttribute('data-wind-swells', String(turns + 1));
+  });
+});
+
 test.describe('drevo lands (D215)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));

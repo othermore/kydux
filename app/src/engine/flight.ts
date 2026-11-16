@@ -79,6 +79,12 @@ export function hoverOf(ms: number, phase: number): number {
   return Math.sin((ms / HOVER_MS + phase) * Math.PI * 2) * HOVER_CELLS;
 }
 
+/** Whether a flown move turned: its way is not the way of the flown move before it,
+ * when there was one (D236). */
+export function turned(before: Facing | null, now: Facing): boolean {
+  return before !== null && before !== now;
+}
+
 /** How long a tick of the playback lasts, against a tick, by what its figures do in
  * it: a flown tick, every move in it flown and none walked, a third (D185). */
 export function flownTick(events: { kind: string; data: Record<string, unknown> }[]): boolean {

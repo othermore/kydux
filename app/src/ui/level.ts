@@ -486,7 +486,24 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
 
   about.setAttribute('aria-label', t('level.about'));
   about.title = t('level.about');
-  about.addEventListener('click', () => showStart(false, true));
+  // ? opens the start card, and closes the one it opened (D222).
+  const startShown = () => Boolean(shownCard?.open && shownCard.node.querySelector('.start-card'));
+  about.addEventListener('click', () => {
+    if (startShown()) shownCard?.close();
+    else showStart(false, true);
+  });
+  // While the start card is open, a click on any other button of the page closes it,
+  // and the button does what it does: Run runs, Hint hints, the notebook opens, the
+  // speed changes (a select changed from the keyboard too). A click on the scene, the
+  // editor or the card closes nothing (D222).
+  const closeStartFor = (event: Event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const control = target?.closest('button, select, a[href]');
+    if (!control || control === about || !startShown() || shownCard?.node.contains(control)) return;
+    shownCard?.close();
+  };
+  node.addEventListener('click', closeStartFor, { capture: true });
+  node.addEventListener('change', closeStartFor, { capture: true });
 
   // The map over the level (D71): the run and the editor stay as they are; Back,
   // or Escape, closes it, and leaving for another stop while a run goes on asks.

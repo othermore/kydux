@@ -128,3 +128,71 @@ test('? opens the start card over the notebook, and it says Continue', async ({ 
   const atPoint = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.id ?? '', middle);
   expect(atPoint).toBe('start');
 });
+
+test.describe('a card in a window 600 px high (D222)', () => {
+  test.use({ viewport: { width: 1280, height: 600 } });
+
+  /** Whether a card shows its first line: its scroll at the top, its title inside it. */
+  const top = (page: Page, selector: string) =>
+    page.locator(selector).evaluate((card) => {
+      const title = card.querySelector('h3')?.getBoundingClientRect();
+      const box = card.getBoundingClientRect();
+      return {
+        scroll: card.scrollTop,
+        titleShown: Boolean(title && title.top >= box.top - 1 && title.bottom <= box.bottom + 1),
+        taller: card.scrollHeight > card.clientHeight,
+      };
+    });
+
+  test('the start card and the win card show their title when they open, however tall', async ({ page }) => {
+    await page.goto('/#level/the-brooms-in-the-straw');
+    await expect(page.locator('.start-card')).toBeVisible();
+    await expect.poll(() => top(page, '.start-card')).toEqual({ scroll: 0, titleShown: true, taller: true });
+    await page.locator('#start').click();
+    await ready(page);
+    await page.locator('#speed').selectOption('4');
+    await run(page, readFileSync(fileURLToPath(new URL('../../content/levels/the-brooms-in-the-straw/solution.py', import.meta.url)), 'utf8'));
+    await expect(page.locator('.win-card')).toBeVisible();
+    await expect.poll(() => top(page, '.win-card')).toEqual({ scroll: 0, titleShown: true, taller: true });
+  });
+
+  test('with the start card open, a button of the page closes it and does what it does; ? opens and closes it', async ({
+    page,
+  }) => {
+    await page.goto('/#level/the-long-corridor');
+    const card = page.locator('.start-card');
+    await expect(card).toBeVisible();
+    await ready(page);
+    // Run runs.
+    await page.locator('#run').click();
+    await expect(card).toBeHidden();
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
+    // Hint gives its hint.
+    await page.locator('#about').click();
+    await expect(card).toBeVisible();
+    await page.locator('#hint').click();
+    await expect(card).toBeHidden();
+    await expect(page.locator('.hints .hint')).toHaveCount(1);
+    // The notebook opens.
+    await page.locator('#about').click();
+    await expect(card).toBeVisible();
+    await page.locator('#notebook-open').click();
+    await expect(card).toBeHidden();
+    await expect(page.locator('#notebook')).toBeVisible();
+    await page.locator('#notebook-open').click();
+    // The speed changes.
+    await page.locator('#about').click();
+    await expect(card).toBeVisible();
+    await page.locator('#speed').selectOption('2');
+    await expect(card).toBeHidden();
+    await expect(page.locator('#speed')).toHaveValue('2');
+    // The editor and the card itself close nothing; ? closes the card it opened.
+    await page.locator('#about').click();
+    await expect(card).toBeVisible();
+    await page.locator('.cm-content').click();
+    await card.locator('h3').click();
+    await expect(card).toBeVisible();
+    await page.locator('#about').click();
+    await expect(card).toBeHidden();
+  });
+});

@@ -15,6 +15,16 @@ export interface Card {
   close(): void;
 }
 
+/** A card's button takes the keyboard without bringing itself into view, and the card
+ * shows its first line, however tall it is (D222). */
+function takeKeyboard(node: HTMLElement, button: HTMLElement): void {
+  queueMicrotask(() => {
+    button.focus({ preventScroll: true });
+    const panel = node.querySelector<HTMLElement>('.card');
+    if (panel) panel.scrollTop = 0;
+  });
+}
+
 /** A card over the scene: a dialog the child closes with its button or Escape. */
 function overlay(className: string, children: (Node | string)[], onClose: () => void): Card {
   const panel = element('div', { className: `card ${className}` }, children);
@@ -136,7 +146,7 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
     onClose,
   );
   start.addEventListener('click', () => card.close());
-  queueMicrotask(() => start.focus());
+  takeKeyboard(card.node, start);
   return card;
 }
 
@@ -225,6 +235,6 @@ export function winCard({ verdict, kept, next, onAgain, onNext, said, learned, r
     onAgain();
   });
   if (next) after.addEventListener('click', () => onNext(next));
-  queueMicrotask(() => (next ? (after as HTMLButtonElement) : again).focus());
+  takeKeyboard(card.node, next ? (after as HTMLButtonElement) : again);
   return card;
 }

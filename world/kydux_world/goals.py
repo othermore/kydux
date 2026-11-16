@@ -10,7 +10,8 @@ one at x and y; passing over it on the way does not count, unless the goal says
 `"on_the_way": true`, for a level whose ways end in different cells), collect (a thing by
 id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
 say (a text, word for word, or the number of things of a kind in the way played:
-`{"kind": "say", "count_of": "broom"}`, D184), give (a thing by id, to an actor by
+`{"kind": "say", "count_of": "broom"}`, D184, those hung or not with `"hung": true` or
+`false`, D205), give (a thing by id, to an actor by
 id), cast (a spell cast, not a word refused: `{"kind": "cast", "spell": "osto"}`,
 D176, maybe from one of a few cells, `"from": [[x, y], ...]`), no_bumps
 (the wizard bumps into nothing; failed at the first bump), untied (no broom knotted,
@@ -148,13 +149,23 @@ class OpenGoal:
 
 class SayGoal:
     """Met once the wizard has said a text, word for word; or, with `count_of`, the
-    number of things of a kind the way played has (D184)."""
+    number of things of a kind the way played has (D184): with `"hung": false` only those
+    not hung, with `true` only the hung ones, without it every one (D205)."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
         text = spec.params.get("text")
         kind = spec.params.get("count_of")
+        hung = spec.params.get("hung")
+        if hung is not None and (not isinstance(hung, bool) or kind is None):
+            raise LevelError(f"{level.id}: a say goal's hung is true or false, with count_of")
         if isinstance(kind, str) and text is None:
-            text = str(sum(1 for thing in level.things if thing.kind == kind))
+            text = str(
+                sum(
+                    1
+                    for thing in level.things
+                    if thing.kind == kind and (hung is None or thing.hung == hung)
+                )
+            )
         if not isinstance(text, str):
             raise LevelError(f"{level.id}: a say goal needs a text, or count_of a kind")
         self.text = text

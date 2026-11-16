@@ -277,9 +277,8 @@ def test_the_way_in_keeps_the_wizard_on_the_threshold_with_its_words():
 def test_a_forbidden_cell_s_reason_has_its_words_in_every_language(directory):
     """The wizard says why a cell is forbidden (D84, D171): the reason's words are
     `blocked.<reason>` in every language."""
-    reason = load(directory).forbidden_reason
-    if not reason:
-        return
+    reasons = set(load(directory).forbidden_reasons.values())
     for lang in LANGUAGES:
         words = json.loads((ROOT / "i18n" / f"{lang}.json").read_text(encoding="utf-8"))
-        assert words["blocked"].get(reason), f"blocked.{reason} in {lang}"
+        for reason in reasons:
+            assert words["blocked"].get(reason), f"blocked.{reason} in {lang}"

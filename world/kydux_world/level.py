@@ -26,7 +26,8 @@ the names the level teaches (D23); `goals`, some of them bonus goals;
 `tick_limit`; `race`, a race against a racer scored by Ilda's count (D189);
 `dark`, a room unlit until `kirra` (D52), which the level lists among its
 spells when a `collect` or an `open` goal lies in the dark (D162); `forbidden`, the
-tiles the wizard may not step on and why, which its scene gives (D84);
+tiles the wizard may not step on and why, which its scene gives (D84) and the level
+may add to, each with its reason (D205);
 `enchanted`, the boxes of cells that hide every figure in them, which its scene
 gives too and only the page reads (D135); `camera`, a box of cells the page
 shows whole at the level's start (D201), which holds the start, every marker and
@@ -211,7 +212,9 @@ class Level:
     #: The tiles the wizard may not step on, though others may, and why: the other
     #: dormitory's arch (D84).
     forbidden: frozenset[Position] = frozenset()
-    forbidden_reason: str = ""
+    #: Why each forbidden tile is, the reason the wizard says (D84): the scene's and the
+    #: level's own (D205).
+    forbidden_reasons: dict[Position, str] = field(default_factory=dict)
     #: The race the level is, or None (D189).
     race: Race | None = None
     #: On a scene, the kind of each cell's terrain no one walks on, `water`, `tree`,
@@ -364,9 +367,8 @@ class Level:
                 "when a collect or an open goal lies in the dark"
             )
 
-        forbidden, forbidden_reason = _forbidden(
-            data.get("forbidden"), level_id, walls, len(rows), width
-        )
+        forbidden_reasons = _forbidden(data.get("forbidden"), level_id, walls, len(rows), width)
+        forbidden = frozenset(forbidden_reasons)
 
         own = data.get("own_goals", False)
         source = data.get("goals_source")
@@ -398,7 +400,7 @@ class Level:
             dark_area=frozenset(area),
             kind=kind,
             forbidden=forbidden,
-            forbidden_reason=forbidden_reason,
+            forbidden_reasons=forbidden_reasons,
             low=frozenset(low),
             race=_race(data.get("race"), shape, actors),
             kinds=_kinds(data),
@@ -842,28 +844,34 @@ def _sleepers(
 
 def _forbidden(
     value: Any, level_id: str, walls: set[Position], height: int, width: int
-) -> tuple[frozenset[Position], str]:
-    """The tiles the wizard may not step on, and the reason it is told (D84):
-    `{"reason": "not_my_dormitory", "cells": [[x, y], ...]}`, each a floor tile."""
+) -> dict[Position, str]:
+    """The tiles the wizard may not step on, each with the reason it is told (D84):
+    `{"reason": "not_my_dormitory", "cells": [[x, y], ...]}`, each a floor tile; or a
+    list of them, the scene's and the level's own (D205), no tile named twice."""
     if value is None:
-        return frozenset(), ""
-    reason = value.get("reason") if isinstance(value, dict) else None
-    cells = value.get("cells") if isinstance(value, dict) else None
-    if not isinstance(reason, str) or not reason.isidentifier() or not isinstance(cells, list):
-        raise LevelError(f"{level_id}: forbidden is a reason and its cells")
-    found = set()
-    for cell in cells:
-        if not (
-            isinstance(cell, list)
-            and len(cell) == 2
-            and all(isinstance(v, int) and not isinstance(v, bool) for v in cell)
-        ):
-            raise LevelError(f"{level_id}: a forbidden cell is [x, y]")
-        here = Position(*cell)
-        if not (0 <= here.x < width and 0 <= here.y < height) or here in walls:
-            raise LevelError(f"{level_id}: the forbidden cell {here.x},{here.y} is not floor")
-        found.add(here)
-    return frozenset(found), reason
+        return {}
+    found: dict[Position, str] = {}
+    for part in value if isinstance(value, list) else [value]:
+        reason = part.get("reason") if isinstance(part, dict) else None
+        cells = part.get("cells") if isinstance(part, dict) else None
+        if not isinstance(reason, str) or not reason.isidentifier() or not isinstance(cells, list):
+            raise LevelError(f"{level_id}: forbidden is a reason and its cells")
+        for cell in cells:
+            if not (
+                isinstance(cell, list)
+                and len(cell) == 2
+                and all(isinstance(v, int) and not isinstance(v, bool) for v in cell)
+            ):
+                raise LevelError(f"{level_id}: a forbidden cell is [x, y]")
+            here = Position(*cell)
+            if not (0 <= here.x < width and 0 <= here.y < height) or here in walls:
+                raise LevelError(f"{level_id}: the forbidden cell {here.x},{here.y} is not floor")
+            if here in found:
+                raise LevelError(
+                    f"{level_id}: the forbidden cell {here.x},{here.y} is named twice"
+                )
+            found[here] = reason
+    return found
 
 
 def _sought_in_the_dark(
@@ -1252,8 +1260,10 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
         built["things"] = _merged_things(scene, data)
     if scene.things:
         built["fixed"] = [thing["id"] for thing in scene.things]
+    # The scene's forbidden tiles and the level's own, each with its reason (D205).
     if scene.forbidden is not None:
-        built["forbidden"] = scene.forbidden
+        own = data.get("forbidden")
+        built["forbidden"] = [scene.forbidden, own] if own is not None else scene.forbidden
     if scene.enchanted:
         built["enchanted"] = [list(box) for box in scene.enchanted]
     dark = data.get("dark")

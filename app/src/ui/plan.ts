@@ -78,8 +78,10 @@ export function planShapes(view: PlanView): PlanShapes {
     .filter((figure) => !enchanted.has(key(figure.tile)))
     .map(({ id, kind, tile: [x, y], facing }) => ({ id, kind, x, y, facing }));
   const marks = view.marks.map(([x, y]) => ({ x, y }));
-  const zones = (view.zones ?? [])
-    .filter((zone) => zone.cells.length > 0)
+  // Zones are hatched and named only where the wizard may stand in two of them: one alone
+  // tells the child nothing (D205).
+  const seen = (view.zones ?? []).filter((zone) => zone.cells.length > 0);
+  const zones = (seen.length > 1 ? seen : [])
     .map(({ name, cells: tiles }) => {
       const zoneCells = tiles.map(([x, y]) => ({ x, y }));
       const label = [...zoneCells].sort((a, b) => a.y - b.y || a.x - b.x)[0] as { x: number; y: number };

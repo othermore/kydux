@@ -1,17 +1,17 @@
 {
   "title": "The shed",
   "goals": [
-    "Say how many brooms there are in all, with `say`.",
+    "Say how many brooms are on the floor, with `say`.",
     "Print a list with `print`."
   ],
-  "starting_code": "# Find the brooms down here with `find_all`.\n# Walk up to the wall with `move_up`.\n# Find the hanging ones with `find_all`.\n# Say how many there are in all with `say` and `len`.\n",
+  "starting_code": "# Find the brooms on the floor with `find_all`.\n# Print the list with `print`.\n# Say how many there are with `say` and `len`.\n",
   "hints": [
-    "Use `find_all` from where you are to get the first list, and save it in a variable.",
-    "After walking to the wall, use `find_all` again and save that new list in another variable.",
-    "You can add the `len` of the first list and the `len` of the second list together, right inside `say`!"
+    "The hanging brooms are easy to see, so we only need to count the ones on the floor!",
+    "If you use `find_all` from where you stand on the floor, you'll find the brooms lying around, even the ones hidden under the straw.",
+    "Use `print` to show the list, and then `say` with `len` to say the number of brooms in the list."
   ],
-  "intro": "But how many are there? And how do we find them? Remember that from here you can find the ones in the straw, and by the wall the hanging ones.",
-  "outro": "That's all of them! Now we can start untying the rest.",
-  "learned": "Now you know that `find_all` gives a list of what you find from where you stand, and that you can add the `len` of two lists.",
+  "intro": "But how many lie on the floor? Some are in plain sight, but others are hidden in the straw. The ones on the pegs are easy to see, so we don't need to count those.",
+  "outro": "That's exactly how many are on the floor! Now we can start untying the rest.",
+  "learned": "Now you know that `find_all` gives a list of the brooms you can find from where you stand, and `len` tells you how many there are.",
   "changes": "The number of brooms on the floor changes each time, and some are hidden in the straw."
 }

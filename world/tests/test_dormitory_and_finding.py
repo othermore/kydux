@@ -5,7 +5,7 @@ of the child's objects."""
 from pathlib import Path
 
 import pytest
-from kydux_world.level import Level, LevelError, Position
+from kydux_world.level import DEFAULT_TERRAINS, Level, LevelError, Position, Scene, on_scene
 from kydux_world.run import run_code
 from kydux_world.world import ActionArguments, World
 
@@ -200,6 +200,37 @@ def test_others_pass_a_forbidden_tile():
     world = World(level)
     world.wizard.wait(3)
     assert world.actors["dask"].position == Position(1, 2)
+
+
+def test_a_level_forbids_tiles_of_its_own_beside_its_scene_s_each_with_its_reason():
+    """D205: the scene's and the level's own, each tile with its reason; a tile named by
+    both is refused."""
+    scene = Scene(
+        "room",
+        ("......", "......", "......"),
+        dict(DEFAULT_TERRAINS),
+        forbidden={"reason": "not_my_dormitory", "cells": [[0, 0]]},
+    )
+    data = {
+        "id": "room",
+        "start": [2, 1],
+        "forbidden": {"reason": "stay_by_the_brooms", "cells": [[2, 0], [3, 0]]},
+        "goals": [{"kind": "reach", "marker": "E"}],
+        "end": [5, 2],
+    }
+    level = Level.from_dict(on_scene(data, scene))
+    assert level.forbidden_reasons == {
+        Position(0, 0): "not_my_dormitory",
+        Position(2, 0): "stay_by_the_brooms",
+        Position(3, 0): "stay_by_the_brooms",
+    }
+    world = World(level)
+    world.wizard.move_up()
+    assert world.wizard.position == Position(2, 1)
+    assert world.events[-1].data["reason"] == "stay_by_the_brooms"
+    twice = {**data, "forbidden": {"reason": "stay_by_the_brooms", "cells": [[0, 0]]}}
+    with pytest.raises(LevelError, match="named twice"):
+        Level.from_dict(on_scene(twice, scene))
 
 
 def test_a_forbidden_cell_must_be_floor_and_free_only_belongs_to_a_bed():

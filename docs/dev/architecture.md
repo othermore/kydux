@@ -1400,8 +1400,8 @@ one overturns stays, marked as superseded.
   right-hand one, whoever the wizard is, and the scene names the other
   arch's tiles in `scene.json`'s `forbidden`, with the reason the wizard
   is told (`not_my_dormitory`, worded by the wizard's gender), which a
-  level on the scene carries: the wizard's step is refused and turned
-  that way, and anyone else passes. A bed is a thing, `free` or not, drawn
+  level on the scene carries, beside any it forbids of its own (D205): the
+  wizard's step is refused and turned that way, and anyone else passes. A bed is a thing, `free` or not, drawn
   by the painting and never by the page; `wizard.sleep()` beside a free bed
   walks to the floor under its pillow and lies down in it (D130); a goal
   `sleep` names the bed. The dormitory
@@ -2890,7 +2890,10 @@ one overturns stays, marked as superseded.
   its own and names it in the legend. In the shed the zone `wall` is the row under the
   pegs, row 5, from which the hung brooms are found and untied, and the zone `straw` is
   the floor away from the wall, rows 6 to 8 and (5, 8) (D211); it keeps its name, *en la
-  paja*, though most of its brooms lie on the bare boards (D202). Rules out a `find_all` that sees through walls into
+  paja*, though most of its brooms lie on the bare boards (D202). *El cobertizo* names
+  the zone `wall` alone, its hung brooms in it and its lying ones in none, and forbids
+  the row under the pegs (D205); the plan hatches and names zones only where a level
+  has two. Rules out a `find_all` that sees through walls into
   every corner of a place.
 - **D197 — The broom is taught before the lists, with a practice of one `untie`.**
   Decided 2026-11-11 by the owner (*una primera práctica sencilla: una escoba justo a tus
@@ -3066,3 +3069,20 @@ one overturns stays, marked as superseded.
   `tests/tools/test_shed_cells.py` holds these on the scene as the page draws it.
   Rules out a hung broom untied from two rows under its peg, a figure of row 5 with its
   feet on the wall's face, and a figure of row 5 behind the barrel or behind a hung broom.
+- **D205 — A level may forbid cells of its own.** Decided 2026-11-12 by the owner (*si el
+  personaje intenta llegar a la pared (a la zona de la pared) debería fallar diciendo:
+  para contar las escobas en el suelo, mejor me quedo cerca de donde están tiradas*). A
+  level's `level.json` may carry `"forbidden": {"reason": "<id>", "cells": [[x, y],
+  ...]}`, with the form and the checks of the scene's (D84, D171): the wizard stops
+  before a forbidden cell and says the reason's words, `blocked.<reason>`. A level in a
+  scene with forbidden cells of its own has both, each cell with its reason
+  (`Level.forbidden_reasons`); a cell named by both is refused. *El cobertizo* asks one
+  thing, how many brooms lie on the floor: its goal is `{"kind": "say", "count_of":
+  "broom", "hung": false}` (a `say` goal's `hung` counts the things not hung, `true` the
+  hung ones, and without it every one); its zones are `wall` alone, which its hung
+  brooms carry so that a `find_all` from the floor never gives them; and it forbids
+  the row under the pegs with the owner's words, `stay_by_the_brooms` (*Para contar las
+  escobas en el suelo, mejor me quedo cerca de donde están tiradas.*). The plan hatches
+  and names zones only in a level that has two. Rules out a wall or an actor placed to
+  keep the wizard from a part of a scene, and a goal that fails without a word when the
+  wizard goes where the level does not want it.

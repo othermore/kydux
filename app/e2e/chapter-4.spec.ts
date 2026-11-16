@@ -187,13 +187,22 @@ test.describe('the shed', () => {
     await expect(scene(page)).toHaveAttribute('data-untied', 'broom_0');
   });
 
-  test('the brooms are counted from the straw and from the wall; one find_all loses (D196, D202)', async ({ page }) => {
+  test('the brooms on the floor are counted, and a walk to the wall is stopped with the owner\'s words (D202, D205)', async ({ page }) => {
     await open(page, 'the-shed');
     // The brooms lying on the boards are seen; those under the straw only once a program
     // looks there.
     const first = lyingOf('the-shed', waysOf('the-shed')[0] as string);
     await expect.poll(() => lyingDrawn(page)).toEqual(first.seen.sort());
-    expect(await run(page, wrong('the-shed', 'one_find_all_from_the_door'))).not.toMatch(/^¡Lo has conseguido/);
+    // The walk up is stopped before the row under the pegs, and the wizard thinks why.
+    await start(page, 'wizard.move_up(3)');
+    await expect(scene(page)).toHaveAttribute(
+      'data-thought',
+      'Para contar las escobas en el suelo, mejor me quedo cerca de donde están tiradas.',
+      { timeout: ciTimes(60_000) },
+    );
+    await expect(scene(page)).toHaveAttribute('data-wizard', '9,6');
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
+    await expect(page.locator('.outcome')).not.toHaveAttribute('data-kind', 'won');
     expect(await run(page, solution('the-shed'))).toMatch(/^¡Lo has conseguido/);
     // Each way played back to its end, its won card closed to see the scene.
     for (const way of waysOf('the-shed')) {
@@ -386,7 +395,7 @@ test.describe('the debug view of chapter 4', () => {
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
   test("with ?debug, the shed's zones are framed and named (D196)", async ({ page }) => {
-    await page.goto('/?debug#level/the-shed');
+    await page.goto('/?debug#level/the-brooms-on-the-wall');
     await page.locator('#start').click();
     await expect(scene(page)).toHaveAttribute('data-debug', 'true', { timeout: ciTimes(90_000) });
     await page.locator('#debug-cells').click();

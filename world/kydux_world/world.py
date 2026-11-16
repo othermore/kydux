@@ -490,7 +490,7 @@ class Wizard(Child):
                 return
             if ahead in world.level.forbidden:
                 # A tile the wizard may not step on, though anyone else may (D84).
-                reason = world.level.forbidden_reason
+                reason = world.level.forbidden_reasons[ahead]
                 refused = {"at": list(here), "by": "wizard", "reason": reason, "tried": False}
                 world.act("blocked", {**refused, "facing": direction.value})
                 return

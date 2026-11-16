@@ -1,17 +1,17 @@
 {
   "title": "El cobertizo",
   "goals": [
-    "Di cuántas escobas hay en total, con `say`.",
+    "Di cuántas escobas hay en el suelo, con `say`.",
     "Imprime una lista con `print`."
   ],
-  "starting_code": "# Encuentra las escobas de aquí abajo con `find_all`.\n# Camina hacia arriba hasta la pared con `move_up`.\n# Encuentra las colgadas con `find_all`.\n# Di cuántas hay en total con `say` y `len`.\n",
+  "starting_code": "# Encuentra las escobas del suelo con `find_all`.\n# Imprime la lista con `print`.\n# Di cuántas hay con `say` y `len`.\n",
   "hints": [
-    "Usa `find_all` desde donde estás para obtener la primera lista, y guárdala en una variable.",
-    "Después de caminar hasta la pared, vuelve a usar `find_all` y guarda esa nueva lista en otra variable.",
-    "¡Puedes sumar el `len` de la primera lista y el `len` de la segunda, directamente dentro de `say`!"
+    "Las escobas colgadas se ven muy bien, ¡así que solo tenemos que contar las que están en el suelo!",
+    "Si usas `find_all` desde donde estás en el suelo, encontrarás las escobas tiradas, incluso las escondidas bajo la paja.",
+    "Usa `print` para mostrar la lista, y luego `say` con `len` para decir el número de escobas de la lista."
   ],
-  "intro": "Pero ¿cuántas son? Y ¿cómo las encontramos? Recuerda que desde aquí puedes encontrar las que están en la paja, y junto a la pared las que están colgadas.",
-  "outro": "¡Esas son todas! Ahora podemos empezar a desatar el resto.",
-  "learned": "Ahora sabes que `find_all` da una lista de lo que encuentras desde donde estás, y que el `len` de dos listas se puede sumar.",
+  "intro": "Pero ¿cuántas hay en el suelo? Algunas están a la vista, pero otras están escondidas en la paja. Las de los ganchos se ven de sobra, así que no hace falta contarlas.",
+  "outro": "¡Justo esas son las que hay en el suelo! Ahora podemos empezar a desatar el resto.",
+  "learned": "Ahora sabes que `find_all` da una lista de las escobas que puedes encontrar desde donde estás, y `len` te dice cuántas son.",
   "changes": "El número de escobas del suelo cambia cada vez, y algunas están escondidas en la paja."
 }

@@ -14,19 +14,42 @@
         13,
         5
       ]
-    ],
-    "straw": [
+    ]
+  },
+  "forbidden": {
+    "reason": "stay_by_the_brooms",
+    "cells": [
       [
         6,
-        6,
-        13,
-        8
+        5
       ],
       [
-        5,
+        7,
+        5
+      ],
+      [
         8,
-        5,
-        8
+        5
+      ],
+      [
+        9,
+        5
+      ],
+      [
+        10,
+        5
+      ],
+      [
+        11,
+        5
+      ],
+      [
+        12,
+        5
+      ],
+      [
+        13,
+        5
       ]
     ]
   },
@@ -68,17 +91,6 @@
   "things": [
     {
       "kind": "broom",
-      "id": "broom_6",
-      "at": [
-        6,
-        4
-      ],
-      "hung": true,
-      "zone": "wall",
-      "knotted": true
-    },
-    {
-      "kind": "broom",
       "id": "broom_7",
       "at": [
         7,
@@ -90,9 +102,31 @@
     },
     {
       "kind": "broom",
-      "id": "broom_8",
+      "id": "broom_10",
       "at": [
-        8,
+        10,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_11",
+      "at": [
+        11,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_13",
+      "at": [
+        13,
         4
       ],
       "hung": true,
@@ -105,8 +139,7 @@
       "at": [
         9,
         8
-      ],
-      "zone": "straw"
+      ]
     },
     {
       "kind": "broom",
@@ -115,7 +148,6 @@
         7,
         7
       ],
-      "zone": "straw",
       "knotted": true
     },
     {
@@ -125,7 +157,6 @@
         11,
         7
       ],
-      "zone": "straw",
       "knotted": true
     },
     {
@@ -135,7 +166,6 @@
         6,
         8
       ],
-      "zone": "straw",
       "knotted": true,
       "hidden": true
     },
@@ -144,9 +174,18 @@
       "id": "broom_4",
       "at": [
         13,
+        6
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_5",
+      "at": [
+        5,
         8
       ],
-      "zone": "straw",
       "knotted": true,
       "hidden": true
     }
@@ -162,7 +201,8 @@
   "goals": [
     {
       "kind": "say",
-      "count_of": "broom"
+      "count_of": "broom",
+      "hung": false
     },
     {
       "kind": "uses",
@@ -172,25 +212,17 @@
   ],
   "ways": [
     {
-      "id": "six",
+      "id": "a",
       "things": [
         {
-          "id": "broom_7",
-          "gone": true
-        },
-        {
-          "id": "broom_8",
+          "id": "broom_5",
           "gone": true
         }
       ]
     },
     {
-      "id": "seven",
+      "id": "b",
       "things": [
-        {
-          "id": "broom_8",
-          "gone": true
-        },
         {
           "id": "broom_1",
           "at": [
@@ -210,10 +242,10 @@
         {
           "id": "broom_3",
           "at": [
-            6,
-            7
+            7,
+            6
           ],
-          "hidden": false
+          "hidden": true
         },
         {
           "id": "broom_4",
@@ -226,23 +258,31 @@
       ]
     },
     {
-      "id": "eight",
+      "id": "c",
       "things": [
         {
-          "id": "broom_2",
-          "at": [
-            11,
-            8
-          ],
-          "hidden": false
+          "id": "broom_1",
+          "gone": true
+        },
+        {
+          "id": "broom_5",
+          "gone": true
         },
         {
           "id": "broom_3",
           "at": [
-            7,
+            6,
+            6
+          ],
+          "hidden": true
+        },
+        {
+          "id": "broom_4",
+          "at": [
+            13,
             8
           ],
-          "hidden": false
+          "hidden": true
         }
       ]
     }

@@ -673,7 +673,14 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     the screen opening by itself (D221), a card opened at its top and the start card
     closed by any button (D222), the code's letter one of three tried under `?debug`,
     a comment never broken by hand (D223), the knot untied and never the broom (D224),
-    and a walked step three ticks where the wizard can fly (D225).
+    and a walked step three ticks where the wizard can fly (D225); and, in
+    `sprint-45.md`, a turn inside a ring that rubs its rim and stops the program (D226),
+    the goals box as a list or a strip, folded by itself only after three seconds
+    (D227), the start card over the whole window (D228), the race's finish a cell past
+    the painted line (D229), the content and Python's files kept for good under
+    addresses that change with them (D230), the page's sound asleep while nothing
+    sounds (D231), and a figure flown through a ring's hole, behind it or in front of it
+    by the way it flew (D232).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

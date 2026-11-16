@@ -23,10 +23,12 @@ async function load(interruptBuffer?: SharedArrayBuffer): Promise<void> {
   const fetched = fetch(`${base}world.zip?v=${__WORLD_STAMP__}`, { cache: 'no-cache' });
   // Its failure is said where it is awaited, not as a promise no one waited for.
   fetched.catch(() => undefined);
-  const module = (await import(/* @vite-ignore */ `${base}pyodide/pyodide.mjs`)) as {
+  // Python's own files, in the folder of their version, which the server keeps (D230).
+  const folder = `${base}pyodide/${__PYODIDE_VERSION__}/`;
+  const module = (await import(/* @vite-ignore */ `${folder}pyodide.mjs`)) as {
     loadPyodide: (options: { indexURL: string }) => Promise<PyodideAPI>;
   };
-  const py = await module.loadPyodide({ indexURL: `${base}pyodide/` });
+  const py = await module.loadPyodide({ indexURL: folder });
   const world = await fetched;
   if (!world.ok) throw new Error(`world.zip: HTTP ${world.status}`);
   py.unpackArchive(await world.arrayBuffer(), 'zip', { extractDir: '/home/pyodide' });

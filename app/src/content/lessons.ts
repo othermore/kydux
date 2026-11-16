@@ -5,6 +5,7 @@
 // level after it starts with its own program, never with it (D63).
 
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
+import { contentUrl } from './address';
 
 export interface Lesson {
   id: string;
@@ -59,7 +60,7 @@ async function fetched(url: string, kind: 'json' | 'text'): Promise<string | nul
 
 export async function loadLesson(id: string, lang: Language): Promise<Lesson> {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) throw new LessonNotFound(id);
-  const lessonUrl = (file: string) => `${import.meta.env.BASE_URL}content/lessons/${id}/${file}`;
+  const lessonUrl = (file: string) => contentUrl(`lessons/${id}/${file}`);
   const about = await fetched(lessonUrl('lesson.json'), 'json');
   if (!about) throw new LessonNotFound(id);
   const markdown =

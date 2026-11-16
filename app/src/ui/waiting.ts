@@ -14,6 +14,7 @@ import { readingMs } from '../engine/bubble';
 import { currentLanguage, t } from '../i18n';
 import { element } from './dom';
 import { markSvg } from './mark';
+import { contentUrl } from '../content/address';
 
 /** How long a wait shows no tip, in milliseconds. */
 export const GRACE = 2000;
@@ -167,7 +168,7 @@ export function tipNodes(text: string): (Node | string)[] {
 
 /** A tip's picture (D221), in the page's language: content/tips/<lang>/<key>.webp. */
 export function tipPicture(key: string, language = currentLanguage()): string {
-  return `${import.meta.env.BASE_URL}content/tips/${language}/${key}.webp`;
+  return contentUrl(`tips/${language}/${key}.webp`);
 }
 
 /** The next tip's picture fetched ahead, in idle time, so that it is there when the

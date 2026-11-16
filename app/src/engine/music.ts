@@ -18,6 +18,7 @@
 // data-music-heard (`story` or `level`).
 
 import { audio, noise } from './sfx';
+import { contentUrl } from '../content/address';
 
 /** The kinds of voice the page sounds. */
 export const VOICE_KINDS = [
@@ -213,7 +214,7 @@ const themes = new Map<string, Promise<Theme>>();
 export function themeNamed(id: string): Promise<Theme> {
   let found = themes.get(id);
   if (!found) {
-    found = fetch(`${import.meta.env.BASE_URL}content/music/${id}.json`)
+    found = fetch(contentUrl(`music/${id}.json`))
       .then((response) => {
         if (!response.ok) throw new Error(`no theme ${id}`);
         return response.json();

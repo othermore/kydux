@@ -6,6 +6,7 @@
 
 import { friendId, mateId } from '../i18n';
 import { element } from './dom';
+import { contentUrl } from '../content/address';
 
 /** The portrait of whoever speaks: a character by its id, the friend and the
  * dormitory mate as the wizard's gender makes them, the wizard by its look; none for
@@ -23,7 +24,7 @@ export function portraitOf(who: string, look?: string | null): string | null {
 export function portrait(id: string, className: string): HTMLImageElement {
   const picture = element('img', {
     className: `portrait ${className}`,
-    src: `${import.meta.env.BASE_URL}content/art/portraits/${id}.webp`,
+    src: contentUrl(`art/portraits/${id}.webp`),
     alt: '',
   });
   picture.dataset.portrait = id;

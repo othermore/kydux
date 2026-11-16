@@ -16,6 +16,7 @@ import type { Dark } from './shade';
 import { centredCorner, drawnShift, KEY_SCALE, shiftBy } from './shift';
 import type { Tile } from './sight';
 import { spriteKey, type ThingSprites } from './things';
+import { contentUrl } from '../content/address';
 
 /** A scene painted in one picture (D76): its ground, its raised things cut out by
  * the row their foot stands on, and the things that change, each in its states;
@@ -139,9 +140,10 @@ export interface Art {
 /** The art of a level or a story on a painted scene, or null on a scene without. */
 export async function loadArt(level: LevelJson): Promise<Art | null> {
   if (typeof level.art !== 'string') return null;
-  const root = `${import.meta.env.BASE_URL}content/art/`;
-  const json = async <T,>(url: string): Promise<T | null> => {
-    const response = await fetch(url);
+  // Paths under content/; each made an address where it is loaded (D230).
+  const root = 'art/';
+  const json = async <T,>(path: string): Promise<T | null> => {
+    const response = await fetch(contentUrl(path));
     if (!response.ok || !response.headers.get('content-type')?.includes('json')) return null;
     return (await response.json()) as T;
   };
@@ -188,25 +190,25 @@ export function hourKey(key: string, hour: string): string {
 /** Loads the painting's images, the things' sprites and the figures' sheets. */
 export function preloadArt(scene: Phaser.Scene, { scene: painted, figures, sprites, spritesBase }: Art): void {
   for (const [kind, sprite] of Object.entries(sprites ?? {})) {
-    scene.load.image(spriteKey(kind), `${spritesBase ?? ''}${sprite.image}`);
+    scene.load.image(spriteKey(kind), contentUrl(`${spritesBase ?? ''}${sprite.image}`));
   }
-  scene.load.image('art-ground', painted.base + painted.ground);
-  for (const [hour, image] of Object.entries(groundsOf(painted))) scene.load.image(`art-ground-${hour}`, painted.base + image);
+  scene.load.image('art-ground', contentUrl(painted.base + painted.ground));
+  for (const [hour, image] of Object.entries(groundsOf(painted))) scene.load.image(`art-ground-${hour}`, contentUrl(painted.base + image));
   for (const row of painted.rows) {
-    scene.load.image(rowKey(row), painted.base + row.image);
-    for (const [hour, image] of Object.entries(row.hours ?? {})) scene.load.image(`${rowKey(row)}-${hour}`, painted.base + image);
+    scene.load.image(rowKey(row), contentUrl(painted.base + row.image));
+    for (const [hour, image] of Object.entries(row.hours ?? {})) scene.load.image(`${rowKey(row)}-${hour}`, contentUrl(painted.base + image));
   }
   for (const [id, thing] of Object.entries(painted.things)) {
     for (const [state, image] of Object.entries(thing.states)) {
-      scene.load.image(`art-${id}-${state}`, painted.base + image);
+      scene.load.image(`art-${id}-${state}`, contentUrl(painted.base + image));
     }
     for (const [hour, states] of Object.entries(thing.hours ?? {})) {
-      for (const [state, image] of Object.entries(states)) scene.load.image(`art-${id}-${state}-${hour}`, painted.base + image);
+      for (const [state, image] of Object.entries(states)) scene.load.image(`art-${id}-${state}-${hour}`, contentUrl(painted.base + image));
     }
   }
   if (!figures) return;
   for (const name of figures.figures) {
-    scene.load.spritesheet(`fig-${name}`, `${figures.base}${name}.webp`, {
+    scene.load.spritesheet(`fig-${name}`, contentUrl(`${figures.base}${name}.webp`), {
       frameWidth: figures.frame[0],
       frameHeight: figures.frame[1],
     });
@@ -426,7 +428,7 @@ export function planPictures(
       return thing && state
         ? [
             {
-              url: `${scene.base}${state}`,
+              url: contentUrl(`${scene.base}${state}`),
               left: thing.left,
               top: thing.top,
               depth: thingDepth((open ? thing.rows?.open : undefined) ?? thing.row, {
@@ -453,7 +455,7 @@ export function planPictures(
       return [
         {
           id,
-          url: `${scene.base}${state}`,
+          url: contentUrl(`${scene.base}${state}`),
           left: thing.left + (tile[0] - atX) * scene.cell,
           top: thing.top + (tile[1] - atY) * scene.cell,
           ...key,
@@ -466,7 +468,7 @@ export function planPictures(
         const walk = sheets.sheets?.[name]?.walk ?? sheets.rows?.walk ?? 0;
         return {
           id,
-          url: `${sheets.base}${name}.webp`,
+          url: contentUrl(`${sheets.base}${name}.webp`),
           frame: sheets.frame,
           cell: sheets.cell,
           foot: sheets.foot,
@@ -476,13 +478,13 @@ export function planPictures(
       })
     : [];
   return {
-    ground: `${scene.base}${scene.ground}`,
+    ground: contentUrl(`${scene.base}${scene.ground}`),
     cell: scene.cell,
     origin: scene.origin ?? [0, 0],
     doors: shownDoors,
     // The same cut-outs as the scene's, each at its depth among the figures (D151).
     rows: scene.rows.map((row) => ({
-      url: `${scene.base}${row.image}`,
+      url: contentUrl(`${scene.base}${row.image}`),
       top: row.top,
       depth: rowLayerDepth(row, scene.size[1]),
     })),

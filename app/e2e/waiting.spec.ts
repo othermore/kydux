@@ -37,7 +37,7 @@ test.describe('a tip while a screen loads', () => {
     const tips = Object.values(ES.tips as Record<string, string>).map((said) => said.replace(/\*/g, ''));
     expect(tips.map((said) => said.replace(/\{([^|}]*)\|([^}]*)\}/g, '$2'))).toContain(await tip.textContent());
     const picture = page.locator('.waiting-tip-picture');
-    await expect(picture).toHaveAttribute('src', /content\/tips\/es\/[a-z]+\.webp$/);
+    await expect(picture).toHaveAttribute('src', /content\/tips\/es\/[a-z]+\.webp\?v=[0-9a-f]{12}$/);
     await expect.poll(() => picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(640);
     // No button: the screen opens by itself.
     await expect(page.locator('#waiting button')).toHaveCount(0);

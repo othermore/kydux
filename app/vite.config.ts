@@ -20,6 +20,17 @@ function worldStamp(): string {
   }
 }
 
+// Pyodide's version, the folder its files are served from (D230): copy-pyodide.mjs
+// copies them into public/pyodide/<version>/.
+function pyodideVersion(): string {
+  try {
+    const path = fileURLToPath(new URL('node_modules/pyodide/package.json', import.meta.url));
+    return (JSON.parse(readFileSync(path, 'utf8')) as { version?: string }).version ?? 'none';
+  } catch {
+    return 'none';
+  }
+}
+
 // The page's build, said in its footer: the short git hash and the day, in the
 // form `date -I` gives, at build or dev start; `local` where git is not at hand.
 function buildName(): string {
@@ -95,6 +106,7 @@ export default defineConfig({
   plugins: [debugSolutions()],
   define: {
     __WORLD_STAMP__: JSON.stringify(worldStamp()),
+    __PYODIDE_VERSION__: JSON.stringify(pyodideVersion()),
     __BUILD__: JSON.stringify(buildName()),
   },
   server: {

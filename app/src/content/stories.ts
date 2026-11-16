@@ -9,6 +9,7 @@
 import type { Facing, Tile } from '../engine/sight';
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
 import type { LevelJson, WorldEvent } from '../runtime/protocol';
+import { contentUrl } from './address';
 
 /** One thing a figure does in a step (D103), by its `by`, the step's, or the
  * speaker: a walk to a tile or through a list of them, each in a straight line,
@@ -101,7 +102,7 @@ async function json<T>(url: string): Promise<T | null> {
 
 export async function loadStory(id: string, lang: Language): Promise<Story> {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) throw new StoryNotFound(id);
-  const url = (file: string) => `${import.meta.env.BASE_URL}content/stories/${id}/${file}`;
+  const url = (file: string) => contentUrl(`stories/${id}/${file}`);
   const staging = await json<StoryJson>(url('story.json'));
   if (!staging) throw new StoryNotFound(id);
   const text =

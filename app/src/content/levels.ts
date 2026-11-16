@@ -4,6 +4,7 @@
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
 import type { LevelJson, CourseGiven } from '../runtime/protocol';
 import type { ApiTable } from '../ui/notebook';
+import { contentUrl } from './address';
 
 export interface LevelText {
   title: string;
@@ -44,7 +45,7 @@ export function isLevelId(id: string): boolean {
 }
 
 function levelUrl(id: string, file: string): string {
-  return `${import.meta.env.BASE_URL}content/levels/${id}/${file}`;
+  return contentUrl(`levels/${id}/${file}`);
 }
 
 async function json<T>(url: string): Promise<T | null> {

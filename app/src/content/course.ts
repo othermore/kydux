@@ -3,6 +3,7 @@
 // An item is `story:<id>`, `lesson:<id>` or `level:<id>`.
 
 import type { Progress } from '../progress/store';
+import { contentUrl } from './address';
 
 export interface Chapter {
   id: string;
@@ -65,7 +66,7 @@ export function itemHash(item: string): string {
 }
 
 export async function loadCourse(): Promise<Course> {
-  const response = await fetch(`${import.meta.env.BASE_URL}content/course.json`);
+  const response = await fetch(contentUrl('course.json'));
   if (!response.ok || !response.headers.get('content-type')?.includes('json')) {
     return { chapters: [] };
   }

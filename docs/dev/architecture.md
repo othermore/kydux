@@ -98,12 +98,15 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events (stories.ts), the guide's words (guide.ts), and the
                 course (course.ts): its chapters, what comes next, a stop's
-                state, what the child knows in a level (D40)
+                state, what the child knows in a level (D40); every address
+                of a file under content/, with the world's stamp, is made by
+                address.ts (D230)
   src/progress/ the player's progress, a document per game (store.ts), the
                 saved games (games.ts, D70), play time while the child is at the
                 page (playtime.ts, D70), and the calls the screens make on them
                 (progress.ts)
-  scripts/      before dev and build: copy Pyodide into public/, pack the world
+  scripts/      before dev and build: copy Pyodide into public/pyodide/<version>/
+                (D230), pack the world
                 into world.zip, copy the content into content/ with the course in
                 content/course.json (its items' titles in every language among
                 it), each level and story on a scene with its world built in, and

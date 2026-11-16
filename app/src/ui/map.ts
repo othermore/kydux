@@ -18,6 +18,7 @@ import { t } from '../i18n';
 import { MAX_STARS, type Progress } from '../progress/store';
 import { element } from './dom';
 import type { Screen } from './screen';
+import { contentUrl } from '../content/address';
 
 export interface MapScreenParts {
   course: Course;
@@ -108,7 +109,7 @@ export function mapScreen(parts: MapScreenParts): Screen {
       const card = element('div', { className: 'chapter-card' }, [
         element('h2', {}, [parts.chapterTitles.get(chapter.id) ?? chapter.id]),
       ]);
-      card.style.backgroundImage = `url('${import.meta.env.BASE_URL}content/art/chapters/${chapter.id}/card.webp')`;
+      card.style.backgroundImage = `url('${contentUrl(`art/chapters/${chapter.id}/card.webp`)}')`;
       const list = element('ol', { className: 'stops' }, stops);
       const holdsHere = parts.here !== undefined && chapter.items.includes(parts.here);
       const current = standing?.current === true || holdsHere;

@@ -40,6 +40,7 @@ import { settingsScreen } from './ui/settings';
 import { startScreen } from './ui/start';
 import { themesScreen } from './ui/themes';
 import { wizardScreen } from './ui/wizard';
+import { contentUrl } from './content/address';
 
 const runtime = new Runtime();
 let screen: Screen | null = null;
@@ -105,7 +106,7 @@ async function chapterTitle(id: string): Promise<string> {
   const known = courseTitle(courseForTitles, `chapter:${id}`);
   if (known) return known;
   const response = await fetch(
-    `${import.meta.env.BASE_URL}content/chapters/${id}/text.${currentLanguage()}.json`,
+    contentUrl(`chapters/${id}/text.${currentLanguage()}.json`),
   );
   if (!response.ok || !response.headers.get('content-type')?.includes('json')) return id;
   return ((await response.json()) as { title?: string }).title ?? id;

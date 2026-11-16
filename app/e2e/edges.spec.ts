@@ -19,7 +19,7 @@ test('a level that does not exist says so, and leads to the start', async ({ pag
 test('Python that cannot start says so, with a way to reload', async ({ page }) => {
   // A wasm that fails to arrive makes Pyodide wait forever, which the runtime's
   // load timeout catches (a Vitest); a loader that fails to arrive fails at once.
-  await page.route('**/pyodide/pyodide.mjs', (route) => route.abort());
+  await page.route('**/pyodide/**/pyodide.mjs', (route) => route.abort());
   await page.goto('/#level/the-long-corridor');
   await expect(page.locator('.outcome-text')).toHaveText(
     'Python could not start. Reload the page to try again.',

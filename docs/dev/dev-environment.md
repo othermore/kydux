@@ -113,7 +113,9 @@ Section 5 explains how to use those.
 Before the server starts, two scripts run on their own. They prepare
 everything the browser needs into `app/public/`, which git ignores:
 
-- Python's WebAssembly build, copied from its npm package into `pyodide/`.
+- Python's WebAssembly build, copied from its npm package into
+  `pyodide/<version>/`, a folder named by Pyodide's version. The page
+  loads Python from that folder.
 - The world, packed into `world.zip`, which the browser unpacks into
   Python. It carries a stamp, a short hash of the world and the content
   packed with it, which `world-stamp.json` says too. The page is made with
@@ -124,6 +126,10 @@ everything the browser needs into `app/public/`, which git ignores:
   wrong answers stay out, so that a child cannot find them in the game. A
   level that is a part of a scene gets the scene's map built in, by
   `tools/scene_maps.py`, so that the page reads it as any other level.
+  The page asks for every file of it with the world's stamp in its
+  address, as `?v=6cd992b6313c`. The stamp covers every file of
+  `content/`, so a changed file means a new stamp and a new address. The
+  development server answers whatever the address says after the `?`.
 - The course, in `content/course.json`: its chapters in order, each with
   its lessons and levels. It comes from each chapter's `chapter.json`, in
   `content/chapters/`.
@@ -470,10 +476,22 @@ needs `sudo`.
    browser asks for the name and the password once, and remembers them.
 
 The site sends the same headers as the development server
-(`app/vite.config.ts`), so that stopping a runaway program works. The
-browser keeps the game's code for good, since a new build gives it new
-names. It asks again for everything else on each visit, so a friend sees
-a new build as soon as they reload.
+(`app/vite.config.ts`), so that stopping a runaway program works.
+
+The browser keeps three things for good, so that a visit with a full
+cache makes few trips to the server:
+
+- The game's code, in `assets/`, since a new build gives it new names.
+- The content, asked for with the world's stamp in its address. A new
+  build has a new stamp, and so new addresses.
+- Python's own files, in the folder of Pyodide's version. A new version
+  is a new folder.
+
+It asks again for everything else on each visit: the page itself, the
+world and its stamp. So a friend sees a new build as soon as they
+reload. These rules live in `deploy/nginx-kydux.conf`. When that file
+changes, install the site again, once, with `ci/deploy.sh --site`
+(section 11).
 
 What a friend needs to know: the address, their name and password, and
 that their game lives in that browser on that computer. *Export* on the
@@ -558,9 +576,12 @@ The game runs in the browser, but every file comes from the server first. A
 spec measures what each screen costs: how many files, how many trips to the
 server, how many bytes, and how long until the screen shows and until
 Python's files are there. It serves a build the way the server on the
-internet does (`deploy/nginx-kydux.conf`): the files under `assets/` are kept
-by the browser for good, and every other file is asked for again on each
-load, with a short answer when it has not changed. It measures each screen
+internet does (`deploy/nginx-kydux.conf`). The browser keeps for good the
+files under `assets/`, the content asked for with a stamp of twelve
+hexadecimal digits, and Python's files under `pyodide/<version>/`. Every
+other file is asked for again on each load, with a short answer when it
+has not changed. A file of the content or of Python's that is not there is
+a 404, as on the server. It measures each screen
 with an empty cache and a full one, on a fast network and on a slow one
 (400 ms a trip, 1 Mbit/s).
 
@@ -1023,8 +1044,32 @@ ci/deploy.sh --site
 
 It builds, copies, installs `deploy/nginx-kydux.conf` as
 `/etc/nginx/sites-available/kydux`, enables it, checks nginx's
-configuration and reloads nginx. Later builds go up with `ci/deploy.sh`
-alone, no sudo.
+configuration and reloads nginx. It asks for the sudo password itself;
+run it as yourself, never with `sudo` in front, so that the build stays
+yours. Later builds go up with `ci/deploy.sh` alone, no sudo.
+
+### When the site's file changes
+
+`deploy/nginx-kydux.conf` says what the browser keeps for good (section
+5). When it changes, install the site again. The same command builds and
+copies the game first:
+
+```sh
+ci/deploy.sh --site
+```
+
+A build and a site of different days work together: an old site keeps
+nothing for good, and an old build asks for no address the new site
+keeps. To check that it worked,
+ask for one file of the content with the stamp from a phone off the wifi,
+or from the machine itself with the name and password of a friend:
+
+```sh
+curl -sI -u <name> "https://kydux.kidux.org/content/course.json?v=$(sed 's/.*"stamp":"\([0-9a-f]*\)".*/\1/' /srv/kydux/world-stamp.json)" | grep -i cache-control
+```
+
+It should print `cache-control: max-age=315360000`. The same file asked
+for without `?v=` prints `cache-control: no-cache`.
 
 ### The passwords
 

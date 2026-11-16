@@ -1,9 +1,11 @@
 // The load, measured (sprint 44, 2.9): how many trips each screen costs, their bytes,
 // and the time to the screen shown and to Python's files fetched, with an empty cache
 // and a full one, on a fast network and a slow one, against a built game served as
-// deploy/nginx-kydux.conf serves it (HTTP/2, /assets/ kept for good, every other file
-// asked again on each load with an answer of 304 when it has not changed, gzip). Run on
-// demand, from app/, against a folder holding a build (`npm run build` makes dist/):
+// deploy/nginx-kydux.conf serves it (HTTP/2; /assets/, the content asked for with the
+// world's stamp and Python's files in their version's folder kept for good; every other
+// file asked again on each load with an answer of 304 when it has not changed; gzip).
+// Run on demand, from app/, against a folder holding a build (`npm run build` makes
+// dist/):
 //
 //   KYDUX_LOAD=dist npx playwright test e2e/load.spec.ts
 //
@@ -77,12 +79,30 @@ const GZIPPED = new Set(['application/javascript', 'text/css', 'application/json
 
 /** nginx's answer to one request: the file, its headers, a 304 to a request whose
  * file has not changed, gzip where it gzips. */
+/** Whether the server's file keeps the address for good (D230): the build's code, a
+ * file of the content asked for with a stamp of twelve hexadecimal digits, and Python's
+ * files in the folder of Pyodide's version. */
+function kept(url: URL): boolean {
+  if (url.pathname.startsWith('/assets/')) return true;
+  if (url.pathname.startsWith('/content/')) return /^[0-9a-f]{12}$/.test(url.searchParams.get('v') ?? '');
+  return /^\/pyodide\/[0-9][^/]*\//.test(url.pathname);
+}
+
 async function answer(request: Http2ServerRequest, response: Http2ServerResponse): Promise<void> {
   if (served.slow) await later(SLOW_TRIP_MS);
   const url = new URL(request.url, 'https://localhost');
   let path = normalize(join(ROOT, decodeURIComponent(url.pathname)));
   if (!path.startsWith(ROOT)) path = join(ROOT, 'index.html');
-  if (!existsSync(path) || statSync(path).isDirectory()) path = join(ROOT, 'index.html');
+  // As the server's file: a file of the content or of Python's that is not there is a
+  // 404, and any other address that is no file is the page.
+  const missing = !existsSync(path) || statSync(path).isDirectory();
+  if (missing && /^\/(content|pyodide)\//.test(url.pathname)) {
+    served.requests += 1;
+    response.writeHead(404, { 'content-type': 'text/plain' });
+    response.end();
+    return;
+  }
+  if (missing) path = join(ROOT, 'index.html');
   const stat = statSync(path);
   const type = TYPES[extname(path)] ?? 'application/octet-stream';
   const tag = `"${stat.mtimeMs.toString(16)}-${stat.size.toString(16)}"`;
@@ -93,7 +113,7 @@ async function answer(request: Http2ServerRequest, response: Http2ServerResponse
     'cross-origin-opener-policy': 'same-origin',
     'cross-origin-embedder-policy': 'require-corp',
   };
-  if (url.pathname.startsWith('/assets/')) {
+  if (kept(url)) {
     headers['cache-control'] = 'max-age=315360000';
     headers.expires = 'Thu, 31 Dec 2037 23:55:55 GMT';
   } else {

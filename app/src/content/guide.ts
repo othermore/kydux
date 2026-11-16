@@ -3,9 +3,10 @@
 
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
 import type { GuideText } from '../ui/guide';
+import { contentUrl } from './address';
 
 async function fetched(lang: Language): Promise<GuideText | null> {
-  const response = await fetch(`${import.meta.env.BASE_URL}content/guide/text.${lang}.json`);
+  const response = await fetch(contentUrl(`guide/text.${lang}.json`));
   return response.ok ? ((await response.json()) as GuideText) : null;
 }
 

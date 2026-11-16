@@ -78,7 +78,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 computer (handheld.ts), the characters' and the looks' portraits
                 (portraits.ts, D194), the welcome page (about.ts, #about, D193),
                 Kydux's mark in the header (mark.ts), and under ?debug the page
-                that plays any of the music's themes (themes.ts, #music, D192)
+                that plays any of the music's themes, each voice of the one
+                playing to turn off or set by hand (themes.ts, #music, D192, D203)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events (stories.ts), the guide's words (guide.ts), and the
@@ -2767,7 +2768,8 @@ one overturns stays, marked as superseded.
   arrangement plays every voice, its `quiet` one fewer, at 0.7 of the loudness. The
   page plays it with Web Audio (`engine/music.ts`): voices of six kinds, a celesta's bell,
   a bowed string pad, a plucked string, a harp, a flute and a soft drum, each an
-  oscillator or two with an envelope, through a reverb whose impulse is decaying noise; the
+  oscillator or two with an envelope, the pad on lines that sound on from a note to the
+  next (D203), through a reverb whose impulse is decaying noise; the
   notes are scheduled a third of a second ahead on the audio clock; no sound file is
   loaded. A chapter's `chapter.json` names its theme (`music`), which the course carries; a
   story, the map and the start screen play their chapter's theme `full`, a lesson and a
@@ -2778,7 +2780,8 @@ one overturns stays, marked as superseded.
   settings have the music's volume beside the sounds' switch, a slider from none to full
   in five steps (`music`, 0.6 at first, kept with the settings); at none no theme plays.
   The root element says what plays (`data-music`: `waiting`, `playing`, `off`;
-  `data-music-theme`, `data-music-arrangement`), and `?debug#music` plays any theme alone.
+  `data-music-theme`, `data-music-arrangement`), and `?debug#music` plays any theme alone,
+  its voices to hand (D203).
   The themes are original, written for this game as a score in `tools/sound/compose.py`,
   each melody a bar at a time and each section's harmony a chord a bar from which the
   accompaniments are made, and shipped under the GPL as the code is: *Arrival* (dusk,
@@ -2977,3 +2980,30 @@ one overturns stays, marked as superseded.
   level and story step staged in the shed to it. Rules out a broom that appears from bare
   boards, a floor left empty after the story has shown brooms lying on it, and a count
   made by eye.
+- **D203 — The pad is low and unbroken, and a chapter's theme is chosen by ear among
+  three.** Decided 2026-11-12 by the owner (*debería tener mucho menos volumen en general,
+  para que las notas más agudas y punteadas se noten más y esto solo rellene y dé cuerpo
+  al sonido, y además debería ser continuado*; *para cada capítulo 3 canciones distintas
+  para que pueda elegir, una más animada, otra más tranquila y la otra el punto medio*;
+  *activar y desactivar dinámicamente cada instrumento, y quizás también cambiar los
+  volúmenes*). The bowed pad, the `strings` kind, fills under the other voices and never
+  leads: a note of it sounds at 0.07 of its loudness. It is played on lines, each two
+  saws a little apart in pitch through a low-pass filter and a gain, which sound on from a
+  note to the next: a note takes the line whose note is over as it starts, the nearest in
+  pitch, or a line of its own where none is free; where a note follows another the line
+  slides to its pitch, with no fall and no new attack, and where none follows it dies
+  away. A chord held into the next is so one sound that changes its notes, across a
+  section's end and the loop's too. On `?debug#music`, over the list, the theme playing
+  shows its voices, each with a box that silences it or lets it sound and a slider for its
+  volume, from 0 to 1; a voice set by hand sounds at that volume whether the arrangement
+  plays it or not (`music.mix`), until another theme or arrangement is asked or *As
+  written* is pressed, and a line says what is set apart from the theme's file, as
+  `the-broom-lively (Full): flute 0.50, strings off`, to be told to who writes the score.
+  Beside the theme of each chapter in play stand three candidates in that chapter's
+  manner, `<theme>-lively`, `<theme>-even` and `<theme>-calm`: *Arrival* glad, *The
+  library* calm, *The passages* eerie, *The broom* lively, each at its three paces
+  (content/music/README.md). The owner chooses among them by ear; a chapter names its
+  theme, never a candidate. A voice of the `strings` kind that carries a tune, as *The
+  familiar*'s `choir`, is a voice apart from the pad, written louder. Rules out a pad
+  whose notes stop and start, a pad that covers the tune, and a theme chosen from its
+  score without being heard.

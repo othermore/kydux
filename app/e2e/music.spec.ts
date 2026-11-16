@@ -1,6 +1,7 @@
 // The music (D192): it waits for the first gesture on the page, then plays the
 // chapter's theme; a story plays it whole and a lesson quietly; the slider at none
-// silences it, and the settings keep it; ?debug's #music lists every theme.
+// silences it, and the settings keep it; ?debug's #music lists every theme, and the
+// voices of the one playing, each to turn off and to set by hand (D203).
 
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
@@ -51,9 +52,24 @@ test('the slider at none silences the music, and the settings keep it', async ({
 test('with ?debug, #music lists every theme and plays the one chosen', async ({ page }) => {
   await page.goto('/?debug#music');
   const buttons = page.locator('.themes-list button');
-  await expect(buttons).toHaveCount(10);
+  await expect(buttons).toHaveCount(34);
   await page.locator('.themes-list button[data-theme="the-passages"][data-arrangement="quiet"]').click();
   await expect(root(page)).toHaveAttribute('data-music-theme', 'the-passages');
   await expect(root(page)).toHaveAttribute('data-music-arrangement', 'quiet');
   await expect(root(page)).toHaveAttribute('data-music', 'playing', { timeout: ciTimes(10_000) });
+});
+
+test('a theme playing on #music shows its voices, each to turn off and to set by hand (D203)', async ({ page }) => {
+  await page.goto('/?debug#music');
+  await page.locator('.themes-list button[data-theme="the-broom-lively"][data-arrangement="full"]').click();
+  await expect(root(page)).toHaveAttribute('data-music', 'playing', { timeout: ciTimes(10_000) });
+  await expect(page.locator('.themes-mixer li')).toHaveCount(6);
+  await expect(page.locator('#themes-mix')).toHaveText('the-broom-lively (Full): every voice as written');
+  await page.locator('.themes-mixer input[type="checkbox"][data-voice="strings"]').uncheck();
+  await expect(page.locator('#themes-mix')).toHaveText('the-broom-lively (Full): strings off');
+  await page.locator('.themes-mixer input[type="range"][data-voice="flute"]').fill('0.5');
+  await expect(page.locator('#themes-mix')).toHaveText('the-broom-lively (Full): flute 0.50, strings off');
+  await page.locator('#themes-reset').click();
+  await expect(page.locator('#themes-mix')).toHaveText('the-broom-lively (Full): every voice as written');
+  await expect(page.locator('.themes-mixer input[type="checkbox"][data-voice="strings"]')).toBeChecked();
 });

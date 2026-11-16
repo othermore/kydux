@@ -568,21 +568,23 @@ def the_familiar() -> dict:
         60,
         [4, 4],
         {
-            "choir": {"kind": "strings", "volume": 0.8},
+            "choir": {"kind": "strings", "volume": 1.0},
+            "strings": {"kind": "strings", "volume": 0.5},
             "bass": {"kind": "strings", "volume": 0.6},
             "flute": {"kind": "flute", "volume": 0.6},
             "harp": {"kind": "harp", "volume": 0.5},
             "celesta": {"kind": "celesta", "volume": 0.5},
             "drum": {"kind": "drum", "volume": 0.5},
         },
-        ["choir", "bass", "flute", "harp", "celesta", "drum"],
-        ["choir", "bass"],
+        ["choir", "strings", "bass", "flute", "harp", "celesta", "drum"],
+        ["choir", "strings", "bass"],
         [
             section(
                 "a",
                 16,
                 bar,
-                choir=line(a_top, bar, 0.5) + pad(a, 50, 65, 0.38),
+                choir=line(a_top, bar, 0.88),
+                strings=pad(a, 50, 65, 0.38),
                 bass=bass(a, [0], 36, 0.4, 4),
                 drum=drum([4, 8, 12, 16], bar, [0], 36, 0.3),
             ),
@@ -590,7 +592,8 @@ def the_familiar() -> dict:
                 "b",
                 16,
                 bar,
-                choir=line(b_top, bar, 0.55) + pad(b, 52, 67, 0.42),
+                choir=line(b_top, bar, 0.97),
+                strings=pad(b, 52, 67, 0.42),
                 bass=bass(b, [0], 36, 0.44, 4),
                 harp=arpeggio(b, rising, 1, 48, 0.3, 0.06),
                 drum=drum([4, 8, 12, 16], bar, [0], 36, 0.32),
@@ -600,8 +603,8 @@ def the_familiar() -> dict:
                 16,
                 bar,
                 flute=line(c_top, bar, 0.55),
-                choir=line(c_top.replace("6/", "5/").replace("g#5/", "g#4/"), bar, 0.45)
-                + pad(c, 50, 65, 0.42),
+                choir=line(c_top.replace("6/", "5/").replace("g#5/", "g#4/"), bar, 0.8),
+                strings=pad(c, 50, 65, 0.42),
                 bass=bass(c, [0], 36, 0.48, 4),
                 harp=arpeggio(c, rising, 1, 52, 0.32, 0.06),
                 celesta=bells(c, 84, 96, 0.3, every=2),
@@ -612,12 +615,747 @@ def the_familiar() -> dict:
     )
 
 
+# --- The candidates (D203): three themes for each chapter, one lively, one even and one
+# calm, each in its chapter's manner, for the owner to choose among. The pad under each
+# is low and holds its chords one into the next.
+
+# --- Arrival, lively: a bright dance in four in G, a celesta's skipping tune over a
+# plucked bass and its after-beats, a flute's answer in its middle part.
+
+
+def arrival_lively() -> dict:
+    bar = 4
+    a_chords = "G | G | C | G | Em | Am | D7 | D7 | G | G | C | G | Am | D7 | G | G"
+    a_melody = (
+        "d5/0.5 g5/0.5 b5 a5/0.5 g5/0.5 b5 | d6/2 b5 g5 | "
+        "e5/0.5 g5/0.5 c6 b5/0.5 a5/0.5 g5 | b5/3 r | "
+        "e5/0.5 g5/0.5 b5 a5/0.5 g5/0.5 e5 | a5/0.5 c6/0.5 e6 d6/0.5 c6/0.5 a5 | "
+        "f#5/0.5 a5/0.5 d6 c6/0.5 a5/0.5 f#5 | a5/2 r/0.5 d5/0.5 e5/0.5 f#5/0.5 | "
+        "d5/0.5 g5/0.5 b5 a5/0.5 g5/0.5 b5 | d6/2 g6 d6 | "
+        "e6/0.5 d6/0.5 c6 b5/0.5 c6/0.5 e6 | d6/3 r | "
+        "c6/0.5 b5/0.5 a5 e5/0.5 a5/0.5 c6 | b5/0.5 a5/0.5 f#5 d5/0.5 f#5/0.5 a5 | "
+        "g5 b5/0.5 d6/0.5 g6/2 | r d6/0.5 b5/0.5 g5/2"
+    )
+    b_chords = "C | C | G | G | Am | D7 | G | G7 | C | C | Bm | Em | Am | D7 | D7 | D7"
+    b_melody = (
+        "e5/2 g5 c6 | e6/3 d6 | d6/2 b5 g5 | b5/4 | c6/2 a5 e5 | f#5/2 a5 c6 | b5/2 d6/2 | "
+        "b5 d6 f6/2 | e6/2 c6 g5 | e5/2 g5 c6 | d6/2 b5 f#5 | g5/3 b5 | a5/2 c6 e6 | "
+        "d6/2 c6 a5 | f#5 a5 d6 f#6 | e6/0.5 d6/0.5 c6 a5 f#5"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    return theme(
+        "arrival-lively",
+        132,
+        [4, 4],
+        {
+            "celesta": {"kind": "celesta", "volume": 0.8},
+            "flute": {"kind": "flute", "volume": 0.6},
+            "strings": {"kind": "strings", "volume": 0.5},
+            "bass": {"kind": "pluck", "volume": 0.75},
+            "chords": {"kind": "pluck", "volume": 0.45},
+            "drum": {"kind": "drum", "volume": 0.4},
+        },
+        ["celesta", "flute", "strings", "bass", "chords", "drum"],
+        ["celesta", "strings", "bass"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                celesta=line(a_melody, bar, 0.62),
+                strings=pad(a, 55, 71, 0.4),
+                bass=bass(a, [0], 36, 0.55, 0.6, fifth=[2]),
+                chords=after_beat(a, [1, 3], 59, 74, 0.3, 0.4),
+                drum=drum(list(range(1, 17)), bar, [0, 2], 43, 0.2),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                flute=line(b_melody, bar, 0.6),
+                celesta=bells(b, 79, 91, 0.32, every=2),
+                strings=pad(b, 55, 71, 0.42),
+                bass=bass(b, [0], 36, 0.52, 0.6, fifth=[2]),
+                chords=after_beat(b, [1, 3], 59, 74, 0.28, 0.4),
+                drum=drum(list(range(1, 17)), bar, [0], 43, 0.18),
+            ),
+        ],
+        ["a", "b", "a"],
+    )
+
+
+# --- Arrival, even: a lilting tune in six in F, a flute over a rolling harp, the
+# celesta in its middle part.
+
+
+def arrival_even() -> dict:
+    bar = 6
+    a_chords = "F | Bb | F | C | Dm | Bb | C | C7 | F | Am | Bb | F | Gm | C7 | F | F"
+    a_melody = (
+        "c5/2 f5 a5/2 c6 | d6/3 bb5/2 d6 | c6/2 a5 f5/2 a5 | g5/6 | "
+        "f5/2 a5 d6/2 f6 | d6/2 bb5 f5/2 bb5 | e5/2 g5 c6/2 e6 | e6/3 bb5/3 | "
+        "a5/2 c6 f6/2 e6 | e6/3 c6/2 a5 | bb5/2 d6 f6/2 d6 | c6/3 a5/3 | "
+        "bb5/2 a5 g5/2 bb5 | bb5/2 g5 e5/2 g5 | f5/2 a5 c6/2 f6 | f6/3 c6/3"
+    )
+    b_chords = "Dm | Gm | C | F | Dm | Gm | A7 | A7 | Bb | F | Gm | Dm | Bb | C | C7 | C7"
+    b_melody = (
+        "a5/3 d6/3 | bb5/3 g5/3 | g5/2 c6 e6/2 g6 | f6/6 | "
+        "d6/2 f6 a6/2 f6 | g6/3 d6/3 | e6/2 c#6 a5/2 c#6 | e6/6 | "
+        "d6/3 f6/3 | c6/3 a5/3 | bb5/2 d6 g6/2 d6 | f6/3 d6/3 | "
+        "d6/2 bb5 f5/2 bb5 | c6/2 e6 g6/2 e6 | bb5/2 g5 e5/2 g5 | c6/3 bb5/2 g5"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    rolling = [0, 1, 2, 3, 2, 1]
+    return theme(
+        "arrival-even",
+        192,
+        [6, 8],
+        {
+            "flute": {"kind": "flute", "volume": 0.75},
+            "celesta": {"kind": "celesta", "volume": 0.7},
+            "harp": {"kind": "harp", "volume": 0.55},
+            "strings": {"kind": "strings", "volume": 0.5},
+            "bass": {"kind": "pluck", "volume": 0.7},
+        },
+        ["flute", "celesta", "harp", "strings", "bass"],
+        ["harp", "strings", "bass"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                flute=line(a_melody, bar, 0.6),
+                harp=arpeggio(a, rolling, 1, 53, 0.32, 0.08),
+                strings=pad(a, 53, 69, 0.4),
+                bass=bass(a, [0, 3], 41, 0.5, 1.5),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                celesta=line(b_melody, bar, 0.55),
+                flute=descant(b, 72, 84, 0.26),
+                harp=arpeggio(b, rolling, 1, 53, 0.3, 0.08),
+                strings=pad(b, 53, 69, 0.42),
+                bass=bass(b, [0, 3], 41, 0.5, 1.5),
+            ),
+        ],
+        ["a", "b", "a"],
+    )
+
+
+# --- Arrival, calm: a slow waltz in D, a celesta's few long notes over a harp, a
+# flute in its middle part.
+
+
+def arrival_calm() -> dict:
+    bar = 3
+    a_chords = "D | A | Bm | G | D | Em | A | A7 | D | F#m | G | D | Em | A7 | D | D"
+    a_melody = (
+        "f#5/2 a5 | e5/3 | d5/2 f#5 | b5/3 | a5/2 f#5 | g5/2 e5 | c#5 e5 a5 | g5/3 | "
+        "f#5/2 a5 | c#6/3 | b5/2 g5 | a5/3 | g5 e5 b5 | a5/2 e5 | d5/3 | r a4 d5"
+    )
+    b_chords = "G | D | Em | Bm | G | D | A | A | Bm | F#m | G | D | G | Em | A7 | A7"
+    b_melody = (
+        "b5/3 | a5/2 f#5 | g5/3 | f#5/2 d5 | g5 b5 d6 | d6/2 a5 | c#6/3 | e5 a5 c#6 | "
+        "d6/3 | c#6/2 a5 | b5/2 d6 | a5/3 | g5/2 b5 | e5/2 g5 | e5/3 | g5/2 e5"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    return theme(
+        "arrival-calm",
+        96,
+        [3, 4],
+        {
+            "celesta": {"kind": "celesta", "volume": 0.75},
+            "flute": {"kind": "flute", "volume": 0.6},
+            "harp": {"kind": "harp", "volume": 0.6},
+            "strings": {"kind": "strings", "volume": 0.5},
+        },
+        ["celesta", "flute", "harp", "strings"],
+        ["harp", "strings"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                celesta=line(a_melody, bar, 0.58),
+                harp=arpeggio(a, [0, 1, 2], 1, 50, 0.34, 0.08),
+                strings=pad(a, 50, 66, 0.4),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                flute=line(b_melody, bar, 0.55),
+                celesta=bells(b, 78, 90, 0.28, every=4),
+                harp=arpeggio(b, [0, 1, 2], 1, 50, 0.32, 0.08),
+                strings=pad(b, 50, 66, 0.42),
+            ),
+        ],
+        ["a", "b", "a"],
+    )
+
+
+# --- The library, lively: curious and light on its feet, in four in B flat: a flute's
+# skipping tune over plucked strings, the celesta in its middle part.
+
+
+def the_library_lively() -> dict:
+    bar = 4
+    a_chords = "Bb | Gm | Eb | F | Bb | Dm | Eb | F7 | Bb | Gm | Cm | F | Dm | Gm | Cm F7 | Bb"
+    a_melody = (
+        "f5/0.5 bb5/0.5 d6 c6/0.5 bb5/0.5 f5 | g5/1.5 bb5/0.5 d6/2 | "
+        "eb6/0.5 d6/0.5 c6 bb5/0.5 g5/0.5 eb5 | f5/2 a5 c6 | "
+        "d6/0.5 bb5/0.5 f5 bb5/0.5 d6/0.5 f6 | f6/1.5 d6/0.5 a5/2 | "
+        "g5/0.5 bb5/0.5 eb6 d6/0.5 c6/0.5 bb5 | a5/2 c6 eb6 | "
+        "d6/2 bb5 f5 | g5/0.5 a5/0.5 bb5 d6/2 | "
+        "eb6/0.5 d6/0.5 c6 g5/0.5 c6/0.5 eb6 | c6/3 r | "
+        "d6/0.5 f6/0.5 a6 f6/0.5 d6/0.5 a5 | bb5/1.5 g5/0.5 d5/2 | "
+        "eb5/0.5 g5/0.5 c6 a5/0.5 c6/0.5 eb6 | d6/2 bb5/2"
+    )
+    b_chords = "Gm | Cm | F | Bb | Gm | Cm | D7 | D7 | Eb | Bb | Cm | Gm | Eb | Cm | F | F7"
+    b_melody = (
+        "d6 g6/0.5 d6/0.5 bb5/2 | c6 eb6/0.5 c6/0.5 g5/2 | a5 c6/0.5 a5/0.5 f5 a5 | bb5/3 r | "
+        "d6 g6/0.5 d6/0.5 bb5/2 | eb6 g6/0.5 eb6/0.5 c6/2 | f#5 a5 d6 c6 | a5/3 r | "
+        "g5 bb5 eb6/2 | f5 bb5 d6/2 | eb6/0.5 d6/0.5 c6 g5/2 | bb5/0.5 a5/0.5 g5 d5/2 | "
+        "eb5 g5 bb5 eb6 | c6/2 g5 eb5 | f5 a5 c6 f6 | eb6/2 c6 a5"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    return theme(
+        "the-library-lively",
+        104,
+        [4, 4],
+        {
+            "flute": {"kind": "flute", "volume": 0.7},
+            "celesta": {"kind": "celesta", "volume": 0.65},
+            "pizzicato": {"kind": "pluck", "volume": 0.7},
+            "chords": {"kind": "pluck", "volume": 0.4},
+            "strings": {"kind": "strings", "volume": 0.45},
+        },
+        ["flute", "celesta", "pizzicato", "chords", "strings"],
+        ["pizzicato", "chords", "strings"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                flute=line(a_melody, bar, 0.58),
+                pizzicato=bass(a, [0], 34, 0.5, 0.5, fifth=[2]),
+                chords=after_beat(a, [1, 3], 55, 70, 0.28, 0.35),
+                strings=pad(a, 50, 65, 0.38),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                celesta=line(b_melody, bar, 0.52),
+                pizzicato=bass(b, [0], 34, 0.48, 0.5, fifth=[2]),
+                chords=after_beat(b, [1, 3], 55, 70, 0.26, 0.35),
+                strings=pad(b, 50, 65, 0.4),
+            ),
+        ],
+        ["a", "b", "a"],
+    )
+
+
+# --- The library, even: a music box's waltz in E flat, the celesta over a harp, a
+# flute in its middle part.
+
+
+def the_library_even() -> dict:
+    bar = 3
+    a_chords = "Eb | Bb | Cm | Ab | Eb | Fm | Bb | Bb7 | Eb | Gm | Ab | Eb | Fm | Bb7 | Eb | Eb"
+    a_melody = (
+        "g5 bb5 eb6 | d6/2 bb5 | c6 eb6 g6 | eb6/3 | bb5 eb6 g6 | f6/2 c6 | d6 f6 bb5 | ab5/3 | "
+        "g5 bb5 eb6 | d6/2 g6 | ab6 eb6 c6 | bb5/3 | ab5 c6 f6 | d6/2 ab5 | g5/3 | r bb5 eb6"
+    )
+    b_chords = "Cm | Fm | Bb | Eb | Cm | Fm | G7 | G7 | Ab | Eb | Fm | Cm | Ab | Fm | Bb | Bb7"
+    b_melody = (
+        "g5/2 c6 | ab5/3 | f5/2 bb5 | g5/3 | eb6/2 c6 | c6/2 ab5 | b5/2 d6 | g5/3 | "
+        "c6/2 eb6 | bb5/3 | ab5/2 f5 | g5/3 | eb5 ab5 c6 | f5 ab5 c6 | d6/3 | f6/2 ab5"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    return theme(
+        "the-library-even",
+        108,
+        [3, 4],
+        {
+            "celesta": {"kind": "celesta", "volume": 0.7},
+            "flute": {"kind": "flute", "volume": 0.6},
+            "harp": {"kind": "harp", "volume": 0.55},
+            "strings": {"kind": "strings", "volume": 0.45},
+        },
+        ["celesta", "flute", "harp", "strings"],
+        ["harp", "strings"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                celesta=line(a_melody, bar, 0.55),
+                harp=arpeggio(a, [0, 1, 2], 1, 51, 0.34, 0.08),
+                strings=pad(a, 51, 67, 0.38),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                flute=line(b_melody, bar, 0.52),
+                celesta=bells(b, 79, 91, 0.26, every=2),
+                harp=arpeggio(b, [0, 1, 2], 1, 51, 0.32, 0.08),
+                strings=pad(b, 51, 67, 0.4),
+            ),
+        ],
+        ["a", "b", "a"],
+    )
+
+
+# --- The library, calm: very slow, in A minor: a flute's long notes over a harp that
+# climbs a chord a bar, the celesta's few bells in its middle part.
+
+
+def the_library_calm() -> dict:
+    bar = 4
+    a_chords = "Am | F | C | G | Am | Dm | E | E | Am | F | C | G | Dm | Am | E7 | Am"
+    a_melody = (
+        "e5/2 a5/2 | c6/3 a5 | g5/2 e5/2 | d5/4 | e5/2 c6/2 | a5/3 f5 | e5/2 g#5/2 | b5/4 | "
+        "c6/2 e6/2 | f6/3 c6 | e6/2 c6/2 | d6/4 | f6/2 d6/2 | c6/2 a5/2 | g#5/2 b5/2 | a5/4"
+    )
+    b_chords = "C | G | Am | Em | F | C | Dm | E | F | G | Em | Am | Dm | G | E | E7"
+    b_melody = (
+        "r g5 c6 e6 | d6/2 b5/2 | r a5 c6 e6 | b5/2 g5/2 | r a5 c6 f6 | e6/2 g5/2 | "
+        "r f5 a5 d6 | b5/4 | r c6 f6 a6 | g6/2 d6/2 | r b5 e6 g6 | e6/2 c6/2 | "
+        "r a5 d6 f6 | d6/2 b5/2 | r g#5 b5 e6 | d6/2 b5/2"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    climbing = [0, 1, 2, 3]
+    return theme(
+        "the-library-calm",
+        66,
+        [4, 4],
+        {
+            "flute": {"kind": "flute", "volume": 0.65},
+            "celesta": {"kind": "celesta", "volume": 0.6},
+            "harp": {"kind": "harp", "volume": 0.55},
+            "strings": {"kind": "strings", "volume": 0.45},
+        },
+        ["flute", "celesta", "harp", "strings"],
+        ["harp", "strings"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                flute=line(a_melody, bar, 0.52),
+                harp=arpeggio(a, climbing, 1, 45, 0.34, 0.06),
+                strings=pad(a, 48, 64, 0.38),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                celesta=line(b_melody, bar, 0.46),
+                harp=arpeggio(b, climbing, 1, 45, 0.32, 0.06),
+                strings=pad(b, 48, 64, 0.4),
+            ),
+        ],
+        ["a", "b", "a"],
+    )
+
+
+# --- The passages, lively: a creeping waltz in E minor, plucked, the celesta's tune
+# stepping round its notes by half steps, a flute's long notes in its middle part.
+
+
+def the_passages_lively() -> dict:
+    bar = 3
+    a_chords = "Em | Em | Am | B7 | Em | C | F | B7 | Em | D | C | Am | Em | F | B7 | Em"
+    a_melody = (
+        "e5 g5 b5 | a#5/2 b5 | c6 b5 a5 | f#5/2 d#5 | e5 g5 b5 | c6/2 e6 | f6 c6 a5 | b5/3 | "
+        "e6 b5 g5 | f#5/2 a5 | g5 e5 c6 | a5/3 | g5 e5 b5 | a5/2 c6 | b5 a5 f#5 | e5/3"
+    )
+    b_chords = "Am | Em | F | C | Am | B7 | Em | Em | C | G | Am | Em | F | F | B7 | B7"
+    b_melody = (
+        "e6/3 | b5/3 | c6/3 | g5/2 e5 | a5/3 | d#6/3 | e6/2 b5 | g5/3 | "
+        "e6/3 | d6/3 | c6/2 a5 | b5/3 | a5/3 | c6/2 f5 | f#5/3 | a5/2 f#5"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    return theme(
+        "the-passages-lively",
+        144,
+        [3, 4],
+        {
+            "celesta": {"kind": "celesta", "volume": 0.75},
+            "flute": {"kind": "flute", "volume": 0.5},
+            "pizzicato": {"kind": "pluck", "volume": 0.8},
+            "chords": {"kind": "pluck", "volume": 0.45},
+            "strings": {"kind": "strings", "volume": 0.5},
+            "drum": {"kind": "drum", "volume": 0.45},
+        },
+        ["celesta", "flute", "pizzicato", "chords", "strings", "drum"],
+        ["pizzicato", "chords", "strings"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                celesta=line(a_melody, bar, 0.52),
+                pizzicato=bass(a, [0], 40, 0.55, 0.5),
+                chords=after_beat(a, [1, 2], 52, 67, 0.28, 0.3),
+                strings=pad(a, 40, 55, 0.36),
+                drum=drum([1, 5, 9, 13], bar, [0], 38, 0.28),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                flute=line(b_melody, bar, 0.45),
+                celesta=bells(b, 76, 88, 0.28, every=2),
+                pizzicato=bass(b, [0], 40, 0.5, 0.5),
+                chords=after_beat(b, [1, 2], 52, 67, 0.26, 0.3),
+                strings=pad(b, 43, 59, 0.4),
+                drum=drum([1, 5, 9, 13], bar, [0], 38, 0.28),
+            ),
+        ],
+        ["a", "b", "a", "b"],
+    )
+
+
+# --- The passages, even: a low flute that creeps in A minor over a harp's turning
+# figure, the celesta's few steps in its middle part.
+
+
+def the_passages_even() -> dict:
+    bar = 4
+    a_chords = "Am | Am | Dm | E | Am | F | Bb | E7 | Am | G | F | Dm | Am | Bb | E | E7"
+    a_melody = (
+        "a4/1.5 c5/0.5 e5/2 | d#5 e5/3 | f5/1.5 e5/0.5 d5/2 | g#4/2 b4/2 | "
+        "a4/1.5 c5/0.5 e5/2 | f5/1.5 a5/0.5 c6/2 | bb5/1.5 a5/0.5 f5/2 | e5/2 g#5/2 | "
+        "a5/1.5 e5/0.5 c5/2 | b4/1.5 d5/0.5 g5/2 | a5/1.5 f5/0.5 c5/2 | d5/2 f5/2 | "
+        "e5/1.5 c5/0.5 a4/2 | bb4/1.5 d5/0.5 f5/2 | e5/2 g#4/2 | b4/3 r"
+    )
+    b_chords = "Dm | Am | Bb | F | Dm | E | Am | Am | F | C | Dm | Am | Bb | Bb | E | E7"
+    b_melody = (
+        "r/2 a5/0.5 d6/0.5 f6 | e6/2 r/2 | r/2 bb5/0.5 d6/0.5 f6 | c6/2 r/2 | "
+        "r/2 a5/0.5 d6/0.5 a6 | g#6/2 r/2 | r/2 a5/0.5 c6/0.5 e6 | a5/2 r/2 | "
+        "r/2 c6/0.5 f6/0.5 a6 | g6/2 r/2 | r/2 f6/0.5 d6/0.5 a5 | c6/2 r/2 | "
+        "r/2 bb5/0.5 d6/0.5 f6 | d6/2 bb5/2 | r/2 g#5/0.5 b5/0.5 e6 | d6/2 b5/2"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    turning = [0, 2, 1, 2]
+    return theme(
+        "the-passages-even",
+        92,
+        [4, 4],
+        {
+            "flute": {"kind": "flute", "volume": 0.6},
+            "celesta": {"kind": "celesta", "volume": 0.65},
+            "harp": {"kind": "harp", "volume": 0.5},
+            "pizzicato": {"kind": "pluck", "volume": 0.75},
+            "strings": {"kind": "strings", "volume": 0.5},
+            "drum": {"kind": "drum", "volume": 0.45},
+        },
+        ["flute", "celesta", "harp", "pizzicato", "strings", "drum"],
+        ["harp", "pizzicato", "strings"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                flute=line(a_melody, bar, 0.52),
+                harp=arpeggio(a, turning, 0.5, 45, 0.26, 0.08),
+                pizzicato=bass(a, [0], 33, 0.5, 0.5),
+                strings=pad(a, 40, 55, 0.36),
+                drum=drum([1, 5, 9, 13], bar, [0], 36, 0.28),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                celesta=line(b_melody, bar, 0.44),
+                flute=descant(b, 60, 72, 0.24),
+                harp=arpeggio(b, turning, 0.5, 45, 0.24, 0.08),
+                pizzicato=bass(b, [0], 33, 0.48, 0.5),
+                strings=pad(b, 40, 55, 0.4),
+                drum=drum([1, 5, 9, 13], bar, [0], 36, 0.28),
+            ),
+        ],
+        ["a", "b", "a"],
+    )
+
+
+# --- The passages, calm: very slow and bare, in B minor: low strings, a far celesta's
+# few bells, a flute's long notes in its middle part, a drum now and then.
+
+
+def the_passages_calm() -> dict:
+    bar = 4
+    a_chords = "Bm | Bm | G | F# | Bm | Em | C | F#7 | Bm | A | G | Em | Bm | C | F# | F#"
+    a_melody = (
+        "r/2 f#5 b5 | d6/2 r/2 | r/2 g5 b5 | a#5/2 r/2 | r/2 f#5 b5 | e6/2 r/2 | "
+        "r/2 g5 c6 | a#5/2 r/2 | r/2 b5 d6 | c#6/2 r/2 | r/2 b5 g5 | e5/2 r/2 | "
+        "r/2 f#5 d5 | e5/2 r/2 | r/2 c#5 f#5 | r/4"
+    )
+    b_chords = "G | D | Em | Bm | G | A | Bm | Bm | Em | Bm | C | G | Em | C | F# | F#7"
+    b_melody = (
+        "b5/4 | a5/2 f#5/2 | g5/4 | f#5/4 | d6/4 | c#6/2 e6/2 | d6/2 b5/2 | r/4 | "
+        "g5/4 | f#5/2 d5/2 | e5/2 g5/2 | d5/4 | e5/4 | g5/2 e5/2 | c#5/4 | r/4"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    return theme(
+        "the-passages-calm",
+        60,
+        [4, 4],
+        {
+            "celesta": {"kind": "celesta", "volume": 0.65},
+            "flute": {"kind": "flute", "volume": 0.5},
+            "pizzicato": {"kind": "pluck", "volume": 0.7},
+            "strings": {"kind": "strings", "volume": 0.6},
+            "drum": {"kind": "drum", "volume": 0.45},
+        },
+        ["celesta", "flute", "pizzicato", "strings", "drum"],
+        ["pizzicato", "strings"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                celesta=line(a_melody, bar, 0.45),
+                pizzicato=bass(a, [0], 35, 0.45, 0.5),
+                strings=pad(a, 38, 54, 0.38),
+                drum=drum([1, 9], bar, [0, 1.5], 35, 0.26),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                flute=line(b_melody, bar, 0.42),
+                celesta=bells(b, 78, 90, 0.24, every=4),
+                pizzicato=bass(b, [0], 35, 0.42, 0.5),
+                strings=pad(b, 42, 57, 0.4),
+                drum=drum([1, 9], bar, [0, 1.5], 35, 0.26),
+            ),
+        ],
+        ["a", "b", "a"],
+    )
+
+
+# --- The broom, lively: a gallop in A, the flute's quick notes over a plucked bass
+# and its chords, a drum under it; a celesta that runs while the flute soars.
+
+
+def the_broom_lively() -> dict:
+    bar = 4
+    a_chords = "A | A | D | A | F#m | D | E | E7 | A | C#m | D | A | Bm | E7 | A | A"
+    a_melody = (
+        "e5/0.5 a5/0.5 c#6/0.5 a5/0.5 e6 c#6 | e6/0.5 d6/0.5 c#6/0.5 b5/0.5 a5/2 | "
+        "f#5/0.5 a5/0.5 d6/0.5 a5/0.5 f#6 d6 | e6/0.5 c#6/0.5 a5/0.5 c#6/0.5 e6/2 | "
+        "f#6/0.5 e6/0.5 c#6/0.5 a5/0.5 f#5 a5 | d6/0.5 f#6/0.5 a6/0.5 f#6/0.5 d6/2 | "
+        "e6/0.5 g#5/0.5 b5/0.5 e6/0.5 g#6 e6 | d6/0.5 b5/0.5 g#5/0.5 b5/0.5 e5/2 | "
+        "e5/0.5 a5/0.5 c#6/0.5 a5/0.5 e6 a6 | g#6/0.5 e6/0.5 c#6/0.5 e6/0.5 g#5/2 | "
+        "a5/0.5 d6/0.5 f#6/0.5 d6/0.5 a6 f#6 | e6/0.5 c#6/0.5 a5/0.5 e5/0.5 a5/2 | "
+        "b5/0.5 d6/0.5 f#6/0.5 d6/0.5 b5 d6 | e6/0.5 d6/0.5 b5/0.5 g#5/0.5 e5 g#5 | "
+        "a5/0.5 c#6/0.5 e6/0.5 c#6/0.5 a6/2 | a6 e6 a5/2"
+    )
+    b_chords = "D | A | E | A | D | A | B7 | E | F#m | C#m | D | A | Bm | D | E | E7"
+    b_melody = (
+        "f#6/2 a6/2 | e6/3 c#6 | b5/2 e6/2 | c#6/3 e6 | d6/2 f#6/2 | e6/2 c#6 a5 | "
+        "d#6/2 f#6/2 | e6/3 r | a5/2 c#6/2 | g#5/2 e6/2 | f#6/2 d6 a5 | c#6/3 e6 | "
+        "d6/2 f#6/2 | a6/2 f#6/2 | g#6/2 e6 b5 | e6/2 g#5 b5"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    gallop = [1, 1.5, 3, 3.5]
+    return theme(
+        "the-broom-lively",
+        152,
+        [4, 4],
+        {
+            "flute": {"kind": "flute", "volume": 0.8},
+            "celesta": {"kind": "celesta", "volume": 0.55},
+            "pizzicato": {"kind": "pluck", "volume": 0.8},
+            "chords": {"kind": "pluck", "volume": 0.45},
+            "strings": {"kind": "strings", "volume": 0.45},
+            "drum": {"kind": "drum", "volume": 0.5},
+        },
+        ["flute", "celesta", "pizzicato", "chords", "strings", "drum"],
+        ["pizzicato", "chords", "strings"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                flute=line(a_melody, bar, 0.6),
+                celesta=bells(a, 81, 93, 0.3, every=2),
+                pizzicato=bass(a, [0, 2], 45, 0.55, 0.5),
+                chords=after_beat(a, gallop, 57, 72, 0.26, 0.25),
+                strings=pad(a, 52, 67, 0.38),
+                drum=drum(list(range(1, 17)), bar, [0, 2], 43, 0.26),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                flute=line(b_melody, bar, 0.64),
+                celesta=arpeggio(b, [3, 4, 5, 4], 0.5, 57, 0.26, 0.06),
+                pizzicato=bass(b, [0, 2], 45, 0.55, 0.5),
+                chords=after_beat(b, gallop, 57, 72, 0.26, 0.25),
+                strings=pad(b, 52, 67, 0.42),
+                drum=drum(list(range(1, 17)), bar, [0, 2], 43, 0.28),
+            ),
+        ],
+        ["a", "b", "a", "b"],
+    )
+
+
+# --- The broom, even: a flight in six in G, the flute's long notes and leaps over a
+# rolling harp, the celesta's tune in its middle part.
+
+
+def the_broom_even() -> dict:
+    bar = 6
+    a_chords = "G | Em | C | D | G | Bm | C | D7 | Em | C | G | D | C | Am | D7 | G"
+    a_melody = (
+        "b5/3 d6/2 g6 | e6/3 b5/3 | c6/2 e6 g6/2 e6 | d6/3 a5/3 | "
+        "b5/3 d6/2 g6 | f#6/3 d6/3 | e6/2 g6 c7/2 g6 | a6/3 f#6/2 d6 | "
+        "g6/3 e6/2 b5 | c6/3 e6/2 g6 | d6/2 b5 g5/2 b5 | a5/3 d6/3 | "
+        "e6/2 c6 g5/2 c6 | a5/2 c6 e6/2 a6 | f#6/2 a6 d6/2 f#6 | g6/3 d6/3"
+    )
+    b_chords = "C | G | Am | Em | C | G | A7 | D | Em | Bm | C | G | Am | C | D | D7"
+    b_melody = (
+        "e6/3 g6/3 | d6/3 b5/3 | c6/2 e6 a6/2 e6 | g6/6 | "
+        "e6/2 g6 c7/2 g6 | b6/3 g6/3 | e6/2 c#6 a5/2 c#6 | d6/3 f#6/3 | "
+        "g6/3 b6/3 | f#6/3 d6/3 | e6/2 c6 g6/2 e6 | d6/6 | "
+        "c6/2 e6 a5/2 c6 | e6/2 g6 c6/2 e6 | f#6/2 a6 d6/2 f#6 | a6/3 f#6/2 d6"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    rolling = [0, 1, 2, 3, 2, 1]
+    return theme(
+        "the-broom-even",
+        240,
+        [6, 8],
+        {
+            "flute": {"kind": "flute", "volume": 0.75},
+            "celesta": {"kind": "celesta", "volume": 0.6},
+            "harp": {"kind": "harp", "volume": 0.5},
+            "strings": {"kind": "strings", "volume": 0.45},
+            "bass": {"kind": "pluck", "volume": 0.7},
+            "drum": {"kind": "drum", "volume": 0.4},
+        },
+        ["flute", "celesta", "harp", "strings", "bass", "drum"],
+        ["harp", "strings", "bass"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                flute=line(a_melody, bar, 0.6),
+                harp=arpeggio(a, rolling, 1, 55, 0.3, 0.08),
+                strings=pad(a, 50, 66, 0.38),
+                bass=bass(a, [0, 3], 43, 0.5, 1.5),
+                drum=drum(list(range(1, 17)), bar, [0], 43, 0.22),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                celesta=line(b_melody, bar, 0.52),
+                flute=descant(b, 74, 86, 0.26),
+                harp=arpeggio(b, rolling, 1, 55, 0.3, 0.08),
+                strings=pad(b, 50, 66, 0.42),
+                bass=bass(b, [0, 3], 43, 0.5, 1.5),
+                drum=drum(list(range(1, 17)), bar, [0], 43, 0.22),
+            ),
+        ],
+        ["a", "b", "a", "b"],
+    )
+
+
+# --- The broom, calm: a glide, a waltz in B flat: the flute's long lines over a
+# harp's wide chords, a celesta's bells now and then.
+
+
+def the_broom_calm() -> dict:
+    bar = 3
+    a_chords = "Bb | Bb | Eb | Bb | Gm | Eb | F | F7 | Bb | Dm | Eb | Bb | Cm | F7 | Bb | Bb"
+    a_melody = (
+        "d5/2 f5 | bb5/3 | g5/2 bb5 | f5/3 | d5/2 g5 | bb5/2 g5 | a5/2 c6 | a5/3 | "
+        "d6/2 bb5 | a5/2 f5 | g5/2 eb5 | f5/3 | eb5/2 g5 | f5/2 a5 | bb5/2 d6 | bb5/3"
+    )
+    b_chords = "Eb | Bb | Cm | Gm | Eb | Bb | C7 | F | Gm | Dm | Eb | Bb | Cm | Eb | F | F7"
+    b_melody = (
+        "g5/2 bb5 | f5/3 | eb5/2 g5 | d5/3 | g5/2 bb5 | d6/3 | c6/2 e6 | f6/3 | "
+        "d6/2 bb5 | a5/2 f5 | g5/2 bb5 | f5/3 | eb5/2 c6 | bb5/2 g5 | a5/2 c6 | a5/2 f5"
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    wide = [0, 2, 4]
+    return theme(
+        "the-broom-calm",
+        120,
+        [3, 4],
+        {
+            "flute": {"kind": "flute", "volume": 0.7},
+            "celesta": {"kind": "celesta", "volume": 0.5},
+            "harp": {"kind": "harp", "volume": 0.55},
+            "strings": {"kind": "strings", "volume": 0.5},
+            "bass": {"kind": "pluck", "volume": 0.65},
+        },
+        ["flute", "celesta", "harp", "strings", "bass"],
+        ["harp", "strings", "bass"],
+        [
+            section(
+                "a",
+                16,
+                bar,
+                flute=line(a_melody, bar, 0.55),
+                harp=arpeggio(a, wide, 1, 46, 0.3, 0.06),
+                strings=pad(a, 50, 65, 0.38),
+                bass=bass(a, [0], 34, 0.45, 2),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                flute=line(b_melody, bar, 0.58),
+                celesta=bells(b, 77, 89, 0.28, every=2),
+                harp=arpeggio(b, wide, 1, 46, 0.3, 0.06),
+                strings=pad(b, 50, 65, 0.42),
+                bass=bass(b, [0], 34, 0.45, 2),
+            ),
+        ],
+        ["a", "b", "a", "b"],
+    )
+
+
 THEMES = {
     "arrival": arrival,
     "the-library": the_library,
     "the-passages": the_passages,
     "the-broom": the_broom,
     "the-familiar": the_familiar,
+    "arrival-lively": arrival_lively,
+    "arrival-even": arrival_even,
+    "arrival-calm": arrival_calm,
+    "the-library-lively": the_library_lively,
+    "the-library-even": the_library_even,
+    "the-library-calm": the_library_calm,
+    "the-passages-lively": the_passages_lively,
+    "the-passages-even": the_passages_even,
+    "the-passages-calm": the_passages_calm,
+    "the-broom-lively": the_broom_lively,
+    "the-broom-even": the_broom_even,
+    "the-broom-calm": the_broom_calm,
 }
 
 

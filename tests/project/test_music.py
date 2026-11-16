@@ -1,6 +1,7 @@
 """The music's themes (D192): each chapter names one, each parses, and each loops on a
 bar, with no note ringing over a section's end; the files are what the score in
-tools/sound/compose.py makes."""
+tools/sound/compose.py makes. Beside each theme a chapter plays are its three
+candidates (D203), a lively one, an even one and a calm one."""
 
 import importlib.util
 import json
@@ -24,14 +25,14 @@ def compose():
     return module
 
 
-def test_there_are_the_five_themes():
-    assert {path.stem for path in THEMES} == {
-        "arrival",
-        "the-library",
-        "the-passages",
-        "the-broom",
-        "the-familiar",
+CHAPTER_THEMES = ("arrival", "the-library", "the-passages", "the-broom")
+
+
+def test_there_are_the_themes_and_three_candidates_for_each_chapter_in_play():
+    candidates = {
+        f"{theme}-{manner}" for theme in CHAPTER_THEMES for manner in ("lively", "even", "calm")
     }
+    assert {path.stem for path in THEMES} == {*CHAPTER_THEMES, "the-familiar"} | candidates
 
 
 @pytest.mark.parametrize("path", CHAPTERS, ids=lambda p: p.parent.name)

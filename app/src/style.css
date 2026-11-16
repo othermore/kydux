@@ -2390,8 +2390,8 @@ a.stop-body:focus-visible {
   }
 }
 
-/* While a screen loads (D214): Kydux's mark, Loading…, and a tip for a child who has
-   begun, with Go on under it once the screen is ready. */
+/* While a screen loads (D214): Kydux's mark and Loading… in one row, a bar that moves
+   under them (D249), and a tip for a child who has begun. */
 .waiting {
   flex: 1;
   display: flex;
@@ -2409,8 +2409,87 @@ a.stop-body:focus-visible {
   padding-bottom: 16px;
 }
 
-/* A tip: its picture over its words (D221), on one card; the picture keeps its room
-   while it comes, so that the words do not jump. */
+/* The mark at 44 px and Loading… beside it, large, in the ink's colour (D249). */
+.waiting-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.waiting-loading {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* The bar under them (D249). While the screen loads, a band of a third of it sweeps from
+   one end to the other and back; under reduced motion the band is the whole bar, still,
+   and fades in and out. When a tip holds a ready screen, the fill grows from nothing to
+   the whole bar over the time left (--hold), and stays. */
+.waiting-bar {
+  position: relative;
+  width: min(260px, 70%);
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--ink-line);
+}
+
+.waiting-bar-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 35%;
+  border-radius: 4px;
+  background: var(--moss);
+  animation: waiting-sweep 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes waiting-sweep {
+  from {
+    left: 0;
+  }
+  to {
+    left: 65%;
+  }
+}
+
+@keyframes waiting-pulse {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes waiting-fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waiting-bar-fill {
+    width: 100%;
+    animation: waiting-pulse 2s ease-in-out infinite alternate;
+  }
+}
+
+.waiting[data-hold] .waiting-bar-fill {
+  left: 0;
+  width: 100%;
+  opacity: 1;
+  animation: waiting-fill var(--hold) linear forwards;
+}
+
+/* A tip: its picture over its words (D221), on one card. */
 .waiting-tip-box {
   display: flex;
   flex-direction: column;
@@ -2431,11 +2510,11 @@ a.stop-body:focus-visible {
 
 /* As large as the window lets (D239): the box's width, 800 px at most, and never so
    large that the page scrolls: its width also follows the window's height, less the
-   rest of the page at its tallest tip, three lines of words, measured at 391 px: the
-   header, the mark and Loading…, the card's paddings, gap and words, the view's foot
-   and the footer. */
+   rest of the page at its tallest tip, three lines of words, measured at 351 px at
+   1024 by 700: the header, the row of the mark and Loading…, the bar, the card's
+   paddings, gap and words, the view's foot and the footer. */
 .waiting-tip-picture {
-  width: min(100%, 800px, calc((100vh - 392px) * 16 / 9));
+  width: min(100%, 800px, calc((100vh - 352px) * 16 / 9));
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: contain;

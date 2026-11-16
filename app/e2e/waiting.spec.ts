@@ -1,4 +1,6 @@
-// While a screen loads there is something to read (D214, D221): a child who has begun
+// While a screen loads there is something to read (D214, D221), and something that moves:
+// Loading… large beside the mark, and a bar under them, a band that sweeps while the
+// screen loads and a fill over the time a tip holds the ready screen (D249). A child who has begun
 // reads a tip with its picture at the visit's first wait and at a scene other than the
 // last shown, at once, and the screen opens by itself once the tip has been read; a
 // screen of the same scene that loads quickly shows none; a newcomer reads the letter
@@ -52,6 +54,8 @@ test.describe('a tip while a screen loads', () => {
     for (const [width, height, least] of [
       [1280, 800, 720],
       [1024, 700, 480],
+      // No smaller than before the bar (D249).
+      [1366, 650, 458],
       [390, 844, 0],
     ] as const) {
       test.describe(`in ${lang} at ${width} by ${height}`, () => {
@@ -76,10 +80,29 @@ test.describe('a tip while a screen loads', () => {
           const scrolls = await page.evaluate(() => (document.scrollingElement?.scrollHeight ?? 0) - window.innerHeight);
           expect(scrolls).toBeLessThanOrEqual(0);
           if (lang === 'es' && least > 0) await page.screenshot({ path: `${SHOTS}tip-${width}x${height}.png` });
+          if (lang === 'es') console.log(`tip picture at ${width}x${height}: ${drawn.toFixed(1)} px`);
         });
       });
     }
   }
+
+  test('a tip up and the screen ready: the bar fills over the time the tip has left (D249)', async ({ page }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    await page.goto('/#level/the-moving-key');
+    await expect(page.locator('#waiting')).toHaveAttribute('data-tip', /./, { timeout: ciTimes(5_000) });
+    await expect(page.locator('#waiting')).toHaveAttribute('data-hold', /^\d+$/, { timeout: ciTimes(10_000) });
+    const fill = page.locator('.waiting-bar-fill');
+    const animation = await fill.evaluate((node) => {
+      const style = getComputedStyle(node);
+      return { name: style.animationName, seconds: Number.parseFloat(style.animationDuration) };
+    });
+    expect(animation.name).toBe('waiting-fill');
+    expect(animation.seconds).toBeGreaterThan(0);
+    expect(animation.seconds).toBeLessThanOrEqual(10);
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: `${SHOTS}wait-filling.png` });
+    await expect(page.locator('#start')).toBeVisible({ timeout: ciTimes(11_000) });
+  });
 
   test('a tip comes up only with its picture loaded, asked for once (D246)', async ({ page }) => {
     await seedWizard(page, MARTA, { tips: true });
@@ -161,6 +184,46 @@ test.describe('a tip while a screen loads', () => {
     });
     await expect(page.locator('.lesson-screen, .lesson').first()).toBeVisible({ timeout: ciTimes(10_000) });
     expect(await page.locator('#waiting-tip').count()).toBe(0);
+  });
+});
+
+test.describe('Loading… large beside the mark, and a bar that moves (D249)', () => {
+  test.beforeEach(async ({ page }) => {
+    await seedWizard(page, MARTA);
+    // The scene's code held back: the wait stays.
+    await delay(page, '**/assets/scene-*.js', ciTimes(6_000));
+  });
+
+  /** The fill's animation, by its name, and whether it runs. */
+  const fillAnimation = (page: Page) =>
+    page.locator('.waiting-bar-fill').evaluate((node) => ({
+      name: getComputedStyle(node).animationName,
+      running: node.getAnimations().some((one) => one.playState === 'running'),
+    }));
+
+  test('Loading… at 28 px beside the mark, and a band that sweeps along the bar', async ({ page }) => {
+    await page.goto('/#level/the-moving-key');
+    const words = page.locator('#waiting .waiting-loading');
+    await expect(words).toHaveText('Cargando…');
+    expect(await words.evaluate((node) => getComputedStyle(node).fontSize)).toBe('28px');
+    // The mark on the same row, to the left of the words.
+    const mark = await page.locator('#waiting .waiting-head svg').boundingBox();
+    const said = await words.boundingBox();
+    if (!mark || !said) throw new Error('no row');
+    expect(mark.x + mark.width).toBeLessThanOrEqual(said.x);
+    expect(Math.abs(mark.y + mark.height / 2 - (said.y + said.height / 2))).toBeLessThan(6);
+    // The bar under them.
+    const bar = await page.locator('#waiting-bar').boundingBox();
+    expect(bar?.y ?? 0).toBeGreaterThan(said.y + said.height);
+    expect(await fillAnimation(page)).toEqual({ name: 'waiting-sweep', running: true });
+    await page.screenshot({ path: `${SHOTS}wait-start.png` });
+  });
+
+  test('under reduced motion the band is still and fades', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/#level/the-moving-key');
+    await expect(page.locator('#waiting .waiting-loading')).toBeVisible();
+    expect(await fillAnimation(page)).toEqual({ name: 'waiting-pulse', running: true });
   });
 });
 

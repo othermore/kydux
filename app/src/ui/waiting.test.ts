@@ -15,6 +15,7 @@ const KEYS = ['a', 'b', 'c'];
 
 function waiting(tips = true, storage = kept(), more: { due?: boolean; reading?: number } = {}) {
   const shown: string[] = [];
+  const holds: number[] = [];
   const wait = new Wait({
     tips,
     storage,
@@ -22,8 +23,9 @@ function waiting(tips = true, storage = kept(), more: { due?: boolean; reading?:
     due: more.due,
     reading: () => more.reading ?? 6000,
     onTip: (key) => shown.push(key),
+    onHold: (ms) => holds.push(ms),
   });
-  return { wait, shown, storage };
+  return { wait, shown, storage, holds };
 }
 
 describe('the wait while a screen loads (D214, D221)', () => {
@@ -143,6 +145,34 @@ describe('the wait while a screen loads (D214, D221)', () => {
     wait.dispose();
     vi.advanceTimersByTime(TIP_TIME);
     expect(open).not.toHaveBeenCalled();
+  });
+});
+
+describe('the bar that fills while a tip holds the screen (D249)', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('is told once, with the time the tip still has, when the screen is ready under a tip', () => {
+    const { wait, shown, holds } = waiting(true, kept(), { due: true, reading: 6000 });
+    vi.advanceTimersByTime(0);
+    expect(shown).toEqual(['a']);
+    vi.advanceTimersByTime(1500);
+    const open = vi.fn();
+    wait.ready(open);
+    expect(holds).toEqual([4500]);
+    vi.advanceTimersByTime(4499);
+    expect(open).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(open).toHaveBeenCalledOnce();
+    expect(holds).toEqual([4500]);
+  });
+
+  it('is not told when the screen is ready with no tip up', () => {
+    const { wait, holds } = waiting();
+    const open = vi.fn();
+    wait.ready(open);
+    expect(open).toHaveBeenCalledOnce();
+    expect(holds).toEqual([]);
   });
 });
 

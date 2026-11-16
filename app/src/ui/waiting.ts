@@ -1,5 +1,7 @@
-// What a screen shows while it loads (D214, D221): Kydux's mark and "Loading…", and,
-// for a child who has begun, a tip about the game with its picture. No screen waits
+// What a screen shows while it loads (D214, D221): Kydux's mark and "Loading…" in one
+// row, the words large, and under them a bar that moves (D249): a band that sweeps
+// while the screen loads, and a fill over the time a tip still holds a ready screen;
+// and, for a child who has begun, a tip about the game with its picture. No screen waits
 // for Python, which loads in its worker from the moment the page opens; a screen waits
 // for its own code, texts and pictures. A tip is due at once at the visit's first wait
 // and at a screen of a scene other than the one last shown; any other wait shows no
@@ -72,6 +74,8 @@ export interface WaitOptions {
   picture?: (key: string) => Promise<HTMLImageElement | null>;
   /** How long a tip takes to read, in milliseconds (D175); TIP_TIME unless given. */
   reading?: (key: string) => number;
+  /** The screen is ready and a tip up holds it this many milliseconds more (D249). */
+  onHold?: (ms: number) => void;
 }
 
 /** How long a ready screen waits under a tip up: the tip's reading time, never more
@@ -118,9 +122,12 @@ export class Wait {
       this.finish();
       return;
     }
-    // A tip is up: no other comes; the screen waits for this one to be read.
+    // A tip is up: no other comes; the screen waits for this one to be read, and the
+    // view is told how long (D249).
     this.clear();
-    this.timer = setTimeout(() => this.finish(), Math.max(0, this.shownAt + this.readMs - Date.now()));
+    const left = Math.max(0, this.shownAt + this.readMs - Date.now());
+    this.options.onHold?.(left);
+    this.timer = setTimeout(() => this.finish(), left);
   }
 
   /** The wait dropped: its timers stopped, nothing opened. */
@@ -234,15 +241,18 @@ export function askNextTip(): void {
   void tipPictureLoaded(key);
 }
 
-/** The waiting view: the mark, Loading…, and the tip's place, hidden until a tip comes
- * up with its picture loaded, then the picture over its words (D246). */
+/** The waiting view: the mark and Loading… in a row, the bar under them (D249), and the
+ * tip's place, hidden until a tip comes up with its picture loaded, then the picture
+ * over its words (D246). */
 export function waitingView(tips: boolean, due = false): Waiting {
   const words = element('p', { id: 'waiting-tip', className: 'waiting-tip' });
   words.setAttribute('aria-live', 'polite');
   const tip = element('figure', { className: 'waiting-tip-box', hidden: true }, [words]);
+  const bar = element('div', { id: 'waiting-bar', className: 'waiting-bar' }, [element('span', { className: 'waiting-bar-fill' })]);
+  bar.setAttribute('aria-hidden', 'true');
   const node = element('div', { id: 'waiting', className: 'waiting' }, [
-    markSvg(64),
-    element('p', { className: 'status waiting-loading' }, [t('waiting.loading')]),
+    element('div', { className: 'waiting-head' }, [markSvg(44), element('p', { className: 'waiting-loading' }, [t('waiting.loading')])]),
+    bar,
     tip,
   ]);
   const wait = new Wait({
@@ -257,6 +267,11 @@ export function waitingView(tips: boolean, due = false): Waiting {
       tip.replaceChildren(...(picture ? [picture] : []), words);
       tip.hidden = false;
       node.dataset.tip = key;
+    },
+    // The bar fills over the time the tip still holds the ready screen (D249).
+    onHold: (ms) => {
+      node.dataset.hold = String(Math.round(ms));
+      bar.style.setProperty('--hold', `${Math.round(ms)}ms`);
     },
   });
   return { node, wait };

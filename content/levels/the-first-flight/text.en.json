@@ -8,7 +8,7 @@
   "hints": [
     "It is 8 steps to the end of the jetty. Walk there first!",
     "Use `cast` with the word *drevo* to lift the broom when you reach the end of the jetty.",
-    "Fly to the stone with `move_right`, which is 5 steps away. If you cast *drevo* again on the stone, you will land there."
+    "The stone is 5 steps away: fly to it with `move_right`. If you cast *drevo* again on the stone, you will land there."
   ],
   "intro": "Let's see how you do! Walk to the end of the jetty. There, cast *drevo* and fly to the white stone on the other bank.",
   "outro": "You have reached the white stone! Did you notice how fast the broom goes over the water?",

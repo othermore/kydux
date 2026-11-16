@@ -8,7 +8,7 @@
   "hints": [
     "Hasta el final del embarcadero hay 8 pasos. ¡Camina hasta allí primero!",
     "Usa `cast` con la palabra *drevo* para levantar la escoba cuando llegues al final del embarcadero.",
-    "Vuela hasta la piedra con `move_right`, que está a 5 pasos. Si lanzas *drevo* otra vez sobre la piedra, aterrizarás allí."
+    "La piedra está a 5 pasos: vuela hasta ella con `move_right`. Si lanzas *drevo* otra vez sobre la piedra, aterrizarás allí."
   ],
   "intro": "¡A ver qué tal se te da! Camina hasta el final del embarcadero. Allí, lanza *drevo* y vuela hasta la piedra blanca de la otra orilla.",
   "outro": "¡Has llegado a la piedra blanca! ¿Has notado lo rápido que va la escoba sobre el agua?",

@@ -8,10 +8,10 @@
   "hints": [
     "El bucle recorre la lista que da `find_all`, y todo lo que haces para una escoba va dentro de él.",
     "Dentro del bucle tienes que hacer las mismas dos comparaciones que en el nivel anterior.",
-    "El método `broom.untie()` va dentro del bucle, después de caminar hacia los dos lados."
+    "El método `broom.untie()` va dentro del bucle, después de los dos movimientos: el de izquierda o derecha y el de arriba o abajo."
   ],
   "intro": "¡Vale, ya lo tienes! Pero intentemos hacerlo para todas las escobas que hay por el suelo, en lugar de ir una a una. La función `find_all` te las da empezando por la más cercana, pero cada una puede estar a cualquier lado de donde esté tu {mago|maga} en ese momento. Los comentarios del programa te guiarán paso a paso, uno para cada instrucción.",
-  "outro": "¡Terminamos con la paja! Todas las escobas están a salvo y ordenadas.",
+  "outro": "¡Terminamos con la paja! Todas las escobas están a salvo.",
   "learned": "Ahora sabes que puedes usar `if` y `<` dentro de un bucle para comparar coordenadas y encontrar los pasos exactos hacia cualquier lado.",
   "changes": "El número de escobas del suelo y dónde están cambian cada vez, así que la siguiente puede estar a cualquier lado.",
   "changed": "Esta vez, las escobas del suelo están en otros sitios."

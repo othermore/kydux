@@ -8,10 +8,10 @@
   "hints": [
     "The loop goes over the list that `find_all` gives, and everything you do for one broom goes inside it.",
     "Inside the loop you have to do the same two comparisons as in the previous level.",
-    "The `broom.untie()` method goes inside the loop, after walking to both sides."
+    "The `broom.untie()` method goes inside the loop, after the two moves: the one left or right and the one up or down."
   ],
   "intro": "All right, you've got it! But let's try to do it for every broom on the floor, instead of going one by one. The `find_all` function gives them to you starting with the nearest, but each one can be on any side of where your wizard is at that moment. The program's comments will guide you step by step, one for each instruction.",
-  "outro": "We're done with the straw! All the brooms are safe and tidy.",
+  "outro": "We're done with the straw! All the brooms are safe.",
   "learned": "Now you know that you can use `if` and `<` inside a loop to compare coordinates and find the right number of steps to any side.",
   "changes": "The number of brooms on the floor and where they lie change each time, so the next one may be on any side.",
   "changed": "This time, the brooms on the floor are in other places."

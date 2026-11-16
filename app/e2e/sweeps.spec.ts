@@ -47,6 +47,9 @@ test("every start card's height and its scroll, in each language, at three scree
           location.hash = hash;
         }, `#level/${id}`);
         const card = page.locator('.start-card');
+        // The first level opens the screen's guide before its card (D258).
+        await page.locator('#guide-skip, .start-card').first().waitFor({ state: 'visible', timeout: 30_000 });
+        if (await page.locator('#guide-skip').isVisible()) await skipGuide(page);
         await expect(card).toBeVisible({ timeout: 30_000 });
         const { tall, over } = await card.evaluate((node) => ({
           tall: Math.round(node.getBoundingClientRect().height),
@@ -85,13 +88,10 @@ test("every level's goals box: the shape taken, folded or not, and what each sha
       await page.evaluate((hash) => {
         location.hash = hash;
       }, `#level/${id}`);
+      // The first level of the course opens the screen's guide before its card (D258).
+      await page.locator('#guide-skip, #start').first().waitFor({ state: 'visible', timeout: 30_000 });
+      if (await page.locator('#guide-skip').isVisible()) await skipGuide(page);
       await page.locator('#start').click({ timeout: 30_000 });
-      // The first level of the course opens the screen's guide after its card.
-      const guided = await page
-        .locator('#guide-skip')
-        .waitFor({ state: 'visible', timeout: 1500 })
-        .then(() => true, () => false);
-      if (guided) await skipGuide(page);
       const goals = page.locator('.goals');
       await expect(goals).toHaveAttribute('data-revealed', 'true', { timeout: 30_000 });
       await page.waitForTimeout(3600);

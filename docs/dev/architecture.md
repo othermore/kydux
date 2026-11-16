@@ -1146,8 +1146,9 @@ one overturns stays, marked as superseded.
   a lesson that looks like a story.
 - **D68 — The screen explains itself once, with arrows.** Decided 2026-10-22
   by the owner's UAT (sprint-11.md), built the same day. The course's first
-  level opens the screen's guide once its start card is closed, the first
-  time it is played (`progress.guided`): `app/src/ui/guide.ts` dims the
+  level opens the screen's guide the first time it is played
+  (`progress.guided`), once its scene is drawn and before its start card
+  (D258): `app/src/ui/guide.ts` dims the
   screen but one part at a time, with a card beside it and an arrow to it,
   *Next* and *Skip*: the scene, the goals, the editor, *Run*, the notebook
   (opened for its step), *Hint* and *?*, and the way to learn. That level's
@@ -3474,9 +3475,10 @@ one overturns stays, marked as superseded.
   figure, a thing of the level in sight or the end's mark, each by its drawn rectangle on
   the page (`SceneHandle.levelBoxes`). The box is first shown in the shape taken, which it
   says in `data-shape`. Where both cover something, the box opens as the list and, three
-  seconds after the child can see it (the scene drawn, the start card closed, the screen's
-  guide over), the page folds it, for that level alone. The child's click on the heading
-  decides from then on, and before the three seconds end it keeps the page from folding.
+  seconds after the child can see it (the scene drawn, the screen's guide over, the start
+  card closed, D258), the page folds it, for that level alone. The child's click on the
+  heading decides from then on, and before the three seconds end it keeps the page from
+  folding.
   The shape is taken once in a level's visit: a start over, the window's size and the
   language keep it. A hidden thing, and what the scene's picture holds of its own (a wall,
   a bed, a statue), do not count. Rules out a box folded as a level opens, a box left open
@@ -3774,10 +3776,10 @@ one overturns stays, marked as superseded.
   address, at a reload, played before or not. A level opens on its starting code (D131),
   and the card is what says what that code is for. The game keeps no list of the cards
   seen. *?* opens the card again, saying *Continue*, and any button of the page closes it
-  (D222). The screen's guide (D68) belongs to the course's first level: closing its card
-  opens the guide the first time, and from then on that card, and no other, offers *Show
-  me the screen*. Rules out a level opened with no word of what it asks, and the guide's
-  button on a card of any other level.
+  (D222). The screen's guide (D68) belongs to the course's first level: the first time,
+  that level's card opens after the guide (D258), and from then on that card, and no
+  other, offers *Show me the screen*. Rules out a level opened with no word of what it
+  asks, and the guide's button on a card of any other level.
 - **D249 — The wait says that it loads: large words and a bar that moves.** Decided
   2026-11-16 by the owner (*En la página de carga (los tips) se debe ver más grande el
   cargando, y debe haber alguna animación que haga ver que se está cargando (o un
@@ -3945,3 +3947,18 @@ one overturns stays, marked as superseded.
   Rules out a letter the child is only told of, a drawing and a castle that do not
   match, words painted into the art or written over the seal, and words cut short with
   an ellipsis.
+- **D258 — In the first level the screen's guide comes first, and the start card after
+  it.** Decided 2026-11-16 by the owner (*hay que poner el tutorial primero y luego pasar
+  a la tarjeta que dice lo que tenemos que hacer en ese nivel*): a child who reads the
+  card and then the guide's eight steps has forgotten the card. The first time the first
+  level opens, no start card opens with the page. The guide (D68) opens by itself once the
+  scene has drawn the level's start and the goals box has taken its shape and is shown
+  (D227), so that every step outlines a part that is there. Ended or skipped, it gives way
+  to the start card (D248), and the level starts from the card's *Empezar*. The guide once
+  seen, the card opens with the page as in every level. *Enséñame la pantalla* on the card
+  closes the card, shows the guide, waiting the same way on a page still loading, and
+  opens the card again after it. Nothing is run while the guide is awaited or shown, and
+  the goals box does not fold until the card after it is closed. Rules out a card read
+  before the guide, a guide over a scene not drawn, a step about the goals with no goals
+  in sight, and a wait of its own length in place of the page's own word that the scene
+  and the box are shown.

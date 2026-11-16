@@ -135,8 +135,8 @@ test('a level and a lesson say their number in the chapter (D56)', async ({ page
 
 test('before arguments are taught, the notebook shows a move with no number (D60)', async ({ page }) => {
   await page.goto('/#level/the-gate');
-  await page.locator('#start').click();
   await skipGuide(page);
+  await page.locator('#start').click();
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook [data-example="wizard.move_right()"]')).toHaveCount(1);
   await expect(page.locator('#notebook')).toContainText('Walks one step to the right.');
@@ -279,6 +279,9 @@ test.describe('the start card over the whole window (D228)', () => {
           location.hash = hash;
         }, `#level/${id}`);
         const card = page.locator('.start-card');
+        // The first level opens the screen's guide before its card (D258).
+        await page.locator('#guide-skip, .start-card').first().waitFor({ state: 'visible', timeout: ciTimes(30_000) });
+        if (await page.locator('#guide-skip').isVisible()) await skipGuide(page);
         await expect(card).toBeVisible({ timeout: ciTimes(30_000) });
         const measured = await card.evaluate((node) => {
           const box = node.getBoundingClientRect();

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { seedWizard } from './helpers';
+import { seedWizard, skipGuide } from './helpers';
 import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
@@ -7,6 +7,7 @@ test.use({ locale: 'en-US' });
 test('the page says its build, and runs the world it was built with (the stamp in ?debug)', async ({ page }) => {
   await seedWizard(page);
   await page.goto('/?debug#level/the-gate');
+  await skipGuide(page);
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   // The footer: the version, and beside it the build, its short hash and its day.

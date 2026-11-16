@@ -105,16 +105,17 @@ for (const [lang, words] of Object.entries(WORDS)) {
     await page.locator('#lesson-next').click();
     await shoot(page, 'lesson-last-page');
 
-    // Try it: the gate, its start card with the friend's words, the editor empty (D63).
+    // Try it: the gate. The first time, the screen's guide comes first (D68, D258): its
+    // first step, then skipped; then the start card with the friend's words, the editor
+    // empty (D63).
     await page.locator('#lesson-try').click();
+    await expect(page.locator('.guide')).toHaveAttribute('data-step', 'scene', { timeout: ciTimes(30_000) });
+    await shoot(page, 'guide');
+    await skipGuide(page);
     await expect(page.locator('.start-card h3')).toHaveText(words.gate);
     await expect(page.locator('#card-intro')).toContainText('Teku');
     await shoot(page, 'start-card');
     await page.locator('#start').click();
-    // The screen's guide, the first time (D68): its first step, then skipped.
-    await expect(page.locator('.guide')).toHaveAttribute('data-step', 'scene');
-    await shoot(page, 'guide');
-    await skipGuide(page);
     await expect(page.locator('.cm-content')).toHaveText('');
     await expect(page.locator('#scene')).toHaveAttribute('data-look', 'teal');
     await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });

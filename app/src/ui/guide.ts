@@ -1,9 +1,9 @@
 // The screen's guide (D68): the screen dimmed but the parts a step shows, a card
 // beside the first of them with an arrow to it, an arrow from the card to each
 // other part, and Next and Skip. The first level of the course opens it the first
-// time it is played, and the ? card plays it again. Its words are
-// content/guide/text.<lang>.json, written by Gemini; they may hold Markdown's
-// italics and code.
+// time it is played, once its scene is drawn and before its start card (D258), and
+// that card plays it again (D248). Its words are content/guide/text.<lang>.json,
+// written by Gemini; they may hold Markdown's italics and code.
 
 import { marked } from 'marked';
 import { t } from '../i18n';

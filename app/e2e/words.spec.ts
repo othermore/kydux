@@ -11,8 +11,8 @@ async function withWizard(browser: Browser, locale: string, gender: 'girl' | 'bo
 
 /** The gate won, its win card open with the friend's words. */
 async function winTheGate(page: Page): Promise<void> {
-  await page.locator('#start').click();
   await skipGuide(page);
+  await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   await page.locator('.cm-content').click();
   await page.keyboard.insertText('wizard.move_right()');

@@ -605,7 +605,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     castle's painting (D251), the first with the letter held before the castle
     (D257), the story at the gate, seven lessons, nine
     levels (seven practices, a fix, an improve) taught by Nuri, the first
-    one's start card the only one to offer the screen's guide again (D248),
+    one opening on the screen's guide before its start card (D258), its card
+    the only one to offer the guide again (D248),
     the wand lent, the first spell, and the story up to the castle
     (`course.md`).
 5.4 Chapter 2, The library (variables, attributes, finding things), in the

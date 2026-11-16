@@ -3,7 +3,8 @@
 // and the card saying how a run went. It is a view of a RunController (D29):
 // it makes the DOM once, renders every snapshot the controller gives, and
 // each button calls the controller. The start card opens the level every time its
-// screen opens (D248). The card comes with no sound where the run's end sounded as its
+// screen opens (D248), after the screen's guide the first time the first level opens
+// (D258). The card comes with no sound where the run's end sounded as its
 // playback ended, and with its sound where there was no playback (D247).
 
 import { itemHash } from '../content/course';
@@ -133,7 +134,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   let foldPending = false;
   let foldedByPage = false;
   let foldTimer: ReturnType<typeof setTimeout> | null = null;
+  // The screen's guide awaited or shown (D258): nothing is run, and the goals box does
+  // not fold, until the start card after it is closed.
   let guiding = false;
+  // The level shown: the scene has drawn the level's start and the goals box is shown in
+  // its shape (D227); what waits for that (the guide, D258) goes on then.
+  let levelShown = false;
+  let whenShown: (() => void) | null = null;
   const status = element('p', { id: 'status', className: 'status' });
   // A level played in several ways (D51): the child is told only what may differ at
   // each run (D204); under ?debug, after a run, a select of the ways' ids plays back
@@ -332,37 +339,47 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   // the child opens it again with ?, or when it is drawn again in another language.
   let startOpened = false;
   let startAgain = false;
-  // The screen's guide (D68), with the notebook opened for its step about it.
+  // The card that opens after the guide's first showing, a card of a first opening,
+  // does not offer the guide just seen; opened again, it does (D258).
+  let guideJustSeen = false;
+  // The screen's guide (D68), with the notebook opened for its step about it. It opens
+  // once the level is shown, so that every step outlines a part that is there, and gives
+  // way to what comes after it, the start card (D258).
   let guide: Guide | null = null;
-  const showGuide = () => {
-    if (guide || !parts.loadGuide) return;
+  const showGuide = (after: () => void) => {
+    if (guiding || !parts.loadGuide) return;
+    guiding = true;
     let openedNotebook = false;
     const setNotebook = (open: boolean) => {
       if (notebook.open !== open) notebook.toggle();
       notebookButton.setAttribute('aria-expanded', String(notebook.open));
     };
-    void parts.loadGuide().then((words) => {
-      if (destroyed || guide) return;
-      guide = openGuide(document.body, words, {
-        onStep: (key) => {
-          if (key === 'notebook' && !notebook.open) {
-            setNotebook(true);
-            openedNotebook = true;
-          } else if (key !== 'notebook' && openedNotebook) {
-            setNotebook(false);
-            openedNotebook = false;
-          }
-        },
-        onClose: () => {
-          if (openedNotebook) setNotebook(false);
-          guide = null;
-          guiding = false;
-          progress.markGuided();
-          editor.focus();
-          seeGoals();
-        },
+    const words = parts.loadGuide();
+    const open = () =>
+      void words.then((text) => {
+        if (destroyed || guide) return;
+        if (startShown()) shownCard?.close();
+        guide = openGuide(document.body, text, {
+          onStep: (key) => {
+            if (key === 'notebook' && !notebook.open) {
+              setNotebook(true);
+              openedNotebook = true;
+            } else if (key !== 'notebook' && openedNotebook) {
+              setNotebook(false);
+              openedNotebook = false;
+            }
+          },
+          onClose: () => {
+            if (openedNotebook) setNotebook(false);
+            guide = null;
+            guiding = false;
+            progress.markGuided();
+            after();
+          },
+        });
       });
-    });
+    if (levelShown) open();
+    else whenShown = open;
   };
   const showStart = (redraw = false) => {
     if (!redraw) startAgain = startOpened;
@@ -379,15 +396,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           carrying: carrying(),
           changes: text.changes,
           // Show me the screen, on the first level's card once the guide has been seen
-          // (D248).
-          onGuide: parts.loadGuide && progress.guided() ? showGuide : undefined,
+          // (D248): the guide, and the card again after it (D258).
+          onGuide:
+            parts.loadGuide && progress.guided() && !guideJustSeen ? () => showGuide(() => showStart()) : undefined,
         },
         () => {
-          // The first level opens the guide once its start card is closed, the first time.
-          if (parts.loadGuide && !progress.guided()) {
-            guiding = true;
-            showGuide();
-          } else editor.focus();
+          guideJustSeen = false;
+          editor.focus();
           seeGoals();
         },
       ),
@@ -428,7 +443,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   let runsHere = 0;
   let judged = true;
   const runCode = () => {
-    if (!controller.snapshot.canRun) return;
+    if (guiding || !controller.snapshot.canRun) return;
     progress.countRun(loaded.id);
     if (!judged) runsHere -= 1;
     runsHere += 1;
@@ -728,12 +743,23 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           goals.node.dataset.stripCovers = String(taken.covers.strip);
           goals.reveal();
           foldPending = taken.fold;
+          levelShown = true;
+          const waiting = whenShown;
+          whenShown = null;
+          waiting?.();
           seeGoals();
         }, 400);
       });
-      // The start card opens the level every time its screen opens (D248).
+      // The start card opens the level every time its screen opens (D248); the first time
+      // the first level opens, the screen's guide comes first, once the level is shown,
+      // and the card after it (D258).
       progress.setCurrent(`level:${loaded.id}`);
-      showStart();
+      if (parts.loadGuide && !progress.guided())
+        showGuide(() => {
+          guideJustSeen = true;
+          showStart();
+        });
+      else showStart();
     },
     async relabel() {
       const before = text;

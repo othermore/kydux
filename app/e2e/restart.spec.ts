@@ -10,8 +10,8 @@ test.use({ locale: 'en-US' });
 test('a run shows the level starting again before it plays, and Restart does too', async ({ page }) => {
   await seedWizard(page);
   await page.goto('/#level/the-gate');
-  await page.locator('#start').click();
   await skipGuide(page);
+  await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
   const note = page.locator('#restart-note');
   await expect(note).toBeHidden();

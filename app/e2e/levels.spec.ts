@@ -151,8 +151,9 @@ test.describe('chapter 1', () => {
   for (const [id, code] of CHAPTER_1) {
     test(`${id} is won by its solution`, async ({ page }) => {
       await page.goto(`/#level/${id}`);
-      await page.locator('#start').click();
+      // The first level opens the screen's guide first, then its card (D258).
       if (id === 'the-gate') await skipGuide(page);
+      await page.locator('#start').click();
       await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
       await page.locator('#speed').selectOption('4');
       expect(await run(page, code)).toMatch(/^You did it/);

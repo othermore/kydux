@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
+import { skipGuide } from './helpers';
 import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
@@ -145,8 +146,9 @@ test.describe("the notebook's page of Python (D256)", () => {
     );
 
   test("the course's first level has no bar of tabs", async ({ page }) => {
-    await open(page, 'the-gate');
-    await page.locator('#guide-skip').click();
+    await page.goto('/#level/the-gate');
+    await skipGuide(page);
+    await page.locator('#start').click();
     await page.locator('#notebook-open').click();
     await expect(page.locator('#notebook .notebook-tabs')).toHaveCount(0);
   });

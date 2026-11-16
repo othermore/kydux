@@ -5,7 +5,7 @@
 import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
-import { actsSeen, seedWizard, storyNext, watchActs } from './helpers';
+import { actsSeen, seedWizard, skipGuide, storyNext, watchActs } from './helpers';
 import { ciTimes } from './support';
 
 const SHOTS = fileURLToPath(new URL('./shots/painted/', import.meta.url));
@@ -190,6 +190,7 @@ test('with ?debug the scene shows its cells, for a tester to name one', async ({
   await page.locator('#debug-masks').click();
   await expect(scene).toHaveAttribute('data-debug-layers', 'numbers,cells');
   await page.goto('/#level/the-gate');
+  await skipGuide(page);
   await page.locator('#start').click();
   await expect(page.locator('#scene')).toHaveAttribute('data-state', /./, { timeout: ciTimes(90_000) });
   await expect(page.locator('#scene')).not.toHaveAttribute('data-debug', /./);

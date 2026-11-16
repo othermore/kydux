@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { skipGuide } from './helpers';
 import { ciTimes } from './support';
 
 test.use({ locale: 'en-US' });
@@ -23,6 +24,8 @@ test('a lesson turns its pages, theory first, and Try it opens the level, its ed
 
   await page.locator('#lesson-try').click();
   await expect(page).toHaveURL(/#level\/the-gate$/);
+  // The screen's guide first, the first time, then the card (D258).
+  await skipGuide(page);
   await page.locator('#start').click();
   // The gate starts with no program: the example stays in the lesson (D63).
   await expect(page.locator('.cm-content')).toHaveText('');

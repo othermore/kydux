@@ -4,11 +4,11 @@
     "Land on the white stone.",
     "Cast *drevo* from the jetty."
   ],
-  "starting_code": "# Walk to the end of the jetty with `move_right`.\n\n# The word that lifts the broom with `cast`.\n\n# Fly to the stone with `move_right`.\n",
+  "starting_code": "# Walk to the end of the jetty with `move_right`.\n\n# Cast the word that lifts the broom with `cast`.\n\n# Fly to the stone with `move_right`.\n",
   "hints": [
     "It is 8 steps to the end of the jetty. Walk there first!",
     "Use `cast` with the word *drevo* to lift the broom when you reach the end of the jetty.",
-    "Once you are flying, `move_right` will cross the water! It is 5 cells to the white stone."
+    "Walking, the water cannot be crossed: the broom must already be in the air before you cross, and then `move_right` reaches the stone."
   ],
   "intro": "Let's see how you do! Walk to the end of the jetty, which is eight steps away. There, cast *drevo* with your wand, and fly without stopping to the white stone on the other side, five steps from the jetty.",
   "outro": "A perfect landing! Did you feel how fast the broom goes over the water?",

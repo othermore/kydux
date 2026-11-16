@@ -5,7 +5,7 @@
     "Walk along the row at least as far as cell (9, 6).",
     "Use `for`."
   ],
-  "starting_code": "# Go up to the brooms' row with `move_up`.\n\n# Go left to the first broom with `move_left`.\n\n# Find all the brooms with `find_all`.\n\n# For each broom, untie it with `untie` and step right with `move_right`.\n",
+  "starting_code": "# Go up to the brooms' row with `move_up`.\n\n# Go left to the first broom with `move_left`.\n\n# Find all the brooms with `find_all`.\n\n# For each broom:\n\n# Untie it with `untie`.\n\n# Step right with `move_right`.\n",
   "hints": [
     "First, walk up and left to stand on the first broom.",
     "Find the brooms and keep the list in a variable. Then, use a `for` loop to go through them.",

@@ -4,11 +4,11 @@
     "Aterriza en la piedra blanca.",
     "Lanza *drevo* desde el embarcadero."
   ],
-  "starting_code": "# Camina hasta el final del embarcadero con `move_right`.\n\n# La palabra que levanta la escoba con `cast`.\n\n# Vuela hasta la piedra con `move_right`.\n",
+  "starting_code": "# Camina hasta el final del embarcadero con `move_right`.\n\n# Lanza la palabra que levanta la escoba con `cast`.\n\n# Vuela hasta la piedra con `move_right`.\n",
   "hints": [
     "Hasta el final del embarcadero hay 8 pasos. ¡Camina hasta allí primero!",
     "Usa `cast` con la palabra *drevo* para levantar la escoba cuando llegues al final del embarcadero.",
-    "¡Una vez que estés volando, `move_right` cruzará el agua! Hay 5 casillas hasta la piedra blanca."
+    "Andando, el agua no se pisa: la escoba tiene que estar ya en el aire antes de cruzar, y entonces `move_right` llega hasta la piedra."
   ],
   "intro": "¡A ver qué tal se te da! Camina hasta el final del embarcadero, que está a ocho pasos. Allí, lanza *drevo* con la varita y vuela sin parar hasta la piedra blanca de la otra orilla, a cinco pasos del embarcadero.",
   "outro": "¡Un aterrizaje perfecto! ¿Has notado lo rápido que va la escoba sobre el agua?",

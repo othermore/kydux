@@ -5,7 +5,7 @@
     "Camina por la fila al menos hasta la casilla (9, 6).",
     "Usa `for`."
   ],
-  "starting_code": "# Sube hasta la fila de las escobas con `move_up`.\n\n# Ve a la izquierda hasta la primera escoba con `move_left`.\n\n# Encuentra todas las escobas con `find_all`.\n\n# Para cada escoba, desátala con `untie` y da un paso a la derecha con `move_right`.\n",
+  "starting_code": "# Sube hasta la fila de las escobas con `move_up`.\n\n# Ve a la izquierda hasta la primera escoba con `move_left`.\n\n# Encuentra todas las escobas con `find_all`.\n\n# Para cada escoba:\n\n# Desátala con `untie`.\n\n# Da un paso a la derecha con `move_right`.\n",
   "hints": [
     "Primero, camina hacia arriba y a la izquierda para colocarte sobre la primera escoba.",
     "Encuentra las escobas y guarda la lista en una variable. Luego, usa un bucle `for` para repasarlas.",

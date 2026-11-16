@@ -8,8 +8,8 @@
   "hints": [
     "Look at the rings closely. They are no longer in the same places!",
     "Do not add any new lines, or your program will take off too late. Just change the numbers.",
-    "Change the calls so the stretches are 2 and 3, 2 and 3, 3 and 2, and 2 and 2."
+    "Count the cells from one ring to the next on the course: they are the two numbers of each call."
   ],
-  "intro": "Zarek wants a rematch! He has moved the rings and flies more neatly: his program has 12 lines. A tie is still Zarek's! Here is the program that won the race. Not a single line may be added or you will take off late, but you only need to change the numbers in your calls.",
+  "intro": "Zarek wants a rematch! He has moved the rings and flies more neatly: his program has 12 lines. A tie is still Zarek's! Here is the program that won the race. One line more and you tie, and a tie is Zarek's; you only need to change the numbers in your calls.",
   "outro": "By a single tick! Zarek comes in right behind you."
 }

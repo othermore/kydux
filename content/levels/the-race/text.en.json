@@ -5,13 +5,13 @@
     "Cross the finish before Zarek.",
     "In fewer than 12 lines."
   ],
-  "starting_code": "# A function with two arguments for a pair with `def`.\n\n# The word with `cast`.\n\n# The start with `move_right`.\n\n# The four pairs.\n",
+  "starting_code": "# A function with two arguments for a pair with `def`.\n\n# The word with `cast`.\n\n# The start with `move_right`.\n\n# Call your function for each of the four pairs.\n",
   "hints": [
     "The zigzag is the same, but the lengths change! Give your function two arguments.",
     "Inside the function, use those arguments for the two `move_right` lengths.",
-    "Call the function four times with the exact lengths for the stretches: 3 and 2, 3 and 2, 2 and 3, and 2 and 2."
+    "Count the cells from ring to ring: each pair has its two lengths, and they are the arguments of each call."
   ],
   "intro": "Let's see who crosses the finish line first! Zarek has a program of 14 lines. Before the start I will read both programs, one tick a line, so a long program takes off late! Every ring missed costs five ticks before the finish, and a tie is Zarek's. Zarek's program is fast, but yours can be shorter with a function with arguments for the four pairs.",
-  "outro": "You won! By a hair! A short program takes off sooner, and on the race course every tick counts.",
+  "outro": "You won! A short program takes off sooner, and on the race course every tick counts.",
   "learned": "Now you know that a function takes arguments between its brackets, each with a name it uses inside, so one function serves for stretches that differ, and a short program takes off sooner."
 }

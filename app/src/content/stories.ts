@@ -288,7 +288,10 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
       for (const [actor, queue] of queues) {
         const next = queue.shift();
         if (!next) continue;
-        events.push({ tick, actor, kind: next.kind, data: next.data, line: null });
+        // The wizard's broom lifts and lands as the world's own events do, noted by
+        // the broom, so that the scene plays them as a flight and not as a step (D185).
+        const broom = actor === 'wizard' && (next.kind === 'fly' || next.kind === 'land');
+        events.push({ tick, actor: broom ? 'broom' : actor, kind: next.kind, data: next.data, line: null });
         played(actor, next.kind, next.data);
       }
       tick += 1;

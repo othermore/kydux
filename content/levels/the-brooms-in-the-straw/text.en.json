@@ -11,7 +11,7 @@
     "To find how many steps left to take, subtract the broom's `x` position from {wizard}'s `x` position.",
     "Do the same with `y` to find the steps down. Then use those numbers to walk to the broom and untie it!"
   ],
-  "intro": "{mate} has stacked the brooms from the row by the bench. The rest are scattered in the straw! Each one is to the left of the last, and never above it. The very last one is always on cell (6, 8). For each broom, we need to count how many cells left and how many down it is from where you stand, walk there, and untie it. Don't worry if it's on the same row: a move of zero steps simply walks nothing.",
+  "intro": "{mate} has stacked the brooms from the row by the bench. The rest are scattered in the straw! Each one is to the left of the last, and never above it. The very last one is always on cell (6, 8). For each broom, we need to count how many cells left and how many down it is from where you stand, walk there, and untie it. Don't worry if it's on the same row: a move of zero steps simply does nothing.",
   "outro": "We got them! You moved to each one perfectly.",
   "learned": "Now you know that inside the loop a program works with that turn's broom, so the same counts serve for every one.",
   "ways": {

@@ -68,6 +68,12 @@ describe('a story as the scene\'s events (D74)', () => {
     ]);
   });
 
+  it('lands the wizard who began a story in the air, the event the broom\'s as in a level (D185)', () => {
+    const { events } = storyEvents({ world, flying: ['wizard'], steps: steps({ who: 'voice', by: 'wizard', do: { land: true } }) });
+    const land = events.find((event) => event.kind === 'land');
+    expect(land).toMatchObject({ actor: 'broom', data: { id: 'wizard' } });
+  });
+
   it('has a figure step out from behind a thing when its appearing says from where (D128)', () => {
     const { events } = storyEvents({ world, steps: steps({ who: 'voice', by: 'nuri', do: { appear: [2, 1], from: [1, 1] } }) });
     expect(events[0]?.data).toEqual({ at: [2, 1], from: [1, 1] });

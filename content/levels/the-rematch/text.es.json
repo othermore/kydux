@@ -8,8 +8,8 @@
   "hints": [
     "Fíjate bien en los aros. ¡Ya no están en el mismo sitio!",
     "No añadas ninguna línea nueva o tu programa despegará demasiado tarde. Solo cambia los números.",
-    "Cambia las llamadas para que los tramos sean 2 y 3, 2 y 3, 3 y 2, y 2 y 2."
+    "Cuenta en la pista las casillas de un aro al siguiente: son los dos números de cada llamada."
   ],
-  "intro": "¡Zarek pide la revancha! Ha movido los aros y ahora vuela más fino: su programa tiene 12 líneas. ¡Si empatáis vuelve a ganar Zarek! Aquí tienes el programa que ganó la carrera. No puedes añadir ni una sola línea o despegarás tarde, pero solo necesitas cambiar los números de las llamadas.",
+  "intro": "¡Zarek pide la revancha! Ha movido los aros y ahora vuela más fino: su programa tiene 12 líneas. ¡Si empatáis vuelve a ganar Zarek! Aquí tienes el programa que ganó la carrera. Con una línea de más empatas, y el empate es de Zarek; solo necesitas cambiar los números de las llamadas.",
   "outro": "¡Por un solo tick! Zarek llega justo detrás de ti."
 }

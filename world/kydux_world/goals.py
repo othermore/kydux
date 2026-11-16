@@ -258,11 +258,13 @@ class ThroughInOrderGoal:
 
 
 class BeforeGoal:
-    """Met when the wizard crosses the race's finish at a tick lower than the racer's
-    (D189); at the same tick it is a tie, not met, and the race is flown again (D220):
-    `{"kind": "before", "racer": "zarek"}`. The page is shown Ilda's count: the lines
-    read, the flight, the ticks served for the rings missed, the tick crossed at, the
-    racer's lines and tick, and whether it is a tie."""
+    """Met at the race's end, when Ilda's count of the wizard is lower than the racer's
+    tick (D189, D234): the lines read, the flight to the finish, and five ticks for each
+    ring missed by then; at the same count it is a tie, not met, and the race is flown
+    again (D220): `{"kind": "before", "racer": "zarek"}`. Failed at the racer's tick when
+    the wizard has not crossed by then. The page is shown the count: the lines, the
+    flight, the penalty, their sum, the racer's lines and tick, and whether it is a
+    tie."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
         race = level.race
@@ -271,16 +273,23 @@ class BeforeGoal:
         self.race = race
 
     def check(self, world: "World") -> bool:
-        return world.crossed_at is not None and world.crossed_at < self.race.tick
+        count = self._count(world)
+        return world.finished and count is not None and count < self.race.tick
 
     def failed(self, world: "World") -> bool:
-        if world.crossed_at is not None:
-            return world.crossed_at >= self.race.tick
+        count = self._count(world)
+        if count is not None:
+            return world.finished and count >= self.race.tick
         return world.tick >= self.race.tick or world.finished
 
+    @staticmethod
+    def _count(world: "World") -> int | None:
+        crossed = world.crossed_at
+        return None if crossed is None else crossed + world.penalty
+
     def shown(self, world: "World") -> dict[str, Any]:
-        tick = world.crossed_at
-        flight = None if tick is None else tick - world.read_lines - world.penalty
+        tick = self._count(world)
+        flight = None if world.crossed_at is None else world.crossed_at - world.read_lines
         return {
             "lines": world.read_lines,
             "flight": flight,

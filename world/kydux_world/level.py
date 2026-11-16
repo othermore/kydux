@@ -175,8 +175,8 @@ class Race:
     starts, as the wizard's does with drevo, with a tick for the lift, then its `path`,
     a cell a tick, through its `rings`; it crosses the finish line at its path's last
     cell, on the finish's column. The wizard takes off at the tick of the program's own
-    lines, crosses at its own `finish`, and serves five ticks before it for each ring it
-    missed."""
+    lines and crosses at its own `finish`; each ring it has missed by then adds five
+    ticks to its count (D234)."""
 
     against: str
     lines: int

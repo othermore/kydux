@@ -439,7 +439,7 @@ def test_in_the_race_a_turn_inside_a_ring_stops_it_before_it_is_flown_out():
     result = run_code(content_level("the-race"), code)
     assert result.status == "error"
     assert (result.events[-1].tick, result.events[-1].data["reason"]) == (8, "ring_rim")
-    assert not [e for e in result.events if e.kind == "circle"]
+    assert not [e for e in result.events if e.kind == "judged"]
     assert result.goals[0].failed and result.goals[1].failed
 
 
@@ -527,7 +527,7 @@ ZAREK_PATH = [
 ]  # fmt: skip
 
 
-def race(path=ZAREK_PATH, his=RACE_RINGS, lines=18, racer_at=(6, 8), shared=False):
+def race(path=ZAREK_PATH, his=RACE_RINGS, lines=18, racer_at=(6, 8), shared=False, bonus=False):
     rows = ["." * 42 for _ in range(18)]
     rows[12] = "." * 6 + "S" + "." * 35
 
@@ -562,7 +562,7 @@ def race(path=ZAREK_PATH, his=RACE_RINGS, lines=18, racer_at=(6, 8), shared=Fals
                 "finish": [31, 12],
             },
             "goals": [
-                {"kind": "through_in_order", "ids": goal_ids},
+                {"kind": "through_in_order", "ids": goal_ids, "bonus": bonus},
                 {"kind": "before", "racer": "zarek"},
             ],
         }
@@ -645,15 +645,86 @@ def test_the_same_flight_in_eighteen_lines_ties_and_a_tie_is_not_a_win():
     assert result.status != "won"
 
 
-def test_a_ring_missed_costs_five_ticks_circling_before_the_finish():
-    code = WITH_ARGUMENTS.replace("two_rings(3, 5)\n", "wizard.move_right(8)\n")
+A_PAIR_SKIPPED = WITH_ARGUMENTS.replace("two_rings(3, 5)\n", "wizard.move_right(8)\n")
+
+
+def judged(result):
+    """Ilda's verdict (D234): the run's last event, a tick after the race is flown out."""
+    (event,) = [e for e in result.events if e.kind == "judged"]
+    assert (event.actor, event.tick, event.line) == ("wizard", result.ticks, None)
+    assert event is result.events[-1]
+    return event.data
+
+
+def test_a_ring_missed_adds_five_ticks_to_the_count_and_stops_nobody_before_the_finish():
+    """D234: the wizard crosses at its lines and its flight; the penalty is Ilda's sum."""
+    result = run_code(race(), A_PAIR_SKIPPED)
+    assert result.goals[0].params["missed"] == ["ring_3", "ring_4"]
+    count = result.goals[1].params
+    assert (count["lines"], count["flight"], count["penalty"], count["tick"]) == (11, 38, 10, 59)
+    landed = next(e for e in result.events if e.kind == "land" and e.actor == "broom")
+    crossing = [e for e in result.events if e.kind == "move" and e.data["to"] == [31, 12]]
+    assert [e.tick for e in crossing] == [49] and landed.tick == 49
+    # The rings are needed in this level: the lower count is not enough.
+    assert result.goals[0].failed and result.goals[1].met and result.status != "won"
+
+
+def test_the_race_is_judged_at_its_end_by_ilda_s_count():
+    won = run_code(race(), WITH_ARGUMENTS)
+    assert judged(won) == {
+        "at": [31, 12],
+        "lines": 11,
+        "flight": 42,
+        "missed": 0,
+        "penalty": 0,
+        "tick": 53,
+        "racer": "zarek",
+        "racer_lines": 18,
+        "racer_tick": 60,
+        "winner": "wizard",
+    }
+    # Zarek crosses at 60, Ilda speaks at 61, and the goal is met as she does.
+    assert (won.ticks, won.goals[1].met_at_tick) == (61, 61)
+    skipped = judged(run_code(race(), A_PAIR_SKIPPED))
+    assert (skipped["missed"], skipped["penalty"], skipped["tick"]) == (2, 10, 59)
+    assert skipped["winner"] == "wizard"
+    tied = judged(run_code(race(), written_out([(2, 4), (3, 5), (2, 4), (3, 1)])))
+    assert (tied["tick"], tied["winner"]) == (60, None)
+    past = run_code(race(), 'wizard.cast("drevo")\nwizard.move_right(25)\n')
+    verdict = judged(past)
+    assert (verdict["missed"], verdict["tick"], verdict["winner"]) == (8, 68, "zarek")
+    assert past.goals[1].failed and past.goals[1].failed_at_tick == past.ticks
+
+
+def test_a_race_not_finished_is_the_racer_s():
+    result = run_code(race(), 'wizard.cast("drevo")\nwizard.move_right(3)\n')
+    verdict = judged(result)
+    assert (verdict["flight"], verdict["tick"], verdict["winner"]) == (None, None, "zarek")
+    assert (verdict["missed"], verdict["penalty"]) == (0, 0)
+    # Lost at Zarek's crossing, a tick before Ilda says so.
+    assert (result.goals[1].failed_at_tick, result.ticks) == (60, 61)
+
+
+def test_a_ring_flown_through_after_the_finish_takes_no_penalty_away():
+    """D234: the penalty is of the rings missed when the wizard crosses."""
+    code = 'wizard.cast("drevo")\nwizard.move_right(25)\nwizard.move_left(24)\nwizard.move_up(2)\n'
     result = run_code(race(), code)
-    circles = [e for e in result.events if e.kind == "circle" and e.actor == "wizard"]
-    missed = result.goals[0].params["missed"]
-    assert missed == ["ring_3", "ring_4"]
-    assert len(circles) == 5 * len(missed)
-    assert result.goals[1].params["penalty"] == 10
-    assert result.status != "won"
+    mine = [e for e in result.events if e.kind == "through" and "by" not in e.data]
+    assert [e.data["id"] for e in mine] == ["ring_1"]
+    assert result.goals[1].params["penalty"] == 40
+
+
+def test_with_the_rings_a_bonus_the_lower_count_wins_and_a_ring_missed_costs_its_star():
+    level = race(bonus=True)
+    clean = run_code(level, WITH_ARGUMENTS)
+    assert clean.status == "won" and clean.goals[0].met
+    skipped = run_code(level, A_PAIR_SKIPPED)
+    assert skipped.status == "won"
+    assert (skipped.goals[0].failed, skipped.goals[0].bonus) == (True, True)
+    twice = A_PAIR_SKIPPED.replace("two_rings(3, 1)\n", "wizard.move_right(4)\n")
+    lost = run_code(level, twice)
+    assert (lost.goals[1].params["penalty"], lost.status) == (20, "incomplete")
+    assert judged(lost)["winner"] == "zarek"
 
 
 def test_straight_to_the_finish_past_every_ring_is_later_than_zarek_flown_or_walked():
@@ -1141,23 +1212,49 @@ def test_the_race_and_the_rematch_have_zarek_cross_at_sixty_one_in_his_lane():
 def test_the_race_s_solution_crosses_at_fifty_four_and_eighteen_lines_tie_at_sixty_one():
     folder = CONTENT / "the-race"
     won = run_code(content_level("the-race"), (folder / "solution.py").read_text())
-    assert won.status == "won" and won.goals[1].params["tick"] == 54
+    assert won.status == "won" and won.goals[0].params["tick"] == 54
+    assert all(goal.met for goal in won.goals)
     tied = run_code(
         content_level("the-race"), (folder / "wrong" / "eighteen_lines.py").read_text()
     )
-    assert tied.goals[1].params["tick"] == 61 and tied.goals[1].params["tie"]
-    assert tied.goals[1].failed
+    assert tied.goals[0].params["tick"] == 61 and tied.goals[0].params["tie"]
+    assert tied.goals[0].failed
 
 
 def test_the_rematch_is_won_at_fifty_four_and_the_race_s_program_crosses_at_eighty_nine():
     folder = CONTENT / "the-rematch"
     won = run_code(content_level("the-rematch"), (folder / "solution.py").read_text())
-    assert won.status == "won" and won.goals[1].params["tick"] == 54
+    assert won.status == "won" and won.goals[0].params["tick"] == 54
+    assert all(goal.met for goal in won.goals)
     given = run_code(
         content_level("the-rematch"), (folder / "wrong" / "the_race_s_program.py").read_text()
     )
-    assert len(given.goals[0].params["missed"]) == 7
-    assert given.goals[1].params["tick"] == 89 and given.goals[1].failed
+    assert len(given.goals[1].params["missed"]) == 7
+    assert given.goals[0].params["tick"] == 89 and given.goals[0].failed
+
+
+def test_in_the_two_races_a_pair_skipped_still_wins_and_two_pairs_lose():
+    """D234: the rings in order are the races' bonus; the winner Ilda names wins the
+    level, with a star less for a ring missed, and the penalty of two pairs loses it."""
+    programs = {
+        "the-race": ("two_rings(3, 5)\n", "wizard.move_right(8)\n", "two_pairs_skipped.py"),
+        "the-rematch": ("two_rings(2, 4)\n", "wizard.move_right(6)\n", "two_pairs_missed.py"),
+    }
+    for name, (pair, straight, wrong) in programs.items():
+        folder, level = CONTENT / name, content_level(name)
+        assert [(spec.kind, spec.bonus) for spec in level.goals[:2]] == [
+            ("before", False),
+            ("through_in_order", True),
+        ]
+        solution = (folder / "solution.py").read_text()
+        assert solution.count(pair) == 1
+        one = run_code(level, solution.replace(pair, straight))
+        assert (one.status, one.goals[0].params["tick"]) == ("won", 60)
+        assert one.goals[1].failed and len(one.goals[1].params["missed"]) == 2
+        assert one.events[-1].data["winner"] == "wizard"
+        two = run_code(level, (folder / "wrong" / wrong).read_text())
+        assert (two.status, two.goals[0].params["penalty"]) == ("incomplete", 20)
+        assert two.goals[0].params["tick"] > 61 and two.events[-1].data["winner"] == "zarek"
 
 
 def test_the_rematch_is_chapter_4_s_second_fix_and_the_rings_its_one_improve():

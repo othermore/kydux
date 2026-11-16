@@ -13,8 +13,9 @@ catch; and a world that has ended refuses every further action, so that a
 bare `except:` cannot carry the run on.
 
 A level that is a race (D189) starts with Ilda reading the program, a tick a
-line, before the wizard's first action, and ends with the race flown out; a
-wizard in the air when the program ends sets down where it is (D185).
+line, before the wizard's first action, and ends with the race flown out and
+judged by her count (D234); a wizard in the air when the program ends sets down
+where it is (D185).
 """
 
 import sys
@@ -26,7 +27,7 @@ from typing import Any
 
 from .actors import Actor, Friend, Teacher, make_actor, sight_tiles
 from .goals import code_lines, make_goal
-from .level import CARRIED_KINDS, Level, Position
+from .level import CARRIED_KINDS, Level, Position, Race
 from .things import Bed, Child, Door, Hole, Ring, Thing, make_thing, steps_between
 
 CHILD = "<child>"
@@ -119,7 +120,7 @@ DELTAS = ((0, -1), (-1, 0), (1, 0), (0, 1))
 #: How far the wizard walks to the cell under a bed's pillow to go to bed, at most
 #: (D130).
 PILLOW_WALK = 8
-#: The ticks a ring missed costs in a race, served before the finish (D189).
+#: The ticks a ring missed adds to Ilda's count of a race (D234).
 RING_PENALTY = 5
 
 
@@ -158,7 +159,8 @@ class World:
         #: did: what the `no_error` goal fails at.
         self.error: str | None = None
         #: In a race (D189): the lines Ilda read, the tick the wizard crossed the finish
-        #: at, and the ticks it served for the rings it missed.
+        #: at, and the ticks added to its count for the rings it had missed by then
+        #: (D234).
         self.read_lines = 0
         self.crossed_at: int | None = None
         self.penalty = 0
@@ -399,8 +401,8 @@ class World:
         """The child's code has ended, `ended` when it came to its end with the world
         still running: a broom in the air sets down where it is, over a cell that is
         walked on, and stays in the air over any other (D185, D215); a race is flown
-        out until the racer crosses the finish (D189); then the goals that are met only
-        then are checked."""
+        out until the racer crosses the finish (D189) and judged, a tick of Ilda's
+        (D234); then the goals that are met only then are checked."""
         here = self.wizard._k_position
         if self.over is None and self.wizard._k_flying and self.landable(here):
             self.wizard._set(flying=False)
@@ -414,7 +416,40 @@ class World:
             except RunOver:
                 pass
         self.finished = True
+        if ended and self.over is None and race is not None:
+            self._judge(race)
         self._check_goals()
+
+    def _judge(self, race: Race) -> None:
+        """Ilda's verdict of a race (D234), in a tick of its own while the run has one
+        left: the lines, the flight, the rings missed and their penalty, the count they
+        add up to, the racer's, and the winner, the one with the lower count; nobody at
+        the same count (D220), and the racer when the wizard has not crossed."""
+        crossed = self.crossed_at
+        count = None if crossed is None else crossed + self.penalty
+        if count is None or count > race.tick:
+            winner: str | None = race.against
+        else:
+            winner = "wizard" if count < race.tick else None
+        judged = {
+            "at": list(self.wizard.position),
+            "lines": self.read_lines,
+            "flight": None if crossed is None else crossed - self.read_lines,
+            "missed": self.penalty // RING_PENALTY,
+            "penalty": self.penalty,
+            "tick": count,
+            "racer": race.against,
+            "racer_lines": race.lines,
+            "racer_tick": race.tick,
+            "winner": winner,
+        }
+        if self.tick < self.level.tick_limit:
+            try:
+                self.act("judged", judged, line=None)
+            except RunOver:
+                pass
+        else:
+            self.note("wizard", "judged", judged)
 
     def won(self) -> bool:
         """Every goal that is not a bonus met, and none of them failed: a bonus goal
@@ -559,14 +594,6 @@ class Wizard(Child):
                     bumped["kind"] = world.level.kinds[ahead]
                 world.act("bump", bumped)
                 return
-            race = world.level.race
-            if race is not None and ahead == race.finish and world.crossed_at is None:
-                # Five ticks before the finish for each ring missed, circling (D189).
-                missed = world.missed()
-                for ring_id in missed:
-                    for _ in range(RING_PENALTY):
-                        world.act("circle", {"at": list(here), "ring": ring_id})
-                        world.penalty += 1
             through = self._k_through(direction)
             entered = (ring.name, direction, here) if ring is not None else None
             self._set(position=ahead, ring=entered)
@@ -587,7 +614,8 @@ class Wizard(Child):
     ) -> None:
         """In a move's first tick, before the goals are looked at: the ring flown through
         along its way, or against it (D187, D219), and a race's finish crossed (D189), at
-        the move's last tick (D225)."""
+        the move's last tick (D225), with five ticks of penalty for each ring missed by
+        then (D234)."""
         world: World = self._k_world
         if through is not None:
             name, came_from = through
@@ -604,6 +632,7 @@ class Wizard(Child):
         race = world.level.race
         if race is not None and ahead == race.finish and world.crossed_at is None:
             world.crossed_at = world.tick + ticks - 1
+            world.penalty = RING_PENALTY * len(world.missed())
 
     def _k_through(self, direction: Direction) -> tuple[str, Position] | None:
         """The ring whose cell the wizard leaves the way it flew in, so flying through

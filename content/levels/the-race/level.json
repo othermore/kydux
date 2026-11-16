@@ -314,6 +314,10 @@
   ],
   "goals": [
     {
+      "kind": "before",
+      "racer": "zarek"
+    },
+    {
       "kind": "through_in_order",
       "ids": [
         "ring_1",
@@ -324,11 +328,8 @@
         "ring_6",
         "ring_7",
         "ring_8"
-      ]
-    },
-    {
-      "kind": "before",
-      "racer": "zarek"
+      ],
+      "bonus": true
     },
     {
       "kind": "lines_under",

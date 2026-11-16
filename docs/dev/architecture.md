@@ -2765,12 +2765,13 @@ one overturns stays, marked as superseded.
   theme is a file `content/music/<id>.json`: its tempo, its metre, its one set of voices
   (D210), and its sections of notes (pitch, start, length, loudness), which follow one
   another in their `order` and loop without a seam, no note ringing past its section's
-  end. The page plays it with Web Audio (`engine/music.ts`): voices of seven kinds, a
+  end. The page plays it with Web Audio (`engine/music.ts`): voices of nine kinds, a
   celesta's bell, a bowed string pad, a plucked string, a harp, a flute, a piano's struck
-  tone (D209) and a soft drum, each an oscillator or two with an envelope, the pad on
-  lines that sound on from a note to the next (D203), through a reverb whose impulse is
-  decaying noise; the notes are scheduled a third of a second ahead on the audio clock;
-  no sound file is loaded. A chapter's `chapter.json` names its theme (`music`), which the
+  tone (D209), a horn and a march's snare (D213) and a soft drum, each an oscillator or
+  two or a burst of noise with an envelope, the pad on lines that sound on from a note to
+  the next (D203), through a reverb whose impulse is decaying noise; the notes are
+  scheduled a third of a second ahead on the audio clock; no sound file is loaded. A
+  chapter's `chapter.json` names its theme (`music`), which the
   course carries; a story, the map and the start screen play their chapter's theme at its
   written loudness, a lesson and a level every voice of it at 0.7 (D210), the map and the
   start screen in the chapter the child is in; the settings and the creator leave what
@@ -3167,11 +3168,11 @@ one overturns stays, marked as superseded.
   eerie: very slow, in E with its lowered second, a low pad that barely moves, a tritone
   held against it, single notes of the celesta and the harp far apart, a note repeated
   fading as an echo, a low drum now and then as a far door, no tune one could whistle.
-  The broom and the passages have a second, `the-broom-b` and `the-passages-b`, for the
-  owner's ear: the broom's with another tune and other surprises, the passages' with less
-  in it. *The familiar* waits until its chapter is seen. The page sounds one more kind of
-  voice, `piano`: a struck tone, bright at the hammer's blow, that starts at once and dies
-  away by itself in a time of its pitch, however long the note is written (`pianoRing`).
+  The broom's theme is the owner's choice; the passages' waits for it, with three
+  candidates beside it (D213). *The familiar* waits until its chapter is seen. The page
+  sounds one more kind of voice, `piano`: a struck tone, bright at the hammer's blow, that
+  starts at once and dies away by itself in a time of its pitch, however long the note is
+  written (`pianoRing`).
   Rules out a chosen chapter with candidates left beside its theme, and a held flute
   where the owner asked for struck notes.
 - **D210 — A theme has one set of voices.** Decided 2026-11-12 by the owner, who chose
@@ -3187,3 +3188,30 @@ one overturns stays, marked as superseded.
   theme on the mixer, they say the theme and the voices they turned off, if any, with the
   mixer's line; a voice turned off leaves the theme everywhere. Rules out a level's music
   without its tune, and two forms of a theme that differ in their instruments.
+- **D213 — The broom's theme is chosen, and the passages have three candidates in other
+  manners.** Decided 2026-11-13 by the owner, by ear on the mixer (*Para la música me
+  gusta the broom (la versión sin -b). La de the passages no me gusta. Sin la celesta
+  creo que me gustaría más, pero quiero escuchar otras cosas completamente distintas*),
+  who asked for the manner of a march played while someone steals into a guarded place.
+  `the-broom` is its chapter's theme and stands alone. `the-passages` is its chapter's
+  theme until the owner chooses, and beside it stand three candidates, each with a pulse
+  to walk to and none with a celesta. `the-passages-march` is a guard's round, in E minor
+  with its lowered second at 104 beats a minute: a plucked low figure that creeps, a
+  snare played softly with a roll every fourth bar, a timpani on the bar, chords plucked
+  off the beat, and a horn that calls in the first section, has the tune in the second
+  and holds long notes over the third, where the march steps lightly.
+  `the-passages-tiptoe` is someone young where they should not be, in D minor with the
+  chord a half step over it at 92: a plucked bass that walks up each chord and down, a
+  flute's short phrases with a breath between them, a harp's note over the bar, and the
+  eighth bar of each section held in silence over a soft drum. `the-passages-watch` is
+  time running, in A minor with its lowered second at 116: a string plucked on every
+  eighth note as a clock, a piano's low notes three, three and two, a horn's long notes
+  that rise a half step and wait, a piano's tune in the second section. The one chosen
+  takes the id `the-passages` and the others leave the tree (D209). The page sounds two
+  more kinds of voice: `brass`, a horn, a saw whose filter opens as the note is blown,
+  held for the note's length; and `snare`, a short rattle of noise over a skin's tone, a
+  tap whatever pitch and length are written. Every theme is the game's own notes and
+  quotes no other work's. A lesson and a level play a theme quieter and in no other way
+  (D210), and the mixer's second button says *a menos volumen*, *quieter*: *más bajo* is
+  read as a lower tone. Rules out a candidate that is the refused theme with a voice
+  less, and a note taken from another work.

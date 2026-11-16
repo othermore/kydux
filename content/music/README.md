@@ -17,13 +17,16 @@ or later, like the rest of it. They quote no other work.
 | `the-broom` | 4, The broom | a race, tense: fast in four in E minor, a piano's short cells that climb and break off over a low voice running in eighth notes, the drum on every beat, a chord pushed off the beat; a bar with no tune, a leap, a raised seventh left hanging |
 | `the-familiar` | 5, The familiar | the tower: a slow chorale that opens out, a flute and a harp joining it |
 
-Beside two of them is a second, for the owner's ear (D209); a chapter names its theme,
-never a second:
+Beside the passages' theme are three candidates, for the owner's ear (D213): the same
+night in other manners, each with a pulse to walk to and none with the celesta. A
+chapter names its theme, never a candidate; the one chosen takes the id `the-passages`
+and the others leave this folder.
 
-| Second | Its manner |
+| Candidate | Its manner |
 |---|---|
-| `the-broom-b` | the same race with another tune: cells that climb by half steps too, a leap of two octaves down, a bar where the drum stops, a chord of F in its second section |
-| `the-passages-b` | the same night with less in it: the pad and its tritone, fewer notes far apart, one echo, the far drum once a section |
+| `the-passages-march` | a guard's round: a march in E minor with its lowered second, a plucked low figure that creeps, a snare played softly with a roll every fourth bar, a timpani on the bar, chords plucked off the beat, and a horn that calls, then has the tune, then holds long notes while the march steps lightly |
+| `the-passages-tiptoe` | someone young where they should not be: in D minor with the chord a half step over it, a plucked bass that walks up each chord and down, a chord plucked off the beat, a flute's short phrases with a breath between them, a harp's note over the bar, and a bar where all holds its breath but a soft drum |
+| `the-passages-watch` | time running while nobody must hear: in A minor with its lowered second, a string plucked on every eighth note as a clock, a piano's low notes three, three and two, a timpani on the bar, a horn's long notes that rise a half step and wait, a piano's tune in the second section, a snare's roll at the end of each half |
 
 ## The file
 
@@ -36,10 +39,12 @@ A theme is `<id>.json`:
 - `voices`: each voice by name, with its `kind` and its `volume` from 0 to 1. The kinds
   are `celesta` (a bell), `strings` (a bowed pad), `pluck` (a plucked string,
   pizzicato), `harp`, `flute`, `piano` (a struck tone that dies away by itself, however
-  long its note is written) and `drum` (a soft drum). The pad is the body under the
-  other voices (D203): it sounds low, and a chord of it held into the next is one
-  unbroken sound that changes its notes. A theme has no other set of voices: the page
-  refuses a file with `arrangements` (D210).
+  long its note is written), `brass` (a horn, held for its note's length), `drum` (a
+  soft drum, a timpani when it is low) and `snare` (a march's snare, a tap whatever
+  pitch and length are written). The pad is the body under the other voices (D203): it
+  sounds low, and a chord of it held into the next is one unbroken sound that changes
+  its notes. A theme has no other set of voices: the page refuses a file with
+  `arrangements` (D210).
 - `sections`: each with its `id`, its number of `bars`, and its `notes` by voice. A note
   is `[pitch, start, length, loudness]`: its pitch as a MIDI number (60 is the middle C),
   its start and its length in beats from the section's start, and its loudness from 0 to
@@ -62,7 +67,8 @@ A test holds the files to what the score makes, and every theme to its rules.
 ## How a theme is heard alone
 
 Open the game with `?debug`, at `#music`: every theme is listed, each with two buttons,
-one to hear it as a story plays it and one as a level plays it, lower.
+one to hear it as a story plays it and one as a level plays it: the same music,
+quieter.
 
 ```
 https://localhost:5173/?debug#music

@@ -486,45 +486,309 @@ def the_passages() -> dict:
     )
 
 
-# --- The passages, with less in it: the pad and its tritone, fewer notes far apart, one
-# echo, the far door once a section.
+# --- The passages' candidates, for the owner's ear (D213): the same night in three other
+# manners, each with a pulse to walk to, none with the celesta.
 
 
-def the_passages_b() -> dict:
+def figure(progression, cells: list[str], bar: int, loud: float) -> list[list[float]]:
+    """A low figure a bar long, written on E and moved to each bar's chord, the cells
+    taken in turn; the progression has a chord a bar."""
+    notes = []
+    for index, (start, span, root, _) in enumerate(progression):
+        assert span == bar, "a figure needs a chord a bar"
+        shift = (root - NAMES["e"] + 5) % 12 - 5
+        notes += [
+            [p + shift, start + at, length, volume]
+            for p, at, length, volume in line(cells[index % len(cells)], bar, loud)
+        ]
+    return notes
+
+
+def walking(
+    progression, pattern: list[int], low: int, loud: float, length: float = 0.5
+) -> list[list[float]]:
+    """A chord's notes a beat each from its root, by `pattern`: 0 the root at or above
+    `low`, 1 the chord's next note above it, and so on."""
+    notes = []
+    for start, span, root, intervals in progression:
+        base = low + (root - low) % 12
+        ladder = tones(root, intervals[:3], base, base + 24)
+        for index in range(int(round(span))):
+            notes.append([ladder[pattern[index % len(pattern)]], start + index, length, loud])
+    return notes
+
+
+def ticking(progression, low: int, loud: float) -> list[list[float]]:
+    """A chord's fifth plucked on every eighth note, as a clock, the first of each three,
+    three and two a little louder."""
+    notes = []
+    for start, span, root, _ in progression:
+        p = low + (root + 7 - low) % 12
+        for index in range(int(round(span / 0.5))):
+            accent = 0.12 if index % 8 in (0, 3, 6) else 0.0
+            notes.append([p, start + index * 0.5, 0.4, loud + accent])
+    return notes
+
+
+def roll(bars: list[int], bar: int, loud: float) -> list[list[float]]:
+    """A snare's roll that swells over the last beat of the bars given (counted from 1)."""
+    return [
+        [60, number * bar - 1 + k * 0.25, 0.25, loud * (0.55 + 0.15 * k)]
+        for number in bars
+        for k in range(4)
+    ]
+
+
+def marching(bars: list[int], bar: int, loud: float, rolls: int = 4) -> list[list[float]]:
+    """A march's snare, soft: every beat, the short notes before the second and the
+    fourth, and a roll at the end of every `rolls`-th bar."""
+    taps = [(0, 1.0), (0.75, 0.5), (1, 0.85), (2, 1.0), (2.5, 0.6), (3, 0.85), (3.5, 0.6)]
+    notes = []
+    for number in bars:
+        rolled = number % rolls == 0
+        notes += [
+            [60, (number - 1) * bar + beat, 0.25, loud * weight]
+            for beat, weight in taps
+            if not (rolled and beat >= 3)
+        ]
+        if rolled:
+            notes += roll([number], bar, loud)
+    return notes
+
+
+def within(notes: list[list[float]], bars: list[int], bar: int) -> list[list[float]]:
+    """The notes that start in the bars given (counted from 1)."""
+    return [note for note in notes if int(note[1] // bar) + 1 in bars]
+
+
+# The march: a guard's round at night, in E minor with its lowered second: a plucked low
+# figure that creeps, a snare played softly, a timpani on the bar, chords plucked off
+# the beat, and a horn, which calls in the first section, has the tune in the second and
+# holds long notes over the third, where the march steps lightly.
+
+STEP = "e2 r/0.5 e2/0.5 b2 d3/0.5 e3/0.5"
+TURN = "e3 r/0.5 e3/0.5 d3 b2/0.5 a2/0.5"
+LIGHT = "e2 r b2 r"
+
+
+def the_passages_march() -> dict:
     bar = 4
-    a = harmony("Em | Em | Em | Em | F | F | Em | Em | Em | Em | Em | Em | F | F | Em | Em", bar)
-    b = harmony("Am | Am | Am | Am | Bb | Bb | Am | Am | Dm | Dm | Dm | Dm | E | E | E | E", bar)
+    every = list(range(1, 17))
+    a = harmony("Em | Em | Em | Em | F | F | Em | Em | Am | Am | Em | Em | F | F | B7 | B7", bar)
+    b = harmony("Em | Em | F | F | Em | Em | Dm | B7 | Em | Em | F | F | Am | Am | B7 | B7", bar)
+    c = harmony("Am | Am | Em | Em | F | F | Em | Em | Am | Am | G | G | F | F | B7 | B7", bar)
+    a_horn = (
+        "r/4 | r/4 | r/4 | r/4 | r/4 | r/4 | r/4 | r/3 b3 | "
+        "c4/2.5 r/0.5 b3/0.5 c4/0.5 | e4/3 r | r/3 b3 | e4/2 g4/1.5 r/0.5 | "
+        "f4/2.5 r/0.5 e4/0.5 f4/0.5 | a4/3 r | f#4/1.5 f#4/0.5 a4 f#4 | d#4/3 r"
+    )
+    b_horn = (
+        "e4/1.5 e4/0.5 g4 b4 | b4/2.5 r/0.5 a4/0.5 g4/0.5 | "
+        "a4/1.5 a4/0.5 c5 a4 | f4/3 r | "
+        "e4/1.5 e4/0.5 g4 b4 | e5/2.5 r/0.5 d5/0.5 b4/0.5 | "
+        "d5/1.5 a4/0.5 f4 a4 | f#4/3 r | "
+        "g4/0.5 r/0.5 g4/0.5 r/0.5 b4 e5 | d5/1.5 b4/0.5 g4/2 | "
+        "c5/0.5 r/0.5 c5/0.5 r/0.5 a4 f4 | a4/3 r | "
+        "e5/1.5 e5/0.5 c5 a4 | c5/2 b4 a4 | "
+        "b4/1.5 b4/0.5 d#5 f#5 | f#5/2 d#5 r"
+    )
+    c_horn = (
+        "a3/4 | c4/3 r | b3/4 | e4/3 r | f4/4 | a4/2 c5/2 | b4/4 | g4/3 r | "
+        "a4/1.5 a4/0.5 c5 e5 | e5/3 r | d5/1.5 d5/0.5 b4 g4 | b4/3 r | "
+        "c5/2 a4/2 | f4/3 r | f#4/2 a4/2 | b4/2 d#5 r"
+    )
     return theme(
-        "the-passages-b",
-        52,
+        "the-passages-march",
+        104,
         [4, 4],
         {
-            "pad": {"kind": "strings", "volume": 0.6},
-            "shadow": {"kind": "strings", "volume": 0.4},
-            "celesta": {"kind": "celesta", "volume": 0.5},
-            "drum": {"kind": "drum", "volume": 0.6},
+            "horn": {"kind": "brass", "volume": 0.6},
+            "bass": {"kind": "pluck", "volume": 0.85},
+            "chords": {"kind": "pluck", "volume": 0.45},
+            "pad": {"kind": "strings", "volume": 0.4},
+            "snare": {"kind": "snare", "volume": 0.5},
+            "drum": {"kind": "drum", "volume": 0.55},
         },
         [
             section(
                 "a",
                 16,
                 bar,
-                pad=pad(a, 38, 52, 0.42, count=2),
-                shadow=[[58, 32, 16, 0.3]],
-                celesta=far(("f5", 12, 0.34), ("e6", 46, 0.3)) + echo(71, 26, 0.3, times=3),
-                drum=[[31, 22, 1, 0.3]],
+                horn=line(a_horn, bar, 0.5),
+                bass=figure(a, [STEP, STEP, STEP, TURN], bar, 0.5),
+                chords=within(after_beat(a, [1.5, 3.5], 55, 70, 0.3, 0.3), every[4:], bar),
+                pad=pad(a, 43, 59, 0.34),
+                snare=marching(every, bar, 0.3),
+                drum=drum(every, bar, [0], 40, 0.3),
             ),
             section(
                 "b",
                 16,
                 bar,
-                pad=pad(b, 38, 52, 0.42, count=2),
-                shadow=[[52, 40, 16, 0.28]],
-                celesta=far(("bb5", 18, 0.32), ("g#5", 56, 0.3)),
-                drum=[[31, 44, 1, 0.28]],
+                horn=line(b_horn, bar, 0.58),
+                bass=figure(b, [STEP, TURN], bar, 0.54),
+                chords=after_beat(b, [1.5, 3.5], 55, 70, 0.32, 0.3),
+                pad=pad(b, 43, 59, 0.36),
+                snare=marching(every, bar, 0.34),
+                drum=drum(every, bar, [0], 40, 0.32) + drum(every, bar, [2], 40, 0.2),
+            ),
+            section(
+                "c",
+                16,
+                bar,
+                horn=line(c_horn, bar, 0.46),
+                bass=figure(c, [LIGHT], bar, 0.46),
+                chords=walking(c, [1, 2, 3, 2], 52, 0.24),
+                pad=pad(c, 43, 59, 0.38),
+                snare=roll([4, 8, 12, 16], bar, 0.26),
+                drum=drum(every[::2], bar, [0], 40, 0.24),
+            ),
+        ],
+        ["a", "b", "c", "b"],
+    )
+
+
+# The tiptoe: someone young where they should not be, in D minor with the chord a half
+# step over it: a plucked bass that walks up each chord and down, a chord plucked off
+# the beat, a flute's short phrases with a breath between them, a harp's note over the
+# bar, and a bar where everything holds its breath but a soft drum.
+
+
+def the_passages_tiptoe() -> dict:
+    bar = 4
+    every = list(range(1, 17))
+    moving = [number for number in every if number != 8]
+    a = harmony(
+        "Dm | Dm | Gm | Dm | Eb | Eb | A7 | A7 | Dm | Dm | Gm | Dm | Bb | Eb | A7 | A7", bar
+    )
+    b = harmony("F | F | C | C | Gm | Gm | A7 | A7 | Bb | Bb | F | F | Eb | Eb | A7 | A7", bar)
+    a_tune = (
+        "r d5/0.5 e5/0.5 f5/0.5 r/0.5 a5/0.5 r/0.5 | g5/0.5 f5/0.5 e5/0.5 r/0.5 d5 r | "
+        "r g5/0.5 a5/0.5 bb5/0.5 r/0.5 d6/0.5 r/0.5 | c6/0.5 bb5/0.5 a5/0.5 r/0.5 f5 r | "
+        "r eb5/0.5 g5/0.5 bb5/0.5 r/0.5 g5/0.5 r/0.5 | eb5/0.5 r/0.5 eb5/0.5 r/0.5 g5/2 | "
+        "r e5/0.5 g5/0.5 a5/0.5 r/0.5 c#6/0.5 r/0.5 | r/4 | "
+        "r d5/0.5 e5/0.5 f5/0.5 r/0.5 a5/0.5 r/0.5 | d6/0.5 r/0.5 a5/0.5 r/0.5 f5/0.5 e5/0.5 d5 | "
+        "r bb5/0.5 a5/0.5 g5/0.5 r/0.5 d5/0.5 r/0.5 | f5/0.5 e5/0.5 d5/0.5 r/0.5 a4 r | "
+        "r d5/0.5 f5/0.5 bb5/0.5 r/0.5 f5/0.5 r/0.5 | g5/0.5 r/0.5 eb5/0.5 r/0.5 bb4/2 | "
+        "a4/0.5 c#5/0.5 e5/0.5 g5/0.5 a5 r | r/2 e5/0.5 r/0.5 c#5/0.5 r/0.5"
+    )
+    b_tune = (
+        "a5/1.5 c6/0.5 f5/2 | r f5/0.5 g5/0.5 a5/2 | g5/1.5 e5/0.5 c5/2 | r e5/0.5 f5/0.5 g5/2 | "
+        "bb5/1.5 a5/0.5 g5/2 | r d5/0.5 g5/0.5 bb5/2 | a5/1.5 g5/0.5 e5 c#5 | r/4 | "
+        "d5/0.5 r/0.5 f5/0.5 r/0.5 bb5/2 | a5/0.5 r/0.5 f5/0.5 r/0.5 d5/2 | "
+        "c5/0.5 r/0.5 f5/0.5 r/0.5 a5/2 | c6/3 r | "
+        "bb5/1.5 g5/0.5 eb5/2 | r eb5/0.5 g5/0.5 bb5/2 | "
+        "a5/0.5 r/0.5 g5/0.5 r/0.5 e5/0.5 r/0.5 c#5/0.5 r/0.5 | r/2 a4/0.5 r/0.5 a4/0.5 r/0.5"
+    )
+    return theme(
+        "the-passages-tiptoe",
+        92,
+        [4, 4],
+        {
+            "flute": {"kind": "flute", "volume": 0.7},
+            "bass": {"kind": "pluck", "volume": 0.8},
+            "chords": {"kind": "pluck", "volume": 0.45},
+            "harp": {"kind": "harp", "volume": 0.5},
+            "pad": {"kind": "strings", "volume": 0.35},
+            "drum": {"kind": "drum", "volume": 0.5},
+        },
+        [
+            section(
+                "a",
+                16,
+                bar,
+                flute=line(a_tune, bar, 0.56),
+                bass=within(walking(a, [0, 1, 2, 1], 38, 0.48), moving, bar),
+                chords=within(after_beat(a, [1.5, 3.5], 60, 75, 0.26, 0.3), moving, bar),
+                harp=within(bells(a, 74, 86, 0.3, every=2), moving, bar),
+                pad=pad(a, 45, 60, 0.3),
+                drum=drum(every[::2], bar, [0], 38, 0.2) + drum([8], bar, [1, 3], 38, 0.18),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                flute=line(b_tune, bar, 0.56),
+                bass=within(walking(b, [0, 2, 1, 2], 38, 0.48), moving, bar),
+                chords=within(after_beat(b, [1.5, 3.5], 60, 75, 0.26, 0.3), moving, bar),
+                harp=within(bells(b, 74, 86, 0.3), moving, bar),
+                pad=pad(b, 45, 60, 0.32),
+                drum=drum(every[::2], bar, [0], 38, 0.2) + drum([8], bar, [1, 3], 38, 0.18),
             ),
         ],
         ["a", "b", "a"],
+    )
+
+
+# The watch: time running while nobody must hear, in A minor with its lowered second: a
+# string plucked on every eighth note as a clock, a piano's low notes three, three and
+# two under it, a timpani on the bar, a horn's long notes that rise a half step and
+# wait, and in the second section a piano's tune in the same three, three and two; a
+# snare's roll closes each half of a section.
+
+
+def the_passages_watch() -> dict:
+    bar = 4
+    every = list(range(1, 17))
+    a = harmony(
+        "Am | Am | Am | Am | Bb | Bb | Am | Am | Dm | Dm | Am | Am | Bb | Bb | E7 | E7", bar
+    )
+    b = harmony("F | F | C | C | Dm | Dm | E7 | E7 | F | F | G | G | Am | Am | E7 | E7", bar)
+    a_horn = (
+        "r/4 | r/2 e4/2 | f4/3 r | e4/2 r/2 | r/2 f4/2 | g4/3 r | e4/4 | r/4 | "
+        "r/2 a4/2 | bb4/3 r | a4/2 e4/2 | r/4 | r/2 d5/2 | f5/3 r | e5/4 | g#4/2 b4 r"
+    )
+    b_tune = (
+        "c5/1.5 a4/0.5 f4 a4 | c5/1.5 f5/0.5 e5/2 | e5/1.5 c5/0.5 g4 c5 | e5/1.5 g5/0.5 d5/2 | "
+        "f5/1.5 d5/0.5 a4 d5 | f5/1.5 a5/0.5 g5/2 | g#5/1.5 e5/0.5 b4 d5 | e5/3 r | "
+        "a5/1.5 f5/0.5 c5 f5 | a5/1.5 c6/0.5 a5/2 | b5/1.5 g5/0.5 d5 g5 | b5/1.5 d6/0.5 b5/2 | "
+        "c6/1.5 a5/0.5 e5 a5 | e5/1.5 c5/0.5 a4/2 | g#4/1.5 b4/0.5 d5 e5 | g#5/3 r"
+    )
+
+    def low(progression, loud: float) -> list[list[float]]:
+        return bass(progression, [0, 1.5, 3], 45, loud, 1.4) + bass(
+            progression, [0], 33, loud * 0.8, 4.0
+        )
+
+    return theme(
+        "the-passages-watch",
+        116,
+        [4, 4],
+        {
+            "tune": {"kind": "piano", "volume": 0.75},
+            "horn": {"kind": "brass", "volume": 0.55},
+            "tick": {"kind": "pluck", "volume": 0.5},
+            "bass": {"kind": "piano", "volume": 0.5},
+            "pad": {"kind": "strings", "volume": 0.4},
+            "drum": {"kind": "drum", "volume": 0.55},
+            "snare": {"kind": "snare", "volume": 0.45},
+        },
+        [
+            section(
+                "a",
+                16,
+                bar,
+                horn=line(a_horn, bar, 0.5),
+                tick=ticking(a, 57, 0.26),
+                bass=low(a, 0.42),
+                pad=pad(a, 45, 60, 0.34),
+                drum=drum(every, bar, [0], 36, 0.28),
+                snare=roll([8, 16], bar, 0.3),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                tune=line(b_tune, bar, 0.6),
+                horn=descant(b, 52, 64, 0.34),
+                tick=ticking(b, 57, 0.28),
+                bass=low(b, 0.44),
+                pad=pad(b, 45, 60, 0.36),
+                drum=drum(every, bar, [0], 36, 0.3) + drum(every, bar, [3], 36, 0.18),
+                snare=roll([8, 16], bar, 0.32),
+            ),
+        ],
+        ["a", "b", "a", "b"],
     )
 
 
@@ -555,28 +819,44 @@ def beats(bars: list[int], bar: int, low: int, down: float, up: float) -> list[l
 
 
 RUN = [0, 0, 12, 0, 7, 0, 12, 7]
-VOICES_OF_THE_RACE = {
-    "tune": {"kind": "piano", "volume": 0.8},
-    "bass": {"kind": "pluck", "volume": 0.85},
-    "push": {"kind": "pluck", "volume": 0.45},
-    "strings": {"kind": "strings", "volume": 0.4},
-    "drum": {"kind": "drum", "volume": 0.55},
-}
 
 
-def the_race(
-    id_: str, a_chords: str, a_tune: str, b_chords: str, b_tune: str, drumless: set
-) -> dict:
-    """A theme of the broom's race: its two sections' chords and tunes, and the bars of
-    the first whose drum is silent."""
+def the_broom() -> dict:
     bar = 4
-    a = harmony(a_chords, bar)
-    b = harmony(b_chords, bar)
+    every = list(range(1, 17))
+    a = harmony("Em | Em | C | D | Em | Em | Am | B7 | Em | G | C | D | Am | Em | B7 | B7", bar)
+    a_tune = (
+        "e5/0.5 f#5/0.5 g5/0.5 a5/0.5 b5 r | g5/0.5 a5/0.5 b5/0.5 c6/0.5 b5/0.5 r/1.5 | "
+        "c6/0.5 d6/0.5 e6 r/0.5 e5/0.5 g5 | r/4 | "
+        "b4/0.5 c5/0.5 d5/0.5 e5/0.5 f#5 r | e5/0.5 f#5/0.5 g5/0.5 a5/0.5 b5/0.5 r/0.5 e6 | "
+        "e6/0.5 d6/0.5 c6 r/0.5 a5/0.5 c6 | d#6/2 r/0.5 b5/0.5 a5 | "
+        "e5/0.5 f#5/0.5 g5/0.5 b5/0.5 e6 r | d6/0.5 e6/0.5 f#6/0.5 g6/0.5 f#6 r | "
+        "e6/0.5 f#6/0.5 g6 r/2 | f#4/0.5 a4/0.5 d5 r/2 | "
+        "a4/0.5 b4/0.5 c5/0.5 d5/0.5 e5 r | g5/0.5 f#5/0.5 e5/0.5 f#5/0.5 g5 r | "
+        "a5/0.5 b5/0.5 c6/0.5 d#6/0.5 f#6 r | a6/0.5 f#6/0.5 d#6/0.5 b5/0.5 d#6/2"
+    )
+    b = harmony("C | D | Em | Em | C | D | B7 | B7 | Am | B7 | Em | C | Am | B7 | Em | B7", bar)
+    b_tune = (
+        "g5/0.5 a5/0.5 b5/0.5 c6/0.5 e6 r | a5/0.5 b5/0.5 c6/0.5 d6/0.5 f#6 r | "
+        "b5/0.5 c6/0.5 d6/0.5 e6/0.5 g6/0.5 r/1.5 | r/4 | "
+        "e6/0.5 d6/0.5 c6/0.5 b5/0.5 c6 r | f#6/0.5 e6/0.5 d6/0.5 c6/0.5 d6 r | "
+        "d#5 f#5/0.5 a5/0.5 b5 d#6 | f#6/2 r/2 | "
+        "c5/0.5 d5/0.5 e5/0.5 f#5/0.5 g5 r | d#5/0.5 e5/0.5 f#5/0.5 g5/0.5 a5 r | "
+        "b5/0.5 c6/0.5 b5/0.5 a5/0.5 g5 e6 | e6/0.5 r/0.5 e6/0.5 r/0.5 g6/0.5 r/1.5 | "
+        "a5/0.5 b5/0.5 c6/0.5 d6/0.5 e6 r | d#6/0.5 e6/0.5 f#6/0.5 a6/0.5 b6 r | "
+        "g6/0.5 f#6/0.5 e6/0.5 d#6/0.5 r/2 | b5/0.5 c6/0.5 d6/0.5 d#6/0.5 f#6/2"
+    )
     return theme(
-        id_,
+        "the-broom",
         160,
         [4, 4],
-        dict(VOICES_OF_THE_RACE),
+        {
+            "tune": {"kind": "piano", "volume": 0.8},
+            "bass": {"kind": "pluck", "volume": 0.85},
+            "push": {"kind": "pluck", "volume": 0.45},
+            "strings": {"kind": "strings", "volume": 0.4},
+            "drum": {"kind": "drum", "volume": 0.55},
+        },
         [
             section(
                 "a",
@@ -586,7 +866,7 @@ def the_race(
                 bass=running(a, RUN, 40, 0.5),
                 push=after_beat(a, [3.5], 55, 70, 0.34, 0.3),
                 strings=pad(a, 45, 60, 0.32),
-                drum=beats([n for n in range(1, 17) if n not in drumless], bar, 43, 0.3, 0.2),
+                drum=beats(every, bar, 43, 0.3, 0.2),
             ),
             section(
                 "b",
@@ -596,74 +876,10 @@ def the_race(
                 bass=running(b, RUN, 40, 0.52),
                 push=after_beat(b, [3.5], 55, 70, 0.36, 0.3),
                 strings=pad(b, 45, 60, 0.34),
-                drum=beats(list(range(1, 17)), bar, 43, 0.32, 0.22),
+                drum=beats(every, bar, 43, 0.32, 0.22),
             ),
         ],
         ["a", "b", "a", "b"],
-    )
-
-
-def the_broom() -> dict:
-    return the_race(
-        "the-broom",
-        "Em | Em | C | D | Em | Em | Am | B7 | Em | G | C | D | Am | Em | B7 | B7",
-        (
-            "e5/0.5 f#5/0.5 g5/0.5 a5/0.5 b5 r | g5/0.5 a5/0.5 b5/0.5 c6/0.5 b5/0.5 r/1.5 | "
-            "c6/0.5 d6/0.5 e6 r/0.5 e5/0.5 g5 | r/4 | "
-            "b4/0.5 c5/0.5 d5/0.5 e5/0.5 f#5 r | e5/0.5 f#5/0.5 g5/0.5 a5/0.5 b5/0.5 r/0.5 e6 | "
-            "e6/0.5 d6/0.5 c6 r/0.5 a5/0.5 c6 | d#6/2 r/0.5 b5/0.5 a5 | "
-            "e5/0.5 f#5/0.5 g5/0.5 b5/0.5 e6 r | d6/0.5 e6/0.5 f#6/0.5 g6/0.5 f#6 r | "
-            "e6/0.5 f#6/0.5 g6 r/2 | f#4/0.5 a4/0.5 d5 r/2 | "
-            "a4/0.5 b4/0.5 c5/0.5 d5/0.5 e5 r | g5/0.5 f#5/0.5 e5/0.5 f#5/0.5 g5 r | "
-            "a5/0.5 b5/0.5 c6/0.5 d#6/0.5 f#6 r | a6/0.5 f#6/0.5 d#6/0.5 b5/0.5 d#6/2"
-        ),
-        "C | D | Em | Em | C | D | B7 | B7 | Am | B7 | Em | C | Am | B7 | Em | B7",
-        (
-            "g5/0.5 a5/0.5 b5/0.5 c6/0.5 e6 r | a5/0.5 b5/0.5 c6/0.5 d6/0.5 f#6 r | "
-            "b5/0.5 c6/0.5 d6/0.5 e6/0.5 g6/0.5 r/1.5 | r/4 | "
-            "e6/0.5 d6/0.5 c6/0.5 b5/0.5 c6 r | f#6/0.5 e6/0.5 d6/0.5 c6/0.5 d6 r | "
-            "d#5 f#5/0.5 a5/0.5 b5 d#6 | f#6/2 r/2 | "
-            "c5/0.5 d5/0.5 e5/0.5 f#5/0.5 g5 r | d#5/0.5 e5/0.5 f#5/0.5 g5/0.5 a5 r | "
-            "b5/0.5 c6/0.5 b5/0.5 a5/0.5 g5 e6 | e6/0.5 r/0.5 e6/0.5 r/0.5 g6/0.5 r/1.5 | "
-            "a5/0.5 b5/0.5 c6/0.5 d6/0.5 e6 r | d#6/0.5 e6/0.5 f#6/0.5 a6/0.5 b6 r | "
-            "g6/0.5 f#6/0.5 e6/0.5 d#6/0.5 r/2 | b5/0.5 c6/0.5 d6/0.5 d#6/0.5 f#6/2"
-        ),
-        set(),
-    )
-
-
-# --- The broom, another tune for the owner's ear: the same race, its cells climbing by
-# half steps too, a leap of two octaves down, a bar where the drum stops, a chord a half
-# step above the tonic's fifth (F) in its second section.
-
-
-def the_broom_b() -> dict:
-    return the_race(
-        "the-broom-b",
-        "Em | Em | Em | Em | C | C | B7 | B7 | Em | Em | Em | Em | Am | C | B7 | B7",
-        (
-            "b4/0.5 e5/0.5 f#5/0.5 g5/0.5 r/2 | e5/0.5 f#5/0.5 g5/0.5 a5/0.5 b5/0.5 r/1.5 | "
-            "g5/0.5 a5/0.5 b5/0.5 c6/0.5 d6/0.5 r/1.5 | e6/0.5 r/0.5 e4/0.5 r/2.5 | "
-            "e5/0.5 f5/0.5 f#5/0.5 g5/0.5 c6 r | g5/0.5 g#5/0.5 a5/0.5 b5/0.5 c6/0.5 r/1.5 | "
-            "b5/0.5 c6/0.5 d#6 r/2 | r/4 | "
-            "e6/0.5 d#6/0.5 e6/0.5 f#6/0.5 g6 r | f#6/0.5 e6/0.5 d#6/0.5 b5/0.5 r/2 | "
-            "g5/0.5 a5/0.5 b5/0.5 c6/0.5 d#6 r | e6/2 r/2 | "
-            "a4/0.5 b4/0.5 c5/0.5 d5/0.5 e5/0.5 r/1.5 | "
-            "e5/0.5 f#5/0.5 g5/0.5 a5/0.5 b5/0.5 r/0.5 e6 | "
-            "d#6/0.5 e6/0.5 f#6/0.5 a6/0.5 r/2 | f#6/0.5 d#6/0.5 b5/0.5 a5/0.5 f#5/2"
-        ),
-        "Am | Am | Em | Em | F | F | B7 | B7 | Am | Am | Em | C | Am | F | B7 | B7",
-        (
-            "a5/0.5 b5/0.5 c6/0.5 r/0.5 c6/0.5 d6/0.5 e6 | r/2 e5/0.5 a5/0.5 c6 | "
-            "b5/0.5 c6/0.5 d6/0.5 e6/0.5 g6 r | e6/0.5 b5/0.5 g5/0.5 e5/0.5 b4/2 | "
-            "f5/0.5 g5/0.5 a5/0.5 c6/0.5 f6 r | e6/0.5 f6/0.5 a6 r/2 | "
-            "d#6/0.5 f#6/0.5 b6 r/2 | a6/0.5 f#6/0.5 d#6/0.5 r/2.5 | "
-            "c5/0.5 d5/0.5 e5/0.5 f5/0.5 e5 r | e5/0.5 f5/0.5 g#5/0.5 a5/0.5 b5/0.5 r/1.5 | "
-            "g5/0.5 a5/0.5 b5 r/2 | c6/0.5 d6/0.5 e6 r/2 | "
-            "e6/0.5 f#6/0.5 g6 r/0.5 a4/0.5 c5 | f5/0.5 a5/0.5 c6/0.5 f6/0.5 r/2 | "
-            "f#6/0.5 a6/0.5 b6/0.5 d#6/0.5 r/2 | c6/0.5 c#6/0.5 d6/0.5 d#6/0.5 f#6/2"
-        ),
-        {8},
     )
 
 
@@ -743,9 +959,10 @@ THEMES = {
     "arrival": arrival,
     "the-library": the_library,
     "the-passages": the_passages,
-    "the-passages-b": the_passages_b,
+    "the-passages-march": the_passages_march,
+    "the-passages-tiptoe": the_passages_tiptoe,
+    "the-passages-watch": the_passages_watch,
     "the-broom": the_broom,
-    "the-broom-b": the_broom_b,
     "the-familiar": the_familiar,
 }
 

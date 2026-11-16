@@ -98,6 +98,19 @@ describe('the music (D192)', () => {
     expect(sound(ctx, 'celesta', 60, 1, 8, 0.5, out)).toBeGreaterThan(sound(ctx, 'celesta', 60, 1, 0.25, 0.5, out));
   });
 
+  it("holds a horn's note for its length, and ends a snare's tap at once (D213)", () => {
+    const ctx = fakeContext();
+    const out = ctx.createGain() as unknown as AudioNode;
+    const held = sound(ctx, 'brass', 52, 1, 3, 0.5, out);
+    expect(held - 1).toBeGreaterThan(3);
+    expect(held - 1).toBeLessThan(3.5);
+    expect(sound(ctx, 'brass', 52, 1, 0.5, 0.5, out)).toBeLessThan(held);
+    // A snare has no pitch and no length of its own to write: a tap is a tap.
+    const tap = sound(ctx, 'snare', 60, 1, 0.25, 0.5, out);
+    expect(tap).toBe(sound(ctx, 'snare', 72, 1, 4, 0.5, out));
+    expect(tap - 1).toBeLessThan(0.2);
+  });
+
   it("leads a pad's note onto the line whose note is over, the nearest in pitch (D203)", () => {
     const lines = [
       { until: 4, pitch: 53 },
@@ -133,8 +146,11 @@ function fakeContext(): AudioContext {
   });
   const node = () => ({ connect: (target: unknown) => target });
   return {
+    sampleRate: 8000,
+    createBuffer: (_channels: number, length: number) => ({ getChannelData: () => new Float32Array(length) }),
+    createBufferSource: () => ({ ...node(), buffer: null, start: () => undefined, stop: () => undefined }),
     createGain: () => ({ ...node(), gain: param() }),
-    createBiquadFilter: () => ({ ...node(), type: '', frequency: param() }),
+    createBiquadFilter: () => ({ ...node(), type: '', frequency: param(), Q: param() }),
     createOscillator: () => ({ ...node(), type: '', frequency: param(), start: () => undefined, stop: () => undefined }),
   } as unknown as AudioContext;
 }

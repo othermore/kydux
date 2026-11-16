@@ -521,7 +521,7 @@
     "music": {
       "title": "The music's themes",
       "story": "As in a story",
-      "level": "As in a level, lower",
+      "level": "As in a level, quieter",
       "playing": "Playing: {theme}, {heard}",
       "voices": "Its voices",
       "reset": "As written",

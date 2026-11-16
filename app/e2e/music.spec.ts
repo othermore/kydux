@@ -53,11 +53,11 @@ test('the slider at none silences the music, and the settings keep it', async ({
 test('with ?debug, #music lists every theme, two buttons each, and plays the one chosen', async ({ page }) => {
   await page.goto('/?debug#music');
   const buttons = page.locator('.themes-list button');
-  // Five chapters' themes and the two second ones, the broom's and the passages'.
-  await expect(buttons).toHaveCount(14);
-  await expect(page.locator('.themes-list button[data-theme="the-broom-b"]')).toHaveCount(2);
-  await page.locator('.themes-list button[data-theme="the-passages-b"][data-heard="level"]').click();
-  await expect(root(page)).toHaveAttribute('data-music-theme', 'the-passages-b');
+  // Five chapters' themes and the passages' three candidates (D213).
+  await expect(buttons).toHaveCount(16);
+  await expect(page.locator('.themes-list button[data-theme="the-passages-tiptoe"]')).toHaveCount(2);
+  await page.locator('.themes-list button[data-theme="the-passages-march"][data-heard="level"]').click();
+  await expect(root(page)).toHaveAttribute('data-music-theme', 'the-passages-march');
   await expect(root(page)).toHaveAttribute('data-music-heard', 'level');
   await expect(root(page)).toHaveAttribute('data-music', 'playing', { timeout: ciTimes(10_000) });
 });

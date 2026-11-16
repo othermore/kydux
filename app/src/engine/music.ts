@@ -1,17 +1,17 @@
-// The music (D192): every chapter has a theme of its own, written as notes and played
-// by the page with Web Audio, as the effects are (sfx.ts): no sound file is loaded. A
-// theme is content/music/<id>.json: its tempo, its metre, its voices, each of a kind
-// the page knows how to sound (a celesta's bell, a bowed string pad, a plucked string,
-// a harp, a flute, a piano's struck tone, a soft drum), and its sections of notes, which
-// follow one another and loop without a seam. A theme has one set of voices (D210): a
-// story and the map play every one at its written loudness, a lesson and a level every
-// one, lower. The bowed pad is the body under the other voices (D203): low in the
-// mix, and one unbroken sound, each of its lines sliding from a note to the next
-// without a breath between them. The notes are scheduled a little ahead on the audio
-// clock, through a reverb made of decaying noise, under the music's volume in the
-// settings; a change of loudness or of theme fades over two seconds. The music
-// starts at the first gesture on the page, as a browser asks, and is still while the
-// tab is hidden. A voice's volume may be set by hand while its theme plays (D203).
+// The music (D192): every chapter has a theme of its own, written as notes and played by
+// the page with Web Audio, as the effects are (sfx.ts): no sound file is loaded. A theme
+// is content/music/<id>.json: its tempo, its metre, its voices, each of a kind the page
+// knows how to sound (a celesta's bell, a bowed string pad, a plucked string, a harp, a
+// flute, a piano's struck tone, a horn, a soft drum, a march's snare), and its sections
+// of notes, which follow one another and loop without a seam. A theme has one set of
+// voices (D210): a story and the map play every one at its written loudness, a lesson
+// and a level every one, lower. The bowed pad is the body under the other voices (D203):
+// low in the mix, and one unbroken sound, each of its lines sliding from a note to the
+// next without a breath between them. The notes are scheduled a little ahead on the
+// audio clock, through a reverb made of decaying noise, under the music's volume in the
+// settings; a change of loudness or of theme fades over two seconds. The music starts at
+// the first gesture on the page, as a browser asks, and is still while the tab is
+// hidden. A voice's volume may be set by hand while its theme plays (D203).
 //
 // The root element says what plays, for the tests: data-music (`waiting` for the
 // first gesture, `playing`, `off` with the volume at none), data-music-theme and
@@ -20,7 +20,17 @@
 import { audio, noise } from './sfx';
 
 /** The kinds of voice the page sounds. */
-export const VOICE_KINDS = ['celesta', 'strings', 'pluck', 'harp', 'flute', 'piano', 'drum'] as const;
+export const VOICE_KINDS = [
+  'celesta',
+  'strings',
+  'pluck',
+  'harp',
+  'flute',
+  'piano',
+  'brass',
+  'drum',
+  'snare',
+] as const;
 export type VoiceKind = (typeof VOICE_KINDS)[number];
 
 /** A note: its pitch (a MIDI number, 60 the middle C), its start and its length in
@@ -401,6 +411,44 @@ export function sound(
       breath.connect(band).connect(breathGain).connect(gain);
       breath.start(at);
       breath.stop(at + Math.min(0.2, seconds));
+      ends = end;
+      break;
+    }
+    case 'brass': {
+      // A horn: a saw whose filter opens as the note is blown and settles, held for
+      // the note's length; a soft tone an octave under it gives it its body.
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(hertz * 1.2, at);
+      filter.frequency.exponentialRampToValueAtTime(Math.min(5000, hertz * 4.5), at + 0.07);
+      filter.frequency.exponentialRampToValueAtTime(Math.min(3500, hertz * 3), at + 0.3);
+      filter.connect(gain);
+      const end = envelope(gain, at, loudness * 0.22, 0.045, Math.max(0, seconds - 0.12), 0.16);
+      oscillator(ctx, 'sawtooth', hertz, at, end).connect(filter);
+      const body = ctx.createGain();
+      body.gain.setValueAtTime(0.35, at);
+      oscillator(ctx, 'triangle', hertz / 2, at, end).connect(body).connect(filter);
+      ends = end;
+      break;
+    }
+    case 'snare': {
+      // A march's snare, played softly: a short rattle of noise, and the skin under it.
+      const length = 0.12;
+      const end = envelope(gain, at, loudness * 0.55, 0.002, 0, length);
+      const rattle = noise(ctx, length);
+      const band = ctx.createBiquadFilter();
+      band.type = 'bandpass';
+      band.frequency.setValueAtTime(2400, at);
+      band.Q.setValueAtTime(0.7, at);
+      rattle.connect(band).connect(gain);
+      rattle.start(at);
+      rattle.stop(at + length);
+      const skin = ctx.createGain();
+      skin.gain.setValueAtTime(0.5, at);
+      skin.gain.exponentialRampToValueAtTime(0.001, at + 0.06);
+      const tone = oscillator(ctx, 'triangle', 220, at, end);
+      tone.frequency.exponentialRampToValueAtTime(160, at + 0.05);
+      tone.connect(skin).connect(gain);
       ends = end;
       break;
     }

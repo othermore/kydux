@@ -521,7 +521,7 @@
     "music": {
       "title": "Los temas de la música",
       "story": "Como en una historia",
-      "level": "Como en un nivel, más bajo",
+      "level": "Como en un nivel, a menos volumen",
       "playing": "Suena: {theme}, {heard}",
       "voices": "Sus instrumentos",
       "reset": "Como está escrito",

@@ -6,7 +6,10 @@ The owner read the first part of chapter 4's walkthrough (the shed, to
 `drafts/recorrido-capitulo-4-2026-11-12-2.es-comments.md` and in their
 message of that day, and this sprint is all of them. What they found in
 the shed holds for the rest of the chapter and, where it is about the
-ways, for every chapter. They do not read the earlier chapters again.
+ways, for every chapter. Of the earlier chapters they read again only
+the levels whose texts this sprint changes, each with its text as it
+was and as it is (2.9). The owner read this plan the same day and
+answered it; the plan holds their answers.
 
 What the owner asks, in short:
 
@@ -27,9 +30,12 @@ What the owner asks, in short:
 5. The next review comes with chapter 4's walkthrough and with contact
    sheets of every scene of the chapter, each with the grid drawn over
    it, the masks, every cell a figure walks and where the figure is
-   drawn on it.
+   drawn on it. It comes too with the earlier chapters' levels whose
+   texts change because of the ways, and with each change told: how the
+   text was and how it is.
 6. The music: two themes chosen, one chosen with a change of voice, one
-   to write again, one to wait.
+   to write again, one to wait. A theme plays the same voices in a
+   story and in a level: no instrument leaves.
 
 The owner is away and reads nothing until the designer's review of this
 sprint finds nothing. Nothing is released until they are happy with
@@ -159,11 +165,13 @@ kept as they are.
   superpuesta para ver exactamente los límites de las casillas*).
   `tools/art/sweep.py` writes for a scene, besides what it checks, the
   sheets of section 2.6: every one has the cells' borders drawn as
-  lines seen on any ground and each cell's number in the cell's top
-  left corner, inside it. The `?debug` layer of numbers draws the
-  cells' borders too, so that a number in a game picture is read
-  against its cell. Rules out a sheet or a debug picture where a
-  number can be read as the cell above or below it.
+  lines seen on any ground and each cell's number where the game's
+  layer of numbers writes it: at the foot of the cell, in its middle,
+  over everything drawn. The owner reads a cell that way: *el personaje
+  en 6,5 espero que aparezca justo encima de donde está escrito 6,5*.
+  The `?debug` layer of numbers draws the cells' borders too. Rules
+  out a sheet or a debug picture without the cells' borders, and a
+  sheet that writes a number elsewhere in its cell than the game does.
 
 - **D209 — The themes chosen by ear, and the struck voice.** Decided
   2026-11-12 by the owner, by ear on the mixer (D203): *The arrival:
@@ -182,6 +190,23 @@ kept as they are.
   gives each theme. Rules out a chosen chapter with candidates left
   beside its theme, and a held flute where the owner asked for struck
   notes.
+
+- **D210 — A theme has one set of voices.** Decided 2026-11-12 by the
+  owner, who chose every theme in its `full` form and asked what the
+  other was: *cuando se quitan algunos instrumentos la canción cambia
+  mucho, solo tendría sentido si se quitasen los instrumentos de
+  relleno y se dejase la voz principal, pero creo que no es el caso*.
+  They are right: the `quiet` arrangement of most themes drops the
+  voices that carry the tune (in `the-library`, the flute and the
+  celesta). A
+  theme's file names its voices and no arrangements. A story and the
+  map play the theme at its written loudness; a lesson and a level play
+  the same voices, every one, at 0.7 of it. The player is given no
+  choice of voices. When the owner chooses a theme on the mixer, they
+  say the theme and the voices they turned off, if any, with the
+  mixer's line; a voice turned off leaves the theme everywhere. Rules
+  out a level's music without its tune, and two forms of a theme that
+  differ in their instruments.
 
 ## 2. What is asked
 
@@ -404,39 +429,50 @@ back wall's foot on y 5.55 to 5.65; the front wall's top from y 8.73):
    (13, 8), by -0.3, so that a lying broom's sprite ends left of the
    bales. If on the sheet a broom still touches a bale, the shift grows
    by steps of 0.05 until it does not, and the commit says the number.
-   (The owner wrote *las que están en la columna 6*; the bales stand by
-   column 13, and a broom on column 6 moved left would go under the
-   barrel and the bench. The report says this to the owner.)
+   The owner confirmed the two cells.
 3. **The barrel over the broom of peg 6**: the barrel is a thing of the
    scene, cut from the painting by a traced outline (D128,
    `tools/art/trace.py`), static, on row 5, drawn after the hung brooms
    of its row and before every figure of row 6. A broom hung on peg 6
    shows its cord and its handle over the barrel's top, and its brush
-   is behind the barrel. (The owner gave two ways, behind the barrel or
-   hung higher; D195 keeps a hung broom on its peg, so it is behind.)
-4. **The figure on (6, 6)**: `nudged` by 0.45, so that it stands beside
-   the barrel, almost on the next cell (D105). The broom of peg 6 is
-   untied from (6, 6) as before.
-5. **The figures of row 6**: cells (6, 6) to (13, 6) `lowered` by 0.2
-   (D149), so that no hat's tip touches the back wall's foot. If one
-   still does on the sheet, by 0.3.
-6. **The figures of row 8 and the front wall**: the owner sees figures
+   is behind the barrel. The owner confirmed it: behind the barrel.
+4. **The row by the back wall**: the owner's two remarks on figures
+   there name cell (6, 5) and row 5, as the numbers' layer writes them:
+   a figure under a peg, its feet on the strip of floor at the wall's
+   foot. Nobody stands on row 5: `map.txt` keeps it unwalked, a hung
+   broom's cell is (x, 5), where its sprite hangs from the peg painted
+   in row 4, and the wizard unties it from (x, 6). On row 6 a figure
+   stands whole on the boards, its hat's tip under the wall's foot,
+   and the figure of (6, 6) stands in front of the barrel's foot. So
+   row 5 stays unwalked and row 6 keeps its cells as they are, with no
+   nudge and no lowering. The things' sheet (2.6) shows a figure on
+   every cell of row 6 and a broom on every peg, for the owner to judge
+   it by eye.
+5. **The figures of row 8 and the front wall**: the owner sees figures
    of the lowest row in front of the front wall, where they should be
    behind it. The wall's top is cut `over` them, but a figure's feet
    end on the wall's upper outline, so the figure seems to stand on the
    wall. Cells (5, 8) to (13, 8) are `lowered` by 0.2, so that the
    wall's top hides the shoes and the hem. A lying broom or a mark on
-   those cells stays where it is. The masks of the front wall and of the
-   door's beam are checked against the painting on the masks' sheet,
-   pixel for pixel on their outlines, and traced again where they do
-   not follow it.
+   those cells stays where it is. The owner accepted this.
+6. **The door's lintel**: the owner sees a figure in the doorway drawn
+   over the lower part of the lintel. The beam's mask (`door_beam`, a
+   box) ends on y 9.254, and the painted lintel goes on under it: its
+   lower outline lies near y 9.385, from x 8.33 to x 11.67. The beam's
+   mask is traced on the painting (D128) down to that outline and along
+   the jambs' upper corners, so that a figure on (9, 9) or (10, 9), or
+   walking through the doorway, is behind the whole lintel. The front
+   wall's mask is checked the same way on the masks' sheet, pixel for
+   pixel on its outlines, and traced again where it does not follow
+   the painting.
 7. **The test**: in the browser, for every walked cell of rows 8, 9 and
    10 of the shed and for a walk between each pair of neighbours among
    them, no pixel of a figure is drawn over a pixel the front wall or
-   the beam paints. For row 6, no pixel of a figure standing on a cell
-   lies above the back wall's foot. For (6, 6), no pixel of the figure
-   lies over the barrel's mask. For each straw cell, no pixel of a
-   lying broom lies over the barrel, the bales or the bench.
+   the lintel paints; the lintel's pixels are taken from the painting
+   between its outlines, not from the mask. For row 6, no pixel of a
+   figure standing on a cell lies above the back wall's foot. For each
+   straw cell, no pixel of a lying broom lies over the barrel, the
+   bales or the bench.
 
 Where a number given here does not reach what its sentence asks, the
 sentence rules, the number moves by steps of 0.05 and the commit says
@@ -457,13 +493,15 @@ For each scene of chapter 4 (`the-broom-shed`, `the-lake-edge`,
   `under` or `over`.
 - For the shed, **things**: a lying broom on each of the seven straw
   cells, the straw cells outlined, a hung broom on each of the eight
-  pegs, a figure on each cell of row 6 and of row 8.
+  pegs, a figure on each cell of row 6, of row 8 and of the doorway.
 
 At least 64 pixels a cell. A scene wider than 40 cells is written in
 parts that share two columns. The sheets go to
 `drafts/hojas-capitulo-4-<date>/`, with `drafts/hojas-capitulo-4-<date>.es.md`,
 a page in Spanish for the owner that shows each sheet under one or two
-sentences of what to look at in it, one idea a sentence.
+sentences of what to look at in it, one idea a sentence. The page
+says once, at its top, how a cell is read: the number is at the foot
+of its cell, and a figure on a cell stands just over its number.
 The walkthrough of chapter 4 is written again beside it.
 
 ### 2.7 The music (D209)
@@ -500,9 +538,18 @@ The walkthrough of chapter 4 is written again beside it.
   `the-passages-b.json`, the second with less in it. The three
   candidates and the theme that were there leave.
 - `the-familiar` stays as it is until its chapter is seen.
+- **One set of voices (D210)**: no theme's file has `arrangements`.
+  `arrival` plays the six voices of the lively candidate's `full`;
+  `the-library` the four of the calm candidate's `full`, the flute's
+  place taken by the piano; the new ones every voice they are written
+  with. A lesson and a level play them all, lower. The page keeps the
+  two loudnesses and fades between them as it does.
 - The mixer on `?debug#music` lists the themes and the two `-b`
-  candidates. `content/music/README.md`, D192 and D203 say the tree as
-  it is. The tests of the music count what is there.
+  candidates, each with two buttons: as a story plays it and as a
+  level plays it, lower. Its boxes and sliders are as they are. Its
+  line names the theme and what is set apart from the file, with no
+  word for an arrangement. `content/music/README.md`, D192 and D203
+  say the tree as it is. The tests of the music count what is there.
 
 The owner's ear is the test of these. The report tells them to restart
 their dev server and open `https://localhost:5173/?debug#music`.
@@ -520,6 +567,39 @@ to walk to. One brief for the thirteen `changes` (2.1). The programmer
 reads the drafts, corrects them and says in the commit what was
 corrected. The words this plan gives letter for letter are not sent to
 Gemini.
+
+### 2.9 The earlier chapters' changed levels, for the owner
+
+Nine levels of chapters 2 and 3 change what the child reads because of
+D204: `eldras-door` and `the-moving-key`; `left-or-right`,
+`past-the-teacher`, `by-the-statues`, `the-dark-room`,
+`the-night-walk`, `the-opening-hole` and `the-wrong-door`. The owner
+reads them at the review: *es importante que en esa revisión incluyas
+los niveles de los capítulos anteriores en los que has hecho cambios en
+los textos por el tema de las maneras. Y debes indicarme que cambio se
+ha hecho (como estaba antes y como está ahora).* Two things are made
+for that in `drafts/`:
+
+- `recorrido-niveles-cambiados-<date>.es.md`: the walkthrough of those
+  nine levels alone, in the course's order, each as its chapter's
+  walkthrough shows it, with every way under its id.
+  `tools/walkthrough.py` takes the levels to show.
+- `cambios-de-texto-sprint-42-<date>.es.md`: a page in Spanish for the
+  owner, one idea a sentence. First the words that every level with
+  ways shows, the same in all of them: the start card's sentence, the
+  outcome's sentence, the line of ways that leaves. Then, level by
+  level, every text of the level the child reads that this sprint
+  changes. Each change says where the child reads it in plain words
+  (the start card, the goal, a hint, the level's bar), then *Antes:*
+  with the Spanish text as it was at the commit before piece 3.1, then
+  *Ahora:* with the Spanish text as it is, then the picture of the
+  screen that shows it now. A text that is new says *Antes: no
+  existía.* A text that leaves says *Ahora: ya no se muestra.* The
+  page is made from `git diff` of the Spanish texts between that
+  commit and the last one, so that no change is missed, and the report
+  says the command. Whatever else of chapters 1 to 3 the sprint
+  changes in a text the child reads has its place in the page too,
+  under its own heading.
 
 ## 3. The pieces
 
@@ -579,32 +659,38 @@ Gemini.
 - **World**: the scene's `straw`, read by the content's tests; (5, 8)
   floor.
 - **Art tools**: `shifted` in the settings and the export; the barrel
-  traced; `nudged` and `lowered` as 2.5; the sweep knows the shift.
+  and the lintel traced; row 8 `lowered` as 2.5; the sweep knows the
+  shift.
 - **Page**: a sprite's shift; the barrel's place in the order of
   drawing.
 - **Documents**: D202 rewritten, D207, the scene's README or `about`
   lines, D195's sentence on the broom of peg 6.
-- **Tests**: 2.5's seventh point; the content test of D202 on every
-  level, way and story step; the settings' refusal of a long shift.
+- **Tests**: 2.5's seventh point; a unit that the lintel's mask covers
+  the painting from the wall's top to the lintel's lower outline
+  across the doorway; the content test of D202 on every level, way and
+  story step; the settings' refusal of a long shift.
 
 ### 3.5 The sheets (D208, 2.6)
 
 - **Art tools**: the three kinds of sheet from `sweep.py`.
 - **Page**: the numbers' layer draws the cells' borders.
 - **Tests**: a unit that a sheet's grid lines fall on the cells'
-  borders and that each number lies inside its cell; the debug spec
-  for the layer.
+  borders and that each number lies inside its cell, at its foot; the
+  debug spec for the layer.
 
-### 3.6 The music (D209, 2.7)
+### 3.6 The music (D209, D210, 2.7)
 
-- **Page**: the `piano` kind in `engine/music.ts`.
+- **Page**: the `piano` kind in `engine/music.ts`; a theme's one set
+  of voices, played lower in a lesson and a level; the mixer's two
+  buttons and its line.
 - **Tools**: `tools/sound/compose.py` where it writes or checks
   themes.
 - **Content**: the themes as 2.7.
-- **Documents**: `content/music/README.md`, D192, D203, D209.
+- **Documents**: `content/music/README.md`, D192, D203, D209, D210.
 - **Tests**: `tests/project/test_music.py` and `app/e2e/music.spec.ts`
   on the tree as it is; a unit that a `piano` note's sound ends by
-  itself.
+  itself; a unit that a level plays every voice a story plays, lower;
+  a theme's file with `arrangements` refused.
 
 ### 3.7 The whole check, the walkthrough, the sheets and the report
 
@@ -614,6 +700,8 @@ Playwright's own server on 4173. Then, in `drafts/`, never committed:
 
 - chapter 4's walkthrough, `recorrido-capitulo-4-<date>.es.md`, with
   every way of every level under its id;
+- the earlier chapters' changed levels and the page of their texts
+  before and now, as 2.9;
 - the sheets of 2.6 and their page;
 - the report in Spanish: what was built piece by piece, every choice
   the plan left and how it was taken, every number of 2.5 that moved,
@@ -653,14 +741,23 @@ The words the plan gives letter for letter (the owner's sentence for
 the wall in El cobertizo, the goal's line, the two i18n lines) are kept
 as they are. No text the child reads says "manera" or "way" for the
 arrangements of a level: that is the first thing the owner will look
-for. The plan decides everything; where it does not, take the smallest
-choice that keeps its intent and say it in the commit. Where a number
-of section 2.5 does not reach what its sentence asks, the sentence
-rules. The owner reads nothing before you build: they read chapter 4's
-walkthrough and the contact sheets once the designer's review of this
-sprint finds nothing. Every document and comment in the present. Before
-git add, read git diff of each file and stage only your own hunks;
-commit promptly. Hand over the walkthrough, the sheets with their page
-and a report in Spanish as 3.7 asks, and end with the prompt for the
-designer's review in English, in a code block.
+for. The owner read the plan and answered it, and the plan holds their
+answers: row 5 of the shed stays unwalked and row 6 as it is, the
+door's lintel is traced to its lower outline (2.5), a theme plays one
+set of voices everywhere (D210), and the sheets write each number at
+the foot of its cell, where the game's layer writes it (D208). The plan
+decides everything; where it does not, take the smallest choice that
+keeps its intent and say it in the commit. Where a number of section
+2.5 does not reach what its sentence asks, the sentence rules. The
+owner reads nothing before you build: once the designer's review of
+this sprint finds nothing they read chapter 4's walkthrough, the
+contact sheets, and the nine earlier levels whose texts change, each
+text as it was and as it is (2.9): make that page from git diff of the
+Spanish texts, not by hand, so that no change is missed. Every document
+and comment in the present. Before git add, read git diff of each file
+and stage only your own hunks; commit promptly. Hand over chapter 4's
+walkthrough, the changed levels' walkthrough with the page of their
+texts before and now, the sheets with their page and a report in
+Spanish as 3.7 asks, and end with the prompt for the designer's review
+in English, in a code block.
 ```

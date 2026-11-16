@@ -3012,8 +3012,8 @@ one overturns stays, marked as superseded.
   `text.<lang>.json` a `changes`, one sentence in the child's words of what may be
   different at each run (*La llave está cada vez a una distancia distinta de la
   puerta.*); the start card shows it with the same words on every such level under it,
-  `level.changes_tail` (*Tu programa tiene que valer siempre.*), and no count or list of
-  ways (`changesLines` in `ui/cards.ts`). No `text.<lang>.json` names a way, and
+  `level.changes_tail` (*Tu programa tiene que funcionar en todos los casos.*), and no
+  count or list of ways (`changesLines` in `ui/cards.ts`). No `text.<lang>.json` names a way, and
   `tools/i18n_check.py` refuses a level with ways and no `changes`, or with `ways`. The
   level opens on its first way; a run shows the first way it does not win, and the scene
   keeps it until the next run or until the level starts over, when it is on its first way

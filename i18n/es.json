@@ -71,7 +71,7 @@
     "notebook_key": "Abre o cierra el cuaderno: Alt+N",
     "carrying": "Llevas {things}.",
     "way_label": "Manera",
-    "changes_tail": "Tu programa tiene que valer siempre.",
+    "changes_tail": "Tu programa tiene que funcionar en todos los casos.",
     "kind_fix": "Este programa todavía no funciona. Encuentra qué falla, y arréglalo.",
     "kind_improve": "Este programa funciona, pero puede ser mejor. Mejóralo.",
     "continue": "Continuar",

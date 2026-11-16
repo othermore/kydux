@@ -12,5 +12,5 @@
   "intro": "Oh no! I wrote a program for when we come back through this room, and it goes straight to the locked door! I think I put the `if` lines where the `else` ones went... Can you fix it?",
   "outro": "Thank you! Now we can come back this way any night. Look, further on there is a corridor with three doors in a row.",
   "learned": "Now you know how to read a condition and see which lines run.",
-  "changes": "The door that is locked changes each time."
+  "changes": "The door that is locked is not always the same one."
 }

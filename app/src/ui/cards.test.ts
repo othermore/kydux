@@ -45,11 +45,11 @@ describe('judge (D57)', () => {
 });
 
 describe("a start card's words on what may differ at each run (D204)", () => {
-  it('says what may differ and that the program has to work every time, and nothing of ways', () => {
+  it('says what may differ and that the program has to work in every case, and nothing of ways', () => {
     initLanguage({ languages: ['es'], storage: null });
     expect(changesLines('El número de escobas cambia cada vez.')).toEqual([
       'El número de escobas cambia cada vez.',
-      'Tu programa tiene que valer siempre.',
+      'Tu programa tiene que funcionar en todos los casos.',
     ]);
   });
 

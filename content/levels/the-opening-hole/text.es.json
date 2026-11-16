@@ -13,5 +13,5 @@
   "intro": "¡Cuidado dónde pisas! A tres casillas hay uno de esos agujeros que se abren en el suelo. La marca está al otro lado, en el arco del almacén. ¡Esperaremos mientras esté abierto, y luego cruzaremos!",
   "outro": "¡A salvo al otro lado! Estamos en la puerta de un almacén oscuro.",
   "learned": "Ahora sabes que `while not` espera a algo que aún no es verdad, y que `hole.closed` dice cuándo lo es; `hole.open` dice lo contrario.",
-  "changes": "El agujero se abre cada vez con un número de ticks distinto."
+  "changes": "El agujero no siempre tarda lo mismo en abrirse y cerrarse."
 }

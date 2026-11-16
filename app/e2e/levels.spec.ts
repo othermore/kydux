@@ -513,8 +513,8 @@ test.describe('a level played two ways, which the child never sees (D51, D204)',
   async function begin(page: Page): Promise<void> {
     // The card says what may differ at each run, and names no way.
     await expect(page.locator('#card-changes p')).toHaveText([
-      'Where Dask is looking changes each time.',
-      'Your program has to work every time.',
+      'Dask may start out looking somewhere different each time.',
+      'Your program has to work in every case.',
     ]);
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });

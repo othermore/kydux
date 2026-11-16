@@ -62,7 +62,7 @@ export interface StartCardText {
 }
 
 /** What a level's start card says of its ways (D204): what may differ at each run and
- * that the program has to work every time; nothing for a level played one way. No count
+ * that the program has to work in every case; nothing for a level played one way. No count
  * of ways and no list of them. */
 export function changesLines(changes: string | undefined): string[] {
   return changes ? [changes, t('level.changes_tail')] : [];
@@ -119,7 +119,7 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
       element('p', {}, [t('goals.title')]),
       list,
       ...(text.carrying ? [element('p', { id: 'card-carrying', className: 'card-carrying' }, [text.carrying])] : []),
-      // What may differ at each run, and that the program has to work every time (D204).
+      // What may differ at each run, and that the program has to work in every case (D204).
       ...(text.changes
         ? [
             element(

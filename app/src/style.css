@@ -1731,7 +1731,7 @@ a.stop-body:focus-visible {
   font-size: 15px;
 }
 
-/* What may differ at each run of a level, and that the program has to work every time
+/* What may differ at each run of a level, and that the program has to work in every case
    (D204), on its start card. */
 .card-changes {
   margin: -4px 0 14px;

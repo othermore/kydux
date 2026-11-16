@@ -351,7 +351,7 @@ test.describe('in the library (D85, D86, D51)', () => {
     // is at a different distance each time, and names no way.
     await expect(page.locator('#card-changes p')).toHaveText([
       'The key is a different distance away each time.',
-      'Your program has to work every time.',
+      'Your program has to work in every case.',
     ]);
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });

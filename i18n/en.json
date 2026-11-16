@@ -71,7 +71,7 @@
     "notebook_key": "Open or close the notebook: Alt+N",
     "carrying": "You carry {things}.",
     "way_label": "Way",
-    "changes_tail": "Your program has to work every time.",
+    "changes_tail": "Your program has to work in every case.",
     "kind_fix": "This program does not work yet. Find what is wrong, and fix it.",
     "kind_improve": "This program works, but it can be better. Make it better.",
     "continue": "Continue",

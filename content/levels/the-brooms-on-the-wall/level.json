@@ -107,6 +107,26 @@
       "hung": true,
       "zone": "wall",
       "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        7,
+        7
+      ],
+      "zone": "straw",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        11,
+        7
+      ],
+      "zone": "straw",
+      "knotted": true
     }
   ],
   "api": [
@@ -119,7 +139,8 @@
   ],
   "goals": [
     {
-      "kind": "untied"
+      "kind": "untied",
+      "zone": "wall"
     },
     {
       "kind": "reach",

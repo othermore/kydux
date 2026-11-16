@@ -1,7 +1,7 @@
 {
   "title": "Las escobas de la pared",
   "goals": [
-    "No dejes ninguna escoba con nudo.",
+    "No dejes ninguna escoba colgada con nudo.",
     "Camina junto a la pared al menos hasta la casilla (8, 6).",
     "Usa `for`."
   ],

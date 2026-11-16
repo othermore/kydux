@@ -223,16 +223,8 @@
             "kind": "broom",
             "id": "broom_2",
             "at": [
-              12,
+              11,
               7
-            ]
-          },
-          {
-            "kind": "broom",
-            "id": "broom_3",
-            "at": [
-              6,
-              8
             ]
           }
         ]

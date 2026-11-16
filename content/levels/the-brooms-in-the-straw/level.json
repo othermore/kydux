@@ -50,7 +50,7 @@
       "kind": "friend",
       "id": "friend",
       "at": [
-        12,
+        13,
         8
       ]
     },
@@ -108,7 +108,27 @@
       "kind": "broom",
       "id": "broom_1",
       "at": [
-        10,
+        11,
+        7
+      ],
+      "zone": "straw",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        8,
+        7
+      ],
+      "zone": "straw",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_3",
+      "at": [
+        6,
         7
       ],
       "zone": "straw",
@@ -117,18 +137,7 @@
     },
     {
       "kind": "broom",
-      "id": "broom_2",
-      "at": [
-        8,
-        8
-      ],
-      "zone": "straw",
-      "knotted": true,
-      "hidden": true
-    },
-    {
-      "kind": "broom",
-      "id": "broom_3",
+      "id": "broom_4",
       "at": [
         6,
         8
@@ -167,36 +176,63 @@
   ],
   "ways": [
     {
-      "id": "three"
+      "id": "four"
     },
     {
-      "id": "three_low",
+      "id": "four_low",
       "things": [
         {
           "id": "broom_1",
           "at": [
-            11,
+            10,
             8
-          ]
+          ],
+          "hidden": false
+        },
+        {
+          "id": "broom_2",
+          "at": [
+            8,
+            8
+          ],
+          "hidden": false
+        },
+        {
+          "id": "broom_3",
+          "at": [
+            12,
+            8
+          ],
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "four_mid",
+      "things": [
+        {
+          "id": "broom_1",
+          "at": [
+            10,
+            7
+          ],
+          "hidden": false
         },
         {
           "id": "broom_2",
           "at": [
             9,
             8
-          ]
-        }
-      ]
-    },
-    {
-      "id": "three_mid",
-      "things": [
+          ],
+          "hidden": false
+        },
         {
-          "id": "broom_2",
+          "id": "broom_3",
           "at": [
-            9,
+            7,
             8
-          ]
+          ],
+          "hidden": true
         }
       ]
     }

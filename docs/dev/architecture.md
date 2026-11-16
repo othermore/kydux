@@ -2654,8 +2654,8 @@ one overturns stays, marked as superseded.
   nearest first, ties by row and then column, hidden ones found as `find_nearest` finds
   them, and `len`, which the sandbox lets through among the builtins. A hidden thing found
   makes the world's `found` event, in the tick of the call or before the first tick, and
-  the page draws it from then on: the brooms in the straw are not seen until a program
-  looks for them. `wizard.say` takes a number as it takes a word and says its digits; a
+  the page draws it from then on: the brooms under the straw are not seen until a program
+  looks for them, and those on the bare boards are seen from the start (D202). `wizard.say` takes a number as it takes a word and says its digits; a
   list is refused. The goal `say` takes `"count_of": "<kind>"` in place of `"text"`: met
   when the wizard says the number of things of that kind the way played has. The
   notebook's words for `find_all` and `items` show `len`. Rules out counting brooms by
@@ -2878,8 +2878,10 @@ one overturns stays, marked as superseded.
   carries its zones: the plan window hatches each zone's cells lightly, the other way
   from the low cells', and writes its name on its first cell (`plan.zone.<name>`:
   *junto a la pared*, *en la paja*); `?debug` frames each zone's cells in a colour of
-  its own and names it in the legend. Rules out a `find_all` that sees through walls
-  into every corner of a place.
+  its own and names it in the legend. In the shed the floor's zone keeps the name
+  `straw`, *en la paja*, though some of its brooms lie on the bare boards (D202): it is
+  the floor away from the wall. Rules out a `find_all` that sees through walls into
+  every corner of a place.
 - **D197 — The broom is taught before the lists, with a practice of one `untie`.**
   Decided 2026-11-11 by the owner (*una primera práctica sencilla: una escoba justo a tus
   pies, búscala con find_nearest y quítale el nudo con untie*). The lesson `the-broom`,
@@ -2948,3 +2950,22 @@ one overturns stays, marked as superseded.
   threshold in view, and no peg under the goals' panel or the zoom's buttons at 1280
   by 800. A level with no `camera` starts as it does without one. Rules out a level
   whose things lie under the page's own panels as it opens, and a shed seen in pieces.
+- **D202 — In the shed a lying broom is in sight on the boards or hidden under the
+  straw.** Decided 2026-11-11 by the owner (*Hay que colocar algunas a la vista (donde no
+  hay paja) y otras escondidas (donde sí hay paja) para que tenga sentido el find_all
+  pero tenga sentido la historia de "están desordenadas o tiradas por el suelo" que
+  decimos*). On the shed's picture the floor's zone, rows 7 and 8, has straw on (6, 7),
+  (6, 8), (7, 8), (12, 8) and (13, 8) and bare boards on its other cells. A lying broom
+  on one of those five cells is `hidden` until a program finds it (D184); one on the
+  boards is seen from the start; none lies on (13, 7), half under the straw, nor on row
+  6, the wall's zone. The knotted lying brooms are four, `broom_1` and `broom_2` on the
+  boards and `broom_3` and `broom_4` under the straw, laid on other cells in each way of
+  *El cobertizo* and *Las escobas de la paja*, whose programs look for them; the story's
+  step 4, *La escoba a tus pies* and *Las escobas de la pared* show the two on the
+  boards, with `broom_0` by the door. In *Las escobas de la pared* the two stay knotted
+  while the wall's are untied: its goal is `{"kind": "untied", "zone": "wall"}`, which
+  counts the brooms of that zone in the way played (an `untied` goal takes `ids` or
+  `zone`, never both, and refuses a zone with no broom). The content tests hold every
+  level and story step staged in the shed to it. Rules out a broom that appears from bare
+  boards, a floor left empty after the story has shown brooms lying on it, and a count
+  made by eye.

@@ -13,8 +13,9 @@ say (a text, word for word, or the number of things of a kind in the way played:
 `{"kind": "say", "count_of": "broom"}`, D184), give (a thing by id, to an actor by
 id), cast (a spell cast, not a word refused: `{"kind": "cast", "spell": "osto"}`,
 D176, maybe from one of a few cells, `"from": [[x, y], ...]`), no_bumps
-(the wizard bumps into nothing; failed at the first bump), untied (no broom knotted;
-failed at the run's end with one still knotted, D183), no_error (the run ends
+(the wizard bumps into nothing; failed at the first bump), untied (no broom knotted,
+or none of those named in `ids` or lying in a `zone`; failed at the run's end with one
+still knotted, D183, D202), no_error (the run ends
 without an error, nor the world refusing the program; failed at the first),
 through_in_order (the rings named, flown through in that order: `{"kind":
 "through_in_order", "ids": ["ring_1", ...]}`, D187), before (the wizard crosses a
@@ -167,18 +168,27 @@ class SayGoal:
 
 class UntiedGoal:
     """Met once no broom it counts is knotted; failed at the run's end when one still is
-    (D183): `{"kind": "untied"}` counts every broom of the level, and
-    `{"kind": "untied", "ids": ["broom_0"]}` the brooms named."""
+    (D183): `{"kind": "untied"}` counts every broom of the level,
+    `{"kind": "untied", "ids": ["broom_0"]}` the brooms named, and
+    `{"kind": "untied", "zone": "wall"}` the brooms of a zone in the way played (D202)."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
         brooms = {thing.id for thing in level.things if thing.kind == "broom"}
         if not brooms:
             raise LevelError(f"{level.id}: an untied goal needs a broom")
-        ids = spec.params.get("ids")
+        ids, zone = spec.params.get("ids"), spec.params.get("zone")
+        if ids is not None and zone is not None:
+            raise LevelError(f"{level.id}: an untied goal counts by ids or by zone, not both")
         if ids is not None and (
             not isinstance(ids, list) or not ids or not all(i in brooms for i in ids)
         ):
             raise LevelError(f"{level.id}: an untied goal's ids name brooms of the level")
+        if zone is not None:
+            if zone not in level.zones:
+                raise LevelError(f"{level.id}: an untied goal's zone {zone} is not the level's")
+            ids = [t.id for t in level.things if t.kind == "broom" and t.zone == zone]
+            if not ids:
+                raise LevelError(f"{level.id}: an untied goal's zone {zone} has no broom")
         self.ids = set(ids) if ids is not None else None
 
     def check(self, world: "World") -> bool:

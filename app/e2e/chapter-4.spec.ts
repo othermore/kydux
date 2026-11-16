@@ -8,8 +8,9 @@
 // fast, with the wind's sound (D185, D186); the loop round the rings flown into the
 // trees and the function that wins (D190); the race by Ilda's count, its band and its
 // card (D189); each story told to its end, the first on two scenes; the map's stops in
-// order. Screenshots of every stop go to e2e/shots/chapter-4/, which git ignores, for
-// the owner.
+// order; the shed's levels framed whole, their pegs clear of the page's panels (D201);
+// the shed's lying brooms in sight on the boards and hidden under the straw (D202).
+// Screenshots of every stop go to e2e/shots/chapter-4/, which git ignores, for the owner.
 
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -145,26 +146,60 @@ test.describe('the shed', () => {
 
   test('the broom at your feet is found and untied in two lines, the hung ones drawn on their pegs (D195, D197)', async ({ page }) => {
     await open(page, 'the-broom-at-your-feet');
-    // The four hung brooms on the pegs of columns 6 to 9, the one at the feet on the floor.
+    // The four hung brooms on the pegs of columns 6 to 9, the one at the feet and two more
+    // lying on the boards, in sight (D202).
     await expect(scene(page)).toHaveAttribute(
       'data-sprite-things',
-      'broom_0:broom:9,8;broom_6:broom-hung:6,5;broom_7:broom-hung:7,5;broom_8:broom-hung:8,5;broom_9:broom-hung:9,5',
+      'broom_0:broom:9,8;broom_1:broom:7,7;broom_2:broom:11,7;' +
+        'broom_6:broom-hung:6,5;broom_7:broom-hung:7,5;broom_8:broom-hung:8,5;broom_9:broom-hung:9,5',
     );
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}shed-pegs.png` });
     expect(await run(page, solution('the-broom-at-your-feet'))).toMatch(/^¡Lo has conseguido/);
     await expect(scene(page)).toHaveAttribute('data-untied', 'broom_0');
   });
 
-  test('the brooms are counted from the straw and from the wall; one find_all loses (D196)', async ({ page }) => {
+  test('the brooms are counted from the straw and from the wall; one find_all loses (D196, D202)', async ({ page }) => {
     await open(page, 'the-shed');
-    // Only the hung ones are seen before a program looks in the straw.
-    await expect(scene(page)).toHaveAttribute('data-sprite-things', /^broom_6:broom-hung:6,5;broom_7/);
-    await expect(scene(page)).not.toHaveAttribute('data-sprite-things', /broom_1:/);
+    // The hung one and the three lying on the boards are seen; the two under the straw
+    // only once a program looks there.
+    await expect(scene(page)).toHaveAttribute(
+      'data-sprite-things',
+      'broom_0:broom:9,8;broom_1:broom:7,7;broom_2:broom:11,7;broom_6:broom-hung:6,5',
+    );
     expect(await run(page, wrong('the-shed', 'one_find_all_from_the_door'))).not.toMatch(/^¡Lo has conseguido/);
     expect(await run(page, solution('the-shed'))).toMatch(/^¡Lo has conseguido/);
-    await expect(scene(page)).toHaveAttribute('data-found', /broom_1/);
-    await expect(scene(page)).toHaveAttribute('data-sprite-things', /broom_1:broom:10,7/);
-    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}shed-found.png` });
+    // Each way played back to its end, its won card closed to see the scene.
+    for (const way of waysOf('the-shed')) {
+      await page.locator('#way').selectOption(way, { force: true });
+      await expect(page.locator('#way')).toHaveValue(way);
+      await expect(page.locator('#again')).toBeHidden();
+      await expect(page.locator('#again')).toBeVisible({ timeout: ciTimes(60_000) });
+      await expect(page.locator('.outcome-text')).toContainText('Lo has conseguido');
+      await page.locator('#again').click();
+      await expect(scene(page)).toHaveAttribute('data-found', /broom_3.*broom_4|broom_4.*broom_3/);
+      await expect(scene(page)).toHaveAttribute('data-sprite-things', /broom_3:broom:.*broom_4:broom:/);
+      await page.locator('.scene-frame').screenshot({ path: `${SHOTS}shed-found-${way}.png` });
+    }
+  });
+
+  test('in the straw two brooms lie in sight at the start, and find_all uncovers the other two (D202)', async ({ page }) => {
+    await open(page, 'the-brooms-in-the-straw');
+    const lying = async () =>
+      ((await scene(page).getAttribute('data-sprite-things')) ?? '').split(';').filter((entry) => entry.includes(':broom:')).length;
+    await expect.poll(lying).toBe(2);
+    await expect(scene(page)).toHaveAttribute('data-sprite-things', /^broom_1:broom:11,7;broom_2:broom:8,7;broom_6:/);
+    expect(await run(page, solution('the-brooms-in-the-straw'))).toMatch(/^¡Lo has conseguido/);
+    // Each way played back to its end, its won card closed to see the scene.
+    for (const way of waysOf('the-brooms-in-the-straw')) {
+      await page.locator('#way').selectOption(way, { force: true });
+      await expect(page.locator('#way')).toHaveValue(way);
+      await expect(page.locator('#again')).toBeHidden();
+      await expect(page.locator('#again')).toBeVisible({ timeout: ciTimes(60_000) });
+      await expect(page.locator('.outcome-text')).toContainText('Lo has conseguido');
+      await page.locator('#again').click();
+      await expect.poll(lying).toBe(4);
+      await page.locator('.scene-frame').screenshot({ path: `${SHOTS}straw-found-${way}.png` });
+    }
   });
 
   test('two brooms untied by hand win the way of two and lose the longer ones (D51)', async ({ page }) => {

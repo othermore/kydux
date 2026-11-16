@@ -569,18 +569,24 @@ def found_from(level, moves=()):
     return [tuple(broom.position) for broom in world.wizard.find_all("broom")]
 
 
-@pytest.mark.parametrize("way", ["three", "three_low", "three_mid"])
-def test_in_the_straw_each_broom_lies_left_of_and_not_above_the_one_before(way):
+@pytest.mark.parametrize(
+    ("way", "steps"),
+    [("four", [1, 4, 6, 7]), ("four_low", [1, 3, 5, 7]), ("four_mid", [2, 4, 6, 7])],
+)
+def test_in_the_straw_each_broom_lies_left_of_or_under_the_one_before_and_none_above(way, steps):
+    """D202: from the start, (12, 7), four brooms at growing distances, the last on (6, 8)."""
     found = found_from(content_level("the-brooms-in-the-straw").way(way))
-    assert len(found) == 3 and found[-1] == (6, 8)
+    assert len(found) == 4 and found[-1] == (6, 8)
+    assert [abs(x - 12) + abs(y - 7) for x, y in found] == steps
     for before, after in zip([(12, 7), *found], found, strict=False):
-        assert after[0] < before[0] and after[1] >= before[1]
+        assert after != before and after[0] <= before[0] and after[1] >= before[1]
 
 
 @pytest.mark.parametrize(("way", "count"), [("two", 2), ("three", 3), ("four", 4)])
 def test_on_the_wall_find_all_gives_the_hung_brooms_left_to_right(way, count):
     level = content_level("the-brooms-on-the-wall").way(way)
-    assert found_from(level) == []
+    # From the door, the two brooms lying on the boards, left for later (D202).
+    assert found_from(level) == [(7, 7), (11, 7)]
     found = found_from(level, [("move_up", 2), ("move_left", 3)])
     assert found == [(column, 5) for column in range(6, 6 + count)]
 
@@ -599,14 +605,76 @@ def test_in_the_check_the_hung_brooms_go_left_to_right_and_the_first_has_no_knot
     assert [tuple(broom.position) for broom in brooms] == [(c, 5) for c in range(6, 6 + count)]
 
 
-@pytest.mark.parametrize(("way", "hung"), [("six", 2), ("seven", 3), ("eight", 4)])
-def test_the_shed_counts_four_in_the_straw_from_the_door_and_the_hung_ones_from_the_wall(
-    way, hung
-):
+@pytest.mark.parametrize(("way", "hung"), [("six", 1), ("seven", 2), ("eight", 3)])
+def test_the_shed_counts_five_from_the_door_and_the_hung_ones_from_the_wall(way, hung):
+    """D202: from the door the three brooms in sight and the two under the straw."""
     level = content_level("the-shed").way(way)
-    assert len(found_from(level)) == 4
+    assert len(found_from(level)) == 5
     assert all(cell[1] in (7, 8) for cell in found_from(level))
     assert len(found_from(level, [("move_up", 2)])) == hung
+
+
+#: The cells of the shed's floor that the picture covers with straw (D202).
+STRAW = {(6, 7), (6, 8), (7, 8), (12, 8), (13, 8)}
+
+
+def shed_stagings():
+    """Every level and story step staged in the-broom-shed, in each of its ways: a name
+    and the brooms, each its cell, whether it hangs, is hidden and is knotted."""
+    found = []
+    for folder in sorted(CONTENT.iterdir()):
+        data = json.loads((folder / "level.json").read_text(encoding="utf-8"))
+        if data.get("scene") != "the-broom-shed":
+            continue
+        level = content_level(folder.name)
+        for way_id, way in level.ways or (("", level),):
+            brooms = [
+                (tuple(t.position), t.hung, t.hidden, t.knotted)
+                for t in way.things
+                if t.kind == "broom"
+            ]
+            found.append((f"{folder.name} {way_id}".strip(), brooms))
+    stories = CONTENT.parent / "stories"
+    for folder in sorted(stories.iterdir()):
+        story = json.loads((folder / "story.json").read_text(encoding="utf-8"))
+        for number, step in enumerate(story["steps"], 1):
+            scene = step.get("scene")
+            if isinstance(scene, dict) and scene.get("scene") == "the-broom-shed":
+                brooms = [
+                    (tuple(t["at"]), t.get("hung", False), t.get("hidden", False), False)
+                    for t in scene.get("things", [])
+                    if t["kind"] == "broom"
+                ]
+                found.append((f"{folder.name} step {number}", brooms))
+    return found
+
+
+@pytest.mark.parametrize(
+    ("where", "brooms"), shed_stagings(), ids=lambda v: v if isinstance(v, str) else ""
+)
+def test_in_the_shed_a_lying_broom_is_hidden_under_the_straw_and_seen_on_the_boards(where, brooms):
+    """D202: a lying broom on one of the five straw cells is hidden, elsewhere seen; none
+    lies on (13, 7), half under the straw, nor on row 6, the wall's zone."""
+    for cell, hung, hidden, _ in brooms:
+        if hung:
+            continue
+        assert cell != (13, 7) and cell[1] != 6, f"{where}: a broom on {cell}"
+        assert hidden == (cell in STRAW), f"{where}: the broom on {cell}"
+
+
+@pytest.mark.parametrize("name", ["the-shed", "the-brooms-in-the-straw"])
+def test_the_knotted_lying_brooms_are_two_on_the_boards_and_two_under_the_straw_otherwise_each_way(
+    name,
+):
+    laid = []
+    for where, brooms in shed_stagings():
+        if not where.startswith(f"{name} "):
+            continue
+        knotted = sorted(cell for cell, hung, _, knot in brooms if knot and not hung)
+        assert sum(cell in STRAW for cell in knotted) == 2, where
+        assert sum(cell not in STRAW for cell in knotted) == 2, where
+        laid.append(tuple(knotted))
+    assert len(laid) == 3 and len(set(laid)) == 3
 
 
 def test_the_race_and_the_rematch_have_zarek_cross_at_fifty_five_and_fifty():
@@ -719,6 +787,43 @@ def test_the_untied_goal_counts_only_the_brooms_it_names():
     assert run_code(rack(goals=[{"kind": "untied"}]), solved).status != "won"
     with pytest.raises(LevelError, match="ids name brooms"):
         World(rack(goals=[{"kind": "untied", "ids": ["nothing"]}]))
+
+
+def test_the_untied_goal_counts_the_brooms_of_a_zone_in_the_way_played():
+    """D202: the wall's brooms untied, the straw's left knotted, meet a goal of the wall."""
+    wall = {"kind": "untied", "zone": "wall"}
+    half = "wizard.move_up(2)\nwizard.move_left(2)\nhung_1.untie()\n"
+    solved = half + "wizard.move_right()\nhung_2.untie()\n"
+    assert run_code(rack(goals=[wall]), solved).status == "won"
+    assert run_code(rack(goals=[{"kind": "untied"}]), solved).status != "won"
+    assert run_code(rack(goals=[wall]), half).status != "won"
+    # A way that takes a hung broom away: the goal counts the one the way has.
+    ways = [{"id": "one", "things": [{"id": "hung_2", "gone": True}]}, {"id": "two"}]
+    level = rack(goals=[wall], ways=ways)
+    assert run_code(level.way("one"), half).status == "won"
+    assert run_code(level.way("two"), half).status != "won"
+
+
+@pytest.mark.parametrize(
+    ("goal", "says"),
+    [
+        ({"kind": "untied", "zone": "wall", "ids": ["hung_1"]}, "ids or by zone, not both"),
+        ({"kind": "untied", "zone": "loft"}, "zone loft is not the level's"),
+    ],
+)
+def test_an_untied_goal_s_zone_is_the_level_s_and_alone(goal, says):
+    with pytest.raises(LevelError, match=says):
+        World(rack(goals=[goal]))
+
+
+def test_an_untied_goal_s_zone_has_a_broom_in_the_way_played():
+    hung = [{"id": "hung_1", "gone": True}, {"id": "hung_2", "gone": True}]
+    level = rack(
+        goals=[{"kind": "untied", "zone": "wall"}],
+        ways=[{"id": "bare", "things": hung}, {"id": "full"}],
+    )
+    with pytest.raises(LevelError, match="zone wall has no broom"):
+        World(level.way("bare"))
 
 
 def test_a_thing_s_zone_is_the_level_s_and_holds_where_it_is_found_from():

@@ -95,52 +95,49 @@
     },
     {
       "kind": "broom",
-      "id": "broom_9",
-      "at": [
-        9,
-        5
-      ],
-      "hung": true,
-      "zone": "wall",
-      "knotted": true
-    },
-    {
-      "kind": "broom",
       "id": "broom_0",
       "at": [
         9,
         8
       ],
-      "zone": "straw",
-      "hidden": true
+      "zone": "straw"
     },
     {
       "kind": "broom",
       "id": "broom_1",
       "at": [
-        10,
+        7,
         7
       ],
       "zone": "straw",
-      "knotted": true,
-      "hidden": true
+      "knotted": true
     },
     {
       "kind": "broom",
       "id": "broom_2",
       "at": [
-        8,
-        8
+        11,
+        7
       ],
       "zone": "straw",
-      "knotted": true,
-      "hidden": true
+      "knotted": true
     },
     {
       "kind": "broom",
       "id": "broom_3",
       "at": [
         6,
+        8
+      ],
+      "zone": "straw",
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_4",
+      "at": [
+        13,
         8
       ],
       "zone": "straw",
@@ -172,11 +169,11 @@
       "id": "six",
       "things": [
         {
-          "id": "broom_8",
+          "id": "broom_7",
           "gone": true
         },
         {
-          "id": "broom_9",
+          "id": "broom_8",
           "gone": true
         }
       ]
@@ -185,13 +182,63 @@
       "id": "seven",
       "things": [
         {
-          "id": "broom_9",
+          "id": "broom_8",
           "gone": true
+        },
+        {
+          "id": "broom_1",
+          "at": [
+            10,
+            7
+          ],
+          "hidden": false
+        },
+        {
+          "id": "broom_2",
+          "at": [
+            11,
+            8
+          ],
+          "hidden": false
+        },
+        {
+          "id": "broom_3",
+          "at": [
+            6,
+            7
+          ],
+          "hidden": true
+        },
+        {
+          "id": "broom_4",
+          "at": [
+            12,
+            8
+          ],
+          "hidden": true
         }
       ]
     },
     {
-      "id": "eight"
+      "id": "eight",
+      "things": [
+        {
+          "id": "broom_2",
+          "at": [
+            11,
+            8
+          ],
+          "hidden": false
+        },
+        {
+          "id": "broom_3",
+          "at": [
+            7,
+            8
+          ],
+          "hidden": true
+        }
+      ]
     }
   ]
 }

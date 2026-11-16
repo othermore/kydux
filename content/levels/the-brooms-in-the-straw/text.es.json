@@ -15,8 +15,8 @@
   "outro": "¡Terminamos con la paja! Has calculado cada distancia perfectamente.",
   "learned": "Ahora sabes que dentro del bucle un programa trabaja con la escoba de esa vuelta, así que las mismas cuentas funcionan para todas.",
   "ways": {
-    "three": "tres escobas en la paja",
-    "three_low": "tres escobas, más abajo",
-    "three_mid": "tres escobas, en medio"
+    "four": "cuatro escobas",
+    "four_low": "cuatro escobas, más abajo",
+    "four_mid": "cuatro escobas, en medio"
   }
 }

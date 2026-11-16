@@ -15,8 +15,8 @@
   "outro": "All done with the straw! You calculated every distance perfectly.",
   "learned": "Now you know that inside the loop a program works with that turn's broom, so the same sums work for every one.",
   "ways": {
-    "three": "three brooms in the straw",
-    "three_low": "three brooms, lower down",
-    "three_mid": "three brooms, in between"
+    "four": "four brooms",
+    "four_low": "four brooms, lower down",
+    "four_mid": "four brooms, in between"
   }
 }

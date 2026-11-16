@@ -683,12 +683,19 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     by the way it flew (D232); and, in `sprint-46.md`, a bonus goal that fails losing its
     star and not the level (D233), and the race judged at its end, Ilda saying what
     each one took, the penalty and the winner on a band at the scene's foot (D234); and,
-    in `sprint-47.md`, a flying figure hovering slowly and only while the program plays
-    (D235), the broom's wind as soft air that swells at a turn, heard only while the
-    program plays (D236), a thought about a bump half a second after it and words over a
-    flying figure as it is drawn (D237), Inconsolata at 16 the code's only letter (D238),
-    the tips' pictures at 960 by 540, shown as large as the window lets (D239), and words
-    put under a figure where the goals box would cover them above (D240).
+    in `sprint-47.md`, a flying figure hovering slowly (D235; whenever it is seen,
+    D242), the broom's wind heard only while the program plays (D236; a gust for each
+    flown command, D243), a thought about a bump half a second after it and words
+    over a flying figure as it is drawn (D237), Inconsolata at 16 the code's only letter
+    (D238), the tips' pictures at 960 by 540, shown as large as the window lets (D239;
+    each coming up with its tip, D246), and words put under a figure where the goals
+    box would cover them above (D240; a thought beside the head, D245); and,
+    in `sprint-48.md`, the way each figure faces kept by the scene and never read from a
+    frame (D241), a figure in the air hovering whenever it is seen, after Stop too
+    (D242), the broom's wind as a gust for each flown command (D243), a lift and a
+    landing seen and heard, whoever orders them (D244), a thought with no room above
+    beside the head (D245), a tip that comes up with its picture (D246), and a run's
+    end that sounds when the run ends (D247).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

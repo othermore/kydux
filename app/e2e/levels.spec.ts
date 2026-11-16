@@ -521,18 +521,21 @@ test.describe('a level played two ways, which the child never sees (D51, D204)',
     await page.locator('#speed').selectOption('4');
   }
 
-  test('a program caught where Dask looks down says this time it was different, and shows no select', async ({
+  test('a program caught where Dask looks down says first what is different this time, and shows no select', async ({
     page,
   }) => {
     await page.goto('/#level/by-the-statues');
     await begin(page);
     // Dask looks up as the level opens; looking down, a walk down first is seen.
     await run(page, 'wizard.move_down(2)\nwizard.move_right(4)\nwizard.move_down(2)');
-    await expect(page.locator('.outcome-text')).toContainText('This time it was different. The teacher saw you!');
+    // On a line of its own, before what the card says of the run.
+    await expect(page.locator('.outcome-text')).toHaveText(
+      /^This time, Dask starts out looking somewhere else\.\nThe teacher saw you!/,
+    );
     await expect(page.locator('#way')).toHaveCount(0);
     // Run again: the same way is on the screen, and nothing is said of a change.
     await run(page, 'wizard.move_down(2)\nwizard.move_right(4)\nwizard.move_down(2)');
-    await expect(page.locator('.outcome-text')).not.toContainText('different');
+    await expect(page.locator('.outcome-text')).not.toContainText('This time');
   });
 
   test("under ?debug, a select of the ways' ids plays back a way won while another is not", async ({ page }) => {

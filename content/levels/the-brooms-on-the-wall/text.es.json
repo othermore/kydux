@@ -13,5 +13,6 @@
   "intro": "Las escobas de la paja las dejamos para luego. Primero vamos a ocuparnos de las colgadas. Tenemos que caminar junto a la pared y desatar cada una. Cuelgan de ganchos diferentes cada vez, con huecos entre ellas. Si vas primero a un extremo de la pared, `find_all` te las da empezando por la más cercana, y solo tienes que caminar hacia un lado. ¿Recuerdas `distance_to`, de la biblioteca? Te dice a cuántos pasos de ti está una cosa.",
   "outro": "¡Lo conseguimos! Las escobas de la pared están a salvo.",
   "learned": "Ahora sabes que un bucle `for` te deja desatar cada escoba, y que `distance_to` te dice cuántos pasos caminar hasta la siguiente.",
-  "changes": "El número de escobas de la pared y los ganchos de los que cuelgan cambian cada vez."
+  "changes": "El número de escobas de la pared y los ganchos de los que cuelgan cambian cada vez.",
+  "changed": "Esta vez, hay otras escobas colgadas."
 }

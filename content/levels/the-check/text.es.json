@@ -14,5 +14,6 @@
   "intro": "{mate} ha dejado todas las escobas ordenadas, colgadas en sus ganchos en la pared. Se ha dado cuenta de que algunas todavía tienen un nudo encantado. ¡Algunas se nos escaparon, así que hay que repasarlas! He puesto el programa que usamos para recorrer las escobas en la pared, para ir una por una desatando el nudo. ¡Pero se para en la primera escoba sin nudo, cuelgue donde cuelgue, porque desatar una escoba sin nudo es un error! ¿Puedes arreglar el programa con un `if`? Para ver si una escoba tiene nudo, se puede usar su atributo `knotted`.",
   "outro": "¡Uf! Todas las escobas están a salvo. ¡Y justo a tiempo, oigo que viene la clase!",
   "learned": "Ahora sabes que un `if` dentro de un `for` decide en cada vuelta, y que antes de usar `untie()` puedes mirar `knotted` para saber si hay nudo.",
-  "changes": "El número de escobas de la pared, los ganchos de los que cuelgan y cuáles tienen todavía un nudo cambian cada vez."
+  "changes": "El número de escobas de la pared, los ganchos de los que cuelgan y cuáles tienen todavía un nudo cambian cada vez.",
+  "changed": "Esta vez, hay otras escobas con nudo."
 }

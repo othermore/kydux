@@ -196,7 +196,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const speedLabel = labelled(element('span', { className: 'speed-label' }), () =>
     t('level.speed'),
   );
-  const card: OutcomeCard = outcomeCard();
+  const card: OutcomeCard = outcomeCard(() => text.changed);
 
   // The camera's zoom, and Find my wizard (zoom.ts).
   const zoom = zoomBox(sceneParent);

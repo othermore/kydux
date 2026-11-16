@@ -13,5 +13,6 @@
   "intro": "We're done with the brooms that were hanging. The rest are scattered in the straw! From where you are, if you use `find_all` you'll find them in order, starting with the nearest, but the next one may be on any side of you. You can work out how many steps you have to walk from where you are at each moment to the next broom, and so go through them all: compare its `x` and its `y` with yours to know where to walk, and take the smaller number from the greater for the steps.",
   "outro": "All done with the straw! You calculated every distance perfectly.",
   "learned": "Now you know that you can use `if` and `<` inside a loop to compare coordinates and find the right number of steps to any side.",
-  "changes": "The number of brooms on the floor and where they lie change each time, so the next one may be on any side."
+  "changes": "The number of brooms on the floor and where they lie change each time, so the next one may be on any side.",
+  "changed": "This time, the brooms on the floor are in other places."
 }

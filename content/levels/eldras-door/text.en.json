@@ -15,5 +15,6 @@
   "intro": "But wait: what if, besides taking the key, you want to open the door? Let's practise it! Let's try again from the start, but this time, once you have the key, go to the door and open it. The door is five steps from where you started, and you have already walked some of them to the key; walk only the rest. The program from before is already written for you.",
   "outro": "The door is open and the key is in your hand, by the shortest way! Eldra's little room is waiting.",
   "learned": "Now you know that a number can be made from a variable, `5 - steps`, kept in a variable of its own or written straight into a move.",
-  "changes": "The key is at a different distance from the door each time."
+  "changes": "The key is at a different distance from the door each time.",
+  "changed": "This time, the key is at another distance from the door."
 }

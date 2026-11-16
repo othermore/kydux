@@ -3013,13 +3013,17 @@ one overturns stays, marked as superseded.
   different at each run (*La llave está cada vez a una distancia distinta de la
   puerta.*); the start card shows it with the same words on every such level under it,
   `level.changes_tail` (*Tu programa tiene que funcionar en todos los casos.*), and no
-  count or list of ways (`changesLines` in `ui/cards.ts`). No `text.<lang>.json` names a way, and
-  `tools/i18n_check.py` refuses a level with ways and no `changes`, or with `ways`. The
-  level opens on its first way; a run shows the first way it does not win, and the scene
-  keeps it until the next run or until the level starts over, when it is on its first way
-  again (`firstWay`). When the way a run shows is not the one on the screen before it, the
-  outcome's card starts with `outcome.changed` (*Esta vez era distinto.*), then says what
-  it says of any run (`RunController`'s `onScreenWay`). A run that wins every way has the
+  count or list of ways (`changesLines` in `ui/cards.ts`). No `text.<lang>.json` names a
+  way, and `tools/i18n_check.py` refuses a level with ways and no `changes` or no
+  `changed`, or with `ways`. The level opens on its first way; a run shows the first way
+  it does not win, and the scene keeps it until the next run or until the level starts
+  over, when it is on its first way again (`firstWay`). When the way a run shows is not the one on the screen before it, the
+  outcome's card starts with the level's `changed`, one sentence of each
+  `text.<lang>.json` in the owner's pattern (*Esta vez, la llave está en otro sitio.*): it
+  names the thing of `changes` that is different on the screen this time, never what the
+  difference is, and stands on a line of its own, so that it is not read as part of
+  *Todavía no: …*; then the card says what it says of any run (`RunController`'s
+  `onScreenWay`, `outcomeText` in `ui/outcome.ts`). A run that wins every way has the
   won card of any level. Only `?debug` draws the `#way` select, with the ways' ids, and
   only there is `outcome.way_won` said. The walkthrough and the course book, read by the
   owner and by developers, head each way with its id and say once that the child never

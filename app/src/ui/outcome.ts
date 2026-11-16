@@ -71,10 +71,11 @@ export function explanationText(explanation: Explanation): string {
 }
 
 /** What the card says: first, when the run's way is not the one on the screen before
- * it, that this time it was different (D204). */
-export function outcomeText(outcome: Outcome): string {
+ * it, the level's words for what is different this time, on a line of their own
+ * (D204). */
+export function outcomeText(outcome: Outcome, different?: string): string {
   const said = outcomeWords(outcome);
-  return outcome.changed ? `${t('outcome.changed')} ${said}` : said;
+  return outcome.changed && different ? `${different}\n${said}` : said;
 }
 
 function outcomeWords(outcome: Outcome): string {
@@ -146,7 +147,9 @@ export interface OutcomeCard {
   readonly current: Outcome | null;
 }
 
-export function outcomeCard(): OutcomeCard {
+/** The card; `different` gives the level's words for what is different this time, in
+ * the language of the moment (D204). */
+export function outcomeCard(different: () => string | undefined = () => undefined): OutcomeCard {
   const text = element('p', { className: 'outcome-text' });
   // Python that could not start needs the page loaded again.
   const reload = element('button', { id: 'reload', type: 'button', hidden: true });
@@ -169,7 +172,7 @@ export function outcomeCard(): OutcomeCard {
     show(outcome, printed = lastPrinted, race = null) {
       current = outcome;
       lastPrinted = printed;
-      text.replaceChildren(...withCode(outcomeText(outcome)));
+      text.replaceChildren(...withCode(outcomeText(outcome, different())));
       raced.textContent = race ?? '';
       raced.hidden = !race;
       printedLabel.textContent = t('outcome.printed');

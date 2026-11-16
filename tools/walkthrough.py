@@ -140,8 +140,12 @@ class Document:
         self.lines.append(f"```python\n{solution}\n```\n")
         ways = about.get("ways") or []
         if ways:
-            # What the start card says of the ways, and what only this document names (D204).
+            # What the start card says of the ways, what a run's card says first when the
+            # scene is another, and what only this document names (D204).
             self.lines.append(f"**Lo que cambia cada vez:** {spoken(text.get('changes', ''))}\n")
+            self.lines.append(
+                f"**Lo que dice cuando esta vez es distinto:** {spoken(text.get('changed', ''))}\n"
+            )
             self.lines.append(
                 "El nivel se juega en varias disposiciones, cada una con su nombre interno; "
                 "el niño nunca ve estos nombres.\n"

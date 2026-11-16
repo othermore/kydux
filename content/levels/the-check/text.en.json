@@ -14,5 +14,6 @@
   "intro": "{mate} has put all the brooms back in order, hung on their pegs on the wall. They noticed that some still have an enchanted knot. Some got past us, so we have to check them again! I've put in the program we used to go along the brooms on the wall, untying the knots one by one. But it stops at the first broom without a knot, wherever it hangs, because untying a broom with no knot is an error! Can you fix the program with an `if`? To see if a broom has a knot, you can use its `knotted` attribute.",
   "outro": "Phew! Every broom is safe now. And just in time, I can hear the class coming!",
   "learned": "Now you know that an `if` inside a `for` decides at each turn, and that before using `untie()` you can look at `knotted` to see whether there's a knot.",
-  "changes": "The number of brooms on the wall, the pegs they hang from and which still have a knot change each time."
+  "changes": "The number of brooms on the wall, the pegs they hang from and which still have a knot change each time.",
+  "changed": "This time, other brooms have a knot."
 }

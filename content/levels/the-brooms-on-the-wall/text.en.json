@@ -13,5 +13,6 @@
   "intro": "We'll leave the brooms in the straw for later. Let's take care of the hanging ones first. We need to walk along the wall and untie each one. They hang on different pegs each time, with gaps between them. If you go to one end of the wall first, `find_all` gives them to you starting with the nearest, and you only have to walk in one direction. Remember `distance_to`, from the library? It tells you how many steps away from you a thing is.",
   "outro": "We did it! The brooms on the wall are safe.",
   "learned": "Now you know that a `for` loop lets you untie each broom, and that `distance_to` tells you how many steps to walk to the next one.",
-  "changes": "The number of brooms on the wall and the pegs they hang from change each time."
+  "changes": "The number of brooms on the wall and the pegs they hang from change each time.",
+  "changed": "This time, other brooms are hanging."
 }

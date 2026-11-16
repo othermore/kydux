@@ -30,7 +30,6 @@
     "caught": "The teacher saw you! Try again, and watch which way they look.",
     "printed": "Your code printed:",
     "blocked": "On line {line}: {reason}",
-    "changed": "This time it was different.",
     "way_won": "The wizard gets through this way. Not every way yet: choose another one to see it."
   },
   "level": {

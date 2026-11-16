@@ -13,5 +13,6 @@
   "intro": "But how many lie on the floor? Some are in plain sight, but others are hidden in the straw. The ones on the pegs are easy to see, so we don't need to count those.",
   "outro": "Perfect! You have counted the brooms on the floor. Before we get to them, let's take the knots off the ones hanging on the wall.",
   "learned": "Now you know that `find_all` gives a list of the brooms you can find from where you stand, and `len` tells you how many there are.",
-  "changes": "The number of brooms on the floor changes each time, and some are hidden in the straw."
+  "changes": "The number of brooms on the floor changes each time, and some are hidden in the straw.",
+  "changed": "This time, there is a different number of brooms on the floor."
 }

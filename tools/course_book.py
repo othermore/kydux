@@ -56,6 +56,7 @@ WORDS = {
         "hints": "Pistas",
         "solution": "Solución",
         "changes": "Lo que cambia cada vez",
+        "changed": "Lo que dice cuando esta vez es distinto",
         "ways": "Disposiciones (nombres internos, que el niño nunca ve)",
         "outro": "Al ganar",
         "learned": "Lo aprendido",
@@ -104,6 +105,7 @@ WORDS = {
         "hints": "Hints",
         "solution": "Solution",
         "changes": "What changes each time",
+        "changed": "What it says when this time is different",
         "ways": "Arrangements (inner names, which the child never sees)",
         "outro": "On a win",
         "learned": "What was learned",
@@ -223,8 +225,10 @@ def level_section(
         lines.append(f"- {bonus}{say(goal)}")
     lines.append("")
     if level.get("ways"):
-        # What the start card says, and the ways' ids, which only this book names (D204).
+        # What the start card says and what a run's card says first when the scene is
+        # another, and the ways' ids, which only this book names (D204).
         lines += [f"**{w['changes']}**: {say(text.get('changes', ''))}", ""]
+        lines += [f"**{w['changed']}**: {say(text.get('changed', ''))}", ""]
         lines += [f"**{w['ways']}**: " + ", ".join(f"`{way['id']}`" for way in level["ways"]), ""]
     code = say(text.get("starting_code", ""))
     lines += [f"**{w['starting']}**", ""]

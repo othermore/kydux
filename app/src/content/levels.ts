@@ -19,6 +19,9 @@ export interface LevelText {
   learned?: string;
   /** What may differ at each run of a level with ways, in the child's words (D204). */
   changes?: string;
+  /** What is different this time, said first on the card of a run whose way is not the
+   * one on the screen before it (D204). */
+  changed?: string;
 }
 
 export interface LoadedLevel {
@@ -70,6 +73,7 @@ function madeForWizard(text: LevelText): LevelText {
     ...(text.outro !== undefined ? { outro: forWizard(text.outro) } : {}),
     ...(text.learned !== undefined ? { learned: forWizard(text.learned) } : {}),
     ...(text.changes !== undefined ? { changes: forWizard(text.changes) } : {}),
+    ...(text.changed !== undefined ? { changed: forWizard(text.changed) } : {}),
   };
 }
 

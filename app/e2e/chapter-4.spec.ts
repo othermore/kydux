@@ -277,7 +277,7 @@ test.describe('the shed', () => {
     await run(page, wrong('the-brooms-on-the-wall', 'the_steps_written_out'));
     await expect(page.locator('.outcome')).not.toHaveAttribute('data-kind', 'won');
     await expect(page.locator('#way')).toHaveValue('b');
-    await expect(page.locator('.outcome-text')).toContainText(/^Esta vez era distinto\. /);
+    await expect(page.locator('.outcome-text')).toHaveText(/^Esta vez, hay otras escobas colgadas\.\n/);
   });
 
   test('in the straw a walk only left and down is refused at the first broom to the right, in the game\'s words (D212)', async ({

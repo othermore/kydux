@@ -39,6 +39,7 @@ def small_repo(tmp_path: Path) -> Path:
                 "intro": "Mira, {friend}.",
                 "outro": "Ya.",
                 "changes": "La llave cambia de sitio cada vez.",
+                "changed": "Esta vez, la llave está en otro sitio.",
             }
         )
     )
@@ -65,6 +66,8 @@ def test_the_document_says_each_stop_with_a_comments_line_under_each_picture(tmp
     assert "Hola, Marta, cansada." in text and "Mira, Teku." in text
     # A way under its id, which the child never sees, after what the card says (D204).
     assert "**Lo que cambia cada vez:** La llave cambia de sitio cada vez." in text
+    different = "Esta vez, la llave está en otro sitio."
+    assert f"**Lo que dice cuando esta vez es distinto:** {different}" in text
     assert "el niño nunca ve estos nombres" in text
     assert "### Disposición `w`" in text
     assert "manera" not in text.lower()

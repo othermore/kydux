@@ -13,5 +13,6 @@
   "intro": "Ya hemos terminado con las escobas que estaban colgadas. ¡Las demás están tiradas por la paja! Desde donde estás, si usas `find_all` las encontrarás ordenadas empezando por la más cercana, pero la siguiente puede estar a cualquier lado de ti. Puedes calcular cuántos pasos tienes que andar desde donde estás en cada momento hasta la siguiente escoba, y así pasar por todas: compara su `x` y su `y` con las tuyas para saber hacia dónde caminar, y resta el número menor del mayor para saber los pasos.",
   "outro": "¡Terminamos con la paja! Has calculado cada distancia perfectamente.",
   "learned": "Ahora sabes que puedes usar `if` y `<` dentro de un bucle para comparar coordenadas y encontrar los pasos exactos hacia cualquier lado.",
-  "changes": "El número de escobas del suelo y dónde están cambian cada vez, así que la siguiente puede estar a cualquier lado."
+  "changes": "El número de escobas del suelo y dónde están cambian cada vez, así que la siguiente puede estar a cualquier lado.",
+  "changed": "Esta vez, las escobas del suelo están en otros sitios."
 }

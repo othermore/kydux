@@ -17,7 +17,8 @@ Fails, printing file:line: message for each, on:
     in i18n/, or with texts whose keys differ, or with a different number of goals
     than its level.json, or a different number of hints in each language; a level
     played in several ways without `changes` in each text, what may differ at each
-    run, or with `ways`, names of its ways, which the child is never told (D204);
+    run, or without `changed`, what is different this time, or with `ways`, names
+    of its ways, which the child is never told (D204);
   - a choice for the wizard, {boy's words|girl's words}, with other than one bar,
     in any text for the player; and in Spanish, `mago` or `maga` outside a choice,
     so that no text speaks of a girl as a boy by oversight (D37);
@@ -113,8 +114,9 @@ def check_levels(languages: list[str]) -> list[str]:
                     f"{name}/text.{lang}.json: {goals} goals in level.json, not as many here"
                 )
             # The child is told what may differ at each run, never of ways (D204).
-            if level.get("ways") and not text.get("changes"):
-                findings.append(f"{name}/text.{lang}.json: played in ways, and no changes")
+            for key in ("changes", "changed"):
+                if level.get("ways") and not text.get(key):
+                    findings.append(f"{name}/text.{lang}.json: played in ways, and no {key}")
             if any(key == "ways" or key.startswith("ways.") for key in text):
                 findings.append(f"{name}/text.{lang}.json: names its ways (D204)")
         hints = {lang: len(text.get("hints", [])) for lang, text in texts.items()}

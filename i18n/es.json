@@ -30,7 +30,6 @@
     "caught": "¡Te ha visto el profesor! Inténtalo otra vez, y fíjate hacia dónde mira.",
     "printed": "Tu código ha escrito:",
     "blocked": "En la línea {line}: {reason}",
-    "changed": "Esta vez era distinto.",
     "way_won": "{El mago|La maga} pasa de esta manera. Todavía no de todas: elige otra para verla."
   },
   "level": {

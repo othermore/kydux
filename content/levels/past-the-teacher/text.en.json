@@ -13,5 +13,6 @@
   "intro": "It is Dask again! His lantern lights up almost the whole corridor. We need to reach the mark in the arch below, but we must cross his path. We do not know how long he will look this way, so we will wait while he looks right. We should walk down to the cell before the crossing and wait.",
   "outro": "We got past! Beyond this arch there is a corridor with a hole in its floor.",
   "learned": "Now you know that `while` waits while something remains true, no matter how long.",
-  "changes": "Dask starts from a different place each time."
+  "changes": "Dask starts from a different place each time.",
+  "changed": "This time, Dask starts from another place."
 }

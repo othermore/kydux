@@ -15,5 +15,6 @@
   "intro": "The storeroom is dark! The key is in another place each night, so we cannot know the steps to it before we enter. We must light up the room with *kirra*, find the key, count the steps with the two numbers and walk there to pick it up. Then we will count the steps the same way to the cell above the door, `store_door`, and open it!",
   "outro": "The light showed everything, and the door is open! But wait... can you hear voices?",
   "learned": "Now you know that a position holds two numbers, `x` and `y`, and that their differences say the steps between two cells.",
-  "changes": "The key is in a different place in the storeroom each time."
+  "changes": "The key is in a different place in the storeroom each time.",
+  "changed": "This time, the key is in another place in the storeroom."
 }

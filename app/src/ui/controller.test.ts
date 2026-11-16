@@ -367,7 +367,7 @@ describe('RunController with ways (D51)', () => {
     return { ...locked, status: 'incomplete', way: 'locked', ways: [open, locked] };
   }
 
-  it('shows the first way not won, and says this time it was different, the first being on the screen', async () => {
+  it('shows the first way not won, and says the scene changed, the first being on the screen', async () => {
     const { runtime, controller, last } = setUp();
     controller.run('wizard.move_right(6)');
     runtime.answer(twoWays());

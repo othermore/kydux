@@ -946,23 +946,22 @@ test.describe('the notebook of chapter 4', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
-  test("Python's own words come as the lessons teach them: len, then def and its arguments (D60)", async ({ page }) => {
-    for (const [id, shown] of [
-      ['the-broom-at-your-feet', []],
-      ['the-shed', ['len(brooms)']],
-      ['the-rings', ['len(brooms)', 'def quick_fly():']],
-      ['the-race', ['len(brooms)', 'def quick_fly():', 'def two_rings(to_second, to_next):']],
+  test("Python's page gains len, then def and its arguments as the lessons teach them (D60, D256)", async ({ page }) => {
+    for (const [id, has, lacks] of [
+      ['the-broom-at-your-feet', ['while'], ['lists', 'len', 'def']],
+      ['the-shed', ['lists', 'len'], ['for_each', 'def']],
+      ['the-rings', ['len', 'for_each', 'less_greater', 'def'], ['def_arguments']],
+      ['the-race', ['def', 'def_arguments'], []],
     ] as const) {
       await open(page, id);
       await page.locator('#notebook-open').click();
-      const python = page.locator('#notebook .notebook-python [data-example]');
-      if (shown.length === 0) await expect(python).toHaveCount(0);
-      else await expect(python).toHaveText([...shown]);
+      await page.locator('#notebook-tab-python').click();
+      const syntax = page.locator('#notebook .notebook-syntax');
+      for (const concept of has) await expect(syntax.locator(`li[data-concept="${concept}"]`)).toHaveCount(1);
+      for (const concept of lacks) await expect(syntax.locator(`li[data-concept="${concept}"]`)).toHaveCount(0);
     }
-    await expect(page.locator('#notebook .notebook-python')).toContainText('son los argumentos de la función');
+    await expect(page.locator('#notebook li[data-concept="def_arguments"]')).toContainText('def saludar(nombre):');
     await page.locator('#notebook').screenshot({ path: `${SHOTS}notebook-python.png` });
-    await page.locator('#notebook [data-example="def two_rings(to_second, to_next):"]').click();
-    await expect(page.locator('.cm-content')).toContainText('def two_rings(to_second, to_next):');
   });
 });
 

@@ -391,7 +391,9 @@ has 2.11, 2.12, 2.0, 2.7, 2.5, 2.8 and 2.6 (`sprint-4.md`).
 2.7 The level-start card (goals, picture, example, Start) and the win scene
     (a short animation, stars by goals met, Next).
 2.8 Completion in the editor from the exposed API, and the notebook panel
-    listing it with translated descriptions and a click to insert an example.
+    listing it with translated descriptions and a click to insert an example;
+    a tab of the words and signs of Python taught so far, each as it is typed,
+    with a line and an example to read (D256).
 2.9 The world refuses to be tampered with: the wizard's position, facing
     and items are read-only to the child's code, the world's own modules are
     out of its reach, and a run's events must add up, each step following

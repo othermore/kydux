@@ -273,10 +273,10 @@
       "y": "A cell's second number, its row: how many cells from the top, counting from 0."
     },
     "tab_actions": "Actions",
+    "tab_python": "Python",
     "tab_spells": "Spells and words",
     "spells": "Spells",
     "words": "Words",
-    "python": "Python",
     "bed": {
       "kind": "What it is: \"bed\".",
       "name": "The bed's own name in this level.",
@@ -451,9 +451,74 @@
     }
   },
   "notebook_python": {
-    "len": "Gives how many values a list has: len(brooms) is the number of brooms in the list brooms.",
-    "def": "Gives a name to the lines moved in under it, a function. They run each time the name is written with brackets: quick_fly().",
-    "def_arguments": "The names in the brackets of def are the function's arguments: the call gives them their values in the same order, two_rings(2, 4)."
+    "comments": {
+      "does": "A comment is a note for whoever reads the program; the computer skips what follows the `#` on its line.",
+      "example": "# Towards the door\nwizard.move_right()"
+    },
+    "strings": {
+      "does": "A string is words between quotes; the computer keeps them exactly as written.",
+      "example": "wizard.say(\"Hello\")"
+    },
+    "print": {
+      "does": "Shows a value under the editor.",
+      "example": "print(door.locked)"
+    },
+    "variables": {
+      "does": "A variable keeps a value under a name: the name left of the `=`, the value right of it.",
+      "example": "book = wizard.find_nearest(\"book\")"
+    },
+    "arithmetic": {
+      "does": "Add and subtract numbers; the result is a number, to keep or to use.",
+      "example": "total = 4 + 3\nrest = total - 2"
+    },
+    "equal": {
+      "does": "Compares two values: `True` when they are equal, `False` when not.",
+      "example": "print(dask.facing == \"up\")"
+    },
+    "not": {
+      "does": "Says the contrary of an expression.",
+      "example": "print(not door.locked)"
+    },
+    "if": {
+      "does": "A condition: the lines moved in under it run only when its expression is `True`.",
+      "example": "if dask.facing == \"up\":\n    wizard.move_right(2)"
+    },
+    "else": {
+      "does": "Goes with an `if`: its lines run when the condition is `False`.",
+      "example": "if left_door.locked:\n    wizard.move_right(2)\nelse:\n    wizard.move_left(2)"
+    },
+    "for_range": {
+      "does": "A loop: runs the lines moved in under it as many times as `range` says.",
+      "example": "for step in range(3):\n    wizard.move_right(2)"
+    },
+    "while": {
+      "does": "A loop that runs its lines again and again while its expression is `True`.",
+      "example": "while dask.facing == \"right\":\n    wizard.wait()"
+    },
+    "lists": {
+      "does": "A list is several values in order, between square brackets; ask for an element by its index, counted from 0.",
+      "example": "names = [\"Teku\", \"Nuri\", \"Bimo\"]\nprint(names[0])"
+    },
+    "len": {
+      "does": "Says how many values a list has.",
+      "example": "print(len(brooms))"
+    },
+    "for_each": {
+      "does": "A loop over a list: runs its lines once for each element.",
+      "example": "for broom in brooms:\n    broom.untie()"
+    },
+    "less_greater": {
+      "does": "Compare two numbers, less than and greater than; they answer `True` or `False`.",
+      "example": "if broom_x < my_x:\n    wizard.move_left(my_x - broom_x)"
+    },
+    "def": {
+      "does": "A function: names the lines moved in under it, which run each time the name is written with its brackets.",
+      "example": "def quick_fly():\n    wizard.move_right(2)\n    wizard.move_up(2)\n\nquick_fly()"
+    },
+    "def_arguments": {
+      "does": "The names in the `def`'s brackets are the function's arguments; a call gives them their values in order.",
+      "example": "def greet(name):\n    print(\"Hello\", name)\n\ngreet(\"Teku\")"
+    }
   },
   "kinds": {
     "lesson": "Lesson {n}",

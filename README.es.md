@@ -60,11 +60,13 @@ izquierda. Una marca redonda que late en el suelo enseña a dónde debe
 llegar tu personaje. Los objetivos, en la esquina, se marcan solos cuando
 los cumples. Si algo sale
 mal, el juego dice por qué, y *Pista* te da una ayuda. El primer nivel te
-enseña cada parte de la pantalla, una a una; el botón *?* lo enseña otra
-vez. *Cuaderno* enseña lo que sabe hacer tu personaje, cada cosa con un
-ejemplo que se puede pulsar. Cuando ya sabes un hechizo o una contraseña,
-su segunda pestaña, *Hechizos y palabras*, los enseña también, con lo que
-hace cada uno. *Lección* vuelve a leer la lección del nivel, y *Mapa* abre el mapa
+enseña cada parte de la pantalla, una a una; su tarjeta de inicio lo
+enseña otra vez. *Cuaderno* enseña lo que sabe hacer tu personaje, cada
+cosa con un ejemplo que se puede pulsar. Cuando ya has aprendido alguna
+palabra o signo de Python, su pestaña *Python* los enseña, cada uno como
+se escribe, con lo que hace y un ejemplo para leer. Cuando ya sabes un
+hechizo o una contraseña, su pestaña *Hechizos y palabras* los enseña
+también, con lo que hace cada uno. *Lección* vuelve a leer la lección del nivel, y *Mapa* abre el mapa
 encima del nivel.
 
 Gana el nivel, y el juego te da hasta tres estrellas, y te dice por qué.

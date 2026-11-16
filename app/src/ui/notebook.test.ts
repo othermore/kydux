@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { type ApiTable, allows, heldObjects, notebookEntries, pythonWords, spellsAndWords } from './notebook';
+import { type ApiTable, allows, heldObjects, notebookEntries, notebookTabs, PYTHON, pythonEntries, spellsAndWords } from './notebook';
+import en from '../../../i18n/en.json';
+import es from '../../../i18n/es.json';
 
 const TABLE: ApiTable = {
   roles: {
@@ -83,13 +85,32 @@ describe('the notebook', () => {
     expect(spellsAndWords({ id: 'none', api: ['wizard.cast'] })).toEqual({ spells: [], words: [] });
   });
 
-  it("says Python's own words once a lesson has taught them, in the notebook's order (D60)", () => {
-    expect(pythonWords()).toEqual([]);
-    expect(pythonWords({ knownWords: [], concepts: ['arguments', 'len'] })).toEqual([
-      { word: 'len', example: 'len(brooms)' },
-    ]);
+  it("lists Python's words a level's concepts hold, in the table's order, and every one outside the course (D256)", () => {
+    expect(pythonEntries({ knownWords: [], concepts: ['arguments'] })).toEqual([]);
+    expect(pythonEntries({ knownWords: [], concepts: ['arguments', 'comments'] })).toEqual([{ concept: 'comments', shown: '#' }]);
     expect(
-      pythonWords({ knownWords: [], concepts: ['def_arguments', 'def', 'len'] }).map((entry) => entry.word),
-    ).toEqual(['len', 'def', 'def_arguments']);
+      pythonEntries({ knownWords: [], concepts: ['def', 'lists', 'comments', 'len', 'if'] }).map((entry) => entry.concept),
+    ).toEqual(['comments', 'if', 'lists', 'len', 'def']);
+    expect(pythonEntries()).toHaveLength(17);
+  });
+
+  it('has the tabs that have something in them, in their order (D256)', () => {
+    const walking = { api: ['wizard.move_right'] };
+    const casting = { api: ['wizard.move_right', 'wizard.cast'], spells: ['zelim'] };
+    expect(notebookTabs(walking, { knownWords: [], concepts: [] })).toEqual(['actions']);
+    expect(notebookTabs(walking, { knownWords: [], concepts: ['comments'] })).toEqual(['actions', 'python']);
+    expect(notebookTabs(casting, { knownWords: [], concepts: [] })).toEqual(['actions', 'spells']);
+    expect(notebookTabs(casting, { knownWords: [], concepts: ['comments'] })).toEqual(['actions', 'python', 'spells']);
+  });
+
+  it("has a line and an example for every word of the page, in every language (D256)", () => {
+    for (const words of [en, es] as Record<string, unknown>[]) {
+      const page = words.notebook_python as Record<string, { does?: string; example?: string }>;
+      expect(Object.keys(page)).toEqual(PYTHON.map((entry) => entry.concept));
+      for (const entry of Object.values(page)) {
+        expect(entry.does?.trim()).toBeTruthy();
+        expect(entry.example?.trim()).toBeTruthy();
+      }
+    }
   });
 });

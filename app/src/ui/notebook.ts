@@ -2,9 +2,11 @@
 // each, the actions and attributes the course has taught up to here (D40),
 // with an example to click and a sentence in the child's language (D30).
 // Nothing not taught yet is shown, and no object that is not in the level.
-// A second tab, once the course has given any, lists the spells and the words
-// (passwords) known up to here, each with what it does (D80). Python's own words
-// the course has taught, `len` and `def` with its arguments, follow the objects (D60).
+// Once a lesson has taught any of Python's own words and signs, a tab Python lists
+// them in the order taught, each as it is typed, with a line and an example to read
+// (D60, D256); a tab of the spells and the words (passwords) known up to here, each
+// with what it does, follows once the course has given any (D80). The bar of tabs
+// shows once there are two, so that a tab never moves.
 
 import type { LevelJson, CourseGiven } from '../runtime/protocol';
 import { t } from '../i18n';
@@ -84,18 +86,50 @@ export function notebookEntries(level: LevelJson, table: ApiTable, course?: Cour
   return entries;
 }
 
-/** Python's own words the notebook says once a lesson has taught them (D60): each the
- * concept a lesson teaches and its example. */
-const PYTHON: readonly { word: string; example: string }[] = [
-  { word: 'len', example: 'len(brooms)' },
-  { word: 'def', example: 'def quick_fly():' },
-  { word: 'def_arguments', example: 'def two_rings(to_second, to_next):' },
+/** The page of Python (D256): each word or sign of Python a lesson teaches, by the
+ * concept it marks (D60), and how it is typed, in the order the course teaches them.
+ * Its line and its example are `notebook_python.<concept>.does` and `.example`. */
+export const PYTHON: readonly { concept: string; shown: string }[] = [
+  { concept: 'comments', shown: '#' },
+  { concept: 'strings', shown: '" "' },
+  { concept: 'print', shown: 'print()' },
+  { concept: 'variables', shown: '=' },
+  { concept: 'arithmetic', shown: '+  -' },
+  { concept: 'equal', shown: '==' },
+  { concept: 'not', shown: 'not' },
+  { concept: 'if', shown: 'if' },
+  { concept: 'else', shown: 'else' },
+  { concept: 'for_range', shown: 'for … in range()' },
+  { concept: 'while', shown: 'while' },
+  { concept: 'lists', shown: '[ ]' },
+  { concept: 'len', shown: 'len()' },
+  { concept: 'for_each', shown: 'for … in …' },
+  { concept: 'less_greater', shown: '<  >' },
+  { concept: 'def', shown: 'def' },
+  { concept: 'def_arguments', shown: 'def …(…)' },
 ];
 
-/** Python's words taught up to the level (`concepts`, D60), in the notebook's order. */
-export function pythonWords(course?: CourseGiven): { word: string; example: string }[] {
-  const concepts = course?.concepts ?? [];
-  return PYTHON.filter((entry) => concepts.includes(entry.word));
+/** The page of Python's entries at a level: the table's that its concepts hold, in the
+ * table's order; every one for a level outside the course, which knows them all (D60,
+ * D256). */
+export function pythonEntries(course?: CourseGiven): { concept: string; shown: string }[] {
+  const concepts = course?.concepts;
+  return concepts ? PYTHON.filter((entry) => concepts.includes(entry.concept)) : [...PYTHON];
+}
+
+/** The notebook's tabs, in their order (D80, D256): what the objects can do, Python's
+ * words, and the spells and words. */
+export type NotebookTab = 'actions' | 'python' | 'spells';
+
+/** The tabs a level's notebook has: those with something in them, in their order; the
+ * first is always there. */
+export function notebookTabs(level: LevelJson, course?: CourseGiven): NotebookTab[] {
+  const { spells, words } = spellsAndWords(level, course);
+  return [
+    'actions',
+    ...(pythonEntries(course).length > 0 ? ['python' as const] : []),
+    ...(spells.length > 0 || words.length > 0 ? ['spells' as const] : []),
+  ];
 }
 
 /** The spells and the words the second tab lists (D80): the spells known up to the
@@ -123,7 +157,8 @@ export interface NotebookPanel {
   relabel(): void;
 }
 
-/** The panel: each object's actions, then its attributes, each with its example. */
+/** The panel: each object's actions, then its attributes, each with its example to
+ * click; Python's words with their examples to read (D256); the spells and words. */
 export function notebookPanel(
   level: LevelJson,
   table: ApiTable,
@@ -132,7 +167,7 @@ export function notebookPanel(
 ): NotebookPanel {
   const node = element('aside', { id: 'notebook', className: 'notebook', hidden: true });
   node.setAttribute('aria-labelledby', 'notebook-title');
-  let tab: 'actions' | 'spells' = 'actions';
+  let tab: NotebookTab = 'actions';
   // A spell or a word, in italics as a word to type, with what it does, and its
   // example to click: `wizard.cast("zelim")`, `wizard.say("ambrel")`; a spell cast
   // on a thing names it, `wizard.cast("fendra", book)`.
@@ -186,37 +221,36 @@ export function notebookPanel(
         ]),
       );
     }
-    const python = pythonWords(course);
-    if (python.length) {
-      sections.push(
-        element('section', { className: 'notebook-object notebook-python' }, [
-          element('h3', {}, [t('notebook.python')]),
-          element(
-            'ul',
-            {},
-            python.map((entry) => {
-              const example = element('button', { type: 'button', className: 'example' }, [
-                element('code', {}, [entry.example]),
-              ]);
-              example.dataset.example = entry.example;
-              example.addEventListener('click', () => onExample(entry.example));
-              return element('li', {}, [
-                example,
-                element('span', { className: 'description' }, withCode(t(`notebook_python.${entry.word}`))),
-              ]);
-            }),
-          ),
-        ]),
-      );
-    }
     const actions = sections.length ? sections : [element('p', {}, [t('notebook.nothing')])];
+    // Python's words (D256): each as it is typed, its line, and its example to read, which
+    // is no button: it names things of other programs.
+    const python = element('section', { className: 'notebook-python' }, [
+      element(
+        'ul',
+        { className: 'notebook-syntax' },
+        pythonEntries(course).map((entry) => {
+          const item = element('li', {}, [
+            element('code', { className: 'syntax-word' }, [entry.shown]),
+            element('span', { className: 'description' }, withCode(t(`notebook_python.${entry.concept}.does`))),
+            element('pre', { className: 'syntax-example' }, [
+              element('code', {}, [t(`notebook_python.${entry.concept}.example`)]),
+            ]),
+          ]);
+          item.dataset.concept = entry.concept;
+          return item;
+        }),
+      ),
+    ]);
     const header = element('header', {}, [element('h2', { id: 'notebook-title' }, [t('notebook.title')]), close]);
     const { spells, words } = spellsAndWords(level, course);
-    if (spells.length === 0 && words.length === 0) {
+    const present = notebookTabs(level, course);
+    if (!present.includes(tab)) tab = 'actions';
+    if (present.length === 1) {
+      node.dataset.tab = tab;
       node.replaceChildren(header, ...actions);
       return;
     }
-    const tabs = (['actions', 'spells'] as const).map((key) => {
+    const tabs = present.map((key) => {
       const button = element('button', { id: `notebook-tab-${key}`, type: 'button', className: 'notebook-tab' }, [
         t(`notebook.tab_${key}`),
       ]);
@@ -239,7 +273,11 @@ export function notebookPanel(
         : []),
     ];
     const shown = element('div', { id: 'notebook-shown', className: 'notebook-shown' }, [
-      ...(tab === 'actions' ? actions : [element('section', { className: 'notebook-magic' }, magicList)]),
+      ...(tab === 'actions'
+        ? actions
+        : tab === 'python'
+          ? [python]
+          : [element('section', { className: 'notebook-magic' }, magicList)]),
     ]);
     shown.setAttribute('role', 'tabpanel');
     node.dataset.tab = tab;

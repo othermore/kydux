@@ -96,7 +96,7 @@ test('a level\'s notebook has nothing the course has not taught yet', async ({ p
 });
 
 test('the notebook\'s second tab has the spells and the words given so far (D80)', async ({ page }) => {
-  // Before any: no tabs.
+  // Before any spell or word: no such tab.
   await open(page, 'the-long-corridor');
   await page.locator('#notebook-open').click();
   await expect(page.locator('#notebook-tab-spells')).toHaveCount(0);
@@ -135,4 +135,62 @@ test('the spells and words in Spanish', async ({ browser }) => {
   await page.locator('#notebook-tab-spells').click();
   await expect(page.locator('#notebook')).toContainText('zelim: rompe el sello de una puerta que tienes al lado.');
   await context.close();
+});
+
+test.describe("the notebook's page of Python (D256)", () => {
+  const PYTHON = [
+    'comments', 'strings', 'print', 'variables', 'arithmetic', 'equal', 'not', 'if', 'else',
+    'for_range', 'while', 'lists', 'len', 'for_each', 'less_greater', 'def', 'def_arguments',
+  ];
+  const entries = (page: Page) => page.locator('#notebook .notebook-syntax > li');
+
+  test("the course's first level has no bar of tabs", async ({ page }) => {
+    await open(page, 'the-gate');
+    await page.locator('#guide-skip').click();
+    await page.locator('#notebook-open').click();
+    await expect(page.locator('#notebook .notebook-tabs')).toHaveCount(0);
+  });
+
+  test('Fixing the program: two tabs, Python second with the comment alone, its example read and not put in the editor', async ({
+    page,
+  }) => {
+    await open(page, 'the-dark-note');
+    const before = await page.locator('.cm-content').textContent();
+    await page.locator('#notebook-open').click();
+    await expect(page.locator('#notebook .notebook-tab')).toHaveCount(2);
+    await expect(page.locator('#notebook .notebook-tab').nth(1)).toHaveAttribute('id', 'notebook-tab-python');
+    await expect(page.locator('#notebook-tab-python')).toHaveText('Python');
+    await page.locator('#notebook-tab-python').click();
+    await expect(page.locator('#notebook')).toHaveAttribute('data-tab', 'python');
+    await expect(entries(page)).toHaveCount(1);
+    const comment = page.locator('#notebook li[data-concept="comments"]');
+    await expect(comment.locator('.syntax-word')).toHaveText('#');
+    await expect(comment.locator('.description')).not.toBeEmpty();
+    expect((await comment.locator('pre.syntax-example').textContent())?.split('\n')).toEqual([
+      '# Towards the door',
+      'wizard.move_right()',
+    ]);
+    await expect(comment.locator('button')).toHaveCount(0);
+    await comment.locator('pre.syntax-example').click();
+    await expect(page.locator('.cm-content')).toHaveText(before ?? '');
+  });
+
+  test("chapter 4's last level has the seventeen, in the order taught, and the spells and words third", async ({
+    page,
+  }) => {
+    // The smallest screen the game is made for (D38).
+    await page.setViewportSize({ width: 1024, height: 700 });
+    await open(page, 'the-rematch');
+    await page.locator('#notebook-open').click();
+    await expect(page.locator('#notebook .notebook-tab')).toHaveCount(3);
+    await expect(page.locator('#notebook .notebook-tab').nth(2)).toHaveAttribute('id', 'notebook-tab-spells');
+    await page.locator('#notebook-tab-python').click();
+    await expect(entries(page)).toHaveCount(17);
+    expect(await entries(page).evaluateAll((items) => items.map((item) => (item as HTMLElement).dataset.concept))).toEqual(PYTHON);
+    // No example is wider than the panel, at the narrowest the game is played.
+    const wide = await page
+      .locator('#notebook pre.syntax-example')
+      .evaluateAll((boxes) => boxes.filter((box) => box.scrollWidth > box.clientWidth + 1).length);
+    expect(wide).toBe(0);
+  });
 });

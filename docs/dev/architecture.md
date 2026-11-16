@@ -1023,13 +1023,13 @@ one overturns stays, marked as superseded.
 - **D60 — A lesson may teach a concept, which the notebook follows.**
   Decided 2026-10-22 by the owner's UAT (sprint-10.md), built the same
   day. `teaches` in `lesson.json` may name a concept beside the API's
-  names: `concept:arguments`, `concept:comments`, `concept:print`,
-  `concept:strings`, `concept:len`, `concept:def`, `concept:def_arguments`.
-  `pack-world.mjs` writes the concepts known at each level into
-  `course.json`'s `concepts`, and the page gives them to the level as
-  `concepts`. The notebook says Python's own words once taught, `len`, `def`
-  and a `def`'s arguments, each with its example, after the objects
-  (`notebook_python.<word>`). `api.table()` gives an action that can go without
+  names: `concept:arguments` and each word or sign of Python the course
+  teaches (D256), in the order the lesson explains them. `pack-world.mjs`
+  writes the concepts known at each level into `course.json`'s `concepts`,
+  in the order taught, and the page gives them to the level as `concepts`.
+  The notebook says Python's words once taught on a tab of their own (D256),
+  and a check holds a level's code and a lesson's blocks to the concepts
+  taught before them. `api.table()` gives an action that can go without
   its argument a `simple` example (`wizard.move_right()`), with its words
   in `notebook_simple.<role>.<member>`; the notebook and the completion
   show the simple ones until `arguments` is known. A level outside the
@@ -1343,7 +1343,8 @@ one overturns stays, marked as superseded.
   The page gives the world the spells known, as it gives the API (D40),
   and the notebook the words known, which the world does not take: it
   holds a level's own words to its own doors. Once there is one, the
-  notebook has a second tab, *Spells and words*: each in italics with what
+  notebook has a tab *Spells and words*, after *Python* when that one is
+  there (D256): each in italics with what
   it does or opens, from i18n (`spells.<name>`, `words.<name>`, held by
   the i18n check to the world's spells and the levels' words), and an
   example to click. Rules out a child having to remember a spell's or a
@@ -3871,3 +3872,24 @@ one overturns stays, marked as superseded.
   owner's, chosen by ear. Rules out a sound of the landing's own laid over the wind, a hum
   or an effect, which draws the ear more than a landing asks; a landing that starts from
   silence; and a landing cut short by the run's end.
+- **D256 — The notebook has a page of Python.** Decided 2026-11-16 by the owner
+  (*quiero añadir al cuaderno una sección más donde estén los elementos que se hayan ido
+  enseñando ya de sintaxis: for, if, while, comparaciones, listas.... simplemente una
+  linea recordando lo que hace cada uno, y un ejemplo. Eso ayuda al niño a ver la
+  sintaxis para escribir los programas*). Once a lesson has taught any of them, the
+  notebook has a tab *Python*, between the actions and the spells and words: every word
+  and sign of Python the course has taught up to the level, in the order the course
+  teaches them, each as it is typed (`if`, `==`, `[ ]`), with one line that says what it
+  does and an example of one to five lines (`notebook_python.<concept>.does` and
+  `.example`). A lesson marks each in `teaches` (`concept:<name>`, D60): a comment, a
+  string, `print`, a variable, a sum and a subtraction, `==`, `not`, `if`, `else`, `for`
+  with `range`, `while`, a list and its index, `len`, `for` over a list, `<` and `>`,
+  `def` and a `def`'s arguments. A tab is there once it has something, and the bar of
+  tabs once there are two, so that a tab never moves: *Python* comes second from the
+  level after the lesson on comments. The examples are read, not put into the editor:
+  they name things of other programs; the actions' examples still put their line in.
+  An example needs only what is taught when its own concept is, and the test that holds
+  a level's code to the concepts taught before it holds the examples too. A level
+  outside the course shows every entry. Rules out a child paging back through the
+  lessons for a colon or a bracket, an entry shown before its lesson, and a click that
+  puts into the child's program a name its level does not hold.

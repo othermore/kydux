@@ -463,6 +463,43 @@ def test_a_lesson_s_blocks_need_only_the_concepts_taught_up_to_it(path, known):
                 assert not unknown, f"{path.name}/{lang}.md: a block uses {sorted(unknown)}"
 
 
+def taught_once_marked() -> dict[str, set[str]]:
+    """For each concept, the concepts known once the lesson that marks it is read."""
+    known_at = {}
+    for _path, known in lessons_with_concepts():
+        for concept in known:
+            known_at.setdefault(concept, set(known))
+    return known_at
+
+
+def test_the_page_of_python_has_a_line_and_an_example_for_each_concept_but_arguments():
+    """D256: notebook_python holds every concept but `arguments`; each example, in every
+    language, is whole Python with as many lines in each, and needs only what is known
+    once the lesson that marks its concept has been read."""
+    import ast
+
+    pages = {
+        lang: json.loads((ROOT / "i18n" / f"{lang}.json").read_text(encoding="utf-8"))[
+            "notebook_python"
+        ]
+        for lang in LANGUAGES
+    }
+    known_at = taught_once_marked()
+    for lang, page in pages.items():
+        assert set(page) == CONCEPTS - {"arguments"}, (
+            f"{lang}: {set(page) ^ (CONCEPTS - {'arguments'})}"
+        )
+        for concept, entry in page.items():
+            assert entry["does"].strip(), f"{lang}: {concept} says nothing"
+            example = entry["example"]
+            ast.parse(example)
+            unknown = concepts_used(example) - known_at[concept]
+            assert not unknown, f"{lang}: {concept}'s example uses {sorted(unknown)}"
+    for concept in pages["en"]:
+        counts = {lang: len(page[concept]["example"].split("\n")) for lang, page in pages.items()}
+        assert len(set(counts.values())) == 1, f"{concept}'s example: {counts}"
+
+
 @pytest.mark.parametrize("path", [p for p in CHAPTERS if rewritten(p)], ids=lambda p: p.name)
 def test_every_level_of_a_rewritten_chapter_closes(path):
     """Every level says an outro and what was learned; the chapter's last level says

@@ -54,10 +54,12 @@ level again and makes the wizard do what your code says, on the left. A
 round mark that beats on the ground shows where your wizard must get to.
 The goals, in the corner, tick themselves off as you reach them. If a run goes wrong, the game says
 why, and *Hint* gives you a clue. The first level shows you each part of
-the screen, one at a time; the *?* button shows it again. *Notebook*
+the screen, one at a time; its start card shows it again. *Notebook*
 lists what your wizard can do, each with an example to click. Once you
-know a spell or a password, its second tab, *Spells and words*, lists
-them too, with what each one does. *Lesson* reads
+have learned some of Python's own words and signs, its tab *Python*
+lists them, each as it is typed, with what it does and an example to
+read. Once you know a spell or a password, its tab *Spells and words*
+lists them too, with what each one does. *Lesson* reads
 the level's lesson again, and *Map* opens the map over the level.
 
 Win the level, and the game gives you up to three stars, and says why.

@@ -827,7 +827,8 @@ footer .build {
   font-size: 17px;
 }
 
-/* The notebook's two tabs (D80): what the wizard can do, and the spells and words. */
+/* The notebook's tabs (D80, D256): what the objects can do, Python's words, and the
+   spells and words. */
 .notebook-tabs {
   display: flex;
   gap: 4px;
@@ -893,6 +894,32 @@ footer .build {
   display: block;
   margin: 2px 0 0 4px;
   font-size: 15px;
+}
+
+/* The page of Python (D256): each word or sign as it is typed, a little larger than its
+   line, the line, and the example to read in the editor's own letter, its lines kept, on
+   the colour of the panel's code; an example wider than the panel scrolls in its box. */
+.notebook-syntax li {
+  margin: 10px 0 12px;
+}
+
+.notebook .syntax-word {
+  font: 600 17px var(--mono);
+}
+
+.notebook .syntax-example {
+  margin: 4px 0 0;
+  padding: 4px 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--panel);
+  font: 15px/1.35 var(--mono);
+  white-space: pre;
+}
+
+.notebook .syntax-example code {
+  font: inherit;
 }
 
 .notebook .close {

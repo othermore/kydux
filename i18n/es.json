@@ -273,10 +273,10 @@
       "y": "El segundo número de una casilla, su fila: cuántas casillas hay desde arriba, contando desde 0."
     },
     "tab_actions": "Acciones",
+    "tab_python": "Python",
     "tab_spells": "Hechizos y palabras",
     "spells": "Hechizos",
     "words": "Palabras",
-    "python": "Python",
     "bed": {
       "kind": "Qué es: \"bed\".",
       "name": "El nombre de la cama en este nivel.",
@@ -451,9 +451,74 @@
     }
   },
   "notebook_python": {
-    "len": "Da cuántos valores tiene una lista: len(brooms) es el número de escobas de la lista brooms.",
-    "def": "Da un nombre a las líneas que van metidas debajo, una función. Se ejecutan cada vez que se escribe el nombre con paréntesis: quick_fly().",
-    "def_arguments": "Los nombres entre los paréntesis del def son los argumentos de la función: al llamarla se les dan sus valores en el mismo orden, two_rings(2, 4)."
+    "comments": {
+      "does": "Un comentario es una nota para quien lee el programa; el ordenador se salta lo que sigue al `#` en su línea.",
+      "example": "# Hacia la puerta\nwizard.move_right()"
+    },
+    "strings": {
+      "does": "Una cadena son palabras entre comillas; el ordenador las guarda exactamente como están escritas.",
+      "example": "wizard.say(\"Hola\")"
+    },
+    "print": {
+      "does": "Muestra un valor debajo del editor.",
+      "example": "print(door.locked)"
+    },
+    "variables": {
+      "does": "Una variable guarda un valor con un nombre: el nombre a la izquierda del `=`, el valor a la derecha.",
+      "example": "book = wizard.find_nearest(\"book\")"
+    },
+    "arithmetic": {
+      "does": "Suman y restan números; el resultado es un número, para guardarlo o usarlo.",
+      "example": "total = 4 + 3\nrest = total - 2"
+    },
+    "equal": {
+      "does": "Compara dos valores: `True` cuando son iguales, `False` cuando no lo son.",
+      "example": "print(dask.facing == \"up\")"
+    },
+    "not": {
+      "does": "Dice lo contrario de una expresión.",
+      "example": "print(not door.locked)"
+    },
+    "if": {
+      "does": "Una condición: las líneas metidas hacia dentro debajo se ejecutan solo cuando su expresión es `True`.",
+      "example": "if dask.facing == \"up\":\n    wizard.move_right(2)"
+    },
+    "else": {
+      "does": "Va con un `if`: sus líneas se ejecutan cuando la condición es `False`.",
+      "example": "if left_door.locked:\n    wizard.move_right(2)\nelse:\n    wizard.move_left(2)"
+    },
+    "for_range": {
+      "does": "Un bucle: ejecuta las líneas metidas hacia dentro tantas veces como dice `range`.",
+      "example": "for step in range(3):\n    wizard.move_right(2)"
+    },
+    "while": {
+      "does": "Un bucle que ejecuta sus líneas una y otra vez mientras su expresión es `True`.",
+      "example": "while dask.facing == \"right\":\n    wizard.wait()"
+    },
+    "lists": {
+      "does": "Una lista son varios valores en orden, entre corchetes; se pide un elemento por su índice, contando desde 0.",
+      "example": "nombres = [\"Teku\", \"Nuri\", \"Bimo\"]\nprint(nombres[0])"
+    },
+    "len": {
+      "does": "Dice cuántos valores tiene una lista.",
+      "example": "print(len(brooms))"
+    },
+    "for_each": {
+      "does": "Un bucle sobre una lista: ejecuta sus líneas una vez por cada elemento.",
+      "example": "for broom in brooms:\n    broom.untie()"
+    },
+    "less_greater": {
+      "does": "Comparan dos números, menor que y mayor que; responden `True` o `False`.",
+      "example": "if escoba_x < mi_x:\n    wizard.move_left(mi_x - escoba_x)"
+    },
+    "def": {
+      "does": "Una función: da un nombre a las líneas metidas debajo; se ejecutan al escribir el nombre con sus paréntesis.",
+      "example": "def quick_fly():\n    wizard.move_right(2)\n    wizard.move_up(2)\n\nquick_fly()"
+    },
+    "def_arguments": {
+      "does": "Los nombres entre los paréntesis del `def` son sus argumentos; una llamada les da sus valores en el mismo orden.",
+      "example": "def saludar(nombre):\n    print(\"Hola\", nombre)\n\nsaludar(\"Teku\")"
+    }
   },
   "kinds": {
     "lesson": "Lección {n}",

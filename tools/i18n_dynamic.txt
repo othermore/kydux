@@ -5,8 +5,8 @@
 language.
 
 # The notebook says each member of kydux_world.api's table by `notebook.${role}.${member}`,
-# and the scene names a thing by `things.${kind}`; tools/i18n_check.py holds those
-# keys to the world itself.
+# and each of its tabs by `notebook.tab_${key}` (D256), and the scene names a thing by
+# `things.${kind}`; tools/i18n_check.py holds those keys to the world itself.
 notebook.
 things.
 
@@ -32,8 +32,8 @@ characters.
 # to the world's table.
 notebook_simple.
 
-# The notebook says Python's own words the course has taught, `len` and `def`, by
-# `notebook_python.${word}` (D60).
+# The notebook's page of Python says each word and sign the course has taught, by
+# `notebook_python.${concept}.does` and `.example` (D60, D256).
 notebook_python.
 
 # An item's number names its kind by `kinds.${kind}` (D56), a level's task by

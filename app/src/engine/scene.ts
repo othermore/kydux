@@ -1411,7 +1411,7 @@ class LevelScene extends Phaser.Scene {
    * LIFT_MS, in its flying frame, and stands facing the way it flew once its feet are on
    * its cell (touchDown), or at once where it is shown at once. The wizard coming down
    * shows no frame of the cast that set it down: from its flying frame it stands. For
-   * the wizard, air that falls is heard, whoever ordered the landing; a gust that sounds
+   * the wizard, its sound is heard (D253), whoever ordered the landing; a gust that sounds
    * falls as planned. */
   private land(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
     const flying = this.flyers.get(sprite);

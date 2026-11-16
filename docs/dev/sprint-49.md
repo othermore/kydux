@@ -120,8 +120,12 @@ commits of its own before the programmer starts:
   a whole stretch of flight; that is out (2.8). What stays for the
   programmer is small: the wind's level counted from its own plan
   and never read back from a node (2.6).
-- **The landing goes out** (D253): no swell, lower and softer
-  than the lift, twice as long (`set_down`, `engine/sfx.ts`).
+- **The landing is a thing switched off** (D253): a hum and its
+  air that fall in pitch while they are turned down evenly, twice
+  the lift's length, with a soft start (`set_down`,
+  `engine/sfx.ts`). The owner's second word on it: *tiene que ser
+  un sonido que vaya bajando de volumen y cambiando el tono para
+  que suene como un aparato que se apaga*.
 - **The thought at a locked door** stays as it is.
 - **The browser tests on GitHub** run only when started by hand
   (D179, `.github/workflows/check.yml`).
@@ -185,10 +189,11 @@ built with their entry; D179 is brought to the owner's answer.
   1.10, rest 0.50*). The level is counted from the wind's own
   plan. Rules out a bang at a start, a level read back from a
   node, and a written mix that is not the owner's.
-- **D253 — The landing goes out.** The owner's (*debería ser un
-  poco más pausado, como si se "apagase" el sonido*). Built by the
-  designer. Rules out a landing that is the lift played
-  backwards.
+- **D253 — The landing is a thing switched off.** The owner's
+  (*debería ser un poco más pausado, como si se "apagase" el
+  sonido*; *como un aparato que se apaga*). Built by the designer.
+  Rules out a landing that is the lift played backwards, and one
+  that is heard as a thump.
 - **D254 — The mark's wand is wood.** The owner's (*la varita
   tiene que ser de madera*; *me gusta la opción D*). Built by the
   designer. Rules out a wand in ink.
@@ -711,7 +716,7 @@ architecture.md as built. D248 to D251 and the counting of D252 are
 yours to build. The rest is built already, in the designer's commits
 after sprint 48: the bang taken out of a wind's start (setNow in
 engine/sound.ts, with its test in sleep.test.ts), the wind's mix as
-the owner set it by ear, the landing that goes out (D253), the
+the owner set it by ear, the landing as a thing switched off (D253), the
 browser tests on GitHub started by hand alone (D179), and the mark's
 wand of wood (D254). Read those commits before piece 3.6, and change
 nothing of them.

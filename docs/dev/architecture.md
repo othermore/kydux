@@ -337,7 +337,7 @@ tiles are `[x, y]`.
 | `found` | `world`, in the tick of `find_all` or `find_nearest` | `ids`, the hidden things found; `at`, their cells | each comes into sight from the straw and is drawn from now on; one found before the first tick is shown with it; `data-found` (D184) |
 | `untie` | wizard | `id`, `at` | the wizard bends over the broom, a long tick, and its thread is gone; `data-untied` (D183) |
 | `fly` | `broom`, in the wizard's tick of drevo, or a racer in its own | `id`, the figure; `at` | the figure rises half a cell over 0.3 s at the playback's speed, the wizard with the sound of air that rises (`lift`, D244), drawn in its flying row's level frame, and hovers slowly whenever it is seen, after Stop too (D235, D242); a lift starts no wind, each flown command being a gust (`move`, D243); every move after it is flown in a third of a walked step's time (`move`'s `flying`); `data-flying`, `data-hover`, `data-rise` (D185) |
-| `land` | `broom`, after the run's last tick, or a racer at its path's end | `id`, `at` | the figure sets down on its cell over 0.3 s, in its flying frame until its feet are there, then standing the way it flew (D241); the wizard with the sound of air that falls (`set_down`), the same where the world lands it at a program's end (D244); a gust that sounds falls as it was planned (D185, D243) |
+| `land` | `broom`, after the run's last tick, or a racer at its path's end | `id`, `at` | the figure sets down on its cell over 0.3 s, in its flying frame until its feet are there, then standing the way it flew (D241); the wizard with the sound of a thing switched off (`set_down`, D253), the same where the world lands it at a program's end (D244); a gust that sounds falls as it was planned (D185, D243) |
 | `through` | the ring, in the move of the wizard or of a racer | `id`, `at`, the cell flown from; `by`, the racer | the ring glows as the figure passes along its way; the wizard's are counted in `data-through`, in order (D187, D219, D220) |
 | `wrong_way` | the ring, in the wizard's move | `id`, `at`, `way`, the cell flown from | the ring shakes, with the bump's sound, and half a second after it the wizard thinks the way it is flown (D237), over its head or beside it (D245); the ring counts as missed (D219) |
 | `read` | wizard, before the first action of a race | `at`, `count`, `lines` | the band at the scene's foot says Ilda reading the two programs and the ticks to each take-off, the line read lit in the editor; `data-race-band` (D189) |
@@ -3706,7 +3706,7 @@ one overturns stays, marked as superseded.
   and a step walked at once as a landing that ends walking. In the set-down the figure keeps
   its flying frame until its feet are on its cell, and then stands facing the way it flew
   (D241), with no frame of the cast that set it down. For the wizard a lift sounds as air
-  that rises (`lift`) and a landing as air that goes out (`set_down`), two sounds of noise
+  that rises (`lift`) and a landing as a hum that is switched off (`set_down`), two sounds
   told apart by ear (D253, `engine/sfx.ts`), beside the spell's own sound when a spell is
   cast. The landing the world makes at a program's end (D185), with no spell cast, is
   seen and heard as the one the wizard casts (D215), and the run's card waits for it (D175).
@@ -3825,16 +3825,24 @@ one overturns stays, marked as superseded.
   written (`WIND_WRITTEN`) is the one the owner set by ear: the air at 1.1, the whistle at
   1, and the rest on at 0.5. Rules out a bang at a start, a level read back from a node, and
   a mix as written that is not the one the owner chose.
-- **D253 — The landing goes out.** Decided 2026-11-16 by the owner (*el sonido de descender
-  se parece mucho al de ascender. El de descender debería ser un poco más pausado, como si
-  se "apagase" el sonido*). The lift and the landing (D244) are told apart by ear. The lift
-  swells: it comes up over its first fifth, its band rising, and is gone in 0.6 seconds. The
-  landing (`set_down`) does not swell: it is there at once, lower and softer than the lift,
-  and fades for twice as long, 1.2 seconds, while its band sinks from under the lift's top
-  to under its bottom, as a sound that is turned down to nothing. A unit test holds what
-  tells them apart: the landing longer by half at least, softer, with no swell, and lower.
-  The numbers are a setting for the owner's ear. Rules out a landing that is the lift played
-  backwards.
+- **D253 — The landing is a thing switched off.** Decided 2026-11-16 by the owner (*el
+  sonido de descender se parece mucho al de ascender. El de descender debería ser un poco
+  más pausado, como si se "apagase" el sonido*; and, *tiene que ser un sonido que vaya
+  bajando de volumen y cambiando el tono para que suene como un aparato que se apaga*). The
+  lift and the landing (D244) are told apart by ear. The lift is air that is struck: noise
+  that comes up over its first fifth, its band rising, and is gone in 0.6 seconds. The
+  landing (`set_down`) is a hum, a triangle wave that glides down more than two octaves,
+  from 520 to 90 hertz, over 1.2 seconds, and under it the broom's air, a narrow band of
+  noise that falls with it an octave above. Both come up from nothing over 0.1 seconds and
+  are turned down to nothing on a straight line (an effect's `even`): half the loudness is
+  left at half the length, and nothing in it is struck. An effect without `even` jumps up
+  and dies away at once, as a hit does, most of it gone by a third of its length. An
+  effect's `band` makes its noise a band around its pitch, whose fall is heard, and its
+  `under` is a voice that sounds with it. A unit test holds what makes the landing: a tone
+  and its air, each falling two octaves at least, even, with a soft start, twice the lift's
+  length. The numbers are a setting for the owner's ear. Rules out a landing that is the
+  lift played backwards, a landing of low noise that dies away at once, which is heard as a
+  thump, and a landing whose pitch is not heard to fall.
 - **D254 — The mark's wand is wood.** Decided 2026-11-16 by the owner (*igual pero la varita
   de madera en vez de negra … el gorro puede ser negro también si queda mejor, pero la
   varita tiene que ser de madera*; and, of the trials shown, *me gusta la opción D*). The

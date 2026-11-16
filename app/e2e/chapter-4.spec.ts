@@ -577,7 +577,7 @@ test.describe('the lift and the landing (D244)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
-  test("El primer vuelo: the lift rises with air that rises, and the landing cast sets down with air that falls", async ({
+  test("El primer vuelo: the lift rises with air that rises, and the landing cast sets down with its own sound", async ({
     page,
   }) => {
     await open(page, 'the-first-flight', '1');

@@ -3696,14 +3696,15 @@ one overturns stays, marked as superseded.
   with it. The ticks that follow play meanwhile: a move flown at once is seen as a take-off,
   and a step walked at once as a landing that ends walking. In the set-down the figure keeps
   its flying frame until its feet are on its cell, and then stands facing the way it flew
-  (D241). For the wizard a lift sounds as air that rises (`lift`) and a landing as air that
-  falls (`set_down`), noise swept up and swept down over about 0.6 seconds
-  (`engine/sfx.ts`), beside the spell's own sound when a spell is cast. The landing the
-  world makes at a program's end (D185), with no spell cast, is seen and heard as the one
-  the wizard casts (D215), and the run's card waits for it (D175). Another figure's lift and
-  landing are seen and not heard. Shown at once, under the slider or at a restart, and under
-  reduced motion, the figure is where it ends, with no rise. Rules out a figure that changes
-  its height in one frame, and a landing that differs by who ordered it.
+  (D241), with no frame of the cast that set it down. For the wizard a lift sounds as air
+  that rises (`lift`) and a landing as air that falls (`set_down`), noise swept up and swept
+  down over about 0.6 seconds (`engine/sfx.ts`), beside the spell's own sound when a spell
+  is cast. The landing the world makes at a program's end (D185), with no spell cast, is
+  seen and heard as the one the wizard casts (D215), and the run's card waits for it (D175).
+  Another figure's lift and landing are seen and not heard. Shown at once, under the slider
+  or at a restart, and under reduced motion, the figure is where it ends, with no rise.
+  Rules out a figure that changes its height in one frame, and a landing that differs by who
+  ordered it.
 - **D245 — A thought with no room above goes beside the head.** Decided 2026-11-15 by the
   owner (*La burbuja de pensamiento cuando está abajo no queda bien, porque queda muy lejos
   del personaje (y debería aparecer como desde su cabeza). Lo que se puede hacer es ponerla

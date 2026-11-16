@@ -1409,14 +1409,18 @@ class LevelScene extends Phaser.Scene {
 
   /** A figure set down where it is (D185, D244): it comes down from where it is over
    * LIFT_MS, in its flying frame, and stands facing the way it flew once its feet are on
-   * its cell (touchDown), or at once where it is shown at once. For the wizard, air that
-   * falls is heard, whoever ordered the landing; a gust that sounds falls as planned. */
+   * its cell (touchDown), or at once where it is shown at once. The wizard coming down
+   * shows no frame of the cast that set it down: from its flying frame it stands. For
+   * the wizard, air that falls is heard, whoever ordered the landing; a gust that sounds
+   * falls as planned. */
   private land(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
     const flying = this.flyers.get(sprite);
     if (!flying) return;
     if (instant || this.still) this.touchDown(sprite);
-    else if (flying.to === 1) this.riseTo(flying, 0, false);
-    else return;
+    else if (flying.to === 1) {
+      this.riseTo(flying, 0, false);
+      if (sprite === this.wizard) this.dropPartFrames();
+    } else return;
     if (sprite === this.wizard && !instant) this.playSound('set_down');
   }
 
@@ -1998,7 +2002,12 @@ class LevelScene extends Phaser.Scene {
     const down = this.settingDown();
     let party = 0;
     if (won && down > 0) {
-      this.time.delayedCall(down, () => this.celebrate());
+      const run = this.restarts;
+      this.time.delayedCall(down, () => {
+        if (run !== this.restarts) return;
+        this.touchDown(this.wizard);
+        this.celebrate();
+      });
       party = down + this.playback.tickDuration * 2;
     } else if (won) party = this.celebrate();
     return Math.max(party, down, this.speech.settle(), verdict);
@@ -2082,6 +2091,13 @@ class LevelScene extends Phaser.Scene {
     this.nightFall?.remove(false);
     this.nightFall = null;
     this.light.set(this.options.story?.light ?? 'none');
+  }
+
+  /** The frames still to come of the part the wizard plays, dropped; the part's end is
+   * kept, and with it data-casting and data-acting for the part's length. */
+  private dropPartFrames(): void {
+    for (const timer of this.casting.slice(0, -1)) timer.remove(false);
+    this.casting = this.casting.slice(-1);
   }
 
   /** A cast's frames stopped where they are, their timers dropped. */

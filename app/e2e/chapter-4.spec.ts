@@ -594,6 +594,28 @@ test.describe('the lift and the landing (D244)', () => {
     await expect(scene(page)).toHaveAttribute('data-sounds', /set_down/);
   });
 
+  test('El primer vuelo: set down by its cast, the wizard stands from its flying frame, with no frame of the cast', async ({
+    page,
+  }) => {
+    await open(page, 'the-first-flight', '1');
+    await page.evaluate(() => {
+      const node = document.querySelector('#scene') as HTMLElement;
+      const seen: string[] = [];
+      (window as unknown as { frames: string[] }).frames = seen;
+      new MutationObserver(() => seen.push(node.dataset.wizardFrame ?? '')).observe(node, {
+        attributes: true,
+        attributeFilter: ['data-wizard-frame'],
+      });
+    });
+    expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
+    const frames = await page.evaluate(() => (window as unknown as { frames: string[] }).frames);
+    // After the flying frame, 48: standing facing right, 7, and the celebration's row,
+    // 36 to 38; never the cast's row facing right, 18 to 20.
+    const landed = frames.slice(frames.lastIndexOf('48') + 1);
+    expect(landed[0]).toBe('7');
+    expect(landed.filter((frame) => !['7', '36', '37', '38'].includes(frame))).toEqual([]);
+  });
+
   test("La carrera: the landing the world makes at the program's end sets down and sounds, and Zarek's does not", async ({
     page,
   }) => {

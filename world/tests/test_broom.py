@@ -1288,6 +1288,13 @@ def test_the_finish_lands_the_wizard_on_its_finish_and_zarek_in_his_lane_the_cla
     assert all(stand[who][0] > race.finish.x for who in ("ilda", "friend", "mate"))
     # No ring is shown.
     assert not any(thing.get("kind") == "ring" for thing in data.get("things", []))
+    # The step that names Rinlo at the edge of the field frames the far end: Rinlo by the
+    # gate and everyone the step moves, inside the box.
+    aside = data["steps"][4]
+    (left, top), (right, bottom) = aside["camera"]["fit"]
+    seen = [stand["rinlo"]] + [cell for do in aside["do"] for cell in do.get("walk", [])]
+    assert len(seen) > 3
+    assert all(left <= x <= right and top <= y <= bottom for x, y in seen)
 
 
 def test_in_the_rings_a_loop_round_the_pair_flies_into_the_trees():

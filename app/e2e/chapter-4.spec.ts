@@ -667,7 +667,11 @@ test.describe('the stories', () => {
         if (id === 'the-flying-lesson' && step >= 3) {
           await expect(page.locator('#scene')).toHaveAttribute('data-story-part', '1');
         }
-        if (id === 'the-finish') await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', 'wide');
+        // From the step that names Rinlo by the gate, the far end is framed nearer: the
+        // class beyond the finish and the gate with Rinlo beside it.
+        if (id === 'the-finish') {
+          await expect(page.locator('#scene')).toHaveAttribute('data-camera-fit', step >= 5 ? '30,5,40,12' : 'wide');
+        }
       }
       await expect(page.locator('#story-go-on')).toBeVisible();
     });

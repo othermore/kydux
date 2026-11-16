@@ -115,6 +115,18 @@
     {
       "who": "voice",
       "by": "wizard",
+      "camera": {
+        "fit": [
+          [
+            30,
+            5
+          ],
+          [
+            40,
+            12
+          ]
+        ]
+      },
       "do": [
         {
           "by": "wizard",

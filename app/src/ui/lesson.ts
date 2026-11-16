@@ -131,7 +131,10 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
         forward,
       ]),
     );
-    forward.focus();
+    // A page is read from its top: its button takes the focus without bringing the
+    // window down to it, on a page taller than the window.
+    forward.focus({ preventScroll: true });
+    document.documentElement.scrollTop = 0;
   };
 
   return {

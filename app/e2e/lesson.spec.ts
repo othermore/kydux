@@ -110,6 +110,26 @@ for (const [lesson, level] of [
   });
 }
 
+test.describe('a page taller than the window', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('is read from its top, its button holding the focus below', async ({ page }) => {
+    await page.goto('/#lesson/if');
+    await page.locator('#lesson-next').click();
+    await page.locator('#lesson-next').click();
+    await expect(page.locator('#lesson-page')).toHaveText('Page 3 of 3');
+    // The page does not fit: its title is in the window, and its button under it.
+    expect(await page.evaluate(() => document.documentElement.scrollHeight > innerHeight)).toBe(true);
+    expect(await page.evaluate(() => scrollY)).toBe(0);
+    await expect(page.locator('.lesson-page h2')).toBeInViewport();
+    await expect(page.locator('#lesson-try')).toBeFocused();
+    await expect(page.locator('#lesson-try')).not.toBeInViewport();
+    // And the page before it, come back to, starts at its top as well.
+    await page.locator('#lesson-back').click();
+    expect(await page.evaluate(() => scrollY)).toBe(0);
+  });
+});
+
 test('a lesson read shows as done on the map, and opens its level', async ({ page }) => {
   await page.goto('/#lesson/what-a-program-is');
   for (let turn = 0; turn < 2; turn += 1) await page.locator('#lesson-next').click();

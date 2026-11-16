@@ -110,8 +110,22 @@ And of the game's mark:
 Of the trials shown: *me gusta la opción D de los logos*, the hat
 in ink.
 
-What follows from the answer, all of it done by the designer in
-commits of its own before the programmer starts:
+And of the landing as the designer built it from this answer, a
+hum that falls, heard with the programmer already building:
+
+> no está mal del todo pero es demasiado llamativo creo. Estaría
+> bien si en los últimos segundos del vuelo antes de aterrizar se
+> subiese un poco el sonido rest progresivamente, y luego fuese ese
+> sonido el que se apagase cambiando a un tono más bajo y bajando el
+> volumen progresivamente. Así quizás conseguimos mejor el efecto.
+
+Of three trials of that, on a page that played whole flights with
+the game's own wind: *veo bien la opción C. Si más adelante quiero
+le damos otra vuelta.*
+
+What follows from the answer, all of it but the landing's last
+word done by the designer in commits of its own before the
+programmer starts:
 
 - **The wind stays a gust for each flown command**, as it is built
   and as the owner now hears it. Its mix as written is the
@@ -120,12 +134,15 @@ commits of its own before the programmer starts:
   a whole stretch of flight; that is out (2.8). What stays for the
   programmer is small: the wind's level counted from its own plan
   and never read back from a node (2.6).
-- **The landing is a thing switched off** (D253): a hum and its
-  air that fall in pitch while they are turned down evenly, twice
-  the lift's length, with a soft start (`set_down`,
-  `engine/sfx.ts`). The owner's second word on it: *tiene que ser
-  un sonido que vaya bajando de volumen y cambiando el tono para
-  que suene como un aparato que se apaga*.
+- **The landing is a thing switched off** (D253). The owner's
+  second word on it: *tiene que ser un sonido que vaya bajando de
+  volumen y cambiando el tono para que suene como un aparato que
+  se apaga*. The designer built it as a sound of its own, a hum
+  and its air that fall (`set_down`, `engine/sfx.ts`). The owner
+  heard that one as too striking and asked for the wind itself:
+  its rest rises as the landing nears and is then switched off
+  (D255). That is the programmer's, piece 3.8, added while the
+  sprint is built (2.9).
 - **The thought at a locked door** stays as it is.
 - **The browser tests on GitHub** run only when started by hand
   (D179, `.github/workflows/check.yml`).
@@ -147,6 +164,9 @@ What this sprint holds:
 6. The wind's level is counted from its own plan and never read
    back from a node; by ear the wind is the one the owner has
    approved (D252).
+7. The landing is the wind switched off: the rest rises over the
+   flight's last second and a half, and at the landing it sinks
+   in pitch and in loudness to nothing (D255).
 
 The rules of the earlier sprints hold: pieces in order, one local
 commit each, `ci/check.sh` and the browser specs a piece touches green
@@ -197,6 +217,13 @@ built with their entry; D179 is brought to the owner's answer.
 - **D254 — The mark's wand is wood.** The owner's (*la varita
   tiene que ser de madera*; *me gusta la opción D*). Built by the
   designer. Rules out a wand in ink.
+- **D255 — The landing is the wind itself, which rises as the
+  ground nears and is then switched off.** The owner's (*que se
+  subiese un poco el sonido rest progresivamente, y luego fuese
+  ese sonido el que se apagase*; *veo bien la opción C*). Added
+  while the sprint is built; the programmer's (2.9, 3.8). Rules
+  out a sound of the landing's own laid over the wind, and a
+  landing cut short by the run's end.
 
 ## 2. What is asked
 
@@ -577,10 +604,18 @@ everywhere, and a test can hold it.
 8. *Los aros*' own program, run: the wind as the owner knows it,
    and the rest under it while the wizard hovers.
 
-Two more are the designer's and are there to be tried before the
-sprint is built: the landing, on the debug page's two buttons and
-at the end of *El primer vuelo*; and the mark, in the header and
-on the browser's tab.
+**The landing**:
+
+9. *El primer vuelo*'s own program, run: from the lift on the air
+   under the gust grows, and when the wizard sets down it sinks
+   and goes out in a second and a half, with no hum. *Los aros*'
+   own program: the air grows over the last second and a half
+   of the flight, and goes out after the wizard has landed, with
+   the run already ended. `?debug#music`: the landing's button
+   and the whole flight's sound the same.
+
+One more is the designer's and is there to be tried before the
+sprint is built: the mark, in the header and on the browser's tab.
 
 ### 2.8 What is left out, and why
 
@@ -610,10 +645,153 @@ on the browser's tab.
 - **The browser tests on GitHub**: started by hand alone (D179),
   in the designer's commit. Nothing under `.github/` is the
   programmer's.
+- **Another sound for the spell at a landing.** Where a spell
+  lands the wizard, the spell's own sound is heard over the
+  landing's first third of a second, as it is over the lift's.
+  The owner, told of it, chose the landing as it is.
+- **A landing for Zarek**: another figure's landing is seen and
+  not heard (D244).
+
+### 2.9 The landing is the wind switched off (D255)
+
+Added on 2026-11-16, while the sprint is built. The owner chose it
+by ear among three trials played with the game's own wind; what is
+asked is that trial, with its numbers.
+
+**What is heard.**
+
+- **The approach.** Over the last `LAND_NEAR`, 1.5 seconds, before
+  the wizard's landing, or from the lift where the flight is
+  shorter, the rest's level rises on a straight line from the
+  level it has to `LAND_LEVEL`, 0.11, and is there at the landing.
+  The gusts sound over it as they are planned.
+- **The switch-off.** At the landing, over `LAND_FALL`, 1.5
+  seconds: the rest's band glides down from its 300 hertz to
+  `LAND_HERTZ`, 90 (an exponential ramp); the band's Q goes on a
+  straight line from the rest's 1.1 to `LAND_Q`, 5, over the first
+  half of the fall, so that the falling pitch is heard; and the
+  rest's level falls on a straight line to nothing. After it the
+  band and its Q are the rest's again.
+- **No effect** sounds at a landing: `set_down` goes from the
+  effects. A spell's own sound at a landing that is cast is as it
+  is.
+- **A landing with no approach behind it**, the program played on
+  from a pause a tick before: where the level counted is under
+  `LAND_LEVEL`, it comes up to it over 0.1 seconds and then falls.
+- The levels are the rest's own level's, heard through the rest's
+  mix, 0.5 as written. With the rest's voice off on the debug page
+  there is no landing to hear.
+
+Measured by the designer with the mix as written, at the speakers:
+the landing tops at an rms of 0.006 to 0.009, where the hum topped
+at 0.012 to 0.017 and a gust tops at 0.005 to 0.01.
+
+**The playback**, `engine/playback.ts`. It holds the run's ticks,
+and says how long it is, at the speed now, from the start of the
+tick that plays to the start of the first tick ahead that holds an
+event the caller asks for; nothing where no tick ahead holds one.
+The count is a pure function, exported, with a test: the lengths
+of the ticks between (`lengthOf`, with the pace) by the tick's
+length.
+
+**The scene**, `engine/scene.ts`.
+
+- At each tick shown while the program plays, never at once, with
+  its events shown and the wizard in the air: the time to the
+  wizard's next `land`, whoever orders it. Where it is `LAND_NEAR`
+  or less, `wind.near(seconds)`. It is asked again at every such
+  tick: the wind draws the line again from the level it counts,
+  and so a change of speed is followed. A flight whose landing is
+  further than that, or that ends in the air, has no approach.
+- At the wizard's `land`, not at once: `wind.land()` where the
+  effect is played now. `set_down` is still said among
+  `data-sounds`, as `wind` is for a gust, muted or not.
+- When the playback leaves `playing` (Stop, a pause, the run's
+  end): `wind.stop` as now. It ends a gust and an approach. A
+  landing that has begun is heard to its end, as the set-down is
+  seen to its end: the world's landing at a program's end sounds
+  whole with the run done. A restart, for a new run or under the
+  slider, cuts all of it in `WIND_CUT`, the landing too.
+- `data-landing` on the scene: `near` while an approach is
+  planned, `down` while a landing falls, absent at any other time;
+  from the wind's own count on the page's clock, muted or not, as
+  `data-wind` is.
+
+**The wind**, `engine/sound.ts`, on what piece 3.6 leaves.
+
+- `WindGraph` holds the rest's band, `restBand`.
+- `near(seconds)`: the sound made where it is not, as the rest
+  asks it; the rest's level from the value counted, on a straight
+  line, to `LAND_LEVEL` at `max(0.05, seconds)` from now.
+- `land()`: the switch-off as told above, from the level counted.
+  The rest is asked for no more.
+- While an approach is planned, `gust`, `drop`, `rest(true)` and
+  `remix` leave the rest's level as it is planned. `rest(false)`
+  and `stop` end the approach: the level falls as the rest's does.
+- While a landing falls, `gust`, `drop`, `rest(false)`, `stop` and
+  `remix` leave the rest's level, its band and its Q as they are
+  planned. `rest(true)` and `near`, a lift right after a landing,
+  end it: the band and its Q are the rest's at once, and the level
+  is taken on from the value counted. The restart's cut ends it
+  too, in the seconds given: a second call or a flag of `stop`,
+  the smaller.
+- Nothing is read back (D252). The rest's level is counted from
+  what was last given to the clock, a curve or a line. The band
+  and its Q start a landing from the rest's own values, which the
+  wind knows, and are set to them at once where a landing is
+  ended.
+- `landing`: `near`, `down` or none, counted on the page's clock
+  where no sound is made too, as `blowing` is. `blowing` is of the
+  gusts alone, as it is.
+- The sound is kept, and the context awake (D231), while an
+  approach or a landing sounds.
+
+**The effects**, `engine/sfx.ts`. `set_down` goes, and with it
+what was made for it alone: `Effect`'s `even`, `band` and `under`,
+and what `lasts`, `pitched` and `sound` do with them. Their tests
+go; the test that holds the lift as struck air stays.
+
+**The debug page**, `ui/themes.ts`. The `landing` sample is the
+rest asked for, an approach of `LAND_NEAR` and the landing; the
+`flight` sample has its approach over its last 1.5 seconds and its
+landing from the wind. No sample is added.
+
+**Tests.**
+
+- Vitest, the playback: the time to an event ahead through flown
+  ticks and a cast's tick, at another speed, and with none ahead.
+- Vitest, `sleep.test.ts`, the stand-in that reads 99: `near` in
+  silence draws 0 to `LAND_LEVEL`; `near` in a hover starts from
+  the value the rest's curve has; a gust in an approach leaves the
+  rest's level's plan; a second `near`, the clock moved, starts
+  from the line's value at that moment; `land` gives the level to
+  0 and the band to 90 hertz at 1.5 seconds, the Q to 5 at 0.75,
+  and the band and Q back after; `land` with no approach goes up
+  to `LAND_LEVEL` at 0.1 seconds first; `rest(false)` and `stop`
+  in a landing leave it, and the cut ends it; `rest(true)` in a
+  landing puts the band back; `landing` says `near`, `down` and
+  none at the right moments, with no sound made too; no call
+  carries 99.
+- Browser, `chapter-4.spec.ts`: *El primer vuelo*'s own program
+  has `data-landing` at `near` from the lift's tick, at `down` at
+  the landing and absent after it, and `set_down` once among
+  `data-sounds`; *Los aros*' own program has no `near` at its
+  first gusts, and `down` with `data-state` at `done`; Stop in an
+  approach takes `data-landing` away at once with the wizard in
+  the air; the slider on a tick of a flight gives none; with the
+  sound off in the settings the attributes are the same.
+- Browser, `music.spec.ts`: the six samples, as they are.
+
+**The documents.** D255, D253, D244, D243 and the `land` event's
+row are entered in `architecture.md` with this section. The
+programmer's: the headers of `sound.ts` and `sfx.ts`, the comment
+of the scene's `land`, the comments of `themes.ts`, and
+`docs/dev/plan.md`, which names D255 with chapter 4's wind.
 
 ## 3. The pieces
 
-One local commit each, in this order.
+One local commit each, in this order; 3.8, added while the sprint
+is built, comes after 3.6 and before 3.7.
 
 ### 3.1 The start card at every opening (D248, 2.1)
 
@@ -668,8 +846,19 @@ committed:
   on it: each gust starts where the one before was; the tip
   picture's widths before and after; what was built piece by
   piece; every choice the plan left and how it was taken; Gemini's
-  drafts and what was corrected in each; and the owner's eight
+  drafts and what was corrected in each; and the owner's nine
   steps of 2.7, written to be followed.
+
+### 3.8 The landing is the wind switched off (D255, 2.9)
+
+After 3.6, before 3.7. The playback's time to an event ahead, the
+wind's `near`, `land` and `landing`, the scene's calls and
+`data-landing`, `set_down` gone from the effects, the debug page's
+two samples, the tests. To the report of 3.7 it adds a drawing of
+the rest's level and of its band's pitch in time, counted from the
+wind's own plan, through *El primer vuelo*'s flight and through a
+flight with a wait in the air, with the lift, the approach's start
+and the landing marked on it.
 
 ## 4. Gemini
 
@@ -777,4 +966,64 @@ chapters 3 and 4 made again, and the report in Spanish as 3.7 asks,
 with the owner's eight steps of 2.7. Write your memory note
 kydux-sprint-49-state, and end with the prompt for the designer's
 review in English, in a code block.
+```
+
+### 5.1 The addendum, given while the sprint is built
+
+```
+An addition to sprint 49 from the designer, through the owner. Read
+it when the command you are running ends; finish and commit the piece
+you are on first.
+
+The owner has heard the landing the designer built (commit 8927147,
+the hum of set_down) and finds it too striking. They asked for the
+wind itself instead, and chose it by ear among three trials: the
+wind's rest rises over the flight's last second and a half, and at
+the landing that same air is switched off, sinking in pitch and in
+loudness to nothing. This is D255, and it is yours to build: piece
+3.8 of docs/dev/sprint-49.md, told whole in its section 2.9. Read
+again in that plan: the owner's words near its start, D255 in
+section 1, step 9 of 2.7, the two new lines of 2.8, section 2.9 and
+piece 3.8; and in docs/dev/architecture.md D255, D253, D244, D243
+and the land event's row, which are entered as built.
+
+Those changes of the designer's are in the tree and not committed:
+docs/dev/sprint-49.md whole, and in docs/dev/architecture.md the
+hunks of D243, D244, D253, D255 and the land event's row. The
+designer does not commit while you hold a provisional commit. Once
+your provisional commit has its final form, and before your next
+piece's commit, commit them alone, with no hunk of yours among them:
+git add -p for architecture.md, the forbidden-words check, then
+git commit -F /tmp/k49/d255/msg.txt (read the message first). Until
+then keep them out of your own commits.
+
+What this changes in what you were told:
+- Build 3.8 after 3.6 and before 3.7: it stands on the level counted
+  from the wind's own plan. One local commit, ci/check.sh and the
+  browser specs it touches green before it. If 3.6 is not committed
+  yet, finish it as planned first.
+- "Change nothing of the designer's commits" no longer holds for the
+  landing: set_down goes from engine/sfx.ts with Effect's even, band
+  and under and their tests, and the scene's land() calls the wind.
+  The bang's fix, the wind's mix and the mark stay untouched.
+- "Add no sample to the debug page" holds: the landing and the flight
+  samples play the landing from the wind; none is added.
+- The gusts' plans, numbers and mix stay the owner's. The landing's
+  numbers are the owner's too, as 2.9 gives them: LAND_NEAR 1.5 s,
+  LAND_LEVEL 0.11, LAND_FALL 1.5 s, LAND_HERTZ 90, LAND_Q 5 over the
+  fall's first half. Change none.
+- The report's steps for the owner are nine, with step 9 of 2.7, and
+  it carries the drawing piece 3.8 asks for. plan.md names D255.
+
+What the owner will look for: the air growing under the gusts as the
+landing nears, from the lift on in El primer vuelo; no hum and no
+thump at the landing, only that air going down and out in a second
+and a half; the same where the world lands the wizard at a program's
+end, heard whole after the run is done; silence at once at Stop in
+the air.
+
+The designer's trial is at /tmp/k49/land2/page.js (near and
+switchOff, variant C), scratch outside the tree: it shows the ramps
+that the owner heard, and it reads values back from the nodes, which
+your build never does. Take the ramps from it, nothing else.
 ```

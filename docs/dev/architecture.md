@@ -3664,29 +3664,35 @@ one overturns stays, marked as superseded.
   figure shown at another tick by the slider goes on from where the rise and fall is, with
   no jump. The wind stops with the program (D236). Under reduced motion there is no hover.
   Rules out a flight frozen in the air.
-- **D243 — The broom's wind is wind: noise that rises, changes and falls (D252 says when).**
-  Decided 2026-11-15 by the owner (*suena como un sonido agudo como de un aspirador que
-  estuviese muy bajito o muy lejos … No puede ser un sonido continuo, sino que debe ser un
-  sonido variable, como el sonido del viento … que tenga algún tipo de principio y final y
-  evolución a lo largo del sonido … Cuando está parado debe sonar muy muy bajo el viento, o
-  ni siquiera sonar, y en movimiento el viento debe sonar como "más a rachas", no
-  continuo*). No sound of one level lasts the flight long, and a wizard in the air that
-  does not move makes no gust. The wind (`Wind`, `engine/sound.ts`) is noise through a
-  band. Its level wanders between targets drawn at random, and the band's pitch follows the
-  level, higher as it is louder, as wind does; a faint narrow high band, the whistle, comes
-  with the level's peaks. How strong a wind blows and how it wanders are drawn at random,
-  so that no two flights sound alike. When it rises, when it changes and when it falls
-  follow the flown commands (D252). A bump ends it at once; Stop, a pause and the run's end
-  fade it in 0.15 seconds (D236). The wind's voices have a mix (`windMix`): `air`, the
-  wind itself; `whistle`; and `rest`, a very faint air while the wizard hovers with the
-  program playing, which falls under the wind and comes back when the wind has fallen or is
-  ended by a bump. Under `?debug`, `#music` plays a one-cell move, a long move, a zigzag, a
-  straight flight in four commands, a lift, a landing and a whole flight, which hovers a
-  while before its last move so that the rest is heard, with a box and a slider for each
-  voice and a line that says the mix, as the themes' mixer does (D203). The scene says
-  whether the wind sounds and how many flown commands the run has had (`data-wind`,
-  `data-wind-gusts`), muted or not. Rules out a sound of one level that lasts while the
-  broom is in the air, a steady tone, and two flights alike.
+- **D243 — The broom's wind is a gust for each flown command.** Decided 2026-11-15 by the
+  owner (*suena como un sonido agudo como de un aspirador que estuviese muy bajito o muy
+  lejos … No puede ser un sonido continuo, sino que debe ser un sonido variable, como el
+  sonido del viento … cada comando move mientras estás en la escoba debería generar un
+  sonido mientras dura el movimiento, que tenga algún tipo de principio y final y evolución
+  a lo largo del sonido … Cuando está parado debe sonar muy muy bajo el viento, o ni
+  siquiera sonar, y en movimiento el viento debe sonar como "más a rachas", no continuo*).
+  No loud sound lasts the flight long. Each `move_*` command flown sounds as one gust
+  (`Wind.gust`, `engine/sound.ts`): noise through a band, which rises from nothing as the
+  command starts (D252), changes all through it and falls after its last cell. Its level
+  wanders between targets drawn at random, a new one every eighth to a third of a second,
+  and the band's pitch follows the level, higher as it is louder, as wind does; a faint
+  narrow high band, the whistle, comes with the level's peaks. How high a gust peaks, where
+  in the command, and how it wanders are drawn at random for each, so that no two are alike.
+  A gust's length is its command's: the world says in every flown `move` which step of its
+  command it is, and of how many (`step`, `steps`), and the page counts the cells still to
+  fly at the tick's length. A one-cell command is a short puff. A command that starts while
+  a gust still sounds takes that gust on, raised to a peak of its own, and no second gust is
+  laid over it: a zigzag of short moves is heard as one wind that changes. A bump ends the
+  gust at once; Stop, a pause and the run's end fade it in 0.15 seconds (D236). The wind's
+  voices have a mix (`windMix`): `air`, the gust; `whistle`; and `rest`, a very faint air
+  while the wizard hovers with the program playing, which falls under a gust and comes back
+  when the gust has fallen or is ended by a bump. The mix as it is written is the owner's,
+  set by ear (D252). Under `?debug`, `#music` plays a one-cell move, a long move, a zigzag,
+  a lift, a landing and a whole flight, which hovers a while before its last move so that
+  the rest is heard, with a box and a slider for each voice and a line that says the mix, as
+  the themes' mixer does (D203). The scene says whether a gust sounds and how many the run
+  has had (`data-wind`, `data-wind-gusts`), muted or not. Rules out a loud sound that lasts
+  while the broom is in the air, a steady tone, a gust for every cell, and two gusts alike.
 - **D244 — A lift and a landing are seen and heard, whoever orders them.** Decided
   2026-11-15 by the owner (*quizás el hechizo de montar y desmontar pueden ser otros dos
   sonidos que sean como de ascender y descender*; *En la carrera, si no hay un "drevo" al
@@ -3803,24 +3809,16 @@ one overturns stays, marked as superseded.
   the castle of Arvelia, and the letter that came with that very drawing; the journey and
   the gate are told on the scene. Rules out a painting seen only while something loads,
   and a timer that holds it.
-- **D252 — One wind for a stretch of flight: it rises once, changes at the turns, and
-  falls at the end.** Decided 2026-11-16 by the owner (*hay un sonido fuerte en los sonidos
-  (tanto de un paso como de varios) justo al principio, que suena casi como el disparo de
-  una escopeta. Ese hay que quitarlo o suavizarlo mucho … aunque está bien que haya un
-  primer sonido de despegar claro. El añadir "rest" mejora algo el sonido … Me gustan los
-  cambios aleatorios, la clave es que coincidan un poco con el principio y el final de los
-  movimientos (cambios de dirección), pero no siempre tiene que haber un "golpe de viento"
-  por paso volado*). The flown commands that follow one another are one wind (D243). It
-  rises, from nothing and in no less than 0.18 seconds, at the first flown command after a
-  silence; the clear sound of a start is the lift's own (D244). A command flown the same
-  way as the one before carries the wind on, with no change at the join. A command that
-  turns draws a new level, reached in 0.15 to 0.25 seconds, so that a change of the wind
-  comes with a change of the flight; not more often than every 0.35 seconds, so that a
-  zigzag of short moves is a wind that changes now and then and not a puff for each step.
-  Between the turns the level wanders slowly, a new target every 0.35 to 0.7 seconds.
-  After the last cell of a command the wind holds for 0.12 seconds, for the next command
-  to take it on, and then falls in 0.5 to 0.8 seconds. The wind's level at any moment is
-  counted from its own plan (`levelAt`) and nothing reads it back from the sound's nodes,
-  where a value only scheduled reads as another: a wind that starts, starts from nothing.
-  The rest (D243) is on in the mix as it is written. Rules out a bang at a start, a new
-  rise for every flown command, and a level read back from a node.
+- **D252 — A wind starts from nothing, and its mix is the owner's.** Decided 2026-11-16 by
+  the owner (*hay un sonido fuerte en los sonidos (tanto de un paso como de varios) justo al
+  principio, que suena casi como el disparo de una escopeta. Ese hay que quitarlo o
+  suavizarlo mucho … El añadir "rest" mejora algo el sonido*; and, the bang gone and the mix
+  set by ear, *El vuelo suena bien así: El viento de la escoba: air 1.10, rest 0.50*). A
+  gust (D243) that starts in silence starts from a level of nothing and rises; the clear
+  sound of a start is the lift's own (D244). The wind's level at any moment is counted from
+  its own plan, the points it last gave to the clock (`levelAt`), and nothing reads it back
+  from the sound's nodes, where a value only scheduled reads as another: a gust that the
+  next command takes on goes on from the level counted, in every browser. The mix as it is
+  written (`WIND_WRITTEN`) is the one the owner set by ear: the air at 1.1, the whistle at
+  1, and the rest on at 0.5. Rules out a bang at a start, a level read back from a node, and
+  a mix as written that is not the one the owner chose.

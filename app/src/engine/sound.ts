@@ -8,9 +8,9 @@
 // One loop of noise feeds three voices, each through its mix (windMix, set by the page
 // of themes under ?debug, D203): the air, a band whose pitch follows the gust's level,
 // higher as it is louder; the whistle, a narrow high band heard at the gust's peaks
-// alone; and the rest, a very faint air while the wizard hovers and no gust sounds, off
-// unless its mix is on. The settings' switch silences it with the effects. While it
-// sounds it keeps the sound context awake (D231).
+// alone; and the rest, a very faint air while the wizard hovers and no gust sounds. The
+// mix as it is written is the owner's, set by ear. The settings' switch silences the
+// wind with the effects. While it sounds it keeps the sound context awake (D231).
 //
 //   noise (2 s, looped) ─┬→ bandpass (Q 1.1) → lowpass → gust ──────→ air ─────┐
 //                        ├→ bandpass (Q 12) → whistle level ────────→ whistle ─┼→ out → speakers
@@ -79,13 +79,13 @@ export function gustPlan(seconds: number, random: () => number = Math.random): G
 }
 
 /** The wind's three voices, as the page of themes sets them: whether each sounds and its
- * volume, 1 its own (D243). Never kept: the air and the whistle on and at 1, the rest
- * off, when the page loads. */
+ * volume, 1 its own (D243). As written they are the owner's mix, set by ear: the air at
+ * 1.1, the whistle at 1, the rest at 0.5. A mix set on the page is never kept. */
 export type WindVoice = 'air' | 'whistle' | 'rest';
 export const WIND_WRITTEN: Readonly<Record<WindVoice, { on: boolean; volume: number }>> = {
-  air: { on: true, volume: 1 },
+  air: { on: true, volume: 1.1 },
   whistle: { on: true, volume: 1 },
-  rest: { on: false, volume: 1 },
+  rest: { on: true, volume: 0.5 },
 };
 export const windMix: Record<WindVoice, { on: boolean; volume: number }> = {
   air: { ...WIND_WRITTEN.air },

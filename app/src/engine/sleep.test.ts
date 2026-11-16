@@ -311,12 +311,16 @@ describe("the broom's wind, a gust for each flown command (D243)", () => {
     expect(wind.graph).toBeNull();
   });
 
-  it('sets a voice turned off or on at once in the mix: the rest off as written', async () => {
+  it("sets a voice turned off or on at once in the mix, from the owner's mix as written", async () => {
     const { sound, graph, param } = await blowing();
-    expect(param(graph.rest).value).toBe(0);
+    expect(param(graph.air).value).toBe(1.1);
+    expect(param(graph.whistle).value).toBe(1);
+    expect(param(graph.rest).value).toBe(0.5);
     sound.mixWind('whistle', false, 1);
     expect(param(graph.whistle).value).toBe(0);
-    expect(param(graph.air).value).toBe(1);
+    expect(param(graph.air).value).toBe(1.1);
+    sound.mixWind('rest', false, 0.5);
+    expect(param(graph.rest).value).toBe(0);
     sound.mixWind('rest', true, 1);
     expect(param(graph.rest).value).toBe(1);
   });

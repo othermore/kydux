@@ -10,7 +10,7 @@
 // air, the whistle and the rest, each have a box and a slider from 0 to 3, with a line
 // that says the mix, to be told to who sets its numbers. The whole flight hovers a while
 // between two of its moves, where the rest is heard when its box is on. The mix is never
-// kept: each voice is as written when the page loads, the rest off.
+// kept: each voice is as written when the page loads.
 
 import { type Heard, music, type Theme, themeNamed } from '../engine/music';
 import { play as playEffect } from '../engine/sfx';

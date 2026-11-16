@@ -204,6 +204,10 @@ export interface SceneHandle {
    * wizard, every figure, every thing of the level in sight and the end's mark, which
    * the goals box may not cover (D227). */
   levelBoxes(): { left: number; top: number; right: number; bottom: number }[];
+  /** Who says what of the page lies over the scene, the goals box, as a box in the
+   * page's pixels, asked whenever words are put over someone, which never go under it
+   * (D240). */
+  onCover(covered: () => { left: number; top: number; right: number; bottom: number } | null): void;
   /** Who is told when the map is opened, with the scene's plan at that tick, the run
    * paused until `playback.play()`, and when a run started again closes it (D134). */
   onMap(opened: (view: PlanView) => void, closed: () => void): void;
@@ -302,6 +306,8 @@ class LevelScene extends Phaser.Scene {
   /** Who is told when the map opens, and when a run started again closes it (D134). */
   private mapOpened: ((view: PlanView) => void) | null = null;
   private mapClosed: (() => void) | null = null;
+  /** Who says what of the page lies over the scene, in the page's pixels (D240). */
+  covered: (() => { left: number; top: number; right: number; bottom: number } | null) | null = null;
   /** The words said, in bubbles and thoughts (speech.ts), and the camera (camera.ts). */
   private speech!: Speech;
   private view!: SceneCamera;
@@ -722,6 +728,7 @@ class LevelScene extends Phaser.Scene {
       tickMs: this.tickMs,
       shown: () => this.view.shown(),
       shownSides: () => this.view.shownSides(),
+      cover: () => this.coverOnScene(),
     });
     const story = this.options.story;
     this.view = new SceneCamera(this, this.parentNode, {
@@ -1085,6 +1092,19 @@ class LevelScene extends Phaser.Scene {
     const left = canvas.left + (box.left - camera.worldView.x) * scale;
     const top = canvas.top + (box.top - camera.worldView.y) * scale;
     return { left, top, right: left + box.width * scale, bottom: top + box.height * scale };
+  }
+
+  /** What of the page lies over the scene, as a box in the scene's world (D240); null
+   * where nothing does. */
+  private coverOnScene(): { left: number; top: number; right: number; bottom: number } | null {
+    const box = this.covered?.();
+    if (!box) return null;
+    const camera = this.cameras.main;
+    const canvas = this.game.canvas.getBoundingClientRect();
+    const scale = (camera.zoom * canvas.width) / this.game.canvas.width;
+    const across = (x: number) => camera.worldView.x + (x - canvas.left) / scale;
+    const down = (y: number) => camera.worldView.y + (y - canvas.top) / scale;
+    return { left: across(box.left), top: down(box.top), right: across(box.right), bottom: down(box.bottom) };
   }
 
   private placeWizard(tile: Tile, facing: Facing): void {
@@ -2546,6 +2566,9 @@ export async function startScene(
         },
         settle(won) {
           return scene.settle(won);
+        },
+        onCover(covered) {
+          scene.covered = covered;
         },
         onMap(opened, closed) {
           scene.listenForMap(opened, closed);

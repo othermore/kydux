@@ -37,7 +37,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 D76), a painted thing drawn on the tile its level lays it on,
                 in its middle (shift.ts, D85, D109), a figure drawn on its
                 scene's painted strip (depth.ts, D105, D149), a speaker's bubble
-                clear of the other figures (bubble.ts), the camera's zoom with
+                clear of the other figures and of the goals box (bubble.ts,
+                D240), the camera's zoom with
                 the buttons and the wheel, and when a level's framing holds
                 (zooming.ts, D106, D201), the goal's
                 beating mark on the ground and the sealed doors' glow (D79,
@@ -311,7 +312,7 @@ tiles are `[x, y]`.
 |---|---|---|---|
 | `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; `ticks`, a walked step of the wizard's where it can fly, three (D225) | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132); a flown move has no tap: the wizard's holds the wind at its flying level, and one whose way is not its flown move's before swells it (D236) |
 | `bump` | wizard | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it; the thought names a friend, a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side, half a second after the bump (D237) |
-| `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above |
+| `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above or the goals box would cover it (D240) |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
 | `pick_up` | wizard | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); `data-carried` |
 | `open` | wizard, by `door.open()`; or the door, in the wizard's tick, opened by a spell or a word | `id`, `at`, `by`: `hand`, `spell` or `word` | the door's frame turns open; `data-doors` |
@@ -3626,3 +3627,14 @@ one overturns stays, marked as superseded.
   shows it up to 800 pixels wide, and never so large that the view scrolls: its width also
   follows the window's height. Rules out a picture enlarged beyond its own pixels, and a
   tip the child scrolls to read.
+- **D240 — Words on the scene go under who they are over where the goals box would cover
+  them above.** Decided 2026-11-15, in the review of sprint 47. The goals box lies on the
+  page over the scene and takes its shape at the level's start, from where the level's
+  figures and things are then (D227); words come later, over a figure that may be high in
+  the window, as a thought over a wizard in a ring (D237), and the box, open along the
+  top, would cover their top line. The scene asks the page where the box is, as it is
+  drawn, open or folded, and counts its foot as the top of the room the words have where
+  they would be under it: with no room left above, the words go under who they are over,
+  by the rule of a window's edge. Folded, the box covers a corner alone and the words stay
+  above. Rules out folding the box under the child's eyes, which hides the goals' marks
+  while the run is read, and sliding the words down over the figure.

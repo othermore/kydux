@@ -10,6 +10,7 @@ import {
   bubbleWrap,
   readingMs,
   readingTicks,
+  roomTop,
   settleMs,
   wordsOver,
 } from './bubble';
@@ -131,5 +132,31 @@ describe('words over a figure in the air (D237)', () => {
 
   it('shows a thought about a bump half a second after it', () => {
     expect(AFTER_BUMP_MS).toBe(500);
+  });
+});
+
+describe('words under the goals box (D240)', () => {
+  const cover = { left: 0, top: 0, right: 400, bottom: 60 };
+
+  it('keeps the room\'s own top where nothing lies over the scene', () => {
+    expect(roomTop(0, 100, 200, 90, null)).toBe(0);
+  });
+
+  it('keeps it where the box lies beside the words', () => {
+    expect(roomTop(0, 400, 520, 90, cover)).toBe(0);
+    expect(roomTop(0, 420, 540, 90, cover)).toBe(0);
+  });
+
+  it('takes the box\'s foot where the words would be under it', () => {
+    expect(roomTop(0, 100, 200, 90, cover)).toBe(60);
+    expect(roomTop(0, 390, 510, 30, cover)).toBe(60);
+  });
+
+  it('keeps the room\'s top where it is lower than the box\'s foot', () => {
+    expect(roomTop(120, 100, 200, 200, cover)).toBe(120);
+  });
+
+  it('keeps it where the box lies under the words, off the scene', () => {
+    expect(roomTop(0, 100, 200, 300, { left: 0, top: 600, right: 400, bottom: 700 })).toBe(0);
   });
 });

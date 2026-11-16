@@ -634,7 +634,7 @@ test.describe('the rings and the race', () => {
     await page.screenshot({ path: `${SHOTS}ring-rim-card.png` });
   });
 
-  test("the rim's thought comes half a second after the bump, over the hat, and the card once it is read (D237)", async ({
+  test("the rim's thought comes half a second after the bump, under the goals box, and the card once it is read (D237, D240)", async ({
     page,
   }) => {
     await open(page, 'the-rings', '1');
@@ -655,10 +655,10 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).toHaveAttribute('data-thought', 'Oh, giré demasiado pronto y rocé el aro.', {
       timeout: ciTimes(10_000),
     });
-    // Over the hat, or under the feet where the window leaves no room above.
-    const over = await scene(page).getAttribute('data-words-over');
-    test.info().annotations.push({ type: 'words-over', description: String(over) });
-    expect(['1.95', 'below']).toContain(over);
+    // Under the feet: over the hat the goals box, open along the top, would cover it (D240).
+    await expect(page.locator('.goals')).toHaveAttribute('data-shape', 'strip');
+    await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
+    await expect(scene(page)).toHaveAttribute('data-words-over', 'below');
     await page.waitForTimeout(500);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}ring-rim-thought.png` });
     await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(30_000) });
@@ -667,6 +667,18 @@ test.describe('the rings and the race', () => {
     expect(thought - bump).toBeGreaterThan(350);
     expect(thought - bump).toBeLessThan(1500);
     expect(card).toBeGreaterThan(thought);
+  });
+
+  test("with the goals box folded, the rim's thought is over the hat (D237, D240)", async ({ page }) => {
+    await open(page, 'the-rings');
+    await page.locator('#goals-toggle').click();
+    await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'true');
+    await start(page, wrong('the-rings', 'turned_inside_the_ring'));
+    await expect(scene(page)).toHaveAttribute('data-thought', 'Oh, giré demasiado pronto y rocé el aro.', {
+      timeout: ciTimes(60_000),
+    });
+    await expect(scene(page)).toHaveAttribute('data-words-over', '1.95');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}ring-rim-thought-folded.png` });
   });
 
   test("flown down into a ring, the wizard rubs its rim in front of it, in its hole (D226, D232)", async ({ page }) => {

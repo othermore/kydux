@@ -708,6 +708,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         );
         zoom.attach(handle);
         controller.attach(handle);
+        // Words on the scene never go under the goals box (D240).
+        handle.onCover(() => goals.box());
         // The goals box takes its shape once the camera has drawn the level's start: the
         // list, or the strip, whichever first covers nothing of the level; where both do,
         // the list, folded three seconds after the child can see it (D227).

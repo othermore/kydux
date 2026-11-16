@@ -687,7 +687,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     (D235), the broom's wind as soft air that swells at a turn, heard only while the
     program plays (D236), a thought about a bump half a second after it and words over a
     flying figure as it is drawn (D237), Inconsolata at 16 the code's only letter (D238),
-    and the tips' pictures at 960 by 540, shown as large as the window lets (D239).
+    the tips' pictures at 960 by 540, shown as large as the window lets (D239), and words
+    put under a figure where the goals box would cover them above (D240).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

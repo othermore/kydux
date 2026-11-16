@@ -3,7 +3,8 @@
 // else and below it would not, or above and to one side of whoever it would cover; and
 // how long words stay said, as long as they take to read (D175); a thought about a bump
 // comes half a second after it, and words over a figure in the air are over it as it is
-// drawn (D237). Kept apart from speech.ts so that it is tested without Phaser.
+// drawn (D237); words go under who they are over where the goals box would cover them
+// above (D240). Kept apart from speech.ts so that it is tested without Phaser.
 
 /** How long after a bump the wizard's thought about it shows, in milliseconds (D237):
  * the bump is seen, and then read of. */
@@ -38,6 +39,14 @@ function meets(one: Box, other: Box): boolean {
  * story step's framing shows of it (D199), where the camera does not follow the words. */
 export function bubbleRoom(size: number, shown: readonly [number, number] | null): [number, number] {
   return shown ? [Math.max(0, shown[0]), Math.min(size, shown[1])] : [0, size];
+}
+
+/** The top that words over someone stay under, in the scene's pixels (D240): the room's
+ * own `top`, or the foot of what of the page lies over the scene, `cover`, where the
+ * words, from `left` to `right` and with their foot at `foot`, would be under it. */
+export function roomTop(top: number, left: number, right: number, foot: number, cover: Box | null): number {
+  const under = cover && cover.left < right && left < cover.right && cover.top < foot;
+  return under ? Math.max(top, cover.bottom) : top;
 }
 
 /** Where the tail's tip goes across a bubble's box, from the box's middle and in the

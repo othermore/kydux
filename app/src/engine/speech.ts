@@ -10,6 +10,8 @@
 // waiting for it as for words that are up, and dropped by a restart, the slider or any
 // other words. Words over a figure in the air are over it as it is drawn, higher by its
 // flight's lift and a ring's raise; words under it stay under the place of its feet.
+// Where the goals box, which lies on the page over the scene, would cover words over
+// someone, they go under them, as where there is no room above (D240).
 // The scene's parent says what is said: data-bubble and data-speaker, data-thought,
 // data-words-scale, and data-words-over (how far over the place of the feet of who they
 // are over the words' foot is, in cells, or `below`).
@@ -25,6 +27,7 @@ import {
   bubbleShift,
   bubbleTip,
   bubbleWrap,
+  roomTop,
   settleMs,
   wordsOver,
 } from './bubble';
@@ -58,6 +61,9 @@ export interface SpeechParts {
   /** The left and the right of what such a framing shows, which a bubble stays between
    * as well; null likewise. */
   shownSides: () => [number, number] | null;
+  /** What of the page lies over the scene, the goals box, as a box in the scene's pixels,
+   * under which no words over someone are put (D240); null where nothing does. */
+  cover: () => Box | null;
 }
 
 export class Speech {
@@ -189,11 +195,14 @@ export class Speech {
     return bubbleRoom(this.parts.height, this.parts.shown());
   }
 
-  /** Whether a bubble this tall fits over who speaks, inside the scene. */
-  private roomAbove(height: number): boolean {
+  /** Whether words this tall and this wide fit over who they are over: inside the scene,
+   * and under nothing of the page that lies over it (D240). */
+  private roomAbove(height: number, width: number): boolean {
     const over = this.speaker ?? this.parts.wizard();
-    const top = over.y - this.parts.headroom - this.parts.lifted(over) - (height + 14) * this.scale;
-    return top >= this.room[0] + 2;
+    const foot = over.y - this.parts.headroom - this.parts.lifted(over);
+    const top = foot - (height + 14) * this.scale;
+    const half = (width / 2) * this.scale;
+    return top >= roomTop(this.room[0], over.x - half, over.x + half, foot, this.parts.cover()) + 2;
   }
 
   /** A thought over the wizard: grey and rounded, with two small circles under it,
@@ -237,7 +246,7 @@ export class Speech {
     const width = words.width + pad * 2;
     const height = words.height + pad * 2;
     // Above the wizard, the two small circles lead down to it; below, up to it.
-    const below = !this.roomAbove(height);
+    const below = !this.roomAbove(height, width);
     const sign = below ? 1 : -1;
     const top = below ? 14 : -height - 14;
     const cloud = this.scene.add.graphics();
@@ -312,9 +321,9 @@ export class Speech {
       const top = over.y + 22 + tail * scale;
       return sides(top, top + height * scale);
     };
-    const wanted = () => bubbleBelow(aboveBox(), belowBox(), figures, this.roomAbove(height + tail));
+    const wanted = () => bubbleBelow(aboveBox(), belowBox(), figures, this.roomAbove(height + tail, width));
     let below = wanted();
-    if (below && !belowFits() && this.roomAbove(height + tail)) {
+    if (below && !belowFits() && this.roomAbove(height + tail, width)) {
       const [narrow, tall] = [width, height];
       words.setWordWrapWidth(this.parts.width / 3);
       width = words.width + pad * 2;

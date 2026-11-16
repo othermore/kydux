@@ -4,7 +4,8 @@
 // shapes, a list in the scene's top left corner and a strip along the scene's top, and
 // the level takes the first that covers nothing of it once its start is drawn; where
 // both cover something, the list, which the page folds three seconds after the child
-// can see it, unless the child has used its heading before (D227).
+// can see it, unless the child has used its heading before (D227). The scene asks where
+// it is, and puts no words under it (D240).
 
 import { t } from '../i18n';
 import { element } from './dom';
@@ -33,6 +34,9 @@ export interface GoalsPanel {
   measure(shape: GoalsShape): PageBox;
   /** Shows it, once its shape is taken; until then it is laid out but not seen. */
   reveal(): void;
+  /** Its rectangle on the page as it is drawn, open or folded; null until it is shown.
+   * The scene puts no words under it (D240). */
+  box(): PageBox | null;
   /** Whether the child has used its heading. */
   readonly touched: boolean;
 }
@@ -145,6 +149,11 @@ export function goalsPanel(goals: { text: string; bonus?: boolean }[]): GoalsPan
     reveal() {
       node.style.visibility = '';
       node.dataset.revealed = 'true';
+    },
+    box() {
+      if (node.dataset.revealed !== 'true') return null;
+      const { left, top, right, bottom } = node.getBoundingClientRect();
+      return { left, top, right, bottom };
     },
     get touched() {
       return touched;

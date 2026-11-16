@@ -1066,6 +1066,39 @@ def test_the_rematch_is_won_at_fifty_three_and_the_race_s_program_crosses_at_eig
     assert given.goals[1].params["tick"] == 88 and given.goals[1].failed
 
 
+def test_the_rematch_is_chapter_4_s_second_fix_and_the_rings_its_one_improve():
+    chapter = json.loads(
+        (CONTENT.parent / "chapters" / "04-the-broom" / "chapter.json").read_text(encoding="utf-8")
+    )
+    kinds = {}
+    for item in chapter["items"]:
+        if item.startswith("level:"):
+            kind = content_level(item.split(":")[1]).kind
+            kinds.setdefault(kind, []).append(item.split(":")[1])
+    assert kinds["fix"] == ["the-check", "the-rematch"]
+    assert kinds["improve"] == ["the-rings"]
+
+
+def test_the_finish_lands_the_wizard_on_its_finish_and_zarek_in_his_lane_the_clappers_in_sight():
+    """Sprint 44's 2.7, on the lanes of D220: every walk, flight and landing is checked on
+    the race course (no one walks through a pole); the wizard lands on its finish, Zarek
+    flies in along his lane to his and lands; the friend, the classmate and Ilda stand
+    beyond the finish, all in the wide frame of the first step."""
+    data = json.loads((CONTENT.parent / "stories" / "the-finish" / "story.json").read_text())
+    story_on_scenes(data, lambda name: read_scene(CONTENT.parent / "scenes", name))
+    race = content_level("the-race").race
+    assert data["wizard"] == list(race.finish) == [31, 8]
+    first = data["steps"][0]
+    assert first["camera"] == {"wide": True}
+    flown = [do for do in first["do"] if do.get("by") == "zarek"]
+    assert flown[0]["appear"][1] == race.path[-1].y and flown[0]["flying"]
+    assert flown[1]["fly"] == list(race.path[-1]) and flown[2] == {"by": "zarek", "land": True}
+    stand = {actor["id"]: actor["at"] for actor in data["actors"] if "at" in actor}
+    assert all(stand[who][0] > race.finish.x for who in ("ilda", "friend", "mate"))
+    # No ring is shown.
+    assert not any(thing.get("kind") == "ring" for thing in data.get("things", []))
+
+
 def test_in_the_rings_a_loop_round_the_pair_flies_into_the_trees():
     folder = CONTENT / "the-rings"
     result = run_code(

@@ -47,8 +47,13 @@ describe("the page's look (D193)", () => {
     expect(css).not.toMatch(/#3b5bdb|#3d5bd9/i);
   });
 
-  it('draws its mark from shapes in ink and gold only', () => {
+  it('draws its mark as a hat in ink and a wand of wood, with gold, the tab\'s icon the same (D254)', () => {
     const colours = new Set(MARK_SHAPES.flatMap(([, attributes]) => [attributes.fill, attributes.stroke]).filter(Boolean));
-    expect([...colours].sort()).toEqual(['#2b2533', '#d49b2a']);
+    expect([...colours].sort()).toEqual(['#2b2533', '#6b4423', '#a06c38', '#d49b2a']);
+    const icon = readFileSync(new URL('../public/favicon.svg', import.meta.url), 'utf8');
+    for (const [tag, attributes] of MARK_SHAPES) {
+      const written = Object.entries(attributes).map(([name, value]) => `${name}="${value}"`).join(' ');
+      expect(icon).toContain(`<${tag} ${written}/>`);
+    }
   });
 });

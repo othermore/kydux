@@ -2859,8 +2859,9 @@ one overturns stays, marked as superseded.
   thin ink line and a soft shadow (`.card`, `.panel`), a chip is a small gold label
   (`.chip`), a field is paper with an ink line. The screens keep their layout and their
   `data-*` hooks; their colours, borders, radii and shadows are the tokens'. The header
-  has Kydux's mark, a pointed hat and a wand in ink and gold drawn as an inline SVG
-  (`ui/mark.ts`, the tab's icon `favicon.svg` the same), and the link to the welcome page.
+  has Kydux's mark, a pointed hat and a wand drawn as an inline SVG in ink, wood and gold
+  (`ui/mark.ts`, the tab's icon `favicon.svg` the same, D254), and the link to the welcome
+  page.
   The welcome page (`#about`, `ui/about.ts`) opens on a painting of Arvelia on its hill
   above the lake at dusk, the village at its foot (Gemini, `welcome-castle.md`), with the
   promise and its big button over it; then what Kydux is, for whom (from eight years
@@ -3834,3 +3835,10 @@ one overturns stays, marked as superseded.
   tells them apart: the landing longer by half at least, softer, with no swell, and lower.
   The numbers are a setting for the owner's ear. Rules out a landing that is the lift played
   backwards.
+- **D254 — The mark's wand is wood.** Decided 2026-11-16 by the owner (*igual pero la varita
+  de madera en vez de negra … el gorro puede ser negro también si queda mejor, pero la
+  varita tiene que ser de madera*; and, of the trials shown, *me gusta la opción D*). The
+  mark (D193) keeps its drawing. The hat is in ink with its gold band. The wand is wood, a
+  light brown with a darker grip at the hand's end, and the star at its tip is gold. The
+  header's mark (`ui/mark.ts`) and the tab's icon (`favicon.svg`) are the same shapes in the
+  same colours, and a test holds them together. Rules out a wand in ink.

@@ -1,16 +1,21 @@
-// Kydux's mark (D193): a pointed hat and a wand, in ink and gold, drawn as an inline SVG
-// beside the name in the header; app/public/favicon.svg is the same drawing.
+// Kydux's mark (D193, D254): a pointed hat in ink with a gold band and a wand of wood with
+// a gold star at its tip, drawn as an inline SVG beside the name in the header;
+// app/public/favicon.svg is the same drawing.
 
 const SVG = 'http://www.w3.org/2000/svg';
 const INK = '#2b2533';
 const GOLD = '#d49b2a';
+const WOOD = '#a06c38';
+const GRIP = '#6b4423';
 
 /** The shapes of the mark, in a 32 by 32 box: each its tag and its attributes. */
 export const MARK_SHAPES: [string, Record<string, string>][] = [
   ['path', { d: 'M6.5 24.5 L14.6 3.2 Q15.6 1.6 16.6 3.4 L21.5 24.5 Z', fill: INK }],
   ['path', { d: 'M7.6 20.6 L20.6 20.6 L21.3 23.6 L6.7 23.6 Z', fill: GOLD }],
   ['ellipse', { cx: '14', cy: '25.4', rx: '12.5', ry: '3.2', fill: INK }],
-  ['path', { d: 'M22.4 30 L29.2 15.6', stroke: INK, 'stroke-width': '2.4', 'stroke-linecap': 'round' }],
+  ['path', { d: 'M22.4 30 L29.2 15.6', stroke: WOOD, 'stroke-width': '2.4', 'stroke-linecap': 'round' }],
+  // The wand's grip, a darker wood at the hand's end.
+  ['path', { d: 'M22.4 30 L24.4 25.8', stroke: GRIP, 'stroke-width': '2.4', 'stroke-linecap': 'round' }],
   ['path', { d: 'M29.6 9.2 L30.6 12.4 L33.8 13.4 L30.6 14.4 L29.6 17.6 L28.6 14.4 L25.4 13.4 L28.6 12.4 Z', fill: GOLD }],
 ];
 

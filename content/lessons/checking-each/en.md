@@ -2,7 +2,7 @@
 
 An `if` can go inside a `for`, so that each turn does one thing or another depending on that turn's value. The `if`'s lines are moved in by eight spaces: four for the `for` and four for the `if`.
 
-A broom's `knotted` attribute is `True` while its black thread is still knotted. Untying a broom with no knot is an error that stops the program, so we must make sure our program looks at `knotted` before it unties!
+A broom's `knotted` attribute is `True` while its black thread is still knotted. Taking the knot off a broom that has none is an error that stops the program, so we must make sure our program looks at `knotted` before it takes a knot off!
 
 ```python try
 names = ["Teku", "Nuri", "Bimo"]

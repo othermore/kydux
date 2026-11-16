@@ -39,6 +39,13 @@ game's developers before it enters the game.
   code is "Run" / "Ejecutar"; the panel that lists what the wizard can do is
   the notebook / "cuaderno"; a module is a book of the school's library. A
   name a text asks the child to type (a password, a spell) is in italics.
+- What is untied is a knot, never a broom (D224): a text unties or takes off a
+  broom's knot, or its thread (*desatar el nudo*, *quitar el nudo*, *untie its knot*),
+  and never unties the broom itself (no *desatar una escoba*, no *escobas desatadas*);
+  `untie` stays the method's name.
+- *Paja* names only the straw the brooms lie in, on or under (*las escobas de la
+  paja*, *escondidas en la paja*): no sentence ends, does, finishes or makes *la paja*
+  (no *terminamos con la paja*). In Spanish those turns of phrase mean something else.
 - Python stays Python: keywords, the game's names (`wizard`, `move_right`,
   `door`, `find_nearest`...) and the code are never translated. Comments and
   strings inside code are translated.

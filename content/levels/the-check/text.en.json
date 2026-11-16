@@ -7,12 +7,12 @@
   ],
   "starting_code": "# The program we used for the wall stops at the first broom without a knot!\nwizard.move_up(3)\nwizard.move_right(4)\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    steps = broom.distance_to(wizard)\n    wizard.move_left(steps)\n    broom.untie()\n",
   "hints": [
-    "The program tries to untie every broom, but untying a broom with no knot is an error!",
-    "We only want to untie a broom if it actually has a knot. Look at its attribute to see if it's knotted before using the method.",
-    "Put an `if` inside the loop to look at `broom.knotted`, just before untying, and don't forget to add four more spaces before the method so it's inside the `if`!"
+    "The program tries to take the knot off every broom, but taking off a knot that does not exist is an error!",
+    "We only want to take the knot off if the broom actually has one. Look at its attribute to see if it's knotted before using the method.",
+    "Put an `if` inside the loop to look at `broom.knotted`, just before taking the knot off, and don't forget to add four more spaces before the method so it's inside the `if`!"
   ],
-  "intro": "{mate} has noticed that some brooms still have an enchanted knot. Maybe they had two, or maybe they slipped past us when we tried to untie them, so we have to check them again. I've put in the program we used to go along the brooms on the wall, untying the knots one by one. But it stops at the first broom without a knot, wherever it hangs, because untying a broom with no knot is an error! Can you fix the program with an `if`? To see if a broom has a knot, you can use its `knotted` attribute.",
-  "outro": "The brooms on the wall are all untied! Now we have to take care of the ones lying in the straw, which are next.",
+  "intro": "{mate} has noticed that some brooms still have an enchanted knot. Maybe they had two, or maybe they slipped past us when we tried to take the knots off, so we have to check them again. I've put in the program we used to go along the brooms on the wall, untying the knots one by one. But it stops at the first broom without a knot, wherever it hangs, because taking off a knot that does not exist is an error! Can you fix the program with an `if`? To see if a broom has a knot, you can use its `knotted` attribute.",
+  "outro": "The brooms on the wall have no knots left! Now we have to take care of the ones lying in the straw, which are next.",
   "learned": "Now you know that an `if` inside a `for` decides at each turn, and that before using `untie()` you can look at `knotted` to see whether there's a knot.",
   "changes": "The brooms on the wall and which ones still have a knot change each time.",
   "changed": "This time, other brooms have a knot."

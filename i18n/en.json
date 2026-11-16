@@ -92,7 +92,7 @@
     "line": " (line {line})",
     "unknown_action": "`{object}` does not know an action called `{name}`.",
     "no_new_attribute": "You cannot give `{object}` a new `{name}`. What `{object}` can do is in its notebook.",
-    "no_knot": "This broom has no knot, so there is nothing to untie, and the program stops here. Before untying a broom, look whether it has a knot.",
+    "no_knot": "This broom has no knot, so there is nothing to untie, and the program stops here. Before taking the knot off a broom, look whether it has one.",
     "no_landing": "There is nowhere to set the broom down here, so the program stops here, still in the air. Land where there is ground.",
     "index_range": "The list doesn't have that many: it has {count}, and you wanted number {asked}.",
     "index_range_unknown": "The list doesn't have as many as you asked for."
@@ -172,7 +172,7 @@
       "other": "That way cannot be flown through."
     },
     "ring": "I bumped into the ring! It is flown through from above or from below.",
-    "too_far": "To untie {thing} I must stand on it.",
+    "too_far": "To take the knot off {thing} I must stand on it.",
     "no_broom": "With no broom, drevo has nothing to lift.",
     "no_knot": "This broom has no knot: there is nothing to untie.",
     "no_landing": "There is nowhere to set the broom down."

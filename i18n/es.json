@@ -92,7 +92,7 @@
     "line": " (línea {line})",
     "unknown_action": "`{object}` no conoce ninguna acción llamada `{name}`.",
     "no_new_attribute": "No puedes darle a `{object}` algo nuevo llamado `{name}`. Lo que `{object}` puede hacer está en su cuaderno.",
-    "no_knot": "Esta escoba no tiene nudo, así que no hay nada que desatar, y el programa se para aquí. Antes de desatar una escoba, mira si tiene nudo.",
+    "no_knot": "Esta escoba no tiene nudo, así que no hay nada que desatar, y el programa se para aquí. Antes de quitarle el nudo a una escoba, mira si lo tiene.",
     "no_landing": "Aquí no hay dónde posar la escoba, así que el programa se para aquí, todavía en el aire. Aterriza donde haya suelo.",
     "index_range": "La lista no tiene tantos: tiene {count}, y pediste el {asked}.º",
     "index_range_unknown": "La lista no tiene tantos elementos como pediste."
@@ -172,7 +172,7 @@
       "other": "Por ahí no se pasa, ni volando."
     },
     "ring": "¡Choco con el aro! Se pasa por dentro, de arriba abajo o de abajo arriba.",
-    "too_far": "Para desatar {thing} tengo que estar de pie sobre ella.",
+    "too_far": "Para quitarle el nudo a {thing} tengo que estar de pie sobre ella.",
     "no_broom": "Sin escoba, drevo no tiene nada que levantar.",
     "no_knot": "Esta escoba no tiene nudo: no hay nada que desatar.",
     "no_landing": "No hay dónde posar la escoba."

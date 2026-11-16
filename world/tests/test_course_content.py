@@ -663,6 +663,31 @@ def test_no_text_the_child_reads_tells_of_a_level_s_ways():
             assert any(innocent in near for innocent in INNOCENT_WAYS), f"{where}: …{near}…"
 
 
+#: The turns of phrase D224 rules out in Spanish: a broom untied, where its knot is; and
+#: a sentence that ends, does, finishes or makes *la paja*.
+UNTIED_BROOMS = [
+    r"\bdes[aá]t\w*\s+(una|la|las|esa|cada|todas\s+las)\s+escobas?\b",
+    r"\bescobas?\b[^.!?]{0,30}\bdesatad[ao]s?\b",
+    r"\bdes[aá]t\w*las?\b",
+    r"\bdesatar\s+cada\s+una\b",
+]
+STRAW_DONE = [
+    r"\b(termin\w*|acab\w*|hac(er|emos|éis|es|e|en)|hago|hice|hizo|hech[oa]s?)\s+(con\s+)?la\s+paja\b",
+]
+
+
+def test_no_spanish_text_unties_a_broom_or_ends_the_straw():
+    """D224: what is untied is the knot, never the broom; *la paja* names only where the
+    brooms lie. Comments of a starting code are read too."""
+    for where, text in child_texts():
+        if "/text.en.json" in where or where.endswith("en.md") or "i18n/en.json" in where:
+            continue
+        for pattern in UNTIED_BROOMS + STRAW_DONE:
+            for line in text.split("\n"):
+                found = re.search(pattern, line, re.IGNORECASE)
+                assert not found, f"{where}: …{line.strip()[:120]}…"
+
+
 @pytest.mark.parametrize(
     "path", sorted(CONTENT.glob("levels/*/level.json")), ids=lambda p: p.parent.name
 )

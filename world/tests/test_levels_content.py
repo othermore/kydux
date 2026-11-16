@@ -1,7 +1,9 @@
 """Every level in content/ can be played, and keeps to what it teaches.
 
 Its solution wins, stumbling on nothing in any way, and calls nothing outside the
-level's api (D23); it has three wrong answers or more, none of which wins; a text
+level's api (D23); so does every other solution in its solutions/, written another way
+the course shows (D198), with three stars; it has three wrong answers or more, none of
+which wins; a text
 in every language, whose starting code runs without an error, as a girl's wizard
 and a boy's see it.
 """
@@ -21,6 +23,10 @@ CONTENT = ROOT / "content" / "levels"
 LANGUAGES = sorted(p.stem for p in (ROOT / "i18n").glob("*.json"))
 LEVELS = sorted(p for p in CONTENT.iterdir() if (p / "level.json").is_file())
 WRONG = [(level, wrong) for level in LEVELS for wrong in sorted((level / "wrong").glob("*.py"))]
+#: A level's other solutions, each written another way the course shows (D198).
+OTHER = [
+    (level, other) for level in LEVELS for other in sorted((level / "solutions").glob("*.py"))
+]
 
 
 def load(directory: Path) -> Level:
@@ -77,6 +83,30 @@ def test_the_solution_stumbles_on_nothing_in_any_way(directory):
         result = run_code(level.way(way) if way else level, code)
         stumbles = [e for e in result.events if e.kind in ("bump", "blocked")]
         assert not stumbles, f"{directory.name}, way {way}: {stumbles[0].data}"
+
+
+def test_the_loop_by_index_has_a_level_it_wins():
+    """The second way of a loop over a list, `for i in range(len(brooms)):` (D198), is
+    proved on the wall's brooms."""
+    assert CONTENT / "the-brooms-on-the-wall" / "solutions" / "by_index.py" in [
+        o for _, o in OTHER
+    ]
+
+
+@pytest.mark.parametrize(
+    ("directory", "other"), OTHER, ids=lambda p: p.name if isinstance(p, Path) else str(p)
+)
+def test_another_solution_wins_every_way_with_three_stars(directory, other):
+    """No hint, no bump, every bonus goal met, in every way, within the level's api."""
+    level = load(directory)
+    code = other.read_text(encoding="utf-8")
+    assert not outside_api(level, code)
+    for way in [way_id for way_id, _ in level.ways] or [None]:
+        result = run_code(level.way(way) if way else level, code)
+        assert result.status == "won", f"{other.name}, way {way}: {result.error}"
+        stumbles = [e for e in result.events if e.kind in ("bump", "blocked")]
+        assert not stumbles, f"{other.name}, way {way}: {stumbles[0].data}"
+        assert all(goal.met for goal in result.goals if goal.bonus), f"{other.name}, way {way}"
 
 
 @pytest.mark.parametrize("directory", LEVELS, ids=lambda p: p.name)

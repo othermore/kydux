@@ -120,7 +120,7 @@ const content = mkdtempSync(join(tmpdir(), 'kydux-content-'));
 process.on('exit', () => rmSync(content, { recursive: true, force: true }));
 const shipped = (path) => {
   const name = relative(join(repo, 'content'), path).split(sep);
-  return !(name.includes('wrong') || name.at(-1) === 'solution.py');
+  return !(name.includes('wrong') || name.includes('solutions') || name.at(-1) === 'solution.py');
 };
 if (existsSync(join(repo, 'content'))) {
   cpSync(join(repo, 'content'), content, { recursive: true, filter: shipped });

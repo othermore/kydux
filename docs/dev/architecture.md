@@ -105,7 +105,9 @@ world/          kydux_world, the model of the levels, and its tests: level.py re
                 explain.py errors in the child's words; run.py runs the child's code;
                 sandbox.py keeps it from Pyodide's bridge to JavaScript
 content/        the levels, each with level.json, its words in text.<lang>.json,
-                its solution and its wrong answers (the last two never shipped);
+                its solution, maybe other solutions written another way the
+                course shows (solutions/), and its wrong answers (none of these
+                three ever shipped);
                 the scenes the levels are parts of (scenes/, each a map.txt and a
                 scene.json, D65, D73); a painted scene's art and the figures'
                 sheets, the wizard's in every look and the two friends' (art/,
@@ -2905,8 +2907,12 @@ one overturns stays, marked as superseded.
   line does not say it so plainly; a lesson's run explains it too. Its block prints the
   first and the last. `for-each` has two pages, each with its block: `for broom in
   brooms:`, and `for i in range(len(brooms)):` with `brooms[i]`, the index counting the
-  turns, with when each way is handy. Rules out a child who meets `[0]` for the first
-  time in a challenge.
+  turns, with when each way is handy. No level asks for the second way, and a level may
+  be won with either: *Las escobas de la pared* has a second solution written with the
+  index (`solutions/by_index.py`), which the content tests win in every way with three
+  stars, as they do every program in a level's `solutions/`. Rules out a child who meets
+  `[0]` for the first time in a challenge, and a way the course shows that no level is
+  proved to take.
 - **D199 — A story step may frame a place.** Decided 2026-11-11 by the owner (*al
   entrar al cobertizo la cámara se centrase en el cobertizo, para que se vea entero*).
   A step's `camera` may be `{"fit": [[x0, y0], [x1, y1]]}`: the page zooms out as far as

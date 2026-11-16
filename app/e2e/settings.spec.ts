@@ -14,7 +14,7 @@ async function openTheCorridor(page: Page, address = '/#level/the-long-corridor'
 const editorFontSize = (page: Page) =>
   page.locator('.cm-content').evaluate((node) => getComputedStyle(node).fontSize);
 
-/** The editor's letter: its first family, its width and its size. */
+/** The editor's letter: its first family, its width and its size (D238). */
 const editorLetter = (page: Page) =>
   page.locator('.cm-content').evaluate((node) => {
     const style = getComputedStyle(node);
@@ -113,7 +113,7 @@ test('the settings in Spanish, and a language chosen there', async ({ browser })
   await context.close();
 });
 
-test("the editor's sizes are 14, 16, 20 and 24, and 16 where nothing is chosen (D223)", async ({ page }) => {
+test("the editor's sizes are 14, 16, 20 and 24, and 16 where nothing is chosen (D223, D238)", async ({ page }) => {
   await page.goto('/#settings');
   const sizes = await page.locator('#settings-font-size option').evaluateAll((options) =>
     options.map((option) => (option as HTMLOptionElement).value),
@@ -122,7 +122,7 @@ test("the editor's sizes are 14, 16, 20 and 24, and 16 where nothing is chosen (
   await expect(page.locator('#settings-font-size')).toHaveValue('16');
 });
 
-test("the code is set in the bundled Inconsolata at 16 where nothing is chosen, and no request leaves the page's origin (D223)", async ({
+test("the code is set in the bundled Inconsolata at 16, no other face is asked for, and no request leaves the page's origin (D238)", async ({
   page,
 }) => {
   const asked: string[] = [];
@@ -133,53 +133,13 @@ test("the code is set in the bundled Inconsolata at 16 where nothing is chosen, 
   const origin = new URL(page.url()).origin;
   const elsewhere = asked.filter((url) => /^https?:/.test(url) && new URL(url).origin !== origin);
   expect(elsewhere).toEqual([]);
-  // Without ?debug the letter is not offered.
-  await page.goto('/#settings');
-  await expect(page.locator('#settings-font-size')).toBeVisible();
-  await expect(page.locator('#settings-code-font')).toHaveCount(0);
+  expect(asked.filter((url) => /noto/i.test(url))).toEqual([]);
 });
 
-test("under ?debug the settings offer the three letters; each sets the editor's face, width and size at once, and stays after a reload (D223)", async ({
-  page,
-}) => {
-  await openTheCorridor(page, '/?debug#level/the-long-corridor');
-  await page.locator('#level-settings').click();
-  await expect(page).toHaveURL(/\?debug#settings$/);
-  const choice = page.locator('#settings-code-font');
-  const offered = await choice.locator('option').evaluateAll((options) =>
-    options.map((option) => [(option as HTMLOptionElement).value, option.textContent]),
-  );
-  expect(offered).toEqual([
-    ['inconsolata-16', 'Inconsolata, 16'],
-    ['noto-semi-14', 'Noto Sans Mono semi-condensed, 14'],
-    ['noto-condensed-14', 'Noto Sans Mono condensed, 14'],
-  ]);
-  await expect(choice).toHaveValue('inconsolata-16');
-
-  const sample = page.locator('#settings-sample');
-  for (const [name, stretch] of [
-    ['noto-semi-14', '87.5%'],
-    ['noto-condensed-14', '75%'],
-  ] as const) {
-    await page.locator('#settings-code-font').selectOption(name);
-    // At once, with no reload: the sample, and the size the candidate gives.
-    await expect(page.locator('#settings-font-size')).toHaveValue('14');
-    await expect(sample).toHaveCSS('font-stretch', stretch);
-    await expect(sample).toHaveCSS('font-size', '14px');
+test('the settings offer no letter to choose, with ?debug or without (D238)', async ({ page }) => {
+  for (const address of ['/#settings', '/?debug#settings']) {
+    await page.goto(address);
+    await expect(page.locator('#settings-font-size')).toBeVisible();
+    await expect(page.locator('#settings-code-font')).toHaveCount(0);
   }
-  // The size stays the child's to change after.
-  await page.locator('#settings-font-size').selectOption('20');
-  await page.locator('#settings-back').click();
-  await expect(page).toHaveURL(/#level\/the-long-corridor$/);
-  await expect.poll(() => editorLetter(page)).toEqual({ face: 'Noto Sans Mono', stretch: '75%', size: '20px' });
-  await expect.poll(() => loaded(page, 'Noto Sans Mono')).toBe(true);
-  await page.reload();
-  await expect(page.locator('.cm-editor')).toBeVisible();
-  await expect.poll(() => editorLetter(page)).toEqual({ face: 'Noto Sans Mono', stretch: '75%', size: '20px' });
-
-  await page.goto('/?debug#settings');
-  await expect(page.locator('#settings-code-font')).toHaveValue('noto-condensed-14');
-  await page.locator('#settings-code-font').selectOption('inconsolata-16');
-  await expect(page.locator('#settings-font-size')).toHaveValue('16');
-  await expect(sample).toHaveCSS('font-stretch', '100%');
 });

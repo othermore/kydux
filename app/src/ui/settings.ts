@@ -1,17 +1,15 @@
-// The settings: the language, the playback speed, the editor's text size,
-// whether the game's sounds play, and how loud the music is (D192). Under ?debug, the
-// code's letter too, one of the candidates of D223.
+// The settings: the language, the playback speed, the editor's text size (its letter
+// is Inconsolata, D238), whether the game's sounds play, and how loud the music is
+// (D192).
 // Each change is saved in the progress document and applies at once; Back
 // returns to the screen the child came from.
 
-import { debugging } from '../engine/debugging';
 import type { Speed } from '../engine/playback';
 import { music } from '../engine/music';
 import { setMuted } from '../engine/sfx';
 import { currentLanguage, languages, setLanguage, t } from '../i18n';
 import * as progress from '../progress/progress';
 import { element } from './dom';
-import { CODE_FONT_NAMES, CODE_FONTS, isCodeFont } from './codefont';
 import { applyLook, FONT_SIZES } from './look';
 import type { Screen } from './screen';
 
@@ -72,25 +70,6 @@ function musicSlider(volume: number): HTMLElement {
   ]);
 }
 
-/** Under ?debug, the code's letter: a candidate picked sets the editor's size to its
- * own and shows at once; the size stays the child's to change after (D223). */
-function codeFontChoice(now: string, redraw: () => void): HTMLElement {
-  return choice(
-    'settings-code-font',
-    t('debug.font.title'),
-    CODE_FONT_NAMES.map((name) => [name, t(`debug.font.${name}`)]),
-    now,
-    (name) => {
-      if (!isCodeFont(name)) return;
-      progress.setSetting('codeFont', name);
-      progress.setSetting('fontSize', CODE_FONTS[name].size);
-      applyLook(progress.settings());
-      redraw();
-      document.querySelector<HTMLElement>('#settings-code-font')?.focus();
-    },
-  );
-}
-
 export function settingsScreen(parts: SettingsScreenParts): Screen {
   const node = element('div', { className: 'settings-screen' });
   const draw = (): void => {
@@ -123,7 +102,6 @@ export function settingsScreen(parts: SettingsScreenParts): Screen {
             applyLook(progress.settings());
           },
         ),
-        ...(debugging() ? [codeFontChoice(now.codeFont, draw)] : []),
         choice(
           'settings-sound',
           t('settings.sound'),

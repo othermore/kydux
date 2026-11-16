@@ -66,16 +66,14 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 chapters' music, played from its notes (music.ts, D192)
   src/editor/   the child's editor, CodeMirror, a wrapped line's part hanging
                 under the line's own indentation (D223)
-  src/fonts/    the two faces of the code's letter, bundled, each with its
-                SOURCE.md and licence (D223)
+  src/fonts/    the code's letter, Inconsolata, bundled, with its SOURCE.md
+                and licence (D238)
   src/ui/       the screens: start with the saved games (start.ts), the
                 wizard's creator (wizard.ts), the map, also over a level (map.ts),
                 a lesson with its teacher (lesson.ts), a story told on its scene
-                (story.ts, D74), the
-                settings (settings.ts), with the code's letter under ?debug, one of
-                three candidates (codefont.ts, D223), and the level screen, a view of the run controller
-                (controller.ts), with its goals panel, outcome card, start and
-                win cards (cards.ts), the zoom box over the scene (zoom.ts), the
+                (story.ts, D74), the settings (settings.ts), and the level
+                screen, a view of the run controller (controller.ts), with its
+                goals panel, outcome card, start and win cards (cards.ts), the zoom box over the scene (zoom.ts), the
                 wizard's notebook with its spells and words (notebook.ts, D80),
                 the naughty child's map open on the scene's plan, drawn in ink as the
                 scene draws it (plan.ts, D134, D143, D151), a lesson's code run on its page (lessonrun.ts, D142),
@@ -671,8 +669,8 @@ one overturns stays, marked as superseded.
   set as CSS variables on the page's root (`app/src/ui/look.ts`), so that a
   screen drawn later finds them: `--split`, the scene's share of the level
   screen's width, from 0.35 to 0.75, and `--editor-font-size`, chosen in
-  the settings (`#settings`) among 14, 16, 20 and 24 pixels (D223), with
-  `--mono-face` and `--mono-stretch`, the code's letter (D223). The handle
+  the settings (`#settings`) among 14, 16, 20 and 24 pixels (D223), in
+  `--mono-face`, Inconsolata, the code's letter (D238). The handle
   between the panes takes pointer events, so a mouse and a finger both
   drag it; a double-click gives back 0.6, and the arrow keys move it by
   0.05, so that it can be reached without a pointer. The share shows while
@@ -2843,7 +2841,7 @@ one overturns stays, marked as superseded.
   page, paper for what lies on it, ink for the words, moss green for a button and what
   is done, a warm gold for what is chosen and for the focus ring, a sky blue for links,
   a soft red for a warning; with the radii, two shadows, the spaces and the type (the
-  interface's sans serif, a serif for the story's words, the code's letter, D223) beside
+  interface's sans serif, a serif for the story's words, the code's letter, D238) beside
   it. The page's background is the parchment with a fine grain, an SVG noise written in
   the stylesheet, no file. The components: a button stands on a darker foot and sinks
   onto it when pressed (`.button`, `.big-button`; `.quiet-button` paper with an ink line;

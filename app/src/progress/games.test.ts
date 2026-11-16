@@ -70,9 +70,27 @@ describe('GamesStore (D70)', () => {
   it('a new game keeps the machine\'s language and settings', () => {
     progress.setWizard(ANA);
     progress.setSetting('fontSize', 20);
-    progress.setSetting('codeFont', 'noto-semi-14');
     progress.newGame();
-    expect(progress.settings()).toMatchObject({ fontSize: 20, codeFont: 'noto-semi-14' });
+    expect(progress.settings()).toMatchObject({ fontSize: 20 });
+  });
+
+  it('brings a game kept with another letter over to Inconsolata at 16, once, and keeps the size of any other (D238)', () => {
+    progress.setWizard(ANA);
+    const key = `kydux.game.${games.current()}`;
+    const kept = (settings: object) => {
+      const document = JSON.parse(storage.getItem(key) ?? '{}');
+      storage.setItem(key, JSON.stringify({ ...document, settings: { ...document.settings, ...settings } }));
+    };
+    kept({ codeFont: 'noto-semi-14', fontSize: 14 });
+    expect(games.load().settings.fontSize).toBe(16);
+    // Saved again, the game keeps no letter: the next read finds none.
+    games.save(games.load());
+    expect(JSON.parse(storage.getItem(key) ?? '{}').settings).not.toHaveProperty('codeFont');
+    expect(games.load().settings.fontSize).toBe(16);
+    kept({ codeFont: 'inconsolata-16', fontSize: 20 });
+    expect(games.load().settings.fontSize).toBe(20);
+    storage.setItem(key, JSON.stringify({ ...JSON.parse(storage.getItem(key) ?? '{}'), settings: { fontSize: 24 } }));
+    expect(games.load().settings.fontSize).toBe(24);
   });
 
   it('counts play time to the game being played, and deletes a game', () => {

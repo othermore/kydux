@@ -3,7 +3,6 @@
 // behind the same interface. Nothing else in the game keeps progress anywhere.
 
 import { isLook } from '../engine/looks';
-import { CODE_FONTS, type CodeFont, DEFAULT_CODE_FONT, isCodeFont } from '../ui/codefont';
 
 /** The document's shape this version of the game writes. A document of another
  * version, or none, is read as the defaults. */
@@ -13,8 +12,6 @@ export interface Settings {
   speed: 1 | 2 | 4;
   /** The editor's text size, in pixels: one of FONT_SIZES. */
   fontSize: number;
-  /** The code's letter, one of the candidates of D223. */
-  codeFont: CodeFont;
   /** The scene's share of the level screen's width, from 0.35 to 0.75. */
   split: number;
   /** Whether the game's sounds play. */
@@ -74,8 +71,8 @@ export const FONT_SIZES = [14, 16, 20, 24] as const;
 
 export const DEFAULT_SETTINGS: Settings = {
   speed: 1,
-  fontSize: CODE_FONTS[DEFAULT_CODE_FONT].size,
-  codeFont: DEFAULT_CODE_FONT,
+  // A new child's editor is at 16, its letter Inconsolata (D238).
+  fontSize: 16,
   split: 0.6,
   sound: true,
   music: 0.6,
@@ -158,7 +155,10 @@ export function readProgress(value: unknown): Progress | null {
     if (typeof music === 'number' && music >= 0 && music <= 1) progress.settings.music = music;
     if (speed === 1 || speed === 2 || speed === 4) progress.settings.speed = speed;
     if ((FONT_SIZES as readonly unknown[]).includes(fontSize)) progress.settings.fontSize = fontSize as number;
-    if (isCodeFont(codeFont)) progress.settings.codeFont = codeFont;
+    // A game kept while one of the other letters was tried under ?debug (D223) is read
+    // with its editor at 16, the size of the one letter (D238); the field is not
+    // written back, so the next read finds none.
+    if (typeof codeFont === 'string' && codeFont.startsWith('noto-')) progress.settings.fontSize = 16;
     if (typeof split === 'number' && split >= SPLIT_MIN && split <= SPLIT_MAX) {
       progress.settings.split = split;
     }

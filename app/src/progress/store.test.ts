@@ -69,7 +69,6 @@ describe('LocalProgressStore', () => {
     expect(read.settings).toEqual({
       speed: 1,
       fontSize: 16,
-      codeFont: 'inconsolata-16',
       split: 0.5,
       sound: true,
       music: 0.6,
@@ -81,17 +80,19 @@ describe('LocalProgressStore', () => {
     expect(read.current).toBeNull();
   });
 
-  it("reads the code's letter and the editor's size, and either not offered as its default (D223)", () => {
+  it("reads the editor's size, 16 where none is kept or one not offered (D238)", () => {
     const read = (settings: object) => readProgress({ version: PROGRESS_VERSION, settings })?.settings;
-    expect(read({})).toMatchObject({ codeFont: 'inconsolata-16', fontSize: 16 });
-    expect(read({ codeFont: 'noto-semi-14', fontSize: 14 })).toMatchObject({ codeFont: 'noto-semi-14', fontSize: 14 });
-    expect(read({ codeFont: 'noto-condensed-14', fontSize: 24 })).toMatchObject({
-      codeFont: 'noto-condensed-14',
-      fontSize: 24,
-    });
-    // A letter that is none of the three, and sizes that are not offered.
-    expect(read({ codeFont: 'comic-12', fontSize: 17 })).toMatchObject({ codeFont: 'inconsolata-16', fontSize: 16 });
-    expect(read({ codeFont: 'toString', fontSize: 15 })).toMatchObject({ codeFont: 'inconsolata-16', fontSize: 16 });
+    expect(read({})).toMatchObject({ fontSize: 16 });
+    expect(read({ fontSize: 24 })).toMatchObject({ fontSize: 24 });
+    expect(read({ fontSize: 17 })).toMatchObject({ fontSize: 16 });
+  });
+
+  it('reads a game kept while another letter was tried with its editor at 16, and keeps no letter (D238)', () => {
+    const read = (settings: object) => readProgress({ version: PROGRESS_VERSION, settings })?.settings;
+    expect(read({ codeFont: 'noto-semi-14', fontSize: 14 })).toEqual(expect.objectContaining({ fontSize: 16 }));
+    expect(read({ codeFont: 'noto-condensed-14', fontSize: 24 })).toEqual(expect.objectContaining({ fontSize: 16 }));
+    expect(read({ codeFont: 'inconsolata-16', fontSize: 20 })).toEqual(expect.objectContaining({ fontSize: 20 }));
+    expect(read({ codeFont: 'noto-semi-14', fontSize: 14 })).not.toHaveProperty('codeFont');
   });
 
   it('keeps a story as the item last opened, as a lesson and a level (D122)', () => {

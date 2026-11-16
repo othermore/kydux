@@ -545,13 +545,7 @@
       "wind_tones": "the two high tones",
       "wind_unchanged": "both voices as written"
     },
-    "zone": "Zone",
-    "font": {
-      "title": "Code font",
-      "inconsolata-16": "Inconsolata, 16",
-      "noto-semi-14": "Noto Sans Mono semi-condensed, 14",
-      "noto-condensed-14": "Noto Sans Mono condensed, 14"
-    }
+    "zone": "Zone"
   },
   "race": {
     "reading": "Ilda reads the programs: you, {mine} lines; {name}, {theirs}.",

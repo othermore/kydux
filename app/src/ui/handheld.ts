@@ -1,6 +1,6 @@
 // On a phone or a tablet, a note under the header says the game is made for a
 // computer: the editor wants a keyboard and the scene a mouse. It is on every
-// screen, since a first visit opens on the story and not on the start screen,
+// screen, since a first visit opens on the welcome page and not on the start screen,
 // until the child closes it; closed, it stays closed in that tab.
 
 import { t } from '../i18n';

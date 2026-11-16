@@ -523,6 +523,7 @@
     "hero_alt": "The castle of Arvelia on top of its hill by the lake at dusk, with the village at its foot",
     "hero_title": "Learn Python with magic",
     "hero_text": "You arrive at a school of magic, and every step you take there, you take by writing real programs.",
+    "start": "Start playing",
     "play": "Play",
     "what_title": "What Kydux is",
     "what_text": "Kydux is a game for learning to program in Python. Your character arrives at Arvelia, a school of magic in an old castle. There, everything obeys written instructions. To open a door, cross a corridor or fly on a broom, you write real Python.",

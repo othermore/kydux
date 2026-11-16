@@ -2154,6 +2154,13 @@ a.stop-body:focus-visible {
   font-size: clamp(16px, 2vw, 20px);
 }
 
+/* The welcome's button to play, the page's biggest. */
+.about-screen .big-button {
+  padding: 12px 30px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
 .about-section {
   padding: var(--space-4) var(--space-5);
   border-radius: var(--radius-large);

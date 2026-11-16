@@ -386,9 +386,10 @@ const OPENING = '#story/the-letter';
 
 async function showStart(content: HTMLElement): Promise<void> {
   // A first visit, with no wizard, no saved game and no address, opens on the
-  // story (D61); with saved games, the start screen offers them (D70).
+  // welcome page, whose Start playing begins the story (D61, D193); with saved
+  // games, the start screen offers them (D70).
   if (!progress.wizard() && progress.savedGames().length === 0 && location.hash === '') {
-    location.replace(OPENING);
+    location.replace('#about');
     return;
   }
   document.title = t('app.title');
@@ -539,7 +540,10 @@ function route(): void {
     return;
   }
   if (wanted.name === 'about') {
-    show(content, aboutScreen());
+    // A child who has never played starts the story from it; one who has goes back
+    // to the start screen and its Continue.
+    const newcomer = !progress.wizard() && progress.savedGames().length === 0;
+    show(content, aboutScreen({ play: newcomer ? OPENING : '#start', newcomer }));
     return;
   }
   if (wanted.name === 'wizard') {

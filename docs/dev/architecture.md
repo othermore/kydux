@@ -1015,10 +1015,12 @@ one overturns stays, marked as superseded.
   password door opens in the second half of its tick, once the word is
   said.
 - **D61 — The game opens in the story.** Decided 2026-10-22 by the owner's
-  UAT (sprint-10.md), built the same day. A first visit, with no wizard and
-  no address, opens on `story:the-letter`, the game's opening (`story.json`
-  has `opening: true`, and it is in no chapter): the letter of admission,
-  the journey, the shut gate at dusk, and no mechanics. Its *Go on* leads
+  UAT (sprint-10.md), built the same day. The game begins with
+  `story:the-letter`, the game's opening (`story.json` has `opening: true`,
+  and it is in no chapter): the letter of admission, the journey, the shut
+  gate at dusk, and no mechanics. A first visit, with no wizard, no saved game
+  and no address, opens on the welcome page (D193), whose *Start playing*
+  begins it. Its *Go on* leads
   to the creator, or, once a wizard exists, to the course's first item; it
   is never the place *Continue* returns to. The start screen's big button
   begins the story while there is no wizard, and *New game* begins it
@@ -1137,7 +1139,7 @@ one overturns stays, marked as superseded.
   Every change saves the game being played; there is no *Save*. The start
   screen offers *Continue*, *Load a game* (each game with its wizard, where
   it is, its play time and dates, *Play* and *Delete*, which asks) and *New
-  game*; a first visit with no game opens the story, and with saved games
+  game*; a first visit with no game opens the welcome page (D193), and with saved games
   and none being played the start screen offers them. An imported file
   becomes one more game; *Export* keeps the game being played. Play time is
   counted every ten seconds a level, a lesson or a story is on screen
@@ -2798,12 +2800,17 @@ one overturns stays, marked as superseded.
   (`ui/mark.ts`, the tab's icon `favicon.svg` the same), and the link to the welcome page.
   The welcome page (`#about`, `ui/about.ts`) opens on a painting of Arvelia on its hill
   above the lake at dusk, the village at its foot (Gemini, `welcome-castle.md`), with the
-  promise and *Play* over it; then what Kydux is, for whom (eight to twelve), how it is
-  played (a story, a lesson and a level, each with a picture of the game in the page's
-  language, `app/public/about/<lang>/`), that it is free software of the Kidux family in
-  English and Spanish, and *Play* again; its words are under `about` in the i18n files.
-  The start screen, before a wizard is made, shows the welcome's first part, with a link
-  to the rest; a first visit with no address still opens on the story (D61). The map's
+  promise and its big button over it; then what Kydux is, for whom (eight to twelve), how
+  it is played (a story, a lesson and a level, each with a picture of the game in the
+  page's language, `app/public/about/<lang>/`), that it is free software of the Kidux
+  family in English and Spanish, and the button again; its words are under `about` in
+  the i18n files. A first visit, with no wizard, no saved game and no address, opens on
+  it (the owner, 2026-11-11: *si nunca ha jugado y acaba de llegar, prefiero que haya una
+  landing page que explique algo*): the button says *Start playing* and begins the story
+  (D61). A child who has played opens on the start screen, where *Continue* goes on; from
+  the welcome page, reached by the header's link, the button says *Play* and goes back to
+  the start screen. The start screen, before a wizard is made, shows the welcome's first
+  part, with a link to the rest. The map's
   chapters each have a card, a band of the chapter's first level's scene cut small by
   `tools/art/chapter_cards.py` into `content/art/chapters/<id>/card.webp`, the title
   over it on a dark veil; a chapter whose first stop is locked is greyed. Rules out a

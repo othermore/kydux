@@ -13,8 +13,11 @@ async function makeWizard(page: Page, name: string, gender: 'girl' | 'boy', look
   await page.locator('#wizard-looks .radio').nth(look).click();
 }
 
-test('a first visit opens on the story, which leads to the creator (D61)', async ({ page }) => {
+test('a first visit opens on the welcome page, whose Start playing begins the story, which leads to the creator (D61, D193)', async ({ page }) => {
   await page.goto('/');
+  await expect(page).toHaveURL(/#about$/);
+  await expect(page.locator('#about-play')).toHaveText('Start playing');
+  await page.locator('#about-play').click();
   await expect(page).toHaveURL(/#story\/the-letter$/);
   await expect(page.locator('#story-title')).toHaveText('The letter');
   // No code in the opening: the story comes first, told on the scene (D74).

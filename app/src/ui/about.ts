@@ -1,7 +1,9 @@
 // The welcome page, #about (D193): what Kydux is, for whom, how it is played (a story, a
 // lesson and a level, each with a picture of the game), that it is free software of the
-// Kidux family, and Play. Its hero is a painting of Arvelia on its hill above the lake at
-// dusk. The start screen shows its first part to a child with no wizard yet.
+// Kidux family, and a big button to play. Its hero is a painting of Arvelia on its hill
+// above the lake at dusk. A first visit opens on it, and its Start playing begins the
+// story (D61); a child who has played goes back to the start screen from it. The start
+// screen shows its first part to a child with no wizard yet.
 
 import { currentLanguage, t } from '../i18n';
 import { element } from './dom';
@@ -24,8 +26,16 @@ export function welcomeSection(): HTMLElement {
   ]);
 }
 
-export function aboutScreen(): Screen {
+export interface AboutScreenParts {
+  /** Where its button goes: the opening story for a newcomer, the start screen else. */
+  play: string;
+  /** Whether the child has never played: the button says Start playing. */
+  newcomer: boolean;
+}
+
+export function aboutScreen(parts: AboutScreenParts): Screen {
   const node = element('div', { className: 'about-screen' });
+  const playWords = () => (parts.newcomer ? t('about.start') : t('about.play'));
   const draw = () => {
     document.title = t('about.page_title');
     const lang = PICTURED.includes(currentLanguage()) ? currentLanguage() : 'en';
@@ -40,7 +50,7 @@ export function aboutScreen(): Screen {
         element('div', { className: 'about-hero-words' }, [
           element('h2', {}, [t('about.hero_title')]),
           element('p', {}, [t('about.hero_text')]),
-          element('a', { className: 'big-button', id: 'about-play', href: '#start' }, [t('about.play')]),
+          element('a', { className: 'big-button', id: 'about-play', href: parts.play }, [playWords()]),
         ]),
       ]),
       element('section', { className: 'about-section panel', id: 'about-what' }, [
@@ -81,7 +91,7 @@ export function aboutScreen(): Screen {
         ]),
       ]),
       element('p', { className: 'about-end' }, [
-        element('a', { className: 'big-button', href: '#start' }, [t('about.play')]),
+        element('a', { className: 'big-button', id: 'about-play-end', href: parts.play }, [playWords()]),
       ]),
     );
   };

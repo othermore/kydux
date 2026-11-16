@@ -23,7 +23,8 @@ read, and only `npm run walkthrough -- <chapter>` runs it (`docs/dev/dev-environ
 ## The loop and its screenshots
 
 `loop.spec.ts` walks the whole game once in each language. It opens the game
-fresh on the story's opening, makes a wizard, reads the story page at the
+fresh on the welcome page, starts playing into the story's opening, makes a
+wizard, reads the story page at the
 gate and the first lesson, sees the first step of the screen's guide, fails
 the gate once, asks for a hint, wins, goes on to the next lesson, and opens
 the map and the settings.
@@ -33,10 +34,10 @@ test already checks what each step shows. They land in `shots/`, one folder
 per language, numbered in the order they were taken:
 
 ```
-app/e2e/shots/en/01-opening.png
-app/e2e/shots/en/02-creator.png
+app/e2e/shots/en/01-welcome.png
+app/e2e/shots/en/02-opening.png
 ...
-app/e2e/shots/es/18-settings.png
+app/e2e/shots/es/19-settings.png
 ```
 
 Git ignores the folder. Each run of the loop replaces it, so the shots are

@@ -16,23 +16,39 @@ async function picturesShown(page: Page): Promise<void> {
 }
 
 for (const [locale, title, play] of [
-  ['es-ES', 'Qué es Kydux', 'Jugar'],
-  ['en-US', 'What Kydux is', 'Play'],
+  ['es-ES', 'Qué es Kydux', 'Empieza a jugar'],
+  ['en-US', 'What Kydux is', 'Start playing'],
 ] as const) {
   test.describe(`the welcome page in ${locale}`, () => {
     test.use({ locale, viewport: { width: 1280, height: 800 } });
 
-    test('shows its painting, what Kydux is, its three pictures and Play', async ({ page }) => {
-      await page.goto('/#about');
+    test('a first visit opens on it: its painting, what Kydux is, its three pictures, and Start playing begins the story', async ({ page }) => {
+      await page.goto('/');
+      await expect(page).toHaveURL(/#about$/);
       await expect(page.locator('#about-what h3')).toHaveText(title);
       await expect(page.locator('#about-play')).toHaveText(play);
       await picturesShown(page);
       await page.screenshot({ path: `e2e/shots/about-${locale}.png`, fullPage: true });
+      await expect(page.locator('#about-play-end')).toHaveText(play);
       await page.locator('#about-play').click();
-      await expect(page).toHaveURL(/#start$/);
+      await expect(page).toHaveURL(/#story\/the-letter$/);
     });
   });
 }
+
+test.describe('the welcome page for a child who has played', () => {
+  test.use({ locale: 'es-ES' });
+
+  test('a wizard made: the page opens on the start screen, and the welcome\'s button goes back to it', async ({ page }) => {
+    await seedWizard(page, MARTA);
+    await page.goto('/');
+    await expect(page.locator('#continue')).toHaveText('Continuar: Ante la puerta');
+    await page.goto('/#about');
+    await expect(page.locator('#about-play')).toHaveText('Jugar');
+    await page.locator('#about-play').click();
+    await expect(page).toHaveURL(/#start$/);
+  });
+});
 
 test.describe('the look', () => {
   test.use({ locale: 'es-ES' });

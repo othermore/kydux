@@ -62,8 +62,12 @@ for (const [lang, words] of Object.entries(WORDS)) {
     });
     const page = await context.newPage();
 
-    // A fresh visit: the story's opening, then the creator (D61).
+    // A fresh visit: the welcome page, whose Start playing begins the story's
+    // opening, then the creator (D61, D193).
     await page.goto('/');
+    await expect(page.locator('#about-play')).toBeVisible();
+    await shoot(page, 'welcome');
+    await page.locator('#about-play').click();
     await expect(page.locator('#story-title')).toHaveText(words.opening);
     await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done');
     await shoot(page, 'opening');

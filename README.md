@@ -16,11 +16,12 @@ software under the GNU General Public License, version 3 or later.
 Kydux runs in a web browser. There is nothing to install yet: for now it
 runs only from this repository, as `docs/dev/dev-environment.md` explains.
 
-The *About* link, at the top of every screen, opens the welcome page. It
-tells what the game is, who it is for and how it is played, with pictures
-of the game.
+The first time, the game opens on its welcome page. It tells what the game
+is, who it is for and how it is played, with pictures of the game. Its big
+*Start playing* button begins the game. The *About* link, at the top of
+every screen, opens the welcome page again later.
 
-The first time, the game opens on a story. A letter invites you to
+The game begins with a story. A letter invites you to
 Arvelia, a school of magic, and you travel to its gate. Then you make your
 wizard. You give it a name, say whether it is a girl or a boy, and choose
 how it looks. The game then calls you by that name.

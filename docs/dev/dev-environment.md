@@ -180,8 +180,9 @@ The map keeps a locked stop closed. A level's or a lesson's address opens
 it anyway. That is on purpose, so that you can test any level without
 playing the ones before it.
 
-The first time the game opens, it opens on the story, which leads to the
-creator. The course begins once the player has a wizard. A level's or a
+The first time the game opens, it opens on the welcome page. Its *Start
+playing* button begins the story, which leads to the creator. A player who
+has a wizard or a saved game opens on the start screen instead. The course begins once the player has a wizard. A level's or a
 lesson's address works without one: the texts then call the player
 *apprentice*. The first level of the course shows the screen's guide the
 first time it is played; the `?` card shows it again.
@@ -201,7 +202,7 @@ keeps the other games. *Export* downloads the game being played as
 
 To start from a clean page, with no game at all, clear the site's data in
 the browser, or open the game in a private window. The game then opens on
-the letter, as a child's first visit does.
+the welcome page, as a child's first visit does.
 
 ### A level that is part of a scene
 

@@ -1,0 +1,211 @@
+{
+  "id": "the-check",
+  "kind": "fix",
+  "scene": "the-broom-shed",
+  "start": [
+    6,
+    8
+  ],
+  "end": [
+    13,
+    6
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        7,
+        8
+      ]
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        7,
+        7
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_3",
+      "at": [
+        8,
+        7
+      ]
+    },
+    {
+      "kind": "broom",
+      "id": "broom_4",
+      "at": [
+        9,
+        7
+      ]
+    },
+    {
+      "kind": "broom",
+      "id": "broom_5",
+      "at": [
+        9,
+        6
+      ]
+    },
+    {
+      "kind": "broom",
+      "id": "broom_6",
+      "at": [
+        10,
+        6
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_7",
+      "at": [
+        11,
+        6
+      ]
+    },
+    {
+      "kind": "broom",
+      "id": "broom_8",
+      "at": [
+        12,
+        6
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_9",
+      "at": [
+        13,
+        6
+      ]
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        6,
+        7
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        6,
+        6
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.find_all",
+    "broom.untie",
+    "broom.knotted",
+    "thing.position",
+    "wizard.position",
+    "position.x",
+    "position.y"
+  ],
+  "goals": [
+    {
+      "kind": "untied"
+    },
+    {
+      "kind": "reach",
+      "marker": "E",
+      "hidden": true
+    },
+    {
+      "kind": "no_error"
+    },
+    {
+      "kind": "uses",
+      "member": "knotted",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "six",
+      "things": [
+        {
+          "id": "broom_2",
+          "gone": true
+        },
+        {
+          "id": "broom_5",
+          "gone": true
+        },
+        {
+          "id": "broom_7",
+          "gone": true
+        },
+        {
+          "id": "broom_4",
+          "knotted": true
+        },
+        {
+          "id": "broom_6",
+          "knotted": false
+        },
+        {
+          "id": "broom_8",
+          "knotted": false
+        },
+        {
+          "id": "broom_9",
+          "knotted": true
+        }
+      ]
+    },
+    {
+      "id": "eight",
+      "things": [
+        {
+          "id": "broom_5",
+          "gone": true
+        },
+        {
+          "id": "broom_2",
+          "knotted": false
+        },
+        {
+          "id": "broom_3",
+          "knotted": true
+        },
+        {
+          "id": "broom_6",
+          "knotted": false
+        },
+        {
+          "id": "broom_7",
+          "knotted": true
+        },
+        {
+          "id": "broom_8",
+          "knotted": false
+        }
+      ]
+    },
+    {
+      "id": "nine"
+    }
+  ]
+}

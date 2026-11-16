@@ -176,6 +176,7 @@ NOTHING_TO_TRY = {
     "while": 2,
     "kirra-and-osto": 2,
     "the-portal": 2,
+    "drevo": 1,
 }
 
 
@@ -322,12 +323,12 @@ def level_json(item_id: str) -> dict:
     return json.loads((CONTENT / "levels" / item_id / "level.json").read_text(encoding="utf-8"))
 
 
-def walked(item_id: str) -> list[tuple[int, int]]:
+def walked(item_id: str, way: int = 0) -> list[tuple[int, int]]:
     """The tiles the wizard stands on in a level's solution, from its start to its end,
-    in its first way."""
+    in its first way, or the one given."""
     directory = CONTENT / "levels" / item_id
     level = Level.from_directory(directory)
-    level = level.ways[0][1] if level.ways else level
+    level = level.ways[way][1] if level.ways else level
     result = run_code(level, (directory / "solution.py").read_text(encoding="utf-8"))
     tiles = [tuple(level.start)]
     tiles += [
@@ -352,12 +353,17 @@ def scene_pairs() -> list[tuple[str, str]]:
 def test_a_level_on_a_scene_starts_where_the_one_before_it_ended(before, after):
     """D65: where a level ends the next begins, on the same tile: its end, or, with no
     end, the tile its solution leaves the wizard on; but a fix or an improve level that
-    plays the level before it again, from the start, begins where that one began."""
+    plays the level before it again, from the start, begins where that one began. A level
+    whose ways end on different cells, the brooms in a row, is followed from where its
+    solution leaves the wizard in one of them (the row's end, in its longest way)."""
     ended = level_json(before).get("end") or list(walked(before)[-1])
     again = level_json(after).get("kind") in ("fix", "improve") and level_json(before)["start"]
+    ways = [
+        list(walked(before, way)[-1]) for way in range(len(level_json(before).get("ways", [])))
+    ]
     # The dark tunnel starts where the child cannot know (D152).
     if after != "the-dark-tunnel":
-        assert level_json(after)["start"] in (ended, again)
+        assert level_json(after)["start"] in (ended, again, *ways)
 
 
 SCENE_LEVELS = sorted(

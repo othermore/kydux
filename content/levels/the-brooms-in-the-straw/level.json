@@ -1,0 +1,157 @@
+{
+  "id": "the-brooms-in-the-straw",
+  "kind": "practice",
+  "scene": "the-broom-shed",
+  "start": [
+    11,
+    6
+  ],
+  "end": [
+    6,
+    8
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        10,
+        7
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        8,
+        7
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_3",
+      "at": [
+        6,
+        8
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_4",
+      "at": [
+        6,
+        8
+      ],
+      "knotted": true
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        12,
+        6
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        12,
+        7
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.find_all",
+    "broom.untie",
+    "thing.position",
+    "wizard.position",
+    "position.x",
+    "position.y"
+  ],
+  "goals": [
+    {
+      "kind": "untied"
+    },
+    {
+      "kind": "reach",
+      "marker": "E",
+      "hidden": true
+    },
+    {
+      "kind": "uses",
+      "member": "x",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "three",
+      "things": [
+        {
+          "id": "broom_4",
+          "gone": true
+        }
+      ]
+    },
+    {
+      "id": "four",
+      "things": [
+        {
+          "id": "broom_2",
+          "at": [
+            9,
+            8
+          ]
+        },
+        {
+          "id": "broom_3",
+          "at": [
+            7,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "four_high",
+      "things": [
+        {
+          "id": "broom_1",
+          "at": [
+            10,
+            6
+          ]
+        },
+        {
+          "id": "broom_2",
+          "at": [
+            9,
+            7
+          ]
+        },
+        {
+          "id": "broom_3",
+          "at": [
+            7,
+            7
+          ]
+        }
+      ]
+    }
+  ]
+}

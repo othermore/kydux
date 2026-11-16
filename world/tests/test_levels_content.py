@@ -92,9 +92,21 @@ def test_a_wrong_answer_does_not_win(directory, wrong):
     ids=lambda v: v.name if isinstance(v, Path) else v,
 )
 def test_the_starting_code_runs_without_an_error(directory, lang, gender):
+    """The starting code runs; but a fix level's given program may stop where the world
+    refuses what it asks, the error the level is about: untying a broom with no knot
+    (D183)."""
     text = json.loads((directory / f"text.{lang}.json").read_text(encoding="utf-8"))
     result = run_code(load(directory), for_wizard(text["starting_code"], gender))
-    assert result.status != "error", result.error
+    refused = (
+        load(directory).kind == "fix"
+        and result.error is not None
+        and (result.error.explanation or {}).get("kind") in REFUSALS
+    )
+    assert result.status != "error" or refused, result.error
+
+
+#: The world's refusals a fix level's given program may stop at (D183).
+REFUSALS = ("no_knot",)
 
 
 @pytest.mark.parametrize(

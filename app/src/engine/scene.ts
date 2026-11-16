@@ -940,7 +940,10 @@ class LevelScene extends Phaser.Scene {
       // A thing in the wizard's hands from the start is seen only once given (D123); one
       // drawn from a sprite and hidden, once found (D184).
       const unseen = thing.hidden === true && this.sprites.has(thing.id);
-      image.setVisible(!thing.carried && !unseen).setAlpha(1);
+      // A thing the way shown takes away, or the first way before any run (D184).
+      const way = this.shownWay ?? this.map.firstWay;
+      const gone = way !== null && (this.map.wayGone[way] ?? []).includes(thing.id);
+      image.setVisible(!thing.carried && !unseen && !gone).setAlpha(1);
       if (thing.kind === 'door') this.doorLook(thing.id, thing.open, thing.lock);
       this.glows.get(thing.id)?.setVisible(!thing.open);
       if (thing.open) this.openDoors.add(thing.id);

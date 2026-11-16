@@ -1,0 +1,23 @@
+{
+  "title": "The check",
+  "goals": [
+    "Leave no broom knotted.",
+    "End on the last broom, (13, 6).",
+    "The program ends with no error.",
+    "Use `knotted`."
+  ],
+  "starting_code": "# This is the program that checks every broom, but it stops at the first one!\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    right = broom.position.x - wizard.position.x\n    up = wizard.position.y - broom.position.y\n    wizard.move_right(right)\n    wizard.move_up(up)\n    broom.untie()\n",
+  "hints": [
+    "The program tries to untie every broom, but untying a broom with no knot is an error!",
+    "We only want to untie a broom if it actually has a knot. Look at its attribute to see if it is knotted before using the method.",
+    "Put an `if` inside the loop to look at `knotted`, just before untying, and don't forget to add spaces before the method so it's inside the `if`!"
+  ],
+  "intro": "{mate} has laid every single broom on the floor, from the corner to the hay, for a last look. A few escaped us and are still knotted! I took the last program and changed it to move right and up to check them all. But it stops at the first broom, because that one doesn't have a knot, and untying a broom with no knot is an error! The last broom is at (13, 6).",
+  "outro": "Phew! Every broom is safe now. And just in time, I can hear the class coming!",
+  "learned": "Now you know that an `if` inside a `for` decides in each turn, and that a method that needs something is used after looking at the attribute that says it.",
+  "ways": {
+    "six": "six brooms, two knotted",
+    "eight": "eight brooms, two knotted",
+    "nine": "nine brooms, three knotted"
+  }
+}

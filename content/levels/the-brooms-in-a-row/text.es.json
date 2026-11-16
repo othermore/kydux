@@ -1,0 +1,22 @@
+{
+  "title": "Las escobas de la fila",
+  "goals": [
+    "No dejes ninguna escoba con nudo.",
+    "Camina por la fila al menos hasta la casilla (9, 6).",
+    "Usa `for`."
+  ],
+  "starting_code": "# Sube hasta la fila de las escobas con `move_up`.\n\n# Ve a la izquierda hasta la primera escoba con `move_left`.\n\n# Encuentra todas las escobas con `find_all`.\n\n# Para cada escoba, desátala con `untie` y da un paso a la derecha con `move_right`.\n",
+  "hints": [
+    "Primero, camina hacia arriba y a la izquierda para colocarte sobre la primera escoba.",
+    "Encuentra las escobas y guarda la lista en una variable. Luego, usa un bucle `for` para repasarlas.",
+    "¡Dentro del bucle, recuerda dejar cuatro espacios delante de las líneas! Desata la escoba en la que estás, y luego da un paso a la derecha hasta la siguiente."
+  ],
+  "intro": "¡Mira! Quienquiera que estuviera aquí dejó algunas escobas en fila en el suelo, empezando dos casillas arriba y tres a la izquierda. ¡He mirado una y he encontrado un hilo negro anudado entre las ramas! Es un encantamiento oscuro que hará que la escoba se encabrite en el aire y tire a quien la monte. ¡Debemos desatarlas todas! Como no sabemos exactamente cuántas hay en la fila, un bucle sobre una lista es lo más seguro para arreglarlas.",
+  "outro": "¡Fila terminada! Ya no quedan nudos encantados aquí.",
+  "learned": "Ahora sabes que un `for` sobre una lista ejecuta sus líneas una vez por cada valor, y que solo un bucle desata cada escoba cuando nadie sabe cuántas son.",
+  "ways": {
+    "three": "tres escobas en la fila",
+    "four": "cuatro escobas",
+    "five": "cinco escobas"
+  }
+}

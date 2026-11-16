@@ -1,0 +1,21 @@
+{
+  "title": "El cobertizo",
+  "goals": [
+    "Di cuántas escobas hay.",
+    "Imprime la lista."
+  ],
+  "starting_code": "# Encuentra todas las escobas con `find_all`.\n\n# Imprime la lista con `print`.\n\n# Di cuántas hay con `say` y `len`.\n",
+  "hints": [
+    "¡Primero debemos encontrar todas las escobas, incluso las escondidas en la paja! Usa `find_all` y guárdalas en una variable.",
+    "Puedes ver la lista entera si pones tu variable dentro de `print`.",
+    "¡Para contar las escobas, usa `len` con tu lista dentro, y pon todo eso dentro de `say`!"
+  ],
+  "intro": "¡{mate} y yo hemos buscado por todas partes! Alguien ha entrado en el cobertizo y ha revuelto las escobas. Están tiradas entre la paja y necesitamos saber cuántas hay. ¡Si falta alguna, es que alguien se la ha llevado! ¿Puedes encontrarlas todas y decirnos el número?",
+  "outro": "¡Así que esas son todas las que hay! Ahora debemos revisarlas con cuidado. Creo que alguien las ha tocado.",
+  "learned": "Ahora sabes qué es una lista, que `len` dice cuántos valores tiene, y que `find_all` da todas las cosas de una clase como una lista, aunque no se vean.",
+  "ways": {
+    "six": "seis escobas",
+    "eight": "ocho escobas",
+    "nine": "nueve escobas"
+  }
+}

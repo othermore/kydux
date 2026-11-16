@@ -1,0 +1,21 @@
+{
+  "title": "The shed",
+  "goals": [
+    "Say how many brooms there are.",
+    "Print the list."
+  ],
+  "starting_code": "# Find all the brooms with `find_all`.\n\n# Print the list with `print`.\n\n# Say how many there are with `say` and `len`.\n",
+  "hints": [
+    "We need to find all the brooms first, even the ones hiding in the straw! Use `find_all` and keep them in a variable.",
+    "You can look at the whole list by putting your variable inside `print`.",
+    "To count the brooms, use `len` with your list inside, and put all of that inside `say`!"
+  ],
+  "intro": "{mate} and I have looked everywhere! Someone has been in the shed and messed up all the brooms. They are hiding in the straw and we need to know how many there are. If any are missing, someone took them! Can you find them all and tell us the number?",
+  "outro": "So that's how many there are! Now we need to check them carefully. I think someone tampered with them.",
+  "learned": "Now you know what a list is, that `len` says how many values it has, and that `find_all` gives every thing of a kind as a list, even hidden ones.",
+  "ways": {
+    "six": "six brooms",
+    "eight": "eight brooms",
+    "nine": "nine brooms"
+  }
+}

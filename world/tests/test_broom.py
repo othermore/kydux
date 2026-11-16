@@ -4,6 +4,7 @@ flown through in order (D187), the race scored by Ilda's count (D189), and the
 child's own functions."""
 
 import json
+from pathlib import Path
 
 import pytest
 from kydux_world.goals import code_lines
@@ -586,3 +587,83 @@ def test_a_part_s_steps_are_checked_on_its_own_scene():
             ],
             actors=[],
         )
+
+
+# The levels of chapter 4 as they are in content/ (39.6): their ways' orders and the
+# race's tick tables, on their scenes.
+CONTENT = Path(__file__).resolve().parents[2] / "content" / "levels"
+
+
+def content_level(name):
+    return Level.from_directory(CONTENT / name)
+
+
+def cells_found(level):
+    world = World(level)
+    return [tuple(broom.position) for broom in world.wizard.find_all("broom")]
+
+
+@pytest.mark.parametrize("way", ["three", "four", "four_high"])
+def test_in_the_straw_each_broom_lies_left_of_and_not_above_the_one_before(way):
+    level = content_level("the-brooms-in-the-straw").way(way)
+    found = cells_found(level)
+    assert found[-1] == (6, 8)
+    for before, after in zip([(11, 6), *found], found, strict=False):
+        assert after[0] < before[0] and after[1] >= before[1]
+
+
+@pytest.mark.parametrize(
+    ("way", "count", "knots"), [("six", 6, 2), ("eight", 8, 2), ("nine", 9, 3)]
+)
+def test_in_the_check_each_broom_lies_right_of_and_not_below_the_one_before(way, count, knots):
+    level = content_level("the-check").way(way)
+    world = World(level)
+    brooms = world.wizard.find_all("broom")
+    assert len(brooms) == count and sum(broom.knotted for broom in brooms) == knots
+    assert not brooms[0].knotted
+    found = [tuple(broom.position) for broom in brooms]
+    assert found[-1] == (13, 6)
+    for before, after in zip([(6, 8), *found], found, strict=False):
+        assert after[0] >= before[0] and after[1] <= before[1]
+
+
+@pytest.mark.parametrize(("way", "count"), [("six", 6), ("eight", 8), ("nine", 9)])
+def test_the_shed_has_six_eight_or_nine_brooms_by_the_way(way, count):
+    assert len(cells_found(content_level("the-shed").way(way))) == count
+
+
+def test_the_race_and_the_rematch_have_zarek_cross_at_fifty_five_and_fifty():
+    race, rematch = content_level("the-race"), content_level("the-rematch")
+    assert (race.race.lines, len(race.race.path), race.race.tick) == (14, 40, 55)
+    assert (rematch.race.lines, len(rematch.race.path), rematch.race.tick) == (12, 37, 50)
+    for level in (race, rematch):
+        assert not {(31, 4), (31, 5)} & set(level.race.path)
+
+
+def test_the_race_s_solution_crosses_at_forty_nine_and_eighteen_lines_one_after_zarek():
+    folder = CONTENT / "the-race"
+    won = run_code(content_level("the-race"), (folder / "solution.py").read_text())
+    assert won.status == "won" and won.goals[1].params["tick"] == 49
+    lost = run_code(
+        content_level("the-race"), (folder / "wrong" / "eighteen_lines.py").read_text()
+    )
+    assert lost.goals[1].params["tick"] == 56 and lost.goals[1].failed
+
+
+def test_the_rematch_is_won_at_forty_nine_and_tied_at_fifty():
+    folder = CONTENT / "the-rematch"
+    won = run_code(content_level("the-rematch"), (folder / "solution.py").read_text())
+    assert won.status == "won" and won.goals[1].params["tick"] == 49
+    tied = run_code(
+        content_level("the-rematch"), (folder / "wrong" / "twelve_lines.py").read_text()
+    )
+    assert tied.goals[1].params["tick"] == 50 and tied.goals[1].failed
+
+
+def test_in_the_rings_a_loop_round_the_pair_flies_into_the_trees():
+    folder = CONTENT / "the-rings"
+    result = run_code(
+        content_level("the-rings"), (folder / "wrong" / "a_loop_round_the_pair.py").read_text()
+    )
+    bumps = [e.data for e in result.events if e.kind == "bump"]
+    assert bumps and bumps[0]["by"] == "high" and bumps[0]["kind"] == "tree"

@@ -1,0 +1,128 @@
+{
+  "id": "the-rings",
+  "kind": "improve",
+  "scene": "the-ring-field",
+  "start": [
+    4,
+    7
+  ],
+  "end": [
+    37,
+    9
+  ],
+  "speaker": "ilda",
+  "carrying": [
+    "wand",
+    "broom"
+  ],
+  "spells": [
+    "drevo"
+  ],
+  "things": [
+    {
+      "kind": "ring",
+      "id": "ring_1",
+      "at": [
+        5,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_2",
+      "at": [
+        7,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_3",
+      "at": [
+        18,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_4",
+      "at": [
+        20,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_5",
+      "at": [
+        33,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_6",
+      "at": [
+        35,
+        8
+      ]
+    }
+  ],
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "ilda",
+      "at": [
+        3,
+        7
+      ],
+      "facing": "right",
+      "sight": 0
+    },
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        3,
+        6
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        3,
+        8
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.cast"
+  ],
+  "goals": [
+    {
+      "kind": "through_in_order",
+      "ids": [
+        "ring_1",
+        "ring_2",
+        "ring_3",
+        "ring_4",
+        "ring_5",
+        "ring_6"
+      ]
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "lines_under",
+      "lines": 18
+    }
+  ],
+  "tick_limit": 100
+}

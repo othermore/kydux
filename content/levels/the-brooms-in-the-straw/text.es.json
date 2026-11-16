@@ -1,0 +1,22 @@
+{
+  "title": "Las escobas de la paja",
+  "goals": [
+    "No dejes ninguna escoba con nudo.",
+    "Termina en la casilla (6, 8).",
+    "Usa `x`."
+  ],
+  "starting_code": "# Encuentra todas las escobas con `find_all`.\n\n# Para cada escoba:\n\n# Cuenta los pasos a la izquierda con `position.x`.\n\n# Cuenta los pasos hacia abajo con `position.y`.\n\n# Muévete a la izquierda con `move_left`.\n\n# Muévete hacia abajo con `move_down`.\n\n# Desátala con `untie`.\n",
+  "hints": [
+    "¡Usa un bucle `for` para repasar las escobas que encuentres. Todo lo demás va dentro del bucle!",
+    "Para saber cuántos pasos dar a la izquierda, resta la posición `x` de la escoba de la posición `x` de {wizard}.",
+    "¡Haz lo mismo con la `y` para los pasos hacia abajo! Luego usa esos números para caminar hasta la escoba y desatarla."
+  ],
+  "intro": "{mate} ha apilado las escobas de la fila junto al banco. ¡Las demás están tiradas por la paja! Cada una está a la izquierda de la anterior, y nunca más arriba. La última de todas siempre está en la casilla (6, 8). Para cada escoba, debemos contar cuántas casillas a la izquierda y cuántas abajo hay desde donde estás, caminar hasta allí, y desatarla. No pasa nada si está en la misma fila: un movimiento de cero pasos simplemente no hace nada.",
+  "outro": "¡Las tenemos! Has caminado hasta cada una perfectamente.",
+  "learned": "Ahora sabes que dentro del bucle un programa trabaja con la escoba de esa vuelta, así que las mismas cuentas sirven para todas.",
+  "ways": {
+    "three": "tres escobas en la paja",
+    "four": "cuatro escobas",
+    "four_high": "cuatro escobas, una en la fila de arriba"
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "id": "the-rematch",
+  "kind": "improve",
+  "scene": "the-race-course",
+  "start": [
+    10,
+    7
+  ],
+  "end": [
+    31,
+    7
+  ],
+  "speaker": "ilda",
+  "carrying": [
+    "wand",
+    "broom"
+  ],
+  "spells": [
+    "drevo"
+  ],
+  "things": [
+    {
+      "kind": "ring",
+      "id": "ring_1",
+      "at": [
+        12,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_2",
+      "at": [
+        14,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_3",
+      "at": [
+        17,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_4",
+      "at": [
+        19,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_5",
+      "at": [
+        22,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_6",
+      "at": [
+        25,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_7",
+      "at": [
+        27,
+        8
+      ]
+    },
+    {
+      "kind": "ring",
+      "id": "ring_8",
+      "at": [
+        29,
+        8
+      ]
+    }
+  ],
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "ilda",
+      "at": [
+        9,
+        7
+      ],
+      "facing": "right",
+      "sight": 0
+    },
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        8,
+        7
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        8,
+        6
+      ]
+    },
+    {
+      "kind": "racer",
+      "id": "zarek",
+      "at": [
+        10,
+        5
+      ],
+      "facing": "right"
+    }
+  ],
+  "race": {
+    "against": "zarek",
+    "lines": 12,
+    "path": [
+      [
+        12,
+        5
+      ],
+      [
+        12,
+        6
+      ],
+      [
+        15,
+        6
+      ],
+      [
+        15,
+        4
+      ],
+      [
+        17,
+        4
+      ],
+      [
+        17,
+        6
+      ],
+      [
+        20,
+        6
+      ],
+      [
+        20,
+        4
+      ],
+      [
+        22,
+        4
+      ],
+      [
+        22,
+        6
+      ],
+      [
+        24,
+        6
+      ],
+      [
+        24,
+        4
+      ],
+      [
+        27,
+        4
+      ],
+      [
+        27,
+        6
+      ],
+      [
+        29,
+        6
+      ],
+      [
+        30,
+        6
+      ],
+      [
+        30,
+        8
+      ],
+      [
+        31,
+        8
+      ],
+      [
+        31,
+        7
+      ]
+    ],
+    "finish": [
+      31,
+      7
+    ]
+  },
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.cast"
+  ],
+  "goals": [
+    {
+      "kind": "through_in_order",
+      "ids": [
+        "ring_1",
+        "ring_2",
+        "ring_3",
+        "ring_4",
+        "ring_5",
+        "ring_6",
+        "ring_7",
+        "ring_8"
+      ]
+    },
+    {
+      "kind": "before",
+      "racer": "zarek"
+    }
+  ],
+  "tick_limit": 120
+}

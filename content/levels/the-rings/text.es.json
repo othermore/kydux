@@ -1,0 +1,17 @@
+{
+  "title": "Los aros",
+  "goals": [
+    "Pasa por los seis aros en orden.",
+    "Aterriza en la piedra blanca.",
+    "En menos de 18 líneas."
+  ],
+  "starting_code": "# La pareja de aros está escrita tres veces. ¡Dale un nombre!\nwizard.cast(\"drevo\")\nwizard.move_right(1)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(6)\nwizard.move_right(9)\nwizard.move_up(6)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(11)\nwizard.move_down(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\n",
+  "hints": [
+    "Busca las cuatro líneas que pasan por un par de aros: abajo, derecha, arriba y derecha.",
+    "Dale a esas cuatro líneas un nombre con `def` y pon los cuatro movimientos dentro.",
+    "Reemplaza las líneas que se repiten con una llamada a tu nueva función en los tres sitios."
+  ],
+  "intro": "¡Aquí está mi programa para el campo de aros! Pasa por tres parejas de aros. Entre la primera y la segunda hay un grupo de árboles altos que hay que pasar por abajo; entre la segunda y la tercera, un estanque para pasar por arriba. ¡El programa tiene 21 líneas! Hazlo más corto con una función para la pareja, llamada en los tres sitios.",
+  "outro": "¡Muy bien hecho! Un programa más corto es mucho más fácil de leer, y vuela igual de suave.",
+  "learned": "Ahora sabes que `def` da un nombre a unas líneas, y que escribir el nombre con paréntesis las ejecuta en cualquier sitio y tantas veces como haga falta."
+}

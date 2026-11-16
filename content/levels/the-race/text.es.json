@@ -1,0 +1,17 @@
+{
+  "title": "La carrera",
+  "goals": [
+    "Pasa por los ocho aros en orden.",
+    "Cruza la meta antes que Zarek.",
+    "En menos de 12 líneas."
+  ],
+  "starting_code": "# Una acción con dos argumentos para una pareja con `def`.\n\n# La palabra con `cast`.\n\n# La salida con `move_right`.\n\n# Las cuatro parejas.\n",
+  "hints": [
+    "¡El zigzag es el mismo, pero las distancias cambian! Dale a tu acción dos argumentos.",
+    "Dentro de la función, usa esos argumentos para las distancias de los dos `move_right`.",
+    "Llama a la función cuatro veces con las distancias exactas para los tramos: 3 y 2, 3 y 2, 2 y 3, y 2 y 2."
+  ],
+  "intro": "¡A ver quién cruza la meta antes! Zarek tiene un programa de 14 líneas. Antes de la salida leeré los dos programas, un tick por línea, ¡así que un programa largo despega tarde! Cada aro saltado cuesta cinco ticks antes de cruzar la meta, y en caso de empate gana Zarek. El programa de Zarek es rápido, pero el tuyo puede ser más corto con una función con argumentos para las cuatro parejas.",
+  "outro": "¡Has ganado! ¡Por los pelos! Un programa corto despega antes, y en la pista de carreras cada tick cuenta.",
+  "learned": "Ahora sabes que una acción propia recibe argumentos entre sus paréntesis, con un nombre cada uno que usa dentro, así que la misma función sirve para tramos distintos, y un programa corto despega antes."
+}

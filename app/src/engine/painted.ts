@@ -9,7 +9,7 @@
 import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
 import type { PlanPictures } from './layout';
-import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
+import { dormitoryMate, friendSets, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
 import { coverDepth, type Lowered, type Nudged, nudgedBy, overDepth, rowDepth, thingDepth } from './depth';
 import type { Dark } from './shade';
@@ -392,6 +392,12 @@ export function thingDepthOn(art: Art, id: string, tile: Tile, placed: ThingPlac
  * colours unlike the wizard's and each other's (D90), and the wizard is drawn in
  * the look the child chose. */
 export function figureName(id: string, look: Look): string {
+  // A first-year of Ilda's class: a friend's figure in its other set of colours, so
+  // that no one takes it for the friend or the mate (39.6).
+  if (id === 'classmate_boy' || id === 'classmate_girl') {
+    const friend = id === 'classmate_boy' ? 'teku' : 'nuri';
+    return `${friend}-${friendSets(look)[friend] === 'a' ? 'b' : 'a'}`;
+  }
   if (id === 'friend') return friendSheet(teacherFriend(look.gender).id, look);
   if (id === 'mate') return friendSheet(dormitoryMate(look.gender).id, look);
   if (id === 'nuri' || id === 'teku') return friendSheet(id, look);

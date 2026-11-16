@@ -1,0 +1,192 @@
+{
+  "id": "the-finish",
+  "speaker": "friend",
+  "scene": "the-race-course",
+  "wizard": [
+    31,
+    7
+  ],
+  "camera": [
+    31,
+    8
+  ],
+  "flying": [
+    "wizard"
+  ],
+  "actors": [
+    {
+      "id": "zarek",
+      "kind": "racer",
+      "facing": "right"
+    },
+    {
+      "id": "ilda",
+      "kind": "teacher",
+      "facing": "up"
+    },
+    {
+      "id": "friend",
+      "kind": "friend",
+      "facing": "up"
+    },
+    {
+      "id": "mate",
+      "kind": "friend",
+      "facing": "up"
+    },
+    {
+      "id": "rinlo",
+      "kind": "friend",
+      "at": [
+        37,
+        9
+      ],
+      "facing": "left"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "by": "wizard",
+      "do": [
+        {
+          "by": "wizard",
+          "land": true
+        },
+        {
+          "by": "zarek",
+          "appear": [
+            28,
+            6
+          ],
+          "flying": true
+        },
+        {
+          "by": "zarek",
+          "fly": [
+            30,
+            6
+          ]
+        },
+        {
+          "by": "zarek",
+          "land": true
+        }
+      ]
+    },
+    {
+      "who": "zarek",
+      "do": {
+        "face": "down"
+      }
+    },
+    {
+      "who": "ilda",
+      "do": [
+        {
+          "appear": [
+            30,
+            13
+          ]
+        },
+        {
+          "walk": [
+            30,
+            9
+          ]
+        },
+        {
+          "by": "friend",
+          "appear": [
+            29,
+            13
+          ]
+        },
+        {
+          "by": "friend",
+          "walk": [
+            29,
+            10
+          ]
+        },
+        {
+          "by": "mate",
+          "appear": [
+            28,
+            13
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            28,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "who": "voice",
+      "by": "wizard",
+      "do": [
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              32,
+              7
+            ],
+            [
+              32,
+              9
+            ],
+            [
+              35,
+              9
+            ]
+          ]
+        },
+        {
+          "by": "friend",
+          "walk": [
+            [
+              34,
+              10
+            ],
+            [
+              34,
+              9
+            ]
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              28,
+              11
+            ],
+            [
+              35,
+              11
+            ],
+            [
+              35,
+              10
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "face": "right"
+        }
+      ]
+    },
+    {
+      "who": "friend"
+    },
+    {
+      "who": "voice"
+    }
+  ]
+}

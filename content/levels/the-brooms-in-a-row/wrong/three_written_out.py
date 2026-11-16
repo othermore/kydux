@@ -1,0 +1,8 @@
+wizard.move_up(2)
+wizard.move_left(3)
+broom_1.untie()
+wizard.move_right()
+broom_2.untie()
+wizard.move_right()
+broom_3.untie()
+wizard.move_right()

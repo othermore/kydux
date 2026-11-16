@@ -8,7 +8,7 @@ const stop = (page: Page, item: string) => page.locator(`.stop[data-item="${item
 
 test('the map shows the course in order: the first stop open, the rest locked', async ({ page }) => {
   await page.goto('/#map');
-  await expect(page.locator('.map-chapter h2')).toHaveText(['Arrival', 'The library', 'The passages']);
+  await expect(page.locator('.map-chapter h2')).toHaveText(['Arrival', 'The library', 'The passages', 'The broom']);
   const first = page.locator('.stop').first();
   // The opening is chapter 1's first story, numbered like the rest (D78).
   await expect(first).toHaveAttribute('data-item', 'story:the-letter');

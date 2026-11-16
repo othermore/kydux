@@ -1,0 +1,143 @@
+{
+  "id": "the-flying-lesson",
+  "speaker": "ilda",
+  "scene": "the-lake-edge",
+  "wizard": [
+    1,
+    7
+  ],
+  "camera": [
+    3,
+    6
+  ],
+  "actors": [
+    {
+      "id": "friend",
+      "kind": "friend",
+      "at": [
+        0,
+        6
+      ],
+      "facing": "right"
+    },
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        0,
+        8
+      ],
+      "facing": "right"
+    },
+    {
+      "id": "ilda",
+      "kind": "teacher",
+      "facing": "right"
+    },
+    {
+      "id": "classmate_boy",
+      "kind": "friend",
+      "facing": "right"
+    },
+    {
+      "id": "classmate_girl",
+      "kind": "friend",
+      "facing": "right"
+    },
+    {
+      "id": "zarek",
+      "kind": "racer",
+      "facing": "down"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice"
+    },
+    {
+      "who": "ilda",
+      "do": [
+        {
+          "appear": [
+            0,
+            5
+          ]
+        },
+        {
+          "walk": [
+            1,
+            5
+          ]
+        },
+        {
+          "face": "down"
+        },
+        {
+          "by": "classmate_boy",
+          "appear": [
+            0,
+            4
+          ]
+        },
+        {
+          "by": "classmate_girl",
+          "appear": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "who": "zarek",
+      "do": [
+        {
+          "appear": [
+            3,
+            2
+          ],
+          "flying": true
+        },
+        {
+          "fly": [
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ]
+          ]
+        },
+        {
+          "land": true
+        },
+        {
+          "face": "left"
+        }
+      ]
+    },
+    {
+      "who": "ilda"
+    },
+    {
+      "who": "mate"
+    },
+    {
+      "who": "voice"
+    }
+  ]
+}

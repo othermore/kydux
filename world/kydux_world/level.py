@@ -799,8 +799,8 @@ def _list_of_boxes(value: Any, level_id: str) -> list[tuple[int, int, int, int]]
 
 def _ways(data: dict[str, Any]) -> list[tuple[dict[str, Any], dict[str, Any]]]:
     """Each way of a level, with level.json as that way plays it: its things and actors
-    merged by id, field by field, and its carrying, spells and dark in place of the
-    level's (D51)."""
+    merged by id, field by field, a thing it says is `gone` taken away, and its
+    carrying, spells and dark in place of the level's (D51)."""
     level_id = data["id"]
     ways = data["ways"]
     if not isinstance(ways, list) or len(ways) < 2 or not all(isinstance(w, dict) for w in ways):
@@ -833,12 +833,21 @@ def _merged_by_id(
     if not isinstance(changes, list) or not all(isinstance(c, dict) for c in changes):
         raise LevelError(f"{level_id}: the way {way_id}'s {key} must be a list of objects")
     by_id = {item.get("id"): dict(item) for item in base if isinstance(item, dict)}
+    gone = set()
     for change in changes:
         item_id = change.get("id")
         if item_id not in by_id:
             raise LevelError(f"{level_id}: the way {way_id} changes {item_id}, not in {key}")
+        # A thing a way does not have: six brooms in one way, nine in another (D184).
+        if change.get("gone") is True:
+            if key != "things" or set(change) != {"id", "gone"}:
+                raise LevelError(
+                    f"{level_id}: the way {way_id} takes away a thing, by its id alone"
+                )
+            gone.add(item_id)
+            continue
         by_id[item_id].update(change)
-    return [by_id[item.get("id")] for item in base]
+    return [by_id[item.get("id")] for item in base if item.get("id") not in gone]
 
 
 def _carrying(data: dict[str, Any], level_id: str, start: Position) -> tuple[ThingSpec, ...]:

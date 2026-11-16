@@ -1,0 +1,7 @@
+{
+  "id": "lists",
+  "speaker": "friend",
+  "teaches": [
+    "wizard.find_all"
+  ]
+}

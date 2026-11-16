@@ -1,0 +1,170 @@
+{
+  "id": "the-shed",
+  "kind": "practice",
+  "scene": "the-broom-shed",
+  "start": [
+    9,
+    8
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        7,
+        8
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        7,
+        7
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_3",
+      "at": [
+        8,
+        7
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_4",
+      "at": [
+        9,
+        7
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_5",
+      "at": [
+        9,
+        6
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_6",
+      "at": [
+        10,
+        6
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_7",
+      "at": [
+        11,
+        6
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_8",
+      "at": [
+        12,
+        6
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_9",
+      "at": [
+        13,
+        6
+      ],
+      "knotted": true,
+      "hidden": true
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        8,
+        8
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        10,
+        8
+      ]
+    }
+  ],
+  "api": [
+    "wizard.find_all",
+    "wizard.say"
+  ],
+  "goals": [
+    {
+      "kind": "say",
+      "count_of": "broom"
+    },
+    {
+      "kind": "uses",
+      "member": "print",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "six",
+      "things": [
+        {
+          "id": "broom_2",
+          "gone": true
+        },
+        {
+          "id": "broom_5",
+          "gone": true
+        },
+        {
+          "id": "broom_7",
+          "gone": true
+        }
+      ]
+    },
+    {
+      "id": "eight",
+      "things": [
+        {
+          "id": "broom_5",
+          "gone": true
+        }
+      ]
+    },
+    {
+      "id": "nine"
+    }
+  ]
+}

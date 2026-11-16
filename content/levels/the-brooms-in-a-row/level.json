@@ -1,0 +1,134 @@
+{
+  "id": "the-brooms-in-a-row",
+  "kind": "practice",
+  "scene": "the-broom-shed",
+  "start": [
+    9,
+    8
+  ],
+  "end": [
+    9,
+    6
+  ],
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        6,
+        6
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        7,
+        6
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_3",
+      "at": [
+        8,
+        6
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_4",
+      "at": [
+        9,
+        6
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_5",
+      "at": [
+        10,
+        6
+      ],
+      "knotted": true
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        8,
+        8
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        10,
+        8
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.find_all",
+    "broom.untie"
+  ],
+  "goals": [
+    {
+      "kind": "untied"
+    },
+    {
+      "kind": "reach",
+      "marker": "E",
+      "hidden": true,
+      "on_the_way": true
+    },
+    {
+      "kind": "uses",
+      "member": "for",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "three",
+      "things": [
+        {
+          "id": "broom_4",
+          "gone": true
+        },
+        {
+          "id": "broom_5",
+          "gone": true
+        }
+      ]
+    },
+    {
+      "id": "four",
+      "things": [
+        {
+          "id": "broom_5",
+          "gone": true
+        }
+      ]
+    },
+    {
+      "id": "five"
+    }
+  ]
+}

@@ -1,0 +1,268 @@
+{
+  "id": "the-morning-after",
+  "speaker": "friend",
+  "scene": "the-dormitory",
+  "light": "morning",
+  "wizard": [
+    18,
+    9
+  ],
+  "camera": [
+    16,
+    8
+  ],
+  "actors": [
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        18,
+        6
+      ],
+      "facing": "down",
+      "asleep": "bed_1"
+    },
+    {
+      "id": "friend",
+      "kind": "friend",
+      "facing": "up"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "by": "wizard",
+      "do": [
+        {
+          "by": "mate",
+          "wake": true
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              14,
+              9
+            ],
+            [
+              14,
+              10
+            ],
+            [
+              12,
+              10
+            ],
+            [
+              12,
+              13
+            ]
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              16,
+              6
+            ],
+            [
+              16,
+              9
+            ],
+            [
+              14,
+              9
+            ],
+            [
+              14,
+              10
+            ],
+            [
+              11,
+              10
+            ],
+            [
+              11,
+              12
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "open": "front_door"
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              13,
+              13
+            ],
+            [
+              13,
+              12
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "face": "left"
+        }
+      ]
+    },
+    {
+      "who": "friend",
+      "do": [
+        {
+          "appear": [
+            12,
+            15
+          ]
+        },
+        {
+          "walk": [
+            12,
+            12
+          ]
+        },
+        {
+          "face": "down"
+        }
+      ]
+    },
+    {
+      "who": "mate"
+    },
+    {
+      "who": "voice",
+      "by": "wizard",
+      "scene": {
+        "scene": "the-broom-shed",
+        "wizard": [
+          9,
+          14
+        ],
+        "camera": [
+          9,
+          10
+        ],
+        "actors": [
+          {
+            "id": "friend",
+            "kind": "friend",
+            "at": [
+              9,
+              13
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "mate",
+            "kind": "friend",
+            "at": [
+              10,
+              14
+            ],
+            "facing": "up"
+          }
+        ],
+        "things": [
+          {
+            "kind": "broom",
+            "id": "broom_1",
+            "at": [
+              6,
+              6
+            ]
+          },
+          {
+            "kind": "broom",
+            "id": "broom_2",
+            "at": [
+              7,
+              6
+            ]
+          },
+          {
+            "kind": "broom",
+            "id": "broom_3",
+            "at": [
+              8,
+              6
+            ]
+          },
+          {
+            "kind": "broom",
+            "id": "broom_4",
+            "at": [
+              8,
+              7
+            ]
+          },
+          {
+            "kind": "broom",
+            "id": "broom_5",
+            "at": [
+              11,
+              7
+            ]
+          },
+          {
+            "kind": "broom",
+            "id": "broom_6",
+            "at": [
+              12,
+              8
+            ]
+          },
+          {
+            "kind": "broom",
+            "id": "broom_7",
+            "at": [
+              13,
+              6
+            ]
+          }
+        ]
+      },
+      "do": [
+        {
+          "by": "friend",
+          "walk": [
+            [
+              9,
+              8
+            ],
+            [
+              8,
+              8
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            9,
+            8
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            10,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "who": "friend",
+      "do": {
+        "face": "up"
+      }
+    },
+    {
+      "who": "friend"
+    }
+  ]
+}

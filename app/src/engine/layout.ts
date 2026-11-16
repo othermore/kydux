@@ -162,6 +162,10 @@ export interface Layout {
   ways: Record<string, Record<string, Tile>>;
   /** And which way each way turns the actors it names (D51). */
   wayFacings: Record<string, Record<string, Facing>>;
+  /** The things each way takes away, by the way's id: six brooms in one, nine in
+   * another (D184); the first way's are gone before any run. */
+  wayGone: Record<string, string[]>;
+  firstWay: string | null;
   /** What the scene shows and the world does not hold, like a flat stone. */
   props: { kind: string; tile: Tile }[];
   /** Every reach goal's cell, a hidden one's too (D143). */
@@ -292,9 +296,13 @@ export function layout(level: LevelJson): Layout {
   }
   const ways: Record<string, Record<string, Tile>> = {};
   const wayFacings: Record<string, Record<string, Facing>> = {};
+  const wayGone: Record<string, string[]> = {};
   for (const way of asList(level.ways)) {
     const moved: Record<string, Tile> = {};
     const turned: Record<string, Facing> = {};
+    wayGone[String(way.id)] = asList(way.things)
+      .filter((spec) => spec.gone === true)
+      .map((spec) => String(spec.id));
     for (const spec of [...asList(way.things), ...asList(way.actors)]) {
       const tile = place(spec);
       if (tile) moved[String(spec.id)] = tile;
@@ -316,6 +324,8 @@ export function layout(level: LevelJson): Layout {
     carrying,
     ways,
     wayFacings,
+    wayGone,
+    firstWay: asList(level.ways)[0] ? String(asList(level.ways)[0]?.id) : null,
     dark: level.dark === true,
     darkArea: boxedCells(level.dark_area),
     enchanted: boxedCells(level.enchanted),

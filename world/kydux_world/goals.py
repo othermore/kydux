@@ -355,20 +355,35 @@ class NumbersUnderGoal:
         return len(numbers) < self.count
 
 
+#: The words of Python a uses goal may name, by the kind of statement each makes.
+KEYWORDS = {"for": ast.For, "while": ast.While, "if": ast.If, "def": ast.FunctionDef}
+
+
 class UsesGoal:
     """Met, before the run starts, when the code names a member of an object, an
-    action or an attribute: `{"kind": "uses", "member": "find_nearest"}`."""
+    action or an attribute: `{"kind": "uses", "member": "find_nearest"}`; a function of
+    Python's, called (`print`); or a word of Python's, `for`, `while`, `if`, `def`."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
         member = spec.params.get("member")
-        if not isinstance(member, str) or not member.isidentifier():
+        if not isinstance(member, str) or not (member.isidentifier() or member in KEYWORDS):
             raise LevelError(f"{level.id}: a uses goal names a member")
         self.member = member
 
     def check(self, world: "World") -> bool:
         tree = _code_tree(world.code)
-        return tree is not None and any(
-            isinstance(node, ast.Attribute) and node.attr == self.member for node in ast.walk(tree)
+        if tree is None:
+            return False
+        if self.member in KEYWORDS:
+            return any(isinstance(node, KEYWORDS[self.member]) for node in ast.walk(tree))
+        return any(
+            (isinstance(node, ast.Attribute) and node.attr == self.member)
+            or (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == self.member
+            )
+            for node in ast.walk(tree)
         )
 
 

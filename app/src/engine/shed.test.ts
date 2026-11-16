@@ -5,7 +5,7 @@ import { TILE } from './placeholders';
 import { spriteFoot, spriteName, spriteOrigin, type ThingSprites } from './things';
 import { boxFrame } from './zooming';
 
-// Sprint 40's page: a broom hung on a peg (D195), the zones (D196) and a story step's
+// The shed on the page: a broom hung on a peg (D195), the zones (D196) and a story step's
 // framing (D199).
 
 const SPRITES: ThingSprites = {

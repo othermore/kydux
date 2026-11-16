@@ -648,9 +648,9 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     the race scored by Ilda's count (D189), and a function taught where a loop cannot
     serve (D190); and, in the same sprint, the browser tests' time on GitHub (D191), a
     score of its own for every chapter (D192), the page's look with a welcome page
-    (D193), and portraits of every character and every look (D194); and, after the
-    owner's reading of the chapter (`sprint-40.md`), the shed's brooms hung on a peg a
-    cell (D195), found by where the wizard stands, by the wall or in the straw (D196),
+    (D193), and portraits of every character and every look (D194); and, in
+    `sprint-40.md`, the shed's brooms hung on a peg a cell (D195), found by where the
+    wizard stands, by the wall or in the straw (D196),
     the broom taught first with a practice of one `untie` (D197), a list's element by
     its index and both ways of a loop over a list (D198), a story's step that frames a
     place (D199), and the map folded by chapter (D200).

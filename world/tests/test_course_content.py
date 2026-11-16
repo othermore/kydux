@@ -368,14 +368,14 @@ def test_a_level_on_a_scene_starts_where_the_one_before_it_ended(before, after):
         list(walked(before, way)[-1]) for way in range(len(level_json(before).get("ways", [])))
     ]
     # The dark tunnel starts where the child cannot know (D152); two of the shed's levels
-    # start where the friend says, the door and the straw's top right (sprint 40, 2.4).
+    # start where the friend says, the door and the straw's top right.
     if after not in ("the-dark-tunnel", *STARTS_SAID):
         assert level_json(after)["start"] in (ended, again, *ways)
 
 
 #: The levels that start where their intro says rather than where the one before ended:
 #: the wall's, back at the shed's door, and the straw's, come down from the wall to the
-#: straw's top right (sprint 40, 2.4).
+#: straw's top right.
 STARTS_SAID = {"the-brooms-on-the-wall": [9, 8], "the-brooms-in-the-straw": [12, 7]}
 
 

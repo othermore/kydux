@@ -2850,13 +2850,13 @@ one overturns stays, marked as superseded.
   2026-11-11 by the owner (*habrá que poner las escobas colgadas; hay que hacer la
   imagen de una escoba colgada y ver cómo se posicionan para que encajen en el gancho
   perfectamente*). The shed's rack holds eight pegs, one in the middle of each cell from
-  column 6 to 13, laid by the tool from the painting's own peg (`repaint.py pegs`; the
-  twelve Gemini painted are filled over and the board drawn out at its ends). A
-  hanging broom is a thing of kind `broom` with `"hung": true`, on
+  column 6 to 13, laid by the tool from the painting's own peg (`repaint.py pegs`,
+  which fills the painting's pegs over and draws the board out to the rack's ends).
+  A hanging broom is a thing of kind `broom` with `"hung": true`, on
   the rack's cell under its peg, (x, 5) in the shed, a cell no one walks on; `untie()`
   works from the cell under it, (x, 6), as a door opens from beside it, and is refused
   `too_far` from anywhere else (`under` in `level.py`). A broom on the floor is untied
-  on its own cell, as before. The page draws a hung broom from its kind's hung sprite,
+  on its own cell (D183). The page draws a hung broom from its kind's hung sprite,
   `broom-hung` in `things.json` (Gemini's broom hanging by a loop of cord from a peg),
   which hangs from its top (`anchor: "top"`): its `origin` is the sprite's own peg, laid
   over the scene's peg's point (`foot`, above its cell), at its row's depth,

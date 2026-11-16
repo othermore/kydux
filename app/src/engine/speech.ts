@@ -4,9 +4,10 @@
 // over, until that time has passed; it follows who it is over as they walk, sits
 // below them when there is no room above, and is never held past the scene's
 // sides. Under a place a story step frames (D199) the camera does not follow the
-// words: there a bubble keeps inside what the frame shows. Its words are never smaller on the screen than at zoom 1 (D106): zoomed
-// out, they are drawn larger. The scene's parent says what is said: data-bubble and
-// data-speaker, data-thought, and data-words-scale.
+// words: there a bubble keeps inside what the frame shows. Its words are never
+// smaller on the screen than at zoom 1 (D106): zoomed out, they are drawn larger.
+// The scene's parent says what is said: data-bubble and data-speaker, data-thought,
+// and data-words-scale.
 
 import Phaser from 'phaser';
 import { TILE } from './placeholders';

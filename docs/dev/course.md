@@ -278,9 +278,10 @@ course behind the castle. The three go down before breakfast to undo what the vo
 in the walls asked an older pupil to do to the brooms; then Ilda gives the flying
 lesson, Zarek boasts, the wizard races him twice, and an older pupil is seen
 muttering by the gate. The ideas, one a lesson, each where its level cannot be won
-without it: a list, because the brooms lie hidden in the straw and their number
-changes from one way to another; a loop over a list, because the same is done to
-each broom and no fixed number of turns wins every way; an `if` inside the loop,
+without it: a list, because the brooms are many, some hung on the wall and some
+lying in the straw, and their number changes from one way to another; a loop over a
+list, because the same is done to each broom and no fixed number of turns wins
+every way; an `if` inside the loop,
 because untying a broom with no knot is an error; flying, because water is not
 walked on; an action of the child's own, a function, because the same two rings
 come three times with a different manoeuvre between them, which a loop cannot
@@ -309,14 +310,14 @@ each level says (D182).
 | `level:the-brooms-on-the-wall` | Practice 3 | Two, three or four knotted brooms hung on the pegs from column 6: up to the wall, left to under the first, then for each broom of the list untie it and step right. Two untyings written out win the shortest way only; a list made at the door is empty. Bonus: `for` used. | |
 | `level:the-brooms-in-the-straw` | Practice 4 | From the straw's top right, three brooms lying in the straw, each left of and not above the one before, the last on (6, 8): in the loop, the steps left and down from the wizard's cell to the broom's, from their two numbers (D153), walked, and the broom untied. The intro is the owner's. Bonus: `x` used. | |
 | `lesson:checking-each` | Lesson 4 | *An if inside the loop*: an `if` inside a `for`, its lines moved in by eight spaces, so that each turn does one thing or another by the value of that turn. One page; its block prints which name of a list is a cat. | `broom.knotted` |
-| `level:the-check` | Fix 1 | Every broom hung back on its peg, six, seven or eight, two or three still knotted: the wall's program, given whole, stops at the first broom with no knot, *this broom has no knot*; untie only `if broom.knotted:`. Goals: no broom knotted, and the run ends with no error. The intro is the owner's. Bonus: `knotted` used. | |
+| `level:the-check` | Fix 1 | Every broom hung back on its peg, five, six or seven, two or three still knotted, the peg by the bales left empty so that the step after the last broom has floor under it: the wall's program, given whole, stops at the first broom with no knot, *this broom has no knot*; untie only `if broom.knotted:`. Goals: no broom knotted, and the run ends with no error. The intro is the owner's. Bonus: `knotted` used. | |
 | `story:the-flying-lesson` | Story 2 | At the lake's edge: Ilda arrives with the class; the friend pockets the black thread; Zarek flies in, circles and lands, boasting; Ilda names the word and the first exercise. | |
-| `lesson:drevo` | Lesson 4 | Ilda's: the word `drevo`, cast with the wand and a broom carried, lifts the broom; from then on the moves fly, over water, hedges and fences, three times as fast, never through a tree's crown; the broom sets down where the program ends. One page and no *Try it*: the spell is cast in the level (D174). | (the spell `drevo`) |
-| `level:the-first-flight` | Practice 4 | Walk to the jetty's end, the word, and fly over the water to the white stone; a walk into the water is refused, *water is not walked on*. Bonus: `drevo` cast from the jetty. | |
-| `lesson:an-action-of-your-own` | Lesson 5 | `def` gives some lines a name, and the programmers call it a function; the name with brackets runs them, wherever it is written and as often; a loop repeats what is the same and follows on, a function serves wherever it is wanted, with other lines between, and reads as what it does. Two pages; its block defines a greeting and calls it twice with another line between. | `concept:def` |
+| `lesson:drevo` | Lesson 5 | Ilda's: the word `drevo`, cast with the wand and a broom carried, lifts the broom; from then on the moves fly, over water, hedges and fences, three times as fast, never through a tree's crown; the broom sets down where the program ends. One page and no *Try it*: the spell is cast in the level (D174). | (the spell `drevo`) |
+| `level:the-first-flight` | Practice 5 | Walk to the jetty's end, the word, and fly over the water to the white stone; a walk into the water is refused, *water is not walked on*. Bonus: `drevo` cast from the jetty. | |
+| `lesson:an-action-of-your-own` | Lesson 6 | `def` gives some lines a name, and the programmers call it a function; the name with brackets runs them, wherever it is written and as often; a loop repeats what is the same and follows on, a function serves wherever it is wanted, with other lines between, and reads as what it does. Two pages; its block defines a greeting and calls it twice with another line between. | `concept:def` |
 | `level:the-rings` | Improve 1 | Three pairs of rings flown through in order, under the trees between the first two pairs and over the pond between the last two: the given program writes the pair out three times, 21 lines; with the pair as a function, fewer than 18 (D190). A `for` round the pair flies into the trees. | |
-| `lesson:arguments-of-your-own` | Lesson 6 | Names between the `def`'s brackets are the function's arguments; a call gives them values, in the same order, as `move_right(3)` is given its 3, and inside the function the names are worth them. One page; its block greets two names with one function. | `concept:def_arguments` |
-| `level:the-race` | Practice 5 | Eight rings at different distances and the finish, before Zarek, by Ilda's count: a tick a line before the take-off, the flight, five ticks a ring missed (D189). The program without a function crosses one tick after him; a function with two arguments crosses first. Bonus: fewer than 12 lines. | |
+| `lesson:arguments-of-your-own` | Lesson 7 | Names between the `def`'s brackets are the function's arguments; a call gives them values, in the same order, as `move_right(3)` is given its 3, and inside the function the names are worth them. One page; its block greets two names with one function. | `concept:def_arguments` |
+| `level:the-race` | Practice 6 | Eight rings at different distances and the finish, before Zarek, by Ilda's count: a tick a line before the take-off, the flight, five ticks a ring missed (D189). The program without a function crosses one tick after him; a function with two arguments crosses first. Bonus: fewer than 12 lines. | |
 | `level:the-rematch` | Improve 2 | The rings moved and Zarek sharper: the race's program flies into a ring's side; the same function with new numbers wins by one tick, and a line more ties, which is Zarek's. | |
 | `story:the-finish` | Story 3 | Zarek lands and concedes; Ilda, who found a black thread in the shed's straw, gives the wizard the broom; an older pupil by the gate muttering what gives him away, the one from the crack, unnamed; the voice still a mystery; what the chapter taught. | |
 
@@ -329,7 +330,7 @@ count of a kind in the way played (D184); flying, `drevo`, every move flown, a f
 step played three times as fast with the wind's sound (D185); cells that a flight
 crosses and a walk does not, `low`, and cells neither does, `high` (D186); rings,
 flown through vertically and in order, with the rings missed counted (D187); the
-wizard's flying rows and the new figures, Zarek and Rinlo (D188); a racer with a
+wizard's flying rows and the figures of Zarek and Rinlo (D188); a racer with a
 fixed path and the race scored by Ilda's count, its start delayed a tick a line and
 five ticks a ring missed, and the goal of crossing the finish first (D189); a goal
 that the run ends with no error; a cast goal made from a set of cells; a story that

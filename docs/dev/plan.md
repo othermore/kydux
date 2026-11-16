@@ -707,7 +707,9 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     struck, D253, heard as the wind that rises as the ground nears and is switched off,
     D255), a thought with no room above
     beside the head (D245), a tip that comes up with its picture (D246), and a run's
-    end that sounds when the run ends (D247).
+    end that sounds when the run ends (D247); and, in `sprint-50.md`, the notebook's
+    page of Python, every word and sign taught so far with a line and an example to
+    read (D256).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
     the child defines a creature with its attributes and methods and sends
     it through a passage.

@@ -68,7 +68,13 @@ A chapter's scene is one painting. Its map is read from the painting.
    writes `sweep-<scene>.png` with every cell where something covers it,
    lists the cells where the wizard is wholly hidden, and fails when a
    cut-out breaks one of the rules below. Run it after every export, and
-   look at its sheet before anyone plays the scene.
+   look at its sheet before anyone plays the scene. For a review,
+   `tools/art/sweep.py <scene> --sheets <folder>` writes the scene's
+   review sheets (D208): its cells in two sheets, the even rows and the
+   odd ones, with a figure on every cell walked on or flown over; its
+   masks, each named; and, for the shed, its brooms and its rows of
+   figures. Each sheet carries the grid and each cell's number at its
+   foot, where a figure on that cell stands.
 7. Paint the margin, the scene going on beyond its playable area (D83):
    say its cells in the settings (`margin`), make the canvas with
    `tools/art/margin.py <scene> canvas`, ask Gemini to paint its border

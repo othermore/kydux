@@ -4,6 +4,7 @@ walked on, drawn as the page draws it, and what of the painting covers it there;
 and the checks that a scene's cut-outs hold neither too much nor too little.
 
     tools/art/sweep.py [scene]
+    tools/art/sweep.py [scene] --sheets <folder>
 
 Prints, for each cell where something is drawn in front of the wizard, how much
 of the wizard it covers, how much of its head, and which images; writes a sheet
@@ -14,6 +15,14 @@ all-<scene>.png; and prints the problems found, failing when
 there are any. The page draws a
 row's image at the row's depth, R + 0.75, a figure on row r at r + FOOT_IN_CELL,
 and a thing among the rows by its own row (painted.ts).
+
+With --sheets it writes instead the scene's review sheets into the folder (D208):
+the cells, the even rows and the odd ones, each cell walked on or flown over tinted
+and a figure on it where the game draws it; the masks, each tinted, outlined and
+named; and for the shed its brooms and the figures of rows 5, 6, 8 and the doorway.
+Every sheet carries the cells' borders and each cell's number at its foot, where the
+game's ?debug layer writes it. A scene wider than forty cells is written in parts
+that share two columns.
 
 The problems, each on a cell walked on:
 
@@ -286,17 +295,16 @@ def window(layer: Layer, x0: int, y0: int, x1: int, y1: int) -> np.ndarray:
     return out
 
 
-def figure(name: str = LOOK) -> tuple[np.ndarray, int]:
-    """A figure's standing frame, facing down, the wizard's unless named, and how far
-    above its bottom the feet are."""
+def figure(name: str = LOOK, flying: bool = False) -> tuple[np.ndarray, int]:
+    """A figure's standing frame, facing down, the wizard's unless named, or its first
+    flying frame (flight.ts), and how far above its bottom the feet are."""
     figures = CONTENT / "art" / "figures"
     data = json.loads((figures / "figures.json").read_text(encoding="utf-8"))
     width, height = data["frame"]
     sheet = Image.open(figures / f"{name}.webp").convert("RGBA")
-    standing = data["standing"]
-    return np.array(sheet.crop((standing * width, 0, (standing + 1) * width, height))), data[
-        "foot"
-    ]
+    column, row = (0, data["rows"]["fly"]) if flying else (data["standing"], 0)
+    box = (column * width, row * height, (column + 1) * width, (row + 1) * height)
+    return np.array(sheet.crop(box)), data["foot"]
 
 
 def seen_at(scene: Scene, x: int, y: int, name: str = LOOK) -> int:
@@ -829,6 +837,293 @@ def everyone(scene: Scene, hidden: set[tuple[int, int]]) -> Image.Image:
     return out
 
 
+# The review's sheets (D208): the scene as the game draws it with its grid and its
+# numbers, the number of a cell at its foot, in its middle, as the ?debug layer writes
+# it, so that a figure on a cell stands just over its number.
+
+#: How tall a cell's number is, as a part of a cell: the ?debug layer's 9 pixels of a
+#: 48-pixel cell (debug.ts).
+NUMBER_SIZE = 9 / 48
+#: The widest a sheet is, in cells: a wider scene is written in parts that share
+#: SHARED columns.
+WIDEST = 40
+SHARED = 2
+#: How far a flying figure is lifted above its cell, in cells (flight.ts).
+FLY_LIFT = 0.5
+#: The tints of a cell walked on and of one only flown over.
+WALKED_TINT = (60, 220, 255)
+FLOWN_TINT = (90, 120, 255)
+
+
+@dataclass
+class Placed:
+    """Something drawn among the scene's layers by its depth, in rows: a figure, or a
+    thing drawn from its sprite."""
+
+    depth: float
+    image: Image.Image
+    left: int
+    top: int
+
+
+def flown(scene: str) -> np.ndarray:
+    """The cells a flight crosses and no one walks on (D186)."""
+    folder = CONTENT / "scenes" / scene
+    marks = (folder / "map.txt").read_text(encoding="utf-8").split()
+    terrains = json.loads((folder / "scene.json").read_text(encoding="utf-8"))["terrains"]
+    fly = {k for k, t in terrains.items() if t.get("fly") and not t.get("walk")} | {"~"}
+    return np.array([[char in fly for char in row] for row in marks])
+
+
+def standing_on(scene: Scene, x: int, y: int, flying: bool = False) -> Placed:
+    """A figure on (x, y) where the game draws it, nudged and lowered; flying, lifted
+    half a cell, its depth its cell's."""
+    frame, foot = figure(flying=flying)
+    height, width = frame.shape[:2]
+    left = int(middle_at(scene, x, y) * scene.cell) - width // 2
+    lift = round(FLY_LIFT * scene.cell) if flying else 0
+    top = int(feet_at(scene, x, y) * scene.cell) + foot - height - lift
+    image = Image.fromarray(shaded(scene, frame, x, y))
+    return Placed(feet_at(scene, x, y), image, left, top)
+
+
+def sprite_on(scene: Scene, kind: str, cell: tuple[int, int], hung: bool = False) -> Placed:
+    """A thing drawn from its kind's sprite on a cell, as the game draws it (things.ts):
+    its size, its foot and its origin from things.json, moved by the scene's shift
+    (D207); a hung broom from its hung sprite (D195), at its row's depth, a lying one
+    just under it."""
+    things = CONTENT / "art" / "things"
+    sprites = json.loads((things / "things.json").read_text(encoding="utf-8"))
+    name = f"{kind}-hung" if hung and f"{kind}-hung" in sprites else kind
+    about = sprites[name]
+    picture = Image.open(things / about["image"]).convert("RGBA")
+    height = round(about["size"][1] * scene.cell)
+    width = round(picture.width * height / picture.height)
+    picture = picture.resize((width, height), Image.Resampling.LANCZOS)
+    top_anchor = about.get("anchor") == "top"
+    ox, oy = about.get("origin", [0.5, 0.0] if top_anchor else [0.5, 1.0])
+    x, y = cell
+    fx = (x + about["foot"][0] + scene.shifted.get(cell, 0.0)) * scene.cell
+    fy = (y + about["foot"][1]) * scene.cell
+    lying = about.get("lying", False)
+    depth = y + ROW_IN_CELL + (-0.00001 if lying else 0.00001)
+    return Placed(depth, picture, round(fx - ox * width), round(fy - oy * height))
+
+
+def composed(scene: Scene, placed: list[Placed], ground: Image.Image | None = None) -> Image.Image:
+    """The scene as the game draws it: the ground, or the one given, then its layers
+    and what is placed among them, each by its depth."""
+    width, height = scene.columns * scene.cell, scene.rows * scene.cell
+    out = (ground or Image.fromarray(scene.ground)).convert("RGBA")
+    drawn: list[tuple[float, int, Layer | Placed]] = [
+        (layer.depth, 0, layer) for layer in scene.layers
+    ]
+    drawn += [(item.depth, 1, item) for item in placed]
+    for _, _, what in sorted(drawn, key=lambda item: (item[0], item[1])):
+        if isinstance(what, Layer):
+            out.alpha_composite(Image.fromarray(window(what, 0, 0, width, height)))
+        else:
+            out.paste(what.image, (what.left, what.top), what.image)
+    return out
+
+
+def tinted(scene: Scene, image: Image.Image, cells: dict[tuple[int, int], tuple]) -> Image.Image:
+    """Cells tinted on the ground, under everything the game draws over it."""
+    tint = Image.new("RGBA", image.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(tint)
+    cell = scene.cell
+    for (x, y), colour in cells.items():
+        draw.rectangle(
+            (x * cell, y * cell, (x + 1) * cell - 1, (y + 1) * cell - 1), fill=(*colour, 80)
+        )
+    return Image.alpha_composite(image, tint)
+
+
+def framed(scene: Scene, image: Image.Image, cells: dict[tuple[int, int], tuple]) -> Image.Image:
+    """Cells framed inside their borders, over everything drawn."""
+    out = image.copy()
+    draw = ImageDraw.Draw(out)
+    cell, inset = scene.cell, max(3, scene.cell // 24)
+    for (x, y), colour in cells.items():
+        box = (x * cell + inset, y * cell + inset, (x + 1) * cell - inset, (y + 1) * cell - inset)
+        draw.rectangle(box, outline=(*colour, 255), width=max(2, scene.cell // 40))
+    return out
+
+
+def gridded(scene: Scene, image: Image.Image) -> Image.Image:
+    """The cells' borders, a dark line under a light one, seen on any ground, and each
+    cell's number at its foot, in its middle, over everything drawn (D208), as the
+    game's ?debug layer draws them (debug.ts)."""
+    out = image.convert("RGBA")
+    lines = Image.new("RGBA", out.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(lines)
+    cell = scene.cell
+    width, height = scene.columns * cell, scene.rows * cell
+    for colour, line in (((0, 0, 0, 140), 3), ((255, 255, 255, 205), 1)):
+        for x in range(scene.columns + 1):
+            draw.line(((x * cell, 0), (x * cell, height)), fill=colour, width=line)
+        for y in range(scene.rows + 1):
+            draw.line(((0, y * cell), (width, y * cell)), fill=colour, width=line)
+    out.alpha_composite(lines)
+    words = ImageDraw.Draw(out)
+    font = number_font(round(NUMBER_SIZE * cell))
+    for y in range(scene.rows):
+        for x in range(scene.columns):
+            words.text(
+                ((x + 0.5) * cell, (y + FOOT_IN_CELL) * cell),
+                f"{x},{y}",
+                font=font,
+                anchor="mm",
+                fill=(255, 243, 107),
+                stroke_width=2,
+                stroke_fill=(0, 0, 0),
+            )
+    return out
+
+
+def number_font(size: int) -> ImageFont.ImageFont | ImageFont.FreeTypeFont:
+    """A bold monospace face for the numbers, as the ?debug layer's, or Pillow's own."""
+    for path in (
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf",
+        "/Library/Fonts/Courier New Bold.ttf",
+        "C:/Windows/Fonts/courbd.ttf",
+    ):
+        if Path(path).is_file():
+            return ImageFont.truetype(path, size)
+    return ImageFont.load_default(size=size)
+
+
+def parts(columns: int) -> list[range]:
+    """The columns of each part of a sheet: one part up to WIDEST cells wide, else
+    parts of equal width that share SHARED columns with the next."""
+    if columns <= WIDEST:
+        return [range(columns)]
+    count = -(-(columns - SHARED) // (WIDEST - SHARED))
+    width = -(-(columns + SHARED * (count - 1)) // count)
+    starts = [index * (width - SHARED) for index in range(count)]
+    return [range(start, min(start + width, columns)) for start in starts]
+
+
+def written(scene: Scene, image: Image.Image, folder: Path, name: str) -> list[Path]:
+    """A sheet saved whole, or in its parts, each part named by its columns."""
+    folder.mkdir(parents=True, exist_ok=True)
+    found = []
+    pieces = parts(scene.columns)
+    for columns in pieces:
+        piece = image.crop(
+            (columns.start * scene.cell, 0, columns.stop * scene.cell, scene.rows * scene.cell)
+        )
+        suffix = "" if len(pieces) == 1 else f"-columns-{columns.start}-{columns.stop - 1}"
+        path = folder / f"{scene.name}-{name}{suffix}.png"
+        piece.convert("RGB").save(path)
+        found.append(path)
+    return found
+
+
+def cells_sheets(scene: Scene, folder: Path) -> list[Path]:
+    """Two sheets, the even rows and the odd ones: every cell walked on or flown over
+    tinted, and a figure on each of that sheet's rows where the game draws it, flying
+    over a cell only flown over, so that every figure is seen whole."""
+    walked = {(int(x), int(y)) for y, x in zip(*np.nonzero(scene.walked), strict=True)}
+    over = flown(scene.name)
+    only_flown = {(int(x), int(y)) for y, x in zip(*np.nonzero(over), strict=True)} - walked
+    tints = {cell: WALKED_TINT for cell in walked} | {cell: FLOWN_TINT for cell in only_flown}
+    found = []
+    for parity, name in ((0, "cells-even-rows"), (1, "cells-odd-rows")):
+        placed = [
+            standing_on(scene, x, y, flying=(x, y) in only_flown)
+            for x, y in sorted(walked | only_flown, key=lambda c: (c[1], c[0]))
+            if y % 2 == parity and (x, y) not in scene.enchanted
+        ]
+        ground = tinted(scene, Image.fromarray(scene.ground).convert("RGBA"), tints)
+        image = framed(scene, composed(scene, placed, ground), tints)
+        found += written(scene, gridded(scene, image), folder, name)
+    return found
+
+
+#: The colours the masks are tinted in, one after another.
+MASK_COLOURS = [
+    (255, 80, 80),
+    (80, 200, 255),
+    (255, 200, 40),
+    (120, 255, 120),
+    (220, 110, 255),
+    (255, 140, 60),
+]
+
+
+def masks_sheet(scene: Scene, folder: Path) -> list[Path]:
+    """The scene with every mask tinted and outlined, each named: a row's image by its
+    row and how it is drawn (static, under, over), a thing by its id, its row and
+    whether it is drawn under or over a figure on its row."""
+    image = composed(scene, [])
+    width, height = scene.columns * scene.cell, scene.rows * scene.cell
+    over = np.zeros((height, width, 4), dtype=np.uint8)
+    labels = []
+    for index, layer in enumerate(scene.layers):
+        colour = MASK_COLOURS[index % len(MASK_COLOURS)]
+        alpha = window(layer, 0, 0, width, height)[..., 3] > 127
+        if not alpha.any():
+            continue
+        edge = alpha & ~image_first.eroded(alpha, max(2, scene.cell // 32))
+        over[alpha & (over[..., 3] < 70)] = (*colour, 70)
+        over[edge] = (*colour, 255)
+        rows, columns = np.nonzero(alpha)
+        if layer.row is not None:
+            words = layer.name
+        else:
+            how = " · over" if layer.over else " · under" if layer.under else ""
+            words = f"{layer.name} · row {int(layer.depth)}{how}"
+        labels.append(((int(columns.min()) + 4, int(rows.min()) + 4), words, colour))
+    image.alpha_composite(Image.fromarray(over))
+    image = gridded(scene, image)
+    draw = ImageDraw.Draw(image)
+    font = number_font(round(scene.cell * 0.2))
+    for place, words, colour in labels:
+        draw.text(
+            place, words, font=font, fill=(*colour, 255), stroke_width=3, stroke_fill=(0, 0, 0)
+        )
+    return written(scene, image, folder, "masks")
+
+
+def shed_sheets(scene: Scene, folder: Path) -> list[Path]:
+    """The shed's things (D202, D211): its brooms, a lying one on each of the seven straw
+    cells, outlined, and a hung one on each of the eight pegs; a figure on each cell of
+    row 5, with the eight brooms hung behind them and with no broom; of rows 6 and 8,
+    and of the doorway's two rows, each sheet's rows far enough apart that every figure
+    is seen whole."""
+    about = json.loads((CONTENT / "scenes" / scene.name / "scene.json").read_text())
+    straw = [tuple(cell) for cell in about["straw"]]
+    pegs = [(x, 4) for x in range(6, 14)]
+    hung = [sprite_on(scene, "broom", peg, hung=True) for peg in pegs]
+    lying = [sprite_on(scene, "broom", cell) for cell in straw]
+
+    def row(y: int) -> list[Placed]:
+        return [standing_on(scene, x, y) for x in range(scene.columns) if scene.walked[y, x]]
+
+    sheets = {
+        "things-brooms": (hung + lying, {cell: (255, 200, 40) for cell in straw}),
+        "things-row-5-hung": (hung + row(5), {}),
+        "things-row-5-bare": (row(5), {}),
+        "things-rows-6-9": (row(6) + row(9), {}),
+        "things-rows-8-10": (row(8) + row(10), {}),
+    }
+    found = []
+    for name, (placed, frames) in sheets.items():
+        image = framed(scene, composed(scene, placed), frames)
+        found += written(scene, gridded(scene, image), folder, name)
+    return found
+
+
+def review_sheets(name: str, folder: Path) -> list[Path]:
+    """Every review sheet of a scene (D208), into a folder."""
+    scene = load(name)
+    found = cells_sheets(scene, folder) + masks_sheet(scene, folder)
+    if name == "the-broom-shed":
+        found += shed_sheets(scene, folder)
+    return found
+
+
 def main(name: str) -> int:
     scene = load(name)
     found = covers(scene)
@@ -855,7 +1150,11 @@ def main(name: str) -> int:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 4 and sys.argv[2] == "--sheets":
+        for path in review_sheets(sys.argv[1], Path(sys.argv[3])):
+            print(path)
+        sys.exit(0)
     if len(sys.argv) != 2:
-        print("usage: sweep.py <scene>")
+        print("usage: sweep.py <scene> [--sheets <folder>]")
         sys.exit(2)
     sys.exit(main(sys.argv[1]))

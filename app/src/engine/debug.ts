@@ -1,7 +1,8 @@
 // What a tester sees on a scene opened with `?debug` in the address: layers over
 // the scene that name and show its cells, turned on and off from a small panel in
-// the scene's corner. Each cell's column and row, drawn on a canvas of its own at
-// the screen's resolution, so that they stay sharp however the scene is scaled;
+// the scene's corner. Each cell's column and row, at its foot, and the cells'
+// borders, drawn on a canvas of its own at the screen's resolution, so that they stay
+// sharp however the scene is scaled (D208);
 // each cell tinted by its kind of terrain, crossed out when no one walks on it,
 // and in another colour while an open door's leaf lies on it (D125);
 // and every painted image's mask, each row in its own colour. Which layers are on
@@ -366,7 +367,10 @@ export class DebugView {
   }
 
   /** The column and row of each cell in view, at the screen's own resolution, on
-   * the cell's floor: centred where a figure standing in it has its feet. */
+   * the cell's floor: centred where a figure standing in it has its feet; and the
+   * cells' borders, a dark line under a light one, seen on any ground (D208). The
+   * canvas says where its cell (0, 0) begins and how wide a cell is, in its own
+   * pixels (`data-grid`). */
   private drawNumbers(camera: Phaser.Cameras.Scene2D.Camera): void {
     const canvas = this.scene.game.canvas;
     const frame = this.numbers.parentElement;
@@ -392,15 +396,36 @@ export class DebugView {
     // Screen pixels a pixel of the scene: the canvas's scaling, the camera's zoom.
     const scale = (box.width / canvas.width) * camera.zoom * ratio;
     const view = camera.worldView;
+    const { x0, y0, x1, y1 } = this.extent;
+    const first = [Math.max(x0, Math.floor(view.x / TILE)), Math.max(y0, Math.floor(view.y / TILE))];
+    const last = [Math.min(x1, Math.ceil(view.right / TILE)), Math.min(y1, Math.ceil(view.bottom / TILE))];
+    const grid = `${Math.round(-view.x * scale)},${Math.round(-view.y * scale)},${(TILE * scale).toFixed(2)}`;
+    if (this.numbers.dataset.grid !== grid) this.numbers.dataset.grid = grid;
+    for (const [style, line] of [
+      ['rgba(0, 0, 0, 0.55)', Math.max(3, 3 * ratio)],
+      ['rgba(255, 255, 255, 0.8)', Math.max(1, ratio)],
+    ] as const) {
+      context.strokeStyle = style;
+      context.lineWidth = line;
+      context.beginPath();
+      for (let x = first[0] ?? 0; x <= (last[0] ?? 0); x += 1) {
+        const across = Math.round((x * TILE - view.x) * scale) + 0.5;
+        context.moveTo(across, 0);
+        context.lineTo(across, height);
+      }
+      for (let y = first[1] ?? 0; y <= (last[1] ?? 0); y += 1) {
+        const down = Math.round((y * TILE - view.y) * scale) + 0.5;
+        context.moveTo(0, down);
+        context.lineTo(width, down);
+      }
+      context.stroke();
+    }
     context.font = `bold ${Math.max(8, 9 * scale)}px monospace`;
     context.textBaseline = 'middle';
     context.textAlign = 'center';
     context.lineWidth = Math.max(2, 2.5 * ratio);
     context.strokeStyle = '#000000';
     context.fillStyle = '#fff36b';
-    const { x0, y0, x1, y1 } = this.extent;
-    const first = [Math.max(x0, Math.floor(view.x / TILE)), Math.max(y0, Math.floor(view.y / TILE))];
-    const last = [Math.min(x1, Math.ceil(view.right / TILE)), Math.min(y1, Math.ceil(view.bottom / TILE))];
     for (let y = first[1] ?? 0; y < (last[1] ?? 0); y += 1) {
       for (let x = first[0] ?? 0; x < (last[0] ?? 0); x += 1) {
         const left = ((x + 0.5) * TILE - view.x) * scale;

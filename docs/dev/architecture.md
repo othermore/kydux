@@ -3124,3 +3124,25 @@ one overturns stays, marked as superseded.
   until a level needs one (`test_course_content.py`). Rules out a level whose things lie
   so that a program walks only two ways to them, a move that takes a negative number as
   a walk the other way, and a level that needs a comparison before its lesson.
+- **D208 — A scene's review sheets carry the grid.** Decided 2026-11-12 by the owner
+  (*necesito todas las hojas de contacto para ver que las máscaras estén bien y para ver
+  todas las casillas transitables y donde se posicionan los personajes en esas casillas.
+  Y necesito que las hojas de contacto tengan no solo el número de celda sino la rejilla
+  superpuesta para ver exactamente los límites de las casillas*). `tools/art/sweep.py
+  <scene> --sheets <folder>` writes a scene's review sheets: its cells in two sheets, the
+  even rows and the odd ones, so that every figure is seen whole, each cell walked on or
+  flown over tinted and a figure on it where the game draws it, nudged and lowered, and
+  flying over a cell only flown over; its masks, each tinted, outlined and named with
+  its row and whether it is drawn under or over a figure; and for the shed its brooms, a
+  lying one on each straw cell and a hung one on each peg, and a figure on each cell of
+  row 5, with the brooms hung behind them and with none, of rows 6 and 8 and of the
+  doorway. Every sheet has the cells' borders drawn as a dark line under a light one,
+  seen on any ground, and each cell's number where the game's layer of numbers writes
+  it: at the foot of the cell, in its middle, over everything drawn. The owner reads a
+  cell that way: *el personaje en 6,5 espero que aparezca justo encima de donde está
+  escrito 6,5*. A sheet is at the scene's own cell, at least 64 pixels; a scene wider
+  than forty cells is written in parts that share two columns. The `?debug` layer of
+  numbers draws the cells' borders too, and says on its canvas where its cell (0, 0)
+  begins and how wide a cell is (`data-grid`). Rules out a sheet or a debug picture
+  without the cells' borders, and a sheet that writes a number elsewhere in its cell than
+  the game does.

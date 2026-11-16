@@ -195,6 +195,48 @@ test('with ?debug the scene shows its cells, for a tester to name one', async ({
   await expect(page.locator('#scene')).not.toHaveAttribute('data-debug', /./);
 });
 
+test("with ?debug the numbers' layer draws the cells' borders, and each number at its cell's foot (D208)", async ({
+  page,
+}) => {
+  await seedWizard(page);
+  await page.goto('/?debug#level/the-sealed-door');
+  await page.locator('#start').click();
+  await expect(page.locator('#scene')).toHaveAttribute('data-debug', 'true', { timeout: ciTimes(90_000) });
+  const numbers = page.locator('canvas.debug-numbers');
+  await expect(numbers).toHaveAttribute('data-grid', /^-?\d+,-?\d+,\d+(\.\d+)?$/);
+  const seen = await numbers.evaluate((node: HTMLCanvasElement) => {
+    const [left = 0, top = 0, size = 0] = (node.dataset.grid ?? '').split(',').map(Number);
+    const context = node.getContext('2d');
+    /** The most opaque pixel the layer drew round a point. */
+    const peak = (x: number, y: number, reach = 2): number => {
+      if (!context) return -1;
+      const data = context.getImageData(Math.round(x) - reach, Math.round(y) - reach, 2 * reach + 1, 2 * reach + 1).data;
+      let most = 0;
+      for (let index = 3; index < data.length; index += 4) most = Math.max(most, data[index] ?? 0);
+      return most;
+    };
+    // A cell well inside the canvas: its left border, its floor away from its number,
+    // and its number, at its foot.
+    const x = left + (Math.ceil(-left / size) + 2) * size;
+    const y = top + (Math.ceil(-top / size) + 2) * size;
+    return {
+      size,
+      border: peak(x, y + 0.3 * size),
+      top: peak(x + 0.3 * size, y),
+      floor: peak(x + 0.3 * size, y + 0.3 * size),
+      number: peak(x + 0.5 * size, y + 0.8 * size, Math.round(0.08 * size)),
+      above: peak(x + 0.5 * size, y + 0.55 * size),
+    };
+  });
+  expect(seen.size).toBeGreaterThan(10);
+  expect(seen.border).toBeGreaterThan(100);
+  expect(seen.top).toBeGreaterThan(100);
+  expect(seen.floor).toBe(0);
+  expect(seen.number).toBeGreaterThan(100);
+  expect(seen.above).toBe(0);
+  await page.locator('.scene-frame').screenshot({ path: `${SHOTS}debug-grid.png` });
+});
+
 test('the outline shows only where more than a quarter of the wizard is hidden', async ({ page }) => {
   await seedWizard(page);
   await page.goto('/#level/the-corridor');

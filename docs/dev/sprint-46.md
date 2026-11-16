@@ -118,3 +118,64 @@ D233 and D234 in `architecture.md`, D189 and the events' table in the present,
 `course.md`'s rows of the two levels, `plan.md`. `ci/check.sh` and the
 browser specs touched after each piece; `ci/check.sh --e2e` whole,
 once, at the end. Chapter 4's walkthrough made again.
+
+## 4. The owner's answer: one word for a tick, and a verdict told
+
+The same day, with pieces 3.1 to 3.5 built, the owner answered what the
+designer had asked before them, the card's words and how Ilda announces:
+
+> 1. En lugar de haré que esperes 5 turnos, que diga que habrá una
+> penalización de 5 turnos. Y usemos turnos en todo en lugar de ticks, o
+> ticks en Todo en lugar de turnos. Mira todos los capítulos a ver qué
+> término es el que estamos usando, y arregla el texto pasándolo por
+> gemini.
+>
+> 2. Si, un bocadillo diciendo lo que ha tardado cada uno, luego si ha
+> habido alguna penalización, dice pero X ha tenido una penalización de 5
+> ticks/turnos y por tanto Y ha ganado. Y si no hay penalizaciones
+> simplemente termina después de decir lo que ha tardado cada uno,
+> diciendo "y por tanto X ha ganado".
+>
+> Luego la tarjeta de final no hace falta que repita las puntuaciones
+
+### 4.1 Ticks everywhere
+
+Every chapter says *tick*: the lessons *Esperar*, *Mientras*, *El
+portal* and *Kirra y Osto*, the level *La salida del túnel*, the
+descriptions of `wait` and the race's own closing words. *Turno* stood
+only on the start card of *La carrera*, twice, and *turn* on its English.
+The card says *un tick* a line and *una penalización de cinco ticks* a
+ring skipped; nothing else of the owner's card changes.
+
+### 4.2 The verdict, in the owner's order
+
+Ilda's band says one bubble: the ticks each one took to cross the finish
+(the wizard's lines and flight, without the penalty), then the penalty and
+who has won with it, or with no penalty the winner at once. She speaks to
+everybody, by the racers' names, as the owner's words do. The cases the
+owner's two sentences do not name follow them as closely as they can: a
+tie (with or without a penalty) says that the race is flown again; a
+wizard that wins in spite of its penalty hears the penalty and *aun así*;
+a wizard slower even before its penalty hears *además*, since *pero* would
+not be true; a wizard that did not cross the finish hears that, with no
+numbers. `raceVerdict` returns the one string; the band holds a single
+paragraph, no part of it in bold.
+
+Ilda stands at the start, twenty-seven cells from the finish and outside
+what the camera shows at the race's end, so the bubble is her band at the
+scene's foot, with her portrait, and no bubble over her figure.
+
+### 4.3 The cards say no numbers
+
+`raceCount`, `#card-race`, `#outcome-race`, the wide layout of the race's
+won card and the keys `race.count`, `race.count_unfinished`, `race.tie`,
+`race.judged_clean`, `race.judged_missed`, `race.wins_wizard` and
+`race.wins_racer` leave. The goal's `params` keep the count.
+
+### 4.4 Texts
+
+Gemini writes the eight verdicts, in Spanish and in English, and the two
+cards with the owner's two changes, from the brief
+`sprint-46-the-verdict-told.md`. The designer's one correction: the
+sentence of the wizard that wins with a penalty does not say its name
+twice.

@@ -338,7 +338,7 @@ tiles are `[x, y]`.
 | `through` | the ring, in the move of the wizard or of a racer | `id`, `at`, the cell flown from; `by`, the racer | the ring glows as the figure passes along its way; the wizard's are counted in `data-through`, in order (D187, D219, D220) |
 | `wrong_way` | the ring, in the wizard's move | `id`, `at`, `way`, the cell flown from | the ring shakes and the wizard thinks the way it is flown, with the bump's sound; the ring counts as missed (D219) |
 | `read` | wizard, before the first action of a race | `at`, `count`, `lines` | the band at the scene's foot says Ilda reading the two programs and the ticks to each take-off, the line read lit in the editor; `data-race-band` (D189) |
-| `judged` | wizard, a tick after a race is flown out | `at`; `lines`, `flight`, `missed`, `penalty` and `tick`, Ilda's count of the wizard, `flight` and `tick` null when it has not crossed; `racer`, `racer_lines`, `racer_tick`; `winner`, `wizard`, the racer's id, or null for a tie | the band says Ilda's verdict: the rings missed and their penalty, both counts, the winner; `data-race-verdict` (D234) |
+| `judged` | wizard, a tick after a race is flown out | `at`; `lines`, `flight`, `missed`, `penalty` and `tick`, Ilda's count of the wizard, `flight` and `tick` null when it has not crossed; `racer`, `racer_lines`, `racer_tick`; `winner`, `wizard`, the racer's id, or null for a tie | the band says Ilda's verdict: the ticks each one took, the wizard's penalty when it has one, the winner or the tie; `data-race-verdict` (D234) |
 
 A run's status is `won`, `incomplete`, `error`, `too_many_ticks`,
 `interrupted` or `caught`; its goals say for each whether it was met or
@@ -2770,9 +2770,9 @@ one overturns stays, marked as superseded.
   wizard is lower than the racer's tick; equal counts are a tie, which is nobody's:
   the goal is not met and the race is flown again (D220). A band over the scene says Ilda
   reading (*Ilda lee los programas: tú, 11 líneas; Zarek, 18*) and the ticks to each
-  take-off, and at the race's end her verdict (D234); the win and the outcome cards say
-  her count from the goal's `params`: *tus
-  líneas (11) + tu vuelo (43) + la penalización (0) = 54 ticks. Zarek: 18 + 43 = 61 ticks*.
+  take-off, and at the race's end her verdict (D234). The owner's start card says the
+  penalties in ticks, the game's one word for a step of the world's time: a tick a line
+  before leaving, and *una penalización de cinco ticks* a ring skipped.
   In *La carrera* the program without a function, 18 lines, ties with him at 61; in *La
   revancha* the race's program, its numbers unchanged, misses seven rings and counts
   89. Rules out a race won by a long program that arrives first, and a penalty the child
@@ -3367,7 +3367,7 @@ one overturns stays, marked as superseded.
   line at the last cell of his path, in his lane, past the painted line (D229). A level
   whose racer misses a ring of his
   own, or leaves his lane, does not load. Ilda's count stays as D189 gives it; equal ticks
-  are a tie, the goal `before` is not met and the outcome says that the race is flown
+  are a tie, the goal `before` is not met and Ilda's verdict says that the race is flown
   again. Rules out a racer who flies where there are no rings, two racers through the same
   ring, a racer's flourish to spend ticks, and a tie that is anybody's win.
 - **D221 — A tip with its picture at the first load and at every new scene, and the screen
@@ -3546,11 +3546,20 @@ one overturns stays, marked as superseded.
   failed at that tick, by the count, and failed at the racer's tick when the wizard has not
   crossed by then. A program that ends in an error is not judged. The band, a parchment
   at the scene's foot with Ilda's portrait, says her reading and, at `judged`, her
-  verdict: the rings missed and their penalty, both counts, the winner; the run's end
-  waits until the verdict is read (D175), and the cards keep the count in full. In *La
+  verdict, in the owner's order (*un bocadillo diciendo lo que ha tardado cada uno, luego
+  si ha habido alguna penalización, dice «pero X ha tenido una penalización de 5 ticks y
+  por tanto Y ha ganado»; y si no hay penalizaciones simplemente termina diciendo «y por
+  tanto X ha ganado»*): the ticks each one took to cross the finish, the wizard's without
+  its penalty; then the penalty, when there is one, and who has won with it; with none,
+  the winner at once; a tie says that the race is flown again, and a race the wizard did
+  not finish gives no numbers (`raceVerdict` in `engine/words.ts`, `race.judged_*`). The
+  run's end waits until the verdict is read (D175), and the cards that follow say no
+  numbers of the race (*la tarjeta de final no hace falta que repita las puntuaciones*).
+  In *La
   carrera* and *La revancha* the goal that is needed is `before`, and the rings in order
   are a bonus (D233): a pair missed counts 60 against 61 and wins with a star less, two
   pairs count 65 and lose. A level with several bonus goals, as *La carrera* with the
   rings and its lines, asks for them all for its third star (D57), and the card's reason
   says so (`stars.bonuses`). Rules out a wizard held before the line, a penalty served
-  before it is said, and a winner Ilda names who loses the level.
+  before it is said, a winner Ilda names who loses the level, and the count said twice,
+  by Ilda and by a card.

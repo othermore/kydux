@@ -9,7 +9,7 @@ the shed holds for the rest of the chapter and, where it is about the
 ways, for every chapter. Of the earlier chapters they read again only
 the levels whose texts this sprint changes, each with its text as it
 was and as it is (2.9). The owner read this plan the same day and
-answered it; the plan holds their answers.
+answered it three times; the plan holds their answers.
 
 What the owner asks, in short:
 
@@ -21,12 +21,20 @@ What the owner asks, in short:
    hung ones are seen at once and are not counted. A step towards the
    wall is stopped, with the wizard's own words.
 3. The wall's brooms hang on pegs that differ at each run, with gaps
-   between them. The program goes to one end of the wall and walks from
-   broom to broom by the distance to the next one. No level asks to end
-   on a cell that does not matter.
+   between them. The wizard walks the row under the pegs, row 5, and
+   everything about the hung brooms is done from it: the program goes
+   to one end of that row and walks from broom to broom by the distance
+   to the next one. A figure on that row stands in front of the hung
+   broom and of the barrel, its soles just in the row below. No level
+   asks to end on a cell that does not matter.
 4. The brooms hidden in the straw lie only on seven cells, the ones the
-   picture paints straw on. The shed's figures and brooms are drawn
-   clear of its barrel, its bales and its walls.
+   picture paints straw on. The floor's brooms are found from row 6 and
+   below. They come nearest first, so the next one may lie on any side
+   of the wizard: the program walks to each by its coordinates, to the
+   left or to the right, up or down, and a lesson before that level
+   teaches `<` and `>` and how the coordinates' numbers behave. The
+   shed's lying brooms are drawn clear of its barrel and its bales,
+   and its figures clear of its bales and its walls.
 5. The next review comes with chapter 4's walkthrough and with contact
    sheets of every scene of the chapter, each with the grid drawn over
    it, the masks, every cell a figure walks and where the figure is
@@ -119,9 +127,9 @@ kept as they are.
     the walk follows from where they are. In the shed, the wall's
     levels and the straw's have no `reach` goal and no `end`.
   - `distance_to` between the wizard and a hung thing counts the steps
-    to the cell under it, where the wizard stands to untie it (D195):
-    a broom hung over the wizard's own column of the wall's row is 0
-    steps away, the next peg's is 1. `find_all` and `find_nearest` order
+    to the cell under it, where the wizard stands to untie it (D195,
+    D211): a broom hung over the cell the wizard stands on is 0 steps
+    away, the next peg's is 1. `find_all` and `find_nearest` order
     by that same distance. A hung thing's `position` stays its peg's
     cell.
   Rules out a hung broom one step further than the walk to it, a level
@@ -136,7 +144,7 @@ kept as they are.
   6], [5, 8], [6, 8], [12, 8], [13, 8]]`, the cells the picture paints
   straw on. A lying broom on a straw cell is `hidden` until a program
   finds it; a hidden broom lies nowhere else. A lying broom in sight
-  lies on the boards of rows 7 and 8, off the straw cells and off
+  lies on the boards of rows 6 to 8, off the straw cells and off
   (13, 7). (5, 8) is floor: a broom on it is untied from its own cell
   (D183), and a figure on it stands in front of the bench. The content's
   tests hold every level, every way and every story step in the shed to
@@ -208,6 +216,69 @@ kept as they are.
   out a level's music without its tune, and two forms of a theme that
   differ in their instruments.
 
+- **D211 — In the shed the row under the pegs is walked, and a hung
+  broom is reached from it.** Decided 2026-11-12 by the owner (*La fila
+  5 debe ser pisable/transitable pero con la posición bajada (y la
+  casilla de la izquierda de esa fila, la del barril, con la posición
+  desplazada a la derecha para caer justo entre esa casilla y la de su
+  derecha). Y la fila 5 es desde la que se accede a las escobas
+  colgadas, y desde donde se hace todo (el find para las escobas
+  colgadas y te vas moviendo)*; and *la búsqueda de las escobas del
+  suelo la puedes iniciar en la fila 6 y encontrar escobas en esa fila
+  o las inferiores*; and, on the picture of it, *Aunque haya una escoba
+  en la fila 5, también puede estar un personaje en la misma fila. El
+  niño quedará tapando a la escoba, que estará detrás. Hay que bajar
+  la posición del niño un poco más, de modo que la planta de sus pies
+  esté en la casilla de abajo pero sus tobillos estén en su casilla. Y
+  el niño también debe verse por delante del barril en la casilla 6,5,
+  como si el barril estuviese detrás del niño*). The shed's back wall's
+  foot is painted at 0.6 of row 5, and the boards show under it. Row 5
+  is floor from column 6 to column 13. A figure on it is drawn lower
+  (`lowered`): its soles lie just past the cell's lower border, in
+  row 6, its ankles are in its own cell, and its body is over the
+  wall's face, as someone standing against a wall is seen. (6, 5) is
+  `nudged` half a cell to the right: a figure on it stands on the
+  border between columns 6 and 7, and it is drawn in front of the
+  barrel. A hung broom is on its peg's cell, (x, 4), and is untied,
+  found and measured from the cell under it, (x, 5) (D195, D196,
+  D206); a figure on (x, 5) stands in front of the broom and hides
+  what of it lies behind. The
+  shed's zones are `wall`, row 5, `[[6, 5, 13, 5]]`, and `straw`, the
+  floor away from the wall, `[[6, 6, 13, 8], [5, 8, 5, 8]]`. D154 holds
+  everywhere else: a row a wall's foot is painted on is walked only
+  where the owner says so for the scene, and floor shows under the
+  foot for a figure's feet. Rules out a hung broom untied from two
+  rows under its peg, a figure of row 5 with its feet on the wall's
+  face, and a figure of row 5 behind the barrel or behind a hung
+  broom.
+
+- **D212 — A walk to a thing that may lie on any side compares before
+  it subtracts.** Decided 2026-11-12 by the owner (*dije que deben
+  estar ordenadas por distancia, pero el programa me acabo de dar
+  cuenta de que tendra que ser capaz de moverse en las 4 direcciones
+  porque podemos ir a la izquierda a coger una escoba que está arriba y
+  luego tener que volver a la derecha a coger una escoba que está más
+  abajo... De modo que hay que ver qué número es más grande para hacer
+  movimientos a la izquierda o la derecha. Para que el niño sepa hacer
+  eso habría que explicarle las comparaciones menor y mayor y
+  recordárselo y hacerle un poco entender cómo se comportan los números
+  en las coordenadas y que cambios hay que hacer de izquierda a derecha
+  y cuáles de derecha a izquierda*). `find_all` gives the floor's
+  brooms nearest first from where the list is made, and the next one
+  may lie to the left or to the right of the wizard, higher or lower.
+  A move takes a whole number of steps, 0 or more, and the world
+  refuses a negative one. So the program asks first which of the two
+  numbers is the smaller, and then takes the smaller from the greater.
+  The lesson `less-or-greater` comes before *Las escobas de la paja*
+  and teaches `<` and `>` and how the coordinates' numbers behave: `x`
+  grows to the right and `y` grows downwards, so a thing with a smaller
+  `x` is to the left and a thing with a smaller `y` is higher up. The
+  course teaches `<` and `>` there and nothing else of the kind: no
+  `<=`, `>=`, `!=`, `abs`, `min` or `max` until a level needs one.
+  Rules out a level whose things are laid so that a program walks only
+  two ways to them, a move that takes a negative number as a walk the
+  other way, and a level that needs a comparison before its lesson.
+
 ## 2. What is asked
 
 ### 2.1 What may differ, in the child's words (D204)
@@ -229,8 +300,8 @@ what each must say and not as its words:
   some are hidden in the straw.
 - `the-brooms-on-the-wall`: how many brooms hang on the wall and on
   which pegs differs each time.
-- `the-brooms-in-the-straw`: how many brooms lie in the straw and where
-  differs each time.
+- `the-brooms-in-the-straw`: how many brooms lie on the floor and where
+  differs each time, so the next one may be on any side.
 - `the-check`: how many brooms hang, on which pegs, and which of them
   still have a knot differs each time.
 
@@ -261,18 +332,20 @@ are not asked for.
   `print`, as it is. `"hung": false` counts the things of the kind that
   are not hung; `true` counts the hung ones; without it every one
   counts.
-- `"forbidden": {"reason": "stay_by_the_brooms", "cells": [[6, 6], [7,
-  6], [8, 6], [9, 6], [10, 6], [11, 6], [12, 6], [13, 6]]}`, the wall's
-  row. The reason's words are the owner's, letter for letter: *Para
-  contar las escobas en el suelo, mejor me quedo cerca de donde están
-  tiradas.* In English: *To count the brooms on the floor, I had better
-  stay near where they lie.*
-- `zones` holds `wall` alone, `[[6, 6, 13, 6]]`, and the hung brooms
+- `"forbidden": {"reason": "stay_by_the_brooms", "cells": [[6, 5], [7,
+  5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5]]}`, the row
+  under the pegs (D211). The wizard walks rows 6 to 8. The reason's
+  words are the owner's, letter for letter: *Para contar las escobas en
+  el suelo, mejor me quedo cerca de donde están tiradas.* In English:
+  *To count the brooms on the floor, I had better stay near where they
+  lie.*
+- `zones` holds `wall` alone, `[[6, 5, 13, 5]]`, and the hung brooms
   carry it, so that a `find_all` from the floor never gives them. The
   lying brooms carry no zone: they are found from anywhere the wizard
   may stand. The plan hatches and names zones only in a level where the
   wizard may stand in two of them, so this level's plan shows none.
-- Hung, the same in every way: pegs 7, 10, 11 and 13.
+- Hung, the same in every way: pegs 7, 10, 11 and 13, each on its
+  peg's cell, (x, 4).
 - Start (9, 8), friend (10, 8), mate (8, 7), camera as they are. The
   lying brooms by way, the first of each the one at the wizard's feet:
 
@@ -291,9 +364,9 @@ are not asked for.
   ```
 
 - Wrong programs, each failing for the reason its name gives:
-  `a_number_typed.py` (says 5), `the_walk_to_the_wall.py` (walks up two
-  and is stopped), `the_list_said.py` (says the list and not its
-  length).
+  `a_number_typed.py` (says 5), `the_walk_to_the_wall.py` (walks up
+  three and is stopped before the third step), `the_list_said.py` (says
+  the list and not its length).
 - Gemini writes again, from the brief of 2.8: the intro, the starting
   code's comments, the hints, the learned line and the outro. The intro
   no longer speaks of two places: it asks how many lie on the floor,
@@ -308,8 +381,9 @@ it is why the floor's list holds no hung broom.
 
 `the-brooms-on-the-wall`:
 
-- Eight hung brooms declared, one a peg, knotted, zone `wall`; each way
-  takes some away with `gone`. The pegs with a broom, by way:
+- Eight hung brooms declared, one a peg, on (6, 4) to (13, 4), knotted,
+  zone `wall`; each way takes some away with `gone`. The pegs with a
+  broom, by way:
 
   | way | pegs |
   | --- | --- |
@@ -327,7 +401,7 @@ it is why the floor's list holds no hung broom.
 - The solution:
 
   ```python
-  wizard.move_up(2)
+  wizard.move_up(3)
   wizard.move_right(4)
   brooms = wizard.find_all("broom")
   for broom in brooms:
@@ -336,15 +410,16 @@ it is why the floor's list holds no hung broom.
       broom.untie()
   ```
 
-  From the wall's right end the list comes in the order of the walk,
+  The walk is along row 5, under the pegs (D211). From its right end,
+  (13, 5), the list comes in the order of the walk,
   since `find_all` gives the nearest first. In ways `b` and `c` the
   first broom hangs over the end's own cell and the first move is of 0
   steps, which walks nothing and takes no tick. The left end and
   `move_right` solve it as well.
 - Wrong programs, each failing for the reason its name gives:
   `a_step_for_each.py` (unties and takes one step: the pegs have gaps),
-  `the_list_from_the_middle.py` (walks up two and makes the list there:
-  the nearest first is then on one side and then on the other),
+  `the_list_from_the_middle.py` (walks up three and makes the list
+  there: the nearest first is then on one side and then on the other),
   `the_list_made_at_the_door.py` (the list made before the walk holds
   the floor's brooms), `the_steps_written_out.py` (the numbers of way
   `a`).
@@ -354,9 +429,10 @@ it is why the floor's list holds no hung broom.
   pegs each time; go first to one end of the wall, because the list
   comes nearest first and from an end the walk goes one way only; for
   each broom, ask how far it is with `distance_to`, walk that many
-  steps, untie it. `distance_to` was taught in chapter 2 (lesson
-  `the-distance`); the intro or the first hint recalls it in one
-  sentence.
+  steps, untie it. Where a text says where the wizard stands, it is
+  under the pegs, by the wall. `distance_to` was taught in chapter 2
+  (lesson `the-distance`); the intro or the first hint recalls it in
+  one sentence.
 
 `the-check` (the fix):
 
@@ -389,32 +465,142 @@ they show one: Gemini writes those pages again so that their example is
 the walk by distance and not a step for each broom. A lesson's page
 that runs code (D170) runs the new example.
 
-### 2.4 *Las escobas de la paja*: no cell to end on
+### 2.4 *Las escobas de la paja*: to each broom by its coordinates (D212)
 
-- Zones: `wall` `[[6, 6, 13, 6]]`, `straw` `[[6, 7, 13, 8], [5, 8, 5,
-  8]]`. The same two in `the-brooms-on-the-wall`.
+**The lesson `less-or-greater`** comes before the level. The chapter's
+list reads `lesson:for-each`, `level:the-brooms-on-the-wall`,
+`lesson:less-or-greater`, `level:the-brooms-in-the-straw`,
+`lesson:checking-each`; whatever counts or numbers the chapter's stops
+follows the list. Its `lesson.json` has the friend as speaker and
+`teaches` as `if`'s has it. Gemini writes it, title and pages, from the
+shed's brief (2.8). Three pages, each with a block the child runs
+(plain Python, D170). What each page must say:
+
+1. **Smaller or greater.** `<` and `>` compare two numbers and answer
+   `True` or `False`, as `==` does (lesson `true-or-false`, recalled in
+   one sentence). How the sign is read: its open side is towards the
+   greater number. When the two numbers are equal neither is the
+   smaller: `4 < 4` is `False`.
+
+   ```python
+   print(3 < 5)
+   print(5 < 3)
+   print(5 > 3)
+   print(4 < 4)
+   ```
+
+2. **The coordinates' numbers.** `x` is counted from the left and `y`
+   from above (lesson `the-two-coordinates`, recalled in one sentence).
+   So `x` grows with each step to the right and shrinks with each step
+   to the left; `y` grows with each step down and shrinks with each
+   step up. A broom whose `x` is smaller than the wizard's is to its
+   left; greater, to its right. A broom whose `y` is smaller is higher
+   up; greater, lower down. That `y` grows downwards is what surprises,
+   and the page says it plainly.
+
+   ```python
+   my_x = 9
+   broom_x = 6
+   print(broom_x < my_x)
+   ```
+
+   The page says what the answer means here: `True`, the broom is to
+   the left. It asks the child to put 12 in `broom_x` and run it again.
+
+3. **Which subtraction.** A move takes 0 steps or more:
+   `wizard.move_left(-3)` is refused, and the page gives the game's own
+   words for that refusal as the child will read them. So the program
+   looks first and subtracts after, always the smaller from the
+   greater, with the `if` and `else` of chapter 3 (recalled in one
+   sentence):
+
+   ```python
+   my_x = 9
+   broom_x = 6
+   if broom_x < my_x:
+       print("left", my_x - broom_x)
+   else:
+       print("right", broom_x - my_x)
+   ```
+
+   The page asks the child to try 12 and then 9 in `broom_x`: with 9
+   the `else` runs and the steps are 0, and a move of 0 steps walks
+   nothing. Up and down go the same way with `y`, said in two
+   sentences and with no block of their own: a smaller `y` is up, and
+   the steps are the wizard's `y` less the broom's. The blocks'
+   strings are translated, as a starting code's are.
+
+The lesson names no `<=`, `>=`, `!=` or `abs` (D212), and uses no
+metaphor after the sign's open side.
+
+**The level `the-brooms-in-the-straw`:**
+
+- Zones as D211: `wall` `[[6, 5, 13, 5]]`, `straw` `[[6, 6, 13, 8],
+  [5, 8, 5, 8]]`. The same two in `the-brooms-on-the-wall`, and in any
+  level or story step of the shed that names zones.
 - No `reach` goal and no `end`. Goals: `untied` and the bonus that uses
   `x`.
-- Start (12, 7), friend (13, 8), mate (13, 7), as they are. The hung
-  brooms are the pegs of the wall's way `a`, untied.
-- The lying brooms by way. The level's program walks only left and
-  down, so every way's list, in the order `find_all` gives it from the
-  start, never goes right and never goes up:
+- Start (10, 6), on the floor's first row, where a `find_all` gives the
+  floor's brooms. The friend on (8, 5) and the mate on (11, 5), under
+  two empty pegs by the wall: no walk between two cells of rows 6 to 8
+  passes them, whichever of the two moves the program makes first. The
+  hung brooms are the pegs of the wall's way `a`, 12, 10, 9 and 6,
+  untied.
+- The lying brooms by way, every one knotted, with the list as
+  `find_all` gives it from the start and the walk from each broom to
+  the next (columns to the right, rows down; a minus sign is to the
+  left or up):
 
-  | way | in sight, knotted | hidden, knotted | in the list's order |
-  | --- | --- | --- | --- |
-  | `a` | (11, 7), (9, 7) | (6, 8), (5, 8) | (11, 7), (9, 7), (6, 8), (5, 8) |
-  | `b` | (10, 8), (8, 8) | (12, 8), (6, 8) | (12, 8), (10, 8), (8, 8), (6, 8) |
-  | `c` | (10, 7), (9, 8), (8, 8), (7, 8) | (5, 8) | (10, 7), (9, 8), (8, 8), (7, 8), (5, 8) |
+  | way | in sight | hidden | the list's order | the walks |
+  | --- | --- | --- | --- | --- |
+  | `a` | (11, 7), (8, 8) | (7, 6), (13, 8) | (11, 7), (7, 6), (8, 8), (13, 8) | (1, 1), (-4, -1), (1, 2), (5, 0) |
+  | `b` | (9, 7), (7, 8) | (13, 6), (6, 6), (6, 8) | (9, 7), (13, 6), (6, 6), (7, 8), (6, 8) | (-1, 1), (4, -1), (-7, 0), (1, 2), (-1, 0) |
+  | `c` | (10, 8) | (7, 6), (12, 8) | (10, 8), (7, 6), (12, 8) | (0, 2), (-3, -2), (5, 2) |
 
-  A content test asserts that order and that property for each way.
-- The solution is the one it has. The wrong program that writes one
-  way's numbers is of way `a`; the other two stay if they still fail,
-  and are written again for the reason in their name if they do not.
-- Gemini writes again the goals' lines and whatever line of the intro,
-  the hints or the learned line names the cell (6, 8).
+  In every way the walk goes once at least to the left, to the right,
+  up and down, and no two brooms are equally far from the start. No
+  broom lies on (5, 8) in this level: the bench stands over it, and one
+  of the two orders of moves would walk into it. A content test asserts
+  for each way the list's order, the four directions, the distances
+  all different, and that the friend and the mate stand on no cell of
+  rows 6 to 8.
+- The solution:
 
-### 2.5 The shed's cells and picture (D202, D207)
+  ```python
+  brooms = wizard.find_all("broom")
+  for broom in brooms:
+      if broom.position.x < wizard.position.x:
+          wizard.move_left(wizard.position.x - broom.position.x)
+      else:
+          wizard.move_right(broom.position.x - wizard.position.x)
+      if broom.position.y < wizard.position.y:
+          wizard.move_up(wizard.position.y - broom.position.y)
+      else:
+          wizard.move_down(broom.position.y - wizard.position.y)
+      broom.untie()
+  ```
+
+  Where the two numbers are equal the `else` runs and its move is of 0
+  steps.
+- Wrong programs, each failing for the reason its name gives:
+  `left_and_down_only.py` (the solution the level had: in way `a` the
+  first broom is to the right, the subtraction gives -1 and the move is
+  refused), `the_comparison_turned_round.py` (`>` where `<` belongs:
+  the same refusal), `only_sideways_compared.py` (compares the `x` and
+  always walks down: refused at the first broom higher up),
+  `the_untie_before_the_walk.py` (as it is), `the_steps_written_out.py`
+  (the walks of way `a`). The level's other wrong programs leave.
+- Gemini writes again the intro, the goals' lines, the starting code's
+  comments, the three hints, the learned line and the outro. They say,
+  in the level's words: the brooms come nearest first, and the next one
+  may be on any side; for each, compare its `x` with yours to know
+  whether to walk left or right and take the smaller from the greater
+  for the steps; the same with `y` for up and down; then untie it. The
+  second hint recalls the lesson: a smaller `x` is to the left, a
+  smaller `y` is higher up. The starting code's comments lead through
+  the loop's steps without writing its lines. No text names a cell.
+
+### 2.5 The shed's cells and picture (D202, D207, D211)
 
 What the owner saw, cell by cell, read on the painting with its grid
 (`art/raw/game-broom-shed/game-broom-shed-pegs.png`; the barrel is
@@ -430,24 +616,34 @@ back wall's foot on y 5.55 to 5.65; the front wall's top from y 8.73):
    bales. If on the sheet a broom still touches a bale, the shift grows
    by steps of 0.05 until it does not, and the commit says the number.
    The owner confirmed the two cells.
-3. **The barrel over the broom of peg 6**: the barrel is a thing of the
-   scene, cut from the painting by a traced outline (D128,
-   `tools/art/trace.py`), static, on row 5, drawn after the hung brooms
-   of its row and before every figure of row 6. A broom hung on peg 6
-   shows its cord and its handle over the barrel's top, and its brush
-   is behind the barrel. The owner confirmed it: behind the barrel.
-4. **The row by the back wall**: the owner's two remarks on figures
-   there name cell (6, 5) and row 5, as the numbers' layer writes them:
-   a figure under a peg, its feet on the strip of floor at the wall's
-   foot. Nobody stands on row 5: `map.txt` keeps it unwalked, a hung
-   broom's cell is (x, 5), where its sprite hangs from the peg painted
-   in row 4, and the wizard unties it from (x, 6). On row 6 a figure
-   stands whole on the boards, its hat's tip under the wall's foot,
-   and the figure of (6, 6) stands in front of the barrel's foot. So
-   row 5 stays unwalked and row 6 keeps its cells as they are, with no
-   nudge and no lowering. The things' sheet (2.6) shows a figure on
-   every cell of row 6 and a broom on every peg, for the owner to judge
-   it by eye.
+3. **The barrel between the broom of peg 6 and the figures**: the
+   barrel is a thing of the scene, cut from the painting by a traced
+   outline (D128, `tools/art/trace.py`), static, on row 5 at its row's
+   depth: drawn after the hung brooms, which are on row 4, and before
+   every figure of row 5 and of row 6. A broom hung on peg 6 shows its
+   cord and its handle over the barrel's top, and its brush is behind
+   the barrel. A figure on (6, 5) or on (6, 6) is drawn in front of
+   the barrel, whole. The owner said both: the broom behind the
+   barrel, the child in front of it.
+4. **The row under the pegs** (D211): `map.txt`'s row 5 is floor from
+   column 6 to column 13. Cells (6, 5) to (13, 5) are `lowered` by
+   0.25, so that a figure's soles lie just under the cell's lower
+   border, in row 6 (y 6.05), and its ankles in its own cell (the
+   wizard's shoes are 0.1 of a cell high). (6, 5) is `nudged` by 0.5:
+   the
+   figure's middle is on the border between columns 6 and 7. A figure
+   walking from (7, 5) to (6, 5) moves half a cell. A figure on (13, 5)
+   stands clear of the standing bales: where it touches them on the
+   sheet, the cell is nudged to the left by steps of 0.05 until it does
+   not. A hung broom's
+   thing is on (x, 4), its sprite hung from the painted peg's point as
+   it is today (`broom-hung`'s `foot` is given from the peg's cell), at
+   row 4's depth: a figure on (x, 5) is drawn over the broom, as
+   someone standing before it is seen, and only what of the broom
+   lies outside the figure shows, its cord and the top of its handle
+   over the hat. The mark of a goal, the plan
+   and the outline draw a figure of row 5 where the game does (D149 f).
+   Row 6 keeps its cells as they are.
 5. **The figures of row 8 and the front wall**: the owner sees figures
    of the lowest row in front of the front wall, where they should be
    behind it. The wall's top is cut `over` them, but a figure's feet
@@ -469,10 +665,17 @@ back wall's foot on y 5.55 to 5.65; the front wall's top from y 8.73):
    10 of the shed and for a walk between each pair of neighbours among
    them, no pixel of a figure is drawn over a pixel the front wall or
    the lintel paints; the lintel's pixels are taken from the painting
-   between its outlines, not from the mask. For row 6, no pixel of a
-   figure standing on a cell lies above the back wall's foot. For each
-   straw cell, no pixel of a lying broom lies over the barrel, the
-   bales or the bench.
+   between its outlines, not from the mask. For each cell of row 5,
+   the lowest pixel of a figure standing on it lies under y 6.0 and no
+   more than 0.1 of a cell under it, every pixel of the figure of
+   (6, 5) and of (6, 6) is drawn, the barrel's none over them, every
+   pixel of a figure of row 5 is drawn over a broom hung on the peg
+   above it, and no pixel of the figure of (13, 5) lies over the
+   standing bales. For each of the eight pegs, the top of a hung broom's
+   sprite lies on the painted peg, as it does today. For row 6, no
+   pixel of a figure standing on a cell lies above the back wall's
+   foot. For each straw cell, no pixel of a lying broom lies over the
+   barrel, the bales or the bench.
 
 Where a number given here does not reach what its sentence asks, the
 sentence rules, the number moves by steps of 0.05 and the commit says
@@ -493,7 +696,9 @@ For each scene of chapter 4 (`the-broom-shed`, `the-lake-edge`,
   `under` or `over`.
 - For the shed, **things**: a lying broom on each of the seven straw
   cells, the straw cells outlined, a hung broom on each of the eight
-  pegs, a figure on each cell of row 6, of row 8 and of the doorway.
+  pegs, a figure on each cell of row 5, of row 6, of row 8 and of the
+  doorway. Row 5 is drawn twice: with the eight brooms hung behind the
+  figures, and with no broom.
 
 At least 64 pixels a cell. A scene wider than 40 cells is written in
 parts that share two columns. The sheets go to
@@ -557,13 +762,17 @@ their dev server and open `https://localhost:5173/?debug#music`.
 ### 2.8 The texts (Gemini)
 
 One brief for the shed (levels `the-shed`, `the-brooms-on-the-wall`,
-`the-brooms-in-the-straw`, `the-check`, lessons `for-each` and
-`checking-each`), with the bible, the course, the chapter's texts as
-they are, the owner's four comments whole, sections 2.2 to 2.4 of this
+`the-brooms-in-the-straw`, `the-check`, lessons `for-each`,
+`less-or-greater` and `checking-each`), with the bible, the course,
+the chapter's texts as they are, the lessons `true-or-false`, `if`,
+`else` and `the-two-coordinates` whole, the owner's four comments
+whole and their words in D211 and D212, sections 2.2 to 2.4 of this
 plan, and the rules: no *manera*; what changes each time is said in the
 level's own words; metaphors only where an idea is first explained; an
 idea is taught only where it is needed; no cell is named for the child
-to walk to. One brief for the thirteen `changes` (2.1). The programmer
+to walk to; the wizard stands under the pegs, by the wall, to reach a
+hung broom, and on the floor away from the wall to find the lying
+ones. One brief for the thirteen `changes` (2.1). The programmer
 reads the drafts, corrects them and says in the commit what was
 corrected. The words this plan gives letter for letter are not sent to
 Gemini.
@@ -628,7 +837,36 @@ for that in `drafts/`:
   such as *de la misma manera*).
 - **Check**: `ci/check.sh`, the specs touched.
 
-### 3.2 A level's forbidden cells and the floor's count (D205, 2.2)
+### 3.2 The shed's cells and picture (D202, D207, D211, 2.5)
+
+The shed's cells come first: the levels of 3.3 and 3.4 stand on them.
+
+- **World**: the scene's `straw`, read by the content's tests; (5, 8)
+  floor; row 5 floor from column 6 to 13; every hung broom of every
+  level and story step of the shed on its peg's cell, (x, 4), and
+  every `wall` zone on row 5, every `straw` zone as D211 gives it. The
+  stories' lying brooms obey D202. Each of the shed's levels still wins
+  with its solution after this piece, with the fewest changes that
+  takes (`move_up(3)` where a program walked up two); 3.3 and 3.4 give
+  them their final form.
+- **Art tools**: `shifted` in the settings and the export; the barrel
+  and the lintel traced; rows 5 and 8 `lowered` and (6, 5) `nudged` as
+  2.5; the sweep knows the shift.
+- **Page**: a sprite's shift; the barrel behind the figures of rows 5
+  and 6 and over the hung broom of peg 6; a hung broom drawn from its
+  peg's cell, behind a figure of row 5.
+- **Documents**: D202 rewritten, D207, D211, D195 rewritten in the
+  present (the broom on its peg's cell, untied from the cell under it,
+  a walked one in the shed), D196's and D154's entries, D149's (c),
+  the scene's README or `about` lines, D195's sentence on the broom of
+  peg 6.
+- **Tests**: 2.5's seventh point; a unit that the lintel's mask covers
+  the painting from the wall's top to the lintel's lower outline
+  across the doorway; the settings' refusal of a long shift; the
+  world's units for a hung broom untied from the cell under its peg
+  and from nowhere else.
+
+### 3.3 A level's forbidden cells and the floor's count (D205, 2.2)
 
 - **World**: `forbidden` in `level.json`, merged with the scene's; the
   `say` goal's `hung`.
@@ -642,33 +880,21 @@ for that in `drafts/`:
   solution and wrong programs in every way; a browser spec that walks
   up in *El cobertizo* and reads the owner's words in the bubble.
 
-### 3.3 The walks by distance (D206, 2.3, 2.4)
+### 3.4 The walks by distance and by the coordinates (D206, D212, 2.3, 2.4)
 
 - **World**: the distance to a hung thing and the order of the found.
 - **Content**: `the-brooms-on-the-wall`, `the-check` and
   `the-brooms-in-the-straw` as 2.3 and 2.4, with their texts and the
-  two lessons' pages.
-- **Documents**: D206, D195's and D184's entries, the grimoire's line
-  on `distance_to` if it says how a hung thing counts.
+  pages of `for-each` and `checking-each`; the lesson `less-or-greater`
+  and its place in `chapter.json`.
+- **Documents**: D206, D212, D184's entry, the grimoire's line on
+  `distance_to` if it says how a hung thing counts,
+  `docs/dev/course.md` with the new lesson and what it teaches.
 - **Tests**: units for the distance and the order with hung things;
   each level's solution and wrong programs in every way; the straw's
-  order test; the browser specs of these levels.
-
-### 3.4 The shed's cells and picture (D202, D207, 2.5)
-
-- **World**: the scene's `straw`, read by the content's tests; (5, 8)
-  floor.
-- **Art tools**: `shifted` in the settings and the export; the barrel
-  and the lintel traced; row 8 `lowered` as 2.5; the sweep knows the
-  shift.
-- **Page**: a sprite's shift; the barrel's place in the order of
-  drawing.
-- **Documents**: D202 rewritten, D207, the scene's README or `about`
-  lines, D195's sentence on the broom of peg 6.
-- **Tests**: 2.5's seventh point; a unit that the lintel's mask covers
-  the painting from the wall's top to the lintel's lower outline
-  across the doorway; the content test of D202 on every level, way and
-  story step; the settings' refusal of a long shift.
+  test of 2.4; the content test of D202 on every level, way and story
+  step of the shed; the lesson's blocks run and print what its pages
+  say; the browser specs of these levels and of the lesson's pages.
 
 ### 3.5 The sheets (D208, 2.6)
 
@@ -735,29 +961,38 @@ Playwright's own server on 4173; never a push, never a timer, never a
 deploy: the owner is away and nothing is released until they are happy
 with chapter 4. Never stop or build into the servers on ports 443 and
 5173, and stop your own preview when you are done. Gemini paints
-nothing. Gemini writes the texts of section 2.8 from two briefs; you
-read and correct the drafts and say in the commit what you corrected.
-The words the plan gives letter for letter (the owner's sentence for
-the wall in El cobertizo, the goal's line, the two i18n lines) are kept
-as they are. No text the child reads says "manera" or "way" for the
-arrangements of a level: that is the first thing the owner will look
-for. The owner read the plan and answered it, and the plan holds their
-answers: row 5 of the shed stays unwalked and row 6 as it is, the
-door's lintel is traced to its lower outline (2.5), a theme plays one
-set of voices everywhere (D210), and the sheets write each number at
-the foot of its cell, where the game's layer writes it (D208). The plan
-decides everything; where it does not, take the smallest choice that
-keeps its intent and say it in the commit. Where a number of section
-2.5 does not reach what its sentence asks, the sentence rules. The
-owner reads nothing before you build: once the designer's review of
-this sprint finds nothing they read chapter 4's walkthrough, the
-contact sheets, and the nine earlier levels whose texts change, each
-text as it was and as it is (2.9): make that page from git diff of the
-Spanish texts, not by hand, so that no change is missed. Every document
-and comment in the present. Before git add, read git diff of each file
-and stage only your own hunks; commit promptly. Hand over chapter 4's
-walkthrough, the changed levels' walkthrough with the page of their
-texts before and now, the sheets with their page and a report in
-Spanish as 3.7 asks, and end with the prompt for the designer's review
-in English, in a code block.
+nothing. Gemini writes the texts of section 2.8 from two briefs, the new
+lesson less-or-greater among them; you read and correct the drafts and
+say in the commit what you corrected. The words the plan gives letter
+for letter (the owner's sentence for the wall in El cobertizo, the
+goal's line, the two i18n lines) are kept as they are. No text the child
+reads says "manera" or "way" for the arrangements of a level: that is
+the first thing the owner will look for. The owner read the plan and
+answered it three times, and the plan holds their answers. Row 5 of the
+shed, under the pegs, is walked: its figures are drawn lower, their
+soles just in row 6 and their ankles in row 5, in front of the barrel
+and of the hung brooms, the figure of (6, 5) half a cell to the right; a
+hung broom is on its peg's cell (x, 4) and is untied, found and measured
+from (x, 5), and the floor's brooms are found from rows 6 to 8 (D211).
+The straw's level walks to each broom by its coordinates on any of the
+four sides, and the lesson less-or-greater before it teaches < and > and
+how the coordinates' numbers behave (D212, 2.4): the plan gives every
+way's brooms, the list's order and the walks, checked by hand; hold them
+with the test 2.4 asks for. The door's lintel is traced to its lower
+outline (2.5), a theme plays one set of voices everywhere (D210), and
+the sheets write each number at the foot of its cell, where the game's
+layer writes it (D208). The plan decides everything; where it does not,
+take the smallest choice that keeps its intent and say it in the commit.
+Where a number of section 2.5 does not reach what its sentence asks, the
+sentence rules. The owner reads nothing before you build: once the
+designer's review of this sprint finds nothing they read chapter 4's
+walkthrough, the contact sheets, and the nine earlier levels whose texts
+change, each text as it was and as it is (2.9): make that page from git
+diff of the Spanish texts, not by hand, so that no change is missed.
+Every document and comment in the present. Before git add, read git diff
+of each file and stage only your own hunks; commit promptly. Hand over
+chapter 4's walkthrough, the changed levels' walkthrough with the page
+of their texts before and now, the sheets with their page and a report
+in Spanish as 3.7 asks, and end with the prompt for the designer's
+review in English, in a code block.
 ```

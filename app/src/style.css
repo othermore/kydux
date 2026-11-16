@@ -1031,6 +1031,21 @@ footer .build {
   }
 }
 
+/* A race's won card carries Ilda's count as well (D189): it is wider, its stars smaller
+ * and its count in the reasons' size, so that it fits the scene's frame whole. */
+.card.win-card-race {
+  max-width: min(600px, 90%);
+}
+
+.win-card-race .stars {
+  font-size: 48px;
+}
+
+.win-card-race .card-race {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
 .stars-kept {
   margin: -8px 0 12px;
   color: var(--muted);

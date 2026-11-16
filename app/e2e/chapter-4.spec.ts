@@ -300,6 +300,9 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).toHaveAttribute('data-race-band', /11 líneas; Zarek, 14/, { timeout: ciTimes(60_000) });
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}race-band.png` });
     await expect(page.locator('#card-race')).toContainText('tick 49', { timeout: ciTimes(120_000) });
+    // The card with the count, the words and what was learned is seen whole, unscrolled.
+    const card = page.locator('.win-card');
+    expect(await card.evaluate((node) => node.scrollHeight - node.clientHeight)).toBe(0);
     await page.screenshot({ path: `${SHOTS}race-count-card.png` });
     await page.locator('#again').click();
     await page.locator('#speed').selectOption('4');

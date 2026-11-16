@@ -194,7 +194,8 @@ export function winCard({ verdict, kept, next, onAgain, onNext, said, learned, r
         element('a', { id: 'to-map', className: 'quiet-button', href: '#map' }, [t('map.open_map')]),
       ]);
   const card = overlay(
-    'win-card',
+    // A race's card carries Ilda's count too, and is laid out wider to fit the scene.
+    race ? 'win-card win-card-race' : 'win-card',
     [
       element('h3', {}, [t('outcome.won')]),
       shown,

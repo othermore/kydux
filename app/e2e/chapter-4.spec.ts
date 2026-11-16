@@ -478,9 +478,13 @@ test.describe('the rings and the race', () => {
     });
     await expect(scene(page)).toHaveAttribute('data-sounds', /bump/);
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}rings-wrong-way.png` });
-    await expect(scene(page)).toHaveAttribute('data-thought', 'Este aro se cruza hacia abajo, desde arriba. ¡Así no cuenta!', {
-      timeout: ciTimes(30_000),
-    });
+    const second = 'Este aro se cruza hacia abajo, desde arriba. ¡Así no cuenta!';
+    await expect(scene(page)).toHaveAttribute('data-thought', second, { timeout: ciTimes(30_000) });
+    // The thought stays its reading time in this level's ticks, a third as long as
+    // elsewhere (D175, D225): twelve ticks on it is still there, the flight going on.
+    const seen = Number(await scene(page).getAttribute('data-tick'));
+    await page.waitForFunction((tick) => Number(document.querySelector<HTMLElement>('#scene')?.dataset.tick) >= tick, seen + 12);
+    expect(await scene(page).getAttribute('data-thought')).toBe(second);
     await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(120_000) });
     await expect(page.locator('.win-card')).toHaveCount(0);
     await expect(scene(page)).not.toHaveAttribute('data-through', /ring/);

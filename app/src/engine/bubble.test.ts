@@ -62,6 +62,14 @@ describe('the words read to their end (D175)', () => {
     expect(readingTicks(sentence, 400)).toBeLessThanOrEqual(10);
   });
 
+  it('stay as long where a tick is played in a third (D225): three times the ticks', () => {
+    // A ring's wrong way, 60 characters: 3.8 seconds, 29 ticks of a third of 400.
+    const thought = 'Este aro se cruza hacia arriba, desde abajo. ¡Así no cuenta!';
+    expect(readingMs(thought)).toBe(3800);
+    expect(readingTicks(thought, 400)).toBe(10);
+    expect(readingTicks(thought, 400 / 3)).toBe(29);
+  });
+
   it('settle when the last of them is read, at once with none, and never for ever', () => {
     expect(settleMs([], 1000)).toBe(0);
     expect(settleMs([1500, 4700], 1000)).toBe(3700);

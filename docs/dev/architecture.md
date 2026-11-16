@@ -307,7 +307,7 @@ tiles are `[x, y]`.
 |---|---|---|---|
 | `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; `ticks`, a walked step of the wizard's where it can fly, three (D225) | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132) |
 | `bump` | wizard | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it; the thought names a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side |
-| `say` | wizard | `text` | a bubble over the wizard for three ticks, under it when there is no room above |
+| `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
 | `pick_up` | wizard | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); `data-carried` |
 | `open` | wizard, by `door.open()`; or the door, in the wizard's tick, opened by a spell or a word | `id`, `at`, `by`: `hand`, `spell` or `word` | the door's frame turns open; `data-doors` |
@@ -2546,13 +2546,15 @@ one overturns stays, marked as superseded.
   pantallas*). A bubble or a thought in a level stays for its reading time, 0.8 seconds and
   50 thousandths more for each of its characters, in ticks of 400 milliseconds, three at
   least (`readingTicks`): a greeting three ticks, the threshold's sentence of 58 characters
-  ten. Once a run is over, no tick ends them, and each goes when, on the scene's clock, it is
-  read to its end. The outcome's card of a level appears once no bubble and no thought is on
-  the scene: the controller waits for the scene's `settle(won)`, the longer of the
-  celebration of a run won (14.3) and the words read to their end (`Speech.settle`), after a
-  run refused, failed or lost alike; a sleeper's thought, said for ever, is not waited for.
-  In a story a bubble stays until its step ends. Rules out a card over the reason the wizard
-  stopped, and a sentence gone before it is read.
+  ten. Where the wizard can fly, a tick is played in a third (D225) and the words stay
+  three times as many ticks: a ring's wrong way, 29. Once a run is over, no tick ends
+  them, and each goes when, on the scene's clock, it is read to its end. The outcome's
+  card of a level appears once no bubble and no thought is on the scene: the controller
+  waits for the scene's `settle(won)`, the longer of the celebration of a run won (14.3)
+  and the words read to their end (`Speech.settle`), after a run refused, failed or lost
+  alike; a sleeper's thought, said for ever, is not waited for. In a story a bubble stays
+  until its step ends. Rules out a card over the reason the wizard stopped, and a sentence
+  gone before it is read.
 - **D176 — A bonus for casting a spell is earned by the spell, not by the word `cast`.**
   Decided 2026-11-09 by the owner (*si he hecho mal el hechizo no debe marcar el bonus
   extra*). A goal of kind `cast`, `{"kind": "cast", "spell": "orvim"}`, names a known spell

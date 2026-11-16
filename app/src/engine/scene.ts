@@ -510,10 +510,16 @@ class LevelScene extends Phaser.Scene {
     else breakSeal(this, glow, this.playback.tickDuration * 0.8);
   }
 
-  /** How many ticks words said stay: in a level, as long as they take to read (D175);
-   * in a story, until the next step. */
+  /** How long a tick of this scene lasts at speed 1: a third of TICK_MS where the wizard
+   * can fly (D225). */
+  private get tickMs(): number {
+    return TICK_MS * this.playback.pace;
+  }
+
+  /** How many ticks words said stay: in a level, as long as they take to read (D175),
+   * in the ticks this scene plays; in a story, until the next step. */
   private sayTicks(text: string): number {
-    return this.options.story ? Number.POSITIVE_INFINITY : readingTicks(text, TICK_MS);
+    return this.options.story ? Number.POSITIVE_INFINITY : readingTicks(text, this.tickMs);
   }
 
   /** A sprite's thing put on its tile, its foot there, among the figures by its row:
@@ -675,7 +681,7 @@ class LevelScene extends Phaser.Scene {
       height: this.map.height * TILE,
       wrap: this.options.story ? 6 : 4,
       figures: () => [this.wizard, ...[...this.actors.values()].map((actor) => actor.sprite)],
-      tickMs: TICK_MS,
+      tickMs: this.tickMs,
       shown: () => this.view.shown(),
     });
     const story = this.options.story;

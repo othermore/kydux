@@ -470,6 +470,22 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).toHaveAttribute('data-through', 'ring_1,ring_2,ring_3,ring_4,ring_5,ring_6');
   });
 
+  test('a turn inside a ring rubs its rim: the bump, the thought, the program stopped in the air (D226)', async ({ page }) => {
+    await open(page, 'the-rings', '1');
+    await start(page, wrong('the-rings', 'turned_inside_the_ring'));
+    await expect(scene(page)).toHaveAttribute('data-thought', 'Oh, giré demasiado pronto y rocé el aro.', {
+      timeout: ciTimes(60_000),
+    });
+    await expect(scene(page)).toHaveAttribute('data-sounds', /bump/);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}ring-rim.png` });
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
+    await expect(page.locator('.outcome-text')).toContainText('rozó el borde');
+    await expect(page.locator('.win-card')).toHaveCount(0);
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
+    await expect(scene(page)).toHaveAttribute('data-wizard', '5,8');
+    await page.screenshot({ path: `${SHOTS}ring-rim-card.png` });
+  });
+
   test('a pair flown down and then up is seen and said: each ring shakes, the wizard thinks its way (D219)', async ({ page }) => {
     await open(page, 'the-rings', '1');
     await start(page, wrong('the-rings', 'the_pair_upside_down'));

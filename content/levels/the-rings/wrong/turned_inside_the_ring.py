@@ -1,0 +1,5 @@
+wizard.cast("drevo")
+wizard.move_right(1)
+wizard.move_up(1)
+wizard.move_right(2)
+wizard.move_down(2)

@@ -136,6 +136,10 @@ describe("Ilda's count after a race (D189)", () => {
     expect(explanationText({ kind: 'no_landing', params: { thing: 'wizard' } })).toMatch(
       /^Aquí no hay dónde posar la escoba, así que el programa se para aquí, todavía en el aire\./,
     );
+    // A turn inside a ring, which rubs its rim (D226).
+    expect(explanationText({ kind: 'ring_rim', params: { thing: 'ring_1' } })).toMatch(
+      /^La escoba giró mientras todavía estaba dentro del aro y rozó el borde/,
+    );
     // A list asked for one it has not (D198).
     expect(explanationText({ kind: 'index_range', params: { count: 3, asked: 4 } })).toBe(
       'La lista no tiene tantos: tiene 3, y pediste el 4.º',

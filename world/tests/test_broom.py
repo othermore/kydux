@@ -367,6 +367,98 @@ def test_a_ring_flown_again_along_its_way_in_its_turn_counts():
     assert result.status == "won"
 
 
+#: The rings' first two moves: the broom lifted, and a step right to the first ring.
+INTO_THE_RING = 'wizard.cast("drevo")\nwizard.move_right(1)\n'
+
+
+@pytest.mark.parametrize("turn", ["right", "left"])
+def test_a_turn_inside_a_ring_rubs_its_rim_and_stops_the_program_in_the_air(turn):
+    """D226: in the ring's cell, a move to its side is refused at that line, the
+    wizard in the air in the ring, the ring not flown."""
+    code = INTO_THE_RING + f"wizard.move_up(1)\nwizard.move_{turn}(1)\n"
+    result = run_code(content_level("the-rings"), code)
+    assert result.status == "error"
+    assert result.error.line == 4
+    assert result.error.explanation["kind"] == "ring_rim"
+    blocked = result.events[-1]
+    assert (blocked.tick, blocked.kind) == (4, "blocked")
+    assert blocked.data == {
+        "at": [5, 8], "by": "ring_1", "reason": "ring_rim", "tried": True, "facing": turn,
+    }  # fmt: skip
+    assert not [e for e in result.events if e.kind in ("through", "wrong_way", "land")]
+    world = World(content_level("the-rings"))
+    world.wizard.cast("drevo")
+    world.wizard.move_right(1)
+    world.wizard.move_up(1)
+    with pytest.raises(Refused):
+        getattr(world.wizard, f"move_{turn}")(1)
+    assert world.wizard.position == Position(5, 8) and world.wizard.flying
+    assert world.wizard.facing == turn
+
+
+def test_inside_a_ring_a_move_on_flies_it_and_a_move_back_leaves_it_unflown():
+    rings = content_level("the-rings")
+    on = run_code(rings, INTO_THE_RING + "wizard.move_up(1)\nwizard.move_up(1)\n")
+    assert [e.data["id"] for e in on.events if e.kind == "through"] == ["ring_1"]
+    assert on.status != "error"
+    back = run_code(rings, INTO_THE_RING + "wizard.move_up(1)\nwizard.move_down(1)\n")
+    assert not [e for e in back.events if e.kind in ("through", "wrong_way", "blocked")]
+    assert back.status != "error"
+    # A program that ends inside a ring leaves the wizard in the air there.
+    ended = World(rings)
+    ended.wizard.cast("drevo")
+    ended.wizard.move_right(1)
+    ended.wizard.move_up(1)
+    ended.finish()
+    assert ended.wizard.flying and ended.wizard.position == Position(5, 8)
+    assert ended.error is None
+
+
+def test_the_second_ring_rubs_too_entered_along_its_way_or_against_it():
+    rings = content_level("the-rings")
+    along = (
+        INTO_THE_RING
+        + "wizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(1)\nwizard.move_right(1)\n"
+    )
+    result = run_code(rings, along)
+    assert (result.events[-1].data["by"], result.events[-1].data["reason"]) == (
+        "ring_2",
+        "ring_rim",
+    )
+    against = INTO_THE_RING + "wizard.move_right(2)\nwizard.move_up(1)\nwizard.move_left(1)\n"
+    result = run_code(rings, against)
+    # Into ring_2 from below, against its way, then a turn: the same rub.
+    assert (result.events[-1].data["by"], result.events[-1].data["reason"]) == (
+        "ring_2",
+        "ring_rim",
+    )
+
+
+def test_in_the_race_a_turn_inside_a_ring_stops_it_before_it_is_flown_out():
+    code = INTO_THE_RING + "wizard.move_up(1)\nwizard.move_right(1)\n"
+    result = run_code(content_level("the-race"), code)
+    assert result.status == "error"
+    assert (result.events[-1].tick, result.events[-1].data["reason"]) == (8, "ring_rim")
+    assert not [e for e in result.events if e.kind == "circle"]
+    assert result.goals[0].failed and result.goals[1].failed
+
+
+def test_no_program_of_the_ring_levels_rubs_a_rim_but_the_one_written_to():
+    for name in ("the-rings", "the-race", "the-rematch"):
+        folder = CONTENT / name
+        level = content_level(name)
+        texts = [json.loads((folder / f"text.{lang}.json").read_text())["starting_code"]
+                 for lang in ("es", "en")]  # fmt: skip
+        programs = {"solution": (folder / "solution.py").read_text()}
+        programs |= {p.stem: p.read_text() for p in (folder / "wrong").glob("*.py")}
+        programs |= {f"starting code {n}": text for n, text in enumerate(texts)}
+        for program, code in programs.items():
+            rubbed = [
+                e for e in run_code(level, code).events if e.data.get("reason") == "ring_rim"
+            ]
+            assert bool(rubbed) == (program == "turned_inside_the_ring"), (name, program)
+
+
 def rings(*specs, start=(0, 3)):
     """A field of rings on rows 1 and 2, each `(x, y, way, colour)`, all named by the
     goal in their order; the wizard at `start`."""

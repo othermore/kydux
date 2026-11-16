@@ -95,7 +95,8 @@
     "no_knot": "This broom has no knot, so there is nothing to untie, and the program stops here. Before taking the knot off a broom, look whether it has one.",
     "no_landing": "There is nowhere to set the broom down here, so the program stops here, still in the air. Land where there is ground.",
     "index_range": "The list doesn't have that many: it has {count}, and you wanted number {asked}.",
-    "index_range_unknown": "The list doesn't have as many as you asked for."
+    "index_range_unknown": "The list doesn't have as many as you asked for.",
+    "ring_rim": "The broom turned while it was still inside the ring and rubbed its rim, so the program stops here, still in the air. Leave the ring by its other side, one step more upward or downward, before turning."
   },
   "things": {
     "door": "the door",
@@ -179,7 +180,8 @@
     "ring_way": {
       "up": "This ring is flown upward, from below. Like this, it doesn't count!",
       "down": "This ring is flown downward, from above. Like this, it doesn't count!"
-    }
+    },
+    "ring_rim": "Oh, I turned too soon and grazed the ring."
   },
   "notebook": {
     "title": "The wizard's notebook",

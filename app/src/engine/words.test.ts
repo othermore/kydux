@@ -82,6 +82,8 @@ describe('what a flight cannot cross, and a walk what a flight can (D186, D187)'
     expect(blockedText('no_knot', 'broom')).toBe('Esta escoba no tiene nudo: no hay nada que desatar.');
     // drevo cast over the water (D215).
     expect(blockedText('no_landing', null, { kind: 'water' })).toBe('No hay dónde posar la escoba.');
+    // A turn inside a ring rubs its rim: the owner's words (D226).
+    expect(blockedText('ring_rim', 'ring')).toBe('Oh, giré demasiado pronto y rocé el aro.');
     initLanguage({ languages: ['en'], storage: null });
   });
 });

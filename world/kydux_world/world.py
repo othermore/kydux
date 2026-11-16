@@ -499,6 +499,11 @@ class Wizard(Child):
             here = self._k_position
             ahead = Position(here.x + dx, here.y + dy)
             flying = self._k_flying
+            inside = self._k_ring
+            if inside is not None and direction in (Direction.LEFT, Direction.RIGHT):
+                # Inside a ring, a turn to its side rubs its rim: the program stops there,
+                # the wizard still in the air in the ring, which is not flown (D226).
+                world.refuse(inside[0], "ring_rim", list(here), facing=direction.value)
             friend = world.friend_at(ahead)
             if friend is not None:
                 # A friend stands in the way: the wizard walks round (D66).

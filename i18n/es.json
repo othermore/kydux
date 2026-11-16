@@ -95,7 +95,8 @@
     "no_knot": "Esta escoba no tiene nudo, así que no hay nada que desatar, y el programa se para aquí. Antes de quitarle el nudo a una escoba, mira si lo tiene.",
     "no_landing": "Aquí no hay dónde posar la escoba, así que el programa se para aquí, todavía en el aire. Aterriza donde haya suelo.",
     "index_range": "La lista no tiene tantos: tiene {count}, y pediste el {asked}.º",
-    "index_range_unknown": "La lista no tiene tantos elementos como pediste."
+    "index_range_unknown": "La lista no tiene tantos elementos como pediste.",
+    "ring_rim": "La escoba giró mientras todavía estaba dentro del aro y rozó el borde, así que el programa se para aquí, todavía en el aire. Sal del aro por el otro lado, un paso más hacia arriba o hacia abajo, antes de girar."
   },
   "things": {
     "door": "la puerta",
@@ -179,7 +180,8 @@
     "ring_way": {
       "up": "Este aro se cruza hacia arriba, desde abajo. ¡Así no cuenta!",
       "down": "Este aro se cruza hacia abajo, desde arriba. ¡Así no cuenta!"
-    }
+    },
+    "ring_rim": "Oh, giré demasiado pronto y rocé el aro."
   },
   "notebook": {
     "title": "El cuaderno {del mago|de la maga}",

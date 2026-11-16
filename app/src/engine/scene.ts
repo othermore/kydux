@@ -2046,9 +2046,11 @@ class LevelScene extends Phaser.Scene {
         const why = blockedText(String(event.data.reason), thing?.kind ?? null, detail);
         this.speech.think(why, tick, this.sayTicks(why));
         if (event.data.tried === true) this.shake(this.things.get(by) ?? this.wizard, duration);
-        // drevo cast over a cell no one walks on: it sounds as a bump does, and the
-        // wizard stays in the air (D215).
-        if (event.data.reason === 'no_landing') this.playSound('bump');
+        // drevo cast over a cell no one walks on, and a turn inside a ring that rubs its
+        // rim: each sounds as a bump does, and the wizard stays in the air (D215, D226);
+        // the rim nudges the wizard the way it turned, as a bump does.
+        if (event.data.reason === 'no_landing' || event.data.reason === 'ring_rim') this.playSound('bump');
+        if (event.data.reason === 'ring_rim') this.nudge(this.wizard, facing ?? 'right', duration);
         break;
       }
       // 'wait': the wizard stands still while the world moves on.

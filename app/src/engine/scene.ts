@@ -145,7 +145,7 @@ import { Speech } from './speech';
 import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
 import { heldOutline, MarkSilhouette, Silhouette } from './silhouette';
-import { LONG, Playback } from './playback';
+import { HELD, LONG, Playback } from './playback';
 import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
@@ -158,6 +158,9 @@ import {
   flyFrame,
   type Glide,
   glideAt,
+  glideBegins,
+  glideMost,
+  glideOver,
   glideTo,
   hoverOf,
   hoverPhase,
@@ -194,6 +197,10 @@ interface Flyer {
 const WIND_STOP = 0.15;
 const WIND_BUMP = 0.05;
 const WIND_CUT = 0.02;
+/** How far, in milliseconds, a tick may begin off the time its glide has for its step
+ * and the glide keep its time (D259): past it, the ticks' clock started again, and the
+ * glide's goes with it. */
+const GLIDE_SLACK = 4;
 /** Who judges a race and speaks in its band (D189, D234). */
 const RACE_JUDGE = 'ilda';
 /** How long the scene takes to fade out and in when the level starts again, and how
@@ -392,10 +399,11 @@ class LevelScene extends Phaser.Scene {
   /** The figures in the air (D185), and those setting down from it (D244). */
   private readonly flyers = new Map<Phaser.GameObjects.Sprite, Flyer>();
   /** The figures gliding over their runs of flown steps (D259): each glide, the cells of
-   * its steps, when it started by the page's clock, and the tick's length it was made for. */
+   * its steps, when it started by the page's clock, the tick's length it was made for, and
+   * how far into it its figure was last drawn, in milliseconds. */
   private readonly glides = new Map<
     Phaser.GameObjects.Sprite,
-    { glide: Glide; cells: string[]; since: number; tickMs: number }
+    { glide: Glide; cells: string[]; since: number; tickMs: number; at: number }
   >();
   private readonly wind = new Wind();
   /** The way each figure faces (D241), kept by its sprite. */
@@ -1594,7 +1602,15 @@ class LevelScene extends Phaser.Scene {
   private glideStep(sprite: Phaser.GameObjects.Sprite, who: string, tick: number, from: Tile, to: Tile): void {
     const under = this.glides.get(sprite);
     const tickMs = this.playback.tickDuration;
-    if (under && under.tickMs === tickMs && under.cells[tick - under.glide.tick] === String(to)) return;
+    // Planned by the glide under way: the step is the glide's. Where its tick begins later
+    // than the glide has it, the ticks' clock started again after the page was held up
+    // (playback's HELD), and the glide's clock is put back as far: the figure goes on from
+    // where it is drawn, never back.
+    if (under && under.tickMs === tickMs && under.cells[tick - under.glide.tick] === String(to)) {
+      const late = this.playback.startedAt - under.since - glideBegins(under.glide, tick);
+      if (late > GLIDE_SLACK) under.since += late;
+      return;
+    }
     this.tweens.killTweensOf(sprite);
     // The run read ahead begins with this step; were it not to, the step alone.
     const read = this.playback.flownRun(who).map(({ event, length }) => ({
@@ -1619,19 +1635,24 @@ class LevelScene extends Phaser.Scene {
     if (!under) sprite.setPosition(x0, y0);
     // It starts when its tick began by the playback's clock, so that it meets the ticks.
     const since = Math.min(this.playback.startedAt, performance.now());
-    this.glides.set(sprite, { glide: { points, ends, tick }, cells, since, tickMs });
+    this.glides.set(sprite, { glide: { points, ends, tick }, cells, since, tickMs, at: 0 });
   }
 
   /** Each gliding figure, each frame: where its glide has it by the page's clock, facing
-   * the way it flies to its next point; on its last point once its glide ends (D259). */
+   * the way it flies to its next point; on its last point once its glide ends (D259). It
+   * is drawn no farther ahead of the tick shown than HELD, the ticks being that late at
+   * most, and never back from where it was drawn; its glide lasts until the tick of its
+   * last step is shown, so that a late tick finds the glide that planned it. */
   private moveGlides(): void {
     const now = this.game.loop.now;
     for (const [sprite, gliding] of this.glides) {
-      const at = glideAt(gliding.glide, now - gliding.since);
+      const most = glideMost(gliding.glide, this.shownTick, HELD);
+      gliding.at = Math.max(gliding.at, Math.min(now - gliding.since, most));
+      const at = glideAt(gliding.glide, gliding.at);
       sprite.setPosition(at.x, at.y);
       const facing = gliding.glide.points[at.to]?.facing;
       if (facing && this.wayOf(sprite) !== facing) this.face(sprite, facing);
-      if (at.done) this.glides.delete(sprite);
+      if (at.done && glideOver(gliding.glide, this.shownTick)) this.glides.delete(sprite);
     }
   }
 
@@ -1648,7 +1669,10 @@ class LevelScene extends Phaser.Scene {
   /** Paused or stopped, each gliding figure goes on to the cell of the tick shown and
    * stands there, as the tick has it (D259). */
   private cutGlides(): void {
-    for (const gliding of this.glides.values()) gliding.glide = glideTo(gliding.glide, this.playback.tick);
+    for (const gliding of this.glides.values()) {
+      gliding.glide = glideTo(gliding.glide, this.playback.tick);
+      gliding.cells = gliding.cells.slice(0, gliding.glide.ends.length);
+    }
   }
 
   /** Where each flying figure is as the frame is drawn (data-flyers-at, D259): its feet

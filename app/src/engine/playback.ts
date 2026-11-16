@@ -7,8 +7,10 @@
 // so that a walk is seen as anywhere else and a flight three times as fast. What happens
 // before the first tick, a hidden thing found by the first line (D184), is played
 // with the first tick. Its ticks keep one clock: each is due when the ones before it have
-// lasted their length from the play's start, however late a timer fires, so that a
-// figure gliding over its flown steps meets them on time (D259). It says how long it is
+// lasted their length from the play's start, and a tick whose timer fired late is
+// followed sooner by the next, so that a figure gliding over its flown steps meets them
+// on time (D259); only a page held up for longer than HELD starts the clock again from
+// there, so that its ticks are not played in a rush. It says how long it is
 // to the first tick ahead that holds an event asked for (timeTo, D255), and a figure's
 // run of flown steps from the tick shown (flownRun, D259). It knows nothing of Phaser:
 // the scene listens to it and draws.
@@ -22,6 +24,11 @@ export type PlaybackEvent = WorldEvent;
 /** How long a tick lasts in which the wizard casts or picks up, against a tick. */
 export const LONG = 1.6;
 export { FLOWN } from './flight';
+/** How late a tick's timer may fire, in milliseconds, and the ticks keep their clock, the
+ * next ones following sooner; later than this, and than the tick's length, the page was
+ * held up and the clock starts again from there (D259). At four times the speed a flown
+ * tick lasts 33 ms, and a timer is that late many times in a flight. */
+export const HELD = 250;
 /** The wizard's events that take a long tick. */
 const HANDS = new Set(['cast', 'pick_up', 'untie']);
 /** How long a tick's events take, against a tick: LONG for the wizard's hands, a
@@ -223,7 +230,7 @@ export class Playback {
   }
 
   /** When the tick shown began by the clock the ticks are due by: when it was due,
-   * however late its timer fired (D259). */
+   * however late its timer fired, or when it fired where the clock started again (D259). */
   get startedAt(): number {
     return this.began;
   }
@@ -260,10 +267,10 @@ export class Playback {
     }
     this.current += 1;
     // This tick is due when the one before it ended, or now at a play's start; a timer
-    // that fired more than a tick late starts the clock again from now.
+    // that fired later than HELD, and than the tick lasts, starts the clock again from now.
     const now = this.now();
     const length = this.tickDuration * lengthOf(events, this.pace);
-    const start = this.due !== null && this.due + length > now ? this.due : now;
+    const start = this.due !== null && now - this.due < Math.max(length, HELD) ? this.due : now;
     this.due = start + length;
     this.began = start;
     for (const listener of this.tickListeners) listener(this.current, events, false);

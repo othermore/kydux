@@ -6,6 +6,9 @@ import {
   flyFrame,
   type Glide,
   glideAt,
+  glideBegins,
+  glideMost,
+  glideOver,
   glideTo,
   HOVER_CELLS,
   HOVER_MS,
@@ -212,6 +215,18 @@ describe('a flight glides (D259)', () => {
     expect(glideTo(glide, 9)).toBe(glide);
   });
 
+  it('has each step begin when the one before it ends, and is drawn no farther ahead of the tick shown than it is given', () => {
+    expect([5, 6, 7, 8].map((tick) => glideBegins(glide, tick))).toEqual([0, 100, 200, 300]);
+    // Given nothing ahead, it goes as far as the end of the step of the tick shown.
+    expect([5, 7, 8].map((tick) => glideMost(glide, tick, 0))).toEqual([100, 300, 400]);
+    // Given 250 ms, as far as that from the start of the step of the tick shown.
+    expect([5, 7, 8].map((tick) => glideMost(glide, tick, 250))).toEqual([250, 450, 550]);
+    // A page held up for a second in its first tick finds it on its third step, not at its end.
+    expect(glideAt(glide, Math.min(1000, glideMost(glide, 5, 250)))).toMatchObject({ x: 64, y: -16, to: 3, done: false });
+    // It is over at the tick of its last step, not before.
+    expect([7, 8, 9].map((tick) => glideOver(glide, tick))).toEqual([false, true, true]);
+  });
+
   it("reads a figure's run of flown steps ahead: on while it flies on, to a stand, a bump or a cast", () => {
     const step = (tick: number, from: number, to: number, actor = 'wizard'): PlaybackEvent => ({
       tick,
@@ -264,7 +279,7 @@ describe('a flight glides (D259)', () => {
     now = 203;
     fired[1]?.();
     expect(waits[2]).toBeCloseTo(97);
-    // A timer more than a tick late starts the clock again from then.
+    // A timer later than HELD, the page held up, starts the clock again from then.
     now = 600;
     fired[2]?.();
     expect(waits[3]).toBeCloseTo(100);

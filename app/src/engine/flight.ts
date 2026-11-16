@@ -139,6 +139,28 @@ export function glideAt(glide: Glide, elapsed: number): { x: number; y: number; 
   return { x: last.x, y: last.y, to: points.length - 1, done: true };
 }
 
+/** How long into a glide its step of `tick` begins, in milliseconds: when the step
+ * before it ends, and at once for its first. */
+export function glideBegins(glide: Glide, tick: number): number {
+  const index = tick - glide.tick;
+  return index > 0 ? (glide.ends[Math.min(index, glide.ends.length) - 1] ?? 0) : 0;
+}
+
+/** The farthest into a glide its figure is drawn while the tick shown is `tick`, in
+ * milliseconds: the end of that tick's step, or `ahead` milliseconds past its start where
+ * that is later, so that a figure whose ticks are late flies on ahead of them, and is
+ * never farther from them than that, however long the page is held up (D259). */
+export function glideMost(glide: Glide, tick: number, ahead: number): number {
+  const index = Math.max(0, tick - glide.tick);
+  const end = glide.ends[Math.min(index, glide.ends.length - 1)] ?? 0;
+  return Math.max(end, glideBegins(glide, tick) + ahead);
+}
+
+/** Whether `tick` is the tick of a glide's last step, or one after it. */
+export function glideOver(glide: Glide, tick: number): boolean {
+  return tick >= glide.tick + glide.ends.length - 1;
+}
+
 /** A glide cut at the step of `tick`, the tick shown at a pause or a stop: the figure
  * goes on to that step's cell and stands there (D259). Unchanged where it ends before. */
 export function glideTo(glide: Glide, tick: number): Glide {

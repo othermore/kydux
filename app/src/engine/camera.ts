@@ -181,9 +181,13 @@ export class SceneCamera {
     const wizard = this.parts.wizard();
     const { scrollX, scrollY } = camera;
     camera.startFollow(wizard, true, LAG, LAG);
-    // From the frame of a level's start it glides; else it is on the wizard at once.
+    // From the frame of a level's start it glides; else it is on the wizard at once, and
+    // goes with a wizard that glides from there (glide, D259).
     if (this.framed) camera.setScroll(scrollX, scrollY);
-    else camera.centerOn(wizard.x, wizard.y);
+    else {
+      camera.centerOn(wizard.x, wizard.y);
+      this.gliding = false;
+    }
     this.framed = false;
     delete this.parent.dataset.framed;
     this.parent.dataset.following = 'true';

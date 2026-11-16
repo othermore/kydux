@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { FLOWN, LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState, ticksTo } from './playback';
+import { FLOWN, HELD, LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState, ticksTo } from './playback';
 
 function events(n: number): PlaybackEvent[] {
   return Array.from({ length: n }, (_, i) => ({
@@ -224,6 +224,56 @@ describe('Playback', () => {
     off();
     playback.play();
     expect(seen).toEqual([0]);
+  });
+});
+
+describe("the ticks' one clock (D259)", () => {
+  /** A playback on a clock and timers moved by hand: `fire` runs the timer set, at `at`. */
+  function byHand(tickMs: number) {
+    let now = 0;
+    let timer: { callback: () => void; ms: number } | null = null;
+    const playback = new Playback({
+      tickMs,
+      schedule: (callback, ms) => (timer = { callback, ms }),
+      cancel: () => (timer = null),
+      now: () => now,
+    });
+    const began: number[] = [];
+    playback.onTick((tick) => tick > 0 && began.push(playback.startedAt));
+    playback.load(events(6));
+    const fire = (at: number): number => {
+      now = at;
+      const set = timer;
+      timer = null;
+      set?.callback();
+      return (timer as { ms: number } | null)?.ms ?? -1;
+    };
+    return { playback, began, fire };
+  }
+
+  it('has a tick after a late timer follow sooner, each one beginning when it was due', () => {
+    const { playback, began, fire } = byHand(100);
+    playback.play();
+    // The second tick's timer fires 130 ms late, more than a tick: the third is past due.
+    expect(fire(230)).toBe(0);
+    expect(fire(231)).toBe(69);
+    expect(fire(300)).toBe(100);
+    expect(began).toEqual([0, 100, 200, 300]);
+  });
+
+  it('starts again from there once the page was held up for longer than HELD', () => {
+    const { playback, began, fire } = byHand(100);
+    playback.play();
+    expect(fire(100 + HELD + 1)).toBe(100);
+    expect(began).toEqual([0, 100 + HELD + 1]);
+  });
+
+  it('keeps the clock of a tick longer than HELD through a timer late by less than the tick', () => {
+    const { playback, began, fire } = byHand(400);
+    playback.play();
+    expect(fire(400 + 399)).toBe(1);
+    expect(fire(400 + 400 + 400)).toBe(400);
+    expect(began).toEqual([0, 400, 1200]);
   });
 });
 

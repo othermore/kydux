@@ -3783,8 +3783,8 @@ one overturns stays, marked as superseded.
   loads, a band sweeps along the bar, since nothing says how much is left. When the
   screen is ready and a tip holds it until it is read (D221), the bar fills over the time
   left: full, the screen opens. Under reduced motion the band stands still and fades in
-  and out slowly, and the bar fills the same. The row takes less height than the mark
-  over the words did, and a tip's picture is as large as the window lets (D239). Rules out a wait in which
+  and out slowly, and the bar fills the same. The row is as tall as the mark, 44 px, and
+  leaves a tip's picture as large as the window lets (D239). Rules out a wait in which
   nothing moves, and a small grey line as its only word.
 - **D250 — The first lines moved in teach the keys that move them.** Decided 2026-11-16 by
   the owner (*Cuando se enseñe el primer "anidamiento" (if o for o while) hay que explicar

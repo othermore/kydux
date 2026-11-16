@@ -5,7 +5,7 @@
     "Reach the white stone.",
     "In fewer than 16 lines."
   ],
-  "starting_code": "# The pair of rings is written three times. Give it a name!\nwizard.cast(\"drevo\")\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(6)\nwizard.move_right(8)\nwizard.move_down(6)\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_right(11)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\n",
+  "starting_code": "# The instructions to fly through a pair of rings are repeated three times, just the same. Make a function so you do not repeat them!\nwizard.cast(\"drevo\")\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(6)\nwizard.move_right(8)\nwizard.move_down(6)\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_right(11)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\n",
   "hints": [
     "Look for the four lines that fly through a pair of rings: up, right, down and right.",
     "Give those four lines a name with `def` and put the four moves inside it.",

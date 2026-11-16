@@ -2712,8 +2712,9 @@ one overturns stays, marked as superseded.
   (`figure-zarek-standing.md`, `figure-rinlo-standing.md`), each view a little taller in
   its frame than a first-year's, between the children's and the grown-ups' (`DRAWN`,
   `figures.py --drawn`); their walking rows are the standing frame three times. Zarek has
-  flying rows from Gemini's drawing of him riding the broom in the same views
-  (`figure-zarek-fly.md`, `--drawn-fly`); Rinlo stands only. `figures.json`'s `sheets`
+  flying rows from Gemini's drawings of him riding the broom in the same views, both
+  hands on its handle, as a racer holds it (`figure-zarek-fly-down.md`,
+  `figure-zarek-fly.md`, `--drawn-fly-view`); Rinlo stands only. `figures.json`'s `sheets`
   says each one's rows. Ilda's sheet stands. Rules out a wizard flying in its walking
   frames.
 - **D189 — The race: Ilda's count.** Decided 2026-11-10 by the owner (*ticks + líneas +

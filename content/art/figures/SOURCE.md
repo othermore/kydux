@@ -33,6 +33,7 @@ later, like the rest of it.
   standing still in the four views (`figure-zarek-standing.md`,
   `figure-rinlo-standing.md`), drawn with the pupils' and the teachers' figures as
   their reference, cut by `tools/art/figures.py --drawn` at a height between the
-  children's and the grown-ups'; Zarek's flying rows are Gemini's edit of his drawing
-  riding a broom (`figure-zarek-fly.md`), cut by `--drawn-fly`, his down view a drawing
-  of its own (`figure-zarek-fly-down.md`), put in its row by `--drawn-fly-view`.
+  children's and the grown-ups'; Zarek's flying rows are Gemini's drawings of him
+  riding a broom, both hands on its handle: his down view (`figure-zarek-fly-down.md`),
+  and from it his right, left and back views (`figure-zarek-fly.md`), each put in its
+  row by `--drawn-fly-view`.

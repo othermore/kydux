@@ -788,20 +788,29 @@ the figure's sheet in `content/art/figures/`:
 .venv/bin/python tools/art/figures.py --drawn zarek art/raw/figures/figure-zarek-standing.png
 ```
 
-Its flying rows come from a drawing of it riding the broom in the same
-views, `figure-zarek-fly.md`:
+Its flying rows come from a drawing of it riding the broom in the four
+views. This cuts them all into the flying rows:
 
 ```sh
 .venv/bin/python tools/art/figures.py --drawn-fly zarek art/raw/figures/figure-zarek-fly.png
 ```
 
-One view of the flying rows can be drawn again on its own. Gemini draws
-it from a prompt of its own, such as `figure-zarek-fly-down.md`. This puts
-it in place of that view, at the height the row has:
+Some views of the flying rows can be drawn again. Gemini draws them from a
+prompt of their own: Zarek's down view from `figure-zarek-fly-down.md`, and
+his right, left and back views from `figure-zarek-fly.md`. This puts each
+figure of the drawing, from left to right, in place of the view named, at
+the height its row has. Name one way, or several joined by commas:
 
 ```sh
 .venv/bin/python tools/art/figures.py --drawn-fly-view zarek down art/raw/figures/figure-zarek-fly-down.png
+.venv/bin/python tools/art/figures.py --drawn-fly-view zarek right,left,up art/raw/figures/figure-zarek-fly.png
 ```
+
+It says so and stops when the drawing has another number of figures than
+the ways named. The pose `figure-zarek-fly.md` is drawn from is
+`art/raw/figures/wizard-fly-sides-reference.png`: the boy's flying base's
+middle frames facing right, facing left and from the back, four times their
+size, on flat magenta.
 
 Run `--check` after either, and look at the figure's sheet at the end of
 `figures-check.png`.

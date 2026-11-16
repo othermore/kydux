@@ -86,7 +86,7 @@ author = "Kydux contributors"
 licence = "GPL-3.0-or-later"
 
 ["zarek-fly.webp"]
-source = "generated: gemini-3-pro-image, an edit of Zarek's standing drawing riding a broom, tools/art/prompts/figure-zarek-fly.md; each view put on its grid, level, up and down, by tools/art/figures.py --drawn-fly; the down view a drawing of its own, tools/art/prompts/figure-zarek-fly-down.md, put in its row by --drawn-fly-view"
+source = "generated: gemini-3-pro-image, drawings of Zarek riding a broom, both hands on its handle: his down view, tools/art/prompts/figure-zarek-fly-down.md, and from it his right, left and back views, tools/art/prompts/figure-zarek-fly.md; each view put in its row, level, up and down, the magenta round it cleared, by tools/art/figures.py --drawn-fly-view"
 author = "Kydux contributors"
 licence = "GPL-3.0-or-later"
 

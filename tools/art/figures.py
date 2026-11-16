@@ -62,8 +62,8 @@ A figure with no sheet before it, a pupil a year older (DRAWN: Zarek, Rinlo), is
 from a drawing of it standing still in the four views (--drawn), each view as tall as
 DRAWN says, its walking rows its standing frame three times; and its flying rows from a
 drawing of it riding the broom in the same four views (--drawn-fly), scaled as its
-standing views, bobbing as the wizard's; one view may be drawn again alone
-(--drawn-fly-view), as tall as the one it replaces. figures.json says its rows in
+standing views, bobbing as the wizard's; some views may be drawn again
+(--drawn-fly-view), each as tall as the one it replaces. figures.json says its rows in
 `sheets`.
 
 Each look's portrait (--portraits, D194) is its gender's base bust (PORTRAIT_BASES, cut
@@ -775,21 +775,33 @@ def make_drawn_fly(name: str, drawing: Path) -> Path:
     return drawn_sheet(name)
 
 
-def make_drawn_fly_view(name: str, way: str, drawing: Path) -> Path:
-    """One view of a drawn figure's flying rows drawn again (--drawn-fly-view): the
-    figure of a drawing of that view alone, as tall in its frame as the view it
-    replaces, bobbing, in its row of the flying base; its sheet made."""
+def make_drawn_fly_view(name: str, ways: str, drawing: Path) -> Path:
+    """Views of a drawn figure's flying rows drawn again (--drawn-fly-view): `ways`, one
+    way or several joined by commas, the drawing's figures from left to right; each as
+    tall in its frame as the view it replaces, the magenta round it cleared as the
+    wizard's flying rows' are, bobbing, in its row of the flying base; its sheet made."""
+    import sprites  # noqa: PLC0415 - the cut's tools, only for the bases
+
     about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
     frame = tuple(about["frame"])
     fw, fh = frame
-    row = about["ways"].index(way)
+    wanted = ways.split(",")
+    views = drawn_views(Image.open(drawing))
+    if len(views) != len(wanted):
+        raise SystemExit(f"{drawing} has {len(views)} figures, and {len(wanted)} ways are named")
     base = Image.open(BASE_DIR / f"{name}-fly.webp").convert("RGBA")
-    level = np.array(base.crop((0, row * fh, fw, (row + 1) * fh)))[..., 3] > 0
-    filled = np.flatnonzero(level.any(axis=1))
-    tall = int(filled.max() - filled.min()) + 1
-    (view,) = drawn_views(Image.open(drawing))
-    cell = alone(framed(view, tall / view.height, about))
-    base.paste(bobbing(cell, frame), (0, row * fh))
+    for way, view in zip(wanted, views, strict=True):
+        row = about["ways"].index(way)
+        level = np.array(base.crop((0, row * fh, fw, (row + 1) * fh)))[..., 3] > 0
+        filled = np.flatnonzero(level.any(axis=1))
+        tall = int(filled.max() - filled.min()) + 1
+        cell = alone(framed(view, tall / view.height, about))
+        cell = Image.fromarray(
+            sprites.off_magenta_rim(
+                np.array(cell), margin=FLY_MARGIN, depth=FLY_RIM, bright=FLY_BRIGHT
+            )
+        )
+        base.paste(bobbing(cell, frame), (0, row * fh))
     base.save(BASE_DIR / f"{name}-fly.webp", quality=90, method=6)
     return drawn_sheet(name)
 
@@ -1105,8 +1117,8 @@ def main() -> int:
     parser.add_argument(
         "--drawn-fly-view",
         nargs=3,
-        metavar=("FIGURE", "WAY", "DRAWING"),
-        help="draw one view of a drawn figure's flying rows again",
+        metavar=("FIGURE", "WAYS", "DRAWING"),
+        help="draw views of a drawn figure's flying rows again (ways joined by commas)",
     )
     parser.add_argument(
         "--drawn", nargs=2, metavar=("FIGURE", "DRAWING"), help="make a figure from a drawing"

@@ -682,10 +682,12 @@ the reference for the style and the proportions (`figure-zarek-standing.md`,
 `figure-rinlo-standing.md`), and cut into a sheet whose walking rows are the standing
 frame three times (`tools/art/figures.py --drawn`). Each view is a little taller in its
 frame than a first-year's, between the children's and the grown-ups'. Zarek, who races,
-has flying rows from Gemini's drawing of him riding the broom in the same four views
-(`figure-zarek-fly.md`, `--drawn-fly`); a view drawn again on its own, his down view
-with the handle ahead and the twigs behind (`figure-zarek-fly-down.md`), takes the place
-of that view in his flying rows at the height the row had (`--drawn-fly-view`).
+has flying rows drawn by Gemini riding the broom as a racer does, both hands on its
+handle: facing the viewer, the handle ahead and the twigs behind
+(`figure-zarek-fly-down.md`), and from that view, facing right, facing left and from
+the back (`figure-zarek-fly.md`, with the young wizard's flying views as the pose's
+reference). Each view takes its row at the height the row has (`--drawn-fly-view`), the
+magenta round it cleared as the wizard's flying rows' is.
 
 ### Portraits
 

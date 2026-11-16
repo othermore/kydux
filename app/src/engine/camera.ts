@@ -250,6 +250,15 @@ export class SceneCamera {
     return [top, top + camera.height / camera.zoom];
   }
 
+  /** The left and the right, in the scene's pixels, of what such a framing shows; null
+   * where the camera follows. */
+  shownSides(): [number, number] | null {
+    if (!this.placed && !this.levelFraming.holding) return null;
+    const camera = this.camera;
+    const left = camera.scrollX + (camera.width / 2) * (1 - 1 / camera.zoom);
+    return [left, left + camera.width / camera.zoom];
+  }
+
   /** A level's place shown whole and centred (D201), off the wizard until a run takes
    * the wizard out of it, a drag or Find my wizard. */
   private showBox(box: [number, number, number, number]): void {

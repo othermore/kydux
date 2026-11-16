@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { type Box, bubbleBelow, bubbleRoom, bubbleShift, bubbleWrap, readingMs, readingTicks, settleMs } from './bubble';
+import {
+  type Box,
+  bubbleBelow,
+  bubbleMiddle,
+  bubbleRoom,
+  bubbleShift,
+  bubbleTip,
+  bubbleWrap,
+  readingMs,
+  readingTicks,
+  settleMs,
+} from './bubble';
 
 const box = (left: number, top: number, right: number, bottom: number): Box => ({ left, top, right, bottom });
 
@@ -16,6 +27,32 @@ describe('a speaker\'s bubble', () => {
     expect(bubbleRoom(768, [120, 560])).toEqual([120, 560]);
     // A frame wider than the scene shows its margin: the scene's own sides hold.
     expect(bubbleRoom(576, [-40, 620])).toEqual([0, 576]);
+  });
+
+  it('is held in from the sides of the scene, and of what a framing shows of it (D199)', () => {
+    // Over who speaks where there is room on both sides.
+    expect(bubbleMiddle(900, 150, [0, 2016])).toBe(900);
+    // By the scene's side, its half kept inside.
+    expect(bubbleMiddle(60, 150, [0, 2016])).toBe(150);
+    expect(bubbleMiddle(2000, 150, [0, 2016])).toBe(1866);
+    // The finish under the race course's wide framing, which ends short of the scene's
+    // right side: the friend's words, drawn larger zoomed out, end at the frame's.
+    const sides = bubbleRoom(2016, [125, 1858]);
+    expect(bubbleMiddle(1656, 277, sides)).toBe(1581);
+    // Wider than what is shown: from its left side.
+    expect(bubbleMiddle(400, 500, [100, 900])).toBe(600);
+  });
+
+  it('keeps its tail over who speaks where its box is held in or moved, at any scale', () => {
+    // The box over who speaks: the tail at its middle.
+    expect(bubbleTip(0, 1, 300)).toBe(0);
+    // The box held 75 pixels of the scene to the left: the tip as far to the right.
+    expect(bubbleTip(75, 1, 300)).toBe(75);
+    // Drawn at 1.8, zoomed out: the same pixels of the scene are fewer of the box's own.
+    expect(bubbleTip(75, 1.8, 300)).toBeCloseTo(41.67, 2);
+    // Never on the box's round corners.
+    expect(bubbleTip(400, 1, 300)).toBe(138);
+    expect(bubbleTip(-400, 2, 300)).toBe(-138);
   });
 
   const above = box(100, 0, 300, 80);

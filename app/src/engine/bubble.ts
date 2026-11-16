@@ -21,11 +21,26 @@ function meets(one: Box, other: Box): boolean {
   return one.left < other.right && other.left < one.right && one.top < other.bottom && other.top < one.bottom;
 }
 
-/** The top and the bottom a bubble stays between, in the scene's pixels: the scene's
- * own, or what a story step's framing shows of it (D199), where the camera does not
- * follow the words. */
-export function bubbleRoom(sceneHeight: number, shown: readonly [number, number] | null): [number, number] {
-  return shown ? [Math.max(0, shown[0]), Math.min(sceneHeight, shown[1])] : [0, sceneHeight];
+/** The top and the bottom a bubble stays between, in the scene's pixels, or its left
+ * and its right, `size` the scene's height or its width: the scene's own, or what a
+ * story step's framing shows of it (D199), where the camera does not follow the words. */
+export function bubbleRoom(size: number, shown: readonly [number, number] | null): [number, number] {
+  return shown ? [Math.max(0, shown[0]), Math.min(size, shown[1])] : [0, size];
+}
+
+/** Where the tail's tip goes across a bubble's box, from the box's middle and in the
+ * box's own pixels: over who speaks, `offset` pixels of the scene from the middle of a
+ * box drawn at `scale`, short of the box's round corners. */
+export function bubbleTip(offset: number, scale: number, width: number): number {
+  const reach = width / 2 - 12;
+  return Math.min(Math.max(offset / scale, -reach), reach);
+}
+
+/** Where a bubble's middle goes across the scene: where it is wanted, over who speaks,
+ * held in so that its half on each side stays between `sides`; from the left one where
+ * it is wider than the room between them. */
+export function bubbleMiddle(wanted: number, half: number, sides: readonly [number, number]): number {
+  return Math.min(Math.max(wanted, sides[0] + half), Math.max(sides[0] + half, sides[1] - half));
 }
 
 /** Whether a bubble goes below who speaks: where above there is no room, or where above

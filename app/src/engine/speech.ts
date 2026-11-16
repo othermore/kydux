@@ -12,7 +12,16 @@
 import Phaser from 'phaser';
 import { TILE } from './placeholders';
 import { wordsScale } from './zooming';
-import { type Box, bubbleBelow, bubbleRoom, bubbleShift, bubbleWrap, settleMs } from './bubble';
+import {
+  type Box,
+  bubbleBelow,
+  bubbleMiddle,
+  bubbleRoom,
+  bubbleShift,
+  bubbleTip,
+  bubbleWrap,
+  settleMs,
+} from './bubble';
 
 /** How far a bubble's drawn box and tail reach beyond its words, at most: a
  * container's bounds are its words' alone. */
@@ -36,6 +45,9 @@ export interface SpeechParts {
   /** In a story, the top and the bottom, in the scene's pixels, of what a step's framing
    * shows (D199), which a bubble stays between; null where the camera follows who speaks. */
   shown: () => [number, number] | null;
+  /** The left and the right of what such a framing shows, which a bubble stays between
+   * as well; null likewise. */
+  shownSides: () => [number, number] | null;
 }
 
 export class Speech {
@@ -125,12 +137,13 @@ export class Speech {
     return box;
   }
 
-  /** Over who speaks, or under them when there is no room above; never past the sides. */
+  /** Over who speaks, or under them when there is no room above; never past the scene's
+   * sides, nor past those of what a framing shows of it. */
   private anchor(): [number, number] {
     const over = this.speaker ?? this.parts.wizard();
     const half = (this.place.width / 2 + 4) * this.scale;
-    const wanted = over.x + this.place.shift;
-    const x = Math.min(Math.max(wanted, half), Math.max(half, this.parts.width - half));
+    const sides = bubbleRoom(this.parts.width, this.parts.shownSides());
+    const x = bubbleMiddle(over.x + this.place.shift, half, sides);
     return [x, over.y + (this.place.below ? 22 : -this.parts.headroom)];
   }
 
@@ -254,8 +267,8 @@ export class Speech {
     this.place = { width, below, shift };
     const [x, y] = this.anchor();
     // The tail's tip is at the anchor, over who speaks, even where the box is held
-    // in from the scene's side.
-    const tip = Math.min(Math.max(over.x - x, -width / 2 + 12), width / 2 - 12);
+    // in from a side or moved off someone.
+    const tip = bubbleTip(over.x - x, scale, width);
     const base = below ? top : top + height;
     const box = this.scene.add.graphics();
     box.fillStyle(0xffffff, 1).lineStyle(2, 0x1f2330, 1);

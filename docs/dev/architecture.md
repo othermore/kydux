@@ -2959,8 +2959,9 @@ one overturns stays, marked as superseded.
   following no one, until a later step of the same part frames another, and the story's
   steps without one keep it (`framingAt`); a part told on another scene starts with
   none. The world checks the box against the scene. A bubble said under a framing
-  stays inside what the framing shows of the scene (`bubbleRoom`,
-  `SceneCamera.shown`), since the camera does not follow the words. The scene's parent
+  stays inside what the framing shows of the scene, between its top and its bottom and
+  between its sides (`bubbleRoom`, `bubbleMiddle`, `SceneCamera.shown`, `shownSides`),
+  since the camera does not follow the words. The scene's parent
   says it in `data-camera-fit` (`x0,y0,x1,y1` or `wide`). Rules out a story where a
   place is seen in pieces.
 - **D200 — The map folds by chapter.** Decided 2026-11-11 by the designer under the

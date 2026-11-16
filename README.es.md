@@ -17,6 +17,10 @@ Kydux funciona en un navegador web. Todavía no hay nada que instalar: por
 ahora solo funciona desde este repositorio, como explica
 `docs/dev/dev-environment.md`.
 
+El enlace *Qué es Kydux*, arriba en cada pantalla, abre la página de
+bienvenida. Cuenta qué es el juego, para quién es y cómo se juega, con
+imágenes del juego.
+
 La primera vez, el juego se abre con una historia. Una carta te invita a
 Arvelia, un colegio de magia, y viajas hasta su puerta. Después creas tu
 personaje. Le pones un nombre, eliges si es una maga o un mago, y escoges

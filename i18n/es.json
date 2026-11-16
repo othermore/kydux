@@ -516,5 +516,32 @@
     "left": "Despegas en {mine}; {name}, en {theirs}.",
     "count": "La cuenta de Ilda: tus líneas ({lines}) + tu vuelo ({flight}) + la penalización ({penalty}) = tick {tick}. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}.",
     "count_unfinished": "La cuenta de Ilda: no has cruzado la meta. {name}: {racer_lines} + {racer_flight} = tick {racer_tick}."
+  },
+  "about": {
+    "link": "Qué es Kydux",
+    "page_title": "Kydux — qué es",
+    "hero_alt": "El castillo de Arvelia, en lo alto de su colina junto al lago, al anochecer, con el pueblo a sus pies",
+    "hero_title": "Aprende Python con magia",
+    "hero_text": "Llegas a un colegio de magia, y cada paso que das allí lo das escribiendo programas de verdad.",
+    "play": "Jugar",
+    "what_title": "Qué es Kydux",
+    "what_text": "Kydux es un juego para aprender a programar en Python. Tu personaje llega a Arvelia, un colegio de magia en un viejo castillo. Allí todo obedece a instrucciones escritas. Para abrir una puerta, cruzar un pasillo o volar en escoba, escribes Python de verdad.",
+    "more": "Más sobre Kydux",
+    "who_title": "Para quién es",
+    "who_text": "Para niñas y niños de ocho a doce años. No hace falta saber programar: el juego lo enseña paso a paso, una idea cada vez. Una persona mayor puede jugar al lado, y también aprenderá.",
+    "how_title": "Cómo se juega",
+    "story_name": "Una historia.",
+    "story_text": "Los personajes hablan en la propia escena, y la aventura sigue.",
+    "story_alt": "Una historia: los personajes en el cobertizo de las escobas, y lo que cuenta la voz debajo",
+    "lesson_name": "Una lección.",
+    "lesson_text": "Un profesor o un amigo explica una idea, con un ejemplo que puedes probar.",
+    "lesson_alt": "Una lección: una página que explica las listas, con su ejemplo",
+    "level_name": "Un nivel.",
+    "level_text": "Escribes tu programa, lo ejecutas y miras qué hace tu personaje. Si algo sale mal, el juego te dice por qué.",
+    "level_alt": "Un nivel: la escena a la izquierda y el programa a la derecha",
+    "free_title": "Libre, y de la familia Kidux",
+    "free_text": "Kydux es software libre, bajo la Licencia Pública General de GNU. Está en español y en inglés, y se juega en el navegador. Es de la familia de Kidux, un sistema para el primer ordenador de un niño.",
+    "kidux_link": "Conoce Kidux",
+    "kidux_url": "https://kidux.org/es/"
   }
 }

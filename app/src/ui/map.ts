@@ -91,10 +91,16 @@ export function mapScreen(parts: MapScreenParts): Screen {
         if (here) li.dataset.here = 'true';
         return li;
       });
-      return element('section', { className: 'map-chapter' }, [
+      // The chapter's card: a band of its first scene, its title over it, greyed while
+      // the chapter is still locked (D193).
+      const card = element('div', { className: 'chapter-card' }, [
         element('h2', {}, [parts.chapterTitles.get(chapter.id) ?? chapter.id]),
-        element('ol', { className: 'stops' }, stops),
       ]);
+      card.style.backgroundImage = `url('${import.meta.env.BASE_URL}content/art/chapters/${chapter.id}/card.webp')`;
+      const section = element('section', { className: 'map-chapter' }, [card, element('ol', { className: 'stops' }, stops)]);
+      const first = chapter.items[0];
+      if (first && stopState(course, first, progress) === 'locked') section.dataset.locked = 'true';
+      return section;
     });
     const back = parts.overlay
       ? element('button', { id: 'map-close', type: 'button', className: 'quiet-button' }, [t('map.back_level')])

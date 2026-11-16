@@ -25,8 +25,10 @@ import type { LevelJson } from './runtime/protocol';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
 import { handheldNote } from './ui/handheld';
+import { markSvg } from './ui/mark';
 import type { LessonRunner } from './ui/lessonrun';
 import type { MapScreenParts } from './ui/map';
+import { aboutScreen } from './ui/about';
 import type { Screen } from './ui/screen';
 import { debugging } from './engine/debugging';
 import { lookOf } from './engine/looks';
@@ -63,6 +65,7 @@ type Route =
   | { name: 'settings' }
   | { name: 'wizard' }
   | { name: 'music' }
+  | { name: 'about' }
   | { name: 'level'; id: string }
   | { name: 'lesson'; id: string; from?: string }
   | { name: 'story'; id: string };
@@ -83,6 +86,7 @@ function parseRoute(hash: string): Route {
   if (hash === '#settings') return { name: 'settings' };
   if (hash === '#wizard') return { name: 'wizard' };
   if (hash === '#music' && debugging()) return { name: 'music' };
+  if (hash === '#about') return { name: 'about' };
   return { name: 'start' };
 }
 
@@ -282,10 +286,13 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
   root.replaceChildren(
     element('header', { className: 'top' }, [
       element('div', { className: 'brand' }, [
-        element('h1', {}, [element('a', { href: '#start', id: 'home' }, [t('app.title')])]),
+        element('h1', {}, [element('a', { href: '#start', id: 'home' }, [markSvg(), t('app.title')])]),
         element('span', { className: 'tagline' }, [t('app.tagline')]),
       ]),
-      languagePicker(),
+      element('div', { className: 'top-links' }, [
+        element('a', { href: '#about', id: 'about-link' }, [t('about.link')]),
+        languagePicker(),
+      ]),
     ]),
     ...handheldNote(),
     content,
@@ -529,6 +536,10 @@ function route(): void {
   }
   if (wanted.name === 'music') {
     void loadCourse().then((course) => show(content, themesScreen(course.themes ?? [])));
+    return;
+  }
+  if (wanted.name === 'about') {
+    show(content, aboutScreen());
     return;
   }
   if (wanted.name === 'wizard') {

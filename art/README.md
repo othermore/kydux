@@ -717,6 +717,10 @@ A sprite is cut from a box of a picture by `tools/art/sprites.py sprite`:
   four: the broom shed, the lake's edge, the ring field and the race
   course.
 - `content/art/things/`: the sprites of things (D182), with `things.json`.
+- `content/art/chapters/<chapter>/card.webp`: each chapter's card for the map, a band
+  of its first level's scene cut small by `tools/art/chapter_cards.py` (D193).
+- `app/public/about/`: the welcome page's painting of Arvelia and its pictures of the
+  game, with their `SOURCE.md` (D193).
 
 Everything the project makes ships under the GPL, like the code. A picture
 from anywhere else comes in only under a licence that lets it ship with a

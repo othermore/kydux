@@ -45,3 +45,9 @@ debug.
 # flight's bump on a high one by `blocked.high.${kind}` (D186, engine/words.ts).
 blocked.no_walk.
 blocked.high.
+
+# The welcome page names each of its three pictures by `about.${part}_name`,
+# `about.${part}_text` and `about.${part}_alt`: a story, a lesson, a level (D193).
+about.story_
+about.lesson_
+about.level_

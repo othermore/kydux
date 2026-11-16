@@ -10,6 +10,7 @@ import { t } from '../i18n';
 import * as progress from '../progress/progress';
 import type { SavedGame } from '../progress/games';
 import { exportProgress, importProgress, type Wizard } from '../progress/store';
+import { welcomeSection } from './about';
 import { element } from './dom';
 import type { Screen } from './screen';
 
@@ -166,6 +167,8 @@ export function startScreen(parts: StartScreenParts): Screen {
     }
     node.replaceChildren(
       element('div', { className: 'start-greeting' }, greeting),
+      // Before a wizard is made, what Kydux is, with a link to the welcome page (D193).
+      ...(wizard ? [] : [welcomeSection()]),
       element('p', { className: 'start-intro' }, [t('start.intro')]),
       element('div', { className: 'start-actions' }, actions),
       ...(wizard ? [element('p', { id: 'saved-note', className: 'saved-note' }, [t('start.saved')])] : []),

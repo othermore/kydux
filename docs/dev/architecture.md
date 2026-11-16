@@ -73,8 +73,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 a level's words with their code shown as code (words.ts, D140),
                 the stars (stars.ts), the screen's guide (guide.ts, D68), and
                 the note on a phone or a tablet that the game is made for a
-                computer (handheld.ts), and under ?debug the page that plays
-                any of the music's themes (themes.ts, #music, D192)
+                computer (handheld.ts), the welcome page (about.ts, #about, D193),
+                Kydux's mark in the header (mark.ts), and under ?debug the page
+                that plays any of the music's themes (themes.ts, #music, D192)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events (stories.ts), the guide's words (guide.ts), and the
@@ -109,7 +110,8 @@ content/        the levels, each with level.json, its words in text.<lang>.json,
                 <lang>.md; the stories (stories/), each with story.json, its
                 staging, and text.<lang>.json, D74; the chapters, each with
                 chapter.json and text.<lang>.json; the screen's guide's words
-                (guide/, D68); the music's themes, each its notes (music/, D192)
+                (guide/, D68); the music's themes, each its notes (music/, D192);
+                each chapter's card for the map (art/chapters/, D193)
 i18n/           en.json, es.json: the app's words, the same keys in each
 docs/dev/       the plan, the sprints, this log, the guide; the story (story.md)
                 and the course (course.md) that the content is written from
@@ -151,6 +153,7 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 makes the figures' sheets from the base sheets in art/figures/,
                 recoloured for each look, and trials/ the scripts of the art
                 trials, contact.py and demo.py among them; D72, D76), the
+                chapters' cards for the map (art/chapter_cards.py, D193), the
                 music's score, written out as the themes' notes
                 (sound/compose.py, D192), and a model's music asked for a trial
                 (sound/generate.py)
@@ -2774,3 +2777,33 @@ one overturns stays, marked as superseded.
   line). A test holds every chapter to a theme, every theme to its rules, and the files to
   what the score makes. Rules out loaded music files and a score that names or quotes any
   work under copyright.
+- **D193 — The page's look, and a welcome page.** Decided 2026-11-10 by the owner (*una
+  página inicial de bienvenida que explique y venda qué es Kydux; el arte de todas las
+  páginas: fondos, botones, cajas; limpio y fácil de usar para un niño, un poco más
+  acabado y fino*). One look for every screen, written once at the top of `style.css`
+  as tokens and components. The palette is taken from the paintings: parchment for the
+  page, paper for what lies on it, ink for the words, moss green for a button and what
+  is done, a warm gold for what is chosen and for the focus ring, a sky blue for links,
+  a soft red for a warning; with the radii, two shadows, the spaces and the type (the
+  interface's sans serif, a serif for the story's words, the monospace for code) beside
+  it. The page's background is the parchment with a fine grain, an SVG noise written in
+  the stylesheet, no file. The components: a button stands on a darker foot and sinks
+  onto it when pressed (`.button`, `.big-button`; `.quiet-button` paper with an ink line;
+  `danger` soft red), a card over the scene and a panel on the page are paper with a
+  thin ink line and a soft shadow (`.card`, `.panel`), a chip is a small gold label
+  (`.chip`), a field is paper with an ink line. The screens keep their layout and their
+  `data-*` hooks; their colours, borders, radii and shadows are the tokens'. The header
+  has Kydux's mark, a pointed hat and a wand in ink and gold drawn as an inline SVG
+  (`ui/mark.ts`, the tab's icon `favicon.svg` the same), and the link to the welcome page.
+  The welcome page (`#about`, `ui/about.ts`) opens on a painting of Arvelia on its hill
+  above the lake at dusk, the village at its foot (Gemini, `welcome-castle.md`), with the
+  promise and *Play* over it; then what Kydux is, for whom (eight to twelve), how it is
+  played (a story, a lesson and a level, each with a picture of the game in the page's
+  language, `app/public/about/<lang>/`), that it is free software of the Kidux family in
+  English and Spanish, and *Play* again; its words are under `about` in the i18n files.
+  The start screen, before a wizard is made, shows the welcome's first part, with a link
+  to the rest; a first visit with no address still opens on the story (D61). The map's
+  chapters each have a card, a band of the chapter's first level's scene cut small by
+  `tools/art/chapter_cards.py` into `content/art/chapters/<id>/card.webp`, the title
+  over it on a dark veil; a chapter whose first stop is locked is greyed. Rules out a
+  page that looks like a form, and decoration that gets in a child's way.

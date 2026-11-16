@@ -7,13 +7,13 @@
   ],
   "starting_code": "# Encuentra todas las escobas con `find_all`.\n# Para cada escoba de la lista:\n#     cuenta los pasos a la izquierda con `position.x`\n#     y los pasos hacia abajo con `position.y`;\n#     muévete a la izquierda con `move_left`\n#     y hacia abajo con `move_down`;\n#     y desátala con `untie`.\n",
   "hints": [
-    "Usa un bucle `for` para repasar las escobas que encuentres. ¡Todo lo demás va dentro del bucle!",
-    "Para saber cuántos pasos dar a la izquierda, resta la `x` de la escoba de la `x` de tu posición.",
-    "Para los pasos hacia abajo, resta tu `y` de la `y` de la escoba. ¡Luego usa esos números para caminar hasta ella y desatarla!"
+    "Usa un bucle `for` para recorrer las escobas que encuentres. ¡Todo lo demás va dentro del bucle!",
+    "La distancia se calcula restando posiciones: la `x` para los pasos a la izquierda y la `y` para los pasos hacia abajo.",
+    "Los pasos a la izquierda son tu `x` menos la `x` de la escoba, y los pasos hacia abajo, la `y` de la escoba menos tu `y`. ¡Luego usa esos números para caminar hasta ella y desatarla!"
   ],
   "intro": "Ya hemos terminado con las escobas que estaban colgadas. ¡Las demás están tiradas por la paja! Desde donde estás, si usas `find_all` las encontrarás ordenadas empezando por la más cercana, y te puedes ir moviendo abajo y a la izquierda para ir desatando todas. Puedes calcular cuántos pasos tienes que andar desde donde estás en cada momento hasta la siguiente escoba, y así pasar por todas.",
   "outro": "¡Terminamos con la paja! Has calculado cada distancia perfectamente.",
-  "learned": "Ahora sabes que dentro del bucle un programa trabaja con la escoba de esa vuelta, así que las mismas cuentas sirven para todas.",
+  "learned": "Ahora sabes que dentro del bucle un programa trabaja con la escoba de esa vuelta, así que las mismas cuentas funcionan para todas.",
   "ways": {
     "three": "tres escobas en la paja",
     "three_low": "tres escobas, más abajo",

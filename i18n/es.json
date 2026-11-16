@@ -96,7 +96,7 @@
     "no_new_attribute": "No puedes darle a `{object}` algo nuevo llamado `{name}`. Lo que `{object}` puede hacer está en su cuaderno.",
     "no_knot": "Esta escoba no tiene nudo, así que no hay nada que desatar, y el programa se para aquí. Antes de desatar una escoba, mira si tiene nudo.",
     "index_range": "La lista no tiene tantos: tiene {count}, y pediste el {asked}.º",
-    "index_range_unknown": "La lista no tiene tantos elementos como pides."
+    "index_range_unknown": "La lista no tiene tantos elementos como pediste."
   },
   "things": {
     "door": "la puerta",
@@ -328,7 +328,7 @@
     "done": "hecho",
     "open": "abierto",
     "locked": "todavía cerrado",
-    "unfold": "Abrir",
+    "unfold": "Desplegar",
     "fold": "Plegar",
     "stars_total": "{stars} de {most} estrellas",
     "open_map": "Mapa",

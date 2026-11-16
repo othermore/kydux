@@ -12,5 +12,5 @@
   ],
   "intro": "¡Aquí hay una escoba a tus pies, y tiene un nudo encantado! Tenemos que quitárselo. Las de los ganchos también tienen nudos, pero vamos a encargarnos primero de esta. Te recuerdo cómo: primero encuéntrala y luego quítale el nudo.",
   "outro": "¡Genial! Ya hay una escoba a salvo. Pero hay más...",
-  "learned": "Ahora sabes que una escoba es un objeto cuyo método `untie()` le quita el nudo al estar sobre ella, y que `find_nearest` te da la que necesitas."
+  "learned": "Ahora sabes que una escoba es un objeto, que su método `untie()` le quita el nudo cuando estás sobre ella, y que `find_nearest` te da la más cercana."
 }

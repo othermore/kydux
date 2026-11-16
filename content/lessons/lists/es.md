@@ -22,7 +22,7 @@ print(len(nombres))
 ---
 ## Uno de la lista
 
-¿Y si queremos solo uno de los elementos de la lista?
+¿Y si queremos solo uno de los valores de la lista? Cada valor de una lista es un elemento.
 
 Podemos pedir un elemento de la lista por su lugar, que los programadores llaman un índice. `nombres[0]` es el primero, ya que una lista cuenta desde el 0, igual que las casillas. ¡El tercero sería `nombres[2]`!
 

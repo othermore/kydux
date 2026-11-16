@@ -2921,7 +2921,7 @@ one overturns stays, marked as superseded.
   (`chapterStandings`: the first chapter neither finished nor locked, or the last one
   reached once every one is finished), and so does the chapter of the stop being
   played. A finished chapter is folded under its card, with its stars' total
-  (`map.stars_total`) and *Abrir* (`map.unfold`), which unfolds it, *Plegar*
+  (`map.stars_total`) and *Desplegar* (`map.unfold`), which unfolds it, *Plegar*
   (`map.fold`) folding it again. A locked chapter is folded and greyed, its first stop
   named and the rest hidden. Under `?debug` every chapter stands open. A chapter's fold
   is remembered while the page lives, not kept. A chapter's section says

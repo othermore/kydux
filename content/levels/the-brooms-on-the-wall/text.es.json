@@ -8,12 +8,12 @@
   "starting_code": "# Camina hacia arriba hasta la pared con `move_up`.\n# Ve a la izquierda hasta debajo del primer gancho con `move_left`.\n# Encuentra las escobas colgadas con `find_all`.\n# Para cada escoba de la lista:\n#     desátala con `untie`\n#     y da un paso a la derecha con `move_right`.\n",
   "hints": [
     "Muévete 2 pasos hacia arriba y 3 a la izquierda para colocarte debajo del primer gancho.",
-    "Usa `find_all` para obtener la lista de las escobas colgadas, y luego empieza un bucle `for` para repasarlas.",
-    "Dentro del bucle, ¡recuerda dejar espacios antes de `untie` y `move_right` para que el programa sepa que pertenecen a cada vuelta!"
+    "Usa `find_all` para obtener la lista de las escobas colgadas, y luego empieza un bucle `for` para recorrerlas.",
+    "Dentro del bucle, ¡recuerda dejar espacios antes de `untie` y `move_right` para que el ordenador sepa que van dentro del bucle!"
   ],
-  "intro": "He apartado las escobas de la paja para luego. Primero vamos a ocuparnos de las colgadas. Tenemos que caminar junto a la pared y desatar cada una.",
+  "intro": "Las escobas de la paja las dejamos para luego. Primero vamos a ocuparnos de las colgadas. Tenemos que caminar junto a la pared y desatar cada una.",
   "outro": "¡Lo conseguimos! Las escobas de la pared están a salvo.",
-  "learned": "Ahora sabes que un `for` sobre una lista ejecuta sus líneas una vez para cada escoba, de modo que un solo programa sirve sin importar cuántas haya.",
+  "learned": "Ahora sabes que un `for` sobre una lista ejecuta sus líneas una vez para cada escoba, de modo que un solo programa funciona sin importar cuántas haya.",
   "ways": {
     "two": "dos escobas en la pared",
     "three": "tres escobas",

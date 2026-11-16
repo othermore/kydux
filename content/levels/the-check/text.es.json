@@ -10,11 +10,11 @@
   "hints": [
     "El programa intenta desatar todas las escobas, ¡pero desatar una escoba sin nudo es un error!",
     "Solo queremos desatar una escoba si realmente tiene un nudo. Mira su atributo para ver si está anudada antes de usar el método.",
-    "¡Pon un `if` dentro del bucle para mirar `broom.knotted`, justo antes de desatar, y no olvides añadir espacios antes del método para que esté dentro del `if`!"
+    "¡Pon un `if` dentro del bucle para mirar `broom.knotted`, justo antes de desatar, y no olvides añadir cuatro espacios más antes del método para que esté dentro del `if`!"
   ],
   "intro": "{mate} ha dejado todas las escobas ordenadas, colgadas en sus ganchos en la pared. Se ha dado cuenta de que algunas todavía tienen un nudo encantado. ¡Algunas se nos escaparon, así que hay que repasarlas! He puesto el programa que usamos para recorrer las escobas en la pared, para ir una por una desatando el nudo. ¡Pero se para en la primera escoba, porque esa no tiene nudo, y desatar una escoba sin nudo es un error! ¿Puedes arreglar el programa con un `if`? Para ver si una escoba tiene nudo, se puede usar su atributo `knotted`.",
   "outro": "¡Uf! Todas las escobas están a salvo. ¡Y justo a tiempo, oigo que viene la clase!",
-  "learned": "Ahora sabes que un `if` dentro de un `for` decide en cada vuelta, y que un método que necesita algo se usa después de mirar el atributo que lo dice.",
+  "learned": "Ahora sabes que un `if` dentro de un `for` decide en cada vuelta, y que antes de usar `untie()` puedes mirar `knotted` para saber si hay nudo.",
   "ways": {
     "five": "cinco escobas, dos con nudo",
     "six": "seis escobas, dos con nudo",

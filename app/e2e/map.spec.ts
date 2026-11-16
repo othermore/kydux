@@ -164,7 +164,7 @@ test('opened by itself, the map opens at the item last opened, marked (D122)', a
   await expect(here).toBeInViewport();
 });
 
-test("a finished chapter folds under its card with its stars; Open unfolds it, a locked one shows how it begins (D200)", async ({
+test("a finished chapter folds under its card with its stars; Unfold opens it, a locked one shows how it begins (D200)", async ({
   page,
 }) => {
   // A saved game with every stop of chapter 1 done, each level won with two stars.
@@ -185,6 +185,7 @@ test("a finished chapter folds under its card with its stars; Open unfolds it, a
   await expect(chapter(0)).toHaveAttribute('data-folded', 'true');
   await expect(chapter(0).locator('.stops')).toBeHidden();
   await expect(chapter(0).locator('.chapter-stars')).toHaveText(`${2 * levels} of ${3 * levels} stars`);
+  await expect(chapter(0).locator('.chapter-fold')).toHaveText('Unfold');
   await expect(chapter(1)).toHaveAttribute('data-current', 'true');
   await expect(chapter(1)).not.toHaveAttribute('data-folded', /./);
   await expect(chapter(1).locator('.stop').first()).toBeVisible();

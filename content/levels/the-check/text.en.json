@@ -9,12 +9,12 @@
   "starting_code": "# The program we used for the wall stops at the first broom!\nwizard.move_up(2)\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    broom.untie()\n    wizard.move_right()\n",
   "hints": [
     "The program tries to untie every broom, but untying a broom with no knot is an error!",
-    "We only want to untie a broom if it actually has a knot. Look at its attribute to see if it is knotted before using the method.",
-    "Put an `if` inside the loop to look at `broom.knotted`, just before untying, and don't forget to add spaces before the method so it's inside the `if`!"
+    "We only want to untie a broom if it actually has a knot. Look at its attribute to see if it's knotted before using the method.",
+    "Put an `if` inside the loop to look at `broom.knotted`, just before untying, and don't forget to add four more spaces before the method so it's inside the `if`!"
   ],
   "intro": "{mate} has put all the brooms back in order, hung on their pegs on the wall. They noticed that some still have an enchanted knot. Some got past us, so we have to check them again! I've put in the program we used to go along the brooms on the wall, untying the knots one by one. But it stops at the first broom, because that one has no knot, and untying a broom with no knot is an error! Can you fix the program with an `if`? To see if a broom has a knot, you can use its `knotted` attribute.",
   "outro": "Phew! Every broom is safe now. And just in time, I can hear the class coming!",
-  "learned": "Now you know that an `if` inside a `for` decides at each turn, and that a method that needs something is used after looking at the attribute that says it.",
+  "learned": "Now you know that an `if` inside a `for` decides at each turn, and that before using `untie()` you can look at `knotted` to see whether there's a knot.",
   "ways": {
     "five": "five brooms, two knotted",
     "six": "six brooms, two knotted",

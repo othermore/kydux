@@ -37,7 +37,9 @@
 // from its kind's sprite, "id:kind:x,y" joined by ";", D182), data-found (the
 // hidden things found and seen, joined by ",", D184), data-untied (the brooms
 // untied, D183), data-flying (the figures in the air, joined by ",", D185),
-// data-wind (`on` while a flight's wind blows), data-through (the rings flown
+// data-hover (the hover's clock, in whole milliseconds, which stands while the
+// program does not play, D235), data-wind (`on` while a flight's wind blows),
+// data-through (the rings flown
 // through, in order, joined by ","), data-race-band (what Ilda's band says while she
 // reads the programs, D189), data-race-verdict (her verdict of the race, D234) and
 // data-world (what the camera shows, in cells: "left,top,width,height").
@@ -141,7 +143,7 @@ import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, bumpText, friendText, raceVerdict, ringWayText, sleepingText } from './words';
-import { bobOf, FLOWN, FLY_LIFT, flyFrame, RING_PAST, throughRing } from './flight';
+import { FLOWN, FLY_LIFT, flyFrame, hoverOf, hoverPhase, RING_PAST, RING_RAISE, throughRing } from './flight';
 import { drawnFromSprite, spriteFoot, spriteKey, spriteName, spriteOrigin, spriteScale, type ThingSprite } from './things';
 import { Wind } from './sound';
 
@@ -342,9 +344,12 @@ class LevelScene extends Phaser.Scene {
    * its feet are past a ring's plane in a ring's cell (D232). */
   private readonly flyers = new Map<
     Phaser.GameObjects.Sprite,
-    { since: number; shadow: Phaser.GameObjects.Ellipse; way: 'up' | 'down'; past: number }
+    { shadow: Phaser.GameObjects.Ellipse; way: 'up' | 'down'; past: number; raise: number }
   >();
   private readonly wind = new Wind();
+  /** The hover's clock, in milliseconds (D235): it runs while the playback plays, and
+   * in a story always; nothing else moves it. */
+  private hoverMs = 0;
 
   constructor(
     private readonly map: Layout,
@@ -833,7 +838,11 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** A word said follows who says it while they walk. */
-  override update(): void {
+  override update(_time: number, delta: number): void {
+    // The hover's clock runs while the program plays, and in a story always (D235).
+    if (!this.still && (this.playback.state === 'playing' || this.options.story)) this.hoverMs += delta;
+    const hover = String(Math.round(this.hoverMs));
+    if (this.parentNode.dataset.hover !== hover) this.parentNode.dataset.hover = hover;
     this.drawLight();
     // What the camera shows, in cells: its left, its top, its width and its height.
     const view = this.cameras.main.worldView;
@@ -1268,7 +1277,7 @@ class LevelScene extends Phaser.Scene {
       .ellipse(sprite.x, sprite.y, TILE * 0.55, TILE * 0.18, 0x000000, 0.22)
       .setDepth(sprite.depth - 0.0004);
     const facing = sprite === this.wizard ? this.wizardFacing() : facingOf(sprite);
-    this.flyers.set(sprite, { since: this.time.now, shadow, way: facing === 'down' ? 'down' : 'up', past: 0 });
+    this.flyers.set(sprite, { shadow, way: facing === 'down' ? 'down' : 'up', past: 0, raise: 0 });
     if (sprite === this.wizard && !instant) {
       this.wind.start();
       this.playedSounds.push('wind');
@@ -1314,17 +1323,21 @@ class LevelScene extends Phaser.Scene {
   private flyFrames(): void {
     const sides: string[] = [];
     for (const [sprite, flying] of this.flyers) {
-      const { since, shadow, way } = flying;
+      const { shadow, way } = flying;
+      const id = sprite === this.wizard ? 'wizard' : this.idOf(sprite);
       const figures = this.art?.figures;
       const name = sprite.texture.key.replace(/^fig-/, '');
       const facing = sprite === this.wizard ? this.wizardFacing() : facingOf(sprite);
-      const frame = figures && sprite.texture.key.startsWith('fig-') ? flyFrame(flyRowOf(figures, name), facing, this.time.now - since) : null;
+      const frame = figures && sprite.texture.key.startsWith('fig-') ? flyFrame(flyRowOf(figures, name), facing) : null;
       if (frame !== null && sprite.texture.frameTotal - 1 > frame) sprite.setFrame(frame);
-      const bob = frame === null ? bobOf(this.time.now - since) : 0;
       const ring = throughRing([sprite.x / TILE, sprite.y / TILE], this.ringTiles, way, this.art ? FOOT_IN_CELL : 0.5);
       flying.past = ring.past;
-      if (Math.abs(ring.past) >= RING_PAST / 2) sides.push(`${sprite === this.wizard ? 'wizard' : this.idOf(sprite)}:${ring.past < 0 ? 'behind' : 'front'}`);
-      const lift = (FLY_LIFT + bob + ring.raise) * TILE;
+      flying.raise = ring.raise;
+      if (Math.abs(ring.past) >= RING_PAST / 2) sides.push(`${id}:${ring.past < 0 ? 'behind' : 'front'}`);
+      // The hover, whole outside a ring's cell and none at its middle, whose hole is
+      // tight (D232, D235).
+      const hover = hoverOf(this.hoverMs, hoverPhase(id)) * (1 - ring.raise / RING_RAISE);
+      const lift = (FLY_LIFT + ring.raise + hover) * TILE;
       const height = sprite.frame.height || sprite.height;
       const base = figures && sprite.texture.key.startsWith('fig-') ? 1 - figures.foot / figures.frame[1] : 0.6;
       sprite.setOrigin(0.5, base + lift / (height * sprite.scaleY));

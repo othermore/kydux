@@ -399,6 +399,83 @@ test.describe('the first flight', () => {
   });
 });
 
+/** A flight that hovers: the wizard walks to the broom, lifts and waits in the air for
+ * sixty ticks, eight seconds at speed 1 (D235, D236). */
+const HOVERING = 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.wait(60)\n';
+
+/** The hover's clock, as the scene says it (D235). */
+const hoverOf = async (page: Page) => Number(await scene(page).getAttribute('data-hover'));
+
+test.describe('the hover (D235)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test('a flight hovers while the program plays, and stands still after Stop, under the slider and until Play', async ({
+    page,
+  }) => {
+    await open(page, 'the-first-flight', '1');
+    await start(page, HOVERING);
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard', { timeout: ciTimes(60_000) });
+    const playing = await hoverOf(page);
+    await page.waitForTimeout(400);
+    expect(await hoverOf(page)).toBeGreaterThan(playing);
+
+    await page.locator('#stop').click();
+    await expect(scene(page)).toHaveAttribute('data-state', 'done');
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
+    const stopped = await hoverOf(page);
+    await page.waitForTimeout(500);
+    expect(await hoverOf(page)).toBe(stopped);
+
+    // A stopped run is over and its slider is off: the run again, and while it plays in
+    // the air, the slider back to a tick of the flight, a pause, and the flight still.
+    await page.locator('#run').click();
+    // In the air again: the walk is 24 ticks and the lift the 25th.
+    await page.waitForFunction(
+      () => {
+        const node = document.querySelector<HTMLElement>('#scene')?.dataset;
+        return node?.state === 'playing' && Number(node.tick) >= 30 && node.flying === 'wizard';
+      },
+      undefined,
+      { timeout: ciTimes(60_000) },
+    );
+    const timeline = page.locator('#timeline');
+    await expect(timeline).toBeEnabled();
+    await timeline.fill(String(Number(await scene(page).getAttribute('data-tick')) - 2));
+    await expect(scene(page)).toHaveAttribute('data-state', 'paused');
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
+    const paused = await hoverOf(page);
+    await page.waitForTimeout(500);
+    expect(await hoverOf(page)).toBe(paused);
+
+    await page.locator('#stop').click();
+    await expect(scene(page)).toHaveAttribute('data-state', 'playing');
+    const again = await hoverOf(page);
+    await page.waitForTimeout(400);
+    expect(await hoverOf(page)).toBeGreaterThan(again);
+  });
+
+  test('in a story the hover runs while the words are read', async ({ page }) => {
+    await page.goto('/#story/the-flying-lesson');
+    await expect(scene(page)).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+    // The fourth step: Zarek comes flying over the lake.
+    await storyNext(page, 3);
+    await expect(scene(page)).toHaveAttribute('data-flying', 'zarek', { timeout: ciTimes(30_000) });
+    const reading = await hoverOf(page);
+    await page.waitForTimeout(400);
+    expect(await hoverOf(page)).toBeGreaterThan(reading);
+  });
+
+  test('under reduced motion a flight does not hover', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await open(page, 'the-first-flight');
+    await start(page, HOVERING);
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard', { timeout: ciTimes(60_000) });
+    await page.waitForTimeout(400);
+    expect(await hoverOf(page)).toBe(0);
+  });
+});
+
 test.describe('drevo lands (D215)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));

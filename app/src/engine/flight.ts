@@ -1,8 +1,8 @@
 // Flying (D185): a figure on its broom is drawn from its sheet's flying rows, one a
-// way it faces, lifted half a cell above its cell with a soft shadow on the ground,
-// bobbing over the rows' three frames (level, a little up, a little down); a flown
-// step takes a third of a walked one's time, at every speed, so that a flight is
-// three times as fast to the eye. In a ring's cell a flying figure flies through the
+// way it faces, in the row's level frame, lifted half a cell above its cell with a soft
+// shadow on the ground; the page moves it slowly up and down, a hover on a clock that
+// runs only while the program plays (D235); a flown step takes a third of a walked
+// one's time, at every speed, so that a flight is three times as fast to the eye. In a ring's cell a flying figure flies through the
 // ring's hole (D232): drawn higher, its feet and broom above the ring's lower rim, and
 // its feet past the ring's plane the way it last flew, upward behind the ring, downward
 // in front of it. Kept apart from scene.ts so that it is tested without Phaser.
@@ -14,10 +14,11 @@ import type { Facing, Tile } from './sight';
 export const FLY_LIFT = 0.5;
 /** How long a flown step takes, against a walked one. */
 export const FLOWN = 1 / 3;
-/** How long each of the bobbing's frames is shown, in milliseconds. */
-export const BOB_MS = 160;
-/** How far a sheet with no flying rows bobs, in cells, up and down. */
-export const BOB_CELLS = 0.04;
+/** How long a flying figure's hover takes to rise and fall once, in milliseconds of
+ * the hover's clock (D235). */
+export const HOVER_MS = 2400;
+/** How far a flying figure hovers up and down, in cells. */
+export const HOVER_CELLS = 0.05;
 
 /** How much higher a figure flying in a ring's cell is drawn, in cells, so that its feet
  * and its broom are inside the ring's hole, above its lower rim: the ring's picture
@@ -55,18 +56,27 @@ export function throughRing(
 /** The rows of a sheet, by the way a figure faces. */
 const ROW: Record<Facing, number> = { down: 0, left: 1, right: 2, up: 3 };
 
-/** The frame a flying figure shows `ms` into its flight, facing a way: the flying
- * rows' level, up, level, down frames in turn; null for a sheet with no such rows. */
-export function flyFrame(flyRow: number | undefined, facing: Facing, ms: number): number | null {
+/** The frame a flying figure is drawn in, facing a way: its flying row's level frame,
+ * the first of the row's three (D235); null for a sheet with no such rows. */
+export function flyFrame(flyRow: number | undefined, facing: Facing): number | null {
   if (flyRow === undefined) return null;
-  const step = [0, 1, 0, 2][Math.floor(Math.max(0, ms) / BOB_MS) % 4] ?? 0;
-  return (flyRow + ROW[facing]) * 3 + step;
+  return (flyRow + ROW[facing]) * 3;
 }
 
-/** How far a figure drawn from a sheet with no flying rows is lifted besides its
- * lift, `ms` into its flight, in cells: a slow rise and fall. */
-export function bobOf(ms: number): number {
-  return Math.sin((Math.max(0, ms) / (BOB_MS * 4)) * Math.PI * 2) * BOB_CELLS;
+/** Where in its rise and fall a figure is at the hover clock's zero, from 0 to 1: the
+ * wizard at its start, any other figure by its id, so that two figures in the air do
+ * not rise together (D235). */
+export function hoverPhase(id: string): number {
+  if (id === 'wizard') return 0;
+  let sum = 0;
+  for (let i = 0; i < id.length; i += 1) sum += id.charCodeAt(i);
+  return (sum % 8) / 8;
+}
+
+/** How far a flying figure is lifted by its hover, in cells, upward positive, `ms` into
+ * the hover's clock: a slow smooth rise and fall (D235). */
+export function hoverOf(ms: number, phase: number): number {
+  return Math.sin((ms / HOVER_MS + phase) * Math.PI * 2) * HOVER_CELLS;
 }
 
 /** How long a tick of the playback lasts, against a tick, by what its figures do in

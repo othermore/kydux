@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { FOOT_IN_CELL, figureDepth, thingDepth } from './depth';
-import { BOB_MS, bobOf, FLY_LIFT, flownTick, flyFrame, RING_PAST, RING_RAISE, throughRing } from './flight';
+import {
+  FLY_LIFT,
+  flownTick,
+  flyFrame,
+  HOVER_CELLS,
+  HOVER_MS,
+  hoverOf,
+  hoverPhase,
+  RING_PAST,
+  RING_RAISE,
+  throughRing,
+} from './flight';
 import { FLOWN, LONG, lengthOf, Playback, type PlaybackEvent } from './playback';
 import { spriteFoot, spriteScale, type ThingSprite } from './things';
 import { TILE } from './placeholders';
@@ -14,16 +25,27 @@ const move = (tick: number, flying: boolean, actor = 'wizard'): PlaybackEvent =>
 });
 
 describe('flying (D185)', () => {
-  it('bobs over the flying rows: level, up, level, down, by the way the figure faces', () => {
-    expect([0, 1, 2, 3, 4].map((step) => flyFrame(12, 'down', step * BOB_MS))).toEqual([36, 37, 36, 38, 36]);
-    expect(flyFrame(12, 'up', 0)).toBe(45);
-    expect(flyFrame(undefined, 'down', 0)).toBeNull();
+  it("draws a flying figure in its flying row's level frame, by the way it faces (D235)", () => {
+    expect(flyFrame(12, 'down')).toBe(36);
+    expect(flyFrame(12, 'left')).toBe(39);
+    expect(flyFrame(12, 'right')).toBe(42);
+    expect(flyFrame(12, 'up')).toBe(45);
+    expect(flyFrame(undefined, 'down')).toBeNull();
   });
 
-  it('lifts a figure with no flying rows a little up and down instead', () => {
-    expect(bobOf(0)).toBeCloseTo(0);
-    expect(bobOf(BOB_MS)).toBeGreaterThan(0);
-    expect(bobOf(BOB_MS * 3)).toBeLessThan(0);
+  it('hovers slowly: up its whole a quarter of the way, back after a rise and fall (D235)', () => {
+    const wizard = hoverPhase('wizard');
+    expect(wizard).toBe(0);
+    expect(hoverOf(0, wizard)).toBeCloseTo(0);
+    expect(hoverOf(HOVER_MS / 4, wizard)).toBeCloseTo(HOVER_CELLS);
+    expect(hoverOf((HOVER_MS * 3) / 4, wizard)).toBeCloseTo(-HOVER_CELLS);
+    expect(hoverOf(HOVER_MS, wizard)).toBeCloseTo(0);
+  });
+
+  it('gives every other figure a place of its own in the hover, so that two racers do not rise together', () => {
+    expect(hoverPhase('zarek')).toBe(0.625);
+    expect(hoverPhase('zarek')).not.toBe(hoverPhase('wizard'));
+    expect(hoverOf(0, hoverPhase('zarek'))).not.toBeCloseTo(hoverOf(0, hoverPhase('wizard')));
   });
 
   it('plays a tick whose every move is flown in a third of a walked one, at every speed', () => {

@@ -191,8 +191,7 @@ test.describe('a page runs its code (D142)', () => {
   }) => {
     await page.goto('/#lesson/if');
     await page.locator('#lesson-next').click();
-    await expect(page.locator('#lesson-page')).toHaveText('Page 2 of 2');
-    await expect(page.locator('#lesson-next')).toHaveCount(0);
+    await expect(page.locator('#lesson-page')).toHaveText('Page 2 of 3');
     await page.locator('.lesson-run button').click();
     await expect(page.locator('.lesson-printed')).toHaveText('Looking up\nPosition: (11, 6)', { timeout: ciTimes(90_000) });
     await page.locator('.lesson-run .cm-content').click();
@@ -201,6 +200,55 @@ test.describe('a page runs its code (D142)', () => {
     await page.locator('.lesson-run button').click();
     await expect(page.locator('.lesson-printed')).toHaveText('Position: (11, 6)', { timeout: ciTimes(30_000) });
   });
+
+  for (const [locale, last, pageLabel] of [
+    ['en-US', 'This line is outside the if', 'Page 3 of 3'],
+    ['es-ES', 'Esta línea está fuera del if', 'Página 3 de 3'],
+  ] as const) {
+    test.describe(`the keys that move a line in, on if's third page (D250, ${locale})`, () => {
+      test.use({ locale });
+
+      test('Tab moves the last line in, the delete key brings it out, and Enter after the colon starts the line moved in', async ({
+        page,
+      }) => {
+        await page.goto('/#lesson/if');
+        await page.locator('#lesson-next').click();
+        await page.locator('#lesson-next').click();
+        await expect(page.locator('#lesson-page')).toHaveText(pageLabel);
+        await expect(page.locator('#lesson-next')).toHaveCount(0);
+        const lines = page.locator('.lesson-run .cm-line');
+        const printed = page.locator('.lesson-printed');
+        const run = page.locator('.lesson-run button');
+        // As written: the line outside is printed, the one inside is not.
+        await run.click();
+        await expect(printed).toHaveText(last, { timeout: ciTimes(90_000) });
+        // Tab at the start of the last line: it starts with four spaces, and nothing is
+        // printed.
+        await lines.nth(2).click();
+        await page.keyboard.press('Home');
+        await page.keyboard.press('Tab');
+        expect(await lines.nth(2).textContent()).toBe(`    print("${last}")`);
+        await page.screenshot({ path: `e2e/shots/lesson/if-tab-${locale}.png` });
+        await run.click();
+        await expect(page.locator('.lesson-run')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+        // Nothing printed, and the page says so.
+        await expect(printed).toBeHidden();
+        await expect(page.locator('.lesson-said')).toBeVisible();
+        // The delete key there: the line has none, and is printed again.
+        await lines.nth(2).click();
+        await page.keyboard.press('Home');
+        await page.keyboard.press('Backspace');
+        expect(await lines.nth(2).textContent()).toBe(`print("${last}")`);
+        await run.click();
+        await expect(printed).toHaveText(last, { timeout: ciTimes(30_000) });
+        // Enter at the end of the first line: the new line starts four spaces in.
+        await lines.nth(0).click();
+        await page.keyboard.press('End');
+        await page.keyboard.press('Enter');
+        expect(await lines.nth(1).textContent()).toBe('    ');
+      });
+    });
+  }
 
   test('less-or-greater compares, tells left from right, and takes the smaller from the greater (D212)', async ({
     page,

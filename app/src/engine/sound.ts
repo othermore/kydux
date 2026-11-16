@@ -123,6 +123,14 @@ export interface WindGraph {
   out: GainNode;
 }
 
+/** A param set at once. Its value read back is this one from the call on; a value only
+ * scheduled reads as the node's default, 1 for a gain, until the sound's clock has
+ * rendered it, and a ramp that starts from what is read would start from there. */
+function setNow(param: AudioParam, value: number, now: number): void {
+  param.value = value;
+  param.setValueAtTime(value, now);
+}
+
 /** A param moved from where it is now: its scheduled values after now dropped, and its
  * value now held, so that what follows starts from it. */
 function fromNow(param: AudioParam, now: number): void {
@@ -227,9 +235,9 @@ export class Wind {
     const ctx = audio();
     if (!this.graph || !ctx) return;
     const now = ctx.currentTime;
-    this.graph.air.gain.setValueAtTime(mixOf('air'), now);
-    this.graph.whistle.gain.setValueAtTime(mixOf('whistle'), now);
-    this.graph.rest.gain.setValueAtTime(mixOf('rest'), now);
+    setNow(this.graph.air.gain, mixOf('air'), now);
+    setNow(this.graph.whistle.gain, mixOf('whistle'), now);
+    setNow(this.graph.rest.gain, mixOf('rest'), now);
     this.restLevel(this.graph, now);
     this.settle();
   }
@@ -257,19 +265,19 @@ export class Wind {
     const band = (hertz: number, q: number) => {
       const filter = ctx.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(hertz, now);
-      filter.Q.setValueAtTime(q, now);
+      setNow(filter.frequency, hertz, now);
+      setNow(filter.Q, q, now);
       return filter;
     };
     const gain = (value: number) => {
       const node = ctx.createGain();
-      node.gain.setValueAtTime(value, now);
+      setNow(node.gain, value, now);
       return node;
     };
     const airBand = band(AIR_LOW_HERTZ, AIR_Q);
     const lowpass = ctx.createBiquadFilter();
     lowpass.type = 'lowpass';
-    lowpass.frequency.setValueAtTime(AIR_LOWPASS, now);
+    setNow(lowpass.frequency, AIR_LOWPASS, now);
     const whistleBand = band(WHISTLE_LOW_HERTZ, WHISTLE_Q);
     const restBand = band(REST_HERTZ, AIR_Q);
     const [gust, whistleLevelNode, restLevelNode] = [gain(0), gain(0), gain(0)];

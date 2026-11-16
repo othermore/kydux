@@ -156,13 +156,13 @@ describe('the sound context asleep while nothing sounds (D231)', () => {
   });
 });
 
-/** A param of the wind's graph that keeps what it is asked to do, in order. */
+/** A param of the wind's graph that keeps what it is asked to do, in order. As in a
+ * browser, a value scheduled is not the value read back: only one assigned is. */
 class RecordedParam {
   calls: [string, ...number[]][] = [];
   constructor(public value: number) {}
   setValueAtTime(value: number, at: number) {
     this.calls.push(['set', value, at]);
-    this.value = value;
     return this;
   }
   linearRampToValueAtTime(value: number, at: number) {
@@ -229,6 +229,20 @@ describe("the broom's wind, a gust for each flown command (D243)", () => {
     expect(param(graph.airBand, 'frequency').calls.filter(([kind]) => kind === 'linear')).toHaveLength(level.length);
     expect(param(graph.whistleBand, 'frequency').calls.filter(([kind]) => kind === 'linear')).toHaveLength(level.length);
     expect(param(graph.whistleLevel).calls.filter(([kind]) => kind === 'linear')).toHaveLength(level.length);
+  });
+
+  it('starts the first gust of a new sound from nothing, and its bands from their low ends', async () => {
+    const { graph, param } = await blowing();
+    const held = (node: unknown, name = 'gain') => {
+      const { calls } = param(node, name);
+      const cancel = calls.findIndex(([kind]) => kind === 'cancel');
+      return calls[cancel + 1];
+    };
+    expect(held(graph.gust)).toEqual(['set', 0, 1]);
+    expect(held(graph.whistleLevel)).toEqual(['set', 0, 1]);
+    expect(held(graph.restLevel)).toEqual(['set', 0, 1]);
+    expect(held(graph.airBand, 'frequency')).toEqual(['set', 320, 1]);
+    expect(held(graph.whistleBand, 'frequency')).toEqual(['set', 1700, 1]);
   });
 
   it('takes a sounding gust on from its level now, with no second voice', async () => {

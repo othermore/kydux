@@ -1,5 +1,7 @@
 {
   "id": "for-each",
   "speaker": "friend",
-  "teaches": []
+  "teaches": [
+    "concept:for_each"
+  ]
 }

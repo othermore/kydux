@@ -1,5 +1,7 @@
 {
   "id": "else",
   "speaker": "friend",
-  "teaches": []
+  "teaches": [
+    "concept:else"
+  ]
 }

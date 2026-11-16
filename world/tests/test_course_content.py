@@ -20,8 +20,28 @@ LANGUAGES = sorted(p.stem for p in (ROOT / "i18n").glob("*.json"))
 CHAPTERS = sorted(p for p in (CONTENT / "chapters").iterdir() if (p / "chapter.json").is_file())
 LESSONS = sorted(p for p in (CONTENT / "lessons").iterdir() if (p / "lesson.json").is_file())
 STORIES = sorted(p for p in (CONTENT / "stories").glob("*") if (p / "story.json").is_file())
-#: The concepts a lesson may teach, beside the API's names (D60).
-CONCEPTS = {"arguments", "comments", "def", "def_arguments", "len", "print", "strings"}
+#: The concepts a lesson may teach, beside the API's names (D60): Python's words and
+#: signs, each shown on the notebook's page of Python but `arguments` (D256).
+CONCEPTS = {
+    "arguments",
+    "arithmetic",
+    "comments",
+    "def",
+    "def_arguments",
+    "else",
+    "equal",
+    "for_each",
+    "for_range",
+    "if",
+    "len",
+    "less_greater",
+    "lists",
+    "not",
+    "print",
+    "strings",
+    "variables",
+    "while",
+}
 TRY = re.compile(r"```python try\n(.*?)```", re.S)
 FENCED = re.compile(r"```.*?```", re.S)
 INLINE = re.compile(r"`[^`\n]*`")
@@ -320,9 +340,11 @@ def rewritten(chapter_path: Path) -> bool:
 
 
 def concepts_used(code: str) -> set[str]:
-    """The concepts a piece of code needs known (D60): a comment, an action given
+    """The concepts a piece of code needs known (D60, D256): a comment, an action given
     something in its brackets, a string, print, len, a function of its own (def) and
-    its arguments."""
+    its arguments; a variable given a value, a sum or a subtraction, a comparison by
+    `==` or by `<` and `>`, `not`, an `if` and its `else`, a `for` over a `range` or
+    over anything else, a `while`, and a list in brackets or an index."""
     import ast
     import io
     import tokenize
@@ -343,6 +365,33 @@ def concepts_used(code: str) -> set[str]:
                 used.add("def_arguments")
         if isinstance(node, ast.Constant) and isinstance(node.value, str):
             used.add("strings")
+        if isinstance(node, (ast.Assign, ast.AnnAssign)):
+            used.add("variables")
+        if isinstance(node, ast.AugAssign):
+            used |= {"variables", "arithmetic"}
+        if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Sub)):
+            used.add("arithmetic")
+        if isinstance(node, ast.Compare):
+            for op in node.ops:
+                if isinstance(op, (ast.Eq, ast.NotEq)):
+                    used.add("equal")
+                if isinstance(op, (ast.Lt, ast.Gt, ast.LtE, ast.GtE)):
+                    used.add("less_greater")
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not):
+            used.add("not")
+        if isinstance(node, (ast.If, ast.IfExp)):
+            used.add("if")
+            if node.orelse:
+                used.add("else")
+        if isinstance(node, ast.For):
+            ranged = (
+                isinstance(node.iter, ast.Call) and getattr(node.iter.func, "id", None) == "range"
+            )
+            used.add("for_range" if ranged else "for_each")
+        if isinstance(node, ast.While):
+            used.add("while")
+        if isinstance(node, (ast.List, ast.Subscript)):
+            used.add("lists")
     return used
 
 
@@ -376,6 +425,42 @@ def test_a_level_s_code_needs_only_the_concepts_taught_before_it(directory, item
     for where, code in codes.items():
         unknown = concepts_used(code) - known
         assert not unknown, f"{item}'s {where} uses {sorted(unknown)} before a lesson explains it"
+
+
+def lessons_with_concepts() -> list[tuple[Path, set[str]]]:
+    """Every lesson of the course, with the concepts known once it is read, its own
+    among them."""
+    found, known = [], set()
+    for path in CHAPTERS:
+        for item in chapter(path)["items"]:
+            kind, _, item_id = item.partition(":")
+            if kind == "lesson":
+                lesson = json.loads((CONTENT / "lessons" / item_id / "lesson.json").read_text())
+                taught = lesson["teaches"]
+                known |= {n.split(":", 1)[1] for n in taught if n.startswith("concept:")}
+                found.append((CONTENT / "lessons" / item_id, set(known)))
+    return found
+
+
+BLOCK = re.compile(r"```python(?: try)?\n(.*?)```", re.S)
+
+
+@pytest.mark.parametrize(
+    ("path", "known"), lessons_with_concepts(), ids=lambda v: getattr(v, "name", "")
+)
+def test_a_lesson_s_blocks_need_only_the_concepts_taught_up_to_it(path, known):
+    """Every block of a lesson that is whole Python uses nothing a lesson up to it, this
+    one among them, has not marked (D256); a line shown alone that is no whole program
+    is passed over."""
+    for lang in LANGUAGES:
+        for gender in ("girl", "boy"):
+            text = for_wizard((path / f"{lang}.md").read_text(encoding="utf-8"), gender)
+            for block in BLOCK.findall(text):
+                try:
+                    unknown = concepts_used(block) - known
+                except SyntaxError:
+                    continue
+                assert not unknown, f"{path.name}/{lang}.md: a block uses {sorted(unknown)}"
 
 
 @pytest.mark.parametrize("path", [p for p in CHAPTERS if rewritten(p)], ids=lambda p: p.name)

@@ -1,5 +1,7 @@
 {
   "id": "if",
   "speaker": "friend",
-  "teaches": []
+  "teaches": [
+    "concept:if"
+  ]
 }

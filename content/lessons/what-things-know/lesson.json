@@ -5,6 +5,8 @@
     "wizard.items",
     "door.locked",
     "concept:print",
+    "concept:variables",
+    "concept:arithmetic",
     "wizard.find_nearest",
     "thing.reveal"
   ]

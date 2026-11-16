@@ -1,5 +1,7 @@
 {
   "id": "while",
   "speaker": "friend",
-  "teaches": []
+  "teaches": [
+    "concept:while"
+  ]
 }

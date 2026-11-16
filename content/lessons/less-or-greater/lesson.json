@@ -1,5 +1,7 @@
 {
   "id": "less-or-greater",
   "speaker": "friend",
-  "teaches": []
+  "teaches": [
+    "concept:less_greater"
+  ]
 }

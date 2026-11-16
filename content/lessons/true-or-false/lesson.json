@@ -3,6 +3,8 @@
   "speaker": "friend",
   "teaches": [
     "teacher.facing",
-    "wizard.facing"
+    "wizard.facing",
+    "concept:equal",
+    "concept:not"
   ]
 }

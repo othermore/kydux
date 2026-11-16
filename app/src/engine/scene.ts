@@ -188,6 +188,10 @@ export interface SceneHandle {
   settle(won: boolean): number;
   /** Where the wizard stands on the page, a box in the page's pixels. */
   wizardBox(): { left: number; top: number; right: number; bottom: number };
+  /** What of the level is drawn on the page now, each a box in the page's pixels: the
+   * wizard, every figure, every thing of the level in sight and the end's mark, which
+   * the goals box may not cover (D227). */
+  levelBoxes(): { left: number; top: number; right: number; bottom: number }[];
   /** Who is told when the map is opened, with the scene's plan at that tick, the run
    * paused until `playback.play()`, and when a run started again closes it (D134). */
   onMap(opened: (view: PlanView) => void, closed: () => void): void;
@@ -1020,7 +1024,21 @@ class LevelScene extends Phaser.Scene {
 
   /** Where the wizard stands on the page (SceneHandle). */
   wizardBox(): { left: number; top: number; right: number; bottom: number } {
-    const box = this.wizard.getBounds();
+    return this.onPage(this.wizard.getBounds());
+  }
+
+  /** What of the level is drawn on the page now (SceneHandle, D227): the wizard, every
+   * figure seen, every thing of the level seen, and the end's mark. */
+  levelBoxes(): { left: number; top: number; right: number; bottom: number }[] {
+    const drawn: { getBounds(): Phaser.Geom.Rectangle }[] = [this.wizard];
+    for (const actor of this.actors.values()) if (actor.sprite.visible) drawn.push(actor.sprite);
+    for (const image of this.things.values()) if (image.visible && image.alpha > 0) drawn.push(image);
+    for (const { mark } of this.marks) if (mark.visible) drawn.push(mark);
+    return drawn.map((object) => this.onPage(object.getBounds()));
+  }
+
+  /** A rectangle of the scene's world as a box in the page's pixels. */
+  private onPage(box: Phaser.Geom.Rectangle): { left: number; top: number; right: number; bottom: number } {
     const camera = this.cameras.main;
     const canvas = this.game.canvas.getBoundingClientRect();
     const scale = (camera.zoom * canvas.width) / this.game.canvas.width;
@@ -2423,6 +2441,9 @@ export async function startScene(
         },
         wizardBox() {
           return scene.wizardBox();
+        },
+        levelBoxes() {
+          return scene.levelBoxes();
         },
         settle(won) {
           return scene.settle(won);

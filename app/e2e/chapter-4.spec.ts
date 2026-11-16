@@ -151,6 +151,8 @@ test.describe('the shed', () => {
       await open(page, id);
       await expect(scene(page)).toHaveAttribute('data-camera-fit', '3,0,16,10');
       await expect(scene(page)).not.toHaveAttribute('data-restarting', /./);
+      // The goals box in the shape it takes once the start is drawn (D227).
+      await expect(page.locator('.goals')).toHaveAttribute('data-revealed', 'true');
       const panel = await page.locator('.goals').boundingBox();
       const buttons = await page.locator('.zoom-box').boundingBox();
       const canvas = await page.locator('#scene canvas').boundingBox();

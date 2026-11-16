@@ -536,18 +536,21 @@ ends on:
 ### Sweeping every level
 
 A spec measures every level of the game at once, for the designer and for you
-to read: how tall each start card is, and whether it scrolls, in both
-languages, at 1024 by 700, 1280 by 800 and 1366 by 650. It is skipped unless it
-is asked for. Build first, then run it from `app/`:
+to read. It gives two tables. The first says how tall each start card is, and
+whether it scrolls, in both languages, at 1024 by 700, 1280 by 800 and 1366 by
+650. The second says which shape the goals box takes in each level, the list or
+the strip, whether it folds after its three seconds, and how many things of the
+level each shape would cover, in Spanish, at 1024 by 700 and 1280 by 800. It is
+skipped unless it is asked for. Build first, then run it from `app/`:
 
 ```sh
 npm run build
 KYDUX_SWEEPS=1 npx playwright test e2e/sweeps.spec.ts
 ```
 
-It takes about ten minutes. It writes its table to
-`app/e2e/shots/sweeps/start-cards.md`. A card that scrolls says by how many
-pixels.
+It takes about fifteen minutes. It writes its tables to
+`app/e2e/shots/sweeps/start-cards.md` and `app/e2e/shots/sweeps/goals-box.md`. A
+card that scrolls says by how many pixels.
 
 ### Measuring how long the game takes to load
 

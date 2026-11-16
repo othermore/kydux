@@ -1,6 +1,7 @@
 // Sweeps of every level, on demand, for the designer and the owner to read: the start
 // card's height and what it scrolls by (D228), in each language, at the screens it is
-// measured on. Each writes a table into e2e/shots/sweeps/. Run from app/:
+// measured on; and the goals box's shape, whether it folds, and what each shape covers
+// (D227). Each writes a table into e2e/shots/sweeps/. Run from app/:
 //
 //   KYDUX_SWEEPS=1 npx playwright test e2e/sweeps.spec.ts
 //
@@ -9,7 +10,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
-import { seedWizard } from './helpers';
+import { seedWizard, skipGuide } from './helpers';
 
 const OUT = fileURLToPath(new URL('./shots/sweeps/', import.meta.url));
 const CHAPTERS = fileURLToPath(new URL('../../content/chapters/', import.meta.url));
@@ -65,5 +66,53 @@ test("every start card's height and its scroll, in each language, at three scree
   writeFileSync(
     `${OUT}start-cards.md`,
     `# The start cards: height in px, and what each scrolls by (D228)\n${rows.join('\n')}\n`,
+  );
+});
+
+test("every level's goals box: the shape taken, folded or not, and what each shape covers (D227)", async ({ browser }) => {
+  test.setTimeout(1_800_000);
+  const rows: string[] = [];
+  const found = new Map<string, string[]>();
+  for (const [width, height] of [
+    [1024, 700],
+    [1280, 800],
+  ] as const) {
+    const context = await browser.newContext({ locale: 'es-ES', viewport: { width, height } });
+    const page = await context.newPage();
+    await seedWizard(page);
+    await page.goto('/#start');
+    for (const id of courseLevels()) {
+      await page.evaluate((hash) => {
+        location.hash = hash;
+      }, `#level/${id}`);
+      await page.locator('#start').click({ timeout: 30_000 });
+      // The first level of the course opens the screen's guide after its card.
+      const guided = await page
+        .locator('#guide-skip')
+        .waitFor({ state: 'visible', timeout: 1500 })
+        .then(() => true, () => false);
+      if (guided) await skipGuide(page);
+      const goals = page.locator('.goals');
+      await expect(goals).toHaveAttribute('data-revealed', 'true', { timeout: 30_000 });
+      await page.waitForTimeout(3600);
+      const seen = await goals.evaluate((node) => ({
+        shape: node.dataset.shape,
+        folded: node.dataset.folded,
+        list: node.dataset.listCovers,
+        strip: node.dataset.stripCovers,
+      }));
+      const title = (await page.locator('.level-title').textContent()) ?? id;
+      const cells = found.get(id) ?? [title];
+      cells.push(`${seen.shape}${seen.folded === 'true' ? ', folded' : ''} (list ${seen.list}, strip ${seen.strip})`);
+      found.set(id, cells);
+    }
+    await context.close();
+  }
+  rows.push('| level | 1024×700 | 1280×800 |', '|---|---|---|');
+  for (const cells of found.values()) rows.push(`| ${cells.join(' | ')} |`);
+  mkdirSync(OUT, { recursive: true });
+  writeFileSync(
+    `${OUT}goals-box.md`,
+    `# The goals box: the shape taken, folded after three seconds or not, and how many things of the level each shape covers (D227), in Spanish\n\n${rows.join('\n')}\n`,
   );
 });

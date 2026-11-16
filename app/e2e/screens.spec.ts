@@ -88,6 +88,73 @@ test('the goals fold away from the scene, and open again', async ({ page }) => {
   await expect(page.locator('#goals-list')).toBeVisible();
 });
 
+test.describe("the goals box's two shapes, taken once the start is drawn (D227)", () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  /** The box's shape, whether it is folded, and what each shape covered. */
+  const seen = (page: Page) =>
+    page.locator('.goals').evaluate((node) => ({
+      shape: node.dataset.shape,
+      folded: node.dataset.folded,
+      list: node.dataset.listCovers,
+      strip: node.dataset.stripCovers,
+    }));
+
+  test('the list where it covers nothing, still open after four seconds', async ({ page }) => {
+    await page.goto('/#level/the-long-corridor');
+    await page.locator('#start').click();
+    await expect(page.locator('.goals')).toHaveAttribute('data-revealed', 'true');
+    await page.waitForTimeout(4000);
+    expect(await seen(page)).toEqual({ shape: 'list', folded: 'false', list: '0', strip: '0' });
+    await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/goals/list-the-long-corridor.png' });
+  });
+
+  for (const id of ['the-rings', 'the-race']) {
+    test(`${id}: the strip, over no ring and no figure, still open after four seconds`, async ({ page }) => {
+      await page.goto(`/#level/${id}`);
+      await page.locator('#start').click();
+      await expect(page.locator('.goals')).toHaveAttribute('data-revealed', 'true');
+      await page.waitForTimeout(4000);
+      const box = await seen(page);
+      expect(box.shape).toBe('strip');
+      expect(box.folded).toBe('false');
+      expect(box.strip).toBe('0');
+      expect(Number(box.list)).toBeGreaterThan(0);
+      await page.locator('.scene-frame').screenshot({ path: `e2e/shots/goals/strip-${id}.png` });
+    });
+  }
+
+  test('where both cover something, open two seconds after the start card closes, folded within four; its heading opens it again', async ({
+    page,
+  }) => {
+    await page.goto('/#level/the-sealed-door');
+    await page.locator('#start').click();
+    const goals = page.locator('.goals');
+    await expect(goals).toHaveAttribute('data-revealed', 'true');
+    await page.waitForTimeout(2000);
+    await expect(goals).toHaveAttribute('data-folded', 'false');
+    await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/goals/open-the-sealed-door.png' });
+    await expect(goals).toHaveAttribute('data-folded', 'true', { timeout: 2500 });
+    expect(await seen(page)).toMatchObject({ shape: 'list' });
+    await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/goals/folded-the-sealed-door.png' });
+    await page.locator('#goals-toggle').click();
+    await expect(goals).toHaveAttribute('data-folded', 'false');
+    await page.waitForTimeout(4000);
+    await expect(goals).toHaveAttribute('data-folded', 'false');
+  });
+
+  test('a heading clicked twice inside the three seconds keeps the page from folding the box', async ({ page }) => {
+    await page.goto('/#level/the-sealed-door');
+    await page.locator('#start').click();
+    const goals = page.locator('.goals');
+    await expect(goals).toHaveAttribute('data-revealed', 'true');
+    await page.locator('#goals-toggle').click();
+    await page.locator('#goals-toggle').click();
+    await page.waitForTimeout(4000);
+    await expect(goals).toHaveAttribute('data-folded', 'false');
+  });
+});
+
 test.describe('the keys', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#level/the-long-corridor');

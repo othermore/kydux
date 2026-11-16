@@ -382,12 +382,17 @@ test.describe('what the page draws of the chapter', () => {
     await expect(scene(page)).toHaveAttribute('data-wizard', '10,10');
   });
 
-  test('the goals box folds itself when it would cover the wizard at the start', async ({ page }) => {
+  test('the goals box takes the strip where the list would cover the wizard, and stays open (D227)', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await open(page, 'the-tunnel-exit');
-    await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'true', { timeout: ciTimes(10_000) });
-    await page.locator('#goals-toggle').click();
-    await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
+    const goals = page.locator('.goals');
+    await expect(goals).toHaveAttribute('data-revealed', 'true', { timeout: ciTimes(10_000) });
+    await expect(goals).toHaveAttribute('data-shape', 'strip');
+    await expect(goals).toHaveAttribute('data-strip-covers', '0');
+    await page.waitForTimeout(3500);
+    await expect(goals).toHaveAttribute('data-folded', 'false');
     await open(page, 'past-the-teacher');
+    await expect(page.locator('.goals')).toHaveAttribute('data-shape', 'list');
     await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
   });
 

@@ -446,6 +446,26 @@ footer .build {
   list-style: none;
 }
 
+/* The strip: the heading, then the goals one after another along the line, a goal on
+   the line's rest where it fits whole and on the next where it does not. */
+.goals[data-shape='strip'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 14px;
+}
+
+.goals[data-shape='strip'] h3 {
+  margin: 0;
+}
+
+.goals[data-shape='strip'] ul {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 18px;
+  row-gap: 2px;
+}
+
 .goal {
   display: flex;
   gap: 8px;
@@ -633,11 +653,26 @@ footer .build {
   accent-color: var(--accent);
 }
 
+/* The goals box in its two shapes (D227): the list, a column at the scene's top left
+   corner, as wide as its longest goal and at most 300 px and 40% of the scene; the
+   strip, along the scene's top, as wide as its words and at most the scene's width less
+   the box's margins. */
 .goals-slot {
   position: absolute;
   top: 10px;
   left: 10px;
-  max-width: 60%;
+  max-width: min(300px, 40%);
+}
+
+.goals-slot[data-shape='strip'] {
+  right: 10px;
+  max-width: none;
+  display: flex;
+  pointer-events: none;
+}
+
+.goals-slot[data-shape='strip'] .goals {
+  pointer-events: auto;
 }
 
 /* The camera's zoom, over the scene's corner (D69). */

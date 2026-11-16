@@ -23,7 +23,7 @@ import { type Guide, type GuideText, openGuide } from './guide';
 import { judge, type Verdict } from './stars';
 import { zoomBox } from './zoom';
 import { element } from './dom';
-import { type GoalsPanel, goalsPanel } from './goals';
+import { type GoalsPanel, type GoalsShape, goalsPanel, takeShape } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
 import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
 import { type Outcome, type OutcomeCard, outcomeCard, raceCount } from './outcome';
@@ -33,6 +33,9 @@ import { withCode } from './words';
 import type { Screen } from './screen';
 
 const SPEEDS: Speed[] = [1, 2, 4];
+/** How long the goals box stays open before the page folds it, where both its shapes
+ * cover something (D227). */
+const FOLD_AFTER = 3000;
 
 export interface LevelScreen {
   node: HTMLElement;
@@ -122,6 +125,13 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const goalTexts = () => text.goals.map((g, index) => ({ text: g, bonus: bonus[index] }));
   let goals: GoalsPanel = goalsPanel(goalTexts());
   goalsSlot.append(goals.node);
+  // The goals box's shape, taken once in the level's visit, and whether it is to fold, or
+  // was folded, by itself (D227).
+  let goalsShape: GoalsShape | null = null;
+  let foldPending = false;
+  let foldedByPage = false;
+  let foldTimer: ReturnType<typeof setTimeout> | null = null;
+  let guiding = false;
   const status = element('p', { id: 'status', className: 'status' });
   // A level played in several ways (D51): the child is told only what may differ at
   // each run (D204); under ?debug, after a run, a select of the ways' ids plays back
@@ -344,8 +354,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         onClose: () => {
           if (openedNotebook) setNotebook(false);
           guide = null;
+          guiding = false;
           progress.markGuided();
           editor.focus();
+          seeGoals();
         },
       });
     });
@@ -368,11 +380,28 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         },
         () => {
           // The first level opens the guide once its start card is closed, the first time.
-          if (parts.guideFirst && !progress.guided()) showGuide();
-          else editor.focus();
+          if (parts.guideFirst && !progress.guided()) {
+            guiding = true;
+            showGuide();
+          } else editor.focus();
+          seeGoals();
         },
       ),
     );
+  };
+  // The child can see the goals box once its shape is taken, the start card closed and
+  // the screen's guide over: three seconds after, a box to fold folds, unless the child
+  // has used its heading (D227).
+  const seeGoals = () => {
+    if (!foldPending || foldTimer !== null || goalsShape === null || guiding) return;
+    if (shownCard?.open && shownCard.over === 'window') return;
+    foldTimer = setTimeout(() => {
+      foldTimer = null;
+      foldPending = false;
+      if (destroyed || goals.touched) return;
+      goals.fold();
+      foldedByPage = true;
+    }, FOLD_AFTER);
   };
   const showWin = (verdict: Verdict, kept: number, race: string | null) =>
     showCard(
@@ -680,15 +709,20 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         );
         zoom.attach(handle);
         controller.attach(handle);
-        // The goals box folds itself when it would cover the wizard at the start, once
-        // the camera has drawn where the wizard stands.
+        // The goals box takes its shape once the camera has drawn the level's start: the
+        // list, or the strip, whichever first covers nothing of the level; where both do,
+        // the list, folded three seconds after the child can see it (D227).
         setTimeout(() => {
           if (destroyed) return;
-          const box = handle.wizardBox();
-          const panel = goals.node.getBoundingClientRect();
-          const covers =
-            box.left < panel.right && panel.left < box.right && box.top < panel.bottom && panel.top < box.bottom;
-          if (covers) goals.fold();
+          const taken = takeShape(goals.measure('list'), goals.measure('strip'), handle.levelBoxes());
+          goalsShape = taken.shape;
+          goals.shape(taken.shape);
+          // What each shape covered, for the tests and the sweep.
+          goals.node.dataset.listCovers = String(taken.covers.list);
+          goals.node.dataset.stripCovers = String(taken.covers.strip);
+          goals.reveal();
+          foldPending = taken.fold;
+          seeGoals();
         }, 400);
       });
       // The start card opens a level the first time it is played.
@@ -706,6 +740,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       zoom.relabel();
       goals = goalsPanel(goalTexts());
       goalsSlot.replaceChildren(goals.node);
+      if (goalsShape) {
+        goals.shape(goalsShape);
+        goals.reveal();
+      }
+      if (foldedByPage) goals.fold();
       editor.view.contentDOM.setAttribute('aria-label', t('level.code_label'));
       about.setAttribute('aria-label', t('level.about'));
       about.title = t('level.about');

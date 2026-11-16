@@ -9,6 +9,9 @@ export async function skipGuide(page: Page): Promise<void> {
   await expect(page.locator('.guide')).toHaveCount(0);
 }
 
+/** The key that turns the tips off (ui/waiting.ts), read once as the page opens. */
+export const TIPS_OFF = 'kydux.tips-off';
+
 export interface SeededWizard {
   name: string;
   gender: 'girl' | 'boy';
@@ -27,14 +30,26 @@ export async function gotoTesting(page: Page, hash: string): Promise<void> {
   await page.addStyleTag({ content: '.debug-box, .debug-legend, #debug-solution { display: none !important; }' });
 }
 
-export async function seedWizard(target: Page | BrowserContext, wizard: SeededWizard = MARTA): Promise<void> {
+export async function seedWizard(
+  target: Page | BrowserContext,
+  wizard: SeededWizard = MARTA,
+  { tips = false }: { tips?: boolean } = {},
+): Promise<void> {
   const document = JSON.stringify({ version: 1, wizard });
-  await target.addInitScript((kept) => {
-    if (!localStorage.getItem('kydux.games') && !localStorage.getItem('kydux.progress')) {
-      localStorage.setItem('kydux.progress', kept);
-    }
-  }, document);
+  await target.addInitScript(
+    ({ kept, off, key }) => {
+      if (!localStorage.getItem('kydux.games') && !localStorage.getItem('kydux.progress')) {
+        localStorage.setItem('kydux.progress', kept);
+      }
+      // A slow load would hold the screen for a tip's ten seconds (D214): every spec but
+      // the one on waiting turns the tips off, with a key no setting shows.
+      if (off) localStorage.setItem(key, '1');
+      else localStorage.removeItem(key);
+    },
+    { kept: document, off: !tips, key: TIPS_OFF },
+  );
 }
+
 
 /** The wizard's acts (data-acting on the scene: `pickup`, `win`) recorded as
  * they start, so that a test checks an act played even after it ended: a slow

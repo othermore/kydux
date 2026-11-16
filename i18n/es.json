@@ -563,5 +563,21 @@
     "free_text": "Kydux es software libre, bajo la Licencia Pública General de GNU. Está en español y en inglés, y se juega en el navegador. Es de la familia de Kidux, un sistema para el primer ordenador de un niño.",
     "kidux_link": "Conoce Kidux",
     "kidux_url": "https://kidux.org/es/"
+  },
+  "waiting": {
+    "loading": "Cargando…",
+    "go": "Seguir"
+  },
+  "tips": {
+    "notebook": "Abre el cuaderno para ver todas las instrucciones que puedes utilizar en tu programa.",
+    "spells": "En el cuaderno, además, puedes ver todos los hechizos y palabras mágicas disponibles.",
+    "click": "Si haces clic sobre una instrucción en el cuaderno, se escribe sola en el programa.",
+    "dot": "Si pones el nombre de un objeto seguido de un punto, te aparecen todas las cosas que tiene ese objeto para que no tengas que escribirlas.",
+    "hint": "Cuando tu programa no consigue ganar, ya puedes pulsar el botón *Pista*, debajo del programa. Cada vez que lo pulsas lees una pista más, ¡hasta tres!",
+    "keys": "Para ejecutar tu programa pulsa Ctrl+Intro o Alt+R (Cmd+Intro u Opción+R en Mac). Y con Alt+N (Opción+N en Mac) puedes abrir y cerrar el cuaderno.",
+    "timeline": "Después de ejecutar un programa, puedes arrastrar la barra debajo de la escena para repasar lo que pasó momento a momento y descubrir qué falló.",
+    "zoom": "Usa los botones *+* y *−* (o la rueda del ratón) para acercar y alejar la escena. Si no ves a tu {mago|maga}, el botón *Buscar a {mi mago|mi maga}* {lo|la} vuelve a poner a la vista.",
+    "lesson": "En una lección con un ejemplo de código, puedes cambiarlo y pulsar el botón *Ejecutar*, debajo de él, para ver allí mismo qué hace tu cambio.",
+    "map": "El botón *Mapa* abre el mapa. Desde allí puedes volver a abrir cualquier parada a la que ya hayas llegado para jugarla otra vez, y ver las estrellas de cada nivel ganado."
   }
 }

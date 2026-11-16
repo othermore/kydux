@@ -45,3 +45,10 @@ always of the code that was just tested.
 
 `helpers.ts` is not a test. It gives a test a wizard before the game loads,
 for the tests of what comes after the creator.
+
+While a screen loads, a child who has begun reads tips, and a slow load holds the
+screen for a tip's ten seconds (D214). So the tips are off in every page a spec
+opens: `playwright.config.ts` sets the key `kydux.tips-off` in the browser's
+storage, and `seedWizard` sets it too, for a context a spec makes itself.
+`waiting.spec.ts` alone turns them on, with `seedWizard(page, wizard, { tips:
+true })` and an empty `storageState`.

@@ -2289,3 +2289,53 @@ a.stop-body:focus-visible {
     background: var(--ink);
   }
 }
+
+/* While a screen loads (D214): Kydux's mark, Loading…, and a tip for a child who has
+   begun, with Go on under it once the screen is ready. */
+.waiting {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 64px 16px;
+  text-align: center;
+}
+
+.waiting-tip {
+  max-width: 34em;
+  margin: 12px 0 0;
+  padding: 16px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+/* A story's scene place until its scene is there: the still, or the paper with the
+   mark; the scene comes in over it (D214). */
+.story-still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story-still-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+}
+
+.story-frame .scene {
+  transition: opacity 0.5s ease;
+}
+
+.story-frame .scene.story-scene-waiting {
+  opacity: 0;
+}
+

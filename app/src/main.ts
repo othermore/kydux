@@ -30,6 +30,7 @@ import type { LessonRunner } from './ui/lessonrun';
 import type { MapScreenParts } from './ui/map';
 import { aboutScreen } from './ui/about';
 import type { Screen } from './ui/screen';
+import { type Wait, waitingView } from './ui/waiting';
 import { debugging } from './engine/debugging';
 import { lookOf } from './engine/looks';
 import { listenForMusic, music } from './engine/music';
@@ -142,6 +143,7 @@ function itemLabel(course: Course, item: string): string | undefined {
 
 /** What a lesson or a story says when there is none by that id. */
 function notFound(content: HTMLElement, kind: 'lesson' | 'story', id: string): void {
+  dropWait();
   document.title = t('app.title');
   content.replaceChildren(
     element('div', { className: 'not-found' }, [
@@ -237,14 +239,19 @@ async function showLesson(content: HTMLElement, id: string, key: string, from?: 
   }
 }
 
-/** A story told on its scene (D74). */
+/** A story told on its scene (D74): its words come first (D214). The screen waits for
+ * the story, the course and its own code; the scene's code arrives behind it, and the
+ * screen starts the scene once it is there. */
 async function showStory(content: HTMLElement, id: string, key: string): Promise<void> {
+  const sceneCode = import('./engine/scene');
+  sceneCode.catch((error: unknown) => {
+    if (shownRoute === key) failed(content, error);
+  });
   try {
-    const [story, course, { storyScreen }, { startScene }] = await Promise.all([
+    const [story, course, { storyScreen }] = await Promise.all([
       loadStory(id, currentLanguage()),
       loadCourse(),
       import('./ui/story'),
-      import('./engine/scene'),
     ]);
     if (shownRoute !== key) return;
     show(
@@ -258,7 +265,12 @@ async function showStory(content: HTMLElement, id: string, key: string): Promise
           ? { onward: progress.wizard() ? itemHash(next(course, `story:${id}`) ?? courseStart(course)) : '#wizard' }
           : {}),
         label: itemLabel(course, `story:${id}`),
-        startScene,
+        startScene: (...args) => sceneCode.then(({ startScene }) => startScene(...args)),
+        // The opening is read over the welcome's painting of the castle until its scene
+        // is there (D61, D214).
+        ...(story.opening
+          ? { still: { src: `${import.meta.env.BASE_URL}about/welcome-castle.webp`, alt: t('about.hero_alt') } }
+          : {}),
         reload: () => loadStory(id, currentLanguage()),
       }),
     );
@@ -303,16 +315,62 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
   );
 }
 
-/** Puts a screen in the page in place of the one before. */
+/** The wait of the screen being loaded, with its tips (D214). */
+let waiting: { content: HTMLElement; wait: Wait } | null = null;
+
+/** Puts a screen in the page in place of the one before: at once, or, where a tip is
+ * up while it loaded, once the tip has been read (D214). */
 function show(content: HTMLElement, next: Screen): void {
-  screen?.destroy();
-  screen = next;
-  content.replaceChildren(next.node);
-  next.mount?.();
+  const open = () => {
+    screen?.destroy();
+    screen = next;
+    content.replaceChildren(next.node);
+    next.mount?.();
+    warmUp();
+  };
+  const held = waiting?.content === content ? waiting.wait : null;
+  waiting = null;
+  if (held) held.ready(open);
+  else open();
+}
+
+/** The code the other screens need, fetched in idle time once the first screen shows,
+ * so that a later screen waits only for its own files (D214). */
+let warmed = false;
+function warmUp(): void {
+  if (warmed) return;
+  warmed = true;
+  const idle = (then: () => void) =>
+    'requestIdleCallback' in globalThis ? globalThis.requestIdleCallback(then) : setTimeout(then, 200);
+  const parts: (() => Promise<unknown>)[] = [
+    () => import('./ui/story'),
+    () => import('./engine/scene'),
+    () => import('./ui/lesson'),
+    () => import('./ui/level'),
+    () => import('./editor/editor'),
+    () => import('./ui/map'),
+  ];
+  const fetchNext = () => {
+    const part = parts.shift();
+    if (!part) return;
+    idle(() => {
+      part()
+        .catch(() => {})
+        .finally(fetchNext);
+    });
+  };
+  fetchNext();
+}
+
+/** The wait of a screen that will not show: its tips stopped. */
+function dropWait(): void {
+  waiting?.wait.dispose();
+  waiting = null;
 }
 
 /** The world running is not the page's: the page must be reloaded (stamp.ts). */
 function stale(content: HTMLElement): void {
+  dropWait();
   screen?.destroy();
   screen = null;
   const reload = element('button', { id: 'reload', type: 'button' }, [t('level.reload')]);
@@ -325,6 +383,7 @@ function stale(content: HTMLElement): void {
 function failed(content: HTMLElement, error: unknown): void {
   // The network, or a part of the game that did not arrive.
   console.error(error);
+  dropWait();
   const reload = element('button', { id: 'reload', type: 'button' }, [t('level.reload')]);
   reload.addEventListener('click', () => location.reload());
   content.replaceChildren(
@@ -478,6 +537,7 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
       failed(content, error);
       return;
     }
+    dropWait();
     screen?.destroy();
     screen = null;
     content.replaceChildren(
@@ -490,6 +550,11 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
 }
 
 let root: HTMLElement | null = null;
+
+/** A child who has never played: no wizard made and no game saved. */
+function newcomer(): boolean {
+  return !progress.wizard() && progress.savedGames().length === 0;
+}
 
 /** The music a screen plays (D192): a story, the map and the start screen their
  * chapter's theme at its loudness, a lesson and a level every voice of it lower (D210);
@@ -527,9 +592,12 @@ function route(): void {
   playMusicFor(wanted);
   screen?.destroy();
   screen = null;
-  const content = element('main', { className: 'content' }, [
-    element('p', { className: 'status' }, [t('level.loading')]),
-  ]);
+  // While the screen loads, the waiting view, with a tip for a child who has begun
+  // (D214); a wait dropped by a new route opens nothing.
+  waiting?.wait.dispose();
+  const view = waitingView(!newcomer());
+  const content = element('main', { className: 'content' }, [view.node]);
+  waiting = { content, wait: view.wait };
   chrome(root, content);
   shownContent = content;
   if (wanted.name === 'settings') {
@@ -543,8 +611,8 @@ function route(): void {
   if (wanted.name === 'about') {
     // A child who has never played starts the story from it; one who has goes back
     // to the start screen and its Continue.
-    const newcomer = !progress.wizard() && progress.savedGames().length === 0;
-    show(content, aboutScreen({ play: newcomer ? OPENING : '#start', newcomer }));
+    const first = newcomer();
+    show(content, aboutScreen({ play: first ? OPENING : '#start', newcomer: first }));
     return;
   }
   if (wanted.name === 'wizard') {

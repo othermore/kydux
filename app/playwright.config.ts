@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
+import { TIPS_OFF } from './e2e/helpers';
 import { CI_TIMES } from './e2e/support';
 
 // The built game, served by `vite preview` the way a release runs: over HTTPS
@@ -25,6 +26,12 @@ export default defineConfig({
     baseURL,
     ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
+    // The tips while a screen loads are off in every page a spec opens (D214): a slow
+    // load would hold a screen for a tip's ten seconds. The spec on waiting turns them on.
+    storageState: {
+      cookies: [],
+      origins: [{ origin: baseURL.replace(/\/$/, ''), localStorage: [{ name: TIPS_OFF, value: '1' }] }],
+    },
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

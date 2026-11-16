@@ -58,3 +58,5 @@ about.level_
 
 # The plan window and ?debug name each zone of a level by `plan.zone.${name}` (D196).
 plan.zone.
+# The tips a child who has begun reads while a screen loads, by key (ui/waiting.ts).
+tips.

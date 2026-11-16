@@ -77,9 +77,16 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the note on a phone or a tablet that the game is made for a
                 computer (handheld.ts), the characters' and the looks' portraits
                 (portraits.ts, D194), the welcome page (about.ts, #about, D193),
-                Kydux's mark in the header (mark.ts), and under ?debug the page
+                Kydux's mark in the header (mark.ts), what a screen shows while
+                it loads, the mark, Loading… and a tip with its clock (waiting.ts,
+                D214), and under ?debug the page
                 that plays any of the music's themes, each voice of the one
-                playing to turn off or set by hand (themes.ts, #music, D192, D203)
+                playing to turn off or set by hand (themes.ts, #music, D192, D203).
+                main.ts shows a screen: it shows the waiting view at once, loads
+                the screen's own code, texts and pictures (a story needs no scene
+                code to show its words), puts the screen in when it is ready or,
+                with a tip up, when the tip has been read, and once the first
+                screen shows fetches the other screens' code in idle time (D214)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events (stories.ts), the guide's words (guide.ts), and the

@@ -563,5 +563,21 @@
     "free_text": "Kydux is free software, under the GNU General Public License. It is in English and in Spanish, and it is played in a web browser. It belongs to the Kidux family, a system for a child's first computer.",
     "kidux_link": "Meet Kidux",
     "kidux_url": "https://kidux.org"
+  },
+  "waiting": {
+    "loading": "Loading…",
+    "go": "Go on"
+  },
+  "tips": {
+    "notebook": "Open the notebook to see all the instructions you can use in your program.",
+    "spells": "In the notebook, you can also see all the available spells and magic words.",
+    "click": "If you click on an instruction in the notebook, it writes itself into your program.",
+    "dot": "If you type an object's name followed by a dot, all the things that object has will appear so you don't have to type them.",
+    "hint": "When your program doesn't win, you can press the *Hint* button under the program. Each press shows one more hint, up to three!",
+    "keys": "To run your program, press Ctrl+Enter or Alt+R (Cmd+Enter or Option+R on a Mac). And with Alt+N (Option+N on a Mac) you can open and close the notebook.",
+    "timeline": "After running a program, you can drag the bar under the scene to go over what happened moment by moment and find out what went wrong.",
+    "zoom": "Use the *+* and *−* buttons (or the mouse wheel) to bring the scene nearer or farther. If you lose sight of your wizard, the *Find my wizard* button brings them back into view.",
+    "lesson": "In a lesson with an example of code, you can change it and press the *Run* button under it to see right there what your change does.",
+    "map": "The *Map* button opens the map. From there you can open again any stop you have already reached, to play it once more, and see the stars of every level you have won."
   }
 }

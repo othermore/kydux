@@ -8,7 +8,11 @@
 // the last step Go on leads to what comes next; reaching it marks the story read,
 // as reading a story to its end does. A story told on several scenes in turn (the
 // morning after, from the dormitory to the shed) starts each part's scene as its
-// first step comes.
+// first step comes. The screen shows before its scene's code is there (D214): the
+// voice's words are read at once and steps that do nothing on the scene are gone on
+// from, while the scene's place shows the story's still (the opening's, the welcome's
+// painting of the castle) or the page's paper with Kydux's mark; a step's actions play
+// when the scene comes, which fades in over the still.
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
@@ -20,6 +24,7 @@ import { characterName, forWizard, t } from '../i18n';
 import type { LevelJson } from '../runtime/protocol';
 import * as progress from '../progress/progress';
 import { element } from './dom';
+import { markSvg } from './mark';
 import { portrait, portraitOf } from './portraits';
 import type { Screen } from './screen';
 import { zoomBox } from './zoom';
@@ -41,7 +46,12 @@ export interface StoryScreenParts {
   ) => Promise<SceneHandle>;
   /** The story in the language now set, for a change of language. */
   reload: () => Promise<Story>;
+  /** The picture the scene's place shows until the scene is there, with its words. */
+  still?: { src: string; alt: string };
 }
+
+/** How long the scene takes to come in over the still, in milliseconds (style.css). */
+const FADE_IN = 500;
 
 /** The place framed at a step (D199): the last step's framing from the part's first
  * step to it, or none. */
@@ -64,10 +74,14 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   let shownPart = -1;
   let loadingPart = -1;
 
-  const sceneParent = element('div', { id: 'scene', className: 'scene' });
+  const sceneParent = element('div', { id: 'scene', className: 'scene story-scene-waiting' });
   // The camera's zoom, as on a level's scene (D106).
   const zoom = zoomBox(sceneParent, { story: true });
-  const frame = element('div', { className: 'scene-frame story-frame' }, [sceneParent, zoom.node]);
+  // Until the scene is there, its place shows the still, or the paper with the mark.
+  const still = parts.still
+    ? element('img', { id: 'story-still', className: 'story-still', src: parts.still.src, alt: parts.still.alt })
+    : element('div', { id: 'story-still', className: 'story-still story-still-mark' }, [markSvg(72)]);
+  const frame = element('div', { className: 'scene-frame story-frame' }, [still, sceneParent, zoom.node]);
   const voice = element('div', { id: 'story-voice', className: 'story-voice' });
   // What a figure says, for a screen reader, which cannot read the bubble.
   const heard = element('p', { id: 'story-heard', className: 'visually-hidden', ariaLive: 'polite' });
@@ -174,8 +188,17 @@ export function storyScreen(parts: StoryScreenParts): Screen {
       loadingPart = -1;
       sceneParent.dataset.storyPart = String(index);
       zoom.attach(handle);
+      // The first scene comes in over the still, which then leaves.
+      if (sceneParent.classList.contains('story-scene-waiting')) {
+        sceneParent.classList.remove('story-scene-waiting');
+        setTimeout(() => {
+          still.hidden = true;
+        }, FADE_IN);
+      }
       play();
-    });
+    })
+      // A scene whose code did not arrive: the page says so (main.ts).
+      .catch(() => {});
   };
 
   /** The scene as the step before left it, then this step played. */

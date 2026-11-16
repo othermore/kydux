@@ -449,3 +449,176 @@ describe("the wind's levels counted from its own plan, never read back (D252)", 
     expect(params.flatMap((one) => one.assigned)).not.toContain(READ_BACK);
   });
 });
+
+describe('the landing as the wind switched off (D255)', () => {
+  const param = (node: unknown, name = 'gain') => (node as Record<string, RecordedParam>)[name] as RecordedParam;
+  /** A param's calls from its last cancel on. */
+  const sinceCancel = (recorded: RecordedParam) => {
+    const cancel = recorded.calls.map(([kind]) => kind).lastIndexOf('cancel');
+    return recorded.calls.slice(cancel);
+  };
+  const begin = async () => {
+    vi.stubGlobal('AudioContext', RecordingContext);
+    const sound = await import('./sound');
+    const sfx = await import('./sfx');
+    const ctx = sfx.audio() as unknown as RecordingContext;
+    const wind = new sound.Wind(() => 0.5);
+    const graph = () => {
+      if (!wind.graph) throw new Error('no wind');
+      return wind.graph;
+    };
+    return { sound, ctx, wind, graph };
+  };
+
+  it('draws the rest from nothing to LAND_LEVEL in silence', async () => {
+    const { sound, wind, graph } = await begin();
+    wind.near(1.5);
+    expect(sinceCancel(param(graph().restLevel))).toEqual([
+      ['cancel', 1],
+      ['set', 0, 1],
+      ['linear', sound.LAND_LEVEL, 2.5],
+    ]);
+    expect(wind.landing).toBe('near');
+  });
+
+  it("starts an approach in a hover from the value the rest's curve has", async () => {
+    const { sound, ctx, wind, graph } = await begin();
+    wind.rest(true);
+    const curve = { from: 0, at: 1, targets: [{ level: sound.REST_LEVEL, at: 1, constant: 0.2 }] };
+    ctx.currentTime = 1.5;
+    wind.near(1);
+    const [, held, line] = sinceCancel(param(graph().restLevel));
+    expect(held?.[1]).toBeCloseTo(sound.curveAt(curve, 1.5), 12);
+    expect(line).toEqual(['linear', sound.LAND_LEVEL, 2.5]);
+  });
+
+  it("leaves the rest's plan to a gust in an approach, and draws a second approach from the line's value", async () => {
+    const { sound, ctx, wind, graph } = await begin();
+    wind.near(1.5);
+    const rest = param(graph().restLevel);
+    const before = rest.calls.length;
+    wind.gust(0.5);
+    wind.rest(true);
+    wind.remix();
+    expect(rest.calls.length).toBe(before);
+    ctx.currentTime = 1.75;
+    wind.near(0.75);
+    const [, held, line] = sinceCancel(rest);
+    expect(held?.[1]).toBeCloseTo(sound.LAND_LEVEL / 2, 12);
+    expect(line).toEqual(['linear', sound.LAND_LEVEL, 2.5]);
+  });
+
+  it('switches the wind off at the landing: the level to 0 and the band to 90 Hz in 1.5 s, the Q to 5 in 0.75 s, both back after', async () => {
+    const { sound, ctx, wind, graph } = await begin();
+    wind.near(1.5);
+    ctx.currentTime = 2.5;
+    wind.land();
+    expect(sinceCancel(param(graph().restLevel))).toEqual([
+      ['cancel', 2.5],
+      ['set', sound.LAND_LEVEL, 2.5],
+      ['linear', 0, 4],
+    ]);
+    expect(sinceCancel(param(graph().restBand, 'frequency'))).toEqual([
+      ['cancel', 2.5],
+      ['set', 300, 2.5],
+      ['exponential', sound.LAND_HERTZ, 4],
+      ['set', 300, 4.02],
+    ]);
+    expect(sinceCancel(param(graph().restBand, 'Q'))).toEqual([
+      ['cancel', 2.5],
+      ['set', 1.1, 2.5],
+      ['linear', sound.LAND_Q, 3.25],
+      ['set', 1.1, 4.02],
+    ]);
+    expect(wind.landing).toBe('down');
+  });
+
+  it('comes up to LAND_LEVEL in a tenth of a second first where there was no approach', async () => {
+    const { sound, wind, graph } = await begin();
+    wind.land();
+    expect(sinceCancel(param(graph().restLevel))).toEqual([
+      ['cancel', 1],
+      ['set', 0, 1],
+      ['linear', sound.LAND_LEVEL, 1.1],
+      ['linear', 0, 2.6],
+    ]);
+  });
+
+  it('is heard to its end through the rest asked for no more and a stop, and cut by a restart', async () => {
+    const { ctx, wind, graph } = await begin();
+    wind.near(1.5);
+    ctx.currentTime = 2.5;
+    wind.land();
+    const [rest, band, q] = [param(graph().restLevel), param(graph().restBand, 'frequency'), param(graph().restBand, 'Q')];
+    const counts = () => [rest.calls.length, band.calls.length, q.calls.length];
+    const before = counts();
+    wind.rest(false);
+    wind.stop(0.15);
+    wind.gust(0.5);
+    expect(counts()).toEqual(before);
+    expect(wind.landing).toBe('down');
+    ctx.currentTime = 3;
+    wind.stop(0.02, true);
+    expect(wind.landing).toBeNull();
+    expect(sinceCancel(band)).toEqual([
+      ['cancel', 3],
+      ['set', 300, 3],
+    ]);
+    expect(sinceCancel(q)).toEqual([
+      ['cancel', 3],
+      ['set', 1.1, 3],
+    ]);
+    expect(sinceCancel(rest).at(-1)).toEqual(['linear', 0, 3.02]);
+  });
+
+  it('puts the band back at once when the rest is asked for again in a landing', async () => {
+    const { ctx, wind, graph } = await begin();
+    wind.land();
+    ctx.currentTime = 1.5;
+    wind.rest(true);
+    expect(wind.landing).toBeNull();
+    expect(sinceCancel(param(graph().restBand, 'frequency'))).toEqual([
+      ['cancel', 1.5],
+      ['set', 300, 1.5],
+    ]);
+  });
+
+  it('says near, down and none at the right moments, with no sound made too', async () => {
+    const { sound, wind } = await begin();
+    sound.mixWind('rest', false, 0.5);
+    expect(wind.landing).toBeNull();
+    wind.near(1);
+    expect(wind.graph).toBeNull();
+    expect(wind.landing).toBe('near');
+    wind.land();
+    expect(wind.landing).toBe('down');
+    vi.advanceTimersByTime((sound.LAND_FALL + 0.1) * 1000 - 1);
+    expect(wind.landing).toBe('down');
+    vi.advanceTimersByTime(2);
+    expect(wind.landing).toBeNull();
+    // Stop in an approach ends it at once.
+    wind.near(1);
+    wind.stop(0.15);
+    expect(wind.landing).toBeNull();
+  });
+
+  it('carries no value read back from a node in an approach and a landing', async () => {
+    const { ctx, wind, graph } = await begin();
+    wind.rest(true);
+    wind.gust(1);
+    ctx.currentTime = 1.4;
+    wind.near(1);
+    ctx.currentTime = 1.9;
+    wind.near(0.5);
+    ctx.currentTime = 2.4;
+    wind.land();
+    ctx.currentTime = 2.9;
+    wind.rest(true);
+    wind.stop(0.02, true);
+    const params = Object.values(graph()).flatMap((node) =>
+      ['gain', 'frequency', 'Q'].map((name) => (node as Record<string, RecordedParam>)[name]).filter((one) => one instanceof RecordedParam),
+    ) as RecordedParam[];
+    expect(params.flatMap((one) => one.calls).filter((call) => call.slice(1).includes(READ_BACK))).toEqual([]);
+    expect(params.flatMap((one) => one.assigned)).not.toContain(READ_BACK);
+  });
+});

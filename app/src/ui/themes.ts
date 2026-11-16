@@ -14,7 +14,7 @@
 
 import { type Heard, music, type Theme, themeNamed } from '../engine/music';
 import { play as playEffect } from '../engine/sfx';
-import { mixWind, WIND_WRITTEN, Wind, type WindVoice, windMix } from '../engine/sound';
+import { LAND_NEAR, mixWind, WIND_WRITTEN, Wind, type WindVoice, windMix } from '../engine/sound';
 import { t } from '../i18n';
 import { element } from './dom';
 import type { Screen } from './screen';
@@ -63,26 +63,43 @@ const HOVER_MS = 2200;
 type WindSample = 'one' | 'eight' | 'zigzag' | 'lift' | 'landing' | 'flight';
 const WIND_SAMPLES: readonly WindSample[] = ['one', 'eight', 'zigzag', 'lift', 'landing', 'flight'];
 
-/** What a sample plays, in order: gusts of so many cells, the lift's and the landing's
- * sounds, and when each comes, in milliseconds from the start. */
-type Played = { at: number; cells: number } | { at: number; effect: 'lift' | 'set_down' };
+/** What a sample plays, in order: gusts of so many cells, the lift's sound, the rest
+ * asked for, the landing's approach of so many seconds and the landing, the wind switched
+ * off (D255), and when each comes, in milliseconds from the start. */
+type Played =
+  | { at: number; cells: number }
+  | { at: number; effect: 'lift' }
+  | { at: number; wind: 'rest' | 'land' }
+  | { at: number; near: number };
 function windPlan(sample: WindSample): Played[] {
   if (sample === 'one') return [{ at: 0, cells: 1 }];
   if (sample === 'eight') return [{ at: 0, cells: 8 }];
   if (sample === 'zigzag') return Array.from({ length: 8 }, (_, i) => ({ at: i * MOVE_MS, cells: 1 }));
   if (sample === 'lift') return [{ at: 0, effect: 'lift' }];
-  if (sample === 'landing') return [{ at: 0, effect: 'set_down' }];
-  // A lift, a move of one, the four moves of a pair of rings, a hover, a move of eight,
-  // a landing.
-  const played: Played[] = [{ at: 0, effect: 'lift' }];
+  // The rest asked for, its approach of LAND_NEAR, and the landing.
+  if (sample === 'landing') {
+    return [
+      { at: 0, wind: 'rest' },
+      { at: 0, near: LAND_NEAR },
+      { at: LAND_NEAR * 1000, wind: 'land' },
+    ];
+  }
+  // A lift, the rest asked for while in the air, a move of one, the four moves of a pair
+  // of rings, a hover, a move of eight, the approach over the last LAND_NEAR and the
+  // landing.
+  const played: Played[] = [
+    { at: 0, effect: 'lift' },
+    { at: 0, wind: 'rest' },
+  ];
   let at = LIFT_PAUSE_MS;
   for (const cells of [1, 2, 2, 2, 2, 8]) {
     if (cells === 8) at += HOVER_MS;
     played.push({ at, cells });
     at += cells * MOVE_MS;
   }
-  played.push({ at, effect: 'set_down' });
-  return played;
+  const near = Math.min(LAND_NEAR * 1000, at);
+  played.push({ at: at - near, near: near / 1000 }, { at, wind: 'land' });
+  return played.sort((one, other) => one.at - other.at);
 }
 
 /** What the wind's mix is apart from as it is written, as `air 1.40, whistle off, rest
@@ -106,15 +123,16 @@ function windPanel(): { node: HTMLElement; draw: () => void; destroy: () => void
   let timers: ReturnType<typeof setTimeout>[] = [];
   const play = (sample: WindSample) => {
     for (const timer of timers) clearTimeout(timer);
-    wind.stop(0.02);
+    wind.stop(0.02, true);
     timers = windPlan(sample).map((played) =>
       setTimeout(() => {
-        if ('effect' in played) {
-          playEffect(played.effect);
-          // The whole flight is in the air from its lift to its landing, as a level's
-          // wizard is: the rest is asked for meanwhile.
-          if (sample === 'flight') wind.rest(played.effect === 'lift');
-        } else wind.gust((played.cells * MOVE_MS) / 1000);
+        if ('effect' in played) playEffect(played.effect);
+        else if ('cells' in played) wind.gust((played.cells * MOVE_MS) / 1000);
+        else if ('near' in played) wind.near(played.near);
+        // The whole flight is in the air from its lift to its landing, as a level's
+        // wizard is: the rest is asked for meanwhile, and the landing switches it off.
+        else if (played.wind === 'rest') wind.rest(true);
+        else wind.land();
       }, played.at),
     );
   };
@@ -169,7 +187,7 @@ function windPanel(): { node: HTMLElement; draw: () => void; destroy: () => void
     draw,
     destroy: () => {
       for (const timer of timers) clearTimeout(timer);
-      wind.stop(0.02);
+      wind.stop(0.02, true);
     },
   };
 }

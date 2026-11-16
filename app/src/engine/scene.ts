@@ -45,7 +45,9 @@
 // data-hover (the hover's clock, in whole milliseconds, which always runs but under
 // reduced motion, D235, D242), data-wind (`on` while a gust of the wizard's sounds,
 // from its start to its fall's end, muted or not, D243), data-wind-gusts (the gusts this
-// run, one for each flown command, counted with the ticks shown), data-through (the
+// run, one for each flown command, counted with the ticks shown), data-landing (`near`
+// while the wind rises to the wizard's landing, `down` while it is switched off, muted or
+// not, D255), data-through (the
 // rings flown through, in order, joined by ","), data-race-band (what Ilda's band says while she
 // reads the programs, D189), data-race-verdict (her verdict of the race, D234) and
 // data-world (what the camera shows, in cells: "left,top,width,height").
@@ -150,7 +152,7 @@ import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
 import { blockedText, bumpText, friendText, raceVerdict, ringWayText, sleepingText } from './words';
 import { FLOWN, FLY_LIFT, flyFrame, hoverOf, hoverPhase, LIFT_MS, RING_PAST, RING_RAISE, riseOf, throughRing } from './flight';
 import { drawnFromSprite, spriteFoot, spriteKey, spriteName, spriteOrigin, spriteScale, type ThingSprite } from './things';
-import { Wind } from './sound';
+import { LAND_NEAR, Wind } from './sound';
 
 /** How long one tick lasts at speed 1. */
 export const TICK_MS = 400;
@@ -911,6 +913,10 @@ class LevelScene extends Phaser.Scene {
     // the air with the program playing.
     const wind = this.wind.blowing ? 'on' : 'off';
     if (this.parentNode.dataset.wind !== wind) this.parentNode.dataset.wind = wind;
+    // The landing's wind (D255): near while its approach is planned, down while it falls.
+    const landing = this.wind.landing;
+    if (landing === null) delete this.parentNode.dataset.landing;
+    else if (this.parentNode.dataset.landing !== landing) this.parentNode.dataset.landing = landing;
     // The thought's cloud on the page, for the tests to hold it clear of the goals box.
     const cloud = this.speech.thoughtBox();
     const onPage = cloud && this.onPage(new Phaser.Geom.Rectangle(cloud.left, cloud.top, cloud.right - cloud.left, cloud.bottom - cloud.top));
@@ -1029,7 +1035,8 @@ class LevelScene extends Phaser.Scene {
     this.untied.clear();
     this.through.length = 0;
     for (const sprite of [...this.flyers.keys()]) this.land(sprite, true);
-    this.wind.stop(WIND_CUT);
+    // A restart cuts all of the wind, a landing that falls too (D255).
+    this.wind.stop(WIND_CUT, true);
     this.countGusts(0);
     this.raceBand(0, [], true);
     for (const id of [...this.revealed.keys()]) this.unreveal(id);
@@ -1305,11 +1312,21 @@ class LevelScene extends Phaser.Scene {
       } else this.showActor(event, instant);
     }
     this.raceBand(tick, events, instant);
+    this.nearLanding(instant);
     if (this.options.story) {
       this.frameStory(events);
       this.view.keep();
     } else this.view.hold(this.wizardTile);
     this.publish();
+  }
+
+  /** The landing near (D255): at a tick shown while the program plays, the wizard in the
+   * air, the time to its next landing, whoever orders it; within LAND_NEAR, the wind's
+   * rest rises to the landing, drawn again at every such tick from the level it has. */
+  private nearLanding(instant: boolean): void {
+    if (instant || this.playback.state !== 'playing' || !this.inAir(this.wizard)) return;
+    const ms = this.playback.timeTo((event) => event.kind === 'land' && String(event.data.id ?? event.actor) === 'wizard');
+    if (ms !== null && ms / 1000 <= LAND_NEAR) this.wind.near(ms / 1000);
   }
 
   /** The wizard's figure, or an actor's, by its id. */
@@ -1402,17 +1419,15 @@ class LevelScene extends Phaser.Scene {
     if (instant || this.playback.state !== 'playing') return;
     if (step > 1 && this.wind.blowing) return;
     this.wind.gust(((steps - step + 1) * this.playback.tickDuration * FLOWN) / 1000);
-    this.playedSounds.push('wind');
-    if (this.playedSounds.length > SOUNDS_KEPT) this.playedSounds.shift();
-    this.parentNode.dataset.sounds = this.playedSounds.join(',');
+    this.heard('wind');
   }
 
   /** A figure set down where it is (D185, D244): it comes down from where it is over
    * LIFT_MS, in its flying frame, and stands facing the way it flew once its feet are on
    * its cell (touchDown), or at once where it is shown at once. The wizard coming down
    * shows no frame of the cast that set it down: from its flying frame it stands. For
-   * the wizard, its sound is heard (D253), whoever ordered the landing; a gust that sounds
-   * falls as planned. */
+   * the wizard, whoever ordered the landing, the wind is switched off (D255), said as
+   * `set_down` among data-sounds; a gust that sounds falls as planned. */
   private land(sprite: Phaser.GameObjects.Sprite, instant: boolean): void {
     const flying = this.flyers.get(sprite);
     if (!flying) return;
@@ -1421,7 +1436,10 @@ class LevelScene extends Phaser.Scene {
       this.riseTo(flying, 0, false);
       if (sprite === this.wizard) this.dropPartFrames();
     } else return;
-    if (sprite === this.wizard && !instant) this.playSound('set_down');
+    if (sprite === this.wizard && !instant) {
+      this.wind.land();
+      this.heard('set_down');
+    }
   }
 
   /** A flyer's rise sent toward `to` from where it is, over LIFT_MS at the playback's
@@ -1681,6 +1699,12 @@ class LevelScene extends Phaser.Scene {
   /** A sound of the scene played (sfx.ts), and said on data-sounds. */
   private playSound(name: EffectName, pitch = 1): void {
     play(name, pitch);
+    this.heard(name);
+  }
+
+  /** A sound named among data-sounds, muted or not: an effect, a gust (`wind`) or the
+   * wind switched off at a landing (`set_down`). */
+  private heard(name: string): void {
     this.playedSounds.push(name);
     if (this.playedSounds.length > SOUNDS_KEPT) this.playedSounds.shift();
     this.parentNode.dataset.sounds = this.playedSounds.join(',');

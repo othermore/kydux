@@ -6,7 +6,8 @@
 // where the wizard can fly every tick does, a walked step there taking three (D225),
 // so that a walk is seen as anywhere else and a flight three times as fast. What happens
 // before the first tick, a hidden thing found by the first line (D184), is played
-// with the first tick. It knows nothing of Phaser: the scene listens to it and
+// with the first tick. It says how long it is to the first tick ahead that holds an
+// event asked for (timeTo, D255). It knows nothing of Phaser: the scene listens to it and
 // draws.
 
 import type { WorldEvent } from '../runtime/protocol';
@@ -26,6 +27,25 @@ const HANDS = new Set(['cast', 'pick_up', 'untie']);
 export function lengthOf(events: PlaybackEvent[], pace = 1): number {
   if (events.some((event) => event.actor === 'wizard' && HANDS.has(event.kind))) return LONG;
   return flownTick(events) ? FLOWN : pace;
+}
+
+/** How long, against a tick, from the start of the tick at `from` (an index of `ticks`)
+ * to the start of the first tick after it that holds an event `wanted`: the lengths of
+ * the ticks between, as they are played (lengthOf, with the pace); null where no tick
+ * ahead holds one (D255). */
+export function ticksTo(
+  ticks: readonly PlaybackEvent[][],
+  from: number,
+  wanted: (event: PlaybackEvent) => boolean,
+  pace = 1,
+): number | null {
+  let length = 0;
+  for (let index = from; index < ticks.length; index += 1) {
+    const events = ticks[index] ?? [];
+    if (index > from && events.some(wanted)) return length;
+    length += lengthOf(events, pace);
+  }
+  return null;
 }
 
 export type PlaybackState = 'idle' | 'playing' | 'paused' | 'done';
@@ -148,6 +168,14 @@ export class Playback {
       for (const listener of this.tickListeners) listener(this.current, events, true);
     }
     this.setState('paused');
+  }
+
+  /** How long, in milliseconds at the speed now, from the start of the tick that plays
+   * to the start of the first tick ahead that holds an event `wanted`; null where none
+   * does (D255). */
+  timeTo(wanted: (event: PlaybackEvent) => boolean): number | null {
+    const ticks = ticksTo(this.ticks, Math.max(0, this.current - 1), wanted, this.pace);
+    return ticks === null ? null : ticks * this.tickDuration;
   }
 
   /** From the next tick on. */

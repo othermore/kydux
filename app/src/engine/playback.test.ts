@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState } from './playback';
+import { FLOWN, LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState, ticksTo } from './playback';
 
 function events(n: number): PlaybackEvent[] {
   return Array.from({ length: n }, (_, i) => ({
@@ -224,5 +224,55 @@ describe('Playback', () => {
     off();
     playback.play();
     expect(seen).toEqual([0]);
+  });
+});
+
+describe('the time to an event ahead (D255)', () => {
+  const at = (tick: number, kind: string, data: Record<string, unknown> = {}, actor = 'wizard'): PlaybackEvent => ({
+    tick,
+    actor,
+    kind,
+    data,
+    line: 1,
+  });
+  // A cast that lifts, two flown cells, a cast that lands.
+  const flight = [
+    at(1, 'cast'),
+    at(1, 'fly', { id: 'wizard' }, 'broom'),
+    at(2, 'move', { flying: true }),
+    at(3, 'move', { flying: true }),
+    at(4, 'cast'),
+    at(5, 'land', { id: 'wizard' }, 'broom'),
+  ];
+  const landing = (event: PlaybackEvent) => event.kind === 'land';
+
+  it("counts the ticks between, a flown cell a third and a cast's tick LONG, from the start of the tick that plays", () => {
+    const playback = new Playback({ tickMs: 400 });
+    playback.load(flight);
+    const ticks = Array.from({ length: 5 }, (_, i) => flight.filter((event) => event.tick === i + 1));
+    expect(ticksTo(ticks, 0, landing)).toBeCloseTo(LONG + 2 * FLOWN + LONG, 12);
+    expect(ticksTo(ticks, 2, landing)).toBeCloseTo(FLOWN + LONG, 12);
+    playback.play();
+    // The lift's tick plays: from its start to the landing's tick.
+    expect(playback.timeTo(landing)).toBeCloseTo((LONG + 2 * FLOWN + LONG) * 400, 9);
+    playback.pause();
+  });
+
+  it('is counted at the speed now', () => {
+    const playback = new Playback({ tickMs: 400 });
+    playback.load(flight);
+    playback.setSpeed(4);
+    playback.play();
+    expect(playback.timeTo(landing)).toBeCloseTo(((LONG + 2 * FLOWN + LONG) * 400) / 4, 9);
+    playback.pause();
+  });
+
+  it('is nothing where no tick ahead holds the event', () => {
+    const playback = new Playback({ tickMs: 400 });
+    playback.load(flight.slice(0, 4));
+    playback.play();
+    expect(playback.timeTo(landing)).toBeNull();
+    expect(ticksTo([], 0, landing)).toBeNull();
+    playback.pause();
   });
 });

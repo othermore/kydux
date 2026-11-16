@@ -651,6 +651,99 @@ test.describe('the lift and the landing (D244)', () => {
   });
 });
 
+/** Every moment data-landing, the state, data-flying or the gusts change, with the tick
+ * then (D255). */
+async function watchLanding(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const node = document.querySelector('#scene') as HTMLElement;
+    const seen: string[] = [];
+    (window as unknown as { landings: string[] }).landings = seen;
+    const note = () => {
+      const set = node.dataset;
+      seen.push([set.tick ?? '', set.landing ?? '', set.state ?? '', set.flying ?? '', set.windGusts ?? '0'].join('|'));
+    };
+    new MutationObserver(note).observe(node, {
+      attributes: true,
+      attributeFilter: ['data-landing', 'data-state', 'data-flying', 'data-wind-gusts'],
+    });
+  });
+}
+
+type Landing = { tick: number; landing: string; state: string; flying: string; gusts: number };
+async function landingsSeen(page: Page): Promise<Landing[]> {
+  const seen = await page.evaluate(() => (window as unknown as { landings: string[] }).landings);
+  return seen.map((line) => {
+    const [tick, landing, state, flying, gusts] = line.split('|');
+    return { tick: Number(tick), landing: landing ?? '', state: state ?? '', flying: flying ?? '', gusts: Number(gusts) };
+  });
+}
+
+/** El primer vuelo's own program: the approach from the lift's tick, the wind switched off
+ * at the landing, and nothing after it; set_down said once (D255). */
+async function landsAsTheWindSwitchedOff(page: Page): Promise<void> {
+  await watchLanding(page);
+  expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
+  await expect(scene(page)).not.toHaveAttribute('data-landing', /./, { timeout: ciTimes(5_000) });
+  const seen = await landingsSeen(page);
+  const lift = seen.find((one) => one.flying.includes('wizard'));
+  const near = seen.find((one) => one.landing === 'near');
+  expect(near?.tick).toBe(lift?.tick);
+  const down = seen.findIndex((one) => one.landing === 'down');
+  expect(down).toBeGreaterThan(seen.indexOf(near as Landing));
+  expect(seen.slice(down).some((one) => one.landing === '')).toBe(true);
+  const sounds = ((await scene(page).getAttribute('data-sounds')) ?? '').split(',');
+  expect(sounds.filter((sound) => sound === 'set_down')).toHaveLength(1);
+}
+
+test.describe('the landing as the wind switched off (D255)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("El primer vuelo: near from the lift's tick, down at the landing, none after it", async ({ page }) => {
+    await open(page, 'the-first-flight', '1');
+    await landsAsTheWindSwitchedOff(page);
+  });
+
+  test("Los aros' own program: no approach at its first gusts, and the landing falls with the run done", async ({
+    page,
+  }) => {
+    await open(page, 'the-rings', '4');
+    await watchLanding(page);
+    await start(page, wrong('the-rings', 'the_given_program'));
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
+    const seen = await landingsSeen(page);
+    const first = seen.find((one) => one.gusts >= 1);
+    expect(first?.landing).toBe('');
+    expect(seen.some((one) => one.state === 'done' && one.landing === 'down')).toBe(true);
+  });
+
+  test('Stop in an approach takes it away at once, the wizard still in the air', async ({ page }) => {
+    await open(page, 'the-first-flight', '1');
+    await start(page, solution('the-first-flight'));
+    await expect(scene(page)).toHaveAttribute('data-landing', 'near', { timeout: ciTimes(60_000) });
+    await page.locator('#stop').click();
+    await expect(scene(page)).not.toHaveAttribute('data-landing', /./, { timeout: 500 });
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
+  });
+
+  test('the slider on a tick of a flight plans no landing', async ({ page }) => {
+    await open(page, 'the-first-flight');
+    expect(await run(page, solution('the-first-flight'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).not.toHaveAttribute('data-landing', /./, { timeout: ciTimes(5_000) });
+    await page.locator('#timeline').fill('27');
+    await expect(scene(page)).toHaveAttribute('data-flying', 'wizard');
+    await page.waitForTimeout(500);
+    await expect(scene(page)).not.toHaveAttribute('data-landing', /./);
+  });
+
+  test('with the sound off in the settings, the same', async ({ page }) => {
+    await page.goto('/#settings');
+    await page.locator('#settings-sound').selectOption('off');
+    await open(page, 'the-first-flight', '1');
+    await landsAsTheWindSwitchedOff(page);
+  });
+});
+
 /** A flight that hovers: the wizard walks to the broom, lifts, flies two cells and waits
  * in the air for sixty ticks, eight seconds at speed 1 (D235, D236, D242). */
 const HOVERING = 'wizard.move_right(8)\nwizard.cast("drevo")\nwizard.move_right(2)\nwizard.wait(60)\n';

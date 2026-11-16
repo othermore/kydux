@@ -13,11 +13,15 @@
 // wind with the effects. While it sounds it keeps the sound context awake (D231).
 // Nothing is read back from a node (D252): the wind keeps the points it last gave the
 // sound's clock for each param it plans, and the rest's curves, and counts from them the
-// level a gust taken on, a drop and the rest start from (levelAt, curveAt).
+// level a gust taken on, a drop and the rest start from (levelAt, curveAt). The landing is
+// the wind switched off (D255): the rest rises on a straight line over the flight's last
+// LAND_NEAR seconds (near), and at the landing (land) its band glides down while it
+// narrows and its level falls to nothing; the scene asks for both.
 //
 //   noise (2 s, looped) ─┬→ bandpass (Q 1.1) → lowpass → gust ──────→ air ─────┐
 //                        ├→ bandpass (Q 12) → whistle level ────────→ whistle ─┼→ out → speakers
 //                        └→ bandpass at 300 Hz → rest level ────────→ rest ────┘
+//                           (glides to 90 Hz, Q 5, at a landing)
 
 import { audio, isMuted, keepAwake, noise, wake } from './sfx';
 
@@ -42,6 +46,17 @@ const REST_HERTZ = 300;
 export const REST_LEVEL = 0.006;
 const REST_FALL = 0.05;
 const REST_RISE = 0.2;
+/** The landing as the wind switched off (D255), the owner's numbers: the rest rises on a
+ * straight line to LAND_LEVEL over the flight's last LAND_NEAR seconds; at the landing,
+ * over LAND_FALL seconds, its band glides down to LAND_HERTZ, its Q goes to LAND_Q over
+ * the fall's first half, and its level falls on a straight line to nothing. A landing
+ * with no approach behind it comes up to LAND_LEVEL in LAND_UP first. */
+export const LAND_NEAR = 1.5;
+export const LAND_LEVEL = 0.11;
+export const LAND_FALL = 1.5;
+export const LAND_HERTZ = 90;
+export const LAND_Q = 5;
+const LAND_UP = 0.1;
 
 /** A point of a gust's level in time: `at` seconds from its start. */
 export interface GustPoint {
@@ -161,6 +176,7 @@ export interface WindGraph {
   gust: GainNode;
   whistleBand: BiquadFilterNode;
   whistleLevel: GainNode;
+  restBand: BiquadFilterNode;
   restLevel: GainNode;
   air: GainNode;
   whistle: GainNode;
@@ -216,7 +232,13 @@ export class Wind {
    * clock's own seconds, and the rest's level's curve (D252): what the wind counts its
    * levels from. Empty while no sound is made. */
   private planned: Record<Planned, GustPoint[]> = { gust: [], air: [], whistle: [], whistleLevel: [] };
-  private restCurve: Curve | null = null;
+  /** The rest's level as last given to the clock: a curve toward its targets, or a line
+   * (an approach, a landing, a cut). */
+  private restPlan: { curve: Curve } | { line: GustPoint[] } | null = null;
+  /** The landing (D255): `near` while its approach is planned, `down` while it falls,
+   * until `downEnds` on the page's clock. */
+  private landingNow: 'near' | 'down' | null = null;
+  private downEnds = 0;
 
   constructor(private readonly random: () => number = Math.random) {}
 
@@ -224,6 +246,14 @@ export class Wind {
    * where no sound is made. */
   get blowing(): boolean {
     return Date.now() < this.gustEnds;
+  }
+
+  /** The landing (D255): `near` while its approach is planned, `down` while the wind is
+   * switched off, null at any other time; by the page's own count where no sound is
+   * made too. */
+  get landing(): 'near' | 'down' | null {
+    if (this.landingNow === 'down' && Date.now() >= this.downEnds) this.landingNow = null;
+    return this.landingNow;
   }
 
   /** A gust for a command of `seconds`, given whole to the sound's clock; one that
@@ -262,6 +292,10 @@ export class Wind {
   /** The wizard hovers with the program playing, or not: the rest is heard while it does
    * and no gust sounds, where its mix is on. */
   rest(on: boolean): void {
+    // Asked for again, a lift right after a landing, it ends the landing; asked for no
+    // more, it ends an approach (D255).
+    if (on && this.landing === 'down') this.endLanding();
+    if (!on && this.landingNow === 'near') this.landingNow = null;
     this.resting = on;
     if (on) winds.add(this);
     this.settle();
@@ -299,9 +333,94 @@ export class Wind {
 
   /** All of it stopped: the gust dropped in `seconds`, 0.15 when the program stops
    * playing and 0.02 at a restart, and the rest asked for no more. */
-  stop(seconds: number): void {
+  stop(seconds: number, cut = false): void {
     this.resting = false;
+    // It ends an approach; a landing that falls is heard to its end, but where all is cut,
+    // a restart (D255).
+    if (this.landingNow === 'near') this.landingNow = null;
+    const landing = cut && this.landing === 'down';
+    if (landing) this.endLanding();
     this.drop(seconds);
+    const ctx = audio();
+    if (landing && this.graph && ctx) {
+      const now = ctx.currentTime;
+      const from = this.restValue(now);
+      holdAt(this.graph.restLevel.gain, from, now);
+      this.graph.restLevel.gain.linearRampToValueAtTime(0, now + Math.max(0.01, seconds));
+      this.restPlan = {
+        line: [
+          { at: now, level: from },
+          { at: now + Math.max(0.01, seconds), level: 0 },
+        ],
+      };
+    }
+  }
+
+  /** The landing near (D255): the rest's level from the value counted, on a straight
+   * line, to LAND_LEVEL in `seconds`, 0.05 at least, drawn again at each call. The sound
+   * is made where it is not, as the rest asks it. */
+  near(seconds: number): void {
+    if (this.landing === 'down') this.endLanding();
+    this.landingNow = 'near';
+    winds.add(this);
+    if (mixOf('rest') > 0) this.sound();
+    const ctx = audio();
+    if (this.graph && ctx) {
+      const now = ctx.currentTime;
+      const end = now + Math.max(0.05, seconds);
+      const from = this.restValue(now);
+      holdAt(this.graph.restLevel.gain, from, now);
+      this.graph.restLevel.gain.linearRampToValueAtTime(LAND_LEVEL, end);
+      this.restPlan = {
+        line: [
+          { at: now, level: from },
+          { at: end, level: LAND_LEVEL },
+        ],
+      };
+    }
+    this.settle();
+  }
+
+  /** The landing (D255): the wind switched off, from the level counted. The rest's band
+   * glides down to LAND_HERTZ over LAND_FALL, narrowing to LAND_Q over its first half, and
+   * its level falls on a straight line to nothing; after it the band and its Q are the
+   * rest's again. Where the level counted is under LAND_LEVEL, there being no approach
+   * behind it, it comes up to it in LAND_UP first. The rest is asked for no more. */
+  land(): void {
+    this.resting = false;
+    if (mixOf('rest') > 0) this.sound();
+    const ctx = audio();
+    let up = LAND_UP;
+    if (this.graph && ctx) {
+      const now = ctx.currentTime;
+      const from = this.restValue(now);
+      up = from < LAND_LEVEL ? LAND_UP : 0;
+      const start = now + up;
+      const end = start + LAND_FALL;
+      const { restLevel, restBand } = this.graph;
+      holdAt(restLevel.gain, from, now);
+      const line: GustPoint[] = [{ at: now, level: from }];
+      if (up > 0) {
+        restLevel.gain.linearRampToValueAtTime(LAND_LEVEL, start);
+        line.push({ at: start, level: LAND_LEVEL });
+      }
+      restLevel.gain.linearRampToValueAtTime(0, end);
+      line.push({ at: end, level: 0 });
+      this.restPlan = { line };
+      // The band and its Q from the rest's own values, which the wind knows.
+      holdAt(restBand.frequency, REST_HERTZ, now);
+      if (up > 0) restBand.frequency.setValueAtTime(REST_HERTZ, start);
+      restBand.frequency.exponentialRampToValueAtTime(LAND_HERTZ, end);
+      restBand.frequency.setValueAtTime(REST_HERTZ, end + 0.02);
+      holdAt(restBand.Q, AIR_Q, now);
+      if (up > 0) restBand.Q.setValueAtTime(AIR_Q, start);
+      restBand.Q.linearRampToValueAtTime(LAND_Q, start + LAND_FALL / 2);
+      restBand.Q.setValueAtTime(AIR_Q, end + 0.02);
+      wake(ctx, up + LAND_FALL + 0.1);
+    }
+    this.landingNow = 'down';
+    this.downEnds = Date.now() + (up + LAND_FALL) * 1000;
+    this.settle();
   }
 
   /** The mix's gains as windMix has them, at once. */
@@ -321,22 +440,42 @@ export class Wind {
    * while a gust sounds or it is not asked for, and while it is asked for, there again
    * when the gust has fallen. */
   private restLevel(graph: WindGraph, now: number): void {
+    // An approach or a landing keeps the level as it is planned (D255).
+    if (this.landing !== null) return;
     const level = graph.restLevel.gain;
     const gust = Math.max(0, this.gustEnds - Date.now()) / 1000;
-    // From the value its last curve has now (D252), toward its targets.
-    const from = this.restCurve ? curveAt(this.restCurve, now) : 0;
+    // From the value its last plan has now (D252), toward its targets.
+    const from = this.restValue(now);
     holdAt(level, from, now);
     const targets: Curve['targets'][number][] = [];
     if (!this.resting || gust > 0) targets.push({ level: 0, at: now, constant: REST_FALL });
     if (this.resting) targets.push({ level: REST_LEVEL, at: now + gust, constant: REST_RISE });
     for (const target of targets) level.setTargetAtTime(target.level, target.at, target.constant);
-    this.restCurve = { from, at: now, targets };
+    this.restPlan = { curve: { from, at: now, targets } };
+  }
+
+  /** The rest's level at a moment, counted from what was last given to the clock, a
+   * curve or a line; 0 with none, as its node is made (D252). */
+  private restValue(at: number): number {
+    if (!this.restPlan) return 0;
+    return 'curve' in this.restPlan ? curveAt(this.restPlan.curve, at) : levelAt(this.restPlan.line, at);
+  }
+
+  /** A landing that falls ended: its band and Q the rest's again at once; the level is
+   * taken on from the value counted by what follows (D255). */
+  private endLanding(): void {
+    this.landingNow = null;
+    const ctx = audio();
+    if (!this.graph || !ctx) return;
+    const now = ctx.currentTime;
+    holdAt(this.graph.restBand.frequency, REST_HERTZ, now);
+    holdAt(this.graph.restBand.Q, AIR_Q, now);
   }
 
   /** What the wind keeps of its plans, let go: no sound, nothing counted. */
   private forget(): void {
     this.planned = { gust: [], air: [], whistle: [], whistleLevel: [] };
-    this.restCurve = null;
+    this.restPlan = null;
   }
 
   /** A planned param's level at a moment, counted from the points it was last given;
@@ -390,6 +529,7 @@ export class Wind {
       gust,
       whistleBand,
       whistleLevel: whistleLevelNode,
+      restBand,
       restLevel: restLevelNode,
       air,
       whistle,
@@ -404,12 +544,18 @@ export class Wind {
   private settle(): void {
     if (this.quiet) clearTimeout(this.quiet);
     this.quiet = null;
-    const heard = this.resting && mixOf('rest') > 0;
-    if (!this.graph && !this.resting) winds.delete(this);
+    // An approach keeps the sound, and a landing until it has fallen (D255).
+    const heard = (this.resting && mixOf('rest') > 0) || this.landing === 'near';
+    if (!this.graph && !this.resting && this.landing === null) winds.delete(this);
     if (heard || !this.graph) return;
+    const until = Math.max(this.gustEnds, this.landing === 'down' ? this.downEnds : 0);
     this.quiet = setTimeout(
       () => {
         this.quiet = null;
+        if (this.landing !== null) {
+          this.settle();
+          return;
+        }
         if (this.blowing || (this.resting && mixOf('rest') > 0) || !this.graph) return;
         const graph = this.graph;
         this.graph = null;
@@ -419,7 +565,7 @@ export class Wind {
         keepAwake(this, false);
         if (!this.resting) winds.delete(this);
       },
-      Math.max(0, this.gustEnds - Date.now()) + 200,
+      Math.max(0, until - Date.now()) + 200,
     );
   }
 }

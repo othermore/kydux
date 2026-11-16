@@ -694,7 +694,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     in `sprint-48.md`, the way each figure faces kept by the scene and never read from a
     frame (D241), a figure in the air hovering whenever it is seen, after Stop too
     (D242), the broom's wind as a gust for each flown command (D243), a lift and a
-    landing seen and heard, whoever orders them (D244), a thought with no room above
+    landing seen and heard, whoever orders them (D244; the landing heard as the wind
+    that rises as the ground nears and is switched off, D255), a thought with no room above
     beside the head (D245), a tip that comes up with its picture (D246), and a run's
     end that sounds when the run ends (D247).
 5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:

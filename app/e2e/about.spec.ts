@@ -1,7 +1,8 @@
 // The welcome page and the page's look (D193): #about in both languages with its
-// painting, its three pictures of the game and Play; the start screen before a wizard is
-// made shows what Kydux is; a button is drawn in the look's moss green; the header has
-// the mark and the link; the map's chapters have their cards, a locked one greyed.
+// painting, for whom, its three pictures of the game in their order and Play; the start
+// screen before a wizard is made shows what Kydux is; a button is drawn in the look's
+// moss green; the header has the mark and the link; the map's chapters have their cards,
+// a locked one greyed.
 
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
@@ -15,9 +16,9 @@ async function picturesShown(page: Page): Promise<void> {
   }
 }
 
-for (const [locale, title, play] of [
-  ['es-ES', 'Qué es Kydux', 'Empieza a jugar'],
-  ['en-US', 'What Kydux is', 'Start playing'],
+for (const [locale, title, play, parts] of [
+  ['es-ES', 'Qué es Kydux', 'Empieza a jugar', ['El juego.', 'La historia.', 'Las lecciones.']],
+  ['en-US', 'What Kydux is', 'Start playing', ['The game.', 'The story.', 'The lessons.']],
 ] as const) {
   test.describe(`the welcome page in ${locale}`, () => {
     test.use({ locale, viewport: { width: 1280, height: 800 } });
@@ -27,6 +28,9 @@ for (const [locale, title, play] of [
       await expect(page).toHaveURL(/#about$/);
       await expect(page.locator('#about-what h3')).toHaveText(title);
       await expect(page.locator('#about-play')).toHaveText(play);
+      // How it is played: the game first, then its story, then its lessons (D193).
+      await expect(page.locator('#about-how figcaption strong')).toHaveText([...parts]);
+      await expect(page.locator('#about-who p')).toContainText(locale === 'es-ES' ? 'a partir de ocho años' : 'from eight years old');
       await picturesShown(page);
       await page.screenshot({ path: `e2e/shots/about-${locale}.png`, fullPage: true });
       await expect(page.locator('#about-play-end')).toHaveText(play);

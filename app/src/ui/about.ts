@@ -1,7 +1,7 @@
-// The welcome page, #about (D193): what Kydux is, for whom, how it is played (a story, a
-// lesson and a level, each with a picture of the game), that it is free software of the
-// Kidux family, and a big button to play. Its hero is a painting of Arvelia on its hill
-// above the lake at dusk. A first visit opens on it, and its Start playing begins the
+// The welcome page, #about (D193): what Kydux is, for whom, how it is played (the game,
+// its story and its lessons, each with a picture of the game), that it is free software
+// of the Kidux family, and a big button to play. Its hero is a painting of Arvelia on its
+// hill above the lake at dusk. A first visit opens on it, and its Start playing begins the
 // story (D61); a child who has played goes back to the start screen from it. The start
 // screen shows its first part to a child with no wizard yet.
 
@@ -11,7 +11,7 @@ import type { Screen } from './screen';
 
 /** The languages the pictures of the game were taken in; another reads the English ones. */
 const PICTURED = ['en', 'es'];
-const PARTS = ['story', 'lesson', 'level'] as const;
+const PARTS = ['level', 'story', 'lesson'] as const;
 
 function picture(name: string): string {
   return `${import.meta.env.BASE_URL}about/${name}`;

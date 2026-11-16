@@ -1477,7 +1477,34 @@ a.stop-body:focus-visible {
 }
 
 .themes-list code {
-  min-width: 10em;
+  min-width: 12em;
+}
+
+/* The voices of the theme that plays (D203): a box, a name, a slider and its volume. */
+.themes-mixer {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.themes-mixer li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.themes-mixer label {
+  min-width: 14em;
+}
+
+.themes-mixer input[type='range'] {
+  flex: 1;
+}
+
+.themes-volume {
+  min-width: 3em;
+  font-family: var(--mono);
 }
 
 .settings-sample {

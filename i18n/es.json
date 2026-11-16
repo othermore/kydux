@@ -523,7 +523,11 @@
       "title": "Los temas de la música",
       "full": "Entero",
       "quiet": "Suave",
-      "playing": "Suena: {theme}, {arrangement}"
+      "playing": "Suena: {theme}, {arrangement}",
+      "voices": "Sus instrumentos",
+      "reset": "Como está escrito",
+      "off": "apagado",
+      "unchanged": "todos los instrumentos como están escritos"
     },
     "zone": "Zona"
   },

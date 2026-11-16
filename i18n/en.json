@@ -523,7 +523,11 @@
       "title": "The music's themes",
       "full": "Full",
       "quiet": "Quiet",
-      "playing": "Playing: {theme}, {arrangement}"
+      "playing": "Playing: {theme}, {arrangement}",
+      "voices": "Its voices",
+      "reset": "As written",
+      "off": "off",
+      "unchanged": "every voice as written"
     },
     "zone": "Zone"
   },

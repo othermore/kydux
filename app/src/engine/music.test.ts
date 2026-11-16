@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { arranged, frequency, loopOf, notesBetween, readTheme, type Theme, timed } from './music';
+import { arranged, frequency, lineFor, loopOf, notesBetween, readTheme, type Theme, timed } from './music';
 
 /** A theme of two sections of one bar of 3/4 each, the second played twice. */
 function waltz(tempo: number): Theme {
@@ -62,6 +62,30 @@ describe('the music (D192)', () => {
     expect(quiet.tune).toBe(0);
     expect(quiet.bass).toBeGreaterThan(0);
     expect(quiet.bass).toBeLessThan(0.5);
+  });
+
+  it('gives a voice set by hand its volume, whether the arrangement plays it or not (D203)', () => {
+    const theme = waltz(120);
+    expect(arranged(theme, 'full', { tune: 0.2 })).toEqual({ tune: 0.2, bass: 0.5 });
+    expect(arranged(theme, 'full', { bass: 0 })).toEqual({ tune: 0.8, bass: 0 });
+    const quiet = arranged(theme, 'quiet', { tune: 0.5 });
+    expect(quiet.tune).toBeGreaterThan(0);
+    expect(quiet.tune).toBeLessThan(0.5);
+  });
+
+  it("leads a pad's note onto the line whose note is over, the nearest in pitch (D203)", () => {
+    const lines = [
+      { until: 4, pitch: 53 },
+      { until: 4, pitch: 57 },
+      { until: 6, pitch: 60 },
+    ];
+    expect(lineFor(lines, 4, 58)).toBe(1);
+    expect(lineFor(lines, 4, 52)).toBe(0);
+    // The third line's note still sounds at 4: a note there takes another line.
+    expect(lineFor(lines, 4, 60)).toBe(1);
+    expect(lineFor(lines, 6, 60)).toBe(2);
+    expect(lineFor(lines, 3, 55)).toBe(-1);
+    expect(lineFor([], 0, 60)).toBe(-1);
   });
 
   it('refuses a theme with a voice of no kind it sounds', () => {

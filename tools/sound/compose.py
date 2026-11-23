@@ -12,6 +12,7 @@ a rest, `|` the end of a bar, which must hold the metre's beats. Its harmony is 
 bar (`Dm | Bb | A7`, two in a bar split it), from which the accompaniments are made: a
 held pad led smoothly from chord to chord, a bass, a waltz's two chords after the bass,
 arpeggios, a descant of long chord notes, a bell on a bar's first beat, a soft drum.
+A section may have a tempo of its own, or go evenly from one to another (D315).
 The file the page reads holds only the notes, by section and voice.
 """
 
@@ -216,9 +217,18 @@ def shifted(notes: list[list[float]], bars: int, bar: int) -> list[list[float]]:
     return [[p, start + bars * bar, length, loud] for p, start, length, loud in notes]
 
 
-def section(name: str, bars: int, bar: int, **voices: list[list[float]]) -> dict:
+def section(
+    name: str,
+    bars: int,
+    bar: int,
+    *,
+    tempo: float | list[float] | None = None,
+    **voices: list[list[float]],
+) -> dict:
     """A section of `bars` bars of `bar` beats: its notes by voice, each rounded, and none
-    ringing past its end, so that the next section, or the loop's start, follows clean."""
+    ringing past its end, so that the next section, or the loop's start, follows clean.
+    `tempo` is its own where it is not the theme's (D315): one it keeps, or the one it
+    starts at and the one it ends at."""
     ends = bars * bar
     notes = {}
     for voice, written in voices.items():
@@ -229,7 +239,9 @@ def section(name: str, bars: int, bar: int, **voices: list[list[float]]) -> dict
             length = min(length, ends - start)
             kept.append([int(p), round(start, 4), round(length, 4), round(min(loud, 1.0), 3)])
         notes[voice] = kept
-    return {"id": name, "bars": bars, "notes": notes}
+    if tempo is None:
+        return {"id": name, "bars": bars, "notes": notes}
+    return {"id": name, "bars": bars, "tempo": tempo, "notes": notes}
 
 
 def theme(
@@ -708,10 +720,13 @@ def the_familiar() -> dict:
 
 
 # --- The truth: the year's ending, told in the tower's high hall at sunset, grave and
-# then great: the familiar's tune with the minor's own low sixth, slow in three in D
-# minor. A piano has it alone, over its left hand; the strings rise through a middle part
-# of their own to the dominant; then every voice plays the tune, which turns aside on its
-# last note and comes home two bars later (D313).
+# then great: the familiar's tune with the minor's own low sixth, in three in D minor. A
+# piano has it alone, slow, over its left hand. An organ comes in with a middle part of
+# its own over the cellos and a timpani, and the theme speeds up bar by bar as a snare,
+# the violins and a horn join it, up to the dominant. Then every voice plays the tune,
+# faster than it began, over the cellos' running eighth notes: it turns aside on its last
+# note, and its last three bars are said again twice as broad, the violins rising against
+# them, to a major chord (D313).
 
 
 def broken(
@@ -768,6 +783,19 @@ def thunder(
     ]
 
 
+def tattoo(bars: list[int], bar: int, loud: float) -> list[list[float]]:
+    """A snare's figure in three on the bars given (counted from 1): the first beat, and
+    the two halves of each beat after it, softer."""
+    return [
+        [60, (number - 1) * bar + beat, 0.25, loud * (1.0 if beat == 0 else 0.6)]
+        for number in bars
+        for beat in (0, 1, 1.5, 2, 2.5)
+    ]
+
+
+PULSE = [0, 0, 12, 0, 12, 0]
+
+
 def the_truth() -> dict:
     bar = 3
     a_chords = "Dm | Gm | Dm | A | Bb | C | Dm | A | Dm | Gm | F | C | Bb | Gm | A7 | Dm"
@@ -785,11 +813,14 @@ def the_truth() -> dict:
         "f6/2 d6 | e6/1.5 d6/0.5 c6 | c6/2 a5 | a5/1.5 g5/0.5 f5 | "
         "g5/2 bb5 | bb5/1.5 a5/0.5 g5 | d6/3 | c#6/2 e6"
     )
-    b_horn = "r/3 | " * 12 + "d4/3 | e4/3 | e4/3 | e4/2 a4"
+    b_horn = "r/3 | " * 8 + "d4/3 | e4/3 | e4/3 | f4/3 | d4/3 | e4/3 | e4/3 | e4/2 a4"
     # The tune's last note is an octave up over a chord that is not home, and its last
-    # three bars are said again to get there.
-    c_chords = a_chords.rsplit(" | ", 1)[0] + " | Bb | Gm | A7 | Dm | Dm"
-    c_tune = tune + "d6/3 | bb5/2 g5 | g5/1.5 f5/0.5 e5 | d5/3 | r/3"
+    # three bars are said again to get there, each of their notes twice as long; the
+    # violins leave the tune there and rise by step to the keynote against it.
+    c_chords = a_chords.rsplit(" | ", 1)[0] + " | Bb | Gm | Em7b5 | A7 | A | D | D"
+    c_tune = tune + "d6/3 | bb5/3 | g5/3 | g5/2 f5 | e5/3 | d5/3 | r/3"
+    c_rise = tune + "d6/3 | bb5/3 | g5/3 | a5/2 b5 | c#6/3 | d6/3 | r/3"
+    b_octaves = line(b_tune, bar, 0.7) + raised(line(b_tune, bar, 0.6), -12)
     a = harmony(a_chords, bar)
     b = harmony(b_chords, bar)
     c = harmony(c_chords, bar)
@@ -803,12 +834,15 @@ def the_truth() -> dict:
         {
             "piano": {"kind": "piano", "volume": 0.9},
             "left": {"kind": "piano", "volume": 0.7},
+            "organ": {"kind": "organ", "volume": 0.8},
+            "cellos": {"kind": "cello", "volume": 0.8},
             "violins": {"kind": "strings", "volume": 0.9},
             "horn": {"kind": "brass", "volume": 0.8},
             "flute": {"kind": "flute", "volume": 0.5},
             "strings": {"kind": "strings", "volume": 0.65},
             "bass": {"kind": "strings", "volume": 0.75},
             "drum": {"kind": "drum", "volume": 0.8},
+            "snare": {"kind": "snare", "volume": 0.6},
         },
         [
             section(
@@ -825,36 +859,75 @@ def the_truth() -> dict:
                 "b",
                 16,
                 bar,
-                violins=swelling(line(b_tune, bar, 0.62), 0, 48, 0.9, 1.3)
-                + raised(within(line(b_tune, bar, 0.6), 9, 16, bar), -12),
+                tempo=[76, 100],
+                organ=swelling(
+                    line(b_tune, bar, 0.5) + pad(b, 50, 69, 0.38, 4) + bass(b, [0], 33, 0.42, 3),
+                    0,
+                    48,
+                    0.6,
+                    1.15,
+                ),
+                cellos=swelling(
+                    bass(b[:8], [0], 36, 0.5, 3)
+                    + running(b[8:], PULSE, 36, 0.5)
+                    + bass(b, [0], 24, 0.45, 3),
+                    0,
+                    48,
+                    0.7,
+                    1.2,
+                ),
+                violins=swelling(
+                    within(b_octaves, 9, 16, bar),
+                    24,
+                    48,
+                    0.9,
+                    1.3,
+                ),
                 flute=within(line(b_tune, bar, 0.45), 9, 16, bar),
                 piano=bells(b[8:], 72, 84, 0.3),
-                left=swelling(broken(b, flowing, 0.5, 38, 0.28, 0.08), 0, 48, 0.9, 1.35),
-                horn=swelling(line(b_horn, bar, 0.45), 36, 48, 0.8, 1.4),
-                strings=swelling(pad(b, 50, 67, 0.5, 4), 0, 48, 0.85, 1.3),
-                bass=swelling(bass(b, [0], 33, 0.5, 3), 0, 48, 0.9, 1.3),
-                drum=drum(list(range(9, 17)), bar, [0], 38, 0.35)
-                + thunder(16, bar, 33, 0.2, 0.75),
+                left=swelling(broken(b, flowing, 0.5, 38, 0.28, 0.08), 0, 48, 0.9, 1.2),
+                horn=swelling(line(b_horn, bar, 0.4), 24, 48, 0.8, 1.5),
+                strings=swelling(pad(b, 50, 67, 0.5, 4), 0, 48, 0.85, 1.15),
+                bass=swelling(bass(b, [0], 33, 0.5, 3), 0, 48, 0.9, 1.15),
+                drum=swelling(
+                    bass(b[:15], [0], 33, 0.4) + bass(b[8:15], [2], 33, 0.3), 0, 48, 0.75, 1.6
+                )
+                + thunder(16, bar, 33, 0.2, 0.85, 3.0),
+                snare=tattoo(list(range(5, 9)), bar, 0.3)
+                + swelling(tattoo(list(range(9, 16)), bar, 0.45), 24, 48, 1.0, 1.5)
+                + roll([8, 16], bar, 0.6)
+                + tattoo([16], bar, 0.7)[:1],
             ),
             section(
                 "c",
-                20,
+                22,
                 bar,
-                violins=line(c_tune, bar, 0.9) + raised(line(c_tune, bar, 0.8), -12),
-                horn=raised(line(c_tune, bar, 0.65), -12),
-                piano=line(c_tune, bar, 0.55) + raised(line(c_tune, bar, 0.42), -12),
-                flute=raised(within(line(c_tune, bar, 0.45), 9, 19, bar), 12),
-                left=broken(c[:18], wide, 0.5, 38, 0.4, 0.1) + broken(c[18:], slow, 1, 38, 0.3),
-                strings=swelling(pad(c, 50, 67, 0.8, 4), 54, 60, 0.8, 0.35),
-                bass=swelling(
-                    bass(c, [0], 33, 0.8, 3) + bass(c, [0], 45, 0.5, 3), 54, 60, 0.8, 0.35
-                ),
-                drum=drum([n for n in range(1, 19) if n != 16], bar, [0], 38, 0.6)
+                tempo=100,
+                violins=line(c_rise, bar, 0.9) + raised(line(c_rise, bar, 0.8), -12),
+                horn=raised(line(c_tune, bar, 0.7), -12),
+                organ=line(c_tune, bar, 0.65)
+                + pad(c, 50, 69, 0.42, 4)
+                + bass(c, [0], 33, 0.45, 3),
+                piano=line(c_tune, bar, 0.45) + raised(line(c_tune, bar, 0.32), -12),
+                flute=raised(within(line(c_rise, bar, 0.45), 9, 21, bar), 12),
+                left=broken(c[:20], wide, 0.5, 38, 0.32, 0.1) + broken(c[20:], slow, 1, 38, 0.32),
+                cellos=running(c[:20], PULSE, 36, 0.62)
+                + bass(c[20:], [0], 36, 0.85, 3)
+                + bass(c, [0], 24, 0.6, 3),
+                strings=pad(c, 50, 67, 0.7, 4),
+                bass=bass(c, [0], 33, 0.7, 3) + bass(c, [0], 45, 0.42, 3),
+                drum=bass(c[:15], [0], 33, 0.6)
+                + bass(c[:15], [2], 33, 0.4)
                 + thunder(8, bar, 33, 0.2, 0.6)
                 + thunder(15, bar, 33, 0.3, 0.9)
-                + drum([16], bar, [0], 38, 0.95)
-                + thunder(18, bar, 33, 0.2, 0.65)
-                + drum([19], bar, [0], 38, 0.8),
+                + bass(c[15:19], [0], 33, 0.95)
+                + thunder(20, bar, 33, 0.3, 0.95, 3.0)
+                + bass(c[20:], [0], 38, 1.0),
+                snare=tattoo([n for n in range(1, 20) if n != 16], bar, 0.6)
+                + roll([8, 15], bar, 0.7)
+                + tattoo([16], bar, 0.9)[:1]
+                + [[60, 19 * bar + k * 0.25, 0.25, 0.4 + 0.05 * k] for k in range(12)]
+                + tattoo([21, 22], bar, 1.0)[::5],
             ),
         ],
         ["a", "b", "c"],

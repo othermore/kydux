@@ -2880,12 +2880,13 @@ one overturns stays, marked as superseded.
   theme is a file `content/music/<id>.json`: its tempo, its metre, its one set of voices
   (D210), and its sections of notes (pitch, start, length, loudness), which follow one
   another in their `order` and loop without a seam, no note ringing past its section's
-  end. The page plays it with Web Audio (`engine/music.ts`): voices of nine kinds, a
+  end. The page plays it with Web Audio (`engine/music.ts`): voices of eleven kinds, a
   celesta's bell, a bowed string pad, a plucked string, a harp, a flute, a piano's struck
-  tone (D209), a horn and a march's snare (D213) and a soft drum, each an oscillator or
-  two or a burst of noise with an envelope, the pad on lines that sound on from a note to
-  the next (D203), through a reverb whose impulse is decaying noise; the notes are
-  scheduled a third of a second ahead on the audio clock; no sound file is loaded. A
+  tone (D209), a horn, a march's snare (D213), a soft drum, an organ's pipes and a cello's
+  stroke of the bow (D315), each a few oscillators or a burst of noise with an envelope,
+  the pad on lines that sound on from a note to the next (D203), through a reverb whose
+  impulse is decaying noise; the notes are scheduled a third of a second ahead on the
+  audio clock; no sound file is loaded. A
   chapter's `chapter.json` names its theme (`music`), which the
   course carries; a story, the map and the start screen play their chapter's theme at its
   written loudness, a lesson and a level every voice of it at 0.4 (D210), the map and the
@@ -4956,22 +4957,31 @@ one overturns stays, marked as superseded.
   intensa y dramática y que te deje el recuerdo (puede ser la misma canción en una
   versión más dramática e intensa, o una nueva canción)*; *en la parte de historia que
   hace el cierre de todo lo que has aprendido, podemos volver a la anterior, a la del
-  familiar, que es más alegre*). It is the familiar's theme made grave and then great, so
-  that the child knows the tune and hears what it has become: the first flute's tune with
-  the minor's own low sixth in the place of the raised one, in three in D minor, at 76
-  beats a minute, 52 bars in three parts. In the first a piano has the tune alone, an
-  octave under the flute's, over its left hand, a note a beat, and the low strings come
-  in under it at its second half. In the middle part the violins rise on a tune of their
-  own to the dominant, the piano's left hand running in eighth notes, a flute and a horn
-  joining them, a timpani's roll at its end. In the last every voice plays the tune, the
-  violins in octaves, the horn under them, the timpani on every bar; its last note is an
-  octave up over a chord that is not home, its last three bars are said again to get
-  there, and a quiet bar leads back to the piano alone. It starts quieter than the
-  familiar's theme and is louder than it at its height. It is made as the others are
-  (D192): the same kinds of voices, the score in `tools/sound/compose.py`, sections that
-  loop without a seam; it is no chapter's theme, and a test holds it to its tune, its
-  piano alone and its last part. Rules out a tune or a harmony taken from any other work
-  (D192).
+  familiar, que es más alegre*; *me gustaría que empezase así pero subiese el ritmo y la
+  intensidad […] entrar un órgano y algo de percusión... para darle intensidad y hacerla
+  más apoteósica*). It is the familiar's theme made grave and then great, so that the
+  child knows the tune and hears what it has become: the first flute's tune with the
+  minor's own low sixth in the place of the raised one, in three in D minor, 54 bars in
+  three parts, a minute and fifty seconds. The first part is at 76 beats a minute: a
+  piano has the tune alone, an octave under the flute's, over its left hand, a note a
+  beat, and the low strings come in under it at its second half. The middle part speeds
+  up evenly from 76 to 100 (D315) and grows louder as it does: an organ comes in on a
+  tune of its own, over its chords and a low pedal, with the cellos and the double basses
+  under it and a timpani on every bar, the piano's left hand running in eighth notes; a
+  snare joins at its fifth bar; from its ninth the violins take the organ's tune up in
+  octaves with a flute, a horn under them, and the cellos go in eighth notes; a timpani's
+  and a snare's roll on the dominant end it. The last part keeps 100: every voice plays
+  the tune, the violins in octaves, the organ, the horn and the piano with them, over the
+  cellos' eighth notes, the timpani and the snare. Its last note is an octave up over a
+  chord that is not home; its last three bars are then said again twice as broad, the
+  violins and the flute rising against the tune as it comes down, a roll under them, to a
+  chord of D major held for two bars, the second without the tune, which leads back to
+  the piano alone. It starts quieter than the familiar's theme and is over twice as loud
+  as it at its height, the organ, the cellos and the violins as loud as one another
+  there. It is made as the others are (D192): the score in `tools/sound/compose.py`,
+  sections that loop without a seam; it is no chapter's theme, a story names it (D314),
+  and a test holds it to its tune, its piano alone, its tempo and its last part. Rules
+  out a tune or a harmony taken from any other work (D192).
 - **D314 — A story may name the music it is told to.** Decided 2026-11-22 by the owner, of
   the year's ending. A story's `story.json` may say `music`, a theme of `content/music/`, at
   its top: the story opens to that theme in the place of its chapter's. A step may say
@@ -4993,3 +5003,23 @@ one overturns stays, marked as superseded.
   not a theme's id, and one inside a step's scene; a test holds every theme a story names
   to be there. Rules out a theme chosen by the page from a story's id, and a second theme
   heard at once.
+- **D315 — A section of a theme may have a tempo of its own, and an organ and a cello are
+  voices.** Decided 2026-11-22 by the owner, of *The truth* (*lo ideal es que el ritmo
+  también cambie, que empiece más lento y luego lo suba un poco*, *según nos vamos
+  acercando a la gran revelación*; *si no hay órgano, pueden entrar quizás unos de cuerda
+  […] más grandes (cello o doble bass) que los violines para que den más peso y tonos más
+  graves*). A section may say `tempo`: a number, the tempo it keeps, or `[from, to]`, the
+  one it starts at and the one it ends at, between which it goes evenly, each beat a
+  little shorter or longer than the one before it; a section that says none goes at its
+  theme's. The notes stay written in beats of their section, and the page lays the loop
+  out in beats of the theme's tempo (`placed` and `loopOf` in `engine/music.ts`): a
+  note's start and its length are those of its place in its section's time, so the
+  loop's length, the section of a moment and the slider of D312 follow, and the loop has
+  no seam. In the score, `section(..., tempo=...)` writes it. The page sounds two kinds
+  of voice more. An `organ` is six ranks of pure tones, the note's pitch and those above
+  it, none over 7000 hertz, as loud at the note's end as at its start. A `cello`, a cello
+  or a double bass, is two saw waves a few cents apart through a filter that closes: a
+  stroke of the bow for each note, where `strings` is a pad whose lines slide from a note
+  to the next (D203). The page refuses a section's tempo that is not one positive number
+  or two, and a test holds the themes to it. Rules out a tempo that changes by steps
+  inside a section, and a tempo of one voice alone.

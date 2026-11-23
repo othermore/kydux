@@ -7,6 +7,7 @@ import {
   loopSeconds,
   notesBetween,
   pianoRing,
+  placed,
   readTheme,
   sectionAt,
   sound,
@@ -167,8 +168,78 @@ describe('the music (D192)', () => {
     expect(sectionAt(theme, 4.5)).toBe('b');
   });
 
+  it('lays a section of a tempo of its own out at its pace, the loop in beats of the theme (D315)', () => {
+    // The second section twice as fast as the theme: its bar takes half the beats.
+    const base = waltz(120);
+    const theme = readTheme({
+      ...base,
+      sections: base.sections.map((section) => (section.id === 'b' ? { ...section, tempo: 240 } : section)),
+    });
+    const loop = loopOf(theme);
+    expect(loop.beats).toBe(6);
+    expect(loop.notes.filter((note) => note.pitch === 77).map((note) => [note.beat, note.length])).toEqual([
+      [3, 1.5],
+      [4.5, 1.5],
+    ]);
+    expect(loopSeconds(theme)).toBe(3);
+    expect(sectionAt(theme, 1.4)).toBe('a');
+    expect(sectionAt(theme, 1.5)).toBe('b');
+    const [first, second] = timed(theme, loop, 0, 1.5, 3).filter((note) => note.pitch === 77);
+    expect([first?.at, first?.seconds, second?.at]).toEqual([1.5, 0.75, 2.25]);
+    // A section at the theme's tempo keeps its beats to the last digit.
+    expect(placed(base, base.sections[0]!, 0.3333)).toBe(0.3333);
+  });
+
+  it('speeds a section up evenly from a tempo to another, each beat shorter than the one before (D315)', () => {
+    const base = waltz(60);
+    const section = { ...base.sections[0]!, bars: 2, tempo: [60, 120] as [number, number] };
+    const theme = readTheme({ ...base, sections: [section], order: ['a'] });
+    const at = [0, 1, 2, 3, 4, 5, 6].map((beat) => placed(theme, section, beat));
+    expect(at[0]).toBe(0);
+    const lengths = at.slice(1).map((value, index) => value - at[index]!);
+    for (const [index, length] of lengths.entries()) {
+      if (index > 0) expect(length).toBeLessThan(lengths[index - 1]!);
+    }
+    // The first beat a little shorter than a beat at 60, the last a little longer than one at 120.
+    expect(lengths[0]).toBeLessThan(1);
+    expect(lengths[0]).toBeGreaterThan(0.9);
+    expect(lengths[5]).toBeGreaterThan(0.5);
+    expect(lengths[5]).toBeLessThan(0.55);
+    // Six beats whose tempo doubles evenly last as long as six times the logarithm of two at the first tempo.
+    expect(at[6]).toBeCloseTo(6 * Math.log(2));
+    expect(loopSeconds(theme)).toBeCloseTo(6 * Math.log(2));
+    expect(loopOf(theme).beats).toBeCloseTo(6 * Math.log(2));
+    // Slowing down is the same the other way round.
+    const slowing = { ...section, tempo: [120, 60] as [number, number] };
+    expect(placed(theme, slowing, 6)).toBeCloseTo(3 * Math.log(2) * 2);
+    expect(placed(theme, slowing, 1)).toBeLessThan(placed(theme, slowing, 6) - placed(theme, slowing, 5));
+  });
+
+  it("refuses a section's tempo that is neither one nor a pair (D315)", () => {
+    const base = waltz(120);
+    const withTempo = (tempo: unknown) => ({
+      ...base,
+      sections: base.sections.map((section) => ({ ...section, tempo })),
+    });
+    expect(() => readTheme(withTempo(0))).toThrow(/tempo/);
+    expect(() => readTheme(withTempo([90]))).toThrow(/tempo/);
+    expect(() => readTheme(withTempo([90, -1]))).toThrow(/tempo/);
+    expect(() => readTheme(withTempo([90, 120]))).not.toThrow();
+  });
+
+  it("holds an organ's and a cello's note for its length (D315)", () => {
+    const ctx = fakeContext();
+    const out = ctx.createGain() as unknown as AudioNode;
+    for (const kind of ['organ', 'cello'] as const) {
+      const held = sound(ctx, kind, 50, 1, 3, 0.5, out);
+      expect(held - 1).toBeGreaterThan(3);
+      expect(held - 1).toBeLessThan(3.5);
+      expect(sound(ctx, kind, 50, 1, 0.5, 0.5, out)).toBeLessThan(held);
+    }
+  });
+
   it('refuses a theme with a voice of no kind it sounds', () => {
-    expect(() => readTheme({ ...waltz(120), voices: { tune: { kind: 'organ', volume: 1 } } })).toThrow(/no kind/);
+    expect(() => readTheme({ ...waltz(120), voices: { tune: { kind: 'kazoo', volume: 1 } } })).toThrow(/no kind/);
   });
 
   it('tunes the A above the middle C to 440 hertz', () => {

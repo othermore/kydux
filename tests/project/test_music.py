@@ -14,7 +14,19 @@ REPO = Path(__file__).resolve().parents[2]
 MUSIC = REPO / "content" / "music"
 THEMES = sorted(MUSIC.glob("*.json"))
 CHAPTERS = sorted((REPO / "content" / "chapters").glob("*/chapter.json"))
-KINDS = {"celesta", "strings", "pluck", "harp", "flute", "piano", "brass", "drum", "snare"}
+KINDS = {
+    "celesta",
+    "strings",
+    "pluck",
+    "harp",
+    "flute",
+    "piano",
+    "brass",
+    "drum",
+    "snare",
+    "organ",
+    "cello",
+}
 
 
 def compose():
@@ -74,6 +86,10 @@ def test_a_theme_parses_and_loops_on_a_bar(path):
     assert 2 <= len(sections) <= 3
     for section in sections.values():
         length = section["bars"] * beats
+        # A section's own tempo is one, or one to start at and one to end at (D315).
+        own = section.get("tempo", theme["tempo"])
+        assert all(tempo > 0 for tempo in (own if isinstance(own, list) else [own]))
+        assert not isinstance(own, list) or len(own) == 2
         for voice, notes in section["notes"].items():
             assert voice in voices
             for pitch, start, beats_long, loudness in notes:
@@ -185,10 +201,13 @@ def test_the_familiar_is_two_flutes_in_three_with_the_celesta_s_tune_in_the_midd
 
 
 def test_the_truth_is_the_familiar_s_tune_grave_from_a_piano_alone_to_every_voice():
-    """D313: slower than the familiar's theme and in three as it is; its tune is the
-    familiar's first flute's with each B a half step lower, which a piano has alone an
-    octave under it over its left hand for eight bars; every voice sounds in the last
-    part, the violins on the tune in octaves, and the last bar leaves the tune out."""
+    """D313: it starts slower than the familiar's theme and in three as it is; its tune
+    is the familiar's first flute's with each B a half step lower, which a piano has
+    alone an octave under it over its left hand for eight bars; the middle part starts at
+    that tempo, with an organ, the cellos and a timpani from its first bar, and speeds up
+    to the last part's, which is faster than the theme began and keeps it; every voice
+    sounds in the last part, the violins in octaves, the cellos in eighth notes; the tune
+    ends on the keynote over a major chord, and the last bar leaves it out."""
     theme = loaded(ENDING_THEME)
     familiar = loaded("the-familiar")
     assert theme["tempo"] < familiar["tempo"] and theme["metre"] == [3, 4]
@@ -210,10 +229,32 @@ def test_the_truth_is_the_familiar_s_tune_grave_from_a_piano_alone_to_every_voic
     }
     assert alone == {"piano", "left"}
     assert "piano" in {theme["voices"][voice]["kind"] for voice in alone}
+    # The tempo: the first part at the theme's, the middle one from it up to the last's.
+    assert "tempo" not in first
+    begins, ends = middle["tempo"]
+    assert begins == theme["tempo"] < ends == last["tempo"]
+    assert last["tempo"] <= 1.4 * theme["tempo"]
+    kinds = {voice: theme["voices"][voice]["kind"] for voice in theme["voices"]}
+    assert {"organ", "cello", "drum", "snare"} <= set(kinds.values())
+    entering = {voice for voice, notes in middle["notes"].items() if notes[0][1] == 0}
+    assert {"organ", "cello", "drum"} <= {kinds[voice] for voice in entering}
     assert set(last["notes"]) == set(theme["voices"])
     assert set(middle["notes"]) == set(theme["voices"])
     tune = {(note[1], note[0]) for note in last["notes"]["violins"]}
     assert all((start, pitch - 12) in tune or (start, pitch + 12) in tune for start, pitch in tune)
+    cellos = next(voice for voice, kind in kinds.items() if kind == "cello")
+    eighths = {note[1] for note in last["notes"][cellos] if note[2] == 0.5}
+    assert {beat / 2 for beat in range(6)} <= eighths
+    # The last chord is D major: no F natural in the last two bars, an F sharp among them.
     final = (last["bars"] - 1) * 3
+    closing = {
+        note[0] % 12
+        for voice, notes in last["notes"].items()
+        if kinds[voice] not in ("drum", "snare")
+        for note in notes
+        if note[1] >= final - 3
+    }
+    assert closing == {2, 6, 9}
     for voice in ("violins", "horn", "piano", "flute"):
         assert all(note[1] < final for note in last["notes"][voice]), voice
+        assert max(last["notes"][voice], key=lambda note: note[1])[0] % 12 == 2, voice

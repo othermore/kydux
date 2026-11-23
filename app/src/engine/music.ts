@@ -2,8 +2,10 @@
 // the page with Web Audio, as the effects are (sfx.ts): no sound file is loaded. A theme
 // is content/music/<id>.json: its tempo, its metre, its voices, each of a kind the page
 // knows how to sound (a celesta's bell, a bowed string pad, a plucked string, a harp, a
-// flute, a piano's struck tone, a horn, a soft drum, a march's snare), and its sections
-// of notes, which follow one another and loop without a seam. A theme has one set of
+// flute, a piano's struck tone, a horn, a soft drum, a march's snare, an organ's pipes,
+// a cello's stroke of the bow), and its sections of notes, which follow one another and
+// loop without a seam. A section may have a tempo of its own, or speed up or slow down
+// evenly from one tempo to another (D315). A theme has one set of
 // voices (D210): a story and the map play every one at its written loudness, a lesson
 // and a level every one, lower. The bowed pad is the body under the other voices (D203):
 // low in the mix, and one unbroken sound, each of its lines sliding from a note to the
@@ -33,6 +35,8 @@ export const VOICE_KINDS = [
   'brass',
   'drum',
   'snare',
+  'organ',
+  'cello',
 ] as const;
 export type VoiceKind = (typeof VOICE_KINDS)[number];
 
@@ -46,9 +50,15 @@ export interface Voice {
   volume: number;
 }
 
+/** A section's own tempo (D315): one it keeps, or the one it starts at and the one it
+ * ends at, between which it goes evenly, beat by beat. */
+export type SectionTempo = number | [from: number, to: number];
+
 export interface Section {
   id: string;
   bars: number;
+  /** The section's tempo where it is not the theme's (D315). */
+  tempo?: SectionTempo;
   /** Each voice's notes, by the voice's name. */
   notes: Record<string, Note[]>;
 }
@@ -107,18 +117,38 @@ function played(theme: Theme): Section[] {
   return order.flatMap((id) => byId.get(id) ?? []);
 }
 
-/** The theme's sections in their order, one after another, as one loop. */
+/** Where a beat of a section falls, counted from the section's start in beats of the
+ * theme's tempo (D315): the beat itself in a section at the theme's tempo, sooner in a
+ * faster one, later in a slower one. In a section that goes from a tempo to another the
+ * tempo changes evenly with the beats, and the time up to a beat is what every beat
+ * before it took. */
+export function placed(theme: Theme, section: Section, beat: number): number {
+  const tempo = section.tempo ?? theme.tempo;
+  const [from, to] = typeof tempo === 'number' ? [tempo, tempo] : tempo;
+  const beats = section.bars * theme.metre[0];
+  if (from === to || beats <= 0) return from === theme.tempo ? beat : (beat * theme.tempo) / from;
+  const rise = (to - from) / beats;
+  return (theme.tempo / rise) * Math.log((from + rise * beat) / from);
+}
+
+/** A section's length in beats of the theme's tempo. */
+function span(theme: Theme, section: Section): number {
+  return placed(theme, section, section.bars * theme.metre[0]);
+}
+
+/** The theme's sections in their order, one after another, as one loop: its beats are
+ * of the theme's tempo, a section of another tempo laid out at its own pace (D315). */
 export function loopOf(theme: Theme): Loop {
-  const bar = theme.metre[0];
   const notes: LoopNote[] = [];
   let at = 0;
   for (const section of played(theme)) {
     for (const [voice, list] of Object.entries(section.notes)) {
       for (const [pitch, start, length, loudness] of list) {
-        notes.push({ voice, pitch, beat: at + start, length, loudness });
+        const beat = placed(theme, section, start);
+        notes.push({ voice, pitch, beat: at + beat, length: placed(theme, section, start + length) - beat, loudness });
       }
     }
-    at += section.bars * bar;
+    at += span(theme, section);
   }
   notes.sort((a, b) => a.beat - b.beat || a.pitch - b.pitch);
   return { beats: at, notes };
@@ -146,18 +176,17 @@ export function secondsPerBeat(theme: Theme): number {
 
 /** How long the theme's loop lasts, once round, in seconds. */
 export function loopSeconds(theme: Theme): number {
-  const bars = played(theme).reduce((sum, section) => sum + section.bars, 0);
-  return bars * theme.metre[0] * secondsPerBeat(theme);
+  return played(theme).reduce((sum, section) => sum + span(theme, section), 0) * secondsPerBeat(theme);
 }
 
 /** The section that sounds `seconds` into the theme's loop, by its id; '' in a theme
  * of no section. */
 export function sectionAt(theme: Theme, seconds: number): string {
-  const bar = theme.metre[0] * secondsPerBeat(theme);
+  const beat = secondsPerBeat(theme);
   const sections = played(theme);
   let end = 0;
   for (const section of sections) {
-    end += section.bars * bar;
+    end += span(theme, section) * beat;
     if (seconds < end) return section.id;
   }
   return sections.at(-1)?.id ?? '';
@@ -232,6 +261,13 @@ export function readTheme(value: unknown): Theme {
   }
   if ('arrangements' in theme) throw new Error(`${theme.id}: a theme has one set of voices, no arrangements (D210)`);
   if (!Array.isArray(theme.sections) || theme.sections.length === 0) throw new Error(`${theme.id}: it has sections`);
+  for (const section of theme.sections) {
+    const tempo = section.tempo ?? theme.tempo;
+    const given = typeof tempo === 'number' ? [tempo] : Array.isArray(tempo) && tempo.length === 2 ? tempo : [];
+    if (given.length === 0 || !given.every((value) => value > 0)) {
+      throw new Error(`${theme.id}: ${section.id}'s tempo is one, or one to start at and one to end at`);
+    }
+  }
   return theme;
 }
 
@@ -353,8 +389,21 @@ export function pianoRing(pitch: number): number {
   return Math.min(3.2, Math.max(0.8, 2 * 2 ** ((60 - pitch) / 24)));
 }
 
-/** One note of a voice that is struck, plucked or blown, from `at` for `seconds`, into
- * `out`; the time its sound ends. */
+/** An organ's pipes on one key: each rank's pitch as a multiple of the note's own, and
+ * its share of the sound: the note, its octaves, and the fifths between them. */
+const RANKS: ReadonlyArray<readonly [times: number, share: number]> = [
+  [1, 1],
+  [2, 0.7],
+  [3, 0.3],
+  [4, 0.42],
+  [6, 0.12],
+  [8, 0.16],
+];
+/** No rank sounds above this, in hertz: a pipe that high is a whistle over the rest. */
+const HIGHEST = 7000;
+
+/** One note of a voice that is struck, plucked, blown or bowed with a stroke of its own,
+ * from `at` for `seconds`, into `out`; the time its sound ends. */
 export function sound(
   ctx: AudioContext,
   kind: Exclude<VoiceKind, 'strings'>,
@@ -458,6 +507,34 @@ export function sound(
       const body = ctx.createGain();
       body.gain.setValueAtTime(0.35, at);
       oscillator(ctx, 'triangle', hertz / 2, at, end).connect(body).connect(filter);
+      ends = end;
+      break;
+    }
+    case 'organ': {
+      // An organ: every rank of pipes on the key at once, speaking at the key's fall
+      // and sounding evenly, as loud at the note's end as at its start.
+      const end = envelope(gain, at, loudness * 0.06, 0.035, Math.max(0, seconds - 0.06), 0.22);
+      for (const [times, share] of RANKS) {
+        if (hertz * times > HIGHEST) continue;
+        const rank = ctx.createGain();
+        rank.gain.setValueAtTime(share, at);
+        oscillator(ctx, 'sine', hertz * times, at, end).connect(rank).connect(gain);
+      }
+      ends = end;
+      break;
+    }
+    case 'cello': {
+      // A cello, or a double bass under it: a stroke of the bow for each note, two saws
+      // a little apart that bite as the bow takes the string and mellow as it is held.
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(Math.min(5000, hertz * 9), at);
+      filter.frequency.exponentialRampToValueAtTime(Math.min(3000, hertz * 4.5), at + 0.18);
+      filter.connect(gain);
+      const end = envelope(gain, at, loudness * 0.11, 0.025, Math.max(0, seconds - 0.1), 0.14);
+      for (const cents of [-6, 6]) {
+        oscillator(ctx, 'sawtooth', hertz * 2 ** (cents / 1200), at, end).connect(filter);
+      }
       ends = end;
       break;
     }

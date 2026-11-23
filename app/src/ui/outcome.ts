@@ -1,7 +1,7 @@
 // What a run came to, said to the child: a card under the editor. An outcome
 // is data; the card says it in the language of the moment.
 
-import { blockedText } from '../engine/words';
+import { blockedText, toldText } from '../engine/words';
 import { t } from '../i18n';
 import type { ErrorInfo, Explanation } from '../runtime/protocol';
 import { element } from './dom';
@@ -67,6 +67,26 @@ export function explanationText(explanation: Explanation): string {
         return t('error.index_range_unknown', p);
       case 'no_such_module':
         return t('error.no_such_module', p);
+      // A class of the child's, its objects and its methods (D271).
+      case 'missing_self':
+        return p.name === '__init__' ? t('error.missing_self', p) : t('error.missing_self_method', p);
+      case 'no_attribute':
+        return t('error.no_attribute', p);
+      case 'object_arguments':
+        return /^[A-Z]/.test(String(p.name)) ? t('error.object_arguments', p) : t('error.method_arguments', p);
+      case 'no_such_method':
+        return t('error.no_such_method', p);
+      // What the first year does not allow, in Orla's or the book's words (D261).
+      case 'other_attribute':
+      case 'other_method':
+      case 'other_name':
+      case 'go_to_not_yet':
+      case 'not_a_familiar':
+      case 'class_changed':
+      case 'name_letters':
+      case 'name_long':
+      case 'name_taken':
+        return toldText({ ...p, key: explanation.kind });
       default:
         return t('error.other', p);
     }

@@ -7,6 +7,7 @@ import {
   LocalProgressStore,
   PROGRESS_VERSION,
   readProgress,
+  readFamiliar,
   readWizard,
   wizardName,
 } from './store';
@@ -196,5 +197,29 @@ describe('the wizard (D36)', () => {
     const storage = memoryStorage();
     storage.setItem('kydux.progress', JSON.stringify({ version: PROGRESS_VERSION }));
     expect(new LocalProgressStore(storage).load().wizard).toBeNull();
+  });
+});
+
+describe('the familiar kept (D265)', () => {
+  it('is read back with its draft and its living familiar, each of its shape', () => {
+    const living = { kind: 'Fox', name: 'Pimu', color: 'red', source: 'class Fox(Familiar):\n    pass' };
+    expect(readFamiliar({ draft: { kind: 'Fox', name: 'Pimu' }, living })).toEqual({
+      draft: { kind: 'Fox', name: 'Pimu' },
+      living,
+    });
+    expect(readFamiliar({ living: { ...living, learned: 'class Fox...' } })?.living?.learned).toBe('class Fox...');
+    expect(readFamiliar({ draft: { kind: 'Fox', name: 'Pimu 2', color: 3 } })).toEqual({ draft: { kind: 'Fox' } });
+    expect(readFamiliar({ living: { kind: 'Fox', name: 'Pimu', color: 'red' } })).toBeNull();
+    expect(readFamiliar('Pimu')).toBeNull();
+  });
+
+  it('is none in a game with no familiar yet, and kept by the helpers', () => {
+    const storage = memoryStorage();
+    storage.setItem('kydux.progress', JSON.stringify({ version: PROGRESS_VERSION }));
+    expect(new LocalProgressStore(storage).load().familiar).toBeUndefined();
+    progress.useStore(new LocalProgressStore(memoryStorage()));
+    expect(progress.familiar()).toEqual({});
+    progress.keepFamiliar({ draft: { kind: 'Crow' } });
+    expect(progress.familiar()).toEqual({ draft: { kind: 'Crow' } });
   });
 });

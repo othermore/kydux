@@ -13,8 +13,9 @@ import { t } from '../i18n';
 import { element } from './dom';
 import { withCode } from './words';
 
-/** The spells cast on a thing the child names (kydux_world.world.AIMED). */
-const AIMED = new Set(['fendra']);
+/** The spells cast on a thing the child names (kydux_world.world.AIMED): fendra on a
+ * book, minka on the familiar (D262). */
+const AIMED = new Set(['fendra', 'minka']);
 
 /** One member of kydux_world.api's table, as api.json has it. */
 export interface ApiMember {
@@ -40,6 +41,37 @@ export interface NotebookEntry {
   example: string;
   /** Whether the example and its words are the simple ones, with no argument (D60). */
   simple: boolean;
+  /** A method of the child's own class, as the child wrote it (D269). */
+  source?: string;
+}
+
+/** The familiar's name in the child's code (D266): the living familiar's, or the draft's,
+ * in small letters, or the default's. */
+export function familiarVar(level: LevelJson): string {
+  const block = level.familiar as { living?: { name?: unknown }; draft?: { name?: unknown } } | undefined;
+  const name = block?.living?.name ?? block?.draft?.name;
+  return (typeof name === 'string' && name ? name : 'Pimu').toLowerCase();
+}
+
+/** A method of the living familiar's kept class, as the child wrote it (D269): its `def`
+ * and the lines under it; null where the class has none of that name. */
+export function ownMethod(level: LevelJson, method: string): string | null {
+  const block = level.familiar as { stage?: string; from?: string; living?: { source?: unknown; learned?: unknown } } | undefined;
+  const living = block?.living;
+  if (block?.stage !== 'living' || !living) return null;
+  const kept = typeof living.learned === 'string' && block.from === 'learned' ? living.learned : living.source;
+  if (typeof kept !== 'string') return null;
+  const lines = kept.split('\n');
+  const start = lines.findIndex((line) => new RegExp(`^\\s*def ${method}\\(`).test(line));
+  if (start < 0) return null;
+  const indent = (lines[start]?.match(/^\s*/)?.[0] ?? '').length;
+  const body = [lines[start] ?? ''];
+  for (const line of lines.slice(start + 1)) {
+    if (line.trim() && (line.match(/^\s*/)?.[0] ?? '').length <= indent) break;
+    body.push(line);
+  }
+  while (body.length > 1 && !body[body.length - 1]?.trim()) body.pop();
+  return body.map((line) => line.slice(indent)).join('\n');
 }
 
 /** The role of an object of a kind, as kydux_world.api.role_of says. */
@@ -54,13 +86,18 @@ export function allows(api: readonly string[], table: ApiTable, role: string, me
   return table.thing_roles.includes(role) && thingMembers.includes(member) && api.includes(`thing.${member}`);
 }
 
-/** What the child's code holds in a level: the wizard, then its things and actors. */
+/** What the child's code holds in a level: the wizard, then its things and actors, and
+ * in a level with a familiar, the familiar by its name (D266); someone else's familiar
+ * is not the child's to name. */
 export function heldObjects(level: LevelJson, table: ApiTable): { name: string; role: string }[] {
   const listed = (key: string) => (level[key] as { id: string; kind: string }[] | undefined) ?? [];
   return [
     { name: 'wizard', role: 'wizard' },
     ...listed('things').map((t) => ({ name: t.id, role: roleOf(t.kind, table) })),
-    ...listed('actors').map((a) => ({ name: a.id, role: roleOf(a.kind, table) })),
+    ...listed('actors')
+      .filter((a) => a.kind !== 'familiar')
+      .map((a) => ({ name: a.id, role: roleOf(a.kind, table) })),
+    ...(level.familiar ? [{ name: familiarVar(level), role: 'familiar' }] : []),
   ];
 }
 
@@ -81,6 +118,12 @@ export function notebookEntries(level: LevelJson, table: ApiTable, course?: Cour
         const example = (simple ? (member.simple ?? '') : member.example).replace(/^\w+(?=\.)/, object.name);
         entries.push({ object: object.name, role, member, example, simple });
       }
+    }
+    // In a living level, the living familiar's own method, as the child wrote it (D269).
+    const own = object.role === 'familiar' ? ownMethod(level, 'go_to') : null;
+    if (own) {
+      const member: ApiMember = { name: 'go_to', kind: 'action', example: `${object.name}.go_to(13, 4)` };
+      entries.push({ object: object.name, role: 'familiar', member, example: member.example, simple: false, source: own });
     }
   }
   return entries;
@@ -216,7 +259,8 @@ export function notebookPanel(
   // example to click: `wizard.cast("zelim")`, `wizard.say("ambrel")`; a spell cast
   // on a thing names it, `wizard.cast("fendra", book)`.
   const magic = (word: string, key: string, action: string) => {
-    const said = AIMED.has(word) ? `wizard.${action}("${word}", book)` : `wizard.${action}("${word}")`;
+    const aimed = word === 'minka' ? familiarVar(level) : 'book';
+    const said = AIMED.has(word) ? `wizard.${action}("${word}", ${aimed})` : `wizard.${action}("${word}")`;
     const example = element('button', { type: 'button', className: 'example' }, [element('code', {}, [said])]);
     example.dataset.example = said;
     example.addEventListener('click', () => onExample(said));
@@ -252,6 +296,10 @@ export function notebookPanel(
               return element('li', {}, [
                 example,
                 element('span', { className: 'description' }, withCode(describe(entry.role, entry.member.name, entry.simple))),
+                // The child's own method, as written (D269).
+                ...(entry.source
+                  ? [element('pre', { className: 'syntax-example own-method' }, [element('code', {}, [entry.source])])]
+                  : []),
               ]);
             }),
           ),

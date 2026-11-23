@@ -122,7 +122,9 @@ export interface FigureArt {
   rows?: { walk: number; cast: number; pickup?: number; win?: number; sleep?: number; fly?: number };
   /** The rows of a sheet laid out otherwise than a wizard's, by its name: a
    * friend's walking rows and its lying one (D91), a racer's flying ones (D188). */
-  sheets?: Record<string, { walk: number; sleep?: number; fly?: number }>;
+  sheets?: Record<string, { walk: number; sleep?: number; fly?: number; sit?: number }>;
+  /** The familiars' sheets (D273), each a creature's walking sheet drawn at its height. */
+  familiars?: string[];
 }
 
 /** A part of a wizard's sheet played as frames: casting or picking up the way the

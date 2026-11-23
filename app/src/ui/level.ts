@@ -7,6 +7,7 @@
 // (D258). The card comes with no sound where the run's end sounded as its
 // playback ended, and with its sound where there was no playback (D247).
 
+import { checkedFamiliar, familiarTable, isPractice, keptAfter } from '../content/familiar';
 import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
 import type { Editor, EditorOptions } from '../editor/editor';
@@ -61,7 +62,12 @@ export interface LevelScreenParts {
   table: ApiTable;
   /** Made by the caller, so that Phaser and CodeMirror load on their own. */
   createEditor: (parent: HTMLElement, options: EditorOptions) => Editor;
-  startScene: (parent: HTMLElement, level: LoadedLevel['level'], look: Look) => Promise<SceneHandle>;
+  startScene: (
+    parent: HTMLElement,
+    level: LoadedLevel['level'],
+    look: Look,
+    options?: { told?: Record<string, string> },
+  ) => Promise<SceneHandle>;
   /** The map over the level (D71): made once its data is loaded, given how to close
    * it and where a stop chosen goes. */
   openMap?: () => Promise<(overlay: { onClose: () => void; onGo: (hash: string) => void }) => Screen>;
@@ -402,6 +408,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           said: said(text.intro),
           carrying: carrying(),
           changes: text.changes,
+          // Described again with a familiar living: practice, which keeps nothing (D265).
+          practice: isPractice(loaded.level) ? t('familiar.practice') : undefined,
           // Show me the screen, on the first level's card once the guide has been seen
           // (D248): the guide, and the card again after it (D258).
           onGuide:
@@ -526,6 +534,14 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         const verdict = judge({ world: snapshot.world, hintsShown, misses: Math.max(0, runsHere - 1) });
         const kept = progress.levelProgress(loaded.id).stars ?? 0;
         progress.markWon(loaded.id, verdict.earned);
+        // The trial kept as the draft, the familiar born kept for good, what it learned
+        // kept with it (D265).
+        const familiars = familiarTable();
+        if (familiars) {
+          const kept = checkedFamiliar(progress.familiar(), familiars);
+          const after = keptAfter(loaded.level, snapshot.world, kept);
+          if (after) progress.keepFamiliar(after);
+        }
         // Continue, on the start screen, goes to what comes after.
         if (parts.next) progress.setCurrent(parts.next);
         showWin(verdict, kept);
@@ -710,7 +726,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       mounted = true;
       // The wizard the child made, or the first look before there is one.
       const look = lookOf(progress.wizard()?.look);
-      void parts.startScene(sceneParent, loaded.level, look).then((handle) => {
+      // The level's own words said while a program runs (D264).
+      const told = loaded.text.told ? { told: loaded.text.told } : {};
+      void parts.startScene(sceneParent, loaded.level, look, told).then((handle) => {
         if (destroyed) {
           handle.destroy();
           return;

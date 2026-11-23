@@ -4,9 +4,12 @@
 // gender who meets the wizard at the gate, `{{boy's words|girl's words}}`, and
 // the friend's name, `{friend}`; and the dormitory mate's name, `{mate}`, the
 // friend of the wizard's own gender (D84), whose words follow the wizard's
-// choice. All are resolved here, from the wizard the child made; anything else
-// in braces (a t() parameter, a Python set) is left as it is.
+// choice; and the familiar's words, `{familiar}`, `{familiar_kind}` and the rest, with
+// a choice by its kind's gender, `{familiar:el|la}` (D266). All are resolved here,
+// from the wizard the child made and the familiar of the game; anything else in braces
+// (a t() parameter, a Python set) is left as it is.
 
+import type { FamiliarWords } from '../content/familiar';
 import { dormitoryMate, FRIENDS, teacherFriend } from '../engine/looks';
 
 export type Gender = 'girl' | 'boy';
@@ -34,28 +37,38 @@ export function mateOf(wizard: Pick<Speaker, 'gender'> | null): { id: string; ge
 const FRIEND_CHOICE = /\{\{([^{}|\n]*)\|([^{}|\n]*)\}\}/g;
 /** A choice: two sides, on one line, with no brace or bar inside either. */
 const CHOICE = /\{([^{}|\n]*)\|([^{}|\n]*)\}/g;
+/** A choice by the familiar's kind's gender (D266). Resolved before the wizard's. */
+const FAMILIAR_CHOICE = /\{familiar:([^{}|\n]*)\|([^{}|\n]*)\}/g;
+/** The familiar's placeholders (D266). */
+const FAMILIAR = /\{(familiar(?:_[a-z_]+)?|mate_familiar|mate_var|mate_color|friend_familiar)\}/g;
 const NAME = /\{wizard\}/g;
 const FRIEND = /\{friend\}/g;
 const MATE = /\{mate\}/g;
 
 /** The text with its choices made and the names put in. With no wizard, the first
  * side of each wizard's choice, and `unnamed` for the name; `friendName` names the
- * friend the wizard has, and `mateName` its dormitory mate. */
+ * friend the wizard has, and `mateName` its dormitory mate; `familiar` gives the
+ * familiar's words, and with none its placeholders are left as they are. */
 export function personal(
   text: string,
   wizard: Speaker | null,
   unnamed = '',
   friendName = '',
   mateName = '',
+  familiar: FamiliarWords | null = null,
 ): string {
   if (!text.includes('{')) return text;
   const girl = wizard?.gender === 'girl';
   const friendGirl = friendOf(wizard).gender === 'girl';
   const name = wizard?.name ?? unnamed;
+  const familiarGirl = familiar?.gender === 'f';
   return text
     .replace(FRIEND_CHOICE, (_whole, boy: string, girlWords: string) => (friendGirl ? girlWords : boy))
+    .replace(FAMILIAR_CHOICE, (_whole, him: string, her: string) => (familiarGirl ? her : him))
     .replace(CHOICE, (_whole, boy: string, girlWords: string) => (girl ? girlWords : boy))
     .replace(NAME, () => name)
     .replace(FRIEND, () => friendName)
-    .replace(MATE, () => mateName);
+    .replace(MATE, () => mateName)
+    // Last, so that nothing in the familiar's own class is read for a choice.
+    .replace(FAMILIAR, (whole, key: string) => familiar?.values[key] ?? whole);
 }

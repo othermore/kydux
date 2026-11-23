@@ -64,3 +64,11 @@ tips.
 # Under ?debug, the settings name each candidate of the code's letter by
 # `debug.font.${name}` (D223).
 debug.font.
+
+# A kind of familiar's words and a colour's, by `familiars.${kind}.<part>` and
+# `familiars.colors.${color}.<gender>` (D266, app/src/i18n/index.ts).
+familiars.
+
+# What is said while a program runs, `told.${key}`, when the level has no words of its
+# own for it (D264, engine/words.ts toldText).
+told.

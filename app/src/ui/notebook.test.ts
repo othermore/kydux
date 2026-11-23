@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { type ApiTable, allows, heldObjects, notebookEntries, notebookTabs, PYTHON, pythonBlocks, spellsAndWords } from './notebook';
+import {
+  type ApiTable,
+  allows,
+  familiarVar,
+  heldObjects,
+  notebookEntries,
+  notebookTabs,
+  ownMethod,
+  PYTHON,
+  pythonBlocks,
+  spellsAndWords,
+} from './notebook';
 import en from '../../../i18n/en.json';
 import es from '../../../i18n/es.json';
 
@@ -137,5 +148,47 @@ describe('the notebook', () => {
         expect(entry.example?.trim()).toBeTruthy();
       }
     }
+  });
+});
+
+describe("the familiar's page of the notebook (D266, D269)", () => {
+  const source = [
+    'class Fox(Familiar):',
+    '    def __init__(self, name, color):',
+    '        self.name = name',
+    '        self.color = color',
+    '',
+    '    def go_to(self, x, y):',
+    '        if x < self.position.x:',
+    '            self.move_left(self.position.x - x)',
+    '',
+  ].join('\n');
+  const table: ApiTable = {
+    roles: { wizard: [], thing: [], familiar: [{ name: 'position', kind: 'attribute', example: 'pimu.position' }] },
+    thing_roles: ['thing'],
+  };
+
+  it("names the familiar as the child's code does, and shows its own go_to as written", () => {
+    const level = {
+      api: ['familiar.position'],
+      familiar: { stage: 'living', from: 'learned', living: { name: 'Nabi', source: 'x', learned: source } },
+    };
+    expect(familiarVar(level)).toBe('nabi');
+    expect(ownMethod(level, 'go_to')).toBe(
+      ['def go_to(self, x, y):', '    if x < self.position.x:', '        self.move_left(self.position.x - x)'].join('\n'),
+    );
+    const entries = notebookEntries(level, table);
+    expect(entries.map((entry) => entry.example)).toEqual(['nabi.position', 'nabi.go_to(13, 4)']);
+    expect(entries[1]?.source).toContain('def go_to');
+  });
+
+  it("has no go_to before the living familiar's class has one, and no one else's familiar", () => {
+    const level = {
+      api: ['familiar.position'],
+      actors: [{ id: 'mate_familiar', kind: 'familiar' }],
+      familiar: { stage: 'trial', draft: { kind: 'Fox' } },
+    };
+    expect(heldObjects(level, table).map((one) => one.name)).toEqual(['wizard', 'pimu']);
+    expect(ownMethod(level, 'go_to')).toBeNull();
   });
 });

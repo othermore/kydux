@@ -57,7 +57,7 @@ export interface StoryPart {
   step: number;
   world: LevelJson;
   camera: Tile;
-  light?: 'morning';
+  light?: 'morning' | 'sunset';
   flying?: string[];
 }
 
@@ -70,13 +70,16 @@ export interface Story {
   /** The tile the camera starts on, before any step (D74). */
   camera: Tile;
   /** The light the story is told under, besides its scene's own (D124). */
-  light?: 'morning';
+  light?: 'morning' | 'sunset';
   /** Who is in the air on a broom when the story starts (D185). */
   flying?: string[];
   /** The parts told on another scene, in order (39.4). */
   parts?: StoryPart[];
   /** The game's opening, before the course (D61). */
   opening?: boolean;
+  /** The still a story's last steps are told over, the welcome's painting of the castle
+   * (D251, `the-end-of-the-year`). */
+  still?: 'castle';
   /** Who tells the story, for the map and the characters' names (D67). */
   speaker?: string;
 }
@@ -97,6 +100,7 @@ interface StoryJson {
   parts?: StoryPart[];
   opening?: boolean;
   speaker?: string;
+  still?: string;
 }
 
 async function json<T>(url: string): Promise<T | null> {
@@ -122,11 +126,12 @@ export async function loadStory(id: string, lang: Language): Promise<Story> {
     steps: staging.steps.map((step, index) => ({ ...step, text: forWizard(text.steps[index] ?? '') })),
     world: staging.world,
     camera: staging.camera,
-    ...(staging.light === 'morning' ? { light: 'morning' as const } : {}),
+    ...(staging.light === 'morning' || staging.light === 'sunset' ? { light: staging.light } : {}),
     ...(Array.isArray(staging.flying) ? { flying: staging.flying.map(String) } : {}),
     ...(Array.isArray(staging.parts) ? { parts: staging.parts } : {}),
     ...(staging.opening === true ? { opening: true } : {}),
     ...(typeof staging.speaker === 'string' ? { speaker: staging.speaker } : {}),
+    ...(staging.still === 'castle' ? { still: 'castle' as const } : {}),
   };
 }
 

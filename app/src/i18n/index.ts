@@ -2,6 +2,7 @@
 // in i18n/ at the repository root: adding one is adding its file, with the
 // same keys as the others (tools/i18n_check.py keeps them in step).
 
+import type { FamiliarWords, KindWords } from '../content/familiar';
 import { friendOf, mateOf, personal, type Speaker } from './personal';
 
 export type { Gender, Speaker } from './personal';
@@ -37,12 +38,56 @@ export function speakOf(wizard: Speaker | null): void {
   speaker = wizard;
 }
 
+/** The familiar the words speak of (D266), or none before the page has its table. */
+let familiar: FamiliarWords | null = null;
+
+/** Tells the words which familiar they speak of: the game's, its draft or the default
+ * (content/familiar.ts, familiarWords). */
+export function speakOfFamiliar(words: FamiliarWords | null): void {
+  familiar = words;
+}
+
+/** The familiar's words now, for a text said of another familiar (D264). */
+export function familiarSpoken(): FamiliarWords | null {
+  return familiar;
+}
+
+/** A kind of familiar's words in the language now set (i18n's `familiars`, D266). */
+export function kindWords(kind: string): KindWords {
+  const word = (part: string) =>
+    lookup(catalogs[current], `familiars.${kind}.${part}`) ?? lookup(catalogs[fallbackLanguage], `familiars.${kind}.${part}`);
+  return {
+    kind: word('kind') ?? kind.toLowerCase(),
+    a_kind: word('a_kind') ?? kind.toLowerCase(),
+    gender: word('gender') === 'f' ? 'f' : 'm',
+  };
+}
+
+/** A colour's word, agreeing with a kind's gender (i18n's `familiars.colors`, D266). */
+export function colourWord(color: string, gender: 'm' | 'f'): string {
+  const key = `familiars.colors.${color}.${gender}`;
+  return lookup(catalogs[current], key) ?? lookup(catalogs[fallbackLanguage], key) ?? color;
+}
+
+/** A text in its own words, its choices made for the wizard and for `words`, a familiar
+ * other than the game's (D264); `{name}` parameters are left for the caller. */
+export function forFamiliar(text: string, words: FamiliarWords | null): string {
+  const unnamed =
+    lookup(catalogs[current], 'wizard.no_name') ?? lookup(catalogs[fallbackLanguage], 'wizard.no_name');
+  return personal(text, speaker, unnamed ?? '', friendName(), mateName(), words);
+}
+
+/** A text of the i18n files as written, before any choice is made, or null. */
+export function rawText(key: string): string | null {
+  return lookup(catalogs[current], key) ?? lookup(catalogs[fallbackLanguage], key) ?? null;
+}
+
 /** A text with its choices made for the wizard and the friend, and their names
  * put in (D37, D77). */
 export function forWizard(text: string): string {
   const unnamed =
     lookup(catalogs[current], 'wizard.no_name') ?? lookup(catalogs[fallbackLanguage], 'wizard.no_name');
-  return personal(text, speaker, unnamed ?? '', friendName(), mateName());
+  return personal(text, speaker, unnamed ?? '', friendName(), mateName(), familiar);
 }
 
 /** The friend the wizard has (D77): Nuri for a boy wizard, Teku for a girl. */

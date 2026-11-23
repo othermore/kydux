@@ -2,6 +2,7 @@
 // store keeps it in the browser's localStorage; a remote one can come later
 // behind the same interface. Nothing else in the game keeps progress anywhere.
 
+import type { KeptFamiliar } from '../content/familiar';
 import { isLook } from '../engine/looks';
 
 /** The document's shape this version of the game writes. A document of another
@@ -58,6 +59,9 @@ export interface Progress {
   levels: Record<string, LevelProgress>;
   /** The item of the course last opened: `level:<id>` or `lesson:<id>`. */
   current: string | null;
+  /** The familiar (D265): the draft of the last trial while none lives, and the one
+   * that lives, for good; absent in a game with no familiar yet. */
+  familiar?: KeptFamiliar;
 }
 
 /** The scene's share of the width, at least and at most (D35). */
@@ -182,7 +186,43 @@ export function readProgress(value: unknown): Progress | null {
   }
   if (typeof value.current === 'string' && ITEM.test(value.current)) progress.current = value.current;
   progress.guided = value.guided === true;
+  const familiar = readFamiliar(value.familiar);
+  if (familiar) progress.familiar = familiar;
   return progress;
+}
+
+/** A word of the first year's familiars: a kind, a colour or a name, letters only. */
+const FAMILIAR_WORD = /^\p{L}{1,24}$/u;
+
+function familiarWord(value: unknown): value is string {
+  return typeof value === 'string' && FAMILIAR_WORD.test(value);
+}
+
+/** The familiar kept read back (D265): a draft's kind, and its name and colour when
+ * given, and a living familiar's kind, name, colour and classes, each of its shape; the
+ * table's own check of kinds, colours and names is made where the game uses it
+ * (content/familiar.ts, checkedFamiliar). Null for none. */
+export function readFamiliar(value: unknown): KeptFamiliar | null {
+  if (!isObject(value)) return null;
+  const found: KeptFamiliar = {};
+  const draft = value.draft;
+  if (isObject(draft) && familiarWord(draft.kind)) {
+    found.draft = { kind: draft.kind };
+    if (familiarWord(draft.name)) found.draft.name = draft.name;
+    if (familiarWord(draft.color)) found.draft.color = draft.color;
+  }
+  const living = value.living;
+  if (
+    isObject(living) &&
+    familiarWord(living.kind) &&
+    familiarWord(living.name) &&
+    familiarWord(living.color) &&
+    typeof living.source === 'string'
+  ) {
+    found.living = { kind: living.kind, name: living.name, color: living.color, source: living.source };
+    if (typeof living.learned === 'string') found.living.learned = living.learned;
+  }
+  return found.draft || found.living ? found : null;
 }
 
 /** The store in the browser's localStorage. A storage that cannot be read or

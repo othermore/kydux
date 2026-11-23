@@ -74,6 +74,8 @@ export const EFFECTS = {
     },
   },
   fail: { wave: 'sawtooth', from: 300, to: 150, seconds: 0.3, volume: 0.12 },
+  // A familiar's trial coming into the circle (D263): a soft shimmer that rises.
+  trial: { wave: 'sine', from: 880, to: 1320, seconds: 0.4, volume: 0.1 },
   // The wizard's lift (D244): air that rises, noise whose band sweeps up; it comes up
   // over its first fifth and dies away.
   lift: { wave: 'noise', from: 300, to: 1100, seconds: 0.6, volume: 0.12, attack: 0.12 },

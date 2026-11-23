@@ -57,3 +57,23 @@ describe('the friend of the other gender (D77)', () => {
     );
   });
 });
+
+describe("the familiar's words (D266)", () => {
+  const words = {
+    gender: 'f' as const,
+    values: { familiar: 'Lu', familiar_var: 'lu', familiar_a_kind: 'una liebre', familiar_color_word: 'blanca', familiar_source: 'x = {a|b}' },
+  };
+
+  it('fills its placeholders and the choice by its kind, and leaves them with none', () => {
+    const text = 'Es {familiar_a_kind} {familiar_color_word}: {familiar:el|la} de {wizard}, {familiar}.';
+    expect(personal(text, { name: 'Ana', gender: 'girl' }, '', '', '', words)).toBe(
+      'Es una liebre blanca: la de Ana, Lu.',
+    );
+    expect(personal('{familiar} y {mate}', { name: 'Ana', gender: 'girl' }, '', '', 'Nuri')).toBe('{familiar} y Nuri');
+    expect(personal('{familiar:el|la}', null)).toBe('el');
+  });
+
+  it("reads nothing of the familiar's own class for a choice", () => {
+    expect(personal('{familiar_source}', null, '', '', '', words)).toBe('x = {a|b}');
+  });
+});

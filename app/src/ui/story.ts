@@ -257,8 +257,12 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     heard.textContent = said ? `${who}: ${said.text.replace(/[`*_]/g, '')}` : '';
     // While a figure speaks in its bubble, the band shows who it is (D194).
     const face = said ? portraitOf(said.who, progress.wizard()?.look) : null;
-    speaking.replaceChildren(...(face ? [portrait(face, 'small'), element('span', {}, [who])] : []));
-    if (face) voice.append(speaking);
+    // A voice with no figure and no portrait, the cold voice, by its name alone (D264).
+    const named = said && !face && said.who !== 'wizard';
+    speaking.replaceChildren(
+      ...(face ? [portrait(face, 'small'), element('span', {}, [who])] : named ? [element('span', {}, [who])] : []),
+    );
+    if (face || named) voice.append(speaking);
     back.disabled = step === 0;
     // Again only where the step does something; Skip until the last step.
     again.hidden = !current?.do;

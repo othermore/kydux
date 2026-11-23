@@ -83,6 +83,16 @@ export interface WorldResult {
    * first not won or the first, and every way's own result. */
   way?: string;
   ways?: WayResult[];
+  /** In a level with a familiar (D265): the trial the level is about, whether a familiar
+   * was born, the trial's class as written, and the class the living familiar took. */
+  familiar?: {
+    trial: { kind: string; name?: string; color?: string } | null;
+    born: boolean;
+    source: string | null;
+    learned: string | null;
+  };
+  /** In the birth level, whether the rehearsal passed (D268). */
+  passes?: boolean;
 }
 
 /** One way's result, by the way's id. */

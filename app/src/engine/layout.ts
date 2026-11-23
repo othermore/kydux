@@ -6,6 +6,7 @@
 // level on a scene (D65) comes with the scene's map built in by pack-world.
 // The world's events say the rest.
 
+import { familiarTable, filledIn, firstSheet, mateColour, sheetOf } from '../content/familiar';
 import type { LevelJson } from '../runtime/protocol';
 import type { Facing, Tile } from './sight';
 
@@ -89,6 +90,20 @@ export interface ActorLayout {
   hidden: boolean;
   /** The bed it lies asleep in from the start (D91); it gets up on its tile. */
   asleep?: string;
+  /** For a familiar, the child's or someone else's (D273): how it is drawn. */
+  creature?: CreatureLook;
+  /** Seated on the floor, drawn in its sitting rows (D273). */
+  sitting?: boolean;
+}
+
+/** How a familiar is drawn (D263, D273): its kind and colour, the sheet it is drawn from,
+ * and whether it lives, or is a trial with its colour (`good`) or with none (`pale`), or a
+ * spark. */
+export interface CreatureLook {
+  kind: string;
+  color: string | null;
+  look: 'good' | 'pale' | 'living' | 'spark';
+  sheet: string | null;
 }
 
 /** What the plan of the scene is drawn from at a tick (D134). */
@@ -194,6 +209,67 @@ export interface Layout {
   race?: RaceLayout;
   /** The rings the level asks flown through, in their order (D187). */
   rings: string[];
+  /** In a living level, the game's familiar, where it stands at the start (D269). */
+  living?: { tile: Tile; facing: Facing; creature: CreatureLook };
+  /** Where someone painted into the scene speaks from, by id (D264). */
+  voices: Record<string, Tile>;
+  /** The cells only a familiar enters (D270), `,` on the map. */
+  small: Tile[];
+}
+
+/** The familiar the child describes, or lives with: the game's, written into the level's
+ * block (D265), or the level's own, or the default. */
+function childsFamiliar(level: LevelJson): { kind: string; color: string } | null {
+  const block = isRecord(level.familiar) ? level.familiar : null;
+  const table = familiarTable();
+  const living = isRecord(block?.living) ? block.living : null;
+  const draft = isRecord(block?.draft) ? block.draft : null;
+  const described = (living ?? draft) as { kind?: unknown; name?: unknown; color?: unknown } | null;
+  if (!table) {
+    return typeof described?.kind === 'string' && typeof described.color === 'string'
+      ? { kind: described.kind, color: described.color }
+      : null;
+  }
+  const filled = filledIn(
+    typeof described?.kind === 'string'
+      ? {
+          kind: described.kind,
+          ...(typeof described.color === 'string' ? { color: described.color } : {}),
+        }
+      : undefined,
+    table,
+  );
+  return { kind: filled.kind, color: filled.color };
+}
+
+/** How an actor of the kind `familiar` is drawn (D273): its kind, or the first of a list
+ * that is not the child's; its colour, or the one for that kind; the room-mate's copy of
+ * the child's, of its kind in the room-mate's colour; the child's own where it names
+ * neither. */
+function creatureOf(spec: Record<string, unknown>, level: LevelJson): CreatureLook {
+  const child = childsFamiliar(level);
+  const table = familiarTable();
+  if (spec.spark === true) return { kind: '', color: null, look: 'spark', sheet: null };
+  let kind: string;
+  let color: string | null;
+  if (spec.of === 'mate') {
+    kind = child?.kind ?? 'Fox';
+    color = table ? mateColour(kind, child?.color, table) : null;
+  } else if (spec.creature === undefined) {
+    kind = child?.kind ?? 'Fox';
+    color = child?.color ?? null;
+  } else {
+    const kinds = Array.isArray(spec.creature) ? spec.creature.map(String) : [String(spec.creature)];
+    const index = Math.max(0, kinds.findIndex((one) => one !== child?.kind));
+    kind = kinds[index] ?? kinds[0] ?? 'Fox';
+    const colours = Array.isArray(spec.color) ? spec.color : [spec.color];
+    const found = colours[Array.isArray(spec.color) ? index : 0];
+    color = typeof found === 'string' ? found : null;
+  }
+  const trial = spec.trial === true;
+  const look = trial ? (color === null ? 'pale' : 'good') : 'living';
+  const sheet = color === null ? firstSheet(kind, table) : sheetOf(kind, color);
+  return { kind, color, look, sheet };
 }
 
 const DEFAULT_SIGHT = 4;
@@ -287,7 +363,19 @@ export function layout(level: LevelJson): Layout {
     // Only a teacher looks out for the wizard; a ghost or a cat sees nothing to catch.
     const sight = spec.kind !== 'teacher' ? 0 : typeof spec.sight === 'number' ? spec.sight : DEFAULT_SIGHT;
     const asleep = typeof spec.asleep === 'string' ? { asleep: spec.asleep } : {};
-    actors.push({ id: String(spec.id), kind: String(spec.kind), tile, facing, sight, hidden: spec.hidden === true, ...asleep });
+    const creature = spec.kind === 'familiar' ? { creature: creatureOf(spec, level) } : {};
+    const sitting = spec.sitting === true ? { sitting: true } : {};
+    actors.push({
+      id: String(spec.id),
+      kind: String(spec.kind),
+      tile,
+      facing,
+      sight,
+      hidden: spec.hidden === true,
+      ...asleep,
+      ...creature,
+      ...sitting,
+    });
   }
   // A reach goal may be hidden: the cell is said in words, and no mark drawn (D134).
   for (const goal of asList(level.goals)) {
@@ -304,10 +392,12 @@ export function layout(level: LevelJson): Layout {
     .filter(([x, y], index, all) => all.findIndex(([ox, oy]) => ox === x && oy === y) === index);
   const shelves: Tile[] = [];
   const low: Tile[] = [];
+  const small: Tile[] = [];
   rows.forEach((row, y) => {
     [...row].forEach((char, x) => {
       if (char === '=') shelves.push([x, y]);
       if (char === '~') low.push([x, y]);
+      if (char === ',') small.push([x, y]);
     });
   });
   const carrying = carriedKinds(level);
@@ -377,7 +467,25 @@ export function layout(level: LevelJson): Layout {
     rings: asList(level.goals)
       .filter((goal) => goal.kind === 'through_in_order')
       .flatMap((goal) => (Array.isArray(goal.ids) ? goal.ids.map(String) : [])),
+    ...livingOf(level),
+    voices: Object.fromEntries(
+      Object.entries(isRecord(level.voices) ? level.voices : {}).flatMap(([who, cell]) => {
+        const tile = asTile(cell);
+        return tile ? [[who, tile]] : [];
+      }),
+    ),
+    small,
   };
+}
+
+/** In a living level, the game's familiar where it stands at the start (D269). */
+function livingOf(level: LevelJson): Pick<Layout, 'living'> {
+  const block = isRecord(level.familiar) ? level.familiar : null;
+  const living = isRecord(block?.living) ? block.living : null;
+  const tile = asTile(living?.at);
+  if (block?.stage !== 'living' || !living || !tile) return {};
+  const facing = (typeof living.facing === 'string' ? living.facing : 'down') as Facing;
+  return { living: { tile, facing, creature: creatureOf({ kind: 'familiar' }, level) } };
 }
 
 /** A level's race (D189, D220), its path's turning points walked out into the cells

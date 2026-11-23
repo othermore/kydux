@@ -96,7 +96,13 @@
     "no_landing": "Aquí no hay dónde posar la escoba, así que el programa se para aquí, todavía en el aire. Aterriza donde haya suelo.",
     "index_range": "La lista no tiene tantos: tiene {count}, y pediste el {asked}.º",
     "index_range_unknown": "La lista no tiene tantos elementos como pediste.",
-    "ring_rim": "La escoba giró mientras todavía estaba dentro del aro y rozó el borde, así que el programa se para aquí, todavía en el aire. Sal del aro por el otro lado, un paso más hacia arriba o hacia abajo, antes de girar."
+    "ring_rim": "La escoba giró mientras todavía estaba dentro del aro y rozó el borde, así que el programa se para aquí, todavía en el aire. Sal del aro por el otro lado, un paso más hacia arriba o hacia abajo, antes de girar.",
+    "missing_self": "Cuando nace un objeto, Python se lo pasa a `__init__` el primero de todos. A este `__init__` le falta un sitio para él: `self`.",
+    "missing_self_method": "Cuando se usa `{name}`, Python le pasa el objeto el primero de todos. A este `{name}` le falta un sitio para él: `self`.",
+    "no_attribute": "Este objeto no tiene nada que se llame `{name}`.",
+    "object_arguments": "Para hacer un `{name}` hacen falta {wanted} datos entre los paréntesis, y le has dado {given}.",
+    "method_arguments": "`{name}` recibe {wanted} datos entre los paréntesis, y le has dado {given}.",
+    "no_such_method": "{familiar} no sabe hacer `{name}`."
   },
   "things": {
     "door": "la puerta",
@@ -184,7 +190,13 @@
       "up": "Este aro se cruza hacia arriba, desde abajo. ¡Así no cuenta!",
       "down": "Este aro se cruza hacia abajo, desde arriba. ¡Así no cuenta!"
     },
-    "ring_rim": "Oh, giré demasiado pronto y rocé el aro."
+    "ring_rim": "Oh, giré demasiado pronto y rocé el aro.",
+    "already_here": "Ya está en el círculo: no hace falta llamarlo otra vez.",
+    "already_living": "Ya tengo un familiar: no puedo crear otro.",
+    "not_called": "Todavía no lo he llamado al círculo con minka: así no puede moverse.",
+    "no_way": "Mi familiar no encuentra por dónde volver.",
+    "familiar": "Hay un familiar en mi camino: tengo que dar un rodeo.",
+    "passage": "Por ahí solo cabe un familiar."
   },
   "notebook": {
     "title": "El cuaderno {del mago|de la maga}",
@@ -455,7 +467,8 @@
     "eldra": "Eldra",
     "baro": "Baro",
     "teku": "Teku",
-    "rinlo": "Rinlo"
+    "rinlo": "Rinlo",
+    "cold_voice": "Una voz fría"
   },
   "notebook_simple": {
     "wizard": {
@@ -704,5 +717,88 @@
     "zoom": "Usa los botones *+* y *−* (o la rueda del ratón) para acercar y alejar la escena. Si no ves a tu {mago|maga}, el botón *Buscar a {mi mago|mi maga}* {lo|la} vuelve a poner a la vista.",
     "lesson": "En una lección con un ejemplo de código, puedes cambiarlo y pulsar el botón *Ejecutar*, debajo de él, para ver allí mismo qué hace tu cambio.",
     "map": "El botón *Mapa* abre el mapa. Desde allí puedes volver a abrir cualquier parada a la que ya hayas llegado para jugarla otra vez, y ver las estrellas de cada nivel ganado."
+  },
+  "familiars": {
+    "Fox": {
+      "kind": "zorro",
+      "a_kind": "un zorro",
+      "gender": "m"
+    },
+    "Crow": {
+      "kind": "cuervo",
+      "a_kind": "un cuervo",
+      "gender": "m"
+    },
+    "Bat": {
+      "kind": "murciélago",
+      "a_kind": "un murciélago",
+      "gender": "m"
+    },
+    "Hare": {
+      "kind": "liebre",
+      "a_kind": "una liebre",
+      "gender": "f"
+    },
+    "Mouse": {
+      "kind": "ratón",
+      "a_kind": "un ratón",
+      "gender": "m"
+    },
+    "Frog": {
+      "kind": "rana",
+      "a_kind": "una rana",
+      "gender": "f"
+    },
+    "colors": {
+      "red": {
+        "m": "rojo",
+        "f": "roja"
+      },
+      "white": {
+        "m": "blanco",
+        "f": "blanca"
+      },
+      "black": {
+        "m": "negro",
+        "f": "negra"
+      },
+      "brown": {
+        "m": "marrón",
+        "f": "marrón"
+      },
+      "green": {
+        "m": "verde",
+        "f": "verde"
+      },
+      "grey": {
+        "m": "gris",
+        "f": "gris"
+      }
+    }
+  },
+  "familiar": {
+    "practice": "Ya tienes un familiar: aquí puedes practicar todo lo que quieras, pero no puedes crear otro, y nada de lo que hagas se guarda."
+  },
+  "told": {
+    "other_attribute": "Eso, `{name}`, todavía no. Los de primero solo podéis darle a vuestro familiar un nombre, `name`, y un color, `color`.",
+    "other_method": "`{name}` pide una magia que se aprende en otros cursos: los de primero todavía no podéis enseñarle eso a un familiar.",
+    "other_name": "En la descripción de un familiar de primero no cabe `{name}`: eso pide una magia de otros cursos.",
+    "go_to_not_yet": "`go_to`, todavía no. Ir a un sitio se le enseña a un familiar cuando ya vive, no antes.",
+    "not_a_familiar": "`minka` solo llama a familiares, y tu clase no dice que lo sea.",
+    "class_changed": "La descripción de un familiar vivo ya no se cambia: solo se le añade lo que aprende.",
+    "name_letters": "El libro no admite «{name}»: el nombre de un familiar es una sola palabra, y solo de letras.",
+    "name_long": "El libro no admite «{name}»: es demasiado largo. Doce letras, como mucho.",
+    "name_taken": "El libro no admite «{name}»: ese nombre ya lo usan Python o el colegio. Elige otro.",
+    "spark": "Los de primero solo podéis tener familiares de seis tipos, y ese no es uno de ellos.",
+    "pale_colour": "Dar a {familiar_a_kind} un color que no es el suyo pide una magia fuera del alcance de los de primero.",
+    "pale_grey": "{wizard}, tú no eres tan {bueno|buena} como {friend}, y lo de la liebre gris no te va a salir bien.",
+    "halt": "¡Alto! Ya tienes un familiar, y eso es más que suficiente. No puedes crear otro."
+  },
+  "book": {
+    "pencil": "El libro lo anota a lápiz:",
+    "ink": "El libro lo escribe a tinta:",
+    "cannot": "Tu clase no sabe hacer un familiar con un nombre y un color.",
+    "colours": "Los colores de {kind}, como se escriben:",
+    "order": "Orla manda:"
   }
 }

@@ -164,6 +164,9 @@ export function runBlock(code: string, runner: LessonRunner): RunBlock {
         return things.find((thing) => thing.id === id)?.kind ?? null;
       };
       const answer = runSaid(result, level, kinds);
+      // How the block ended, for the tests: a lesson's block may end in the error it is
+      // about, explained as its result (D272).
+      node.dataset.ended = result.world ? firstWay(result.world).status : result.status;
       printed.textContent = answer.printed.replace(/\n$/, '');
       printed.hidden = answer.printed === '';
       const lines = [

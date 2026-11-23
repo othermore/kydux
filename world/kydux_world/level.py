@@ -1453,7 +1453,19 @@ def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None
     level_id = level.id
     if value is None:
         return None
-    known = {"stage", "circle", "trials", "methods", "book", "then", "draft", "living", "from"}
+    # `practice`: the page's mark of a level described again with a familiar living.
+    known = {
+        "stage",
+        "circle",
+        "trials",
+        "methods",
+        "book",
+        "then",
+        "draft",
+        "living",
+        "from",
+        "practice",
+    }
     if not isinstance(value, dict) or set(value) - known - {"orders"}:
         raise LevelError(f"{level_id}: the familiar block has {', '.join(sorted(known))}, orders")
     stage = value.get("stage")
@@ -1501,7 +1513,7 @@ def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None
     draft = _described(value.get("draft"), level_id, "the draft")
     # A living level plays with the living familiar; any other may be told the game has
     # one, which makes a trial level practice and holds the birth (D265, D268).
-    living = _living(value.get("living"), shape, level)
+    living = _living(value.get("living"), shape, level, stage)
     if stage == "living" and living is None:
         raise LevelError(f"{level_id}: a living level has its living familiar")
     source = value.get("from", "source")
@@ -1529,9 +1541,10 @@ def _cells_list(value: Any, level_id: str) -> list[Any]:
     return value
 
 
-def _living(value: Any, shape: _Shape, level: "Level") -> Living | None:
+def _living(value: Any, shape: _Shape, level: "Level", stage: str) -> Living | None:
     """A living level's familiar (D265, D269): its kind, name and colour, its kept class,
-    and where it stands and faces at the start."""
+    and where it stands and faces at the start; in another level, the game's familiar,
+    which only says that one lives, standing nowhere."""
     from .familiars import KINDS, name_problem
 
     level_id = level.id
@@ -1548,6 +1561,8 @@ def _living(value: Any, shape: _Shape, level: "Level") -> Living | None:
     source, learned = value.get("source"), value.get("learned")
     if not isinstance(source, str) or (learned is not None and not isinstance(learned, str)):
         raise LevelError(f"{level_id}: the living familiar's classes are programs")
+    if stage != "living" and "at" not in value:
+        return Living(kind, name, color, source, Position(0, 0), "down", learned)
     at = _cell(shape, value.get("at"), "the living familiar")
     if not level.familiar_walks(at):
         raise LevelError(f"{level_id}: the living familiar stands on no cell it walks")

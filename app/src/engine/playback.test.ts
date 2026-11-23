@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { FLOWN, HELD, LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState, ticksTo } from './playback';
+import { FLOWN, HELD, LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState, ticksTo, TOLD_MOST } from './playback';
 
 function events(n: number): PlaybackEvent[] {
   return Array.from({ length: n }, (_, i) => ({
@@ -324,5 +324,36 @@ describe('the time to an event ahead (D255)', () => {
     expect(playback.timeTo(landing)).toBeNull();
     expect(ticksTo([], 0, landing)).toBeNull();
     playback.pause();
+  });
+});
+
+describe('words said in a run (D264)', () => {
+  it('hold the tick they are said in until they are read, ten seconds at most, divided by the speed', () => {
+    const playback = new Playback({ tickMs: 400 });
+    const shown: number[] = [];
+    playback.onTick((tick) => {
+      shown.push(tick);
+      if (tick === 1) playback.holdTick(3000);
+      if (tick === 2) playback.holdTick(60_000);
+    });
+    playback.load(events(3));
+    playback.play();
+    expect(shown).toEqual([0, 1]);
+    vi.advanceTimersByTime(2999);
+    expect(shown).toEqual([0, 1]);
+    vi.advanceTimersByTime(1);
+    expect(shown).toEqual([0, 1, 2]);
+    vi.advanceTimersByTime(TOLD_MOST - 1);
+    expect(shown).toEqual([0, 1, 2]);
+    vi.advanceTimersByTime(1);
+    expect(shown).toEqual([0, 1, 2, 3]);
+    playback.reset();
+    playback.setSpeed(4);
+    shown.length = 0;
+    playback.play();
+    vi.advanceTimersByTime(749);
+    expect(shown).toEqual([1]);
+    vi.advanceTimersByTime(1);
+    expect(shown).toEqual([1, 2]);
   });
 });

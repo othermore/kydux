@@ -70,7 +70,9 @@
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
-import { type Layout, layout, type PlanView, towards } from './layout';
+import { type CreatureLook, type Layout, layout, type PlanView, towards } from './layout';
+import { familiarTable, firstSheet, sheetOf } from '../content/familiar';
+import { type Pixels, TREMBLE_MS, TREMBLE_PX, trialSheet } from './trial';
 import { DEFAULT_LOOK, type Look } from './looks';
 import {
   actorKey,
@@ -151,7 +153,16 @@ import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
 import { type Hold, holeClosed, holeHeld } from './hole';
 import { type EffectName, play, STEP_LOWER, type StepName } from './sfx';
-import { blockedText, bumpText, friendText, raceVerdict, ringWayText, sleepingText } from './words';
+import {
+  blockedText,
+  bookText,
+  bumpText,
+  friendText,
+  raceVerdict,
+  ringWayText,
+  sleepingText,
+  toldText,
+} from './words';
 import {
   FLOWN,
   FLY_LIFT,
@@ -211,9 +222,33 @@ const RESTART_HOLD_MS = 160;
 /** How a scene is played: a level's run, or a story's steps (D74). */
 export interface SceneOptions {
   /** A story: the camera starts on this tile (camera.ts), and the words stay said;
-   * `flying`, who is in the air on a broom from the start (D185). */
-  story?: { camera: Tile; light?: LightName; flying?: string[] };
+   * `flying`, who is in the air on a broom from the start (D185); `light`, the light it
+   * is told under, a morning (D124) or the sunset a scene is painted at too (D273). */
+  story?: { camera: Tile; light?: LightName | 'sunset'; flying?: string[] };
+  /** A level's own words said while a program runs, by their key (D264). */
+  told?: Record<string, string>;
 }
+
+/** The world's events of a familiar, its trial and its book (D262 to D270), which the
+ * scene shows apart from a figure's walk. */
+const FAMILIAR_EVENTS = new Set([
+  'trial',
+  'spark',
+  'held',
+  'footprint',
+  'born',
+  'puzzled',
+  'hand_over',
+  'lit',
+  'copied',
+  'told',
+  'book',
+  'order',
+  'learned',
+]);
+/** The placeholder a familiar is drawn with on a scene with no sheet for it. */
+const CREATURE_KEY = 'creature-placeholder';
+const SPARK_KEY = 'spark';
 
 export { type Art, type FigureArt, loadArt, type SceneArt } from './painted';
 
@@ -416,6 +451,20 @@ class LevelScene extends Phaser.Scene {
   /** The hover's clock, in milliseconds (D235, D242): it always runs, but under reduced
    * motion; nothing else moves it. */
   private hoverMs = 0;
+  /** How each familiar is drawn, by its id (D263, D273): the child's, its trials, and the
+   * others' creatures; the trials a run calls, made as it plays; the footprints of light
+   * a held run leaves (D268); the figures seated (D273); the plates lit (D270); and where
+   * a voice painted into the scene speaks from (D264). */
+  private readonly creatures = new Map<string, CreatureLook>();
+  private readonly called = new Set<string>();
+  private footprints: Phaser.GameObjects.GameObject[] = [];
+  /** The keys of the words said in the run shown, in order (D264), for the tests. */
+  private toldKeys: string[] = [];
+  private readonly sitting = new Set<Phaser.GameObjects.Sprite>();
+  private readonly litPlates = new Set<string>();
+  private readonly voiceSprites = new Map<string, Phaser.GameObjects.Sprite>();
+  /** What the book's band says in the run shown (D267). */
+  private bookSaid: { words: string; code: string; look: string } | null = null;
 
   constructor(
     private readonly map: Layout,
@@ -469,8 +518,11 @@ class LevelScene extends Phaser.Scene {
     this.ways.set(sprite, facing);
     const flying = this.flyers.get(sprite);
     if (flying && (facing === 'up' || facing === 'down')) flying.way = facing;
-    if (sprite.texture.key.startsWith('fig-')) sprite.setFrame(SHEET_ROW[facing] * 3 + step);
-    else sprite.setFrame(facing);
+    if (sprite.texture.key.startsWith('fig-')) {
+      // A figure seated is drawn in its sitting rows, the same way faced (D273).
+      const sit = this.sitting.has(sprite) ? this.art?.figures?.sheets?.[sprite.texture.key.slice(4)]?.sit : undefined;
+      sprite.setFrame(((sit ?? 0) + SHEET_ROW[facing]) * 3 + (sit === undefined ? step : (this.art?.figures?.standing ?? 1)));
+    } else if (sprite.texture.key !== CREATURE_KEY && sprite.texture.key !== SPARK_KEY) sprite.setFrame(facing);
   }
 
   /** A figure walking to a point, its frames stepping as it goes on a painted scene. */
@@ -745,9 +797,18 @@ class LevelScene extends Phaser.Scene {
     }
     const marked = [...this.map.markers.map(([, tile]) => tile), ...(sleepAt ? [sleepAt] : [])];
     this.parentNode.dataset.marks = marked.map((tile) => tile.join(',')).join(';');
+    this.makeCreatureTextures();
     for (const actor of this.map.actors) {
       const key = actor.kind === 'friend' ? friendKey(actor.id) : actorKey(actor.kind);
-      const sprite = this.figure(actor.id, key, actor.tile, actor.facing).setDepth(3);
+      // A familiar is drawn from its creature's sheet, alive or a trial (D263, D273).
+      const sprite = actor.creature
+        ? this.creatureSprite(actor.creature, actor.tile, actor.facing)
+        : this.figure(actor.id, key, actor.tile, actor.facing).setDepth(3);
+      if (actor.creature) this.creatures.set(actor.id, actor.creature);
+      if (actor.sitting) {
+        this.sitting.add(sprite);
+        this.face(sprite, actor.facing);
+      }
       this.actors.set(actor.id, { sprite, tile: actor.tile, facing: actor.facing, sight: actor.sight });
       if (sprite.texture.key.startsWith('fig-') && this.art?.figures?.floating?.includes(figureName(actor.id, this.look))) {
         this.sways.set(
@@ -767,10 +828,17 @@ class LevelScene extends Phaser.Scene {
         );
       }
     }
+    // The game's familiar in a living level, where it stands at the start (D269).
+    const living = this.map.living;
+    if (living) {
+      const sprite = this.creatureSprite(living.creature, living.tile, living.facing);
+      this.creatures.set('familiar', living.creature);
+      this.actors.set('familiar', { sprite, tile: living.tile, facing: living.facing, sight: 0 });
+    }
     this.wizard = this.figure('wizard', WIZARD_KEY, this.map.start, 'down').setDepth(4);
     // Fixed over the camera's view each frame (lit), so that no zoom or drag shows its edge.
     this.lightCover = this.add.rectangle(0, 0, 1, 1, 0x000000, 0).setOrigin(0, 0).setDepth(lightDepth(this.map.height));
-    this.light.set(this.options.story?.light ?? 'none');
+    this.light.set(this.lightName());
     this.speech = new Speech(this, this.parentNode, {
       width: this.map.width * TILE,
       headroom: this.headroom,
@@ -1002,6 +1070,9 @@ class LevelScene extends Phaser.Scene {
         else delete this.parentNode.dataset.shade;
       }
     }
+    // A trial with no colour trembles, a pixel of its sheet to each side, about eight
+    // times a second, but under reduced motion (D263).
+    this.trembleTrials();
     this.speech.update();
     if (this.silhouette) {
       this.silhouette.off = this.asleep.get(this.wizard)?.lying === true || this.inEnchanted(this.wizardTile);
@@ -1142,6 +1213,8 @@ class LevelScene extends Phaser.Scene {
       if (actor.hidden || actor.asleep) sway?.stop();
       else sway?.start();
     }
+    this.restartFamiliars();
+    this.paintHour();
     this.placeWizard(this.map.start, 'down');
     this.wizard.setAlpha(1).setVisible(!this.inEnchanted(this.map.start));
     // In a story, who is in the air from the start (D185).
@@ -1343,6 +1416,10 @@ class LevelScene extends Phaser.Scene {
       }
       // A hidden thing found, seen from now on (D184).
       else if (event.kind === 'found') this.showFound(event, instant);
+      // A familiar's trial, its book, its birth, its words (D262 to D270).
+      else if (FAMILIAR_EVENTS.has(event.kind) || (event.kind === 'pick_up' && this.actors.has(event.actor)))
+        this.showFamiliar(tick, event, instant);
+      else if (event.kind === 'blocked' && this.actors.has(event.actor)) this.showFamiliar(tick, event, instant);
       // A ring flown through (D187), or flown against its way (D219).
       else if (event.kind === 'through')
         this.flownThrough(String(event.data.id), instant, typeof event.data.by !== 'string');
@@ -1355,6 +1432,7 @@ class LevelScene extends Phaser.Scene {
       } else this.showActor(tick, event, instant);
     }
     this.raceBand(tick, events, instant);
+    this.bookBand();
     this.nearLanding(instant);
     if (this.options.story) {
       this.frameStory(events);
@@ -1831,6 +1909,11 @@ class LevelScene extends Phaser.Scene {
   /** A figure's step (D132): the wizard's, a grown-up's (figures.json's `adults`) or
    * a child's, every other one a little lower. */
   private step(id: string): void {
+    // A familiar's steps are lighter than anyone's (D273).
+    if (this.creatures.has(id)) {
+      this.playSound('step_child', 1.6);
+      return;
+    }
     const sheet = figureName(id, this.look);
     const name: StepName =
       id === 'wizard' ? 'step' : (this.art?.figures?.adults ?? []).includes(sheet) ? 'step_adult' : 'step_child';
@@ -2253,11 +2336,32 @@ class LevelScene extends Phaser.Scene {
     }
   }
 
+  /** The light laid over the scene: a story's morning; a sunset is a painting of its own,
+   * and lays none (D273). */
+  private lightName(): LightName {
+    const light = this.options.story?.light;
+    return light === 'sunset' || light === undefined ? 'none' : light;
+  }
+
+  /** A story told at an hour the scene is painted at, the sunset (D273): its ground and
+   * rows at that hour shown over the painting's own, and each thing's picture at that
+   * hour where it has one. */
+  private paintHour(): void {
+    const hour = this.options.story?.light === 'sunset' ? 'sunset' : null;
+    if (!hour || !this.art?.scene.hours?.[hour]) return;
+    for (const image of this.grounds.get(hour) ?? []) image.setAlpha(1);
+    for (const image of this.things.values()) {
+      const key = hourKey(image.texture.key, hour);
+      if (this.textures.exists(key)) image.setTexture(key);
+    }
+    this.parentNode.dataset.ground = hour;
+  }
+
   /** The light back to what it is before a run: the painting's own, or the story's. */
   private resetLight(): void {
     this.nightFall?.remove(false);
     this.nightFall = null;
-    this.light.set(this.options.story?.light ?? 'none');
+    this.light.set(this.lightName());
   }
 
   /** The frames still to come of the part the wizard plays, dropped; the part's end is
@@ -2374,6 +2478,11 @@ class LevelScene extends Phaser.Scene {
         } else if (!instant && (event.data.by === 'high' || event.data.by === 'ring')) {
           const why = bumpText(String(event.data.by), typeof event.data.kind === 'string' ? event.data.kind : null);
           this.speech.think(why, tick, this.sayTicks(why), AFTER_BUMP_MS);
+        } else if (!instant && (event.data.by === 'familiar' || event.data.kind === 'passage')) {
+          // A familiar in the way, or a familiars' passage, where the wizard does not fit
+          // (D270).
+          const why = event.data.by === 'familiar' ? t('blocked.familiar') : t('blocked.passage');
+          this.speech.think(why, tick, this.sayTicks(why), AFTER_BUMP_MS);
         }
         break;
       }
@@ -2473,6 +2582,15 @@ class LevelScene extends Phaser.Scene {
         if (facing) this.face(this.wizard, facing);
         if (instant) break;
         const by = String(event.data.by);
+        // What the first year does not allow is told by Orla or the book (D261, D264).
+        if (by === 'orla' || by === 'book') break;
+        // A familiar moved before it is called (D270).
+        if (this.creatures.has(by) || this.called.has(by) || by.startsWith('familiar')) {
+          const reason = event.data.reason === 'not_here' ? 'not_called' : String(event.data.reason);
+          const why = blockedText(reason, null);
+          this.speech.think(why, tick, this.sayTicks(why));
+          break;
+        }
         const thing = this.map.things.find((t) => t.id === by);
         const detail = {
           ...(typeof event.data.spell === 'string' ? { spell: event.data.spell } : {}),
@@ -2497,8 +2615,465 @@ class LevelScene extends Phaser.Scene {
     }
   }
 
+  /** The placeholder a familiar is drawn with on a scene with no sheet for it, a small
+   * round creature, and the light a spark is drawn with (D263). */
+  private makeCreatureTextures(): void {
+    if (!this.textures.exists(CREATURE_KEY)) {
+      const texture = this.textures.createCanvas(CREATURE_KEY, 28, 24);
+      const ctx = texture?.getContext();
+      if (texture && ctx) {
+        ctx.fillStyle = '#d9822b';
+        ctx.strokeStyle = '#2a1a10';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(12, 16, 10, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(20, 9, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        texture.refresh();
+      }
+    }
+    if (!this.textures.exists(SPARK_KEY)) {
+      const texture = this.textures.createCanvas(SPARK_KEY, 32, 32);
+      const ctx = texture?.getContext();
+      if (texture && ctx) {
+        const glow = ctx.createRadialGradient(16, 16, 1, 16, 16, 15);
+        glow.addColorStop(0, 'rgba(255, 251, 230, 0.95)');
+        glow.addColorStop(1, 'rgba(255, 236, 160, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, 32, 32);
+        ctx.fillStyle = 'rgba(255, 252, 235, 0.95)';
+        ctx.beginPath();
+        for (const [x, y] of [[16, 1], [19, 13], [31, 16], [19, 19], [16, 31], [13, 19], [1, 16], [13, 13]] as const) {
+          ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        texture.refresh();
+      }
+    }
+  }
+
+  /** A familiar's texture for its look (D263): its sheet, alive; a trial's made from that
+   * sheet, frame by frame, with its colour or, from the kind's first sheet, with none;
+   * null where the sheet is not there. */
+  private creatureTexture(look: CreatureLook): string | null {
+    if (look.look === 'spark' || !look.sheet) return null;
+    const source = `fig-${look.sheet}`;
+    const figures = this.art?.figures;
+    if (!figures || !this.textures.exists(source)) return null;
+    if (look.look === 'living') return source;
+    const pale = look.look === 'pale';
+    const key = `fig-trial-${pale ? 'pale' : 'good'}-${look.sheet}`;
+    if (this.textures.exists(key)) return key;
+    const image = this.textures.get(source).getSourceImage() as HTMLImageElement | HTMLCanvasElement;
+    const [width, height] = [image.width, image.height];
+    const drawn = document.createElement('canvas');
+    [drawn.width, drawn.height] = [width, height];
+    const context = drawn.getContext('2d', { willReadFrequently: true });
+    const texture = this.textures.createCanvas(key, width, height);
+    const ctx = texture?.getContext();
+    if (!context || !texture || !ctx || width === 0) return null;
+    context.drawImage(image, 0, 0);
+    const sheet: Pixels = { width, height, data: context.getImageData(0, 0, width, height).data };
+    const made = trialSheet(sheet, figures.frame, figures.cell, pale);
+    ctx.putImageData(new ImageData(made.data as Uint8ClampedArray<ArrayBuffer>, width, height), 0, 0);
+    // The trial's frames where the creature's sheet has its own.
+    const [frameWidth, frameHeight] = figures.frame;
+    let index = 0;
+    for (let top = 0; top + frameHeight <= height; top += frameHeight) {
+      for (let left = 0; left + frameWidth <= width; left += frameWidth) {
+        texture.add(index, 0, left, top, frameWidth, frameHeight);
+        index += 1;
+      }
+    }
+    texture.refresh();
+    return key;
+  }
+
+  /** A familiar's figure, drawn as its look says, standing on a tile (D263, D273). */
+  private creatureSprite(look: CreatureLook, tile: Tile, facing: Facing): Phaser.GameObjects.Sprite {
+    const figures = this.art?.figures;
+    const key = this.creatureTexture(look);
+    let sprite: Phaser.GameObjects.Sprite;
+    if (figures && key) {
+      sprite = this.add.sprite(...this.figureAt(tile), key, SHEET_ROW[facing] * 3 + figures.standing);
+      sprite.setOrigin(0.5, 1 - figures.foot / figures.frame[1]).setScale(TILE / figures.cell);
+    } else {
+      const placeholder = look.look === 'spark' ? SPARK_KEY : CREATURE_KEY;
+      sprite = this.add.sprite(...this.figureAt(tile), placeholder).setOrigin(0.5, 0.9);
+      if (look.look === 'pale') sprite.setAlpha(0.45);
+      else if (look.look === 'good') sprite.setAlpha(0.8);
+    }
+    sprite.setDepth(3);
+    this.ways.set(sprite, facing);
+    if (look.look === 'spark') this.flicker(sprite);
+    return sprite;
+  }
+
+  /** A familiar drawn again in another look (D268): a trial born, alive at last; the
+   * room-mate's copy drawn again from the trial called. */
+  private relook(id: string, look: CreatureLook): void {
+    const actor = this.actors.get(id);
+    if (!actor) return;
+    this.creatures.set(id, look);
+    this.tweens.killTweensOf(actor.sprite);
+    const key = this.creatureTexture(look);
+    const figures = this.art?.figures;
+    if (key && figures) {
+      actor.sprite.setTexture(key).setAlpha(1).setScale(TILE / figures.cell);
+      actor.sprite.setOrigin(0.5, 1 - figures.foot / figures.frame[1]);
+      this.face(actor.sprite, actor.facing);
+    } else {
+      actor.sprite.setTexture(look.look === 'spark' ? SPARK_KEY : CREATURE_KEY).setOrigin(0.5, 0.9);
+      actor.sprite.setAlpha(look.look === 'pale' ? 0.45 : look.look === 'good' ? 0.8 : 1);
+    }
+    if (look.look === 'spark') this.flicker(actor.sprite);
+  }
+
+  /** A spark's light, flickering where a trial would stand, with no figure (D263). */
+  private flicker(sprite: Phaser.GameObjects.Sprite): void {
+    if (this.still) return;
+    this.tweens.add({
+      targets: sprite,
+      alpha: { from: 0.35, to: 1 },
+      duration: 130,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+  }
+
+  /** Each trial with no colour trembles: its picture moved a pixel of its sheet to each
+   * side, about eight times a second, by its origin, so that no walk is touched (D263). */
+  private trembleTrials(): void {
+    const figures = this.art?.figures;
+    if (!figures) return;
+    const side = this.still ? 0 : Math.floor(this.time.now / TREMBLE_MS) % 2 === 0 ? 1 : -1;
+    for (const [id, look] of this.creatures) {
+      if (look.look !== 'pale') continue;
+      const sprite = this.actors.get(id)?.sprite;
+      if (!sprite?.texture.key.startsWith('fig-')) continue;
+      sprite.setOrigin(0.5 - (side * TREMBLE_PX) / figures.frame[0], sprite.originY);
+    }
+  }
+
+  /** The familiars as they were before the run (D262, D268): the trials the run called
+   * gone, the child's familiar on its cell, the others' as the level has them, no
+   * footprint, no plate lit, the book's band empty. */
+  private restartFamiliars(): void {
+    for (const id of this.called) {
+      this.actors.get(id)?.sprite.destroy();
+      this.actors.delete(id);
+      this.creatures.delete(id);
+    }
+    this.called.clear();
+    for (const object of this.footprints) object.destroy();
+    this.footprints = [];
+    for (const actor of this.map.actors) if (actor.creature) this.relook(actor.id, actor.creature);
+    const living = this.map.living;
+    const state = this.actors.get('familiar');
+    if (living && state) {
+      this.tweens.killTweensOf(state.sprite);
+      state.tile = living.tile;
+      state.facing = living.facing;
+      state.sprite.setPosition(...this.figureAt(living.tile)).setVisible(true).setAngle(0);
+      this.relook('familiar', living.creature);
+    }
+    for (const thing of this.map.things) if (thing.kind === 'plate') this.plateLook(thing.id, false);
+    this.litPlates.clear();
+    this.toldKeys = [];
+    delete this.parentNode.dataset.told;
+    delete this.parentNode.dataset.footprints;
+    this.bookSaid = null;
+    this.bookBand();
+  }
+
+  /** A familiar's trial and book, its steps held, its birth and its words (D262 to D270). */
+  private showFamiliar(tick: number, event: WorldEvent, instant: boolean): void {
+    const data = event.data;
+    const duration = this.playback.tickDuration * 0.9;
+    switch (event.kind) {
+      case 'trial': {
+        const id = String(data.id);
+        const at = tileOf(data.at);
+        if (!at) return;
+        if (typeof data.dissolved === 'string') this.dissolve(data.dissolved, instant);
+        const kind = String(data.kind);
+        const color = typeof data.color === 'string' ? data.color : null;
+        const look: CreatureLook = {
+          kind,
+          color,
+          look: data.pale === true ? 'pale' : 'good',
+          sheet: color ? sheetOf(kind, color) : firstSheet(kind, familiarTable()),
+        };
+        this.actors.get(id)?.sprite.destroy();
+        const sprite = this.creatureSprite(look, at, 'down');
+        this.actors.set(id, { sprite, tile: at, facing: 'down', sight: 0 });
+        this.creatures.set(id, look);
+        this.called.add(id);
+        if (!instant) {
+          const alpha = sprite.alpha;
+          sprite.setAlpha(0);
+          this.tweens.add({ targets: sprite, alpha, duration });
+          this.burst(at);
+          play('trial');
+        }
+        break;
+      }
+      case 'spark': {
+        const at = tileOf(data.at);
+        if (!at || instant) return;
+        const spark = this.creatureSprite({ kind: '', color: null, look: 'spark', sheet: null }, at, 'down');
+        this.footprints.push(spark);
+        this.time.delayedCall(this.playback.tickDuration * 3, () => {
+          if (!spark.active) return;
+          this.tweens.killTweensOf(spark);
+          this.tweens.add({ targets: spark, alpha: 0, duration: 300, onComplete: () => spark.destroy() });
+        });
+        play('trial', 0.6);
+        break;
+      }
+      case 'held': {
+        // The step that would leave the circle, held at its edge (D268).
+        const actor = this.actors.get(event.actor);
+        const facing = isFacing(data.facing) ? data.facing : 'down';
+        if (actor && !instant) {
+          this.face(actor.sprite, facing);
+          this.nudge(actor.sprite, facing, duration);
+          play('bump');
+        }
+        const to = tileOf(data.to);
+        if (to) this.footprint(to, instant);
+        break;
+      }
+      case 'footprint': {
+        const at = tileOf(data.at);
+        if (at) this.footprint(at, instant);
+        break;
+      }
+      case 'born': {
+        const id = String(data.id);
+        const look = this.creatures.get(id);
+        if (look && look.look !== 'living') {
+          const sheet = look.color ? sheetOf(look.kind, look.color) : look.sheet;
+          this.relook(id, { ...look, look: 'living', sheet });
+          const at = tileOf(data.at);
+          if (at && !instant) {
+            this.burst(at);
+            play('cast', 0.8);
+          }
+        }
+        break;
+      }
+      case 'puzzled': {
+        // A familiar told what it does not know tilts its head (D269).
+        const actor = this.actors.get(String(data.id));
+        if (actor && !instant) {
+          this.tweens.add({ targets: actor.sprite, angle: 16, duration: duration / 3, yoyo: true, hold: duration / 3 });
+        }
+        break;
+      }
+      case 'pick_up': {
+        // A familiar picks up a piece of thread where its move ends (D270).
+        const image = this.things.get(String(data.id));
+        if (!image) break;
+        this.tweens.killTweensOf(image);
+        if (instant) image.setVisible(false);
+        else {
+          this.tweens.add({
+            targets: image,
+            y: image.y - 8,
+            alpha: 0,
+            duration,
+            onComplete: () => image.setVisible(false).setAlpha(1),
+          });
+          play('pick_up', 1.4);
+        }
+        break;
+      }
+      case 'hand_over':
+        // What the familiar carries, in the wizard's hands now (D262).
+        for (const id of Array.isArray(data.things) ? data.things : []) this.carried.add(String(id));
+        if (!instant) play('pick_up');
+        break;
+      case 'lit': {
+        const id = String(data.id);
+        this.litPlates.add(id);
+        this.plateLook(id, true);
+        if (!instant) play('trial', 1.3);
+        break;
+      }
+      case 'copied': {
+        // The room-mate copies the trial called (D268).
+        const kind = String(data.kind);
+        const color = typeof data.color === 'string' ? data.color : null;
+        const before = this.creatures.get(String(data.id));
+        this.relook(String(data.id), {
+          kind,
+          color,
+          look: before?.look === 'living' ? 'living' : color ? 'good' : 'pale',
+          sheet: color ? sheetOf(kind, color) : firstSheet(kind, familiarTable()),
+        });
+        break;
+      }
+      case 'told':
+        this.tell(tick, data, instant);
+        break;
+      case 'book':
+        this.bookSaid = bookText(data);
+        if (!instant) play('pick_up', 0.7);
+        break;
+      case 'order':
+        this.bookSaid = bookText(data, true);
+        break;
+      case 'blocked': {
+        // A familiar called back that finds no way (D262).
+        if (instant) break;
+        const why = blockedText(String(data.reason), null);
+        this.speech.think(why, tick, this.sayTicks(why));
+        break;
+      }
+      // 'learned': the familiar's class took a method; nothing is seen of it.
+    }
+  }
+
+  /** A trial dissolved by the next one called onto its cell (D262). */
+  private dissolve(id: string, instant: boolean): void {
+    const actor = this.actors.get(id);
+    if (!actor) return;
+    this.actors.delete(id);
+    this.creatures.delete(id);
+    this.called.delete(id);
+    if (instant) {
+      actor.sprite.destroy();
+      return;
+    }
+    this.tweens.killTweensOf(actor.sprite);
+    this.tweens.add({ targets: actor.sprite, alpha: 0, duration: this.playback.tickDuration * 0.5, onComplete: () => actor.sprite.destroy() });
+  }
+
+  /** A footprint of light on a cell, where a held trial would have gone (D268): two
+   * small marks on the floor, under whoever stands there. */
+  private footprint(tile: Tile, instant: boolean): void {
+    const [x, y] = this.figureAt(tile);
+    const marks = this.add.container(x, y - TILE * 0.08).setDepth(MARK_DEPTH + 0.01);
+    for (const [dx, dy] of [[-5, 2], [5, -3]] as const) {
+      marks.add(this.add.ellipse(dx, dy, 9, 5, 0xfff3c4, 0.85).setStrokeStyle(1.5, 0xffd75e, 0.9));
+    }
+    if (!instant) {
+      marks.setAlpha(0);
+      this.tweens.add({ targets: marks, alpha: 1, duration: this.playback.tickDuration * 0.6 });
+    }
+    this.footprints.push(marks);
+    this.parentNode.dataset.footprints = String(this.footprints.filter((object) => object instanceof Phaser.GameObjects.Container).length);
+  }
+
+  /** A footprint's bump: a flash where the held trial's way would have bumped (D268). */
+  private footprintBump(tile: Tile, facing: Facing): void {
+    const [x, y] = this.figureAt(tile);
+    const [dx, dy] = DELTA[facing];
+    const flash = this.add.circle(x + dx * TILE * 0.4, y - TILE * 0.2 + dy * TILE * 0.4, TILE * 0.18, 0xfff3c4, 0.9);
+    flash.setDepth(MARK_DEPTH + 0.02);
+    this.footprints.push(flash);
+    this.tweens.add({ targets: flash, alpha: 0, scale: 1.8, duration: this.playback.tickDuration, onComplete: () => flash.setVisible(false) });
+    play('bump', 1.4);
+  }
+
+  /** A burst of light over a cell: a trial coming, or a familiar born (D263, D268). */
+  private burst(tile: Tile): void {
+    if (this.still) return;
+    const [x, y] = this.figureAt(tile);
+    const ring = this.add.circle(x, y - TILE * 0.3, TILE * 0.25, 0xfffbe6, 0.7).setDepth(overDepth(this.map.height));
+    this.tweens.add({ targets: ring, alpha: 0, scale: 2.4, duration: this.playback.tickDuration * 1.2, onComplete: () => ring.destroy() });
+  }
+
+  /** A brass plate lit, or back as it lies (D270): its picture lit, where the scene has
+   * one; unlit, its other picture, or none, the painting's own plate. */
+  private plateLook(id: string, lit: boolean): void {
+    const image = this.things.get(id);
+    const painted = this.art?.scene.things[this.artOf(id)];
+    if (!image || !painted) return;
+    const shown = lit ? 'lit' : Object.keys(painted.states).find((state) => state !== 'lit');
+    const key = shown ? `art-${this.artOf(id)}-${shown}` : null;
+    if (key && this.textures.exists(key)) image.setTexture(key).setVisible(true);
+    else image.setVisible(false);
+  }
+
+  /** Someone says something while the program runs (D264): a bubble over who says it, or
+   * from the spot the scene names for a voice painted into it, or the book's band; the
+   * playback holds until the words are read. */
+  private tell(tick: number, data: Record<string, unknown>, instant: boolean): void {
+    const who = String(data.who);
+    const text = toldText(data, this.options.told);
+    this.toldKeys.push(`${who}:${String(data.key)}`);
+    this.parentNode.dataset.told = this.toldKeys.join(',');
+    if (who === 'book') {
+      this.bookSaid = { words: text, code: '', look: 'told' };
+    } else {
+      const sprite = who === 'wizard' ? this.wizard : (this.actors.get(who)?.sprite ?? this.voiceSprite(who));
+      if (!sprite) return;
+      this.speech.say(text, tick, this.sayTicks(text), sprite, who);
+    }
+    if (!instant) {
+      play('say');
+      this.playback.holdTick(readingMs(text));
+    }
+  }
+
+  /** Where a voice painted into the scene speaks from (D264): a figure no one sees, on the
+   * spot the scene names, for its bubble to point at. */
+  private voiceSprite(who: string): Phaser.GameObjects.Sprite | null {
+    const known = this.voiceSprites.get(who);
+    if (known) return known;
+    const spot = this.map.voices[who];
+    if (!spot) return null;
+    const sprite = this.add.sprite(...this.figureAt(spot), CREATURE_KEY).setOrigin(0.5, 0.9).setAlpha(0);
+    this.voiceSprites.set(who, sprite);
+    return sprite;
+  }
+
+  /** The book's band under the scene (D267): the line the book notes, in pencil or in
+   * ink, its words when it cannot, a kind's colours, the line Orla's order runs; hidden
+   * while it has nothing to say. */
+  private bookBand(): void {
+    let band = this.parentNode.querySelector<HTMLElement>('.book-band');
+    const said = this.bookSaid;
+    if (!said) {
+      if (band) band.hidden = true;
+      delete this.parentNode.dataset.bookBand;
+      return;
+    }
+    if (!band) {
+      band = document.createElement('div');
+      band.className = 'book-band';
+      band.append(document.createElement('p'), document.createElement('code'));
+      this.parentNode.append(band);
+    }
+    band.hidden = false;
+    band.dataset.look = said.look;
+    const words = band.querySelector('p');
+    const code = band.querySelector('code');
+    if (words) words.textContent = said.words;
+    if (code) {
+      code.textContent = said.code;
+      code.hidden = said.code === '';
+    }
+    this.parentNode.dataset.bookBand = `${said.look}:${said.code || said.words}`;
+  }
+
   private showActor(tick: number, event: WorldEvent, instant: boolean): void {
     const actor = this.actors.get(event.actor);
+    // A voice painted into the scene, or with no figure, speaks from its spot (D264).
+    if (!actor && event.kind === 'say' && !instant) {
+      const spot = this.voiceSprite(event.actor);
+      const said = String(event.data.text ?? '');
+      if (spot) this.speech.say(said, this.shownTick, this.sayTicks(said), spot, event.actor);
+      return;
+    }
     if (!actor) return;
     const facing = isFacing(event.data.facing) ? event.data.facing : actor.facing;
     switch (event.kind) {
@@ -2536,6 +3111,24 @@ class LevelScene extends Phaser.Scene {
         actor.facing = facing;
         this.face(actor.sprite, facing);
         break;
+      // A familiar bumps where it cannot go (D270); after a step held at the circle's
+      // edge, the bump is a footprint's, the trial staying where it is (D268).
+      case 'bump': {
+        if (event.data.footprint === true) {
+          const at = tileOf(event.data.at);
+          if (at && !instant) this.footprintBump(at, facing);
+          break;
+        }
+        this.tweens.killTweensOf(actor.sprite);
+        actor.facing = facing;
+        actor.sprite.setPosition(...this.figureAt(actor.tile));
+        this.face(actor.sprite, facing);
+        if (!instant) {
+          this.nudge(actor.sprite, facing, this.playback.tickDuration * 0.9);
+          play('bump');
+        }
+        break;
+      }
       // A story's actor lies down in a bed and gets up (D91).
       case 'sleep':
         this.sways.get(actor.sprite)?.stop();
@@ -2682,6 +3275,18 @@ class LevelScene extends Phaser.Scene {
     this.debug?.doorsOpen(this.openDoors);
     dataset.glowing = [...this.glows].filter(([, glow]) => glow.visible).map(([id]) => id).sort().join(',');
     dataset.carried = [...this.carried].sort().join(',');
+    // Each familiar on the scene, how it is drawn and from which sheet (D263, D273), and
+    // the plates lit (D270).
+    const creatures = [...this.creatures]
+      .filter(([id]) => this.actors.get(id)?.sprite.visible)
+      .map(([id, look]) => `${id}:${look.look}:${look.kind}:${look.color ?? ''}:${look.sheet ?? ''}`);
+    if (creatures.length > 0) dataset.creatures = creatures.join(';');
+    else delete dataset.creatures;
+    const trials = creatures.filter((one) => /^[^:]+:(good|pale|spark):/.test(one));
+    if (trials.length > 0) dataset.trials = trials.join(';');
+    else delete dataset.trials;
+    if (this.litPlates.size > 0) dataset.lit = [...this.litPlates].sort().join(',');
+    else delete dataset.lit;
     if (this.shoved.size > 0) dataset.shoved = [...this.shoved].sort().join(',');
     else delete dataset.shoved;
     this.publishDrawn();

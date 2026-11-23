@@ -78,6 +78,9 @@ export interface StartCardText {
   again?: boolean;
   /** What may differ at each run, in the child's words, when the level has ways (D204). */
   changes?: string;
+  /** That the level is played as practice: the familiar is described again with one
+   * living already, and nothing is kept (D265). */
+  practice?: string;
   /** Plays the screen's guide again (D68): offered on the course's first level's card,
    * once the guide has been seen (D248). */
   onGuide?: () => void;
@@ -138,6 +141,7 @@ export function startCard(text: StartCardText, onClose: () => void = () => {}): 
       element('h3', {}, [text.title]),
       ...(text.said ? [saidBy(text.said, 'card-intro')] : []),
       ...(text.task ? [element('p', { id: 'card-task', className: 'card-task' }, [text.task])] : []),
+      ...(text.practice ? [element('p', { id: 'card-practice', className: 'card-task' }, [text.practice])] : []),
       element('p', {}, [t('goals.title')]),
       list,
       ...(text.carrying ? [element('p', { id: 'card-carrying', className: 'card-carrying' }, [text.carrying])] : []),

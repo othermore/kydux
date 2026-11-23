@@ -164,6 +164,9 @@ def table() -> dict[str, Any]:
         "longest": LONGEST,
         "reserved": list(RESERVED),
         "methods": list(METHODS),
+        "python": sorted(
+            {w.lower() for w in (*keyword.kwlist, *keyword.softkwlist)} | set(_BUILTINS)
+        ),
     }
 
 
@@ -408,3 +411,9 @@ def making_frame() -> tuple[str, int] | None:
             return frame.f_code.co_filename, frame.f_lineno
         frame = frame.f_back
     return None
+
+
+if __name__ == "__main__":
+    import json
+
+    print(json.dumps(table(), indent=2))

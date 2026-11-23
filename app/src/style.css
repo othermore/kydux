@@ -693,6 +693,52 @@ footer .build {
   margin: 0;
 }
 
+/* The book's band at the scene's foot (D267): the line the book notes, in pencil or in
+   ink, its words when it cannot, a kind's colours, the line an order of Orla's runs. */
+.book-band {
+  position: absolute;
+  left: 10px;
+  right: 52px;
+  bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  width: fit-content;
+  max-width: calc(100% - 62px);
+  margin: 0 auto;
+  padding: 8px 14px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius);
+  background: rgb(250 244 228 / 95%);
+  box-shadow: var(--shadow);
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.book-band p {
+  margin: 0;
+}
+
+.book-band code {
+  font-size: 17px;
+}
+
+/* In pencil, grey and faint; in ink, dark and firm. */
+.book-band[data-look='pencil'] code {
+  color: #6b6f7a;
+  font-style: italic;
+}
+
+.book-band[data-look='ink'] code {
+  color: #14213d;
+  font-weight: bold;
+}
+
+.book-band[data-look='cannot'] p {
+  color: #8a3b12;
+}
+
 /* The camera's zoom, over the scene's corner (D69). */
 .zoom-box {
   position: absolute;

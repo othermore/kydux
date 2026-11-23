@@ -18,7 +18,21 @@ import { loadGuideText } from './content/guide';
 import { LessonNotFound, loadLesson } from './content/lessons';
 import { loadStory, StoryNotFound } from './content/stories';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
-import { currentLanguage, fallbackLanguage, forWizard, initLanguage, keepLanguageIn, languages, setLanguage, speakOf, t } from './i18n';
+import { checkedFamiliar, familiarTable, familiarWords, loadFamiliars, writeIntoLevel } from './content/familiar';
+import {
+  colourWord,
+  currentLanguage,
+  fallbackLanguage,
+  forWizard,
+  initLanguage,
+  keepLanguageIn,
+  kindWords,
+  languages,
+  setLanguage,
+  speakOf,
+  speakOfFamiliar,
+  t,
+} from './i18n';
 import { startPlayTime } from './progress/playtime';
 import * as progress from './progress/progress';
 import type { LevelJson } from './runtime/protocol';
@@ -212,7 +226,22 @@ function lessonRunner(
 }
 
 /** A lesson (D56): pages read one after another. */
+/** The familiar the words speak of (D266): the game's, its draft, or the default, once
+ * the first year's table is loaded. */
+function speakOfTheFamiliar(): void {
+  const table = familiarTable();
+  const kept = table ? checkedFamiliar(progress.familiar(), table) : null;
+  speakOfFamiliar(table && kept ? familiarWords(kept, table, kindWords, colourWord) : null);
+}
+
+/** The table loaded and the familiar's words set, before a screen's texts are read. */
+async function familiarKnown(): Promise<void> {
+  await loadFamiliars();
+  speakOfTheFamiliar();
+}
+
 async function showLesson(content: HTMLElement, id: string, key: string, from?: string): Promise<void> {
+  await familiarKnown();
   try {
     const [lesson, course, { lessonScreen }, { createEditor }] = await Promise.all([
       loadLesson(id, currentLanguage()),
@@ -244,6 +273,7 @@ async function showLesson(content: HTMLElement, id: string, key: string, from?: 
  * the story, the course and its own code; the scene's code arrives behind it, and the
  * screen starts the scene once it is there. */
 async function showStory(content: HTMLElement, id: string, key: string): Promise<void> {
+  await familiarKnown();
   const sceneCode = import('./engine/scene');
   sceneCode.catch((error: unknown) => {
     if (shownRoute === key) failed(content, error);
@@ -269,6 +299,11 @@ async function showStory(content: HTMLElement, id: string, key: string): Promise
         startScene: (...args) => sceneCode.then(({ startScene }) => startScene(...args)),
         // The opening is read over the welcome's painting of the castle until its scene
         // is there (D61, D214), its first step with the letter before it (D257).
+        // A story that names the castle as its still tells the steps that say so over it
+        // (D251): the end of the first year.
+        ...(!story.opening && story.still === 'castle'
+          ? { still: { src: `${import.meta.env.BASE_URL}about/welcome-castle.webp`, alt: t('about.hero_alt') } }
+          : {}),
         ...(story.opening
           ? {
               still: { src: `${import.meta.env.BASE_URL}about/welcome-castle.webp`, alt: t('about.hero_alt') },
@@ -507,6 +542,7 @@ async function showStart(content: HTMLElement): Promise<void> {
 async function showLevel(content: HTMLElement, id: string, key: string): Promise<void> {
   try {
     if (!isLevelId(id)) throw new LevelNotFound(id);
+    await familiarKnown();
     const [loaded, course, table, { levelScreen }, { createEditor }, { startScene }] =
       await Promise.all([
         loadLevel(id, currentLanguage()),
@@ -526,6 +562,10 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
     loaded.level.api = knownApi(course, id, (loaded.level.api as string[] | undefined) ?? []);
     // So do the spells (D80).
     loaded.level.spells = knownSpells(course, id, (loaded.level.spells as string[] | undefined) ?? []);
+    // The game's draft and familiar, written into the level before the world reads it
+    // (D265).
+    const familiars = familiarTable();
+    if (familiars) writeIntoLevel(loaded.level, checkedFamiliar(progress.familiar(), familiars));
     // What the course gives the page alone: the words given so far, and the concepts
     // taught up to here (CourseGiven).
     loaded.course = {
@@ -612,8 +652,10 @@ function route(): void {
       : wanted.name;
   if (key === shownRoute && screen) return;
   shownRoute = key;
-  // The words speak of the wizard as the progress document has it now (D37).
+  // The words speak of the wizard as the progress document has it now (D37), and of its
+  // familiar (D266).
   speakOf(progress.wizard());
+  speakOfTheFamiliar();
   if (wanted.name !== 'settings') beforeSettings = location.hash || '#start';
   playMusicFor(wanted);
   screen?.destroy();

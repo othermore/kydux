@@ -3,6 +3,7 @@
 // it, changes it, and saves it (D31).
 
 import { GamesStore, type SavedGame } from './games';
+import type { KeptFamiliar } from '../content/familiar';
 import { type LevelProgress, type Progress, type ProgressStore, type Settings, type Wizard } from './store';
 
 function browserStorage(): Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null {
@@ -121,6 +122,18 @@ export function setHints(id: string, shown: number): void {
 export function countRun(id: string): void {
   editLevel(id, (level) => {
     level.runs = (level.runs ?? 0) + 1;
+  });
+}
+
+/** What the game keeps of its familiar (D265): nothing yet, a draft, or one that lives. */
+export function familiar(): KeptFamiliar {
+  return store.load().familiar ?? {};
+}
+
+/** The familiar kept from now on: a draft, or the one that lives (D265). */
+export function keepFamiliar(kept: KeptFamiliar): void {
+  change((progress) => {
+    progress.familiar = kept;
   });
 }
 

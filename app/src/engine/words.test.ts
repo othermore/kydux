@@ -1,11 +1,15 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { initLanguage } from '../i18n';
-import { blockedText, bumpText, raceVerdict, ringWayText } from './words';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { initLanguage, speakOf, speakOfFamiliar } from '../i18n';
+import { blockedText, bookText, bumpText, raceVerdict, ringWayText, toldText } from './words';
 
 const english = { languages: ['en'], storage: null };
 const spanish = { languages: ['es'], storage: null };
 
-afterEach(() => initLanguage(english));
+afterEach(() => {
+  initLanguage(english);
+  speakOf(null);
+  speakOfFamiliar(null);
+});
 
 describe('blockedText', () => {
   it('says an open door\'s leaf is in the way, in both languages (D125)', () => {
@@ -142,5 +146,33 @@ describe('Ilda\'s verdict of a race (D234)', () => {
   it('says that the racer has won a race the wizard did not finish, with no numbers', () => {
     initLanguage(spanish);
     expect(raceVerdict(judged(null, 8, 'zarek'))).toBe('Kydux no ha cruzado la meta, y por tanto ha ganado Zarek.');
+  });
+});
+
+describe("the words said in a run and the book's band (D264, D267)", () => {
+  beforeEach(() => {
+    initLanguage(spanish);
+    speakOf({ name: 'Ana', gender: 'girl' });
+    speakOfFamiliar({ gender: 'm', values: { familiar: 'Pimu', familiar_a_kind: 'un zorro', familiar_kind: 'zorro' } });
+  });
+
+  it("says the level's own words, made for the trial's kind, or the chapter's", () => {
+    const own = { won: 'Es {familiar_a_kind}, sí. {wizard}.' };
+    expect(toldText({ who: 'orla', key: 'won', kind: 'Hare' }, own)).toBe('Es una liebre, sí. Ana.');
+    expect(toldText({ who: 'orla', key: 'won' }, own)).toBe('Es un zorro, sí. Ana.');
+    expect(toldText({ who: 'orla', key: 'other_attribute', name: 'age' })).toContain('`age`');
+    expect(toldText({ who: 'orla', key: 'pale_grey' })).toContain('tan buena como');
+  });
+
+  it("puts the book's line in pencil or in ink, its words when it cannot, and a kind's colours", () => {
+    expect(bookText({ line: 'Fox("Pimu", "red")', ok: true, ink: false })).toEqual({
+      words: 'El libro lo anota a lápiz:',
+      code: 'Fox("Pimu", "red")',
+      look: 'pencil',
+    });
+    expect(bookText({ line: 'Fox("Pimu", "red")', ok: true, ink: true }).look).toBe('ink');
+    expect(bookText({ line: 'x', ok: false }).look).toBe('cannot');
+    expect(bookText({ kind: 'Fox', colors: ['red', 'white', 'black'] }).code).toBe('"red"  "white"  "black"');
+    expect(bookText({ line: 'pimu.go_to(13, 10)' }, true)).toEqual({ words: 'Orla manda:', code: 'pimu.go_to(13, 10)', look: 'order' });
   });
 });

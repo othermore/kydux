@@ -12,8 +12,10 @@
 // on time (D259); only a page held up for longer than HELD starts the clock again from
 // there, so that its ticks are not played in a rush. It says how long it is
 // to the first tick ahead that holds an event asked for (timeTo, D255), and a figure's
-// run of flown steps from the tick shown (flownRun, D259). It knows nothing of Phaser:
-// the scene listens to it and draws.
+// run of flown steps from the tick shown (flownRun, D259). A tick in which someone says
+// something while the program runs is held as long as the words take to read, at most
+// TOLD_MOST, both divided by the speed (holdTick, D264). It knows nothing of Phaser: the
+// scene listens to it and draws.
 
 import type { WorldEvent } from '../runtime/protocol';
 import { FLOWN, flownTick } from './flight';
@@ -29,6 +31,9 @@ export { FLOWN } from './flight';
  * held up and the clock starts again from there (D259). At four times the speed a flown
  * tick lasts 33 ms, and a timer is that late many times in a flight. */
 export const HELD = 250;
+/** The longest a tick is held for words said while the program runs, in milliseconds
+ * at speed 1 (D264). */
+export const TOLD_MOST = 10_000;
 /** The wizard's events that take a long tick. */
 const HANDS = new Set(['cast', 'pick_up', 'untie']);
 /** How long a tick's events take, against a tick: LONG for the wizard's hands, a
@@ -126,6 +131,9 @@ export class Playback {
   private currentState: PlaybackState = 'idle';
   private multiplier: Speed = 1;
   private timer: unknown = null;
+  /** How much longer than its length the tick being shown is held, in milliseconds at
+   * speed 1 (D264). */
+  private holding = 0;
   private tickListeners: TickListener[] = [];
   private stateListeners: StateListener[] = [];
 
@@ -235,6 +243,12 @@ export class Playback {
     return this.began;
   }
 
+  /** Holds the tick being shown, from a tick listener, until words said in it are read
+   * (D264): `ms` at speed 1, TOLD_MOST at most, divided by the speed as the tick is. */
+  holdTick(ms: number): void {
+    this.holding = Math.max(this.holding, Math.min(ms, TOLD_MOST));
+  }
+
   /** A figure's run of flown steps from the tick shown on, read ahead (D259). */
   flownRun(who: string): FlownStep[] {
     return flownRun(this.ticks, Math.max(0, this.current - 1), who, this.pace);
@@ -273,7 +287,13 @@ export class Playback {
     const start = this.due !== null && now - this.due < Math.max(length, HELD) ? this.due : now;
     this.due = start + length;
     this.began = start;
+    this.holding = 0;
     for (const listener of this.tickListeners) listener(this.current, events, false);
+    // Words said in the tick hold it until they are read (D264).
+    if (this.holding > 0) {
+      this.due = Math.max(this.due, start + this.holding / this.multiplier);
+      this.holding = 0;
+    }
     // A listener may have paused it, for the map's window (D134): play() goes on.
     if (this.currentState !== 'playing') return;
     this.timer = this.schedule(

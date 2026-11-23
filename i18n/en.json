@@ -96,7 +96,13 @@
     "no_landing": "There is nowhere to set the broom down here, so the program stops here, still in the air. Land where there is ground.",
     "index_range": "The list doesn't have that many: it has {count}, and you wanted number {asked}.",
     "index_range_unknown": "The list doesn't have as many as you asked for.",
-    "ring_rim": "The broom turned while it was still inside the ring and rubbed its rim, so the program stops here, still in the air. Leave the ring by its other side, one step more upward or downward, before turning."
+    "ring_rim": "The broom turned while it was still inside the ring and rubbed its rim, so the program stops here, still in the air. Leave the ring by its other side, one step more upward or downward, before turning.",
+    "missing_self": "When an object is born, Python gives it to `__init__` first of all. This `__init__` has no place for it: `self`.",
+    "missing_self_method": "When `{name}` is used, Python gives it the object first of all. This `{name}` has no place for it: `self`.",
+    "no_attribute": "This object has nothing called `{name}`.",
+    "object_arguments": "Making a `{name}` takes {wanted} data between the brackets, and you gave it {given}.",
+    "method_arguments": "`{name}` takes {wanted} data between the brackets, and you gave it {given}.",
+    "no_such_method": "{familiar} does not know how to `{name}`."
   },
   "things": {
     "door": "the door",
@@ -184,7 +190,13 @@
       "up": "This ring is flown upward, from below. Like this, it doesn't count!",
       "down": "This ring is flown downward, from above. Like this, it doesn't count!"
     },
-    "ring_rim": "Oh, I turned too soon and grazed the ring."
+    "ring_rim": "Oh, I turned too soon and grazed the ring.",
+    "already_here": "It is in the circle already: there is no need to call it again.",
+    "already_living": "I have a familiar already: I cannot make another.",
+    "not_called": "I have not called it into the circle with minka yet: it cannot move like this.",
+    "no_way": "My familiar cannot find a path back to me.",
+    "familiar": "A familiar is in my way: I have to go round.",
+    "passage": "Only a familiar fits in there."
   },
   "notebook": {
     "title": "The wizard's notebook",
@@ -455,7 +467,8 @@
     "eldra": "Eldra",
     "baro": "Baro",
     "teku": "Teku",
-    "rinlo": "Rinlo"
+    "rinlo": "Rinlo",
+    "cold_voice": "A cold voice"
   },
   "notebook_simple": {
     "wizard": {
@@ -704,5 +717,88 @@
     "zoom": "Use the *+* and *−* buttons (or the mouse wheel) to bring the scene nearer or farther. If you lose sight of your wizard, the *Find my wizard* button brings them back into view.",
     "lesson": "In a lesson with an example of code, you can change it and press the *Run* button under it to see right there what your change does.",
     "map": "The *Map* button opens the map. From there you can open again any stop you have already reached, to play it once more, and see the stars of every level you have won."
+  },
+  "familiars": {
+    "Fox": {
+      "kind": "fox",
+      "a_kind": "a fox",
+      "gender": "m"
+    },
+    "Crow": {
+      "kind": "crow",
+      "a_kind": "a crow",
+      "gender": "m"
+    },
+    "Bat": {
+      "kind": "bat",
+      "a_kind": "a bat",
+      "gender": "m"
+    },
+    "Hare": {
+      "kind": "hare",
+      "a_kind": "a hare",
+      "gender": "f"
+    },
+    "Mouse": {
+      "kind": "mouse",
+      "a_kind": "a mouse",
+      "gender": "m"
+    },
+    "Frog": {
+      "kind": "frog",
+      "a_kind": "a frog",
+      "gender": "f"
+    },
+    "colors": {
+      "red": {
+        "m": "red",
+        "f": "red"
+      },
+      "white": {
+        "m": "white",
+        "f": "white"
+      },
+      "black": {
+        "m": "black",
+        "f": "black"
+      },
+      "brown": {
+        "m": "brown",
+        "f": "brown"
+      },
+      "green": {
+        "m": "green",
+        "f": "green"
+      },
+      "grey": {
+        "m": "grey",
+        "f": "grey"
+      }
+    }
+  },
+  "familiar": {
+    "practice": "You already have a familiar: you can practise here as much as you like, but you cannot make another, and nothing you do here is kept."
+  },
+  "told": {
+    "other_attribute": "That, `{name}`, not yet. First-years may only give their familiar a name, `name`, and a colour, `color`.",
+    "other_method": "`{name}` asks for magic learned in later years: first-years cannot teach a familiar that yet.",
+    "other_name": "There is no room for `{name}` in a first-year's description of a familiar: that asks for magic of later years.",
+    "go_to_not_yet": "`go_to`, not yet. A familiar is taught to go places once it lives, not before.",
+    "not_a_familiar": "`minka` only calls familiars, and your class does not say it is one.",
+    "class_changed": "A living familiar's description is never changed again: it only grows with what it learns.",
+    "name_letters": "The book will not take “{name}”: a familiar's name is a single word, of letters only.",
+    "name_long": "The book will not take “{name}”: it is too long. Twelve letters at most.",
+    "name_taken": "The book will not take “{name}”: Python or the school uses that name already. Choose another.",
+    "spark": "First-years may only have familiars of six kinds, and that is not one of them.",
+    "pale_colour": "Giving {familiar_a_kind} a colour that is not its own asks for magic beyond a first-year.",
+    "pale_grey": "{wizard}, you are not as good as {friend} yet, and the grey hare will not come out well for you.",
+    "halt": "Stop! You have a familiar already, and that is quite enough. You cannot make another."
+  },
+  "book": {
+    "pencil": "The book notes it in pencil:",
+    "ink": "The book writes it in ink:",
+    "cannot": "Your class does not know how to make a familiar with a name and a colour.",
+    "colours": "The colours of {kind}, as they are written:",
+    "order": "Orla orders:"
   }
 }

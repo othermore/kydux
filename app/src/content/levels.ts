@@ -23,6 +23,9 @@ export interface LevelText {
   /** What is different this time, said first on the card of a run whose way is not the
    * one on the screen before it (D204). */
   changed?: string;
+  /** What the level's figures say while a program runs, by key (D264): kept as written,
+   * and made for the wizard and for the familiar each time it is said. */
+  told?: Record<string, string>;
 }
 
 export interface LoadedLevel {

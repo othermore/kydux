@@ -259,6 +259,18 @@ if (table.status !== 0) {
 }
 writeFileSync(join(publicDir, 'api.json'), table.stdout);
 
+// The first year's table of familiars (D260): its kinds and colours, the friends' names,
+// the reserved names and Python's words, which the page reads as the world does.
+const familiars = spawnSync(python, ['-m', 'kydux_world.familiars'], {
+  cwd: join(repo, 'world'),
+  encoding: 'utf8',
+});
+if (familiars.status !== 0) {
+  console.error(`pack-world: kydux_world.familiars failed\n${familiars.stderr}`);
+  process.exit(1);
+}
+writeFileSync(join(publicDir, 'familiars.json'), familiars.stdout);
+
 // The names a wizard may not take (D61): the story's, the levels' and the world's,
 // gathered by tools/reserved_names.py from the same files; the creator refuses them.
 const reserved = spawnSync(python, [join(repo, 'tools', 'reserved_names.py')], { encoding: 'utf8' });

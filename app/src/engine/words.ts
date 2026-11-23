@@ -2,7 +2,8 @@
 // be done (D28). The engine asks here and nowhere else for i18n, so that the
 // rest of it stays free of the player's language.
 
-import { characterName, t } from '../i18n';
+import { type FamiliarWords, wordsOf } from '../content/familiar';
+import { characterName, colourWord, familiarSpoken, forFamiliar, kindWords, rawText, t } from '../i18n';
 
 /** A thing's kind said with its article: "the door", "la puerta". Every kind the
  * world has is in i18n/<lang>.json as things.<kind>, which tools/i18n_check.py holds
@@ -117,6 +118,16 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
       return t('blocked.no_landing');
     case 'ring_rim':
       return t('blocked.ring_rim');
+    // A familiar called twice, or a second one with one living (D262, D265).
+    case 'already_here':
+      return t('blocked.already_here');
+    case 'already_living':
+      return t('blocked.already_living');
+    // A familiar moved before minka calls it, and one that finds no way back (D262, D270).
+    case 'not_called':
+      return t('blocked.not_called');
+    case 'no_way':
+      return t('blocked.no_way');
     default:
       return t('blocked.unknown_action');
   }
@@ -141,6 +152,41 @@ export function raceVerdict(data: Record<string, unknown>): string {
   if (tie) return t('race.judged_penalty_tie', said);
   // Slower even before the penalty, which is then one thing more and not the reason.
   return said.own > said.theirs ? t('race.judged_slower', said) : t('race.judged_penalty_racer', said);
+}
+
+/** The words someone says while the program runs (D264), from a `told` event: the
+ * level's own (`own`, its text's `told` map) or the chapter's (`told.<key>`), made for
+ * the wizard and for the familiar the event speaks of, its kind, name and colour, over
+ * the game's own; `{name}` and `{line}` from the event. */
+export function toldText(data: Record<string, unknown>, own: Record<string, string> = {}): string {
+  const key = String(data.key);
+  const raw = own[key] ?? rawText(`told.${key}`) ?? key;
+  const game: FamiliarWords = familiarSpoken() ?? { values: {}, gender: 'm' };
+  const words = wordsOf(game, { kind: data.kind, name: data.name, color: data.color }, kindWords, colourWord);
+  const params: Record<string, string> = {};
+  for (const name of ['name', 'line', 'color', 'kind']) {
+    if (data[name] !== undefined && data[name] !== null) params[name] = String(data[name]);
+  }
+  return forFamiliar(raw, words).replace(/\{(\w+)\}/g, (whole, name: string) => params[name] ?? whole);
+}
+
+/** What the book's band says (D267): the line it notes, in pencil or in ink; that the
+ * child's class cannot make the familiar; the colours of a kind, as the strings to write;
+ * or the line Orla's order runs. */
+export function bookText(data: Record<string, unknown>, order = false): { words: string; code: string; look: string } {
+  if (order) return { words: t('book.order'), code: String(data.line ?? ''), look: 'order' };
+  if (Array.isArray(data.colors)) {
+    const kind = typeof data.kind === 'string' ? kindWords(data.kind).a_kind : '';
+    return {
+      words: t('book.colours', { kind }),
+      code: data.colors.map((colour) => `"${String(colour)}"`).join('  '),
+      look: 'colours',
+    };
+  }
+  if (data.ok !== true) return { words: t('book.cannot'), code: String(data.line ?? ''), look: 'cannot' };
+  return data.ink === true
+    ? { words: t('book.ink'), code: String(data.line ?? ''), look: 'ink' }
+    : { words: t('book.pencil'), code: String(data.line ?? ''), look: 'pencil' };
 }
 
 /** Who stands in the wizard's way: a friend, by the name the story gives them (D66, D77). */

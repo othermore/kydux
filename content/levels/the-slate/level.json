@@ -43,10 +43,10 @@
       "kind": "friend",
       "id": "friend",
       "at": [
-        6,
-        7
+        7,
+        5
       ],
-      "facing": "right"
+      "facing": "left"
     },
     {
       "kind": "familiar",
@@ -54,8 +54,8 @@
       "creature": "Hare",
       "color": "grey",
       "at": [
-        7,
-        7
+        6,
+        5
       ],
       "facing": "right"
     },

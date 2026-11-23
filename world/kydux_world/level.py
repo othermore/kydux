@@ -255,6 +255,9 @@ class FamiliarBlock:
     #: The actor of a familiar that steps out of the circle and lives after a won run,
     #: and the cell it steps to (D268).
     then: tuple[str, Position] | None = None
+    #: The cells that familiar walks after its step out, a cell a tick, its way's corners
+    #: walked out (D302).
+    then_way: tuple[Position, ...] = ()
     draft: Described | None = None
     living: Living | None = None
     #: `source` or `learned`: the living familiar's class kept at its birth, or the one
@@ -1539,17 +1542,21 @@ def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None
     if not isinstance(book, bool):
         raise LevelError(f"{level_id}: the familiar's book is true or false")
     then = None
+    then_way: tuple[Position, ...] = ()
     if value.get("then") is not None:
         spec = value["then"]
         actors = {actor.id: actor for actor in level.actors}
-        if not isinstance(spec, dict) or set(spec) != {"born", "to"}:
-            raise LevelError(f"{level_id}: then is the familiar born and the cell it steps to")
+        if not isinstance(spec, dict) or not {"born", "to"} <= set(spec) <= {"born", "to", "way"}:
+            raise LevelError(
+                f"{level_id}: then is the familiar born, the cell it steps to and its way"
+            )
         if spec["born"] not in actors or actors[spec["born"]].kind != "familiar":
             raise LevelError(f"{level_id}: then names an actor of the kind familiar")
         to = _cell(shape, spec["to"], "then's cell")
         if not level.free(to):
             raise LevelError(f"{level_id}: then's cell is floor")
         then = (spec["born"], to)
+        then_way = _then_way(spec.get("way", []), to, shape, level, spec["born"])
     draft = _described(value.get("draft"), level_id, "the draft")
     # A living level plays with the living familiar; any other may be told the game has
     # one, which makes a trial level practice and holds the birth (D265, D268).
@@ -1573,7 +1580,34 @@ def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None
         orders=orders,
         orders_on=orders_on,
         most=most,
+        then_way=then_way,
     )
+
+
+def _then_way(
+    value: Any, start: Position, shape: _Shape, level: "Level", walker: str
+) -> tuple[Position, ...]:
+    """The cells a familiar born by `then` walks after its step out (D302): its way's
+    corners walked out from `start`, each leg straight, every cell walked by a familiar
+    and held by no other actor."""
+    level_id = level.id
+    if not isinstance(value, list):
+        raise LevelError(f"{level_id}: then's way is a list of corners")
+    held = {actor.position for actor in level.actors if actor.id != walker}
+    cells: list[Position] = []
+    here = start
+    for corner in value:
+        to = _cell(shape, corner, "a corner of then's way")
+        if (to.x != here.x) == (to.y != here.y):
+            raise LevelError(f"{level_id}: each leg of then's way is straight, one cell or more")
+        dx = (to.x > here.x) - (to.x < here.x)
+        dy = (to.y > here.y) - (to.y < here.y)
+        while here != to:
+            here = Position(here.x + dx, here.y + dy)
+            if not level.familiar_walks(here) or here in held:
+                raise LevelError(f"{level_id}: then's way crosses {here.x},{here.y}")
+            cells.append(here)
+    return tuple(cells)
 
 
 def _cells_list(value: Any, level_id: str) -> list[Any]:

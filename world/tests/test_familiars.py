@@ -402,6 +402,43 @@ def test_moving_a_familiar_from_behind_its_back_is_found():
     assert result.status == "error" and result.error.type == "WorldError"
 
 
+def test_a_familiar_born_walks_its_way_to_the_moon_and_lights_it():
+    """D302: after its step out of the circle, the walker of `then` walks its way, a cell
+    a tick, lighting the plate it ends on, and may end on the child's familiar's cell."""
+    for level_id, walker in (
+        ("one-line-in-the-book", "friend_familiar"),
+        ("out-of-the-circle", "mate_familiar"),
+    ):
+        level = level_of(level_id)
+        result = run_code(
+            level, (ROOT / "content" / "levels" / level_id / "solution.py").read_text()
+        )
+        assert result.status == "won", level_id
+        walked = [e for e in _events(result, "move") if e.actor == walker]
+        assert [e.data["to"] for e in walked[1:]] == [list(c) for c in level.familiar.then_way]
+        assert walked[-1].data["to"] == [6, 4]
+        assert "moon" in [e.data["id"] for e in _events(result, "lit")]
+    born = [e for e in _events(result, "move") if e.actor.startswith("familiar")]
+    assert born[-1].data["to"] == [6, 4], "the child's familiar ends on the moon the mate shares"
+
+
+def test_then_s_way_is_straight_on_walked_floor_and_held_by_no_one():
+    given = json.loads(
+        (ROOT / "content" / "levels" / "one-line-in-the-book" / "level.json").read_text()
+    )
+    data = hall("one-line-in-the-book", actors=given["actors"])
+    block = given["familiar"]
+    for way, reason in [
+        ([[6, 4]], "straight"),
+        ([[7, 7]], "straight"),
+        ([[7, 4], [11, 4]], "crosses 9,4"),
+        ([[7, 4], [6, 4], [6, 7]], "crosses 6,7"),
+    ]:
+        then = {**block["then"], "way": way}
+        with pytest.raises(LevelError, match=reason):
+            Level.from_dict({**data, "familiar": {**block, "then": then}})
+
+
 def test_the_level_s_block_is_checked():
     data = hall("the-circle", actors=[ORLA])
     for wrong, reason in [

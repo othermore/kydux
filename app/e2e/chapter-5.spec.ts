@@ -294,6 +294,27 @@ test.describe('one familiar at a time, and none moved in a trial (D297, D301)', 
   });
 });
 
+test.describe('a familiar born walks to the moon, and two share it (D302)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("in Una línea en el libro the friend's hare leaves the circle and walks to the moon, which lights", async ({ page }) => {
+    await open(page, 'one-line-in-the-book');
+    expect(await run(page, solution('one-line-in-the-book'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute('data-actors', /(^|;)friend_familiar:6,4,/);
+    await expect(scene(page)).toHaveAttribute('data-lit', /moon/);
+    await page.locator('#scene').screenshot({ path: `${SHOTS}hare-on-the-moon.png` });
+  });
+
+  test("in Fuera del círculo the mate's familiar walks to the moon and stands beside the child's", async ({ page }) => {
+    await open(page, 'out-of-the-circle');
+    expect(await run(page, solution('out-of-the-circle'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute('data-actors', /(^|;)mate_familiar:6,4,/);
+    await expect(scene(page)).toHaveAttribute('data-shared', /\+mate_familiar:6,4/);
+    await page.locator('#scene').screenshot({ path: `${SHOTS}two-on-the-moon.png` });
+  });
+});
+
 test.describe('the trials that hold and those that fade (D276)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));

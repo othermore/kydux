@@ -256,6 +256,8 @@ const FAMILIAR_EVENTS = new Set([
 /** The placeholder a familiar is drawn with on a scene with no sheet for it. */
 const CREATURE_KEY = 'creature-placeholder';
 const SPARK_KEY = 'spark';
+/** How far aside each of two familiars sharing a cell stands, in cells (D302). */
+const SIDE_BY_SIDE = 0.25;
 /** The least time between two of a familiar's taps, in milliseconds (D277): its quick
  * steps at speed 1 are each heard, at twice the speed one in two, at four times one in
  * three. */
@@ -479,6 +481,8 @@ class LevelScene extends Phaser.Scene {
    * a held run leaves (D268); the figures seated (D273); the plates lit (D270); and where
    * a voice painted into the scene speaks from (D264). */
   private readonly creatures = new Map<string, CreatureLook>();
+  /** The familiars standing side by side on one cell, by the one that came second (D302). */
+  private readonly sideBySide = new Map<string, string>();
   private readonly called = new Set<string>();
   /** When each familiar's last step was heard, on the scene's clock (D277). */
   private readonly lastPaw = new Map<string, number>();
@@ -2943,6 +2947,7 @@ class LevelScene extends Phaser.Scene {
       this.fading.delete(id);
     }
     this.called.clear();
+    this.sideBySide.clear();
     for (const object of this.footprints) object.destroy();
     this.footprints = [];
     for (const actor of this.map.actors) if (actor.creature) this.relook(actor.id, actor.creature);
@@ -2965,6 +2970,22 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** A familiar's trial and book, its steps held, its birth and its words (D262 to D270). */
+  /** Another familiar standing on a cell a familiar steps onto (D302), or null: who is
+   * a familiar is said by its creature's look. The pairs side by side are told in
+   * data-shared. */
+  private sharedWith(id: string, tile: Tile): ActorState | null {
+    if (!this.creatures.has(id)) return null;
+    for (const [other, look] of this.creatures) {
+      const state = this.actors.get(other);
+      if (other === id || look.look === 'spark' || !state?.sprite.visible) continue;
+      if (state.tile[0] === tile[0] && state.tile[1] === tile[1]) {
+        this.sideBySide.set(id, `${other}+${id}:${tile[0]},${tile[1]}`);
+        return state;
+      }
+    }
+    return null;
+  }
+
   private showFamiliar(tick: number, event: WorldEvent, instant: boolean): void {
     const data = event.data;
     const duration = this.playback.tickDuration * 0.9;
@@ -3298,8 +3319,15 @@ class LevelScene extends Phaser.Scene {
         }
         this.tweens.killTweensOf(actor.sprite);
         this.glides.delete(actor.sprite);
+        // A familiar that ends its step on another familiar's cell shares it: the two stand
+        // side by side, the one there sliding aside as the other comes (D302).
+        const shared = this.sharedWith(event.actor, to);
         if (instant) {
           actor.sprite.setPosition(...this.figureAt(to));
+          if (shared) {
+            actor.sprite.x += SIDE_BY_SIDE * TILE;
+            shared.sprite.x = this.figureAt(to)[0] - SIDE_BY_SIDE * TILE;
+          }
           this.face(actor.sprite, facing);
           this.enchantedStep(actor.sprite, from, to, 0, true);
           break;
@@ -3309,7 +3337,10 @@ class LevelScene extends Phaser.Scene {
         // A step lasts the ticks it takes, as they are played: a familiar's half a person's
         // where it walks (D277).
         const length = this.playback.tickDuration * 0.9 * this.playback.span(stepTicks(event));
-        this.walk(actor.sprite, facing, x, y, length);
+        if (shared) {
+          this.tweens.add({ targets: shared.sprite, x: x - SIDE_BY_SIDE * TILE, duration: length });
+        }
+        this.walk(actor.sprite, facing, x + (shared ? SIDE_BY_SIDE * TILE : 0), y, length);
         this.enchantedStep(actor.sprite, from, to, length, false);
         this.step(event.actor);
         break;
@@ -3505,6 +3536,8 @@ class LevelScene extends Phaser.Scene {
       .map(([id, look]) => `${id}:${look.look}:${look.kind}:${look.color ?? ''}:${look.sheet ?? ''}`);
     if (creatures.length > 0) dataset.creatures = creatures.join(';');
     else delete dataset.creatures;
+    if (this.sideBySide.size > 0) dataset.shared = [...this.sideBySide.values()].join(';');
+    else delete dataset.shared;
     const trials = creatures.filter((one) => /^[^:]+:(good|pale|spark):/.test(one));
     if (trials.length > 0) dataset.trials = trials.join(';');
     else delete dataset.trials;

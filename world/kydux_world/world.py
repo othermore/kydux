@@ -513,7 +513,10 @@ class World:
     def _k_ends_move(self, familiar: familiars.Familiar) -> None:
         """Where a familiar's move ends, in that step's tick: a plate there is lit (D270).
         It picks up nothing by stopping (D278)."""
-        here = familiar._k_cell
+        self._k_lights(familiar._k_cell)
+
+    def _k_lights(self, here: Position) -> None:
+        """A plate on a cell where a familiar ends a move is lit, in that move's tick (D270)."""
         for thing in sorted(self.things.values(), key=lambda t: t.name):
             if thing._k_position == here and isinstance(thing, Plate) and not thing._k_lit:
                 thing._set(lit=True)
@@ -987,6 +990,14 @@ class World:
             try:
                 self.act("move", step, line=None, actor=name)
                 self.note(name, "born", {"id": name, "at": list(to)})
+                # Then it walks its way, a cell a tick, lighting the plate it ends on (D302).
+                for cell in block.then_way:
+                    here = actor._k_position
+                    facing = _direction(here, cell).value
+                    actor._set(position=cell, facing=facing)
+                    step = {"from": list(here), "to": list(cell), "facing": facing}
+                    self.act("move", step, line=None, actor=name)
+                    self._k_lights(cell)
             except RunOver:
                 pass
         if won:

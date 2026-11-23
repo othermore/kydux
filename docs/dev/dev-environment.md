@@ -457,11 +457,32 @@ Then open `https://localhost:5173` in the browser.
 
 ### Opening the game to friends
 
+The game everyone plays is the published one, on GitHub Pages (section 9).
+This section is about another way to serve it: from `hija`, to a few
+friends, behind a password. It is for a beta, a build that is not for
+everyone yet.
+
+That server is kept ready and switched off. Its site is installed in
+nginx and not enabled, and the folder it serves and the passwords stay
+where they are. Section 11 has the two commands that switch it on and off.
+
+Before it serves again, it needs a name of its own. Its name was
+`kydux.kidux.org`, and that name is the published game's. Choose another
+one, such as `beta.kidux.org`, and put it in three places: the DNS record
+of step 2 below, `deploy/nginx-kydux.conf` (the two `server_name` lines
+and the certificate's two paths), and the line `CERT=` of `ci/deploy.sh`.
+Then make the certificate for that name (section 11). The rest of this
+section and section 11 are written with `kydux.kidux.org`: read the
+beta's name in its place.
+
+A build served under such a name counts no visit and asks nothing about
+cookies. Only the published name does (section 9).
+
 A few friends can play from their homes. The game runs wholly in each
 browser, and every game is saved in the browser it is played in, so the
 server only hands out files: nginx, which the machine has, serves the
-built game over HTTPS behind a password, at `https://kydux.kidux.org`.
-Nothing of the development server is used.
+built game over HTTPS behind a password. Nothing of the development
+server is used.
 
 The pieces, once, in this order. Section 11 holds every command that
 needs `sudo`.
@@ -1073,6 +1094,49 @@ tip has its picture in every language:
 ```
 
 ## 11. The commands that need `sudo`, for opening the game to friends
+
+### Switching the site off, and on again
+
+The friends' server is kept switched off (section 5). Switching it off
+takes the site out of the ones nginx serves and leaves everything else in
+place: the site's file, the folder with the build, the passwords and the
+certificate.
+
+```sh
+sudo rm /etc/nginx/sites-enabled/kydux
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+`nginx -t` should say `syntax is ok` and `test is successful`. To check
+that it is off, list the enabled sites. `kydux` should not be among them:
+
+```sh
+ls /etc/nginx/sites-enabled/
+```
+
+Then close the way in from outside. In the router, take out the two
+forwards to `hija`, ports 443 and 80. With the site off nothing answers
+on port 443, but port 80 still reaches nginx's other site, which is for
+the home network alone.
+
+The certificate of a name that points elsewhere cannot be renewed, and
+certbot says so in its log twice a day. To stop that, delete the
+certificate. A beta makes its own, for its own name:
+
+```sh
+sudo certbot delete --cert-name kydux.kidux.org
+```
+
+Switching it on again is the same step that installed it, once it has a
+name and a certificate of its own (section 5) and the router forwards the
+two ports again:
+
+```sh
+ci/deploy.sh --site
+```
+
+### Setting it up
 
 Each step of "Opening the game to friends" (section 5) that changes the
 machine or needs root is here, ready to paste, in order. The machine is

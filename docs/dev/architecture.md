@@ -5394,3 +5394,17 @@ one overturns stays, marked as superseded.
   of the game's own. Rules out a published game that cannot stop a runaway program in
   place, a policy loosened for the child's code or on any other host, a service worker
   that keeps files, and a publication made from a tree that is no commit.
+- **D330 — The friends' server is kept, inactive.** Decided 2026-11-23 by the owner (*A
+  partir de ahora no usaremos el servidor de pruebas de mis amigos (Aunque lo
+  mantendremos inactivo, es decir, recordaremos como hacer el deploy y añadir usuarios,
+  por si en el futuro lo necesitamos para versiones beta etc)*). The game served by
+  nginx on hija behind a password stays in the repository whole and ready:
+  `deploy/nginx-kydux.conf`, `ci/deploy.sh`, `deploy/password.sh` and their pages of
+  `dev-environment.md`. On the machine its site is installed and not enabled, with the
+  folder it serves and the passwords' file left where they are, so that one command
+  brings it back. Its name was `kydux.kidux.org`, which is the published game's (D329):
+  a beta served from it takes a name of its own first, with its DNS record, its
+  certificate and that name in the site's file and in `ci/deploy.sh`. A game served
+  there counts nothing and asks nothing about cookies under any name but the published
+  one (D328). Rules out taking the server's files out of the repository, and two games
+  under one name.

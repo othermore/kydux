@@ -228,6 +228,22 @@ def test_a_figure_stepping_out_from_behind_a_thing_is_unseen_before(scene):
 
 
 @pytest.mark.parametrize("scene", SCENES)
+def test_a_way_out_behind_a_cover_hides_a_standing_figure_whole(scene):
+    """On every cell whose terrain says `out` (D319), no figure of the sheets, standing
+    and facing any way, shows a pixel under the scene's covers."""
+    seen = [line for line in export_scene.outs_seen(scene) if not line.endswith(" 0 pixels seen")]
+    assert not seen, seen
+
+
+@pytest.mark.parametrize("scene", SCENES)
+def test_no_figure_leaves_or_comes_in_by_an_edge_with_a_painted_margin(scene):
+    """A story's figure goes out by the scene's edge, or comes in by it, only on a side
+    where the painting has no margin (D319, D322): past the edge there it would stand
+    in sight on the margin."""
+    assert not export_scene.ways_over_margins(scene)
+
+
+@pytest.mark.parametrize("scene", SCENES)
 def test_a_bed_s_pillow_side_is_the_floor_cell_nearest_its_pillow_in_front_of_it(scene):
     """Each bed's `pillow_side` (D130) is a floor cell of the row just below the bed's
     tile, the one nearest the pillow's point (art.json's `beds`)."""

@@ -1135,6 +1135,9 @@ def scene(settings: Settings) -> Path:
             if margin
             else {}
         ),
+        # The cells of the painting's edges the view never shows, left, top, right and
+        # bottom (D323).
+        **({"unseen": settings.data["unseen"]["cells"]} if settings.data.get("unseen") else {}),
         "rows": rows_out,
         "things": things,
         **({"beds": beds_of(settings)} if settings.data.get("beds") else {}),
@@ -1332,10 +1335,13 @@ def main(arguments: list[str]) -> int:
         # The cells each open leaf lies on, as the scene names them (D125), and the
         # figures that step out from behind a thing, unseen before they do (D128).
         wrong = leaves_differ(settings_of.id)
-        for line in behind_seen(settings_of.id):
+        # The ways out behind a cover, hiding a figure whole, and no way across the
+        # painted margin (D319, D322).
+        for line in [*behind_seen(settings_of.id), *outs_seen(settings_of.id)]:
             print(line)
             if not line.endswith(" 0 pixels seen"):
                 wrong.append(line)
+        wrong += ways_over_margins(settings_of.id)
         for line in wrong:
             print(line)
         # The wizard on every cell walked on, and the cut's problems it would show.
@@ -1493,6 +1499,101 @@ def behind_seen(scene_id: str) -> list[str]:
                 seen = max(sweep.seen_at(scene, x, y, sheet) for sheet in sheets)
                 where = f"{story['id']}, step {number}"
                 lines.append(f"{where}: {who} behind {x},{y}, {seen} pixels seen")
+    return lines
+
+
+#: The sides of a scene's edge, in the order of a margin's cells (D83).
+SIDES = ("left", "top", "right", "bottom")
+
+
+def ways_taken(scene_id: str) -> list[dict]:
+    """The ways out of the scene and into it that its stories' figures take (D319,
+    D322), as the world's check of the stories finds them: each with the story, the
+    step, who, the cell, and the side of the edge or `out`."""
+    sys.path.insert(0, str(REPO / "world"))
+    sys.path.insert(0, str(REPO / "tools"))
+    from kydux_world.level import read_scene, story_on_scenes
+    from scene_maps import sitters
+
+    ways: list[dict] = []
+    for path in sorted((REPO / "content" / "stories").glob("*/story.json")):
+        story = json.loads(path.read_text())
+        story_on_scenes(
+            story,
+            lambda scene, story=story: read_scene(REPO / "content" / "scenes", scene, story["id"]),
+            sitters(REPO / "content"),
+            ways,
+        )
+    return [way for way in ways if way["scene"] == scene_id]
+
+
+def across_margins(ways: list[dict], margin: list[float]) -> list[str]:
+    """Each way taken by a side of the edge where the painting has a margin (D83): a
+    figure past the edge there would stand in sight on it. A line each."""
+    lines = []
+    for way in ways:
+        side = way.get("leaves", way.get("enters"))
+        if side in SIDES and margin[SIDES.index(side)] > 0:
+            verb = "leaves" if "leaves" in way else "comes in"
+            lines.append(f"{way['step']}: {way['who']} {verb} by the {side} edge, over the margin")
+    return lines
+
+
+def ways_over_margins(scene_id: str) -> list[str]:
+    """The ways the scene's stories take across its painted margin (D319, D322): none."""
+    art = json.loads((REPO / "content" / "art" / "scenes" / scene_id / "art.json").read_text())
+    return across_margins(ways_taken(scene_id), art.get("margin", [0, 0, 0, 0]))
+
+
+def out_cells(scene_id: str) -> list[tuple[int, int]]:
+    """The scene's ways out behind a cover, the cells whose terrain says `out` (D319)."""
+    folder = REPO / "content" / "scenes" / scene_id
+    about = (
+        json.loads((folder / "scene.json").read_text())
+        if (folder / "scene.json").is_file()
+        else {}
+    )
+    letters = {k for k, t in about.get("terrains", {}).items() if t.get("out") is True}
+    rows = [row for row in (folder / "map.txt").read_text().splitlines() if row]
+    return [(x, y) for y, row in enumerate(rows) for x, char in enumerate(row) if char in letters]
+
+
+def standing_seen(scene: sweep.Scene, x: int, y: int, name: str, facing: str) -> int:
+    """How many pixels of a figure standing on (x, y), facing that way, are seen, nothing
+    drawn in front of them (sweep.seen_at, the count of D128, for any way it faces)."""
+    frame, foot = sweep.figure(name, facing=facing)
+    height, width = frame.shape[:2]
+    alpha = frame[..., 3].astype(np.float32) / 255
+    left = int(sweep.middle_at(scene, x, y) * scene.cell) - width // 2
+    bottom = int(sweep.feet_at(scene, x, y) * scene.cell) + foot
+    top = bottom - height
+    here = sweep.feet_at(scene, x, y) + 0.0005
+    front = np.zeros_like(alpha)
+    for layer in scene.layers:
+        if layer.depth > here:
+            over = sweep.window(layer, left, top, left + width, bottom)[..., 3]
+            front = np.maximum(front, over.astype(np.float32) / 255)
+    return int(((alpha * (1 - front)) > 0.5).sum())
+
+
+def outs_seen(scene_id: str) -> list[str]:
+    """For each way out behind a cover (D319), the most pixels seen of any figure of the
+    sheets standing there, whichever way it faces: none, for a figure to go out of sight
+    whole behind the cover. A line each."""
+    cells = out_cells(scene_id)
+    if not cells:
+        return []
+    scene = sweep.load(scene_id)
+    data = json.loads((FIGURES_OUT / "figures.json").read_text())
+    names = sorted(
+        path.stem for path in FIGURES_OUT.glob("*.webp") if not path.stem.startswith("familiar")
+    )
+    lines = []
+    for x, y in cells:
+        seen = max(
+            standing_seen(scene, x, y, name, facing) for name in names for facing in data["ways"]
+        )
+        lines.append(f"way out {x},{y}: {seen} pixels seen")
     return lines
 
 

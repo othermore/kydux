@@ -17,13 +17,14 @@ import { contentUrl } from './address';
 
 /** One thing a figure does in a step (D103), by its `by`, the step's, or the
  * speaker: a walk to a tile or through a list of them, each in a straight line,
- * ending out of sight when it says `vanish`; a turn; an appearing, maybe stepping
- * out `from` behind a thing on a cell beside (D128); a vanishing
- * (a speaker's once its words are said); lying down asleep in a bed and waking
+ * ending out of the scene by a way out when it says `leave` (D319); a turn; an
+ * appearing, maybe stepping out `from` behind a thing on a cell beside (D128), and a
+ * vanishing (a speaker's once its words are said), a ghost's or a familiar's
+ * (D322); lying down asleep in a bed and waking
  * (D91); opening or closing a door; standing up, seated, and sitting down; and
  * bringing a thing staged hidden into sight on its cell (D279). */
 export type Action = { by?: string } & (
-  | { walk: Tile | Tile[]; vanish?: true }
+  | { walk: Tile | Tile[]; leave?: true }
   | { fly: Tile | Tile[] }
   | { land: true }
   | { face: Facing }
@@ -198,7 +199,10 @@ function waypoints(walk: Tile | Tile[]): Tile[] {
  * `ticks` and the second a `wait` (D277). An event of a figure other
  * than the step's `by`, or its speaker, says `aside`, for the camera to keep
  * with the one the step is about. A figure's words come after its step's actions,
- * or, in a step that says `meanwhile`, in the tick of the first of them (D275). */
+ * or, in a step that says `meanwhile`, in the tick of the first of them (D275). A walk
+ * that leaves by the scene's edge goes on two cells past it, off the map, and one that
+ * leaves by a way-out cell ends there; the figure is gone (`leave`) the tick after its
+ * last move (D319). */
 export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   events: WorldEvent[];
   spans: { first: number; last: number }[];
@@ -242,6 +246,8 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   const same = (one: Tile, other: Tile) => one[0] === other[0] && one[1] === other[1];
   const underLeaf = (tile: Tile) => [...opened].some((id) => doors.get(id)?.covers.some((cell) => same(cell, tile)));
   const shut = (tile: Tile) => [...doors].some(([id, door]) => !opened.has(id) && same(door.at, tile));
+  // The ways out behind a cover, which a walk that leaves ends on (D319).
+  const outs = ((story.world.out as Tile[] | undefined) ?? []).map(([x, y]) => `${x},${y}`);
   const floor = ([x, y]: Tile) => {
     const char = start[y]?.[x];
     return char !== undefined && char !== '#' && char !== '=';
@@ -277,7 +283,7 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   const played = (actor: string, kind: string, data: Record<string, unknown>) => {
     if (kind === 'move') standing.set(actor, data.to as Tile);
     else if (kind === 'appear') standing.set(actor, data.at as Tile);
-    else if (kind === 'vanish') standing.delete(actor);
+    else if (kind === 'vanish' || kind === 'leave') standing.delete(actor);
     else if (kind === 'close') opened.delete(String(data.id));
     else if (kind === 'open') {
       opened.add(String(data.id));
@@ -315,17 +321,31 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
           queue.push({ kind: 'fly', data: { id: doer, ...aside } });
         }
         let [x, y] = where.get(doer) ?? waypoints(route)[0] ?? [0, 0];
+        let [dx, dy, last]: [number, number, Facing] = [0, 0, 'down'];
         for (const [tx, ty] of waypoints(route)) {
           const way: Facing = tx > x ? 'right' : tx < x ? 'left' : ty > y ? 'down' : 'up';
+          [dx, dy, last] = [Math.sign(tx - x), Math.sign(ty - y), way];
           while (x !== tx || y !== ty) {
             const from: Tile = [x, y];
-            x += Math.sign(tx - x);
-            y += Math.sign(ty - y);
+            x += dx;
+            y += dy;
             queue.push({ kind: 'move', data: { from, to: [x, y], facing: way, ...flown, ...aside } });
           }
         }
+        if ('walk' in action && action.leave) {
+          // Out by the scene's edge, on past it two cells, a move a tick as the walk's
+          // own, or behind a cover on a way-out cell; gone the tick after (D319).
+          if (!outs.includes(`${x},${y}`)) {
+            for (let past = 0; past < 2; past += 1) {
+              const from: Tile = [x, y];
+              x += dx;
+              y += dy;
+              queue.push({ kind: 'move', data: { from, to: [x, y], facing: last, ...aside } });
+            }
+          }
+          queue.push({ kind: 'leave', data: { ...aside } });
+        }
         where.set(doer, [x, y]);
-        if ('walk' in action && action.vanish) queue.push({ kind: 'vanish', data: { ...aside } });
       } else if ('land' in action) {
         aloft.delete(doer);
         queue.push({ kind: 'land', data: { id: doer, ...aside } });

@@ -81,10 +81,10 @@
         {
           "by": "ilda",
           "walk": [
-            3,
+            0,
             15
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "friend",

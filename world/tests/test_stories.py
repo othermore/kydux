@@ -1,6 +1,8 @@
 """A story staged on its scene (D74): the world it is played in, and a staging
 that does not fit the scene refused with the reason."""
 
+import json
+
 import pytest
 from kydux_world.level import DEFAULT_TERRAINS, LevelError, Scene, story_on_scene
 
@@ -23,13 +25,14 @@ def staged(**change):
         "scene": "yard",
         "wizard": [1, 1],
         "camera": [3, 2],
-        "actors": [{"id": "nuri", "kind": "friend"}],
+        "actors": [{"id": "nuri", "kind": "ghost"}],
         "steps": [
             {"who": "voice", "do": None},
             {"who": "voice", "do": {"appear": [5, 1]}, "by": "nuri"},
             {"who": "nuri", "do": {"walk": [2, 1]}},
             {"who": "wizard", "do": {"face": "right"}},
             {"who": "nuri", "do": {"vanish": True}},
+            {"who": "voice", "do": None},
         ],
     }
     data.update(change)
@@ -45,7 +48,7 @@ def test_a_story_comes_with_the_world_it_is_played_in():
     # An actor who appears is out of sight until then, where it first appears;
     # no one watches for the wizard.
     assert world["actors"] == [
-        {"id": "nuri", "kind": "friend", "at": [5, 1], "hidden": True, "sight": 0}
+        {"id": "nuri", "kind": "ghost", "at": [5, 1], "hidden": True, "sight": 0}
     ]
     assert story["camera"] == [3, 2]
     assert [step["who"] for step in story["steps"]][:2] == ["voice", "voice"]
@@ -217,12 +220,11 @@ def test_the_ending_s_two_stories_name_the_truth_and_bring_the_familiar_back():
 
 def test_a_meanwhile_speaker_may_walk_out_of_sight_as_its_last_action():
     """D310: who speaks meanwhile says the words as the step begins and may walk out of
-    sight at its end; without meanwhile, a speaker out of sight is refused."""
-    actors = [{"id": "nuri", "kind": "friend", "at": [3, 1]}]
-    walk = {"walk": [5, 1], "vanish": True}
-    staged(actors=actors, steps=[{"who": "nuri", "meanwhile": True, "do": walk}])
+    the scene at its end; without meanwhile, a speaker out of sight is refused."""
+    walk = {"walk": [0, 2], "leave": True}
+    on_the_lane([{"who": "nuri", "meanwhile": True, "do": walk}])
     with pytest.raises(LevelError, match="speaks out of sight"):
-        staged(actors=actors, steps=[{"who": "nuri", "do": walk}])
+        on_the_lane([{"who": "nuri", "do": walk}])
 
 
 def test_the_tower_s_first_year_is_the_three_friends_who_leave_the_dormitory():
@@ -241,11 +243,13 @@ def test_the_tower_s_first_year_is_the_three_friends_who_leave_the_dormitory():
     first = story_on_scene(
         {**story, "steps": story["steps"][:6]}, read_scene(content / "scenes", story["scene"])
     )
-    assert first["steps"][5]["do"][-1] == {"by": "wizard", "walk": [0, 15], "vanish": True}
-    six = [a for a in story["steps"][5]["do"] if a.get("vanish")]
+    assert first["steps"][5]["do"][-1] == {"by": "wizard", "walk": [0, 15], "leave": True}
+    six = [a for a in story["steps"][5]["do"] if a.get("leave")]
     assert sorted(a["by"] for a in six) == ["friend", "mate", "wizard"]
-    seventeen = [a for a in story["steps"][16]["do"] if a.get("vanish")]
+    # Into the left archway's tunnel, to its way out behind the wall (D319).
+    seventeen = [a for a in story["steps"][16]["do"] if a.get("leave")]
     assert sorted(a["by"] for a in seventeen) == ["friend", "mate", "wizard"]
+    assert {tuple(a["walk"][-1]) for a in seventeen} == {(14, 3)}
 
 
 def in_the_room(steps, actors=(MATE,)):
@@ -276,7 +280,7 @@ def test_a_figure_lies_down_in_a_bed_beside_it_and_wakes():
     [
         ([by("mate", {"walk": [2, 2]})], "mate is asleep"),
         ([by("mate", {"face": "left"})], "mate is asleep"),
-        ([{"who": "voice", "do": {"vanish": True}, "by": "mate"}], "mate is asleep"),
+        ([{"who": "voice", "do": {"vanish": True}, "by": "mate"}], "mate is no ghost"),
         ([by("wizard", {"wake": True})], "wizard is not asleep"),
         ([by("wizard", {"sleep": "bed_2"})], "beside no bed_2"),
         ([by("wizard", {"sleep": "bed_3"})], "no bed of the scene"),
@@ -361,32 +365,128 @@ def test_a_walk_through_a_corner_must_go_straight_each_way():
     staged(actors=[], steps=[{"who": "wizard", "do": {"walk": [[1, 3], [3, 3], [3, 1]]}}])
 
 
-def test_a_walk_may_end_out_of_sight_and_the_wizard_never_goes():
-    story = staged(
-        actors=[{"id": "nuri", "kind": "friend", "at": [3, 1]}],
-        steps=[
-            {"who": "nuri", "do": None},
-            {"who": "voice", "do": {"by": "nuri", "walk": [5, 1], "vanish": True}},
-        ],
-    )
-    assert story["world"]["actors"][0]["at"] == [3, 1]
-    with pytest.raises(LevelError, match="speaks out of sight"):
-        staged(
-            actors=[{"id": "nuri", "kind": "friend", "at": [3, 1]}],
-            steps=[{"who": "nuri", "do": {"walk": [5, 1], "vanish": True}}],
-        )
+#: A lane open at its two ends, with a door of floor at its top and its foot, and a way out
+#: behind a cover (`o`, D319): the left edge at 0,2, the right at 6,2, the top at 2,0, the
+#: foot at 2,4 and 3,4.
+LANE = Scene(
+    "lane",
+    ("##g####", "##g##o#", "ggggggg", "#ggggg#", "##gg###"),
+    {
+        **TERRAINS,
+        "o": {"kind": "wall", "walk": "story", "sight": False, "fly": False, "out": True},
+    },
+)
+
+
+def on_the_lane(steps, actors=None, ways=None):
+    data = {
+        "id": "a-lane",
+        "scene": "lane",
+        "wizard": [1, 3],
+        "actors": actors or [{"id": "nuri", "kind": "friend", "at": [3, 2]}],
+        "steps": steps,
+    }
+    return story_on_scene(data, LANE, ways=ways)
+
+
+@pytest.mark.parametrize(
+    ("walk", "side"),
+    [([0, 2], "left"), ([6, 2], "right"), ([[2, 2], [2, 0]], "top"), ([[2, 2], [2, 4]], "bottom")],
+)
+def test_a_walk_leaves_by_the_edge_it_heads_off(walk, side):
+    """D319: a walk that leaves ends on the scene's edge, its last move heading off it."""
+    ways: list = []
+    on_the_lane([by("nuri", {"walk": walk, "leave": True}), {"who": "voice"}], ways=ways)
+    end = walk if isinstance(walk[0], int) else walk[-1]
+    assert ways == [
+        {"scene": "lane", "story": "a-lane", "step": "a-lane, step 1", "who": "nuri"}
+        | {"cell": end, "leaves": side}
+    ]
+
+
+def test_a_walk_leaves_by_a_way_out_behind_a_cover():
+    """D319: or on a cell whose terrain says out, floor a story walks; the world the page
+    draws names those cells."""
+    ways: list = []
+    story = on_the_lane([by("nuri", {"walk": [[5, 2], [5, 1]], "leave": True})], ways=ways)
+    assert ways[0]["leaves"] == "out" and ways[0]["cell"] == [5, 1]
+    assert story["world"]["out"] == [[5, 1]]
+
+
+@pytest.mark.parametrize(
+    ("doing", "says"),
+    [
+        # Reaching the border sideways is no way out, nor is a plain cell inside.
+        ({"walk": [[3, 3], [3, 4], [2, 4]], "leave": True}, "leaves at 2,4, no way out"),
+        ({"walk": [4, 2], "leave": True}, "leaves at 4,2, no way out"),
+        ({"leave": True}, "leave ends a walk"),
+        ({"fly": [0, 2], "leave": True}, "leave ends a walk"),
+        ({"walk": [0, 2], "leave": False}, "leave is true"),
+        ({"walk": [0, 2], "vanish": True}, "ends in leave"),
+    ],
+)
+def test_a_walk_that_leaves_by_no_way_out_is_refused(doing, says):
+    with pytest.raises(LevelError, match=says):
+        on_the_lane([by("nuri", doing), {"who": "voice"}])
+
+
+def test_who_has_left_does_nothing_more_and_the_wizard_leaves_last():
+    """D319, D310: gone, a figure does nothing more; the wizard leaves only in a part's last
+    step; two leave by one cell, one behind the other, the edge's cell free a tick after."""
+    with pytest.raises(LevelError, match="nuri is out of sight"):
+        on_the_lane([by("nuri", {"walk": [0, 2], "leave": True}), by("nuri", {"face": "up"})])
     with pytest.raises(LevelError, match="stays in the story"):
-        staged(
-            actors=[],
-            steps=[
-                {"who": "voice", "by": "wizard", "do": {"walk": [3, 1], "vanish": True}},
-                {"who": "voice"},
-            ],
-        )
-    # At the very end of a story, the wizard may walk out of sight.
-    staged(
-        actors=[], steps=[{"who": "voice", "by": "wizard", "do": {"walk": [3, 1], "vanish": True}}]
+        on_the_lane([by("wizard", {"walk": [[1, 2], [0, 2]], "leave": True}), {"who": "voice"}])
+    on_the_lane([{"who": "voice"}, by("wizard", {"walk": [[1, 2], [0, 2]], "leave": True})])
+    two = [
+        {"id": "nuri", "kind": "friend", "at": [2, 2]},
+        {"id": "teku", "kind": "friend", "at": [3, 2]},
+    ]
+    pair = [
+        {"by": "nuri", "walk": [0, 2], "leave": True},
+        {"by": "teku", "walk": [0, 2], "leave": True},
+    ]
+    on_the_lane([{"who": "voice", "do": pair}], actors=two)
+    with pytest.raises(LevelError, match="teku's walk is stopped at 2,2"):
+        on_the_lane([{"who": "voice", "do": pair[::-1]}], actors=two)
+
+
+@pytest.mark.parametrize(
+    ("kind", "steps", "says"),
+    [
+        ("teacher", [{"who": "dask", "do": {"vanish": True}}, {"who": "voice"}], "no ghost"),
+        ("friend", [by("dask", {"vanish": True})], "no ghost"),
+        ("ghost", [{"who": "dask", "do": {"vanish": True}}], "no step comes after"),
+        ("ghost", [{"who": "dask", "do": {"vanish": True}}, {"who": "voice"}], ""),
+        ("familiar", [by("dask", {"vanish": True})], ""),
+    ],
+)
+def test_a_figure_fades_out_only_as_a_ghost_or_a_familiar(kind, steps, says):
+    """D322: a bare vanish is a ghost's or a familiar's; a speaker's is played as the next
+    step begins, never in a part's last step."""
+    actors = [{"id": "dask", "kind": kind, "at": [3, 2]}]
+    if not says:
+        on_the_lane(steps, actors=actors)
+        return
+    with pytest.raises(LevelError, match=says):
+        on_the_lane(steps, actors=actors)
+
+
+def test_a_way_out_is_floor_a_story_walks(tmp_path):
+    """D319: a terrain says out only with walk story, and only as true."""
+    from kydux_world.level import read_scene
+
+    folder = tmp_path / "yard"
+    folder.mkdir()
+    (folder / "map.txt").write_text("###\n#o#\n###\n")
+    for terrain in ({"kind": "wall", "out": True}, {"kind": "wall", "walk": "story", "out": 1}):
+        (folder / "scene.json").write_text(json.dumps({"terrains": {"o": terrain}}))
+        with pytest.raises(LevelError, match="way out only as floor a story walks"):
+            read_scene(tmp_path, "yard")
+    (folder / "scene.json").write_text(
+        json.dumps({"terrains": {"o": {"kind": "wall", "walk": "story", "out": True}}})
     )
+    assert read_scene(tmp_path, "yard").terrains["o"]["out"] is True
 
 
 def test_a_figure_opens_and_closes_a_door_beside_it():
@@ -640,14 +740,16 @@ def test_only_a_thing_the_wizard_carries_is_staged_hidden():
 
 
 #: A room whose landing and stairs the painting shows and no level walks: `l`, a wall to a
-#: level, and `v`, the floor before the crates, a shelf to it; `u` is furniture (D288).
+#: level, and `v`, the floor before the crates, a shelf to it; `u` is furniture (D288); the
+#: stairs' foot, `o`, a way out (D319).
 LANDING = Scene(
     "landing",
-    ("#######", "#lllvu#", "#l#...#", "#l#...#", "#######"),
+    ("#######", "#lllvu#", "#l#...#", "#o#...#", "#######"),
     {
         **DEFAULT_TERRAINS,
         "u": {"kind": "furniture", "walk": False, "sight": True},
         "l": {"kind": "wall", "walk": "story", "sight": False, "fly": False},
+        "o": {"kind": "wall", "walk": "story", "sight": False, "fly": False, "out": True},
         "v": {"kind": "furniture", "walk": "story", "sight": True, "fly": False},
     },
 )
@@ -668,7 +770,7 @@ def test_a_story_s_figure_stands_on_and_walks_a_story_s_floor():
     """D288: the floor a story alone walks is floor to its figures, read from the scene;
     the level's map built under it keeps it a wall and a shelf."""
     story = on_the_landing(
-        [by("rinlo", [{"walk": [[4, 1], [1, 1], [1, 3]], "vanish": True}])], at=(4, 2)
+        [by("rinlo", [{"walk": [[4, 1], [1, 1], [1, 3]], "leave": True}])], at=(4, 2)
     )
     assert story["world"]["map"][1:4] == ["####==#", "###...#", "###..S#"]
     on_the_landing([by("rinlo", {"walk": [1, 1]})], at=(4, 1))
@@ -677,7 +779,7 @@ def test_a_story_s_figure_stands_on_and_walks_a_story_s_floor():
     with pytest.raises(LevelError, match="stopped at 3,1"):
         on_the_landing([by("rinlo", {"walk": [1, 1]})], at=(4, 1), things=[door])
     on_the_landing(
-        [by("rinlo", [{"open": "side"}, {"walk": [[1, 1], [1, 3]], "vanish": True}])],
+        [by("rinlo", [{"open": "side"}, {"walk": [[1, 1], [1, 3]], "leave": True}])],
         at=(4, 1),
         things=[door],
     )

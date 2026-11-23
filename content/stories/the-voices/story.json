@@ -133,7 +133,7 @@
               14
             ]
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "friend",
@@ -151,7 +151,7 @@
               14
             ]
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "wizard",
@@ -173,7 +173,7 @@
               14
             ]
           ],
-          "vanish": true
+          "leave": true
         }
       ]
     }

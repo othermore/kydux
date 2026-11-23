@@ -4,6 +4,17 @@
       "kind": "furniture",
       "walk": false,
       "sight": true
+    },
+    "t": {
+      "kind": "wall",
+      "walk": "story",
+      "sight": false
+    },
+    "o": {
+      "kind": "wall",
+      "walk": "story",
+      "sight": false,
+      "out": true
     }
   },
   "things": [],

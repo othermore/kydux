@@ -5185,3 +5185,19 @@ one overturns stays, marked as superseded.
   kinds of actor, and every `enter` to a cell of the edge the figure may stand on, or fly
   over, or to a way-out cell; the art's check holds no figure to come in by an edge with
   a margin. Rules out a figure that fades in on a path, in a doorway or in the air.
+- **D323 — The view may end inside a painting.** Decided 2026-11-22 by the owner, of
+  the band of starry sky painted over the entrance's far wall (*ese cielo no debería ser
+  un cielo sino una pared continuada hacia arriba, que es la pared del vestíbulo*; *O si
+  no, simplemente, acabar ahí el escenario con el muro y que no hubiese más (es decir,
+  borrar la franja superior que es el cielo)*; *no pasa nada por cortar un poco las
+  torres de atrás*). A scene's settings may say `unseen`, the cells of the painting's
+  edges the view never shows, left, top, right and bottom, which `art.json` carries; the
+  camera's bounds are the painting with its margin less them (`viewMarginOf` in
+  `engine/painted.ts`), so a window of any shape stops there as it stops at a painting's
+  edge (D92), and the zoom goes no lower than what is left fills the canvas. The
+  entrance's view starts at 2.07 cells, the coping's outline along the whole far wall,
+  so the hall's wall reads as going on up out of the picture; the tips of the two far
+  towers are cut with the sky. The painting, the map and every cell stay as they are.
+  The far wall's cover takes the coping in, up to that outline, so that a figure gone
+  into a tunnel behind the wall (D319) shows nothing over it. Rules out a sky over a
+  hall, and a painting cut to a new size that would move every cell of the scene.

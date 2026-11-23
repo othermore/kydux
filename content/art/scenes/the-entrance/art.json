@@ -5,11 +5,17 @@
     30
   ],
   "ground": "ground.webp",
+  "unseen": [
+    0,
+    2.07,
+    0,
+    0
+  ],
   "rows": [
     {
       "row": 9,
       "image": "row-9-static.webp",
-      "top": 230,
+      "top": 198,
       "static": true
     },
     {

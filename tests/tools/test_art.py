@@ -2071,3 +2071,36 @@ def test_an_edit_of_two_things_is_laid_in_two_runs_the_second_from_the_first(
     four = np.array(Image.open(scene.edits / "four.png"))
     assert (four[120:150, 130:160] == (120, 100, 40)).all()
     assert (four[:100] == one[:100]).all()
+
+
+def test_a_way_across_a_painted_margin_is_found():
+    """A figure that leaves or comes in by a side of the edge with a margin (D319, D322)."""
+    ways = [
+        {"step": "a, step 2", "who": "nuri", "leaves": "bottom"},
+        {"step": "a, step 3", "who": "teku", "enters": "left"},
+        {"step": "a, step 4", "who": "dask", "leaves": "out"},
+    ]
+    assert export_scene.across_margins(ways, [0, 0, 0, 0]) == []
+    assert export_scene.across_margins(ways, [3, 2, 3, 2]) == [
+        "a, step 2: nuri leaves by the bottom edge, over the margin",
+        "a, step 3: teku comes in by the left edge, over the margin",
+    ]
+    assert export_scene.across_margins(ways, [0, 0, 0, 2]) == [
+        ways[0]["step"] + ": nuri leaves by the bottom edge, over the margin"
+    ]
+
+
+def test_a_way_out_shows_a_figure_its_cover_leaves_bare():
+    """A figure on a way-out cell is counted as D128 counts one behind a thing: a cover
+    that hides it whole leaves no pixel; one that ends below its head, its head (D319)."""
+    cell = 96
+    ground = np.zeros((4 * cell, 3 * cell, 4), dtype=np.uint8)
+
+    def scene_with(top: int) -> "sweep.Scene":
+        wall = np.zeros((4 * cell - top, 3 * cell, 4), dtype=np.uint8)
+        wall[..., 3] = 255
+        layers = [sweep.Layer("row 3 static", 3.75, 3, wall, 0, top, static=True)]
+        return sweep.Scene("walled", cell, 3, 4, np.ones((4, 3), bool), ground, layers)
+
+    assert export_scene.standing_seen(scene_with(0), 1, 1, sweep.LOOK, "up") == 0
+    assert export_scene.standing_seen(scene_with(int(1.5 * cell)), 1, 1, sweep.LOOK, "up") > 0

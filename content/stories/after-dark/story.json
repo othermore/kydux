@@ -158,11 +158,26 @@
               15
             ],
             [
-              19,
+              11,
               15
             ]
+          ]
+        },
+        {
+          "by": "friend",
+          "face": "right"
+        },
+        {
+          "by": "friend",
+          "face": "left"
+        },
+        {
+          "by": "friend",
+          "walk": [
+            0,
+            15
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "wizard",
@@ -176,11 +191,18 @@
               15
             ],
             [
-              19,
+              14,
               15
             ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            0,
+            15
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "mate",
@@ -196,13 +218,20 @@
             [
               12,
               15
-            ],
-            [
-              19,
-              15
             ]
+          ]
+        },
+        {
+          "by": "mate",
+          "close": "front_door"
+        },
+        {
+          "by": "mate",
+          "walk": [
+            0,
+            15
           ],
-          "vanish": true
+          "leave": true
         }
       ]
     }

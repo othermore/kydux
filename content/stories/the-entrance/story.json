@@ -77,9 +77,7 @@
     },
     {
       "who": "ilda",
-      "do": {
-        "vanish": true
-      }
+      "do": null
     }
   ]
 }

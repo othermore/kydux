@@ -80,30 +80,18 @@
         {
           "by": "friend",
           "walk": [
-            [
-              9,
-              14
-            ],
-            [
-              10,
-              14
-            ]
+            9,
+            14
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "mate",
           "walk": [
-            [
-              9,
-              14
-            ],
-            [
-              10,
-              14
-            ]
+            9,
+            14
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "wizard",
@@ -119,13 +107,9 @@
             [
               9,
               14
-            ],
-            [
-              10,
-              14
             ]
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "dask",
@@ -135,9 +119,9 @@
           "by": "dask",
           "walk": [
             10,
-            2
+            0
           ],
-          "vanish": true
+          "leave": true
         }
       ]
     }

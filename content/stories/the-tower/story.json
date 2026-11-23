@@ -151,7 +151,7 @@
             0,
             15
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "mate",
@@ -172,7 +172,7 @@
             0,
             15
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "wizard",
@@ -191,7 +191,7 @@
             0,
             15
           ],
-          "vanish": true
+          "leave": true
         }
       ]
     },
@@ -345,10 +345,10 @@
             ],
             [
               20,
-              5
+              3
             ]
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "friend",
@@ -385,10 +385,10 @@
             ],
             [
               14,
-              6
+              3
             ]
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "wizard",
@@ -403,10 +403,10 @@
             ],
             [
               14,
-              6
+              3
             ]
           ],
-          "vanish": true
+          "leave": true
         },
         {
           "by": "mate",
@@ -421,10 +421,10 @@
             ],
             [
               14,
-              6
+              3
             ]
           ],
-          "vanish": true
+          "leave": true
         }
       ]
     },

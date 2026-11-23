@@ -108,10 +108,10 @@
   },
   "things": {
     "far_wall": {
-      "about": "The far wall's face, its arches' stones, its pillars and its knights, drawn over whoever walks into the arches: the wall's box less what is seen through its three openings, which Gemini painted magenta.",
+      "about": "The far wall's face, its arches' stones, its pillars and its knights, drawn over whoever walks into the arches: the wall's box less what is seen through its three openings, which Gemini painted magenta. Its top is the wall's own top edge, the coping's outline, so that a figure gone into a tunnel behind the wall (D319) shows nothing over the coping.",
       "box": [
         4.0,
-        2.4,
+        2.06,
         36.0,
         9.15
       ],
@@ -636,6 +636,15 @@
     ],
     "painting": "art/raw/game-entrance/entrance-marked.png",
     "mended": "art/raw/game-entrance/entrance-marked-stubs.png"
+  },
+  "unseen": {
+    "about": "The view ends at the far wall's top edge (D323): the starry band painted above the coping, where the hall's wall goes on up out of the picture, is never shown. 2.07 cells, the coping's outline at 198 to 200 pixels of the ground along the whole wall.",
+    "cells": [
+      0,
+      2.07,
+      0,
+      0
+    ]
   },
   "dark": [
     {

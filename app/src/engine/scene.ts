@@ -55,7 +55,9 @@
 // reads the programs, D189), data-race-verdict (her verdict of the race, D234),
 // data-flyers-at (where each flying figure is as each frame is drawn: its feet in the
 // scene's pixels and on the canvas, the camera counted, "id:x,y,x,y" joined by ";",
-// D259) and data-world (what the camera shows, in cells: "left,top,width,height").
+// D259), data-world (what the camera shows, in cells: "left,top,width,height") and, in a
+// story, data-figures (each figure drawn, its box in cells and its alpha,
+// "id:left,top,right,bottom:alpha" joined by ";", D319, D322).
 //
 // The camera is a window on the scene (D69, camera.ts): it follows the wizard,
 // the player zooms it and drags it to look around, and a run or a restart brings
@@ -122,6 +124,7 @@ import {
   type Played,
   playFrames,
   marginOf,
+  viewMarginOf,
   preloadArt,
   SHEET_ROW,
   sleepFrame,
@@ -968,7 +971,7 @@ class LevelScene extends Phaser.Scene {
     this.view = new SceneCamera(this, this.parentNode, {
       columns: this.map.width,
       rows: this.map.height,
-      margin: marginOf(this.art),
+      margin: viewMarginOf(this.art),
       painted: this.art !== null,
       story: story ? { x: centre(story.camera)[0], y: centre(story.camera)[1] } : null,
       levelBox: this.map.camera,
@@ -1134,6 +1137,7 @@ class LevelScene extends Phaser.Scene {
     const view = this.cameras.main.worldView;
     const world = [view.x, view.y, view.width, view.height].map((v) => (v / TILE).toFixed(2)).join(',');
     if (this.parentNode.dataset.world !== world) this.parentNode.dataset.world = world;
+    if (this.options.story) this.publishFigures();
     if (this.glides.size > 0) this.moveGlides();
     // The camera moves with the wizard at once while it glides (D259).
     this.view.glide(this.glides.has(this.wizard));
@@ -1218,6 +1222,20 @@ class LevelScene extends Phaser.Scene {
     }
     this.debug?.update(this.cameras.main);
     if (this.art) this.publishDrawn();
+  }
+
+  /** In a story, each figure drawn, its box in cells and its alpha, for the tests that
+   * hold who comes in and who leaves to be whole and solid (D319, D322). */
+  private publishFigures(): void {
+    const drawn = [['wizard', this.wizard] as const, ...[...this.actors].map(([id, { sprite }]) => [id, sprite] as const)]
+      .filter(([, sprite]) => sprite.visible)
+      .map(([id, sprite]) => {
+        const box = sprite.getBounds();
+        const cells = [box.left, box.top, box.right, box.bottom].map((v) => (v / TILE).toFixed(2)).join(',');
+        return `${id}:${cells}:${sprite.alpha.toFixed(2)}`;
+      })
+      .join(';');
+    if (this.parentNode.dataset.figures !== drawn) this.parentNode.dataset.figures = drawn;
   }
 
   /** The depth of the goal's mark on `tile`: on the ground (D160), or, where a door open
@@ -2723,10 +2741,10 @@ class LevelScene extends Phaser.Scene {
           play('cast');
         }
         break;
-      case 'vanish':
-        // At the very end of a story, the wizard walks out of sight with the others.
-        if (instant) this.wizard.setVisible(false);
-        else this.tweens.add({ targets: this.wizard, alpha: 0, duration: this.playback.tickDuration * 0.9, onComplete: () => this.wizard.setVisible(false).setAlpha(1) });
+      // At the end of a part, the wizard walks out of the scene with the others (D310,
+      // D319).
+      case 'leave':
+        this.leave(this.wizard);
         break;
       case 'give':
         this.unreveal(String(event.data.id));
@@ -3503,6 +3521,12 @@ class LevelScene extends Phaser.Scene {
         }
         break;
       }
+      // Gone out of the scene by a way out, past its edge or behind a cover: hidden at
+      // once, with nothing of it in sight to fade (D319).
+      case 'leave':
+        this.leave(actor.sprite);
+        break;
+      // A ghost or a familiar fades out (D322).
       case 'vanish':
         this.tweens.killTweensOf(actor.sprite);
         this.sways.get(actor.sprite)?.stop();
@@ -3525,6 +3549,16 @@ class LevelScene extends Phaser.Scene {
         if (!instant) this.cameras.main.shake(this.playback.tickDuration * 0.6, 0.006);
         break;
     }
+  }
+
+  /** A figure gone out of the scene by a way out (D319): hidden at once, its sway and
+   * its shadow with it. */
+  private leave(sprite: Phaser.GameObjects.Sprite): void {
+    this.tweens.killTweensOf(sprite);
+    this.glides.delete(sprite);
+    this.sways.get(sprite)?.stop();
+    sprite.setVisible(false).setAlpha(1);
+    this.flyers.get(sprite)?.shadow.setVisible(false);
   }
 
   /** Whether sight passes a tile: the shared rule (sight.ts), with the doors shut now. */

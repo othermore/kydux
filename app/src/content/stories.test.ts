@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { loadStory, type StoryStep, storyEvents, themeAt } from './stories';
 
-const world = { map: ['#####', '#S..#', '#...#', '#####'], actors: [{ id: 'nuri', kind: 'friend', at: [3, 2] }] };
+// Nuri is a ghost here: a ghost and a familiar alone fade in and out of sight (D322).
+const world = { map: ['#####', '#S..#', '#...#', '#####'], actors: [{ id: 'nuri', kind: 'ghost', at: [3, 2] }] };
 
 function steps(...list: Omit<StoryStep, 'text'>[]): StoryStep[] {
   return list.map((step, index) => ({ ...step, text: `words ${index}` }));
@@ -126,16 +127,35 @@ describe('a story as the scene\'s events (D74)', () => {
     ]);
   });
 
-  it('turns at each tile of a walk, and a walk may end out of sight', () => {
+  it('turns at each tile of a walk, and a walk that leaves by the edge goes on two cells past it (D319)', () => {
+    const lane = { map: ['#####', '....#', '#...#', '#####'], actors: [{ id: 'nuri', kind: 'friend', at: [3, 2] }] };
     const { events } = storyEvents({
-      world,
-      steps: steps({ who: 'voice', by: 'nuri', do: { walk: [[3, 1], [1, 1]], vanish: true } }),
+      world: lane,
+      steps: steps({ who: 'voice', by: 'nuri', do: { walk: [[3, 1], [0, 1]], leave: true } }, { who: 'voice', do: null }),
     });
-    expect(events.map((e) => [e.tick, e.kind, e.data.facing ?? null])).toEqual([
-      [1, 'move', 'up'],
-      [2, 'move', 'left'],
-      [3, 'move', 'left'],
-      [4, 'vanish', null],
+    expect(events.map((e) => [e.tick, e.kind, e.data.facing ?? null, e.data.to ?? null])).toEqual([
+      [1, 'move', 'up', [3, 1]],
+      [2, 'move', 'left', [2, 1]],
+      [3, 'move', 'left', [1, 1]],
+      [4, 'move', 'left', [0, 1]],
+      // Off the map, a move a tick as the walk's own, out of sight past the edge.
+      [5, 'move', 'left', [-1, 1]],
+      [6, 'move', 'left', [-2, 1]],
+      // Gone the tick after, at once.
+      [7, 'leave', null, null],
+    ]);
+  });
+
+  it('ends a walk that leaves by a way out behind a cover on its cell, gone the tick after (D319)', () => {
+    const hall = { ...world, out: [[2, 1]] };
+    const { events } = storyEvents({
+      world: hall,
+      steps: steps({ who: 'voice', by: 'nuri', do: { walk: [[2, 2], [2, 1]], leave: true } }),
+    });
+    expect(events.map((e) => [e.tick, e.kind, e.data.to ?? null])).toEqual([
+      [1, 'move', [2, 2]],
+      [2, 'move', [2, 1]],
+      [3, 'leave', null],
     ]);
   });
 

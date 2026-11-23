@@ -11,6 +11,61 @@ test.beforeEach(async ({ page }) => {
   await seedWizard(page);
 });
 
+/** A frame of the scene as a test records it (D319, D322): each figure drawn with its box
+ * in cells and its alpha, what the camera shows, and whether it travels. */
+interface Frame {
+  figures: string;
+  world: string;
+  travel: boolean;
+}
+
+/** Every frame of the scene from now on, and every value data-actors takes. */
+async function recordFrames(page: Page): Promise<void> {
+  await page.locator('#scene').evaluate((node) => {
+    const frames: Frame[] = [];
+    const actors: string[] = [node.dataset.actors ?? ''];
+    const kept = window as unknown as { kyduxFrames: Frame[]; kyduxActors: string[]; kyduxLook?: number };
+    kept.kyduxFrames = frames;
+    kept.kyduxActors = actors;
+    // Each value it took, the one before each change: changes made in one task are seen
+    // together, at its end.
+    new MutationObserver((records) => {
+      for (const record of records) actors.push(record.oldValue ?? '');
+    }).observe(node, { attributes: true, attributeFilter: ['data-actors'], attributeOldValue: true });
+    const look = () => {
+      kept.kyduxFrames.push({
+        figures: node.dataset.figures ?? '',
+        world: node.dataset.world ?? '',
+        travel: node.dataset.cameraTravel === 'true',
+      });
+      kept.kyduxLook = requestAnimationFrame(look);
+    };
+    if (kept.kyduxLook === undefined) look();
+  });
+}
+
+async function framesRecorded(page: Page): Promise<{ frames: Frame[]; actors: string[] }> {
+  return page.evaluate(() => {
+    const kept = window as unknown as { kyduxFrames: Frame[]; kyduxActors: string[] };
+    return { frames: kept.kyduxFrames, actors: [...kept.kyduxActors, document.getElementById('scene')?.dataset.actors ?? ''] };
+  });
+}
+
+/** A figure in a frame: its box in cells and its alpha, or null where it is not drawn. */
+function figureIn(frame: Frame, id: string): { box: number[]; alpha: number } | null {
+  const part = frame.figures.split(';').find((one) => one.startsWith(`${id}:`));
+  if (!part) return null;
+  const [, box = '', alpha = '0'] = part.split(':');
+  return { box: box.split(',').map(Number), alpha: Number(alpha) };
+}
+
+/** Whether any of a box lies inside what the camera shows. */
+function inView(box: number[], world: string): boolean {
+  const [left = 0, top = 0, width = 0, height = 0] = world.split(',').map(Number);
+  const [x0 = 0, y0 = 0, x1 = 0, y1 = 0] = box;
+  return x1 > left && x0 < left + width && y1 > top && y0 < top + height;
+}
+
 test('the voice tells a step under the scene; a figure says its own in a bubble', async ({ page }) => {
   await page.goto('/#story/at-the-gate');
   const scene = page.locator('#scene');
@@ -496,6 +551,109 @@ test("the camera travels between the passage's two halves, and the bubble waits 
   await page.waitForTimeout(300);
   expect((await framesSeen()).some((frame) => frame.travel)).toBe(false);
 });
+
+test('Orla goes down the stairs and out by the foot of the picture, solid to the last, the camera with her (D319, D321)', async ({
+  page,
+}) => {
+  test.setTimeout(ciTimes(180_000));
+  await page.goto('/#story/the-trail');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await storyNext(page, 4);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  await expect(scene).toHaveAttribute('data-camera-fit', '4,2,15,11');
+  await recordFrames(page);
+  // Step 6: the camera goes down to the stairs' foot as she goes.
+  await page.locator('#story-next').click();
+  await expect(scene).toHaveAttribute('data-camera-fit', '4,4,15,14');
+  await page.waitForFunction(
+    () => /orla:8,14,/.test(document.getElementById('scene')?.dataset.actors ?? ''),
+    null,
+    { timeout: ciTimes(30_000), polling: 'raf' },
+  );
+  await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-trail-6-stairs.png' });
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  const { frames, actors } = await framesRecorded(page);
+  expect(frames.some((frame) => frame.travel)).toBe(true);
+  await expect(scene).not.toHaveAttribute('data-camera-travel', /./);
+  // Through the door, over the landing and down the painted steps.
+  for (const cell of ['9,11', '9,12', '9,13', '8,13', '8,14']) {
+    expect(actors.some((all) => all.includes(`orla:${cell},`)), cell).toBe(true);
+  }
+  // Solid whenever any of her is in sight, never faded (D319); gone at the end.
+  for (const frame of frames) {
+    const orla = figureIn(frame, 'orla');
+    if (orla && inView(orla.box, frame.world)) expect(orla.alpha).toBe(1);
+  }
+  expect(frames.some((frame) => (figureIn(frame, 'orla')?.box[1] ?? 0) > 14)).toBe(true);
+  await expect(scene).not.toHaveAttribute('data-actors', /orla/);
+  await expect(scene).not.toHaveAttribute('data-figures', /orla/);
+  // The step played again finds her at her place by the circle, in sight.
+  await recordFrames(page);
+  await page.locator('#story-again').click();
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  expect((await framesRecorded(page)).actors.some((all) => all.includes('orla:11,4,'))).toBe(true);
+  // Step 7: the camera comes back up to the hall.
+  await storyNext(page);
+  await expect(scene).toHaveAttribute('data-camera-fit', '4,2,15,11');
+});
+
+test('in The tower Zarek goes into the middle archway and out of sight behind the wall, never translucent (D319)', async ({
+  page,
+}) => {
+  test.setTimeout(ciTimes(240_000));
+  await page.goto('/#story/the-tower');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await storyNext(page, 6);
+  await expect(scene).toHaveAttribute('data-story-part', '1', { timeout: ciTimes(60_000) });
+  await storyNext(page, 6);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+  await recordFrames(page);
+  await page.locator('#story-next').click();
+  await expect(page.locator('#story-step')).toHaveText(/^14 /);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+  const { frames, actors } = await framesRecorded(page);
+  for (const cell of ['20,5', '20,4', '20,3']) expect(actors.some((all) => all.includes(`zarek:${cell},`)), cell).toBe(true);
+  for (const frame of frames) {
+    const zarek = figureIn(frame, 'zarek');
+    if (zarek) expect(zarek.alpha).toBe(1);
+  }
+  await expect(scene).not.toHaveAttribute('data-figures', /zarek/);
+});
+
+for (const [name, size] of [
+  ['wide', { width: 1600, height: 700 }],
+  ['narrow', { width: 700, height: 1000 }],
+] as const) {
+  test(`in The tower, in a ${name} window, the three are out of what the camera shows once past the edge (D319)`, async ({
+    page,
+  }) => {
+    test.setTimeout(ciTimes(180_000));
+    await page.setViewportSize(size);
+    await page.goto('/#story/the-tower');
+    const scene = page.locator('#scene');
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+    await storyNext(page, 4);
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+    await recordFrames(page);
+    await page.locator('#story-next').click();
+    await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+    const { frames } = await framesRecorded(page);
+    let past = 0;
+    for (const frame of frames) {
+      for (const id of ['friend', 'mate', 'wizard']) {
+        const figure = figureIn(frame, id);
+        if (!figure || (figure.box[2] ?? 0) > 0) continue;
+        past += 1;
+        expect(inView(figure.box, frame.world), `${id} ${frame.world}`).toBe(false);
+      }
+      expect(Number(frame.world.split(',')[0])).toBeGreaterThanOrEqual(-0.01);
+    }
+    expect(past).toBeGreaterThan(0);
+    await expect(scene).not.toHaveAttribute('data-figures', /(^|;)(friend|mate|wizard):/);
+  });
+}
 
 test("the hall goes dark while the children tell Orla, and comes back in the evening (D280)", async ({ page }) => {
   test.setTimeout(ciTimes(180_000));

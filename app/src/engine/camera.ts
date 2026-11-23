@@ -65,8 +65,9 @@ interface Shot {
 }
 
 export interface CameraParts {
-  /** The scene's size in tiles, and the margin painted round it on each side
-   * (left, top, right, bottom). */
+  /** The scene's size in tiles, and what the view may show round it on each side
+   * (left, top, right, bottom): the margin painted there, less what the painting's
+   * edges cut (D323). */
   columns: number;
   rows: number;
   margin: [number, number, number, number];

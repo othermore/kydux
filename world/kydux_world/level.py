@@ -1814,6 +1814,15 @@ def read_scene(scenes: Path, scene_id: Any, level_id: Any = None) -> Scene:
             # story's floor is a wall or a shelf to a level, and no flight crosses it.
             "fly": walk is True or (walk != "story" and bool(terrain.get("fly", False))),
         }
+        # A way out of the scene behind a cover that hides a figure whole, which a story's
+        # figure walks to and leaves by, and comes in by (D319, D322): floor a story walks.
+        if "out" in terrain:
+            if terrain["out"] is not True or walk != "story":
+                raise LevelError(
+                    f"{scene_id}: the terrain {letter} is a way out only as floor a story "
+                    "walks, out true with walk story (D319)"
+                )
+            terrains[letter]["out"] = True
     unknown = sorted({char for row in rows for char in row} - set(terrains))
     if unknown:
         raise LevelError(f"{scene_id}: the letters {''.join(unknown)} are no terrain of the scene")
@@ -1991,7 +2000,8 @@ STILLS = ("castle",)
 def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
     """A step's actions (D103): none, one, or a list, each one of STORY_DOINGS with
     the figure who does it in `by` when it is not the step's; a walk may end in
-    `vanish`, and an appearing may come `from` a cell beside (D128)."""
+    `leave`, out of the scene by a way out (D319), and an appearing may come `from` a
+    cell beside (D128)."""
     if doing is None:
         return []
     listed = doing if isinstance(doing, list) else [doing]
@@ -1999,7 +2009,18 @@ def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
         raise LevelError(f"{here}: do is one of {', '.join(STORY_DOINGS)}")
     for action in listed:
         kinds = set(action) - {"by"} if isinstance(action, dict) else set()
-        if "walk" in kinds and kinds <= {"walk", "vanish"} and action.get("vanish", True) is True:
+        if "walk" in kinds and "vanish" in kinds:
+            raise LevelError(
+                f"{here}: a walk out of the scene ends in leave, by a way out; nobody fades "
+                "out of a scene (D319)"
+            )
+        if "leave" in kinds:
+            if "walk" not in kinds or kinds != {"walk", "leave"}:
+                raise LevelError(f"{here}: leave ends a walk, out of the scene (D319)")
+            if action["leave"] is not True:
+                raise LevelError(f"{here}: leave is true, or not given")
+            continue
+        if kinds == {"walk"}:
             continue
         # An appearing from behind a thing beside the cell (D128).
         if kinds == {"appear", "from"}:
@@ -2010,6 +2031,25 @@ def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
         if len(kinds) != 1 or not kinds <= set(STORY_DOINGS):
             raise LevelError(f"{here}: do is one of {', '.join(STORY_DOINGS)}")
     return listed
+
+
+def _way_out(
+    at: Position, dx: int, dy: int, width: int, height: int, outs: set[Position]
+) -> str | None:
+    """The way out a walk that leaves ends at (D319): `out`, a cell behind a cover; the
+    side of the scene's edge its last move heads off it by, `left`, `top`, `right` or
+    `bottom`; or None, no way out."""
+    if at in outs:
+        return "out"
+    if dx < 0 and at.x == 0:
+        return "left"
+    if dy < 0 and at.y == 0:
+        return "top"
+    if dx > 0 and at.x == width - 1:
+        return "right"
+    if dy > 0 and at.y == height - 1:
+        return "bottom"
+    return None
 
 
 def _waypoints(walk: Any, here: str) -> list[Position]:
@@ -2030,7 +2070,10 @@ def _story_tile(value: Any, what: str, story_id: Any) -> Position:
 
 
 def story_on_scene(
-    data: dict[str, Any], scene: Scene, sitters: frozenset[str] = frozenset()
+    data: dict[str, Any],
+    scene: Scene,
+    sitters: frozenset[str] = frozenset(),
+    ways: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """A story's staging checked against its scene and made whole (D74): the
     world the page draws, as a level on the scene is built, under `world`.
@@ -2045,10 +2088,15 @@ def story_on_scene(
     (`do`, one or a list, D103), each done by its `by`, the step's `by`, or its
     speaker: a walk to a tile or through a list of them, each in a straight
     line, every tile on the way walked on and free (no one standing there, no
-    door shut), and ending out of sight when it says `vanish`; a turn to face
-    a way; appearing on a free tile, maybe stepping out `from` behind a thing
-    on a cell beside it, a shelf or a floor (D128); vanishing, a speaker once
-    its words are said; lying down asleep in a bed, no one else's, from the cell
+    door shut), and, when it says `leave`, out of the scene by a way out (D319): its
+    last move heading off the map onto the scene's edge, where the figure walks on
+    two cells past it, a move a tick, and is gone the tick after, or onto a cell whose
+    terrain says `out`, behind a cover, where it is gone the tick after it arrives; a
+    turn to face a way; appearing on a free tile, maybe stepping out `from` behind a
+    thing on a cell beside it, a shelf or a floor (D128); vanishing, a speaker once its
+    words are said and never in a part's last step, where no step after plays it, an
+    appearing or a vanishing with no thing to step from being a ghost's or a familiar's
+    alone (D322); lying down asleep in a bed, no one else's, from the cell
     under its pillow (`pillow_side`, D130), or from beside a bed with none, and
     waking (D91); opening or closing a door beside it; standing up, seated, and sitting
     down, a figure of `sitters`, whose sheet has the sitting rows (D273), and bringing
@@ -2060,7 +2108,9 @@ def story_on_scene(
     walks onto an open door's leaf, and whoever stands on it as the door opens
     steps aside along the row (D125). The voice does nothing itself; no one
     speaks or moves out of sight, and no one asleep walks, turns or goes. The wizard
-    stays in sight but for a walk out of sight in the story's last step. A story with
+    stays in sight but for a walk out of the scene in a part's last step (D310). The ways
+    out the story's figures take are told to `ways`, when it is given, for the art's
+    check: the story, the step, who, the cell, and the side of the edge or `out`. A story with
     a still, the opening, may tell its first steps in a row over the still (`still`,
     D251), each of the voice and doing nothing; the first of them, in a row, may hold
     the story's letter before the still (`letter`, D257). The story may name the theme
@@ -2114,6 +2164,13 @@ def story_on_scene(
         for x, char in enumerate(row)
         if scene.terrains[char]["walk"] == "story"
     }
+    # The ways out behind a cover (D319).
+    outs = {
+        Position(x, y)
+        for y, row in enumerate(scene.rows)
+        for x, char in enumerate(row)
+        if scene.terrains[char].get("out") is True
+    }
 
     def walked(tile: Position, flying: bool = False) -> bool:
         """A tile a figure stands on, or, `flying`, flies over: a low cell too (D186), and
@@ -2137,12 +2194,15 @@ def story_on_scene(
                 raise LevelError(f"{story_id}: only a thing the wizard carries is hidden")
             hidden.add(thing.get("id"))
     shown: set[str] = set()
+    # Each actor's kind: a ghost and a familiar alone may fade (D322).
+    kind_of: dict[str, str] = {}
     for actor in actors:
         actor_id = _identifier(story_id, actor.get("id"), "an actor's id")
         if actor_id in where:
             raise LevelError(f"{story_id}: two figures are called {actor_id}")
         if actor.get("kind") not in ACTOR_KINDS:
             raise LevelError(f"{story_id}: {actor_id} is of no kind of actor")
+        kind_of[actor_id] = actor["kind"]
         where[actor_id] = (
             _story_tile(actor["at"], f"{actor_id}'s at", story_id) if "at" in actor else None
         )
@@ -2243,6 +2303,16 @@ def story_on_scene(
         at = where[who]
         return at is not None and abs(at.x - tile.x) + abs(at.y - tile.y) == 1
 
+    def fades(who: str, doing: str, here: str) -> None:
+        """A figure that fades in or out of sight is a ghost or a familiar, the script's
+        own (D322): who else comes in walks in, and who goes walks out."""
+        if kind_of.get(who) not in ("ghost", "familiar"):
+            way = "enter" if doing == "appear" else "a walk that ends in leave"
+            raise LevelError(
+                f"{here}: {who} is no ghost or familiar to {doing}: who comes or goes walks, "
+                f"{way} (D319, D322)"
+            )
+
     first_seen: dict[str, Position] = {}
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
@@ -2316,10 +2386,17 @@ def story_on_scene(
             doer = action.get("by", step.get("by", who))
             if doer not in where:
                 raise LevelError(f"{here}: the action is done by no one in the story; give its by")
-            # A speaker who goes says the step's words first, then goes.
+            # A speaker who goes says the step's words first, then goes, as the next step
+            # begins: never in a part's last step, where no step after plays it.
             if set(action) - {"by"} == {"vanish"} and doer == who and who != "voice":
                 if doer == "wizard":
                     raise LevelError(f"{here}: the wizard stays in the story")
+                fades(doer, "vanish", here)
+                if number == len(steps):
+                    raise LevelError(
+                        f"{here}: {doer} vanishes once its words are said, in a step no "
+                        "step comes after"
+                    )
                 vanishing = True
                 continue
             queue = queues.setdefault(doer, [])
@@ -2360,15 +2437,34 @@ def story_on_scene(
                         at = Position(at.x + dx, at.y + dy)
                         queue.append(("move", at))
                 planned[doer] = at
-                if action.get("vanish") is True:
-                    # The wizard may walk out of sight at the very end of a story.
+                if action.get("leave") is True:
+                    # The wizard may walk out of the scene at the end of a part (D310).
                     if doer == "wizard" and number != len(steps):
                         raise LevelError(f"{here}: the wizard stays in the story")
+                    end = at
+                    way = _way_out(at, dx, dy, width, height, outs)
+                    if way is None:
+                        raise LevelError(
+                            f"{here}: {doer} leaves at {at.x},{at.y}, no way out: the "
+                            "scene's edge, the last move heading off it, or a cell that says "
+                            "out (D319)"
+                        )
+                    if way != "out":
+                        # On past the edge, two cells, a move a tick.
+                        for _ in range(2):
+                            at = Position(at.x + dx, at.y + dy)
+                            queue.append(("out", at))
+                    queue.append(("leave", None))
                     planned[doer] = None
-                    queue.append(("vanish", None))
+                    if ways is not None:
+                        ways.append(
+                            {"scene": scene.id, "story": story_id, "step": here, "who": doer}
+                            | {"cell": list(end), "leaves": way}
+                        )
             elif "vanish" in action:
                 if doer == "wizard":
                     raise LevelError(f"{here}: the wizard stays in the story")
+                fades(doer, "vanish", here)
                 planned[doer] = None
                 queue.append(("vanish", None))
             elif "face" in action:
@@ -2397,9 +2493,10 @@ def story_on_scene(
                 queue.append((kind, action.get("sleep")))
         # Who speaks meanwhile may walk out of sight as the last of its actions, its words
         # said as the step begins (D275, D310).
-        gone = step.get("meanwhile") is True and queues.get(who, [("", None)])[-1:] == [
-            ("vanish", None)
-        ]
+        gone = step.get("meanwhile") is True and queues.get(who, [("", None)])[-1:] in (
+            [("vanish", None)],
+            [("leave", None)],
+        )
         # In a step where a familiar walks, the figures play in half ticks: a familiar's
         # step takes one, every other doing two, as the page plays it (D277).
         quick = any(
@@ -2450,8 +2547,11 @@ def story_on_scene(
                     if value in shown:
                         raise LevelError(f"{here}: {value} is in sight already")
                     shown.add(value)
-                elif kind == "vanish":
+                elif kind in ("vanish", "leave"):
                     where[doer] = None
+                elif kind == "out":
+                    # Past the scene's edge, on no cell of the map (D319).
+                    where[doer] = value
                 elif kind == "move":
                     if doer in seated:
                         raise LevelError(f"{here}: {doer} is seated, and stands before walking")
@@ -2494,6 +2594,9 @@ def story_on_scene(
         world_actors.append(placed)
     if world_actors:
         built["actors"] = world_actors
+    # The ways out behind a cover, for the page to tell them from the edge (D319).
+    if outs:
+        built["out"] = [list(cell) for cell in sorted(outs, key=lambda c: (c.y, c.x))]
     del built["id"]
     staging = ("wizard", "facing", "actors", "things")
     story = {key: value for key, value in data.items() if key not in staging}
@@ -2528,7 +2631,10 @@ PART_STAGING = (
 
 
 def story_on_scenes(
-    data: dict[str, Any], scene_of: Any, sitters: frozenset[str] = frozenset()
+    data: dict[str, Any],
+    scene_of: Any,
+    sitters: frozenset[str] = frozenset(),
+    ways: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """A story told on one scene, or on several in turn (the morning after, from the
     dormitory to the shed): a step with a `scene`, the new scene's staging, starts a
@@ -2539,7 +2645,8 @@ def story_on_scenes(
     (`later`, D280). A step names its theme (`music`, D314) beside its `who`, never in
     its scene; the story's and the steps' themes are carried in the story made whole.
     `scene_of` gives a scene by id; `sitters`, the figures whose sheets have the
-    sitting rows (D273, D279)."""
+    sitting rows (D273, D279); `ways`, when given, is told the ways out and in the
+    figures take (D319, D322)."""
     story_id = data.get("id")
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
@@ -2573,7 +2680,9 @@ def story_on_scenes(
             if staging.get("later", True) is not True:
                 raise LevelError(f"{story_id}, step {first + 1}: later is true, or not given")
             staging = {"id": story_id, **staging}
-        built = story_on_scene({**staging, "steps": own}, scene_of(staging.get("scene")), sitters)
+        built = story_on_scene(
+            {**staging, "steps": own}, scene_of(staging.get("scene")), sitters, ways
+        )
         parts.append((first, built))
     story = dict(parts[0][1])
     story["steps"] = [{k: v for k, v in step.items() if k != "scene"} for step in steps]

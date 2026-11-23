@@ -7,7 +7,7 @@
     },
     "s": {
       "kind": "stair",
-      "walk": false,
+      "walk": "story",
       "sight": true
     },
     "l": {

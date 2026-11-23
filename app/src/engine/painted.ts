@@ -37,6 +37,9 @@ export interface SceneArt {
    * (left, top, right, bottom), and the playable corner in the ground's pixels. */
   margin?: [number, number, number, number];
   origin?: Tile;
+  /** The cells of the painting's edges the view never shows, left, top, right and
+   * bottom (D323): the band above the entrance's far wall. */
+  unseen?: [number, number, number, number];
   /** The raised rows, each drawn over the figures above it; a row's static things
    * (D89), the walls that never change, are an image of their own. A row's image
    * `under` is drawn over whoever stands on the row itself too, a door's arch; one
@@ -233,6 +236,15 @@ export function preloadArt(scene: Phaser.Scene, { scene: painted, figures, sprit
  * side (D83): left, top, right, bottom; none for a scene without art. */
 export function marginOf(art: Art | null): [number, number, number, number] {
   return art?.scene.margin ?? [0, 0, 0, 0];
+}
+
+/** What the view may show round the playable area, in cells on each side (left, top,
+ * right, bottom): the margin less what of the painting's edges is unseen (D323), less than
+ * nothing on a side the view ends inside the playable area. */
+export function viewMarginOf(art: Art | null): [number, number, number, number] {
+  const margin = marginOf(art);
+  const unseen = art?.scene.unseen ?? [0, 0, 0, 0];
+  return [margin[0] - unseen[0], margin[1] - unseen[1], margin[2] - unseen[2], margin[3] - unseen[3]];
 }
 
 /** The painting as the ground, with its margin round the playable area, and its

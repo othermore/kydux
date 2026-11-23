@@ -707,12 +707,167 @@ def the_familiar() -> dict:
     )
 
 
+# --- The truth: the year's ending, told in the tower's high hall at sunset, grave and
+# then great: the familiar's tune with the minor's own low sixth, slow in three in D
+# minor. A piano has it alone, over its left hand; the strings rise through a middle part
+# of their own to the dominant; then every voice plays the tune, which turns aside on its
+# last note and comes home two bars later (D313).
+
+
+def broken(
+    progression, shape: list[int], step: float, low: int, loud: float, accent: float = 0.0
+) -> list[list[float]]:
+    """A piano's left hand: a chord's notes one after another from its root, `step` beats
+    each, by `shape`: 1 the root from `low`, 5 its fifth, 8 its octave, 10 the third over
+    the octave, 12 the fifth over it."""
+    notes = []
+    for start, span, root, intervals in progression:
+        base = low + (root - low) % 12
+        over = {1: 0, 5: intervals[2], 8: 12, 10: 12 + intervals[1], 12: 12 + intervals[2]}
+        for index in range(int(round(span / step))):
+            p = base + over[shape[index % len(shape)]]
+            notes.append(
+                [p, start + index * step, step * 1.5, loud + (accent if index == 0 else 0.0)]
+            )
+    return notes
+
+
+def swelling(
+    notes: list[list[float]], first: float, last: float, begin: float, end: float
+) -> list[list[float]]:
+    """Notes that grow or fall evenly from the beat `first` to the beat `last`: a note
+    that starts between them is `begin` times as loud as written at the first and `end`
+    times at the last; the others stay as written."""
+    made = []
+    for p, start, length, loud in notes:
+        if first <= start < last:
+            loud *= begin + (end - begin) * (start - first) / (last - first)
+        made.append([p, start, length, loud])
+    return made
+
+
+def within(notes: list[list[float]], first: int, last: int, bar: int) -> list[list[float]]:
+    """The notes that start in the bars from `first` to `last` (counted from 1)."""
+    return [note for note in notes if (first - 1) * bar <= note[1] < last * bar]
+
+
+def raised(notes: list[list[float]], by: int) -> list[list[float]]:
+    """Notes moved up by `by` half steps, down when it is under zero."""
+    return [[p + by, start, length, loud] for p, start, length, loud in notes]
+
+
+def thunder(
+    number: int, bar: int, low: int, begin: float, end: float, over: float = 2.0
+) -> list[list[float]]:
+    """A timpani's roll that swells over the last `over` beats of a bar (counted from 1),
+    from `begin` to `end`."""
+    count = int(round(over / 0.25))
+    return [
+        [low, number * bar - over + k * 0.25, 0.25, begin + (end - begin) * k / (count - 1)]
+        for k in range(count)
+    ]
+
+
+def the_truth() -> dict:
+    bar = 3
+    a_chords = "Dm | Gm | Dm | A | Bb | C | Dm | A | Dm | Gm | F | C | Bb | Gm | A7 | Dm"
+    tune = (
+        "a5/2 d6 | bb5/1.5 a5/0.5 g5 | a5/2 f5 | e5/3 | "
+        "f5 g5 a5 | g5/2 e5 | f5/1.5 e5/0.5 d5 | e5/3 | "
+        "a5/2 d6 | bb5/1.5 c6/0.5 d6 | c6/2 a5 | c6/1.5 bb5/0.5 a5 | "
+        "f5 a5 d6 | bb5/2 g5 | g5/1.5 f5/0.5 e5 | "
+    )
+    a_tune = tune + "d5/3"
+    b_chords = "Bb | C | Am | Dm | Bb | C | F | A | Bb | C | Am | Dm | Gm | Em7b5 | Asus4 | A"
+    b_tune = (
+        "d5/2 f5 | e5/2 g5 | a5/1.5 g5/0.5 e5 | f5/3 | "
+        "f5/2 bb5 | g5/2 c6 | a5/1.5 bb5/0.5 c6 | c#6/2 e6 | "
+        "f6/2 d6 | e6/1.5 d6/0.5 c6 | c6/2 a5 | a5/1.5 g5/0.5 f5 | "
+        "g5/2 bb5 | bb5/1.5 a5/0.5 g5 | d6/3 | c#6/2 e6"
+    )
+    b_horn = "r/3 | " * 12 + "d4/3 | e4/3 | e4/3 | e4/2 a4"
+    # The tune's last note is an octave up over a chord that is not home, and its last
+    # three bars are said again to get there.
+    c_chords = a_chords.rsplit(" | ", 1)[0] + " | Bb | Gm | A7 | Dm | Dm"
+    c_tune = tune + "d6/3 | bb5/2 g5 | g5/1.5 f5/0.5 e5 | d5/3 | r/3"
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    c = harmony(c_chords, bar)
+    slow = [1, 5, 10]
+    flowing = [1, 5, 8, 10, 8, 5]
+    wide = [1, 5, 8, 10, 12, 10]
+    return theme(
+        "the-truth",
+        76,
+        [3, 4],
+        {
+            "piano": {"kind": "piano", "volume": 0.9},
+            "left": {"kind": "piano", "volume": 0.7},
+            "violins": {"kind": "strings", "volume": 0.9},
+            "horn": {"kind": "brass", "volume": 0.8},
+            "flute": {"kind": "flute", "volume": 0.5},
+            "strings": {"kind": "strings", "volume": 0.65},
+            "bass": {"kind": "strings", "volume": 0.75},
+            "drum": {"kind": "drum", "volume": 0.8},
+        },
+        [
+            section(
+                "a",
+                16,
+                bar,
+                piano=raised(line(a_tune, bar, 0.58), -12)
+                + within(line(a_tune, bar, 0.28), 9, 16, bar),
+                left=broken(a, slow, 1, 38, 0.36, 0.05),
+                strings=pad(a[8:], 50, 67, 0.2),
+                bass=bass(a[8:], [0], 33, 0.22, 3),
+            ),
+            section(
+                "b",
+                16,
+                bar,
+                violins=swelling(line(b_tune, bar, 0.62), 0, 48, 0.9, 1.3)
+                + raised(within(line(b_tune, bar, 0.6), 9, 16, bar), -12),
+                flute=within(line(b_tune, bar, 0.45), 9, 16, bar),
+                piano=bells(b[8:], 72, 84, 0.3),
+                left=swelling(broken(b, flowing, 0.5, 38, 0.28, 0.08), 0, 48, 0.9, 1.35),
+                horn=swelling(line(b_horn, bar, 0.45), 36, 48, 0.8, 1.4),
+                strings=swelling(pad(b, 50, 67, 0.5, 4), 0, 48, 0.85, 1.3),
+                bass=swelling(bass(b, [0], 33, 0.5, 3), 0, 48, 0.9, 1.3),
+                drum=drum(list(range(9, 17)), bar, [0], 38, 0.35)
+                + thunder(16, bar, 33, 0.2, 0.75),
+            ),
+            section(
+                "c",
+                20,
+                bar,
+                violins=line(c_tune, bar, 0.9) + raised(line(c_tune, bar, 0.8), -12),
+                horn=raised(line(c_tune, bar, 0.65), -12),
+                piano=line(c_tune, bar, 0.55) + raised(line(c_tune, bar, 0.42), -12),
+                flute=raised(within(line(c_tune, bar, 0.45), 9, 19, bar), 12),
+                left=broken(c[:18], wide, 0.5, 38, 0.4, 0.1) + broken(c[18:], slow, 1, 38, 0.3),
+                strings=swelling(pad(c, 50, 67, 0.8, 4), 54, 60, 0.8, 0.35),
+                bass=swelling(
+                    bass(c, [0], 33, 0.8, 3) + bass(c, [0], 45, 0.5, 3), 54, 60, 0.8, 0.35
+                ),
+                drum=drum([n for n in range(1, 19) if n != 16], bar, [0], 38, 0.6)
+                + thunder(8, bar, 33, 0.2, 0.6)
+                + thunder(15, bar, 33, 0.3, 0.9)
+                + drum([16], bar, [0], 38, 0.95)
+                + thunder(18, bar, 33, 0.2, 0.65)
+                + drum([19], bar, [0], 38, 0.8),
+            ),
+        ],
+        ["a", "b", "c"],
+    )
+
+
 THEMES = {
     "arrival": arrival,
     "the-library": the_library,
     "the-passages": the_passages,
     "the-broom": the_broom,
     "the-familiar": the_familiar,
+    "the-truth": the_truth,
 }
 
 

@@ -96,7 +96,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 clock, the tip put up once its picture is loaded and decoded
                 (waiting.ts, D214, D221, D246), and under ?debug the page
                 that plays any of the music's themes, each voice of the one
-                playing to turn off or set by hand (themes.ts, #music, D192, D203).
+                playing to turn off or set by hand, and its time on a slider to
+                move in (themes.ts, #music, D192, D203, D312).
                 main.ts shows a screen: it shows the waiting view at once, a tip
                 due with no grace at the visit's first wait and at a screen whose
                 scene, named in the course file, is not the one last shown, loads
@@ -2909,9 +2910,10 @@ one overturns stays, marked as superseded.
   drum on every beat) and *The familiar* (the tower's high hall at the year's end, wonder and a
   little longing: slow in three in D minor with its raised sixth, two flutes answering each
   other over a harp and the low pad, a celesta's tune high over the harp's running eighth
-  notes in its middle part, D296). A test holds every chapter to a theme, every theme to its
-  rules, and the files to what the score makes. Rules out loaded music files and a score
-  that names or quotes any work under copyright.
+  notes in its middle part, D296). The year's ending has a theme more, *The truth* (D313).
+  A test holds every chapter to a theme, every theme to its rules, and the files to what
+  the score makes. Rules out loaded music files and a score that names or quotes any work
+  under copyright.
 - **D193 — The page's look, and a welcome page.** Decided 2026-11-10 by the owner (*una
   página inicial de bienvenida que explique y venda qué es Kydux; el arte de todas las
   páginas: fondos, botones, cajas; limpio y fácil de usar para un niño, un poco más
@@ -4934,3 +4936,36 @@ one overturns stays, marked as superseded.
   another first-year, and the pupils seen leaving the first-years' dormitory are those
   three. A walk-on pupil (`classmate_boy`, `classmate_girl`) is of another year, as the
   second-years of *The flying lesson* are.
+- **D312 — The theme's time on the page of themes.** Decided 2026-11-22 by the owner
+  (*estaría bien en el debug poder tener un visor del tiempo (duración de la canción y
+  poder deslizar a un punto concreto) para decirte exactamente en qué segundo pasa*). On
+  `?debug#music`, over the voices of the theme that plays, a slider as long as the theme's
+  loop follows the music, and takes the theme to the second it is let go at; beside it are
+  the second that sounds, the loop's length and the section, as `32.7 s of 98.2 s, part
+  b`. The voices set by hand stay as set. So a sound that is wrong is told by its second,
+  and its voice is found by going back to it with one voice off after another. The music
+  has `position` and `seek(seconds)` for it: the cut to another moment takes 0.05 s, and
+  a note that started before that moment is not sounded, so a pad's chord comes in at its
+  next bar.
+- **D313 — The year's ending has a theme of its own, *The truth*.** Decided 2026-11-22 by
+  the owner (*la parte final de la historia cuando van al despacho de Orla y le cuentan
+  todo y ella les cuenta todo lo que pasó, se merece una canción final sola, que sea más
+  intensa y dramática y que te deje el recuerdo (puede ser la misma canción en una
+  versión más dramática e intensa, o una nueva canción)*; *en la parte de historia que
+  hace el cierre de todo lo que has aprendido, podemos volver a la anterior, a la del
+  familiar, que es más alegre*). It is the familiar's theme made grave and then great, so
+  that the child knows the tune and hears what it has become: the first flute's tune with
+  the minor's own low sixth in the place of the raised one, in three in D minor, at 76
+  beats a minute, 52 bars in three parts. In the first a piano has the tune alone, an
+  octave under the flute's, over its left hand, a note a beat, and the low strings come
+  in under it at its second half. In the middle part the violins rise on a tune of their
+  own to the dominant, the piano's left hand running in eighth notes, a flute and a horn
+  joining them, a timpani's roll at its end. In the last every voice plays the tune, the
+  violins in octaves, the horn under them, the timpani on every bar; its last note is an
+  octave up over a chord that is not home, its last three bars are said again to get
+  there, and a quiet bar leads back to the piano alone. It starts quieter than the
+  familiar's theme and is louder than it at its height. It is made as the others are
+  (D192): the same kinds of voices, the score in `tools/sound/compose.py`, sections that
+  loop without a seam; it is no chapter's theme, and a test holds it to its tune, its
+  piano alone and its last part. Rules out a tune or a harmony taken from any other work
+  (D192).

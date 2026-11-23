@@ -1,7 +1,7 @@
-"""The music's themes (D192): each chapter names one, each parses, and each loops on a
-bar, with no note ringing over a section's end; the files are what the score in
-tools/sound/compose.py makes. A theme has one set of voices and no arrangements (D210),
-and no candidate stands beside a chapter's theme (D209)."""
+"""The music's themes (D192): each chapter names one, the year's ending has one of its own
+(D313), each parses, and each loops on a bar, with no note ringing over a section's end;
+the files are what the score in tools/sound/compose.py makes. A theme has one set of
+voices and no arrangements (D210), and no candidate stands beside them (D209)."""
 
 import importlib.util
 import json
@@ -26,10 +26,16 @@ def compose():
 
 
 CHAPTER_THEMES = ("arrival", "the-library", "the-passages", "the-broom", "the-familiar")
+ENDING_THEME = "the-truth"
 
 
-def test_there_are_the_chapters_themes_and_no_other():
-    assert {path.stem for path in THEMES} == set(CHAPTER_THEMES)
+def test_there_are_the_chapters_themes_and_the_ending_s_and_no_other():
+    assert {path.stem for path in THEMES} == {*CHAPTER_THEMES, ENDING_THEME}
+
+
+def test_no_chapter_has_the_ending_s_theme():
+    for path in CHAPTERS:
+        assert json.loads(path.read_text(encoding="utf-8")).get("music") != ENDING_THEME
 
 
 @pytest.mark.parametrize("path", CHAPTERS, ids=lambda p: p.parent.name)
@@ -164,3 +170,38 @@ def test_the_familiar_is_two_flutes_in_three_with_the_celesta_s_tune_in_the_midd
     assert sorted(note[1] for note in first["harp"]) == [float(beat) for beat in range(beats)]
     for running in (middle, last):
         assert sorted(note[1] for note in running["harp"]) == [i / 2 for i in range(beats * 2)]
+
+
+def test_the_truth_is_the_familiar_s_tune_grave_from_a_piano_alone_to_every_voice():
+    """D313: slower than the familiar's theme and in three as it is; its tune is the
+    familiar's first flute's with each B a half step lower, which a piano has alone an
+    octave under it over its left hand for eight bars; every voice sounds in the last
+    part, the violins on the tune in octaves, and the last bar leaves the tune out."""
+    theme = loaded(ENDING_THEME)
+    familiar = loaded("the-familiar")
+    assert theme["tempo"] < familiar["tempo"] and theme["metre"] == [3, 4]
+    sections = {section["id"]: section for section in theme["sections"]}
+    first, middle, last = (sections[name] for name in theme["order"])
+    consort = {section["id"]: section for section in familiar["sections"]}[familiar["order"][0]]
+    grave = sorted(
+        (start, pitch - 1 if pitch % 12 == 11 else pitch, length)
+        for pitch, start, length, _ in consort["notes"]["flute"]
+    )
+    low = sorted(
+        (start, pitch + 12, length)
+        for pitch, start, length, loudness in first["notes"]["piano"]
+        if loudness > 0.5
+    )
+    assert low == grave
+    alone = {
+        voice for voice, notes in first["notes"].items() if any(note[1] < 8 * 3 for note in notes)
+    }
+    assert alone == {"piano", "left"}
+    assert "piano" in {theme["voices"][voice]["kind"] for voice in alone}
+    assert set(last["notes"]) == set(theme["voices"])
+    assert set(middle["notes"]) == set(theme["voices"])
+    tune = {(note[1], note[0]) for note in last["notes"]["violins"]}
+    assert all((start, pitch - 12) in tune or (start, pitch + 12) in tune for start, pitch in tune)
+    final = (last["bars"] - 1) * 3
+    for voice in ("violins", "horn", "piano", "flute"):
+        assert all(note[1] < final for note in last["notes"][voice]), voice

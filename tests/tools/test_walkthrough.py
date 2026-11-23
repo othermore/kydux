@@ -76,6 +76,24 @@ def test_the_document_says_each_stop_with_a_comments_line_under_each_picture(tmp
     assert (path.parent / path.name.removesuffix(".es.md") / "story-s-01.png").is_file()
 
 
+def test_a_step_s_pictures_while_it_plays_come_before_its_own_with_one_comments_line(tmp_path):
+    """Sprint 55, 2.6: a story's step shot while its acts play."""
+    repo = small_repo(tmp_path)
+    shots = repo / "app" / "e2e" / "shots" / "walkthrough-03-test"
+    for letter in "ba":
+        (shots / f"story-s-01-{letter}.png").write_bytes(b"png")
+    text = walkthrough.write_document("03-test", repo, day="2026-11-19").read_text()
+    step = text[text.index("### Paso 1 de 1") : text.index("## Lección")]
+    assert step.count("![") == 3 and step.count("**Comentarios:**") == 1
+    pictures = [line for line in step.splitlines() if line.startswith("*Historia")]
+    assert pictures == [
+        "*Historia, paso 1, mientras ocurre (a)*",
+        "*Historia, paso 1, mientras ocurre (b)*",
+        "*Historia, paso 1*",
+    ]
+    assert step.rstrip().removesuffix("---").rstrip().endswith("**Comentarios:**")
+
+
 def test_a_document_the_owner_may_have_written_in_is_never_overwritten(tmp_path):
     repo = small_repo(tmp_path)
     first = walkthrough.write_document("03-test", repo, day="2026-11-07")

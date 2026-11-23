@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """A chapter's walkthrough as one document for the owner to read and write on: every
-story step, every lesson page, each level's card, start, route tick by tick and won card
+story step, with the pictures taken while its acts play before its own, every lesson
+page, each level's card, start, route tick by tick and won card
 in its first way (D216), and the check sheets of its scenes, from the pictures
 e2e/walkthrough.spec.ts takes (`npm run walkthrough -- <chapter>` runs both), with a
 **Comentarios:** line under every picture. A level with ways says under its card what
@@ -79,8 +80,11 @@ class Document:
         self.kinds: dict[str, int] = {}
         self.missing = 0
 
-    def picture(self, name: str, caption: str, source: Path | None = None) -> None:
-        """A picture, copied beside the document, with its caption and comments line."""
+    def picture(
+        self, name: str, caption: str, source: Path | None = None, comments: bool = True
+    ) -> None:
+        """A picture, copied beside the document, with its caption and, unless it is one
+        of several the comments go under, its comments line."""
         path = source or self.shots / name
         if not path.exists():
             self.lines.append(f"*(falta la captura `{name}`)*\n")
@@ -88,11 +92,9 @@ class Document:
             return
         self.pictures.mkdir(parents=True, exist_ok=True)
         shutil.copy(path, self.pictures / name)
-        self.lines += [
-            f"![{caption}]({self.pictures.name}/{name})\n",
-            f"*{caption}*\n",
-            "**Comentarios:**\n\n",
-        ]
+        self.lines += [f"![{caption}]({self.pictures.name}/{name})\n", f"*{caption}*\n"]
+        if comments:
+            self.lines.append("**Comentarios:**\n\n")
 
     def story(self, story_id: str) -> None:
         self.counts["story"] += 1
@@ -108,6 +110,13 @@ class Document:
             who = WHO.get(step.get("who", "voice"), step.get("who", "").capitalize())
             self.lines.append(f"### Paso {number} de {len(steps)}: {who}\n")
             self.lines.append(f"> {spoken(said)}\n")
+            # The pictures taken while the step's acts play, a, b and on, then its own,
+            # the comments under the last.
+            playing = sorted(self.shots.glob(f"story-{story_id}-{number:02d}-[a-z].png"))
+            for shot in playing:
+                letter = shot.stem.rsplit("-", 1)[1]
+                caption = f"{text['title']}, paso {number}, mientras ocurre ({letter})"
+                self.picture(shot.name, caption, comments=False)
             self.picture(f"story-{story_id}-{number:02d}.png", f"{text['title']}, paso {number}")
 
     def lesson(self, lesson_id: str) -> None:

@@ -1,5 +1,6 @@
 // A chapter played from its first stop to its last, as the child plays it, in Spanish,
-// for the owner to read: every story step, every lesson page with its code run, and for
+// for the owner to read: every story step, with pictures every second and a half while
+// its acts play, every lesson page with its code run, and for
 // each level the start card, the start, the won card and the route tick by tick in its
 // first way (D216), every other way at its end for the levels KYDUX_ALL_WAYS names, and
 // the map's plan where the map is carried. The
@@ -32,11 +33,32 @@ async function settled(page: Page, ms = 30_000): Promise<void> {
   await page.waitForTimeout(ciTimes(400));
 }
 
+/** How often a step is shot while its acts play, and how many times at most. */
+const PLAYING_EVERY = 1_500;
+const PLAYING_SHOTS = 'abcdefgh';
+
+/** A step's pictures while its acts still play, from the story's opening or from the
+ * click: one every second and a half while the scene plays, story-<id>-<step>-a.png, -b
+ * and on, eight at most, until the scene is done; a step done within a second and a half
+ * has none. A scene still loading is waited for, a minute at most, and not shot. */
+async function whilePlaying(page: Page, id: string, step: number): Promise<void> {
+  let shots = 0;
+  for (let waited = 0; shots < PLAYING_SHOTS.length && waited < 60_000; waited += PLAYING_EVERY) {
+    await page.waitForTimeout(PLAYING_EVERY);
+    const state = await page.locator('#scene').getAttribute('data-state');
+    if (state === 'done') return;
+    if (state !== 'playing') continue;
+    await page.screenshot({ path: `${OUT}story-${id}-${pad(step)}-${PLAYING_SHOTS[shots]}.png` });
+    shots += 1;
+  }
+}
+
 async function story(page: Page, id: string): Promise<void> {
   await page.goto(`/#story/${id}`);
   await page.locator('#scene').waitFor({ timeout: ciTimes(90_000) });
-  await settled(page, 90_000);
   let step = 1;
+  await whilePlaying(page, id, step);
+  await settled(page, 90_000);
   await page.screenshot({ path: `${OUT}story-${id}-${pad(step)}.png` });
   while ((await page.locator('#story-next').count()) > 0) {
     const before = await page.locator('#story-step').textContent();
@@ -46,8 +68,9 @@ async function story(page: Page, id: string): Promise<void> {
       before,
       { timeout: ciTimes(30_000) },
     );
-    await settled(page);
     step += 1;
+    await whilePlaying(page, id, step);
+    await settled(page);
     await page.screenshot({ path: `${OUT}story-${id}-${pad(step)}.png` });
   }
 }

@@ -3079,17 +3079,18 @@ one overturns stays, marked as superseded.
   A step's `camera` may be `{"fit": [[x0, y0], [x1, y1]]}`: the page zooms out as far as
   it must, and no further than its zoom of 1, to show that box of cells whole, centred
   on it (`boxFrame`, `SceneCamera.place`); or `{"wide": true}`: the scene's playable
-  width, on the window's middle (the wide fields). The framing holds, the camera
-  following no one, until a later step of the same part frames another, and the story's
-  steps without one keep it (`framingAt`); a part told on another scene starts with
-  none, whether it is opened at once or after time has passed (D280). The world checks
-  the box against the scene. A bubble said under a framing
+  width, on the window's middle (the wide fields); or `{"follow": "<figure>"}`: no place
+  but a figure of the story, which the camera goes with (D327). The framing holds, the
+  camera following no one else, until a later step of the same part frames another, and
+  the story's steps without one keep it (`framingAt`); a part told on another scene
+  starts with none, whether it is opened at once or after time has passed (D280). The
+  world checks the box against the scene. A bubble said under a framing of a place
   stays inside what the framing shows of the scene, between its top and its bottom and
   between its sides (`bubbleRoom`, `bubbleMiddle`, `SceneCamera.shown`, `shownSides`),
   since the camera does not follow the words; it stays there whole as who says it walks
   to the frame's edge, out of it or out of the scene (`bubbleHeld`, D319). The scene's
-  parent says it in `data-camera-fit` (`x0,y0,x1,y1` or `wide`). Rules out a story where
-  a place is seen in pieces.
+  parent says it in `data-camera-fit` (`x0,y0,x1,y1`, `wide` or `follow:<figure>`).
+  Rules out a story where a place is seen in pieces.
 - **D200 — The map folds by chapter.** Decided 2026-11-11 by the designer under the
   owner's rule for the look (D193: clean, nothing crowded). The map shows each chapter
   as its card. The chapter the wizard is in stands open, its stops listed
@@ -5270,3 +5271,20 @@ one overturns stays, marked as superseded.
   `classmate-boy`, and `figureName` picks them. Rules out a walk-on pupil in a friend's
   second set, which is the robe the friend of another look wears, and a set chosen by
   the look, which the two friends' choice (D90) already spends.
+- **D327 — A story step may have the camera go with a figure.** Decided 2026-11-23 by
+  the owner, of *Ante la puerta* (*En la puerta cuando aparece el amigo me gustaría que
+  la cámara bajara para seguirlo según sube por el camino*). A step's `camera` may be
+  `{"follow": "<figure>"}`, the id of a figure of the story: the camera travels to that
+  figure as it travels to a place (D321), the travel's end moving with the figure while
+  it lasts, and from then on goes with it, the figure in the window's middle as far as
+  the scene's edges allow, at the page's zoom of 1 and with the level camera's lag
+  (`SceneCamera.place`, `goWith`). It holds as a framing does (D199): the steps after
+  keep it until one of the same part frames a place or another figure, to which the
+  camera travels from where the figure left it. A bubble said under it is placed as with
+  no framing, since the camera is with who moves. The world's check refuses a figure
+  the story does not have and a step that ends with the figure out of sight; a reader
+  who asks for less motion sees the camera on the figure at once. In *Ante la puerta*,
+  the step where the friend comes up the path follows the friend from the path's foot to
+  the wizard's side, and the friend's first words frame the gate again. Rules out a
+  figure that walks in from where the window does not reach, seen only when it arrives,
+  and a camera sent after a figure by a row of framings, one a step.

@@ -43,6 +43,7 @@ the loader passes as `goals_source`.
 import json
 import keyword
 import re
+from collections.abc import Collection
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -828,13 +829,25 @@ def _check_zones(
 
 
 def _step_camera(
-    value: Any, here: str, width: int, height: int, whose: str = "a step's camera"
-) -> None:
+    value: Any,
+    here: str,
+    width: int,
+    height: int,
+    whose: str = "a step's camera",
+    figures: Collection[str] = (),
+) -> str | None:
     """A story step's camera (D199): `{"fit": [[x0, y0], [x1, y1]]}`, a box of cells the
-    page shows whole, or `{"wide": true}`, the scene's playable width; a level's
-    (D201), only the box."""
-    if value == {"wide": True} and whose == "a step's camera":
-        return
+    page shows whole, `{"wide": true}`, the scene's playable width, or `{"follow": id}`,
+    one of the story's `figures` the camera goes with (D327); a level's (D201), only the
+    box. Gives the figure followed, or None."""
+    stepped = whose == "a step's camera"
+    if value == {"wide": True} and stepped:
+        return None
+    if stepped and isinstance(value, dict) and set(value) == {"follow"}:
+        kept = value["follow"]
+        if not isinstance(kept, str) or kept not in figures:
+            raise LevelError(f"{here}: the camera follows a figure of the story, not {kept}")
+        return kept
     box = value.get("fit") if isinstance(value, dict) and set(value) == {"fit"} else None
     corners = (
         box
@@ -846,11 +859,12 @@ def _step_camera(
         else None
     )
     if corners is None:
-        wide = " or wide" if whose == "a step's camera" else ""
-        raise LevelError(f'{here}: {whose} is {{"fit": [[x0, y0], [x1, y1]]}}{wide}')
+        other = ', wide or {"follow": a figure}' if stepped else ""
+        raise LevelError(f'{here}: {whose} is {{"fit": [[x0, y0], [x1, y1]]}}{other}')
     (x0, y0), (x1, y1) = corners
     if not (0 <= x0 <= x1 < width and 0 <= y0 <= y1 < height):
         raise LevelError(f"{here}: the camera's box is off the scene or turned round")
+    return None
 
 
 def _level_camera(value: Any, level: "Level") -> None:
@@ -2369,6 +2383,7 @@ def story_on_scene(
     # A figure painted into the scene speaks from its spot (D264).
     voices = set(scene.voices)
     holding_letter = True
+    kept: str | None = None
     for number, step in enumerate(steps, 1):
         here = f"{story_id}, step {number}"
         if not isinstance(step, dict):
@@ -2404,8 +2419,12 @@ def story_on_scene(
                 raise LevelError(
                     f"{here}: meanwhile is for a figure's words, said while its actions play"
                 )
+        # The figure the camera goes with (D327), held as a framing is: to the part's end,
+        # or to the step that frames another.
+        if "scene" in step:
+            kept = None
         if "camera" in step:
-            _step_camera(step["camera"], here, width, height)
+            kept = _step_camera(step["camera"], here, width, height, figures=where)
         if "music" in step:
             _theme(step["music"], here)
         actions = _story_actions(doing, here)
@@ -2703,6 +2722,8 @@ def story_on_scene(
             where[who] = None
         if who != "voice" and who in where and where[who] is None and not vanishing and not gone:
             raise LevelError(f"{here}: {who} speaks out of sight")
+        if kept is not None and where[kept] is None:
+            raise LevelError(f"{here}: the camera follows {kept}, who is out of sight")
 
     world_actors = []
     for actor in actors:

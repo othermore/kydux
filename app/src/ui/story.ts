@@ -168,13 +168,14 @@ function letterBox(
   return { left: middleX - width / 2, top: middleY - height / 2, width, height };
 }
 
-/** The place framed at a step (D199): the last step's framing from the part's first
- * step to it, or none. */
+/** The place framed at a step (D199), or the figure the camera goes with (D327): the
+ * last step's framing from the part's first step to it, or none. */
 export function framingAt(steps: readonly StoryStep[], first: number, step: number): StoryFraming | null {
   for (let index = step; index >= first; index -= 1) {
     const camera = steps[index]?.camera;
     if (camera?.fit) return { fit: [camera.fit[0][0], camera.fit[0][1], camera.fit[1][0], camera.fit[1][1]] };
     if (camera?.wide) return { wide: true };
+    if (camera?.follow) return { follow: camera.follow };
   }
   return null;
 }

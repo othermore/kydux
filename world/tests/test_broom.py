@@ -1512,8 +1512,8 @@ def test_a_thing_s_zone_is_the_level_s_and_holds_where_it_is_found_from():
 def test_a_story_step_frames_a_box_of_cells_or_the_scene_s_width():
     from kydux_world.level import _step_camera
 
-    _step_camera({"fit": [[3, 3], [16, 10]]}, "story", 20, 15)
-    _step_camera({"wide": True}, "story", 20, 15)
+    assert _step_camera({"fit": [[3, 3], [16, 10]]}, "story", 20, 15) is None
+    assert _step_camera({"wide": True}, "story", 20, 15) is None
     for wrong in (
         {"fit": [[3, 3], [26, 10]]},
         {"fit": [[16, 3], [3, 10]]},
@@ -1522,6 +1522,20 @@ def test_a_story_step_frames_a_box_of_cells_or_the_scene_s_width():
     ):
         with pytest.raises(LevelError):
             _step_camera(wrong, "story", 20, 15)
+
+
+def test_a_story_step_has_the_camera_go_with_a_figure_of_the_story():
+    """The camera goes with one of the story's figures (D327), and a level's camera with
+    none."""
+    from kydux_world.level import _step_camera
+
+    figures = {"wizard", "friend"}
+    assert _step_camera({"follow": "friend"}, "story", 20, 15, figures=figures) == "friend"
+    for wrong in ({"follow": "owl"}, {"follow": ["friend"]}, {"follow": "friend", "wide": True}):
+        with pytest.raises(LevelError):
+            _step_camera(wrong, "story", 20, 15, figures=figures)
+    with pytest.raises(LevelError):
+        _step_camera({"follow": "friend"}, "level", 20, 15, "a level's camera", figures)
 
 
 def test_time_passes_only_where_a_step_s_scene_says_so():

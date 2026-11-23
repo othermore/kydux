@@ -1073,10 +1073,10 @@ class LevelScene extends Phaser.Scene {
     this.view.follow();
   }
 
-  /** In a story, the place a step frames, or none (D199, camera.ts), travelled to with
-   * `travel` (D321). */
+  /** In a story, the place a step frames, the figure the camera goes with (D327), or
+   * none (D199, camera.ts), travelled to with `travel` (D321). */
   place(framing: StoryFraming | null, travel = false): void {
-    this.view.place(framing, travel);
+    this.view.place(framing, travel, framing && 'follow' in framing ? this.spriteOf(framing.follow) : null);
   }
 
   /** The camera's travel ended at once and nothing left waiting for it, as the scene

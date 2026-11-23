@@ -739,7 +739,7 @@ test('in The flying lesson Ilda and two pupils come up the path one behind anoth
   await expect(scene).not.toHaveAttribute('data-flying', /zarek/);
 });
 
-test('at the gate the friend comes up the path from its foot, and after dark the friend stands outside the door (D322)', async ({
+test('at the gate the friend comes up the path from its foot, the camera down to them and up with them (D327), and after dark the friend stands outside the door (D322)', async ({
   page,
 }) => {
   test.setTimeout(ciTimes(180_000));
@@ -747,14 +747,39 @@ test('at the gate the friend comes up the path from its foot, and after dark the
   const scene = page.locator('#scene');
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
   await expect(scene).toHaveAttribute('data-actors', 'friend:8,29,up');
+  await storyNext(page);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
   await recordFrames(page);
-  await storyNext(page, 2);
+  await storyNext(page);
+  await expect(scene).toHaveAttribute('data-camera-fit', 'follow:friend');
   await expect(scene).toHaveAttribute('data-actors', 'friend:8,22,up', { timeout: ciTimes(30_000) });
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
-  for (const frame of (await framesRecorded(page)).frames) {
+  const { frames } = await framesRecorded(page);
+  const top = (frame: Frame) => Number(frame.world.split(',')[1]);
+  for (const frame of frames) {
     const friend = figureIn(frame, 'friend');
     expect(friend?.alpha).toBe(1);
   }
+  // The camera travels down the path to the friend, then comes up it with them: once the
+  // travel is over the friend is whole in the window in every frame, and the window ends
+  // higher than the travel left it, the wizard in it.
+  const arrived = frames.findIndex((frame, index) => !frame.travel && frames[index - 1]?.travel === true);
+  expect(arrived).toBeGreaterThan(0);
+  const lowest = Math.max(...frames.map(top));
+  expect(lowest - top(frames[0] as Frame)).toBeGreaterThan(3);
+  for (const frame of frames.slice(arrived)) {
+    const [, y0 = 0, , y1 = 0] = figureIn(frame, 'friend')?.box ?? [];
+    const [, from = 0, , tall = 0] = frame.world.split(',').map(Number);
+    expect(y0).toBeGreaterThan(from);
+    expect(y1).toBeLessThan(from + tall);
+  }
+  const last = frames.at(-1) as Frame;
+  expect(lowest - top(last)).toBeGreaterThan(3);
+  expect(inView(figureIn(last, 'wizard')?.box ?? [], last.world)).toBe(true);
+  // The friend's own step frames the gate again, the camera's travel up to it.
+  await storyNext(page);
+  await expect(scene).toHaveAttribute('data-camera-fit', '4,17,12,23');
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,21,up', { timeout: ciTimes(30_000) });
   await page.goto('/#story/after-dark');
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
   await expect(scene).toHaveAttribute('data-actors', /(^|;)friend:12,15,up/);

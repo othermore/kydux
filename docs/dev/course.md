@@ -137,7 +137,7 @@ password opens it and stays open after; the wand is picked up once, in
 | Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
 | `story:the-letter` | Story 1 | The letter of admission that came weeks before, told in the past and held before the painted castle, its words written by hand on it (D257); the castle, this very one (D251); the journey, told as the wizard walks up to the gate; the shut gate; then the creator. | |
-| `story:at-the-gate` | Story 2 | The shut gate; the friend arrives and offers to teach; the method: try, watch, try again. | |
+| `story:at-the-gate` | Story 2 | The shut gate; the friend arrives up the path, the camera going down to them and up with them (D327), and offers to teach; the method: try, watch, try again. | |
 | `lesson:what-a-program-is` | Lesson 1 | A program is a list of instructions, run from the top down; your program tells your wizard, you, what to do; the round mark is where the wizard must get to. | `wizard.move_right` |
 | `level:the-gate` | Practice 1 | One instruction, to the mark before the gate. Its code starts empty. | |
 | `lesson:objects-and-actions` | Lesson 2 | An instruction can be an action; an action needs someone to do it; characters and things are objects; an action is a method; the dot and the brackets; the notebook. | `wizard.move_left`, `move_up`, `move_down` |

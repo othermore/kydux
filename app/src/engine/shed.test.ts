@@ -97,4 +97,19 @@ describe("a story step's framing (D199)", () => {
     expect(travelsTo(steps, 1, 1)).toBe(false);
     expect(travelsTo(steps, 0, 0)).toBe(false);
   });
+
+  it('holds a figure the camera goes with as it holds a place, travelled to and from (D327)', () => {
+    const steps = [{}, { camera: { follow: 'friend' } }, {}, { camera: { fit: [[4, 17], [12, 23]] } }].map((step) => ({
+      who: 'voice',
+      do: null,
+      text: '',
+      ...step,
+    })) as Parameters<typeof framingAt>[0];
+    expect(framingAt(steps, 0, 1)).toEqual({ follow: 'friend' });
+    expect(framingAt(steps, 0, 2)).toEqual({ follow: 'friend' });
+    expect(framingAt(steps, 0, 3)).toEqual({ fit: [4, 17, 12, 23] });
+    expect(travelsTo(steps, 0, 1)).toBe(true);
+    expect(travelsTo(steps, 0, 2)).toBe(false);
+    expect(travelsTo(steps, 0, 3)).toBe(true);
+  });
 });

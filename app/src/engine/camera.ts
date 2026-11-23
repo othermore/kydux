@@ -22,6 +22,10 @@
 // data-camera-travel is `true`; a figure's words wait for it to arrive (`arrived`). A new
 // framing, a step shown at once, a resize, a drag or a zoom takes it to its travel's end
 // at once, and so does a motion reduced.
+// A story step may have the camera go with a figure instead (D327): the figure in the
+// window's middle, as the wizard is in a level, the camera moving as it walks, held as a
+// framing is; the travel to it ends on the figure wherever it has walked meanwhile.
+// data-camera-fit says `follow:<id>`.
 // It says data-zoom (the zoom, to two decimals), data-following, data-dragged
 // while a drag has let go of it, and data-view and data-bounds (the window and
 // the scene with its margin, in tiles across and down, "w×h") on the scene's
@@ -99,13 +103,17 @@ export class SceneCamera {
   private framed = false;
   /** In a story, the place a step frames (D199), held until a step frames none. */
   private placed: StoryFraming | null = null;
+  /** The figure the camera goes with, where the step's framing is one (D327), and
+   * whether it is with it now: not while it travels to it, nor once a drag lets go. */
+  private kept: Phaser.GameObjects.Sprite | null = null;
+  private keeping = false;
   /** In a level, the place its start frames (D201), and whether it is held. */
   private readonly levelFraming: LevelFraming;
   /** Whether the wizard glides in the air, the camera moving with it at once (D259). */
   private gliding = false;
   /** In a story, the travel to a step's framing under way (D321): its tween, and where it
    * goes from and to. */
-  private travel: { tween: Phaser.Tweens.Tween; from: Shot; to: Shot } | null = null;
+  private travel: { tween: Phaser.Tweens.Tween; from: Shot; to: () => Shot } | null = null;
   /** What waits for the camera to arrive, a figure's words (D321). */
   private arrivals: (() => void)[] = [];
 
@@ -168,6 +176,7 @@ export class SceneCamera {
       this.arrive();
       camera.stopFollow();
       this.followed = null;
+      this.keeping = false;
       this.letGoOfBox();
       this.parent.dataset.following = 'false';
       this.parent.dataset.dragged = 'true';
@@ -185,8 +194,9 @@ export class SceneCamera {
     this.dragged = false;
     delete this.parent.dataset.dragged;
     if (story && this.placed) {
-      // A travel under way goes on to the place it travels to (D321).
-      if (!this.travel) this.showPlaced(this.placed);
+      // A travel under way goes on to the place it travels to (D321), and a camera with
+      // its figure goes on with it wherever a seek puts the figure (D327).
+      if (!this.travel && !this.keeping) this.showPlaced(this.placed);
       return;
     }
     if (story) {
@@ -284,21 +294,25 @@ export class SceneCamera {
     }
   }
 
-  /** In a story, a step's framing (D199): a box of cells shown whole and centred, or
-   * the scene's width on the window's middle, kept until a step frames none; null lets
-   * the camera follow whoever the steps are about again. data-camera-fit says it from
-   * the start. With `travel`, the camera goes there from where it is over TRAVEL_MS
-   * (D321); a travel under way ends first, at once. */
-  place(framing: StoryFraming | null, travel = false): void {
+  /** In a story, a step's framing (D199): a box of cells shown whole and centred, the
+   * scene's width on the window's middle, or `figure` in the window's middle, the camera
+   * going with it (D327); kept until a step frames none; null lets the camera follow
+   * whoever the steps are about again. data-camera-fit says it from the start. With
+   * `travel`, the camera goes there from where it is over TRAVEL_MS (D321); a travel
+   * under way ends first, at once. */
+  place(framing: StoryFraming | null, travel = false, figure: Phaser.GameObjects.Sprite | null = null): void {
     this.arrive();
-    this.placed = framing;
-    if (!framing) {
+    const held = framing && 'follow' in framing && !figure ? null : framing;
+    this.placed = held;
+    this.kept = held && 'follow' in held ? figure : null;
+    if (!held) {
       delete this.parent.dataset.cameraFit;
       this.follow();
       return;
     }
-    this.parent.dataset.cameraFit = 'fit' in framing ? framing.fit.join(',') : 'wide';
-    this.showPlaced(framing, travel);
+    this.parent.dataset.cameraFit =
+      'fit' in held ? held.fit.join(',') : 'follow' in held ? `follow:${held.follow}` : 'wide';
+    this.showPlaced(held, travel);
   }
 
   /** Whether the camera travels to a step's framing (D321). */
@@ -325,8 +339,10 @@ export class SceneCamera {
     if (travel) {
       this.travel = null;
       travel.tween.remove();
-      this.shoot(travel.to);
+      this.shoot(travel.to());
       delete this.parent.dataset.cameraTravel;
+      // Arrived at the figure it goes with, it goes with it from there (D327).
+      if (this.kept) this.goWith(this.kept);
     }
     const waiting = this.arrivals;
     this.arrivals = [];
@@ -337,7 +353,7 @@ export class SceneCamera {
    * shows (D199), or a level's while it is held (D201); null where the camera follows
    * the wizard or whoever the steps are about. */
   shown(): [number, number] | null {
-    if (!this.placed && !this.levelFraming.holding) return null;
+    if (!this.framedPlace && !this.levelFraming.holding) return null;
     const camera = this.camera;
     const top = camera.scrollY + (camera.height / 2) * (1 - 1 / camera.zoom);
     return [top, top + camera.height / camera.zoom];
@@ -346,10 +362,16 @@ export class SceneCamera {
   /** The left and the right, in the scene's pixels, of what such a framing shows; null
    * where the camera follows. */
   shownSides(): [number, number] | null {
-    if (!this.placed && !this.levelFraming.holding) return null;
+    if (!this.framedPlace && !this.levelFraming.holding) return null;
     const camera = this.camera;
     const left = camera.scrollX + (camera.width / 2) * (1 - 1 / camera.zoom);
     return [left, left + camera.width / camera.zoom];
+  }
+
+  /** Whether a story step's framing holds a place: a box or the scene's width, not a
+   * figure the camera goes with. */
+  private get framedPlace(): boolean {
+    return this.placed !== null && !('follow' in this.placed);
   }
 
   /** A level's place shown whole and centred (D201), off the wizard until a run takes
@@ -379,8 +401,33 @@ export class SceneCamera {
 
   private showPlaced(framing: StoryFraming, travel = false): void {
     this.arrive();
+    this.keeping = false;
     const camera = this.camera;
     const from = this.shot();
+    const reduced = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    if ('follow' in framing) {
+      // The figure in the window's middle at the zoom of 1, the camera going with it as
+      // with the wizard in a level (D327); it travels to wherever the figure is by then.
+      const figure = this.kept;
+      if (!figure) return;
+      camera.stopFollow();
+      camera.deadzone = null;
+      camera.setFollowOffset(0, 0);
+      this.followed = null;
+      if (Math.abs(1 - this.zoom) > 1e-6) {
+        this.zoom = 1;
+        this.applyZoom();
+      }
+      this.parent.dataset.following = 'true';
+      const on = (): Shot => ({
+        zoom: this.zoom,
+        x: camera.clampX(figure.x - camera.width / 2) + camera.width / 2,
+        y: camera.clampY(figure.y - camera.height / 2) + camera.height / 2,
+      });
+      if (travel && !reduced && this.travelFrom(from, on)) return;
+      this.goWith(figure);
+      return;
+    }
     const scale = this.fit() * TILE;
     const shown: Tile = [camera.width / scale, camera.height / scale];
     const middle = camera.midPoint.y / TILE;
@@ -396,8 +443,13 @@ export class SceneCamera {
     }
     camera.centerOn(centre[0] * TILE, 'fit' in framing ? centre[1] * TILE : middle * TILE);
     this.parent.dataset.following = 'false';
-    const reduced = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     if (travel && !reduced) this.travelFrom(from);
+  }
+
+  /** The camera on a figure it goes with, and with it from there (D327). */
+  private goWith(figure: Phaser.GameObjects.Sprite): void {
+    this.camera.startFollow(figure, true, LAG, LAG);
+    this.keeping = true;
   }
 
   /** Where the camera is now (Shot), its window held within the scene and its margin. */
@@ -419,18 +471,25 @@ export class SceneCamera {
     this.camera.centerOn(shot.x, shot.y);
   }
 
-  /** The camera's travel from a shot to where it is placed now (D321): back at the shot,
-   * then its zoom and its middle eased to the place's over TRAVEL_MS. */
-  private travelFrom(from: Shot): void {
-    const to = this.shot();
-    const far = Math.abs(to.zoom - from.zoom) > 1e-4 || Math.hypot(to.x - from.x, to.y - from.y) > 0.5;
-    if (!far) return;
+  /** The camera's travel from a shot to where it is placed now (D321), or to `target`,
+   * a shot that may move as the travel goes (D327): back at the shot, then its zoom and
+   * its middle eased to the place's over TRAVEL_MS. Whether it travels: not where it is
+   * there already. */
+  private travelFrom(from: Shot, target?: () => Shot): boolean {
+    const placed = this.shot();
+    const to = target ?? (() => placed);
+    const first = to();
+    const far = Math.abs(first.zoom - from.zoom) > 1e-4 || Math.hypot(first.x - from.x, first.y - from.y) > 0.5;
+    if (!far) return false;
     this.shoot(from);
-    const between = (part: number): Shot => ({
-      zoom: from.zoom + (to.zoom - from.zoom) * part,
-      x: from.x + (to.x - from.x) * part,
-      y: from.y + (to.y - from.y) * part,
-    });
+    const between = (part: number): Shot => {
+      const end = to();
+      return {
+        zoom: from.zoom + (end.zoom - from.zoom) * part,
+        x: from.x + (end.x - from.x) * part,
+        y: from.y + (end.y - from.y) * part,
+      };
+    };
     const tween = this.scene.tweens.addCounter({
       from: 0,
       to: 1,
@@ -445,6 +504,7 @@ export class SceneCamera {
     });
     this.travel = { tween, from, to };
     this.parent.dataset.cameraTravel = 'true';
+    return true;
   }
 
   /** In a story, at each tick: with whoever the step is about, unless a drag has

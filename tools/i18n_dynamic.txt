@@ -72,3 +72,7 @@ familiars.
 # What is said while a program runs, `told.${key}`, when the level has no words of its
 # own for it (D264, engine/words.ts toldText).
 told.
+
+# The friend's orders to her hare in the hall at work, by the way it steps (D300):
+# `ambient.move_${way}`, chosen by app/src/engine/ambient.ts.
+ambient.

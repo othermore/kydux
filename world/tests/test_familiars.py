@@ -439,6 +439,35 @@ def test_then_s_way_is_straight_on_walked_floor_and_held_by_no_one():
             Level.from_dict({**data, "familiar": {**block, "then": then}})
 
 
+def test_the_mate_s_tries_are_a_spark_and_the_friend_s_drill_a_loop_in_the_circle():
+    """D300: `tries` reads as a spark; `drill` is a loop of steps back to the familiar's
+    own cell, in the circle, on no trial's cell nor another's."""
+    level = level_of("one-line-in-the-book")
+    mate = next(a for a in level.actors if a.id == "mate_familiar")
+    hare = next(a for a in level.actors if a.id == "friend_familiar")
+    assert mate.spark and mate.tries
+    assert hare.drill[-1] == hare.position and len(hare.drill) == 6
+    given = json.loads(
+        (ROOT / "content" / "levels" / "one-line-in-the-book" / "level.json").read_text()
+    )
+
+    def with_drill(drill: list) -> dict:
+        actors = [
+            {**a, "drill": drill} if a["id"] == "friend_familiar" else a for a in given["actors"]
+        ]
+        return {**hall("one-line-in-the-book", actors=actors), "familiar": given["familiar"]}
+
+    Level.from_dict(with_drill([[8, 6], [8, 7]]))
+    for drill in (
+        [[8, 6], [9, 6]],
+        [[8, 5], [8, 6], [8, 7]],
+        [[9, 7], [10, 7], [9, 7], [8, 7]],
+        [[8, 6], [9, 7], [8, 7]],
+    ):
+        with pytest.raises(LevelError, match="drill"):
+            Level.from_dict(with_drill(drill))
+
+
 def test_the_level_s_block_is_checked():
     data = hall("the-circle", actors=[ORLA])
     for wrong, reason in [

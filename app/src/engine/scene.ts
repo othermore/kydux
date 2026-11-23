@@ -75,6 +75,7 @@ import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
 import { type CreatureLook, type Layout, layout, type PlanView, towards } from './layout';
 import { familiarTable, firstSheet, sheetOf } from '../content/familiar';
+import { HallShow } from './hallshow';
 import { type Pixels, TREMBLE_MS, TREMBLE_PX, trialLeft, trialSheet, trialShown, trialTime } from './trial';
 import { DEFAULT_LOOK, type Look } from './looks';
 import {
@@ -127,7 +128,7 @@ import {
   thingDepthOn,
 } from './painted';
 import { contentUrl } from '../content/address';
-import { characterName, t } from '../i18n';
+import { characterName, forWizard, t } from '../i18n';
 import { AFTER_BUMP_MS, readingMs, readingTicks } from './bubble';
 import { SceneCamera, VIEW_TILES } from './camera';
 import type { StoryFraming } from './zooming';
@@ -1029,11 +1030,15 @@ class LevelScene extends Phaser.Scene {
         this.wind.stop(WIND_STOP);
         this.cutGlides();
       }
+      // The friend's orders play while no program runs, the card closed (D300).
+      if (state === 'idle' && this.startClosed) this.hallShow?.startDrill();
+      else if (state !== 'idle') this.hallShow?.stopDrill();
     });
     // Where the flying figures are drawn, once each frame is drawn (D259).
     this.events.on(Phaser.Scenes.Events.RENDER, () => this.publishFlyers());
     this.restart();
     this.parentNode.dataset.state = this.playback.state;
+    this.hallAtWork();
     this.ready();
   }
 
@@ -2896,6 +2901,47 @@ class LevelScene extends Phaser.Scene {
   /** The level's start card closed (SceneHandle, D276). */
   cardClosed(): void {
     this.startClosed = true;
+    if (this.playback.state === 'idle') this.hallShow?.startDrill();
+  }
+
+  /** The hall at work (D300): the room-mate's tries on the cell of the actor that has
+   * them, and the friend's orders to her familiar round its drill. */
+  private hallShow: HallShow | null = null;
+
+  private hallAtWork(): void {
+    const tries = this.map.actors.find((actor) => actor.tries)?.id ?? null;
+    const drilled = this.map.actors.find((actor) => actor.drill && actor.drill.length > 0);
+    if (!tries && !drilled) return;
+    const name = forWizard('{friend_familiar}');
+    this.hallShow = new HallShow(
+      {
+        scene: this,
+        parent: this.parentNode,
+        still: this.still,
+        kinds: familiarTable()?.kinds ?? {},
+        creature: (look, at) => this.creatureSprite(look, at, 'down'),
+        lookOf: (attempt) => {
+          const kind = attempt.kind ?? '';
+          const sheet = attempt.look === 'spark' ? null : attempt.color ? sheetOf(kind, attempt.color) : firstSheet(kind, familiarTable());
+          return { kind, color: attempt.color, look: attempt.look, sheet };
+        },
+        actor: (id) => {
+          const state = this.actors.get(id);
+          return state ? { sprite: state.sprite, tile: state.tile, facing: state.facing } : null;
+        },
+        figureAt: (tile) => this.figureAt(tile),
+        walk: (sprite, facing, x, y, ms) => this.walk(sprite, facing, x, y, ms),
+        face: (sprite, facing) => this.face(sprite, facing),
+        say: (text, over, who) => this.speech.say(text, this.shownTick, Number.POSITIVE_INFINITY, over, who),
+        unsay: () => this.speech.clearBubble(),
+        order: (key) => t(key, { name }),
+        stepMs: this.playback.tickDuration * FAMILIAR_PACE * 0.9,
+      },
+      tries,
+      // A familiar is ordered by the one whose it is: the friend's, `friend_familiar`.
+      drilled ? { id: drilled.id, owner: drilled.id.replace(/_familiar$/, ''), loop: drilled.drill ?? [] } : null,
+    );
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.hallShow?.destroy());
   }
 
   /** Each trial that does not hold, seen and then fading (`trialLeft`, D276, D285): a

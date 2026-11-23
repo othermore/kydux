@@ -815,6 +815,12 @@
     "one_class": "Stop! Each pupil writes only one description of a familiar at a time.",
     "too_soon": "It is too soon to move your animal. First you must be sure it is the one you want, and you must tell me, so that I note it in the book."
   },
+  "ambient": {
+    "move_up": "{name}, move up.",
+    "move_down": "{name}, move down.",
+    "move_left": "{name}, move left.",
+    "move_right": "{name}, move right."
+  },
   "book": {
     "line": "The book can conjure it in a single line:",
     "written": "Orla writes your conjuring in the book of Arvelia:",

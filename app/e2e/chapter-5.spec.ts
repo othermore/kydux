@@ -315,6 +315,31 @@ test.describe('a familiar born walks to the moon, and two share it (D302)', () =
   });
 });
 
+test.describe('the hall at work in Una línea en el libro (D300)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("the mate's tries come and go always; the friend's orders play while no program runs", async ({ page }) => {
+    await open(page, 'one-line-in-the-book');
+    await expect(scene(page)).toHaveAttribute('data-ambient', 'tries,drill');
+    // The friend orders her hare: a bubble over her, the hare a cell from its own.
+    await expect(scene(page)).toHaveAttribute('data-speaker', 'friend', { timeout: ciTimes(10_000) });
+    await page.locator('#scene').screenshot({ path: `${SHOTS}hall-at-work.png` });
+    await start(page, solution('one-line-in-the-book'));
+    await expect(scene(page)).toHaveAttribute('data-ambient', 'tries');
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
+    // After a run in which the hare was born, the orders do not come back.
+    await expect(scene(page)).toHaveAttribute('data-ambient', 'tries');
+  });
+
+  test('with less motion asked, the spark stands and no order is said', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await open(page, 'one-line-in-the-book');
+    await expect(scene(page)).not.toHaveAttribute('data-ambient', /./);
+    await expect(scene(page)).toHaveAttribute('data-creatures', /(^|;)mate_familiar:spark:/);
+  });
+});
+
 test.describe('the trials that hold and those that fade (D276)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));

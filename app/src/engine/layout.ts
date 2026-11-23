@@ -94,6 +94,10 @@ export interface ActorLayout {
   creature?: CreatureLook;
   /** Seated on the floor, drawn in its sitting rows (D273). */
   sitting?: boolean;
+  /** The room-mate's tries, shown coming and going on its cell (D300). */
+  tries?: boolean;
+  /** The loop of cells its owner orders a familiar round while no program runs (D300). */
+  drill?: Tile[];
 }
 
 /** How a familiar is drawn (D263, D273): its kind and colour, the sheet it is drawn from,
@@ -253,7 +257,7 @@ function childsFamiliar(level: LevelJson): { kind: string; color: string } | nul
 function creatureOf(spec: Record<string, unknown>, level: LevelJson): CreatureLook {
   const child = childsFamiliar(level);
   const table = familiarTable();
-  if (spec.spark === true) return { kind: '', color: null, look: 'spark', sheet: null };
+  if (spec.spark === true || spec.tries === true) return { kind: '', color: null, look: 'spark', sheet: null };
   let kind: string;
   let color: string | null;
   if (spec.of === 'mate') {
@@ -369,6 +373,12 @@ export function layout(level: LevelJson): Layout {
     const asleep = typeof spec.asleep === 'string' ? { asleep: spec.asleep } : {};
     const creature = spec.kind === 'familiar' ? { creature: creatureOf(spec, level) } : {};
     const sitting = spec.sitting === true ? { sitting: true } : {};
+    // The hall at work (D300): the mate's tries, the friend's loop of orders.
+    const tries = spec.kind === 'familiar' && spec.tries === true ? { tries: true } : {};
+    const loop = asList(spec.drill)
+      .map((cell) => asTile(cell))
+      .filter((cell): cell is Tile => cell !== null);
+    const drill = spec.kind === 'familiar' && loop.length > 0 ? { drill: loop } : {};
     actors.push({
       id: String(spec.id),
       kind: String(spec.kind),
@@ -379,6 +389,8 @@ export function layout(level: LevelJson): Layout {
       ...asleep,
       ...creature,
       ...sitting,
+      ...tries,
+      ...drill,
     });
   }
   // A reach goal may be hidden: the cell is said in words, and no mark drawn (D134).

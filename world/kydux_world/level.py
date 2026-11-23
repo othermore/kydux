@@ -203,6 +203,10 @@ class ActorSpec:
     trial: bool = False
     spark: bool = False
     of: str | None = None
+    #: A spark that the page shows as the room-mate's tries, coming and going (D300).
+    tries: bool = False
+    #: The loop of cells the friend orders her familiar round, its last its own (D300).
+    drill: tuple[Position, ...] = ()
     #: Seated on the floor, drawn in its sitting rows (D273).
     sitting: bool = False
 
@@ -981,8 +985,18 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
         patrol_start,
         patrol_along,
         sitting=sitting,
+        drill=_drill(shape, spec, actor_id),
         **_creature(spec, shape.level_id, actor_id),
     )
+
+
+def _drill(shape: _Shape, spec: dict[str, Any], actor_id: str) -> tuple[Position, ...]:
+    """A familiar's loop of cells, ordered round by its owner (D300): checked against the
+    familiar block once it is read (`_check_drills`)."""
+    value = spec.get("drill", [])
+    if not isinstance(value, list):
+        raise LevelError(f"{shape.level_id}: {actor_id}'s drill is a list of [x, y]")
+    return tuple(shape.tile(cell, f"{actor_id}'s drill") for cell in value)
 
 
 def _creature(spec: dict[str, Any], level_id: str, actor_id: str) -> dict[str, Any]:
@@ -992,13 +1006,24 @@ def _creature(spec: dict[str, Any], level_id: str, actor_id: str) -> dict[str, A
     `mate`, the room-mate's copy of the child's. No other actor has any of these."""
     from .familiars import KINDS, SHEETS
 
-    keys = ("creature", "color", "trial", "spark", "of")
+    keys = ("creature", "color", "trial", "spark", "of", "tries", "drill")
     if spec.get("kind") != "familiar":
         if any(key in spec for key in keys):
             raise LevelError(f"{level_id}: only a familiar has {', '.join(keys)}")
         return {}
     creature, color, of = spec.get("creature"), spec.get("color"), spec.get("of")
     trial, spark = spec.get("trial", False), spec.get("spark", False)
+    # The room-mate's tries are a spark to the world; the page shows them coming and
+    # going (D300).
+    tries = spec.get("tries", False)
+    if not isinstance(tries, bool) or (tries and (spark or trial)):
+        raise LevelError(f"{level_id}: {actor_id}'s tries are true or false, in place of a spark")
+    if tries:
+        if creature is not None or color is not None or of is not None or "drill" in spec:
+            raise LevelError(f"{level_id}: {actor_id}'s tries have no kind and no colour")
+        return {"spark": True, "tries": True}
+    if "drill" in spec and (spark or of is not None):
+        raise LevelError(f"{level_id}: {actor_id}'s drill is a creature's, not a spark's")
     if not isinstance(trial, bool) or not isinstance(spark, bool) or (trial and spark):
         raise LevelError(f"{level_id}: {actor_id} is a trial or a spark, true or false")
     if of is not None:
@@ -1567,6 +1592,7 @@ def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None
     if source not in ("source", "learned"):
         raise LevelError(f"{level_id}: the living familiar's class is from source or learned")
     orders, orders_on = _orders(value.get("orders"), shape, level, stage)
+    _check_drills(level, block, trials)
     return FamiliarBlock(
         stage,
         circle=box,
@@ -1582,6 +1608,28 @@ def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None
         most=most,
         then_way=then_way,
     )
+
+
+def _check_drills(level: "Level", block: FamiliarBlock, trials: tuple[Position, ...]) -> None:
+    """Each familiar's drill (D300): a loop of cells one step apart, its first one step
+    from the familiar's own cell and its last that cell, all inside the circle, none a
+    trial's cell nor another actor's."""
+    for actor in level.actors:
+        if not actor.drill:
+            continue
+        held = {other.position for other in level.actors if other.id != actor.id}
+        cells = actor.drill
+        steps = zip((actor.position, *cells), cells, strict=False)
+        if (
+            cells[-1] != actor.position
+            or any(abs(a.x - b.x) + abs(a.y - b.y) != 1 for a, b in steps)
+            or not all(block.in_circle(cell) for cell in cells)
+            or any(cell in trials or cell in held for cell in cells)
+        ):
+            raise LevelError(
+                f"{level.id}: {actor.id}'s drill is a loop of steps in the circle, back to "
+                "its own cell, on no trial's cell nor another's"
+            )
 
 
 def _then_way(

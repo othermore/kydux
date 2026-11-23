@@ -65,16 +65,42 @@
       "at": [
         8,
         7
+      ],
+      "drill": [
+        [
+          8,
+          6
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          9,
+          8
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          8,
+          7
+        ]
       ]
     },
     {
       "kind": "familiar",
       "id": "mate_familiar",
-      "spark": true,
       "at": [
         11,
         7
-      ]
+      ],
+      "tries": true
     }
   ],
   "familiar": {

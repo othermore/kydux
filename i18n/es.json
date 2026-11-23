@@ -815,6 +815,12 @@
     "one_class": "¡Alto! Cada alumno escribe una sola descripción de familiar cada vez.",
     "too_soon": "Aún es pronto para mover a tu animal. Antes debes estar seguro de que es el que quieres, y debes decírmelo para que lo anote en el libro."
   },
+  "ambient": {
+    "move_up": "{name}, muévete arriba.",
+    "move_down": "{name}, muévete abajo.",
+    "move_left": "{name}, muévete a la izquierda.",
+    "move_right": "{name}, muévete a la derecha."
+  },
   "book": {
     "line": "El libro puede conjurarla en una sola línea:",
     "written": "Orla escribe tu conjuro en el libro de Arvelia:",

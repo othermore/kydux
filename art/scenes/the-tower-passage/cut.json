@@ -46,6 +46,19 @@
       "over": true,
       "states": {"standing": "painting"}
     },
+    "arch_wall": {
+      "about": "The corridor's arch at the foot of the back stairs (D307): the wall round its opening and the steps below it, without the opening, traced on the painting, drawn over a figure on rows 0 to 11, so that Rinlo coming down the last stairs on (2, 9) to (2, 11) is seen through the opening alone, and stands whole under the arch on (2, 12). Cut from the painting by its polygon less the opening (`holes`).",
+      "box": [0.0, 9.43, 4.0, 13.02],
+      "row": 12,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "polygon": [[0.0, 9.43], [4.0, 9.43], [4.0, 13.02], [0.0, 13.02]],
+      "holes": [
+        [[2.45, 10.28], [2.06, 10.31], [1.86, 10.4], [1.7, 10.5], [1.62, 10.6], [1.56, 10.72], [1.53, 10.9], [1.53, 12.1], [3.42, 12.1], [3.42, 10.88], [3.38, 10.74], [3.28, 10.57], [3.12, 10.42], [2.95, 10.34], [2.75, 10.3]]
+      ],
+      "states": {"standing": "painting"}
+    },
     "room_door_jamb": {
       "about": "The stone block at the side doorway's foot, the wall in front of whoever crosses the doorway on (5, 3), drawn over that figure, whose feet it hides (D104, D289). The painting's own pixels, a box on the block's straight top and sides, measured on the painting: whatever of the figure it covers is the block's own.",
       "box": [5.49, 4.085, 6.005, 4.6],
@@ -136,13 +149,23 @@
   ],
   "lowered": [
     {
-      "about": "The forgotten room's side doorway (D289): a figure crossing it is drawn lower, its feet on the middle of the cell below, behind the stone block at the doorway's near end, which is drawn over it (`room_door_jamb`) and hides it up to the chest.",
-      "cells": [[5, 3], [5, 3]],
+      "about": "The forgotten room's side doorway and the landing of the back stairs (D289, D307): a figure crossing the doorway is drawn lower, its feet on the middle of the cell below, behind the stone block at the doorway's near end, which is drawn over it (`room_door_jamb`) and hides it up to the chest; on the landing it stays as low, its feet below the open leaf's foot, going down once and staying down.",
+      "cells": [[2, 3], [5, 3]],
       "by": 0.65
     },
     {
-      "about": "The landing of the back stairs, before the side door (D289): a figure on it is drawn lower, its feet below the open leaf's foot, as one passing before the leaf.",
-      "cells": [[2, 3], [4, 3]],
+      "about": "The room's floor before its side doorway (D307): a figure drawn lower, between the stool and the candle's box.",
+      "cells": [[6, 3], [7, 3]],
+      "by": 0.4
+    },
+    {
+      "about": "The last stairs behind the corridor's arch (D307): a figure drawn lower, so that its legs show in the arch's opening as it comes down.",
+      "cells": [[2, 10], [2, 10]],
+      "by": 0.6
+    },
+    {
+      "about": "The last stair behind the corridor's arch (D307): a figure drawn lower, its feet behind the steps below the opening.",
+      "cells": [[2, 11], [2, 11]],
       "by": 0.3
     },
     {
@@ -156,5 +179,5 @@
   "castle": 0,
   "thresholds": {"outline": 100},
   "cut": false,
-  "source": "# The small passage\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-small-passage.md`, in the style of\n  `art/raw/image-first/field-2k.png`, and edited by it\n  (`scene-small-passage-2.md`, `scene-small-passage-3.md`).\n- Its trench painted by it on an enlargement of the wall\n  (`scene-small-passage-6.md`), squeezed onto the middles of its cells by\n  `tools/art/narrow.py`, repaired by it (`scene-small-passage-7.md`), its\n  rubble painted again (`scene-small-passage-8.md`), and laid back by\n  `tools/art/narrow.py`.\n- Its grid taken out by it (`game-tower-passage-nogrid.md`).\n- Its second flap painted by it on a part of the corridor's wall\n  (`tower-passage-flap.md`) and laid on the painting by `tools/art/lay.py`,\n  only its own pixels.\n- The forgotten room's side door open painted by Gemini for the game's\n  owner on a part of the painting, the wall without the door and the leaf\n  alone, the leaf set in its place by the owner; laid on the painting by\n  `tools/art/lay.py`, its doorway and its leaf, only their own pixels, the\n  leaf a little darker.\n"
+  "source": "# The small passage\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-small-passage.md`, in the style of\n  `art/raw/image-first/field-2k.png`, and edited by it\n  (`scene-small-passage-2.md`, `scene-small-passage-3.md`).\n- Its trench painted by it on an enlargement of the wall\n  (`scene-small-passage-6.md`), squeezed onto the middles of its cells by\n  `tools/art/narrow.py`, repaired by it (`scene-small-passage-7.md`), its\n  rubble painted again (`scene-small-passage-8.md`), and laid back by\n  `tools/art/narrow.py`.\n- Its grid taken out by it (`game-tower-passage-nogrid.md`).\n- Its second flap painted by it on a part of the corridor's wall\n  (`tower-passage-flap.md`) and laid on the painting by `tools/art/lay.py`,\n  only its own pixels.\n- The forgotten room's side door open painted by Gemini for the game's\n  owner on a part of the painting, the wall without the door and the leaf\n  alone, the leaf set in its place by the owner; laid on the painting by\n  `tools/art/lay.py`, its doorway and its leaf, only their own pixels, the\n  leaf a little darker.\n- The corridor's arch's wall is cut from the painting by\n  `tools/art/export_scene.py`, a polygon round it less its opening.\n"
 }

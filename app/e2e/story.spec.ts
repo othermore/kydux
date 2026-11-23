@@ -419,7 +419,7 @@ test('Rinlo stands, crosses the room leaving the pieces behind him, and sits aga
   await expect(scene).not.toHaveAttribute('data-found', /thread/);
 });
 
-test('Rinlo opens the side door and goes down the back stairs, then comes out under the arch (D289)', async ({ page }) => {
+test('Rinlo opens the side door and goes down the back stairs and through the arch, walking (D289, D307)', async ({ page }) => {
   test.setTimeout(ciTimes(180_000));
   await page.goto('/#story/what-the-familiar-brought');
   const scene = page.locator('#scene');
@@ -434,18 +434,19 @@ test('Rinlo opens the side door and goes down the back stairs, then comes out un
     });
   });
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
-  // The first step frames the room, its side door, the landing and the stairs.
-  await expect(scene).toHaveAttribute('data-camera-fit', '0,0,19,9');
-  // The door open, its leaf drawn with its own picture, and Rinlo gone down the stairs,
-  // after the door and the landing.
+  // The first step frames the whole scene: the room, its side door, the landing, the
+  // stairs and the arch.
+  await expect(scene).toHaveAttribute('data-camera-fit', '0,0,19,14');
+  // The door open, its leaf drawn with its own picture, and Rinlo down the stairs and
+  // through the arch, where he waits, walking all the way (D307).
   await expect(scene).toHaveAttribute('data-door-looks', /room_door:art-room_door-open/);
-  await expect(scene).not.toHaveAttribute('data-actors', /rinlo/);
+  await expect(scene).toHaveAttribute('data-actors', /(^|;)rinlo:2,12,/);
   const walked = await page.evaluate(() => (window as unknown as { rinlo: string[] }).rinlo);
-  for (const cell of ['6,3', '5,3', '2,3', '2,8']) {
+  for (const cell of ['6,3', '5,3', '2,3', '2,8', '2,10', '2,12']) {
     expect(walked.some((actors) => actors.includes(`rinlo:${cell},`))).toBe(true);
   }
   await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/rinlo-down-the-back-stairs.png' });
-  // The second frames the corridor: under the arch, by the children, who turn to him.
+  // The second frames the corridor: from under the arch to the children, who turn to him.
   await storyNext(page);
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
   await expect(scene).toHaveAttribute('data-camera-fit', '0,5,19,14');
@@ -569,4 +570,21 @@ test("in The tower the three leave the dormitory by the left, and go into the ar
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
   await expect(scene).not.toHaveAttribute('data-actors', /(^|;)(friend|mate):/);
   await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-tower-17.png' });
+});
+
+
+test("in The trail the familiar walks up into the hall's tunnel and comes out of it (D307)", async ({ page }) => {
+  test.setTimeout(ciTimes(240_000));
+  await seedWizard(page);
+  await page.goto('/#story/the-trail');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  // Step 9: up the column to the tunnel's far cell, behind its wall, never faded.
+  await storyNext(page, 8);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+  await expect(scene).toHaveAttribute('data-actors', /(^|;)familiar:14,1,up/);
+  // Step 10: down out of it and back to the children.
+  await storyNext(page);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+  await expect(scene).toHaveAttribute('data-actors', /(^|;)familiar:11,10,/);
 });

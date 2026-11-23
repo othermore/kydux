@@ -21,3 +21,5 @@ later, like the rest of it.
   alone, the leaf set in its place by the owner; laid on the painting by
   `tools/art/lay.py`, its doorway and its leaf, only their own pixels, the
   leaf a little darker.
+- The corridor's arch's wall is cut from the painting by
+  `tools/art/export_scene.py`, a polygon round it less its opening.

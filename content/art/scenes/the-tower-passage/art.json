@@ -28,6 +28,12 @@
     },
     {
       "row": 12,
+      "image": "row-12-static.webp",
+      "top": 905,
+      "static": true
+    },
+    {
+      "row": 12,
       "image": "row-12-static-over.webp",
       "top": 996,
       "static": true,
@@ -56,10 +62,10 @@
   },
   "lowered": [
     {
-      "about": "The forgotten room's side doorway (D289): a figure crossing it is drawn lower, its feet on the middle of the cell below, behind the stone block at the doorway's near end, which is drawn over it (`room_door_jamb`) and hides it up to the chest.",
+      "about": "The forgotten room's side doorway and the landing of the back stairs (D289, D307): a figure crossing the doorway is drawn lower, its feet on the middle of the cell below, behind the stone block at the doorway's near end, which is drawn over it (`room_door_jamb`) and hides it up to the chest; on the landing it stays as low, its feet below the open leaf's foot, going down once and staying down.",
       "cells": [
         [
-          5,
+          2,
           3
         ],
         [
@@ -70,15 +76,43 @@
       "by": 0.65
     },
     {
-      "about": "The landing of the back stairs, before the side door (D289): a figure on it is drawn lower, its feet below the open leaf's foot, as one passing before the leaf.",
+      "about": "The room's floor before its side doorway (D307): a figure drawn lower, between the stool and the candle's box.",
       "cells": [
         [
-          2,
+          6,
           3
         ],
         [
-          4,
+          7,
           3
+        ]
+      ],
+      "by": 0.4
+    },
+    {
+      "about": "The last stairs behind the corridor's arch (D307): a figure drawn lower, so that its legs show in the arch's opening as it comes down.",
+      "cells": [
+        [
+          2,
+          10
+        ],
+        [
+          2,
+          10
+        ]
+      ],
+      "by": 0.6
+    },
+    {
+      "about": "The last stair behind the corridor's arch (D307): a figure drawn lower, its feet behind the steps below the opening.",
+      "cells": [
+        [
+          2,
+          11
+        ],
+        [
+          2,
+          11
         ]
       ],
       "by": 0.3

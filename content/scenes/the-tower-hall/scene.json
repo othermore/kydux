@@ -9,6 +9,11 @@
       "kind": "stair",
       "walk": false,
       "sight": true
+    },
+    "l": {
+      "kind": "wall",
+      "walk": "story",
+      "sight": false
     }
   },
   "things": [

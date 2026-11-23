@@ -186,23 +186,15 @@
             ],
             [
               14,
-              4
+              1
             ]
-          ],
-          "vanish": true
+          ]
         }
       ]
     },
     {
       "who": "voice",
       "do": [
-        {
-          "by": "familiar",
-          "appear": [
-            14,
-            4
-          ]
-        },
         {
           "by": "familiar",
           "walk": [

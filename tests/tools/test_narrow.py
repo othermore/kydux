@@ -58,11 +58,12 @@ def test_the_sweep_tells_the_cells_only_a_familiar_walks_on():
 
 
 def test_the_sweep_counts_the_cells_only_a_story_walks_on_among_those_walked():
-    """D288: the landing, the back stairs and the floor before the room's crates."""
+    """D288, D307: the landing, the back stairs down to the arch and the floor before the
+    room's crates."""
     walked = sweep.walks("the-tower-passage")
-    landing = [(x, 3) for x in range(2, 8)] + [(2, y) for y in range(4, 9)]
+    landing = [(x, 3) for x in range(2, 8)] + [(2, y) for y in range(4, 12)]
     assert all(walked[y, x] for x, y in landing)
-    assert not walked[9, 2] and not walked[11, 2] and walked[12, 2]
+    assert walked[12, 2] and not walked[11, 1] and not walked[11, 3]
     assert not walked[3, 14] and not walked[2, 6]
     # The corridor's two rows, the cell under the arch, the room's floor, and the story's.
-    assert int(walked.sum()) == 36 + 1 + 9 + 11
+    assert int(walked.sum()) == 36 + 1 + 9 + 14

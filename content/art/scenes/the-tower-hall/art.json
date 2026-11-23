@@ -10,6 +10,15 @@
   },
   "rows": [
     {
+      "row": 3,
+      "image": "row-3-static.webp",
+      "top": 0,
+      "static": true,
+      "hours": {
+        "sunset": "row-3-static-sunset.webp"
+      }
+    },
+    {
       "row": 12,
       "image": "row-12-static.webp",
       "top": 974,

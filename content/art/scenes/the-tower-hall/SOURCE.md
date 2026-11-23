@@ -15,3 +15,5 @@ later, like the rest of it.
 - Its lit plates (`tower-hall-lit.md`), its light at sunset
   (`tower-hall-sunset.md`) and its archway marked for the cut
   (`tower-hall-arch-marked-2.md`) are Gemini's edits of that painting.
+- The familiars' tunnel's wall is cut from the painting by
+  `tools/art/export_scene.py`, a polygon round its mouth less the opening.

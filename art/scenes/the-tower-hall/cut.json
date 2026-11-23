@@ -467,6 +467,100 @@
       "states": {
         "standing": "painting"
       }
+    },
+    "tunnel": {
+      "about": "The familiars' small tunnel in the hall's right wall (D307): the wall round its mouth and above it to the scene's top, without the mouth's dark opening, traced on the painting, drawn over a figure on rows 0 to 2, so that a familiar walking up into it on (14, 2) and (14, 1) is seen through the opening alone. Cut from the painting by its polygon less the opening (`holes`), at both hours.",
+      "box": [
+        13.5,
+        0.0,
+        15.5,
+        3.54
+      ],
+      "row": 3,
+      "static": true,
+      "solid": true,
+      "mask": "polygon",
+      "polygon": [
+        [
+          13.5,
+          0.0
+        ],
+        [
+          15.5,
+          0.0
+        ],
+        [
+          15.5,
+          3.54
+        ],
+        [
+          13.5,
+          3.54
+        ]
+      ],
+      "holes": [
+        [
+          [
+            14.47,
+            2.76
+          ],
+          [
+            14.38,
+            2.81
+          ],
+          [
+            14.3,
+            2.88
+          ],
+          [
+            14.24,
+            2.96
+          ],
+          [
+            14.2,
+            3.08
+          ],
+          [
+            14.18,
+            3.2
+          ],
+          [
+            14.18,
+            3.6
+          ],
+          [
+            14.77,
+            3.6
+          ],
+          [
+            14.77,
+            3.2
+          ],
+          [
+            14.76,
+            3.06
+          ],
+          [
+            14.75,
+            2.94
+          ],
+          [
+            14.7,
+            2.84
+          ],
+          [
+            14.62,
+            2.78
+          ],
+          [
+            14.55,
+            2.76
+          ]
+        ]
+      ],
+      "states": {
+        "standing": "painting"
+      }
     }
   },
   "cuts": [],
@@ -534,7 +628,7 @@
       "by": -0.12
     }
   ],
-  "source": "# The tower's highest hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/game-tower-hall.md`, given its plan on the grid and the\n  design's first painting of the hall (`tools/art/prompts/scene-tower-hall.md`),\n  in the style of `art/raw/image-first/field-2k.png`.\n- Edited by it: its grid taken out and the perches and baskets that stood on\n  the walked floor taken away (`tower-hall-base.md`); the cat moved onto the\n  lectern (`tower-hall-mend.md`) and the three plates onto their cells\n  (`tower-hall-moon.md`, `tower-hall-sun.md`, `tower-hall-star.md`), each\n  mended in its box by `tools/art/repaint.py`, the painting kept elsewhere.\n- Its lit plates (`tower-hall-lit.md`), its light at sunset\n  (`tower-hall-sunset.md`) and its archway marked for the cut\n  (`tower-hall-arch-marked-2.md`) are Gemini's edits of that painting.\n",
+  "source": "# The tower's highest hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/game-tower-hall.md`, given its plan on the grid and the\n  design's first painting of the hall (`tools/art/prompts/scene-tower-hall.md`),\n  in the style of `art/raw/image-first/field-2k.png`.\n- Edited by it: its grid taken out and the perches and baskets that stood on\n  the walked floor taken away (`tower-hall-base.md`); the cat moved onto the\n  lectern (`tower-hall-mend.md`) and the three plates onto their cells\n  (`tower-hall-moon.md`, `tower-hall-sun.md`, `tower-hall-star.md`), each\n  mended in its box by `tools/art/repaint.py`, the painting kept elsewhere.\n- Its lit plates (`tower-hall-lit.md`), its light at sunset\n  (`tower-hall-sunset.md`) and its archway marked for the cut\n  (`tower-hall-arch-marked-2.md`) are Gemini's edits of that painting.\n- The familiars' tunnel's wall is cut from the painting by\n  `tools/art/export_scene.py`, a polygon round its mouth less the opening.\n",
   "kept": [
     [
       8.9,

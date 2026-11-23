@@ -168,9 +168,31 @@ def test_the_forgotten_room_s_side_door_rests_shut_and_opens_in_two_pieces():
     assert {"cells": [[5, 3], [5, 3]], "by": 0.25} in [
         {k: v for k, v in part.items() if k in ("cells", "by")} for part in art["nudged"]
     ]
-    crossing = next(part for part in art["lowered"] if part["cells"] == [[5, 3], [5, 3]])
+    crossing = next(part for part in art["lowered"] if part["cells"] == [[2, 3], [5, 3]])
     assert 4.4 <= 3 + 0.8 + crossing["by"] <= 4.6
-    landing = next(part for part in art["lowered"] if part["cells"] == [[2, 3], [4, 3]])
-    assert 3 + 0.8 + landing["by"] > leaf[3]
+    # The landing as low as the doorway, the figure going down once (D307).
+    assert 3 + 0.8 + crossing["by"] > leaf[3]
     assert not any("leaf" in part for part in art["nudged"] + art["lowered"])
     assert any(row["image"] == "row-4-static.webp" for row in art["rows"])
+
+
+def test_the_tunnel_and_the_arch_are_walked_behind_their_walls():
+    """D307: the hall's tunnel (14, 1)-(14, 3) and the passage's last stairs (2, 9)-(2, 11)
+    are walked by a story alone, and each opening has a cover on its row, cut from the
+    painting less the opening, not over, at every hour of the scene."""
+    for scene, cells, row in (
+        ("the-tower-hall", [(14, 1), (14, 2), (14, 3)], 3),
+        ("the-tower-passage", [(2, 9), (2, 10), (2, 11)], 12),
+    ):
+        rows = (CONTENT / "scenes" / scene / "map.txt").read_text(encoding="utf-8").splitlines()
+        terrains = json.loads((CONTENT / "scenes" / scene / "scene.json").read_text())["terrains"]
+        for x, y in cells:
+            assert terrains[rows[y][x]]["walk"] == "story", (scene, x, y)
+        art = json.loads((CONTENT / "art" / "scenes" / scene / "art.json").read_text())
+        covers = [
+            r for r in art["rows"] if r["row"] == row and r.get("static") and not r.get("over")
+        ]
+        assert len(covers) == 1, scene
+        assert (CONTENT / "art" / "scenes" / scene / covers[0]["image"]).is_file()
+        for image in covers[0].get("hours", {}).values():
+            assert (CONTENT / "art" / "scenes" / scene / image).is_file()

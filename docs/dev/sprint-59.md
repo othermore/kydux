@@ -875,3 +875,107 @@ commit only. Write your memory note kydux-sprint-59-state, and
 end with the prompt for the designer's review in English, in a
 code block.
 ```
+
+## 6. Added on 2026-11-22: the three leave the dormitory
+
+The owner, of *The tower*'s parts 5 and 6, after the plan was
+handed over: *«Solo hay tres alumnos de primero que son los
+tres amigos»*; *«Cuando digo se ve a los alumnos salir me
+refiero a los tres amigos. No hay más alumnos de primero.»*
+
+### 6.1 The decision
+
+- **D311 — The first year is the three friends.** Decided
+  2026-11-22 by the owner. The wizard, the friend and the mate
+  are the whole first year: no story, level or text shows or
+  names another first-year, and the pupils seen leaving the
+  first-years' dormitory are those three. A walk-on pupil
+  (`classmate_boy`, `classmate_girl`) is of another year, as
+  the second-years of *The flying lesson* are.
+
+### 6.2 What is asked
+
+This takes the place of 2.9's step 6 of `the-tower`, which the
+open leaf of `front_door` stops (it covers [9, 15] and
+[10, 15], and the mate reaches [10, 15] before the wizard has
+shut the door). Step 17 stays as 2.9 has it. The texts of steps
+5 and 6 stay as they are.
+
+`content/stories/the-tower/story.json`:
+
+- `actors`: `mate` as it is; `friend`, of kind `friend`, at
+  [12, 9], facing `right`. `classmate_boy` and `classmate_girl`
+  go.
+- Step 5, its `camera` as it is. The three come to the door and
+  the friend opens it:
+  - `friend`: `walk [12, 13]`; `open front_door`;
+  - `mate`: `walk [[14, 10], [12, 10], [12, 12]]`;
+  - `wizard`: `walk [[16, 9], [14, 9], [14, 10], [12, 10],
+    [12, 11]]`.
+- Step 6. The three go out, the wizard shuts the door, and they
+  leave by the left (D310):
+  - `friend`: `walk [[12, 15], [11, 15]]`; `face right`;
+    `face left`; `walk [0, 15]`, `vanish`;
+  - `mate`: `walk [[12, 15], [14, 15]]`; `walk [0, 15]`,
+    `vanish`;
+  - `wizard`: `walk [12, 15]`; `close front_door`;
+    `walk [0, 15]`, `vanish`.
+
+  The figures are named in that order, the friend first. Tick
+  by tick: the wizard shuts the door in the fifth, the friend
+  steps onto [10, 15] in the sixth, the wizard follows it, and
+  the mate, who stood aside at [14, 15], goes last. The
+  designer checked steps 1 to 6 with `story_on_scene` on
+  `the-dormitory`, step 6 as a story's last.
+
+`app/src/engine/painted.ts`, `figureName`: the comment calls
+`classmate_boy` and `classmate_girl` pupils of another year.
+*The flying lesson* stays as it is: its words make them
+second-years.
+
+The tests: `test_stories.py` asks that `the-tower` has neither
+walk-on pupil and that step 6 ends with none of the three in
+sight; `chapter-5.spec.ts`, *the-tower is told to its end*,
+follows. The walkthrough's pictures of parts
+5 and 6 are taken again.
+
+### 6.3 What the owner will try
+
+In place of 2.14's step 10, *The tower* (story 1): in 5 the
+three friends come to the dormitory's door and the friend opens
+it. In 6 they go out, the wizard shuts the door, and the three
+leave by the left; none stays in sight, and no other pupil is
+seen. In 17 the three go into the dark of the arch and none
+stays in it.
+
+### 6.4 The prompt for CLAUDE-programmer
+
+A follow-up of the sprint's prompt, pasted without clearing the
+programmer's context.
+
+```
+A follow-up to sprint 59, from the owner's answer after the
+plan was handed over. It belongs to piece 3.9 (the stories'
+staging); build it there, or as its own commit if 3.9 is done.
+
+Read section 6 of docs/dev/sprint-59.md, which the designer has
+added and committed (the rest of the document is as it was).
+In short: the first year is the three friends alone (D311), so
+in the-tower the two walk-on pupils go, the friend stands in
+the common room from the start, and steps 5 and 6 are staged as
+6.2 says: the three come to the door, go out, the wizard shuts
+it and the three leave by the left, out of sight (D310). 6.2
+takes the place of 2.9's step 6, which the door's open leaf
+stops; step 17 stays as 2.9 has it. The texts stay as they are.
+
+Enter D311 with D297 to D310, in the plan's words. Change the
+comment of figureName as 6.2 says, and bring any document that
+calls the walk-on pupils first-years to the present. The tests
+of 6.2; the walkthrough's pictures of the-tower's parts 5 and 6
+taken again. In your report, step 10 of 2.14 is read as 6.3.
+
+The rules of the sprint's prompt hold: the designer's staging
+was checked with story_on_scene, but check it on the page too,
+and say what you changed; never edit content while a browser
+run is going; stage only your own hunks.
+```

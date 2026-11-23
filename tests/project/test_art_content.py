@@ -61,12 +61,9 @@ def walked(scene: str) -> set[tuple[int, int]]:
     return {(x, y) for y, row in enumerate(rows) for x, char in enumerate(row) if char in walks}
 
 
-#: The walked cells something painted stands on: in the shed, by the owner's word, the
-#: barrel's cell, where a figure stands nudged to its right, in front of it (D211); in the
-#: passage, the steps under the corridor's arch, part of the arch's cover of row 12, which
-#: hides the feet of a figure coming down the last stairs and is drawn behind one standing
-#: on them (D307).
-STANDS_ON = {"the-broom-shed": {(6, 5)}, "the-tower-passage": {(2, 12)}}
+#: The walked cells something painted stands on, by the owner's word: in the shed, the
+#: barrel's cell, where a figure stands nudged to its right, in front of it (D211).
+STANDS_ON = {"the-broom-shed": {(6, 5)}}
 
 
 @pytest.mark.parametrize("scene", SCENES)

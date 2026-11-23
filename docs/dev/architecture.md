@@ -4483,10 +4483,10 @@ one overturns stays, marked as superseded.
   están contando la historia*). A step whose `scene` says `"later": true` opens after a
   passing of time: the scene fades to dark (`PASS_FADE`, 0.6 s), stays dark for a moment
   (`PASS_DARK`, 0.8 s, or the reading of the words its story gives the dark, D309) while
-  the part's staging is drawn, and comes back out of the dark
-  (0.6 s), two seconds in all (`story.ts`, `.story-dark`); the band says nothing
-  meanwhile, the step is played and its words open once the scene is back, and the music
-  goes on. `later` is said only in a step's `scene` (`PART_STAGING`), and is true; the
+  the part's staging is drawn, framed as its first step frames it (D318), and comes back
+  out of the dark (0.6 s), two seconds in all (`story.ts`, `.story-dark`); the band says
+  nothing and Next waits meanwhile (D317), the step is played and its words open once the
+  scene is back, and the music goes on. `later` is said only in a step's `scene` (`PART_STAGING`), and is true; the
   part carries it to the page. The part may be the same scene staged under another
   light (`light`, D273): the afternoon gone while something was told. A step shown at
   once (back, Again, or a story skipped through) shows its staging with no wait, and a
@@ -5079,3 +5079,78 @@ one overturns stays, marked as superseded.
   for a `drum` voice and the `snare`, a theme has a drum kit. Rules out a theme stretched
   or cut to a story's length, two movements heard at once across a fade, and a movement
   that starts off the beat.
+- **D317 — While a story goes on by itself, Next waits.** Decided 2026-11-22 by the
+  owner, of the words on the dark of *Lo que trajo el familiar* (*como pasa solo tras un
+  tiempo, el botón "Siguiente" debe estar desactivado*). Where the story goes on with no
+  press, time that passes (D280) and the held moment before a story that goes on from the
+  one before (D320), Next and Again are disabled until the step's words can be read, and
+  Enter, Space and R do nothing meanwhile (`wait` in `ui/story.ts`). Back and Skip stay:
+  a step gone to that way is shown at once, as D280 says. Next takes the keyboard back as
+  it wakes, when it had it. Rules out a press that cuts a wait the story made on purpose.
+- **D318 — A part comes out of the dark already framed.** Decided 2026-11-22 by the
+  owner, of the hall in its evening (*la escena tiene un encuadre y al salir el primer
+  diálogo de Orla se re-encuadra y queda raro porque parece un salto en la cámara...
+  debería estar encuadrada ya de modo que luego entre el diálogo*). A part opened after a
+  passing of time (D280) is drawn in the dark with the framing its first step gives
+  (D199), so what comes back out of the dark is what the step then shows, and the words
+  enter over a picture that does not move. Rules out a camera that moves between the
+  light coming back and the first words.
+- **D319 — Nobody fades out of a scene: who leaves walks out by a way out.** Decided
+  2026-11-22 by the owner, of Orla in *El rastro* (*Orla se va hasta la puerta y ahí se
+  desvanece. Debería continuar y bajar por las escaleras y desaparecer del escenario sin
+  desvanecerse. Eso debe ser así SIEMPRE. los personajes que salen de la escena no pueden
+  desvanecerse, deben abandonar la escena por un lugar adecuado*). A figure that leaves a
+  scene, in a story or in a level, walks until nothing of it is seen, and is never made
+  to fade. There are two ways out. *The picture's edge*: the walk ends on a cell of the
+  scene's edge, heading out, on a side where the painting has no margin, and the figure
+  walks on past the edge at its own pace until its whole box is past it; the camera never
+  shows anything beyond the painting (`least` in `engine/camera.ts`), so the frame cuts
+  the figure as a stage's wing does. *A cover inside the picture*: the walk ends on a
+  cell the scene marks as a way out (a terrain with `"out": true`, floor only a story
+  walks, D288), behind a cover that hides a standing figure whole, a wall's face over an
+  archway or a lintel; the figure goes behind the stones as it walks (D307) and is taken
+  out of the scene once it is hidden. A story writes it as a walk that ends in
+  `"leave": true`; the wizard may leave only where D310 lets it. The world's check holds
+  every leaving walk to end at one of the two ways out, and the art's check holds every
+  way-out cell to hide a figure whole. Stairs a figure goes down to leave are floor a
+  story walks. The one figure that fades is a ghost (an actor of kind `ghost`), which
+  goes as a ghost does, with `"vanish": true` once its words are said: Eldra in *El banco
+  de varitas*. A spell's own creature undone by a spell (a trial dissolved, D262) is the
+  spell's doing, not a leaving. Rules out a fade in the middle of a corridor, a walk that
+  ends at a dead end and a figure taken away while any of it is seen.
+- **D320 — A story may go on from the one before with nothing between.** Decided
+  2026-11-22 by the owner, of the join between *Lo que trajo el familiar* and *El fin de
+  curso* (*sale la pantalla de carga, luego brevemente el castillo, y luego otra vez Orla
+  [...] Para este cambio todo debería estar pre-cargado (si hay algo que cargar) y la
+  transición debe ser inmediata [...] No puede haber nada en medio, solo el cambio de
+  música justo en ese momento (podemos dejar unos segundos sin diálogo para aumentar la
+  tensión, después de "hay algo que debes saber", cuando se hace clic en siguiente, uno o
+  dos segundos (según el momento en el que deba entrar la canción nueva) y luego empieza
+  el siguiente diálogo*). A story may say `"continues"`, the id of the story it goes on
+  from. The world's check holds that story to be the course's item just before it, the
+  last part of that story to do nothing on the scene, and the two stagings to be one: the
+  scene, its light, every figure's cell and way of facing, the things, the camera and the
+  framing held at the join. While the earlier story's last part shows, the page loads the
+  later story and its still. At the earlier story's last press the page stays on its
+  screen and its live scene: the earlier story is marked read, the later one becomes the
+  current item and the address, the title and the count become the later story's, and its
+  music is asked for at that press (D314, D316). Then comes a held moment with no words:
+  the bubble gone, Next waiting (D317), for as long as the music takes to turn to what
+  was asked, one second at the least and three at the most, and a second and a half where
+  no music turns; then the later story's first step is played. Neither the waiting screen
+  nor the later story's still is shown, and the scene is not drawn again. Opened any
+  other way (the map, Continue, the address, a reload, the browser's way back) the later
+  story opens as any story does, and so does the join when the later story has not
+  loaded in time. *El fin de curso* continues *Lo que trajo el familiar*. Rules out a
+  loading screen, a still or a cut between two stories told as one moment.
+- **D321 — Between two framings of a part the camera travels.** Decided 2026-11-22 by
+  the designer, from the owner's word on a part that came back framed anew (*queda raro
+  porque parece un salto en la cámara*, D318). When a step reached by Next frames a
+  place other than the one its part holds (D199), the camera travels from the one to the
+  other over 0.7 s, easing in and out, its window and its zoom together, while the step
+  is played; `data-camera-fit` says the new framing from the step's start and
+  `data-camera-travel` is `true` while the camera travels. A step reached any other way
+  (Back, a step played again, a part's start, the dark of D280, a window resized) is
+  framed at once. The words said meanwhile keep on their speaker and rest inside what the
+  new framing shows. Rules out a cut inside a part: a cut is a part's change (D280,
+  D309).

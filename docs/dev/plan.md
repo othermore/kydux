@@ -761,7 +761,12 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     first year that is the three friends (D311), the theme's time on the page of themes
     (D312), the year's ending's theme, *The truth* (D313), a story that names the
     music it is told to (D314), a section of a theme at a tempo of its own (D315), and
-    a theme told in movements that a story asks for by name (D316).
+    a theme told in movements that a story asks for by name (D316); and, in
+    `sprint-60.md`, Next that waits while a story goes on by itself (D317), a part
+    that comes out of the dark framed (D318), nobody fading out of a scene, who leaves
+    walking out by a way out (D319), a story that goes on from the one before with
+    nothing between (D320), and the camera travelling between two framings of a part
+    (D321).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

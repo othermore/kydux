@@ -453,3 +453,72 @@ def test_the_openings_first_step_may_hold_the_letter_before_its_still():
 def test_a_step_holding_the_letter_is_refused_where_it_does_not_belong(steps, reason):
     with pytest.raises(LevelError, match=reason):
         staged(opening=True, steps=steps)
+
+
+#: A room where Rinlo sits, and the pieces of a thread hidden in it (D279).
+RINLO = {"id": "rinlo", "kind": "friend", "at": [1, 1], "facing": "right", "sitting": True}
+PIECES = [
+    {"kind": "thread", "id": "thread_1", "at": [2, 2], "hidden": True},
+    {"kind": "thread", "id": "thread_2", "at": [4, 2], "hidden": True},
+]
+
+
+def seated(steps, actors=(RINLO,), things=PIECES, sitters=frozenset({"rinlo"})):
+    data = {
+        "id": "the-pieces",
+        "scene": "room",
+        "wizard": [5, 2],
+        "actors": list(actors),
+        "things": list(things),
+    }
+    return story_on_scene({**data, "steps": steps}, ROOM, sitters)
+
+
+def test_a_seated_figure_stands_walks_shows_what_it_leaves_and_sits():
+    seated(
+        [
+            by("rinlo", {"stand": True}),
+            by(
+                "rinlo",
+                [
+                    {"walk": [1, 2]},
+                    {"walk": [2, 2]},
+                    {"walk": [4, 2]},
+                    {"show": "thread_2"},
+                    {"walk": [2, 2]},
+                    {"show": "thread_1"},
+                    {"walk": [1, 2]},
+                    {"face": "right"},
+                    {"sit": True},
+                ],
+            ),
+            {"who": "rinlo"},
+        ]
+    )
+
+
+@pytest.mark.parametrize(
+    ("steps", "says"),
+    [
+        ([by("wizard", {"stand": True})], "wizard stands up, and is not seated"),
+        ([by("rinlo", {"walk": [1, 2]})], "rinlo is seated, and stands before walking"),
+        ([by("wizard", {"sit": True})], "wizard has no sitting rows"),
+        ([by("rinlo", {"show": "thread_3"})], "thread_3 is no thing staged hidden"),
+        (
+            [by("rinlo", {"show": "thread_1"}), by("rinlo", {"show": "thread_1"})],
+            "in sight already",
+        ),
+        ([by("rinlo", {"stand": "yes"})], "stand is true"),
+    ],
+)
+def test_a_story_s_stand_sit_and_show_are_checked(steps, says):
+    with pytest.raises(LevelError, match=says):
+        seated(steps)
+
+
+def test_only_a_thing_the_wizard_carries_is_staged_hidden():
+    with pytest.raises(LevelError, match="only a thing the wizard carries is hidden"):
+        seated(
+            [{"who": "voice"}],
+            things=[{"kind": "door", "id": "door_1", "at": [2, 2], "hidden": True}],
+        )

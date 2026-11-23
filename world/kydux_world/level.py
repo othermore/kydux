@@ -1868,6 +1868,9 @@ STORY_DOINGS = (
     "wake",
     "open",
     "close",
+    "stand",
+    "sit",
+    "show",
 )
 #: The lights a story may be told under, besides its scene's own (D124).
 STORY_LIGHTS = ("morning", "sunset")
@@ -1917,7 +1920,9 @@ def _story_tile(value: Any, what: str, story_id: Any) -> Position:
     return Position(*value)
 
 
-def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
+def story_on_scene(
+    data: dict[str, Any], scene: Scene, sitters: frozenset[str] = frozenset()
+) -> dict[str, Any]:
     """A story's staging checked against its scene and made whole (D74): the
     world the page draws, as a level on the scene is built, under `world`.
 
@@ -1934,7 +1939,10 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     on a cell beside it, a shelf or a floor (D128); vanishing, a speaker once
     its words are said; lying down asleep in a bed, no one else's, from the cell
     under its pillow (`pillow_side`, D130), or from beside a bed with none, and
-    waking (D91); opening or closing a door beside it. One figure's actions follow
+    waking (D91); opening or closing a door beside it; standing up, seated, and sitting
+    down, a figure of `sitters`, whose sheet has the sitting rows (D273), and bringing
+    into sight a thing staged `hidden` (D279), a seated figure never walking. One
+    figure's actions follow
     one another; different figures' are played at once, tick by tick, in the
     order they are first named, and are checked so. An actor may start
     `asleep` in a bed, its `at` the bed's pillow_side, where it gets up. No one
@@ -1983,9 +1991,18 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         return char not in (WALL, SHELF) and (flying or char != LOW)
 
     # Where each figure stands, or None while out of sight; the familiars, whose steps
-    # are quick (D277).
+    # are quick (D277); who is seated (D273, D279).
     where: dict[str, Position | None] = {"wizard": wizard}
     familiar_ids = {actor.get("id") for actor in actors if actor.get("kind") == "familiar"}
+    seated = {actor.get("id") for actor in actors if actor.get("sitting") is True}
+    # The things staged hidden, which a figure brings into sight (D279), and those shown.
+    hidden: set[str] = set()
+    for thing in data.get("things", []):
+        if isinstance(thing, dict) and thing.get("hidden") is True:
+            if thing.get("kind") not in CARRIED_KINDS:
+                raise LevelError(f"{story_id}: only a thing the wizard carries is hidden")
+            hidden.add(thing.get("id"))
+    shown: set[str] = set()
     for actor in actors:
         actor_id = _identifier(story_id, actor.get("id"), "an actor's id")
         if actor_id in where:
@@ -2227,6 +2244,18 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                 if action[kind] not in doors:
                     raise LevelError(f"{here}: no door {action[kind]} in the story")
                 queue.append((kind, action[kind]))
+            elif "stand" in action or "sit" in action:
+                # A seated figure stands up, and one with the sitting rows sits (D279).
+                kind = "stand" if "stand" in action else "sit"
+                if action[kind] is not True:
+                    raise LevelError(f"{here}: {kind} is true")
+                if kind == "sit" and doer not in sitters:
+                    raise LevelError(f"{here}: {doer} has no sitting rows to sit in")
+                queue.append((kind, None))
+            elif "show" in action:
+                if action["show"] not in hidden:
+                    raise LevelError(f"{here}: {action['show']} is no thing staged hidden")
+                queue.append(("show", action["show"]))
             else:
                 kind = "sleep" if "sleep" in action else "wake"
                 queue.append((kind, action.get("sleep")))
@@ -2259,6 +2288,8 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                     if not free(value, doer):
                         raise LevelError(f"{here}: {doer} appears on a tile not free")
                     where[doer] = value
+                    # Who comes into sight comes on its feet (D279).
+                    seated.discard(doer)
                     first_seen.setdefault(doer, value)
                 elif kind == "wake":
                     if doer not in asleep:
@@ -2268,9 +2299,21 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                     raise LevelError(f"{here}: {doer} is asleep")
                 elif kind == "sleep":
                     lie_down(doer, value, here)
+                elif kind == "stand":
+                    if doer not in seated:
+                        raise LevelError(f"{here}: {doer} stands up, and is not seated")
+                    seated.discard(doer)
+                elif kind == "sit":
+                    seated.add(doer)
+                elif kind == "show":
+                    if value in shown:
+                        raise LevelError(f"{here}: {value} is in sight already")
+                    shown.add(value)
                 elif kind == "vanish":
                     where[doer] = None
                 elif kind == "move":
+                    if doer in seated:
+                        raise LevelError(f"{here}: {doer} is seated, and stands before walking")
                     if not free(value, doer):
                         raise LevelError(
                             f"{here}: {doer}'s walk is stopped at {value.x},{value.y}"
@@ -2323,13 +2366,16 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
 PART_STAGING = ("scene", "wizard", "actors", "things", "camera", "light", "flying")
 
 
-def story_on_scenes(data: dict[str, Any], scene_of: Any) -> dict[str, Any]:
+def story_on_scenes(
+    data: dict[str, Any], scene_of: Any, sitters: frozenset[str] = frozenset()
+) -> dict[str, Any]:
     """A story told on one scene, or on several in turn (the morning after, from the
     dormitory to the shed): a step with a `scene`, the new scene's staging, starts a
     part of the story told there, each part checked on its scene as a story is
     (story_on_scene), its figures where the staging puts them. The story made whole
     is the first part's, with every step, and `parts`, each later part's first step
-    and the world, camera and light it is told in. `scene_of` gives a scene by id."""
+    and the world, camera and light it is told in. `scene_of` gives a scene by id;
+    `sitters`, the figures whose sheets have the sitting rows (D273, D279)."""
     story_id = data.get("id")
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
@@ -2353,7 +2399,7 @@ def story_on_scenes(data: dict[str, Any], scene_of: Any) -> dict[str, Any]:
                     f"{', '.join(PART_STAGING)}"
                 )
             staging = {"id": story_id, **staging}
-        built = story_on_scene({**staging, "steps": own}, scene_of(staging.get("scene")))
+        built = story_on_scene({**staging, "steps": own}, scene_of(staging.get("scene")), sitters)
         parts.append((first, built))
     story = dict(parts[0][1])
     story["steps"] = [{k: v for k, v in step.items() if k != "scene"} for step in steps]

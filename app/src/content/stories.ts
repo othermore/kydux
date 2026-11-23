@@ -17,7 +17,8 @@ import { contentUrl } from './address';
  * ending out of sight when it says `vanish`; a turn; an appearing, maybe stepping
  * out `from` behind a thing on a cell beside (D128); a vanishing
  * (a speaker's once its words are said); lying down asleep in a bed and waking
- * (D91); opening or closing a door. */
+ * (D91); opening or closing a door; standing up, seated, and sitting down; and
+ * bringing a thing staged hidden into sight on its cell (D279). */
 export type Action = { by?: string } & (
   | { walk: Tile | Tile[]; vanish?: true }
   | { fly: Tile | Tile[] }
@@ -29,6 +30,9 @@ export type Action = { by?: string } & (
   | { wake: true }
   | { open: string }
   | { close: string }
+  | { stand: true }
+  | { sit: true }
+  | { show: string }
 );
 
 /** What a step does before its words: nothing, one action, or a list of them. */
@@ -187,8 +191,11 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   const beds = new Map<string, Tile>();
   const doors = new Map<string, { at: Tile; covers: Tile[] }>();
   const opened = new Set<string>();
+  // Where each thing a figure may bring into sight lies (D279).
+  const shownAt = new Map<string, Tile>();
   type Placed = { id: string; kind?: string; at?: Tile; open?: boolean; covers?: { open?: Tile[] } };
   for (const thing of (story.world.things as Placed[] | undefined) ?? []) {
+    if (thing.at) shownAt.set(thing.id, thing.at);
     if (thing.kind === 'bed' && thing.at) beds.set(thing.id, thing.at);
     if (thing.kind === 'door' && thing.at) {
       doors.set(thing.id, { at: thing.at, covers: thing.covers?.open ?? [] });
@@ -311,6 +318,14 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
         queue.push({ kind: 'open', data: { id: action.open, ...aside } });
       } else if ('close' in action) {
         queue.push({ kind: 'close', data: { id: action.close, ...aside } });
+      } else if ('stand' in action) {
+        queue.push({ kind: 'stand', data: { ...aside } });
+      } else if ('sit' in action) {
+        queue.push({ kind: 'sit', data: { ...aside } });
+      } else if ('show' in action) {
+        // A thing staged hidden comes into sight as a thing found does (D184, D279).
+        const at = shownAt.get(action.show);
+        queue.push({ kind: 'found', data: { ids: [action.show], ...(at ? { at: [at] } : {}), ...aside } });
       }
     }
     // Words said as the step begins, in the tick of its first actions (D275).
@@ -336,7 +351,9 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
         // The wizard's broom lifts and lands as the world's own events do, noted by
         // the broom, so that the scene plays them as a flight and not as a step (D185).
         const broom = actor === 'wizard' && (next.kind === 'fly' || next.kind === 'land');
-        events.push({ tick, actor: broom ? 'broom' : actor, kind: next.kind, data, line: null });
+        // A thing brought into sight is the world's event, as a thing found is (D184, D279).
+        const by = next.kind === 'found' ? 'world' : broom ? 'broom' : actor;
+        events.push({ tick, actor: by, kind: next.kind, data, line: null });
         played(actor, next.kind, data);
       }
       if (quick) lengths.set(tick, 0.5);

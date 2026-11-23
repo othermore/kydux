@@ -49,6 +49,44 @@
       "sitting": true
     }
   ],
+  "things": [
+    {
+      "kind": "thread",
+      "id": "thread_1",
+      "at": [
+        9,
+        2
+      ],
+      "hidden": true
+    },
+    {
+      "kind": "thread",
+      "id": "thread_2",
+      "at": [
+        11,
+        3
+      ],
+      "hidden": true
+    },
+    {
+      "kind": "thread",
+      "id": "thread_3",
+      "at": [
+        12,
+        3
+      ],
+      "hidden": true
+    },
+    {
+      "kind": "thread",
+      "id": "thread_4",
+      "at": [
+        10,
+        3
+      ],
+      "hidden": true
+    }
+  ],
   "steps": [
     {
       "who": "voice",
@@ -116,11 +154,63 @@
     },
     {
       "who": "rinlo",
-      "do": null
+      "do": {
+        "stand": true
+      }
     },
     {
       "who": "voice",
-      "do": null
+      "by": "rinlo",
+      "do": [
+        {
+          "walk": [
+            12,
+            3
+          ]
+        },
+        {
+          "show": "thread_3"
+        },
+        {
+          "walk": [
+            11,
+            3
+          ]
+        },
+        {
+          "show": "thread_2"
+        },
+        {
+          "walk": [
+            10,
+            3
+          ]
+        },
+        {
+          "show": "thread_4"
+        },
+        {
+          "walk": [
+            9,
+            3
+          ]
+        },
+        {
+          "show": "thread_1"
+        },
+        {
+          "walk": [
+            8,
+            3
+          ]
+        },
+        {
+          "face": "right"
+        },
+        {
+          "sit": true
+        }
+      ]
     },
     {
       "who": "friend",

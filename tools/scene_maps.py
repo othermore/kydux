@@ -27,6 +27,14 @@ def with_art(built: dict, scene_id: str, content: Path) -> dict:
     return built
 
 
+def sitters(content: Path = CONTENT) -> frozenset[str]:
+    """The figures whose sheets have the sitting rows (D273), which a story may seat and
+    stand up (D279)."""
+    path = content / "art" / "figures" / "figures.json"
+    sheets = json.loads(path.read_text(encoding="utf-8")).get("sheets", {})
+    return frozenset(name for name, sheet in sheets.items() if "sit" in sheet)
+
+
 def scene_maps(content: Path = CONTENT) -> dict[str, dict[str, dict]]:
     sys.path.insert(0, str(REPO / "world"))
     from kydux_world.level import Level, on_scene, read_scene, story_on_scenes
@@ -47,7 +55,9 @@ def scene_maps(content: Path = CONTENT) -> dict[str, dict[str, dict]]:
     for path in sorted((content / "stories").glob("*/story.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         story = story_on_scenes(
-            data, lambda scene, data=data: read_scene(content / "scenes", scene, data.get("id"))
+            data,
+            lambda scene, data=data: read_scene(content / "scenes", scene, data.get("id")),
+            sitters(content),
         )
         story["world"] = with_art(story["world"], data["scene"], content)
         # A story told on several scenes in turn has each part's world on its own (39.4).

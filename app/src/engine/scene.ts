@@ -36,7 +36,8 @@
 // cells under an open door's leaf, debug.ts), data-sprite-things (each thing drawn
 // from its kind's sprite, "id:kind:x,y" joined by ";", D182), data-found (the
 // hidden things found and seen, joined by ",", D184), data-trials-fading (the trials seen that
-// do not hold, which fade, joined by ",", D276), data-untied (the brooms
+// do not hold, which fade, joined by ",", D276), data-seated (the figures drawn
+// seated, joined by ",", D279), data-untied (the brooms
 // untied, D183), data-thought-box (the thought's cloud on the page,
 // "left,top,right,bottom", D245), data-wizard-facing (the way the wizard faces, as the
 // scene keeps it, D241), data-wizard-frame (the name of the frame the wizard is drawn
@@ -1244,6 +1245,9 @@ class LevelScene extends Phaser.Scene {
       state.facing = (this.shownWay ? this.map.wayFacings[this.shownWay]?.[actor.id] : undefined) ?? actor.facing;
       const hidden = actor.hidden || this.inEnchanted(state.tile) || this.fadedStaged.has(actor.id);
       state.sprite.setPosition(...this.figureAt(state.tile)).setAlpha(1).setVisible(!hidden).setAngle(0);
+      // Seated as the staging has it, whatever a story's step did since (D279).
+      if (actor.sitting) this.sitting.add(state.sprite);
+      else this.sitting.delete(state.sprite);
       this.face(state.sprite, state.facing);
       if (actor.asleep) this.layDown(state.sprite, actor.id, actor.asleep, true);
       const sway = this.sways.get(state.sprite);
@@ -3254,6 +3258,16 @@ class LevelScene extends Phaser.Scene {
         actor.facing = facing;
         this.face(actor.sprite, facing);
         break;
+      // A story's seated figure stands up, and one with the sitting rows sits, the way it
+      // faces (D279).
+      case 'stand':
+        this.sitting.delete(actor.sprite);
+        this.face(actor.sprite, actor.facing);
+        break;
+      case 'sit':
+        this.sitting.add(actor.sprite);
+        this.face(actor.sprite, actor.facing);
+        break;
       // A familiar bumps where it cannot go (D270); after a step held at the circle's
       // edge, the bump is a footprint's, the trial staying where it is (D268).
       case 'bump': {
@@ -3294,6 +3308,8 @@ class LevelScene extends Phaser.Scene {
         if (!at) return;
         this.tweens.killTweensOf(actor.sprite);
         actor.tile = at;
+        // Who comes into sight comes on its feet (D279).
+        this.sitting.delete(actor.sprite);
         actor.sprite.setPosition(...this.figureAt(at)).setVisible(true);
         this.face(actor.sprite, actor.facing);
         this.sways.get(actor.sprite)?.start();
@@ -3414,6 +3430,10 @@ class LevelScene extends Phaser.Scene {
       .filter(([, a]) => a.sprite.visible)
       .map(([id, a]) => `${id}:${a.tile.join(',')},${a.facing}`)
       .join(';');
+    // The figures drawn seated (D273, D279).
+    const seated = [...this.actors].filter(([, a]) => a.sprite.visible && this.sitting.has(a.sprite)).map(([id]) => id);
+    if (seated.length > 0) dataset.seated = seated.sort().join(',');
+    else delete dataset.seated;
     dataset.doors = [...this.openDoors].sort().join(',');
     this.debug?.doorsOpen(this.openDoors);
     dataset.glowing = [...this.glows].filter(([, glow]) => glow.visible).map(([id]) => id).sort().join(',');

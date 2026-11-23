@@ -382,3 +382,37 @@ test.describe('the letter held before the castle (D257)', () => {
     });
   });
 });
+
+test('Rinlo stands, crosses the room leaving the pieces behind him, and sits again (D279)', async ({ page }) => {
+  test.setTimeout(ciTimes(180_000));
+  await page.goto('/#story/the-voice-in-the-tunnel');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await expect(scene).toHaveAttribute('data-seated', 'rinlo');
+  // At his «No. Vete, vete de aquí.» he stands; no piece is seen yet.
+  await storyNext(page, 5);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  await expect(scene).not.toHaveAttribute('data-seated', /rinlo/);
+  await expect(scene).toHaveAttribute('data-actors', /rinlo:8,3,/);
+  await expect(scene).not.toHaveAttribute('data-found', /thread/);
+  // At the noises, he crosses to the room's far side and back, the pieces behind him.
+  await scene.evaluate((node) => {
+    const seen: string[] = [];
+    (window as unknown as { rinlo: string[] }).rinlo = seen;
+    new MutationObserver(() => seen.push(node.getAttribute('data-actors') ?? '')).observe(node, {
+      attributes: true,
+      attributeFilter: ['data-actors'],
+    });
+  });
+  await storyNext(page);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  const walked = await page.evaluate(() => (window as unknown as { rinlo: string[] }).rinlo);
+  expect(walked.some((actors) => /rinlo:12,3,/.test(actors))).toBe(true);
+  await expect(scene).toHaveAttribute('data-actors', /rinlo:8,3,right/);
+  await expect(scene).toHaveAttribute('data-seated', 'rinlo');
+  await expect(scene).toHaveAttribute('data-found', 'thread_1,thread_2,thread_3,thread_4');
+  await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/rinlo-and-the-pieces.png' });
+  // Back at his words, the pieces are gone again and he stands.
+  await page.locator('#story-back').click();
+  await expect(scene).not.toHaveAttribute('data-found', /thread/);
+});

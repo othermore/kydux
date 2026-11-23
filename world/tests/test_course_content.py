@@ -334,7 +334,13 @@ def test_a_story_is_staged_on_its_scene_and_said_in_every_language(path):
     from kydux_world.level import read_scene, story_on_scenes
 
     story = json.loads((path / "story.json").read_text(encoding="utf-8"))
-    story_on_scenes(story, lambda scene: read_scene(CONTENT / "scenes", scene, story["id"]))
+    figures = json.loads(
+        (CONTENT / "art" / "figures" / "figures.json").read_text(encoding="utf-8")
+    )
+    sitters = frozenset(name for name, sheet in figures["sheets"].items() if "sit" in sheet)
+    story_on_scenes(
+        story, lambda scene: read_scene(CONTENT / "scenes", scene, story["id"]), sitters
+    )
     for lang in LANGUAGES:
         text = json.loads((path / f"text.{lang}.json").read_text(encoding="utf-8"))
         assert text.get("title"), f"{path.name}/text.{lang}.json has no title"

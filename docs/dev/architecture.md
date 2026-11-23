@@ -340,6 +340,7 @@ tiles are `[x, y]`.
 | `bump` | wizard, or a familiar | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `familiar` (with `id`), and for a familiar's bump `wizard`, `actor` or `familiar` (with `id`, D270); a familiars' passage, a small cell, is a `wall` to the wizard, with the cell's `kind` (D270); `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it, and in the air ends the gust at once (D243); the thought names a friend, a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side, half a second after the bump (D237), over the head or, with no room there, beside it (D245) |
 | `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above or the goals box would cover it (D240) |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
+| `wait` | in a story, a figure in a step where a familiar walks | | nothing: the second half of a doing of its (D277) |
 | `pick_up` | wizard, or a familiar | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); a familiar's thing rises a little and vanishes, in the tick of its `pick_up` (D278); `data-carried` |
 | `open` | wizard, by `door.open()`; or the door, in the wizard's tick, opened by a spell or a word | `id`, `at`, `by`: `hand`, `spell` or `word` | the door's frame turns open; `data-doors` |
 | `shoved` | the door, in the tick it opens | `id`, the figure; `from`, `to`; `by`, the door | the figure on the open leaf's cells walks aside along the row (D125); `data-shoved` |
@@ -351,13 +352,15 @@ tiles are `[x, y]`.
 | `give` | wizard | `id`, `to`, `at` | the wizard turns to the figure that takes the thing, which faces the wizard; then the thing floats from the middle of the wizard's hands to the middle of that figure, where it is drawn, and fades there (D48) |
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
+| `stand` | in a story, an actor seated | | the figure is drawn standing from then on (D279) |
+| `sit` | in a story, an actor with the sitting rows | | the figure is drawn seated, the way it faces (D279) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
 | `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved or told to pick up before its minka), `nothing`, `by` the familiar, its `pick_up` where nothing lies, which shakes it (D278), and the first year's warnings, `by` `orla`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, told as Orla's words (D264) and ending the run in a refusal |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `vanish` | in a story, an actor, or the wizard at the story's very end | | the figure fades out of sight (D74) |
 | `appear` | in a story, an actor | `at`; `from`, a cell beside it, when it steps out from behind a thing there | the figure comes into sight on its cell: walking out from `from`, behind what stands there, over the tick (D128), or fading in (D74) |
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
-| `found` | `world`, in the tick of `find_all` or `find_nearest` | `ids`, the hidden things found; `at`, their cells | each comes into sight from the straw and is drawn from now on; one found before the first tick is shown with it; `data-found` (D184) |
+| `found` | `world`, in the tick of `find_all` or `find_nearest`, or in a story as a figure shows a thing staged hidden (D279) | `ids`, the hidden things found; `at`, their cells | each comes into sight from the straw and is drawn from now on; one found before the first tick is shown with it; `data-found` (D184) |
 | `untie` | wizard | `id`, `at` | the wizard bends over the broom, a long tick, and its thread is gone; `data-untied` (D183) |
 | `fly` | `broom`, in the wizard's tick of drevo, or a racer in its own | `id`, the figure; `at` | the figure rises half a cell over 0.3 s at the playback's speed, the wizard with the sound of air that rises (`lift`, D244), drawn in its flying row's level frame, and hovers slowly whenever it is seen, after Stop too (D235, D242); a lift starts no wind, each flown command being a gust (`move`, D243); every move after it is flown in a third of a walked step's time (`move`'s `flying`), the moves that follow one another as one glide (D259); `data-flying`, `data-hover`, `data-rise` (D185) |
 | `land` | `broom`, after the run's last tick, or a racer at its path's end | `id`, `at` | the figure sets down on its cell over 0.3 s, in its flying frame until its feet are there, then standing the way it flew (D241); the wizard with the wind switched off, its rest, which rose as the landing neared, sinking in pitch and loudness to nothing (`Wind.land`, `set_down` among `data-sounds`, `data-landing`, D253, D255), the same where the world lands it at a program's end (D244); a gust that sounds falls as it was planned (D185, D243) |
@@ -1733,7 +1736,8 @@ one overturns stays, marked as superseded.
   order; different figures' play at once, tick by tick, in the order they
   are first named, so that two friends walk together. A `walk` is a tile
   or a list of tiles, each reached in a straight line; a walk may end in
-  `vanish`, for a figure walking out of sight. `open` and `close` name a
+  `vanish`, for a figure walking out of sight; a seated figure stands and sits, and a
+  figure brings a staged thing into sight (D279). `open` and `close` name a
   door of the story beside the figure, which changes state as a level's
   door does. The camera keeps with the step's `by`, or its speaker: the
   others' events say `aside`, and a teacher walking away down a corridor
@@ -4296,7 +4300,7 @@ one overturns stays, marked as superseded.
   `trial`, `spark`, or `"of": "mate"` for the room-mate's copy of the child's; a `creature`
   given as a list is the first kind that is not the child's); the child's own is `{"id":
   "familiar", "kind": "familiar"}` in a story. Orla has a walking sheet (`orla`, an adult)
-  and Rinlo a sitting row. The thread's piece and the trail's end are sprites (D182). A
+  and Rinlo a sitting row, in which a story seats him and stands him up (D279). The thread's piece and the trail's end are sprites (D182). A
   level's plan is its scene's picture in ink (D143, D151). Rules out illustrations for the
   stories (D74), and a picture of Bimo awake, of the friend's little box, of the slate and of
   the spark.
@@ -4398,3 +4402,21 @@ one overturns stays, marked as superseded.
   by the level after it, *Fuera del círculo*'s notebook lists `pick_up` with the steps.
   Rules out a familiar that takes what it stops on without a word, a `pick_up` that reaches
   the cells beside, and one more method to write in the book.
+- **D279 — In a story a seated figure stands and sits, and a staged thing comes into
+  sight.** Decided 2026-11-18 from the owner's comment (*debería al menos verse mover a
+  Rinlo un poco… para que se entienda que está haciendo algo o rompiendo y tirando los
+  hilos, y que ahí aparezcan los hilos*). Three doings join `STORY_DOINGS`: `stand`, by a
+  figure staged `sitting`, which is drawn standing from then on; `sit`, by a figure whose
+  sheet has the sitting rows (D273; the story's check is given them, `sitters`, from
+  figures.json), which is drawn seated, the way it faces; and `show`, with the id of a
+  thing staged `hidden` in the story or its part (a carried kind), which comes into sight
+  on its cell as a thing found does (D184): the event `found`, the world's. Each is one of
+  a figure's queue (D103) and plays in its turn: a figure may walk, show a thing where it
+  stood, walk on, and sit, a walk with things shown between its stretches written as
+  stretches. A seated figure does not walk, and the story's check refuses a walk by one;
+  a figure that comes into sight comes on its feet. In *La voz en el túnel* Rinlo stands
+  at his *No. Vete, vete de aquí.*, and at the voice's *Oís algunos ruidos más…* walks to
+  (12, 3) and back, leaving `thread_3`, `thread_2` and `thread_4` on the cells he leaves
+  and throwing `thread_1` aside to (9, 2) as he passes (9, 3), then faces right at (8, 3)
+  and sits. Rules out a figure that slides seated, and things that lie in a story before
+  what brings them.

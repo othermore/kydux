@@ -10,7 +10,7 @@
     "`__init__` is written with `def`, inside the class, and takes three things: `self`, the name and the colour. Inside, each piece of data is kept in `self` with the dot.",
     "Outside the class, the name and the colour go between the class's brackets, in that order and in quotes."
   ],
-  "intro": "In the book of Arvelia every familiar must be conjured in a single line. That is why everything else must be in the description.\n\nTeach your class to make yours born whole.",
+  "intro": "In the book of Arvelia every familiar must be conjured in a single line. That is why everything else must be in the description.\n\nChange your class so that the familiar is conjured in a single line, already whole with its name and colour.",
   "outro": "Look: {friend_familiar}, {friend}'s hare, is stepping out of the circle. It is the first familiar of the class to live.",
   "learned": "Now you know that `__init__` is the action a class runs by itself when an object is born, that `self` is the object being born, and that anyone can use your class without reading your program if they know what `__init__` takes."
 }

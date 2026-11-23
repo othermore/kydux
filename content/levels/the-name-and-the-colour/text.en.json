@@ -9,7 +9,7 @@
     "An attribute is written as it is read: the object's name, a dot, `name` or `color`, and then `=` and its value in quotes.",
     "The name is a single word, and the colours of {familiar_a_kind} are in the lesson *What it knows*. With both given, `wizard.cast` and `\"minka\"`."
   ],
-  "intro": "Well, well, our star pupil, of course. You've made a grey hare! That is something exceptional for a first-year. Well done.\n\n{wizard}, don't just stand there looking, come on! I want to see that familiar with a name and a colour before today's lesson ends.",
+  "intro": "Well, well, our star pupil, of course. {friend}, you've made a grey hare! That is something exceptional for a first-year. Well done.\n\n{wizard}, don't just stand there looking, come on! I want to see that familiar with a name and a colour before today's lesson ends.",
   "outro": "I think you have made a whole creature: it has its colour, and its name.\n\nBut to take it out of the circle safely, I must write its description in the book, to bind it so that it stays the same for the familiar's whole life. Otherwise it could turn into something else, or vanish.\n\nTo write a description in the book, every detail of your familiar must be in its description, so that the familiar is conjured with a single line, with no details added afterwards.\n\nYour description, your class, is still empty, and you are giving the colour through the object's attribute. You will have to learn to assign the attributes in the class's description.",
   "learned": "Now you know that an object keeps attributes of its own, written with the dot just as they are read, and that `{familiar_var}` is your program's name for it, while `{familiar_var}.name` is what the object knows of itself."
 }

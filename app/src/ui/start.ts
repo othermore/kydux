@@ -1,13 +1,23 @@
 // The start screen: where the game opens. Before the child has made a wizard,
 // its big button begins the story; after, Continue goes to the item of the
-// course last opened. The saved games (D70) are listed under Load a game, each
-// played or deleted from there; New game begins the story again for a new
-// wizard; a game can be kept as a file and given back as one more game.
+// course last opened, and a line under the greeting says which game is being
+// played, by its name (D290). The saved games (D70) are listed under Load a game
+// by their names, each played or deleted from there; New game begins the story
+// again for a new wizard; a game can be kept as a file and given back as one more
+// game, whose name is asked before it is added (D291).
 
 import { t } from '../i18n';
 import * as progress from '../progress/progress';
 import type { SavedGame } from '../progress/games';
-import { exportProgress, importProgress, type Wizard } from '../progress/store';
+import {
+  exportProgress,
+  GAME_NAME_MAX,
+  importProgress,
+  isNameCharacter,
+  type Progress,
+  sameName,
+  type Wizard,
+} from '../progress/store';
 import { welcomeSection } from './about';
 import { element } from './dom';
 import { portrait } from './portraits';
@@ -48,12 +58,14 @@ function day(iso: string): string {
   return new Date(iso).toLocaleDateString(document.documentElement.lang || undefined);
 }
 
-/** The saved games, each with its wizard, where it is, how long it has been played
- * and when, and Play and Delete (D70). Hidden until Load a game opens it. */
+/** The saved games, each by its name, its wizard's under it when they differ, where
+ * it is, how long it has been played and when, and Play and Delete (D70, D290).
+ * Hidden until Load a game opens it. */
 function gamesList(saved: SavedGame[], parts: StartScreenParts, redraw: () => void): HTMLElement {
   const current = progress.currentGame();
   const rows = saved.map((game) => {
     const wizard = game.progress.wizard as Wizard;
+    const name = game.name ?? wizard.name;
     const figure = portrait(`wizard-${wizard.look}`, 'small');
     const play = element('button', { type: 'button', className: 'play' }, [t('start.play')]);
     play.addEventListener('click', () => {
@@ -62,7 +74,7 @@ function gamesList(saved: SavedGame[], parts: StartScreenParts, redraw: () => vo
     });
     const remove = element('button', { type: 'button', className: 'quiet-button delete' }, [t('start.delete')]);
     remove.addEventListener('click', () => {
-      if (!window.confirm(t('start.delete_confirm', { name: wizard.name }))) return;
+      if (!window.confirm(t('start.delete_confirm', { name }))) return;
       progress.deleteGame(game.id);
       if (game.id === current) parts.onChanged();
       else redraw();
@@ -70,7 +82,8 @@ function gamesList(saved: SavedGame[], parts: StartScreenParts, redraw: () => vo
     const row = element('li', { className: 'game' }, [
       figure,
       element('div', { className: 'game-about' }, [
-        element('strong', { className: 'game-name' }, [wizard.name]),
+        element('strong', { className: 'game-name' }, [name]),
+        ...(sameName(name, wizard.name) ? [] : [element('span', { className: 'game-wizard' }, [wizard.name])]),
         element('span', { className: 'game-place' }, [parts.placeOf(game.progress.current)]),
         element('span', { className: 'game-time' }, [
           t('start.played', { time: playTime(game.seconds), begun: day(game.created), last: day(game.played) }),
@@ -88,9 +101,81 @@ function gamesList(saved: SavedGame[], parts: StartScreenParts, redraw: () => vo
   ]);
 }
 
+/** A game read from a file and waiting for its name (D291), with the name written
+ * so far. */
+interface Brought {
+  game: Progress;
+  name: string;
+}
+
+/** The small form that asks the name of a game brought from a file, under Export
+ * and Import: the name offered is the one the game takes from its wizard (D291);
+ * Import it adds the game with the name written, Cancel and Escape bring nothing. */
+function importForm(brought: Brought, onAdded: () => void, onClosed: () => void): HTMLElement {
+  const field = element('input', {
+    id: 'import-name',
+    type: 'text',
+    value: brought.name,
+    maxLength: GAME_NAME_MAX,
+    autocomplete: 'off',
+    spellcheck: false,
+  });
+  const rule = element('p', { id: 'import-name-rule', className: 'wizard-rule', hidden: true }, [
+    t('wizard.game_name_rule'),
+  ]);
+  const taken = element('p', { id: 'import-name-taken', className: 'wizard-rule', hidden: true }, [
+    t('wizard.game_name_taken'),
+  ]);
+  const done = element('button', { id: 'import-done', type: 'button', className: 'quiet-button' }, [
+    t('start.import_done'),
+  ]);
+  const cancel = element('button', { id: 'import-cancel', type: 'button', className: 'quiet-button' }, [
+    t('start.import_cancel'),
+  ]);
+  const ready = () => {
+    const named = progress.checkNewGameName(brought.name);
+    taken.hidden = named !== 'taken';
+    done.disabled = named !== 'ok';
+  };
+  const add = () => {
+    if (progress.addGame(brought.game, brought.name)) onAdded();
+  };
+  field.addEventListener('input', () => {
+    // A character the rule refuses is taken out as it is typed, and the rule said.
+    const typed = field.value;
+    const allowed = [...typed].filter(isNameCharacter).join('');
+    rule.hidden = allowed === typed;
+    if (allowed !== typed) field.value = allowed;
+    brought.name = allowed;
+    ready();
+  });
+  done.addEventListener('click', add);
+  cancel.addEventListener('click', onClosed);
+  const form = element('div', { id: 'import-form', className: 'import-form' }, [
+    element('label', { className: 'wizard-field', htmlFor: 'import-name' }, [t('start.import_name')]),
+    field,
+    rule,
+    taken,
+    element('div', { className: 'start-actions' }, [done, cancel]),
+  ]);
+  form.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && event.target === field) {
+      event.preventDefault();
+      if (!done.disabled) add();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      onClosed();
+    }
+  });
+  ready();
+  return form;
+}
+
 export function startScreen(parts: StartScreenParts): Screen {
   const node = element('div', { className: 'start-screen' });
   const message = element('p', { id: 'start-message', className: 'start-message', hidden: true });
+  // A game brought from a file, while its name is asked.
+  let brought: Brought | null = null;
 
   const draw = () => {
     const { wizard } = parts;
@@ -133,28 +218,61 @@ export function startScreen(parts: StartScreenParts): Screen {
     imported.addEventListener('click', () => picker.click());
     picker.addEventListener('change', async () => {
       const file = picker.files?.[0];
+      picker.value = '';
       if (!file) return;
+      let game: Progress;
       try {
-        // The language the child chose stays as it is now: the file brings a game.
-        const brought = importProgress(await file.text());
-        const now = progress.load();
-        brought.language = now.language;
-        brought.settings = now.settings;
-        // A file from before the wizard was made keeps the one made since.
-        brought.wizard ??= now.wizard;
-        progress.addGame(brought);
-        parts.onChanged();
+        game = importProgress(await file.text());
       } catch {
         message.textContent = t('start.import_failed');
         message.hidden = false;
+        return;
       }
+      message.hidden = true;
+      // The language the child chose stays as it is now: the file brings a game.
+      const now = progress.load();
+      game.language = now.language;
+      game.settings = now.settings;
+      // A file from before the wizard was made keeps the one made since.
+      game.wizard ??= now.wizard;
+      // A game with no wizard at all is added with no name: the creator names it.
+      if (!game.wizard) {
+        progress.addGame(game);
+        parts.onChanged();
+        return;
+      }
+      brought = { game, name: progress.offeredGameName(game.wizard.name, false) };
+      draw();
+      node.querySelector<HTMLInputElement>('#import-name')?.focus();
     });
-    const greeting: HTMLElement[] = [element('h2', {}, [wizard ? t('start.hello') : t('start.welcome')])];
+    const hello = element('h2', {}, [wizard ? t('start.hello') : t('start.welcome')]);
+    const greeting: HTMLElement[] = [hello];
     if (wizard) {
       const shown = portrait(`wizard-${wizard.look}`, 'medium');
       shown.id = 'start-figure';
-      greeting.unshift(shown);
+      // Which game is being played, under the hello (D290).
+      const name = progress.currentGameName();
+      const told = name
+        ? [element('p', { id: 'current-game', className: 'current-game' }, [t('start.current_game', { name })])]
+        : [];
+      greeting.splice(0, 1, shown, element('div', { className: 'start-hello' }, [hello, ...told]));
     }
+    const asking = brought
+      ? [
+          importForm(
+            brought,
+            () => {
+              brought = null;
+              parts.onChanged();
+            },
+            () => {
+              brought = null;
+              draw();
+              node.querySelector<HTMLElement>('#import')?.focus();
+            },
+          ),
+        ]
+      : [];
     const actions: HTMLElement[] = [go, ...(wizard ? [map] : []), ...(saved.length > 0 ? [load] : []), fresh, settings];
     if (wizard) {
       actions.push(
@@ -175,6 +293,7 @@ export function startScreen(parts: StartScreenParts): Screen {
         element('h3', {}, [t('start.progress')]),
         element('p', {}, [t('start.progress_about')]),
         element('div', { className: 'start-actions' }, [exported, imported, picker]),
+        ...asking,
         message,
       ]),
     );

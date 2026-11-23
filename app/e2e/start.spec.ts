@@ -49,10 +49,43 @@ test('a game exported comes back, imported as one more game', async ({ page }) =
   const file = await (await downloading).path();
   expect(file).toBeTruthy();
 
+  // The name is asked first: the wizard's, with a number, since a game of the list has it.
   await page.locator('#import-file').setInputFiles(file as string);
+  const name = page.locator('#import-name');
+  await expect(name).toHaveValue('Marta 2');
+  await expect(name).toBeFocused();
+  await expect(page.locator('#import-done')).toBeEnabled();
+  await name.fill('marta');
+  await expect(page.locator('#import-name-taken')).toBeVisible();
+  await expect(page.locator('#import-done')).toBeDisabled();
+  await name.fill('The copy');
+  await expect(page.locator('#import-name-taken')).toBeHidden();
+  await name.press('Enter');
+  await expect(page.locator('#import-form')).toHaveCount(0);
   await expect(page.locator('#continue')).toHaveText(`Continue: ${STAIRS}`);
+  await expect(page.locator('#current-game')).toHaveText('You are in the game “The copy”.');
   await page.locator('#load-game').click();
   await expect(page.locator('#games .game')).toHaveCount(2);
+  await expect(page.locator('#games .game-name')).toHaveText(['The copy', 'Marta']);
+  await expect(page.locator('#games .game').nth(0).locator('.game-wizard')).toHaveText('Marta');
+});
+
+test('Cancel and Escape on the name of a game brought bring nothing (D291)', async ({ page }) => {
+  await page.goto('/');
+  const downloading = page.waitForEvent('download');
+  await page.locator('#export').click();
+  const file = (await (await downloading).path()) as string;
+  await page.locator('#import-file').setInputFiles(file);
+  await expect(page.locator('#import-form')).toBeVisible();
+  await page.locator('#import-cancel').click();
+  await expect(page.locator('#import-form')).toHaveCount(0);
+  await page.locator('#import-file').setInputFiles(file);
+  await expect(page.locator('#import-name')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#import-form')).toHaveCount(0);
+  await page.locator('#load-game').click();
+  await expect(page.locator('#games .game-name')).toHaveText(['Marta']);
+  await expect(page.locator('#current-game')).toHaveText('You are in the game “Marta”.');
 });
 
 test('a new game begins the story for a new wizard; the games are loaded by name (D70)', async ({ page }) => {
@@ -70,22 +103,30 @@ test('a new game begins the story for a new wizard; the games are loaded by name
   await page.locator('#home').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Leo');
 
-  // The list: each wizard, where the game is, and Play.
+  // The game being played, by its name (D290).
+  await expect(page.locator('#current-game')).toHaveText('You are in the game “Leo”.');
+
+  // The list: each game by its name, where it is, and Play.
   await page.locator('#load-game').click();
   const games = page.locator('#games .game');
   await expect(games).toHaveCount(2);
-  await expect(games.nth(0)).toContainText('Leo');
-  await expect(games.nth(1)).toContainText('Marta');
+  await expect(page.locator('#games .game-name')).toHaveText(['Leo', 'Marta']);
   await expect(games.nth(1)).toContainText(`Improve 1: ${STAIRS}`);
   await games.nth(1).locator('.play').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Marta');
+  await expect(page.locator('#current-game')).toHaveText('You are in the game “Marta”.');
   await expect(page.locator('#continue')).toHaveText(`Continue: ${STAIRS}`);
 
-  // Delete asks first.
+  // Delete asks first, with the game's name.
   await page.locator('#load-game').click();
-  page.once('dialog', (dialog) => dialog.accept());
+  let asked = '';
+  page.once('dialog', (dialog) => {
+    asked = dialog.message();
+    void dialog.accept();
+  });
   await page.locator('#games .game', { hasText: 'Leo' }).locator('.delete').click();
   await expect(page.locator('#games .game')).toHaveCount(1);
+  expect(asked).toBe('Delete the game “Leo”? It cannot be brought back.');
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Marta');
 });
 

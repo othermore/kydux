@@ -340,7 +340,7 @@
     "saved": "Your game is saved as you play.",
     "play": "Play",
     "delete": "Delete",
-    "delete_confirm": "Delete {name}'s game? It cannot be brought back.",
+    "delete_confirm": "Delete the game “{name}”? It cannot be brought back.",
     "played": "Played {time} · begun {begun} · last played {last}",
     "minutes": "{n} min",
     "hours": "{h} h {m} min",
@@ -350,9 +350,13 @@
     "export": "Export",
     "import": "Import",
     "import_failed": "That file is not a Kydux progress file. Nothing has changed.",
+    "import_name": "What name do you give this game?",
+    "import_done": "Import it",
+    "import_cancel": "Cancel",
     "map": "The map",
     "hello": "Hello, {wizard}",
-    "change_wizard": "Change my wizard",
+    "current_game": "You are in the game “{name}”.",
+    "change_wizard": "Change the names",
     "begin": "Begin the story"
   },
   "map": {
@@ -457,6 +461,9 @@
     "back": "Back",
     "default_name": "Kydux",
     "name_taken": "That name belongs to someone or something in the game. Choose another.",
+    "game_name": "Your game's name",
+    "game_name_rule": "A name has letters, digits, spaces, hyphens and apostrophes, up to 30 of them.",
+    "game_name_taken": "You already have a game with that name. Choose another.",
     "gender_first": "Choose first who your wizard is, and their looks appear here."
   },
   "characters": {

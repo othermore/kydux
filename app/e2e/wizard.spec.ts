@@ -123,25 +123,83 @@ test('the scene draws the look chosen, and the words follow a girl in Spanish', 
   await context.close();
 });
 
-test('Change my wizard opens it as it is; Back and Escape leave it so', async ({ page }) => {
+test('Change the names opens the wizard with both names; Back and Escape leave both so (D290)', async ({ page }) => {
   await seedWizard(page);
   await page.goto('/');
+  await expect(page.locator('#change-wizard')).toHaveText('Change the names');
   await page.locator('#change-wizard').click();
   await expect(page.locator('#wizard-name')).toHaveValue('Marta');
+  // The game of before is named by its wizard (D291).
+  await expect(page.locator('#game-name')).toHaveValue('Marta');
   await expect(page.locator('#wizard-gender [data-value="girl"]')).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('#wizard-looks .radio').nth(0)).toHaveAttribute('aria-checked', 'true');
+  // A wizard made: the game's name changes only by the child's hand.
   await page.locator('#wizard-name').fill('Mar');
+  await expect(page.locator('#game-name')).toHaveValue('Marta');
+  await page.locator('#game-name').fill('My game');
   await page.locator('#wizard-back').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Marta');
+  await expect(page.locator('#current-game')).toHaveText('You are in the game “Marta”.');
   await page.locator('#change-wizard').click();
   await page.locator('#wizard-name').fill('Mar');
+  await page.locator('#game-name').fill('My game');
   await page.keyboard.press('Escape');
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Marta');
+  await expect(page.locator('#current-game')).toHaveText('You are in the game “Marta”.');
   await page.locator('#change-wizard').click();
+  await expect(page.locator('#game-name')).toHaveValue('Marta');
   await page.locator('#wizard-name').fill('Mar');
+  await page.locator('#game-name').fill('My game');
   await page.locator('#wizard-done').click();
   await page.locator('#home').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Mar');
+  await expect(page.locator('#current-game')).toHaveText('You are in the game “My game”.');
+  await page.locator('#load-game').click();
+  await expect(page.locator('#games .game-name')).toHaveText(['My game']);
+  await expect(page.locator('#games .game-wizard')).toHaveText(['Mar']);
+});
+
+test("a new game's name follows its wizard's until it is written, with a number when it is taken (D290, D291)", async ({
+  page,
+}) => {
+  await seedWizard(page);
+  await page.goto('/');
+  await page.locator('#new').click();
+  await expect(page).toHaveURL(/#story\/the-letter$/);
+  await page.goto('/#wizard');
+  const game = page.locator('#game-name');
+  await expect(game).toHaveValue('Kydux');
+  await page.locator('#wizard-name').fill('Mar');
+  await expect(game).toHaveValue('Mar');
+  // A second game for a wizard called like the first is offered a number.
+  await page.locator('#wizard-name').fill('marta');
+  await expect(game).toHaveValue('marta 2');
+  await page.locator('#wizard-name').fill('');
+  await expect(game).toHaveValue('');
+  await page.locator('#wizard-name').fill('Lea');
+  await expect(game).toHaveValue('Lea');
+  await page.locator('#wizard-gender [data-value="girl"]').click();
+  await expect(page.locator('#wizard-done')).toBeEnabled();
+  // Another game's name, in any case of letters: Done waits, and the message says why.
+  await game.fill('MARTA');
+  await expect(page.locator('#game-name-taken')).toBeVisible();
+  await expect(page.locator('#wizard-done')).toBeDisabled();
+  // Written by hand, the name stays the child's.
+  await game.fill('Second year');
+  await expect(page.locator('#game-name-taken')).toBeHidden();
+  await page.locator('#wizard-name').fill('Leo');
+  await expect(game).toHaveValue('Second year');
+  await page.locator('#game-name').pressSequentially('!');
+  await expect(page.locator('#game-name-rule')).toBeVisible();
+  await expect(game).toHaveValue('Second year');
+  await page.locator('#wizard-done').click();
+  await expect(page).toHaveURL(/#story\/at-the-gate$/);
+  await page.locator('#home').click();
+  await expect(page.locator('#current-game')).toHaveText('You are in the game “Second year”.');
+  await page.locator('#load-game').click();
+  await expect(page.locator('#games .game-name')).toHaveText(['Second year', 'Marta']);
+  await expect(page.locator('#games .game').nth(0).locator('.game-wizard')).toHaveText('Leo');
+  await expect(page.locator('#games .game').nth(1).locator('.game-wizard')).toHaveCount(0);
 });
 
 test('the wizard goes with exported progress to another browser', async ({ page, browser }) => {
@@ -156,7 +214,11 @@ test('the wizard goes with exported progress to another browser', async ({ page,
   await elsewhere.goto('/#start');
   await expect(elsewhere.locator('#continue')).toHaveText('Begin the story');
   await elsewhere.locator('#import-file').setInputFiles(file as string);
+  // The game's name is asked, its wizard's offered (D291).
+  await expect(elsewhere.locator('#import-name')).toHaveValue('Marta');
+  await elsewhere.locator('#import-done').click();
   await expect(elsewhere.locator('.start-screen h2')).toHaveText('Hello, Marta');
+  await expect(elsewhere.locator('#current-game')).toHaveText('You are in the game “Marta”.');
   await other.close();
 });
 

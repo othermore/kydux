@@ -1,11 +1,13 @@
-// The wizard creator (D36): a name, a girl or a boy, and a look among the
-// game's. Done keeps the wizard in the progress document and goes on; when a
-// wizard exists already, the screen opens with it, and Back leaves it as it was.
+// The wizard creator (D36): a name, the game's name (D290), a girl or a boy, and a
+// look among the game's. The game's name follows the wizard's, as the name a game
+// takes from its wizard (D291), until the child writes it. Done keeps the wizard and
+// the game's name together and goes on; when a wizard exists already, the screen
+// opens with it and the game's name, and Back leaves both as they were.
 
 import { looksFor } from '../engine/looks';
 import { t } from '../i18n';
 import * as progress from '../progress/progress';
-import { isNameCharacter, NAME_MAX, type Wizard, wizardName } from '../progress/store';
+import { GAME_NAME_MAX, isNameCharacter, NAME_MAX, type Wizard, wizardName } from '../progress/store';
 import { element } from './dom';
 import { portrait } from './portraits';
 import type { Screen } from './screen';
@@ -75,6 +77,14 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
   let name = before?.name ?? t('wizard.default_name');
   let gender: Wizard['gender'] | null = before?.gender ?? null;
   let look: string | null = before?.look ?? null;
+  // The game's name (D290): a game's own, or the one its wizard's name gives (D291)
+  // until the child writes in the field.
+  let written = before !== null;
+  const offered = () => {
+    const kept = wizardName(name);
+    return kept === null ? '' : progress.offeredGameName(kept);
+  };
+  let gameName = before ? (progress.currentGameName() ?? offered()) : offered();
   // The names a wizard may not take: the story's, the levels', the world's (D61).
   let reserved = new Set<string>();
   void fetch(`${import.meta.env.BASE_URL}reserved.json`)
@@ -89,7 +99,7 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
   const done = () => {
     const kept = wizardName(name);
     if (kept === null || gender === null || look === null || taken(kept)) return;
-    progress.setWizard({ name: kept, gender, look });
+    if (!progress.keepWizard({ name: kept, gender, look }, gameName)) return;
     parts.onDone();
   };
 
@@ -120,23 +130,56 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
     const finish = element('button', { id: 'wizard-done', type: 'button', className: 'big-button' }, [
       t('wizard.done'),
     ]);
+    const gameInput = element('input', {
+      id: 'game-name',
+      type: 'text',
+      value: gameName,
+      maxLength: GAME_NAME_MAX,
+      autocomplete: 'off',
+      spellcheck: false,
+    });
+    const gameRule = element('p', { id: 'game-name-rule', className: 'wizard-rule', hidden: true }, [
+      t('wizard.game_name_rule'),
+    ]);
+    const gameTaken = element('p', { id: 'game-name-taken', className: 'wizard-rule', hidden: true }, [
+      t('wizard.game_name_taken'),
+    ]);
     const ready = () => {
       takenWords.hidden = !taken(name);
-      finish.disabled = wizardName(name) === null || gender === null || look === null || taken(name);
+      const named = progress.checkGameName(gameName);
+      gameTaken.hidden = named !== 'taken';
+      finish.disabled =
+        wizardName(name) === null || gender === null || look === null || taken(name) || named !== 'ok';
+    };
+    /** What is typed in a name's field, the characters the rule refuses taken out
+     * and the rule said. */
+    const typedName = (field: HTMLInputElement, said: HTMLElement): string => {
+      const typed = field.value;
+      const allowed = [...typed].filter(isNameCharacter).join('');
+      said.hidden = allowed === typed;
+      if (allowed !== typed) field.value = allowed;
+      return allowed;
     };
     input.addEventListener('input', () => {
-      // A character the rule refuses is taken out as it is typed, and the rule said.
-      const typed = input.value;
-      const allowed = [...typed].filter(isNameCharacter).join('');
-      rule.hidden = allowed === typed;
-      if (allowed !== typed) input.value = allowed;
-      name = allowed;
+      name = typedName(input, rule);
       previewName.textContent = name.trim();
+      // The game's name follows the wizard's until the child writes it (D291).
+      if (!written) {
+        gameName = offered();
+        gameInput.value = gameName;
+      }
       ready();
     });
-    input.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') done();
+    gameInput.addEventListener('input', () => {
+      written = true;
+      gameName = typedName(gameInput, gameRule);
+      ready();
     });
+    for (const field of [input, gameInput]) {
+      field.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') done();
+      });
+    }
     // The name to start from is chosen whole on entering the field, so that typing
     // a name of one's own replaces it rather than adding to it.
     input.addEventListener('focus', () => {
@@ -195,6 +238,10 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
           input,
           rule,
           takenWords,
+          element('label', { className: 'wizard-field', htmlFor: 'game-name' }, [t('wizard.game_name')]),
+          gameInput,
+          gameRule,
+          gameTaken,
           element('p', { className: 'wizard-field' }, [t('wizard.gender')]),
           genders,
           element('p', { className: 'wizard-field' }, [t('wizard.looks')]),

@@ -340,7 +340,7 @@
     "saved": "Tu partida se guarda sola mientras juegas.",
     "play": "Jugar",
     "delete": "Borrar",
-    "delete_confirm": "¿Borrar la partida de {name}? No se podrá recuperar.",
+    "delete_confirm": "¿Borrar la partida «{name}»? No se podrá recuperar.",
     "played": "Jugado {time} · empezada el {begun} · última vez el {last}",
     "minutes": "{n} min",
     "hours": "{h} h {m} min",
@@ -350,9 +350,13 @@
     "export": "Exportar",
     "import": "Importar",
     "import_failed": "Ese fichero no es un fichero de progreso de Kydux. No ha cambiado nada.",
+    "import_name": "¿Qué nombre le pones a esta partida?",
+    "import_done": "Importarla",
+    "import_cancel": "Cancelar",
     "map": "El mapa",
     "hello": "Hola, {wizard}",
-    "change_wizard": "Cambiar mi personaje",
+    "current_game": "Estás en la partida «{name}».",
+    "change_wizard": "Cambiar los nombres",
     "begin": "Empezar la historia"
   },
   "map": {
@@ -457,6 +461,9 @@
     "back": "Volver",
     "default_name": "Kydux",
     "name_taken": "Ese nombre es de alguien o de algo del juego. Elige otro.",
+    "game_name": "El nombre de tu partida",
+    "game_name_rule": "Un nombre puede tener letras, números, espacios, guiones y apóstrofos, hasta 30.",
+    "game_name_taken": "Ya tienes una partida con ese nombre. Elige otro.",
     "gender_first": "Elige primero cómo es tu personaje, y aquí aparecerá su aspecto."
   },
   "characters": {

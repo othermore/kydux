@@ -2,8 +2,8 @@
   "title": "El rastro",
   "steps": [
     "La prueba ha terminado, y en la sala hay tres criaturas que esta mañana no existían. Orla cierra el libro: «Cuidadlos. Lo que ve vuestro familiar, lo veis vosotros. Y su nombre, solo a quien queráis de verdad.» Y baja a buscar a la clase siguiente.",
-    "{familiar} olisquea el bolsillo de {friend}, que exclama: «¡Eh! Ahí llevo la caja de los hilos.»",
-    "La criatura cruza la sala como una flecha y se mete por un arco diminuto que hay al pie de la pared. Se la oye correr por dentro del muro. Vuelve con algo en la boca: un hilo negro, con el mismo nudo.",
+    "{familiar} no se aparta del bolsillo de {friend}, que exclama: «¡Eh! Ahí llevo la caja de los hilos.»",
+    "La criatura cruza la sala como una flecha y se mete por un arco diminuto que hay al pie de la pared. Se la oye moverse por dentro del muro. Vuelve trayendo algo: un hilo negro, con el mismo nudo.",
     "Lo he leído. El castillo está lleno de pasadizos pequeños: los hicieron para que los familiares llevaran recados de una sala a otra. Una persona no cabe. Ni nosotros.",
     "Quien anudó las escobas guarda hilo ahí dentro.",
     "«Y si sabemos dónde, ya no son tres hilos en una caja», dice {friend}. Bajáis un piso. En el pasillo de debajo de la sala, a ras de suelo, el pasadizo tiene otra boca, pequeña como una gatera. Dentro, a la luz de la varita, otro hilo.",

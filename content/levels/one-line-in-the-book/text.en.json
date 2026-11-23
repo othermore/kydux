@@ -11,6 +11,6 @@
     "Outside the class, the name and the colour go between the class's brackets, in that order and in quotes."
   ],
   "intro": "The book of Arvelia writes each familiar down in a single line, and a description that cannot make it born in one line does not go in. Teach your class to make yours born whole.",
-  "outro": "Look: Tolu, {friend}'s hare, is stepping out of the circle. It is the first familiar of the class to live.",
+  "outro": "Look: {friend_familiar}, {friend}'s hare, is stepping out of the circle. It is the first familiar of the class to live.",
   "learned": "Now you know that `__init__` is the action a class runs by itself when an object is born, that `self` is the object being born, and that anyone can use your class without reading your program if they know what `__init__` takes."
 }

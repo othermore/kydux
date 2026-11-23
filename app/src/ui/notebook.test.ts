@@ -81,6 +81,23 @@ describe('the notebook', () => {
     expect(notebookEntries({ id: 'room', api: [] }, table)).toEqual([]);
   });
 
+  it("shows a plate with its position alone, once a level teaches it, and none before (D299)", () => {
+    const table: ApiTable = {
+      ...TABLE,
+      roles: { ...TABLE.roles, plate: [{ name: 'position', kind: 'attribute', example: 'key.position' }] },
+    };
+    const things = ['moon', 'sun', 'star'].map((id) => ({ kind: 'plate', id }));
+    const hall = { id: 'hall', things, api: ['thing.position', 'wizard.move_right'] };
+    expect(heldObjects(hall, table).slice(1)).toEqual(things.map(({ id }) => ({ name: id, role: 'plate' })));
+    expect(notebookEntries(hall, table).map((e) => e.object)).toEqual(['wizard']);
+    const taught = notebookEntries({ ...hall, api: [...hall.api, 'plate.position'] }, table);
+    expect(taught.filter((e) => e.role === 'plate').map((e) => e.example)).toEqual([
+      'moon.position',
+      'sun.position',
+      'star.position',
+    ]);
+  });
+
   it('is empty for a level that teaches nothing yet', () => {
     expect(notebookEntries({ id: 'none', api: [] }, TABLE)).toEqual([]);
   });

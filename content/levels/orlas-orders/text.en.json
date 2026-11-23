@@ -5,7 +5,7 @@
     "It obeys Orla's two orders.",
     "It bumps into nothing."
   ],
-  "starting_code": "{familiar_source}\n\n    # Teach it `go_to`, with `self`, `x` and `y`.\n    \n        # The position you want to go to is in the variables `x` and `y`.\n        # You can see your familiar's position with `self.position`, and its x and y coordinates with `self.position.x` and `self.position.y`.\n        # Comparing the variable `x` with `self.position.x` you can tell whether it has to move left or right, and by subtracting, how many cells.\n        \n        # For `y` it is the same, up or down.\n        \n# Send {familiar} to the sun's plate: 13, 4.\n\n",
+  "starting_code": "{familiar_source}\n\n    # Teach it `go_to`, with `self`, `x` and `y`.\n    \n        # The position you want to go to is in the variables `x` and `y`.\n        # You can see your familiar's position with `self.position`, and its x and y coordinates with `self.position.x` and `self.position.y`.\n        # Comparing the variable `x` with `self.position.x` you can tell whether it has to move left or right, and by subtracting, how many cells.\n        \n        # For `y` it is the same, up or down.\n        \n# Remember: the plates are three objects, `sun`, `moon` and `star`, and each has its `position`.\n# Send {familiar} to the sun's plate: 13, 4.\n\n",
   "hints": [
     "Inside the method, `self.position.x` and `self.position.y` say where your familiar is at that moment.",
     "The steps it has to take are the difference between the two x, the larger minus the smaller; and then the same with the two y.",

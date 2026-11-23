@@ -69,3 +69,28 @@ def test_a_hole_is_looked_at_by_open_and_closed_and_no_slab_is_left():
     assert "hole" in api.THING_ROLES
     assert "slab" not in api.MEMBERS and "slab" not in api.THING_ROLES
     assert all("in_place" not in members for members in api.MEMBERS.values())
+
+
+def test_a_plate_has_its_position_alone_taught_by_out_of_the_circle():
+    """D299: a plate is a role of its own whose one member is `position`; nothing taught
+    of a thing reaches it, and Out of the circle teaches it."""
+    import json
+    from pathlib import Path
+
+    from kydux_world.things import Plate
+
+    assert api.role_of("plate") == "plate" and "plate" not in api.THING_ROLES
+    assert api.MEMBERS["plate"] == ("position",)
+    things = ["thing.kind", "thing.name", "thing.position", "thing.distance_to", "thing.reveal"]
+    assert api.members_taught(things, "plate") == []
+    assert api.members_taught([*things, "plate.position"], "plate") == ["position"]
+    assert Plate._k_role == "plate"
+    position = {"name": "position", "kind": "attribute", "example": "key.position"}
+    assert api.table()["plate"] == [position]
+    levels = Path(__file__).resolve().parents[2] / "content" / "levels"
+    teaching = [
+        level.parent.name
+        for level in sorted(levels.glob("*/level.json"))
+        if "plate.position" in json.loads(level.read_text(encoding="utf-8")).get("api", [])
+    ]
+    assert teaching == ["out-of-the-circle"]

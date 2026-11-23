@@ -417,7 +417,10 @@ class Ring(Thing):
 
 class Plate(Thing):
     """A brass plate in the floor, walked over, lit when a familiar ends a move on it
-    (D270): the moon's, the sun's and the star's; to the child's code, a thing as any."""
+    (D270): the moon's, the sun's and the star's; to the child's code, its position alone
+    (D299): `moon.position`"""
+
+    _k_role = "plate"
 
     def __init__(self, world: "World", spec: ThingSpec) -> None:
         super().__init__(world, spec)

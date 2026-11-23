@@ -235,6 +235,9 @@
       "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}.",
       "reveal": "Hace que una cosa brille donde está, incluso a través de lo que la esconde, para que veas dónde se encuentra."
     },
+    "plate": {
+      "position": "La casilla en la que está el plato, en x e y."
+    },
     "door": {
       "kind": "Qué es: \"door\".",
       "name": "El nombre de la puerta en este nivel.",

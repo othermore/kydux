@@ -243,3 +243,38 @@ test("the forgotten room's notebook has the familiar's pick_up, which it inherit
   await expect(notebook.locator('[data-example="pimu.pick_up()"]')).toBeVisible();
   await expect(notebook).toContainText('Your familiar picks up what lies on its cell and carries it.');
 });
+
+test('the plates are not in the notebook before Out of the circle, and from it with their position alone (D299)', async ({
+  page,
+}) => {
+  await open(page, 'the-circle');
+  await page.locator('#notebook-open').click();
+  const notebook = page.locator('#notebook');
+  await expect(notebook).toBeVisible();
+  for (const plate of ['moon', 'sun', 'star']) {
+    await expect(notebook.locator(`[data-example^="${plate}."]`)).toHaveCount(0);
+  }
+  await page.locator('#notebook-close').click();
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+End');
+  await page.keyboard.press('Enter');
+  await page.keyboard.type('moon.');
+  await expect(page.locator('.cm-tooltip-autocomplete')).toHaveCount(0);
+
+  await open(page, 'out-of-the-circle');
+  await page.locator('#notebook-open').click();
+  for (const plate of ['moon', 'sun', 'star']) {
+    await expect(notebook.locator(`[data-example^="${plate}."]`)).toHaveCount(1);
+    await expect(notebook.locator(`[data-example="${plate}.position"]`)).toBeVisible();
+  }
+  await expect(notebook).toContainText('The cell the plate is on, as x and y.');
+  await page.locator('#notebook-close').click();
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+End');
+  await page.keyboard.press('Enter');
+  await page.keyboard.type('moon.');
+  const offered = page.locator('.cm-tooltip-autocomplete');
+  await expect(offered).toBeVisible();
+  await expect(offered.locator('li')).toHaveCount(1);
+  await expect(offered).toContainText('position');
+});

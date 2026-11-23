@@ -5,7 +5,8 @@ A level lists in `api` the names it uses, as `role.member` (D23):
 is to the child: `wizard`; a thing's kind when it has members of its own
 (`door`), or `thing`; an actor's kind (`teacher`, `ghost`, `cat`, `friend`). A
 door is a thing too, so `thing.position` covers a door's position; so does a
-key's.
+key's. A plate is a role of its own whose one member is its position (D299): nothing
+taught of a thing reaches it.
 
 The table here is the one list of what the child can type. It is plain data,
 so that a level can be checked without the world's classes; a test holds the
@@ -68,6 +69,8 @@ MEMBERS: dict[str, tuple[str, ...]] = {
     ),
     # What a position holds: its two numbers, `key.position.x` (D153).
     "position": ("x", "y"),
+    # A plate in the floor (D299): its cell and nothing else, taught by Out of the circle.
+    "plate": ("position",),
 }
 
 #: The roles that are things, and so have a thing's members.

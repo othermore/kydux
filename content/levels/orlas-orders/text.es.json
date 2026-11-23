@@ -5,7 +5,7 @@
     "Obedece las dos órdenes de Orla.",
     "No choca con nada."
   ],
-  "starting_code": "{familiar_source}\n\n    # Enséñale `go_to`, con `self`, `x` e `y`.\n    \n        # La posición a la que quieres ir está en las variables `x` e `y`.\n        # Puedes ver la posición de tu familiar con `self.position`, y sus coordenadas x e y con `self.position.x` y `self.position.y`.\n        # Comparando la variable `x` con `self.position.x` puedes saber si tiene que moverse a la izquierda o a la derecha, y haciendo la resta, cuántas casillas.\n        \n        # Para la `y` es igual, hacia arriba o hacia abajo.\n        \n# Manda a {familiar} al plato del sol: 13, 4.\n\n",
+  "starting_code": "{familiar_source}\n\n    # Enséñale `go_to`, con `self`, `x` e `y`.\n    \n        # La posición a la que quieres ir está en las variables `x` e `y`.\n        # Puedes ver la posición de tu familiar con `self.position`, y sus coordenadas x e y con `self.position.x` y `self.position.y`.\n        # Comparando la variable `x` con `self.position.x` puedes saber si tiene que moverse a la izquierda o a la derecha, y haciendo la resta, cuántas casillas.\n        \n        # Para la `y` es igual, hacia arriba o hacia abajo.\n        \n# Recuerda: los platos son tres objetos, `sun`, `moon` y `star`, y cada uno tiene su `position`.\n# Manda a {familiar} al plato del sol: 13, 4.\n\n",
   "hints": [
     "Dentro del método, `self.position.x` y `self.position.y` dicen dónde está tu familiar en ese momento.",
     "Los pasos que tiene que dar son la diferencia entre las dos x, la mayor menos la menor; y después, lo mismo con las dos y.",

@@ -117,7 +117,8 @@
     "familiar.move_down",
     "familiar.move_left",
     "familiar.move_right",
-    "familiar.pick_up"
+    "familiar.pick_up",
+    "plate.position"
   ],
   "goals": [
     {

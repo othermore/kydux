@@ -302,7 +302,8 @@ def test_the_course_compares_by_size_only_with_less_and_greater_and_after_their_
 def test_a_level_teaches_only_what_a_lesson_before_it_explained(path):
     """In a chapter that has lessons (D41), every name a level teaches was explained
     by a lesson before it in the course, or taught by a level before it, a method of
-    the familiar's by the level whose class may have it. A chapter
+    the familiar's by the level whose class may have it, a plate's position by a
+    thing's (D299). A chapter
     with no lesson yet holds levels to be given their lessons in its own sprint."""
     if not any(item.startswith("lesson:") for item in chapter(path)["items"]):
         return
@@ -318,7 +319,14 @@ def test_a_level_teaches_only_what_a_lesson_before_it_explained(path):
         level = Level.from_directory(CONTENT / "levels" / item_id)
         api = list(level.api)
         if item in chapter(path)["items"]:
-            unexplained = [name for name in api if name not in explained]
+            # A plate's position is a thing's position (D153), told of a plate by the
+            # level that teaches it, in its starting code (D299).
+            unexplained = [
+                name
+                for name in api
+                if name not in explained
+                and not (name == "plate.position" and "thing.position" in explained)
+            ]
             assert not unexplained, f"{item_id} teaches {unexplained}, which no lesson explained"
         explained.update(api)
         # A method the level lets the child write in a familiar's class is the child's

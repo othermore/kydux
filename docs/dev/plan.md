@@ -10,7 +10,7 @@ own.
 
 | Part | Choice | Why |
 |---|---|---|
-| The game | A static web app: HTML, CSS, **TypeScript**, built by **Vite** | Runs in any browser from any web server, offline once loaded; the same files serve a local launcher, a Kidux package and, later, a hosted site. |
+| The game | A static web app: HTML, CSS, **TypeScript**, built by **Vite** | Runs in any browser from any web server, offline once loaded; the same files serve a local launcher, a Kidux package and the published site, on GitHub Pages (D329). |
 | Python | **Pyodide 314.x** (CPython 3.14 in WebAssembly), from its npm package, run in a **Web Worker** | Real Python, the one the child will meet outside the game; a worker keeps the page responsive and lets a runaway program be stopped. |
 | The level model | A Python package of our own, `kydux_world`, run inside Pyodide | The child's code calls real Python objects (`wizard.move_right()`), the world is deterministic, and the same package runs under CPython on the development machine, so every level is checked by plain `pytest` in milliseconds, without a browser. |
 | The scene | **Phaser 3** | Tile maps from Tiled, sprite animation, tweens, audio and input in one MIT library made for exactly this kind of 2D game. |
@@ -554,8 +554,7 @@ the screen's guide, the map over the level and the saved games in the
 browser, and rewrites chapters 2 and 3 the same way (`sprint-11.md`).
 Phase 4, the art and the sound, comes next (sprints 12 to 14), on the
 scenes that exist; then chapters 4 and 5, each a sprint with its scene,
-and the challenges. The saved games on the server wait for phase 7, when
-the game runs online.
+and the challenges. The saved games on a server wait for phase 7.
 
 What the owner's UAT of 2026-10-22 taught, which every chapter follows
 (sprint-10.md has the first pieces; the rest are sprints 11 and 12):
@@ -591,8 +590,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
   there is one, the open one marked (D293); export and import stay as the
   way to carry one away. A wizard's gender and look are chosen once, at the
   start of a game (D292). Sprint 11 keeps the list in the browser
-  (D70); the same list on the server the game runs from, with the
-  browser's as the fallback, comes with the online game (phase 7).
+  (D70); the same list on a server, with the browser's as the fallback,
+  comes with phase 7.
 - **One scene per chapter.** A chapter's levels are parts of one scene, or
   of a few, where a level ends the next begins and the friend who teaches
   stands in it; the camera is a window on the scene, zoomed and dragged
@@ -803,6 +802,13 @@ The game on a child's computer, three ways.
 6.5 The website: Kydux's section on the Kidux site (its words through the
     site's `toml` files, its pictures from the suite) and its `README`s
     completed; the repository public when the owner says.
+6.6 The game published at `kydux.kidux.org`, on GitHub Pages, from version
+    0.1: `ci/publish.sh` puts the build on the branch `gh-pages`, the page
+    isolates itself through a service worker where the host sends no header
+    (D329), and the published game counts its use, with Google Analytics
+    where the cookies are accepted and GoatCounter, behind a notice of one
+    line (D328). The friends' server on hija is kept, inactive, for a beta
+    (D330).
 
 UAT: the Windows and macOS binaries on real machines; the `.deb` on a Kidux
 machine; the guide followed as written.
@@ -811,9 +817,9 @@ machine; the guide followed as written.
 
 Not planned in detail; kept possible by the design.
 
-- Online: the built game on a paid host, with the saved games kept on the
-  server (the same list as the browser's, D70, behind the same store) and
-  accounts; then rankings by stars and lines; then duels between wizards as
+- Online: the saved games kept on a server (the same list as the
+  browser's, D70, behind the same store) and accounts, on a host that can
+  keep them; then rankings by stars and lines; then duels between wizards as
   a level type where two programs run in the same world.
 - More languages: a new pair of files per language.
 - A level editor for teachers, from the Tiled format.

@@ -37,6 +37,7 @@ import {
   speakOfFamiliar,
   t,
 } from './i18n';
+import { isolate, needsIsolating } from './isolation';
 import { startPlayTime } from './progress/playtime';
 import * as progress from './progress/progress';
 import type { LevelJson } from './runtime/protocol';
@@ -871,4 +872,9 @@ function open(page: HTMLElement): void {
 }
 
 const page = document.querySelector<HTMLElement>('#app');
-if (page) open(page);
+if (page) {
+  // A server that sends no headers leaves the page to isolate itself, by loading
+  // again through its service worker (D329); the page waits for that load.
+  if (needsIsolating()) void isolate().then((loading) => (loading ? undefined : open(page)));
+  else open(page);
+}

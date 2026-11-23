@@ -8,7 +8,8 @@ WebAssembly, running the child's code against `kydux_world`, a Python package
 of Kydux's own that models a level deterministically and records what
 happens as a list of events. The page plays the events back. Nothing runs on
 a server: the game is files, served by whatever is at hand, the development
-server, the launcher on a child's computer, or a host online later.
+server, the launcher on a child's computer, or the host it is published on,
+GitHub Pages at `kydux.kidux.org` (D329).
 
 Because `kydux_world` is plain Python, it runs on the development machine
 under CPython too, and every level's solution and wrong answers are checked
@@ -112,7 +113,15 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 with a tip up, by itself once the tip has had its reading time,
                 and once the first screen shows fetches the other screens' code
                 in idle time; it asks for the next tip's picture as the page
-                opens, before the first screen loads (D214, D221, D246)
+                opens, before the first screen loads (D214, D221, D246); before
+                any of it, a page that is not isolated isolates itself
+                (isolation.ts, with public/isolate.js, D329), and the published
+                game asks about the cookies (ui/cookies.ts, D328)
+  src/analytics/ the published game's counting of its use (D328): where it is
+                published and counted (site.ts), the page a screen is counted
+                as and what a visit to a level tells (pages.ts), the answer
+                given to the cookies (consent.ts), and the counting itself
+                (analytics.ts)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events, who leaves and who comes in by a way out or in with them,
@@ -212,7 +221,10 @@ tools/          the i18n check, the forbidden-word check, the names a wizard
                 (sound/generate.py)
 tests/tools/    the writing and art tools' tests, with the services faked
 tests/project/  the repository's own checks
-ci/             check.sh, push.sh and hours.py, dev-cert.sh, the git hooks
+ci/             check.sh, push.sh and hours.py, dev-cert.sh, the git hooks,
+                publish.sh, which publishes the build on GitHub Pages (D329), and
+                deploy.sh, which copies it to the friends' server (D330)
+deploy/         the friends' server: nginx's site and the passwords' script (D330)
 ```
 
 ### Versions
@@ -461,11 +473,13 @@ one overturns stays, marked as superseded.
   game's weight goes to Pyodide and the scene. Revisited if the shell grows
   past what helpers keep readable.
 - **D11 — The game is served cross-origin isolated everywhere.** Decided
-  2026-10-20. Every server sends `Cross-Origin-Opener-Policy: same-origin`
-  and `Cross-Origin-Embedder-Policy: require-corp`, so that the page has
+  2026-10-20. Every server of the game's own sends
+  `Cross-Origin-Opener-Policy: same-origin` and
+  `Cross-Origin-Embedder-Policy: require-corp`, so that the page has
   `SharedArrayBuffer` and Pyodide's interrupt can stop a runaway program in
-  place. Where isolation is missing, the runtime stops a run by restarting
-  the worker instead.
+  place. A host of plain files sends neither, and there the page isolates
+  itself (D329). Where isolation is missing, the runtime stops a run by
+  restarting the worker instead.
 - **D12 — GitHub sees Kydux only inside its hours.** Decided 2026-10-20 by
   the owner. Madrid's 19:00 to 03:00 around a night from Tuesday to Friday,
   and the whole of Saturday, Sunday and Monday. `ci/push.sh` is the one way
@@ -521,8 +535,10 @@ one overturns stays, marked as superseded.
   first load of about 13 MB over a slow connection.
 - **D19 — The game keeps to its own origin, and the child's code away from
   JavaScript.** Decided 2026-10-21, piece 1.8, narrowing D14. Every server
-  of the game sends, with the isolation headers, this
-  Content-Security-Policy, which the launcher sends as it is:
+  of the game's own sends, with the isolation headers, this
+  Content-Security-Policy, which the launcher sends as it is, and which the
+  worker that runs the child's Python has on every host; the published
+  game's page alone has a wider one (D329):
 
   ```
   default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self';
@@ -5339,3 +5355,42 @@ one overturns stays, marked as superseded.
   Rules out a game that does not open without the cookies, a refusal in one press, a
   long text before the game, Google's tag loaded before a yes, and any counting on a
   host other than the published one.
+- **D329 — The game is published on GitHub Pages, where the page isolates itself.**
+  Decided 2026-11-23 by the owner (*Esta versión ya la publicaré, así que querría
+  tenerla en github pages (y lo que haré será configurar el dominio kydux.kidux.org
+  para que apunte a github pages)*). `ci/publish.sh` builds the game and pushes the
+  build, as one commit on top of the last, to the branch `gh-pages`, which GitHub Pages
+  serves at `kydux.kidux.org`: `app/dist` without its source maps, `CNAME` with the
+  name, and `.nojekyll`, which has the files served as they are. It publishes a commit's
+  build, so it refuses a tree with changes not committed, and it pushes inside the hours
+  alone (D12); `--dry-run` makes the commit and pushes nothing; `KYDUX_PAGES_REMOTE`
+  names another repository to hold the branch. The owner publishes, as the owner pushes.
+
+  GitHub Pages sends no header of the game's, neither the two that isolate the page
+  (D11) nor the Content-Security-Policy (D19). So a page that finds itself not isolated,
+  in a secure context, registers a service worker (`public/isolate.js`, from
+  `src/isolation.ts`) and loads itself once more, through it; the worker answers every
+  request of the game's own origin with what the server gave and those three headers,
+  and keeps nothing, so that the game needs the network exactly as without it. A browser
+  that will not register it leaves the page as it is, and a runaway program is stopped
+  by starting Python again (D11); the page tries once in a tab's life. On a server of
+  the game's own the page is isolated from the first answer and registers nothing.
+
+  There are two policies. The game's own, D19's, is the one every server of the game's
+  own sends and the one the service worker gives to everything but the published game's
+  page, the worker that runs the child's Python among it: the child's code reaches no
+  other server on any host. The published one is the same with the hosts the visits are
+  counted on (D328) added to `script-src`, `connect-src` and `img-src`: Google's tag and
+  Google Analytics, and GoatCounter's image. The service worker gives it to the page on
+  the published host alone, and `index.html` carries it in a `meta`, without
+  `frame-ancestors`, which a `meta` cannot say, for the first load, before the service
+  worker answers; where a server sends the game's own policy too, the stricter of the
+  two holds, so the `meta` widens nothing there. The policy's copies
+  (`app/vite.config.ts`, `deploy/nginx-kydux.conf`, `isolate.js` and `index.html`) and
+  the host's (`site.ts`, `isolate.js`, `ci/publish.sh`) are held equal by
+  `tests/project/test_published.py`, and `e2e/published.spec.ts` plays the game as plain
+  files under the published name. GitHub Pages has every file asked for again after ten
+  minutes and answered as not changed; what D230 keeps for good is kept so on a server
+  of the game's own. Rules out a published game that cannot stop a runaway program in
+  place, a policy loosened for the child's code or on any other host, a service worker
+  that keeps files, and a publication made from a tree that is no commit.

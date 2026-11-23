@@ -1,8 +1,9 @@
 # The development environment
 
-This guide explains how to work on Kydux. It covers four things: how to
+This guide explains how to work on Kydux. It covers five things: how to
 prepare a machine, how to run the game while you develop it, how to try the
-game from another computer, and how to check your work before you commit.
+game from another computer, how to check your work before you commit, and
+how to push, release and publish it.
 
 Kydux is developed on a Linux server with no screen. In this guide that
 server is called `hija`, which is its hostname. The game is tried from
@@ -749,6 +750,84 @@ already on GitHub goes up the same way, on its own.
 Two files are never committed: `CLAUDE.md` and the `.claude/` directory.
 They hold the project's internal instructions, and `.gitignore` keeps them
 out.
+
+### Publishing the game
+
+The game everyone plays is at `https://kydux.kidux.org`. GitHub Pages
+serves it. GitHub Pages serves the files of one branch of the repository,
+`gh-pages`. That branch holds the built game and nothing else: no source,
+no documents.
+
+One script builds the game and puts the build on that branch. Run it on
+the release's commit, after you have pushed it:
+
+```sh
+ci/publish.sh
+```
+
+It should end with a line like
+`==> Published version 0.1.0 (1a2b3c4) for https://kydux.kidux.org/`.
+A minute or two later the address shows the new build. A browser that
+holds the old one gets the new one when the page is loaded again.
+
+The script is careful about three things:
+
+- It publishes a commit's build. So it refuses to run while the tree has
+  changes that are not committed, and it lists them.
+- It pushes only inside the hours, as `ci/push.sh` does. Outside them it
+  refuses.
+- It never rewrites the branch. Each publication is one commit on top of
+  the last, named `Publish version <version> (<commit>)`.
+
+To see what it would publish without publishing it:
+
+```sh
+ci/publish.sh --dry-run
+```
+
+It builds, makes the commit in a temporary folder, pushes nothing, and
+says where the folder is.
+
+Besides the build, the branch holds two small files that the script
+writes. `CNAME` holds the name `kydux.kidux.org`, which tells GitHub
+Pages the address it answers to. `.nojekyll` tells it to serve the files
+as they are.
+
+If the branch has to live in another repository, name it in
+`KYDUX_PAGES_REMOTE`, as a git remote of this repository or as an
+address:
+
+```sh
+KYDUX_PAGES_REMOTE=git@github.com:othermore/kydux-site.git ci/publish.sh
+```
+
+#### What is different on the published game
+
+Two things happen at `kydux.kidux.org` that happen nowhere else. The page
+decides by the name it was opened under, so the same build does neither
+on your machine.
+
+- **The page isolates itself.** GitHub Pages cannot send the two headers
+  that isolate the page (section 5). So the page registers a small service
+  worker, `isolate.js`, and loads itself once more through it. You see
+  that as one quick reload on the very first visit. After it, the console
+  says `Kydux: cross-origin isolated`.
+- **The game counts its use, and asks about cookies first.** A notice
+  comes before the first screen. With a yes, Google Analytics counts each
+  screen and each level's seconds, runs, hints and stars. The settings
+  page shows the answer and changes it.
+
+To try both on `hija` without publishing anything, run the browser test
+that serves the build as plain files under the published name:
+
+```sh
+cd app
+npm run build
+npx playwright test e2e/published.spec.ts
+```
+
+It should say that 7 tests passed. No request leaves the machine: the
+test answers Google's and GoatCounter's addresses itself.
 
 ## 10. Making the art and the sound
 

@@ -43,6 +43,15 @@ app/e2e/shots/es/19-settings.png
 Git ignores the folder. Each run of the loop replaces it, so the shots are
 always of the code that was just tested.
 
+`published.spec.ts` plays the game as it is published (D328, D329): the
+built files served plain, with no header of the game's, under the name
+`kydux.kidux.org`, which the browser is told to find on this machine. It
+checks that the page isolates itself, the notice about the cookies and its
+two answers, and what is counted. It answers Google's and GoatCounter's
+addresses itself, so nothing leaves the machine. It runs in the full
+Chromium (`channel: 'chromium'`), since the headless shell does not take a
+plain `http` address under a name for a secure one.
+
 `helpers.ts` is not a test. It gives a test a wizard before the game loads,
 for the tests of what comes after the creator.
 

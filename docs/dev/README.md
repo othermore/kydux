@@ -14,7 +14,7 @@
 
 Two agents work on Kydux, with no shared context between them; the owner
 carries every message from one to the other, tests what is built, and
-alone pushes or deploys.
+alone pushes, publishes or deploys.
 
 - **The designer** writes the story and the course, takes the decisions
   into `architecture.md`'s log, writes each sprint in `sprint-<n>.md`

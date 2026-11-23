@@ -802,13 +802,14 @@ The game on a child's computer, three ways.
     screenshots: installing, playing, moving progress between computers.
 6.5 The website: Kydux's section on the Kidux site (its words through the
     site's `toml` files, its pictures from the suite) and its `README`s
-    completed; the repository public when the owner says.
+    completed; the repository public, with the game's publication.
 6.6 The game published at `kydux.kidux.org`, on GitHub Pages, from version
     0.1: `ci/publish.sh` puts the build on the branch `gh-pages`, the page
     isolates itself through a service worker where the host sends no header
-    (D329), and the published game counts its use, with Google Analytics
-    where the cookies are accepted and GoatCounter, behind a notice of one
-    line (D328). The friends' server on hija is kept, inactive, for a beta
+    (D329), and the published game counts its use with Google Analytics
+    and GoatCounter, behind a notice about the cookies (D328), each run
+    and each hint read among it (D334), and holds no solution of a level
+    (D333). The friends' server on hija is kept, inactive, for a beta
     (D330).
 
 UAT: the Windows and macOS binaries on real machines; the `.deb` on a Kidux

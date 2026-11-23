@@ -47,7 +47,8 @@ always of the code that was just tested.
 built files served plain, with no header of the game's, under the name
 `kydux.kidux.org`, which the browser is told to find on this machine. It
 checks that the page isolates itself, the notice about the cookies and its
-two answers, and what is counted. It answers Google's and GoatCounter's
+two answers, what is counted, and that the tester's mode offers no
+solution there (D333). It answers Google's and GoatCounter's
 addresses itself, so nothing leaves the machine. It runs in the full
 Chromium (`channel: 'chromium'`), since the headless shell does not take a
 plain `http` address under a name for a secure one.

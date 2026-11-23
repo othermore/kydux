@@ -293,9 +293,11 @@ Two more things help you test quickly in this mode:
 - **Write the solution** is a button under the editor, beside the
   notebook. It replaces the code with the level's solution, so that a run
   shows the level solved. It is there whenever the address has `?debug`, on
-  the development server and on a build alike. A build keeps the solutions
-  apart from the game, under `__debug/solution/`, and only this button asks
-  for them.
+  the development server and on a build served from your machine or from a
+  server of trials. A build keeps the solutions apart from the game, under
+  `__debug/solution/`, and only this button asks for them. The published
+  game has neither the button nor the solutions: `ci/publish.sh` leaves
+  that folder out (D333).
 
 ### A story on its scene
 
@@ -777,7 +779,7 @@ out.
 The game everyone plays is at `https://kydux.kidux.org`. GitHub Pages
 serves it. GitHub Pages serves the files of one branch of the repository,
 `gh-pages`. That branch holds the built game and nothing else: no source,
-no documents.
+no documents, no solution of a level.
 
 One script builds the game and puts the build on that branch. Run it on
 the release's commit, after you have pushed it:
@@ -791,7 +793,7 @@ It should end with a line like
 A minute or two later the address shows the new build. A browser that
 holds the old one gets the new one when the page is loaded again.
 
-The script is careful about three things:
+The script is careful about four things:
 
 - It publishes a commit's build. So it refuses to run while the tree has
   changes that are not committed, and it lists them.
@@ -799,6 +801,8 @@ The script is careful about three things:
   refuses.
 - It never rewrites the branch. Each publication is one commit on top of
   the last, named `Publish version <version> (<commit>)`.
+- It leaves out what is not for the players. The source maps stay behind,
+  and so does `__debug/`, the folder with the levels' solutions.
 
 To see what it would publish without publishing it:
 
@@ -814,7 +818,13 @@ writes. `CNAME` holds the name `kydux.kidux.org`, which tells GitHub
 Pages the address it answers to. `.nojekyll` tells it to serve the files
 as they are.
 
-If the branch has to live in another repository, name it in
+GitHub's side is set once, and you can see it in the repository's
+*Settings*, under *Pages*. The source is the branch `gh-pages` and the
+folder `/ (root)`. The custom domain is `kydux.kidux.org`. *Enforce
+HTTPS* is ticked. The name's DNS record is a `CNAME` to
+`othermore.github.io.`, and GitHub issues the certificate by itself.
+
+The branch lives in this repository. If it ever has to live in another, name it in
 `KYDUX_PAGES_REMOTE`, as a git remote of this repository or as an
 address:
 
@@ -835,8 +845,9 @@ on your machine.
   says `Kydux: cross-origin isolated`.
 - **The game counts its use, and asks about cookies first.** A notice
   comes before the first screen. With a yes, Google Analytics counts each
-  screen and each level's seconds, runs, hints and stars. The settings
-  page shows the answer and changes it.
+  screen, each level's seconds, runs, hints and stars, each run with how
+  it ended, and each hint read (D328, D334). The settings page shows the
+  answer and changes it.
 
 To try both on `hija` without publishing anything, run the browser test
 that serves the build as plain files under the published name:
@@ -847,7 +858,7 @@ npm run build
 npx playwright test e2e/published.spec.ts
 ```
 
-It should say that 7 tests passed. No request leaves the machine: the
+It should say that 9 tests passed. No request leaves the machine: the
 test answers Google's and GoatCounter's addresses itself.
 
 ## 10. Making the art and the sound

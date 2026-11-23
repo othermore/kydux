@@ -119,7 +119,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 game asks about the cookies (ui/cookies.ts, D328)
   src/analytics/ the published game's counting of its use (D328): where it is
                 published and counted (site.ts), the page a screen is counted
-                as and what a visit to a level tells (pages.ts), the answer
+                as and what a visit to a level, a run and a hint tell
+                (pages.ts, D334), the answer
                 given to the cookies (consent.ts), and the counting itself
                 (analytics.ts)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
@@ -5304,8 +5305,8 @@ one overturns stays, marked as superseded.
   the wizard's side, and the friend's first words frame the gate again. Rules out a
   figure that walks in from where the window does not reach, seen only when it arrives,
   and a camera sent after a figure by a row of framings, one a step.
-- **D328 — The published game counts how it is used, and asks about the cookies in one
-  line.** Decided 2026-11-23 by the owner (*poner google analytics, goatcounter y el
+- **D328 — The published game counts how it is used, and asks about the cookies
+  first.** Decided 2026-11-23 by the owner (*poner google analytics, goatcounter y el
   aviso de cookies. En principio usaremos el mismo analytics y goatcounter que tengo en
   el proyecto de kidux*; *queremos saber estadísticas de los niveles en los que la gente
   pasa más tiempo y demás*). The game counts its use where it is published and nowhere
@@ -5316,54 +5317,35 @@ one overturns stays, marked as superseded.
   `/story/<id>`, `/map`, `/settings`, `/wizard`, `/start`, and `/about` for the welcome
   page a newcomer is shown), the same in every language, and each visit to a level: a
   win (`level_won`) with the seconds played, the programs run, the hints read and the
-  stars earned, or a visit left without one (`level_left`) with its seconds and runs.
-  Nothing the child writes is sent: no program, no name, nothing of a saved game. The
-  counting is Kidux's own: Google Analytics' stream `G-LHD6DKXB9P`, whose reports tell
-  the game from the website by the host, and GoatCounter's site `kidux`, every path
-  under `/kydux`.
+  stars earned, or a visit left without one (`level_left`) with its seconds and runs,
+  and within it each run and each hint read (D334). Nothing the child writes is sent: no
+  program, no name, nothing of a saved game. The counting is Kidux's own: Google
+  Analytics' stream `G-LHD6DKXB9P`, whose reports tell the game from the website by the
+  host, and GoatCounter's site `kidux`, every path under `/kydux`.
 
-  Google Analytics keeps cookies, so the page asks first, and its notice is the owner's
-  (*el mensaje de cookies es muy largo. Creo que estaría bien que hubiese simplemente un
-  mensaje corto ("Usamos cookies para mejorar el juego") y un botón de aceptar y uno de
-  "rechazar" y el de rechazar en lugar de rechazar que saque ya el mensaje completo
-  explicando por qué, y pregunte: estás seguro de que quieres rechazarlas? Además, no hay
-  que decir nada de goatcounter en el mensaje, porque goatcounter no usa cookies*;
-  *podemos hacer que funcione sin las cookies, no tendremos datos, pero pidamos dos o
-  tres clics para llegar ahí (y mantendremos en cualquier caso goatcounter)*). Before
-  the game's first screen the page shows one line, *We use cookies to make the game
-  better*, with *Accept* and *Refuse*, in the language of the page and with the two
-  languages to choose from. *Accept* opens the game. *Refuse* refuses nothing yet: it
-  puts up the whole of why, what is counted and what never is, what a cookie is, that
-  the game plays the same without them, and a word for a child (*si eres menor y
-  necesitas ayuda, pide a un adulto*), and then asks *Are you sure you want to refuse
-  them?*, with *Accept the cookies* and *Yes, refuse them*. The second press refuses,
-  and the game opens as it does with a yes. The answer is kept in the browser
-  (`kydux.cookies`): a yes for good, a no for a day and a half, after which the page
-  asks again (*Si las cookies están rechazadas, una vez cada 1-2 días hay que volver a
-  preguntar. Si están aceptadas, están aceptadas para siempre*). The settings say which
-  answer the browser holds and change it: a yes is taken back there, and the counting
-  cookies are deleted with it; a no becomes a yes.
-
+  Google Analytics keeps cookies, so the page asks first: a notice about the cookies
+  comes before the game's first screen, in the language of the page and with the two
+  languages to choose from, and the game opens and plays the same with either answer.
   Google's tag is loaded only in a browser that said yes, and nothing is kept for it or
-  sent to it in any other. GoatCounter keeps nothing in the browser: it is asked for an
-  image, with no script of its own in the page, and it counts the pages and the wins
-  whatever the answer, with the two presses of a refusal as events. The notice and the
-  settings speak of the cookies alone: no text of the game names GoatCounter or says
-  what is counted without cookies (*no digas lo que cuenta el juego sin cookies, eso no
-  hay que aclararlo en ningún sitio*), and none says that a no is asked about again
-  (*no pongas en los ajustes lo de que el juego volverá a preguntar. Eso lo sabemos
-  nosotros*). The notice's words are Gemini's from
-  `tools/write/briefs/the-cookies-notice.md`, its one line and its question the owner's.
-  Rules out a game that does not open without the cookies, a refusal in one press, a
-  long text before the game, Google's tag loaded before a yes, and any counting on a
-  host other than the published one.
+  sent to it in any other. The settings say which answer the browser holds and change
+  it: a yes is taken back there, and the counting cookies are deleted with it; a no
+  becomes a yes. GoatCounter keeps no cookie: it is asked for an image, with no script
+  of its own in the page. How the notice asks and how the answer is kept are the
+  code's alone to say (`src/ui/cookies.ts`, `src/analytics/consent.ts`,
+  `e2e/published.spec.ts`), by the owner's word (*no lo menciones en la documentación
+  del repositorio, que esté solo en el código*): no document of the repository
+  describes them. Rules out a game that does not open without the cookies, Google's tag
+  loaded before a yes, and any counting on a host other than the published one.
 - **D329 — The game is published on GitHub Pages, where the page isolates itself.**
   Decided 2026-11-23 by the owner (*Esta versión ya la publicaré, así que querría
   tenerla en github pages (y lo que haré será configurar el dominio kydux.kidux.org
   para que apunte a github pages)*). `ci/publish.sh` builds the game and pushes the
   build, as one commit on top of the last, to the branch `gh-pages`, which GitHub Pages
-  serves at `kydux.kidux.org`: `app/dist` without its source maps, `CNAME` with the
-  name, and `.nojekyll`, which has the files served as they are. It publishes a commit's
+  serves at `kydux.kidux.org`: `app/dist` without its source maps and without the
+  levels' solutions (D333), `CNAME` with the name, and `.nojekyll`, which has the files
+  served as they are. The branch lives in the game's own repository, which is public
+  (*El repositorio lo podemos hacer público cuando publiquemos el juego. Y así vive ahí
+  la rama publicada*). It publishes a commit's
   build, so it refuses a tree with changes not committed, and it pushes inside the hours
   alone (D12); `--dry-run` makes the commit and pushes nothing; `KYDUX_PAGES_REMOTE`
   names another repository to hold the branch. The owner publishes, as the owner pushes.
@@ -5430,3 +5412,39 @@ one overturns stays, marked as superseded.
   standing on the plate or on the rows over it is in front of the light in each of its
   states. The tower hall's three plates, the moon's, the sun's and the star's, say so.
   Rules out a figure hidden by a light it stands on.
+- **D333 — The published game holds no solution of a level.** Decided 2026-11-23 by the
+  owner (*en el juego publicado eso no se debe mandar, eso solo se queda en el
+  repositorio y en los servidores de prueba*). A build keeps each level's solution apart
+  from the game, under `__debug/solution/`, for the tester's button that writes it in
+  the editor (`?debug`). `ci/publish.sh` leaves that folder out of the branch it
+  publishes, as it leaves the source maps out, and on the published host the tester's
+  mode has no such button (`level.ts`, by `published()`); the rest of the mode is the
+  same there, every stop of the map open and the scene's layers. A computer of one's
+  own and a server of trials have the button and the solutions. The build is one for
+  every place it runs: the publication takes from it, and the page asks where it is.
+  `tests/project/test_published.py` holds the folder's name equal in `pack-world.mjs`
+  and in the script and publishes a build with a solution in it, and
+  `e2e/published.spec.ts` looks for the button under the published name. Rules out a
+  solution one request away from a child, and a build made apart for the publication.
+- **D334 — Each run and each hint read is told to Google Analytics.** Decided 2026-11-23
+  by the owner (*Añade los dos eventos que has propuesto para GA, nos ayudarán a saber
+  si los niños se están atascando o les está siendo muy fácil un nivel*). A visit won
+  or left (D328) says how a visit ended; these say what happened in it. `program_run`
+  is told as a run ends, with the level, the seconds played in it so far, the programs
+  run with this one (`runs`), how it ended (`result`, the outcome's kind: `won`,
+  `way_won`, `incomplete`, `too_many_ticks`, `interrupted`, `caught`, `failed`, `error`)
+  and, for an error, its kind (`error_kind`): the kind the world explains it by (D22:
+  `missing_colon`, `unknown_name`, `indentation`), or Python's name of an error the
+  world has no kind for, from a closed list (`ZeroDivisionError`), or `other`. A class
+  of the child's own is a name the child wrote and is never told, and neither is an
+  error's message or its line. `hint_read` is told as a hint is shown, with the level,
+  the seconds, the runs before it and the hint's number (`hints`). Both carry the
+  game's language, as every event does, and reuse the names a visit already tells
+  (`level`, `seconds`, `runs`, `hints`), so that Google Analytics has two names more to
+  be taught, `result` and `error_kind`. The seconds are the play time's (D70), which
+  grows ten seconds at a time. They go where a visit goes: to Google Analytics, on the
+  published host, in a browser that said yes (`pages.ts`, `analytics.ts`); GoatCounter
+  is told of neither. So a level where many runs fail and many hints are read is one
+  where children are stuck, and a level won at the first run with no hint asks nothing
+  of them. Rules out the program's text, an error's message or a name of the child's
+  sent anywhere, and an event at every tick of a run.

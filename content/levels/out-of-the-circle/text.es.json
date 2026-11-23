@@ -18,7 +18,7 @@
   "told": {
     "go": "Si ya estás segur{o|a}, adelante.\n\nEscribiré tu descripción y tu conjuro en el libro de Arvelia, y quedará conjurado para siempre.",
     "not_yet": "Así no funciona, si estás segur{o|a} de que quieres crear tu familiar…\n\n…necesitas sacarlo y llevarlo al lugar correcto.",
-    "halt": "¡Alto! Ya tienes un familiar, y eso es más que suficiente. No puedes crear otro.",
+    "halt": "¡Alto! Ya has completado este nivel, y ahora solo estás repitiéndolo para practicar.\n\nYa tienes un familiar, y eso es más que suficiente: no puedes crear otro.",
     "copy": "¡Espera, que lo copio otra vez!\n\n¡Quiero asegurarme de que tengo lo mismo que tú, mejor no tener problemas!"
   }
 }

@@ -18,7 +18,7 @@
   "told": {
     "go": "If you are sure, go ahead.\n\nI will write your description and your conjuring in the book of Arvelia, and it will be conjured for ever.",
     "not_yet": "That is not how it works: if you are sure you want to make your familiar…\n\n…you need to take it out and lead it to the right place.",
-    "halt": "Stop! You have a familiar already, and that is more than enough. You cannot make another.",
+    "halt": "Stop! You have already completed this level, and now you are only repeating it for practice.\n\nYou have a familiar already, and that is more than enough: you cannot make another.",
     "copy": "Wait, I'll copy it again!\n\nI want to be sure I have the same as you. Better to have no trouble!"
   }
 }

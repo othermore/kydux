@@ -244,9 +244,10 @@ export class Playback {
   }
 
   /** Holds the tick being shown, from a tick listener, until words said in it are read
-   * (D264): `ms` at speed 1, TOLD_MOST at most, divided by the speed as the tick is. */
-  holdTick(ms: number): void {
-    this.holding = Math.max(this.holding, Math.min(ms, TOLD_MOST));
+   * (D264): `ms` at speed 1, TOLD_MOST at most, divided by the speed as the tick is; `most`
+   * is the sum of its pieces' where the words are said in several bubbles (D274). */
+  holdTick(ms: number, most: number = TOLD_MOST): void {
+    this.holding = Math.max(this.holding, Math.min(ms, most));
   }
 
   /** A figure's run of flown steps from the tick shown on, read ahead (D259). */

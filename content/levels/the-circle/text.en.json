@@ -10,10 +10,10 @@
     "Last, `wizard.cast` with two things: `\"minka\"` and the name you kept your creature with."
   ],
   "intro": "Look: {friend} already has a trial in the circle. Now you: describe a kind of familiar, make one and call it into the circle. The six kinds are in my book.",
-  "outro": "Trials come undone by themselves, so no harm done. Next time you will give it its name and its colour.",
+  "outro": "Luckily, as long as you do not take it out of the circle, it is only a trial, and it soon vanishes.\n\nNext time you will give it its name and its colour.",
   "learned": "Now you know that a class describes a kind of thing, and that an object is one thing made with it, with the class's name and brackets; the name you keep it with is only your program's name for it.",
   "told": {
-    "won": "It is {familiar_a_kind}, yes. But it does not know its colour yet, nor what it is called.",
+    "won": "Not bad. At least it is {familiar_a_kind}, yes.\n\nBut it does not know its colour yet, nor what it is called.\n\nThat is why it is not conjured whole.",
     "bimo": "*(Opens one eye, and closes it again.)* Mrrr…"
   }
 }

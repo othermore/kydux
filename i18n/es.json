@@ -783,25 +783,24 @@
     "practice": "Ya tienes un familiar: aquí puedes practicar todo lo que quieras, pero no puedes crear otro, y nada de lo que hagas se guarda."
   },
   "told": {
-    "other_attribute": "Eso, `{name}`, todavía no. Los de primero solo podéis darle a vuestro familiar un nombre, `name`, y un color, `color`.",
-    "other_method": "`{name}` pide una magia que se aprende en otros cursos: los de primero todavía no podéis enseñarle eso a un familiar.",
-    "other_name": "En la descripción de un familiar de primero no cabe `{name}`: eso pide una magia de otros cursos.",
-    "go_to_not_yet": "`go_to`, todavía no. Ir a un sitio se le enseña a un familiar cuando ya vive, no antes.",
+    "other_attribute": "Eso, `{name}`, todavía no.\n\nLos de primero solo podéis darle a vuestro familiar un nombre, `name`, y un color, `color`.",
+    "other_method": "No intentéis adelantaros, os quedan años por delante.\n\nPara hacer cosas como `{name}` todavía os faltan algunos años.",
+    "other_name": "No intentéis adelantaros, os quedan años por delante.\n\nPara añadir otras cosas a la descripción de un familiar, como `{name}`, todavía os faltan algunos años.",
+    "go_to_not_yet": "Es pronto para enseñar `go_to` a tu familiar.\n\nIr a un sitio se le enseña a un familiar cuando ya ha salido del círculo, no antes.",
     "not_a_familiar": "`minka` solo llama a familiares, y tu clase no dice que lo sea.",
     "class_changed": "La descripción de un familiar vivo ya no se cambia: solo se le añade lo que aprende.",
-    "name_letters": "El libro no admite «{name}»: el nombre de un familiar es una sola palabra, y solo de letras.",
-    "name_long": "El libro no admite «{name}»: es demasiado largo. Doce letras, como mucho.",
-    "name_taken": "El libro no admite «{name}»: ese nombre ya lo usan Python o el colegio. Elige otro.",
+    "name_letters": "No puedo escribir «{name}» como nombre en el libro…\n\n…el nombre de un familiar es una sola palabra, y solo de letras.",
+    "name_long": "No puedo escribir «{name}» como nombre en el libro: es demasiado largo. Doce letras, como mucho.",
+    "name_taken": "No puedo escribir «{name}» como nombre en el libro: ese nombre ya lo usan Python o el colegio. Elige otro.",
     "spark": "Los de primero solo podéis tener familiares de seis tipos, y ese no es uno de ellos.",
-    "pale_colour": "Dar a {familiar_a_kind} un color que no es el suyo pide una magia fuera del alcance de los de primero.",
-    "pale_grey": "{wizard}, tú no eres tan {bueno|buena} como {friend}, y lo de la liebre gris no te va a salir bien.",
+    "pale_colour": "Dar a {familiar_a_kind} un color que no es el suyo requiere una técnica fuera del alcance de los de primero.",
+    "pale_grey": "{wizard}, que tu compañer{{o|a}} {friend} lo haya conseguido no debe confundirte.\n\nLograr un animal de un color no natural es algo muy difícil para los alumnos de primero.",
     "halt": "¡Alto! Ya tienes un familiar, y eso es más que suficiente. No puedes crear otro."
   },
   "book": {
-    "pencil": "El libro lo anota a lápiz:",
-    "ink": "El libro lo escribe a tinta:",
+    "line": "El libro puede conjurarla en una sola línea:",
+    "written": "Orla escribe tu conjuro en el libro de Arvelia:",
     "cannot": "Tu clase no sabe hacer un familiar con un nombre y un color.",
-    "colours": "Los colores de {kind}, como se escriben:",
-    "order": "Orla manda:"
+    "colours": "Los colores de {kind}, como se escriben:"
   }
 }

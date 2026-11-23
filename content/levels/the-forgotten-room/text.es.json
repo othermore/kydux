@@ -10,8 +10,8 @@
     "Lo que ve tu familiar lo ves tú: desde el cuarto, `wizard.find_all` con `\"thread\"` da la lista de los trozos.",
     "Recorre esa lista con `for` y manda a tu familiar a la x y la y de la posición de cada trozo; al final, `minka` lo trae de vuelta con todo."
   ],
-  "intro": "Se lo prometimos a Rinlo. Que {familiar} vaya a por todos los trozos, y luego haz que vuelva contigo.",
+  "intro": "Tenemos que ayudar a Rinlo. Que {familiar} vaya a la habitación, recoja todos los trozos y vuelva contigo.",
   "outro": "¡Los tienes todos! … ¿Has oído eso? Un cerrojo, arriba.",
-  "changes": "Rinlo tiró los trozos sin mirar dónde caían.",
+  "changes": "Los trozos están desperdigados por todo el suelo. Podrían estar en cualquier parte.",
   "changed": "Esta vez, los trozos han caído en otros sitios del cuarto."
 }

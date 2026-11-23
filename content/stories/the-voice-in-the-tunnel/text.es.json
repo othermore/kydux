@@ -1,14 +1,17 @@
 {
   "title": "La voz en el túnel",
   "steps": [
-    "{familiar} está dentro del cuarto. El pasadizo trae los sonidos como un tubo, y los tres os agacháis junto a la boca.",
+    "{familiar} está dentro del cuarto. Por el pasadizo llegan voces y los tres os agacháis para intentar escuchar.",
     "Alguien deshizo tus nudos, Rinlo. Yo sé quién fue. Se llama {wizard}.",
-    "{familiar}, que ha nacido hoy, se encoge de miedo y vuelve a toda prisa por el pasadizo hasta tus pies.",
+    "{familiar} se encoge de miedo y vuelve a toda prisa por el pasadizo, hasta tus pies.",
     "Te queda un hilo. Átalo a su varita. Su próximo hechizo le estallará en las manos.",
-    "No. Dijiste que nadie se haría daño, ¡y casi se caen todos! No. Vete.",
-    "Se oye algo que se rompe, una vez y otra. Luego, silencio. La voz no contesta.",
-    "¿Rinlo? Te hemos oído. Le has dicho que no. Baja. Se lo contamos a Orla contigo.",
-    "Lo he roto. Lo he hecho trozos. No puedo salir ahí fuera. Llevaos los trozos. No quiero ni tocarlos.",
-    "Pues que los traiga {familiar}. Todos."
+    "No. Dijiste que nadie se haría daño. Lo de las escobas fue peligroso, y esto podría matar{lo|la}.",
+    "No. Vete, vete de aquí.",
+    "Oís algunos ruidos más. Luego, silencio. La voz no contesta.",
+    "¿Rinlo? ¡Escucha! Te hemos oído. Podemos ayudarte, sabemos que te has resistido y le has dicho que no.",
+    "Baja con nosotros e iremos todos a hablar con Orla para que nos ayude.",
+    "Lo he roto. He hecho añicos todo el hilo… pero sigue estando aquí, lo siento y me da miedo.",
+    "No puedo salir ahí fuera. Llevaos los trozos, alejadlos de mí. No quiero ni tocarlos.",
+    "{familiar} puede traerlos, así quizás Rinlo se calme."
   ]
 }

@@ -254,7 +254,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     // The voice has no name: only a figure's words are kept as said by someone.
     const said = current && !byVoice ? current : null;
     const who = said?.who === 'wizard' ? forWizard('{wizard}') : said ? characterName(said.who) : '';
-    heard.textContent = said ? `${who}: ${said.text.replace(/[`*_]/g, '')}` : '';
+    heard.textContent = said ? `${who}: ${said.text.replace(/[`*]/g, '')}` : '';
     // While a figure speaks in its bubble, the band shows who it is (D194).
     const face = said ? portraitOf(said.who, progress.wizard()?.look) : null;
     // A voice with no figure and no portrait, the cold voice, by its name alone (D264).

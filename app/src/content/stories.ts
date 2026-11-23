@@ -49,6 +49,9 @@ export interface StoryStep {
   still?: boolean;
   /** Holds the story's letter before its still (D257): the first steps over the still. */
   letter?: boolean;
+  /** A figure's words said as the step begins, its actions played under them (D275):
+   * someone speaks while someone else is still on their way. */
+  meanwhile?: boolean;
 }
 
 /** A part of a story told on another scene (39.4): from its first step on, the
@@ -153,7 +156,8 @@ function waypoints(walk: Tile | Tile[]): Tile[] {
  * play at once (D103): at each tick, each figure with an event left plays its
  * next, in the order the figures are first named. An event of a figure other
  * than the step's `by`, or its speaker, says `aside`, for the camera to keep
- * with the one the step is about. */
+ * with the one the step is about. A figure's words come after its step's actions,
+ * or, in a step that says `meanwhile`, in the tick of the first of them (D275). */
 export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   events: WorldEvent[];
   spans: { first: number; last: number }[];
@@ -298,6 +302,9 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
         queue.push({ kind: 'close', data: { id: action.close, ...aside } });
       }
     }
+    // Words said as the step begins, in the tick of its first actions (D275).
+    const under = step.meanwhile === true && step.who !== 'voice' && [...queues.values()].some((queue) => queue.length > 0);
+    if (under) events.push({ tick, actor: step.who, kind: 'say', data: { text: step.text }, line: null });
     while ([...queues.values()].some((queue) => queue.length > 0)) {
       for (const [actor, queue] of queues) {
         const next = queue.shift();
@@ -310,7 +317,7 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
       }
       tick += 1;
     }
-    if (step.who !== 'voice') add(step.who, 'say', { text: step.text });
+    if (step.who !== 'voice' && !under) add(step.who, 'say', { text: step.text });
     spans.push({ first, last: tick - 1 });
   }
   return { events, spans };

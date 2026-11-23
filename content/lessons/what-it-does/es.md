@@ -1,6 +1,8 @@
 # Lo que hace
 
-Tu familiar ya sabe cosas, y sabe hacer lo que hace todo familiar. Ahora va a saber hacer algo suyo. Usas métodos desde el primer día: `wizard.move_up()` usa un método de `wizard`. Hoy vas a escribir uno.
+Tu familiar ya sabe cosas: sabe hacer lo que hace todo familiar. Ahora le vas a enseñar una nueva habilidad.
+
+Hasta ahora has usado métodos en los objetos: `wizard.move_up()` usa un método de `wizard`. Hoy vas a escribir tu propio método.
 
 ---
 ## Escribir un método
@@ -28,14 +30,14 @@ Lo que va antes del punto es lo que Python pone en `self`. Por eso entre los par
 ---
 ## Para qué sirve
 
-Quien sepa el nombre del método puede mandar a tu familiar sin saber cómo está hecho por dentro.
+Sabiendo el nombre del método puedes hacer que tu familiar lo ejecute sin saber cómo está hecho por dentro.
 
 Dentro de un método, `self` puede usar todo lo que tiene el objeto: sus atributos y sus otros métodos, también los que hereda.
 
 ---
 ## Dos órdenes
 
-Aquí Vesso recibe dos órdenes. Después de cada una dice cuántas veces ha saltado ya: tres, y luego cinco.
+Vamos a enseñar a Vesso a saltar y contar sus saltos. Cada vez que le digas que salte, te dirá cuántas veces ha saltado.
 
 ```python try
 class Crow:

@@ -710,7 +710,7 @@ METAPHORS = {
 }
 #: What says it in the ordinary sense, of no programming idea, or recalls it once in
 #: parentheses, as the owner allows the second time.
-MAY_SAY = {"story:the-letter", "level:the-lost-book"}
+MAY_SAY = {"story:the-letter", "story:the-tower", "level:the-lost-book"}
 
 
 @pytest.mark.parametrize("lang", LANGUAGES)

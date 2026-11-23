@@ -352,7 +352,7 @@ tiles are `[x, y]`.
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved before its minka), and the first year's warnings, `by` `orla` or `book`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, told as Orla's or the book's words (D264) and ending the run in a refusal |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved before its minka), and the first year's warnings, `by` `orla`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, told as Orla's words (D264) and ending the run in a refusal |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `vanish` | in a story, an actor, or the wizard at the story's very end | | the figure fades out of sight (D74) |
 | `appear` | in a story, an actor | `at`; `from`, a cell beside it, when it steps out from behind a thing there | the figure comes into sight on its cell: walking out from `from`, behind what stands there, over the tick (D128), or fading in (D74) |
@@ -367,9 +367,9 @@ tiles are `[x, y]`.
 | `judged` | wizard, a tick after a race is flown out | `at`; `lines`, `flight`, `missed`, `penalty` and `tick`, Ilda's count of the wizard, `flight` and `tick` null when it has not crossed; `racer`, `racer_lines`, `racer_tick`; `winner`, `wizard`, the racer's id, or null for a tie | the band says Ilda's verdict: the ticks each one took, the wizard's penalty when it has one, the winner or the tie; `data-race-verdict` (D234) |
 | `trial` | the trial, in the wizard's tick of minka | `id` (`familiar_<n>`), `kind`, `name`, `color`, `at`, `pale` and its `reason` (`colour`, `grey`, `none` or null), `dissolved`, the trial whose cell it takes | the creature drawn in light from its sheet (D263), fading in with a burst and the `trial` sound: whole and washed towards white with an edge of light, or, pale, its lines alone in white light, trembling; the trial it replaces dissolves; `data-creatures`, `data-trials` |
 | `spark` | the trial, in the wizard's tick of minka | `id`, `kind`, `at` | a shapeless spark of light where the trial would stand, for three ticks (D261) |
-| `told` | the actor who speaks, or `book`, in the tick going on | `who`, `key`; `kind`, `name`, `color`, `line` for its words | the level's or the chapter's words in a bubble over who says them, from a spot of the scene for a voice painted into it, or in the book's band; the playback holds until they are read (D264); `data-told` |
-| `book` | `book`, in the tick of minka or after the program | `line`, `ok`, `ink`; or `kind` and `colors`, a kind's colours | the band under the scene: the line noted in pencil or in ink, the book's words when the class cannot make the familiar, or the kind's colours as the strings to write (D267); `data-book-band` |
-| `order` | `orla`, after the program | `line`, the line the world runs; `to` | the band shows the line, and the familiar's steps follow as its own (D267) |
+| `told` | the actor who speaks, or `book`, in the tick going on | `who`, `key`; `kind`, `name`, `color`, `line` for its words | the level's or the chapter's words in a bubble over who says them, from a spot of the scene for a voice painted into it, or in the book's band, a bubble for each of their pieces (D274); the playback holds until they are read (D264); `data-told` |
+| `book` | `book`, in the tick of minka or after the program | `line`, `ok`, `ink`; or `kind` and `colors`, a kind's colours | the band under the scene: the line that conjures the trial, which the book can conjure or, with `ink`, Orla writes in it; the book's words when the class cannot make the familiar; or the kind's colours as the strings to write (D267); `data-book-band` |
+| `order` | `orla`, after the program | `line`, the line the world runs; `to` | the band shows the line alone, the order being what Orla says, and the familiar's steps follow as its own (D267) |
 | `held` | the trial, in the birth level's run that does not pass | `at`, `to`, `facing` | the trial nudges at the circle's edge with the bump's sound, and a footprint of light on the cell it would reach (D268) |
 | `footprint` | the trial, after a step held | `from`, `at`, `facing` | a footprint of light on the cell the step would reach (D268); `data-footprints` |
 | `born` | the familiar, in the step that leaves the circle, or another's after the program | `id`, `at` | the trial takes its living sheet, with a burst (D268) |
@@ -4063,7 +4063,7 @@ one overturns stays, marked as superseded.
   `stage` is `trial` (a level where the description is tried), `birth` (the level where it
   leaves the circle) or `living` (a level played with the familiar there); `circle` is the
   rectangle of cells inside the ring; `trials` the cells where a trial appears, in order;
-  `methods` what a class may define; `book` whether the book tries to note the trial (D267);
+  `methods` what a class may define; `book` whether the book tries the line that conjures the trial (D267);
   `then` what follows a won run (D268); `draft` and, in a `living` level, `living` (`kind`,
   `name`, `color`, `source`, `at`, `facing`) are the level's own defaults, so that any level
   plays alone (D49), the tests run it and `#level/<id>` opens it under `?debug`; the page
@@ -4078,7 +4078,8 @@ one overturns stays, marked as superseded.
   and `other_name` (in the class's body), `go_to_not_yet` (a `go_to` before the level that
   teaches it), `not_a_familiar` (`minka` on an object of a class without `(Familiar)`:
   *`minka` solo llama a familiares, y tu clase no dice que lo sea*), `class_changed` (D269),
-  by Orla; and `name_letters`, `name_long`, `name_taken`, by the book. A **flawed trial**
+  and `name_letters`, `name_long`, `name_taken`, a name Orla cannot write in the book (*no
+  puedo escribir «Pimu Dos» como nombre en el libro*); all are Orla's. A **flawed trial**
   does not stop anything: a kind that is not of the first year gives a shapeless spark of
   light where the trial would stand, and Orla's words (`spark`); a colour that is not the
   kind's own gives the trial with no colour (`pale: true`, reason `colour`), Orla's words
@@ -4139,7 +4140,7 @@ one overturns stays, marked as superseded.
   [["orla", "won"], ["bimo", "bimo"]]}`, and said in that order after the goals. Someone
   painted into a scene speaks from a spot the scene names (`scene.json`, `"voices": {"bimo":
   [9, 3]}`); a story's `who` with no actor of that id speaks from the same spot. A warning
-  (D261) is told the same way, by Orla or in the book's band (D267). Rules out words of the
+  (D261) is told the same way, by Orla. Long words are said in pieces (D274). Rules out words of the
   story in the outcome card only, and a run that goes on under an unread bubble.
 - **D265 — The draft and the familiar are kept with the game, and written into the level.**
   Decided 2026-11-17 from the design. `Progress` has `familiar?: {draft?: {kind, name?,
@@ -4174,16 +4175,19 @@ one overturns stays, marked as superseded.
   says `book`, when the program has ended with a good trial (a first-year kind, a name, its
   colour), the world calls the child's class itself as `Class(name, color)` with the trial's
   own name and colour, inside the sandbox and its limits, what it prints dropped, and looks
-  at the object it gets: the same name and colour, or the book cannot note it. The event
+  at the object it gets: the same name and colour, or the book cannot conjure it. The event
   `book` carries the line (`Fox("Pimu", "red")`), `ok`, and `ink` (true in the `birth`
-  level's passing run only); the page shows it in a band under the scene, written in pencil
-  or in ink, and failing with the book's words (*tu clase no sabe hacer un familiar con un
-  nombre y un color*). In level 12, when the program has ended with the familiar on the
+  level's passing run only); the page shows it in a band under the scene, under the words
+  for what the book does with it: it can conjure the creature in a single line (*el libro
+  puede conjurarla en una sola línea*, the band's look `line`); with `ink`, Orla writes the
+  child's conjuring in the book of Arvelia (*Orla escribe tu conjuro en el libro de
+  Arvelia*, `written`); or it fails, with the book's words (*tu clase no sabe hacer un
+  familiar con un nombre y un color*, `cannot`). In level 12, when the program has ended with the familiar on the
   sun's plate, the world gives Orla's two orders, which the level's block names (`"orders":
   {"on": "sun", "steps": [{"to": [13, 10], "key": "order_star"}, {"to": [11, 10], "key":
   "order_wizard"}]}`): for each, an `order` event with the line the world runs
-  (`pimu.go_to(13, 10)`, then `pimu.go_to(11, 10)`) shown in the band, her words (`told`),
-  and the call of the child's `go_to`, its steps ticks as any (D270) with the child's lines
+  (`pimu.go_to(13, 10)`, then `pimu.go_to(11, 10)`) shown alone in the band (`order`), her
+  words (`told`, the order itself: *Pimu: ¡A la estrella!*), and the call of the child's `go_to`, its steps ticks as any (D270) with the child's lines
   inside `go_to` lit. An error inside is explained as the child's own and the goal stays
   unmet. Rules out a check of the program's text for `__init__` or `go_to`.
 - **D268 — The fourth level's program is rehearsed, and a familiar is born once.** Decided
@@ -4192,8 +4196,8 @@ one overturns stays, marked as superseded.
   `run_code` runs the program twice, each in a new world. The first run is silent, a
   rehearsal in which the trial crosses the circle's edge freely. The verdict is `passes`
   when the rehearsal is won and no familiar lives in the game. The second run is the one
-  shown, played by the verdict. *Passing*: at the `minka` Orla speaks (`go`) and the book
-  notes the line in ink; the step that leaves the circle gives the event `born`; after the
+  shown, played by the verdict. *Passing*: at the `minka` Orla speaks (`go`) and writes
+  the line in the book (D267); the step that leaves the circle gives the event `born`; after the
   program, the level's `then` (the room-mate's trial steps out of the circle and lives, a
   tick of the world's). *Not passing*: the trial walks inside the circle; the step that
   would leave it is `held` (a tick, the line lit, the trial at the edge), and every step
@@ -4287,4 +4291,29 @@ one overturns stays, marked as superseded.
   "familiar", "kind": "familiar"}` in a story. Orla has a walking sheet (`orla`, an adult)
   and Rinlo a sitting row. The thread's piece and the trail's end are sprites (D182). A
   level's plan is its scene's picture in ink (D143, D151). Rules out illustrations for the
-  stories (D74), and a picture of Bimo awake, of the tin box, of the slate and of the spark.
+  stories (D74), and a picture of Bimo awake, of the friend's little box, of the slate and of
+  the spark.
+- **D274 — Long words are said in pieces.** Decided 2026-11-17 by the owner (*los diálogos
+  que se hacen con burbujas no deben ser muy largos, pero se pueden partir en trozos
+  incluso a mitad de frase con ... para hacerlos más cortos*). A bubble holds some 110
+  characters at most, and a story's narration some 185. Words told in a run (D264) may be
+  written in several pieces, a blank line between them: each piece is a bubble of its own,
+  one after another over the same speaker, each for its own reading time (D175), and the
+  playback holds the tick for the sum of them (`toldPieces`, `Speech.sayPieces`,
+  `Playback.holdTick`); a run shown at once shows the last piece. A sentence cut in two
+  ends its piece with `…` and begins the next with `…`; where the words are read whole,
+  on the outcome's card and in the book's band, the pieces are joined with a space and
+  such a sentence is whole again (`toldWhole`). In a story, long words are several steps
+  of the same speaker, the later ones with `"do": null`. A level's cards, its `intro` and
+  `outro`, part their words in paragraphs at each blank line (`saidParagraphs`). A bubble
+  shows a name written as code with its underscores, `__init__`: only the backquotes and
+  the asterisks of emphasis are left out. Rules out a bubble that covers the scene, and
+  words cut by the game at a length rather than by who writes them.
+- **D275 — A figure may speak while its step's actions play.** Decided 2026-11-17 by the
+  designer, from the owner's corrections of chapter 5's stories (the cold voice names the
+  wizard while the familiar runs back along the passage). A story's step says its words
+  once its actions are done; a step with `"meanwhile": true` says them as it begins, in
+  the tick of its first actions, which play under the bubble. It is for a figure's step
+  that does something: `story_on_scene` refuses it on the voice's step, whose words
+  already stand in the band while its actions play, and on a step with `"do": null`.
+  Rules out a second timeline for a story's words.

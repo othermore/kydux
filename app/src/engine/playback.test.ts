@@ -356,4 +356,19 @@ describe('words said in a run (D264)', () => {
     vi.advanceTimersByTime(1);
     expect(shown).toEqual([1, 2]);
   });
+
+  it('holds a tick for words said in pieces as long as all of them take (D274)', () => {
+    const playback = new Playback({ tickMs: 400 });
+    const shown: number[] = [];
+    playback.onTick((tick) => {
+      shown.push(tick);
+      if (tick === 1) playback.holdTick(25_000, 25_000);
+    });
+    playback.load(events(2));
+    playback.play();
+    vi.advanceTimersByTime(24_999);
+    expect(shown).toEqual([0, 1]);
+    vi.advanceTimersByTime(1);
+    expect(shown).toEqual([0, 1, 2]);
+  });
 });

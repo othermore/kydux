@@ -1,6 +1,6 @@
 # Lo que hereda
 
-Esta es la descripción de tu última prueba. Mira su primera línea. Esto lo has escrito desde el primer día, y no te he dicho qué es.
+Mira esta descripción de {familiar_a_kind}. En la primera línea hay algo de lo que no te he contado mucho todavía: `Familiar`.
 
 ```python
 {familiar_source}
@@ -11,7 +11,7 @@ Esta es la descripción de tu última prueba. Mira su primera línea. Esto lo ha
 ---
 ## La clase `Familiar`
 
-En la primera línea dices que un `{familiar_class}` es un `Familiar`. `Familiar` es otra clase, y está escrita en este libro desde mucho antes de que tú llegaras: describe lo que tiene todo familiar de Arvelia.
+Con la primera línea dices que un `{familiar_class}` es un `Familiar`. `Familiar` es otra clase, y está escrita en este libro desde mucho antes de que tú llegaras: describe lo imprescindible para todo familiar de Arvelia, y así os ponemos las cosas un poco más fáciles a los de primer curso.
 
 Una clase que dice que es de otra tiene todo lo que tiene la otra, sin escribirlo. Eso se llama **heredar**.
 
@@ -20,21 +20,23 @@ Una clase que dice que es de otra tiene todo lo que tiene la otra, sin escribirl
 
 Tu familiar sabe dónde está, `position`, y sabe andar, con `move_up`, `move_down`, `move_left` y `move_right`. Son los mismos nombres que usa tu `wizard`, y hacen lo mismo.
 
-En cuanto salga del círculo, estará en tus programas con su nombre.
+En cuanto salga del círculo, tu familiar pasará a ser un objeto que estará en tus programas con su nombre, igual que está `wizard`.
 
 ---
 ## Una clase vacía
 
-Aquí hay un `Familiar` pequeño, escrito a la vista. La clase `Crow` está vacía, y aun así Vesso nace con su nombre: hereda el `__init__` de `Familiar`.
+Aquí hay dos clases que no son de familiares. `Person` describe a una persona, que tiene un nombre. `Student`, la de un alumno, dice que es una `Person`, y está vacía.
+
+Aun así, Tavi se crea con su nombre: `Student` hereda el `__init__` de `Person`.
 
 ```python try
-class Familiar:
+class Person:
     def __init__(self, name):
         self.name = name
 
-class Crow(Familiar):
+class Student(Person):
     pass
 
-vesso = Crow("Vesso")
-print(vesso.name)
+tavi = Student("Tavi")
+print(tavi.name)
 ```

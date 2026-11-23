@@ -693,8 +693,9 @@ footer .build {
   margin: 0;
 }
 
-/* The book's band at the scene's foot (D267): the line the book notes, in pencil or in
-   ink, its words when it cannot, a kind's colours, the line an order of Orla's runs. */
+/* The book's band at the scene's foot (D267): the line that conjures the trial, tried by
+   the book or written in it by Orla, its words when the class cannot, a kind's colours,
+   the line an order of Orla's runs. */
 .book-band {
   position: absolute;
   left: 10px;
@@ -730,13 +731,13 @@ footer .build {
   font-size: 17px;
 }
 
-/* In pencil, grey and faint; in ink, dark and firm. */
-.book-band[data-look='pencil'] code {
+/* A line the book tries, grey and faint; the line Orla writes in it, dark and firm. */
+.book-band[data-look='line'] code {
   color: #6b6f7a;
   font-style: italic;
 }
 
-.book-band[data-look='ink'] code {
+.book-band[data-look='written'] code {
   color: #14213d;
   font-weight: bold;
 }
@@ -1137,6 +1138,12 @@ footer .build {
 
 .card-said strong::after {
   content: ':';
+}
+
+/* A paragraph after the first of what is said on a card. */
+.card-said-more {
+  display: block;
+  margin-top: 8px;
 }
 
 .card-carrying {

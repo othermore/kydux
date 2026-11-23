@@ -240,7 +240,7 @@ class Order:
 @dataclass(frozen=True)
 class FamiliarBlock:
     """A level's `familiar` block (D260): its stage, the circle and the cells its trials
-    stand on, the methods a class may define, whether the book notes the trial, what
+    stand on, the methods a class may define, whether the book tries the trial's line, what
     follows a won run, the level's own draft and living familiar, which of the living
     one's classes plays, and Orla's orders with the plate they follow."""
 
@@ -2120,6 +2120,14 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
             holding_letter = False
         if "by" in step and doing is None:
             raise LevelError(f"{here}: by names who does the action, and there is none")
+        if "meanwhile" in step:
+            # A figure's words said while the step's actions play (D275).
+            if step["meanwhile"] is not True:
+                raise LevelError(f"{here}: meanwhile is true, or not given")
+            if who == "voice" or doing is None:
+                raise LevelError(
+                    f"{here}: meanwhile is for a figure's words, said while its actions play"
+                )
         if "camera" in step:
             _step_camera(step["camera"], here, width, height)
         actions = _story_actions(doing, here)

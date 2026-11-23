@@ -10,10 +10,10 @@
     "Al final, `wizard.cast` con dos cosas: `\"minka\"` y el nombre con el que has guardado tu criatura."
   ],
   "intro": "Mira: {friend} ya tiene su prueba en el círculo. Ahora tú: describe un tipo de familiar, haz uno y llámalo al círculo. Los seis tipos están en mi libro.",
-  "outro": "Las pruebas se deshacen solas, así que no pasa nada. La próxima vez le darás su nombre y su color.",
+  "outro": "Por suerte, mientras no lo saques del círculo, es solo una prueba que desaparece enseguida.\n\nLa próxima vez le darás su nombre y su color.",
   "learned": "Ahora sabes que una clase describe un tipo de cosa, y que un objeto es una cosa hecha con ella, con el nombre de la clase y unos paréntesis; el nombre con el que lo guardas es solo el que le da tu programa.",
   "told": {
-    "won": "Es {familiar_a_kind}, sí. Pero aún no sabe de qué color es ni cómo se llama.",
+    "won": "No está mal. Al menos, es {familiar_a_kind}, sí.\n\nPero aún no sabe de qué color es ni cómo se llama.\n\nPor eso no llega a conjurarse por completo.",
     "bimo": "*(Abre un ojo, y lo vuelve a cerrar.)* Mrrr…"
   }
 }

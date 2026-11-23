@@ -30,8 +30,8 @@ La última línea da un error, y es justo el que hay que ver: `other` es otro ob
 ---
 ## Dos atributos, y nada más
 
-El libro lo dice claro: el familiar de un alumno de primer curso tiene dos atributos, `name` y `color`, y ninguno más. El nombre es una sola palabra.
+Como os dije antes, las reglas son claras para los alumnos de primero: el familiar de un alumno de primer curso tiene dos atributos, `name` y `color`, y ninguno más. El nombre es una sola palabra.
 
 El color es uno de los naturales de su tipo: un zorro puede ser `"red"`, `"white"` o `"black"`; un cuervo, `"black"` o `"white"`; un murciélago, `"black"` o `"white"`; una liebre, `"brown"` o `"white"`; un ratón, `"brown"` o `"white"`, y una rana, `"green"` o `"red"`. Gris, nunca.
 
-Los demás colores, y los demás atributos, piden una magia que se aprende en cursos más altos.
+Los demás colores, y los demás atributos, necesitan conocimientos mágicos más profundos, y no podréis hacerlo hasta cursos más altos.

@@ -1,12 +1,24 @@
 {
   "title": "El rastro",
   "steps": [
-    "La prueba ha terminado, y en la sala hay tres criaturas que esta mañana no existían. Orla cierra el libro: «Cuidadlos. Lo que ve vuestro familiar, lo veis vosotros. Y su nombre, solo a quien queráis de verdad.» Y baja a buscar a la clase siguiente.",
-    "{familiar} no se aparta del bolsillo de {friend}, que exclama: «¡Eh! Ahí llevo la caja de los hilos.»",
-    "La criatura cruza la sala como una flecha y se mete por un arco diminuto que hay al pie de la pared. Se la oye moverse por dentro del muro. Vuelve trayendo algo: un hilo negro, con el mismo nudo.",
-    "Lo he leído. El castillo está lleno de pasadizos pequeños: los hicieron para que los familiares llevaran recados de una sala a otra. Una persona no cabe. Ni nosotros.",
-    "Quien anudó las escobas guarda hilo ahí dentro.",
-    "«Y si sabemos dónde, ya no son tres hilos en una caja», dice {friend}. Bajáis un piso. En el pasillo de debajo de la sala, a ras de suelo, el pasadizo tiene otra boca, pequeña como una gatera. Dentro, a la luz de la varita, otro hilo.",
-    "No me cabe ni la cabeza. {familiar} sí."
+    "La prueba ha terminado, y en la sala hay tres criaturas que esta mañana no existían. Orla cierra el libro.",
+    "Cuidadlos. Son la criatura más cercana que siempre tendréis.",
+    "Dad su nombre solo a quien sea de vuestra absoluta confianza…",
+    "…pues quien conoce su nombre, puede invocarlo y darle órdenes.",
+    "Ahora, podéis iros, y yo me voy a enseñar a los alumnos de tercero cómo conjurar unicornios.",
+    "Y baja a buscar a la clase siguiente.",
+    "{familiar} no se aparta del bolsillo de {friend}.",
+    "¡Eh! ¿Qué pasa, {familiar}? En ese bolsillo llevo los hilos negros que encontramos al principio de curso.",
+    "La criatura cruza la sala como una flecha y se mete por un arco diminuto que hay al pie de la pared. Se la oye moverse por dentro del muro.",
+    "Vuelve trayendo algo: un hilo negro, exactamente igual que los que encontrasteis.",
+    "Oh, he leído sobre ello en *Mentiras y Verdades sobre Arvelia*, del prestigioso mago Juni Tamari.",
+    "El castillo está lleno de pasadizos pequeños…",
+    "…hechos para que los familiares puedan moverse rápido de un lado a otro…",
+    "…sin molestar al resto de habitantes del castillo.",
+    "Son tan estrechos que solo un animal pequeño cabe por ellos.",
+    "Pues estoy segur{o|a} de que al otro lado de ese pasadizo está el que preparó la trampa de las escobas.",
+    "Y si lo encontramos, tendremos la prueba que necesitamos para hablar con Orla.",
+    "Bajáis un piso. En el pasillo de debajo de la sala, a ras de suelo, el pasadizo tiene otra entrada, pequeña como una gatera. Dentro, a la luz de la varita, encontráis otro hilo.",
+    "No me cabe ni la cabeza, creo que tendremos que mandar a nuestros familiares."
   ]
 }

@@ -101,12 +101,23 @@ export interface Said {
   portrait?: string | null;
 }
 
+/** The paragraphs of words said on a card: a blank line in the text parts them. */
+export function saidParagraphs(text: string): string[] {
+  return text
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter((paragraph) => paragraph !== '');
+}
+
 function saidBy(said: Said, id: string): HTMLElement {
+  const [first = '', ...more] = saidParagraphs(said.text);
   return element('p', { id, className: 'card-said' }, [
     ...(said.portrait ? [portrait(said.portrait, 'small')] : []),
     element('strong', {}, [said.speaker]),
     ' ',
-    ...withCode(said.text),
+    ...withCode(first),
+    // Each paragraph after the first on a line of its own, under it.
+    ...more.map((paragraph) => element('span', { className: 'card-said-more' }, withCode(paragraph))),
   ]);
 }
 

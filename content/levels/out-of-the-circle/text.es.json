@@ -2,7 +2,7 @@
   "title": "Fuera del círculo",
   "goals": [
     "Una prueba con su nombre y su color.",
-    "El libro puede anotarla en una línea.",
+    "El libro puede conjurarla en una línea.",
     "Tu familiar ha salido del círculo.",
     "Está en el plato de la luna."
   ],
@@ -12,13 +12,13 @@
     "Un movimiento se usa con el punto, con el nombre que tu programa le da a tu familiar delante.",
     "Tres movimientos: dos pasos hacia abajo, cuatro a la izquierda y cinco hacia arriba."
   ],
-  "intro": "Mientras esté en el círculo, puedes deshacerlo y describir otro. Si lo sacas, vivirá. Piénsalo, y luego llévalo al plato de la luna.",
+  "intro": "Recuerda que mientras tu familiar esté en el círculo, puedes deshacerlo y describir otro. Si lo sacas, vivirá.\n\nPiénsalo bien antes de sacarlo, y luego llévalo al plato de la luna.",
   "outro": "{familiar} vive. Respira, tiene sombra, y te mira.",
   "learned": "Ahora sabes que tu familiar anda con movimientos que nunca escribiste, heredados de `Familiar`, con los mismos nombres que los de tu `wizard`, y que un objeto se usa con el punto, sea de una clase del juego o de la tuya.",
   "told": {
-    "go": "Si ya estás {seguro|segura}, adelante. Deja que escriba la descripción en el libro de Arvelia, y luego puedes crear tu familiar.",
-    "not_yet": "Así todavía no. Dentro del círculo puedes cambiarlo.",
+    "go": "Si ya estás segur{o|a}, adelante.\n\nEscribiré tu descripción y tu conjuro en el libro de Arvelia, y quedará conjurado para siempre.",
+    "not_yet": "Así no funciona, si estás segur{o|a} de que quieres crear tu familiar…\n\n…necesitas sacarlo y llevarlo al lugar correcto.",
     "halt": "¡Alto! Ya tienes un familiar, y eso es más que suficiente. No puedes crear otro.",
-    "copy": "¡Espera, que lo copio otra vez!"
+    "copy": "¡Espera, que lo copio otra vez!\n\n¡Quiero asegurarme de que tengo lo mismo que tú, mejor no tener problemas!"
   }
 }

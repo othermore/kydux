@@ -3,7 +3,7 @@
 // carried from the second level to the last, its name in the texts, its class in the
 // starting code and its sheet on the scene (D265, D266); a kind no first-year has gives a
 // spark and Orla's words (D261); a colour not the kind's own and the grey hare come pale,
-// a white fox whole (D263); the book notes the line (D267); the slate as given stops with
+// a white fox whole (D263); the book tries the line (D267); the slate as given stops with
 // the explanation of a missing self (D271); the birth rehearsed, a wrong program left in
 // footprints with nothing born, the birth kept, the level a practice after it and a second
 // familiar halted (D268); Orla's two orders walked and the class kept (D267); a go_to
@@ -126,7 +126,7 @@ test.describe('the familiar kept from level to level (D265, D266)', () => {
     expect(await editorText(page)).toContain('Haz a Nabi');
     await page.locator('#speed').selectOption('4');
     expect(await run(page, asNabi(solution('one-line-in-the-book')))).toMatch(won);
-    await expect(scene(page)).toHaveAttribute('data-book-band', 'pencil:Crow("Nabi", "white")');
+    await expect(scene(page)).toHaveAttribute('data-book-band', 'line:Crow("Nabi", "white")');
 
     // The slate copies the crow; the room-mate's is black.
     await page.goto('/#level/the-slate');
@@ -202,10 +202,10 @@ test.describe('the trials (D261, D263)', () => {
     await page.locator('#scene').screenshot({ path: `${SHOTS}trial-pale-beside-white.png` });
   });
 
-  test('the book notes the line in pencil', async ({ page }) => {
+  test('the book tries the line that conjures the trial', async ({ page }) => {
     await open(page, 'one-line-in-the-book');
     await run(page, solution('one-line-in-the-book'));
-    await expect(scene(page)).toHaveAttribute('data-book-band', 'pencil:Fox("Pimu", "red")');
+    await expect(scene(page)).toHaveAttribute('data-book-band', 'line:Fox("Pimu", "red")');
     await expect(page.locator('.book-band')).toBeVisible();
   });
 
@@ -247,7 +247,7 @@ test.describe('the birth (D268)', () => {
 
     expect(await run(page, solution('out-of-the-circle'))).toMatch(/^¡Lo has conseguido/);
     await expect(scene(page)).toHaveAttribute('data-told', /orla:go/);
-    await expect(scene(page)).toHaveAttribute('data-book-band', 'ink:Fox("Pimu", "red")');
+    await expect(scene(page)).toHaveAttribute('data-book-band', 'written:Fox("Pimu", "red")');
     expect((await kept(page))?.living).toMatchObject({ kind: 'Fox', name: 'Pimu', color: 'red' });
 
     // Played again, the level is practice, and a second familiar is halted.

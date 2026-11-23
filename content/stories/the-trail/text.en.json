@@ -1,12 +1,24 @@
 {
   "title": "The trail",
   "steps": [
-    "The trial is over, and in the hall there are three creatures that did not exist this morning. Orla closes the book: \"Look after them. What your familiar sees, you see. And its name, only to those you truly love.\" And she goes down to fetch the next class.",
-    "{familiar} will not leave {friend}'s pocket alone, and {friend} cries out: \"Hey! That's where I keep the box of threads.\"",
-    "The creature shoots across the hall like an arrow and slips into a tiny arch at the foot of the wall. You can hear it moving inside the wall. It comes back carrying something: a black thread, with the same knot.",
-    "I've read about it. The castle is full of small passages: they were made so that familiars could carry messages from one room to another. A person doesn't fit. Not even us.",
-    "Whoever knotted the brooms keeps thread in there.",
-    "\"And if we know where, it's no longer three threads in a box,\" says {friend}. You go down a floor. In the corridor under the hall, at the foot of the wall, the passage has another mouth, small as a cat flap. Inside, by the light of your wand, another thread.",
-    "Not even my head fits. {familiar} does."
+    "The trial is over, and in the hall there are three creatures that did not exist this morning. Orla closes the book.",
+    "Look after them. They are the closest creature you will ever have.",
+    "Give its name only to those you trust completely…",
+    "…for whoever knows its name can summon it and give it orders.",
+    "Now you may go, and I am off to teach the third-years how to conjure unicorns.",
+    "And she goes down to fetch the next class.",
+    "{familiar} will not leave {friend}'s pocket alone.",
+    "Hey! What is it, {familiar}? That's the pocket where I keep the black threads we found at the start of the year.",
+    "The creature shoots across the hall like an arrow and slips into a tiny arch at the foot of the wall. You can hear it moving inside the wall.",
+    "It comes back carrying something: a black thread, exactly like the ones you found.",
+    "Oh, I've read about this in *Lies and Truths about Arvelia*, by the renowned wizard Juni Tamari.",
+    "The castle is full of small passages…",
+    "…made so that familiars can move quickly from one place to another…",
+    "…without disturbing the rest of the castle's dwellers.",
+    "They are so narrow that only a small animal fits through them.",
+    "Well, I'm sure that at the other end of that passage is whoever set the trap with the brooms.",
+    "And if we find him, we'll have the proof we need to talk to Orla.",
+    "You go down a floor. In the corridor under the hall, at the foot of the wall, the passage has another entrance, small as a cat flap. Inside, by the light of your wand, you find another thread.",
+    "Not even my head fits. I think we'll have to send our familiars."
   ]
 }

@@ -35,7 +35,15 @@
       "do": null
     },
     {
-      "who": "zarek",
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "voice",
       "scene": {
         "scene": "the-entrance",
         "wizard": [
@@ -94,6 +102,30 @@
       ]
     },
     {
+      "who": "zarek",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "zarek",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "zarek",
+      "do": null
+    },
+    {
       "who": "mate",
       "do": {
         "walk": [
@@ -103,6 +135,18 @@
         "vanish": true
       },
       "by": "zarek"
+    },
+    {
+      "who": "mate",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "mate",
+      "do": null
     },
     {
       "who": "voice",
@@ -215,6 +259,38 @@
     },
     {
       "who": "voice",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
       "do": null
     },
     {

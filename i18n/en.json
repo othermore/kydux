@@ -783,25 +783,24 @@
     "practice": "You already have a familiar: you can practise here as much as you like, but you cannot make another, and nothing you do here is kept."
   },
   "told": {
-    "other_attribute": "That, `{name}`, not yet. First-years may only give their familiar a name, `name`, and a colour, `color`.",
-    "other_method": "`{name}` asks for magic learned in later years: first-years cannot teach a familiar that yet.",
-    "other_name": "There is no room for `{name}` in a first-year's description of a familiar: that asks for magic of later years.",
-    "go_to_not_yet": "`go_to`, not yet. A familiar is taught to go places once it lives, not before.",
+    "other_attribute": "That, `{name}`, not yet.\n\nFirst-years may only give their familiar a name, `name`, and a colour, `color`.",
+    "other_method": "Do not try to get ahead: you have years before you.\n\nThings like `{name}` are still some years away for you.",
+    "other_name": "Do not try to get ahead: you have years before you.\n\nAdding other things to a familiar's description, like `{name}`, is still some years away for you.",
+    "go_to_not_yet": "It is too soon to teach your familiar `go_to`.\n\nA familiar is taught to go places once it has left the circle, not before.",
     "not_a_familiar": "`minka` only calls familiars, and your class does not say it is one.",
     "class_changed": "A living familiar's description is never changed again: it only grows with what it learns.",
-    "name_letters": "The book will not take “{name}”: a familiar's name is a single word, of letters only.",
-    "name_long": "The book will not take “{name}”: it is too long. Twelve letters at most.",
-    "name_taken": "The book will not take “{name}”: Python or the school uses that name already. Choose another.",
+    "name_letters": "I cannot write “{name}” in the book as a name…\n\n…a familiar's name is a single word, of letters only.",
+    "name_long": "I cannot write “{name}” in the book as a name: it is too long. Twelve letters at most.",
+    "name_taken": "I cannot write “{name}” in the book as a name: Python or the school uses that name already. Choose another.",
     "spark": "First-years may only have familiars of six kinds, and that is not one of them.",
-    "pale_colour": "Giving {familiar_a_kind} a colour that is not its own asks for magic beyond a first-year.",
-    "pale_grey": "{wizard}, you are not as good as {friend} yet, and the grey hare will not come out well for you.",
+    "pale_colour": "Giving {familiar_a_kind} a colour that is not its own takes a skill beyond a first-year's reach.",
+    "pale_grey": "{wizard}, do not let it mislead you that your classmate {friend} has managed it.\n\nGetting an animal in a colour that is not natural to it is very hard for a first-year.",
     "halt": "Stop! You have a familiar already, and that is quite enough. You cannot make another."
   },
   "book": {
-    "pencil": "The book notes it in pencil:",
-    "ink": "The book writes it in ink:",
+    "line": "The book can conjure it in a single line:",
+    "written": "Orla writes your conjuring in the book of Arvelia:",
     "cannot": "Your class does not know how to make a familiar with a name and a colour.",
-    "colours": "The colours of {kind}, as they are written:",
-    "order": "Orla orders:"
+    "colours": "The colours of {kind}, as they are written:"
   }
 }

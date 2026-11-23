@@ -23,9 +23,9 @@ and in a living level the familiar itself (D269). A familiar's steps are ticks o
 own (D270); `minka` calls an object's trial into the circle, or brings the living
 familiar back (D262); what the first year does not allow is told by Orla, a warning
 that stops the program, or a trial that comes pale or as a spark (D261). After the
-program the world may use the child's class itself: the book notes the trial in a
-line, and Orla gives her orders (D267); a level's familiar may be born, rehearsed
-first (D268).
+program the world may use the child's class itself: the book tries the line that
+conjures the trial, and Orla gives her orders (D267); a level's familiar may be born,
+rehearsed first (D268).
 """
 
 import ast
@@ -511,9 +511,9 @@ class World:
     def warn(
         self, reason: str, by: str, at_line: int | None | object = CHILD, **detail: Any
     ) -> None:
-        """What the first year does not allow, told by Orla or the book (D261): a tick, a
-        `blocked` event with the reason and who says it, their words, and the program
-        stopped as an error is. While the book tries a line, nothing is shown."""
+        """What the first year does not allow, told by Orla (D261): a tick, a `blocked`
+        event with the reason and who says it, their words, and the program stopped as
+        an error is. While the book tries a line, nothing is shown."""
         if self.booking:
             raise Refused(reason, by, detail)
         refused = {"at": list(self.wizard._k_position), "by": by, "reason": reason, "tried": False}
@@ -877,10 +877,11 @@ class World:
             self._closing()
 
     def _after_program(self) -> None:
-        """After the program, the child's class used by the world (D267): the book notes
-        the trial in pencil, where the level's block says so, as a tick of its own; or,
-        the familiar on the plate the orders follow, Orla gives each order, a tick of hers
-        and the call of the child's `go_to`, its steps ticks of the familiar's."""
+        """After the program, the child's class used by the world (D267): the book tries
+        the line that conjures the trial, where the level's block says so, as a tick of
+        its own; or, the familiar on the plate the orders follow, Orla gives each order,
+        a tick of hers and the call of the child's `go_to`, its steps ticks of the
+        familiar's."""
         block = self.familiar_block
         assert block is not None
         trial = self.first_trial()
@@ -1643,11 +1644,11 @@ def _minka(world: World, here: Position, familiar: Any) -> Effect:
     """Calls a familiar (D262). An object called in a level with the circle brings its
     trial into it: on the next free cell of the level's trials, or the oldest trial's,
     which dissolves; a kind no first-year describes gives a spark, and a colour not the
-    kind's own a pale trial, with Orla's words (D261). A name the book does not take
-    stops the program. In the birth level the room-mate copies the trial, and in a run
-    that passes Orla says so and the book notes it in ink (D268). The living familiar
-    runs back to the wizard and hands over what it carries; one already in the circle is
-    not called twice."""
+    kind's own a pale trial, with Orla's words (D261). A name Orla cannot write in the
+    book stops the program. In the birth level the room-mate copies the trial, and in a
+    run that passes Orla says so and writes its line in the book (D268). The living
+    familiar runs back to the wizard and hands over what it carries; one already in the
+    circle is not called twice."""
     block = world.familiar_block
     state = familiar._k_state
     if state == "living":
@@ -1660,7 +1661,7 @@ def _minka(world: World, here: Position, familiar: Any) -> Effect:
     if familiars.given(familiar, "name"):
         problem = familiars.name_problem(familiar.__dict__["_k_name"])
         if problem is not None:
-            world.warn(problem, "book", name=str(familiar.__dict__["_k_name"]))
+            world.warn(problem, "orla", name=str(familiar.__dict__["_k_name"]))
     return Effect(then=lambda: _trial(world, familiar))
 
 

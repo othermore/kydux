@@ -227,8 +227,14 @@ BRACED_BAR = re.compile(r"\{[^{}\n]*\|[^{}\n]*\}")
 GENDERED = {"es": re.compile(r"\bmag[oa]\b", re.IGNORECASE)}
 #: The owner's words where `mago` is someone else, never the wizard: a wizard who was
 #: killed, whose soul's leavings are the black threads (chapter 5, *Lo que trajo el
-#: familiar*).
-NOT_THE_WIZARD = {"es": ("del alma de un mago al que mataron",)}
+#: familiar*), and the author of the book the friend has read (*El rastro*).
+NOT_THE_WIZARD = {
+    "es": (
+        "del alma de un mago",
+        "Un mago al que debieron matar",
+        "del prestigioso mago Juni Tamari",
+    )
+}
 #: The words that choose the wizard's gender, which name it on purpose.
 CHOOSE_GENDER = {"wizard.girl", "wizard.boy"}
 

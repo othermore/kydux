@@ -1,14 +1,17 @@
 {
   "title": "The voice in the tunnel",
   "steps": [
-    "{familiar} is inside the room. The passage carries sounds like a pipe, and the three of you crouch by the mouth.",
+    "{familiar} is inside the room. Voices come down the passage, and the three of you crouch to try to listen.",
     "Someone undid your knots, Rinlo. I know who it was. Their name is {wizard}.",
-    "{familiar}, born only today, shrinks with fear and hurries back through the passage to your feet.",
+    "{familiar} shrinks with fear and hurries back through the passage, to your feet.",
     "You have one thread left. Tie it to their wand. Their next spell will burst in their hands.",
-    "No. You said nobody would get hurt, and they nearly all fell! No. Go away.",
-    "Something is heard breaking, once and again. Then silence. The voice does not answer.",
-    "Rinlo? We heard you. You told it no. Come down. We'll tell Orla, together with you.",
-    "I've broken it. I've broken it to pieces. I can't come out there. Take the pieces away. I don't even want to touch them.",
-    "Then {familiar} will bring them. All of them."
+    "No. You said nobody would get hurt. The brooms were dangerous, and this could kill them.",
+    "No. Go away, get out of here.",
+    "You hear a few more noises. Then silence. The voice does not answer.",
+    "Rinlo? Listen! We heard you. We can help you: we know you stood up to it and told it no.",
+    "Come down with us, and we'll all go and talk to Orla so that she can help us.",
+    "I've broken it. I've torn all the thread to shreds… but it is still here, I can feel it, and it frightens me.",
+    "I can't come out there. Take the pieces, get them away from me. I don't even want to touch them.",
+    "{familiar} can bring them: perhaps that will calm Rinlo."
   ]
 }

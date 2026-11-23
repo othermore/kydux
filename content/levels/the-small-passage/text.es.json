@@ -10,7 +10,7 @@
     "Un `go_to` derecho al cuarto anda primero por el pasillo y choca con la pared. Llévalo de esquina en esquina.",
     "Tres veces `go_to`: a 10, 8; a 13, 8, y a 13, 3."
   ],
-  "intro": "Ahí está la boca del pasadizo, al pie de la pared. Por dentro sube, gira y vuelve a subir hasta el cuarto olvidado. Manda a {familiar} esquina a esquina.",
+  "intro": "Ahí está la boca del pasadizo, al pie de la pared. Por dentro sube, gira y vuelve a subir hasta el cuarto donde está el dueño de los hilos.\n\nManda a {familiar} esquina a esquina.",
   "outro": "¡Ha llegado! Escucha… Ahí dentro hay alguien.",
   "learned": "Ahora sabes que un método de tu clase se usa una vez y otra, como los de tu `wizard`, y que tu clase ya es una herramienta que hace lo que tú no puedes hacer."
 }

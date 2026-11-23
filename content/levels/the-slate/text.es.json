@@ -9,7 +9,7 @@
     "Con `self` en su sitio, las pruebas salen sin nombre: `name = name` guarda el nombre solo dentro de la acción, no en el objeto.",
     "Dos arreglos: `self` el primero entre los paréntesis de `__init__`, y `self.` delante de los dos nombres que se guardan."
   ],
-  "intro": "Me rindo: quiero uno como el tuyo, de otro color. Te he copiado en mi pizarra a toda prisa y he añadido mi línea. El mío se llamará *(bajito)* {mate_familiar}. Lánzalo tú, que a ti te sale.",
+  "intro": "Me rindo: esto se me da fatal, no me sale ninguno bien. Deja que me copie de tu descripción, y tendré un familiar igual, pero de otro color.\n\nTe he copiado en mi pizarra a toda prisa y he añadido mi línea. El mío se llamará *(bajito)* {mate_familiar}. Mejor lanza tú el conjuro también, que a mí hoy no me sale nada.",
   "outro": "Una sola clase, y dos familiares, cada uno con su nombre y su color. ¡Gracias, {wizard}!",
   "learned": "Ahora sabes los dos despistes que todo el mundo tiene con una clase: uno que Python avisa, cuando falta `self`, y otro que nadie avisa, un nombre guardado solo dentro de la acción; y que una clase hace tantos objetos como hagan falta, cada uno con sus datos.",
   "told": {

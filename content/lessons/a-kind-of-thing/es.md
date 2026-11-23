@@ -17,7 +17,7 @@ class Crow:
 ---
 ## El objeto
 
-Una cosa hecha con la clase es un **objeto**. Se hace escribiendo el nombre de la clase con paréntesis, y se guarda con un nombre, como cualquier valor.
+Para hacer cosas de una clase, tenemos que construirlas, como conjurar a una criatura. Una cosa hecha con la clase es un **objeto**. Se hace escribiendo el nombre de la clase con paréntesis, y se guarda con un nombre, como cualquier valor.
 
 ```python try
 class Crow:
@@ -35,8 +35,13 @@ Al imprimir un objeto, Python dice que es un `Crow` y añade un número largo, q
 ---
 ## Los familiares de primer curso
 
-En el libro de Arvelia hay una página para los alumnos de primer curso. Dice los seis tipos de familiar que podéis describir, y la clase de cada uno: el zorro es `Fox`; el cuervo, `Crow`; el murciélago, `Bat`; la liebre, `Hare`; el ratón, `Mouse`, y la rana, `Frog`. Los alumnos mayores describen otros; los de primero, estos.
+Las reglas en Arvelia son muy estrictas. Estos son los seis tipos de familiar permitidos para un alumno de primero: el zorro es `Fox`; el cuervo, `Crow`; el murciélago, `Bat`; la liebre, `Hare`; el ratón, `Mouse`, y la rana, `Frog`.
 
-En la sala de la torre, la primera línea de tu clase lleva además `(Familiar)`, así: `class Fox(Familiar):`. Con eso dices que tu zorro es un familiar de Arvelia. Lo que hay detrás de esos paréntesis te lo contaré más adelante.
+Para los niños de primero, tenemos un conjuro, la descripción de un familiar, ya preparado para que sea más fácil conjurar vuestro familiar. Sirve para cualquier familiar, sea del tipo que sea. Su clase se llama `Familiar`.
 
-El hechizo que llama al círculo lo que describes es *minka*: `wizard.cast("minka", ...)`, con el objeto que quieres llamar.
+---
+## Tu clase y el hechizo
+
+Por eso, cuando crees tu clase, la primera línea lleva además `(Familiar)`, así: `class Fox(Familiar):`. Con eso dices que tu zorro es un familiar de Arvelia. Lo que hay detrás de esos paréntesis te lo contaré más adelante.
+
+Una vez tienes tu descripción escrita, el hechizo que llama al círculo lo que describes es *minka*: `wizard.cast("minka", ...)`, con el objeto que quieres llamar.

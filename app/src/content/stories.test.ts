@@ -108,6 +108,24 @@ describe('a story as the scene\'s events (D74)', () => {
     expect(events[0]?.data).toEqual({ from: [1, 1], to: [2, 1], facing: 'right' });
   });
 
+  it("says a figure's words as the step begins where it says meanwhile (D275)", () => {
+    const { events, spans } = storyEvents({
+      world,
+      steps: steps({ who: 'nuri', meanwhile: true, do: { by: 'wizard', walk: [3, 1] } }, { who: 'nuri', meanwhile: true, do: null }),
+    });
+    expect(events.map((e) => [e.tick, e.actor, e.kind])).toEqual([
+      [1, 'nuri', 'say'],
+      [1, 'wizard', 'move'],
+      [2, 'wizard', 'move'],
+      // With nothing to play under them, the words have their own tick.
+      [3, 'nuri', 'say'],
+    ]);
+    expect(spans).toEqual([
+      { first: 1, last: 2 },
+      { first: 3, last: 3 },
+    ]);
+  });
+
   it('turns at each tile of a walk, and a walk may end out of sight', () => {
     const { events } = storyEvents({
       world,

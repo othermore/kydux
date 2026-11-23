@@ -88,6 +88,9 @@ export class Speech {
   /** A thought said to show later (D237): its words, its ticks, when it shows on the
    * scene's clock, and the timer that shows it. */
   private pending: { text: string; ticks: number; due: number; timer: Phaser.Time.TimerEvent } | null = null;
+  /** The bubbles still to come of words said in pieces (D274): the timers that show
+   * them, and when, on the scene's clock, the last of them is read to its end. */
+  private queue: { timers: Phaser.Time.TimerEvent[]; read: number } | null = null;
   /** The last tick `expire` was told of, from which a thought shown later lasts. */
   private lastTick = 0;
   /** Where a bubble or a thought sits: its width, and whether it is below who it is over. */
@@ -122,6 +125,7 @@ export class Speech {
     this.lastTick = tick;
     // A thought still to come is not shown under the slider or after a restart.
     if (instant) this.dropPending();
+    if (instant) this.dropQueue();
     if (this.bubble && (instant || tick >= this.bubbleUntil)) this.clearBubble();
     if (this.thought && (instant || tick >= this.thoughtUntil)) this.clearThought();
   }
@@ -133,6 +137,7 @@ export class Speech {
       ...(this.bubble ? [this.bubbleRead] : []),
       ...(this.thought ? [this.thoughtRead] : []),
       ...(this.pending ? [this.pending.due + this.pending.ticks * this.parts.tickMs] : []),
+      ...(this.queue ? [this.queue.read] : []),
     ];
     return settleMs(read, this.scene.time.now);
   }
@@ -350,11 +355,48 @@ export class Speech {
   /** Words said in a bubble over the wizard, or over the actor who says them, for
    * `ticks` ticks from `tick`. */
   say(text: string, tick: number, ticks: number, over: Phaser.GameObjects.Sprite, who: string): void {
-    this.clearBubble();
+    this.dropQueue();
+    this.bubbleUp(text, tick, ticks, over, who);
+  }
+
+  /** Words said in several bubbles, one after another (D274): the first now, for its
+   * ticks from `tick`, and each of the others `after` milliseconds from now, when the
+   * one before is read, for its ticks from the last tick shown then; `shown` is called
+   * as each of the others comes. */
+  sayPieces(
+    pieces: { text: string; ticks: number; after: number }[],
+    tick: number,
+    over: Phaser.GameObjects.Sprite,
+    who: string,
+    shown: () => void = () => {},
+  ): void {
+    const [first, ...rest] = pieces;
+    if (!first) return;
+    this.say(first.text, tick, first.ticks, over, who);
+    const last = rest[rest.length - 1];
+    if (!last) return;
+    const timers = rest.map((piece, index) =>
+      this.scene.time.delayedCall(piece.after, () => {
+        if (index === rest.length - 1) this.queue = null;
+        this.bubbleUp(piece.text, this.lastTick, piece.ticks, over, who);
+        shown();
+      }),
+    );
+    this.queue = { timers, read: this.scene.time.now + last.after + last.ticks * this.parts.tickMs };
+  }
+
+  /** The bubbles still to come of words said in pieces, not shown after all. */
+  private dropQueue(): void {
+    for (const timer of this.queue?.timers ?? []) timer.remove();
+    this.queue = null;
+  }
+
+  private bubbleUp(text: string, tick: number, ticks: number, over: Phaser.GameObjects.Sprite, who: string): void {
+    this.removeBubble();
     this.clearThought();
     this.speaker = over;
     // A story's words may mark a word to type or a name in code; a bubble shows them plain.
-    const plain = text.replace(/[`*_]/g, '');
+    const plain = text.replace(/[`*]/g, '');
     const words = this.scene.add
       .text(0, 0, plain, {
         fontFamily: 'system-ui, sans-serif',
@@ -466,8 +508,13 @@ export class Speech {
     this.publishOver();
   }
 
-  /** The bubble gone, if there is one. */
+  /** The bubble gone, if there is one, and those still to come of words said in pieces. */
   clearBubble(): void {
+    this.dropQueue();
+    this.removeBubble();
+  }
+
+  private removeBubble(): void {
     this.bubble?.destroy();
     this.bubble = null;
     delete this.parent.dataset.bubble;

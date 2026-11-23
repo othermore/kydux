@@ -10,8 +10,8 @@
     "What your familiar sees, you see: from the room, `wizard.find_all` with `\"thread\"` gives the list of the pieces.",
     "Walk that list with `for` and send your familiar to the x and the y of each piece's position; last, `minka` brings it back with everything."
   ],
-  "intro": "We promised Rinlo. Let {familiar} go for every piece, and then bring it back to you.",
+  "intro": "We have to help Rinlo. Let {familiar} go to the room, pick up every piece and come back to you.",
   "outro": "You have them all! … Did you hear that? A bolt, up above.",
-  "changes": "Rinlo threw the pieces without looking where they fell.",
+  "changes": "The pieces are scattered all over the floor. They could be anywhere.",
   "changed": "This time, the pieces have fallen in other places in the room."
 }

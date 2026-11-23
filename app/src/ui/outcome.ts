@@ -1,7 +1,7 @@
 // What a run came to, said to the child: a card under the editor. An outcome
 // is data; the card says it in the language of the moment.
 
-import { blockedText, toldText } from '../engine/words';
+import { blockedText, toldText, toldWhole } from '../engine/words';
 import { t } from '../i18n';
 import type { ErrorInfo, Explanation } from '../runtime/protocol';
 import { element } from './dom';
@@ -86,7 +86,8 @@ export function explanationText(explanation: Explanation): string {
       case 'name_letters':
       case 'name_long':
       case 'name_taken':
-        return toldText({ ...p, key: explanation.kind });
+        // Said in pieces on the scene, read whole on the card (D274).
+        return toldWhole(toldText({ ...p, key: explanation.kind }));
       default:
         return t('error.other', p);
     }

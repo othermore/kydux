@@ -11,11 +11,11 @@
     "Los pasos que tiene que dar son la diferencia entre las dos x, la mayor menos la menor; y después, lo mismo con las dos y.",
     "Dentro de `go_to`, un `if` con su `else` para la x y otro para la y, cada uno con sus dos movimientos; fuera de la clase, `go_to` con 13 y 4."
   ],
-  "intro": "Ahora lo mandaré yo. Los familiares nacen sabiendo andar, pero ir a un sitio hay que enseñárselo. En Arvelia, eso se llama `go_to`.",
-  "outro": "Copio tu `go_to` en el libro, junto a la línea de {familiar}. Ya sabe ir a donde le digan.",
+  "intro": "Los familiares nacen sabiendo andar, pero si quieres que vaya solo a un sitio concreto, tienes que enseñarle a hacerlo.\n\nEn Arvelia, eso se llama `go_to`. Enséñaselo y luego llévalo al plato del sol.",
+  "outro": "Voy a copiar tu `go_to` en el libro. Así, cuando le digas que vaya a un sitio, sabrá cómo hacerlo.",
   "learned": "Ahora sabes que un método es una acción de una clase, escrita con `def` dentro de ella y con `self`, que se usa con el punto, y que quien sabe su nombre puede mandar al objeto sin saber cómo está hecho por dentro.",
   "told": {
-    "order_star": "¡A la estrella!",
-    "order_wizard": "¡Con tu {mago|maga}!"
+    "order_star": "Ahora, déjame probar a mí para ver que lo has enseñado bien.\n\n{familiar}: ¡A la estrella!",
+    "order_wizard": "{familiar}: ¡Con tu {mago|maga}!"
   }
 }

@@ -1,11 +1,13 @@
 # Born complete
 
-Giving the data one at a time, after the object is made, is easy to forget, and a half-made familiar does not go in the book. A class can say what an object must be given to be born whole.
+Giving the data one at a time, after the object is made, is easy but unsafe. In the book we must write one single instruction, one line, that conjures the familiar. Everything else will have to be in the familiar's description.
+
+A class, the description, can assign the object's attributes, so that it has them the moment it is conjured.
 
 ---
 ## `__init__` and `self`
 
-That is done with an action written inside the class, with a name Python knows: `__init__`, with two underscores on each side. Python runs it by itself every time an object of the class is born.
+That is done with a method written inside the class, with a name Python knows: `__init__`, with two underscores on each side. It is the method used when an object of the class is conjured: Python runs it by itself every time.
 
 Its first argument is always `self`: the object being born. What is kept in `self.` stays in the object.
 
@@ -19,9 +21,9 @@ class Crow:
 ---
 ## Making the object
 
-Now the object is made by giving it its data between the brackets: `Crow("Vesso", "black")`.
+Now the object is made by giving it its data between the brackets: `Crow("Vesso", "black")`. Those are the data the function `__init__` receives, and it sees to assigning them to the object.
 
-`"Vesso"` goes to `name`, and `"black"` to `color`. `self` is given nothing: Python puts it there.
+`"Vesso"` goes to `name`, and `"black"` to `color`. Nothing is put in the call for `self`: Python puts that one in.
 
 ---
 ## Two whole crows

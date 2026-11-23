@@ -91,7 +91,28 @@
             9,
             8
           ]
-        },
+        }
+      ]
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": [
         {
           "by": "orla",
           "walk": [
@@ -142,6 +163,10 @@
       ]
     },
     {
+      "who": "friend",
+      "do": null
+    },
+    {
       "who": "voice",
       "do": [
         {
@@ -165,7 +190,12 @@
             ]
           ],
           "vanish": true
-        },
+        }
+      ]
+    },
+    {
+      "who": "voice",
+      "do": [
         {
           "by": "familiar",
           "appear": [
@@ -197,7 +227,27 @@
       "do": null
     },
     {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
       "who": "mate",
+      "do": null
+    },
+    {
+      "who": "friend",
       "do": null
     },
     {

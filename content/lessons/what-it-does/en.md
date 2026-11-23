@@ -1,6 +1,8 @@
 # What it does
 
-Your familiar already knows things, and knows how to do what every familiar does. Now it is going to know how to do something of its own. You have used methods since the first day: `wizard.move_up()` uses a method of `wizard`. Today you will write one.
+Your familiar already knows things: it knows how to do what every familiar does. Now you are going to teach it a new skill.
+
+Until now you have used methods on objects: `wizard.move_up()` uses a method of `wizard`. Today you will write a method of your own.
 
 ---
 ## Writing a method
@@ -28,14 +30,14 @@ What comes before the dot is what Python puts in `self`. That is why there is on
 ---
 ## What it is for
 
-Whoever knows the method's name can send your familiar without knowing how it is made inside.
+Knowing the method's name, you can make your familiar run it without knowing how it is made inside.
 
 Inside a method, `self` can use everything the object has: its attributes and its other methods, the inherited ones too.
 
 ---
 ## Two orders
 
-Here Vesso is given two orders. After each one he says how many times he has hopped so far: three, then five.
+Let us teach Vesso to hop and to count his hops. Every time you tell him to hop, he will tell you how many times he has hopped.
 
 ```python try
 class Crow:

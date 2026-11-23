@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { WorldEvent, WorldGoal, WorldResult } from '../runtime/protocol';
 import { initLanguage } from '../i18n';
-import { changesLines } from './cards';
+import { changesLines, saidParagraphs } from './cards';
 import { judge } from './stars';
 
 function goal(met: boolean, bonus = false): WorldGoal {
@@ -63,5 +63,16 @@ describe("a start card's words on what may differ at each run (D204)", () => {
 
   it('says nothing for a level played one way', () => {
     expect(changesLines(undefined)).toEqual([]);
+  });
+});
+
+describe("a card's words in paragraphs", () => {
+  it('parts what is said at each blank line', () => {
+    expect(saidParagraphs('One thing.')).toEqual(['One thing.']);
+    expect(saidParagraphs('One thing.\n\nAnother, to `type`.\n \nA third.')).toEqual([
+      'One thing.',
+      'Another, to `type`.',
+      'A third.',
+    ]);
   });
 });

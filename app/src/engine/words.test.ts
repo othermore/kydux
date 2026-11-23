@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { initLanguage, speakOf, speakOfFamiliar } from '../i18n';
-import { blockedText, bookText, bumpText, raceVerdict, ringWayText, toldText } from './words';
+import { blockedText, bookText, bumpText, raceVerdict, ringWayText, toldPieces, toldText, toldWhole } from './words';
 
 const english = { languages: ['en'], storage: null };
 const spanish = { languages: ['es'], storage: null };
@@ -161,18 +161,30 @@ describe("the words said in a run and the book's band (D264, D267)", () => {
     expect(toldText({ who: 'orla', key: 'won', kind: 'Hare' }, own)).toBe('Es una liebre, sí. Ana.');
     expect(toldText({ who: 'orla', key: 'won' }, own)).toBe('Es un zorro, sí. Ana.');
     expect(toldText({ who: 'orla', key: 'other_attribute', name: 'age' })).toContain('`age`');
-    expect(toldText({ who: 'orla', key: 'pale_grey' })).toContain('tan buena como');
+    expect(toldText({ who: 'orla', key: 'pale_grey' })).toContain('tu compañero Teku');
   });
 
-  it("puts the book's line in pencil or in ink, its words when it cannot, and a kind's colours", () => {
+  it("puts the line that conjures the trial, tried or written, the book's words when it cannot, and a kind's colours", () => {
     expect(bookText({ line: 'Fox("Pimu", "red")', ok: true, ink: false })).toEqual({
-      words: 'El libro lo anota a lápiz:',
+      words: 'El libro puede conjurarla en una sola línea:',
       code: 'Fox("Pimu", "red")',
-      look: 'pencil',
+      look: 'line',
     });
-    expect(bookText({ line: 'Fox("Pimu", "red")', ok: true, ink: true }).look).toBe('ink');
+    expect(bookText({ line: 'Fox("Pimu", "red")', ok: true, ink: true })).toEqual({
+      words: 'Orla escribe tu conjuro en el libro de Arvelia:',
+      code: 'Fox("Pimu", "red")',
+      look: 'written',
+    });
     expect(bookText({ line: 'x', ok: false }).look).toBe('cannot');
     expect(bookText({ kind: 'Fox', colors: ['red', 'white', 'black'] }).code).toBe('"red"  "white"  "black"');
-    expect(bookText({ line: 'pimu.go_to(13, 10)' }, true)).toEqual({ words: 'Orla manda:', code: 'pimu.go_to(13, 10)', look: 'order' });
+    // Orla's order is in her bubble: the band shows only the line it runs.
+    expect(bookText({ line: 'pimu.go_to(13, 10)' }, true)).toEqual({ words: '', code: 'pimu.go_to(13, 10)', look: 'order' });
+  });
+
+  it('parts words said in pieces at each blank line, and reads them whole on a card (D274)', () => {
+    expect(toldPieces('One thing.')).toEqual(['One thing.']);
+    expect(toldPieces('One thing, and…\n\n…another.\n\nA third.')).toEqual(['One thing, and…', '…another.', 'A third.']);
+    expect(toldWhole('One thing, and…\n\n…another.\n\nA third.')).toBe('One thing, and another. A third.');
+    expect(toldWhole('One thing.')).toBe('One thing.');
   });
 });

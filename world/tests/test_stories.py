@@ -393,6 +393,32 @@ def test_a_step_over_the_still_is_refused_where_it_does_not_belong(change, steps
         staged(**change, steps=steps)
 
 
+def test_a_figure_may_speak_while_its_steps_actions_play():
+    """D275: `meanwhile` on a figure's step that does something."""
+    steps = [
+        {"who": "voice", "do": {"appear": [5, 1]}, "by": "nuri"},
+        {"who": "nuri", "do": {"by": "wizard", "face": "right"}, "meanwhile": True},
+    ]
+    story = staged(steps=steps)
+    assert [step.get("meanwhile") for step in story["steps"]] == [None, True]
+
+
+@pytest.mark.parametrize(
+    ("step", "reason"),
+    [
+        ({"who": "nuri", "do": {"face": "left"}, "meanwhile": "yes"}, "meanwhile is true"),
+        ({"who": "nuri", "do": None, "meanwhile": True}, "meanwhile is for a figure's words"),
+        (
+            {"who": "voice", "do": {"face": "left"}, "by": "nuri", "meanwhile": True},
+            "meanwhile is for a figure's words",
+        ),
+    ],
+)
+def test_meanwhile_is_refused_where_it_does_not_belong(step, reason):
+    with pytest.raises(LevelError, match=reason):
+        staged(steps=[{"who": "voice", "do": {"appear": [5, 1]}, "by": "nuri"}, step])
+
+
 def test_the_openings_first_step_may_hold_the_letter_before_its_still():
     """D257: `letter` on the first steps over the still, in a row."""
     steps = [

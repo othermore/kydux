@@ -170,11 +170,30 @@ export function toldText(data: Record<string, unknown>, own: Record<string, stri
   return forFamiliar(raw, words).replace(/\{(\w+)\}/g, (whole, name: string) => params[name] ?? whole);
 }
 
-/** What the book's band says (D267): the line it notes, in pencil or in ink; that the
- * child's class cannot make the familiar; the colours of a kind, as the strings to write;
- * or the line Orla's order runs. */
+/** The pieces words said while the program runs are said in (D274): a blank line in the
+ * text parts them, each a bubble of its own. */
+export function toldPieces(text: string): string[] {
+  const pieces = text
+    .split(/\n\s*\n/)
+    .map((piece) => piece.trim())
+    .filter((piece) => piece !== '');
+  return pieces.length > 0 ? pieces : [text];
+}
+
+/** Words said in pieces as one text (D274), for a card or the book's band: the pieces
+ * with a space between them, and a sentence cut in two, `…` at the end of a piece and at
+ * the start of the next, whole again. */
+export function toldWhole(text: string): string {
+  return toldPieces(text)
+    .reduce((whole, piece) => (whole.endsWith('…') && piece.startsWith('…') ? `${whole.slice(0, -1)} ${piece.slice(1).trimStart()}` : `${whole} ${piece}`));
+}
+
+/** What the book's band says (D267): the line that conjures the trial, tried by the book
+ * or written in it by Orla; that the child's class cannot make the familiar; the colours
+ * of a kind, as the strings to write; or the line Orla's order runs, with no words of
+ * its own, the order being what she says. */
 export function bookText(data: Record<string, unknown>, order = false): { words: string; code: string; look: string } {
-  if (order) return { words: t('book.order'), code: String(data.line ?? ''), look: 'order' };
+  if (order) return { words: '', code: String(data.line ?? ''), look: 'order' };
   if (Array.isArray(data.colors)) {
     const kind = typeof data.kind === 'string' ? kindWords(data.kind).a_kind : '';
     return {
@@ -185,8 +204,8 @@ export function bookText(data: Record<string, unknown>, order = false): { words:
   }
   if (data.ok !== true) return { words: t('book.cannot'), code: String(data.line ?? ''), look: 'cannot' };
   return data.ink === true
-    ? { words: t('book.ink'), code: String(data.line ?? ''), look: 'ink' }
-    : { words: t('book.pencil'), code: String(data.line ?? ''), look: 'pencil' };
+    ? { words: t('book.written'), code: String(data.line ?? ''), look: 'written' }
+    : { words: t('book.line'), code: String(data.line ?? ''), look: 'line' };
 }
 
 /** Who stands in the wizard's way: a friend, by the name the story gives them (D66, D77). */

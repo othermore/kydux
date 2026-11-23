@@ -147,7 +147,7 @@ import { Speech } from './speech';
 import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
 import { heldOutline, MarkSilhouette, Silhouette } from './silhouette';
-import { HELD, LONG, Playback } from './playback';
+import { HELD, LONG, Playback, TOLD_MOST } from './playback';
 import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
@@ -161,7 +161,9 @@ import {
   raceVerdict,
   ringWayText,
   sleepingText,
+  toldPieces,
   toldText,
+  toldWhole,
 } from './words';
 import {
   FLOWN,
@@ -3012,22 +3014,39 @@ class LevelScene extends Phaser.Scene {
 
   /** Someone says something while the program runs (D264): a bubble over who says it, or
    * from the spot the scene names for a voice painted into it, or the book's band; the
-   * playback holds until the words are read. */
+   * playback holds until the words are read. Words in several pieces are said in a
+   * bubble each, one after another (D274). */
   private tell(tick: number, data: Record<string, unknown>, instant: boolean): void {
     const who = String(data.who);
     const text = toldText(data, this.options.told);
     this.toldKeys.push(`${who}:${String(data.key)}`);
     this.parentNode.dataset.told = this.toldKeys.join(',');
+    // Each piece is read for as long as it takes, the longest hold at most (D274).
+    const pieces = toldPieces(text);
+    const reading = pieces.map((piece) => Math.min(readingMs(piece), TOLD_MOST));
     if (who === 'book') {
-      this.bookSaid = { words: text, code: '', look: 'told' };
+      this.bookSaid = { words: toldWhole(text), code: '', look: 'told' };
     } else {
       const sprite = who === 'wizard' ? this.wizard : (this.actors.get(who)?.sprite ?? this.voiceSprite(who));
       if (!sprite) return;
-      this.speech.say(text, tick, this.sayTicks(text), sprite, who);
+      if (instant) {
+        // Under the slider, the words as they end.
+        const last = pieces[pieces.length - 1] ?? text;
+        this.speech.say(last, tick, this.sayTicks(last), sprite, who);
+      } else {
+        let after = 0;
+        const said = pieces.map((piece, index) => {
+          const one = { text: piece, ticks: this.sayTicks(piece), after: after / this.playback.speed };
+          after += reading[index] ?? 0;
+          return one;
+        });
+        this.speech.sayPieces(said, tick, sprite, who, () => play('say'));
+      }
     }
     if (!instant) {
       play('say');
-      this.playback.holdTick(readingMs(text));
+      const whole = who === 'book' ? Math.min(readingMs(toldWhole(text)), TOLD_MOST) : reading.reduce((sum, ms) => sum + ms, 0);
+      this.playback.holdTick(whole, whole);
     }
   }
 
@@ -3043,9 +3062,9 @@ class LevelScene extends Phaser.Scene {
     return sprite;
   }
 
-  /** The book's band under the scene (D267): the line the book notes, in pencil or in
-   * ink, its words when it cannot, a kind's colours, the line Orla's order runs; hidden
-   * while it has nothing to say. */
+  /** The book's band under the scene (D267): the line that conjures the trial, tried by
+   * the book or written in it by Orla, its words when the class cannot, a kind's colours,
+   * the line Orla's order runs; hidden while it has nothing to say. */
   private bookBand(): void {
     let band = this.parentNode.querySelector<HTMLElement>('.book-band');
     const said = this.bookSaid;
@@ -3064,7 +3083,10 @@ class LevelScene extends Phaser.Scene {
     band.dataset.look = said.look;
     const words = band.querySelector('p');
     const code = band.querySelector('code');
-    if (words) words.textContent = said.words;
+    if (words) {
+      words.textContent = said.words;
+      words.hidden = said.words === '';
+    }
     if (code) {
       code.textContent = said.code;
       code.hidden = said.code === '';

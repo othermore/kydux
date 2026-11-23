@@ -65,25 +65,33 @@
       "who": "voice",
       "do": {
         "walk": [
-          [
-            13,
-            8
-          ],
-          [
-            10,
-            8
-          ],
-          [
-            10,
-            13
-          ]
+          13,
+          8
         ]
       },
       "by": "familiar"
     },
     {
       "who": "cold_voice",
-      "do": null
+      "do": {
+        "by": "familiar",
+        "walk": [
+          10,
+          8
+        ]
+      },
+      "meanwhile": true
+    },
+    {
+      "who": "rinlo",
+      "do": {
+        "by": "familiar",
+        "walk": [
+          10,
+          13
+        ]
+      },
+      "meanwhile": true
     },
     {
       "who": "rinlo",
@@ -98,6 +106,14 @@
       "do": {
         "face": "right"
       }
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "rinlo",
+      "do": null
     },
     {
       "who": "rinlo",

@@ -15,6 +15,12 @@ of chapter 5:
 > cambiar para que no haya confusión al cambiar los demás
 > personajes.
 
+And, on reading this plan, the same day:
+
+> Cuando importas una partida te pregunta el nombre que quieres
+> darle. Y al cargar una partida te muestra los nombres que les
+> hemos dado.
+
 **Where it is today.**
 
 - *The list.* `GamesStore` (`app/src/progress/games.ts`, D70)
@@ -58,20 +64,23 @@ same.
   the progress document: being unique is a property of the list,
   and the entry already holds what is the game's and not the
   course's (begun, last played, seconds). Rules out a name in the
-  exported file: a file brought in is named as D291 says.
+  exported file: the child names a game brought from a file as
+  it comes in (D291).
 - **D291 — A game with no name takes its wizard's name, and a
   number after it when that is taken.** Decided 2026-11-21 by
   the owner. One rule gives the automatic name, for a wizard's
   name and the names taken: the wizard's name when it is free;
   otherwise the wizard's name, a space and the first number from
-  2 that makes it free (*Marta*, *Marta 2*, *Marta 3*). It names:
+  2 that makes it free (*Marta*, *Marta 2*, *Marta 3*). It names
   every game of the list that has a wizard and no name, each
   time the list is opened by `GamesStore`, the game begun first
-  taking its name first; a game brought from a file (`add`), and
-  so the single document of before the list (D70); and, in the
-  creator, a game that is being made, until the child writes a
-  name. A game named keeps its name. A game with no wizard has
-  no name and is not listed, as today.
+  taking its name first, and the single document of before the
+  list (D70). Elsewhere it is the name offered, which the child
+  keeps or changes: in the creator, for a game being made, until
+  the child writes a name; and on the start screen, for a game
+  brought from a file, whose name is asked before the game
+  enters the list. A game named keeps its name. A game with no
+  wizard has no name and is not listed, as today.
 - **D292 — A wizard's gender and look are chosen once.** Decided
   2026-11-21 by the owner. Once a wizard is made, its name can be
   changed and nothing else of it: the creator shows the gender
@@ -97,8 +106,10 @@ same.
 - `GamesStore`, when made, after `migrate()`: names the games
   that have a wizard and no name, the oldest `created` first.
   It writes the list only when a name was given.
-- `add` (a file brought in, the migration) names the game by
-  the same rule.
+- `add` takes the name of the game it adds: the one the child
+  gave for a file brought in (2.3), the automatic one for the
+  migration. It refuses a name that breaks the rule or is
+  taken, and adds nothing then.
 - A way to name a game: it refuses a name that breaks the rule
   or is another game's, and tells so. The game's own name is
   not taken against itself: *marta* may become *Marta*.
@@ -144,6 +155,22 @@ name, then the gender and the look, the preview, the buttons.
   time, *Play* and *Delete* as today.
 - *Delete* asks with the game's name.
 - `#saved-note` names the game being played.
+- *Import* asks the game's name. Once the file is read and is a
+  game with a wizard (the file's, or the one being played when
+  the file has none), nothing is added yet: under the *Export*
+  and *Import* buttons a small form opens, `#import-form`, with
+  its question, the field `#import-name` filled with the
+  automatic name for that wizard (D291) and focused, the rule
+  and the name-taken message of the creator's field
+  (`#import-name-rule`, `#import-name-taken`), and two buttons,
+  `#import-done` and `#import-cancel`. `#import-done` is
+  disabled while the name is not valid or is a game's of the
+  list; Enter in the field presses it. It adds the game with
+  that name, and the screen is drawn again with the game being
+  played, as today. `#import-cancel` and Escape close the form:
+  nothing is added and nothing changes. A file that is no game
+  shows today's message and no form. A game with no wizard at
+  all is added with no name, as today: the creator names it.
 - `#change-wizard` keeps its id and its place; its words say
   what it does today: the names.
 
@@ -159,6 +186,9 @@ is the game's name.
 | `wizard.game_name_taken` | You already have a game with that name. Choose another. | Ya tienes una partida con ese nombre. Elige otro. |
 | `wizard.once` | Choose calmly: later you can change the names, but not who your wizard is or their look. | Elige con calma: después podrás cambiar los nombres, pero no cómo es tu personaje ni su aspecto. |
 | `wizard.fixed` | Who your wizard is and their look are chosen once, when the game begins. | Cómo es tu personaje y su aspecto se eligen una sola vez, al empezar la partida. |
+| `start.import_name` | What name do you give this game? | ¿Qué nombre le pones a esta partida? |
+| `start.import_done` | Import it | Importarla |
+| `start.import_cancel` | Cancel | Cancelar |
 | `start.saved` | Your game, “{name}”, is saved as you play. | Tu partida, «{name}», se guarda sola mientras juegas. |
 | `start.delete_confirm` | Delete the game “{name}”? It cannot be brought back. | ¿Borrar la partida «{name}»? No se podrá recuperar. |
 | `start.change_wizard` | Change the names | Cambiar los nombres |
@@ -166,8 +196,9 @@ is the game's name.
 The user guide, `README.md` and `README.es.md` in sync, says in
 its lines on the saved games, in short sentences: each game has
 a name; it is given with the wizard's name and can be changed
-from the start screen; no two games have the same name; who the
-wizard is and its look are chosen once, at the start of a game.
+from the start screen; no two games have the same name; *Import*
+asks the name of the game it brings; who the wizard is and its
+look are chosen once, at the start of a game.
 
 ### 2.5 The documents
 
@@ -185,7 +216,8 @@ head of `games.ts`, `wizard.ts` and `start.ts`.
   and named, the oldest first; two wizards called alike give
   *Marta* and *Marta 2*, a third *Marta 3*; a named game keeps
   its name; a second opening of the list changes nothing; a
-  game with no wizard is left with no name; `add` names by the
+  game with no wizard is left with no name; `add` adds with the
+  name given and refuses one taken; the migration names by the
   rule; naming refuses another game's name, in any case of
   letters, and takes the game's own; an entry with a bad name
   is read with none.
@@ -203,8 +235,12 @@ head of `games.ts`, `wizard.ts` and `start.ts`.
 - `start.spec.ts`: the list by the games' names, the wizard's
   name under one that differs, *Delete* asking with the game's
   name (the dialog's message read), `#saved-note` with the name;
-  a file brought in for a wizard called like one of the list is
-  listed with its number.
+  a file brought in opens the form with the automatic name, its
+  number when a game of the list is called alike; a name of the
+  list disables `#import-done` and shows the message; a name
+  written there is the game's in the list; *Cancel* and Escape
+  add nothing. The two tests that import a file today
+  (`start.spec.ts`, `wizard.spec.ts`) walk the form.
 - `loop.spec.ts` and any other spec that walks the creator: as
   the page asks. The keys of the two languages stay the same
   (`tools/i18n_check.py`).
@@ -226,15 +262,18 @@ On the owner's own browser, where games of before are saved:
    wizard's name as it is typed, with a number when it is
    taken; written by hand, it stays; the note says the gender
    and the look are for the whole game.
-5. *Export* and *Import* of a game: it comes in as one more
-   game, with its wizard's name and a number.
+5. *Export* and *Import* of a game: the screen asks the name of
+   the game brought, offering its wizard's name with a number;
+   a name of the list is refused; the name written is the one
+   the list shows; *Cancel* brings nothing.
 
 ### 2.8 What is left out, and why
 
 - The game's name inside the level, the map or the settings: it
   is the start screen's and the creator's.
 - The name in the exported file and the file's own name: the
-  file is a progress document, the same for every store (D31).
+  file is a progress document, the same for every store (D31),
+  and the child names the game where it comes in.
 - A page of its own to rename a game from the list: the owner
   asks for the creator's page, and the game named there is the
   one being played; another is renamed after *Play*.
@@ -254,8 +293,9 @@ The entry's name, the rules, the naming of the games of before,
 
 ### 3.2 The creator and the start screen (D290, D291; 2.2, 2.3, 2.4)
 
-The field, the list, *Delete*, the note, the button's words, the
-texts in both languages. `wizard.spec.ts`, `start.spec.ts`.
+The field, the list, *Delete*, the note, the button's words,
+*Import*'s form, the texts in both languages. `wizard.spec.ts`,
+`start.spec.ts`.
 
 ### 3.3 The gender and the look chosen once (D292; 2.2, 2.4)
 
@@ -271,7 +311,8 @@ whole, once, in a copy. The report in Spanish, in `drafts/`: the
 five steps of 2.7; pictures of the current commit only (the
 creator for a wizard being made and for one made, the message of
 a name taken, the list with two wizards called alike, the start
-screen's note); what was decided where the plan does not decide.
+screen's note, *Import*'s form); what was decided where the
+plan does not decide.
 The memory note `kydux-sprint-57-state`, and the prompt for the
 designer's review.
 
@@ -312,9 +353,10 @@ no name is still read. One function gives the automatic name:
 the wizard's name, or the wizard's name, a space and the first
 number from 2 that makes it free. When the store is made, every
 game with a wizard and no name is named by it, the oldest first,
-and the list is written only if a name was given. A game brought
-from a file is named the same way. Naming a game refuses a name
-that is another game's.
+and the list is written only if a name was given. The single
+document of before the list is named the same way. A game
+brought from a file is added with the name the child gives it.
+Naming a game refuses a name that is another game's.
 
 2. The creator and the start screen. Under the wizard's name, a
 field for the game's name (#game-name, with #game-name-rule and
@@ -325,7 +367,11 @@ name valid and free, and keeps the wizard and the name together.
 The start screen lists the games by their names, the wizard's
 name under one that differs; Delete asks with the game's name;
 the note under the greeting names the game; the button
-#change-wizard says "Change the names". The plan's table has
+#change-wizard says "Change the names". Import asks the name of
+the game it brings before adding it: a small form under the
+buttons (#import-form, #import-name with the automatic name
+offered, #import-done, #import-cancel), the same rule and the
+same messages; Cancel and Escape bring nothing. The plan's table has
 every text in English and Spanish: enter them as they are.
 
 3. The gender and the look, once (D292). On the page of a wizard
@@ -358,8 +404,8 @@ What the owner will look for, on a browser with games of before:
     in Delete's question;
 (4) a new game: its name follows the wizard's name, with a
     number when taken, and stays once written by hand;
-(5) a game exported and imported comes in with its wizard's name
-    and a number.
+(5) Import asks the name of the game it brings, offering its
+    wizard's name with a number; the list shows the name given.
 
 Enter D290, D291 and D292 with the plan's words, and bring D36,
 D64 and D70, docs/dev/plan.md and the user guide (README.md and

@@ -276,10 +276,10 @@
             "id": "mate",
             "kind": "friend",
             "at": [
-              11,
-              14
+              8,
+              13
             ],
-            "facing": "up"
+            "facing": "right"
           },
           {
             "id": "familiar",

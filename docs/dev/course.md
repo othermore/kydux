@@ -11,13 +11,12 @@ condition only once both are known. The story is `story.md`'s.
 Chapters 1 to 3 are given in full and are built, each in its scene (D65):
 its levels are parts of one place, each starting where the one before it
 ended, with the friend who teaches standing by (D66). Chapters 4 and 5 are
-given at the level of lessons and level titles, each with the world
-features it needs, its scene, its stories (D62, D74) and its fix and
-improve levels (D56) in outline; each is built in its own sprint. Every
-text the child reads is drafted by Gemini from a brief (D55).
+given with the world features each needs, its scenes, its stories (D62,
+D74) and its fix, improve and challenge levels (D56); each is built in its
+own sprint. Every text the child reads is drafted by Gemini from a brief
+(D55).
 
-An id is a slug (D44). In chapters 4 and 5, *T* numbers a lesson and *L*
-a level, across the course, only to refer to them here.
+An id is a slug (D44).
 
 ## How a level earns its idea
 
@@ -95,6 +94,21 @@ design:
   finish, so that a shorter program takes off sooner and the child sees why it
   won or lost: the start band shows the lines read, and the card the count
   (D189). Rule given by the owner on 2026-11-10.
+
+- **A limit is met as a stumble in the story.** What the first year does not
+  allow, a kind no first-year describes, a colour not the kind's own, an
+  attribute or a method more, is met where the child tries it, told by Orla in
+  the story's words with the line and the name it is about, never as a list read
+  beforehand and never as a red error of Python's (D261). A lesson's block is
+  plain Python, where the limits do not hold. Rule given by the owner on
+  2026-11-17.
+- **A choice that cannot be undone is rehearsed before it is made.** The
+  familiar leaves the circle once and for good: the world plays the program
+  through first, and only a program that meets every goal is shown as the birth,
+  Orla saying so without asking; any other is shown stopping at the circle's
+  edge, with footprints of light where the familiar would have gone, so that the
+  child can change the description and try again (D268). Rule given by the owner
+  on 2026-11-17.
 
 Each later chapter's design is checked against this before its texts are
 briefed: every lesson names the level that needs it, and what in that
@@ -344,34 +358,85 @@ follows.
 
 ## Chapter 5 — The familiar (`05-the-familiar`)
 
-In the tower, Orla gives the familiars. The ideas: a class, its
-attributes, its methods.
+The last day of the first year, in Orla's tower by the afternoon sun, and in the
+walls below it. Each first-year is given a familiar, which is not chosen but
+described: a class of the child's is a kind of familiar, an object one creature,
+and Orla's word `minka` calls it into the circle as a trial of light (D260, D262).
+The ideas, one a lesson, each where its level cannot be won without it: a class
+and an object, because `minka` calls only an object of a kind of familiar the
+child has described; attributes, because the trial is drawn from what the object
+knows of itself, and comes pale and nameless without its colour and its name;
+`__init__` and `self`, because Orla's book writes a familiar down in one line,
+`Fox("Pimu", "red")`, made with the child's own class; inheritance, lightly,
+because the familiar walks out of the circle with moves the child never wrote,
+which every `Familiar` has; and a method of the child's own, because Orla, who
+does not know the wizard's program, can send the familiar only by the name of an
+action it knows, `go_to`. The first year allows six kinds in their natural
+colours, a name and nothing more; anything else stumbles in the story with Orla's
+words, never with a red error (D261). The description is a draft through the
+first three levels, kept with the game and written into the next level's starting
+code, and decided for good when the creature leaves the circle in the fourth,
+after a rehearsal of the program (D265, D268); there is one familiar a game. Not
+taught: `super()`, attributes of a class, `__str__`, properties. The chapter ends
+the course: its challenge, the course's first, puts a class of the child's, its
+method with arguments, a list walked with `for`, attributes read with the dot and
+a spell together in one program.
 
-| # | Item | The idea, or what it practises | API it unlocks |
+Its scenes are two, painted in the look of the castle's inside, twenty cells by
+fifteen, their margins the castle: `the-tower-hall`, the highest hall of the
+tower, with the lectern and the great book, Bimo asleep beside it, the circle of
+runes, three brass plates in the floor and the winding stair coming up, where the
+wizard stands on one cell and never moves while the familiar walks; and
+`the-tower-passage`, the corridor a floor below, with the mouth of a familiars'
+passage at the foot of its wall, the masonry behind the wall cut open from above
+with the passage's trench winding through it, narrower than a cell, and the
+forgotten room above it (D273). The stories are told on the two scenes, on the
+dormitory and the entrance where the first one opens, and over the welcome's
+painting of the castle where the last one ends (D74, D251).
+
+| Item | Kind | The idea, or what it practises | API or concept it unlocks |
 | --- | --- | --- | --- |
-| T23 | `lesson:a-kind-of-thing` | A class describes a kind of object; the wizard, a door and a key are each of a class. `class Familiar:` describes the child's own. | (Python's `class`) |
-| L29 | `level:the-tower-door` | Make a familiar and give it to Orla. | |
-| T24 | `lesson:what-it-knows` | `__init__` and `self`: the attributes each familiar has from the start. | |
-| L30 | `level:the-name-and-the-kind` | A familiar with a name and a kind, which the tower's door reads. | |
-| T25 | `lesson:what-it-does` | A method: an action of the class's own, `def move(self, ...)`. | `wizard.send`, the spell `minka` |
-| L31 | `level:the-small-passage` | Send the familiar through a passage too small for a wizard; call it back with `minka`. | |
-| L32 | `level:the-end-of-the-year` | The course together. | |
+| `story:the-tower` | Story 1 | The last day of the first year: in the dormitory by morning the trunks half packed, the secret kept all year, the threads in the friend's tin box; at the entrance Zarek names Rinlo; up in the tower's hall Orla says that a familiar is not chosen but described, that `minka` calls it into the circle as a trial that lives only once it leaves the circle, and the first year's limits; Bimo has the last word. The story changes scene twice. | |
+| `lesson:a-kind-of-thing` | Lesson 1 | Orla's: everything in a program is an object, and every object comes from a description of its kind, a class: `class`, a name with a capital, a colon and `pass`; the class's name with brackets makes an object, and two objects of one class are not the same one (`print` shows each and `==` says `False`). Page 4: the six kinds a first-year may describe, and `(Familiar)` after the class's name in the tower. The metaphor once, the mould and the biscuits. | `concept:class`, `wizard.cast` |
+| `level:the-circle` | Practice 1 | A kind of familiar written as an empty class with `(Familiar)`, one object of it made and kept under a name, and called with `minka`: a pale trial, with no colour and no name, stands in the circle. Another kind gives a spark; a class without `(Familiar)` is not called; the class called in place of an object is refused; a method in the class stops the program (D261). Goal: a trial of a first-year kind. | |
+| `lesson:what-it-knows` | Lesson 2 | Orla's: an object's attributes, what it knows of itself, written with the dot and `=` as they are read; an attribute is that object's own, and the program's name for the object is not the name it knows itself by. The block ends in the error meant to be seen, a crow given no name (`"try": "error"`, D272). Page 4: a first-year's familiar has `name` and `color`, a single word and one of its kind's colours, and the table of colours. | `concept:attributes`, `familiar.name`, `familiar.color` |
+| `level:the-name-and-the-colour` | Practice 2 | The object given its `name` and its `color` before the cast: the trial stands whole in its colour, steady, with its name over it. A colour not the kind's own, or a grey hare, comes pale and trembling with Orla's words and the book's colours; another attribute stops the program; a name of more than one word is refused by the book; the name and colour given after the cast come too late. Orla praises the friend's grey hare. Goal: a named, coloured trial. | |
+| `lesson:born-complete` | Lesson 3 | Orla's: `__init__`, the action Python runs by itself when an object is born, its first argument `self`, the object being born; what is kept in `self.` stays in it; the object made with its data in the brackets, `self` given by Python. Vesso black and Dalu white. | `concept:init` |
+| `level:one-line-in-the-book` | Practice 3 | The class taught `__init__` with `self`, `name` and `color`, and the familiar made whole in one line: after the program the book writes the line in pencil, made with the child's class (D267). The attributes given outside the class make a good trial the book cannot note; the data in the other order make a pale fox named after a colour; one datum is too few; an `__init__` without `self` is explained. The friend's hare steps out of the circle and lives. Goals: a named, coloured trial; the book can note it. | |
+| `level:the-slate` | Fix 1 | The mate's copy of the wizard's description, on a slate: `__init__` without `self` stops at the line that makes the first creature (`missing_self`), and with `self` added, `name = name` keeps nothing in the object, so two pale, nameless trials come. Mended, one class gives two familiars, the wizard's and Kesi, told apart by their colour. Goal: two named, coloured trials. | |
+| `lesson:what-it-inherits` | Lesson 4 | Orla's, over the child's own description: `(Familiar)` says that a fox is a familiar, and a class that says it is of another has everything the other has without writing it, which is to inherit: `position` and the four moves, the wizard's own names. The block writes a small `Familiar` of its own and an empty `Crow` that is born with its name all the same. | `concept:inherit`, `familiar.move_up`, `familiar.move_down`, `familiar.move_left`, `familiar.move_right` |
+| `level:out-of-the-circle` | Practice 4 | The last chance to change the description, and the familiar taken out of the circle with the moves it inherits, to the moon's plate. The program is rehearsed before it is shown (D268): right, Orla says so, the book writes it in ink, the familiar is born as it crosses the circle's edge and walks to the plate, which lights, and the mate's copy steps out after it; wrong, the trial stops at the edge and footprints of light show the way it would have gone. With a familiar alive, a second is refused with Orla's *halt*. Goals: a named, coloured trial; the book can note it; the familiar born; on the moon's plate. | |
+| `lesson:what-it-does` | Lesson 5 | Orla's: a method of the class's own, written with `def` inside the class with `self`, the object it is told to act, and called with the dot; whoever knows a method's name can send the object without knowing how it is made inside. Vesso hops and counts. | `concept:methods`, `familiar.position` |
+| `level:orlas-orders` | Practice 5 | The living familiar's class written again with a method of its own, `go_to(self, x, y)`, which compares and takes the smaller number from the greater (chapter 4's *less-or-greater*), and the familiar sent to the sun's plate with it; then Orla's two orders, to the star's plate and to the wizard's side, each a call of the child's `go_to` the world makes (D267, D269). The row first bumps on the lectern; a `go_to` that ignores its data fails the orders; no `go_to` is a creature tilting its head; a changed `__init__` is refused. Goals: on the sun's plate; Orla's orders obeyed. Bonus: no bump. | |
+| `story:the-trail` | Story 2 | Orla leaves; the familiar sniffs the friend's pocket, runs into the tiny arch at the foot of the wall and comes back with another black thread; the friend knows of the familiars' passages; the three go down to the corridor below, where the passage has a mouth. The story changes scene. | |
+| `level:the-small-passage` | Practice 6 | From the corridor, where the wizard does not move, the familiar sent with `go_to` from corner to corner, into the mouth, under the wall, along the passage's trench and up into the forgotten room, the cells read on the plan; a `go_to` straight to the room walks along the corridor and bumps on its wall. Goal: the familiar in the room. Bonus: no bump. | |
+| `story:the-voice-in-the-tunnel` | Story 3 | Through the passage the cold voice, from the room, asks Rinlo to tie the last thread to the wizard's wand; the familiar runs back; Rinlo says no and breaks the thread; he cannot come out and asks the three to take the pieces. | |
+| `level:the-forgotten-room` | Challenge 1 | The course in one program: the familiar sent to the room as before, then to every piece of thread `find_all` finds, the pieces lying elsewhere each time, `find_all` seeing from where the familiar stands (D270), and called back with `minka`, which brings it to the wizard with the pieces. The pieces' cells written as numbers win one arrangement; `find_all` before the familiar is in the room finds nothing; without `minka` the wizard has none. Goal: every piece in the wizard's hands. Bonus: no bump. | |
+| `story:what-the-familiar-brought` | Story 4 | Rinlo comes into sight at the back stair's arch and tells everything; up in the hall, Orla says what the threads are and believes the children. The story changes scene. | |
+| `story:the-end-of-the-year` | Story 5 | In the hall at sunset Orla tells who Korvel was and the truth about the wizard's parents, and her doubt; the school on guard and together; the end-of-year dinner and the familiar asleep in the hood, told over the painting of the castle; what the course taught. | |
 
-The world features chapter 5 needs: an object of the child's class taken
-into the world and its methods called by it, safely (the sandbox's rules
-hold for it); tiles only a familiar passes; `wizard.send`.
-
-Its scene: the tower, its stair and its rooms, and the small passages
-only a familiar passes. Its rewrite: an opening story, the tower and
-the familiars; a closing
-one, the end of the first year and the challenges ahead. A fix level
-follows `what-it-knows`: an `__init__` that forgets `self`, so the
-familiar knows nothing. An improve level follows `what-it-does`: two
-familiars made with the same lines twice, made one class.
+The world features chapter 5 needs: a real class, `Familiar`, in a level's names,
+whose subclasses are kinds of familiar, with the first year's table of kinds,
+colours and names (D260); the first year's limits as warnings and flawed trials
+told by Orla, never red errors (D261); `minka` with an object, calling a trial into
+the circle or bringing a living familiar back with what it carries (D262); the
+trial drawn by the page from the creature's sheet, whole and steady with its colour,
+in lines of trembling light without (D263); someone's words told in a run, the
+playback held while they are read (D264); the draft and the familiar kept with the
+game and written into the level (D265); the familiar in the texts (D266); the
+child's class used by the world after the program, the book's line and Orla's
+orders (D267); the fourth level's program rehearsed, a familiar born once (D268);
+a living familiar in the programs, its class written again only adding (D269); a
+familiar's steps as ticks, cells only a familiar enters, things it picks up and a
+zone it sees into (D270); the goals and explanations of the chapter (D271); a
+lesson's block that ends in an error meant to be seen, and the five ideas in the
+notebook's tab Python (D272); the two scenes and the fourteen familiars' sheets
+(D273).
 
 ## The challenges
 
-Ten levels with no lesson, after the course, each combining more of it,
+The course ends in one, chapter 5's *The forgotten room*. Then ten levels
+with no lesson, after the course, each combining more of it,
 each with a bonus goal: *The maze* (loops and conditions), *Every book*
 (lists), *Dask's round* (`while` and `teacher.can_see`), *The seven
 seals* (spells in a loop), *The flood* (flying and timing), *The relay*
@@ -381,7 +446,7 @@ stairs* (moving tiles and functions), *Zarek's revenge* (the race again),
 
 ## The count
 
-Thirty-five lessons and forty levels, forty-two with the fix and
-improve levels of chapter 5, then ten challenges. The draft
+Thirty-eight lessons and forty-five levels, the last of them the
+course's first challenge, then ten challenges more. The draft
 asked for 10 to 20 lessons; one idea per lesson, each with its theory,
 asks for more, and each is short: a few pages.

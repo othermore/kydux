@@ -712,9 +712,19 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     end that sounds when the run ends (D247); and, in `sprint-50.md`, the notebook's
     page of Python, every word and sign taught so far with a line and an example to
     read (D256).
-5.7 Chapter 5, The familiar (classes and objects), in a scene of the tower:
-    the child defines a creature with its attributes and methods and sends
-    it through a passage.
+5.7 Chapter 5, The familiar (classes and objects), in two scenes of the tower
+    (`sprint-53.md`): the tower's highest hall and the small passage below it,
+    narrower than a cell; Orla's five lessons and eight levels (a fix and the
+    course's first challenge), a class of the child's as a kind of familiar and an
+    object as one creature (D260), the first year's limits told as stumbles of the
+    story (D261), `minka` calling an object (D262), a trial drawn in light by the
+    page (D263), someone's words in a run (D264), the draft and the familiar kept
+    with the game (D265) and named in the texts (D266), the child's class used by
+    the world after the program (D267), the fourth level rehearsed and a familiar
+    born once (D268), a living familiar in the programs (D269), its steps, the cells
+    only it enters and what it sees (D270), the chapter's goals and explanations
+    (D271), a lesson's block that ends in an error meant to be seen (D272), and the
+    two scenes and the fourteen familiars' sheets (D273).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

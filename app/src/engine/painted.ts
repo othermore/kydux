@@ -82,6 +82,9 @@ export interface SceneArt {
       floors?: Record<string, string>;
       /** The state a door is drawn in where no level or story places it (D104). */
       rest?: 'open' | 'closed';
+      /** Set in the floor, a brass plate and its light (D270, D332): drawn on the floor,
+       * under every figure and every row's things, whatever its row. */
+      lying?: boolean;
       /** Each state's image at an hour the scene is painted whole at (D126), by the
        * hour, then the state. */
       hours?: Record<string, Record<string, string>>;
@@ -370,7 +373,7 @@ function depthOn(art: Art, id: string, tile: Tile, { open = false, inside = fals
   if (!painted) return 3;
   // A door swung open lies on the wall beside its doorway, among the rows as it is (D111).
   const row = (open ? painted.rows?.open : undefined) ?? painted.row;
-  return thingDepth(row + shiftOf(art, id, tile)[1], { under: painted.under, open, inside, lying });
+  return thingDepth(row + shiftOf(art, id, tile)[1], { under: painted.under, open, inside, lying, set: painted.lying });
 }
 
 /** A painted thing in its state, among the rows by its foot (D76), drawn on the

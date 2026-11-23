@@ -82,6 +82,17 @@ describe('the depths of a painted scene (D76, D95)', () => {
     expect(FLOOR_DEPTH).toBeLessThan(rowDepth(0));
   });
 
+  it('lays a thing set in the floor under every figure, one drawn higher on its row too (D332)', () => {
+    // The tower hall's star: on row 10, where a figure is drawn 0.12 of a cell higher.
+    const plate = thingDepth(10, { set: true });
+    expect(plate).toBe(FLOOR_DEPTH);
+    expect(plate).toBeLessThan(figureDepth(10 + FOOT_IN_CELL - 0.12));
+    expect(plate).toBeLessThan(figureDepth(9 + FOOT_IN_CELL));
+    expect(plate).toBeLessThan(rowDepth(0));
+    // A thing standing on that row is over the figure drawn higher on it.
+    expect(thingDepth(10)).toBeGreaterThan(figureDepth(10 + FOOT_IN_CELL - 0.12));
+  });
+
   it('lays the mark in an open doorway over the door\'s open picture, under who stands there (D172)', () => {
     const open = thingDepth(6, { under: true, open: true });
     const inDoorway = markDepthIn(open);

@@ -33,23 +33,27 @@ export function rowDepth(row: number, under = false): number {
  * or a gate over the figure in its doorway while it is shut (D95); `inside`, a
  * thing lying on a cell no one walks, inside the furniture there, under that
  * row's things; `lying`, a key on the floor, under its row's things too, so that a
- * torch standing on its row is over it (D164). */
+ * torch standing on its row is over it (D164); `set`, a thing set in the floor, a brass
+ * plate and its light, the floor's own whatever its row (D332). */
 export interface ThingDrawn {
   under?: boolean;
   open?: boolean;
   inside?: boolean;
   lying?: boolean;
+  set?: boolean;
 }
 
 /** The depth of a painted thing standing on row `row`, just over its row's image
  * and under the figure standing on the row: a door or a gate marked `under` is over
  * the figure in its doorway while it is shut; open, what is seen through it is
  * under that figure, and its arch over them (D95); a thing `inside` furniture, or a
- * key `lying` on the floor, is just under its row's image (D164). */
+ * key `lying` on the floor, is just under its row's image (D164); a thing `set` in the
+ * floor lies on it, under every figure and every row's things (D332). */
 export function thingDepth(
   row: number,
-  { under = false, open = false, inside = false, lying = false }: ThingDrawn = {},
+  { under = false, open = false, inside = false, lying = false, set = false }: ThingDrawn = {},
 ): number {
+  if (set) return FLOOR_DEPTH;
   if (inside || lying) return rowDepth(row) - 0.00001;
   return rowDepth(row, under && !open) + 0.00001;
 }
@@ -65,7 +69,8 @@ export function coverDepth(row: number): number {
 }
 
 /** The depth of a picture lying on the floor: a hole (D167), a door's doorway open
- * (D289); over the ground, under a goal's mark, every row's things and every figure. */
+ * (D289), a plate and its light (D332); over the ground, under a goal's mark, every
+ * row's things and every figure. */
 export const FLOOR_DEPTH = 2.8;
 
 /** The depth of a goal's mark (D160): on the ground, over the floor's own pictures (a

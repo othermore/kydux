@@ -5418,3 +5418,13 @@ one overturns stays, marked as superseded.
   the map covers what is still to come. `tips-pictures.spec.ts` seeds that game and
   checks the states before it takes the picture. Rules out a picture taken from the
   tester's view, and one that names a stop the child has not reached.
+- **D332 — A thing set in the floor is under every figure, whatever its row.** Decided
+  2026-11-23 by the designer, for the owner's (*El familiar queda detrás de la imagen de
+  la estrella cuando está encendida. No sé si pasará con los otros tres círculos*). A
+  painted thing whose `cut.json` entry says `"lying": true`, a brass plate and its light
+  (D270, D287), is drawn at the floor's own depth (`FLOOR_DEPTH`), over the ground and
+  under a goal's mark, every row's things and every figure, and not among the rows by
+  its foot (D76): a light's picture reaches below its plate's row (D287), and a figure
+  standing on the plate or on the rows over it is in front of the light in each of its
+  states. The tower hall's three plates, the moon's, the sun's and the star's, say so.
+  Rules out a figure hidden by a light it stands on.

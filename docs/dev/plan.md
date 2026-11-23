@@ -770,8 +770,9 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     unseen (D323); and a story's figure that stamps where it stands and throws what
     it holds all at once (D324); by the owner's word on GitHub's budget, a
     workflow that runs no browser test and stores nothing (D325); the walk-on
-    pupils in colours of their own (D326); and a story step whose camera goes
-    with a figure (D327).
+    pupils in colours of their own (D326); a story step whose camera goes
+    with a figure (D327); a tip's picture that shows what a child sees there
+    (D331); and a thing set in the floor under every figure (D332).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

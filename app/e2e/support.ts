@@ -1,5 +1,5 @@
 // What the browser tests share with their configuration: how much longer they wait
-// on GitHub's runner, which plays the game some three times slower than hija (D191).
+// under `CI`, on a runner that plays the game some three times slower than hija (D191).
 
 /** How many times longer every wait is under `CI`. */
 export const CI_TIMES = process.env.CI ? 3 : 1;

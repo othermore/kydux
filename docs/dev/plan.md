@@ -284,8 +284,8 @@ kydux/
   asset in a manifest with a licence, the two READMEs in step). All of them
   together: `ci/check.sh`. The Playwright suite, slower, runs before a release
   and when a piece touches the shell.
-- **GitHub Actions** runs `ci/check.sh` on every push, and the Playwright suite
-  too only when started by hand (D179); it builds the release
+- **GitHub Actions** runs `ci/check.sh` on every push, and never the Playwright
+  suite, whose gate is hija (D179, D325); it builds the release
   bundles on a tag. Pushes and tags happen only inside the hours, so the runs
   do too.
 - **Releases**: `0.1`, `0.2`, ... while the course is incomplete; `1.0` when
@@ -650,7 +650,7 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     language and never the wizard (D174), the card that waits for the wizard's words
     (D175), a bonus earned by the spell cast (D176), a stop that is no outcome (D177), `osto`
     taught after the `while` in a lesson of its own and needed by the night walk's hole,
-    which never closes (D178), and the browser tests run on GitHub at a release (D179); and,
+    which never closes (D178), and the browser tests' gate on hija (D179); and,
     after the owner's next pass (`sprint-38.md`), a lesson block's walk told in steps,
     never a cell (D180), and a mark covered only by what is painted over it, the three
     doors' top arch cut to its stones (D181).
@@ -664,7 +664,7 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     with the wind's sound (D185), cells a flight crosses and a walk does not (D186),
     rings flown through in order (D187), the flying figures, Zarek and Rinlo (D188),
     the race scored by Ilda's count (D189), and a function taught where a loop cannot
-    serve (D190); and, in the same sprint, the browser tests' time on GitHub (D191), a
+    serve (D190); and, in the same sprint, the browser tests' time under `CI` (D191), a
     score of its own for every chapter (D192), the page's look with a welcome page
     (D193), and portraits of every character and every look (D194); and, in
     `sprint-40.md`, the shed's brooms hung on a peg a cell (D195), found by where the
@@ -769,7 +769,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     (D321), nobody fading into a scene, who comes in walking in by a way in (D322),
     and the view that ends inside a painting, the band over the entrance's wall
     unseen (D323); and a story's figure that stamps where it stands and throws what
-    it holds all at once (D324).
+    it holds all at once (D324); and, by the owner's word on GitHub's budget, a
+    workflow that runs no browser test and stores nothing (D325).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

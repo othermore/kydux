@@ -7,13 +7,13 @@ import { CI_TIMES } from './e2e/support';
 
 // The built game, served by `vite preview` the way a release runs: over HTTPS
 // when this machine has the development certificate (ci/dev-cert.sh), over
-// HTTP on localhost otherwise, as on GitHub. Both are secure contexts.
+// HTTP on localhost otherwise. Both are secure contexts.
 const tlsDir = process.env.KYDUX_TLS_DIR ?? join(homedir(), '.config', 'kydux', 'tls');
 const https = process.env.KYDUX_HTTP !== '1' && existsSync(join(tlsDir, 'server.crt'));
 const baseURL = `${https ? 'https' : 'http'}://localhost:4173/`;
 
-// On GitHub's runner a test, an expect and the specs' own waits get three times
-// their time (D191).
+// Under `CI`, a slow runner's sign, a test, an expect and the specs' own waits get
+// three times their time (D191).
 export default defineConfig({
   testDir: './e2e',
   timeout: 120_000 * CI_TIMES,

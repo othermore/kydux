@@ -722,10 +722,10 @@ already on GitHub is never rewritten.
 A release is a version of the game that the owner has tried and said yes
 to. Its commit is the one that sets the version number. That commit
 carries a tag named after the version. GitHub runs every check but the
-browser tests on it, as on any push. It runs the browser tests only when
-you start them by hand, because there they take hours and some run out of
-their time. Here, `ci/check.sh --e2e` runs them before a sprint's last
-commit.
+browser tests on it, as on any push. The browser tests never run on
+GitHub: there they take hours, and a failed run's report uses the
+account's storage. Here, `ci/check.sh --e2e` runs them before a sprint's
+last commit.
 
 Tag the version commit before you push. For version 0.0.4, with its
 version commit at the top of `main`:
@@ -745,10 +745,6 @@ You should see the tag among the push's last lines, as
 its way up, the tag follows it, and the push says so first:
 `The tag v0.0.4 on its commit dated again`. A tag on a commit that is
 already on GitHub goes up the same way, on its own.
-
-To run the browser tests on GitHub, open the repository's *Actions* tab,
-choose the workflow *check*, and press *Run workflow*. Nothing else starts
-them there.
 
 Two files are never committed: `CLAUDE.md` and the `.claude/` directory.
 They hold the project's internal instructions, and `.gitignore` keeps them

@@ -480,7 +480,7 @@ one overturns stays, marked as superseded.
   with their keys in `~/.config/kydux/tls/`; the dev and preview servers use
   it when it exists. The authority carries name constraints that limit it to
   the machine's names and private address ranges, so that trusting it on the
-  other computer trusts nothing else. Without the certificate, as on GitHub,
+  other computer trusts nothing else. Without the certificate
   the servers serve HTTP on localhost, which browsers count as secure.
 - **D14 — The child's code is contained by the browser's sandbox.**
   Decided 2026-10-20. The child's Python is real CPython compiled to
@@ -2691,16 +2691,14 @@ one overturns stays, marked as superseded.
   the level (D176), and a `while` waiting for it to close ends at the tick limit; the
   chapter's last level uses both its spells. Rules out a spell taught, summed up in the
   story, and never cast, and a spell that spares the child the loop.
-- **D179 — The browser tests run on GitHub only when started by hand.** Decided 2026-11-09
-  and 2026-11-16 by the owner, on the designer's proposal (*me parece bien que las pruebas
-  de github que se pasan de tiempo se dejen para lanzar a mano pero no se lancen*):
-  GitHub's runner takes hours for the browser tests, and the ones that wait the longest in
-  real time run out of their time there, with three times the time too (D191), while every
-  one passes on hija. On GitHub the `check` job (`ci/check.sh`) runs on every push, tag
-  and pull request; the `e2e` job (`ci/check.sh --e2e`) runs only when the workflow is
-  started by hand (`workflow_dispatch`), and never by a push or a tag. The gate is
-  `ci/check.sh --e2e` on hija, once before a sprint's last commit, each piece checked with
-  `ci/check.sh` and the browser tests it touches (the owner, 2026-11-09). A release tags
+- **D179 — The browser tests' gate is hija, and a release tags its version commit before
+  the push.** Decided 2026-11-09 and 2026-11-16 by the owner, on the designer's proposal:
+  GitHub's runner takes hours for the browser tests, and the ones that wait the longest
+  in real time run out of their time there, with three times the time too (D191), while
+  every one passes on hija. The gate is `ci/check.sh --e2e` on hija, once before a sprint's
+  last commit, each piece checked with `ci/check.sh` and the browser tests it touches
+  (the owner, 2026-11-09). On GitHub the `check` job (`ci/check.sh`) runs on every push,
+  tag and pull request, and no browser test runs there (D325). A release tags
   its version commit, `git tag -a v<version>`, before `ci/push.sh`, which pushes with
   `--follow-tags`; a tag on a commit it dates again is made again on the commit's new self,
   with its message, dated now, and a tag on a commit already pushed goes up alone. Rules
@@ -2884,13 +2882,16 @@ one overturns stays, marked as superseded.
   the rematch moves the rings and gives the race's program to repair, so that only its
   numbers change.
   Rules out a `def` whose only reason is a lines goal a `for` would meet.
-- **D191 — The browser tests on GitHub run with three times the time.** Decided
-  2026-11-10 from the tag run of v0.0.5, which lost three tests by time alone (D179).
+- **D191 — Under `CI` the browser tests run with three times the time.** Decided
+  2026-11-10: a hosted runner plays the game some three times slower than hija, and a
+  test there is lost by time alone (D179).
   Under `CI`, Playwright's test timeout is 360 s and its expect timeout 45 s
   (`app/playwright.config.ts`), and the specs' own waits are three times theirs through
   one helper, `ciTimes` in `app/e2e/support.ts`; a wait of under 400 ms, a sample within a
-  tick, stays as it is. `retries` stays 1. `ci/push.sh --tags` refuses a tag whose commit
-  does not carry the tag's version. Rules out a run on GitHub that is red by the
+  tick, stays as it is. `retries` is 1 there, and the run writes its report as pages. The
+  allowance serves a run on any slow machine that sets `CI`; the project's workflow runs
+  no browser test (D325). `ci/push.sh --tags` refuses a tag whose commit
+  does not carry the tag's version. Rules out a run that is red by the
   runner's speed alone where time can mend it.
 - **D192 — Every chapter has a score of its own, made by the game from notes.** Decided
   2026-11-10 by the owner (*cada capítulo debe tener una banda sonora apropiada, ajustada a
@@ -5242,3 +5243,17 @@ one overturns stays, marked as superseded.
   más…*, Rinlo stamps twice, throws `thread_1`, `thread_2` and `thread_3` from (8, 3),
   stands a tick and sits. Rules out a figure that walks round a room laying down, one
   by one, what it breaks in anger, and one that spins the whole round as it throws.
+- **D325 — GitHub runs no browser test and stores nothing from a run.** Decided
+  2026-11-23 by the owner (*Estoy usando todo mi presupuesto de GitHub actions*; *No es
+  prioritario tener checks en GitHub, puedo asegurar que los hago antes de hacer un
+  push*; and, to the designer's proposal to delete the stored reports and take the
+  browser tests' job out of the workflow, *Haz 1 y 2*): what a run stores in a private
+  repository counts against the account every day it is kept, ninety by default, and
+  the reports of five failed browser-test runs held 1.1 GB there, while the runs' minutes
+  were few. The workflow has one job, `check` (`ci/check.sh`), on a push to `main`, a
+  tag, a pull request and a run started by hand, and no step of it uploads anything. The
+  browser tests run on hija alone, where they are the gate (D179), and what a run
+  leaves stays on the machine: the list on the terminal and a failed test's trace in
+  `app/test-results/`, which git ignores. Rules out a
+  browser-test job on GitHub, one started by hand too, and a step that uploads an
+  artifact from a run of the private repository.

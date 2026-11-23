@@ -5408,3 +5408,13 @@ one overturns stays, marked as superseded.
   there counts nothing and asks nothing about cookies under any name but the published
   one (D328). Rules out taking the server's files out of the repository, and two games
   under one name.
+- **D331 — A tip's picture shows what a child sees there.** Decided 2026-11-23 by the
+  owner (*La captura del tip sobre el mapa no debería mostrar niveles ocultos anteriores
+  y otros niveles sí accesibles (Eso solo pasa si usas el modo debug), debería mostrar
+  por ejemplo los primeros 3 niveles destapados y lo demás sin destapar, para no hacer
+  spoiler*). A tip's picture (D221, D239) is taken from a game a child could have: the
+  map's is the first chapter of a wizard on the second practice, the stops before it
+  done, the one they are on open, the next one named and every one after it covered, as
+  the map covers what is still to come. `tips-pictures.spec.ts` seeds that game and
+  checks the states before it takes the picture. Rules out a picture taken from the
+  tester's view, and one that names a stop the child has not reached.

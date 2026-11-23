@@ -9,13 +9,20 @@
 //
 // (docs/dev/dev-environment.md says how).
 
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { MARTA, type SeededWizard, seedWizard } from './helpers';
 
 const CONTENT = fileURLToPath(new URL('../../content/tips/', import.meta.url));
 const PABLO: SeededWizard = { name: 'Pablo', gender: 'boy', look: 'amber' };
+/** The first chapter's stops, in order. */
+const FIRST: string[] = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../../content/chapters/01-arrival/chapter.json', import.meta.url)), 'utf8'),
+).items;
+/** How many of them the map's picture shows done: the two stories, the first lesson, the
+ * first practice and the second lesson, so that the child is on the second practice. */
+const DONE = 5;
 /** The picture's size, and the most it may weigh (D239). */
 const WIDTH = 960;
 const HEIGHT = 540;
@@ -78,6 +85,26 @@ async function picture(page: Page, lang: string, key: string, around: Locator[])
   expect(webp, `${lang}/${key} fits ${MOST_BYTES} bytes`).not.toBe('');
   mkdirSync(`${CONTENT}${lang}`, { recursive: true });
   writeFileSync(`${CONTENT}${lang}/${key}.webp`, Buffer.from(webp, 'base64'));
+}
+
+/** Gives the page a game a few stops into the first chapter, before the game loads: the
+ * map then shows what a child there sees, the stops done, the one they are on, the next
+ * one named and the rest still covered. */
+async function seedFewStops(page: Page, wizard: SeededWizard): Promise<void> {
+  const done = FIRST.slice(0, DONE).map((item) => item.split(':'));
+  const read = (kind: string) => Object.fromEntries(done.filter(([k]) => k === kind).map(([, id]) => [id, { read: true }]));
+  const progress = {
+    version: 1,
+    wizard,
+    guided: true,
+    stories: read('story'),
+    lessons: read('lesson'),
+    levels: Object.fromEntries(done.filter(([k]) => k === 'level').map(([, id]) => [id, { won: true, stars: 3, runs: 1 }])),
+    current: FIRST[DONE],
+  };
+  await page.addInitScript((kept) => {
+    if (!localStorage.getItem('kydux.games')) localStorage.setItem('kydux.progress', kept);
+  }, JSON.stringify(progress));
 }
 
 async function openLevel(page: Page, id: string): Promise<void> {
@@ -158,7 +185,17 @@ for (const [lang, locale, wizard] of [
       await picture(page, lang, 'keys', [page.locator('#settings-keys')]);
     });
 
-    test('a lesson whose example is run on its page, and the map', async ({ page }) => {
+    test('the map, and a lesson whose example is run on its page', async ({ page }) => {
+      // The map of a child on the second practice: no stop further on is uncovered.
+      await seedFewStops(page, wizard);
+      await page.goto('/#map');
+      await expect(page.locator('.map-screen')).toBeVisible();
+      const chapter = page.locator('.map-chapter').first();
+      const stops = chapter.locator('.stop');
+      await expect(stops.nth(DONE)).toHaveAttribute('data-state', 'open');
+      await expect(stops.nth(DONE + 2)).toHaveAttribute('data-state', 'locked');
+      // The first chapter's heading and its first stops, large enough to read.
+      await picture(page, lang, 'map', [chapter.locator('h3, h2').first(), ...[0, 1, 2, 3, 4, 5, 6].map((n) => stops.nth(n))]);
       // how-much's third page holds its block, a walk that prints nothing: the page
       // says what the walk did.
       await page.goto('/#lesson/how-much');
@@ -169,12 +206,6 @@ for (const [lang, locale, wizard] of [
       const block = page.locator('.lesson-run').first();
       await expect(block.locator('.lesson-said')).toBeVisible({ timeout: 90_000 });
       await picture(page, lang, 'lesson', [block]);
-      await page.goto('/#map');
-      await expect(page.locator('.map-screen')).toBeVisible();
-      // The first chapter's heading and its first stops, large enough to read.
-      const chapter = page.locator('.map-chapter').first();
-      const stops = chapter.locator('.stop');
-      await picture(page, lang, 'map', [chapter.locator('h3, h2').first(), ...[0, 1, 2, 3, 4, 5].map((n) => stops.nth(n))]);
     });
   });
 }

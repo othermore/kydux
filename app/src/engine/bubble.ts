@@ -74,6 +74,14 @@ export function bubbleBelow(above: Box, below: Box, figures: readonly Box[], roo
   return figures.some((figure) => meets(above, figure)) && !figures.some((figure) => meets(below, figure));
 }
 
+/** The side of who speaks a bubble goes to (D284): where it would go below and cover what
+ * words keep off, the familiar's circle, the side away from it, judged by its middle against
+ * the speaker's; null where it does not. */
+export function bubbleBeside(below: Box, keep: Box | null, speaker: number): 'left' | 'right' | null {
+  if (!keep || !meets(below, keep)) return null;
+  return (keep.left + keep.right) / 2 <= speaker ? 'right' : 'left';
+}
+
 /** How far sideways a bubble above who speaks moves to clear the figures it would cover,
  * the shorter way that stays inside the scene and covers no one; 0 where none does. */
 export function bubbleShift(above: Box, figures: readonly Box[], sceneWidth: number): number {

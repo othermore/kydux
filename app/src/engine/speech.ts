@@ -26,6 +26,7 @@ import { wordsScale } from './zooming';
 import {
   type Box,
   bubbleBelow,
+  bubbleBeside,
   bubbleMiddle,
   bubbleRoom,
   bubbleShift,
@@ -75,6 +76,8 @@ export interface SpeechParts {
   view: () => Box;
   /** The way a figure faces, as the scene keeps it (D241): a thought goes behind it. */
   facing: (figure: Phaser.GameObjects.Sprite) => 'up' | 'down' | 'left' | 'right';
+  /** What words keep off, in the scene's pixels: the familiar's circle (D284), or null. */
+  keepOff?: () => Box | null;
 }
 
 export class Speech {
@@ -471,7 +474,10 @@ export class Speech {
       const top = over.y + 22 + tail * scale;
       return sides(top, top + height * scale);
     };
-    const wanted = () => bubbleBelow(aboveBox(), belowBox(), figures, this.roomAbove(height + tail, width));
+    // What words keep off, the familiar's circle, is cleared as a figure is (D284).
+    const keep = this.parts.keepOff?.() ?? null;
+    const avoid = keep ? [...figures, keep] : figures;
+    const wanted = () => bubbleBelow(aboveBox(), belowBox(), avoid, this.roomAbove(height + tail, width));
     let below = wanted();
     if (below && !belowFits() && this.roomAbove(height + tail, width)) {
       const [narrow, tall] = [width, height];
@@ -484,7 +490,13 @@ export class Speech {
         [width, height] = [narrow, tall];
       }
     }
-    const shift = below ? 0 : bubbleShift(aboveBox(), figures, this.parts.width);
+    // With no room above, and the circle below: beside who speaks, away from it (D284).
+    const beside = below ? bubbleBeside(belowBox(), keep, over.x) : null;
+    if (beside) {
+      this.besideBubble(beside, over, words, width, height, pad, who, plain, tick, ticks);
+      return;
+    }
+    const shift = below ? 0 : bubbleShift(aboveBox(), avoid, this.parts.width);
     const top = below ? tail : -height - tail;
     this.place = { width, below, shift, side: below ? 'below' : 'above', bottom: 0 };
     const [x, y] = this.anchor();
@@ -509,6 +521,53 @@ export class Speech {
     box.strokePath();
     words.setY(top + pad);
     this.bubble = this.scene.add.container(x, y, [box, words]).setDepth(10).setScale(this.scale);
+    this.bubbleUntil = tick + ticks;
+    this.bubbleRead = this.readAt(ticks);
+    this.parent.dataset.bubble = plain;
+    this.parent.dataset.speaker = who;
+    this.publishOver();
+  }
+
+  /** A bubble beside who speaks, on `side`, level with the head, its tail to the head's
+   * side (D284). */
+  private besideBubble(
+    side: 'left' | 'right',
+    over: Phaser.GameObjects.Sprite,
+    words: Phaser.GameObjects.Text,
+    width: number,
+    height: number,
+    pad: number,
+    who: string,
+    plain: string,
+    tick: number,
+    ticks: number,
+  ): void {
+    const scale = this.scale;
+    const head = this.headOf(over);
+    const edge = (side === 'right' ? head.right - over.x : head.left - over.x) / scale;
+    const gap = 12;
+    const left = side === 'right' ? edge + gap : edge - gap - width;
+    const top = -height / 3;
+    const near = side === 'right' ? left : left + width;
+    const middle = top + height / 2;
+    const box = this.scene.add.graphics();
+    box.fillStyle(0xffffff, 1).lineStyle(2, 0x1f2330, 1);
+    box.fillRoundedRect(left, top, width, height, 8);
+    box.strokeRoundedRect(left, top, width, height, 8);
+    box.fillTriangle(near, middle - 7, near, middle + 7, edge, middle);
+    box.beginPath();
+    box.moveTo(near, middle - 7);
+    box.lineTo(edge, middle);
+    box.lineTo(near, middle + 7);
+    box.strokePath();
+    box.lineStyle(3, 0xffffff, 1);
+    box.beginPath();
+    box.moveTo(near, middle - 6);
+    box.lineTo(near, middle + 6);
+    box.strokePath();
+    words.setPosition(left + width / 2, top + pad);
+    this.place = { width, below: false, shift: 0, side, bottom: (top + height) * scale };
+    this.bubble = this.scene.add.container(...this.anchor(), [box, words]).setDepth(10).setScale(scale);
     this.bubbleUntil = tick + ticks;
     this.bubbleRead = this.readAt(ticks);
     this.parent.dataset.bubble = plain;

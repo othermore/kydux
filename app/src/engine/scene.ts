@@ -898,6 +898,13 @@ class LevelScene extends Phaser.Scene {
       },
       facing: (figure) => this.wayOf(figure),
       cover: () => this.coverOnScene(),
+      // The familiar's circle, which words keep off (D284).
+      keepOff: () => {
+        const circle = this.map.circle;
+        if (!circle) return null;
+        const [[x0, y0], [x1, y1]] = circle;
+        return { left: x0 * TILE, top: y0 * TILE, right: (x1 + 1) * TILE, bottom: (y1 + 1) * TILE };
+      },
     });
     const story = this.options.story;
     this.view = new SceneCamera(this, this.parentNode, {

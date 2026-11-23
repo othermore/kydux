@@ -3,6 +3,7 @@ import {
   AFTER_BUMP_MS,
   type Box,
   bubbleBelow,
+  bubbleBeside,
   bubbleMiddle,
   bubbleRoom,
   bubbleShift,
@@ -230,5 +231,23 @@ describe('a thought beside the head where there is no room above (D245)', () => 
       expect(near(placing, side, placing.dots[1].y)).toBeLessThan(6);
       expect(placing.dots[0].radius).toBeGreaterThan(placing.dots[1].radius);
     }
+  });
+});
+
+describe('words told in the circle keep off it (D284)', () => {
+  // The circle of El círculo, its cells 8 to 11 across and 6 to 8 down, at 96 a cell.
+  const circle = { left: 768, top: 576, right: 1152, bottom: 864 };
+
+  it('go beside who speaks, away from the circle, where below would cover it', () => {
+    // Orla at (11, 4): her bubble under her feet reaches the circle's top row.
+    const below = { left: 950, top: 493, right: 1250, bottom: 600 };
+    expect(bubbleBeside(below, circle, 1104)).toBe('right');
+    expect(bubbleBeside(below, circle, 700)).toBe('left');
+  });
+
+  it('stay where they are where they cover nothing of it, or where there is none', () => {
+    const clear = { left: 950, top: 400, right: 1250, bottom: 470 };
+    expect(bubbleBeside(clear, circle, 1104)).toBeNull();
+    expect(bubbleBeside({ left: 950, top: 493, right: 1250, bottom: 600 }, null, 1104)).toBeNull();
   });
 });

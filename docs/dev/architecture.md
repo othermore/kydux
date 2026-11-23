@@ -4497,3 +4497,12 @@ one overturns stays, marked as superseded.
   is kept; the band and the robe's stars take the set's band colour where it differs
   (`FRIEND_PORTRAITS`, `friend_portrait_parts`). With no look, the first set. Rules out a
   portrait in green beside a figure in burgundy.
+- **D284 — Words told in the circle's levels keep off the circle.** Decided 2026-11-18 by
+  the designer, from sprint 53's review. In a level with a circle (a `familiar` block with
+  `circle`), the bubble of words told (D264) covers none of the circle's cells: the circle
+  is cleared as a figure is (`keepOff`, `Speech`), so that a bubble opens above who speaks
+  where the frame has the room, moved aside off the circle where above would cover it;
+  and where it has not, and below would cover the circle, it opens beside who speaks,
+  level with the head, on the side away from the circle (`bubbleBeside`): Orla's words at
+  the win of *El círculo* to her right. What Orla and Bimo speak about is seen while they
+  speak. Rules out a bubble over the trial it tells about.

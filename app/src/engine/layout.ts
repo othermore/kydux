@@ -215,6 +215,8 @@ export interface Layout {
   voices: Record<string, Tile>;
   /** The cells only a familiar enters (D270), `,` on the map. */
   small: Tile[];
+  /** The familiar's circle, its first and last cells (D262), which words keep off (D284). */
+  circle?: [Tile, Tile];
 }
 
 /** The familiar the child describes, or lives with: the game's, written into the level's
@@ -468,6 +470,7 @@ export function layout(level: LevelJson): Layout {
       .filter((goal) => goal.kind === 'through_in_order')
       .flatMap((goal) => (Array.isArray(goal.ids) ? goal.ids.map(String) : [])),
     ...livingOf(level),
+    ...circleOf(level),
     voices: Object.fromEntries(
       Object.entries(isRecord(level.voices) ? level.voices : {}).flatMap(([who, cell]) => {
         const tile = asTile(cell);
@@ -479,6 +482,15 @@ export function layout(level: LevelJson): Layout {
 }
 
 /** In a living level, the game's familiar where it stands at the start (D269). */
+/** A level's familiar circle, from its block (D262, D284). */
+function circleOf(level: LevelJson): Pick<Layout, 'circle'> {
+  const block = isRecord(level.familiar) ? level.familiar : null;
+  const box = block?.circle;
+  if (!Array.isArray(box) || box.length !== 4) return {};
+  const [x0, y0, x1, y1] = box.map(Number) as [number, number, number, number];
+  return { circle: [[x0, y0], [x1, y1]] };
+}
+
 function livingOf(level: LevelJson): Pick<Layout, 'living'> {
   const block = isRecord(level.familiar) ? level.familiar : null;
   const living = isRecord(block?.living) ? block.living : null;

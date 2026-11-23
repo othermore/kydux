@@ -65,7 +65,16 @@
     {
       "who": "voice",
       "camera": {
-        "wide": true
+        "fit": [
+          [
+            0,
+            0
+          ],
+          [
+            19,
+            9
+          ]
+        ]
       },
       "by": "rinlo",
       "do": [
@@ -99,7 +108,16 @@
     {
       "who": "voice",
       "camera": {
-        "wide": true
+        "fit": [
+          [
+            0,
+            5
+          ],
+          [
+            19,
+            14
+          ]
+        ]
       },
       "do": [
         {

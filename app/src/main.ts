@@ -721,13 +721,15 @@ function route(): void {
     wanted.name === 'level' || wanted.name === 'lesson' || wanted.name === 'story'
       ? `${wanted.name}/${wanted.id}${wanted.name === 'lesson' && wanted.from ? `/from/${wanted.from}` : ''}`
       : wanted.name;
+  // The settings come back to the address shown, whoever built its screen: a story joined
+  // in place takes its address with no screen built (D320).
+  if (wanted.name !== 'settings') beforeSettings = location.hash || '#start';
   if (key === shownRoute && screen) return;
   shownRoute = key;
   // The words speak of the wizard as the progress document has it now (D37), and of its
   // familiar (D266).
   speakOf(progress.wizard());
   speakOfTheFamiliar();
-  if (wanted.name !== 'settings') beforeSettings = location.hash || '#start';
   playMusicFor(wanted);
   screen?.destroy();
   screen = null;

@@ -809,6 +809,12 @@ test('The end of the year goes on from What the familiar brought on its live sce
   await page.locator('#story-skip').click();
   await expect(page.locator('.story-frame')).toHaveAttribute('data-still', 'on');
   await expect(page.locator('#story-still')).toBeVisible();
+  // The settings opened from it come back to it, the address the join gave.
+  await page.locator('#settings-link').click();
+  await expect(page).toHaveURL(/#settings$/);
+  await page.locator('#settings-back').click();
+  await expect(page).toHaveURL(/#story\/the-end-of-the-year$/);
+  await expect(page.locator('#story-title')).toHaveText('The end of the year');
 });
 
 test("the hall goes dark while the children tell Orla, and comes back in the evening (D280)", async ({ page }) => {

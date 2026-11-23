@@ -9,6 +9,7 @@
 // shows once there are two.
 
 import type { LevelJson, CourseGiven } from '../runtime/protocol';
+import { type FamiliarTable, familiarTable } from '../content/familiar';
 import { t } from '../i18n';
 import { element } from './dom';
 import { withCode } from './words';
@@ -84,6 +85,20 @@ export function allows(api: readonly string[], table: ApiTable, role: string, me
   if (api.includes(`${role}.${member}`)) return true;
   const thingMembers = (table.roles.thing ?? []).map((m) => m.name);
   return table.thing_roles.includes(role) && thingMembers.includes(member) && api.includes(`thing.${member}`);
+}
+
+/** The first year's familiars a pupil may describe (D298), where the level's block
+ * describes one (stage `trial` or `birth`): the six kinds in the table's order, each with
+ * its colours once the level teaches `familiar.color`, the colours offered to the child
+ * and not the friend's grey; null elsewhere. */
+export function familiarsListed(
+  level: LevelJson,
+  table: FamiliarTable | null,
+): { kind: string; colours: string[] }[] | null {
+  const stage = (level.familiar as { stage?: unknown } | undefined)?.stage;
+  if (!table || (stage !== 'trial' && stage !== 'birth')) return null;
+  const colours = ((level.api as string[] | undefined) ?? []).includes('familiar.color');
+  return Object.entries(table.kinds).map(([kind, offered]) => ({ kind, colours: colours ? [...offered] : [] }));
 }
 
 /** What the child's code holds in a level: the wizard, then its things and actors, and
@@ -312,6 +327,31 @@ export function notebookPanel(
           ...group('attribute', t('notebook.attributes')),
         ]),
       );
+    }
+    // The six kinds a pupil may describe, after the wizard's actions (D298): each a button
+    // that writes the kind, as an example does, with its word and, once colours are taught,
+    // its colours as the strings to write.
+    const listed = familiarsListed(level, familiarTable());
+    if (listed) {
+      const coloured = listed.some((entry) => entry.colours.length > 0);
+      const kinds = listed.map(({ kind, colours }) => {
+        const button = element('button', { type: 'button', className: 'example' }, [element('code', {}, [kind])]);
+        button.dataset.example = kind;
+        button.addEventListener('click', () => onExample(kind));
+        const item = element('li', {}, [
+          button,
+          element('span', { className: 'description' }, [t(`familiars.${kind}.kind`)]),
+          ...colours.map((colour) => element('code', { className: 'familiar-colour' }, [`"${colour}"`])),
+        ]);
+        item.dataset.kind = kind;
+        return item;
+      });
+      const familiars = element('section', { id: 'notebook-familiars', className: 'notebook-object' }, [
+        element('h3', {}, [t('notebook.familiars.title')]),
+        element('p', {}, [t(coloured ? 'notebook.familiars.text_colours' : 'notebook.familiars.text')]),
+        element('ul', {}, kinds),
+      ]);
+      sections.splice(sections.length > 0 ? 1 : 0, 0, familiars);
     }
     const actions = sections.length ? sections : [element('p', {}, [t('notebook.nothing')])];
     // Python's words (D256): each as it is typed, its line, and its example to read, which

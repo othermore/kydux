@@ -238,6 +238,11 @@
     "plate": {
       "position": "La casilla en la que está el plato, en x e y."
     },
+    "familiars": {
+      "title": "Los familiares de primero",
+      "text": "Un alumno de primero puede describir uno de estos seis.",
+      "text_colours": "Un alumno de primero puede describir uno de estos seis, en uno de sus colores."
+    },
     "door": {
       "kind": "Qué es: \"door\".",
       "name": "El nombre de la puerta en este nivel.",

@@ -278,3 +278,30 @@ test('the plates are not in the notebook before Out of the circle, and from it w
   await expect(offered.locator('li')).toHaveCount(1);
   await expect(offered).toContainText('position');
 });
+
+test("where a familiar is described, the notebook lists the first year's six, with their colours once taught (D298)", async ({
+  page,
+}) => {
+  await open(page, 'the-circle');
+  await page.locator('#notebook-open').click();
+  const listed = page.locator('#notebook-familiars');
+  await expect(listed.locator('h3')).toHaveText("The first year's familiars");
+  await expect(listed).toContainText('A first-year pupil can describe one of these six.');
+  await expect(listed.locator('li')).toHaveCount(6);
+  await expect(listed.locator('[data-example]')).toHaveText(['Fox', 'Crow', 'Bat', 'Hare', 'Mouse', 'Frog']);
+  await expect(listed.locator('.familiar-colour')).toHaveCount(0);
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+End');
+  await listed.locator('[data-example="Hare"]').click();
+  await expect(page.locator('.cm-content')).toContainText('Hare');
+
+  await open(page, 'the-name-and-the-colour');
+  await page.locator('#notebook-open').click();
+  await expect(listed).toContainText('A first-year pupil can describe one of these six, in one of its colours.');
+  await expect(listed.locator('[data-kind="Hare"] .familiar-colour')).toHaveText(['"brown"', '"white"']);
+  await expect(listed).not.toContainText('"grey"');
+
+  await open(page, 'orlas-orders');
+  await page.locator('#notebook-open').click();
+  await expect(listed).toHaveCount(0);
+});

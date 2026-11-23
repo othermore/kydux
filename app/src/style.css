@@ -997,6 +997,13 @@ footer .build {
   font-size: 15px;
 }
 
+/* A first-year familiar's colours, beside its word (D298). */
+.notebook .familiar-colour {
+  margin: 2px 0 0 4px;
+  margin-right: 6px;
+  font-size: 15px;
+}
+
 /* The page of Python (D256), kept short: each word or sign as it is typed, on the colour
    of the open tab, so that the eye finds where each entry begins; its line follows on the
    same row, and under them the example to read, in the editor's own letter, its lines

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   type ApiTable,
   allows,
+  familiarsListed,
   familiarVar,
   heldObjects,
   notebookEntries,
@@ -209,3 +210,32 @@ describe("the familiar's page of the notebook (D266, D269)", () => {
     expect(ownMethod(level, 'go_to')).toBeNull();
   });
 });
+
+describe("the first year's familiars in the notebook (D298)", () => {
+  const table = {
+    kinds: { Fox: ['red', 'white', 'black'], Crow: ['black', 'white'], Bat: ['black', 'white'], Hare: ['brown', 'white'], Mouse: ['brown', 'white'], Frog: ['green', 'red'] },
+    friend: { kind: 'Hare', name: 'Tolu', color: 'grey' },
+  } as unknown as Parameters<typeof familiarsListed>[1];
+
+  it('lists the six kinds where a familiar is described, with no colour before colours are taught', () => {
+    const circle = { id: 'the-circle', familiar: { stage: 'trial' }, api: ['wizard.cast'] };
+    expect(familiarsListed(circle, table)).toEqual(
+      ['Fox', 'Crow', 'Bat', 'Hare', 'Mouse', 'Frog'].map((kind) => ({ kind, colours: [] })),
+    );
+    expect(familiarsListed({ ...circle, familiar: { stage: 'birth' } }, table)).toHaveLength(6);
+  });
+
+  it("gives each kind its colours once familiar.color is taught, and never the friend's grey", () => {
+    const named = { id: 'the-name-and-the-colour', familiar: { stage: 'trial' }, api: ['familiar.color'] };
+    const listed = familiarsListed(named, table) ?? [];
+    expect(listed.find((entry) => entry.kind === 'Hare')?.colours).toEqual(['brown', 'white']);
+    expect(listed.flatMap((entry) => entry.colours)).not.toContain('grey');
+  });
+
+  it('lists none in a living level, outside the chapter, or with no table', () => {
+    expect(familiarsListed({ id: 'orlas-orders', familiar: { stage: 'living' } }, table)).toBeNull();
+    expect(familiarsListed({ id: 'the-gate' }, table)).toBeNull();
+    expect(familiarsListed({ id: 'the-circle', familiar: { stage: 'trial' } }, null)).toBeNull();
+  });
+});
+

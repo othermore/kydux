@@ -323,7 +323,12 @@ def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
         said = {
             key
             for key in catalog
-            if (key.split(".")[0] in ("notebook", "notebook_simple") and key.count(".") == 2)
+            if (
+                key.split(".")[0] in ("notebook", "notebook_simple")
+                and key.count(".") == 2
+                # The notebook's list of the first year's familiars is no role's (D298).
+                and not key.startswith("notebook.familiars.")
+            )
             or key.startswith(("things.", "spells.", "words."))
         }
         for key in sorted(wanted - said):

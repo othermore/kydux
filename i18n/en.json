@@ -238,6 +238,11 @@
     "plate": {
       "position": "The cell the plate is on, as x and y."
     },
+    "familiars": {
+      "title": "The first year's familiars",
+      "text": "A first-year pupil can describe one of these six.",
+      "text_colours": "A first-year pupil can describe one of these six, in one of its colours."
+    },
     "door": {
       "kind": "What it is: \"door\".",
       "name": "The door's own name in this level.",

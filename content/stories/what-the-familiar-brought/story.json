@@ -49,17 +49,59 @@
       "sitting": true
     }
   ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "room_door",
+      "at": [
+        5,
+        3
+      ],
+      "art": "room_door",
+      "open": false
+    }
+  ],
   "steps": [
     {
       "who": "voice",
       "camera": {
         "wide": true
       },
+      "by": "rinlo",
       "do": [
         {
-          "by": "rinlo",
-          "vanish": true
+          "stand": true
         },
+        {
+          "walk": [
+            6,
+            3
+          ]
+        },
+        {
+          "open": "room_door"
+        },
+        {
+          "walk": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              8
+            ]
+          ],
+          "vanish": true
+        }
+      ]
+    },
+    {
+      "who": "voice",
+      "camera": {
+        "wide": true
+      },
+      "do": [
         {
           "by": "rinlo",
           "appear": [

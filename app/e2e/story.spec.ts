@@ -418,17 +418,50 @@ test('Rinlo stands, crosses the room leaving the pieces behind him, and sits aga
   await expect(scene).not.toHaveAttribute('data-found', /thread/);
 });
 
+test('Rinlo opens the side door and goes down the back stairs, then comes out under the arch (D289)', async ({ page }) => {
+  test.setTimeout(ciTimes(180_000));
+  await page.goto('/#story/what-the-familiar-brought');
+  const scene = page.locator('#scene');
+  await scene.waitFor({ timeout: ciTimes(90_000) });
+  // Every place Rinlo is drawn on while the first step plays.
+  await scene.evaluate((node) => {
+    const seen: string[] = [];
+    (window as unknown as { rinlo: string[] }).rinlo = seen;
+    new MutationObserver(() => seen.push(node.getAttribute('data-actors') ?? '')).observe(node, {
+      attributes: true,
+      attributeFilter: ['data-actors'],
+    });
+  });
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  // The first step: the door open, its leaf drawn with its own picture, and Rinlo gone
+  // down the stairs, after the door and the landing.
+  await expect(scene).toHaveAttribute('data-door-looks', /room_door:art-room_door-open/);
+  await expect(scene).not.toHaveAttribute('data-actors', /rinlo/);
+  const walked = await page.evaluate(() => (window as unknown as { rinlo: string[] }).rinlo);
+  for (const cell of ['6,3', '5,3', '2,3', '2,8']) {
+    expect(walked.some((actors) => actors.includes(`rinlo:${cell},`))).toBe(true);
+  }
+  await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/rinlo-down-the-back-stairs.png' });
+  // The second: under the arch, by the children, who turn to him.
+  await storyNext(page);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  await expect(scene).toHaveAttribute('data-actors', /rinlo:5,13,/);
+  await expect(scene).toHaveAttribute('data-wizard-facing', 'left');
+  await expect(scene).toHaveAttribute('data-actors', /friend:\d+,\d+,left/);
+  await expect(scene).toHaveAttribute('data-actors', /mate:\d+,\d+,left/);
+});
+
 test("the hall goes dark while the children tell Orla, and comes back in the evening (D280)", async ({ page }) => {
   test.setTimeout(ciTimes(180_000));
   await page.goto('/#story/what-the-familiar-brought');
   const scene = page.locator('#scene');
   const frame = page.locator('.story-frame');
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
-  // Step 11, the friend's «We have something to tell you…», in the hall by day.
-  await storyNext(page, 10);
+  // Step 12, the friend's «We have something to tell you…», in the hall by day.
+  await storyNext(page, 11);
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
   await expect(scene).not.toHaveAttribute('data-hour', 'sunset');
-  // Step 12: the scene goes dark, and Orla's words are said once it is back, at sunset.
+  // Step 13: the scene goes dark, and Orla's words are said once it is back, at sunset.
   await page.locator('#story-next').click();
   await expect(frame).toHaveAttribute('data-passing', 'dark');
   await expect(scene).not.toHaveAttribute('data-speaker', 'orla');
@@ -438,7 +471,7 @@ test("the hall goes dark while the children tell Orla, and comes back in the eve
   await expect(scene).toHaveAttribute('data-hour', 'sunset');
   await expect(scene).toHaveAttribute('data-speaker', 'orla', { timeout: ciTimes(15_000) });
   await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-hall-in-the-evening.png' });
-  // Back to step 11: the day's hall at once, with no dark.
+  // Back to step 12: the day's hall at once, with no dark.
   await page.locator('#story-back').click();
   await expect(frame).not.toHaveAttribute('data-passing', /./);
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });

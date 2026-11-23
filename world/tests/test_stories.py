@@ -571,3 +571,34 @@ def test_a_story_s_figure_stands_on_and_walks_a_story_s_floor():
         on_the_landing([by("rinlo", {"walk": [4, 1]})], at=(5, 1))
     with pytest.raises(LevelError, match="stopped at 5,1"):
         on_the_landing([by("rinlo", {"walk": [[4, 1], [5, 1]]})], at=(4, 2))
+
+
+def test_rinlo_opens_the_side_door_and_goes_down_the_back_stairs():
+    """D289: Lo que trajo el familiar has the room's side door, shut, and twenty-eight
+    steps, its texts as many in each language; walked through shut, the door stops him."""
+    import copy
+    import json
+    from pathlib import Path
+
+    from kydux_world.level import read_scene, story_on_scenes
+
+    content = Path(__file__).resolve().parents[2] / "content"
+    folder = content / "stories" / "what-the-familiar-brought"
+    story = json.loads((folder / "story.json").read_text(encoding="utf-8"))
+    assert story["things"] == [
+        {"kind": "door", "id": "room_door", "at": [5, 3], "art": "room_door", "open": False}
+    ]
+    figures = json.loads((content / "art" / "figures" / "figures.json").read_text())
+    sitters = frozenset(name for name, sheet in figures["sheets"].items() if "sit" in sheet)
+
+    def built(data):
+        return story_on_scenes(data, lambda name: read_scene(content / "scenes", name), sitters)
+
+    assert len(built(story)["steps"]) == 28
+    for lang in ("es", "en"):
+        text = json.loads((folder / f"text.{lang}.json").read_text(encoding="utf-8"))
+        assert len(text["steps"]) == 28
+    shut = copy.deepcopy(story)
+    shut["steps"][0]["do"] = [act for act in shut["steps"][0]["do"] if "open" not in act]
+    with pytest.raises(LevelError, match="stopped at 5,3"):
+        built(shut)

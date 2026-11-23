@@ -1201,3 +1201,42 @@ ci/check.sh --e2e once at its end; never edit content while a
 browser run is going; no Co-Authored-By; stage only your own
 hunks.
 ```
+
+## 9. The designer's own: The truth gains speed, an organ and the cellos (D315)
+
+Added on 2026-11-22, built by the designer while 59.13 was being built;
+nothing here is the programmer's to build.
+
+The owner, hearing *The truth*: *está bien pero me parece un poco lenta de
+más... me gustaría que empezase así pero subiese el ritmo y la intensidad,
+por ejemplo cuando entran los violines podría en vez de entrar los
+violines (o además) entrar un órgano y algo de percusión... para darle
+intensidad y hacerla más apoteósica*; *si no hay órgano, pueden entrar
+quizás unos de cuerda […] más grandes (cello o doble bass) que los
+violines para que den más peso y tonos más graves*; *lo ideal es que el
+ritmo también cambie, que empiece más lento y luego lo suba un poco*,
+*según nos vamos acercando a la gran revelación*.
+
+**D315 — A section of a theme may have a tempo of its own, and an organ
+and a cello are voices.** A section may say `tempo`, a number or
+`[from, to]`, between which it goes evenly; the page lays the loop out in
+beats of the theme's tempo, so the loop's length, the section of a moment
+and the slider of D312 follow. The page sounds two kinds of voice more,
+`organ` and `cello`. It is entered in `docs/dev/architecture.md`, with
+D313 as the theme is.
+
+**The theme.** 54 bars, a minute and fifty seconds. Its first part is as
+it was, a piano alone at 76. Its middle part, from 0:38, goes evenly from
+76 to 100: an organ on a tune of its own over the cellos, the double
+basses and a timpani, a snare from its fifth bar, the violins in octaves,
+a flute and a horn from its ninth. Its last part, from 1:11, keeps 100
+with every voice, says its last three bars again twice as broad and ends
+on a chord of D major. So in 8.3, step 1, the owner hears a piano alone,
+then the organ from 0:38, then every voice from 1:11. The major chord is
+the designer's choice, for the owner's ear to keep or to turn back to the
+minor.
+
+Recorded from the page as a story hears it, the last part is a third
+louder than it was and over twice the familiar's theme, its peak at half
+of full scale; the organ, the cellos and the violins are level with one
+another there.

@@ -759,8 +759,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     painted opening behind its stones (D307), the way a story's wizard faces (D308),
     words on the dark between two parts (D309), a part left out of sight (D310), the
     first year that is the three friends (D311), the theme's time on the page of themes
-    (D312), the year's ending's theme, *The truth* (D313), and a story that names the
-    music it is told to (D314).
+    (D312), the year's ending's theme, *The truth* (D313), a story that names the
+    music it is told to (D314), and a section of a theme at a tempo of its own (D315).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

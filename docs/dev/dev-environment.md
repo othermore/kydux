@@ -307,8 +307,11 @@ A story plays its chapter's music unless it names its own. A `"music"`
 at the top of `story.json` is the theme the story opens to, by its name
 in `content/music/`. A `"music"` in a step, beside its `"who"`, changes
 the theme from that step on. Going back over that step brings back the
-theme before it. To try a story, open its
-address in the browser, like this one:
+theme before it. A theme told in movements is named with the movement to
+play, after a slash: `"the-truth/love"`. `content/music/README.md` says
+what a movement is.
+
+To try a story, open its address in the browser, like this one:
 
 ```
 https://localhost:5173/#story/at-the-gate

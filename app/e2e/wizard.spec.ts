@@ -80,7 +80,7 @@ test('a name of the game\'s own is refused, and a boy\'s looks are a boy\'s', as
   await page.goto('/#wizard');
   await page.locator('#wizard-gender [data-value="boy"]').click();
   await expect(page.locator('#wizard-looks .radio')).toHaveCount(4);
-  expect(await portraitShown(page, '#wizard-preview')).toBe('wizard-amber');
+  expect(await portraitShown(page, '#wizard-preview')).toBe('wizard-moss');
   for (const name of ['Dask', 'zelim', 'Wizard']) {
     await page.locator('#wizard-name').fill(name);
     await expect(page.locator('#wizard-name-taken')).toBeVisible();

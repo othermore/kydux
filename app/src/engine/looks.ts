@@ -29,7 +29,20 @@ const SKIN = {
   dark: '#8d5524',
 };
 
+/** The first look of each gender is the one the creator proposes (D295): the green
+ * robe, a boy's and a girl's alike, which reads best on every scene and stands apart
+ * from the other figures. An id is the word saved games keep, not the robe's colour. */
 export const LOOKS: readonly Look[] = [
+  {
+    id: 'moss',
+    gender: 'boy',
+    skin: SKIN.paler,
+    hair: '#e0c060',
+    hairStyle: 'short',
+    robe: '#5c8a2e',
+    hat: '#3d5e1d',
+    band: '#ffd43b',
+  },
   {
     id: 'amber',
     gender: 'boy',
@@ -46,8 +59,8 @@ export const LOOKS: readonly Look[] = [
     skin: SKIN.brown,
     hair: '#1f1a17',
     hairStyle: 'long',
-    robe: '#1f9e89',
-    hat: '#146b5d',
+    robe: '#5c8a2e',
+    hat: '#3d5e1d',
     band: '#ffd43b',
   },
   {
@@ -69,16 +82,6 @@ export const LOOKS: readonly Look[] = [
     robe: '#d6517d',
     hat: '#9c2f55',
     band: '#ffe08a',
-  },
-  {
-    id: 'moss',
-    gender: 'boy',
-    skin: SKIN.paler,
-    hair: '#e0c060',
-    hairStyle: 'short',
-    robe: '#5c8a2e',
-    hat: '#3d5e1d',
-    band: '#ffd43b',
   },
   {
     id: 'sky',

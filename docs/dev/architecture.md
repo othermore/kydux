@@ -4750,3 +4750,17 @@ one overturns stays, marked as superseded.
   two sets of colours on one page, a figure enlarged from its small sprite, and people
   on a level, a lesson or the map, where they would come between the child and what
   they are doing (D193).
+- **D295 — The look the creator proposes is the green one.** Decided 2026-11-22 by the
+  owner (*el color por defecto del mago sea el verde. Y el de la maga también*; *que la
+  maga verde (la que será por defecto) tenga la túnica de color más parecido al del mago
+  verde; por defecto ese sea el color, porque se ve mejor y se distingue bien del resto*).
+  The first look of each gender in `LOOKS` (`engine/looks.ts`) is the one the creator
+  shows before the child chooses (D36, D291), and it is the green robe: `moss` for a boy,
+  `teal` for a girl, both with the robe `#5c8a2e`, the hat `#3d5e1d` and the yellow band.
+  A look's id is the word a saved game keeps, not its robe's colour, so a wizard made
+  before keeps its look by its id; the girl's sheet and portrait
+  (`content/art/figures/wizard-teal.webp`, `content/art/portraits/wizard-teal.webp`) are
+  the same drawings with the robe and the hat in the boy's green. The friends' colours
+  follow the wizard's look as they do for any other (D90, D283). Rules out a default
+  look that differs between a boy and a girl in its robe, and a look's id renamed, which
+  would lose the look of the games saved.

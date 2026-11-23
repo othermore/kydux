@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   bowed,
+  cueOf,
   frequency,
+  lineAfter,
   lineFor,
   loopOf,
   loopSeconds,
@@ -9,10 +11,14 @@ import {
   pianoRing,
   placed,
   readTheme,
+  runBeat,
+  runNotes,
+  runOf,
   sectionAt,
   sound,
   type Theme,
   timed,
+  timedRun,
   voiceLevels,
 } from './music';
 
@@ -109,6 +115,10 @@ describe('the music (D192)', () => {
     expect(held - 1).toBeGreaterThan(3);
     expect(held - 1).toBeLessThan(3.5);
     expect(sound(ctx, 'brass', 52, 1, 0.5, 0.5, out)).toBeLessThan(held);
+    // A cymbal rings for its note's length, a crash or a tick, up to three seconds.
+    expect(sound(ctx, 'cymbal', 60, 1, 2, 0.5, out)).toBeCloseTo(3.002);
+    expect(sound(ctx, 'cymbal', 60, 1, 0.1, 0.5, out)).toBeCloseTo(1.102);
+    expect(sound(ctx, 'cymbal', 60, 1, 9, 0.5, out)).toBeCloseTo(4.002);
     // A snare has no pitch and no length of its own to write: a tap is a tap.
     const tap = sound(ctx, 'snare', 60, 1, 0.25, 0.5, out);
     expect(tap).toBe(sound(ctx, 'snare', 72, 1, 4, 0.5, out));
@@ -291,3 +301,98 @@ function fakeContext(): AudioContext {
     createOscillator: () => ({ ...node(), type: '', frequency: param(), start: () => undefined, stop: () => undefined }),
   } as unknown as AudioContext;
 }
+
+describe('a theme told in movements (D316)', () => {
+  /** Four sections in 3/4 at 60: `still` of two bars, `rise` of one bar twice as fast,
+   * `full` of two bars, `hush` of one; three movements, the second with a lead. */
+  const told = (): Theme =>
+    readTheme({
+      id: 'told',
+      tempo: 60,
+      metre: [3, 4],
+      voices: { tune: { kind: 'piano', volume: 0.8 } },
+      sections: [
+        { id: 'still', bars: 2, notes: { tune: [[60, 0, 3, 0.5], [62, 3, 3, 0.5]] } },
+        { id: 'rise', bars: 1, tempo: 120, notes: { tune: [[64, 0, 1, 0.5], [65, 2, 1, 0.5]] } },
+        { id: 'full', bars: 2, notes: { tune: [[67, 0, 3, 0.5], [69, 3, 3, 0.5]] } },
+        { id: 'hush', bars: 1, notes: { tune: [[48, 0, 3, 0.3]] } },
+      ],
+      movements: [
+        { id: 'first', round: ['still'] },
+        { id: 'height', once: ['rise'], round: ['full'] },
+        { id: 'silence', round: ['hush'], enters: 'beat' },
+      ],
+    });
+
+  it('a cue names a theme, or a theme and one of its movements', () => {
+    expect(cueOf('the-truth')).toEqual({ id: 'the-truth' });
+    expect(cueOf('the-truth/height')).toEqual({ id: 'the-truth', movement: 'height' });
+  });
+
+  it('with no movement named, every section sounds in its order, over and over', () => {
+    const run = runOf(told());
+    expect(run.movement).toBeUndefined();
+    expect(run.lead.beats).toBe(0);
+    expect(run.round.beats).toBeCloseTo(6 + 1.5 + 6 + 3);
+    expect(run.sections.map((section) => section.id)).toEqual(['still', 'rise', 'full', 'hush']);
+    expect(runOf(told(), 'nowhere').movement).toBeUndefined();
+  });
+
+  it('a movement plays its lead once and then its own sections over and over', () => {
+    const run = runOf(told(), 'height');
+    expect(run.movement).toBe('height');
+    expect(run.lead.beats).toBeCloseTo(1.5);
+    expect(run.round.beats).toBe(6);
+    const heard = runNotes(run, 0, 1.5 + 12).map((note) => [note.pitch, Number(note.beat.toFixed(3))]);
+    expect(heard).toEqual([
+      [64, 0],
+      [65, 1],
+      [67, 1.5],
+      [69, 4.5],
+      [67, 7.5],
+      [69, 10.5],
+    ]);
+    // From a moment within the loop, only what starts from there.
+    expect(runNotes(run, 5, 8).map((note) => note.pitch)).toEqual([67]);
+    expect(runNotes(run, 0, 1).map((note) => note.pitch)).toEqual([64]);
+  });
+
+  it("a run's notes fall on the audio clock from the run's first beat", () => {
+    const theme = told();
+    const notes = timedRun(theme, runOf(theme, 'height'), 100, 100, 103);
+    expect(notes.map((note) => [note.pitch, Number(note.at.toFixed(3))])).toEqual([
+      [64, 100],
+      [65, 101],
+      [67, 101.5],
+    ]);
+  });
+
+  it('where a run is, the lead once and the loop time after time', () => {
+    const run = runOf(told(), 'height');
+    expect(runBeat(run, 1)).toBe(1);
+    expect(runBeat(run, 1.5 + 6 + 2)).toBeCloseTo(3.5);
+    expect(runBeat(run, -1)).toBe(0);
+  });
+
+  it("another movement comes in at the next bar's line, or at the next beat", () => {
+    const theme = told();
+    const first = runOf(theme, 'first');
+    expect(lineAfter(first, 3, 0.2, 'bar')).toBe(3);
+    expect(lineAfter(first, 3, 3, 'bar')).toBe(3);
+    expect(lineAfter(first, 3, 3.1, 'bar')).toBe(6);
+    expect(lineAfter(first, 3, 13.5, 'bar')).toBe(15);
+    expect(lineAfter(first, 3, 13.5, 'beat')).toBe(14);
+    // A beat of a faster section is shorter, and the lead's end is a bar's line.
+    const height = runOf(theme, 'height');
+    expect(lineAfter(height, 3, 0.2, 'beat')).toBeCloseTo(0.5);
+    expect(lineAfter(height, 3, 0.2, 'bar')).toBeCloseTo(1.5);
+    expect(lineAfter(height, 3, 1.5 + 6 + 3.5, 'bar')).toBeCloseTo(1.5 + 12);
+  });
+
+  it('a movement that names no section, or one the theme has not, is refused', () => {
+    const theme = told();
+    expect(() => readTheme({ ...theme, movements: [{ id: 'empty', round: [] }] })).toThrow(/over and over/);
+    expect(() => readTheme({ ...theme, movements: [{ id: 'lost', round: ['nowhere'] }] })).toThrow(/has not/);
+    expect(() => readTheme({ ...theme, movements: [{ id: 'odd', round: ['still'], enters: 'now' }] })).toThrow(/bar/);
+  });
+});

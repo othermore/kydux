@@ -2,7 +2,8 @@
 (D313), each parses, and each loops on a bar, with no note ringing over a section's end;
 the files are what the score in tools/sound/compose.py makes. A theme has one set of
 voices and no arrangements (D210), and no candidate stands beside them (D209). Every theme
-a story names, at its top or in a step (D314), is one of them."""
+a story names, at its top or in a step (D314), is one of them, and so is the movement it
+names of it (D316)."""
 
 import importlib.util
 import json
@@ -26,6 +27,7 @@ KINDS = {
     "snare",
     "organ",
     "cello",
+    "cymbal",
 }
 
 
@@ -64,8 +66,15 @@ STORIES = sorted((REPO / "content" / "stories").glob("*/story.json"))
 def test_every_theme_a_story_names_is_there(path):
     story = json.loads(path.read_text(encoding="utf-8"))
     named = [story.get("music"), *(step.get("music") for step in story.get("steps", []))]
-    for theme in filter(None, named):
-        assert (MUSIC / f"{theme}.json").is_file(), f"{path.parent.name} names no theme {theme}"
+    for cue in filter(None, named):
+        # A theme, or a theme and a movement of it after a slash (D316).
+        theme, _, movement = cue.partition("/")
+        file = MUSIC / f"{theme}.json"
+        assert file.is_file(), f"{path.parent.name} names no theme {theme}"
+        movements = json.loads(file.read_text(encoding="utf-8")).get("movements", [])
+        assert not movement or movement in {each["id"] for each in movements}, (
+            f"{path.parent.name} names no movement {cue}"
+        )
 
 
 @pytest.mark.parametrize("path", THEMES, ids=lambda p: p.stem)
@@ -82,8 +91,19 @@ def test_a_theme_parses_and_loops_on_a_bar(path):
     sections = {section["id"]: section for section in theme["sections"]}
     order = theme.get("order", list(sections))
     assert set(order) == set(sections)
-    assert 48 <= sum(sections[name]["bars"] for name in order) <= 64
-    assert 2 <= len(sections) <= 3
+    movements = theme.get("movements", [])
+    if movements:
+        # A theme told in movements (D316): each some sections once and then some over
+        # and over, every section in one of them, each coming in on a bar or on a beat.
+        assert len({movement["id"] for movement in movements}) == len(movements)
+        for movement in movements:
+            assert movement["round"] and movement.get("enters", "bar") in ("bar", "beat")
+            assert set(movement.get("once", []) + movement["round"]) <= set(sections)
+        told = [name for each in movements for name in each.get("once", []) + each["round"]]
+        assert sorted(told) == sorted(sections)
+    else:
+        assert 48 <= sum(sections[name]["bars"] for name in order) <= 64
+        assert 2 <= len(sections) <= 3
     for section in sections.values():
         length = section["bars"] * beats
         # A section's own tempo is one, or one to start at and one to end at (D315).
@@ -200,19 +220,32 @@ def test_the_familiar_is_two_flutes_in_three_with_the_celesta_s_tune_in_the_midd
         assert sorted(note[1] for note in running["harp"]) == [i / 2 for i in range(beats * 2)]
 
 
-def test_the_truth_is_the_familiar_s_tune_grave_from_a_piano_alone_to_every_voice():
-    """D313: it starts slower than the familiar's theme and in three as it is; its tune
-    is the familiar's first flute's with each B a half step lower, which a piano has
-    alone an octave under it over its left hand for eight bars; the middle part starts at
-    that tempo, with an organ, the cellos and a timpani from its first bar, and speeds up
-    to the last part's, which is faster than the theme began and keeps it; every voice
-    sounds in the last part, the violins in octaves, the cellos in eighth notes; the tune
-    ends on the keynote over a major chord, and the last bar leaves it out."""
+def test_the_truth_is_the_familiar_s_tune_grave_told_in_movements_up_to_a_drum_kit():
+    """D313, D316: it starts slower than the familiar's theme and in three as it is; its
+    tune is the familiar's first flute's with each B a half step lower, which a piano has
+    alone an octave under it over its left hand for eight bars. Its movements are the
+    piano alone, the organ's part with the cellos and a drum, the revelation, a silence
+    and the major's. The revelation speeds up once, from the theme's tempo to one faster
+    that its two sections keep over and over: every voice sounds in them, the violins in
+    octaves, the cellos in eighth notes, a kick on every bar's first beat, a snare on its
+    third, a hat on every eighth note, a crash where each half starts. The silence has no
+    more than four voices, each soft. The major's movement plays the tune with an F sharp
+    and a B natural, every pitched voice in it, and then a piano has it alone."""
     theme = loaded(ENDING_THEME)
     familiar = loaded("the-familiar")
     assert theme["tempo"] < familiar["tempo"] and theme["metre"] == [3, 4]
     sections = {section["id"]: section for section in theme["sections"]}
-    first, middle, last = (sections[name] for name in theme["order"])
+    movements = {movement["id"]: movement for movement in theme["movements"]}
+    assert list(movements) == ["alone", "name", "revelation", "silence", "love"]
+    kinds = {voice: theme["voices"][voice]["kind"] for voice in theme["voices"]}
+    unpitched = ("drum", "snare", "cymbal")
+
+    def sounding(section: dict) -> set[str]:
+        return {kinds[voice] for voice in section["notes"]}
+
+    # The piano alone: the familiar's tune, grave.
+    (first,) = (sections[name] for name in movements["alone"]["round"])
+    assert "once" not in movements["alone"] and "tempo" not in first
     consort = {section["id"]: section for section in familiar["sections"]}[familiar["order"][0]]
     grave = sorted(
         (start, pitch - 1 if pitch % 12 == 11 else pitch, length)
@@ -228,33 +261,63 @@ def test_the_truth_is_the_familiar_s_tune_grave_from_a_piano_alone_to_every_voic
         voice for voice, notes in first["notes"].items() if any(note[1] < 8 * 3 for note in notes)
     }
     assert alone == {"piano", "left"}
-    assert "piano" in {theme["voices"][voice]["kind"] for voice in alone}
-    # The tempo: the first part at the theme's, the middle one from it up to the last's.
-    assert "tempo" not in first
-    begins, ends = middle["tempo"]
-    assert begins == theme["tempo"] < ends == last["tempo"]
-    assert last["tempo"] <= 1.4 * theme["tempo"]
-    kinds = {voice: theme["voices"][voice]["kind"] for voice in theme["voices"]}
-    assert {"organ", "cello", "drum", "snare"} <= set(kinds.values())
-    entering = {voice for voice, notes in middle["notes"].items() if notes[0][1] == 0}
-    assert {"organ", "cello", "drum"} <= {kinds[voice] for voice in entering}
-    assert set(last["notes"]) == set(theme["voices"])
-    assert set(middle["notes"]) == set(theme["voices"])
-    tune = {(note[1], note[0]) for note in last["notes"]["violins"]}
-    assert all((start, pitch - 12) in tune or (start, pitch + 12) in tune for start, pitch in tune)
+    # The organ's part: at the theme's tempo, with the cellos and a drum from its first
+    # bar, no snare and no cymbal.
+    (named,) = (sections[name] for name in movements["name"]["round"])
+    assert "tempo" not in named
+    entering = {kinds[voice] for voice, notes in named["notes"].items() if notes[0][1] == 0}
+    assert {"organ", "cello", "drum"} <= entering
+    assert not {"snare", "cymbal"} & sounding(named)
+    # The revelation: the way up once, then the height over and over.
+    (rise,) = (sections[name] for name in movements["revelation"]["once"])
+    high = [sections[name] for name in movements["revelation"]["round"]]
+    begins, ends = rise["tempo"]
+    assert begins == theme["tempo"] < ends <= 1.4 * theme["tempo"]
+    assert rise["bars"] <= 8 and {"snare", "drum", "organ", "brass"} <= sounding(rise)
     cellos = next(voice for voice, kind in kinds.items() if kind == "cello")
-    eighths = {note[1] for note in last["notes"][cellos] if note[2] == 0.5}
-    assert {beat / 2 for beat in range(6)} <= eighths
-    # The last chord is D major: no F natural in the last two bars, an F sharp among them.
-    final = (last["bars"] - 1) * 3
+    for section in high:
+        assert section["tempo"] == ends
+        assert set(section["notes"]) == set(theme["voices"])
+        bars = range(section["bars"])
+        notes = section["notes"]
+        assert {bar * 3.0 for bar in bars} <= {
+            start for pitch, start, _, _ in notes["kit"] if pitch < 36
+        }
+        assert {bar * 3.0 + 2 for bar in list(bars)[:-1]} <= {note[1] for note in notes["snare"]}
+        assert sorted(note[1] for note in notes["hat"]) == [i / 2 for i in range(len(bars) * 6)]
+        assert {0.0, len(bars) * 1.5} <= {note[1] for note in notes["crash"]}
+        eighths = {note[1] for note in notes[cellos] if note[2] == 0.5}
+        assert {beat / 2 for beat in range(6)} <= eighths
+        tune = {(note[1], note[0]) for note in notes["violins"] if note[1] >= len(bars) * 1.5}
+        assert all(
+            (start, pitch - 12) in tune or (start, pitch + 12) in tune for start, pitch in tune
+        )
+    # The silence: on a beat, a few soft voices.
+    (hush,) = (sections[name] for name in movements["silence"]["round"])
+    assert movements["silence"]["enters"] == "beat" and len(hush["notes"]) <= 4
+    assert all(note[3] <= 0.35 for notes in hush["notes"].values() for note in notes)
+    # The major's: every pitched voice once, then a piano alone, in D major both.
+    (glory,) = (sections[name] for name in movements["love"]["once"])
+    (after,) = (sections[name] for name in movements["love"]["round"])
+    assert movements["love"]["enters"] == "beat"
+    assert {kind for kind in kinds.values() if kind not in unpitched} <= sounding(glory)
+    assert sounding(after) <= {"piano", "strings"}
+    for section in (glory, after):
+        classes = {
+            note[0] % 12
+            for voice, notes in section["notes"].items()
+            if kinds[voice] not in unpitched
+            for note in notes
+        }
+        assert {6, 11} <= classes and not {5, 10} & classes, section["id"]
     closing = {
         note[0] % 12
-        for voice, notes in last["notes"].items()
-        if kinds[voice] not in ("drum", "snare")
+        for voice, notes in glory["notes"].items()
+        if kinds[voice] not in unpitched
         for note in notes
-        if note[1] >= final - 3
+        if note[1] >= (glory["bars"] - 2) * 3
     }
     assert closing == {2, 6, 9}
-    for voice in ("violins", "horn", "piano", "flute"):
-        assert all(note[1] < final for note in last["notes"][voice]), voice
-        assert max(last["notes"][voice], key=lambda note: note[1])[0] % 12 == 2, voice
+    # The whole theme, as the debug page plays it, tells the movements in their order.
+    told = [name for each in movements.values() for name in each.get("once", []) + each["round"]]
+    assert theme["order"] == told

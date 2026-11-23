@@ -1,7 +1,7 @@
 {
   "id": "the-end-of-the-year",
   "scene": "the-tower-hall",
-  "music": "the-truth",
+  "music": "the-truth/name",
   "light": "sunset",
   "still": "castle",
   "speaker": "orla",
@@ -104,6 +104,7 @@
     },
     {
       "who": "orla",
+      "music": "the-truth/revelation",
       "do": null
     },
     {
@@ -168,6 +169,7 @@
     },
     {
       "who": "voice",
+      "music": "the-truth/silence",
       "do": null
     },
     {
@@ -176,6 +178,7 @@
     },
     {
       "who": "orla",
+      "music": "the-truth/love",
       "do": null
     },
     {

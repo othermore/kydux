@@ -3,7 +3,8 @@
 // voices (D210); the slider at none silences it, and the settings keep it; ?debug's
 // #music lists every theme with two buttons, as a story and as a level, and the voices
 // of the one playing, each to turn off and to set by hand (D203), under the theme's time
-// and the slider that takes it to another moment (D312).
+// and the slider that takes it to another moment (D312), and the movements of a theme
+// told in them, each a button (D316).
 
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
@@ -96,6 +97,40 @@ test('a theme playing on #music shows its time, and its slider takes it to anoth
   await seek.fill('70');
   await expect(page.locator('#themes-time')).toHaveText(/^(69|7\d)\.\d s of 98\.2 s, part c$/);
   await expect(page.locator('#themes-mix')).toHaveText('the-familiar: strings off');
+});
+
+test('a theme told in movements has a button for each on #music, and the one asked for comes in on its own (D316)', async ({
+  page,
+}) => {
+  await page.goto('/?debug#music');
+  await page.locator('.themes-list button[data-theme="the-truth"][data-heard="story"]').click();
+  await expect(root(page)).toHaveAttribute('data-music', 'playing', { timeout: ciTimes(10_000) });
+  // The whole theme, every section in order: no movement told, and the slider free.
+  await expect(root(page)).not.toHaveAttribute('data-music-movement');
+  await expect(page.locator('#themes-time')).toHaveText(/^\d\.\d s of 198\.7 s, part alone$/);
+  await expect(page.locator('#themes-seek')).toBeEnabled();
+  // Five movements and the whole theme.
+  const movements = page.locator('.themes-movements button');
+  await expect(movements).toHaveCount(6);
+  await expect(movements.nth(2)).toHaveAttribute('data-movement', 'revelation');
+  // The revelation asked for: it comes in at the next bar line, with the section that
+  // gathers speed, and the whole theme's slider waits.
+  await movements.nth(2).click();
+  await expect(root(page)).toHaveAttribute('data-music-movement', 'revelation');
+  await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
+  await expect(page.locator('#themes-time')).toHaveText(/^\d\.\d s of revelation, part rise$/);
+  await expect(page.locator('#themes-seek')).toBeDisabled();
+  // A voice set by hand stays as set in the movement asked for next.
+  await page.locator('.themes-mixer input[type="checkbox"][data-voice="kit"]').uncheck();
+  await page.locator('.themes-movements button[data-movement="love"]').click();
+  await expect(root(page)).toHaveAttribute('data-music-movement', 'love');
+  await expect(page.locator('#themes-time')).toHaveText(/^\d\.\d s of love, part glory$/);
+  await expect(page.locator('#themes-mix')).toHaveText('the-truth: kit off');
+  // The whole theme again: from its first section, the slider free.
+  await page.locator('.themes-movements button[data-movement=""]').click();
+  await expect(root(page)).not.toHaveAttribute('data-music-movement');
+  await expect(page.locator('#themes-time')).toHaveText(/^\d\.\d s of 198\.7 s, part alone$/);
+  await expect(page.locator('#themes-seek')).toBeEnabled();
 });
 
 test("with ?debug, #music plays the broom's wind six ways, and its mixer of three voices says each one changed (D243)", async ({

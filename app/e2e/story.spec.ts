@@ -604,7 +604,7 @@ test('a story with parts is read to its end with no page error, the zoom box ask
   expect(errors).toEqual([]);
 });
 
-test.describe('the ending told to The truth (D313, D314)', () => {
+test.describe('the ending told to The truth, a movement at each turn of the story (D313, D314, D316)', () => {
   const root = (page: Page) => page.locator('html');
 
   test("from step 11 of What the familiar brought on into The end of the year with no other theme between, and the familiar's back at its dinner", async ({
@@ -618,9 +618,11 @@ test.describe('the ending told to The truth (D313, D314)', () => {
     await storyNext(page, 10);
     await expect(page.locator('#story-step')).toHaveText(/^11 /);
     await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
+    await expect(root(page)).toHaveAttribute('data-music-movement', 'alone');
     await page.locator('#story-back').click();
     await expect(page.locator('#story-step')).toHaveText(/^10 /);
     await expect(root(page)).toHaveAttribute('data-music-theme', 'the-familiar');
+    await expect(root(page)).not.toHaveAttribute('data-music-movement');
     await storyNext(page);
     await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
     // Every value the theme is given from here to the next story's first step.
@@ -637,16 +639,33 @@ test.describe('the ending told to The truth (D313, D314)', () => {
     await expect(page.locator('#story-title')).toHaveText('The end of the year');
     await expect(page.locator('#story-step')).toHaveText(/^1 /);
     await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
+    await expect(root(page)).toHaveAttribute('data-music-movement', 'name');
     const seen = await page.evaluate(() => (window as unknown as { themesSeen: string[] }).themesSeen);
     expect(seen.filter((theme) => theme !== 'the-truth')).toEqual([]);
-    // Step 32, the dinner over the castle's painting: the familiar's theme; back, The truth.
     await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
-    await storyNext(page, 31);
+    // The theme's movements at the story's turns (D316): the revelation at step 8, the
+    // silence at 24, the major statement at 26; a step back, the movement before.
+    await storyNext(page, 7);
+    await expect(page.locator('#story-step')).toHaveText(/^8 /);
+    await expect(root(page)).toHaveAttribute('data-music-movement', 'revelation');
+    await storyNext(page, 16);
+    await expect(page.locator('#story-step')).toHaveText(/^24 /);
+    await expect(root(page)).toHaveAttribute('data-music-movement', 'silence');
+    await storyNext(page, 2);
+    await expect(page.locator('#story-step')).toHaveText(/^26 /);
+    await expect(root(page)).toHaveAttribute('data-music-movement', 'love');
+    await page.locator('#story-back').click();
+    await expect(page.locator('#story-step')).toHaveText(/^25 /);
+    await expect(root(page)).toHaveAttribute('data-music-movement', 'silence');
+    // Step 32, the dinner over the castle's painting: the familiar's theme; back, The truth.
+    await storyNext(page, 7);
     await expect(page.locator('#story-step')).toHaveText(/^32 /);
     await expect(root(page)).toHaveAttribute('data-music-theme', 'the-familiar');
+    await expect(root(page)).not.toHaveAttribute('data-music-movement');
     await page.locator('#story-back').click();
     await expect(page.locator('#story-step')).toHaveText(/^31 /);
     await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
+    await expect(root(page)).toHaveAttribute('data-music-movement', 'love');
   });
 
   test("a visit that starts at The end of the year opens to The truth, and the map after it plays the familiar's", async ({

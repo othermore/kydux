@@ -1947,6 +1947,14 @@ a.stop-body:focus-visible {
   font-family: var(--mono);
 }
 
+/* A theme's movements (D316): a button for each, and one for the whole theme. */
+.themes-movements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 .settings-sample {
   margin: 0;
   padding: 8px 12px;

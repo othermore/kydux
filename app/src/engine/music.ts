@@ -37,6 +37,7 @@ export const VOICE_KINDS = [
   'snare',
   'organ',
   'cello',
+  'cymbal',
 ] as const;
 export type VoiceKind = (typeof VOICE_KINDS)[number];
 
@@ -67,6 +68,17 @@ export interface Section {
  * written loudness; in a lesson and a level, every voice lower. */
 export type Heard = 'story' | 'level';
 
+/** A movement of a theme that is told in movements (D316): the sections it plays once, and the
+ * ones it then plays over and over, until another movement is asked for. */
+export interface Movement {
+  id: string;
+  once?: string[];
+  round: string[];
+  /** Where the movement comes in when it is asked for while the theme sounds: at the next
+   * bar's line, or at the next beat for a movement that cannot wait a bar. */
+  enters?: 'bar' | 'beat';
+}
+
 export interface Theme {
   id: string;
   /** Beats a minute, a beat being the metre's unit: a quarter in 3/4, an eighth in 6/8. */
@@ -77,6 +89,8 @@ export interface Theme {
   /** The sections in the order they are played, by id; every section once, in the
    * file's order, when it is not given. */
   order?: string[];
+  /** The movements a story may ask for by name, as `theme/movement` (D316). */
+  movements?: Movement[];
 }
 
 /** A note of the loop, its start counted in beats from the loop's first beat. */
@@ -92,6 +106,20 @@ export interface LoopNote {
 export interface Loop {
   beats: number;
   notes: LoopNote[];
+}
+
+/** What sounds of a theme (D316): a lead played once, then a loop played over and over,
+ * each with the beat every one of its beats starts at. The whole theme is a run of no
+ * lead whose loop is every section in its order; a movement is its own sections. */
+export interface Run {
+  movement?: string;
+  enters: 'bar' | 'beat';
+  lead: Loop;
+  round: Loop;
+  leadLines: number[];
+  roundLines: number[];
+  /** The sections of the lead and of the loop, each with the beat it ends at. */
+  sections: { id: string; ends: number }[];
 }
 
 /** How loud the music is at its fullest: a note of the tune about as loud as a step, the
@@ -139,9 +167,14 @@ function span(theme: Theme, section: Section): number {
 /** The theme's sections in their order, one after another, as one loop: its beats are
  * of the theme's tempo, a section of another tempo laid out at its own pace (D315). */
 export function loopOf(theme: Theme): Loop {
+  return laid(theme, played(theme));
+}
+
+/** Sections one after another as one loop. */
+function laid(theme: Theme, sections: Section[]): Loop {
   const notes: LoopNote[] = [];
   let at = 0;
-  for (const section of played(theme)) {
+  for (const section of sections) {
     for (const [voice, list] of Object.entries(section.notes)) {
       for (const [pitch, start, length, loudness] of list) {
         const beat = placed(theme, section, start);
@@ -152,6 +185,83 @@ export function loopOf(theme: Theme): Loop {
   }
   notes.sort((a, b) => a.beat - b.beat || a.pitch - b.pitch);
   return { beats: at, notes };
+}
+
+/** The beat every beat of the sections starts at, laid out one after another. */
+function linesOf(theme: Theme, sections: Section[]): number[] {
+  const lines: number[] = [];
+  let at = 0;
+  for (const section of sections) {
+    for (let beat = 0; beat < section.bars * theme.metre[0]; beat += 1) lines.push(at + placed(theme, section, beat));
+    at += span(theme, section);
+  }
+  return lines;
+}
+
+/** What sounds of a theme (D316): the movement named, or the whole theme, every section in
+ * its order, with no movement named or one the theme has not. */
+export function runOf(theme: Theme, movement?: string): Run {
+  const found = theme.movements?.find((each) => each.id === movement);
+  const byId = new Map(theme.sections.map((section) => [section.id, section]));
+  const pick = (ids: string[]) => ids.flatMap((id) => byId.get(id) ?? []);
+  const once = found ? pick(found.once ?? []) : [];
+  const round = found ? pick(found.round) : played(theme);
+  const lead = laid(theme, once);
+  const sections: Run['sections'] = [];
+  let ends = 0;
+  for (const section of [...once, ...round]) {
+    ends += span(theme, section);
+    sections.push({ id: section.id, ends });
+  }
+  return {
+    ...(found ? { movement: found.id } : {}),
+    enters: found?.enters ?? 'bar',
+    lead,
+    round: laid(theme, round),
+    leadLines: linesOf(theme, once),
+    roundLines: linesOf(theme, round),
+    sections,
+  };
+}
+
+/** The notes of a run that start at a beat from `from` up to `to`, `to` not included,
+ * counted from the run's start: the lead's, then the loop's time after time. */
+export function runNotes(run: Run, from: number, to: number): LoopNote[] {
+  const lead = run.lead.beats;
+  const found = run.lead.notes.filter((note) => note.beat >= from && note.beat < to);
+  if (to <= lead) return found;
+  for (const note of notesBetween(run.round, Math.max(0, from - lead), to - lead)) {
+    found.push({ ...note, beat: note.beat + lead });
+  }
+  return found;
+}
+
+/** Where a run is at a beat counted from its start: the beat within the lead and one
+ * time round the loop. */
+export function runBeat(run: Run, beat: number): number {
+  const lead = run.lead.beats;
+  if (beat < lead || run.round.beats <= 0) return Math.max(0, beat);
+  return lead + ((beat - lead) % run.round.beats);
+}
+
+/** The first line of a run at or after a beat, counted from the run's start, where
+ * another movement may come in (D316): a bar's first beat, or any beat. The lead's end and
+ * the end of each time round the loop are a bar's line. */
+export function lineAfter(run: Run, metre: number, beat: number, enters: 'bar' | 'beat'): number {
+  const every = enters === 'bar' ? metre : 1;
+  // A line a hair before the beat is that beat: the clock's arithmetic is not exact.
+  const edge = beat - 1e-6;
+  const lead = run.lead.beats;
+  if (edge < lead) {
+    const line = run.leadLines.find((each, index) => index % every === 0 && each >= edge);
+    return line ?? lead;
+  }
+  const length = run.round.beats;
+  if (length <= 0) return beat;
+  const round = Math.floor((edge - lead) / length);
+  const start = lead + round * length;
+  const line = run.roundLines.find((each, index) => index % every === 0 && start + each >= edge);
+  return line === undefined ? start + length : start + line;
 }
 
 /** The notes that start at a beat from `from` up to `to`, `to` not included, of the
@@ -207,6 +317,24 @@ export function timed(theme: Theme, loop: Loop, zero: number, from: number, to: 
     at: zero + note.beat * beat,
     seconds: note.length * beat,
   }));
+}
+
+/** The notes of a run whose first beat is at `zero` on the audio clock that start from
+ * `from` up to `to` seconds on it, `to` not included, each with its time. */
+export function timedRun(theme: Theme, run: Run, zero: number, from: number, to: number): Timed[] {
+  const beat = secondsPerBeat(theme);
+  return runNotes(run, (from - zero) / beat, (to - zero) / beat).map((note) => ({
+    ...note,
+    at: zero + note.beat * beat,
+    seconds: note.length * beat,
+  }));
+}
+
+/** What is asked of the music (D316): a theme by its id, or one of its movements, as
+ * `theme/movement`. */
+export function cueOf(cue: string): { id: string; movement?: string } {
+  const [id = cue, movement] = cue.split('/');
+  return movement ? { id, movement } : { id };
 }
 
 /** A MIDI pitch's frequency in hertz. */
@@ -266,6 +394,17 @@ export function readTheme(value: unknown): Theme {
     const given = typeof tempo === 'number' ? [tempo] : Array.isArray(tempo) && tempo.length === 2 ? tempo : [];
     if (given.length === 0 || !given.every((value) => value > 0)) {
       throw new Error(`${theme.id}: ${section.id}'s tempo is one, or one to start at and one to end at`);
+    }
+  }
+  const ids = new Set(theme.sections.map((section) => section.id));
+  for (const movement of theme.movements ?? []) {
+    const named = [...(movement.once ?? []), ...(Array.isArray(movement.round) ? movement.round : [])];
+    if (typeof movement.id !== 'string' || !Array.isArray(movement.round) || movement.round.length === 0) {
+      throw new Error(`${theme.id}: a movement has an id and the sections it plays over and over`);
+    }
+    if (!named.every((id) => ids.has(id))) throw new Error(`${theme.id}: ${movement.id} names a section the theme has not`);
+    if (movement.enters !== undefined && movement.enters !== 'bar' && movement.enters !== 'beat') {
+      throw new Error(`${theme.id}: ${movement.id} comes in at a bar's line or at a beat`);
     }
   }
   return theme;
@@ -559,6 +698,25 @@ export function sound(
       ends = end;
       break;
     }
+    case 'cymbal': {
+      // A cymbal: a wash of high noise that rings for its note's length, so a long note
+      // is a crash that dies slowly and a short one the tick of a closed pair.
+      const ring = Math.min(3, Math.max(0.04, seconds));
+      const end = envelope(gain, at, loudness * 0.4, 0.002, 0, ring);
+      const wash = noise(ctx, ring + 0.01);
+      const high = ctx.createBiquadFilter();
+      high.type = 'highpass';
+      high.frequency.setValueAtTime(5200, at);
+      const top = ctx.createBiquadFilter();
+      top.type = 'lowpass';
+      top.frequency.setValueAtTime(12000, at);
+      top.frequency.exponentialRampToValueAtTime(7000, at + ring);
+      wash.connect(high).connect(top).connect(gain);
+      wash.start(at);
+      wash.stop(end);
+      ends = end;
+      break;
+    }
     case 'drum': {
       // A soft drum: a low thump falling in pitch, and a brush of noise.
       const end = envelope(gain, at, loudness * 0.5, 0.004, 0, 0.45);
@@ -582,12 +740,14 @@ export function sound(
   return ends;
 }
 
-/** A theme as it plays: where its beat 0 lies on the audio clock, how far its notes
- * are scheduled, and each voice's gain, under the theme's own. */
+/** A theme as it plays: what sounds of it, where that run's first beat lies on the audio
+ * clock, how far its notes are scheduled, and each voice's gain, under the theme's own. */
 interface Playing {
   theme: Theme;
-  loop: Loop;
+  run: Run;
   zero: number;
+  /** The movement asked for while another sounds, and the line it comes in at (D316). */
+  turn: { run: Run; at: number } | null;
   /** The audio clock's time up to which the notes are scheduled. */
   scheduled: number;
   heard: Heard;
@@ -607,7 +767,7 @@ class Music {
   private chain: AudioNode[] = [];
   private connected = false;
   private playing: Playing | null = null;
-  private wanted: { id: string; heard: Heard } | null = null;
+  private wanted: { id: string; movement?: string; heard: Heard } | null = null;
   private volume = 0.6;
   private unlocked = false;
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -627,12 +787,14 @@ class Music {
     this.publish();
   }
 
-  /** The theme to play, heard as a story or a level hears it: from now, or from the
-   * first gesture. Another theme, or the same heard elsewhere, plays as its file says,
-   * with no voice set by hand. */
-  play(id: string, heard: Heard): void {
+  /** The theme to play, or one of its movements as `theme/movement` (D316), heard as a story or
+   * a level hears it: from now, or from the first gesture. Another theme, or the same
+   * heard elsewhere, plays as its file says, with no voice set by hand. A movement of the
+   * theme that sounds comes in at the next bar's line, or beat, with no break. */
+  play(cue: string, heard: Heard): void {
+    const { id, movement } = cueOf(cue);
     if (this.wanted?.id !== id || this.wanted.heard !== heard) this.mixed = {};
-    this.wanted = { id, heard };
+    this.wanted = { id, heard, ...(movement ? { movement } : {}) };
     void this.start();
     this.publish();
   }
@@ -653,19 +815,24 @@ class Music {
     for (const voice of Object.keys(this.mixed)) this.mix(voice, null);
   }
 
-  /** Where the theme that plays is in its loop and how long the loop lasts, in seconds,
-   * for the page of themes (D312); null while none plays. */
-  get position(): { at: number; length: number } | null {
+  /** Where the theme that plays is in what sounds of it, how long that lasts and the
+   * section it is in, in seconds, for the page of themes (D312), with the movement that
+   * sounds when it is one (D316); null while none plays. */
+  get position(): { at: number; length: number; section: string; movement?: string } | null {
     const playing = this.playing;
     if (!playing || !this.ctx) return null;
-    const length = loopSeconds(playing.theme);
+    const { run, theme } = playing;
+    const beat = secondsPerBeat(theme);
+    const length = (run.lead.beats + run.round.beats) * beat;
     if (length <= 0) return null;
-    return { at: Math.max(0, this.ctx.currentTime - playing.zero) % length, length };
+    const at = runBeat(run, (this.ctx.currentTime - playing.zero) / beat);
+    const section = run.sections.find((each) => at < each.ends) ?? run.sections.at(-1);
+    return { at: at * beat, length, section: section?.id ?? '', ...(run.movement ? { movement: run.movement } : {}) };
   }
 
   /** The theme that plays taken to a moment of its loop, in seconds from its start, for
-   * the page of themes (D312): what sounds is cut short, and the theme sounds on from
-   * there, its voices as they are set. */
+   * the page of themes (D312): what sounds is cut short, and the whole theme sounds on
+   * from there, its voices as they are set. */
   seek(seconds: number): void {
     const ctx = this.ctx;
     const playing = this.playing;
@@ -673,13 +840,15 @@ class Music {
     const length = loopSeconds(playing.theme);
     const from = length > 0 ? Math.min(Math.max(0, seconds), length) % length : 0;
     this.fadeOut(playing, CUT);
-    this.playing = this.begin(ctx, playing.theme, playing.heard, from, CUT);
+    if (this.wanted?.id === playing.theme.id) this.wanted = { id: this.wanted.id, heard: this.wanted.heard };
+    this.playing = this.begin(ctx, playing.theme, playing.heard, undefined, from, CUT);
+    this.publish();
   }
 
   /** What the page asked to play, and whether it plays. */
-  get state(): { music: string; theme?: string; heard?: Heard } {
+  get state(): { music: string; theme?: string; movement?: string; heard?: Heard } {
     const music = this.volume === 0 ? 'off' : !this.unlocked ? 'waiting' : this.playing ? 'playing' : 'still';
-    return { music, theme: this.wanted?.id, heard: this.wanted?.heard };
+    return { music, theme: this.wanted?.id, movement: this.wanted?.movement, heard: this.wanted?.heard };
   }
 
   /** The first gesture on the page: the browser lets sound start. */
@@ -709,6 +878,7 @@ class Music {
     wake(ctx);
     if (this.playing?.theme.id === wanted.id) {
       if (this.playing.heard !== wanted.heard) this.hear(this.playing, wanted.heard);
+      this.turn(ctx, this.playing, wanted.movement);
       return;
     }
     const asked = (this.asking += 1);
@@ -721,7 +891,7 @@ class Music {
     if (asked !== this.asking || this.wanted !== wanted || this.volume === 0) return;
     this.fadeOut(this.playing);
     this.connect();
-    this.playing = this.begin(ctx, theme, wanted.heard);
+    this.playing = this.begin(ctx, theme, wanted.heard, wanted.movement);
     this.ticking(true);
     keepAwake(this, true);
     this.publish();
@@ -751,9 +921,9 @@ class Music {
     }
   }
 
-  /** A theme set to play from `from` seconds into its loop, heard within `fade`
-   * seconds. */
-  private begin(ctx: AudioContext, theme: Theme, heard: Heard, from = 0, fade = FADE): Playing {
+  /** A theme set to play, the whole of it or the movement named, from `from` seconds into
+   * it, heard within `fade` seconds. */
+  private begin(ctx: AudioContext, theme: Theme, heard: Heard, movement?: string, from = 0, fade = FADE): Playing {
     const out = ctx.createGain();
     const now = ctx.currentTime;
     out.gain.setValueAtTime(0.0001, now);
@@ -768,7 +938,26 @@ class Music {
       voices.set(name, gain);
     }
     const first = now + 0.1;
-    return { theme, loop: loopOf(theme), zero: first - from, scheduled: first, heard, out, voices, lines: new Map() };
+    const run = runOf(theme, movement);
+    return { theme, run, zero: first - from, turn: null, scheduled: first, heard, out, voices, lines: new Map() };
+  }
+
+  /** Another movement of the theme that plays asked for (D316): it comes in at the next
+   * line of what sounds that no note is scheduled past, a bar's or a beat's as the
+   * movement says, and what sounds goes on until then. The movement that sounds, or the one
+   * that is to come in, asked for again changes nothing. */
+  private turn(ctx: AudioContext, playing: Playing, movement: string | undefined): void {
+    const named = playing.theme.movements?.find((each) => each.id === movement)?.id;
+    if ((playing.turn?.run ?? playing.run).movement === named) return;
+    if (playing.run.movement === named) {
+      playing.turn = null;
+      return;
+    }
+    const run = runOf(playing.theme, named);
+    const beat = secondsPerBeat(playing.theme);
+    const from = (Math.max(playing.scheduled, ctx.currentTime) - playing.zero) / beat;
+    const line = lineAfter(playing.run, playing.theme.metre[0], from, run.enters);
+    playing.turn = { run, at: playing.zero + line * beat };
   }
 
   /** The theme that plays heard elsewhere: every voice fades to its loudness there. */
@@ -832,8 +1021,23 @@ class Music {
     const until = ctx.currentTime + AHEAD;
     if (until <= playing.scheduled) return;
     // A page that slept a while starts again at the moment it wakes, not behind it.
-    const from = Math.max(playing.scheduled, ctx.currentTime, playing.zero);
-    for (const note of timed(playing.theme, playing.loop, playing.zero, from, until)) {
+    let from = Math.max(playing.scheduled, ctx.currentTime, playing.zero);
+    const turn = playing.turn;
+    if (turn && until > turn.at) {
+      // What sounds is scheduled up to the line, and the movement asked for from it (D316).
+      this.sounding(ctx, playing, from, turn.at - 1e-6);
+      playing.run = turn.run;
+      playing.zero = turn.at;
+      playing.turn = null;
+      from = Math.max(from, turn.at);
+    }
+    this.sounding(ctx, playing, from, until);
+    playing.scheduled = until;
+  }
+
+  /** The notes of what sounds that start from `from` up to `to` on the audio clock. */
+  private sounding(ctx: AudioContext, playing: Playing, from: number, to: number): void {
+    for (const note of timedRun(playing.theme, playing.run, playing.zero, from, to)) {
       const voice = playing.theme.voices[note.voice];
       const out = playing.voices.get(note.voice);
       if (!voice || !out) continue;
@@ -845,14 +1049,15 @@ class Music {
         sound(ctx, voice.kind, note.pitch, note.at, note.seconds, note.loudness, out);
       }
     }
-    playing.scheduled = until;
   }
 
   private publish(): void {
     const root = document.documentElement.dataset;
-    const { music, theme, heard } = this.state;
+    const { music, theme, movement, heard } = this.state;
     root.music = music;
     if (theme) root.musicTheme = theme;
+    if (movement) root.musicMovement = movement;
+    else delete root.musicMovement;
     if (heard) root.musicHeard = heard;
   }
 

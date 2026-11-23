@@ -7,7 +7,11 @@
 // who writes it. Over the voices is the theme's time (D312): a slider as long as the
 // theme's loop that follows the music and takes it to the moment it is dragged to, and
 // beside it the second that sounds, the loop's length and the section, so that a sound
-// is told by its second and looked for among the voices.
+// is told by its second and looked for among the voices. A theme told in movements
+// (D316) has a button for each under its time, and one for the whole theme: the movement
+// asked for comes in as it does in a story, the voices staying as they are set, and while
+// one sounds the words say the second of it, its name and the section, and the slider,
+// which is the whole theme's, waits.
 // Under the list is the broom's wind (D243): six buttons play a one-cell move, a move of
 // eight cells, a zigzag, a lift, a landing and a whole flight, and its three voices, the
 // air, the whistle and the rest, each have a box and a slider from 0 to 3, with a line
@@ -222,12 +226,20 @@ export function themesScreen(themes: string[]): Screen {
       section: sectionAt(now.theme, at),
     });
   };
+  /** The second of the movement that sounds, its name and the section (D316). */
+  const tellMovement = (now: Clock, at: number, movement: string, section: string) => {
+    now.said.textContent = t('debug.music.time_movement', { at: at.toFixed(1), movement, section });
+  };
   /** The slider follows the theme that plays, unless it is being dragged. */
   const follow = () => {
     const position = music.position;
     if (!clock || clock.held) return;
-    clock.slider.disabled = !position;
+    clock.slider.disabled = !position || position.movement !== undefined;
     if (!position) return;
+    if (position.movement !== undefined) {
+      tellMovement(clock, position.at, position.movement, position.section);
+      return;
+    }
     clock.slider.value = position.at.toFixed(1);
     tellTime(clock, position.at);
   };
@@ -328,8 +340,25 @@ export function themesScreen(themes: string[]): Screen {
     });
     clock = time;
     follow();
+    // A movement, or the whole theme, asked for as a story asks for it (D316).
+    const turnTo = (movement: string, label: string) => {
+      const button = element('button', { type: 'button' }, [label]);
+      button.dataset.movement = movement;
+      button.addEventListener('click', () => music.play(movement ? `${now.theme.id}/${movement}` : now.theme.id, now.heard));
+      return button;
+    };
+    const movements = now.theme.movements?.length
+      ? [
+          element('p', { className: 'themes-movements' }, [
+            t('debug.music.movements'),
+            ...now.theme.movements.map((movement) => turnTo(movement.id, movement.id)),
+            turnTo('', t('debug.music.whole')),
+          ]),
+        ]
+      : [];
     return [
       element('p', { className: 'themes-clock' }, [seek, time.said]),
+      ...movements,
       element('h3', {}, [t('debug.music.voices')]),
       element('ul', { className: 'themes-mixer' }, rows),
       reset,

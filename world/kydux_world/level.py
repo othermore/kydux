@@ -2064,8 +2064,9 @@ def story_on_scene(
     a still, the opening, may tell its first steps in a row over the still (`still`,
     D251), each of the voice and doing nothing; the first of them, in a row, may hold
     the story's letter before the still (`letter`, D257). The story may name the theme
-    it opens to, and a step the theme from it on (`music`, a theme's id, D314); both are
-    carried as written."""
+    it opens to, and a step the theme from it on (`music`, a theme's id, D314, or a
+    theme's and a movement of it, `the-truth/revelation`, D316); both are carried as
+    written."""
     story_id = data.get("id")
     if "scene" not in data:
         raise LevelError(f"{story_id}: a story is told on a scene")
@@ -2502,9 +2503,11 @@ def story_on_scene(
 
 
 def _theme(value: Any, here: str) -> str:
-    """The theme a story or a step names (D314): a theme's id, shaped as a story's is."""
-    if not isinstance(value, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", value):
-        raise LevelError(f"{here}: music is a theme's id")
+    """The theme a story or a step names (D314): a theme's id, shaped as a story's is,
+    or a theme's id and a movement's of that theme, a slash between them (D316)."""
+    name = r"[a-z0-9][a-z0-9-]*"
+    if not isinstance(value, str) or not re.fullmatch(f"{name}(/{name})?", value):
+        raise LevelError(f"{here}: music is a theme's id, or a theme's and a movement's")
     return value
 
 

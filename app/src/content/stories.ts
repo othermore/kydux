@@ -6,7 +6,9 @@
 // scene; a door's leaf, opening, moves whoever stands where it comes to lie
 // (D125). The opening's first steps may be told over its still (`still`, D251), the
 // first of them holding its letter before it (`letter`, D257). And the theme a step is
-// told to, which the story or one of its steps may name (`music`, D314).
+// told to, which the story or one of its steps may name (`music`, D314): a theme, or a
+// theme and a movement of it, `the-truth/revelation` (D316), given to the music as
+// written.
 
 import type { Facing, Tile } from '../engine/sight';
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
@@ -57,7 +59,8 @@ export interface StoryStep {
   /** A figure's words said as the step begins, its actions played under them (D275):
    * someone speaks while someone else is still on their way. */
   meanwhile?: boolean;
-  /** The theme the story is told to from this step on (D314). */
+  /** The theme the story is told to from this step on (D314), or a theme and a
+   * movement of it after a slash (D316). */
   music?: string;
 }
 
@@ -97,7 +100,8 @@ export interface Story {
   still?: 'castle';
   /** Who tells the story, for the map and the characters' names (D67). */
   speaker?: string;
-  /** The theme the story opens to, in the place of its chapter's (D314). */
+  /** The theme the story opens to, in the place of its chapter's (D314), or a theme
+   * and a movement of it after a slash (D316). */
   music?: string;
 }
 
@@ -156,9 +160,10 @@ export async function loadStory(id: string, lang: Language): Promise<Story> {
   };
 }
 
-/** The theme in force at a step (D314): the last one a step up to it names, else the
- * story's own, else `chapter`'s, the theme its chapter plays. So going back over a step
- * that changed the theme brings back the one before it. */
+/** The theme in force at a step (D314), with its movement where one is named (D316):
+ * the last one a step up to it names, else the story's own, else `chapter`'s, the theme
+ * its chapter plays. So going back over a step that changed the theme, or its movement,
+ * brings back the one before it. */
 export function themeAt(
   story: Pick<Story, 'steps' | 'music'>,
   step: number,

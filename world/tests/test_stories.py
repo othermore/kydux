@@ -143,9 +143,10 @@ def test_a_story_says_which_way_its_wizard_faces_from_the_first_frame():
 
 
 def test_a_story_and_a_step_may_name_the_theme_they_are_told_to():
-    """D314: `music` at a story's top and in a step is a theme's id, carried as written
-    into the story made whole, its parts' steps too; anything else is refused with the
-    story and the step named, and so is `music` inside a step's scene."""
+    """D314, D316: `music` at a story's top and in a step is a theme's id, or a theme's
+    and a movement's with a slash between them, carried as written into the story made
+    whole, its parts' steps too; anything else is refused with the story and the step
+    named, and so is `music` inside a step's scene."""
     from kydux_world.level import story_on_scenes
 
     story = staged(music="the-truth")
@@ -153,9 +154,15 @@ def test_a_story_and_a_step_may_name_the_theme_they_are_told_to():
     steps = [{"who": "voice", "do": None}, {"who": "voice", "music": "the-familiar", "do": None}]
     assert staged(steps=steps, actors=[])["steps"][1]["music"] == "the-familiar"
     assert "music" not in staged()
+    assert staged(music="the-truth/name")["music"] == "the-truth/name"
+    turned = [
+        {"who": "voice", "do": None},
+        {"who": "voice", "music": "the-truth/love", "do": None},
+    ]
+    assert staged(steps=turned, actors=[])["steps"][1]["music"] == "the-truth/love"
     with pytest.raises(LevelError, match="a-story: music is a theme's id"):
         staged(music=3)
-    for wrong in (5, "", "The Truth", "the_truth"):
+    for wrong in (5, "", "The Truth", "the_truth", "the-truth/", "/love", "the-truth/a/b"):
         bad = [{"who": "voice", "do": None}, {"who": "voice", "music": wrong, "do": None}]
         with pytest.raises(LevelError, match="a-story, step 2: music is a theme's id"):
             staged(steps=bad, actors=[])
@@ -180,9 +187,11 @@ def test_a_story_and_a_step_may_name_the_theme_they_are_told_to():
 
 
 def test_the_ending_s_two_stories_name_the_truth_and_bring_the_familiar_back():
-    """D313, D314: What the familiar brought turns to The truth as the four go up to the
-    tower, step 11; The end of the year opens to it and turns back to the familiar's theme
-    at the dinner, step 32, the first told over the still; no other step names one."""
+    """D313, D314, D316: What the familiar brought turns to The truth, its piano alone, as
+    the four go up to the tower, step 11; The end of the year opens to its organ's part,
+    turns to the revelation at step 8, to the silence at step 24 and to the major's
+    movement at step 26, and back to the familiar's theme at the dinner, step 32, the
+    first told over the still; no other step names one."""
     import json
     from pathlib import Path
 
@@ -194,10 +203,15 @@ def test_the_ending_s_two_stories_name_the_truth_and_bring_the_familiar_back():
         return story, named
 
     brought, named = themes("what-the-familiar-brought")
-    assert "music" not in brought and named == {11: "the-truth"}
+    assert "music" not in brought and named == {11: "the-truth/alone"}
     assert "scene" in brought["steps"][10] and "music" not in brought["steps"][10]["scene"]
     ending, named = themes("the-end-of-the-year")
-    assert ending["music"] == "the-truth" and named == {32: "the-familiar"}
+    assert ending["music"] == "the-truth/name" and named == {
+        8: "the-truth/revelation",
+        24: "the-truth/silence",
+        26: "the-truth/love",
+        32: "the-familiar",
+    }
     assert ending["steps"][31].get("still") is True and "still" not in ending["steps"][30]
 
 

@@ -96,8 +96,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 clock, the tip put up once its picture is loaded and decoded
                 (waiting.ts, D214, D221, D246), and under ?debug the page
                 that plays any of the music's themes, each voice of the one
-                playing to turn off or set by hand, and its time on a slider to
-                move in (themes.ts, #music, D192, D203, D312).
+                playing to turn off or set by hand, its time on a slider to
+                move in, and its movements each on a button (themes.ts, #music,
+                D192, D203, D312, D316).
                 main.ts shows a screen: it shows the waiting view at once, a tip
                 due with no grace at the visit's first wait and at a screen whose
                 scene, named in the course file, is not the one last shown, loads
@@ -109,7 +110,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 opens, before the first screen loads (D214, D221, D246)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
-                events, and the theme in force at a step (stories.ts, D314), the
+                events, and the theme, or the movement of one, in force at a step
+                (stories.ts, D314, D316), the
                 guide's words (guide.ts), and the course (course.ts): its
                 chapters, what comes next, a stop's state, what the child knows
                 in a level (D40), the theme a screen opens to (D192, D314); the first year's
@@ -2880,10 +2882,11 @@ one overturns stays, marked as superseded.
   theme is a file `content/music/<id>.json`: its tempo, its metre, its one set of voices
   (D210), and its sections of notes (pitch, start, length, loudness), which follow one
   another in their `order` and loop without a seam, no note ringing past its section's
-  end. The page plays it with Web Audio (`engine/music.ts`): voices of eleven kinds, a
+  end; a theme told in movements goes as a story leads it (D316). The page plays it
+  with Web Audio (`engine/music.ts`): voices of twelve kinds, a
   celesta's bell, a bowed string pad, a plucked string, a harp, a flute, a piano's struck
-  tone (D209), a horn, a march's snare (D213), a soft drum, an organ's pipes and a cello's
-  stroke of the bow (D315), each a few oscillators or a burst of noise with an envelope,
+  tone (D209), a horn, a march's snare (D213), a soft drum, an organ's pipes, a cello's
+  stroke of the bow (D315) and a cymbal (D316), each a few oscillators or a burst of noise with an envelope,
   the pad on lines that sound on from a note to the next (D203), through a reverb whose
   impulse is decaying noise; the notes are scheduled a third of a second ahead on the
   audio clock; no sound file is loaded. A
@@ -2899,7 +2902,8 @@ one overturns stays, marked as superseded.
   settings have the music's volume beside the sounds' switch, a slider from none to full
   in five steps (`music`, 0.6 at first, kept with the settings); at none no theme plays.
   The root element says what plays (`data-music`: `waiting`, `playing`, `off`;
-  `data-music-theme`; `data-music-heard`, `story` or `level`), and `?debug#music` plays
+  `data-music-theme`; `data-music-heard`, `story` or `level`; `data-music-movement`
+  while a movement of the theme is asked for, D316), and `?debug#music` plays
   any theme alone, its voices to hand (D203). The themes are original, written for
   this game as a score in
   `tools/sound/compose.py`, each melody a bar at a time and each section's harmony a chord
@@ -4954,39 +4958,50 @@ one overturns stays, marked as superseded.
 - **D313 — The year's ending has a theme of its own, *The truth*.** Decided 2026-11-22 by
   the owner (*la parte final de la historia cuando van al despacho de Orla y le cuentan
   todo y ella les cuenta todo lo que pasó, se merece una canción final sola, que sea más
-  intensa y dramática y que te deje el recuerdo (puede ser la misma canción en una
-  versión más dramática e intensa, o una nueva canción)*; *en la parte de historia que
-  hace el cierre de todo lo que has aprendido, podemos volver a la anterior, a la del
-  familiar, que es más alegre*; *me gustaría que empezase así pero subiese el ritmo y la
-  intensidad […] entrar un órgano y algo de percusión... para darle intensidad y hacerla
-  más apoteósica*). It is the familiar's theme made grave and then great, so that the
-  child knows the tune and hears what it has become: the first flute's tune with the
-  minor's own low sixth in the place of the raised one, in three in D minor, 54 bars in
-  three parts, a minute and fifty seconds. The first part is at 76 beats a minute: a
-  piano has the tune alone, an octave under the flute's, over its left hand, a note a
-  beat, and the low strings come in under it at its second half. The middle part speeds
-  up evenly from 76 to 100 (D315) and grows louder as it does: an organ comes in on a
-  tune of its own, over its chords and a low pedal, with the cellos and the double basses
-  under it and a timpani on every bar, the piano's left hand running in eighth notes; a
-  snare joins at its fifth bar; from its ninth the violins take the organ's tune up in
-  octaves with a flute, a horn under them, and the cellos go in eighth notes; a timpani's
-  and a snare's roll on the dominant end it. The last part keeps 100: every voice plays
+  intensa y dramática y que te deje el recuerdo (puede ser la misma canción en una versión
+  más dramática e intensa, o una nueva canción)*; *en la parte de historia que hace el
+  cierre de todo lo que has aprendido, podemos volver a la anterior, a la del familiar,
+  que es más alegre*; *me gustaría que empezase así pero subiese el ritmo y la intensidad
+  […] entrar un órgano y algo de percusión... para darle intensidad y hacerla más
+  apoteósica*; *las percusiones (tambores pero podría ser incluso tipo batería) ayudan a
+  subir mucho la intensidad*). It is the familiar's theme made grave and then great, so
+  that the child knows the tune and hears what it has become: the first flute's tune with
+  the minor's own low sixth in the place of the raised one, in three in D minor. It is
+  told in five movements, which the ending's two stories ask for at their turns (D316), of
+  eight sections in all. *alone*, 16 bars at 76 beats a minute: a piano has the tune
+  alone, an octave under the flute's, over its left hand, a note a beat, and the low
+  strings come in under it at its second half. *name*, 16 bars at 76: an organ on a tune
+  of its own over its chords and a low pedal, the cellos and the double basses under it,
+  the piano's left hand, and a low drum twice at the start of each bar, as a heart beats;
+  it is no faster than the piano alone, a little louder, and darker. *revelation* starts
+  with eight bars played once that speed up evenly from 76 to 100 (D315) and grow louder
+  all the way: the second half of the organ's tune, the violins taking it up in octaves
+  with a flute, a horn under them, the cellos in eighth notes, a snare's figure, a kick
+  from the third bar, the toms' fills and a roll on the dominant. It then goes round two
+  sections of 16 bars at 100, each as loud as the other. In the first every voice plays
   the tune, the violins in octaves, the organ, the horn and the piano with them, over the
-  cellos' eighth notes, the timpani and the snare. Its last note is an octave up over a
-  chord that is not home; its last three bars are then said again twice as broad, the
-  violins and the flute rising against the tune as it comes down, a roll under them, to a
-  chord of D major held for two bars, the second without the tune, which leads back to
-  the piano alone. It starts quieter than the familiar's theme and is over twice as loud
-  as it at its height, the organ, the cellos and the violins as loud as one another
-  there. It is made as the others are (D192): the score in `tools/sound/compose.py`,
-  sections that loop without a seam; it is no chapter's theme, a story names it (D314),
-  and a test holds it to its tune, its piano alone, its tempo and its last part. Rules
-  out a tune or a harmony taken from any other work (D192).
+  cellos' eighth notes, the timpani and a drum kit: a kick on each bar's first beat, a
+  snare on its third, a hat on every eighth note, a crash at each half, the toms' way down
+  ending each half. In the second the horn and the organ have the organ's tune, the
+  violins holding chords and then taking it up in octaves, with the toms after the kick in
+  every bar. *silence*, four bars at 76: a low open fifth held by the strings, two notes
+  of the piano and the heartbeat. *love* starts with ten bars played once at 88: the tune
+  turned major, its sixth and its third raised, broad, for every voice, with the timpani's
+  roll and a crash, ending on a chord of D major held for two bars; it then goes round
+  eight bars at 76 in which the piano keeps the major tune, alone as it began, over its
+  left hand and soft strings. Played as a story hears it, the piano alone is quieter than
+  the familiar's theme, and the revelation's two sections are three times as loud as the
+  piano alone, their peaks at a little over half of full scale. With no story leading it
+  the theme plays its eight sections in order, three minutes and nineteen seconds. It is
+  made as the others are (D192): the score in `tools/sound/compose.py`; it is no chapter's
+  theme, a story names it (D314), and a test holds it to its tune, its piano alone, its
+  tempos, its drum kit and its major end. Rules out a tune or a harmony taken from any
+  other work (D192).
 - **D314 — A story may name the music it is told to.** Decided 2026-11-22 by the owner, of
   the year's ending. A story's `story.json` may say `music`, a theme of `content/music/`, at
   its top: the story opens to that theme in the place of its chapter's. A step may say
   `music` too, beside its `who`, never in its `scene`: the theme changes as that step is
-  shown. The theme in force at a step is the last one named at or before it, the story's
+  shown. A `music` may name a movement of its theme with it (D316). The theme in force at a step is the last one named at or before it, the story's
   own where no step has named one, the chapter's where the story names none (`themeAt` in
   `content/stories.ts`); so going back over a step that changed the theme brings back the
   one before it, and a step played again leaves the theme as it is. The story's screen
@@ -5000,7 +5015,7 @@ one overturns stays, marked as superseded.
   familiar brought* turns to *The truth* (D313) at its step 11, as the four go up to the
   tower; *The end of the year* opens to it and turns back to *The familiar* at its step
   32, the dinner over the castle's painting. The world's check refuses a `music` that is
-  not a theme's id, and one inside a step's scene; a test holds every theme a story names
+  not a theme's id, or a theme's and a movement's (D316), and one inside a step's scene; a test holds every theme a story names
   to be there. Rules out a theme chosen by the page from a story's id, and a second theme
   heard at once.
 - **D315 — A section of a theme may have a tempo of its own, and an organ and a cello are
@@ -5023,3 +5038,44 @@ one overturns stays, marked as superseded.
   to the next (D203). The page refuses a section's tempo that is not one positive number
   or two, and a test holds the themes to it. Rules out a tempo that changes by steps
   inside a section, and a tempo of one voice alone.
+- **D316 — A theme may be told in movements, which a story asks for by name.** Decided
+  2026-11-22 by the owner, of *The truth* (*comprueba la duración de la música con la
+  historia, con el momento en que aparecen los diálogos a un ritmo de lectura normal, para
+  ver que se acelerará y aparecerán las percusiones y la intensidad mayor en el momento
+  adecuado*; *las percusiones (tambores pero podría ser incluso tipo batería) ayudan a
+  subir mucho la intensidad*). A theme that loops by its own clock cannot meet a story's
+  moment: the 49 steps the ending tells to *The truth* take three and a half minutes at
+  the page's own reading time (0.8 s a text and 0.05 s a letter), two and a half for a
+  quick reader and over six for a slow child, so a height written at a second of the loop
+  falls on a different step for each of them. So a theme's file may say `movements`, each
+  with its `id`, the sections it plays `once` as it comes in, if it has any, and the
+  sections it then plays `round`, over and over; every section of the theme is in one
+  movement. A `music` in a story (D314) is a theme's id, or a theme's and a movement's
+  with a slash between them, `the-truth/revelation`; the page takes it apart (`cueOf` in
+  `engine/music.ts`). A movement asked for while its theme sounds comes in at the next bar
+  line, or at the next beat where the movement says `enters: "beat"`, in time, with no
+  fade and no break: what sounds is scheduled up to that line and the movement from it,
+  the notes already struck ringing out. A movement asked for that already sounds, or that
+  is already due, goes on. A movement of a theme that does not sound starts with its
+  theme, which fades in as any does (D192). A theme asked for with no movement plays every
+  section in its `order`, as a theme that has no movements does; so a level would play it
+  whole, and the page of themes plays it whole and takes it to a second (D312). That page
+  has a button for each movement of the theme that plays and one for the whole theme: a
+  movement comes in there as it does in a story, the voices staying as they are set, and
+  while one sounds the page says its second, its name and its section, `12.4 s of
+  revelation, part rise`, and the slider, which is the whole theme's, waits. The root
+  element says the movement asked for (`data-music-movement`); `data-music-theme` stays
+  the theme's id. *The truth* has five (D313). *What the familiar brought* asks for
+  `alone` at its step 11. *The end of the year* opens to `name`; it asks for `revelation`
+  at its step 8, where Orla starts on who the wizard's parents are, for `silence` at 24,
+  where nobody says a thing, for `love` at 26, where she names the most powerful magic,
+  and for the familiar's theme at 32. At the page's reading time the eight bars that speed
+  up cover steps 8 to 10 and the drum kit comes in at step 11 or 12, as the attack is
+  told. The world's check takes a `music` of that shape and no other; a test holds every
+  movement a story names to be in its theme, every section of a theme with movements to be
+  in one of them, and each movement to have sections to go round. The page sounds one kind
+  of voice more, a `cymbal`: a burst of noise with its low part taken out, a crash when
+  its note is long and a closed hat's tick when it is short. With a kick and toms written
+  for a `drum` voice and the `snare`, a theme has a drum kit. Rules out a theme stretched
+  or cut to a story's length, two movements heard at once across a fade, and a movement
+  that starts off the beat.

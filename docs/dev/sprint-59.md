@@ -1240,3 +1240,74 @@ Recorded from the page as a story hears it, the last part is a third
 louder than it was and over twice the familiar's theme, its peak at half
 of full scale; the organ, the cellos and the violins are level with one
 another there.
+
+## 10. The designer's own: the music led by the story, and a drum kit (D316)
+
+Added on 2026-11-22, built by the designer; nothing here is the
+programmer's to build. It touches two things 59.13 built: the world's rule
+for a story's `music` (`_theme` in `world/kydux_world/level.py`), which
+takes a theme's id and a movement's too, and the `music` of the ending's
+two stories.
+
+The owner: *comprueba la duración de la música con la historia, con el
+momento en que aparecen los diálogos a un ritmo de lectura normal, para
+ver que se acelerará y aparecerán las percusiones y la intensidad mayor en
+el momento adecuado. Me parece que las percusiones (tambores pero podría
+ser incluso tipo batería) ayudan a subir mucho la intensidad, tenlo en
+cuenta por si crees que puede encajar*.
+
+**The check.** *The truth* sounds from step 11 of *What the familiar
+brought* to step 31 of *The end of the year*, 49 steps. At the page's own
+reading time, 0.8 s a text and 0.05 s a letter, they take 3:30; a quick
+reader takes 2:27 and a slow child 6:14. The theme of section 9 was a loop
+of 1:50, so the ending heard it 1.9 times at the page's time, 1.3 times
+quick and 3.4 times slow. At the page's time the revelation, steps 8 to 16
+of *The end of the year*, fell on the piano alone of the loop's second
+turn, and the loud part came where nobody says a thing. No loop of a fixed
+length fits the three readers.
+
+**D316 — A theme may be told in movements, which a story asks for by
+name.** A theme's file may say `movements`, each the sections it plays
+once and the ones it then goes round; a story's `music` is a theme's id or
+`theme/movement`; a movement asked for while its theme sounds comes in at
+the next bar line, or the next beat, with no fade. It is entered in
+`docs/dev/architecture.md`, with D313 as the theme is, and a `cymbal` is a
+kind of voice.
+
+**The theme.** Eight sections in five movements:
+
+| Movement | Asked for at | What sounds |
+|---|---|---|
+| `alone` | *What the familiar brought*, step 11 | the piano alone, 38 s a round |
+| `name` | *The end of the year*, step 1 | the organ's own tune, low, over the cellos and a drum as a heart beats, 38 s a round |
+| `revelation` | step 8 | once, 16 s that go from 76 to 100 with the snare, the kick and the toms coming in; then round, 58 s: every voice on the tune over a drum kit, and the organ's tune as loud |
+| `silence` | step 24 | a low fifth and the heartbeat, 9 s a round; it comes in on the beat |
+| `love` | step 26 | once, 20 s: the tune in D major, broad, every voice; then round, 19 s: the piano alone with the major tune |
+
+Step 32 turns to the familiar's theme, as 59.13 built it.
+
+At the page's reading time the 16 s that speed up cover steps 8 to 10 and
+the kit comes in at step 11 or 12, as the attack is told; a quick reader
+reaches the silence inside the first round of the loud part and a slow one
+hears it go round, each section as loud as the other.
+
+**The percussion.** A drum kit in the loud part: a kick on each bar's
+first beat, a snare on its third, a closed hat on every eighth note, a
+crash at each half, the toms' fills at each half's end; the timpani stays
+under it. Each is a voice of its own on the mixer (`kit`, `snare`, `hat`,
+`crash`, and `drum` for the timpani and the heartbeat), so the owner hears
+the theme with any of them off.
+
+**What the owner will try.** On `https://localhost:5173/?debug#music`,
+after starting `npm run dev` again, *the-truth* as a story: the whole
+theme plays, 3:19, and under its time are the five movements' buttons,
+each coming in as it does in the story. Then the two stories read at their
+own pace. The designer's choices for the owner's ear to keep or to turn
+down: the drum kit, the major statement at `love` and the piano after it,
+the silence, and the steps the movements are asked for at.
+
+Recorded from the page as a story hears it: the piano alone at 0.028 of
+full scale a bar, `name` at 0.039, the 16 s rising from 0.050 to 0.084,
+the loud part at 0.085 with peaks at 0.5 to 0.57, the silence at 0.011,
+the major statement at 0.08, the piano after it at 0.024. A change of
+movement recorded the same way has no gap and no doubled bar.

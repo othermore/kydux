@@ -500,6 +500,29 @@ test.describe('the living familiar (D267, D269, D270)', () => {
     // The class kept with go_to, in a game whose familiar lives: Nabi's test above.
   });
 
+  test("the familiar sets off to the star as Orla's command comes up, the command holding nothing (D303)", async ({ page }) => {
+    await open(page, 'orlas-orders', '1');
+    // When the familiar reaches each cell, by the page's clock.
+    await scene(page).evaluate((node) => {
+      const seen: [number, string][] = [];
+      (window as unknown as { cells: [number, string][] }).cells = seen;
+      new MutationObserver(() => {
+        const found = /(?:^|;)familiar:(\d+,\d+),/.exec(node.getAttribute('data-actors') ?? '');
+        if (found && found[1] !== seen[seen.length - 1]?.[1]) seen.push([performance.now(), found[1] as string]);
+      }).observe(node, { attributes: true, attributeFilter: ['data-actors'] });
+    });
+    await start(page, solution('orlas-orders'));
+    await expect(scene(page)).toHaveAttribute('data-told', /orla:order_wizard/, { timeout: ciTimes(90_000) });
+    const cells = await page.evaluate(() => (window as unknown as { cells: [number, string][] }).cells);
+    const sun = cells.findIndex(([, cell]) => cell === '13,4');
+    const [onSun] = cells[sun] ?? [0];
+    const [setOff, first] = cells[sun + 1] ?? [Number.POSITIVE_INFINITY, ''];
+    expect(first).toBe('13,5');
+    // The first piece's reading, 0.8 s and 50 ms a character, then half a second at most.
+    const firstPiece = 'Ahora, déjame probar a mí para ver que lo has enseñado bien.';
+    expect(setOff - onSun).toBeLessThanOrEqual(800 + 50 * [...firstPiece].length + 500);
+  });
+
   test("a class of another kind is stopped by Orla, who names the kind kept (D305)", async ({ page }) => {
     await open(page, 'orlas-orders');
     const crow = solution('orlas-orders').replaceAll('class Fox(', 'class Crow(');

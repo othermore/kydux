@@ -10,6 +10,7 @@ import {
   type PlaybackState,
   ticksTo,
   TOLD_MOST,
+  toldHold,
 } from './playback';
 
 function events(n: number): PlaybackEvent[] {
@@ -438,5 +439,18 @@ describe('where a familiar walks (D277)', () => {
     vi.advanceTimersByTime(200);
     expect(playback.tick).toBe(3);
     expect(spans).toEqual([1, 1]);
+  });
+});
+
+describe("the hold for words told in a tick (D264, D274, D303)", () => {
+  it('holds for every piece, after what was told before', () => {
+    expect(toldHold([3800, 1900], 0, false)).toBe(5700);
+    expect(toldHold([1200], 2000, false)).toBe(3200);
+  });
+
+  it("holds for the pieces before an order's command, and nothing for a command alone", () => {
+    expect(toldHold([3800, 1900], 0, true)).toBe(3800);
+    expect(toldHold([1900], 0, true)).toBe(0);
+    expect(toldHold([1900], 1500, true)).toBe(1500);
   });
 });

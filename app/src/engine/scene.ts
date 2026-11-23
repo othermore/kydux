@@ -152,7 +152,7 @@ import { Speech } from './speech';
 import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
 import { heldOutline, MarkSilhouette, Silhouette } from './silhouette';
-import { FAMILIAR_PACE, HELD, LONG, Playback, TOLD_MOST } from './playback';
+import { FAMILIAR_PACE, HELD, LONG, Playback, TOLD_MOST, toldHold } from './playback';
 import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
@@ -499,6 +499,8 @@ class LevelScene extends Phaser.Scene {
    * after which the next told in it are said. */
   private toldKeys: string[] = [];
   private toldMs = 0;
+  /** Whether the tick shown is one of Orla's orders, whose command holds nothing (D303). */
+  private ordering = false;
   private readonly sitting = new Set<Phaser.GameObjects.Sprite>();
   private readonly litPlates = new Set<string>();
   private readonly voiceSprites = new Map<string, Phaser.GameObjects.Sprite>();
@@ -1494,6 +1496,7 @@ class LevelScene extends Phaser.Scene {
     this.parentNode.dataset.tick = String(tick);
     this.shownTick = tick;
     this.toldMs = 0;
+    this.ordering = false;
     this.endGlides(tick);
     // Drawn at once on a later tick than it came or last stepped in, a trial that does
     // not hold is not there (D276).
@@ -3128,6 +3131,8 @@ class LevelScene extends Phaser.Scene {
         break;
       case 'order':
         this.bookSaid = bookText(data, true);
+        // The command said in this tick holds nothing of it (D303).
+        this.ordering = true;
         break;
       case 'blocked': {
         // A familiar called back that finds no way (D262).
@@ -3218,6 +3223,7 @@ class LevelScene extends Phaser.Scene {
     const reading = pieces.map((piece) => Math.min(readingMs(piece), TOLD_MOST));
     // Words told in the tick by another before are read first (D264).
     const later = this.toldMs > 0;
+    const before = this.toldMs;
     if (who === 'book') {
       this.bookSaid = { words: toldWhole(text), code: '', look: 'told' };
     } else {
@@ -3241,7 +3247,11 @@ class LevelScene extends Phaser.Scene {
     }
     if (!instant) {
       if (who === 'book' || !later) play('say');
-      const whole = who === 'book' ? Math.min(readingMs(toldWhole(text)), TOLD_MOST) : this.toldMs;
+      // In an order's tick, the command is read while the familiar walks (D303).
+      const whole =
+        who === 'book'
+          ? Math.min(readingMs(toldWhole(text)), TOLD_MOST)
+          : toldHold(reading, before, this.ordering && who === 'orla');
       this.playback.holdTick(whole, whole);
     }
   }

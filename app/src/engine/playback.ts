@@ -40,6 +40,15 @@ export const HELD = 250;
 /** The longest a tick is held for words said while the program runs, in milliseconds
  * at speed 1 (D264). */
 export const TOLD_MOST = 10_000;
+/** How long a tick is held for words told in it (D264, D274), in milliseconds at speed
+ * 1: what was told before them (`before`) and the reading of each of their pieces; in the
+ * tick of one of Orla's orders, the last piece, the command, holds nothing, the familiar
+ * setting off as its bubble comes up (D303). */
+export function toldHold(reading: readonly number[], before: number, order: boolean): number {
+  const pieces = order ? reading.slice(0, -1) : reading;
+  return pieces.reduce((sum, ms) => sum + ms, before);
+}
+
 /** The wizard's events that take a long tick. */
 const HANDS = new Set(['cast', 'pick_up', 'untie']);
 /** How long a tick's events take, against a tick: LONG for the wizard's hands, a

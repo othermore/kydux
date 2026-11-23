@@ -14,9 +14,15 @@ owner's rule of the same day:
 
 > No quiero que hagas la puerta tú con una herramienta.
 
-No tool makes, turns or fills anything of this door. This sprint
-asks Gemini again, for another picture and in other words, and
-builds the story on it.
+> Lo que sí podemos hacer es que Gemini genere la puerta abierta
+> y cerrada y trabajar aparte con herramientas las máscaras si
+> Gemini no sabe dibujar la escena sin puerta.
+
+No tool makes, turns or fills anything of this door. The door
+shut is painted already: it is the painting. This sprint asks
+Gemini for the door open, in other words than sprint 55's, and
+for no picture of the scene without its door: the scene needs
+none. The masks are the tools' work. The story is built on it.
 
 **Where it is today.**
 
@@ -95,29 +101,36 @@ builds the story on it.
   nothing painted anew lies against the old floor; and the leaf
   standing open on the landing, seen from the front, flat before
   the right end of the scroll shelves, hinged on the wall's end,
-  its foot on the shelves' foot. `tools/art/lay.py` lays the
-  picture's two changes on the painting, each the difference
-  within its box: the doorway gives the scene's ground and the
-  door's `without`, the leaf on it the door's open picture. Its
-  state `closed` is the painting's own leaf and its state `open`
-  Gemini's, each cut by the difference, each mask 0 or 1 (D155).
-  It rests closed (D104), so every level and story of the scene
-  shows it shut. Outside the two boxes every pixel of the ground
-  is the painting's own, and the trench's covers stay fitted.
-  The open leaf is on row 2: a figure on the landing passes in
-  front of it. The door is a story's thing
-  (`"art": "room_door"`); no level has it, and the arched door
-  in the room's back wall has no open state. In *Lo que trajo el
-  familiar* Rinlo stands up, walks to the door, opens it,
-  crosses the landing and goes down the stairs to their foot at
-  (2, 8), walking out of sight there; in the next step he comes
+  its foot on the shelves' foot. The scene has no picture
+  without its door, and needs none: the door shut is the
+  painting, which stays the scene's ground, whole, and the door
+  open is Gemini's picture, whose two changes `tools/art/lay.py`
+  lays on the painting, each the difference within its box. The
+  door's state `open` is those two changes drawn over the
+  ground, the doorway's and the leaf's; its state `closed` draws
+  nothing. The masks are the tools' work: cut by the difference
+  (D148), each 0 or 1 (D155), and fitted with the tools, a
+  setting of the difference or a traced outline, wherever the
+  difference alone leaves a hole or a ragged edge. The doorway's
+  mask covers the whole of the shut door. The door rests closed
+  (D104), so every level and story of the scene shows the
+  painting as it is. The doorway's piece lies on the floor,
+  under every figure, and the leaf is on row 2: a figure in the
+  doorway or on the landing passes in front of both. The door
+  is a story's thing (`"art": "room_door"`); no level has it,
+  and the arched door in the room's back wall has no open state.
+  In *Lo que trajo el familiar* Rinlo stands up, walks to the
+  door, opens it, crosses the landing and goes down the stairs
+  to their foot at (2, 8), walking out of sight there; in the
+  next step he comes
   into sight at (2, 12), under the corridor's arch, and walks to
   the children. Between the stairs' foot and the arch no figure
   is drawn: there the painting shows the corridor's wall from
   above and its arch from the front, and a figure walking
   through would have its head over the wall's top while its legs
   stood in the arch's opening. Rules out a door, a doorway or a
-  leaf made, turned, filled or redrawn by a tool; a doorway of
+  leaf whose pixels are made, turned, filled or redrawn by a
+  tool; a picture of the scene without its door; a doorway of
   bare floor painted anew against the painting's floor; a Rinlo
   who is taken out of his room and put in the corridor; and a
   figure drawn across the arch's stones.
@@ -163,24 +176,26 @@ scene's edits folder, the scene's painting when it is not given.
 The tool is otherwise as it is. Then, from the one try:
 
 1. The doorway, on the painting:
-   `lay.py the-tower-passage <try> --part 0 0 10 5.65 --box <doorway> --out game-tower-passage-doorway.png`.
+   `lay.py the-tower-passage <try> --part 0 0 10 5.65 --box <doorway> --out tower-passage-door-open-doorway.png`.
    Its box is measured on the try, the smallest that holds the
    doorway's change with the outlines that close it: about
    `[5.4, 2.45, 6.05, 4.12]`.
-2. The leaf, on the doorway's picture:
-   `lay.py the-tower-passage <try> --from game-tower-passage-doorway.png --part 0 0 10 5.65 --box <leaf> --out game-tower-passage-door-open.png`.
+2. The leaf, on that picture:
+   `lay.py the-tower-passage <try> --from tower-passage-door-open-doorway.png --part 0 0 10 5.65 --box <leaf> --out game-tower-passage-door-open.png`.
    Its box is the smallest that holds the leaf with its outline:
    about `[4.0, 0.7, 5.47, 2.95]`.
 
-The fit is found outside one box, and the try's other change is
-in what it measures: the two runs must print the same height and
-the same shift. Each run prints that no pixel differs outside
-its box.
+`game-tower-passage-door-open.png` is the door open: the
+painting, with Gemini's doorway and Gemini's leaf and nothing
+else changed. The fit is found outside one box, and the try's
+other change is in what it measures: the two runs must print the
+same height and the same shift. Each run prints that no pixel
+differs outside its box.
 
 **How a try is judged.** On the two laid pictures and on the
 looks `lay.py` writes, enlarged to four times the game's size,
-and once at the game's size. The doorway and the leaf are judged
-apart.
+and once at the game's size, beside the painting. The doorway
+and the leaf are judged apart.
 
 The doorway passes when:
 
@@ -188,8 +203,12 @@ The doorway passes when:
 - nothing of the wall, top or end face, is lower than y = 3.0;
 - from there to the block the doorway's floor is flat, with
   nothing standing on it;
+- nothing of the shut door shows in it or round it;
 - no side of the box and no edge of the mask is seen: no line,
-  no step of tone, no blot, no mark of the floor cut in half;
+  no step of tone, no blot, no mark of the floor cut in half.
+  A mask the difference cuts badly is fitted with the tools
+  before the try is failed for it: a setting of the difference,
+  or an outline traced on the threshold's own (`trace.py`);
 - the block below it is the painting's.
 
 The leaf passes when:
@@ -204,23 +223,22 @@ The leaf passes when:
 No magenta and no cyan is anywhere in a try.
 
 **How many.** Six images at most in this sprint. A part that
-passes is kept and not asked again; the next try asks only what
-is missing, with the same words less the paragraph of the part
-kept, and a guide with the one box:
+passes is kept from its try and not judged again:
 
-- neither passed: the whole change again, its words mended by
-  what the try shows;
+- neither passed: the door open again, its words mended by what
+  the try shows;
 - the doorway passed: the leaf alone, as an edit of the same
-  part cut from `game-tower-passage-doorway.png`, a thing added
-  to it;
-- the leaf passed: the doorway alone, as an edit of
-  `door-part.png`; the leaf is laid from its own try.
+  part cut from `tower-passage-door-open-doorway.png`, a thing
+  added to it, with the same words less the doorway's paragraph
+  and a guide with the cyan box only;
+- the leaf passed: the door open again, and only its doorway is
+  taken; the leaf is laid from its own try.
 
-If six are spent and a part is still missing, the sprint stops
-there: nothing of 2.2 or 2.3 is built, nothing is committed but
-`lay.py`'s option if it was made, and the report shows each try
-laid, with what failed in it. No tool then makes what is
-missing.
+No try asks for the scene without its door. If six are spent and
+a part is still missing, the sprint stops there: nothing of 2.2
+or 2.3 is built, nothing is committed but `lay.py`'s option if
+it was made, and the report shows each try laid, with what
+failed in it. No tool then paints what is missing.
 
 **Tests.** `tests/tools/test_art.py`, beside `lay.py`'s: with
 `--from`, the edit is laid on that picture and the painting is
@@ -230,31 +248,38 @@ not read for it; without it, the tool does what it does today.
 
 **What is asked.**
 
-- `art/scenes/the-tower-passage/cut.json`: the ground is
-  `game-tower-passage-doorway.png`; the painting stays
-  `game-tower-passage-flap.png`. `laid` has the doorway and the
-  leaf after the second flap, each with its `from`, its
-  `picture`, its `part`, its `box` and its `to`, as measured.
-  The thing `room_door`, a door as the storeroom's `store_door`
-  is: `"at": [5, 3]`, `"rest": "closed"`, `"without"` the
-  doorway's picture, its state `closed` cut from the painting,
-  on row 3, its state `open` from
-  `game-tower-passage-door-open.png`, on row 2. The three
-  covers, `laid`'s flap, `hides`, `rims`, `nudged`, `lowered`
-  and `kept` are untouched; `about` and `source` say how the
-  door is painted and laid, in the present, and `source` names
-  the prompt that gave the picture kept. The prompts of the
-  tries not kept are in `drafts/`, and nothing names them.
+- `art/scenes/the-tower-passage/cut.json`: the painting and the
+  ground stay `game-tower-passage-flap.png`. `laid` has the
+  doorway and the leaf after the second flap, each with its
+  `from`, its `picture`, its `part`, its `box` and its `to`, as
+  measured. The thing `room_door`, a door as the storeroom's
+  `store_door` is: `"at": [5, 3]`, `"rest": "closed"`; its
+  state `closed` is the ground's own and draws nothing; its
+  state `open` is cut from `game-tower-passage-door-open.png`
+  against the painting, in two pieces: the doorway's, which
+  lies on the floor under every figure, and the leaf's, on
+  row 2. Where the export or the engine has no way to say that
+  a state is the ground's own, or that a state has a piece that
+  lies and a piece that stands, the smallest change that says
+  it is made, and said in the commit. The three covers, `laid`'s
+  flap, `hides`, `rims`, `nudged`, `lowered` and `kept` are
+  untouched; `about` and `source` say how the door is painted
+  and laid, in the present, and `source` names the prompt that
+  gave the picture kept. The prompts of the tries not kept are
+  in `drafts/`, and nothing names them.
+- The masks. Each piece is cut by the difference, 0 or 1 at
+  every pixel. The doorway's covers the whole of the shut door,
+  plank and stones: with the door open nothing of them shows.
+  The leaf's has its outline whole and its corners whole. Where
+  the difference alone does not give that, the mask is fitted
+  with the tools: the state's own settings (`diff`), or an
+  outline traced on the picture (`trace.py`). No pixel of
+  Gemini's picture is changed for a mask's sake.
 - The scene exported again
   (`.venv/bin/python tools/art/export_scene.py the-tower-passage`).
-  Outside the doorway's box the exported ground is, pixel for
-  pixel, today's: compare them and say so in the report. With
-  the door shut, the scene drawn is today's within that box as
-  well: the closed state lays the painting's leaf and its
-  stones back whole, with nothing of the threshold showing
-  through and no line round it. Where the difference leaves a
-  hole, the state's own settings (`diff`) are fitted until it
-  does not.
+  The exported ground is today's, pixel for pixel, the whole of
+  it: compare them and say so in the report. With the door shut
+  the scene drawn is today's.
 - The trench's rim and the two mouths cover a familiar as they
   do today: the sweep says of them what it says today, and
   nothing new of the story's cells. If the sweep finds something
@@ -263,16 +288,19 @@ not read for it; without it, the tool does what it does today.
   loosened.
 - Enlarged, at four times its size on the game's ground: the
   door shut is the painting's door; the door open has its leaf
-  whole before the shelves and the doorway clear; Rinlo on
-  (4, 3) and on (5, 3) is in front of the leaf, of the wall's
-  strip and of its end, whole, and his feet stand above the
-  block.
+  whole before the shelves and the doorway clear, with no edge
+  of a mask seen; Rinlo on (6, 3) and in the doorway stands on
+  the threshold's piece, not under it; Rinlo on (4, 3) and on
+  (5, 3) is in front of the leaf, of the wall's strip and of
+  its end, whole, and his feet stand above the block.
 - No level's world has the door, and nothing of the two levels
   changes: their plans show the door shut, as today's do.
 
-**Tests.** `tests/project/test_chapter_5_art.py`: the door's two
-states are in the scene's `art.json`, it rests closed, its open
-picture has nothing below y = 3.0 and nothing right of x = 5.5.
+**Tests.** `tests/project/test_chapter_5_art.py`: the door is in
+the scene's `art.json` with its open state, it rests closed, its
+leaf's piece has nothing below y = 3.0 and nothing right of
+x = 5.5, and its doorway's piece nothing left of x = 5.3 or
+below y = 4.2.
 `sweeps.spec.ts` and `painted.spec.ts` green.
 
 ### 2.3 The story
@@ -356,6 +384,10 @@ counts one step more.
   redraws the door, its doorway or its leaf (D289). `lay.py`
   joins Gemini's picture to the painting, and the difference
   cuts the masks, as for every state of the game (D148, D281).
+- **A picture of the scene without its door.** Gemini is not
+  asked for it and the scene does not need it: the ground is
+  the painting, door shut, and the open state covers the shut
+  door (D289).
 - **The whole scene painted anew** with its door open. A new
   painting moves every stone a little, and the trench's covers,
   the flaps and the plans are fitted to this one.
@@ -388,7 +420,9 @@ If they are spent, the sprint ends here with its report.
 ### 3.2 The door in the scene (D289, 2.2)
 
 `lay.py`'s option and its test; the prompt kept, in
-`tools/art/prompts/`; the passage's `cut.json`; the scene
+`tools/art/prompts/`; the passage's `cut.json`; what the export
+or the engine needs for a state that is the ground's own and
+for the open state's two pieces, with its tests; the scene
 exported; the tests of 2.2; D289 entered, D273 naming the door,
 the plan's chapter 5 naming D289. `ci/check.sh`,
 `sweeps.spec.ts`, `painted.spec.ts` and `chapter-5.spec.ts`
@@ -409,8 +443,8 @@ current commit only (the side door shut and open, at the game's
 size and at four times; Rinlo at the door, in the doorway, on
 the landing, on the stairs and under the arch); every try of
 Gemini with what passed and what failed in it, and the count;
-the boxes measured and what `lay.py` printed; the ground
-compared outside the doorway's box; what was decided where the
+the boxes measured and what `lay.py` printed; each mask and
+how it was fitted; the ground compared with today's; what was decided where the
 plan does not decide. The memory note `kydux-sprint-56-state`,
 and the prompt for the designer's review.
 
@@ -429,9 +463,11 @@ This is sprint 56: the forgotten room's side door and Rinlo's
 way down the back stairs, the piece 3.5 that sprint 55 left
 unbuilt when Gemini's three tries failed. The door is Gemini's
 to paint, by the owner's rule: no tool makes, turns, fills or
-redraws the door, its doorway or its leaf. Gemini is asked
-again, for another picture and in other words: the door open,
-in one edit. Build on the last commit of main as you find it.
+redraws a pixel of the door, its doorway or its leaf. Gemini is
+asked again, in other words: the door open, in one edit. The
+door shut is the painting, and no picture of the scene without
+its door is asked or needed; the masks are the tools' work.
+Build on the last commit of main as you find it.
 
 Read first: CLAUDE.md, .claude/working-model.md,
 docs/dev/README.md, docs/dev/sprint-56.md (this plan, whole),
@@ -456,24 +492,29 @@ end showing its end face, a flat threshold stone in the doorway
 with an outline along its two sides, and the leaf standing open
 before the right end of the scroll shelves. Copy each try
 before the next one is asked. Lay each try with tools/art/lay.py
-in two runs, the doorway on the painting and the leaf on the
-doorway's picture (lay.py takes one option more, --from), and
-judge the doorway and the leaf apart, by the plan's lists, at
-four times the game's size. A part that passes is kept; the next
-try asks only what is missing. Six images at most. If six are
-spent and a part is missing, stop: build nothing of the scene or
-the story, and report every try. Never make what is missing with
-a tool, and never touch a pixel of Gemini's picture by hand or
-by a script: lay.py and the export's difference are the only
-things between Gemini's picture and the game.
+in two runs, the doorway on the painting and the leaf on that
+picture (lay.py takes one option more, --from): the result is
+the door open, the painting with Gemini's two changes and
+nothing else. Judge the doorway and the leaf apart, by the
+plan's lists, at four times the game's size. A part that passes
+is kept from its try. Six images at most, and none asks for the
+scene without its door. If six are spent and a part is missing,
+stop: build nothing of the scene or the story, and report every
+try. Never paint what is missing with a tool, and never change a
+pixel of Gemini's picture by hand or by a script. The masks are
+another matter: they are yours to work with the tools.
 
-2. The scene. The passage's ground is the doorway's picture; the
-thing room_door at (5, 3) rests closed, its closed state the
-painting's own leaf on row 3, its open state Gemini's leaf on
-row 2, each by the difference, each mask 0 or 1. The scene
-exported; outside the doorway's box the ground is today's pixel
-for pixel, and with the door shut the scene drawn is today's.
-D289 entered with the plan's words.
+2. The scene. The passage's ground stays the painting, door
+shut, the whole of it. The thing room_door at (5, 3) rests
+closed; its closed state is the ground's own and draws nothing;
+its open state is cut from the door-open picture against the
+painting, in two pieces: the doorway's, lying on the floor under
+every figure and covering the whole of the shut door, and the
+leaf's, on row 2. Each mask is 0 or 1, cut by the difference and
+fitted with the tools (the diff settings, an outline traced with
+trace.py) wherever the difference alone leaves a hole, a ragged
+edge or a cut corner. The scene exported; the ground is today's
+pixel for pixel. D289 entered with the plan's words.
 
 3. The story. Lo que trajo el familiar has the door and opens
 it. Its first step becomes two, as the plan writes them: Rinlo
@@ -518,8 +559,9 @@ are mended only by what a try shows, and the report says how.
 The plan's numbers for the boxes are the designer's measures:
 measure them on the try kept and take yours. Where the plan does
 not decide (the door's other settings, as store_door has them,
-the states' diff settings, how the scene's ground and painting
-are named in the settings, an act the story's staging lacks),
+how a state is said to be the ground's own, how the open state
+has a piece that lies and a piece that stands, the masks'
+settings and traces, an act the story's staging lacks),
 take the smallest choice that keeps its intent and say it in the
 commit. Do not build what section 2.5 leaves out. Look at each
 picture enlarged before you keep it. A cover that hides too much

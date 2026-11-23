@@ -509,7 +509,11 @@ wall with the trench painted along the middles of its cells:
 The numbers of each step are the scene's `art/scenes/<scene>/narrow.json`. The trench is
 about half a cell wide. Where the passage goes into a wall the figures walk behind, the
 wall is a row drawn over it (`over`), so that the familiar is hidden there as it walks;
-the sweep stands a familiar on every small cell (`small-<scene>.png`).
+the sweep walks a familiar through every small cell both ways, facing as it goes
+(`small-<scene>.png` in, `small-<scene>-out.png` out). Where the painted trench's middle
+is off its cells' middle, those cells are `nudged`; where a rim lies just below a
+familiar's feet, the rim is a cover drawn over it, and the settings name its cells
+(`rims`), on which the sweep wants the feet behind it and the body seen (D282).
 
 ## A small thing painted into the base
 

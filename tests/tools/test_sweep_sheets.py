@@ -104,3 +104,16 @@ def test_the_shed_s_sheets_are_its_whole_picture_at_its_cell(tmp_path):
     for path in written:
         assert Image.open(path).size == (20 * CELL, 15 * CELL)
     assert CELL >= 64
+
+
+def test_a_passage_is_walked_both_ways_facing_as_the_familiar_goes():
+    """The small cells a chain, walked in from its lowest end and out again, each facing
+    the next cell, the last as it came (D282)."""
+    trench = [(10, 12), (10, 11), (10, 10), (10, 9), (10, 8), (11, 8), (12, 8), (13, 8), (13, 7)]
+    ways = sweep.passage_ways(trench)
+    assert ways[(10, 12)] == ("up", "down")
+    assert ways[(10, 8)] == ("right", "left")
+    assert ways[(12, 8)] == ("right", "left")
+    assert ways[(13, 8)] == ("up", "down")
+    assert ways[(13, 7)] == ("up", "down")
+    assert sweep.passage_ways([(4, 4)]) == {(4, 4): ("down", "down")}

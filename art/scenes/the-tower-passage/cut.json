@@ -27,6 +27,16 @@
       "mask": "box",
       "over": true,
       "states": {"standing": "painting"}
+    },
+    "trench_rim": {
+      "about": "The trench's near rim along row 8, its pale stones from the trench's lower edge down to where they end: over a familiar on (10, 8) to (13, 8), which is seen from its body up, its feet behind the rim; no familiar on row 9 or below reaches it (D282).",
+      "box": [10.68, 8.635, 13.82, 8.84],
+      "row": 8,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {"standing": "painting"}
     }
   },
   "laid": [
@@ -40,6 +50,19 @@
     }
   ],
   "hides": [[10, 12], [10, 11], [10, 10], [13, 5], [13, 4]],
+  "rims": [[11, 8], [12, 8], [13, 8]],
+  "nudged": [
+    {
+      "about": "The trench's stretch up column 10: its painted floor's middle is 0.02 of a cell right of the cells', and a familiar's figure 0.005 left of its frame's, measured on the game's ground (D282).",
+      "cells": [[10, 8], [10, 12]],
+      "by": 0.025
+    },
+    {
+      "about": "The stretch up column 13, measured the same way, off by as much.",
+      "cells": [[13, 4], [13, 8]],
+      "by": 0.025
+    }
+  ],
   "lowered": [
     {
       "about": "Under the room's front wall's lit top: a familiar drawn lower, so that it is wholly under the wall until it steps into the room.",
@@ -47,7 +70,7 @@
       "by": 0.25
     }
   ],
-  "kept": [[9.9, 10.3, 11.1, 13.0], [12.9, 4.4, 14.1, 6.1]],
+  "kept": [[9.9, 10.3, 11.1, 13.0], [12.9, 4.4, 14.1, 6.1], [10.6, 8.55, 13.9, 8.9]],
   "cuts": [],
   "castle": 0,
   "thresholds": {"outline": 100},

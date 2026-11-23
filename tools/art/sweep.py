@@ -304,14 +304,16 @@ def window(layer: Layer, x0: int, y0: int, x1: int, y1: int) -> np.ndarray:
     return out
 
 
-def figure(name: str = LOOK, flying: bool = False) -> tuple[np.ndarray, int]:
-    """A figure's standing frame, facing down, the wizard's unless named, or its first
-    flying frame (flight.ts), and how far above its bottom the feet are."""
+def figure(name: str = LOOK, flying: bool = False, facing: str = "down") -> tuple[np.ndarray, int]:
+    """A figure's standing frame, facing down unless `facing` says, the wizard's unless
+    named, or its first flying frame (flight.ts), and how far above its bottom the feet
+    are."""
     figures = CONTENT / "art" / "figures"
     data = json.loads((figures / "figures.json").read_text(encoding="utf-8"))
     width, height = data["frame"]
     sheet = Image.open(figures / f"{name}.webp").convert("RGBA")
-    column, row = (0, data["rows"]["fly"]) if flying else (data["standing"], 0)
+    way = data["ways"].index(facing)
+    column, row = (0, data["rows"]["fly"]) if flying else (data["standing"], way)
     box = (column * width, row * height, (column + 1) * width, (row + 1) * height)
     return np.array(sheet.crop(box)), data["foot"]
 
@@ -1161,25 +1163,30 @@ def main(name: str) -> int:
 
 #: The familiar the sweep stands on the cells only a familiar walks on (D270), and how
 #: much of it may be covered on a cell where nothing is to hide it, and must be on a
-#: cell where the painted wall is drawn over it (`hides` in the scene's settings).
+#: cell where the painted wall is drawn over it (`hides` in the scene's settings), at
+#: least half, as it is at a mouth's edge walking out of it; on a cell where a rim is
+#: drawn over its feet (`rims`, D282), some of it is covered, and no more than its feet
+#: and legs.
 FAMILIAR = "familiar-fox-red"
 FAMILIAR_SEEN = 0.1
-FAMILIAR_HIDDEN = 0.6
+FAMILIAR_HIDDEN = 0.5
+FAMILIAR_FEET = 0.35
 
 
-def familiar_on(scene: Scene, x: int, y: int) -> Placed:
-    """A familiar on (x, y), facing down, where the game draws it, nudged and lowered."""
-    frame, foot = figure(FAMILIAR)
+def familiar_on(scene: Scene, x: int, y: int, facing: str = "down") -> Placed:
+    """A familiar on (x, y), facing that way, where the game draws it, nudged and
+    lowered."""
+    frame, foot = figure(FAMILIAR, facing=facing)
     height, width = frame.shape[:2]
     left = int(middle_at(scene, x, y) * scene.cell) - width // 2
     top = int(feet_at(scene, x, y) * scene.cell) + foot - height
     return Placed(feet_at(scene, x, y), Image.fromarray(frame), left, top)
 
 
-def familiar_covered(scene: Scene, x: int, y: int) -> float:
-    """How much of a familiar standing on (x, y), facing down, is covered by what is
+def familiar_covered(scene: Scene, x: int, y: int, facing: str = "down") -> float:
+    """How much of a familiar standing on (x, y), facing that way, is covered by what is
     drawn in front of it."""
-    frame, foot = figure(FAMILIAR)
+    frame, foot = figure(FAMILIAR, facing=facing)
     height, width = frame.shape[:2]
     alpha = frame[..., 3].astype(np.float32) / 255
     left = int(middle_at(scene, x, y) * scene.cell) - width // 2
@@ -1194,33 +1201,91 @@ def familiar_covered(scene: Scene, x: int, y: int) -> float:
     return float((front * alpha).sum() / max(1.0, alpha.sum()))
 
 
+def passage_ways(cells: list[tuple[int, int]]) -> dict[tuple[int, int], tuple[str, str]]:
+    """The way a familiar faces on each cell of a passage as it walks in and as it walks
+    out (D282): the cells a chain, walked in from its lowest end; on its last cell it faces
+    as it came. A cell of no chain faces down both ways."""
+    ways = {(1, 0): "right", (-1, 0): "left", (0, 1): "down", (0, -1): "up"}
+    back = {"right": "left", "left": "right", "up": "down", "down": "up"}
+    found = {cell: ("down", "down") for cell in cells}
+    left = set(cells)
+
+    def beside(cell: tuple[int, int]) -> list[tuple[int, int]]:
+        return [
+            (cell[0] + dx, cell[1] + dy) for dx, dy in ways if (cell[0] + dx, cell[1] + dy) in left
+        ]
+
+    while left:
+        ends = sorted((c for c in left if len(beside(c)) <= 1), key=lambda c: (-c[1], c[0]))
+        here = ends[0] if ends else max(left, key=lambda c: (c[1], -c[0]))
+        chain = [here]
+        left.discard(here)
+        while beside(chain[-1]):
+            nxt = beside(chain[-1])[0]
+            chain.append(nxt)
+            left.discard(nxt)
+        for index, cell in enumerate(chain):
+            ahead = chain[min(index + 1, len(chain) - 1)]
+            came = chain[max(index - 1, 0)]
+            if len(chain) == 1:
+                continue
+            step = (
+                (ahead[0] - cell[0], ahead[1] - cell[1])
+                if index + 1 < len(chain)
+                else (
+                    cell[0] - came[0],
+                    cell[1] - came[1],
+                )
+            )
+            way = ways[step]
+            found[cell] = (way, back[way])
+    return found
+
+
 def familiars(scene: Scene, name: str) -> list[Problem]:
-    """A familiar on every cell only a familiar walks on (D270): whole where nothing is
-    to hide it, hidden where the scene's settings say the painted wall is drawn over it
-    (`hides`); the sheet small-<scene>.png shows each, and the problems are returned."""
+    """A familiar on every cell only a familiar walks on (D270), walked through the
+    passage both ways, facing as it goes: whole where nothing is to hide it, hidden where
+    the scene's settings say the painted wall is drawn over it (`hides`), its feet alone
+    behind a rim where they say one is drawn over them (`rims`, D282); the sheets
+    small-<scene>.png (walked in) and small-<scene>-out.png show each, and the problems
+    are returned."""
     small = walks(name, small=True)
     if not small.any():
         return []
     if not (CONTENT / "art" / "figures" / f"{FAMILIAR}.webp").is_file():
         print(f"no {FAMILIAR} sheet: the cells only a familiar walks on are not swept")
         return []
-    hides = set()
+    hides: set[tuple[int, int]] = set()
+    rims: set[tuple[int, int]] = set()
     if (scene_settings.SCENES / name / "cut.json").is_file():
-        hides = {tuple(cell) for cell in scene_settings.settings(name).data.get("hides", [])}
+        own = scene_settings.settings(name).data
+        hides = {tuple(cell) for cell in own.get("hides", [])}
+        rims = {tuple(cell) for cell in own.get("rims", [])}
+    cells = [(int(x), int(y)) for y, x in zip(*np.nonzero(small), strict=True)]
+    ways = passage_ways(cells)
     found = []
-    placed = []
-    for y, x in zip(*np.nonzero(small), strict=True):
-        cell = (int(x), int(y))
-        share = familiar_covered(scene, *cell)
-        print(f"{x:2},{y:2}  a familiar covered {share:4.0%}")
-        if cell in hides and share < FAMILIAR_HIDDEN:
-            found.append(Problem("shown", cell, "a familiar under the wall", round(share * 100)))
-        if cell not in hides and share > FAMILIAR_SEEN:
-            found.append(Problem("covered", cell, "a familiar in the passage", round(share * 100)))
-        placed.append(familiar_on(scene, *cell))
-    out = RAW / "game-check" / f"small-{name}.png"
-    composed(scene, placed).save(out)
-    print(out.relative_to(REPO))
+    for walked, suffix in ((0, ""), (1, "-out")):
+        placed = []
+        for cell in cells:
+            facing = ways[cell][walked]
+            share = familiar_covered(scene, *cell, facing)
+            print(f"{cell[0]:2},{cell[1]:2}  {facing:5}  a familiar covered {share:4.0%}")
+            if cell in hides and share < FAMILIAR_HIDDEN:
+                found.append(
+                    Problem("shown", cell, "a familiar under the wall", round(share * 100))
+                )
+            elif cell in rims and not FAMILIAR_SEEN <= share <= FAMILIAR_FEET:
+                found.append(
+                    Problem("covered", cell, "a familiar behind the rim", round(share * 100))
+                )
+            elif cell not in hides | rims and share > FAMILIAR_SEEN:
+                found.append(
+                    Problem("covered", cell, "a familiar in the passage", round(share * 100))
+                )
+            placed.append(familiar_on(scene, *cell, facing))
+        out = RAW / "game-check" / f"small-{name}{suffix}.png"
+        composed(scene, placed).save(out)
+        print(out.relative_to(REPO))
     return found
 
 

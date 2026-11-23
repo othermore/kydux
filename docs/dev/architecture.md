@@ -4463,3 +4463,23 @@ one overturns stays, marked as superseded.
   new flap at (15, 13), asks where the familiar found the thread, and the familiar goes
   into the trench's mouth to (10, 9) and is out again with another. Rules out a second
   trench in the wall's cut, and a story where the familiar finds two threads by one way.
+- **D282 — In the trench a familiar stands on its middle, behind its near rim.** Decided
+  2026-11-18 from the owner's comment (*En el primer tramo hacia arriba debe ir un pelín
+  más hacia la derecha*; *una parte del muro de debajo del animal sale detrás del propio
+  animal*). A familiar on a cell of the trench is drawn on the painted trench's middle:
+  where the painting's middle is not the cell's, the cell is `nudged` by the measured
+  difference (D105). Measured on the game's ground, the floor between the rims' inner
+  lines runs at 10.52 up column 10 and at 13.52 up column 13, and a familiar's figure
+  stands 0.005 of a cell left of its frame's middle: the cells (10, 8) to (10, 12) and
+  (13, 4) to (13, 8) are nudged 0.025 to the right; row 8's stretch is not, its familiar
+  walking along it. Along that stretch, columns 10 to 13, the trench's near rim, the pale
+  stones just below the figure's feet from the trench's lower edge down to where they end,
+  is a cover drawn over a figure (`trench_rim`, a box from (10.68, 8.635) to
+  (13.82, 8.84), `over`, D273): a familiar on (11, 8) to (13, 8) is seen from its body up,
+  its feet behind the rim, and none on row 9 or below reaches it. The scene's settings
+  name those cells (`rims`), and `sweep.py` walks a familiar through every cell of the
+  trench both ways, facing as it goes (`passage_ways`, `small-<scene>.png` in and
+  `small-<scene>-out.png` out): on a rim's cell from a tenth to a little over a third of
+  it is covered, its feet and legs (a quarter, measured), under the wall at least half of
+  it, as at a mouth's edge walking out, and elsewhere a tenth at most. Rules out a familiar that walks
+  on the trench's wall, and a trench painted again to meet the figure.

@@ -25,7 +25,7 @@ En cuanto salga del círculo, tu familiar pasará a ser un objeto que estará en
 ---
 ## Una clase vacía
 
-Aquí hay dos clases que no son de familiares. `Person` describe a una persona, que tiene un nombre. `Student`, la de un alumno, dice que es una `Person`, y está vacía.
+Aquí hay dos clases de ejemplo, para practicar. `Person` describe a una persona, que tiene un nombre. `Student`, la de un alumno, dice que es una `Person`, y está vacía.
 
 Aun así, Tavi se crea con su nombre: `Student` hereda el `__init__` de `Person`.
 

@@ -1,7 +1,7 @@
 {
   "title": "La pizarra de {mate}",
   "goals": [
-    "{familiar} y {mate_familiar} en el círculo, cada uno con su nombre y su color."
+    "Conjura dos familiares de distintos colores, uno para ti y otro para {mate}, que ha copiado tu misma descripción."
   ],
   "starting_code": "class {familiar_class}(Familiar):\n    def __init__(name, color):\n        name = name\n        color = color\n\n{familiar_var} = {familiar_class}(\"{familiar}\", \"{familiar_color}\")\n{mate_var} = {familiar_class}(\"{mate_familiar}\", \"{mate_color}\")\nwizard.cast(\"minka\", {familiar_var})\nwizard.cast(\"minka\", {mate_var})\n",
   "hints": [

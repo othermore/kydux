@@ -25,7 +25,7 @@ As soon as it leaves the circle, your familiar will become an object that is in 
 ---
 ## An empty class
 
-Here are two classes that are not of familiars. `Person` describes a person, who has a name. `Student`, a pupil's class, says it is a `Person`, and it is empty.
+Here are two example classes, to practise with. `Person` describes a person, who has a name. `Student`, a pupil's class, says it is a `Person`, and it is empty.
 
 Even so, Tavi is made with a name: `Student` inherits the `__init__` of `Person`.
 

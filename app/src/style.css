@@ -3218,3 +3218,111 @@ a.stop-body:focus-visible {
   text-align-last: auto;
 }
 
+
+/* The notice about cookies (D328), the published game's first page: the castle's
+   painting over the words, the two buttons under them, and the languages beneath. The
+   whole of why is long: in a wide window the painting stands beside it, so that the
+   buttons are seen without scrolling. */
+.cookie-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) var(--space-6);
+}
+
+.cookie-notice[data-step='why'] {
+  max-width: 760px;
+}
+
+.cookie-card {
+  overflow: hidden;
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-lifted);
+}
+
+.cookie-picture {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 6;
+  object-fit: cover;
+  object-position: 50% 35%;
+}
+
+.cookie-words {
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.cookie-words h1 {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-story);
+  font-size: clamp(24px, 4vw, 32px);
+  line-height: 1.2;
+}
+
+.cookie-words p {
+  margin: 0 0 var(--space-3);
+}
+
+.cookie-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin: var(--space-5) 0 0;
+}
+
+.cookie-notice .big-button {
+  padding: 10px 26px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.cookie-languages {
+  display: flex;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.cookie-languages .quiet-button.small {
+  margin-bottom: 0;
+}
+
+.cookie-question {
+  font-weight: 600;
+}
+
+@media (min-width: 900px) {
+  .cookie-notice[data-step='why'] {
+    max-width: 1080px;
+  }
+
+  .cookie-notice[data-step='why'] .cookie-card {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+
+  .cookie-notice[data-step='why'] .cookie-picture {
+    height: 100%;
+    aspect-ratio: auto;
+    object-position: 74% 50%;
+  }
+}
+
+/* The settings' words about the cookies, on the published game (D328). */
+.settings-cookies {
+  width: 100%;
+}
+
+.settings-cookies h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.settings-cookies p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 16px;
+}

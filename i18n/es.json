@@ -830,5 +830,21 @@
     "written": "Orla escribe tu conjuro en el libro de Arvelia:",
     "cannot": "Tu clase no sabe hacer un familiar con un nombre y un color.",
     "colours": "Los colores de {kind}, como se escriben:"
+  },
+  "cookies": {
+    "page_title": "Kydux — cookies",
+    "title": "Usamos cookies para mejorar el juego",
+    "accept": "Aceptar",
+    "refuse": "Rechazar",
+    "why_title": "Por qué usamos cookies",
+    "text": "Queremos saber dónde se atasca quien juega y qué niveles llevan más tiempo, para poder mejorar el juego. Para ello contamos qué historias, lecciones y niveles se abren, cuánto se tarda en un nivel, cuántas veces se ejecuta un programa, las pistas leídas y las estrellas ganadas. Nunca enviamos los programas que escribes, el nombre de tu personaje ni quién eres, y nunca pedimos un nombre, una dirección ni una cuenta.",
+    "detail": "El recuento lo lleva Google Analytics, que guarda cookies en el navegador. Una cookie es una pequeña nota que el navegador se queda para que podamos saber que una visita de hoy y una de mañana llegan del mismo navegador. Sin las cookies se puede jugar igual, pero nos será más difícil saber qué niveles hay que mejorar. Si eres menor y necesitas ayuda, pide a un adulto que lea esto contigo y decida; la respuesta se puede cambiar en cualquier momento en la página de ajustes.",
+    "sure": "¿Seguro que quieres rechazarlas?",
+    "accept_them": "Aceptar las cookies",
+    "refuse_sure": "Sí, rechazarlas",
+    "settings_title": "Cookies",
+    "settings_accepted": "Las cookies están aceptadas en este navegador y el juego cuenta cómo se juega. Este botón retira el permiso y borra las cookies; tus partidas guardadas se quedan donde están.",
+    "settings_refused": "Las cookies están rechazadas en este navegador. Dentro de un día o dos, el juego volverá a preguntar.",
+    "withdraw": "Retirar el permiso"
   }
 }

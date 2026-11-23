@@ -7,6 +7,7 @@
 // (D258). The card comes with no sound where the run's end sounded as its
 // playback ended, and with its sound where there was no playback (D247).
 
+import * as analytics from '../analytics/analytics';
 import { checkedFamiliar, familiarTable, isPractice, keptAfter, withFamiliar } from '../content/familiar';
 import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
@@ -469,6 +470,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const runCode = () => {
     if (guiding || !controller.snapshot.canRun) return;
     progress.countRun(loaded.id);
+    analytics.ran(loaded.id);
     if (!judged) runsHere -= 1;
     runsHere += 1;
     judged = false;
@@ -546,6 +548,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         const verdict = judge({ world: snapshot.world, hintsShown, misses: Math.max(0, runsHere - 1) });
         const kept = progress.levelProgress(loaded.id).stars ?? 0;
         progress.markWon(loaded.id, verdict.earned);
+        analytics.won(loaded.id, verdict.earned, hintsShown);
         // The trial kept as the draft, the familiar born kept for good, what it learned
         // kept with it (D265).
         const familiars = familiarTable();

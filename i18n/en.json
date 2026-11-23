@@ -830,5 +830,21 @@
     "written": "Orla writes your conjuring in the book of Arvelia:",
     "cannot": "Your class does not know how to make a familiar with a name and a colour.",
     "colours": "The colours of {kind}, as they are written:"
+  },
+  "cookies": {
+    "page_title": "Kydux — cookies",
+    "title": "We use cookies to make the game better",
+    "accept": "Accept",
+    "refuse": "Refuse",
+    "why_title": "Why we use cookies",
+    "text": "We want to know where players get stuck and which levels take the longest, so that we can make the game better. To do this, we count which stories, lessons and levels are opened, how long a level takes, how many times a program is run, the hints read and the stars earned. We never send the programs you write, your wizard's name or who you are, and we never ask for a name, an address or an account.",
+    "detail": "The count is kept by Google Analytics, which saves cookies in the browser. A cookie is a small note the browser keeps so that we can tell that a visit today and one tomorrow come from the same browser. You can play just the same without the cookies, but it will be harder for us to know which levels to make better. If you are a child and need help, ask a grown-up to read this with you and decide; the answer can be changed at any time on the settings page.",
+    "sure": "Are you sure you want to refuse them?",
+    "accept_them": "Accept the cookies",
+    "refuse_sure": "Yes, refuse them",
+    "settings_title": "Cookies",
+    "settings_accepted": "The cookies are accepted in this browser, and the game counts how it is played. This button takes the yes back and deletes the cookies; your saved games stay where they are.",
+    "settings_refused": "The cookies are refused in this browser. In a day or two, the game will ask again.",
+    "withdraw": "Withdraw the permission"
   }
 }

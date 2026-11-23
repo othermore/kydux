@@ -1,4 +1,7 @@
 import { version } from '../package.json';
+import * as analytics from './analytics/analytics';
+import { answered } from './analytics/consent';
+import { published } from './analytics/site';
 import {
   type Course,
   chapterThemeOf,
@@ -45,6 +48,7 @@ import { markSvg } from './ui/mark';
 import type { LessonRunner } from './ui/lessonrun';
 import type { MapScreenParts } from './ui/map';
 import { aboutScreen } from './ui/about';
+import { showCookieNotice } from './ui/cookies';
 import type { Screen } from './ui/screen';
 import type { StoryJoin, StoryScreenParts } from './ui/story';
 import { askNextTip, type Wait, waitingView } from './ui/waiting';
@@ -811,11 +815,9 @@ console.info(
     : 'Kydux: not isolated; a runaway program is stopped by starting Python again.', // i18n-ignore
 );
 
-root = document.querySelector<HTMLElement>('#app');
-if (root) {
-  const page = root;
-  keepLanguageIn(progress.languageStorage);
-  initLanguage();
+/** Starts the game on the page: the settings applied, the screens listened for, and
+ * the screen the address names shown. */
+function begin(page: HTMLElement): void {
   applyLook(progress.settings());
   setMuted(!progress.settings().sound);
   music.setVolume(progress.settings().music);
@@ -826,7 +828,10 @@ if (root) {
   startPlayTime({
     playing: () => /^(level|lesson|story)\//.test(shownRoute ?? ''),
     visible: () => document.visibilityState === 'visible',
-    add: (seconds) => progress.addPlayTime(seconds),
+    add: (seconds) => {
+      progress.addPlayTime(seconds);
+      analytics.played(seconds);
+    },
   });
   // A screen opened again where it is, a level from its own stop on the map (D131).
   document.addEventListener('kydux:reopen', () => {
@@ -850,4 +855,20 @@ if (root) {
   // child who will read tips (D246).
   if (!newcomer()) askNextTip();
   route();
+  // The published game counts its screens from here on (D328).
+  analytics.start(currentLanguage, newcomer);
 }
+
+/** Opens the page: on the published game the notice about cookies first, where it has
+ * no answer or its no has run out, and the game once it is answered (D328); everywhere
+ * else the game at once. */
+function open(page: HTMLElement): void {
+  root = page;
+  keepLanguageIn(progress.languageStorage);
+  initLanguage();
+  if (published() && !answered()) showCookieNotice(page, () => begin(page));
+  else begin(page);
+}
+
+const page = document.querySelector<HTMLElement>('#app');
+if (page) open(page);

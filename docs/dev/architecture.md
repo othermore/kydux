@@ -5288,3 +5288,54 @@ one overturns stays, marked as superseded.
   the wizard's side, and the friend's first words frame the gate again. Rules out a
   figure that walks in from where the window does not reach, seen only when it arrives,
   and a camera sent after a figure by a row of framings, one a step.
+- **D328 — The published game counts how it is used, and asks about the cookies in one
+  line.** Decided 2026-11-23 by the owner (*poner google analytics, goatcounter y el
+  aviso de cookies. En principio usaremos el mismo analytics y goatcounter que tengo en
+  el proyecto de kidux*; *queremos saber estadísticas de los niveles en los que la gente
+  pasa más tiempo y demás*). The game counts its use where it is published and nowhere
+  else: on the host `kydux.kidux.org` (`src/analytics/site.ts`); on a child's computer,
+  the development server or a server of trials, the same files count nothing, ask
+  nothing and load nothing from outside. What is counted is each screen seen, as a page
+  named by the screen and its id in the course (`/level/<id>`, `/lesson/<id>`,
+  `/story/<id>`, `/map`, `/settings`, `/wizard`, `/start`, and `/about` for the welcome
+  page a newcomer is shown), the same in every language, and each visit to a level: a
+  win (`level_won`) with the seconds played, the programs run, the hints read and the
+  stars earned, or a visit left without one (`level_left`) with its seconds and runs.
+  Nothing the child writes is sent: no program, no name, nothing of a saved game. The
+  counting is Kidux's own: Google Analytics' stream `G-LHD6DKXB9P`, whose reports tell
+  the game from the website by the host, and GoatCounter's site `kidux`, every path
+  under `/kydux`.
+
+  Google Analytics keeps cookies, so the page asks first, and its notice is the owner's
+  (*el mensaje de cookies es muy largo. Creo que estaría bien que hubiese simplemente un
+  mensaje corto ("Usamos cookies para mejorar el juego") y un botón de aceptar y uno de
+  "rechazar" y el de rechazar en lugar de rechazar que saque ya el mensaje completo
+  explicando por qué, y pregunte: estás seguro de que quieres rechazarlas? Además, no hay
+  que decir nada de goatcounter en el mensaje, porque goatcounter no usa cookies*;
+  *podemos hacer que funcione sin las cookies, no tendremos datos, pero pidamos dos o
+  tres clics para llegar ahí (y mantendremos en cualquier caso goatcounter)*). Before
+  the game's first screen the page shows one line, *We use cookies to make the game
+  better*, with *Accept* and *Refuse*, in the language of the page and with the two
+  languages to choose from. *Accept* opens the game. *Refuse* refuses nothing yet: it
+  puts up the whole of why, what is counted and what never is, what a cookie is, that
+  the game plays the same without them, and a word for a child (*si eres menor y
+  necesitas ayuda, pide a un adulto*), and then asks *Are you sure you want to refuse
+  them?*, with *Accept the cookies* and *Yes, refuse them*. The second press refuses,
+  and the game opens as it does with a yes. The answer is kept in the browser
+  (`kydux.cookies`): a yes for good, a no for a day and a half, after which the page
+  asks again (*Si las cookies están rechazadas, una vez cada 1-2 días hay que volver a
+  preguntar. Si están aceptadas, están aceptadas para siempre*). The settings say which
+  answer the browser holds and change it: a yes is taken back there, and the counting
+  cookies are deleted with it; a no becomes a yes.
+
+  Google's tag is loaded only in a browser that said yes, and nothing is kept for it or
+  sent to it in any other. GoatCounter keeps nothing in the browser: it is asked for an
+  image, with no script of its own in the page, and it counts the pages and the wins
+  whatever the answer, with the two presses of a refusal as events. The notice and the
+  settings speak of the cookies alone: no text of the game names GoatCounter or says
+  what is counted without cookies (*no digas lo que cuenta el juego sin cookies, eso no
+  hay que aclararlo en ningún sitio*). The notice's words are Gemini's from
+  `tools/write/briefs/the-cookies-notice.md`, its one line and its question the owner's.
+  Rules out a game that does not open without the cookies, a refusal in one press, a
+  long text before the game, Google's tag loaded before a yes, and any counting on a
+  host other than the published one.

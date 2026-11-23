@@ -1,6 +1,7 @@
 // The settings: the language, the playback speed, the editor's text size (its letter
 // is Inconsolata, D238), whether the game's sounds play, and how loud the music is
-// (D192).
+// (D192); on the published game, the answer given to the cookies and the button that
+// changes it (D328).
 // Each change is saved in the progress document and applies at once; Back
 // returns to the screen the child came from.
 
@@ -8,7 +9,9 @@ import type { Speed } from '../engine/playback';
 import { music } from '../engine/music';
 import { setMuted } from '../engine/sfx';
 import { currentLanguage, languages, setLanguage, t } from '../i18n';
+import { published } from '../analytics/site';
 import * as progress from '../progress/progress';
+import { cookieSetting } from './cookies';
 import { element } from './dom';
 import { applyLook, FONT_SIZES } from './look';
 import type { Screen } from './screen';
@@ -129,6 +132,8 @@ export function settingsScreen(parts: SettingsScreenParts): Screen {
           ]),
         ),
       ]),
+      // The published game alone has cookies to speak of (D328).
+      ...(published() ? [cookieSetting()] : []),
       element('a', { id: 'settings-back', className: 'big-button', href: parts.back }, [t('settings.back')]),
     );
   };

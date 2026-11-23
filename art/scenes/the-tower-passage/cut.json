@@ -1,0 +1,46 @@
+{
+  "about": "The small passage, chapter 5's second scene (D273): a corridor of the tower, the masonry behind its wall seen cut open from above with a familiars' trench narrower than a cell winding through it, and a forgotten room above. Painted by Gemini from the design's trial, its trench squeezed onto the middles of its cells by tools/art/narrow.py (narrow.json), and its grid taken out by Gemini (the base). Where a familiar walks under the painted wall, at the passage's two mouths, the wall is a box drawn over it (`over`). Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-tower-passage",
+    "edits": "art/raw/game-tower-passage",
+    "painting": "game-tower-passage-nogrid.png",
+    "grid": "grid.json",
+    "ground": "game-tower-passage-nogrid.png"
+  },
+  "things": {
+    "corridor_mouth": {
+      "about": "The corridor's wall over the passage's lower mouth, from its lit top down to just above the floor: over a familiar on (10, 10), (10, 11) and (10, 12), which walks under it into the flap (D273).",
+      "box": [10.0, 10.38, 11.0, 12.8],
+      "row": 12,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {"standing": "painting"}
+    },
+    "room_mouth": {
+      "about": "The forgotten room's front wall over the passage's upper mouth, its lit top and its face with the flap: over a familiar on (13, 5) and (13, 4), which walks under it into the room (D273).",
+      "box": [13.0, 4.45, 14.0, 6.0],
+      "row": 5,
+      "static": true,
+      "solid": true,
+      "mask": "box",
+      "over": true,
+      "states": {"standing": "painting"}
+    }
+  },
+  "hides": [[10, 12], [10, 11], [10, 10], [13, 5], [13, 4]],
+  "lowered": [
+    {
+      "about": "Under the room's front wall's lit top: a familiar drawn lower, so that it is wholly under the wall until it steps into the room.",
+      "cells": [[13, 4], [13, 4]],
+      "by": 0.25
+    }
+  ],
+  "kept": [[9.9, 10.3, 11.1, 13.0], [12.9, 4.4, 14.1, 6.1]],
+  "cuts": [],
+  "castle": 0,
+  "thresholds": {"outline": 100},
+  "cut": false,
+  "source": "# The small passage\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-small-passage.md`, in the style of\n  `art/raw/image-first/field-2k.png`, and edited by it\n  (`scene-small-passage-2.md`, `scene-small-passage-3.md`).\n- Its trench painted by it on an enlargement of the wall\n  (`scene-small-passage-6.md`), squeezed onto the middles of its cells by\n  `tools/art/narrow.py`, repaired by it (`scene-small-passage-7.md`), its\n  rubble painted again (`scene-small-passage-8.md`), and laid back by\n  `tools/art/narrow.py`.\n- Its grid taken out by it (`game-tower-passage-nogrid.md`).\n"
+}

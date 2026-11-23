@@ -1,0 +1,541 @@
+{
+  "about": "The tower's highest hall, chapter 5's first scene (D273): Gemini's painting of the hall from the design's trial and its plan, its grid taken out and what stood on the walked floor taken away by Gemini's edit (tools/art/prompts/tower-hall-base.md, on the canvas of the trial painting with those parts blurred), the cat moved onto the lectern and the three plates onto their cells by Gemini's mends in boxes (`repaint`, `moon`, `sun`, `star`); its lit plates and its light at sunset are Gemini's edits of that base, laid on it by their outlines (`lit_whole`, `sunset_whole`), and every cut-out is a difference between two of its pictures (D148). Pictures named here are in art/raw/, which git ignores.",
+  "sources": {
+    "folder": "art/raw/game-tower-hall",
+    "edits": "art/raw/game-tower-hall",
+    "painting": "tower-hall-base-4.png",
+    "grid": "grid.json",
+    "ground": "tower-hall-base-4.png",
+    "hours": {
+      "sunset": "tower-hall-sunset-laid.png"
+    }
+  },
+  "base": {
+    "about": "The base: the first painting with its grid and with the perches, the baskets and the plates where they stood blurred; Gemini 3 Pro Image painted the whole picture again from tools/art/prompts/tower-hall-base.md on the canvas this makes, without the grid and with nothing on the walked floor, and its whole answer is the base (tower-hall-base.png), not joined.",
+    "from": "art/raw/game-tower-hall/game-tower-hall.png",
+    "boxes": [
+      [
+        1236,
+        896,
+        1692,
+        1207
+      ],
+      [
+        1188,
+        1398,
+        1440,
+        2115
+      ],
+      [
+        1188,
+        2115,
+        1800,
+        2553
+      ],
+      [
+        3372,
+        1398,
+        3593,
+        2115
+      ],
+      [
+        2136,
+        717,
+        2904,
+        1135
+      ]
+    ],
+    "crop": [
+      0,
+      0,
+      4800,
+      3584
+    ],
+    "canvas": "art/raw/game-tower-hall/tower-hall-mend-canvas.png",
+    "painting": "art/raw/game-tower-hall/tower-hall-base.png"
+  },
+  "repaint": {
+    "about": "The base's last mend: the moon's plate moved onto its cell, (6, 4), and the cat from the floor onto the lectern, beside the book. Painted by Gemini 3 Pro Image from tools/art/prompts/tower-hall-mend.md on a crop of the base with the plate, the lectern, the book and the cat laid on it as flat shapes (the trial's way with the passage's guide), and joined by tools/art/repaint.py in these boxes, the base kept pixel for pixel outside them.",
+    "from": "art/raw/game-tower-hall/tower-hall-base.png",
+    "boxes": [
+      [
+        1236,
+        889,
+        1668,
+        1214
+      ],
+      [
+        2112,
+        710,
+        2940,
+        1171
+      ]
+    ],
+    "crop": [
+      840,
+      239,
+      3240,
+      2031
+    ],
+    "canvas": "art/raw/game-tower-hall/tower-hall-mend-2-canvas.png",
+    "painting": "art/raw/game-tower-hall/tower-hall-mended.png",
+    "plain": true,
+    "shapes": [
+      {
+        "kind": "rectangle",
+        "box": [
+          1248,
+          896,
+          1620,
+          1207
+        ],
+        "fill": [
+          239,
+          194,
+          137
+        ]
+      },
+      {
+        "kind": "ellipse",
+        "box": [
+          1469,
+          975,
+          1651,
+          1166
+        ],
+        "fill": [
+          222,
+          170,
+          50
+        ]
+      },
+      {
+        "kind": "rectangle",
+        "box": [
+          2124,
+          717,
+          2928,
+          1159
+        ],
+        "fill": [
+          239,
+          194,
+          137
+        ]
+      },
+      {
+        "kind": "rectangle",
+        "box": [
+          2179,
+          722,
+          2621,
+          968
+        ],
+        "fill": [
+          120,
+          72,
+          36
+        ]
+      },
+      {
+        "kind": "rectangle",
+        "box": [
+          2357,
+          968,
+          2443,
+          1104
+        ],
+        "fill": [
+          120,
+          72,
+          36
+        ]
+      },
+      {
+        "kind": "rectangle",
+        "box": [
+          2304,
+          1087,
+          2496,
+          1147
+        ],
+        "fill": [
+          120,
+          72,
+          36
+        ]
+      },
+      {
+        "kind": "rectangle",
+        "box": [
+          2388,
+          741,
+          2604,
+          944
+        ],
+        "fill": [
+          250,
+          246,
+          236
+        ]
+      },
+      {
+        "kind": "ellipse",
+        "box": [
+          2196,
+          765,
+          2376,
+          944
+        ],
+        "fill": [
+          128,
+          128,
+          136
+        ]
+      }
+    ]
+  },
+  "moon": {
+    "about": "The moon's plate made as small as the other two, on its cell: painted by Gemini 3 Pro Image from tools/art/prompts/tower-hall-moon.md on a close crop of the mended painting with the plate laid on it as a flat disc, and joined by tools/art/repaint.py in this box, the painting kept pixel for pixel outside it.",
+    "from": "art/raw/game-tower-hall/tower-hall-mended.png",
+    "boxes": [
+      [
+        1212,
+        884,
+        1668,
+        1219
+      ]
+    ],
+    "fade": 24,
+    "crop": [
+      1080,
+      693,
+      2040,
+      1410
+    ],
+    "canvas": "art/raw/game-tower-hall/tower-hall-moon-canvas.png",
+    "painting": "art/raw/game-tower-hall/tower-hall-base-2.png",
+    "plain": true,
+    "shapes": [
+      {
+        "kind": "rectangle",
+        "box": [
+          1212,
+          884,
+          1668,
+          1219
+        ],
+        "fill": [
+          239,
+          194,
+          137
+        ]
+      },
+      {
+        "kind": "ellipse",
+        "box": [
+          1464,
+          975,
+          1656,
+          1166
+        ],
+        "fill": [
+          222,
+          170,
+          50
+        ]
+      }
+    ]
+  },
+  "sun": {
+    "about": "The sun's plate moved onto its cell and made as small as the moon's: painted by Gemini 3 Pro Image from tools/art/prompts/tower-hall-sun.md on a close crop of the painting with the plate laid on it as a flat disc, and joined by tools/art/repaint.py in this box, the painting kept pixel for pixel outside it.",
+    "from": "art/raw/game-tower-hall/tower-hall-base-2.png",
+    "boxes": [
+      [
+        3096,
+        860,
+        3571,
+        1231
+      ]
+    ],
+    "fade": 24,
+    "crop": [
+      2760,
+      693,
+      3720,
+      1410
+    ],
+    "canvas": "art/raw/game-tower-hall/tower-hall-sun-canvas.png",
+    "painting": "art/raw/game-tower-hall/tower-hall-base-3.png",
+    "plain": true,
+    "shapes": [
+      {
+        "kind": "rectangle",
+        "box": [
+          3096,
+          860,
+          3571,
+          1231
+        ],
+        "fill": [
+          239,
+          194,
+          137
+        ]
+      },
+      {
+        "kind": "ellipse",
+        "box": [
+          3149,
+          980,
+          3331,
+          1161
+        ],
+        "fill": [
+          222,
+          170,
+          50
+        ]
+      }
+    ]
+  },
+  "star": {
+    "about": "The star's plate moved onto its cell and made as small as the moon's: painted by Gemini 3 Pro Image from tools/art/prompts/tower-hall-star.md on a close crop of the painting with the plate laid on it as a flat disc, and joined by tools/art/repaint.py in this box, the painting kept pixel for pixel outside it.",
+    "from": "art/raw/game-tower-hall/tower-hall-base-3.png",
+    "boxes": [
+      [
+        3096,
+        2377,
+        3593,
+        2559
+      ]
+    ],
+    "fade": 24,
+    "crop": [
+      2760,
+      1911,
+      3720,
+      2628
+    ],
+    "canvas": "art/raw/game-tower-hall/tower-hall-star-canvas.png",
+    "painting": "art/raw/game-tower-hall/tower-hall-base-4.png",
+    "plain": true,
+    "shapes": [
+      {
+        "kind": "rectangle",
+        "box": [
+          3096,
+          2377,
+          3593,
+          2559
+        ],
+        "fill": [
+          239,
+          194,
+          137
+        ]
+      },
+      {
+        "kind": "ellipse",
+        "box": [
+          3149,
+          2380,
+          3331,
+          2552
+        ],
+        "fill": [
+          222,
+          170,
+          50
+        ]
+      }
+    ]
+  },
+  "lit_whole": {
+    "about": "The base with its three plates lit, Gemini 3 Pro Image's edit from tools/art/prompts/tower-hall-lit.md, laid whole on the base by its outlines before the plates' lit states are cut from it by difference (D148).",
+    "from": "art/raw/game-tower-hall/tower-hall-base-4.png",
+    "whole": true,
+    "painting": "art/raw/game-tower-hall/tower-hall-lit-laid.png"
+  },
+  "sunset_whole": {
+    "about": "The hall at sunset, whole (D126): Gemini 3 Pro Image, given the base as it is, painted it again an hour later from tools/art/prompts/tower-hall-sunset.md, the same things in the same places, the windows' sky and the light at sunset. Its outlines lie on the base's within one to three pixels, tile by tile (two by two cells), a little more to the right towards the right edge; tools/art/repaint.py join lays it whole by its outlines (`whole`) into the scene's picture at sunset (`sources` `hours`), which every image of the scene is cut from a second time.",
+    "from": "art/raw/game-tower-hall/tower-hall-base-4.png",
+    "whole": true,
+    "painting": "art/raw/game-tower-hall/tower-hall-sunset-laid.png"
+  },
+  "things": {
+    "moon": {
+      "about": "The moon's plate, lying in the floor (D273): the base shows it as it is; lit, it is Gemini's edit of the base with the three plates lit (tools/art/prompts/tower-hall-lit.md), laid on the base by its outlines, cut by the difference within the plate's glow (D148).",
+      "box": [
+        5.0,
+        3.42,
+        8.0,
+        6.2
+      ],
+      "row": 4,
+      "solid": false,
+      "without": "tower-hall-base-4.png",
+      "states": {
+        "lit": {
+          "picture": "tower-hall-lit-laid.png",
+          "diff": {
+            "threshold": 10,
+            "soft": 6,
+            "speck": 8,
+            "holes": 60000,
+            "scraps": 0.3
+          }
+        }
+      },
+      "lying": true
+    },
+    "sun": {
+      "about": "The sun's plate, lying in the floor (D273): the base shows it as it is; lit, it is Gemini's edit of the base with the three plates lit (tools/art/prompts/tower-hall-lit.md), laid on the base by its outlines, cut by the difference within the plate's glow (D148).",
+      "box": [
+        12.05,
+        3.42,
+        15.0,
+        6.2
+      ],
+      "row": 4,
+      "solid": false,
+      "without": "tower-hall-base-4.png",
+      "states": {
+        "lit": {
+          "picture": "tower-hall-lit-laid.png",
+          "diff": {
+            "threshold": 10,
+            "soft": 6,
+            "speck": 8,
+            "holes": 60000,
+            "scraps": 0.3
+          }
+        }
+      },
+      "lying": true
+    },
+    "star": {
+      "about": "The star's plate, lying in the floor (D273): the base shows it as it is; lit, it is Gemini's edit of the base with the three plates lit (tools/art/prompts/tower-hall-lit.md), laid on the base by its outlines, cut by the difference within the plate's glow (D148).",
+      "box": [
+        12.3,
+        9.35,
+        14.9,
+        10.74
+      ],
+      "row": 10,
+      "solid": false,
+      "without": "tower-hall-base-4.png",
+      "states": {
+        "lit": {
+          "picture": "tower-hall-lit-laid.png",
+          "diff": {
+            "threshold": 10,
+            "soft": 6,
+            "speck": 8,
+            "holes": 60000,
+            "scraps": 0.3
+          }
+        }
+      },
+      "lying": true
+    },
+    "arch": {
+      "about": "The entrance's archway, its foot on row 12, so that it is drawn over whoever stands in it, (9, 11) or (10, 11), and over the feet of whoever stands behind it on row 10, its jambs whole to their feet: cut from Gemini's flat magenta (tools/art/prompts/tower-hall-arch-marked-2.md) by the difference (D148), its lightest stones read at a lower threshold.",
+      "box": [
+        8.85,
+        10.15,
+        11.15,
+        12.98
+      ],
+      "row": 12,
+      "static": true,
+      "solid": true,
+      "mask": "difference",
+      "picture": "tower-hall-arch-marked-2.png",
+      "diff": {
+        "threshold": 40,
+        "soft": 40,
+        "speck": 3,
+        "rim": true
+      },
+      "lined": "parts",
+      "states": {
+        "standing": "painting"
+      }
+    }
+  },
+  "cuts": [],
+  "castle": 0,
+  "thresholds": {
+    "outline": 100
+  },
+  "cut": false,
+  "nudged": [
+    {
+      "about": "Round the entrance's archway, whose opening lies between the two columns (D149).",
+      "cells": [
+        [
+          9,
+          10
+        ],
+        [
+          9,
+          11
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          10
+        ],
+        [
+          10,
+          11
+        ]
+      ],
+      "by": -0.2
+    }
+  ],
+  "lowered": [
+    {
+      "about": "Right above the archway's top: a figure drawn higher, its feet on the floor at the arch's stones, so that the wizard on (10, 10) is seen whole.",
+      "cells": [
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          10
+        ]
+      ],
+      "by": -0.45
+    },
+    {
+      "about": "The last floor row, right behind the bottom wall's lit top: a figure drawn a little higher, so that its feet stand on the floor and not on the wall.",
+      "cells": [
+        [
+          5,
+          10
+        ],
+        [
+          14,
+          10
+        ]
+      ],
+      "by": -0.12
+    }
+  ],
+  "source": "# The tower's highest hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/game-tower-hall.md`, given its plan on the grid and the\n  design's first painting of the hall (`tools/art/prompts/scene-tower-hall.md`),\n  in the style of `art/raw/image-first/field-2k.png`.\n- Edited by it: its grid taken out and the perches and baskets that stood on\n  the walked floor taken away (`tower-hall-base.md`); the cat moved onto the\n  lectern (`tower-hall-mend.md`) and the three plates onto their cells\n  (`tower-hall-moon.md`, `tower-hall-sun.md`, `tower-hall-star.md`), each\n  mended in its box by `tools/art/repaint.py`, the painting kept elsewhere.\n- Its lit plates (`tower-hall-lit.md`), its light at sunset\n  (`tower-hall-sunset.md`) and its archway marked for the cut\n  (`tower-hall-arch-marked-2.md`) are Gemini's edits of that painting.\n",
+  "kept": [
+    [
+      8.9,
+      10.2,
+      11.1,
+      10.65
+    ]
+  ]
+}

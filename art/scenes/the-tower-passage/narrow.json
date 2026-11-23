@@ -1,0 +1,34 @@
+{
+  "about": "The small passage's trench narrower than a cell (D273), made by tools/art/narrow.py from Gemini's pictures in art/raw/ (which git ignores): the trial scene (scene-small-passage-5, the trial scene-small-passage-3 saved again), its wall enlarged with the trench painted on a guide (scene-small-passage-6), squeezed, repaired (scene-small-passage-7), its mirrored rubble painted again (scene-small-passage-8), and laid back (scene-small-passage-9), whose grid Gemini then took out (game-tower-passage-nogrid, the scene's base). Pixels of the enlargement unless said; the enlargement is columns 8 to 15 of the scene, from just above row 4's foot to just below the corridor wall's foot, at twice the scene's size.",
+  "whole": "art/raw/scene-small-passage-5/scene-small-passage-5.png",
+  "close": "art/raw/scene-small-passage-6/scene-small-passage-6.png",
+  "squeezed": "art/raw/scene-small-passage-7/guide.png",
+  "repaired": "art/raw/scene-small-passage-7/scene-small-passage-7.png",
+  "greened": "art/raw/scene-small-passage-8/guide.png",
+  "rubble": "art/raw/scene-small-passage-8/scene-small-passage-8.png",
+  "out": "art/raw/scene-small-passage-9/scene-small-passage-9.png",
+  "painting": "art/raw/game-tower-passage/game-tower-passage-nogrid.png",
+  "scene_size": [4800, 3584],
+  "box": [1920, 1003, 3600, 3243],
+  "floor": 3142,
+  "cell": 512,
+  "grid_rows_inside": 9,
+  "wide": 0.55,
+  "margin": 350,
+  "flap": 0.57,
+  "columns": [[1014, 1522, 1280], [2560, 3066, 2816]],
+  "rows": [[1945, 2365, 2203]],
+  "column_fade": [2550, 500],
+  "flaps": [
+    {"painted": [2592, 542, 3044, 945], "to": [2816, 945]},
+    {"painted": [1044, 4069, 1521, 4552], "to": [1280, 4546]}
+  ],
+  "green": [[400, 950, 1095, 3120], [400, 950, 1340, 2022]],
+  "grid": {
+    "colour": [233, 190, 172],
+    "columns": {"9": 2, "10": 3, "11": 4, "12": 4, "13": 4, "14": 5},
+    "rows": {"5": -2, "6": -1, "7": -1, "8": 0, "9": 3, "10": 4, "11": 5, "12": 5, "13": 7}
+  },
+  "trench": [[10, 12], [10, 11], [10, 10], [10, 9], [10, 8], [11, 8], [12, 8], [13, 8], [13, 7], [13, 6], [13, 5], [13, 4]],
+  "guide_box": [7, 2, 16, 14]
+}

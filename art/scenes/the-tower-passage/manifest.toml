@@ -1,0 +1,11 @@
+# The settings of the-tower-passage for the cut and the export (D82): what tools/art/export_scene.py needs of this scene.
+
+["cut.json"]
+source = "written by hand from the painting of the scene and its edits (art/raw/); read by tools/art/scene_settings.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["narrow.json"]
+source = "written by hand from the trial pictures of the passage (art/raw/scene-small-passage-*); read by tools/art/narrow.py"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"

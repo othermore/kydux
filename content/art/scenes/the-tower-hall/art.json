@@ -1,0 +1,126 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "hours": {
+    "sunset": "ground-sunset.webp"
+  },
+  "rows": [
+    {
+      "row": 12,
+      "image": "row-12-static.webp",
+      "top": 974,
+      "static": true,
+      "hours": {
+        "sunset": "row-12-static-sunset.webp"
+      }
+    }
+  ],
+  "things": {
+    "moon": {
+      "row": 4,
+      "left": 480,
+      "top": 328,
+      "states": {
+        "lit": "moon-lit.webp"
+      },
+      "hours": {
+        "sunset": {
+          "lit": "moon-lit-sunset.webp"
+        }
+      },
+      "lying": true
+    },
+    "sun": {
+      "row": 4,
+      "left": 1157,
+      "top": 328,
+      "states": {
+        "lit": "sun-lit.webp"
+      },
+      "hours": {
+        "sunset": {
+          "lit": "sun-lit-sunset.webp"
+        }
+      },
+      "lying": true
+    },
+    "star": {
+      "row": 10,
+      "left": 1181,
+      "top": 898,
+      "states": {
+        "lit": "star-lit.webp"
+      },
+      "hours": {
+        "sunset": {
+          "lit": "star-lit-sunset.webp"
+        }
+      },
+      "lying": true
+    }
+  },
+  "lowered": [
+    {
+      "about": "Right above the archway's top: a figure drawn higher, its feet on the floor at the arch's stones, so that the wizard on (10, 10) is seen whole.",
+      "cells": [
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          10
+        ]
+      ],
+      "by": -0.45
+    },
+    {
+      "about": "The last floor row, right behind the bottom wall's lit top: a figure drawn a little higher, so that its feet stand on the floor and not on the wall.",
+      "cells": [
+        [
+          5,
+          10
+        ],
+        [
+          14,
+          10
+        ]
+      ],
+      "by": -0.12
+    }
+  ],
+  "nudged": [
+    {
+      "about": "Round the entrance's archway, whose opening lies between the two columns (D149).",
+      "cells": [
+        [
+          9,
+          10
+        ],
+        [
+          9,
+          11
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          10
+        ],
+        [
+          10,
+          11
+        ]
+      ],
+      "by": -0.2
+    }
+  ],
+  "source": "SOURCE.md"
+}

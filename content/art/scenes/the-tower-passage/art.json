@@ -1,0 +1,42 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 5,
+      "image": "row-5-static-over.webp",
+      "top": 427,
+      "static": true,
+      "over": true
+    },
+    {
+      "row": 12,
+      "image": "row-12-static-over.webp",
+      "top": 996,
+      "static": true,
+      "over": true
+    }
+  ],
+  "things": {},
+  "lowered": [
+    {
+      "about": "Under the room's front wall's lit top: a familiar drawn lower, so that it is wholly under the wall until it steps into the room.",
+      "cells": [
+        [
+          13,
+          4
+        ],
+        [
+          13,
+          4
+        ]
+      ],
+      "by": 0.25
+    }
+  ],
+  "source": "SOURCE.md"
+}

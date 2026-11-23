@@ -139,13 +139,18 @@ class Scene:
     dark: list = field(default_factory=list)
 
 
-def walks(scene: str) -> np.ndarray:
+def walks(scene: str, small: bool = False) -> np.ndarray:
     """The cells walked on, from the scene's map and its terrains: the cells the
-    wizard is refused too, which the others walk on (D84)."""
+    wizard is refused too, which the others walk on (D84); with `small`, the cells only
+    a familiar walks on, a terrain whose `walk` is "small" (D270)."""
     folder = CONTENT / "scenes" / scene
     marks = (folder / "map.txt").read_text(encoding="utf-8").split()
     terrains = json.loads((folder / "scene.json").read_text(encoding="utf-8"))["terrains"]
-    walk = {letter for letter, terrain in terrains.items() if terrain.get("walk")} | {"."}
+    if small:
+        walk = {letter for letter, terrain in terrains.items() if terrain.get("walk") == "small"}
+    else:
+        walk = {letter for letter, terrain in terrains.items() if terrain.get("walk") is True}
+        walk |= {"."}
     return np.array([[char in walk for char in row] for row in marks])
 
 
@@ -153,6 +158,8 @@ def walks(scene: str) -> np.ndarray:
 #: whoever stands on the row, or over them, a door or its arch (D95).
 ROW_IN_CELL = 0.75
 UNDER_IN_CELL = 0.9
+#: The depth of a thing set in the floor, a plate (D273): under every figure.
+LYING = -1.0
 
 
 def depth_of(row: int, rows: int, under: bool = False, over: bool = False) -> float:
@@ -265,10 +272,12 @@ def load(scene: str) -> Scene:
         # A thing is drawn just after its row's image (painted.ts).
         under = thing.get("under", False) and not (door and state == "open")
         row = thing.get("rows", {}).get(state, thing["row"])
+        # A thing set in the floor, a plate, is under every figure (D273).
+        depth = LYING if thing.get("lying") else depth_of(row, rows, under) + 0.001
         found.layers.append(
             Layer(
                 name,
-                depth_of(row, rows, under) + 0.001,
+                depth,
                 None,
                 rgba,
                 thing["left"],
@@ -1142,11 +1151,77 @@ def main(name: str) -> int:
     whole = out.with_name(f"all-{name}.png")
     everyone(scene, set(hidden)).save(whole)
     print(whole.relative_to(REPO))
+    wrong += familiars(scene, name)
     for problem in wrong:
         print(problem)
     if differs(scene) is None:
         print("the export's pictures are not there: lawn and holes not checked")
     return 1 if wrong else 0
+
+
+#: The familiar the sweep stands on the cells only a familiar walks on (D270), and how
+#: much of it may be covered on a cell where nothing is to hide it, and must be on a
+#: cell where the painted wall is drawn over it (`hides` in the scene's settings).
+FAMILIAR = "familiar-fox-red"
+FAMILIAR_SEEN = 0.1
+FAMILIAR_HIDDEN = 0.6
+
+
+def familiar_on(scene: Scene, x: int, y: int) -> Placed:
+    """A familiar on (x, y), facing down, where the game draws it, nudged and lowered."""
+    frame, foot = figure(FAMILIAR)
+    height, width = frame.shape[:2]
+    left = int(middle_at(scene, x, y) * scene.cell) - width // 2
+    top = int(feet_at(scene, x, y) * scene.cell) + foot - height
+    return Placed(feet_at(scene, x, y), Image.fromarray(frame), left, top)
+
+
+def familiar_covered(scene: Scene, x: int, y: int) -> float:
+    """How much of a familiar standing on (x, y), facing down, is covered by what is
+    drawn in front of it."""
+    frame, foot = figure(FAMILIAR)
+    height, width = frame.shape[:2]
+    alpha = frame[..., 3].astype(np.float32) / 255
+    left = int(middle_at(scene, x, y) * scene.cell) - width // 2
+    bottom = int(feet_at(scene, x, y) * scene.cell) + foot
+    top = bottom - height
+    here = feet_at(scene, x, y) + 0.0005
+    front = np.zeros_like(alpha)
+    for layer in scene.layers:
+        if layer.depth > here:
+            over = window(layer, left, top, left + width, bottom)[..., 3].astype(np.float32) / 255
+            front = np.maximum(front, over)
+    return float((front * alpha).sum() / max(1.0, alpha.sum()))
+
+
+def familiars(scene: Scene, name: str) -> list[Problem]:
+    """A familiar on every cell only a familiar walks on (D270): whole where nothing is
+    to hide it, hidden where the scene's settings say the painted wall is drawn over it
+    (`hides`); the sheet small-<scene>.png shows each, and the problems are returned."""
+    small = walks(name, small=True)
+    if not small.any():
+        return []
+    if not (CONTENT / "art" / "figures" / f"{FAMILIAR}.webp").is_file():
+        print(f"no {FAMILIAR} sheet: the cells only a familiar walks on are not swept")
+        return []
+    hides = set()
+    if (scene_settings.SCENES / name / "cut.json").is_file():
+        hides = {tuple(cell) for cell in scene_settings.settings(name).data.get("hides", [])}
+    found = []
+    placed = []
+    for y, x in zip(*np.nonzero(small), strict=True):
+        cell = (int(x), int(y))
+        share = familiar_covered(scene, *cell)
+        print(f"{x:2},{y:2}  a familiar covered {share:4.0%}")
+        if cell in hides and share < FAMILIAR_HIDDEN:
+            found.append(Problem("shown", cell, "a familiar under the wall", round(share * 100)))
+        if cell not in hides and share > FAMILIAR_SEEN:
+            found.append(Problem("covered", cell, "a familiar in the passage", round(share * 100)))
+        placed.append(familiar_on(scene, *cell))
+    out = RAW / "game-check" / f"small-{name}.png"
+    composed(scene, placed).save(out)
+    print(out.relative_to(REPO))
+    return found
 
 
 if __name__ == "__main__":

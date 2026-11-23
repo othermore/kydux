@@ -155,6 +155,12 @@ is `whole`: `join` lays the picture on the painting by the affine that lays its
 dark outlines best on the painting's, over the whole picture, since the light of
 another hour changes every tone, and takes it whole, the scene's picture at that
 hour (the settings' `sources` `hours`).
+
+A section may lay flat shapes on its canvas (`shapes`, D273), each a `rectangle` or an
+`ellipse` in the painting's pixels with its `fill`, in order, over the painting given
+`plain`: a model paints where a flat colour asks it and keeps the rest, so that a thing
+moved to its cell is a flat disc on a patch of the floor's colour where it was and where
+it goes (the tower hall's plates, its lectern and its cat).
 """
 
 import json
@@ -321,6 +327,14 @@ def canvas(scene: str, section: str = "repaint") -> Path:
         blurred = np.full_like(painting, repaint["flat"])
     part = painted_part(painting.shape[:2], repaint)[..., None]
     out = (painting * (1 - part) + blurred * part).astype(np.uint8)
+    if repaint.get("shapes"):
+        shaped = Image.fromarray(out)
+        draw = ImageDraw.Draw(shaped)
+        for shape in repaint["shapes"]:
+            {"rectangle": draw.rectangle, "ellipse": draw.ellipse}[shape["kind"]](
+                shape["box"], fill=tuple(shape["fill"])
+            )
+        out = np.array(shaped)
     x0, y0, x1, y1 = repaint["crop"]
     target = REPO / repaint["canvas"]
     target.parent.mkdir(parents=True, exist_ok=True)

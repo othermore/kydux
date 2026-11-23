@@ -57,7 +57,7 @@ def walked(scene: str) -> set[tuple[int, int]]:
     terrains = json.loads((CONTENT / "scenes" / scene / "scene.json").read_text(encoding="utf-8"))[
         "terrains"
     ]
-    walks = {letter for letter, terrain in terrains.items() if terrain.get("walk")} | {"."}
+    walks = {letter for letter, terrain in terrains.items() if terrain.get("walk") is True} | {"."}
     return {(x, y) for y, row in enumerate(rows) for x, char in enumerate(row) if char in walks}
 
 
@@ -218,7 +218,7 @@ def test_a_bed_s_pillow_side_is_the_floor_cell_nearest_its_pillow_in_front_of_it
     walks = {
         letter
         for letter, terrain in {".": {"walk": True}, **spec.get("terrains", {})}.items()
-        if terrain.get("walk")
+        if terrain.get("walk") is True
     }
     beds = json.loads((CONTENT / "art" / "scenes" / scene / "art.json").read_text()).get(
         "beds", {}

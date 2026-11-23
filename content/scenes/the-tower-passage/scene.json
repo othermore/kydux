@@ -1,0 +1,20 @@
+{
+  "terrains": {
+    "u": {
+      "kind": "furniture",
+      "walk": false,
+      "sight": true
+    },
+    "p": {
+      "kind": "passage",
+      "walk": "small",
+      "sight": true
+    }
+  },
+  "voices": {
+    "cold_voice": [
+      8,
+      2
+    ]
+  }
+}

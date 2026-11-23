@@ -988,6 +988,9 @@ def scene(settings: Settings) -> Path:
             things[name]["hours"] = at_hour
         if thing.get("under"):
             things[name]["under"] = True
+        # A thing set in the floor, a plate (D273): drawn under every figure.
+        if thing.get("lying"):
+            things[name]["lying"] = True
         # A state drawn among the rows by its own row: a door swung open against the
         # wall it lies on (D111).
         rows_of = {

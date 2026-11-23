@@ -221,7 +221,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const speedLabel = labelled(element('span', { className: 'speed-label' }), () =>
     t('level.speed'),
   );
-  const card: OutcomeCard = outcomeCard(() => text.changed);
+  // The card words a stop with the level's own words for it, as the scene does (D264).
+  const card: OutcomeCard = outcomeCard(
+    () => text.changed,
+    () => text.told ?? {},
+  );
 
   // The camera's zoom, and Find my wizard (zoom.ts).
   const zoom = zoomBox(sceneParent);

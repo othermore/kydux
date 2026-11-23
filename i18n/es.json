@@ -804,7 +804,10 @@
     "spark": "Los de primero solo podéis tener familiares de seis tipos, y ese no es uno de ellos.",
     "pale_colour": "Dar a {familiar_a_kind} un color que no es el suyo requiere una técnica fuera del alcance de los de primero.",
     "pale_grey": "{wizard}, que tu compañer{{o|a}} {friend} lo haya conseguido no debe confundirte.\n\nLograr un animal de un color no natural es algo muy difícil para los alumnos de primero.",
-    "halt": "¡Alto! Ya tienes un familiar, y eso es más que suficiente. No puedes crear otro."
+    "halt": "¡Alto! Ya tienes un familiar, y eso es más que suficiente. No puedes crear otro.",
+    "one_familiar": "¡Alto! Cada alumno crea un solo familiar cada vez.",
+    "one_class": "¡Alto! Cada alumno escribe una sola descripción de familiar cada vez.",
+    "too_soon": "Aún es pronto para mover a tu animal. Antes debes estar seguro de que es el que quieres, y debes decírmelo para que lo anote en el libro."
   },
   "book": {
     "line": "El libro puede conjurarla en una sola línea:",

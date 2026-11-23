@@ -253,15 +253,18 @@ def test_an_object_called_twice_is_not_called_again_and_the_program_goes_on():
     assert [e.data["reason"] for e in _events(result, "blocked")] == ["already_here"]
 
 
-def test_with_every_trial_s_cell_taken_the_oldest_trial_dissolves():
+def test_the_slate_s_two_familiars_take_the_trials_two_cells():
+    """D297: The slate makes two familiars, one on each cell of its trials; elsewhere a
+    second object is stopped by Orla (the chapter's cases)."""
     code = (
         "class Fox(Familiar):\n    pass\n\none = Fox()\nother = Fox()\n"
         'wizard.cast("minka", one)\nwizard.cast("minka", other)\n'
     )
-    result = run_code(level_of("the-circle"), code)
-    trials = _events(result, "trial")
-    assert [t.data["at"] for t in trials] == [[10, 7], [10, 7]]
-    assert trials[1].data["dissolved"] == trials[0].data["id"]
+    assert level_of("the-slate").familiar.most == 2
+    assert level_of("the-circle").familiar.most == 1
+    trials = _events(run_code(level_of("the-slate"), code), "trial")
+    assert [t.data["at"] for t in trials] == [[10, 7], [11, 7]]
+    assert not any(t.data.get("dissolved") for t in trials)
 
 
 def test_a_familiar_takes_name_and_color_and_nothing_else_even_inside_init():
@@ -409,6 +412,9 @@ def test_the_level_s_block_is_checked():
             "methods",
         ),
         ({"stage": "living"}, "its living familiar"),
+        ({"stage": "trial", "circle": [8, 6, 11, 8], "trials": [[10, 7]], "most": 2}, "most"),
+        ({"stage": "trial", "circle": [8, 6, 11, 8], "trials": [[10, 7]], "most": 3}, "most"),
+        ({"stage": "trial", "circle": [8, 6, 11, 8], "trials": [[10, 7]], "most": True}, "most"),
         (
             {
                 "stage": "trial",

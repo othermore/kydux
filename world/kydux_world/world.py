@@ -220,6 +220,8 @@ class World:
         self.familiar_end: Position | None = None
         #: While the book calls the child's class (D267).
         self.booking = False
+        #: The classes of familiars the child's program has written (D297).
+        self.classes_written = 0
         self._tree: ast.AST | None = None
         self._check_goals()
 
@@ -266,11 +268,16 @@ class World:
 
     def _k_made(self, familiar: familiars.Familiar) -> None:
         """A familiar object made by the child's program, one creature: its id, and no
-        cell until it is called (D262); one the book makes to try a line is the book's."""
+        cell until it is called (D262); one the book makes to try a line is the book's. In
+        a level of trials or of the birth a program makes as many as the block's `most`,
+        and Orla stops the one that goes over it at its line (D297)."""
         if self.booking:
             familiar._set(id="book", state="book", cell=None, facing="down", virtual=None)
             return
         number = 1 + sum(1 for name in self.made if name.startswith("familiar_"))
+        block = self.familiar_block
+        if block is not None and block.stage in ("trial", "birth") and number > block.most:
+            self.warn("one_familiar" if block.most == 1 else "two_familiars", "orla")
         name = f"familiar_{number}"
         familiar._set(id=name, state="object", cell=None, facing="down", virtual=None)
         self.made[name] = familiar
@@ -282,6 +289,12 @@ class World:
         made = familiars.making_frame()
         file, line = made if made is not None else (CHILD, None)
         block = self.familiar_block
+        # One description of a familiar a program, in a level of trials or of the birth:
+        # Orla stops the second at its class's line (D297).
+        if file == CHILD and block is not None and block.stage in ("trial", "birth"):
+            self.classes_written += 1
+            if self.classes_written > 1:
+                self.warn("one_class", "orla", at_line=line)
         source = self.code if file == CHILD else (block.kept_class() if block else None) or ""
         node = familiars.class_node(source, klass, line)
         methods = block.methods if block is not None else familiars.METHODS
@@ -404,6 +417,7 @@ class World:
         but by its pick_up (D278)."""
         if self.booking:
             raise familiars.NoSuchMethod(familiar._k_var(), name)
+        self._k_too_soon()
         try:
             count = _steps(name, steps)
         except ActionArguments as wrong:
@@ -459,6 +473,13 @@ class World:
         if moved:
             self._k_ends_move(familiar)
 
+    def _k_too_soon(self) -> None:
+        """In a level of trials a familiar is not moved (D301): a move, a pick_up or a
+        go_to asked of one is stopped by Orla at its line, before anything else of it."""
+        block = self.familiar_block
+        if block is not None and block.stage == "trial":
+            self.warn("too_soon", "orla")
+
     def _k_familiar_stopped(
         self, familiar: familiars.Familiar, ahead: Position
     ) -> dict[str, Any] | None:
@@ -504,6 +525,7 @@ class World:
         trial's step is (D270)."""
         if self.booking:
             raise familiars.NoSuchMethod(familiar._k_var(), "pick_up")
+        self._k_too_soon()
         block = self.familiar_block
         state = familiar._k_state
         fid = familiar._k_id

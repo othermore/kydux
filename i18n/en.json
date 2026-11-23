@@ -804,7 +804,10 @@
     "spark": "First-years may only have familiars of six kinds, and that is not one of them.",
     "pale_colour": "Giving {familiar_a_kind} a colour that is not its own takes a skill beyond a first-year's reach.",
     "pale_grey": "{wizard}, do not let it mislead you that your classmate {friend} has managed it.\n\nGetting an animal in a colour that is not natural to it is very hard for a first-year.",
-    "halt": "Stop! You have a familiar already, and that is quite enough. You cannot make another."
+    "halt": "Stop! You have a familiar already, and that is quite enough. You cannot make another.",
+    "one_familiar": "Stop! Each pupil makes only one familiar at a time.",
+    "one_class": "Stop! Each pupil writes only one description of a familiar at a time.",
+    "too_soon": "It is too soon to move your animal. First you must be sure it is the one you want, and you must tell me, so that I note it in the book."
   },
   "book": {
     "line": "The book can conjure it in a single line:",

@@ -30,8 +30,9 @@ export type Outcome = (
   | { kind: 'failed' }
 ) & { changed?: boolean };
 
-/** An error explained by the world, in the child's words (D22). */
-export function explanationText(explanation: Explanation): string {
+/** An error explained by the world, in the child's words (D22); `own`, the level's own
+ * words for what someone says (D264). */
+export function explanationText(explanation: Explanation, own: Record<string, string> = {}): string {
   const p = explanation.params;
   const said = (() => {
     switch (explanation.kind) {
@@ -86,8 +87,12 @@ export function explanationText(explanation: Explanation): string {
       case 'name_letters':
       case 'name_long':
       case 'name_taken':
+      case 'one_familiar':
+      case 'two_familiars':
+      case 'one_class':
+      case 'too_soon':
         // Said in pieces on the scene, read whole on the card (D274).
-        return toldWhole(toldText({ ...p, key: explanation.kind }));
+        return toldWhole(toldText({ ...p, key: explanation.kind }, own));
       default:
         return t('error.other', p);
     }
@@ -98,12 +103,12 @@ export function explanationText(explanation: Explanation): string {
 /** What the card says: first, when the run's way is not the one on the screen before
  * it, the level's words for what is different this time, on a line of their own
  * (D204). */
-export function outcomeText(outcome: Outcome, different?: string): string {
-  const said = outcomeWords(outcome);
+export function outcomeText(outcome: Outcome, different?: string, own: Record<string, string> = {}): string {
+  const said = outcomeWords(outcome, own);
   return outcome.changed && different ? `${different}\n${said}` : said;
 }
 
-function outcomeWords(outcome: Outcome): string {
+function outcomeWords(outcome: Outcome, own: Record<string, string> = {}): string {
   switch (outcome.kind) {
     case 'won':
       return t('outcome.won');
@@ -130,7 +135,7 @@ function outcomeWords(outcome: Outcome): string {
     case 'error': {
       const { type, message, line, explanation } = outcome.error;
       if (explanation) {
-        const text = explanationText(explanation);
+        const text = explanationText(explanation, own);
         return line != null ? `${text}${t('error.line', { line })}` : text;
       }
       return line != null
@@ -153,7 +158,10 @@ export interface OutcomeCard {
 
 /** The card; `different` gives the level's words for what is different this time, in
  * the language of the moment (D204). */
-export function outcomeCard(different: () => string | undefined = () => undefined): OutcomeCard {
+export function outcomeCard(
+  different: () => string | undefined = () => undefined,
+  own: () => Record<string, string> = () => ({}),
+): OutcomeCard {
   const text = element('p', { className: 'outcome-text' });
   // Python that could not start needs the page loaded again.
   const reload = element('button', { id: 'reload', type: 'button', hidden: true });
@@ -174,7 +182,7 @@ export function outcomeCard(different: () => string | undefined = () => undefine
     show(outcome, printed = lastPrinted) {
       current = outcome;
       lastPrinted = printed;
-      text.replaceChildren(...withCode(outcomeText(outcome, different())));
+      text.replaceChildren(...withCode(outcomeText(outcome, different(), own())));
       printedLabel.textContent = t('outcome.printed');
       printedText.textContent = printed.replace(/\n$/, '');
       printedBox.hidden = printed === '';

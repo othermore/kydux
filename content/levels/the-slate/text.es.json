@@ -13,6 +13,7 @@
   "outro": "Una sola clase, y dos familiares, cada uno con su nombre y su color. ¡Gracias, {wizard}!",
   "learned": "Ahora sabes los dos despistes que todo el mundo tiene con una clase: uno que Python avisa, cuando falta `self`, y otro que nadie avisa, un nombre guardado solo dentro de la acción; y que una clase hace tantos objetos como hagan falta, cada uno con sus datos.",
   "told": {
-    "won": "Ese. Ese sí."
+    "won": "Ese. Ese sí.",
+    "two_familiars": "¡Alto! Con dos familiares basta: uno para ti y otro para {mate}."
   }
 }

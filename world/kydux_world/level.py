@@ -262,6 +262,9 @@ class FamiliarBlock:
     source: str = "source"
     orders: tuple[Order, ...] = ()
     orders_on: str | None = None
+    #: How many familiars a program may make in a level of trials or of the birth (D297):
+    #: 1, or 2 where the child makes one for the room-mate too.
+    most: int = 1
 
     def in_circle(self, position: Position) -> bool:
         if self.circle is None:
@@ -1491,6 +1494,7 @@ def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None
         "living",
         "from",
         "practice",
+        "most",
     }
     if not isinstance(value, dict) or set(value) - known - {"orders"}:
         raise LevelError(f"{level_id}: the familiar block has {', '.join(sorted(known))}, orders")
@@ -1518,6 +1522,16 @@ def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None
     block = FamiliarBlock(stage, circle=box)
     if any(not block.in_circle(cell) for cell in trials) or len(set(trials)) != len(trials):
         raise LevelError(f"{level_id}: the trials' cells are cells of the circle, each once")
+    # How many familiars a program may make (D297): one, or two where the level says so.
+    most = value.get("most", 1)
+    if "most" in value and stage not in ("trial", "birth"):
+        raise LevelError(f"{level_id}: most is said in a level of trials or of the birth")
+    if (
+        most not in (1, 2)
+        or isinstance(most, bool)
+        or (stage in ("trial", "birth") and len(trials) < most)
+    ):
+        raise LevelError(f"{level_id}: most is 1 or 2, with as many trials' cells at least")
     methods = value.get("methods", [])
     if not isinstance(methods, list) or not set(methods) <= set(METHODS):
         raise LevelError(f"{level_id}: the methods a class may define are of {', '.join(METHODS)}")
@@ -1558,6 +1572,7 @@ def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None
         source=source,
         orders=orders,
         orders_on=orders_on,
+        most=most,
     )
 
 

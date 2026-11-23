@@ -244,6 +244,8 @@ class Familiar(Child):
         # given, or a method its class does not know.
         if name.startswith("_"):
             raise AttributeError(name)
+        if name == "go_to":
+            type(self)._k_world._k_too_soon()
         if name not in ("name", "color") and type(self)._k_world._k_called(name):
             type(self)._k_world._k_puzzled(self)
             raise NoSuchMethod(self._k_var(), name)

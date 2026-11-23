@@ -264,6 +264,36 @@ test.describe('the trials (D261, D263)', () => {
   });
 });
 
+test.describe('one familiar at a time, and none moved in a trial (D297, D301)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+  const fox = 'class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n';
+
+  test('in El círculo Orla stops a second object and a second class', async ({ page }) => {
+    await open(page, 'the-circle');
+    const objects = 'class Fox(Familiar):\n    pass\n\npimu = Fox()\nkesi = Fox()\nwizard.cast("minka", pimu)\n';
+    expect(await run(page, objects)).toContain('Cada alumno crea un solo familiar cada vez.');
+    await expect(scene(page)).toHaveAttribute('data-told', /orla:one_familiar/);
+    const classes = 'class Fox(Familiar):\n    pass\n\nclass Crow(Familiar):\n    pass\n\npimu = Fox()\nwizard.cast("minka", pimu)\n';
+    expect(await run(page, classes)).toContain('Cada alumno escribe una sola descripción de familiar cada vez.');
+    await expect(scene(page)).toHaveAttribute('data-told', /orla:one_class/);
+  });
+
+  test('on the slate two familiars are made, and Orla stops a third', async ({ page }) => {
+    await open(page, 'the-slate');
+    const third = `${fox}pimu = Fox("Pimu", "red")\nkesi = Fox("Kesi", "white")\ntolu = Fox("Tolu", "black")\nwizard.cast("minka", pimu)\n`;
+    expect(await run(page, third)).toContain('¡Alto! Con dos familiares basta: uno para ti y otro para Nuri.');
+    await expect(scene(page)).toHaveAttribute('data-told', /orla:two_familiars/);
+  });
+
+  test('in Una línea en el libro a move is too soon', async ({ page }) => {
+    await open(page, 'one-line-in-the-book');
+    const moved = `${fox}pimu = Fox("Pimu", "red")\nwizard.cast("minka", pimu)\npimu.move_left(1)\n`;
+    expect(await run(page, moved)).toContain('Aún es pronto para mover a tu animal.');
+    await expect(scene(page)).toHaveAttribute('data-told', /orla:too_soon/);
+  });
+});
+
 test.describe('the trials that hold and those that fade (D276)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));

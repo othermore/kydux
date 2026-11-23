@@ -318,6 +318,36 @@
             "explanation": "go_to_not_yet",
             "line": 2
           }
+        },
+        {
+          "name": "a second object",
+          "code": "class Fox(Familiar):\n    pass\n\npimu = Fox()\nkesi = Fox()\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "one_familiar",
+            "line": 5,
+            "told": [
+              [
+                "orla",
+                "one_familiar"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "a second class",
+          "code": "class Fox(Familiar):\n    pass\n\nclass Crow(Familiar):\n    pass\n\npimu = Fox()\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "one_class",
+            "line": 4,
+            "told": [
+              [
+                "orla",
+                "one_class"
+              ]
+            ]
+          }
         }
       ]
     },
@@ -451,6 +481,21 @@
               "holds": true
             }
           }
+        },
+        {
+          "name": "picked up too soon",
+          "code": "class Fox(Familiar):\n    pass\n\npimu = Fox()\npimu.name = \"Pimu\"\npimu.color = \"red\"\nwizard.cast(\"minka\", pimu)\npimu.pick_up()\n",
+          "expect": {
+            "status": "error",
+            "explanation": "too_soon",
+            "line": 8,
+            "told": [
+              [
+                "orla",
+                "too_soon"
+              ]
+            ]
+          }
         }
       ]
     },
@@ -521,6 +566,51 @@
             "explanation": "missing_self",
             "line": 6
           }
+        },
+        {
+          "name": "moved too soon",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nwizard.cast(\"minka\", pimu)\npimu.move_left(1)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "too_soon",
+            "line": 8,
+            "told": [
+              [
+                "orla",
+                "too_soon"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "moved too soon before it is called",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\npimu.move_left(1)\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "too_soon",
+            "line": 7,
+            "told": [
+              [
+                "orla",
+                "too_soon"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "sent with go_to too soon",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nwizard.cast(\"minka\", pimu)\npimu.go_to(9, 7)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "too_soon",
+            "line": 8,
+            "told": [
+              [
+                "orla",
+                "too_soon"
+              ]
+            ]
+          }
         }
       ]
     },
@@ -579,6 +669,36 @@
             "status": "error",
             "explanation": "unknown_name",
             "line": 6
+          }
+        },
+        {
+          "name": "a third object",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nkesi = Fox(\"Kesi\", \"white\")\ntolu = Fox(\"Tolu\", \"black\")\nwizard.cast(\"minka\", pimu)\nwizard.cast(\"minka\", kesi)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "two_familiars",
+            "line": 8,
+            "told": [
+              [
+                "orla",
+                "two_familiars"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "a second class",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\nclass Crow(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nkesi = Crow(\"Kesi\", \"white\")\nwizard.cast(\"minka\", pimu)\nwizard.cast(\"minka\", kesi)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "one_class",
+            "line": 6,
+            "told": [
+              [
+                "orla",
+                "one_class"
+              ]
+            ]
           }
         }
       ]

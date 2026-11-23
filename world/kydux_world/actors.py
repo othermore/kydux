@@ -1,5 +1,6 @@
 """The actors: who moves in the world besides the wizard, or stands in it: the
-teacher, the ghost, the cat, a friend who teaches (D66), and a racer (D189).
+teacher, the ghost, the cat, a friend who teaches (D66), a racer (D189), and someone
+else's familiar (D273).
 
 An actor takes its step in every tick, after the wizard has done its thing
 (architecture.md, D21). The teacher walks its patrol one tile per tick,
@@ -185,6 +186,14 @@ class Racer(Actor):
             world.note(self.name, "land", {"id": self.name, "at": list(there)})
 
 
+class Creature(Actor):
+    """Someone else's familiar (D273): it stands where it is, a trial in the circle, a
+    spark, or a creature that lives; its name is told only to those it is trusted to, so
+    the child's code holds nothing of it (D266)."""
+
+    _k_role = "friend"
+
+
 #: Each actor kind's class, by the kind's name in level.json.
 ACTORS: dict[str, type[Actor]] = {
     "teacher": Teacher,
@@ -192,6 +201,7 @@ ACTORS: dict[str, type[Actor]] = {
     "cat": Cat,
     "friend": Friend,
     "racer": Racer,
+    "familiar": Creature,
 }
 
 

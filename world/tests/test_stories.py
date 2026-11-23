@@ -339,6 +339,20 @@ def test_a_figure_may_step_out_from_behind_a_thing_on_a_cell_beside_it():
         staged(steps=[{"who": "nuri", "do": {"walk": [2, 1], "from": [2, 2]}}])
 
 
+def test_a_story_s_last_steps_may_be_told_over_its_still():
+    """D251, for the end of the year: a story that names its still, the castle, tells its
+    last steps over it, in a row."""
+    steps = [
+        {"who": "voice", "do": {"appear": [5, 1]}, "by": "nuri"},
+        {"who": "voice", "do": None, "still": True},
+        {"who": "voice", "do": None, "still": True},
+    ]
+    story = staged(still="castle", steps=steps)
+    assert [step.get("still") for step in story["steps"]] == [None, True, True]
+    with pytest.raises(LevelError, match="a story's still is one of"):
+        staged(still="lake", steps=steps)
+
+
 def test_the_openings_first_steps_may_be_told_over_its_still():
     """D251: `still` on the first steps in a row, of the voice, doing nothing, in a story
     that has a still (the opening)."""
@@ -357,8 +371,13 @@ def test_the_openings_first_steps_may_be_told_over_its_still():
         ({}, [{"who": "voice", "do": None, "still": True}], "only in a story that has one"),
         (
             {"opening": True},
-            [{"who": "voice", "do": None}, {"who": "voice", "do": None, "still": True}],
-            "the first, in a row",
+            [
+                {"who": "voice", "do": None, "still": True},
+                {"who": "voice", "do": None},
+                {"who": "voice", "do": None, "still": True},
+                {"who": "voice", "do": None},
+            ],
+            "the first, or the last, in a row",
         ),
         (
             {"opening": True},

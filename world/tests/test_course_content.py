@@ -25,6 +25,8 @@ STORIES = sorted(p for p in (CONTENT / "stories").glob("*") if (p / "story.json"
 CONCEPTS = {
     "arguments",
     "arithmetic",
+    "attributes",
+    "class",
     "comments",
     "def",
     "def_arguments",
@@ -33,9 +35,12 @@ CONCEPTS = {
     "for_each",
     "for_range",
     "if",
+    "inherit",
+    "init",
     "len",
     "less_greater",
     "lists",
+    "methods",
     "not",
     "print",
     "strings",
@@ -160,6 +165,12 @@ def test_a_lesson_s_blocks_run_in_the_level_after_it(path, lang, gender):
     lesson = json.loads((path / "lesson.json").read_text(encoding="utf-8"))
     for code in found:
         result = run_code(Level.from_directory(level), code)
+        if lesson.get("try") == "error":
+            # The block ends in the error it is about, and in no other (D272).
+            assert result.status == "error", f"{path.name}'s block ends in no error"
+            kind = (result.error.explanation or {}).get("kind")
+            assert kind == lesson["error"], f"{path.name}'s block ends in {kind}"
+            continue
         assert result.status != "error", result.error
         stumbles = [e for e in result.events if e.kind in ("bump", "blocked")]
         if lesson.get("try") == "refused":
@@ -172,15 +183,17 @@ def test_a_lesson_s_blocks_run_in_the_level_after_it(path, lang, gender):
 
 @pytest.mark.parametrize("path", LESSONS, ids=lambda p: p.name)
 def test_a_lesson_s_try_says_how_its_block_runs_and_only_a_block_has_one(path):
-    """`try` says how a lesson's block runs (refused, D84); a lesson with nothing worth
-    trying has no block and no `try` (D173)."""
+    """`try` says how a lesson's block runs (refused, D84; or ending in the error it
+    shows, `error`, with the error's kind, D272); a lesson with nothing worth trying has
+    no block and no `try` (D173)."""
     lesson = json.loads((path / "lesson.json").read_text(encoding="utf-8"))
     blocks = {
         lang: TRY.findall((path / f"{lang}.md").read_text(encoding="utf-8")) for lang in LANGUAGES
     }
     if "try" in lesson:
-        assert lesson["try"] == "refused", f"{path.name}: try is refused or absent"
+        assert lesson["try"] in ("refused", "error"), f"{path.name}: try is refused or error"
         assert all(blocks.values()), f"{path.name} says how its block runs and has none"
+    assert ("error" in lesson) == (lesson.get("try") == "error"), f"{path.name}'s error"
 
 
 #: The lessons with nothing worth trying, and so no block, with their pages (D173, D174).
@@ -344,7 +357,10 @@ def concepts_used(code: str) -> set[str]:
     something in its brackets, a string, print, len, a function of its own (def) and
     its arguments; a variable given a value, a sum or a subtraction, a comparison by
     `==` or by `<` and `>`, `not`, an `if` and its `else`, a `for` over a `range` or
-    over anything else, a `while`, and a list in brackets or an index."""
+    over anything else, a `while`, and a list in brackets or an index; a class, an
+    attribute of a name given a value, an `__init__` in a class, a class whose parent the
+    code describes too (the world's `Familiar`, written from the first familiar on, is
+    what inheriting explains, D272), and a function in a class that is not `__init__`."""
     import ast
     import io
     import tokenize
@@ -353,7 +369,26 @@ def concepts_used(code: str) -> set[str]:
     tokens = tokenize.generate_tokens(io.StringIO(code).readline)
     if any(token.type == tokenize.COMMENT for token in tokens):
         used.add("comments")
-    for node in ast.walk(ast.parse(code)):
+    tree = ast.parse(code)
+    described = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef):
+            used.add("class")
+            parents = [b.id for b in node.bases if isinstance(b, ast.Name)]
+            if any(p != "Familiar" or p in described for p in parents) or len(parents) < len(
+                node.bases
+            ):
+                used.add("inherit")
+            for inner in node.body:
+                if isinstance(inner, ast.FunctionDef):
+                    used.add("init" if inner.name == "__init__" else "methods")
+        if isinstance(node, (ast.Assign, ast.AnnAssign)):
+            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+            if any(
+                isinstance(target, ast.Attribute) and isinstance(target.value, ast.Name)
+                for target in targets
+            ):
+                used.add("attributes")
         if isinstance(node, ast.Call):
             if isinstance(node.func, ast.Attribute) and (node.args or node.keywords):
                 used.add("arguments")
@@ -476,6 +511,9 @@ def taught_once_marked() -> dict[str, set[str]]:
 #: said with each action; a comment, a string and `print` are on the screen in the
 #: programs; `len` is said in the list's entry.
 OFF_THE_PAGE = {"arguments", "comments", "len", "print", "strings"}
+#: The page's entries that go with another's concept (D272): an object with the class,
+#: `self` with `__init__`.
+WITH = {"object": "class", "self": "init"}
 
 
 def test_the_page_of_python_has_a_line_and_an_example_for_each_concept_it_shows():
@@ -492,13 +530,16 @@ def test_the_page_of_python_has_a_line_and_an_example_for_each_concept_it_shows(
     }
     known_at = taught_once_marked()
     for lang, page in pages.items():
-        shown = CONCEPTS - OFF_THE_PAGE
+        shown = (CONCEPTS - OFF_THE_PAGE) | set(WITH)
         assert set(page) == shown, f"{lang}: {set(page) ^ shown}"
         for concept, entry in page.items():
             assert entry["does"].strip(), f"{lang}: {concept} says nothing"
             example = entry["example"]
             ast.parse(example)
-            unknown = concepts_used(example) - known_at[concept]
+            marked = WITH.get(concept, concept)
+            if marked not in known_at:
+                continue  # no lesson marks it yet: held to its lesson once it is written
+            unknown = concepts_used(example) - known_at[marked]
             assert not unknown, f"{lang}: {concept}'s example uses {sorted(unknown)}"
     for concept in pages["en"]:
         counts = {lang: len(page[concept]["example"].split("\n")) for lang, page in pages.items()}

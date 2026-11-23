@@ -107,8 +107,15 @@ describe('the notebook', () => {
       [{ concept: 'less_greater', shown: '==  <  >' }],
       [{ concept: 'not', shown: 'not' }],
     ]);
-    expect(pythonBlocks()).toHaveLength(9);
-    expect(pythonBlocks().flat()).toHaveLength(12);
+    expect(pythonBlocks()).toHaveLength(14);
+    expect(pythonBlocks().flat()).toHaveLength(19);
+    // A class and an object stand side by side once the class is taught, `__init__` and
+    // `self` once `__init__` is (D272).
+    expect(shown(['class', 'attributes', 'init'])).toEqual([['class', 'class'], ['attributes'], ['init', 'init']]);
+    expect(pythonBlocks({ knownWords: [], concepts: ['class'] }).flat().map((entry) => entry.key ?? entry.concept)).toEqual([
+      'class',
+      'object',
+    ]);
   });
 
   it('has the tabs that have something in them, in their order (D256)', () => {
@@ -124,7 +131,7 @@ describe('the notebook', () => {
   it("has a line and an example for every word of the page, in every language (D256)", () => {
     for (const words of [en, es] as Record<string, unknown>[]) {
       const page = words.notebook_python as Record<string, { does?: string; example?: string }>;
-      expect(Object.keys(page)).toEqual(PYTHON.flatMap((block) => block.entries.map((entry) => entry.concept)));
+      expect(Object.keys(page)).toEqual(PYTHON.flatMap((block) => block.entries.map((entry) => entry.key ?? entry.concept)));
       for (const entry of Object.values(page)) {
         expect(entry.does?.trim()).toBeTruthy();
         expect(entry.example?.trim()).toBeTruthy();

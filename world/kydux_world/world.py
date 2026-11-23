@@ -17,19 +17,34 @@ line, before the wizard's first action, and ends with the race flown out and
 judged by her count (D234); a wizard in the air when the program ends sets down
 where it is (D185). A flown step says which step of its command it is, and of how
 many (D243).
+
+A level with a familiar (D260) holds the world's `Familiar` among the program's names,
+and in a living level the familiar itself (D269). A familiar's steps are ticks of its
+own (D270); `minka` calls an object's trial into the circle, or brings the living
+familiar back (D262); what the first year does not allow is told by Orla, a warning
+that stops the program, or a trial that comes pale or as a spark (D261). After the
+program the world may use the child's class itself: the book notes the trial in a
+line, and Orla gives her orders (D267); a level's familiar may be born, rehearsed
+first (D268).
 """
 
+import ast
+import contextlib
+import io
 import sys
+import textwrap
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from typing import Any
 
+from . import familiars
 from .actors import Actor, Friend, Teacher, make_actor, sight_tiles
 from .goals import code_lines, make_goal
 from .level import CARRIED_KINDS, Level, Position, Race
-from .things import Bed, Child, Door, Hole, Ring, Thing, make_thing, steps_between
+from .sandbox import child_builtins
+from .things import Bed, Child, Door, Hole, Plate, Ring, Thing, make_thing, steps_between
 
 CHILD = "<child>"
 
@@ -87,12 +102,18 @@ class Caught(RunOver):
 class Refused(Exception):
     """An action the world cannot do with what it is given, which stops the child's
     program as any error does and is explained in the child's words (D22): untying a
-    broom with no knot (`no_knot`, D183). Its words name the thing, `by`."""
+    broom with no knot (`no_knot`, D183), or what the first year does not allow (D261).
+    Its words name the thing, `by`, and what `detail` says of it."""
 
-    def __init__(self, reason: str, by: str) -> None:
+    def __init__(self, reason: str, by: str, detail: dict[str, Any] | None = None) -> None:
         super().__init__(f"{by}: {reason}")
         self.reason = reason
         self.by = by
+        self.detail = dict(detail or {})
+
+
+class WorldKept(Exception):
+    """A living level whose kept class makes no familiar of its kind (D269)."""
 
 
 class ActionArguments(TypeError):
@@ -167,7 +188,402 @@ class World:
         self.penalty = 0
         #: The hidden things the wizard has found, by id (D184).
         self.found: set[str] = set()
+        #: Every act's first tick and how many ticks it takes: the wizard's, a
+        #: familiar's or the world's own after the program (D270).
+        self.acts: list[tuple[int, int]] = []
+        #: Whether the child's program has come to its end, before the world uses its
+        #: class (D267): the goals that look at the program's end look then.
+        self.program_over = False
+        #: The world's `Familiar` in a level with a familiar (D260), the familiars made,
+        #: by id, the trials standing in the circle in the order they were called, the
+        #: living familiar (D269), and how the birth level's run is played: `rehearsal`,
+        #: `passing` or `holding` (D268).
+        self.familiar_block = level.familiar
+        self.Familiar = familiars.familiar_class(self) if level.familiar else None
+        self.made: dict[str, familiars.Familiar] = {}
+        self.circle: list[familiars.Familiar] = []
+        self.living: familiars.Familiar | None = None
+        self.verdict = "rehearsal"
+        #: Whether the book could note the trial (D267), and the line it wrote.
+        self.noted: bool | None = None
+        #: The familiar born this run, a step held at the circle's edge (D268).
+        self.born: familiars.Familiar | None = None
+        self.held = False
+        #: The room-mate's copy of the child's familiar, its kind and colour (D268).
+        self.copy: tuple[str, str | None] | None = None
+        #: Orla's orders obeyed, and an error of the child's class after the program.
+        self.obeyed = 0
+        self.after_error: BaseException | None = None
+        #: The class the living familiar took over, as written (D269).
+        self.learned: str | None = None
+        #: The familiar's cell at the program's end (D271).
+        self.familiar_end: Position | None = None
+        #: While the book calls the child's class (D267).
+        self.booking = False
+        self._tree: ast.AST | None = None
         self._check_goals()
+
+    def prepare(self) -> None:
+        """Before the program: in a living level, the familiar is made from its kept
+        class, run under the book's file name, and stood on its cell (D269); the room-mate's
+        copy of the child's familiar is drawn from the level's draft (D268)."""
+        block = self.familiar_block
+        if block is None:
+            return
+        mate = next((a for a in self.actors.values() if a._k_spec.of == "mate"), None)
+        if mate is not None:
+            described = block.draft or block.living
+            kind = described.kind if described else familiars.DEFAULT["kind"]
+            color = described.color if described else familiars.DEFAULT["color"]
+            self.copy = (kind, familiars.mate_colour(kind, color))
+        if block.living is None or block.stage != "living":
+            return
+        living = block.living
+        source = block.kept_class() or ""
+        names: dict[str, Any] = {
+            "__name__": "__main__",
+            "__builtins__": child_builtins(),
+            "Familiar": self.Familiar,
+        }
+        with contextlib.redirect_stdout(io.StringIO()):
+            exec(compile(source, familiars.BOOK, "exec"), names)
+        kind = names.get(living.kind)
+        if not (isinstance(kind, type) and issubclass(kind, familiars.Familiar)):
+            raise WorldKept(f"the kept class has no kind of familiar {living.kind}")
+        with contextlib.redirect_stdout(io.StringIO()):
+            try:
+                creature = kind(living.name, living.color)
+            except TypeError:
+                creature = kind()
+        object.__setattr__(creature, "_k_name", living.name)
+        object.__setattr__(creature, "_k_color", living.color)
+        self.made.pop(creature._k_id, None)
+        creature._set(id="familiar", state="living", cell=living.at, facing=living.facing)
+        self.made["familiar"] = creature
+        self.living = creature
+
+    # The familiars (D260 to D270): what the world's `Familiar` asks of the world.
+
+    def _k_made(self, familiar: familiars.Familiar) -> None:
+        """A familiar object made by the child's program, one creature: its id, and no
+        cell until it is called (D262); one the book makes to try a line is the book's."""
+        if self.booking:
+            familiar._set(id="book", state="book", cell=None, facing="down", virtual=None)
+            return
+        number = 1 + sum(1 for name in self.made if name.startswith("familiar_"))
+        name = f"familiar_{number}"
+        familiar._set(id=name, state="object", cell=None, facing="down", virtual=None)
+        self.made[name] = familiar
+
+    def _k_looked_at(self, klass: type) -> None:
+        """A kind of familiar made by the program, or the book's kept class (D260): its body
+        holds nothing the level's block does not allow (D261); in a living level, the
+        program's class of the familiar's kind takes the familiar over (D269)."""
+        made = familiars.making_frame()
+        file, line = made if made is not None else (CHILD, None)
+        block = self.familiar_block
+        source = self.code if file == CHILD else (block.kept_class() if block else None) or ""
+        node = familiars.class_node(source, klass, line)
+        methods = block.methods if block is not None else familiars.METHODS
+        if node is not None:
+            problem = familiars.body_problem(node, methods)
+            if problem is not None:
+                reason, name, at = problem
+                own = at if file == CHILD else None
+                self.warn(reason, "orla", at_line=own, name=name, line=own)
+            if file == CHILD:
+                segment = ast.get_source_segment(source, node, padded=True)
+                klass._k_source = textwrap.dedent(segment) if segment else None  # type: ignore[attr-defined]
+        if file == CHILD and self.living is not None:
+            self._k_takes_over(klass, node)
+
+    def _k_takes_over(self, klass: type, node: ast.ClassDef | None) -> None:
+        """The program's class of the living familiar's kind, its `__init__` the kept one's,
+        takes the familiar over, adding what it knows (D269); another kind, or another
+        `__init__`, is a description changed, which Orla does not allow."""
+        living = self.living
+        assert living is not None
+        old = type(living)
+        if klass.__name__ != old.__name__:
+            self.warn("class_changed", "orla", name=klass.__name__)
+        kept = familiars.class_node(self.familiar_block.kept_class() or "", old, None)
+        if familiars.init_of(node) != familiars.init_of(kept):
+            self.warn("class_changed", "orla", name=klass.__name__)
+        for key, value in vars(old).items():
+            if callable(value) and not key.startswith("__") and key not in vars(klass):
+                setattr(klass, key, value)
+        object.__setattr__(living, "__class__", klass)
+        own = sorted(
+            key
+            for key, value in vars(klass).items()
+            if callable(value) and not key.startswith("_")
+        )
+        self.note(
+            "familiar", "learned", {"id": "familiar", "kind": klass.__name__, "methods": own}
+        )
+        self.learned = getattr(klass, "_k_source", None)
+
+    def _k_code_tree(self) -> ast.AST | None:
+        if self._tree is None:
+            try:
+                self._tree = ast.parse(self.code)
+            except SyntaxError:
+                return None
+        return self._tree
+
+    def _k_called(self, member: str) -> bool:
+        """Whether the line of the program running now calls a member by that name: a
+        method asked of a familiar, rather than an attribute read (D269, D271)."""
+        line = child_line()
+        tree = self._k_code_tree()
+        if line is None or tree is None:
+            return False
+        return any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == member
+            and node.lineno <= line <= (node.end_lineno or node.lineno)
+            for node in ast.walk(tree)
+        )
+
+    def _k_puzzled(self, familiar: familiars.Familiar) -> None:
+        """A familiar told what its class does not know tilts its head (D269)."""
+        if familiar._k_state in ("trial", "living") and familiar._k_cell is not None:
+            self.note(
+                familiar._k_id, "puzzled", {"id": familiar._k_id, "at": list(familiar._k_cell)}
+            )
+
+    def _k_familiar_position(self, familiar: familiars.Familiar) -> Position | None:
+        if familiar._k_virtual is not None:
+            return familiar._k_virtual
+        if familiar._k_state in ("trial", "living"):
+            return familiar._k_cell
+        return None
+
+    def figure(self, name: str) -> familiars.Familiar:
+        return self.made[name]
+
+    def familiar_ids(self) -> set[str]:
+        """The ids of the familiars on the scene: the child's and the others' (D270)."""
+        others = {a.name for a in self.actors.values() if a._k_spec.kind == "familiar"}
+        return set(self.made) | others
+
+    def taken_by(self, position: Position, mover: object = None) -> tuple[str, str] | None:
+        """Who stands on a cell, for a familiar walking there (D270): the wizard, an
+        actor, or another familiar of the child's; None when no one does."""
+        if self.wizard._k_position == position:
+            return ("wizard", "wizard")
+        for actor in self.actors.values():
+            if actor._k_position == position and not getattr(actor, "_k_gone", False):
+                return ("actor", actor.name)
+        for name, other in self.made.items():
+            if other is mover or other._k_state not in ("trial", "living"):
+                continue
+            if other._k_cell == position:
+                return ("familiar", name)
+        return None
+
+    def familiar_can_enter(self, position: Position) -> bool:
+        """Whether a familiar can step onto a cell's ground: the floor or a familiars'
+        passage, no shut door, no open leaf, no open hole (D270)."""
+        if not (self.level.familiar_walks(position) and self._not_shut(position)):
+            return False
+        if self.leaf_over(position) is not None:
+            return False
+        hole = self.hole_at(position)
+        return hole is None or hole._k_closed_at(self.tick + 1)
+
+    def _k_familiar_moves(
+        self, familiar: familiars.Familiar, way: str, steps: object, name: str
+    ) -> None:
+        """A familiar's move (D270): the wizard's walk with the familiar as the one that
+        walks, a cell a tick; a bump on what blocks, on the wizard, on an actor and on
+        another familiar. A trial moves only in the birth level, held at the circle's edge
+        in a run that is not passing and going on in footprints of light (D268). Where a
+        move of one step or more ends, the familiar picks up what lies there and lights a
+        plate."""
+        if self.booking:
+            raise familiars.NoSuchMethod(familiar._k_var(), name)
+        try:
+            count = _steps(name, steps)
+        except ActionArguments as wrong:
+            var = familiar._k_var().lower()
+            raise ActionArguments(name, str(wrong), f"{var}.{name}(3)") from None
+        if count == 0:
+            return
+        block = self.familiar_block
+        state = familiar._k_state
+        fid = familiar._k_id
+        birth = block is not None and block.stage == "birth"
+        if state not in ("trial", "living") or (state == "trial" and not birth):
+            self.ready()
+            here = list(self.wizard._k_position)
+            self.act("blocked", {"at": here, "by": fid, "reason": "not_here", "tried": False})
+            return
+        direction = Direction(way)
+        moved = 0
+        for _ in range(count):
+            self.ready()
+            familiar._set(facing=way)
+            virtual = familiar._k_virtual
+            here = virtual if virtual is not None else familiar._k_cell
+            dx, dy = direction.delta
+            ahead = Position(here.x + dx, here.y + dy)
+            stopped = self._k_familiar_stopped(familiar, ahead)
+            if stopped is not None:
+                bumped = {"at": list(here), "facing": way, **stopped}
+                if virtual is not None:
+                    bumped["footprint"] = True
+                self.act("bump", bumped, actor=fid)
+                break
+            leaving = (
+                familiar._k_state == "trial" and block is not None and not block.in_circle(ahead)
+            )
+            if virtual is None and leaving and self.verdict == "holding":
+                # The step that would leave the circle is held at its edge (D268).
+                self.held = True
+                familiar._set(virtual=ahead)
+                held = {"at": list(here), "to": list(ahead), "facing": way}
+                self.act("held", held, actor=fid)
+                continue
+            if virtual is not None:
+                familiar._set(virtual=ahead)
+                step = {"from": list(here), "at": list(ahead), "facing": way}
+                self.act("footprint", step, actor=fid)
+                continue
+            familiar._set(cell=ahead)
+            moved += 1
+            step = {"from": list(here), "to": list(ahead), "facing": way}
+            born = partial(self._k_born, familiar, ahead) if leaving else None
+            self.act("move", step, then=born, actor=fid)
+        if moved:
+            self._k_ends_move(familiar)
+
+    def _k_familiar_stopped(
+        self, familiar: familiars.Familiar, ahead: Position
+    ) -> dict[str, Any] | None:
+        """What stops a familiar's step onto a cell, as a bump's data, or None."""
+        if not self.familiar_can_enter(ahead):
+            by = (
+                "door"
+                if self.door_at(ahead) is not None
+                else "hole"
+                if self.hole_at(ahead) is not None
+                else "wall"
+            )
+            stopped: dict[str, Any] = {"by": by}
+            if ahead in self.level.kinds:
+                stopped["kind"] = self.level.kinds[ahead]
+            return stopped
+        taken = self.taken_by(ahead, familiar)
+        if taken is not None:
+            return {"by": taken[0], "id": taken[1]}
+        return None
+
+    def _k_born(self, familiar: familiars.Familiar, at: Position) -> None:
+        """A trial steps out of the circle and lives (D268)."""
+        familiar._set(state="living")
+        self.circle = [trial for trial in self.circle if trial is not familiar]
+        self.born = familiar
+        self.note(familiar._k_id, "born", {"id": familiar._k_id, "at": list(at)})
+
+    def _k_ends_move(self, familiar: familiars.Familiar) -> None:
+        """Where a familiar's move ends, in that step's tick: it picks up every thing that
+        is carried that lies there, and a plate there is lit (D270)."""
+        here = familiar._k_cell
+        for thing in sorted(self.things.values(), key=lambda t: t.name):
+            if thing._k_position != here:
+                continue
+            free = not (thing._k_carried or thing._k_given or thing._k_held)
+            if thing.kind in CARRIED_KINDS and free:
+                thing._pick(familiar._k_id)
+                taken = {"id": thing.name, "at": list(here), "by": familiar._k_id}
+                self.note(familiar._k_id, "pick_up", taken)
+            if isinstance(thing, Plate) and not thing._k_lit:
+                thing._set(lit=True)
+                self.note(thing.name, "lit", {"id": thing.name, "at": list(here)})
+
+    def tell(self, who: str, key: str, **values: Any) -> None:
+        """Someone of the scene says something while the program runs (D264): a note in
+        the tick going on, with the values its words take."""
+        self.note(who, "told", {"who": who, "key": key, **values})
+
+    def warn(
+        self, reason: str, by: str, at_line: int | None | object = CHILD, **detail: Any
+    ) -> None:
+        """What the first year does not allow, told by Orla or the book (D261): a tick, a
+        `blocked` event with the reason and who says it, their words, and the program
+        stopped as an error is. While the book tries a line, nothing is shown."""
+        if self.booking:
+            raise Refused(reason, by, detail)
+        refused = {"at": list(self.wizard._k_position), "by": by, "reason": reason, "tried": False}
+        self.act("blocked", {**refused, **detail}, line=at_line)
+        self.tell(by, reason, **detail)
+        self.error = reason
+        raise Refused(reason, by, detail)
+
+    def first_trial(self) -> familiars.Familiar | None:
+        """The trial the level is about: the first standing in the circle of a first-year
+        kind, or the one born this run."""
+        if self.born is not None:
+            return self.born
+        for trial in self.circle:
+            if familiars.kind_of(trial) in familiars.KINDS:
+                return trial
+        return None
+
+    def described(self, familiar: familiars.Familiar) -> dict[str, Any]:
+        """A trial as the world judges it (D261): its kind, its name when the book takes
+        it, its colour when it is the kind's own, and what it is worth; a trial called is
+        what it was when it came, whatever the program gives the object after."""
+        seen = familiar.__dict__.get("_k_seen")
+        if seen is not None:
+            return dict(seen)
+        kind = familiars.kind_of(familiar)
+        name = familiar.__dict__.get("_k_name")
+        color = familiar.__dict__.get("_k_color")
+        worth, reason = familiars.worth(kind, color, familiars.given(familiar, "color"))
+        named = familiars.given(familiar, "name") and familiars.name_problem(name) is None
+        return {
+            "kind": kind,
+            "name": name if named else None,
+            "color": color if worth == "good" else None,
+            "worth": worth,
+            "reason": reason,
+        }
+
+    def book_line(self, familiar: familiars.Familiar) -> tuple[str, bool]:
+        """The book notes a good trial in one line made with the child's own class (D267):
+        the line, and whether the class makes, from the trial's name and colour, a familiar
+        with that name and colour. What it prints is dropped."""
+        seen = self.described(familiar)
+        name, color = seen["name"], seen["color"]
+        line = f'{seen["kind"]}("{name}", "{color}")'
+        self.booking = True
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                made = type(familiar)(name, color)
+            ok = made.__dict__.get("_k_name") == name and made.__dict__.get("_k_color") == color
+        except Exception:
+            ok = False
+        finally:
+            self.booking = False
+        return line, ok
+
+    def familiar_result(self) -> dict[str, Any] | None:
+        """What the page keeps of the run's familiar (D265): the trial the level is about,
+        whether a familiar was born, the trial's class as written, and the class the living
+        familiar took over."""
+        if self.familiar_block is None:
+            return None
+        trial = self.first_trial()
+        seen = self.described(trial) if trial is not None else None
+        return {
+            "trial": {k: seen[k] for k in ("kind", "name", "color")} if seen else None,
+            "born": self.born is not None,
+            "source": getattr(type(trial), "_k_source", None) if trial is not None else None,
+            "learned": self.learned,
+        }
 
     def begin(self) -> None:
         """The run's start, before the wizard's first action: in a race, Ilda reads
@@ -208,12 +624,21 @@ class World:
                     passed.add(event.data["id"])
         return [ring for ring in order if ring not in passed]
 
-    def namespace(self) -> dict[str, Child]:
+    def namespace(self) -> dict[str, Any]:
         """What the child's code holds: the wizard, and the level's things and actors by
         id; not what the wizard holds from the start, which the code asks for with
-        `find_item` (D123), so that no name is put into the program unseen."""
+        `find_item` (D123), so that no name is put into the program unseen. Someone else's
+        familiar is not among them: its name is told only to those it is trusted to
+        (D266). In a level with a familiar, the world's `Familiar` (D260), and in a living
+        level the familiar itself, by its name in small letters (D269)."""
         things = {name: thing for name, thing in self.things.items() if not thing._k_spec.carried}
-        return {"wizard": self.wizard, **things, **self.actors}
+        actors = {name: a for name, a in self.actors.items() if a._k_spec.kind != "familiar"}
+        found: dict[str, Any] = {"wizard": self.wizard, **things, **actors}
+        if self.Familiar is not None:
+            found["Familiar"] = self.Familiar
+        if self.living is not None:
+            found[self.living.__dict__["_k_name"].lower()] = self.living
+        return found
 
     def is_free(self, position: Position, flying: bool = False) -> bool:
         """Whether the wizard or an actor can walk onto a tile in the next tick: floor,
@@ -264,6 +689,17 @@ class World:
             standing = isinstance(actor, Teacher) and not actor._k_spec.sight
             if (isinstance(actor, Friend) or standing) and actor.position == position:
                 return actor.name
+        return None
+
+    def familiar_at(self, position: Position) -> str | None:
+        """The id of the familiar standing on a tile, the child's or someone else's, or
+        None (D270)."""
+        for actor in self.actors.values():
+            if actor._k_spec.kind == "familiar" and actor._k_position == position:
+                return actor.name
+        for name, figure in self.made.items():
+            if figure._k_state in ("trial", "living") and figure._k_cell == position:
+                return name
         return None
 
     def ring_at(self, position: Position) -> Ring | None:
@@ -354,15 +790,18 @@ class World:
         then: Callable[[], None] | None = None,
         line: int | None | object = CHILD,
         ticks: int = 1,
+        actor: str = "wizard",
     ) -> None:
-        """One tick of the wizard's: its event, what it does to the world (`then`, as a
-        door opening to a spell), every actor's step, who sees it, the goals; or `ticks`
-        of them, the event in the first. Its line is the child's code's running now, or
-        the one given (Ilda's reading, D189)."""
+        """One tick of the wizard's, or of `actor`'s, a familiar's or the world's own after
+        the program (D270): its event, what it does to the world (`then`, as a door opening
+        to a spell), every actor's step, who sees it, the goals; or `ticks` of them, the
+        event in the first. Its line is the child's code's running now, or the one given
+        (Ilda's reading, D189)."""
         self.ready()
         self.tick += 1
+        self.acts.append((self.tick, ticks))
         self._line = child_line() if line is CHILD else line  # type: ignore[assignment]
-        self.events.append(Event(self.tick, "wizard", kind, data, self._line))
+        self.events.append(Event(self.tick, actor, kind, data, self._line))
         if then is not None:
             then()
         self._tick_goes_on()
@@ -403,7 +842,9 @@ class World:
         still running: a broom in the air sets down where it is, over a cell that is
         walked on, and stays in the air over any other (D185, D215); a race is flown
         out until the racer crosses the finish (D189) and judged, a tick of Ilda's
-        (D234); then the goals that are met only then are checked."""
+        (D234); the world uses the child's class, the book and Orla's orders (D267); then
+        the goals that are met only then are checked, and a run won ends with what
+        follows it and the words said (D264, D268)."""
         here = self.wizard._k_position
         if self.over is None and self.wizard._k_flying and self.landable(here):
             self.wizard._set(flying=False)
@@ -416,10 +857,100 @@ class World:
                     self.act("wait", {"at": at, "after": True}, line=None)
             except RunOver:
                 pass
+        if ended and self.over is None and self.familiar_block is not None:
+            self.program_over = True
+            figure = self.living or self.born
+            self.familiar_end = figure._k_cell if figure is not None else None
+            self._check_goals()
+            try:
+                self._after_program()
+            except RunOver:
+                pass
+            except Exception as caught:  # the child's own class failed: theirs (D267)
+                self.after_error = caught
+                self.error = type(caught).__name__
         self.finished = True
         if ended and self.over is None and race is not None:
             self._judge(race)
         self._check_goals()
+        if ended and self.over is None and self.after_error is None:
+            self._closing()
+
+    def _after_program(self) -> None:
+        """After the program, the child's class used by the world (D267): the book notes
+        the trial in pencil, where the level's block says so, as a tick of its own; or,
+        the familiar on the plate the orders follow, Orla gives each order, a tick of hers
+        and the call of the child's `go_to`, its steps ticks of the familiar's."""
+        block = self.familiar_block
+        assert block is not None
+        trial = self.first_trial()
+        if block.book and block.stage == "trial" and trial is not None:
+            seen = self.described(trial)
+            if seen["worth"] == "good" and seen["name"] is not None:
+                line, ok = self.book_line(trial)
+                self.noted = ok
+                self.act("book", {"line": line, "ok": ok, "ink": False}, line=None, actor="book")
+        living = self.living or self.born
+        plates = {t.name: t for t in self.things.values() if isinstance(t, Plate)}
+        on = plates.get(block.orders_on or "")
+        if not block.orders or living is None or on is None:
+            return
+        if living._k_cell != on._k_position:
+            return
+        var = living.__dict__["_k_name"].lower()
+        for order in block.orders:
+            x, y = order.to
+            line = f"{var}.go_to({x}, {y})"
+            self.act("order", {"line": line, "to": [x, y]}, line=None, actor="orla")
+            self.tell("orla", order.key, **self._values(living))
+            method = getattr(type(living), "go_to", None)
+            if method is None:
+                self._k_puzzled(living)
+                raise familiars.NoSuchMethod(living._k_var(), "go_to")
+            method(living, x, y)
+            if living._k_cell != order.to:
+                return
+            self.obeyed += 1
+
+    def _closing(self) -> None:
+        """The run's end, after the goals: a run won is followed by the level's `then`, a
+        familiar of someone else's stepping out of the circle and living, a tick of the
+        world's, and the words said at a win (D264, D268); a birth level's run held at the
+        circle's edge ends with Orla's words, `not_yet`, or `halt` with a familiar living."""
+        block = self.familiar_block
+        if block is None:
+            return
+        won = self.won()
+        passing = block.stage != "birth" or self.verdict == "passing"
+        if won and passing and block.then is not None:
+            name, to = block.then
+            actor = self.actors[name]
+            here = actor._k_position
+            facing = _direction(here, to).value if here != to else actor._k_facing
+            actor._set(position=to, facing=facing)
+            step = {"from": list(here), "to": list(to), "facing": facing}
+            try:
+                self.act("move", step, line=None, actor=name)
+                self.note(name, "born", {"id": name, "at": list(to)})
+            except RunOver:
+                pass
+        if won:
+            trial = self.first_trial()
+            values = self._values(trial) if trial is not None else {}
+            for who, key in self.level.told_won:
+                self.tell(who, key, **values)
+        if block.stage == "birth" and self.verdict == "holding":
+            if block.living is not None and self.circle:
+                self.tell("orla", "halt")
+            elif self.held:
+                self.tell("orla", "not_yet")
+
+    def _values(self, familiar: familiars.Familiar | None) -> dict[str, Any]:
+        """The values a familiar gives the words said of it (D264)."""
+        if familiar is None:
+            return {}
+        seen = self.described(familiar)
+        return {key: seen[key] for key in ("kind", "name", "color") if seen[key] is not None}
 
     def _judge(self, race: Race) -> None:
         """Ilda's verdict of a race (D234), in a tick of its own while the run has one
@@ -546,6 +1077,19 @@ class Wizard(Child):
                 world.act(
                     "bump",
                     {"at": list(here), "facing": direction.value, "by": "friend", "id": friend},
+                )
+                return
+            familiar = world.familiar_at(ahead)
+            if familiar is not None:
+                # A familiar stands in the way, the child's or someone else's (D270).
+                world.act(
+                    "bump",
+                    {
+                        "at": list(here),
+                        "facing": direction.value,
+                        "by": "familiar",
+                        "id": familiar,
+                    },
                 )
                 return
             if ahead in world.level.forbidden:
@@ -678,13 +1222,19 @@ class Wizard(Child):
         opens = (lambda: door._opened_by("word")) if door else None
         world.act("say", {"text": said}, then=opens)
 
-    def cast(self, spell: str, thing: Thing | None = None) -> None:
+    def cast(self, spell: str, thing: Any = None) -> None:
         """Cast a spell with the wand, which the wizard must carry; it works where the
-        wizard stands, and fendra on the thing it is given: `wizard.cast("zelim")`,
-        `wizard.cast("fendra", book)`"""
+        wizard stands, fendra on the thing it is given and minka on the familiar:
+        `wizard.cast("zelim")`, `wizard.cast("fendra", book)`, `wizard.cast("minka", pimu)`"""
         if not isinstance(spell, str):
             raise ActionArguments("cast", "cast() takes a spell's name, in quotes")
-        if spell in AIMED and not isinstance(thing, Thing):
+        theirs = _child_s_own(thing)
+        if spell == "minka" and not (familiars.is_familiar(thing) or theirs):
+            # Nothing to call: no object, a thing of the world, or a class (D262).
+            raise ActionArguments(
+                "cast", "minka takes the familiar to call", 'wizard.cast("minka", pimu)'
+            )
+        if spell in AIMED and spell != "minka" and not isinstance(thing, Thing):
             raise ActionArguments(
                 "cast", f"{spell} takes the thing to bring", f'wizard.cast("{spell}", book)'
             )
@@ -702,13 +1252,20 @@ class Wizard(Child):
             refused = {"at": here, "by": "wizard", "reason": "unknown_spell", "tried": True}
             world.act("blocked", {**refused, "spell": spell})
             return
+        if spell == "minka" and theirs:
+            # An object of a class of the child's that does not say it is a familiar.
+            world.warn("not_a_familiar", "orla", name=type(thing).__name__)
         effect = SPELLS[spell](world, self._k_position, thing)
         if effect.refused is not None:
-            by = thing.name if thing is not None else "wizard"
-            refused = {"at": here, "by": by, "reason": effect.refused, "tried": True}
+            by = thing._k_id if familiars.is_familiar(thing) else getattr(thing, "name", None)
+            refused = {"at": here, "by": by or "wizard", "reason": effect.refused, "tried": True}
             world.act("blocked", {**refused, "spell": spell})
+            if effect.then is not None:
+                effect.then()
             return
         world.act("cast", {"spell": spell, "at": here}, then=effect.then)
+        if effect.after is not None:
+            effect.after()
 
     def give(self, thing: Thing) -> None:
         """Give a thing the wizard carries to whoever stands beside it: `wizard.give(book)`"""
@@ -807,15 +1364,19 @@ class Wizard(Child):
     def _nearby(self, kind: object) -> list[Child]:
         """The things and actors of a kind the wizard finds where it stands, nearest
         first, a hung broom as near as the cell under it (D206): a thing of a zone only
-        from within it (D196)."""
+        from within it, where the wizard or its living familiar stands (D196, D270); a
+        thread's end on the floor by no one."""
         world: World = self._k_world
         here = self._k_position
+        living = world.living or world.born
+        seen_from = [here] if living is None else [here, living._k_cell]
         found: list[tuple[int, int, int, Child]] = []
         for item in [*world.things.values(), *world.actors.values()]:
             zone = item._k_spec.zone if isinstance(item, Thing) else None
-            if zone is not None and here not in world.level.zones.get(zone, ()):
+            cells = world.level.zones.get(zone, ()) if zone is not None else ()
+            if zone is not None and not any(cell in cells for cell in seen_from):
                 continue
-            if item.kind != kind or item.position is None:
+            if item.kind != kind or item.position is None or item.kind == "trail":
                 continue
             where = item._k_reached_from() if isinstance(item, Thing) else item.position
             if where is not None:
@@ -952,6 +1513,9 @@ class Effect:
 
     then: Callable[[], None] | None = None
     refused: str | None = None
+    #: What follows the cast's tick, in ticks of its own: a living familiar running back
+    #: to the wizard (D262).
+    after: Callable[[], None] | None = None
 
 
 def _zelim(world: World, here: Position, _thing: Thing | None = None) -> Effect:
@@ -964,8 +1528,21 @@ def _zelim(world: World, here: Position, _thing: Thing | None = None) -> Effect:
 FENDRA_REACH = 3
 
 
-#: The spells cast on a thing the child names, the second argument of `cast`.
-AIMED = ("fendra",)
+#: The spells cast on a thing the child names, the second argument of `cast`: fendra
+#: on a thing, minka on a familiar (D262).
+AIMED = ("fendra", "minka")
+
+
+def _child_s_own(value: object) -> bool:
+    """Whether a value is an object of a class the child's program made, and not one of
+    the world's: what minka is told it cannot call unless the class says it is a
+    familiar (D261)."""
+    kind = type(value)
+    return (
+        not isinstance(value, type | Child)
+        and getattr(kind, "__module__", None) == "__main__"
+        and kind.__module__ != "builtins"
+    )
 
 
 def in_line(world: World, here: Position) -> list[tuple[int, Thing]]:
@@ -1062,13 +1639,171 @@ def _drevo(world: World, here: Position, _thing: Thing | None = None) -> Effect:
     return Effect(then=lift)
 
 
+def _minka(world: World, here: Position, familiar: Any) -> Effect:
+    """Calls a familiar (D262). An object called in a level with the circle brings its
+    trial into it: on the next free cell of the level's trials, or the oldest trial's,
+    which dissolves; a kind no first-year describes gives a spark, and a colour not the
+    kind's own a pale trial, with Orla's words (D261). A name the book does not take
+    stops the program. In the birth level the room-mate copies the trial, and in a run
+    that passes Orla says so and the book notes it in ink (D268). The living familiar
+    runs back to the wizard and hands over what it carries; one already in the circle is
+    not called twice."""
+    block = world.familiar_block
+    state = familiar._k_state
+    if state == "living":
+        return Effect(after=lambda: _call_back(world, familiar))
+    if state == "trial":
+        return Effect(refused="already_here")
+    if block is None or block.stage == "living" or block.circle is None:
+        # A second familiar, with one living: Orla stops it (D265).
+        return Effect(refused="already_living", then=lambda: world.tell("orla", "halt"))
+    if familiars.given(familiar, "name"):
+        problem = familiars.name_problem(familiar.__dict__["_k_name"])
+        if problem is not None:
+            world.warn(problem, "book", name=str(familiar.__dict__["_k_name"]))
+    return Effect(then=lambda: _trial(world, familiar))
+
+
+def _trial(world: World, familiar: familiars.Familiar) -> None:
+    """In the cast's tick, the object's trial in the circle, or a spark (D262, D263)."""
+    block = world.familiar_block
+    assert block is not None
+    seen = world.described(familiar)
+    taken = {trial._k_cell for trial in world.circle}
+    free = [cell for cell in block.trials if cell not in taken]
+    fid = familiar._k_id
+    if seen["worth"] == "spark":
+        at = free[0] if free else world.circle[0]._k_cell
+        world.note(fid, "spark", {"id": fid, "kind": seen["kind"], "at": list(at)})
+        world.tell("orla", "spark", kind=seen["kind"])
+        return
+    dissolved = None
+    if free:
+        cell = free[0]
+    else:
+        oldest = world.circle.pop(0)
+        cell = oldest._k_cell
+        oldest._set(state="object", cell=None, seen=None)
+        dissolved = oldest._k_id
+    familiar._set(state="trial", cell=cell, facing="down", seen=seen)
+    world.circle.append(familiar)
+    pale = seen["worth"] == "pale"
+    world.note(
+        fid,
+        "trial",
+        {
+            "id": fid,
+            "kind": seen["kind"],
+            "name": seen["name"],
+            "color": seen["color"],
+            "at": list(cell),
+            "pale": pale,
+            "reason": seen["reason"],
+            "dissolved": dissolved,
+        },
+    )
+    given = familiar.__dict__.get("_k_color")
+    if seen["reason"] in ("colour", "grey"):
+        words = "pale_grey" if seen["reason"] == "grey" else "pale_colour"
+        world.tell("orla", words, kind=seen["kind"], color=str(given))
+        colours = list(familiars.KINDS[seen["kind"]])
+        world.note("book", "book", {"kind": seen["kind"], "colors": colours})
+    if block.stage != "birth":
+        return
+    _copied(world, seen)
+    if seen["worth"] != "good" or seen["name"] is None:
+        return
+    line, ok = world.book_line(familiar)
+    world.noted = ok
+    if world.verdict == "passing" and ok:
+        world.tell("orla", "go")
+        world.note("book", "book", {"line": line, "ok": ok, "ink": True})
+    elif world.verdict == "holding":
+        world.note("book", "book", {"line": line, "ok": ok, "ink": False})
+
+
+def _copied(world: World, seen: dict[str, Any]) -> None:
+    """The room-mate copies the trial called, when it differs in kind or colour from her
+    copy, and says so (D268)."""
+    mate = next((a for a in world.actors.values() if a._k_spec.of == "mate"), None)
+    if mate is None or world.copy is None:
+        return
+    kind = seen["kind"]
+    copy = (kind, familiars.mate_colour(kind, seen["color"]))
+    if copy == world.copy:
+        return
+    world.copy = copy
+    world.note(mate.name, "copied", {"id": mate.name, "kind": copy[0], "color": copy[1]})
+    world.tell("mate", "copy")
+
+
+def _call_back(world: World, familiar: familiars.Familiar) -> None:
+    """The living familiar runs back to the wizard by the shortest way over the cells a
+    familiar enters, to the free cell beside the wizard nearest by that way (ties by y,
+    then x), a cell a tick, and hands over what it carries in its last step's tick;
+    beside the wizard already, it hands over with no step; with no way, it stays (D262)."""
+    fid = familiar._k_id
+    start = familiar._k_cell
+    wizard = world.wizard._k_position
+    beside = {Position(wizard.x + dx, wizard.y + dy) for dx, dy in DELTAS}
+    if start in beside:
+        _hand_over(world, familiar)
+        return
+    came: dict[Position, Position | None] = {start: None}
+    edge, reached = [start], []
+    while edge and not reached:
+        ahead = []
+        for cell in edge:
+            for dx, dy in DELTAS:
+                there = Position(cell.x + dx, cell.y + dy)
+                if there in came or not world.familiar_can_enter(there):
+                    continue
+                if world.taken_by(there, familiar) is not None:
+                    continue
+                came[there] = cell
+                ahead.append(there)
+        reached = sorted((cell for cell in ahead if cell in beside), key=lambda c: (c.y, c.x))
+        edge = ahead
+    if not reached:
+        here = list(world.wizard._k_position)
+        world.note(fid, "blocked", {"at": here, "by": fid, "reason": "no_way", "tried": False})
+        return
+    way, cell = [], reached[0]
+    while cell != start:
+        way.append(cell)
+        cell = came[cell] or start
+    here = start
+    for step in reversed(way):
+        world.ready()
+        facing = _direction(here, step).value
+        familiar._set(cell=step, facing=facing)
+        moved = {"from": list(here), "to": list(step), "facing": facing}
+        world.act("move", moved, actor=fid)
+        here = step
+    _hand_over(world, familiar)
+
+
+def _hand_over(world: World, familiar: familiars.Familiar) -> None:
+    """The familiar hands the wizard everything it carries (D262)."""
+    held = sorted(
+        (t for t in world.things.values() if t._k_held == familiar._k_id), key=lambda t: t.name
+    )
+    if not held:
+        return
+    for thing in held:
+        thing._carry()
+    given = {"id": familiar._k_id, "things": [t.name for t in held], "at": list(familiar._k_cell)}
+    world.note(familiar._k_id, "hand_over", given)
+
+
 #: Each spell's effect, by its name (D42); kydux_world.level.KNOWN_SPELLS lists the
 #: same names, so that a level can be checked without the world.
-SPELLS: dict[str, Callable[[World, Position, Thing | None], Effect]] = {
+SPELLS: dict[str, Callable[[World, Position, Any], Effect]] = {
     "zelim": _zelim,
     "fendra": _fendra,
     "kirra": _kirra,
     "osto": _osto,
     "orvim": _orvim,
     "drevo": _drevo,
+    "minka": _minka,
 }

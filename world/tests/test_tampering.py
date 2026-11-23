@@ -73,3 +73,45 @@ def test_an_honest_run_adds_up():
     assert run_code(CORRIDOR, "wizard.move_right(3)\nwizard.move_left(2)").status == "incomplete"
     code = "wizard.move_right(9)\nwizard.move_left(2)\nwizard.move_right(2)"
     assert run_code(CORRIDOR, code).status == "won"
+
+
+def test_a_method_of_the_child_s_class_keeps_to_the_sandbox_and_to_the_world_s_rules():
+    """D267, D270: a class of the child's, which the world itself calls after the
+    program, imports nothing refused and moves its familiar only by its steps."""
+    level = Level.from_dict(
+        {
+            "id": "hall",
+            "map": ["#######", "#.....#", "#..S..#", "#######"],
+            "carrying": ["wand"],
+            "spells": ["minka"],
+            "familiar": {
+                "stage": "birth",
+                "circle": [1, 1, 5, 1],
+                "trials": [[3, 1]],
+                "methods": ["__init__"],
+                "book": True,
+            },
+            "goals": [{"kind": "born"}],
+        }
+    )
+    code = (
+        "class Fox(Familiar):\n"
+        "    def __init__(self, name, color):\n"
+        "        import js\n"
+        "        self.name = name\n"
+        "        self.color = color\n\n"
+        'pimu = Fox("Pimu", "red")\n'
+    )
+    assert run_code(level, code).error.type == "ModuleNotFoundError"
+    code = (
+        "class Fox(Familiar):\n"
+        "    def __init__(self, name, color):\n"
+        "        self.name = name\n"
+        "        self.color = color\n\n"
+        'pimu = Fox("Pimu", "red")\n'
+        'wizard.cast("minka", pimu)\n'
+        "object.__setattr__(pimu, '_k_cell', type(wizard.position)(1, 1))\n"
+        "pimu.move_down(1)\n"
+    )
+    result = run_code(level, code)
+    assert result.status == "error" and result.error.type == "WorldError"

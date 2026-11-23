@@ -108,7 +108,10 @@
     "bed": "the bed",
     "map": "the naughty child's map",
     "broom": "the broom",
-    "ring": "the ring"
+    "ring": "the ring",
+    "thread": "the piece of thread",
+    "trail": "the end of a thread",
+    "plate": "the plate"
   },
   "plan": {
     "title": "The naughty child's map",
@@ -300,6 +303,16 @@
       "position": "Where the one racing you is, as x and y.",
       "facing": "The way the one racing you looks: \"up\", \"down\", \"left\" or \"right\".",
       "distance_to": "Gives the number of steps from an object to the wizard."
+    },
+    "familiar": {
+      "name": "Your familiar's name, the one it knows itself by: a single word, of letters.",
+      "color": "Your familiar's colour, one of its kind's: a fox may be \"red\", \"white\" or \"black\".",
+      "position": "The cell your familiar stands on, as x and y, or None before minka calls it.",
+      "move_right": "Your familiar walks right, one cell per step. It stops where it cannot go on.",
+      "move_left": "Your familiar walks left, one cell per step. It stops where it cannot go on.",
+      "move_up": "Your familiar walks up, one cell per step. It stops where it cannot go on.",
+      "move_down": "Your familiar walks down, one cell per step. It stops where it cannot go on.",
+      "go_to": "The action you taught it yourself: it goes to the cell you tell it, first the column and then the row."
     }
   },
   "start": {
@@ -451,6 +464,12 @@
       "move_up": "Walks one step up.",
       "move_down": "Walks one step down.",
       "wait": "Stands still for one tick, while the world goes on."
+    },
+    "familiar": {
+      "move_right": "Your familiar takes one step to the right.",
+      "move_left": "Your familiar takes one step to the left.",
+      "move_up": "Your familiar takes one step up.",
+      "move_down": "Your familiar takes one step down."
     }
   },
   "notebook_python": {
@@ -505,6 +524,34 @@
     "def_arguments": {
       "does": "The names in the `def`'s brackets are the function's arguments; a call gives them their values in order.",
       "example": "def greet(name):\n    print(\"Hello\", name)\n\ngreet(\"Teku\")"
+    },
+    "class": {
+      "does": "A class describes a kind of thing: `class`, a name with a capital and a colon, and under it, moved in, what that kind has; `pass` while it has nothing yet.",
+      "example": "class Crow:\n    pass"
+    },
+    "object": {
+      "does": "An object is a thing made with a class: the class's name with brackets. A class makes as many objects as you like.",
+      "example": "vesso = Crow()\ndalu = Crow()"
+    },
+    "attributes": {
+      "does": "An attribute is what an object knows about itself: written and read with the dot.",
+      "example": "vesso.name = \"Vesso\"\nprint(vesso.name)"
+    },
+    "init": {
+      "does": "`__init__` is the action Python runs by itself each time an object of the class is born, with the data you give in the brackets.",
+      "example": "class Crow:\n    def __init__(self, name):\n        self.name = name\n\nvesso = Crow(\"Vesso\")"
+    },
+    "self": {
+      "does": "`self` is the object being born, or the one told to act; Python gives it, and what is kept in `self.` stays in the object.",
+      "example": "self.name = name"
+    },
+    "inherit": {
+      "does": "A class that says in brackets that it is of another inherits everything the other has, without writing it.",
+      "example": "class Fox(Familiar):\n    pass"
+    },
+    "methods": {
+      "does": "A method is an action of the class: written with `def` inside it, its first datum is `self`, and it is called with the dot.",
+      "example": "class Crow:\n    def hop(self, times):\n        print(\"hop\", times)\n\nvesso.hop(3)"
     }
   },
   "kinds": {
@@ -530,7 +577,8 @@
     "kirra": "lights the dark room you are in.",
     "osto": "holds closed, for a while, a hole beside you that opens in the floor.",
     "orvim": "opens the naughty child's map on the plan of the place you are in, every cell with its numbers, if you carry the map.",
-    "drevo": "lifts the broom you carry into the air: from then on your moves fly, three times as fast, over water, hedges and fences, but not through the crowns of trees or walls; cast it again in the air and the broom sets down, if the ground under it can be stood on; at the program's end the broom sets down by itself wherever there is ground."
+    "drevo": "lifts the broom you carry into the air: from then on your moves fly, three times as fast, over water, hedges and fences, but not through the crowns of trees or walls; cast it again in the air and the broom sets down, if the ground under it can be stood on; at the program's end the broom sets down by itself wherever there is ground.",
+    "minka": "calls your familiar: into the tower's circle while it is a trial, or to your side once it lives, with whatever it carries."
   },
   "words": {
     "ambrel": "the school's word, which opens its gates."

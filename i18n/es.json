@@ -108,7 +108,10 @@
     "bed": "la cama",
     "map": "el mapa del niño travieso",
     "broom": "la escoba",
-    "ring": "el aro"
+    "ring": "el aro",
+    "thread": "el trozo de hilo",
+    "trail": "el cabo de hilo",
+    "plate": "el plato"
   },
   "plan": {
     "title": "El mapa del niño travieso",
@@ -300,6 +303,16 @@
       "position": "Dónde está quien corre contra ti, en x e y.",
       "facing": "Hacia dónde mira quien corre contra ti: \"up\", \"down\", \"left\" o \"right\".",
       "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}."
+    },
+    "familiar": {
+      "name": "El nombre de tu familiar, el que él sabe de sí mismo: una sola palabra, de letras.",
+      "color": "El color de tu familiar, uno de los de su tipo: un zorro puede ser \"red\", \"white\" o \"black\".",
+      "position": "La casilla en la que está tu familiar, en x e y, o None antes de que minka lo llame.",
+      "move_right": "Tu familiar camina a la derecha, una casilla por paso. Se para donde no puede pasar.",
+      "move_left": "Tu familiar camina a la izquierda, una casilla por paso. Se para donde no puede pasar.",
+      "move_up": "Tu familiar camina hacia arriba, una casilla por paso. Se para donde no puede pasar.",
+      "move_down": "Tu familiar camina hacia abajo, una casilla por paso. Se para donde no puede pasar.",
+      "go_to": "La acción que le enseñaste tú: va a la casilla que le digas, primero la columna y luego la fila."
     }
   },
   "start": {
@@ -451,6 +464,12 @@
       "move_up": "Da un paso hacia arriba.",
       "move_down": "Da un paso hacia abajo.",
       "wait": "Se queda quiet{o|a} un tick, mientras el mundo sigue."
+    },
+    "familiar": {
+      "move_right": "Tu familiar da un paso a la derecha.",
+      "move_left": "Tu familiar da un paso a la izquierda.",
+      "move_up": "Tu familiar da un paso hacia arriba.",
+      "move_down": "Tu familiar da un paso hacia abajo."
     }
   },
   "notebook_python": {
@@ -505,6 +524,34 @@
     "def_arguments": {
       "does": "Los nombres entre los paréntesis del `def` son sus argumentos; una llamada les da sus valores en el mismo orden.",
       "example": "def saludar(nombre):\n    print(\"Hola\", nombre)\n\nsaludar(\"Teku\")"
+    },
+    "class": {
+      "does": "Una clase describe un tipo de cosa: `class`, un nombre con mayúscula y dos puntos, y debajo, con sangría, lo que tiene ese tipo; `pass` si aún no tiene nada.",
+      "example": "class Crow:\n    pass"
+    },
+    "object": {
+      "does": "Un objeto es una cosa hecha con una clase: el nombre de la clase con paréntesis. De una clase salen tantos objetos como quieras.",
+      "example": "vesso = Crow()\ndalu = Crow()"
+    },
+    "attributes": {
+      "does": "Un atributo es lo que un objeto sabe de sí mismo: se escribe y se lee con el punto.",
+      "example": "vesso.name = \"Vesso\"\nprint(vesso.name)"
+    },
+    "init": {
+      "does": "`__init__` es la acción que Python hace él solo cada vez que nace un objeto de la clase, con los datos que le das entre los paréntesis.",
+      "example": "class Crow:\n    def __init__(self, name):\n        self.name = name\n\nvesso = Crow(\"Vesso\")"
+    },
+    "self": {
+      "does": "`self` es el objeto que está naciendo, o al que le dan la orden; lo pone Python, y lo que se guarda en `self.` se queda en el objeto.",
+      "example": "self.name = name"
+    },
+    "inherit": {
+      "does": "Una clase que dice entre paréntesis que es de otra hereda todo lo que tiene la otra, sin escribirlo.",
+      "example": "class Fox(Familiar):\n    pass"
+    },
+    "methods": {
+      "does": "Un método es una acción de la clase: se escribe con `def` dentro de ella, su primer dato es `self` y se llama con el punto.",
+      "example": "class Crow:\n    def hop(self, times):\n        print(\"hop\", times)\n\nvesso.hop(3)"
     }
   },
   "kinds": {
@@ -530,7 +577,8 @@
     "kirra": "ilumina la sala oscura en la que estás.",
     "osto": "mantiene cerrado un rato un agujero que tienes al lado y que se abre en el suelo.",
     "orvim": "abre el mapa del niño travieso por el plano del sitio en el que estás, cada casilla con sus números, si llevas el mapa.",
-    "drevo": "levanta en el aire la escoba que llevas: desde ese momento, tus movimientos vuelan, tres veces más deprisa, por encima del agua, los setos y las vallas, pero no por las copas de los árboles ni por los muros; si lo lanzas otra vez en el aire, la escoba se posa, si el suelo de debajo se puede pisar; al final del programa, la escoba se posa sola donde haya suelo."
+    "drevo": "levanta en el aire la escoba que llevas: desde ese momento, tus movimientos vuelan, tres veces más deprisa, por encima del agua, los setos y las vallas, pero no por las copas de los árboles ni por los muros; si lo lanzas otra vez en el aire, la escoba se posa, si el suelo de debajo se puede pisar; al final del programa, la escoba se posa sola donde haya suelo.",
+    "minka": "llama a tu familiar: al círculo de la torre mientras es una prueba, o a tu lado cuando ya vive, con todo lo que lleve."
   },
   "words": {
     "ambrel": "la palabra de la escuela, que abre sus puertas."

@@ -1,6 +1,7 @@
 import pytest
 from kydux_world import api
 from kydux_world.actors import ACTORS
+from kydux_world.familiars import Familiar
 from kydux_world.level import Level, Position
 from kydux_world.run import run_code
 from kydux_world.things import THINGS, ReadOnly, Thing
@@ -184,7 +185,16 @@ def test_dir_shows_only_the_child_s_names():
     assert dir(world.things["door"]) == sorted(api.MEMBERS["door"])
 
 
-ROLES = {"wizard": Wizard, "thing": Thing, **THINGS, **ACTORS, "position": Position}
+#: The class of each role: the child's familiar is the world's `Familiar`, someone else's
+#: an actor with nothing of the child's (D266, D270).
+ROLES = {
+    "wizard": Wizard,
+    "thing": Thing,
+    **THINGS,
+    **ACTORS,
+    "position": Position,
+    "familiar": Familiar,
+}
 
 
 @pytest.mark.parametrize(

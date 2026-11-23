@@ -88,10 +88,12 @@ export function notebookEntries(level: LevelJson, table: ApiTable, course?: Cour
 
 /** A word or sign of Python on the notebook's page (D256): the concept a lesson marks
  * (D60) and how it is typed. Its line and its example are
- * `notebook_python.<concept>.does` and `.example`. */
+ * `notebook_python.<concept>.does` and `.example`, or `<key>` for an entry that goes with
+ * another's concept, an object with the class and `self` with `__init__` (D272). */
 export interface PythonEntry {
   concept: string;
   shown: string;
+  key?: string;
 }
 
 /** The page of Python (D256), block by block, in the order the course teaches each
@@ -131,6 +133,21 @@ export const PYTHON: readonly { entries: readonly PythonEntry[]; joined?: boolea
       { concept: 'def_arguments', shown: 'def …(…)' },
     ],
   },
+  {
+    entries: [
+      { concept: 'class', shown: 'class' },
+      { concept: 'class', key: 'object', shown: 'Crow()' },
+    ],
+  },
+  { entries: [{ concept: 'attributes', shown: '.name =' }] },
+  {
+    entries: [
+      { concept: 'init', shown: '__init__' },
+      { concept: 'init', key: 'self', shown: 'self' },
+    ],
+  },
+  { entries: [{ concept: 'inherit', shown: 'class …(…)' }] },
+  { entries: [{ concept: 'methods', shown: 'def …(self)' }] },
 ];
 
 /** The page of Python's blocks at a level: of each block, the entries its concepts hold,
@@ -261,14 +278,15 @@ export function notebookPanel(
             'li',
             { className: entries.length > 1 ? 'syntax-block side-by-side' : 'syntax-block' },
             entries.map((entry) => {
+              const key = entry.key ?? entry.concept;
               const item = element('div', { className: 'syntax-entry' }, [
                 element('code', { className: 'syntax-word' }, [entry.shown]),
-                element('span', { className: 'description' }, withCode(t(`notebook_python.${entry.concept}.does`))),
+                element('span', { className: 'description' }, withCode(t(`notebook_python.${key}.does`))),
                 element('pre', { className: 'syntax-example' }, [
-                  element('code', {}, [t(`notebook_python.${entry.concept}.example`)]),
+                  element('code', {}, [t(`notebook_python.${key}.example`)]),
                 ]),
               ]);
-              item.dataset.concept = entry.concept;
+              item.dataset.concept = key;
               return item;
             }),
           ),

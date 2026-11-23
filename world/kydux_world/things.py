@@ -62,8 +62,16 @@ class Thing(Child):
     _k_role = "thing"
 
     def __init__(self, world: "World", spec: ThingSpec) -> None:
-        # `given`: the id of the actor the wizard gave the thing to, or None (D48).
-        self._set(world=world, spec=spec, position=spec.position, carried=spec.carried, given=None)
+        # `given`: the id of the actor the wizard gave the thing to, or None (D48); `held`:
+        # the id of the familiar that carries it, or None (D270).
+        self._set(
+            world=world,
+            spec=spec,
+            position=spec.position,
+            carried=spec.carried,
+            given=None,
+            held=None,
+        )
 
     @property
     def _k_child_name(self) -> str:
@@ -72,6 +80,8 @@ class Thing(Child):
     def __repr__(self) -> str:
         if self._k_given is not None:
             where = f"given to {self._k_given}"
+        elif self._k_held is not None:
+            where = f"carried by {self._k_held}"
         elif self._k_carried:
             where = "carried"
         else:
@@ -91,7 +101,9 @@ class Thing(Child):
     @property
     def position(self) -> Position | None:
         """Where the thing lies, as x and y, or None once the wizard carries it: `key.position`"""
-        if self._k_carried or self._k_given is not None or self._k_unseen():
+        if self._k_carried or self._k_given is not None or self._k_held is not None:
+            return None
+        if self._k_unseen():
             return None
         return self._k_position
 
@@ -118,6 +130,8 @@ class Thing(Child):
         world: World = self._k_world
         if self._k_given is not None:
             return world.actors[self._k_given]._k_position
+        if self._k_held is not None:
+            return world.figure(self._k_held)._k_cell
         if self._k_carried:
             return world.wizard._k_position
         return None if self._k_unseen() else self._k_position
@@ -142,7 +156,11 @@ class Thing(Child):
         )
 
     def _carry(self) -> None:
-        self._set(carried=True)
+        self._set(carried=True, held=None)
+
+    def _pick(self, familiar: str) -> None:
+        """Picked up by a familiar, which carries it until it hands it over (D270)."""
+        self._set(held=familiar)
 
     def _give(self, to: str) -> None:
         self._set(carried=False, given=to)
@@ -397,6 +415,15 @@ class Ring(Thing):
     to the row below or the reverse (D187); to the child's code, a thing as any."""
 
 
+class Plate(Thing):
+    """A brass plate in the floor, walked over, lit when a familiar ends a move on it
+    (D270): the moon's, the sun's and the star's; to the child's code, a thing as any."""
+
+    def __init__(self, world: "World", spec: ThingSpec) -> None:
+        super().__init__(world, spec)
+        self._set(lit=False)
+
+
 #: Each kind of thing with a class of its own; any other kind is a Thing.
 THINGS: dict[str, type[Thing]] = {
     "door": Door,
@@ -405,6 +432,7 @@ THINGS: dict[str, type[Thing]] = {
     "bed": Bed,
     "broom": Broom,
     "ring": Ring,
+    "plate": Plate,
 }
 
 

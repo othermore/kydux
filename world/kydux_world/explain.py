@@ -10,11 +10,13 @@ the error beside the explanation, for an adult.
 
 import ast
 import difflib
+import inspect
 import re
 from dataclasses import dataclass, field
 from typing import Any
 
 from . import api
+from .familiars import Familiar, NoAttribute, NoSuchMethod
 from .level import Level
 from .things import Child, ReadOnly
 from .world import CHILD, ActionArguments, Refused
@@ -145,8 +147,14 @@ def explain(error: BaseException, level: Level, code: str | None = None) -> Expl
             "not_called", {"object": error.owner, "name": error.action, "example": error.example}
         )
     if isinstance(error, Refused):
-        # The world refused the program, as untying a broom with no knot (D183).
-        return Explanation(error.reason, {"thing": error.by})
+        # The world refused the program, as untying a broom with no knot (D183), or the
+        # first year does not allow what it asks (D261).
+        return Explanation(error.reason, {"thing": error.by, **error.detail})
+    if isinstance(error, NoSuchMethod):
+        # A familiar told what its class does not know (D269).
+        return Explanation("no_such_method", {"familiar": error.familiar, "name": error.method})
+    if isinstance(error, NoAttribute):
+        return Explanation("no_attribute", {"name": error.attribute})
     if isinstance(error, ReadOnly):
         kind = "read_only" if error.exists else "no_new_attribute"
         return Explanation(kind, {"object": error.owner, "name": error.attribute})
@@ -154,6 +162,10 @@ def explain(error: BaseException, level: Level, code: str | None = None) -> Expl
         if error.example:
             return Explanation("arguments", {"name": error.action, "example": error.example})
         return _arguments(error.action, level)
+    if isinstance(error, TypeError):
+        made = _object_arguments(error)
+        if made is not None:
+            return made
     if isinstance(error, AttributeError) and isinstance(getattr(error, "obj", None), Child):
         owner: Child = error.obj  # type: ignore[attr-defined]
         params: dict[str, Any] = {"object": owner._k_child_name, "name": error.name}
@@ -161,6 +173,14 @@ def explain(error: BaseException, level: Level, code: str | None = None) -> Expl
         if suggestion:
             params["suggestion"] = suggestion
         return Explanation("unknown_action", params)
+    if (
+        isinstance(error, AttributeError)
+        and not isinstance(error, ReadOnly)
+        and getattr(error, "name", None)
+        and not isinstance(getattr(error, "obj", None), Child | type(ast))
+    ):
+        # An object of the child's, or a value, with no attribute by that name (D271).
+        return Explanation("no_attribute", {"name": error.name})
     if isinstance(error, NameError):
         name = str(getattr(error, "name", "") or "")
         params = {"name": name}
@@ -181,10 +201,72 @@ def explain(error: BaseException, level: Level, code: str | None = None) -> Expl
     return Explanation("other", {"type": type(error).__name__, "message": str(error)})
 
 
+#: Python's words for a class's method called with too many or too few data.
+_TAKES = re.compile(
+    r"^(\w+)\.(\w+)\(\) takes (\d+) positional arguments? but (\d+) (?:was|were) given"
+)
+_MISSING = re.compile(r"^(\w+)\.(\w+)\(\) missing (\d+) required positional arguments?")
+
+
+def _object_arguments(error: TypeError) -> Explanation | None:
+    """An object made, or a method of the child's class called, with too many or too few
+    data (D271): `object_arguments`, with the class or the method, what it takes and what
+    it was given; one datum too many on a method whose first name is not `self` is a
+    method missing its `self`, `missing_self`."""
+    message = str(error)
+    taken = _TAKES.match(message)
+    missing = _MISSING.match(message)
+    if taken is None and missing is None:
+        return None
+    match = taken or missing
+    assert match is not None
+    klass, method = match.group(1), match.group(2)
+    if klass in ("Wizard", "Thing", "Door", "Key", "Teacher", "Broom", "Hole", "Bed"):
+        return None
+    function = _function_of(error, klass, method)
+    names = _parameters(function)
+    if taken is not None:
+        wants, given = int(taken.group(3)), int(taken.group(4))
+        if given == wants + 1 and (not names or names[0] != "self"):
+            return Explanation("missing_self", {"name": method, "kind": klass})
+        wanted, gave = wants - 1, given - 1
+    else:
+        wanted = max(len(names) - 1, 0) if names else int(missing.group(3))
+        gave = wanted - int(missing.group(3))
+    shown = klass if method == "__init__" else method
+    return Explanation("object_arguments", {"name": shown, "wanted": wanted, "given": gave})
+
+
+def _function_of(error: TypeError, klass: str, method: str) -> Any:
+    """The class's method the error was about, from the child's code where it was called."""
+    trace = error.__traceback__
+    frame = None
+    while trace is not None:
+        if trace.tb_frame.f_code.co_filename == CHILD:
+            frame = trace.tb_frame
+        trace = trace.tb_next
+    if frame is None:
+        return None
+    found = {**frame.f_globals, **frame.f_locals}.get(klass)
+    if found is None:
+        found = next((type(v) for v in frame.f_locals.values() if type(v).__name__ == klass), None)
+    return getattr(found, method, None) if found is not None else None
+
+
+def _parameters(function: Any) -> list[str]:
+    try:
+        return list(inspect.signature(function).parameters)
+    except (TypeError, ValueError):
+        return []
+
+
 def _child_classes(base: type = Child) -> list[type]:
-    """Every class of object the child may hold, the wizard's and the things' and actors'."""
+    """Every class of object the child may hold, the wizard's and the things' and actors';
+    not a familiar's, whose actions say their own example (D270)."""
     found = []
     for kind in base.__subclasses__():
+        if issubclass(kind, Familiar):
+            continue
         found.append(kind)
         found.extend(_child_classes(kind))
     return found

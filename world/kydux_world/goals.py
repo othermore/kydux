@@ -9,14 +9,16 @@ does not lose the level (D233).
 The kinds: reach (the run ends with the wizard on a marker's tile, or on
 one at x and y; passing over it on the way does not count, unless the goal says
 `"on_the_way": true`, for a level whose ways end in different cells), collect (a thing by
-id, or any `of` a kind: `{"kind": "collect", "of": "key"}`), open (a door),
+id, or any `of` a kind: `{"kind": "collect", "of": "key"}`, or every thing of the kind,
+`"all": true`, D271), open (a door),
 say (a text, word for word, or the number of things of a kind in the way played:
 `{"kind": "say", "count_of": "broom"}`, D184, those hung or not with `"hung": true` or
 `false`, D205), give (a thing by id, to an actor by
 id), cast (a spell cast, not a word refused: `{"kind": "cast", "spell": "osto"}`,
 D176), land (the wizard's own drevo sets the broom down on a marker's tile or on one
 at x and y, D215; the broom's setting down at the program's end does not count), no_bumps
-(the wizard bumps into nothing; failed at the first bump), untied (no broom knotted,
+(the wizard bumps into nothing, or the familiar with `"of": "familiar"`; failed at the
+first bump), untied (no broom knotted,
 or none of those named in `ids` or of a `zone`; failed at the run's end with one
 still knotted, D183, D202), no_error (the run ends
 without an error, nor the world refusing the program; failed at the first),
@@ -24,6 +26,10 @@ through_in_order (the rings named, flown through in that order: `{"kind":
 "through_in_order", "ids": ["ring_1", ...]}`, D187), before (the wizard crosses a
 race's finish at a tick lower than the racer's: `{"kind": "before", "racer":
 "zarek"}`, D189),
+trial (at the program's end the circle holds `count` trials of a first-year kind, each
+`named` and `coloured` when the goal asks it, D271), noted (the book could note the trial,
+D267), born (the familiar has left the circle, D268), familiar_at (the familiar ends the
+program on a cell, `at`, or `on` a plate), orders (Orla's orders obeyed, D267),
 not_seen_by (an actor; failed when it catches the wizard), ticks_under (the
 run ends in fewer ticks than that, so that the shorter of two winning programs
 earns it, D133), and three read from the code before the run: lines_under
@@ -121,21 +127,30 @@ class ReachGoal:
 
 
 class CollectGoal:
-    """Met once the wizard carries a thing: one by its id, or any `of` a kind."""
+    """Met once the wizard carries a thing: one by its id, or any `of` a kind, or, with
+    `"all": true`, every thing of the kind in the way played (D271)."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
-        if "id" in spec.params:
+        self.all = spec.params.get("all", False)
+        if not isinstance(self.all, bool):
+            raise LevelError(f"{level.id}: a collect goal's all is true or false")
+        if "id" in spec.params and not self.all:
             self.id: str | None = _thing_id(spec, level)
             self.kind: str | None = None
         elif isinstance(spec.params.get("of"), str):
             self.id, self.kind = None, spec.params["of"]
         else:
             raise LevelError(f"{level.id}: a collect goal needs an id, or `of` a kind")
+        if self.all and not any(thing.kind == self.kind for thing in level.things):
+            raise LevelError(f"{level.id}: a collect goal for all of {self.kind} needs one")
 
     def check(self, world: "World") -> bool:
         carried = world.carried()
         if self.id is not None:
             return any(t.name == self.id for t in carried)
+        if self.all:
+            every = [t for t in world.things.values() if t.kind == self.kind]
+            return all(t._k_carried for t in every)
         return any(t.kind == self.kind for t in carried)
 
 
@@ -320,16 +335,27 @@ class NotSeenByGoal:
 
 
 class NoBumpsGoal:
-    """Met at the end of a run in which the wizard bumped into nothing; failed at the
-    first bump: what an improve level asks (D56)."""
+    """Met at the end of a run in which the wizard bumped into nothing, or the familiar,
+    `{"kind": "no_bumps", "of": "familiar"}` (D271); failed at the first bump: what an
+    improve level asks (D56)."""
 
     def __init__(self, spec: GoalSpec, level: Level) -> None:
-        pass
+        self.of = spec.params.get("of", "wizard")
+        if self.of not in ("wizard", "familiar"):
+            raise LevelError(f"{level.id}: a no_bumps goal is of the wizard or the familiar")
+        if self.of == "familiar" and level.familiar is None:
+            raise LevelError(f"{level.id}: a no_bumps goal of the familiar needs a familiar")
 
     def check(self, world: "World") -> bool:
         return world.finished and not self.failed(world)
 
     def failed(self, world: "World") -> bool:
+        if self.of == "familiar":
+            mine = set(world.made)
+            return any(
+                e.actor in mine and e.kind == "bump" and not e.data.get("footprint")
+                for e in world.events
+            )
         return any(e.actor == "wizard" and e.kind == "bump" for e in world.events)
 
 
@@ -518,6 +544,114 @@ class SleepGoal:
         return world.slept == self.bed
 
 
+def _familiar_block(spec: GoalSpec, level: Level) -> None:
+    if level.familiar is None:
+        raise LevelError(f"{level.id}: a {spec.kind} goal needs the level's familiar")
+
+
+class TrialGoal:
+    """Met when, at the program's end, the circle holds `count` trials of a first-year
+    kind (the one born in the run counts as its trial), each with a name the book takes
+    when the goal says `named`, and its kind's own colour when it says `coloured`; with
+    `count` 2, their names differ (D271)."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        _familiar_block(spec, level)
+        count = spec.params.get("count", 1)
+        if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+            raise LevelError(f"{level.id}: a trial goal's count is a whole number")
+        self.count = count
+        self.named = bool(spec.params.get("named", False))
+        self.coloured = bool(spec.params.get("coloured", False))
+
+    def check(self, world: "World") -> bool:
+        if not world.program_over:
+            return False
+        trials = [world.born] if world.born is not None else []
+        trials += [trial for trial in world.circle if trial is not world.born]
+        seen = [world.described(trial) for trial in trials]
+        seen = [s for s in seen if s["worth"] != "spark"]
+        if self.named:
+            seen = [s for s in seen if s["name"] is not None]
+        if self.coloured:
+            seen = [s for s in seen if s["worth"] == "good"]
+        if self.count > 1 and len({s["name"] for s in seen}) < len(seen):
+            return False
+        return len(seen) >= self.count
+
+    def failed(self, world: "World") -> bool:
+        return world.finished and not self.check(world)
+
+
+class NotedGoal:
+    """Met once the book could note the trial in one line with the child's class (D267)."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        _familiar_block(spec, level)
+
+    def check(self, world: "World") -> bool:
+        return world.noted is True and (world.program_over or world.born is not None)
+
+    def failed(self, world: "World") -> bool:
+        return world.finished and not self.check(world)
+
+
+class BornGoal:
+    """Met once the familiar has left the circle and lives (D268)."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        _familiar_block(spec, level)
+
+    def check(self, world: "World") -> bool:
+        return world.born is not None
+
+    def failed(self, world: "World") -> bool:
+        return world.finished and world.born is None
+
+
+class FamiliarAtGoal:
+    """Met when the familiar ends the program on a cell, `{"at": [x, y]}`, or on a plate,
+    `{"on": "moon"}` (D271)."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        _familiar_block(spec, level)
+        if "on" in spec.params:
+            plates = {t.id: t.position for t in level.things if t.kind == "plate"}
+            if spec.params["on"] not in plates:
+                raise LevelError(f"{level.id}: the familiar_at goal is on a plate of the level")
+            self.target = plates[spec.params["on"]]
+        elif "at" in spec.params:
+            x, y = spec.params["at"]
+            self.target = Position(int(x), int(y))
+            if not level.inside(self.target):
+                raise LevelError(f"{level.id}: the familiar_at goal's cell is off the map")
+        else:
+            raise LevelError(f"{level.id}: a familiar_at goal is at a cell or on a plate")
+
+    def check(self, world: "World") -> bool:
+        return world.program_over and world.familiar_end == self.target
+
+    def failed(self, world: "World") -> bool:
+        return world.finished and not self.check(world)
+
+
+class OrdersGoal:
+    """Met once the familiar has obeyed every order of Orla's, standing after each where
+    she sent it (D267)."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        _familiar_block(spec, level)
+        if not level.familiar or not level.familiar.orders:
+            raise LevelError(f"{level.id}: an orders goal needs Orla's orders")
+        self.count = len(level.familiar.orders)
+
+    def check(self, world: "World") -> bool:
+        return world.obeyed >= self.count
+
+    def failed(self, world: "World") -> bool:
+        return world.finished and world.obeyed < self.count
+
+
 GOALS: dict[str, type] = {
     "reach": ReachGoal,
     "collect": CollectGoal,
@@ -537,6 +671,11 @@ GOALS: dict[str, type] = {
     "ticks_under": TicksUnderGoal,
     "numbers_under": NumbersUnderGoal,
     "uses": UsesGoal,
+    "trial": TrialGoal,
+    "noted": NotedGoal,
+    "born": BornGoal,
+    "familiar_at": FamiliarAtGoal,
+    "orders": OrdersGoal,
 }
 
 _own_goals: dict[tuple[str, str], dict[str, type]] = {}

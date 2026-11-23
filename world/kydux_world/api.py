@@ -54,12 +54,26 @@ MEMBERS: dict[str, tuple[str, ...]] = {
     "racer": ("kind", "name", "position", "facing", "distance_to"),
     # A friend teaches by words, not by code: the child's code has nothing of it (D66).
     "friend": (),
+    # The child's familiar (D270): what every familiar has, the name and the colour its
+    # class gives it, and what it inherits from `Familiar`.
+    "familiar": (
+        "name",
+        "color",
+        "position",
+        "move_up",
+        "move_down",
+        "move_left",
+        "move_right",
+    ),
     # What a position holds: its two numbers, `key.position.x` (D153).
     "position": ("x", "y"),
 }
 
 #: The roles that are things, and so have a thing's members.
 THING_ROLES = ("thing", "door", "key", "hole", "bed", "broom")
+#: The members a level may name that the child's own class defines, not the world's
+#: (D269): the familiar's `go_to`, which the notebook shows as the child wrote it.
+OWN: dict[str, tuple[str, ...]] = {"familiar": ("go_to",)}
 
 
 def role_of(kind: str) -> str:
@@ -71,7 +85,7 @@ def role_of(kind: str) -> str:
 
 def known(name: str) -> bool:
     role, _, member = name.partition(".")
-    return member in MEMBERS.get(role, ())
+    return member in MEMBERS.get(role, ()) or member in OWN.get(role, ())
 
 
 def allows(api: tuple[str, ...] | list[str], role: str, member: str) -> bool:
@@ -100,11 +114,19 @@ def table() -> dict[str, list[dict[str, str]]]:
     build time (architecture.md, D30), so that the page needs no Python to show it."""
     from .actors import ACTORS
     from .explain import example
+    from .familiars import Familiar
     from .level import Position
     from .things import THINGS, Thing
     from .world import Wizard
 
-    classes = {"wizard": Wizard, "thing": Thing, **THINGS, **ACTORS, "position": Position}
+    classes = {
+        "wizard": Wizard,
+        "thing": Thing,
+        **THINGS,
+        **ACTORS,
+        "position": Position,
+        "familiar": Familiar,
+    }
     found: dict[str, list[dict[str, str]]] = {}
     for role, members in MEMBERS.items():
         owner = classes[role]

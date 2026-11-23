@@ -1,0 +1,936 @@
+{
+  "about": "The rules the world and the page share (D260, D261, D266), and every case of chapter 5's levels (sprint 53, 3.3): a program and what it must give.",
+  "names": [
+    [
+      "Pimu",
+      null
+    ],
+    [
+      "Kesi",
+      null
+    ],
+    [
+      "Ñu",
+      null
+    ],
+    [
+      "Abcdefghijkl",
+      null
+    ],
+    [
+      "Pimu2",
+      "name_letters"
+    ],
+    [
+      "Pimu Rojo",
+      "name_letters"
+    ],
+    [
+      "",
+      "name_letters"
+    ],
+    [
+      3,
+      "name_letters"
+    ],
+    [
+      "Abcdefghijklm",
+      "name_long"
+    ],
+    [
+      "Wizard",
+      "name_taken"
+    ],
+    [
+      "print",
+      "name_taken"
+    ],
+    [
+      "If",
+      "name_taken"
+    ],
+    [
+      "Moon",
+      "name_taken"
+    ],
+    [
+      "Familiar",
+      "name_taken"
+    ],
+    [
+      "Len",
+      "name_taken"
+    ],
+    [
+      "Match",
+      "name_taken"
+    ]
+  ],
+  "mate_colours": [
+    [
+      "Fox",
+      "red",
+      "white"
+    ],
+    [
+      "Fox",
+      "white",
+      "red"
+    ],
+    [
+      "Fox",
+      "black",
+      "red"
+    ],
+    [
+      "Fox",
+      null,
+      "red"
+    ],
+    [
+      "Fox",
+      "blue",
+      "red"
+    ],
+    [
+      "Crow",
+      "black",
+      "white"
+    ],
+    [
+      "Crow",
+      "white",
+      "black"
+    ],
+    [
+      "Bat",
+      "black",
+      "white"
+    ],
+    [
+      "Hare",
+      "brown",
+      "white"
+    ],
+    [
+      "Hare",
+      "white",
+      "brown"
+    ],
+    [
+      "Hare",
+      "grey",
+      "brown"
+    ],
+    [
+      "Mouse",
+      "white",
+      "brown"
+    ],
+    [
+      "Frog",
+      "green",
+      "red"
+    ],
+    [
+      "Frog",
+      "red",
+      "green"
+    ],
+    [
+      "Dragon",
+      "red",
+      null
+    ]
+  ],
+  "friends": [
+    [
+      "Pimu",
+      "Tolu",
+      "Kesi"
+    ],
+    [
+      "Tolu",
+      "Rumo",
+      "Kesi"
+    ],
+    [
+      "kesi",
+      "Tolu",
+      "Nabi"
+    ],
+    [
+      "Nabi",
+      "Tolu",
+      "Kesi"
+    ],
+    [
+      "Rumo",
+      "Tolu",
+      "Kesi"
+    ]
+  ],
+  "worth": [
+    [
+      "Fox",
+      "red",
+      true,
+      "good",
+      null
+    ],
+    [
+      "Fox",
+      "white",
+      true,
+      "good",
+      null
+    ],
+    [
+      "Fox",
+      "blue",
+      true,
+      "pale",
+      "colour"
+    ],
+    [
+      "Fox",
+      "grey",
+      true,
+      "pale",
+      "colour"
+    ],
+    [
+      "Hare",
+      "grey",
+      true,
+      "pale",
+      "grey"
+    ],
+    [
+      "Hare",
+      "brown",
+      true,
+      "good",
+      null
+    ],
+    [
+      "Fox",
+      null,
+      false,
+      "pale",
+      "none"
+    ],
+    [
+      "Dragon",
+      "red",
+      true,
+      "spark",
+      null
+    ]
+  ],
+  "levels": {
+    "the-circle": {
+      "solution": "class Fox(Familiar):\n    pass\n\npimu = Fox()\nwizard.cast(\"minka\", pimu)\n",
+      "expect": {
+        "status": "won",
+        "trial": {
+          "kind": "Fox",
+          "pale": true,
+          "reason": "none",
+          "name": null
+        },
+        "told": [
+          [
+            "orla",
+            "won"
+          ],
+          [
+            "bimo",
+            "bimo"
+          ]
+        ],
+        "result": {
+          "kind": "Fox",
+          "name": null,
+          "color": null
+        }
+      },
+      "wrong": [
+        {
+          "name": "a dragon",
+          "code": "class Dragon(Familiar):\n    pass\n\nd = Dragon()\nwizard.cast(\"minka\", d)\n",
+          "expect": {
+            "status": "incomplete",
+            "spark": true,
+            "told": [
+              [
+                "orla",
+                "spark"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "no parent",
+          "code": "class Fox:\n    pass\n\npimu = Fox()\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "not_a_familiar",
+            "line": 5,
+            "told": [
+              [
+                "orla",
+                "not_a_familiar"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "the class called",
+          "code": "class Fox(Familiar):\n    pass\n\nwizard.cast(\"minka\", Fox)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "arguments",
+            "line": 4
+          }
+        },
+        {
+          "name": "a method of its own",
+          "code": "class Fox(Familiar):\n    def fly(self):\n        pass\n\npimu = Fox()\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "other_method",
+            "line": 2,
+            "told": [
+              [
+                "orla",
+                "other_method"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "go_to before its level",
+          "code": "class Fox(Familiar):\n    def go_to(self, x, y):\n        pass\n\npimu = Fox()\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "go_to_not_yet",
+            "line": 2
+          }
+        }
+      ]
+    },
+    "the-name-and-the-colour": {
+      "solution": "class Fox(Familiar):\n    pass\n\npimu = Fox()\npimu.name = \"Pimu\"\npimu.color = \"red\"\nwizard.cast(\"minka\", pimu)\n",
+      "expect": {
+        "status": "won",
+        "trial": {
+          "kind": "Fox",
+          "pale": false,
+          "name": "Pimu",
+          "color": "red"
+        },
+        "result": {
+          "kind": "Fox",
+          "name": "Pimu",
+          "color": "red"
+        }
+      },
+      "wrong": [
+        {
+          "name": "a blue fox",
+          "code": "class Fox(Familiar):\n    pass\n\npimu = Fox()\npimu.name = \"Pimu\"\npimu.color = \"blue\"\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "incomplete",
+            "trial": {
+              "pale": true,
+              "reason": "colour"
+            },
+            "told": [
+              [
+                "orla",
+                "pale_colour"
+              ]
+            ],
+            "colours": [
+              "red",
+              "white",
+              "black"
+            ]
+          }
+        },
+        {
+          "name": "a grey hare",
+          "code": "class Hare(Familiar):\n    pass\n\nlu = Hare()\nlu.name = \"Lu\"\nlu.color = \"grey\"\nwizard.cast(\"minka\", lu)\n",
+          "expect": {
+            "status": "incomplete",
+            "trial": {
+              "kind": "Hare",
+              "pale": true,
+              "reason": "grey"
+            },
+            "told": [
+              [
+                "orla",
+                "pale_grey"
+              ]
+            ],
+            "colours": [
+              "brown",
+              "white"
+            ]
+          }
+        },
+        {
+          "name": "its age",
+          "code": "class Fox(Familiar):\n    pass\n\npimu = Fox()\npimu.age = 3\npimu.name = \"Pimu\"\npimu.color = \"red\"\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "other_attribute",
+            "line": 5,
+            "told": [
+              [
+                "orla",
+                "other_attribute"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "no name",
+          "code": "class Fox(Familiar):\n    pass\n\npimu = Fox()\npimu.color = \"red\"\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "incomplete",
+            "trial": {
+              "pale": false,
+              "name": null
+            }
+          }
+        },
+        {
+          "name": "a name of two words",
+          "code": "class Fox(Familiar):\n    pass\n\npimu = Fox()\npimu.name = \"Pimu 2\"\npimu.color = \"red\"\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "name_letters",
+            "line": 7,
+            "told": [
+              [
+                "book",
+                "name_letters"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "named after the cast",
+          "code": "class Fox(Familiar):\n    pass\n\npimu = Fox()\nwizard.cast(\"minka\", pimu)\npimu.name = \"Pimu\"\npimu.color = \"red\"\n",
+          "expect": {
+            "status": "incomplete",
+            "trial": {
+              "pale": true,
+              "reason": "none",
+              "name": null
+            }
+          }
+        },
+        {
+          "name": "a white fox",
+          "code": "class Fox(Familiar):\n    pass\n\npimu = Fox()\npimu.name = \"Pimu\"\npimu.color = \"white\"\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "won",
+            "trial": {
+              "pale": false,
+              "color": "white"
+            }
+          }
+        }
+      ]
+    },
+    "one-line-in-the-book": {
+      "solution": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nwizard.cast(\"minka\", pimu)\n",
+      "expect": {
+        "status": "won",
+        "book": {
+          "line": "Fox(\"Pimu\", \"red\")",
+          "ok": true,
+          "ink": false
+        },
+        "born_actor": [
+          "friend_familiar",
+          [
+            7,
+            7
+          ]
+        ]
+      },
+      "wrong": [
+        {
+          "name": "the attributes outside the class",
+          "code": "class Fox(Familiar):\n    pass\n\npimu = Fox()\npimu.name = \"Pimu\"\npimu.color = \"red\"\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "incomplete",
+            "trial": {
+              "pale": false
+            },
+            "book": {
+              "ok": false
+            }
+          }
+        },
+        {
+          "name": "the data the other way round",
+          "code": "class Fox(Familiar):\n    def __init__(self, color, name):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "incomplete",
+            "trial": {
+              "pale": true,
+              "reason": "colour",
+              "name": "red"
+            }
+          }
+        },
+        {
+          "name": "one datum",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\")\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "object_arguments",
+            "line": 6,
+            "params": {
+              "name": "Fox",
+              "wanted": 2,
+              "given": 1
+            }
+          }
+        },
+        {
+          "name": "no self",
+          "code": "class Fox(Familiar):\n    def __init__(name, color):\n        name = name\n        color = color\n\npimu = Fox(\"Pimu\", \"red\")\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "missing_self",
+            "line": 6
+          }
+        }
+      ]
+    },
+    "the-slate": {
+      "solution": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nkesi = Fox(\"Kesi\", \"white\")\nwizard.cast(\"minka\", pimu)\nwizard.cast(\"minka\", kesi)\n",
+      "expect": {
+        "status": "won",
+        "told": [
+          [
+            "mate",
+            "won"
+          ]
+        ],
+        "trials": 2
+      },
+      "wrong": [
+        {
+          "name": "as given",
+          "code": "class Fox(Familiar):\n    def __init__(name, color):\n        name = name\n        color = color\n\npimu = Fox(\"Pimu\", \"red\")\nkesi = Fox(\"Kesi\", \"white\")\nwizard.cast(\"minka\", pimu)\nwizard.cast(\"minka\", kesi)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "missing_self",
+            "line": 6
+          }
+        },
+        {
+          "name": "self added only",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        name = name\n        color = color\n\npimu = Fox(\"Pimu\", \"red\")\nkesi = Fox(\"Kesi\", \"white\")\nwizard.cast(\"minka\", pimu)\nwizard.cast(\"minka\", kesi)\n",
+          "expect": {
+            "status": "incomplete",
+            "trial": {
+              "pale": true,
+              "reason": "none",
+              "name": null
+            },
+            "trials": 2
+          }
+        },
+        {
+          "name": "the name kept only",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        color = color\n\npimu = Fox(\"Pimu\", \"red\")\nkesi = Fox(\"Kesi\", \"white\")\nwizard.cast(\"minka\", pimu)\nwizard.cast(\"minka\", kesi)\n",
+          "expect": {
+            "status": "incomplete",
+            "trial": {
+              "pale": true,
+              "name": "Pimu"
+            }
+          }
+        },
+        {
+          "name": "called before made",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\nwizard.cast(\"minka\", pimu)\nwizard.cast(\"minka\", kesi)\npimu = Fox(\"Pimu\", \"red\")\nkesi = Fox(\"Kesi\", \"white\")\n",
+          "expect": {
+            "status": "error",
+            "explanation": "unknown_name",
+            "line": 6
+          }
+        }
+      ]
+    },
+    "out-of-the-circle": {
+      "solution": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nwizard.cast(\"minka\", pimu)\npimu.move_down(2)\npimu.move_left(4)\npimu.move_up(5)\n",
+      "expect": {
+        "status": "won",
+        "passes": true,
+        "born": [
+          10,
+          9
+        ],
+        "told": [
+          [
+            "orla",
+            "go"
+          ]
+        ],
+        "book": {
+          "line": "Fox(\"Pimu\", \"red\")",
+          "ok": true,
+          "ink": true
+        },
+        "lit": "moon",
+        "born_actor": [
+          "mate_familiar",
+          [
+            12,
+            7
+          ]
+        ],
+        "steps": 11
+      },
+      "wrong": [
+        {
+          "name": "the starting code",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "incomplete",
+            "passes": false,
+            "told": [],
+            "trial": {
+              "pale": false
+            }
+          }
+        },
+        {
+          "name": "a cell short",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nwizard.cast(\"minka\", pimu)\npimu.move_down(2)\npimu.move_left(3)\npimu.move_up(5)\n",
+          "expect": {
+            "status": "incomplete",
+            "passes": false,
+            "held": [
+              10,
+              8
+            ],
+            "footprints": [
+              [
+                9,
+                9
+              ],
+              [
+                8,
+                9
+              ],
+              [
+                7,
+                9
+              ],
+              [
+                7,
+                8
+              ],
+              [
+                7,
+                7
+              ],
+              [
+                7,
+                6
+              ],
+              [
+                7,
+                5
+              ],
+              [
+                7,
+                4
+              ]
+            ],
+            "told": [
+              [
+                "orla",
+                "not_yet"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "up first",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\nwizard.cast(\"minka\", pimu)\npimu.move_up(5)\npimu.move_down(2)\npimu.move_left(4)\n",
+          "expect": {
+            "status": "incomplete",
+            "passes": false,
+            "held": [
+              10,
+              6
+            ],
+            "footprint_bump": [
+              10,
+              5
+            ],
+            "told": [
+              [
+                "orla",
+                "not_yet"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "a blue fox",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"blue\")\nwizard.cast(\"minka\", pimu)\npimu.move_down(2)\npimu.move_left(4)\npimu.move_up(5)\n",
+          "expect": {
+            "status": "incomplete",
+            "passes": false,
+            "held": [
+              10,
+              8
+            ],
+            "told": [
+              [
+                "orla",
+                "pale_colour"
+              ],
+              [
+                "mate",
+                "copy"
+              ],
+              [
+                "orla",
+                "not_yet"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "moved before it is called",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"red\")\npimu.move_down(2)\npimu.move_left(4)\npimu.move_up(5)\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "incomplete",
+            "passes": false,
+            "not_here": 3
+          }
+        },
+        {
+          "name": "a white fox copied",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\npimu = Fox(\"Pimu\", \"white\")\nwizard.cast(\"minka\", pimu)\npimu.move_down(2)\npimu.move_left(4)\npimu.move_up(5)\n",
+          "expect": {
+            "status": "won",
+            "passes": true,
+            "told": [
+              [
+                "mate",
+                "copy"
+              ],
+              [
+                "orla",
+                "go"
+              ]
+            ],
+            "copied": [
+              "Fox",
+              "red"
+            ]
+          }
+        }
+      ]
+    },
+    "orlas-orders": {
+      "solution": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n    def go_to(self, x, y):\n        if x < self.position.x:\n            self.move_left(self.position.x - x)\n        else:\n            self.move_right(x - self.position.x)\n        if y < self.position.y:\n            self.move_up(self.position.y - y)\n        else:\n            self.move_down(y - self.position.y)\n\npimu.go_to(13, 4)\n",
+      "expect": {
+        "status": "won",
+        "orders": 2,
+        "told": [
+          [
+            "orla",
+            "order_star"
+          ],
+          [
+            "orla",
+            "order_wizard"
+          ]
+        ],
+        "learned": true,
+        "lit": "sun",
+        "end": [
+          11,
+          10
+        ]
+      },
+      "wrong": [
+        {
+          "name": "the row first",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n    def go_to(self, x, y):\n        if y < self.position.y:\n            self.move_up(self.position.y - y)\n        else:\n            self.move_down(y - self.position.y)\n        if x < self.position.x:\n            self.move_left(self.position.x - x)\n        else:\n            self.move_right(x - self.position.x)\n\npimu.go_to(13, 4)\n",
+          "expect": {
+            "status": "incomplete",
+            "bump": [
+              10,
+              5
+            ]
+          }
+        },
+        {
+          "name": "a go_to with no data",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n    def go_to(self):\n        self.move_right(3)\n        self.move_up(5)\n\npimu.go_to()\n",
+          "expect": {
+            "status": "error",
+            "explanation": "object_arguments",
+            "params": {
+              "name": "go_to",
+              "wanted": 0,
+              "given": 2
+            },
+            "told": [
+              [
+                "orla",
+                "order_star"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "no go_to",
+          "code": "pimu.go_to(13, 4)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "no_such_method",
+            "line": 1,
+            "params": {
+              "familiar": "Pimu",
+              "name": "go_to"
+            },
+            "puzzled": true
+          }
+        },
+        {
+          "name": "the __init__ changed",
+          "code": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = \"white\"\n\n    def go_to(self, x, y):\n        if x < self.position.x:\n            self.move_left(self.position.x - x)\n        else:\n            self.move_right(x - self.position.x)\n        if y < self.position.y:\n            self.move_up(self.position.y - y)\n        else:\n            self.move_down(y - self.position.y)\n\npimu.go_to(13, 4)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "class_changed",
+            "told": [
+              [
+                "orla",
+                "class_changed"
+              ]
+            ]
+          }
+        },
+        {
+          "name": "another kind",
+          "code": "class Crow(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n    def go_to(self, x, y):\n        if x < self.position.x:\n            self.move_left(self.position.x - x)\n        else:\n            self.move_right(x - self.position.x)\n        if y < self.position.y:\n            self.move_up(self.position.y - y)\n        else:\n            self.move_down(y - self.position.y)\n\npimu.go_to(13, 4)\n",
+          "expect": {
+            "status": "error",
+            "explanation": "class_changed"
+          }
+        }
+      ]
+    },
+    "the-small-passage": {
+      "solution": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\n",
+      "expect": {
+        "status": "won",
+        "steps": 13,
+        "end": [
+          13,
+          3
+        ]
+      },
+      "wrong": [
+        {
+          "name": "straight to the room",
+          "code": "pimu.go_to(13, 3)\n",
+          "expect": {
+            "status": "incomplete",
+            "bump": [
+              13,
+              13
+            ]
+          }
+        },
+        {
+          "name": "a corner a cell short",
+          "code": "pimu.go_to(10, 9)\npimu.go_to(13, 3)\n",
+          "expect": {
+            "status": "incomplete",
+            "bump": [
+              10,
+              9
+            ]
+          }
+        },
+        {
+          "name": "the first corner only",
+          "code": "pimu.go_to(10, 8)\n",
+          "expect": {
+            "status": "incomplete",
+            "end": [
+              10,
+              8
+            ]
+          }
+        },
+        {
+          "name": "the first and the last",
+          "code": "pimu.go_to(10, 8)\npimu.go_to(13, 3)\n",
+          "expect": {
+            "status": "won"
+          }
+        }
+      ]
+    },
+    "the-forgotten-room": {
+      "solution": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in wizard.find_all(\"thread\"):\n    pimu.go_to(thread.position.x, thread.position.y)\nwizard.cast(\"minka\", pimu)\n",
+      "expect": {
+        "status": "won",
+        "ticks": 37,
+        "ways": {
+          "a": "won",
+          "b": "won",
+          "c": "won"
+        },
+        "handed": 3
+      },
+      "wrong": [
+        {
+          "name": "the pieces as numbers",
+          "code": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\npimu.go_to(9, 2)\npimu.go_to(11, 3)\npimu.go_to(12, 3)\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "incomplete",
+            "ways": {
+              "a": "won",
+              "b": "incomplete"
+            }
+          }
+        },
+        {
+          "name": "found from the corridor",
+          "code": "threads = wizard.find_all(\"thread\")\npimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in threads:\n    pimu.go_to(thread.position.x, thread.position.y)\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "incomplete"
+          }
+        },
+        {
+          "name": "no minka",
+          "code": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in wizard.find_all(\"thread\"):\n    pimu.go_to(thread.position.x, thread.position.y)\n",
+          "expect": {
+            "status": "incomplete"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -3,8 +3,9 @@
 A level is read from its level.json. The map is rows of characters: `#` a
 wall, `.` floor, `=` a shelf (no one walks on it, a thing may lie on it, and
 sight passes over it, D46), `~` a low cell (water, a hedge, a bench: no one
-walks on it, a flight crosses it and sight passes over it, D186), `S` where the
-wizard starts, and any other letter a floor tile that things, actors and goals
+walks on it, a flight crosses it and sight passes over it, D186), `,` a cell
+only a familiar enters (a familiars' passage: the wizard bumps there, D270), `S`
+where the wizard starts, and any other letter a floor tile that things, actors and goals
 may name by that letter (a marker), like `D` for a door. A wall is high: a
 flight bumps on it as a walk does. Positions are (x, y) from the top-left corner,
 x to the right and y down.
@@ -31,8 +32,10 @@ may add to, each with its reason (D205);
 `enchanted`, the boxes of cells that hide every figure in them, which its scene
 gives too and only the page reads (D135); `camera`, a box of cells the page
 shows whole at the level's start (D201), which holds the start, every marker and
-every thing; and `ways`, the ways the level is
-played, each one the same program must win (D51). A level may
+every thing; `familiar`, the familiar the level describes, calls or plays with
+(D260), with `told`, what is said at the end of a run won (D264), and `fault`, the
+explanation a fix level's given program stops with (D272); and `ways`, the ways the
+level is played, each one the same program must win (D51). A level may
 come with goals of its own, in a goals.py beside level.json, whose source
 the loader passes as `goals_source`.
 """
@@ -65,18 +68,35 @@ class LevelError(ValueError):
     """A level definition that cannot be played."""
 
 
-WALL, FLOOR, SHELF, LOW, START = "#", ".", "=", "~", "S"
+WALL, FLOOR, SHELF, LOW, SMALL, START = "#", ".", "=", "~", ",", "S"
 
 #: The kinds of thing a level may hold, and the ones the wizard can carry.
-THING_KINDS = ("key", "door", "book", "wand", "potion", "hole", "bed", "map", "broom", "ring")
+THING_KINDS = (
+    "key",
+    "door",
+    "book",
+    "wand",
+    "potion",
+    "hole",
+    "bed",
+    "map",
+    "broom",
+    "ring",
+    "thread",
+    "trail",
+    "plate",
+)
 #: The kinds that lie on cells of their own, one or two side by side (D150, D167).
 CELLED_KINDS = ("door", "hole")
-CARRIED_KINDS = ("key", "book", "wand", "potion", "map", "broom")
+CARRIED_KINDS = ("key", "book", "wand", "potion", "map", "broom", "thread")
+#: The kinds that lie in or on the floor, walked over and found by no one (D270): a
+#: thread's end, a brass plate.
+FLOOR_KINDS = ("trail", "plate")
 #: The terrains a thing lies up on, out of the hands' reach (D129): a level map's
 #: shelf, a scene's bookcase. A thing on another tile no one walks, a stone or a
 #: pile of books, lies within reach of the tile beside it.
 HIGH_KINDS = ("shelf", "bookcase")
-ACTOR_KINDS = ("teacher", "ghost", "cat", "friend", "racer")
+ACTOR_KINDS = ("teacher", "ghost", "cat", "friend", "racer", "familiar")
 #: A ring's way, the way it is flown through: `up`, from the row under it to the row
 #: over it, or `down` (D219).
 RING_WAYS = ("up", "down")
@@ -87,7 +107,12 @@ RING_COLOURS = ("red", "blue", "yellow", "purple")
 WALK_TICKS_FLYING = 3
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
-KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto", "orvim", "drevo")
+KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto", "orvim", "drevo", "minka")
+#: The explanations a fix level's given program may stop with, its `fault` (D272).
+FAULTS = ("missing_self", "no_attribute", "object_arguments", "no_such_method")
+#: A level's familiar block's stages (D260): a level where the description is tried, the
+#: level where it leaves the circle, a level played with the familiar there.
+FAMILIAR_STAGES = ("trial", "birth", "living")
 #: The kinds of level (D56): a screen to solve, a program to repair, a program to
 #: make better, a challenge with no lesson before it.
 LEVEL_KINDS = ("practice", "fix", "improve", "challenge")
@@ -166,6 +191,88 @@ class ActorSpec:
     #: Where on its patrol the actor starts, and which way along it it walks (D137).
     patrol_start: int = 0
     patrol_along: int = 1
+    #: For a familiar of someone else's (D273): its kind, or a list of kinds of which
+    #: the first that is not the child's; its colour, or one for each of those kinds;
+    #: whether it is a trial in the circle, or a spark; and `of`, `mate` for the
+    #: room-mate's copy of the child's, drawn from the child's description.
+    creature: str | tuple[str, ...] | None = None
+    color: str | tuple[str, ...] | None = None
+    trial: bool = False
+    spark: bool = False
+    of: str | None = None
+    #: Seated on the floor, drawn in its sitting rows (D273).
+    sitting: bool = False
+
+
+@dataclass(frozen=True)
+class Described:
+    """A familiar as it is described: its kind, and its name and colour when given."""
+
+    kind: str
+    name: str | None = None
+    color: str | None = None
+
+
+@dataclass(frozen=True)
+class Living:
+    """The game's familiar that lives (D265, D269): its kind, name and colour, the class
+    kept when it was born (`source`) and with what it learned after (`learned`), where it
+    stands at the level's start and the way it faces."""
+
+    kind: str
+    name: str
+    color: str
+    source: str
+    at: Position
+    facing: str = "down"
+    learned: str | None = None
+
+
+@dataclass(frozen=True)
+class Order:
+    """One of Orla's orders after the program (D267): the cell she sends the familiar to,
+    and her words' key."""
+
+    to: Position
+    key: str
+
+
+@dataclass(frozen=True)
+class FamiliarBlock:
+    """A level's `familiar` block (D260): its stage, the circle and the cells its trials
+    stand on, the methods a class may define, whether the book notes the trial, what
+    follows a won run, the level's own draft and living familiar, which of the living
+    one's classes plays, and Orla's orders with the plate they follow."""
+
+    stage: str
+    circle: tuple[int, int, int, int] | None = None
+    trials: tuple[Position, ...] = ()
+    methods: tuple[str, ...] = ()
+    book: bool = False
+    #: The actor of a familiar that steps out of the circle and lives after a won run,
+    #: and the cell it steps to (D268).
+    then: tuple[str, Position] | None = None
+    draft: Described | None = None
+    living: Living | None = None
+    #: `source` or `learned`: the living familiar's class kept at its birth, or the one
+    #: with what it learned after (`learned`, or the source where it learned nothing).
+    source: str = "source"
+    orders: tuple[Order, ...] = ()
+    orders_on: str | None = None
+
+    def in_circle(self, position: Position) -> bool:
+        if self.circle is None:
+            return False
+        x0, y0, x1, y1 = self.circle
+        return x0 <= position.x <= x1 and y0 <= position.y <= y1
+
+    def kept_class(self) -> str | None:
+        """The living familiar's class as this level plays it."""
+        if self.living is None:
+            return None
+        if self.source == "learned" and self.living.learned:
+            return self.living.learned
+        return self.living.source
 
 
 @dataclass(frozen=True)
@@ -239,6 +346,16 @@ class Level:
     #: The level's zones by name, each its cells: a thing of a zone is found only from
     #: within it (D196).
     zones: dict[str, frozenset[Position]] = field(default_factory=dict)
+    #: The cells only a familiar enters, a familiars' passage (D270).
+    small: frozenset[Position] = frozenset()
+    #: The familiar the level describes, calls or plays with (D260), or None.
+    familiar: FamiliarBlock | None = None
+    #: What is said at the end of a run won, each by whom and its words' key (D264).
+    told_won: tuple[tuple[str, str], ...] = ()
+    #: Where someone painted into the scene speaks from, by id (D264).
+    voices: dict[str, Position] = field(default_factory=dict)
+    #: The explanation a fix level's given program stops with (D272), or None.
+    fault: str | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Level":
@@ -264,7 +381,7 @@ class Level:
         if width == 0 or any(len(row) != width for row in rows):
             raise LevelError(f"{level_id}: the map's rows must all be as long as the first")
 
-        walls, shelves, low, starts, markers = set(), set(), set(), [], {}
+        walls, shelves, low, small, starts, markers = set(), set(), set(), set(), [], {}
         for y, row in enumerate(rows):
             for x, char in enumerate(row):
                 here = Position(x, y)
@@ -274,6 +391,8 @@ class Level:
                     shelves.add(here)
                 elif char == LOW:
                     low.add(here)
+                elif char == SMALL:
+                    small.add(here)
                 elif char == START:
                     starts.append(here)
                 elif char == FLOOR:
@@ -296,6 +415,7 @@ class Level:
             markers,
             starts[0],
             frozenset(low),
+            frozenset(small),
         )
         zones = _zones(data.get("zones", {}), level_id)
         things = tuple(_thing(shape, spec) for spec in _list(data, "things", level_id))
@@ -421,6 +541,14 @@ class Level:
             race=_race(data.get("race"), shape, actors, things),
             kinds=_kinds(data),
             zones=zones,
+            small=frozenset(small),
+            voices=_voices(data.get("voices"), shape),
+            fault=_fault(data.get("fault"), level_id, kind),
+        )
+        level = replace(
+            level,
+            familiar=_familiar(data.get("familiar"), shape, level),
+            told_won=_told_won(data.get("told"), level),
         )
         check_api(level)
         _level_camera(data.get("camera"), level)
@@ -455,9 +583,18 @@ class Level:
         return 0 <= position.x < self.width and 0 <= position.y < self.height
 
     def free(self, position: Position) -> bool:
-        """Inside the map, and neither a wall, a shelf nor a low cell: a tile to walk on.
-        Doors are the world's to say."""
-        return self.clear(position) and position not in self.shelves and position not in self.low
+        """Inside the map, and neither a wall, a shelf, a low cell nor a familiars' passage:
+        a tile to walk on. Doors are the world's to say."""
+        return (
+            self.clear(position)
+            and position not in self.shelves
+            and position not in self.low
+            and position not in self.small
+        )
+
+    def familiar_walks(self, position: Position) -> bool:
+        """A tile a familiar walks on: the floor, or a familiars' passage (D270)."""
+        return self.free(position) or position in self.small
 
     def flies(self, position: Position) -> bool:
         """A tile a flight crosses: one to walk on, or a low cell (D186)."""
@@ -489,6 +626,8 @@ class _Shape:
     markers: dict[str, Position]
     start: Position
     low: frozenset[Position] = frozenset()
+    #: The cells only a familiar enters (D270).
+    small: frozenset[Position] = frozenset()
 
     def place(self, spec: dict[str, Any], what: str, walks: bool = False) -> Position:
         """Where a thing lies, or, with `walks`, where an actor stands: not on a shelf."""
@@ -796,9 +935,61 @@ def _actor(shape: _Shape, spec: dict[str, Any]) -> ActorSpec:
         raise LevelError(f"{shape.level_id}: {actor_id} is asleep in a bed, named by its id")
     if asleep is not None and patrol:
         raise LevelError(f"{shape.level_id}: {actor_id} is asleep, and walks no patrol")
+    sitting = spec.get("sitting", False)
+    if not isinstance(sitting, bool) or (sitting and patrol):
+        raise LevelError(f"{shape.level_id}: {actor_id} sits, true or false, and walks no patrol")
     return ActorSpec(
-        kind, actor_id, position, facing, patrol, sight, asleep, patrol_start, patrol_along
+        kind,
+        actor_id,
+        position,
+        facing,
+        patrol,
+        sight,
+        asleep,
+        patrol_start,
+        patrol_along,
+        sitting=sitting,
+        **_creature(spec, shape.level_id, actor_id),
     )
+
+
+def _creature(spec: dict[str, Any], level_id: str, actor_id: str) -> dict[str, Any]:
+    """An actor of the kind `familiar`, someone else's creature (D273): `creature`, a
+    kind or a list of kinds; `color`, one, or one for each kind of the list, or none for
+    a trial with no colour; `trial` or `spark`, or neither for one that lives; or `of`,
+    `mate`, the room-mate's copy of the child's. No other actor has any of these."""
+    from .familiars import KINDS, SHEETS
+
+    keys = ("creature", "color", "trial", "spark", "of")
+    if spec.get("kind") != "familiar":
+        if any(key in spec for key in keys):
+            raise LevelError(f"{level_id}: only a familiar has {', '.join(keys)}")
+        return {}
+    creature, color, of = spec.get("creature"), spec.get("color"), spec.get("of")
+    trial, spark = spec.get("trial", False), spec.get("spark", False)
+    if not isinstance(trial, bool) or not isinstance(spark, bool) or (trial and spark):
+        raise LevelError(f"{level_id}: {actor_id} is a trial or a spark, true or false")
+    if of is not None:
+        if of != "mate" or creature is not None or color is not None or spark:
+            raise LevelError(f"{level_id}: {actor_id} is of the mate, drawn from the child's")
+        return {"of": of, "trial": trial}
+    if spark:
+        if creature is not None or color is not None:
+            raise LevelError(f"{level_id}: {actor_id} is a spark, with no kind and no colour")
+        return {"spark": True}
+    kinds = creature if isinstance(creature, list) else [creature]
+    if not kinds or not all(kind in KINDS for kind in kinds):
+        raise LevelError(f"{level_id}: {actor_id}'s creature is a kind of the first year")
+    colours = color if isinstance(color, list) else [color] * len(kinds)
+    if len(colours) != len(kinds) or not all(
+        c in SHEETS[k] or (c is None and trial) for k, c in zip(kinds, colours, strict=True)
+    ):
+        raise LevelError(f"{level_id}: {actor_id}'s colour is its kind's, one for each kind")
+    return {
+        "creature": tuple(kinds) if isinstance(creature, list) else creature,
+        "color": tuple(colours) if isinstance(color, list) else color,
+        "trial": trial,
+    }
 
 
 def _patrol_path(shape: _Shape, actor_id: str, points: list[Position]) -> list[Position]:
@@ -1201,6 +1392,220 @@ def _check_ids(
         seen.add(item_id)
 
 
+def _cell(shape: _Shape, value: Any, what: str) -> Position:
+    """A cell given as [x, y] that is the map's and not a wall."""
+    return shape.tile(value, what)
+
+
+def _voices(value: Any, shape: _Shape) -> dict[str, Position]:
+    """Where someone painted into the scene speaks from (D264): `{"bimo": [9, 3]}`."""
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise LevelError(f"{shape.level_id}: voices are named, each a cell [x, y]")
+    found = {}
+    for who, cell in value.items():
+        if not isinstance(who, str) or not who.isidentifier():
+            raise LevelError(f"{shape.level_id}: a voice's name is a Python name")
+        if not (
+            isinstance(cell, list)
+            and len(cell) == 2
+            and all(isinstance(v, int) and not isinstance(v, bool) for v in cell)
+        ):
+            raise LevelError(f"{shape.level_id}: the voice {who} speaks from a cell [x, y]")
+        found[who] = Position(*cell)
+    return found
+
+
+def _fault(value: Any, level_id: str, kind: str) -> str | None:
+    """A fix level's `fault` (D272): the explanation its given program stops with."""
+    if value is None:
+        return None
+    if kind != "fix" or value not in FAULTS:
+        raise LevelError(f"{level_id}: a fix level's fault is one of {', '.join(FAULTS)}")
+    return value
+
+
+def _described(value: Any, level_id: str, what: str) -> Described | None:
+    """A familiar described, `{"kind": "Fox", "name": "Pimu", "color": "red"}`, its name
+    and colour maybe left out: a kind and a colour of the first year's table, and a name
+    the book takes (D260, D261)."""
+    from .familiars import KINDS, name_problem
+
+    if value is None:
+        return None
+    if not isinstance(value, dict) or set(value) - {"kind", "name", "color"}:
+        raise LevelError(f"{level_id}: {what} is a kind, a name and a colour")
+    kind, name, color = value.get("kind"), value.get("name"), value.get("color")
+    if kind not in KINDS:
+        raise LevelError(f"{level_id}: {what}'s kind is one of {', '.join(KINDS)}")
+    if name is not None and name_problem(name) is not None:
+        raise LevelError(f"{level_id}: {what}'s name {name!r} is not one the book takes")
+    if color is not None and color not in KINDS[kind]:
+        raise LevelError(f"{level_id}: {what}'s colour is one of {kind}'s")
+    return Described(kind, name, color)
+
+
+def _familiar(value: Any, shape: _Shape, level: "Level") -> FamiliarBlock | None:
+    """A level's `familiar` block (D260), checked against the level."""
+    from .familiars import METHODS
+
+    level_id = level.id
+    if value is None:
+        return None
+    known = {"stage", "circle", "trials", "methods", "book", "then", "draft", "living", "from"}
+    if not isinstance(value, dict) or set(value) - known - {"orders"}:
+        raise LevelError(f"{level_id}: the familiar block has {', '.join(sorted(known))}, orders")
+    stage = value.get("stage")
+    if stage not in FAMILIAR_STAGES:
+        raise LevelError(
+            f"{level_id}: the familiar's stage is one of {', '.join(FAMILIAR_STAGES)}"
+        )
+    circle = value.get("circle")
+    box: tuple[int, int, int, int] | None = None
+    if circle is not None:
+        boxes = _list_of_boxes([circle], level_id, "the familiar's circle")
+        box = boxes[0]
+        x0, y0, x1, y1 = box
+        cells = [Position(x, y) for x in range(x0, x1 + 1) for y in range(y0, y1 + 1)]
+        if x0 > x1 or y0 > y1 or not all(level.free(cell) for cell in cells):
+            raise LevelError(f"{level_id}: the familiar's circle is a box of floor cells")
+    trials = tuple(
+        _cell(shape, cell, "a trial's cell")
+        for cell in _cells_list(value.get("trials", []), level_id)
+    )
+    if stage in ("trial", "birth"):
+        if box is None or not trials:
+            raise LevelError(f"{level_id}: a {stage} level has its circle and its trials' cells")
+    block = FamiliarBlock(stage, circle=box)
+    if any(not block.in_circle(cell) for cell in trials) or len(set(trials)) != len(trials):
+        raise LevelError(f"{level_id}: the trials' cells are cells of the circle, each once")
+    methods = value.get("methods", [])
+    if not isinstance(methods, list) or not set(methods) <= set(METHODS):
+        raise LevelError(f"{level_id}: the methods a class may define are of {', '.join(METHODS)}")
+    book = value.get("book", False)
+    if not isinstance(book, bool):
+        raise LevelError(f"{level_id}: the familiar's book is true or false")
+    then = None
+    if value.get("then") is not None:
+        spec = value["then"]
+        actors = {actor.id: actor for actor in level.actors}
+        if not isinstance(spec, dict) or set(spec) != {"born", "to"}:
+            raise LevelError(f"{level_id}: then is the familiar born and the cell it steps to")
+        if spec["born"] not in actors or actors[spec["born"]].kind != "familiar":
+            raise LevelError(f"{level_id}: then names an actor of the kind familiar")
+        to = _cell(shape, spec["to"], "then's cell")
+        if not level.free(to):
+            raise LevelError(f"{level_id}: then's cell is floor")
+        then = (spec["born"], to)
+    draft = _described(value.get("draft"), level_id, "the draft")
+    # A living level plays with the living familiar; any other may be told the game has
+    # one, which makes a trial level practice and holds the birth (D265, D268).
+    living = _living(value.get("living"), shape, level)
+    if stage == "living" and living is None:
+        raise LevelError(f"{level_id}: a living level has its living familiar")
+    source = value.get("from", "source")
+    if source not in ("source", "learned"):
+        raise LevelError(f"{level_id}: the living familiar's class is from source or learned")
+    orders, orders_on = _orders(value.get("orders"), shape, level, stage)
+    return FamiliarBlock(
+        stage,
+        circle=box,
+        trials=trials,
+        methods=tuple(methods),
+        book=book,
+        then=then,
+        draft=draft,
+        living=living,
+        source=source,
+        orders=orders,
+        orders_on=orders_on,
+    )
+
+
+def _cells_list(value: Any, level_id: str) -> list[Any]:
+    if not isinstance(value, list):
+        raise LevelError(f"{level_id}: the trials' cells are a list of [x, y]")
+    return value
+
+
+def _living(value: Any, shape: _Shape, level: "Level") -> Living | None:
+    """A living level's familiar (D265, D269): its kind, name and colour, its kept class,
+    and where it stands and faces at the start."""
+    from .familiars import KINDS, name_problem
+
+    level_id = level.id
+    if value is None:
+        return None
+    fields = {"kind", "name", "color", "source", "learned", "at", "facing"}
+    if not isinstance(value, dict) or set(value) - fields:
+        raise LevelError(f"{level_id}: the living familiar has {', '.join(sorted(fields))}")
+    kind, name, color = value.get("kind"), value.get("name"), value.get("color")
+    if kind not in KINDS or color not in KINDS[kind] or name_problem(name) is not None:
+        raise LevelError(
+            f"{level_id}: the living familiar is a kind, a colour and a name of the book"
+        )
+    source, learned = value.get("source"), value.get("learned")
+    if not isinstance(source, str) or (learned is not None and not isinstance(learned, str)):
+        raise LevelError(f"{level_id}: the living familiar's classes are programs")
+    at = _cell(shape, value.get("at"), "the living familiar")
+    if not level.familiar_walks(at):
+        raise LevelError(f"{level_id}: the living familiar stands on no cell it walks")
+    facing = value.get("facing", "down")
+    if facing not in FACINGS:
+        raise LevelError(f"{level_id}: the living familiar faces up, down, left or right")
+    return Living(kind, name, color, source, at, facing, learned)
+
+
+def _orders(
+    value: Any, shape: _Shape, level: "Level", stage: str
+) -> tuple[tuple[Order, ...], str | None]:
+    """Orla's orders after the program (D267): `{"on": <plate>, "steps": [{"to": [x, y],
+    "key": <words>}...]}`, given when the familiar ends on that plate."""
+    if value is None:
+        return (), None
+    level_id = level.id
+    if stage != "living" or not isinstance(value, dict) or set(value) != {"on", "steps"}:
+        raise LevelError(f"{level_id}: a living level's orders follow a plate, step by step")
+    plates = {thing.id for thing in level.things if thing.kind == "plate"}
+    if value["on"] not in plates:
+        raise LevelError(f"{level_id}: the orders follow a plate of the level")
+    steps = value["steps"]
+    if not isinstance(steps, list) or not steps:
+        raise LevelError(f"{level_id}: the orders have their steps")
+    found = []
+    for step in steps:
+        if not isinstance(step, dict) or set(step) != {"to", "key"}:
+            raise LevelError(f"{level_id}: an order is a cell and its words' key")
+        to = _cell(shape, step["to"], "an order's cell")
+        if not isinstance(step["key"], str) or not step["key"].isidentifier():
+            raise LevelError(f"{level_id}: an order's words' key is a name")
+        found.append(Order(to, step["key"]))
+    return tuple(found), value["on"]
+
+
+def _told_won(value: Any, level: "Level") -> tuple[tuple[str, str], ...]:
+    """What is said at the end of a run won (D264): `{"won": [["orla", "won"], ...]}`,
+    each said by an actor of the level or a voice of its scene."""
+    if value is None:
+        return ()
+    level_id = level.id
+    said = value.get("won") if isinstance(value, dict) and set(value) == {"won"} else None
+    if not isinstance(said, list):
+        raise LevelError(f"{level_id}: told is what is said when the run is won")
+    speakers = {actor.id for actor in level.actors} | set(level.voices)
+    found = []
+    for entry in said:
+        if not (
+            isinstance(entry, list) and len(entry) == 2 and all(isinstance(e, str) for e in entry)
+        ):
+            raise LevelError(f"{level_id}: told says who speaks and the words' key")
+        if entry[0] not in speakers:
+            raise LevelError(f"{level_id}: told's {entry[0]} is no one of the level or its scene")
+        found.append((entry[0], entry[1]))
+    return tuple(found)
+
+
 #: What a scene's letters are when it gives no table of its own (D65): wall,
 #: floor, shelf and a low cell, as in a level's map.
 DEFAULT_TERRAINS = {
@@ -1226,9 +1631,12 @@ class Scene:
     forbidden: dict[str, Any] | None = None
     #: The boxes of cells that hide every figure in them, x0, y0, x1, y1 (D135).
     enchanted: tuple[tuple[int, int, int, int], ...] = ()
+    #: Where someone painted into the scene speaks from, by id, each [x, y] (D264).
+    voices: dict[str, list[int]] = field(default_factory=dict)
 
     def walks(self, x: int, y: int) -> bool:
-        return bool(self.terrains[self.rows[y][x]]["walk"])
+        """Whether the wizard and everyone walks a cell: not a familiars' passage (D270)."""
+        return self.terrains[self.rows[y][x]]["walk"] is True
 
 
 def read_scene(scenes: Path, scene_id: Any, level_id: Any = None) -> Scene:
@@ -1253,13 +1661,15 @@ def read_scene(scenes: Path, scene_id: Any, level_id: Any = None) -> Scene:
             raise LevelError(f"{scene_id}: a terrain is one letter, not S or E, with its kind")
         if not isinstance(terrain.get("kind"), str):
             raise LevelError(f"{scene_id}: the terrain {letter} needs its kind")
-        walk = bool(terrain.get("walk", False))
+        # A familiars' passage is walked by a familiar alone, `"walk": "small"` (D270).
+        raw = terrain.get("walk", False)
+        walk: bool | str = "small" if raw == "small" else bool(raw)
         terrains[letter] = {
             "kind": terrain["kind"],
             "walk": walk,
-            "sight": bool(terrain.get("sight", walk)),
+            "sight": bool(terrain.get("sight", walk is True)),
             # Floor flies; a terrain no one walks on flies only when it says so (D186).
-            "fly": walk or bool(terrain.get("fly", False)),
+            "fly": walk is True or bool(terrain.get("fly", False)),
         }
     unknown = sorted({char for row in rows for char in row} - set(terrains))
     if unknown:
@@ -1278,7 +1688,13 @@ def read_scene(scenes: Path, scene_id: Any, level_id: Any = None) -> Scene:
         raise LevelError(f"{scene_id}: forbidden is a reason and its cells")
     props = tuple(about.get("props", []))
     enchanted = _enchanted(about.get("enchanted", []), scene_id, rows, terrains)
-    return Scene(scene_id, rows, terrains, things, props, rooms, forbidden, enchanted)
+    voices = about.get("voices", {})
+    if not isinstance(voices, dict) or not all(
+        isinstance(cell, list) and len(cell) == 2 and all(isinstance(v, int) for v in cell)
+        for cell in voices.values()
+    ):
+        raise LevelError(f"{scene_id}: voices are named, each a cell [x, y]")
+    return Scene(scene_id, rows, terrains, things, props, rooms, forbidden, enchanted, voices)
 
 
 def _enchanted(
@@ -1294,7 +1710,7 @@ def _enchanted(
         for y in range(y0, y1 + 1):
             for x in range(x0, x1 + 1):
                 inside = 0 <= y < len(rows) and 0 <= x < len(rows[y])
-                if not inside or not terrains[rows[y][x]]["walk"]:
+                if not inside or terrains[rows[y][x]]["walk"] is not True:
                     raise LevelError(f"{scene_id}: the enchanted cell {x},{y} is not floor")
     return tuple(tuple(box) for box in boxes)
 
@@ -1351,7 +1767,9 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
         line = []
         for char in row:
             terrain = scene.terrains[char]
-            if terrain["walk"]:
+            if terrain["walk"] == "small":
+                line.append(SMALL)
+            elif terrain["walk"]:
                 line.append(FLOOR)
             elif terrain.get("fly"):
                 line.append(LOW)
@@ -1379,7 +1797,7 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
     built["terrain"] = list(scene.rows)
     built["terrains"] = {letter: terrain["kind"] for letter, terrain in scene.terrains.items()}
     built["walked"] = sorted(
-        letter for letter, terrain in scene.terrains.items() if terrain["walk"]
+        letter for letter, terrain in scene.terrains.items() if terrain["walk"] is True
     )
     if scene.props:
         built["props"] = list(scene.props)
@@ -1393,6 +1811,8 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
         built["forbidden"] = [scene.forbidden, own] if own is not None else scene.forbidden
     if scene.enchanted:
         built["enchanted"] = [list(box) for box in scene.enchanted]
+    if scene.voices:
+        built["voices"] = {who: list(cell) for who, cell in scene.voices.items()}
     dark = data.get("dark")
     if isinstance(dark, list):
         missing = [room for room in dark if room not in scene.rooms]
@@ -1416,7 +1836,10 @@ STORY_DOINGS = (
     "close",
 )
 #: The lights a story may be told under, besides its scene's own (D124).
-STORY_LIGHTS = ("morning",)
+STORY_LIGHTS = ("morning", "sunset")
+#: The stills a story's steps may be told over (D251): the welcome's painting of the
+#: castle, which the opening tells its first steps over and `the-end-of-the-year` its last.
+STILLS = ("castle",)
 
 
 def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
@@ -1637,30 +2060,40 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
         raise LevelError(f"{story_id}: a story has its steps")
-    # Whether the steps so far are all told over the story's still (D251), and all hold
-    # its letter before it (D257).
-    over_still = True
+    # The steps told over the story's still (D251) are its first ones in a row, or its
+    # last ones; the steps that hold its letter before it are its first ones (D257).
+    still_name = data.get("still")
+    if still_name is not None and still_name not in STILLS:
+        raise LevelError(f"{story_id}: a story's still is one of {', '.join(STILLS)}")
+    over = [isinstance(step, dict) and "still" in step for step in steps]
+    told_over = [index for index, mark in enumerate(over) if mark]
+    if (
+        told_over
+        and told_over != list(range(len(told_over)))
+        and told_over != list(range(len(steps) - len(told_over), len(steps)))
+    ):
+        raise LevelError(
+            f"{story_id}: the steps over the still are the first, or the last, in a row"
+        )
+    # A figure painted into the scene speaks from its spot (D264).
+    voices = set(scene.voices)
     holding_letter = True
     for number, step in enumerate(steps, 1):
         here = f"{story_id}, step {number}"
         if not isinstance(step, dict):
             raise LevelError(f"{here}: a step is an object")
         who, doing = step.get("who"), step.get("do")
-        if who != "voice" and who not in where:
+        if who != "voice" and who not in where and who not in voices:
             raise LevelError(f"{here}: {who} is no one in the story")
         if "still" in step:
             if step["still"] is not True:
                 raise LevelError(f"{here}: still is true, or not given")
-            if data.get("opening") is not True:
+            if data.get("opening") is not True and still_name is None:
                 raise LevelError(
                     f"{here}: a step is told over the still only in a story that has one"
                 )
-            if not over_still:
-                raise LevelError(f"{here}: the steps over the still are the first, in a row")
             if who != "voice" or doing is not None:
                 raise LevelError(f"{here}: a step over the still is the voice's, and does nothing")
-        else:
-            over_still = False
         if "letter" in step:
             if step["letter"] is not True:
                 raise LevelError(f"{here}: letter is true, or not given")
@@ -1805,7 +2238,7 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
                         shut.update(doors[value])
         if vanishing:
             where[who] = None
-        if who != "voice" and where[who] is None and not vanishing:
+        if who != "voice" and who in where and where[who] is None and not vanishing:
             raise LevelError(f"{here}: {who} speaks out of sight")
 
     world_actors = []

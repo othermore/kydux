@@ -137,9 +137,15 @@ def test_a_wrong_answer_does_not_win(directory, wrong):
 def test_the_starting_code_runs_without_an_error(directory, lang, gender):
     """The starting code runs; but a fix level's given program may stop where the world
     refuses what it asks, the error the level is about: untying a broom with no knot
-    (D183)."""
+    (D183); and a fix level that names its `fault` stops with that explanation and no
+    other (D272)."""
     text = json.loads((directory / f"text.{lang}.json").read_text(encoding="utf-8"))
-    result = run_code(load(directory), for_wizard(text["starting_code"], gender))
+    level = load(directory)
+    result = run_code(level, for_wizard(text["starting_code"], gender, lang=lang))
+    if level.fault is not None:
+        assert result.status == "error", f"{directory.name}'s given program stops nowhere"
+        assert (result.error.explanation or {}).get("kind") == level.fault, result.error
+        return
     refused = (
         load(directory).kind == "fix"
         and result.error is not None

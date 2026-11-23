@@ -287,6 +287,10 @@ def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
     wanted = {
         f"notebook.{role}.{member}" for role, members in api.MEMBERS.items() for member in members
     }
+    # A member of the child's own class the notebook explains, the familiar's go_to (D269).
+    wanted |= {
+        f"notebook.{role}.{member}" for role, members in api.OWN.items() for member in members
+    }
     wanted |= {f"things.{kind}" for kind in level.THING_KINDS}
     # The notebook's spells and words (D80): every spell the world casts, and every
     # word a level gives.

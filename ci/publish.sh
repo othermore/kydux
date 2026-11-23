@@ -7,9 +7,11 @@
 #   ci/publish.sh --dry-run   build and make the commit, push nothing, and say
 #                             where the commit is
 #
-# The branch holds the built files alone: app/dist without its source maps, CNAME,
-# the name the site answers to, and .nojekyll, which has GitHub serve the files as
-# they are. Each publication is one commit on top of the branch's last; nothing of
+# The branch holds the built files alone: app/dist without its source maps and
+# without the levels' solutions (__debug/, which the tester's mode reads on a
+# computer of one's own and on a server of trials), CNAME, the name the site
+# answers to, and .nojekyll, which has GitHub serve the files as they are. Each
+# publication is one commit on top of the branch's last; nothing of
 # the branch is rewritten. The push is made inside the hours Kydux is seen working
 # on GitHub (ci/hours.py) and refused outside them. The tree holds no change that
 # is not committed, so that what is published is a commit's build.
@@ -81,7 +83,7 @@ esac
 
 echo "==> Copying $dist onto the branch $BRANCH"
 find "$site" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-rsync -a --exclude='*.map' "$dist"/ "$site"/
+rsync -a --exclude='*.map' --exclude='/__debug/' "$dist"/ "$site"/
 printf '%s\n' "$HOST" > "$site/CNAME"
 : > "$site/.nojekyll"
 

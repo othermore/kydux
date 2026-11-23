@@ -1,7 +1,8 @@
 """The published game: one policy in every place that states it, and ci/publish.sh.
 
 The Content-Security-Policy of the game's own servers is written in three files, and
-the published game's in two (D14, D19, D329): each must say what the others say. The
+the published game's in two (D14, D19, D329): each must say what the others say. A
+publication holds no solution of a level (D333). The
 script's test makes a scratch repository with a copy of ci/publish.sh, a bare
 repository to publish to and a folder that stands for the build, and runs
 `ci/publish.sh --dry-run`, which pushes nothing and runs at any hour.
@@ -107,6 +108,8 @@ def scratch(tmp_path: Path) -> Path:
     (built / "index.html").write_text("<!doctype html>\n")
     (built / "assets" / "main.js").write_text("// built\n")
     (built / "assets" / "main.js.map").write_text("{}\n")
+    (built / "__debug" / "solution").mkdir(parents=True)
+    (built / "__debug" / "solution" / "the-gate").write_text("wizard.move_right(3)\n")
     return work
 
 
@@ -133,7 +136,12 @@ def site_of(done: subprocess.CompletedProcess) -> Path:
     return Path(found.group(1))
 
 
-def test_a_publication_is_the_build_with_its_name_and_no_maps(scratch: Path) -> None:
+def test_the_solutions_are_packed_in_the_folder_a_publication_leaves_out() -> None:
+    assert "join(publicDir, '__debug', 'solution')" in read("app/scripts/pack-world.mjs")
+    assert "--exclude='/__debug/'" in read("ci/publish.sh")
+
+
+def test_a_publication_is_the_build_with_its_name_and_no_maps_or_solutions(scratch: Path) -> None:
     done = publish(scratch)
     assert done.returncode == 0, done.stderr
     site = site_of(done)

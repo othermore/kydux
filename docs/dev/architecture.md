@@ -5113,11 +5113,12 @@ one overturns stays, marked as superseded.
   `"leave": true`; the wizard may leave only where D310 lets it. The world's check holds
   every leaving walk to end at one of the two ways out, and the art's check holds every
   way-out cell to hide a figure whole. Stairs a figure goes down to leave are floor a
-  story walks. The one figure that fades is a ghost (an actor of kind `ghost`), which
-  goes as a ghost does, with `"vanish": true` once its words are said: Eldra in *El banco
-  de varitas*. A spell's own creature undone by a spell (a trial dissolved, D262) is the
-  spell's doing, not a leaving. Rules out a fade in the middle of a corridor, a walk that
-  ends at a dead end and a figure taken away while any of it is seen.
+  story walks. The figures that fade are the script's own (D322): a ghost (an actor of
+  kind `ghost`), which goes as a ghost does, with `"vanish": true` once its words are
+  said, Eldra in *El banco de varitas*; a creature a spell calls or sends away (kind
+  `familiar`); and a thing not well made that comes apart (a trial dissolved, D262).
+  Rules out a fade in the middle of a corridor, a walk that ends at a dead end and a
+  figure taken away while any of it is seen.
 - **D320 — A story may go on from the one before with nothing between.** Decided
   2026-11-22 by the owner, of the join between *Lo que trajo el familiar* and *El fin de
   curso* (*sale la pantalla de carga, luego brevemente el castillo, y luego otra vez Orla
@@ -5151,6 +5152,36 @@ one overturns stays, marked as superseded.
   is played; `data-camera-fit` says the new framing from the step's start and
   `data-camera-travel` is `true` while the camera travels. A step reached any other way
   (Back, a step played again, a part's start, the dark of D280, a window resized) is
-  framed at once. The words said meanwhile keep on their speaker and rest inside what the
-  new framing shows. Rules out a cut inside a part: a cut is a part's change (D280,
+  framed at once. The step's doings are played from the travel's start and the voice's
+  words show at once in their band; a figure's words wait for the camera, their bubble
+  coming up once it has arrived, over a picture that does not move (D318). A framing a
+  step gives for its dialogue's sake travels as any other (the owner, asked whether every
+  change of framing inside a part may be a travel: *A veces hay que cambiar por un
+  diálogo creo, no?*): the passage's two halves in *La voz en el túnel*, each framed for
+  who speaks there. Where a part gives no framing, the camera keeps whoever the step is
+  about, gliding (D74). Rules out a cut inside a part: a cut is a part's change (D280,
   D309).
+- **D322 — Nobody fades into a scene: who comes in walks in by a way in.** Decided
+  2026-11-22 by the owner, asked whether D319 holds for who comes in (*También a los que
+  entran, salvo las excepciones en las que por guión aparecen o desaparecen. Y salvo los
+  personajes que ya están en la escena cuando empieza la escena, que son la mayoría de
+  los casos*) and who may still fade (*los que aparecen con un hechizo como los
+  familiares o desaparecen cuando se desvanecen porque no estaban bien creados, también
+  son excepciones*). A figure that comes into a scene once the scene has started walks or
+  flies in, whole and solid, by one of D319's ways turned round. *The picture's edge*: on
+  a side where the painting has no margin, the figure starts past the edge, where the
+  frame hides it, and comes in at its own pace onto a cell of the scene's edge; a story
+  writes `{"enter": [x, y]}`, with `"flying": true` for one that comes through the air.
+  *A cover inside the picture*: the figure comes out from behind a thing on the cell
+  beside (`appear` with `from`, D128), or `enter` names a way-out cell (`"out": true`),
+  where the figure is set behind the cover and its walk brings it out. Several that come
+  in by one cell of the edge come in single file, in the order the step names them. A
+  figure in the scene when the scene, or a part of it, starts is staged there (`at`) and
+  is no entrance, and a story stages there whoever the moment finds there: who has
+  knocked stands outside the door, the racer just behind is in the air over the course.
+  The script's exceptions keep their fade, in and out: a ghost (kind `ghost`), a creature
+  a spell calls or sends away (kind `familiar`), and a thing not well made that comes
+  apart (D262). The world's check holds a bare `appear` and a bare `vanish` to those two
+  kinds of actor, and every `enter` to a cell of the edge the figure may stand on, or fly
+  over, or to a way-out cell; the art's check holds no figure to come in by an edge with
+  a margin. Rules out a figure that fades in on a path, in a doorway or in the air.

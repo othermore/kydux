@@ -4,7 +4,10 @@ Asked by the owner on 2026-11-22, after trying sprint 59's last
 piece: four comments on the stories of chapter 5. Two of them are
 the designer's own commit, made before this plan (section 6).
 This sprint builds the other two, and the camera's travel that
-the first of them needs. The owner's words head each decision of
+the first of them needs. Section 7 holds the owner's answers of
+the same day to the plan's three questions: who comes in walks
+in too (D322), which figures still fade, and the words that wait
+for the camera. The owner's words head each decision of
 section 1.
 
 **Where it is today.**
@@ -51,8 +54,9 @@ Each is in `docs/dev/architecture.md` in full.
   no pueden desvanecerse, deben abandonar la escena por un lugar
   adecuado. [...] Eso debe ser así SIEMPRE.* Two ways out: the
   picture's edge, walked past; or a cell behind a cover that
-  hides a figure whole (`"out": true`). The one figure that
-  fades is a ghost.
+  hides a figure whole (`"out": true`). The figures that fade
+  are the script's own: a ghost, a creature a spell calls (a
+  familiar), a thing not well made that comes apart.
 - **D320 — A story may go on from the one before with nothing
   between.** The owner: *la transición debe ser inmediata [...]
   No puede haber nada en medio, solo el cambio de música justo
@@ -65,6 +69,14 @@ Each is in `docs/dev/architecture.md` in full.
   cámara* (D318): Orla's way down the stairs is outside the
   hall's framing, and the framing that shows it is reached by a
   travel, not a cut.
+- **D322 — Nobody fades into a scene: who comes in walks in by
+  a way in.** The owner: *También a los que entran, salvo las
+  excepciones en las que por guión aparecen o desaparecen. Y
+  salvo los personajes que ya están en la escena cuando empieza
+  la escena, que son la mayoría de los casos*, and *los que
+  aparecen con un hechizo como los familiares o desaparecen
+  cuando se desvanecen porque no estaban bien creados, también
+  son excepciones*. Section 7.
 - **D317 and D318**, built by the designer (section 6): Next
   waits while a story goes on by itself, and a part comes out of
   the dark already framed.
@@ -81,9 +93,9 @@ Each is in `docs/dev/architecture.md` in full.
 - `"vanish": true` with a `walk` is an error; its message names
   `leave` and D319.
 - A bare `{"vanish": true}` is the step's speaker's alone, as
-  today, and only where that speaker is an actor of kind
-  `ghost`. In a story's last step it is an error: it would never
-  be played.
+  today, and only where that speaker is an actor of kind `ghost`
+  or `familiar` (the script's exceptions, D322). In a story's
+  last step it is an error: it would never be played.
 
 **The world's check** (`story_on_scene`). A walk that leaves ends
 in one of two ways; any other is a `LevelError` that names the
@@ -129,7 +141,7 @@ the wizard's (a part's last step alone).
   alpha. The wizard's and the actors' alike. A seek back, a step
   played again and Back bring the figure to where the step finds
   it, in sight.
-- `vanish` keeps its fade, for the ghost.
+- `vanish` keeps its fade, for the ghost and the familiar.
 - A `meanwhile` speaker that leaves keeps its words where it was
   last seen (D310).
 
@@ -198,10 +210,14 @@ does not.
   reached by Next from the step before it, in the same part, and
   frames another place than the one held. Every other way of
   reaching a step frames at once.
-- The step's events are played from the travel's start. A bubble
-  keeps on its speaker while the camera travels and is laid out
-  for what the new framing shows (`shown`, `shownSides` give the
-  travel's end).
+- The step's events are played from the travel's start, and
+  the voice's words show at once in their band. A figure's
+  bubble waits for the camera: it comes up once the travel has
+  ended (and once the figure's doings have, as ever), laid out
+  for what the new framing shows (`shown`, `shownSides`), over a
+  picture that does not move. The owner's *debería estar
+  encuadrada ya de modo que luego entre el diálogo* (D318) holds
+  here as it does after the dark.
 - *the-trail*: step 6 says `"camera": {"fit": [[4, 4], [15,
   14]]}`, the hall from Orla's place to the stairs' foot; step 7
   says `"camera": {"fit": [[4, 2], [15, 11]]}` again, as the
@@ -279,7 +295,7 @@ A, each failing with an error that names both:
 - **pytest** (`world/tests`): a walk that leaves by each edge;
   one that reaches the border sideways, one that ends inside the
   map on a plain cell, `leave` with no walk, a walk with
-  `vanish`, a bare `vanish` by one who is no ghost and one in a
+  `vanish`, a bare `vanish` by a teacher and one in a
   last step: each its error. A terrain `out` with no `"walk":
   "story"`. `continues`: each of the five rules broken on a copy
   of the two stories. The content as it is passes.
@@ -313,7 +329,9 @@ A, each failing with an error that names both:
     its step 32: the still shows. B opened by its address: as
     today.
   - *the-voice-in-the-tunnel*, 2: the travel begins and ends,
-    and Back from step 2 frames at once.
+    no bubble shows while `data-camera-travel` is `true` and the
+    step's bubble shows after it; Back from step 2 frames at
+    once.
 
 ### 2.5 What the owner will try
 
@@ -325,22 +343,25 @@ A, each failing with an error that names both:
    dormitory by the corridor's left end; Zarek and then the
    three walk into an archway, darken and are gone behind the
    wall.
-3. Chapters 1 to 3: *La primera noche* 5, *De noche* 9, *Os han
-   visto* 9, *Las voces* 7.
+3. Chapters 1 to 3: *La primera noche* 5, *Después del
+   anochecer* 9, *Atrapados* 9, *Voces en el muro* 7.
 4. Chapter 5, *Lo que trajo el familiar* to its end, then Next
    on *Hay algo que debes saber*: nothing moves, the music
    turns, a breath with no words, and Orla says *Esa voz en las
    paredes tiene nombre*. No waiting screen, no castle.
-5. *La voz del túnel*: the camera travels between the passage's
-   two halves.
+5. *La voz en el túnel*: the camera travels between the
+   passage's two halves, and each bubble comes up once the
+   camera has arrived.
+6. Who comes in: the list of section 7.6.
 
 ### 2.6 What is left out, and why
 
-- **Who comes into a scene.** `appear` fades a figure in, eleven
-  times in seven stories (D128's step from behind a thing is the
-  twelfth use). The owner's rule speaks of who leaves; whether
-  it holds for who comes in is asked of the owner with this
-  plan, and is an addendum here if so.
+- **A way in or out across a painted margin.** `the-field` and
+  `the-library` have a margin on every side (D83): a figure past
+  the map's edge there stands in sight on the margin. No figure
+  leaves or comes in by their edges; a way across a margin, for
+  a path the painting carries to its own edge, is a later
+  plan's.
 - **A trial dissolved** (D262) and a thing picked up or given:
   a spell's doing and a hand's, not a leaving.
 - **A door between the two stories' items on the map.** The map
@@ -371,6 +392,10 @@ entrance's tunnel cells and its cover's top edge, the art's
 check. A picture of each step's end for the report, of the
 commit as it is.
 
+Between 3.3 and 3.4 comes section 7's piece, *who comes in*
+(D322), with its own commit: it stages a figure on the hall's
+stairs, which 3.3 makes floor a story walks.
+
 ### 3.4 The story that goes on in place (D320; 2.3)
 
 The key, the world's check, the background load, the join, the
@@ -378,10 +403,11 @@ music's answer, the held moment.
 
 ### 3.5 The documents, the whole check and the report
 
-`docs/dev/architecture.md`: the events' table (`vanish`, a row
-for `leave`, the move off the map), the story format where it
-tells `vanish` (D74's and D103's lines, D310), the terrain's
-`out` beside D288, the modules' list (camera, stories, story,
+`docs/dev/architecture.md`: the events' table (`vanish`,
+`appear`, a row for `leave` and one for `enter`, the move off
+the map), the story format where it tells `vanish` and `appear`
+(D74's and D103's lines, D128, D310), the terrain's `out` beside
+D288, the modules' list (camera, stories, story,
 music). `docs/dev/plan.md` if a piece's shape differs from this
 plan. Present tense throughout. Then `ci/check.sh --e2e` whole,
 the report in Spanish and the prompt for the reviewer.
@@ -400,17 +426,19 @@ giving it.
 You are CLAUDE-programmer on Kydux, at /home/other/Projects/kydux.
 
 This is sprint 60, from the owner's four comments of 2026-11-22
-on chapter 5's stories. The designer has built two of them
-already (Next waits while time passes, D317; a part comes out of
-the dark framed, D318). You build the other two and the camera's
-travel they need. Build on the last commit of main as you find
-it.
+on chapter 5's stories and the owner's answers of the same day.
+The designer has built two of the comments already (Next waits
+while time passes, D317; a part comes out of the dark framed,
+D318). You build the rest: the camera's travel, who leaves, who
+comes in, and a story that goes on in place. Build on the last
+commit of main as you find it.
 
 Read first: CLAUDE.md, .claude/working-model.md,
-docs/dev/README.md, docs/dev/sprint-60.md (this plan, whole),
-and in docs/dev/architecture.md D74, D92, D128, D199, D280,
-D288, D306, D309, D310, D314, D316 and D317 to D321. Then your
-memory notes kydux-sprint-59-state, kydux-mask-fit-not-figure,
+docs/dev/README.md, docs/dev/sprint-60.md (this plan, whole;
+section 7 is part of it), and in docs/dev/architecture.md D74,
+D83, D92, D128, D199, D262, D280, D288, D306, D309, D310, D314,
+D316 and D317 to D322. Then your memory notes
+kydux-sprint-59-state, kydux-mask-fit-not-figure,
 kydux-checks-per-piece, kydux-report-images-current,
 kydux-no-co-authored-by, kydux-docs-present-tense,
 kydux-commit-by-path-shared-tree and
@@ -422,8 +450,8 @@ app/src/content/stories.ts (storyEvents, framingAt's use),
 app/src/ui/story.ts (whole), app/src/main.ts (route, showStory),
 app/src/engine/scene.ts (vanish, appear, move, the dark
 columns), camera.ts (place, showPlaced, least), music.ts; the
-stories and scenes of the plan's table, with their map.txt,
-scene.json and art.json.
+stories and scenes of the plan's two tables (2.1 and 7.4), with
+their map.txt, scene.json and art.json.
 
 What is asked, in short; the plan has each in full, with the
 cells and the numbers.
@@ -431,19 +459,20 @@ cells and the numbers.
 1. The camera's travel (D321). A step reached by Next that
 frames another place than its part holds is reached by a travel
 of 0.7 s, eased, not a cut; every other way of reaching a step
-frames at once. data-camera-travel.
+frames at once. data-camera-travel. The step's doings play from
+the travel's start and the voice's words show at once; a
+figure's bubble comes up once the camera has arrived.
 
 2. A walk that leaves (D319). "leave": true at a walk's end, in
 the place of "vanish" there. The world holds every leaving walk
 to a way out: the scene's edge, the last move heading off the
 map, or a cell whose terrain says "out": true (only with
 "walk": "story"). The page walks the figure two cells past the
-edge, or to the way-out cell, and hides it at once: no fade. A
-bare "vanish" stays for the speaker of kind ghost alone, and
-never in a last step. The art's check: no leaving by an edge
-with a margin; a figure on an "out" cell shows no pixel.
+edge, or to the way-out cell, and hides it at once: no fade. The
+art's check: no leaving by an edge with a margin; a figure on an
+"out" cell shows no pixel.
 
-3. The restagings of the plan's table: nine steps in seven
+3. The restagings of the table in 2.1: nine steps in seven
 stories. The hall's stairs are walked by a story; the-trail's
 step 6 frames the stairs and step 7 the hall again; the
 entrance's three archways go on behind the wall's face to
@@ -451,7 +480,19 @@ way-out cells on row 3, the wall's cover taken up to the wall's
 top edge with the tools. Ilda's vanish at the-entrance's end is
 taken out; Eldra's stays.
 
-4. A story that goes on in place (D320). "continues" in
+4. Who comes in (D322, section 7). {"enter": [x, y]} in the
+place of "appear": the figure starts two cells past the scene's
+edge, out of sight, and comes in at its own pace onto a cell of
+the border (flying with "flying": true), or is set on a way-out
+cell behind its cover. Several by one cell come in single file.
+No fade. A bare "appear" and a bare "vanish" are held to actors
+of kind ghost or familiar; "appear" with "from" (D128) stays.
+The restagings of the table in 7.4: five figures enter by an
+edge in three steps (caught 2, the-flying-lesson 2 and 4), five
+are staged in the scene from its start (at-the-gate,
+after-dark, the-morning-after, the-finish, the-tower 18).
+
+5. A story that goes on in place (D320). "continues" in
 the-end-of-the-year; the world's five rules for the pair; the
 page loads the later story while the earlier one's last part
 shows, and at the last Next stays on its screen and its live
@@ -462,8 +503,11 @@ as long as the music takes to turn (1 s to 3 s; 1.5 s with no
 music), then the later story's first step. No waiting view, no
 still, no scene made.
 
-5. The documents in the present tense, the whole check, the
+6. The documents in the present tense, the whole check, the
 report.
+
+The pieces and their order are section 3's, with section 7's
+piece between 3.3 and 3.4.
 
 Rules that hold: per piece, ci/check.sh and only the browser
 specs the piece touches; the whole ci/check.sh --e2e once, at
@@ -478,14 +522,14 @@ child reads is asked for here; if one turns out to be needed,
 stop and say so. The report's pictures are of the commit as it
 is.
 
-Where the plan and the code disagree, or a cell of the table
-does not read well on its painting, choose what serves the
-decision's words, and say so in the report.
+Where the plan and the code disagree, or a cell of a table does
+not read well on its painting, choose what serves the decision's
+words, and say so in the report.
 
 End with the report in Spanish for the owner (what is built,
-what the owner will try, in the order of section 2.5, what you
-changed from the plan and why, the whole check's result) and the
-prompt in English for the reviewer.
+what the owner will try, in the order of sections 2.5 and 7.6,
+what you changed from the plan and why, the whole check's
+result) and the prompt in English for the reviewer.
 ```
 
 ## 6. The designer's own: Next waits, and a part comes back framed (D317, D318)
@@ -507,3 +551,207 @@ diálogo*.
 
 The test is `app/e2e/story.spec.ts`, *the hall goes dark while
 the children tell Orla, and comes back in the evening (D280)*.
+
+## 7. The owner's answers: who comes in, who still fades, and the words that wait (D322)
+
+The plan asked the owner three things. The answers, of
+2026-11-22:
+
+1. *Eldra alone fades?* **Yes**, and with her the script's own:
+   *los que aparecen con un hechizo como los familiares o
+   desaparecen cuando se desvanecen porque no estaban bien
+   creados, también son excepciones*. A ghost, a familiar a
+   spell calls or sends away, a trial that comes apart (D262).
+2. *Does the rule hold for who comes in?* **Yes**: *También a
+   los que entran, salvo las excepciones en las que por guión
+   aparecen o desaparecen. Y salvo los personajes que ya están
+   en la escena cuando empieza la escena, que son la mayoría de
+   los casos.* This section plans it.
+3. *May every change of framing inside a part be a travel?* The
+   owner: *A veces hay que cambiar por un diálogo creo, no?* Yes,
+   a step frames another place for its dialogue's sake (the
+   passage's two halves in *La voz en el túnel*), and that
+   change travels as any other; what waits is the figure's
+   bubble, which comes up once the camera has arrived (2.2).
+
+**Where it is today.** `appear` sets a figure on a cell and takes
+its alpha from nothing to 1 over 0.9 of a tick
+(`app/src/engine/scene.ts`, `case 'appear'`); with `from` the
+figure walks out from behind a thing on the cell beside (D128).
+Ten figures fade in so, in seven stories; the friend behind the
+library's shelf (*the-wand-bank*, 5) is the one use of `from`.
+The world's check (`_story_actions`, `story_on_scene`) asks of
+the cell only that it be free and that the figure be out of
+sight.
+
+### 7.1 The story's keys
+
+- `{"enter": [x, y]}`, by an actor that is not in the scene: an
+  actor with no `at` that has not come in, as `appear` asks
+  today. With `"flying": true` the figure comes in through the
+  air, as `appear` takes it today. The wizard never enters: it
+  is staged.
+- The cell is a way in, of one of two kinds.
+  1. *The edge.* A cell on the scene's border, no corner, that
+     the figure may stand on, or fly over when it comes flying.
+     The figure comes in from past that side: left of column 0,
+     above row 0, right of the last column, under the last row.
+  2. *A way-out cell.* A cell whose terrain says `"out": true`
+     (2.1). The figure is set there, behind the cover, and its
+     walk brings it out.
+- Figures that enter by one cell of the edge in one step come in
+  single file, in the order the step names them.
+- A bare `appear` (no `from`) and a bare `vanish` are an actor's
+  of kind `ghost` or `familiar` alone. By any other figure each
+  is an error; its message names `enter`, or `leave`, and D322.
+- `appear` with `from` (D128) stays as it is, for any actor.
+- A figure in the scene when the story, or a part, starts says
+  `at` in the staging, as today. That is no entrance, whether
+  the first framing shows the figure or not.
+
+### 7.2 The world's check
+
+`_story_actions` takes `enter`, alone or with `flying`.
+`story_on_scene` holds it so; each failure is a `LevelError`
+that names the story, the step, the figure and the cell.
+
+- The figure is out of the scene (the error `appear` gives
+  today for one already in sight).
+- The cell is a way in of 7.1: on the border and no corner, or
+  an `out` cell. A cell inside the map, and a corner, each have
+  their own message.
+- A border cell is one the figure walks on (`walked`, the
+  story's floor of D288 with it), or flies over with `flying`.
+- By the edge the figure takes two ticks to reach its cell: it
+  is set two cells past the edge at the action's tick, and moves
+  one cell a tick. The k-th figure before it by the same cell in
+  the same step sets it k cells further out, and k ticks later
+  on its cell. The cell is free when the figure reaches it, by
+  the rule that holds a walk's cells free; a figure that stays
+  on the cell while one comes behind it fails by that rule.
+- By a way-out cell the figure is on its cell at the action's
+  tick.
+- A bare `appear` or `vanish` by an actor of another kind than
+  `ghost` and `familiar`.
+
+The cells past the edge are no cells of the map: nothing is
+asked of them.
+
+**The art's check** (`tools/art/sweep.py` and its test): a scene
+whose art has a `margin` on a side has no `enter` by that side's
+edge, as it has no walk that leaves by it (2.1).
+
+### 7.3 The page
+
+- `storyEvents` counts as the world does. By the edge: an event
+  `enter` at the action's tick, with the place past the edge (a
+  cell off the map, two out, or more in a file) and the way the
+  figure faces, in; then one `move` a tick, as a walk's (a
+  flight's, flying), up to the way-in cell. By a way-out cell:
+  `enter` with that cell. The figure's next action follows at
+  the next tick.
+- `scene.ts`, `case 'enter'`: the figure is placed on the cell
+  it is given, off the map as on it (2.1's move off the map),
+  shown at once with alpha 1, on its feet (D279) or in the air
+  with its shadow, its sway started. No tween of alpha. Played
+  at once (a seek, Back, a step played again), the figure is
+  where the step finds it.
+- `appear` keeps its fade for the ghost and the familiar, and
+  its step from behind a thing (D128).
+- The camera never shows past the painting (`least`), so a
+  figure past the edge is out of sight in any window. A story's
+  camera that keeps the step's figure (D74) keeps the cells of
+  the scene: it is not asked to look past the edge.
+- The scene's handle tells of a figure what it tells today (its
+  cell, whether it is drawn, its alpha), a figure past the edge
+  with the cell it is on.
+
+### 7.4 The restagings
+
+Five figures come in by an edge, in three steps; five are in
+the scene when it starts, because the moment finds them there
+or because the picture gives no edge to come in by. Look at
+each with a picture of the step's start and of its end, and
+move a cell where the painting asks for it.
+
+| Story, step | Scene | Who | Comes in |
+|---|---|---|---|
+| `caught`, 2 | `the-way-down` | Dask | `enter [10, 14]`, then `walk [10, 13]`: out of the dark at the picture's foot, onto the children |
+| `the-flying-lesson`, 2 | `the-broom-shed` | Ilda, the girl, the boy | by the path at the picture's foot. Ilda `enter [9, 14]`, `walk [9, 7]`, `face up`; `classmate_girl` `enter [9, 14]` behind her, `walk [9, 12]`; `classmate_boy` `enter [10, 14]`, `walk [10, 12]` |
+| `the-flying-lesson`, 4 | `the-lake-edge` | Zarek | `enter [8, 0]` flying, over the lake's water at the top edge; `fly [[8, 3], [4, 3], [4, 4], [3, 4], [3, 5]]`, `land`, `face left` |
+| `at-the-gate`, 3 | `the-field` | friend | staged from the story's start `at [8, 29]`, the path's foot, facing up, under the first framing's foot; step 3's walk is `[8, 22]`, up the path into the framing. The field has a margin under its last row: no way in by that edge (2.6) |
+| `after-dark`, 4; `the-morning-after`, 2 | `the-dormitory` | friend | staged from the story's start `at [12, 15]`, facing up, in the corridor outside the common room's door: who knocks stands there. The step keeps `walk [12, 12]` and `face down`, through the door the wizard has opened |
+| `the-finish`, 1 | `the-race-course` | Zarek | staged from the story's start in the air, `at [26, 12]`, the story's `"flying"` naming him with the wizard: the racer just behind. The step keeps `fly [32, 12]` and `land` |
+| `the-tower`, 18 | `the-tower-hall` | mate | staged in the part `at [9, 12]`, facing up, on the landing under the arch, behind the friend (floor a story walks, 2.1). The walk is as written |
+| `the-wand-bank`, 5 | `the-library` | friend | stays: out from behind the shelf (D128) |
+
+*The lake.* Zarek's line says he crossed the lake on his first
+day; he comes over it. If his figure reads badly against the
+trees' crowns at the top edge, he comes by the left edge
+instead: `enter [0, 2]` flying, `fly [[3, 2], [3, 3], [4, 3],
+[4, 4], [3, 4], [3, 5]]`.
+
+*The dormitory's corridor.* The friend stands at `[12, 15]`
+through steps 1 to 3 of *after-dark* and step 1 of
+*the-morning-after*, in front of the wall's face, where a window
+that shows the corridor shows them. That is the knock's own
+picture.
+
+### 7.5 The tests
+
+- **pytest**: `enter` by each edge and flying over water at the
+  edge; on a corner, on a cell inside the map, on a border cell
+  that is a wall, by a figure already in the scene, with a key
+  that is not its own: each its error. Two by one cell: the
+  second is on the cell a tick after the first; a first that
+  stays on the cell fails. `enter` on an `out` cell. A bare
+  `appear` and a bare `vanish` by a `friend`: each its error;
+  by a `familiar` and by a `ghost`: accepted. The content as it
+  is passes.
+- **The art's check**: an `enter` by an edge with a margin.
+- **vitest**: `storyEvents` for an entrance by each edge (the
+  `enter` two cells out, the two moves, the next action's tick),
+  for a file of two, for one flying, for an `out` cell; a seek
+  to a tick inside the entrance.
+- **Browser** (`app/e2e/story.spec.ts` and the chapters' specs
+  that play these stories):
+  - *caught*, 2: at the step's start Dask is drawn and nothing
+    of him is inside what the camera shows; his alpha is 1 from
+    the step's start to its end; he ends on `[10, 13]`. Again
+    plays the entrance anew; Back from step 3 finds him on
+    `[10, 13]`.
+  - *the-flying-lesson*, 2: the three end on `[9, 7]`,
+    `[9, 12]` and `[10, 12]`, none ever translucent, the girl
+    never on Ilda's cell. Step 4: Zarek is in the air from the
+    step's start and lands on `[3, 5]`.
+  - *at-the-gate*: the friend is on `[8, 29]` at step 1 and on
+    `[8, 22]` at step 3's end, alpha 1 throughout.
+  - *after-dark*, 1: the friend is on `[12, 15]`.
+  - The specs that wait for an `appear` in these steps wait for
+    what the step does here.
+
+### 7.6 What the owner will try
+
+1. Chapter 3, *Atrapados*, 2: Dask walks in from the dark at
+   the picture's foot and stops in front of the three.
+2. Chapter 4, *La clase de vuelo*, 2: Ilda and two classmates
+   come up the path into the shed, one behind another. At 4,
+   Zarek comes flying over the lake and lands by the class.
+3. Chapter 1, *Ante la puerta*, 3: the friend comes up the path
+   from below the frame.
+4. Chapter 3, *Después del anochecer*, 4, and chapter 4, *La
+   mañana siguiente*, 2: the friend is outside the door from the
+   start, and comes in when the door is open.
+5. Chapter 4, *La meta*, 1: Zarek is in the air behind the
+   wizard, flies in and lands.
+6. Chapter 5, *La torre*, 18: the mate comes up from the landing
+   behind the other two.
+
+### 7.7 The piece
+
+One piece, *who comes in*, after 3.3 and before 3.4, with its
+own commit: the key, the world's check, the art's check,
+`storyEvents`, the scene's `enter`, the eight restagings, the
+tests. `ci/check.sh` and the browser specs it touches. For the
+report, a picture of each step's start and end, of the commit as
+it is.

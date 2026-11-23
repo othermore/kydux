@@ -15,5 +15,10 @@ later, like the rest of it.
 - Its lit plates (`tower-hall-lit.md`), its light at sunset
   (`tower-hall-sunset.md`) and its archway marked for the cut
   (`tower-hall-arch-marked-2.md`) are Gemini's edits of that painting.
+- The sun's and the star's engravings made as dark as the moon's by it
+  (`tower-hall-sun-engraving.md`, `tower-hall-star-engraving.md`), and at
+  sunset the same (`tower-hall-sun-engraving-sunset.md`,
+  `tower-hall-star-engraving-sunset.md`, the sun given the day's as its
+  model), each joined by `tools/art/repaint.py` in its plate's outline.
 - The familiars' tunnel's wall is cut from the painting by
   `tools/art/export_scene.py`, a polygon round its mouth less the opening.

@@ -3,11 +3,11 @@
   "sources": {
     "folder": "art/raw/game-tower-hall",
     "edits": "art/raw/game-tower-hall",
-    "painting": "tower-hall-base-4.png",
+    "painting": "tower-hall-base-6.png",
     "grid": "grid.json",
-    "ground": "tower-hall-base-4.png",
+    "ground": "tower-hall-base-6.png",
     "hours": {
-      "sunset": "tower-hall-sunset-laid.png"
+      "sunset": "tower-hall-sunset-6.png"
     }
   },
   "base": {
@@ -351,6 +351,74 @@
       }
     ]
   },
+  "sun_engraving": {
+    "about": "The sun's engraving as dark on its brass as the moon's (D304): painted by Gemini 3 Pro Image from tools/art/prompts/tower-hall-sun-engraving.md on a close crop of the painting as it is, and joined by tools/art/repaint.py in the plate's outline (`areas`), the floor round it and the painting everywhere else kept pixel for pixel.",
+    "from": "art/raw/game-tower-hall/tower-hall-base-4.png",
+    "areas": [
+      [[3362, 1067], [3360, 1089], [3353, 1111], [3342, 1131], [3327, 1148], [3309, 1163], [3288, 1173], [3265, 1180], [3242, 1182], [3219, 1180], [3196, 1173], [3175, 1163], [3157, 1148], [3142, 1131], [3131, 1111], [3124, 1089], [3122, 1067], [3124, 1045], [3131, 1023], [3142, 1003], [3157, 986], [3175, 971], [3196, 961], [3219, 954], [3242, 952], [3265, 954], [3288, 961], [3309, 971], [3327, 986], [3342, 1003], [3353, 1023], [3360, 1045]]
+    ],
+    "fade": 6,
+    "crop": [
+      2760,
+      693,
+      3720,
+      1410
+    ],
+    "canvas": "art/raw/game-tower-hall/tower-hall-sun-engraving-canvas.png",
+    "painting": "art/raw/game-tower-hall/tower-hall-base-5.png",
+    "plain": true
+  },
+  "star_engraving": {
+    "about": "The star's engraving as dark on its brass as the moon's (D304): painted by Gemini 3 Pro Image from tools/art/prompts/tower-hall-star-engraving.md on a close crop of the painting as it is, and joined by tools/art/repaint.py in the plate's outline (`areas`), the floor round it and the painting everywhere else kept pixel for pixel.",
+    "from": "art/raw/game-tower-hall/tower-hall-base-5.png",
+    "areas": [
+      [[3333, 2464], [3331, 2482], [3326, 2499], [3317, 2515], [3306, 2528], [3292, 2540], [3276, 2548], [3259, 2553], [3241, 2555], [3223, 2553], [3206, 2548], [3190, 2540], [3176, 2528], [3165, 2515], [3156, 2499], [3151, 2482], [3149, 2464], [3151, 2446], [3156, 2429], [3165, 2413], [3176, 2400], [3190, 2388], [3206, 2380], [3223, 2375], [3241, 2373], [3259, 2375], [3276, 2380], [3292, 2388], [3306, 2400], [3317, 2413], [3326, 2429], [3331, 2446]]
+    ],
+    "fade": 6,
+    "crop": [
+      2760,
+      1911,
+      3720,
+      2628
+    ],
+    "canvas": "art/raw/game-tower-hall/tower-hall-star-engraving-canvas.png",
+    "painting": "art/raw/game-tower-hall/tower-hall-base-6.png",
+    "plain": true
+  },
+  "sun_engraving_sunset": {
+    "about": "The sun's engraving as dark on its brass as the moon's (D304), at sunset: painted by Gemini 3 Pro Image from tools/art/prompts/tower-hall-sun-engraving-sunset.md on a close crop of the painting as it is, and joined by tools/art/repaint.py in the plate's outline (`areas`), the floor round it and the painting everywhere else kept pixel for pixel.",
+    "from": "art/raw/game-tower-hall/tower-hall-sunset-laid.png",
+    "areas": [
+      [[3363, 1068], [3361, 1090], [3354, 1112], [3343, 1132], [3328, 1149], [3309, 1164], [3288, 1174], [3266, 1181], [3242, 1183], [3218, 1181], [3196, 1174], [3175, 1164], [3156, 1149], [3141, 1132], [3130, 1112], [3123, 1090], [3121, 1068], [3123, 1046], [3130, 1024], [3141, 1004], [3156, 987], [3175, 972], [3196, 962], [3218, 955], [3242, 953], [3266, 955], [3288, 962], [3309, 972], [3328, 987], [3343, 1004], [3354, 1024], [3361, 1046]]
+    ],
+    "fade": 6,
+    "crop": [
+      2760,
+      693,
+      3720,
+      1410
+    ],
+    "canvas": "art/raw/game-tower-hall/tower-hall-sun-engraving-sunset-canvas.png",
+    "painting": "art/raw/game-tower-hall/tower-hall-sunset-5.png",
+    "plain": true
+  },
+  "star_engraving_sunset": {
+    "about": "The star's engraving as dark on its brass as the moon's (D304), at sunset: painted by Gemini 3 Pro Image from tools/art/prompts/tower-hall-star-engraving-sunset.md on a close crop of the painting as it is, and joined by tools/art/repaint.py in the plate's outline (`areas`), the floor round it and the painting everywhere else kept pixel for pixel.",
+    "from": "art/raw/game-tower-hall/tower-hall-sunset-5.png",
+    "areas": [
+      [[3333, 2464], [3331, 2482], [3326, 2499], [3317, 2515], [3306, 2528], [3292, 2540], [3276, 2548], [3259, 2553], [3241, 2555], [3223, 2553], [3206, 2548], [3190, 2540], [3176, 2528], [3165, 2515], [3156, 2499], [3151, 2482], [3149, 2464], [3151, 2446], [3156, 2429], [3165, 2413], [3176, 2400], [3190, 2388], [3206, 2380], [3223, 2375], [3241, 2373], [3259, 2375], [3276, 2380], [3292, 2388], [3306, 2400], [3317, 2413], [3326, 2429], [3331, 2446]]
+    ],
+    "fade": 6,
+    "crop": [
+      2760,
+      1911,
+      3720,
+      2628
+    ],
+    "canvas": "art/raw/game-tower-hall/tower-hall-star-engraving-sunset-canvas.png",
+    "painting": "art/raw/game-tower-hall/tower-hall-sunset-6.png",
+    "plain": true
+  },
   "lit_whole": {
     "about": "The base with its three plates lit, Gemini 3 Pro Image's edit from tools/art/prompts/tower-hall-lit.md, laid whole on the base by its outlines before the plates' lit states are cut from it by difference (D148).",
     "from": "art/raw/game-tower-hall/tower-hall-base-4.png",
@@ -375,7 +443,7 @@
       "row": 4,
       "reach": 1.2,
       "solid": false,
-      "without": "tower-hall-base-4.png",
+      "without": "tower-hall-base-6.png",
       "states": {
         "lit": {
           "picture": "tower-hall-lit-laid.png",
@@ -402,7 +470,7 @@
       "row": 4,
       "reach": 1.2,
       "solid": false,
-      "without": "tower-hall-base-4.png",
+      "without": "tower-hall-base-6.png",
       "states": {
         "lit": {
           "picture": "tower-hall-lit-laid.png",
@@ -428,7 +496,7 @@
       ],
       "row": 10,
       "solid": false,
-      "without": "tower-hall-base-4.png",
+      "without": "tower-hall-base-6.png",
       "states": {
         "lit": {
           "picture": "tower-hall-lit-laid.png",
@@ -628,7 +696,7 @@
       "by": -0.12
     }
   ],
-  "source": "# The tower's highest hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/game-tower-hall.md`, given its plan on the grid and the\n  design's first painting of the hall (`tools/art/prompts/scene-tower-hall.md`),\n  in the style of `art/raw/image-first/field-2k.png`.\n- Edited by it: its grid taken out and the perches and baskets that stood on\n  the walked floor taken away (`tower-hall-base.md`); the cat moved onto the\n  lectern (`tower-hall-mend.md`) and the three plates onto their cells\n  (`tower-hall-moon.md`, `tower-hall-sun.md`, `tower-hall-star.md`), each\n  mended in its box by `tools/art/repaint.py`, the painting kept elsewhere.\n- Its lit plates (`tower-hall-lit.md`), its light at sunset\n  (`tower-hall-sunset.md`) and its archway marked for the cut\n  (`tower-hall-arch-marked-2.md`) are Gemini's edits of that painting.\n- The familiars' tunnel's wall is cut from the painting by\n  `tools/art/export_scene.py`, a polygon round its mouth less the opening.\n",
+  "source": "# The tower's highest hall\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/game-tower-hall.md`, given its plan on the grid and the\n  design's first painting of the hall (`tools/art/prompts/scene-tower-hall.md`),\n  in the style of `art/raw/image-first/field-2k.png`.\n- Edited by it: its grid taken out and the perches and baskets that stood on\n  the walked floor taken away (`tower-hall-base.md`); the cat moved onto the\n  lectern (`tower-hall-mend.md`) and the three plates onto their cells\n  (`tower-hall-moon.md`, `tower-hall-sun.md`, `tower-hall-star.md`), each\n  mended in its box by `tools/art/repaint.py`, the painting kept elsewhere.\n- Its lit plates (`tower-hall-lit.md`), its light at sunset\n  (`tower-hall-sunset.md`) and its archway marked for the cut\n  (`tower-hall-arch-marked-2.md`) are Gemini's edits of that painting.\n- The sun's and the star's engravings made as dark as the moon's by it\n  (`tower-hall-sun-engraving.md`, `tower-hall-star-engraving.md`), and at\n  sunset the same (`tower-hall-sun-engraving-sunset.md`,\n  `tower-hall-star-engraving-sunset.md`, the sun given the day's as its\n  model), each joined by `tools/art/repaint.py` in its plate's outline.\n- The familiars' tunnel's wall is cut from the painting by\n  `tools/art/export_scene.py`, a polygon round its mouth less the opening.\n",
   "kept": [
     [
       8.9,

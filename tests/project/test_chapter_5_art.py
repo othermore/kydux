@@ -1,7 +1,8 @@
 """Chapter 5's figures and sprites hold what the page reads of them (D273): the fourteen
 familiars' walking sheets, half a child's height, each figure of the right-facing row
 the left-facing one turned over; Orla's sheet and Rinlo's sitting rows; the thread's and
-the trail's sprites, lying; and the hall's plates' light whole (D287)."""
+the trail's sprites, lying; the hall's plates' light whole (D287) and their figures
+dark (D304)."""
 
 import json
 import sys
@@ -124,6 +125,29 @@ def test_each_plate_s_light_is_whole_in_both_lights():
                 assert alpha[-1].max() == 255, "the wall ends the star's glow"
             else:
                 assert alpha[-1].max() == 0, name
+
+
+#: The middle of each plate on the hall's grounds, in pixels, measured on ground.webp.
+PLATES = {"moon": (625, 428), "sun": (1297, 427), "star": (1297, 979)}
+
+
+def dark_in(grey: np.ndarray, x: int, y: int) -> float:
+    """The share of a plate's middle well darker than its brass: its engraving."""
+    yy, xx = np.mgrid[0 : grey.shape[0], 0 : grey.shape[1]]
+    middle = grey[(xx - x) ** 2 + (yy - y) ** 2 < 30**2]
+    return float((middle < 0.6 * np.median(middle)).mean())
+
+
+def test_the_sun_s_and_the_star_s_figures_read_as_clearly_as_the_moon_s():
+    """D304: on both grounds the engraving on the sun's and the star's plate is as dark
+    on its brass as the moon's."""
+    hall = CONTENT / "art" / "scenes" / "the-tower-hall"
+    for ground in ("ground.webp", "ground-sunset.webp"):
+        grey = np.array(Image.open(hall / ground).convert("L")).astype(float)
+        moon = dark_in(grey, *PLATES["moon"])
+        assert moon > 0.05, ground
+        assert dark_in(grey, *PLATES["sun"]) >= moon, ground
+        assert dark_in(grey, *PLATES["star"]) >= moon, ground
 
 
 def test_the_forgotten_room_s_side_door_rests_shut_and_opens_in_two_pieces():

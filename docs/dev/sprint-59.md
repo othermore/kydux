@@ -1011,3 +1011,193 @@ not sounded, so a pad's chord comes in at its next bar.
 The designer enters D312 in `docs/dev/architecture.md` at the sprint's
 review, with the page's lines there (the file holds the programmer's
 entries of D297 to D311 until then).
+
+## 8. Added on 2026-11-22: the ending's theme, and a story that names its music
+
+The owner, hearing chapter 5's theme in its stories: *«esta
+canción […] está bien para la historia de los familiares, pero
+creo que el final, la parte final de la historia cuando van al
+despacho de Orla y le cuentan todo y ella les cuenta todo lo
+que pasó, se merece una canción final sola, que sea más intensa
+y dramática y que te deje el recuerdo (puede ser la misma
+canción en una versión más dramática e intensa, o una nueva
+canción)»*; *«y luego en la parte de historia que hace el
+cierre de todo lo que has aprendido, podemos volver a la
+anterior, a la del familiar, que es más alegre»*.
+
+### 8.1 The decisions
+
+- **D313 — The year's ending has a theme of its own, *The
+  truth*.** Decided 2026-11-22 by the owner. The designer wrote
+  it and entered it (9cdf436): `content/music/the-truth.json`,
+  the familiar's tune made grave and then great, a piano alone,
+  then the violins, then every voice. It is no chapter's theme.
+  Nothing of it is the programmer's to build.
+- **D314 — A story may name the music it is told to.** Decided
+  2026-11-22 by the owner, of the year's ending. A story's
+  `story.json` may say `music`, a theme of `content/music/`, at
+  its top: the story opens to that theme in the place of its
+  chapter's. A step may say `music` too: the theme changes as
+  that step is shown. The theme in force at a step is the last
+  one named at or before it, the story's own where no step has
+  named one, the chapter's where the story names none; so going
+  back over a step that changed the theme brings back the one
+  before it, and a step played again leaves the theme as it
+  is. The change fades as any change of theme does (D192), and
+  the new theme starts at its beginning; a theme asked for that
+  already plays goes on without a break, from a story to the
+  next too. The map, the start screen, the lessons and the
+  levels play their chapter's theme, as they do. A test holds
+  every theme a story names to be there. Rules out a theme
+  chosen by the page from a story's id, and a second theme
+  heard at once.
+
+### 8.2 What is asked
+
+**The content.** Two stories name *The truth*:
+
+- `content/stories/what-the-familiar-brought/story.json`: step
+  11 (*Subís los cuatro a la torre*), the step that changes the
+  scene to the hall, says `"music": "the-truth"`, beside its
+  `who`, not inside its `scene`. Steps 1 to 10, in the passage,
+  play the chapter's theme.
+- `content/stories/the-end-of-the-year/story.json`: at its top
+  `"music": "the-truth"`; step 32, the first told over the
+  still (*Es la cena de fin de curso*), says
+  `"music": "the-familiar"`.
+
+So *The truth* starts as the four go up to the tower, plays on
+with no break into *The end of the year*, through all that Orla
+tells, and the familiar's theme comes back with the castle's
+painting, for the dinner and the closing of what was learned.
+The texts stay as they are.
+
+**The world's check** (`world/kydux_world/level.py`,
+`story_on_scene` and `story_on_scenes`). `music` at a story's
+top and in a step is a theme's id, a string of the shape a
+story's id has; anything else is refused, with the story and
+the step named, and so is `music` inside a step's `scene`. The
+story made whole carries both as they were written: `music` at
+its top, and each step's `music` in the step.
+
+**The course** (`app/scripts/pack-world.mjs`,
+`app/src/content/course.ts`). The page must know a story's
+opening theme before it fetches the story, so that no bar of
+the chapter's theme sounds between *What the familiar brought*
+and *The end of the year*. `course.json` carries the themes the
+stories open to, by item, as it carries `scenes`:
+`"music": {"story:the-end-of-the-year": "the-truth"}`.
+`themeOf(course, item)` gives the item's own theme where the
+course has one, else its chapter's, else the first chapter's.
+`playMusicFor` in `main.ts` needs no other change.
+
+**The story's screen** (`app/src/content/stories.ts`,
+`app/src/ui/story.ts`). `Story` has `music?`, `StoryStep` has
+`music?`. A function of `stories.ts`, tested alone, gives the
+theme in force at a step: the last `music` of the steps up to
+it, else the story's, else the one given as the chapter's
+(`themeOf`, which `showStory` has the course for). Whenever the
+screen shows a step, forward, back or at its start, it asks the
+music for the theme in force, heard as a story:
+`music.play(theme, 'story')` does nothing when that theme
+already plays so, so asking at every step is right, and no
+state of the screen's own is needed. A step played again (*R*,
+the button) asks nothing new. A change of language keeps the
+theme. Where a step both changes the theme and opens a part
+after time has passed (none does today), the theme is asked as
+the step is shown, with the dark.
+
+**The tests.**
+
+- `world/tests/test_stories.py`: `music` at the top and in a
+  step is carried into the story made whole; a number, an empty
+  string, and `music` inside a `scene` are refused; the two
+  stories of the ending name what 8.2 says, at those steps and
+  no other.
+- `tests/project/test_music.py`: every theme named by a story
+  of `content/stories/`, at its top or in a step, is a file of
+  `content/music/`. The docstring of the file says so.
+- vitest: the theme in force (none named; the story's; a step's;
+  two steps; going back before the first); `themeOf` with the
+  course's `music`.
+- `app/e2e/story.spec.ts`, or `chapter-5.spec.ts` where the two
+  stories are already told to their end: *What the familiar
+  brought* opens with `data-music-theme` `the-familiar`; at step
+  11 it is `the-truth`; back at step 10 it is `the-familiar`
+  again; forward to the story's end and on into *The end of the
+  year*, it is `the-truth` at its first step with no other value
+  between; at step 32 it is `the-familiar`. A visit that starts
+  at `#story/the-end-of-the-year` has `the-truth`.
+
+**The documents.** D314 in `docs/dev/architecture.md`, in 8.1's
+words, after D313, which is there with D312; D192's sentence on
+what a story plays says a story may name its own (D314); the
+overview's lines on stories and on the course's file where
+they list what each carries. `content/music/README.md`: its
+first paragraph says a story may name a theme, at its top or in
+a step, and the row of `the-truth` says which stories play it.
+The document that gives `story.json`'s keys gains `music`.
+`docs/dev/plan.md`: D312 to D314 beside the sprint's others.
+
+### 8.3 What the owner will try
+
+1. `https://localhost:5173/?debug#music`, after the development
+   server is started again (a new theme is listed once the
+   content is packed): `the-truth` is in the list; as a story
+   hears it, a piano alone, then the violins from 0:38, then
+   every voice from 1:16.
+2. *What the familiar brought* (story 4 of chapter 5): the
+   familiar's theme while Rinlo tells in the passage; at *Subís
+   los cuatro a la torre* it fades and the piano starts. Back
+   one step: the familiar's theme again.
+3. On to *The end of the year* with Continue: the music does
+   not start again nor change; it plays on through what Orla
+   tells.
+4. At *Es la cena de fin de curso*, over the castle's painting,
+   the familiar's theme comes back, and stays to *Hasta el
+   próximo curso*.
+5. The map after it: the familiar's theme, as before.
+
+### 8.4 The prompt for CLAUDE-programmer
+
+A follow-up of the sprint's prompt, pasted without clearing the
+programmer's context.
+
+```
+A follow-up to sprint 59, from the owner's words on the music
+of the year's ending. Build it as one more piece, 59.13, after
+59.12.
+
+Read section 8 of docs/dev/sprint-59.md, which the designer has
+added and committed (the rest of the document is as it was).
+In short: the designer has written a sixth theme,
+content/music/the-truth.json (D313, commit 9cdf436, with its
+tests, its row in content/music/README.md and D312 and D313 in
+docs/dev/architecture.md); nothing of the theme is yours to
+build or to change. Yours is D314: a story's story.json may say
+"music" at its top (the theme it opens to, in the place of its
+chapter's) and in a step (the theme from that step on); going
+back over that step brings back the theme before it. 8.2 says
+how: the world's check carries both keys, course.json carries
+the themes the stories open to, by item, so that themeOf gives
+a story's own theme before the story is fetched, and the
+story's screen asks the music for the theme in force whenever
+it shows a step. Then the two stories of the ending name the
+themes as 8.2 says: what-the-familiar-brought at step 11,
+the-end-of-the-year at its top and at step 32. No bar of the
+familiar's theme may sound between the two stories.
+
+Enter D314 after D313, in 8.1's words, and bring the documents
+8.2 names to the present. The tests of 8.2. Check on the page,
+with the sound on, that the change at step 11 fades as a change
+of chapter does, that Continue into the-end-of-the-year neither
+restarts nor changes the theme, and that Back over step 11 and
+over step 32 brings back the theme before. In your report, add
+8.3 to the steps the owner will try.
+
+The rules of the sprint's prompt hold: ci/check.sh and the
+touched browser specs for the piece, the whole
+ci/check.sh --e2e once at its end; never edit content while a
+browser run is going; no Co-Authored-By; stage only your own
+hunks.
+```

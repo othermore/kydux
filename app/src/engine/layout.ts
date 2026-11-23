@@ -481,7 +481,6 @@ export function layout(level: LevelJson): Layout {
   };
 }
 
-/** In a living level, the game's familiar where it stands at the start (D269). */
 /** A level's familiar circle, from its block (D262, D284). */
 function circleOf(level: LevelJson): Pick<Layout, 'circle'> {
   const block = isRecord(level.familiar) ? level.familiar : null;
@@ -491,6 +490,7 @@ function circleOf(level: LevelJson): Pick<Layout, 'circle'> {
   return { circle: [[x0, y0], [x1, y1]] };
 }
 
+/** In a living level, the game's familiar where it stands at the start (D269). */
 function livingOf(level: LevelJson): Pick<Layout, 'living'> {
   const block = isRecord(level.familiar) ? level.familiar : null;
   const living = isRecord(block?.living) ? block.living : null;

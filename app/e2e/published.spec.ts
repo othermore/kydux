@@ -254,6 +254,10 @@ test.describe('on the published host, served as plain files', () => {
     expect((await events(page, 'page_view')).map((view) => view.page_location)).toEqual([
       `https://${HOST}/level/the-long-corridor`,
     ]);
+    const runs = await events(page, 'program_run');
+    expect(runs).toHaveLength(1);
+    expect(runs[0]).toMatchObject({ level: 'the-long-corridor', runs: 1, result: 'won', game_language: 'en' });
+    expect(runs[0]).not.toHaveProperty('error_kind');
     const [won, ...more] = await events(page, 'level_won');
     expect(more).toEqual([]);
     expect(won).toMatchObject({ level: 'the-long-corridor', runs: 1, hints: 0, game_language: 'en' });
@@ -266,6 +270,53 @@ test.describe('on the published host, served as plain files', () => {
     await page.locator('#home').click();
     await expect(page.locator('.start-screen')).toBeVisible();
     expect(await events(page, 'level_left')).toEqual([]);
+  });
+
+  test('each run is told with how it ended, and each hint read', async ({ page, context }) => {
+    const sent = await catchCounting(context);
+    await acceptedBefore(context);
+    await page.goto('/#level/the-long-corridor');
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
+    await page.locator('#speed').selectOption('4');
+    const run = async (program: string) => {
+      await page.locator('.cm-content').click();
+      await page.keyboard.press('ControlOrMeta+A');
+      await page.keyboard.insertText(program);
+      await page.locator('#run').click();
+    };
+
+    // A program that stops short of the goal, and one Python cannot read. What the
+    // child wrote is in neither.
+    await run('wizard.move_right(2)');
+    await expect.poll(() => events(page, 'program_run'), { timeout: ciTimes(30_000) }).toHaveLength(1);
+    await run('marta = wizard.move_right(');
+    await expect.poll(() => events(page, 'program_run'), { timeout: ciTimes(30_000) }).toHaveLength(2);
+    const [short, unread] = await events(page, 'program_run');
+    expect(short).toMatchObject({ level: 'the-long-corridor', runs: 1, result: 'incomplete', game_language: 'en' });
+    expect(short).not.toHaveProperty('error_kind');
+    expect(typeof short?.seconds).toBe('number');
+    expect(unread).toMatchObject({ level: 'the-long-corridor', runs: 2, result: 'error', error_kind: 'unclosed' });
+    expect(Object.keys(unread ?? {}).sort()).toEqual(['error_kind', 'game_language', 'level', 'result', 'runs', 'seconds']);
+    expect(JSON.stringify(await queued(page))).not.toContain('marta');
+
+    // A hint read is told with its number and the runs before it.
+    await expect(page.locator('#hint')).toBeEnabled();
+    await page.locator('#hint').click();
+    await expect(page.locator('.hints .hint')).toHaveCount(1);
+    expect(await events(page, 'hint_read')).toEqual([
+      { level: 'the-long-corridor', seconds: short?.seconds, runs: 2, hints: 1, game_language: 'en' },
+    ]);
+
+    // GoatCounter is told of neither.
+    expect(goatPaths(sent, true)).toEqual([]);
+  });
+
+  test("the tester's mode holds no button for a level's solution", async ({ page, context }) => {
+    await catchCounting(context);
+    await acceptedBefore(context);
+    await page.goto('/?debug#level/the-long-corridor');
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
+    await expect(page.locator('#debug-solution')).toHaveCount(0);
   });
 
   test('a level left without a win is told as left', async ({ page, context }) => {

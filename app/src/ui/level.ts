@@ -8,6 +8,7 @@
 // playback ended, and with its sound where there was no playback (D247).
 
 import * as analytics from '../analytics/analytics';
+import { published } from '../analytics/site';
 import { checkedFamiliar, familiarTable, isPractice, keptAfter, withFamiliar } from '../content/familiar';
 import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
@@ -193,9 +194,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   );
   // In the tester's mode, a button writes the level's solution in the editor: the
   // solution packed apart for it (pack-world.mjs), or on the development server
-  // read from content/ (vite.config.ts).
+  // read from content/ (vite.config.ts). The published game holds no solution, and
+  // has no button for one (D333).
   const solution =
-    debugging()
+    debugging() && !published()
       ? [labelled(element('button', { id: 'debug-solution', type: 'button' }), () => t('debug.solution'))]
       : [];
   const notebook = notebookPanel(
@@ -498,6 +500,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     );
   };
   hint.addEventListener('click', () => {
+    if (hintsShown < allHints().length) analytics.hinted(loaded.id, hintsShown + 1);
     hintsShown = Math.min(hintsShown + 1, allHints().length);
     progress.setHints(loaded.id, hintsShown);
     renderHints();
@@ -534,7 +537,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     if (force || snapshot.outcome !== shownOutcome) {
       if (snapshot.outcome) card.show(snapshot.outcome, snapshot.printed);
       else card.hide();
-      if (!force && snapshot.outcome) judged = true;
+      if (!force && snapshot.outcome) {
+        judged = true;
+        const { outcome } = snapshot;
+        analytics.ended(loaded.id, outcome.kind, outcome.kind === 'error' ? outcome.error : undefined);
+      }
       // A run's end has its sound (the settings may silence it): played by the controller
       // as the playback ended, or here for an outcome that had no playback (D247).
       if (!force && snapshot.outcome && !snapshot.sounded) play(snapshot.outcome.kind === 'won' ? 'win' : 'fail');

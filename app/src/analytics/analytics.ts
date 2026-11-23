@@ -1,12 +1,22 @@
 // The published game counts how it is used (D328): each screen seen, as a page named by
 // its id in the course, and each visit to a level, with the seconds played in it, the
-// programs run, the hints read and the stars earned. Google Analytics gets them where
+// programs run, the hints read and the stars earned, and in it each run as it ends and
+// each hint as it is read (D334). Google Analytics gets them where
 // the cookies are accepted, and is loaded only there; GoatCounter, which keeps nothing
 // in the browser, gets the pages and the wins whatever the answer. On any other host
 // nothing here does anything: every function returns at once.
 
 import { accepted } from './consent';
-import { goatUrl, type LevelTold, LevelVisit, type Page, pageOf } from './pages';
+import {
+  errorKind,
+  goatUrl,
+  type HintTold,
+  type LevelTold,
+  LevelVisit,
+  type Page,
+  pageOf,
+  type RunTold,
+} from './pages';
 import { published, SITE } from './site';
 
 declare global {
@@ -49,7 +59,10 @@ export function goat(page: Pick<Page, 'path' | 'title'>, event = false): void {
   goatFirst = false;
 }
 
-function tell(name: 'level_won' | 'level_left', told: LevelTold): void {
+function tell(
+  name: 'level_won' | 'level_left' | 'program_run' | 'hint_read',
+  told: LevelTold | RunTold | HintTold,
+): void {
   gtag('event', name, { ...told, game_language: language() });
 }
 
@@ -119,6 +132,21 @@ export function played(seconds: number): void {
 /** A program run in a level. */
 export function ran(level: string): void {
   if (visit?.level === level) visit.ran();
+}
+
+/** A run of a level as it ended (D334): `result` is its outcome's kind, and `error`
+ * the error it ended in, of which the kind alone is told. */
+export function ended(
+  level: string,
+  result: string,
+  error?: { type: string; explanation?: { kind: string } | null },
+): void {
+  if (visit?.level === level) tell('program_run', visit.ended(result, error && errorKind(error)));
+}
+
+/** A hint of a level read (D334): `hints` counts the hints read with it. */
+export function hinted(level: string, hints: number): void {
+  if (visit?.level === level) tell('hint_read', visit.hinted(hints));
 }
 
 /** A level won, with the stars earned and the hints read. */

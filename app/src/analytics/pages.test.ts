@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { goatUrl, LevelVisit, pageOf } from './pages';
+import { errorKind, goatUrl, LevelVisit, pageOf } from './pages';
 import { published, SITE } from './site';
 
 describe('the page a screen is counted as (D328)', () => {
@@ -82,6 +82,62 @@ describe('a visit to a level (D328)', () => {
     visit.ran();
     expect(visit.left()).toEqual({ level: 'the-gate', seconds: 30, runs: 1 });
     expect(visit.left()).toBeNull();
+  });
+});
+
+describe('a run and a hint of a visit (D334)', () => {
+  it('tells each run as it ends, with the seconds and the runs so far', () => {
+    const visit = new LevelVisit('the-gate');
+    visit.played(10);
+    visit.ran();
+    expect(visit.ended('incomplete')).toEqual({ level: 'the-gate', seconds: 10, runs: 1, result: 'incomplete' });
+    visit.played(20);
+    visit.ran();
+    expect(visit.ended('error', 'missing_colon')).toEqual({
+      level: 'the-gate',
+      seconds: 30,
+      runs: 2,
+      result: 'error',
+      error_kind: 'missing_colon',
+    });
+    visit.ran();
+    expect(visit.ended('won')).toEqual({ level: 'the-gate', seconds: 30, runs: 3, result: 'won' });
+  });
+
+  it('goes on telling the runs after the win', () => {
+    const visit = new LevelVisit('the-gate');
+    visit.ran();
+    visit.won(3, 0);
+    visit.ran();
+    expect(visit.ended('won')).toEqual({ level: 'the-gate', seconds: 0, runs: 2, result: 'won' });
+  });
+
+  it('tells a hint read with its number and the runs before it', () => {
+    const visit = new LevelVisit('the-gate');
+    visit.played(40);
+    visit.ran();
+    visit.ran();
+    expect(visit.hinted(1)).toEqual({ level: 'the-gate', seconds: 40, runs: 2, hints: 1 });
+    expect(visit.hinted(2)).toEqual({ level: 'the-gate', seconds: 40, runs: 2, hints: 2 });
+  });
+});
+
+describe('the kind an error is told as (D334)', () => {
+  it("is the world's kind for it", () => {
+    expect(errorKind({ type: 'SyntaxError', explanation: { kind: 'missing_colon' } })).toBe('missing_colon');
+    expect(errorKind({ type: 'NameError', explanation: { kind: 'unknown_name' } })).toBe('unknown_name');
+  });
+
+  it("is Python's name of an error the world has no kind for", () => {
+    expect(errorKind({ type: 'ZeroDivisionError', explanation: { kind: 'other' } })).toBe('ZeroDivisionError');
+    expect(errorKind({ type: 'TypeError' })).toBe('TypeError');
+    expect(errorKind({ type: 'ValueError', explanation: null })).toBe('ValueError');
+  });
+
+  it('never tells a name the child wrote', () => {
+    expect(errorKind({ type: 'MartaError', explanation: { kind: 'other' } })).toBe('other');
+    expect(errorKind({ type: 'MartaError' })).toBe('other');
+    expect(errorKind({ type: 'NameError', explanation: { kind: 'Marta la maga' } })).toBe('NameError');
   });
 });
 

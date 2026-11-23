@@ -204,8 +204,10 @@ shows the part the camera follows (D69).
   time the level opens (D248). Each saved game is
   one such document (D70): `GamesStore` keeps them in `localStorage` under
   `kydux.game.<id>`, with their list under `kydux.games` (IndexedDB when it
-  outgrows it); *Export* and *Import*, on the start screen, move a game as
-  a JSON file between computers;
+  outgrows it), an entry `{id, name, created, played, seconds}` whose
+  `name` is the game's own, unique in the list (D290, D291); *Export* and
+  *Import*, on the start screen, move a game as a JSON file between
+  computers, *Import* asking the name of the game it brings;
   the launcher can also keep it as a file beside itself when asked. An
   online store comes later behind the same interface.
 - The wizard's look: a base sprite drawn with placeholder colours for skin,
@@ -579,9 +581,12 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
 - **The map does not throw the player out.** It opens over the level, shows
   where the player is, closes back to it, asks before leaving; a chapter is a
   mini-map, and what lies ahead is unnamed. Lessons can be read from a level.
-- **Saved games.** A game per wizard, listed with its wizard, its place,
-  its play time and its dates, loaded on return; export and import stay as
-  the way to carry one away. Sprint 11 keeps the list in the browser
+- **Saved games.** A game per wizard, listed by its name, unique, which the
+  child gives with the wizard's name (D290, D291), with its wizard, its
+  place, its play time and its dates, loaded on return; the start screen
+  says which game is being played; export and import stay as the way to
+  carry one away. A wizard's gender and look are chosen once, at the
+  start of a game (D292). Sprint 11 keeps the list in the browser
   (D70); the same list on the server the game runs from, with the
   browser's as the fallback, comes with the online game (phase 7).
 - **One scene per chapter.** A chapter's levels are parts of one scene, or

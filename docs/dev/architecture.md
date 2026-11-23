@@ -723,28 +723,30 @@ one overturns stays, marked as superseded.
   window resize. Under 800 pixels the panes stack and the handle is gone.
   The settings' Back returns to the screen they were opened from.
 - **D36 — The wizard is the child's: a name, a gender and a look, kept in
-  the progress document.** Decided 2026-10-21 (sprint-6.md), built the
-  same day. `progress.wizard` is `{name, gender, look}`, or null before the
-  child has made one; the document's `version` stays 1, and one without
-  `wizard` reads as null. `readWizard` (`app/src/progress/store.ts`) keeps a
-  wizard only when its name, trimmed, is 1 to 20 letters of any alphabet,
-  digits, spaces, hyphens or apostrophes, its gender `girl` or `boy`, and
-  its look one the game has. `gender` chooses the words (D37), nothing
-  else. The looks are `app/src/engine/looks.ts`: eight ids, each with the
-  placeholder figure's skin, hair, hair style, robe, hat and band, four
-  skin tones each with both hair styles, none like a famous wizard; with
-  phase 4's art the same ids pick sprite sheets, so the document does not
-  change. The creator is at `#wizard` (`app/src/ui/wizard.ts`); the start
-  screen's big button leads there while there is no wizard, and offers
-  *Change my wizard* once there is. Done needs a name and a gender: the
-  gender is never preset, since a default would choose for the child.
-  The gender buttons are words, not a figure each, since a figure is a
-  look and any look is either's. Escape and Back leave an existing wizard
-  as it was. *New game* begins with no wizard (D64, D70); an import keeps
-  the file's, or the current one when the file has none. The scene draws
-  the wizard from the look and says its id in `data-look`, which the
-  browser tests read: a WebGL canvas's pixels cannot be read reliably, so
-  the colours are checked on the creator's 2D canvas instead.
+  the progress document.** Decided 2026-10-21 (sprint-6.md), built the same
+  day. `progress.wizard` is `{name, gender, look}`, or null before the child
+  has made one; the document's `version` stays 1, and one without `wizard`
+  reads as null. `readWizard` (`app/src/progress/store.ts`) keeps a wizard
+  only when its name, trimmed, is 1 to 20 letters of any alphabet, digits,
+  spaces, hyphens or apostrophes, its gender `girl` or `boy`, and its look
+  one the game has. `gender` chooses the words (D37), nothing else. The
+  looks are `app/src/engine/looks.ts`: eight ids, each with the placeholder
+  figure's skin, hair, hair style, robe, hat and band, four skin tones each
+  with both hair styles, none like a famous wizard; with phase 4's art the
+  same ids pick sprite sheets, so the document does not change. The creator
+  is at `#wizard` (`app/src/ui/wizard.ts`); the start screen's big button
+  leads there while there is no wizard, and offers *Change the names* once
+  there is: the wizard's name and the game's (D290) change there, and the
+  gender and the look are shown and not offered (D292). Done needs a name
+  and a gender: the gender is never preset, since a default would choose for
+  the child. The gender buttons are words, not a figure each, since a figure
+  is a look and any look is either's. Escape and Back leave an existing
+  wizard and the game's name as they were. *New game* begins with no wizard
+  (D64, D70); an import keeps the file's, or the current one when the file
+  has none. The scene draws the wizard from the look and says its id in
+  `data-look`, which the browser tests read: a WebGL canvas's pixels cannot
+  be read reliably, so the colours are checked on the creator's 2D canvas
+  instead.
 - **D37 — The words follow the wizard.** Decided 2026-10-21 (sprint-6.md),
   built the same day. A text for the player may hold a choice,
   `{boy's words|girl's words}`, either side possibly empty (`cansad{o|a}`),
@@ -1139,9 +1141,10 @@ one overturns stays, marked as superseded.
   said in comments. Rules out the example copied into the editor, which
   left a fix level with half a program and a practice half done.
 - **D64 — Starting again forgets the wizard.** Decided 2026-10-22 by the
-  owner's UAT (sprint-11.md). A game begun again begins with no wizard:
-  *New game* (D70) opens the story from the letter to the creator, and the
-  new wizard is made there. The language and the settings are kept, since
+  owner's UAT (sprint-11.md). A game begun again begins with no wizard: *New
+  game* (D70) opens the story from the letter to the creator, and the new
+  wizard is made there, its gender and look chosen for the whole game (D292)
+  and the game named (D290). The language and the settings are kept, since
   they are the machine's, not the game's.
 - **D65 — A chapter's levels are parts of one scene.** Decided 2026-10-22 by
   the owner's UAT (sprint-11.md), built the same day. A scene is
@@ -1212,22 +1215,25 @@ one overturns stays, marked as superseded.
 - **D70 — Games are saved, several, in the browser.** Decided 2026-10-22 by
   the owner's UAT (sprint-11.md), built the same day. `GamesStore`
   (`app/src/progress/games.ts`) keeps each game's progress document under
-  `kydux.game.<id>`, the list under `kydux.games` (begun, last played,
-  seconds played) and the game being played under `kydux.current`; a game
-  is begun by its first save, and the list shows the games with a wizard.
-  Every change saves the game being played; there is no *Save*. The start
-  screen offers *Continue*, *Load a game* (each game with its wizard, where
-  it is, its play time and dates, *Play* and *Delete*, which asks) and *New
-  game*; a first visit with no game opens the welcome page (D193), and with saved games
-  and none being played the start screen offers them. An imported file
-  becomes one more game; *Export* keeps the game being played. Play time is
-  counted every ten seconds a level, a lesson or a story is on screen
-  with the tab in sight and the child at the page: a key, a click, a scroll or
-  a move of the pointer within the last two minutes; a child who walks away is
-  not counted. The single document of before, `kydux.progress`,
-  becomes the list's first game the first time the list is read, so the
-  document keeps its version: its shape is the same. The online game
-  (plan, phase 7) keeps the same list on the server it runs from.
+  `kydux.game.<id>`, the list under `kydux.games` (each game's name, D290,
+  when it was begun and last played, and the seconds played) and the game
+  being played under `kydux.current`; a game is begun by its first save, and
+  the list shows the games with a wizard. Every change saves the game being
+  played; there is no *Save*. The start screen says under its greeting which
+  game is being played, and offers *Continue*, *Load a game* (each game by
+  its name, its wizard's under it when the two differ, where it is, its play
+  time and dates, *Play* and *Delete*, which asks with the game's name) and
+  *New game*; a first visit with no game opens the welcome page (D193), and
+  with saved games and none being played the start screen offers them. An
+  imported file becomes one more game, whose name is asked first (D291);
+  *Export* keeps the game being played. Play time is counted every ten
+  seconds a level, a lesson or a story is on screen with the tab in sight
+  and the child at the page: a key, a click, a scroll or a move of the
+  pointer within the last two minutes; a child who walks away is not
+  counted. The single document of before, `kydux.progress`, becomes the
+  list's first game the first time the list is read, so the document keeps
+  its version: its shape is the same. The online game (plan, phase 7) keeps
+  the same list on the server it runs from.
 - **D71 — The map opens over the level, and a lesson from it.** Decided
   2026-10-22 by the owner's UAT (sprint-11.md), built the same day. From a
   level, *Map* opens the map over it (the run and the editor kept), the
@@ -4632,3 +4638,51 @@ one overturns stays, marked as superseded.
   landing drawn behind the leaf, which is taller than a figure and would hide it whole; a
   Rinlo who is taken out of his room and put in the corridor; and a figure drawn across
   the arch's stones.
+- **D290 — A saved game has a name of its own, unique among the games of the list.**
+  Decided 2026-11-21 by the owner (*Las partidas guardadas deben tener nombre … en el
+  mismo sitio donde se pone el nombre del mago hay que poder dar nombre a la partida. El
+  nombre debe ser único*; *al principio cuando enciendes el juego y estás en una partida
+  te dice en qué partida estás*). The name is the list's: `GameEntry.name`, kept in
+  `kydux.games`; the progress document is as it was, its `version` 1. A name, trimmed, is
+  1 to 30 characters of the kinds a wizard's name has (D36; `gameName` in
+  `app/src/progress/store.ts`). Two names are the same when they are equal trimmed and
+  without regard to case (`sameName`); no two games of the list have the same name, and
+  an entry kept with a name that breaks the rule, or with one a game begun before has,
+  is read with none. It is given and changed in the creator, `#wizard`, in a field under
+  the wizard's name, `#game-name`; *Done* waits for a name that is valid and free, and
+  keeps the wizard and names the game in one go (`keepWizard`), never one without the
+  other. The names of the story (D36's reserved names) are free to a game. The start
+  screen says under its greeting which game is being played (`#current-game`), lists
+  the games by their names, the wizard's name under one that differs, and *Delete* asks
+  with it. Rules out the name in the progress document: being unique is a property of
+  the list, and the entry already holds what is the game's and not the course's (begun,
+  last played, seconds). Rules out a name in the exported file: the child names a game
+  brought from a file as it comes in (D291).
+- **D291 — A game with no name takes its wizard's name, and a number after it when that
+  is taken.** Decided 2026-11-21 by the owner (*Si la partida ya está creada y no tiene
+  nombre … se le asignará como nombre el nombre del mago y, si se repite, un número
+  secuencial después*; *Cuando importas una partida te pregunta el nombre que quieres
+  darle*). One rule gives the automatic name, for a wizard's name and the names taken
+  (`automaticName`): the wizard's name when it is free; otherwise the wizard's name, a
+  space and the first number from 2 that makes it free (*Marta*, *Marta 2*, *Marta 3*).
+  It names every game of the list that has a wizard and no name, each time the list is
+  opened by `GamesStore`, the game begun first taking its name first, and the list is
+  written only when a name was given; and the single document of before the list (D70).
+  Elsewhere it is the name offered, which the child keeps or changes: in the creator,
+  for a game being made, until the child writes a name; and on the start screen, for a
+  game brought from a file, whose name is asked, in `#import-form` under *Export* and
+  *Import*, before the game enters the list; *Cancel* and Escape bring nothing. A game
+  named keeps its name. A game with no wizard has no name and is not listed; one brought
+  from a file is added with none, and the creator names it.
+- **D292 — A wizard's gender and look are chosen once.** Decided 2026-11-21 by the owner
+  (*una vez establecido, el sexo y color del mago no se pueden cambiar para que no haya
+  confusión al cambiar los demás personajes*). Once a wizard is made, its name can be
+  changed and nothing else of it: the creator shows the gender and the look and offers
+  neither, the preview of its look and a sentence, `#wizard-fixed`, where the two groups
+  of buttons are for a wizard being made, under which a note, `#wizard-once`, says the
+  choice is for the whole game; and `setWizard` keeps the gender and the look of the
+  wizard made, whatever it is given. The words (D37), the friend who teaches (D77) and
+  the friends' colours and portraits (D90, D283) are so the same from the first page of
+  a game to its last. *New game* begins with no wizard (D64), and there all is chosen; a
+  game brought from a file keeps the file's wizard. Rules out a look changed within its
+  gender: the friends' colours follow the look.

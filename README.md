@@ -24,7 +24,9 @@ every screen, opens the welcome page again later.
 The game begins with a story. A letter invites you to
 Arvelia, a school of magic, and you travel to its gate. Then you make your
 wizard. You give it a name, say whether it is a girl or a boy, and choose
-how it looks. The game then calls you by that name.
+how it looks. Choose calmly: who your wizard is and their look stay for the
+whole game. You also give your game a name. The game then calls you by your
+wizard's name.
 
 After that, the game opens on its start screen. *Continue* takes you to
 where you left off. The first time, that is the gate, where a friend
@@ -71,10 +73,13 @@ The one you are in is open. A chapter you have finished is folded, with its star
 and *Open* unfolds it. A chapter still locked is greyed, and shows only how it begins.
 
 The game saves your game in the browser as you play. It keeps several
-games, one for each wizard: *Load a game*, on the start screen, lists them,
-with where each one is and how long it has been played. *New game* begins
-the story again for a new wizard. *Export* saves the game you are playing
-as a file, and *Import* brings it back on another computer.
+games, one for each wizard. Each game has a name, and no two games have the
+same one. The start screen says which game you are in. *Load a game* lists
+the games by their names, with where each one is and how long it has been
+played. *Change the names* changes your wizard's name and your game's.
+*New game* begins the story again for a new wizard. *Export* saves the game
+you are playing as a file, and *Import* brings it back on another computer.
+*Import* asks the name of the game it brings.
 
 ## Lessons
 

@@ -25,7 +25,9 @@ Kydux*, arriba en cada pantalla, vuelve a abrirla después.
 El juego empieza con una historia. Una carta te invita a
 Arvelia, un colegio de magia, y viajas hasta su puerta. Después creas tu
 personaje. Le pones un nombre, eliges si es una maga o un mago, y escoges
-su aspecto. Después, el juego te llama por ese nombre.
+su aspecto. Elige con calma: cómo es tu personaje y su aspecto se quedan
+para toda la partida. También le pones un nombre a tu partida. Después, el
+juego te llama por el nombre de tu personaje.
 
 A partir de ahí, el juego se abre en su pantalla de inicio. *Continuar* te
 lleva a donde lo dejaste. La primera vez, eso es la puerta, donde te
@@ -80,11 +82,14 @@ ya has terminado está plegado, con sus estrellas, y *Abrir* lo despliega. Un
 capítulo que sigue cerrado sale en gris, y solo enseña cómo empieza.
 
 El juego guarda tu partida en el navegador mientras juegas. Guarda varias
-partidas, una por personaje: *Cargar una partida*, en la pantalla de
-inicio, las enseña, con dónde está cada una y cuánto se ha jugado.
-*Partida nueva* empieza otra vez la historia para un personaje nuevo.
-*Exportar* guarda la partida que juegas en un fichero, e *Importar* la
-recupera en otro ordenador.
+partidas, una por personaje. Cada partida tiene un nombre, y no hay dos
+partidas con el mismo. La pantalla de inicio dice en qué partida estás.
+*Cargar una partida* las enseña por sus nombres, con dónde está cada una y
+cuánto se ha jugado. *Cambiar los nombres* cambia el nombre de tu personaje
+y el de tu partida. *Partida nueva* empieza otra vez la historia para un
+personaje nuevo. *Exportar* guarda la partida que juegas en un fichero, e
+*Importar* la recupera en otro ordenador. *Importar* pregunta el nombre de
+la partida que trae.
 
 ## Lecciones
 

@@ -731,7 +731,11 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     sits and brings a thing into sight (D279), time that passes as the scene gone dark
     and back (D280), the corridor's second tiny entrance (D281), the familiar on the
     trench's middle, behind its near rim (D282), a friend's portrait in the colours it
-    wears (D283), and words told in the circle's levels off the circle (D284).
+    wears (D283), and words told in the circle's levels off the circle (D284); and, in
+    `sprint-55.md`, a staged trial with no colour seen ten seconds from the card's
+    close (D285), the way a level's wizard faces when it opens (D286), a light lying in
+    the floor drawn whole and ending softly (D287), and the cells only a story's figure
+    walks (D288).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

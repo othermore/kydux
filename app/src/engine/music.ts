@@ -11,8 +11,9 @@
 // audio clock, through a reverb made of decaying noise, under the music's volume in the
 // settings; a change of loudness or of theme fades over two seconds. The music starts at
 // the first gesture on the page, as a browser asks, and is still while the tab is
-// hidden. A voice's volume may be set by hand while its theme plays (D203). While a
-// theme plays or fades, the music keeps the sound context awake (D231, sfx.ts).
+// hidden. A voice's volume may be set by hand while its theme plays (D203), and the
+// theme taken to any moment of its loop (D312). While a theme plays or fades, the music
+// keeps the sound context awake (D231, sfx.ts).
 //
 // The root element says what plays, for the tests: data-music (`waiting` for the
 // first gesture, `playing`, `off` with the volume at none), data-music-theme and
@@ -90,6 +91,8 @@ const LEVEL = 0.5;
 const LOWER = 0.4;
 /** How long a change of loudness or of theme takes, in seconds. */
 export const FADE = 2;
+/** How long the cut to another moment of the theme takes, in seconds (D312). */
+const CUT = 0.05;
 /** How far ahead of the audio clock the notes are scheduled, and how often, in seconds. */
 const AHEAD = 0.3;
 const EVERY = 0.05;
@@ -97,16 +100,19 @@ const EVERY = 0.05;
 const REVERB = 2.6;
 const WET = 0.32;
 
-/** The theme's sections in their order, one after another, as one loop. */
-export function loopOf(theme: Theme): Loop {
+/** The theme's sections in the order they are played. */
+function played(theme: Theme): Section[] {
   const byId = new Map(theme.sections.map((section) => [section.id, section]));
   const order = theme.order ?? theme.sections.map((section) => section.id);
+  return order.flatMap((id) => byId.get(id) ?? []);
+}
+
+/** The theme's sections in their order, one after another, as one loop. */
+export function loopOf(theme: Theme): Loop {
   const bar = theme.metre[0];
   const notes: LoopNote[] = [];
   let at = 0;
-  for (const id of order) {
-    const section = byId.get(id);
-    if (!section) continue;
+  for (const section of played(theme)) {
     for (const [voice, list] of Object.entries(section.notes)) {
       for (const [pitch, start, length, loudness] of list) {
         notes.push({ voice, pitch, beat: at + start, length, loudness });
@@ -136,6 +142,25 @@ export function notesBetween(loop: Loop, from: number, to: number): LoopNote[] {
 /** A beat's length in seconds at the theme's tempo. */
 export function secondsPerBeat(theme: Theme): number {
   return 60 / theme.tempo;
+}
+
+/** How long the theme's loop lasts, once round, in seconds. */
+export function loopSeconds(theme: Theme): number {
+  const bars = played(theme).reduce((sum, section) => sum + section.bars, 0);
+  return bars * theme.metre[0] * secondsPerBeat(theme);
+}
+
+/** The section that sounds `seconds` into the theme's loop, by its id; '' in a theme
+ * of no section. */
+export function sectionAt(theme: Theme, seconds: number): string {
+  const bar = theme.metre[0] * secondsPerBeat(theme);
+  const sections = played(theme);
+  let end = 0;
+  for (const section of sections) {
+    end += section.bars * bar;
+    if (seconds < end) return section.id;
+  }
+  return sections.at(-1)?.id ?? '';
 }
 
 /** A note set on the audio clock: when it starts and how long it lasts, in seconds. */
@@ -551,6 +576,29 @@ class Music {
     for (const voice of Object.keys(this.mixed)) this.mix(voice, null);
   }
 
+  /** Where the theme that plays is in its loop and how long the loop lasts, in seconds,
+   * for the page of themes (D312); null while none plays. */
+  get position(): { at: number; length: number } | null {
+    const playing = this.playing;
+    if (!playing || !this.ctx) return null;
+    const length = loopSeconds(playing.theme);
+    if (length <= 0) return null;
+    return { at: Math.max(0, this.ctx.currentTime - playing.zero) % length, length };
+  }
+
+  /** The theme that plays taken to a moment of its loop, in seconds from its start, for
+   * the page of themes (D312): what sounds is cut short, and the theme sounds on from
+   * there, its voices as they are set. */
+  seek(seconds: number): void {
+    const ctx = this.ctx;
+    const playing = this.playing;
+    if (!ctx || !playing) return;
+    const length = loopSeconds(playing.theme);
+    const from = length > 0 ? Math.min(Math.max(0, seconds), length) % length : 0;
+    this.fadeOut(playing, CUT);
+    this.playing = this.begin(ctx, playing.theme, playing.heard, from, CUT);
+  }
+
   /** What the page asked to play, and whether it plays. */
   get state(): { music: string; theme?: string; heard?: Heard } {
     const music = this.volume === 0 ? 'off' : !this.unlocked ? 'waiting' : this.playing ? 'playing' : 'still';
@@ -626,11 +674,13 @@ class Music {
     }
   }
 
-  private begin(ctx: AudioContext, theme: Theme, heard: Heard): Playing {
+  /** A theme set to play from `from` seconds into its loop, heard within `fade`
+   * seconds. */
+  private begin(ctx: AudioContext, theme: Theme, heard: Heard, from = 0, fade = FADE): Playing {
     const out = ctx.createGain();
     const now = ctx.currentTime;
     out.gain.setValueAtTime(0.0001, now);
-    out.gain.exponentialRampToValueAtTime(1, now + FADE);
+    out.gain.exponentialRampToValueAtTime(1, now + fade);
     out.connect(this.master as GainNode);
     const levels = voiceLevels(theme, heard, this.mixed);
     const voices = new Map<string, GainNode>();
@@ -640,7 +690,8 @@ class Music {
       gain.connect(out);
       voices.set(name, gain);
     }
-    return { theme, loop: loopOf(theme), zero: now + 0.1, scheduled: now + 0.1, heard, out, voices, lines: new Map() };
+    const first = now + 0.1;
+    return { theme, loop: loopOf(theme), zero: first - from, scheduled: first, heard, out, voices, lines: new Map() };
   }
 
   /** The theme that plays heard elsewhere: every voice fades to its loudness there. */
@@ -654,17 +705,17 @@ class Music {
     this.publish();
   }
 
-  private fadeOut(playing: Playing | null): void {
+  private fadeOut(playing: Playing | null, fade = FADE): void {
     if (!playing || !this.ctx) return;
     const now = this.ctx.currentTime;
     playing.out.gain.cancelScheduledValues(now);
     playing.out.gain.setValueAtTime(Math.max(playing.out.gain.value, 0.0002), now);
-    playing.out.gain.exponentialRampToValueAtTime(0.0001, now + FADE);
-    const silent = now + FADE + AHEAD + 1;
+    playing.out.gain.exponentialRampToValueAtTime(0.0001, now + fade);
+    const silent = now + fade + AHEAD + 1;
     for (const lines of playing.lines.values()) {
       for (const line of lines) for (const saw of line.saws) saw.stop(silent);
     }
-    setTimeout(() => playing.out.disconnect(), (FADE + AHEAD + 1.5) * 1000);
+    setTimeout(() => playing.out.disconnect(), (fade + AHEAD + 1.5) * 1000);
   }
 
   private stop(): void {

@@ -663,6 +663,7 @@
       "story": "As in a story",
       "level": "As in a level, quieter",
       "playing": "Playing: {theme}, {heard}",
+      "time": "{at} s of {length} s, part {section}",
       "voices": "Its voices",
       "reset": "As written",
       "off": "off",

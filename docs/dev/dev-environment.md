@@ -938,11 +938,21 @@ harmony a chord a bar. After changing it, this writes the themes again into
 ```
 
 It prints each file it wrote. To hear a theme alone, open the game with
-`?debug` at `#music`, and press its Full or Quiet button:
+`?debug` at `#music`:
 
 ```
 https://localhost:5173/?debug#music
 ```
+
+Each theme has two buttons. One plays it as a story does. The other plays
+it as a level does, quieter.
+
+Over the list are the time and the voices of the theme that plays. The
+time's slider follows the music. Drag it and let go, and the theme plays on
+from that second. Beside it are the second that sounds, the theme's length
+and the part it is in. Each voice has a box that silences it and a slider
+for its volume. A sound is found with the two: go to a little before its
+second, and turn the voices off one at a time until it is gone.
 
 The page's music starts only after a click or a key on the page, since a
 browser plays no sound before one. `content/music/README.md` says the

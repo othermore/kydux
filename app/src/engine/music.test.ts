@@ -4,9 +4,11 @@ import {
   frequency,
   lineFor,
   loopOf,
+  loopSeconds,
   notesBetween,
   pianoRing,
   readTheme,
+  sectionAt,
   sound,
   type Theme,
   timed,
@@ -152,6 +154,17 @@ describe('the music (D192)', () => {
     expect(lines).toHaveLength(2);
     expect(gains[2]?.[0]).toEqual(['set', 0, 3.5]);
     expect(gains[2]?.some(([call]) => call === 'cancel')).toBe(false);
+  });
+
+  it("says how long a theme's loop lasts, and the section of each of its moments (D312)", () => {
+    // Three bars of three beats, half a second a beat: a, then b twice.
+    const theme = waltz(120);
+    expect(loopSeconds(theme)).toBe(4.5);
+    expect(sectionAt(theme, 0)).toBe('a');
+    expect(sectionAt(theme, 1.4)).toBe('a');
+    expect(sectionAt(theme, 1.5)).toBe('b');
+    expect(sectionAt(theme, 4.4)).toBe('b');
+    expect(sectionAt(theme, 4.5)).toBe('b');
   });
 
   it('refuses a theme with a voice of no kind it sounds', () => {

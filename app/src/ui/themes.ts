@@ -4,7 +4,10 @@
 // Over the list are the voices of the theme that plays (D203), each with a box that
 // silences it or lets it sound and a slider for its volume, set by hand while the theme
 // plays, and a line that says what is set apart from the theme's file, to be told to
-// who writes it.
+// who writes it. Over the voices is the theme's time (D312): a slider as long as the
+// theme's loop that follows the music and takes it to the moment it is dragged to, and
+// beside it the second that sounds, the loop's length and the section, so that a sound
+// is told by its second and looked for among the voices.
 // Under the list is the broom's wind (D243): six buttons play a one-cell move, a move of
 // eight cells, a zigzag, a lift, a landing and a whole flight, and its three voices, the
 // air, the whistle and the rest, each have a box and a slider from 0 to 3, with a line
@@ -12,7 +15,7 @@
 // between two of its moves, where the rest is heard when its box is on. The mix is never
 // kept: each voice is as written when the page loads.
 
-import { type Heard, music, type Theme, themeNamed } from '../engine/music';
+import { type Heard, loopSeconds, music, sectionAt, type Theme, themeNamed } from '../engine/music';
 import { play as playEffect } from '../engine/sfx';
 import { LAND_NEAR, mixWind, WIND_WRITTEN, Wind, type WindVoice, windMix } from '../engine/sound';
 import { t } from '../i18n';
@@ -31,6 +34,18 @@ interface Shown {
   heard: Heard;
   voices: Map<string, Mixed>;
 }
+
+/** The theme's time as the page shows it (D312): its slider, the words beside it, and
+ * whether the slider is being dragged, when it does not follow the music. */
+interface Clock {
+  theme: Theme;
+  slider: HTMLInputElement;
+  said: HTMLElement;
+  held: boolean;
+}
+
+/** How often the theme's time is read from the music, in milliseconds. */
+const CLOCK_MS = 100;
 
 /** A voice as the theme's file has it: sounding, at its volume. */
 function written(theme: Theme, name: string): Mixed {
@@ -196,7 +211,27 @@ export function themesScreen(themes: string[]): Screen {
   const node = element('div', { className: 'themes-screen' });
   let shown: Shown | null = null;
   let asked = 0;
+  let clock: Clock | null = null;
   const wind = windPanel();
+
+  /** The second that sounds, the loop's length and the section, beside the slider. */
+  const tellTime = (now: Clock, at: number) => {
+    now.said.textContent = t('debug.music.time', {
+      at: at.toFixed(1),
+      length: loopSeconds(now.theme).toFixed(1),
+      section: sectionAt(now.theme, at),
+    });
+  };
+  /** The slider follows the theme that plays, unless it is being dragged. */
+  const follow = () => {
+    const position = music.position;
+    if (!clock || clock.held) return;
+    clock.slider.disabled = !position;
+    if (!position) return;
+    clock.slider.value = position.at.toFixed(1);
+    tellTime(clock, position.at);
+  };
+  const timer = setInterval(follow, CLOCK_MS);
 
   const draw = () => {
     const said = element('p', { id: 'themes-playing', className: 'status' });
@@ -232,6 +267,7 @@ export function themesScreen(themes: string[]): Screen {
     music.unmix();
     music.play(theme, heard);
     shown = null;
+    clock = null;
     draw();
     const mine = (asked += 1);
     void themeNamed(theme)
@@ -277,7 +313,23 @@ export function themesScreen(themes: string[]): Screen {
     const reset = element('button', { type: 'button', id: 'themes-reset' }, [t('debug.music.reset')]);
     reset.addEventListener('click', () => play(now.theme.id, now.heard));
     tell();
+    const length = loopSeconds(now.theme);
+    const seek = element('input', { type: 'range', id: 'themes-seek', min: '0', max: length.toFixed(1), step: '0.1', value: '0' });
+    const time: Clock = { theme: now.theme, slider: seek, said: element('span', { id: 'themes-time' }), held: false };
+    // While it is dragged the slider says the second it is at; let go, the theme sounds
+    // from there.
+    seek.addEventListener('input', () => {
+      time.held = true;
+      tellTime(time, Number(seek.value));
+    });
+    seek.addEventListener('change', () => {
+      music.seek(Number(seek.value));
+      time.held = false;
+    });
+    clock = time;
+    follow();
     return [
+      element('p', { className: 'themes-clock' }, [seek, time.said]),
       element('h3', {}, [t('debug.music.voices')]),
       element('ul', { className: 'themes-mixer' }, rows),
       reset,
@@ -292,6 +344,9 @@ export function themesScreen(themes: string[]): Screen {
       wind.draw();
       draw();
     },
-    destroy: wind.destroy,
+    destroy: () => {
+      clearInterval(timer);
+      wind.destroy();
+    },
   };
 }

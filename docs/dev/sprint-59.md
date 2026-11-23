@@ -979,3 +979,35 @@ was checked with story_on_scene, but check it on the page too,
 and say what you changed; never edit content while a browser
 run is going; stage only your own hunks.
 ```
+
+## 7. The designer's own: the theme's time on the page of themes (D312)
+
+Added on 2026-11-22, built by the designer while the sprint was being
+built; nothing here is the programmer's to build.
+
+The owner, hearing chapter 5's theme: one tone far louder and lower than
+the rest, like a string, at a change of style; and a wish for the debug
+page to show the theme's time, with a slider to go to a moment, so as to
+say at which second a sound is and to find its voice.
+
+**The tone.** It was the engine's, not the score's: a bowed pad's line
+just made sounded at full gain for a moment (`bowed()` in
+`app/src/engine/music.ts` took back the silence the line started from).
+In *The familiar* the pad's chord grows from three notes to four at the
+change to the second part, 32.7 s in, and the fourth, a middle C, burst
+out. A line just made keeps its silence; a test holds it.
+
+**D312 — The theme's time on the page of themes.** Decided 2026-11-22 by
+the owner. On `?debug#music`, over the voices of the theme that plays, a
+slider as long as the theme's loop follows the music, and takes the theme
+to the second it is let go at; beside it are the second that sounds, the
+loop's length and the section, as `32.7 s of 98.2 s, part b`. The voices
+set by hand stay as set. So a sound that is wrong is told by its second,
+and its voice is found by going back to it with one voice off after
+another. The music has `position` and `seek(seconds)` for it: the cut to
+another moment takes 0.05 s, and a note that started before that moment is
+not sounded, so a pad's chord comes in at its next bar.
+
+The designer enters D312 in `docs/dev/architecture.md` at the sprint's
+review, with the page's lines there (the file holds the programmer's
+entries of D297 to D311 until then).

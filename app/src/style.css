@@ -1931,6 +1931,22 @@ a.stop-body:focus-visible {
   font-family: var(--mono);
 }
 
+/* The theme's time (D312): a slider as long as its loop, and the second that sounds. */
+.themes-clock {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.themes-clock input[type='range'] {
+  flex: 1;
+}
+
+.themes-clock span {
+  min-width: 13em;
+  font-family: var(--mono);
+}
+
 .settings-sample {
   margin: 0;
   padding: 8px 12px;

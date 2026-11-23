@@ -663,6 +663,7 @@
       "story": "Como en una historia",
       "level": "Como en un nivel, a menos volumen",
       "playing": "Suena: {theme}, {heard}",
+      "time": "{at} s de {length} s, parte {section}",
       "voices": "Sus instrumentos",
       "reset": "Como está escrito",
       "off": "apagado",

@@ -2,7 +2,8 @@
 // chapter's theme; a story plays it at its loudness and a lesson lower, with the same
 // voices (D210); the slider at none silences it, and the settings keep it; ?debug's
 // #music lists every theme with two buttons, as a story and as a level, and the voices
-// of the one playing, each to turn off and to set by hand (D203).
+// of the one playing, each to turn off and to set by hand (D203), under the theme's time
+// and the slider that takes it to another moment (D312).
 
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
@@ -75,6 +76,26 @@ test('a theme playing on #music shows its voices, each to turn off and to set by
   await page.locator('#themes-reset').click();
   await expect(page.locator('#themes-mix')).toHaveText('the-broom: every voice as written');
   await expect(page.locator('.themes-mixer input[type="checkbox"][data-voice="strings"]')).toBeChecked();
+});
+
+test('a theme playing on #music shows its time, and its slider takes it to another moment (D312)', async ({ page }) => {
+  await page.goto('/?debug#music');
+  await page.locator('.themes-list button[data-theme="the-familiar"][data-heard="story"]').click();
+  await expect(root(page)).toHaveAttribute('data-music', 'playing', { timeout: ciTimes(10_000) });
+  // Forty-eight bars of three beats at 88 a minute; the theme has just started.
+  const seek = page.locator('#themes-seek');
+  await expect(seek).toHaveAttribute('max', '98.2');
+  await expect(page.locator('#themes-time')).toHaveText(/^\d\.\d s of 98\.2 s, part a$/);
+  // The slider let go at the fortieth second: the theme sounds on from there, in its
+  // second part.
+  await seek.fill('40');
+  await expect(page.locator('#themes-time')).toHaveText(/^(39|4\d)\.\d s of 98\.2 s, part b$/);
+  expect(Number(await seek.inputValue())).toBeGreaterThanOrEqual(39.8);
+  // A voice set by hand stays as set in the moment the theme is taken to.
+  await page.locator('.themes-mixer input[type="checkbox"][data-voice="strings"]').uncheck();
+  await seek.fill('70');
+  await expect(page.locator('#themes-time')).toHaveText(/^(69|7\d)\.\d s of 98\.2 s, part c$/);
+  await expect(page.locator('#themes-mix')).toHaveText('the-familiar: strings off');
 });
 
 test("with ?debug, #music plays the broom's wind six ways, and its mixer of three voices says each one changed (D243)", async ({

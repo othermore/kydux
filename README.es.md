@@ -13,9 +13,12 @@ software libre bajo la Licencia Pública General de GNU, versión 3 o posterior.
 
 ## Cómo se juega
 
-Kydux funciona en un navegador web. Todavía no hay nada que instalar: por
-ahora solo funciona desde este repositorio, como explica
-`docs/dev/dev-environment.md`.
+Kydux funciona en un navegador web, y no hay nada que instalar. Abre
+[kydux.kidux.org](https://kydux.kidux.org) y juega.
+
+La primera vez, la página pregunta por las cookies. El juego las usa para
+contar cómo se juega, y así poder mejorar sus niveles. Puedes jugar
+respondas lo que respondas, y los ajustes cambian la respuesta más tarde.
 
 La primera vez, el juego se abre en su página de bienvenida. Cuenta qué
 es el juego, para quién es y cómo se juega, con imágenes del juego. Su
@@ -103,14 +106,16 @@ Cada lección explica una idea, empezando por qué es y para qué sirve. Los
 niveles que vienen después practican esa idea, y nada que no se haya
 explicado todavía.
 
-Hay tres capítulos listos. El primero, *La llegada*, va desde qué es un
+El primer año está listo, en cinco capítulos. El primero, *La llegada*, va desde qué es un
 programa hasta las acciones, los números, las palabras, las cosas que se
 llevan y el primer hechizo. El segundo, *La biblioteca*, trae los nombres
 para los valores, lo que saben las cosas, cómo encontrarlas, las llaves y
 un hechizo que alcanza. El tercero, *Los pasadizos*, trae lo verdadero y
-lo falso, elegir con `if` y `else`, y repetir con `for` y `while`. Los
-capítulos siguientes traen las listas, las acciones propias y, al final,
-los objetos propios. Llegan de capítulo en capítulo.
+lo falso, elegir con `if` y `else`, y repetir con `for` y `while`. El
+cuarto, *La escoba*, trae las listas, hacer lo mismo con cada cosa de una
+lista, volar y las acciones propias, con `def`. El quinto, *El familiar*,
+trae los objetos propios: una clase, lo que un objeto sabe y lo que puede
+hacer.
 
 ## Licencia
 

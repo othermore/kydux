@@ -13,8 +13,12 @@ software under the GNU General Public License, version 3 or later.
 
 ## Playing
 
-Kydux runs in a web browser. There is nothing to install yet: for now it
-runs only from this repository, as `docs/dev/dev-environment.md` explains.
+Kydux runs in a web browser, and there is nothing to install. Open
+[kydux.kidux.org](https://kydux.kidux.org) and play.
+
+The first time, the page asks about cookies. The game uses them to count
+how it is played, so that its levels can be made better. You can play
+whatever you answer, and the settings change the answer later.
 
 The first time, the game opens on its welcome page. It tells what the game
 is, who it is for and how it is played, with pictures of the game. Its big
@@ -93,13 +97,15 @@ Each lesson explains one idea, starting from what it is and why it exists.
 The levels after it practise that idea, and nothing that has not been
 explained yet.
 
-Three chapters are ready. The first, *Arrival*, goes from what a program
+The first year is ready, in five chapters. The first, *Arrival*, goes from what a program
 is to actions, numbers, words, things to carry and the first spell. The
 second, *The library*, brings names for values, what things know, finding
 things, keys and a spell that reaches. The third, *The passages*, brings
 true and false, choosing with `if` and `else`, and repeating with `for`
-and `while`. The next chapters bring lists, actions of your own and, last,
-objects of your own. They come one chapter at a time.
+and `while`. The fourth, *The broom*, brings lists, doing the same to each
+thing of a list, flying, and actions of your own, with `def`. The fifth,
+*The familiar*, brings objects of your own: a class, what an object knows
+and what it can do.
 
 ## Licence
 

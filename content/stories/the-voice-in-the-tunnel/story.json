@@ -90,6 +90,10 @@
       "do": null
     },
     {
+      "who": "voice",
+      "do": null
+    },
+    {
       "who": "friend",
       "do": {
         "face": "right"

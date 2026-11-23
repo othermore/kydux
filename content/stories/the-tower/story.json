@@ -214,6 +214,14 @@
       "do": null
     },
     {
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
       "who": "orla",
       "do": null
     },
@@ -222,7 +230,7 @@
       "do": null
     },
     {
-      "who": "bimo",
+      "who": "voice",
       "do": [
         {
           "by": "friend",
@@ -243,6 +251,10 @@
           "face": "right"
         }
       ]
+    },
+    {
+      "who": "bimo",
+      "do": null
     }
   ]
 }

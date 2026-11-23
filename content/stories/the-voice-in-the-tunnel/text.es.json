@@ -3,9 +3,10 @@
   "steps": [
     "{familiar} está dentro del cuarto. El pasadizo trae los sonidos como un tubo, y los tres os agacháis junto a la boca.",
     "Alguien deshizo tus nudos, Rinlo. Yo sé quién fue. Se llama {wizard}.",
-    "{familiar}, que ha nacido hoy, agacha las orejas y vuelve corriendo por el pasadizo hasta tus pies.",
+    "{familiar}, que ha nacido hoy, se encoge de miedo y vuelve a toda prisa por el pasadizo hasta tus pies.",
     "Te queda un hilo. Átalo a su varita. Su próximo hechizo le estallará en las manos.",
-    "No. Dijiste que nadie se haría daño, ¡y casi se caen todos! No. Vete. *(Se oye algo que se rompe, una vez y otra. Luego, silencio. La voz no contesta.)*",
+    "No. Dijiste que nadie se haría daño, ¡y casi se caen todos! No. Vete.",
+    "Se oye algo que se rompe, una vez y otra. Luego, silencio. La voz no contesta.",
     "¿Rinlo? Te hemos oído. Le has dicho que no. Baja. Se lo contamos a Orla contigo.",
     "Lo he roto. Lo he hecho trozos. No puedo salir ahí fuera. Llevaos los trozos. No quiero ni tocarlos.",
     "Pues que los traiga {familiar}. Todos."

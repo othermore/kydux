@@ -4,6 +4,7 @@ import {
   type Box,
   bubbleBelow,
   bubbleBeside,
+  bubbleHeld,
   bubbleMiddle,
   bubbleRoom,
   bubbleReach,
@@ -35,6 +36,21 @@ describe('a speaker\'s bubble', () => {
     expect(bubbleRoom(768, [120, 560])).toEqual([120, 560]);
     // A frame wider than the scene shows its margin: the scene's own sides hold.
     expect(bubbleRoom(576, [-40, 620])).toEqual([0, 576]);
+  });
+
+  it('stays whole inside what a framing shows as who says it walks out of the frame (D319)', () => {
+    // The entrance framed from row 5: the words under who speaks, 70 pixels tall with
+    // their tail, follow down to the frame's top and stay there.
+    expect(bubbleHeld(300, 0, 70, [240, 960])).toBe(300);
+    expect(bubbleHeld(190, 0, 70, [240, 960])).toBe(240);
+    // Words over who walks out by the frame's foot stay over it; over who walks up to
+    // its top, they keep under it.
+    expect(bubbleHeld(1010, 70, 0, [240, 960])).toBe(960);
+    expect(bubbleHeld(280, 70, 0, [240, 960])).toBe(310);
+    // Words under who walks out by the foot keep their box over it.
+    expect(bubbleHeld(950, 0, 70, [240, 960])).toBe(890);
+    // A room shorter than the box keeps the box's top.
+    expect(bubbleHeld(100, 0, 70, [240, 290])).toBe(240);
   });
 
   it('is held in from the sides of the scene, and of what a framing shows of it (D199)', () => {

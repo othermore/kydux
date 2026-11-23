@@ -6,8 +6,9 @@
 // drawn (D237); words go under who they are over where the goals box would cover them
 // above (D240); and a thought with no room above goes beside the head, raised or
 // lower, its dots going to the head, and under the feet only where neither side has
-// room (D245, thoughtPlace). Kept apart from speech.ts so that it is tested without
-// Phaser.
+// room (D245, thoughtPlace); and a bubble whose speaker walks out of what a story
+// step's framing shows stays whole inside it (bubbleHeld). Kept apart from speech.ts so
+// that it is tested without Phaser.
 
 /** How long after a bump the wizard's thought about it shows, in milliseconds (D237):
  * the bump is seen, and then read of. */
@@ -42,6 +43,15 @@ function meets(one: Box, other: Box): boolean {
  * story step's framing shows of it (D199), where the camera does not follow the words. */
 export function bubbleRoom(size: number, shown: readonly [number, number] | null): [number, number] {
   return shown ? [Math.max(0, shown[0]), Math.min(size, shown[1])] : [0, size];
+}
+
+/** Where a bubble's anchor goes, from `y` over or under who speaks, for its box and
+ * tail, which reach `over` above the anchor and `under` below it, to stay whole between
+ * the top and the bottom of `room`, in the scene's pixels: who speaks walks out of what
+ * a story step's framing shows, or leaves the scene (D319), and the words stay inside it
+ * to be read. The top is kept where the room is shorter than the box. */
+export function bubbleHeld(y: number, over: number, under: number, room: readonly [number, number]): number {
+  return Math.max(Math.min(y, room[1] - under), room[0] + over);
 }
 
 /** The top that words over someone stay under, in the scene's pixels (D240): the room's

@@ -4,7 +4,8 @@
 // over, until that time has passed; it follows who it is over as they walk, sits
 // below them when there is no room above, and is never held past the scene's
 // sides. Under a place a story step frames (D199) the camera does not follow the
-// words: there a bubble keeps inside what the frame shows. Its words are never
+// words: there a bubble keeps inside what the frame shows, whole, as who says it walks
+// to the frame's edge, out of it or out of the scene (D319). Its words are never
 // smaller on the screen than at zoom 1 (D106): zoomed out, they are drawn larger.
 // A thought about a bump shows half a second after it (D237): kept until then, the card
 // waiting for it as for words that are up, and dropped by a restart, the slider or any
@@ -27,6 +28,7 @@ import {
   type Box,
   bubbleBelow,
   bubbleBeside,
+  bubbleHeld,
   bubbleMiddle,
   bubbleReach,
   bubbleRoom,
@@ -97,13 +99,23 @@ export class Speech {
   private queue: { timers: Phaser.Time.TimerEvent[]; read: number } | null = null;
   /** The last tick `expire` was told of, from which a thought shown later lasts. */
   private lastTick = 0;
-  /** Where a bubble or a thought sits: its width, and whether it is below who it is over. */
-  private place: { width: number; below: boolean; shift: number; side: ThoughtSide; bottom: number } = {
+  /** Where a bubble or a thought sits: its width, and whether it is below who it is over;
+   * `tall`, how far a bubble's box and tail reach from its anchor, over or under who
+   * speaks, in its own pixels, 0 for a thought and for a bubble beside the head. */
+  private place: {
+    width: number;
+    below: boolean;
+    shift: number;
+    side: ThoughtSide;
+    bottom: number;
+    tall: number;
+  } = {
     width: 0,
     below: false,
     shift: 0,
     side: 'above',
     bottom: 0,
+    tall: 0,
   };
   /** The thought's cloud as drawn, its box against the point it hangs from (the head's
    * top beside it, the anchor over or under it), in the scene's pixels. */
@@ -230,7 +242,16 @@ export class Speech {
     const half = (this.place.width / 2 + 4) * this.scale;
     const sides = bubbleRoom(this.parts.width, this.parts.shownSides());
     const x = bubbleMiddle(over.x + this.place.shift, half, sides);
-    return [x, over.y + (this.place.below ? 22 : -this.parts.headroom - this.parts.lifted(over))];
+    return [x, this.held(over.y + (this.place.below ? 22 : -this.parts.headroom - this.parts.lifted(over)))];
+  }
+
+  /** A bubble's anchor, from `y` over or under who speaks, held where the bubble is whole
+   * inside what a framing shows: who says it may walk to the frame's edge and out of it,
+   * or leave the scene (D319). */
+  private held(y: number): number {
+    if (this.place.tall === 0 || !this.parts.shown()) return y;
+    const reach = (this.place.tall + 2) * this.scale;
+    return this.place.below ? bubbleHeld(y, 0, reach, this.room) : bubbleHeld(y, reach, 0, this.room);
   }
 
   /** The top and the bottom a bubble stays between, in the scene's pixels: the scene's
@@ -333,7 +354,7 @@ export class Speech {
       cloud.fillCircle(-6, sign * 8, 4).strokeCircle(-6, sign * 8, 4);
       cloud.fillCircle(-12, sign * 1, 2.5).strokeCircle(-12, sign * 1, 2.5);
       words.setOrigin(0.5, below ? 0 : 1).setY(below ? 14 + pad : -14 - pad);
-      this.place = { width, below, shift: 0, side: placing.place, bottom: 0 };
+      this.place = { width, below, shift: 0, side: placing.place, bottom: 0, tall: 0 };
       const scaled = (n: number) => n * this.scale;
       this.cloud = { left: scaled(-width / 2), right: scaled(width / 2), top: scaled(top), bottom: scaled(top + height) };
     } else {
@@ -348,7 +369,7 @@ export class Speech {
         cloud.fillCircle(x, y, dot.radius / this.scale).strokeCircle(x, y, dot.radius / this.scale);
       }
       words.setOrigin(0.5, 0).setPosition(left + width / 2, top + pad);
-      this.place = { width, below: false, shift: 0, side: placing.place, bottom: placing.cloud.bottom - head.top };
+      this.place = { width, below: false, shift: 0, side: placing.place, bottom: placing.cloud.bottom - head.top, tall: 0 };
       this.cloud = {
         left: placing.cloud.left - head.middle,
         right: placing.cloud.right - head.middle,
@@ -465,7 +486,7 @@ export class Speech {
       });
     const belowFits = () => over.y + 22 + (height + tail) * scale <= this.room[1];
     const sides = (from: number, to: number): Box => {
-      this.place = { width, below: false, shift: 0, side: 'above', bottom: 0 };
+      this.place = { width, below: false, shift: 0, side: 'above', bottom: 0, tall: 0 };
       const [middle] = this.anchor();
       return {
         left: middle - (width / 2) * scale,
@@ -510,7 +531,7 @@ export class Speech {
     const reach = bubbleReach(width, scale, edge);
     const shift = below ? 0 : bubbleShift(aboveBox(), avoid, this.parts.width, reach);
     const top = below ? tail : -height - tail;
-    this.place = { width, below, shift, side: below ? 'below' : 'above', bottom: 0 };
+    this.place = { width, below, shift, side: below ? 'below' : 'above', bottom: 0, tall: height + tail };
     const [x, y] = this.anchor();
     // The tail's tip is at the anchor, over who speaks, even where the box is held
     // in from a side or moved off someone.
@@ -579,7 +600,7 @@ export class Speech {
     box.lineTo(near, middle + 6);
     box.strokePath();
     words.setPosition(left + width / 2, top + pad);
-    this.place = { width, below: false, shift: 0, side, bottom: (top + height) * scale };
+    this.place = { width, below: false, shift: 0, side, bottom: (top + height) * scale, tall: 0 };
     this.bubble = this.scene.add.container(...this.anchor(), [box, words]).setDepth(10).setScale(scale);
     this.bubbleUntil = tick + ticks;
     this.bubbleRead = this.readAt(ticks);

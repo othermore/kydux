@@ -721,8 +721,10 @@ footer .build {
   margin: 0;
 }
 
-/* With *Find my wizard* beside the zoom, the band keeps clear of the button's width. */
-.scene-frame:has(.find-wizard:not([hidden])) .book-band {
+/* With *Find my wizard* beside the zoom, the book's band and Ilda's keep clear of the
+   button's width. */
+.scene-frame:has(.find-wizard:not([hidden])) .book-band,
+.scene-frame:has(.find-wizard:not([hidden])) .race-band {
   right: 170px;
   max-width: calc(100% - 180px);
 }

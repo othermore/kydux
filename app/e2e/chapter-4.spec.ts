@@ -1086,6 +1086,42 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).not.toHaveAttribute('data-through', /ring/);
   });
 
+  test("Ilda's band keeps clear of Find my wizard, with the camera let go of the wizard", async ({ page }) => {
+    for (const [width, height] of [
+      [1280, 800],
+      [1024, 700],
+    ] as const) {
+      await page.setViewportSize({ width, height });
+      // The same level's address again would not load it anew.
+      await page.goto('about:blank');
+      await open(page, 'the-race');
+      await start(page, solution('the-race'));
+      await expect(page.locator('.race-band')).toBeVisible({ timeout: ciTimes(60_000) });
+      // The camera dragged off the wizard: the button comes beside the zoom.
+      const canvas = (await page.locator('#scene canvas').boundingBox())!;
+      for (let drag = 0; drag < 3; drag += 1) {
+        await page.mouse.move(canvas.x + canvas.width * 0.3, canvas.y + canvas.height * 0.5);
+        await page.mouse.down();
+        await page.mouse.move(canvas.x + canvas.width * 0.9, canvas.y + canvas.height * 0.2, { steps: 8 });
+        await page.mouse.up();
+      }
+      await expect(page.locator('.find-wizard')).toBeVisible();
+      // The band comes and goes as Ilda reads and judges: measured while both are seen.
+      const apart = await page.waitForFunction(
+        () => {
+          const band = document.querySelector<HTMLElement>('.race-band');
+          const button = document.querySelector<HTMLElement>('.find-wizard');
+          if (!band || !button || band.hidden || button.hidden || !band.offsetWidth || !button.offsetWidth) return null;
+          return { band: band.getBoundingClientRect().right, button: button.getBoundingClientRect().left };
+        },
+        null,
+        { polling: 'raf', timeout: ciTimes(60_000) },
+      );
+      const { band, button } = (await apart.jsonValue()) as { band: number; button: number };
+      expect(band).toBeLessThanOrEqual(button);
+    }
+  });
+
   test('Ilda reads the programs on her band and judges the race at its end; the function counts 54, the same flight in 18 lines ties at 61 (D189, D220, D229, D234)', async ({ page }) => {
     await open(page, 'the-race', '2');
     await start(page, solution('the-race'));

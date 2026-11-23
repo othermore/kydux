@@ -65,23 +65,6 @@
         8,
         7
       ]
-    },
-    {
-      "kind": "familiar",
-      "id": "mate_familiar",
-      "creature": [
-        "Bat",
-        "Mouse"
-      ],
-      "color": [
-        "black",
-        "brown"
-      ],
-      "trial": true,
-      "at": [
-        11,
-        8
-      ]
     }
   ],
   "familiar": {

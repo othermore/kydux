@@ -64,17 +64,6 @@
         8,
         7
       ]
-    },
-    {
-      "kind": "familiar",
-      "id": "mate_familiar",
-      "creature": "Frog",
-      "color": "green",
-      "trial": true,
-      "at": [
-        11,
-        6
-      ]
     }
   ],
   "familiar": {

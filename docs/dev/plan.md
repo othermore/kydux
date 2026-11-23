@@ -768,7 +768,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     nothing between (D320), the camera travelling between two framings of a part
     (D321), nobody fading into a scene, who comes in walking in by a way in (D322),
     and the view that ends inside a painting, the band over the entrance's wall
-    unseen (D323).
+    unseen (D323); and a story's figure that stamps where it stands and throws what
+    it holds all at once (D324).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

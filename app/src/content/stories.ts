@@ -22,8 +22,9 @@ import { contentUrl } from './address';
  * appearing, maybe stepping out `from` behind a thing on a cell beside (D128), and a
  * vanishing (a speaker's once its words are said), a ghost's or a familiar's
  * (D322); lying down asleep in a bed and waking
- * (D91); opening or closing a door; standing up, seated, and sitting down; and
- * bringing a thing staged hidden into sight on its cell (D279). */
+ * (D91); opening or closing a door; standing up, seated, and sitting down;
+ * bringing a thing staged hidden into sight on its cell (D279); and stamping where it
+ * stands, and throwing things staged hidden, all at once, each to its cell (D324). */
 export type Action = { by?: string } & (
   | { walk: Tile | Tile[]; leave?: true }
   | { enter: Tile; flying?: true }
@@ -39,6 +40,8 @@ export type Action = { by?: string } & (
   | { stand: true }
   | { sit: true }
   | { show: string }
+  | { stamp: true }
+  | { throw: string[] }
 );
 
 /** What a step does before its words: nothing, one action, or a list of them. */
@@ -418,6 +421,12 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
         // A thing staged hidden comes into sight as a thing found does (D184, D279).
         const at = shownAt.get(action.show);
         queue.push({ kind: 'found', data: { ids: [action.show], ...(at ? { at: [at] } : {}), ...aside } });
+      } else if ('stamp' in action) {
+        queue.push({ kind: 'stamp', data: { ...aside } });
+      } else if ('throw' in action) {
+        // The things staged hidden a figure throws, all at once, each to its own cell (D324).
+        const at = action.throw.map((id) => shownAt.get(id) ?? [0, 0]);
+        queue.push({ kind: 'throw', data: { ids: action.throw, at, ...aside } });
       }
     }
     // Words said as the step begins, in the tick of its first actions (D275).

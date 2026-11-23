@@ -713,6 +713,48 @@ def test_a_seated_figure_stands_walks_shows_what_it_leaves_and_sits():
     )
 
 
+def test_a_figure_on_its_feet_stamps_and_throws_the_pieces_at_once():
+    seated(
+        [
+            by("rinlo", {"stand": True}),
+            by(
+                "rinlo",
+                [
+                    {"stamp": True},
+                    {"throw": ["thread_1", "thread_2"]},
+                    {"sit": True},
+                ],
+            ),
+            {"who": "rinlo"},
+        ]
+    )
+
+
+@pytest.mark.parametrize(
+    ("doing", "says"),
+    [
+        ({"stamp": "hard"}, "stamp is true"),
+        ({"throw": "thread_1"}, "throw is a list of things staged hidden"),
+        ({"throw": []}, "throw is a list of things staged hidden"),
+        ({"throw": ["thread_1", "thread_1"]}, "things staged hidden, each once"),
+        ({"throw": ["thread_3"]}, "thread_3 is no thing staged hidden"),
+        (
+            [{"show": "thread_1"}, {"throw": ["thread_1", "thread_2"]}],
+            "thread_1 is in sight already",
+        ),
+    ],
+)
+def test_a_story_s_stamp_and_throw_are_checked(doing, says):
+    with pytest.raises(LevelError, match=says):
+        seated([by("rinlo", {"stand": True}), by("rinlo", doing)])
+
+
+@pytest.mark.parametrize("doing", [{"stamp": True}, {"throw": ["thread_1"]}])
+def test_a_seated_figure_neither_stamps_nor_throws(doing):
+    with pytest.raises(LevelError, match="rinlo is seated, and stands before a"):
+        seated([by("rinlo", doing)])
+
+
 @pytest.mark.parametrize(
     ("steps", "says"),
     [

@@ -1,7 +1,8 @@
 // The playback of a run's events, tick by tick, at a speed the child chooses:
 // each step plays every event of one tick, the wizard's and the actors'. A tick
 // in which the wizard does something with its hands, casting, picking up or
-// untying, lasts LONG of a tick, so that it is seen through before the next step;
+// untying, lasts LONG of a tick, so that it is seen through before the next step,
+// and one in which a story's figure throws lasts THROWN, for what it throws to land (D324);
 // a tick in which every move is flown lasts a third of one (D185), and in a level
 // where the wizard can fly every tick does, a walked step there taking three (D225),
 // so that a walk is seen as anywhere else and a flight three times as fast; in a level
@@ -28,6 +29,9 @@ export type PlaybackEvent = WorldEvent;
 
 /** How long a tick lasts in which the wizard casts or picks up, against a tick. */
 export const LONG = 1.6;
+/** How long a tick lasts in which a story's figure throws, against a tick: the rage and
+ * the things' flight to where they land (D324). */
+export const THROWN = 2;
 export { FLOWN } from './flight';
 /** How long a tick lasts where a familiar walks, against a tick: a familiar's step takes
  * one, a person's two (D277). */
@@ -51,11 +55,12 @@ export function toldHold(reading: readonly number[], before: number, order: bool
 
 /** The wizard's events that take a long tick. */
 const HANDS = new Set(['cast', 'pick_up', 'untie']);
-/** How long a tick's events take, against a tick: LONG for the wizard's hands, a
- * third for a flight (D185), and `pace` for any other: a third where the wizard can
- * fly (D225), a half where a familiar walks (D277), one elsewhere. */
+/** How long a tick's events take, against a tick: LONG for the wizard's hands, THROWN
+ * for a throw (D324), a third for a flight (D185), and `pace` for any other: a third
+ * where the wizard can fly (D225), a half where a familiar walks (D277), one elsewhere. */
 export function lengthOf(events: PlaybackEvent[], pace = 1): number {
   if (events.some((event) => event.actor === 'wizard' && HANDS.has(event.kind))) return LONG;
+  if (events.some((event) => event.kind === 'throw')) return THROWN;
   return flownTick(events) ? FLOWN : pace;
 }
 

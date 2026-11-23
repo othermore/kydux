@@ -154,36 +154,16 @@
       "by": "rinlo",
       "do": [
         {
-          "walk": [
-            12,
-            3
-          ]
+          "stamp": true
         },
         {
-          "show": "thread_3"
+          "stamp": true
         },
         {
-          "walk": [
-            11,
-            3
-          ]
-        },
-        {
-          "show": "thread_2"
-        },
-        {
-          "walk": [
-            9,
-            3
-          ]
-        },
-        {
-          "show": "thread_1"
-        },
-        {
-          "walk": [
-            8,
-            3
+          "throw": [
+            "thread_1",
+            "thread_2",
+            "thread_3"
           ]
         },
         {

@@ -33,7 +33,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (camera.ts, D69, D74, D199, D201, D321), the
                 words said in bubbles and the wizard's thoughts (speech.ts), the
                 playback of a run's events (playback.ts, its long ticks for
-                what the wizard's hands do), a painted scene drawn from its
+                what the wizard's hands do and for a story's throw, D324), a
+                painted scene drawn from its
                 art with its figures sorted by their feet, and what of it the
                 view may show (scene.ts, painted.ts, D76, D323), a painted thing
                 drawn on the tile its level lays it on,
@@ -374,6 +375,8 @@ tiles are `[x, y]`.
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
 | `stand` | in a story, an actor seated | | the figure is drawn standing from then on (D279) |
 | `sit` | in a story, an actor with the sitting rows | | the figure is drawn seated, the way it faces (D279) |
+| `stamp` | in a story, an actor on its feet | | the figure rages on its place for the tick, trembling and making a small turn to a side and back, with the bump's sound; `data-shaking` (D324) |
+| `throw` | in a story, an actor on its feet | `ids`, the things staged hidden it throws; `at`, their cells | the figure rages as in a stamp, with the sound of air, and the things leave its hands at once, each flying in an arc to its own cell and tumbling once on the way; the tick lasts twice another (`THROWN`); each is drawn from now on, `data-found` (D324) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
 | `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved or told to pick up before its minka), `nothing`, `by` the familiar, its `pick_up` where nothing lies, which shakes it (D278), and the first year's warnings, `by` `orla`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, `one_familiar`, `two_familiars`, `one_class` (D297), `too_soon` (D301), `kind_kept` (D305), told as Orla's words (D264) and ending the run in a refusal |
 | `turn` | an actor | `facing` | the actor faces the other way |
@@ -1775,7 +1778,8 @@ one overturns stays, marked as superseded.
   are first named, so that two friends walk together. A `walk` is a tile
   or a list of tiles, each reached in a straight line; a walk may end in
   `leave`, for a figure walking out of the scene by a way out (D319); a seated figure stands and sits, and a
-  figure brings a staged thing into sight (D279). `open` and `close` name a
+  figure brings a staged thing into sight (D279); a figure stamps where it
+  stands, and throws staged things all at once (D324). `open` and `close` name a
   door of the story beside the figure, which changes state as a level's
   door does. The camera keeps with the step's `by`, or its speaker: the
   others' events say `aside`, and a teacher walking away down a corridor
@@ -4483,12 +4487,10 @@ one overturns stays, marked as superseded.
   stood, walk on, and sit, a walk with things shown between its stretches written as
   stretches. A seated figure does not walk, and the story's check refuses a walk by one;
   a figure that comes into sight comes on its feet. In *La voz en el túnel* Rinlo stands
-  at his *No. Vete, vete de aquí.*, and at the voice's *Oís algunos ruidos más…* walks to
-  (12, 3) and back, leaving `thread_3` and `thread_2` on the cells he leaves and throwing
-  `thread_1` aside to (9, 2) as he passes (9, 3), then faces right at (8, 3) and sits: the
-  three pieces of *El cuarto olvidado* as its first arrangement lays them, which the child
-  sees next. Rules out a figure that slides seated, and things that lie in a story before
-  what brings them.
+  at his *No. Vete, vete de aquí.*, and sits again, facing right at (8, 3), once the
+  three pieces of the thread lie on the floor (D324): those of *El cuarto olvidado* as its
+  first arrangement lays them, which the child sees next. Rules out a figure that slides
+  seated, and things that lie in a story before what brings them.
 - **D280 — Time that passes in a story is the scene gone dark and back.** Decided
   2026-11-18 by the owner (*hay que poner una animación (como apagar y encender la
   escena, ponerla gris... algo así) para que se entienda que están contando toda la
@@ -5214,3 +5216,29 @@ one overturns stays, marked as superseded.
   The far wall's cover takes the coping in, up to that outline, so that a figure gone
   into a tunnel behind the wall (D319) shows nothing over it. Rules out a sky over a
   hall, and a painting cut to a new size that would move every cell of the scene.
+- **D324 — In a story a figure stamps, and throws what it holds all at once.** Decided
+  2026-11-23 from the owner's comment on Rinlo breaking the thread in *La voz en el túnel*
+  (*Se mueve por la habitación y va dejando los hilos en el suelo. Debería verse en su
+  lugar algún movimiento brusco de enfado (temblar, girar sobre si mismo, etc...) y los
+  hilos debería lanzarlos todos desde donde está, a la vez y no uno a uno, y que cayesen
+  por ahí*; and, of the turn, *Más que girar sobre si mismo me gustaría que vibrar o
+  temblase y hiciese pequeños giros sin dar la vuelta completa*). Two doings join
+  `STORY_DOINGS`. `stamp`, `true`: the figure rages where it stands for the tick, with
+  the bump's sound, the noises the narration tells of. A rage is a trembling to each
+  side of the figure's place, back on it at the end, and one small turn meanwhile: a
+  quarter of a round to a side and back to the way it faced, never the whole round. One
+  rage after another turns to one side and to the other by turns, the first towards
+  the front of the scene for a figure in profile, which shows its face. `throw`, a list
+  of things staged `hidden`, each once: the figure rages for a tick, with the sound of
+  air, and the things leave its hands together, each flying in an arc to its own cell
+  and tumbling once on the way; each lies in sight from then on, as one a figure shows
+  does (D279, `found` in `data-found`). The throw's tick lasts twice another (`THROWN`
+  in `playback.ts`), so that the things are seen to land before the figure's next
+  doing. Both are done on the figure's feet and in sight: the story's check refuses
+  them of a seated figure and of one out of sight, and refuses a thrown thing that is
+  not staged hidden, one named twice and one in sight already. A reader who asks for
+  less motion sees no trembling, no turn and no flight: the things lie on their cells
+  from the throw's tick. In *La voz en el túnel*, at the voice's *Oís algunos ruidos
+  más…*, Rinlo stamps twice, throws `thread_1`, `thread_2` and `thread_3` from (8, 3),
+  stands a tick and sits. Rules out a figure that walks round a room laying down, one
+  by one, what it breaks in anger, and one that spins the whole round as it throws.

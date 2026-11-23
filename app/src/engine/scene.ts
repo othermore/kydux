@@ -8,7 +8,8 @@
 // (each painted thing seen and the middle of its picture, "id:x,y" in cells,
 // joined by ";", D109),
 // data-thought (why an action could not be done, while the wizard thinks it),
-// data-shaking (present while something shakes at a failed try), data-bubble
+// data-shaking (present while something shakes at a failed try, or a story's figure
+// stamps, D324), data-bubble
 // and data-speaker (the words said in a bubble and who says them), data-look
 // (the id of the look the wizard is drawn with, D36), data-wizard-figure and
 // data-friend-figure (the sheets they are drawn from, D77), data-casting (present
@@ -264,6 +265,19 @@ const CREATURE_KEY = 'creature-placeholder';
 const SPARK_KEY = 'spark';
 /** How far aside each of two familiars sharing a cell stands, in cells (D302). */
 const SIDE_BY_SIDE = 0.25;
+/** A story's figure in a rage (D324), stamping or throwing: how far it trembles to each
+ * side, in the scene's pixels, and how many times in a tick; and the ways a figure
+ * faces, in the round's order, by which it makes its small turns. */
+const RAGE_SHAKE = 5;
+const RAGE_TREMBLES = 5;
+const ROUND: readonly Facing[] = ['right', 'down', 'left', 'up'];
+/** A throw (D324), whose tick lasts THROWN: how long the things fly and how long the
+ * thrower rages, in ticks; how high over its feet its hands are and how high over the
+ * straight line the things rise, in cells. */
+const THROW_FLIGHT = 1.5;
+const THROW_RAGE = 1;
+const THROW_HANDS = 0.4;
+const THROW_RISE = 1;
 /** The least time between two of a familiar's taps, in milliseconds (D277): its quick
  * steps at speed 1 are each heard, at twice the speed one in two, at four times one in
  * three. */
@@ -372,6 +386,9 @@ class LevelScene extends Phaser.Scene {
   private showing = 0;
   /** The floating figures' swaying while they stand, by their sprite (D120). */
   private sways = new Map<Phaser.GameObjects.Sprite, Sway>();
+  /** How many times each figure has raged since the scene started again (D324): its
+   * small turns go to one side and to the other by turns. */
+  private rages = new Map<Phaser.GameObjects.Sprite, number>();
   private things = new Map<string, Phaser.GameObjects.Image>();
   private doors = new Map<string, Tile>();
   /** Each painted door's piece lying on the floor while it is open, its doorway, under
@@ -1282,6 +1299,7 @@ class LevelScene extends Phaser.Scene {
   /** Everything where it stood before the run; `seeking`, on the way to a tick. */
   private restart(seeking = false): void {
     this.restarts += 1;
+    this.rages.clear();
     // A step shown anew takes the camera to its travel's end at once, and what waited
     // for it is the step shown before (D321).
     this.view.drop();
@@ -1634,6 +1652,85 @@ class LevelScene extends Phaser.Scene {
       image.setVisible(true).setAlpha(0);
       this.tweens.add({ targets: image, alpha: 1, duration: this.playback.tickDuration * 0.8 });
     }
+  }
+
+  /** A story's figure throws things staged hidden (D324): it rages where it stands, with
+   * a whoosh, and they leave its hands at once, each flying in an arc to its own cell and
+   * tumbling once on the way, where it lies in sight from then on as a thing found does
+   * (D184). */
+  private throwThings(actor: ActorState, event: WorldEvent, instant: boolean): void {
+    const ids = Array.isArray(event.data.ids) ? event.data.ids.map(String) : [];
+    const moving = !instant && !this.still;
+    const length = this.playback.tickDuration * THROW_FLIGHT;
+    if (moving) {
+      this.playSound('lift');
+      this.rage(actor, this.playback.tickDuration * THROW_RAGE);
+    }
+    const from: [number, number] = [actor.sprite.x, actor.sprite.y - THROW_HANDS * TILE];
+    const cells = Array.isArray(event.data.at) ? (event.data.at as Tile[]) : [];
+    ids.forEach((id, index) => {
+      this.found.add(id);
+      const image = this.things.get(id);
+      if (!image || this.carried.has(id)) return;
+      this.tweens.killTweensOf(image);
+      // On the cell it falls on, whatever a flight cut short left of it.
+      const sprite = this.sprites.get(id);
+      const cell = cells[index];
+      if (sprite && cell) this.placeSprite(image, sprite, cell);
+      image.setVisible(true).setAlpha(1).setAngle(0);
+      if (!moving) return;
+      const to: [number, number] = [image.x, image.y];
+      // Each tumbles once as it flies, one the other way from the next.
+      const tumble = index % 2 === 0 ? 360 : -360;
+      image.setPosition(...from);
+      this.tweens.add({
+        targets: image,
+        x: to[0],
+        y: to[1],
+        duration: length,
+        ease: 'Linear',
+        onUpdate: (tween) => {
+          image.setPosition(...hopAt(from, to, tween.progress, THROW_RISE * TILE)).setAngle(tumble * tween.progress);
+        },
+        onComplete: () => image.setPosition(...to).setAngle(0),
+      });
+    });
+  }
+
+  /** A figure rages where it stands for `ms` (D324): it trembles to each side of its
+   * place, back on it at the end, and makes a small turn meanwhile, a quarter of a round
+   * to a side and back to the way it faced: never the whole round. One rage after
+   * another turns to one side and to the other by turns, the first towards the front
+   * of the scene for a figure in profile, which shows its face. */
+  private rage(actor: ActorState, ms: number): void {
+    const sprite = actor.sprite;
+    const x = sprite.x;
+    const trembles = Math.max(1, Math.round((RAGE_TREMBLES * ms) / this.playback.tickDuration));
+    const count = this.rages.get(sprite) ?? 0;
+    this.rages.set(sprite, count + 1);
+    const first = ROUND.indexOf(actor.facing);
+    const front = ROUND[(first + 1) % ROUND.length] === 'down' ? 1 : -1;
+    const side = count % 2 === 0 ? front : -front;
+    this.face(sprite, ROUND[(first + side + ROUND.length) % ROUND.length] ?? actor.facing);
+    // Back to the way it faced, halfway; a restart drops it.
+    const run = this.restarts;
+    this.time.delayedCall(ms / 2, () => {
+      if (run === this.restarts) this.face(sprite, actor.facing);
+    });
+    this.shaking += 1;
+    this.parentNode.dataset.shaking = 'true';
+    this.tweens.add({
+      targets: sprite,
+      x: { from: x - RAGE_SHAKE, to: x + RAGE_SHAKE },
+      duration: ms / (2 * trembles),
+      yoyo: true,
+      repeat: trembles - 1,
+      onComplete: () => {
+        sprite.setX(x);
+        this.shaking -= 1;
+        if (this.shaking === 0) delete this.parentNode.dataset.shaking;
+      },
+    });
   }
 
   /** A ring flown through (D187): kept in order, the wizard's, and seen to glow for a
@@ -3459,6 +3556,17 @@ class LevelScene extends Phaser.Scene {
       case 'sit':
         this.sitting.add(actor.sprite);
         this.face(actor.sprite, actor.facing);
+        break;
+      // A story's figure stamps where it stands: it trembles for the tick, with the
+      // bump's sound (D324).
+      case 'stamp':
+        if (!instant && !this.still) {
+          this.rage(actor, this.playback.tickDuration);
+          this.playSound('bump');
+        }
+        break;
+      case 'throw':
+        this.throwThings(actor, event, instant);
         break;
       // A familiar bumps where it cannot go (D270); after a step held at the circle's
       // edge, the bump is a footprint's, the trial staying where it is (D268).

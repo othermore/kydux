@@ -1990,6 +1990,8 @@ STORY_DOINGS = (
     "stand",
     "sit",
     "show",
+    "stamp",
+    "throw",
 )
 #: The lights a story may be told under, besides its scene's own (D124).
 STORY_LIGHTS = ("morning", "sunset")
@@ -2129,7 +2131,9 @@ def story_on_scene(
     under its pillow (`pillow_side`, D130), or from beside a bed with none, and
     waking (D91); opening or closing a door beside it; standing up, seated, and sitting
     down, a figure of `sitters`, whose sheet has the sitting rows (D273), and bringing
-    into sight a thing staged `hidden` (D279), a seated figure never walking. One
+    into sight a thing staged `hidden` (D279), a seated figure never walking; stamping
+    where it stands, and throwing things staged `hidden`, each once and none in sight
+    yet, all at once, both on its feet and in sight (D324). One
     figure's actions follow
     one another; different figures' are played at once, tick by tick, in the
     order they are first named, and are checked so. An actor may start
@@ -2215,7 +2219,8 @@ def story_on_scene(
     where: dict[str, Position | None] = {"wizard": wizard}
     familiar_ids = {actor.get("id") for actor in actors if actor.get("kind") == "familiar"}
     seated = {actor.get("id") for actor in actors if actor.get("sitting") is True}
-    # The things staged hidden, which a figure brings into sight (D279), and those shown.
+    # The things staged hidden, which a figure brings into sight (D279) or throws (D324),
+    # and those shown.
     hidden: set[str] = set()
     for thing in data.get("things", []):
         if isinstance(thing, dict) and thing.get("hidden") is True:
@@ -2572,6 +2577,25 @@ def story_on_scene(
                 if action["show"] not in hidden:
                     raise LevelError(f"{here}: {action['show']} is no thing staged hidden")
                 queue.append(("show", action["show"]))
+            elif "stamp" in action:
+                # A figure stamps where it stands (D324).
+                if action["stamp"] is not True:
+                    raise LevelError(f"{here}: stamp is true")
+                queue.append(("stamp", None))
+            elif "throw" in action:
+                # A figure throws the things staged hidden it names, all at once (D324).
+                thrown = action["throw"]
+                if (
+                    not isinstance(thrown, list)
+                    or not thrown
+                    or not all(isinstance(name, str) for name in thrown)
+                    or len(set(thrown)) != len(thrown)
+                ):
+                    raise LevelError(f"{here}: throw is a list of things staged hidden, each once")
+                for name in thrown:
+                    if name not in hidden:
+                        raise LevelError(f"{here}: {name} is no thing staged hidden")
+                queue.append(("throw", tuple(thrown)))
             else:
                 kind = "sleep" if "sleep" in action else "wake"
                 queue.append((kind, action.get("sleep")))
@@ -2637,6 +2661,16 @@ def story_on_scene(
                     if value in shown:
                         raise LevelError(f"{here}: {value} is in sight already")
                     shown.add(value)
+                elif kind in ("stamp", "throw"):
+                    # Done on its feet, in sight (D324).
+                    if doer in seated:
+                        raise LevelError(f"{here}: {doer} is seated, and stands before a {kind}")
+                    if where.get(doer) is None:
+                        raise LevelError(f"{here}: {doer} is out of sight")
+                    for name in value or ():
+                        if name in shown:
+                            raise LevelError(f"{here}: {name} is in sight already")
+                        shown.add(name)
                 elif kind in ("vanish", "leave"):
                     where[doer] = None
                 elif kind == "out":

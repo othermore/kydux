@@ -443,7 +443,7 @@ test.describe('the letter held before the castle (D257)', () => {
   });
 });
 
-test('Rinlo stands, crosses the room leaving the pieces behind him, and sits again (D279)', async ({ page }) => {
+test('Rinlo stands, stamps where he is, throws the three pieces at once, and sits again (D279, D324)', async ({ page }) => {
   test.setTimeout(ciTimes(180_000));
   await page.goto('/#story/the-voice-in-the-tunnel');
   const scene = page.locator('#scene');
@@ -455,19 +455,32 @@ test('Rinlo stands, crosses the room leaving the pieces behind him, and sits aga
   await expect(scene).not.toHaveAttribute('data-seated', /rinlo/);
   await expect(scene).toHaveAttribute('data-actors', /rinlo:8,3,/);
   await expect(scene).not.toHaveAttribute('data-found', /thread/);
-  // At the noises, he crosses to the room's far side and back, the pieces behind him.
+  // At the noises: where Rinlo is, whether he trembles and where the pieces are drawn,
+  // each time one of them changes.
   await scene.evaluate((node) => {
-    const seen: string[] = [];
-    (window as unknown as { rinlo: string[] }).rinlo = seen;
-    new MutationObserver(() => seen.push(node.getAttribute('data-actors') ?? '')).observe(node, {
-      attributes: true,
-      attributeFilter: ['data-actors'],
-    });
+    const seen: { actors: string; shaking: boolean; things: string }[] = [];
+    (window as unknown as { rinlo: typeof seen }).rinlo = seen;
+    new MutationObserver(() =>
+      seen.push({
+        actors: node.getAttribute('data-actors') ?? '',
+        shaking: node.hasAttribute('data-shaking'),
+        things: node.getAttribute('data-sprite-things') ?? '',
+      }),
+    ).observe(node, { attributes: true, attributeFilter: ['data-actors', 'data-shaking', 'data-sprite-things'] });
   });
   await storyNext(page);
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
-  const walked = await page.evaluate(() => (window as unknown as { rinlo: string[] }).rinlo);
-  expect(walked.some((actors) => /rinlo:12,3,/.test(actors))).toBe(true);
+  const seen = await page.evaluate(
+    () => (window as unknown as { rinlo: { actors: string; shaking: boolean; things: string }[] }).rinlo,
+  );
+  // He never leaves his cell, and trembles on it before a piece is in sight.
+  expect(seen.every(({ actors }) => /rinlo:8,3,/.test(actors))).toBe(true);
+  expect(seen.some(({ shaking, things }) => shaking && things === '')).toBe(true);
+  // The three leave his hands at once, from his cell, and none is seen alone.
+  expect(seen.some(({ things }) => things === 'thread_1:thread:8,3;thread_2:thread:8,3;thread_3:thread:8,3')).toBe(true);
+  expect(seen.every(({ things }) => things === '' || things.split(';').length === 3)).toBe(true);
+  // Each lies on its own cell, and he sits facing as he sat.
+  await expect(scene).toHaveAttribute('data-sprite-things', 'thread_1:thread:9,2;thread_2:thread:11,3;thread_3:thread:12,3');
   await expect(scene).toHaveAttribute('data-actors', /rinlo:8,3,right/);
   await expect(scene).toHaveAttribute('data-seated', 'rinlo');
   await expect(scene).toHaveAttribute('data-found', 'thread_1,thread_2,thread_3');
@@ -475,6 +488,7 @@ test('Rinlo stands, crosses the room leaving the pieces behind him, and sits aga
   // Back at his words, the pieces are gone again and he stands.
   await page.locator('#story-back').click();
   await expect(scene).not.toHaveAttribute('data-found', /thread/);
+  await expect(scene).toHaveAttribute('data-sprite-things', '');
 });
 
 test('Rinlo opens the side door and goes down the back stairs and through the arch, walking (D289, D307)', async ({ page }) => {

@@ -292,6 +292,36 @@ describe('a story as the scene\'s events (D74)', () => {
 });
 
 
+describe('a figure stamps and throws what it holds (D324)', () => {
+  const room = {
+    map: ['######', '#S...#', '#....#', '######'],
+    actors: [{ id: 'rinlo', kind: 'friend', at: [1, 2], facing: 'right' }],
+    things: [
+      { kind: 'thread', id: 'thread_1', at: [2, 1], hidden: true },
+      { kind: 'thread', id: 'thread_2', at: [4, 2], hidden: true },
+    ],
+  };
+
+  it('plays a stamp a tick, and a throw as one event with every thing and its cell', () => {
+    const { events, spans } = storyEvents({
+      world: room,
+      steps: steps({ who: 'voice', by: 'rinlo', do: [{ stamp: true }, { throw: ['thread_2', 'thread_1'] }] }),
+    });
+    expect(spans[0]).toEqual({ first: 1, last: 2 });
+    expect(events.map((e) => [e.tick, e.actor, e.kind])).toEqual([
+      [1, 'rinlo', 'stamp'],
+      [2, 'rinlo', 'throw'],
+    ]);
+    expect(events[1]?.data).toEqual({
+      ids: ['thread_2', 'thread_1'],
+      at: [
+        [4, 2],
+        [2, 1],
+      ],
+    });
+  });
+});
+
 describe('a familiar in a story walks at twice the pace (D277)', () => {
   const hall = {
     map: ['########', '#S.....#', '#......#', '########'],

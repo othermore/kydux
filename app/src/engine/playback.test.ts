@@ -4,6 +4,7 @@ import {
   FLOWN,
   HELD,
   LONG,
+  THROWN,
   lengthOf,
   Playback,
   type PlaybackEvent,
@@ -113,6 +114,20 @@ describe('Playback', () => {
     vi.advanceTimersByTime(1);
     expect(ticks).toEqual([0, 1, 2]);
     expect(lengthOf([{ ...first!, actor: 'mate', kind: 'sleep' }])).toBe(1);
+  });
+
+  it("gives a throw's tick THROWN, whoever throws, for what is thrown to land (D324)", () => {
+    const playback = new Playback({ tickMs: 400 });
+    const ticks: number[] = [];
+    playback.onTick((tick) => ticks.push(tick));
+    const [first, second] = events(2);
+    playback.load([{ ...first!, actor: 'rinlo', kind: 'throw', data: { ids: ['thread_1'], at: [[9, 2]] } }, second!]);
+    playback.play();
+    vi.advanceTimersByTime(400 * THROWN - 1);
+    expect(ticks).toEqual([0, 1]);
+    vi.advanceTimersByTime(1);
+    expect(ticks).toEqual([0, 1, 2]);
+    expect(lengthOf([{ ...first!, actor: 'rinlo', kind: 'stamp' }])).toBe(1);
   });
 
   it('goes faster from the next tick on', () => {

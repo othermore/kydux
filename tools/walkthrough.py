@@ -45,10 +45,12 @@ SHEETS = (
 
 
 def spoken(text: str) -> str:
-    """A text as Marta reads it: her forms, the friend's, and the names."""
-    text = re.sub(r"\{\{([^{}|]*)\|([^{}|]*)\}\}", r"\1", text)
-    text = re.sub(r"\{([^{}|]*)\|([^{}|]*)\}", r"\2", text)
-    return text.replace("{wizard}", "Marta").replace("{friend}", "Teku").replace("{mate}", "Nuri")
+    """A text as Marta reads it: her forms, the friend's, the names, and the words of the
+    familiar a game with none yet is shown with (D266), as the page fills them."""
+    sys.path.insert(0, str(REPO / "world" / "tests"))
+    from wizard_words import for_wizard
+
+    return for_wizard(text, "girl", "Marta", lang="es")
 
 
 def free_path(drafts: Path, number: int | str, day: str) -> Path:
@@ -129,7 +131,7 @@ class Document:
         text = json.loads((folder / "text.es.json").read_text(encoding="utf-8"))
         kind = KINDS.get(about.get("kind", "practice"), about.get("kind", ""))
         self.kinds[kind] = self.kinds.get(kind, 0) + 1
-        title = text["title"]
+        title = spoken(text["title"])
         self.lines.append(f"## {kind} {self.kinds[kind]}: {title} (`level:{level_id}`)\n")
         where = f"Escena `{about['scene']}`. Empieza en {tuple(about['start'])}"
         if about.get("end"):

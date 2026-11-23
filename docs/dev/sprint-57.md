@@ -21,6 +21,10 @@ And, on reading this plan, the same day:
 > darle. Y al cargar una partida te muestra los nombres que les
 > hemos dado.
 
+> Y al principio cuando enciendes el juego y estás en una partida
+> te dice en qué partida estás (en algún sitio en esa pantalla o
+> en el botón continuar).
+
 **Where it is today.**
 
 - *The list.* `GamesStore` (`app/src/progress/games.ts`, D70)
@@ -59,8 +63,9 @@ same.
   same name. It is given and changed in the creator, `#wizard`,
   in a field under the wizard's name; *Done* waits for a name
   that is valid and free. The names of the story (D36's reserved
-  names) are free to a game. The start screen lists the games by
-  their names, and *Delete* asks with it. Rules out the name in
+  names) are free to a game. The start screen says under its
+  greeting which game is being played, lists the games by their
+  names, and *Delete* asks with it. Rules out the name in
   the progress document: being unique is a property of the list,
   and the entry already holds what is the game's and not the
   course's (begun, last played, seconds). Rules out a name in the
@@ -154,7 +159,12 @@ name, then the gender and the look, the preview, the buttons.
   differ without regard to case. The portrait, the place, the
   time, *Play* and *Delete* as today.
 - *Delete* asks with the game's name.
-- `#saved-note` names the game being played.
+- The game being played is told in the greeting: under the
+  hello, a line `#current-game` with the game's name, in type
+  that is read at once, not the small note's. It is there
+  whenever the game being played has a name, so on every opening
+  of the game with a wizard made. The *Continue* button keeps
+  its words, which tell the place. `#saved-note` stays as it is.
 - *Import* asks the game's name. Once the file is read and is a
   game with a wizard (the file's, or the one being played when
   the file has none), nothing is added yet: under the *Export*
@@ -189,7 +199,7 @@ is the game's name.
 | `start.import_name` | What name do you give this game? | ¿Qué nombre le pones a esta partida? |
 | `start.import_done` | Import it | Importarla |
 | `start.import_cancel` | Cancel | Cancelar |
-| `start.saved` | Your game, “{name}”, is saved as you play. | Tu partida, «{name}», se guarda sola mientras juegas. |
+| `start.current_game` | You are in the game “{name}”. | Estás en la partida «{name}». |
 | `start.delete_confirm` | Delete the game “{name}”? It cannot be brought back. | ¿Borrar la partida «{name}»? No se podrá recuperar. |
 | `start.change_wizard` | Change the names | Cambiar los nombres |
 
@@ -234,7 +244,8 @@ head of `games.ts`, `wizard.ts` and `start.ts`.
   rewritten to this.
 - `start.spec.ts`: the list by the games' names, the wizard's
   name under one that differs, *Delete* asking with the game's
-  name (the dialog's message read), `#saved-note` with the name;
+  name (the dialog's message read), `#current-game` with the name
+  of the game being played, and of another once *Play* chose it;
   a file brought in opens the form with the automatic name, its
   number when a game of the list is called alike; a name of the
   list disables `#import-done` and shows the message; a name
@@ -256,8 +267,10 @@ On the owner's own browser, where games of before are saved:
    both be changed; the gender and the look are shown and cannot
    be changed; a name of another game is refused with its
    message.
-3. Back on the start screen: the note under the greeting and the
-   list show the new name; *Delete* asks with it.
+3. Back on the start screen: the line under the greeting says
+   which game is being played, with its new name, and the list
+   shows it; *Play* on another game changes the line; *Delete*
+   asks with the name.
 4. *New game*, to the creator: the game's name follows the
    wizard's name as it is typed, with a number when it is
    taken; written by hand, it stays; the note says the gender
@@ -293,7 +306,8 @@ The entry's name, the rules, the naming of the games of before,
 
 ### 3.2 The creator and the start screen (D290, D291; 2.2, 2.3, 2.4)
 
-The field, the list, *Delete*, the note, the button's words,
+The field, the greeting's line, the list, *Delete*, the button's
+words,
 *Import*'s form, the texts in both languages. `wizard.spec.ts`,
 `start.spec.ts`.
 
@@ -311,8 +325,8 @@ whole, once, in a copy. The report in Spanish, in `drafts/`: the
 five steps of 2.7; pictures of the current commit only (the
 creator for a wizard being made and for one made, the message of
 a name taken, the list with two wizards called alike, the start
-screen's note, *Import*'s form); what was decided where the
-plan does not decide.
+screen's greeting with the game told, *Import*'s form); what
+was decided where the plan does not decide.
 The memory note `kydux-sprint-57-state`, and the prompt for the
 designer's review.
 
@@ -366,7 +380,8 @@ it; for a wizard made it shows the game's name. Done waits for a
 name valid and free, and keeps the wizard and the name together.
 The start screen lists the games by their names, the wizard's
 name under one that differs; Delete asks with the game's name;
-the note under the greeting names the game; the button
+a line under the greeting (#current-game) says which game is
+being played; the button
 #change-wizard says "Change the names". Import asks the name of
 the game it brings before adding it: a small form under the
 buttons (#import-form, #import-name with the automatic name
@@ -400,8 +415,9 @@ What the owner will look for, on a browser with games of before:
     called alike as X and X 2;
 (2) "Change the names": both names can be changed, the gender
     and the look cannot, and another game's name is refused;
-(3) the new name on the start screen's note and in the list, and
-    in Delete's question;
+(3) the start screen saying under its greeting which game is
+    being played, with its new name; the name in the list and in
+    Delete's question;
 (4) a new game: its name follows the wizard's name, with a
     number when taken, and stays once written by hand;
 (5) Import asks the name of the game it brings, offering its

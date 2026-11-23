@@ -513,8 +513,7 @@ the sweep walks a familiar through every small cell both ways, facing as it goes
 (`small-<scene>.png` in, `small-<scene>-out.png` out). Where the painted trench's middle
 is off its cells' middle, those cells are `nudged`; where a rim lies just below a
 familiar's feet, the rim is a cover drawn over it, and the settings name its cells
-(`rims`); those cells are `lowered` by less than 0, which draws the familiar higher, on
-the trench's floor, and the sweep wants its paws alone behind the rim (D282).
+(`rims`), on which the sweep wants the feet behind it and the body seen (D282).
 
 ## A small thing painted into the base
 

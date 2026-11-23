@@ -4474,22 +4474,29 @@ one overturns stays, marked as superseded.
   lines runs at 10.52 up column 10 and at 13.52 up column 13, and a familiar's figure
   stands 0.005 of a cell left of its frame's middle: the cells (10, 8) to (10, 12) and
   (13, 4) to (13, 8) are nudged 0.025 to the right; row 8's stretch is not, its familiar
-  walking along it. Along that stretch the floor runs from 8.40 to 8.66 down, above where
-  a figure's feet are drawn on a cell (0.8 down it): the cells (10, 8) to (13, 8) are
-  `lowered` by -0.1, which draws a familiar a tenth of a cell higher, its feet at 8.7, on
-  the trench's floor at its near edge, the corners with the row so that it walks level
-  along it. The trench's near rim, the pale stones just below from the trench's lower
-  edge down to where they end, is a cover drawn over a figure (`trench_rim`, a box from
-  (10.68, 8.635) to (13.82, 8.84), `over`, D273): a familiar on (11, 8) to (13, 8) is
-  seen whole down to its legs, the tips of its paws behind the rim, and none on row 9 or
-  below reaches it. The scene's settings name those cells (`rims`), and `sweep.py` walks
-  a familiar through every cell of the trench both ways, facing as it goes
-  (`passage_ways`, `small-<scene>.png` in and `small-<scene>-out.png` out): on a rim's
-  cell the rim covers something of it and no more than its paws, from 2 % to 15 % (8 %
-  measured on (11, 8) and (12, 8), 3 % to 4 % on (13, 8)), under the wall at least half
-  of it, as at a mouth's edge walking out, and elsewhere a tenth at most. Rules out a
-  familiar that walks on the trench's wall, one cut at its belly by the rim, and a trench
-  painted again to meet the figure.
+  walking along it. Along that stretch, columns 10 to 13, the trench's near rim, the pale
+  stones just below the figure's feet, is a cover drawn over a figure (`trench_rim`,
+  `over`, D273), and its upper edge is the rim's own painted line: the top of the dark
+  outline that parts the trench's floor from the pale stones, with its dips at the
+  stones' joints and its curve at the left corner. The mask is a polygon traced inside
+  the pale stones, whose edge the cut puts on the outer edge of that outline (D93),
+  with parts taken as drawn: the rim below the outline, down to where it ends at 8.84,
+  and its two ends from the outline's top, where the rim runs on into the rims of
+  columns 10 and 13 with no outline between, so that the cut finds no edge there; the
+  box keeps the whole below 8.66, where the floor ends. Measured on the export, the
+  mask begins on the outline's first row, 8.66 to 8.69 along the stretch, nowhere
+  above it, and has no hole. A familiar on (11, 8) to (13, 8) stands with its feet on
+  the floor at 8.8, behind the rim: it is seen down to the wall's line, and none on
+  row 9 or below reaches the cover. The scene's settings name those cells (`rims`),
+  and `sweep.py` walks a familiar through every cell of the trench both ways, facing
+  as it goes (`passage_ways`, `small-<scene>.png` in and `small-<scene>-out.png` out):
+  on a rim's cell from a tenth to a little over a third of it is covered, its feet and
+  legs (a fifth seen from the side, an eighth from the front or the back, measured),
+  under the wall at least half of it, as at a mouth's edge walking out, and elsewhere
+  a tenth at most; a hole in the rim's mask shows as a share under the tenth. Rules
+  out a familiar that walks on the trench's wall, a trench painted again to meet the
+  figure, and a rim's cover cut as a box, whose straight edge lies above the painted
+  line.
 - **D283 — A friend's portrait wears what the friend wears in the scene.** Decided
   2026-11-18 by the designer, from sprint 53's review. A friend has two sets of colours,
   and the wizard's look says which it wears (D90, `friendSheet`). The portrait beside a

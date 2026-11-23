@@ -29,12 +29,20 @@
       "states": {"standing": "painting"}
     },
     "trench_rim": {
-      "about": "The trench's near rim along row 8, its pale stones from the trench's lower edge down to where they end: over a familiar on (10, 8) to (13, 8), which is seen down to its legs, the tips of its paws behind the rim; no familiar on row 9 or below reaches it (D282).",
-      "box": [10.68, 8.635, 13.82, 8.84],
+      "about": "The trench's near rim along row 8, from the top of its dark outline, the trench's lower edge, down to where its pale stones end. The polygon runs inside the pale stones and the cut puts its edge on the outline's (D93); the fixed parts fill the rim below the outline, and its two ends from the outline's top, where the rim runs on into the rims of columns 10 and 13 with no outline between; the box keeps it below the trench's floor. Over a familiar on (10, 8) to (13, 8), whose feet stand behind the rim; no familiar on row 9 or below reaches it (D282).",
+      "box": [10.66, 8.66, 13.82, 8.84],
       "row": 8,
       "static": true,
       "solid": true,
-      "mask": "box",
+      "mask": "polygon",
+      "polygon": [[10.74, 8.7], [13.8, 8.7], [13.8, 8.74], [10.74, 8.74]],
+      "fixed": [
+        [[10.68, 8.72], [13.82, 8.72], [13.82, 8.84], [10.68, 8.84]],
+        [[10.69, 8.688], [13.82, 8.688], [13.82, 8.84], [10.69, 8.84]],
+        [[10.74, 8.667], [10.78, 8.667], [10.78, 8.84], [10.74, 8.84]],
+        [[10.77, 8.66], [11.36, 8.66], [11.36, 8.84], [10.77, 8.84]],
+        [[13.37, 8.66], [13.82, 8.66], [13.82, 8.84], [13.37, 8.84]]
+      ],
       "over": true,
       "states": {"standing": "painting"}
     }
@@ -64,11 +72,6 @@
     }
   ],
   "lowered": [
-    {
-      "about": "The trench's stretch along row 8: a familiar drawn a tenth of a cell higher, on the trench's floor, the tips of its paws behind the near rim (D282).",
-      "cells": [[10, 8], [13, 8]],
-      "by": -0.1
-    },
     {
       "about": "Under the room's front wall's lit top: a familiar drawn lower, so that it is wholly under the wall until it steps into the room.",
       "cells": [[13, 4], [13, 4]],

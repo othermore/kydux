@@ -16,7 +16,7 @@
     {
       "row": 8,
       "image": "row-8-static-over.webp",
-      "top": 829,
+      "top": 831,
       "static": true,
       "over": true
     },
@@ -30,20 +30,6 @@
   ],
   "things": {},
   "lowered": [
-    {
-      "about": "The trench's stretch along row 8: a familiar drawn a tenth of a cell higher, on the trench's floor, the tips of its paws behind the near rim (D282).",
-      "cells": [
-        [
-          10,
-          8
-        ],
-        [
-          13,
-          8
-        ]
-      ],
-      "by": -0.1
-    },
     {
       "about": "Under the room's front wall's lit top: a familiar drawn lower, so that it is wholly under the wall until it steps into the room.",
       "cells": [

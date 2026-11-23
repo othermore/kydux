@@ -12,6 +12,7 @@ import {
   mateColour,
   nameProblem,
   sheetOf,
+  withFamiliar,
   wordsOf,
   writeIntoLevel,
 } from './familiar';
@@ -131,5 +132,35 @@ describe('the familiar in the texts (D266)', () => {
     expect(trial.values.familiar_a_kind).toBe('una liebre');
     expect(trial.values.familiar_color_word).toBe('white-f');
     expect(trial.values.familiar).toBe('Pimu');
+  });
+});
+
+describe("the tester's solution with the game's familiar (D265)", () => {
+  const slate = [
+    'class Fox(Familiar):',
+    '    def __init__(self, name, color):',
+    '        self.name = name',
+    '        self.color = color',
+    '',
+    'pimu = Fox("Pimu", "red")',
+    'kesi = Fox("Kesi", "white")',
+    'wizard.cast("minka", pimu)',
+    'wizard.cast("minka", kesi)',
+    '',
+  ].join('\n');
+
+  it('writes the kind, the names and the colours of the game\'s familiar, and of the room-mate\'s copy', () => {
+    const crow = withFamiliar(slate, { living: { kind: 'Crow', name: 'Nabi', color: 'white', source: '' } }, table);
+    expect(crow).toContain('class Crow(Familiar):');
+    expect(crow).toContain('nabi = Crow("Nabi", "white")');
+    expect(crow).toContain('kesi = Crow("Kesi", "black")');
+    expect(crow).toContain('wizard.cast("minka", nabi)');
+  });
+
+  it('names the copy apart when the child took its name, and keeps a game with no familiar as it is', () => {
+    const kesi = withFamiliar(slate, { draft: { kind: 'Fox', name: 'Kesi', color: 'black' } }, table);
+    expect(kesi).toContain('kesi = Fox("Kesi", "black")');
+    expect(kesi).toContain('nabi = Fox("Nabi", "red")');
+    expect(withFamiliar(slate, {}, table)).toBe(slate);
   });
 });

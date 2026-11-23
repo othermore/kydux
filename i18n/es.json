@@ -126,7 +126,8 @@
     "tunnel": "túnel oscuro",
     "zone": {
       "wall": "junto a la pared",
-      "straw": "en la paja"
+      "straw": "en la paja",
+      "room": "en el cuarto"
     }
   },
   "guide": {
@@ -637,9 +638,11 @@
       "pole": "Poste",
       "gate": "Cancela",
       "lawn": "Césped que no se pisa",
-      "furniture": "Muebles"
+      "furniture": "Muebles",
+      "passage": "Pasadizo de familiares"
     },
     "low": "Bajo: se cruza volando, no se pisa",
+    "small": "Pequeño: solo lo pisa un familiar",
     "music": {
       "title": "Los temas de la música",
       "story": "Como en una historia",

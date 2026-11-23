@@ -126,7 +126,8 @@
     "tunnel": "dark tunnel",
     "zone": {
       "wall": "by the wall",
-      "straw": "in the straw"
+      "straw": "in the straw",
+      "room": "in the room"
     }
   },
   "guide": {
@@ -637,9 +638,11 @@
       "pole": "Pole",
       "gate": "Gate",
       "lawn": "Lawn not walked on",
-      "furniture": "Furniture"
+      "furniture": "Furniture",
+      "passage": "Familiars' passage"
     },
     "low": "Low: flown over, not walked on",
+    "small": "Small: only a familiar walks here",
     "music": {
       "title": "The music's themes",
       "story": "As in a story",

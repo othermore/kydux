@@ -52,6 +52,7 @@ const KIND_COLOURS: Record<string, number> = {
   gate: 0x805a30,
   lawn: 0x8fcf6f,
   furniture: 0xb5838d,
+  passage: 0x6b5b4b,
 };
 const OTHER = 0xff66cc;
 /** The cross on a cell an open door's leaf lies on (D125). */
@@ -62,6 +63,8 @@ const ENCHANTED = 0xb56bff;
 const ZONE_COLOURS = [0xffb000, 0x2fbf71, 0xb08cff, 0x00bcd4];
 /** The cross on a low cell, which a flight crosses and a walk does not (D186). */
 const LOW = 0x1f6fff;
+/** The cross on a small cell, which a familiar enters and the wizard does not (D270). */
+const SMALL = 0x00c2a8;
 
 
 function kept(): Record<DebugLayer, boolean> {
@@ -161,9 +164,10 @@ export class DebugView {
         const kind = this.kindAt(x, y);
         cells.fillStyle(KIND_COLOURS[kind] ?? OTHER, 0.38).fillRect(x * TILE, y * TILE, TILE, TILE);
         const char = kind === 'margin' ? '#' : (this.map.rows[y]?.[x] ?? '#');
-        if (char === '#' || char === '=' || char === '~') {
-          // Red where no one walks or flies, blue where a flight crosses (D186).
-          cells.lineStyle(2, char === '~' ? LOW : 0xff2a2a, 0.75);
+        if (char === '#' || char === '=' || char === '~' || char === ',') {
+          // Red where no one walks or flies, blue where a flight crosses (D186), green
+          // where only a familiar walks (D270).
+          cells.lineStyle(2, char === '~' ? LOW : char === ',' ? SMALL : 0xff2a2a, 0.75);
           cells.lineBetween(x * TILE + 6, y * TILE + 6, (x + 1) * TILE - 6, (y + 1) * TILE - 6);
           cells.lineBetween((x + 1) * TILE - 6, y * TILE + 6, x * TILE + 6, (y + 1) * TILE - 6);
         }
@@ -329,6 +333,7 @@ export class DebugView {
     }
     entry('', debugWord('blocked'), true);
     if (this.map.low.length > 0) entry(hex(LOW), debugWord('low'), true);
+    if (this.map.small.length > 0) entry(hex(SMALL), debugWord('small'), true);
     if (this.map.things.some((thing) => (thing.covers ?? []).length > 0)) entry(hex(LEAF), debugWord('leaf'));
     if (this.map.enchanted.length > 0) entry(hex(ENCHANTED), debugWord('enchanted'), true);
     this.map.zones.forEach((zone, index) => {

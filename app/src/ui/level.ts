@@ -7,7 +7,7 @@
 // (D258). The card comes with no sound where the run's end sounded as its
 // playback ended, and with its sound where there was no playback (D247).
 
-import { checkedFamiliar, familiarTable, isPractice, keptAfter } from '../content/familiar';
+import { checkedFamiliar, familiarTable, isPractice, keptAfter, withFamiliar } from '../content/familiar';
 import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
 import type { Editor, EditorOptions } from '../editor/editor';
@@ -496,7 +496,12 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   renderHints();
   solution[0]?.addEventListener('click', async () => {
     const response = await fetch(`${import.meta.env.BASE_URL}__debug/solution/${loaded.id}`);
-    if (response.ok) editor.setDoc(await response.text());
+    if (!response.ok) return;
+    const code = await response.text();
+    // A level with a familiar: the solution with the game's own familiar (D265).
+    const familiars = familiarTable();
+    const kept = familiars && loaded.level.familiar ? checkedFamiliar(progress.familiar(), familiars) : null;
+    editor.setDoc(kept && familiars ? withFamiliar(code, kept, familiars) : code);
   });
 
   // What was last drawn, so that the card and the editor's marks change only

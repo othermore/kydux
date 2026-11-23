@@ -209,6 +209,33 @@ export function keptAfter(
   return null;
 }
 
+/** A level's solution, written with the table's default familiar, made the game's own
+ * for the tester's *Escribir la solución* (D265, D266): the kind, the name, its name in
+ * the program and the colour of the game's familiar, else of its draft, and the
+ * room-mate's copy as the slate writes it. A game with no familiar keeps it as it is. */
+export function withFamiliar(code: string, kept: KeptFamiliar, table: FamiliarTable): string {
+  const given = kept.living ?? kept.draft;
+  if (!given) return code;
+  const own = filledIn(given, table);
+  const fallback = table.default;
+  const others = friendsNames(own.name, table);
+  const theirs = friendsNames(fallback.name, table);
+  const word = (text: string) => new RegExp(`\\b${text}\\b`, 'g');
+  // The room-mate's copy is set aside first, so that the child's names and colour never
+  // write over it, nor it over them.
+  const mateData = '\u0000mate-data\u0000';
+  const mateVar = '\u0000mate-var\u0000';
+  return code
+    .replaceAll(`"${theirs.mate}", "${mateColour(fallback.kind, fallback.color, table) ?? ''}"`, mateData)
+    .replace(word(theirs.mate.toLowerCase()), mateVar)
+    .replace(word(fallback.kind), own.kind)
+    .replaceAll(`"${fallback.name}"`, `"${own.name}"`)
+    .replace(word(fallback.name.toLowerCase()), own.name.toLowerCase())
+    .replaceAll(`"${fallback.color}"`, `"${own.color}"`)
+    .replaceAll(mateData, `"${others.mate}", "${mateColour(own.kind, own.color, table) ?? ''}"`)
+    .replaceAll(mateVar, others.mate.toLowerCase());
+}
+
 /** The words of i18n's `familiars`, for a kind and a colour (D266). */
 export interface KindWords {
   /** The kind in a word, `zorro`; with its article, `un zorro`; its gender, `m` or `f`. */

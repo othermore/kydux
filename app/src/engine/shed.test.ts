@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { framingAt } from '../ui/story';
+import { framingAt, travelsTo } from '../ui/story';
 import { FOOT_IN_CELL, figureDepth, shiftedBy, thingDepth } from './depth';
 import { layout } from './layout';
 import { TILE } from './placeholders';
@@ -81,5 +81,20 @@ describe("a story step's framing (D199)", () => {
     expect(framingAt(steps, 0, 2)).toEqual({ fit: [3, 3, 16, 10] });
     expect(framingAt(steps, 0, 3)).toEqual({ wide: true });
     expect(framingAt(steps, 2, 2)).toBeNull();
+  });
+
+  it('is travelled to, reached by Next, where the part held another place or none (D321)', () => {
+    const steps = [{}, { camera: { fit: [[3, 3], [16, 10]] } }, {}, { camera: { fit: [[3, 3], [16, 10]] } }, { camera: { wide: true } }].map(
+      (step) => ({ who: 'voice', do: null, text: '', ...step }),
+    ) as Parameters<typeof travelsTo>[0];
+    // From the camera that follows, to the first framing.
+    expect(travelsTo(steps, 0, 1)).toBe(true);
+    // The place held, framed again or kept: no travel.
+    expect(travelsTo(steps, 0, 2)).toBe(false);
+    expect(travelsTo(steps, 0, 3)).toBe(false);
+    expect(travelsTo(steps, 0, 4)).toBe(true);
+    // A part's first step is framed at once, and so is a step that frames nothing.
+    expect(travelsTo(steps, 1, 1)).toBe(false);
+    expect(travelsTo(steps, 0, 0)).toBe(false);
   });
 });

@@ -149,6 +149,16 @@ export function framingAt(steps: readonly StoryStep[], first: number, step: numb
   return null;
 }
 
+/** Whether a step of a part, reached by Next from the step before it, is reached by the
+ * camera's travel (D321): it frames another place than the one the part holds there, or
+ * a place where the camera followed someone. A part's first step is framed at once. */
+export function travelsTo(steps: readonly StoryStep[], first: number, step: number): boolean {
+  if (step <= first) return false;
+  const held = framingAt(steps, first, step);
+  const before = framingAt(steps, first, step - 1);
+  return held !== null && JSON.stringify(held) !== JSON.stringify(before);
+}
+
 export function storyScreen(parts: StoryScreenParts): Screen {
   let story = parts.story;
   let step = 0;
@@ -515,7 +525,8 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   };
 
   /** The scene as the step before left it, then this step played; `onward`, reached by
-   * Next, where a part marked later opens after time has passed (D280). */
+   * Next, where a part marked later opens after time has passed (D280), and where the
+   * camera travels to a framing the part has not held (D321). */
   const play = (onward = false) => {
     if (frame.dataset.passing) {
       // A step gone to while time passes is shown at once, a part started in the dark
@@ -552,14 +563,16 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     const span = spans[step - (part?.step ?? 0)];
     if (!span) return;
     // A step played again brings back a camera a drag let go of (D106); the place the
-    // last step of this part to frame one framed is held (D199).
+    // last step of this part to frame one framed is held (D199), reached by Next from the
+    // step before by a travel (D321), once the step before is shown as it ended.
     scene.follow();
-    scene.place(framingAt(story.steps, part?.step ?? 0, step));
     scene.playback.load(
       events.filter((event) => event.tick <= span.last),
       lengths,
     );
     scene.playback.seek(span.first - 1);
+    const first = part?.step ?? 0;
+    scene.place(framingAt(story.steps, first, step), onward && travelsTo(story.steps, first, step));
     scene.playback.play();
   };
 

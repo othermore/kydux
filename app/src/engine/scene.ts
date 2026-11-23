@@ -284,8 +284,9 @@ export interface SceneHandle {
   restartShow(ready?: () => Promise<void>): Promise<void>;
   /** The camera back on the wizard, following it (12.6). */
   follow(): void;
-  /** In a story, the place a step frames, or none (D199, camera.ts). */
-  place(framing: StoryFraming | null): void;
+  /** In a story, the place a step frames, or none (D199, camera.ts); with `travel`, the
+   * camera travels there from where it is (D321). */
+  place(framing: StoryFraming | null, travel?: boolean): void;
   /** Zooms the camera one step in (1) or out (-1); false when it can go no further. */
   zoom(step: 1 | -1): boolean;
   /** Whether the camera can zoom one step in (1) or out (-1). */
@@ -1050,9 +1051,24 @@ class LevelScene extends Phaser.Scene {
     this.view.follow();
   }
 
-  /** In a story, the place a step frames, or none (D199, camera.ts). */
-  place(framing: StoryFraming | null): void {
-    this.view.place(framing);
+  /** In a story, the place a step frames, or none (D199, camera.ts), travelled to with
+   * `travel` (D321). */
+  place(framing: StoryFraming | null, travel = false): void {
+    this.view.place(framing, travel);
+  }
+
+  /** The camera's travel ended at once and nothing left waiting for it, as the scene
+   * goes (D321). */
+  endCamera(): void {
+    this.view.drop();
+    this.view.arrive();
+  }
+
+  /** A story's bubble said once the camera has arrived where it travels (D321): words
+   * enter over a picture that does not move. */
+  private sayOnArrival(said: () => void): void {
+    if (this.options.story) this.view.arrived(said);
+    else said();
   }
 
   /** In a story, the camera is with whoever the tick is about (D74): who speaks,
@@ -1246,6 +1262,10 @@ class LevelScene extends Phaser.Scene {
   /** Everything where it stood before the run; `seeking`, on the way to a tick. */
   private restart(seeking = false): void {
     this.restarts += 1;
+    // A step shown anew takes the camera to its travel's end at once, and what waited
+    // for it is the step shown before (D321).
+    this.view.drop();
+    this.view.arrive();
     // A run started again closes the map it opened (D134).
     this.mapClosed?.();
     this.found.clear();
@@ -2625,8 +2645,10 @@ class LevelScene extends Phaser.Scene {
       case 'say':
         if (!instant) {
           const said = String(event.data.text ?? '');
-          this.speech.say(said, tick, this.sayTicks(said), this.wizard, 'wizard');
-          play('say');
+          this.sayOnArrival(() => {
+            this.speech.say(said, tick, this.sayTicks(said), this.wizard, 'wizard');
+            play('say');
+          });
         }
         break;
       case 'turn':
@@ -3354,7 +3376,8 @@ class LevelScene extends Phaser.Scene {
     if (!actor && event.kind === 'say' && !instant) {
       const spot = this.voiceSprite(event.actor);
       const said = String(event.data.text ?? '');
-      if (spot) this.speech.say(said, this.shownTick, this.sayTicks(said), spot, event.actor);
+      const at = this.shownTick;
+      if (spot) this.sayOnArrival(() => this.speech.say(said, at, this.sayTicks(said), spot, event.actor));
       return;
     }
     if (!actor) return;
@@ -3448,8 +3471,11 @@ class LevelScene extends Phaser.Scene {
       case 'say':
         if (!instant) {
           const said = String(event.data.text ?? '');
-          this.speech.say(said, this.shownTick, this.sayTicks(said), actor.sprite, event.actor);
-          play('say');
+          const at = this.shownTick;
+          this.sayOnArrival(() => {
+            this.speech.say(said, at, this.sayTicks(said), actor.sprite, event.actor);
+            play('say');
+          });
         }
         break;
       case 'appear': {
@@ -3784,8 +3810,8 @@ export async function startScene(
         follow() {
           scene.follow();
         },
-        place(framing) {
-          scene.place(framing);
+        place(framing, travel) {
+          scene.place(framing, travel);
         },
         zoom(step) {
           return scene.zoomBy(step);
@@ -3814,6 +3840,7 @@ export async function startScene(
         destroy() {
           resized.disconnect();
           playback.stop();
+          if (scene.cameras?.main) scene.endCamera();
           game?.destroy(true);
           game = null;
         },

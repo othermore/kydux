@@ -17,7 +17,11 @@
 // width, held until a later step frames another or none. A level may frame one too
 // (D201): its start shows the box whole, and a run keeps it while the wizard is inside
 // it; a drag or Find my wizard lets it go until the next start. data-camera-fit says
-// the box held.
+// the box held. Between two framings of a part the camera travels (D321): its window and
+// its zoom go from the one to the other over TRAVEL_MS, easing in and out, while
+// data-camera-travel is `true`; a figure's words wait for it to arrive (`arrived`). A new
+// framing, a step shown at once, a resize, a drag or a zoom takes it to its travel's end
+// at once, and so does a motion reduced.
 // It says data-zoom (the zoom, to two decimals), data-following, data-dragged
 // while a drag has let go of it, and data-view and data-bounds (the window and
 // the scene with its margin, in tiles across and down, "w×h") on the scene's
@@ -48,6 +52,17 @@ const DRAG_THRESHOLD = 6;
 /** In a story, the room, in the scene's pixels, the camera's window keeps between
  * its edge and the figure it follows with its words. */
 const STORY_EDGE = TILE;
+/** How long the camera travels from a framing to the next in a part, in milliseconds
+ * (D321). */
+export const TRAVEL_MS = 700;
+
+/** Where the camera is: its zoom against its fit, and the middle of its window in the
+ * scene's pixels. */
+interface Shot {
+  zoom: number;
+  x: number;
+  y: number;
+}
 
 export interface CameraParts {
   /** The scene's size in tiles, and the margin painted round it on each side
@@ -87,6 +102,11 @@ export class SceneCamera {
   private readonly levelFraming: LevelFraming;
   /** Whether the wizard glides in the air, the camera moving with it at once (D259). */
   private gliding = false;
+  /** In a story, the travel to a step's framing under way (D321): its tween, and where it
+   * goes from and to. */
+  private travel: { tween: Phaser.Tweens.Tween; from: Shot; to: Shot } | null = null;
+  /** What waits for the camera to arrive, a figure's words (D321). */
+  private arrivals: (() => void)[] = [];
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -112,6 +132,9 @@ export class SceneCamera {
     // The canvas is the frame's size: the zoom fits the window to it again, and a
     // story's window is made again.
     this.scene.scale.on('resize', (size: Phaser.Structs.Size) => {
+      // A window of another size takes a travel to its end at once (D321); the frame's
+      // refresh at the same size does not.
+      if (Math.abs(size.width - camera.width) > 0.5 || Math.abs(size.height - camera.height) > 0.5) this.arrive();
       camera.setSize(size.width, size.height);
       this.applyZoom();
       if (this.parts.story) this.fitWindow();
@@ -141,6 +164,7 @@ export class SceneCamera {
       const dx = pointer.x - pointer.prevPosition.x;
       const dy = pointer.y - pointer.prevPosition.y;
       if (dx === 0 && dy === 0) return;
+      this.arrive();
       camera.stopFollow();
       this.followed = null;
       this.letGoOfBox();
@@ -160,7 +184,8 @@ export class SceneCamera {
     this.dragged = false;
     delete this.parent.dataset.dragged;
     if (story && this.placed) {
-      this.showPlaced(this.placed);
+      // A travel under way goes on to the place it travels to (D321).
+      if (!this.travel) this.showPlaced(this.placed);
       return;
     }
     if (story) {
@@ -260,8 +285,11 @@ export class SceneCamera {
 
   /** In a story, a step's framing (D199): a box of cells shown whole and centred, or
    * the scene's width on the window's middle, kept until a step frames none; null lets
-   * the camera follow whoever the steps are about again. data-camera-fit says it. */
-  place(framing: StoryFraming | null): void {
+   * the camera follow whoever the steps are about again. data-camera-fit says it from
+   * the start. With `travel`, the camera goes there from where it is over TRAVEL_MS
+   * (D321); a travel under way ends first, at once. */
+  place(framing: StoryFraming | null, travel = false): void {
+    this.arrive();
     this.placed = framing;
     if (!framing) {
       delete this.parent.dataset.cameraFit;
@@ -269,7 +297,39 @@ export class SceneCamera {
       return;
     }
     this.parent.dataset.cameraFit = 'fit' in framing ? framing.fit.join(',') : 'wide';
-    this.showPlaced(framing);
+    this.showPlaced(framing, travel);
+  }
+
+  /** Whether the camera travels to a step's framing (D321). */
+  get travelling(): boolean {
+    return this.travel !== null;
+  }
+
+  /** `then` done once the camera has arrived where it travels: at once where it does not
+   * travel (D321). */
+  arrived(then: () => void): void {
+    if (this.travel) this.arrivals.push(then);
+    else then();
+  }
+
+  /** What waits for the camera dropped, a step shown anew taking its place. */
+  drop(): void {
+    this.arrivals = [];
+  }
+
+  /** The travel under way ended at once, the camera where it was going, and what waited
+   * for it done. */
+  arrive(): void {
+    const travel = this.travel;
+    if (travel) {
+      this.travel = null;
+      travel.tween.remove();
+      this.shoot(travel.to);
+      delete this.parent.dataset.cameraTravel;
+    }
+    const waiting = this.arrivals;
+    this.arrivals = [];
+    for (const then of waiting) then();
   }
 
   /** The top and the bottom, in the scene's pixels, of what a story step's framing
@@ -316,8 +376,10 @@ export class SceneCamera {
     delete this.parent.dataset.cameraFit;
   }
 
-  private showPlaced(framing: StoryFraming): void {
+  private showPlaced(framing: StoryFraming, travel = false): void {
+    this.arrive();
     const camera = this.camera;
+    const from = this.shot();
     const scale = this.fit() * TILE;
     const shown: Tile = [camera.width / scale, camera.height / scale];
     const middle = camera.midPoint.y / TILE;
@@ -333,6 +395,55 @@ export class SceneCamera {
     }
     camera.centerOn(centre[0] * TILE, 'fit' in framing ? centre[1] * TILE : middle * TILE);
     this.parent.dataset.following = 'false';
+    const reduced = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    if (travel && !reduced) this.travelFrom(from);
+  }
+
+  /** Where the camera is now (Shot), its window held within the scene and its margin. */
+  private shot(): Shot {
+    const camera = this.camera;
+    return {
+      zoom: this.zoom,
+      x: camera.clampX(camera.scrollX) + camera.width / 2,
+      y: camera.clampY(camera.scrollY) + camera.height / 2,
+    };
+  }
+
+  /** The camera at a shot. */
+  private shoot(shot: Shot): void {
+    if (Math.abs(shot.zoom - this.zoom) > 1e-6) {
+      this.zoom = shot.zoom;
+      this.applyZoom();
+    }
+    this.camera.centerOn(shot.x, shot.y);
+  }
+
+  /** The camera's travel from a shot to where it is placed now (D321): back at the shot,
+   * then its zoom and its middle eased to the place's over TRAVEL_MS. */
+  private travelFrom(from: Shot): void {
+    const to = this.shot();
+    const far = Math.abs(to.zoom - from.zoom) > 1e-4 || Math.hypot(to.x - from.x, to.y - from.y) > 0.5;
+    if (!far) return;
+    this.shoot(from);
+    const between = (part: number): Shot => ({
+      zoom: from.zoom + (to.zoom - from.zoom) * part,
+      x: from.x + (to.x - from.x) * part,
+      y: from.y + (to.y - from.y) * part,
+    });
+    const tween = this.scene.tweens.addCounter({
+      from: 0,
+      to: 1,
+      duration: TRAVEL_MS,
+      ease: 'Sine.easeInOut',
+      onUpdate: (counter) => {
+        if (this.travel?.tween === counter) this.shoot(between(counter.getValue() ?? 0));
+      },
+      onComplete: () => {
+        if (this.travel?.tween === tween) this.arrive();
+      },
+    });
+    this.travel = { tween, from, to };
+    this.parent.dataset.cameraTravel = 'true';
   }
 
   /** In a story, at each tick: with whoever the step is about, unless a drag has
@@ -398,6 +509,7 @@ export class SceneCamera {
   }
 
   private setZoom(zoom: number): void {
+    this.arrive();
     this.zoom = zoom;
     this.applyZoom();
     if (this.parts.story) this.fitWindow();

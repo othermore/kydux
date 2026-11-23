@@ -456,6 +456,47 @@ test('Rinlo opens the side door and goes down the back stairs and through the ar
   await expect(scene).toHaveAttribute('data-actors', /mate:\d+,\d+,left/);
 });
 
+test("the camera travels between the passage's two halves, and the bubble waits for it to arrive (D321)", async ({ page }) => {
+  test.setTimeout(ciTimes(180_000));
+  await page.goto('/#story/the-voice-in-the-tunnel');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await expect(scene).toHaveAttribute('data-camera-fit', '0,5,19,14');
+  // Each frame, whether the camera travels and whether a bubble shows, from before the press.
+  const watch = () =>
+    scene.evaluate((node) => {
+      const seen: { travel: boolean; bubble: boolean }[] = [];
+      (window as unknown as { framesSeen: typeof seen }).framesSeen = seen;
+      const look = () => {
+        seen.push({ travel: node.dataset.cameraTravel === 'true', bubble: node.dataset.bubble !== undefined });
+        requestAnimationFrame(look);
+      };
+      look();
+    });
+  const framesSeen = () =>
+    page.evaluate(() => (window as unknown as { framesSeen: { travel: boolean; bubble: boolean }[] }).framesSeen);
+  await watch();
+  // Step 2, the cold voice from the room: the framing is said at once, and the camera goes
+  // up to the room's half of the passage before its words come up.
+  await page.locator('#story-next').click();
+  await expect(scene).toHaveAttribute('data-camera-fit', '0,0,19,9');
+  await expect(scene).toHaveAttribute('data-camera-travel', 'true');
+  await expect(scene).toHaveAttribute('data-speaker', 'cold_voice', { timeout: ciTimes(15_000) });
+  await expect(scene).not.toHaveAttribute('data-camera-travel', /./);
+  const travelled = await framesSeen();
+  expect(travelled.some((frame) => frame.travel)).toBe(true);
+  expect(travelled.some((frame) => frame.travel && frame.bubble)).toBe(false);
+  const lastTravel = travelled.map((frame) => frame.travel).lastIndexOf(true);
+  expect(travelled.findIndex((frame) => frame.bubble)).toBeGreaterThan(lastTravel);
+  // Back to step 1: framed at once, with no travel.
+  await watch();
+  await page.locator('#story-back').click();
+  await expect(scene).toHaveAttribute('data-camera-fit', '0,5,19,14');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  await page.waitForTimeout(300);
+  expect((await framesSeen()).some((frame) => frame.travel)).toBe(false);
+});
+
 test("the hall goes dark while the children tell Orla, and comes back in the evening (D280)", async ({ page }) => {
   test.setTimeout(ciTimes(180_000));
   await page.goto('/#story/what-the-familiar-brought');

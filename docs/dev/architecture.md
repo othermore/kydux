@@ -4421,9 +4421,10 @@ one overturns stays, marked as superseded.
   stretches. A seated figure does not walk, and the story's check refuses a walk by one;
   a figure that comes into sight comes on its feet. In *La voz en el túnel* Rinlo stands
   at his *No. Vete, vete de aquí.*, and at the voice's *Oís algunos ruidos más…* walks to
-  (12, 3) and back, leaving `thread_3`, `thread_2` and `thread_4` on the cells he leaves
-  and throwing `thread_1` aside to (9, 2) as he passes (9, 3), then faces right at (8, 3)
-  and sits. Rules out a figure that slides seated, and things that lie in a story before
+  (12, 3) and back, leaving `thread_3` and `thread_2` on the cells he leaves and throwing
+  `thread_1` aside to (9, 2) as he passes (9, 3), then faces right at (8, 3) and sits: the
+  three pieces of *El cuarto olvidado* as its first arrangement lays them, which the child
+  sees next. Rules out a figure that slides seated, and things that lie in a story before
   what brings them.
 - **D280 — Time that passes in a story is the scene gone dark and back.** Decided
   2026-11-18 by the owner (*hay que poner una animación (como apagar y encender la

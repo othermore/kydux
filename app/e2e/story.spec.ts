@@ -411,7 +411,7 @@ test('Rinlo stands, crosses the room leaving the pieces behind him, and sits aga
   expect(walked.some((actors) => /rinlo:12,3,/.test(actors))).toBe(true);
   await expect(scene).toHaveAttribute('data-actors', /rinlo:8,3,right/);
   await expect(scene).toHaveAttribute('data-seated', 'rinlo');
-  await expect(scene).toHaveAttribute('data-found', 'thread_1,thread_2,thread_3,thread_4');
+  await expect(scene).toHaveAttribute('data-found', 'thread_1,thread_2,thread_3');
   await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/rinlo-and-the-pieces.png' });
   // Back at his words, the pieces are gone again and he stands.
   await page.locator('#story-back').click();

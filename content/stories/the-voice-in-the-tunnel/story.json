@@ -76,15 +76,6 @@
         3
       ],
       "hidden": true
-    },
-    {
-      "kind": "thread",
-      "id": "thread_4",
-      "at": [
-        10,
-        3
-      ],
-      "hidden": true
     }
   ],
   "steps": [
@@ -179,15 +170,6 @@
         },
         {
           "show": "thread_2"
-        },
-        {
-          "walk": [
-            10,
-            3
-          ]
-        },
-        {
-          "show": "thread_4"
         },
         {
           "walk": [

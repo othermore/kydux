@@ -13,17 +13,21 @@ Un **método** se escribe con `def`, dentro de la clase, y su primer argumento e
 class Crow:
     def __init__(self, name):
         self.name = name
-        self.hops = 0
+        self.caws = 0
 
-    def hop(self, times):
-        self.hops = self.hops + times
-        print(self.name, "ha saltado", self.hops, "veces")
+    def caw(self, times):
+        for i in range(times):
+            print("¡Grraaa!")
+        self.caws = self.caws + times
+        print("(y con eso van", self.caws, "graznidos)")
 ```
+
+Con `times` le decimos el número de graznidos que debe dar. Después dice cuántos lleva.
 
 ---
 ## Usar el método
 
-Se usa con el punto: `vesso.hop(3)`.
+Se usa con el punto: `vesso.caw(3)`.
 
 Lo que va antes del punto es lo que Python pone en `self`. Por eso entre los paréntesis solo hay una cosa.
 
@@ -37,19 +41,21 @@ Dentro de un método, `self` puede usar todo lo que tiene el objeto: sus atribut
 ---
 ## Dos órdenes
 
-Vamos a enseñar a Vesso a saltar y contar sus saltos. Cada vez que le digas que salte, te dirá cuántas veces ha saltado.
+Vamos a enseñar a Vesso a graznar y a contar sus graznidos. Cada vez que le digas que grazne, dará los graznidos que le pidas y te dirá cuántos lleva.
 
 ```python try
 class Crow:
     def __init__(self, name):
         self.name = name
-        self.hops = 0
+        self.caws = 0
 
-    def hop(self, times):
-        self.hops = self.hops + times
-        print(self.name, "ha saltado", self.hops, "veces")
+    def caw(self, times):
+        for i in range(times):
+            print("¡Grraaa!")
+        self.caws = self.caws + times
+        print("(y con eso van", self.caws, "graznidos)")
 
 vesso = Crow("Vesso")
-vesso.hop(3)
-vesso.hop(2)
+vesso.caw(3)
+vesso.caw(2)
 ```

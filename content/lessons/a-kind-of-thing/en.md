@@ -37,7 +37,7 @@ When it prints an object, Python says it is a `Crow` and adds a long number, whi
 
 The rules in Arvelia are very strict. These are the six kinds of familiar allowed to a first-year pupil: the fox is `Fox`; the crow, `Crow`; the bat, `Bat`; the hare, `Hare`; the mouse, `Mouse`; and the frog, `Frog`.
 
-For the first-years we have a conjuring, the description of a familiar, made ready so that conjuring your familiar is easier. It serves for any familiar, whatever its kind. Its class is called `Familiar`.
+For the first-years we have the description of a familiar, made ready so that describing your familiar is easier. It serves for any familiar, whatever its kind. Its class is called `Familiar`.
 
 ---
 ## Your class and the spell

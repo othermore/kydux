@@ -32,6 +32,6 @@ The last line gives an error, and it is just the one to see: `other` is another 
 
 As I told you before, the rules are clear for first-year pupils: a first-year's familiar has two attributes, `name` and `color`, and no more. The name is a single word.
 
-The colour is one of its kind's natural ones: a fox can be `"red"`, `"white"` or `"black"`; a crow, `"black"` or `"white"`; a bat, `"black"` or `"white"`; a hare, `"brown"` or `"white"`; a mouse, `"brown"` or `"white"`; and a frog, `"green"` or `"red"`. Grey, never.
+The colour is one of its kind's natural ones: a fox can be `"red"`, `"white"` or `"black"`; a crow, `"black"` or `"white"`; a bat, `"black"` or `"white"`; a hare, `"brown"` or `"white"`; a mouse, `"brown"` or `"white"`; and a frog, `"green"` or `"red"`.
 
 The other colours, and other attributes, need deeper magical knowledge, and you will not be able to do it until later years.

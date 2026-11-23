@@ -37,7 +37,7 @@ Al imprimir un objeto, Python dice que es un `Crow` y añade un número largo, q
 
 Las reglas en Arvelia son muy estrictas. Estos son los seis tipos de familiar permitidos para un alumno de primero: el zorro es `Fox`; el cuervo, `Crow`; el murciélago, `Bat`; la liebre, `Hare`; el ratón, `Mouse`, y la rana, `Frog`.
 
-Para los niños de primero, tenemos un conjuro, la descripción de un familiar, ya preparado para que sea más fácil conjurar vuestro familiar. Sirve para cualquier familiar, sea del tipo que sea. Su clase se llama `Familiar`.
+Para los niños de primero tenemos la descripción de un familiar, ya preparada para que sea más fácil describir vuestro familiar. Sirve para cualquier familiar, sea del tipo que sea. Su clase se llama `Familiar`.
 
 ---
 ## Tu clase y el hechizo

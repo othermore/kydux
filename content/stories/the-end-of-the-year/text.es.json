@@ -2,6 +2,7 @@
   "title": "El fin de curso",
   "steps": [
     "Esa voz en las paredes tiene nombre: Korvel.",
+    "Fue, como vosotros, alumno de esta escuela. Y, más tarde, profesor.",
     "Hace muchos años, escribió encantamientos sobre el propio castillo.",
     "Al principio lo hacía para mejorarlo: para que fuese más seguro, más cómodo, más mágico.",
     "Pero poco a poco fue metiendo cambios, pequeños retoques en los hechizos…",
@@ -27,7 +28,7 @@
     "Entonces tú, {wizard}, ya le venciste una vez.",
     "Así es. El amor es un enemigo poderoso del mal.",
     "Mantened siempre cerca a aquellos que os quieren y devolvedles su amor.",
-    "No hay mayor magia en el mundo que la de amar y ser amado.",
+    "No hay magia más poderosa en el mundo que la de amar y ser amado.",
     "E id tranquilos, ahora yo estoy al tanto.",
     "Seguramente, si quedaba algo de Korvel, haya desaparecido al romperse los hilos.",
     "Pero estaremos alerta, preparados por si vuelve a atacar.",
@@ -36,6 +37,8 @@
     "«Empezaste dando un paso. Acabas describiendo criaturas.»",
     "Por el camino aprendiste a dar órdenes con sus argumentos, a lanzar hechizos y a llevar cosas, a guardar valores con un nombre y a leer lo que las cosas saben de sí mismas…",
     "…a contar casillas, a esperar y a elegir con `if` y `else`, a repetir con `for` y `while`, a usar listas, a volar, a escribir tus propias funciones con `def`…",
-    "…y por fin clases, objetos, `__init__`, herencia y métodos. {familiar} duerme en tu capucha. Fin del primer curso."
+    "…y por fin clases, objetos, `__init__`, herencia y métodos.",
+    "Pero, ante todo, aprendiste el valor de la amistad y que la magia más poderosa es el amor.",
+    "Hasta el próximo curso."
   ]
 }

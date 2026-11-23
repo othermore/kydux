@@ -13,7 +13,7 @@
   "outro": "Por suerte, mientras no lo saques del círculo, es solo una prueba que desaparece enseguida.\n\nLa próxima vez le darás su nombre y su color.",
   "learned": "Ahora sabes que una clase describe un tipo de cosa, y que un objeto es una cosa hecha con ella, con el nombre de la clase y unos paréntesis; el nombre con el que lo guardas es solo el que le da tu programa.",
   "told": {
-    "won": "No está mal. Al menos, es {familiar_a_kind}, sí.\n\nPero aún no sabe de qué color es ni cómo se llama.\n\nPor eso no llega a conjurarse por completo.",
+    "won": "No está mal. Al menos, es {familiar_a_kind}, sí.\n\nComo veis, vuestro familiar desaparece a los pocos segundos.\n\nNecesita un nombre y un color para ser estable y poder mantenerse más tiempo en el círculo.",
     "bimo": "*(Abre un ojo, y lo vuelve a cerrar.)* Mrrr…"
   }
 }

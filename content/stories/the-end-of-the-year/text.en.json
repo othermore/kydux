@@ -2,6 +2,7 @@
   "title": "The end of the year",
   "steps": [
     "That voice in the walls has a name: Korvel.",
+    "He was, like you, a pupil of this school. And, later, a teacher.",
     "Many years ago, he wrote enchantments on the castle itself.",
     "At first he did it to make it better: safer, more comfortable, more magical.",
     "But little by little he slipped in changes, small touches to the spells…",
@@ -27,7 +28,7 @@
     "Then you, {wizard}, have beaten him once already.",
     "So it is. Love is a mighty enemy of evil.",
     "Keep those who love you always near, and give them back their love.",
-    "There is no greater magic in the world than to love and be loved.",
+    "There is no magic more powerful in the world than to love and be loved.",
     "And go in peace: I know of it now.",
     "Most likely, if anything was left of Korvel, it vanished when the threads were broken.",
     "But we shall stay watchful, ready in case he strikes again.",
@@ -36,6 +37,8 @@
     "\"You began by taking a step. You end by describing creatures.\"",
     "Over the year you learned to give orders with their arguments, to cast spells and carry things, to keep values with a name and read what things know of themselves…",
     "…to count cells, to wait and to choose with `if` and `else`, to repeat with `for` and `while`, to use lists, to fly, to write functions of your own with `def`…",
-    "…and at last classes, objects, `__init__`, inheriting and methods. {familiar} sleeps in your hood. The end of the first year."
+    "…and at last classes, objects, `__init__`, inheriting and methods.",
+    "But, above all, you learned the worth of friendship, and that the most powerful magic is love.",
+    "Until next year."
   ]
 }

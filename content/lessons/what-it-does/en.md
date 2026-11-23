@@ -13,17 +13,21 @@ A **method** is written with `def`, inside the class, and its first argument is 
 class Crow:
     def __init__(self, name):
         self.name = name
-        self.hops = 0
+        self.caws = 0
 
-    def hop(self, times):
-        self.hops = self.hops + times
-        print(self.name, "has hopped", self.hops, "times")
+    def caw(self, times):
+        for i in range(times):
+            print("Craaak!")
+        self.caws = self.caws + times
+        print("(and that makes", self.caws, "caws)")
 ```
+
+With `times` we tell him how many caws to give. Then he says how many that makes.
 
 ---
 ## Using the method
 
-You use it with the dot: `vesso.hop(3)`.
+You use it with the dot: `vesso.caw(3)`.
 
 What comes before the dot is what Python puts in `self`. That is why there is only one thing between the brackets.
 
@@ -37,19 +41,21 @@ Inside a method, `self` can use everything the object has: its attributes and it
 ---
 ## Two orders
 
-Let us teach Vesso to hop and to count his hops. Every time you tell him to hop, he will tell you how many times he has hopped.
+Let us teach Vesso to caw and to count his caws. Every time you tell him to caw, he will caw as many times as you say and tell you how many that makes.
 
 ```python try
 class Crow:
     def __init__(self, name):
         self.name = name
-        self.hops = 0
+        self.caws = 0
 
-    def hop(self, times):
-        self.hops = self.hops + times
-        print(self.name, "has hopped", self.hops, "times")
+    def caw(self, times):
+        for i in range(times):
+            print("Craaak!")
+        self.caws = self.caws + times
+        print("(and that makes", self.caws, "caws)")
 
 vesso = Crow("Vesso")
-vesso.hop(3)
-vesso.hop(2)
+vesso.caw(3)
+vesso.caw(2)
 ```

@@ -13,7 +13,7 @@
   "outro": "Luckily, as long as you do not take it out of the circle, it is only a trial, and it soon vanishes.\n\nNext time you will give it its name and its colour.",
   "learned": "Now you know that a class describes a kind of thing, and that an object is one thing made with it, with the class's name and brackets; the name you keep it with is only your program's name for it.",
   "told": {
-    "won": "Not bad. At least it is {familiar_a_kind}, yes.\n\nBut it does not know its colour yet, nor what it is called.\n\nThat is why it is not conjured whole.",
+    "won": "Not bad. At least it is {familiar_a_kind}, yes.\n\nAs you see, your familiar vanishes after a few seconds.\n\nIt needs a name and a colour to be stable and to stay longer in the circle.",
     "bimo": "*(Opens one eye, and closes it again.)* Mrrr…"
   }
 }

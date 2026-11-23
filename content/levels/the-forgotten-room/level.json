@@ -129,6 +129,7 @@
     "wizard.find_all",
     "familiar.position",
     "familiar.go_to",
+    "familiar.pick_up",
     "thing.position"
   ],
   "goals": [

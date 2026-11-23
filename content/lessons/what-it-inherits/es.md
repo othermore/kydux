@@ -18,7 +18,7 @@ Una clase que dice que es de otra tiene todo lo que tiene la otra, sin escribirl
 ---
 ## Lo que hereda tu familiar
 
-Tu familiar sabe dónde está, `position`, y sabe andar, con `move_up`, `move_down`, `move_left` y `move_right`. Son los mismos nombres que usa tu `wizard`, y hacen lo mismo.
+Tu familiar sabe dónde está, `position`, y sabe andar, con `move_up`, `move_down`, `move_left` y `move_right`. Son los mismos nombres que usa tu `wizard`, y hacen lo mismo. También sabe recoger lo que tiene debajo, con `pick_up`.
 
 En cuanto salga del círculo, tu familiar pasará a ser un objeto que estará en tus programas con su nombre, igual que está `wizard`.
 

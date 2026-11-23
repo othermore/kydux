@@ -235,3 +235,11 @@ test.describe("the notebook's page of Python (D256)", () => {
     expect(wide).toBe(0);
   });
 });
+
+test("the forgotten room's notebook has the familiar's pick_up, which it inherits (D278)", async ({ page }) => {
+  await open(page, 'the-forgotten-room');
+  await page.locator('#notebook-open').click();
+  const notebook = page.locator('#notebook');
+  await expect(notebook.locator('[data-example="pimu.pick_up()"]')).toBeVisible();
+  await expect(notebook).toContainText('Your familiar picks up what lies on its cell and carries it.');
+});

@@ -905,10 +905,10 @@
       ]
     },
     "the-forgotten-room": {
-      "solution": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in wizard.find_all(\"thread\"):\n    pimu.go_to(thread.position.x, thread.position.y)\nwizard.cast(\"minka\", pimu)\n",
+      "solution": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in wizard.find_all(\"thread\"):\n    pimu.go_to(thread.position.x, thread.position.y)\n    pimu.pick_up()\nwizard.cast(\"minka\", pimu)\n",
       "expect": {
         "status": "won",
-        "ticks": 37,
+        "ticks": 40,
         "ways": {
           "a": "won",
           "b": "won",
@@ -919,7 +919,7 @@
       "wrong": [
         {
           "name": "the pieces as numbers",
-          "code": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\npimu.go_to(9, 2)\npimu.go_to(11, 3)\npimu.go_to(12, 3)\nwizard.cast(\"minka\", pimu)\n",
+          "code": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\npimu.go_to(9, 2)\npimu.pick_up()\npimu.go_to(11, 3)\npimu.pick_up()\npimu.go_to(12, 3)\npimu.pick_up()\nwizard.cast(\"minka\", pimu)\n",
           "expect": {
             "status": "incomplete",
             "ways": {
@@ -930,16 +930,28 @@
         },
         {
           "name": "found from the corridor",
-          "code": "threads = wizard.find_all(\"thread\")\npimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in threads:\n    pimu.go_to(thread.position.x, thread.position.y)\nwizard.cast(\"minka\", pimu)\n",
+          "code": "threads = wizard.find_all(\"thread\")\npimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in threads:\n    pimu.go_to(thread.position.x, thread.position.y)\n    pimu.pick_up()\nwizard.cast(\"minka\", pimu)\n",
           "expect": {
             "status": "incomplete"
           }
         },
         {
           "name": "no minka",
-          "code": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in wizard.find_all(\"thread\"):\n    pimu.go_to(thread.position.x, thread.position.y)\n",
+          "code": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in wizard.find_all(\"thread\"):\n    pimu.go_to(thread.position.x, thread.position.y)\n    pimu.pick_up()\n",
           "expect": {
             "status": "incomplete"
+          }
+        },
+        {
+          "name": "no pick up",
+          "code": "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\nfor thread in wizard.find_all(\"thread\"):\n    pimu.go_to(thread.position.x, thread.position.y)\nwizard.cast(\"minka\", pimu)\n",
+          "expect": {
+            "status": "incomplete",
+            "ways": {
+              "a": "incomplete",
+              "b": "incomplete",
+              "c": "incomplete"
+            }
           }
         }
       ]

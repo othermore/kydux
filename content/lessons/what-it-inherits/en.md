@@ -18,7 +18,7 @@ A class that says it is of another has everything the other has, without writing
 ---
 ## What your familiar inherits
 
-Your familiar knows where it is, `position`, and knows how to walk, with `move_up`, `move_down`, `move_left` and `move_right`. They are the same names your `wizard` uses, and they do the same.
+Your familiar knows where it is, `position`, and knows how to walk, with `move_up`, `move_down`, `move_left` and `move_right`. They are the same names your `wizard` uses, and they do the same. It also knows how to pick up what lies under it, with `pick_up`.
 
 As soon as it leaves the circle, your familiar will become an object that is in your programs by its name, just as `wizard` is.
 

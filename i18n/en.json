@@ -196,6 +196,7 @@
     "already_living": "I have a familiar already: I cannot make another.",
     "not_called": "I have not called it into the circle with minka yet: it cannot move like this.",
     "no_way": "My familiar cannot find a path back to me.",
+    "familiar_nothing": "My familiar has nothing to pick up there.",
     "familiar": "A familiar is in my way: I have to go round.",
     "passage": "Only a familiar fits in there."
   },
@@ -325,6 +326,7 @@
       "move_left": "Your familiar walks left, one cell per step. It stops where it cannot go on.",
       "move_up": "Your familiar walks up, one cell per step. It stops where it cannot go on.",
       "move_down": "Your familiar walks down, one cell per step. It stops where it cannot go on.",
+      "pick_up": "Your familiar picks up what lies on its cell and carries it. It gives it to you when minka brings it back.",
       "go_to": "The action you taught it yourself: it goes to the cell you tell it, first the column and then the row."
     }
   },

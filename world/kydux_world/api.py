@@ -55,7 +55,7 @@ MEMBERS: dict[str, tuple[str, ...]] = {
     # A friend teaches by words, not by code: the child's code has nothing of it (D66).
     "friend": (),
     # The child's familiar (D270): what every familiar has, the name and the colour its
-    # class gives it, and what it inherits from `Familiar`.
+    # class gives it, and what it inherits from `Familiar`, its steps and pick_up (D278).
     "familiar": (
         "name",
         "color",
@@ -64,6 +64,7 @@ MEMBERS: dict[str, tuple[str, ...]] = {
         "move_down",
         "move_left",
         "move_right",
+        "pick_up",
     ),
     # What a position holds: its two numbers, `key.position.x` (D153).
     "position": ("x", "y"),

@@ -430,6 +430,19 @@ test.describe('the living familiar (D267, D269, D270)', () => {
     await page.locator('#scene').screenshot({ path: `${SHOTS}the-small-passage-under-the-covers.png` });
   });
 
+  test('the card recalls pick_up, and a familiar sent to the pieces without it comes back with nothing (D278)', async ({ page }) => {
+    await page.goto('/#level/the-forgotten-room');
+    await expect(page.locator('#card-intro')).toContainText('también tiene pick_up', { timeout: ciTimes(90_000) });
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
+    expect(await editorText(page)).toContain('# Allí, haz que lo recoja con `pick_up`.');
+    await page.locator('#speed').selectOption('4');
+    expect(await run(page, wrong('the-forgotten-room', 'no_pick_up'))).not.toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).not.toHaveAttribute('data-carried', /thread/);
+    expect(await run(page, solution('the-forgotten-room'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute('data-carried', /thread_1.*thread_2.*thread_3/);
+  });
+
   test('the pieces written out as numbers lose an arrangement (D51)', async ({ page }) => {
     await open(page, 'the-forgotten-room');
     await run(page, wrong('the-forgotten-room', 'the_pieces_as_numbers'));

@@ -2641,11 +2641,14 @@ class LevelScene extends Phaser.Scene {
         const by = String(event.data.by);
         // What the first year does not allow is told by Orla or the book (D261, D264).
         if (by === 'orla' || by === 'book') break;
-        // A familiar moved before it is called (D270).
+        // A familiar moved before it is called (D270), or told to pick up where nothing
+        // lies, which it tries (D278).
         if (this.creatures.has(by) || this.called.has(by) || by.startsWith('familiar')) {
-          const reason = event.data.reason === 'not_here' ? 'not_called' : String(event.data.reason);
-          const why = blockedText(reason, null);
+          const reason = { not_here: 'not_called', nothing: 'familiar_nothing' }[String(event.data.reason)];
+          const why = blockedText(reason ?? String(event.data.reason), null);
           this.speech.think(why, tick, this.sayTicks(why));
+          const tried = this.actors.get(by)?.sprite;
+          if (event.data.tried === true && tried) this.shake(tried, duration);
           break;
         }
         const thing = this.map.things.find((t) => t.id === by);

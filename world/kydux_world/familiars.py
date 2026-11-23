@@ -189,9 +189,9 @@ class NoSuchMethod(AttributeError):
 
 
 class Familiar(Child):
-    """What every familiar of Arvelia has: a position, and the four moves, which a kind of
-    familiar inherits (D270). The world makes a class of its own from this one for each
-    run (`familiar_class`); the child's class inherits from it."""
+    """What every familiar of Arvelia has: a position, the four moves and `pick_up`, which a
+    kind of familiar inherits (D270, D278). The world makes a class of its own from this one
+    for each run (`familiar_class`); the child's class inherits from it."""
 
     _k_role = "familiar"
 
@@ -296,6 +296,10 @@ class Familiar(Child):
     def move_down(self, steps: int = 1) -> None:
         """Walk down, one cell per step, stopping where it cannot go: `pimu.move_down(3)`"""
         type(self)._k_world._k_familiar_moves(self, "down", steps, "move_down")
+
+    def pick_up(self) -> None:
+        """Pick up what lies on its own cell, and carry it: `pimu.pick_up()`"""
+        type(self)._k_world._k_familiar_picks_up(self)
 
 
 def _no_data(kind: str) -> Any:

@@ -502,3 +502,48 @@ def test_a_level_has_drevo_or_a_familiar_that_walks_not_both(tmp_path):
         familiar={"stage": "trial", "circle": [8, 6, 11, 8], "trials": [[10, 7]]},
     )
     assert Level.from_dict({**trials, "spells": ["minka", "drevo"]}).walk_ticks == 1
+
+
+def _room(code: str):
+    return run_code(level_of("the-forgotten-room").way("a"), code)
+
+
+INTO_THE_ROOM = "pimu.go_to(10, 8)\npimu.go_to(13, 8)\npimu.go_to(13, 3)\n"
+
+
+def test_pick_up_takes_the_piece_on_its_cell_in_a_tick_of_its_own():
+    stopped = _room(INTO_THE_ROOM + "pimu.go_to(12, 3)\n")
+    assert _events(stopped, "pick_up") == []
+    picked = _room(
+        INTO_THE_ROOM + 'pimu.go_to(12, 3)\npimu.pick_up()\nwizard.cast("minka", pimu)\n'
+    )
+    taken = _events(picked, "pick_up")
+    assert [(e.actor, e.data["id"], e.data["at"]) for e in taken] == [
+        ("familiar", "thread_3", [12, 3])
+    ]
+    assert taken[0].tick == stopped.ticks + 1
+    assert _events(picked, "hand_over")[-1].data["things"] == ["thread_3"]
+
+
+def test_pick_up_with_nothing_there_is_a_stumble_and_the_run_goes_on():
+    result = _room(INTO_THE_ROOM + "pimu.pick_up()\npimu.move_left(1)\n")
+    stumbles = [e for e in _events(result, "blocked") if e.data["reason"] == "nothing"]
+    assert [(e.actor, e.data["by"], e.data["tried"]) for e in stumbles] == [
+        ("wizard", "familiar", True)
+    ]
+    assert result.status != "error"
+    assert _events(result, "move")[-1].data["to"] == [12, 3]
+
+
+def test_pick_up_told_to_a_trial_before_its_minka_is_not_here():
+    level = level_of("out-of-the-circle")
+    code = CLASS + 'pimu = Fox("Pimu", "red")\npimu.pick_up()\n'
+    result = run_code(level, code)
+    refused = [e for e in _events(result, "blocked") if e.data["by"] == "familiar_1"]
+    assert [e.data["reason"] for e in refused] == ["not_here"]
+
+
+def test_a_plate_is_still_lit_by_a_familiar_that_ends_a_move_on_it():
+    result = run_code(level_of("orlas-orders"), "pimu.move_right(3)\npimu.move_up(5)\n")
+    assert [e.data["id"] for e in _events(result, "lit")] == ["sun"]
+    assert _events(result, "pick_up") == []

@@ -400,8 +400,8 @@ class World:
         walks, a cell a tick; a bump on what blocks, on the wizard, on an actor and on
         another familiar. A trial moves only in the birth level, held at the circle's edge
         in a run that is not passing and going on in footprints of light (D268). Where a
-        move of one step or more ends, the familiar picks up what lies there and lights a
-        plate."""
+        move of one step or more ends, the familiar lights a plate; it picks up nothing
+        but by its pick_up (D278)."""
         if self.booking:
             raise familiars.NoSuchMethod(familiar._k_var(), name)
         try:
@@ -488,20 +488,50 @@ class World:
         self.note(familiar._k_id, "born", {"id": familiar._k_id, "at": list(at)})
 
     def _k_ends_move(self, familiar: familiars.Familiar) -> None:
-        """Where a familiar's move ends, in that step's tick: it picks up every thing that
-        is carried that lies there, and a plate there is lit (D270)."""
+        """Where a familiar's move ends, in that step's tick: a plate there is lit (D270).
+        It picks up nothing by stopping (D278)."""
         here = familiar._k_cell
         for thing in sorted(self.things.values(), key=lambda t: t.name):
-            if thing._k_position != here:
-                continue
-            free = not (thing._k_carried or thing._k_given or thing._k_held)
-            if thing.kind in CARRIED_KINDS and free:
-                thing._pick(familiar._k_id)
-                taken = {"id": thing.name, "at": list(here), "by": familiar._k_id}
-                self.note(familiar._k_id, "pick_up", taken)
-            if isinstance(thing, Plate) and not thing._k_lit:
+            if thing._k_position == here and isinstance(thing, Plate) and not thing._k_lit:
                 thing._set(lit=True)
                 self.note(thing.name, "lit", {"id": thing.name, "at": list(here)})
+
+    def _k_familiar_picks_up(self, familiar: familiars.Familiar) -> None:
+        """A familiar's pick_up (D278): a tick in which it takes every thing of a carried
+        kind that lies free on its own cell, and carries it, the wizard having them when
+        minka brings it back (D262); with nothing there, a stumble, the run going on and
+        the wizard thinking of it. Told to a trial before its minka, it is not_here, as a
+        trial's step is (D270)."""
+        if self.booking:
+            raise familiars.NoSuchMethod(familiar._k_var(), "pick_up")
+        block = self.familiar_block
+        state = familiar._k_state
+        fid = familiar._k_id
+        birth = block is not None and block.stage == "birth"
+        self.ready()
+        if state not in ("trial", "living") or (state == "trial" and not birth):
+            here = list(self.wizard._k_position)
+            self.act("blocked", {"at": here, "by": fid, "reason": "not_here", "tried": False})
+            return
+        here = familiar._k_cell
+        found = [
+            thing
+            for thing in sorted(self.things.values(), key=lambda t: t.name)
+            if thing._k_position == here
+            and thing.kind in CARRIED_KINDS
+            and not (thing._k_carried or thing._k_given or thing._k_held)
+        ]
+        if not found:
+            refused = {"at": list(here), "by": fid, "reason": "nothing", "tried": True}
+            self.act("blocked", refused)
+            return
+        for index, thing in enumerate(found):
+            thing._pick(fid)
+            taken = {"id": thing.name, "at": list(here), "by": fid}
+            if index == 0:
+                self.act("pick_up", taken, actor=fid)
+            else:
+                self.note(fid, "pick_up", taken)
 
     def tell(self, who: str, key: str, **values: Any) -> None:
         """Someone of the scene says something while the program runs (D264): a note in

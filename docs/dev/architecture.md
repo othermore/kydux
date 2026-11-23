@@ -340,7 +340,7 @@ tiles are `[x, y]`.
 | `bump` | wizard, or a familiar | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `familiar` (with `id`), and for a familiar's bump `wizard`, `actor` or `familiar` (with `id`, D270); a familiars' passage, a small cell, is a `wall` to the wizard, with the cell's `kind` (D270); `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it, and in the air ends the gust at once (D243); the thought names a friend, a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side, half a second after the bump (D237), over the head or, with no room there, beside it (D245) |
 | `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above or the goals box would cover it (D240) |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
-| `pick_up` | wizard, or a familiar | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); a familiar's thing rises a little and vanishes where its move ends (D270); `data-carried` |
+| `pick_up` | wizard, or a familiar | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); a familiar's thing rises a little and vanishes, in the tick of its `pick_up` (D278); `data-carried` |
 | `open` | wizard, by `door.open()`; or the door, in the wizard's tick, opened by a spell or a word | `id`, `at`, `by`: `hand`, `spell` or `word` | the door's frame turns open; `data-doors` |
 | `shoved` | the door, in the tick it opens | `id`, the figure; `from`, `to`; `by`, the door | the figure on the open leaf's cells walks aside along the row (D125); `data-shoved` |
 | `cast` | wizard | `spell`, `at` | the wand is pointed and a point of light flies from it, to the thing the spell takes or a tile ahead, and bursts in a ring |
@@ -352,7 +352,7 @@ tiles are `[x, y]`.
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved before its minka), and the first year's warnings, `by` `orla`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, told as Orla's words (D264) and ending the run in a refusal |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved or told to pick up before its minka), `nothing`, `by` the familiar, its `pick_up` where nothing lies, which shakes it (D278), and the first year's warnings, `by` `orla`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, told as Orla's words (D264) and ending the run in a refusal |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `vanish` | in a story, an actor, or the wizard at the story's very end | | the figure fades out of sight (D74) |
 | `appear` | in a story, an actor | `at`; `from`, a cell beside it, when it steps out from behind a thing there | the figure comes into sight on its cell: walking out from `from`, behind what stands there, over the tick (D128), or fading in (D74) |
@@ -4230,7 +4230,7 @@ one overturns stays, marked as superseded.
   own. Rules out a second object for the same creature and a familiar that forgets what it
   is.
 - **D270 — A familiar's steps are ticks; some cells only a familiar enters; it picks up
-  where it stops; what it sees, the wizard finds.** Decided 2026-11-17 from the design.
+  when told; what it sees, the wizard finds.** Decided 2026-11-17 from the design.
   `World.act` takes an `actor` (`"wizard"` by default): a familiar's `move_up`, `move_down`,
   `move_left` and `move_right` are the wizard's `_move` with the familiar as the one that
   walks, a cell a tick, at twice a person's pace (D277), a bump on what blocks and on the
@@ -4240,12 +4240,13 @@ one overturns stays, marked as superseded.
   program) and that each one's steps follow on. A trial moves only in the `birth` level;
   before its `minka` a move is `blocked`, `not_here`. The role `familiar` in `api.py`:
   `familiar.name`, `familiar.color`, `familiar.position` (`x`, `y`), `familiar.move_up`,
-  `familiar.move_down`, `familiar.move_left`, `familiar.move_right`. A scene's terrain with
+  `familiar.move_down`, `familiar.move_left`, `familiar.move_right`, `familiar.pick_up`
+  (D278). A scene's terrain with
   `"walk": "small"` is entered by a familiar and not by the wizard, who bumps there with the
   terrain's kind and a thought of its own. A thing kind `thread` is in `THING_KINDS` and
-  `CARRIED_KINDS`; a familiar picks up every carried kind of thing on the cell where a move
-  of one step or more ends (the familiar's `pick_up` event, in that step's tick) and carries
-  it; the wizard has it only when `minka` brings the familiar back (D262). A zone's things
+  `CARRIED_KINDS`; a familiar told to `pick_up` takes every carried kind of thing on its
+  cell (the familiar's `pick_up` event, D278) and carries it; the wizard has it only when
+  `minka` brings the familiar back (D262). A zone's things
   are found from within it (D196) by the wizard **or by its living familiar**, and
   `find_all` orders them as ever, nearest to the wizard first. A thing kind `trail` is a
   thread's end on the floor: not carried, walked over, found by no one. A thing kind `plate`
@@ -4377,3 +4378,23 @@ one overturns stays, marked as superseded.
   twice it, one in three at four times. Rules out a familiar of two cells a tick, which
   would make a move of one cell cost a whole tick and skip the cell between, and a slower
   child with the animal's time unchanged.
+- **D278 — A familiar picks up when it is told: `pick_up`, which it inherits.** Decided
+  2026-11-18 by the owner (*si solo va a la posición de los hilos, no los coje. Habría que
+  usar pick_up. No hay que enseñarlo ni programarlo, o simplemente decir que los familiares
+  tienen pick_up, que se podría introducir antes cuando se explica la herencia y se dice
+  que por ser familiar se tiene move_X, y luego aquí recordarlo*). `Familiar` has
+  `pick_up()`, with no argument, and every kind inherits it as it inherits its steps
+  (`MEMBERS["familiar"]`, `familiar.pick_up` in a level's `api`). It takes a tick: the
+  familiar takes every thing of a carried kind that lies free on its own cell (the
+  familiar's `pick_up` event, as D270 gives it, the first acting and the others noted in
+  its tick) and carries it; the wizard has it when `minka` brings the familiar back (D262).
+  With nothing on its cell it is a stumble and not an error: `blocked`, `by` the familiar,
+  `reason: nothing`, `tried: true`, `at` its cell, the run going on; the familiar shakes and
+  the wizard thinks a line about it (`blocked.familiar_nothing`). Told to a trial before
+  its `minka`, it is `blocked`, `not_here`, as a step of a trial's is. A familiar picks up
+  nothing by ending a move on it; a plate is still lit by a familiar that ends a move on
+  it. The child writes no `pick_up` in its class and none is asked: lesson 4 names it
+  beside the steps, and *El cuarto olvidado* recalls it. Since a lesson's names are taught
+  by the level after it, *Fuera del círculo*'s notebook lists `pick_up` with the steps.
+  Rules out a familiar that takes what it stops on without a word, a `pick_up` that reaches
+  the cells beside, and one more method to write in the book.

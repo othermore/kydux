@@ -196,6 +196,7 @@
     "already_living": "Ya tengo un familiar: no puedo crear otro.",
     "not_called": "Todavía no lo he llamado al círculo con minka: así no puede moverse.",
     "no_way": "Mi familiar no encuentra por dónde volver.",
+    "familiar_nothing": "Mi familiar no tiene nada que recoger ahí.",
     "familiar": "Hay un familiar en mi camino: tengo que dar un rodeo.",
     "passage": "Por ahí solo cabe un familiar."
   },
@@ -325,6 +326,7 @@
       "move_left": "Tu familiar camina a la izquierda, una casilla por paso. Se para donde no puede pasar.",
       "move_up": "Tu familiar camina hacia arriba, una casilla por paso. Se para donde no puede pasar.",
       "move_down": "Tu familiar camina hacia abajo, una casilla por paso. Se para donde no puede pasar.",
+      "pick_up": "Tu familiar recoge lo que hay en su casilla y lo lleva encima. Te lo da cuando minka lo trae de vuelta.",
       "go_to": "La acción que le enseñaste tú: va a la casilla que le digas, primero la columna y luego la fila."
     }
   },

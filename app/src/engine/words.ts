@@ -128,6 +128,9 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
       return t('blocked.not_called');
     case 'no_way':
       return t('blocked.no_way');
+    // A familiar told to pick up where nothing lies (D278).
+    case 'familiar_nothing':
+      return t('blocked.familiar_nothing');
     default:
       return t('blocked.unknown_action');
   }

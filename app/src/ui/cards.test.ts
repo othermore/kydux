@@ -1,8 +1,11 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { WorldEvent, WorldGoal, WorldResult } from '../runtime/protocol';
 import { initLanguage } from '../i18n';
 import { changesLines, saidParagraphs } from './cards';
 import { judge } from './stars';
+import { codeParts } from './words';
 
 function goal(met: boolean, bonus = false): WorldGoal {
   return { kind: 'reach', params: {}, met, met_at_tick: met ? 1 : null, failed: false, failed_at_tick: null, bonus, walked_over: false };
@@ -74,5 +77,25 @@ describe("a card's words in paragraphs", () => {
       'Another, to `type`.',
       'A third.',
     ]);
+  });
+});
+
+describe('the won card shows code as code', () => {
+  it("cuts every level's closing words and what was learned at their backquotes, leaving none", () => {
+    const levels = fileURLToPath(new URL('../../../content/levels/', import.meta.url));
+    for (const id of readdirSync(levels)) {
+      for (const lang of ['es', 'en']) {
+        const text = JSON.parse(readFileSync(`${levels}${id}/text.${lang}.json`, 'utf8')) as Record<string, unknown>;
+        for (const key of ['outro', 'learned']) {
+          const said = text[key];
+          if (typeof said !== 'string') continue;
+          for (const paragraph of saidParagraphs(said)) {
+            // An even count of backquotes: each name in a pair is code, and none is shown.
+            expect((paragraph.match(/`/g) ?? []).length % 2, `${id} ${lang} ${key}`).toBe(0);
+            expect(codeParts(paragraph).every((part) => !part.text.includes('`'))).toBe(true);
+          }
+        }
+      }
+    }
   });
 });

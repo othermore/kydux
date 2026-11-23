@@ -11,6 +11,7 @@ import type { RuntimeLike } from './controller';
 import { element } from './dom';
 import { outcomeText } from './outcome';
 import type { PlanWindow } from './plan';
+import { withCode } from './words';
 
 /** How far the wizard walked, in cells: to the right and down, negative for left and up. */
 export interface Moved {
@@ -76,6 +77,14 @@ export function walkText(moved: Moved): string {
   else if (moved.right === 0) steps = stepsDown(moved.down);
   else steps = t('lesson.steps_and', { first: stepsDown(moved.down), second: stepsRightAfter(moved.right) });
   return t('lesson.moved', { steps });
+}
+
+/** The line under a block's result, in the wizard's words: its walk, then its note, an
+ * error's explanation, whose names in backquotes are shown as code (withCode); empty
+ * where there is neither. */
+export function saidLine(answer: Pick<RunSaid, 'moved' | 'note'>): string {
+  const lines = [...(answer.moved ? [walkText(answer.moved)] : []), ...(answer.note ? [answer.note] : [])];
+  return forWizard(lines.join(' '));
 }
 
 /** The words for a run's result. */
@@ -169,12 +178,10 @@ export function runBlock(code: string, runner: LessonRunner): RunBlock {
       node.dataset.ended = result.world ? firstWay(result.world).status : result.status;
       printed.textContent = answer.printed.replace(/\n$/, '');
       printed.hidden = answer.printed === '';
-      const lines = [
-        ...(answer.moved ? [walkText(answer.moved)] : []),
-        ...(answer.note ? [answer.note] : []),
-      ];
-      said.textContent = forWizard(lines.join(' '));
-      said.hidden = lines.length === 0;
+      // An explanation's names in backquotes shown as code, as on the cards.
+      const line = saidLine(answer);
+      said.replaceChildren(...withCode(line));
+      said.hidden = line === '';
       if (result.world && firstWay(result.world).events.some((event) => event.kind === 'map')) {
         plan = await runner.openPlan(level, () => {
           plan = null;

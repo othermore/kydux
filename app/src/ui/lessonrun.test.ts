@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { initLanguage, speakOf } from '../i18n';
 import type { RunResult, WorldResult } from '../runtime/protocol';
-import { runSaid, walkText } from './lessonrun';
+import { runSaid, saidLine, walkText } from './lessonrun';
+import { codeParts } from './words';
 
 const english = { languages: ['en'], storage: null };
 const spanish = { languages: ['es'], storage: null };
@@ -148,5 +149,18 @@ describe('what a block of a lesson says when it runs (D142)', () => {
 
   it('says that it ended when it printed nothing and moved no one', () => {
     expect(runSaid(ran(world({})), {}, () => null).note).toBeTruthy();
+  });
+});
+
+describe("the line under a block's result shows code as code", () => {
+  it('cuts an explanation at its backquotes, the name in them code and no backquote left', () => {
+    const line = saidLine({ moved: null, note: 'Este objeto no tiene nada que se llame `name`.' });
+    const parts = codeParts(line);
+    expect(parts).toEqual([
+      { text: 'Este objeto no tiene nada que se llame ', code: false },
+      { text: 'name', code: true },
+      { text: '.', code: false },
+    ]);
+    expect(saidLine({ moved: null, note: null })).toBe('');
   });
 });

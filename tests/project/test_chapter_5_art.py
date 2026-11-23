@@ -124,3 +124,51 @@ def test_each_plate_s_light_is_whole_in_both_lights():
                 assert alpha[-1].max() == 255, "the wall ends the star's glow"
             else:
                 assert alpha[-1].max() == 0, name
+
+
+def test_the_forgotten_room_s_side_door_rests_shut_and_opens_in_two_pieces():
+    """D289: the story's door rests closed, its closed state draws nothing; open, its leaf
+    stands on the landing beside the wall, as high as the shut door, on row 3, and its
+    doorway lies on the floor, covering the whole of the shut door; the block at the
+    doorway's foot is drawn over whoever crosses it, drawn on the doorway's middle and
+    lower; on the landing, a figure is drawn with its feet below the leaf's foot."""
+    passage = CONTENT / "art" / "scenes" / "the-tower-passage"
+    art = json.loads((passage / "art.json").read_text(encoding="utf-8"))
+    door = art["things"]["room_door"]
+    assert door["kind"] == "door" and door["rest"] == "closed" and door["at"] == [5, 3]
+    assert set(door["states"]) == {"closed", "open"} and door["row"] == 3
+    assert set(door["floors"]) == {"open"}
+    cell = art["cell"]
+    shut = np.array(Image.open(passage / door["states"]["closed"]).convert("RGBA"))[..., 3]
+    assert not shut.any()
+
+    def extent(name: str) -> tuple[float, float, float, float]:
+        alpha = np.array(Image.open(passage / name).convert("RGBA"))[..., 3]
+        ys, xs = np.nonzero(alpha)
+        left, top = door["left"], door["top"]
+        return (
+            (left + xs.min()) / cell,
+            (top + ys.min()) / cell,
+            (left + xs.max() + 1) / cell,
+            (top + ys.max() + 1) / cell,
+        )
+
+    leaf = extent(door["states"]["open"])
+    assert 3.95 <= leaf[3] <= 4.05 and 2.45 <= leaf[1] <= 2.6
+    assert 4.45 <= leaf[0] <= 4.6 and leaf[2] <= 5.6
+    doorway = extent(door["floors"]["open"])
+    assert doorway[0] >= 5.3 and doorway[3] <= 4.2
+    floor = np.array(Image.open(passage / door["floors"]["open"]).convert("RGBA"))[..., 3]
+    x0, y0, x1, y1 = (round(v * cell) for v in (5.45, 2.57, 6.0, 4.08))
+    covered = floor[y0 - door["top"] : y1 - door["top"], x0 - door["left"] : x1 - door["left"]]
+    assert covered.all()
+    # Crossing the doorway, a figure is drawn on its middle, lower, its feet behind the
+    # block, a row 4 cover; the leaf draws no one away from it.
+    assert {"cells": [[5, 3], [5, 3]], "by": 0.25} in [
+        {k: v for k, v in part.items() if k in ("cells", "by")} for part in art["nudged"]
+    ]
+    assert any(part["cells"] == [[5, 3], [5, 3]] and part["by"] == 0.4 for part in art["lowered"])
+    landing = next(part for part in art["lowered"] if part["cells"] == [[2, 3], [4, 3]])
+    assert 3 + 0.8 + landing["by"] > leaf[3]
+    assert not any("leaf" in part for part in art["nudged"] + art["lowered"])
+    assert any(row["image"] == "row-4-static.webp" for row in art["rows"])

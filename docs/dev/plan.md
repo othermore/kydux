@@ -735,7 +735,8 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     `sprint-55.md`, a staged trial with no colour seen ten seconds from the card's
     close (D285), the way a level's wizard faces when it opens (D286), a light lying in
     the floor drawn whole and ending softly (D287), and the cells only a story's figure
-    walks (D288).
+    walks (D288); and, in `sprint-56.md`, the forgotten room's side door painted open by
+    Gemini, with Rinlo down the back stairs (D289).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

@@ -292,6 +292,12 @@ def load(scene: str) -> Scene:
                 swung=door and state == "open",
             )
         )
+        # The open state's piece that lies on the floor, a door's doorway, is under every
+        # figure (D289).
+        floor = thing.get("floors", {}).get(state)
+        if floor:
+            lying = np.array(Image.open(folder / floor).convert("RGBA"))
+            found.layers.append(Layer(name, LYING, None, lying, thing["left"], thing["top"]))
     found.layers.sort(key=lambda layer: layer.depth)
     return found
 

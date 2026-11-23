@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   coverDepth,
+  FLOOR_DEPTH,
   FOOT_IN_CELL,
   figureDepth,
   loweredBy,
@@ -71,7 +72,14 @@ describe('the depths of a painted scene (D76, D95)', () => {
     expect(MARK_DEPTH).toBeLessThan(figureDepth(FOOT_IN_CELL - 1));
     expect(MARK_DEPTH).toBeLessThan(thingDepth(0, { lying: true }));
     // Over the floor's own pictures: a hole is drawn at 2.8.
-    expect(MARK_DEPTH).toBeGreaterThan(2.8);
+    expect(MARK_DEPTH).toBeGreaterThan(FLOOR_DEPTH);
+  });
+
+  it("lays a door's doorway open on the floor, over the ground and under every figure (D289)", () => {
+    expect(FLOOR_DEPTH).toBeGreaterThan(0);
+    expect(FLOOR_DEPTH).toBeLessThan(MARK_DEPTH);
+    expect(FLOOR_DEPTH).toBeLessThan(figureDepth(0));
+    expect(FLOOR_DEPTH).toBeLessThan(rowDepth(0));
   });
 
   it('lays the mark in an open doorway over the door\'s open picture, under who stands there (D172)', () => {

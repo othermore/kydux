@@ -4299,7 +4299,8 @@ one overturns stays, marked as superseded.
   picture: he is part of the scene, speaks from his spot (D264) and never leaves. The hall
   has a second light, `sunset`, as the dormitory has `morning`; it comes in *Lo que trajo
   el familiar* while the children tell Orla, after the scene has gone dark (D280). The
-  forgotten room's door has no open state. A familiar's sheet is
+  forgotten room's side door opens, painted open by Gemini, and the arched door in its
+  back wall has no open state (D289). A familiar's sheet is
   `content/art/figures/familiar-<kind>-<color>.webp`, fourteen in all, laid out as a
   wizard's walking sheet (three steps down, left, right and up) with each figure half a
   wizard's height, standing in the lower half of its frame, so that it is cut and drawn as
@@ -4580,3 +4581,50 @@ one overturns stays, marked as superseded.
   (5, 3) and (2, 4) to (2, 8); and `v`, the floor before the room's crates and stool
   (`"kind": "furniture", "sight": true`), on (6, 3) and (7, 3). Rules out a level's cell
   opened to make room for a story, and a figure of a story staged on a wall.
+- **D289 — The forgotten room's side door opens, painted with Gemini, and Rinlo comes
+  down the back stairs.** Decided 2026-11-19 and 2026-11-20 by the owner (*Rinlo tiene
+  que aparecer desde arriba, abrir la puerta y bajar las escaleras*; *No quiero que hagas
+  la puerta tú con una herramienta*; of the door open, *el muro se está acortando*, *el
+  muro de piedras pequeñas debería verse, no una piedra grande*, *la puerta debería ser …
+  simplemente cuadrada*, *debe quedar más abajo alineada con el recuadro magenta*, *Mira
+  como sería la puerta con sus proporciones correctas y colocada en el sitio correcto*,
+  *podrías intentar oscurecer un poco el tono de la puerta*; of a figure crossing it, *los
+  pies quedarán tapados por el muro de delante y solo se le vera la parte superior del
+  cuerpo, pasando por delante del muro de detrás y de la puerta abierta*). The forgotten
+  room's side door, in its left wall at (5, 3), onto the landing of the back stairs, is
+  the thing `room_door` of the scene's settings. The painting shows it shut, from above: a
+  plank lying in the wall's strip between two rows of small stones. The door open is a
+  picture of that part of the painting made by the owner with Gemini, from Gemini's
+  edits of it, the wall without the door and the leaf alone, the leaf set in its place by
+  the owner: the plank gone and the wall's strip of small stones whole, not shortened,
+  down to the doorway's foot, where a little of the floor shows before the stone block;
+  and the leaf, a plain square door of planks with two iron bands, standing upright on
+  the landing beside the wall, seen from the front, as high as the shut door, its hinges
+  on the wall's strip and its foot on the landing's floor at the doorway's lower end. The
+  scene's ground stays the painting, whole: the door shut is the painting, and
+  `tools/art/lay.py` lays the picture's doorway and leaf on it, each the difference within
+  its box (D148, D281), the leaf a little darker (`tone`), as dark as the scene's other
+  wood. The door's state `open` is those changes drawn over the ground; its state
+  `closed` draws nothing. The masks are the tools' work: cut by the difference (D148),
+  each 0 or 1 (D155), and fitted with the tools, a setting of the difference or a box,
+  wherever the difference alone leaves a hole or a ragged edge. The doorway's piece
+  covers the whole of the shut door and lies on the floor, under every figure; the leaf
+  is on row 3. A figure crossing the doorway is drawn on the middle of the floor at its
+  foot and lower, its feet behind the stone block, the wall in front, which is drawn over
+  it (`room_door_jamb`, D104): it passes before the wall behind and the open leaf. On the
+  landing a figure is drawn lower, its feet below the leaf's foot, and passes before the
+  leaf, drawn away from it by no one (`passed_before`). The door rests closed (D104), so
+  every level and story of the scene shows the painting as it is. The door is a story's
+  thing (`"art": "room_door"`); no level has it, and the arched door in the room's back
+  wall has no open state. In *Lo que trajo el familiar* Rinlo stands up, walks to the
+  door, opens it, crosses the landing and goes down the stairs to their foot at (2, 8),
+  walking out of sight there; in the next step he comes into sight at (2, 12), under the
+  corridor's arch, and walks to the children. Between the stairs' foot and the arch no
+  figure is drawn: there the painting shows the corridor's wall from above and its arch
+  from the front, and a figure walking through would have its head over the wall's top
+  while its legs stood in the arch's opening. Rules out a door, a doorway or a leaf whose
+  pixels are made, turned, filled or redrawn by a tool, its tone excepted; a picture of
+  the scene without its door as its ground; a doorway whose wall is shortened or replaced
+  by a single stone; a figure on the landing drawn behind the leaf, which is taller than a
+  figure and would hide it whole; a Rinlo who is taken out of his room and put in the
+  corridor; and a figure drawn across the arch's stones.

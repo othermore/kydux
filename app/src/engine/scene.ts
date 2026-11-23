@@ -109,6 +109,7 @@ import {
   MARK_RADIUS,
   drawSleepMark,
   figureName,
+  floorKey,
   flyRowOf,
   hourKey,
   loadArt,
@@ -133,6 +134,7 @@ import type { StoryFraming } from './zooming';
 import { DebugView, type PaintedImage } from './debug';
 import { debugging } from './debugging';
 import {
+  FLOOR_DEPTH,
   FOOT_IN_CELL,
   figureDepth,
   lightDepth,
@@ -361,6 +363,9 @@ class LevelScene extends Phaser.Scene {
   private sways = new Map<Phaser.GameObjects.Sprite, Sway>();
   private things = new Map<string, Phaser.GameObjects.Image>();
   private doors = new Map<string, Tile>();
+  /** Each painted door's piece lying on the floor while it is open, its doorway, under
+   * every figure (D289). */
+  private doorFloors = new Map<string, Phaser.GameObjects.Image>();
   private openDoors = new Set<string>();
   /** The rune's glow over each sealed door while its seal holds (D79). */
   private glows = new Map<string, Phaser.GameObjects.Container>();
@@ -627,12 +632,14 @@ class LevelScene extends Phaser.Scene {
         : image.depth;
     if (!moving || this.still) {
       image.setTexture(key).setDepth(depth).setAlpha(1);
+      this.floorLook(id, open, 0);
       return;
     }
     // Seen opening or closing: through its half-open state when it has one, each
     // picture fading out at its own depth as the next fades in at its own; the
     // picture of the hour the scene shows (D126), never a frame of another.
     const step = this.playback.tickDuration * 0.3;
+    this.floorLook(id, open, step * 2);
     const ajar = this.atHour(`art-${this.artOf(id)}-ajar`);
     const fade = (to: string, length: number) => {
       const from = image.texture.key;
@@ -654,6 +661,39 @@ class LevelScene extends Phaser.Scene {
       delete this.parentNode.dataset.opening;
       if (run === this.restarts && this.openDoors.has(id) === open) fade(key, step);
     });
+  }
+
+  /** A painted door's piece lying on the floor (D289), made beside the door's own
+   * picture where its scene has one, shown while the door is open. */
+  private floorOf(id: string, image: Phaser.GameObjects.Image, open: boolean): void {
+    if (!this.art?.scene.things[this.artOf(id)]?.floors) return;
+    const floor = this.add.image(image.x, image.y, image.texture.key).setOrigin(0, 0).setScale(image.scaleX, image.scaleY);
+    this.doorFloors.set(id, floor.setDepth(FLOOR_DEPTH).setVisible(false));
+    this.floorLook(id, open, 0);
+  }
+
+  /** A door's piece lying on the floor in the state it is in, where that state has one,
+   * at the door's place: shown at once, or fading in or out over `fade` milliseconds as
+   * the door's own picture does (D156, D289). */
+  private floorLook(id: string, open: boolean, fade: number): void {
+    const floor = this.doorFloors.get(id);
+    const image = this.things.get(id);
+    if (!floor || !image) return;
+    const key = this.atHour(floorKey(this.artOf(id), open ? 'open' : 'closed'));
+    const shown = this.textures.exists(key);
+    this.tweens.killTweensOf(floor);
+    floor.setPosition(image.x, image.y);
+    if (shown) floor.setTexture(key);
+    if (fade <= 0) {
+      floor.setVisible(shown).setAlpha(1);
+      return;
+    }
+    if (shown) {
+      floor.setVisible(true).setAlpha(0);
+      this.tweens.add({ targets: floor, alpha: 1, duration: fade });
+    } else if (floor.visible) {
+      this.tweens.add({ targets: floor, alpha: 0, duration: fade, onComplete: () => floor.setVisible(false) });
+    }
   }
 
   /** A painted thing's texture at the hour the scene shows: its morning picture
@@ -760,7 +800,10 @@ class LevelScene extends Phaser.Scene {
       const painted = this.art ? paintThing(this, this.art, thing, this.inside(thing.tile)) : null;
       if (painted) {
         this.things.set(thing.id, painted);
-        if (thing.kind === 'door') this.doors.set(thing.id, thing.tile);
+        if (thing.kind === 'door') {
+          this.doors.set(thing.id, thing.tile);
+          this.floorOf(thing.id, painted, thing.open === true);
+        }
         continue;
       }
       // A thing of a kind with a sprite of its own, a broom or a ring, on a painted scene
@@ -797,6 +840,14 @@ class LevelScene extends Phaser.Scene {
         .setOrigin(0, 0)
         .setScale(scale)
         .setDepth(thingDepthOn(this.art, id, painted.at ?? [0, painted.row], { open: painted.rest === 'open' }));
+      // Its piece lying on the floor in that state, under every figure (D289).
+      if (painted.floors?.[painted.rest] && this.textures.exists(floorKey(id, painted.rest))) {
+        this.add
+          .image(painted.left * scale, painted.top * scale, floorKey(id, painted.rest))
+          .setOrigin(0, 0)
+          .setScale(scale)
+          .setDepth(FLOOR_DEPTH);
+      }
     }
     for (const thing of this.map.things) {
       if (thing.kind === 'door' && thing.lock === 'spell') this.addGlow(thing.id, thing.tile);

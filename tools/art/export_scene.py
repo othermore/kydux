@@ -982,7 +982,7 @@ def scene(settings: Settings) -> Path:
         without = withouts[name]
         native = native_box(grid, thing["box"])
         box = tuple(round(v * CELL) for v in thing["box"])
-        states = {}
+        states, floors = {}, {}
         at_hour: dict[str, dict[str, str]] = {hour: {} for hour in hours}
         left, top = box[0], box[1]
         for state, picture in thing["states"].items():
@@ -1010,6 +1010,27 @@ def scene(settings: Settings) -> Path:
                 pixels = pictures[hour] if shown is painting else relit(shown, ratios[hour])
                 at_hour[hour][state] = f"{name}-{state}-{hour}.webp"
                 webp(state_sprite(pixels, alpha, *shape), out / at_hour[hour][state])
+            # The state's piece that lies on the floor, under every figure: a door's
+            # doorway open, cut from the same picture within its own box (D289).
+            floor = picture.get("floor") if isinstance(picture, dict) else None
+            if floor is not None:
+                within = native_box(grid, floor["box"])
+                lying = difference_mask(shown, painting, within, floor.get("diff"))
+                lying = lying.astype(np.float32)
+                # The outline of what the piece hides whole, where the picture kept some
+                # of its pixels as they were: the door shut under its open doorway.
+                if "covers" in floor:
+                    hidden = soft_area(painting.shape[:2], grid, floor["covers"]) >= 0.5
+                    lying = np.maximum(lying, hidden.astype(np.float32))
+                # Ended at its own box's bottom, not at the thing's row.
+                down = max(0.0, floor["box"][3] - thing["row"] - 1)
+                lies = (grid, columns, rows, box, thing["row"], down, scale)
+                floors[state] = f"{name}-{state}-floor.webp"
+                webp(state_sprite(shown, lying, *lies), out / floors[state])
+                for hour in hours:
+                    at_hour[hour][f"{state}-floor"] = f"{name}-{state}-floor-{hour}.webp"
+                    pixels = relit(shown, ratios[hour])
+                    webp(state_sprite(pixels, lying, *lies), out / at_hour[hour][f"{state}-floor"])
         things[name] = {"row": thing["row"], "left": left, "top": top, "states": states}
         # A door or a hole, which opens and closes (D167).
         if "kind" in thing:
@@ -1030,6 +1051,9 @@ def scene(settings: Settings) -> Path:
         }
         if rows_of:
             things[name]["rows"] = rows_of
+        # Each state's piece lying on the floor, under every figure (D289).
+        if floors:
+            things[name]["floors"] = floors
         # The state a door is drawn in where no level or story places it (D104).
         if "rest" in thing:
             things[name]["rest"] = thing["rest"]
@@ -1351,7 +1375,9 @@ def leaf_measures(scene_id: str, folder: Path | None = None) -> dict[str, dict[s
     difference (D148), its shadow in its picture, is measured on the rows above its own,
     whose figures it hides, and on its own and below, where it stands before the
     figures behind it and a figure in front of it may touch it. The nudges the leaves
-    themselves give (`leaf` in art.json) are not counted: they follow from this."""
+    themselves give (`leaf` in art.json) are not counted: they follow from this. A door
+    whose settings say its figures pass before its open leaf (`passed_before`, D289) is
+    not measured."""
     folder = folder or REPO / "content" / "art" / "scenes" / scene_id
     art = json.loads((folder / "art.json").read_text())
     cell = art["cell"]
@@ -1372,6 +1398,10 @@ def leaf_measures(scene_id: str, folder: Path | None = None) -> dict[str, dict[s
     for name, thing in art["things"].items():
         picture = thing["states"].get("open")
         if picture is None or not sweep.is_door(thing):
+            continue
+        # A leaf the figures pass before, standing beside its doorway on the floor they
+        # walk, lies on no cell and is drawn away from no one (D289).
+        if settings_of.get(name, {}).get("passed_before"):
             continue
         row = thing.get("rows", {}).get("open", thing["row"])
         doorway = doorways.get(name, [thing.get("at")])
@@ -1717,20 +1747,24 @@ def composed(folder: Path, name: str, state: str) -> tuple[Image.Image, int]:
     scene = sweep.load(folder.name)
     things = art["things"]
 
-    def drawn(other: str, shown: str) -> sweep.Layer:
+    def drawn(other: str, shown: str) -> list[sweep.Layer]:
         thing = things[other]
         rgba = np.array(Image.open(folder / thing["states"][shown]).convert("RGBA"))
         under = thing.get("under", False) and shown != "open"
         row = thing.get("rows", {}).get(shown, thing["row"])
         depth = sweep.depth_of(row, scene.rows, under) + 0.001
-        return sweep.Layer(other, depth, None, rgba, thing["left"], thing["top"], under=under)
+        found = [sweep.Layer(other, depth, None, rgba, thing["left"], thing["top"], under=under)]
+        # The state's piece lying on the floor, under every figure (D289).
+        floor = thing.get("floors", {}).get(shown)
+        if floor:
+            lying = np.array(Image.open(folder / floor).convert("RGBA"))
+            found.append(sweep.Layer(other, sweep.LYING, None, lying, thing["left"], thing["top"]))
+        return found
 
     layers = [layer for layer in scene.layers if layer.name not in things]
     for other, thing in things.items():
         resting = thing.get("rest") if thing.get("rest") in thing["states"] else None
-        layers.append(
-            drawn(other, state if other == name else resting or next(iter(thing["states"])))
-        )
+        layers += drawn(other, state if other == name else resting or next(iter(thing["states"])))
     layers.sort(key=lambda layer: layer.depth)
     thing = things[name]
     sizes = [Image.open(folder / file).size for file in thing["states"].values()]

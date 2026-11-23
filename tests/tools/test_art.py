@@ -2029,3 +2029,45 @@ def test_a_thing_painted_on_a_part_is_laid_on_the_painting_its_own_pixels_only()
     assert not differs[:, :100].any() and not differs[:60].any()
     assert not differs[80:].any() and not differs[:, 120:].any()
     assert mask[62:78, 102:118].all()
+
+
+def test_an_edit_of_two_things_is_laid_in_two_runs_the_second_from_the_first(
+    tmp_path, monkeypatch
+):
+    """D289: with --from, the edit is laid on that picture of the scene's edits, and the
+    painting is not read for it; without it, on the painting. --diff gives the
+    difference's settings, and --tone scales the laid pixels."""
+    rng = np.random.default_rng(5)
+    painting = rng.integers(60, 200, size=(200, 200, 3), dtype=np.uint8)
+    edited = painting.copy()
+    edited[20:40, 20:40] = (10, 10, 30)
+    edited[120:150, 130:160] = (240, 200, 40)
+    scene = scene_of_pictures(
+        tmp_path, monkeypatch, {"base.png": painting, "edit.png": edited}, {}
+    )
+    monkeypatch.setattr(scene_settings.Settings, "marks", lambda self: ["."])
+    monkeypatch.setattr(export_scene, "RAW", tmp_path)
+    whole = ["--part", "0", "0", "1", "1"]
+    lay.main(
+        ["door", "edit.png", *whole, "--box", "0.05", "0.05", "0.25", "0.25", "--out", "one.png"]
+    )
+    one = np.array(Image.open(scene.edits / "one.png"))
+    assert (one[20:40, 20:40] == (10, 10, 30)).all() and (
+        one[120:150, 130:160] == painting[120:150, 130:160]
+    ).all()
+    # The second run reads the first's picture, not the painting.
+    (tmp_path / "base.png").unlink()
+    box = ["--box", "0.6", "0.55", "0.85", "0.8"]
+    lay.main(["door", "edit.png", *whole, *box, "--from", "one.png", "--out", "two.png"])
+    two = np.array(Image.open(scene.edits / "two.png"))
+    assert (two == edited).all()
+    # The difference's settings: read too high, nothing differs enough to be laid.
+    high = ["--diff", '{"threshold": 250, "soft": 250}']
+    lay.main(["door", "edit.png", *whole, *box, "--from", "one.png", *high, "--out", "three.png"])
+    assert (np.array(Image.open(scene.edits / "three.png")) == one).all()
+    # The tone scales the laid pixels only.
+    tone = ["--tone", "0.5", "0.5", "1.0"]
+    lay.main(["door", "edit.png", *whole, *box, "--from", "one.png", *tone, "--out", "four.png"])
+    four = np.array(Image.open(scene.edits / "four.png"))
+    assert (four[120:150, 130:160] == (120, 100, 40)).all()
+    assert (four[:100] == one[:100]).all()

@@ -2,22 +2,30 @@
 """A thing painted into a scene's base by an edit of a part of it (D148, D281).
 
     tools/art/lay.py <scene> <picture> --part X0 Y0 X1 Y1 --box X0 Y0 X1 Y1 --out <name>
+        [--from <picture>] [--diff <settings, JSON>] [--tone R G B]
 
 `picture` is a model's edit of a part of the scene's painting, the part `--part` gives
 in cells: the model was given that part, cut from the painting, and drew one thing into
-it. The model gives its picture at a size of its own, a little off the part's shape: it
-is laid on the part first, resized to the part's width and to the height, and moved by
-the shift, that differ least from the painting outside the thing's box. Then only the
+it. The edit is laid on the scene's painting, or on `--from`, a picture of the scene's
+edits folder: the painting with another of the edit's changes laid on it already, so
+that an edit with several changes is laid in as many runs, one box each (D289); `--diff`
+gives the difference its settings, as a state's `diff` in a scene's settings does, where
+the defaults take too little of the thing or too much round it; `--tone` scales the laid
+pixels' red, green and blue, a thing painted apart brought to the painting's light. The
+model gives its picture at a size of its own, a little off the part's shape: it is laid
+on the part first, resized to the part's width and to the height, and moved by the
+shift, that differ least from the painting outside the thing's box. Then only the
 thing's own pixels enter the painting: the difference of the laid picture against the
 painting within `--box`, as a cut-out is made (`export_scene.difference_mask`), is
 copied over the painting, and every other pixel stays the painting's own. The new
-painting is written beside the scene's pictures as `<name>`, in art/raw/, with a look
-of the box enlarged and its mask's edge in magenta, art/raw/game-check/lay-<name>; it
+painting is written beside the scene's pictures as `<name>`, in art/raw/, with a look of
+the box enlarged and its mask's edge in magenta, art/raw/game-check/lay-<name>; it
 prints the fit found, the pixels laid, and the pixels that differ from the painting
 outside the box, which are none.
 """
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -82,18 +90,22 @@ def lay(
     picture: Image.Image,
     part: tuple[int, int, int, int],
     box: tuple[int, int, int, int],
+    diff: dict | None = None,
+    tone: tuple[float, float, float] = (1.0, 1.0, 1.0),
 ) -> tuple[np.ndarray, np.ndarray, dict]:
     """The painting with the thing in `box` laid from `picture`, an edit of `part` (both
-    boxes in the painting's pixels); the mask laid, at the painting's size; and the fit."""
+    boxes in the painting's pixels), its difference read with `diff`'s settings; the mask
+    laid, at the painting's size; and the fit."""
     px0, py0, px1, py1 = part
     own = painting[py0:py1, px0:px1]
     inside = (box[0] - px0, box[1] - py0, box[2] - px0, box[3] - py0)
     found = fit(own, picture, inside)
     shown = painting.copy()
     shown[py0:py1, px0:px1] = found["laid"]
-    mask = export_scene.difference_mask(shown, painting, box).astype(bool)
+    mask = export_scene.difference_mask(shown, painting, box, diff).astype(bool)
     laid = painting.copy()
-    laid[mask] = shown[mask]
+    toned = np.clip(shown[mask].astype(np.float32) * np.array(tone, dtype=np.float32), 0, 255)
+    laid[mask] = toned.round().astype(np.uint8)
     return laid, mask, found
 
 
@@ -105,13 +117,21 @@ def main(arguments: list[str]) -> int:
     parser.add_argument("--part", type=float, nargs=4, required=True, metavar=corners)
     parser.add_argument("--box", type=float, nargs=4, required=True, metavar=corners)
     parser.add_argument("--out", required=True)
+    parser.add_argument("--from", dest="laid_on", help="the picture laid on, in the edits")
+    parser.add_argument("--diff", type=json.loads, help="the difference's settings, JSON")
+    parser.add_argument(
+        "--tone", type=float, nargs=3, default=(1.0, 1.0, 1.0), metavar=("R", "G", "B")
+    )
     found = parser.parse_args(arguments)
     settings = scene_settings.settings(found.scene)
     picture = found.picture if found.picture.is_absolute() else settings.edits / found.picture
-    painting = np.array(Image.open(settings.painting).convert("RGB"))
+    base = settings.edits / found.laid_on if found.laid_on else settings.painting
+    painting = np.array(Image.open(base).convert("RGB"))
     part = export_scene.native_box(settings.grid, tuple(found.part))
     box = export_scene.native_box(settings.grid, tuple(found.box))
-    laid, mask, fitted = lay(painting, Image.open(picture), part, box)
+    laid, mask, fitted = lay(
+        painting, Image.open(picture), part, box, found.diff, tuple(found.tone)
+    )
     outside = ~export_scene.in_box(mask.shape, box)
     differs = int(np.count_nonzero(np.any(laid != painting, axis=2) & outside))
     target = settings.edits / found.out

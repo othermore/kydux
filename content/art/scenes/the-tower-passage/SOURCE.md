@@ -16,3 +16,8 @@ later, like the rest of it.
 - Its second flap painted by it on a part of the corridor's wall
   (`tower-passage-flap.md`) and laid on the painting by `tools/art/lay.py`,
   only its own pixels.
+- The forgotten room's side door open painted by Gemini for the game's
+  owner on a part of the painting, the wall without the door and the leaf
+  alone, the leaf set in its place by the owner; laid on the painting by
+  `tools/art/lay.py`, its doorway and its leaf, only their own pixels, the
+  leaf a little darker.

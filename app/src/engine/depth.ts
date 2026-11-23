@@ -64,6 +64,10 @@ export function coverDepth(row: number): number {
   return rowDepth(row) + 0.0004;
 }
 
+/** The depth of a picture lying on the floor: a hole (D167), a door's doorway open
+ * (D289); over the ground, under a goal's mark, every row's things and every figure. */
+export const FLOOR_DEPTH = 2.8;
+
 /** The depth of a goal's mark (D160): on the ground, over the floor's own pictures (a
  * hole, D167), and under every row's things, every thing standing and every figure, so
  * that whatever stands before it or walks over it covers it; the part a cut-out covers

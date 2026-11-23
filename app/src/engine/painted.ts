@@ -74,6 +74,9 @@ export interface SceneArt {
       /** The row a state is drawn among the rows by, when not the thing's: a door
        * swung open against the wall it lies on (D111). */
       rows?: Record<string, number>;
+      /** A state's piece lying on the floor, under every figure, by the state, at the
+       * thing's place: a door's doorway open, its leaf the state's own picture (D289). */
+      floors?: Record<string, string>;
       /** The state a door is drawn in where no level or story places it (D104). */
       rest?: 'open' | 'closed';
       /** Each state's image at an hour the scene is painted whole at (D126), by the
@@ -189,6 +192,12 @@ export function hourKey(key: string, hour: string): string {
   return `${key}-${hour}`;
 }
 
+/** The key of a state's piece lying on the floor (D289); its picture at an hour is the
+ * hour's twin, as any state's. */
+export function floorKey(id: string, state: string): string {
+  return `art-${id}-${state}-floor`;
+}
+
 /** Loads the painting's images, the things' sprites and the figures' sheets. */
 export function preloadArt(scene: Phaser.Scene, { scene: painted, figures, sprites, spritesBase }: Art): void {
   for (const [kind, sprite] of Object.entries(sprites ?? {})) {
@@ -203,6 +212,9 @@ export function preloadArt(scene: Phaser.Scene, { scene: painted, figures, sprit
   for (const [id, thing] of Object.entries(painted.things)) {
     for (const [state, image] of Object.entries(thing.states)) {
       scene.load.image(`art-${id}-${state}`, contentUrl(painted.base + image));
+    }
+    for (const [state, image] of Object.entries(thing.floors ?? {})) {
+      scene.load.image(floorKey(id, state), contentUrl(painted.base + image));
     }
     for (const [hour, states] of Object.entries(thing.hours ?? {})) {
       for (const [state, image] of Object.entries(states)) scene.load.image(`art-${id}-${state}-${hour}`, contentUrl(painted.base + image));

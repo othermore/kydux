@@ -7,6 +7,12 @@
   "ground": "ground.webp",
   "rows": [
     {
+      "row": 4,
+      "image": "row-4-static.webp",
+      "top": 392,
+      "static": true
+    },
+    {
       "row": 5,
       "image": "row-5-static-over.webp",
       "top": 427,
@@ -28,8 +34,55 @@
       "over": true
     }
   ],
-  "things": {},
+  "things": {
+    "room_door": {
+      "row": 3,
+      "left": 418,
+      "top": 204,
+      "states": {
+        "closed": "room_door-closed.webp",
+        "open": "room_door-open.webp"
+      },
+      "kind": "door",
+      "floors": {
+        "open": "room_door-open-floor.webp"
+      },
+      "rest": "closed",
+      "at": [
+        5,
+        3
+      ]
+    }
+  },
   "lowered": [
+    {
+      "about": "The forgotten room's side doorway (D289): a figure crossing it is drawn lower, its feet behind the stone block at the doorway's near end, which is drawn over it (`room_door_jamb`).",
+      "cells": [
+        [
+          5,
+          3
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "by": 0.4
+    },
+    {
+      "about": "The landing of the back stairs, before the side door (D289): a figure on it is drawn lower, its feet below the open leaf's foot, as one passing before the leaf.",
+      "cells": [
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "by": 0.3
+    },
     {
       "about": "Under the room's front wall's lit top: a familiar drawn lower, so that it is wholly under the wall until it steps into the room.",
       "cells": [
@@ -46,6 +99,20 @@
     }
   ],
   "nudged": [
+    {
+      "about": "The forgotten room's side doorway, open (D289): a figure crossing it is drawn on the middle of the floor at the doorway's foot, between its two sides measured on the door-open picture at 5.545 and 5.96.",
+      "cells": [
+        [
+          5,
+          3
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "by": 0.25
+    },
     {
       "about": "The trench's stretch up column 10: its painted floor's middle is 0.02 of a cell right of the cells', and a familiar's figure 0.005 left of its frame's, measured on the game's ground (D282).",
       "cells": [

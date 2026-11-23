@@ -38,6 +38,7 @@ import * as progress from './progress/progress';
 import type { LevelJson } from './runtime/protocol';
 import { Runtime } from './runtime/runtime';
 import { element } from './ui/dom';
+import { gearIcon } from './ui/icons';
 import { handheldNote } from './ui/handheld';
 import { markSvg } from './ui/mark';
 import type { LessonRunner } from './ui/lessonrun';
@@ -338,6 +339,16 @@ function languagePicker(): HTMLElement {
   return element('label', { className: 'language' }, [t('app.language'), ' ', select]);
 }
 
+/** The gear that opens the settings, beside the language: on every screen but a
+ * level, which has its own beside its title, and the settings themselves (D293). */
+function settingsGear(): HTMLElement[] {
+  if (shownRoute === 'settings' || shownRoute?.startsWith('level/')) return [];
+  const gear = element('a', { id: 'settings-link', className: 'icon-button', href: '#settings' }, [gearIcon()]);
+  gear.setAttribute('aria-label', t('settings.title'));
+  gear.title = t('settings.title');
+  return [gear];
+}
+
 function chrome(root: HTMLElement, content: HTMLElement): void {
   root.replaceChildren(
     element('header', { className: 'top' }, [
@@ -348,6 +359,7 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
       element('div', { className: 'top-links' }, [
         element('a', { href: '#about', id: 'about-link' }, [t('about.link')]),
         languagePicker(),
+        ...settingsGear(),
       ]),
     ]),
     ...handheldNote(),
@@ -451,11 +463,11 @@ function failed(content: HTMLElement, error: unknown): void {
 }
 
 /** Where Continue goes: the item last opened, else the first of the course. */
-async function continueTarget(course: Course): Promise<{ hash: string; title: string }> {
+function continueTarget(course: Course): string {
   const current = progress.load().current;
   // Continue never leads back to the opening (D78).
   const item = current && current !== course.opening && items(course).includes(current) ? current : courseStart(course);
-  return { hash: itemHash(item), title: await itemTitle(item) };
+  return itemHash(item);
 }
 
 /** What the map shows: the course, the progress, and every item's and chapter's
@@ -512,7 +524,7 @@ async function showStart(content: HTMLElement): Promise<void> {
   }
   document.title = t('app.title');
   const course = await loadCourse();
-  const continueTo = await continueTarget(course);
+  const continueTo = continueTarget(course);
   // Where each saved game is: its item's number and title, or the course's start.
   const places = new Map(
     await Promise.all(
@@ -708,7 +720,7 @@ function route(): void {
           void loadCourse()
             .then(continueTarget)
             .then((target) => {
-              location.hash = target.hash;
+              location.hash = target;
             });
         },
       }),

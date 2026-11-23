@@ -201,10 +201,11 @@ the lessons read. The list of games is under `kydux.games`, with when each
 was begun, when it was last played and how long. The game being played is
 under `kydux.current`. Closing the tab or the browser loses nothing.
 
-The start screen lists the games under *Load a game*, where each one can be
-played or deleted. *New game* begins the story again for a new wizard and
-keeps the other games. *Export* downloads the game being played as
-`kydux-progress.json`, and *Import* adds such a file as one more game.
+The start screen lists the games in a box, as soon as there is one. Each game
+can be played, exported or deleted there. *New game* begins the story again
+for a new wizard and keeps the other games. *Export* downloads its row's game
+as `kydux-<name>.json`, named after the game. *Import a game* adds such a file
+as one more game.
 
 To start from a clean page, with no game at all, clear the site's data in
 the browser, or open the game in a private window. The game then opens on
@@ -494,8 +495,8 @@ changes, install the site again, once, with `ci/deploy.sh --site`
 (section 11).
 
 What a friend needs to know: the address, their name and password, and
-that their game lives in that browser on that computer. *Export* on the
-start screen carries a game to another one.
+that their game lives in that browser on that computer. *Export*, beside a
+game on the start screen, carries it to another one.
 
 ## 6. Checking your work
 

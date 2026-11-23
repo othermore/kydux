@@ -29,8 +29,8 @@ su aspecto. Elige con calma: cómo es tu personaje y su aspecto se quedan
 para toda la partida. También le pones un nombre a tu partida. Después, el
 juego te llama por el nombre de tu personaje.
 
-A partir de ahí, el juego se abre en su pantalla de inicio. *Continuar* te
-lleva a donde lo dejaste. La primera vez, eso es la puerta, donde te
+A partir de ahí, el juego se abre en su pantalla de inicio. *Continuar partida*
+te lleva a donde lo dejaste. La primera vez, eso es la puerta, donde te
 encuentras con un amigo o una amiga que te enseña los primeros pasos. Es
 Nuri, una chica, si tu personaje es un mago, y Teku, un chico, si tu
 personaje es una maga.
@@ -84,12 +84,14 @@ capítulo que sigue cerrado sale en gris, y solo enseña cómo empieza.
 El juego guarda tu partida en el navegador mientras juegas. Guarda varias
 partidas, una por personaje. Cada partida tiene un nombre, y no hay dos
 partidas con el mismo. La pantalla de inicio dice en qué partida estás.
-*Cargar una partida* las enseña por sus nombres, con dónde está cada una y
-cuánto se ha jugado. *Cambiar los nombres* cambia el nombre de tu personaje
-y el de tu partida. *Partida nueva* empieza otra vez la historia para un
-personaje nuevo. *Exportar* guarda la partida que juegas en un fichero, e
-*Importar* la recupera en otro ordenador. *Importar* pregunta el nombre de
-la partida que trae.
+Debajo, un cuadro enseña tus partidas guardadas por sus nombres, con dónde
+está cada una y cuánto se ha jugado. La partida en la que estás lleva la marca
+*Abierta ahora*. *Jugar* abre otra. El lápiz que hay junto al nombre de tu
+personaje cambia el nombre de tu personaje y el de tu partida. *Partida nueva*
+empieza otra vez la historia para un personaje nuevo. *Exportar*, junto a cada
+partida, guarda esa partida en un fichero. *Importar una partida* recupera un
+fichero así, en este ordenador o en otro, y pregunta el nombre de la partida
+que trae. La rueda dentada de arriba a la derecha abre los ajustes.
 
 ## Lecciones
 

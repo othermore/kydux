@@ -31,18 +31,23 @@ const loaded = (page: Page, family: string) =>
 
 const stageWidth = async (page: Page) => (await page.locator('.stage').boundingBox())?.width ?? 0;
 
-test('the settings open from the start screen, and Back returns to it', async ({ page }) => {
+test('the settings open from the gear in the header, and Back returns to the start screen', async ({ page }) => {
   await page.goto('/#start');
   await page.locator('#settings-link').click();
   await expect(page).toHaveURL(/#settings$/);
   await expect(page.locator('.settings-screen h2')).toHaveText('Settings');
+  // The settings themselves show no gear (D293).
+  await expect(page.locator('#settings-link')).toHaveCount(0);
   await page.locator('#settings-back').click();
   await expect(page.locator('#continue')).toBeVisible();
+  await expect(page.locator('header.top #settings-link')).toHaveAttribute('aria-label', 'Settings');
 });
 
 test('the text size chosen shows in the editor at once, and after a reload', async ({ page }) => {
   await openTheCorridor(page);
   await expect.poll(() => editorFontSize(page)).toBe('16px');
+  // A level has its own gear beside its title, and the header none (D293).
+  await expect(page.locator('#settings-link')).toHaveCount(0);
   await page.locator('#level-settings').click();
   await expect(page).toHaveURL(/#settings$/);
   await page.locator('#settings-font-size').selectOption('24');

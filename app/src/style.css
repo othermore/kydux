@@ -107,6 +107,34 @@ a {
   outline-offset: 2px;
 }
 
+/* A button stands on a foot, and has its ring round itself
+   and its foot together, close against both: the foot lies under the thing's box, where
+   an outline does not reach. The outline stays, unseen, for a window of forced colours,
+   which draws no shadow. */
+.button,
+.buttons button,
+.card button,
+.big-button,
+.quiet-button,
+.icon-button,
+.about {
+  box-shadow: 0 var(--foot-height) 0 var(--foot-colour);
+}
+
+.button:focus-visible,
+.buttons button:focus-visible,
+.card button:focus-visible,
+.big-button:focus-visible,
+.quiet-button:focus-visible,
+.icon-button:focus-visible,
+.about:focus-visible {
+  outline-color: transparent;
+  box-shadow:
+    0 var(--foot-height) 0 var(--foot-colour),
+    0 0 0 3px var(--focus),
+    0 var(--foot-height) 0 3px var(--focus);
+}
+
 /* The components (D193). A button: rounded, moss green standing on a darker foot, which
    it sinks onto when pressed; a quiet one is paper with an ink line; a danger one soft
    red. */
@@ -114,11 +142,13 @@ a {
 .buttons button,
 .card button,
 .big-button {
+  --foot-height: 3px;
+  --foot-colour: var(--moss-deep);
+
   border: 1px solid var(--moss-deep);
   border-radius: var(--radius);
   background: var(--moss);
   color: var(--paper);
-  box-shadow: 0 3px 0 var(--moss-deep);
   transition: background-color 120ms, transform 80ms, box-shadow 80ms;
 }
 
@@ -134,17 +164,20 @@ a {
 .card button:active:not(:disabled),
 .big-button:active:not(:disabled),
 .quiet-button:active:not(:disabled) {
+  --foot-height: 1px;
+
   transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--moss-deep);
 }
 
 .quiet-button,
 .card #again,
 .button.quiet {
+  --foot-height: 2px;
+  --foot-colour: var(--ink-line);
+
   border: 1px solid var(--ink-line);
   background: var(--paper);
   color: var(--moss-deep);
-  box-shadow: 0 2px 0 var(--ink-line);
 }
 
 .quiet-button:hover:not(:disabled),
@@ -156,10 +189,12 @@ a {
 
 .quiet-button.danger,
 .button.danger {
+  --foot-height: 2px;
+  --foot-colour: var(--rose);
+
   border-color: var(--rose);
   background: var(--rose-soft);
   color: var(--rose-deep);
-  box-shadow: 0 2px 0 var(--rose);
 }
 
 /* A card lies over the scene; a panel is paper on the page: both with a thin ink line
@@ -1069,6 +1104,9 @@ footer .build {
 }
 
 .about {
+  --foot-height: 2px;
+  --foot-colour: var(--ink-line);
+
   margin-bottom: 8px;
   width: 28px;
   height: 28px;
@@ -1076,7 +1114,6 @@ footer .build {
   border-radius: 50%;
   background: var(--paper);
   color: var(--moss-deep);
-  box-shadow: 0 2px 0 var(--ink-line);
   font-weight: bold;
   cursor: pointer;
 }
@@ -1280,19 +1317,165 @@ footer .build {
 
 /* The start screen. */
 
+/* A sheet of paper in the middle of the window, over the painting (D294). */
 .start-screen {
-  max-width: 640px;
+  align-self: flex-start;
+  width: 100%;
+  max-width: 760px;
   margin: 32px auto;
-  padding: 0 8px;
+  padding: 20px 28px 12px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-large);
+  background: var(--paper);
+  box-shadow: var(--shadow-lifted);
+}
+
+/* The start screen's backdrop (D294): the painting fills the window behind the page
+   and stays while the page scrolls. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.backdrop-painting {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+/* Over the painting, the header is a band of paper and the footer is written in light
+   on the grass. */
+#app:has(.backdrop) header.top {
+  margin: 0 -16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--ink-line);
+  background: var(--paper);
+}
+
+#app:has(.backdrop) footer {
+  color: var(--paper);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 70%);
+}
+
+/* The school's people painted whole (D294). */
+.figure {
+  display: block;
+  width: auto;
+  user-select: none;
+  filter: drop-shadow(0 3px 5px rgb(20 16 30 / 35%));
+}
+
+.figure.mirrored {
+  transform: scaleX(-1);
+}
+
+/* A group of them: a box in which each stands on the ground at its place, the ones
+   behind first. */
+.figures {
+  position: relative;
+}
+
+.figures .figure {
+  position: absolute;
+  bottom: 0;
+}
+
+/* The two groups at the start screen's corners, each as wide as the strip the sheet
+   leaves beside it and no wider than they are painted for; a window too narrow to leave
+   them room shows the painting alone. */
+.backdrop .figures {
+  --strip: calc((100vw - 760px) / 2 - 24px);
+  position: absolute;
+  bottom: 30px;
+  width: min(var(--strip), 460px);
+  aspect-ratio: 1 / 1.2;
+  display: none;
+}
+
+@media (min-width: 1240px) {
+  .backdrop .figures {
+    display: block;
+  }
+}
+
+.backdrop-left {
+  left: 12px;
+}
+
+.backdrop-right {
+  right: 12px;
+}
+
+.backdrop-left [data-who='eldra'] {
+  bottom: 56%;
+  left: 27%;
+  height: 38%;
+  opacity: 0.92;
+}
+
+.backdrop-left [data-who='orla'] {
+  left: 0;
+  height: 68%;
+}
+
+.backdrop-left [data-who='ilda'] {
+  left: 46%;
+  height: 72%;
+}
+
+.backdrop-left [data-who='nuri'] {
+  bottom: -4%;
+  left: 13%;
+  height: 42%;
+}
+
+.backdrop-left [data-who='teku'] {
+  bottom: -5%;
+  left: 43%;
+  height: 42%;
+}
+
+.backdrop-left [data-who='bimo'] {
+  bottom: -3%;
+  left: 80%;
+  height: 19%;
+}
+
+.backdrop-right [data-who='baro'] {
+  left: -6%;
+  height: 66%;
+}
+
+.backdrop-right [data-who='dask'] {
+  left: 54%;
+  height: 76%;
+}
+
+.backdrop-right [data-who='wenna'] {
+  left: 31%;
+  height: 68%;
+}
+
+.backdrop-right [data-who='rinlo'] {
+  bottom: -4%;
+  left: 20%;
+  height: 42%;
+}
+
+.backdrop-right [data-who='zarek'] {
+  bottom: -5%;
+  left: 50%;
+  height: 43%;
 }
 
 .start-screen h2 {
   margin: 0 0 8px;
   font-size: 28px;
-}
-
-.start-intro {
-  color: var(--muted);
 }
 
 .start-actions {
@@ -1317,14 +1500,11 @@ footer .build {
   font-size: 20px;
 }
 
-.start-progress {
-  margin-top: 32px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-}
+/* Beside the big button, a quiet one is as tall as it, on a foot as deep. */
+.start-actions .quiet-button {
+  --foot-height: 3px;
 
-.start-progress h3 {
-  margin: 8px 0 4px;
+  font-size: 20px;
 }
 
 .start-message {
@@ -1345,7 +1525,6 @@ footer .build {
 .import-form .start-actions {
   margin: 4px 0 0;
 }
-
 
 /* The map. */
 
@@ -1526,7 +1705,6 @@ a.stop-body:focus-visible {
   margin: 24px 0 0;
   text-align: center;
 }
-
 
 .lesson-teacher figcaption {
   font-weight: 700;
@@ -1836,6 +2014,39 @@ a.stop-body:focus-visible {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
+}
+
+/* The hello and, beside it, the pencil that opens the wizard to change the two names
+   (D293). */
+.start-name {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* A round button that shows a small drawing in place of words (D293): the pencil here,
+   the gear in the header. */
+.icon-button {
+  --foot-height: 2px;
+  --foot-colour: var(--ink-line);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--ink-line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.icon-button:hover,
+.icon-button:focus-visible {
+  border-color: var(--moss-deep);
+  background: var(--moss);
+  color: var(--paper);
 }
 
 .wizard-screen {
@@ -2158,10 +2369,32 @@ a.stop-body:focus-visible {
   display: none;
 }
 
-/* The saved games on the start screen (D70). */
+/* The saved games on the start screen (D70, D293): a box with its title, New game
+   and Import in its corner, and under the title how the games are kept. */
 .saved-note {
+  margin: 6px 0 10px;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.games-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.games-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.games .import-form,
+.games .start-message {
+  margin: 0 0 10px;
 }
 
 .games {
@@ -2174,7 +2407,7 @@ a.stop-body:focus-visible {
 }
 
 .games h3 {
-  margin: 0 0 8px;
+  margin: 0;
 }
 
 .games ul {
@@ -2195,9 +2428,26 @@ a.stop-body:focus-visible {
   border-top: none;
 }
 
-.game[data-current='true'] .game-name::after {
-  content: ' ★';
-  color: var(--gold);
+/* The game being played, the open one: in the gold of what is chosen, with a word in
+   Play's place. */
+.game[data-current='true'] {
+  margin: 0 -8px;
+  padding: 8px 6px;
+  border: 2px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--gold-soft);
+}
+
+.game[data-current='true'] + .game {
+  border-top: none;
+}
+
+.game-open {
+  align-self: center;
+  padding: 0 6px;
+  color: var(--gold-deep);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .game-about {
@@ -2224,7 +2474,8 @@ a.stop-body:focus-visible {
   font-size: inherit;
 }
 
-/* In a narrow window the buttons go under what the game is. */
+/* In a narrow window the buttons go under what the game is, and the sheet keeps less
+   room around what it holds. */
 @media (max-width: 640px) {
   .game {
     flex-wrap: wrap;
@@ -2232,7 +2483,17 @@ a.stop-body:focus-visible {
 
   .game-buttons {
     flex-basis: 100%;
+    flex-wrap: wrap;
     justify-content: flex-end;
+  }
+
+  .start-screen {
+    margin: 16px auto;
+    padding: 14px 12px 8px;
+  }
+
+  .games {
+    padding: 10px 12px;
   }
 }
 
@@ -2552,19 +2813,89 @@ a.stop-body:focus-visible {
   text-align: center;
 }
 
-/* The start screen, before a wizard is made: what Kydux is, above the buttons. */
-.start-welcome {
-  margin: 12px 0;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-large);
+/* The school's people on the welcome page (D294). Three stand before the castle, at the
+   hero's right, in front of the veil its words lie on. */
+.about-hero-figures {
+  position: absolute;
+  right: 3%;
+  bottom: 0;
+  width: 30%;
+  height: 66%;
 }
 
-.start-welcome h3 {
-  margin: 0 0 4px;
+.about-hero-figures [data-who='ilda'] {
+  right: 0;
+  height: 100%;
 }
 
-.start-welcome p {
-  margin: 0 0 6px;
+.about-hero-figures [data-who='nuri'] {
+  right: 50%;
+  bottom: -3%;
+  height: 62%;
+}
+
+.about-hero-figures [data-who='teku'] {
+  right: 22%;
+  bottom: -5%;
+  height: 62%;
+}
+
+/* A section with people at its side: they stand on the panel's foot, taller than it, so
+   their heads rise over its top edge. */
+.about-section.with-figures {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-end;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.about-section.figures-left {
+  flex-direction: row-reverse;
+}
+
+.about-words {
+  flex: 1;
+  align-self: center;
+  padding: var(--space-4) 0;
+}
+
+.about-figures {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  height: 190px;
+  margin-top: -44px;
+}
+
+.about-figures .figure {
+  position: static;
+  height: 100%;
+}
+
+.about-figures .figure + .figure {
+  margin-left: -18px;
+}
+
+.about-figures [data-who='zarek'],
+.about-figures [data-who='rinlo'] {
+  height: 82%;
+}
+
+.about-figures [data-who='bimo'] {
+  height: 34%;
+}
+
+/* In a narrow window the page is its words and its pictures of the game. */
+@media (max-width: 760px) {
+  .about-hero-figures,
+  .about-figures {
+    display: none;
+  }
+
+  .about-section.with-figures {
+    display: block;
+  }
 }
 
 @media (max-width: 640px) {

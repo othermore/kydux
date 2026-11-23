@@ -1,15 +1,21 @@
 // The welcome page and the page's look (D193): #about in both languages with its
-// painting, for whom, its three pictures of the game in their order and Play; the start
-// screen before a wizard is made shows what Kydux is; a button is drawn in the look's
-// moss green; the header has the mark and the link; the map's chapters have their cards,
-// a locked one greyed.
+// painting, the school's people on it (D294), for whom, its three pictures of the game in
+// their order and Play; the start screen before a wizard is made leads to it from the
+// header; a button is drawn in the look's moss green; the header has the mark and the
+// link; the map's chapters have their cards, a locked one greyed.
 
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
 
 async function picturesShown(page: Page): Promise<void> {
+  // The painting and the three pictures of the game, and the school's people (D294).
+  await expect(page.locator('.about-screen img:not(.figure)')).toHaveCount(4);
+  await expect(page.locator('.about-hero-figures .figure')).toHaveCount(3);
+  await expect(page.locator('.about-section .figure')).toHaveCount(7);
+  for (const people of await page.locator('.about-screen .figures').all()) {
+    await expect(people).toHaveAttribute('aria-hidden', 'true');
+  }
   const pictures = page.locator('.about-screen img');
-  await expect(pictures).toHaveCount(4);
   for (const picture of await pictures.all()) {
     await picture.scrollIntoViewIfNeeded();
     await expect.poll(() => picture.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
@@ -46,7 +52,7 @@ test.describe('the welcome page for a child who has played', () => {
   test('a wizard made: the page opens on the start screen, and the welcome\'s button goes back to it', async ({ page }) => {
     await seedWizard(page, MARTA);
     await page.goto('/');
-    await expect(page.locator('#continue')).toHaveText('Continuar: Ante la puerta');
+    await expect(page.locator('#continue')).toHaveText('Continuar partida');
     await page.goto('/#about');
     await expect(page.locator('#about-play')).toHaveText('Jugar');
     await page.locator('#about-play').click();
@@ -57,10 +63,10 @@ test.describe('the welcome page for a child who has played', () => {
 test.describe('the look', () => {
   test.use({ locale: 'es-ES' });
 
-  test('the start screen before a wizard is made says what Kydux is, with a link to the rest', async ({ page }) => {
+  test('the start screen before a wizard is made leads to the welcome page from the header', async ({ page }) => {
     await page.goto('/#start');
-    await expect(page.locator('#start-welcome h3')).toHaveText('Qué es Kydux');
-    await page.locator('#start-about').click();
+    await expect(page.locator('#continue')).toHaveText('Iniciar partida');
+    await page.locator('#about-link').click();
     await expect(page).toHaveURL(/#about$/);
   });
 

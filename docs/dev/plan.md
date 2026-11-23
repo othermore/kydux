@@ -199,15 +199,16 @@ shows the part the camera follows (D69).
   with `progress` = `{version, language, wizard: {name, gender, look},
   settings: {speed, fontSize, split}, lessons: {id: {read}}, levels: {id:
   {won, stars, code, hints, tried}}, current}`: `wizard` what the child
-  made (D36), `current` the item last opened, where *Continue* goes. The
+  made (D36), `current` the item last opened, where *Continue game* goes. The
   game keeps no list of the start cards seen: a level's card opens every
   time the level opens (D248). Each saved game is
   one such document (D70): `GamesStore` keeps them in `localStorage` under
   `kydux.game.<id>`, with their list under `kydux.games` (IndexedDB when it
   outgrows it), an entry `{id, name, created, played, seconds}` whose
-  `name` is the game's own, unique in the list (D290, D291); *Export* and
-  *Import*, on the start screen, move a game as a JSON file between
-  computers, *Import* asking the name of the game it brings;
+  `name` is the game's own, unique in the list (D290, D291); *Export*, beside
+  each game of the start screen's list, and *Import a game*, at the list's
+  top, move a game as a JSON file between computers (D293), *Import a game*
+  asking the name of the game it brings;
   the launcher can also keep it as a file beside itself when asked. An
   online store comes later behind the same interface.
 - The wizard's look: a base sprite drawn with placeholder colours for skin,
@@ -432,7 +433,9 @@ The game around the levels: the course as the child walks it.
 Sprint 5 has 3.5, 3.1, 3.3, 3.4 and 3.6 (`sprint-5.md`); sprint 6 has 3.9, 3.2,
 3.7 and 3.8 (`sprint-6.md`).
 
-3.1 The start screen: language, New wizard / Continue, Export / Import.
+3.1 The start screen: Start game or Continue game, the map, the saved games
+    with New game, Import, and Export a game (D293); the language and the
+    settings' gear in the header.
 3.2 The wizard creator: a name, a girl or a boy, and a look chosen among
     several (D36), each a sprite sheet of its own; shown in every scene.
 3.3 The chapter map: levels as places on a picture, the path lit as levels
@@ -584,8 +587,9 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
 - **Saved games.** A game per wizard, listed by its name, unique, which the
   child gives with the wizard's name (D290, D291), with its wizard, its
   place, its play time and its dates, loaded on return; the start screen
-  says which game is being played; export and import stay as the way to
-  carry one away. A wizard's gender and look are chosen once, at the
+  says which game is being played and lists the games in a box as soon as
+  there is one, the open one marked (D293); export and import stay as the
+  way to carry one away. A wizard's gender and look are chosen once, at the
   start of a game (D292). Sprint 11 keeps the list in the browser
   (D70); the same list on the server the game runs from, with the
   browser's as the fallback, comes with the online game (phase 7).
@@ -741,7 +745,11 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     close (D285), the way a level's wizard faces when it opens (D286), a light lying in
     the floor drawn whole and ending softly (D287), and the cells only a story's figure
     walks (D288); and, in `sprint-56.md`, the forgotten room's side door painted open by
-    Gemini, with Rinlo down the back stairs (D289).
+    Gemini, with Rinlo down the back stairs (D289); and, in `sprint-57.md`, a saved
+    game's own name (D290), the name a game takes from its wizard (D291), and a
+    wizard's gender and look chosen once (D292); and, in `sprint-58.md`, one start
+    screen with the saved games in a box on it (D293), over a painting of the castle
+    with the school's people at its sides (D294).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

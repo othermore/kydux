@@ -28,7 +28,7 @@ how it looks. Choose calmly: who your wizard is and their look stay for the
 whole game. You also give your game a name. The game then calls you by your
 wizard's name.
 
-After that, the game opens on its start screen. *Continue* takes you to
+After that, the game opens on its start screen. *Continue game* takes you to
 where you left off. The first time, that is the gate, where a friend
 meets you and teaches you the first steps. The friend is Nuri, a girl, if
 your wizard is a boy, and Teku, a boy, if your wizard is a girl.
@@ -74,12 +74,14 @@ and *Open* unfolds it. A chapter still locked is greyed, and shows only how it b
 
 The game saves your game in the browser as you play. It keeps several
 games, one for each wizard. Each game has a name, and no two games have the
-same one. The start screen says which game you are in. *Load a game* lists
-the games by their names, with where each one is and how long it has been
-played. *Change the names* changes your wizard's name and your game's.
-*New game* begins the story again for a new wizard. *Export* saves the game
-you are playing as a file, and *Import* brings it back on another computer.
-*Import* asks the name of the game it brings.
+same one. The start screen says which game you are in. Under it, a box lists
+your saved games by their names, with where each one is and how long it has
+been played. The game you are in is marked *Open now*. *Play* opens another
+one. The pencil beside your wizard's name changes your wizard's name and your
+game's. *New game* begins the story again for a new wizard. *Export*, beside
+each game, saves that game as a file. *Import a game* brings such a file back,
+on this computer or on another one, and asks the name of the game it brings.
+The gear at the top right opens the settings.
 
 ## Lessons
 

@@ -27,8 +27,12 @@ test('a first visit opens on the welcome page, whose Start playing begins the st
   await expect(page).toHaveURL(/#wizard$/);
   // The start screen, reached on purpose, begins the story too.
   await page.goto('/#start');
-  await expect(page.locator('#continue')).toHaveText('Begin the story');
+  await expect(page.locator('#continue')).toHaveText('Start game');
   await expect(page.locator('#continue')).toHaveAttribute('href', '#story/the-letter');
+  // The same screen as with a wizard, with no map yet and no game to play (D293).
+  await expect(page.locator('.start-screen h2')).toHaveText('Welcome to the school of magic');
+  await expect(page.locator('#map-link')).toHaveCount(0);
+  await expect(page.locator('#start-welcome')).toHaveCount(0);
 });
 
 test('the creator, and Done opens the first lesson by name', async ({ page }) => {
@@ -66,7 +70,8 @@ test('the creator, and Done opens the first lesson by name', async ({ page }) =>
 
   await page.locator('#home').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Ana');
-  await expect(page.locator('#continue')).toHaveText('Continue: At the gate');
+  await expect(page.locator('#continue')).toHaveText('Continue game');
+  await expect(page.locator('#continue')).toHaveAttribute('href', '#story/at-the-gate');
   await expect(page.locator('#change-wizard')).toBeVisible();
   expect(await portraitShown(page, '#start-figure')).toBe('wizard-sky');
 });
@@ -128,10 +133,11 @@ test('the scene draws the look chosen, and the words follow a girl in Spanish', 
   await context.close();
 });
 
-test('Change the names opens the wizard with both names; Back and Escape leave both so (D290)', async ({ page }) => {
+test('the pencil opens the wizard with both names; Back and Escape leave both so (D290)', async ({ page }) => {
   await seedWizard(page);
   await page.goto('/');
-  await expect(page.locator('#change-wizard')).toHaveText('Change the names');
+  // The pencil beside the two names (D293).
+  await expect(page.locator('#change-wizard')).toHaveAttribute('aria-label', 'Change the names');
   await page.locator('#change-wizard').click();
   await expect(page.locator('#wizard-name')).toHaveValue('Marta');
   // The game of before is named by its wizard (D291).
@@ -167,7 +173,6 @@ test('Change the names opens the wizard with both names; Back and Escape leave b
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Mar');
   expect(await portraitShown(page, '#start-figure')).toBe('wizard-teal');
   await expect(page.locator('#current-game')).toHaveText('You are in the game “My game”.');
-  await page.locator('#load-game').click();
   await expect(page.locator('#games .game-name')).toHaveText(['My game']);
   await expect(page.locator('#games .game-wizard')).toHaveText(['Mar']);
 });
@@ -209,7 +214,6 @@ test("a new game's name follows its wizard's until it is written, with a number 
   await expect(page).toHaveURL(/#story\/at-the-gate$/);
   await page.locator('#home').click();
   await expect(page.locator('#current-game')).toHaveText('You are in the game “Second year”.');
-  await page.locator('#load-game').click();
   await expect(page.locator('#games .game-name')).toHaveText(['Second year', 'Marta']);
   await expect(page.locator('#games .game').nth(0).locator('.game-wizard')).toHaveText('Leo');
   await expect(page.locator('#games .game').nth(1).locator('.game-wizard')).toHaveCount(0);
@@ -219,19 +223,24 @@ test('the wizard goes with exported progress to another browser', async ({ page,
   await seedWizard(page);
   await page.goto('/');
   const downloading = page.waitForEvent('download');
-  await page.locator('#export').click();
+  await page.locator('#games .game .export').click();
   const file = await (await downloading).path();
 
   const other = await browser.newContext({ locale: 'en-US' });
   const elsewhere = await other.newPage();
   await elsewhere.goto('/#start');
-  await expect(elsewhere.locator('#continue')).toHaveText('Begin the story');
+  await expect(elsewhere.locator('#continue')).toHaveText('Start game');
+  // With no saved game there is no box: Import stands beside the big button (D293).
+  await expect(elsewhere.locator('#games')).toHaveCount(0);
+  await expect(elsewhere.locator('.start-actions #import')).toHaveText('Import a game');
   await elsewhere.locator('#import-file').setInputFiles(file as string);
   // The game's name is asked, its wizard's offered (D291).
   await expect(elsewhere.locator('#import-name')).toHaveValue('Marta');
   await elsewhere.locator('#import-done').click();
   await expect(elsewhere.locator('.start-screen h2')).toHaveText('Hello, Marta');
   await expect(elsewhere.locator('#current-game')).toHaveText('You are in the game “Marta”.');
+  await expect(elsewhere.locator('#games .game[data-current="true"] .game-name')).toHaveText('Marta');
+  await expect(elsewhere.locator('#games #import')).toBeVisible();
   await other.close();
 });
 

@@ -1,11 +1,12 @@
 // The welcome page, #about (D193): what Kydux is, for whom, how it is played (the game,
 // its story and its lessons, each with a picture of the game), that it is free software
 // of the Kidux family, and a big button to play. Its hero is a painting of Arvelia on its
-// hill above the lake at dusk. A first visit opens on it, and its Start playing begins the
-// story (D61); a child who has played goes back to the start screen from it. The start
-// screen shows its first part to a child with no wizard yet.
+// hill above the lake at dusk, with three of the school's people standing before it, and
+// others stand beside its sections (D294). Its button begins the story for a child who
+// has never played (D61) and goes back to the start screen for one who has.
 
 import { currentLanguage, t } from '../i18n';
+import { group } from './decor';
 import { element } from './dom';
 import type { Screen } from './screen';
 
@@ -17,12 +18,12 @@ function picture(name: string): string {
   return `${import.meta.env.BASE_URL}about/${name}`;
 }
 
-/** The welcome's first part: what Kydux is, with a link to the rest. */
-export function welcomeSection(): HTMLElement {
-  return element('section', { className: 'about-section panel start-welcome', id: 'start-welcome' }, [
-    element('h3', {}, [t('about.what_title')]),
-    element('p', {}, [t('about.what_text')]),
-    element('a', { href: '#about', id: 'start-about' }, [t('about.more')]),
+/** A section of words on a panel, with some of the school's people standing at its side
+ * (D294): at its right looking at the words, or at its left, mirrored. */
+function sectionWith(id: string, words: Node[], people: string[], side: 'left' | 'right'): HTMLElement {
+  return element('section', { className: `about-section panel with-figures figures-${side}`, id }, [
+    element('div', { className: 'about-words' }, words),
+    group('about-figures', people, side === 'left'),
   ]);
 }
 
@@ -47,20 +48,25 @@ export function aboutScreen(parts: AboutScreenParts): Screen {
     node.replaceChildren(
       element('section', { className: 'about-hero' }, [
         hero,
+        group('about-hero-figures', ['ilda', 'nuri', 'teku']),
         element('div', { className: 'about-hero-words' }, [
           element('h2', {}, [t('about.hero_title')]),
           element('p', {}, [t('about.hero_text')]),
           element('a', { className: 'big-button', id: 'about-play', href: parts.play }, [playWords()]),
         ]),
       ]),
-      element('section', { className: 'about-section panel', id: 'about-what' }, [
-        element('h3', {}, [t('about.what_title')]),
-        element('p', {}, [t('about.what_text')]),
-      ]),
-      element('section', { className: 'about-section panel', id: 'about-who' }, [
-        element('h3', {}, [t('about.who_title')]),
-        element('p', {}, [t('about.who_text')]),
-      ]),
+      sectionWith(
+        'about-what',
+        [element('h3', {}, [t('about.what_title')]), element('p', {}, [t('about.what_text')])],
+        ['orla', 'bimo'],
+        'right',
+      ),
+      sectionWith(
+        'about-who',
+        [element('h3', {}, [t('about.who_title')]), element('p', {}, [t('about.who_text')])],
+        ['zarek', 'rinlo'],
+        'left',
+      ),
       element('section', { className: 'about-section', id: 'about-how' }, [
         element('h3', {}, [t('about.how_title')]),
         element(
@@ -82,14 +88,19 @@ export function aboutScreen(parts: AboutScreenParts): Screen {
           ),
         ),
       ]),
-      element('section', { className: 'about-section panel', id: 'about-free' }, [
-        element('h3', {}, [t('about.free_title')]),
-        element('p', {}, [
-          t('about.free_text'),
-          ' ',
-          element('a', { href: t('about.kidux_url') }, [t('about.kidux_link')]),
-        ]),
-      ]),
+      sectionWith(
+        'about-free',
+        [
+          element('h3', {}, [t('about.free_title')]),
+          element('p', {}, [
+            t('about.free_text'),
+            ' ',
+            element('a', { href: t('about.kidux_url') }, [t('about.kidux_link')]),
+          ]),
+        ],
+        ['baro', 'wenna', 'dask'],
+        'right',
+      ),
       element('p', { className: 'about-end' }, [
         element('a', { className: 'big-button', id: 'about-play-end', href: parts.play }, [playWords()]),
       ]),

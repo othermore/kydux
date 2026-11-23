@@ -9,6 +9,7 @@ being reduced to true pixels as cut.py does for pixel art.
     tools/art/sprites.py sprite <picture.png> --out <thing.webp> --box x0,y0,x1,y1 --height 256
         [--lawn]
     tools/art/sprites.py portrait <bust.png> --out <portrait.webp>
+    tools/art/sprites.py whole <figure.png> --out <figure.webp> --height 600
 
 A sheet is drawn on flat magenta. The magenta is keyed out softly: a pixel near
 it is transparent, one at the edge of a figure partly so, with the magenta's
@@ -31,7 +32,9 @@ painted standing on a lawn, the ring on its post, the lawn and its shadows taken
 out by their colour, green over red, and only the thing's own piece kept, its
 holes the lawn seen through it; trimmed, `height` pixels tall, written as a webp.
 `portrait` cuts a character's bust painted on flat magenta (D194) into a square of 512
-pixels, centred, the cut of its chest on the bottom edge.
+pixels, centred, the cut of its chest on the bottom edge. `whole` cuts a character
+painted whole on flat magenta (D294), head to feet, keyed as a portrait is, trimmed to
+the figure and `height` pixels tall.
 """
 
 import argparse
@@ -297,21 +300,37 @@ def _groups(mask: Array) -> Array:
 PORTRAIT = 512
 
 
-def portrait(path: Path, out: Path, size: int = PORTRAIT) -> Path:
-    """A portrait bust painted on flat magenta (D194): keyed out, its magenta rim
-    cleared, only its largest piece kept, trimmed, and scaled into a square of `size`
-    pixels, centred, the cut of its chest on the bottom edge; written as a webp."""
+def _one_piece(path: Path) -> Array:
+    """A figure painted alone on flat magenta: keyed out, its magenta rim cleared, only
+    its largest piece kept, trimmed to it."""
     keyed = off_magenta_rim(soft_key(cut.load(path)), depth=4)
     labelled = _groups(keyed[..., 3] > 0)
     sizes = np.bincount(labelled.ravel())
     sizes[0] = 0
     keyed[..., 3] = np.where(labelled == int(sizes.argmax()), keyed[..., 3], 0)
-    trimmed = cut.trim(keyed)
+    return cut.trim(keyed)
+
+
+def portrait(path: Path, out: Path, size: int = PORTRAIT) -> Path:
+    """A portrait bust painted on flat magenta (D194): keyed out, its magenta rim
+    cleared, only its largest piece kept, trimmed, and scaled into a square of `size`
+    pixels, centred, the cut of its chest on the bottom edge; written as a webp."""
+    trimmed = _one_piece(path)
     picture = scaled(trimmed, min(size / trimmed.shape[0], size / trimmed.shape[1]))
     square = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     square.alpha_composite(picture, ((size - picture.width) // 2, size - picture.height))
     out.parent.mkdir(parents=True, exist_ok=True)
     square.save(out, quality=90, method=6)
+    return out
+
+
+def whole(path: Path, out: Path, height: int) -> Path:
+    """A character painted whole on flat magenta (D294), head to feet: keyed as a
+    portrait is, trimmed to the figure, `height` pixels tall; written as a webp."""
+    trimmed = _one_piece(path)
+    picture = scaled(trimmed, height / trimmed.shape[0])
+    out.parent.mkdir(parents=True, exist_ok=True)
+    picture.save(out, quality=90, method=6)
     return out
 
 
@@ -333,7 +352,9 @@ def sprite(path: Path, out: Path, box: tuple[int, int, int, int], height: int, l
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Painted pieces cut from a sheet.")
-    parser.add_argument("kind", choices=("figures", "things", "textures", "sprite", "portrait"))
+    parser.add_argument(
+        "kind", choices=("figures", "things", "textures", "sprite", "portrait", "whole")
+    )
     parser.add_argument("sheet", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--name", default="figure")
@@ -348,6 +369,9 @@ def main() -> int:
     args = parser.parse_args()
     if args.kind == "portrait":
         print(portrait(args.sheet, args.out))
+        return 0
+    if args.kind == "whole":
+        print(whole(args.sheet, args.out, int(args.height)))
         return 0
     if args.kind == "sprite":
         box = tuple(int(v) for v in args.box.split(","))

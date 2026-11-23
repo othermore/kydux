@@ -88,7 +88,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the note on a phone or a tablet that the game is made for a
                 computer (handheld.ts), the characters' and the looks' portraits
                 (portraits.ts, D194), the welcome page (about.ts, #about, D193),
-                Kydux's mark in the header (mark.ts), what a screen shows while
+                Kydux's mark in the header (mark.ts), the pencil and the gear
+                (icons.ts, D293), the start screen's painting and the school's
+                people at a page's sides (decor.ts, D294), what a screen shows while
                 it loads, the mark, Loading… and a tip with its picture and its
                 clock, the tip put up once its picture is loaded and decoded
                 (waiting.ts, D214, D221, D246), and under ?debug the page
@@ -734,10 +736,10 @@ one overturns stays, marked as superseded.
   figure's skin, hair, hair style, robe, hat and band, four skin tones each
   with both hair styles, none like a famous wizard; with phase 4's art the
   same ids pick sprite sheets, so the document does not change. The creator
-  is at `#wizard` (`app/src/ui/wizard.ts`); the start screen's big button
-  leads there while there is no wizard, and offers *Change the names* once
-  there is: the wizard's name and the game's (D290) change there, and the
-  gender and the look are shown and not offered (D292). Done needs a name
+  is at `#wizard` (`app/src/ui/wizard.ts`); the opening story leads there
+  while there is no wizard (D61), and the start screen's pencil, beside the
+  wizard's name, once there is (D293): the wizard's name and the game's (D290)
+  change there, and the gender and the look are shown and not offered (D292). Done needs a name
   and a gender: the gender is never preset, since a default would choose for
   the child. The gender buttons are words, not a figure each, since a figure
   is a look and any look is either's. Escape and Back leave an existing
@@ -1101,9 +1103,9 @@ one overturns stays, marked as superseded.
   begins it. Its first steps are told over the painting of the castle
   (D251). Its *Go on* leads
   to the creator, or, once a wizard exists, to the course's first item; it
-  is never the place *Continue* returns to. The start screen's big button
-  begins the story while there is no wizard, and *New game* begins it
-  again for a new wizard, keeping the language and the settings (D64,
+  is never the place *Continue game* returns to. The start screen's big
+  button, *Start game*, begins the story while there is no wizard (D293),
+  and *New game* begins it again for a new wizard, keeping the language and the settings (D64,
   D70). The
   creator shows the looks of the gender chosen, four each (`looksFor`),
   none before a gender is; its name starts as *Kydux*, chosen whole on
@@ -1220,13 +1222,15 @@ one overturns stays, marked as superseded.
   being played under `kydux.current`; a game is begun by its first save, and
   the list shows the games with a wizard. Every change saves the game being
   played; there is no *Save*. The start screen says under its greeting which
-  game is being played, and offers *Continue*, *Load a game* (each game by
-  its name, its wizard's under it when the two differ, where it is, its play
-  time and dates, *Play* and *Delete*, which asks with the game's name) and
-  *New game*; a first visit with no game opens the welcome page (D193), and
-  with saved games and none being played the start screen offers them. An
-  imported file becomes one more game, whose name is asked first (D291);
-  *Export* keeps the game being played. Play time is counted every ten
+  game is being played, and lists the games in a box as soon as there is one
+  (D293): each game by its name, its wizard's under it when the two differ,
+  where it is, its play time and dates, with *Play*, *Export*, which keeps
+  that game as a file, and *Delete*, which asks with the game's name; the
+  game being played is marked as the open one and has no *Play*. *New game*
+  and *Import a game* stand at the box's top; an imported file becomes one
+  more game, whose name is asked first (D291). A first visit with no game
+  opens the welcome page (D193), and with saved games and none being played
+  the start screen offers them. Play time is counted every ten
   seconds a level, a lesson or a story is on screen with the tab in sight
   and the child at the page: a key, a click, a scroll or a move of the
   pointer within the last two minutes; a child who walks away is not
@@ -1363,7 +1367,7 @@ one overturns stays, marked as superseded.
 - **D78 — The opening belongs to chapter 1, and stories are numbered.**
   Decided 2026-10-24 (sprint 13, 13.1). `story:the-letter` is chapter 1's
   first item, named by `course.json`'s `opening`, and is done once a
-  wizard exists; the creator follows it, and *Continue* never goes back to
+  wizard exists; the creator follows it, and *Continue game* never goes back to
   it. Every item's label carries its chapter and its number by kind,
   stories too: *Chapter 1 · Story 1*, *Chapter 1 · Practice 4*. Rules out
   an unnumbered story before the course.
@@ -2910,7 +2914,8 @@ one overturns stays, marked as superseded.
   it. The page's background is the parchment with a fine grain, an SVG noise written in
   the stylesheet, no file. The components: a button stands on a darker foot and sinks
   onto it when pressed (`.button`, `.big-button`; `.quiet-button` paper with an ink line;
-  `danger` soft red), a card over the scene and a panel on the page are paper with a
+  `danger` soft red; a round `.icon-button` for a drawing alone, D293), and the gold ring
+  of a key goes round a button and its foot together, close against both, a card over the scene and a panel on the page are paper with a
   thin ink line and a soft shadow (`.card`, `.panel`), a chip is a small gold label
   (`.chip`), a field is paper with an ink line. The screens keep their layout and their
   `data-*` hooks; their colours, borders, radii and shadows are the tokens'. The header
@@ -2927,10 +2932,11 @@ one overturns stays, marked as superseded.
   the i18n files. A first visit, with no wizard, no saved game and no address, opens on
   it (the owner, 2026-11-11: *si nunca ha jugado y acaba de llegar, prefiero que haya una
   landing page que explique algo*): the button says *Start playing* and begins the story
-  (D61). A child who has played opens on the start screen, where *Continue* goes on; from
-  the welcome page, reached by the header's link, the button says *Play* and goes back to
-  the start screen. The start screen, before a wizard is made, shows the welcome's first
-  part, with a link to the rest. The map's
+  (D61). A child who has played opens on the start screen, where *Continue game* goes
+  on; from the welcome page, reached by the header's link, the button says *Play* and
+  goes back to the start screen, which is one, with or without a wizard (D293). The
+  school's people stand on the welcome page, beside its castle and three of its parts
+  (D294). The map's
   chapters each have a card, a band of the chapter's first level's scene cut small by
   `tools/art/chapter_cards.py` into `content/art/chapters/<id>/card.webp`, the title
   over it on a dark veil; a chapter whose first stop is locked is greyed. Rules out a
@@ -4670,8 +4676,9 @@ one overturns stays, marked as superseded.
   written only when a name was given; and the single document of before the list (D70).
   Elsewhere it is the name offered, which the child keeps or changes: in the creator,
   for a game being made, until the child writes a name; and on the start screen, for a
-  game brought from a file, whose name is asked, in `#import-form` under *Export* and
-  *Import*, before the game enters the list; *Cancel* and Escape bring nothing. A game
+  game brought from a file, whose name is asked, in `#import-form` over the list of
+  games, or under the big button while no game is saved (D293), before the game enters
+  the list; *Cancel* and Escape bring nothing. A game
   named keeps its name. A game with no wizard has no name and is not listed; one brought
   from a file is added with none, and the creator names it.
 - **D292 — A wizard's gender and look are chosen once.** Decided 2026-11-21 by the owner
@@ -4686,3 +4693,58 @@ one overturns stays, marked as superseded.
   a game to its last. *New game* begins with no wizard (D64), and there all is chosen; a
   game brought from a file keeps the file's wizard. Rules out a look changed within its
   gender: the friends' colours follow the look.
+- **D293 — One start screen, with the saved games in a box on it.** Decided 2026-11-21 by
+  the owner (*si mostramos directamente las partidas guardadas, ya no hace falta el botón
+  cargar una partida*; *así descargamos la botonera y solo dejamos "Continuar" y "El
+  mapa"*; *la sección de "Tu progreso" también podemos eliminarla*; *para que no haya dos
+  pantallas distintas*). The start screen is the same with or without a wizard: a
+  greeting, a row of buttons and the saved games. The big button, `#continue`, says
+  *Start game* while there is no wizard and begins the story (D61), and *Continue game*
+  once there is, to the item last opened; *The map* stands beside it once there is a
+  wizard, as tall as it and on a foot as deep. The box `#games` is shown as soon as one
+  game is saved, with nothing to press for it: at its top, *New game* and *Import a
+  game*; under its title, in small italics, the note `#saved-note`, that the game is
+  saved as it is played, in this browser, and is exported to a file to be carried to
+  another browser or kept as a copy; then a row a game (D70), each with *Play*, *Export*
+  and *Delete*. The game being played is the open one: its row is framed in gold
+  (`data-current`), and the words *Open now* stand where *Play* would. *Export* keeps
+  its row's game as `kydux-<name>.json`, the game's name with its spaces as hyphens.
+  While no game is saved, *Import a game* stands beside the big button. Once a wizard is
+  made, a pencil beside its name (`#change-wizard`) opens the creator, where the names
+  are changed (D36, D290). The settings open from a gear in the header, beside the
+  language (`#settings-link`), on every screen but a level, which has its gear beside its
+  title, and the settings themselves. The pencil and the gear are round buttons,
+  `.icon-button`, drawn by `ui/icons.ts` and named for a screen reader by the words a
+  button would say. Rules out *Load a game* as a button that unfolds the list; a section
+  of progress with one *Export* for the game being played; a sentence of the story's
+  beginning on the start screen, true only before the story is begun; and a second
+  start screen for a child with no wizard.
+- **D294 — A painting behind the start screen, and the school's people at the sides.**
+  Decided 2026-11-21 by the owner (*en el fondo y a los lados se viesen cosas, como una
+  imagen del castillo y imágenes de los distintos personajes (idealmente a cuerpo
+  completo, bien dibujados como recreados)*; *no debemos poner al mismo personaje con
+  distintos colores de ropa, elegimos solo un color de cada personaje para las
+  decoraciones de la página*). Eleven of the story's characters are painted whole, head
+  to feet, by Gemini on flat magenta, each from its small figure and its portrait, so
+  that it is the one the child knows (`tools/art/prompts/whole-<id>.md`; the cat from its
+  portrait alone), then keyed and trimmed by `tools/art/sprites.py whole` to 600 pixels of
+  height in `app/public/decor/<id>.webp`: Eldra, Orla, Ilda, Baro, Dask, Wenna, the
+  friends Nuri and Teku, Rinlo, Zarek and Bimo the cat. Each wears one set of colours
+  wherever it decorates a page; the friends, whose colours inside the game go with the
+  wizard's look (D90, D283), wear their first ones, Nuri green with yellow stars and Teku
+  ochre with a brown hat. The wizard is not among them: its look is the child's (D36).
+  The start screen is a sheet of paper, 760 pixels wide, over a painting of Arvelia on its
+  hill and the village by the lake at dusk (`backdrop.webp`, from `start-backdrop.md`),
+  fixed behind the page while the sheet scrolls, the header a band of paper over it. In a
+  window 1240 pixels wide or more, two groups stand at the window's foot, one at each side
+  of the sheet, six at the left and five at the right, both looking at the sheet
+  (`ui/decor.ts`: `backdrop()`, `group()`, a figure turned by `.mirrored`); a narrower
+  window shows the painting alone. The welcome page (D193) has Ilda, Nuri and Teku before
+  its castle, and a group beside three of its parts: Orla and Bimo by what Kydux is, Zarek
+  and Rinlo by whom it is for, Baro, Wenna and Dask by its being free; a window narrower
+  than 760 pixels shows none of them. All of it is decoration: hidden from a screen
+  reader, taking no click and no key, and covering no word and no button.
+  `app/public/decor/SOURCE.md` records how each picture is made. Rules out a character in
+  two sets of colours on one page, a figure enlarged from its small sprite, and people
+  on a level, a lesson or the map, where they would come between the child and what
+  they are doing (D193).

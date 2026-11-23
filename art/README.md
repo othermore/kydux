@@ -785,6 +785,18 @@ base bust a gender (`art/figures/portrait-wizard-<gender>.webp`) by
 `tools/art/figures.py --portraits`, so that a look's portrait wears its colours. The
 friends' portraits wear their first colours.
 
+### People painted whole
+
+The start screen and the welcome page are decorated with the story's characters painted
+whole, head to feet (D294). Each is asked of Gemini alone on flat magenta, from its small
+figure and its portrait, so that it is the same character
+(`tools/art/prompts/whole-<id>.md`), in one set of colours, the friends in their first
+ones. `tools/art/sprites.py whole` keys the magenta out as a portrait's, trims the
+picture to the figure and makes it 600 pixels tall in `app/public/decor/<id>.webp`. The
+painting behind the start screen is `backdrop.webp`, from `start-backdrop.md`: whatever
+is worth seeing lies in its outer quarters, since the page covers its middle, and its
+foot is open grass for the people to stand on.
+
 ## Sprites of things
 
 A kind of thing may be drawn from a picture of its own, the same on every scene
@@ -846,6 +858,8 @@ A sprite is cut from a box of a picture by `tools/art/sprites.py sprite`:
   of its first level's scene cut small by `tools/art/chapter_cards.py` (D193).
 - `app/public/about/`: the welcome page's painting of Arvelia and its pictures of the
   game, with their `SOURCE.md` (D193).
+- `app/public/decor/`: the painting behind the start screen and the story's characters
+  painted whole, with their `SOURCE.md` (D294).
 
 Everything the project makes ships under the GPL, like the code. A picture
 from anywhere else comes in only under a licence that lets it ship with a

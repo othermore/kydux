@@ -2898,8 +2898,10 @@ one overturns stays, marked as superseded.
   lowered second, a string plucked on every eighth note as a clock over a piano's low notes,
   a horn's long notes and a piano's tune far under them), *The broom* (a race: fast in four
   in E minor, a piano's short climbing cells over a low voice that runs in eighth notes, the
-  drum on every beat) and *The familiar* (the tower: a slow chorale in C that opens out, the
-  flute taking its top line). A test holds every chapter to a theme, every theme to its
+  drum on every beat) and *The familiar* (the tower's high hall at the year's end, wonder and a
+  little longing: slow in three in D minor with its raised sixth, two flutes answering each
+  other over a harp and the low pad, a celesta's tune high over the harp's running eighth
+  notes in its middle part, D296). A test holds every chapter to a theme, every theme to its
   rules, and the files to what the score makes. Rules out loaded music files and a score
   that names or quotes any work under copyright.
 - **D193 — The page's look, and a welcome page.** Decided 2026-11-10 by the owner (*una
@@ -3283,7 +3285,7 @@ one overturns stays, marked as superseded.
   climb by step and break off, and every few bars a surprise, a bar with no tune, a leap
   of register, a raised seventh left hanging; its loop ends in the air. *The passages* is
   the theme of D213, a clock that ticks at night. The broom's theme and the passages' are
-  the owner's choice by ear (D213). *The familiar* waits until its chapter is seen. The page
+  the owner's choice by ear (D213). *The familiar* is the theme of D296. The page
   sounds one more kind of voice, `piano`: a struck tone, bright at the hammer's blow, that
   starts at once and dies away by itself in a time of its pitch, however long the note is
   written (`pianoRing`).
@@ -4764,3 +4766,21 @@ one overturns stays, marked as superseded.
   follow the wizard's look as they do for any other (D90, D283). Rules out a default
   look that differs between a boy and a girl in its robe, and a look's id renamed, which
   would lose the look of the games saved.
+- **D296 — The familiar's theme: a consort of two flutes in three.** Decided 2026-11-22 by
+  the owner (*la canción del último capítulo es la que teníamos de prueba, pero tenemos
+  pendiente hacer una*; *siguiendo el estilo de las canciones de los otros 4 capítulos, es
+  una referencia importante sobre la que construir*), who judges it by ear on the mixer
+  (D203). Chapter 5 is the tower's high hall at the year's end: wonder at what is learned
+  there, and a little longing, since the year closes. Its theme is slow, 88 beats a
+  minute, in three, in D minor with its raised sixth, 48 bars in three parts of sixteen.
+  In the first, two flutes play as a consort, the second answering the first a bar
+  later, over a harp's open notes, one a beat, and the low pad. In the middle part a
+  celesta has the tune, high over the harp, which runs in eighth notes, while the first
+  flute holds long notes under it; the part closes on D major. In the last the consort
+  comes back over the running harp, and the celesta rings in the bars where the flute's
+  tune rests. It is made as the other four are (D192, D209, D213): the same kinds of
+  voices, a celesta, a harp, the low pad and a tune's instrument that is the chapter's
+  own, a melody written a bar at a time over a chord a bar, sections that loop without
+  a seam; what is its own is the metre in three and the two flutes. A test holds it to
+  its metre, its two flutes and the celesta's place. Rules out a sixth theme beside it as
+  a candidate (D209), and a tune or a harmony taken from any other work (D192).

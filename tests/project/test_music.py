@@ -138,3 +138,29 @@ def test_the_passages_tick_on_every_eighth_note_under_a_far_horn_and_tune():
         ]
         assert {note[1] % 4 for note in section["notes"]["bass"]} == {0.0, 1.5, 3.0}
         assert section["notes"]["horn"]
+
+
+def test_the_familiar_is_two_flutes_in_three_with_the_celesta_s_tune_in_the_middle():
+    """D296: slow in three; two flutes, the second the quieter and a bar after the first in
+    the outer parts; the celesta silent in the first part and on the tune in every bar of
+    the middle one; the harp a note a beat at first, then running in eighth notes."""
+    theme = loaded("the-familiar")
+    assert 80 <= theme["tempo"] <= 96 and theme["metre"] == [3, 4]
+    voices = theme["voices"]
+    assert [name for name, voice in voices.items() if voice["kind"] == "flute"] == [
+        "flute",
+        "second",
+    ]
+    assert voices["second"]["volume"] < voices["flute"]["volume"]
+    sections = {section["id"]: section for section in theme["sections"]}
+    first, middle, last = (sections[name]["notes"] for name in theme["order"])
+    beats = sections[theme["order"][0]]["bars"] * 3
+    assert all(sections[name]["bars"] * 3 == beats for name in theme["order"])
+    for outer in (first, last):
+        assert min(note[1] for note in outer["flute"]) == 0
+        assert min(note[1] for note in outer["second"]) == 3
+    assert "celesta" not in first
+    assert set(by_bar(middle["celesta"], 3)) == set(range(beats // 3))
+    assert sorted(note[1] for note in first["harp"]) == [float(beat) for beat in range(beats)]
+    for running in (middle, last):
+        assert sorted(note[1] for note in running["harp"]) == [i / 2 for i in range(beats * 2)]

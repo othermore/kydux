@@ -608,72 +608,99 @@ def the_broom() -> dict:
     )
 
 
-# --- The familiar: the tower; a slow, solemn chorale that opens out.
+# --- The familiar: the tower's high hall at the year's end, wonder and a little
+# longing, slow in three in D minor with its raised sixth: two flutes as a consort, the
+# second answering the first a bar later, over a harp's open notes and the low pad; in
+# the middle part a celesta's tune, high as stars, over the harp running in eighth notes
+# while a flute holds long notes under it, closing on D major; then the consort again
+# over the running harp, the celesta ringing above it (D296).
 
 
 def the_familiar() -> dict:
-    bar = 4
-    a = harmony("C | Am | F | G | C | Em | F | G | Am | Em | F | C | Dm | G | C | G", bar)
-    b = harmony("F | C | Dm | Am | Bb | F | G | G | C | F | Am | Em | F | G | C | C", bar)
-    c = harmony("Am | F | C | G | Am | F | G | E | Am | Dm | G | C | F | G | C | G7", bar)
-    # The chorale's top line, sung by the strings, then by the flute as it opens out.
-    a_top = (
-        "e5/4 | e5/2 c5/2 | c5/2 a4/2 | b4/2 d5/2 | c5/2 e5/2 | g5/2 e5/2 | f5/2 a5/2 | g5/4 | "
-        "e5/2 c5/2 | b4/2 e5/2 | a5/2 f5/2 | e5/2 g5/2 | f5/2 d5/2 | d5/2 b4/2 | c5/4 | d5/4"
+    bar = 3
+    rest = "r/3"
+    a_chords = "Dm | G | Dm | C | F | C | Dm | Am | Dm | G | F | Am | Dm | G | C | Dm"
+    a_flute = (
+        "a5/2 d6 | b5/1.5 a5/0.5 g5 | a5/2 f5 | e5/3 | "
+        "f5 g5 a5 | g5/2 e5 | f5/1.5 e5/0.5 d5 | e5/3 | "
+        "a5/2 d6 | b5/1.5 c6/0.5 d6 | c6/2 a5 | c6/1.5 b5/0.5 a5 | "
+        "f5 a5 d6 | b5/2 g5 | g5/1.5 f5/0.5 e5 | d5/3"
     )
-    b_top = (
-        "a5/2 c6/2 | g5/4 | f5/2 a5/2 | e5/4 | d5/2 f5/2 | c5/2 a5/2 | g5/2 b5/2 | d6/4 | "
-        "e6/2 c6/2 | a5/2 c6/2 | c6/2 e6/2 | b5/2 g5/2 | a5/2 f5/2 | d5/2 g5/2 | e5/4 | c5/4"
+    a_second = (
+        "r/3 | g4/2 d5 | f5/1.5 e5/0.5 d5 | g4 c5 d5 | "
+        "a4/2 c5 | e5/2 c5 | d5/2 a4 | c5 b4 a4 | "
+        "d5/2 f5 | g5/2 f5 | f5/1.5 e5/0.5 f5 | e5/2 c5 | "
+        "d5/2 f5 | g5/1.5 f5/0.5 d5 | e5/1.5 d5/0.5 c5 | a4/3"
     )
-    c_top = (
-        "e6/4 | f6/2 c6/2 | e6/2 g6/2 | d6/4 | c6/2 e6/2 | a6/2 f6/2 | g6/2 d6/2 | e6/2 g#5/2 | "
-        "a5/2 c6/2 | d6/2 f6/2 | g6/2 b5/2 | c6/2 e6/2 | f6/2 a6/2 | g6/2 d6/2 | e6/4 | f6/2 d6/2"
+    b_chords = (
+        "Fmaj7 | C | Fmaj7 | C | Dm7 | Am7 | Bb | C | Fmaj7 | C | Dm7 | Am7 | Bb | C | Dsus4 | D"
     )
-    rising = [0, 1, 2, 3]
+    b_celesta = (
+        "e6/2 c6 | e6/1.5 d6/0.5 g6 | a6/2 e6 | g6/3 | "
+        "f6/2 d6 | e6/1.5 d6/0.5 c6 | d6/2 f6 | e6/3 | "
+        "e6/2 c6 | e6/1.5 g6/0.5 c7 | a6/2 f6 | g6/1.5 e6/0.5 c6 | "
+        "d6 f6 a6 | g6/2 e6 | g6/1.5 a6/0.5 g6 | f#6/3"
+    )
+    b_flute = (
+        "a5/3 | g5/3 | a5/3 | c6/1.5 b5/0.5 g5 | "
+        "a5/3 | g5/3 | f5/3 | e5 g5 c6 | "
+        "a5/3 | g5/3 | f5/2 a5 | e5/3 | "
+        "d5/2 f5 | e5/2 g5 | a5/3 | d5 f#5 a5"
+    )
+    # The stars over the consort: the celesta answers where the flute's tune rests on a
+    # long note, and falls to the loop's start.
+    c_celesta = " | ".join(
+        [rest, rest, rest, "r e6 g6", rest, rest, rest, "r e6 a6"]
+        + [rest, rest, rest, rest, rest, rest, rest, "a6 f6 d6"]
+    )
+    a = harmony(a_chords, bar)
+    b = harmony(b_chords, bar)
+    open_notes = [0, 2, 3]
+    flowing = [0, 2, 4, 5, 4, 2]
     return theme(
         "the-familiar",
-        60,
-        [4, 4],
+        88,
+        [3, 4],
         {
-            "choir": {"kind": "strings", "volume": 1.0},
-            "strings": {"kind": "strings", "volume": 0.5},
-            "bass": {"kind": "strings", "volume": 0.6},
-            "flute": {"kind": "flute", "volume": 0.6},
-            "harp": {"kind": "harp", "volume": 0.5},
-            "celesta": {"kind": "celesta", "volume": 0.5},
-            "drum": {"kind": "drum", "volume": 0.5},
+            "flute": {"kind": "flute", "volume": 0.7},
+            "second": {"kind": "flute", "volume": 0.5},
+            "celesta": {"kind": "celesta", "volume": 0.6},
+            "harp": {"kind": "harp", "volume": 0.55},
+            "strings": {"kind": "strings", "volume": 0.45},
+            "bass": {"kind": "strings", "volume": 0.5},
         },
         [
             section(
                 "a",
                 16,
                 bar,
-                choir=line(a_top, bar, 0.88),
-                strings=pad(a, 50, 65, 0.38),
-                bass=bass(a, [0], 36, 0.4, 4),
-                drum=drum([4, 8, 12, 16], bar, [0], 36, 0.3),
+                flute=line(a_flute, bar, 0.58),
+                second=line(a_second, bar, 0.5),
+                harp=arpeggio(a, open_notes, 1, 50, 0.3, 0.06),
+                strings=pad(a, 48, 64, 0.36),
+                bass=bass(a, [0], 38, 0.36, 3),
             ),
             section(
                 "b",
                 16,
                 bar,
-                choir=line(b_top, bar, 0.97),
-                strings=pad(b, 52, 67, 0.42),
-                bass=bass(b, [0], 36, 0.44, 4),
-                harp=arpeggio(b, rising, 1, 48, 0.3, 0.06),
-                drum=drum([4, 8, 12, 16], bar, [0], 36, 0.32),
+                celesta=line(b_celesta, bar, 0.5),
+                flute=line(b_flute, bar, 0.46),
+                second=descant(b, 60, 72, 0.3),
+                harp=arpeggio(b, flowing, 0.5, 50, 0.28, 0.08),
+                strings=pad(b, 48, 64, 0.4, 4),
+                bass=bass(b, [0], 38, 0.38, 3),
             ),
             section(
                 "c",
                 16,
                 bar,
-                flute=line(c_top, bar, 0.55),
-                choir=line(c_top.replace("6/", "5/").replace("g#5/", "g#4/"), bar, 0.8),
-                strings=pad(c, 50, 65, 0.42),
-                bass=bass(c, [0], 36, 0.48, 4),
-                harp=arpeggio(c, rising, 1, 52, 0.32, 0.06),
-                celesta=bells(c, 84, 96, 0.3, every=2),
-                drum=drum([4, 8, 12, 16], bar, [0], 36, 0.34),
+                flute=line(a_flute, bar, 0.6),
+                second=line(a_second, bar, 0.5),
+                celesta=line(c_celesta, bar, 0.42) + bells(a, 84, 96, 0.28, every=2),
+                harp=arpeggio(a, flowing, 0.5, 50, 0.28, 0.08),
+                strings=pad(a, 48, 64, 0.4),
+                bass=bass(a, [0], 38, 0.4, 3),
             ),
         ],
         ["a", "b", "c"],

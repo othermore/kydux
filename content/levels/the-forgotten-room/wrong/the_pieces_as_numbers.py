@@ -1,0 +1,7 @@
+pimu.go_to(10, 8)
+pimu.go_to(13, 8)
+pimu.go_to(13, 3)
+pimu.go_to(9, 2)
+pimu.go_to(11, 3)
+pimu.go_to(12, 3)
+wizard.cast("minka", pimu)

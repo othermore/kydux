@@ -1,0 +1,15 @@
+{
+  "title": "The name and the colour",
+  "goals": [
+    "A trial with its name and a colour of its kind."
+  ],
+  "starting_code": "class {familiar_class}(Familiar):\n    pass\n\n# Make one {familiar_kind} and keep it with a name.\n\n# Give it its name, with `.name`.\n\n# Give it its colour, with `.color`.\n\n# Call it with `minka`.\n\n",
+  "hints": [
+    "First, the object: your class's name with brackets, kept with a name.",
+    "An attribute is written as it is read: the object's name, a dot, `name` or `color`, and then `=` and its value in quotes.",
+    "The name is a single word, and the colours of {familiar_a_kind} are in the lesson *What it knows*. With both given, `wizard.cast` and `\"minka\"`."
+  ],
+  "intro": "You've made a grey hare! That is something exceptional for a first-year. Well done. And you, {wizard}: give your familiar its name and its colour before you call it.",
+  "outro": "This trial is whole: it has its colour, and its name above it. Now look at the book: in it, every familiar is written down in a single line.",
+  "learned": "Now you know that an object keeps attributes of its own, written with the dot just as they are read, and that `{familiar_var}` is your program's name for it, while `{familiar_var}.name` is what the object knows of itself."
+}

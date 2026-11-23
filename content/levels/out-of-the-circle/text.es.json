@@ -1,0 +1,24 @@
+{
+  "title": "Fuera del círculo",
+  "goals": [
+    "Una prueba con su nombre y su color.",
+    "El libro puede anotarla en una línea.",
+    "Tu familiar ha salido del círculo.",
+    "Está en el plato de la luna."
+  ],
+  "starting_code": "class {familiar_class}(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n{familiar_var} = {familiar_class}(\"{familiar}\", \"{familiar_color}\")\nwizard.cast(\"minka\", {familiar_var})\n\n# Dos pasos hacia abajo con `move_down`, y estará fuera del círculo.\n\n# Cuatro pasos a la izquierda con `move_left`.\n\n# Cinco pasos hacia arriba con `move_up`, hasta el plato de la luna.\n\n",
+  "hints": [
+    "Tu familiar hereda de `Familiar` los mismos movimientos que tiene tu `wizard`.",
+    "Un movimiento se usa con el punto, con el nombre que tu programa le da a tu familiar delante.",
+    "Tres movimientos: dos pasos hacia abajo, cuatro a la izquierda y cinco hacia arriba."
+  ],
+  "intro": "Mientras esté en el círculo, puedes deshacerlo y describir otro. Si lo sacas, vivirá. Piénsalo, y luego llévalo al plato de la luna.",
+  "outro": "{familiar} vive. Respira, tiene sombra, y te mira.",
+  "learned": "Ahora sabes que tu familiar anda con movimientos que nunca escribiste, heredados de `Familiar`, con los mismos nombres que los de tu `wizard`, y que un objeto se usa con el punto, sea de una clase del juego o de la tuya.",
+  "told": {
+    "go": "Si ya estás {seguro|segura}, adelante. Deja que escriba la descripción en el libro de Arvelia, y luego puedes crear tu familiar.",
+    "not_yet": "Así todavía no. Dentro del círculo puedes cambiarlo.",
+    "halt": "¡Alto! Ya tienes un familiar, y eso es más que suficiente. No puedes crear otro.",
+    "copy": "¡Espera, que lo copio otra vez!"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "title": "El nombre y el color",
+  "goals": [
+    "Una prueba con su nombre y un color de su tipo."
+  ],
+  "starting_code": "class {familiar_class}(Familiar):\n    pass\n\n# Haz {familiar_a_kind} y guárdal{familiar:o|a} con un nombre.\n\n# Dale su nombre, con `.name`.\n\n# Dale su color, con `.color`.\n\n# Llámal{familiar:o|a} con `minka`.\n\n",
+  "hints": [
+    "Primero, el objeto: el nombre de tu clase con paréntesis, guardado con un nombre.",
+    "Un atributo se escribe como se lee: el nombre del objeto, un punto, `name` o `color`, y después `=` y su valor entre comillas.",
+    "El nombre es una sola palabra, y los colores de {familiar_a_kind} están en la lección *Lo que sabe*. Con los dos dados, `wizard.cast` y `\"minka\"`."
+  ],
+  "intro": "¡Has logrado una liebre gris! Eso es algo excepcional para {{un alumno|una alumna}} de primero. Enhorabuena. Y tú, {wizard}: dale a tu familiar su nombre y su color antes de llamarlo.",
+  "outro": "Esta prueba está entera: tiene su color, y su nombre encima. Ahora mira el libro: en él, cada familiar se anota en una sola línea.",
+  "learned": "Ahora sabes que un objeto guarda atributos propios, que se escriben con el punto igual que se leen, y que `{familiar_var}` es el nombre que le da tu programa, y `{familiar_var}.name`, lo que el objeto sabe de sí mismo."
+}

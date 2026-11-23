@@ -1,0 +1,107 @@
+{
+  "id": "the-voice-in-the-tunnel",
+  "scene": "the-tower-passage",
+  "speaker": "friend",
+  "wizard": [
+    9,
+    13
+  ],
+  "camera": [
+    10,
+    8
+  ],
+  "actors": [
+    {
+      "id": "friend",
+      "kind": "friend",
+      "at": [
+        8,
+        13
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        11,
+        14
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "familiar",
+      "kind": "familiar",
+      "at": [
+        13,
+        3
+      ],
+      "facing": "left"
+    },
+    {
+      "id": "rinlo",
+      "kind": "friend",
+      "at": [
+        8,
+        3
+      ],
+      "facing": "right",
+      "sitting": true
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "camera": {
+        "wide": true
+      },
+      "do": null
+    },
+    {
+      "who": "cold_voice",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": {
+        "walk": [
+          [
+            13,
+            8
+          ],
+          [
+            10,
+            8
+          ],
+          [
+            10,
+            13
+          ]
+        ]
+      },
+      "by": "familiar"
+    },
+    {
+      "who": "cold_voice",
+      "do": null
+    },
+    {
+      "who": "rinlo",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": {
+        "face": "right"
+      }
+    },
+    {
+      "who": "rinlo",
+      "do": null
+    },
+    {
+      "who": "mate",
+      "do": null
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "title": "El fin de curso",
+  "steps": [
+    "La voz tiene nombre: Korvel. Hace mucho escribió encantamientos sobre el propio castillo. Al principio lo hacía para mejorarlo: para que fuese más seguro, más cómodo, más mágico. Pero poco a poco fue metiendo cambios para que el castillo le obedeciese solo a él. Otros magos y yo vimos lo que estaba haciendo, y lo expulsamos.",
+    "Tus padres estudiaron aquí. Eran magos, y de los mejores. Se pusieron a reescribir los hechizos del castillo: mantenían lo bueno, para que siguiera enseñando a los alumnos nuevos cada año y protegiendo a los magos, y sacaban lo que Korvel había metido para tener control sobre él.",
+    "Korvel volvió para matarlos. Pero tu madre ya te esperaba, y tú, que aún no habías nacido, los protegiste a los dos. Korvel solo pudo matar la magia que había en ellos. Por eso no son magos ahora, y por eso no recuerdan nada.",
+    "Los hechizos que habían escrito todavía no estaban terminados ni atados del todo. Al morir la magia de tus padres se deshicieron, y con ellos se vino abajo la magia del castillo. Y con ella murió también Korvel: ansioso de poder, y buscando la vida eterna, había puesto toda su magia, su propia alma, en esos hechizos. Tardamos años enteros en recomponer la magia de Arvelia. Y siempre creímos que Korvel había muerto.",
+    "Hoy ya no estoy segura. Quizá su alma quedó presa en los muros, en restos de hechizos antiguos que no llegaron a desaparecer, esperando para vengarse y volver a adueñarse del castillo. No lo sé. Pero puede ser.",
+    "Nadie dice nada. Al fin, {mate}: «Entonces tú ya le ganaste una vez.» Y Orla: «Y sin saber todavía una sola palabra.»",
+    "Ahora el colegio lo sabe, y nadie volverá a escuchar esa voz a solas. Rinlo ayudará a los maestros: sabe dónde habla.",
+    "La cena de fin de curso. Zarek se sienta al lado de Rinlo, refunfuñando: «Si te da miedo, te enseño yo. Despacio.» Orla te nombra {alumno|alumna} de Arvelia de pleno derecho. Segundo curso espera.",
+    "«Empezaste dando un paso. Acabas describiendo criaturas.» Por el camino aprendiste a dar órdenes con sus argumentos, a lanzar hechizos y a llevar cosas, a guardar valores con un nombre y a leer lo que las cosas saben de sí mismas, a contar casillas, a esperar y a elegir con `if` y `else`, a repetir con `for` y `while`, a usar listas, a volar, a escribir tus propias funciones con `def`, y por fin clases, objetos, `__init__`, herencia y métodos. {familiar} duerme en tu capucha. Fin del primer curso."
+  ]
+}

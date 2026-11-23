@@ -1,0 +1,199 @@
+{
+  "id": "what-the-familiar-brought",
+  "scene": "the-tower-passage",
+  "speaker": "mate",
+  "wizard": [
+    9,
+    13
+  ],
+  "camera": [
+    8,
+    11
+  ],
+  "actors": [
+    {
+      "id": "friend",
+      "kind": "friend",
+      "at": [
+        8,
+        13
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        11,
+        14
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "familiar",
+      "kind": "familiar",
+      "at": [
+        10,
+        13
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "rinlo",
+      "kind": "friend",
+      "at": [
+        8,
+        3
+      ],
+      "facing": "right",
+      "sitting": true
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "camera": {
+        "wide": true
+      },
+      "do": [
+        {
+          "by": "rinlo",
+          "vanish": true
+        },
+        {
+          "by": "rinlo",
+          "appear": [
+            2,
+            12
+          ]
+        },
+        {
+          "by": "rinlo",
+          "walk": [
+            [
+              2,
+              13
+            ],
+            [
+              5,
+              13
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "face": "left"
+        },
+        {
+          "by": "friend",
+          "face": "left"
+        },
+        {
+          "by": "mate",
+          "face": "left"
+        }
+      ]
+    },
+    {
+      "who": "rinlo",
+      "do": null
+    },
+    {
+      "who": "mate",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "scene": {
+        "scene": "the-tower-hall",
+        "wizard": [
+          10,
+          5
+        ],
+        "camera": [
+          10,
+          6
+        ],
+        "actors": [
+          {
+            "id": "rinlo",
+            "kind": "friend",
+            "at": [
+              9,
+              5
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "friend",
+            "kind": "friend",
+            "at": [
+              8,
+              5
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "mate",
+            "kind": "friend",
+            "at": [
+              12,
+              5
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "familiar",
+            "kind": "familiar",
+            "at": [
+              10,
+              6
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "orla",
+            "kind": "teacher",
+            "at": [
+              11,
+              4
+            ],
+            "facing": "down"
+          }
+        ]
+      },
+      "camera": {
+        "fit": [
+          [
+            4,
+            2
+          ],
+          [
+            15,
+            11
+          ]
+        ]
+      },
+      "do": {
+        "face": "up"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    }
+  ]
+}

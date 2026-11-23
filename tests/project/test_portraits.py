@@ -38,7 +38,8 @@ def speakers() -> set[str]:
         story = json.loads(path.read_text())
         found.add(story.get("speaker"))
         found |= {step.get("who") for step in story["steps"]}
-    found -= {None, "voice", "wizard"}
+    # The voice is no one, and the cold voice is heard and never seen (D264).
+    found -= {None, "voice", "wizard", "cold_voice"}
     # The friend and the mate are Nuri or Teku, as the wizard's gender makes them.
     if found & {"friend", "mate"}:
         found = (found - {"friend", "mate"}) | {"nuri", "teku"}

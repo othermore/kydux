@@ -10,9 +10,9 @@ import { contentUrl } from '../content/address';
 
 /** The portrait of whoever speaks: a character by its id, the friend and the
  * dormitory mate as the wizard's gender makes them, the wizard by its look; none for
- * the voice, which is no one seen. */
+ * the voice, which is no one seen, nor for the cold voice, heard and never seen (D264). */
 export function portraitOf(who: string, look?: string | null): string | null {
-  if (who === 'voice') return null;
+  if (who === 'voice' || who === 'cold_voice') return null;
   if (who === 'wizard') return look ? `wizard-${look}` : null;
   if (who === 'friend') return friendId();
   if (who === 'mate') return mateId();

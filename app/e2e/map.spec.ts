@@ -12,7 +12,7 @@ const SHOTS = fileURLToPath(new URL('./shots/', import.meta.url));
 
 test('the map shows the course in order: the first stop open, the rest locked', async ({ page }) => {
   await page.goto('/#map');
-  await expect(page.locator('.map-chapter h2')).toHaveText(['Arrival', 'The library', 'The passages', 'The broom']);
+  await expect(page.locator('.map-chapter h2')).toHaveText(['Arrival', 'The library', 'The passages', 'The broom', 'The familiar']);
   const first = page.locator('.stop').first();
   // The opening is chapter 1's first story, numbered like the rest (D78).
   await expect(first).toHaveAttribute('data-item', 'story:the-letter');

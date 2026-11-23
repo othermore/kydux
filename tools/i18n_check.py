@@ -225,6 +225,10 @@ def check_chapters(languages: list[str]) -> list[str]:
 BRACED_BAR = re.compile(r"\{[^{}\n]*\|[^{}\n]*\}")
 #: The words for the wizard that Spanish genders; they belong inside a choice.
 GENDERED = {"es": re.compile(r"\bmag[oa]\b", re.IGNORECASE)}
+#: The owner's words where `mago` is someone else, never the wizard: a wizard who was
+#: killed, whose soul's leavings are the black threads (chapter 5, *Lo que trajo el
+#: familiar*).
+NOT_THE_WIZARD = {"es": ("del alma de un mago al que mataron",)}
 #: The words that choose the wizard's gender, which name it on purpose.
 CHOOSE_GENDER = {"wizard.girl", "wizard.boy"}
 
@@ -269,7 +273,10 @@ def check_choices(languages: dict[str, dict[str, str]]) -> list[str]:
                 findings.append(f"{where}: {braced!r} is a choice with other than two sides")
         gendered = GENDERED.get(lang)
         if gendered:
-            for word in gendered.findall(BRACED_BAR.sub("", text)):
+            plain = BRACED_BAR.sub("", text)
+            for words in NOT_THE_WIZARD.get(lang, ()):
+                plain = plain.replace(words, "")
+            for word in gendered.findall(plain):
                 findings.append(f"{where}: {word!r} outside a choice; write {{el mago|la maga}}")
     return findings
 

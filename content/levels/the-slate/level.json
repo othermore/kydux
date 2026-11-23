@@ -1,0 +1,119 @@
+{
+  "id": "the-slate",
+  "kind": "fix",
+  "scene": "the-tower-hall",
+  "speaker": "mate",
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "minka"
+  ],
+  "camera": {
+    "fit": [
+      [
+        4,
+        2
+      ],
+      [
+        15,
+        11
+      ]
+    ]
+  },
+  "tick_limit": 100,
+  "start": [
+    10,
+    10
+  ],
+  "fault": "missing_self",
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "orla",
+      "at": [
+        11,
+        4
+      ],
+      "facing": "down",
+      "sight": 0
+    },
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        6,
+        7
+      ],
+      "facing": "right"
+    },
+    {
+      "kind": "familiar",
+      "id": "friend_familiar",
+      "creature": "Hare",
+      "color": "grey",
+      "at": [
+        7,
+        7
+      ],
+      "facing": "right"
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        13,
+        7
+      ],
+      "facing": "left"
+    }
+  ],
+  "familiar": {
+    "stage": "trial",
+    "circle": [
+      8,
+      6,
+      11,
+      8
+    ],
+    "trials": [
+      [
+        10,
+        7
+      ],
+      [
+        11,
+        7
+      ]
+    ],
+    "methods": [
+      "__init__"
+    ],
+    "draft": {
+      "kind": "Fox",
+      "name": "Pimu",
+      "color": "red"
+    }
+  },
+  "told": {
+    "won": [
+      [
+        "mate",
+        "won"
+      ]
+    ]
+  },
+  "api": [
+    "wizard.cast",
+    "familiar.name",
+    "familiar.color"
+  ],
+  "goals": [
+    {
+      "kind": "trial",
+      "count": 2,
+      "named": true,
+      "coloured": true
+    }
+  ]
+}

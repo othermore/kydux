@@ -1,0 +1,18 @@
+{
+  "title": "{mate}'s slate",
+  "goals": [
+    "{familiar} and {mate_familiar} in the circle, each with its name and its colour."
+  ],
+  "starting_code": "class {familiar_class}(Familiar):\n    def __init__(name, color):\n        name = name\n        color = color\n\n{familiar_var} = {familiar_class}(\"{familiar}\", \"{familiar_color}\")\n{mate_var} = {familiar_class}(\"{mate_familiar}\", \"{mate_color}\")\nwizard.cast(\"minka\", {familiar_var})\nwizard.cast(\"minka\", {mate_var})\n",
+  "hints": [
+    "The first thing `__init__` takes is always the object being born.",
+    "With `self` in its place, the trials come with no name: `name = name` keeps the name only inside the action, not in the object.",
+    "Two fixes: `self` first between the brackets of `__init__`, and `self.` before the two names that are kept."
+  ],
+  "intro": "I give up: I want one like yours, in another colour. I copied yours onto my slate in a hurry and added my own line. Mine will be called *(softly)* {mate_familiar}. You cast it, it works for you.",
+  "outro": "One class, and two familiars, each with its name and its colour. Thank you, {wizard}!",
+  "learned": "Now you know the two slips everyone makes with a class: one Python tells you about, a missing `self`, and one nobody tells you about, a name kept only inside the action; and that one class makes as many objects as needed, each with its own data.",
+  "told": {
+    "won": "That one. Yes, that one."
+  }
+}

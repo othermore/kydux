@@ -1,0 +1,9 @@
+class Fox(Familiar):
+    def __init__(name, color):
+        name = name
+        color = color
+
+pimu = Fox("Pimu", "red")
+kesi = Fox("Kesi", "white")
+wizard.cast("minka", pimu)
+wizard.cast("minka", kesi)

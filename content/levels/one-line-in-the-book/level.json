@@ -1,0 +1,126 @@
+{
+  "id": "one-line-in-the-book",
+  "kind": "practice",
+  "scene": "the-tower-hall",
+  "speaker": "orla",
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "minka"
+  ],
+  "camera": {
+    "fit": [
+      [
+        4,
+        2
+      ],
+      [
+        15,
+        11
+      ]
+    ]
+  },
+  "tick_limit": 100,
+  "start": [
+    10,
+    10
+  ],
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "orla",
+      "at": [
+        11,
+        4
+      ],
+      "facing": "down",
+      "sight": 0
+    },
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        6,
+        7
+      ],
+      "facing": "right"
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        13,
+        7
+      ],
+      "facing": "left"
+    },
+    {
+      "kind": "familiar",
+      "id": "friend_familiar",
+      "creature": "Hare",
+      "color": "grey",
+      "trial": true,
+      "at": [
+        8,
+        7
+      ]
+    },
+    {
+      "kind": "familiar",
+      "id": "mate_familiar",
+      "spark": true,
+      "at": [
+        11,
+        7
+      ]
+    }
+  ],
+  "familiar": {
+    "stage": "trial",
+    "circle": [
+      8,
+      6,
+      11,
+      8
+    ],
+    "trials": [
+      [
+        10,
+        7
+      ]
+    ],
+    "methods": [
+      "__init__"
+    ],
+    "book": true,
+    "then": {
+      "born": "friend_familiar",
+      "to": [
+        7,
+        7
+      ]
+    },
+    "draft": {
+      "kind": "Fox",
+      "name": "Pimu",
+      "color": "red"
+    }
+  },
+  "api": [
+    "wizard.cast",
+    "familiar.name",
+    "familiar.color"
+  ],
+  "goals": [
+    {
+      "kind": "trial",
+      "count": 1,
+      "named": true,
+      "coloured": true
+    },
+    {
+      "kind": "noted"
+    }
+  ]
+}

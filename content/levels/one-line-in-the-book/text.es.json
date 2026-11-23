@@ -1,0 +1,16 @@
+{
+  "title": "Una línea en el libro",
+  "goals": [
+    "Una prueba con su nombre y su color.",
+    "El libro puede anotarla en una línea."
+  ],
+  "starting_code": "class {familiar_class}(Familiar):\n    # En lugar de `pass`, escribe `__init__` con `self`, `name` y `color`.\n    # Su primera línea guarda el nombre en `self`.\n    # Su segunda línea guarda el color en `self`.\n    pass\n\n# Haz a {familiar}, con su nombre y su color, en una sola línea.\n\n# Llámal{familiar:o|a} con `minka`.\n\n",
+  "hints": [
+    "Python ejecuta `__init__` él solo cada vez que nace un objeto, y le da ese objeto en `self`.",
+    "`__init__` se escribe con `def`, dentro de la clase, y recibe tres cosas: `self`, el nombre y el color. Dentro, cada dato se guarda en `self` con el punto.",
+    "Fuera de la clase, el nombre y el color van entre los paréntesis de la clase, en ese orden y entre comillas."
+  ],
+  "intro": "El libro de Arvelia anota cada familiar en una sola línea, y una descripción que no lo hace nacer en una línea no entra en él. Enseña a tu clase a hacer que el tuyo nazca completo.",
+  "outro": "Mira: Tolu, la liebre de {friend}, sale del círculo. Es el primer familiar de la clase que vive.",
+  "learned": "Ahora sabes que `__init__` es la acción que la clase ejecuta ella sola cuando nace un objeto, que `self` es el objeto que nace, y que cualquiera puede usar tu clase sin leer tu programa si sabe qué recibe `__init__`."
+}

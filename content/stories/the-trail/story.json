@@ -1,0 +1,258 @@
+{
+  "id": "the-trail",
+  "scene": "the-tower-hall",
+  "speaker": "friend",
+  "wizard": [
+    10,
+    10
+  ],
+  "camera": [
+    10,
+    7
+  ],
+  "actors": [
+    {
+      "id": "familiar",
+      "kind": "familiar",
+      "at": [
+        11,
+        10
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "friend",
+      "kind": "friend",
+      "at": [
+        7,
+        10
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "friend_familiar",
+      "kind": "familiar",
+      "creature": "Hare",
+      "color": "grey",
+      "at": [
+        6,
+        10
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        8,
+        10
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "mate_familiar",
+      "kind": "familiar",
+      "of": "mate",
+      "at": [
+        9,
+        10
+      ],
+      "facing": "up"
+    },
+    {
+      "id": "orla",
+      "kind": "teacher",
+      "at": [
+        11,
+        4
+      ],
+      "facing": "down"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "camera": {
+        "fit": [
+          [
+            4,
+            2
+          ],
+          [
+            15,
+            11
+          ]
+        ]
+      },
+      "do": [
+        {
+          "by": "mate_familiar",
+          "walk": [
+            9,
+            8
+          ]
+        },
+        {
+          "by": "orla",
+          "walk": [
+            [
+              11,
+              9
+            ],
+            [
+              9,
+              9
+            ],
+            [
+              9,
+              11
+            ]
+          ],
+          "vanish": true
+        }
+      ]
+    },
+    {
+      "who": "voice",
+      "do": [
+        {
+          "by": "mate_familiar",
+          "walk": [
+            9,
+            10
+          ]
+        },
+        {
+          "by": "familiar",
+          "walk": [
+            [
+              11,
+              9
+            ],
+            [
+              7,
+              9
+            ]
+          ]
+        },
+        {
+          "by": "familiar",
+          "face": "down"
+        }
+      ]
+    },
+    {
+      "who": "voice",
+      "do": [
+        {
+          "by": "familiar",
+          "walk": [
+            [
+              13,
+              9
+            ],
+            [
+              13,
+              5
+            ],
+            [
+              14,
+              5
+            ],
+            [
+              14,
+              4
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "familiar",
+          "appear": [
+            14,
+            4
+          ]
+        },
+        {
+          "by": "familiar",
+          "walk": [
+            [
+              14,
+              9
+            ],
+            [
+              11,
+              9
+            ],
+            [
+              11,
+              10
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "mate",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "scene": {
+        "scene": "the-tower-passage",
+        "wizard": [
+          9,
+          13
+        ],
+        "camera": [
+          10,
+          9
+        ],
+        "actors": [
+          {
+            "id": "friend",
+            "kind": "friend",
+            "at": [
+              8,
+              13
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "mate",
+            "kind": "friend",
+            "at": [
+              11,
+              14
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "familiar",
+            "kind": "familiar",
+            "at": [
+              10,
+              13
+            ],
+            "facing": "up"
+          }
+        ]
+      },
+      "camera": {
+        "wide": true
+      },
+      "do": {
+        "face": "up"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "mate",
+      "do": null
+    }
+  ]
+}

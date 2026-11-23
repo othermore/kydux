@@ -1,0 +1,24 @@
+{
+  "title": "Out of the circle",
+  "goals": [
+    "A trial with its name and its colour.",
+    "The book can write it down in one line.",
+    "Your familiar has left the circle.",
+    "It is on the moon's plate."
+  ],
+  "starting_code": "class {familiar_class}(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n{familiar_var} = {familiar_class}(\"{familiar}\", \"{familiar_color}\")\nwizard.cast(\"minka\", {familiar_var})\n\n# Two steps down with `move_down`, and it is out of the circle.\n\n# Four steps to the left with `move_left`.\n\n# Five steps up with `move_up`, to the moon's plate.\n\n",
+  "hints": [
+    "Your familiar inherits from `Familiar` the same moves your `wizard` has.",
+    "A move is used with the dot, with your program's name for your familiar before it.",
+    "Three moves: two steps down, four to the left and five up."
+  ],
+  "intro": "While it is in the circle, you can undo it and describe another. If you take it out, it will live. Think it over, and then take it to the moon's plate.",
+  "outro": "{familiar} lives. It breathes, it casts a shadow, and it is looking at you.",
+  "learned": "Now you know that your familiar walks with moves you never wrote, inherited from `Familiar`, with the same names as your `wizard`'s, and that an object is used with the dot, whether its class is the game's or yours.",
+  "told": {
+    "go": "If you are sure, go ahead. Let me write the description in the book of Arvelia, and then you can make your familiar.",
+    "not_yet": "Not like that yet. Inside the circle you can still change it.",
+    "halt": "Stop! You have a familiar already, and that is more than enough. You cannot make another.",
+    "copy": "Wait, I'll copy it again!"
+  }
+}

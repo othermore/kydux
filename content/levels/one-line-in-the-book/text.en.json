@@ -1,0 +1,16 @@
+{
+  "title": "One line in the book",
+  "goals": [
+    "A trial with its name and its colour.",
+    "The book can write it down in one line."
+  ],
+  "starting_code": "class {familiar_class}(Familiar):\n    # In place of `pass`, write `__init__` with `self`, `name` and `color`.\n    # Its first line keeps the name in `self`.\n    # Its second line keeps the colour in `self`.\n    pass\n\n# Make {familiar}, with its name and its colour, in one line.\n\n# Call it with `minka`.\n\n",
+  "hints": [
+    "Python runs `__init__` by itself every time an object is born, and gives it that object in `self`.",
+    "`__init__` is written with `def`, inside the class, and takes three things: `self`, the name and the colour. Inside, each piece of data is kept in `self` with the dot.",
+    "Outside the class, the name and the colour go between the class's brackets, in that order and in quotes."
+  ],
+  "intro": "The book of Arvelia writes each familiar down in a single line, and a description that cannot make it born in one line does not go in. Teach your class to make yours born whole.",
+  "outro": "Look: Tolu, {friend}'s hare, is stepping out of the circle. It is the first familiar of the class to live.",
+  "learned": "Now you know that `__init__` is the action a class runs by itself when an object is born, that `self` is the object being born, and that anyone can use your class without reading your program if they know what `__init__` takes."
+}

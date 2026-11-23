@@ -261,7 +261,8 @@ def compared(code: str) -> set[str]:
 
 def taught_code(item: str) -> list[tuple[str, str]]:
     """The code an item of the course shows the child or solves with: a level's solution,
-    its other solutions and its starting code in each language; a lesson's blocks."""
+    its other solutions and its starting code in each language, filled in as the page
+    fills it (D266); a lesson's blocks."""
     kind, _, item_id = item.partition(":")
     if kind == "lesson":
         path = CONTENT / "lessons" / item_id
@@ -280,7 +281,8 @@ def taught_code(item: str) -> list[tuple[str, str]]:
     ]
     for lang in LANGUAGES:
         text = json.loads((path / f"text.{lang}.json").read_text(encoding="utf-8"))
-        found.append((f"{item} starting code {lang}", text.get("starting_code") or ""))
+        code = for_wizard(text.get("starting_code") or "", "girl", lang=lang)
+        found.append((f"{item} starting code {lang}", code))
     return found
 
 
@@ -296,14 +298,11 @@ def test_the_course_compares_by_size_only_with_less_and_greater_and_after_their_
             assert index >= lesson or not found, f"{where} compares before its lesson"
 
 
-def level_api(item_id: str) -> list[str]:
-    return list(Level.from_directory(CONTENT / "levels" / item_id).api)
-
-
 @pytest.mark.parametrize("path", CHAPTERS, ids=lambda p: p.name)
 def test_a_level_teaches_only_what_a_lesson_before_it_explained(path):
     """In a chapter that has lessons (D41), every name a level teaches was explained
-    by a lesson before it in the course, or taught by a level before it. A chapter
+    by a lesson before it in the course, or taught by a level before it, a method of
+    the familiar's by the level whose class may have it. A chapter
     with no lesson yet holds levels to be given their lessons in its own sprint."""
     if not any(item.startswith("lesson:") for item in chapter(path)["items"]):
         return
@@ -316,11 +315,16 @@ def test_a_level_teaches_only_what_a_lesson_before_it_explained(path):
             continue
         if kind != "level":
             continue
-        api = level_api(item_id)
+        level = Level.from_directory(CONTENT / "levels" / item_id)
+        api = list(level.api)
         if item in chapter(path)["items"]:
             unexplained = [name for name in api if name not in explained]
             assert not unexplained, f"{item_id} teaches {unexplained}, which no lesson explained"
         explained.update(api)
+        # A method the level lets the child write in a familiar's class is the child's
+        # own from then on, taught by the level that asks for it (D267, D269).
+        if level.familiar is not None:
+            explained.update(f"familiar.{m}" for m in level.familiar.methods if m != "__init__")
 
 
 @pytest.mark.parametrize("path", STORIES, ids=lambda p: p.name)
@@ -537,8 +541,7 @@ def test_the_page_of_python_has_a_line_and_an_example_for_each_concept_it_shows(
             example = entry["example"]
             ast.parse(example)
             marked = WITH.get(concept, concept)
-            if marked not in known_at:
-                continue  # no lesson marks it yet: held to its lesson once it is written
+            assert marked in known_at, f"{concept}: no lesson teaches it"
             unknown = concepts_used(example) - known_at[marked]
             assert not unknown, f"{lang}: {concept}'s example uses {sorted(unknown)}"
     for concept in pages["en"]:

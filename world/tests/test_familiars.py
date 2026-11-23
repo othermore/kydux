@@ -21,7 +21,7 @@ from kydux_world.world import World
 ROOT = Path(__file__).resolve().parents[2]
 CASES = json.loads((Path(__file__).parent / "familiar_cases.json").read_text(encoding="utf-8"))
 
-#: The tower's hall as the levels play it (sprint-53.md, 3.2): the floor columns 5 to 14,
+#: A hall like the tower's, for the checks of a level's block: the floor columns 5 to 14,
 #: rows 4 to 10, the lectern on (9,3)-(10,4), the entrance arch below.
 HALL = (
     ["#" * 20] * 4
@@ -30,24 +30,6 @@ HALL = (
     + ["#########..#########"]
     + ["#" * 20] * 3
 )
-#: The corridor below it, the passage only a familiar enters, and the forgotten room.
-PASSAGE = [
-    "#" * 20,
-    "#" * 20,
-    "#########...########",
-    "########......######",
-    "#############,######",
-    "#############,######",
-    "#############,######",
-    "#############,######",
-    "##########,,,,######",
-    "##########,#########",
-    "##########,#########",
-    "##########,#########",
-    "##########,#########",
-    "#..................#",
-    "#..................#",
-]
 
 
 def _with(rows: list[str], cell: tuple[int, int], char: str) -> list[str]:
@@ -69,9 +51,6 @@ CLASS = (
     "        self.name = name\n"
     "        self.color = color\n"
 )
-LEARNED = CLASS + CASES["levels"]["orlas-orders"]["solution"].split(CLASS, 1)[1].split("\n\n")[0]
-LIVING = {"kind": "Fox", "name": "Pimu", "color": "red", "source": CLASS}
-DRAFT = {"kind": "Fox", "name": "Pimu", "color": "red"}
 
 
 def hall(level_id: str, **level: object) -> dict:
@@ -86,299 +65,9 @@ def hall(level_id: str, **level: object) -> dict:
     }
 
 
-def passage(level_id: str, **level: object) -> dict:
-    return {
-        "id": level_id,
-        "map": _with(PASSAGE, (9, 13), "S"),
-        "voices": {"cold_voice": [8, 2]},
-        "zones": {"room": [[0, 1, 19, 3]]},
-        "actors": [
-            {"kind": "friend", "id": "friend", "at": [8, 13]},
-            {"kind": "friend", "id": "mate", "at": [11, 14]},
-            {"kind": "friend", "id": "rinlo", "at": [8, 3], "facing": "right", "sitting": True},
-        ],
-        **level,
-    }
-
-
-#: The levels as the plan places them, until content/levels/ has them.
-SCRATCH = {
-    "the-circle": hall(
-        "the-circle",
-        actors=[
-            ORLA,
-            {"kind": "friend", "id": "friend", "at": [6, 7]},
-            {"kind": "friend", "id": "mate", "at": [13, 7], "facing": "left"},
-            {
-                "kind": "familiar",
-                "id": "friend_familiar",
-                "creature": "Hare",
-                "trial": True,
-                "at": [8, 7],
-            },
-            {
-                "kind": "familiar",
-                "id": "mate_familiar",
-                "creature": "Frog",
-                "color": "green",
-                "trial": True,
-                "at": [11, 6],
-            },
-        ],
-        familiar={"stage": "trial", "circle": [8, 6, 11, 8], "trials": [[10, 7]], "methods": []},
-        told={"won": [["orla", "won"], ["bimo", "bimo"]]},
-        api=["wizard.cast"],
-        goals=[{"kind": "trial", "count": 1}],
-    ),
-    "the-name-and-the-colour": hall(
-        "the-name-and-the-colour",
-        actors=[
-            ORLA,
-            {"kind": "friend", "id": "friend", "at": [6, 7]},
-            {"kind": "friend", "id": "mate", "at": [13, 7], "facing": "left"},
-            {
-                "kind": "familiar",
-                "id": "friend_familiar",
-                "creature": "Hare",
-                "color": "grey",
-                "trial": True,
-                "at": [8, 7],
-            },
-            {
-                "kind": "familiar",
-                "id": "mate_familiar",
-                "creature": ["Bat", "Mouse"],
-                "color": ["black", "brown"],
-                "trial": True,
-                "at": [11, 8],
-            },
-        ],
-        familiar={
-            "stage": "trial",
-            "circle": [8, 6, 11, 8],
-            "trials": [[10, 7]],
-            "methods": [],
-            "draft": {"kind": "Fox"},
-        },
-        api=["wizard.cast", "familiar.name", "familiar.color"],
-        goals=[{"kind": "trial", "count": 1, "named": True, "coloured": True}],
-    ),
-    "one-line-in-the-book": hall(
-        "one-line-in-the-book",
-        actors=[
-            ORLA,
-            {"kind": "friend", "id": "friend", "at": [6, 7]},
-            {"kind": "friend", "id": "mate", "at": [13, 7], "facing": "left"},
-            {
-                "kind": "familiar",
-                "id": "friend_familiar",
-                "creature": "Hare",
-                "color": "grey",
-                "trial": True,
-                "at": [8, 7],
-            },
-            {"kind": "familiar", "id": "mate_familiar", "spark": True, "at": [11, 7]},
-        ],
-        familiar={
-            "stage": "trial",
-            "circle": [8, 6, 11, 8],
-            "trials": [[10, 7]],
-            "methods": ["__init__"],
-            "book": True,
-            "then": {"born": "friend_familiar", "to": [7, 7]},
-            "draft": DRAFT,
-        },
-        api=["wizard.cast", "familiar.name", "familiar.color"],
-        goals=[{"kind": "trial", "count": 1, "named": True, "coloured": True}, {"kind": "noted"}],
-    ),
-    "the-slate": hall(
-        "the-slate",
-        kind="fix",
-        fault="missing_self",
-        actors=[
-            ORLA,
-            {"kind": "friend", "id": "friend", "at": [6, 7]},
-            {
-                "kind": "familiar",
-                "id": "friend_familiar",
-                "creature": "Hare",
-                "color": "grey",
-                "at": [7, 7],
-            },
-            {"kind": "friend", "id": "mate", "at": [13, 7], "facing": "left"},
-        ],
-        familiar={
-            "stage": "trial",
-            "circle": [8, 6, 11, 8],
-            "trials": [[10, 7], [11, 7]],
-            "methods": ["__init__"],
-            "draft": DRAFT,
-        },
-        told={"won": [["mate", "won"]]},
-        api=["wizard.cast", "familiar.name", "familiar.color"],
-        goals=[{"kind": "trial", "count": 2, "named": True, "coloured": True}],
-    ),
-    "out-of-the-circle": hall(
-        "out-of-the-circle",
-        actors=[
-            ORLA,
-            {"kind": "friend", "id": "friend", "at": [7, 10]},
-            {
-                "kind": "familiar",
-                "id": "friend_familiar",
-                "creature": "Hare",
-                "color": "grey",
-                "at": [6, 10],
-            },
-            {"kind": "friend", "id": "mate", "at": [13, 7], "facing": "left"},
-            {
-                "kind": "familiar",
-                "id": "mate_familiar",
-                "of": "mate",
-                "trial": True,
-                "at": [11, 7],
-            },
-        ],
-        familiar={
-            "stage": "birth",
-            "circle": [8, 6, 11, 8],
-            "trials": [[10, 7]],
-            "methods": ["__init__"],
-            "book": True,
-            "then": {"born": "mate_familiar", "to": [12, 7]},
-            "draft": DRAFT,
-        },
-        api=[
-            "wizard.cast",
-            "familiar.name",
-            "familiar.color",
-            "familiar.move_up",
-            "familiar.move_down",
-            "familiar.move_left",
-            "familiar.move_right",
-        ],
-        goals=[
-            {"kind": "trial", "count": 1, "named": True, "coloured": True},
-            {"kind": "noted"},
-            {"kind": "born"},
-            {"kind": "familiar_at", "on": "moon"},
-        ],
-    ),
-    "orlas-orders": hall(
-        "orlas-orders",
-        actors=[
-            ORLA,
-            {"kind": "friend", "id": "friend", "at": [7, 10]},
-            {
-                "kind": "familiar",
-                "id": "friend_familiar",
-                "creature": "Hare",
-                "color": "grey",
-                "at": [6, 10],
-            },
-            {"kind": "friend", "id": "mate", "at": [8, 10]},
-            {"kind": "familiar", "id": "mate_familiar", "of": "mate", "at": [9, 10]},
-        ],
-        familiar={
-            "stage": "living",
-            "from": "source",
-            "methods": ["__init__", "go_to"],
-            "living": {**LIVING, "at": [10, 9], "facing": "up"},
-            "orders": {
-                "on": "sun",
-                "steps": [
-                    {"to": [13, 10], "key": "order_star"},
-                    {"to": [11, 10], "key": "order_wizard"},
-                ],
-            },
-        },
-        spells=[],
-        carrying=[],
-        api=[
-            "familiar.name",
-            "familiar.color",
-            "familiar.position",
-            "familiar.move_up",
-            "familiar.move_down",
-            "familiar.move_left",
-            "familiar.move_right",
-        ],
-        goals=[
-            {"kind": "familiar_at", "on": "sun"},
-            {"kind": "orders"},
-            {"kind": "no_bumps", "of": "familiar", "bonus": True},
-        ],
-    ),
-    "the-small-passage": passage(
-        "the-small-passage",
-        familiar={
-            "stage": "living",
-            "from": "learned",
-            "methods": ["__init__", "go_to"],
-            "living": {**LIVING, "learned": LEARNED, "at": [10, 13], "facing": "up"},
-        },
-        things=[
-            {"kind": "trail", "id": "trail_1", "at": [10, 10]},
-            {"kind": "trail", "id": "trail_2", "at": [12, 8]},
-            {"kind": "trail", "id": "trail_3", "at": [13, 7]},
-        ],
-        api=["familiar.position", "familiar.go_to"],
-        goals=[
-            {"kind": "familiar_at", "at": [13, 3]},
-            {"kind": "no_bumps", "of": "familiar", "bonus": True},
-        ],
-    ),
-    "the-forgotten-room": passage(
-        "the-forgotten-room",
-        kind="challenge",
-        carrying=["wand"],
-        spells=["minka"],
-        familiar={
-            "stage": "living",
-            "from": "learned",
-            "methods": ["__init__", "go_to"],
-            "living": {**LIVING, "learned": LEARNED, "at": [10, 13], "facing": "up"},
-        },
-        things=[
-            {"kind": "thread", "id": "thread_1", "at": [9, 2], "zone": "room"},
-            {"kind": "thread", "id": "thread_2", "at": [11, 3], "zone": "room"},
-            {"kind": "thread", "id": "thread_3", "at": [12, 3], "zone": "room"},
-            {"kind": "thread", "id": "thread_4", "at": [10, 3], "zone": "room"},
-        ],
-        api=["wizard.cast", "wizard.find_all", "familiar.position", "thing.position"],
-        goals=[
-            {"kind": "collect", "of": "thread", "all": True},
-            {"kind": "no_bumps", "of": "familiar", "bonus": True},
-        ],
-        ways=[
-            {"id": "a", "things": [{"id": "thread_4", "gone": True}]},
-            {
-                "id": "b",
-                "things": [
-                    {"id": "thread_1", "at": [9, 3]},
-                    {"id": "thread_2", "at": [10, 3]},
-                    {"id": "thread_3", "at": [11, 2]},
-                    {"id": "thread_4", "gone": True},
-                ],
-            },
-            {
-                "id": "c",
-                "things": [
-                    {"id": "thread_1", "at": [9, 3]},
-                    {"id": "thread_4", "at": [9, 2]},
-                ],
-            },
-        ],
-    ),
-}
-
-
 def level_of(level_id: str) -> Level:
-    """The level as content/levels/ has it, or the scratch level until it does."""
-    directory = ROOT / "content" / "levels" / level_id
-    if (directory / "level.json").is_file():
-        return Level.from_directory(directory)
-    return Level.from_dict(SCRATCH[level_id])
+    """The level as content/levels/ has it."""
+    return Level.from_directory(ROOT / "content" / "levels" / level_id)
 
 
 # The rules the page shares (D261, D266).
@@ -414,10 +103,9 @@ def test_the_table_has_fourteen_creatures_the_grey_hare_the_friend_s():
 def test_every_name_a_chapter_5_level_gives_that_a_familiar_could_take_is_reserved():
     """D261: a name is no id of a thing or an actor of the chapter's levels."""
     chapter = ROOT / "content/chapters/05-the-familiar/chapter.json"
-    items = json.loads(chapter.read_text())["items"] if chapter.is_file() else list(SCRATCH)
-    for item in items:
-        kind, _, item_id = item.rpartition(":")
-        if kind not in ("level", ""):
+    for item in json.loads(chapter.read_text())["items"]:
+        kind, _, item_id = item.partition(":")
+        if kind != "level":
             continue
         level = level_of(item_id)
         for name in level.ids():
@@ -607,9 +295,6 @@ def test_the_rehearsal_is_silent_and_the_shown_run_is_the_one_played():
 
 
 def test_with_a_familiar_living_a_second_is_halted_and_the_practice_is_the_rehearsal_s():
-    data = dict(SCRATCH["out-of-the-circle"])
-    block = dict(data["familiar"])
-    block["living"] = None
     level = level_of("out-of-the-circle")
     living = familiars.DEFAULT | {"source": CLASS}
     from dataclasses import replace
@@ -715,7 +400,7 @@ def test_moving_a_familiar_from_behind_its_back_is_found():
 
 
 def test_the_level_s_block_is_checked():
-    data = dict(SCRATCH["the-circle"])
+    data = hall("the-circle", actors=[ORLA])
     for wrong, reason in [
         ({"stage": "grown"}, "stage"),
         ({"stage": "trial", "circle": [8, 6, 11, 8], "trials": [[6, 5]]}, "the trials' cells"),

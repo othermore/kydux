@@ -1,0 +1,248 @@
+{
+  "id": "the-tower",
+  "scene": "the-dormitory",
+  "light": "morning",
+  "speaker": "orla",
+  "wizard": [
+    16,
+    8
+  ],
+  "camera": [
+    15,
+    8
+  ],
+  "actors": [
+    {
+      "id": "mate",
+      "kind": "friend",
+      "at": [
+        14,
+        9
+      ],
+      "facing": "right"
+    }
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "do": {
+        "face": "down"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "voice",
+      "do": null
+    },
+    {
+      "who": "zarek",
+      "scene": {
+        "scene": "the-entrance",
+        "wizard": [
+          20,
+          19
+        ],
+        "camera": [
+          20,
+          18
+        ],
+        "actors": [
+          {
+            "id": "friend",
+            "kind": "friend",
+            "at": [
+              19,
+              19
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "mate",
+            "kind": "friend",
+            "at": [
+              21,
+              19
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "zarek",
+            "kind": "friend",
+            "facing": "down"
+          }
+        ]
+      },
+      "do": [
+        {
+          "by": "wizard",
+          "face": "up"
+        },
+        {
+          "by": "zarek",
+          "appear": [
+            20,
+            15
+          ]
+        },
+        {
+          "by": "zarek",
+          "walk": [
+            20,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "who": "mate",
+      "do": {
+        "walk": [
+          20,
+          14
+        ],
+        "vanish": true
+      },
+      "by": "zarek"
+    },
+    {
+      "who": "voice",
+      "scene": {
+        "scene": "the-tower-hall",
+        "wizard": [
+          10,
+          11
+        ],
+        "camera": [
+          10,
+          7
+        ],
+        "actors": [
+          {
+            "id": "friend",
+            "kind": "friend",
+            "at": [
+              9,
+              11
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "mate",
+            "kind": "friend",
+            "facing": "up"
+          },
+          {
+            "id": "orla",
+            "kind": "teacher",
+            "at": [
+              11,
+              4
+            ],
+            "facing": "down"
+          }
+        ]
+      },
+      "camera": {
+        "fit": [
+          [
+            4,
+            2
+          ],
+          [
+            15,
+            11
+          ]
+        ]
+      },
+      "do": [
+        {
+          "by": "wizard",
+          "walk": [
+            10,
+            10
+          ]
+        },
+        {
+          "by": "friend",
+          "walk": [
+            [
+              9,
+              9
+            ],
+            [
+              6,
+              9
+            ],
+            [
+              6,
+              7
+            ]
+          ]
+        },
+        {
+          "by": "mate",
+          "appear": [
+            9,
+            11
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              9,
+              9
+            ],
+            [
+              13,
+              9
+            ],
+            [
+              13,
+              7
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "face": "up"
+        }
+      ]
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "bimo",
+      "do": [
+        {
+          "by": "friend",
+          "walk": [
+            7,
+            7
+          ]
+        },
+        {
+          "by": "friend",
+          "walk": [
+            6,
+            7
+          ]
+        },
+        {
+          "by": "friend",
+          "face": "right"
+        }
+      ]
+    }
+  ]
+}

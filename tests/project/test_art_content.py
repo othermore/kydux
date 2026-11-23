@@ -86,9 +86,22 @@ def levels_on(scene: str) -> list[dict]:
     return found
 
 
+def lowered(art: dict) -> dict[tuple[int, int], float]:
+    """How much lower than its cell a figure is drawn there, in cells, as the page draws
+    it (D105): the first range of `lowered` that names a cell is taken."""
+    found: dict[tuple[int, int], float] = {}
+    for part in art.get("lowered", []):
+        (x0, y0), (x1, y1) = part["cells"]
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                found.setdefault((x, y), part["by"])
+    return found
+
+
 @pytest.mark.parametrize("scene", SCENES)
 def test_a_level_s_start_mark_things_and_friend_are_never_hidden(scene):
     art, masks = rows_of(scene)
+    drawn = lowered(art)
     hidden = []
     for level in levels_on(scene):
         cells = {"start": level["start"]}
@@ -111,8 +124,13 @@ def test_a_level_s_start_mark_things_and_friend_are_never_hidden(scene):
         for what, (x, y) in cells.items():
             if what in art["things"]:
                 continue
+            by = drawn.get((x, y), 0.0)
             front = max(
-                (part(m, art["cell"], x, y, 0.15, 0.85) for row, m in masks.items() if row > y),
+                (
+                    part(m, art["cell"], x, y, 0.15 + by, 0.85 + by)
+                    for row, m in masks.items()
+                    if row > y
+                ),
                 default=0.0,
             )
             if front > HIDDEN:

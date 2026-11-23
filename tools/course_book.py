@@ -151,7 +151,7 @@ def pages(markdown: str) -> list[str]:
 def made(text: str, lang: str, gender: str, name: str) -> str:
     from wizard_words import for_wizard
 
-    return for_wizard(text, gender, name)
+    return for_wizard(text, gender, name, lang=lang)
 
 
 def story_section(story_id: str, lang: str, gender: str, name: str, w: dict) -> list[str]:

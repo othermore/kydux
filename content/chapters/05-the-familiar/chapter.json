@@ -1,0 +1,24 @@
+{
+  "id": "05-the-familiar",
+  "music": "the-familiar",
+  "items": [
+    "story:the-tower",
+    "lesson:a-kind-of-thing",
+    "level:the-circle",
+    "lesson:what-it-knows",
+    "level:the-name-and-the-colour",
+    "lesson:born-complete",
+    "level:one-line-in-the-book",
+    "level:the-slate",
+    "lesson:what-it-inherits",
+    "level:out-of-the-circle",
+    "lesson:what-it-does",
+    "level:orlas-orders",
+    "story:the-trail",
+    "level:the-small-passage",
+    "story:the-voice-in-the-tunnel",
+    "level:the-forgotten-room",
+    "story:what-the-familiar-brought",
+    "story:the-end-of-the-year"
+  ]
+}

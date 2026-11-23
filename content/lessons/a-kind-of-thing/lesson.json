@@ -1,0 +1,8 @@
+{
+  "id": "a-kind-of-thing",
+  "speaker": "orla",
+  "teaches": [
+    "concept:class",
+    "wizard.cast"
+  ]
+}

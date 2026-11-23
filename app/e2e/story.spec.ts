@@ -466,9 +466,23 @@ test("the hall goes dark while the children tell Orla, and comes back in the eve
   await storyNext(page, 11);
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
   await expect(scene).not.toHaveAttribute('data-hour', 'sunset');
+  // What the scene frames as it starts to come back out of the dark.
+  await frame.evaluate((node) => {
+    new MutationObserver(() => {
+      if ((node as HTMLElement).dataset.passing !== 'back') return;
+      (window as unknown as { framedBack?: string }).framedBack =
+        document.getElementById('scene')?.dataset.cameraFit ?? 'none';
+    }).observe(node, { attributes: true, attributeFilter: ['data-passing'] });
+  });
   // Step 13: the scene goes dark, and Orla's words are said once it is back, at sunset.
   await page.locator('#story-next').click();
   await expect(frame).toHaveAttribute('data-passing', 'dark');
+  // Time passes by itself: Next waits, disabled, and its keys do nothing (D317).
+  await expect(page.locator('#story-next')).toBeDisabled();
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Space');
+  await expect(frame).toHaveAttribute('data-passing', 'dark');
+  await expect(page.locator('#story-step')).toHaveText(/13/);
   await expect(scene).not.toHaveAttribute('data-speaker', 'orla');
   await expect(page.locator('#story-speaker')).toHaveCount(0);
   // The words on the dark, in a box with no tail (D309).
@@ -476,6 +490,12 @@ test("the hall goes dark while the children tell Orla, and comes back in the eve
   await expect(page.locator('#story-dark-words')).toBeVisible();
   await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-hall-dark.png' });
   await expect(frame).not.toHaveAttribute('data-passing', /./, { timeout: ciTimes(15_000) });
+  // The hall comes out of the dark framed as Orla's step frames it (D318), and Next
+  // wakes with the keyboard.
+  expect(await page.evaluate(() => (window as unknown as { framedBack?: string }).framedBack)).toBe('4,2,15,11');
+  await expect(scene).toHaveAttribute('data-camera-fit', '4,2,15,11');
+  await expect(page.locator('#story-next')).toBeEnabled();
+  await expect(page.locator('#story-next')).toBeFocused();
   await expect(scene).toHaveAttribute('data-hour', 'sunset');
   await expect(scene).toHaveAttribute('data-speaker', 'orla', { timeout: ciTimes(15_000) });
   await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-hall-in-the-evening.png' });

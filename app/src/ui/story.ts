@@ -465,12 +465,25 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     }, FADE_IN);
   };
 
+  /** Whether the story goes on by itself for a moment: Next and Again wait, disabled,
+   * and so do their keys; Back and Skip stay (D317). */
+  const wait = (on: boolean) => {
+    const waking = forward.disabled && !on;
+    const held = document.activeElement === forward || document.activeElement === document.body;
+    forward.disabled = on;
+    again.disabled = on;
+    // A disabled button gives the keyboard up: Next takes it back as it wakes.
+    if (waking && held) forward.focus();
+  };
+
   /** Time passes before a part marked later (D280): the scene goes dark, the part's
-   * staging is drawn in the dark, comes back out of it, and the step is played, its words
-   * said, once it is back. The band says nothing meanwhile. */
+   * staging is drawn in the dark, framed as its step frames it (D318), comes back out of
+   * it, and the step is played, its words said, once it is back. The band says nothing
+   * meanwhile, and Next waits (D317). */
   const passTime = (index: number) => {
     const token = ++passing;
     words();
+    wait(true);
     voice.replaceChildren();
     heard.textContent = '';
     sceneParent.dataset.state = 'loading';
@@ -488,6 +501,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     after(() => {
       startPart(index, () => {
         if (token !== passing) return;
+        scene?.place(framingAt(story.steps, partsOf()[index]?.step ?? 0, step));
         after(() => {
           frame.dataset.passing = 'back';
           after(() => {
@@ -514,6 +528,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
         shownPart = -1;
       }
     }
+    wait(false);
     const passed = partsOf()[partAt(step)];
     if (onward && passed?.later && passed.step === step && partAt(step) !== shownPart) {
       passTime(partAt(step));
@@ -579,12 +594,12 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     const target = event.target as HTMLElement | null;
     if (target?.closest('button, a, input, select, textarea')) return;
     if (event.key === 'r' || event.key === 'R') {
-      if (!again.hidden) play();
+      if (!again.hidden && !again.disabled) play();
       return;
     }
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
-    go(1);
+    if (!forward.disabled) go(1);
   };
 
   return {

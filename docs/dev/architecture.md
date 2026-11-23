@@ -365,7 +365,7 @@ tiles are `[x, y]`.
 | `wrong_way` | the ring, in the wizard's move | `id`, `at`, `way`, the cell flown from | the ring shakes, with the bump's sound, and half a second after it the wizard thinks the way it is flown (D237), over its head or beside it (D245); the ring counts as missed (D219) |
 | `read` | wizard, before the first action of a race | `at`, `count`, `lines` | the band at the scene's foot says Ilda reading the two programs and the ticks to each take-off, the line read lit in the editor; `data-race-band` (D189) |
 | `judged` | wizard, a tick after a race is flown out | `at`; `lines`, `flight`, `missed`, `penalty` and `tick`, Ilda's count of the wizard, `flight` and `tick` null when it has not crossed; `racer`, `racer_lines`, `racer_tick`; `winner`, `wizard`, the racer's id, or null for a tie | the band says Ilda's verdict: the ticks each one took, the wizard's penalty when it has one, the winner or the tie; `data-race-verdict` (D234) |
-| `trial` | the trial, in the wizard's tick of minka | `id` (`familiar_<n>`), `kind`, `name`, `color`, `at`, `pale` and its `reason` (`colour`, `grey`, `none` or null), `dissolved`, the trial whose cell it takes | the creature drawn in light from its sheet (D263), fading in with a burst and the `trial` sound: whole and washed towards white with an edge of light, or, pale, its lines alone in white light, trembling; the trial it replaces dissolves; `data-creatures`, `data-trials` |
+| `trial` | the trial, in the wizard's tick of minka | `id` (`familiar_<n>`), `kind`, `name`, `color`, `at`, `pale` and its `reason` (`colour`, `grey`, `none` or null), `dissolved`, the trial whose cell it takes; `holds`, whether it has a name the book took and a colour of its kind (D276) | the creature drawn in light from its sheet (D263), fading in with a burst and the `trial` sound: whole and washed towards white with an edge of light, or, pale, its lines alone in white light, trembling; the trial it replaces dissolves; one that does not hold is seen for four seconds of the page's clock and fades in one, and drawn at once on a later tick is not there (D276); `data-creatures`, `data-trials` |
 | `spark` | the trial, in the wizard's tick of minka | `id`, `kind`, `at` | a shapeless spark of light where the trial would stand, for three ticks (D261) |
 | `told` | the actor who speaks, or `book`, in the tick going on | `who`, `key`; `kind`, `name`, `color`, `line` for its words | the level's or the chapter's words in a bubble over who says them, from a spot of the scene for a voice painted into it, or in the book's band, a bubble for each of their pieces (D274); the playback holds until they are read (D264); `data-told` |
 | `book` | `book`, in the tick of minka or after the program | `line`, `ok`, `ink`; or `kind` and `colors`, a kind's colours | the band under the scene: the line that conjures the trial, which the book can conjure or, with `ink`, Orla writes in it; the book's words when the class cannot make the familiar; or the kind's colours as the strings to write (D267); `data-book-band` |
@@ -4101,8 +4101,9 @@ one overturns stays, marked as superseded.
   `trials`; with every cell taken, the oldest trial dissolves and the new one takes its
   cell; an object already in the circle is not called twice (`blocked`, `already_here`, not
   a stop). The event is `trial` (the object's id `familiar_<n>`, its kind, name, colour,
-  cell, `pale` and its reason, the cell's earlier trial dissolved) or `spark`. On a
-  **living** familiar `minka` brings it back: after the cast's tick the familiar runs by the
+  cell, `pale` and its reason, the cell's earlier trial dissolved, and whether it holds,
+  D276) or `spark`. On a **living** familiar `minka` brings it back: after the cast's
+  tick the familiar runs by the
   shortest way over the cells a familiar enters (D270) to the free cell beside the wizard
   that is nearest by that way (ties by y, then x), a cell a tick, and hands the wizard
   everything it carries in its last step's tick (the event `hand_over` with the things'
@@ -4121,7 +4122,8 @@ one overturns stays, marked as superseded.
   creature's sheet, frame by frame (`app/src/engine/trial.ts`, its numbers scaled to the
   sheet's cell): no trial is painted. A pale trial of a kind
   is drawn from the kind's first sheet. The spark and the footprints of light (D268) are
-  drawn by the page as well. Rules out a pale trial as the figure washed to grey (sample 1,
+  drawn by the page as well. A trial with no name or no colour is seen for a few seconds
+  and fades (D276). Rules out a pale trial as the figure washed to grey (sample 1,
   mistaken for a white creature), one with a veil and a glow of light, which fill a figure
   half a cell high and make it a white creature's, one in a light of a colour, which a child
   who asked for that colour takes for it, and a sheet of trials from Gemini.
@@ -4135,7 +4137,9 @@ one overturns stays, marked as superseded.
   zorro rojo*, *una liebre blanca*). They are shown as a bubble over the actor for their
   reading time (D175), and the playback holds until they are read: ten seconds at most,
   divided by the speed; step by step, until the next step; a run shown at once (Stop, a
-  replayed end) shows the last words only. They are built on `Speech`, as the race's verdict
+  replayed end) shows the last words only. Words told in one tick by several, Orla's and
+  Bimo's at a win, are said one after another in their order, the tick held for all of
+  them (`Speech.sayAfter`). They are built on `Speech`, as the race's verdict
   is (D234). The words said at a win are named in the level's `level.json`, `"told": {"won":
   [["orla", "won"], ["bimo", "bimo"]]}`, and said in that order after the goals. Someone
   painted into a scene speaks from a spot the scene names (`scene.json`, `"voices": {"bimo":
@@ -4317,3 +4321,28 @@ one overturns stays, marked as superseded.
   that does something: `story_on_scene` refuses it on the voice's step, whose words
   already stand in the band while its actions play, and on a step with `"do": null`.
   Rules out a second timeline for a story's words.
+- **D276 — A trial holds only with a name and a colour; one that does not fades in a
+  few seconds.** Decided 2026-11-18 by the owner (*no debería de durar todo el rato,
+  deberia desaparecer a los pocos segundos porque es una prueba y además no tiene color ni
+  nombre*; *Necesita un nombre y un color para ser estable y poder mantenerse más tiempo
+  en el círculo*; of the friend's grey hare, *esa se puede quedar ahí un rato porque ya
+  tiene nombre y color*). A trial called holds when the book took a name for it and it has
+  a colour of its kind: the `trial` event gives both its `name` and its `color` (D262),
+  and says `holds`. A trial with no name, with no colour, or pale, does not hold. Holding
+  is how long a trial is seen, and nothing else: the world's circle, the cell a trial
+  takes, the dissolving of a cell's earlier trial, the goal `trial` and the words told are
+  as they are. The page draws a trial that does not hold as D263 says, for four seconds of
+  its own clock at the normal speed (`TRIAL_SEEN_MS`, `scene.ts`), and then lets it fade
+  in one (`TRIAL_FADE_MS`), as the spark goes out by itself. The seconds are the page's and
+  not ticks, since the playback holds a tick while words are read (D264); they are shorter
+  as the speed is higher, they wait while the run is paused, and where a trial steps (the
+  birth's level) they are counted from its last step. A trial that holds stands until the
+  run is cleared. A staged trial (an actor with `trial`) holds when it is staged with its
+  colour: its master has named it. Staged with none, it is seen when the level opens, its
+  seconds start when the start card closes (`SceneHandle.cardClosed`), and it does not
+  come back when a run starts again in that visit. Drawn at once on a later tick than it
+  came or last stepped in (the timeline, a run shown ended), a trial that does not hold
+  is not there; a `dissolved` of a trial already faded shows nothing. `data-trials` lists
+  the trials seen: one faded leaves it. Rules out a trial with no name or no colour that
+  stands for the whole level, a fade counted in ticks, and a world that forgets a trial
+  its goal still counts.

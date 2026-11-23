@@ -237,7 +237,8 @@
           "kind": "Fox",
           "pale": true,
           "reason": "none",
-          "name": null
+          "name": null,
+          "holds": false
         },
         "told": [
           [
@@ -328,7 +329,8 @@
           "kind": "Fox",
           "pale": false,
           "name": "Pimu",
-          "color": "red"
+          "color": "red",
+          "holds": true
         },
         "result": {
           "kind": "Fox",
@@ -344,7 +346,8 @@
             "status": "incomplete",
             "trial": {
               "pale": true,
-              "reason": "colour"
+              "reason": "colour",
+              "holds": false
             },
             "told": [
               [
@@ -367,7 +370,8 @@
             "trial": {
               "kind": "Hare",
               "pale": true,
-              "reason": "grey"
+              "reason": "grey",
+              "holds": false
             },
             "told": [
               [
@@ -403,7 +407,8 @@
             "status": "incomplete",
             "trial": {
               "pale": false,
-              "name": null
+              "name": null,
+              "holds": false
             }
           }
         },
@@ -430,7 +435,8 @@
             "trial": {
               "pale": true,
               "reason": "none",
-              "name": null
+              "name": null,
+              "holds": false
             }
           }
         },
@@ -441,7 +447,8 @@
             "status": "won",
             "trial": {
               "pale": false,
-              "color": "white"
+              "color": "white",
+              "holds": true
             }
           }
         }
@@ -471,7 +478,8 @@
           "expect": {
             "status": "incomplete",
             "trial": {
-              "pale": false
+              "pale": false,
+              "holds": true
             },
             "book": {
               "ok": false
@@ -486,7 +494,8 @@
             "trial": {
               "pale": true,
               "reason": "colour",
-              "name": "red"
+              "name": "red",
+              "holds": false
             }
           }
         },
@@ -545,7 +554,8 @@
             "trial": {
               "pale": true,
               "reason": "none",
-              "name": null
+              "name": null,
+              "holds": false
             },
             "trials": 2
           }
@@ -557,7 +567,8 @@
             "status": "incomplete",
             "trial": {
               "pale": true,
-              "name": "Pimu"
+              "name": "Pimu",
+              "holds": false
             }
           }
         },
@@ -611,7 +622,8 @@
             "passes": false,
             "told": [],
             "trial": {
-              "pale": false
+              "pale": false,
+              "holds": true
             }
           }
         },

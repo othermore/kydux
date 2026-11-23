@@ -159,6 +159,20 @@ async function level(page: Page, id: string): Promise<void> {
   await page.waitForTimeout(ciTimes(800));
   await page.screenshot({ path: `${OUT}level-${id}-01-inicio.png` });
   await typed(page, solution);
+  // A trial that does not hold is seen for its seconds only (D276): the won picture is the
+  // scene while it is seen and someone speaks, the card's after it.
+  const fading = await page
+    .waitForFunction(
+      () => {
+        const scene = document.querySelector<HTMLElement>('#scene');
+        if (document.querySelector('.outcome:not([hidden])')) return 'ended';
+        return /(^|,)familiar_\d/.test(scene?.dataset.trialsFading ?? '') && scene?.dataset.bubble ? 'fading' : false;
+      },
+      null,
+      { polling: 'raf', timeout: ciTimes(90_000) },
+    )
+    .then((handle) => handle.jsonValue());
+  if (fading === 'fading') await page.screenshot({ path: `${OUT}level-${id}-unica-ganado.png` });
   await page.locator('.outcome').waitFor({ timeout: ciTimes(90_000) });
   // The win card's stars are drawn in one after another: the picture waits for the last.
   await page.waitForTimeout(ciTimes(1_500));
@@ -174,7 +188,8 @@ async function level(page: Page, id: string): Promise<void> {
       await page.locator('.win-card').waitFor({ timeout: ciTimes(8_000) }).catch(() => {});
       await atEnd(page);
     }
-    await page.screenshot({ path: `${OUT}level-${id}-${way}-ganado.png` });
+    const card = fading === 'fading' && way === 'unica' ? 'ganado-tarjeta' : 'ganado';
+    await page.screenshot({ path: `${OUT}level-${id}-${way}-${card}.png` });
     // The route tick by tick of the first way only; a level named to show every way
     // shows each other at its end (the owner, 2026-11-08, 2026-11-13), so that the
     // document stays short.

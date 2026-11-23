@@ -373,16 +373,41 @@ export class Speech {
     const [first, ...rest] = pieces;
     if (!first) return;
     this.say(first.text, tick, first.ticks, over, who);
-    const last = rest[rest.length - 1];
+    this.queuePieces(rest, over, who, shown);
+  }
+
+  /** Words said after those still to come in this tick (D264): each piece `after`
+   * milliseconds from now, the first too, the bubbles still to come kept. */
+  sayAfter(
+    pieces: { text: string; ticks: number; after: number }[],
+    over: Phaser.GameObjects.Sprite,
+    who: string,
+    shown: () => void = () => {},
+  ): void {
+    this.queuePieces(pieces, over, who, shown);
+  }
+
+  /** Bubbles to come, each `after` milliseconds from now, joined to those still to come. */
+  private queuePieces(
+    pieces: { text: string; ticks: number; after: number }[],
+    over: Phaser.GameObjects.Sprite,
+    who: string,
+    shown: () => void,
+  ): void {
+    const last = pieces[pieces.length - 1];
     if (!last) return;
-    const timers = rest.map((piece, index) =>
-      this.scene.time.delayedCall(piece.after, () => {
-        if (index === rest.length - 1) this.queue = null;
+    const queue = this.queue ?? { timers: [], read: 0 };
+    this.queue = queue;
+    for (const piece of pieces) {
+      const timer = this.scene.time.delayedCall(piece.after, () => {
+        queue.timers = queue.timers.filter((one) => one !== timer);
+        if (queue.timers.length === 0 && this.queue === queue) this.queue = null;
         this.bubbleUp(piece.text, this.lastTick, piece.ticks, over, who);
         shown();
-      }),
-    );
-    this.queue = { timers, read: this.scene.time.now + last.after + last.ticks * this.parts.tickMs };
+      });
+      queue.timers.push(timer);
+    }
+    queue.read = Math.max(queue.read, this.scene.time.now + last.after + last.ticks * this.parts.tickMs);
   }
 
   /** The bubbles still to come of words said in pieces, not shown after all. */

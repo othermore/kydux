@@ -83,6 +83,42 @@ async function kept(page: Page): Promise<{ draft?: Record<string, string>; livin
 /** The editor's text. */
 const editorText = (page: Page) => page.locator('.cm-content').innerText();
 
+/** Waits, frame by frame, until the scene's trials match: one that does not hold is seen
+ * for little more than a second at speed 4 (D276). */
+async function trialsMatch(page: Page, pattern: RegExp): Promise<void> {
+  await page.waitForFunction(
+    (source) => new RegExp(source).test(document.querySelector('#scene')?.getAttribute('data-trials') ?? ''),
+    pattern.source,
+    { polling: 'raf', timeout: ciTimes(90_000) },
+  );
+}
+
+/** Every value the scene's trials take from now on, with when it took it, in
+ * milliseconds of the page's clock (D276). */
+async function watchTrials(page: Page): Promise<void> {
+  await scene(page).evaluate((node) => {
+    const seen: [number, string][] = [[performance.now(), node.getAttribute('data-trials') ?? '']];
+    (window as unknown as { trialsSeen: [number, string][] }).trialsSeen = seen;
+    new MutationObserver(() => seen.push([performance.now(), node.getAttribute('data-trials') ?? ''])).observe(node, {
+      attributes: true,
+      attributeFilter: ['data-trials'],
+    });
+  });
+}
+
+const trialsSeen = (page: Page) =>
+  page.evaluate(() => (window as unknown as { trialsSeen: [number, string][] }).trialsSeen);
+
+/** How long, in milliseconds, a trial was seen in what watchTrials recorded: from the first
+ * value that names it as `look` says (`pale`, `good`) to the first after that does not
+ * name it; null where it is still seen. */
+function seenFor(seen: [number, string][], id: string, look = ''): number | null {
+  const first = seen.findIndex(([, trials]) => trials.split(';').some((one) => one.startsWith(`${id}:${look}`)));
+  if (first < 0) return null;
+  const gone = seen.slice(first).find(([, trials]) => !trials.split(';').some((one) => one.startsWith(`${id}:`)));
+  return gone ? gone[0] - (seen[first] as [number, string])[0] : null;
+}
+
 for (const [wizard, locale, won] of [
   [MARTA, 'es-ES', /^¡Lo has conseguido/],
   [PABLO, 'en-US', /^You did it/],
@@ -181,13 +217,16 @@ test.describe('the trials (D261, D263)', () => {
 
   test('a blue fox and the grey hare come pale, a white fox whole', async ({ page }) => {
     await open(page, 'the-name-and-the-colour');
-    await run(page, wrong('the-name-and-the-colour', 'a_blue_fox'));
-    await expect(scene(page)).toHaveAttribute('data-trials', /:pale:Fox:/);
+    // A pale trial does not hold, and is seen for its seconds only (D276).
+    await start(page, wrong('the-name-and-the-colour', 'a_blue_fox'));
+    await trialsMatch(page, /familiar_1:pale:Fox:/);
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
     await expect(scene(page)).toHaveAttribute('data-told', /orla:pale_colour/);
-    await run(page, wrong('the-name-and-the-colour', 'a_grey_hare'));
-    await expect(scene(page)).toHaveAttribute('data-trials', /:pale:Hare:/);
-    await expect(scene(page)).toHaveAttribute('data-told', /orla:pale_grey/);
+    await start(page, wrong('the-name-and-the-colour', 'a_grey_hare'));
+    await trialsMatch(page, /familiar_1:pale:Hare:/);
     await page.locator('#scene').screenshot({ path: `${SHOTS}trial-pale.png` });
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
+    await expect(scene(page)).toHaveAttribute('data-told', /orla:pale_grey/);
     const white = solution('the-name-and-the-colour').replace('"red"', '"white"');
     expect(await run(page, white)).toMatch(/^¡Lo has conseguido/);
     await expect(scene(page)).toHaveAttribute('data-trials', /:good:Fox:white:familiar-fox-white/);
@@ -197,9 +236,13 @@ test.describe('the trials (D261, D263)', () => {
   test('a pale trial beside a white one, on the slate', async ({ page }) => {
     await open(page, 'the-slate');
     const both = solution('the-slate').replace('Fox("Pimu", "red")', 'Fox("Pimu", "white")').replace('Fox("Kesi", "white")', 'Fox("Kesi", "blue")');
-    await run(page, both);
-    await expect(scene(page)).toHaveAttribute('data-trials', /:good:Fox:white:.*:pale:Fox:/);
+    await start(page, both);
+    await trialsMatch(page, /:good:Fox:white:.*:pale:Fox:/);
     await page.locator('#scene').screenshot({ path: `${SHOTS}trial-pale-beside-white.png` });
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
+    // The white one holds; the pale one has faded (D276).
+    await expect(scene(page)).toHaveAttribute('data-trials', /:good:Fox:white:/);
+    await expect(scene(page)).not.toHaveAttribute('data-trials', /:pale:Fox:/, { timeout: ciTimes(10_000) });
   });
 
   test('the book tries the line that conjures the trial', async ({ page }) => {
@@ -217,6 +260,73 @@ test.describe('the trials (D261, D263)', () => {
     await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
     await expect(page.locator('.outcome-text')).toContainText('Cuando nace un objeto');
     await expect(page.locator('.outcome-text')).toContainText('self');
+  });
+});
+
+test.describe('the trials that hold and those that fade (D276)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test("the circle's hare with no colour fades after the card, and the child's fox while Orla speaks", async ({ page }) => {
+    test.setTimeout(ciTimes(180_000));
+    await page.goto('/#level/the-circle');
+    // Behind the card, the friend's trial alone, a drawing with no colour.
+    await expect(scene(page)).toHaveAttribute('data-trials', /^friend_familiar:pale:Hare:[^;]*$/, { timeout: ciTimes(90_000) });
+    await expect(page.locator('#start')).toBeVisible();
+    // While the card is open, its seconds wait.
+    await page.waitForTimeout(6_000);
+    await expect(scene(page)).toHaveAttribute('data-trials', /friend_familiar:pale:Hare:/);
+    await watchTrials(page);
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
+    await expect(scene(page)).not.toHaveAttribute('data-trials', /friend_familiar/, { timeout: ciTimes(12_000) });
+    const hare = seenFor(await trialsSeen(page), 'friend_familiar');
+    // Some four seconds and its fade, at the normal speed, counted from the card's close.
+    expect(hare).not.toBeNull();
+    expect(hare as number).toBeGreaterThan(4_000);
+    expect(hare as number).toBeLessThan(ciTimes(8_000));
+
+    // The solution at the normal speed: the fox comes, Orla speaks, the fox fades.
+    await watchTrials(page);
+    expect(await run(page, solution('the-circle'))).toMatch(/^¡Lo has conseguido/);
+    const seen = await trialsSeen(page);
+    expect(seen.some(([, trials]) => /familiar_1:pale:Fox:/.test(trials))).toBe(true);
+    expect(seenFor(seen, 'familiar_1', 'pale')).not.toBeNull();
+    // The friend's hare is not back with the run.
+    expect(seen.some(([, trials]) => trials.includes('friend_familiar'))).toBe(false);
+    await expect(scene(page)).toHaveAttribute('data-told', /orla:won/);
+
+    // A second run: the hare is not back either.
+    await watchTrials(page);
+    await page.locator('#speed').selectOption('4');
+    await run(page, solution('the-circle'));
+    expect((await trialsSeen(page)).some(([, trials]) => trials.includes('friend_familiar'))).toBe(false);
+  });
+
+  test('the grey hare and a fox with a name and a colour stand; a fox with only a name fades', async ({ page }) => {
+    test.setTimeout(ciTimes(180_000));
+    await open(page, 'the-name-and-the-colour');
+    // The friend's hare is grey and named: it stands.
+    await page.waitForTimeout(3_000);
+    await expect(scene(page)).toHaveAttribute('data-trials', /friend_familiar:good:Hare:grey:/);
+    await expect(scene(page)).not.toHaveAttribute('data-trials-fading', /./);
+    expect(await run(page, solution('the-name-and-the-colour'))).toMatch(/^¡Lo has conseguido/);
+    // Three seconds at speed 4 are twelve at the normal speed: both stand.
+    await page.waitForTimeout(3_000);
+    await expect(scene(page)).toHaveAttribute('data-trials', /friend_familiar:good:Hare:grey:.*familiar_1:good:Fox:red:/);
+    // Only a name: no colour, and it fades.
+    await watchTrials(page);
+    await start(page, solution('the-name-and-the-colour').replace('pimu.color = "red"\n', ''));
+    await trialsMatch(page, /familiar_1:pale:Fox:/);
+    await expect(scene(page)).toHaveAttribute('data-trials-fading', 'familiar_1');
+    await expect(page.locator('.outcome')).toBeVisible({ timeout: ciTimes(90_000) });
+    await expect(scene(page)).not.toHaveAttribute('data-trials', /familiar_1/, { timeout: ciTimes(10_000) });
+    await expect(scene(page)).toHaveAttribute('data-trials', /friend_familiar:good:Hare:grey:/);
+    const fox = seenFor(await trialsSeen(page), 'familiar_1', 'pale');
+    // Four seconds and one of fading, a quarter of that at speed 4.
+    expect(fox).not.toBeNull();
+    expect(fox as number).toBeGreaterThan(1_000);
+    expect(fox as number).toBeLessThan(ciTimes(3_000));
   });
 });
 

@@ -175,6 +175,11 @@ class Document:
                 tick = int(re.search(r"tick-(\d+)", frame.name).group(1))
                 self.picture(frame.name, f"{title}, {name}, tick {tick}")
             self.picture(f"level-{level_id}-{tag}-ganado.png", f"{title}, {name}: al ganar")
+            # A trial that does not hold is seen while someone speaks, the card after it
+            # (D276).
+            card = f"level-{level_id}-{tag}-ganado-tarjeta.png"
+            if (self.shots / card).exists():
+                self.picture(card, f"{title}, {name}: la tarjeta al ganar")
         plan = f"level-{level_id}-plano.png"
         if (self.shots / plan).exists():
             self.lines.append("### El plano del mapa, abierto con `orvim`\n")

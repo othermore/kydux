@@ -417,6 +417,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         },
         () => {
           guideJustSeen = false;
+          // A staged trial that does not hold starts its seconds (D276).
+          cardClosed = true;
+          scene?.cardClosed();
           editor.focus();
           seeGoals();
         },
@@ -720,6 +723,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   setPageTitle();
 
   let scene: SceneHandle | null = null;
+  /** Whether the start card has been closed once, told to a scene that comes after. */
+  let cardClosed = false;
   let planShown: PlanWindow | null = null;
   let destroyed = false;
   let mounted = false;
@@ -739,6 +744,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
           return;
         }
         scene = handle;
+        if (cardClosed) handle.cardClosed();
         // The map opened by its spell (D134): the run waits until it is closed, and a
         // run started again closes it.
         handle.onMap(

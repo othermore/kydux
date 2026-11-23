@@ -35,7 +35,8 @@
 // data-debug-layers and data-debug-leaves (the tester's view, its layers and the
 // cells under an open door's leaf, debug.ts), data-sprite-things (each thing drawn
 // from its kind's sprite, "id:kind:x,y" joined by ";", D182), data-found (the
-// hidden things found and seen, joined by ",", D184), data-untied (the brooms
+// hidden things found and seen, joined by ",", D184), data-trials-fading (the trials seen that
+// do not hold, which fade, joined by ",", D276), data-untied (the brooms
 // untied, D183), data-thought-box (the thought's cloud on the page,
 // "left,top,right,bottom", D245), data-wizard-facing (the way the wizard faces, as the
 // scene keeps it, D241), data-wizard-frame (the name of the frame the wizard is drawn
@@ -251,6 +252,10 @@ const FAMILIAR_EVENTS = new Set([
 /** The placeholder a familiar is drawn with on a scene with no sheet for it. */
 const CREATURE_KEY = 'creature-placeholder';
 const SPARK_KEY = 'spark';
+/** How long a trial that does not hold is seen before it fades, and how long it takes to
+ * fade, in milliseconds at speed 1, by the page's clock and not by ticks (D276). */
+export const TRIAL_SEEN_MS = 4000;
+export const TRIAL_FADE_MS = 1000;
 
 export { type Art, type FigureArt, loadArt, type SceneArt } from './painted';
 
@@ -262,6 +267,9 @@ export interface SceneHandle {
   load(result: WorldResult, way?: string | null): void;
   /** The level's first way on the scene again, as it opens (D204). */
   firstWay(): void;
+  /** The level's start card closed: the seconds of a staged trial that does not hold
+   * start (D276). */
+  cardClosed(): void;
   reset(): void;
   /** Shows the level starting again: the scene fades, everything is put back,
    * `ready` is called and awaited while nothing is seen, and it comes back;
@@ -459,9 +467,19 @@ class LevelScene extends Phaser.Scene {
    * a voice painted into the scene speaks from (D264). */
   private readonly creatures = new Map<string, CreatureLook>();
   private readonly called = new Set<string>();
+  /** The trials seen that do not hold (D276), by id: how long each has still to be seen
+   * and to fade, in milliseconds at speed 1, the alpha it fades from, the tick it came in
+   * (0 for one staged), and whether it is staged, whose seconds start once the start
+   * card is closed; the staged ones faded in this visit, which no run brings back. */
+  private readonly fading = new Map<string, { left: number; alpha: number; tick: number; staged: boolean }>();
+  private readonly fadedStaged = new Set<string>();
+  private startClosed = false;
   private footprints: Phaser.GameObjects.GameObject[] = [];
-  /** The keys of the words said in the run shown, in order (D264), for the tests. */
+  /** The keys of the words said in the run shown, in order (D264), for the tests; and how
+   * long, in milliseconds at speed 1, the words told so far in the tick shown take to read,
+   * after which the next told in it are said. */
   private toldKeys: string[] = [];
+  private toldMs = 0;
   private readonly sitting = new Set<Phaser.GameObjects.Sprite>();
   private readonly litPlates = new Set<string>();
   private readonly voiceSprites = new Map<string, Phaser.GameObjects.Sprite>();
@@ -807,6 +825,10 @@ class LevelScene extends Phaser.Scene {
         ? this.creatureSprite(actor.creature, actor.tile, actor.facing)
         : this.figure(actor.id, key, actor.tile, actor.facing).setDepth(3);
       if (actor.creature) this.creatures.set(actor.id, actor.creature);
+      // A trial staged with no colour does not hold (D276).
+      if (actor.creature?.look === 'pale') {
+        this.fading.set(actor.id, { left: TRIAL_SEEN_MS + TRIAL_FADE_MS, alpha: sprite.alpha, tick: 0, staged: true });
+      }
       if (actor.sitting) {
         this.sitting.add(sprite);
         this.face(sprite, actor.facing);
@@ -1075,6 +1097,7 @@ class LevelScene extends Phaser.Scene {
     // A trial with no colour trembles, a pixel of its sheet to each side, about eight
     // times a second, but under reduced motion (D263).
     this.trembleTrials();
+    this.fadeTrials(delta);
     this.speech.update();
     if (this.silhouette) {
       this.silhouette.off = this.asleep.get(this.wizard)?.lying === true || this.inEnchanted(this.wizardTile);
@@ -1207,7 +1230,7 @@ class LevelScene extends Phaser.Scene {
       this.tweens.killTweensOf(state.sprite);
       state.tile = this.startTile(actor.id, actor.tile);
       state.facing = (this.shownWay ? this.map.wayFacings[this.shownWay]?.[actor.id] : undefined) ?? actor.facing;
-      const hidden = actor.hidden || this.inEnchanted(state.tile);
+      const hidden = actor.hidden || this.inEnchanted(state.tile) || this.fadedStaged.has(actor.id);
       state.sprite.setPosition(...this.figureAt(state.tile)).setAlpha(1).setVisible(!hidden).setAngle(0);
       this.face(state.sprite, state.facing);
       if (actor.asleep) this.layDown(state.sprite, actor.id, actor.asleep, true);
@@ -1394,7 +1417,13 @@ class LevelScene extends Phaser.Scene {
     }
     this.parentNode.dataset.tick = String(tick);
     this.shownTick = tick;
+    this.toldMs = 0;
     this.endGlides(tick);
+    // Drawn at once on a later tick than it came or last stepped in, a trial that does
+    // not hold is not there (D276).
+    if (instant) {
+      for (const [id, trial] of this.fading) if (!trial.staged && trial.tick < tick) this.trialGone(id);
+    }
     this.speech.expire(tick, instant);
     // A spell's light flies to the thing it takes, which waits for it (D127).
     const pulled = events.find((event) => event.kind === 'pull');
@@ -2770,6 +2799,53 @@ class LevelScene extends Phaser.Scene {
     }
   }
 
+  /** The level's start card closed (SceneHandle, D276). */
+  cardClosed(): void {
+    this.startClosed = true;
+  }
+
+  /** Each trial that does not hold, seen for TRIAL_SEEN_MS of the page's clock at the
+   * normal speed and then fading in TRIAL_FADE_MS (D276): the seconds shorter as the
+   * speed is higher, waiting while the run is paused, a staged one's waiting for the
+   * start card to close. */
+  private fadeTrials(delta: number): void {
+    if (this.fading.size === 0 || this.playback.state === 'paused') return;
+    const spent = delta * this.playback.speed;
+    for (const [id, trial] of this.fading) {
+      if (trial.staged && !this.startClosed) continue;
+      const sprite = this.actors.get(id)?.sprite;
+      if (!sprite) {
+        this.fading.delete(id);
+        continue;
+      }
+      trial.left -= spent;
+      if (trial.left <= 0) this.trialGone(id);
+      else if (trial.left < TRIAL_FADE_MS) sprite.setAlpha(trial.alpha * (trial.left / TRIAL_FADE_MS));
+    }
+  }
+
+  /** A trial that does not hold, gone (D276); a staged one stays gone in this visit. */
+  private trialGone(id: string): void {
+    const trial = this.fading.get(id);
+    this.fading.delete(id);
+    const sprite = this.actors.get(id)?.sprite;
+    if (!sprite) return;
+    this.tweens.killTweensOf(sprite);
+    sprite.setVisible(false);
+    if (trial?.staged) this.fadedStaged.add(id);
+    this.publish();
+  }
+
+  /** A trial that steps (the birth level, D268) has its seconds counted from its last
+   * step (D276). */
+  private trialStepped(id: string, tick: number): void {
+    const trial = this.fading.get(id);
+    if (!trial) return;
+    trial.left = TRIAL_SEEN_MS + TRIAL_FADE_MS;
+    trial.tick = tick;
+    this.actors.get(id)?.sprite.setAlpha(trial.alpha);
+  }
+
   /** The familiars as they were before the run (D262, D268): the trials the run called
    * gone, the child's familiar on its cell, the others' as the level has them, no
    * footprint, no plate lit, the book's band empty. */
@@ -2778,6 +2854,7 @@ class LevelScene extends Phaser.Scene {
       this.actors.get(id)?.sprite.destroy();
       this.actors.delete(id);
       this.creatures.delete(id);
+      this.fading.delete(id);
     }
     this.called.clear();
     for (const object of this.footprints) object.destroy();
@@ -2824,6 +2901,10 @@ class LevelScene extends Phaser.Scene {
         this.actors.set(id, { sprite, tile: at, facing: 'down', sight: 0 });
         this.creatures.set(id, look);
         this.called.add(id);
+        // A trial with no name the book took, or no colour of its kind, fades (D276).
+        if (data.holds !== true) {
+          this.fading.set(id, { left: TRIAL_SEEN_MS + TRIAL_FADE_MS, alpha: sprite.alpha, tick, staged: false });
+        }
         if (!instant) {
           const alpha = sprite.alpha;
           sprite.setAlpha(0);
@@ -2848,6 +2929,7 @@ class LevelScene extends Phaser.Scene {
       }
       case 'held': {
         // The step that would leave the circle, held at its edge (D268).
+        this.trialStepped(event.actor, tick);
         const actor = this.actors.get(event.actor);
         const facing = isFacing(data.facing) ? data.facing : 'down';
         if (actor && !instant) {
@@ -2866,6 +2948,7 @@ class LevelScene extends Phaser.Scene {
       }
       case 'born': {
         const id = String(data.id);
+        this.fading.delete(id);
         const look = this.creatures.get(id);
         if (look && look.look !== 'living') {
           const sheet = look.color ? sheetOf(look.kind, look.color) : look.sheet;
@@ -2957,7 +3040,9 @@ class LevelScene extends Phaser.Scene {
     this.actors.delete(id);
     this.creatures.delete(id);
     this.called.delete(id);
-    if (instant) {
+    this.fading.delete(id);
+    // A trial already faded is not there to dissolve (D276).
+    if (instant || !actor.sprite.visible) {
       actor.sprite.destroy();
       return;
     }
@@ -3024,6 +3109,8 @@ class LevelScene extends Phaser.Scene {
     // Each piece is read for as long as it takes, the longest hold at most (D274).
     const pieces = toldPieces(text);
     const reading = pieces.map((piece) => Math.min(readingMs(piece), TOLD_MOST));
+    // Words told in the tick by another before are read first (D264).
+    const later = this.toldMs > 0;
     if (who === 'book') {
       this.bookSaid = { words: toldWhole(text), code: '', look: 'told' };
     } else {
@@ -3034,18 +3121,20 @@ class LevelScene extends Phaser.Scene {
         const last = pieces[pieces.length - 1] ?? text;
         this.speech.say(last, tick, this.sayTicks(last), sprite, who);
       } else {
-        let after = 0;
+        let after = this.toldMs;
         const said = pieces.map((piece, index) => {
           const one = { text: piece, ticks: this.sayTicks(piece), after: after / this.playback.speed };
           after += reading[index] ?? 0;
           return one;
         });
-        this.speech.sayPieces(said, tick, sprite, who, () => play('say'));
+        if (later) this.speech.sayAfter(said, sprite, who, () => play('say'));
+        else this.speech.sayPieces(said, tick, sprite, who, () => play('say'));
+        this.toldMs = after;
       }
     }
     if (!instant) {
-      play('say');
-      const whole = who === 'book' ? Math.min(readingMs(toldWhole(text)), TOLD_MOST) : reading.reduce((sum, ms) => sum + ms, 0);
+      if (who === 'book' || !later) play('say');
+      const whole = who === 'book' ? Math.min(readingMs(toldWhole(text)), TOLD_MOST) : this.toldMs;
       this.playback.holdTick(whole, whole);
     }
   }
@@ -3112,6 +3201,7 @@ class LevelScene extends Phaser.Scene {
         if (!from || !to) return;
         actor.tile = to;
         actor.facing = facing;
+        this.trialStepped(event.actor, tick);
         // A racer's flown step, a third of a walked one, and no tap (D185, D189), gliding
         // on from the step before with no rest (D259).
         const flown = event.data.flying === true;
@@ -3314,6 +3404,10 @@ class LevelScene extends Phaser.Scene {
     const trials = creatures.filter((one) => /^[^:]+:(good|pale|spark):/.test(one));
     if (trials.length > 0) dataset.trials = trials.join(';');
     else delete dataset.trials;
+    // The trials seen that do not hold, which fade (D276).
+    const fading = [...this.fading.keys()].filter((id) => this.actors.get(id)?.sprite.visible);
+    if (fading.length > 0) dataset.trialsFading = fading.join(',');
+    else delete dataset.trialsFading;
     if (this.litPlates.size > 0) dataset.lit = [...this.litPlates].sort().join(',');
     else delete dataset.lit;
     if (this.shoved.size > 0) dataset.shoved = [...this.shoved].sort().join(',');
@@ -3477,6 +3571,9 @@ export async function startScene(
         },
         firstWay() {
           scene.shownWay = null;
+        },
+        cardClosed() {
+          scene.cardClosed();
         },
         reset() {
           playback.reset();

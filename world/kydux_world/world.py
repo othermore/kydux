@@ -1701,6 +1701,9 @@ def _trial(world: World, familiar: familiars.Familiar) -> None:
             "pale": pale,
             "reason": seen["reason"],
             "dissolved": dissolved,
+            # Whether the trial holds, seen as long as the run is: with a name the book
+            # took and a colour of its kind (D276); the page fades one that does not.
+            "holds": seen["name"] is not None and seen["color"] is not None,
         },
     )
     given = familiar.__dict__.get("_k_color")

@@ -500,3 +500,15 @@ test("a story draws the game's own familiar, a white crow, and the mate's copy o
   // The room-mate's copy is the child's kind in another of its colours (D268).
   await expect(scene).toHaveAttribute('data-creatures', /(^|;)mate_familiar:[^:;]*:Crow:black:/);
 });
+
+test("the trail's step 8: the friend's bubble has its tail over her head (D306)", async ({ page }) => {
+  await seedWizard(page);
+  await page.goto('/#story/the-trail');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await storyNext(page, 7);
+  await expect(scene).toHaveAttribute('data-speaker', 'friend', { timeout: ciTimes(30_000) });
+  await expect(scene).toHaveAttribute('data-tail', /./);
+  const tail = Number(await scene.getAttribute('data-tail'));
+  expect(Math.abs(tail)).toBeLessThanOrEqual(0.25);
+});

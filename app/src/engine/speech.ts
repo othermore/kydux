@@ -28,6 +28,7 @@ import {
   bubbleBelow,
   bubbleBeside,
   bubbleMiddle,
+  bubbleReach,
   bubbleRoom,
   bubbleShift,
   bubbleTip,
@@ -111,6 +112,8 @@ export class Speech {
   private speaker: Phaser.GameObjects.Sprite | null = null;
   /** How much larger the words are drawn than the scene's pixels (wordsScale). */
   private scale = 1;
+  /** Where the bubble's tail's tip is against the box's middle, in its own pixels. */
+  private tipAt = 0;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -194,6 +197,11 @@ export class Speech {
     else if (dataset.wordsOver !== over) dataset.wordsOver = over;
     if (place === undefined) delete dataset.wordsPlace;
     else if (dataset.wordsPlace !== place) dataset.wordsPlace = place;
+    // How far the bubble's tail's tip is from who speaks, in cells across (D306).
+    const who = this.speaker ?? this.parts.wizard();
+    const tail = this.bubble ? ((this.bubble.x + this.tipAt * this.scale - who.x) / TILE).toFixed(2) : undefined;
+    if (tail === undefined) delete dataset.tail;
+    else if (dataset.tail !== tail) dataset.tail = tail;
   }
 
   /** The bubble's box and tail with the figure, for the camera to keep in view: the
@@ -496,13 +504,18 @@ export class Speech {
       this.besideBubble(beside, over, words, width, height, pad, who, plain, tick, ticks);
       return;
     }
-    const shift = below ? 0 : bubbleShift(aboveBox(), avoid, this.parts.width);
+    // The box moves off others no farther than its tail reaches who speaks (D306).
+    const half = (width / 2 + 4) * scale;
+    const edge = bubbleMiddle(over.x, half, bubbleRoom(this.parts.width, this.parts.shownSides())) - over.x;
+    const reach = bubbleReach(width, scale, edge);
+    const shift = below ? 0 : bubbleShift(aboveBox(), avoid, this.parts.width, reach);
     const top = below ? tail : -height - tail;
     this.place = { width, below, shift, side: below ? 'below' : 'above', bottom: 0 };
     const [x, y] = this.anchor();
     // The tail's tip is at the anchor, over who speaks, even where the box is held
     // in from a side or moved off someone.
     const tip = bubbleTip(over.x - x, scale, width);
+    this.tipAt = tip;
     const base = below ? top : top + height;
     const box = this.scene.add.graphics();
     box.fillStyle(0xffffff, 1).lineStyle(2, 0x1f2330, 1);

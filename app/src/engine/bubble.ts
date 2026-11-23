@@ -83,19 +83,42 @@ export function bubbleBeside(below: Box, keep: Box | null, speaker: number): 'le
 }
 
 /** How far sideways a bubble above who speaks moves to clear the figures it would cover,
- * the shorter way that stays inside the scene and covers no one; 0 where none does. */
-export function bubbleShift(above: Box, figures: readonly Box[], sceneWidth: number): number {
+ * the shorter way that stays inside the scene and covers no one; 0 where none does. It
+ * moves `most` at the most, as far as its tail still reaches who speaks (D306): where no
+ * way clears within it, the shorter way as far as `most`, the box covering what it must. */
+export function bubbleShift(
+  above: Box,
+  figures: readonly Box[],
+  sceneWidth: number,
+  most = Number.POSITIVE_INFINITY,
+): number {
   const covered = figures.filter((figure) => meets(above, figure));
   if (covered.length === 0) return 0;
   const gap = 6;
   const right = Math.max(...covered.map((figure) => figure.right)) + gap - above.left;
   const left = Math.min(...covered.map((figure) => figure.left)) - gap - above.right;
+  const inside = (dx: number) => above.left + dx >= 0 && above.right + dx <= sceneWidth;
   const clear = (dx: number) => {
     const moved = { ...above, left: above.left + dx, right: above.right + dx };
-    return moved.left >= 0 && moved.right <= sceneWidth && !figures.some((figure) => meets(moved, figure));
+    return inside(dx) && !figures.some((figure) => meets(moved, figure));
   };
-  const ways = [right, left].filter(clear).sort((one, other) => Math.abs(one) - Math.abs(other));
-  return ways[0] ?? 0;
+  const shorter = (one: number, other: number) => Math.abs(one) - Math.abs(other);
+  const ways = [right, left].filter((dx) => clear(dx) && Math.abs(dx) <= most).sort(shorter);
+  if (ways[0] !== undefined) return ways[0];
+  if (!Number.isFinite(most)) return 0;
+  // The tail wins: the box moves the shorter way, no farther than the tail reaches.
+  const partway = [right, left]
+    .map((dx) => Math.sign(dx) * Math.min(Math.abs(dx), Math.max(0, most)))
+    .filter(inside)
+    .sort(shorter);
+  return partway[0] ?? 0;
+}
+
+/** How far a bubble's box may move from over who speaks, in the scene's pixels, its tail
+ * still reaching them (D306): half its width less the tail's margin, at its scale, less
+ * what the scene's side already took. */
+export function bubbleReach(width: number, scale: number, edgeTaken: number): number {
+  return Math.max(0, (width / 2 - 12) * scale - Math.abs(edgeTaken));
 }
 
 /** How long words take to read, in milliseconds (D175): 0.8 seconds, and 50

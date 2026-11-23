@@ -6,6 +6,7 @@ import {
   bubbleBeside,
   bubbleMiddle,
   bubbleRoom,
+  bubbleReach,
   bubbleShift,
   bubbleTip,
   bubbleWrap,
@@ -249,5 +250,48 @@ describe('words told in the circle keep off it (D284)', () => {
     const clear = { left: 950, top: 400, right: 1250, bottom: 470 };
     expect(bubbleBeside(clear, circle, 1104)).toBeNull();
     expect(bubbleBeside({ left: 950, top: 493, right: 1250, bottom: 600 }, null, 1104)).toBeNull();
+  });
+});
+
+describe("a bubble's tail is over who speaks (D306)", () => {
+  // The trail, step 8: the friend speaks at (7, 9), the wizard stands at (10, 10), the
+  // camera's fit [[4, 2], [15, 11]] twelve cells wide, so the words wrap at four cells:
+  // a box some 208 pixels wide over the friend, which a figure under its middle meets,
+  // the wizard further right.
+  const TILE = 48;
+  const box = (left: number, top: number, width: number, height: number) => ({
+    left,
+    top,
+    right: left + width,
+    bottom: top + height,
+  });
+  const width = 4 * TILE + 16;
+  const friend = 7.5 * TILE;
+  const above = box(friend - width / 2, 6 * TILE, width, 3 * TILE);
+  const wizard = box(10.5 * TILE - 18, 9 * TILE, 36, 44 + TILE);
+  const between = box(8 * TILE - 18, 7.5 * TILE, 36, 44 + TILE);
+
+  it('moves the box off the wizard no farther than its tail reaches the friend', () => {
+    const free = bubbleShift(above, [between, wizard], 20 * TILE);
+    expect(Math.abs(free)).toBeGreaterThan(width / 2 - 12);
+    const reach = bubbleReach(width, 1, 0);
+    const shift = bubbleShift(above, [between, wizard], 20 * TILE, reach);
+    expect(shift).not.toBe(0);
+    expect(Math.abs(shift)).toBeLessThanOrEqual(reach);
+    // The tail's tip, drawn from the box's middle, is over the friend.
+    expect(bubbleTip(-shift, 1, width)).toBe(-shift);
+  });
+
+  it("takes from the reach what the scene's side already took", () => {
+    expect(bubbleReach(208, 1, 0)).toBe(92);
+    expect(bubbleReach(208, 1.5, 0)).toBe(138);
+    expect(bubbleReach(208, 1, -40)).toBe(52);
+    expect(bubbleReach(208, 1, 200)).toBe(0);
+  });
+
+  it('keeps a shift that clears within the reach', () => {
+    const near = box(friend + 60, 7 * TILE, 36, 44);
+    const shift = bubbleShift(above, [near], 20 * TILE, 92);
+    expect(Math.abs(shift)).toBeLessThanOrEqual(92);
   });
 });

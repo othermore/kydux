@@ -1676,7 +1676,8 @@ class Scene:
     voices: dict[str, list[int]] = field(default_factory=dict)
 
     def walks(self, x: int, y: int) -> bool:
-        """Whether the wizard and everyone walks a cell: not a familiars' passage (D270)."""
+        """Whether the wizard and everyone walks a cell: not a familiars' passage (D270), nor
+        a story's own floor (D288)."""
         return self.terrains[self.rows[y][x]]["walk"] is True
 
 
@@ -1702,15 +1703,18 @@ def read_scene(scenes: Path, scene_id: Any, level_id: Any = None) -> Scene:
             raise LevelError(f"{scene_id}: a terrain is one letter, not S or E, with its kind")
         if not isinstance(terrain.get("kind"), str):
             raise LevelError(f"{scene_id}: the terrain {letter} needs its kind")
-        # A familiars' passage is walked by a familiar alone, `"walk": "small"` (D270).
+        # A familiars' passage is walked by a familiar alone, `"walk": "small"` (D270); the
+        # floor the painting shows where no level goes, by a story's figures alone,
+        # `"walk": "story"` (D288).
         raw = terrain.get("walk", False)
-        walk: bool | str = "small" if raw == "small" else bool(raw)
+        walk: bool | str = raw if raw in ("small", "story") else bool(raw)
         terrains[letter] = {
             "kind": terrain["kind"],
             "walk": walk,
             "sight": bool(terrain.get("sight", walk is True)),
-            # Floor flies; a terrain no one walks on flies only when it says so (D186).
-            "fly": walk is True or bool(terrain.get("fly", False)),
+            # Floor flies; a terrain no one walks on flies only when it says so (D186); a
+            # story's floor is a wall or a shelf to a level, and no flight crosses it.
+            "fly": walk is True or (walk != "story" and bool(terrain.get("fly", False))),
         }
     unknown = sorted({char for row in rows for char in row} - set(terrains))
     if unknown:
@@ -1810,7 +1814,7 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
             terrain = scene.terrains[char]
             if terrain["walk"] == "small":
                 line.append(SMALL)
-            elif terrain["walk"]:
+            elif terrain["walk"] is True:
                 line.append(FLOOR)
             elif terrain.get("fly"):
                 line.append(LOW)
@@ -1936,7 +1940,9 @@ def story_on_scene(
     The staging puts the wizard at `wizard`, the camera on `camera`, the light
     over the scene on `light` (`morning`, D124), and each actor at its `at`; an
     actor with no `at` is out of sight until a step makes it appear; the story's
-    `things` place the scene's things or add a door.
+    `things` place the scene's things or add a door. A story's figure stands on and
+    walks the scene's floor, and the floor its terrains keep for a story (`"walk":
+    "story"`, D288), which a level's map has as a wall or a shelf.
     Each step is said by `voice`, `wizard` or an actor, after its actions
     (`do`, one or a list, D103), each done by its `by`, the step's `by`, or its
     speaker: a walk to a tile or through a list of them, each in a straight
@@ -1991,8 +1997,20 @@ def story_on_scene(
     if not (0 <= camera.x < width and 0 <= camera.y < height):
         raise LevelError(f"{story_id}: the camera's tile {camera.x},{camera.y} is off the scene")
 
+    # The floor only a story's figures walk, read from the scene's terrains, since a
+    # level's map has it as a wall or a shelf (D288).
+    told = {
+        Position(x, y)
+        for y, row in enumerate(scene.rows)
+        for x, char in enumerate(row)
+        if scene.terrains[char]["walk"] == "story"
+    }
+
     def walked(tile: Position, flying: bool = False) -> bool:
-        """A tile a figure stands on, or, `flying`, flies over: a low cell too (D186)."""
+        """A tile a figure stands on, or, `flying`, flies over: a low cell too (D186), and
+        a story's own floor (D288)."""
+        if tile in told:
+            return True
         inside = 0 <= tile.y < height and 0 <= tile.x < width
         char = grid[tile.y][tile.x] if inside else WALL
         return char not in (WALL, SHELF) and (flying or char != LOW)

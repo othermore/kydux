@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 from kydux_world import api
-from kydux_world.level import Level
+from kydux_world.level import Level, on_scene, read_scene
 from kydux_world.run import run_code
 from wizard_words import for_wizard
 
@@ -288,3 +288,32 @@ def test_a_forbidden_cell_s_reason_has_its_words_in_every_language(directory):
         words = json.loads((ROOT / "i18n" / f"{lang}.json").read_text(encoding="utf-8"))
         for reason in reasons:
             assert words["blocked"].get(reason), f"blocked.{reason} in {lang}"
+
+
+#: The passage's two levels' maps, as the world reads them (D288): the story's floor of
+#: their scene, the landing, the back stairs and the floor before the room's crates, is in
+#: neither.
+PASSAGE_LEVEL_MAP = [
+    "####################",
+    "####################",
+    "######===...===#####",
+    "######==......=#####",
+    "#############,######",
+    "#############,######",
+    "#############,######",
+    "#############,######",
+    "##########,,,,######",
+    "##########,#########",
+    "##########,#########",
+    "##########,#########",
+    "##.#######,#########",
+    "#........S.........#",
+    "#..................#",
+]
+
+
+@pytest.mark.parametrize("level_id", ["the-small-passage", "the-forgotten-room"])
+def test_the_passage_s_levels_have_their_maps_letter_for_letter(level_id):
+    data = json.loads((CONTENT / level_id / "level.json").read_text(encoding="utf-8"))
+    built = on_scene(data, read_scene(ROOT / "content" / "scenes", data["scene"], level_id))
+    assert built["map"] == PASSAGE_LEVEL_MAP

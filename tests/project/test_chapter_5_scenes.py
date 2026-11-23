@@ -65,3 +65,18 @@ def test_the_hall_s_six_levels_and_the_passage_s_two_open_with_the_wizard_facing
     for level in [*hall, "the-small-passage", "the-forgotten-room"]:
         data = json.loads((CONTENT / "levels" / level / "level.json").read_text())
         assert data["facing"] == "up", level
+
+
+def test_the_passage_s_story_floor_is_its_landing_its_stairs_and_the_room_s_front():
+    """D288: `l`, the landing and the back stairs, and `v`, the floor before the crates
+    and the stool, are walked by a story's figures alone."""
+    folder = CONTENT / "scenes" / "the-tower-passage"
+    scene = json.loads((folder / "scene.json").read_text())
+    assert scene["terrains"]["l"] == {"kind": "wall", "walk": "story", "sight": False}
+    assert scene["terrains"]["v"] == {"kind": "furniture", "walk": "story", "sight": True}
+    rows = (folder / "map.txt").read_text().split()
+    told = {
+        (x, y): char for y, row in enumerate(rows) for x, char in enumerate(row) if char in "lv"
+    }
+    landing = {(x, 3) for x in range(2, 6)} | {(2, y) for y in range(4, 9)}
+    assert told == {**{cell: "l" for cell in landing}, (6, 3): "v", (7, 3): "v"}

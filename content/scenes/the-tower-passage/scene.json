@@ -9,6 +9,16 @@
       "kind": "passage",
       "walk": "small",
       "sight": true
+    },
+    "l": {
+      "kind": "wall",
+      "walk": "story",
+      "sight": false
+    },
+    "v": {
+      "kind": "furniture",
+      "walk": "story",
+      "sight": true
     }
   },
   "voices": {

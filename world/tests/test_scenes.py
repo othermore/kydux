@@ -168,6 +168,34 @@ def test_a_terrain_lets_the_wizard_walk_or_not_and_sight_pass_or_not(tmp_path):
     assert run_code(level, round_it).status == "won"
 
 
+def test_a_story_s_floor_is_to_a_level_what_it_is_with_walk_false(tmp_path):
+    """D288: a terrain whose walk is "story" is read with no sight and no flight where it
+    says none, and a level on the scene has, to the letter, the map it has with the
+    terrain not walked."""
+    told = {
+        **GARDEN_JSON,
+        "terrains": {
+            **GARDEN_JSON["terrains"],
+            "f": {"kind": "fence", "walk": "story", "sight": True},
+            "h": {"kind": "hedge", "walk": "story", "fly": True},
+        },
+    }
+    folder = tmp_path / "yard"
+    folder.mkdir()
+    (folder / "map.txt").write_text("\n".join(GARDEN), encoding="utf-8")
+    (folder / "scene.json").write_text(json.dumps(told), encoding="utf-8")
+    scene = read_scene(tmp_path, "yard")
+    assert scene.terrains["f"] == {"kind": "fence", "walk": "story", "sight": True, "fly": False}
+    assert scene.terrains["h"] == {"kind": "hedge", "walk": "story", "sight": False, "fly": False}
+    assert not scene.walks(3, 1)
+    built = on_scene(part(start=[1, 2], end=[5, 2]), scene)
+    (folder / "scene.json").write_text(json.dumps(GARDEN_JSON), encoding="utf-8")
+    plain = on_scene(part(start=[1, 2], end=[5, 2]), read_scene(tmp_path, "yard"))
+    assert built["map"] == plain["map"]
+    assert built["map"][1] == "#..=..#" and built["map"][3] == "#....##"
+    assert built["walked"] == plain["walked"] == [".", "g", "p"]
+
+
 def test_the_page_gets_the_scene_s_letters_kinds_and_props(tmp_path):
     folder = tmp_path / "yard"
     folder.mkdir()

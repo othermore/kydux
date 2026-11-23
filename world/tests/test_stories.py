@@ -522,3 +522,52 @@ def test_only_a_thing_the_wizard_carries_is_staged_hidden():
             [{"who": "voice"}],
             things=[{"kind": "door", "id": "door_1", "at": [2, 2], "hidden": True}],
         )
+
+
+#: A room whose landing and stairs the painting shows and no level walks: `l`, a wall to a
+#: level, and `v`, the floor before the crates, a shelf to it; `u` is furniture (D288).
+LANDING = Scene(
+    "landing",
+    ("#######", "#lllvu#", "#l#...#", "#l#...#", "#######"),
+    {
+        **DEFAULT_TERRAINS,
+        "u": {"kind": "furniture", "walk": False, "sight": True},
+        "l": {"kind": "wall", "walk": "story", "sight": False, "fly": False},
+        "v": {"kind": "furniture", "walk": "story", "sight": True, "fly": False},
+    },
+)
+
+
+def on_the_landing(steps, at=(4, 2), things=()):
+    data = {
+        "id": "down-the-stairs",
+        "scene": "landing",
+        "wizard": [5, 3],
+        "actors": [{"id": "rinlo", "kind": "friend", "at": list(at)}],
+        "things": list(things),
+    }
+    return story_on_scene({**data, "steps": steps}, LANDING)
+
+
+def test_a_story_s_figure_stands_on_and_walks_a_story_s_floor():
+    """D288: the floor a story alone walks is floor to its figures, read from the scene;
+    the level's map built under it keeps it a wall and a shelf."""
+    story = on_the_landing(
+        [by("rinlo", [{"walk": [[4, 1], [1, 1], [1, 3]], "vanish": True}])], at=(4, 2)
+    )
+    assert story["world"]["map"][1:4] == ["####==#", "###...#", "###..S#"]
+    on_the_landing([by("rinlo", {"walk": [1, 1]})], at=(4, 1))
+    # A story's door stands on it: shut, it stops a walk; opened, it lets one through.
+    door = {"kind": "door", "id": "side", "at": [3, 1], "open": False}
+    with pytest.raises(LevelError, match="stopped at 3,1"):
+        on_the_landing([by("rinlo", {"walk": [1, 1]})], at=(4, 1), things=[door])
+    on_the_landing(
+        [by("rinlo", [{"open": "side"}, {"walk": [[1, 1], [1, 3]], "vanish": True}])],
+        at=(4, 1),
+        things=[door],
+    )
+    # Furniture that is no story's floor is refused, as ever.
+    with pytest.raises(LevelError, match="rinlo stands on no floor"):
+        on_the_landing([by("rinlo", {"walk": [4, 1]})], at=(5, 1))
+    with pytest.raises(LevelError, match="stopped at 5,1"):
+        on_the_landing([by("rinlo", {"walk": [[4, 1], [5, 1]]})], at=(4, 2))

@@ -320,7 +320,9 @@ it is walked on (`walk`), seen across (`sight`) and flown over (`fly`): a
 low terrain, water or a hedge, is flown over and not walked on; a high one,
 a tree or a wall, neither (D186); a terrain whose `walk` is `"small"`, a
 familiars' passage, is walked on by a familiar alone, and the wizard bumps
-there with the terrain's kind (D270).
+there with the terrain's kind (D270); a terrain whose `walk` is `"story"`
+is floor the painting shows where no level goes: a wall to a level, or a
+shelf where it is seen across, and floor to a story's figures (D288).
 
 The child's code holds `wizard` and every thing and actor of the level by
 its id. Everything it holds is read-only to it (D20). Its errors are
@@ -4239,28 +4241,28 @@ one overturns stays, marked as superseded.
   is.
 - **D270 — A familiar's steps are ticks; some cells only a familiar enters; it picks up
   when told; what it sees, the wizard finds.** Decided 2026-11-17 from the design.
-  `World.act` takes an `actor` (`"wizard"` by default): a familiar's `move_up`, `move_down`,
-  `move_left` and `move_right` are the wizard's `_move` with the familiar as the one that
-  walks, a cell a tick, at twice a person's pace (D277), a bump on what blocks and on the
-  wizard, on an actor and on another
-  trial; a count of zero walks nothing and costs nothing. `check_consistency` asks one
-  acting event for each tick (the wizard's, a familiar's, or the world's own after the
-  program) and that each one's steps follow on. A trial moves only in the `birth` level;
-  before its `minka` a move is `blocked`, `not_here`. The role `familiar` in `api.py`:
-  `familiar.name`, `familiar.color`, `familiar.position` (`x`, `y`), `familiar.move_up`,
+  `World.act` takes an `actor` (`"wizard"` by default): a familiar's `move_up`,
+  `move_down`, `move_left` and `move_right` are the wizard's `_move` with the familiar as
+  the one that walks, a cell a tick, at twice a person's pace (D277), a bump on what
+  blocks and on the wizard, on an actor and on another trial; a count of zero walks
+  nothing and costs nothing. `check_consistency` asks one acting event for each tick (the
+  wizard's, a familiar's, or the world's own after the program) and that each one's steps
+  follow on. A trial moves only in the `birth` level; before its `minka` a move is
+  `blocked`, `not_here`. The role `familiar` in `api.py`: `familiar.name`,
+  `familiar.color`, `familiar.position` (`x`, `y`), `familiar.move_up`,
   `familiar.move_down`, `familiar.move_left`, `familiar.move_right`, `familiar.pick_up`
-  (D278). A scene's terrain with
-  `"walk": "small"` is entered by a familiar and not by the wizard, who bumps there with the
-  terrain's kind and a thought of its own. A thing kind `thread` is in `THING_KINDS` and
-  `CARRIED_KINDS`; a familiar told to `pick_up` takes every carried kind of thing on its
-  cell (the familiar's `pick_up` event, D278) and carries it; the wizard has it only when
-  `minka` brings the familiar back (D262). A zone's things
-  are found from within it (D196) by the wizard **or by its living familiar**, and
-  `find_all` orders them as ever, nearest to the wizard first. A thing kind `trail` is a
-  thread's end on the floor: not carried, walked over, found by no one. A thing kind `plate`
-  lies in the floor, is walked over, and is lit when a familiar ends a move on it (the event
-  `lit`, the plate's state `lit`); the three plates' ids are `moon`, `sun` and `star`. Rules
-  out a familiar that moves without ticks and a wizard that sees through walls without it.
+  (D278). A scene's terrain with `"walk": "small"` is entered by a familiar and not by the
+  wizard, who bumps there with the terrain's kind and a thought of its own; one with
+  `"walk": "story"` by a story's figures alone (D288). A thing kind `thread` is in
+  `THING_KINDS` and `CARRIED_KINDS`; a familiar told to `pick_up` takes every carried kind
+  of thing on its cell (the familiar's `pick_up` event, D278) and carries it; the wizard
+  has it only when `minka` brings the familiar back (D262). A zone's things are found from
+  within it (D196) by the wizard **or by its living familiar**, and `find_all` orders them
+  as ever, nearest to the wizard first. A thing kind `trail` is a thread's end on the
+  floor: not carried, walked over, found by no one. A thing kind `plate` lies in the
+  floor, is walked over, and is lit when a familiar ends a move on it (the event `lit`,
+  the plate's state `lit`); the three plates' ids are `moon`, `sun` and `star`. Rules out
+  a familiar that moves without ticks and a wizard that sees through walls without it.
 - **D271 — The goals and the explanations of the chapter.** Decided 2026-11-17 by the
   designer. Goals (`goals.py`, each with its `params` for the page): `trial` (at the
   program's end the circle holds `count` trials of a first-year kind, each `named` and
@@ -4565,3 +4567,16 @@ one overturns stays, marked as superseded.
   sharp. It is the one mask by difference that is not 0 or 1 (D155): a thing lying in the
   floor is under every figure, and nothing is seen through it. Rules out a glow cut on a
   cell's line or on its box's, and a soft mask on anything a figure walks behind.
+- **D288 — Some cells only a story's figure walks.** Decided 2026-11-19 by the designer,
+  for the owner's (*Rinlo tiene que aparecer desde arriba, abrir la puerta y bajar las
+  escaleras*). A scene's terrain with `"walk": "story"` is floor the painting shows where
+  no level goes. In a level's map it is what it is with `"walk": false`, a wall or, with
+  `"sight": true`, a shelf: the wizard, a familiar, a flight, the sight, the plan and the
+  goals read it so, and a level on the scene is, to the letter, the level it is without
+  it. A story's staging (`story_on_scene`) counts it floor: a figure of a story stands on
+  it, walks over it, and a door of the story stands on it. The sweep counts it among the
+  cells walked on. `the-tower-passage` has two such terrains: `l`, the landing outside the
+  forgotten room and the back stairs (`"kind": "wall", "sight": false`), on (2, 3) to
+  (5, 3) and (2, 4) to (2, 8); and `v`, the floor before the room's crates and stool
+  (`"kind": "furniture", "sight": true`), on (6, 3) and (7, 3). Rules out a level's cell
+  opened to make room for a story, and a figure of a story staged on a wall.

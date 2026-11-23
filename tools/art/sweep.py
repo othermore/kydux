@@ -141,15 +141,20 @@ class Scene:
 
 def walks(scene: str, small: bool = False) -> np.ndarray:
     """The cells walked on, from the scene's map and its terrains: the cells the
-    wizard is refused too, which the others walk on (D84); with `small`, the cells only
-    a familiar walks on, a terrain whose `walk` is "small" (D270)."""
+    wizard is refused too, which the others walk on (D84), and those only a story's
+    figures walk on, a terrain whose `walk` is "story" (D288); with `small`, the cells
+    only a familiar walks on, a terrain whose `walk` is "small" (D270)."""
     folder = CONTENT / "scenes" / scene
     marks = (folder / "map.txt").read_text(encoding="utf-8").split()
     terrains = json.loads((folder / "scene.json").read_text(encoding="utf-8"))["terrains"]
     if small:
         walk = {letter for letter, terrain in terrains.items() if terrain.get("walk") == "small"}
     else:
-        walk = {letter for letter, terrain in terrains.items() if terrain.get("walk") is True}
+        walk = {
+            letter
+            for letter, terrain in terrains.items()
+            if terrain.get("walk") is True or terrain.get("walk") == "story"
+        }
         walk |= {"."}
     return np.array([[char in walk for char in row] for row in marks])
 

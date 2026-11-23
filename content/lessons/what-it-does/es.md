@@ -17,7 +17,7 @@ class Crow:
 
     def caw(self, times):
         for i in range(times):
-            print("¡Grraaa!")
+            print("¡Grraaak!")
         self.caws = self.caws + times
         print("(y con eso van", self.caws, "graznidos)")
 ```
@@ -51,7 +51,7 @@ class Crow:
 
     def caw(self, times):
         for i in range(times):
-            print("¡Grraaa!")
+            print("¡Grraaak!")
         self.caws = self.caws + times
         print("(y con eso van", self.caws, "graznidos)")
 

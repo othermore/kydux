@@ -869,7 +869,8 @@ class LevelScene extends Phaser.Scene {
       this.creatures.set('familiar', living.creature);
       this.actors.set('familiar', { sprite, tile: living.tile, facing: living.facing, sight: 0 });
     }
-    this.wizard = this.figure('wizard', WIZARD_KEY, this.map.start, 'down').setDepth(4);
+    // The wizard faces the way its level says (D286).
+    this.wizard = this.figure('wizard', WIZARD_KEY, this.map.start, this.map.facing).setDepth(4);
     // Fixed over the camera's view each frame (lit), so that no zoom or drag shows its edge.
     this.lightCover = this.add.rectangle(0, 0, 1, 1, 0x000000, 0).setOrigin(0, 0).setDepth(lightDepth(this.map.height));
     this.light.set(this.lightName());
@@ -1260,7 +1261,7 @@ class LevelScene extends Phaser.Scene {
     }
     this.restartFamiliars();
     this.paintHour();
-    this.placeWizard(this.map.start, 'down');
+    this.placeWizard(this.map.start, this.map.facing);
     this.wizard.setAlpha(1).setVisible(!this.inEnchanted(this.map.start));
     // In a story, who is in the air from the start (D185).
     for (const id of this.options.story?.flying ?? []) {

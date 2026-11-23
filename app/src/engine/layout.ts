@@ -161,6 +161,8 @@ export interface Layout {
   width: number;
   height: number;
   start: Tile;
+  /** The way the wizard faces at the start, the level's `facing` or down (D286). */
+  facing: Facing;
   /** Marker letters on the map that no thing or actor stands on, like a goal's. */
   markers: [string, Tile][];
   things: ThingLayout[];
@@ -438,6 +440,7 @@ export function layout(level: LevelJson): Layout {
     width: Math.max(1, rows[0]?.length ?? 1),
     height: Math.max(1, rows.length),
     start,
+    facing: facingOf(level.facing),
     markers,
     reaches,
     things,
@@ -488,6 +491,12 @@ function circleOf(level: LevelJson): Pick<Layout, 'circle'> {
   if (!Array.isArray(box) || box.length !== 4) return {};
   const [x0, y0, x1, y1] = box.map(Number) as [number, number, number, number];
   return { circle: [[x0, y0], [x1, y1]] };
+}
+
+/** A level's way for its wizard at the start (D286): one of the four, down where it says
+ * none; the world refuses any other. */
+function facingOf(value: unknown): Facing {
+  return value === 'up' || value === 'left' || value === 'right' ? value : 'down';
 }
 
 /** In a living level, the game's familiar where it stands at the start (D269). */

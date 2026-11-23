@@ -1060,8 +1060,13 @@ class Wizard(Child):
         # `ring`: the ring whose cell the wizard flew into, the way it was going and the
         # cell it flew in from, so that flying on the same way out of it goes through the
         # ring, along its way or against it (D187, D219).
+        # It faces the way its level says, down where it says none (D286).
         self._set(
-            world=world, position=world.level.start, facing=Direction.DOWN, flying=False, ring=None
+            world=world,
+            position=world.level.start,
+            facing=Direction(world.level.facing),
+            flying=False,
+            ring=None,
         )
 
     def __repr__(self) -> str:

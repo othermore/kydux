@@ -3692,20 +3692,21 @@ one overturns stays, marked as superseded.
   alone and the words stay above. Rules out folding the box under the child's eyes, which
   hides the goals' marks while the run is read, and sliding the words down over the figure.
 - **D241 — The scene keeps the way each figure faces, and never reads it back from a
-  frame.** Decided 2026-11-15, from the owner's (*El mago de color naranja sigue vibrando. Y
-  cuando lo paro … en algunos puntos la del mago queda borrosa (congelada pero como
+  frame.** Decided 2026-11-15, from the owner's (*El mago de color naranja sigue vibrando.
+  Y cuando lo paro … en algunos puntos la del mago queda borrosa (congelada pero como
   duplicada o triplicada). Algo hay raro. Como si estuviese todo el tiempo cambiando de
-  mirar al frente a mirar a los lados*). The scene keeps the way each figure faces from the
-  moment it is placed, and sets it where it turns the figure (`face`, the one place a figure
-  is faced). Whatever asks which way a figure faces is told the way kept: its flying frame,
-  its landing, the side of a ring's plane it is on, the rows of a cast and where its light
-  flies, a bump's nudge. No frame's number is turned back into a way: a sheet's rows are in
-  no order a division could read, the wizard's flying rows being 14 to 17, after the rows of
-  its acts, where a division by four reads row 14 as facing right and row 16 as facing down,
-  and a figure in the air, whose frame is set every frame from the way it faces, would be
-  drawn turning between two ways sixty times a second. The scene says the wizard's way and
-  its frame as drawn (`data-wizard-facing`, `data-wizard-frame`). Rules out a way read from
-  a frame's number, and a rule that holds only while every sheet keeps its rows in fours.
+  mirar al frente a mirar a los lados*). The scene keeps the way each figure faces from
+  the moment it is placed, the wizard as its level says (D286), and sets it where it turns
+  the figure (`face`, the one place a figure is faced). Whatever asks which way a figure
+  faces is told the way kept: its flying frame, its landing, the side of a ring's plane it
+  is on, the rows of a cast and where its light flies, a bump's nudge. No frame's number
+  is turned back into a way: a sheet's rows are in no order a division could read, the
+  wizard's flying rows being 14 to 17, after the rows of its acts, where a division by
+  four reads row 14 as facing right and row 16 as facing down, and a figure in the air,
+  whose frame is set every frame from the way it faces, would be drawn turning between two
+  ways sixty times a second. The scene says the wizard's way and its frame as drawn
+  (`data-wizard-facing`, `data-wizard-frame`). Rules out a way read from a frame's number,
+  and a rule that holds only while every sheet keeps its rows in fours.
 - **D242 — A figure in the air hovers whenever it is seen, and Stop silences its wind.**
   Decided 2026-11-15 by the owner (*no me gusta que queden completamente congelados, he
   cambiado de opinión. Parar detendrá el programa, pero mantendrá la animación de volar en
@@ -4539,3 +4540,13 @@ one overturns stays, marked as superseded.
   in a run keeps D276's four seconds, shorter as the speed is higher. The walkthrough's
   start picture of *El círculo* shows the hare. Rules out a staged trial gone before the
   child has looked at the scene, and one that stands the whole level.
+- **D286 — A level says which way its wizard faces when it opens.** Decided 2026-11-19 by
+  the owner (*El mago debería estar mirando hacia el círculo, no hacia abajo*). A level's
+  `facing` is `up`, `down`, `left` or `right`, and `down` where it has none. It is the way
+  the wizard faces at tick 0: in the world, which reads it wherever it reads the way a
+  wizard faces, and on the page, when the level opens, when a run is started again or
+  stopped, and on the timeline's first tick (D241). A level whose wizard stands still
+  before what the level is about says it: the hall's six levels, whose wizard stands under
+  the circle, and the passage's two, whose wizard stands under the passage's mouth, say
+  `"facing": "up"`. Rules out a wizard with its back to its own familiar's birth, and a
+  turn asked of the child's program only to look the right way.

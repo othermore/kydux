@@ -359,6 +359,8 @@ class Level:
     voices: dict[str, Position] = field(default_factory=dict)
     #: The explanation a fix level's given program stops with (D272), or None.
     fault: str | None = None
+    #: The way the wizard faces at tick 0, one of FACINGS (D286).
+    facing: str = "down"
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Level":
@@ -509,6 +511,10 @@ class Level:
         forbidden_reasons = _forbidden(data.get("forbidden"), level_id, walls, len(rows), width)
         forbidden = frozenset(forbidden_reasons)
 
+        facing = data.get("facing", "down")
+        if facing not in FACINGS:
+            raise LevelError(f"{level_id}: facing is one of {', '.join(FACINGS)}")
+
         own = data.get("own_goals", False)
         source = data.get("goals_source")
         if not isinstance(own, bool) or (source is not None and not isinstance(source, str)):
@@ -547,6 +553,7 @@ class Level:
             small=frozenset(small),
             voices=_voices(data.get("voices"), shape),
             fault=_fault(data.get("fault"), level_id, kind),
+            facing=facing,
         )
         level = replace(
             level,

@@ -47,6 +47,24 @@ def test_the_edge_of_the_map_stops_the_wizard_too():
     assert world.wizard.facing == "left"
 
 
+def test_the_wizard_faces_the_way_its_level_says_before_any_act():
+    """D286: down where the level says none; what reads the way reads the level's."""
+    assert World(ROOM).wizard.facing == "down"
+    level = Level.from_dict(
+        {"id": "room", "map": ["#####", "#S..#", "#...#", "#####"], "facing": "left"}
+    )
+    world = World(level)
+    assert world.wizard.facing == "left"
+    assert repr(world.wizard) == "<wizard at 1, 1 facing left>"
+    world.wizard.say(world.wizard.facing)
+    assert kinds(world) == [("say", {"text": "left"})]
+    run = run_code(level, "wizard.say(wizard.facing)\nwizard.move_left()\n")
+    assert [(e.kind, e.data) for e in run.events if e.kind in ("say", "bump")] == [
+        ("say", {"text": "left"}),
+        ("bump", {"at": [1, 1], "facing": "left", "by": "wall"}),
+    ]
+
+
 def test_the_wizard_turns_even_when_it_cannot_move():
     world = World(ROOM)
     world.wizard.move_up()

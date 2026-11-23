@@ -3,7 +3,8 @@
 // carried from the second level to the last, its name in the texts, its class in the
 // starting code and its sheet on the scene (D265, D266); a kind no first-year has gives a
 // spark and Orla's words (D261); a colour not the kind's own and the grey hare come pale,
-// a white fox whole (D263); the book tries the line (D267); the slate as given stops with
+// a white fox whole (D263); the circle's hare with no colour seen ten seconds after the
+// card at any speed (D285); the wizard facing the circle from the start (D286); the book tries the line (D267); the slate as given stops with
 // the explanation of a missing self (D271); the birth rehearsed, a wrong program left in
 // footprints with nothing born, the birth kept, the level a practice after it and a second
 // familiar halted (D268); Orla's two orders walked and the class kept (D267); a go_to
@@ -333,6 +334,25 @@ test.describe('the trials that hold and those that fade (D276)', () => {
     expect(fox).not.toBeNull();
     expect(fox as number).toBeGreaterThan(1_000);
     expect(fox as number).toBeLessThan(ciTimes(3_000));
+  });
+});
+
+test.describe('the wizard faces the circle (D286)', () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test('in El círculo the wizard faces up when the level opens, at the win and after the run is started again', async ({ page }) => {
+    test.setTimeout(ciTimes(180_000));
+    await open(page, 'the-circle');
+    await expect(scene(page)).toHaveAttribute('data-wizard-facing', 'up');
+    expect(await run(page, solution('the-circle'))).toMatch(/^¡Lo has conseguido/);
+    await expect(scene(page)).toHaveAttribute('data-wizard-facing', 'up');
+    await page.locator('#again').click();
+    await page.locator('#restart').click();
+    await expect(scene(page)).toHaveAttribute('data-restarting', 'true');
+    await expect(scene(page)).not.toHaveAttribute('data-restarting', 'true', { timeout: ciTimes(30_000) });
+    await expect(scene(page)).toHaveAttribute('data-tick', '0');
+    await expect(scene(page)).toHaveAttribute('data-wizard-facing', 'up');
   });
 });
 

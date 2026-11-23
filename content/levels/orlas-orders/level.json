@@ -22,6 +22,7 @@
     10,
     10
   ],
+  "facing": "up",
   "actors": [
     {
       "kind": "teacher",

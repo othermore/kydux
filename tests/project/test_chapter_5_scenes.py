@@ -56,3 +56,12 @@ def test_the_passage_s_small_cells_are_the_trench_s_and_the_wall_hides_the_mouth
     corridor = {(x, y) for x in range(1, 19) for y in (13, 14)}
     room = {(x, 3) for x in range(8, 14)} | {(x, 2) for x in range(9, 12)}
     assert floor == corridor | room | {(2, 12)}
+
+
+def test_the_hall_s_six_levels_and_the_passage_s_two_open_with_the_wizard_facing_up():
+    """D286: the wizard stands still before the circle, or under the passage's mouth."""
+    hall = ["the-circle", "the-name-and-the-colour", "one-line-in-the-book", "the-slate"]
+    hall += ["out-of-the-circle", "orlas-orders"]
+    for level in [*hall, "the-small-passage", "the-forgotten-room"]:
+        data = json.loads((CONTENT / "levels" / level / "level.json").read_text())
+        assert data["facing"] == "up", level

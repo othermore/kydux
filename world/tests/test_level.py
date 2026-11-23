@@ -36,6 +36,19 @@ def test_the_tick_limit_defaults_to_a_thousand():
     assert Level.from_dict(data).tick_limit == 1000
 
 
+def test_a_level_says_which_way_its_wizard_faces_down_where_it_says_none():
+    """D286."""
+    assert Level.from_dict(CORRIDOR).facing == "down"
+    for way in ("up", "down", "left", "right"):
+        assert Level.from_dict({**CORRIDOR, "facing": way}).facing == way
+
+
+@pytest.mark.parametrize("facing", ["north", "Up", 1, None])
+def test_a_level_facing_no_way_is_refused_with_its_id(facing):
+    with pytest.raises(LevelError, match="corridor: facing is one of up, down, left, right"):
+        Level.from_dict({**CORRIDOR, "facing": facing})
+
+
 def test_inside():
     level = Level.from_dict(CORRIDOR)
     assert level.inside(Position(4, 2))

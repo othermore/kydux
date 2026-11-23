@@ -29,6 +29,14 @@ describe('what a level of chapter 3 tells the page', () => {
 });
 
 describe('layout', () => {
+  it("gives the way the level's wizard faces at the start, down where it says none (D286)", () => {
+    expect(layout({ map: ['S.E'] }).facing).toBe('down');
+    for (const facing of ['up', 'down', 'left', 'right'] as const) {
+      expect(layout({ map: ['S.E'], facing }).facing).toBe(facing);
+    }
+    expect(layout({ map: ['S.E'], facing: 'north' }).facing).toBe('down');
+  });
+
   it('says how each door opens (D43)', () => {
     const map = layout({
       id: 'doors',

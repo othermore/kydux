@@ -26,6 +26,7 @@
     10,
     10
   ],
+  "facing": "up",
   "fault": "missing_self",
   "actors": [
     {

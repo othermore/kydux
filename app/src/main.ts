@@ -191,7 +191,7 @@ function lessonRunner(
         const map = layout(level);
         const art = await loadArt(level);
         const figures = [
-          { id: 'wizard', kind: 'wizard', tile: map.start, facing: 'down' },
+          { id: 'wizard', kind: 'wizard', tile: map.start, facing: map.facing },
           ...map.actors
             .filter((actor) => !actor.hidden)
             .map(({ id: actor, kind, tile, facing }) => ({ id: actor, kind, tile, facing: facing as string })),

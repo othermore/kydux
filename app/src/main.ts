@@ -17,7 +17,7 @@ import {
 } from './content/course';
 import { loadGuideText } from './content/guide';
 import { LessonNotFound, loadLesson } from './content/lessons';
-import { loadStory, StoryNotFound } from './content/stories';
+import { loadStory, type Story, StoryNotFound } from './content/stories';
 import { isLevelId, LevelNotFound, loadApiTable, loadLevel, loadLevelText } from './content/levels';
 import { checkedFamiliar, familiarTable, familiarWords, loadFamiliars, writeIntoLevel } from './content/familiar';
 import {
@@ -46,6 +46,7 @@ import type { LessonRunner } from './ui/lessonrun';
 import type { MapScreenParts } from './ui/map';
 import { aboutScreen } from './ui/about';
 import type { Screen } from './ui/screen';
+import type { StoryJoin, StoryScreenParts } from './ui/story';
 import { askNextTip, type Wait, waitingView } from './ui/waiting';
 import { debugging } from './engine/debugging';
 import { lookOf } from './engine/looks';
@@ -285,9 +286,58 @@ async function showLesson(content: HTMLElement, id: string, key: string, from?: 
   }
 }
 
+/** What a story's screen is given (D74): the story, its label, where it leads, its theme
+ * and its still, and the scene's start, its code arriving behind the screen (D214). */
+function storyParts(
+  story: Story,
+  course: Course,
+  id: string,
+  sceneCode: Promise<typeof import('./engine/scene')>,
+): StoryScreenParts {
+  return {
+    story,
+    next: next(course, `story:${id}`),
+    // The game's opening goes on to the creator, or, with a wizard made, to what
+    // follows it (D61).
+    ...(story.opening
+      ? { onward: progress.wizard() ? itemHash(next(course, `story:${id}`) ?? courseStart(course)) : '#wizard' }
+      : {}),
+    label: itemLabel(course, `story:${id}`),
+    // The theme the story opens to, and the music asked for the theme in force at
+    // each step shown (D314); how long it takes to turn to it (D320).
+    theme: themeOf(course, `story:${id}`),
+    hear: (theme) => music.play(theme, 'story'),
+    turning: () => music.turning,
+    // Every part's figure of the familiar is the game's own (D305).
+    startScene: (parent, world, ...rest) =>
+      sceneCode.then(({ startScene }) => startScene(parent, withGamesFamiliar(world), ...rest)),
+    // The opening is read over the welcome's painting of the castle until its scene
+    // is there (D61, D214), its first step with the letter before it (D257).
+    // A story that names the castle as its still tells the steps that say so over it
+    // (D251): the end of the first year.
+    ...(!story.opening && story.still === 'castle'
+      ? { still: { src: `${import.meta.env.BASE_URL}about/welcome-castle.webp`, alt: t('about.hero_alt') } }
+      : {}),
+    ...(story.opening
+      ? {
+          still: { src: `${import.meta.env.BASE_URL}about/welcome-castle.webp`, alt: t('about.hero_alt') },
+          letter: {
+            src: `${import.meta.env.BASE_URL}about/welcome-letter.webp`,
+            title: () => t('story.letter_title'),
+            words: () => t('story.letter_words'),
+            alt: () => t('story.letter_alt'),
+          },
+        }
+      : {}),
+    reload: () => loadStory(id, currentLanguage()),
+  };
+}
+
 /** A story told on its scene (D74): its words come first (D214). The screen waits for
  * the story, the course and its own code; the scene's code arrives behind it, and the
- * screen starts the scene once it is there. */
+ * screen starts the scene once it is there. Once it shows, the course's next item, when
+ * it is a story that goes on from this one in place (D320), is loaded with its still,
+ * and handed to the screen for its last press. */
 async function showStory(content: HTMLElement, id: string, key: string): Promise<void> {
   await familiarKnown();
   const sceneCode = import('./engine/scene');
@@ -301,45 +351,32 @@ async function showStory(content: HTMLElement, id: string, key: string): Promise
       import('./ui/story'),
     ]);
     if (shownRoute !== key) return;
-    show(
-      content,
-      storyScreen({
-        story,
-        next: next(course, `story:${id}`),
-        // The game's opening goes on to the creator, or, with a wizard made, to what
-        // follows it (D61).
-        ...(story.opening
-          ? { onward: progress.wizard() ? itemHash(next(course, `story:${id}`) ?? courseStart(course)) : '#wizard' }
-          : {}),
-        label: itemLabel(course, `story:${id}`),
-        // The theme the story opens to, and the music asked for the theme in force at
-        // each step shown (D314).
-        theme: themeOf(course, `story:${id}`),
-        hear: (theme) => music.play(theme, 'story'),
-        // Every part's figure of the familiar is the game's own (D305).
-        startScene: (parent, world, ...rest) =>
-          sceneCode.then(({ startScene }) => startScene(parent, withGamesFamiliar(world), ...rest)),
-        // The opening is read over the welcome's painting of the castle until its scene
-        // is there (D61, D214), its first step with the letter before it (D257).
-        // A story that names the castle as its still tells the steps that say so over it
-        // (D251): the end of the first year.
-        ...(!story.opening && story.still === 'castle'
-          ? { still: { src: `${import.meta.env.BASE_URL}about/welcome-castle.webp`, alt: t('about.hero_alt') } }
-          : {}),
-        ...(story.opening
-          ? {
-              still: { src: `${import.meta.env.BASE_URL}about/welcome-castle.webp`, alt: t('about.hero_alt') },
-              letter: {
-                src: `${import.meta.env.BASE_URL}about/welcome-letter.webp`,
-                title: () => t('story.letter_title'),
-                words: () => t('story.letter_words'),
-                alt: () => t('story.letter_alt'),
-              },
-            }
-          : {}),
-        reload: () => loadStory(id, currentLanguage()),
-      }),
-    );
+    let joined: StoryJoin | null = null;
+    show(content, storyScreen({ ...storyParts(story, course, id, sceneCode), join: () => joined }));
+    const after = parseItem(next(course, `story:${id}`) ?? '');
+    if (after?.kind !== 'story') return;
+    void loadStory(after.id, currentLanguage())
+      .then(async (later) => {
+        if (later.continues !== id) return;
+        const parts = storyParts(later, course, after.id, sceneCode);
+        if (parts.still) {
+          const picture = new Image();
+          picture.src = parts.still.src;
+          await picture.decode();
+        }
+        if (shownRoute !== key) return;
+        joined = {
+          parts,
+          // The later story is the item and the address with no screen built: the route
+          // finds the one shown (D320).
+          shown: () => {
+            progress.setCurrent(`story:${after.id}`);
+            shownRoute = `story/${after.id}`;
+            location.hash = itemHash(`story:${after.id}`);
+          },
+        };
+      })
+      .catch(() => {});
   } catch (error) {
     if (shownRoute !== key) return;
     if (error instanceof StoryNotFound) notFound(content, 'story', id);

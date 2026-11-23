@@ -264,6 +264,21 @@ export function lineAfter(run: Run, metre: number, beat: number, enters: 'bar' |
   return line === undefined ? start + length : start + line;
 }
 
+/** Where on the audio clock a movement asked for comes in (D316): the first line of what
+ * sounds, a bar's or a beat's, at or after `from` on the clock; `zero`, the clock's time of
+ * what sounds' first beat. */
+export function turnAt(theme: Theme, sounding: Run, zero: number, from: number, enters: 'bar' | 'beat'): number {
+  const beat = secondsPerBeat(theme);
+  return zero + lineAfter(sounding, theme.metre[0], (from - zero) / beat, enters) * beat;
+}
+
+/** How long until the music turns to what was last asked of it, in seconds, from the
+ * clock's `now` (D320): to the line where the movement asked for comes in; null where
+ * nothing turns, no music sounding or what was asked already sounding. */
+export function turnIn(turn: { at: number } | null, now: number): number | null {
+  return turn ? Math.max(0, turn.at - now) : null;
+}
+
 /** The notes that start at a beat from `from` up to `to`, `to` not included, of the
  * loop played over and over: each with its beat counted from the first time round. */
 export function notesBetween(loop: Loop, from: number, to: number): LoopNote[] {
@@ -845,6 +860,13 @@ class Music {
     this.publish();
   }
 
+  /** How long until the music turns to what was last asked of it, in seconds: the
+   * movement asked for of the theme that sounds, coming in at its line (D320); null where
+   * nothing turns. */
+  get turning(): number | null {
+    return this.ctx && this.playing ? turnIn(this.playing.turn, this.ctx.currentTime) : null;
+  }
+
   /** What the page asked to play, and whether it plays. */
   get state(): { music: string; theme?: string; movement?: string; heard?: Heard } {
     const music = this.volume === 0 ? 'off' : !this.unlocked ? 'waiting' : this.playing ? 'playing' : 'still';
@@ -954,10 +976,8 @@ class Music {
       return;
     }
     const run = runOf(playing.theme, named);
-    const beat = secondsPerBeat(playing.theme);
-    const from = (Math.max(playing.scheduled, ctx.currentTime) - playing.zero) / beat;
-    const line = lineAfter(playing.run, playing.theme.metre[0], from, run.enters);
-    playing.turn = { run, at: playing.zero + line * beat };
+    const from = Math.max(playing.scheduled, ctx.currentTime);
+    playing.turn = { run, at: turnAt(playing.theme, playing.run, playing.zero, from, run.enters) };
   }
 
   /** The theme that plays heard elsewhere: every voice fades to its loudness there. */

@@ -746,6 +746,71 @@ test('at the gate the friend comes up the path from its foot, and after dark the
   await expect(scene).toHaveAttribute('data-actors', /(^|;)friend:12,15,up/);
 });
 
+test('The end of the year goes on from What the familiar brought on its live scene: the music turns in a held moment, nothing between (D320)', async ({
+  page,
+}) => {
+  test.setTimeout(ciTimes(240_000));
+  await page.goto('/#story/what-the-familiar-brought');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await page.locator('#story-skip').click();
+  await expect(page.locator('#story-go-on')).toBeVisible();
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+  await expect(scene).toHaveAttribute('data-speaker', 'orla', { timeout: ciTimes(15_000) });
+  // The later story and its still loaded behind this one's last step.
+  await page.waitForTimeout(ciTimes(1500));
+  const fit = await scene.getAttribute('data-camera-fit');
+  // From before the press: the canvas, any waiting view or still shown, and when a bubble
+  // comes.
+  await page.evaluate(() => {
+    type Join = { canvas: Element | null; waited: boolean; still: boolean; bubbleAt: number | null; pressed: number };
+    const kept = window as unknown as { join: Join };
+    kept.join = { canvas: document.querySelector('#scene canvas'), waited: false, still: false, bubbleAt: null, pressed: 0 };
+    const look = () => {
+      if (document.querySelector('#waiting')) kept.join.waited = true;
+      const still = document.getElementById('story-still');
+      if (still && !still.hidden) kept.join.still = true;
+      const bubble = document.getElementById('scene')?.dataset.bubble;
+      if (kept.join.pressed > 0 && kept.join.bubbleAt === null && bubble !== undefined) {
+        kept.join.bubbleAt = performance.now() - kept.join.pressed;
+      }
+    };
+    new MutationObserver(look).observe(document.body, { subtree: true, childList: true, attributes: true });
+    document.getElementById('story-go-on')?.addEventListener('click', () => {
+      // The bubble of the step before goes with the press, in the same task.
+      setTimeout(() => {
+        kept.join.pressed = performance.now();
+        look();
+      }, 0);
+    });
+  });
+  await page.locator('#story-go-on').click();
+  await expect(page).toHaveURL(/#story\/the-end-of-the-year$/);
+  await expect(page.locator('#story-title')).toHaveText('The end of the year');
+  await expect(page.locator('#story-step')).toHaveText(/^1 .*39/);
+  await expect(page).toHaveTitle(/The end of the year/);
+  await expect(page.locator('#story-next')).toBeDisabled();
+  await expect(page.locator(':root')).toHaveAttribute('data-music-movement', 'name');
+  await expect(scene).toHaveAttribute('data-camera-fit', fit ?? '');
+  // Orla's first words come once the music has turned, and Next wakes with the keyboard.
+  await expect(scene).toHaveAttribute('data-bubble', /That voice in the walls has a name/, { timeout: 4000 });
+  await expect(scene).toHaveAttribute('data-speaker', 'orla');
+  await expect(page.locator('#story-next')).toBeEnabled();
+  await expect(page.locator('#story-next')).toBeFocused();
+  const join = await page.evaluate(() => {
+    type Join = { canvas: Element | null; waited: boolean; still: boolean; bubbleAt: number | null };
+    const kept = (window as unknown as { join: Join }).join;
+    return { same: kept.canvas === document.querySelector('#scene canvas'), waited: kept.waited, still: kept.still, bubbleAt: kept.bubbleAt };
+  });
+  expect(join).toMatchObject({ same: true, waited: false, still: false });
+  expect(join.bubbleAt ?? 0).toBeGreaterThanOrEqual(1000);
+  await expect(scene).toHaveAttribute('data-camera-fit', fit ?? '');
+  // On to its dinner over the castle's painting, as the story opened by itself.
+  await page.locator('#story-skip').click();
+  await expect(page.locator('.story-frame')).toHaveAttribute('data-still', 'on');
+  await expect(page.locator('#story-still')).toBeVisible();
+});
+
 test("the hall goes dark while the children tell Orla, and comes back in the evening (D280)", async ({ page }) => {
   test.setTimeout(ciTimes(180_000));
   await page.goto('/#story/what-the-familiar-brought');

@@ -3,8 +3,10 @@
 level's level.json with the scene's map built in, the wizard's S at its start
 and the E at its end; a story's story.json with its staging checked against the
 scene and the world it is played in under `world`; on a painted scene, each
-says so in `art` (D76). Printed as a JSON object,
-{"levels": {id: level.json}, "stories": {id: story.json}}; pack-world.mjs
+says so in `art` (D76). A story that goes on from the one before it with nothing
+between (`continues`, D320) is held to the chapters' items and to that story.
+Printed as a JSON object, {"levels": {id: level.json}, "stories": {id:
+story.json}}; pack-world.mjs
 writes each into public/content/, so that the page loads a level on a scene as
 any other, and a story with its world ready.
 
@@ -37,7 +39,14 @@ def sitters(content: Path = CONTENT) -> frozenset[str]:
 
 def scene_maps(content: Path = CONTENT) -> dict[str, dict[str, dict]]:
     sys.path.insert(0, str(REPO / "world"))
-    from kydux_world.level import Level, on_scene, read_scene, story_on_scenes
+    from kydux_world.level import (
+        Level,
+        LevelError,
+        on_scene,
+        read_scene,
+        story_continues,
+        story_on_scenes,
+    )
 
     levels = {}
     for path in sorted((content / "levels").glob("*/level.json")):
@@ -64,6 +73,23 @@ def scene_maps(content: Path = CONTENT) -> dict[str, dict[str, dict]]:
         for part in story.get("parts", []):
             part["world"] = with_art(part["world"], part["scene"], content)
         stories[data["id"]] = story
+    # A story that goes on from the one before it with nothing between (D320), held to
+    # the chapters' items and to that story's last part.
+    told = {}
+    for path in (content / "stories").glob("*/story.json"):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        told[data["id"]] = data
+    chapters = [
+        json.loads(path.read_text(encoding="utf-8")).get("items", [])
+        for path in sorted((content / "chapters").glob("*/chapter.json"))
+    ]
+    for story_id, data in told.items():
+        if "continues" not in data:
+            continue
+        earlier = told.get(data["continues"])
+        if earlier is None:
+            raise LevelError(f"{story_id} continues {data['continues']}, which is no story")
+        story_continues(earlier, data, chapters)
     return {"levels": levels, "stories": stories}
 
 

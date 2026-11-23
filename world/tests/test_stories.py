@@ -899,3 +899,73 @@ def test_a_figure_fades_in_only_as_a_ghost_or_a_familiar(kind, says):
     with pytest.raises(LevelError, match=f"{says}.*enter"):
         on_the_lane([by("dask", {"appear": [3, 3]})], actors=actors)
     on_the_lane([by("dask", {"appear": [3, 3], "from": [3, 4]})], actors=actors)
+
+
+def the_join():
+    """The end of the year and the story it goes on from, as content has them (D320), with
+    the chapters' items."""
+    from pathlib import Path
+
+    content = Path(__file__).resolve().parents[2] / "content"
+
+    def read(story):
+        return json.loads((content / "stories" / story / "story.json").read_text())
+
+    chapters = [
+        json.loads(path.read_text())["items"]
+        for path in sorted((content / "chapters").glob("*/chapter.json"))
+    ]
+    return read("what-the-familiar-brought"), read("the-end-of-the-year"), chapters
+
+
+def test_the_end_of_the_year_goes_on_from_what_the_familiar_brought():
+    from kydux_world.level import story_continues
+
+    earlier, later, chapters = the_join()
+    assert later["continues"] == "what-the-familiar-brought"
+    story_continues(earlier, later, chapters)
+
+
+def _broken(rule):
+    import copy
+
+    earlier, later, chapters = (copy.deepcopy(part) for part in the_join())
+    if rule == "items":
+        chapters = [
+            [item for item in items if item != "story:the-end-of-the-year"] for items in chapters
+        ]
+    elif rule == "does":
+        earlier["steps"][-1]["do"] = {"face": "left"}
+    elif rule == "still":
+        earlier["steps"][-1]["still"] = True
+    elif rule == "staging":
+        later["actors"][0]["at"] = [9, 6]
+    elif rule == "light":
+        del later["light"]
+    elif rule == "framing":
+        later["steps"][0]["camera"] = {"fit": [[4, 4], [15, 14]]}
+    elif rule == "opening":
+        later["steps"][0]["still"] = True
+    return earlier, later, chapters
+
+
+@pytest.mark.parametrize(
+    ("rule", "says"),
+    [
+        ("items", "not the item just after what-the-familiar-brought"),
+        ("does", "of its last part, does something"),
+        ("still", "step 28 is told over a still"),
+        ("staging", "its actors is not the last part's"),
+        ("light", "its light is not the last part's"),
+        ("framing", "frames another place"),
+        ("opening", "its first step is told over a still"),
+    ],
+)
+def test_a_story_that_goes_on_in_place_is_held_to_the_one_before(rule, says):
+    """D320: each of the five rules broken on a copy of the two stories."""
+    from kydux_world.level import story_continues
+
+    with pytest.raises(
+        LevelError, match=f"the-end-of-the-year continues what-the-familiar-brought: .*{says}"
+    ):
+        story_continues(*_broken(rule))

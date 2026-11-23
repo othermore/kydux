@@ -20,7 +20,11 @@
 // game's words of admission written by hand between the drawing and the fold, filling
 // that room to the fold as if the letter went on behind it; placed on the painting
 // whatever the frame shows of it, lowered out of the frame at the first step without it
-// and raised again at Back; the frame says where it is in data-letter.
+// and raised again at Back; the frame says where it is in data-letter. A story that
+// goes on from this one in place (D320) is taken up at the last press: the page makes it
+// the item and the address, its music is asked for, and after a held moment with no words,
+// as long as the music takes to turn, its first step is played on the live scene, with no
+// waiting view, no still and no scene made anew.
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
@@ -64,10 +68,36 @@ export interface StoryScreenParts {
   theme?: string;
   /** Asks the music for a theme, heard as a story: a theme that already plays goes on. */
   hear?: (theme: string) => void;
+  /** How long until the music turns to what was last asked of it, in seconds, or null
+   * where nothing turns (D320). */
+  turning?: () => number | null;
+  /** The story that goes on from this one in place (D320), once it is loaded, or null:
+   * its parts, and what the page does as it becomes the item shown (the address). */
+  join?: () => StoryJoin | null;
+}
+
+/** A story that goes on from the one shown with nothing between (D320). */
+export interface StoryJoin {
+  parts: StoryScreenParts;
+  shown: () => void;
 }
 
 /** How long the scene takes to come in over the still, in milliseconds (style.css). */
 const FADE_IN = 500;
+
+/** The held moment before a story that goes on from the one before (D320): as long as the
+ * music takes to turn, held between these, in milliseconds, and HELD_NONE where nothing
+ * turns. */
+const HELD_LEAST = 1000;
+const HELD_MOST = 3000;
+const HELD_NONE = 1500;
+
+/** The held moment's length, in milliseconds, from how long the music takes to turn, in
+ * seconds, or null where nothing turns (D320). */
+export function heldMs(turning: number | null): number {
+  if (turning === null) return HELD_NONE;
+  return Math.min(HELD_MOST, Math.max(HELD_LEAST, turning * 1000));
+}
 
 /** How long the letter takes to be lowered or raised, in milliseconds (style.css). */
 const LETTER_MS = 600;
@@ -159,7 +189,9 @@ export function travelsTo(steps: readonly StoryStep[], first: number, step: numb
   return held !== null && JSON.stringify(held) !== JSON.stringify(before);
 }
 
-export function storyScreen(parts: StoryScreenParts): Screen {
+export function storyScreen(first: StoryScreenParts): Screen {
+  /** The story's parts: the one opened, or the one that goes on from it in place (D320). */
+  let parts = first;
   let story = parts.story;
   let step = 0;
   let scene: SceneHandle | null = null;
@@ -179,9 +211,11 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   // The camera's zoom, as on a level's scene (D106).
   const zoom = zoomBox(sceneParent, { story: true });
   // Until the scene is there, its place shows the still, or the paper with the mark.
-  const still = parts.still
-    ? element('img', { id: 'story-still', className: 'story-still', src: parts.still.src, alt: parts.still.alt })
-    : element('div', { id: 'story-still', className: 'story-still story-still-mark' }, [markSvg(72)]);
+  const stillOf = (given: StoryScreenParts): HTMLElement =>
+    given.still
+      ? element('img', { id: 'story-still', className: 'story-still', src: given.still.src, alt: given.still.alt })
+      : element('div', { id: 'story-still', className: 'story-still story-still-mark' }, [markSvg(72)]);
+  let still = stillOf(parts);
   // The letter (D257): its picture and the game's words between its drawing and its
   // fold, a heading and a paragraph, over the still and under the scene. The paragraph
   // ends in a mark that tells how far its last line runs.
@@ -247,9 +281,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     t('story.skip'),
   ]);
   const forward = element('button', { id: 'story-next', type: 'button', className: 'big-button' });
+  const number = parts.label ? element('span', { id: 'story-number', className: 'item-number' }, [parts.label]) : null;
   const node = element('div', { className: 'story-screen' }, [
     element('div', { className: 'lesson-top' }, [
-      ...(parts.label ? [element('span', { id: 'story-number', className: 'item-number' }, [parts.label])] : []),
+      ...(number ? [number] : []),
       element('h2', { id: 'story-title', className: 'story-title' }),
       element('a', { id: 'story-map', className: 'quiet-button small', href: '#map' }, [t('map.open_map')]),
     ]),
@@ -316,6 +351,8 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   /** Time that passes, while a step's words are not yet said (D280): counted so that a
    * step gone to meanwhile drops it. */
   let passing = 0;
+  /** The held moment before a story that goes on in place, under way (D320). */
+  let holding: ReturnType<typeof setTimeout> | null = null;
 
   /** The scene of a part started, the one before it gone, and the step played on it, or
    * what `then` does once it is there. */
@@ -528,6 +565,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
    * Next, where a part marked later opens after time has passed (D280), and where the
    * camera travels to a framing the part has not held (D321). */
   const play = (onward = false) => {
+    if (holding !== null) {
+      clearTimeout(holding);
+      holding = null;
+    }
     if (frame.dataset.passing) {
       // A step gone to while time passes is shown at once, a part started in the dark
       // started again for it.
@@ -583,9 +624,45 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     if (theme) parts.hear?.(theme);
   };
 
+  /** The story that goes on from this one in place, taken up at its last press (D320):
+   * this one read and the other the page's item and address, its title, its count and its
+   * still's node; its music asked for; then a held moment with no words, the bubble gone and
+   * Next waiting, as long as the music takes to turn; then its first step, on the live scene,
+   * whose staging is this story's last part's. */
+  const goInPlace = (joined: StoryJoin) => {
+    progress.markStoryRead(story.id);
+    joined.shown();
+    parts = joined.parts;
+    story = parts.story;
+    step = 0;
+    shownPart = 0;
+    sceneParent.dataset.storyPart = '0';
+    const next = stillOf(parts);
+    next.hidden = true;
+    still.replaceWith(next);
+    still = next;
+    if (number) number.textContent = parts.label ?? '';
+    hear();
+    words();
+    wait(true);
+    voice.replaceChildren();
+    heard.textContent = '';
+    if (scene) {
+      scene.playback.load([]);
+      scene.playback.seek(0);
+    }
+    holding = setTimeout(() => {
+      holding = null;
+      if (!destroyed) play();
+    }, heldMs(parts.turning?.() ?? null));
+  };
+
   const go = (by: 1 | -1) => {
     if (by === 1 && last()) {
-      goOn();
+      // In place only on the live scene of the last part; else the ordinary way (D320).
+      const joined = scene && loadingPart === -1 ? parts.join?.() : null;
+      if (joined) goInPlace(joined);
+      else goOn();
       return;
     }
     step = Math.min(Math.max(0, step + by), story.steps.length - 1);
@@ -636,6 +713,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     },
     destroy() {
       destroyed = true;
+      if (holding !== null) clearTimeout(holding);
       if (fading !== null) clearTimeout(fading);
       if (lowering !== null) clearTimeout(lowering);
       resized?.disconnect();

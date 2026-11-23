@@ -19,6 +19,8 @@ import {
   type Theme,
   timed,
   timedRun,
+  turnAt,
+  turnIn,
   voiceLevels,
 } from './music';
 
@@ -387,6 +389,18 @@ describe('a theme told in movements (D316)', () => {
     expect(lineAfter(height, 3, 0.2, 'beat')).toBeCloseTo(0.5);
     expect(lineAfter(height, 3, 0.2, 'bar')).toBeCloseTo(1.5);
     expect(lineAfter(height, 3, 1.5 + 6 + 3.5, 'bar')).toBeCloseTo(1.5 + 12);
+  });
+
+  it('tells when a movement asked for comes in on the clock, and how long until it does (D320)', () => {
+    const theme = told();
+    const first = runOf(theme, 'first');
+    // At 60 a beat is a second: what sounds started at 100, asked at 100.2, turns at 103.
+    expect(turnAt(theme, first, 100, 100.2, 'bar')).toBe(103);
+    expect(turnAt(theme, first, 100, 103, 'bar')).toBe(103);
+    expect(turnAt(theme, first, 100, 104.5, 'beat')).toBe(105);
+    expect(turnIn({ at: 103 }, 100.2)).toBeCloseTo(2.8);
+    expect(turnIn({ at: 103 }, 104)).toBe(0);
+    expect(turnIn(null, 100)).toBeNull();
   });
 
   it('a movement that names no section, or one the theme has not, is refused', () => {

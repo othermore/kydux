@@ -2790,3 +2790,66 @@ def story_on_scenes(
             for first, built in parts[1:]
         ]
     return story
+
+
+#: What of a part's staging two stories told as one moment share (D320).
+JOINED_STAGING = ("scene", "light", "wizard", "facing", "actors", "things", "camera", "flying")
+
+
+def story_continues(
+    earlier: dict[str, Any], later: dict[str, Any], chapters: list[list[str]]
+) -> None:
+    """A story that goes on from the one before it with nothing between (D320): `later`
+    says `continues`, the id of `earlier`. Each rule broken is a LevelError that names
+    both: `earlier` is the item just before `later` in a chapter's items; no step of its
+    last part does anything, and none is told over a still; `later`'s staging is that
+    part's, the scene, the light, the wizard's cell and facing, every actor as staged, the
+    things, the camera's point and who flies; the framing held at its last step (D199) is
+    the one `later`'s first step gives; and `later`'s first step is not told over a still,
+    its first part not after time has passed (D280)."""
+    first, then = earlier.get("id"), later.get("id")
+    here = f"{then} continues {first}"
+    if later.get("continues") != first:
+        raise LevelError(f"{here}: it says continues {later.get('continues')}")
+    if not any(
+        items[index : index + 2] == [f"story:{first}", f"story:{then}"]
+        for items in chapters
+        for index in range(len(items) - 1)
+    ):
+        raise LevelError(f"{here}: {then} is not the item just after {first} in a chapter")
+    steps = earlier.get("steps", [])
+    start = max(
+        [0]
+        + [index for index, step in enumerate(steps) if isinstance(step, dict) and "scene" in step]
+    )
+    for number, step in enumerate(steps[start:], start + 1):
+        if step.get("do") is not None:
+            raise LevelError(f"{here}: {first}'s step {number}, of its last part, does something")
+        if step.get("still"):
+            raise LevelError(f"{here}: {first}'s step {number} is told over a still")
+    part = earlier if start == 0 else steps[start]["scene"]
+
+    def staged(staging: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "scene": staging.get("scene"),
+            "light": staging.get("light"),
+            "wizard": staging.get("wizard"),
+            "facing": staging.get("facing", "down"),
+            "actors": sorted(staging.get("actors", []), key=lambda actor: str(actor.get("id"))),
+            "things": staging.get("things", []),
+            "camera": staging.get("camera"),
+            "flying": sorted(staging.get("flying", [])),
+        }
+
+    were, are = staged(part), staged(later)
+    for key in JOINED_STAGING:
+        if were[key] != are[key]:
+            raise LevelError(f"{here}: its {key} is not the last part's of {first}")
+    held = next((step["camera"] for step in reversed(steps[start:]) if "camera" in step), None)
+    opening = later.get("steps", [{}])[0]
+    if held != opening.get("camera"):
+        raise LevelError(f"{here}: its first step frames another place than {first}'s last")
+    if opening.get("still"):
+        raise LevelError(f"{here}: its first step is told over a still")
+    if later.get("later") or (opening.get("scene") or {}).get("later"):
+        raise LevelError(f"{here}: its first part opens after time has passed")

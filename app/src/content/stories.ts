@@ -106,6 +106,8 @@ export interface Story {
   /** The theme the story opens to, in the place of its chapter's (D314), or a theme
    * and a movement of it after a slash (D316). */
   music?: string;
+  /** The story this one goes on from with nothing between (D320). */
+  continues?: string;
 }
 
 export class StoryNotFound extends Error {
@@ -126,6 +128,7 @@ interface StoryJson {
   speaker?: string;
   still?: string;
   music?: string;
+  continues?: string;
 }
 
 async function json<T>(url: string): Promise<T | null> {
@@ -159,6 +162,7 @@ export async function loadStory(id: string, lang: Language): Promise<Story> {
     ...(typeof staging.speaker === 'string' ? { speaker: staging.speaker } : {}),
     ...(staging.still === 'castle' ? { still: 'castle' as const } : {}),
     ...(typeof staging.music === 'string' ? { music: staging.music } : {}),
+    ...(typeof staging.continues === 'string' ? { continues: staging.continues } : {}),
     ...(later.length > 0 ? { later: Object.fromEntries(later) } : {}),
   };
 }

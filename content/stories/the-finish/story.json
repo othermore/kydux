@@ -11,12 +11,17 @@
     10
   ],
   "flying": [
-    "wizard"
+    "wizard",
+    "zarek"
   ],
   "actors": [
     {
       "id": "zarek",
       "kind": "racer",
+      "at": [
+        26,
+        12
+      ],
       "facing": "right"
     },
     {
@@ -67,14 +72,6 @@
         {
           "by": "wizard",
           "land": true
-        },
-        {
-          "by": "zarek",
-          "appear": [
-            28,
-            12
-          ],
-          "flying": true
         },
         {
           "by": "zarek",

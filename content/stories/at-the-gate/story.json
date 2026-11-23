@@ -13,7 +13,12 @@
   "actors": [
     {
       "id": "friend",
-      "kind": "friend"
+      "kind": "friend",
+      "at": [
+        8,
+        29
+      ],
+      "facing": "up"
     }
   ],
   "steps": [
@@ -43,13 +48,6 @@
         ]
       },
       "do": [
-        {
-          "by": "friend",
-          "appear": [
-            8,
-            26
-          ]
-        },
         {
           "by": "friend",
           "walk": [

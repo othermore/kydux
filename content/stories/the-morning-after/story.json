@@ -25,6 +25,10 @@
     {
       "id": "friend",
       "kind": "friend",
+      "at": [
+        12,
+        15
+      ],
       "facing": "up"
     }
   ],
@@ -113,12 +117,6 @@
     {
       "who": "friend",
       "do": [
-        {
-          "appear": [
-            12,
-            15
-          ]
-        },
         {
           "walk": [
             12,

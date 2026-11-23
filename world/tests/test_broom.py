@@ -907,7 +907,7 @@ def told(steps, **change):
 def test_a_story_s_figure_flies_over_the_water_and_lands():
     told(
         [
-            {"who": "voice", "do": {"appear": [1, 1], "flying": True}, "by": "zarek"},
+            {"who": "voice", "do": {"enter": [0, 1], "flying": True}, "by": "zarek"},
             {"who": "zarek", "do": [{"fly": [[3, 1], [3, 2], [4, 2]]}, {"land": True}]},
         ]
     )
@@ -922,7 +922,7 @@ def test_a_figure_lands_only_on_a_cell_walked_on():
     with pytest.raises(LevelError, match="lands where no one stands"):
         told(
             [
-                {"who": "voice", "do": {"appear": [1, 1], "flying": True}, "by": "zarek"},
+                {"who": "voice", "do": {"enter": [0, 1], "flying": True}, "by": "zarek"},
                 {"who": "zarek", "do": [{"fly": [[2, 1], [2, 2]]}, {"land": True}]},
             ]
         )
@@ -1293,9 +1293,10 @@ def test_the_rematch_is_chapter_4_s_second_fix_and_the_rings_its_one_improve():
 
 def test_the_finish_lands_the_wizard_on_its_finish_and_zarek_in_his_lane_the_clappers_in_sight():
     """Sprint 44's 2.7, on the lanes of D220: every walk, flight and landing is checked on
-    the race course (no one walks through a pole); the wizard lands on its finish, Zarek
-    flies in along his lane to his and lands; the friend, the classmate and Ilda stand
-    beyond the finish, all in the wide frame of the first step."""
+    the race course (no one walks through a pole); the wizard lands on its finish, Zarek,
+    in the air just behind from the story's start (D322), flies on along his lane to his
+    and lands; the friend, the classmate and Ilda stand beyond the finish, all in the wide
+    frame of the first step."""
     data = json.loads((CONTENT.parent / "stories" / "the-finish" / "story.json").read_text())
     story_on_scenes(data, lambda name: read_scene(CONTENT.parent / "scenes", name))
     race = content_level("the-race").race
@@ -1303,8 +1304,9 @@ def test_the_finish_lands_the_wizard_on_its_finish_and_zarek_in_his_lane_the_cla
     first = data["steps"][0]
     assert first["camera"] == {"wide": True}
     flown = [do for do in first["do"] if do.get("by") == "zarek"]
-    assert flown[0]["appear"][1] == race.path[-1].y and flown[0]["flying"]
-    assert flown[1]["fly"] == list(race.path[-1]) and flown[2] == {"by": "zarek", "land": True}
+    zarek = next(actor for actor in data["actors"] if actor["id"] == "zarek")
+    assert zarek["at"][1] == race.path[-1].y and "zarek" in data["flying"]
+    assert flown[0]["fly"] == list(race.path[-1]) and flown[1] == {"by": "zarek", "land": True}
     stand = {actor["id"]: actor["at"] for actor in data["actors"] if "at" in actor}
     assert all(stand[who][0] > race.finish.x for who in ("ilda", "friend", "mate"))
     # No ring is shown.

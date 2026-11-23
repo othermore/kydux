@@ -367,13 +367,14 @@ def test_a_walk_through_a_corner_must_go_straight_each_way():
 
 #: A lane open at its two ends, with a door of floor at its top and its foot, and a way out
 #: behind a cover (`o`, D319): the left edge at 0,2, the right at 6,2, the top at 2,0, the
-#: foot at 2,4 and 3,4.
+#: foot at 2,4 and 3,4; water at 4,0, on the top edge, flown over.
 LANE = Scene(
     "lane",
-    ("##g####", "##g##o#", "ggggggg", "#ggggg#", "##gg###"),
+    ("##g#w##", "##g##o#", "ggggggg", "#ggggg#", "##gg###"),
     {
         **TERRAINS,
         "o": {"kind": "wall", "walk": "story", "sight": False, "fly": False, "out": True},
+        "w": {"kind": "water", "walk": False, "sight": True, "fly": True},
     },
 )
 
@@ -819,3 +820,82 @@ def test_rinlo_opens_the_side_door_and_goes_down_the_back_stairs():
     shut["steps"][0]["do"] = [act for act in shut["steps"][0]["do"] if "open" not in act]
     with pytest.raises(LevelError, match="stopped at 5,3"):
         built(shut)
+
+
+@pytest.mark.parametrize(
+    ("cell", "side", "flying"),
+    [([0, 2], "left", False), ([6, 2], "right", False), ([2, 0], "top", False)]
+    + [([2, 4], "bottom", False), ([4, 0], "top", True)],
+)
+def test_a_figure_comes_in_by_a_cell_of_the_edge(cell, side, flying):
+    """D322: `enter` a cell of the edge the figure stands on, or, flying, flies over; the
+    world has it on the map, hidden, at the cell it comes in by."""
+    ways: list = []
+    doing = {"enter": cell, **({"flying": True} if flying else {})}
+    story = on_the_lane([by("teku", doing)], actors=[{"id": "teku", "kind": "friend"}], ways=ways)
+    assert ways[0]["enters"] == side and ways[0]["cell"] == cell
+    assert story["world"]["actors"][0]["at"] == cell and story["world"]["actors"][0]["hidden"]
+
+
+@pytest.mark.parametrize(
+    ("doing", "says"),
+    [
+        ({"enter": [3, 3]}, "inside the scene"),
+        ({"enter": [0, 0]}, "a corner of the scene"),
+        ({"enter": [9, 2]}, "off the scene"),
+        ({"enter": [0, 1]}, "where no one stands"),
+        ({"enter": [4, 0]}, "where no one stands"),
+        ({"enter": [0, 2], "walk": [1, 2]}, "do is one of"),
+        ({"enter": [0, 2], "flying": False}, "do is one of"),
+    ],
+)
+def test_a_way_in_that_is_none_is_refused(doing, says):
+    with pytest.raises(LevelError, match=says):
+        on_the_lane([by("teku", doing)], actors=[{"id": "teku", "kind": "friend"}])
+
+
+def test_who_is_in_sight_or_the_wizard_never_comes_in():
+    with pytest.raises(LevelError, match="nuri is already in sight"):
+        on_the_lane([by("nuri", {"enter": [0, 2]})])
+    with pytest.raises(LevelError, match="the wizard never enters"):
+        on_the_lane([by("wizard", {"enter": [0, 2]})])
+
+
+def test_two_come_in_by_one_cell_one_behind_the_other():
+    """D322: the second by a cell is on it a tick after the first, who must move on."""
+    two = [{"id": "teku", "kind": "friend"}, {"id": "wenna", "kind": "friend"}]
+    walking = [
+        {"by": "teku", "enter": [0, 2]},
+        {"by": "teku", "walk": [3, 2]},
+        {"by": "wenna", "enter": [0, 2]},
+        {"by": "wenna", "walk": [1, 2]},
+    ]
+    on_the_lane([{"who": "voice", "do": walking}], actors=two)
+    staying = [{"by": "teku", "enter": [0, 2]}, {"by": "wenna", "enter": [0, 2]}]
+    with pytest.raises(LevelError, match="wenna's walk is stopped at 0,2"):
+        on_the_lane([{"who": "voice", "do": staying}], actors=two)
+
+
+def test_a_figure_comes_in_from_behind_a_cover_by_a_way_out():
+    ways: list = []
+    on_the_lane(
+        [by("teku", [{"enter": [5, 1]}, {"walk": [5, 2]}])],
+        actors=[{"id": "teku", "kind": "friend"}],
+        ways=ways,
+    )
+    assert ways[0]["enters"] == "out"
+
+
+@pytest.mark.parametrize(
+    ("kind", "says"),
+    [("friend", "no ghost"), ("teacher", "no ghost"), ("ghost", ""), ("familiar", "")],
+)
+def test_a_figure_fades_in_only_as_a_ghost_or_a_familiar(kind, says):
+    """D322: a bare appear is a ghost's or a familiar's; out from behind a thing, anyone's."""
+    actors = [{"id": "dask", "kind": kind}]
+    if not says:
+        on_the_lane([by("dask", {"appear": [3, 3]})], actors=actors)
+        return
+    with pytest.raises(LevelError, match=f"{says}.*enter"):
+        on_the_lane([by("dask", {"appear": [3, 3]})], actors=actors)
+    on_the_lane([by("dask", {"appear": [3, 3], "from": [3, 4]})], actors=actors)

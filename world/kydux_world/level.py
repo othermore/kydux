@@ -1977,6 +1977,7 @@ def on_scene(data: dict[str, Any], scene: Scene | list[str]) -> dict[str, Any]:
 
 STORY_DOINGS = (
     "walk",
+    "enter",
     "fly",
     "land",
     "face",
@@ -2000,8 +2001,8 @@ STILLS = ("castle",)
 def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
     """A step's actions (D103): none, one, or a list, each one of STORY_DOINGS with
     the figure who does it in `by` when it is not the step's; a walk may end in
-    `leave`, out of the scene by a way out (D319), and an appearing may come `from` a
-    cell beside (D128)."""
+    `leave`, out of the scene by a way out (D319), a figure may `enter` by a way in, on
+    foot or `flying` (D322), and an appearing may come `from` a cell beside (D128)."""
     if doing is None:
         return []
     listed = doing if isinstance(doing, list) else [doing]
@@ -2025,8 +2026,9 @@ def _story_actions(doing: Any, here: str) -> list[dict[str, Any]]:
         # An appearing from behind a thing beside the cell (D128).
         if kinds == {"appear", "from"}:
             continue
-        # A figure that comes into sight in the air, on its broom (D185).
-        if kinds == {"appear", "flying"} and action.get("flying") is True:
+        # A figure that comes into sight in the air, on its broom (D185), and one that
+        # comes in through the air by the scene's edge (D322).
+        if kinds in ({"appear", "flying"}, {"enter", "flying"}) and action.get("flying") is True:
             continue
         if len(kinds) != 1 or not kinds <= set(STORY_DOINGS):
             raise LevelError(f"{here}: do is one of {', '.join(STORY_DOINGS)}")
@@ -2050,6 +2052,29 @@ def _way_out(
     if dy > 0 and at.y == height - 1:
         return "bottom"
     return None
+
+
+def _way_in(at: Position, width: int, height: int, outs: set[Position]) -> str:
+    """The way in a figure comes by onto a cell (D322): `out`, a way out behind a cover;
+    the side of the scene's edge the cell is on, `left`, `top`, `right` or `bottom`; or,
+    for no way in, `inside`, `corner` or `off`."""
+    if at in outs:
+        return "out"
+    if not (0 <= at.x < width and 0 <= at.y < height):
+        return "off"
+    sides = [
+        side
+        for side, on in (
+            ("left", at.x == 0),
+            ("top", at.y == 0),
+            ("right", at.x == width - 1),
+            ("bottom", at.y == height - 1),
+        )
+        if on
+    ]
+    if not sides:
+        return "inside"
+    return sides[0] if len(sides) == 1 else "corner"
 
 
 def _waypoints(walk: Any, here: str) -> list[Position]:
@@ -2096,7 +2121,11 @@ def story_on_scene(
     thing on a cell beside it, a shelf or a floor (D128); vanishing, a speaker once its
     words are said and never in a part's last step, where no step after plays it, an
     appearing or a vanishing with no thing to step from being a ghost's or a familiar's
-    alone (D322); lying down asleep in a bed, no one else's, from the cell
+    alone (D322); coming in, `enter`, by a way in (D322): onto a cell of the scene's
+    edge, no corner, that the figure stands on or, `flying`, flies over, from two cells
+    past it, a move a tick, a figure after another by the same cell in one step a cell
+    further out and a tick later, or onto a way-out cell, behind its cover, at once;
+    lying down asleep in a bed, no one else's, from the cell
     under its pillow (`pillow_side`, D130), or from beside a bed with none, and
     waking (D91); opening or closing a door beside it; standing up, seated, and sitting
     down, a figure of `sitters`, whose sheet has the sitting rows (D273), and bringing
@@ -2109,7 +2138,7 @@ def story_on_scene(
     steps aside along the row (D125). The voice does nothing itself; no one
     speaks or moves out of sight, and no one asleep walks, turns or goes. The wizard
     stays in sight but for a walk out of the scene in a part's last step (D310). The ways
-    out the story's figures take are told to `ways`, when it is given, for the art's
+    out and in the story's figures take are told to `ways`, when it is given, for the art's
     check: the story, the step, who, the cell, and the side of the edge or `out`. A story with
     a still, the opening, may tell its first steps in a row over the still (`still`,
     D251), each of the voice and doing nothing; the first of them, in a row, may hold
@@ -2381,6 +2410,8 @@ def story_on_scene(
         queues: dict[str, list[tuple[str, Any]]] = {}
         planned = dict(where)
         vanishing = False
+        # How many have come in by each cell of the edge in the step so far (D322).
+        filed: dict[Position, int] = {}
         for action in actions:
             # Who does an action: its by, the step's by, or the step's speaker.
             doer = action.get("by", step.get("by", who))
@@ -2400,10 +2431,63 @@ def story_on_scene(
                 vanishing = True
                 continue
             queue = queues.setdefault(doer, [])
+            if "enter" in action:
+                tile = _story_tile(action["enter"], "enter", here)
+                if doer == "wizard":
+                    raise LevelError(f"{here}: the wizard never enters, it is staged")
+                if planned[doer] is not None:
+                    raise LevelError(f"{here}: {doer} is already in sight")
+                flown = action.get("flying") is True
+                way = _way_in(tile, width, height, outs)
+                if way in ("inside", "corner", "off"):
+                    where_is = {
+                        "inside": "inside the scene",
+                        "corner": "a corner of the scene",
+                        "off": "off the scene",
+                    }[way]
+                    raise LevelError(
+                        f"{here}: {doer} enters at {tile.x},{tile.y}, {where_is}: a figure "
+                        "comes in by a cell of the edge or a way out (D322)"
+                    )
+                if not walked(tile, flown):
+                    raise LevelError(
+                        f"{here}: {doer} enters at {tile.x},{tile.y}, where no one stands"
+                        + (" or flies" if flown else "")
+                    )
+                planned[doer] = tile
+                if flown:
+                    queue.append(("lift", None))
+                if way == "out":
+                    queue.append(("enter", tile))
+                else:
+                    # From past the edge, two cells and one more for each figure before it
+                    # by this cell in the step, a move a tick (D322).
+                    behind = filed.get(tile, 0)
+                    filed[tile] = behind + 1
+                    dx, dy = {"left": (1, 0), "top": (0, 1), "right": (-1, 0), "bottom": (0, -1)}[
+                        way
+                    ]
+                    far = 2 + behind
+                    at = Position(tile.x - dx * far, tile.y - dy * far)
+                    queue.append(("in", (at, tile)))
+                    for _ in range(far - 1):
+                        at = Position(at.x + dx, at.y + dy)
+                        queue.append(("out", at))
+                    queue.append(("move", tile))
+                if ways is not None:
+                    ways.append(
+                        {"scene": scene.id, "story": story_id, "step": here, "who": doer}
+                        | {"cell": list(tile), "enters": way}
+                    )
+                continue
             if "appear" in action:
                 tile = _story_tile(action["appear"], "appear", here)
                 if planned[doer] is not None:
                     raise LevelError(f"{here}: {doer} is already in sight")
+                # Out of nothing, a ghost or a familiar alone (D322); from behind a thing,
+                # anyone (D128).
+                if "from" not in action:
+                    fades(doer, "appear", here)
                 if "from" in action:
                     behind = _story_tile(action["from"], "from", here)
                     inside = 0 <= behind.y < height and 0 <= behind.x < width
@@ -2522,13 +2606,19 @@ def story_on_scene(
                             f"{here}: {doer} lands where no one stands, or is not flying"
                         )
                     aloft.discard(doer)
-                elif kind == "appear":
+                elif kind in ("appear", "enter"):
                     if not free(value, doer):
                         raise LevelError(f"{here}: {doer} appears on a tile not free")
                     where[doer] = value
                     # Who comes into sight comes on its feet (D279).
                     seated.discard(doer)
                     first_seen.setdefault(doer, value)
+                elif kind == "in":
+                    # Set past the scene's edge, where the frame hides it (D322); the world
+                    # the page draws has it hidden on the cell it comes in by.
+                    where[doer], cell = value
+                    seated.discard(doer)
+                    first_seen.setdefault(doer, cell)
                 elif kind == "wake":
                     if doer not in asleep:
                         raise LevelError(f"{here}: {doer} is not asleep")

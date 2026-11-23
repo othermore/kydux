@@ -139,7 +139,7 @@
       "who": "ilda",
       "do": [
         {
-          "appear": [
+          "enter": [
             9,
             14
           ]
@@ -155,9 +155,9 @@
         },
         {
           "by": "classmate_boy",
-          "appear": [
+          "enter": [
             10,
-            13
+            14
           ]
         },
         {
@@ -169,22 +169,16 @@
         },
         {
           "by": "classmate_girl",
-          "appear": [
-            10,
+          "enter": [
+            9,
             14
           ]
         },
         {
           "by": "classmate_girl",
           "walk": [
-            [
-              9,
-              14
-            ],
-            [
-              9,
-              12
-            ]
+            9,
+            12
           ]
         }
       ]
@@ -259,16 +253,16 @@
       "who": "zarek",
       "do": [
         {
-          "appear": [
-            3,
-            2
+          "enter": [
+            8,
+            0
           ],
           "flying": true
         },
         {
           "fly": [
             [
-              3,
+              8,
               3
             ],
             [

@@ -17,7 +17,8 @@ import { contentUrl } from './address';
 
 /** One thing a figure does in a step (D103), by its `by`, the step's, or the
  * speaker: a walk to a tile or through a list of them, each in a straight line,
- * ending out of the scene by a way out when it says `leave` (D319); a turn; an
+ * ending out of the scene by a way out when it says `leave` (D319); a coming in by a
+ * way in, on foot or `flying` (D322); a turn; an
  * appearing, maybe stepping out `from` behind a thing on a cell beside (D128), and a
  * vanishing (a speaker's once its words are said), a ghost's or a familiar's
  * (D322); lying down asleep in a bed and waking
@@ -25,6 +26,7 @@ import { contentUrl } from './address';
  * bringing a thing staged hidden into sight on its cell (D279). */
 export type Action = { by?: string } & (
   | { walk: Tile | Tile[]; leave?: true }
+  | { enter: Tile; flying?: true }
   | { fly: Tile | Tile[] }
   | { land: true }
   | { face: Facing }
@@ -202,7 +204,9 @@ function waypoints(walk: Tile | Tile[]): Tile[] {
  * or, in a step that says `meanwhile`, in the tick of the first of them (D275). A walk
  * that leaves by the scene's edge goes on two cells past it, off the map, and one that
  * leaves by a way-out cell ends there; the figure is gone (`leave`) the tick after its
- * last move (D319). */
+ * last move (D319). A figure that comes in by the edge is set two cells past it (`enter`),
+ * a cell further for each before it by the same cell in the step, and walks or flies in,
+ * a move a tick; one that comes in by a way-out cell is set on it (D322). */
 export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   events: WorldEvent[];
   spans: { first: number; last: number }[];
@@ -248,6 +252,7 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   const shut = (tile: Tile) => [...doors].some(([id, door]) => !opened.has(id) && same(door.at, tile));
   // The ways out behind a cover, which a walk that leaves ends on (D319).
   const outs = ((story.world.out as Tile[] | undefined) ?? []).map(([x, y]) => `${x},${y}`);
+  const width = start[0]?.length ?? 0;
   const floor = ([x, y]: Tile) => {
     const char = start[y]?.[x];
     return char !== undefined && char !== '#' && char !== '=';
@@ -282,7 +287,7 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   /** What an event does to who stands where and which doors are open. */
   const played = (actor: string, kind: string, data: Record<string, unknown>) => {
     if (kind === 'move') standing.set(actor, data.to as Tile);
-    else if (kind === 'appear') standing.set(actor, data.at as Tile);
+    else if (kind === 'appear' || kind === 'enter') standing.set(actor, data.at as Tile);
     else if (kind === 'vanish' || kind === 'leave') standing.delete(actor);
     else if (kind === 'close') opened.delete(String(data.id));
     else if (kind === 'open') {
@@ -302,6 +307,8 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
     vanishing = null;
     const about = step.by ?? step.who;
     const queues = new Map<string, { kind: string; data: Record<string, unknown> }[]>();
+    // How many have come in by each cell of the edge in the step so far (D322).
+    const filed = new Map<string, number>();
     for (const action of actionsOf(step.do)) {
       const doer = action.by ?? about;
       if ('vanish' in action && !('walk' in action) && doer === step.who && step.who !== 'voice') {
@@ -346,6 +353,33 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
           queue.push({ kind: 'leave', data: { ...aside } });
         }
         where.set(doer, [x, y]);
+      } else if ('enter' in action) {
+        // A coming in (D322): by a way out behind a cover, set there; by the edge, set two
+        // cells past it, one more for each before it by the same cell in the step, facing
+        // in, and a move a tick, as a walk's or a flight's, onto its cell.
+        const flown = action.flying ? { flying: true } : {};
+        if (action.flying && !aloft.has(doer)) {
+          aloft.add(doer);
+          queue.push({ kind: 'fly', data: { id: doer, ...aside } });
+        }
+        const [x, y] = action.enter;
+        if (outs.includes(`${x},${y}`)) {
+          queue.push({ kind: 'enter', data: { at: action.enter, ...aside } });
+        } else {
+          const [dx, dy, facing]: [number, number, Facing] =
+            x === 0 ? [1, 0, 'right'] : y === 0 ? [0, 1, 'down'] : x === width - 1 ? [-1, 0, 'left'] : [0, -1, 'up'];
+          const behind = filed.get(`${x},${y}`) ?? 0;
+          filed.set(`${x},${y}`, behind + 1);
+          const far = 2 + behind;
+          let at: Tile = [x - dx * far, y - dy * far];
+          queue.push({ kind: 'enter', data: { at, facing, ...aside } });
+          for (let step = 0; step < far; step += 1) {
+            const from = at;
+            at = [at[0] + dx, at[1] + dy];
+            queue.push({ kind: 'move', data: { from, to: at, facing, ...flown, ...aside } });
+          }
+        }
+        where.set(doer, action.enter);
       } else if ('land' in action) {
         aloft.delete(doer);
         queue.push({ kind: 'land', data: { id: doer, ...aside } });

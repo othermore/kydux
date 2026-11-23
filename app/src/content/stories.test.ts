@@ -146,6 +146,84 @@ describe('a story as the scene\'s events (D74)', () => {
     ]);
   });
 
+  // A yard of floor to its edges, five by four, and Teku out of it (D322).
+  const yard = {
+    map: ['.....', '.S...', '.....', '.....'],
+    actors: [
+      { id: 'teku', kind: 'friend' },
+      { id: 'wenna', kind: 'friend' },
+    ],
+  };
+
+  it.each([
+    [[0, 2], [-2, 2], 'right'],
+    [[2, 0], [2, -2], 'down'],
+    [[4, 2], [6, 2], 'left'],
+    [[2, 3], [2, 5], 'up'],
+  ] as const)('brings a figure in by the edge at %j from two cells past it, a move a tick (D322)', (cell, from, facing) => {
+    const { events } = storyEvents({
+      world: yard,
+      steps: steps({ who: 'voice', by: 'teku', do: [{ enter: [...cell] }, { face: 'left' }] }),
+    });
+    expect(events.map((e) => [e.tick, e.kind, e.data.at ?? e.data.to ?? null, e.data.facing ?? null])).toEqual([
+      [1, 'enter', [...from], facing],
+      [2, 'move', [(from[0] + cell[0]) / 2, (from[1] + cell[1]) / 2], facing],
+      [3, 'move', [...cell], facing],
+      // The figure's next doing follows at the next tick.
+      [4, 'turn', null, 'left'],
+    ]);
+  });
+
+  it('finds a figure seeked to inside its entrance where the step has it, past the edge or on its way (D322)', () => {
+    const { events } = storyEvents({ world: yard, steps: steps({ who: 'voice', by: 'teku', do: { enter: [4, 2] } }) });
+    // Where the scene puts Teku shown at once up to a tick: the last place an event gives.
+    const at = (tick: number) =>
+      events.filter((e) => e.tick <= tick && e.actor === 'teku').map((e) => e.data.at ?? e.data.to).at(-1);
+    expect(at(1)).toEqual([6, 2]);
+    expect(at(2)).toEqual([5, 2]);
+    expect(at(3)).toEqual([4, 2]);
+  });
+
+  it('brings two by one cell in single file, the second a cell further and a tick later (D322)', () => {
+    const { events } = storyEvents({
+      world: yard,
+      steps: steps({ who: 'voice', do: [{ by: 'teku', enter: [2, 3] }, { by: 'wenna', enter: [2, 3] }] }),
+    });
+    const of = (who: string) => events.filter((e) => e.actor === who).map((e) => [e.tick, e.kind, e.data.at ?? e.data.to]);
+    expect(of('teku')).toEqual([
+      [1, 'enter', [2, 5]],
+      [2, 'move', [2, 4]],
+      [3, 'move', [2, 3]],
+    ]);
+    expect(of('wenna')).toEqual([
+      [1, 'enter', [2, 6]],
+      [2, 'move', [2, 5]],
+      [3, 'move', [2, 4]],
+      [4, 'move', [2, 3]],
+    ]);
+  });
+
+  it('brings a figure in through the air, its broom lifted first, and onto a way out at once (D322)', () => {
+    const flown = storyEvents({
+      world: yard,
+      steps: steps({ who: 'voice', by: 'teku', do: { enter: [2, 0], flying: true } }),
+    });
+    expect(flown.events.map((e) => [e.tick, e.kind, e.data.flying ?? null])).toEqual([
+      [1, 'fly', null],
+      [2, 'enter', null],
+      [3, 'move', true],
+      [4, 'move', true],
+    ]);
+    const behind = storyEvents({
+      world: { ...yard, out: [[4, 0]] },
+      steps: steps({ who: 'voice', by: 'teku', do: [{ enter: [4, 0] }, { walk: [4, 1] }] }),
+    });
+    expect(behind.events.map((e) => [e.tick, e.kind, e.data.at ?? e.data.to])).toEqual([
+      [1, 'enter', [4, 0]],
+      [2, 'move', [4, 1]],
+    ]);
+  });
+
   it('ends a walk that leaves by a way out behind a cover on its cell, gone the tick after (D319)', () => {
     const hall = { ...world, out: [[2, 1]] };
     const { events } = storyEvents({

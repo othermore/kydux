@@ -3521,6 +3521,21 @@ class LevelScene extends Phaser.Scene {
         }
         break;
       }
+      // Come into the scene by a way in (D322): past its edge, where the frame hides it, or
+      // behind a cover, whole and solid, on its feet or in the air, from where it walks in.
+      case 'enter': {
+        const at = tileOf(event.data.at);
+        if (!at) return;
+        this.tweens.killTweensOf(actor.sprite);
+        this.glides.delete(actor.sprite);
+        actor.tile = at;
+        actor.facing = facing;
+        this.sitting.delete(actor.sprite);
+        actor.sprite.setPosition(...this.figureAt(at)).setVisible(true).setAlpha(1);
+        this.face(actor.sprite, actor.facing);
+        this.sways.get(actor.sprite)?.start();
+        break;
+      }
       // Gone out of the scene by a way out, past its edge or behind a cover: hidden at
       // once, with nothing of it in sight to fade (D319).
       case 'leave':

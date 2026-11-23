@@ -17,6 +17,7 @@ interface Frame {
   figures: string;
   world: string;
   travel: boolean;
+  flying: string;
 }
 
 /** Every frame of the scene from now on, and every value data-actors takes. */
@@ -37,6 +38,7 @@ async function recordFrames(page: Page): Promise<void> {
         figures: node.dataset.figures ?? '',
         world: node.dataset.world ?? '',
         travel: node.dataset.cameraTravel === 'true',
+        flying: node.dataset.flying ?? '',
       });
       kept.kyduxLook = requestAnimationFrame(look);
     };
@@ -72,13 +74,14 @@ test('the voice tells a step under the scene; a figure says its own in a bubble'
   await expect(page.locator('#story-title')).toHaveText('At the gate');
   await expect(page.locator('#story-voice')).toContainText('You are at the gate');
   await expect(scene).toHaveAttribute('data-state', 'done');
-  // The friend, Teku for Marta (D77), is not there yet, and the camera stays on the story's tile.
-  await expect(scene).toHaveAttribute('data-actors', '');
+  // The friend, Teku for Marta (D77), stands down the path, at its foot, from the start
+  // (D322); the camera stays on the story's tile.
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,29,up');
   await expect(scene).toHaveAttribute('data-following', 'false');
   await expect(page.locator('#story-back')).toBeDisabled();
 
-  // The wizard calls out; the friend comes up the path from below the picture, then walks
-  // up to the wizard and speaks.
+  // The wizard calls out; the friend comes up the path from its foot, then walks up to the
+  // wizard and speaks.
   await storyNext(page);
   await expect(scene).toHaveAttribute('data-speaker', 'wizard');
   await expect(scene).toHaveAttribute('data-bubble', /Is anyone there\?/);
@@ -654,6 +657,94 @@ for (const [name, size] of [
     await expect(scene).not.toHaveAttribute('data-figures', /(^|;)(friend|mate|wizard):/);
   });
 }
+
+test('in Caught Dask walks in from past the foot of the picture, solid all the way (D322)', async ({ page }) => {
+  test.setTimeout(ciTimes(180_000));
+  await page.goto('/#story/caught');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await recordFrames(page);
+  await page.locator('#story-next').click();
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  await expect(scene).toHaveAttribute('data-actors', /dask:10,13,up/);
+  const { frames } = await framesRecorded(page);
+  const seen = frames.filter((frame) => figureIn(frame, 'dask'));
+  // Drawn from the step's start, out of what the camera shows; solid to its end.
+  const first = seen[0] ? figureIn(seen[0], 'dask') : null;
+  expect(first && !inView(first.box, seen[0]?.world ?? '')).toBe(true);
+  for (const frame of seen) expect(figureIn(frame, 'dask')?.alpha).toBe(1);
+  // Again plays the entrance anew; Back from step 3 finds him on his cell.
+  await recordFrames(page);
+  await page.locator('#story-again').click();
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  expect((await framesRecorded(page)).actors.some((all) => /dask:10,1[56],/.test(all))).toBe(true);
+  await storyNext(page);
+  await page.locator('#story-back').click();
+  await expect(scene).toHaveAttribute('data-actors', /dask:10,13,up/);
+});
+
+test('in The flying lesson Ilda and two pupils come up the path one behind another, and Zarek flies in over the lake (D322)', async ({
+  page,
+}) => {
+  test.setTimeout(ciTimes(180_000));
+  await page.goto('/#story/the-flying-lesson');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await recordFrames(page);
+  await page.locator('#story-next').click();
+  await expect(page.locator('#story-step')).toHaveText(/^2 /);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+  for (const placed of ['ilda:9,7,', 'classmate_girl:9,12,', 'classmate_boy:10,12,']) {
+    await expect(scene).toHaveAttribute('data-actors', new RegExp(placed));
+  }
+  const { frames, actors } = await framesRecorded(page);
+  for (const frame of frames) {
+    for (const id of ['ilda', 'classmate_girl', 'classmate_boy']) {
+      const figure = figureIn(frame, id);
+      if (figure) expect(figure.alpha, id).toBe(1);
+    }
+  }
+  // The girl never stands on Ilda's cell.
+  for (const all of actors) {
+    const ilda = /ilda:(-?\d+,-?\d+),/.exec(all)?.[1];
+    const girl = /classmate_girl:(-?\d+,-?\d+),/.exec(all)?.[1];
+    expect(ilda !== undefined && ilda === girl, all).toBe(false);
+  }
+  await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-flying-lesson-2.png' });
+  // Step 4: Zarek in the air from the step's start, landing by the class.
+  await storyNext(page);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+  await recordFrames(page);
+  await page.locator('#story-next').click();
+  await expect(scene).toHaveAttribute('data-actors', /zarek:3,5,left/, { timeout: ciTimes(30_000) });
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  const flight = (await framesRecorded(page)).frames.filter((frame) => figureIn(frame, 'zarek'));
+  expect(flight.length).toBeGreaterThan(0);
+  expect(flight[0]?.flying).toContain('zarek');
+  for (const frame of flight) expect(figureIn(frame, 'zarek')?.alpha).toBe(1);
+  await expect(scene).not.toHaveAttribute('data-flying', /zarek/);
+});
+
+test('at the gate the friend comes up the path from its foot, and after dark the friend stands outside the door (D322)', async ({
+  page,
+}) => {
+  test.setTimeout(ciTimes(180_000));
+  await page.goto('/#story/at-the-gate');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,29,up');
+  await recordFrames(page);
+  await storyNext(page, 2);
+  await expect(scene).toHaveAttribute('data-actors', 'friend:8,22,up', { timeout: ciTimes(30_000) });
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  for (const frame of (await framesRecorded(page)).frames) {
+    const friend = figureIn(frame, 'friend');
+    expect(friend?.alpha).toBe(1);
+  }
+  await page.goto('/#story/after-dark');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await expect(scene).toHaveAttribute('data-actors', /(^|;)friend:12,15,up/);
+});
 
 test("the hall goes dark while the children tell Orla, and comes back in the evening (D280)", async ({ page }) => {
   test.setTimeout(ciTimes(180_000));

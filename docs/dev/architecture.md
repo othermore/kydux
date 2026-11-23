@@ -2914,10 +2914,12 @@ one overturns stays, marked as superseded.
   it. The page's background is the parchment with a fine grain, an SVG noise written in
   the stylesheet, no file. The components: a button stands on a darker foot and sinks
   onto it when pressed (`.button`, `.big-button`; `.quiet-button` paper with an ink line;
-  `danger` soft red; a round `.icon-button` for a drawing alone, D293), and the gold ring
-  of a key goes round a button and its foot together, close against both, a card over the scene and a panel on the page are paper with a
-  thin ink line and a soft shadow (`.card`, `.panel`), a chip is a small gold label
-  (`.chip`), a field is paper with an ink line. The screens keep their layout and their
+  `danger` soft red; a round `.icon-button` for a drawing alone, D293), the feet of
+  two buttons in a row are as deep and a quiet button in a row with a big one has its
+  letter, so that the two stand level, and the gold ring of a key goes round a button
+  and its foot together, close against both; a card over the scene and a panel on the
+  page are paper with a thin ink line and a soft shadow (`.card`, `.panel`), a chip is a
+  small gold label (`.chip`), a field is paper with an ink line. The screens keep their layout and their
   `data-*` hooks; their colours, borders, radii and shadows are the tokens'. The header
   has Kydux's mark, a pointed hat and a wand drawn as an inline SVG in ink, wood and gold
   (`ui/mark.ts`, the tab's icon `favicon.svg` the same, D254), and the link to the welcome

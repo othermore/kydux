@@ -72,6 +72,10 @@ And, seeing the first pictures of it:
 > justo con el botón? Y que el botón verde parezca un pixel o dos más
 > alto que el botón marrón?
 
+And, once those two were mended on the start screen:
+
+> eso se ha arreglado para todos los botones??
+
 The designer builds this sprint, as it built sprint 46: the owner asks
 for it within one conversation and reviews it by looking; nobody else
 reviews it before the owner does.
@@ -95,7 +99,9 @@ Reading the page for it showed two more things:
   goes on, and there the ring is always seen.
 - **The row's two buttons were not as tall.** The big button's letter
   is 20 pixels and its foot 3 deep; the quiet one beside it had a
-  letter of 18 and a foot of 2.
+  letter of 18 and a foot of 2. The same held on the wizard's page, a
+  lesson's and a story's, where *Back* stands in the row of the big
+  button.
 
 ## 2. Decisions
 
@@ -165,7 +171,11 @@ Both are written in full in `architecture.md`.
   `--foot-colour`; its ring is drawn as shadows round the button and
   round its foot, three pixels of gold close against both. The outline
   stays, transparent, for a window of forced colours.
-- `.start-actions .quiet-button` has the big button's letter and foot.
+- Every button's foot is as deep, three pixels, quiet and danger ones
+  as a green one's; the small quiet buttons of a screen's top keep two.
+  In a row with a big button, a quiet one has the big one's letter, and
+  so its height: the start screen's row, the wizard's page, a lesson's
+  and a story's pages.
 
 ### 3.4 Texts
 

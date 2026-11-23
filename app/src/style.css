@@ -137,7 +137,7 @@ a {
 
 /* The components (D193). A button: rounded, moss green standing on a darker foot, which
    it sinks onto when pressed; a quiet one is paper with an ink line; a danger one soft
-   red. */
+   red. Their feet are as deep, so that two in a row stand level. */
 .button,
 .buttons button,
 .card button,
@@ -172,7 +172,7 @@ a {
 .quiet-button,
 .card #again,
 .button.quiet {
-  --foot-height: 2px;
+  --foot-height: 3px;
   --foot-colour: var(--ink-line);
 
   border: 1px solid var(--ink-line);
@@ -189,7 +189,6 @@ a {
 
 .quiet-button.danger,
 .button.danger {
-  --foot-height: 2px;
   --foot-colour: var(--rose);
 
   border-color: var(--rose);
@@ -1500,10 +1499,8 @@ footer .build {
   font-size: 20px;
 }
 
-/* Beside the big button, a quiet one is as tall as it, on a foot as deep. */
-.start-actions .quiet-button {
-  --foot-height: 3px;
-
+/* In a row with a big button, a quiet one has its letter, and so its height. */
+:where(:has(> .big-button)) .quiet-button {
   font-size: 20px;
 }
 
@@ -1671,6 +1668,8 @@ a.stop-body:focus-visible {
 }
 
 .quiet-button.small {
+  --foot-height: 2px;
+
   margin-bottom: 8px;
   padding: 3px 12px;
   font-size: 15px;
@@ -2470,7 +2469,8 @@ a.stop-body:focus-visible {
 }
 
 /* Play is the row's first button, of the size of the one beside it. */
-.game-buttons .big-button {
+.game-buttons .big-button,
+.game-buttons .quiet-button {
   font-size: inherit;
 }
 

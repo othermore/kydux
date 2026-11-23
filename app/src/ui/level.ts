@@ -8,7 +8,6 @@
 // playback ended, and with its sound where there was no playback (D247).
 
 import * as analytics from '../analytics/analytics';
-import { published } from '../analytics/site';
 import { checkedFamiliar, familiarTable, isPractice, keptAfter, withFamiliar } from '../content/familiar';
 import { itemHash } from '../content/course';
 import { type LoadedLevel, loadLevelText } from '../content/levels';
@@ -194,12 +193,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   );
   // In the tester's mode, a button writes the level's solution in the editor: the
   // solution packed apart for it (pack-world.mjs), or on the development server
-  // read from content/ (vite.config.ts). The published game holds no solution, and
-  // has no button for one (D333).
-  const solution =
-    debugging() && !published()
-      ? [labelled(element('button', { id: 'debug-solution', type: 'button' }), () => t('debug.solution'))]
-      : [];
+  // read from content/ (vite.config.ts). The published game holds no solution
+  // (D333) and has no tester's mode (D335).
+  const solution = debugging()
+    ? [labelled(element('button', { id: 'debug-solution', type: 'button' }), () => t('debug.solution'))]
+    : [];
   const notebook = notebookPanel(
     loaded.level,
     parts.table,

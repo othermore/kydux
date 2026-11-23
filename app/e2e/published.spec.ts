@@ -311,9 +311,14 @@ test.describe('on the published host, served as plain files', () => {
     expect(goatPaths(sent, true)).toEqual([]);
   });
 
-  test("the tester's mode holds no button for a level's solution", async ({ page, context }) => {
+  test("the tester's mode is not there", async ({ page, context }) => {
     await catchCounting(context);
     await acceptedBefore(context);
+    // A newcomer's map keeps its locked stops closed: the mode would make each a link.
+    await page.goto('/?debug#map');
+    await expect(page.locator('.map-screen a.stop-body').first()).toBeAttached({ timeout: ciTimes(90_000) });
+    expect(await page.locator('.map-screen span.stop-body').count()).toBeGreaterThan(0);
+    // A level has no button for its solution.
     await page.goto('/?debug#level/the-long-corridor');
     await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await expect(page.locator('#debug-solution')).toHaveCount(0);

@@ -808,9 +808,9 @@ The game on a child's computer, three ways.
     isolates itself through a service worker where the host sends no header
     (D329), and the published game counts its use with Google Analytics
     and GoatCounter, behind a notice about the cookies (D328), each run
-    and each hint read among it (D334), and holds no solution of a level
-    (D333). The friends' server on hija is kept, inactive, for a beta
-    (D330).
+    and each hint read among it (D334), holds no solution of a level
+    (D333) and has no tester's mode (D335). The friends' server on hija is
+    kept, inactive, for a beta (D330).
 
 UAT: the Windows and macOS binaries on real machines; the `.deb` on a Kidux
 machine; the guide followed as written.

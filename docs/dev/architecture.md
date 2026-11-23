@@ -5417,9 +5417,8 @@ one overturns stays, marked as superseded.
   repositorio y en los servidores de prueba*). A build keeps each level's solution apart
   from the game, under `__debug/solution/`, for the tester's button that writes it in
   the editor (`?debug`). `ci/publish.sh` leaves that folder out of the branch it
-  publishes, as it leaves the source maps out, and on the published host the tester's
-  mode has no such button (`level.ts`, by `published()`); the rest of the mode is the
-  same there, every stop of the map open and the scene's layers. A computer of one's
+  publishes, as it leaves the source maps out, and the published host has no tester's
+  mode, so no such button (D335). A computer of one's
   own and a server of trials have the button and the solutions. The build is one for
   every place it runs: the publication takes from it, and the page asks where it is.
   `tests/project/test_published.py` holds the folder's name equal in `pack-world.mjs`
@@ -5448,3 +5447,17 @@ one overturns stays, marked as superseded.
   where children are stuck, and a level won at the first run with no hint asks nothing
   of them. Rules out the program's text, an error's message or a name of the child's
   sent anywhere, and an event at every tick of a run.
+- **D335 — The published game has no tester's mode.** Decided 2026-11-23 by the owner
+  (*?debug … deja abrir todo el mapa (pero no está en el servidor de producción)*; asked
+  what the published game should do with it, *Quitarlo entero*). The tester's mode
+  (`?debug`) opens every stop of the map, draws the scene's layers of cells and masks,
+  offers a level's solution and its ways, and plays the music's mixer: a tester's
+  tools, and on the published game a way for a child to skip the course by writing one
+  word in the address. So `debugging()` (`engine/debugging.ts`), which every screen asks,
+  answers no on the published host (`published()`, D328), and there an address with
+  `?debug` shows the game as any other does. A computer of one's own and a server of
+  trials have the whole mode. The build is one for every place it runs (D333): the page
+  asks where it is. `debugging.test.ts` holds the answer by host, and
+  `e2e/published.spec.ts` opens the map and a level with `?debug` under the published
+  name. Rules out a map opened whole, a solution or a scene's layers on the published
+  game, and a second build without the mode.

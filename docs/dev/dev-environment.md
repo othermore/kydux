@@ -280,6 +280,10 @@ turning a layer on or off:
 The browser remembers which layers are on. The address without `?debug`
 shows the game as the child sees it.
 
+This mode is for your machine and for a server of trials. The published
+game has none of it: at `https://kydux.kidux.org`, an address with
+`?debug` shows the game as any other address does (D335).
+
 Two more things help you test quickly in this mode:
 
 - **The map opens every stop.** Each lesson, level and story is a link,
@@ -296,8 +300,8 @@ Two more things help you test quickly in this mode:
   the development server and on a build served from your machine or from a
   server of trials. A build keeps the solutions apart from the game, under
   `__debug/solution/`, and only this button asks for them. The published
-  game has neither the button nor the solutions: `ci/publish.sh` leaves
-  that folder out (D333).
+  game does not hold the solutions: `ci/publish.sh` leaves that folder
+  out (D333).
 
 ### A story on its scene
 

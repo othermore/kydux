@@ -14,3 +14,6 @@ rest of it (D194).
   `tools/art/figures.py --portraits` from its gender's base bust,
   `art/figures/portrait-wizard-<gender>.webp`, which Gemini 3 Pro Image painted from
   the base sheet's figure (`tools/art/prompts/portrait-wizard-<gender>.md`).
+- `nuri-b.webp` and `teku-b.webp`: Nuri and Teku in their second set of colours (D90,
+  D283), recoloured by `tools/art/figures.py --portraits` from `nuri.webp` and
+  `teku.webp`, which wear the first.

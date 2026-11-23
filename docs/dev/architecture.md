@@ -1558,7 +1558,8 @@ one overturns stays, marked as superseded.
   two friends', stand farthest apart as seen (CIELAB's ΔE), the closest
   two counting; it depends on the look alone, so a friend wears the same
   colours all the game. `tools/art/figures.py` draws a sheet a set,
-  `<friend>-a` and `<friend>-b`, and `figureName` picks it. Rules out a
+  `<friend>-a` and `<friend>-b`, and `figureName` picks it; its portrait is of that set too
+  (D283). Rules out a
   single colour a friend, which with eight looks always meets one of them,
   and a rule by hue: no saturated colour is far in hue from all eight.
 - **D91 — A pupil asleep lies in the bed, under its covers.** Decided
@@ -4483,3 +4484,16 @@ one overturns stays, marked as superseded.
   it is covered, its feet and legs (a quarter, measured), under the wall at least half of
   it, as at a mouth's edge walking out, and elsewhere a tenth at most. Rules out a familiar that walks
   on the trench's wall, and a trench painted again to meet the figure.
+- **D283 — A friend's portrait wears what the friend wears in the scene.** Decided
+  2026-11-18 by the designer, from sprint 53's review. A friend has two sets of colours,
+  and the wizard's look says which it wears (D90, `friendSheet`). The portrait beside a
+  friend's words is of the set the friend wears (`portraitOf`, by `friendSets` of the
+  look): `<friend>.webp` is the friend in its first set, and each friend's second set has
+  a portrait of its own, `<friend>-b.webp`, made from the first by the recolouring that
+  makes the wizard's (`tools/art/figures.py --portraits`, D194), with no painting asked:
+  the cloth's pieces, which the bust's dark outlines part, are the robe where they reach
+  the bust's foot and the hat elsewhere, with the cloth's folds joined to them; where the
+  skin is of the cloth's hues, Teku's orange, the face is the lowest of those pieces and
+  is kept; the band and the robe's stars take the set's band colour where it differs
+  (`FRIEND_PORTRAITS`, `friend_portrait_parts`). With no look, the first set. Rules out a
+  portrait in green beside a figure in burgundy.

@@ -121,3 +121,20 @@ test.describe('a thought about a bump (D237)', () => {
     await expect(page.locator('#scene')).not.toHaveAttribute('data-thought', /./);
   });
 });
+
+test("a friend's portrait wears the colours the friend wears in the scene (D283)", async ({ browser }) => {
+  // Marta in teal has Teku in his second set, navy; in sky, in his first, orange (D90).
+  for (const [look, portrait] of [
+    ['teal', 'teku-b'],
+    ['sky', 'teku'],
+  ] as const) {
+    const context = await browser.newContext({ locale: 'es-ES' });
+    await seedWizard(context, { ...MARTA, look });
+    const page = await context.newPage();
+    await page.goto('/#story/at-the-gate');
+    await storyNext(page, 3);
+    await expect(page.locator('#scene')).toHaveAttribute('data-friend-figure', portrait === 'teku' ? 'teku-a' : 'teku-b');
+    await expect(page.locator('#story-speaker img')).toHaveAttribute('data-portrait', portrait);
+    await context.close();
+  }
+});

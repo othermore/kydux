@@ -1020,9 +1020,77 @@ def portrait_parts(
     return {"hat": hat, "robe": robe, "band": band | stars, "skin": skin, "hair": hair}
 
 
+def _recoloured(bust: np.ndarray, parts: dict[str, np.ndarray], colours: dict) -> np.ndarray:
+    """A bust with each part named in `colours` in that colour, its shading kept."""
+    hsv = _hsv(bust[..., :3].astype(float))
+    out = bust.copy()
+    for part, mask in parts.items():
+        if part not in colours or not mask.any():
+            continue
+        h, s, v = _target(colours[part])
+        middle = float(np.median(hsv[..., 2][mask])) or 1.0
+        values = np.clip(hsv[..., 2][mask] / middle * v, 0, 1)
+        rgb = np.array([colorsys.hsv_to_rgb(h, s, value) for value in values]) * 255
+        out[..., :3][mask] = rgb.round().astype(np.uint8)
+    return out
+
+
+#: The friends' portraits (D283): `<friend>.webp` is the friend in its first set of
+#: colours (D90), and its second set's is made from it by recolouring, as a look's is: for
+#: each, the hues of its cloth, robe and hat, whether its skin is of those hues too (Teku's
+#: orange robe is), and the hues of its band and its robe's stars, which take the set's
+#: band colour (none where the second set's band is the first's).
+FRIEND_PORTRAITS = {
+    "nuri": {"cloth": (110, 165), "skin_in_cloth": False, "accents": ()},
+    "teku": {"cloth": (10, 36), "skin_in_cloth": True, "accents": ((175, 215), (38, 95))},
+}
+
+
+def friend_portrait_parts(
+    bust: np.ndarray,
+    cloth: tuple[int, int],
+    skin_in_cloth: bool = False,
+    accents: tuple[tuple[int, int], ...] = (),
+) -> dict[str, np.ndarray]:
+    """A friend's bust's parts (D283): the cloth's large pieces, which its dark outlines
+    part, are the robe where they reach the bust's foot and the hat elsewhere, each with
+    the cloth's small pieces joined to it, its shaded folds; where the skin is of the
+    cloth's hues, the face is the lowest of the other large pieces and is kept; the accents
+    are the band and the robe's stars, each of its hues, light ones too."""
+    alpha = bust[..., 3] > 0
+    hsv = _hsv(bust[..., :3].astype(float))
+    hue, sat, val = hsv[..., 0] * 360, hsv[..., 1], hsv[..., 2]
+    low, high = cloth
+    cloths = alpha & (hue >= low) & (hue <= high) & (sat > 0.4) & (val > 0.22)
+    pieces, sizes = _pieces(cloths)
+    large = list(np.nonzero(sizes > sizes.max() * 0.08)[0])
+    foot = bust.shape[0] - 6
+    robe_pieces = [n for n in large if np.nonzero(pieces == n)[0].max() >= foot]
+    others = [n for n in large if n not in robe_pieces]
+    face = np.zeros_like(alpha)
+    if skin_in_cloth and others:
+        lowest = max(others, key=lambda n: np.nonzero(pieces == n)[0].mean())
+        face = pieces == lowest
+        others = [n for n in others if n != lowest]
+    robe = np.isin(pieces, robe_pieces)
+    hat = np.isin(pieces, others)
+    # The cloth's shaded folds and edges, darker or paler than its large pieces.
+    loose = alpha & (hue >= low) & (hue <= high) & (sat > 0.2) & (val > 0.08) & ~face
+    loose_pieces, _ = _pieces(loose)
+    for part in (hat, robe):
+        joined = np.unique(loose_pieces[part & loose])
+        part |= np.isin(loose_pieces, joined[joined > 0])
+    accent = np.zeros_like(alpha)
+    for low, high in accents:
+        accent |= alpha & (hue >= low) & (hue <= high) & (sat > 0.15) & (val > 0.3)
+    accent &= _grown(robe | hat, 16)
+    return {"robe": robe & ~accent, "hat": hat & ~accent, "band": accent}
+
+
 def make_portraits() -> list[Path]:
     """Each look's portrait (D194), content/art/portraits/wizard-<look>.webp: its
-    gender's base bust with each part in the look's colour, its shading kept."""
+    gender's base bust with each part in the look's colour, its shading kept; and each
+    friend's in its second set of colours, `<friend>-b.webp`, from its first (D283)."""
     written = []
     busts = {
         gender: np.array(Image.open(BASE_DIR / name).convert("RGBA"))
@@ -1031,19 +1099,20 @@ def make_portraits() -> list[Path]:
     parts = {gender: portrait_parts(bust) for gender, bust in busts.items()}
     PORTRAITS.mkdir(parents=True, exist_ok=True)
     for look_id, look in looks().items():
-        bust = busts[look["gender"]]
-        hsv = _hsv(bust[..., :3].astype(float))
-        out = bust.copy()
-        for part, mask in parts[look["gender"]].items():
-            if not mask.any():
-                continue
-            h, s, v = _target(look[part])
-            middle = float(np.median(hsv[..., 2][mask])) or 1.0
-            values = np.clip(hsv[..., 2][mask] / middle * v, 0, 1)
-            rgb = np.array([colorsys.hsv_to_rgb(h, s, value) for value in values]) * 255
-            out[..., :3][mask] = rgb.round().astype(np.uint8)
+        out = _recoloured(busts[look["gender"]], parts[look["gender"]], look)
         target = PORTRAITS / f"wizard-{look_id}.webp"
         Image.fromarray(out).save(target, quality=90, method=6)
+        written.append(target)
+    sets = friend_sets()
+    for name, about in FRIEND_PORTRAITS.items():
+        bust = np.array(Image.open(PORTRAITS / f"{name}.webp").convert("RGBA"))
+        own = friend_portrait_parts(bust, **about)
+        first, second = sets[name]["a"], sets[name]["b"]
+        colours = {key: second[key] for key in ("robe", "hat")}
+        if about["accents"] and second["band"] != first["band"]:
+            colours["band"] = second["band"]
+        target = PORTRAITS / f"{name}-b.webp"
+        Image.fromarray(_recoloured(bust, own, colours)).save(target, quality=90, method=6)
         written.append(target)
     return written
 

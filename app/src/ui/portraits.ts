@@ -1,9 +1,12 @@
 // The characters' portraits (D194): a bust of each, content/art/portraits/<id>.webp,
 // painted as the figures are, and one for each of the wizard's looks,
 // wizard-<look>.webp, recoloured from its gender's base bust so that it matches the
-// figure. A lesson's teacher, a card's and a story's speaker, the creator's looks and
-// the start screen's wizard are shown by them. `data-portrait` names the one shown.
+// figure; a friend's in the set of colours the friend wears for the wizard's look,
+// `<friend>.webp` its first and `<friend>-b.webp` its second (D90, D283). A lesson's
+// teacher, a card's and a story's speaker, the creator's looks and the start screen's
+// wizard are shown by them. `data-portrait` names the one shown.
 
+import { friendSets, lookOf } from '../engine/looks';
 import { friendId, mateId } from '../i18n';
 import { element } from './dom';
 import { contentUrl } from '../content/address';
@@ -14,9 +17,10 @@ import { contentUrl } from '../content/address';
 export function portraitOf(who: string, look?: string | null): string | null {
   if (who === 'voice' || who === 'cold_voice') return null;
   if (who === 'wizard') return look ? `wizard-${look}` : null;
-  if (who === 'friend') return friendId();
-  if (who === 'mate') return mateId();
-  return who;
+  const id = who === 'friend' ? friendId() : who === 'mate' ? mateId() : who;
+  // A friend in the set of colours it wears in the scene (D283): the first with no look.
+  if ((id === 'nuri' || id === 'teku') && look && friendSets(lookOf(look))[id] === 'b') return `${id}-b`;
+  return id;
 }
 
 /** A portrait's picture, with no words of its own: the name is said beside it. One the

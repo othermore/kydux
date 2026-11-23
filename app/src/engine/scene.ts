@@ -37,7 +37,8 @@
 // from its kind's sprite, "id:kind:x,y" joined by ";", D182), data-found (the
 // hidden things found and seen, joined by ",", D184), data-trials-fading (the trials seen that
 // do not hold, which fade, joined by ",", D276), data-seated (the figures drawn
-// seated, joined by ",", D279), data-untied (the brooms
+// seated, joined by ",", D279), data-hour (`sunset` while a story shows the scene
+// painted at that hour, D273, D280), data-untied (the brooms
 // untied, D183), data-thought-box (the thought's cloud on the page,
 // "left,top,right,bottom", D245), data-wizard-facing (the way the wizard faces, as the
 // scene keeps it, D241), data-wizard-frame (the name of the frame the wizard is drawn
@@ -2407,7 +2408,12 @@ class LevelScene extends Phaser.Scene {
    * hour where it has one. */
   private paintHour(): void {
     const hour = this.options.story?.light === 'sunset' ? 'sunset' : null;
-    if (!hour || !this.art?.scene.hours?.[hour]) return;
+    if (!hour || !this.art?.scene.hours?.[hour]) {
+      delete this.parentNode.dataset.hour;
+      return;
+    }
+    // The hour the scene is shown at, for the tests (D280).
+    this.parentNode.dataset.hour = hour;
     for (const image of this.grounds.get(hour) ?? []) image.setAlpha(1);
     for (const image of this.things.values()) {
       const key = hourKey(image.texture.key, hour);

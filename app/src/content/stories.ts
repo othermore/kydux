@@ -66,6 +66,8 @@ export interface StoryPart {
   camera: Tile;
   light?: 'morning' | 'sunset';
   flying?: string[];
+  /** Opened after time has passed: the scene gone dark and back (D280). */
+  later?: boolean;
 }
 
 export interface Story {

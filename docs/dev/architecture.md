@@ -3027,7 +3027,8 @@ one overturns stays, marked as superseded.
   width, on the window's middle (the wide fields). The framing holds, the camera
   following no one, until a later step of the same part frames another, and the story's
   steps without one keep it (`framingAt`); a part told on another scene starts with
-  none. The world checks the box against the scene. A bubble said under a framing
+  none, whether it is opened at once or after time has passed (D280). The world checks
+  the box against the scene. A bubble said under a framing
   stays inside what the framing shows of the scene, between its top and its bottom and
   between its sides (`bubbleRoom`, `bubbleMiddle`, `SceneCamera.shown`, `shownSides`),
   since the camera does not follow the words. The scene's parent
@@ -4289,7 +4290,9 @@ one overturns stays, marked as superseded.
   (D148): one edit of the base with the three lit, the masks by difference. The great book
   lies open on the lectern in the base painting, and Bimo sleeps on the lectern beside it in
   every picture: he is part of the scene, speaks from his spot (D264) and never leaves. The
-  hall has a second light, `sunset`, as the dormitory has `morning`. The forgotten room's
+  hall has a second light, `sunset`, as the dormitory has `morning`; it comes in *Lo que
+  trajo el familiar* while the children tell Orla, after the scene has gone dark (D280).
+  The forgotten room's
   door has no open state. A familiar's sheet is
   `content/art/figures/familiar-<kind>-<color>.webp`, fourteen in all, laid out as a
   wizard's walking sheet (three steps down, left, right and up) with each figure half a
@@ -4420,3 +4423,23 @@ one overturns stays, marked as superseded.
   and throwing `thread_1` aside to (9, 2) as he passes (9, 3), then faces right at (8, 3)
   and sits. Rules out a figure that slides seated, and things that lie in a story before
   what brings them.
+- **D280 — Time that passes in a story is the scene gone dark and back.** Decided
+  2026-11-18 by the owner (*hay que poner una animación (como apagar y encender la
+  escena, ponerla gris... algo así) para que se entienda que están contando toda la
+  historia*; *el cambio a por la tarde noche se peude hacer cuando se supone que los niños
+  están contando la historia*). A step whose `scene` says `"later": true` opens after a
+  passing of time: the scene fades to dark (`PASS_FADE`, 0.6 s), stays dark for a moment
+  (`PASS_DARK`, 0.8 s) while the part's staging is drawn, and comes back out of the dark
+  (0.6 s), two seconds in all (`story.ts`, `.story-dark`); the band says nothing
+  meanwhile, the step is played and its words open once the scene is back, and the music
+  goes on. `later` is said only in a step's `scene` (`PART_STAGING`), and is true; the
+  part carries it to the page. The part may be the same scene staged under another
+  light (`light`, D273): the afternoon gone while something was told. A step shown at
+  once (back, Again, or a story skipped through) shows its staging with no wait, and a
+  step gone to while the scene is dark is shown at once. A change of place stays a cut.
+  In *Lo que trajo el familiar* step 12, Orla's *Debo agradeceros por vuestra
+  sinceridad.*, is a part of its own: the hall again, every figure where step 10 put it,
+  the wizard turned to Orla as there, under `sunset`, with the framing step 10 gave; from
+  there to the story's end the hall is in its evening, and *El fin de curso* opens under
+  the same light. Rules out words that say time went by over a scene that does not
+  change, and a light that changes between two stories with nothing that tells why.

@@ -67,6 +67,12 @@ const FADE_IN = 500;
 /** How long the letter takes to be lowered or raised, in milliseconds (style.css). */
 const LETTER_MS = 600;
 
+/** Time that passes in a story (D280): how long the scene takes to go dark and to come
+ * back out of it, and how long it stays dark, in milliseconds (style.css); two seconds
+ * in all. */
+const PASS_FADE = 600;
+const PASS_DARK = 800;
+
 /** Where the letter lies on the painting (D257), in fractions of the painting: its width,
  * the middle it is centred on across, and its top. The painted castle lies from 0.516 to
  * 0.849 of the painting's width and from 0.054 to 0.498 of its height; the sheet covers
@@ -176,10 +182,13 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     parts.letter && letterPicture
       ? element('div', { id: 'story-letter', className: 'story-letter', hidden: true }, [letterPicture, letterWords])
       : null;
+  // The dark the scene goes into and comes back out of while time passes (D280).
+  const dark = element('div', { id: 'story-dark', className: 'story-dark' });
   const frame = element('div', { className: 'scene-frame story-frame' }, [
     still,
     ...(letter ? [letter] : []),
     sceneParent,
+    dark,
     zoom.node,
   ]);
   /** The letter's words and description in the language now set (D257). */
@@ -287,8 +296,13 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   ];
   const partAt = (index: number) => partsOf().filter((part) => part.step <= index).length - 1;
 
-  /** The scene of a part started, the one before it gone, and the step played on it. */
-  const startPart = (index: number) => {
+  /** Time that passes, while a step's words are not yet said (D280): counted so that a
+   * step gone to meanwhile drops it. */
+  let passing = 0;
+
+  /** The scene of a part started, the one before it gone, and the step played on it, or
+   * what `then` does once it is there. */
+  const startPart = (index: number, then: () => void = () => play()) => {
     const part = partsOf()[index];
     if (!part || loadingPart === index) return;
     loadingPart = index;
@@ -316,7 +330,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
       sceneParent.dataset.storyPart = String(index);
       zoom.attach(handle);
       came = true;
-      play();
+      then();
     })
       // A scene whose code did not arrive: the page says so (main.ts).
       .catch(() => {});
@@ -444,8 +458,53 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     }, FADE_IN);
   };
 
-  /** The scene as the step before left it, then this step played. */
-  const play = () => {
+  /** Time passes before a part marked later (D280): the scene goes dark, the part's
+   * staging is drawn in the dark, comes back out of it, and the step is played, its words
+   * said, once it is back. The band says nothing meanwhile. */
+  const passTime = (index: number) => {
+    const token = ++passing;
+    words();
+    voice.replaceChildren();
+    heard.textContent = '';
+    sceneParent.dataset.state = 'loading';
+    frame.dataset.passing = 'dark';
+    const darkFrom = performance.now();
+    const after = (then: () => void, ms: number) =>
+      setTimeout(() => {
+        if (token === passing && !destroyed) then();
+      }, ms);
+    after(() => {
+      startPart(index, () => {
+        if (token !== passing) return;
+        after(() => {
+          frame.dataset.passing = 'back';
+          after(() => {
+            delete frame.dataset.passing;
+            play();
+          }, PASS_FADE);
+        }, Math.max(0, darkFrom + PASS_FADE + PASS_DARK - performance.now()));
+      });
+    }, PASS_FADE);
+  };
+
+  /** The scene as the step before left it, then this step played; `onward`, reached by
+   * Next, where a part marked later opens after time has passed (D280). */
+  const play = (onward = false) => {
+    if (frame.dataset.passing) {
+      // A step gone to while time passes is shown at once, a part started in the dark
+      // started again for it.
+      passing += 1;
+      delete frame.dataset.passing;
+      if (!scene || loadingPart !== -1) {
+        loadingPart = -1;
+        shownPart = -1;
+      }
+    }
+    const passed = partsOf()[partAt(step)];
+    if (onward && passed?.later && passed.step === step && partAt(step) !== shownPart) {
+      passTime(partAt(step));
+      return;
+    }
     words();
     showPlace();
     const index = partAt(step);
@@ -481,7 +540,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
       return;
     }
     step = Math.min(Math.max(0, step + by), story.steps.length - 1);
-    play();
+    play(by === 1);
   };
   back.addEventListener('click', () => go(-1));
   forward.addEventListener('click', () => go(1));

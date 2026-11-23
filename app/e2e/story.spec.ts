@@ -416,3 +416,30 @@ test('Rinlo stands, crosses the room leaving the pieces behind him, and sits aga
   await page.locator('#story-back').click();
   await expect(scene).not.toHaveAttribute('data-found', /thread/);
 });
+
+test("the hall goes dark while the children tell Orla, and comes back in the evening (D280)", async ({ page }) => {
+  test.setTimeout(ciTimes(180_000));
+  await page.goto('/#story/what-the-familiar-brought');
+  const scene = page.locator('#scene');
+  const frame = page.locator('.story-frame');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  // Step 11, the friend's «We have something to tell you…», in the hall by day.
+  await storyNext(page, 10);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  await expect(scene).not.toHaveAttribute('data-hour', 'sunset');
+  // Step 12: the scene goes dark, and Orla's words are said once it is back, at sunset.
+  await page.locator('#story-next').click();
+  await expect(frame).toHaveAttribute('data-passing', 'dark');
+  await expect(scene).not.toHaveAttribute('data-speaker', 'orla');
+  await expect(page.locator('#story-speaker')).toHaveCount(0);
+  await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-hall-dark.png' });
+  await expect(frame).not.toHaveAttribute('data-passing', /./, { timeout: ciTimes(15_000) });
+  await expect(scene).toHaveAttribute('data-hour', 'sunset');
+  await expect(scene).toHaveAttribute('data-speaker', 'orla', { timeout: ciTimes(15_000) });
+  await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-hall-in-the-evening.png' });
+  // Back to step 11: the day's hall at once, with no dark.
+  await page.locator('#story-back').click();
+  await expect(frame).not.toHaveAttribute('data-passing', /./);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  await expect(scene).not.toHaveAttribute('data-hour', 'sunset');
+});

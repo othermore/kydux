@@ -1520,3 +1520,25 @@ def test_a_story_step_frames_a_box_of_cells_or_the_scene_s_width():
     ):
         with pytest.raises(LevelError):
             _step_camera(wrong, "story", 20, 15)
+
+
+def test_time_passes_only_where_a_step_s_scene_says_so():
+    """A part that opens after the scene has gone dark and back says `later` in its step's
+    scene, and nowhere else (D280)."""
+    evening = {
+        "scene": "lake",
+        "wizard": [0, 3],
+        "camera": [2, 2],
+        "light": "sunset",
+        "later": True,
+    }
+    first = {"who": "voice", "do": None}
+    story = told([first, {"who": "voice", "scene": evening, "do": None}], actors=[])
+    assert story["parts"][0]["later"] is True
+    assert story["parts"][0]["light"] == "sunset"
+    with pytest.raises(LevelError, match="later is said in a step"):
+        told([{**first, "later": True}], actors=[])
+    with pytest.raises(LevelError, match="later is said in a step"):
+        told([first], actors=[], later=True)
+    with pytest.raises(LevelError, match="later is true"):
+        told([first, {"who": "voice", "scene": {**evening, "later": 1}}], actors=[])

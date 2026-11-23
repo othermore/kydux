@@ -209,7 +209,82 @@
     },
     {
       "who": "orla",
-      "do": null
+      "scene": {
+        "scene": "the-tower-hall",
+        "wizard": [
+          10,
+          5
+        ],
+        "camera": [
+          10,
+          6
+        ],
+        "actors": [
+          {
+            "id": "rinlo",
+            "kind": "friend",
+            "at": [
+              9,
+              5
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "friend",
+            "kind": "friend",
+            "at": [
+              8,
+              5
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "mate",
+            "kind": "friend",
+            "at": [
+              12,
+              5
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "familiar",
+            "kind": "familiar",
+            "at": [
+              10,
+              6
+            ],
+            "facing": "up"
+          },
+          {
+            "id": "orla",
+            "kind": "teacher",
+            "at": [
+              11,
+              4
+            ],
+            "facing": "down"
+          }
+        ],
+        "light": "sunset",
+        "later": true
+      },
+      "camera": {
+        "fit": [
+          [
+            4,
+            2
+          ],
+          [
+            15,
+            11
+          ]
+        ]
+      },
+      "do": {
+        "face": "up"
+      },
+      "by": "wizard"
     },
     {
       "who": "orla",

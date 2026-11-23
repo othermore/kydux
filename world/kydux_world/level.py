@@ -2362,8 +2362,9 @@ def story_on_scene(
 
 
 #: What a step that changes the story's scene gives of the new one (a story's own
-#: staging, for the steps from it on).
-PART_STAGING = ("scene", "wizard", "actors", "things", "camera", "light", "flying")
+#: staging, for the steps from it on), and whether it opens after time has passed, the
+#: scene gone dark and back (`later`, D280).
+PART_STAGING = ("scene", "wizard", "actors", "things", "camera", "light", "flying", "later")
 
 
 def story_on_scenes(
@@ -2374,12 +2375,16 @@ def story_on_scenes(
     part of the story told there, each part checked on its scene as a story is
     (story_on_scene), its figures where the staging puts them. The story made whole
     is the first part's, with every step, and `parts`, each later part's first step
-    and the world, camera and light it is told in. `scene_of` gives a scene by id;
+    and the world, camera and light it is told in, and whether time passes before it
+    (`later`, D280). `scene_of` gives a scene by id;
     `sitters`, the figures whose sheets have the sitting rows (D273, D279)."""
     story_id = data.get("id")
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
         raise LevelError(f"{story_id}: a story has its steps")
+    # Time passes only where a step's scene says so (D280).
+    if "later" in data or any(isinstance(step, dict) and "later" in step for step in steps):
+        raise LevelError(f"{story_id}: later is said in a step's scene")
     starts = [0] + [
         index for index, step in enumerate(steps) if isinstance(step, dict) and "scene" in step
     ]
@@ -2398,6 +2403,8 @@ def story_on_scenes(
                     f"{story_id}, step {first + 1}: a scene's staging is one of "
                     f"{', '.join(PART_STAGING)}"
                 )
+            if staging.get("later", True) is not True:
+                raise LevelError(f"{story_id}, step {first + 1}: later is true, or not given")
             staging = {"id": story_id, **staging}
         built = story_on_scene({**staging, "steps": own}, scene_of(staging.get("scene")), sitters)
         parts.append((first, built))
@@ -2412,6 +2419,7 @@ def story_on_scenes(
                 "camera": built["camera"],
                 **({"light": built["light"]} if "light" in built else {}),
                 **({"flying": built["flying"]} if "flying" in built else {}),
+                **({"later": True} if built.get("later") is True else {}),
             }
             for first, built in parts[1:]
         ]

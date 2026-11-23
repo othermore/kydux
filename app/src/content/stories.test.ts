@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { loadStory, type StoryStep, storyEvents } from './stories';
+import { loadStory, type StoryStep, storyEvents, themeAt } from './stories';
 
 const world = { map: ['#####', '#S..#', '#...#', '#####'], actors: [{ id: 'nuri', kind: 'friend', at: [3, 2] }] };
 
@@ -272,6 +272,58 @@ describe('the words on the dark before a part that opens later (D309)', () => {
       expect(story.later).toEqual({ 1: 'Pasa un buen rato.' });
       files['text.es.json'] = { title: 'Una historia', steps: ['Uno.', 'Dos.'] };
       expect((await loadStory('a-story', 'es')).later).toBeUndefined();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+describe('the theme in force at a step (D314)', () => {
+  const told = (...named: (string | undefined)[]) =>
+    steps(...named.map((music) => ({ who: 'voice', do: null, ...(music ? { music } : {}) })));
+
+  it("is the chapter's where neither the story nor a step names one", () => {
+    expect(themeAt({ steps: told(undefined, undefined) }, 1, 'the-familiar')).toBe('the-familiar');
+    expect(themeAt({ steps: told(undefined) }, 0, undefined)).toBeUndefined();
+  });
+
+  it("is the story's own from its first step, in the place of its chapter's", () => {
+    expect(themeAt({ steps: told(undefined, undefined), music: 'the-truth' }, 0, 'the-familiar')).toBe('the-truth');
+  });
+
+  it('is the one a step names, from that step on; before it, the one before', () => {
+    const story = { steps: told(undefined, undefined, 'the-truth', undefined) };
+    expect(themeAt(story, 1, 'the-familiar')).toBe('the-familiar');
+    expect(themeAt(story, 2, 'the-familiar')).toBe('the-truth');
+    expect(themeAt(story, 3, 'the-familiar')).toBe('the-truth');
+  });
+
+  it('is the last of two named up to the step, and going back before the first brings the story\'s back', () => {
+    const story = { steps: told(undefined, 'the-familiar', undefined, 'arrival'), music: 'the-truth' };
+    expect(themeAt(story, 0, 'the-library')).toBe('the-truth');
+    expect(themeAt(story, 2, 'the-library')).toBe('the-familiar');
+    expect(themeAt(story, 3, 'the-library')).toBe('arrival');
+    expect(themeAt(story, 9, 'the-library')).toBe('arrival');
+  });
+
+  it("is read from the story's staging: its top's and each step's", async () => {
+    const files: Record<string, unknown> = {
+      'story.json': {
+        music: 'the-truth',
+        steps: [{ who: 'voice' }, { who: 'voice', music: 'the-familiar' }],
+        world: { id: 'w' },
+        camera: [0, 0],
+      },
+      'text.es.json': { title: 'Una historia', steps: ['Uno.', 'Dos.'] },
+    };
+    vi.stubGlobal('fetch', async (url: string) => {
+      const name = /[^/?]+(?=\?|$)/.exec(url)?.[0] ?? '';
+      return { ok: name in files, headers: new Headers({ 'content-type': 'application/json' }), json: async () => files[name] };
+    });
+    try {
+      const story = await loadStory('a-story', 'es');
+      expect(story.music).toBe('the-truth');
+      expect(story.steps.map((step) => step.music)).toEqual([undefined, 'the-familiar']);
     } finally {
       vi.unstubAllGlobals();
     }

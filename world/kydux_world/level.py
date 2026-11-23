@@ -42,6 +42,7 @@ the loader passes as `goals_source`.
 
 import json
 import keyword
+import re
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -2062,10 +2063,14 @@ def story_on_scene(
     stays in sight but for a walk out of sight in the story's last step. A story with
     a still, the opening, may tell its first steps in a row over the still (`still`,
     D251), each of the voice and doing nothing; the first of them, in a row, may hold
-    the story's letter before the still (`letter`, D257)."""
+    the story's letter before the still (`letter`, D257). The story may name the theme
+    it opens to, and a step the theme from it on (`music`, a theme's id, D314); both are
+    carried as written."""
     story_id = data.get("id")
     if "scene" not in data:
         raise LevelError(f"{story_id}: a story is told on a scene")
+    if "music" in data:
+        _theme(data["music"], story_id)
     wizard = _story_tile(data.get("wizard"), "wizard", story_id)
     # Which way the wizard faces from the first frame (D308).
     facing = data.get("facing", "down")
@@ -2296,6 +2301,8 @@ def story_on_scene(
                 )
         if "camera" in step:
             _step_camera(step["camera"], here, width, height)
+        if "music" in step:
+            _theme(step["music"], here)
         actions = _story_actions(doing, here)
         # Each figure's part of the step, its actions one after another as single
         # events (a walk is a move a tile), with where each leaves it; the figures
@@ -2494,6 +2501,13 @@ def story_on_scene(
     return story
 
 
+def _theme(value: Any, here: str) -> str:
+    """The theme a story or a step names (D314): a theme's id, shaped as a story's is."""
+    if not isinstance(value, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", value):
+        raise LevelError(f"{here}: music is a theme's id")
+    return value
+
+
 #: What a step that changes the story's scene gives of the new one (a story's own
 #: staging, for the steps from it on), and whether it opens after time has passed, the
 #: scene gone dark and back (`later`, D280).
@@ -2519,8 +2533,10 @@ def story_on_scenes(
     (story_on_scene), its figures where the staging puts them. The story made whole
     is the first part's, with every step, and `parts`, each later part's first step
     and the world, camera and light it is told in, and whether time passes before it
-    (`later`, D280). `scene_of` gives a scene by id;
-    `sitters`, the figures whose sheets have the sitting rows (D273, D279)."""
+    (`later`, D280). A step names its theme (`music`, D314) beside its `who`, never in
+    its scene; the story's and the steps' themes are carried in the story made whole.
+    `scene_of` gives a scene by id; `sitters`, the figures whose sheets have the
+    sitting rows (D273, D279)."""
     story_id = data.get("id")
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
@@ -2541,6 +2557,11 @@ def story_on_scenes(
             staging = {k: v for k, v in data.items() if k != "steps"}
         else:
             staging = steps[first]["scene"]
+            if isinstance(staging, dict) and "music" in staging:
+                raise LevelError(
+                    f"{story_id}, step {first + 1}: music is said beside the step's who, "
+                    "not in its scene"
+                )
             if not isinstance(staging, dict) or set(staging) - set(PART_STAGING):
                 raise LevelError(
                     f"{story_id}, step {first + 1}: a scene's staging is one of "

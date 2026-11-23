@@ -1,7 +1,8 @@
 """The music's themes (D192): each chapter names one, the year's ending has one of its own
 (D313), each parses, and each loops on a bar, with no note ringing over a section's end;
 the files are what the score in tools/sound/compose.py makes. A theme has one set of
-voices and no arrangements (D210), and no candidate stands beside them (D209)."""
+voices and no arrangements (D210), and no candidate stands beside them (D209). Every theme
+a story names, at its top or in a step (D314), is one of them."""
 
 import importlib.util
 import json
@@ -42,6 +43,17 @@ def test_no_chapter_has_the_ending_s_theme():
 def test_every_chapter_names_a_theme_there_is(path):
     music = json.loads(path.read_text(encoding="utf-8")).get("music")
     assert music and (MUSIC / f"{music}.json").is_file(), f"{path.parent.name} names no theme"
+
+
+STORIES = sorted((REPO / "content" / "stories").glob("*/story.json"))
+
+
+@pytest.mark.parametrize("path", STORIES, ids=lambda p: p.parent.name)
+def test_every_theme_a_story_names_is_there(path):
+    story = json.loads(path.read_text(encoding="utf-8"))
+    named = [story.get("music"), *(step.get("music") for step in story.get("steps", []))]
+    for theme in filter(None, named):
+        assert (MUSIC / f"{theme}.json").is_file(), f"{path.parent.name} names no theme {theme}"
 
 
 @pytest.mark.parametrize("path", THEMES, ids=lambda p: p.stem)

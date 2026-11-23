@@ -1,6 +1,7 @@
 import { version } from '../package.json';
 import {
   type Course,
+  chapterThemeOf,
   conceptsAt,
   courseStart,
   items,
@@ -311,6 +312,10 @@ async function showStory(content: HTMLElement, id: string, key: string): Promise
           ? { onward: progress.wizard() ? itemHash(next(course, `story:${id}`) ?? courseStart(course)) : '#wizard' }
           : {}),
         label: itemLabel(course, `story:${id}`),
+        // The theme the story opens to, and the music asked for the theme in force at
+        // each step shown (D314).
+        theme: themeOf(course, `story:${id}`),
+        hear: (theme) => music.play(theme, 'story'),
         // Every part's figure of the familiar is the game's own (D305).
         startScene: (parent, world, ...rest) =>
           sceneCode.then(({ startScene }) => startScene(parent, withGamesFamiliar(world), ...rest)),
@@ -650,11 +655,12 @@ function newcomer(): boolean {
   return !progress.wizard() && progress.savedGames().length === 0;
 }
 
-/** The music a screen plays (D192): a story, the map and the start screen their
- * chapter's theme at its loudness, a lesson and a level every voice of it lower (D210);
- * the map and the start screen are in the chapter the child is in. The settings, the
- * creator and the page of themes leave the music as it is, or start the first
- * chapter's. */
+/** The music a screen plays (D192): a story the theme it opens to, its own where it
+ * names one (D314), the map and the start screen their chapter's theme, all at its
+ * loudness, a lesson and a level every voice of it lower (D210); the map and the start
+ * screen are in the chapter the child is in, whatever story the child read last. The
+ * settings, the creator and the page of themes leave the music as it is, or start the
+ * first chapter's. */
 function playMusicFor(wanted: Route): void {
   if (wanted.name === 'music') return;
   if ((wanted.name === 'settings' || wanted.name === 'wizard') && music.state.theme) return;
@@ -665,7 +671,7 @@ function playMusicFor(wanted: Route): void {
   const heard = wanted.name === 'level' || wanted.name === 'lesson' ? 'level' : 'story';
   void loadCourse()
     .then((course) => {
-      const theme = themeOf(course, item);
+      const theme = wanted.name === 'story' ? themeOf(course, item) : chapterThemeOf(course, item);
       if (theme) music.play(theme, heard);
     })
     .catch(() => {});

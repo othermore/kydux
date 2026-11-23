@@ -109,9 +109,10 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 opens, before the first screen loads (D214, D221, D246)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
-                events (stories.ts), the guide's words (guide.ts), and the
-                course (course.ts): its chapters, what comes next, a stop's
-                state, what the child knows in a level (D40); the first year's
+                events, and the theme in force at a step (stories.ts, D314), the
+                guide's words (guide.ts), and the course (course.ts): its
+                chapters, what comes next, a stop's state, what the child knows
+                in a level (D40), the theme a screen opens to (D192, D314); the first year's
                 familiars, the draft and the familiar written into a level, and
                 what a text says of them (familiar.ts, D260, D265, D266); every address
                 of a file under content/, with the world's stamp, is made by
@@ -124,7 +125,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (D230), pack the world
                 into world.zip, copy the content into content/ with the course in
                 content/course.json (its items' titles in every language among
-                it), each level and story on a scene with its world built in, and
+                it, and the theme each story that names one opens to, D314), each
+                level and story on a scene with its world built in, and
                 write the world's table as api.json and the first year's
                 familiars as familiars.json (D260)
   e2e/          the browser tests (Playwright), beside the node_modules they need;
@@ -149,7 +151,8 @@ content/        the levels, each with level.json, its words in text.<lang>.json,
                 sheets, the wizard's in every look and the two friends' (art/,
                 D76, D77); the lessons, each with lesson.json and
                 <lang>.md; the stories (stories/), each with story.json, its
-                staging, and text.<lang>.json, D74; the chapters, each with
+                staging and maybe the music it is told to (D314), and
+                text.<lang>.json, D74; the chapters, each with
                 chapter.json and text.<lang>.json; the screen's guide's words
                 (guide/, D68); the music's themes, each its notes (music/, D192);
                 each chapter's card for the map (art/chapters/, D193)
@@ -2886,8 +2889,8 @@ one overturns stays, marked as superseded.
   chapter's `chapter.json` names its theme (`music`), which the
   course carries; a story, the map and the start screen play their chapter's theme at its
   written loudness, a lesson and a level every voice of it at 0.4 (D210), the map and the
-  start screen in the chapter the child is in; the settings and the creator leave what
-  plays. A change of loudness or of theme fades over two seconds. The music starts at the
+  start screen in the chapter the child is in; a story may name its own, at its top or in
+  a step (D314); the settings and the creator leave what plays. A change of loudness or of theme fades over two seconds. The music starts at the
   first gesture on the page, as a browser asks, goes on across screens without a break,
   and is still while the tab is hidden. While a theme plays or fades it keeps the page's
   one sound context awake, which otherwise sleeps three seconds after the last sound
@@ -4969,3 +4972,24 @@ one overturns stays, marked as superseded.
   loop without a seam; it is no chapter's theme, and a test holds it to its tune, its
   piano alone and its last part. Rules out a tune or a harmony taken from any other work
   (D192).
+- **D314 — A story may name the music it is told to.** Decided 2026-11-22 by the owner, of
+  the year's ending. A story's `story.json` may say `music`, a theme of `content/music/`, at
+  its top: the story opens to that theme in the place of its chapter's. A step may say
+  `music` too, beside its `who`, never in its `scene`: the theme changes as that step is
+  shown. The theme in force at a step is the last one named at or before it, the story's
+  own where no step has named one, the chapter's where the story names none (`themeAt` in
+  `content/stories.ts`); so going back over a step that changed the theme brings back the
+  one before it, and a step played again leaves the theme as it is. The story's screen
+  asks the music for the theme in force whenever it shows a step, forward, back or at its
+  start, heard as a story. The change fades as any change of theme does (D192), and the
+  new theme starts at its beginning; a theme asked for that already plays goes on without
+  a break, from a story to the next too: `course.json` carries the theme each story that
+  names one opens to, by item (`music`), and `themeOf` gives it before the story is
+  fetched. The map, the start screen, the lessons and the levels play their chapter's
+  theme, as they do (`chapterThemeOf`), whatever story the child read last. *What the
+  familiar brought* turns to *The truth* (D313) at its step 11, as the four go up to the
+  tower; *The end of the year* opens to it and turns back to *The familiar* at its step
+  32, the dinner over the castle's painting. The world's check refuses a `music` that is
+  not a theme's id, and one inside a step's scene; a test holds every theme a story names
+  to be there. Rules out a theme chosen by the page from a story's id, and a second theme
+  heard at once.

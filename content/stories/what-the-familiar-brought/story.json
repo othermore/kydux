@@ -180,6 +180,7 @@
     },
     {
       "who": "voice",
+      "music": "the-truth",
       "scene": {
         "scene": "the-tower-hall",
         "wizard": [

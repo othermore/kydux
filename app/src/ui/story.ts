@@ -24,7 +24,7 @@
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
-import { type Story, type StoryPart, type StoryStep, storyEvents } from '../content/stories';
+import { type Story, type StoryPart, type StoryStep, storyEvents, themeAt } from '../content/stories';
 import { lookOf } from '../engine/looks';
 import { readingMs } from '../engine/bubble';
 import type { SceneHandle, SceneOptions } from '../engine/scene';
@@ -60,6 +60,10 @@ export interface StoryScreenParts {
   /** The letter held before the still at a step that holds it (D257): its picture, and
    * its heading, words and description in the language now set. */
   letter?: { src: string; title: () => string; words: () => string; alt: () => string };
+  /** The theme the story opens to where no step has named one (D192, D314). */
+  theme?: string;
+  /** Asks the music for a theme, heard as a story: a theme that already plays goes on. */
+  hear?: (theme: string) => void;
 }
 
 /** How long the scene takes to come in over the still, in milliseconds (style.css). */
@@ -544,12 +548,20 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     scene.playback.play();
   };
 
+  /** The theme in force at the step shown, asked of the music as a step is shown,
+   * forward, back or at the start (D314); a step played again asks nothing new. */
+  const hear = () => {
+    const theme = themeAt(story, step, parts.theme);
+    if (theme) parts.hear?.(theme);
+  };
+
   const go = (by: 1 | -1) => {
     if (by === 1 && last()) {
       goOn();
       return;
     }
     step = Math.min(Math.max(0, step + by), story.steps.length - 1);
+    hear();
     play(by === 1);
   };
   back.addEventListener('click', () => go(-1));
@@ -557,6 +569,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
   again.addEventListener('click', () => play());
   skip.addEventListener('click', () => {
     step = story.steps.length - 1;
+    hear();
     play();
     forward.focus();
   });
@@ -580,6 +593,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
       // The opening is before the course: Continue does not come back to it.
       if (!story.opening) progress.setCurrent(`story:${story.id}`);
       document.addEventListener('keydown', onKey);
+      hear();
       // The scene of the story's first part, with the wizard the child made, or the
       // first look before there is one.
       play();

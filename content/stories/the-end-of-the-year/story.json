@@ -1,6 +1,7 @@
 {
   "id": "the-end-of-the-year",
   "scene": "the-tower-hall",
+  "music": "the-truth",
   "light": "sunset",
   "still": "castle",
   "speaker": "orla",
@@ -199,6 +200,7 @@
     },
     {
       "who": "voice",
+      "music": "the-familiar",
       "do": null,
       "still": true
     },

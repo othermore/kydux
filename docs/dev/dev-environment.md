@@ -301,7 +301,13 @@ Two more things help you test quickly in this mode:
 A story is a short play on a scene. Its `story.json` says the scene,
 where the wizard and the others stand, the tile the camera looks at, and
 each step: who speaks and what happens first. Its `text.<lang>.json`
-holds the title and one text for each step. To try a story, open its
+holds the title and one text for each step.
+
+A story plays its chapter's music unless it names its own. A `"music"`
+at the top of `story.json` is the theme the story opens to, by its name
+in `content/music/`. A `"music"` in a step, beside its `"who"`, changes
+the theme from that step on. Going back over that step brings back the
+theme before it. To try a story, open its
 address in the browser, like this one:
 
 ```

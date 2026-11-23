@@ -42,6 +42,9 @@ export interface Course {
   /** The scene each level and each story is played on, by item, so that the page knows
    * a screen's scene before it fetches it (D221); a story's first. */
   scenes?: Record<string, string>;
+  /** The theme each story that names its own opens to, by item (D314), so that the page
+   * plays it before it fetches the story. */
+  music?: Record<string, string>;
 }
 
 export type ItemKind = 'story' | 'lesson' | 'level';
@@ -52,14 +55,21 @@ export function parseItem(item: string): { kind: ItemKind; id: string } | null {
   return match ? { kind: match[1] as ItemKind, id: match[2] ?? '' } : null;
 }
 
-/** The address that opens an item. */
-/** The theme a screen plays (D192): the chapter's that holds `item`, or the first
- * chapter's when no chapter holds it or names a theme. */
-export function themeOf(course: Course, item: string | null | undefined): string | undefined {
+/** The theme of the chapter that holds `item` (D192), or the first chapter's when no
+ * chapter holds it or names a theme: what the map, the start screen, a lesson and a level
+ * play. */
+export function chapterThemeOf(course: Course, item: string | null | undefined): string | undefined {
   const chapter = item ? course.chapters.find((one) => one.items.includes(item)) : undefined;
   return chapter?.music ?? course.chapters[0]?.music;
 }
 
+/** The theme an item opens to: a story's own where it names one (D314), else its
+ * chapter's. */
+export function themeOf(course: Course, item: string | null | undefined): string | undefined {
+  return (item ? course.music?.[item] : undefined) ?? chapterThemeOf(course, item);
+}
+
+/** The address that opens an item. */
 export function itemHash(item: string): string {
   const parsed = parseItem(item);
   return parsed ? `#${parsed.kind}/${parsed.id}` : '#map';

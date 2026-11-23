@@ -5,7 +5,8 @@
 // at once (D103), then its words said in a bubble, or by the voice under the
 // scene; a door's leaf, opening, moves whoever stands where it comes to lie
 // (D125). The opening's first steps may be told over its still (`still`, D251), the
-// first of them holding its letter before it (`letter`, D257).
+// first of them holding its letter before it (`letter`, D257). And the theme a step is
+// told to, which the story or one of its steps may name (`music`, D314).
 
 import type { Facing, Tile } from '../engine/sight';
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
@@ -56,6 +57,8 @@ export interface StoryStep {
   /** A figure's words said as the step begins, its actions played under them (D275):
    * someone speaks while someone else is still on their way. */
   meanwhile?: boolean;
+  /** The theme the story is told to from this step on (D314). */
+  music?: string;
 }
 
 /** A part of a story told on another scene (39.4): from its first step on, the
@@ -94,6 +97,8 @@ export interface Story {
   still?: 'castle';
   /** Who tells the story, for the map and the characters' names (D67). */
   speaker?: string;
+  /** The theme the story opens to, in the place of its chapter's (D314). */
+  music?: string;
 }
 
 export class StoryNotFound extends Error {
@@ -113,6 +118,7 @@ interface StoryJson {
   opening?: boolean;
   speaker?: string;
   still?: string;
+  music?: string;
 }
 
 async function json<T>(url: string): Promise<T | null> {
@@ -145,8 +151,24 @@ export async function loadStory(id: string, lang: Language): Promise<Story> {
     ...(staging.opening === true ? { opening: true } : {}),
     ...(typeof staging.speaker === 'string' ? { speaker: staging.speaker } : {}),
     ...(staging.still === 'castle' ? { still: 'castle' as const } : {}),
+    ...(typeof staging.music === 'string' ? { music: staging.music } : {}),
     ...(later.length > 0 ? { later: Object.fromEntries(later) } : {}),
   };
+}
+
+/** The theme in force at a step (D314): the last one a step up to it names, else the
+ * story's own, else `chapter`'s, the theme its chapter plays. So going back over a step
+ * that changed the theme brings back the one before it. */
+export function themeAt(
+  story: Pick<Story, 'steps' | 'music'>,
+  step: number,
+  chapter: string | undefined,
+): string | undefined {
+  for (let index = Math.min(step, story.steps.length - 1); index >= 0; index -= 1) {
+    const named = story.steps[index]?.music;
+    if (named) return named;
+  }
+  return story.music ?? chapter;
 }
 
 /** A step's actions as a list. */

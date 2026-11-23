@@ -603,3 +603,63 @@ test('a story with parts is read to its end with no page error, the zoom box ask
   await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
   expect(errors).toEqual([]);
 });
+
+test.describe('the ending told to The truth (D313, D314)', () => {
+  const root = (page: Page) => page.locator('html');
+
+  test("from step 11 of What the familiar brought on into The end of the year with no other theme between, and the familiar's back at its dinner", async ({
+    page,
+  }) => {
+    test.setTimeout(ciTimes(300_000));
+    await page.goto('/#story/what-the-familiar-brought');
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-familiar');
+    // Step 11, the four going up to the tower: The truth; back at 10, the familiar's.
+    await storyNext(page, 10);
+    await expect(page.locator('#story-step')).toHaveText(/^11 /);
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
+    await page.locator('#story-back').click();
+    await expect(page.locator('#story-step')).toHaveText(/^10 /);
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-familiar');
+    await storyNext(page);
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
+    // Every value the theme is given from here to the next story's first step.
+    await page.evaluate(() => {
+      const seen: string[] = [];
+      (window as unknown as { themesSeen: string[] }).themesSeen = seen;
+      const html = document.documentElement;
+      new MutationObserver(() => seen.push(html.dataset.musicTheme ?? '')).observe(html, {
+        attributes: true,
+        attributeFilter: ['data-music-theme'],
+      });
+    });
+    await finishStory(page);
+    await expect(page.locator('#story-title')).toHaveText('The end of the year');
+    await expect(page.locator('#story-step')).toHaveText(/^1 /);
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
+    const seen = await page.evaluate(() => (window as unknown as { themesSeen: string[] }).themesSeen);
+    expect(seen.filter((theme) => theme !== 'the-truth')).toEqual([]);
+    // Step 32, the dinner over the castle's painting: the familiar's theme; back, The truth.
+    await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+    await storyNext(page, 31);
+    await expect(page.locator('#story-step')).toHaveText(/^32 /);
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-familiar');
+    await page.locator('#story-back').click();
+    await expect(page.locator('#story-step')).toHaveText(/^31 /);
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
+  });
+
+  test("a visit that starts at The end of the year opens to The truth, and the map after it plays the familiar's", async ({
+    page,
+  }) => {
+    test.setTimeout(ciTimes(180_000));
+    await page.goto('/#story/the-end-of-the-year');
+    await expect(page.locator('#story-step')).toHaveText(/^1 /, { timeout: ciTimes(90_000) });
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-truth');
+    await page.locator('#story-skip').click();
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-familiar');
+    await page.locator('#story-go-on').click();
+    await expect(page).toHaveURL(/#map$/);
+    await expect(root(page)).toHaveAttribute('data-music-theme', 'the-familiar');
+  });
+});

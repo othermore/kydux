@@ -157,6 +157,9 @@ const concepts = {};
 const numbers = {};
 /** The scene each level and story is played on (D221). */
 const scenes = {};
+/** The theme a story opens to where it names its own (D314), so that the page plays it
+ * before it fetches the story. */
+const music = {};
 /** The game's opening, the story before the creator (D61, D78). */
 let opening = null;
 const taught = new Set();
@@ -182,6 +185,7 @@ for (const chapter of chapters) {
     if (kind !== 'lesson') {
       const played = readJson(kind === 'story' ? 'stories' : 'levels', id, kind === 'story' ? 'story.json' : 'level.json');
       if (typeof played.scene === 'string') scenes[item] = played.scene;
+      if (kind === 'story' && typeof played.music === 'string') music[item] = played.music;
     }
     if (kind !== 'level') continue;
     const level = readJson('levels', id, 'level.json');
@@ -238,7 +242,7 @@ const themes = existsSync(musicDir)
 writeFileSync(
   join(content, 'course.json'),
   `${JSON.stringify(
-    { chapters, themes, known, spells_known: spellsKnown, words_known: wordsKnown, concepts, numbers, titles, opening, scenes },
+    { chapters, themes, known, spells_known: spellsKnown, words_known: wordsKnown, concepts, numbers, titles, opening, scenes, music },
     null,
     2,
   )}\n`,

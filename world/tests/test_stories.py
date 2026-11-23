@@ -142,6 +142,65 @@ def test_a_story_says_which_way_its_wizard_faces_from_the_first_frame():
         staged(facing="north")
 
 
+def test_a_story_and_a_step_may_name_the_theme_they_are_told_to():
+    """D314: `music` at a story's top and in a step is a theme's id, carried as written
+    into the story made whole, its parts' steps too; anything else is refused with the
+    story and the step named, and so is `music` inside a step's scene."""
+    from kydux_world.level import story_on_scenes
+
+    story = staged(music="the-truth")
+    assert story["music"] == "the-truth"
+    steps = [{"who": "voice", "do": None}, {"who": "voice", "music": "the-familiar", "do": None}]
+    assert staged(steps=steps, actors=[])["steps"][1]["music"] == "the-familiar"
+    assert "music" not in staged()
+    with pytest.raises(LevelError, match="a-story: music is a theme's id"):
+        staged(music=3)
+    for wrong in (5, "", "The Truth", "the_truth"):
+        bad = [{"who": "voice", "do": None}, {"who": "voice", "music": wrong, "do": None}]
+        with pytest.raises(LevelError, match="a-story, step 2: music is a theme's id"):
+            staged(steps=bad, actors=[])
+
+    def told(second):
+        data = {
+            "id": "a-story",
+            "scene": "yard",
+            "wizard": [1, 1],
+            "music": "the-truth",
+            "steps": [{"who": "voice", "do": None}, second],
+        }
+        return story_on_scenes(data, {"yard": YARD}.get)
+
+    part = {"who": "voice", "music": "the-familiar", "scene": {"scene": "yard", "wizard": [2, 1]}}
+    whole = told({**part, "do": None})
+    assert whole["music"] == "the-truth"
+    assert whole["steps"][1]["music"] == "the-familiar"
+    inside = {"who": "voice", "do": None, "scene": {"scene": "yard", "music": "the-familiar"}}
+    with pytest.raises(LevelError, match="step 2: music is said beside the step's who"):
+        told(inside)
+
+
+def test_the_ending_s_two_stories_name_the_truth_and_bring_the_familiar_back():
+    """D313, D314: What the familiar brought turns to The truth as the four go up to the
+    tower, step 11; The end of the year opens to it and turns back to the familiar's theme
+    at the dinner, step 32, the first told over the still; no other step names one."""
+    import json
+    from pathlib import Path
+
+    stories = Path(__file__).resolve().parents[2] / "content" / "stories"
+
+    def themes(story_id):
+        story = json.loads((stories / story_id / "story.json").read_text())
+        named = {n: step["music"] for n, step in enumerate(story["steps"], 1) if "music" in step}
+        return story, named
+
+    brought, named = themes("what-the-familiar-brought")
+    assert "music" not in brought and named == {11: "the-truth"}
+    assert "scene" in brought["steps"][10] and "music" not in brought["steps"][10]["scene"]
+    ending, named = themes("the-end-of-the-year")
+    assert ending["music"] == "the-truth" and named == {32: "the-familiar"}
+    assert ending["steps"][31].get("still") is True and "still" not in ending["steps"][30]
+
+
 def test_a_meanwhile_speaker_may_walk_out_of_sight_as_its_last_action():
     """D310: who speaks meanwhile says the words as the step begins and may walk out of
     sight at its end; without meanwhile, a speaker out of sight is refused."""

@@ -3,9 +3,10 @@
 Every chapter has a theme of its own (D192), and the year's ending has one more (D313).
 The page plays them with Web Audio (`app/src/engine/music.ts`). No sound file is loaded:
 a theme is the notes, and the page sounds them. A chapter names its theme in its
-`chapter.json` (`"music"`). A theme has one set of voices (D210): a story, the map and
-the start screen play every one at its written loudness; a lesson and a level play every
-one too, lower.
+`chapter.json` (`"music"`). A story may name its own in its `story.json` (D314): at its
+top, the theme it opens to, and in a step, the theme from that step on. A theme has one
+set of voices (D210): a story, the map and the start screen play every one at its written
+loudness; a lesson and a level play every one too, lower.
 
 The themes are Kydux's own, written for the game, and ship under the GNU GPL, version 3
 or later, like the rest of it. They quote no other work.
@@ -17,7 +18,7 @@ or later, like the rest of it. They quote no other work.
 | `the-passages` | 3, The passages | night, a secret, time running while nobody must hear: in four in A minor with its lowered second, a string plucked on every eighth note as a clock, a piano's low notes three, three and two, a timpani on the bar, a horn's long notes that rise a half step and wait, far off, a piano's tune in the second section kept under the clock, a snare's roll at the end of each half |
 | `the-broom` | 4, The broom | a race, tense: fast in four in E minor, a piano's short cells that climb and break off over a low voice running in eighth notes, the drum on every beat, a chord pushed off the beat; a bar with no tune, a leap, a raised seventh left hanging |
 | `the-familiar` | 5, The familiar | the tower's high hall at the year's end, wonder and a little longing: slow in three in D minor with its raised sixth, two flutes as a consort, the second answering the first a bar later, over a harp and a low pad; in its middle part a celesta's tune high over the harp running in eighth notes, a flute's long notes under it; then the consort again over the running harp, the celesta ringing where the tune rests (D296) |
-| `the-truth` | the year's ending, in the tower at sunset | what happened told at last, grave and then great: the familiar's tune with the minor's own low sixth, slower in three in D minor; a piano has it alone, low, over its left hand, and the low strings come in under it; in the middle part the violins rise on a tune of their own to the dominant, the piano running in eighth notes, a flute and a horn joining, a timpani's roll; then every voice plays the tune, the violins in octaves and the horn under them, which turns aside on its last note and comes home two bars later (D313) |
+| `the-truth` | the year's ending, in the tower at sunset: *What the familiar brought* from its step 11, and *The end of the year* to its step 31 | what happened told at last, grave and then great: the familiar's tune with the minor's own low sixth, slower in three in D minor; a piano has it alone, low, over its left hand, and the low strings come in under it; in the middle part the violins rise on a tune of their own to the dominant, the piano running in eighth notes, a flute and a horn joining, a timpani's roll; then every voice plays the tune, the violins in octaves and the horn under them, which turns aside on its last note and comes home two bars later (D313) |
 
 ## The file
 

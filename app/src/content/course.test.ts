@@ -3,6 +3,7 @@ import { defaultProgress } from '../progress/store';
 import {
   type Course,
   chapterStandings,
+  chapterThemeOf,
   courseStart,
   itemHash,
   knownApi,
@@ -11,6 +12,7 @@ import {
   parseItem,
   previous,
   stopState,
+  themeOf,
 } from './course';
 
 const COURSE: Course = {
@@ -132,5 +134,29 @@ describe("the map's chapters (D200)", () => {
       levels: { b: { won: true }, c: { won: true }, e: { won: true }, f: { won: true } },
     };
     expect(standing(progress).map((chapter) => chapter.current)).toEqual([false, false, true]);
+  });
+});
+
+describe('the theme a screen opens to (D192, D314)', () => {
+  const course: Course = {
+    chapters: [
+      { id: '04-the-broom', items: ['level:a'], music: 'the-broom' },
+      { id: '05-the-familiar', items: ['story:b', 'level:c', 'story:d'], music: 'the-familiar' },
+    ],
+    music: { 'story:d': 'the-truth' },
+  };
+
+  it("is a story's own where the course has one, else its chapter's, else the first chapter's", () => {
+    expect(themeOf(course, 'story:d')).toBe('the-truth');
+    expect(themeOf(course, 'story:b')).toBe('the-familiar');
+    expect(themeOf(course, 'level:a')).toBe('the-broom');
+    expect(themeOf(course, 'level:z')).toBe('the-broom');
+    expect(themeOf(course, null)).toBe('the-broom');
+    expect(themeOf({ chapters: course.chapters }, 'story:d')).toBe('the-familiar');
+  });
+
+  it("is the chapter's for the map and the start screen, whatever story the child read last", () => {
+    expect(chapterThemeOf(course, 'story:d')).toBe('the-familiar');
+    expect(chapterThemeOf(course, 'level:c')).toBe('the-familiar');
   });
 });

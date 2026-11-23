@@ -30,13 +30,34 @@
     },
     {
       "who": "voice",
-      "do": {
-        "appear": [
-          8,
-          28
+      "camera": {
+        "fit": [
+          [
+            4,
+            17
+          ],
+          [
+            12,
+            23
+          ]
         ]
       },
-      "by": "friend"
+      "do": [
+        {
+          "by": "friend",
+          "appear": [
+            8,
+            26
+          ]
+        },
+        {
+          "by": "friend",
+          "walk": [
+            8,
+            22
+          ]
+        }
+      ]
     },
     {
       "who": "friend",

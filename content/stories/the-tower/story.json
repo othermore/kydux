@@ -20,6 +20,24 @@
         9
       ],
       "facing": "right"
+    },
+    {
+      "id": "classmate_boy",
+      "kind": "friend",
+      "at": [
+        12,
+        12
+      ],
+      "facing": "down"
+    },
+    {
+      "id": "classmate_girl",
+      "kind": "friend",
+      "at": [
+        12,
+        9
+      ],
+      "facing": "down"
     }
   ],
   "steps": [
@@ -44,15 +62,167 @@
     },
     {
       "who": "voice",
+      "camera": {
+        "fit": [
+          [
+            0,
+            5
+          ],
+          [
+            20,
+            15
+          ]
+        ]
+      },
+      "do": [
+        {
+          "by": "classmate_boy",
+          "walk": [
+            12,
+            13
+          ]
+        },
+        {
+          "by": "classmate_boy",
+          "open": "front_door"
+        },
+        {
+          "by": "classmate_boy",
+          "walk": [
+            [
+              12,
+              15
+            ],
+            [
+              11,
+              15
+            ]
+          ]
+        },
+        {
+          "by": "classmate_boy",
+          "face": "right"
+        },
+        {
+          "by": "classmate_boy",
+          "face": "left"
+        },
+        {
+          "by": "classmate_boy",
+          "walk": [
+            0,
+            15
+          ],
+          "vanish": true
+        },
+        {
+          "by": "classmate_girl",
+          "walk": [
+            12,
+            15
+          ]
+        },
+        {
+          "by": "classmate_girl",
+          "close": "front_door"
+        },
+        {
+          "by": "classmate_girl",
+          "walk": [
+            0,
+            15
+          ],
+          "vanish": true
+        }
+      ]
+    },
+    {
+      "who": "voice",
+      "do": [
+        {
+          "by": "mate",
+          "walk": [
+            [
+              14,
+              10
+            ],
+            [
+              12,
+              10
+            ],
+            [
+              12,
+              13
+            ]
+          ]
+        },
+        {
+          "by": "mate",
+          "open": "front_door"
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              12,
+              15
+            ],
+            [
+              11,
+              15
+            ]
+          ]
+        },
+        {
+          "by": "mate",
+          "face": "right"
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              16,
+              9
+            ],
+            [
+              14,
+              9
+            ],
+            [
+              14,
+              10
+            ],
+            [
+              12,
+              10
+            ],
+            [
+              12,
+              15
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "close": "front_door"
+        },
+        {
+          "by": "wizard",
+          "face": "left"
+        }
+      ]
+    },
+    {
+      "who": "voice",
       "scene": {
         "scene": "the-entrance",
         "wizard": [
           20,
-          19
+          6
         ],
         "camera": [
           20,
-          18
+          12
         ],
         "actors": [
           {
@@ -60,83 +230,154 @@
             "kind": "friend",
             "at": [
               19,
-              19
+              6
             ],
-            "facing": "up"
+            "facing": "down"
           },
           {
             "id": "mate",
             "kind": "friend",
             "at": [
-              21,
-              19
+              20,
+              5
             ],
-            "facing": "up"
+            "facing": "down"
           },
           {
             "id": "zarek",
             "kind": "friend",
-            "facing": "down"
+            "facing": "right",
+            "at": [
+              15,
+              16
+            ]
           }
         ]
       },
       "do": [
         {
           "by": "wizard",
-          "face": "up"
+          "walk": [
+            20,
+            16
+          ]
         },
         {
-          "by": "zarek",
-          "appear": [
-            20,
-            15
+          "by": "friend",
+          "walk": [
+            19,
+            16
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              20,
+              9
+            ],
+            [
+              21,
+              9
+            ],
+            [
+              21,
+              16
+            ]
           ]
         },
         {
           "by": "zarek",
           "walk": [
-            20,
-            17
+            [
+              15,
+              18
+            ],
+            [
+              20,
+              18
+            ]
           ]
+        },
+        {
+          "by": "zarek",
+          "face": "up"
+        }
+      ],
+      "camera": {
+        "fit": [
+          [
+            13,
+            5
+          ],
+          [
+            27,
+            19
+          ]
+        ]
+      }
+    },
+    {
+      "who": "zarek",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "zarek",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "zarek",
+      "do": null
+    },
+    {
+      "who": "mate",
+      "by": "zarek",
+      "do": [
+        {
+          "by": "zarek",
+          "walk": [
+            [
+              22,
+              18
+            ],
+            [
+              22,
+              10
+            ],
+            [
+              20,
+              10
+            ],
+            [
+              20,
+              5
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "friend",
+          "face": "right"
+        },
+        {
+          "by": "mate",
+          "face": "left"
         }
       ]
     },
     {
-      "who": "zarek",
-      "do": null
-    },
-    {
-      "who": "friend",
-      "do": null
-    },
-    {
-      "who": "zarek",
-      "do": null
-    },
-    {
-      "who": "friend",
-      "do": null
-    },
-    {
-      "who": "friend",
-      "do": null
-    },
-    {
-      "who": "zarek",
-      "do": null
-    },
-    {
-      "who": "mate",
-      "do": {
-        "walk": [
-          20,
-          14
-        ],
-        "vanish": true
-      },
-      "by": "zarek"
-    },
-    {
       "who": "mate",
       "do": null
     },
@@ -146,7 +387,69 @@
     },
     {
       "who": "mate",
-      "do": null
+      "meanwhile": true,
+      "do": [
+        {
+          "by": "friend",
+          "walk": [
+            [
+              19,
+              11
+            ],
+            [
+              14,
+              11
+            ],
+            [
+              14,
+              6
+            ]
+          ],
+          "vanish": true
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              20,
+              11
+            ],
+            [
+              14,
+              11
+            ],
+            [
+              14,
+              9
+            ],
+            [
+              13,
+              9
+            ],
+            [
+              13,
+              6
+            ]
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              21,
+              11
+            ],
+            [
+              14,
+              11
+            ],
+            [
+              14,
+              6
+            ]
+          ]
+        }
+      ]
     },
     {
       "who": "voice",
@@ -302,21 +605,11 @@
       "do": [
         {
           "by": "friend",
-          "walk": [
-            7,
-            7
-          ]
-        },
-        {
-          "by": "friend",
-          "walk": [
-            6,
-            7
-          ]
-        },
-        {
-          "by": "friend",
           "face": "right"
+        },
+        {
+          "by": "mate",
+          "face": "left"
         }
       ]
     },

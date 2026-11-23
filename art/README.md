@@ -484,6 +484,17 @@ A cell whose figure the upright leaf only touches is walked, the figure drawn 0.
 down below the leaf's row and sideways on it: `export_scene.py` writes those cells into art.json,
 with the door's name (`leaf`), and the content test holds them.
 
+A door in a side wall, seen from above, opens in two pieces (D289): its leaf, standing
+upright on the floor beside the wall, and its doorway, the wall's strip with the shut
+door gone, which lies on the floor. The open state's `floor` is the doorway's piece: its
+own `box` and `diff`, and `covers`, the outline of the shut door, which the piece hides
+whole even where the picture kept some of its pixels. `export_scene.py` writes it beside
+the leaf's picture, `<name>-open-floor.webp`, and names it in art.json (`floors`); the page
+and the sweep draw it under every figure. Where the figures pass before the open leaf and
+none stands behind it, the door's settings say `"passed_before": true`: the leaf is not
+measured, and the scene's `lowered` and `nudged` cells say where a figure beside it and in
+its doorway is drawn. The forgotten room's side door is such a door.
+
 A door of chapters 1 and 2 is painted shut and open (D116): `doorways` and `swung`.
 
 ## A passage narrower than a cell
@@ -527,6 +538,14 @@ base's own; it says how many pixels it laid and that none differ outside the box
 writes `art/raw/game-check/lay-<name>.png`, the box enlarged with the mask's edge in
 magenta, to look at. The scene's `cut.json` names the new base as its `painting` and
 `ground`, and says what was laid (`laid`).
+
+A picture with two changes, like a door's open doorway and its leaf (D289), is laid in two
+runs, one box each: the second with `--from`, the picture the first one wrote, so that both
+changes end in one picture. `--diff` gives the difference its settings where the defaults
+take too little of the thing or too much round it. `--tone` scales the laid pixels' red,
+green and blue: a thing painted apart, lighter than the painting, is brought to the
+painting's light. The picture so laid may be a state of a thing and not the base: the
+forgotten room's door open is the state's `picture`, and the ground stays the painting.
 
 ## Where the cells are
 

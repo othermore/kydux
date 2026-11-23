@@ -4614,9 +4614,9 @@ one overturns stays, marked as superseded.
   below, behind the stone block, the wall in front, which is drawn over it
   (`room_door_jamb`, D104) and hides it up to the chest: it passes before the wall behind
   and the open leaf. On the landing a figure is drawn lower, its feet below the leaf's
-  foot, and passes before the leaf, drawn away from it by no one (`passed_before`). The
-  door rests closed (D104), so every level and story of the scene shows the painting as it
-  is. The door is a story's thing (`"art": "room_door"`); no level has it, and the arched
+  foot, and passes before the leaf; the leaf is not measured (D157) and moves no figure
+  away from it (`passed_before`). The door rests closed (D104), so every level and story
+  of the scene shows the painting as it is. The door is a story's thing (`"art": "room_door"`); no level has it, and the arched
   door in the room's back wall has no open state. In *Lo que trajo el familiar* Rinlo
   stands up, walks to the door, opens it, crosses the landing and goes down the stairs to
   their foot at (2, 8), walking out of sight there; in the next step he comes into sight

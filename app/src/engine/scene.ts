@@ -290,6 +290,8 @@ export interface SceneHandle {
   zoom(step: 1 | -1): boolean;
   /** Whether the camera can zoom one step in (1) or out (-1). */
   canZoom(step: 1 | -1): boolean;
+  /** Whether the scene is drawn still, its camera there to ask: false once destroyed. */
+  live(): boolean;
   /** A run played out: the wizard celebrates it when it is `won` (14.3); how long the
    * page waits before its card, the celebration and the words on the scene read to
    * their end, the longer of them (D175). */
@@ -3790,6 +3792,9 @@ export async function startScene(
         },
         canZoom(step) {
           return scene.canZoomBy(step);
+        },
+        live() {
+          return game !== null && scene.cameras?.main !== undefined;
         },
         wizardBox() {
           return scene.wizardBox();

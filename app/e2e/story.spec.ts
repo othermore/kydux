@@ -4,7 +4,7 @@
 
 import { readFileSync } from 'node:fs';
 import { expect, type Page, test } from '@playwright/test';
-import { seedWizard, storyNext, storySaid } from './helpers';
+import { finishStory, seedWizard, storyNext, storySaid } from './helpers';
 import { ciTimes } from './support';
 
 test.beforeEach(async ({ page }) => {
@@ -587,4 +587,19 @@ test("in The trail the familiar walks up into the hall's tunnel and comes out of
   await storyNext(page);
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
   await expect(scene).toHaveAttribute('data-actors', /(^|;)familiar:11,10,/);
+});
+
+test('a story with parts is read to its end with no page error, the zoom box asking no scene gone (2.12)', async ({
+  page,
+}) => {
+  test.setTimeout(ciTimes(300_000));
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/#story/what-the-familiar-brought');
+  await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await finishStory(page);
+  // Go on opens the next story, on its own scene.
+  await expect(page.locator('#story-title')).toHaveText('The end of the year');
+  await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  expect(errors).toEqual([]);
 });

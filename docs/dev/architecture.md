@@ -37,9 +37,10 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 D76), a painted thing drawn on the tile its level lays it on,
                 in its middle (shift.ts, D85, D109), a figure drawn on its
                 scene's painted strip (depth.ts, D105, D149), a speaker's bubble
-                clear of the other figures and of the goals box, and a thought
-                beside the head where there is no room above it (bubble.ts,
-                D240, D245), the camera's zoom with
+                clear of the other figures and of the goals box as far as its
+                tail still reaches the speaker's head, and a thought beside the
+                head where there is no room above it (bubble.ts, D240, D245,
+                D306), the camera's zoom with
                 the buttons and the wheel, and when a level's framing holds
                 (zooming.ts, D106, D201), the goal's
                 beating mark on the ground and the sealed doors' glow (D79,
@@ -359,7 +360,7 @@ tiles are `[x, y]`.
 | `stand` | in a story, an actor seated | | the figure is drawn standing from then on (D279) |
 | `sit` | in a story, an actor with the sitting rows | | the figure is drawn seated, the way it faces (D279) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved or told to pick up before its minka), `nothing`, `by` the familiar, its `pick_up` where nothing lies, which shakes it (D278), and the first year's warnings, `by` `orla`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, told as Orla's words (D264) and ending the run in a refusal |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved or told to pick up before its minka), `nothing`, `by` the familiar, its `pick_up` where nothing lies, which shakes it (D278), and the first year's warnings, `by` `orla`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, `one_familiar`, `two_familiars`, `one_class` (D297), `too_soon` (D301), `kind_kept` (D305), told as Orla's words (D264) and ending the run in a refusal |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `vanish` | in a story, an actor, or the wizard at the story's very end | | the figure fades out of sight (D74) |
 | `appear` | in a story, an actor | `at`; `from`, a cell beside it, when it steps out from behind a thing there | the figure comes into sight on its cell: walking out from `from`, behind what stands there, over the tick (D128), or fading in (D74) |
@@ -817,8 +818,10 @@ one overturns stays, marked as superseded.
   though the level does not need them, and the world lets them be used,
   rather than the notebook offering what the world then refuses. The
   notebook still shows only the objects the level holds: no door where
-  there is none, and the teacher only where the teacher is. A name the
-  course has not taught yet is shown nowhere.
+  there is none, and the teacher only where the teacher is; and an object
+  none of whose members is taught, as a plate before *Out of the circle*
+  (D299), is not listed and not offered. A name the course has not taught
+  yet is shown nowhere.
 - **D42 — Spells.** Decided 2026-10-21 (sprint-7.md), built the same day.
   A spell is a word, cast with the wand: `wizard.cast("<spell>")` is the
   wand's action (D27), and a spell that acts on a thing is given it too,
@@ -1348,8 +1351,12 @@ one overturns stays, marked as superseded.
   ways of three walking frames each. A door may be both sealed and keyed
   by a word, as the castle's is: it hears no word while its seal holds,
   so the spell comes first and the word after, and the door opens to the
-  word. Rules out building a scene's look from its map, and a word that
-  counts before the seal is broken.
+  word. An opening painted in a wall that a story's figure goes through is
+  a row's static cover of its stones alone, a polygon less the opening and
+  the floor or steps under it (`holes`), drawn over a figure on the rows
+  above it, so that the figure behind is seen through the opening alone and
+  the floor stays behind every figure (D307). Rules out building a scene's look from
+  its map, and a word that counts before the seal is broken.
 - **D77 — Two friends, and the one who teaches is of the other gender.**
   Decided 2026-10-24 by the owner (sprint 13, 13.1). The story has two
   first-year friends: Nuri, a girl, and Teku, a boy. The friend who meets
@@ -2366,7 +2373,8 @@ one overturns stays, marked as superseded.
   and looking at the wizard's position. Rules out a start the child remembers from the level
   before.
 - **D153 — The dark room teaches the two numbers of a position.** Decided 2026-11-08 by the
-  owner. A position's two numbers are its attributes `x` and `y` (`key.position.x`); the
+  owner. A position's two numbers are its attributes `x` and `y` (`key.position.x`), a
+  plate's too (`moon.position.x`, D299); the
   steps between two cells are the difference of their `x` and of their `y`, kept in two
   variables; a lesson *Las dos coordenadas* (`lesson:the-two-coordinates`) before *La sala
   oscura* recalls the system of coordinates and teaches it; the level is played in three
@@ -4082,6 +4090,7 @@ one overturns stays, marked as superseded.
     "trials": [[10, 7]],
     "methods": ["__init__"],
     "book": false,
+    "most": 1,
     "then": null,
     "draft": {"kind": "Fox", "name": "Pimu", "color": "red"}
   }
@@ -4091,7 +4100,8 @@ one overturns stays, marked as superseded.
   leaves the circle) or `living` (a level played with the familiar there); `circle` is the
   rectangle of cells inside the ring; `trials` the cells where a trial appears, in order;
   `methods` what a class may define; `book` whether the book tries the line that conjures the trial (D267);
-  `then` what follows a won run (D268); `draft` and, in a `living` level, `living` (`kind`,
+  `most` how many objects a program may make, 1 or 2, 1 when not said (D297);
+  `then` what follows a won run (D268), with the `way` its walker walks after (D302); `draft` and, in a `living` level, `living` (`kind`,
   `name`, `color`, `source`, `at`, `facing`) are the level's own defaults, so that any level
   plays alone (D49), the tests run it and `#level/<id>` opens it under `?debug`; the page
   writes the game's own over them before a run (D265). Rules out a `wizard.describe(...)`
@@ -4105,8 +4115,9 @@ one overturns stays, marked as superseded.
   and `other_name` (in the class's body), `go_to_not_yet` (a `go_to` before the level that
   teaches it), `not_a_familiar` (`minka` on an object of a class without `(Familiar)`:
   *`minka` solo llama a familiares, y tu clase no dice que lo sea*), `class_changed` (D269),
-  and `name_letters`, `name_long`, `name_taken`, a name Orla cannot write in the book (*no
-  puedo escribir «Pimu Dos» como nombre en el libro*); all are Orla's. A **flawed trial**
+  `name_letters`, `name_long`, `name_taken`, a name Orla cannot write in the book (*no
+  puedo escribir «Pimu Dos» como nombre en el libro*), `one_familiar`, `two_familiars` and
+  `one_class` (D297), `too_soon` (D301) and `kind_kept` (D305); all are Orla's. A **flawed trial**
   does not stop anything: a kind that is not of the first year gives a shapeless spark of
   light where the trial would stand, and Orla's words (`spark`); a colour that is not the
   kind's own gives the trial with no colour (`pale: true`, reason `colour`), Orla's words
@@ -4171,7 +4182,8 @@ one overturns stays, marked as superseded.
   [["orla", "won"], ["bimo", "bimo"]]}`, and said in that order after the goals. Someone
   painted into a scene speaks from a spot the scene names (`scene.json`, `"voices": {"bimo":
   [9, 3]}`); a story's `who` with no actor of that id speaks from the same spot. A warning
-  (D261) is told the same way, by Orla. Long words are said in pieces (D274). Rules out words of the
+  (D261) is told the same way, by Orla. Long words are said in pieces (D274); in the tick
+  of an order of Orla's the last piece, its command, holds nothing (D303). Rules out words of the
   story in the outcome card only, and a run that goes on under an unread bubble.
 - **D265 — The draft and the familiar are kept with the game, and written into the level.**
   Decided 2026-11-17 from the design. `Progress` has `familiar?: {draft?: {kind, name?,
@@ -4218,7 +4230,9 @@ one overturns stays, marked as superseded.
   {"on": "sun", "steps": [{"to": [13, 10], "key": "order_star"}, {"to": [11, 10], "key":
   "order_wizard"}]}`): for each, an `order` event with the line the world runs
   (`pimu.go_to(13, 10)`, then `pimu.go_to(11, 10)`) shown alone in the band (`order`), her
-  words (`told`, the order itself: *Pimu: ¡A la estrella!*), and the call of the child's `go_to`, its steps ticks as any (D270) with the child's lines
+  words (`told`, the order itself: *Pimu: ¡A la estrella!*), whose last piece holds
+  nothing, so that the familiar sets off as its bubble comes up (D303), and the call of
+  the child's `go_to`, its steps ticks as any (D270) with the child's lines
   inside `go_to` lit. An error inside is explained as the child's own and the goal stays
   unmet. Rules out a check of the program's text for `__init__` or `go_to`.
 - **D268 — The fourth level's program is rehearsed, and a familiar is born once.** Decided
@@ -4264,7 +4278,8 @@ one overturns stays, marked as superseded.
   nothing and costs nothing. `check_consistency` asks one acting event for each tick (the
   wizard's, a familiar's, or the world's own after the program) and that each one's steps
   follow on. A trial moves only in the `birth` level; before its `minka` a move is
-  `blocked`, `not_here`. The role `familiar` in `api.py`: `familiar.name`,
+  `blocked`, `not_here`. In a `trial` level a move, `pick_up` or `go_to` asked of a
+  familiar is stopped by Orla, `too_soon` (D301). The role `familiar` in `api.py`: `familiar.name`,
   `familiar.color`, `familiar.position` (`x`, `y`), `familiar.move_up`,
   `familiar.move_down`, `familiar.move_left`, `familiar.move_right`, `familiar.pick_up`
   (D278). A scene's terrain with `"walk": "small"` is entered by a familiar and not by the
@@ -4277,7 +4292,8 @@ one overturns stays, marked as superseded.
   as ever, nearest to the wizard first. A thing kind `trail` is a thread's end on the
   floor: not carried, walked over, found by no one. A thing kind `plate` lies in the
   floor, is walked over, and is lit when a familiar ends a move on it (the event `lit`,
-  the plate's state `lit`); the three plates' ids are `moon`, `sun` and `star`. Rules out
+  the plate's state `lit`); the three plates' ids are `moon`, `sun` and `star`, and their
+  role, `plate`, has `position` alone (D299). Rules out
   a familiar that moves without ticks and a wizard that sees through walls without it.
 - **D271 — The goals and the explanations of the chapter.** Decided 2026-11-17 by the
   designer. Goals (`goals.py`, each with its `params` for the page): `trial` (at the
@@ -4323,9 +4339,10 @@ one overturns stays, marked as superseded.
   any figure and comes out at 0.57 of a cell; its row to the right is the row to the left
   mirrored by the tool; a kind's other colours are edits of its first sheet. Others'
   creatures in a level or a story are actors of the kind `familiar` (`creature`, `color`,
-  `trial`, `spark`, or `"of": "mate"` for the room-mate's copy of the child's; a
-  `creature` given as a list is the first kind that is not the child's); the child's own
-  is `{"id": "familiar", "kind": "familiar"}` in a story. Orla has a walking sheet
+  `trial`, `spark`, `tries` and `drill` (D300), or `"of": "mate"` for the room-mate's copy
+  of the child's; a `creature` given as a list is the first kind that is not the child's);
+  the child's own is `{"id": "familiar", "kind": "familiar"}` in a story, drawn as the
+  game's kept familiar (D305). Orla has a walking sheet
   (`orla`, an adult) and Rinlo a sitting row, in which a story seats him and stands him up
   (D279). The thread's piece and the trail's end are sprites (D182). A level's plan is its
   scene's picture in ink (D143, D151). Rules out illustrations for the stories (D74), and
@@ -4353,7 +4370,9 @@ one overturns stays, marked as superseded.
   the tick of its first actions, which play under the bubble. It is for a figure's step
   that does something: `story_on_scene` refuses it on the voice's step, whose words
   already stand in the band while its actions play, and on a step with `"do": null`.
-  Rules out a second timeline for a story's words.
+  Who speaks under `meanwhile` may walk out of sight as the last of its actions, its
+  words said as the step begins; its bubble stays where it was last seen until the step
+  ends (D310). Rules out a second timeline for a story's words.
 - **D276 — A trial holds only with a name and a colour; one that does not fades in a
   few seconds.** Decided 2026-11-18 by the owner (*no debería de durar todo el rato,
   deberia desaparecer a los pocos segundos porque es una prueba y además no tiene color ni
@@ -4453,7 +4472,8 @@ one overturns stays, marked as superseded.
   historia*; *el cambio a por la tarde noche se peude hacer cuando se supone que los niños
   están contando la historia*). A step whose `scene` says `"later": true` opens after a
   passing of time: the scene fades to dark (`PASS_FADE`, 0.6 s), stays dark for a moment
-  (`PASS_DARK`, 0.8 s) while the part's staging is drawn, and comes back out of the dark
+  (`PASS_DARK`, 0.8 s, or the reading of the words its story gives the dark, D309) while
+  the part's staging is drawn, and comes back out of the dark
   (0.6 s), two seconds in all (`story.ts`, `.story-dark`); the band says nothing
   meanwhile, the step is played and its words open once the scene is back, and the music
   goes on. `later` is said only in a step's `scene` (`PART_STAGING`), and is true; the
@@ -4593,9 +4613,11 @@ one overturns stays, marked as superseded.
   it. A story's staging (`story_on_scene`) counts it floor: a figure of a story stands on
   it, walks over it, and a door of the story stands on it. The sweep counts it among the
   cells walked on. `the-tower-passage` has two such terrains: `l`, the landing outside the
-  forgotten room and the back stairs (`"kind": "wall", "sight": false`), on (2, 3) to
-  (5, 3) and (2, 4) to (2, 8); and `v`, the floor before the room's crates and stool
-  (`"kind": "furniture", "sight": true`), on (6, 3) and (7, 3). Rules out a level's cell
+  forgotten room and the back stairs down to the corridor's arch (`"kind": "wall",
+  "sight": false`), on (2, 3) to (5, 3) and (2, 4) to (2, 11); and `v`, the floor before
+  the room's crates and stool (`"kind": "furniture", "sight": true`), on (6, 3) and
+  (7, 3). `the-tower-hall` has `l` on (14, 1) to (14, 3), the familiars' tunnel behind its
+  mouth (D307). Rules out a level's cell
   opened to make room for a story, and a figure of a story staged on a wall.
 - **D289 — The forgotten room's side door opens, painted with Gemini, and Rinlo comes down
   the back stairs.** Decided 2026-11-19 and 2026-11-20 by the owner (*Rinlo tiene que
@@ -4784,3 +4806,131 @@ one overturns stays, marked as superseded.
   a seam; what is its own is the metre in three and the two flutes. A test holds it to
   its metre, its two flutes and the celesta's place. Rules out a sixth theme beside it as
   a candidate (D209), and a tune or a harmony taken from any other work (D192).
+- **D297 — One familiar a pupil at a time.** Decided 2026-11-22 by the owner (*si se
+  declaran varias clases o se crean varios objetos, Orla debería pararlo diciendo que cada
+  alumno solo debe crear un familiar cada vez, salvo en el capítulo en que se pide al mago
+  que cree el familiar para él y para su compañero […] Estas protecciones aplican a todos
+  los niveles, salvo que explícitamente necesitemos crear dos familiares*), and of the fix:
+  *En este nivel sí se permite crear dos familiares, pero solo dos. Si se crean más de dos
+  o si se hacen dos descripciones, Orla debe pararlo.* A level's `familiar` block says how
+  many objects a program may make, `most`: 1 when it is not said, 2 in *The slate*; only a
+  block of stage `trial` or `birth` says it, and its `trials` has a cell for each. The
+  object that goes over it is stopped by Orla at its line (`one_familiar`, or
+  `two_familiars`, one of *The slate*'s own words, which names the mate), and so is the
+  second class of a familiar a program writes (`one_class`); the object the book makes to
+  try a line is not counted. Rules out a second trial on a cell another holds, and a level
+  that takes more familiars without saying so.
+- **D298 — The notebook lists the first year's familiars.** Decided 2026-11-22 by the
+  owner (*se deberían listar los animales que puede crear un alumno de primero (y más
+  adelante, añadirle los colores posibles a cada uno, cuando se explique lo de los
+  colores)*). Where a familiar is described (a block of stage `trial` or `birth`), the
+  notebook's tab of actions has a section with the six kinds (`#notebook-familiars`), in
+  the table's order, each as code with its word and a button that writes it at the
+  cursor; each has its colours beside it, as code strings, from the level that teaches
+  `familiar.color` on. Rules out a colour told before colours are taught, and the
+  friend's grey.
+- **D299 — A plate has its position, and nothing else.** Decided 2026-11-22 by the owner
+  (*el cuaderno muestra los objetos sun, moon, star… no debería mostrarlos todavía, ya que
+  no hacen falta aún*, and *decirle que tiene tres objetos: sun, moon, star, y que los tres
+  objetos tienen su atributo position. Y no habría que poner nada más sobre esos objetos
+  en el cuaderno […] ni en el autocomplete*). A plate is a role of its own, `plate`, whose
+  one member is `position` (`MEMBERS["plate"]` in `api.py`), taught by *Out of the
+  circle*, whose starting code says so in a comment, as *Orla's orders* reminds it. Before
+  that level a plate has no member, and neither the notebook nor the completion shows it
+  (D40). Rules out a thing's other members on a plate.
+- **D300 — The hall's other pupils are at work.** Decided 2026-11-22 by the owner, of
+  *One line in the book* (*debería verse al compañero intentando lanzar hechizos que
+  fallan todo el rato […] a veces ese y a veces cualquier animal aleatorio, sin color o con
+  color, pero que desaparece a los pocos segundos*, and *a la amiga avanzada debería ya
+  vérsele dando órdenes a su animal […] que el animal se vaya moviendo solo una casilla,
+  sin salirse de su zona del círculo*). Both are the page's own show, on its clock: the
+  world's ticks, the goals and the run's `data-*` know nothing of them. The mate's tries
+  go on always: an actor with `"tries": true`, which the world reads as a spark, shows on
+  its cell the spark about one time in three, or one of the six kinds, pale or in one of
+  its colours, never the same picture twice running, each for about 2.5 s and gone. The
+  friend's orders play while no program runs: her familiar's `drill`, a loop of cells
+  inside the circle, each a step from the one before and back to its own cell, is walked
+  a step an order, each order her bubble (`ambient.*`). With less motion asked, the spark
+  stands and no order is said. What is shown is chosen by `engine/ambient.ts`, with no
+  Phaser in it, and drawn by `engine/hallshow.ts`; `#scene[data-ambient]` says what plays.
+  Rules out a show that changes what a run finds.
+- **D301 — A trial is not moved.** Decided 2026-11-22 by the owner (*debería pararlo Orla
+  simplemente, diciendo "aún es pronto para mover a tu animal, antes debes estar seguro de
+  que es el que quieres y debes decírmelo para que lo anote en el libro"*). In a level of
+  stage `trial`, a move, `pick_up` or `go_to` asked of a familiar is stopped by Orla with
+  those words (`too_soon`), whether the action is taught or not. Rules out the wizard's
+  thought about the circle there.
+- **D302 — A familiar born walks to the moon's plate, and two share it.** Decided
+  2026-11-22 by the owner (*cuando la amiga saca al familiar del círculo, lo debería llevar
+  al plato de la luna, no solo sacarlo (va por delante justo un nivel)*), and of the
+  mate's: *también debería llevarse a la luna […] al llegar el segundo le hace hueco al
+  primero desplazándose un poco dentro de la casilla de la luna*. A block's `then` takes a
+  `way`, a list of corners walked after the step out of the circle, a cell a tick, each
+  leg straight over cells a familiar walks and no other actor holds, lighting the plate
+  it ends on. The walker of a `then` may end on the cell the child's familiar holds; the
+  page draws the two side by side on it, a quarter of a cell each side of its middle, the
+  one there sliding over as the other comes (`data-shared`). Rules out two familiars drawn
+  one over the other.
+- **D303 — An order's command does not hold the run.** Decided 2026-11-22 by the owner
+  (*entre que el familiar va al sol y que Orla lo manda a la estrella, hay una pausa
+  demasiado grande. Tiene que ser una pausa un poco más pequeña.*). In the tick of an
+  order, the last piece of Orla's words, the command, holds nothing: the familiar sets off
+  as its bubble comes up, and the bubble stays for its reading (`toldHold` in
+  `playback.ts`). The pieces before it hold as words do (D264, D274).
+- **D304 — A plate's figure reads unlit.** Decided 2026-11-22 by the owner (*el sol y la
+  estrella no se ven mucho cuando no están iluminados. ¿Podemos aumentar el contraste
+  (hacer la figura un poco más oscura, como la de la luna)?*). The sun's and the star's
+  engravings are painted as dark on the brass as the moon's, by Gemini, on a close crop of
+  each plate, in the day's ground and the sunset's, and joined in the plate's outline, the
+  floor round it the painting's own. The lit pictures cover them whole. Rules out an
+  engraving darkened by a filter.
+- **D305 — The game's familiar is in its stories, and is kept for good.** Decided
+  2026-11-22 by the owner (*Debería saber el animal que he conjurado en el momento en el
+  que lo saco del círculo, ahí ya se debe quedar recordado y usarlo en la historia y además
+  obligar a que ya el animal que se usa siempre sea ese (si se cambia en un nivel
+  posterior, debe fallar diciendo que ya has conjurado y sacado del círculo a un X y que
+  debes seguir con eso)*). A story's figure of the familiar is the game's kept one, its
+  kind and its colour, in every part: the page gives it to each part's world before its
+  scene starts. In a living level a class of another kind is stopped by Orla with words
+  that name the kind kept (`kind_kept`). Rules out the table's default in a game with a
+  familiar.
+- **D306 — A bubble's tail is over who speaks.** Decided 2026-11-22 by the owner (*sale
+  como un globo que dice el mago principal, en lugar de decirlo Nuri*). A bubble's box is
+  moved off other figures only as far as its tail still reaches the one who speaks
+  (`bubbleShift`, `bubbleReach` in `bubble.ts`): the tail's tip is over the speaker's
+  head, always. Where the two cannot both be had, the tail wins and the box covers what it
+  must.
+- **D307 — A figure goes through a painted opening behind its stones.** Decided
+  2026-11-22 by the owner, of the familiars' tunnel (*se debe meter por el túnel y
+  desaparecer dentro porque sigue subiendo y sale fuera de la vista, en lugar de
+  desaparecer en plan "desvanecerse" en la puerta del túnel. Y luego al aparecer,
+  igual*), and of the passage's arch (*debería cruzar el arco (que debe tener máscara para
+  que funcione) y quedarse ahí*). An opening painted in a wall that a story's figure goes
+  through has story-walked cells behind it (D288) and a cover cut from the painting, its
+  stones without its opening (D76): the hall's tunnel, on (14, 1) to (14, 3), under a
+  cover of row 3; the passage's back stairs down to the arch, on (2, 9) to (2, 11), under
+  a cover of row 12. The figure walks; it never fades at a wall. The covers are a tool's
+  cut of the painting (the owner's rule on masks), not a new painting.
+- **D308 — A story says which way its wizard faces.** Decided 2026-11-22 by the owner
+  (*Deberían estar desde el principio, cuando aparece la escena, mirando a Orla*). A
+  story, and a part of one, takes `facing` beside `wizard`, one of the four and `down`
+  where it has none (D286). Rules out a first frame that a `face` then corrects.
+- **D309 — Words on the dark between two parts.** Decided 2026-11-22 by the owner (*Puede
+  aparecer en un texto en caja blanca como los de los diálogos pero sin triángulo de
+  diálogos, en la pantalla negra […] de transición*). A `later` part may have words: its
+  story's text gives them under `later`, by the number of the step that opens the part,
+  counted from 1. They show in the middle of the dark (`#story-dark-words`), in a
+  bubble's box with no tail, and the dark waits for their reading.
+- **D310 — The wizard may leave a part out of sight.** Decided 2026-11-22 by the owner, of
+  *The tower* (*adentrándose igual en la oscuridad*), and of its dormitory (*desaparecer
+  por la izquierda del escenario*). In the last step of a part, before a `scene`, the
+  wizard may walk out of sight as in a story's last step, and so may the one who speaks
+  under `meanwhile` (D275), as its last action; its bubble stays where it was last seen
+  until the step ends.
+- **D311 — The first year is the three friends.** Decided 2026-11-22 by the owner (*Solo
+  hay tres alumnos de primero que son los tres amigos*; *Cuando digo se ve a los alumnos
+  salir me refiero a los tres amigos. No hay más alumnos de primero.*). The wizard, the
+  friend and the mate are the whole first year: no story, level or text shows or names
+  another first-year, and the pupils seen leaving the first-years' dormitory are those
+  three. A walk-on pupil (`classmate_boy`, `classmate_girl`) is of another year, as the
+  second-years of *The flying lesson* are.

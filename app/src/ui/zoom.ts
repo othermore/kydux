@@ -27,9 +27,14 @@ export function zoomBox(sceneParent: HTMLElement, { story = false } = {}): ZoomB
     { id: 'find-wizard', type: 'button', className: 'zoom-button find-wizard', hidden: true },
     [t('level.find_wizard')],
   );
+  /** The scene while its camera is there: none once it is gone, as a story changes its
+   * part and before the next is attached. */
+  const live = () => (scene?.live() ? scene : null);
   const refresh = () => {
-    zoomIn.disabled = !(scene?.canZoom(1) ?? true);
-    zoomOut.disabled = !(scene?.canZoom(-1) ?? true);
+    const shown = live();
+    if (scene && !shown) return;
+    zoomIn.disabled = !(shown?.canZoom(1) ?? true);
+    zoomOut.disabled = !(shown?.canZoom(-1) ?? true);
   };
   const relabel = () => {
     for (const [button, words] of [
@@ -43,14 +48,14 @@ export function zoomBox(sceneParent: HTMLElement, { story = false } = {}): ZoomB
   };
   relabel();
   zoomIn.addEventListener('click', () => {
-    scene?.zoom(1);
+    live()?.zoom(1);
     refresh();
   });
   zoomOut.addEventListener('click', () => {
-    scene?.zoom(-1);
+    live()?.zoom(-1);
     refresh();
   });
-  findWizard.addEventListener('click', () => scene?.follow());
+  findWizard.addEventListener('click', () => live()?.follow());
   new MutationObserver(() => {
     findWizard.hidden = story ? sceneParent.dataset.dragged !== 'true' : sceneParent.dataset.following !== 'false';
     // The wheel zooms too: the buttons say where it can go from there.

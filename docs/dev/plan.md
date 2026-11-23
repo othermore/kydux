@@ -749,7 +749,16 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     game's own name (D290), the name a game takes from its wizard (D291), and a
     wizard's gender and look chosen once (D292); and, in `sprint-58.md`, one start
     screen with the saved games in a box on it (D293), over a painting of the castle
-    with the school's people at its sides (D294).
+    with the school's people at its sides (D294); and, in `sprint-59.md`, one familiar
+    a pupil at a time (D297), the first year's familiars in the notebook (D298), a
+    plate with its position alone (D299), the hall's other pupils at work (D300), a
+    trial that is not moved (D301), the familiars born walking to the moon's plate and
+    sharing it (D302), an order's command that does not hold the run (D303), the
+    plates' figures that read unlit (D304), the game's familiar in its stories and kept
+    for good (D305), a bubble's tail over who speaks (D306), a figure going through a
+    painted opening behind its stones (D307), the way a story's wizard faces (D308),
+    words on the dark between two parts (D309), a part left out of sight (D310), and
+    the first year that is the three friends (D311).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

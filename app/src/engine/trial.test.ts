@@ -1,5 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { blurred, goodTrial, type Pixels, paleTrial, spread, trialLines, trialSheet } from './trial';
+import {
+  blurred,
+  goodTrial,
+  type Pixels,
+  paleTrial,
+  spread,
+  TRIAL_FADE_MS,
+  TRIAL_SEEN_MS,
+  TRIAL_STAGED_SEEN_MS,
+  trialLeft,
+  trialLines,
+  trialSheet,
+  trialShown,
+  trialTime,
+} from './trial';
 
 /** A figure on a frame: a white body with a dark outline, on nothing. */
 function figure(width = 40, height = 40, colour: [number, number, number] = [250, 250, 250]): Pixels {
@@ -62,5 +76,30 @@ describe('a trial drawn from the figure (D263)', () => {
     const soft = blurred(plane, 5, 5, 1);
     expect(soft[12]).toBeLessThan(1);
     expect(soft[11]).toBeGreaterThan(0);
+  });
+});
+
+describe("a trial that does not hold, by the page's clock (D276, D285)", () => {
+  /** The milliseconds a trial has left after `ms` of the page's clock at `speed`, in frames of 16. */
+  const after = (staged: boolean, ms: number, speed: number) => {
+    let left = trialTime(staged);
+    for (let spent = 0; spent < ms; spent += 16) left = trialLeft(left, Math.min(16, ms - spent), speed, staged);
+    return left;
+  };
+
+  it('staged with no colour, is whole at nine seconds after the card at speed 4 and gone at eleven and a quarter', () => {
+    expect(trialTime(true)).toBe(TRIAL_STAGED_SEEN_MS + TRIAL_FADE_MS);
+    expect(trialShown(after(true, 9_000, 4))).toBe(1);
+    expect(trialShown(after(true, 10_500, 4))).toBeCloseTo(0.5);
+    expect(after(true, 11_250, 4)).toBeLessThanOrEqual(0);
+    expect(trialShown(after(true, 11_250, 4))).toBe(0);
+  });
+
+  it('called in a run, is gone in a second and a quarter at speed 4, and in five at the normal speed', () => {
+    expect(trialTime(false)).toBe(TRIAL_SEEN_MS + TRIAL_FADE_MS);
+    expect(trialShown(after(false, 900, 4))).toBe(1);
+    expect(after(false, 1_250, 4)).toBeLessThanOrEqual(0);
+    expect(trialShown(after(false, 4_000, 1))).toBe(1);
+    expect(after(false, 5_000, 1)).toBeLessThanOrEqual(0);
   });
 });

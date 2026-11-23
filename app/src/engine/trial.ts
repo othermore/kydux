@@ -6,8 +6,10 @@
 // with the floor seen through, over a soft shade that lifts the lines off a pale floor,
 // and with no edge of light: beside a white creature's trial, full and glowing, it is a
 // hollow drawing, at the game's size as well. The scene makes its light tremble. The
-// numbers are given at 200 pixels a cell and scaled to the sheet's cell.
-// Pure pixels, with no Phaser: the scene turns them into textures.
+// numbers are given at 200 pixels a cell and scaled to the sheet's cell. A trial that
+// does not hold is seen a few seconds of the page's clock and then fades (D276, D285).
+// Pure pixels and numbers, with no Phaser: the scene turns them into textures and
+// sprites.
 
 /** An image's pixels, RGBA, straight alpha, row by row. */
 export interface Pixels {
@@ -43,6 +45,35 @@ export const PALE = {
   line: [255, 255, 255] as const,
   halos: [{ size: 13, blur: 4, colour: [60, 40, 30] as const, strength: 0.55 }],
 };
+
+/** How long a trial that does not hold is seen before it fades, and how long it takes to
+ * fade, in milliseconds of the page's clock and not in ticks: a trial called in a run is
+ * seen TRIAL_SEEN_MS at the normal speed, shorter as the speed is higher (D276); a trial
+ * staged with no colour is seen TRIAL_STAGED_SEEN_MS from the start card's close,
+ * whatever the speed, since the speed is a run's and the staged trial was called before
+ * any run (D285). */
+export const TRIAL_SEEN_MS = 4000;
+export const TRIAL_STAGED_SEEN_MS = 10000;
+export const TRIAL_FADE_MS = 1000;
+
+/** The milliseconds a trial that does not hold has left, seen and fading, when it comes:
+ * staged or called in a run. */
+export function trialTime(staged: boolean): number {
+  return (staged ? TRIAL_STAGED_SEEN_MS : TRIAL_SEEN_MS) + TRIAL_FADE_MS;
+}
+
+/** The milliseconds a fading trial has left after a frame of `delta` milliseconds played
+ * at `speed`: a staged trial spends the page's plain clock, a called one the clock times
+ * the speed (D276, D285). A paused run spends nothing; the scene does not ask. */
+export function trialLeft(left: number, delta: number, speed: number, staged: boolean): number {
+  return left - (staged ? delta : delta * speed);
+}
+
+/** How much of its alpha a fading trial is drawn with, `left` milliseconds left: whole
+ * until its fade, then less and less over TRIAL_FADE_MS, nothing once it is gone. */
+export function trialShown(left: number): number {
+  return Math.max(0, Math.min(1, left / TRIAL_FADE_MS));
+}
 
 /** How a pale trial trembles (D263): a pixel of its sheet to each side, about eight
  * times a second. */

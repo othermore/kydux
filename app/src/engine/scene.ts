@@ -75,7 +75,7 @@ import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';
 import { type CreatureLook, type Layout, layout, type PlanView, towards } from './layout';
 import { familiarTable, firstSheet, sheetOf } from '../content/familiar';
-import { type Pixels, TREMBLE_MS, TREMBLE_PX, trialSheet } from './trial';
+import { type Pixels, TREMBLE_MS, TREMBLE_PX, trialLeft, trialSheet, trialShown, trialTime } from './trial';
 import { DEFAULT_LOOK, type Look } from './looks';
 import {
   actorKey,
@@ -258,10 +258,6 @@ const SPARK_KEY = 'spark';
  * steps at speed 1 are each heard, at twice the speed one in two, at four times one in
  * three. */
 const PAW_GAP = 120;
-/** How long a trial that does not hold is seen before it fades, and how long it takes to
- * fade, in milliseconds at speed 1, by the page's clock and not by ticks (D276). */
-export const TRIAL_SEEN_MS = 4000;
-export const TRIAL_FADE_MS = 1000;
 
 export { type Art, type FigureArt, loadArt, type SceneArt } from './painted';
 
@@ -841,7 +837,7 @@ class LevelScene extends Phaser.Scene {
       if (actor.creature) this.creatures.set(actor.id, actor.creature);
       // A trial staged with no colour does not hold (D276).
       if (actor.creature?.look === 'pale') {
-        this.fading.set(actor.id, { left: TRIAL_SEEN_MS + TRIAL_FADE_MS, alpha: sprite.alpha, tick: 0, staged: true });
+        this.fading.set(actor.id, { left: trialTime(true), alpha: sprite.alpha, tick: 0, staged: true });
       }
       if (actor.sitting) {
         this.sitting.add(sprite);
@@ -2843,13 +2839,11 @@ class LevelScene extends Phaser.Scene {
     this.startClosed = true;
   }
 
-  /** Each trial that does not hold, seen for TRIAL_SEEN_MS of the page's clock at the
-   * normal speed and then fading in TRIAL_FADE_MS (D276): the seconds shorter as the
-   * speed is higher, waiting while the run is paused, a staged one's waiting for the
-   * start card to close. */
+  /** Each trial that does not hold, seen and then fading (`trialLeft`, D276, D285): a
+   * called one's seconds shorter as the speed is higher, a staged one's the page's plain
+   * clock from the start card's close; both waiting while the run is paused. */
   private fadeTrials(delta: number): void {
     if (this.fading.size === 0 || this.playback.state === 'paused') return;
-    const spent = delta * this.playback.speed;
     for (const [id, trial] of this.fading) {
       if (trial.staged && !this.startClosed) continue;
       const sprite = this.actors.get(id)?.sprite;
@@ -2857,9 +2851,10 @@ class LevelScene extends Phaser.Scene {
         this.fading.delete(id);
         continue;
       }
-      trial.left -= spent;
+      trial.left = trialLeft(trial.left, delta, this.playback.speed, trial.staged);
       if (trial.left <= 0) this.trialGone(id);
-      else if (trial.left < TRIAL_FADE_MS) sprite.setAlpha(trial.alpha * (trial.left / TRIAL_FADE_MS));
+      // Whole until its fade, which the tween of its coming leaves alone.
+      else if (trialShown(trial.left) < 1) sprite.setAlpha(trial.alpha * trialShown(trial.left));
     }
   }
 
@@ -2880,7 +2875,7 @@ class LevelScene extends Phaser.Scene {
   private trialStepped(id: string, tick: number): void {
     const trial = this.fading.get(id);
     if (!trial) return;
-    trial.left = TRIAL_SEEN_MS + TRIAL_FADE_MS;
+    trial.left = trialTime(trial.staged);
     trial.tick = tick;
     this.actors.get(id)?.sprite.setAlpha(trial.alpha);
   }
@@ -2942,7 +2937,7 @@ class LevelScene extends Phaser.Scene {
         this.called.add(id);
         // A trial with no name the book took, or no colour of its kind, fades (D276).
         if (data.holds !== true) {
-          this.fading.set(id, { left: TRIAL_SEEN_MS + TRIAL_FADE_MS, alpha: sprite.alpha, tick, staged: false });
+          this.fading.set(id, { left: trialTime(false), alpha: sprite.alpha, tick, staged: false });
         }
         if (!instant) {
           const alpha = sprite.alpha;

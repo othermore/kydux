@@ -4344,16 +4344,16 @@ one overturns stays, marked as superseded.
   is how long a trial is seen, and nothing else: the world's circle, the cell a trial
   takes, the dissolving of a cell's earlier trial, the goal `trial` and the words told are
   as they are. The page draws a trial that does not hold as D263 says, for four seconds of
-  its own clock at the normal speed (`TRIAL_SEEN_MS`, `scene.ts`), and then lets it fade
+  its own clock at the normal speed (`TRIAL_SEEN_MS`, `trial.ts`), and then lets it fade
   in one (`TRIAL_FADE_MS`), as the spark goes out by itself. The seconds are the page's and
   not ticks, since the playback holds a tick while words are read (D264); they are shorter
   as the speed is higher, they wait while the run is paused, and where a trial steps (the
   birth's level) they are counted from its last step. A trial that holds stands until the
   run is cleared. A staged trial (an actor with `trial`) holds when it is staged with its
   colour: its master has named it. Staged with none, it is seen when the level opens, its
-  seconds start when the start card closes (`SceneHandle.cardClosed`), and it does not
-  come back when a run starts again in that visit. Drawn at once on a later tick than it
-  came or last stepped in (the timeline, a run shown ended), a trial that does not hold
+  seconds start when the start card closes (`SceneHandle.cardClosed`) and are D285's,
+  and it does not come back when a run starts again in that visit. Drawn at once on a
+  later tick than it came or last stepped in (the timeline, a run shown ended), a trial that does not hold
   is not there; a `dissolved` of a trial already faded shows nothing. `data-trials` lists
   the trials seen: one faded leaves it. Rules out a trial with no name or no colour that
   stands for the whole level, a fade counted in ticks, and a world that forgets a trial
@@ -4527,3 +4527,15 @@ one overturns stays, marked as superseded.
   level with the head, on the side away from the circle (`bubbleBeside`): Orla's words at
   the win of *El círculo* to her right. What Orla and Bimo speak about is seen while they
   speak. Rules out a bubble over the trial it tells about.
+- **D285 — A staged trial with no colour is seen ten seconds from the start card's close,
+  whatever the speed.** Decided 2026-11-19 by the owner (*No llego a ver la criatura de
+  Teku. Deben aguantar suficiente tiempo antes de desvanecerse, para que se vea aquí*). A
+  trial staged with no colour (D276) is what the level's card points at, and the child
+  must find it in the circle after closing the card. It is seen for ten seconds of the
+  page's clock from the start card's close (`TRIAL_STAGED_SEEN_MS`, `trial.ts`) and then
+  fades in one (`TRIAL_FADE_MS`). The speed does not shorten them: the speed is a run's,
+  and the staged trial was called before any run. It waits while a run is paused, and it
+  does not come back when a run starts again in that visit, as D276 says. A trial called
+  in a run keeps D276's four seconds, shorter as the speed is higher. The walkthrough's
+  start picture of *El círculo* shows the hare. Rules out a staged trial gone before the
+  child has looked at the scene, and one that stands the whole level.

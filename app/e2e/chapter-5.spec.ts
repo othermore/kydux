@@ -267,7 +267,7 @@ test.describe('the trials that hold and those that fade (D276)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
-  test("the circle's hare with no colour fades after the card, and the child's fox while Orla speaks", async ({ page }) => {
+  test("the circle's hare with no colour is seen ten seconds after the card at any speed, and the child's fox fades while Orla speaks", async ({ page }) => {
     test.setTimeout(ciTimes(180_000));
     await page.goto('/#level/the-circle');
     // Behind the card, the friend's trial alone, a drawing with no colour.
@@ -279,14 +279,20 @@ test.describe('the trials that hold and those that fade (D276)', () => {
     await watchTrials(page);
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
-    await expect(scene(page)).not.toHaveAttribute('data-trials', /friend_familiar/, { timeout: ciTimes(12_000) });
+    // The fastest speed does not shorten them (D285): three seconds after the card's
+    // close the hare is still seen, and it leaves ten seconds and its fade after.
+    await page.locator('#speed').selectOption('4');
+    await page.waitForTimeout(3_000);
+    await expect(scene(page)).toHaveAttribute('data-trials', /friend_familiar:pale:Hare:/);
+    await expect(scene(page)).not.toHaveAttribute('data-trials', /friend_familiar/, { timeout: ciTimes(15_000) });
     const hare = seenFor(await trialsSeen(page), 'friend_familiar');
-    // Some four seconds and its fade, at the normal speed, counted from the card's close.
+    // Counted from before the card's close.
     expect(hare).not.toBeNull();
-    expect(hare as number).toBeGreaterThan(4_000);
-    expect(hare as number).toBeLessThan(ciTimes(8_000));
+    expect(hare as number).toBeGreaterThan(10_500);
+    expect(hare as number).toBeLessThan(ciTimes(13_500));
 
     // The solution at the normal speed: the fox comes, Orla speaks, the fox fades.
+    await page.locator('#speed').selectOption('1');
     await watchTrials(page);
     expect(await run(page, solution('the-circle'))).toMatch(/^¡Lo has conseguido/);
     const seen = await trialsSeen(page);

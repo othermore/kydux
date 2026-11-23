@@ -2219,6 +2219,23 @@ a.stop-body:focus-visible {
   gap: 6px;
 }
 
+/* Play is the row's first button, of the size of the one beside it. */
+.game-buttons .big-button {
+  font-size: inherit;
+}
+
+/* In a narrow window the buttons go under what the game is. */
+@media (max-width: 640px) {
+  .game {
+    flex-wrap: wrap;
+  }
+
+  .game-buttons {
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
+}
+
 /* The map over a level (D71): the level stays under it, as it was. */
 .map-overlay {
   position: fixed;

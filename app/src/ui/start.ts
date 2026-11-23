@@ -67,7 +67,7 @@ function gamesList(saved: SavedGame[], parts: StartScreenParts, redraw: () => vo
     const wizard = game.progress.wizard as Wizard;
     const name = game.name ?? wizard.name;
     const figure = portrait(`wizard-${wizard.look}`, 'small');
-    const play = element('button', { type: 'button', className: 'play' }, [t('start.play')]);
+    const play = element('button', { type: 'button', className: 'big-button play' }, [t('start.play')]);
     play.addEventListener('click', () => {
       progress.chooseGame(game.id);
       parts.onChanged();
